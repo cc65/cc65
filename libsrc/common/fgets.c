@@ -22,7 +22,7 @@ char* fgets (char* s, unsigned size, FILE* f)
 
        	/* Get next character */
        	c = fgetc (f);
-       	if (c == -1) {
+       	if (c == EOF) {
        	    s [i] = 0;
        	    /* Error or EOF */
        	    if (f->f_flags & _FERROR) {

@@ -6,34 +6,37 @@
 
 
        	.export		__fdesc
-	.import		return0, __filetab
-	.importzp	tmp1
+	.import		return0
 
-__fdesc:
-	ldy	#0
-L1:	lda	__filetab+1,y	; load flags
-	beq    	L2		; jump if empty (== CLOSED)
-	iny
-	iny
-	cpy	#16		; Done?
-	bne	L1
+        .include        "_file.inc"
+
+.proc   __fdesc
+
+       	ldy	#0
+        lda     #_FOPEN
+Loop:  	and    	__filetab + _FILE_f_flags,y     ; load flags
+       	beq    	Found		                ; jump if closed
+.repeat ::_FILE_size
+      	iny
+.endrepeat
+       	cpy    	#(FOPEN_MAX * _FILE_size)       ; Done?
+      	bne	Loop
 
 ; File table is full
 
-	jmp	return0
+      	jmp	return0
 
-; Free slot found
+; Free slot found, get address
 
-L2:    	sty	tmp1		; Offset
-	lda	#<__filetab
-	ldx	#>__filetab
-	clc
-	adc	tmp1
-	tay
-	txa
-	adc	#0
-	tax
-	tya
-	rts
+Found:  tya                     ; Offset
+        clc
+        adc     #<__filetab
+        ldx     #>__filetab     ; High byte
+        bcc     @L1             ; Jump if no overflow
+        inx                     ; Bump high byte
+@L1:    rts
+
+.endproc
+
 
 

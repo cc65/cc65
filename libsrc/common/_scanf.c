@@ -1,15 +1,18 @@
 /*
  * _scanf.c
  *
- * (C) Copyright 2001 Ullrich von Bassewitz (uz@cc65.org)
+ * (C) Copyright 2001-2002 Ullrich von Bassewitz (uz@cc65.org)
  *
- * This is the basic layer for all scanf type functions.
+ * This is the basic layer for all scanf type functions. It should get
+ * rewritten in assembler at some time in the future, so most of the code
+ * is not as elegant as it could be.
  */
 
 
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 #include <setjmp.h>
 #include <ctype.h>
 #include <limits.h>
@@ -49,12 +52,56 @@ static unsigned char	Positive;  	/* Flag for positive value */
 static unsigned char 	NoAssign;	/* Supppress assigment */
 static unsigned char	IsShort;    	/* Short type */
 static unsigned char	IsLong;     	/* Long type */
+static unsigned char    Invert;         /* Do we need to invert the charset? */
+static unsigned char    CharSet[32];    /* 32 * 8 bits = 256 bits */
+static const unsigned char Bits[8] = {
+    0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+};
 
 
 
 /*****************************************************************************/
-/*  		       		Character sets				     */
+/*  		       	    	Character sets				     */
 /*****************************************************************************/
+
+
+
+static void AddCharToSet (unsigned char C)
+/* Set the given bit in the character set */
+{
+    asm ("ldy #%o", C);
+    asm ("lda (sp),y");
+    asm ("lsr a");
+    asm ("lsr a");
+    asm ("lsr a");
+    asm ("tax");
+    asm ("lda (sp),y");
+    asm ("and #$07");
+    asm ("tay");
+    asm ("lda %v,y", Bits);
+    asm ("ora %v,x", CharSet);
+    asm ("sta %v,x", CharSet);
+}
+
+
+
+static unsigned char IsCharInSet (unsigned char C)
+/* Check if the given char is part of the character set */
+{
+    asm ("ldy #%o", C);
+    asm ("lda (sp),y");
+    asm ("lsr a");
+    asm ("lsr a");
+    asm ("lsr a");
+    asm ("tax");
+    asm ("lda (sp),y");
+    asm ("and #$07");
+    asm ("tay");
+    asm ("lda %v,y", Bits);
+    asm ("and %v,x", CharSet);
+    asm ("ldx #$00");
+    return __AX__;
+}
 
 
 
@@ -126,7 +173,6 @@ static void ReadInt (unsigned char Base)
     /* Read the value */
     IntVal = 0;
     while (isxdigit (C) && Width-- > 0) {
-	printf ("ReadInt: '%c'\n", C);
        	IntVal = IntVal * Base + HexVal (C);
 	ReadChar ();
     }
@@ -170,6 +216,7 @@ int _scanf (struct indesc* D_, const char* format, va_list ap_)
     char*	  S;
     unsigned char Base;	      	/* Integer base in %i */
     unsigned char HaveWidth;	/* True if a width was given */
+    char          Start;        /* Start of range */
 
     /* Place copies of the arguments into global variables. This is not very
      * nice, but on a 6502 platform it gives better code, since the values
@@ -186,7 +233,6 @@ int _scanf (struct indesc* D_, const char* format, va_list ap_)
      * is reached.
      */
     Result = setjmp (JumpBuf);
-    printf ("Result = %u\n", Result);
     if (Result == RC_OK) {
 
 Again:
@@ -219,10 +265,9 @@ Again:
 	    	    /* A mismatch. We will stop scanning the input and return
 	    	     * the number of conversions.
 	    	     */
-	    	    printf ("F = '%c', C = '%c' --> mismatch\n", F, C);
 	    	    return Conversions;
 
-	    	} else {
+    	    	} else {
 
 	    	    /* A match. Read the next input character and start over */
 	    	    goto Again;
@@ -253,11 +298,11 @@ Again:
     	    	     	} while (isdigit (F));
     	    	    } else {
     	    	     	switch (F) {
-    	    	     	    case '*':	NoAssign = 1;	break;
+    	    	     	    case '*': 	NoAssign = 1;	break;
     	    	     	    case 'h':	IsShort = 1;	break;
     	    	     	    case 'l':
     	    	     	    case 'L':	IsLong = 1;	break;
-    	    	     	    default: 	goto FlagsDone;
+    	    	     	    default:  	goto FlagsDone;
     	    	     	}
     	    		F = *format++;
     	    	    }
@@ -265,7 +310,6 @@ Again:
 FlagsDone:
 
     		/* Check for the actual conversion character */
-		printf ("F = '%c'\n", F);
     		switch (F) {
 
      		    case 'D':
@@ -291,8 +335,8 @@ FlagsDone:
 			 	case 'x':
 			 	case 'X':
 			 	    Base = 16;
-			 	    ReadChar();
-			 	    break;
+			    	    ReadChar();
+			    	    break;
 			 	default:
 			 	    Base = 8;
 			    }
@@ -308,7 +352,7 @@ FlagsDone:
 
       	      	    case 'o':
       	      	  	/* Unsigned octal integer */
-			SkipWhite ();
+    			SkipWhite ();
       	      	    	ReadInt (8);
 			AssignInt ();
       	      		break;
@@ -351,8 +395,9 @@ FlagsDone:
 			/* Terminate the string just read */
 			if (!NoAssign) {
 			    *S = '\0';
-			}
-			break;
+    			}
+                        ++Conversions;
+    			break;
 
 		    case 'c':
 			/* Fixed length string, NOT zero terminated */
@@ -362,28 +407,108 @@ FlagsDone:
 			}
 			if (!NoAssign) {
 			    S = va_arg (ap, char*);
-			}
-			while (Width--) {
-			    if (!NoAssign) {
-			     	*S++ = C;
-			    }
-			    ReadChar ();
-			}
+                            while (Width--) {
+                                *S++ = C;
+                                ReadChar ();
+                            }
+			} else {
+                            /* Just skip as many chars as given */
+                            while (Width--) {
+                                ReadChar ();
+                            }
+                        }
 			++Conversions;
 			break;
 
 		    case '[':
 			/* String using characters from a set */
+                        Invert = 0;
+                        /* Clear the set */
+                        memset (CharSet, 0, sizeof (CharSet));
+                        F = *format++;
+                        if (F == '^') {
+                            Invert = 1;
+                            F = *format++;
+                        }
+                        if (F == ']') {
+                            AddCharToSet (']');
+                            F = *format++;
+                        }
+                        /* Read the characters that are part of the set */
+                        while (F != ']' && F != '\0') {
+                            if (*format == '-') {
+                                /* A range. Get start and end, skip the '-' */
+                                Start = F;
+                                F = *++format;
+                                ++format;
+                                if (F == ']') {
+                                    /* '-' as last char means: include '-' */
+                                    AddCharToSet (Start);
+                                    AddCharToSet ('-');
+                                } else if (F != '\0') {
+                                    /* Include all chars in the range */
+                                    while (1) {
+                                        AddCharToSet (Start);
+                                        if (Start == F) {
+                                            break;
+                                        }
+                                        ++Start;
+                                    }
+                                    /* Get next char after range */
+                                    F = *format++;
+                                }
+                            } else {
+                                /* Just a character */
+                                AddCharToSet (F);
+                                /* Get next char */
+                                F = *format++;
+                            }
+                        }
+
+                        /* Invert the set if requested */
+                        if (Invert) {
+                            for (Start = 0; Start < sizeof (CharSet); ++Start) {
+                                CharSet[Start] ^= 0xFF;
+                            }
+                        }
+
+                        /* We have the set in CharSet. Read characters and
+                         * store them into a string while they are part of
+                         * the set.
+                         */
+			if (!NoAssign) {
+			    S = va_arg (ap, char*);
+                            while (IsCharInSet (C) && Width--) {
+                                *S++ = C;
+                                ReadChar ();
+                            }
+                            *S = '\0';
+                        } else {
+                            while (IsCharInSet (C) && Width--) {
+                                ReadChar ();
+                            }
+                        }
+                        ++Conversions;
 			break;
 
      		    case 'p':
-     			/* Pointer */
+     			/* Pointer, format is 0xABCD */
+			SkipWhite ();
+			if (C != '0') {
+                            longjmp (JumpBuf, RC_NOCONV);
+                        }
+			ReadChar ();
+                        if (C != 'x' && C != 'X') {
+                            longjmp (JumpBuf, RC_NOCONV);
+                        }
+                        ReadChar ();
+                        ReadInt (16);
+			AssignInt ();
      			break;
 
      		    case 'n':
      			/* Store characters consumed so far */
 			IntVal = D->ccount;
-			IsLong = 0;
 			AssignInt ();
 			break;
 

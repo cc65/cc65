@@ -116,6 +116,7 @@ S_OBJS = 	_fdesc.o	\
 		vcprintf.o	\
 		vfprintf.o	\
 		vsprintf.o	\
+                vsscanf.o       \
 		zerobss.o
 
 

@@ -1,7 +1,7 @@
 /*
  * _file.h
  *
- * Ullrich von Bassewitz, 02.06.1998
+ * (C) Copyright 1998, 2002 Ullrich von Bassewitz (uz@cc65.org)
  *
  */
 
@@ -30,6 +30,7 @@ extern FILE _filetab [FOPEN_MAX];
 #define	_FOPEN		0x01
 #define _FEOF		0x02
 #define _FERROR		0x04
+#define _FPUSHBACK      0x08
 
 
 

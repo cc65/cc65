@@ -6,23 +6,26 @@
 
 	.export		__filetab, _stdin, _stdout, _stderr
 
+        .include        "_file.inc"
+
 .data
 
 __filetab:
-in: 	.byte	0, 1   		; stdin
-out:	.byte	1, 1   		; stdout
-err:	.byte	2, 1   		; stderr
-      	.byte	0, 0   		; free slot
-      	.byte	0, 0   		; free slot
-      	.byte	0, 0   		; free slot
-      	.byte	0, 0   		; free slot
-      	.byte	0, 0   		; free slot
+        .byte   0, _FOPEN       ; stdin
+        .byte   1, _FOPEN       ; stdout
+        .byte   2, _FOPEN       ; stderr
+.repeat FOPEN_MAX - 3
+        .byte   0, _FCLOSED     ; free slot
+.endrepeat
+
+
+; Standard file descriptors
 
 _stdin:
-	.word	in
+	.word	__filetab + (0 * _FILE_size)
 
 _stdout:
-	.word	out
+	.word	__filetab + (1 * _FILE_size)
 
 _stderr:
-	.word	err
+	.word	__filetab + (2 * _FILE_size)

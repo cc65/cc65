@@ -1,7 +1,8 @@
 /*
- * Ullrich von Bassewitz, 11.08.1998
+ * fgetc.c
  *
- * int fgetc (FILE* f);
+ * (C) Copyright 1998, 2002 Ullrich von Bassewitz (uz@cc65.org)
+ *
  */
 
 
@@ -13,13 +14,19 @@
 
 
 
+/*****************************************************************************/
+/*     	    	     		     Code				     */
+/*****************************************************************************/
+
+
+
 int fgetc (FILE* f)
 {
-    char c;
+    unsigned char c;
 
     /* Check if the file is open or if there is an error condition */
     if ((f->f_flags & _FOPEN) == 0 || (f->f_flags & (_FERROR | _FEOF)) != 0) {
-    	return -1;
+    	return EOF;
     }
 
     /* Read the byte */
@@ -28,16 +35,16 @@ int fgetc (FILE* f)
         case -1:
 	    /* Error */
 	    f->f_flags |= _FERROR;
-	    return -1;
+	    return EOF;
 
         case 0:
 	    /* EOF */
 	    f->f_flags |= _FEOF;
-	    return -1;
+	    return EOF;
 
         default:
 	    /* Char read */
-	    return ((int) c) & 0xFF;
+	    return c;
 
     }
 }

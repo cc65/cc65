@@ -20,7 +20,7 @@ char* gets (char* s)
 
        	/* Get next character */
        	c = fgetc (stdin);
-       	if (c == -1) {
+       	if (c == EOF) {
        	    /* Error or EOF */
        	    s [i] = 0;
        	    if (stdin->f_flags & _FERROR) {

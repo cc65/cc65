@@ -85,6 +85,14 @@ struct o65_header {
 #define O65_SIZE_16BIT          0x0000  /* All size words are 16bit */
 #define O65_SIZE_MASK           0x2000  /* Mask to extract size */
 
+#define O65_FTYPE_OBJ           0x1000  /* Object file */
+#define O65_FTYPE_EXE           0x0000  /* Executable file */
+#define O65_FTYPE_MASK          0x1000  /* Mask to extract type */
+
+#define O65_ADDR_SIMPLE         0x0800  /* Simple addressing */
+#define O65_ADDR_DEFAULT        0x0000  /* Default addressing */
+#define O65_ADDR_MASK           0x0800  /* Mask to extract addressing */
+
 #define O65_ALIGN_1             0x0000  /* Bytewise alignment */
 #define O65_ALIGN_2             0x0001  /* Align words */
 #define O65_ALIGN_4             0x0002  /* Align longwords */

@@ -438,6 +438,7 @@ unsigned SizeOf (const type* T)
     	case T_INT:
 	case T_UINT:
 	case T_PTR:
+	case T_FUNC:	/* Maybe pointer to function */
 	    return 2;
 
         case T_LONG:
@@ -764,7 +765,7 @@ type GetQualifier (const type* T)
 FuncDesc* GetFuncDesc (const type* T)
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 {
-    if (UnqualifiedType (T[0]) == T_PTR) {      
+    if (UnqualifiedType (T[0]) == T_PTR) {
 	/* Pointer to function */
 	++T;
     }

@@ -50,7 +50,7 @@
 
 
 
-void Write8 (FILE* F, unsigned char Val);
+void Write8 (FILE* F, unsigned Val);
 /* Write an 8 bit value to the file */
 
 void Write16 (FILE* F, unsigned Val);

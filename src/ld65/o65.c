@@ -303,7 +303,7 @@ static void FreeO65RelocTab (O65RelocTab* R)
 
 
 
-static void O65RelocPutByte (O65RelocTab* R, unsigned char B)
+static void O65RelocPutByte (O65RelocTab* R, unsigned B)
 /* Put the byte into the relocation table */
 {
     /* Do we have enough space in the buffer? */
@@ -316,7 +316,7 @@ static void O65RelocPutByte (O65RelocTab* R, unsigned char B)
     }
 
     /* Put the byte into the buffer */
-    R->Buf [R->Fill++] = B;
+    R->Buf [R->Fill++] = (unsigned char) B;
 }
 
 
@@ -454,7 +454,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     	O65RelocPutByte (D->CurReloc, 0xFF);
     	Diff -= 0xFE;
     }
-    O65RelocPutByte (D->CurReloc, Diff);
+    O65RelocPutByte (D->CurReloc, (unsigned char) Diff);
 
     /* Remember this offset for the next time */
     D->LastOffs = Offs;

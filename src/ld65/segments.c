@@ -168,7 +168,7 @@ static Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Typ
 
     /* Calculate the alignment bytes needed for the section */
     V = (0x01UL << S->Align) - 1;
-    S->Fill = ((Seg->Size + V) & ~V) - Seg->Size;
+    S->Fill = (unsigned char) (((Seg->Size + V) & ~V) - Seg->Size);
 
     /* Adjust the segment size and set the section offset */
     Seg->Size  += S->Fill;

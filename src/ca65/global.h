@@ -67,6 +67,7 @@ extern unsigned char	LineCont;	/* Allow line continuation */
 extern unsigned char   	DollarIsPC;	/* Allow the $ symbol as current PC */
 extern unsigned char	NoColonLabels;	/* Allow labels without a colon */
 extern unsigned char	LooseStringTerm;/* Allow ' as string terminator */
+extern unsigned char	LooseCharTerm;	/* Allow " for char constants */
 extern unsigned char    AtInIdents;	/* Allow '@' in identifiers */
 extern unsigned char	DollarInIdents;	/* Allow '$' in identifiers */
 extern unsigned char	PCAssignment;	/* Allow "* = $XXX" or "$ = $XXX" */

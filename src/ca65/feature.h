@@ -49,10 +49,11 @@ typedef enum {
     FEAT_DOLLAR_IS_PC,
     FEAT_LABELS_WITHOUT_COLONS,
     FEAT_LOOSE_STRING_TERM,
+    FEAT_LOOSE_CHAR_TERM,
     FEAT_AT_IN_IDENTIFIERS,
     FEAT_DOLLAR_IN_IDENTIFIERS,
     FEAT_PC_ASSIGNMENT,
-    
+
     /* Special value: Number of features available */
     FEAT_COUNT
 } feature_t;

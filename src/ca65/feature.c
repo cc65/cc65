@@ -52,6 +52,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "dollar_is_pc",
     "labels_without_colons",
     "loose_string_term",
+    "loose_char_term",
     "at_in_identifiers",
     "dollar_in_identifiers",
     "pc_assignment",
@@ -100,11 +101,12 @@ feature_t SetFeature (const char* Key)
      	case FEAT_DOLLAR_IS_PC:		 DollarIsPC	= 1;	break;
      	case FEAT_LABELS_WITHOUT_COLONS: NoColonLabels	= 1;	break;
      	case FEAT_LOOSE_STRING_TERM:	 LooseStringTerm= 1;	break;
+	case FEAT_LOOSE_CHAR_TERM:	 LooseCharTerm	= 1;	break;
      	case FEAT_AT_IN_IDENTIFIERS:	 AtInIdents	= 1;	break;
      	case FEAT_DOLLAR_IN_IDENTIFIERS: DollarInIdents	= 1;	break;
      	case FEAT_PC_ASSIGNMENT:	 PCAssignment	= 1;	break;
        	default:     			 /* Keep gcc silent */	break;
-    }
+    }								      
 
     /* Return the value found */
     return Feature;

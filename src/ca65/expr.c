@@ -609,8 +609,13 @@ static ExprNode* Factor (void)
 	    break;
 
 	default:
-	    N = LiteralExpr (0);      	/* Dummy */
-	    Error (ERR_SYNTAX);
+	    if (LooseCharTerm && Tok == TOK_STRCON && strlen(SVal) == 1) {
+		/* A character constant */
+		N = LiteralExpr (TgtTranslateChar (SVal[0]));
+	    } else {
+		N = LiteralExpr (0);	/* Dummy */
+		Error (ERR_SYNTAX);
+	    }
 	    NextTok ();
 	    break;
     }

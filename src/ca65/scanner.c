@@ -128,6 +128,7 @@ struct DotKeyword {
     { "BITXOR",	    	TOK_XOR		},
     { "BLANK",	    	TOK_BLANK	},
     { "BSS",  	    	TOK_BSS		},
+    { "BYT", 	    	TOK_BYTE	},
     { "BYTE", 	    	TOK_BYTE	},
     { "CASE",  	    	TOK_CASE	},
     { "CODE", 	    	TOK_CODE    	},

@@ -67,6 +67,7 @@ struct FuncDesc {
     struct SymTable*   	TagTab;		/* Symbol table for structs/enums    */
     unsigned		ParamCount;	/* Number of parameters		     */
     unsigned		ParamSize;	/* Size of the parameters	     */
+    struct SymEntry*	LastParam;	/* Pointer to last parameter	     */
 };
 
 

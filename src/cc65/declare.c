@@ -806,11 +806,18 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
 	ParseOldStyleParamList (F);
     }
 
+    /* Remember the last function parameter. We need it later for several
+     * purposes, for example when passing stuff to fastcall functions. Since
+     * more symbols are added to the table, it is easier if we remember it
+     * now, since it is currently the last entry in the symbol table.
+     */
+    F->LastParam = GetSymTab()->SymTail;
+
     /* Assign offsets. If the function has a variable parameter list,
      * there's one additional byte (the arg size).
      */
     Offs = (F->Flags & FD_VARIADIC)? 1 : 0;
-    Sym = GetSymTab()->SymTail;
+    Sym = F->LastParam;
     while (Sym) {
 	unsigned Size = CheckedSizeOf (Sym->Type);
         if (SymIsRegVar (Sym)) {

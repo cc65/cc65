@@ -334,7 +334,6 @@ void NewFunc (SymEntry* Func)
 /* Parse argument declarations and function body. */
 {
     int HadReturn;
-    SymEntry* LastParam;
     SymEntry* Param;
 
     /* Get the function descriptor from the function entry */
@@ -345,9 +344,6 @@ void NewFunc (SymEntry* Func)
 
     /* Reenter the lexical level */
     ReenterFunctionLevel (D);
-
-    /* Before adding more symbols, remember the last parameter for later */
-    LastParam = D->SymTab->SymTail;
 
     /* Declare two special functions symbols: __fixargs__ and __argsize__.
      * The latter is different depending on the type of the function (variadic
@@ -394,11 +390,11 @@ void NewFunc (SymEntry* Func)
      	CHECK ((D->Flags & FD_VARIADIC) == 0);
 
      	/* Generate the push */
-     	if (IsTypeFunc (LastParam->Type)) {
+     	if (IsTypeFunc (D->LastParam->Type)) {
 	    /* Pointer to function */
 	    Flags = CF_PTR;
 	} else {
-    	    Flags = TypeOf (LastParam->Type) | CF_FORCECHAR;
+    	    Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
 	}
 	g_push (Flags, 0);
     }

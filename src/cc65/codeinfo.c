@@ -287,8 +287,7 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
      	    FuncDesc* D = E->V.F.Func;
      	    if ((D->Flags & FD_FASTCALL) != 0 && D->ParamCount > 0) {
      		/* Will use registers depending on the last param */
-     		SymEntry* LastParam = D->SymTab->SymTail;
-                unsigned LastParamSize = CheckedSizeOf (LastParam->Type);
+                unsigned LastParamSize = CheckedSizeOf (D->LastParam->Type);
      		if (LastParamSize == 1) {
      		    *Use = REG_A;
      		} else if (LastParamSize == 2) {

@@ -583,8 +583,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	FrameSize   = Func->ParamSize;
 	if (FrameParams > 0 && (Func->Flags & FD_FASTCALL) != 0) {
 	    /* Last parameter is not pushed */
-	    const SymEntry* LastParam = Func->SymTab->SymTail;
-	    FrameSize -= CheckedSizeOf (LastParam->Type);
+	    FrameSize -= CheckedSizeOf (Func->LastParam->Type);
 	    --FrameParams;
 	}
 

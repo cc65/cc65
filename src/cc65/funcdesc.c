@@ -35,7 +35,7 @@
 
 /* common */
 #include "xmalloc.h"
-	  
+
 /* cc65 */
 #include "funcdesc.h"
 
@@ -59,6 +59,7 @@ FuncDesc* NewFuncDesc (void)
     F->TagTab	  = 0;
     F->ParamCount = 0;
     F->ParamSize  = 0;
+    F->LastParam  = 0;
 
     /* Return the new struct */
     return F;

@@ -538,7 +538,7 @@ static void CheckSymType (const Export* E)
 	      	Warning ("Type mismatch for `%s', export in "
 			 "%s(%lu), import in %s(%lu)",
 			 GetString (E->Name),
-                         GetSourceFileName (E->Obj, Imp->Pos.Name),
+                         GetSourceFileName (E->Obj, E->Pos.Name),
     			 E->Pos.Line,
                          GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 		   	 Imp->Pos.Line);

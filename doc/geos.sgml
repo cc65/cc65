@@ -46,7 +46,7 @@ GEOS 2.0 so color functions are disabled. Both 40 and 80 columns modes are suppo
 and automatically detected.
 <p>
 It is safe to use these standard includes and its contents:
-<tt/assert.h, conio.h, dio.h, errno.h, geos.h, joystick.h, mouse.h, stdlib.h, string.h/
+<tt/assert.h, conio.h, dio.h, errno.h, geos.h, joystick.h, mouse.h, stdlib.h, string.h, time.h/
 <p>
 It was not tested enough, but functions from these includes might work under GEOS:
 <tt/rs232.h, zlib.h/

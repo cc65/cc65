@@ -5,7 +5,7 @@
 ;
 
 	.export	      	_fprintf
-	.import	      	pushax, addysp, decsp4, _vfprintf
+	.import	      	addysp, decsp4, _vfprintf
 	.importzp	sp, ptr1
 
 	.macpack	generic

@@ -347,6 +347,7 @@ install -s -m 755 src/ca65/ca65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/ca65html/ca65html $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/cc65/cc65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/cl65/cl65 $RPM_BUILD_ROOT/usr/bin
+install -s -m 755 src/co65/co65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/da65/da65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/grc/grc $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT/usr/bin

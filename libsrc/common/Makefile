@@ -16,7 +16,7 @@ C_OBJS = fclose.o fgets.o fprintf.o calloc.o _fopen.o\
 	 _hextab.o fdopen.o strtok.o\
 	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
 	 vprintf.o vsprintf.o sprintf.o abort.o qsort.o putchar.o\
-	 errormsg.o cprintf.o vcprintf.o freopen.o locale.o fsetpos.o\
+	 errormsg.o vcprintf.o freopen.o locale.o fsetpos.o\
 	 fgetpos.o rewind.o fseek.o ftell.o
 
 S_OBJS = 	_fdesc.o	\
@@ -32,6 +32,7 @@ S_OBJS = 	_fdesc.o	\
 		atexit.o	\
 		atoi.o		\
 		copydata.o	\
+		cprintf.o	\
 		errno.o		\
 		fmisc.o 	\
 		free.o		\

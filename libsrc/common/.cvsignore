@@ -5,7 +5,6 @@ _hextab.s
 abort.s
 bsearch.s
 calloc.s
-cprintf.s
 errormsg.s
 fclose.s
 fdopen.s

@@ -62,8 +62,9 @@ available. ROM calls are possible without further precautions.
 Special locations:
 
 <descrip>
-  <tag/Stack/
-  The C runtime stack is located at &dollar;8DFF and growing downwards.
+  <tag/Stack/          
+  The C runtime stack is located at HIMEM and grows downwards, regardless of
+  how your linker config file is setup.
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C
@@ -144,7 +145,7 @@ how to use it.
   <tag><tt/a2.lc.emd/</tag>
   Gives access to 12KB RAM (48 pages of 256 bytes each) on the
   Apple&nbsp;&rsqb;&lsqb; language card. The driver was contributed by
-  Stefan Haubenthal. Note: This driver is incompatible with any DOS using 
+  Stefan Haubenthal. Note: This driver is incompatible with any DOS using
   the language card memory!
 
 </descrip><p>

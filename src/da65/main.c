@@ -70,7 +70,7 @@ static void Usage (void)
 /* Print usage information and exit */
 {
     fprintf (stderr,
-    	     "Usage: %s [options] file\n"
+    	     "Usage: %s [options] [inputfile]\n"
     	     "Short options:\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
        	     "  -h\t\t\tHelp (this text)\n"
@@ -405,13 +405,13 @@ int main (int argc, char* argv [])
 	++I;
     }
 
+    /* Try to read the info file */
+    ReadInfoFile ();
+
     /* Must have an input file */
     if (InFile == 0) {
      	AbEnd ("No input file");
     }
-
-    /* Try to read the configuration file */
-    ReadInfoFile ();
 
     /* Make the output file name from the input file name if none was given */
     if (OutFile == 0) {

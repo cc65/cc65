@@ -65,14 +65,14 @@ int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
 /* Replacement function for sprintf */
 {
 #if defined(__WATCOMC__)
-    return _vbprintf (Buf, BufSize, Format, ap);
+    int Res = _vbprintf (Buf, BufSize, Format, ap);
 #elsif defined(__GNUC__)
-    return vsnprintf (Buf, BufSize, Format, ap);
+    int Res = vsnprintf (Buf, BufSize, Format, ap);
 #else
     int Res = vsprintf (Buf, Format, ap);
-    assert ((unsigned) Res < BufSize);
-    return Res;
 #endif
+    assert (Res >= 0 && (unsigned) Res < BufSize);
+    return Res;		
 }
 
 

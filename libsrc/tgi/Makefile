@@ -14,12 +14,15 @@
 C_OBJS =
 
 S_OBJS =	tgi-kernel.o	\
+                tgi_done.o      \
                 tgi_geterror.o  \
                 tgi_getmaxx.o   \
                 tgi_getmaxy.o   \
                 tgi_getxres.o   \
                 tgi_getyres.o   \
-		tgi_map_mode.o
+                tgi_init.o      \
+		tgi_map_mode.o  \
+                tgi_unload.o
 
 
 all:  	$(C_OBJS) $(S_OBJS)

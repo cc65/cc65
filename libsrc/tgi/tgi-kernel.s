@@ -6,6 +6,9 @@
 
         .include        "tgi-kernel.inc"
 
+        .importzp       ptr1
+
+
 ;----------------------------------------------------------------------------
 ; Variables
 
@@ -13,10 +16,11 @@
 
 _tgi_drv:	.res	2		; Pointer to driver
 _tgi_error:	.res	1		; Last error code
+_tgi_mode:      .res    1               ; Graphics mode or zero
 
 
 .data
-
+                         
 ; Jump table for the driver functions.
 
 tgi_install:	jmp	$0000
@@ -52,11 +56,14 @@ tgi_setup:
         lda     (ptr1),y
         sta     tgi_install,x
         inx
-        cpx     #(TGI_HDR_JMPCOUNT*3)
+        cpx     #(TGI_HDR_JUMPCOUNT*3)
         bne     @L1
+                
+; Initialize variables
 
         lda     #$00
         sta     _tgi_error
+        sta     _tgi_mode
 
         jsr     tgi_install             ; Call driver install routine
 

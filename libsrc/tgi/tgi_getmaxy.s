@@ -9,7 +9,7 @@
         .include        "tgi-kernel.inc"
         .export         _tgi_getmaxy
         .import         _tgi_getyres
-        .import         decax
+        .import         decax1
 
 
 _tgi_getmaxy:

@@ -497,7 +497,7 @@ static void tableswitch (struct expent* eval)
     g_switch (flags);
 
     /* First entry is negative of label count */
-    g_defdata (CF_INT, -((int)lcount)-1, 0);
+    g_defdata (CF_INT | CF_CONST, -((int)lcount)-1, 0);
 
     /* Create the case selector table */
     AddCodeHint ("casetable");

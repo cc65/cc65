@@ -123,6 +123,12 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew);
  * new entry created, or - in case AllocNew is zero - return 0.
  */
 
+SymEntry* SymFindAny (SymTable* Scope, const char* Name);
+/* Find a symbol in the given or any of its parent scopes. The function will
+ * never create a new symbol, since this can only be done in one specific
+ * scope.
+ */
+
 int SymIsZP (SymEntry* Sym);
 /* Return true if the symbol is explicitly marked as zeropage symbol */
 

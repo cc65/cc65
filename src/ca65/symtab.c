@@ -345,7 +345,7 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
 
 
 
-static SymEntry* SymFindAny (SymTable* Scope, const char* Name)
+SymEntry* SymFindAny (SymTable* Scope, const char* Name)
 /* Find a symbol in the given or any of its parent scopes. The function will
  * never create a new symbol, since this can only be done in one specific
  * scope.

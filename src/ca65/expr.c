@@ -386,21 +386,26 @@ static ExprNode* FuncReferenced (void)
 static ExprNode* FuncSizeOf (void)
 /* Handle the .SIZEOF function */
 {
-    StrBuf    FullName = AUTO_STRBUF_INITIALIZER;
+    StrBuf    ScopeName = AUTO_STRBUF_INITIALIZER;
     char      Name[sizeof (SVal)];
     SymTable* Scope;
     SymEntry* Sym;
     SymEntry* SizeSym;
     long      Size;
+    int       NoScope;
 
 
+    /* Assume an error */
+    SizeSym = 0;
+
+    /* Check for a cheap local which needs special handling */
     if (Tok == TOK_LOCAL_IDENT) {
 
-        /* Cheap local symbol, special handling */
+        /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&FullName));
-            return GenLiteralExpr (0);
+            Error ("Unknown symbol or scope: `%s%s'",
+                   SB_GetConstBuf (&ScopeName), Name);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
@@ -408,32 +413,58 @@ static ExprNode* FuncSizeOf (void)
     } else {
 
         /* Parse the scope and the name */
-        SymTable* ParentScope = ParseScopedIdent (Name, &FullName);
-    
+        SymTable* ParentScope = ParseScopedIdent (Name, &ScopeName);
+
         /* Check if the parent scope is valid */
         if (ParentScope == 0) {
             /* No such scope */
-            DoneStrBuf (&FullName);
+            DoneStrBuf (&ScopeName);
             return GenLiteralExpr (0);
         }
-    
-        /* The scope is valid, search first for a child scope, then for a symbol */
-        if ((Scope = SymFindScope (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
+
+        /* If ScopeName is empty, no explicit scope was specified. We have to
+         * search upper scope levels in this case.
+         */
+        NoScope = SB_IsEmpty (&ScopeName);
+
+        /* First search for a scope with the given name */
+        if (NoScope) {
+            Scope = SymFindAnyScope (ParentScope, Name);
+        } else {
+            Scope = SymFindScope (ParentScope, Name, SYM_FIND_EXISTING);
+        }
+
+        /* If we did find a scope with the name, read the symbol defining the
+         * size, otherwise search for a symbol entry with the name and scope.
+         */
+        if (Scope) {
             /* Yep, it's a scope */
             SizeSym = GetSizeOfScope (Scope);
-        } else if ((Sym = SymFind (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
-            SizeSym = GetSizeOfSymbol (Sym);
         } else {
-            Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&FullName));
-            return GenLiteralExpr (0);
+            if (NoScope) {
+                Sym = SymFindAny (ParentScope, Name);
+            } else {
+                Sym = SymFind (ParentScope, Name, SYM_FIND_EXISTING);
+            }
+
+            /* If we found the symbol retrieve the size, otherwise complain */
+            if (Sym) {
+                SizeSym = GetSizeOfSymbol (Sym);
+            } else {
+                Error ("Unknown symbol or scope: `%s%s'",
+                       SB_GetConstBuf (&ScopeName), Name);
+            }
         }
     }
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of `%s' is unknown", SB_GetConstBuf (&FullName));
-        return GenLiteralExpr (0);
+        Error ("Size of `%s%s' is unknown", SB_GetConstBuf (&ScopeName), Name);
+        Size = 0;
     }
+
+    /* Free the scope name */
+    DoneStrBuf (&ScopeName);
 
     /* Return the size */
     return GenLiteralExpr (Size);

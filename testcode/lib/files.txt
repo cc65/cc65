@@ -5,9 +5,11 @@ Test programs for the runtime lib:
 clock.c		-	test program for clock() and CLOCKS_PER_SEC
 cprintf.c	-	test program for cprintf \n and \r operators
 deb.c		-	test program for the library debugger
-div-test.c      -       test division/modulus and the div() routine
-ft.c		-	File I/O test program (open + read functions)
-getsp.s		-	Helper routine for ft.c
+div-test.c	-	test division/modulus and the div() routine
+ft.c		-	file I/O test program (open + read functions)
+getsp.s		-	helper routine for ft.c
 joytest.c	-	readjoy function test program
-time-test.c     -       Test the time/mktime/gmtime/asctime functions
+time-test.c	-	test the time/mktime/gmtime/asctime functions
+cursor.c	-	test the cursor() function
+seek.c		-	test lseek()/fseek()/fell()
 

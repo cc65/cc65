@@ -206,6 +206,7 @@ COPYFROM:
         beq     @L4
         sta     tmp1
 
+        ldy     #$00
 @L3:    ldx     #MMU_CFG_RAM1
         jsr     FETCH
         sta	(ptr2),y
@@ -269,7 +270,8 @@ COPYTO: sta     ptr3
         lda     (ptr3),y                ; Get bytes in last page
         beq     @L4
         sta     tmp1
-
+                    
+        ldy     #$00
 @L3:    lda     (ptr2),y
         ldx     #MMU_CFG_RAM1
         jsr     STASH

@@ -243,7 +243,8 @@ common: ldy     #EM_COPY_COUNT+1
         sta    	$01
 
 ; Transfer the bytes in the last page
-
+  
+        ldy     #$00
 @L3:    lda	(ptr1),y
         sta	(ptr2),y
         iny
@@ -255,7 +256,7 @@ common: ldy     #EM_COPY_COUNT+1
         pla
         sta     $01                     ; Restore the old configuration
         cli
-
+                    
 ; Done
 
 @L4:    rts

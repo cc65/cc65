@@ -65,6 +65,7 @@ struct regs {
 };
 
 /* Defines for the flags in the regs structure */
+#ifdef __OBSOLETE_FLAGS__
 #define F_NEG		0x80	/* N flag */
 #define F_OVF		0x40	/* V flag */
 #define F_BRK		0x10	/* B flag */
@@ -72,12 +73,22 @@ struct regs {
 #define F_IEN  	   	0x04	/* I flag */
 #define F_ZERO	   	0x02	/* Z flag */
 #define F_CARRY	   	0x01	/* C flag */
+#endif
+
+/* Defines for the flags in the regs structure */
+#define F6502_N		0x80	/* N flag */
+#define F6502_V		0x40	/* V flag */
+#define F6502_B  	0x10	/* B flag */
+#define F6502_D  	0x08	/* D flag */
+#define F6502_I  	0x04	/* I flag */
+#define F6502_Z 	0x02	/* Z flag */
+#define F6502_C         0x01	/* C flag */
 
 /* Function to call any machine language subroutine. All registers in the
  * regs structure are passed into the routine and the results are passed
  * out. Some of the flags are ignored on input. The called routine must
  * end with an RTS.
- */
+ */   
 void __fastcall__ _sys (struct regs* r);
 
 

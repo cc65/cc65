@@ -44,15 +44,12 @@
 
 
 
-/* Size of position in file */
-#define POS_SIZE	5
-
 /* Type of a file position */
 typedef struct FilePos_ FilePos;
 struct FilePos_ {
     unsigned long   Line;    	       	/* Line */
-    unsigned char   Col;		/* Column */
-    unsigned char   Name;		/* File */
+    unsigned 	    Col;		/* Column */
+    unsigned 	    Name;		/* File */
 };
 
 

@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998	Ullrich von Bassewitz					     */
-/*		Wacholderweg 14						     */
-/*		D-70597 Stuttgart					     */
-/* EMail:	uz@musoftware.de					     */
+/* (C) 1998-2000 Ullrich von Bassewitz					     */
+/*		 Wacholderweg 14					     */
+/*		 D-70597 Stuttgart					     */
+/* EMail:	 uz@musoftware.de					     */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -37,13 +37,15 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/exprdefs.h"
-#include "../common/filepos.h"
-#include "../common/libdefs.h"
-#include "../common/objdefs.h"
-#include "../common/symdefs.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "exprdefs.h"
+#include "filepos.h"
+#include "libdefs.h"
+#include "objdefs.h"
+#include "symdefs.h"
+#include "xmalloc.h"
 
+/* ld65 */
 #include "error.h"
 #include "exports.h"
 #include "fileio.h"
@@ -54,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*	  			     Data				     */
 /*****************************************************************************/
 
 
@@ -111,7 +113,7 @@ static ObjData* ReadIndexEntry (void)
     ObjData* O	= NewObjData ();
 
     /* Module name/flags/MTime/Start/Size */
-    O->Name	= ReadMallocedStr (Lib);
+    O->Name    	= ReadStr (Lib);
     O->Flags	= Read16 (Lib);
     Read32 (Lib);			/* Skip MTime */
     O->Start	= Read32 (Lib);
@@ -119,7 +121,7 @@ static ObjData* ReadIndexEntry (void)
 
     /* Skip the export size, then read the exports */
     Read16 (Lib);
-    O->ExportCount = Read16 (Lib);
+    O->ExportCount = ReadVar (Lib);
     O->Exports = xmalloc (O->ExportCount * sizeof (Export*));
     for (I = 0; I < O->ExportCount; ++I) {
 	O->Exports [I] = ReadExport (Lib, O);
@@ -127,7 +129,7 @@ static ObjData* ReadIndexEntry (void)
 
     /* Skip the import size, then read the imports */
     Read16 (Lib);
-    O->ImportCount = Read16 (Lib);
+    O->ImportCount = ReadVar (Lib);
     O->Imports = xmalloc (O->ImportCount * sizeof (Import*));
     for (I = 0; I < O->ImportCount; ++I) {
 	O->Imports [I] = ReadImport (Lib, O);

@@ -38,7 +38,8 @@
 
 
 
-#include "../common/objdefs.h"
+/* common */
+#include "objdefs.h"
 
 
 
@@ -104,3 +105,4 @@ void FreeObjData (ObjData* O);
 
 
 
+	  

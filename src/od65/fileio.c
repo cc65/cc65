@@ -67,7 +67,7 @@ unsigned Read8 (FILE* F)
     int C = getc (F);
     if (C == EOF) {
  	Error ("Read error (file corrupt?)");
-    }		  
+    }
     return C;
 }
 
@@ -121,27 +121,35 @@ long Read32Signed (FILE* F)
 
 
 
-char* ReadStr (FILE* F, char* Str)
-/* Read a string from the file. Str must hold 256 chars at max */
+unsigned long ReadVar (FILE* F)
+/* Read a variable size value from the file */
 {
-    /* Read the length byte */
-    unsigned Len = Read8 (F);
+    /* The value was written to the file in 7 bit chunks LSB first. If there
+     * are more bytes, bit 8 is set, otherwise it is clear.
+     */
+    unsigned char C;
+    unsigned long V = 0;
+    unsigned Shift = 0;
+    do {
+	/* Read one byte */
+	C = Read8 (F);
+	/* Encode it into the target value */
+	V |= ((unsigned long)(C & 0x7F)) << Shift;
+	/* Next value */
+	Shift += 7;
+    } while (C & 0x80);
 
-    /* Read the string itself */
-    ReadData (F, Str, Len);
-
-    /* Terminate the string and return it */
-    Str [Len] = '\0';
-    return Str;
+    /* Return the value read */
+    return V;
 }
 
 
 
-char* ReadMallocedStr (FILE* F)
+char* ReadStr (FILE* F)
 /* Read a string from the file into a malloced area */
 {
-    /* Read the length byte */
-    unsigned Len = Read8 (F);
+    /* Read the length */
+    unsigned Len = ReadVar (F);
 
     /* Allocate memory */
     char* Str = xmalloc (Len + 1);
@@ -159,10 +167,10 @@ char* ReadMallocedStr (FILE* F)
 FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 /* Read a file position from the file */
 {
-    /* The line number is encoded as 24 bit value to save some space */
-    Pos->Line =	Read24 (F);
-    Pos->Col  = Read8 (F);
-    Pos->Name = Read8 (F);
+    /* Read the data fields */
+    Pos->Line =	ReadVar (F);
+    Pos->Col  = ReadVar (F);
+    Pos->Name = ReadVar (F);
     return Pos;
 }
 

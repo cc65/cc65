@@ -143,20 +143,8 @@ static unsigned SkipFragment (FILE* F)
     /* Handle the different fragment types */
     switch (Type) {
 
-	case FRAG_LITERAL8:
-       	    Size = Read8 (F);
-	    break;
-
-	case FRAG_LITERAL16:
-	    Size = Read16 (F);
-	    break;
-
-	case FRAG_LITERAL24:
-	    Size = Read24 (F);
-	    break;
-
-	case FRAG_LITERAL32:
-	    Size = Read32 (F);
+	case FRAG_LITERAL:
+       	    Size = ReadVar (F);
 	    break;
 
 	case FRAG_EXPR8:
@@ -171,7 +159,7 @@ static unsigned SkipFragment (FILE* F)
 	    break;
 
 	case FRAG_FILL:
-	    Size = Read16 (F);
+	    Size = ReadVar (F);
 	    break;
 
 	default:
@@ -277,7 +265,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
     printf ("  Options:\n");
 
     /* Read the number of options and print it */
-    Count = Read16 (F);
+    Count = ReadVar (F);
     printf ("    Count:%27u\n", Count);
 
     /* Read and print all options */
@@ -313,7 +301,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 	switch (ArgType) {
 
 	    case OPT_ARGSTR:
-	     	ArgStr = ReadMallocedStr (F);
+	     	ArgStr = ReadStr (F);
 	    	ArgLen = strlen (ArgStr);
 	     	printf ("      Data:%*s\"%s\"\n", 24-ArgLen, "", ArgStr);
 	     	xfree (ArgStr);
@@ -361,7 +349,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
     printf ("  Files:\n");
 
     /* Read the number of files and print it */
-    Count = Read16 (F);
+    Count = ReadVar (F);
     printf ("    Count:%27u\n", Count);
 
     /* Read and print all files */
@@ -370,7 +358,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
 	/* Read the data for one file */
 	unsigned long MTime = Read32 (F);
 	unsigned long Size  = Read32 (F);
-	char*	      Name  = ReadMallocedStr (F);
+	char*	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);
 
 	/* Print the header */
@@ -409,14 +397,14 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
     printf ("  Segments:\n");
 
     /* Read the number of segments and print it */
-    Count = Read8 (F);
+    Count = ReadVar (F);
     printf ("    Count:%27u\n", Count);
 
     /* Read and print all segments */
     for (I = 0; I < Count; ++I) {
 
 	/* Read the data for one segments */
-	char*	      Name  = ReadMallocedStr (F);
+	char*	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);
 	unsigned long Size  = Read32 (F);
 	unsigned      Align = (1U << Read8 (F));
@@ -484,7 +472,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
     printf ("  Imports:\n");
 
     /* Read the number of imports and print it */
-    Count = Read16 (F);
+    Count = ReadVar (F);
     printf ("    Count:%27u\n", Count);
 
     /* Read and print all imports */
@@ -494,7 +482,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 
        	/* Read the data for one import */
        	unsigned char Type  = Read8 (F);
-	char* 	      Name  = ReadMallocedStr (F);
+	char* 	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);
 	ReadFilePos (F, &Pos);
 
@@ -540,7 +528,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     printf ("  Exports:\n");
 
     /* Read the number of exports and print it */
-    Count = Read16 (F);
+    Count = ReadVar (F);
     printf ("    Count:%27u\n", Count);
 
     /* Read and print all exports */
@@ -552,7 +540,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 
        	/* Read the data for one export */
        	unsigned char Type  = Read8 (F);
-	char* 	      Name  = ReadMallocedStr (F);
+	char* 	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);
 	if (Type & EXP_EXPR) {
 	    SkipExpr (F);
@@ -617,19 +605,19 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
     }
 
     /* Read the number of exports and print it */
-    Count = Read16 (F);
+    Count = ReadVar (F);
     printf ("    Count:%27u\n", Count);
 
     /* Read and print all debug symbols */
     for (I = 0; I < Count; ++I) {
 
 	unsigned long 	Value = 0;
-	int 		HaveValue;
+	int 	   	HaveValue;
  	const char* 	TypeDesc;
 
        	/* Read the data for one symbol */
        	unsigned char Type  = Read8 (F);
-	char* 	      Name  = ReadMallocedStr (F);
+	char* 	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);
 	if (Type & EXP_EXPR) {
 	    SkipExpr (F);
@@ -663,6 +651,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	xfree (Name);
     }
 }
+
 
 
 

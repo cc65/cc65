@@ -40,7 +40,8 @@
 
 #include <stdio.h>
 
-#include "../common/filepos.h"
+/* common */
+#include "filepos.h"
 
 
 
@@ -64,6 +65,9 @@ void Write32 (FILE* F, unsigned long Val);
 
 void WriteVal (FILE* F, unsigned long Val, unsigned Size);
 /* Write a value of the given size to the output file */
+
+void WriteVar (FILE* F, unsigned long V);
+/* Write a variable sized value to the file in special encoding */
 
 void WriteStr (FILE* F, const char* S);
 /* Write a string to the file */
@@ -89,10 +93,10 @@ unsigned long Read32 (FILE* F);
 long Read32Signed (FILE* F);
 /* Read a 32 bit value from the file. Sign extend the value. */
 
-char* ReadStr (FILE* F, char* Str);
-/* Read a string from the file. Str must hold 256 chars at max */
+unsigned long ReadVar (FILE* F);
+/* Read a variable size value from the file */
 
-char* ReadMallocedStr (FILE* F);
+char* ReadStr (FILE* F);
 /* Read a string from the file into a malloced area */
 
 FilePos* ReadFilePos (FILE* F, FilePos* Pos);

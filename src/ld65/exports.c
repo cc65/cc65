@@ -42,7 +42,7 @@
 #include "hashstr.h"
 #include "symdefs.h"
 #include "xmalloc.h"
-	  
+
 /* ld65 */
 #include "global.h"
 #include "error.h"
@@ -175,7 +175,7 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     I = NewImport (Type, Obj);
 
     /* Read the name */
-    I->V.Name = ReadMallocedStr (F);
+    I->V.Name = ReadStr (F);
 
     /* Read the file position */
     ReadFilePos (F, &I->Pos);
@@ -195,22 +195,23 @@ Import* ReadImport (FILE* F, ObjData* Obj)
 static Export* NewExport (unsigned char Type, const char* Name, ObjData* Obj)
 /* Create a new export and initialize it */
 {
-    /* Get the length of the symbol name */
-    unsigned Len = strlen (Name);
-
     /* Allocate memory */
-    Export* E = xmalloc (sizeof (Export) + Len);
+    Export* E = xmalloc (sizeof (Export));
 
     /* Initialize the fields */
     E->Next     = 0;
-    E->Flags	= 0;
+    E->Flags  	= 0;
     E->Obj      = Obj;
     E->ImpCount = 0;
     E->ImpList  = 0;
     E->Expr    	= 0;
     E->Type    	= Type;
-    memcpy (E->Name, Name, Len);
-    E->Name [Len] = '\0';
+    if (Name) {
+        E->Name = xstrdup (Name);
+    } else {
+	/* Name will get added later */
+	E->Name = 0;
+    }
 
     /* Return the new entry */
     return E;
@@ -250,7 +251,7 @@ void InsertExport (Export* E)
       	   	    if (Last) {
       	   	       	Last->Next = E;
       	   	    } else {
-      	   	       	HashTab [HashVal] = E;
+      	      	       	HashTab [HashVal] = E;
       	   	    }
        	       	    ImpOpen -= E->ImpCount;	/* Decrease open imports now */
       	   	    xfree (L);
@@ -285,17 +286,16 @@ Export* ReadExport (FILE* F, ObjData* O)
 /* Read an export from a file */
 {
     unsigned char Type;
-    char Name [256];
     Export* E;
 
     /* Read the type */
     Type = Read8 (F);
 
-    /* Read the name */
-    ReadStr (F, Name);
+    /* Create a new export without a name */
+    E = NewExport (Type, 0, O);
 
-    /* Create a new export */
-    E = NewExport (Type, Name, O);
+    /* Read the name */
+    E->Name = ReadStr (F);
 
     /* Read the value */
     if (Type & EXP_EXPR) {

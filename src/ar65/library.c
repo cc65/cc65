@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,13 +37,15 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/bitops.h"
-#include "../common/exprdefs.h"
-#include "../common/filepos.h"
-#include "../common/libdefs.h"
-#include "../common/symdefs.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "bitops.h"
+#include "exprdefs.h"
+#include "filepos.h"
+#include "libdefs.h"
+#include "symdefs.h"
+#include "xmalloc.h"
 
+/* ar65 */
 #include "error.h"
 #include "global.h"
 #include "fileio.h"
@@ -303,6 +305,28 @@ void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F)
 
 
 
+static unsigned long GetVar (unsigned char** Buf)
+/* Get a variable sized value from Buf */
+{
+    unsigned char C;
+    unsigned long V = 0;
+    unsigned Shift = 0;
+    do {
+	/* Read one byte */
+       	C = **Buf;
+	++(*Buf);
+	/* Add this char to the value */
+	V |= ((unsigned long)(C & 0x7F)) << Shift;
+	/* Next value */
+	Shift += 7;
+    } while (C & 0x80);
+
+    /* Return the result */
+    return V;
+}
+
+
+
 static void SkipExpr (unsigned char** Buf)
 /* Skip an expression in Buf */
 {
@@ -339,20 +363,26 @@ static void SkipExpr (unsigned char** Buf)
 
 
 
+static void SkipFilePos (unsigned char** Buf)
+/* Skip a file position in Buf */
+{
+    (void) GetVar (Buf);	/* Line */
+    (void) GetVar (Buf);	/* Col */
+    (void) GetVar (Buf);	/* Name */
+}
+
+
+
 static void LibCheckExports (ObjData* O)
 /* Insert all exports from the given object file into the global list
  * checking for duplicates.
  */
 {
-    char Name [256];
-
     /* Get a pointer to the buffer */
     unsigned char* Exports = O->Exports;
 
-    /* First two bytes are export count */
-    unsigned Lo = *Exports++;
-    unsigned Hi = *Exports++;
-    unsigned Count = (Hi << 8) + Lo;
+    /* Get the export count */
+    unsigned Count = GetVar (&Exports);
 
     /* Read the exports */
     if (Verbose > 1) {
@@ -360,13 +390,12 @@ static void LibCheckExports (ObjData* O)
     }
     while (Count--) {
 
-      	unsigned char Len;
-
       	/* Get the export tag */
       	unsigned char Tag = *Exports++;
 
        	/* Next thing is name of symbol */
-     	Len = *Exports++;
+     	unsigned Len = GetVar (&Exports);
+	char* Name = xmalloc (Len + 1);
      	memcpy (Name, Exports, Len);
      	Name [Len] = '\0';
      	Exports += Len;
@@ -381,13 +410,16 @@ static void LibCheckExports (ObjData* O)
      	}
 
      	/* Skip the position */
-     	Exports += POS_SIZE;
+       	SkipFilePos (&Exports);
 
       	/* Insert the name into the hash table */
 	if (Verbose > 1) {
       		printf ("  %s\n", Name);
 	}
      	ExpInsert (Name, O->Index);
+
+	/* Free the name */
+	xfree (Name);
     }
 }
 

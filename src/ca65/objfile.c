@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,7 +41,7 @@
 /* common */
 #include "fname.h"
 #include "objdefs.h"
-	  
+
 /* ca65 */
 #include "global.h"
 #include "error.h"
@@ -210,19 +210,36 @@ void ObjWrite32 (unsigned long V)
 
 
 
+void ObjWriteVar (unsigned long V)
+/* Write a variable sized value to the file in special encoding */
+{
+    /* We will write the value to the file in 7 bit chunks. If the 8th bit
+     * is clear, we're done, if it is set, another chunk follows. This will
+     * allow us to encode smaller values with less bytes, at the expense of
+     * needing 5 bytes if a 32 bit value is written to file.
+     */
+    do {
+	unsigned char C = (V & 0x7F);
+	V >>= 7;
+	if (V) {
+	    C |= 0x80;
+	}
+	ObjWrite8 (C);
+    } while (V != 0);
+}
+
+
+
 void ObjWriteStr (const char* S)
 /* Write a string to the object file */
 {
     unsigned Len = strlen (S);
-    if (Len > 255) {
-	Internal ("String too long in ObjWriteStr");
-    }
 
-    /* Write the string with a length byte preceeded (this is easier for
+    /* Write the string with the length preceeded (this is easier for
      * the reading routine than the C format since the length is known in
      * advance).
      */
-    ObjWrite8 ((unsigned char) Len);
+    ObjWriteVar (Len);
     ObjWriteData (S, Len);
 }
 
@@ -241,15 +258,15 @@ void ObjWriteData (const void* Data, unsigned Size)
 void ObjWritePos (const FilePos* Pos)
 /* Write a file position to the object file */
 {
-    /* Write the line number as 24 bit value to save one byte */
-    ObjWrite24 (Pos->Line);
-    ObjWrite8  (Pos->Col);
+    /* Write the data entries */
+    ObjWriteVar (Pos->Line);
+    ObjWriteVar (Pos->Col);
     if (Pos->Name == 0) {
-	/* Position is outside file scope, use the main file instead */
-	ObjWrite8 (0);
+ 	/* Position is outside file scope, use the main file instead */
+ 	ObjWriteVar (0);
     } else {
-        ObjWrite8  (Pos->Name - 1);
-    }
+        ObjWriteVar (Pos->Name - 1);
+    }		   
 }
 
 

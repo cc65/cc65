@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,9 +33,11 @@
 
 
 
-#include "../common/optdefs.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "optdefs.h"
+#include "xmalloc.h"
 
+/* ca65 */
 #include "error.h"
 #include "objfile.h"
 #include "options.h"
@@ -164,7 +166,7 @@ void WriteOptions (void)
     ObjStartOptions ();
 
     /* Write the option count */
-    ObjWrite16 (OptCount);
+    ObjWriteVar (OptCount);
 
     /* Walk through the list and write the options */
     O = OptRoot;

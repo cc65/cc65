@@ -119,7 +119,7 @@ void WriteFiles (void)
     ObjStartFiles ();
 
     /* Write the file count */
-    ObjWrite16 (FileCount);
+    ObjWriteVar (FileCount);
 
     /* Write the file data */
     for (I = 0; I < FileCount; ++I) {

@@ -486,19 +486,8 @@ static void WriteOneSeg (Segment* Seg)
     		    Size += F->Len;
     		    F = F->Next;
     		}
-    	 	if (Size < 0x100) {
-    		    ObjWrite8 (FRAG_LITERAL8);
-    		    ObjWrite8 (Size);
-    		} else if (Size < 0x10000) {
-    		    ObjWrite8 (FRAG_LITERAL16);
-    		    ObjWrite16 (Size);
-    		} else if (Size < 0x1000000) {
-    		    ObjWrite8 (FRAG_LITERAL24);
-    		    ObjWrite24 (Size);
-    		} else {
-    		    ObjWrite8 (FRAG_LITERAL32);
-    		    ObjWrite32 (Size);
-    		}
+		ObjWrite8 (FRAG_LITERAL);
+		ObjWriteVar (Size);
 
     		/* Now write the literal data */
     		F = Frag;
@@ -533,7 +522,7 @@ static void WriteOneSeg (Segment* Seg)
 
 	    case FRAG_FILL:
 		ObjWrite8 (FRAG_FILL);
-		ObjWrite16 (Frag->Len);
+       	       	ObjWriteVar (Frag->Len);
 		break;
 
     	    default:
@@ -560,7 +549,7 @@ void WriteSegments (void)
     ObjStartSegments ();
 
     /* First thing is segment count */
-    ObjWrite8 (SegmentCount);
+    ObjWriteVar (SegmentCount);
 
     /* Now walk through all segments and write them to the object file */
     Seg = SegmentList;
@@ -578,7 +567,7 @@ void WriteSegments (void)
 
 
 /*****************************************************************************/
-/*     	      	      	  	     Code				     */
+/*     	      	      	   	     Code				     */
 /*****************************************************************************/
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -978,12 +978,12 @@ void WriteImports (void)
 /* Write the imports list to the object file */
 {
     SymEntry* S;
-
+		   
     /* Tell the object file module that we're about to start the imports */
     ObjStartImports ();
 
     /* Write the import count to the list */
-    ObjWrite16 (ImportCount);
+    ObjWriteVar (ImportCount);
 
     /* Walk throught list and write all imports to the file */
     S = SymList;
@@ -1015,7 +1015,7 @@ void WriteExports (void)
     ObjStartExports ();
 
     /* Write the export count to the list */
-    ObjWrite16 (ExportCount);
+    ObjWriteVar (ExportCount);
 
     /* Walk throught list and write all exports to the file */
     S = SymList;
@@ -1076,13 +1076,8 @@ void WriteDbgSyms (void)
 	    S = S->List;
 	}
 
-	/* Safety check */
-	if (Count > 0xFFFF) {
-	    Fatal (FAT_TOO_MANY_SYMBOLS);
-     	}
-
 	/* Write the symbol count to the list */
-	ObjWrite16 (Count);
+       	ObjWriteVar (Count);
 
        	/* Walk through list and write all symbols to the file */
 	S = SymList;
@@ -1118,7 +1113,7 @@ void WriteDbgSyms (void)
     } else {
 
 	/* No debug symbols */
-	ObjWrite16 (0);
+	ObjWriteVar (0);
 
     }
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,9 +40,11 @@
 
 #include <stdio.h>
 
-#include "../common/exprdefs.h"
-#include "../common/filepos.h"
-
+/* common */
+#include "exprdefs.h"
+#include "filepos.h"
+	  
+/* ld65 */
 #include "objdata.h"
 #include "config.h"
 
@@ -80,7 +82,7 @@ struct Export_ {
     FilePos		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned char	Type;		/* Type of export */
-    char		Name [1];	/* Name - dynamically allocated */
+    char*      	       	Name;		/* Name - dynamically allocated */
 };
 
 

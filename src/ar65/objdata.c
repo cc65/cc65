@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,7 +38,7 @@
 /* common */
 #include "check.h"
 #include "xmalloc.h"
-		  
+
 /* ar65 */
 #include "error.h"
 #include "objdata.h"
@@ -189,7 +189,7 @@ void MakeObjPool (void)
 
 	/* Set the pool pointer */
 	ObjPool [Index] = O;
-
+									     
      	/* Next object */
      	++Index;
      	O = O->Next;

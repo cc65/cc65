@@ -40,7 +40,7 @@
 
 /* common */
 #include "xmalloc.h"
-	  
+
 /* ld65 */
 #include "dbgsyms.h"
 #include "error.h"
@@ -107,14 +107,14 @@ void ObjReadFiles (FILE* F, ObjData* O)
 {
     unsigned I;
 
-    O->FileCount  = Read16 (F);
+    O->FileCount  = ReadVar (F);
     O->Files      = xmalloc (O->FileCount * sizeof (char*));
     for (I = 0; I < O->FileCount; ++I) {
        	/* Skip MTime and size */
        	Read32 (F);
        	Read32 (F);
        	/* Read the filename */
-       	O->Files [I] = ReadMallocedStr (F);
+       	O->Files [I] = ReadStr (F);
     }
 }
 
@@ -125,7 +125,7 @@ void ObjReadImports (FILE* F, ObjData* O)
 {
     unsigned I;
 
-    O->ImportCount = Read16 (F);
+    O->ImportCount = ReadVar (F);
     O->Imports     = xmalloc (O->ImportCount * sizeof (Import*));
     for (I = 0; I < O->ImportCount; ++I) {
    	O->Imports [I] = ReadImport (F, O);
@@ -140,7 +140,7 @@ void ObjReadExports (FILE* F, ObjData* O)
 {
     unsigned I;
 
-    O->ExportCount = Read16 (F);
+    O->ExportCount = ReadVar (F);
     O->Exports     = xmalloc (O->ExportCount * sizeof (Export*));
     for (I = 0; I < O->ExportCount; ++I) {
 	O->Exports [I] = ReadExport (F, O);
@@ -155,7 +155,7 @@ void ObjReadDbgSyms (FILE* F, ObjData* O)
 {
     unsigned I;
 
-    O->DbgSymCount = Read16 (F);
+    O->DbgSymCount = ReadVar (F);
     O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (DbgSym*));
     for (I = 0; I < O->DbgSymCount; ++I) {
 	O->DbgSyms [I] = ReadDbgSym (F, O);
@@ -169,7 +169,7 @@ void ObjReadSections (FILE* F, ObjData* O)
 {
     unsigned I;
 
-    O->SectionCount = Read8 (F);
+    O->SectionCount = ReadVar (F);
     O->Sections     = xmalloc (O->SectionCount * sizeof (Section*));
     for (I = 0; I < O->SectionCount; ++I) {
 	O->Sections [I] = ReadSection (F, O);
@@ -226,3 +226,4 @@ void ObjAdd (FILE* Obj, const char* Name)
 
 
 
+			     

@@ -370,14 +370,15 @@ static void DoDbg (void)
 
     /* Skip the subkey */
     NextTok ();
-	    
+
     /* Parameters are separated by a comma */
     ConsumeComma ();
 
     /* Check the key and dispatch to a handler */
     switch (Key) {
 	case 0:     DbgInfoFile ();		break;
-	case 1:
+	case 1:	    DbgInfoLine ();		break;
+	case 2:	    DbgInfoSym ();		break;
 	default:    ErrorSkip (ERR_SYNTAX);	break;
     }
 }

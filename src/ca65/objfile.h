@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,7 +38,8 @@
 
 
 
-#include "../common/filepos.h"
+/* common */
+#include "filepos.h"
 
 
 
@@ -65,6 +66,9 @@ void ObjWrite24 (unsigned long V);
 
 void ObjWrite32 (unsigned long V);
 /* Write a 32 bit value to the file */
+	  
+void ObjWriteVar (unsigned long V);
+/* Write a variable sized value to the file in special encoding */
 
 void ObjWriteStr (const char* S);
 /* Write a string to the object file */

@@ -81,3 +81,19 @@ void DbgInfoFile (void)
 
 
 
+void DbgInfoLine (void)
+/* Parse and handle LINE subcommand of the .dbg pseudo instruction */
+{
+    ErrorSkip (ERR_NOT_IMPLEMENTED);
+}
+
+
+
+void DbgInfoSym (void)
+/* Parse and handle SYM subcommand of the .dbg pseudo instruction */
+{
+    ErrorSkip (ERR_NOT_IMPLEMENTED);
+}
+
+
+

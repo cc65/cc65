@@ -45,7 +45,13 @@
 
 
 void DbgInfoFile (void);
-/* Parse and handle the .REPEAT statement */
+/* Parse and handle FILE subcommand of the .dbg pseudo instruction */
+
+void DbgInfoLine (void);
+/* Parse and handle LINE subcommand of the .dbg pseudo instruction */
+
+void DbgInfoSym (void);
+/* Parse and handle SYM subcommand of the .dbg pseudo instruction */
 
 
 
@@ -56,4 +62,4 @@ void DbgInfoFile (void);
 
 
 
-	       
+

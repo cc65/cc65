@@ -215,7 +215,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 /* Read a section from a file */
 {
     unsigned HashVal;
-    char Name [256];
+    char* Name;
     unsigned long Size;
     unsigned char Align;
     unsigned char Type;
@@ -223,7 +223,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     Section* Sec;
 
     /* Read the name */
-    ReadStr (F, Name);
+    Name = ReadStr (F);
 
     /* Read the size */
     Size = Read32 (F);
@@ -237,7 +237,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     /* Print some data */
     if (Verbose > 1) {
        	printf ("Module `%s': Found segment `%s', size = %lu, align = %u, type = %u\n",
-	     	O->Name, Name, Size, Align, Type);
+	       	O->Name, Name, Size, Align, Type);
     }
 
     /* Create a hash over the name and try to locate the segment in the table */
@@ -253,6 +253,9 @@ Section* ReadSection (FILE* F, ObjData* O)
     	S->Next = HashTab [HashVal];
     	HashTab [HashVal] = S;
     }
+
+    /* We have the segment and don't need the name any longer */
+    xfree (Name);
 
     /* Allocate the section we will return later */
     Sec = NewSection (S, Align, Type);
@@ -281,20 +284,8 @@ Section* ReadSection (FILE* F, ObjData* O)
     	/* Handle the different fragment types */
 	switch (Type) {
 
-	    case FRAG_LITERAL8:
-	       	Frag = NewFragment (FRAG_LITERAL, Read8 (F), Sec);
-	       	break;
-
-	    case FRAG_LITERAL16:
-	       	Frag = NewFragment (FRAG_LITERAL, Read16 (F), Sec);
-	       	break;
-
-	    case FRAG_LITERAL24:
-	       	Frag = NewFragment (FRAG_LITERAL, Read24 (F), Sec);
-    	       	break;
-
-	    case FRAG_LITERAL32:
-	       	Frag = NewFragment (FRAG_LITERAL, Read32 (F), Sec);
+	    case FRAG_LITERAL:
+	       	Frag = NewFragment (Type, ReadVar (F), Sec);
 	       	break;
 
 	    case FRAG_EXPR8:
@@ -310,7 +301,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 
 	    case FRAG_FILL:
 	  	/* Will allocate memory, but we don't care... */
-	  	Frag = NewFragment (FRAG_FILL, Read16 (F), Sec);
+	  	Frag = NewFragment (Type, ReadVar (F), Sec);
 	  	break;
 
 	    default:

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -55,10 +55,6 @@
 #define FRAG_BYTEMASK   0x07		/* Mask for byte count */
 
 #define FRAG_LITERAL	0x00		/* Literal data */
-#define FRAG_LITERAL8  	0x01		/* Literal data with 8 bit length */
-#define FRAG_LITERAL16	0x02		/* Literal data with 16 bit length */
-#define FRAG_LITERAL24	0x03		/* Literal data with 24 bit length */
-#define FRAG_LITERAL32  0x04		/* Literal data with 32 bit length */
 
 #define FRAG_EXPR	0x08		/* Expression */
 #define FRAG_EXPR8     	0x09   	       	/* 8 bit expression */

@@ -35,8 +35,10 @@
 
 #include <string.h>
 
-#include "../common/xmalloc.h"
+/* common */
+#include "xmalloc.h"
 
+/* ld65 */
 #include "error.h"
 #include "fileio.h"
 
@@ -117,14 +119,31 @@ void WriteVal (FILE* F, unsigned long Val, unsigned Size)
 
 
 
+void WriteVar (FILE* F, unsigned long V)
+/* Write a variable sized value to the file in special encoding */
+{
+    /* We will write the value to the file in 7 bit chunks. If the 8th bit
+     * is clear, we're done, if it is set, another chunk follows. This will
+     * allow us to encode smaller values with less bytes, at the expense of
+     * needing 5 bytes if a 32 bit value is written to file.
+     */
+    do {
+	unsigned char C = (V & 0x7F);
+	V >>= 7;
+	if (V) {
+	    C |= 0x80;
+	}
+	Write8 (F, C);
+    } while (V != 0);
+}
+
+
+
 void WriteStr (FILE* F, const char* S)
 /* Write a string to the file */
 {
     unsigned Len = strlen (S);
-    if (Len > 255) {
-       	Internal ("String too long");
-    }
-    Write8 (F, (unsigned char) Len);
+    WriteVar (F, Len);
     WriteData (F, S, Len);
 }
 
@@ -210,37 +229,43 @@ long Read32Signed (FILE* F)
 
 
 
-char* ReadStr (FILE* F, char* Str)
-/* Read a string from the file. Str must hold 256 chars at max */
+unsigned long ReadVar (FILE* F)
+/* Read a variable size value from the file */
 {
-    /* Read the length byte */
-    unsigned Len = Read8 (F);
+    /* The value was written to the file in 7 bit chunks LSB first. If there
+     * are more bytes, bit 8 is set, otherwise it is clear.
+     */
+    unsigned char C;
+    unsigned long V = 0;
+    unsigned Shift = 0;
+    do {
+	/* Read one byte */
+	C = Read8 (F);
+	/* Encode it into the target value */
+	V |= ((unsigned long)(C & 0x7F)) << Shift;
+	/* Next value */
+	Shift += 7;
+    } while (C & 0x80);
 
-    /* Read the string itself */
-    ReadData (F, Str, Len);
-
-    /* Terminate the string and return it */
-    Str [Len] = '\0';
-    return Str;
+    /* Return the value read */
+    return V;
 }
 
 
 
-char* ReadMallocedStr (FILE* F)
-/* Read a string from the file into a malloced area */
+char* ReadStr (FILE* F)
+/* Read a string from the file (the memory will be malloc'ed) */
 {
-    /* Read the length byte */
-    unsigned Len = Read8 (F);
+    /* Read the length */
+    unsigned Len = ReadVar (F);
 
-    /* Allocate memory */
-    char* Str = xmalloc (Len + 1);
-
-    /* Read the string itself */
-    ReadData (F, Str, Len);
+    /* Allocate memory and read the string itself */
+    char* S = xmalloc (Len + 1);
+    ReadData (F, S, Len);
 
     /* Terminate the string and return it */
-    Str [Len] = '\0';
-    return Str;
+    S [Len] = '\0';
+    return S;
 }
 
 
@@ -248,10 +273,10 @@ char* ReadMallocedStr (FILE* F)
 FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 /* Read a file position from the file */
 {
-    /* The line number is encoded as 24 bit value to save some space */
-    Pos->Line =	Read24 (F);
-    Pos->Col  = Read8 (F);
-    Pos->Name = Read8 (F);
+    /* Read the data fields */
+    Pos->Line =	ReadVar (F);
+    Pos->Col  = ReadVar (F);
+    Pos->Name = ReadVar (F);
     return Pos;
 }
 
@@ -268,4 +293,4 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
 
 
 
-		 
+

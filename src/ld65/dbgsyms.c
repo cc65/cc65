@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,7 @@
 #include "check.h"
 #include "symdefs.h"
 #include "xmalloc.h"
-	  
+
 /* ld65 */
 #include "global.h"
 #include "error.h"
@@ -69,14 +69,11 @@ static DbgSym*	DbgSymPool [256];
 
 
 
-static DbgSym* NewDbgSym (unsigned char Type, const char* Name, ObjData* O)
+static DbgSym* NewDbgSym (unsigned char Type, ObjData* O)
 /* Create a new DbgSym and return it */
 {
-    /* Get the length of the symbol name */
-    unsigned Len = strlen (Name);
-
     /* Allocate memory */
-    DbgSym* D = xmalloc (sizeof (DbgSym) + Len);
+    DbgSym* D = xmalloc (sizeof (DbgSym));
 
     /* Initialize the fields */
     D->Next     = 0;
@@ -84,8 +81,7 @@ static DbgSym* NewDbgSym (unsigned char Type, const char* Name, ObjData* O)
     D->Obj      = O;
     D->Expr    	= 0;
     D->Type    	= Type;
-    memcpy (D->Name, Name, Len);
-    D->Name [Len] = '\0';
+    D->Name	= 0;
 
     /* Return the new entry */
     return D;
@@ -143,17 +139,16 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 /* Read a debug symbol from a file, insert and return it */
 {
     unsigned char Type;
-    char Name [256];
     DbgSym* D;
 
     /* Read the type */
     Type = Read8 (F);
 
-    /* Read the name */
-    ReadStr (F, Name);
+    /* Create a new debug symbol */
+    D = NewDbgSym (Type, O);
 
-    /* Create a new export */
-    D = NewDbgSym (Type, Name, O);
+    /* Read and assign the name */
+    D->Name = ReadStr (F);
 
     /* Read the value */
     if (Type & EXP_EXPR) {

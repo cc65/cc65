@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,9 +35,11 @@
 
 #include <string.h>
 
-#include "../common/hashstr.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "hashstr.h"
+#include "xmalloc.h"
+	  
+/* ar65 */
 #include "error.h"
 #include "objdata.h"
 #include "exports.h"
@@ -112,7 +114,7 @@ void ExpInsert (const char* Name, unsigned Module)
 	    /* Duplicate entry */
 	    Warning ("External symbol `%s' in module `%s' is duplicated in "
 	       	     "module `%s'",
-		     Name, GetObjName (L->Module), GetObjName (Module));
+	  	     Name, GetObjName (L->Module), GetObjName (Module));
 	}
      	if (L->Next == 0) {
      	    break;
@@ -147,4 +149,4 @@ int ExpFind (const char* Name)
 
 
 
-		    
+

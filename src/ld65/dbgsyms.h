@@ -40,9 +40,11 @@
 
 #include <stdio.h>
 
-#include "../common/exprdefs.h"
-#include "../common/filepos.h"
-
+/* common */
+#include "exprdefs.h"
+#include "filepos.h"
+	  
+/* ld65 */
 #include "objdata.h"
 
 
@@ -62,7 +64,7 @@ struct DbgSym_ {
     FilePos    		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned char	Type;		/* Type of symbol */
-    char       		Name [1];	/* Name - dynamically allocated */
+    char*      	       	Name;		/* Name - dynamically allocated */
 };
 
 
@@ -90,3 +92,4 @@ void PrintDbgSymLabels (ObjData* O, FILE* F);
 
 
 
+				

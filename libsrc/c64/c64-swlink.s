@@ -65,10 +65,8 @@ ACIA_CLOCK      = ACIA+7        ; Turbo232 external baud-rate generator
 ;
 
 .bss
-DropCnt:     	.res  	4      	; Number of bytes lost from rx buffer full
 Stopped:     	.res   	1      	; Flow-stopped flag
 RtsOff:		.res	1      	;
-Errors:		.res	1      	; Number of bytes received in error, low byte
 RecvHead:    	.res	1      	; Head of receive buffer
 RecvTail:	.res	1      	; Tail of receive buffer
 RecvFreeCnt:	.res	1      	; Number of bytes in receive buffer
@@ -95,15 +93,15 @@ BaudTable:                      ; bit7 = 1 means setting is invalid
         .byte   $FF             ; SER_BAUD_75
         .byte   $FF             ; SER_BAUD_110
         .byte   $FF             ; SER_BAUD_134_5
-        .byte   $FF             ; SER_BAUD_150
+        .byte   $02             ; SER_BAUD_150
         .byte   $05             ; SER_BAUD_300
         .byte   $06             ; SER_BAUD_600
         .byte   $07             ; SER_BAUD_1200
         .byte   $FF             ; SER_BAUD_1800
         .byte   $08             ; SER_BAUD_2400
-        .byte   $FF             ; SER_BAUD_3600
+        .byte   $09             ; SER_BAUD_3600
         .byte   $0A             ; SER_BAUD_4800
-        .byte   $FF             ; SER_BAUD_7200
+        .byte   $0B             ; SER_BAUD_7200
         .byte   $0C             ; SER_BAUD_9600
         .byte   $0E             ; SER_BAUD_19200
         .byte   $0F             ; SER_BAUD_38400
@@ -127,11 +125,6 @@ ParityTable:
         .byte   $60             ; SER_PAR_EVEN
         .byte   $A0             ; SER_PAR_MARK
         .byte   $E0             ; SER_PAR_SPACE
-
-HandshakeTable:                 ; bit7 = 1 means that setting is invalid
-        .byte   $FF             ; SER_HS_NONE
-        .byte   $00             ; SER_HS_HW
-        .byte   $FF             ; SER_HS_SW
 
 ; Delay times: 32 byte-receive times in milliseconds, or 100 max.
 ; Formula = 320,000 / baud. Invalid values do contain $FF.
@@ -167,18 +160,22 @@ PauseTimes:
 
 INSTALL:
 
+; Deactivate DTR and disable 6551 interrupts
+
+      	lda     #%00001010
+       	sta    	ACIA_CMD
+
 ; Initialize buffers & control
 
-@L4:	lda 	#0
-   	sta 	RecvHead
-      	sta 	SendHead
-   	sta 	RecvTail
-   	sta 	SendTail
-   	sta 	Errors
-   	sta 	Stopped
-   	lda 	#255
-       	sta    	RecvFreeCnt
-      	sta 	SendFreeCnt
+@L4:   	ldx 	#0
+   	stx 	RecvHead
+      	stx 	SendHead
+   	stx 	RecvTail
+   	stx 	SendTail
+   	stx 	Stopped
+   	dex                     ; X = 255
+       	stx    	RecvFreeCnt
+      	stx 	SendFreeCnt
 
 ; Set up nmi's
 
@@ -188,27 +185,13 @@ INSTALL:
    	sty 	NmiSave+1
    	lda 	#<NmiHandler
    	ldy 	#>NmiHandler
-   	sta 	NMIVec
+SetNMI: sta 	NMIVec
    	sty 	NMIVec+1
-
-; Set default to 2400-8N1, enable interrupts
-
-   	lda	ACIA_DATA
-   	lda	ACIA_STATUS
-      	lda 	#$18
-        sta    	ACIA_CTRL
-
-      	lda 	#$01
-      	sta 	RtsOff
-      	ora 	#$08
-       	sta    	ACIA_CMD
-      	lda 	#$06
-      	sta 	BaudCode
 
 ; Done, return an error code
 
-        lda     #SER_ERR_OK
-        tax
+        lda     #<SER_ERR_OK
+        tax                     ; A is zero
       	rts
 
 ;----------------------------------------------------------------------------
@@ -219,169 +202,85 @@ UNINSTALL:
 
 ; Stop interrupts, drop DTR
 
-   	lda 	RtsOff
-   	and 	#%11100010
-   	ora 	#%00000010
-   	sta	ACIA_CMD
+      	lda     #%00001010
+       	sta    	ACIA_CMD
 
-; Restore NMI vector
+; Restore NMI vector and return OK
 
    	lda 	NmiSave+0
       	ldy 	NmiSave+1
-   	sta 	NMIVec
-   	sty 	NMIVec+1
-
-; Flag uninitialized
-
-        lda 	#SER_ERR_OK
-   	tax
-   	rts
+	jmp	SetNMI
 
 ;----------------------------------------------------------------------------
 ; PARAMS routine. A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
 PARAMS:
+
+; First, check if the handshake setting is valid
+
+        ldy	#SER_PARAMS_HANDSHAKE	; Handshake
+        lda     (ptr1),y
+        cmp	#SER_HS_HW		; This is all we support
+        bne	InvParam
+
+; Set the value for the control register, which contains stop bits, word
+; length and the baud rate.
+
         ldy     #SER_PARAMS_BAUDRATE
         lda     (ptr1),y                ; Baudrate index
-        tax
-        lda     BaudTable,x             ; Get 6551 value
-        bmi     invalid                 ; Branch if rate not supported
+        tay
+        lda     BaudTable,y             ; Get 6551 value
+        bmi     InvBaud	   		; Branch if rate not supported
         sta     tmp1
+	sty    	BaudCode   		; Remember baud rate index
 
-        iny                             ; Databits
+        ldy	#SER_PARAMS_DATABITS	; Databits
         lda     (ptr1),y
-        tax
-        lda     BitTable,x
+        tay
+        lda     BitTable,y
         ora     tmp1
         sta     tmp1
 
-        iny                             ; Stopbits
+        ldy	#SER_PARAMS_STOPBITS	; Stopbits
         lda     (ptr1),y
-        tax
-        lda     StopTable,x
+        tay
+        lda     StopTable,y
         ora     tmp1
-        sta     tmp1
+        ora	#%00010000		; Receiver clock source = baudrate
+	sta	ACIA_CTRL
 
-        iny                             ; Parity
+; Set the value for the command register. We remember the base value in
+; RtsOff, since we will have to manipulate ACIT_CMD often.
+
+        ldy	#SER_PARAMS_PARITY	; Parity
         lda     (ptr1),y
-        tax
-        lda     ParityTable,x
-        ora     tmp1
-        sta     tmp1
+        tay
+        lda     ParityTable,y
+	ora	#%00000001		; DTR active
+	sta	RtsOff
+	ora	#%00010000		; Enable receive interrupts
+	sta	ACIA_CMD
 
-        iny                             ; Handshake
-        lda     (ptr1),y
-        tax
-        lda     HandshakeTable,x
-        bmi     invalid
+; Done
 
+        lda     #<SER_ERR_OK
+        tax                             ; A is zero
+      	rts
 
+; Invalid parameter
 
+InvParam:
+	lda	#<SER_ERR_INIT_FAILED
+	ldx	#>SER_ERR_INIT_FAILED
+	rts
 
+; Baud rate not available
 
-
-;----------------------------------------------------------------------------
-;
-; unsigned char __fastcall__ rs232_params (unsigned char params, unsigned char parity);
-; /* Set the port parameters. Use a combination of the #defined values above. */
-;
-; Set communication parameters.
-;
-; baud rates              stops     word    |   parity
-; ---------------------   -----     -----   |   ---------
-; $00=50     $08=9600     $00=1     $00=8   |   $00=none
-; $01=110    $09=19200    $80=2     $20=7   |   $20=odd
-; $02=134.5  $0a=38400              $40=6   |   $60=even
-; $03=300    $0b=57600              $60=5   |   $A0=mark
-; $04=600    $0c=115200                     |   $E0=space
-; $05=1200   $0d=230400
-; $06=2400   $0e=future
-; $07=4800   $0f=future
-;
-
-_rs232_params:
-        and 	#%11100000              ; Save new parity
-   	ora 	#%00000001
-    	sta 	tmp2
-
-; Check cpu speed against baud rate
-
-   	jsr	popa
-       	sta	tmp1
-   	and 	#$0f
-   	cmp 	#$0c
-   	bcc 	@L3
-
-   	ldx 	CpuSpeed                ; ###
-   	cpx 	#1+1
-   	bcc 	@L2
-   	cmp 	#$0c
-   	beq 	@L3
-   	cpx 	#4
-   	bcs 	@L3
-@L2:	lda 	#RS_ERR_BAUD_TOO_FAST
-   	bne	@L9
-
-; Set baud/parameters
-
-@L3:	lda 	tmp1
-   	and 	#$0f
-   	tax
-   	lda 	BaudTable,x
-        cmp 	#$ff
-   	bne 	@L5
-   	lda 	#RS_ERR_BAUD_NOT_AVAIL
-   	bne	@L9
-
-@L5:  	tax
-      	and 	#$30
-       	beq 	@L6
-    	bit 	Turbo232
-    	bmi 	@L6
-    	lda 	#RS_ERR_BAUD_NOT_AVAIL
-   	bne	@L9
-
-@L6:  	lda 	tmp1
-    	and 	#$0f
-    	sta 	BaudCode
-    	lda 	tmp1
-    	and 	#%11100000
-    	ora 	#%00010000
-    	sta 	tmp1
-    	txa
-    	and 	#$0f
-    	ora 	tmp1
-    	sta	ACIA_CTRL
-    	txa
-    	and 	#%00110000
-    	beq 	@L7
-    	lsr
-    	lsr
-    	lsr
-    	lsr
-    	eor 	#%00000011
-    	sta	ACIA_CLOCK
-
-; Set new parity
-
-@L7:  	lda 	tmp2
-    	sta 	RtsOff
-    	ora 	#%00001000
-      	sta	ACIA_CMD
-    	lda	#0
-@L9:	ldx	#0
-   	rts
-
-.rodata
-
-BaudTable:
-   .byte $ff,$ff,$ff,$05,$06,$07,$08,$0a,$0c,$0e,$0f,$10,$20,$30,$ff,$ff
-     ;in:  0   1   2   3   4   5   6   7   8   9   a   b   c   d   e   f
-     ;baud50 110 134   3   6  12  24  48  96  19  38  57 115 230 exp exp
-     ;out masks: $0F=Baud, val$FF=err
-     ;           $30=t232ExtBaud: $00=none, $10=57.6, $20=115.2, $30=230.4
-.code
+InvBaud:
+        lda     #<SER_ERR_BAUD_UNAVAIL
+        ldx     #>SER_ERR_BAUD_UNAVAIL
+        rts
 
 ;----------------------------------------------------------------------------
 ; GET: Will fetch a character from the receive buffer and store it into the
@@ -394,7 +293,7 @@ GET:
 ; Check for bytes to send
 
 	ldx 	SendFreeCnt
-   	cpx 	#$ff
+       	inx                             ; X == $FF?
    	beq 	@L1
    	lda 	#$00
    	jsr    	TryToSend
@@ -404,8 +303,8 @@ GET:
 @L1:  	lda 	RecvFreeCnt             ; (25)
    	cmp 	#$ff
    	bne 	@L2
-   	lda	#SER_ERR_NO_DATA
-   	ldx 	#0
+   	lda	#<SER_ERR_NO_DATA
+   	ldx 	#>SER_ERR_NO_DATA
    	rts
 
 ; Check for flow stopped & enough free: release flow control
@@ -432,7 +331,7 @@ GET:
    	rts
 
 ;----------------------------------------------------------------------------
-; PUT: Output character in A. 
+; PUT: Output character in A.
 ; Must return an error code in a/x.
 ;
 
@@ -441,7 +340,7 @@ PUT:
 ; Try to send
 
         ldx 	SendFreeCnt
-   	cpx 	#$ff
+       	inx                             ; X = $ff?
    	beq 	@L2
    	pha
    	lda 	#$00
@@ -487,7 +386,7 @@ PAUSE:
 ; Stop rx interrupts
 
    	lda 	RtsOff
-   	ora 	#$02
+   	ora 	#%00000010		; Disable interrupts
    	sta	ACIA_CMD
    	lda	#<SER_ERR_OK
    	tax
@@ -522,15 +421,23 @@ UNPAUSE:
 ;
 
 STATUS:
-
-; Get status
-
         lda    	ACIA_STATUS
  	ldy    	#0
  	sta    	(ptr1),y
-    	jsr    	PollReceive  		; bug-recovery hack
+    	jsr    	PollReceive  	   	; bug-recovery hack
  	tya                             ; SER_ERR_OK
  	tax
+        rts
+
+;----------------------------------------------------------------------------
+; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
+; specific data in ptr1, and the ioctl code in A.
+; Must return an error code in a/x.
+;
+
+IOCTL:
+        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
+        ldx     #>SER_ERR_INV_IOCTL
         rts
 
 ;----------------------------------------------------------------------------
@@ -548,46 +455,31 @@ STATUS:
 
 NmiHandler:
      	pha
-       	lda    	ACIA_STATUS             ;(4) ;status ;check for byte received
-     	and 	#$08           		;(2)
-       	beq    	@L9  			;(2*)
+       	lda    	ACIA_STATUS     ;(4) ;status ;check for byte received
+     	and 	#$08           	;(2)
+       	beq    	@L9  		;(2*)
      	cld
      	txa
      	pha
      	tya
      	pha
-       	lda    	ACIA_STATUS             ;(4) opt ;status ;check for receive errors
-    	and 	#$07           		;(2) opt
-       	beq    	@L1            		;(3*)opt
-    	inc 	Errors       		;(5^)opt
-@L1:	lda 	ACIA_DATA               ;(4) ;data  ;get byte and put into receive buffer
-    	ldy 	RecvTail 		;(4)
-    	ldx 	RecvFreeCnt  	       	;(4)
-      	beq 	@L3  			;(2*)
-    	sta 	RecvBuf,y 		;(5)
-    	inc 	RecvTail             	;(6)
-    	dec 	RecvFreeCnt          	;(6)
-    	cpx 	#33            		;(2)  ;check for buffer space low
-       	bcc    	@L2            		;(2*)
-    	jmp 	NMIEXIT                 ;(3)
+@L1:	lda 	ACIA_DATA       ;(4)  data  ;get byte and put into receive buffer
+    	ldy 	RecvTail 	;(4)
+    	ldx 	RecvFreeCnt  	;(4)
+      	beq 	@L3  		;(2*) Jump if no space in receive buffer
+    	sta 	RecvBuf,y 	;(5)
+    	inc 	RecvTail        ;(6)
+    	dec 	RecvFreeCnt     ;(6)
+    	cpx 	#33            	;(2)  check for buffer space low
+       	bcc    	@L2            	;(2*)
+    	jmp 	NMIEXIT         ;(3)
 
 ; Assert flow control
 
-@L2:  	lda 	RtsOff       		;(3)  ;assert flow control if buffer space too low
-    	sta 	ACIA_CMD	;(4) ;command
-    	sta 	Stopped      		;(3)
-    	jmp 	NMIEXIT      		;(3)
-
-; Drop this char
-
-@L3:	inc 	DropCnt+0    		; not time-critical
-    	bne 	@L4
-    	inc 	DropCnt+1
-    	bne 	@L4
-    	inc 	DropCnt+2
-    	bne 	@L4
-    	inc 	DropCnt+3
-@L4:   	jmp 	NMIEXIT
+@L2:  	lda 	RtsOff       	;(3) assert flow control if buffer space too low
+    	sta 	ACIA_CMD	;(4) command
+    	sta 	Stopped      	;(3)
+@L3:    jmp 	NMIEXIT      	;(3)
 
 @L9:	pla
 	jmp 	NmiContinue

@@ -21,6 +21,9 @@
 %.joy:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
+%.ser:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
 %.tgi:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
@@ -55,6 +58,8 @@ EMDS = c64-georam.emd c64-ram.emd c64-ramcart.emd c64-reu.emd c64-vdc.emd
 
 JOYS = c64-stdjoy.joy
 
+SERS = c64-swlink.ser
+
 TGIS = c64-320-200-2.tgi
 
 #--------------------------------------------------------------------------
@@ -62,14 +67,14 @@ TGIS = c64-320-200-2.tgi
 
 .PHONY:	all clean zap
 
-all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
+all: 	$(OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
-	@rm -f $(EMDS) $(JOYS) $(TGIS)
+	@rm -f $(EMDS) $(JOYS) $(SERS) $(TGIS)
 

@@ -60,7 +60,7 @@ CaseNode* NewCaseNode (unsigned char Value)
 
     /* Initialize the fields */
     N->Value = Value;
-    N->Label = GetLocalLabel ();
+    N->Label = 0;
     N->Nodes = 0;
 
     /* Return the new node */
@@ -138,14 +138,16 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
  */
 {
     CaseNode* N = 0;
+    unsigned CaseLabel = GetLocalLabel ();  /* Code label */
 
     while (Depth--) {
+
+	int Index;
 
 	/* Get the key */
        	unsigned char Key = (Val >> (Depth * CHAR_BIT)) & 0xFF;
 
 	/* Search for the node in the collection */
-	int Index;
 	if (SearchCaseNode (Nodes, Key, &Index) == 0) {
 
 	    /* Node not found - insert one */
@@ -153,10 +155,12 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
 	    CollInsert (Nodes, N, Index);
 
 	    /* If this is not the last round, create the collection for
-	     * the subnodes.
+	     * the subnodes, otherwise get a label for the code.
 	     */
 	    if (Depth > 0) {
-	    	N->Nodes = NewCollection ();
+	     	N->Nodes = NewCollection ();
+	    } else {
+	     	N->Label = CaseLabel;
 	    }
 
 	} else {
@@ -167,7 +171,7 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
 	     * duplicate case label in a switch.
 	     */
 	    if (Depth == 0) {
-	    	Error ("Duplicate case label");
+	     	Error ("Duplicate case label");
 	    }
 	}
 
@@ -176,7 +180,7 @@ unsigned InsertCaseValue (Collection* Nodes, unsigned long Val, unsigned Depth)
     }
 
     /* Return the label of the node we found/created */
-    return N->Label;
+    return CaseLabel;
 }
 
 

@@ -1,5 +1,6 @@
 ;
-; Extended memory driver for the C64 hidden RAM
+; Extended memory driver for the C64 hidden RAM. Driver works without
+; problems when statically linked.
 ;
 ; Ullrich von Bassewitz, 2002-12-02
 ;
@@ -26,7 +27,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
         .word   USE
@@ -43,10 +44,8 @@ PAGES  	= ($10000 - BASE) / 256
 ; ------------------------------------------------------------------------
 ; Data.
 
-.data
-curpage:        .byte	$FF		; Current page number (invalid)
-
 .bss
+curpage:        .res    1               ; Current page number
 window:         .res    256             ; Memory "window"
 
 .code
@@ -59,16 +58,18 @@ window:         .res    256             ; Memory "window"
 ;
 
 INSTALL:
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+        ldx     #$FF
+        stx     curpage                 ; Invalidate the current page
+        inx                             ; X = 0
+        txa                             ; A = X = EM_ERR_OK
         rts
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 
@@ -243,7 +244,7 @@ common: ldy     #EM_COPY_COUNT+1
         sta    	$01
 
 ; Transfer the bytes in the last page
-  
+
         ldy     #$00
 @L3:    lda	(ptr1),y
         sta	(ptr2),y
@@ -256,7 +257,7 @@ common: ldy     #EM_COPY_COUNT+1
         pla
         sta     $01                     ; Restore the old configuration
         cli
-                    
+
 ; Done
 
 @L4:    rts

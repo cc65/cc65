@@ -1,9 +1,10 @@
 ;
-; Extended memory driver for the RamCart 64/128KB cartridge
-; (based on GEORAM code by Ullrich von Bassewitz)
+; Extended memory driver for the RamCart 64/128KB cartridge. Driver works 
+; without problems when statically linked.
+; Code is based on GEORAM code by Ullrich von Bassewitz.
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 06,22.12.2002
-; 
+;
 
 
 	.include	"zeropage.inc"
@@ -28,7 +29,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
 	.word	USE
@@ -46,9 +47,9 @@ RAMC_PAGE_HI      = $DE01                 ; Page register high (only for RC128)
 ; ------------------------------------------------------------------------
 ; Data.
 
-.data
+.bss
 
-pagecount:      .word   512		  ; default for RC128
+pagecount:      .res    2               ; Number of available pages
 
 .code
 
@@ -102,11 +103,11 @@ INSTALL:
 	rts
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

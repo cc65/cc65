@@ -26,7 +26,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
 	.word	USE
@@ -99,14 +99,14 @@ INSTALL:
 
 	ldx	#VDC_CSET
 	lda	tmp1
-	jsr	vdcputreg	; restore 16/64k flag
-	jmp	@endok		; and leave default values for 16k
+ 	jsr	vdcputreg	; restore 16/64k flag
+ 	jmp	@endok		; and leave default values for 16k
 
 @have64k:
-	lda	#<256
-	ldx	#>256
-	sta	pagecount
-	stx	pagecount+1
+ 	lda	#<256
+ 	ldx	#>256
+ 	sta	pagecount
+ 	stx	pagecount+1
 @endok:
 	lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
@@ -141,11 +141,11 @@ settestadr2:
 	jmp	vdcsetsrcaddr
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
     	;on C128 restore font and clear the screen?
         rts
 
@@ -255,7 +255,7 @@ COPYFROM:
 	jsr	setup
 	beq	@L2			; Skip if no full pages
 
-; Copy full pages 
+; Copy full pages
 
 @L1:    jsr     transferin
         inc     ptr1+1
@@ -291,7 +291,7 @@ COPYTO:
 	jsr	setup
 	beq	@L2			; Skip if no full pages
 
-; Copy full pages 
+; Copy full pages
 
 @L1:    jsr     transferout
         inc     ptr1+1

@@ -3,30 +3,37 @@
 #
 
 
-# Library dir
+
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= cc65
+
+# Library directories
 COMMON	= ../common
+B6502	= b6502
 
 # Default for the compiler lib search path as compiler define
 CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
-CFLAGS = -O2 -g -Wall -I$(COMMON) $(CDEFS)
+CFLAGS = -O2 -g -Wall -I$(COMMON) -I$(B6502) $(CDEFS)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=
 
+# ------------------------------------------------------------------------------
+# Object files and libraries to link
+
 OBJS =	anonname.o	\
-	asmcode.o	\
+     	asmcode.o 	\
 	asmlabel.o	\
-	asmline.o	\
-	codeent.o	\
-	codegen.o	\
-	codeseg.o	\
-	compile.o	\
-	cpu.o		\
-	dataseg.o	\
+	asmline.o 	\
+	codegen.o 	\
+	compile.o 	\
+	cpu.o	  	\
 	datatype.o	\
 	declare.o      	\
 	declattr.o	\
-	error.o	 	\
+	error.o	  	\
 	expr.o	 	\
 	exprheap.o     	\
 	exprnode.o	\
@@ -42,7 +49,6 @@ OBJS =	anonname.o	\
 	loop.o		\
 	macrotab.o	\
 	main.o		\
-	opcodes.o	\
 	optimize.o     	\
 	preproc.o      	\
 	pragma.o       	\
@@ -55,30 +61,32 @@ OBJS =	anonname.o	\
 	typecmp.o	\
 	util.o
 
-LIBS = $(COMMON)/common.a
+LIBS = 	$(COMMON)/common.a	\
+     	$(B6502)/b6502.a
 
-EXECS = cc65
 
+# ------------------------------------------------------------------------------
+# Makefile targets
 
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-cc65:	$(OBJS)
-	$(CC) $(LDFLAGS) -o cc65 $(CFLAGS) $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) cc65 ; fi
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
 	rm -f *~ core *.map
 
 zap:	clean
-	rm -f *.o $(EXECS) .depend
+	rm -f *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies
@@ -86,6 +94,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -MM $^ > .depend
+	$(CC) -I$(COMMON) -I$(B6502) -MM $^ > .depend
 
 

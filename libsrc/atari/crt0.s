@@ -10,7 +10,7 @@
 ;
 
 	.export		_exit
-	.constructor	setup_sp,26
+	.constructor	initsp,26
 
 	.import		getargs, argc, argv
 	.import		initlib, donelib
@@ -189,7 +189,7 @@ L2:	lda	zpsave,x
 
 ; setup sp
 
-setup_sp:
+initsp:
 	lda	APPMHI
 	sta	sp
 	lda	APPMHI+1

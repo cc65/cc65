@@ -6,7 +6,7 @@
 ; void __fastcall__ graphics(unsigned char mode);
 
 	.export	_graphics
-	.constructor	scr_memtop,28
+	.constructor	initscrmem,28
 
 	.import	__graphmode_used
 
@@ -24,7 +24,7 @@
 
 ; calc. upper memory limit to use
 
-.proc	scr_memtop
+.proc	initscrmem
 
 	lda	__graphmode_used
 	beq	ignore		; mode 0 doesn't need adjustment

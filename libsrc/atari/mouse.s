@@ -14,7 +14,7 @@
 	.export	_mouse_init, _mouse_done, _mouse_box
 	.export _mouse_show, _mouse_hide, _mouse_move
 	.export _mouse_buttons
-	.constructor	mousemem,27
+	.constructor	initmouse,27
 
 	.import popa,popax
 
@@ -39,7 +39,7 @@ yinit	= defymin	; init. y pos.
 ;--------------------------------------------------------------------
 ; reserve memory for the mouse pointer
 
-mousemem:
+initmouse:
 	lda	APPMHI+1
 	and	#%11111000	; make 2k aligned
 	sec

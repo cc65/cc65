@@ -7,10 +7,19 @@
 	.export		_exit
 	.import	   	initlib, donelib
 	.import	   	zerobss, push0
+	.import		__CODE_LOAD__, __BSS_LOAD__	; Linker generated
 	.import		_main
 
         .include        "zeropage.inc"
 	.include	"apple2.inc"
+
+; ------------------------------------------------------------------------
+; The executable header
+
+.segment	"EXEHDR"
+
+	.word	__CODE_LOAD__			; Start address
+	.word	__BSS_LOAD__ - __CODE_LOAD__	; Size
 
 ; ------------------------------------------------------------------------
 ; Actual code

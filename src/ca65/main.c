@@ -186,7 +186,8 @@ static void DefineSymbol (const char* Def)
 
 
 
-static void OptAutoImport (const char* Opt, const char* Arg)
+static void OptAutoImport (const char* Opt attribute ((unused)),
+			   const char* Arg attribute ((unused)))
 /* Mark unresolved symbols as imported */
 {
     AutoImport = 1;
@@ -194,12 +195,9 @@ static void OptAutoImport (const char* Opt, const char* Arg)
 
 
 
-static void OptCPU (const char* Opt, const char* Arg)
+static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --cpu option */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     if (strcmp (Arg, "6502") == 0) {
 	SetCPU (CPU_6502);
     } else if (strcmp (Arg, "65C02") == 0) {
@@ -217,7 +215,8 @@ static void OptCPU (const char* Opt, const char* Arg)
 
 
 
-static void OptDebugInfo (const char* Opt, const char* Arg)
+static void OptDebugInfo (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DbgSyms = 1;
@@ -225,7 +224,7 @@ static void OptDebugInfo (const char* Opt, const char* Arg)
 
 
 
-static void OptFeature (const char* Opt, const char* Arg)
+static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Set an emulation feature */
 {
     /* Set the feature, check for errors */
@@ -236,7 +235,8 @@ static void OptFeature (const char* Opt, const char* Arg)
 
 
 
-static void OptHelp (const char* Opt, const char* Arg)
+static void OptHelp (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -245,7 +245,8 @@ static void OptHelp (const char* Opt, const char* Arg)
 
 
 
-static void OptIgnoreCase (const char* Opt, const char* Arg)
+static void OptIgnoreCase (const char* Opt attribute ((unused)),
+			   const char* Arg attribute ((unused)))
 /* Ignore case on symbols */
 {
     IgnoreCase = 1;
@@ -253,18 +254,16 @@ static void OptIgnoreCase (const char* Opt, const char* Arg)
 
 
 
-static void OptIncludeDir (const char* Opt, const char* Arg)
+static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     AddIncludePath (Arg);
 }
 
 
 
-static void OptListing (const char* Opt, const char* Arg)
+static void OptListing (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Create a listing file */
 {
     Listing = 1;
@@ -272,14 +271,10 @@ static void OptListing (const char* Opt, const char* Arg)
 
 
 
-static void OptPageLength (const char* Opt, const char* Arg)
+static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --pagelength option */
 {
-    int Len;
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
-    Len = atoi (Arg);
+    int Len = atoi (Arg);
     if (Len != -1 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
 	AbEnd ("Invalid page length: %d", Len);
     }
@@ -288,7 +283,8 @@ static void OptPageLength (const char* Opt, const char* Arg)
 
 
 
-static void OptSmart (const char* Opt, const char* Arg)
+static void OptSmart (const char* Opt attribute ((unused)),
+		      const char* Arg attribute ((unused)))
 /* Handle the -s/--smart options */
 {
     SmartMode = 1;
@@ -296,13 +292,9 @@ static void OptSmart (const char* Opt, const char* Arg)
 
 
 
-static void OptTarget (const char* Opt, const char* Arg)
+static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
-
     /* Map the target name to a target id */
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
@@ -312,7 +304,8 @@ static void OptTarget (const char* Opt, const char* Arg)
 
 
 
-static void OptVerbose (const char* Opt, const char* Arg)
+static void OptVerbose (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -320,7 +313,8 @@ static void OptVerbose (const char* Opt, const char* Arg)
 
 
 
-static void OptVersion (const char* Opt, const char* Arg)
+static void OptVersion (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr,

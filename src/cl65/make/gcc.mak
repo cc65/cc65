@@ -6,7 +6,7 @@
 COMMON	= ../common
 
 CC=gcc
-CFLAGS = -O2 -g -Wall -W -Wno-unused-parameter -I$(COMMON)
+CFLAGS = -O2 -g -Wall -W -I$(COMMON)
 EBIND  = emxbind
 LDFLAGS=
 

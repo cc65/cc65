@@ -238,14 +238,14 @@ void OH_AbsoluteY (const OpcDesc* D)
 
 
 
-void OH_AbsoluteLong (const OpcDesc* D)
+void OH_AbsoluteLong (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
 
 
 
-void OH_AbsoluteLongX (const OpcDesc* D)
+void OH_AbsoluteLongX (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
@@ -269,7 +269,7 @@ void OH_Relative (const OpcDesc* D)
 
 
 
-void OH_RelativeLong (const OpcDesc* D)
+void OH_RelativeLong (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
@@ -332,49 +332,49 @@ void OH_AbsoluteIndirect (const OpcDesc* D)
 
 
 
-void OH_StackRelative (const OpcDesc* D)
+void OH_StackRelative (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
 
 
 
-void OH_DirectIndirectLongX (const OpcDesc* D)
+void OH_DirectIndirectLongX (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
 
 
 
-void OH_StackRelativeIndirectY (const OpcDesc* D)
+void OH_StackRelativeIndirectY (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
 
 
 
-void OH_DirectIndirectLong (const OpcDesc* D)
+void OH_DirectIndirectLong (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
 
 
 
-void OH_DirectIndirectLongY (const OpcDesc* D)
+void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
 
 
 
-void OH_BlockMove (const OpcDesc* D)
+void OH_BlockMove (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
 
 
 
-void OH_AbsoluteXIndirect (const OpcDesc* D)
+void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
 }
@@ -402,7 +402,6 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D)
     OH_AbsoluteIndirect (D);
     SeparatorLine ();
 }
-
 
 
 

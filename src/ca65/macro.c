@@ -758,7 +758,7 @@ void MacAbort (void)
 int IsMacro (const char* Name)
 /* Return true if the given name is the name of a macro */
 {
-    return MacFind (SVal, HashStr (SVal) % HASHTAB_SIZE) != 0;
+    return MacFind (Name, HashStr (Name) % HASHTAB_SIZE) != 0;
 }
 
 
@@ -766,7 +766,7 @@ int IsMacro (const char* Name)
 int IsDefine (const char* Name)
 /* Return true if the given name is the name of a define style macro */
 {
-    Macro* M = MacFind (SVal, HashStr (SVal) % HASHTAB_SIZE);
+    Macro* M = MacFind (Name, HashStr (Name) % HASHTAB_SIZE);
     return (M != 0 && M->Style == MAC_STYLE_DEFINE);
 }
 

@@ -93,7 +93,8 @@ static void Usage (void)
 
 
 
-static void OptDumpAll (const char* Opt, const char* Arg)
+static void OptDumpAll (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Dump all object file information */
 {
     What |= D_ALL;
@@ -101,7 +102,8 @@ static void OptDumpAll (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpDbgSyms (const char* Opt, const char* Arg)
+static void OptDumpDbgSyms (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
 /* Dump debug symbols contained in the object file */
 {
     What |= D_DBGSYMS;
@@ -109,7 +111,8 @@ static void OptDumpDbgSyms (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpExports (const char* Opt, const char* Arg)
+static void OptDumpExports (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
 /* Dump the exported symbols */
 {
     What |= D_EXPORTS;
@@ -117,7 +120,8 @@ static void OptDumpExports (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpFiles (const char* Opt, const char* Arg)
+static void OptDumpFiles (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Dump the source files */
 {
     What |= D_FILES;
@@ -125,7 +129,8 @@ static void OptDumpFiles (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpHeader (const char* Opt, const char* Arg)
+static void OptDumpHeader (const char* Opt attribute ((unused)),
+			   const char* Arg attribute ((unused)))
 /* Dump the object file header */
 {
     What |= D_HEADER;
@@ -133,7 +138,8 @@ static void OptDumpHeader (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpImports (const char* Opt, const char* Arg)
+static void OptDumpImports (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
 /* Dump the imported symbols */
 {
     What |= D_IMPORTS;
@@ -141,7 +147,8 @@ static void OptDumpImports (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpLineInfo (const char* Opt, const char* Arg)
+static void OptDumpLineInfo (const char* Opt attribute ((unused)),
+			     const char* Arg attribute ((unused)))
 /* Dump the line infos */
 {
     What |= D_LINEINFO;
@@ -149,7 +156,8 @@ static void OptDumpLineInfo (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpOptions (const char* Opt, const char* Arg)
+static void OptDumpOptions (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
 /* Dump the object file options */
 {
     What |= D_OPTIONS;
@@ -157,7 +165,8 @@ static void OptDumpOptions (const char* Opt, const char* Arg)
 
 
 
-static void OptDumpSegments (const char* Opt, const char* Arg)
+static void OptDumpSegments (const char* Opt attribute ((unused)),
+			     const char* Arg attribute ((unused)))
 /* Dump the segments in the object file */
 {
     What |= D_SEGMENTS;
@@ -165,7 +174,8 @@ static void OptDumpSegments (const char* Opt, const char* Arg)
 
 
 
-static void OptHelp (const char* Opt, const char* Arg)
+static void OptHelp (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -174,7 +184,8 @@ static void OptHelp (const char* Opt, const char* Arg)
 
 
 
-static void OptVersion (const char* Opt, const char* Arg)
+static void OptVersion (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr,

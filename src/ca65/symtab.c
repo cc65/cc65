@@ -596,7 +596,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
     CHECK (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
 #else
     CHECK (Type <= CD_TYPE_MAX);
-#endif    
+#endif
     CHECK (Prio >= CD_PRIO_MIN && Prio <= CD_PRIO_MAX);
 
     /* Don't accept local symbols */
@@ -1023,13 +1023,14 @@ void SymDump (FILE* F)
     while (S) {
 	/* Ignore trampoline symbols */
 	if ((S->Flags & SF_TRAMPOLINE) != 0) {
-	    printf ("%-24s %s %s %s %s %s\n",
-		    S->Name,
-		    (S->Flags & SF_DEFINED)? "DEF" : "---",
-		    (S->Flags & SF_REFERENCED)? "REF" : "---",
-		    (S->Flags & SF_IMPORT)? "IMP" : "---",
-		    (S->Flags & SF_EXPORT)? "EXP" : "---",
-		    (S->Flags & SF_ZP)? "ZP" : "--");
+	    fprintf (F,
+		     "%-24s %s %s %s %s %s\n",
+		     S->Name,
+		     (S->Flags & SF_DEFINED)? "DEF" : "---",
+		     (S->Flags & SF_REFERENCED)? "REF" : "---",
+		     (S->Flags & SF_IMPORT)? "IMP" : "---",
+		     (S->Flags & SF_EXPORT)? "EXP" : "---",
+		     (S->Flags & SF_ZP)? "ZP" : "--");
 	}
 	/* Next symbol */
 	S = S->List;

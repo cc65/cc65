@@ -38,18 +38,22 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+	  
+/* common */
+#include "attrib.h"
 
+/* cl65 */
 #include "error.h"
 
 
 
 /*****************************************************************************/
-/* 		    		     Code				     */
+/* 		    		     Code 				     */
 /*****************************************************************************/
 
 
 
-int spawnvp (int Mode, const char* File, char* const argv [])
+int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [])
 /* Execute the given program searching and wait til it terminates. The Mode
  * argument is ignored (compatibility only). The result of the function is
  * the return code of the program. The function will terminate the program

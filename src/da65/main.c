@@ -143,7 +143,8 @@ static void OptCPU (const char* Opt, const char* Arg)
 
 
 
-static void OptFormFeeds (const char* Opt, const char* Arg)
+static void OptFormFeeds (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Add form feeds to the output */
 {
     FormFeeds = 1;
@@ -151,7 +152,8 @@ static void OptFormFeeds (const char* Opt, const char* Arg)
 
 
 
-static void OptHelp (const char* Opt, const char* Arg)
+static void OptHelp (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -160,14 +162,10 @@ static void OptHelp (const char* Opt, const char* Arg)
 
 
 
-static void OptPageLength (const char* Opt, const char* Arg)
+static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --pagelength option */
 {
-    int Len;
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
-    Len = atoi (Arg);
+    int Len = atoi (Arg);
     if (Len != 0 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
 	AbEnd ("Invalid page length: %d", Len);
     }
@@ -184,7 +182,8 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 
 
 
-static void OptVerbose (const char* Opt, const char* Arg)
+static void OptVerbose (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -192,7 +191,8 @@ static void OptVerbose (const char* Opt, const char* Arg)
 
 
 
-static void OptVersion (const char* Opt, const char* Arg)
+static void OptVersion (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Print the disassembler version */
 {
     fprintf (stderr,
@@ -257,7 +257,7 @@ static void OneOpcode (unsigned RemainingBytes)
 
 	case atDWordTab:
 	    DWordTable ();
-	    break;
+	    break;	
 
 	case atAddrTab:
 	    AddrTable ();

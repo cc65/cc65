@@ -129,7 +129,8 @@ void ClearLineInfo (void)
 
 
 
-static int CmpLineInfo (void* Data, const void* LI1_, const void* LI2_)
+static int CmpLineInfo (void* Data attribute ((unused)), 
+			const void* LI1_, const void* LI2_)
 /* Compare function for the sort */
 {
     /* Cast the pointers */
@@ -161,7 +162,7 @@ static int CmpLineInfo (void* Data, const void* LI1_, const void* LI2_)
     }
 }
 
-
+							   
 
 void MakeLineInfoIndex (void)
 /* Sort the line infos and drop all unreferenced ones */

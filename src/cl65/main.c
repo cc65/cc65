@@ -589,7 +589,8 @@ static void Usage (void)
 
 
 
-static void OptAddSource (const char* Opt, const char* Arg)
+static void OptAddSource (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Strict source code as comments to the generated asm code */
 {
     CmdAddArg (&CC65, "-T");
@@ -597,7 +598,8 @@ static void OptAddSource (const char* Opt, const char* Arg)
 
 
 
-static void OptAnsi (const char* Opt, const char* Arg)
+static void OptAnsi (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
 /* Strict ANSI mode (compiler) */
 {
     CmdAddArg (&CC65, "-A");
@@ -605,7 +607,7 @@ static void OptAnsi (const char* Opt, const char* Arg)
 
 
 
-static void OptAsmIncludeDir (const char* Opt, const char* Arg)
+static void OptAsmIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Include directory (assembler) */
 {
     CmdAddArg (&CA65, "-I");
@@ -614,7 +616,7 @@ static void OptAsmIncludeDir (const char* Opt, const char* Arg)
 
 
 
-static void OptBssName (const char* Opt, const char* Arg)
+static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --bss-name option */
 {
     CmdAddArg (&CC65, "--bss-name");
@@ -623,7 +625,8 @@ static void OptBssName (const char* Opt, const char* Arg)
 
 
 
-static void OptCheckStack (const char* Opt, const char* Arg)
+static void OptCheckStack (const char* Opt attribute ((unused)),
+			   const char* Arg attribute ((unused)))
 /* Handle the --check-stack option */
 {
     CmdAddArg (&CC65, "--check-stack");
@@ -631,7 +634,7 @@ static void OptCheckStack (const char* Opt, const char* Arg)
 
 
 
-static void OptCodeName (const char* Opt, const char* Arg)
+static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --code-name option */
 {
     CmdAddArg (&CC65, "--code-name");
@@ -640,7 +643,7 @@ static void OptCodeName (const char* Opt, const char* Arg)
 
 
 
-static void OptCodeSize (const char* Opt, const char* Arg)
+static void OptCodeSize (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --codesize option */
 {
     CmdAddArg (&CC65, "--codesize");
@@ -649,7 +652,7 @@ static void OptCodeSize (const char* Opt, const char* Arg)
 
 
 
-static void OptCPU (const char* Opt, const char* Arg)
+static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --cpu option */
 {
     /* Add the cpu type to the assembler and compiler */
@@ -661,7 +664,8 @@ static void OptCPU (const char* Opt, const char* Arg)
 
 
 
-static void OptCreateDep (const char* Opt, const char* Arg)
+static void OptCreateDep (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Handle the --create-dep option */
 {
     CmdAddArg (&CC65, "--create-dep");
@@ -669,7 +673,7 @@ static void OptCreateDep (const char* Opt, const char* Arg)
 
 
 
-static void OptDataName (const char* Opt, const char* Arg)
+static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --data-name option */
 {
     CmdAddArg (&CC65, "--data-name");
@@ -678,7 +682,8 @@ static void OptDataName (const char* Opt, const char* Arg)
 
 
 
-static void OptDebug (const char* Opt, const char* Arg)
+static void OptDebug (const char* Opt attribute ((unused)),
+		      const char* Arg attribute ((unused)))
 /* Debug mode (compiler) */
 {
     CmdAddArg (&CC65, "-d");
@@ -686,7 +691,8 @@ static void OptDebug (const char* Opt, const char* Arg)
 
 
 
-static void OptDebugInfo (const char* Opt, const char* Arg)
+static void OptDebugInfo (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Debug Info - add to compiler and assembler */
 {
     CmdAddArg (&CC65, "-g");
@@ -695,7 +701,7 @@ static void OptDebugInfo (const char* Opt, const char* Arg)
 
 
 
-static void OptFeature (const char* Opt, const char* Arg)
+static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Emulation features for the assembler */
 {
     CmdAddArg (&CA65, "--feature");
@@ -704,7 +710,8 @@ static void OptFeature (const char* Opt, const char* Arg)
 
 
 
-static void OptHelp (const char* Opt, const char* Arg)
+static void OptHelp (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
 /* Print help - cl65 */
 {
     Usage ();
@@ -713,7 +720,7 @@ static void OptHelp (const char* Opt, const char* Arg)
 
 
 
-static void OptIncludeDir (const char* Opt, const char* Arg)
+static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Include directory (compiler) */
 {
     CmdAddArg (&CC65, "-I");
@@ -722,7 +729,8 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 
 
 
-static void OptListing (const char* Opt, const char* Arg)
+static void OptListing (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Create an assembler listing */
 {
     CmdAddArg (&CA65, "-l");
@@ -730,7 +738,7 @@ static void OptListing (const char* Opt, const char* Arg)
 
 
 
-static void OptMapFile (const char* Opt, const char* Arg)
+static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Create a map file */
 {
     /* Create a map file (linker) */
@@ -740,7 +748,7 @@ static void OptMapFile (const char* Opt, const char* Arg)
 
 
 
-static void OptRodataName (const char* Opt, const char* Arg)
+static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --rodata-name option */
 {
     CmdAddArg (&CC65, "--rodata-name");
@@ -749,7 +757,8 @@ static void OptRodataName (const char* Opt, const char* Arg)
 
 
 
-static void OptSignedChars (const char* Opt, const char* Arg)
+static void OptSignedChars (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
 /* Make default characters signed */
 {
     CmdAddArg (&CC65, "-j");
@@ -757,7 +766,7 @@ static void OptSignedChars (const char* Opt, const char* Arg)
 
 
 
-static void OptStartAddr (const char* Opt, const char* Arg)
+static void OptStartAddr (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the default start address */
 {
     CmdAddArg (&LD65, "-S");
@@ -766,7 +775,8 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 
 
 
-static void OptStaticLocals (const char* Opt, const char* Arg)
+static void OptStaticLocals (const char* Opt attribute ((unused)),
+			     const char* Arg attribute ((unused)))
 /* Place local variables in static storage */
 {
     CmdAddArg (&CC65, "-Cl");
@@ -774,7 +784,7 @@ static void OptStaticLocals (const char* Opt, const char* Arg)
 
 
 
-static void OptTarget (const char* Opt, const char* Arg)
+static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
     Target = FindTarget (Arg);
@@ -785,7 +795,8 @@ static void OptTarget (const char* Opt, const char* Arg)
 
 
 
-static void OptVerbose (const char* Opt, const char* Arg)
+static void OptVerbose (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Verbose mode (compiler, assembler, linker) */
 {
     CmdAddArg (&CC65, "-v");
@@ -795,7 +806,8 @@ static void OptVerbose (const char* Opt, const char* Arg)
 
 
 
-static void OptVersion (const char* Opt, const char* Arg)
+static void OptVersion (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Print version number */
 {
     fprintf (stderr,

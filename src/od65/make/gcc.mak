@@ -6,7 +6,7 @@
 # Library dir
 COMMON	= ../common
 
-CFLAGS = -O2 -g -Wall -W -Wno-unused-parameter -I$(COMMON)
+CFLAGS = -O2 -g -Wall -W -I$(COMMON)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=

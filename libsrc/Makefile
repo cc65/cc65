@@ -126,7 +126,13 @@ geoslib:
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	for i in common runtime; do \
-	    $(AR) a geos.lib $$i/*.o;\
+	    for objfile in $$i/*.o; do \
+	        if [ -f geos/$$objfile ]; then \
+		    $(AR) a geos.lib geos/$$objfile; \
+		else \
+		    $(AR) a geos.lib $$objfile; \
+		fi; \
+	    done \
 	done
 
 #-----------------------------------------------------------------------------

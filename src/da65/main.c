@@ -298,7 +298,7 @@ static void OneOpcode (unsigned RemainingBytes)
 	case atAddrTab:
 	    AddrTable ();
 	    break;
-                    
+
 	case atRtsTab:
 	    RtsTable ();
 	    break;
@@ -445,11 +445,6 @@ int main (int argc, char* argv [])
     /* Must have an input file */
     if (InFile == 0) {
      	AbEnd ("No input file");
-    }
-
-    /* Make the output file name from the input file name if none was given */
-    if (OutFile == 0) {
-	OutFile = MakeFilename (InFile, OutExt);
     }
 
     /* If no CPU given, use the default CPU */

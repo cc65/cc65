@@ -87,11 +87,17 @@ static void PageHeader (void)
 void OpenOutput (const char* Name)
 /* Open the given file for output */
 {
-    /* Open the output file */
-    F = fopen (Name, "w");
-    if (F == 0) {
-	Error ("Cannot open `%s': %s", Name, strerror (errno));
+    /* If we have a name given, open the output file, otherwise use stdout */
+    if (Name != 0) {
+        F = fopen (Name, "w");
+        if (F == 0) {
+            Error ("Cannot open `%s': %s", Name, strerror (errno));
+        }
+    } else {
+        F = stdout;
     }
+
+    /* Output the header and initialize stuff */
     PageHeader ();
     Line = 4;
     Col  = 1;
@@ -102,7 +108,7 @@ void OpenOutput (const char* Name)
 void CloseOutput (void)
 /* Close the output file */
 {
-    if (fclose (F) != 0) {
+    if (F != stdout && fclose (F) != 0) {
 	Error ("Error closing output file: %s", strerror (errno));
     }
 }

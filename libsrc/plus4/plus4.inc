@@ -21,8 +21,7 @@ CURS_Y		= $CD  		; Cursor row
 SCREEN_PTR	= $C8  		; Pointer to current char in text screen
 CRAM_PTR	= $EA  		; Pointer to current char in color RAM
 
-DOS_FN1         = $25E          ; DOS filename buffer #1
-DOS_FN1LEN      = $26E          ; DOS filename length #1
+INBUF		= $25E          ; BASIC Input buffer
 CHARCOLOR       = $53B
 FKEY_COUNT	= $55D		; Characters for function key
 FKEY_SPACE	= $55F		; Function key definitions

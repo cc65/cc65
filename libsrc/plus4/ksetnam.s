@@ -15,12 +15,9 @@
 
 .proc   SETNAM
 
-; Limit the length of the name and store it into the zero page
+; Store the length of the name into the zero page
 
-        cmp     #16+1
-        bcc     @L1
-        lda     #16                     ; Use a maximum of 16 chars
-@L1:    sta     FNAM_LEN
+	sta     FNAM_LEN
 
 ; Check if we have to copy the name to low memory
 
@@ -34,19 +31,19 @@
         stx     TMPPTR
         sty     TMPPTR+1                ; Store pointer to name in TMPPTR
 
-; Copy the given name into DOS_FN1
+; Copy the given name into INBUF.
 
         ldy     #$00
 @L2:    lda     (TMPPTR),y
-        sta     DOS_FN1,y
+        sta     INBUF,y
         iny
         cpy     FNAM_LEN
         bne     @L2
 
 ; Load the new parameters for the low memory buffer
 
-        ldx     #<DOS_FN1
-        ldy     #>DOS_FN1
+        ldx     #<INBUF
+        ldy     #>INBUF
 
 ; Instead of banking in the ROM, store the values directly into the zeropage
 

@@ -335,11 +335,32 @@ long GetExprVal (ExprNode* Expr)
        	case EXPR_GE:
     	    return (GetExprVal (Expr->Left) >= GetExprVal (Expr->Right));
 
+	case EXPR_BOOLAND:
+	    return GetExprVal (Expr->Left) && GetExprVal (Expr->Right);
+
+	case EXPR_BOOLOR:
+	    return GetExprVal (Expr->Left) || GetExprVal (Expr->Right);
+
+	case EXPR_BOOLXOR:
+	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
+
        	case EXPR_UNARY_MINUS:
 	    return -GetExprVal (Expr->Left);
 
        	case EXPR_NOT:
 	    return ~GetExprVal (Expr->Left);
+
+        case EXPR_SWAP:
+	    Left = GetExprVal (Expr->Left);
+	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
+
+	case EXPR_BOOLNOT:
+       	    return !GetExprVal (Expr->Left);
+
+        case EXPR_FORCEWORD:
+        case EXPR_FORCEFAR:
+            /* These two have no effect on the expression result */
+            return GetExprVal (Expr->Left);
 
        	case EXPR_BYTE0:
 	    return GetExprVal (Expr->Left) & 0xFF;
@@ -353,23 +374,13 @@ long GetExprVal (ExprNode* Expr)
        	case EXPR_BYTE3:
 	    return (GetExprVal (Expr->Left) >> 24) & 0xFF;
 
-        case EXPR_SWAP:
-	    Left = GetExprVal (Expr->Left);
-	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
+       	case EXPR_WORD0:
+	    return GetExprVal (Expr->Left) & 0xFFFF;
 
-	case EXPR_BOOLAND:
-	    return GetExprVal (Expr->Left) && GetExprVal (Expr->Right);
+       	case EXPR_WORD1:
+	    return (GetExprVal (Expr->Left) >> 16) & 0xFFFF;
 
-	case EXPR_BOOLOR:
-	    return GetExprVal (Expr->Left) || GetExprVal (Expr->Right);
-
-	case EXPR_BOOLXOR:
-	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
-
-	case EXPR_BOOLNOT:
-       	    return !GetExprVal (Expr->Left);
-
-        default:
+        default:                                         
        	    Internal ("Unknown expression Op type: %u", Expr->Op);
       	    /* NOTREACHED */
     	    return 0;

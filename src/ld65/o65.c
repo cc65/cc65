@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1999-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -350,16 +350,11 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
  */
 {
     Export* E;
-    unsigned long Val;
 
     switch (Expr->Op) {
 
 	case EXPR_LITERAL:
-	    if (Sign < 0) {
-	       	D->Val -= Expr->V.Val;
-	    } else {
-	       	D->Val += Expr->V.Val;
-	    }
+            D->Val += (Sign * Expr->V.Val);
 	    break;
 
 	case EXPR_SYMBOL:
@@ -397,12 +392,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     	 	/* Remember the segment reference */
     		D->SecRef = GetExprSection (Expr);
                 /* Add the offset of the section to the constant value */
-                Val = D->SecRef->Offs + D->SecRef->Seg->PC;
-                if (Sign < 0) {
-                    D->Val -= Val;
-                } else {
-                    D->Val += Val;
-                }
+                D->Val += Sign * (D->SecRef->Offs + D->SecRef->Seg->PC);
     	    }
     	    break;
 
@@ -414,12 +404,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     	 	/* Remember the segment reference */
        	       	D->SegRef = Expr->V.Seg;
                 /* Add the offset of the segment to the constant value */
-                Val = D->SegRef->PC;
-                if (Sign < 0) {
-                    D->Val -= Val;
-                } else {
-                    D->Val += Val;
-                }
+                D->Val += (Sign * D->SegRef->PC);
     	    }
     	    break;
 
@@ -433,12 +418,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
                 /* Add the start address of the memory area to the constant
                  * value
                  */
-                Val = D->MemRef->Start;
-                if (Sign < 0) {
-                    D->Val -= Val;
-                } else {
-                    D->Val += Val;
-                }
+                D->Val += (Sign * D->MemRef->Start);
     	    }
     	    break;
 

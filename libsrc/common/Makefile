@@ -44,8 +44,11 @@ C_OBJS =	_afailed.o	\
 		putchar.o	\
 		puts.o 		\
 		qsort.o		\
+                raise.o         \
 		realloc.o	\
 		rewind.o	\
+                signal.o        \
+                sigtable.o      \
 		sscanf.o	\
                 strftime.o      \
 		strxfrm.o	\

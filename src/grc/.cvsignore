@@ -1,3 +1,4 @@
 grc
 *.hh
 *.ss
+.depend

@@ -98,6 +98,11 @@ More special thanks to:
 
     Josef contributed the CBM directory routines.
 
+  * Stephen L. Judd
+
+    for his GRLIB code which is the base of the C64 320x200 TGI driver.
+
+
 
 Thanks to
 

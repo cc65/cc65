@@ -175,7 +175,7 @@ static void Parse (void)
        	       	    if (Size == 0) {
 	     	    	if (!IsTypeVoid (Decl.Type)) {
 	     	    	    if (!IsTypeArray (Decl.Type)) {
-	     	    	      	/* Size is unknown and not an array */
+	     	      	      	/* Size is unknown and not an array */
 	     	    	      	Error ("Variable `%s' has unknown size", Decl.Ident);
 	     	    	    }
 	     	    	} else if (ANSI) {
@@ -204,19 +204,27 @@ static void Parse (void)
 	     	    if (IsTypeVoid (Decl.Type)) {
 	     	    	/* We cannot declare variables of type void */
 			Error ("Illegal type for variable `%s'", Decl.Ident);
-	     	    } else if (Size == 0) {
-	     		/* Size is unknown */
-			Error ("Variable `%s' has unknown size", Decl.Ident);
+                        Entry->Flags &= ~(SC_STORAGE | SC_DEF);
+                    } else if (Size == 0) {
+	     		/* Size is unknown. Is it an array? */
+                        if (!IsTypeArray (Decl.Type)) {
+                            Error ("Variable `%s' has unknown size", Decl.Ident);
+                        }
+                        Entry->Flags &= ~(SC_STORAGE | SC_DEF);
 	     	    }
 
-	     	    /* Switch to the BSS segment */
-	     	    g_usebss ();
+                    /* Allocate storage if it is still needed */
+                    if (Entry->Flags & SC_STORAGE) {
 
-	     	    /* Define a label */
-	     	    g_defgloblabel (Entry->Name);
+                        /* Switch to the BSS segment */
+                        g_usebss ();
 
-	     	    /* Allocate space for uninitialized variable */
-	     	    g_res (SizeOf (Entry->Type));
+                        /* Define a label */
+                        g_defgloblabel (Entry->Name);
+
+                        /* Allocate space for uninitialized variable */
+                        g_res (Size);
+                    }
 	     	}
 
 	    }

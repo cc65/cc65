@@ -46,6 +46,7 @@
 #include "scanner.h"
 #include "segment.h"
 #include "spool.h"
+#include "studyexpr.h"          /* ### */
 #include "symentry.h"
 #include "symtab.h"
 
@@ -83,20 +84,6 @@ int IsLocalNameId (unsigned Name)
 /* Return true if Name is the name of a local symbol */
 {
     return (*GetString (Name) == LocalStart);
-}
-
-
-
-static unsigned SymAddrSize (const SymEntry* S)
-/* Get the default address size for a symbol. */
-{
-    /* Local symbols are always near (is this ok?) */
-    if (IsLocalNameId (S->Name)) {
-        return ADDR_SIZE_ABS;
-    }
-
-    /* Return the address size of the segment */
-    return GetCurrentSegAddrSize ();
 }
 
 
@@ -220,20 +207,12 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
 
     /* Map a default address size to a real value */
     if (AddrSize == ADDR_SIZE_DEFAULT) {
-        long Val;
-        if (IsConstExpr (Expr, &Val)) {
-            if (IsByteRange (Val)) {
-                AddrSize = ADDR_SIZE_ZP;
-            } else if (IsWordRange (Val)) {
-                AddrSize = ADDR_SIZE_ABS;
-            } else if (IsFarRange (Val)) {
-                AddrSize = ADDR_SIZE_FAR;
-            } else {
-                AddrSize = ADDR_SIZE_LONG;
-            }
-        } else {
-            AddrSize = SymAddrSize (S);
-        }
+        /* ### Must go! Delay address size calculation until end of assembly! */
+        ExprDesc ED;
+        ED_Init (&ED);
+        StudyExpr (Expr, &ED);
+        AddrSize = ED.AddrSize;
+        ED_Done (&ED);
     }
 
     /* Set the symbol value */

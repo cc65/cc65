@@ -37,6 +37,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "../common/cmdline.h"
+
 #include "global.h"
 #include "error.h"
 

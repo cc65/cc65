@@ -44,11 +44,13 @@
 #  include "spawn.h"		/* All others */
 #endif
 
+#include "../common/cmdline.h"
+#include "../common/fname.h"
 #include "../common/version.h"
+#include "../common/xmalloc.h"
 
 #include "global.h"
 #include "error.h"
-#include "mem.h"
 
 
 
@@ -144,61 +146,6 @@ static char* TargetLib	= 0;
 
 
 /*****************************************************************************/
-/*	   			String handling				     */
-/*****************************************************************************/
-
-
-
-static const char* FindExt (const char* Name)
-/* Return a pointer to the file extension in Name or NULL if there is none */
-{
-    const char* S;
-
-    /* Get the length of the name */
-    unsigned Len = strlen (Name);
-    if (Len < 2) {
-	return 0;
-    }
-
-    /* Get a pointer to the last character */
-    S = Name + Len - 1;
-
-    /* Search for the dot, beware of subdirectories */
-    while (S >= Name && *S != '.' && *S != '\\' && *S != '/') {
-	--S;
-    }
-
-    /* Did we find an extension? */
-    if (*S == '.') {
-	return S;
-    } else {
-	return 0;
-    }
-}
-
-
-
-static char* ForceExt (const char* Name, const char* Ext)
-/* Return a new filename with the new extension */
-{
-    char* Out;
-    const char* P = FindExt (Name);
-    if (P == 0) {
-	/* No dot, add the extension */
-	Out = Xmalloc (strlen (Name) + strlen (Ext) + 1);
-	strcpy (Out, Name);
-	strcat (Out, Ext);
-    } else {
-	Out = Xmalloc (P - Name + strlen (Ext) + 1);
-	memcpy (Out, Name, P - Name);
-	strcpy (Out + (P - Name), Ext);
-    }
-    return Out;
-}
-
-
-
-/*****************************************************************************/
 /*			     Determine a file type			     */
 /*****************************************************************************/
 
@@ -257,16 +204,16 @@ static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
     /* Expand the argument vector if needed */
     if (Cmd->ArgCount == Cmd->ArgMax) {
 	unsigned NewMax  = Cmd->ArgMax + 10;
-	char**	 NewArgs = Xmalloc (NewMax * sizeof (char*));
+	char**	 NewArgs = xmalloc (NewMax * sizeof (char*));
 	memcpy (NewArgs, Cmd->Args, Cmd->ArgMax * sizeof (char*));
-	Xfree (Cmd->Args);
+	xfree (Cmd->Args);
 	Cmd->Args   = NewArgs;
 	Cmd->ArgMax = NewMax;
     }
 
     /* Add a copy of the new argument, allow a NULL pointer */
     if (Arg) {
-	Cmd->Args [Cmd->ArgCount++] = StrDup (Arg);
+	Cmd->Args [Cmd->ArgCount++] = xstrdup (Arg);
     } else {
 	Cmd->Args [Cmd->ArgCount++] = 0;
     }
@@ -279,7 +226,7 @@ static void CmdDelArgs (CmdDesc* Cmd, unsigned LastValid)
 {
     while (Cmd->ArgCount > LastValid) {
 	Cmd->ArgCount--;
-	Xfree (Cmd->Args [Cmd->ArgCount]);
+	xfree (Cmd->Args [Cmd->ArgCount]);
 	Cmd->Args [Cmd->ArgCount] = 0;
     }
 }
@@ -292,16 +239,16 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
     /* Expand the file vector if needed */
     if (Cmd->FileCount == Cmd->FileMax) {
 	unsigned NewMax   = Cmd->FileMax + 10;
-	char**	 NewFiles = Xmalloc (NewMax * sizeof (char*));
+	char**	 NewFiles = xmalloc (NewMax * sizeof (char*));
 	memcpy (NewFiles, Cmd->Files, Cmd->FileMax * sizeof (char*));
-	Xfree (Cmd->Files);
+	xfree (Cmd->Files);
 	Cmd->Files   = NewFiles;
 	Cmd->FileMax = NewMax;
     }
 
     /* Add a copy of the file name, allow a NULL pointer */
     if (File) {
-	Cmd->Files [Cmd->FileCount++] = StrDup (File);
+	Cmd->Files [Cmd->FileCount++] = xstrdup (File);
     } else {
 	Cmd->Files [Cmd->FileCount++] = 0;
     }
@@ -313,7 +260,7 @@ static void CmdInit (CmdDesc* Cmd, const char* Path)
 /* Initialize the command using the given path to the executable */
 {
     /* Remember the command */
-    Cmd->Name = StrDup (Path);
+    Cmd->Name = xstrdup (Path);
 
     /* Use the command name as first argument */
     CmdAddArg (Cmd, Path);
@@ -390,12 +337,12 @@ static void SetTargetFiles (void)
  	unsigned    TargetNameLen = strlen (TargetName);
 
  	/* Set the startup file */
- 	TargetCRT0 = Xmalloc (TargetNameLen + 2 + 1);
+ 	TargetCRT0 = xmalloc (TargetNameLen + 2 + 1);
  	strcpy (TargetCRT0, TargetName);
  	strcat (TargetCRT0, ".o");
 
  	/* Set the library file */
- 	TargetLib = Xmalloc (TargetNameLen + 4 + 1);
+ 	TargetLib = xmalloc (TargetNameLen + 4 + 1);
  	strcpy (TargetLib, TargetName);
  	strcat (TargetLib, ".lib");
 
@@ -468,10 +415,10 @@ static void Link (void)
 
     } else if (FirstInput && FindExt (FirstInput)) {  /* Only if ext present! */
 
-	char* Output = ForceExt (FirstInput, "");
+	char* Output = MakeFilename (FirstInput, "");
 	CmdAddArg (&LD65, "-o");
 	CmdAddArg (&LD65, Output);
-	Xfree (Output);
+	xfree (Output);
 
     }
 
@@ -515,9 +462,9 @@ static void Assemble (const char* File)
 	 * with .s replaced by ".o". Add this file to the list of
 	 * linker files.
 	 */
-	char* ObjName = ForceExt (File, ".o");
+	char* ObjName = MakeFilename (File, ".o");
 	CmdAddFile (&LD65, ObjName);
-	Xfree (ObjName);
+	xfree (ObjName);
     }
 
     /* Add the file as argument for the assembler */
@@ -555,7 +502,7 @@ static void Compile (const char* File)
 	/* The assembler file name will be the name of the source file
 	 * with .c replaced by ".s".
 	 */
-	AsmName = ForceExt (File, ".s");
+	AsmName = MakeFilename (File, ".s");
     }
 
     /* Add the file as argument for the compiler */
@@ -579,7 +526,7 @@ static void Compile (const char* File)
 	    Warning ("Cannot remove temporary file `%s': %s",
 		     AsmName, strerror (errno));
 	}
-	Xfree (AsmName);
+	xfree (AsmName);
     }
 }
 
@@ -627,53 +574,15 @@ static void Usage (void)
        	     "  --debug-info\t\tAdd debug info\n"
        	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet a compiler include directory path\n"
-       	     "  --version\t\tPrint the version number\n"
        	     "  --target sys\t\tSet the target system\n"
+       	     "  --version\t\tPrint the version number\n"
        	     "  --verbose\t\tVerbose mode\n",
-	     ProgName);
+    	     ProgName);
 }
 
 
 
-static const char* GetArg (int* ArgNum, char* argv [], unsigned Len)
-/* Get an option argument */
-{
-    const char* Arg = argv [*ArgNum];
-    if (Arg [Len] != '\0') {
-	/* Argument appended */
-	return Arg + Len;
-    } else {
-	/* Separate argument */
-	Arg = argv [*ArgNum + 1];
-	if (Arg == 0) {
-	    /* End of arguments */
-	    fprintf (stderr, "Option requires an argument: %s\n", argv [*ArgNum]);
-	    exit (EXIT_FAILURE);
-	}
-	++(*ArgNum);
-	return Arg;
-    }
-}
-
-
-
-static void UnknownOption (const char* Arg)
-/* Print an error about a wrong argument */
-{
-    Error ("Unknown option: `%s', use -h for help", Arg);
-}
-
-
-
-static void NeedArg (const char* Arg)
-/* Print an error about a missing option argument and exit. */
-{
-    Error ("Option requires an argument: %s\n", Arg);
-}
-
-
-
-static void OptAnsi (const char* Opt)
+static void OptAnsi (const char* Opt, const char* Arg)
 /* Strict ANSI mode (compiler) */
 {
     CmdAddArg (&CC65, "-A");
@@ -693,7 +602,7 @@ static void OptAsmIncludeDir (const char* Opt, const char* Arg)
 
 
 
-static void OptDebug (const char* Opt)
+static void OptDebug (const char* Opt, const char* Arg)
 /* Debug mode (compiler) */
 {
     CmdAddArg (&CC65, "-d");
@@ -701,7 +610,7 @@ static void OptDebug (const char* Opt)
 
 
 
-static void OptDebugInfo (const char* Opt)
+static void OptDebugInfo (const char* Opt, const char* Arg)
 /* Debug Info - add to compiler and assembler */
 {
     CmdAddArg (&CC65, "-g");
@@ -710,7 +619,7 @@ static void OptDebugInfo (const char* Opt)
 
 
 
-static void OptHelp (const char* Opt)
+static void OptHelp (const char* Opt, const char* Arg)
 /* Print help - cl65 */
 {
     Usage ();
@@ -742,7 +651,7 @@ static void OptTarget (const char* Opt, const char* Arg)
 
 
 
-static void OptVerbose (const char* Opt)
+static void OptVerbose (const char* Opt, const char* Arg)
 /* Verbose mode (compiler, assembler, linker) */
 {
     CmdAddArg (&CC65, "-v");
@@ -752,7 +661,7 @@ static void OptVerbose (const char* Opt)
 
 
 
-static void OptVersion (const char* Opt)
+static void OptVersion (const char* Opt, const char* Arg)
 /* Print version number */
 {
     fprintf (stderr,
@@ -762,44 +671,26 @@ static void OptVersion (const char* Opt)
 
 
 
-static void LongOption (int* ArgNum, char* argv [])
-/* Handle a long command line option */
-{
-    const char* Opt = argv [*ArgNum];
-    const char* Arg = argv [*ArgNum+1];
-
-    if (strcmp (Opt, "--ansi") == 0) {
-	OptAnsi (Opt);
-    } else if (strcmp (Opt, "--asm-include-dir") == 0) {
-    	OptAsmIncludeDir (Opt, Arg);
-    	++(*ArgNum);
-    } else if (strcmp (Opt, "--debug") == 0) {
-       	OptDebug (Opt);
-    } else if (strcmp (Opt, "--debug-info") == 0) {
-       	OptDebugInfo (Opt);
-    } else if (strcmp (Opt, "--help") == 0) {
-       	OptHelp (Opt);
-    } else if (strcmp (Opt, "--include-dir") == 0) {
-    	OptIncludeDir (Opt, Arg);
-    	++(*ArgNum);
-    } else if (strcmp (Opt, "--target") == 0) {
-    	OptTarget (Opt, Arg);
-    	++(*ArgNum);
-    } else if (strcmp (Opt, "--verbose") == 0) {
-       	OptVerbose (Opt);
-    } else if (strcmp (Opt, "--version") == 0) {
-       	OptVersion (Opt);
-    } else {
-        UnknownOption (Opt);
-    }
-}
-
-
-
 int main (int argc, char* argv [])
 /* Utility main program */
 {
+    /* Program long options */
+    static const LongOpt OptTab[] = {
+	{ "--ansi",		0,	OptAnsi			},
+	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
+	{ "--debug",		0,	OptDebug		},
+	{ "--debug-info",	0,	OptDebugInfo		},
+	{ "--help",		0,	OptHelp			},
+	{ "--include-dir",	1,	OptIncludeDir		},
+	{ "--target",		1,	OptTarget		},
+	{ "--verbose",		0,	OptVerbose		},
+	{ "--version",		0,	OptVersion		},
+    };
+
     int I;
+
+    /* Initialize the cmdline module */
+    InitCmdLine (argc, argv, "cl65");
 
     /* Initialize the command descriptors */
     CmdInit (&CC65, "cc65");
@@ -819,12 +710,12 @@ int main (int argc, char* argv [])
 	    switch (Arg [1]) {
 
 		case '-':
-		    LongOption (&I, argv);
+		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 		    break;
 
 		case 'A':
 		    /* Strict ANSI mode (compiler) */
-		    OptAnsi (Arg);
+		    OptAnsi (Arg, 0);
 		    break;
 
 		case 'C':
@@ -833,26 +724,26 @@ int main (int argc, char* argv [])
 			CmdAddArg (&CC65, "-Cl");
 		    } else {
 		     	/* Specify linker config file */
-		     	LinkerConfig = GetArg (&I, argv, 2);
+		     	LinkerConfig = GetArg (&I, 2);
 		    }
 	     	    break;
 
 		case 'D':
 		    /* Define a preprocessor symbol (compiler) */
 		    CmdAddArg (&CC65, "-D");
-		    CmdAddArg (&CC65, GetArg (&I, argv, 2));
+		    CmdAddArg (&CC65, GetArg (&I, 2));
 		    break;
 
 		case 'I':
 		    /* Include directory (compiler) */
-		    OptIncludeDir (Arg, GetArg (&I, argv, 2));
+		    OptIncludeDir (Arg, GetArg (&I, 2));
 		    break;
 
 	   	case 'L':
 		    if (Arg[2] == 'n') {
 		      	/* VICE label file (linker) */
 		      	CmdAddArg (&LD65, "-Ln");
-		      	CmdAddArg (&LD65, GetArg (&I, argv, 3));
+		      	CmdAddArg (&LD65, GetArg (&I, 3));
 		    } else {
 	    	      	UnknownOption (Arg);
 		    }
@@ -875,7 +766,7 @@ int main (int argc, char* argv [])
 
 		case 'V':
 		    /* Print version number */
-	       	    OptVersion (Arg);
+	       	    OptVersion (Arg, 0);
 	   	    break;
 
 	   	case 'W':
@@ -892,34 +783,34 @@ int main (int argc, char* argv [])
 
 		case 'd':
 		    /* Debug mode (compiler) */
-		    OptDebug (Arg);
+		    OptDebug (Arg, 0);
 		    break;
 
 		case 'g':
 		    /* Debugging - add to compiler and assembler */
-		    OptDebugInfo (Arg);
+		    OptDebugInfo (Arg, 0);
 		    break;
 
 		case 'h':
 		case '?':
 		    /* Print help - cl65 */
-	     	    OptHelp (Arg);
+	     	    OptHelp (Arg, 0);
 		    break;
 
 	   	case 'm':
 		    /* Create a map file (linker) */
 		    CmdAddArg (&LD65, "-m");
-		    CmdAddArg (&LD65, GetArg (&I, argv, 2));
+		    CmdAddArg (&LD65, GetArg (&I, 2));
 		    break;
 
 		case 'o':
 		    /* Name the output file */
-		    OutputName = GetArg (&I, argv, 2);
+		    OutputName = GetArg (&I, 2);
 		    break;
 
 		case 't':
 		    /* Set target system - compiler and linker */
-		    OptTarget (Arg, GetArg (&I, argv, 2));
+		    OptTarget (Arg, GetArg (&I, 2));
 		    break;
 
 		case 'v':
@@ -928,7 +819,7 @@ int main (int argc, char* argv [])
 		     	CmdAddArg (&LD65, "-vm");
 	   	    } else {
 	   	     	/* Verbose mode (compiler, assembler, linker) */
-			OptVerbose (Arg);
+			OptVerbose (Arg, 0);
 	   	    }
 	   	    break;
 

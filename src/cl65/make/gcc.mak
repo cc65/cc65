@@ -9,8 +9,9 @@ LDFLAGS=
 OBJS =	error.o	 	\
 	global.o 	\
 	main.o		\
-	mem.o		\
 	spawn.o
+
+LIBS = ../common/common.a
 
 EXECS = cl65
 
@@ -25,8 +26,8 @@ all:	depend
 endif
 
 
-cl65:	$(OBJS)
-	$(CC) $(LDFLAGS) -o cl65 $(CFLAGS) $(OBJS)
+cl65:	$(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o cl65 $(CFLAGS) $(OBJS) $(LIBS)
 
 clean:
 	rm -f *~ core

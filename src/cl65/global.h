@@ -44,10 +44,6 @@
 
 
 
-extern const char*	ProgName;	/* Program name */
-
-
-
 /* End of global.h */
 
 #endif

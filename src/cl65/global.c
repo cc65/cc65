@@ -43,7 +43,3 @@
 
 
 
-const char* ProgName   	    = "cl65";	/* Program name */
-
-
-

@@ -65,8 +65,7 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 
 OBJS =	error.obj	\
 	global.obj	\
-	main.obj	\
-	mem.obj
+	main.obj	
 
 .PRECIOUS $(OBJS:.obj=.c)
 
@@ -90,7 +89,6 @@ NAME $<
 FILE error.obj
 FILE global.obj
 FILE main.obj
-FILE mem.obj
 |
 
 
@@ -99,6 +97,6 @@ clean:
        	@if exist cl65.exe del cl65.exe
 
 strip:
-	@-wstrip cl65.exe   
+	@-wstrip cl65.exe
 
 

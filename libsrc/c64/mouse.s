@@ -153,7 +153,6 @@ _mouse_show:
 _mouse_box:
    	ldy 	#0			; Stack offset
 
-   	php
    	sei 	    			; Disable interrupts
 
    	sta 	YMax
@@ -179,7 +178,7 @@ _mouse_box:
    	lda	(sp),y
    	sta	XMin+1			; minx
 
-   	plp	      			; Enable interrupts
+   	cli	      			; Enable interrupts
 
    	jmp	addysp1			; Drop params, return
 
@@ -195,7 +194,6 @@ _mouse_pos:
 
 	ldy	#0			; Structure offset
 
-	php
 	sei				; Disable interrupts
 
 	lda     XPos			; Transfer the position
@@ -210,7 +208,7 @@ _mouse_pos:
 	iny
 	sta	(ptr1),y
 
-	plp				; Restore initial interrupt state
+	cli				; Restore initial interrupt state
 
 	rts				; Done
 
@@ -404,7 +402,7 @@ MoveSprite:
 MoveSprite1:
    	lda	VIC_SPR_HI_X		; Get high X bits of all sprites
    	and	NotMask-1,x		; Mask out sprite bit
-   	ldy	XPos+1			; Test Y position
+   	ldy	XPos+1 			; Test Y position
    	beq	@L1
    	ora	BitMask-1,x		; Set high X bit
 @L1:	sta	VIC_SPR_HI_X		; Set hi X sprite values
@@ -412,14 +410,14 @@ MoveSprite1:
 ; Set the low X byte
 
    	txa
-   	asl	a   			; Index*2
+   	asl	a      			; Index*2
    	tax
    	lda	XPos
    	sta	VIC_SPR0_X-2,x 	       	; Set low byte
 
 ; Set the Y position
 
-   	ldy	YPos+1	      		; Negative or too large?
+   	ldy	YPos+1 	      		; Negative or too large?
    	bne	MoveSpriteDone		; Jump if yes
    	lda	YPos
    	sta	VIC_SPR0_Y-2,x		; Set Y position

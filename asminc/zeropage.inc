@@ -15,7 +15,7 @@
 
 ; The total amount of zero page space used
 
-zpspace = 24
+zpspace = 26
 
 
 

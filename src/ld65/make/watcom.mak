@@ -76,10 +76,12 @@ OBJS =	bin.obj		\
 	exports.obj	\
 	expr.obj	\
 	extsyms.obj	\
+	fileinfo.obj	\
 	fileio.obj	\
 	fragment.obj	\
 	global.obj	\
 	library.obj	\
+	lineinfo.obj	\
 	main.obj	\
 	mapfile.obj	\
 	o65.obj		\

@@ -65,7 +65,7 @@ struct ObjData {
     unsigned long	Start;		/* Start offset of data in library */
     unsigned 	     	Flags;
     unsigned 	 	FileCount;	/* Input file count */
-    char**	 	Files;		/* List of input files */
+    struct FileInfo**  	Files;		/* List of input files */
     unsigned	 	SectionCount;	/* Count of sections in this object */
     struct Section**  	Sections;	/* List of all sections */
     unsigned	  	ExportCount;	/* Count of exports */

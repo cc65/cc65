@@ -41,6 +41,7 @@
 
 /* ld65 */
 #include "error.h"
+#include "fileinfo.h"
 #include "objdata.h"
 
 
@@ -110,7 +111,7 @@ void FreeObjData (ObjData* O)
     xfree (O->Name);
     xfree (O->Imports);
     xfree (O->Exports);
-    xfree (O->DbgSyms);	    
+    xfree (O->DbgSyms);
     xfree (O->LineInfos);
     xfree (O);
 }
@@ -144,7 +145,7 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
 	PRECONDITION (Index < O->FileCount);
 
 	/* Return the name */
-	return O->Files[Index];
+	return O->Files[Index]->Name;
 
     }
 }

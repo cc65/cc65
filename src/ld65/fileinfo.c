@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  lineinfo.h                                 */
+/*				  fileinfo.c                                 */
 /*                                                                           */
-/*			Source file line info structure                      */
+/*			  sOURCE FILE INFO STRUCTURE                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -34,12 +34,11 @@
 
 
 /* common */
-#include "check.h"
 #include "xmalloc.h"
 
 /* ld65 */
 #include "fileio.h"
-#include "lineinfo.h"
+#include "fileinfo.h"
 
 
 
@@ -49,38 +48,31 @@
 
 
 
-static LineInfo* NewLineInfo (void)
-/* Create and return a new LineInfo struct */
+static FileInfo* NewFileInfo (void)
+/* Allocate and initialize a new FileInfo struct and return it */
 {
     /* Allocate memory */
-    LineInfo* LI = xmalloc (sizeof (LineInfo));
-
-    /* Initialize the fields */
-    LI->File = 0;
-    InitFilePos (&LI->Pos);
-    InitCollection (&LI->Fragments);
+    FileInfo* FI = xmalloc (sizeof (FileInfo));
 
     /* Return the new struct */
-    return LI;
+    return FI;
 }
 
 
 
-LineInfo* ReadLineInfo (FILE* F, ObjData* O)
-/* Read a line info from a file and return it */
+FileInfo* ReadFileInfo (FILE* F, ObjData* O)
+/* Read a file info from a file and return it */
 {
-    /* Allocate a new LineInfo struct and initialize it */
-    LineInfo* LI = NewLineInfo ();
+    /* Allocate a new FileInfo structure */
+    FileInfo* FI = NewFileInfo ();
 
-    /* Read the file position */
-    ReadFilePos (F, &LI->Pos);
+    /* Read the fields from the file */
+    FI->MTime = Read32 (F);
+    FI->Size  = Read32 (F);
+    FI->Name  = ReadStr (F);
 
-    /* Resolve the file index to a pointer to FileInfo struct */
-    CHECK (LI->Pos.Name < O->FileCount);
-    LI->File = O->Files[LI->Pos.Name];
-
-    /* Return the new LineInfo */
-    return LI;
+    /* Return the new struct */
+    return FI;
 }
 
 

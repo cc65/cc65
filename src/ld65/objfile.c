@@ -46,6 +46,7 @@
 #include "dbgsyms.h"
 #include "error.h"
 #include "exports.h"
+#include "fileinfo.h"
 #include "fileio.h"
 #include "lineinfo.h"
 #include "objdata.h"
@@ -112,13 +113,9 @@ void ObjReadFiles (FILE* F, ObjData* O)
     unsigned I;
 
     O->FileCount  = ReadVar (F);
-    O->Files      = xmalloc (O->FileCount * sizeof (char*));
+    O->Files      = xmalloc (O->FileCount * sizeof (FileInfo*));
     for (I = 0; I < O->FileCount; ++I) {
-       	/* Skip MTime and size */
-       	Read32 (F);
-       	Read32 (F);
-       	/* Read the filename */
-       	O->Files [I] = ReadStr (F);
+       	O->Files[I] = ReadFileInfo (F, O);
     }
 }
 
@@ -158,7 +155,7 @@ void ObjReadDbgSyms (FILE* F, ObjData* O)
 /* Read the debug symbols from a file at the current position */
 {
     unsigned I;
-		     
+
     O->DbgSymCount = ReadVar (F);
     O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (DbgSym*));
     for (I = 0; I < O->DbgSymCount; ++I) {

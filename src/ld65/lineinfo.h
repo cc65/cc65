@@ -55,8 +55,9 @@
 
 typedef struct LineInfo LineInfo;
 struct LineInfo {
-    FilePos         Pos;                  /* File position */
-    Collection      Fragments;            /* Fragments for this line */
+    struct FileInfo*    File;		      /* File struct for this line */
+    FilePos             Pos;                  /* File position */
+    Collection          Fragments;            /* Fragments for this line */
 };
 
 

@@ -27,6 +27,7 @@ OBJS = 	bin.o		\
 	exports.o	\
 	expr.o		\
 	extsyms.o	\
+	fileinfo.o	\
 	fileio.o	\
 	fragment.o	\
 	global.o        \

@@ -18,9 +18,9 @@
 
 
 /* For memory efficiency use a separate empty string */
-static const char EmptyString [] = "";
+static char EmptyString [] = "";
 
-static const struct lconv lc = {
+static struct lconv lc = {
     EmptyString,   	/* currency_symbol */
     ".",		/* decimal_point */
     EmptyString,   	/* grouping */

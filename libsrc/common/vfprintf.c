@@ -12,7 +12,7 @@
 
 
 
-static void out (struct outdesc* d, char* buf, unsigned count)
+static void out (struct outdesc* d, const char* buf, unsigned count)
 /* Routine used for writing */
 {
     /* Write to the file */
@@ -42,4 +42,4 @@ int vfprintf (FILE* f, const char* format, va_list ap)
 
 
 
-			     
+

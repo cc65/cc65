@@ -12,7 +12,7 @@
 
 
 
-static void out (struct outdesc* d, char* buf, unsigned count)
+static void out (struct outdesc* d, const char* buf, unsigned count)
 /* Routine used for writing */
 {
     /* String - be shure to check the size */

@@ -16,7 +16,7 @@
 struct outdesc;
 
 /* Type of the function that is called to output data */
-typedef void (*outfunc) (struct outdesc* desc, char* buf, unsigned count);
+typedef void (*outfunc) (struct outdesc* desc, const char* buf, unsigned count);
 
 
 

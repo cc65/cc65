@@ -116,12 +116,13 @@ struct o65_header {
                                  O65_ALIGN_1)
 
 /* The four o65 segment types. */
-#define O65_SEG_UNDEF  	        0x00
-#define O65_SEG_ABS	        0x01
-#define O65_SEG_TEXT   	        0x02
-#define O65_SEG_DATA	        0x03
-#define O65_SEG_BSS	        0x04
-#define O65_SEG_ZP 	        0x05
+#define O65_SEGID_UNDEF  	0x00
+#define O65_SEGID_ABS	        0x01
+#define O65_SEGID_TEXT   	0x02
+#define O65_SEGID_DATA	        0x03
+#define O65_SEGID_BSS	        0x04
+#define O65_SEGID_ZP 	        0x05
+#define O65_SEGID_MASK          0x07
 
 /* Relocation type codes */
 #define O65_RTYPE_WORD          0x80

@@ -16,6 +16,8 @@
 
    	.include    	"c64.inc"
 
+	.macpack	generic
+
 .code
 
 ; --------------------------------------------------------------------------
@@ -43,17 +45,18 @@ _mouse_init:
 	stx	OldPotX
 	stx	OldPotY
        	stx    	XMin
- 	stx	XMin+1
-	stx	YMin
-	stx	YMin+1
-   	stx	YMax+1
+ 	stx	XMin+1			; XMin = 0
+	lda	#29
+	sta    	YMin
+	stx	YMin+1			; YMin = 29
+	lda    	#250
+	sta	YMax
+   	stx	YMax+1			; YMax = 250
 	inx	      			; X = 1
        	stx	Visible			; Mouse *not* visible
-	stx	XMax+1			; >320
-	ldx	#<320
-	stx	XMax
-	ldx	#200
-	stx	YMax
+	lda    	#<344
+	sta	XMax
+	stx	XMax+1			; XMax = 344
 
 ; Remember the old IRQ vector
 
@@ -116,7 +119,7 @@ _mouse_show:
 	beq 	@L1			; Jump if yes
        	dec 	Visible			; Get the flag
 	bne 	@L1			; Jump if still invisible
-       	ldx 	MouseSprite		; Sprite defined?	   
+       	ldx 	MouseSprite		; Sprite defined?
 	beq 	@L1			; Jump if no
 
        	sei 				; Disable interrupts
@@ -239,8 +242,7 @@ MouseIRQ:
 
 ; Calculate the new X coordinate (--> a/y)
 
-      	clc
-      	adc	XPos
+       	add	XPos
       	tay	      			; Remember low byte
       	txa
       	adc	XPos+1
@@ -273,11 +275,14 @@ MouseIRQ:
 
 ; Calculate the new Y coordinate (--> a/y)
 
-	clc
-	adc	YPos
-	tay	    			; Remember low byte
-	txa
-	adc 	YPos+1
+      	sta	OldValue
+      	lda	YPos
+      	sub	OldValue
+      	tay
+      	stx	OldValue
+      	lda	YPos+1
+      	sbc	OldValue
+      	tax
 
    	cpy	YMin
 	sbc	YMin+1
@@ -319,8 +324,7 @@ MoveCheck:
       	sta	NewValue
       	ldx 	#$00
 
-      	sec	    			; a = mod64 (new - old)
-      	sbc	OldValue
+      	sub	OldValue		; a = mod64 (new - old)
       	and	#%01111111
       	cmp	#%01000000		; if (a > 0)
       	bcs	@L1 			;
@@ -334,11 +338,11 @@ MoveCheck:
       	beq   	@L2
       	sec
       	ror   	a   			;   a /= 2
-      	ldx   	#$FF			;   high byte = -1
+       	dex				;   high byte = -1 (X = $FF)
       	ldy   	NewValue
       	rts
 
-@L2:  	lda   	#0
+@L2:   	txa				; A = $00
       	rts
 
 ; --------------------------------------------------------------------------
@@ -397,7 +401,7 @@ OldValue:	.res   	1		; Temp for MoveCheck routine
 NewValue:	.res   	1		; Temp for MoveCheck routine
 
 Visible:	.res   	1		; Is the mouse visible?
-OldPotX:	.res   	1		; Old hw counter values
+OldPotX:   	.res   	1		; Old hw counter values
 OldPotY:	.res   	1
 
 XPos:		.res   	2		; Current mouse position, X

@@ -86,11 +86,13 @@ static unsigned long ReadO65Size (FILE* F, const O65Header* H)
  * header) from the o65 file.
  */
 {
+    unsigned long Size = 0;     /* Initialize to avoid warnings */
     switch (H->mode & O65_SIZE_MASK) {
-        case O65_SIZE_32BIT:    return Read32 (F);
-        case O65_SIZE_16BIT:    return Read16 (F);
+        case O65_SIZE_32BIT:    Size = Read32 (F);
+        case O65_SIZE_16BIT:    Size = Read16 (F);
         default:                Internal ("Invalid size field value in o65 header");
     }
+    return Size;
 }
 
 

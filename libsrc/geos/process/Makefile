@@ -8,7 +8,7 @@
 	@$(AS) -o $@ $(AFLAGS) $<
 
 
-S_OBJS	= processinitrestartenable.o processblock.o processfreeze.o sleep.o
+S_OBJS	= processinitrestartenable.o processblock.o processfreeze.o processsleep.o
 
 all: $(S_OBJS)
 

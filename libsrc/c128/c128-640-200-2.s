@@ -13,15 +13,15 @@
 ; (is the above true? I can't remember if interlace skips lines or takes them from two
 ;  different places (same offset, different base))
 ;
-; X-axis resolution can be changed on the fly by manipulating xres header field so
-; any resolution 8..708 is possible only with gfx-mode initialization changed.
+; X-axis resolution can be changed by manipulating xres header field so
+; any resolution 8..708 is possible only with gfx-mode initialization and CALC changed.
 ;
-; With special initialization we can get 320x200 double-pixel mode (set 1 bit in one VDC reg)
+; With special initialization and CALC we can get 320x200 double-pixel mode.
 ;
 ; Color translation values for BROWN and GRAY3 are obviously wrong, they could
 ; be replaced by equiv. of ORANGE and GRAY2 but this would give only 14 of 16 colors available.
 ;
-; Register 25 ($19) is said to require different value on VDC v1, but I couldn't find what
+; Register 25 ($19) is said to require different value for VDC v1, but I couldn't find what
 ; it should be.
 
 	.include 	"zeropage.inc"
@@ -784,7 +784,7 @@ LINE:
 	lda	#0
 	sta	ERR
 	sta	ERR+1
-	; for (count=nk;count>0;--count) {
+	; for (count=nx;count>0;--count) {
 	lda	NX
 	ldx	NX+1
 	sta	COUNT

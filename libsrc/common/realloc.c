@@ -62,17 +62,23 @@ void* realloc (void* block, size_t size)
      * room left. Try to allocate a new block and copy the data.
      */
     if (newblock = malloc (size)) {
-     	memcpy (newblock, block, oldsize - 2);
+
+	/* Adjust the old size to the user visible portion */
+	oldsize -= sizeof (unsigned);
+
+	/* If the new block is larger than the old one, copy the old 
+	 * data only 
+	 */
+	if (size > oldsize) {
+	    size = oldsize;
+	}
+
+	/* Copy the block data */
+     	memcpy (newblock, block, size);
      	free (block);
     }
     return newblock;
 }
-
-
-
-
-
-
 
 
 

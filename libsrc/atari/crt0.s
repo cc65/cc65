@@ -14,6 +14,7 @@
 	.import		__hinit, initconio, zerobss, pushax, doatexit
 	.import		_main,__filetab,getfd
 	.import		__CODE_LOAD__, __BSS_LOAD__
+	.import		__graphmode_used
 
 	.include	"atari.inc"
 
@@ -83,13 +84,13 @@ L1:	lda	sp,y
 	sta	appmsav
 	lda	APPMHI+1
 	sta	appmsav+1
+
+	jsr	getmemtop	; adjust for graphics mode to use
 	
-	lda	#<$8000
 	sta	sp
 	sta	APPMHI
-	lda	#>$8000
-	sta	sp+1		; Set argument stack ptr
-	sta	APPMHI+1
+	stx	sp+1		; Set argument stack ptr
+	stx	APPMHI+1
 	
 ; set left margin to 0
 
@@ -177,11 +178,92 @@ L2:	lda	zpsave,y
 
 	rts
 
-.data
+; *** end of main startup code
+
+
+; calc. upper memory limit to use
+
+.proc	getmemtop
+
+	ldy	__graphmode_used
+	beq	ignore		; mode 0 doesn't need adjustment
+	cpy	#32
+	bcs	ignore		; invalid value
+
+	tya
+	asl	a
+	tay
+	lda	MEMTOP
+	sec
+	sbc	grmemusage,y
+	pha
+	lda	MEMTOP+1
+	sbc	grmemusage+1,y
+	tax
+	pla
+	rts
+
+ignore:	lda	MEMTOP
+	ldx	MEMTOP+1
+	rts
+
+.endproc
+
+	.data
 
 zpsave:	.res	zpspace
-	
-.bss
+
+; memory usage of the different graphics modes (0-31)
+; values < 0 of "bytes needed" are mappped to 0
+;               bytes needed    ; mode	; val. of MEMTOP
+grmemusage:
+	.word	0		; 0	; 39967
+	.word	0 ;-318		; 1	; 40285
+	.word	0 ;-568		; 2	; 40535
+	.word	0 ;-558		; 3	; 40525
+	.word	0 ;-298		; 4	; 40265
+	.word	182		; 5	; 39785
+	.word	1182		; 6	; 38785
+	.word	3198		; 7	; 36769
+	.word	7120		; 8	; 32847
+	.word	7146		; 9	; 32821
+	.word	7146		; 10	; 32821
+	.word	7146		; 11	; 32821
+	.word	162		; 12	; 39805
+	.word	0 ;-328		; 13	; 40295
+	.word	3278		; 14	; 36689
+	.word	7120		; 15	; 32847
+	.word	0		; 16	; 39967
+	.word	0 ;-320		; 17	; 40287
+	.word	0 ;-572		; 18	; 40539
+	.word	0 ;-560		; 19	; 40527
+	.word	0 ;-296		; 20	; 40263
+	.word	184		; 21	; 39783
+	.word	1192		; 22	; 38775
+	.word	3208		; 23	; 36759
+	.word	7146		; 24	; 32821
+	.word	7146		; 25	; 32821
+	.word	7146		; 26	; 32821
+	.word	7146		; 27	; 32821
+	.word	160		; 28	; 39807
+	.word	0 ;-332		; 29	; 40299
+	.word	3304		; 30	; 36663
+	.word	7146		; 31	; 32821
+
+; the program used to get these values (Atari BASIC):
+;  100 FILE=0
+;  110 IF FILE=1 THEN OPEN #1,8,0,"D:FREEMEM.OUT"
+;  120 IF FILE<>1 THEN OPEN #1,8,0,"E:"
+;  200 DIM G(32)
+;  210 FOR I=0 TO 32:GRAPHICS I:GOSUB 1000:G(I)=VAL:NEXT I
+;  220 GRAPHICS 0
+;  230 FOR I=0 TO 31:PRINT #1;I;":",G(I);" - ";G(0)-G(I):NEXT I
+;  240 CLOSE #1
+;  999 END 
+;  1000 VAL=PEEK(741)+256*PEEK(742)
+;  1010 RETURN 
+
+	.bss
 
 spsave:		.res	1
 appmsav:	.res	1

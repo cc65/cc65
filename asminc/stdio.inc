@@ -42,12 +42,14 @@ _IONBF		= 2
 BUFSIZ		= 256
 EOF 	      	= -1
 FILENAME_MAX	= 16
-FOPEN_MAX	= 8
 L_tmpnam	= (FILENAME_MAX + 1)
 SEEK_CUR	= 0
 SEEK_END	= 1
 SEEK_SET	= 2
 TMP_MAX		= 256
+
+; Maximum number of open files (size of the file table)
+FOPEN_MAX       = 8
 
 ;----------------------------------------------------------------------------
 ; External variables

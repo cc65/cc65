@@ -422,7 +422,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     	      	optionalsigned ();
     	      	optionalint ();
 	      	D->Type[0] = T_SHORT;
-		D->Type[1] = T_END;
+	    	D->Type[1] = T_END;
     	    }
 	    break;
 
@@ -460,7 +460,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     		    NextToken ();
     		    /* FALL THROUGH */
 
-    		default:
+    	    	default:
 	    	    D->Type[0] = T_INT;
 		    D->Type[1] = T_END;
 	  	    break;
@@ -501,6 +501,18 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 		    break;
     	    }
 	    break;
+
+        case TOK_FLOAT:
+    	    NextToken ();
+	    D->Type[0] = T_FLOAT;
+	    D->Type[1] = T_END;
+    	    break;
+
+        case TOK_DOUBLE:
+    	    NextToken ();
+	    D->Type[0] = T_DOUBLE;
+	    D->Type[1] = T_END;
+    	    break;
 
     	case TOK_STRUCT:
     	case TOK_UNION:

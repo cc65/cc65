@@ -63,6 +63,7 @@
 #define CF_INT		0x0001	/* Operation on ints */
 #define CF_PTR		CF_INT	/* Alias for readability */
 #define CF_LONG		0x0000	/* Operation on longs */
+#define CF_FLOAT        0x0004  /* Operation on a float */
 
 #define CF_NOKEEP	0x0008	/* Value may get destroyed when storing */
 

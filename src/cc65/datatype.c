@@ -570,6 +570,11 @@ unsigned TypeOf (const type* T)
        	case T_ULONG:
        	    return CF_LONG | CF_UNSIGNED;
 
+        case T_FLOAT:
+        case T_DOUBLE:      
+            /* These two are identical in the backend */
+            return CF_FLOAT;
+
         case T_FUNC:
 	    F = DecodePtr (T+1);
 	    return (F->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;

@@ -635,7 +635,7 @@ void PrintDbgSegments (FILE* F)
         if (S->Size > 0) {
 
      	    /* Print the segment data */
-       	    fprintf (F, "segment\t\"%s\", 0x%06lX, 0x%04lX, %s, %s\n",
+       	    fprintf (F, "segment\t\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s\n",
        	       	     GetString (S->Name), S->PC, S->Size,
                      AddrSizeToStr (S->AddrSize),
                      S->ReadOnly? "ro" : "rw");

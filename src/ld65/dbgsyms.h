@@ -82,6 +82,11 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* Obj);
 long GetDbgSymVal (DbgSym* D);
 /* Get the value of this symbol */
 
+void ClearDbgSymTable (void);
+/* Clear the debug symbol table. Must be called before outputting debug syms
+ * or debug labels the first time.
+ */
+
 void PrintDbgSyms (ObjData* O, FILE* F);
 /* Print the debug symbols in a debug file */
 

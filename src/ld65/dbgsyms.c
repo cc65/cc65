@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "check.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -98,9 +99,9 @@ static DbgSym* GetDbgSym (DbgSym* D, long Val)
 {
     /* Create the hash. We hash over the symbol value */
     unsigned Hash = ((Val >> 24) & 0xFF) ^
-		    ((Val >> 16) & 0xFF) ^
-		    ((Val >>  8) & 0xFF) ^
-		    ((Val >>  0) & 0xFF);
+	    	    ((Val >> 16) & 0xFF) ^
+	    	    ((Val >>  8) & 0xFF) ^
+	    	    ((Val >>  0) & 0xFF);
 
     /* Check for this symbol */
     DbgSym* Sym = DbgSymPool[Hash];
@@ -166,7 +167,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 
 
 
-static void ClearDbgSymTable (void)
+void ClearDbgSymTable (void)
 /* Clear the debug symbol table */
 {
     unsigned I;
@@ -197,9 +198,6 @@ void PrintDbgSyms (ObjData* O, FILE* F)
 {
     unsigned I;
 
-    /* Clear the debug sym table */
-    ClearDbgSymTable ();
-
     /* Walk through all debug symbols in this module */
     for (I = 0; I < O->DbgSymCount; ++I) {
 
@@ -219,9 +217,10 @@ void PrintDbgSyms (ObjData* O, FILE* F)
 
 	    /* Emit the debug file line */
        	    fprintf (F,
-                     "sym\t\"%s\", %08lX, %s\n",
+                     "sym\t\"%s\",value=0x%08lX,addrsize=%s,type=%s\n",
                      GetString (D->Name),
                      Val,
+                     AddrSizeToStr (D->AddrSize),
                      IS_EXP_LABEL (D->Type)? "label" : "equate");
 
 	    /* Insert the symbol into the table */
@@ -236,9 +235,6 @@ void PrintDbgSymLabels (ObjData* O, FILE* F)
 /* Print the debug symbols in a VICE label file */
 {
     unsigned I;
-
-    /* Clear the debug sym table */
-    ClearDbgSymTable ();
 
     /* Walk through all debug symbols in this module */
     for (I = 0; I < O->DbgSymCount; ++I) {
@@ -273,4 +269,4 @@ void PrintDbgSymLabels (ObjData* O, FILE* F)
 
 
 
-                                     
+

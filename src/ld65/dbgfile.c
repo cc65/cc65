@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -63,6 +63,9 @@ void CreateDbgFile (void)
     if (F == 0) {
        	Error ("Cannot create debug file `%s': %s", DbgFileName, strerror (errno));
     }
+
+    /* Clear the debug sym table (used to detect duplicates) */
+    ClearDbgSymTable ();
 
     /* Output the segment info */
     PrintDbgSegments (F);

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -55,11 +55,11 @@ void PrintDbgInfo (ObjData* O, FILE* F)
     /* Output the files section */
     for (I = 0; I < O->FileCount; ++I) {
 	const FileInfo* FI = O->Files[I];
-	fprintf (F, "file\t\"%s\", %lu, %lu\n",
+	fprintf (F, "file\t\"%s\",size=%lu,mtime=0x%08lX\n",
                  GetString (FI->Name), FI->Size, FI->MTime);
     }
 
-    /* Output the lines */
+    /* Output the line infos */
     for (I = 0; I < O->LineInfoCount; ++I) {
 
 	/* Get this line info */
@@ -74,7 +74,8 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	}
 
 	/* Name and line number */
-	fprintf (F, "line\t\"%s\", %lu", GetString (LI->File->Name), LI->Pos.Line);
+	fprintf (F, "line\t\"%s\",line=%lu", GetString (LI->File->Name),
+                 LI->Pos.Line);
 
 	/* Code ranges */
 	for (J = 0; J < CollCount (CodeRanges); ++J) {
@@ -83,7 +84,7 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	    const CodeRange* R = CollConstAt (CodeRanges, J);
 
 	    /* Print it */
-	    fprintf (F, ", %06lX-%06lX", R->Offs, R->Offs + R->Size - 1);
+       	    fprintf (F, ",range=0x%06lX-0x%06lX", R->Offs, R->Offs + R->Size - 1);
 	}
 
 	/* Terminate the line */

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -132,6 +132,9 @@ void CreateLabelFile (void)
     if (F == 0) {
     	Error ("Cannot create label file `%s': %s", LabelFileName, strerror (errno));
     }
+
+    /* Clear the debug sym table (used to detect duplicates) */
+    ClearDbgSymTable ();
 
     /* Print the labels for the export symbols */
     PrintExportLabels (F);

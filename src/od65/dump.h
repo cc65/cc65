@@ -66,6 +66,9 @@ void DumpObjImports (FILE* F, unsigned long Offset);
 void DumpObjExports (FILE* F, unsigned long Offset);
 /* Dump the exports in the object file */
 
+void DumpObjDbgSyms (FILE* F, unsigned long Offset);
+/* Dump the debug symbols from an object file */
+
 
 
 /* End of dump.h */

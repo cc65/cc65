@@ -77,7 +77,8 @@ static void Usage (void)
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
-	     "  --dump-all\t\tDump all object file information\n"
+	     "  --dump-all\t\tDump all object file information\n" 
+	     "  --dump-dbgsyms\tDump debug symbols\n"
        	     "  --dump-exports\tDump exported symbols\n"
 	     "  --dump-files\t\tDump the source files\n"
 	     "  --dump-header\t\tDump the object file header\n"
@@ -96,6 +97,14 @@ static void OptDumpAll (const char* Opt, const char* Arg)
 {
     What |= D_ALL;
 }
+
+
+
+static void OptDumpDbgSyms (const char* Opt, const char* Arg)
+/* Dump debug symbols contained in the object file */
+{
+    What |= D_DBGSYMS;
+}		     
 
 
 
@@ -215,6 +224,9 @@ static void DumpFile (const char* Name)
 	if (What & D_EXPORTS) {
 	    DumpObjExports (F, 0);
 	}
+	if (What & D_DBGSYMS) {
+	    DumpObjDbgSyms (F, 0);
+	}
     }
 
     /* Close the file */
@@ -228,9 +240,10 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-       	{ "--dump-all",		0,     	OptDumpAll		},
+       	{ "--dump-all",	   	0,     	OptDumpAll		},
+	{ "--dump-dbgsyms",	0,	OptDumpDbgSyms		},
 	{ "--dump-exports",	0,	OptDumpExports		},
-	{ "--dump-files",	0,	OptDumpFiles		},
+	{ "--dump-files", 	0,	OptDumpFiles		},
 	{ "--dump-header",	0,	OptDumpHeader		},
 	{ "--dump-imports",	0,	OptDumpImports		},
 	{ "--dump-options",	0,	OptDumpOptions		},

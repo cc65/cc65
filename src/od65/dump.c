@@ -546,7 +546,9 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     /* Read and print all exports */
     for (I = 0; I < Count; ++I) {
 
- 	const char* TypeDesc;
+	unsigned long 	Value = 0;
+	int 		HaveValue;
+ 	const char* 	TypeDesc;
 
        	/* Read the data for one export */
        	unsigned char Type  = Read8 (F);
@@ -554,8 +556,10 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	unsigned      Len   = strlen (Name);
 	if (Type & EXP_EXPR) {
 	    SkipExpr (F);
+	    HaveValue = 0;
 	} else {
-	    (void) Read32 (F);
+	    Value = Read32 (F);
+	    HaveValue = 1;
 	}
 	ReadFilePos (F, &Pos);
 
@@ -574,6 +578,86 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	/* Print the data */
        	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+	if (HaveValue) {
+	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
+	}
+
+	/* Free the Name */
+	xfree (Name);
+    }
+}
+
+
+
+void DumpObjDbgSyms (FILE* F, unsigned long Offset)
+/* Dump the debug symbols from an object file */
+{
+    ObjHeader H;
+    unsigned  Count;
+    unsigned  I;
+    FilePos   Pos;
+
+    /* Seek to the header position */
+    FileSeek (F, Offset);
+
+    /* Read the header */
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of the options */
+    FileSeek (F, Offset + H.DbgSymOffs);
+
+    /* Output a header */
+    printf ("  Debug symbols:\n");
+
+    /* Check if the object file was compiled with debug info */
+    if ((H.Flags & OBJ_FLAGS_DBGINFO) == 0) {
+	/* Print that there no debug symbols and bail out */
+	printf ("    Count:%27u\n", 0);
+	return;
+    }
+
+    /* Read the number of exports and print it */
+    Count = Read16 (F);
+    printf ("    Count:%27u\n", Count);
+
+    /* Read and print all debug symbols */
+    for (I = 0; I < Count; ++I) {
+
+	unsigned long 	Value = 0;
+	int 		HaveValue;
+ 	const char* 	TypeDesc;
+
+       	/* Read the data for one symbol */
+       	unsigned char Type  = Read8 (F);
+	char* 	      Name  = ReadMallocedStr (F);
+	unsigned      Len   = strlen (Name);
+	if (Type & EXP_EXPR) {
+	    SkipExpr (F);
+	    HaveValue = 0;
+	} else {
+	    Value = Read32 (F);
+	    HaveValue = 1;
+	}
+	ReadFilePos (F, &Pos);
+
+	/* Get a description for the type */
+	switch (Type) {
+	    case EXP_ABS|EXP_CONST:	TypeDesc = "EXP_ABS,EXP_CONST";	break;
+	    case EXP_ZP|EXP_CONST:	TypeDesc = "EXP_ZP,EXP_CONST";	break;
+	    case EXP_ABS|EXP_EXPR:	TypeDesc = "EXP_ABS,EXP_EXPR";	break;
+       	    case EXP_ZP|EXP_EXPR:	TypeDesc = "EXP_ZP,EXP_EXPR";	break;
+	    default:	  		TypeDesc = "EXP_UNKNOWN";	break;
+	}
+
+	/* Print the header */
+	printf ("    Index:%27u\n", I);
+
+	/* Print the data */
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+	if (HaveValue) {
+	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
+	}
 
 	/* Free the Name */
 	xfree (Name);

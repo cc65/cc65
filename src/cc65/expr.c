@@ -226,7 +226,7 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
    	     * as const.
    	     */
    	    unsigned flags = TypeOf (rhst);
-       	    if (rhs->e_flags & E_MCONST) {
+       	    if (rhs->e_flags == E_MCONST) {
    	 	flags |= CF_CONST;
    	    }
    	    return g_typeadjust (TypeOf (lhst) | CF_CONST, flags);
@@ -257,7 +257,7 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
 	    }
      	} else if (IsClassInt (rhst)) {
      	    /* Int to pointer assignment is valid only for constant zero */
-     	    if ((rhs->e_flags & E_MCONST) == 0 || rhs->e_const != 0) {
+     	    if (rhs->e_flags != E_MCONST || rhs->e_const != 0) {
      	       	Warning ("Converting integer to pointer without a cast");
      	    }
 	} else if (IsTypeFuncPtr (lhst) && IsTypeFunc(rhst)) {
@@ -1483,10 +1483,10 @@ static void unaryop (int tok, struct expent* lval)
 
     NextToken ();
     k = hie10 (lval);
-    if (k == 0 && lval->e_flags & E_MCONST) {
+    if (k == 0 && lval->e_flags == E_MCONST) {
     	/* Value is constant */
 	switch (tok) {
-	    case TOK_MINUS: lval->e_const =	-lval->e_const;	break;
+	    case TOK_MINUS: lval->e_const = -lval->e_const;	break;
 	    case TOK_PLUS:  	  				break;
 	    case TOK_COMP:  lval->e_const = ~lval->e_const; 	break;
 	    default:	    Internal ("Unexpected token: %d", tok);
@@ -2170,7 +2170,7 @@ static void parsesub (int k, struct expent* lval)
        	rhst = lval2.e_tptr;
 
     	/* Check left hand side */
-    	if (k == 0 && lval->e_flags & E_MCONST) {
+    	if (k == 0 && lval->e_flags == E_MCONST) {
 
     	    /* Both sides are constant, remove generated code */
       	    RemoveCode (Mark1);
@@ -2832,7 +2832,7 @@ static void Assignment (struct expent* lval)
 
     /* cc65 does not have full support for handling structs by value. Since
      * assigning structs is one of the more useful operations from this
-     * familiy, allow it here.
+     * family, allow it here.
      */
     if (IsClassStruct (ltype)) {
 

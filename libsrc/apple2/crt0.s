@@ -22,11 +22,6 @@
        	.word  	__BSS_LOAD__ - __STARTUP_LOAD__	; Size
 
 ; ------------------------------------------------------------------------
-; Create an empty LOWCODE segment to avoid linker warnings
-
-.segment        "LOWCODE"
-
-; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
 
 .segment       	"STARTUP"

@@ -16,11 +16,6 @@
 
 
 ; ------------------------------------------------------------------------
-; Create an empty LOWCODE segment to avoid linker warnings
-
-.segment        "LOWCODE"
-
-; ------------------------------------------------------------------------
 ; Oric tape header
 
 .segment        "TAPEHDR"

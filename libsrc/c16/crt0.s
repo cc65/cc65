@@ -17,11 +17,6 @@
 
 
 ; ------------------------------------------------------------------------
-; Create an empty LOWCODE segment to avoid linker warnings
-
-.segment        "LOWCODE"
-
-; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
 
 .segment       	"STARTUP"

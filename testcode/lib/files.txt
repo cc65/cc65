@@ -7,6 +7,7 @@ cprintf.c	-	test program for cprintf \n and \r operators
 cursor.c	-	test the cursor() function
 deb.c		-	test program for the library debugger
 div-test.c	-	test division/modulus and the div() routine
+fileio-test.c   -       test C file i/o routines (fopen/fread/fwrite/fclose)
 ft.c		-	file I/O test program (open + read functions)
 getsp.s		-	helper routine for ft.c
 joytest.c	-	readjoy function test program

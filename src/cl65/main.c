@@ -602,6 +602,7 @@ static void Usage (void)
        	     "  -l\t\t\tCreate an assembler listing\n"
        	     "  -m name\t\tCreate a map file\n"
        	     "  -o name\t\tName the output file\n"
+             "  -r\t\t\tEnable register variables\n"
        	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tVerbose mode\n"
        	     "  -vm\t\t\tVerbose map file\n"
@@ -640,6 +641,8 @@ static void Usage (void)
 	     "  --mapfile name\tCreate a map file\n"
              "  --module\t\tLink as a module\n"
              "  --module-id id\tSpecify a module id for the linker\n"
+             "  --register-space b\tSet space available for register variables\n"
+             "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --start-addr addr\tSet the default start address\n"
@@ -831,6 +834,24 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptRegisterSpace (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --register-space option */
+{
+    CmdAddArg (&CC65, "--register-space");
+    CmdAddArg (&CC65, Arg);
+}
+
+
+
+static void OptRegisterVars (const char* Opt attribute ((unused)),
+                             const char* Arg attribute ((unused)))
+/* Handle the --register-vars option */
+{
+    CmdAddArg (&CC65, "-r");
+}
+
+
+
 static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --rodata-name option */
 {
@@ -926,6 +947,8 @@ int main (int argc, char* argv [])
 	{ "--mapfile",	      	1,	OptMapFile		},
         { "--module",           0,      OptModule               },
         { "--module-id",        1,      OptModuleId             },
+        { "--register-space",   1,      OptRegisterSpace        },
+        { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",    	1, 	OptRodataName		},
 	{ "--signed-chars",   	0, 	OptSignedChars	       	},
 	{ "--start-addr",     	1,	OptStartAddr		},
@@ -1067,6 +1090,11 @@ int main (int argc, char* argv [])
 		case 'o':
 		    /* Name the output file */
 		    OutputName = GetArg (&I, 2);
+		    break;
+
+		case 'r':
+		    /* Enable register variables */
+		    OptRegisterVars (Arg, 0);
 		    break;
 
 		case 't':

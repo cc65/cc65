@@ -12,26 +12,128 @@
 	@echo $<
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-OBJS   = runtime.o mul.o div.o push.o inc.o dec.o shl.o shr.o add.o\
-	 sub.o rsub.o or.o xor.o and.o neg.o bneg.o compl.o icmp.o\
-	 call.o swap.o switch.o gt.o ugt.o ge.o makebool.o ldau0sp.o\
-	 uge.o lt.o ult.o le.o ule.o eq.o ne.o test.o subeqsp.o\
-	 udiv.o umod.o mod.o shelp.o aslax1.o asrax1.o shrax1.o\
-         aslax2.o asrax2.o shrax2.o aslax3.o asrax3.o shrax3.o\
-	 enter.o leave.o leasp.o popsreg.o ldai.o ldaxi.o ldauisp.o\
-	 ldaui.o pushw.o pushb.o staxsp.o ldaxsp.o addeqsp.o\
-	 bpushbsp.o pushwsp.o pushbsp.o
+OBJS = 	add.o		\
+       	addeqsp.o	\
+       	and.o		\
+       	aslax1.o	\
+       	aslax2.o	\
+       	aslax3.o	\
+       	asleax1.o	\
+       	asleax2.o	\
+       	asleax3.o	\
+       	asrax1.o	\
+       	asrax2.o	\
+       	asrax3.o	\
+       	asreax1.o	\
+       	asreax2.o	\
+       	asreax3.o	\
+       	axlong.o	\
+       	bneg.o		\
+       	bpushbsp.o	\
+       	call.o		\
+       	compl.o		\
+       	dec.o		\
+       	div.o		\
+       	enter.o		\
+       	eq.o		\
+       	ge.o		\
+       	gt.o		\
+       	icmp.o		\
+       	inc.o		\
+       	ladd.o		\
+       	laddeq.o	\
+       	laddeqsp.o	\
+       	land.o		\
+       	lbneg.o		\
+       	lcmp.o		\
+       	lcompl.o	\
+       	ldai.o		\
+       	ldau0sp.o	\
+       	ldaui.o		\
+       	ldauisp.o	\
+       	ldaxi.o		\
+       	ldaxsp.o	\
+       	ldeax.o		\
+       	ldeaxi.o	\
+       	ldec.o		\
+       	ldiv.o		\
+       	le.o		\
+       	leasp.o		\
+       	leave.o		\
+       	leq.o		\
+       	lge.o		\
+       	lgt.o		\
+       	linc.o		\
+       	lle.o		\
+       	llt.o		\
+       	lmod.o		\
+       	lmul.o		\
+       	lne.o		\
+       	lneg.o		\
+       	lor.o		\
+       	lpop.o		\
+       	lpush.o		\
+       	lrsub.o		\
+       	lruntime.o	\
+       	lsave.o		\
+       	lshelp.o	\
+       	lshl.o		\
+       	lshr.o		\
+       	lsub.o		\
+       	lsubeq.o	\
+       	lsubeqsp.o	\
+       	lswap.o		\
+       	lswitch.o	\
+       	lt.o		\
+       	ltest.o		\
+       	ludiv.o		\
+       	luge.o		\
+       	lugt.o		\
+       	lule.o		\
+       	lult.o		\
+       	lumod.o		\
+       	lxor.o		\
+       	makebool.o	\
+       	mod.o		\
+       	mul.o		\
+       	ne.o		\
+       	neg.o		\
+       	or.o		\
+       	popsreg.o	\
+       	push.o		\
+       	pushb.o		\
+       	pushbsp.o	\
+       	pushw.o		\
+       	pushwsp.o	\
+       	rsub.o		\
+       	runtime.o	\
+       	shelp.o		\
+       	shl.o		\
+       	shr.o		\
+       	shrax1.o	\
+       	shrax2.o	\
+       	shrax3.o	\
+       	shreax1.o	\
+       	shreax2.o	\
+       	shreax3.o	\
+       	staxsp.o	\
+       	steaxsp.o	\
+       	sub.o		\
+       	subeqsp.o	\
+       	swap.o		\
+       	switch.o	\
+       	test.o		\
+       	tosint.o	\
+       	toslong.o	\
+       	udiv.o		\
+       	uge.o		\
+       	ugt.o		\
+       	ule.o		\
+       	ult.o		\
+       	umod.o		\
+       	xor.o
 
-LOBJS  = lruntime.o lconvert.o ladd.o lsub.o lrsub.o leq.o lne.o\
-	 lneg.o lbneg.o lcompl.o lpush.o land.o lor.o lxor.o ldeaxi.o\
-	 ltest.o llt.o lle.o lge.o lgt.o lsave.o asleax1.o laddeqsp.o\
-	 asreax1.o shreax1.o asleax2.o asreax2.o shreax2.o lsubeqsp.o\
-	 asleax3.o asreax3.o shreax3.o lmul.o lshelp.o ludiv.o lumod.o\
-	 ldiv.o lmod.o lswitch.o steaxsp.o lshr.o lshl.o lcmp.o lugt.o\
-	 luge.o lult.o lule.o linc.o ldec.o lswap.o lpop.o ldeax.o\
-	 lsubeq.o laddeq.o
-
-all:	$(OBJS) $(LOBJS)
+all:   	$(OBJS)
 
 clean:
 	@rm -f *~ $(COBJS:.o=.s) $(OBJS) $(LOBJS)

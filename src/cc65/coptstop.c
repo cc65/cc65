@@ -34,7 +34,9 @@
 
 
 #include <stdlib.h>
-#include <ctype.h>
+
+/* common */
+#include "chartype.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -334,12 +336,12 @@ static int IsRegVar (StackOpData* D)
         P->OPC == OP65_LDX                               &&
         P->AM == AM65_ZP                                 &&
         strncmp (P->Arg, "regbank+", 7) == 0             &&
-        isdigit (P->Arg[8])                              &&
+        IsDigit (P->Arg[8])                              &&
         (P = CS_GetEntry (D->Code, D->PushIndex-2)) != 0 &&
         P->OPC == OP65_LDA                               &&
         P->AM == AM65_ZP                                 &&
         strncmp (P->Arg, "regbank+", 7) == 0             &&
-        isdigit (P->Arg[8])) {
+        IsDigit (P->Arg[8])) {
         /* Ok, it loads the register variable */
         D->ZPHi = D->PrevEntry->Arg;
         D->ZPLo = P->Arg;

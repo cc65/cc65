@@ -33,7 +33,8 @@
 
 
 
-#include <ctype.h>
+/* common */
+#include "chartype.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -393,7 +394,7 @@ unsigned OptAdd4 (CodeSeg* S)
      	/* Check for the sequence */
         if (E->OPC == OP65_JSR                          &&
             strncmp (E->Arg, "incax", 5) == 0           &&
-            isdigit (E->Arg[5])                         &&
+            IsDigit (E->Arg[5])                         &&
             E->Arg[6] == '\0'                           &&
             !RegXUsed (S, I+1)) {
 

@@ -14,8 +14,12 @@ pushaysp:
 pusha:	ldy	sp
        	beq	@L1
  	dec	sp
+.ifpc02
+	sta	(sp)
+.else
     	ldy	#0
     	sta	(sp),y
+.endif
     	rts
 
 @L1:	dec	sp+1

@@ -47,6 +47,7 @@ OBJS=	_scrsize.o	\
 	revers.o	\
         systime.o       \
         sysuname.o      \
+        tgi_mode_table.o\
 	wherex.o       	\
        	wherey.o	\
 	write.o
@@ -58,7 +59,7 @@ EMDS =
 
 JOYS = apple2-stdjoy.joy
 
-TGIS =
+TGIS = apple2-280-192-6.tgi
 
 #--------------------------------------------------------------------------
 # Targets

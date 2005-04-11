@@ -37,6 +37,11 @@ is a machine language program with an executable header. It is of course
 possible to change this behaviour by using a modified startup file and linker
 config.
 
+You can also produce real carts with directory structures and encrypted
+headers by modifying the startup and linker config files. There is a simple
+example archive called <tt/cart_template.zip/ in the <htmlurl                                
+url="ftp://ftp.musoftware.de/pub/uz/cc65/contrib/" name="contrib directory">
+that shows how to create a complete bootable Lynx cart.
 
 <sect>Memory layout<p>
 
@@ -48,7 +53,14 @@ Special locations:
 
 <descrip>
   <tag/Text screen/
-  No conio suppport is currently available for the Lynx.
+  No conio support is currently available for the Lynx.
+
+  <tag/Keyboard/
+  The Lynx "flabode" keys, Opt 1, Pause and Opt 2 are implemented using the
+  conio interface. The only characters the keyboard is able to produce are
+  'R' for Restart (Opt 1 + Pause), 'F' for flip (Opt 2 + Pause),
+  'P' for pause, '1' for Opt 1, '2' for Opt 2, '3' for Opt 1 + Opt 2 and
+  '?' for all keys down at the same time.
 
   <tag/Stack/
   The C runtime stack is located at &dollar;BE3F and growing downwards.
@@ -108,6 +120,19 @@ available, but must be statically linked, because no file I/O is available.
 See the documentation for the <htmlurl url="co65.html" name="co65 utility">
 for information on how to do that.
 
+The TGI driver is implemented as a dual buffering device. To use it as a
+single-buffer device set draw page and view page to the same value 0 or 1;
+
+The TGI driver has a few Lynx-specific extensions.
+
+Calling tgi_ioctl(0, spr) will display a standard Lynx sprite on screen.
+
+Calling tgi_ioctl(1, 0) will do a flip screen. If you decide to flip the
+screen then it may be a good idea to call the install-routine for the
+joystick to get that flipped too.
+
+Calling tgi_ioctl(2, bgindex) will set the text background color to the index
+defined by bgindex. If bgindex is 0 then the background color is transparent.
 
 <sect1>Extended memory drivers<p>
 
@@ -121,6 +146,8 @@ statically linked, because no file I/O is available. See the documentation for
 the <htmlurl url="co65.html" name="co65 utility"> for information on how to do
 that.
 
+The joystick will check to see if the screen is flipped or not in the install
+routine and adapt itself to the currect state.
 
 <sect1>Mouse drivers<p>
 
@@ -139,6 +166,15 @@ No serial drivers are currently available for the Lynx.
 
 <sect>Other hints<p>
 
+At this point in time there is no support for the cart filesystem yet.
+I have a cart_template example project that uses an interrupt driven
+display, has support for the cart filesystem and an abcmusic sound
+module.
+
+At some point in time we may find a way to rewrite these to fit the
+way the cc65 drivers require. But for the time being you can create
+less portable applications using these Lynx specific modules in
+cart_template.
 
 
 <sect>Bugs/Feedback<p>

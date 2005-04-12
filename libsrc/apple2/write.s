@@ -1,52 +1,123 @@
-	;;
-	;; Kevin Ruland
-	;;
-	;; int write (int fd, const void* buf, int count);
-	;;
-	;; for now will only write to fd = stdout
-	;;
+;
+; Oliver Schmidt, 12.01.2005
+;
+; int __fastcall__ write (int fd, const void* buf, unsigned count);
+;
 
-	.export		_write
-	.import		popax, COUT
-	.importzp	ptr1, ptr2, ptr3
+        .export		_write
+        .import		rwprolog, rwcommon, rwepilog
+        .import		errnoexit, oserrexit
+        .import		COUT
 
-.proc   _write
+        .include	"zeropage.inc"
+        .include	"errno.inc"
+        .include	"fcntl.inc"
+        .include	"mli.inc"
+        .include	"filedes.inc"
 
-	sta	ptr2            ; Save count for later
-	stx	ptr2+1
-	sta	ptr3
-	sta	ptr3+1		; save for result
-	jsr	popax		; get buf
-	sta	ptr1
-	stx	ptr1+1
-	jsr	popax		; get fd and discard
-L1:	lda	ptr2
-	ora	ptr2+1		; count zero?
-	beq	L9
-	ldy	#$00
-	lda	(ptr1),y
-	cmp	#$0A		; Check for \n = Crtl-j
-	bne	rawout
-	lda	#$0D		; Issue cr
-rawout:
-	ora	#$80
-	jsr	COUT
-	inc	ptr1
-	bne	L2
-	inc	ptr1+1
-L2:	lda	ptr2
-	bne	L3
-	dec	ptr2
-	dec	ptr2+1
-	jmp	L1
-L3:	dec	ptr2
-	jmp	L1
+_write:
+        ; Get parameters
+        jsr	rwprolog
+        bcs	errno
+        tax			; Save fd
 
-; No error, return count
+        ; Check for write access
+        lda	fdtab + FD::FLAGS,y
+        and	#O_WRONLY
+        beq	einval
 
-L9:   	lda	ptr3
-    	ldx	ptr3+1
-    	rts
+        ; Check for device
+        txa			; Restore fd
+        bmi	device
 
-.endproc
+        ; Check	for append flag
+        lda	fdtab + FD::FLAGS,y
+        and	#O_APPEND
+        beq	write
 
+        ; Set fd
+        stx	mliparam + MLI::EOF::REF_NUM
+
+        ; Get file size
+        lda	#GET_EOF_CALL
+        ldx	#EOF_COUNT
+        jsr	callmli
+        bcs	oserr
+
+        .if	MLI::MARK::REF_NUM = MLI::EOF::REF_NUM
+
+        ; REF_NUM already set
+
+        .else
+        .error	"Assertion failed"
+        .endif
+
+        .if	MLI::MARK::POSITION = MLI::EOF::EOF
+
+        ; POSITION already set
+
+        .else
+        .error	"Assertion failed"
+        .endif
+
+        ; Set file pointer
+        lda	#SET_MARK_CALL
+        ldx	#MARK_COUNT
+        jsr	callmli
+        bcs	oserr
+
+        ; Do write
+write:  lda	fdtab + FD::REF_NUM,y
+        ldy	#WRITE_CALL
+        jmp	rwcommon
+
+        ; Save count for epilog
+device: ldx	ptr2
+        lda	ptr2+1
+        stx	mliparam + MLI::RW::TRANS_COUNT
+        sta	mliparam + MLI::RW::TRANS_COUNT+1
+
+        ; Check for zero count
+        ora	ptr2
+        beq	done
+
+        ; Get char from buf
+        ldy	#$00
+next:   lda	(ptr1),y
+
+        ; Replace '\n' with '\r'
+        cmp	#$0A
+        bne	:+
+        lda	#$0D
+
+        ; Set hi bit and write to device
+:       ora	#$80
+        .ifndef	__APPLE2ENH__
+        cmp	#$E0		; Test for lowercase
+        bcc	output
+        and	#$DF		; Convert to uppercase
+        .endif
+output: jsr	COUT		; Preserves X and Y
+
+        ; Increment pointer
+        iny
+        bne	:+
+        inc	ptr1+1
+
+        ; Decrement count
+:       dex
+        bne	next
+        dec	ptr2+1
+        bpl	next
+
+        ; Return success
+done:   jmp	rwepilog
+
+        ; Load errno code
+einval: lda	#EINVAL
+
+        ; Return errno
+errno:  jmp	errnoexit
+
+        ; Return oserror
+oserr:  jmp	oserrexit

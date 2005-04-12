@@ -43,6 +43,7 @@ OBJS=	_scrsize.o	\
      	cclear.o	\
      	cgetc.o		\
      	chline.o	\
+	close.o		\
      	clrscr.o	\
      	color.o		\
      	cputc.o		\
@@ -57,6 +58,9 @@ OBJS=	_scrsize.o	\
 	diosectsize.o	\
 	diowrite.o	\
 	dosdetect.o	\
+	filedes.o	\
+	fileerr.o	\
+	filename.o	\
         get_ostype.o    \
         getenv.o        \
 	gotoxy.o	\
@@ -65,7 +69,9 @@ OBJS=	_scrsize.o	\
      	kbhit.o		\
         mainargs.o      \
 	mli.o		\
+	open.o		\
         oserrlist.o     \
+	oserror.o	\
         randomize.o     \
         rcout.o         \
      	read.o          \
@@ -75,6 +81,7 @@ OBJS=	_scrsize.o	\
         rpread.o        \
         rrdkey.o        \
         rvtabz.o        \
+	rwcommon.o	\
         systime.o       \
         sysuname.o      \
         tgi_mode_table.o\

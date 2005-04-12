@@ -39,7 +39,7 @@ config.
 
 You can also produce real carts with directory structures and encrypted
 headers by modifying the startup and linker config files. There is a simple
-example archive called <tt/cart_template.zip/ in the <htmlurl                                
+example archive called <tt/lynx-cart-demo/ in the <htmlurl
 url="ftp://ftp.musoftware.de/pub/uz/cc65/contrib/" name="contrib directory">
 that shows how to create a complete bootable Lynx cart.
 
@@ -166,15 +166,13 @@ No serial drivers are currently available for the Lynx.
 
 <sect>Other hints<p>
 
-At this point in time there is no support for the cart filesystem yet.
-I have a cart_template example project that uses an interrupt driven
-display, has support for the cart filesystem and an abcmusic sound
-module.
+At this point in time there is no support for the cart filesystem yet. I have
+a <tt/lynx-cart-demo/ example project that uses an interrupt driven display,
+has support for the cart filesystem and an abcmusic sound module.
 
-At some point in time we may find a way to rewrite these to fit the
-way the cc65 drivers require. But for the time being you can create
-less portable applications using these Lynx specific modules in
-cart_template.
+At some point in time we may find a way to rewrite these to fit the way the
+cc65 drivers require. But for the time being you can create less portable
+applications using these Lynx specific modules in <tt/lynx-cart-demo/.
 
 
 <sect>Bugs/Feedback<p>

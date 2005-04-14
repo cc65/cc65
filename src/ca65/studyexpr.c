@@ -619,7 +619,7 @@ static void StudyPlus (ExprNode* Expr, ExprDesc* D)
     StudyExprInternal (Expr->Right, &Right);
 
     /* Check if we can handle the operation */
-    if (ED_IsValid (D) || ED_IsValid (&Right)) {
+    if (ED_IsValid (D) && ED_IsValid (&Right)) {
 
         /* Add both */
         ED_Add (D, &Right);
@@ -654,7 +654,7 @@ static void StudyMinus (ExprNode* Expr, ExprDesc* D)
     StudyExprInternal (Expr->Right, &Right);
 
     /* Check if we can handle the operation */
-    if (ED_IsValid (D) || ED_IsValid (&Right)) {
+    if (ED_IsValid (D) && ED_IsValid (&Right)) {
 
         /* Subtract both */
         ED_Sub (D, &Right);

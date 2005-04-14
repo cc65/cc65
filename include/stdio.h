@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -69,7 +69,9 @@ extern FILE* stderr;
 #define TMP_MAX		256
 
 /* Standard defines that are platform dependent */
-#if defined(__ATARI__)
+#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#  define FILENAME_MAX	64
+#elif defined(__ATARI__)
 #  define FILENAME_MAX	12
 #elif defined(__LUNIX__)
 #  define FILENAME_MAX  80

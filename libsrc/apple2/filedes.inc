@@ -4,13 +4,13 @@
 ; File descriptor management for the POSIX I/O routines
 ;
 
-.struct FD
-        REF_NUM	.byte
-        FLAGS	.byte
-        BUFFER	.addr
-.endstruct
+        .struct FD
+                REF_NUM .byte
+                FLAGS   .byte
+                BUFFER  .addr
+        .endstruct
 
-        .global		fdtab
-        .global		getfd
+        .global         fdtab
+        .global         getfd
 
 MAX_FDS = 8

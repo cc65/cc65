@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -39,10 +39,10 @@
 
 
 /* NULL pointer */
-#ifdef NULL
-#  undef NULL
-#endif
+#ifndef _HAVE_NULL
 #define NULL	0
+#define _HAVE_NULL
+#endif
 
 /* Locale information constants */
 #define LC_ALL		0

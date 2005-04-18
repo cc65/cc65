@@ -20,7 +20,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I ../apple2 -I ../../include
 # Rules
 
 %.o:   	../apple2/%.c
-	@$(CC) $(CFLAGS) $<
+	@$(CC) -o $(notdir $(*).s) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	../apple2/%.s

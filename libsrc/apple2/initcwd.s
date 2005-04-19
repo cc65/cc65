@@ -8,6 +8,8 @@
         .include	"zeropage.inc"
         .include        "mli.inc"
 
+        .segment        "INIT"
+        
 initcwd:
         ; Use imported buffer
         lda	#<__cwd

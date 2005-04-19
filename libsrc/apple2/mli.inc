@@ -11,8 +11,18 @@ RW_BLOCK_COUNT  = 3
 CREATE_CALL     = $C0
 CREATE_COUNT    = 7
 
+DESTROY_CALL    = $C1
+DESTROY_COUNT   = 1
+
+RENAME_CALL     = $C2
+RENAME_COUNT    = 2
+
 ON_LINE_CALL    = $C5
 ON_LINE_COUNT   = 2
+
+SET_PREFIX_CALL = $C6
+GET_PREFIX_CALL = $C7
+PREFIX_COUNT    = 1
 
 OPEN_CALL       = $C8
 OPEN_COUNT      = 3
@@ -35,60 +45,73 @@ EOF_COUNT       = 2
         .struct MLI
                 .union
                         .struct RW_BLOCK
-                                PARAM_COUNT	.byte
-                                UNIT_NUM	.byte
-                                DATA_BUFFER	.addr
-                                BLOCK_NUM	.word
+                                PARAM_COUNT     .byte
+                                UNIT_NUM        .byte
+                                DATA_BUFFER     .addr
+                                BLOCK_NUM       .word
                         .endstruct
                         .struct CREATE
+                                PARAM_COUNT     .byte
+                                PATHNAME        .addr
+                                ACCESS          .byte
+                                FILE_TYPE       .byte
+                                AUX_TYPE        .word
+                                STORAGE_TYPE    .byte
+                                CREATE_DATE     .word
+                                CREATE_TIME     .word
+                        .endstruct
+                        .struct DESTROY
+                                PARAM_COUNT     .byte
+                                PATHNAME        .addr
+                        .endstruct
+                        .struct RENAME
+                                PARAM_COUNT     .byte
+                                PATHNAME        .addr
+                                NEW_PATHNAME    .addr
+                        .endstruct
+                        .struct ON_LINE
+                                PARAM_COUNT     .byte
+                                UNIT_NUM        .byte
+                                DATA_BUFFER     .addr
+                        .endstruct
+                        .struct PREFIX
                                 PARAM_COUNT	.byte
                                 PATHNAME	.addr
-                                ACCESS		.byte
-                                FILE_TYPE	.byte
-                                AUX_TYPE	.word
-                                STORAGE_TYPE	.byte
-                                CREATE_DATE	.word
-                                CREATE_TIME	.word
-                        .endstruct
-                        .struct	ON_LINE
-                                PARAM_COUNT	.byte
-                                UNIT_NUM	.byte
-                                DATA_BUFFER	.addr
                         .endstruct
                         .struct OPEN
-                                PARAM_COUNT	.byte
-                                PATHNAME	.addr
-                                IO_BUFFER	.addr
-                                REF_NUM		.byte
+                                PARAM_COUNT     .byte
+                                PATHNAME        .addr
+                                IO_BUFFER       .addr
+                                REF_NUM         .byte
                         .endstruct
                         .struct RW
-                                PARAM_COUNT	.byte
-                                REF_NUM		.byte
-                                DATA_BUFFER	.addr
-                                REQUEST_COUNT	.word
-                                TRANS_COUNT	.word
+                                PARAM_COUNT     .byte
+                                REF_NUM         .byte
+                                DATA_BUFFER     .addr
+                                REQUEST_COUNT   .word
+                                TRANS_COUNT     .word
                         .endstruct
                         .struct CLOSE
-                                PARAM_COUNT	.byte
-                                REF_NUM		.byte
+                                PARAM_COUNT     .byte
+                                REF_NUM         .byte
                         .endstruct
                         .struct MARK
-                                PARAM_COUNT	.byte
-                                REF_NUM		.byte
-                                POSITION	.byte 3
+                                PARAM_COUNT     .byte
+                                REF_NUM         .byte
+                                POSITION        .byte 3
                         .endstruct
                         .struct EOF
-                                PARAM_COUNT	.byte
-                                REF_NUM		.byte
-                                EOF		.byte 3
+                                PARAM_COUNT     .byte
+                                REF_NUM         .byte
+                                EOF             .byte 3
                         .endstruct
                 .endunion
         .endstruct
 
-        .global		mliparam
-        .global		callmli
+        .global         mliparam
+        .global         callmli
 
-ENTRY   :=	$BF00		; MLI call entry point
-DEVNUM  :=	$BF30		; Most recent accessed device
-PFIXPTR :=	$BF9A		; If = 0, no prefix active
-KVERSION:=      $BFFF		; Kernel version number
+ENTRY   :=      $BF00		; MLI call entry point
+DEVNUM  :=      $BF30		; Most recent accessed device
+PFIXPTR :=      $BF9A		; If = 0, no prefix active
+KVERSION:=      $BFFF           ; Kernel version number

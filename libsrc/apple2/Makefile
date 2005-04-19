@@ -65,6 +65,7 @@ OBJS=	_scrsize.o	\
         getenv.o        \
 	gotoxy.o	\
 	gotoy.o		\
+	initcwd.o	\
         joy_stddrv.o    \
      	kbhit.o		\
         mainargs.o      \

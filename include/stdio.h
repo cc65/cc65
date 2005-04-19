@@ -70,15 +70,15 @@ extern FILE* stderr;
 
 /* Standard defines that are platform dependent */
 #if defined(__APPLE2__) || defined(__APPLE2ENH__)
-#  define FILENAME_MAX	64
+#  define FILENAME_MAX	(64+1)
 #elif defined(__ATARI__)
-#  define FILENAME_MAX	12
+#  define FILENAME_MAX	(12+1)
 #elif defined(__LUNIX__)
-#  define FILENAME_MAX  80
+#  define FILENAME_MAX  (80+1)
 #else
-#  define FILENAME_MAX  16
+#  define FILENAME_MAX  (16+1)
 #endif
-#define L_tmpnam	(FILENAME_MAX + 1)
+#define L_tmpnam	FILENAME_MAX
 
 
 

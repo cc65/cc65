@@ -42,15 +42,15 @@ _IONBF		= 2
 BUFSIZ		= 256
 EOF 	      	= -1
 .if .defined(__APPLE2__) .or .defined(__APPLE2ENH__)
-FILENAME_MAX	= 64
+FILENAME_MAX	= 64+1
 .elseif .defined(__ATARI__)
-FILENAME_MAX	= 12
+FILENAME_MAX	= 12+1
 .elseif .defined(__LUNIX__)
-FILENAME_MAX    = 80
+FILENAME_MAX    = 80+1
 .else
-FILENAME_MAX	= 16
+FILENAME_MAX	= 16+1
 .endif
-L_tmpnam	= (FILENAME_MAX + 1)
+L_tmpnam	= FILENAME_MAX
 SEEK_CUR	= 0
 SEEK_END	= 1
 SEEK_SET	= 2

@@ -6,10 +6,10 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2003      Ullrich von Bassewitz                                       */
-;*               Römerstrasse 52                                             */
-;*               D-70794 Filderstadt                                         */
-;* EMail:        uz@cc65.org                                                 */
+;* (C) 2003-2005, Ullrich von Bassewitz                                      */
+;*                Römerstrasse 52                                            */
+;*                D-70794 Filderstadt                                        */
+;* EMail:         uz@cc65.org                                                */
 ;*                                                                           */
 ;*                                                                           */
 ;* This software is provided 'as-is', without any expressed or implied       */
@@ -41,7 +41,15 @@ _IOLBF		= 1
 _IONBF		= 2
 BUFSIZ		= 256
 EOF 	      	= -1
+.if .defined(__APPLE2__) .or .defined(__APPLE2ENH__)
+FILENAME_MAX	= 64
+.elseif .defined(__ATARI__)
+FILENAME_MAX	= 12
+.elseif .defined(__LUNIX__)
+FILENAME_MAX    = 80
+.else
 FILENAME_MAX	= 16
+.endif
 L_tmpnam	= (FILENAME_MAX + 1)
 SEEK_CUR	= 0
 SEEK_END	= 1

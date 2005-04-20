@@ -1655,11 +1655,12 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.ASSERT</tt><label id=".ASSERT"><p>
 
   Add an assertion. The command is followed by an expression, an action
-  specifier and a message that is output in case the assertion fails. The
-  action specifier may be one of <tt/warning/ or <tt/error/. The assertion
-  is evaluated by the assembler if possible, and also passed to the linker
-  in the object file (if one is generated). The linker will then evaluate
-  the expression when segment placement has been done.
+  specifier, and an optional message that is output in case the assertion
+  fails. If no message was given, the string "Assertion failed" is used. The
+  action specifier may be one of <tt/warning/ or <tt/error/. The assertion is
+  evaluated by the assembler if possible, and also passed to the linker in the
+  object file (if one is generated). The linker will then evaluate the
+  expression when segment placement has been done.
 
   Example:
 
@@ -1672,7 +1673,7 @@ Here's a list of all control commands and a description, what they do:
   the case. More complex expressions are possible. The action specifier
   <tt/warning/ outputs a warning, while the <tt/error/ specifier outputs
   an error message. In the latter case, generation if the output file is
-  suppressed.
+  suppressed in both the assembler and linker.
 
 
 <sect1><tt>.AUTOIMPORT</tt><label id=".AUTOIMPORT"><p>

@@ -1657,8 +1657,9 @@ Here's a list of all control commands and a description, what they do:
   Add an assertion. The command is followed by an expression, an action
   specifier and a message that is output in case the assertion fails. The
   action specifier may be one of <tt/warning/ or <tt/error/. The assertion
-  is passed to the linker and will be evaluated when segment placement has
-  been done.
+  is evaluated by the assembler if possible, and also passed to the linker
+  in the object file (if one is generated). The linker will then evaluate
+  the expression when segment placement has been done.
 
   Example:
 
@@ -1786,9 +1787,8 @@ Here's a list of all control commands and a description, what they do:
   specifiying <tt/constructor/ and 1 is equal to specifying <tt/destructor/).
   The <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
   id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
-  name=".INTERRUPTORCONSTRUCTOR"></tt>commands are actually shortcuts
-  for <tt/.CONDES/ with a type of <tt/constructor/ resp. <tt/destructor/ or
-  <tt/interruptor/.
+  name=".INTERRUPTOR"></tt> commands are actually shortcuts for <tt/.CONDES/
+  with a type of <tt/constructor/ resp. <tt/destructor/ or <tt/interruptor/.
 
   After the type, an optional priority may be specified. Higher numeric values
   mean higher priority. If no priority is given, the default priority of 7 is
@@ -1804,7 +1804,7 @@ Here's a list of all control commands and a description, what they do:
 
   See the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
   id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
-  name=".INTERRUPTOR"></tt>commands and the separate section <ref id="condes"
+  name=".INTERRUPTOR"></tt> commands and the separate section <ref id="condes"
   name="Module constructors/destructors"> explaining the feature in more
   detail.
 
@@ -3829,7 +3829,7 @@ useful for assembler programs.
 
 Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
 id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
-name=".INTERRUPTOR"></tt>keywords it it possible to export functions in a
+name=".INTERRUPTOR"></tt> keywords it it possible to export functions in a
 special way. The linker is able to generate tables with all functions of a
 specific type. Such a table will <em>only</em> include symbols from object
 files that are linked into a specific executable. This may be used to add
@@ -3920,7 +3920,7 @@ priority for the functions accordingly.
 <item>
 Besides the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
 id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
-name=".INTERRUPTOR"></tt>statements, there is also a more generic command:
+name=".INTERRUPTOR"></tt> statements, there is also a more generic command:
 <tt><ref id=".CONDES" name=".CONDES"></tt>. This allows to specify an
 additional type. Predefined types are 0 (constructor), 1 (destructor) and 2
 (interruptor). The linker generates a separate table for each type on request.

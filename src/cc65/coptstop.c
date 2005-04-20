@@ -719,13 +719,13 @@ struct OptFuncDesc {
 };
 
 static const OptFuncDesc FuncTable[] = {
-    { "__bzero",    Opt___bzero,   STOP_X_ZERO   },
-    { "staspidx",   Opt_staspidx,  STOP_NONE     },
-    { "staxspidx",  Opt_staxspidx, STOP_A_UNUSED },
-    { "tosaddax",   Opt_tosaddax,  STOP_NONE     },
-    { "tosandax",   Opt_tosandax,  STOP_NONE     },
-    { "tosorax",    Opt_tosorax,   STOP_NONE     },
-    { "tosxorax",   Opt_tosxorax,  STOP_NONE     },
+    { "__bzero",    Opt___bzero,   STOP_X_ZERO | STOP_A_KNOWN   },
+    { "staspidx",   Opt_staspidx,  STOP_NONE                    },
+    { "staxspidx",  Opt_staxspidx, STOP_A_UNUSED                },
+    { "tosaddax",   Opt_tosaddax,  STOP_NONE                    },
+    { "tosandax",   Opt_tosandax,  STOP_NONE                    },
+    { "tosorax",    Opt_tosorax,   STOP_NONE                    },
+    { "tosxorax",   Opt_tosxorax,  STOP_NONE                    },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
 

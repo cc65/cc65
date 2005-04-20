@@ -37,17 +37,12 @@ _open:
 :       lda	fdtab + FD::REF_NUM,y
         beq	found
 
-        .if	.sizeof(FD) = 4
-
         ; Advance to next fdtab slot
+        .assert .sizeof(FD) = 4, error
         iny
         iny
         iny
         iny
-
-        .else
-        .error	"Assertion failed"
-        .endif
 
         ; Check for end of fdtab
         cpy	#MAX_FDS * .sizeof(FD)
@@ -107,13 +102,8 @@ found:  tya
         and	#O_CREAT
         beq	open
 
-        .if	MLI::CREATE::PATHNAME = MLI::OPEN::PATHNAME
-
         ; PATHNAME already set
-
-        .else
-        .error	"Assertion failed"
-        .endif
+        .assert MLI::CREATE::PATHNAME = MLI::OPEN::PATHNAME, error
 
         ; Set all other parameters from template
         ldx	#(MLI::CREATE::CREATE_TIME+1) - (MLI::CREATE::PATHNAME+1) - 1
@@ -138,7 +128,7 @@ found:  tya
         beq	open
 
         lda	#$47		; "Duplicate filename"
-        
+
         ; Cleanup name
 oserr2: jsr	popname		; Preserves A
 
@@ -148,7 +138,7 @@ oserr1: ldy	tmp2		; Restore fdtab slot
         pha			; Save oserror code
         jsr	freebuffer
         pla			; Restore oserror code
-        
+
         ; Return oserror
         jmp	oserrexit
 
@@ -200,20 +190,15 @@ open:   ldy	tmp2		; Restore fdtab slot
 done:   lda	tmp1		; Restore fd
         sta	fdtab + FD::REF_NUM,y
 
-        .if	.sizeof(FD) = 4
-
         ; Convert fdtab slot to handle
+        .assert .sizeof(FD) = 4, error
         tya
         lsr
         lsr
 
-        .else
-        .error	"Assertion failed"
-        .endif
-
         ; Cleanup name
         jsr	popname		; Preserves A
-        
+
         ; Return success
         ldx	#$00
         rts

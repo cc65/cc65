@@ -17,15 +17,11 @@ getfd:
         cmp	#MAX_FDS
         bcs	error
 
-        .if	.sizeof(FD) = 4
 
         ; Convert handle to fdtab slot
+        .assert .sizeof(FD) = 4, error
         asl
         asl
-
-        .else
-        .error	"Assertion failed"
-        .endif
 
         ; Check for fdtab slot in use
         tay
@@ -43,7 +39,7 @@ error:  lda	#EINVAL
 
         .data
 
-fdtab:  .if	.sizeof(FD) = 4
+fdtab:  .assert .sizeof(FD) = 4, error
 
         .byte	$80		; STDIN_FILENO ::REF_NUM
         .byte	O_RDONLY	; STDIN_FILENO ::FLAGS
@@ -56,9 +52,5 @@ fdtab:  .if	.sizeof(FD) = 4
         .byte	$80		; STDERR_FILENO::REF_NUM
         .byte	O_WRONLY	; STDERR_FILENO::FLAGS
         .addr	$0000		; STDERR_FILENO::BUFFER
-
-        .else
-        .error	"Assertion failed"
-        .endif
 
         .res	(MAX_FDS - 3) * .sizeof(FD)

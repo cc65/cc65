@@ -44,21 +44,13 @@ _write:
         jsr	callmli
         bcs	oserr
 
-        .if	MLI::MARK::REF_NUM = MLI::EOF::REF_NUM
 
         ; REF_NUM already set
+        .assert MLI::MARK::REF_NUM = MLI::EOF::REF_NUM, error
 
-        .else
-        .error	"Assertion failed"
-        .endif
-
-        .if	MLI::MARK::POSITION = MLI::EOF::EOF
 
         ; POSITION already set
-
-        .else
-        .error	"Assertion failed"
-        .endif
+        .assert MLI::MARK::POSITION = MLI::EOF::EOF, error
 
         ; Set file pointer
         lda	#SET_MARK_CALL
@@ -121,3 +113,4 @@ errno:  jmp	errnoexit
 
         ; Return oserror
 oserr:  jmp	oserrexit
+                                                          

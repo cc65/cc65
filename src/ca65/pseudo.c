@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -384,8 +384,8 @@ static void DoAssert (void)
         "ERROR"
     };
 
-    int  Action;
-    long Val;
+    int      Action;
+    unsigned Msg;
 
     /* First we have the expression that has to evaluated */
     ExprNode* Expr = Expression ();
@@ -414,19 +414,36 @@ static void DoAssert (void)
             Error ("Illegal assert action specifier");
     }
     NextTok ();
-    ConsumeComma ();
 
-    /* Read the message */
-    if (Tok != TOK_STRCON) {
-    	ErrorSkip ("String constant expected");
-        return;
+    /* We can have an optional message. If no message is present, use
+     * "Assertion failed".
+     */
+    if (Tok == TOK_COMMA) {
+
+        /* Skip the comma */
+        NextTok ();
+
+        /* Read the message */
+        if (Tok != TOK_STRCON) {
+            ErrorSkip ("String constant expected");
+            return;
+        }
+
+        /* Translate the message into a string id. We can then skip the input
+         * string.
+         */
+        Msg = GetStringId (SVal);
+        NextTok ();
+
+    } else {
+
+        /* Use "Assertion failed" */
+        Msg = GetStringId ("Assertion failed");
+
     }
 
     /* Remember the assertion */
-    AddAssertion (Expr, Action, GetStringId (SVal));
-
-    /* Skip the message */
-    NextTok ();
+    AddAssertion (Expr, Action, Msg);
 }
 
 

@@ -894,6 +894,11 @@ int main (int argc, char* argv [])
         SegCheck ();
     }
 
+    /* If we didn't have any errors, check the assertions */
+    if (ErrorCount == 0) {
+        CheckAssertions ();
+    }
+
     /* If we didn't have an errors, index the line infos */
     MakeLineInfoIndex ();
 

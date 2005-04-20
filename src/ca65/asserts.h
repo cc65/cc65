@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,6 +57,9 @@ struct ExprNode;
 
 void AddAssertion (struct ExprNode* Expr, unsigned Action, unsigned Msg);
 /* Add an assertion to the assertion table */
+
+void CheckAssertions (void);
+/* Check all assertions and evaluate the ones we can evaluate here. */
 
 void WriteAssertions (void);
 /* Write the assertion table to the object file */

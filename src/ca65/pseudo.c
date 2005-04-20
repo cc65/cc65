@@ -422,29 +422,8 @@ static void DoAssert (void)
         return;
     }
 
-    /* If we can evaluate the assertion now, there's no need to pass it to the
-     * linker.
-     */
-    if (IsConstExpr (Expr, &Val)) {
-        /* We can evaluate the expression, so handle it in the assembler */
-        switch (Action) {
-
-            case ASSERT_ACT_WARN:
-                Warning (0, "%s", SVal);
-                break;
-
-            case ASSERT_ACT_ERROR:
-                Error ("%s", SVal);
-                break;
-
-            default:
-                Internal ("Illegal assert action specifier");
-                break;
-        }
-    } else {
-        /* Cannot evaluate, add it to the object file */
-        AddAssertion (Expr, Action, GetStringId (SVal));
-    }
+    /* Remember the assertion */
+    AddAssertion (Expr, Action, GetStringId (SVal));
 
     /* Skip the message */
     NextTok ();

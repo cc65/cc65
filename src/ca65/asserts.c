@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,14 +34,17 @@
 
 
 /* common */
+#include "assertdefs.h"
 #include "coll.h"
 #include "xmalloc.h"
 
 /* ca65 */
 #include "asserts.h"
+#include "error.h"
 #include "expr.h"
 #include "objfile.h"
 #include "scanner.h"
+#include "spool.h"
 
 
 
@@ -98,12 +101,51 @@ void AddAssertion (ExprNode* Expr, unsigned Action, unsigned Msg)
 
 
 
+void CheckAssertions (void)
+/* Check all assertions and evaluate the ones we can evaluate here. */
+{
+    unsigned I;
+
+    /* Get the number of assertions */
+    unsigned Count = CollCount (&Assertions);
+
+    /* Check the assertions */
+    for (I = 0; I < Count; ++I) {
+
+        /* Get the next assertion */
+        Assertion* A = CollAtUnchecked (&Assertions, I);
+
+        /* Can we evaluate the expression? */
+        long Val;
+        if (IsConstExpr (A->Expr, &Val) && Val == 0) {
+            /* Apply the action */
+            const char* Msg = GetString (A->Msg);
+            switch (A->Action) {
+
+                case ASSERT_ACT_WARN:
+                    PWarning (&A->Pos, 0, "%s", Msg);
+                    break;
+
+                case ASSERT_ACT_ERROR:
+                    PError (&A->Pos, "%s", Msg);
+                    break;
+
+                default:
+                    Internal ("Illegal assert action specifier");
+                    break;
+            }
+        }
+    }
+}
+
+
+
 void WriteAssertions (void)
 /* Write the assertion table to the object file */
 {
     unsigned I;
 
-    /* Get the number of strings in the string pool */
+    /* Get the number of assertions */
     unsigned Count = CollCount (&Assertions);
 
     /* Tell the object file module that we're about to start the assertions */

@@ -113,6 +113,7 @@ char* __fastcall__ itoa (int val, char* buf, int radix);
 char* __fastcall__ utoa (unsigned val, char* buf, int radix);
 char* __fastcall__ ltoa (long val, char* buf, int radix);
 char* __fastcall__ ultoa (unsigned long val, char* buf, int radix);
+int __fastcall__ putenv (char* s);
 #endif
 
 

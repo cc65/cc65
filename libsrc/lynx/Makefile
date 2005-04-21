@@ -52,7 +52,6 @@ OBJS =  cartread.o      \
         eeprom.o        \
         extzp.o         \
         framerate.o     \
-	getenv.o	\
         kbhit.o         \
 	mainargs.o	\
 	sysuname.o	\

@@ -67,7 +67,6 @@ S_OBJS =	c_acptr.o	\
                 filedes.o       \
                 filename.o      \
                 filevars.o      \
-		getenv.o 	\
 		gotox.o 	\
 		gotoxy.o 	\
 		gotoy.o 	\

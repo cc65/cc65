@@ -54,7 +54,6 @@ OBJS =  _scrsize.o      \
         crt0.o          \
         ctype.o         \
         cvline.o        \
-        getenv.o        \
         gotox.o         \
         gotoxy.o        \
         gotoy.o         \
@@ -98,4 +97,4 @@ clean:
 zap:	clean
 	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
-                        
+

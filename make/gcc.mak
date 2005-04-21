@@ -1,86 +1,145 @@
+#! /usr/bin/make -f
+# -*- makefile -*-
 #
-# Main gcc Makefile.                                         
-# This makefile is maintained by Greg King, gngking@erols.com
-#
+# Main gcc Makefile.
+# This makefile is maintained by Greg King <gngking@erols.com>.
 
-# Install prefix and directories
-PREFIX	= /usr
-BINDIR	= $(PREFIX)/bin
-LIBDIR	= $(PREFIX)/lib
-DOCDIR	= $(PREFIX)/share/doc
-CC65DATA= $(LIBDIR)/cc65
-CC65LIB	= $(CC65DATA)/lib
-CC65INC = $(CC65DATA)/include
-CC65DOC = $(DOCDIR)/cc65
+# Goals that are supported by the cc65 package
+.PHONY:	all bins libs docs samples tests clean zap
+.PHONY:	uninstall install install-bins install-libs install-docs
 
+# If SYS is defined on this makefile's command-line, then we want it to go
+# to "samples" and "tests", but not to the other rules.  So, we disable a
+# feature of GNU make that would have given ${SYS} to every sub-make.
+MAKEOVERRIDES=
+
+# The install prefix and directories
+prefix		= /usr
+exec_prefix	= $(prefix)
+
+bindir		= $(exec_prefix)/bin
+datadir		= $(prefix)/share
+docdir		= $(datadir)/doc
+libdir		= $(exec_prefix)/lib
+
+CC65DATA	= $(libdir)/cc65
+CC65DOC		= $(docdir)/cc65
+
+CC65ASM		= $(CC65DATA)/asminc
+CC65INC		= $(CC65DATA)/include
+CC65LIB		= $(CC65DATA)/lib
 
 # Programs
-MKDIR	= mkdir
-INSTALL	= install
 
+MKDIR		= mkdir -m 755
 
-.PHONY:	all
-all:	bin libs docs
+# BSD-like install-program/-script
+INSTALL		= install
+#INSTALL		= install-sh
 
-.PHONY: bin
-bin:
+INSTALL_DATA	= $(INSTALL) -c -m 644
+INSTALL_PROG	= $(INSTALL) -c -m 755
+INSTALL_STRIP	= $(INSTALL_PROG) -s
+
+# Rules
+
+# The sample and library-test programs must be compiled for only one platform
+# at a time.  So, those rules are done automatically only when a user names
+# a system on the command-line.  (A user can do those rules with their
+# defaults by putting "all samples tests" on the command-line.)
+#
+all:	bins libs docs $(SYS:%=samples tests)
+
+bins:
 	@$(MAKE) -C src -f make/gcc.mak
 
-.PHONY:	libs
 libs:
-	@$(MAKE) -C libsrc zap all
+	@$(MAKE) -C libsrc
 
-.PHONY:	docs
+# A host system might not have LinuxDoc Tools, so this rule ignores errors.
 docs:
-	@$(MAKE) -C doc html
+	-@$(MAKE) -C doc html
 
-.PHONY: clean
-clean:
-	$(MAKE) -C src -f make/gcc.mak clean
-	$(MAKE) -C libsrc clean
-	$(MAKE) -C doc clean
+# Some platforms cannot compile all of the sample and library-test programs.
+# So, these rules ignore errors.
 
-.PHONY: zap
-zap:
-	$(MAKE) -C src -f make/gcc.mak zap
-	$(MAKE) -C libsrc zap
-	$(MAKE) -C doc zap
+samples:
+	-@$(MAKE) -k -C samples $(SYS:%=SYS=%)
 
-.PHONY:	install
-install:	all
-	@if [ `id -u` != 0 ]; then				      \
-	    echo "";						      \
-	    echo 'Do "make install" as root';			      \
-	    echo "";						      \
-	    false;						      \
-	fi
-	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65LIB)
-	@$(MKDIR) -p $(CC65DATA)/asminc $(CC65DATA)/emd $(CC65DATA)/joy $(CC65DATA)/lib $(CC65DATA)/mou $(CC65DATA)/ser $(CC65DATA)/tgi
-	@$(MKDIR) -p $(CC65INC)/em $(CC65INC)/geos $(CC65INC)/joystick $(CC65INC)/mouse $(CC65INC)/sys $(CC65INC)/tgi
-	@$(INSTALL) -s -m 755 src/ar65/ar65 $(BINDIR)
-	@$(INSTALL) -s -m 755 src/ca65/ca65 $(BINDIR)
-	@$(INSTALL)    -m 755 src/ca65html/ca65html $(BINDIR)
-	@$(INSTALL) -s -m 755 src/cc65/cc65 $(BINDIR)
-	@$(INSTALL) -s -m 755 src/cl65/cl65 $(BINDIR)
-	@$(INSTALL) -s -m 755 src/co65/co65 $(BINDIR)
-	@$(INSTALL) -s -m 755 src/da65/da65 $(BINDIR)
-	@$(INSTALL) -s -m 755 src/grc/grc $(BINDIR)
-	@$(INSTALL) -s -m 755 src/ld65/ld65 $(BINDIR)
-	@$(INSTALL) -s -m 755 src/od65/od65 $(BINDIR)
-	@$(INSTALL) -m 644 libsrc/*.lib libsrc/*.o $(CC65LIB)
-	@$(INSTALL) -m 644 include/*.h $(CC65INC)
-	@$(INSTALL) -m 644 include/geos/*.h $(CC65INC)/geos
-	@$(INSTALL) -m 644 include/em/*.h $(CC65INC)/em
-	@$(INSTALL) -m 644 include/joystick/*.h $(CC65INC)/joystick
-	@$(INSTALL) -m 644 include/mouse/*.h $(CC65INC)/mouse
-	@$(INSTALL) -m 644 include/sys/*.h $(CC65INC)/sys
-	@$(INSTALL) -m 644 include/tgi/*.h $(CC65INC)/tgi
-	@$(INSTALL) -m 644 asminc/*.inc $(CC65DATA)/asminc
-	@$(INSTALL) -m 644 libsrc/*.emd $(CC65DATA)/emd
-	@$(INSTALL) -m 644 libsrc/*.joy $(CC65DATA)/joy
-	@$(INSTALL) -m 644 libsrc/*.ser $(CC65DATA)/ser
-	@$(INSTALL) -m 644 libsrc/*.tgi $(CC65DATA)/tgi
-	@$(INSTALL) -m 644 src/ld65/cfg/*.cfg $(CC65DOC)
-	@$(INSTALL) -m 644 doc/*.html $(CC65DOC)
-	@$(INSTALL) -m 644 doc/{compile.txt,grc.txt,internal.txt,newvers.txt} $(CC65DOC)
+tests:
+	-@$(MAKE) -k -C testcode/lib $(SYS:%=SYS=%)
 
+clean zap:
+	$(MAKE) -C src -f make/gcc.mak $@
+	$(MAKE) -C libsrc $@
+	$(MAKE) -C doc $@
+	$(MAKE) -C samples $@
+	$(MAKE) -C testcode/lib $@ $(SYS:%=SYS=%)
+
+uninstall:	install-test
+	cd $(bindir) && $(RM) ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc ca65html
+	$(RM) -R $(CC65DATA) $(CC65DOC)
+
+install:	install-test install-dirs install-bins install-libs install-docs
+	@echo
+	@echo 'Export some shell environment variables:'
+	@echo
+	@echo 'CC65_INC=$(CC65INC)'
+	@echo 'CC65_LIB=$(CC65LIB)'
+	@echo
+
+.PHONY:	install-test
+install-test:
+	@if [ `id -u` != 0 ]; then					\
+	  echo >&2;							\
+	  echo 'Do "make install" or "make uninstall" as root.' >&2;	\
+	  echo >&2;							\
+	  false;							\
+	  fi
+
+.PHONY:	install-dirs
+install-dirs:
+	-$(MKDIR) -p $(bindir) $(docdir) $(libdir)
+	-$(MKDIR) $(CC65DATA) $(CC65ASM) $(CC65DOC) $(CC65INC)
+	-$(MKDIR) $(CC65INC)/em $(CC65INC)/geos $(CC65INC)/joystick \
+	  $(CC65INC)/mouse $(CC65INC)/sys $(CC65INC)/tgi
+	-$(MKDIR) $(CC65LIB) $(CC65DATA)/emd $(CC65DATA)/joy \
+	  $(CC65DATA)/mou $(CC65DATA)/ser $(CC65DATA)/tgi
+
+install-bins:
+	for f in ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc; \
+	  do $(INSTALL_STRIP) src/$$f/$$f $(bindir) || exit 1; \
+	  done
+	$(INSTALL_PROG) src/ca65html/ca65html $(bindir)
+
+install-libs:
+	for f in asminc/*.inc; \
+	  do $(INSTALL_DATA) $$f $(CC65ASM) || exit 1; \
+	  done
+	for f in include/*.h; \
+	  do $(INSTALL_DATA) $$f $(CC65INC) || exit 1; \
+	  done
+	for d in em geos joystick mouse sys tgi; \
+	  do for f in include/$$d/*.h; \
+	    do $(INSTALL_DATA) $$f $(CC65INC)/$$d || exit 1; \
+	    done || exit 1; \
+	  done
+	for f in libsrc/*.lib libsrc/*.o; \
+	  do $(INSTALL_DATA) $$f $(CC65LIB) || exit 1; \
+	  done
+	for d in emd joy mou ser tgi; \
+	  do for f in libsrc/*.$$d; \
+	    do $(INSTALL_DATA) $$f $(CC65DATA)/$$d || exit 1; \
+	    done || exit 1; \
+	  done
+
+install-docs:
+	for f in src/ld65/cfg/*.cfg; \
+	  do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
+	  done
+	for f in readme.1st grc.txt internal.txt; \
+	  do $(INSTALL_DATA) doc/$$f $(CC65DOC) || exit 1; \
+	  done
+	-for f in doc/*.html; \
+	  do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
+	  done

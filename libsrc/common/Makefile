@@ -79,6 +79,7 @@ C_OBJS =	_afailed.o	        \
 
 # From assembly source-files
 S_OBJS = 	_cwd.o          \
+		_environ.o	\
                 _fdesc.o 	\
 	 	_file.o  	\
 		_fopen.o	\
@@ -112,6 +113,7 @@ S_OBJS = 	_cwd.o          \
 		fwrite.o	\
 		getcpu.o	\
                 getcwd.o        \
+		getenv.o	\
 		isalnum.o	\
 		isalpha.o	\
 		isblank.o	\
@@ -140,11 +142,13 @@ S_OBJS = 	_cwd.o          \
                 oserrcheck.o    \
 		printf.o      	\
 		putchar.o	\
+		putenv.o	\
 	 	rand.o	      	\
                 raise.o         \
                 remove.o        \
                 rename.o        \
                 scanf.o         \
+		searchenv.o	\
 	 	setjmp.o      	\
                 signal.o        \
                 sigtable.o      \

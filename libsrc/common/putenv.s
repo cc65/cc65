@@ -15,8 +15,6 @@
 
         .include "errno.inc"
 
-	.macpack cpu
-
 .code
 
 ;----------------------------------------------------------------------------
@@ -43,14 +41,9 @@
 
 ; Remember the offset of the equal sign and replace it by a zero.
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-	phy
-	stz	(ptr1),y
-.else
         sty     tmp1
         lda     #$00
         sta     (ptr1),y
-.endif
 
 ; Search for the string in the environment. searchenv will set the N flag if
 ; the string is not found, otherwise X contains the index of the entry, ptr2
@@ -61,11 +54,7 @@
 
 ; Before doing anything else, restore the old environment string.
 
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-	ply
-.else
         ldy     tmp1
-.endif
         lda     #'='
         sta     (ptr1),y
 

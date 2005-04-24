@@ -62,7 +62,6 @@ OBJS=	_scrsize.o	\
 	fileerr.o	\
 	filename.o	\
         get_ostype.o    \
-        getenv.o        \
 	gotoxy.o	\
 	gotoy.o		\
 	initcwd.o	\

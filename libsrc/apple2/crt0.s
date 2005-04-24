@@ -4,10 +4,11 @@
 ; This must be the *first* file on the linker command line
 ;
 
-        .export		_exit, __Exit
+        .export		_exit
         .import		zerobss
         .import	   	initlib, donelib
         .import	   	callmain, callirq
+        .import		COUT
         .import	       	__STARTUP_LOAD__, __BSS_LOAD__	; Linker generated
         .import	       	__INTERRUPTOR_COUNT__		; Linker generated
 
@@ -36,12 +37,12 @@
         jsr	init
 
         ; Avoid re-entrance of donelib. This is also the _exit entry
-_exit:  ldx	#<__Exit
-        lda	#>__Exit
+_exit:  ldx	#<exit
+        lda	#>exit
         jsr	reset		; Setup RESET vector
 
-        ; Check for valid interrrupt vector table entry number
-        lda	intnum
+        ; Check for valid interrupt vector table entry number
+        lda     intnum
         beq	:+
 
         ; Deallocate interrupt vector table entry
@@ -53,8 +54,8 @@ _exit:  ldx	#<__Exit
         ; Call module destructors
 :       jsr	donelib
 
-        ; Restore the original RESET vector. This is also the __Exit entry
-__Exit: ldx	#$02
+        ; Restore the original RESET vector
+exit:   ldx	#$02
 :       lda	rvsave,x
         sta	SOFTEV,x
         dex
@@ -100,7 +101,7 @@ init:   ldx	#zpspace-1
         ldx	#<_exit
         lda	#>_exit
         jsr	reset		; Setup RESET vector
-
+                
         ; Clear the BSS data
         jsr	zerobss
 
@@ -120,15 +121,40 @@ init:   ldx	#zpspace-1
         ; Check for ProDOS
         lda	ENTRY
         cmp	#$4C		; Is MLI present? (JMP opcode)
-        bne	:+
+        bne	prterr
 
         ; Allocate interrupt vector table entry
         jsr	ENTRY
         .byte	$40		; Alloc interrupt
         .addr	params
+        bcs	prterr
 
         ; Push arguments and call main()
 :       jmp	callmain
+
+        ; Print error message and return
+prterr: ldx	#msglen-1
+:       lda	errmsg,x
+        jsr	COUT
+        dex
+        bpl	:-
+        rts
+
+errmsg: .ifdef  __APPLE2ENH__
+        .byte	$8D,     't'|$80, 'p'|$80, 'u'|$80, 'r'|$80, 'r'|$80
+        .byte	'e'|$80, 't'|$80, 'n'|$80, 'i'|$80, ' '|$80, 'c'|$80
+        .byte	'o'|$80, 'l'|$80, 'l'|$80, 'a'|$80, ' '|$80, 'o'|$80
+        .byte	't'|$80, ' '|$80, 'd'|$80, 'e'|$80, 'l'|$80, 'i'|$80
+        .byte	'a'|$80, 'F'|$80, $8D
+        .else
+        .byte	$8D,     'T'|$80, 'P'|$80, 'U'|$80, 'R'|$80, 'R'|$80
+        .byte	'E'|$80, 'T'|$80, 'N'|$80, 'I'|$80, ' '|$80, 'C'|$80
+        .byte	'O'|$80, 'L'|$80, 'L'|$80, 'A'|$80, ' '|$80, 'O'|$80
+        .byte	'T'|$80, ' '|$80, 'D'|$80, 'E'|$80, 'L'|$80, 'I'|$80
+        .byte	'A'|$80, 'F'|$80, $8D
+        .endif
+
+msglen = * - errmsg
 
 ; ------------------------------------------------------------------------
 

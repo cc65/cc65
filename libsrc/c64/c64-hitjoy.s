@@ -79,8 +79,10 @@ UNINSTALL:
         rts
 
 ; ------------------------------------------------------------------------
-; IRQ entry point. Is called from the C layer as a subroutine in the 
-; interrupt.
+; IRQ entry point. Is called from the C layer as a subroutine in the
+; interrupt. The routine MUST return carry set if the interrupt has been
+; 'handled' - which means that the interrupt source is gone. Otherwise it
+; MUST return carry clear.
 
 IRQ:    ; cia 2 setup
 
@@ -156,6 +158,8 @@ fire:
         lda     #0
         sta     $dc04
 
+        ; We do never "handle" the interrupt, we use it just as a timer.
+        clc
         rts
 
 ; ------------------------------------------------------------------------

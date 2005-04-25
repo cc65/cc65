@@ -178,7 +178,7 @@ BOX:    ldy     #5
 ; MOVE: Move the mouse to a new position. The position is passed as it comes
 ; from the C program, that is: X on the stack and Y in a/x. The C wrapper will
 ; remove the parameter from the stack on return.
-; No checks are done if the new position is valid (within the bounding box or 
+; No checks are done if the new position is valid (within the bounding box or
 ; the screen). No return code required.
 ;
 
@@ -269,7 +269,9 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 
 ;----------------------------------------------------------------------------
 ; IRQ: Irq handler entry point. Called as a subroutine but in IRQ context
-; (so be careful).
+; (so be careful). The routine MUST return carry set if the interrupt has been
+; 'handled' - which means that the interrupt source is gone. Otherwise it
+; MUST return carry clear.
 ;
 
 IRQ:    lda	SID_ADConv1		; Get mouse X movement
@@ -355,10 +357,11 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 ; Move the mouse pointer to the new X pos
 
         tya
-        jmp     CMOVEY
+        jsr     CMOVEY                                         
 
 ; Done
 
+        clc                             ; Interrupt not handled
 @SkipY: rts
 
 ; --------------------------------------------------------------------------

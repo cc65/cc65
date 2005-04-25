@@ -16,6 +16,11 @@
 ;      code avoids this by using locking mechanisms, but it's complex and
 ;      has a size and performance penalty.
 ;
+;   3. Special semantics: An interruptor called by callirq must tell by
+;      setting or resetting the carry flag if the interrupt has been handled
+;      (which means that the interrupt is no longer active at the interrupt
+;      source). callirq will call no other interruptors if this happens.
+;
 ; As the normal condes routine, this one has the limitation of 127 table
 ; entries.
 ;
@@ -29,7 +34,9 @@
 
 ; --------------------------------------------------------------------------
 ; Call all IRQ routines. The function needs to use self modifying code and
-; is thereforce placed in the data segment.
+; is thereforce placed in the data segment. It will return carry set if the
+; interrupt was handled and carry clear if not. The caller may choose to
+; ignore this at will.
 ; NOTE: The routine must not be called if the table is empty!
 
 .data
@@ -45,9 +52,9 @@ callirq_y:
         sta     jmpvec+1                ; Modify code below
        	sty    	index+1                 ; Modify code below
 jmpvec: jsr    	$FFFF                   ; Patched at runtime
+        bcs     done                    ; Bail out if interrupt handled
 index: 	ldy    	#$FF                    ; Patched at runtime
        	bne     callirq_y
-        rts
-
+done:   rts
 
 

@@ -67,7 +67,6 @@ OBJS =	_scrsize.o	\
         ksetnam.o       \
 	kudtim.o 	\
         mainargs.o      \
-	mouse.o		\
 	peeksys.o	\
 	pokesys.o	\
         randomize.o     \

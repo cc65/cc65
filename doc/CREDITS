@@ -70,6 +70,10 @@ More special thanks to:
     ...for his public domain Swiftlink/Turbo232 drivers which are part
     of the cc65 library in modified form.
 
+  * Debrune Jérôme <jede@oric.org>
+
+    for help with preliminary Oric Atmos support.
+
   * Steve Schmidtke <steve_schmidtke@hotmail.com>
 
     Steve contributed the VIC20 port.
@@ -113,7 +117,7 @@ More special thanks to:
     Jefferson <jefferson_shawn_a8bit@yahoo.com> who built on this foundation.
 
   * Oliver Schmidt <ol.sc@web.de> ...
-
+ 
     ... for quite some Apple ][ contributions.
 
 

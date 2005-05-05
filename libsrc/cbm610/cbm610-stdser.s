@@ -353,7 +353,7 @@ IRQ:    lda     #$0F
         ldy     #ACIA::STATUS
         lda     (acia),y        ; Check ACIA status for receive interrupt
      	and 	#$08
-       	beq    	@L9   		; Jump if no ACIA interrupt
+       	beq    	@L10            ; Jump if no ACIA interrupt
         ldy     #ACIA::DATA
         lda    	(acia),y        ; Get byte from ACIA
     	ldx 	RecvFreeCnt  	; Check if we have free space left
@@ -371,10 +371,18 @@ IRQ:    lda     #$0F
         ldy     #ACIA::CMD
         sta     (acia),y
     	sta 	Stopped
+        sec                     ; Interrupt handled
 
 ; Done, switch back to the execution segment
 
 @L9:    lda     ExecReg
+        sta     IndReg
+        rts
+
+; No ACIA interrupt
+
+@L10:   clc                     ; Interrupt not handled
+        lda     ExecReg
         sta     IndReg
         rts
 

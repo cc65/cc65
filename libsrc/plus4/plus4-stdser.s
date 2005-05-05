@@ -352,7 +352,7 @@ IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
 
 IRQ:    lda    	ACIA_STATUS     ; Check ACIA status for receive interrupt
      	and 	#$08
-       	beq    	@L9  		; Jump if no ACIA interrupt
+       	beq    	@L10            ; Jump if no ACIA interrupt
         lda 	ACIA_DATA       ; Get byte from ACIA
     	ldx 	RecvFreeCnt  	; Check if we have free space left
        	beq    	@L1    	       	; Jump if no space in receive buffer
@@ -362,13 +362,19 @@ IRQ:    lda    	ACIA_STATUS     ; Check ACIA status for receive interrupt
     	dec 	RecvFreeCnt     ; Decrement free space counter
     	cpx 	#33            	; Check for buffer space low
        	bcc    	@L1            	; Assert flow control if buffer space low
-@L9:    rts
+        rts                     ; Return with carry set (interrupt handled)
 
 ; Assert flow control if buffer space too low
 
 @L1:  	lda 	RtsOff
     	sta 	ACIA_CMD
     	sta 	Stopped
+        sec                     ; Interrupt handled
+        rts
+
+; No ACIA interrupt
+
+@L10:   clc                     ; Interrupt not handled
         rts
 
 ;----------------------------------------------------------------------------

@@ -346,13 +346,14 @@ IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
 
 ;----------------------------------------------------------------------------
 ; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
-; registers are already save, no parameters are passed and no return code
-; is expected.
+; registers are already save, no parameters are passed, but the carry flag
+; is clear on entry. The routine must return with carry set if the interrupt
+; was handled, otherwise with carry clear.
 ;
 
 IRQ:    lda    	ACIA_STATUS     ; Check ACIA status for receive interrupt
      	and 	#$08
-       	beq    	@L10            ; Jump if no ACIA interrupt
+       	beq    	@L9             ; Jump if no ACIA interrupt (carry still clear)
         lda 	ACIA_DATA       ; Get byte from ACIA
     	ldx 	RecvFreeCnt  	; Check if we have free space left
        	beq    	@L1    	       	; Jump if no space in receive buffer
@@ -370,12 +371,7 @@ IRQ:    lda    	ACIA_STATUS     ; Check ACIA status for receive interrupt
     	sta 	ACIA_CMD
     	sta 	Stopped
         sec                     ; Interrupt handled
-        rts
-
-; No ACIA interrupt
-
-@L10:   clc                     ; Interrupt not handled
-        rts
+@L9:    rts
 
 ;----------------------------------------------------------------------------
 ; Try to send a byte. Internal routine. A = TryHard

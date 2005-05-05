@@ -344,8 +344,9 @@ IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
 
 ;----------------------------------------------------------------------------
 ; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
-; registers are already save, no parameters are passed and no return code
-; is expected.
+; registers are already save, no parameters are passed, but the carry flag
+; is clear on entry. The routine must return with carry set if the interrupt
+; was handled, otherwise with carry clear.
 ;
 
 IRQ:    lda     #$0F
@@ -353,16 +354,16 @@ IRQ:    lda     #$0F
         ldy     #ACIA::STATUS
         lda     (acia),y        ; Check ACIA status for receive interrupt
      	and 	#$08
-       	beq    	@L10            ; Jump if no ACIA interrupt
+       	beq    	@L9             ; Jump if no ACIA interrupt (carry still clear)
         ldy     #ACIA::DATA
         lda    	(acia),y        ; Get byte from ACIA
-    	ldx 	RecvFreeCnt  	; Check if we have free space left
+     	ldx 	RecvFreeCnt  	; Check if we have free space left
        	beq    	@L1    	       	; Jump if no space in receive buffer
-    	ldy 	RecvTail 	; Load buffer pointer
-    	sta 	RecvBuf,y 	; Store received byte in buffer
-    	inc 	RecvTail        ; Increment buffer pointer
-    	dec 	RecvFreeCnt     ; Decrement free space counter
-    	cpx 	#33            	; Check for buffer space low
+     	ldy 	RecvTail 	; Load buffer pointer
+     	sta 	RecvBuf,y 	; Store received byte in buffer
+     	inc 	RecvTail        ; Increment buffer pointer
+     	dec 	RecvFreeCnt     ; Decrement free space counter
+     	cpx 	#33            	; Check for buffer space low
        	bcs    	@L9            	; Assert flow control if buffer space low
 
 ; Assert flow control if buffer space too low
@@ -370,19 +371,12 @@ IRQ:    lda     #$0F
 @L1:  	lda 	RtsOff
         ldy     #ACIA::CMD
         sta     (acia),y
-    	sta 	Stopped
+     	sta 	Stopped
         sec                     ; Interrupt handled
 
 ; Done, switch back to the execution segment
 
 @L9:    lda     ExecReg
-        sta     IndReg
-        rts
-
-; No ACIA interrupt
-
-@L10:   clc                     ; Interrupt not handled
-        lda     ExecReg
         sta     IndReg
         rts
 

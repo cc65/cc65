@@ -125,10 +125,15 @@ ParityTable:
 ;
 ; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Must return an SER_ERR_xx code in a/x.
-
+; and:
+;
+; CLOSE: Close the port, disable interrupts and flush the buffer. Called
+; without parameters. Must return an error code in a/x.
+;
 
 INSTALL:
 UNINSTALL:
+CLOSE:
 
 ; Deactivate DTR and disable 6551 interrupts
 
@@ -215,28 +220,6 @@ InvBaud:
         lda     #<SER_ERR_BAUD_UNAVAIL
         ldx     #>SER_ERR_BAUD_UNAVAIL
         rts
-
-;----------------------------------------------------------------------------
-; CLOSE: Close the port, disable interrupts and flush the buffer. Called
-; without parameters. Must return an error code in a/x.
-;
-
-CLOSE:
-
-; Stop interrupts, drop DTR
-
-      	lda     #%00001010
-        jsr     write_cmd
-
-; Initalize buffers.
-
-        jsr     InitBuffers
-
-; Return OK
-
-        lda     #<SER_ERR_OK
-        tax                             ; A is zero
-       	rts
 
 ;----------------------------------------------------------------------------
 ; GET: Will fetch a character from the receive buffer and store it into the

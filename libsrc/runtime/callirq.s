@@ -19,7 +19,9 @@
 ;   3. Special semantics: An interruptor called by callirq must tell by
 ;      setting or resetting the carry flag if the interrupt has been handled
 ;      (which means that the interrupt is no longer active at the interrupt
-;      source). callirq will call no other interruptors if this happens.
+;      source). callirq will call no other interruptors if this happens. To
+;      simplify code, all interrupt routines will be called with carry clear
+;      on entry.
 ;
 ; As the normal condes routine, this one has the limitation of 127 table
 ; entries.
@@ -44,7 +46,8 @@
 callirq:
         ldy     #.lobyte(__INTERRUPTOR_COUNT__*2)
 callirq_y:
-        dey
+        clc                             ; Preset carry flag
+loop:   dey
         lda     __INTERRUPTOR_TABLE__,y
         sta     jmpvec+2                ; Modify code below
      	dey
@@ -54,7 +57,7 @@ callirq_y:
 jmpvec: jsr    	$FFFF                   ; Patched at runtime
         bcs     done                    ; Bail out if interrupt handled
 index: 	ldy    	#$FF                    ; Patched at runtime
-       	bne     callirq_y
+       	bne     loop
 done:   rts
 
 

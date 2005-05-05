@@ -6,7 +6,7 @@
 
         .import         return0
         .importzp       ptr1
-	.condes		ser_irq, 2		; Export as IRQ handler
+       	.interruptor    ser_irq, 29     ; Export as high priority IRQ handler
 
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"

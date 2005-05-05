@@ -162,7 +162,15 @@ OPEN:
 
 ; Initialize buffers
 
-        jsr     InitBuffers
+        ldx 	#0
+        stx     Stopped
+       	stx 	RecvHead
+    	stx 	RecvTail
+      	stx 	SendHead
+    	stx 	SendTail
+        dex                             ; X = 255
+       	stx    	RecvFreeCnt
+      	stx 	SendFreeCnt
 
 ; Set the value for the control register, which contains stop bits, word
 ; length and the baud rate.
@@ -408,21 +416,6 @@ IRQ:    lda     #$0F
 
 .endproc
 
-
-;----------------------------------------------------------------------------
-; Initialize buffers
-
-InitBuffers:
-        ldx 	#0
-        stx     Stopped
-       	stx 	RecvHead
-    	stx 	RecvTail
-      	stx 	SendHead
-    	stx 	SendTail
-        dex                             ; X = 255
-       	stx    	RecvFreeCnt
-      	stx 	SendFreeCnt
-        rts
 
 ;----------------------------------------------------------------------------
 ; Write to the ACIA changing the indirect segment. Offset is in Y, value in A.

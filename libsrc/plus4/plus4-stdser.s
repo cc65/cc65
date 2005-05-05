@@ -170,7 +170,15 @@ OPEN:
 
 ; Initialize buffers
 
-        jsr     InitBuffers
+        ldx 	#0
+        stx     Stopped
+       	stx 	RecvHead
+    	stx 	RecvTail
+      	stx 	SendHead
+    	stx 	SendTail
+        dex                             ; X = 255
+       	stx    	RecvFreeCnt
+      	stx 	SendFreeCnt
 
 ; Set the value for the control register, which contains stop bits, word
 ; length and the baud rate.
@@ -392,19 +400,4 @@ IRQ:    lda    	ACIA_STATUS     ; Check ACIA status for receive interrupt
 
 .endproc
 
-
-;----------------------------------------------------------------------------
-; Initialize buffers
-
-InitBuffers:
-        ldx 	#0
-        stx     Stopped
-       	stx 	RecvHead
-    	stx 	RecvTail
-      	stx 	SendHead
-    	stx 	SendTail
-        dex                             ; X = 255
-       	stx    	RecvFreeCnt
-      	stx 	SendFreeCnt
-        rts
 

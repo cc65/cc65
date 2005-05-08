@@ -41,7 +41,7 @@
 /* The watcom compiler doesn't have va_copy and a problematic va_list definition */
 #if defined(__WATCOMC__)
 
-#define va_copy(src,dest)       memcpy((src), (dest), sizeof (va_list))
+#define va_copy(dest,src)       memcpy((dest), (src), sizeof (va_list))
 
 #endif
 

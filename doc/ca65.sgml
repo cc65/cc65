@@ -1199,6 +1199,26 @@ either a string or an expression.
   See: <tt><ref id=".LOWORD" name=".LOWORD"></tt>
 
 
+<sect1><tt>.IDENT</tt><label id=".IDENT"><p>
+
+  The function expects a string as its argument, and converts this argument
+  into an identifier. If the string starts with the current <tt/<ref
+  id=".LOCALCHAR" name=".LOCALCHAR">/, it will be converted into a cheap local
+  identifier, otherwise it will be converted into a normal identifier.
+
+  Example:
+
+  <tscreen><verb>
+    	.macro 	makelabel       arg1, arg2
+                .ident (.concat (arg1, arg2)):
+        .endmacro
+
+                makelabel       "foo", "bar"
+
+                .word           foobar          ; Valid label
+  </verb></tscreen>
+
+
 <sect1><tt>.LEFT</tt><label id=".LEFT"><p>
 
   Builtin function. Extracts the left part of a given token list.

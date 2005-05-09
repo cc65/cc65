@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -174,6 +174,7 @@ enum Token {
     TOK_HIWORD,
     TOK_I16,
     TOK_I8,
+    TOK_MAKEIDENT,
     TOK_IF,
     TOK_IFBLANK,
     TOK_IFCONST,
@@ -266,6 +267,12 @@ extern int     	ForcedEnd;		/* Force end of assembly */
 /*****************************************************************************/
 
 
+
+int IsIdChar (int C);
+/* Return true if the character is a valid character for an identifier */
+
+int IsIdStart (int C);
+/* Return true if the character may start an identifier */
 
 void NewInputFile (const char* Name);
 /* Open a new input file */

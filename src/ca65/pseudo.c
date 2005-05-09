@@ -1720,6 +1720,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,        	DoUnexpected	},	/* .HIWORD */
     { ccNone,		DoI16	  	},
     { ccNone,		DoI8	  	},
+    { ccNone,           DoUnexpected    },      /* .IDENT */
     { ccKeepToken,	DoConditionals	},	/* .IF */
     { ccKeepToken,	DoConditionals	},	/* .IFBLANK */
     { ccKeepToken,	DoConditionals	},	/* .IFCONST */

@@ -179,6 +179,7 @@ struct DotKeyword {
     { ".HIWORD",        TOK_HIWORD      },
     { ".I16",   	TOK_I16		},
     { ".I8",    	TOK_I8		},
+    { ".IDENT",         TOK_MAKEIDENT   },
     { ".IF",    	TOK_IF		},
     { ".IFBLANK",	TOK_IFBLANK	},
     { ".IFCONST",	TOK_IFCONST	},
@@ -276,7 +277,7 @@ static void NextChar (void);
 
 
 
-static int IsIdChar (int C)
+int IsIdChar (int C)
 /* Return true if the character is a valid character for an identifier */
 {
     return IsAlNum (C) 			||
@@ -287,7 +288,7 @@ static int IsIdChar (int C)
 
 
 
-static int IsIdStart (int C)
+int IsIdStart (int C)
 /* Return true if the character may start an identifier */
 {
     return IsAlpha (C) || C == '_';

@@ -42,6 +42,7 @@
 /* ca65 */
 #include "error.h"
 #include "expr.h"
+#include "global.h"
 #include "scanner.h"
 #include "toklist.h"
 #include "nexttok.h"
@@ -223,6 +224,86 @@ static void FuncLeft (void)
 
 
 
+static void NoIdent (void)
+/* Print an error message and skip the remainder of the line */
+{
+    Error ("Argument of .IDENT is not a valid identifier");
+    SkipUntilSep ();
+}
+
+
+
+static void FuncIdent (void)
+/* Handle the .IDENT function */
+{
+    char       Buf[sizeof(SVal)];
+    enum Token Id;
+    unsigned   Len;
+    unsigned   I;
+
+    /* Skip it */
+    NextTok ();
+
+    /* Left paren expected */
+    ConsumeLParen ();
+
+    /* The function expects a string argument */
+    if (Tok != TOK_STRCON) {
+        Error ("String constant expected");
+        SkipUntilSep ();
+        return;
+    }
+
+    /* Check that the string contains a valid identifier. While doing so,
+     * determine if it is a cheap local, or global one.
+     */
+    Len = strlen (SVal);
+    if (Len == 0) {
+        NoIdent ();
+        return;
+    }
+    I = 0;
+    if (SVal[0] == LocalStart) {
+        if (Len < 2) {
+            NoIdent ();
+            return;
+        }
+        I = 1;
+        Id = TOK_LOCAL_IDENT;
+    } else {
+        Id = TOK_IDENT;
+    }
+    if (!IsIdStart (SVal[I])) {
+        NoIdent ();
+        return;
+    }
+    while (I < Len) {
+        if (!IsIdChar (SVal[I])) {
+            NoIdent ();
+            return;
+        }
+        ++I;
+    }
+    if (IgnoreCase) {
+        UpcaseSVal ();
+    }
+
+    /* If anything is ok, save and skip the string. Check that the next token
+     * is a right paren, in which case SVal is untouched. Replace the token by
+     * a identifier token.
+     */
+    memcpy (Buf, SVal, Len+1);
+    NextTok ();
+    if (Tok != TOK_RPAREN) {
+     	Error ("`)' expected");
+    } else {
+        Tok = Id;
+        memcpy (SVal, Buf, Len+1);
+    }
+}
+
+
+
 static void FuncMid (void)
 /* Handle the .MID function */
 {
@@ -383,6 +464,10 @@ void NextTok (void)
 	    case TOK_LEFT:
 		FuncLeft ();
 		break;
+
+            case TOK_MAKEIDENT:
+                FuncIdent ();
+                break;
 
 	    case TOK_MID:
 		FuncMid ();

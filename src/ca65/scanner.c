@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -241,6 +241,7 @@ struct DotKeyword {
     { ".SHR", 	  	TOK_SHR		},
     { ".SIZEOF",        TOK_SIZEOF      },
     { ".SMART",	  	TOK_SMART	},
+    { ".SPRINTF",       TOK_SPRINTF     },
     { ".STRAT",		TOK_STRAT	},
     { ".STRING",	TOK_STRING	},
     { ".STRLEN",	TOK_STRLEN	},

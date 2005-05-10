@@ -228,6 +228,7 @@ enum Token {
     TOK_SETCPU,
     TOK_SIZEOF,
     TOK_SMART,
+    TOK_SPRINTF,
     TOK_STRAT,
     TOK_STRING,
     TOK_STRLEN,

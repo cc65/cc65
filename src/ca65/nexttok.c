@@ -37,7 +37,9 @@
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
+#include "strbuf.h"
 
 /* ca65 */
 #include "error.h"
@@ -56,6 +58,29 @@
 
 
 static unsigned RawMode = 0;		/* Raw token mode flag/counter */
+
+
+
+/*****************************************************************************/
+/*                              Error handling                               */
+/*****************************************************************************/
+
+
+
+static int LookAtStrCon (void)
+/* Make sure the next token is a string constant. If not, print an error
+ * messages skip the remainder of the line and return false. Otherwise return
+ * true.
+ */
+{
+    if (Tok != TOK_STRCON) {
+        Error ("String constant expected");
+        SkipUntilSep ();
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
 
 
@@ -135,9 +160,7 @@ static void FuncConcat (void)
     while (1) {
 
      	/* Next token must be a string */
-     	if (Tok != TOK_STRCON) {
-     	    Error ("String constant expected");
-     	    SkipUntilSep ();
+        if (!LookAtStrCon ()) {
      	    return;
      	}
 
@@ -248,9 +271,7 @@ static void FuncIdent (void)
     ConsumeLParen ();
 
     /* The function expects a string argument */
-    if (Tok != TOK_STRCON) {
-        Error ("String constant expected");
-        SkipUntilSep ();
+    if (!LookAtStrCon ()) {
         return;
     }
 
@@ -410,6 +431,216 @@ static void FuncRight (void)
 
 
 
+static void InvalidFormatString (void)
+/* Print an error message and skip the remainder of the line */
+{
+    Error ("Invalid format string");
+    SkipUntilSep ();
+}
+
+
+
+static void FuncSPrintF (void)
+/* Handle the .SPRINTF function */
+{
+    char        Format[sizeof (SVal)];              /* User given format */
+    const char* F = Format;                         /* User format pointer */
+    StrBuf      R = AUTO_STRBUF_INITIALIZER;        /* Result string */
+    StrBuf      F1 = AUTO_STRBUF_INITIALIZER;       /* One format spec from F */
+    StrBuf      R1 = AUTO_STRBUF_INITIALIZER;       /* One result */
+    int         Done;
+    long        IVal;                               /* Integer value */
+
+
+
+    /* Skip the .SPRINTF token */
+    NextTok ();
+
+    /* Left paren expected */
+    ConsumeLParen ();
+
+    /* First argument is a format string. Remember and skip it */
+    if (!LookAtStrCon ()) {
+        return;
+    }
+    strcpy (Format, SVal);
+    NextTok ();
+
+    /* Walk over the format string, generating the function result in R */
+    while (1) {
+
+        /* Get the next char from the format string and check for EOS */
+        if (*F == '\0') {
+            break;
+        }
+
+        /* Check for a format specifier */
+        if (*F != '%') {
+            /* No format specifier, just copy */
+            SB_AppendChar (&R, *F++);
+            continue;
+        }
+        if (*++F == '%') {
+            /* %% */
+            SB_AppendChar (&R, '%');
+            ++F;
+            continue;
+        }
+        if (*F == '\0') {
+            InvalidFormatString ();
+            break;
+        }
+
+        /* Since a format specifier follows, we do expect anotehr argument for
+         * the .sprintf function.
+         */
+        ConsumeComma ();
+
+        /* We will copy the format spec into F1 checking for the things we
+         * support, and later use xsprintf to do the actual formatting. This
+         * is easier than adding another printf implementation...
+         */
+        SB_Clear (&F1);
+        SB_AppendChar (&F1, '%');
+
+        /* Check for flags */
+        Done = 0;
+        while (*F != '\0' && !Done) {
+            switch (*F) {
+                case '-': /* FALLTHROUGH */
+                case '+': /* FALLTHROUGH */
+                case ' ': /* FALLTHROUGH */
+                case '#': /* FALLTHROUGH */
+                case '0': SB_AppendChar (&F1, *F++);    break;
+                default:  Done = 1;                     break;
+            }
+        }
+
+        /* We do only support a numerical width field */
+        while (IsDigit (*F)) {
+            SB_AppendChar (&F1, *F++);
+        }
+
+        /* Precision - only positive numerical fields supported */
+        if (*F == '.') {
+            SB_AppendChar (&F1, *F++);
+            while (IsDigit (*F)) {
+                SB_AppendChar (&F1, *F++);
+            }
+        }
+
+        /* Length modifiers aren't supported, so read the conversion specs */
+        switch (*F) {
+
+            case 'd':
+            case 'i':
+            case 'o':
+            case 'u':
+            case 'X':
+            case 'x':
+                /* Our ints are actually longs, so we use the 'l' modifier when
+                 * calling xsprintf later. Terminate the format string.
+                 */
+                SB_AppendChar (&F1, 'l');
+                SB_AppendChar (&F1, *F++);
+                SB_Terminate (&F1);
+
+                /* The argument must be a constant expression */
+                IVal = ConstExpression ();
+
+                /* Format this argument according to the spec */
+                SB_Printf (&R1, SB_GetConstBuf (&F1), IVal);
+
+                /* Append the formatted argument to the result */
+                SB_Append (&R, &R1);
+
+                break;
+
+            case 's':
+                /* Add the format spec and terminate the format */
+                SB_AppendChar (&F1, *F++);
+                SB_Terminate (&F1);
+
+                /* The argument must be a string constant */
+                if (!LookAtStrCon ()) {
+                    /* Make it one */
+                    strcpy (SVal, "**undefined**");
+                }
+
+                /* Format this argument according to the spec */
+                SB_Printf (&R1, SB_GetConstBuf (&F1), SVal);
+
+                /* Skip the string constant */
+                NextTok ();
+
+                /* Append the formatted argument to the result */
+                SB_Append (&R, &R1);
+
+                break;
+
+            case 'c':
+                /* Add the format spec and terminate the format */
+                SB_AppendChar (&F1, *F++);
+                SB_Terminate (&F1);
+
+                /* The argument must be a constant expression */
+                IVal = ConstExpression ();
+
+                /* Check for a valid character range */
+                if (IVal <= 0 || IVal > 255) {
+                    Error ("Char argument out of range");
+                    IVal = ' ';
+                }
+
+                /* Format this argument according to the spec. Be sure to pass
+                 * an int as the char value.
+                 */
+                SB_Printf (&R1, SB_GetConstBuf (&F1), (int) IVal);
+
+                /* Append the formatted argument to the result */
+                SB_Append (&R, &R1);
+
+                break;
+
+            default:
+                Error ("Invalid format string");
+                if (*F) {
+                    /* Don't skip beyond end of string */
+                    ++F;
+                }
+                break;
+        }
+
+    }
+
+    /* The length of the final result may not exceed the size of a string */
+    if (SB_GetLen (&R) >= sizeof (SVal)) {
+        Error ("Resulting string is too long");
+        SB_Cut (&R, sizeof (SVal) - 1);
+    }
+
+    /* Terminate the result string */
+    SB_Terminate (&R);
+
+    /* We expect a closing parenthesis, but will not skip it but replace it
+     * by the string token just created.
+     */
+    if (Tok != TOK_RPAREN) {
+     	Error ("`)' expected");
+    } else {
+     	Tok = TOK_STRCON;
+     	memcpy (SVal, SB_GetConstBuf (&R), SB_GetLen (&R) + 1);
+    }
+
+
+    /* Delete the string buffers */
+    DoneStrBuf (&R);
+    DoneStrBuf (&F1);
+    DoneStrBuf (&R1);
+}
+
+
+
 static void FuncString (void)
 /* Handle the .STRING function */
 {
@@ -476,6 +707,10 @@ void NextTok (void)
 	    case TOK_RIGHT:
 		FuncRight ();
 		break;
+
+            case TOK_SPRINTF:
+                FuncSPrintF ();
+                break;
 
 	    case TOK_STRING:
 		FuncString ();

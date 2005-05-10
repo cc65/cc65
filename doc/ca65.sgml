@@ -1498,6 +1498,25 @@ either a string or an expression.
   </verb></tscreen>
 
 
+<sect1><tt>.SPRINTF</tt><label id=".SPRINTF"><p>
+
+  Builtin function. It expects a format string as first argument. The number
+  and type of the following arguments depend on the format string. The format
+  string is similar to the one of the C <tt/printf/ function. Missing things
+  are: Length modifiers, variable width.
+
+  The result of the function is a string.
+
+  Example:
+
+  <tscreen><verb>
+        num     = 3
+
+        ; Generate an identifier:
+        .ident (.sprintf ("%s%03d", "label", num)):
+  </verb></tscreen>
+
+
 <sect1><tt>.STRING</tt><label id=".STRING"><p>
 
   Builtin function. The function accepts an argument in braces and converts

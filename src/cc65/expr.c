@@ -819,7 +819,8 @@ static void ArrayRef (ExprDesc* Expr)
      * address. This is true for most arrays and will produce a lot better
      * code. Check if this is a const base address.
      */
-    ConstBaseAddr = (ED_IsLocConst (Expr) || ED_IsLocStack (Expr));
+    ConstBaseAddr = ED_IsRVal (Expr) && 
+                    (ED_IsLocConst (Expr) || ED_IsLocStack (Expr));
 
     /* If we have a constant base, we delay the address fetch */
     GetCodePos (&Mark1);

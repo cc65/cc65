@@ -174,6 +174,38 @@ void SymTransferExprRefs (SymEntry* From, SymEntry* To)
 
 
 
+static void SymReplaceExprRefs (SymEntry* S)
+/* Replace the references to this symbol by a copy of the symbol expression */
+{
+    unsigned I;
+    long     Val;
+
+    /* Check if the expression is const and get its value */
+    int IsConst = IsConstExpr (S->Expr, &Val);
+    CHECK (IsConst);
+
+    /* Loop over all references */
+    for (I = 0; I < CollCount (&S->ExprRefs); ++I) {
+
+        /* Get the expression node */
+        ExprNode* E = CollAtUnchecked (&S->ExprRefs, I);
+
+        /* Safety */
+        CHECK (E->Op == EXPR_SYMBOL && E->V.Sym == S);
+
+        /* We cannot touch the root node, since there are pointers to it. 
+         * Replace it by a literal node.
+         */
+        E->Op = EXPR_LITERAL;
+        E->V.Val = Val;
+    }
+
+    /* Remove all symbol references from the symbol */
+    CollDeleteAll (&S->ExprRefs);
+}
+
+
+
 void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags)
 /* Define a new symbol */
 {
@@ -182,11 +214,29 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
        	Error ("Symbol `%s' is already an import", GetSymName (S));
        	return;
     }
+    if ((Flags & SF_VAR) != 0 && (S->Flags & (SF_EXPORT | SF_GLOBAL))) {
+        /* Variable symbols cannot be exports or globals */
+        Error ("Var symbol `%s' cannot be an export or global symbol", GetSymName (S));
+        return;
+    }
     if (S->Flags & SF_DEFINED) {
-       	/* Multiple definition */
-       	Error ("Symbol `%s' is already defined", GetSymName (S));
-       	S->Flags |= SF_MULTDEF;
-       	return;
+       	/* Multiple definition. In case of a variable, this is legal. */
+        if ((S->Flags & SF_VAR) == 0) {
+            Error ("Symbol `%s' is already defined", GetSymName (S));
+            S->Flags |= SF_MULTDEF;
+            return;
+        } else {
+            /* Redefinition must also be a variable symbol */
+            if ((Flags & SF_VAR) == 0) {
+                Error ("Symbol `%s' is already different kind", GetSymName (S));
+                return;
+            }
+            /* Delete the current symbol expression, since it will get
+             * replaced
+             */
+            FreeExpr (S->Expr);
+            S->Expr = 0;
+        }
     }
 
     /* Map a default address size to a real value */
@@ -201,6 +251,15 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
 
     /* Set the symbol value */
     S->Expr = Expr;
+
+    /* In case of a variable symbol, walk over all expressions containing 
+     * this symbol and replace the (sub-)expression by the literal value of
+     * the tree. Be sure to replace the expression node in place, since there
+     * may be pointers to it.
+     */
+    if (Flags & SF_VAR) {
+        SymReplaceExprRefs (S);
+    }
 
     /* If the symbol is marked as global, export it. Address size is checked
      * below.
@@ -289,6 +348,11 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
      	Error ("Symbol `%s' is already an import", GetSymName (S));
      	return;
     }
+    if (S->Flags & SF_VAR) {
+        /* Variable symbols cannot be exported */
+        Error ("Var symbol `%s' cannot be exported", GetSymName (S));
+        return;
+    }
 
     /* If the symbol was marked as global before, remove the global flag and
      * proceed, but check the address size.
@@ -336,6 +400,12 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
  * either imported or exported.
  */
 {
+    if (S->Flags & SF_VAR) {
+        /* Variable symbols cannot be exported or imported */
+        Error ("Var symbol `%s' cannot be made global", GetSymName (S));
+        return;
+    }
+
     /* If the symbol is already marked as import, the address size must match.
      * Apart from that, ignore the global declaration.
      */
@@ -432,6 +502,11 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
        	/* The symbol is already marked as imported external symbol */
        	Error ("Symbol `%s' is already an import", GetSymName (S));
        	return;
+    }
+    if (S->Flags & SF_VAR) {
+        /* Variable symbols cannot be exported or imported */
+        Error ("Var symbol `%s' cannot be exported", GetSymName (S));
+        return;
     }
 
     /* If the symbol was already marked as an export or global, check if

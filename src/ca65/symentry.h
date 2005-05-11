@@ -64,7 +64,8 @@
 #define SF_GLOBAL	0x0010	    	/* Global symbol */
 #define SF_LOCAL        0x0020          /* Cheap local symbol */
 #define SF_LABEL        0x0080          /* Used as a label */
-#define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
+#define SF_VAR          0x0100          /* Variable symbol */
+#define SF_FORCED       0x0400          /* Forced import, SF_IMPORT also set */
 #define SF_INDEXED	0x0800		/* Index is valid */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
 #define	SF_DEFINED  	0x4000 	       	/* Defined */
@@ -215,6 +216,17 @@ INLINE int SymIsExport (const SymEntry* S)
 }
 #else
 #  define SymIsExport(S)  (((S)->Flags & SF_EXPORT) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int SymIsVar (const SymEntry* S)
+/* Return true if the given symbol is marked as variable */
+{
+    /* Check the variable flag */
+    return (S->Flags & SF_VAR) != 0;
+}
+#else
+#  define SymIsVar(S)   (((S)->Flags & SF_VAR) != 0)
 #endif
 
 int SymIsConst (SymEntry* Sym, long* Val);

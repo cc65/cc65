@@ -206,47 +206,6 @@ static void FuncConcat (void)
 
 
 
-static void FuncLeft (void)
-/* Handle the .LEFT function */
-{
-    long       	Count;
-    TokList* 	List;
-
-    /* Skip it */
-    NextTok ();
-
-    /* Left paren expected */
-    ConsumeLParen ();
-
-    /* Count argument */
-    Count = ConstExpression ();
-    if (Count < 0 || Count > 100) {
-     	Error ("Range error");
-     	Count = 1;
-    }
-    ConsumeComma ();
-
-    /* Read the token list */
-    List = CollectTokens (0, (unsigned) Count);
-
-    /* Since we want to insert the list before the now current token, we have
-     * to save the current token in some way and then skip it. To do this, we
-     * will add the current token at the end of the token list (so the list
-     * will never be empty), push the token list, and then skip the current
-     * token. This will replace the current token by the first token from the
-     * list (which will be the old current token in case the list was empty).
-     */
-    AddCurTok (List);
-
-    /* Insert it into the scanner feed */
-    PushTokList (List, ".LEFT");
-
-    /* Skip the current token */
-    NextTok ();
-}
-
-
-
 static void NoIdent (void)
 /* Print an error message and skip the remainder of the line */
 {
@@ -325,6 +284,46 @@ static void FuncIdent (void)
 
 
 
+static void FuncLeft (void)
+/* Handle the .LEFT function */
+{
+    long       	Count;
+    TokList* 	List;
+
+    /* Skip it */
+    NextTok ();
+
+    /* Left paren expected */
+    ConsumeLParen ();
+
+    /* Count argument. Correct negative counts to zero. */
+    Count = ConstExpression ();
+    if (Count < 0) {
+     	Count = 1;
+    }
+    ConsumeComma ();
+
+    /* Read the token list */
+    List = CollectTokens (0, (unsigned) Count);
+
+    /* Since we want to insert the list before the now current token, we have
+     * to save the current token in some way and then skip it. To do this, we
+     * will add the current token at the end of the token list (so the list
+     * will never be empty), push the token list, and then skip the current
+     * token. This will replace the current token by the first token from the
+     * list (which will be the old current token in case the list was empty).
+     */
+    AddCurTok (List);
+
+    /* Insert it into the scanner feed */
+    PushTokList (List, ".LEFT");
+
+    /* Skip the current token */
+    NextTok ();
+}
+
+
+
 static void FuncMid (void)
 /* Handle the .MID function */
 {
@@ -338,19 +337,21 @@ static void FuncMid (void)
     /* Left paren expected */
     ConsumeLParen ();
 
-    /* Start argument */
+    /* Start argument. Since the start argument can get negative with 
+     * expressions like ".tcount(arg)-2", we correct it to zero silently.
+     */
     Start = ConstExpression ();
     if (Start < 0 || Start > 100) {
-     	Error ("Range error");
      	Start = 0;
     }
     ConsumeComma ();
 
-    /* Count argument */
+    /* Count argument. Similar as above, we will accept negative counts and
+     * correct them to zero silently.
+     */
     Count = ConstExpression ();
-    if (Count < 0 || Count > 100) {
-     	Error ("Range error");
-     	Count = 1;
+    if (Count < 0) {
+     	Count = 0;
     }
     ConsumeComma ();
 
@@ -387,11 +388,10 @@ static void FuncRight (void)
     /* Left paren expected */
     ConsumeLParen ();
 
-    /* Count argument */
+    /* Count argument. Correct negative counts to zero. */
     Count = ConstExpression ();
-    if (Count < 0 || Count > 100) {
-     	Error ("Range error");
-     	Count = 1;
+    if (Count < 0) {
+     	Count = 0;
     }
     ConsumeComma ();
 

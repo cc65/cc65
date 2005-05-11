@@ -305,8 +305,15 @@ static ExprNode* Symbol (SymEntry* S)
     } else {
         /* Mark the symbol as referenced */
         SymRef (S);
-        /* Create symbol node */
-        return GenSymExpr (S);
+        /* If the symbol is a variable, return just its value, otherwise
+         * return a reference to the symbol.
+         */
+        if (SymIsVar (S)) {
+            return CloneExpr (GetSymExpr (S));
+        } else {
+            /* Create symbol node */
+            return GenSymExpr (S);
+        }
     }
 }
 

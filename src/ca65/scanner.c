@@ -236,6 +236,7 @@ struct DotKeyword {
     { ".RODATA",	TOK_RODATA	},
     { ".SCOPE",         TOK_SCOPE       },
     { ".SEGMENT",  	TOK_SEGMENT	},
+    { ".SET",           TOK_SET         },
     { ".SETCPU",  	TOK_SETCPU    	},
     { ".SHL", 	  	TOK_SHL		},
     { ".SHR", 	  	TOK_SHR		},

@@ -562,16 +562,41 @@ static void OneLine (void)
          * is no colon, it's an assignment.
          */
         if (Tok == TOK_EQ || Tok == TOK_ASSIGN) {
-            /* If it's an assign token, we have a label */
+
+            /* Determine the symbol flags from the assignment token */
             unsigned Flags = (Tok == TOK_ASSIGN)? SF_LABEL : SF_NONE;
+
             /* Skip the '=' */
             NextTok ();
+
             /* Define the symbol with the expression following the '=' */
             SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
+
             /* Don't allow anything after a symbol definition */
             ConsumeSep ();
             return;
+
+        } else if (Tok == TOK_SET) {
+
+            ExprNode* Expr;
+
+            /* .SET defines variables (= redefinable symbols) */
+            NextTok ();
+
+            /* Read the assignment expression, which must be constant */
+            Expr = GenLiteralExpr (ConstExpression ());
+
+            /* Define the symbol with the constant expression following
+             * the '='
+             */
+            SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_VAR);
+
+            /* Don't allow anything after a symbol definition */
+            ConsumeSep ();
+            return;
+
         } else {
+
             /* A label. Remember the current segment, so we can later
              * determine the size of the data stored under the label.
              */

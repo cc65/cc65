@@ -1771,9 +1771,10 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoROData	},
     { ccNone,           DoScope         },
     { ccNone,       	DoSegment	},
+    { ccNone,           DoUnexpected    },      /* .SET */
     { ccNone,          	DoSetCPU        },
     { ccNone,           DoUnexpected    },      /* .SIZEOF */
-    { ccNone,        	DoSmart		},                  
+    { ccNone,        	DoSmart		},
     { ccNone,           DoUnexpected    },      /* .SPRINTF */
     { ccNone,		DoUnexpected	},   	/* .STRAT */
     { ccNone,          	DoUnexpected	},   	/* .STRING */

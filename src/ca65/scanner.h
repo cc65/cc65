@@ -225,6 +225,7 @@ enum Token {
     TOK_RODATA,
     TOK_SCOPE,
     TOK_SEGMENT,
+    TOK_SET,
     TOK_SETCPU,
     TOK_SIZEOF,
     TOK_SMART,

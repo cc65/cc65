@@ -479,7 +479,7 @@ It does not declare any functions.
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
 <item><ref id="strstr" name="strstr">
-<!-- <item><ref id="strtok" name="strtok"> -->
+<item><ref id="strtok" name="strtok">
 <!-- <item><ref id="strxfrm" name="strxfrm"> -->
 <item><ref id="strupper" name="strupper">
 <item><ref id="strupr" name="strupr">
@@ -2069,7 +2069,7 @@ be used in presence of a prototype.
 <tag/Description/<tt/get_ostype/ is machine dependent and does not exist for
 all supported targets. If it exists, it returns a number that identifies the
 operating system or machine type, the program runs on. The machine dependent
-header files define constants that can be used to check the return code.     
+header files define constants that can be used to check the return code.
 <tag/Limits/<itemize>
 <item>The function does not exist on all platforms.
 <item>The return codes are platform dependent.
@@ -3945,7 +3945,8 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strspn" name="strspn">,
-<ref id="strstr" name="strstr">
+<ref id="strstr" name="strstr">,
+<ref id="strtok" name="strtok">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4237,6 +4238,33 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
 <ref id="strspn" name="strspn">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strtok<label id="strtok"><p>
+
+<quote>
+<descrip>
+<tag/Function/Break a string into tokens.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strtok (char* s1, const char* s2);/
+<tag/Description/<tt/strtok/ will break the string s1 into a sequence of
+tokens, which are delimited by characters from the string s2. The first call
+to <tt/strtok/ will return a pointer to the first token in the string s1.
+Following calls must pass a <tt/NULL/ pointer as s1 in order to get the next
+token in the string. Different sets of delimiters may be used for the
+subsequent calls to <tt/strtok/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item><tt/strtok/ will modify the string s1.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcspn" name="strcspn">,
+<!-- <ref id="strpbrk" name="strpbrk"> -->
 <tag/Example/None.
 </descrip>
 </quote>

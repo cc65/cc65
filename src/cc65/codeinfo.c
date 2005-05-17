@@ -416,7 +416,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 	/* Evaluate the used registers */
 	R = E->Use;
 	if (E->OPC == OP65_RTS ||
-	    ((E->Info & OF_BRA) != 0 && E->JumpTo == 0)) {
+       	    ((E->Info & OF_UBRA) != 0 && E->JumpTo == 0)) {
 	    /* This instruction will leave the function */
 	    R |= S->ExitRegs;
 	}
@@ -472,30 +472,37 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 	 */
 	} else if ((E->Info & OF_CBRA) != 0) {
 
+            /* Recursively determine register usage at the branch target */
+	    unsigned U1;
+	    unsigned U2;
+
     	    if (E->JumpTo) {
 
-	       	/* Recursively determine register usage at the branch target */
-		unsigned U1;
-		unsigned U2;
-
+                /* Jump to internal label */
 		U1 = GetRegInfo2 (S, E->JumpTo->Owner, -1, Visited, Used, Unused, Wanted);
-		if (U1 == REG_ALL) {
-		    /* All registers used, no need for second call */
-		    return REG_AXY;
-		}
-		if (Index < 0) {
-		    Index = CS_GetEntryIndex (S, E);
-		}
-       	       	if ((E = CS_GetEntry (S, ++Index)) == 0) {
-		    Internal ("GetRegInfo2: No next entry!");
-		}
-       	       	U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused, Wanted);
-	   	return U1 | U2;	       	/* Used in any of the branches */
 
-	    } else {
-	   	/* Jump to global symbol */
-	  	break;
-	    }
+            } else {
+
+                /* Jump to external label. This will effectively exit the 
+                 * function, so we use the exitregs information here.
+                 */
+                U1 = S->ExitRegs;
+
+            }
+
+            /* Get the next entry */
+            if (Index < 0) {
+                Index = CS_GetEntryIndex (S, E);
+            }
+            if ((E = CS_GetEntry (S, ++Index)) == 0) {
+                Internal ("GetRegInfo2: No next entry!");
+            }                       
+
+            /* Follow flow if branch not taken */
+            U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused, Wanted);
+
+            /* Registers are used if they're use in any of the branches */
+            return U1 | U2;
 
        	} else {
 

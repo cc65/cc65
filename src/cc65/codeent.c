@@ -144,7 +144,7 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
      * lookup the information about this function and use it. The jump itself
      * does not change any registers, so we don't need to use the data from D.
      */
-    if ((E->Info & (OF_BRA | OF_CALL)) != 0 && E->JumpTo == 0) {
+    if ((E->Info & (OF_UBRA | OF_CALL)) != 0 && E->JumpTo == 0) {
      	/* A subroutine call or jump to external symbol (function exit) */
      	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {

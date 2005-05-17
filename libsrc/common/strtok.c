@@ -27,7 +27,7 @@ static char* Last = 0;
 
 
 
-char* strtok (register char* s1, const char* s2)
+char* __fastcall__ strtok (register char* s1, const char* s2)
 {
     char c;
     char* start;
@@ -72,6 +72,6 @@ char* strtok (register char* s1, const char* s2)
     /* Return the start of the token */
     return start;
 }
-                                 
+
 
 

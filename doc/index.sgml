@@ -109,6 +109,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="lynx.html" name="lynx.html"></tag>
   Topics specific to the Atari Lynx Game Console.
 
+  <tag><htmlurl url="pet.html" name="pet.html"></tag>
+  Topics specific to the Commodore PET machines.
+
   <tag><htmlurl url="plus4.html" name="plus4.html"></tag>
   Topics specific to the Commodore Plus/4.
 

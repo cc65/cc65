@@ -262,10 +262,12 @@ Here is a description of all the command line options:
   <item>cbm610 (all CBM-II II computers with 80 column video)
   <item>geos
   <item>lunix
+  <item>lynx
   <item>nes
   <item>pet (all CBM PET systems except the 2001)
   <item>plus4
   <item>supervision
+  <item>vic20
   </itemize>
 
   <tag><tt>-v, --verbose</tt></tag>
@@ -592,6 +594,10 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Apple ][ (-t apple2).
 
+  <tag><tt>__APPLE2ENH__</tt></tag>
+
+  This macro is defined if the target is the enhanced Apple // (-t apple2enh).
+
   <tag><tt>__ATARI__</tt></tag>
 
   This macro is defined if the target is one of the Atari computers
@@ -630,6 +636,18 @@ The compiler defines several macros at startup:
 
   This macro is defined if you are compiling for the GEOS system (-t geos).
 
+  <tag><tt>__LUNIX__</tt></tag>
+
+  This macro is defined if you are compiling for the LUnix system (-t lunix).
+
+  <tag><tt>__LYNX__</tt></tag>
+
+  This macro is defined if the target is the Atari Lynx (-t lynx).
+
+  <tag><tt>__NES__</tt></tag>
+
+  This macro is defined if the target is the NES (-t nes).
+
   <tag><tt>__PET__</tt></tag>
 
   This macro is defined if the target is the PET family of computers (-t pet).
@@ -637,6 +655,10 @@ The compiler defines several macros at startup:
   <tag><tt>__PLUS4__</tt></tag>
 
   This macro is defined if the target is the plus/4 (-t plus4).
+
+  <tag><tt>__SUPERVISION__</tt></tag>
+
+  This macro is defined if the target is the supervision (-t supervision).
 
   <tag><tt>__VIC20__</tt></tag>
 

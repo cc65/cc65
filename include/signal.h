@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,8 +45,8 @@ typedef unsigned char sig_atomic_t;
 typedef void __fastcall__ (*__sigfunc) (int);
 
 /* Functions that implement SIG_IGN and SIG_DFL */
-void _sig_ign (int);
-void _sig_dfl (int);
+void __fastcall__ _sig_ign (int);
+void __fastcall__ _sig_dfl (int);
 
 /* Standard signal handling functions */
 #define SIG_DFL         _sig_dfl

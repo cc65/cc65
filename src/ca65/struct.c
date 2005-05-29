@@ -120,9 +120,16 @@ static long DoStructInternal (long Offs, unsigned Type)
 
         long      MemberSize;
         SymTable* Struct;
+        SymEntry* Sym;
+
+        /* Allow empty and comment lines */
+        if (Tok == TOK_SEP) {
+            NextTok ();
+            continue;
+        }
 
         /* The format is "[identifier] storage-allocator [, multiplicator]" */
-        SymEntry* Sym = 0;
+        Sym = 0;
         if (Tok == TOK_IDENT) {
             /* We have an identifier, generate a symbol */
             Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);

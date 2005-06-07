@@ -1418,7 +1418,7 @@ either a string or an expression.
   Please note that a symbol or scope must exist, before it is used together with
   <tt/.SIZEOF/ (this may get relaxed later, but will always be true for scopes).
   A scope has preference over a symbol with the same name, so if the last part
-  of a name represents both, a scope and a symbol, the scope is choosen over the
+  of a name represents both, a scope and a symbol, the scope is chosen over the
   symbol.
 
   After the following code:

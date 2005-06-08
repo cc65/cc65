@@ -37,6 +37,11 @@
 #define LINEINFO_H
 
 
+                   
+/* common */
+#include "strbuf.h"
+
+
 
 /*****************************************************************************/
 /*				   Forwards                                  */
@@ -45,7 +50,7 @@
 
 
 /* Input file structure */
-struct IFile;
+struct IFile;           
 
 
 
@@ -87,7 +92,7 @@ LineInfo* GetCurLineInfo (void);
  * increased, use UseLineInfo for that purpose.
  */
 
-void UpdateLineInfo (struct IFile* F, unsigned LineNum, const char* Line);
+void UpdateLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line);
 /* Update the line info - called if a new line is read */
 
 const char* GetInputName (const LineInfo* LI);

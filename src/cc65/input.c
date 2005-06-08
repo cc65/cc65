@@ -205,6 +205,9 @@ static IFile* FindFile (const char* Name)
 void OpenMainFile (const char* Name)
 /* Open the main file. Will call Fatal() in case of failures. */
 {
+    AFile* MainFile;
+
+
     /* Setup a new IFile structure for the main file */
     IFile* IF = NewIFile (Name);
 
@@ -216,10 +219,15 @@ void OpenMainFile (const char* Name)
     }
 
     /* Allocate a new AFile structure for the file */
-    (void) NewAFile (IF, F);
+    MainFile = NewAFile (IF, F);
 
     /* Allocate the input line buffer */
     Line = NewStrBuf ();
+
+    /* Update the line infos, so we have a valid line info even at start of
+     * the main file before the first line is read.
+     */
+    UpdateLineInfo (MainFile->Input, MainFile->Line, Line);
 }
 
 
@@ -340,7 +348,7 @@ static void GetInputChar (void)
 
 void NextChar (void)
 /* Skip the current input character and read the next one from the input
- * stream. CurC and NextC are valid after the call. If end of line is 
+ * stream. CurC and NextC are valid after the call. If end of line is
  * reached, both are set to NUL, no more lines are read by this function.
  */
 {
@@ -478,7 +486,7 @@ int NextLine (void)
     InitLine (Line);
 
     /* Create line information for this line */
-    UpdateLineInfo (Input->Input, Input->Line, SB_GetConstBuf (Line));
+    UpdateLineInfo (Input->Input, Input->Line, Line);
 
     /* Done */
     return 1;

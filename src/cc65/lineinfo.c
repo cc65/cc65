@@ -64,22 +64,25 @@ static LineInfo* CurLineInfo = 0;
 
 
 
-static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const char* Line)
+static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line)
 /* Create and return a new line info. Ref count will be 1. */
 {
-    unsigned  Len;
-    LineInfo* LI;
-    char*     T;
+    unsigned    Len;
+    LineInfo*   LI;
+    const char* S;
+    char*       T;
+
+    /* Get the length of the line and a pointer to the line buffer */
+    Len = SB_GetLen (Line);
+    S   = SB_GetConstBuf (Line);
 
     /* Skip leading spaces in Line */
-    while (IsBlank (*Line)) {
-    	++Line;
+    while (Len > 0 && IsBlank (*S)) {
+       	++S;
+        --Len;
     }
 
-    /* Calculate the length of the line */
-    Len = strlen (Line);
-
-    /* Allocate memory */
+    /* Allocate memory for the line info and the input line */
     LI = xmalloc (sizeof (LineInfo) + Len);
 
     /* Initialize the fields */
@@ -93,13 +96,13 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const char* Lin
      */
     T = LI->Line;
     while (Len--) {
-       	if (*Line == '\t') {
-	    *T = ' ';
-	} else {
-	    *T = *Line;
-	}
-	++Line;
-	++T;
+       	if (*S == '\t') {
+       	    *T = ' ';
+       	} else {
+       	    *T = *S;
+       	}
+       	++S;
+       	++T;
     }
 
     /* Add the terminator */
@@ -153,7 +156,7 @@ LineInfo* GetCurLineInfo (void)
 
 
 
-void UpdateLineInfo (struct IFile* F, unsigned LineNum, const char* Line)
+void UpdateLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line)
 /* Update the line info - called if a new line is read */
 {
     /* If a current line info exists, release it */
@@ -165,7 +168,7 @@ void UpdateLineInfo (struct IFile* F, unsigned LineNum, const char* Line)
      * of the supplied one to save some memory.
      */
     if (!AddSource) {
-	Line = "";
+	Line = &EmptyStrBuf;
     }
 
     /* Create a new line info */

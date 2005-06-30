@@ -290,10 +290,20 @@ static void OneOpcode (unsigned RemainingBytes)
     switch (Style) {
 
 	case atDefault:
-	case atCode:
 	    D->Handler (D);
 	    PC += D->Size;
 	    break;
+
+	case atCode:
+            /* Beware: If we don't have enough bytes left to disassemble the
+             * following insn, fall through to byte mode.
+             */
+            if (D->Size <= RemainingBytes) {
+                D->Handler (D);
+                PC += D->Size;
+                break;
+            }
+            /* FALLTHROUGH */
 
 	case atByteTab:
 	    ByteTable ();

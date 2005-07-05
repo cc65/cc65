@@ -72,7 +72,7 @@ L0:	asl	ptr1
 
 ; Overflow, do the subtraction again, this time store the result
 
-	sta	ptr4+1		; We have the high byte already
+        sta    	tmp4            ; We have the high byte already
 	pla
 	sbc	ptr3		; byte 0
 	pha

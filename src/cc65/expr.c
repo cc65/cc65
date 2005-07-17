@@ -639,7 +639,7 @@ static void Primary (ExprDesc* E)
 	Error ("Preprocessor expression expected");
 	ED_MakeConstAbsInt (E, 1);
 	return;
-    }
+    }       
 
     switch (CurTok.Tok) {
 
@@ -819,7 +819,7 @@ static void ArrayRef (ExprDesc* Expr)
      * address. This is true for most arrays and will produce a lot better
      * code. Check if this is a const base address.
      */
-    ConstBaseAddr = ED_IsRVal (Expr) && 
+    ConstBaseAddr = ED_IsRVal (Expr) &&
                     (ED_IsLocConst (Expr) || ED_IsLocStack (Expr));
 
     /* If we have a constant base, we delay the address fetch */
@@ -1123,6 +1123,9 @@ static void StructRef (ExprDesc* Expr)
 static void hie11 (ExprDesc *Expr)
 /* Handle compound types (structs and arrays) */
 {
+    /* Name value used in invalid function calls */
+    static const char IllegalFunc[] = "illegal_function_call";
+
     /* Evaluate the lhs */
     Primary (Expr);
 
@@ -1144,10 +1147,10 @@ static void hie11 (ExprDesc *Expr)
                     Error ("Illegal function call");
                     /* Force the type to be a implicitly defined function, one
                      * returning an int and taking any number of arguments.
-                     * Since we don't have a name, place it at absolute address
-                     * zero.
+                     * Since we don't have a name, invent one.
                      */
                     ED_MakeConstAbs (Expr, 0, GetImplicitFuncType ());
+                    Expr->Name = (long) IllegalFunc;
                 }
                 /* Call the function */
                 FunctionCall (Expr);

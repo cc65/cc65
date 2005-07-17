@@ -63,6 +63,14 @@
 #include <_6522.h>
 #define VIA     (*(struct __6522*)0xE840)
 
+/* All models from 40xx and above */
+#include <_6545.h>
+#define CRTC    (*(struct __6545)0xE880)
+
+/* SuperPET only */
+#include <_6551.h>
+#define ACIA    (*(struct __6551*)0xEFF0)
+
 
 
 /*****************************************************************************/

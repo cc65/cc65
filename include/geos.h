@@ -2,7 +2,7 @@
    Supreme GEOS header file
    includes all other headers
 
-   Maciej 'YTM/Alliance' Witkowiak, 27.10.1999
+   Maciej 'YTM/Elysium' Witkowiak, 27.10.1999
 */
 
 
@@ -67,10 +67,41 @@
 #include <geos/gdlgbox.h>
 #endif
 
+/* Character codes $80-$8F */
+/*  1  */
+/* 2 4 */
+/*  8  */
+#define CH_HLINE		128|0|2|4|0
+#define CH_VLINE		128|1|0|0|8
+#define CH_ULCORNER		128|1|2|0|0
+#define CH_URCORNER		128|1|0|4|0
+#define CH_LLCORNER		128|0|2|0|8
+#define CH_LRCORNER		128|0|0|4|8
+#define CH_TTEE			128|1|2|4|0
+#define CH_RTEE			128|1|0|4|8
+#define CH_BTEE			128|0|2|4|8
+#define CH_LTEE			128|1|2|0|8
+#define CH_CROSS		128|1|2|4|8
 
+/* Additional key defines */
+#define CH_F1			133
+#define CH_F2			137
+#define CH_F3			134
+#define CH_F4			138
+#define CH_F5			135
+#define CH_F6			139
+#define CH_F7			136
+#define CH_F8			140
+
+#define CH_CURS_UP		145
+#define CH_CURS_DOWN		 17
+#define CH_CURS_LEFT		157
+#define CH_CURS_RIGHT		 29
+#define CH_DEL			 20
+#define CH_INS			148
+#define CH_ENTER		'\n'
+#define CH_STOP			  3
+#define CH_ESC			 27
 
 /* End of geos.h */
 #endif
-
-
-

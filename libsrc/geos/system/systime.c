@@ -27,3 +27,8 @@ struct tm currentTime;
 
 }
 
+clock_t clock(void) {
+
+    return _systime();
+
+}

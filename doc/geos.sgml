@@ -6,7 +6,7 @@
 
 <title>GEOSLib docs
 <author>Maciej Witkowiak, <htmlurl url="mailto:ytm@elysium.pl" name="ytm@elysium.pl">
-<date>v1.5, 26.12.1999, 2000, 2001, 2002, 2003
+<date>v1.5, 26.12.1999, 2000, 2001, 2002, 2003, 2005
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writing GEOS applications in general.
@@ -52,6 +52,8 @@ changed between <tt/tgi_init/ and <tt/tgi_done/.
 <p>
 It is safe to use these standard includes and their contents:
 <tt/assert.h, conio.h, dio.h, errno.h, em.h, geos.h, joystick.h, modload.h, mouse.h, stdlib.h, string.h, tgi.h, time.h/
+<p>
+For <tt/time.h/ functions <tt/systime()/ and <tt/clock/ note that the resolution is one second.
 <p>
 It was not tested enough, but functions from these includes might work under GEOS:
 <tt/rs232.h, zlib.h/

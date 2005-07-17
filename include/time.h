@@ -96,6 +96,9 @@ unsigned _clocks_per_sec (void);
 #elif defined(__NES__)
 #  define CLK_TCK    	       	50 	/* POSIX */
 #  define CLOCKS_PER_SEC	50	/* ANSI */
+#elif  defined(__GEOS__)
+#  define CLK_TCK		1	/* POSIX */
+#  define CLOCKS_PER_SEC	1	/* ANSI */
 #endif
 
 

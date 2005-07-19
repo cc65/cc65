@@ -617,7 +617,7 @@ int a, prevchar=-1, i=0, bracket=0, quote=1;
     while (1) {
 	a = getc(F);
 	if ((a=='\n')||(a=='\015')) a = ' ';
-	if (a==',') a = ' ';
+	if (a==',' && quote) a = ' ';
 	if (a=='\042') quote=!quote;
 	if (quote) {
 	    if ((a=='{')||(a=='(')) bracket++;

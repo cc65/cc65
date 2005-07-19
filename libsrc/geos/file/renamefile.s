@@ -4,7 +4,7 @@
 ;
 ; 25.12.1999, 2.1.2003
 
-; char RenameFile  (char *source, char *target);
+; char RenameFile  (char *old, char *new);
 
 	    .export _RenameFile
 	    .import popax, setoserror

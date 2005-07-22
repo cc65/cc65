@@ -1,5 +1,5 @@
 ;
-; Christian Groessler, Jun-2004
+; Christian Groessler, Jul-2005
 ;
 ; int __fastcall__ read(int fd,void *buf,int count)
 ;
@@ -164,7 +164,7 @@ btsmall:
 	sta	ICBLL,x
 	bpl	icbll_copy
 
-	.zeropage
+	.segment	"EXTZP" : zeropage
 
 index:	.res	1		; index into line buffer
 buflen:	.res	1		; length of used part of buffer

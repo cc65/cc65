@@ -1326,8 +1326,8 @@ static void ParseFeatures (void)
     	switch (FeatureTok) {
 
     	    case CFGTOK_CONDES:
-    		ParseConDes ();
-    		break;
+    	 	ParseConDes ();
+    	 	break;
 
             case CFGTOK_STARTADDRESS:
                 ParseStartAddress ();
@@ -1335,7 +1335,7 @@ static void ParseFeatures (void)
 
 
     	    default:
-    		Error ("Unexpected feature token");
+    	 	Error ("Unexpected feature token");
     	}
 
     	/* Skip the semicolon */
@@ -1351,24 +1351,111 @@ static void ParseFeatures (void)
 static void ParseSymbols (void)
 /* Parse a symbols section */
 {
+    static const IdentTok Attributes[] = {
+       	{   "VALUE",   	CFGTOK_VALUE    },
+        {   "WEAK",     CFGTOK_WEAK     },
+    };
+
     while (CfgTok == CFGTOK_IDENT) {
 
-	long Val;
+	long Val = 0L;
+        int  Weak;
 
 	/* Remember the name */
 	unsigned Name = GetStringId (CfgSVal);
 	CfgNextTok ();
 
-	/* Allow an optional assignment */
-	CfgOptionalAssign ();
+        /* Support both, old and new syntax here. New syntax is a colon
+         * followed by an attribute list, old syntax is an optional equal
+         * sign plus a value.
+         */
+        if (CfgTok != CFGTOK_COLON) {
 
-	/* Make sure the next token is an integer, read and skip it */
-	CfgAssureInt ();
-	Val = CfgIVal;
-	CfgNextTok ();
+            /* Old syntax */
 
-	/* Generate an export with the given value */
-	CreateConstExport (Name, Val);
+            /* Allow an optional assignment */
+            CfgOptionalAssign ();
+
+            /* Make sure the next token is an integer, read and skip it */
+            CfgAssureInt ();
+            Val = CfgIVal;
+            CfgNextTok ();
+
+            /* Generate an export with the given value */
+            CreateConstExport (Name, Val);
+
+        } else {
+
+            /* Bitmask to remember the attributes we got already */
+            enum {
+                atNone	    	= 0x0000,
+                atValue         = 0x0001,
+                atWeak          = 0x0002
+            };
+            unsigned AttrFlags = atNone;
+
+
+            /* New syntax - skip the colon */
+            CfgNextTok ();
+
+            /* Parse the attributes */
+            while (1) {
+
+                /* Map the identifier to a token */
+                cfgtok_t AttrTok;
+                CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+                AttrTok = CfgTok;
+
+                /* An optional assignment follows */
+                CfgNextTok ();
+                CfgOptionalAssign ();
+
+                /* Check which attribute was given */
+                switch (AttrTok) {
+
+                    case CFGTOK_VALUE:
+                        /* Don't allow this twice */
+                        FlagAttr (&AttrFlags, atValue, "VALUE");
+                        /* We expect a number */
+                        CfgAssureInt ();
+                        /* Remember the value for later */
+                        Val = CfgIVal;
+                        break;
+
+                    case CFGTOK_WEAK:
+                        /* Don't allow this twice */
+                        FlagAttr (&AttrFlags, atWeak, "WEAK");
+                        CfgBoolToken ();
+                        Weak = (CfgTok == CFGTOK_TRUE);
+                        break;
+
+                    default:
+                        FAIL ("Unexpected attribute token");
+
+                }
+
+                /* Skip the attribute value */
+                CfgNextTok ();
+
+                /* Semicolon ends the decl, otherwise accept an optional comma */
+                if (CfgTok == CFGTOK_SEMI) {
+                    break;
+                } else if (CfgTok == CFGTOK_COMMA) {
+                    CfgNextTok ();
+                }
+            }
+
+            /* Check if we have all mandatory attributes */
+            AttrCheck (AttrFlags, atValue, "VALUE");
+
+            /* Weak is optional, the default are non weak symbols */
+            if ((AttrFlags & atWeak) == 0) {
+                Weak = 0;
+            }
+
+            /* Generate an export with the given value */
+            CreateConstExport (Name, Val);
+        }
 
 	/* Skip the semicolon */
 	CfgConsumeSemi ();

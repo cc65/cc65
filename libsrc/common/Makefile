@@ -41,7 +41,6 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 
 # From C source-files
 C_OBJS =	_afailed.o	        \
-                _aligned_malloc.o       \
 		_hextab.o	        \
                 _poserror.o             \
 		_scanf.o	        \
@@ -66,6 +65,7 @@ C_OBJS =	_afailed.o	        \
                 localtime.o             \
                 mktime.o                \
 		perror.o	        \
+                pmemalign.o             \
 		puts.o 		        \
 		qsort.o		        \
 		realloc.o	        \

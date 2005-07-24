@@ -62,13 +62,14 @@ void __fastcall__ free (void* block);
 
 /* Non standard memory management functions */
 
-void* __fastcall__ _aligned_malloc (size_t size, size_t alignment);
-/* Allocate a block of memory with the given size, which is aligned to a
- * memory address that is a multiple of alignment. alignment MUST NOT be
- * zero and MUST be a power of two, otherwise a call to this function will
- * cause undefined behaviour. The function returns NULL if not enough memory
- * is available to satisfy the request. To free the allocated block, use the
- * free() function.
+int __fastcall__ posix_memalign (void** memptr, size_t alignment, size_t size);
+/* Allocate a block of memory with the given "size", which is aligned to a
+ * memory address that is a multiple of "alignment".  "alignment" MUST NOT be
+ * zero, and MUST be a power of two; otherwise, this function will return
+ * EINVAL.  The function returns ENOMEM if not enough memory is available
+ * to satisfy the request.  "memptr" must point to a variable; that variable
+ * will return the address of the allocated memory.  Use free() to release that
+ * allocated block.
  */
 
 void __fastcall__ _heapadd (void* mem, size_t size);

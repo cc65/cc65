@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*  		 		     data				     */
+/*   		 		     data				     */
 /*****************************************************************************/
 
 
@@ -54,19 +54,20 @@
 /* Structure describing a macro */
 typedef struct Macro Macro;
 struct Macro {
-    Macro*  	 Next;		/* Next macro with same hash value */
-    int          Expanding;     /* Are we currently expanding this macro? */
-    int	    	 ArgCount;	/* Number of parameters, -1 = no parens */
-    unsigned	 MaxArgs;	/* Size of formal argument list */
-    Collection   FormalArgs;	/* Formal argument list (char*) */
-    StrBuf       Replacement;   /* Replacement text */
-    char    	 Name[1];   	/* Name, dynamically allocated */
+    Macro*  	  Next;	        /* Next macro with same hash value */
+    int           Expanding;    /* Are we currently expanding this macro? */
+    int	    	  ArgCount;	/* Number of parameters, -1 = no parens */
+    unsigned	  MaxArgs;	/* Size of formal argument list */
+    Collection    FormalArgs;	/* Formal argument list (char*) */
+    StrBuf        Replacement;  /* Replacement text */
+    unsigned char Variadic;     /* C99 variadic macro */
+    char    	  Name[1];   	/* Name, dynamically allocated */
 };
 
 
 
 /*****************************************************************************/
-/*	    	 	   	     Code	    			     */
+/*   	    	 	   	     Code	    			     */
 /*****************************************************************************/
 
 

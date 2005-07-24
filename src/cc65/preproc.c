@@ -205,6 +205,15 @@ static StrBuf* ME_GetActual (MacroExp* E, unsigned Index)
 
 
 
+static int ME_ArgIsVariadic (const MacroExp* E)
+/* Return true if the next actual argument we will add is a variadic one */
+{
+    return (E->M->Variadic &&
+            E->M->ArgCount == (int) CollCount (&E->ActualArgs) + 1);
+}
+
+
+
 /*****************************************************************************/
 /* 	      	    		     Code		    		     */
 /*****************************************************************************/
@@ -362,21 +371,37 @@ static void ReadMacroArgs (MacroExp* E)
     unsigned  	Parens;         /* Number of open parenthesis */
     StrBuf      Arg = STATIC_STRBUF_INITIALIZER;
 
-    /* Read the actual macro arguments and store pointers to these arguments
-     * into the array of actual arguments in the macro definition.
-     */
-    Parens   = 0;
+    /* Read the actual macro arguments */
+    Parens = 0;
     while (1) {
        	if (CurC == '(') {
+
     	    /* Nested parenthesis */
        	    SB_AppendChar (&Arg, CurC);
     	    NextChar ();
      	    ++Parens;
-     	} else if (IsQuote (CurC)) {
-       	    CopyQuotedString (&Arg);
-     	} else if (CurC == ',' || CurC == ')') {
-     	    if (Parens == 0) {
 
+     	} else if (IsQuote (CurC)) {
+
+            /* Quoted string - just copy */
+       	    CopyQuotedString (&Arg);
+
+     	} else if (CurC == ',' || CurC == ')') {
+
+     	    if (Parens) {
+    	    	/* Comma or right paren inside nested parenthesis */
+     	       	if (CurC == ')') {
+     	       	    --Parens;
+     	       	}
+       	       	SB_AppendChar (&Arg, CurC);
+      	    	NextChar ();
+            } else if (CurC == ',' && ME_ArgIsVariadic (E)) {
+                /* It's a comma, but we're inside a variadic macro argument, so
+                 * just copy it and proceed.
+                 */
+                SB_AppendChar (&Arg, CurC);
+                NextChar ();
+     	    } else {
     	    	/* End of actual argument. Remove whitespace from the end. */
                 while (IsSpace (SB_LookAtLast (&Arg))) {
                     SB_Drop (&Arg, 1);
@@ -398,13 +423,6 @@ static void ReadMacroArgs (MacroExp* E)
        	       	/* Start the next param */
     	    	NextChar ();
                 SB_Clear (&Arg);
-     	    } else {
-    	    	/* Comma or right paren inside nested parenthesis */
-     	       	if (CurC == ')') {
-     	       	    --Parens;
-     	       	}
-       	       	SB_AppendChar (&Arg, CurC);
-      	    	NextChar ();
      	    }
      	} else if (IsSpace (CurC)) {
     	    /* Squeeze runs of blanks within an arg */
@@ -549,7 +567,6 @@ static void MacroArgSubst (MacroExp* E)
             NextChar ();
             SkipWhitespace ();
             if (!IsSym (Ident) || (ArgIdx = FindMacroArg (E->M, Ident)) < 0) {
-                printf ("<%.*s>\n", SB_GetLen (Line), SB_GetConstBuf (Line));
                 PPError ("`#' is not followed by a macro parameter");
             } else {
                 /* Make a valid string from Replacement */
@@ -675,12 +692,16 @@ static void DefineMacro (void)
     ident    	Ident;
     Macro*   	M;
     Macro*   	Existing;
+    int         C89;
 
     /* Read the macro name */
     SkipWhitespace ();
     if (!MacName (Ident)) {
     	return;
     }
+
+    /* Remember if we're in C89 mode */
+    C89 = (IS_Get (&Standard) == STD_C89);
 
     /* Get an existing macro definition with this name */
     Existing = FindMacro (Ident);
@@ -703,13 +724,40 @@ static void DefineMacro (void)
      	    if (CurC == ')') {
      	     	break;
             }
-     	    if (MacName (Ident) == 0) {
-     	     	return;
-     	    }
+
+            /* The next token must be either an identifier, or - if not in
+             * C89 mode - the ellipsis.
+             */
+            if (!C89 && CurC == '.') {
+                /* Ellipsis */
+                NextChar ();
+                if (CurC != '.' || NextC != '.') {
+                    PPError ("`...' expected");
+                    ClearLine ();
+                    return;
+                }
+                NextChar ();
+                NextChar ();
+                strcpy (Ident, "__VA_ARGS__");
+                M->Variadic = 1;
+            } else {
+                /* Must be macro argument name */
+                if (MacName (Ident) == 0) {
+                    return;
+                }
+
+                /* __VA_ARGS__ is only allowed in C89 mode */
+                if (!C89 && strcmp (Ident, "__VA_ARGS__") == 0) {
+                    PPWarning ("`__VA_ARGS__' can only appear in the expansion "
+                               "of a C99 variadic macro");
+                }
+            }
+
+            /* Add the macro argument */
  	    AddMacroArg (M, Ident);
      	    SkipWhitespace ();
-     	    if (CurC != ',') {
-     	     	break;
+       	    if (M->Variadic || CurC != ',') {
+     	      	break;
             }
      	    NextChar ();
      	}

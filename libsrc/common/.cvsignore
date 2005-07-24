@@ -1,6 +1,5 @@
 *.lst
 _afailed.s
-_aligned_malloc.s
 _hextab.s
 _poserror.s
 _scanf.s
@@ -25,6 +24,7 @@ locale.s
 localtime.s
 mktime.s
 perror.s
+pmemalign.s
 puts.s
 qsort.s
 realloc.s

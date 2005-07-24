@@ -82,7 +82,7 @@ uninstall:	install-test
 
 install:	install-test install-dirs install-bins install-libs install-docs
 	@echo
-	@echo 'Export some shell environment variables:'
+	@echo 'You should export some shell environment variables:'
 	@echo
 	@echo 'CC65_INC=$(CC65INC)'
 	@echo 'CC65_LIB=$(CC65LIB)'
@@ -137,7 +137,7 @@ install-docs:
 	for f in src/ld65/cfg/*.cfg; \
 	  do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
 	  done
-	for f in readme.1st grc.txt internal.txt; \
+	for f in readme.1st grc.txt compile.txt CREDITS BUGS internal.txt newvers.txt; \
 	  do $(INSTALL_DATA) doc/$$f $(CC65DOC) || exit 1; \
 	  done
 	-for f in doc/*.html; \

@@ -8,6 +8,7 @@
 SGML  =	apple2.sgml	\
 	ar65.sgml 	\
         atari.sgml      \
+        atmos.sgml      \
         c128.sgml       \
         c16.sgml        \
         c64.sgml        \
@@ -28,6 +29,7 @@ SGML  =	apple2.sgml	\
 	ld65.sgml   	\
 	library.sgml    \
         lynx.sgml       \
+        nes.sgml        \
         plus4.sgml      \
         vic20.sgml
 

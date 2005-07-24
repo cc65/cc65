@@ -94,6 +94,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="atari.html" name="atari.html"></tag>
   Topics specific to the Atari 8 bit machines.
 
+  <tag><htmlurl url="atmos.html" name="atmos.html"></tag>
+  Topics specific to the Oric Atmos.
+
   <tag><htmlurl url="c128.html" name="c128.html"></tag>
   Topics specific to the Commodore 128.
 
@@ -108,6 +111,9 @@ Main documentation page, contains links to other available stuff.
 
   <tag><htmlurl url="lynx.html" name="lynx.html"></tag>
   Topics specific to the Atari Lynx Game Console.
+
+  <tag><htmlurl url="nes.html" name="nes.html"></tag>
+  Topics specific to the Nintendo Entertainment System.
 
   <tag><htmlurl url="pet.html" name="pet.html"></tag>
   Topics specific to the Commodore PET machines.

@@ -560,9 +560,11 @@ This cc65 version has some extensions to the ISO C standard.
         unorthogonal). Flexible array members cannot be initialized...
 
         <itemize>
-        <item>  ...when defining an array of structs with flexible members.
-        <item>  ...if such a struct is a member field of another struct which
-                is not the last field.
++	<!-- add &nbsp; to get rid of "..when undefined" message on Debian Woody -->
+        <item>  &nbsp;...when defining an array of structs with flexible 
+                members.
+        <item>  &nbsp;...if such a struct is a member field of another struct 
+                which is not the last field.
         <item>  If the struct which contains a flexible array member is
                 declared as <tt/register/ and the size and compiler settings
                 do allow the compiler to actually place the struct into the

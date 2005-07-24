@@ -109,11 +109,11 @@ if you don't help. Look at this example:
       i = i + OFFS + 3;
 </verb></tscreen>
 
-The expression is parsed from left to right, that means, the compiler sees
-'i', and puts it contents into the secondary register. Next is OFFS, which is
+The expression is parsed from left to right, that means, the compiler sees 'i',
+and puts it contents into the secondary register. Next is OFFS, which is 
 constant. The compiler emits code to add a constant to the secondary register.
-Same thing again for the constant 3. So the code produced contains a fetch of
-'i', two additions of constants, and a store (into 'i'). Unfortunately, the
+Same thing again for the constant 3. So the code produced contains a fetch 
+of 'i', two additions of constants, and a store (into 'i'). Unfortunately, the
 compiler does not see, that "OFFS + 3" is a constant for itself, since it does
 it's evaluation from left to right. There are some ways to help the compiler
 to recognize expression like this:

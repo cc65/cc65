@@ -288,9 +288,9 @@ The assembler accepts the standard 6502/65816 assembler syntax. One line may
 contain a label (which is identified by a colon), and, in addition to the
 label, an assembler mnemonic, a macro, or a control command (see section <ref
 id="control-commands" name="Control Commands"> for supported control
-commands). Alternatively, the line may contain a symbol definition using the
-'=' token. Everything after a semicolon is handled as a comment (that is, it
-is ignored).
+commands). Alternatively, the line may contain a symbol definition using
+the '=' token. Everything after a semicolon is handled as a comment (that is, 
+it is ignored).
 
 Here are some examples for valid input lines:
 
@@ -632,15 +632,15 @@ names like "Loop". Here is an example:
 
 <sect1>Unnamed labels<p>
 
-If you really want to write messy code, there are also unnamed
-labels. These labels do not have a name (you guessed that already,
-didn't you?). A colon is used to mark the absence of the name.
+If you really want to write messy code, there are also unnamed labels. These
+labels do not have a name (you guessed that already, didn't you?). A colon is
+used to mark the absence of the name.
 
-Unnamed labels may be accessed by using the colon plus several minus
-or plus characters as a label designator. Using the '-' characters
-will create a back reference (use the n'th label backwards), using
-'+' will create a forward reference (use the n'th label in forward
-direction). An example will help to understand this:
+Unnamed labels may be accessed by using the colon plus several minus or plus
+characters as a label designator. Using the '-' characters will create a back
+reference (use the n'th label backwards), using '+' will create a forward
+reference (use the n'th label in forward direction). An example will help to
+understand this:
 
 <tscreen><verb>
 	:	lda	(ptr1),y	; #1
@@ -713,7 +713,7 @@ All (non cheap local) symbols that are declared outside of any nested scopes
 are in global scope.
 
 
-<sect1>A special scope: cheap locals<p>
+<sect1>Cheap locals<p>
 
 A special scope is the scope for cheap local symbols. It lasts from one non
 local symbol to the next one, without any provisions made by the programmer.
@@ -3096,10 +3096,10 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
-  Switch on or off smart mode. The command must be followed by a '+' or
-  '-' character to switch the option on or off respectively. The default
-  is off (that is, the assembler doesn't try to be smart), but this
-  default may be changed by the -s switch on the command line.
+  Switch on or off smart mode. The command must be followed by a '+' or '-'
+  character to switch the option on or off respectively. The default is off
+  (that is, the assembler doesn't try to be smart), but this default may be
+  changed by the -s switch on the command line.
 
   In smart mode the assembler will do the following:
 

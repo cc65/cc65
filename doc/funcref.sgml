@@ -206,9 +206,11 @@ function.
 <item><ref id="em_commit" name="em_commit">
 <item><ref id="em_copyfrom" name="em_copyfrom">
 <item><ref id="em_copyto" name="em_copyto">
+<item><ref id="em_install" name="em_install">
 <item><ref id="em_load_driver" name="em_load_driver">
 <item><ref id="em_map" name="em_map">
 <item><ref id="em_pagecount" name="em_pagecount">
+<item><ref id="em_uninstall" name="em_uninstall">
 <item><ref id="em_unload" name="em_unload">
 <item><ref id="em_use" name="em_use">
 </itemize>
@@ -263,20 +265,20 @@ function.
 
 <sect1><tt/mouse.h/<label id="mouse.h"><p>
 
-<!-- <itemize> -->
-<!-- <item><ref id="mouse_load_driver" name="mouse_load_driver"> -->
-<!-- <item><ref id="mouse_unload" name="mouse_unload"> -->
-<!-- <item><ref id="mouse_install" name="mouse_install"> -->
-<!-- <item><ref id="mouse_uninstall" name="mouse_uninstall"> -->
-<!-- <item><ref id="mouse_hide" name="mouse_hide"> -->
-<!-- <item><ref id="mouse_show" name="mouse_show"> -->
-<!-- <item><ref id="mouse_box" name="mouse_box"> -->
-<!-- <item><ref id="mouse_move" name="mouse_move"> -->
-<!-- <item><ref id="mouse_buttons" name="mouse_buttons"> -->
-<!-- <item><ref id="mouse_pos" name="mouse_pos"> -->
-<!-- <item><ref id="mouse_info" name="mouse_info"> -->
+<itemize>
+<item><ref id="mouse_load_driver" name="mouse_load_driver">
+<item><ref id="mouse_unload" name="mouse_unload">
+<item><ref id="mouse_install" name="mouse_install">
+<item><ref id="mouse_uninstall" name="mouse_uninstall">
+<item><ref id="mouse_hide" name="mouse_hide">
+<item><ref id="mouse_show" name="mouse_show">
+<item><ref id="mouse_box" name="mouse_box">
+<item><ref id="mouse_move" name="mouse_move">
+<item><ref id="mouse_buttons" name="mouse_buttons">
+<item><ref id="mouse_pos" name="mouse_pos">
+<item><ref id="mouse_info" name="mouse_info">
 <!-- <item><ref id="mouse_ioctl" name="mouse_ioctl"> -->
-<!-- </itemize> -->
+</itemize>
 
 (incomplete)
 
@@ -1772,6 +1774,32 @@ loaded.
 </quote>
 
 
+<sect1>em_install<label id="em_install"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install an already loaded extended memory driver.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/unsigned char _fastcall__ em_install (void* driver);/
+<tag/Description/The function installs an already loaded extended memory driver
+and returns an error code. The function may be used to install a driver linked
+statically to the program.
+<tag/Limits/<itemize>
+<item>Not all drivers are able to detect if the supported hardware is really
+present.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_load_driver" name="em_load_driver">,
+<ref id="em_uninstall" name="em_uninstall">,
+<ref id="em_unload" name="em_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>em_load_driver<label id="em_load_driver"><p>
 
 <quote>
@@ -1852,13 +1880,40 @@ by the driver in 256 byte pages.
 </quote>
 
 
+<sect1>em_uninstall<label id="em_uninstall"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall an already loaded extended memory driver.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ em_install (void);/
+<tag/Description/The function uninstalls an already loaded extended memory
+driver but doesn't remove it from memory.
+<tag/Limits/<itemize>
+<item>If the driver has been loaded using <tt/<ref id="em_load_driver"
+name="em_load_driver">/, <tt/<ref id="em_unload" name="em_unload">/
+should be used instead of <tt/em_uninstall/ so the driver is also removed
+from memory.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_install" name="em_install">,
+<ref id="em_load_driver" name="em_load_driver">,
+<ref id="em_unload" name="em_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>em_unload<label id="em_unload"><p>
 
 <quote>
 <descrip>
 <tag/Function/Unload an extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/void __fastcall__ em_unload (void);/
+<tag/Declaration/<tt/unsigned char __fastcall__ em_unload (void);/
 <tag/Description/The function unloads a loaded extended memory driver and
 frees all memory allocated for the driver.
 <tag/Limits/<itemize>
@@ -3182,6 +3237,317 @@ relocatable o65 modules for use with this function.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="mod_free" name="mod_free">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_box<label id="mouse_box"><p>
+
+<quote>
+<descrip>
+<tag/Function/Specify a bounding box for the mouse cursor.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/void __fastcall__ mouse_box (int minx, int miny,
+int maxx, int maxy);/
+<tag/Description/The function allows to set a bounding box for mouse movement.
+<tag/Limits/<itemize>
+<item>The function does not check if the mouse cursor is currently within the
+given rectangle. Placing the mouse cursor within the bounding box is the
+responsibility of the programmer.
+<item>While the bounding box may be larger than the actual screen size, the
+standard mouse cursor draw routines may fail to set the cursor to coordinates
+outside of the screen area. Depending on the platform, you may have to supply
+your own mouse cursor routines.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_move" name="mouse_move">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_buttons<label id="mouse_buttons"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return a bit mask encoding the state of the mouse buttons.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ mouse_buttons (void);/
+<tag/Description/The function returns a bit mask that encodes the state of the
+mouse buttons. You may use the <tt/MOUSE_BTN_XXX/ flags to decode the function
+return value.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_info" name="mouse_info">,
+<ref id="mouse_pos" name="mouse_pos">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_geterrormsg<label id="mouse_geterrormsg"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return a readable error message for an error code.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/const char* __fastcall__ mouse_geterrormsg (unsigned char
+code);/
+<tag/Description/The function returns an error message (in english) for the
+error code passed parameter.
+<tag/Limits/<itemize>
+<item>The function will return "Unknown error" for invalid error codes.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_load_driver" name="mouse_load_driver">,
+<ref id="mouse_uninstall" name="mouse_uninstall">,
+<ref id="mouse_unload" name="mouse_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_hide<label id="mouse_hide"><p>
+
+<quote>
+<descrip>
+<tag/Function/Hide the mouse pointer.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/void __fastcall__ mouse_hide (void);/
+<tag/Description/The function hides the mouse pointer. It manages a counter
+that is shared between <tt/<ref id="mouse_show" name="mouse_show">/ and
+<tt/mouse_hide/ so that every call call to <tt/mouse_hide/ must be followed by
+a call to <tt/<ref id="mouse_show" name="mouse_show">/ to make the mouse cursor
+visible.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_show" name="mouse_show">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_info<label id="mouse_info"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the state of the mouse buttons and the position of the
+mouse.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/void __fastcall__ mouse_info (struct mouse_info* info);/
+<tag/Description/The function returns the state of the mouse buttons and the
+position of the mouse in the <tt/mouse_info/ structure passed as parameter.
+<tag/Limits/<itemize>
+<item>The <tt/mouse_info/ struct is a superset of the <tt/mouse_pos/ struct,
+so if you just need the mouse position, call <tt/<ref id="mouse_pos"
+name="mouse_pos">/ instead.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_buttons" name="mouse_buttons">,
+<ref id="mouse_pos" name="mouse_pos">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_install<label id="mouse_install"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install an already loaded mouse driver.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ mouse_install (const struct
+mouse_callbacks* c, void* driver);/
+<tag/Description/The function installs an already loaded mouse driver and
+returns an error code. The <tt/mouse_callbacks/ structure passed as first
+parameter contains pointers to routines needed to move or hide/show the mouse
+pointer. Defaults for these routines are supplied by the library, so if you
+can live with these defaults (which are platform specific), just pass a
+pointer to <tt/mouse_def_callbacks/. The function may be used to install a
+driver linked statically to the program.
+<tag/Limits/<itemize>
+<item>Not all drivers are able to detect if the supported hardware is really
+present.
+<item>After installing a driver, the mouse cursor is hidden.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_load_driver" name="mouse_load_driver">,
+<ref id="mouse_uninstall" name="mouse_uninstall">,
+<ref id="mouse_unload" name="mouse_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_load_driver<label id="mouse_load_driver"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load and initialize a mouse driver.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ mouse_load_driver (const struct
+mouse_callbacks* c, const char* driver);/
+<tag/Description/Load a mouse driver into memory and initialize it. The
+function returns an error code that tells if the call has been successful. The
+<tt/mouse_callbacks/ structure passed as first parameter contains pointers to
+routines needed to move or hide/show the mouse pointer. Defaults for these
+routines are supplied by the library, so if you can live with these defaults
+(which are platform specific), just pass a pointer to <tt/mouse_def_callbacks/.
+<tag/Limits/<itemize>
+<item>The driver is loaded by name, so currently you must know the type of
+mouse that should be supported. There is no autodetect capability.
+<item>Not all drivers are able to detect if the supported hardware is really
+present.
+<item>After installing a driver, the mouse cursor is hidden.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_install" name="mouse_install">,
+<ref id="mouse_uninstall" name="mouse_uninstall">,
+<ref id="mouse_unload" name="mouse_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_move<label id="mouse_move"><p>
+
+<quote>
+<descrip>
+<tag/Function/Move the mouse cursor to a specific position.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/void __fastcall__ mouse_move (int x, int y);/
+<tag/Description/The function updates the mouse position. If the mouse cursor
+is visible, it is shown at the new position.
+<tag/Limits/<itemize>
+<item>The function does not check if the new position is within the bounding
+box specified with <tt/<ref id="mouse_box" name="mouse_box">/.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_box" name="mouse_box">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_pos<label id="mouse_pos"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the position of the mouse.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/void __fastcall__ mouse_pos (struct mouse_pos* pos);/
+<tag/Description/The function returns the position of the mouse in the
+<tt/mouse_pos/ structure passed as parameter.
+<tag/Limits/<itemize>
+<item>The <tt/mouse_pos/ struct is a subset of the <tt/mouse_info/ struct,
+so if you do also need the mouse buttons, call <tt/<ref id="mouse_info"
+name="mouse_info">/ instead.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_buttons" name="mouse_buttons">,
+<ref id="mouse_info" name="mouse_info">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_show<label id="mouse_show"><p>
+
+<quote>
+<descrip>
+<tag/Function/Show the mouse pointer.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/void __fastcall__ mouse_show (void);/
+<tag/Description/The function shows the mouse pointer. It manages a counter
+that is shared between <tt/<ref id="mouse_hide" name="mouse_hide">/ and
+<tt/mouse_show/. The mouse cursor is visible if there was one more call to
+<tt/mouse_show/ than to <tt/<ref id="mouse_hide" name="mouse_hide">/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_hide" name="mouse_hide">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_uninstall<label id="mouse_uninstall"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall an already loaded mouse driver.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ mouse_install (void);/
+<tag/Description/The function uninstalls an already loaded mouse driver but
+don't removes it from memory.
+<tag/Limits/<itemize>
+<item>If the driver has been loaded using <tt/<ref id="mouse_load_driver"
+name="mouse_load_driver">/, <tt/<ref id="mouse_unload" name="mouse_unload">/
+should be used instead of <tt/mouse_uninstall/ so the driver is also removed
+from memory.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_install" name="mouse_install">,
+<ref id="mouse_load_driver" name="mouse_load_driver">,
+<ref id="mouse_unload" name="mouse_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_unload<label id="mouse_unload"><p>
+
+<quote>
+<descrip>
+<tag/Function/Unload a mouse driver.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ mouse_unload (void);/
+<tag/Description/The function unloads a loaded mouse driver and frees all
+memory allocated for the driver.
+<tag/Limits/<itemize>
+<item>The function does nothing if no driver is loaded.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_install" name="mouse_install">,
+<ref id="mouse_load_driver" name="mouse_load_driver">,
+<ref id="mouse_uninstall" name="mouse_uninstall">
 <tag/Example/None.
 </descrip>
 </quote>

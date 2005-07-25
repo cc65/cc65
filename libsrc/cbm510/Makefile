@@ -64,6 +64,7 @@ OBJS =	_scrsize.o	\
 	kopen.o		\
         kreadst.o       \
 	kscnkey.o	\
+	kscreen.o	\
         ksetnam.o       \
 	kudtim.o 	\
         mainargs.o      \

@@ -4,9 +4,24 @@
 ;
 ; 27.10.2001
 ; 06.03.2002
+; 25.07.2005
 
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
+
+; TODO:
+; TAB (should be implemented)
+; other special characters directly from keyboard are unsafe, though some might be
+; implemented:
+; HOME, UPLINE, ULINEON, ULINEOFF, REV_ON, REV_OFF, BOLDON, ITALICON, OUTLINEON, PLAINTEXT
+; and cursor movement, maybe stuff like INSERT too
+;
+; these must be ignored:
+; ESC_GRAPHICS, ESC_RULER, GOTOX, GOTOY, GOTOXY, NEWCARDSET, all 1..8
+;
+; note that there are conflicts between control characters and keyboard:
+; HOME = KEY_ENTER, KEY_HOME = REV_ON, 
+; UPLINE = ?, KEY_UPARROW = GOTOY, ...
 
 	    .export _cputcxy, _cputc, update_cursor
 
@@ -29,32 +44,18 @@ _cputcxy:
 
 _cputc:
 	tax			; save character
-; some characters are not safe for PutChar
+; some characters 0-31 are not safe for PutChar
 	cmp	#$20
 	bcs	L1
 	cmp	#CR
 	beq	do_cr
 	cmp	#LF
 	beq	do_lf
-	cmp	#$1d
-	bne	L00
+	cmp	#KEY_DELETE
+	bne	L0
 	ldx	#BACKSPACE
 	sec
 	bcs	L2
-L00:	cmp	#ESC_GRAPHICS
-	beq	L0
-	cmp	#ESC_RULER
-	beq	L0
-	cmp	#GOTOX
-	beq	L0
-	cmp	#GOTOY
-	beq	L0
-	cmp	#GOTOXY
-	beq	L0
-	cmp	#NEWCARDSET
-	beq	L0
-	cmp	#$1e
-	bne	L1
 L0:	rts
 
 L1:	clc
@@ -99,4 +100,3 @@ update_cursor:
 do_cr:	lda	#0
 	sta	cursor_c
 	beq	update_cursor
-

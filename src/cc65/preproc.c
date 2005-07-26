@@ -1,8 +1,37 @@
-/*
- * C pre-processor functions.
- * Small portions of this code are copyright (C) 1989 John R. Dunning.
- * See copyleft.jrd for license information.
- */
+/*****************************************************************************/
+/*                                                                           */
+/*                                  preproc.c                                */
+/*                                                                           */
+/*                              cc65 preprocessor                            */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1998-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+
 
 #include <stdio.h>
 #include <string.h>
@@ -720,6 +749,8 @@ static void DefineMacro (void)
 
  	/* Read the formal parameter list */
      	while (1) {
+
+            /* Skip white space and check for end of parameter list */
      	    SkipWhitespace ();
      	    if (CurC == ')') {
      	     	break;
@@ -738,8 +769,13 @@ static void DefineMacro (void)
                 }
                 NextChar ();
                 NextChar ();
-                strcpy (Ident, "__VA_ARGS__");
+
+                /* Remember that the macro is variadic and use __VA_ARGS__ as 
+                 * the argument name.
+                 */
+                AddMacroArg (M, "__VA_ARGS__");
                 M->Variadic = 1;
+
             } else {
                 /* Must be macro argument name */
                 if (MacName (Ident) == 0) {
@@ -751,13 +787,17 @@ static void DefineMacro (void)
                     PPWarning ("`__VA_ARGS__' can only appear in the expansion "
                                "of a C99 variadic macro");
                 }
+
+                /* Add the macro argument */
+ 	        AddMacroArg (M, Ident);
             }
 
-            /* Add the macro argument */
- 	    AddMacroArg (M, Ident);
+            /* If we had an ellipsis, or the next char is not a comma, we've
+             * reached the end of the macro argument list.
+             */
      	    SkipWhitespace ();
        	    if (M->Variadic || CurC != ',') {
-     	      	break;
+     	       	break;
             }
      	    NextChar ();
      	}

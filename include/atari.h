@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000 Mark Keates <markk@dendrite.co.uk>                               */
-/*          Freddy Offenga <taf_offenga@yahoo.com>                           */
-/*          Christian Groessler <cpg@aladdin.de>                             */
+/* (C) 2000-2005 Mark Keates <markk@dendrite.co.uk>                          */
+/*               Freddy Offenga <taf_offenga@yahoo.com>                      */
+/*               Christian Groessler <cpg@aladdin.de>                        */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -228,6 +228,25 @@ struct __dcb {
     unsigned char aux2;       /* 2nd command auxiliary byte */
 };
 #define DCB (*(struct __dcb *)0x300)
+
+/* I/O control block */
+struct __iocb {
+    unsigned char handler;    /* handler index number (0xff free) */
+    unsigned char drive;      /* device number (drive) */
+    unsigned char command;    /* command */
+    unsigned char status;     /* status of last operation */
+    void          *buffer;    /* pointer to buffer */
+    void          *put_byte;  /* pointer to device's PUT BYTE routine */
+    unsigned int  buflen;     /* length of buffer */
+    unsigned char aux1;       /* 1st auxiliary byte */
+    unsigned char aux2;       /* 2nd auxiliary byte */
+    unsigned char aux3;       /* 3rd auxiliary byte */
+    unsigned char aux4;       /* 4th auxiliary byte */
+    unsigned char aux5;       /* 5th auxiliary byte */
+    unsigned char spare;      /* spare byte */
+};
+#define ZIOCB (*(struct __iocb *)0x20)  /* zero page IOCB */
+#define IOCB (*(struct __iocb *)0x340)  /* system IOCB buffers */
 
 /* End of atari.h */
 #endif /* #ifndef _ATARI_H */

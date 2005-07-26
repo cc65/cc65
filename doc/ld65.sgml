@@ -55,7 +55,10 @@ The linker is called as follows:
 ---------------------------------------------------------------------------
 Usage: ld65 [options] module ...
 Short options:
+  -(                    Start a library group
+  -)                    End a library group
   -C name               Use linker config file
+  -D sym=val            Define a symbol
   -L path               Specify a library search path
   -Ln name              Create a VICE label file
   -S addr               Set the default start address
@@ -71,7 +74,9 @@ Long options:
   --cfg-path path       Specify a config file search path
   --config name         Use linker config file
   --dbgfile name        Generate debug information
+  --define sym=val      Define a symbol
   --dump-config name    Dump a builtin configuration
+  --end-group           End a library group
   --help                Help (this text)
   --lib file            Link this library
   --lib-path path       Specify a library search path
@@ -80,6 +85,7 @@ Long options:
   --obj file            Link this object file
   --obj-path path       Specify an object file search path
   --start-addr addr     Set the default start address
+  --start-group         Start a library group
   --target sys          Set the target system
   --version             Print the linker version
 ---------------------------------------------------------------------------
@@ -189,6 +195,15 @@ Here is a description of all the command line options:
   This gives the name of an output config file to use. See section 4 for more
   information about config files. -C may not be used together with <tt><ref
   id="option-t" name="-t"></tt>.
+
+
+  <label id="option-D">
+  <tag><tt>-D sym=value, --define sym=value</tt></tag>
+
+  This option allows to define an external symbol on the command line. Value
+  may start with a '&dollar;' sign or with <tt/0x/ for hexadecimal values,
+  otherwise a leading zero denotes octal values. See also the <ref
+  id="SYMBOLS" name="SYMBOLS section"> in the configuration file.
 
 
   <label id="option--lib-path">
@@ -798,9 +813,7 @@ several attributes that may be defined here.
 
 
 
-
-
-<sect1>Features<label id="FEATURES"><p>
+<sect1>The FEATURES section<label id="FEATURES"><p>
 
 In addition to the <tt/MEMORY/ and <tt/SEGMENTS/ sections described above, the
 linker has features that may be enabled by an additional section labeled
@@ -881,15 +894,38 @@ which can be referenced by the <tt/%S/ symbol. The builtin default for the
 linker is &dollar;200.
 
 <tscreen><verb>
-	FEATURES {
+       	FEATURES {
             # Default start address is $1000
-	    STARTADDRESS:       default = $1000;
-	}
+       	    STARTADDRESS:       default = $1000;
+       	}
 </verb></tscreen>
 
 Please note that order is important: The default start address must be defined
 <em/before/ the <tt/%S/ symbol is used in the config file. This does usually
 mean, that the <tt/FEATURES/ section has to go to the top of the config file.
+
+
+
+<sect1>The SYMBOLS section<label id="SYMBOLS"><p>
+
+The configuration file may also be used to define symbols used in the link
+stage. The mandatory attribute for a symbol is its value. A second, boolean
+attribute named <tt/weak/ is available. If a symbol is marked as weak, it may
+be overridden by defining a symbol of the same name from the command line. The
+default for symbols is that they're strong, which means that an attempt to
+define a symbol with the same name from the command line will lead to an
+error.
+
+The following example defines the stack size for an application, but allows
+the programmer to override the value by specifying <tt/--define
+__STACKSIZE__=xxx/ on the command line.
+
+<tscreen><verb>
+       	SYMBOLS {
+            # Define the stack size for the application
+       	    __STACKSIZE__:      value = $800, weak = yes;
+       	}
+</verb></tscreen>
 
 
 
@@ -915,7 +951,7 @@ name="uz@cc65.org">).
 
 <sect>Copyright<p>
 
-ld65 (and all cc65 binutils) are (C) Copyright 1998-2001 Ullrich von
+ld65 (and all cc65 binutils) are (C) Copyright 1998-2005 Ullrich von
 Bassewitz. For usage of the binaries and/or sources the following
 conditions do apply:
 

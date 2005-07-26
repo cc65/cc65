@@ -1335,7 +1335,7 @@ static void ParseFeatures (void)
 
 
     	    default:
-    	 	Error ("Unexpected feature token");
+       	       	FAIL ("Unexpected feature token");
     	}
 
     	/* Skip the semicolon */
@@ -1359,7 +1359,7 @@ static void ParseSymbols (void)
     while (CfgTok == CFGTOK_IDENT) {
 
 	long Val = 0L;
-        int  Weak;
+        int  Weak = 0;
 
 	/* Remember the name */
 	unsigned Name = GetStringId (CfgSVal);
@@ -1380,9 +1380,6 @@ static void ParseSymbols (void)
             CfgAssureInt ();
             Val = CfgIVal;
             CfgNextTok ();
-
-            /* Generate an export with the given value */
-            CreateConstExport (Name, Val);
 
         } else {
 
@@ -1453,7 +1450,18 @@ static void ParseSymbols (void)
                 Weak = 0;
             }
 
-            /* Generate an export with the given value */
+        }
+
+        /* Check if the symbol is already defined */
+        if (FindExport (Name) != 0) {
+            /* If the symbol is not marked as weak, this is an error.
+             * Otherwise ignore the symbol from the config.
+             */
+            if (!Weak) {
+                CfgError ("Symbol `%s' is already defined", GetString (Name));
+            }
+        } else {
+            /* The symbol is undefined, generate an export */
             CreateConstExport (Name, Val);
         }
 

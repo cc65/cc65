@@ -39,6 +39,7 @@
 #include <errno.h>
 
 /* common */
+#include "chartype.h"
 #include "cmdline.h"
 #include "filetype.h"
 #include "libdefs.h"
@@ -94,6 +95,7 @@ static void Usage (void)
             "  -(\t\t\tStart a library group\n"
             "  -)\t\t\tEnd a library group\n"
             "  -C name\t\tUse linker config file\n"
+            "  -D sym=val\t\tDefine a symbol\n"
             "  -L path\t\tSpecify a library search path\n"
             "  -Ln name\t\tCreate a VICE label file\n"
             "  -S addr\t\tSet the default start address\n"
@@ -109,6 +111,7 @@ static void Usage (void)
             "  --cfg-path path\tSpecify a config file search path\n"
             "  --config name\t\tUse linker config file\n"
             "  --dbgfile name\tGenerate debug information\n"
+            "  --define sym=val\tDefine a symbol\n"
             "  --dump-config name\tDump a builtin configuration\n"
             "  --end-group\t\tEnd a library group\n"
             "  --help\t\tHelp (this text)\n"
@@ -227,6 +230,52 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
 
 
+static void DefineSymbol (const char* Def)
+/* Define a symbol from the command line */
+{
+    const char* P;
+    unsigned I;
+    long Val;
+    StrBuf SymName = AUTO_STRBUF_INITIALIZER;
+
+
+    /* The symbol must start with a character or underline */
+    if (Def [0] != '_' && !IsAlpha (Def [0])) {
+	InvDef (Def);
+    }
+    P = Def;
+
+    /* Copy the symbol, checking the remainder */
+    I = 0;
+    while (IsAlNum (*P) || *P == '_') {
+        SB_AppendChar (&SymName, *P++);
+    }
+    SB_Terminate (&SymName);
+
+    /* Do we have a value given? */
+    if (*P != '=') {
+        InvDef (Def);
+    } else {
+    	/* We have a value */
+    	++P;
+    	if (*P == '$') {
+    	    ++P;
+    	    if (sscanf (P, "%lx", &Val) != 1) {
+    	       	InvDef (Def);
+    	    }
+    	} else {
+    	    if (sscanf (P, "%li", &Val) != 1) {
+     	       	InvDef (Def);
+    	    }
+       	}
+    }
+
+    /* Define the new symbol */
+    CreateConstExport (GetStringId (SB_GetConstBuf (&SymName)), Val);
+}
+
+
+
 static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 /* Specify a config file search path */
 {
@@ -258,6 +307,14 @@ static void OptDbgFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the debug file */
 {
     DbgFileName = Arg;
+}
+
+
+
+static void OptDefine (const char* Opt attribute ((unused)), const char* Arg)
+/* Define a symbol on the command line */
+{
+    DefineSymbol (Arg);
 }
 
 
@@ -406,6 +463,7 @@ int main (int argc, char* argv [])
        	{ "--cfg-path",         1,     	OptCfgPath              },
        	{ "--config",  	       	1,     	OptConfig    	    	},
      	{ "--dbgfile",          1,      OptDbgFile              },
+        { "--define",           1,      OptDefine               },
        	{ "--dump-config",     	1,     	OptDumpConfig           },
         { "--end-group",        0,      OptEndGroup             },
      	{ "--help",	       	0,     	OptHelp	     	    	},
@@ -489,6 +547,10 @@ int main (int argc, char* argv [])
 		case 'C':
 		    OptConfig (Arg, GetArg (&I, 2));
 		    break;
+
+                case 'D':
+                    OptDefine (Arg, GetArg (&I, 2));
+                    break;
 
     		case 'L':
 		    switch (Arg [2]) {

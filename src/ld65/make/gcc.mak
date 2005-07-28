@@ -24,6 +24,7 @@ CVT=cfg/cvt-cfg.pl
 OBJS = 	asserts.o       \
         bin.o		\
 	binfmt.o	\
+        cfgexpr.o       \
 	condes.o	\
 	config.o	\
         dbgfile.o       \

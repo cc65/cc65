@@ -47,9 +47,15 @@
 /* Config file tokens */
 typedef enum {
     CFGTOK_NONE,
-    CFGTOK_INTCON,
-    CFGTOK_STRCON,
-    CFGTOK_IDENT,
+    CFGTOK_INTCON,              /* Integer constant */
+    CFGTOK_STRCON,              /* String constant */
+    CFGTOK_IDENT,               /* Identifier */
+    CFGTOK_PLUS,
+    CFGTOK_MINUS,
+    CFGTOK_MUL,
+    CFGTOK_DIV,
+    CFGTOK_LPAR,
+    CFGTOK_RPAR,
     CFGTOK_LCURLY,
     CFGTOK_RCURLY,
     CFGTOK_SEMI,

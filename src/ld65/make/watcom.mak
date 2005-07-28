@@ -63,6 +63,7 @@ endif
 OBJS =	asserts.obj     \
         bin.obj		\
 	binfmt.obj	\
+        cfgexpr.obj     \
 	condes.obj	\
 	config.obj	\
         dbgfile.obj     \

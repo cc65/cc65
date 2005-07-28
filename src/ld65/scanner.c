@@ -225,6 +225,36 @@ Again:
     /* Other characters */
     switch (C) {
 
+        case '-':
+            NextChar ();
+            CfgTok = CFGTOK_MINUS;
+            break;
+
+        case '+':
+            NextChar ();
+            CfgTok = CFGTOK_PLUS;
+            break;
+
+        case '*':
+            NextChar ();
+            CfgTok = CFGTOK_MUL;
+            break;
+
+        case '/':
+            NextChar ();
+            CfgTok = CFGTOK_DIV;
+            break;
+
+	case '(':
+	    NextChar ();
+	    CfgTok = CFGTOK_LPAR;
+	    break;
+
+	case ')':
+	    NextChar ();
+	    CfgTok = CFGTOK_RPAR;
+	    break;
+
 	case '{':
 	    NextChar ();
 	    CfgTok = CFGTOK_LCURLY;

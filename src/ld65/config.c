@@ -48,6 +48,7 @@
 /* ld65 */
 #include "bin.h"
 #include "binfmt.h"
+#include "cfgexpr.h"
 #include "condes.h"
 #include "config.h"
 #include "error.h"
@@ -406,11 +407,11 @@ static void ParseMemory (void)
 {
     static const IdentTok Attributes [] = {
        	{   "START",  	CFGTOK_START    },
-	{   "SIZE",	CFGTOK_SIZE     },
+	{   "SIZE", 	CFGTOK_SIZE     },
         {   "TYPE",     CFGTOK_TYPE     },
         {   "FILE",     CFGTOK_FILE     },
         {   "DEFINE",   CFGTOK_DEFINE   },
-  	{   "FILL",	CFGTOK_FILL     },
+  	{   "FILL", 	CFGTOK_FILL     },
        	{   "FILLVAL", 	CFGTOK_FILLVAL  },
     };
     static const IdentTok Types [] = {
@@ -444,22 +445,21 @@ static void ParseMemory (void)
 
 		case CFGTOK_START:
 		    FlagAttr (&M->Attr, MA_START, "START");
-		    CfgAssureInt ();
-		    M->Start = CfgIVal;
+                    M->Start = CfgIntExpr ();
 		    break;
 
 	      	case CFGTOK_SIZE:
 	     	    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
-		    CfgAssureInt ();
-	      	    M->Size = CfgIVal;
+	      	    M->Size = CfgIntExpr ();
 		    break;
 
 		case CFGTOK_TYPE:
 		    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
       		    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
 		    if (CfgTok == CFGTOK_RO) {
-			M->Flags |= MF_RO;
+		    	M->Flags |= MF_RO;
 		    }
+                    CfgNextTok ();
 		    break;
 
 	        case CFGTOK_FILE:
@@ -467,6 +467,7 @@ static void ParseMemory (void)
 		    CfgAssureStr ();
        	       	    /* Get the file entry and insert the memory area */
 	    	    FileInsert (GetFile (GetStringId (CfgSVal)), M);
+                    CfgNextTok ();
 		    break;
 
 	        case CFGTOK_DEFINE:
@@ -476,6 +477,7 @@ static void ParseMemory (void)
 		    if (CfgTok == CFGTOK_TRUE) {
 	  	    	M->Flags |= MF_DEFINE;
 		    }
+                    CfgNextTok ();
 		    break;
 
 	        case CFGTOK_FILL:
@@ -485,13 +487,12 @@ static void ParseMemory (void)
 		    if (CfgTok == CFGTOK_TRUE) {
 	  	    	M->Flags |= MF_FILL;
 		    }
+                    CfgNextTok ();
 		    break;
 
 	      	case CFGTOK_FILLVAL:
 		    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
-	     	    CfgAssureInt ();
-		    CfgRangeCheck (0, 0xFF);
-	      	    M->FillVal = (unsigned char) CfgIVal;
+	      	    M->FillVal = (unsigned char) CfgCheckedIntExpr (0, 0xFF);
 		    break;
 
 	     	default:
@@ -499,8 +500,7 @@ static void ParseMemory (void)
 
 	    }
 
-	    /* Skip the attribute value and an optional comma */
-      	    CfgNextTok ();
+	    /* Skip an optional comma */
 	    CfgOptionalComma ();
 	}
 
@@ -641,6 +641,7 @@ static void ParseSegments (void)
     };
 
     unsigned Count;
+    long     Val;
 
     /* The MEMORY section must preceed the SEGMENTS section */
     if ((SectionsEncountered & SE_MEMORY) == 0) {
@@ -674,22 +675,20 @@ static void ParseSegments (void)
 	    switch (AttrTok) {
 
 	        case CFGTOK_ALIGN:
-	    	    CfgAssureInt ();
 	    	    FlagAttr (&S->Attr, SA_ALIGN, "ALIGN");
-	    	    CfgRangeCheck (1, 0x10000);
-	    	    S->Align = BitFind (CfgIVal);
-	    	    if ((0x01UL << S->Align) != CfgIVal) {
+	    	    Val = CfgCheckedIntExpr (1, 0x10000);
+	    	    S->Align = BitFind (Val);
+	    	    if ((0x01L << S->Align) != Val) {
 	    	     	CfgError ("Alignment must be a power of 2");
 	    	    }
 	    	    S->Flags |= SF_ALIGN;
 	    	    break;
 
                 case CFGTOK_ALIGN_LOAD:
-	    	    CfgAssureInt ();
 	    	    FlagAttr (&S->Attr, SA_ALIGN_LOAD, "ALIGN_LOAD");
-	    	    CfgRangeCheck (1, 0x10000);
-       	       	    S->AlignLoad = BitFind (CfgIVal);
-	    	    if ((0x01UL << S->AlignLoad) != CfgIVal) {
+	    	    Val = CfgCheckedIntExpr (1, 0x10000);
+       	       	    S->AlignLoad = BitFind (Val);
+	    	    if ((0x01L << S->AlignLoad) != Val) {
 	    	     	CfgError ("Alignment must be a power of 2");
 	    	    }
 	    	    S->Flags |= SF_ALIGN_LOAD;
@@ -702,18 +701,18 @@ static void ParseSegments (void)
 	    	    if (CfgTok == CFGTOK_TRUE) {
 	    	     	S->Flags |= SF_DEFINE;
 	    	    }
+                    CfgNextTok ();
 	    	    break;
 
 	    	case CFGTOK_LOAD:
 	      	    FlagAttr (&S->Attr, SA_LOAD, "LOAD");
 	    	    S->Load = CfgGetMemory (GetStringId (CfgSVal));
+                    CfgNextTok ();
 	    	    break;
 
 	        case CFGTOK_OFFSET:
-	    	    CfgAssureInt ();
 	    	    FlagAttr (&S->Attr, SA_OFFSET, "OFFSET");
-	    	    CfgRangeCheck (1, 0x1000000);
-	    	    S->Addr   = CfgIVal;
+	    	    S->Addr   = CfgCheckedIntExpr (1, 0x1000000);
 	    	    S->Flags |= SF_OFFSET;
 	    	    break;
 
@@ -723,18 +722,18 @@ static void ParseSegments (void)
 		    if (CfgTok == CFGTOK_TRUE) {
 	  	    	S->Flags |= SF_OPTIONAL;
 		    }
+                    CfgNextTok ();
 	    	    break;
 
 	    	case CFGTOK_RUN:
       	    	    FlagAttr (&S->Attr, SA_RUN, "RUN");
  	    	    S->Run = CfgGetMemory (GetStringId (CfgSVal));
+                    CfgNextTok ();
 	    	    break;
 
 	        case CFGTOK_START:
-      	    	    CfgAssureInt ();
 	    	    FlagAttr (&S->Attr, SA_START, "START");
-	    	    CfgRangeCheck (1, 0x1000000);
-	    	    S->Addr   = CfgIVal;
+	    	    S->Addr   = CfgCheckedIntExpr (1, 0x1000000);
 	    	    S->Flags |= SF_START;
 	    	    break;
 
@@ -748,6 +747,7 @@ static void ParseSegments (void)
 	    	     	case CFGTOK_ZP:	   S->Flags |= (SF_BSS | SF_ZP);    break;
 	    	     	default:      	   Internal ("Unexpected token: %d", CfgTok);
 	    	    }
+                    CfgNextTok ();
 	    	    break;
 
 	    	default:
@@ -755,8 +755,7 @@ static void ParseSegments (void)
 
 	    }
 
-	    /* Skip the attribute value and an optional comma */
-	    CfgNextTok ();
+	    /* Skip an optional comma */
 	    CfgOptionalComma ();
 	}
 
@@ -921,6 +920,8 @@ static void ParseO65 (void)
       	 	}
 		/* Insert the symbol into the table */
 	  	O65SetExport (O65FmtDesc, CfgSValId);
+                /* Eat the identifier token */
+                CfgNextTok ();
 	    	break;
 
 	    case CFGTOK_IMPORT:
@@ -943,6 +944,8 @@ static void ParseO65 (void)
       	    	}
 	    	/* Insert the symbol into the table */
 	    	O65SetImport (O65FmtDesc, CfgSValId);
+                /* Eat the identifier token */
+                CfgNextTok ();
 	    	break;
 
 	    case CFGTOK_TYPE:
@@ -963,6 +966,8 @@ static void ParseO65 (void)
 	    	    default:
 	    	     	CfgError ("Unexpected type token");
 	    	}
+                /* Eat the attribute token */
+                CfgNextTok ();
 	     	break;
 
 	    case CFGTOK_OS:
@@ -984,24 +989,21 @@ static void ParseO65 (void)
                         default:              CfgError ("Unexpected OS token");
                     }
                 }
+                CfgNextTok ();
 	     	break;
 
             case CFGTOK_ID:
                 /* Cannot have this attribute twice */
                 FlagAttr (&AttrFlags, atID, "ID");
                 /* We're expecting a number in the 0..$FFFF range*/
-                CfgAssureInt ();
-                CfgRangeCheck (0, 0xFFFF);
-                ModuleId = (unsigned) CfgIVal;
+                ModuleId = (unsigned) CfgCheckedIntExpr (0, 0xFFFF);
                 break;
 
             case CFGTOK_VERSION:
                 /* Cannot have this attribute twice */
                 FlagAttr (&AttrFlags, atVersion, "VERSION");
                 /* We're expecting a number in byte range */
-                CfgAssureInt ();
-                CfgRangeCheck (0, 0xFF);
-                Version = (unsigned) CfgIVal;
+                Version = (unsigned) CfgCheckedIntExpr (0, 0xFF);
                 break;
 
 	    default:
@@ -1009,8 +1011,7 @@ static void ParseO65 (void)
 
 	}
 
-	/* Skip the attribute value and an optional comma */
-	CfgNextTok ();
+	/* Skip an optional comma */
 	CfgOptionalComma ();
     }
 
@@ -1267,20 +1268,14 @@ static void ParseStartAddress (void)
 	    case CFGTOK_DEFAULT:
 	  	/* Don't allow this twice */
 		FlagAttr (&AttrFlags, atDefault, "DEFAULT");
-	      	/* We expect a number */
-		CfgAssureInt ();
-                CfgRangeCheck (0, 0xFFFFFF);
-		/* Remember the value for later */
-                DefStartAddr = CfgIVal;
+	      	/* We expect a numeric expression */
+                DefStartAddr = CfgCheckedIntExpr (0, 0xFFFFFF);
 	    	break;
 
 	    default:
 		FAIL ("Unexpected attribute token");
 
 	}
-
-       	/* Skip the attribute value */
-	CfgNextTok ();
 
 	/* Semicolon ends the ConDes decl, otherwise accept an optional comma */
 	if (CfgTok == CFGTOK_SEMI) {
@@ -1376,16 +1371,16 @@ static void ParseSymbols (void)
             /* Allow an optional assignment */
             CfgOptionalAssign ();
 
-            /* Make sure the next token is an integer, read and skip it */
-            CfgAssureInt ();
-            Val = CfgIVal;
-            CfgNextTok ();
+            /* Make sure the next token is an integer expression, read and
+             * skip it.
+             */
+            Val = CfgIntExpr ();
 
         } else {
 
             /* Bitmask to remember the attributes we got already */
             enum {
-                atNone	    	= 0x0000,
+                atNone	     	= 0x0000,
                 atValue         = 0x0001,
                 atWeak          = 0x0002
             };
@@ -1403,8 +1398,10 @@ static void ParseSymbols (void)
                 CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
                 AttrTok = CfgTok;
 
-                /* An optional assignment follows */
+                /* Skip the attribute name */
                 CfgNextTok ();
+
+                /* An optional assignment follows */
                 CfgOptionalAssign ();
 
                 /* Check which attribute was given */
@@ -1413,10 +1410,8 @@ static void ParseSymbols (void)
                     case CFGTOK_VALUE:
                         /* Don't allow this twice */
                         FlagAttr (&AttrFlags, atValue, "VALUE");
-                        /* We expect a number */
-                        CfgAssureInt ();
-                        /* Remember the value for later */
-                        Val = CfgIVal;
+                        /* We expect a numeric expression */
+                        Val = CfgIntExpr ();
                         break;
 
                     case CFGTOK_WEAK:
@@ -1424,15 +1419,13 @@ static void ParseSymbols (void)
                         FlagAttr (&AttrFlags, atWeak, "WEAK");
                         CfgBoolToken ();
                         Weak = (CfgTok == CFGTOK_TRUE);
+                        CfgNextTok ();
                         break;
 
                     default:
                         FAIL ("Unexpected attribute token");
 
                 }
-
-                /* Skip the attribute value */
-                CfgNextTok ();
 
                 /* Semicolon ends the decl, otherwise accept an optional comma */
                 if (CfgTok == CFGTOK_SEMI) {

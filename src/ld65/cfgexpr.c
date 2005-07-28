@@ -195,8 +195,9 @@ static void Term (CfgExpr* E)
 
         CfgExpr RightSide = CFGEXPR_INITIALIZER;
 
-        /* Remember the token */
+        /* Remember the token, then skip it */
         cfgtok_t Tok = CfgTok;
+        CfgNextTok ();
 
         /* Left side must be an int */
         CE_AssureInt (E);

@@ -169,7 +169,7 @@ Here is a description of all the command line options:
   <tag><tt>-i, --ignore-case</tt></tag>
 
   This option makes the assembler case insensitive on identifiers and labels.
-  This option will override the default, but may itself be overriden by the
+  This option will override the default, but may itself be overridden by the
   <tt><ref id=".CASE" name=".CASE"></tt> control command.
 
 
@@ -248,7 +248,7 @@ Here is a description of all the command line options:
   Name a directory which is searched for include files. The option may be
   used more than once to specify more than one directory to search. The
   current directory is always searched first before considering any
-  additional directores.
+  additional directories.
 
 
   <tag><tt>-U, --auto-import</tt></tag>
@@ -345,7 +345,7 @@ mnemonics:
 <sect1>6502X mode<label id="6502X-mode"><p>
 
 6502X mode is an extension to the normal 6502 mode. In this mode, several
-mnemomics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
+mnemonics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
 these instructions are illegal, there are no official mnemonics for them. The
 unofficial ones are taken from <htmlurl
 url="http://oxyron.net/graham/opcodes02.html"
@@ -403,8 +403,8 @@ name="http://www.6502.org/source/interpreters/sweet16.htm">.
 <sect1>Number format<p>
 
 For literal values, the assembler accepts the widely used number formats: A
-preceeding '&dollar;' or a trailing 'h' denotes a hex value, a preceeding '%'
-denotes a binary value, and a bare number is interpeted as a decimal. There
+preceding '&dollar;' or a trailing 'h' denotes a hex value, a preceding '%'
+denotes a binary value, and a bare number is interpreted as a decimal. There
 are currently no octal values and no floats.
 
 
@@ -465,7 +465,7 @@ the result is known.
 
 In the context of a boolean expression, any non zero value is evaluated as
 true, any other value to false. The result of a boolean expression is 1 if
-it's true, and zero if it's false. There are boolean operators with extrem
+it's true, and zero if it's false. There are boolean operators with extreme
 low precedence with version 2.x (where x &gt; 0). The <tt/.AND/ and <tt/.OR/
 operators are shortcut operators. That is, if the result of the expression is
 already known, after evaluating the left hand side, the right hand side is
@@ -784,7 +784,7 @@ value needs absolute addressing mode, this fails, and an error message "Range
 error" is output.
 
 Of course the most simple solution for the problem is to move the definition
-of <tt/foo/ in scope <tt/inner/ upwards, so it preceeds its use. There may be
+of <tt/foo/ in scope <tt/inner/ upwards, so it precedes its use. There may be
 rare cases when this cannot be done. In these cases, you can use one of the
 address size override operators:
 
@@ -864,7 +864,7 @@ The only way to deny access to a scope from the outside is to declare a scope
 without a name (using the <tt/<ref id=".SCOPE" name=".SCOPE">/ command).
 
 A special syntax is used to specify the global scope: If a symbol or scope is
-preceeded by the namespace token, the global scope is searched:
+preceded by the namespace token, the global scope is searched:
 
 <tscreen><verb>
         bar     = 3
@@ -884,7 +884,7 @@ the scope is found.
 
 However, one important thing to note when using explicit scope syntax is, that
 a symbol may be accessed before it is defined, but a scope may <bf/not/ be
-used without a preceeding definition. This means that in the following
+used without a preceding definition. This means that in the following
 example:
 
 <tscreen><verb>
@@ -1154,7 +1154,7 @@ either a string or an expression.
 
   Builtin string function. The function allows to concatenate a list of string
   constants separated by commas. The result is a string constant that is the
-  concatentation of all arguments. This function is most useful in macros and
+  concatenation of all arguments. This function is most useful in macros and
   when used together with the <tt/.STRING/ builtin function. The function may
   be used in any case where a string constant is expected.
 
@@ -1238,14 +1238,14 @@ either a string or an expression.
   Example:
 
   To check in a macro if the given argument has a '#' as first token
-  (immidiate addressing mode), use something like this:
+  (immediate addressing mode), use something like this:
 
   <tscreen><verb>
     	.macro 	ldax	arg
     	       	...
     	       	.if (.match (.left (1, {arg}), #))
 
-    	       	; ldax called with immidiate operand
+    	       	; ldax called with immediate operand
     	       	...
 
     	       	.endif
@@ -1352,14 +1352,14 @@ either a string or an expression.
   Example:
 
   To check in a macro if the given argument has a '<tt/#/' as first token
-  (immidiate addressing mode), use something like this:
+  (immediate addressing mode), use something like this:
 
     <tscreen><verb>
   	.macro	ldax	arg
     		...
     		.if (.match (.mid (0, 1, {arg}), #))
 
-    		; ldax called with immidiate operand
+    		; ldax called with immediate operand
     		...
 
     		.endif
@@ -1539,7 +1539,7 @@ either a string or an expression.
 <sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
 
   Builtin function. The function accepts a string argument in braces and
-  eveluates to the length of the string.
+  evaluates to the length of the string.
 
   Example:
 
@@ -1564,14 +1564,14 @@ either a string or an expression.
 
   Example:
 
-  The <tt/ldax/ macro accepts the '#' token to denote immidiate addressing (as
+  The <tt/ldax/ macro accepts the '#' token to denote immediate addressing (as
   with the normal 6502 instructions). To translate it into two separate 8 bit
   load instructions, the '#' token has to get stripped from the argument:
 
   <tscreen><verb>
     	.macro	ldax	arg
     	   	.if (.match (.mid (0, 1, {arg}), #))
-    	   	; ldax called with immidiate operand
+    	   	; ldax called with immediate operand
 	   	lda	#<(.right (.tcount ({arg})-1, {arg}))
 	   	ldx	#>(.right (.tcount ({arg})-1, {arg}))
 	   	.else
@@ -1624,7 +1624,7 @@ Here's a list of all control commands and a description, what they do:
   Valid only in 65816 mode. Switch the accumulator to 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
-  create 16 bit operands for immediate accumulator adressing mode.
+  create 16 bit operands for immediate accumulator addressing mode.
 
   See also: <tt><ref id=".SMART" name=".SMART"></tt>
 
@@ -1634,7 +1634,7 @@ Here's a list of all control commands and a description, what they do:
   Valid only in 65816 mode. Switch the accumulator to 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
-  create 8 bit operands for immediate accu adressing mode.
+  create 8 bit operands for immediate accu addressing mode.
 
   See also: <tt><ref id=".SMART" name=".SMART"></tt>
 
@@ -1722,7 +1722,7 @@ Here's a list of all control commands and a description, what they do:
   giving errors. When switched off (which is the default so this does not
   make much sense), this does not happen and an error message is
   displayed. The state of the autoimport flag is evaluated when the
-  complete source was translated, before outputing actual code, so it is
+  complete source was translated, before outputting actual code, so it is
   <em/not/ possible to switch this feature on or off for separate sections
   of code. The last setting is used for all symbols.
 
@@ -1824,7 +1824,7 @@ Here's a list of all control commands and a description, what they do:
 
   <tt/.CONDES/ is followed by the type, which may be <tt/constructor/,
   <tt/destructor/ or a numeric value between 0 and 6 (where 0 is the same as
-  specifiying <tt/constructor/ and 1 is equal to specifying <tt/destructor/).
+  specifying <tt/constructor/ and 1 is equal to specifying <tt/destructor/).
   The <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
   id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
   name=".INTERRUPTOR"></tt> commands are actually shortcuts for <tt/.CONDES/
@@ -2053,8 +2053,8 @@ Here's a list of all control commands and a description, what they do:
   otherwise the enumeration members are placed in the enclosing scope.
 
   In the enumeration body, symbols are declared. The first symbol has a value
-  of zero, and each following symbol will get the value of the preceeding plus
-  one. This behaviour may be overriden by an explicit assignment. Two symbols
+  of zero, and each following symbol will get the value of the preceding plus
+  one. This behaviour may be overridden by an explicit assignment. Two symbols
   may have the same value.
 
   Example:
@@ -2109,7 +2109,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.ERROR</tt><label id=".ERROR"><p>
 
   Force an assembly error. The assembler will output an error message
-  preceeded by "User error" and will <em/not/ produce an object file.
+  preceded by "User error" and will <em/not/ produce an object file.
 
   This command may be used to check for initial conditions that must be
   set before assembling a source file.
@@ -2132,7 +2132,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.EXITMAC, .EXITMACRO</tt><label id=".EXITMACRO"><p>
 
-  Abort a macro expansion immidiately. This command is often useful in
+  Abort a macro expansion immediately. This command is often useful in
   recursive macros. See separate section <ref id="macros" name="Macros">.
 
 
@@ -2159,7 +2159,7 @@ Here's a list of all control commands and a description, what they do:
 
   Make symbols accessible from other modules. Must be followed by a comma
   separated list of symbols to export. The exported symbols are explicitly
-  marked as zero page symols.
+  marked as zero page symbols.
 
   Example:
 
@@ -2252,7 +2252,7 @@ Here's a list of all control commands and a description, what they do:
         lda     #'a
     </verb></tscreen>
     <bf/Note:/ This does not work in conjunction with <tt/.FEATURE
-    loose_string_term/, since in this case the input would be ambigous.
+    loose_string_term/, since in this case the input would be ambiguous.
 
   <tag><tt>pc_assignment</tt></tag>
 
@@ -2359,7 +2359,7 @@ Here's a list of all control commands and a description, what they do:
   source, are exported, all others are imported. Additional <tt><ref
   id=".IMPORTZP" name=".IMPORTZP"></tt> or <tt><ref id=".EXPORTZP"
   name=".EXPORTZP"></tt> commands for the same symbol are allowed. The symbols
-  in the list are explicitly marked as zero page symols.
+  in the list are explicitly marked as zero page symbols.
 
   Example:
 
@@ -2392,7 +2392,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.IF</tt><label id=".IF"><p>
 
-  Conditional assembly: Evalute an expression and switch assembler output
+  Conditional assembly: Evaluate an expression and switch assembler output
   on or off depending on the expression. The expression must be a constant
   expression, that is, all operands must be defined.
 
@@ -2794,7 +2794,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.OUT</tt><label id=".OUT"><p>
 
   Output a string to the console without producing an error. This command
-  is similiar to <tt/.ERROR/, however, it does not force an assembler error
+  is similar to <tt/.ERROR/, however, it does not force an assembler error
   that prevents the creation of an object file.
 
   Example:
@@ -3169,7 +3169,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.WARNING</tt><label id=".WARNING"><p>
 
   Force an assembly warning. The assembler will output a warning message
-  preceeded by "User warning". This warning will always be output, even if
+  preceded by "User warning". This warning will always be output, even if
   other warnings are disabled with the <tt><ref id="option-W" name="-W0"></tt>
   command line option.
 
@@ -3277,7 +3277,7 @@ When using macro parameters, macros can be even more useful:
   	.endmacro
 </verb></tscreen>
 
-When calling the macro, you may give a parameter, and each occurence of
+When calling the macro, you may give a parameter, and each occurrence of
 the name "addr" in the macro definition will be replaced by the given
 parameter. So
 
@@ -3301,7 +3301,7 @@ A macro may have more than one parameter, in this case, the parameters
 are separated by commas. You are free to give less parameters than the
 macro actually takes in the definition. You may also leave intermediate
 parameters empty. Empty parameters are replaced by empty space (that is,
-they are removed when the macro is exanded). If you have a look at our
+they are removed when the macro is expanded). If you have a look at our
 macro definition above, you will see, that replacing the "addr" parameter
 by nothing will lead to wrong code in most lines. To help you, writing
 macros with a variable parameter list, there are some control commands:
@@ -3429,7 +3429,7 @@ Macros may be used recursively:
 
 There's also a special macro to help writing recursive macros: <tt><ref
 id=".EXITMACRO" name=".EXITMACRO"></tt> This command will stop macro expansion
-immidiately:
+immediately:
 
 <tscreen><verb>
   	.macro 	push   	r1, r2, r3, r4, r5, r6, r7
@@ -3953,7 +3953,7 @@ be requested separately.
 
 <item>
 Constructors and destructors may have priorities. These priorities determine
-the order of the functions in the table. If your intialization or cleanup code
+the order of the functions in the table. If your initialization or cleanup code
 does depend on other initialization or cleanup code, you have to choose the
 priority for the functions accordingly.
 

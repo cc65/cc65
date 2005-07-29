@@ -547,7 +547,7 @@ example above. Let's have a look at it now.
 
 The "file" attribute (the keyword may also be written as "FILE" if you like
 that better) takes a string enclosed in double quotes (`"') that specifies the
-file, where the data is written. You may specifiy the same file several times,
+file, where the data is written. You may specify the same file several times,
 in that case the data for all memory areas having this file name is written
 into this file, in the order of the memory areas defined in the <tt/MEMORY/
 section. Let's specify some file names in the <tt/MEMORY/ section used above:
@@ -602,7 +602,7 @@ about <tt/DATA/? <tt/DATA/ contains initialized data, that is, data that was
 explicitly assigned a value. And your program will rely on these values on
 startup. Since there's no other way to remember the contents of the data
 segment, than storing it into one of the ROMs, we have to put it there. But
-unfortunately, ROM is not writeable, so we have to copy it into RAM before
+unfortunately, ROM is not writable, so we have to copy it into RAM before
 running the actual code.
 
 The linker cannot help you copying the data from ROM into RAM (this must be

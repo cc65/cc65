@@ -148,8 +148,8 @@ Here is a description of all the command line options:
 
   Specify the start/load address of the binary code that is going to be
   disassembled. The given address is interpreted as an octal value if
-  preceeded with a '0' digit, as a hexadecimal value if preceeded 
-  with '0x', '0X', or '$', and as a decimal value in all other cases. If no 
+  preceded with a '0' digit, as a hexadecimal value if preceded
+  with '0x', '0X', or '$', and as a decimal value in all other cases. If no
   start address is specified, $10000 minus the size of the input file is used.
 
 
@@ -412,7 +412,7 @@ code. The following attributes are recognized:
   label.
 
   <tag><tt>SIZE</tt></tag>
-  This attribute is optional and may be used to specifiy the size of the data
+  This attribute is optional and may be used to specify the size of the data
   that follows. If a size greater than 1 is specified, the disassembler will
   create labels in the form <tt/label+offs/ for all bytes within the given
   range, where <tt/label/ is the label name given with the <tt/NAME/

@@ -55,6 +55,7 @@
 #include "exports.h"
 #include "global.h"
 #include "o65.h"
+#include "objdata.h"
 #include "scanner.h"
 #include "spool.h"
 
@@ -1355,6 +1356,7 @@ static void ParseSymbols (void)
 
 	long Val = 0L;
         int  Weak = 0;
+        Export* E;
 
 	/* Remember the name */
 	unsigned Name = GetStringId (CfgSVal);
@@ -1446,7 +1448,7 @@ static void ParseSymbols (void)
         }
 
         /* Check if the symbol is already defined */
-        if (FindExport (Name) != 0) {
+        if ((E = FindExport (Name)) != 0 && !IsUnresolvedExport (E)) {
             /* If the symbol is not marked as weak, this is an error.
              * Otherwise ignore the symbol from the config.
              */
@@ -1458,8 +1460,8 @@ static void ParseSymbols (void)
             CreateConstExport (Name, Val);
         }
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
+    	/* Skip the semicolon */
+    	CfgConsumeSemi ();
     }
 
     /* Remember we had this section */

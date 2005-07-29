@@ -277,7 +277,7 @@ function.
 <item><ref id="mouse_buttons" name="mouse_buttons">
 <item><ref id="mouse_pos" name="mouse_pos">
 <item><ref id="mouse_info" name="mouse_info">
-<!-- <item><ref id="mouse_ioctl" name="mouse_ioctl"> -->
+<item><ref id="mouse_ioctl" name="mouse_ioctl">
 </itemize>
 
 (incomplete)
@@ -3395,6 +3395,31 @@ used in presence of a prototype.
 <ref id="mouse_load_driver" name="mouse_load_driver">,
 <ref id="mouse_uninstall" name="mouse_uninstall">,
 <ref id="mouse_unload" name="mouse_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_ioctl<label id="mouse_ioctl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Call the driver specific ioctl function.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ mouse_ioctl (unsigned char code, void* data);/
+<tag/Description/The function calls the IOCTL entry in the mouse driver,
+which is driver specific. The <tt/code/ parameter will choose between
+different IOCTL functions, and the <tt/data/ depends on code. The
+function returns an error code. The purpose of this function is to allow
+for driver specific extensions. See the documentation for a specific mouse
+driver for supported ioctl calls.
+<tag/Limits/<itemize>
+<item>Calling this function is non portable, because each driver may
+implement different ioctl calls (or none at all).
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
 <tag/Example/None.
 </descrip>
 </quote>

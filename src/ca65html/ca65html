@@ -687,23 +687,21 @@ sub Process2 {
        	    $OutLine .= $&;
 
      	    # Print all identifiers if there are any
-     	    while ($Line =~ /^([_a-zA-Z]\w*)(.*)$/) {
-     		if (exists ($Labels{$OutName}{$1})) {
-     		    $Label = $Labels{$OutName}{$1};
-       	       	    $OutLine .= sprintf ("<a href=\"#%s\">%s</a>", $Label, $1);
-     		} else {
-     		    $OutLine .= $1;
-     		}
-     		$Line = $2;
-     		if ($Line =~ s/^\s*,\s*//) {
-     		    $OutLine .= $&;
-     		} else {
-     		    last;
-     		}
-     	    }
+       	    while ($Line =~ /^([^_a-zA-Z]*)([_a-zA-Z]\w*)(.*)$/) {
+                # Add the non label stuff
+                $OutLine .= Cleanup ($1);
 
-     	    # Add an remainder if there is one
-     	    $OutLine .= Cleanup ($Line);
+                # If the identifier is a known label, add a link
+     		if (exists ($Labels{$OutName}{$2})) {
+     		    $Label = $Labels{$OutName}{$2};
+       	       	    $OutLine .= sprintf ("<a href=\"#%s\">%s</a>", $Label, $2);
+     		} else {
+     		    $OutLine .= $2;
+     		}
+
+                # Proceed with the remainder of the line
+     		$Line = $3;
+     	    }
 
 	# Handle .proc
        	} elsif ($Line =~ /^(\.proc)(\s+)([_a-zA-Z]\w*)?(.*)$/) {

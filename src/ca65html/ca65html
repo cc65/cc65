@@ -703,6 +703,9 @@ sub Process2 {
      		$Line = $3;
      	    }
 
+     	    # Add an remainder if there is one
+     	    $OutLine .= Cleanup ($Line);
+
 	# Handle .proc
        	} elsif ($Line =~ /^(\.proc)(\s+)([_a-zA-Z]\w*)?(.*)$/) {
 

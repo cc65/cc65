@@ -1,0 +1,388 @@
+<!doctype linuxdoc system>
+<article>
+
+<!-- Title information -->
+
+<title>grc -- GEOS Resource Compiler
+<author><url name="Maciej 'YTM/Elysium' Witkowiak" url="mailto:ytm@elysium.pl">
+<and><url name="Greg King" url="mailto:gngking@erols.com">
+<date>VII 2000; VI,VII 2002; 2005-8-3
+<abstract>
+This document describes a compiler that can create GEOS headers and menues for,
+and VLIR files from, cc65-compiled programs.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview
+<p><bf/grc/ is a part of cc65's GEOS support.  The tool is necessary to
+generate required and optional resources.  A required resource for every GEOS
+application is the header, that is:  an icon, some strings, and some addresses.
+Optional resources might be menu definitions, other headers (e.g., for data
+files of an app.), dialog definitions, etc.  Without an application's header,
+GEOS is unable to load and start it.
+
+Currently, <bf/grc/ supports only menues and the required header definition,
+along with support for building VLIR-structured files.
+
+<bf/grc/ generates output in three formats:  C header, <bf/ca65/ source (.s),
+and, for linking VLIR, <bf/ld65/ configuration script.  That is because
+application header data must be in assembly format, while menu definitions can
+be translated easily into C.  The purpose of the C file is to include it as a
+header in only one project file.  The assembly source should be processed by
+<bf/ca65/, and linked as the first object (read about <ref
+name="the building process" id="building-seq">).  The VLIR structure currently
+is supported for only projects that are written entirely in assembly code.
+
+<bf/grc/ can be used also as a handy VLIR linker -- used to build
+VLIR-structured <tt/.cvt/ files out of prepared binary chains.
+
+
+
+<sect>Usage
+<p>grc accepts the following options:<tscreen><verb>
+-f         force the writing of the output files
+-o name    name the .c output file
+-s name    name the .s output file
+-l name    name the ld65 output file
+-h         show this help
+</verb></tscreen>
+When used as a VLIR linker, the correct syntax is:<tscreen><verb>
+ grc -vlir output.cvt header.bin vlir0.bin vlir1.bin ...
+</verb></tscreen>
+Default output names are made from input names with extensions replaced by
+<tt/.h/ and <tt/.s/.  <bf/grc/ will not overwrite existing files unless forced
+to do so.  That is done to avoid situations where you have <tt/test.c/ and
+<tt/test.grc/ files.  Both would put their output into <tt/test.s/.  For that
+reason, you should name your resource-files differently than sources, e.g.,
+<tt/resource.grc/ or <tt/apphead.grc/.
+
+
+
+<sect>Resource file format
+<p>A resource file has the name extension <tt/.grc/.  That is not required, but
+it will make for an easier recognition of the file's purpose.  Also, <bf/cl65/
+recognizes those files.  <bf/grc/'s parser is very weak, at the moment; so,
+read the comments carefully, and write resources exactly as they are written
+here.  Look out for CAPS. and small letters.  Everything after a '<tt/;/',
+until the end of the line, is considered as a comment, and ignored.  See the
+included <ref name="commented example .grc file" id="example-grc"> for a
+better view of the problem.
+
+
+<sect1>Menu definition
+<p><tscreen><verb>
+MENU menuName leftx,topy <ORIENTATION> {
+    "item name 1" <MENU_TYPE> pointer
+    ...
+    "item name x" <MENU_TYPE> pointer
+}</verb></tscreen>
+The definition starts with the keyword <tt/MENU/, then goes the menu's name,
+which will be represented in C as <tt/const void/.  Then are the co-ordinates
+of the top left corner of the menu box.  The position of the bottom right
+corner is estimated, based on the length of item names and the menu's
+orientation.  It means that the menu box always will be as large as it should
+be.  Then, there's the orientation keyword; it can be either <tt/HORIZONTAL/ or
+<tt/VERTICAL/.  Between <tt/&lcub;/ and <tt/&rcub;/, there's the menu's
+content.  It consists of item definitions.  First is an item name -- it has to
+be in quotes.  Next is a menu-type bit.  It can be <tt/MENU_ACTION/ or
+<tt/SUB_MENU/; either of them can be combined with the <tt/DYN_SUB_MENU/ bit
+(see <url name="the GEOSLib documentation" url="geos.html"> for descriptions of
+them).  You can use C logical operators in expressions, but you have to do it
+without spaces.  So, a dynamically created submenu will be something like:
+<tscreen><verb>
+"dynamic" SUB_MENU|DYN_SUB_MENU create_dynamic</verb></tscreen>
+The last part of the item definition is a pointer which can be any name that is
+present in the C source code that includes the generated header.  It can point
+to a function or to another menu definition.
+
+If you are doing sub(sub)menu definitions, remember to place the lowest level
+definition first, and the top-level menu as the last one.  That way, the C
+compiler won't complain about unknown names.
+
+
+<sect1>Header definition
+<p><tscreen><verb>
+HEADER <GEOS_TYPE> "dosname" "classname" "version" {
+    author    "Joe Schmoe"
+    info      "This is my killer-app!"
+    date      yy mm dd hh ss
+    dostype   SEQ
+    mode      any
+    structure SEQ
+}</verb></tscreen>
+The header definition describes the GEOS header sector which is unique to
+each file.  Currently, there's no way to change the default <bf/grc/ icon
+(an empty frame).  It will be possible in the next version.  The definition
+starts with the keyword <tt/HEADER/, then goes the GEOS file-type.  You can use
+only <tt/APPLICATION/ here at the moment.  Then, there are (each one in quotes)
+the DOS file-name (up to 16 characters), the GEOS Class name (up to 12
+characters), and the version info (up to 4 characters).  The version should be
+written as &dquot;<tt/V/x.y&dquot;, where <em/x/ is the major, and <em/y/ is
+the minor, version number.  Those fields, along with both braces, are required.
+The lines between braces are optional, and will be replaced by default and
+current values.  The keyword <tt/author/ and its value in quotes name the
+programmer, and can be up to 63 bytes long.  <tt/info/ (in the same format) can
+have up to 95 characters.  If the <tt/date/ field is omitted, then the time of
+that compilation will be placed into the header.  Note that, if you do specify
+the date, you have to write all 5 numbers.  The <tt/dostype/ can be <tt/SEQ/,
+<tt/PRG/, or <tt/USR/.  <tt/USR/ is used by default; GEOS usually doesn't care.
+The <tt/mode/ can be <tt/any/, <tt/40only/, <tt/80only/, or <tt/c64only/; and,
+it describes system requirements.  <tt/any/ will work on both 64-GEOS and
+128-GEOS, in 40- and 80-column modes.  <tt/40only/ will work on 128-GEOS in
+40-column mode only.  <tt/80only/ will work on only 128-GEOS in 80-column mode,
+and <tt/c64only/ will work on only 64-GEOS.  The default value for
+<tt/structure/ is <tt/SEQ/ (sequential).  You can put <tt/VLIR/ there, too; but
+then, you also have to put in a third type of resource -- a VLIR-table
+description.
+
+
+<sect1>VLIR table description
+<p><tscreen><verb>
+VLIR headname address {
+    vlir0
+    blank
+    vlir2
+    blank
+    vlir4
+}</verb></tscreen>
+The first element is the keyword <tt/VLIR/, then goes the name for the header
+binary file (read below), and the base address for all VLIR chains that are
+different from 0.  It can be either decimal (e.g., <tt/4096/) or hexadecimal
+with a <tt/0x/ prefix (e.g., <tt/0x1000/).  Then, between braces are the names
+of VLIR chain binaries or the keyword <tt/blank/ which denotes empty chains.
+In the example, chains #1 and #3 are missing.  The names between braces are
+the names of binaries that contain code for each VLIR part.  They matter only
+for the generated <bf/ld65/ configuration file, and will be the names of the
+resulting binary files after linking.  Each one will contain one VLIR chain;
+and, they will have to be put together, in the correct order, into a VLIR
+<tt/.cvt/ file, by <bf/grc/ in its VLIR linker mode.
+
+The <tt/headname/ will be the name for the binary file which will contain only
+a GEOS <tt/.cvt/ header made out of compiling the <tt/.s/ header file that also
+was generated by <bf/grc/.  At the end of the resulting <bf/ld65/ config. file
+(<tt/.cfg/), in comments, there will be information about what commands are
+required for putting the stuff together.  Read <ref name="this description"
+id="building-vlir"> for details.
+
+
+
+<sect>Building a GEOS sequential application<label id="building-seq">
+<p>Before proceeding, please read the <url name="compiler" url="cc65.html">,
+<url name="assembler" url="ca65.html">, and <url name="linker" url="ld65.html">
+documentation, and find the appropriate sections about building programs, in
+general.
+
+GEOS support in cc65 is based on the <em/Convert v2.5/ format, well-known in
+the GEOS world.  It means that each file built with the cc65 package has to be
+deconverted, in GEOS, before it can be run.  You can read a step-by-step
+description of that in the GEOS section of the <url name="cc65 Compiler Intro"
+url="intro.html">.
+
+Each project consists of four parts, two are provided by cc65.  Those parts
+are:<enum>
+<item>application header
+<item>start-up object
+<item>application objects
+<item>system library
+</enum>
+<bf/2./ and <bf/4./ are with cc65; you have to write the application,
+yourself. ;-)
+
+The application header is defined in the <tt/HEADER/ section of the <tt/.grc/
+file, and processed into an assembly <tt/.s/ file.  You must assemble it, with
+<bf/ca65/, into the object <tt/.o/ format.
+
+
+<sect1>Building a GEOS application without cl65
+<p>Assume that there are three input files:  &dquot;<tt/test.c/&dquot; (a C
+source), &dquot;<tt/test.h/&dquot; (a header file), and
+&dquot;<tt/resource.grc/&dquot; (with menu and header definitions).  Note the
+fact that I <em/don't recommend/ naming that file &dquot;<tt/test.grc/&dquot;,
+because you will have to be very careful with names (<bf/grc/ will make
+&dquot;<tt/test.s/&dquot; and &dquot;<tt/test.h/&dquot; out of
+&dquot;<tt/test.grc/&dquot;, by default; and, you don't want that because
+&dquot;<tt/test.s/&dquot; is compiled from &dquot;<tt/test.c/&dquot;, and
+&dquot;<tt/test.h/&dquot; is something completely different)!
+
+<bf/One important thing/ -- the top of &dquot;<tt/test.c/&dquot; looks like:
+<tscreen><verb>
+#include <geos.h>
+#include "resource.h"
+</verb></tscreen>
+There are no other includes.
+
+<sect2>First step -- compiling the resources
+<p><verb>
+$ grc resource.grc
+</verb>
+will produce two output files:  &dquot;<tt/resource.h/&dquot; and
+&dquot;<tt/resource.s/&dquot;.
+
+Note that &dquot;<tt/resource.h/&dquot; is included at the top of
+&dquot;<tt/test.c/&dquot;.  So, resource compiling <em/must be/ the first step.
+
+<sect2>Second step -- assembling the application header
+<p><verb>
+$ ca65 -t geos resource.s
+</verb>
+And, voil&aacute; -- &dquot;<tt/resource.o/&dquot; is ready.
+
+<sect2>Third step -- compiling the code
+<p><verb>
+$ cc65 -t geos -O test.c
+$ ca65 -t geos test.s
+</verb>
+That way, you have a &dquot;<tt/test.o/&dquot; object file which
+contains all of the executable code.
+
+<sect2>Fourth and last step -- linking it together
+<p><verb>
+$ ld65 -t geos -o test.cvt resource.o geos.o test.o geos.lib
+</verb>
+&dquot;<tt/resource.o/&dquot; comes first because it contains the
+header.  The next one is &dquot;<tt/geos.o/&dquot;, a required starter-code
+file; then, the actual application code in &dquot;<tt/test.o/&dquot;, and the
+last is the GEOS system library.
+
+The resulting file &dquot;<tt/test.cvt/&dquot; is an executable that's
+contained in the well-known GEOS <em/Convert/ format.  Note that it's name
+(<tt/test/) isn't important; the real name, after deconverting, is the DOS name
+that was given in the header definition.
+
+At each step, a <tt/-t geos/ was present on the command-line.  That switch is
+required for the correct process of GEOS sequential app. building.
+
+
+
+<sect>Building a GEOS VLIR application<label id="building-vlir">
+<p>Currently, you can build VLIR applications only if your code is written in
+assembly -- no C code allowed.
+
+In your sources, only the command <tt/.segment &dquot;/<em/NAME/<tt/&dquot;/
+will decide which code/data goes where.  File-names don't matter.  Segments
+<tt/CODE/, <tt/RODATA/, <tt/DATA/, and <tt/BSS/ go into VLIR part #0.  Segment
+<tt/VLIR1/ goes into VLIR part #1, <tt/VLIR2/ goes into VLIR part #2, and so
+on.
+
+The GEOS resource file's contents are similar to <ref
+name="the sequential-file example" id="building-seq">, but there also is a
+<tt/VLIR/ section and a <tt/structure VLIR/ tag.  Here is that part:<tscreen>
+<verb>
+VLIR vlir-head.bin 0x3000 {
+  vlir-0.bin    ; CODE, RODATA, DATA, BSS
+  vlir-1.bin    ; VLIR1
+  vlir-2.bin    ; VLIR2
+}</verb></tscreen>
+(Source files are only <tt/.s/.)
+
+OK, we have &dquot;<tt/cvthead.grc/&dquot;, so let's allow <bf/grc/ to compile
+it:<verb>
+$ grc cvthead.grc
+</verb>
+Now, there are two new files:  &dquot;<tt/cvthead.cfg/&dquot; and
+&dquot;<tt/cvthead.s/&dquot; -- the first one is a config. file for <bf/ld65/,
+and the second one contains the GEOS <tt/.cvt/ header.  It can be assembled:
+<verb>
+$ ca65 -t geos cvthead.s
+</verb>
+Now, we have &dquot;<tt/cvthead.o/&dquot;.  The rest of the assembly
+sources can be assembled:<verb>
+$ ca65 -t geos vlir0.s
+$ ca65 -t geos vlir1.s
+$ ca65 -t geos vlir2.s
+</verb>
+Note that the file-names here, although similar to those from the
+<tt/VLIR/ section of the <tt/.grc/ file, are not significant.  The only thing
+that matters is which code will go into which segment.
+
+Now, we can generate binaries.  This time, the order of the arguments on the
+command-line is not important.<verb>
+$ ld65 -C cvthead.cfg vlir1.o cvthead.o vlir0.o vlir2.o
+</verb>
+As defined in the <tt/.grc/ file, we now have the binary parts of the
+VLIR file:  &dquot;<tt/vlir-head.bin/&dquot;, &dquot;<tt/vlir-0.bin/&dquot;,
+&dquot;<tt/vlir-1.bin/&dquot;, and &dquot;<tt/vlir-2.bin/&dquot;.
+
+The last step is to put them together in the right order -- the order of the
+arguments <em/is important/ this time!  As suggested in the comments at the end
+of &dquot;<tt/cvthead.cfg/&dquot;, we do:<verb>
+$ grc -vlir output.cvt vlir-head.bin vlir-0.bin vlir-1.bin vlir-2.bin
+</verb>
+That is the end.  The file &dquot;<tt/output.cvt/&dquot; can be
+deconverted under GEOS.  Note that <tt/-C cvthead.cfg/ was used on the
+<bf/ld65/ command-line instead of the switch <tt/-t geos/.
+
+
+
+<sect>Bugs and feedback
+<p>This is the first release of <bf/grc/, and it contains bugs, for sure!  I am
+aware of them; I know that the parser is weak, and if you don't follow the
+grammar rules strictly, then everything will crash.  However, if you find an
+interesting bug, mail me. :-)  Mail me also for help with writing your
+<tt/.grc/ file correctly if you have problems with it.  I would appreciate
+comments also, and help on this file because I am sure that it can be written
+better.
+
+
+
+<sect>Legal stuff
+<p><bf/grc/ is covered by the same license as the whole cc65 package, so you
+should see its documentation for more info.  Anyway, if you like it, and want
+to encourage me to work more on it, send me a postcard with a sight of your
+neighbourhood, city, region, etc.  Or, just e-mail me with info that you
+actually used it.  See <url name="the GEOSLib documentation" url="geos.html">
+for addresses.
+
+
+
+<appendix>
+<sect>Appendix A -- example.grc<label id="example-grc">
+<p><tscreen><verb>
+; Note that MENU can define both menues and submenues.
+; If you want to use any C operators (such as "|", "&", etc.), do it WITHOUT
+; any spaces between the arguments (the parser is simple and weak).
+
+MENU subMenu1 15,0 VERTICAL
+; This is a vertical menu, placed at (15,0).
+{
+; There are three items, all of them will call functions.
+; The first and third ones are normal functions, see GEOSLib documentation for
+; information about what the second function should return (it's a dynamic one).
+    "subitem1" MENU_ACTION smenu1
+    "subitem2" MENU_ACTION|DYN_SUB_MENU smenu2
+    "subitem3" MENU_ACTION smenu3
+}
+
+;; Format:  MENU "name" left,top ALIGN { "itemname" TYPE pointer ... }
+
+MENU mainMenu 0,0 HORIZONTAL
+; Here, we have our main menu, placed at (0,0), and it is a horizontal menu.
+; Because it is a top-level menu, you would register it in your C source by
+; using:  DoMenu(&ero;mainMenu);
+{
+; There are two items -- a submenu and an action.
+; This calls a submenu named subMenu1 (see previous definition).
+    "first sub-menu" SUB_MENU subMenu1
+; This will work the same as an EnterDeskTop() call in C source code.
+    "quit" MENU_ACTION EnterDeskTop
+}
+
+;; Format:  HEADER <GEOS_TYPE> "dosname" "classname" "version"
+
+HEADER APPLICATION "MyFirstApp" "Class Name" "V1.0"
+; This is a header for an APPLICATION which will be seen in the directory as a
+; file named MyFirstApp with the Class-string "Class Name V1.0"
+{
+; Not all fields are required, default and current values will be used.
+    author "Maciej Witkowiak"	; always in quotes!
+    info "Information text"	; always in quotes!
+;    date yy mm dd hh ss	; always 5 fields!
+;    dostype seq		; can be:  PRG, SEQ, USR (only all UPPER- or lower-case)
+;    structure seq		; can be:  SEQ, VLIR (only UPPER- or lower-case)
+    mode c64only		; can be:  any, 40only, 80only, c64only
+}</verb></tscreen>
+</article>

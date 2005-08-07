@@ -12,7 +12,7 @@
 extern int getsp(void);                         /* comes from ../getsp.s */
 
 extern char _dos_type;                          /* bss variable */
-extern unsigned char _graphmode_used;           /* data variable */
+unsigned char data = 0x12;                      /* data variable */
 
 unsigned int *APPMHI = (unsigned int *)14;      /* 14,15 */
 unsigned char *RAMTOP = (unsigned char *)106;   /* in pages */
@@ -36,7 +36,7 @@ int main(void)
 
   printf("  ----------------------\n");
   printf("  main:            $%04X  (code)\n", &main);
-  printf("  _graphmode_used: $%04X  (data)\n", &_graphmode_used);
+  printf("  data:            $%04X  (data)\n", &data);
   printf("  _dos_type:       $%04X  (bss)\n", &_dos_type);
   printf("  allocmem:        $%04X  (dyn. data)\n", allocmem);
   printf("  sp:              $%04X  (stack ptr)\n", getsp());

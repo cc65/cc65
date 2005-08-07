@@ -155,22 +155,15 @@ APPLE2:	The program starts at $800, end of RAM is $8E00, so 33.5K of memory
 	(including stack) are available.
 
 Atari:  The startup code will adjust the upper memory limit to the installed
-        memory, considering future graphics memory usage (which is allocated
-        at top of RAM). The programmer can specify which graphics mode is
-        about to be used by defining a variable _graphmode_used, unsigned
-        char, to the mode value (mode values like Atari DOS, 0-31).
-	(Please note that graphics mode selection isn't supported in the
-	Atari runtime lib yet!)
-	In the default case the upper memory limit will be $8035 (with Basic
-        cartridge) and $A035 (without cartridge). This is the default which
-        leaves room for the biggest possible graphics mode. If only standard
-        text mode is used (_graphmode_used = 0), the values are $9C1F (with
-        Basic) and $BC1F (no cartridge).
-	The program starts at $1F00 (to leave room for DOS), and the free
-        memory values are $6135 (24K, Basic, default mode), $8135 (32K, no
-        Basic, default mode), $7D1F (31K, Basic, mode 0) and $9D1F (39K,
-        no Basic, mode 0).
-	These values are for a 48K or 64K machine.
+        memory detected at runtime. The programmer can adjust the upper memory
+        limit by setting the __RESERVED_MEMORY__ variable at link time. The
+        given __RESERVED_MEMORY__ value will be subtracted from the upper
+        memory limit used by the runtine. This memory could be used as graphics
+        memory, for example.
+        In the default case (no setting of __RESERVED_MEMORY__) the upper
+        memory limit is $9C1F (with Basic cartridge) and $BC1F (without
+        cartridge). The program starts at $2E00 by default.
+        These values are for a 48K or 64K machine.
 
 Note: The above numbers do not mean that the remaining memory is unusable.
 However, it is not linear memory and must be accessed by other, nonportable

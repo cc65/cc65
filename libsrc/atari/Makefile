@@ -84,7 +84,6 @@ OBJS = 	_scrsize.o      \
 	gotoy.o         \
 	gotoxy.o        \
 	graphics.o      \
-	graphuse.o      \
 	joy_stddrv.o    \
 	kbhit.o         \
 	lseek.o         \

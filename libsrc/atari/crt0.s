@@ -16,6 +16,7 @@
        	.import	       	zerobss, pushax
 	.import		_main, __filetab, getfd
 	.import		__LOWCODE_LOAD__, __BSS_LOAD__
+	.import		__RESERVED_MEMORY__
 .ifdef	DYNAMIC_DD
 	.import		__getdefdev
 .endif
@@ -68,10 +69,13 @@ L1:	lda	sp,x
 	lda	APPMHI+1
 	sta	appmsav+1
 
+	sec
 	lda	MEMTOP
+	sbc	#<__RESERVED_MEMORY__
 	sta	APPMHI			; initialize our APPMHI value
-	ldx	MEMTOP+1
-	stx	APPMHI+1
+	lda	MEMTOP+1
+	sbc	#>__RESERVED_MEMORY__
+	sta	APPMHI+1
 
 ; Call module constructors
 

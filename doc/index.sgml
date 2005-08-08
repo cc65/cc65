@@ -1,9 +1,9 @@
 <!doctype linuxdoc system>
 
 <article>
-<title>cc65 documentation overview
+<title>cc65 Documentation Overview
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>03.12.2000
+<date>2005-8-6
 
 <abstract>
 Main documentation page, contains links to other available stuff.
@@ -20,25 +20,30 @@ Main documentation page, contains links to other available stuff.
   Describes the ca65 macro assembler.
 
   <tag><htmlurl url="ca65html.html" name="ca65html.html"></tag>
-  Describes the ca65html assembler source to HTML converter.
+  Describes the ca65html assembler-source-to-HTML converter.
 
   <tag><htmlurl url="cc65.html" name="cc65.html"></tag>
   Describes the cc65 C compiler.
 
   <tag><htmlurl url="cl65.html" name="cl65.html"></tag>
-  Describes the cl65 compile & link utility.
+  Describes the cl65 compile &amp; link utility.
 
   <tag><htmlurl url="co65.html" name="co65.html"></tag>
-  Describes the co65 object file converter.
+  Describes the co65 object-file converter.
 
   <tag><htmlurl url="da65.html" name="da65.html"></tag>
   Describes the da65 6502/65C02 disassembler.
 
-  <tag><htmlurl url="grc.txt" name="grc.txt"></tag>
+  <tag><htmlurl url="grc.html" name="grc.html"></tag>
   Describes the GEOS resource compiler (grc).
 
   <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
   Describes the ld65 linker.
+
+<!--
+  <tag><htmlurl url="od65.html" name="od65.html"></tag>
+  Describes the od65 object-file analyzer.
+-->
 
 </descrip>
 
@@ -48,16 +53,17 @@ Main documentation page, contains links to other available stuff.
 <descrip>
 
   <tag><htmlurl url="intro.html" name="intro.html"></tag>
-  Describes the use of the tools by a short "hello world" example.
+  Describes the use of the tools, by building a short &dquot;hello world&dquot;
+  example.
 
   <tag><htmlurl url="coding.html" name="coding.html"></tag>
-  Containes hints on creating the most effective code with cc65.
+  Contains hints on creating the most effective code with cc65.
 
   <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
   How to compile cc65 and the support tools.
 
   <tag><htmlurl url="debugging.html" name="debugging.html"></tag>
-  Debug programs using the VICE emulator.
+  Debug programs, using the VICE emulator.
 
 </descrip>
 
@@ -70,7 +76,7 @@ Main documentation page, contains links to other available stuff.
   A (currently incomplete) function reference.
 
   <tag><htmlurl url="dio.html" name="dio.html"></tag>
-  Low level disk I/O API.
+  Low-level disk I/O API.
 
   <tag><htmlurl url="geos.html" name="geos.html"></tag>
   The GEOSLib manual.
@@ -81,18 +87,23 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="library.html" name="library.html"></tag>
   An overview over the cc65 runtime and C libraries.
 
+  <tag><url name="6502 Binary Relocation Format document"
+        url="http://www.6502.org/users/andre/o65/fileformat.html"></tag>
+  Describes the o65 file format that is used for dynamically loadable modules
+  and LUnix programs.
+
 </descrip>
 
 
-<sect>Platform specific information<p>
+<sect>Platform-specific information<p>
 
 <descrip>
 
   <tag><htmlurl url="apple2.html" name="apple2.html"></tag>
-  Topics specific to the Apple2&nbsp;][.
+  Topics specific to the Apple&nbsp;&rsqb;&lsqb;.
 
   <tag><htmlurl url="atari.html" name="atari.html"></tag>
-  Topics specific to the Atari 8 bit machines.
+  Topics specific to the Atari 8-bit machines.
 
   <tag><htmlurl url="atmos.html" name="atmos.html"></tag>
   Topics specific to the Oric Atmos.
@@ -132,14 +143,14 @@ Main documentation page, contains links to other available stuff.
 <descrip>
 
   <tag><htmlurl url="newvers.txt" name="newvers.txt"></tag>
-  Somewhat outdated. Lists the differences between the current cc65 release
-  and the original atari version created by J.R Dunning.
+  Somewhat outdated.  Lists the differences between my cc65 releases
+  and the original Atari version that was created by J. R. Dunning.
 
   <tag><htmlurl url="BUGS" name="BUGS"></tag>
-  Known compiler bugs.
+  Known cc65 bugs.
 
   <tag><htmlurl url="CREDITS" name="CREDITS"></tag>
-  Who helped with the compiler and tools?
+  Here is who helped with the compiler and other tools.
 
 </descrip>
 

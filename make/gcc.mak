@@ -137,7 +137,7 @@ install-docs:
 	for f in src/ld65/cfg/*.cfg; \
 	  do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
 	  done
-	for f in readme.1st grc.txt compile.txt CREDITS BUGS internal.txt newvers.txt; \
+	for f in readme.1st compile.txt CREDITS BUGS internal.txt newvers.txt; \
 	  do $(INSTALL_DATA) doc/$$f $(CC65DOC) || exit 1; \
 	  done
 	-for f in doc/*.html; \

@@ -152,6 +152,69 @@ chip registers.
 <sect1>Graphics drivers<p>
 
 Currently there are no graphics drivers available for the Atari platform.
+However, the runtime library provides a function named _graphics, with
+a mode parameter just like the DOS GRAPHICS command. This function will
+turn on the requested graphics mode.
+There are currently no functions available to access the graphics
+memory. The access must be implemented manually.
+
+Many graphics modes require more memory than the text screen which is
+in effect when the program starts up. Therefore the programmer has to
+tell the program beforehand the memory requirements of the graphics
+modes the program intends to use. 
+This can be done with the __RESERVED_MEMORY__ linker config
+variable. The number specified there describes the number of bytes to
+subtract from the top of available memory as seen from the runtime
+library. This memory is then used by the screen buffer.
+
+The numbers for the different graphics modes presented below should
+only be seen as a rule of thumb. Since the screen buffer memory needs
+to start at specific boundaries, the numbers depend on the current top
+of available memory.
+These numbers were determined by a BASIC program.
+
+<table>
+<tabular ca="rr">
+graphics mode|reserved memory@<hline>
+0|1@
+1|1@
+2|1@
+3|1@
+4|1@
+5|182@
+6|1182@
+7|3198@
+8|7120@
+9|7146@
+10|7146@
+11|7146@
+12|162@
+13|1@
+14|3278@
+15|7120@
+16|1@
+17|1@
+18|1@
+19|1@
+20|1@
+21|184@
+22|1192@
+23|3208@
+24|7146@
+25|7146@
+26|7146@
+27|7146@
+28|160@
+29|1@
+30|3304@
+31|7146
+</tabular>
+<caption>reserved memory required for different graphics modes
+</table>
+
+The values of "1" are needed because the graphics command crashes if
+it doesn't have at least one byte available. This seems to be a bug of
+the Atari ROM code.
 
 <sect1>Extended memory drivers<p>
 

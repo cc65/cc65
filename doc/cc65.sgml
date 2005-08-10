@@ -3,7 +3,7 @@
 <article>
 <title>cc65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>03.09.2000, 02.10.2001
+<date>03.09.2000, 02.10.2001, 2005-8-1
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -29,21 +29,22 @@ next release, since there are too many limitations in the current code,
 and removing these limitations would mean a rewrite of many more parts of
 the compiler.
 
-There is a separate document named "library.txt" that covers the library
-available for the compiler. If you know C and are interested in doing
-actual programming, the library documentation is probably of much more use
-than this document.
+There are separate documents named <url url="library.html"> and <url
+url="funcref.html"> that cover the library that is available for the compiler.
+If you know C, and are interested in doing actual programming, the library
+documentation is probably of much more use than this document.
 
 If you need some hints for getting the best code out of the compiler, you
-may have a look at "coding.txt" which covers some code generation issues.
+may have a look at <url url="coding.html"> which covers some code generation
+issues.
 
 
 
 <sect>Usage<p>
 
-The compiler translates C files into files containing assembler code that
+The compiler translates C files into files containing assembly code that
 may be translated by the ca65 macroassembler (for more information about
-the assembler, have a look at ca65.txt).
+the assembler, have a look at <url url="ca65.html">).
 
 
 <sect1>Command line option overview<p>
@@ -115,7 +116,7 @@ Here is a description of all the command line options:
   <tag><tt>--check-stack</tt></tag>
 
   Tells the compiler to generate code that checks for stack overflows. See
-  <tt><ref id="pragma-checkstack" name="#pragma checkstack"></tt> for an
+  <tt><ref id="pragma-checkstack" name="#pragma&nbsp;checkstack"></tt> for an
   explanation of this feature.
 
 
@@ -130,7 +131,7 @@ Here is a description of all the command line options:
   This options allows finer control about speed vs. size decisions in the code
   generation and optimization phases. It gives the allowed size increase
   factor (in percent). The default is 100 when not using <tt/-Oi/ and 200 when
-  using <tt/-Oi/ (<tt/-Oi/ is the same as <tt/--codesize 200/).
+  using <tt/-Oi/ (<tt/-Oi/ is the same as <tt/--codesize&nbsp;200/).
 
 
   <tag><tt>--cpu CPU</tt></tag>
@@ -200,7 +201,7 @@ Here is a description of all the command line options:
   name="register variables">.
 
   The compiler setting can also be changed within the source file by using
-  <tt><ref id="pragma-regvars" name="#pragma regvars"></tt>.
+  <tt><ref id="pragma-regvars" name="#pragma&nbsp;regvars"></tt>.
 
 
   <tag><tt>--register-space</tt></tag>
@@ -227,8 +228,8 @@ Here is a description of all the command line options:
   6502 has no provisions for sign extending characters (which is needed on
   almost any load operation), this will make the code larger and slower. A
   better way is to declare characters explicitly as "signed" if needed. You
-  can also use <tt><ref id="pragma-signedchars" name="#pragma
-  signedchars"></tt> for better control of this option.
+  can also use <tt><ref id="pragma-signedchars"
+  name="#pragma&nbsp;signedchars"></tt> for better control of this option.
 
 
   <label id="option--standard">
@@ -299,8 +300,8 @@ Here is a description of all the command line options:
    	}
   </verb></tscreen>
 
-  the variable a will always have the value 1 when entering the function
-  and using <tt/-Cl/, while in
+  the variable <tt/a/ will always have the value <tt/1/ when entering the
+  function and using <tt/-Cl/, while in
 
   <tscreen><verb>
    	void f (void)
@@ -310,12 +311,13 @@ Here is a description of all the command line options:
    	}
   </verb></tscreen>
 
-  the variable a will have the value 1 only the first time, the function
-  is entered, and will keep the old value from one call of the function to
-  the next.
+  the variable <tt/a/ will have the value <tt/1/ only the first time that the
+  function is entered, and will keep the old value from one call of the
+  function to the next.
 
-  You may also use <tt><ref id="pragma-staticlocals" name="#pragma
-  staticlocals"></tt> to change this setting in your sources.
+  You may also use <tt><ref id="pragma-staticlocals"
+  name="#pragma&nbsp;staticlocals"></tt> to change this setting in your
+  sources.
 
 
   <tag><tt>-I dir, --include-dir dir</tt></tag>
@@ -334,7 +336,7 @@ Here is a description of all the command line options:
   runtime functions would have been called, even if the generated code is
   larger. This will not only remove the overhead for a function call, but will
   make the code visible for the optimizer. <tt/-Oi/ is an alias for
-  <tt/--codesize 200/.
+  <tt/--codesize&nbsp;200/.
 
   <tt/-Or/ will make the compiler honor the <tt/register/ keyword. Local
   variables may be placed in registers (which are actually zero page
@@ -352,8 +354,9 @@ Here is a description of all the command line options:
      	<tt/-Os/ will actually break things.
      	<p>
   <item>The inlined string and memory functions will not handle strings or
-     	memory areas larger than 255 bytes. Similar, the inlined <tt/is..()/
-     	functions will not work with values outside char range.
+	memory areas larger than 255 bytes. Similarly, the inlined <tt/is..()/
+	functions will not work with values outside the char. range (such as
+	<tt/EOF/).
      	<p>
   </itemize>
   <p>
@@ -436,12 +439,12 @@ and the one defined by the ISO standard:
       	possible.
       	<p>
 <item>	Part of the C library is available only with fastcall calling
-	conventions (see below). This means, that you may not mix pointers to
-	those functions with pointers to user written functions.
+	conventions (see below).  It means that you must not mix pointers to
+	those functions with pointers to user-written, not-fastcall functions.
 	<p>
 </itemize>
 
-There may be some more minor differences, I'm currently not aware off. The
+There may be some more minor differences I'm currently not aware of. The
 biggest problem is the missing float data type. With this limitation in
 mind, you should be able to write fairly portable code.
 
@@ -471,9 +474,8 @@ This cc65 version has some extensions to the ISO C standard.
 	<ref id="inline-asm" name="see there">.
 	<p>
 
-<item>	There is a special calling convention named "fastcall". This calling
-     	convention is currently only usable for functions written in
-     	assembler. The syntax for a function declaration using fastcall is
+<item>	There is a special calling convention named "fastcall".
+     	The syntax for a function declaration using fastcall is
 
 	<tscreen><verb>
 	&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
@@ -549,29 +551,28 @@ This cc65 version has some extensions to the ISO C standard.
 	However, taking the address of the variable results in a <tt/void*/
 	which may be passed to any function expecting a pointer.
 
-	See the <htmlurl url="geos.html" name="GEOS library"> for examples on
-	how to use this feature.
+	See the <url url="geos.html" name="GEOS library document"> for examples
+	on how to use this feature.
 	<p>
 
 <item>  cc65 implements flexible array struct members as defined in the C99 ISO
         standard. As an extension, these fields may be initialized. There are
         several exceptions, however (which is probably the reason why the
         standard does not define this feature, because it is highly
-        unorthogonal). Flexible array members cannot be initialized...
+        unorthogonal). Flexible array members cannot be initialized ...
 
         <itemize>
-+	<!-- add &nbsp; to get rid of "..when undefined" message on Debian Woody -->
-        <item>  &nbsp;...when defining an array of structs with flexible 
+        <item>... when defining an array of structs with flexible
                 members.
-        <item>  &nbsp;...if such a struct is a member field of another struct 
+        <item>... if such a struct is a member field of another struct
                 which is not the last field.
-        <item>  If the struct which contains a flexible array member is
-                declared as <tt/register/ and the size and compiler settings
-                do allow the compiler to actually place the struct into the
+        <item>... if the struct which contains a flexible array member is
+                declared as <tt/register/, and the size and compiler settings
+                do allow the compiler actually to place the struct into the
                 register bank in the zero page.
         </itemize>
 
-        Please note that - as defined in the ISO C standard - the <tt/sizeof/
+        Please note that -- as defined in the ISO C standard -- the <tt/sizeof/
         operator returns the struct size with the flexible array member having
         size zero, even if it is initialized.
         <p>
@@ -589,8 +590,8 @@ The compiler defines several macros at startup:
   <tag><tt>__CC65__</tt></tag>
 
   This macro is always defined. Its value is the version number of the
-  compiler in hex. Version 2.0.1 of the compiler will have this macro defined
-  as 0x0201.
+  compiler in hex.  For example, version 2.10.1 of the compiler has this macro
+  defined as <tt/0x02A1/.
 
   <tag><tt>__APPLE2__</tt></tag>
 
@@ -703,7 +704,7 @@ The compiler defines several macros at startup:
 </descrip>
 
 
-<sect>#pragmas<label id="pragmas"><p>
+<sect>&num;pragmas<label id="pragmas"><p>
 
 The compiler understands some pragmas that may be used to change code
 generation and other stuff. Some of these pragmas understand a special form:
@@ -711,7 +712,7 @@ If the first parameter is <tt/push/, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <tt/pop/
 parameter with the <tt/#pragma/.
 
-<sect1><tt>#pragma bssseg (&lt;name&gt;)</tt><p>
+<sect1><tt>#pragma bssseg (&lsqb;push,&rsqb;&lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the BSS segment (the BSS segment
   is used to store uninitialized data). The argument is a string enclosed
@@ -752,8 +753,8 @@ parameter with the <tt/#pragma/.
     <itemize>
     <item>The character index is actually the code of the character in the
       	  C source, so character mappings do always depend on the source
-      	  character set. This means that <tt/#pragma charmap/ is not portable
-      	  - it depends on the build environment.
+      	  character set. This means that <tt/#pragma&nbsp;charmap/ is not
+	  portable -- it depends on the build environment.
     <item>While it is possible to use character literals as indices, the
       	  result may be somewhat unexpected, since character literals are
       	  itself translated. For this reason I would suggest to avoid
@@ -871,7 +872,7 @@ parameter with the <tt/#pragma/.
   declared as register. So your programs become non-portable if you use
   this pragma. In addition, your program may not work. This is usually the
   case if a subroutine is called with the address of a register variable,
-  and this subroutine (or a subroutine called from there) uses itself
+  and this subroutine (or a subroutine called from there) uses
   register variables. So be careful with this #pragma.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
@@ -926,7 +927,7 @@ parameter with the <tt/#pragma/.
 
 <sect1><tt>#pragma zpsym (&lt;name&gt;)</tt><p>
 
-  Tell the compiler that the - previously as external declared - symbol with
+  Tell the compiler that the -- previously as external declared -- symbol with
   the given name is a zero page symbol (usually from an assembler file).
   The compiler will create a matching import declaration for the assembler.
 
@@ -1022,9 +1023,9 @@ each format specifier, an argument is expected which is inserted instead of
 the format specifier before passing the assembly code line to the backend.
 
 <itemize>
-  <item><tt/%b/ - Numerical 8 bit value
-  <item><tt/%w/ - Numerical 16 bit value
-  <item><tt/%l/ - Numerical 32 bit value
+  <item><tt/%b/ - Numerical 8-bit value
+  <item><tt/%w/ - Numerical 16-bit value
+  <item><tt/%l/ - Numerical 32-bit value
   <item><tt/%v/ - Assembler name of a (global) variable or function
   <item><tt/%o/ - Stack offset of a (local) variable
   <item><tt/%g/ - Assembler name of a C label
@@ -1082,7 +1083,8 @@ a future version. Instead use the format specifiers from the table above:
 
 If you have problems using the compiler, if you find any bugs, or if you're
 doing something interesting with it, I would be glad to hear from you. Feel
-free to contact me by email (<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">).
+free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
+name="uz@cc65.org">).
 
 
 

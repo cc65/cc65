@@ -7,7 +7,7 @@
 url="mailto:shawnjefferson@24fightingchickens.com"
 name="shawnjefferson@24fightingchickens.com"> and 
 Christian Groessler, <htmlurl url="mailto:cpg@aladdin.de" name="cpg@aladdin.de">
-<date>20-Feb-2005
+<date>11-Aug-2005
 
 <abstract>
 An overview over the Atari runtime system as it is implemented for the cc65 C
@@ -153,7 +153,7 @@ chip registers.
 
 Currently there are no graphics drivers available for the Atari platform.
 However, the runtime library provides a function named _graphics, with
-a mode parameter just like the DOS GRAPHICS command. This function will
+a mode parameter just like the BASIC GRAPHICS command. This function will
 turn on the requested graphics mode.
 There are currently no functions available to access the graphics
 memory. The access must be implemented manually.

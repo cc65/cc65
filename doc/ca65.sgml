@@ -88,34 +88,36 @@ The assembler accepts the following options:
 Usage: ca65 [options] file
 Short options:
   -D name[=value]	Define a symbol
-  -I dir      		Set an include directory search path
-  -U	      		Mark unresolved symbols as import
-  -V	      		Print the assembler version
-  -W n	      		Set warning level n
-  -g	      		Add debug info to object file
-  -h	      		Help (this text)
-  -i	      		Ignore case of symbols
-  -l	      		Create a listing if assembly was ok
-  -o name     		Name the output file
-  -s	      		Enable smart mode
-  -t sys                Set the target system
-  -v	      		Increase verbosity
+  -I dir		Set an include directory search path
+  -U			Mark unresolved symbols as import
+  -V		      	Print the assembler version
+  -W n			Set warning level n
+  -g			Add debug info to object file
+  -h			Help (this text)
+  -i			Ignore case of symbols
+  -l			Create a listing if assembly was ok
+  -mm model		Set the memory model
+  -o name		Name the output file
+  -s			Enable smart mode
+  -t sys		Set the target system
+  -v			Increase verbosity
 
 Long options:
   --auto-import		Mark unresolved symbols as import
-  --cpu type  		Set cpu type
+  --cpu type		Set cpu type
   --debug-info		Add debug info to object file
-  --feature name        Set an emulation feature
-  --help      		Help (this text)
+  --feature name	Set an emulation feature
+  --help		Help (this text)
   --ignore-case		Ignore case of symbols
   --include-dir dir	Set an include directory search path
-  --list-bytes n        Maximum number of bytes per listing line
-  --listing   		Create a listing if assembly was ok
+  --listing		Create a listing if assembly was ok
+  --list-bytes n	Maximum number of bytes per listing line
+  --memory-model model	Set the memory model
   --pagelength n	Set the page length for the listing
-  --smart     		Enable smart mode
-  --target sys          Set the target system
-  --verbose   		Increase verbosity
-  --version   		Print the assembler version
+  --smart		Enable smart mode
+  --target sys		Set the target system
+  --verbose		Increase verbosity
+  --version		Print the assembler version
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -186,6 +188,12 @@ Here is a description of all the command line options:
   input. See the <tt><ref id=".LISTBYTES" name=".LISTBYTES"></tt> directive
   for more information. The value zero can be used to encode an unlimited
   number of printed bytes.
+
+
+  <tag><tt>-mm model, --memory-model model</tt></tag>
+
+  Define the default memory model. Possible model specifiers are near, far and
+  huge.
 
 
   <tag><tt>-o name</tt></tag>
@@ -289,7 +297,7 @@ contain a label (which is identified by a colon), and, in addition to the
 label, an assembler mnemonic, a macro, or a control command (see section <ref
 id="control-commands" name="Control Commands"> for supported control
 commands). Alternatively, the line may contain a symbol definition using
-the '=' token. Everything after a semicolon is handled as a comment (that is, 
+the '=' token. Everything after a semicolon is handled as a comment (that is,
 it is ignored).
 
 Here are some examples for valid input lines:
@@ -496,59 +504,52 @@ problem in most cases.
 
 Available operators sorted by precedence:
 
-<tscreen><verb>
-    Op 	        Description  		     	      	Precedence
-  -------------------------------------------------------------------
-                Builtin string functions                0
-
-                Builtin pseudo variables                1
-                Builtin pseudo functions       	       	1
-    +  	       	Unary plus   		     	     	1
-    -  	       	Unary minus  		     	     	1
-    ~  	       	Unary bitwise not	     	     	1
-    .BITNOT    	Unary bitwise not      	       	       	1
-    &lt;	   Low byte operator	     	     	   1
-    &gt;	   High byte operator	     	     	   1
-    ^           Bank byte operator                      1
-
-    *  	       	Multiplication		     	     	2
-    /  	       	Division     		     	     	2
-    .MOD       	Modulo operation	     	     	2
-    &amp;      	    Bitwise and	 	     	     	    2
-    .BITAND    	Bitwise and  		     	     	2
-    ^  	       	Bitwise xor  		     	     	2
-    .BITXOR    	Bitwise xor  		     	     	2
-    &lt;&lt;   	      Shift left operator    	     	      2
-    .SHL       	Shift left operator	     	     	2
-    &gt;&gt;   	      Shift right operator
-    .SHR       	Shift right operator 	     	     	2
-
-    +  	       	Binary plus  		   	     	3
-    -  	       	Binary minus 			     	3
-    |  	       	Binary or      			      	3
-    .BITOR     	Binary or    			      	3
-
-    =          	Compare operation (equal)	      	4
-    &lt;&gt;	      Compare operation (not equal)	      4
-    &lt;       	   Compare operation (less)  	      	   4
-    &gt;       	   Compare operation (greater)    	   4
-    &lt;=      	   Compare operation (less or equal)       4
-    &gt;=      	   Compare operation (greater or equal)    4
-
-    &amp;&amp;		Boolean and		     	   	5
-    .AND       	Boolean and  			      	5
-    .XOR       	Boolean xor  			      	5
-
-    ||	       	Boolean or   			      	6
-    .OR	       	Boolean or   			      	6
-
-    !  	       	Boolean not  			      	7
-    .NOT       	Boolean not  			      	7
-</verb></tscreen>
-
+<table>
+<tabular ca="llc">
+Op|Description|Precedence@<hline>
+&nbsp;|Builtin string functions|0@
+&nbsp;|Builtin pseudo variables|1@
+&nbsp;|Builtin pseudo functions|1@
++|Unary plus|1@
+-|Unary minus|1@
+&tilde;|Unary bitwise not|1@
+.BITNOT|Unary bitwise not|1@
+&lt;|Low byte operator|1@
+&gt;|High byte operator|1@
+^|Bank byte operator|1@
+*|Multiplication|2@
+/|Division|2@
+.MOD|Modulo operation|2@
+&amp;|Bitwise and|2@
+.BITAND|Bitwise and|2@
+^|Bitwise xor|2@
+.BITXOR|Bitwise xor|2@
+&lt;&lt;|Shift left operator|2@
+.SHL|Shift left operator|2@
+&gt;&gt;|Shift right operato|r@
+.SHR|Shift right operator|2@
++|Binary plus|3@
+-|Binary minus|3@
+&verbar;|Binary or|3@
+.BITOR|Binary or|3@
+=|Compare operation (equal)|4@
+&lt;&gt;|Compare operation (not equal)|4@
+&lt;|Compare operation (less)|4@
+&gt;|Compare operation (greater)|4@
+&lt;=|Compare operation (less or equal)|4@
+&gt;=|Compare operation (greater or equal)|4@
+&amp;&amp;|Boolean and|5@
+.AND|Boolean and|5@
+.XOR|Boolean xor|5@
+&verbar;&verbar;|Boolean or|6@
+.OR|Boolean or|6@
+!|Boolean not|7@
+.NOT|Boolean not|7@
+</tabular>
+<caption>Available operators sorted by precedence
+</table>
 
 To force a specific order of evaluation, braces may be used as usual.
-
 <p>
 
 

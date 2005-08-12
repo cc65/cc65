@@ -40,6 +40,7 @@ Short options:
   -h			Help (this text)
   -l			Create an assembler listing
   -m name		Create a map file
+  -mm model		Set the memory model
   -o name		Name the output file
   -r			Enable register variables
   -t sys		Set the target system
@@ -59,9 +60,13 @@ Short options:
   -T			Include source as comment
   -V			Print the version number
   -W			Suppress warnings
+  -Wa options		Pass options to the assembler
+  -Wl options		Pass options to the linker
 
 Long options:
   --add-source		Include source as comment
+  --asm-args options	Pass options to the assembler
+  --asm-define sym[=v]	Define an assembler symbol
   --asm-include-dir dir	Set an assembler include directory
   --bss-label name	Define and export a BSS segment label
   --bss-name seg	Set the name of the BSS segment
@@ -70,6 +75,7 @@ Long options:
   --code-label name	Define and export a CODE segment label
   --code-name seg	Set the name of the CODE segment
   --codesize x		Accept larger code by factor x
+  --config name		Use linker config file
   --cpu type		Set cpu type
   --create-dep		Create a make dependency file
   --data-label name	Define and export a DATA segment label
@@ -77,12 +83,17 @@ Long options:
   --debug		Debug mode
   --debug-info		Add debug info
   --feature name	Set an emulation feature
+  --forget-inc-paths	Forget include search paths (compiler)
   --help		Help (this text)
   --include-dir dir	Set a compiler include directory path
+  --ld-args options	Pass options to the linker
   --lib file		Link this library
   --lib-path path	Specify a library search path
+  --list-targets	List all available targets
   --listing		Create an assembler listing
+  --list-bytes n	Number of bytes per assembler listing line
   --mapfile name	Create a map file
+  --memory-model model	Set the memory model
   --module		Link as a module
   --module-id id	Specify a module id for the linker
   --o65-model model	Override the o65 model
@@ -92,7 +103,7 @@ Long options:
   --register-vars	Enable register variables
   --rodata-name seg	Set the name of the RODATA segment
   --signed-chars	Default characters are signed
-  --standard std        Language standard (c89, c99, cc65)
+  --standard std	Language standard (c89, c99, cc65)
   --start-addr addr	Set the default start address
   --static-locals	Make local variables static
   --target sys		Set the target system
@@ -146,6 +157,26 @@ There are a few remaining options that control the behaviour of cl65:
   and linker) will use the "none" system settings by default, cl65 will use
   the C64 as a target system by default. This was chosen since most people
   seem to use cc65 to develop for the C64.
+
+  <tag><tt>-Wa options, --asm-args options</tt></tag>
+
+  Pass options directly to the assembler. This may be used to pass options
+  that aren't directly supported by cl65. Several options may be separated by
+  commas, the commas are replaced by spaces when passing them to the
+  assembler. Beware: Passing arguments directly to the assembler may interfere
+  with some of the defaults, because cl65 doesn't parse the options passed. So
+  if cl65 supports an option by itself, do not pass this option to the
+  assembler by means of the <tt/-Wa/ switch.
+
+  <tag><tt>-Wl options, --ld-args options</tt></tag>
+
+  Pass options directly to the linker. This may be used to pass options that
+  aren't directly supported by cl65. Several options may be separated by
+  commas, the commas are replaced by spaces when passing them to the linker.
+  Beware: Passing arguments directly to the linker may interfere with some of
+  the defaults, because cl65 doesn't parse the options passed. So if cl65
+  supports an option by itself, do not pass this option to the linker by means
+  of the <tt/-Wl/ switch.
 
 </descrip>
 

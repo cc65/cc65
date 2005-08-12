@@ -2929,6 +2929,12 @@ Here's a list of all control commands and a description, what they do:
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
 
 
+<sect1><tt>.RELOC</tt><label id=".RELOC"><p>
+
+  Switch back to relocatable mode. See the <tt><ref id=".ORG"
+  name=".ORG"></tt> command.
+
+
 <sect1><tt>.REPEAT</tt><label id=".REPEAT"><p>
 
   Repeat all commands between <tt/.REPEAT/ and <tt><ref id=".ENDREPEAT"
@@ -2957,12 +2963,6 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   See: <tt><ref id=".ENDREPEAT" name=".ENDREPEAT"></tt>
-
-
-<sect1><tt>.RELOC</tt><label id=".RELOC"><p>
-
-  Switch back to relocatable mode. See the <tt><ref id=".ORG"
-  name=".ORG"></tt> command.
 
 
 <sect1><tt>.RES</tt><label id=".RES"><p>
@@ -4014,17 +4014,16 @@ writing new code from scratch.
 
 <item>Replace all program counter assignments (which are not possible in ca65
 by default, and the respective emulation feature works different from what
-you'd expect) by another way to skip to another memory location, for example
-the <tt><ref id=".RES" name=".RES"></tt>directive.
+you'd expect) by another way to skip to memory locations, for example the
+<tt><ref id=".RES" name=".RES"></tt> directive.
 
 <tscreen><verb>
         ; *=$2000
         .res $2000-*    ; reserve memory up to $2000
 </verb></tscreen>
 
-notice that other than the original TASS, ca65 can never move the
-programmcounter backwards - think of it as if you are assembling to disc with
-TASS.
+Please note that other than the original TASS, ca65 can never move the program
+counter backwards - think of it as if you are assembling to disk with TASS.
 
 <item>Conditional assembly (<tt/.ifeq//<tt/.endif//<tt/.goto/ etc.) must be
 rewritten to match ca65 syntax. Most importantly notice that due to the lack
@@ -4049,8 +4048,8 @@ of <tt/.goto/, everything involving loops must be replaced by
         cl65 --start-addr 0x0ffe -t none myprog.s -o myprog.prg
 </verb></tscreen>
 
-notice that you need to use the actual start address minus two, since two
-bytes are used for the cbm load address.
+Note that you need to use the actual start address minus two, since two bytes
+are used for the cbm load address.
 
 </enum>
 

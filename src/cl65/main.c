@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1999-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -148,24 +148,32 @@ static char* TargetLib	= 0;
 
 
 
+static void CmdExpand (CmdDesc* Cmd)
+/* Expand the argument vector */
+{
+    unsigned NewMax  = Cmd->ArgMax + 10;
+    char**	 NewArgs = xmalloc (NewMax * sizeof (char*));
+    memcpy (NewArgs, Cmd->Args, Cmd->ArgMax * sizeof (char*));
+    xfree (Cmd->Args);
+    Cmd->Args   = NewArgs;
+    Cmd->ArgMax = NewMax;
+}
+
+
+
 static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
 /* Add a new argument to the command */
 {
     /* Expand the argument vector if needed */
-    if (Cmd->ArgCount == Cmd->ArgMax) {
-	unsigned NewMax  = Cmd->ArgMax + 10;
-	char**	 NewArgs = xmalloc (NewMax * sizeof (char*));
-	memcpy (NewArgs, Cmd->Args, Cmd->ArgMax * sizeof (char*));
-	xfree (Cmd->Args);
-	Cmd->Args   = NewArgs;
-	Cmd->ArgMax = NewMax;
+    if (Cmd->ArgCount >= Cmd->ArgMax) {
+        CmdExpand (Cmd);
     }
 
     /* Add a copy of the new argument, allow a NULL pointer */
     if (Arg) {
-	Cmd->Args [Cmd->ArgCount++] = xstrdup (Arg);
+	Cmd->Args[Cmd->ArgCount++] = xstrdup (Arg);
     } else {
-	Cmd->Args [Cmd->ArgCount++] = 0;
+	Cmd->Args[Cmd->ArgCount++] = 0;
     }
 }
 
@@ -176,6 +184,47 @@ static void CmdAddArg2 (CmdDesc* Cmd, const char* Arg1, const char* Arg2)
 {
     CmdAddArg (Cmd, Arg1);
     CmdAddArg (Cmd, Arg2);
+}
+
+
+
+static void CmdAddArgList (CmdDesc* Cmd, const char* ArgList)
+/* Add a list of arguments separated by commas */
+{
+    const char* Arg = ArgList;
+    const char* P   = Arg;
+
+    while (1) {
+        if (*P == '\0' || *P == ',') {
+
+            /* End of argument, add it */
+            unsigned Len = P - Arg;
+
+            /* Expand the argument vector if needed */
+            if (Cmd->ArgCount >= Cmd->ArgMax) {
+                CmdExpand (Cmd);
+            }
+
+            /* Add the new argument */
+            Cmd->Args[Cmd->ArgCount] = memcpy (xmalloc (Len + 1), Arg, Len);
+            Cmd->Args[Cmd->ArgCount][Len] = '\0';
+            ++Cmd->ArgCount;
+
+            /* If the argument was terminated by a comma, skip it, otherwise
+             * we're done.
+             */
+            if (*P == ',') {
+                /* Start over at next char */
+                Arg = ++P;
+            } else {
+                break;
+            }
+        } else {
+            /* Skip other chars */
+            ++P;
+        }
+    }
+
 }
 
 
@@ -677,6 +726,14 @@ static void OptAddSource (const char* Opt attribute ((unused)),
 
 
 
+static void OptAsmArgs (const char* Opt attribute ((unused)), const char* Arg)
+/* Pass arguments to the assembler */
+{
+    CmdAddArgList (&CA65, Arg);
+}
+
+
+
 static void OptAsmDefine (const char* Opt attribute ((unused)), const char* Arg)
 /* Define an assembler symbol (assembler) */
 {
@@ -852,6 +909,14 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 /* Include directory (compiler) */
 {
     CmdAddArg2 (&CC65, "-I", Arg);
+}
+
+
+
+static void OptLdArgs (const char* Opt attribute ((unused)), const char* Arg)
+/* Pass arguments to the linker */
+{
+    CmdAddArgList (&LD65, Arg);
 }
 
 
@@ -1090,6 +1155,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--add-source",	0,    	OptAddSource 		},
+        { "--asm-args",         1,      OptAsmArgs              },
        	{ "--asm-define",      	1,     	OptAsmDefine            },
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
        	{ "--bss-label",       	1,     	OptBssLabel             },
@@ -1110,6 +1176,7 @@ int main (int argc, char* argv [])
        	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
 	{ "--help",	     	0,	OptHelp			},
 	{ "--include-dir",   	1,	OptIncludeDir		},
+        { "--ld-args",          1,      OptLdArgs               },
        	{ "--lib",     	       	1,     	OptLib                  },
        	{ "--lib-path",	       	1,     	OptLibPath              },
 	{ "--list-targets",	0,	OptListTargets		},
@@ -1218,10 +1285,27 @@ int main (int argc, char* argv [])
 	   	    break;
 
 	   	case 'W':
-	   	    /* Suppress warnings - compiler and assembler */
-	   	    CmdAddArg (&CC65, "-W");
-	     	    CmdAddArg2 (&CA65, "-W", "0");
-	   	    break;
+                    switch (Arg[2]) {
+
+                        case 'a':
+                            OptAsmArgs (Arg, GetArg (&I, 3));
+                            break;
+
+                        case 'l':
+                            OptLdArgs (Arg, GetArg (&I, 3));
+                            break;
+
+                        case '\0':
+                            /* Suppress warnings - compiler and assembler */
+                            CmdAddArg (&CC65, "-W");
+                            CmdAddArg2 (&CA65, "-W", "0");
+                            break;
+
+                        default:
+                            UnknownOption (Arg);
+                            break;
+                    }
+                    break;
 
 	   	case 'c':
 	   	    /* Don't link the resulting files */

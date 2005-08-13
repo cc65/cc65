@@ -141,7 +141,6 @@ OBJS = 	add.o		\
        	lsubeq.o	\
        	lsubeqsp.o	\
        	lt.o  		\
-       	ltest.o		\
        	ludiv.o		\
        	luge.o		\
        	lugt.o		\
@@ -209,7 +208,6 @@ OBJS = 	add.o		\
        	subeqsp.o	\
 	subysp.o	\
        	swap.o		\
-       	test.o		\
        	tosint.o	\
        	toslong.o	\
        	udiv.o		\

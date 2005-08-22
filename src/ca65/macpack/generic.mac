@@ -1,0 +1,21 @@
+
+; add - Add without carry
+.macro  add     Arg1, Arg2
+        clc
+        .if .paramcount = 2
+                adc     Arg1, Arg2
+        .else
+                adc     Arg1
+        .endif
+.endmacro
+
+; sub - subtract without borrow
+.macro  sub     Arg1, Arg2
+        sec
+        .if .paramcount = 2
+                sbc     Arg1, Arg2
+        .else
+                sbc     Arg1
+        .endif
+.endmacro
+

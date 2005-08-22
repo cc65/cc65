@@ -10,6 +10,12 @@ CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
+# Perl script for macro file conversion
+CVT=macpack/cvt-mac.pl
+
+# -----------------------------------------------------------------------------
+# List of all object files
+
 OBJS =  anonname.o      \
         asserts.o       \
         condasm.o	\
@@ -50,6 +56,16 @@ OBJS =  anonname.o      \
        	toklist.o      	\
 	ulabel.o
 
+# -----------------------------------------------------------------------------
+# List of all macro files
+
+INCS =	cbm.inc		\
+	cpu.inc		\
+	generic.inc	\
+        longbranch.inc
+
+# -----------------------------------------------------------------------------
+
 LIBS = $(COMMON)/common.a
 
 EXECS = ca65
@@ -63,11 +79,11 @@ all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-
-ca65:   $(OBJS) $(LIBS)
+ca65:   $(INCS) $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+
+inc:	$(INCS)
 
 clean:
 	rm -f *~ core *.lst
@@ -82,5 +98,28 @@ zap:	clean
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
 	$(CC) -I$(COMMON) -MM $^ > .depend
+
+# -----------------------------------------------------------------------------
+# Rules to make config includes
+
+cbm.inc:	macpack/cbm.mac
+	@$(CVT) $< $@ MacCBM
+
+cpu.inc:	macpack/cpu.mac
+	@$(CVT) $< $@ MacCPU
+
+generic.inc:   	macpack/generic.mac
+	@$(CVT) $< $@ MacGeneric
+
+longbranch.inc:	macpack/longbranch.mac
+	@$(CVT) $< $@ MacLongBranch
+
+
+
+
+
+
+
+
 
 

@@ -1,0 +1,22 @@
+; Convert characters to screen codes
+.macro scrcode str         
+        .repeat .strlen(str), i
+                .if (.strat(str, i) >= '@' .and .strat(str, i) <= 'z')
+                        .byte .strat(str, i) - '@'
+                .elseif (.strat(str, i) >= 'A' .and .strat(str, i) <= 'Z')
+                        .byte .strat(str, i) - 'A' + 65
+                .elseif (.strat(str, i) = '[')
+                        .byte 27
+                .elseif (.strat(str, i) = ']')
+                        .byte 29
+                .elseif (.strat(str, i) = '^')
+                        .byte 30
+                .elseif (.strat(str, i) = '_')
+                        .byte 31
+                .else
+                        .byte .strat(str, i)
+                .endif
+        .endrepeat
+.endmacro
+
+

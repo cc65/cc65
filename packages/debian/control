@@ -2,7 +2,7 @@ Source: cc65
 Section: non-free/devel
 Priority: optional
 Maintainer: Michael Klein <michael.klein@puffin.lb.shuttle.de>
-Build-Depends: debhelper, sgml-tools, perl
+Build-Depends: debhelper, linuxdoc-tools, perl
 Standards-Version: 3.2.1
 
 Package: cc65

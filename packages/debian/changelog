@@ -1,3 +1,10 @@
+cc65 (2.11.0-1) stable; urgency=low
+
+  * New upstream version
+  * Adjusted to sarge
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Mon, 22 Aug 2005 20:45:00 +0100
+
 cc65 (2.9.0-1) stable; urgency=low
 
   * New upstream version

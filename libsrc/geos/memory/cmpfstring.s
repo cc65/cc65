@@ -7,7 +7,7 @@
 ; char CmpFString (char length, char *dest, char* source);
 
 	    .import DoubleSPop, SetPtrXY
-	    .import popa
+	    .import popa, return0, return1
 	    .export _CmpFString
 
 	    .include "../inc/jumptab.inc"

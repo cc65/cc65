@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,6 +61,7 @@
 #include "istack.h"
 #include "lineinfo.h"
 #include "listing.h"
+#include "macpack.h"
 #include "macro.h"
 #include "nexttok.h"
 #include "objfile.h"
@@ -111,6 +112,7 @@ static void Usage (void)
             "  --include-dir dir\tSet an include directory search path\n"
             "  --listing\t\tCreate a listing if assembly was ok\n"
             "  --list-bytes n\tMaximum number of bytes per listing line\n"
+            "  --macpack-dir dir\tSet a macro package directory\n"
             "  --memory-model model\tSet the memory model\n"
             "  --pagelength n\tSet the page length for the listing\n"
             "  --smart\t\tEnable smart mode\n"
@@ -416,6 +418,15 @@ static void OptListing (const char* Opt attribute ((unused)),
 /* Create a listing file */
 {
     Listing = 1;
+}
+
+
+
+static void OptMacPackDir (const char* Opt attribute ((unused)), const char* Arg)
+/* Set a macro package directory */
+{
+    /* Use the directory */
+    MacPackSetDir (Arg);
 }
 
 
@@ -754,6 +765,7 @@ int main (int argc, char* argv [])
 	{ "--include-dir",     	1,	OptIncludeDir		},
         { "--list-bytes",       1,      OptListBytes            },
 	{ "--listing", 	       	0,	OptListing		},
+        { "--macpack-dir",      1,      OptMacPackDir           },
         { "--memory-model",     1,      OptMemoryModel          },
 	{ "--pagelength",      	1,	OptPageLength		},
     	{ "--smart",   	       	0,	OptSmart		},

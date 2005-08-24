@@ -1206,14 +1206,6 @@ static void DoLocalChar (void)
 static void DoMacPack (void)
 /* Insert a macro package */
 {
-    /* Macro package names */
-    static const char* Keys [] = {
-    	"GENERIC",
-       	"LONGBRANCH",
-        "CBM",
-        "CPU"
-    };
-
     int Package;
 
     /* We expect an identifier */
@@ -1222,8 +1214,8 @@ static void DoMacPack (void)
     	return;
     }
 
-    /* Map the keyword to a number */
-    Package = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
+    /* Search for the macro package name */
+    Package = MacPackFind (SVal);
     if (Package < 0) {
     	/* Not found */
     	ErrorSkip ("Invalid macro package");
@@ -1234,7 +1226,7 @@ static void DoMacPack (void)
     NextTok ();
 
     /* Insert the package */
-    InsertMacPack (Package);
+    MacPackInsert (Package);
 }
 
 

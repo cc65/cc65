@@ -35,6 +35,8 @@
 
 /* common */
 #include "check.h"
+#include "strbuf.h"
+#include "strutil.h"
 
 /* ca65 */
 #include "error.h"
@@ -56,12 +58,19 @@
 #include "longbranch.inc"
 
 /* Table with pointers to the different packages */
-static char* MacPackages [] = {
-    MacGeneric,
-    MacLongBranch,
-    MacCBM,
-    MacCPU
+static struct {
+    const char* Name;
+    char*       Package;
+} MacPackages[MAC_COUNT] = {
+    /* Packages sorted by id */
+    { "cbm",            MacCBM          },
+    { "cpu",            MacCPU          },
+    { "generic",        MacGeneric      },
+    { "longbranch",     MacLongBranch   },
 };
+
+/* Directory that contains standard macro package files */
+static StrBuf MacPackDir = STATIC_STRBUF_INITIALIZER;
 
 
 
@@ -71,14 +80,80 @@ static char* MacPackages [] = {
 
 
 
-void InsertMacPack (unsigned Id)
+int MacPackFind (const char* Name)
+/* Find a macro package by name. The function will either return the id or
+ * -1 if the package name was not found.
+ */
+{
+    int I;
+
+    for (I = 0; I < MAC_COUNT; ++I) {
+        if (StrCaseCmp (Name, MacPackages[I].Name) == 0) {
+            /* Found */
+            return I;
+        }
+    }
+
+    /* Not found */
+    return -1;
+}
+
+
+
+void MacPackInsert (int Id)
 /* Insert the macro package with the given id in the input stream */
 {
     /* Check the parameter */
-    CHECK (Id < sizeof (MacPackages) / sizeof (MacPackages [0]));
+    CHECK (Id >= 0 && Id < MAC_COUNT);
 
-    /* Insert the package */ 
-    NewInputData (MacPackages[Id], 0);
+    /* If we have a macro package directory given, load a file from the
+     * directory, otherwise use the builtin stuff.
+     */
+    if (SB_IsEmpty (&MacPackDir)) {
+
+        /* Insert the builtin package */
+        NewInputData (MacPackages[Id].Package, 0);
+
+    } else {
+
+        StrBuf Filename = AUTO_STRBUF_INITIALIZER;
+
+        /* Build the complete file name */
+        SB_Copy (&Filename, &MacPackDir);
+        SB_AppendStr (&Filename, MacPackages[Id].Name);
+        SB_AppendStr (&Filename, ".mac");
+        SB_Terminate (&Filename);
+
+        /* Open the macro package as include file */
+        NewInputFile (SB_GetConstBuf (&Filename));
+
+        /* Destroy the contents of Filename */
+        DoneStrBuf (&Filename);
+
+    }
+}
+
+
+
+void MacPackSetDir (const char* Dir)
+/* Set a directory where files for macro packages can be found. Standard is
+ * to use the builtin packages. For debugging macro packages, external files
+ * can be used.
+ */
+{
+    /* Copy the directory name to the buffer */
+    SB_CopyStr (&MacPackDir, Dir);
+
+    /* Make sure that the last character is a path delimiter */
+    if (SB_NotEmpty (&MacPackDir)) {
+        char C = SB_LookAtLast (&MacPackDir);
+        if (C != '\\' && C != '/') {
+            SB_AppendChar (&MacPackDir, '/');
+        }
+    }
+
+    /* Terminate the buffer so it's usable as a C string */
+    SB_Terminate (&MacPackDir);
 }
 
 

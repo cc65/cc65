@@ -78,7 +78,7 @@ unsigned char MissingCharTerm    = 0;   /* Allow lda #'a (no closing term) */
 unsigned char UbiquitousIdents   = 0;   /* Allow ubiquitous identifiers */
 
 /* Misc stuff */
-const char Copyright[]           = "(C) Copyright 1998-2004 Ullrich von Bassewitz";
+const char Copyright[]           = "(C) Copyright 1998-2005 Ullrich von Bassewitz";
 
 
 

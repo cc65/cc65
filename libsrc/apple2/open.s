@@ -12,8 +12,8 @@
 
         .import		pushname, popname
         .import 	errnoexit, oserrexit
-        .import		__aligned_malloc, _free
-        .import 	addysp, incsp4, pushax, popax
+        .import		_posix_memalign, _free
+        .import 	addysp, incsp4, incaxy, pushax, popax
 
         .include	"zeropage.inc"
         .include	"errno.inc"
@@ -48,12 +48,11 @@ _open:
         cpy	#MAX_FDS * .sizeof(FD)
         bcc	:-
 
-        ; Load errno codes
-        lda	#ENOMEM ^ EMFILE
-enomem: eor	#ENOMEM
+        ; Load errno code
+        lda	#EMFILE
 
         ; Cleanup stack
-        jsr	incsp4		; Preserves A
+errno:  jsr	incsp4		; Preserves A
 
         ; Return errno
         jmp	errnoexit
@@ -63,24 +62,24 @@ found:  tya
         pha
 
         ; Alloc I/O buffer
+	lda	#<(fdtab + FD::BUFFER)
+	ldx	#>(fdtab + FD::BUFFER)
+	jsr	incaxy
+	jsr	pushax
         lda	#$00
-        ldx	#>$0400
-        jsr	pushax		; Preserves A
         ldx	#>$0100
-        jsr	__aligned_malloc
+        jsr	pushax		; Preserves A
+        ldx	#>$0400
+        jsr	_posix_memalign
+	tay			; Save errno code
 
         ; Restore fdtab slot
         pla
-        tay
+        sta	tmp2		; Save fdtab slot
 
-        ; Get and check I/O buffer high byte
-        txa
-        beq	enomem
-
-        ; Set I/O buffer high byte (low byte remains zero)
-        sta	fdtab + FD::BUFFER+1,y
-
-        sty	tmp2		; Save fdtab slot
+        ; Check for error
+        tya			; Restore errno code
+        bne	errno
 
         ; Get and save flags
         jsr	popax

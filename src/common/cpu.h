@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -47,6 +47,7 @@
 /* CPUs */
 typedef enum {
     CPU_UNKNOWN = -1,           /* Not specified or invalid target */
+    CPU_NONE,                   /* No CPU - for assembler */
     CPU_6502,
     CPU_6502X,                  /* "Extended", that is: with illegal opcodes */
     CPU_65SC02,
@@ -59,6 +60,7 @@ typedef enum {
 
 /* CPU instruction sets */
 enum {
+    CPU_ISET_NONE       = 1 << CPU_NONE,
     CPU_ISET_6502       = 1 << CPU_6502,
     CPU_ISET_6502X      = 1 << CPU_6502X,
     CPU_ISET_65SC02     = 1 << CPU_65SC02,
@@ -83,7 +85,7 @@ extern const unsigned CPUIsets[CPU_COUNT];
 /*     	       	     	   	     Code      			    	     */
 /*****************************************************************************/
 
-                                           
+
 
 cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if

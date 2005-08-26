@@ -38,8 +38,12 @@
 
 
 
-/* If we have stdint.h, include it, otherwise try some quesswork on types */
-#if __STDC_VERSION__ >= 199901
+/* If we have stdint.h, include it, otherwise try some quesswork on types.
+ * gcc doesn't define __STDC_VERSION__ without special flags, so check for 
+ * gcc explicitly. Undefined symbols are replaced by zero, so a check for
+ * defined(__GNUC__) is not necessary.
+ */
+#if (__STDC_VERSION__ >= 199901) || (__GNUC__ >= 3)
 #include <stdint.h>
 #else
 

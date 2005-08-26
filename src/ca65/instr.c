@@ -83,6 +83,13 @@ static void PutSweet16Branch (const InsDesc* Ins);
 
 
 
+/* Empty instruction table */
+static const struct {
+    unsigned Count;
+} InsTabNone = {
+    0
+};
+
 /* Instruction table for the 6502 */
 #define INS_COUNT_6502         	56
 static const struct {
@@ -575,6 +582,7 @@ static const struct {
 
 /* An array with instruction tables */
 static const InsTable* InsTabs[CPU_COUNT] = {
+    (const InsTable*) &InsTabNone,
     (const InsTable*) &InsTab6502,
     (const InsTable*) &InsTab6502X,
     (const InsTable*) &InsTab65SC02,
@@ -1135,6 +1143,14 @@ int FindInstruction (const char* Ident)
     unsigned I;
     const InsDesc* ID;
     char Key[sizeof (ID->Mnemonic)];
+
+    /* Shortcut for the "none" CPU: If there are no instructions to search
+     * for, bail out early.
+     */
+    if (InsTab->Count == 0) {
+        /* Not found */
+        return -1;
+    }
 
     /* Make a copy, and uppercase that copy */
     I = 0;

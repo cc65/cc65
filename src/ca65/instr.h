@@ -57,32 +57,32 @@
  * When assembling for the 6502 or 65C02, all addressing modes that are not
  * available on these CPUs are removed before doing any checks.
  */
-#define AM65_IMPLICIT    	       	0x00000003UL
-#define AM65_ACCU	       	       	0x00000002UL
+#define AM65_IMPLICIT          	0x00000003UL
+#define AM65_ACCU	       	0x00000002UL
 #define AM65_DIR      	       	0x00000004UL
 #define AM65_ABS     	       	0x00000008UL
 #define AM65_ABS_LONG  		0x00000010UL
 #define AM65_DIR_X 	  	0x00000020UL
 #define AM65_ABS_X            	0x00000040UL
 #define AM65_ABS_LONG_X		0x00000080UL
-#define AM65_DIR_Y               	0x00000100UL
-#define AM65_ABS_Y               	0x00000200UL
-#define AM65_DIR_IND             	0x00000400UL
-#define AM65_ABS_IND     	       	0x00000800UL
-#define AM65_DIR_IND_LONG        	0x00001000UL
-#define AM65_DIR_IND_Y           	0x00002000UL
-#define AM65_DIR_IND_LONG_Y      	0x00004000UL
-#define AM65_DIR_X_IND           	0x00008000UL
-#define AM65_ABS_X_IND           	0x00010000UL
-#define AM65_REL                 	0x00020000UL
-#define AM65_REL_LONG            	0x00040000UL
-#define AM65_STACK_REL           	0x00080000UL
-#define AM65_STACK_REL_IND_Y     	0x00100000UL
+#define AM65_DIR_Y              0x00000100UL
+#define AM65_ABS_Y              0x00000200UL
+#define AM65_DIR_IND            0x00000400UL
+#define AM65_ABS_IND     	0x00000800UL
+#define AM65_DIR_IND_LONG       0x00001000UL
+#define AM65_DIR_IND_Y          0x00002000UL
+#define AM65_DIR_IND_LONG_Y     0x00004000UL
+#define AM65_DIR_X_IND          0x00008000UL
+#define AM65_ABS_X_IND          0x00010000UL
+#define AM65_REL                0x00020000UL
+#define AM65_REL_LONG           0x00040000UL
+#define AM65_STACK_REL          0x00080000UL
+#define AM65_STACK_REL_IND_Y    0x00100000UL
 #define AM65_IMM_ACCU	       	0x00200000UL
 #define AM65_IMM_INDEX	       	0x00400000UL
-#define AM65_IMM_IMPLICIT	       	0x00800000UL
-#define AM65_IMM                 	(AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT)
-#define AM65_BLOCKMOVE           	0x01000000UL
+#define AM65_IMM_IMPLICIT	0x00800000UL
+#define AM65_IMM                (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT)
+#define AM65_BLOCKMOVE          0x01000000UL
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */
 #define AM65_SET_ZP 	(AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)

@@ -232,7 +232,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the disassembler version */
 {
     fprintf (stderr,
-       	     "da65 V%u.%u.%u - (C) Copyright 2000 Ullrich von Bassewitz\n",
+       	     "da65 V%u.%u.%u - (C) Copyright 2005 Ullrich von Bassewitz\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 

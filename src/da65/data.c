@@ -158,38 +158,43 @@ unsigned DWordTable (void)
 unsigned AddrTable (void)
 /* Output a table of addresses */
 {
-    unsigned BytesLeft;
+    unsigned long BytesLeft = GetRemainingBytes ();
+    unsigned long Start = PC;
 
-    /* Count how many bytes may be output. */
-    unsigned Count = GetSpan (atAddrTab);
-
-    /* Handle Count == 1 */
-    if (Count == 1) {
-	ByteTable ();
-    }
-
-    /* Make the given number even */
-    Count &= ~1U;
-
-    /* Output as many data bytes lines as needed. For addresses, each line
-     * will hold just one address.
+    /* Loop while table bytes left and we don't need to create a label at the
+     * current position.
      */
-    BytesLeft = Count;
-    while (BytesLeft > 0) {
+    while (BytesLeft && GetStyleAttr (PC) == atAddrTab) {
 
-	/* Get the address */
-	unsigned Addr = GetCodeWord (PC);
+        unsigned Addr;
+
+        /* If just one byte is left, define it and bail out */
+        if (BytesLeft == 1 || GetStyleAttr (PC+1) != atAddrTab) {
+            DataByteLine (1);
+            break;
+        }
+
+        /* More than one byte left. Check if there is a label defined within
+         * the address word.
+         */
+        if (MustDefLabel (PC+1)) {
+            /* Define the label */
+            DefineConst (GetLabel (PC+1), GetComment (PC+1), PC+1);
+        }
+
+        /* Now get the address from the PC */
+        Addr = GetCodeWord (PC);
 
 	/* In pass 1, define a label, in pass 2 output the line */
 	if (Pass == 1) {
 	    if (!HaveLabel (Addr)) {
-	   	AddIntLabel (Addr);
+	    	AddIntLabel (Addr);
 	    }
 	} else {
 	    const char* Label = GetLabel (Addr);
 	    if (Label == 0) {
-	 	/* OOPS! Should not happen */
-	 	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
+	    	/* OOPS! Should not happen */
+	    	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
 	    }
 	    Indent (MIndent);
 	    Output (".addr");
@@ -199,18 +204,23 @@ unsigned AddrTable (void)
 	    LineFeed ();
 	}
 
-	/* Next line */
+	/* Next table entry */
 	PC        += 2;
        	BytesLeft -= 2;
+
+        /* If we must define a label here, bail out */
+        if (MustDefLabel (PC)) {
+            break;
+        }
     }
 
-    /* If the next line is not a byte table line, add a separator */
+    /* If the next line is not an address table line, add a separator */
     if (CodeLeft() && GetStyleAttr (PC) != atAddrTab) {
 	SeparatorLine ();
     }
 
     /* Return the number of bytes output */
-    return Count;
+    return PC - Start;
 }
 
 
@@ -218,38 +228,43 @@ unsigned AddrTable (void)
 unsigned RtsTable (void)
 /* Output a table of RTS addresses (address - 1) */
 {
-    unsigned BytesLeft;
+    unsigned long BytesLeft = GetRemainingBytes ();
+    unsigned long Start = PC;
 
-    /* Count how many bytes may be output. */
-    unsigned Count = GetSpan (atRtsTab);
-
-    /* Handle Count == 1 */
-    if (Count == 1) {
-	ByteTable ();
-    }
-
-    /* Make the given number even */
-    Count &= ~1U;
-
-    /* Output as many data bytes lines as needed. For addresses, each line
-     * will hold just one address.
+    /* Loop while table bytes left and we don't need to create a label at the
+     * current position.
      */
-    BytesLeft = Count;
-    while (BytesLeft > 0) {
+    while (BytesLeft && GetStyleAttr (PC) == atRtsTab) {
 
-	/* Get the address */
-	unsigned Addr = (GetCodeWord (PC) + 1) & 0xFFFF;
+        unsigned Addr;
+
+        /* If just one byte is left, define it and bail out */
+        if (BytesLeft == 1 || GetStyleAttr (PC+1) != atRtsTab) {
+            DataByteLine (1);
+            break;
+        }
+
+        /* More than one byte left. Check if there is a label defined within
+         * the address word.
+         */
+        if (MustDefLabel (PC+1)) {
+            /* Define the label */
+            DefineConst (GetLabel (PC+1), GetComment (PC+1), PC+1);
+        }
+
+        /* Now get the address from the PC */
+	Addr = (GetCodeWord (PC) + 1) & 0xFFFF;
 
 	/* In pass 1, define a label, in pass 2 output the line */
 	if (Pass == 1) {
 	    if (!HaveLabel (Addr)) {
-	   	AddIntLabel (Addr);
+	    	AddIntLabel (Addr);
 	    }
 	} else {
 	    const char* Label = GetLabel (Addr);
 	    if (Label == 0) {
-	 	/* OOPS! Should not happen */
-	 	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
+	    	/* OOPS! Should not happen */
+	     	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
 	    }
 	    Indent (MIndent);
 	    Output (".word");
@@ -259,18 +274,23 @@ unsigned RtsTable (void)
 	    LineFeed ();
 	}
 
-	/* Next line */
+	/* Next table entry */
 	PC        += 2;
        	BytesLeft -= 2;
+
+        /* If we must define a label here, bail out */
+        if (MustDefLabel (PC)) {
+            break;
+        }
     }
 
-    /* If the next line is not a byte table line, add a separator */
+    /* If the next line is not a return address table line, add a separator */
     if (CodeLeft() && GetStyleAttr (PC) != atRtsTab) {
 	SeparatorLine ();
     }
 
     /* Return the number of bytes output */
-    return Count;
+    return PC - Start;
 }
 
 

@@ -86,7 +86,6 @@ in HTML format. Other formats can be generated from the sources.
 %files doc
 %doc doc/*.html
 %doc doc/compile.txt
-%doc doc/grc.txt
 %doc doc/internal.txt
 %doc doc/newvers.txt
 %doc samples

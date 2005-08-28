@@ -389,6 +389,7 @@ crosscompiler.
 %files pet
 %attr(644,root,root)		/usr/lib/cc65/lib/pet.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/pet.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/pet-*.joy
 
 
 

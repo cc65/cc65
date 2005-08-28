@@ -2752,10 +2752,11 @@ Here's a list of all control commands and a description, what they do:
   packages are:
 
   <tscreen><verb>
+        atari           Defines the scrcode macro.
+        cbm             Defines the scrcode macro.
+        cpu             Defines constants for the .CPU variable.
 	generic		Defines generic macros like add and sub.
-    	longbranch     	Defines conditional long jump macros.
-        cbm             Defines the scrcode macro
-        cpu             Defines constants for the .CPU variable
+    	longbranch     	Defines conditional long jump macros.   
   </verb></tscreen>
 
   Including a macro package twice, or including a macro package that

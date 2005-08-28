@@ -52,6 +52,7 @@
 
 
 /* Predefined macro packages converted into C strings by a perl script */
+#include "atari.inc"
 #include "cbm.inc"
 #include "cpu.inc"
 #include "generic.inc"
@@ -63,6 +64,7 @@ static struct {
     char*       Package;
 } MacPackages[MAC_COUNT] = {
     /* Packages sorted by id */
+    { "atari",          MacAtari        },
     { "cbm",            MacCBM          },
     { "cpu",            MacCPU          },
     { "generic",        MacGeneric      },

@@ -1,6 +1,7 @@
 .depend
 ca65
 .kdbgrc.ca65
+atari.inc
 cbm.inc
 cpu.inc
 generic.inc

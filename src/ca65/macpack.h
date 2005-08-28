@@ -46,6 +46,7 @@
 
 /* Constants for the predefined packages */
 enum {
+    MAC_ATARI,
     MAC_CBM,
     MAC_CPU,
     MAC_GENERIC,

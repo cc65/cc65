@@ -59,7 +59,8 @@ OBJS =  anonname.o      \
 # -----------------------------------------------------------------------------
 # List of all macro files
 
-INCS =	cbm.inc		\
+INCS =	atari.inc       \
+        cbm.inc		\
 	cpu.inc		\
 	generic.inc	\
         longbranch.inc
@@ -101,6 +102,9 @@ depend dep:	$(OBJS:.o=.c)
 
 # -----------------------------------------------------------------------------
 # Rules to make config includes
+
+atari.inc:	macpack/atari.mac
+	@$(CVT) $< $@ MacAtari
 
 cbm.inc:	macpack/cbm.mac
 	@$(CVT) $< $@ MacCBM

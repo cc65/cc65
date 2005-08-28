@@ -2,19 +2,17 @@
 
 ; Helper macro that converts and outputs one character
 .macro _scrcode char
-        .if (char >= '@' .and char <= 'z')
-                .byte   (char - '@')
-        .elseif (char >= 'A' .and char <= 'Z')
-                .byte   (char - 'A' + 65)
-        .elseif (char = '[')
-                .byte   27
-        .elseif (char = ']')
-                .byte   29
-        .elseif (char = '^')
-                .byte   30
-        .elseif (char = '_')
-                .byte   31
-        .elseif (char < 256)
+        .if (char >= 0) .and (char <= 31)
+                .byte   (char + 64)
+        .elseif (char >= 32) .and (char <= 95)
+                .byte   (char - 32)
+        .elseif (char >= 96) .and (char <= 127)
+                .byte   char
+        .elseif (char >= 128) .and (char <= 159)
+                .byte   (char + 64)
+        .elseif (char >= 160) .and (char <= 223)
+                .byte   (char - 32)
+        .elseif (char >= 224) .and (char <= 255)
                 .byte   char
         .else
                 .error  "scrcode: Character constant out of range"
@@ -59,4 +57,3 @@
         scrcode arg2, arg3, arg4, arg5, arg6, arg7, arg8
 .endmacro
 
-                        

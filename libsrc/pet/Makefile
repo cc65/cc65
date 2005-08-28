@@ -26,6 +26,15 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.joy:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
 #--------------------------------------------------------------------------
 # Object files
 
@@ -57,14 +66,28 @@ OBJS =	_scrsize.o	\
         sysuname.o
 
 #--------------------------------------------------------------------------
+# Drivers
+
+EMDS =
+
+JOYS = pet-ptvjoy.joy
+
+TGIS =
+
+#--------------------------------------------------------------------------
 # Targets
 
 .PHONY:	all clean zap
 
-all:	$(OBJS)
+all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS)
+	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
+	@$(RM) $(EMDS) $(JOYS) $(TGIS)
+
 

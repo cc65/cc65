@@ -61,7 +61,7 @@ OBJS =	_scrsize.o	\
 
 EMDS =
 
-JOYS = vic20-stdjoy.joy
+JOYS = vic20-stdjoy.joy vic20-ptvjoy.joy
 
 TGIS =
 

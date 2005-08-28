@@ -221,6 +221,7 @@ petlib:
 	    $(AR) a pet.lib $$i/*.o;\
 	done
 	mv pet/crt0.o pet.o
+	cp pet/*.joy .
 
 #-----------------------------------------------------------------------------
 # Commodore Plus/4

@@ -79,6 +79,9 @@ ExprNode* SimplifyExpr (ExprNode* Expr, const struct ExprDesc* D);
 ExprNode* GenLiteralExpr (long Val);
 /* Return an expression tree that encodes the given literal value */
 
+ExprNode* GenLiteral0 (void);
+/* Return an expression tree that encodes the the number zero */
+
 ExprNode* GenSymExpr (struct SymEntry* Sym);
 /* Return an expression node that encodes the given symbol */
 

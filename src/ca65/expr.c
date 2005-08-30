@@ -443,7 +443,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
     	    Error ("Unexpected end of line");
-    	    return GenLiteralExpr (0);
+    	    return GenLiteral0 ();
     	}
 
 	/* Get a node with this token */
@@ -481,7 +481,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
     	    Error ("Unexpected end of line");
-    	    return GenLiteralExpr (0);
+    	    return GenLiteral0 ();
     	}
 
        	/* Compare the tokens if the result is not already known */
@@ -587,7 +587,7 @@ static ExprNode* FuncSizeOf (void)
         if (ParentScope == 0) {
             /* No such scope */
             DoneStrBuf (&ScopeName);
-            return GenLiteralExpr (0);
+            return GenLiteral0 ();
         }
 
         /* If ScopeName is empty, no explicit scope was specified. We have to
@@ -651,8 +651,7 @@ static ExprNode* FuncStrAt (void)
     if (Tok != TOK_STRCON) {
       	Error ("String constant expected");
       	NextTok ();
-       	return 0;
-
+       	return GenLiteral0 ();
     }
 
     /* Remember the string and skip it */
@@ -668,7 +667,7 @@ static ExprNode* FuncStrAt (void)
     /* Must be a valid index */
     if (Index >= (long) strlen (Str)) {
 	Error ("Range error");
-	return GenLiteralExpr (0);
+	return GenLiteral0 ();
     }
 
     /* Get the char, handle as unsigned. Be sure to translate it into
@@ -768,7 +767,7 @@ static ExprNode* Function (ExprNode* (*F) (void))
     if (Tok != TOK_LPAREN) {
      	Error ("'(' expected");
      	SkipUntilSep ();
-	return GenLiteralExpr (0);
+	return GenLiteral0 ();
     }
     NextTok ();
 
@@ -953,7 +952,7 @@ static ExprNode* Factor (void)
 		/* A character constant */
 		N = GenLiteralExpr (TgtTranslateChar (SVal[0]));
 	    } else {
-		N = GenLiteralExpr (0);	/* Dummy */
+		N = GenLiteral0 ();	/* Dummy */
 		Error ("Syntax error");
 	    }
 	    NextTok ();
@@ -1425,6 +1424,14 @@ ExprNode* GenLiteralExpr (long Val)
     ExprNode* Expr = NewExprNode (EXPR_LITERAL);
     Expr->V.Val = Val;
     return Expr;
+}
+
+
+
+ExprNode* GenLiteral0 (void)
+/* Return an expression tree that encodes the the number zero */
+{
+    return GenLiteralExpr (0);
 }
 
 

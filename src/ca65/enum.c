@@ -59,7 +59,7 @@ void DoEnum (void)
 {
     /* Start at zero */
     long      Offs     = 0;
-    ExprNode* BaseExpr = GenLiteralExpr (0);
+    ExprNode* BaseExpr = GenLiteral0 ();
 
     /* Check for a name */
     int Anon = (Tok != TOK_IDENT);

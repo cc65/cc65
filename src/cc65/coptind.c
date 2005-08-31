@@ -406,12 +406,17 @@ unsigned OptJumpCascades (CodeSeg* S)
 	     	/* Remember, we had changes */
 	     	++Changes;
 
+	     	/* Done */
+	      	continue;
+
+	    }
+
 	    /* Check if both are conditional branches, and the condition of
 	     * the second is the inverse of that of the first. In this case,
 	     * the second branch will never be taken, and we may jump directly
 	     * to the instruction behind this one.
 	     */
-	    } else if ((E->Info & OF_CBRA) != 0 && (N->Info & OF_CBRA) != 0) {
+	    if ((E->Info & OF_CBRA) != 0 && (N->Info & OF_CBRA) != 0) {
 
 	    	CodeEntry* X;	/* Instruction behind N */
 	    	CodeLabel* LX;	/* Label attached to X */
@@ -442,6 +447,9 @@ unsigned OptJumpCascades (CodeSeg* S)
 
 	     	/* Remember, we had changes */
 	     	++Changes;
+
+	     	/* Done */
+	      	continue;
 
 	    }
 	}

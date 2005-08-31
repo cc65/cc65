@@ -639,7 +639,7 @@ static void Primary (ExprDesc* E)
 	Error ("Preprocessor expression expected");
 	ED_MakeConstAbsInt (E, 1);
 	return;
-    }
+    }       
 
     switch (CurTok.Tok) {
 
@@ -729,9 +729,7 @@ static void Primary (ExprDesc* E)
                 strcpy (Ident, CurTok.Ident);
                 NextToken ();
 
-                /* The identifier is either an implicitly declared function or an
-                 * undefined variable.
-                 */
+                /* IDENT is either an auto-declared function or an undefined variable. */
                 if (CurTok.Tok == TOK_LPAREN) {
                     /* Declare a function returning int. For that purpose, prepare a
                      * function signature for a function having an empty param list
@@ -1654,7 +1652,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	rconst = (evalexpr (CF_NONE, hienext, &Expr2) == 0);
 
 	/* Check the type of the rhs */
-   	if (!IsClassInt (Expr2.Type)) {
+	if (!IsClassInt (Expr2.Type)) {
 	    Error ("Integer expression expected");
 	}
 
@@ -1754,7 +1752,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	    }
 	} else if (IsClassPtr (Expr->Type)) {
 	    if (IsClassPtr (Expr2.Type)) {
-   	   	/* Both pointers are allowed in comparison if they point to
+	   	/* Both pointers are allowed in comparison if they point to
 	   	 * the same type, or if one of them is a void pointer.
 	         */
        	       	type* left  = Indirect (Expr->Type);
@@ -1804,7 +1802,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	       	    flags |= CF_UNSIGNED;
 	       	}
 	       	if (rconst) {
-   	       	    flags |= CF_FORCECHAR;
+	       	    flags |= CF_FORCECHAR;
 	       	}
 	    } else {
 		unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
@@ -1828,8 +1826,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
 
 
-static void hie9 (ExprDesc* Expr)
-/* Process *, / and % */
+static void hie9 (ExprDesc *Expr)
+/* Process * and / operators. */
 {
     static const GenDesc hie9_ops[] = {
         { TOK_STAR,   	GEN_NOPUSH,	g_mul   },
@@ -1840,102 +1838,6 @@ static void hie9 (ExprDesc* Expr)
     int UsedGen;
 
     hie_internal (hie9_ops, Expr, hie10, &UsedGen);
-
-
-    ExprDesc Expr2;
-    CodeMark Mark1;
-    CodeMark Mark2;
-    const GenDesc* Gen;
-    token_t Tok;       	     	 	/* The operator token */
-    unsigned ltype, type;
-    int rconst;	       	       	       	/* Operand is a constant */
-
-
-    /* Get the left hand side */
-    ExprWithCheck (hie10, Expr);
-
-    /* Check if one of our operators follows */
-    while (CurTok.Tok == TOK_STAR ||
-           CurTok.Tok == TOK_DIV ||
-           CurTok.Tok == TOK_MOD) {
-
-	/* All operators that call this function expect an int on the lhs */
-	if (!IsClassInt (Expr->Type)) {
-	    Error ("Integer expression expected");
-	}
-
-	/* Remember the operator token, then skip it */
-       	Tok = CurTok.Tok;
-	NextToken ();
-
-	/* Get the lhs on stack */
-       	GetCodePos (&Mark1);
-	ltype = TypeOf (Expr->Type);
-       	if (ED_IsConstAbs (Expr)) {
-	    /* Constant value */
-	    GetCodePos (&Mark2);
-       	    g_push (ltype | CF_CONST, Expr->IVal);
-	} else {
-	    /* Value not constant */
-	    LoadExpr (CF_NONE, Expr);
-	    GetCodePos (&Mark2);
-	    g_push (ltype, 0);
-	}
-
-	/* Get the right hand side */
-	rconst = (evalexpr (CF_NONE, hienext, &Expr2) == 0);
-
-	/* Check the type of the rhs */
-	if (!IsClassInt (Expr2.Type)) {
-	    Error ("Integer expression expected");
-	}
-
-	/* Check for const operands */
-	if (ED_IsConstAbs (Expr) && rconst) {
-
-	    /* Both operands are constant, remove the generated code */
-    	    RemoveCode (&Mark1);
-
-	    /* Evaluate the result */
-	    Expr->IVal = kcalc (Tok, Expr->IVal, Expr2.IVal);
-
-	    /* Get the type of the result */
-	    Expr->Type = promoteint (Expr->Type, Expr2.Type);
-
-	} else {
-
-   	    /* If the right hand side is constant, and the generator function
-	     * expects the lhs in the primary, remove the push of the primary
-	     * now.
-	     */
-	    unsigned rtype = TypeOf (Expr2.Type);
-	    type = 0;
-	    if (rconst) {
-	     	/* Second value is constant - check for div */
-	     	type |= CF_CONST;
-	 	rtype |= CF_CONST;
-	     	if (Tok == TOK_DIV && Expr2.IVal == 0) {
-	      	    Error ("Division by zero");
-	     	} else if (Tok == TOK_MOD && Expr2.IVal == 0) {
-	     	    Error ("Modulo operation with zero");
-	     	}
-	 	if ((Gen->Flags & GEN_NOPUSH) != 0) {
-	 	    RemoveCode (&Mark2);
-	 	    ltype |= CF_REG;   	/* Value is in register */
-	 	}
-	    }
-
- 	    /* Determine the type of the operation result. */
-       	    type |= g_typeadjust (ltype, rtype);
-	    Expr->Type = promoteint (Expr->Type, Expr2.Type);
-
-	    /* Generate code */
-	    Gen->Func (type, Expr2.IVal);
-
-            /* We have a rvalue in the primary now */
-	    ED_MakeRValExpr (Expr);
-	}
-    }
 }
 
 
@@ -2052,7 +1954,7 @@ static void parseadd (ExprDesc* Expr)
 	    	    /* Constant address that must be scaled */
        	       	    g_push (TypeOf (Expr2.Type), 0);   	/* rhs --> stack */
 	    	    g_getimmed (flags, Expr->Name, Expr->IVal);
-   	    	    g_scale (CF_PTR, ScaleFactor);
+	    	    g_scale (CF_PTR, ScaleFactor);
 	    	    g_add (CF_PTR, 0);
 	    	}
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
@@ -2302,7 +2204,7 @@ static void parsesub (ExprDesc* Expr)
  	    /* Integer subtraction. If the left hand side descriptor says that
 	     * the lhs is const, we have to remove this mark, since this is no
 	     * longer true, lhs is on stack instead.
-   	     */
+	     */
 	    if (ED_IsLocAbs (Expr)) {
 		ED_MakeRValExpr (Expr);
 	    }
@@ -2452,7 +2354,7 @@ static void hieOrPP (ExprDesc *Expr)
 
 	/* Get rhs */
 	ConstAbsIntExpr (hieAndPP, &Expr2);
-   
+
 	/* Combine the two */
 	Expr->IVal = (Expr->IVal || Expr2.IVal);
     }

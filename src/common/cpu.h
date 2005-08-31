@@ -55,6 +55,7 @@ typedef enum {
     CPU_65816,
     CPU_SUNPLUS,	        /* Not in the freeware version - sorry */
     CPU_SWEET16,
+    CPU_HUC6280,                /* Used in PC engine */
     CPU_COUNT  	    	        /* Number of different CPUs */
 } cpu_t;
 
@@ -68,6 +69,7 @@ enum {
     CPU_ISET_65816      = 1 << CPU_65816,
     CPU_ISET_SUNPLUS    = 1 << CPU_SUNPLUS,
     CPU_ISET_SWEET16    = 1 << CPU_SWEET16,
+    CPU_ISET_HUC6280    = 1 << CPU_HUC6280,
 };
 
 /* CPU used */

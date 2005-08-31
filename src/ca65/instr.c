@@ -575,7 +575,7 @@ static const struct {
 /* Instruction table for the HuC6280 (the CPU used in the PC engine) */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[98];
+    InsDesc  Ins[107];            
 } InsTabHuC6280 = {
     sizeof (InsTabHuC6280.Ins) / sizeof (InsTabHuC6280.Ins[0]),
     {
@@ -609,13 +609,18 @@ static const struct {
        	{ "BRK",  0x0000001, 0x00, 0, PutAll },
        	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
        	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+       	{ "CLA",  0x0000001, 0x62, 0, PutAll },
        	{ "CLC",  0x0000001, 0x18, 0, PutAll },
        	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
        	{ "CLI",  0x0000001, 0x58, 0, PutAll },
        	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
+       	{ "CLX",  0x0000001, 0x82, 0, PutAll },
+       	{ "CLY",  0x0000001, 0xc2, 0, PutAll },
        	{ "CMP",  0x080A66C, 0xc0, 0, PutAll },
        	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
        	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
+       	{ "CSH",  0x0000001, 0xd4, 0, PutAll },
+       	{ "CSL",  0x0000001, 0x54, 0, PutAll },
        	{ "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
        	{ "DEC",  0x000006F, 0x00, 3, PutAll },
        	{ "DEX",  0x0000001, 0xca, 0, PutAll },
@@ -654,9 +659,12 @@ static const struct {
        	{ "RTI",  0x0000001, 0x40, 0, PutAll },
        	{ "RTS",  0x0000001, 0x60, 0, PutAll },
        	{ "SBC",  0x080A66C, 0xe0, 0, PutAll },
+       	{ "SAX",  0x0000001, 0x22, 0, PutAll },
+       	{ "SAY",  0x0000001, 0x42, 0, PutAll },
        	{ "SEC",  0x0000001, 0x38, 0, PutAll },
        	{ "SED",  0x0000001, 0xf8, 0, PutAll },
        	{ "SEI",  0x0000001, 0x78, 0, PutAll },
+       	{ "SET",  0x0000001, 0xf4, 0, PutAll },
        	{ "SMB0", 0x0000004, 0x87, 1, PutAll },
        	{ "SMB1", 0x0000004, 0x97, 1, PutAll },
        	{ "SMB2", 0x0000004, 0xA7, 1, PutAll },
@@ -669,6 +677,7 @@ static const struct {
        	{ "STX",  0x000010c, 0x82, 1, PutAll },
        	{ "STY",  0x000002c, 0x80, 1, PutAll },
        	{ "STZ",  0x000006c, 0x04, 5, PutAll },
+       	{ "SXY",  0x0000001, 0x02, 0, PutAll },
        	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
        	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
        	{ "TRB",  0x000000c, 0x10, 1, PutAll },
@@ -709,7 +718,7 @@ static unsigned char EATab[9][AM65I_COUNT] = {
      	0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
      	0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
        	0x00
-    },
+    },                          
     {   /* Table 1 */
      	0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
      	0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,

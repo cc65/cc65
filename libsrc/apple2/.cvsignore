@@ -1,3 +1,7 @@
 *.emd
 *.joy
 *.tgi
+closedir.s
+opendir.s
+readdir.s
+rewinddir.s

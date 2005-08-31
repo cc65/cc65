@@ -137,6 +137,7 @@ S_OBJS = 	_cwd.o          \
 	 	memcpy.o      	\
                 memmove.o       \
 	 	memset.o      	\
+		mkdir.o		\
 		modfree.o       \
 		modload.o       \
                 oserrcheck.o    \
@@ -147,6 +148,7 @@ S_OBJS = 	_cwd.o          \
                 raise.o         \
                 remove.o        \
                 rename.o        \
+		rmdir.o		\
                 scanf.o         \
 		searchenv.o	\
 	 	setjmp.o      	\

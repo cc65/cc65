@@ -38,7 +38,12 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS=	_scrsize.o	\
+C_OBJS=	closedir.o	\
+	opendir.o	\
+	readdir.o	\
+	rewinddir.o
+
+S_OBJS=	_scrsize.o	\
      	break.o		\
      	cclear.o	\
      	cgetc.o		\
@@ -82,6 +87,11 @@ OBJS=	_scrsize.o	\
         rrdkey.o        \
         rvtabz.o        \
 	rwcommon.o	\
+	syschdir.o	\
+	sysmkdir.o	\
+	sysremove.o	\
+	sysrename.o	\
+	sysrmdir.o	\
         systime.o       \
         sysuname.o      \
         tgi_mode_table.o\
@@ -105,13 +115,13 @@ TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
 
 .PHONY:	all clean zap
 
-all: 	$(OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
+all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
 	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)

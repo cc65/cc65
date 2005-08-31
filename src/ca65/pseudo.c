@@ -1106,15 +1106,11 @@ Done:
 static void DoInclude (void)
 /* Include another file */
 {
-    char Name [MAX_STR_LEN+1];
-
     /* Name must follow */
     if (Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
-    	strcpy (Name, SVal);
-    	NextTok ();
-    	NewInputFile (Name);
+    	NewInputFile (SVal);
     }
 }
 
@@ -1221,9 +1217,6 @@ static void DoMacPack (void)
     	ErrorSkip ("Invalid macro package");
     	return;
     }
-
-    /* Skip the package name */
-    NextTok ();
 
     /* Insert the package */
     MacPackInsert (Package);

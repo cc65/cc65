@@ -364,8 +364,12 @@ void NewInputFile (const char* Name)
      	IFile  	    = I;
      	++ICount;
 
-     	/* Prime the pump */
-     	NextChar ();
+     	/* Setup the next token and character so it will be skipped on the
+         * next call to NextRawTok().
+         */
+        C = ' ';
+        Tok = TOK_SEP;
+
     }
 }
 
@@ -409,8 +413,11 @@ void NewInputData (char* Data, int Malloced)
     I->Next   	= IData;
     IData     	= I;
 
-    /* Prime the pump */
-    NextChar ();
+    /* Setup the next token and character so it will be skipped on the
+     * next call to NextRawTok().
+     */
+    C = ' ';
+    Tok = TOK_SEP;
 }
 
 
@@ -457,8 +464,8 @@ static void NextChar (void)
 
        	C = *IData->Pos++;
        	if (C == '\0') {
-       	    /* End of input data, will set to last file char */
-       	    DoneInputData ();
+       	    /* End of input data */
+            C = EOF;
        	}
 
     } else {
@@ -1198,11 +1205,21 @@ CharAgain:
 	    /* Check if we have any open token lists in this file */
 	    CheckInputStack ();
 
-	    /* If this was an include file, then close it and handle like a
-	     * separator. Do not close the main file, but return EOF.
+	    /* If this was an include file, then close it and read the next
+             * token. When an include file is opened, the last token of the
+             * old file is not skipped, to prevent the lookahead to read
+             * the next line of the old input file. So we do effectively
+             * skip the last token in the old file (the file name of the
+             * include statement).
+	     * In case of the main file, do not close it, but return EOF.
 	     */
-	    if (ICount > 1) {
+            if (IData) {
+                /* Input came from internal data */
+                DoneInputData ();
+                goto Again;
+	    } else if (ICount > 1) {
 	    	DoneInputFile ();
+                goto Again;
 	    } else {
 		Tok = TOK_EOF;
 	    }

@@ -91,12 +91,11 @@ static const struct {
 };
 
 /* Instruction table for the 6502 */
-#define INS_COUNT_6502         	56
 static const struct {
     unsigned Count;
-    InsDesc  Ins[INS_COUNT_6502];
+    InsDesc  Ins[56];
 } InsTab6502 = {
-    INS_COUNT_6502,
+    sizeof (InsTab6502.Ins) / sizeof (InsTab6502.Ins[0]),
     {
        	{ "ADC",  0x080A26C, 0x60, 0, PutAll },
        	{ "AND",  0x080A26C, 0x20, 0, PutAll },
@@ -158,12 +157,11 @@ static const struct {
 };
 
 /* Instruction table for the 6502 with illegal instructions */
-#define INS_COUNT_6502X        	70
 static const struct {
     unsigned Count;
-    InsDesc  Ins[INS_COUNT_6502X];
+    InsDesc  Ins[70];
 } InsTab6502X = {
-    INS_COUNT_6502X,
+    sizeof (InsTab6502X.Ins) / sizeof (InsTab6502X.Ins[0]),
     {
        	{ "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
@@ -239,12 +237,11 @@ static const struct {
 };
 
 /* Instruction table for the 65SC02 */
-#define INS_COUNT_65SC02      	66
 static const struct {
     unsigned Count;
-    InsDesc  Ins[INS_COUNT_65SC02];
+    InsDesc  Ins[66];
 } InsTab65SC02 = {
-    INS_COUNT_65SC02,
+    sizeof (InsTab65SC02.Ins) / sizeof (InsTab65SC02.Ins[0]),
     {
        	{ "ADC",  0x080A66C, 0x60, 0, PutAll },
        	{ "AND",  0x080A66C, 0x20, 0, PutAll },
@@ -316,12 +313,11 @@ static const struct {
 };
 
 /* Instruction table for the 65C02 */
-#define INS_COUNT_65C02       	98
 static const struct {
     unsigned Count;
-    InsDesc  Ins[INS_COUNT_65C02];
+    InsDesc  Ins[98];
 } InsTab65C02 = {
-    INS_COUNT_65C02,
+    sizeof (InsTab65C02.Ins) / sizeof (InsTab65C02.Ins[0]),
     {
        	{ "ADC",  0x080A66C, 0x60, 0, PutAll },
        	{ "AND",  0x080A66C, 0x20, 0, PutAll },
@@ -425,12 +421,11 @@ static const struct {
 };
 
 /* Instruction table for the 65816 */
-#define INS_COUNT_65816	101
 static const struct {
     unsigned Count;
-    InsDesc  Ins[INS_COUNT_65816];
+    InsDesc  Ins[101];
 } InsTab65816 = {
-    INS_COUNT_65816,
+    sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {
        	{ "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
        	{ "AND",  0x0b8f6fc, 0x20, 0, PutAll },
@@ -542,12 +537,11 @@ static const struct {
 #endif
 
 /* Instruction table for the SWEET16 pseudo CPU */
-#define INS_COUNT_SWEET16 27
 static const struct {
     unsigned Count;
-    InsDesc  Ins[INS_COUNT_SWEET16];
+    InsDesc  Ins[27];
 } InsTabSweet16 = {
-    INS_COUNT_SWEET16,
+    sizeof (InsTabSweet16.Ins) / sizeof (InsTabSweet16.Ins[0]),
     {
         { "ADD",  AMSW16_REG,              0xA0, 0, PutSweet16 },
         { "BC",   AMSW16_BRA,              0x03, 0, PutSweet16Branch },
@@ -578,6 +572,114 @@ static const struct {
     }
 };
 
+/* Instruction table for the HuC6280 (the CPU used in the PC engine) */
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[98];
+} InsTabHuC6280 = {
+    sizeof (InsTabHuC6280.Ins) / sizeof (InsTabHuC6280.Ins[0]),
+    {
+       	{ "ADC",  0x080A66C, 0x60, 0, PutAll },
+       	{ "AND",  0x080A66C, 0x20, 0, PutAll },
+       	{ "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch },
+        { "BBR1", 0x0000000, 0x1F, 0, PutBitBranch },
+        { "BBR2", 0x0000000, 0x2F, 0, PutBitBranch },
+        { "BBR3", 0x0000000, 0x3F, 0, PutBitBranch },
+        { "BBR4", 0x0000000, 0x4F, 0, PutBitBranch },
+        { "BBR5", 0x0000000, 0x5F, 0, PutBitBranch },
+        { "BBR6", 0x0000000, 0x6F, 0, PutBitBranch },
+        { "BBR7", 0x0000000, 0x7F, 0, PutBitBranch },
+        { "BBS0", 0x0000000, 0x8F, 0, PutBitBranch },
+        { "BBS1", 0x0000000, 0x9F, 0, PutBitBranch },
+        { "BBS2", 0x0000000, 0xAF, 0, PutBitBranch },
+        { "BBS3", 0x0000000, 0xBF, 0, PutBitBranch },
+        { "BBS4", 0x0000000, 0xCF, 0, PutBitBranch },
+        { "BBS5", 0x0000000, 0xDF, 0, PutBitBranch },
+        { "BBS6", 0x0000000, 0xEF, 0, PutBitBranch },
+        { "BBS7", 0x0000000, 0xFF, 0, PutBitBranch },
+       	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+       	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+       	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+       	{ "BIT",  0x0A0006C, 0x00, 2, PutAll },
+       	{ "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+       	{ "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+       	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+       	{ "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
+       	{ "BRK",  0x0000001, 0x00, 0, PutAll },
+       	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+       	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+       	{ "CLC",  0x0000001, 0x18, 0, PutAll },
+       	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
+       	{ "CLI",  0x0000001, 0x58, 0, PutAll },
+       	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
+       	{ "CMP",  0x080A66C, 0xc0, 0, PutAll },
+       	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
+       	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
+       	{ "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
+       	{ "DEC",  0x000006F, 0x00, 3, PutAll },
+       	{ "DEX",  0x0000001, 0xca, 0, PutAll },
+       	{ "DEY",  0x0000001, 0x88, 0, PutAll },
+       	{ "EOR",  0x080A66C, 0x40, 0, PutAll },
+       	{ "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
+       	{ "INC",  0x000006f, 0x00, 4, PutAll },
+       	{ "INX",  0x0000001, 0xe8, 0, PutAll },
+       	{ "INY",  0x0000001, 0xc8, 0, PutAll },
+       	{ "JMP",  0x0010808, 0x4c, 6, PutAll },
+       	{ "JSR",  0x0000008, 0x20, 7, PutAll },
+       	{ "LDA",  0x080A66C, 0xa0, 0, PutAll },
+       	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
+       	{ "LDY",  0x080006C, 0xa0, 1, PutAll },
+       	{ "LSR",  0x000006F, 0x42, 1, PutAll },
+       	{ "NOP",  0x0000001, 0xea, 0, PutAll },
+       	{ "ORA",  0x080A66C, 0x00, 0, PutAll },
+       	{ "PHA",  0x0000001, 0x48, 0, PutAll },
+       	{ "PHP",  0x0000001, 0x08, 0, PutAll },
+       	{ "PHX",  0x0000001, 0xda, 0, PutAll },
+       	{ "PHY",  0x0000001, 0x5a, 0, PutAll },
+       	{ "PLA",  0x0000001, 0x68, 0, PutAll },
+       	{ "PLP",  0x0000001, 0x28, 0, PutAll },
+       	{ "PLX",  0x0000001, 0xfa, 0, PutAll },
+       	{ "PLY",  0x0000001, 0x7a, 0, PutAll },
+       	{ "RMB0", 0x0000004, 0x07, 1, PutAll },
+       	{ "RMB1", 0x0000004, 0x17, 1, PutAll },
+       	{ "RMB2", 0x0000004, 0x27, 1, PutAll },
+       	{ "RMB3", 0x0000004, 0x37, 1, PutAll },
+       	{ "RMB4", 0x0000004, 0x47, 1, PutAll },
+       	{ "RMB5", 0x0000004, 0x57, 1, PutAll },
+       	{ "RMB6", 0x0000004, 0x67, 1, PutAll },
+       	{ "RMB7", 0x0000004, 0x77, 1, PutAll },
+       	{ "ROL",  0x000006F, 0x22, 1, PutAll },
+       	{ "ROR",  0x000006F, 0x62, 1, PutAll },
+       	{ "RTI",  0x0000001, 0x40, 0, PutAll },
+       	{ "RTS",  0x0000001, 0x60, 0, PutAll },
+       	{ "SBC",  0x080A66C, 0xe0, 0, PutAll },
+       	{ "SEC",  0x0000001, 0x38, 0, PutAll },
+       	{ "SED",  0x0000001, 0xf8, 0, PutAll },
+       	{ "SEI",  0x0000001, 0x78, 0, PutAll },
+       	{ "SMB0", 0x0000004, 0x87, 1, PutAll },
+       	{ "SMB1", 0x0000004, 0x97, 1, PutAll },
+       	{ "SMB2", 0x0000004, 0xA7, 1, PutAll },
+       	{ "SMB3", 0x0000004, 0xB7, 1, PutAll },
+       	{ "SMB4", 0x0000004, 0xC7, 1, PutAll },
+       	{ "SMB5", 0x0000004, 0xD7, 1, PutAll },
+       	{ "SMB6", 0x0000004, 0xE7, 1, PutAll },
+       	{ "SMB7", 0x0000004, 0xF7, 1, PutAll },
+       	{ "STA",  0x000A66C, 0x80, 0, PutAll },
+       	{ "STX",  0x000010c, 0x82, 1, PutAll },
+       	{ "STY",  0x000002c, 0x80, 1, PutAll },
+       	{ "STZ",  0x000006c, 0x04, 5, PutAll },
+       	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
+       	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
+       	{ "TRB",  0x000000c, 0x10, 1, PutAll },
+       	{ "TSB",  0x000000c, 0x00, 1, PutAll },
+       	{ "TSX",  0x0000001, 0xba, 0, PutAll },
+       	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
+       	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
+       	{ "TYA",  0x0000001, 0x98, 0, PutAll }
+    }
+};
+
 
 
 /* An array with instruction tables */
@@ -594,6 +696,7 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     NULL,
 #endif
     (const InsTable*) &InsTabSweet16,
+    (const InsTable*) &InsTabHuC6280,
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 

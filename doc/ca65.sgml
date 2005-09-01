@@ -135,7 +135,7 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-       	6502, 65SC02, 65C02, 65816, sunplus, sweet16
+       	6502, 65SC02, 65C02, 65816, sunplus, sweet16, HuC6280
 
   The sunplus cpu is not available in the freeware version, because the
   instruction set is "proprietary and confidential".
@@ -2756,7 +2756,7 @@ Here's a list of all control commands and a description, what they do:
         cbm             Defines the scrcode macro.
         cpu             Defines constants for the .CPU variable.
 	generic		Defines generic macros like add and sub.
-    	longbranch     	Defines conditional long jump macros.   
+    	longbranch     	Defines conditional long jump macros.
   </verb></tscreen>
 
   Including a macro package twice, or including a macro package that
@@ -3091,10 +3091,10 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816 and sunplus. Please note that
-  support for the sunplus CPU is not available in the freeware version,
-  because the instruction set of the sunplus CPU is "proprietary and
-  confidential".
+  namely: 6502, 6502X, 65SC02, 65C02, 65816, sunplus and HuC6280. Please 
+  note that support for the sunplus CPU is not available in the freeware 
+  version, because the instruction set of the sunplus CPU is "proprietary 
+  and confidential".
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,
@@ -3711,6 +3711,7 @@ each supported CPU a constant similar to
     CPU_65816
     CPU_SUNPLUS
     CPU_SWEET16
+    CPU_HUC6280
 </verb></tscreen>
 
 is defined. These constants may be used to determine the exact type of the
@@ -3724,6 +3725,7 @@ another constant is defined:
     CPU_ISET_65816
     CPU_ISET_SUNPLUS
     CPU_ISET_SWEET16
+    CPU_ISET_HUC6280
 </verb></tscreen>
 
 The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may

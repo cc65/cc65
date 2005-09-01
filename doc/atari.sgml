@@ -154,7 +154,7 @@ chip registers.
 Currently there are no graphics drivers available for the Atari platform.
 However, the runtime library provides a function named _graphics, with
 a mode parameter just like the BASIC GRAPHICS command. This function will
-turn on the requested graphics mode.
+switch to the requested graphics mode.
 There are currently no functions available to access the graphics
 memory. The access must be implemented manually.
 
@@ -162,7 +162,7 @@ Many graphics modes require more memory than the text screen which is
 in effect when the program starts up. Therefore the programmer has to
 tell the program beforehand the memory requirements of the graphics
 modes the program intends to use. 
-This can be done with the __RESERVED_MEMORY__ linker config
+This can be done by using the __RESERVED_MEMORY__ linker config
 variable. The number specified there describes the number of bytes to
 subtract from the top of available memory as seen from the runtime
 library. This memory is then used by the screen buffer.
@@ -171,7 +171,7 @@ The numbers for the different graphics modes presented below should
 only be seen as a rule of thumb. Since the screen buffer memory needs
 to start at specific boundaries, the numbers depend on the current top
 of available memory.
-These numbers were determined by a BASIC program.
+The following numbers were determined by a BASIC program.
 
 <table>
 <tabular ca="rr">

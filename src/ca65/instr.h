@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -108,7 +108,7 @@ struct InsDesc {
     void       	       	(*Emit) (const InsDesc*);/* Handler function */
 };
 
-/* An instruction table */        
+/* An instruction table */
 typedef struct InsTable InsTable;
 struct InsTable {
     unsigned   	       	Count;	    	      	/* Number of intstructions */

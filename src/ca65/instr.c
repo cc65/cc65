@@ -63,23 +63,80 @@
 
 
 /*****************************************************************************/
-/*     	     	    		     Data   			  	     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
 
-/* Forwards for handler functions */
 static void PutPCRel8 (const InsDesc* Ins);
+/* Handle branches with a 8 bit distance */
+
 static void PutPCRel16 (const InsDesc* Ins);
+/* Handle branches with an 16 bit distance and PER */
+
 static void PutBlockMove (const InsDesc* Ins);
+/* Handle the blockmove instructions (65816) */
+
+static void PutBlockTransfer (const InsDesc* Ins);
+/* Handle the block transfer instructions (HuC6280) */
+
 static void PutBitBranch (const InsDesc* Ins);
+/* Handle 65C02 branch on bit condition */
+
 static void PutREP (const InsDesc* Ins);
+/* Emit a REP instruction, track register sizes */
+
 static void PutSEP (const InsDesc* Ins);
+/* Emit a SEP instruction (65816), track register sizes */
+
+static void PutTAMn (const InsDesc* Ins);
+/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+ * implicit addressing mode, the opcode byte in the table is actually the
+ * second operand byte. The TAM instruction is the more generic form, it takes
+ * an immediate argument.
+ */
+
+static void PutTMA (const InsDesc* Ins);
+/* Emit a TMA instruction (HuC6280) with an immediate argument. Only one bit
+ * in the argument byte may be set.
+ */
+
+static void PutTMAn (const InsDesc* Ins);
+/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+ * implicit addressing mode, the opcode byte in the table is actually the
+ * second operand byte. The TAM instruction is the more generic form, it takes
+ * an immediate argument.
+ */
+
+static void PutTST (const InsDesc* Ins);
+/* Emit a TST instruction (HuC6280). */
+
 static void PutJMP (const InsDesc* Ins);
-static void PutRTS (const InsDesc* Ins);
+/* Handle the jump instruction for the 6502. Problem is that these chips have
+ * a bug: If the address crosses a page, the upper byte gets not corrected and
+ * the instruction will fail. The PutJmp function will add a linker assertion
+ * to check for this case and is otherwise identical to PutAll.
+ */
+
+static void PutRTS (const InsDesc* Ins attribute ((unused)));
+/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
+ * the enclosing scope is FAR.
+ */
+
 static void PutAll (const InsDesc* Ins);
+/* Handle all other instructions */
+
 static void PutSweet16 (const InsDesc* Ins);
+/* Handle a generic sweet16 instruction */
+
 static void PutSweet16Branch (const InsDesc* Ins);
+/* Handle a sweet16 branch instruction */
+
+
+
+/*****************************************************************************/
+/*     	     	    		     Data   	  		  	     */
+/*****************************************************************************/
 
 
 
@@ -575,7 +632,7 @@ static const struct {
 /* Instruction table for the HuC6280 (the CPU used in the PC engine) */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[107];            
+    InsDesc  Ins[135];
 } InsTabHuC6280 = {
     sizeof (InsTabHuC6280.Ins) / sizeof (InsTabHuC6280.Ins[0]),
     {
@@ -607,6 +664,7 @@ static const struct {
        	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
        	{ "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
        	{ "BRK",  0x0000001, 0x00, 0, PutAll },
+       	{ "BSR",  0x0020000, 0x44, 0, PutPCRel8 },
        	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
        	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
        	{ "CLA",  0x0000001, 0x62, 0, PutAll },
@@ -673,15 +731,42 @@ static const struct {
        	{ "SMB5", 0x0000004, 0xD7, 1, PutAll },
        	{ "SMB6", 0x0000004, 0xE7, 1, PutAll },
        	{ "SMB7", 0x0000004, 0xF7, 1, PutAll },
+       	{ "ST0",  0x0800000, 0x03, 1, PutAll },
+       	{ "ST1",  0x0800000, 0x13, 1, PutAll },
+       	{ "ST2",  0x0800000, 0x23, 1, PutAll },
        	{ "STA",  0x000A66C, 0x80, 0, PutAll },
        	{ "STX",  0x000010c, 0x82, 1, PutAll },
        	{ "STY",  0x000002c, 0x80, 1, PutAll },
        	{ "STZ",  0x000006c, 0x04, 5, PutAll },
        	{ "SXY",  0x0000001, 0x02, 0, PutAll },
+       	{ "TAI",  0x2000000, 0xf3, 0, PutBlockTransfer },
+       	{ "TAM",  0x0800000, 0x53, 1, PutAll },
+       	{ "TAM0", 0x0000001, 0x01, 0, PutTAMn},
+       	{ "TAM1", 0x0000001, 0x02, 0, PutTAMn},
+       	{ "TAM2", 0x0000001, 0x04, 0, PutTAMn},
+       	{ "TAM3", 0x0000001, 0x08, 0, PutTAMn},
+       	{ "TAM4", 0x0000001, 0x10, 0, PutTAMn},
+       	{ "TAM5", 0x0000001, 0x20, 0, PutTAMn},
+       	{ "TAM6", 0x0000001, 0x40, 0, PutTAMn},
+       	{ "TAM7", 0x0000001, 0x80, 0, PutTAMn},
        	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
        	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
+       	{ "TDD",  0x2000000, 0xc3, 0, PutBlockTransfer },
+       	{ "TIA",  0x2000000, 0xe3, 0, PutBlockTransfer },
+       	{ "TII",  0x2000000, 0x73, 0, PutBlockTransfer },
+       	{ "TIN",  0x2000000, 0xD3, 0, PutBlockTransfer },
+       	{ "TMA",  0x0800000, 0x43, 1, PutTMA },
+       	{ "TMA0", 0x0000001, 0x01, 0, PutTMAn},
+       	{ "TMA1", 0x0000001, 0x02, 0, PutTMAn},
+       	{ "TMA2", 0x0000001, 0x04, 0, PutTMAn},
+       	{ "TMA3", 0x0000001, 0x08, 0, PutTMAn},
+       	{ "TMA4", 0x0000001, 0x10, 0, PutTMAn},
+       	{ "TMA5", 0x0000001, 0x20, 0, PutTMAn},
+       	{ "TMA6", 0x0000001, 0x40, 0, PutTMAn},
+       	{ "TMA7", 0x0000001, 0x80, 0, PutTMAn},
        	{ "TRB",  0x000000c, 0x10, 1, PutAll },
        	{ "TSB",  0x000000c, 0x00, 1, PutAll },
+        { "TST",  0x000006c, 0x83, 9, PutTST },
        	{ "TSX",  0x0000001, 0xba, 0, PutAll },
        	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
        	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
@@ -712,60 +797,66 @@ const InsTable* InsTab = (const InsTable*) &InsTab6502;
 /* Table to build the effective 65xx opcode from a base opcode and an
  * addressing mode.
  */
-static unsigned char EATab[9][AM65I_COUNT] = {
+static unsigned char EATab[10][AM65I_COUNT] = {
     {   /* Table 0 */
      	0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
      	0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
      	0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
-       	0x00
-    },                          
+       	0x00, 0x00
+    },
     {   /* Table 1 */
      	0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
      	0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
     },
     {   /* Table 2 */
      	0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
       	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
     },
     {   /* Table 3 */
      	0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
     },
     {   /* Table 4 */
      	0x1A, 0x1A, 0xE6, 0xEE, 0x00, 0xF6, 0xFE, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
     },
     {   /* Table 5 */
      	0x00, 0x00, 0x60, 0x98, 0x00, 0x70, 0x9E, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
     },
     {   /* Table 6 */
      	0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
      	0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
     },
     {   /* Table 7 */
      	0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      	0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
     },
     {   /* Table 8 */
        	0x00, 0x40, 0x01, 0x41, 0x00, 0x09, 0x49, 0x00,
      	0x00, 0x00, 0x00, 0x51, 0x00, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-       	0x00
+       	0x00, 0x00
+    },
+    {   /* Table 9 */
+       	0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x30, 0x00,
+     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+       	0x00, 0x00
     },
 };
 
@@ -783,31 +874,32 @@ static unsigned char Sweet16EATab[2][AMSW16I_COUNT] = {
 
 /* Table that encodes the additional bytes for each 65xx instruction */
 unsigned char ExtBytes[AM65I_COUNT] = {
-    0,	    	/* Implicit */
-    0,	    	/* Accu */
-    1,	    	/* Direct */
-    2,	    	/* Absolute */
-    3, 	    	/* Absolute long */
-    1,	    	/* Direct,X */
-    2,	    	/* Absolute,X */
-    3,	    	/* Absolute long,X */
-    1,	    	/* Direct,Y */
-    2,	    	/* Absolute,Y */
-    1,	    	/* (Direct) */
-    2,	    	/* (Absolute) */
-    1,	    	/* [Direct] */
-    1,	    	/* (Direct),Y */
-    1,	    	/* [Direct],Y */
-    1,	    	/* (Direct,X) */
-    2,	    	/* (Absolute,X) */
-    1,	    	/* Relative short */
-    2,	    	/* Relative long */
-    1,	    	/* r,s */
-    1,	    	/* (r,s),y */
-    1,	    	/* Immidiate accu */
-    1,	    	/* Immidiate index */
-    1,	     	/* Immidiate byte */
-    2 	    	/* Blockmove */
+    0,	      	/* Implicit */
+    0,	      	/* Accu */
+    1,	      	/* Direct */
+    2,	      	/* Absolute */
+    3, 	      	/* Absolute long */
+    1,	      	/* Direct,X */
+    2,	      	/* Absolute,X */
+    3,	      	/* Absolute long,X */
+    1,	      	/* Direct,Y */
+    2,	      	/* Absolute,Y */
+    1,	      	/* (Direct) */
+    2,	      	/* (Absolute) */
+    1,	      	/* [Direct] */
+    1,	      	/* (Direct),Y */
+    1,	      	/* [Direct],Y */
+    1,	      	/* (Direct,X) */
+    2,	      	/* (Absolute,X) */
+    1,	      	/* Relative short */
+    2,	      	/* Relative long */
+    1,	      	/* r,s */
+    1,	      	/* (r,s),y */
+    1,	      	/* Immidiate accu */
+    1,	      	/* Immidiate index */
+    1,	      	/* Immidiate byte */
+    2, 	      	/* Blockmove (65816) */
+    7, 	       	/* Block transfer (HuC6280) */
 };
 
 /* Table that encodes the additional bytes for each SWEET16 instruction */
@@ -1007,12 +1099,25 @@ static void PutPCRel16 (const InsDesc* Ins)
 
 
 static void PutBlockMove (const InsDesc* Ins)
-/* Handle the blockmove instructions */
+/* Handle the blockmove instructions (65816) */
 {
     Emit0 (Ins->BaseCode);
     EmitByte (Expression ());
     ConsumeComma ();
     EmitByte (Expression ());
+}
+
+
+
+static void PutBlockTransfer (const InsDesc* Ins)
+/* Handle the block transfer instructions (HuC6280) */
+{
+    Emit0 (Ins->BaseCode);
+    EmitWord (Expression ());
+    ConsumeComma ();
+    EmitWord (Expression ());
+    ConsumeComma ();
+    EmitWord (Expression ());
 }
 
 
@@ -1042,7 +1147,7 @@ static void PutREP (const InsDesc* Ins)
 	    /* We had an error */
 	    Warning (1, "Cannot track processor status byte");
 	} else {
-	    if (Val & 0x10) {
+   	    if (Val & 0x10) {
 	       	/* Index registers to 16 bit */
 	       	ExtBytes[AM65I_IMM_INDEX] = 2;
      	    }
@@ -1057,7 +1162,7 @@ static void PutREP (const InsDesc* Ins)
 
 
 static void PutSEP (const InsDesc* Ins)
-/* Emit a SEP instruction, track register sizes */
+/* Emit a SEP instruction (65816), track register sizes */
 {
     /* Use the generic handler */
     long Val = PutImmed8 (Ins);
@@ -1071,14 +1176,107 @@ static void PutSEP (const InsDesc* Ins)
      	    Warning (1, "Cannot track processor status byte");
      	} else {
      	    if (Val & 0x10) {
-     	   	/* Index registers to 8 bit */
-     	   	ExtBytes[AM65I_IMM_INDEX] = 1;
+     	      	/* Index registers to 8 bit */
+     	      	ExtBytes[AM65I_IMM_INDEX] = 1;
      	    }
      	    if (Val & 0x20) {
-     	   	/* Accu to 8 bit */
-     	   	ExtBytes[AM65I_IMM_ACCU] = 1;
+     	      	/* Accu to 8 bit */
+     	      	ExtBytes[AM65I_IMM_ACCU] = 1;
      	    }
      	}
+    }
+}
+
+
+
+static void PutTAMn (const InsDesc* Ins)
+/* Emit a TAMn instruction (HuC6280). Since this is a two byte instruction with
+ * implicit addressing mode, the opcode byte in the table is actually the
+ * second operand byte. The TAM instruction is the more generic form, it takes
+ * an immediate argument.
+ */
+{
+    /* Emit the TAM opcode itself */
+    Emit0 (0x53);
+
+    /* Emit the argument, which is the opcode from the table */
+    Emit0 (Ins->BaseCode);
+}
+
+
+
+static void PutTMA (const InsDesc* Ins)
+/* Emit a TMA instruction (HuC6280) with an immediate argument. Only one bit
+ * in the argument byte may be set.
+ */
+{
+    /* Use the generic handler */
+    long Val = PutImmed8 (Ins);
+
+    /* Check the range for Val. */
+    if (Val < 0) {
+        /* We had an error */
+        Warning (1, "Cannot check argument of TMA instruction");
+    } else {
+        /* Make sure just one bit is set */
+        if ((Val & (Val - 1)) != 0) {
+            Error ("Argument to TAM must be a power of two");
+        }
+    }
+}
+
+
+
+static void PutTMAn (const InsDesc* Ins)
+/* Emit a TMAn instruction (HuC6280). Since this is a two byte instruction with
+ * implicit addressing mode, the opcode byte in the table is actually the
+ * second operand byte. The TAM instruction is the more generic form, it takes
+ * an immediate argument.
+ */
+{
+    /* Emit the TMA opcode itself */
+    Emit0 (0x43);
+
+    /* Emit the argument, which is the opcode from the table */
+    Emit0 (Ins->BaseCode);
+}
+
+
+
+static void PutTST (const InsDesc* Ins)
+/* Emit a TST instruction (HuC6280). */
+{
+    ExprNode* Arg1;
+    EffAddr   A;
+
+    /* The first argument is always an immediate byte */
+    if (Tok != TOK_HASH) {
+        ErrorSkip ("Invalid addressing mode");
+        return;
+    }
+    NextTok ();
+    Arg1 = Expression ();
+
+    /* Second argument follows */
+    ConsumeComma ();
+
+    /* For the second argument, we use the standard function */
+    if (EvalEA (Ins, &A)) {
+
+        /* No error, output code */
+        Emit1 (A.Opcode, Arg1);
+
+        /* Check how many extension bytes are needed and output the instruction */
+        switch (ExtBytes[A.AddrMode]) {
+
+            case 1:
+                EmitByte (A.Expr);
+                break;
+
+            case 2:
+                EmitWord (A.Expr);
+                break;
+        }
     }
 }
 

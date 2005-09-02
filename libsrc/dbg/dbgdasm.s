@@ -9,7 +9,7 @@
 ; (TEDMon).
 ;
 
-	.import		utsta0, popax
+	.import		popax
 	.import		__hextab, OffsetTab, AdrFlagTab
 	.import		SymbolTab1, SymbolTab2, MnemoTab1, MnemoTab2
 
@@ -76,7 +76,8 @@ disassret:
     	ldx	OperandLen	; Get length of operand
     	inx	   		; Adjust for opcode byte
     	txa
-    	jmp	utsta0		; Set condition codes
+        ldx     #$00            ; Clear high byte
+        rts     
 
 ; -------------------------------------------------------------------------
 ; Helper functions
@@ -133,7 +134,7 @@ PutHex8:
 	rts
 
 ; -------------------------------------------------------------------------
-; Eine Zeile disassemblieren
+; Disassemble one line
 
 DisAssLine:
 	ldy	MemPtr

@@ -33,6 +33,14 @@ Platforms:     	The program is currently only running on the C64, but should
 		be portable to the C128 and CBM510 (and maybe more machines).
 
 -----------------------------------------------------------------------------
+Name:           diodemo
+Description:	A disc copy program written and contributed by Oliver
+                Schmidt, <ol.sc@web.de>. Supports single or dual disc copy.
+Platforms:     	The program does depend on conio and dio (direct disk i/o),
+                so it does currently compile for the Atari and Apple ][
+                machines.
+
+-----------------------------------------------------------------------------
 Name:           gunzip65
 Description:	A gunzip utility for 6502 based machines written by Piotr
                 Fusik <fox@scene.pl>.
@@ -85,5 +93,5 @@ Name:           tgidemo
 Description:	Shows some of the graphics capabilities of the "tiny graphics
 		interface".
 Platforms:	Runs on all platforms that have TGI support:
-		C64
+		Apple ][, C64, C128, Oric Atmos, Geos and Lynx.
 

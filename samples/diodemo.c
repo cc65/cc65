@@ -66,7 +66,7 @@ static driveid_t AskForDrive (const char* Name)
         Char = cgetc ();
         if (isdigit (Char)) {
             cputc (Char);
-            Drive = (driveid_t) (Drive * 10 + Char - '0');
+            Drive = Drive * 10 + Char - '0';
         }
     } while (Char != CH_ENTER);
 
@@ -87,7 +87,7 @@ static void AskForDisk (const char* Name, driveid_t Drive)
 static char* AllocBuffer (sectsize_t SectSize, sectnum_t SectCount, sectnum_t* ChunkCount)
 /* Allocate a copy buffer on the heap and return a pointer to it */
 {
-    void*         Buffer = NULL;
+    char*         Buffer = NULL;
     unsigned long BufferSize;
     unsigned int  Chunks = 1;
 
@@ -101,11 +101,11 @@ static char* AllocBuffer (sectsize_t SectSize, sectnum_t SectCount, sectnum_t* C
         }
     } while (Buffer == NULL && ++Chunks <= MAX_CHUNKS);
 
-    return (char*) Buffer;
+    return Buffer;
 }
 
 
-int main (void)
+int main (int argc, const char* argv[])
 {
     driveid_t  SourceId;
     driveid_t  TargetId;
@@ -126,9 +126,28 @@ int main (void)
     cputs ("\r\n");
 
     /* Get source and target drive id (which may very well be identical) */
-    SourceId = AskForDrive ("Source");
-    TargetId = AskForDrive ("Target");
-    cputs ("\r\n\n");
+    switch (argc) {
+      case 1:
+        SourceId = AskForDrive ("Source");
+        TargetId = AskForDrive ("Target");
+        cputs ("\r\n");
+        break;
+
+      case 2:
+        SourceId = TargetId = atoi (argv[1]);
+        break;
+
+      case 3:
+        SourceId = atoi (argv[1]);
+        TargetId = atoi (argv[2]);
+        break;
+
+      default:
+        cprintf ("\r\nToo many arguments\r\n");
+        return EXIT_FAILURE;
+    }
+
+    cputs ("\r\n");
 
     do {
         /* Check for single drive copy or inital iteration */
@@ -136,8 +155,10 @@ int main (void)
             AskForDisk ("Source", SourceId);
         }
 
-        /* Open drive on initial iteration */
+        /* Check for initial iteration */
         if (Source == NULL) {
+
+            /* Open source drive */
             Source = dio_open (SourceId);
             if (Source == NULL) {
                 cprintf ("\r\n\nError %d on opening Drive %d\r\n", (int) _oserror, SourceId);
@@ -147,7 +168,7 @@ int main (void)
             SectSize  = dio_query_sectsize (Source);
             SectCount = dio_query_sectcount (Source);
 
-            /* */
+            /* Allocate buffer */
             Buffer = AllocBuffer (SectSize, SectCount, &ChunkCount);
             if (Buffer == NULL) {
                 cputs ("\r\n\nError on allocating Buffer\r\n");
@@ -163,7 +184,7 @@ int main (void)
 
             /* Read one sector */
             if (dio_read (Source, Sector, Buffer + (Sector - ChunkOffset) * SectSize) != 0) {
-                cprintf ("\r\n\nError %d on reading Drive %d\r\n", (int) _oserror, SourceId);
+                cprintf ("\r\n\nError %d on reading from Drive %d\r\n", (int) _oserror, SourceId);
                 return EXIT_FAILURE;
             }
         }
@@ -173,7 +194,7 @@ int main (void)
             AskForDisk ("Target", TargetId);
         }
 
-        /* Open drive on initial iteration */
+        /* Open target drive on initial iteration */
         if (Target == NULL) {
             Target = dio_open (TargetId);
             if (Target == NULL) {
@@ -197,7 +218,7 @@ int main (void)
 
             /* Write one sector */
             if (dio_write (Target, Sector, Buffer + (Sector - ChunkOffset) * SectSize) != 0) {
-                cprintf ("\r\n\nError %d on opening Drive %d\r\n", (int) _oserror, TargetId);
+                cprintf ("\r\n\nError %d on writing to Drive %d\r\n", (int) _oserror, TargetId);
                 return EXIT_FAILURE;
             }
         }

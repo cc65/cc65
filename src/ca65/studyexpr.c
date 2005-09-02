@@ -1378,34 +1378,30 @@ void StudyExpr (ExprNode* Expr, ExprDesc* D)
      */
     if (ED_IsValid (D)) {
         unsigned char AddrSize;
-        if (D->SymCount == 1 && D->SecCount == 0) {
-            /* Exactly one symbol. Assume that the expression has the size of
-             * the symbol, provided that this size is known.
-             */
-            const SymEntry* Sym = D->SymRef[0].Ref;
-            AddrSize = GetSymAddrSize (Sym);
-            if (AddrSize != ADDR_SIZE_DEFAULT) {
-                D->AddrSize = AddrSize;
-            } else {
-                AddrSize = GetConstAddrSize (D->Val);
+
+        /* If there are symbols or sections, use the largest one. If the
+         * expression resolves to a const, use the address size of the value.
+         */
+        if (D->SymCount > 0 || D->SecCount > 0) {
+
+            D->AddrSize = ADDR_SIZE_DEFAULT;
+
+            for (I = 0; I < D->SymCount; ++I) {
+                const SymEntry* Sym = D->SymRef[I].Ref;
+                AddrSize = GetSymAddrSize (Sym);
                 if (AddrSize > D->AddrSize) {
                     D->AddrSize = AddrSize;
                 }
             }
-        } else if (D->SymCount == 0 && D->SecCount == 1) {
-            /* Exactly one segment reference (segment+offset). In this case,
-             * the expression has the address size of the segment.
-             */
-            unsigned SegNum = D->SecRef[0].Ref;
-            AddrSize = GetSegAddrSize (SegNum);
-            if (AddrSize != ADDR_SIZE_DEFAULT) {
-                D->AddrSize = AddrSize;
-            } else {
-                AddrSize = GetConstAddrSize (D->Val);
+
+            for (I = 0; I < D->SecCount; ++I) {
+                unsigned SegNum = D->SecRef[0].Ref;
+                AddrSize = GetSegAddrSize (SegNum);
                 if (AddrSize > D->AddrSize) {
                     D->AddrSize = AddrSize;
                 }
             }
+
         } else {
             AddrSize = GetConstAddrSize (D->Val);
             if (AddrSize > D->AddrSize) {

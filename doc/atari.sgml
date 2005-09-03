@@ -7,7 +7,7 @@
 url="mailto:shawnjefferson@24fightingchickens.com"
 name="shawnjefferson@24fightingchickens.com"> and 
 Christian Groessler, <htmlurl url="mailto:cpg@aladdin.de" name="cpg@aladdin.de">
-<date>11-Aug-2005
+<date>03-Sep-2005
 
 <abstract>
 An overview over the Atari runtime system as it is implemented for the cc65 C
@@ -316,20 +316,23 @@ MEMORY {
 
     SECHDR: start = $0000, size = $4, file = %O;        # second load chunk
     RAM: start = $8000, size = $3C20, file = %O;        # $3C20: matches upper bound $BC1F
+    TRAILER: start = $0000, size = $0006, file = %O;
 }
 SEGMENTS {
-    EXEHDR: load = BANK, type = wprot;
+    EXEHDR: load = BANK, type = ro;
 
-    NEXEHDR: load = HEADER, type = wprot;               # first load chunk
-    CODE: load = RAMLO, type = wprot, define = yes;
+    NEXEHDR: load = HEADER, type = ro;                  # first load chunk
+    LOWCODE: load = RAMLO, type = ro, define = yes, optional = yes;
+    INIT: load = RAMLO, type = ro, optional = yes;
+    CODE: load = RAMLO, type = ro, define = yes;
 
-    CHKHDR: load = SECHDR, type = wprot;                # second load chunk
-    RODATA: load = RAM, type = wprot, define = yes;
+    CHKHDR: load = SECHDR, type = ro;                   # second load chunk
+    RODATA: load = RAM, type = ro, define = yes;
     DATA: load = RAM, type = rw, define = yes;
     BSS: load = RAM, type = bss, define = yes;
 
     ZEROPAGE: load = ZP, type = zp;
-    AUTOSTRT: load = RAM, type = wprot;                 # defines program entry point
+    AUTOSTRT: load = TRAILER, type = ro;                # defines program entry point
 }
 FEATURES {
     CONDES: segment = RODATA,
@@ -343,6 +346,7 @@ FEATURES {
 }
 SYMBOLS {
     __STACKSIZE__ = $800;       # 2K stack
+    __RESERVED_MEMORY__: value = $0, weak = yes;
 }
 </verb></tscreen>
 <p>
@@ -363,13 +367,13 @@ memory area).
 The contents of the new NEXEHDR and CHKHDR segments come from this
 file (split.s):
 <tscreen><verb>
-        .import __CODE_LOAD__, __BSS_LOAD__, __CODE_SIZE__
-        .import __DATA_LOAD__, __RODATA_LOAD__
+        .import __LOWCODE_LOAD__, __BSS_LOAD__, __CODE_SIZE__
+        .import __CODE_LOAD__, __DATA_LOAD__, __RODATA_LOAD__
 
         .segment "NEXEHDR"
         .word    $FFFF          ; EXE file magic number
         ; 1st load chunk
-        .word    __CODE_LOAD__
+        .word    __LOWCODE_LOAD__
         .word    __CODE_LOAD__ + __CODE_SIZE__ - 1
 
         .segment "CHKHDR"
@@ -400,20 +404,23 @@ MEMORY {
 
     SECHDR: start = $0000, size = $4, file = %O;        # second load chunk
     RAM: start = $8000, size = $3C20, file = %O;        # $3C20: matches upper bound $BC1F
+    TRAILER: start = $0000, size = $0006, file = %O;
 }
 SEGMENTS {
-    EXEHDR: load = BANK, type = wprot;                  # discarded old EXE header
+    EXEHDR: load = BANK, type = ro;                     # discarded old EXE header
 
-    NEXEHDR: load = HEADER, type = wprot;               # first load chunk
-    RODATA: load = RAMLO, type = wprot, define = yes;
+    NEXEHDR: load = HEADER, type = ro;                  # first load chunk
+    RODATA: load = RAMLO, type = ro, define = yes;
     DATA: load = RAMLO, type = rw, define = yes;
 
-    CHKHDR: load = SECHDR, type = wprot;                # second load chunk
-    CODE: load = RAM, type = wprot, define = yes;
+    CHKHDR: load = SECHDR, type = ro;                   # second load chunk
+    LOWCODE: load = RAM, type = ro, define = yes, optional = yes;
+    INIT: load = RAM, type = ro, optional = yes;
+    CODE: load = RAM, type = ro, define = yes;
     BSS: load = RAM, type = bss, define = yes;
 
     ZEROPAGE: load = ZP, type = zp;
-    AUTOSTRT: load = RAM, type = wprot;                 # defines program entry point
+    AUTOSTRT: load = TRAILER, type = ro;                # defines program entry point
 }
 FEATURES {
     CONDES: segment = RODATA,
@@ -427,12 +434,13 @@ FEATURES {
 }
 SYMBOLS {
     __STACKSIZE__ = $800;       # 2K stack
+    __RESERVED_MEMORY__: value = $0, weak = yes;
 }
 </verb></tscreen>
 
 New contents for NEXEHDR and CHKHDR are needed (split2.s):
 <tscreen><verb>
-        .import __CODE_LOAD__, __BSS_LOAD__, __DATA_SIZE__
+        .import __LOWCODE_LOAD__, __BSS_LOAD__, __DATA_SIZE__
         .import __DATA_LOAD__, __RODATA_LOAD__
 
         .segment "NEXEHDR"
@@ -441,7 +449,7 @@ New contents for NEXEHDR and CHKHDR are needed (split2.s):
         .word    __DATA_LOAD__ + __DATA_SIZE__ - 1
 
         .segment "CHKHDR"
-        .word    __CODE_LOAD__
+        .word    __LOWCODE_LOAD__
         .word    __BSS_LOAD__ - 1
 </verb></tscreen>
 

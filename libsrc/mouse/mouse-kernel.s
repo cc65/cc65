@@ -91,9 +91,11 @@ _mouse_install:
         ldy     tmp1
         bpl     @L2
 
-; Call driver install routine
+; Call driver install routine and check for errors
 
         jsr     mouse_install
+        tay                             ; Test error code
+        bne     @L3                     ; Bail out if install had errors
 
 ; Install the IRQ vector if the driver needs it. A/X contains the error code
 ; from mouse_install, so don't use it.

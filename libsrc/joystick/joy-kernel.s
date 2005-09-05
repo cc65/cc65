@@ -77,6 +77,8 @@ _joy_install:
         bne     @L2
 
         jsr     joy_install             ; Call driver install routine
+        tay                             ; Test error code
+        bne     @L3                     ; Bail out if install had errors
 
 ; Install the IRQ vector if the driver needs it. A/X contains the error code
 ; from joy_install, so don't use it.

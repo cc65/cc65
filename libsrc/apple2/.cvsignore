@@ -1,5 +1,6 @@
 *.emd
 *.joy
+*.ser
 *.tgi
 closedir.s
 opendir.s

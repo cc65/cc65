@@ -940,6 +940,37 @@ configfile/. The go on and modify the config file to suit your needs.
 
 
 
+<sect>Special segments<p>
+
+The builtin config files do contain segments that have a special meaning for
+the compiler and the libraries that come with it. If you replace the builtin
+config files, you will need the following information.
+
+<sect1>INIT<p>
+
+The INIT segment is used for initialization code that may be reused once
+executation reaches main() - provided that the program runs in RAM. You
+may for example add the INIT segment to the heap in really memory
+constrained systems.
+
+<sect1>LOWCODE<p>
+
+For the LOWCODE segment, it is guaranteed that it won't be banked out, so it
+is reachable at any time by interrupt handlers or similar.
+
+<sect1>STARTUP<p>
+
+This segment contains the startup code which initializes the C software stack
+and the libraries. It is placed in its own segment because it needs to be
+loaded at the lowest possible program address on several platforms.
+
+<sect1>HEAP<p>
+
+This segment defines the location of the memory heap used by the malloc
+routine. 
+
+
+
 <sect>Bugs/Feedback<p>
 
 If you have problems using the linker, if you find any bugs, or if you're

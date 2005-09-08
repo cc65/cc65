@@ -32,6 +32,9 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I ../apple2 -I ../../include
 %.joy:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
+%.ser:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
 %.tgi:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
@@ -107,7 +110,7 @@ EMDS = apple2-lc.emd
 
 JOYS = apple2-stdjoy.joy
 
-SERS =
+SERS = apple2-ssc.ser
 
 TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
 

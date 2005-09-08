@@ -41,18 +41,18 @@ _exit:  ldx     #<exit
         lda     #>exit
         jsr     reset		; Setup RESET vector
 
+        ; Call module destructors
+        jsr     donelib
+
         ; Check for valid interrupt vector table entry number
         lda     intnum
-        beq     :+
+        beq     exit
 
         ; Deallocate interrupt vector table entry
         dec     params		; Adjust parameter count
         jsr     ENTRY
         .byte   $41		; Dealloc interrupt
         .addr   params
-
-        ; Call module destructors
-:       jsr     donelib
 
         ; Restore the original RESET vector
 exit:   ldx     #$02
@@ -111,9 +111,6 @@ init:   ldx     #zpspace-1
         lda     HIMEM+1
         sta     sp+1   	    	; Set argument stack ptr
 
-        ; Call module constructors
-        jsr     initlib
-
         ; Check for interruptors
         lda     #<__INTERRUPTOR_COUNT__
         beq     :+
@@ -129,8 +126,15 @@ init:   ldx     #zpspace-1
         .addr   params
         bcs     prterr
 
+	; Enable interrupts as old ProDOS versions (i.e. 1.1.1)
+	; jump to SYS and BIN programs with interrupts disabled
+	cli
+
+        ; Call module constructors
+:       jsr     initlib
+
         ; Push arguments and call main()
-:       jmp     callmain
+        jmp     callmain
 
         ; Print error message and return
 prterr: ldx     #msglen-1

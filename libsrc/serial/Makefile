@@ -34,6 +34,7 @@ C_OBJS =        ser_load.o
 S_OBJS =       	ser-kernel.o	\
                 ser_close.o     \
                 ser_get.o       \
+                ser_ioctl.o     \
                 ser_open.o      \
                 ser_put.o       \
                 ser_status.o    \

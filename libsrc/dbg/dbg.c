@@ -1310,7 +1310,7 @@ static void SingleStep (char StepInto)
     	    /* Be sure not to set the breakpoint twice if this is a jump to
     	     * the following instruction.
     	     */
-    	    Offs = *(signed char*)(brk_pc+1);
+            Offs = ((signed char*)brk_pc)[1];
     	    if (Offs) {
     	     	DbgSetTmpBreak (brk_pc + Offs + 2);
     	    }

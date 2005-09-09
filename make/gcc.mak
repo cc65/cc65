@@ -58,7 +58,7 @@ libs:
 
 # A host system might not have LinuxDoc Tools, so this rule ignores errors.
 docs:
-	-@$(MAKE) -C doc html
+	-@sgml2html > /dev/null 2>&1 && $(MAKE) -C doc html || echo 'SGML-Tools not installed, skipping docs'
 
 # Some platforms cannot compile all of the sample and library-test programs.
 # So, these rules ignore errors.
@@ -90,12 +90,12 @@ install:	install-test install-dirs install-bins install-libs install-docs
 
 .PHONY:	install-test
 install-test:
-	@if [ `id -u` != 0 ]; then					\
-	  echo >&2;							\
-	  echo 'Do "make install" or "make uninstall" as root.' >&2;	\
-	  echo >&2;							\
-	  false;							\
-	  fi
+#	@if [ `id -u` != 0 ]; then					\
+#	  echo >&2;							\
+#	  echo 'Do "make install" or "make uninstall" as root.' >&2;	\
+#	  echo >&2;							\
+#	  false;							\
+#	  fi
 
 .PHONY:	install-dirs
 install-dirs:

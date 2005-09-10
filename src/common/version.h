@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -45,8 +45,8 @@
 
 
 #define VER_MAJOR	2U
-#define VER_MINOR	10U
-#define VER_PATCH	5U
+#define VER_MINOR	11U
+#define VER_PATCH	0U
 
 #define VERSION         ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH)
 

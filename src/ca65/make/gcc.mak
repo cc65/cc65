@@ -90,7 +90,7 @@ clean:
 	rm -f *~ core *.lst
 
 zap:	clean
-	rm -f *.o $(EXECS) .depend
+	rm -f *.o $(EXECS) $(INCS) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

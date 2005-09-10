@@ -98,7 +98,7 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM -MG $^ > .depend
 
 # -----------------------------------------------------------------------------
 # Rules to make config includes

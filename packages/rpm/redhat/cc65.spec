@@ -11,7 +11,7 @@
 Summary: Crosscompiler/Crossassembler for 6502 systems
 %define name cc65
 Name: %{name}
-%define version 2.10.5
+%define version 2.11.0
 Version: %{version}
 Release: 1
 Copyright: Freeware with exceptions - see docs

@@ -58,7 +58,7 @@ libs:
 
 # A host system might not have LinuxDoc Tools, so this rule ignores errors.
 docs:
-	-@sgml2html > /dev/null 2>&1 && $(MAKE) -C doc html || echo 'SGML-Tools not installed, skipping docs'
+	-@$(MAKE) -C doc html
 
 # Some platforms cannot compile all of the sample and library-test programs.
 # So, these rules ignore errors.

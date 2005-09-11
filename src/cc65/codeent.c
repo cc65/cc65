@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -394,10 +394,22 @@ void CE_SetNumArg (CodeEntry* E, long Num)
 
 
 
-int CE_KnownImm (const CodeEntry* E)
-/* Return true if the argument of E is a known immediate value */
+int CE_IsConstImm (const CodeEntry* E)
+/* Return true if the argument of E is a constant immediate value */
 {
     return (E->AM == AM65_IMM && (E->Flags & CEF_NUMARG) != 0);
+}
+
+
+
+int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
+/* Return true if the argument of E is a constant immediate value that is
+ * equal to Num.
+ */
+{
+    return E->AM == AM65_IMM            &&
+           (E->Flags & CEF_NUMARG) != 0 &&
+           E->Num == Num;
 }
 
 
@@ -519,7 +531,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_AND:
        	    if (RegValIsKnown (In->RegA)) {
-		if (CE_KnownImm (E)) {
+		if (CE_IsConstImm (E)) {
 		    Out->RegA = In->RegA & (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
 		    switch (GetKnownReg (E->Use & REG_ZP, In)) {
@@ -676,7 +688,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_EOR:
        	    if (RegValIsKnown (In->RegA)) {
-		if (CE_KnownImm (E)) {
+		if (CE_IsConstImm (E)) {
 		    Out->RegA = In->RegA ^ (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
 		    switch (GetKnownReg (E->Use & REG_ZP, In)) {
@@ -825,7 +837,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_LDA:
-	    if (CE_KnownImm (E)) {
+	    if (CE_IsConstImm (E)) {
 	     	Out->RegA = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Use & REG_ZP, In)) {
@@ -855,7 +867,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_LDX:
-	    if (CE_KnownImm (E)) {
+	    if (CE_IsConstImm (E)) {
 	     	Out->RegX = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Use & REG_ZP, In)) {
@@ -885,7 +897,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_LDY:
-	    if (CE_KnownImm (E)) {
+	    if (CE_IsConstImm (E)) {
 	     	Out->RegY = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Use & REG_ZP, In)) {
@@ -946,7 +958,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_ORA:
 	    if (RegValIsKnown (In->RegA)) {
-	 	if (CE_KnownImm (E)) {
+	 	if (CE_IsConstImm (E)) {
 	 	    Out->RegA = In->RegA | (short) E->Num;
 	       	} else if (E->AM == AM65_ZP) {
 	 	    switch (GetKnownReg (E->Use & REG_ZP, In)) {

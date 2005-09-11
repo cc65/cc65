@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -841,8 +841,7 @@ unsigned OptDupLoads (CodeSeg* S)
 
 	    case OP65_LDA:
        	        if (RegValIsKnown (In->RegA)          && /* Value of A is known */
-       		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-       	       	    In->RegA == (long) E->Num         && /* Both are equal */
+       		    CE_IsKnownImm (E, In->RegA)       && /* Value to be loaded is known */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    !CE_UseLoadFlags (N)) {    	       	 /* Which does not use the flags */
 		    Delete = 1;
@@ -851,8 +850,7 @@ unsigned OptDupLoads (CodeSeg* S)
 
 	    case OP65_LDX:
        	        if (RegValIsKnown (In->RegX)          && /* Value of X is known */
-		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-		    In->RegX == (long) E->Num         && /* Both are equal */
+		    CE_IsKnownImm (E, In->RegX)       && /* Value to be loaded is known */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    !CE_UseLoadFlags (N)) {    	       	 /* Which does not use the flags */
 		    Delete = 1;
@@ -861,8 +859,7 @@ unsigned OptDupLoads (CodeSeg* S)
 
 	    case OP65_LDY:
        	        if (RegValIsKnown (In->RegY)          && /* Value of Y is known */
-		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-		    In->RegY == (long) E->Num         && /* Both are equal */
+		    CE_IsKnownImm (E, In->RegY)       && /* Value to be loaded is known */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    !CE_UseLoadFlags (N)) {    	       	 /* Which does not use the flags */
 		    Delete = 1;
@@ -1354,7 +1351,7 @@ unsigned OptPrecalc (CodeSeg* S)
                 break;
 
             case OP65_AND:
-                if (CE_KnownImm (E) && E->Num == 0xFF) {
+                if (CE_IsKnownImm (E, 0xFF)) {
                     /* AND with 0xFF, remove */
                     CS_DelEntry (S, I);
                     ++Changes;
@@ -1365,7 +1362,7 @@ unsigned OptPrecalc (CodeSeg* S)
                 break;
 
             case OP65_ORA:
-                if (CE_KnownImm (E) && E->Num == 0x00) {
+                if (CE_IsKnownImm (E, 0x00)) {
                     /* ORA with zero, remove */
                     CS_DelEntry (S, I);
                     ++Changes;

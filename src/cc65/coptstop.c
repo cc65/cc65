@@ -126,7 +126,7 @@ static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
      	     * value.
      	     */
      	    P = CS_GetPrevEntry (S, I);
-     	    if (P && P->OPC == OP65_LDY && CE_KnownImm (P)) {
+     	    if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
 
      	   	/* The Y load is just before the stack access, adjust it */
      	   	CE_SetNumArg (P, P->Num - Offs);
@@ -514,57 +514,115 @@ static unsigned Opt_tosaddax (StackOpData* D)
 /* Optimize the tosaddax sequence if possible */
 {
     CodeEntry*  X;
-
+    CodeEntry*  N;
 
     /* We need the entry behind the add */
     CHECK (D->NextEntry != 0);
 
-    /* Check the entry before the push. If it's a lda instruction with an
-     * addressing mode that allows us to replace it, we may use this
-     * location for the op and must not save the value in the zero page
-     * location.
+    /* Check if the X register is known and zero when the add is done, and
+     * if the add is followed by
+     *
+     *  ldy     #$00
+     *  jsr     ldauidx         ; or ldaidx
+     *
+     * If this is true, the addition does actually add an offset to a pointer
+     * before it is dereferenced. Since both subroutines take an offset in Y,
+     * we can pass the offset (instead of #$00) and remove the addition
+     * alltogether.
      */
-    CheckDirectOp (D);
+    if (D->OpEntry->RI->In.RegX == 0                            &&
+        D->NextEntry->OPC == OP65_LDY                           &&
+        CE_IsKnownImm (D->NextEntry, 0)                         &&
+        !CE_HasLabel (D->NextEntry)                             &&
+        (N = CS_GetNextEntry (D->Code, D->OpIndex + 1)) != 0    &&
+        (CE_IsCallTo (N, "ldauidx")                     ||
+         CE_IsCallTo (N, "ldaidx"))) {
 
-    /* Store the value into the zeropage instead of pushing it */
-    ReplacePushByStore (D);
+        int Signed = (strcmp (N->Arg, "ldaidx") == 0);
 
-    /* Inline the add */
-    D->IP = D->OpIndex+1;
-    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
+        /* Store the value into the zeropage instead of pushing it */
+        ReplacePushByStore (D);
 
-    /* Low byte */
-    AddOpLow (D, OP65_ADC);
+        /* Replace the ldy by a tay. Be sure to create the new entry before
+         * deleting the ldy, since we will reference the line info from this
+         * insn.
+         */
+        X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, D->NextEntry->LI);
+        DelEntry (D, D->OpIndex + 1);
+        InsertEntry (D, X, D->OpIndex + 1);
 
-    /* High byte */
-    if (D->PushEntry->RI->In.RegX == 0) {
-     	/* The high byte is the value in X plus the carry */
-     	CodeLabel* L = CS_GenLabel (D->Code, D->NextEntry);
-     	X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, D->OpEntry->LI);
-     	InsertEntry (D, X, D->IP++);
-     	X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
-     	InsertEntry (D, X, D->IP++);
-    } else if (D->OpEntry->RI->In.RegX == 0) {
-       	/* The high byte is that of the first operand plus carry */
-     	CodeLabel* L;
-     	if (RegValIsKnown (D->PushEntry->RI->In.RegX)) {
-     	    /* Value of first op high byte is known */
-	    const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX);
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
-	} else {
-	    /* Value of first op high byte is unknown */
-	    X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
-	}
-	InsertEntry (D, X, D->IP++);
-	L = CS_GenLabel (D->Code, D->NextEntry);
-	X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, D->OpEntry->LI);
-	InsertEntry (D, X, D->IP++);
-	X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
-	InsertEntry (D, X, D->IP++);
+        /* Replace the call to ldaidx/ldauidx. Since X is already zero, and
+         * the ptr is in the zero page location, we just need to load from
+         * the pointer, and fix X in case of ldaidx.
+         */
+        X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, D->ZPLo, 0, N->LI);
+        DelEntry (D, D->OpIndex + 2);
+        InsertEntry (D, X, D->OpIndex + 2);
+        if (Signed) {
+
+            CodeLabel* L;
+
+            /* Add sign extension - N is unused now */
+            N = CS_GetNextEntry (D->Code, D->OpIndex + 2);
+            CHECK (N != 0);
+            L = CS_GenLabel (D->Code, N);
+
+            X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, X->LI);
+            InsertEntry (D, X, D->OpIndex + 3);
+
+            X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, X->LI);
+            InsertEntry (D, X, D->OpIndex + 4);
+        }
+
     } else {
-     	/* High byte is unknown */
-        AddOpHigh (D, OP65_ADC);
+
+        /* Check the entry before the push. If it's a lda instruction with an
+         * addressing mode that allows us to replace it, we may use this
+         * location for the op and must not save the value in the zero page
+         * location.
+         */
+        CheckDirectOp (D);
+
+        /* Store the value into the zeropage instead of pushing it */
+        ReplacePushByStore (D);
+
+        /* Inline the add */
+        D->IP = D->OpIndex+1;
+        X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* Low byte */
+        AddOpLow (D, OP65_ADC);
+
+        /* High byte */
+        if (D->PushEntry->RI->In.RegX == 0) {
+            /* The high byte is the value in X plus the carry */
+            CodeLabel* L = CS_GenLabel (D->Code, D->NextEntry);
+            X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+            X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        } else if (D->OpEntry->RI->In.RegX == 0) {
+            /* The high byte is that of the first operand plus carry */
+            CodeLabel* L;
+            if (RegValIsKnown (D->PushEntry->RI->In.RegX)) {
+                /* Value of first op high byte is known */
+                const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX);
+                X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            } else {
+                /* Value of first op high byte is unknown */
+                X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+            }
+            InsertEntry (D, X, D->IP++);
+            L = CS_GenLabel (D->Code, D->NextEntry);
+            X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+            X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        } else {
+            /* High byte is unknown */
+            AddOpHigh (D, OP65_ADC);
+        }
     }
 
     /* Remove the push and the call to the tosaddax function */

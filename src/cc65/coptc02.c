@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -131,7 +131,7 @@ unsigned Opt65C02BitOps (CodeSeg* S)
             !CS_RangeHasLabel (S, I+1, 2)                       &&
             CS_GetEntries (S, L+1, I+1, 2)                      &&
             (L[1]->OPC == OP65_AND || L[1]->OPC == OP65_ORA)    &&
-            CE_KnownImm (L[1])                                  &&
+            CE_IsConstImm (L[1])                                &&
             L[2]->OPC == OP65_STA                               &&
             L[2]->AM == L[0]->AM                                &&
             strcmp (L[2]->Arg, L[0]->Arg) == 0                  &&

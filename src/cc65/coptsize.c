@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2005, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -289,7 +289,7 @@ unsigned OptSize2 (CodeSeg* S)
 	switch (E->OPC) {
 
 	    case OP65_LDA:
-	        if (CE_KnownImm (E)) {
+	        if (CE_IsConstImm (E)) {
 		    short Val = (short) E->Num;
 		    if (Val == In->RegX) {
 		    	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
@@ -306,7 +306,7 @@ unsigned OptSize2 (CodeSeg* S)
 	        break;
 
 	    case OP65_LDX:
-	        if (CE_KnownImm (E)) {
+	        if (CE_IsConstImm (E)) {
 		    short Val = (short) E->Num;
 		    if (RegValIsKnown (In->RegX) && Val == ((In->RegX - 1) & 0xFF)) {
 			X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, E->LI);
@@ -319,7 +319,7 @@ unsigned OptSize2 (CodeSeg* S)
 	        break;
 
        	    case OP65_LDY:
-	        if (CE_KnownImm (E)) {
+	        if (CE_IsConstImm (E)) {
 		    short Val = (short) E->Num;
 		    if (RegValIsKnown (In->RegY) && Val == ((In->RegY - 1) & 0xFF)) {
 			X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);

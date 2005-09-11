@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -309,7 +309,7 @@ unsigned OptCmp1 (CodeSeg* S)
 	    strcmp (L[1]->Arg, "tmp1") == 0     &&
 	    L[2]->OPC == OP65_ORA	    	&&
 	    strcmp (L[2]->Arg, "tmp1") == 0) {
-                
+
             CodeEntry* X;
 
 	    /* Insert the ora instead */
@@ -335,7 +335,7 @@ unsigned OptCmp1 (CodeSeg* S)
 
 
 
-unsigned OptCmp2 (CodeSeg* S)        
+unsigned OptCmp2 (CodeSeg* S)
 /* Search for the sequence
  *
  *  	stx	xx
@@ -432,8 +432,7 @@ unsigned OptCmp3 (CodeSeg* S)
 	    !CS_RangeHasLabel (S, I+1, 2)   &&
 	    CS_GetEntries (S, L+1, I+1, 2)  &&
 	    L[1]->OPC == OP65_CMP           &&
-	    CE_KnownImm (L[1])              &&
-	    L[1]->Num == 0) {
+	    CE_IsKnownImm (L[1], 0)) {
 
 	    /* Check for the call to boolxx. We only remove the compare if
 	     * the carry flag is evaluated later, because the load will not
@@ -614,7 +613,7 @@ unsigned OptCmp5 (CodeSeg* S)
 
      	/* Check for the sequence */
 	if (L[0]->OPC == OP65_LDY           &&
-	    CE_KnownImm (L[0])              &&
+	    CE_IsConstImm (L[0])            &&
 	    CS_GetEntries (S, L+1, I+1, 5)  &&
 	    !CE_HasLabel (L[1])             &&
 	    CE_IsCallTo (L[1], "ldaxysp")   &&
@@ -828,7 +827,7 @@ unsigned OptCmp8 (CodeSeg* S)
      	/* Check for a compare against an immediate value */
        	if ((E->Info & OF_CMP) != 0           &&
 	    (RegVal = GetCmpRegVal (E)) >= 0  &&
-	    CE_KnownImm (E)) {
+	    CE_IsConstImm (E)) {
 
 	    /* We are able to evaluate the compare at compile time. Check if
 	     * one or more branches are ahead.

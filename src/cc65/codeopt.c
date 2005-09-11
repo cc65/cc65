@@ -491,14 +491,14 @@ static unsigned OptPtrStore1 (CodeSeg* S)
        	if (CE_IsCallTo (L[0], "pushax")            &&
        	    CS_GetEntries (S, L+1, I+1, 3)     	    &&
        	    L[1]->OPC == OP65_LDY              	    &&
-     	    CE_KnownImm (L[1])                      &&
+       	    CE_IsConstImm (L[1])                    &&
      	    !CE_HasLabel (L[1])      	       	    &&
        	    CE_IsCallTo (L[2], "ldauidx")           &&
      	    !CE_HasLabel (L[2])                     &&
        	    (K = OptPtrStore1Sub (S, I+3, L+3)) > 0 &&
 	    CS_GetEntries (S, L+3+K, I+3+K, 2)      &&
        	    L[3+K]->OPC == OP65_LDY                 &&
-     	    CE_KnownImm (L[3+K])                    &&
+     	    CE_IsConstImm (L[3+K])                  &&
 	    !CE_HasLabel (L[3+K])                   &&
 	    CE_IsCallTo (L[4+K], "staspidx")        &&
 	    !CE_HasLabel (L[4+K])) {
@@ -633,8 +633,7 @@ static unsigned OptPtrStore2 (CodeSeg* S)
             L[7]->OPC == OP65_LDX                            &&
             L[8]->OPC == OP65_LDA                            &&
        	    L[9]->OPC == OP65_LDY                            &&
-       	    CE_KnownImm (L[9])                               &&
-            L[9]->Num == 0                                   &&
+       	    CE_IsKnownImm (L[9], 0)                          &&
        	    CE_IsCallTo (L[10], "staspidx")                  &&
        	    !CS_RangeHasLabel (S, I+1, 5)                    &&
             !CS_RangeHasLabel (S, I+7, 4)                    &&
@@ -937,8 +936,7 @@ static unsigned OptPtrLoad3 (CodeSeg* S)
        	    L[4]->JumpTo->Owner == L[6]                      &&
 	    L[5]->OPC == OP65_INX                            &&
 	    L[6]->OPC == OP65_LDY                            &&
-	    CE_KnownImm (L[6])                               &&
-	    L[6]->Num == 0                                   &&
+	    CE_IsKnownImm (L[6], 0)                          &&
        	    CE_IsCallTo (L[7], "ldauidx")                    &&
        	    !CS_RangeHasLabel (S, I+1, 5)                    &&
             !CE_HasLabel (L[7])                              &&
@@ -1029,7 +1027,7 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 	    L[1]->AM == AM65_IMM                             &&
 	    !CE_HasLabel (L[1])        	       	             &&
   	    L[2]->OPC == OP65_LDY                            &&
-	    CE_KnownImm (L[2])                               &&
+	    CE_IsConstImm (L[2])                             &&
 	    !CE_HasLabel (L[2])                              &&
 	    L[3]->OPC == OP65_CLC                            &&
 	    !CE_HasLabel (L[3])                              &&
@@ -1043,8 +1041,7 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 	    L[6]->OPC == OP65_INX                            &&
 	    !CE_HasLabel (L[6])                              &&
 	    L[7]->OPC == OP65_LDY                            &&
-	    CE_KnownImm (L[7])                               &&
-	    L[7]->Num == 0                                   &&
+	    CE_IsKnownImm (L[7], 0)                          &&
        	    CE_IsCallTo (L[8], "ldauidx")                    &&
 	    !CE_HasLabel (L[8])                              &&
 	    /* Check the label last because this is quite costly */
@@ -1161,8 +1158,7 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
             strcmp (L[3]->Arg, "regsave+1") == 0                &&
             L[4]->OPC == OP65_CLC                               &&
             L[5]->OPC == OP65_ADC                               &&
-            CE_KnownImm (L[5])                                  &&
-            L[5]->Num == 1                                      &&
+            CE_IsKnownImm (L[5], 1)                             &&
             L[6]->OPC == OP65_BCC                               &&
             L[6]->JumpTo != 0                                   &&
             L[6]->JumpTo->Owner == L[8]                         &&
@@ -1180,7 +1176,7 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
             L[11]->AM == AM65_ZP                                &&
             strcmp (L[11]->Arg, "regsave+1") == 0               &&
             L[12]->OPC == OP65_LDY                              &&
-            CE_KnownImm (L[12])                                 &&
+            CE_IsConstImm (L[12])                               &&
             CE_IsCallTo (L[13], "ldauidx")) {
 
 	    CodeEntry* X;

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -1493,7 +1493,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			/* If this is an immidiate compare, the A register has
 			 * the value of the compare later.
 			 */
-			if (CE_KnownImm (P)) {
+			if (CE_IsConstImm (P)) {
 			    if (BC == BC_EQ) {
 				E->RI->Out2.RegA = (unsigned char)P->Num;
 			    } else {
@@ -1506,7 +1506,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			/* If this is an immidiate compare, the X register has
 			 * the value of the compare later.
 			 */
-			if (CE_KnownImm (P)) {
+			if (CE_IsConstImm (P)) {
 			    if (BC == BC_EQ) {
 				E->RI->Out2.RegX = (unsigned char)P->Num;
 			    } else {
@@ -1519,7 +1519,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			/* If this is an immidiate compare, the Y register has
 			 * the value of the compare later.
 	 		 */
-			if (CE_KnownImm (P)) {
+			if (CE_IsConstImm (P)) {
 			    if (BC == BC_EQ) {
 				E->RI->Out2.RegY = (unsigned char)P->Num;
 			    } else {

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -192,8 +192,13 @@ void CE_SetNumArg (CodeEntry* E, long Num);
  * have a numeric argument.
  */
 
-int CE_KnownImm (const CodeEntry* E);
-/* Return true if the argument of E is a known immediate value */
+int CE_IsConstImm (const CodeEntry* E);
+/* Return true if the argument of E is a constant immediate value */
+
+int CE_IsKnownImm (const CodeEntry* E, unsigned long Num);
+/* Return true if the argument of E is a constant immediate value that is
+ * equal to Num.
+ */
 
 #if defined(HAVE_INLINE)
 INLINE int CE_IsCallTo (const CodeEntry* E, const char* Name)

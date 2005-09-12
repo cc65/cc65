@@ -31,6 +31,7 @@ SGML  =	apple2.sgml	\
 	library.sgml    \
         lynx.sgml       \
         nes.sgml        \
+        pet.sgml        \
         plus4.sgml      \
         vic20.sgml
 

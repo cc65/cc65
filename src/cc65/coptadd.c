@@ -290,6 +290,82 @@ unsigned OptAdd3 (CodeSeg* S)
 /* Search for the sequence
  *
  *  	jsr     pushax
+ *     	ldx     #$00
+ *      lda     xxx
+ *      jsr     tosaddax
+ *
+ * and replace it by
+ *
+ *      clc
+ *      adc     xxx
+ *      bcc     L1
+ *      inx
+ * L1:
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[4];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+        if (CE_IsCallTo (L[0], "pushax")                        &&
+       	    CS_GetEntries (S, L+1, I+1, 4)                      &&
+            !CS_RangeHasLabel (S, I+1, 3)                       &&
+            L[1]->OPC == OP65_LDX                               &&
+            CE_IsKnownImm (L[1], 0)                             &&
+            L[2]->OPC == OP65_LDA                               &&
+            CE_IsCallTo (L[3], "tosaddax")) {
+
+            CodeEntry* X;
+            CodeLabel* Label;
+
+            /* Insert new code behind the sequence */
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+            /* adc xxx */
+	    X = NewCodeEntry (OP65_ADC, L[2]->AM, L[2]->Arg, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+5);
+
+            /* bcc L1 */
+            Label = CS_GenLabel (S, L[4]);
+            X = NewCodeEntry (OP65_BCC, AM65_BRA, Label->Name, Label, L[3]->LI);
+	    CS_InsertEntry (S, X, I+6);
+
+            /* inx */
+            X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+7);
+
+	    /* Delete the old code */
+	    CS_DelEntries (S, I, 4);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptAdd4 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *  	jsr     pushax
  *      lda     xxx
  *     	ldx     yyy
  *      jsr     tosaddax
@@ -375,7 +451,7 @@ unsigned OptAdd3 (CodeSeg* S)
 
 
 
-unsigned OptAdd4 (CodeSeg* S)
+unsigned OptAdd5 (CodeSeg* S)
 /* Search for a call to incaxn and replace it by an 8 bit add if the X register
  * is not used later.
  */
@@ -428,7 +504,7 @@ unsigned OptAdd4 (CodeSeg* S)
 
 
 
-unsigned OptAdd5 (CodeSeg* S)
+unsigned OptAdd6 (CodeSeg* S)
 /* Search for the sequence
  *
  *  	adc     ...

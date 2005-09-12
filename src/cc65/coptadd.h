@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -100,6 +100,23 @@ unsigned OptAdd3 (CodeSeg* S);
 /* Search for the sequence
  *
  *  	jsr     pushax
+ *     	ldx     #$00
+ *      lda     xxx
+ *      jsr     tosaddax
+ *
+ * and replace it by
+ *
+ *      clc
+ *      adc     xxx
+ *      bcc     L1
+ *      inx
+ * L1:
+ */                           
+
+unsigned OptAdd4 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *  	jsr     pushax
  *      lda     xxx
  *     	ldx     yyy
  *      jsr     tosaddax
@@ -115,12 +132,12 @@ unsigned OptAdd3 (CodeSeg* S);
  *      pla
  */
 
-unsigned OptAdd4 (CodeSeg* S);
+unsigned OptAdd5 (CodeSeg* S);
 /* Search for a call to incaxn and replace it by an 8 bit add if the X register
  * is not used later.
  */
 
-unsigned OptAdd5 (CodeSeg* S);
+unsigned OptAdd6 (CodeSeg* S);
 /* Search for the sequence
  *
  *  	adc     ...

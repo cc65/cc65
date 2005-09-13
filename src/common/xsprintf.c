@@ -206,7 +206,7 @@ static void FormatInt (PrintfCtrl* P, uintmax_t Val)
 
 
     /* Determine the translation table */
-    P->CharTable = (P->Flags & fUpcase)? "0123456789ABCDEF" : "0123456789abcedf";
+    P->CharTable = (P->Flags & fUpcase)? "0123456789ABCDEF" : "0123456789abcdef";
 
     /* Check if the value is negative */
     if ((P->Flags & fUnsigned) == 0 && ((intmax_t) Val) < 0) {

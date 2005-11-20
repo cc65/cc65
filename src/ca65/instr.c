@@ -1427,7 +1427,7 @@ void SetCPU (cpu_t NewCPU)
     CHECK (NewCPU < CPU_COUNT);
 
     /* Check if we have support for the new CPU, if so, use it */
-    if (InsTabs[NewCPU]) {
+    if (NewCPU != CPU_UNKNOWN && InsTabs[NewCPU]) {
     	CPU = NewCPU;
     	InsTab = InsTabs[CPU];
     } else {

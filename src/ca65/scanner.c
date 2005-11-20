@@ -314,7 +314,7 @@ void NewInputFile (const char* Name)
     F = fopen (Name, "r");
     if (F == 0) {
 
-	char* PathName;
+     	char* PathName;
 
      	/* Error (fatal error if this is the main file) */
      	if (ICount == 0) {
@@ -338,7 +338,7 @@ void NewInputFile (const char* Name)
     /* check again if we do now have an open file */
     if (F != 0) {
 
-	unsigned FileIdx;
+     	unsigned FileIdx;
 
      	/* Stat the file and remember the values */
      	struct stat Buf;
@@ -346,8 +346,8 @@ void NewInputFile (const char* Name)
      	    Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
      	}
 
-	/* Add the file to the input file table and remember the index */
-	FileIdx = AddFile (Name, Buf.st_size, Buf.st_mtime);
+     	/* Add the file to the input file table and remember the index */
+     	FileIdx = AddFile (Name, Buf.st_size, Buf.st_mtime);
 
      	/* Create a new state variable and initialize it */
      	I      	    = xmalloc (sizeof (*I));
@@ -364,10 +364,12 @@ void NewInputFile (const char* Name)
      	IFile  	    = I;
      	++ICount;
 
-     	/* Setup the next token and character so it will be skipped on the
-         * next call to NextRawTok().
+        /* Read the first character from the new file */
+        NextChar ();
+
+     	/* Setup the next token so it will be skipped on the next call to
+         * NextRawTok().
          */
-        C = ' ';
         Tok = TOK_SEP;
 
     }
@@ -413,10 +415,12 @@ void NewInputData (char* Data, int Malloced)
     I->Next   	= IData;
     IData     	= I;
 
-    /* Setup the next token and character so it will be skipped on the
-     * next call to NextRawTok().
+    /* Read the first character from the new file */
+    NextChar ();
+
+    /* Setup the next token so it will be skipped on the next call to
+     * NextRawTok().
      */
-    C = ' ';
     Tok = TOK_SEP;
 }
 
@@ -627,7 +631,7 @@ static unsigned ReadStringConst (int StringTerm)
 	}
 	++I;
 
-	/* Skip the character */
+     	/* Skip the character */
 	NextChar ();
     }
 
@@ -927,7 +931,7 @@ Again:
 	     	    return;
 
     	     	case 'X':
-    	     	    Tok = TOK_X;
+     	     	    Tok = TOK_X;
 	     	    return;
 
  	      	case 'Y':
@@ -977,7 +981,7 @@ CharAgain:
 
 	case '-':
 	    NextChar ();
- 	    Tok = TOK_MINUS;
+     	    Tok = TOK_MINUS;
 	    return;
 
 	case '/':
@@ -1027,7 +1031,7 @@ CharAgain:
 		case '-':
 		    IVal = 0;
 		    do {
-		     	--IVal;
+     		     	--IVal;
 	  	     	NextChar ();
 		    } while (C == '-');
 		    Tok = TOK_ULABEL;
@@ -1039,7 +1043,7 @@ CharAgain:
 		     	++IVal;
 	     	     	NextChar ();
 	       	    } while (C == '+');
-		    Tok = TOK_ULABEL;
+	 	    Tok = TOK_ULABEL;
 		    break;
 
                 case '=':
@@ -1127,7 +1131,7 @@ CharAgain:
    	    return;
 
 	case '>':
-	    NextChar ();
+     	    NextChar ();
 	    if (C == '=') {
 		NextChar ();
 		Tok = TOK_GE;
@@ -1177,7 +1181,7 @@ CharAgain:
 	    return;
 
 	case '\"':
-	    ReadStringConst ('\"');
+     	    ReadStringConst ('\"');
 	    Tok = TOK_STRCON;
 	    return;
 
@@ -1267,15 +1271,15 @@ int GetSubKey (const char** Keys, unsigned Count)
 
     /* If we aren't in ignore case mode, we have to uppercase the identifier */
     if (!IgnoreCase) {
-    	UpcaseSVal ();
+     	UpcaseSVal ();
     }
 
     /* Do a linear search (a binary search is not worth the effort) */
     for (I = 0; I < Count; ++I) {
-	if (strcmp (SVal, Keys [I]) == 0) {
-	    /* Found it */
-	    return I;
-	}
+     	if (strcmp (SVal, Keys [I]) == 0) {
+     	    /* Found it */
+     	    return I;
+     	}
     }
 
     /* Not found */

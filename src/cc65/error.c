@@ -75,7 +75,7 @@ static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, 
        	fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
      	vfprintf (stderr, Msg, ap);
      	fprintf (stderr, "\n");
-     
+
         if (Line) {
      	    Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
         }
@@ -198,6 +198,7 @@ void Internal (const char* Format, ...)
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
     va_end (ap);
+    fprintf (stderr, "\n");
 
     if (Line) {
         fprintf (stderr, "\nInput: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));

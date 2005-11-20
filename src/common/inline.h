@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2005  Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +44,7 @@
 
 
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(DISABLE_INLINE)
 #  define HAVE_INLINE	1
 #  define INLINE    	static __inline__
 #endif

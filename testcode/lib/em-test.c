@@ -16,6 +16,14 @@ static unsigned buf[BUF_SIZE];
 
 
 
+static void cleanup (void)
+/* Remove the driver on exit */
+{
+    em_unload ();
+}
+
+
+
 static void fill (register unsigned* page, register unsigned char count, register unsigned num)
 {
     register unsigned char i;
@@ -58,6 +66,7 @@ int main (void)
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));
        	exit (EXIT_FAILURE);
     }
+    atexit (cleanup);
 
     /* Get the number of available pages */
     PageCount = em_pagecount ();
@@ -100,7 +109,7 @@ int main (void)
         cputhex16 (I);
     }
 
-    /* TEST #1: em_copyfrom/em_copyto. */
+    /* TEST #2: em_copyfrom/em_copyto. */
     cputs ("\r\nTesting em_copyfrom/em_copyto");
 
     /* We're filling now 384 bytes per run to test the copy routines with

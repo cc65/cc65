@@ -52,15 +52,15 @@ C1541  	= c1541
 # $(SYS).
 
 EXELIST	=	ascii 		\
-		diodemo		\
-		fire 		\
-		gunzip65 	\
-		hello 		\
-		mousedemo 	\
-		nachtm 		\
-		plasma 		\
-		sieve 		\
-		tgidemo
+     		diodemo		\
+     		fire 		\
+     		gunzip65 	\
+     		hello 		\
+     		mousedemo 	\
+     		nachtm 		\
+     		plasma 		\
+     		sieve 		\
+     		tgidemo
 
 # --------------------------------------------------------------------------
 # Rules how to make each one of the binaries
@@ -83,8 +83,19 @@ gunzip65:      	$(CRT0) gunzip65.o $(CLIB)
 hello: 	       	$(CRT0) hello.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
+# The apple machines need the start address adjusted for the mandelbrot demo
+ifeq "$(SYS)" "apple2"
+mandelbrot:     	$(CRT0) mandelbrot.o $(CLIB)
+	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
+else
+ifeq "$(SYS)" "apple2enh"
+mandelbrot:     	$(CRT0) mandelbrot.o $(CLIB)
+	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
+else
 mandelbrot:     	$(CRT0) mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
+endif
+endif
 
 mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
@@ -98,9 +109,19 @@ plasma:	       	$(CRT0) plasma.o $(CLIB)
 sieve: 	       	$(CRT0) sieve.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
+# The apple machines need the start address adjusted for the mandelbrot demo
+ifeq "$(SYS)" "apple2"
+tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
+	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
+else
+ifeq "$(SYS)" "apple2enh"
+tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
+	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
+else
 tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
-
+endif
+endif
 
 # --------------------------------------------------------------------------
 # Rule to make a disk with all samples. Needs the c1541 program that comes

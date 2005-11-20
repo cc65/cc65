@@ -1,11 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+#include <ctype.h>
 #include <modload.h>
 #include <tgi.h>
 
 
 
+#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#  define TGI_MODE	  TGI_MODE_280_192_6
+#  define PAL_BACK	  0
+#  define PAL_FORE	  3
+#  define COLOR_LIGHTRED  0 /* Dummy */
+#else
+#  define TGI_MODE	  TGI_MODE_320_200_2
+#  define PAL_BACK	  0
+#  define PAL_FORE	  1
+#endif
 
 
 /*****************************************************************************/
@@ -78,7 +89,7 @@ static void DoWarning (void)
     printf ("Warning: This program needs the TGI\n"
             "driver on disk! Press 'y' if you have\n"
             "it - any other key exits.\n");
-    if (cgetc () != 'y') {
+    if (tolower (cgetc ()) != 'y') {
         exit (EXIT_SUCCESS);
     }
     printf ("Ok. Please wait patiently...\n");
@@ -90,20 +101,20 @@ static void DoCircles (void)
 {
     static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_LIGHTRED };
     unsigned char I;
-    unsigned char Color = 1;
+    unsigned char Color = PAL_FORE;
     unsigned X = XRes / 2;
     unsigned Y = YRes / 2;
 
     tgi_setpalette (Palette);
     while (!kbhit ()) {
-        tgi_setcolor (1);
+        tgi_setcolor (PAL_FORE);
         tgi_line (0, 0, XRes-1, YRes-1);
         tgi_line (0, YRes-1, XRes-1, 0);
         tgi_setcolor (Color);
         for (I = 10; I < 240; I += 10) {
             tgi_circle (X, Y, I);
         }
-        Color ^= 0x01;
+	Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
     }
 
     cgetc ();
@@ -119,22 +130,22 @@ static void DoCheckerboard (void)
     unsigned char Color;
 
     tgi_setpalette (Palette);
-    Color = 0;
+    Color = PAL_BACK;
     while (1) {
         for (Y = 0; Y < YRes; Y += 10) {
             for (X = 0; X < XRes; X += 10) {
                 tgi_setcolor (Color);
                 tgi_bar (X, Y, X+9, Y+9);
-                Color ^= 0x01;
+		Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
                 if (kbhit ()) {
                     cgetc ();
                     tgi_clear ();
                     return;
                 }
             }
-            Color ^= 0x01;
+	    Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
         }
-        Color ^= 0x01;
+	Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
     }
 }
 
@@ -146,7 +157,7 @@ static void DoDiagram (void)
     unsigned X, I;
 
     tgi_setpalette (Palette);
-    tgi_setcolor (1);
+    tgi_setcolor (PAL_FORE);
     tgi_line (10, 10, 10, YRes-10);
     tgi_lineto (XRes-10, YRes-10);
     tgi_line (8, 12, 10, 10);
@@ -172,7 +183,7 @@ static void DoLines (void)
     unsigned X;
 
     tgi_setpalette (Palette);
-    tgi_setcolor (1);
+    tgi_setcolor (PAL_FORE);
 
     for	(X = 0; X < YRes; X+=10) {
 	tgi_line (0, 0, YRes, X);
@@ -195,7 +206,7 @@ int main (void)
     DoWarning ();
 
     /* Load and initialize the driver */
-    tgi_load (TGI_MODE_320_200_2);
+    tgi_load (TGI_MODE);
     CheckError ("tgi_load");
     tgi_init ();
     CheckError ("tgi_init");
@@ -217,11 +228,9 @@ int main (void)
     tgi_unload ();
 
     /* Reset the border */
-    bordercolor (Border);
+    (void) bordercolor (Border);
 
     /* Done */
     printf ("Done\n");
     return EXIT_SUCCESS;
 }
-
-

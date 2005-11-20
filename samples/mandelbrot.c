@@ -14,7 +14,11 @@
 
 
 /* Graphics definitions */
-#define GRAPHMODE       TGI_MODE_320_200_2
+#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#  define GRAPHMODE	TGI_MODE_280_192_6
+#else
+#  define GRAPHMODE	TGI_MODE_320_200_2
+#endif
 #define SCREEN_X        (tgi_getmaxx()+1)
 #define SCREEN_Y        (tgi_getmaxy()+1)
 #define MAXCOL          (tgi_getmaxcolor()+1)
@@ -27,6 +31,12 @@
 
 #define mulfp(_a,_b)    ((((signed long)_a)*(_b))>>fpshift)
 #define divfp(_a,_b)    ((((signed long)_a)<<fpshift)/(_b))
+
+/* Workaround missing clock stuff */
+#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#  define clock()	0
+#  define CLK_TCK	1
+#endif
 
 /* Use static local variables for speed */
 #pragma staticlocals (1);

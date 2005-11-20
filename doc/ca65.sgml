@@ -3,8 +3,8 @@
 <article>
 <title>ca65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>19.07.2000, 29.11.2000, 02.10.2001
-
+<date>2000-07-19, 2000-11-29, 2001-10-02, 2005-09-08
+                                                   
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
 used as a companion assembler for the cc65 crosscompiler, but it may also be
@@ -353,7 +353,7 @@ mnemonics:
   	DEA is an alias for DEC A
         INA is an alias for INC A
   	SWA is an alias for XBA
-  	TAD is an alias for TCD
+      	TAD is an alias for TCD
   	TAS is an alias for TCS
   	TDA is an alias for TDC
   	TSA is an alias for TSC
@@ -513,55 +513,62 @@ problem in most cases.
 
 <sect1>Available operators<label id="operators"><p>
 
-Available operators sorted by precedence:
-
 <table>
-<tabular ca="llc">
-Op|Description|Precedence@<hline>
-&nbsp;|Builtin string functions|0@
-&nbsp;|Builtin pseudo variables|1@
-&nbsp;|Builtin pseudo functions|1@
-+|Unary plus|1@
--|Unary minus|1@
-&tilde;|Unary bitwise not|1@
-.BITNOT|Unary bitwise not|1@
-&lt;|Low byte operator|1@
-&gt;|High byte operator|1@
-^|Bank byte operator|1@
-*|Multiplication|2@
-/|Division|2@
-.MOD|Modulo operation|2@
-&amp;|Bitwise and|2@
-.BITAND|Bitwise and|2@
-^|Bitwise xor|2@
-.BITXOR|Bitwise xor|2@
-&lt;&lt;|Shift left operator|2@
-.SHL|Shift left operator|2@
-&gt;&gt;|Shift right operato|r@
-.SHR|Shift right operator|2@
-+|Binary plus|3@
--|Binary minus|3@
-&verbar;|Binary or|3@
-.BITOR|Binary or|3@
-=|Compare operation (equal)|4@
-&lt;&gt;|Compare operation (not equal)|4@
-&lt;|Compare operation (less)|4@
-&gt;|Compare operation (greater)|4@
-&lt;=|Compare operation (less or equal)|4@
-&gt;=|Compare operation (greater or equal)|4@
-&amp;&amp;|Boolean and|5@
-.AND|Boolean and|5@
-.XOR|Boolean xor|5@
-&verbar;&verbar;|Boolean or|6@
-.OR|Boolean or|6@
-!|Boolean not|7@
-.NOT|Boolean not|7@
+<tabular ca="clc">
+<bf/Operator/| <bf/Description/| <bf/Precedence/@<hline>
+| Built-in string functions| 0@
+||~@
+| Built-in pseudo-variables| 1@
+| Built-in pseudo-functions| 1@
++| Unary positive| 1@
+-| Unary negative| 1@
+&tilde;<newline>
+.BITNOT| Unary bitwise not| 1@
+&lt;<newline>
+.LOBYTE| Unary low-byte operator| 1@
+&gt;<newline>
+.HIBYTE| Unary high-byte operator| 1@
+^<newline>
+.BANKBYTE| Unary bank-byte operator| 1@
+||~@
+*| Multiplication| 2@
+/| Division| 2@
+.MOD| Modulo operator| 2@
+&amp;<newline>
+.BITAND| Bitwise and| 2@
+^<newline>
+.BITXOR| Binary bitwise xor| 2@
+&lt;&lt;<newline>
+.SHL| Shift-left operator| 2@
+&gt;&gt;<newline>
+.SHR| Shift-right operator| 2@
+||~@
++| Binary addition| 3@
+-| Binary subtraction| 3@
+&verbar;<newline>
+.BITOR| Bitwise or| 3@
+||~@
+= | Compare operator (equal)| 4@
+&lt;&gt;| Compare operator (not equal)| 4@
+&lt;| Compare operator (less)| 4@
+&gt;| Compare operator (greater)| 4@
+&lt;=| Compare operator (less or equal)| 4@
+&gt;=| Compare operator (greater or equal)| 4@
+||~@
+&amp;&amp;<newline>
+.AND| Boolean and| 5@
+.XOR| Boolean xor| 5@
+||~@
+&verbar;&verbar;<newline>
+.OR| Boolean or| 6@
+||~@
+!<newline>
+.NOT| Boolean not| 7@<hline>
 </tabular>
-<caption>Available operators sorted by precedence
+<caption>Available operators, sorted by precedence
 </table>
 
-To force a specific order of evaluation, braces may be used as usual.
-<p>
+To force a specific order of evaluation, parentheses may be used, as usual.
 
 
 
@@ -3091,9 +3098,9 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816, sunplus and HuC6280. Please 
-  note that support for the sunplus CPU is not available in the freeware 
-  version, because the instruction set of the sunplus CPU is "proprietary 
+  namely: 6502, 6502X, 65SC02, 65C02, 65816, sunplus and HuC6280. Please
+  note that support for the sunplus CPU is not available in the freeware
+  version, because the instruction set of the sunplus CPU is "proprietary
   and confidential".
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,

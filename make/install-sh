@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+# install-sh -- install a program, script, or data-file.
+#
+# This isn't a full install-script; it does only what is needed by the cc65
+# package.  It can install only one file at a time.
+
+# Don't use ":-" because 4.3BSD and earlier shells don't like it.
+# Put in absolute paths if you don't have these commands in your PATH;
+# or, set these upper-case variables in your environment.
+cpprog="${CPPROG-cp}"
+mvprog="${MVPROG-mv}"
+rmprog="${RMPROG-rm}"
+stripprog="${STRIPPROG-strip}"
+chmodprog="${CHMODPROG-chmod}"
+
+instcmd="$cpprog"
+stripcmd=""
+chmodcmd=""
+rmcmd="$rmprog -f"
+mvcmd="$mvprog"
+src=""
+dst=""
+
+while [ x"$1" != x ]; do
+    case $1 in
+	-c) ;;
+
+	-m) chmodcmd="$chmodprog $2"
+	    shift
+	    ;;
+
+	-s) stripcmd="$stripprog"
+	    ;;
+
+	# The first name is the source; the last name is the destination.
+	*)  if [ x"$src" = x ]
+	        then src="$1"
+		else dst="$1"
+		fi
+	esac
+    shift
+    done
+
+[ x"$src" != x ] || { echo "$0: no input file was named." >&2; exit 1;}
+[ x"$dst" != x ] || { echo "$0: no destination was named." >&2; exit 1;}
+
+[ -e "$src" ] || { echo "$0: \"$src\" doesn't exist." >&2; exit 1;}
+
+# Make a temporary file-name in the proper directory.
+dsttmp="$dst/#inst.$$#"
+
+# Append the input filename to the destination directory.
+dst="$dst"/`basename "$src"`
+
+# Trap to remove the temporary file if it isn't renamed.
+trap 'status=$?; $rmcmd "$dsttmp" && exit $status' 0
+trap '(exit $?); exit' 1 2 3 13 15
+
+# Copy the source file to the temporary name.
+$instcmd "$src" "$dsttmp" &&
+
+if [ x"$stripcmd" != x ]
+    then $stripcmd "$dsttmp"
+    fi &&
+if [ x"$chmodcmd" != x ]
+    then $chmodcmd "$dsttmp"
+    fi &&
+
+# Remove an old file (only if the temporary file was created successfully).
+if [ -f "$dst" ]
+    then $rmcmd "$dst" 2>/dev/null ||
+    { echo "$0: can't remove \"$dst\"" >&2
+      (exit 1); exit
+      }
+    fi &&
+
+# Rename the temporary file to the real name.
+$mvcmd "$dsttmp" "$dst" &&
+
+# The final little trick to pass "correctly" the exit status to exit traps.
+{ (exit 0); exit;}

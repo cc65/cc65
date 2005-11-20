@@ -1,54 +1,65 @@
+# -*- makefile -*-
 #
 # Makefile for the cc65 documentation
 #
 
+# You can put navigation-arrow pictures (next, back, contents) into HTML files
+# by setting this variable, either here or on make's command-line.
+# (You will need to copy the .png files from "share/doc/linuxdoc-tools*/html/".)
+#
+#BUTTONS=-I
 
-# Default for the compiler lib search path as compiler define
+# These options decide how text files are made:
+# -f -- removes the backspace-overtyping that makes bold text
+#       in the more/less commands and on typewriter-printers
+# -m -- makes Unix manual pages
+#
+#TXT_OPTIONS=-f -m
 
-SGML  =	apple2.sgml	\
-	ar65.sgml 	\
-        atari.sgml      \
-        atmos.sgml      \
-        c128.sgml       \
-        c16.sgml        \
-        c64.sgml        \
-	ca65.sgml 	\
+SGML =	apple2.sgml	\
+	ar65.sgml	\
+	atari.sgml	\
+	atmos.sgml	\
+	c128.sgml	\
+	c16.sgml	\
+	c64.sgml	\
+	ca65.sgml	\
 	ca65html.sgml	\
-        cbm610.sgml     \
-	cc65.sgml 	\
-	cl65.sgml   	\
-        co65.sgml       \
+	cbm610.sgml	\
+	cc65.sgml	\
+	cl65.sgml	\
+	co65.sgml	\
 	coding.sgml	\
-        da65.sgml       \
+	da65.sgml	\
 	debugging.sgml	\
-	dio.sgml    	\
-        funcref.sgml    \
-	geos.sgml   	\
+	dio.sgml	\
+	funcref.sgml	\
+	geos.sgml	\
 	grc.sgml	\
-	index.sgml  	\
+	index.sgml	\
 	intro.sgml	\
-	ld65.sgml   	\
-	library.sgml    \
-        lynx.sgml       \
-        nes.sgml        \
-        pet.sgml        \
-        plus4.sgml      \
-        vic20.sgml
+	ld65.sgml	\
+	library.sgml	\
+	lynx.sgml	\
+	nes.sgml	\
+	pet.sgml	\
+	plus4.sgml	\
+	vic20.sgml
 
-TXT   =	$(SGML:.sgml=.txt)
-HTML  = $(SGML:.sgml=.html)
-INFO  = $(SGML:.sgml=.info)
-DVI   = $(SGML:.sgml=.dvi)
-TEX   = $(SGML:.sgml=.tex)
+TXT  =	$(SGML:.sgml=.txt)
+HTML =	$(SGML:.sgml=.html)
+INFO =	$(SGML:.sgml=.info)
+DVI  =	$(SGML:.sgml=.dvi)
+TEX  =	$(SGML:.sgml=.tex)
 
 # ------------------------------------------------------------------------------
-# Rules to make targets
+# Pattern-rules, to make targets
 
 %.txt:	%.sgml
-	sgml2txt $<
+	sgml2txt $(TXT_OPTIONS) $<
 
 %.html:	%.sgml
-	sgml2html --split=1 $<
+	sgml2html --split=1 $(BUTTONS) $<
 
 %.info:	%.sgml
 	sgml2info $<
@@ -57,38 +68,45 @@ TEX   = $(SGML:.sgml=.tex)
 	sgml2latex $<
 
 %.tex:	%.sgml
-      	sgml2latex --output=tex $<
+	sgml2latex --output=tex $<
 
 # ------------------------------------------------------------------------------
 # Targets
 
-.PHONY: all
-all:  	txt html info dvi
+.PHONY:	all
+all:	txt html info dvi
 
 .PHONY:	txt
-txt:  	$(TXT)
+txt:	linuxdoc $(TXT)
 
 .PHONY:	html
-html: 	$(HTML)
+html:	linuxdoc $(HTML)
 
 .PHONY:	info
-info: 	$(INFO)
+info:	linuxdoc $(INFO)
 
 .PHONY:	dvi
-dvi:  	$(DVI)
+dvi:	linuxdoc $(DVI)
 
 .PHONY:	tex
-tex:  	$(TEX)
+tex:	linuxdoc $(TEX)
 
-# The index.html target is special, since it does not get splitted
-index.html:	index.sgml
-      	sgml2html --split=0 $<
+.PHONY:	linuxdoc
+linuxdoc:
+	@sgmlcheck index >/dev/null 2>&1 || { \
+	echo; \
+	echo '"LinuxDoc Tools" does not exist on this system.'; \
+	echo 'So, most of the documentation might not have been built.'; \
+	echo; \
+	false;}
 
+.PHONY:	clean
 clean:
-	rm -f *~
+	$(RM) *~
 
+.PHONY:	zap
 zap:	clean
-	rm -f $(TXT) $(HTML) $(INFO) $(DVI) $(TEX) *.html *.info-* *.man
+	$(RM) $(TXT) $(TEX) $(DVI) *.htm* *.inf* *.man
 
 # ------------------------------------------------------------------------------
 # Special target rules
@@ -96,18 +114,14 @@ zap:	clean
 coding.html:	coding.sgml
 	sgml2html --split=0 $<
 
+# funcref.sgml's third section is huge.
+# So, funcref.html is split into sub-section files.
+#
 funcref.html:	funcref.sgml
-	sgml2html --split=2 $<
+	sgml2html --split=2 $(BUTTONS) $<
 
-index.html:    	index.sgml
+# The index.html target is special:
+# It is only a table of contents.  So, it should not be split.
+#
+index.html:	index.sgml
 	sgml2html --split=0 $<
-
-# ------------------------------------------------------------------------------
-# Make the dependencies
-
-.PHONY: depend dep
-depend dep:	$(OBJS:.o=.c)
-	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
-
-

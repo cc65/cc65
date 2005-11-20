@@ -33,9 +33,9 @@ CC65LIB		= $(CC65DATA)/lib
 
 MKDIR		= mkdir -m 755
 
-# BSD-like install-program/-script
-INSTALL		= install
-#INSTALL		= install-sh
+# BSD-like install-script/-program
+INSTALL		= make/install-sh
+#INSTALL		= install
 
 INSTALL_DATA	= $(INSTALL) -c -m 644
 INSTALL_PROG	= $(INSTALL) -c -m 755
@@ -56,9 +56,13 @@ bins:
 libs:
 	@$(MAKE) -C libsrc
 
-# A host system might not have LinuxDoc Tools, so this rule ignores errors.
+# This rule won't try to generate HTML files
+# if a host system doesn't have LinuxDoc Tools.
 docs:
-	-@which sgml2html > /dev/null && $(MAKE) -C doc html || echo 'SGML-Tools not installed, skipping docs'
+	@if sgmlcheck doc/index >/dev/null 2>&1; \
+	  then $(MAKE) -C doc html; \
+	  else echo '"LinuxDoc Tools" is not installed; skipping HTML documentation.'; \
+	  fi
 
 # Some platforms cannot compile all of the sample and library-test programs.
 # So, these rules ignore errors.
@@ -74,7 +78,7 @@ clean zap:
 	$(MAKE) -C libsrc $@
 	$(MAKE) -C doc $@
 	$(MAKE) -C samples $@
-	$(MAKE) -C testcode/lib $@ $(SYS:%=SYS=%)
+#	$(MAKE) -C testcode/lib $@ $(SYS:%=SYS=%)
 
 uninstall:	install-test
 	cd $(bindir) && $(RM) ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc ca65html
@@ -90,12 +94,13 @@ install:	install-test install-dirs install-bins install-libs install-docs
 
 .PHONY:	install-test
 install-test:
-#	@if [ `id -u` != 0 ]; then					\
-#	  echo >&2;							\
-#	  echo 'Do "make install" or "make uninstall" as root.' >&2;	\
-#	  echo >&2;							\
-#	  false;							\
-#	  fi
+	@if [ `id -u` != 0 ]; then \
+	  echo; \
+	  echo 'If you are denied permission to install or uninstall this package,'; \
+	  echo 'then you will need to do "make/gcc.mak install" or "make/gcc.mak uninstall"'; \
+	  echo 'as either the root user or an administrator.'; \
+	  echo; \
+	  fi 2>/dev/null
 
 .PHONY:	install-dirs
 install-dirs:
@@ -134,12 +139,14 @@ install-libs:
 	  done
 
 install-docs:
-	for f in src/ld65/cfg/*.cfg; \
+	for f in src/ld65/cfg/*.cfg src/ca65/macpack/*.mac; \
 	  do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
 	  done
-	for f in readme.1st compile.txt CREDITS BUGS internal.txt newvers.txt; \
+	for f in readme.1st compile.txt BUGS internal.txt newvers.txt; \
 	  do $(INSTALL_DATA) doc/$$f $(CC65DOC) || exit 1; \
 	  done
-	-for f in doc/*.html; \
-	  do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
-	  done
+	if [ -e doc/index.htm* ]; \
+	  then for f in doc/*.htm*; \
+	    do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
+	    done; \
+	  fi

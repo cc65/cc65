@@ -1057,7 +1057,7 @@ int main (void)
     unsigned char       Octave;
     unsigned	 	Val;
     struct __sid_voice*	Voice;
-    VoiceCtrl*	        VC;
+    register VoiceCtrl*	VC;
 
     /* Initialize the debugger */
     DbgInit (0);

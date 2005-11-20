@@ -490,11 +490,9 @@ specify a segment attribute. There are five possible segment attributes:
 
 <tscreen><verb>
 	ro   	means readonly
-	wprot	same as ro but will be marked as write protected in
-		the VICE label file if -Lp is given
-	rw   	means read/write
-	bss  	means that this is an uninitialized segment
-	zp	a zeropage segment
+      	rw   	means read/write
+      	bss  	means that this is an uninitialized segment
+      	zp	a zeropage segment
 </verb></tscreen>
 
 So, because we specified that the segment with the name BSS is of type bss,
@@ -949,7 +947,7 @@ config files, you will need the following information.
 <sect1>INIT<p>
 
 The INIT segment is used for initialization code that may be reused once
-executation reaches main() - provided that the program runs in RAM. You
+execution reaches main() - provided that the program runs in RAM. You
 may for example add the INIT segment to the heap in really memory
 constrained systems.
 
@@ -967,7 +965,7 @@ loaded at the lowest possible program address on several platforms.
 <sect1>HEAP<p>
 
 This segment defines the location of the memory heap used by the malloc
-routine. 
+routine.
 
 
 

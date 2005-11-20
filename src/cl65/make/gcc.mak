@@ -7,6 +7,9 @@ COMMON	= ../common
 
 # Type of spawn function to use
 SPAWN   = SPAWN_UNIX
+ifneq ($(Kickstart),)
+SPAWN   = SPAWN_AMIGA
+endif
 
 
 CC=gcc

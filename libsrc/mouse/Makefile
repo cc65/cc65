@@ -33,6 +33,7 @@ C_OBJS =        mouse_load.o
 
 S_OBJS =        mouse-kernel.o          \
                 mouse_box.o             \
+                mouse_buttons.o         \
                 mouse_geterrormsg.o     \
                 mouse_hide.o            \
                 mouse_info.o            \

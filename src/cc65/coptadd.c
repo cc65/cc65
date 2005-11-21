@@ -316,7 +316,7 @@ unsigned OptAdd3 (CodeSeg* S)
 
      	/* Check for the sequence */
         if (CE_IsCallTo (L[0], "pushax")                        &&
-       	    CS_GetEntries (S, L+1, I+1, 4)                      &&
+       	    CS_GetEntries (S, L+1, I+1, 3)                      &&
             !CS_RangeHasLabel (S, I+1, 3)                       &&
             L[1]->OPC == OP65_LDX                               &&
             CE_IsKnownImm (L[1], 0)                             &&
@@ -327,21 +327,21 @@ unsigned OptAdd3 (CodeSeg* S)
             CodeLabel* Label;
 
             /* Insert new code behind the sequence */
-	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+4);
+     	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
+     	    CS_InsertEntry (S, X, I+4);
 
             /* adc xxx */
-	    X = NewCodeEntry (OP65_ADC, L[2]->AM, L[2]->Arg, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+5);
+     	    X = NewCodeEntry (OP65_ADC, L[2]->AM, L[2]->Arg, 0, L[3]->LI);
+     	    CS_InsertEntry (S, X, I+5);
 
             /* bcc L1 */
             Label = CS_GenLabel (S, L[4]);
             X = NewCodeEntry (OP65_BCC, AM65_BRA, Label->Name, Label, L[3]->LI);
-	    CS_InsertEntry (S, X, I+6);
+     	    CS_InsertEntry (S, X, I+6);
 
             /* inx */
             X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+7);
+     	    CS_InsertEntry (S, X, I+7);
 
 	    /* Delete the old code */
 	    CS_DelEntries (S, I, 4);

@@ -26,8 +26,8 @@
         .include        "mli.inc"
 
 ; Identify DOS version according to:
-; - "Beneath Apple ProDOS", chapter 6-63
-; - "Apple II ProDOS 8 TechNote #023: ProDOS 8 Changes and Minutia"
+; - Beneath Apple ProDOS, chapter 6-63
+; - Apple II ProDOS 8 TechNote #23, ProDOS 8 Changes and Minutia
 ; - ProDOS TechRefMan, chapter 5.2.4
 
         .segment        "INIT"

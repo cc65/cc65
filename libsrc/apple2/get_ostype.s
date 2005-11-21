@@ -8,7 +8,7 @@
         .export         _get_ostype
 
 ; Identify machine according to:
-; "Apple II Miscellaneous TechNote #7: Apple II Family Identification"
+; Apple II Miscellaneous TechNote #7, Apple II Family Identification
 
         .segment        "INIT"
 

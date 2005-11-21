@@ -168,9 +168,9 @@ CLOSE:
 ; Must return an SER_ERR_xx code in a/x.
 
 OPEN:	
-	ldx	#$00
+	ldx	#<$C000
 	stx	ptr2
-	lda	#$C0
+	lda	#>$C000
 	ora	Slot
 	sta	ptr2+1
 	

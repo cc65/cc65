@@ -102,6 +102,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="apple2.html" name="apple2.html"></tag>
   Topics specific to the Apple&nbsp;&rsqb;&lsqb;.
 
+  <tag><htmlurl url="apple2enh.html" name="apple2enh.html"></tag>
+  Topics specific to the enhanced&nbsp;Apple&nbsp;//e.
+
   <tag><htmlurl url="atari.html" name="atari.html"></tag>
   Topics specific to the Atari 8-bit machines.
 

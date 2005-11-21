@@ -17,6 +17,7 @@
 #TXT_OPTIONS=-f -m
 
 SGML =	apple2.sgml	\
+	apple2enh.sgml	\
 	ar65.sgml	\
 	atari.sgml	\
 	atmos.sgml	\
@@ -116,7 +117,7 @@ coding.html:	coding.sgml
 
 # funcref.sgml's third section is huge.
 # So, funcref.html is split into sub-section files.
-#
+#			 
 funcref.html:	funcref.sgml
 	sgml2html --split=2 $(BUTTONS) $<
 

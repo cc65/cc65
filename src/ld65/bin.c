@@ -116,7 +116,15 @@ static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
 static void PrintBoolVal (const char* Name, int B)
 /* Print a boolean value for debugging */
 {
-    printf ("      %s = %s\n", Name, B? "true" : "false");
+    Print (stdout, 2, "      %s = %s\n", Name, B? "true" : "false");
+}
+
+
+
+static void PrintNumVal (const char* Name, unsigned long V)
+/* Print a numerical value for debugging */
+{
+    Print (stdout, 2, "      %s = 0x%lx\n", Name, V);
 }
 
 
@@ -144,13 +152,13 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	       	   S->Load == M 		&&	/* LOAD segment */
 	       	   S->Seg->Dumped == 0;			/* Not already written */
 
-	/* Output the DoWrite flag for debugging */
-	if (Verbosity > 1) {
-       	    PrintBoolVal ("bss", S->Flags & SF_BSS);
-	    PrintBoolVal ("LoadArea", S->Load == M);
-       	    PrintBoolVal ("Dumped", S->Seg->Dumped);
-	    PrintBoolVal ("DoWrite", DoWrite);
-	}
+	/* Output debugging stuff */
+        PrintBoolVal ("bss", S->Flags & SF_BSS);
+        PrintBoolVal ("LoadArea", S->Load == M);
+        PrintBoolVal ("Dumped", S->Seg->Dumped);
+        PrintBoolVal ("DoWrite", DoWrite);
+        PrintNumVal  ("Address", Addr);
+        PrintNumVal  ("FileOffs", (unsigned long) ftell (D->F));
 
 	/* Check if we would need an alignment */
 	if (S->Seg->Align > S->Align) {
@@ -174,8 +182,9 @@ static void BinWriteMem (BinDesc* D, Memory* M)
                 /* Align the address */
                 unsigned long Val = (0x01UL << S->Align) - 1;
                 unsigned long NewAddr = (Addr + Val) & ~Val;
-                if (DoWrite) {
-                    WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                if (DoWrite || (M->Flags & MF_FILL) != 0) {
+                    WriteMult (D->F, M->FillVal, NewAddr - Addr);
+                    PrintNumVal ("SF_ALIGN", NewAddr - Addr);
                 }
                 Addr = NewAddr;
             } else if (S->Flags & (SF_OFFSET | SF_START)) {
@@ -184,8 +193,9 @@ static void BinWriteMem (BinDesc* D, Memory* M)
                     /* It's an offset, not a fixed address, make an address */
                     NewAddr += M->Start;
                 }
-                if (DoWrite) {
+                if (DoWrite || (M->Flags & MF_FILL) != 0) {
                     WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                    PrintNumVal ("SF_OFFSET", NewAddr - Addr);
                 }
                 Addr = NewAddr;
             }
@@ -197,8 +207,9 @@ static void BinWriteMem (BinDesc* D, Memory* M)
                 /* Align the address */
                 unsigned long Val = (0x01UL << S->AlignLoad) - 1;
                 unsigned long NewAddr = (Addr + Val) & ~Val;
-                if (DoWrite) {
+                if (DoWrite || (M->Flags & MF_FILL) != 0) {
                     WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                    PrintNumVal ("SF_ALIGN_LOAD", NewAddr - Addr);
                 }
                 Addr = NewAddr;
             }
@@ -209,11 +220,14 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	 * if the memory area is the load area.
 	 */
        	if (DoWrite) {
+            unsigned long P = ftell (D->F);
 	    RelocLineInfo (S->Seg);
             S->Seg->FillVal = M->FillVal;
 	    SegWrite (D->F, S->Seg, BinWriteExpr, D);
+            PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
 	} else if (M->Flags & MF_FILL) {
 	    WriteMult (D->F, M->FillVal, S->Seg->Size);
+            PrintNumVal ("Filled", (unsigned long) S->Seg->Size);
 	}
 
 	/* If this was the load memory area, mark the segment as dumped */
@@ -230,7 +244,10 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 
     /* If a fill was requested, fill the remaining space */
     if ((M->Flags & MF_FILL) != 0 && M->FillLevel < M->Size) {
-        WriteMult (D->F, M->FillVal, M->Size - M->FillLevel);
+        unsigned long ToFill = M->Size - M->FillLevel;
+       	Print (stdout, 2, "    Filling 0x%lx bytes with 0x%02x\n",
+               ToFill, M->FillVal);
+        WriteMult (D->F, M->FillVal, ToFill);
         M->FillLevel = M->Size;
     }
 }

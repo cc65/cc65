@@ -109,7 +109,7 @@ plasma:	       	$(CRT0) plasma.o $(CLIB)
 sieve: 	       	$(CRT0) sieve.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-# The apple machines need the start address adjusted for the mandelbrot demo
+# The apple machines need the start address adjusted for the tgidemo
 ifeq "$(SYS)" "apple2"
 tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^

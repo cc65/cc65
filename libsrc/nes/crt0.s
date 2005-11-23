@@ -98,9 +98,9 @@ start:
 
 ; Copy the .data segment to RAM
 
-        lda     #<(__ROM0_START__ + __STARTUP_SIZE__+ __CODE_SIZE__+ __RODATA_SIZE__)
+        lda     #<(__DATA_LOAD__)
         sta     ptr1
-        lda     #>(__ROM0_START__ + __STARTUP_SIZE__+ __CODE_SIZE__+ __RODATA_SIZE__)
+        lda     #>(__DATA_LOAD__)
         sta     ptr1+1
         lda     #<(__DATA_RUN__)
         sta     ptr2

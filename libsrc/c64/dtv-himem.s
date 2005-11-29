@@ -41,6 +41,7 @@
 OP_COPYFROM     = %00001101
 OP_COPYTO       = %00001111
 
+START_BANK      = 2                     ; Start at $20000
 PAGES           = (2048 - 128) * 4
 
 
@@ -70,11 +71,14 @@ curpage:        .word  	$0000  	       	; Page
 ;
 
 INSTALL:
+        lda     #$01
+        sta     $d03f                   ; Enable extended register access
         ldx     #$FF
         stx     curpage+1               ; Invalidate curpage
         inx                             ; X = 0
         txa                             ; A/X = EM_ERR_OK
-        rts
+
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -83,7 +87,6 @@ INSTALL:
 
 UNINSTALL:
         rts
-
 
 ; ------------------------------------------------------------------------
 ; PAGECOUNT: Return the total number of available pages in a/x.
@@ -156,55 +159,53 @@ COPYFROM:
         ldx     #OP_COPYFROM
 
 ; DTV DMA transfer routine. Expects the command in X.
+; NOTE: We're using knowledge about field order in the EM_COPY struct here!
 
 transfer:
-        lda     #$01            ; Enable extended features
-        sta     $d03f
+        jsr     WAIT                    ; Wait until DMA is finished
 
-; Wait until the current DMA operation is finished
+; Modulo disable
 
-        jsr     WAIT
+        ldy     #$00
+        sty     $d31e
 
-; Setup the source address. Carry is clear.
+; Setup the target address and the source and target steps. Y contains zero,
+; which is EM_COPY::BUF.
 
-        ldy     #EM_COPY::OFFS
+        sty     $d307                   ; Source step high = 0
+        sty     $d309                   ; Dest step high = 0
+        lda     (ptr1),y
+        sta     $d303                   ; Dest address low
+        iny                             ; Y = 1
+        sty     $d306                   ; Source step low = 1
+        sty     $d308                   ; Dest step low = 1
+        lda     (ptr1),y
+        sta     $d304
+        lda     #$40                    ; Dest is always RAM, start at $00000
+        sta     $d305
+
+; Setup the source address. Incrementing Y will make it point to EM_COPY::OFFS.
+; We will allow page numbers higher than PAGES and map them to ROM. This will
+; allow reading the ROM by specifying a page starting with PAGES.
+
+        iny                             ; EM_COPY::OFFS
         lda     (ptr1),y
         sta     $d300
-        ldy     #EM_COPY::PAGE
+        iny                             ; EM_COPY::PAGE
         lda     (ptr1),y
         sta     $d301
         iny
         lda     (ptr1),y
-        adc     #$42            ; Always RAM, start at $20000
-        sta     $d302
-
-; Setup the target address
-
-        ldy     #EM_COPY::BUF
-        lda     (ptr1),y
-        sta     $d303
-        iny
-        lda     (ptr1),y
-        sta     $d304
-        lda     #$40            ; Always RAM, start at $00000
-        sta     $d305
-
-; Source and target steps
-
-        lda     #$01
-        ldy     #$00
-        sta     $d306
-        sty     $d307
-        sta     $d308
-        sty     $d309
-
-; Modulo disable
-
-        sty     $d31e
+        adc     #START_BANK             ; Carry clear here from WAIT
+        and     #$3f
+        cmp     #>PAGES+START_BANK      ; Valid range?
+        bcs     @L1                     ; Jump if no
+        ora     #$40                    ; Address RAM
+@L1:    sta     $d302
 
 ; Length
 
-        ldy     #EM_COPY::COUNT
+        iny                             ; EM_COPY::COUNT
         lda     (ptr1),y
         sta     $d30a
         iny
@@ -215,22 +216,10 @@ transfer:
 
         stx     $d31f
 
-; Wait until DMA finished
-
-        jsr     WAIT
-
-; Disable access to the extended registers
-
-        lda     #$00
-        sta     $d03f
-
-        rts
-
-
-; ------------------------------------------------------------------------
-; Wait until DMA has finished
+; Wait until DMA is done
 
 WAIT:   lda     $d31f
         lsr     a
         bcs     WAIT
         rts
+

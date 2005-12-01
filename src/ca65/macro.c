@@ -602,7 +602,7 @@ static int MacExpand (void* Data)
        	}
 
        	/* If it's an identifier, it may in fact be a local symbol */
-       	if (Tok == TOK_IDENT && Mac->M->LocalCount) {
+       	if ((Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT) && Mac->M->LocalCount) {
        	    /* Search for the local symbol in the list */
        	    unsigned Index = 0;
        	    IdDesc* I = Mac->M->Locals;

@@ -247,6 +247,7 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 %files c64
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.o
+%attr(644,root,root) 		/usr/lib/cc65/emd/dtv-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/emd/c64-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c64-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/mou/c64-*.mou

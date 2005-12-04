@@ -549,9 +549,12 @@ void SymCheck (void)
 
             /* Check for defined symbols that were never referenced */
 	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
-	    	PWarning (&S->Pos, 2,
-                          "Symbol `%s' is defined but never used",
-                          GetString (S->Name));
+                const char* Name = GetString (S->Name);
+                if (Name[0] != '.') {           /* Ignore internals */
+                    PWarning (&S->Pos, 2,
+                              "Symbol `%s' is defined but never used",
+                              GetString (S->Name));
+                }
 	    }
 
             /* Assign an index to all imports */

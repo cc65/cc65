@@ -316,7 +316,7 @@ unsigned OptAdd3 (CodeSeg* S)
 
      	/* Check for the sequence */
         if (CE_IsCallTo (L[0], "pushax")                        &&
-       	    CS_GetEntries (S, L+1, I+1, 5)                      &&
+       	    CS_GetEntries (S, L+1, I+1, 4)                      &&
             !CS_RangeHasLabel (S, I+1, 3)                       &&
             L[1]->OPC == OP65_LDX                               &&
             CE_IsKnownImm (L[1], 0)                             &&

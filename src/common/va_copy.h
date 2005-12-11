@@ -43,6 +43,11 @@
 
 
 
+/* va_copy is not allowed to be defined */
+#if defined(va_copy)
+#error "The compiler is broken!"
+#endif
+
 /* The watcom compiler doesn't have va_copy and a problematic va_list definition */
 #if defined(__WATCOMC__)
 #define va_copy(dest,src)       memcpy((dest), (src), sizeof (va_list))
@@ -51,6 +56,11 @@
 /* GNU C has a builtin function */
 #if defined(__GNUC__)
 #define va_copy(dest,src)       __va_copy(dest, src)
+#endif
+
+/* If we don't have va_copy now, use a generic version */
+#if !defined(va_copy)
+#define va_copy(dest,src)       ((src)=(dest))
 #endif
 
 

@@ -307,14 +307,11 @@ int IsIdStart (int C)
 void NewInputFile (const char* Name)
 /* Open a new input file */
 {
-    InputFile* I;
-    FILE* F;
+    char* PathName = 0;
 
     /* First try to open the file */
-    F = fopen (Name, "r");
+    FILE* F = fopen (Name, "r");
     if (F == 0) {
-
-     	char* PathName;
 
      	/* Error (fatal error if this is the main file) */
      	if (ICount == 0) {
@@ -330,19 +327,26 @@ void NewInputFile (const char* Name)
      	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
      	}
 
-     	/* Free the allocated memory */
-     	xfree (PathName);
-
+       	/* Use the path name from now on */
+        Name = PathName;
     }
 
     /* check again if we do now have an open file */
     if (F != 0) {
 
      	unsigned FileIdx;
+        InputFile* IF;
 
-     	/* Stat the file and remember the values */
+     	/* Stat the file and remember the values. There a race condition here,
+         * since we cannot use fileno() (non standard identifier in standard
+         * header file), and therefore not fstat. When using stat with the
+         * file name, there's a risk that the file was deleted and recreated
+         * while it was open. Since mtime and size are only used to check
+         * if a file has changed in the debugger, we will ignore this problem
+         * here.
+         */
      	struct stat Buf;
-     	if (fstat (fileno (F), &Buf) != 0) {
+     	if (stat (Name, &Buf) != 0) {
      	    Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
      	}
 
@@ -350,18 +354,18 @@ void NewInputFile (const char* Name)
      	FileIdx = AddFile (Name, Buf.st_size, Buf.st_mtime);
 
      	/* Create a new state variable and initialize it */
-     	I      	    = xmalloc (sizeof (*I));
-     	I->F   	    = F;
-     	I->Pos.Line = 0;
-     	I->Pos.Col  = 0;
-     	I->Pos.Name = FileIdx;
-     	I->Tok      = Tok;
-     	I->C   	    = C;
-     	I->Line[0]  = '\0';
+     	IF           = xmalloc (sizeof (*IF));
+     	IF->F        = F;
+     	IF->Pos.Line = 0;
+     	IF->Pos.Col  = 0;
+     	IF->Pos.Name = FileIdx;
+     	IF->Tok      = Tok;
+     	IF->C        = C;
+     	IF->Line[0]  = '\0';
 
      	/* Use the new file */
-     	I->Next	    = IFile;
-     	IFile  	    = I;
+     	IF->Next     = IFile;
+     	IFile  	     = IF;
      	++ICount;
 
         /* Read the first character from the new file */
@@ -373,6 +377,9 @@ void NewInputFile (const char* Name)
         Tok = TOK_SEP;
 
     }
+
+    /* Free an allocated name buffer */
+    xfree (PathName);
 }
 
 

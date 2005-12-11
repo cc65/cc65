@@ -2,7 +2,7 @@
 # gcc Makefile for the program sources
 #
 
-CFLAGS 	= -g -O2 -Wall
+CFLAGS 	= -g -O2 -Wall -std=c89
 CC	= gcc
 LDFLAGS	=
 

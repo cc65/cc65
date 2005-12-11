@@ -28,7 +28,6 @@
 #include "grc.h"
 
 /* common stuff */
-//#include "cmdline.h"
 #include "fname.h"
 #include "abend.h"
 #include "chartype.h"
@@ -261,7 +260,6 @@ int a;
 	}
 }
 
-//char *bintos(unsigned char a, char *out) {
 char *bintos(unsigned char a, char out[7]) {
 int i=0;
     for (;i<8;i++) {

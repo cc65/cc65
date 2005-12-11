@@ -672,8 +672,9 @@ static void MacroCall (StrBuf* Target, Macro* M)
 static void ExpandMacro (StrBuf* Target, Macro* M)
 /* Expand a macro into Target */
 {
+    /* ### printf ("Expanding %s(%u)\n", M->Name, ++V); */
+
     /* Check if this is a function like macro */
-    //printf ("Expanding %s(%u)\n", M->Name, ++V);
     if (M->ArgCount >= 0) {
 
         int Whitespace = IsSpace (CurC);
@@ -710,7 +711,7 @@ static void ExpandMacro (StrBuf* Target, Macro* M)
         DoneMacroExp (&E);
 
     }
-    //printf ("Done with %s(%u)\n", M->Name, V--);
+    /* ### printf ("Done with %s(%u)\n", M->Name, V--); */
 }
 
 
@@ -770,7 +771,7 @@ static void DefineMacro (void)
                 NextChar ();
                 NextChar ();
 
-                /* Remember that the macro is variadic and use __VA_ARGS__ as 
+                /* Remember that the macro is variadic and use __VA_ARGS__ as
                  * the argument name.
                  */
                 AddMacroArg (M, "__VA_ARGS__");
@@ -827,7 +828,7 @@ static void DefineMacro (void)
         SB_Drop (&M->Replacement, 1);
     }
 
-    //printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement));
+    /* ### printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement)); */
 
     /* If we have an existing macro, check if the redefinition is identical.
      * Print a diagnostic if not.

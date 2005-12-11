@@ -17,7 +17,7 @@ COMMON	= ../common
 CC65_INC = \"/usr/lib/cc65/include/\"
 
 #
-CFLAGS = -O2 -g -Wall -W -I$(COMMON) -DCC65_INC=$(CC65_INC)
+CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON) -DCC65_INC=$(CC65_INC)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=-lm

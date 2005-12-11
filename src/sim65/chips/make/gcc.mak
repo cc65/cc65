@@ -6,7 +6,7 @@
 COMMON  = ../../common
 SIM65	= ..
 
-CFLAGS 	= -g -O2 -Wall -W -I$(COMMON) -I$(SIM65) -fpic
+CFLAGS 	= -g -O2 -Wall -W -std=c89 -I$(COMMON) -I$(SIM65) -fpic
 CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
@@ -56,6 +56,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(CHIPS:.so=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -I$(SIM65) -MM $^ > .depend
+	$(CC) $(CFLAGS) -MM $^ > .depend
 
 

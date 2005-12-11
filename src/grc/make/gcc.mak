@@ -4,7 +4,7 @@
 
 COMMON = ../common
 
-CFLAGS 	= -g -O2 -Wall -W -I$(COMMON)
+CFLAGS 	= -g -O2 -Wall -W -std=c89 -I$(COMMON)
 CC	= gcc
 LDFLAGS	=
 EBIND	= emxbind
@@ -42,6 +42,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -MM $^ > .depend
+	$(CC) $(CFLAGS) -MM $^ > .depend
 
 

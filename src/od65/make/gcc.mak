@@ -6,7 +6,7 @@
 # Library dir
 COMMON	= ../common
 
-CFLAGS = -O2 -g -Wall -W -I$(COMMON)
+CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=
@@ -48,7 +48,7 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -MM $^ > .depend
+	$(CC) $(CFLAGS) -MM $^ > .depend
 
 
 

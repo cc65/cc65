@@ -142,7 +142,7 @@ void ObjWriteHeader (FILE* Obj, ObjHeader* H)
     Write32 (Obj, H->StrPoolOffs);
     Write32 (Obj, H->StrPoolSize);
     Write32 (Obj, H->AssertOffs);
-    Write32 (Obj, H->AssertSize);  
+    Write32 (Obj, H->AssertSize);
     Write32 (Obj, H->ScopeOffs);
     Write32 (Obj, H->ScopeSize);
 }
@@ -164,8 +164,15 @@ void ObjAdd (const char* Name)
 	Error ("Could not open `%s': %s", Name, strerror (errno));
     }
 
-    /* Get the modification time of the object file */
-    if (fstat (fileno (Obj), &StatBuf) != 0) {
+    /* Get the modification time of the object file. There a race condition 
+     * here, since we cannot use fileno() (non standard identifier in standard
+     * header file), and therefore not fstat. When using stat with the    
+     * file name, there's a risk that the file was deleted and recreated
+     * while it was open. Since mtime and size are only used to check
+     * if a file has changed in the debugger, we will ignore this problem
+     * here.
+     */
+    if (stat (Name, &StatBuf) != 0) {
 	Error ("Cannot stat object file `%s': %s", Name, strerror (errno));
     }
 

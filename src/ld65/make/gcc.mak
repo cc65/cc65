@@ -10,7 +10,7 @@ COMMON	= ../common
 CC65_LIB = \"/usr/lib/cc65/lib/\"
 
 #
-CFLAGS = -g -O2 -Wall -W -I$(COMMON) -DCC65_LIB=$(CC65_LIB)
+CFLAGS = -g -O2 -Wall -W -std=c89 -I$(COMMON) -DCC65_LIB=$(CC65_LIB)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=
@@ -113,7 +113,7 @@ zap:   	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -MM -MG $^ > .depend
+	$(CC) $(CFLAGS) -MM -MG $^ > .depend
 
 # -----------------------------------------------------------------------------
 # Rules to make config includes

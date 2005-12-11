@@ -143,9 +143,16 @@ static AFile* NewAFile (IFile* IF, FILE* F)
      */
     if (IF->Usage++ == 0) {
 
-	/* Get file size and modification time */
+	/* Get file size and modification time. There a race condition here,
+         * since we cannot use fileno() (non standard identifier in standard
+         * header file), and therefore not fstat. When using stat with the
+         * file name, there's a risk that the file was deleted and recreated
+         * while it was open. Since mtime and size are only used to check 
+         * if a file has changed in the debugger, we will ignore this problem
+         * here.
+         */
 	struct stat Buf;
-	if (fstat (fileno (F), &Buf) != 0) {
+	if (stat (IF->Name, &Buf) != 0) {
 	    /* Error */
 	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
 	}

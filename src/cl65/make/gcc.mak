@@ -13,7 +13,7 @@ endif
 
 
 CC=gcc
-CFLAGS = -O2 -g -Wall -W -I$(COMMON) -D$(SPAWN)
+CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON) -D$(SPAWN)
 EBIND  = emxbind
 LDFLAGS=
 
@@ -53,7 +53,7 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -D$(SPAWN) -MM $^ > .depend
+	$(CC) $(CFLAGS) -D$(SPAWN) -MM $^ > .depend
 
 
 

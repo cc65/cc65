@@ -2,7 +2,7 @@
 # gcc Makefile for the binutils common stuff
 #
 
-CFLAGS 	= -g -O2 -Wall -W
+CFLAGS 	= -g -O2 -Wall -W -std=c89
 CC	= gcc
 LDFLAGS	=
 LIB	= common.a
@@ -72,6 +72,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
+	$(CC) $(CFLAGS) -MM $^ > .depend
 
 

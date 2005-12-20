@@ -5,6 +5,7 @@
 ;
 
        	.export		_putchar
+        .import         pushax
         .import         _stdout
         .import         _fputc
 
@@ -12,8 +13,9 @@
 .code
 
 _putchar:
-        lda     #<_stdout
-        ldx     #>_stdout
+        jsr     pushax          ; Push c
+        lda     _stdout
+        ldx     _stdout+1
         jmp     _fputc          ; __fastcall__ function
 
 

@@ -4,7 +4,7 @@
 <title>ca65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
 <date>2000-07-19, 2000-11-29, 2001-10-02, 2005-09-08
-                                                   
+
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
 used as a companion assembler for the cc65 crosscompiler, but it may also be
@@ -3039,7 +3039,7 @@ Here's a list of all control commands and a description, what they do:
                 None = 0                ; No error
                 File = 1                ; File error
                 Parse = 2               ; Parse error
-      	.endproc  	      	        ; Close lexical level
+      	.endscope  	      	        ; Close lexical level
 
                 ...
                 lda #Error::File        ; Use symbol from scope Error

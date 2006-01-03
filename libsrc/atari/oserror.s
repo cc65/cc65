@@ -87,7 +87,7 @@ maptable:
 	.byte	ENOSPC		; 169 - directory full
 	.byte	ENOENT		; 170 - file not found
 	.byte	ESPIPE		; 171 - point command invalid
-	.byte	EUNKNOWN	; 172 - [MYDOS] already exists in parent directory
+	.byte	EEXIST		; 172 - [MYDOS] already exists in parent directory
 	.byte	EUNKNOWN	; 173 - bad disk - format couldn't complete
 	.byte	EUNKNOWN	; 174 - [MYDOS] directory not in parent directory
 	.byte	EUNKNOWN	; 175 - [MYDOS] directory not empty

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2005 Mark Keates <markk@dendrite.co.uk>                          */
+/* (C) 2000-2006 Mark Keates <markk@dendrite.co.uk>                          */
 /*               Freddy Offenga <taf_offenga@yahoo.com>                      */
 /*               Christian Groessler <cpg@aladdin.de>                        */
 /*                                                                           */
@@ -194,8 +194,8 @@ extern unsigned char _dos_type;        /* the DOS flavour */
 #define ATARIDOS    0
 #define SPARTADOS   1
 #define OSADOS      2
-#define MYDOS       3     /* detection currently not implemented */
-#define NODOS       255   /* detection currently not implemented */
+#define MYDOS       3
+#define NODOS       255
 
 /* Define hardware */
 #include <_gtia.h>

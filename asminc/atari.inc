@@ -118,7 +118,7 @@ BADMOD	= 145		;($91) bad screen mode number error
 FNCNOT	= 146		;($92) function not implemented in handler
 SCRMEM	= 147		;($93) insufficient memory for screen mode
 
-DSKFMT	= 148		;($94) SpartaDOS: urecognized disk format
+DSKFMT	= 148		;($94) SpartaDOS: unrecognized disk format
 INCVER	= 149		;($95) SpartaDOS: disk was made with incompat. version
 DIRNFD	= 150		;($96) SpartaDOS: directory not found
 FEXIST	= 151		;($97) SpartaDOS: file exists
@@ -481,7 +481,7 @@ ERRFLG	= $023F		;ERROR FLAG - ANY DEVICE ERROR EXCEPT TIME OUT
 
 DFLAGS	= $0240		;DISK FLAGS FROM SECTOR ONE
 DBSECT	= $0241		;NUMBER OF DISK BOOT SECTORS
-BOOTAD	= $0242		;ADDRESS WHERE DISK BOOT LOADER WILL 13E PUT
+BOOTAD	= $0242		;ADDRESS WHERE DISK BOOT LOADER WILL BE PUT
 COLDST	= $0244		;COLDSTART FLAG (1=IN MIDDLE OF COLDSTART>
 RECLEN	= $0245		;##1200xl## 1-byte relocating loader record length
 DSKTIM	= $0246		;DISK TIME OUT REGISTER
@@ -1030,11 +1030,11 @@ DOS	= $0700
 
 RENAME	= $20		;RENAME DISK FILE
 DELETE	= $21		;DELETE DISK FILE
-FORMAT	= $21		;FORMAT
 LOCKFL	= $23		;LOCK FILE TO READ ONLY
 UNLOCK	= $24		;UNLOCK LOCKED FILE
 POINT	= $25		;POINT SECTOR
 NOTE	= $26		;NOTE SECTOR
+FORMAT	= $FE		;FORMAT
 
 ; Command line table, Index values for (DOSVEC),Y -- COMTAB
 ; Compatible with OS/A+, DOS XL and SpartaDOS

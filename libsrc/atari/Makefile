@@ -102,10 +102,12 @@ OBJS = 	_scrsize.o      \
 	scroll.o        \
 	setcolor.o      \
 	siocall.o       \
+	sysmkdir.o      \
 	sysremove.o     \
+	sysrmdir.o      \
 	systime.o       \
+	sysuname.o      \
 	tvtype.o        \
-        sysuname.o      \
 	ucase_fn.o      \
 	wherex.o        \
 	wherey.o        \

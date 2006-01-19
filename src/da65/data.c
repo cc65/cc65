@@ -209,7 +209,7 @@ unsigned AddrTable (void)
        	BytesLeft -= 2;
 
         /* If we must define a label here, bail out */
-        if (MustDefLabel (PC)) {
+        if (BytesLeft && MustDefLabel (PC)) {
             break;
         }
     }
@@ -279,7 +279,7 @@ unsigned RtsTable (void)
        	BytesLeft -= 2;
 
         /* If we must define a label here, bail out */
-        if (MustDefLabel (PC)) {
+        if (BytesLeft && MustDefLabel (PC)) {
             break;
         }
     }

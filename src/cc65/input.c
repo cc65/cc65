@@ -147,7 +147,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
          * since we cannot use fileno() (non standard identifier in standard
          * header file), and therefore not fstat. When using stat with the
          * file name, there's a risk that the file was deleted and recreated
-         * while it was open. Since mtime and size are only used to check 
+         * while it was open. Since mtime and size are only used to check
          * if a file has changed in the debugger, we will ignore this problem
          * here.
          */
@@ -437,13 +437,14 @@ int NextLine (void)
         /* Check for EOF */
         if (C == EOF) {
 
-      	    /* Leave the current file */
-      	    CloseIncludeFile ();
-
             /* Accept files without a newline at the end */
             if (SB_NotEmpty (Line)) {
+                ++Input->Line;
                 break;
             }
+
+      	    /* Leave the current file */
+      	    CloseIncludeFile ();
 
             /* If there is no file open, bail out, otherwise get the
              * previous input file and start over.

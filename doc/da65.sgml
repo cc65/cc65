@@ -61,6 +61,7 @@ Long options:
   --formfeeds           Add formfeeds to the output
   --help                Help (this text)
   --info name           Specify an info file
+  --label-break n       Add newline if label exceeds length n
   --pagelength n        Set the page length for the listing
   --start-addr addr     Set the start/load address
   --verbose             Increase verbosity
@@ -130,6 +131,17 @@ Here is a description of all the command line options:
   without this switch or the corresponding <ref id="global-options"
   name="global option"> <tt><ref id="OUTPUTNAME" name="OUTPUTNAME"></tt>,
   the output will go to the terminal.
+
+
+  <label id="option--label-break">
+  <tag><tt>--label-break n</tt></tag>
+
+  Adds a newline if the length of a label exceeds the given length.
+  Note: If the label would run into the code in the mid column, a
+  linefeed is always inserted regardless of this setting.
+
+  This option overrides the <ref id="global-options" name="global option">
+  <tt><ref id="LABELBREAK" name="LABELBREAK"></tt>.
 
 
   <label id="option--pagelength">
@@ -275,6 +287,17 @@ following attributes are recognized:
   <tt/INPUTSIZE/ is followed by a numerical value that gives the amount of
   data to read from the input file. Data beyond <tt/INPUTOFFS + INPUTSIZE/
   is ignored.
+
+
+  <label id="LABELBREAK">
+  <tag><tt>LABELBREAK</tt></tag>
+  <tt/LABELBREAK/ is followed by a numerical value that specifies the label
+  length that will force a newline. To have all labels on their own lines,
+  you may set this value to zero.
+
+  See also the <tt><ref id="option--label-break" name="--label-break"></tt>
+  command line option. A <tt/LABELBREAK/ statement in the info file will
+  override any value given on the command line.
 
 
   <label id="OUTPUTNAME">

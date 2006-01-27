@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2005 Ullrich von Bassewitz                                       */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -69,6 +69,7 @@ unsigned      Comments        = 0;      /* Add which comments to the output? */
 
 /* Page formatting */
 unsigned PageLength    	      = 0;	/* Length of a listing page */
+unsigned LBreak               = 7;      /* Linefeed if labels exceed this limit */
 unsigned MIndent	      = 9;	/* Mnemonic indent */
 unsigned AIndent	      = 17;	/* Argument indent */
 unsigned CIndent	      = 49;	/* Comment indent */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <time.h>
 
 /* common */
@@ -88,6 +89,7 @@ static void Usage (void)
             "  --help\t\tHelp (this text)\n"
             "  --hexoffs\t\tUse hexadecimal label offsets\n"
             "  --info name\t\tSpecify an info file\n"
+            "  --label-break n\tAdd newline if label exceeds length n\n"
             "  --pagelength n\tSet the page length for the listing\n"
             "  --start-addr addr\tSet the start/load address\n"
             "  --verbose\t\tIncrease verbosity\n"
@@ -194,6 +196,24 @@ static void OptInfo (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --info option */
 {
     InfoSetName (Arg);
+}
+
+
+
+static void OptLabelBreak (const char* Opt, const char* Arg)
+/* Handle the --label-break option */
+{
+    /* Convert the argument to a number */
+    unsigned long Val = CvtNumber (Opt, Arg);
+
+    /* Check for a valid range */
+    if (Val >= UCHAR_MAX) {
+        Error ("Argument for %s out of valid range (%d)",
+               Opt, UCHAR_MAX);
+    }
+
+    /* Use the value */
+    LBreak = (unsigned char) Val;
 }
 
 
@@ -392,6 +412,7 @@ int main (int argc, char* argv [])
       	{ "--help",    	  	0,	OptHelp			},
        	{ "--hexoffs", 	  	0,     	OptHexOffs              },
        	{ "--info",    	       	1,     	OptInfo                 },
+        { "--label-break",      1,      OptLabelBreak           },
       	{ "--pagelength",      	1,	OptPageLength		},
     	{ "--start-addr", 	1,	OptStartAddr		},
       	{ "--verbose", 	       	0,	OptVerbose		},

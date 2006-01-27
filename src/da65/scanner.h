@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2005 Ullrich von Bassewitz                                       */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -73,6 +73,7 @@ typedef enum token_t {
     INFOTOK_INPUTNAME,
     INFOTOK_INPUTOFFS,
     INFOTOK_INPUTSIZE,
+    INFOTOK_LABELBREAK,
     INFOTOK_OUTPUTNAME,
     INFOTOK_PAGELENGTH,
     INFOTOK_STARTADDR,

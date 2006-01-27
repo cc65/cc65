@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2005 Ullrich von Bassewitz                                       */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -74,6 +74,7 @@ extern unsigned         Comments;       /* Add which comments to the output? */
 #define MIN_PAGE_LEN	32
 #define MAX_PAGE_LEN	127
 extern unsigned         PageLength;	/* Length of a listing page */
+extern unsigned         LBreak;         /* Linefeed if labels exceed this limit */
 extern unsigned		MIndent;	/* Mnemonic indent */
 extern unsigned		AIndent;	/* Argument indent */
 extern unsigned 	CIndent;	/* Comment indent */

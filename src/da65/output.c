@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2005 Ullrich von Bassewitz                                       */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -166,8 +166,10 @@ void DefLabel (const char* Name)
 /* Define a label with the given name */
 {
     Output ("%s:", Name);
-    /* Don't start a new line if the label is fully in the left column */
-    if (Col > MIndent) {
+    /* If the label is longer than the configured maximum, or if it runs into
+     * the opcode column, start a new line.
+     */
+    if (Col > LBreak+2 || Col > MIndent) {
      	LineFeed ();
     }
 }

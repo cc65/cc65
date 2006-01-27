@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #if defined(_MSC_VER)
 /* Microsoft compiler */
 #  include <io.h>
@@ -86,6 +87,7 @@ static void GlobalSection (void)
        	{   "INPUTNAME",  	INFOTOK_INPUTNAME	},
         {   "INPUTOFFS",        INFOTOK_INPUTOFFS       },
         {   "INPUTSIZE",        INFOTOK_INPUTSIZE       },
+        {   "LABELBREAK",       INFOTOK_LABELBREAK      },
 	{   "OUTPUTNAME",      	INFOTOK_OUTPUTNAME	},
 	{   "PAGELENGTH",      	INFOTOK_PAGELENGTH	},
 	{   "STARTADDR",	INFOTOK_STARTADDR	},
@@ -157,6 +159,14 @@ static void GlobalSection (void)
 		InfoAssureInt ();
                 InfoRangeCheck (1, 0x10000);
 		InputSize = InfoIVal;
+		InfoNextTok ();
+		break;
+
+            case INFOTOK_LABELBREAK:
+		InfoNextTok ();
+		InfoAssureInt ();
+                InfoRangeCheck (0, UCHAR_MAX);
+		LBreak = (unsigned char) InfoIVal;
 		InfoNextTok ();
 		break;
 

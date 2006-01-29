@@ -44,6 +44,7 @@
 #include "error.h"
 #include "global.h"
 #include "handler.h"
+#include "labels.h"
 #include "opctable.h"
 #include "output.h"
 
@@ -109,7 +110,7 @@ static const char* GetAddrArg (unsigned Flags, unsigned Addr)
 {
     const char* Label = 0;
     if (Flags & flUseLabel) {
-       	Label = GetLabel (Addr);
+       	Label = GetLabel (Addr, PC);
     }
     if (Label) {
        	return Label;
@@ -147,6 +148,10 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
 	    /* Just add the label */
 	    AddIntLabel (Addr);
 	} else {
+
+            /* THIS CODE IS A MESS AND WILL FAIL ON SEVERAL CONDITIONS! ### */
+
+
 	    /* Search for the start of the range or the last non dependent
 	     * label in the range.
 	     */
@@ -161,8 +166,7 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
 		}
 		--LabelAddr;
 		LabelAttr = GetLabelAttr (LabelAddr);
-		if ((LabelAttr & (atIntLabel|atExtLabel)) != 0 &&
-		    (LabelAttr & atDepLabel) == 0) {
+		if ((LabelAttr & (atIntLabel|atExtLabel)) != 0) {
 		    /* The address has an internal or external label */
 		    break;
 		}
@@ -178,7 +182,7 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
 	    if (Offs == 0) {
 		AddIntLabel (Addr);
 	    } else {
-	     	AddDepLabel (Addr, atIntLabel, GetLabel (LabelAddr), Offs);
+	     	AddDepLabel (Addr, atIntLabel, GetLabelName (LabelAddr), Offs);
 	    }
 	}
     }

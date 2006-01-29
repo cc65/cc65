@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   attrtab.c				     */
+/*                                 labels.h                                  */
 /*                                                                           */
-/*			 Disassembler attribute table			     */
+/*                         Label management for da65                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
+/* (C) 2006      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,114 +33,74 @@
 
 
 
-/* da65 */
-#include "error.h"
+#ifndef LABELS_H
+#define LABELS_H
+
+
+
 #include "attrtab.h"
 
 
 
 /*****************************************************************************/
-/*			      	     Data				     */
+/*   	      	    		     Code	    			     */
 /*****************************************************************************/
 
 
 
-/* Attribute table */
-static unsigned short AttrTab[0x10000];
+void AddIntLabel (unsigned Addr);
+/* Add an internal label using the address to generate the name. */
+
+void AddExtLabel (unsigned Addr, const char* Name);
+/* Add an external label */
+
+void AddUnnamedLabel (unsigned Addr);
+/* Add an unnamed label */
+
+void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Offs);
+/* Add a dependent label at the given address using "base name+Offs" as the new
+ * name.
+ */
+
+void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count);
+/* Add an internal label for a range. The first entry gets the label "Name"
+ * while the others get "Name+offs".
+ */
+
+void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count);
+/* Add an external label for a range. The first entry gets the label "Name"
+ * while the others get "Name+offs".
+ */
+
+int HaveLabel (unsigned Addr);
+/* Check if there is a label for the given address */
+
+int MustDefLabel (unsigned Addr);
+/* Return true if we must define a label for this address, that is, if there
+ * is a label at this address, and it is an external or internal label.
+ */
+
+const char* GetLabelName (unsigned Addr);
+/* Return the label name for an address */
+
+const char* GetLabel (unsigned Addr, unsigned RefFrom);
+/* Return the label name for an address, as it is used in a label reference.
+ * RefFrom is the address the label is referenced from. This is needed in case
+ * of unnamed labels, to determine the name.
+ */
+
+void ForwardLabel (unsigned Offs);
+/* If necessary, output a forward label, one that is within the next few
+ * bytes and is therefore output as "label = * + x".
+ */
+
+void DefOutOfRangeLabels (void);
+/* Output any labels that are out of the loaded code range */
 
 
 
-/*****************************************************************************/
-/*				     Code				     */
-/*****************************************************************************/
-
-
-
-void AddrCheck (unsigned Addr)
-/* Check if the given address has a valid range */
-{
-    if (Addr >= 0x10000) {
-	Error ("Address out of range: %08X", Addr);
-    }
-}
-
-
-
-unsigned GetGranularity (attr_t Style)
-/* Get the granularity for the given style */
-{
-    switch (Style) {
-	case atDefault:	 return 1;
-	case atCode:	 return 1;
-	case atIllegal:	 return 1;
-	case atByteTab:	 return 1;
-	case atDByteTab: return 2;
-	case atWordTab:	 return 2;
-	case atDWordTab: return 4;
-	case atAddrTab:  return 2;
-	case atRtsTab:   return 2;
-	case atTextTab:  return 1;
-
-	case atSkip:
-	default:
-	    Internal ("GetGraularity called for style = %d", Style);
-	    return 0;
-    }
-}
-
-
-
-void MarkRange (unsigned Start, unsigned End, attr_t Attr)
-/* Mark a range with the given attribute */
-{
-    /* Do it easy here... */
-    while (Start <= End) {
-	MarkAddr (Start++, Attr);
-    }
-}
-
-
-
-void MarkAddr (unsigned Addr, attr_t Attr)
-/* Mark an address with an attribute */
-{
-    /* Check the given address */
-    AddrCheck (Addr);
-
-    /* We must not have more than one style bit */
-    if (Attr & atStyleMask) {
-	if (AttrTab[Addr] & atStyleMask) {
-	    Error ("Duplicate style for address %04X", Addr);
-	}
-    }
-
-    /* Set the style */
-    AttrTab[Addr] |= Attr;
-}
-
-
-
-attr_t GetStyleAttr (unsigned Addr)
-/* Return the style attribute for the given address */
-{
-    /* Check the given address */
-    AddrCheck (Addr);
-
-    /* Return the attribute */
-    return (AttrTab[Addr] & atStyleMask);
-}
-
-
-
-attr_t GetLabelAttr (unsigned Addr)
-/* Return the label attribute for the given address */
-{
-    /* Check the given address */
-    AddrCheck (Addr);
-
-    /* Return the attribute */
-    return (AttrTab[Addr] & atLabelMask);
-}
+/* End of labels.h */
+#endif
 
 
 

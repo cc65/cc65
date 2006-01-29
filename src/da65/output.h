@@ -67,6 +67,14 @@ void LineFeed (void);
 void DefLabel (const char* Name);
 /* Define a label with the given name */
 
+void DefForward (const char* Name, const char* Comment, unsigned Offs);                
+/* Define a label as "* + x", where x is the offset relative to the
+ * current PC.
+ */
+
+void DefineConst (const char* Name, const char* Comment, unsigned Addr);
+/* Define an address constant */
+
 void OneDataByte (void);
 /* Output a .byte line with the current code byte */
 
@@ -93,9 +101,6 @@ void LineComment (unsigned PC, unsigned Count);
 
 void OutputSettings (void);
 /* Output CPU and other settings */
-
-void DefineConst (const char* Name, const char* Comment, unsigned Addr);
-/* Define an address constant */
 
 
 

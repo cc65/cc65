@@ -51,10 +51,12 @@
 /* da65 */
 #include "attrtab.h"
 #include "code.h"
+#include "comments.h"
 #include "data.h"
 #include "error.h"
 #include "global.h"
 #include "infofile.h"
+#include "labels.h"
 #include "opctable.h"
 #include "output.h"
 #include "scanner.h"
@@ -252,7 +254,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the disassembler version */
 {
     fprintf (stderr,
-       	     "da65 V%u.%u.%u - (C) Copyright 2005 Ullrich von Bassewitz\n",
+       	     "da65 V%u.%u.%u - (C) Copyright 2000-2006, Ullrich von Bassewitz\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
@@ -278,7 +280,7 @@ static void OneOpcode (unsigned RemainingBytes)
         if (Comment) {
             UserComment (Comment);
         }
-	DefLabel (GetLabel (PC));
+	DefLabel (GetLabelName (PC));
     }
 
     /* Check...
@@ -292,13 +294,13 @@ static void OneOpcode (unsigned RemainingBytes)
 	    Style = atIllegal;
 	    MarkAddr (PC, Style);
        	} else if (D->Flags & flIllegal) {
-	   Style = atIllegal;
+	    Style = atIllegal;
 	    MarkAddr (PC, Style);
 	} else {
 	    unsigned I;
 	    for (I = 1; I < D->Size; ++I) {
 	     	if (HaveLabel (PC+I)) {
-		    Style = atIllegal;
+	    	    Style = atIllegal;
      	     	    MarkAddr (PC, Style);
 	     	    break;
 	     	}
@@ -319,6 +321,11 @@ static void OneOpcode (unsigned RemainingBytes)
              * following insn, fall through to byte mode.
              */
             if (D->Size <= RemainingBytes) {
+                /* Output labels within the next insn */
+                unsigned I;
+                for (I = 1; I < D->Size; ++I) {
+                    ForwardLabel (I);
+                }
                 D->Handler (D);
                 PC += D->Size;
                 break;

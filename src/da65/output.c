@@ -176,6 +176,46 @@ void DefLabel (const char* Name)
 
 
 
+void DefForward (const char* Name, const char* Comment, unsigned Offs)
+/* Define a label as "* + x", where x is the offset relative to the
+ * current PC.
+ */
+{
+    if (Pass == PassCount) {
+        Output ("%s", Name);
+        Indent (AIndent);
+        if (UseHexOffs) {
+            Output (":= * + $%04X", Offs);
+        } else {
+            Output (":= * + %u", Offs);
+        }
+        if (Comment) {
+            Indent (CIndent);
+            Output ("; %s", Comment);
+        }
+        LineFeed ();
+    }
+}
+
+
+
+void DefineConst (const char* Name, const char* Comment, unsigned Addr)
+/* Define an address constant */
+{
+    if (Pass == PassCount) {
+        Output ("%s", Name);
+        Indent (AIndent);
+        Output (":= $%04X", Addr);
+        if (Comment) {
+            Indent (CIndent);
+            Output ("; %s", Comment);
+        }
+        LineFeed ();
+    }
+}
+
+
+
 void DataByteLine (unsigned ByteCount)
 /* Output a line with bytes */
 {
@@ -318,23 +358,6 @@ void OutputSettings (void)
     Output ("\"%s\"", CPUNames[CPU]);
     LineFeed ();
     LineFeed ();
-}
-
-
-
-void DefineConst (const char* Name, const char* Comment, unsigned Addr)
-/* Define an address constant */
-{
-    if (Pass == PassCount) {
-        Output ("%s", Name);
-        Indent (AIndent);
-        Output (":= $%04X", Addr);
-        if (Comment) {
-            Indent (CIndent);
-            Output ("; %s", Comment);
-        }
-        LineFeed ();
-    }
 }
 
 

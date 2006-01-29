@@ -63,11 +63,13 @@ endif
 OBJS = 	asminc.obj      \
         attrtab.obj	\
 	code.obj       	\
+        comments.obj    \
 	data.obj	\
 	error.obj  	\
 	global.obj 	\
   	handler.obj	\
 	infofile.obj 	\
+        labels.obj      \
 	main.obj   	\
         opc6502.obj     \
         opc65816.obj    \

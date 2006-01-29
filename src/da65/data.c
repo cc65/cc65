@@ -38,6 +38,7 @@
 #include "code.h"
 #include "error.h"
 #include "global.h"
+#include "labels.h"
 #include "output.h"
 #include "data.h"
 
@@ -174,13 +175,8 @@ unsigned AddrTable (void)
             break;
         }
 
-        /* More than one byte left. Check if there is a label defined within
-         * the address word.
-         */
-        if (MustDefLabel (PC+1)) {
-            /* Define the label */
-            DefineConst (GetLabel (PC+1), GetComment (PC+1), PC+1);
-        }
+        /* More than one byte left. Define a forward label if necessary */
+        ForwardLabel (1);
 
         /* Now get the address from the PC */
         Addr = GetCodeWord (PC);
@@ -191,7 +187,7 @@ unsigned AddrTable (void)
 	    	AddIntLabel (Addr);
 	    }
 	} else {
-	    const char* Label = GetLabel (Addr);
+	    const char* Label = GetLabel (Addr, PC);
 	    if (Label == 0) {
 	    	/* OOPS! Should not happen */
 	    	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
@@ -244,13 +240,8 @@ unsigned RtsTable (void)
             break;
         }
 
-        /* More than one byte left. Check if there is a label defined within
-         * the address word.
-         */
-        if (MustDefLabel (PC+1)) {
-            /* Define the label */
-            DefineConst (GetLabel (PC+1), GetComment (PC+1), PC+1);
-        }
+        /* More than one byte left. Define a forward label if necessary */
+        ForwardLabel (1);
 
         /* Now get the address from the PC */
 	Addr = (GetCodeWord (PC) + 1) & 0xFFFF;
@@ -261,7 +252,7 @@ unsigned RtsTable (void)
 	    	AddIntLabel (Addr);
 	    }
 	} else {
-	    const char* Label = GetLabel (Addr);
+	    const char* Label = GetLabel (Addr, PC);
 	    if (Label == 0) {
 	    	/* OOPS! Should not happen */
 	     	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);

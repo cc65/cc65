@@ -42,8 +42,9 @@
 
 /* da65 */
 #include "asminc.h"
-#include "attrtab.h"
+#include "comments.h"
 #include "error.h"
+#include "labels.h"
 
 
 
@@ -220,8 +221,9 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         /* Apply the sign */
         Val *= Sign;
 
-        /* Define the symbol */
-        AddExtLabel (Val, SB_GetConstBuf (&Ident), Comment);
+        /* Define the symbol and the comment */
+        AddExtLabel (Val, SB_GetConstBuf (&Ident));
+        SetComment (Val, Comment);
 
     }
 

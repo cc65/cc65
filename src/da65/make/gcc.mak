@@ -13,11 +13,13 @@ LDFLAGS=
 OBJS = 	asminc.o        \
         attrtab.o	\
 	code.o	 	\
+        comments.o      \
 	data.o		\
 	error.o	 	\
 	global.o 	\
   	handler.o	\
 	infofile.o	\
+        labels.o        \
 	main.o	 	\
         opc6502.o       \
         opc65816.o      \

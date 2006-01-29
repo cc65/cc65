@@ -51,9 +51,11 @@
 /* da65 */
 #include "asminc.h"
 #include "attrtab.h"
+#include "comments.h"
 #include "error.h"
 #include "global.h"
 #include "infofile.h"
+#include "labels.h"
 #include "opctable.h"
 #include "scanner.h"
 
@@ -357,8 +359,15 @@ static void RangeSection (void)
 
     /* Do we have a label? */
     if (Attributes & tName) {
+
         /* Define a label for the table */
-        AddExtLabel (Start, Name, Comment);
+        AddExtLabel (Start, Name);
+
+        /* Set the comment if we have one */
+        if (Comment) {
+            SetComment (Start, Comment);
+        }
+
         /* Delete name and comment */
         xfree (Name);
         xfree (Comment);
@@ -406,7 +415,7 @@ static void LabelSection (void)
 	       	if (Value >= 0) {
 	       	    InfoError ("Value already given");
 	       	}
-	       	InfoAssureInt ();
+     	       	InfoAssureInt ();
 		InfoRangeCheck (0, 0xFFFF);
 	       	Value = InfoIVal;
 	       	InfoNextTok ();
@@ -430,10 +439,7 @@ static void LabelSection (void)
 	       	if (Name) {
 	       	    InfoError ("Name already given");
 	       	}
-	       	InfoAssureStr ();
-		if (InfoSVal[0] == '\0') {
-		    InfoError ("Name may not be empty");
-		}
+     	       	InfoAssureStr ();
 	       	Name = xstrdup (InfoSVal);
 	       	InfoNextTok ();
 	       	break;
@@ -444,20 +450,23 @@ static void LabelSection (void)
 	       	    InfoError ("Size already given");
 	       	}
 	       	InfoAssureInt ();
-		InfoRangeCheck (1, 0x10000);
+	    	InfoRangeCheck (1, 0x10000);
 	       	Size = InfoIVal;
 	       	InfoNextTok ();
-	       	break;
+     	       	break;
 
-	}
+     	}
 
-	/* Directive is followed by a semicolon */
-	InfoConsumeSemi ();
+     	/* Directive is followed by a semicolon */
+     	InfoConsumeSemi ();
     }
 
     /* Did we get the necessary data */
     if (Name == 0) {
-	InfoError ("Label name is missing");
+     	InfoError ("Label name is missing");
+    }
+    if (Name[0] == '\0' && Size > 1) {
+        InfoError ("Unnamed labels must not have a size > 1");
     }
     if (Value < 0) {
 	InfoError ("Label value is missing");
@@ -474,7 +483,17 @@ static void LabelSection (void)
     }
 
     /* Define the label(s) */
-    AddExtLabelRange ((unsigned) Value, Name, Comment, Size);
+    if (Name[0] == '\0') {
+        /* Size has already beed checked */
+        AddUnnamedLabel (Value);
+    } else {
+        AddExtLabelRange ((unsigned) Value, Name, Size);
+    }
+
+    /* Define the comment */
+    if (Comment) {
+        SetComment (Value, Comment);
+    }
 
     /* Delete the dynamically allocated memory for Name and Comment */
     xfree (Name);

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   attrtab.c				     */
+/*                                comments.h                                 */
 /*                                                                           */
-/*			 Disassembler attribute table			     */
+/*                        Comment management for da65                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
+/* (C) 2006      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,114 +33,31 @@
 
 
 
-/* da65 */
-#include "error.h"
+#ifndef COMMENTS_H
+#define COMMENTS_H
+
+
+
 #include "attrtab.h"
 
 
 
 /*****************************************************************************/
-/*			      	     Data				     */
+/*   	      	    		     Code	    			     */
 /*****************************************************************************/
 
 
 
-/* Attribute table */
-static unsigned short AttrTab[0x10000];
+void SetComment (unsigned Addr, const char* Comment);
+/* Set a comment for the given address */
+
+const char* GetComment (unsigned Addr);
+/* Return the comment for an address */
 
 
 
-/*****************************************************************************/
-/*				     Code				     */
-/*****************************************************************************/
-
-
-
-void AddrCheck (unsigned Addr)
-/* Check if the given address has a valid range */
-{
-    if (Addr >= 0x10000) {
-	Error ("Address out of range: %08X", Addr);
-    }
-}
-
-
-
-unsigned GetGranularity (attr_t Style)
-/* Get the granularity for the given style */
-{
-    switch (Style) {
-	case atDefault:	 return 1;
-	case atCode:	 return 1;
-	case atIllegal:	 return 1;
-	case atByteTab:	 return 1;
-	case atDByteTab: return 2;
-	case atWordTab:	 return 2;
-	case atDWordTab: return 4;
-	case atAddrTab:  return 2;
-	case atRtsTab:   return 2;
-	case atTextTab:  return 1;
-
-	case atSkip:
-	default:
-	    Internal ("GetGraularity called for style = %d", Style);
-	    return 0;
-    }
-}
-
-
-
-void MarkRange (unsigned Start, unsigned End, attr_t Attr)
-/* Mark a range with the given attribute */
-{
-    /* Do it easy here... */
-    while (Start <= End) {
-	MarkAddr (Start++, Attr);
-    }
-}
-
-
-
-void MarkAddr (unsigned Addr, attr_t Attr)
-/* Mark an address with an attribute */
-{
-    /* Check the given address */
-    AddrCheck (Addr);
-
-    /* We must not have more than one style bit */
-    if (Attr & atStyleMask) {
-	if (AttrTab[Addr] & atStyleMask) {
-	    Error ("Duplicate style for address %04X", Addr);
-	}
-    }
-
-    /* Set the style */
-    AttrTab[Addr] |= Attr;
-}
-
-
-
-attr_t GetStyleAttr (unsigned Addr)
-/* Return the style attribute for the given address */
-{
-    /* Check the given address */
-    AddrCheck (Addr);
-
-    /* Return the attribute */
-    return (AttrTab[Addr] & atStyleMask);
-}
-
-
-
-attr_t GetLabelAttr (unsigned Addr)
-/* Return the label attribute for the given address */
-{
-    /* Check the given address */
-    AddrCheck (Addr);
-
-    /* Return the attribute */
-    return (AttrTab[Addr] & atLabelMask);
-}
+/* End of comments.h */
+#endif
 
 
 

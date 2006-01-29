@@ -432,7 +432,9 @@ code. The following attributes are recognized:
 
   <tag><tt>NAME</tt></tag>
   The attribute is followed by a string value which gives the name of the
-  label.
+  label. Empty names are allowed, in this case the disassembler will create
+  an unnamed label (see the assembler docs for more information about unnamed
+  labels).
 
   <tag><tt>SIZE</tt></tag>
   This attribute is optional and may be used to specify the size of the data

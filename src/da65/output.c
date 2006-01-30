@@ -169,7 +169,7 @@ void DefLabel (const char* Name)
     /* If the label is longer than the configured maximum, or if it runs into
      * the opcode column, start a new line.
      */
-    if (Col > LBreak+2 || Col > MIndent) {
+    if (Col > LBreak+2 || Col > MCol) {
      	LineFeed ();
     }
 }
@@ -183,14 +183,14 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
 {
     if (Pass == PassCount) {
         Output ("%s", Name);
-        Indent (AIndent);
+        Indent (ACol);
         if (UseHexOffs) {
             Output (":= * + $%04X", Offs);
         } else {
             Output (":= * + %u", Offs);
         }
         if (Comment) {
-            Indent (CIndent);
+            Indent (CCol);
             Output ("; %s", Comment);
         }
         LineFeed ();
@@ -204,10 +204,10 @@ void DefineConst (const char* Name, const char* Comment, unsigned Addr)
 {
     if (Pass == PassCount) {
         Output ("%s", Name);
-        Indent (AIndent);
+        Indent (ACol);
         Output (":= $%04X", Addr);
         if (Comment) {
-            Indent (CIndent);
+            Indent (CCol);
             Output ("; %s", Comment);
         }
         LineFeed ();
@@ -221,9 +221,9 @@ void DataByteLine (unsigned ByteCount)
 {
     unsigned I;
 
-    Indent (MIndent);
+    Indent (MCol);
     Output (".byte");
-    Indent (AIndent);
+    Indent (ACol);
     for (I = 0; I < ByteCount; ++I) {
  	if (I > 0) {
  	    Output (",$%02X", CodeBuf[PC+I]);
@@ -242,9 +242,9 @@ void DataDByteLine (unsigned ByteCount)
 {
     unsigned I;
 
-    Indent (MIndent);
+    Indent (MCol);
     Output (".dbyte");
-    Indent (AIndent);
+    Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
 	if (I > 0) {
        	    Output (",$%04X", GetCodeDByte (PC+I));
@@ -263,9 +263,9 @@ void DataWordLine (unsigned ByteCount)
 {
     unsigned I;
 
-    Indent (MIndent);
+    Indent (MCol);
     Output (".word");
-    Indent (AIndent);
+    Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
 	if (I > 0) {
 	    Output (",$%04X", GetCodeWord (PC+I));
@@ -284,9 +284,9 @@ void DataDWordLine (unsigned ByteCount)
 {
     unsigned I;
 
-    Indent (MIndent);
+    Indent (MCol);
     Output (".dword");
-    Indent (AIndent);
+    Indent (ACol);
     for (I = 0; I < ByteCount; I += 4) {
 	if (I > 0) {
 	    Output (",$%08lX", GetCodeDWord (PC+I));
@@ -326,14 +326,14 @@ void LineComment (unsigned PC, unsigned Count)
     unsigned I;
 
     if (Pass == PassCount && Comments >= 2) {
-	Indent (CIndent);
+	Indent (CCol);
 	Output ("; %04X", PC);
 	if (Comments >= 3) {
 	    for (I = 0; I < Count; ++I) {
 	      	Output (" %02X", CodeBuf [PC+I]);
 	    }
 	    if (Comments >= 4) {
-	      	Indent (TIndent);
+	      	Indent (TCol);
 	      	for (I = 0; I < Count; ++I) {
 	      	    unsigned char C = CodeBuf [PC+I];
 	      	    if (!isprint (C)) {
@@ -352,9 +352,9 @@ void OutputSettings (void)
 /* Output CPU and other settings */
 {
     LineFeed ();
-    Indent (MIndent);
+    Indent (MCol);
     Output (".setcpu");
-    Indent (AIndent);
+    Indent (ACol);
     Output ("\"%s\"", CPUNames[CPU]);
     LineFeed ();
     LineFeed ();

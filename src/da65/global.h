@@ -74,12 +74,36 @@ extern unsigned         Comments;       /* Add which comments to the output? */
 #define MIN_PAGE_LEN	32
 #define MAX_PAGE_LEN	127
 extern unsigned         PageLength;	/* Length of a listing page */
-extern unsigned         LBreak;         /* Linefeed if labels exceed this limit */
-extern unsigned		MIndent;	/* Mnemonic indent */
-extern unsigned		AIndent;	/* Argument indent */
-extern unsigned 	CIndent;	/* Comment indent */
-extern unsigned 	TIndent;	/* Text bytes indent */
-extern unsigned		BytesPerLine;	/* Max. number of data bytes per line */
+
+/* Linefeed if labels exceed this limit */
+#define MIN_LABELBREAK  1
+#define MAX_LABELBREAK  128
+extern unsigned         LBreak;
+
+/* Mnemonic column */
+#define MIN_MCOL        1
+#define MAX_MCOL        127
+extern unsigned	       	MCol;
+
+/* Argument column */
+#define MIN_ACOL        1
+#define MAX_ACOL        127
+extern unsigned		ACol;
+
+/* Comment column */
+#define MIN_CCOL        1
+#define MAX_CCOL        127
+extern unsigned 	CCol;
+
+/* Text bytes column */
+#define MIN_TCOL        1
+#define MAX_TCOL        127
+extern unsigned 	TCol;
+
+/* Max. number of data bytes per line */
+#define MIN_BYTESPERLINE        1
+#define MAX_BYTESPERLINE        127
+extern unsigned		BytesPerLine;
 
 
 

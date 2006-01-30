@@ -70,10 +70,10 @@ unsigned      Comments        = 0;      /* Add which comments to the output? */
 /* Page formatting */
 unsigned PageLength    	      = 0;	/* Length of a listing page */
 unsigned LBreak               = 7;      /* Linefeed if labels exceed this limit */
-unsigned MIndent	      = 9;	/* Mnemonic indent */
-unsigned AIndent	      = 17;	/* Argument indent */
-unsigned CIndent	      = 49;	/* Comment indent */
-unsigned TIndent	      = 81;	/* Text bytes indent */
+unsigned MCol   	      = 9;	/* Mnemonic column */
+unsigned ACol   	      = 17;	/* Argument column */
+unsigned CCol   	      = 49;	/* Comment column */
+unsigned TCol   	      = 81;	/* Text bytes column */
 unsigned BytesPerLine	      = 8;	/* Max. number of data bytes per line */
 
 

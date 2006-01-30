@@ -192,9 +192,9 @@ unsigned AddrTable (void)
 	    	/* OOPS! Should not happen */
 	    	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
 	    }
-	    Indent (MIndent);
+	    Indent (MCol);
 	    Output (".addr");
-	    Indent (AIndent);
+	    Indent (ACol);
 	    Output ("%s", Label);
 	    LineComment (PC, 2);
 	    LineFeed ();
@@ -257,9 +257,9 @@ unsigned RtsTable (void)
 	    	/* OOPS! Should not happen */
 	     	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
 	    }
-	    Indent (MIndent);
+	    Indent (MCol);
 	    Output (".word");
-	    Indent (AIndent);
+	    Indent (ACol);
 	    Output ("%s-1", Label);
 	    LineComment (PC, 2);
 	    LineFeed ();
@@ -312,9 +312,9 @@ unsigned TextTable (void)
 	/* If we have text, output it */
 	if (Count > 0) {
 	    unsigned CBytes;
-	    Indent (MIndent);
+	    Indent (MCol);
 	    Output (".byte");
-	    Indent (AIndent);
+	    Indent (ACol);
 	    Output ("\"");
 	    for (I = 0; I < Count; ++I) {
 	     	Output ("%c", GetCodeByte (PC+I));

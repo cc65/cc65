@@ -84,6 +84,8 @@ static void Usage (void)
             "  -V\t\t\tPrint the disassembler version\n"
             "\n"
             "Long options:\n"
+            "  --argument-column n\tSpecify argument start column\n"
+            "  --comment-column n\tSpecify comment start column\n"
             "  --comments n\t\tSet the comment level for the output\n"
             "  --cpu type\t\tSet cpu type\n"
             "  --debug-info\t\tAdd debug info to object file\n"
@@ -92,11 +94,26 @@ static void Usage (void)
             "  --hexoffs\t\tUse hexadecimal label offsets\n"
             "  --info name\t\tSpecify an info file\n"
             "  --label-break n\tAdd newline if label exceeds length n\n"
+            "  --mnemonic-column n\tSpecify mnemonic start column\n"
             "  --pagelength n\tSet the page length for the listing\n"
             "  --start-addr addr\tSet the start/load address\n"
+            "  --text-column n\tSpecify text start column\n"
             "  --verbose\t\tIncrease verbosity\n"
             "  --version\t\tPrint the disassembler version\n",
             ProgName);
+}
+
+
+
+static void RangeCheck (const char* Opt, unsigned long Val,
+                        unsigned long Min, unsigned long Max)
+/* Do a range check for the given option and abort if there's a range
+ * error.
+ */
+{
+    if (Val < Min || Val > Max) {
+        Error ("Argument for %s outside valid range (%ld-%ld)", Opt, Min, Max);
+    }
 }
 
 
@@ -129,6 +146,51 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 
 
 
+static void OptArgumentColumn (const char* Opt, const char* Arg)
+/* Handle the --argument-column option */
+{
+    /* Convert the argument to a number */
+    unsigned long Val = CvtNumber (Opt, Arg);
+
+    /* Check for a valid range */
+    RangeCheck (Opt, Val, MIN_ACOL, MAX_ACOL);
+
+    /* Use the value */
+    ACol = (unsigned char) Val;
+}
+
+
+
+static void OptBytesPerLine (const char* Opt, const char* Arg)
+/* Handle the --bytes-per-line option */
+{
+    /* Convert the argument to a number */
+    unsigned long Val = CvtNumber (Opt, Arg);
+
+    /* Check for a valid range */
+    RangeCheck (Opt, Val, MIN_BYTESPERLINE, MAX_BYTESPERLINE);
+
+    /* Use the value */
+    BytesPerLine = (unsigned char) Val;
+}
+
+
+
+static void OptCommentColumn (const char* Opt, const char* Arg)
+/* Handle the --comment-column option */
+{
+    /* Convert the argument to a number */
+    unsigned long Val = CvtNumber (Opt, Arg);
+
+    /* Check for a valid range */
+    RangeCheck (Opt, Val, MIN_CCOL, MAX_CCOL);
+
+    /* Use the value */
+    CCol = (unsigned char) Val;
+}
+
+
+
 static void OptComments (const char* Opt, const char* Arg)
 /* Handle the --comments option */
 {
@@ -136,10 +198,7 @@ static void OptComments (const char* Opt, const char* Arg)
     unsigned long Val = CvtNumber (Opt, Arg);
 
     /* Check for a valid range */
-    if (Val > MAX_COMMENTS) {
-        Error ("Argument for %s outside valid range (%d-%d)",
-               Opt, MIN_COMMENTS, MAX_COMMENTS);
-    }
+    RangeCheck (Opt, Val, MIN_COMMENTS, MAX_COMMENTS);
 
     /* Use the value */
     Comments = (unsigned char) Val;
@@ -209,13 +268,25 @@ static void OptLabelBreak (const char* Opt, const char* Arg)
     unsigned long Val = CvtNumber (Opt, Arg);
 
     /* Check for a valid range */
-    if (Val >= UCHAR_MAX) {
-        Error ("Argument for %s out of valid range (%d)",
-               Opt, UCHAR_MAX);
-    }
+    RangeCheck (Opt, Val, MIN_LABELBREAK, MAX_LABELBREAK);
 
     /* Use the value */
     LBreak = (unsigned char) Val;
+}
+
+
+
+static void OptMnemonicColumn (const char* Opt, const char* Arg)
+/* Handle the --mnemonic-column option */
+{
+    /* Convert the argument to a number */
+    unsigned long Val = CvtNumber (Opt, Arg);
+
+    /* Check for a valid range */
+    RangeCheck (Opt, Val, MIN_MCOL, MAX_MCOL);
+
+    /* Use the value */
+    MCol = (unsigned char) Val;
 }
 
 
@@ -224,8 +295,8 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 /* Handle the --pagelength option */
 {
     int Len = atoi (Arg);
-    if (Len != 0 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
-	AbEnd ("Invalid page length: %d", Len);
+    if (Len != 0) {
+        RangeCheck (Opt, Len, MIN_PAGE_LEN, MAX_PAGE_LEN);
     }
     PageLength = Len;
 }
@@ -236,6 +307,21 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
     StartAddr = CvtNumber (Opt, Arg);
+}
+
+
+
+static void OptTextColumn (const char* Opt, const char* Arg)
+/* Handle the --text-column option */
+{
+    /* Convert the argument to a number */
+    unsigned long Val = CvtNumber (Opt, Arg);
+
+    /* Check for a valid range */
+    RangeCheck (Opt, Val, MIN_TCOL, MAX_TCOL);
+
+    /* Use the value */
+    TCol = (unsigned char) Val;
 }
 
 
@@ -412,16 +498,21 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+        { "--argument-column",  1,      OptArgumentColumn       },
+        { "--bytes-per-line",   1,      OptBytesPerLine         },
+        { "--comment-column",   1,      OptCommentColumn        },
         { "--comments",         1,      OptComments             },
-        { "--cpu",     	       	1,	OptCPU 			},
+        { "--cpu",     	       	1,	OptCPU 	     		},
        	{ "--debug-info",      	0,     	OptDebugInfo            },
-    	{ "--formfeeds",  	0,	OptFormFeeds		},
-      	{ "--help",    	  	0,	OptHelp			},
-       	{ "--hexoffs", 	  	0,     	OptHexOffs              },
+    	{ "--formfeeds",     	0,	OptFormFeeds 		},
+      	{ "--help",    	     	0,	OptHelp	     		},
+       	{ "--hexoffs", 	     	0,     	OptHexOffs              },
        	{ "--info",    	       	1,     	OptInfo                 },
         { "--label-break",      1,      OptLabelBreak           },
+        { "--mnemonic-column",  1,      OptMnemonicColumn       },
       	{ "--pagelength",      	1,	OptPageLength		},
     	{ "--start-addr", 	1,	OptStartAddr		},
+        { "--text-column",      1,      OptTextColumn           },
       	{ "--verbose", 	       	0,	OptVerbose		},
       	{ "--version", 	       	0,	OptVersion		},
     };
@@ -501,6 +592,20 @@ int main (int argc, char* argv [])
     /* Must have an input file */
     if (InFile == 0) {
      	AbEnd ("No input file");
+    }
+
+    /* Check the formatting options for reasonable values. Note: We will not
+     * really check that they make sense, just that they aren't complete
+     * garbage.
+     */
+    if (MCol >= ACol) {
+        AbEnd ("mnemonic-column value must be smaller than argument-column value");
+    }
+    if (ACol >= CCol) {
+        AbEnd ("argument-column value must be smaller than comment-column value");
+    }
+    if (CCol >= TCol) {
+        AbEnd ("comment-column value must be smaller than text-column value");
     }
 
     /* If no CPU given, use the default CPU */

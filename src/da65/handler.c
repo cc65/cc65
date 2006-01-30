@@ -59,7 +59,7 @@
 static void Mnemonic (const char* M)
 /* Indent and output a mnemonic */
 {
-    Indent (MIndent);
+    Indent (MCol);
     Output ("%s", M);
 }
 
@@ -79,7 +79,7 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
     va_start (ap, Arg);
     xvsprintf (Buf, sizeof (Buf), Arg, ap);
     va_end (ap);
-    Indent (AIndent);
+    Indent (ACol);
     Output (Buf);
 
     /* Add the code stuff as comment */

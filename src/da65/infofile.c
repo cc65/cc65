@@ -83,16 +83,24 @@ static void GlobalSection (void)
 /* Parse a global section */
 {
     static const IdentTok GlobalDefs[] = {
+        {   "ARGUMENTCOL",      INFOTOK_ARGUMENT_COLUMN },
+        {   "ARGUMENTCOLUMN",   INFOTOK_ARGUMENT_COLUMN },
+        {   "COMMENTCOL",       INFOTOK_COMMENT_COLUMN  },
+        {   "COMMENTCOLUMN",    INFOTOK_COMMENT_COLUMN  },
         {   "COMMENTS",         INFOTOK_COMMENTS        },
        	{   "CPU",     	        INFOTOK_CPU     	},
         {   "HEXOFFS",          INFOTOK_HEXOFFS         },
-       	{   "INPUTNAME",  	INFOTOK_INPUTNAME	},
+       	{   "INPUTNAME",    	INFOTOK_INPUTNAME	},
         {   "INPUTOFFS",        INFOTOK_INPUTOFFS       },
         {   "INPUTSIZE",        INFOTOK_INPUTSIZE       },
         {   "LABELBREAK",       INFOTOK_LABELBREAK      },
+        {   "MNEMONICCOL",      INFOTOK_MNEMONIC_COLUMN },
+        {   "MNEMONICCOLUMN",   INFOTOK_MNEMONIC_COLUMN },
 	{   "OUTPUTNAME",      	INFOTOK_OUTPUTNAME	},
 	{   "PAGELENGTH",      	INFOTOK_PAGELENGTH	},
-	{   "STARTADDR",	INFOTOK_STARTADDR	},
+	{   "STARTADDR",     	INFOTOK_STARTADDR	},
+        {   "TEXTCOL",          INFOTOK_TEXT_COLUMN     },
+        {   "TEXTCOLUMN",       INFOTOK_TEXT_COLUMN     },
     };
 
     /* Skip the token */
@@ -109,6 +117,22 @@ static void GlobalSection (void)
 
 	/* Look at the token */
 	switch (InfoTok) {
+
+            case INFOTOK_ARGUMENT_COLUMN:
+		InfoNextTok ();
+		InfoAssureInt ();
+                InfoRangeCheck (MIN_ACOL, MAX_ACOL);
+	     	ACol = InfoIVal;
+		InfoNextTok ();
+		break;
+
+            case INFOTOK_COMMENT_COLUMN:
+		InfoNextTok ();
+		InfoAssureInt ();
+                InfoRangeCheck (MIN_CCOL, MAX_CCOL);
+	     	CCol = InfoIVal;
+		InfoNextTok ();
+		break;
 
             case INFOTOK_COMMENTS:
 		InfoNextTok ();
@@ -172,6 +196,14 @@ static void GlobalSection (void)
 		InfoNextTok ();
 		break;
 
+            case INFOTOK_MNEMONIC_COLUMN:
+		InfoNextTok ();
+		InfoAssureInt ();
+                InfoRangeCheck (MIN_MCOL, MAX_MCOL);
+	     	MCol = InfoIVal;
+		InfoNextTok ();
+		break;
+
 	    case INFOTOK_OUTPUTNAME:
 		InfoNextTok ();
 		InfoAssureStr ();
@@ -199,6 +231,17 @@ static void GlobalSection (void)
 		StartAddr = InfoIVal;
 		InfoNextTok ();
 		break;
+
+            case INFOTOK_TEXT_COLUMN:
+		InfoNextTok ();
+		InfoAssureInt ();
+                InfoRangeCheck (MIN_TCOL, MAX_TCOL);
+	     	TCol = InfoIVal;
+		InfoNextTok ();
+		break;
+
+            default:
+                Internal ("Unexpected token: %u", InfoTok);
 
 	}
 
@@ -332,6 +375,9 @@ static void RangeSection (void)
 		}
 		InfoNextTok ();
 		break;
+
+            default:
+                Internal ("Unexpected token: %u", InfoTok);
 	}
 
 	/* Directive is followed by a semicolon */
@@ -455,6 +501,8 @@ static void LabelSection (void)
 	       	InfoNextTok ();
      	       	break;
 
+            default:
+                Internal ("Unexpected token: %u", InfoTok);
      	}
 
      	/* Directive is followed by a semicolon */
@@ -566,6 +614,9 @@ static void AsmIncSection (void)
                 IgnoreUnknown = (InfoTok != INFOTOK_FALSE);
                 InfoNextTok ();
                 break;
+
+            default:
+                Internal ("Unexpected token: %u", InfoTok);
 	}
 
 	/* Directive is followed by a semicolon */
@@ -628,6 +679,9 @@ static void InfoParse (void)
             case INFOTOK_ASMINC:
                 AsmIncSection ();
                 break;
+
+            default:
+                Internal ("Unexpected token: %u", InfoTok);
 	}
 
 	/* Semicolon expected */

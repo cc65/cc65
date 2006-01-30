@@ -55,15 +55,20 @@ Short options:
   -V                    Print the disassembler version
 
 Long options:
+  --argument-column n   Specify argument start column
+  --comment-column n    Specify comment start column
   --comments n          Set the comment level for the output
   --cpu type            Set cpu type
   --debug-info          Add debug info to object file
   --formfeeds           Add formfeeds to the output
   --help                Help (this text)
+  --hexoffs             Use hexadecimal label offsets
   --info name           Specify an info file
   --label-break n       Add newline if label exceeds length n
+  --mnemonic-column n   Specify mnemonic start column
   --pagelength n        Set the page length for the listing
   --start-addr addr     Set the start/load address
+  --text-column n       Specify text start column
   --verbose             Increase verbosity
   --version             Print the disassembler version
 ---------------------------------------------------------------------------
@@ -75,6 +80,19 @@ Long options:
 Here is a description of all the command line options:
 
 <descrip>
+
+  <label id="option--argument-column">
+  <tag><tt>--argument-column n</tt></tag>
+
+  Specifies the column where the argument for a mnemonic or pseudo instruction
+  starts.
+
+
+  <label id="option--comment-column">
+  <tag><tt>--comment-column n</tt></tag>
+
+  Specifies the column where the comment for an instruction starts.
+
 
   <label id="option--comments">
   <tag><tt>--comments n</tt></tag>
@@ -144,6 +162,12 @@ Here is a description of all the command line options:
   <tt><ref id="LABELBREAK" name="LABELBREAK"></tt>.
 
 
+  <label id="option--mnemonic-column">
+  <tag><tt>--mnemonic-column n</tt></tag>
+
+  Specifies the column where a mnemonic or pseudo instrcuction is output.
+
+
   <label id="option--pagelength">
   <tag><tt>--pagelength n</tt></tag>
 
@@ -163,6 +187,13 @@ Here is a description of all the command line options:
   preceded with a '0' digit, as a hexadecimal value if preceded
   with '0x', '0X', or '$', and as a decimal value in all other cases. If no
   start address is specified, $10000 minus the size of the input file is used.
+
+
+  <label id="option--text-column">
+  <tag><tt>--text-column n</tt></tag>
+
+  Specifies the column where additional text is output. This additional text
+  consists of the bytes encoded in this line in text representation.
 
 
   <tag><tt>-v, --verbose</tt></tag>
@@ -259,38 +290,53 @@ following attributes are recognized:
 
 <descrip>
 
-  <tag><tt>COMMENTS</tt></tag>
+  <tag><tt/ARGUMENTCOLUMN/</tag>
+  This attribute specifies the column in the output, where the argument for
+  an opcode or pseudo instruction starts. The corresponding command line
+  option is 
+  <tt><ref id="option--argument-column" name="--argument-column"></tt>.
+
+
+  <tag><tt/COMMENTCOLUMN/</tag>
+  This attribute specifies the column in the output, where the comment starts
+  in a line. It is only used for in-line comments. The corresponding command
+  line option is
+  <tt><ref id="option--comment-column" name="--comment-column"></tt>.
+
+
+  <label id="COMMENTS">
+  <tag><tt/COMMENTS/</tag>
   This attribute may be used instead of the <tt><ref id="option--comments"
   name="--comments"></tt> option on the command line. It takes a numerical
   parameter between 0 and 4. Higher values increase the amount of information
   written to the output file in form of comments.
 
 
-  <tag><tt>CPU</tt></tag>
+  <tag><tt/CPU/</tag>
   This attribute may be used instead of the <tt><ref id="option--cpu"
   name="--cpu"></tt> option on the command line. It takes a string parameter.
 
 
-  <tag><tt>INPUTNAME</tt></tag>
+  <tag><tt/INPUTNAME/</tag>
   The attribute is followed by a string value, which gives the name of the
   input file to read. If it is present, the disassembler does not accept an
   input file name on the command line.
 
 
-  <tag><tt>INPUTOFFS</tt></tag>
+  <tag><tt/INPUTOFFS/</tag>
   The attribute is followed by a numerical value that gives an offset into
   the input file which is skipped before reading data. The attribute may be
   used to skip headers or unwanted code sections in the input file.
 
 
-  <tag><tt>INPUTSIZE</tt></tag>
+  <tag><tt/INPUTSIZE/</tag>
   <tt/INPUTSIZE/ is followed by a numerical value that gives the amount of
   data to read from the input file. Data beyond <tt/INPUTOFFS + INPUTSIZE/
   is ignored.
 
 
   <label id="LABELBREAK">
-  <tag><tt>LABELBREAK</tt></tag>
+  <tag><tt/LABELBREAK/</tag>
   <tt/LABELBREAK/ is followed by a numerical value that specifies the label
   length that will force a newline. To have all labels on their own lines,
   you may set this value to zero.
@@ -300,8 +346,14 @@ following attributes are recognized:
   override any value given on the command line.
 
 
+  <tag><tt/MNEMONICCOLUMN/</tag>
+  This attribute specifies the column in the output, where the mnemonic or
+  pseudo instruction is placed. The corresponding command line option is
+  <tt><ref id="option--mnemonic-column" name="--mnemonic-column"></tt>.
+
+
   <label id="OUTPUTNAME">
-  <tag><tt>OUTPUTNAME</tt></tag>
+  <tag><tt/OUTPUTNAME/</tag>
   The attribute is followed by string value, which gives the name of the
   output file to write. If it is present, specification of an output file on
   the command line using the <tt><ref id="option-o" name="-o"></tt> option is
@@ -312,19 +364,27 @@ following attributes are recognized:
   the output will go to the terminal.
 
 
-  <tag><tt>PAGELENGTH</tt></tag>
+  <tag><tt/PAGELENGTH/</tag>
   This attribute may be used instead of the <tt><ref id="option--pagelength"
   name="--pagelength"></tt> option on the command line. It takes a numerical
   parameter. Using zero as page length (which is the default) means that no
   pages are generated.
 
 
-  <tag><tt>STARTADDR</tt></tag>
+  <tag><tt/STARTADDR/</tag>
   This attribute may be used instead of the <tt><ref id="option--start-addr"
   name="--start-addr"></tt> option on the command line. It takes a numerical
   parameter. The default for the start address is $10000 minus the size of
   the input file (this assumes that the input file is a ROM that contains the
   reset and irq vectors).
+
+
+  <tag><tt/TEXTCOLUMN/</tag>
+  This attribute specifies the column, where the data bytes are output 
+  translated into ASCII text. It is only used if
+  <tt><ref id="COMMENTS" name="COMMENTS"></tt> is set to at least 4. The
+  corresponding command line option is
+  <tt><ref id="option--text-column" name="--text-column"></tt>.
 
 </descrip>
 

@@ -68,7 +68,7 @@
 
 
 
-static void ParseTypeSpec (DeclSpec* D, int Default);
+static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers);
 /* Parse a type specificier */
 
 static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers);
@@ -277,7 +277,7 @@ static void ParseEnumDecl (void)
 	/* Add an entry to the symbol table */
 	AddConstSym (Ident, type_int, SC_ENUM, EnumVal++);
 
-	/* Check for end of definition */
+    	/* Check for end of definition */
     	if (CurTok.Tok != TOK_COMMA)
     	    break;
     	NextToken ();
@@ -331,7 +331,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 	/* Get the type of the entry */
 	DeclSpec Spec;
 	InitDeclSpec (&Spec);
-	ParseTypeSpec (&Spec, -1);
+	ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
 
 	/* Read fields with this type */
 	while (1) {
@@ -377,7 +377,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 	       	if (FieldSize > StructSize) {
 	       	    StructSize = FieldSize;
 	       	}
-	    }
+    	    }
 
 	    /* Add a field entry to the table */
 	    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
@@ -387,7 +387,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
             }
 	    NextToken ();
 	}
-	ConsumeSemi ();
+    	ConsumeSemi ();
     }
 
     /* Skip the closing brace */
@@ -403,19 +403,18 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 
 
 
-static void ParseTypeSpec (DeclSpec* D, int Default)
+static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
 /* Parse a type specificier */
 {
     ident     	Ident;
     SymEntry* 	Entry;
     type 	StructType;
-    type    	Qualifiers;	/* Type qualifiers */
 
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
 
     /* Read type qualifiers if we have any */
-    Qualifiers = OptionalQualifiers (T_QUAL_NONE);
+    Qualifiers = OptionalQualifiers (Qualifiers);
 
     /* Look at the data type */
     switch (CurTok.Tok) {
@@ -423,7 +422,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     	case TOK_VOID:
     	    NextToken ();
 	    D->Type[0] = T_VOID;
-	    D->Type[1] = T_END;
+    	    D->Type[1] = T_END;
     	    break;
 
     	case TOK_CHAR:
@@ -437,7 +436,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     	    if (CurTok.Tok == TOK_UNSIGNED) {
     	      	NextToken ();
     	      	optionalint ();
-	      	D->Type[0] = T_ULONG;
+    	      	D->Type[0] = T_ULONG;
 	      	D->Type[1] = T_END;
     	    } else {
     	      	optionalsigned ();
@@ -523,7 +522,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     		case TOK_LONG:
     		    NextToken ();
     		    optionalint ();
-		    D->Type[0] = T_ULONG;
+    		    D->Type[0] = T_ULONG;
 		    D->Type[1] = T_END;
     		    break;
 
@@ -573,11 +572,11 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
     	case TOK_ENUM:
     	    NextToken ();
-	    if (CurTok.Tok != TOK_LCURLY) {
+    	    if (CurTok.Tok != TOK_LCURLY) {
 	     	/* Named enum */
 		if (CurTok.Tok == TOK_IDENT) {
 		    /* Find an entry with this name */
-		    Entry = FindTagSym (CurTok.Ident);
+    		    Entry = FindTagSym (CurTok.Ident);
 		    if (Entry) {
 			if (SymIsLocal (Entry) && (Entry->Flags & SC_ENUM) == 0) {
 		    	    Error ("Symbol `%s' is already different kind", Entry->Name);
@@ -587,24 +586,24 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 		    }
 		    /* Skip the identifier */
 		    NextToken ();
-		} else {
+    		} else {
     	            Error ("Identifier expected");
-		}
-	    }
-	    /* Remember we have an extra type decl */
-	    D->Flags |= DS_EXTRA_TYPE;
-	    /* Parse the enum decl */
+    		}
+    	    }
+    	    /* Remember we have an extra type decl */
+    	    D->Flags |= DS_EXTRA_TYPE;
+    	    /* Parse the enum decl */
     	    ParseEnumDecl ();
-	    D->Type[0] = T_INT;
-	    D->Type[1] = T_END;
+    	    D->Type[0] = T_INT;
+    	    D->Type[1] = T_END;
     	    break;
 
         case TOK_IDENT:
-	    Entry = FindSym (CurTok.Ident);
-	    if (Entry && SymIsTypeDef (Entry)) {
+    	    Entry = FindSym (CurTok.Ident);
+    	    if (Entry && SymIsTypeDef (Entry)) {
        	       	/* It's a typedef */
     	      	NextToken ();
-		TypeCpy (D->Type, Entry->Type);
+    		TypeCpy (D->Type, Entry->Type);
     	      	break;
     	    }
     	    /* FALL THROUGH */
@@ -612,14 +611,14 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     	default:
     	    if (Default < 0) {
     		Error ("Type expected");
-		D->Type[0] = T_INT;
-		D->Type[1] = T_END;
+    		D->Type[0] = T_INT;
+    		D->Type[1] = T_END;
     	    } else {
-		D->Flags  |= DS_DEF_TYPE;
-		D->Type[0] = (type) Default;
-		D->Type[1] = T_END;
-	    }
-	    break;
+    		D->Flags  |= DS_DEF_TYPE;
+    		D->Type[0] = (type) Default;
+    		D->Type[1] = T_END;
+    	    }
+    	    break;
     }
 
     /* There may also be qualifiers *after* the initial type */
@@ -687,7 +686,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	 * we ignore all this, since we use auto anyway.
 	 */
 	if ((Spec.StorageClass & SC_AUTO) == 0 &&
-	    (Spec.StorageClass & SC_REGISTER) == 0) {
+    	    (Spec.StorageClass & SC_REGISTER) == 0) {
 	    Error ("Illegal storage class");
 	}
 
@@ -737,7 +736,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
       	/* Allow an ellipsis as last parameter */
 	if (CurTok.Tok == TOK_ELLIPSIS) {
-	    NextToken ();
+    	    NextToken ();
 	    F->Flags |= FD_VARIADIC;
 	    break;
 	}
@@ -987,7 +986,7 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     if (CurTok.Tok == TOK_FASTCALL || CurTok.Tok == TOK_NEAR || CurTok.Tok == TOK_FAR) {
 
 	/* Remember the current type pointer */
-	type* T = D->Type + D->Index;
+    	type* T = D->Type + D->Index;
 
 	/* Read the flags */
 	unsigned Flags = FunctionModifierFlags ();
@@ -1088,7 +1087,7 @@ type* ParseType (type* Type)
 
     /* Get a type without a default */
     InitDeclSpec (&Spec);
-    ParseTypeSpec (&Spec, -1);
+    ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
 
     /* Parse additional declarators */
     ParseDecl (&Spec, &Decl, DM_NO_IDENT);
@@ -1133,14 +1132,19 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, int DefType)
 /* Parse a declaration specification */
 {
+    type Qualifiers;
+
     /* Initialize the DeclSpec struct */
     InitDeclSpec (D);
 
-    /* First, get the storage class specifier for this declaration */
+    /* There may be qualifiers *before* the storage class specifier */
+    Qualifiers = OptionalQualifiers (T_QUAL_NONE);
+
+    /* Now get the storage class specifier for this declaration */
     ParseStorageClass (D, DefStorage);
 
-    /* Parse the type specifiers */
-    ParseTypeSpec (D, DefType);
+    /* Parse the type specifiers passing any initial type qualifiers */
+    ParseTypeSpec (D, DefType, Qualifiers);
 }
 
 

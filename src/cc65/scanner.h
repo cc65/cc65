@@ -55,6 +55,7 @@ typedef enum token_t {
     TOK_INVALID,
     TOK_CEOF,
 
+    /* Storage specifiers */
     TOK_AUTO,
     TOK_EXTERN,
     TOK_REGISTER,
@@ -67,6 +68,9 @@ typedef enum token_t {
     TOK_VOLATILE,
     TOK_RESTRICT,
     TOK_LAST_TYPEQUAL   = TOK_RESTRICT,
+
+    /* Function specifiers */
+    TOK_INLINE,
 
     /* Tokens denoting types */
     TOK_FIRST_TYPE,

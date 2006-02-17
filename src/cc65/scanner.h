@@ -58,7 +58,6 @@ typedef enum token_t {
     TOK_AUTO,
     TOK_EXTERN,
     TOK_REGISTER,
-    TOK_RESTRICT,
     TOK_STATIC,
     TOK_TYPEDEF,
 
@@ -66,7 +65,8 @@ typedef enum token_t {
     TOK_FIRST_TYPEQUAL,
     TOK_CONST           = TOK_FIRST_TYPEQUAL,
     TOK_VOLATILE,
-    TOK_LAST_TYPEQUAL   = TOK_VOLATILE,
+    TOK_RESTRICT,
+    TOK_LAST_TYPEQUAL   = TOK_RESTRICT,
 
     /* Tokens denoting types */
     TOK_FIRST_TYPE,

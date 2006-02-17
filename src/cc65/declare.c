@@ -103,6 +103,13 @@ static type OptionalQualifiers (type Q)
 		Q |= T_QUAL_VOLATILE;
 		break;
 
+            case TOK_RESTRICT:
+                if (Q & T_QUAL_RESTRICT) {
+                    Error ("Duplicate qualifier: `restrict'");
+                }
+                Q |= T_QUAL_RESTRICT;
+                break;
+
 	    default:
 		Internal ("Unexpected type qualifier token: %d", CurTok.Tok);
 

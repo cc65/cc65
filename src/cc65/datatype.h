@@ -104,7 +104,8 @@ enum {
     T_QUAL_NONE     = 0x0000,
     T_QUAL_CONST    = 0x1000,
     T_QUAL_VOLATILE = 0x2000,
-    T_MASK_QUAL	    = 0x3000,
+    T_QUAL_RESTRICT = 0x4000,
+    T_MASK_QUAL	    = 0x7000,
 
     /* Types */
     T_CHAR     	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,

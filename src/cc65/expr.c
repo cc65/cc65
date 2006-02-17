@@ -639,7 +639,7 @@ static void Primary (ExprDesc* E)
 	Error ("Preprocessor expression expected");
 	ED_MakeConstAbsInt (E, 1);
 	return;
-    }       
+    }
 
     switch (CurTok.Tok) {
 
@@ -1628,6 +1628,8 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	/* All operators that call this function expect an int on the lhs */
 	if (!IsClassInt (Expr->Type)) {
 	    Error ("Integer expression expected");
+            /* To avoid further errors, make Expr a valid int expression */
+            ED_MakeConstAbsInt (Expr, 1);
 	}
 
 	/* Remember the operator token, then skip it */

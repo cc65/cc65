@@ -135,9 +135,6 @@ enum {
 
 
 
-/* Forward for a symbol entry */
-struct SymEntry;
-
 /* Type entry */
 typedef unsigned short type;
 

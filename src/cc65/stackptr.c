@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2004      Ullrich von Bassewitz                                       */
+/* (C) 2004-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -55,7 +55,7 @@ int StackPtr = 0;
 
 
 
-void SP_Push (const type* T)
+void SP_Push (const Type* T)
 /* Adjust the stackpointer for a push of an argument of the given type */
 {
     StackPtr -= SizeOf (T);
@@ -63,12 +63,12 @@ void SP_Push (const type* T)
 
 
 
-void SP_Pop (const type* T)
+void SP_Pop (const Type* T)
 /* Adjust the stackpointer for a pop of an argument of the given type */
-{                          
+{
     StackPtr += SizeOf (T);
 }
 
 
 
-                           
+

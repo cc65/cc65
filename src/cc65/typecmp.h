@@ -67,7 +67,7 @@ typedef enum {
 
 
 
-typecmp_t TypeCmp (const type* lhs, const type* rhs);
+typecmp_t TypeCmp (const Type* lhs, const Type* rhs);
 /* Compare two types and return the result */
 
 

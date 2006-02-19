@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/* (C) 2002-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -49,7 +49,7 @@
 
 
 
-void TypeConversion (ExprDesc* Expr, type* NewType);
+void TypeConversion (ExprDesc* Expr, Type* NewType);
 /* Do an automatic conversion of the given expression to the new type. Output
  * warnings or errors where this automatic conversion is suspicious or
  * impossible.

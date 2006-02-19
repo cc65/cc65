@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/* (C) 2002-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -55,10 +55,10 @@
 
 
 
-static void DoConversion (ExprDesc* Expr, const type* NewType)
+static void DoConversion (ExprDesc* Expr, const Type* NewType)
 /* Emit code to convert the given expression to a new type. */
 {
-    type*    OldType;
+    Type*    OldType;
     unsigned OldSize;
     unsigned NewSize;
 
@@ -162,7 +162,7 @@ ExitPoint:
 
 
 
-void TypeConversion (ExprDesc* Expr, type* NewType)
+void TypeConversion (ExprDesc* Expr, Type* NewType)
 /* Do an automatic conversion of the given expression to the new type. Output
  * warnings or errors where this automatic conversion is suspicious or
  * impossible.
@@ -264,7 +264,7 @@ void TypeCast (ExprDesc* Expr)
  * expression is an lvalue and false if not.
  */
 {
-    type    NewType[MAXTYPELEN];
+    Type    NewType[MAXTYPELEN];
 
     /* Skip the left paren */
     NextToken ();
@@ -288,3 +288,4 @@ void TypeCast (ExprDesc* Expr)
 
 
 
+     

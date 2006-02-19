@@ -133,7 +133,7 @@ SymEntry* FindLocalSym (const char* Name);
 SymEntry* FindTagSym (const char* Name);
 /* Find the symbol with the given name in the tag table */
 
-SymEntry* FindStructField (const type* TypeArray, const char* Name);
+SymEntry* FindStructField (const Type* TypeArray, const char* Name);
 /* Find a struct field in the fields list */
 
 
@@ -147,16 +147,16 @@ SymEntry* FindStructField (const type* TypeArray, const char* Name);
 SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
 
-SymEntry* AddConstSym (const char* Name, const type* Type, unsigned Flags, long Val);
+SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val);
 /* Add an constant symbol to the symbol table and return it */
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags);
 /* Add a goto label to the symbol table */
 
-SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int Offs);
+SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs);
 /* Add a local symbol and return the symbol entry */
 
-SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags);
+SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags);
 /* Add an external or global symbol to the symbol table and return the entry */
 
 

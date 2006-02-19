@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -161,11 +161,11 @@ void CvtRegVarToAuto (SymEntry* Sym)
 
 
 
-void ChangeSymType (SymEntry* Entry, type* Type)
+void ChangeSymType (SymEntry* Entry, Type* T)
 /* Change the type of the given symbol */
 {
     TypeFree (Entry->Type);
-    Entry->Type = TypeDup (Type);
+    Entry->Type = TypeDup (T);
 }
 
 

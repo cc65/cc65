@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -100,7 +100,7 @@ struct SymEntry {
     SymEntry*  	     		Link;  	  /* General purpose single linked list */
     struct SymTable*		Owner; 	  /* Symbol table the symbol is in */
     unsigned   			Flags; 	  /* Symbol flags */
-    type*      			Type;  	  /* Symbol type */
+    Type*      			Type;  	  /* Symbol type */
     char*                       AsmName;  /* Assembler name if any */
 
     /* Data that differs for the different symbol types */
@@ -210,7 +210,7 @@ INLINE const char* SymGetAsmName (const SymEntry* Sym)
 void CvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */
 
-void ChangeSymType (SymEntry* Entry, type* Type);
+void ChangeSymType (SymEntry* Entry, Type* T);
 /* Change the type of the given symbol */
 
 void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);

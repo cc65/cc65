@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/* (C) 2002-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -85,7 +85,7 @@ enum {
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
     struct SymEntry*	Sym;	/* Symbol table entry if known */
-    type*	       	Type;   /* Type array of expression */
+    Type*	       	Type;   /* Type array of expression */
     unsigned            Flags;
     unsigned long 	Name;	/* Name or label number */
     long       	       	IVal;   /* Integer value if expression constant */
@@ -285,7 +285,7 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
  * an additional offset in Offs.
  */
 
-ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, type* Type);
+ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type);
 /* Make Expr an absolute const with the given value and type. */
 
 ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value);
@@ -334,7 +334,7 @@ int ED_IsBool (const ExprDesc* Expr);
 void PrintExprDesc (FILE* F, ExprDesc* Expr);
 /* Print an ExprDesc */
 
-type* ReplaceType (ExprDesc* Expr, const type* NewType);
+Type* ReplaceType (ExprDesc* Expr, const Type* NewType);
 /* Replace the type of Expr by a copy of Newtype and return the old type string */
 
 

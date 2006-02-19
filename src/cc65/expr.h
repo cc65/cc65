@@ -33,7 +33,7 @@ void PushAddr (const ExprDesc* Expr);
  * must be saved if it's not constant, before evaluating the rhs.
  */
 
-void Store (ExprDesc* Expr, const type* StoreType);
+void Store (ExprDesc* Expr, const Type* StoreType);
 /* Store the primary register into the location denoted by lval. If StoreType
  * is given, use this type when storing instead of lval->Type. If StoreType
  * is NULL, use lval->Type instead.

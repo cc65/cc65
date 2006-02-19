@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005, Ullrich von Bassewitz                                      */
+/* (C) 2001-2006, Ullrich von Bassewitz                                      */
 /*                Römerstrasse 52                                            */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -449,7 +449,7 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 /* Create a new code segment, initialize and return it */
 {
     unsigned I;
-    const type* RetType;
+    const Type* RetType;
 
     /* Allocate memory */
     CodeSeg* S = xmalloc (sizeof (CodeSeg));

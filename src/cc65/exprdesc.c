@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/* (C) 2002-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -133,7 +133,7 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
 
 
 
-ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, type* Type)
+ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
 /* Make Expr an absolute const with the given value and type. */
 {
     Expr->Sym   = 0;
@@ -325,10 +325,10 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
 
 
 
-type* ReplaceType (ExprDesc* Expr, const type* NewType)
+Type* ReplaceType (ExprDesc* Expr, const Type* NewType)
 /* Replace the type of Expr by a copy of Newtype and return the old type string */
 {
-    type* OldType = Expr->Type;
+    Type* OldType = Expr->Type;
     Expr->Type = TypeDup (NewType);
     return OldType;
 }

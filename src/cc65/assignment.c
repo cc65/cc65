@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/* (C) 2002-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -57,7 +57,7 @@ void Assignment (ExprDesc* Expr)
 /* Parse an assignment */
 {
     ExprDesc Expr2;
-    type* ltype = Expr->Type;
+    Type* ltype = Expr->Type;
 
 
     /* We must have an lvalue for an assignment */
@@ -87,7 +87,7 @@ void Assignment (ExprDesc* Expr)
          * the former case, push the address only if really needed.
          */
         int UseReg = 1;
-        type* stype;
+        Type* stype;
         switch (Size) {
             case SIZEOF_CHAR:   stype = type_uchar;             break;
             case SIZEOF_INT:    stype = type_uint;              break;

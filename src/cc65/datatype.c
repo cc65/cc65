@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -56,16 +56,16 @@
 
 
 /* Predefined type strings */
-type type_schar[]       = { T_SCHAR,   	T_END };
-type type_uchar[]       = { T_UCHAR,	T_END };
-type type_int[]         = { T_INT,	T_END };
-type type_uint[]        = { T_UINT,	T_END };
-type type_long[]        = { T_LONG,	T_END };
-type type_ulong[]       = { T_ULONG,	T_END };
-type type_void[]        = { T_VOID,	T_END };
-type type_size_t[]      = { T_SIZE_T,   T_END };
-type type_float[]       = { T_FLOAT,    T_END };
-type type_double[]      = { T_DOUBLE,   T_END };
+Type type_schar[]       = { TYPE(T_SCHAR),  TYPE(T_END) };
+Type type_uchar[]       = { TYPE(T_UCHAR),  TYPE(T_END) };
+Type type_int[]         = { TYPE(T_INT),    TYPE(T_END) };
+Type type_uint[]        = { TYPE(T_UINT),   TYPE(T_END) };
+Type type_long[]        = { TYPE(T_LONG),   TYPE(T_END) };
+Type type_ulong[]       = { TYPE(T_ULONG),  TYPE(T_END) };
+Type type_void[]        = { TYPE(T_VOID),   TYPE(T_END) };
+Type type_size_t[]      = { TYPE(T_SIZE_T), TYPE(T_END) };
+Type type_float[]       = { TYPE(T_FLOAT),  TYPE(T_END) };
+Type type_double[]      = { TYPE(T_DOUBLE), TYPE(T_END) };
 
 
 
@@ -75,11 +75,11 @@ type type_double[]      = { T_DOUBLE,   T_END };
 
 
 
-unsigned TypeLen (const type* T)
+unsigned TypeLen (const Type* T)
 /* Return the length of the type string */
 {
-    const type* Start = T;
-    while (*T != T_END) {
+    const Type* Start = T;
+    while (T->C != T_END) {
 	++T;
     }
     return T - Start;
@@ -87,49 +87,43 @@ unsigned TypeLen (const type* T)
 
 
 
-type* TypeCpy (type* Dest, const type* Src)
+Type* TypeCpy (Type* Dest, const Type* Src)
 /* Copy a type string */
 {
-    type T;
-    type* Orig = Dest;
-    do {
-	T = *Src++;
-	*Dest++ = T;
-    } while (T);
+    Type* Orig = Dest;
+    while (1) {
+      	*Dest = *Src;
+        if (Src->C == T_END) {
+            break;
+        }
+      	Src++;
+        Dest++;
+    }
     return Orig;
 }
 
 
 
-type* TypeCat (type* Dest, const type* Src)
-/* Append Src */
-{
-    TypeCpy (Dest + TypeLen (Dest), Src);
-    return Dest;
-}
-
-
-
-type* TypeDup (const type* T)
+Type* TypeDup (const Type* T)
 /* Create a copy of the given type on the heap */
 {
-    unsigned Len = (TypeLen (T) + 1) * sizeof (type);
-    return (type*) memcpy (xmalloc (Len), T, Len);
+    unsigned Len = (TypeLen (T) + 1) * sizeof (Type);
+    return memcpy (xmalloc (Len), T, Len);
 }
 
 
 
-type* TypeAlloc (unsigned Len)
+Type* TypeAlloc (unsigned Len)
 /* Allocate memory for a type string of length Len. Len *must* include the
  * trailing T_END.
  */
 {
-    return (type*) xmalloc (Len * sizeof (type));
+    return xmalloc (Len * sizeof (Type));
 }
 
 
 
-void TypeFree (type* T)
+void TypeFree (Type* T)
 /* Free a type string */
 {
     xfree (T);
@@ -149,7 +143,7 @@ int SignExtendChar (int C)
 
 
 
-type GetDefaultChar (void)
+TypeCode GetDefaultChar (void)
 /* Return the default char type (signed/unsigned) depending on the settings */
 {
     return IS_Get (&SignedChars)? T_SCHAR : T_UCHAR;
@@ -157,19 +151,17 @@ type GetDefaultChar (void)
 
 
 
-type* GetCharArrayType (unsigned Len)
+Type* GetCharArrayType (unsigned Len)
 /* Return the type for a char array of the given length */
 {
     /* Allocate memory for the type string */
-    type* T = TypeAlloc (1 + DECODE_SIZE + 2);
+    Type* T = TypeAlloc (3);    /* array/char/terminator */
 
     /* Fill the type string */
-    T [0] 	      = T_ARRAY;
-    T [DECODE_SIZE+1] = GetDefaultChar();
-    T [DECODE_SIZE+2] = T_END;
-
-    /* Encode the length in the type string */
-    Encode (T+1, Len);
+    T[0].C   = T_ARRAY;
+    T[0].A.L = Len;             /* Array length is in the L attribute */
+    T[1].C   = GetDefaultChar ();
+    T[2].C   = T_END;
 
     /* Return the new type */
     return T;
@@ -177,14 +169,14 @@ type* GetCharArrayType (unsigned Len)
 
 
 
-type* GetImplicitFuncType (void)
+Type* GetImplicitFuncType (void)
 /* Return a type string for an inplicitly declared function */
 {
     /* Get a new function descriptor */
     FuncDesc* F = NewFuncDesc ();
 
     /* Allocate memory for the type string */
-    type* T = TypeAlloc (1 + DECODE_SIZE + 2);
+    Type* T = TypeAlloc (3);    /* func/returns int/terminator */
 
     /* Prepare the function descriptor */
     F->Flags  = FD_IMPLICIT | FD_EMPTY | FD_VARIADIC;
@@ -192,12 +184,10 @@ type* GetImplicitFuncType (void)
     F->TagTab = &EmptySymTab;
 
     /* Fill the type string */
-    T [0]    	      = T_FUNC;
-    T [DECODE_SIZE+1] = T_INT;
-    T [DECODE_SIZE+2] = T_END;
-
-    /* Encode the function descriptor into the type string */
-    EncodePtr (T+1, F);
+    T[0].C   = T_FUNC;
+    T[0].A.P = F;
+    T[1].C   = T_INT;
+    T[2].C   = T_END;
 
     /* Return the new type */
     return T;
@@ -205,7 +195,7 @@ type* GetImplicitFuncType (void)
 
 
 
-type* PointerTo (const type* T)
+Type* PointerTo (const Type* T)
 /* Return a type string that is "pointer to T". The type string is allocated
  * on the heap and may be freed after use.
  */
@@ -214,11 +204,11 @@ type* PointerTo (const type* T)
     unsigned Size = TypeLen (T) + 1;
 
     /* Allocate the new type string */
-    type* P = TypeAlloc	(Size + 1);
+    Type* P = TypeAlloc	(Size + 1);
 
     /* Create the return type... */
-    P[0] = T_PTR;
-    memcpy (P+1, T, Size * sizeof (type));
+    P[0].C = T_PTR;
+    memcpy (P+1, T, Size * sizeof (Type));
 
     /* ...and return it */
     return P;
@@ -226,41 +216,42 @@ type* PointerTo (const type* T)
 
 
 
-static type PrintTypeComp (FILE* F, type T, type Mask, const char* Name)
+static TypeCode PrintTypeComp (FILE* F, TypeCode C, TypeCode Mask, const char* Name)
 /* Check for a specific component of the type. If it is there, print the
  * name and remove it. Return the type with the component removed.
  */
 {
-    if ((T & Mask) == Mask) {
+    if ((C & Mask) == Mask) {
       	fprintf (F, "%s ", Name);
-	T &= ~Mask;
+	C &= ~Mask;
     }
-    return T;
+    return C;
 }
 
 
 
-void PrintType (FILE* F, const type* Type)
+void PrintType (FILE* F, const Type* T)
 /* Output translation of type array. */
 {
-    type T;
-    long Size;
+    /* Walk over the type string */
+    while (T->C != T_END) {
 
-    /* Walk over the complete string */
-    while ((T = *Type++) != T_END) {
+        /* Get the type code */
+        TypeCode C = T->C;
 
 	/* Print any qualifiers */
-    	T = PrintTypeComp (F, T, T_QUAL_CONST, "const");
-	T = PrintTypeComp (F, T, T_QUAL_VOLATILE, "volatile");
+       	C = PrintTypeComp (F, C, T_QUAL_CONST, "const");
+	C = PrintTypeComp (F, C, T_QUAL_VOLATILE, "volatile");
+        C = PrintTypeComp (F, C, T_QUAL_RESTRICT, "restrict");
 
     	/* Signedness. Omit the signedness specifier for long and int */
-	if ((T & T_MASK_TYPE) != T_TYPE_INT && (T & T_MASK_TYPE) != T_TYPE_LONG) {
-	    T = PrintTypeComp (F, T, T_SIGN_SIGNED, "signed");
+       	if ((C & T_MASK_TYPE) != T_TYPE_INT && (C & T_MASK_TYPE) != T_TYPE_LONG) {
+	    C = PrintTypeComp (F, C, T_SIGN_SIGNED, "signed");
 	}
-    	T = PrintTypeComp (F, T, T_SIGN_UNSIGNED, "unsigned");
+    	C = PrintTypeComp (F, C, T_SIGN_UNSIGNED, "unsigned");
 
     	/* Now check the real type */
-     	switch (T & T_MASK_TYPE) {
+     	switch (C & T_MASK_TYPE) {
     	    case T_TYPE_CHAR:
     	  	fprintf (F, "char");
     	  	break;
@@ -286,49 +277,47 @@ void PrintType (FILE* F, const type* Type)
      	  	fprintf (F, "void");
     	  	break;
     	    case T_TYPE_STRUCT:
-    	     	fprintf (F, "struct %s", ((SymEntry*) DecodePtr (Type))->Name);
-       	     	Type += DECODE_SIZE;
+    	     	fprintf (F, "struct %s", ((SymEntry*) T->A.P)->Name);
 	     	break;
 	    case T_TYPE_UNION:
-	     	fprintf (F, "union %s", ((SymEntry*) DecodePtr (Type))->Name);
-	     	Type += DECODE_SIZE;
+	     	fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
 	     	break;
 	    case T_TYPE_ARRAY:
 		/* Recursive call */
-		PrintType (F, Type + DECODE_SIZE);
-		Size = Decode (Type);
-		if (Size == UNSPECIFIED) {
+		PrintType (F, T + 1);
+		if (T->A.L == UNSPECIFIED) {
 		    fprintf (F, "[]");
 		} else {
-		    fprintf (F, "[%lu]", Size);
+		    fprintf (F, "[%ld]", T->A.L);
 		}
 	     	return;
 	    case T_TYPE_PTR:
  		/* Recursive call */
-		PrintType (F, Type);
+		PrintType (F, T + 1);
 		fprintf (F, "*");
 	     	return;
 	    case T_TYPE_FUNC:
 	     	fprintf (F, "function returning ");
-	     	Type += DECODE_SIZE;
 	     	break;
 	    default:
-	     	fprintf (F, "unknown type: %04X", T);
+	     	fprintf (F, "unknown type: %04lX", T->C);
 	}
 
+        /* Next element */
+        ++T;
     }
 }
 
 
 
-void PrintFuncSig (FILE* F, const char* Name, type* Type)
+void PrintFuncSig (FILE* F, const char* Name, Type* T)
 /* Print a function signature. */
 {
     /* Get the function descriptor */
-    const FuncDesc* D = GetFuncDesc (Type);
+    const FuncDesc* D = GetFuncDesc (T);
 
     /* Print a comment with the function signature */
-    PrintType (F, GetFuncReturn (Type));
+    PrintType (F, GetFuncReturn (T));
     if (D->Flags & FD_NEAR) {
         fprintf (F, " __near__");
     }
@@ -364,82 +353,30 @@ void PrintFuncSig (FILE* F, const char* Name, type* Type)
 
 
 
-void PrintRawType (FILE* F, const type* Type)
+void PrintRawType (FILE* F, const Type* T)
 /* Print a type string in raw format (for debugging) */
 {
-    while (*Type != T_END) {
-       	fprintf (F, "%04X ", *Type++);
+    while (T->C != T_END) {
+       	fprintf (F, "%04lX ", T->C);
+        ++T;
     }
     fprintf (F, "\n");
 }
 
 
 
-void Encode (type* Type, unsigned long Val)
-/* Encode Val into the given type string */
+int TypeHasAttr (const Type* T)
+/* Return true if the given type has attribute data */
 {
-    int I;
-    for (I = 0; I < DECODE_SIZE; ++I) {
-	*Type++ = ((type) Val) | 0x8000;
-	Val >>= 15;
-    }
+    return IsClassStruct (T) || IsTypeArray (T) || IsClassFunc (T);
 }
 
 
 
-void EncodePtr (type* Type, void* P)
-/* Encode a pointer into a type array */
-{
-    Encode (Type, (unsigned long) P);
-}
-
-
-
-unsigned long Decode (const type* Type)
-/* Decode */
-{
-    int I;
-    unsigned long Val = 0;
-    for (I = DECODE_SIZE-1; I >= 0; I--) {
-	Val <<= 15;
-	Val |= (Type[I] & 0x7FFF);
-    }
-    return Val;
-}
-
-
-
-void* DecodePtr (const type* Type)
-/* Decode a pointer from a type array */
-{
-    return (void*) Decode (Type);
-}
-
-
-
-int HasEncode (const type* Type)
-/* Return true if the given type has encoded data */
-{
-    return IsClassStruct (Type) || IsTypeArray (Type) || IsTypeFunc (Type);
-}
-
-
-
-void CopyEncode (const type* Source, type* Target)
-/* Copy encoded data from Source to Target */
-{
-    memcpy (Target, Source, DECODE_SIZE * sizeof (type));
-}
-
-
-
-unsigned SizeOf (const type* T)
+unsigned SizeOf (const Type* T)
 /* Compute size of object represented by type array. */
 {
-    SymEntry* Entry;
-    long      ElementCount;
-
-    switch (UnqualifiedType (T[0])) {
+    switch (UnqualifiedType (T->C)) {
 
     	case T_VOID:
        	    return 0;   /* Assume voids have size zero */
@@ -479,20 +416,18 @@ unsigned SizeOf (const type* T)
 
 	case T_STRUCT:
 	case T_UNION:
-       	    Entry = DecodePtr (T+1);
-       	    return Entry->V.S.Size;
+            return ((SymEntry*) T->A.P)->V.S.Size;
 
 	case T_ARRAY:
-            ElementCount = GetElementCount (T);
-            if (ElementCount == UNSPECIFIED) {
+            if (T->A.L == UNSPECIFIED) {
                 /* Array with unspecified size */
                 return 0;
             } else {
-	        return ElementCount * SizeOf (T + DECODE_SIZE + 1);
+	        return T->A.L * SizeOf (T + 1);
             }
 
     	default:
-	    Internal ("Unknown type in SizeOf: %04X", *T);
+	    Internal ("Unknown type in SizeOf: %04lX", T->C);
 	    return 0;
 
     }
@@ -500,23 +435,19 @@ unsigned SizeOf (const type* T)
 
 
 
-unsigned PSizeOf (const type* T)
+unsigned PSizeOf (const Type* T)
 /* Compute size of pointer object. */
 {
     /* We are expecting a pointer expression */
-    CHECK ((T[0] & T_MASK_CLASS) == T_CLASS_PTR);
+    CHECK (IsClassPtr (T));
 
     /* Skip the pointer or array token itself */
-    if (IsTypeArray (T)) {
-       	return SizeOf (T + DECODE_SIZE + 1);
-    } else {
-      	return SizeOf (T + 1);
-    }
+    return SizeOf (T + 1);
 }
 
 
 
-unsigned CheckedSizeOf (const type* T)
+unsigned CheckedSizeOf (const Type* T)
 /* Return the size of a data type. If the size is zero, emit an error and
  * return some valid size instead (so the rest of the compiler doesn't have
  * to work with invalid sizes).
@@ -532,7 +463,7 @@ unsigned CheckedSizeOf (const type* T)
 
 
 
-unsigned CheckedPSizeOf (const type* T)
+unsigned CheckedPSizeOf (const Type* T)
 /* Return the size of a data type that is pointed to by a pointer. If the
  * size is zero, emit an error and return some valid size instead (so the
  * rest of the compiler doesn't have to work with invalid sizes).
@@ -548,12 +479,10 @@ unsigned CheckedPSizeOf (const type* T)
 
 
 
-unsigned TypeOf (const type* T)
+unsigned TypeOf (const Type* T)
 /* Get the code generator base type of the object */
 {
-    FuncDesc* F;
-
-    switch (UnqualifiedType (T[0])) {
+    switch (UnqualifiedType (T->C)) {
 
 	case T_SCHAR:
     	    return CF_CHAR;
@@ -584,8 +513,7 @@ unsigned TypeOf (const type* T)
             return CF_FLOAT;
 
         case T_FUNC:
-	    F = DecodePtr (T+1);
-	    return (F->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
+	    return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
 
         case T_STRUCT:
         case T_UNION:
@@ -593,100 +521,54 @@ unsigned TypeOf (const type* T)
        	    return CF_INT | CF_UNSIGNED;
 
        	default:
-       	    Error ("Illegal type");
+       	    Error ("Illegal type %04lX", T->C);
        	    return CF_INT;
     }
 }
 
 
 
-type* Indirect (type* T)
+Type* Indirect (Type* T)
 /* Do one indirection for the given type, that is, return the type where the
  * given type points to.
  */
 {
     /* We are expecting a pointer expression */
-    CHECK ((T[0] & T_MASK_CLASS) == T_CLASS_PTR);
+    CHECK (IsClassPtr (T));
 
     /* Skip the pointer or array token itself */
-    if (IsTypeArray (T)) {
-       	return T + DECODE_SIZE + 1;
-    } else {
-      	return T + 1;
-    }
+    return T + 1;
 }
 
 
 
-type* ArrayToPtr (const type* T)
+Type* ArrayToPtr (const Type* T)
 /* Convert an array to a pointer to it's first element */
 {
     /* Function must only be called for an array */
-    CHECK ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
+    CHECK (IsTypeArray (T));
 
     /* Return pointer to first element */
-    return PointerTo (T + DECODE_SIZE + 1);
+    return PointerTo (T + 1);
 }
 
 
 
-int IsClassInt (const type* T)
-/* Return true if this is an integer type */
+TypeCode GetQualifier (const Type* T)
+/* Get the qualifier from the given type string */
 {
-    return (T[0] & T_MASK_CLASS) == T_CLASS_INT;
+    /* If this is an array, look at the element type, otherwise look at the
+     * type itself.
+     */
+    if (IsTypeArray (T)) {
+     	++T;
+    }
+    return (T->C & T_MASK_QUAL);
 }
 
 
 
-int IsClassFloat (const type* T)
-/* Return true if this is a float type */
-{
-    return (T[0] & T_MASK_CLASS) == T_CLASS_FLOAT;
-}
-
-
-
-int IsClassPtr (const type* T)
-/* Return true if this is a pointer type */
-{
-    return (T[0] & T_MASK_CLASS) == T_CLASS_PTR;
-}
-
-
-
-int IsClassStruct (const type* T)
-/* Return true if this is a struct type */
-{
-    return (T[0] & T_MASK_CLASS) == T_CLASS_STRUCT;
-}
-
-
-
-int IsSignUnsigned (const type* T)
-/* Return true if this is an unsigned type */
-{
-    return (T[0] & T_MASK_SIGN) == T_SIGN_UNSIGNED;
-}
-
-
-
-int IsQualConst (const type* T)
-/* Return true if the given type has a const memory image */
-{
-    return (GetQualifier (T) & T_QUAL_CONST) != 0;
-}
-
-
-
-int IsQualVolatile (const type* T)
-/* Return true if the given type has a volatile type qualifier */
-{
-    return (GetQualifier (T) & T_QUAL_VOLATILE) != 0;
-}
-
-
-
-int IsFastCallFunc (const type* T)
+int IsFastCallFunc (const Type* T)
 /* Return true if this is a function type or pointer to function with
  * __fastcall__ calling conventions
  */
@@ -697,7 +579,7 @@ int IsFastCallFunc (const type* T)
 
 
 
-int IsVariadicFunc (const type* T)
+int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
  * variable parameter list
  */
@@ -708,76 +590,113 @@ int IsVariadicFunc (const type* T)
 
 
 
-type GetQualifier (const type* T)
-/* Get the qualifier from the given type string */
-{
-    /* If this is an array, look at the element type, otherwise look at the
-     * type itself.
-     */
-    if (IsTypeArray (T)) {
-     	T += DECODE_SIZE + 1;
-    }
-    return (T[0] & T_MASK_QUAL);
-}
-
-
-
-FuncDesc* GetFuncDesc (const type* T)
+FuncDesc* GetFuncDesc (const Type* T)
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 {
-    if (UnqualifiedType (T[0]) == T_PTR) {
-	/* Pointer to function */
-	++T;
+    if (UnqualifiedType (T->C) == T_PTR) {
+ 	/* Pointer to function */
+ 	++T;
     }
 
     /* Be sure it's a function type */
-    CHECK (T[0] == T_FUNC);
+    CHECK (IsClassFunc (T));
 
-    /* Decode the function descriptor and return it */
-    return DecodePtr (T+1);
+    /* Get the function descriptor from the type attributes */
+    return T->A.P;
 }
 
 
 
-type* GetFuncReturn (type* T)
+void SetFuncDesc (Type* T, FuncDesc* F)
+/* Set the FuncDesc pointer in a function or pointer-to-function type */
+{
+    if (UnqualifiedType (T->C) == T_PTR) {
+ 	/* Pointer to function */
+ 	++T;
+    }
+
+    /* Be sure it's a function type */
+    CHECK (IsClassFunc (T));
+
+    /* Set the function descriptor */
+    T->A.P = F;
+}
+
+
+
+Type* GetFuncReturn (Type* T)
 /* Return a pointer to the return type of a function or pointer-to-function type */
 {
-    if (UnqualifiedType (T[0]) == T_PTR) {
-	/* Pointer to function */
-	++T;
+    if (UnqualifiedType (T->C) == T_PTR) {
+ 	/* Pointer to function */
+ 	++T;
     }
 
     /* Be sure it's a function type */
-    CHECK (T[0] == T_FUNC);
+    CHECK (IsClassFunc (T));
 
     /* Return a pointer to the return type */
-    return T + 1 + DECODE_SIZE;
-
+    return T + 1;
 }
 
 
 
-long GetElementCount (const type* T)
+long GetElementCount (const Type* T)
 /* Get the element count of the array specified in T (which must be of
  * array type).
  */
 {
     CHECK (IsTypeArray (T));
-    return Decode (T+1);
+    return T->A.L;
 }
 
 
 
-type* GetElementType (type* T)
+void SetElementCount (Type* T, long Count)
+/* Set the element count of the array specified in T (which must be of
+ * array type).
+ */
+{
+    CHECK (IsTypeArray (T));
+    T->A.L = Count;
+}
+
+
+
+Type* GetElementType (Type* T)
 /* Return the element type of the given array type. */
 {
     CHECK (IsTypeArray (T));
-    return T + DECODE_SIZE + 1;
+    return T + 1;
 }
 
 
 
-type* IntPromotion (type* T)
+SymEntry* GetSymEntry (const Type* T)
+/* Return a SymEntry pointer from a type */
+{
+    /* Only structs or unions have a SymEntry attribute */
+    CHECK (IsClassStruct (T));
+
+    /* Return the attribute */
+    return T->A.P;
+}
+
+
+
+void SetSymEntry (Type* T, SymEntry* S)
+/* Set the SymEntry pointer for a type */
+{
+    /* Only structs or unions have a SymEntry attribute */
+    CHECK (IsClassStruct (T));
+
+    /* Set the attribute */
+    T->A.P = S;
+}
+
+
+
+Type* IntPromotion (Type* T)
 /* Apply the integer promotions to T and return the result. The returned type
  * string may be T if there is no need to change it.
  */
@@ -797,11 +716,11 @@ type* IntPromotion (type* T)
 
 
 
-type* PtrConversion (type* T)
+Type* PtrConversion (Type* T)
 /* If the type is a function, convert it to pointer to function. If the
  * expression is an array, convert it to pointer to first element. Otherwise
  * return T.
- */                          
+ */
 {
     if (IsTypeFunc (T)) {
        	return PointerTo (T);
@@ -811,6 +730,7 @@ type* PtrConversion (type* T)
         return T;
     }
 }
+
 
 
 

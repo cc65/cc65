@@ -193,7 +193,7 @@ struct Token {
     double  	FVal;		/* The float attribute */
     ident   	Ident;		/* Identifier if IDENT */
     LineInfo*   LI;		/* Source line where the token comes from */
-    type*	Type;		/* Type if integer or float constant */
+    Type*	Type;		/* Type if integer or float constant */
 };
 
 extern Token CurTok;		/* The current token */

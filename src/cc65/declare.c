@@ -68,10 +68,10 @@
 
 
 
-static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers);
+static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers);
 /* Parse a type specificier */
 
-static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers);
+static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers);
 /* Parse initialization of variables. Return the number of data bytes. */
 
 
@@ -82,7 +82,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers);
 
 
 
-static type OptionalQualifiers (type Q)
+static TypeCode OptionalQualifiers (TypeCode Q)
 /* Read type qualifiers if we have any */
 {
     while (TokIsTypeQual (&CurTok)) {
@@ -151,7 +151,7 @@ static void InitDeclSpec (DeclSpec* D)
 /* Initialize the DeclSpec struct for use */
 {
     D->StorageClass     = 0;
-    D->Type[0]          = T_END;
+    D->Type[0].C        = T_END;
     D->Flags            = 0;
 }
 
@@ -160,9 +160,9 @@ static void InitDeclSpec (DeclSpec* D)
 static void InitDeclaration (Declaration* D)
 /* Initialize the Declaration struct for use */
 {
-    D->Ident[0] = '\0';
-    D->Type[0]  = T_END;
-    D->Index    = 0;
+    D->Ident[0]  = '\0';
+    D->Type[0].C = T_END;
+    D->Index     = 0;
 }
 
 
@@ -181,22 +181,33 @@ static void NeedTypeSpace (Declaration* D, unsigned Count)
 
 
 
-static void AddTypeToDeclaration (Declaration* D, type T)
+static void AddTypeToDeclaration (Declaration* D, TypeCode T)
 /* Add a type specifier to the type of a declaration */
 {
     NeedTypeSpace (D, 1);
-    D->Type[D->Index++] = T;
+    D->Type[D->Index++].C = T;
 }
 
 
 
-static void AddEncodeToDeclaration (Declaration* D, type T, unsigned long Val)
-/* Add a type plus encoding to the type of a declaration */
+static void AddFuncTypeToDeclaration (Declaration* D, FuncDesc* F)
+/* Add a function type plus function descriptor to the type of a declaration */
 {
-    NeedTypeSpace (D, DECODE_SIZE+1);
-    D->Type[D->Index++] = T;
-    Encode (D->Type + D->Index, Val);
-    D->Index += DECODE_SIZE;
+    NeedTypeSpace (D, 1);
+    D->Type[D->Index].C = T_FUNC;
+    SetFuncDesc (D->Type + D->Index, F);
+    ++D->Index;
+}
+
+
+
+static void AddArrayToDeclaration (Declaration* D, long Size)
+/* Add an array type plus size to the type of a declaration */
+{
+    NeedTypeSpace (D, 1);
+    D->Type[D->Index].C = T_ARRAY;
+    D->Type[D->Index].A.L = Size;
+    ++D->Index;
 }
 
 
@@ -294,7 +305,7 @@ static void ParseEnumDecl (void)
 
 
 
-static SymEntry* ParseStructDecl (const char* Name, type StructType)
+static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
 /* Parse a struct/union declaration. */
 {
 
@@ -372,7 +383,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
                     }
                     FlexibleMember = 1;
                     /* Assume zero for size calculations */
-                    Encode (Decl.Type + 1, FLEXIBLE);
+                    SetElementCount (Decl.Type, FLEXIBLE);
                 } else {
                     StructSize += CheckedSizeOf (Decl.Type);
                 }
@@ -410,12 +421,12 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 
 
 
-static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
+static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 /* Parse a type specificier */
 {
     ident     	Ident;
     SymEntry* 	Entry;
-    type 	StructType;
+    TypeCode    StructType;
 
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
@@ -428,14 +439,14 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
 
     	case TOK_VOID:
     	    NextToken ();
-	    D->Type[0] = T_VOID;
-    	    D->Type[1] = T_END;
+	    D->Type[0].C = T_VOID;
+    	    D->Type[1].C = T_END;
     	    break;
 
     	case TOK_CHAR:
     	    NextToken ();
-	    D->Type[0] = GetDefaultChar();
-	    D->Type[1] = T_END;
+	    D->Type[0].C = GetDefaultChar();
+	    D->Type[1].C = T_END;
 	    break;
 
     	case TOK_LONG:
@@ -443,13 +454,13 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
     	    if (CurTok.Tok == TOK_UNSIGNED) {
     	      	NextToken ();
     	      	optionalint ();
-    	      	D->Type[0] = T_ULONG;
-	      	D->Type[1] = T_END;
+    	      	D->Type[0].C = T_ULONG;
+	      	D->Type[1].C = T_END;
     	    } else {
     	      	optionalsigned ();
     	      	optionalint ();
-	      	D->Type[0] = T_LONG;
-	      	D->Type[1] = T_END;
+	      	D->Type[0].C = T_LONG;
+	      	D->Type[1].C = T_END;
     	    }
 	    break;
 
@@ -458,20 +469,20 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
     	    if (CurTok.Tok == TOK_UNSIGNED) {
     	      	NextToken ();
     	      	optionalint ();
-	      	D->Type[0] = T_USHORT;
-	      	D->Type[1] = T_END;
+	      	D->Type[0].C = T_USHORT;
+	      	D->Type[1].C = T_END;
     	    } else {
     	      	optionalsigned ();
     	      	optionalint ();
-	      	D->Type[0] = T_SHORT;
-	    	D->Type[1] = T_END;
+	      	D->Type[0].C = T_SHORT;
+	    	D->Type[1].C = T_END;
     	    }
 	    break;
 
     	case TOK_INT:
     	    NextToken ();
-	    D->Type[0] = T_INT;
-	    D->Type[1] = T_END;
+	    D->Type[0].C = T_INT;
+	    D->Type[1].C = T_END;
     	    break;
 
        case TOK_SIGNED:
@@ -480,22 +491,22 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
 
        		case TOK_CHAR:
     		    NextToken ();
-		    D->Type[0] = T_SCHAR;
-	     	    D->Type[1] = T_END;
+		    D->Type[0].C = T_SCHAR;
+	     	    D->Type[1].C = T_END;
     		    break;
 
     		case TOK_SHORT:
     		    NextToken ();
     		    optionalint ();
-		    D->Type[0] = T_SHORT;
-		    D->Type[1] = T_END;
+		    D->Type[0].C = T_SHORT;
+		    D->Type[1].C = T_END;
     		    break;
 
     		case TOK_LONG:
     		    NextToken ();
     	 	    optionalint ();
-		    D->Type[0] = T_LONG;
-		    D->Type[1] = T_END;
+		    D->Type[0].C = T_LONG;
+		    D->Type[1].C = T_END;
     	     	    break;
 
     		case TOK_INT:
@@ -503,8 +514,8 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
     		    /* FALL THROUGH */
 
     	    	default:
-	    	    D->Type[0] = T_INT;
-		    D->Type[1] = T_END;
+	    	    D->Type[0].C = T_INT;
+		    D->Type[1].C = T_END;
 	  	    break;
     	    }
 	    break;
@@ -515,22 +526,22 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
 
        	 	case TOK_CHAR:
     		    NextToken ();
-		    D->Type[0] = T_UCHAR;
-		    D->Type[1] = T_END;
+		    D->Type[0].C = T_UCHAR;
+		    D->Type[1].C = T_END;
     	     	    break;
 
     	    	case TOK_SHORT:
     		    NextToken ();
     		    optionalint ();
-		    D->Type[0] = T_USHORT;
-		    D->Type[1] = T_END;
+		    D->Type[0].C = T_USHORT;
+		    D->Type[1].C = T_END;
     		    break;
 
     		case TOK_LONG:
     		    NextToken ();
     		    optionalint ();
-    		    D->Type[0] = T_ULONG;
-		    D->Type[1] = T_END;
+    		    D->Type[0].C = T_ULONG;
+		    D->Type[1].C = T_END;
     		    break;
 
     	     	case TOK_INT:
@@ -538,22 +549,22 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
     		    /* FALL THROUGH */
 
     		default:
-		    D->Type[0] = T_UINT;
-	     	    D->Type[1] = T_END;
+		    D->Type[0].C = T_UINT;
+	     	    D->Type[1].C = T_END;
 		    break;
     	    }
 	    break;
 
         case TOK_FLOAT:
     	    NextToken ();
-	    D->Type[0] = T_FLOAT;
-	    D->Type[1] = T_END;
+	    D->Type[0].C = T_FLOAT;
+	    D->Type[1].C = T_END;
     	    break;
 
         case TOK_DOUBLE:
     	    NextToken ();
-	    D->Type[0] = T_DOUBLE;
-	    D->Type[1] = T_END;
+	    D->Type[0].C = T_DOUBLE;
+	    D->Type[1].C = T_END;
     	    break;
 
     	case TOK_STRUCT:
@@ -572,9 +583,9 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
 	    /* Declare the struct in the current scope */
     	    Entry = ParseStructDecl (Ident, StructType);
        	    /* Encode the struct entry into the type */
-	    D->Type[0] = StructType;
-	    EncodePtr (D->Type+1, Entry);
-	    D->Type[DECODE_SIZE+1] = T_END;
+	    D->Type[0].C = StructType;
+	    SetSymEntry (D->Type, Entry);
+	    D->Type[1].C = T_END;
 	    break;
 
     	case TOK_ENUM:
@@ -601,8 +612,8 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
     	    D->Flags |= DS_EXTRA_TYPE;
     	    /* Parse the enum decl */
     	    ParseEnumDecl ();
-    	    D->Type[0] = T_INT;
-    	    D->Type[1] = T_END;
+    	    D->Type[0].C = T_INT;
+    	    D->Type[1].C = T_END;
     	    break;
 
         case TOK_IDENT:
@@ -618,30 +629,29 @@ static void ParseTypeSpec (DeclSpec* D, int Default, type Qualifiers)
     	default:
     	    if (Default < 0) {
     		Error ("Type expected");
-    		D->Type[0] = T_INT;
-    		D->Type[1] = T_END;
+    		D->Type[0].C = T_INT;
+    		D->Type[1].C = T_END;
     	    } else {
-    		D->Flags  |= DS_DEF_TYPE;
-    		D->Type[0] = (type) Default;
-    		D->Type[1] = T_END;
+    		D->Flags |= DS_DEF_TYPE;
+    		D->Type[0].C = (TypeCode) Default;
+    		D->Type[1].C = T_END;
     	    }
     	    break;
     }
 
     /* There may also be qualifiers *after* the initial type */
-    D->Type[0] |= OptionalQualifiers (Qualifiers);
+    D->Type[0].C |= OptionalQualifiers (Qualifiers);
 }
 
 
 
-static type* ParamTypeCvt (type* T)
+static Type* ParamTypeCvt (Type* T)
 /* If T is an array, convert it to a pointer else do nothing. Return the
  * resulting type.
  */
 {
     if (IsTypeArray (T)) {
-       	T += DECODE_SIZE;
-	T[0] = T_PTR;
+       	T->C = T_PTR;
     }
     return T;
 }
@@ -847,8 +857,8 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
 
     /* Check for an implicit int return in the function */
     if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
-        Spec->Type[0] == T_INT 	         &&
-        Spec->Type[1] == T_END) {
+        Spec->Type[0].C == T_INT         &&
+        Spec->Type[1].C == T_END) {
         /* Function has an implicit int return. Output a warning if we don't
          * have the C89 standard enabled explicitly.
          */
@@ -945,7 +955,7 @@ static unsigned FunctionModifierFlags (void)
 
 
 
-static void ApplyFunctionModifiers (type* T, unsigned Flags)
+static void ApplyFunctionModifiers (Type* T, unsigned Flags)
 /* Apply a set of function modifier flags to a function */
 {
     /* Get the function descriptor */
@@ -973,19 +983,19 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
 
-    	type T;
+    	TypeCode C;
 
         /* Skip the star */
        	NextToken ();
 
     	/* Allow optional const or volatile qualifiers */
-       	T = T_PTR | OptionalQualifiers (T_QUAL_NONE);
+       	C = T_PTR | OptionalQualifiers (T_QUAL_NONE);
 
         /* Parse the type, the pointer points to */
        	Decl (Spec, D, Mode);
 
 	/* Add the type */
-	AddTypeToDeclaration (D, T);
+	AddTypeToDeclaration (D, C);
        	return;
     }
 
@@ -993,7 +1003,7 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     if (CurTok.Tok == TOK_FASTCALL || CurTok.Tok == TOK_NEAR || CurTok.Tok == TOK_FAR) {
 
 	/* Remember the current type pointer */
-    	type* T = D->Type + D->Index;
+    	Type* T = D->Type + D->Index;
 
 	/* Read the flags */
 	unsigned Flags = FunctionModifierFlags ();
@@ -1051,7 +1061,7 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
        	    F = ParseFuncDecl (Spec);
 
 	    /* Add the function type. Be sure to bounds check the type buffer */
-	    AddEncodeToDeclaration (D, T_FUNC, (unsigned long) F);
+	    AddFuncTypeToDeclaration (D, F);
        	} else {
 	    /* Array declaration */
        	    long Size = UNSPECIFIED;
@@ -1072,8 +1082,8 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
        	    }
        	    ConsumeRBrack ();
 
-	    /* Add the type */
-	    AddEncodeToDeclaration (D, T_ARRAY, Size);
+	    /* Add the array type with the size */
+	    AddArrayToDeclaration (D, Size);
        	}
     }
 }
@@ -1086,7 +1096,7 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 
 
 
-type* ParseType (type* Type)
+Type* ParseType (Type* T)
 /* Parse a complete type specification */
 {
     DeclSpec Spec;
@@ -1100,10 +1110,10 @@ type* ParseType (type* Type)
     ParseDecl (&Spec, &Decl, DM_NO_IDENT);
 
     /* Copy the type to the target buffer */
-    TypeCpy (Type, Decl.Type);
+    TypeCpy (T, Decl.Type);
 
     /* Return a pointer to the target buffer */
-    return Type;
+    return T;
 }
 
 
@@ -1139,7 +1149,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, int DefType)
 /* Parse a declaration specification */
 {
-    type Qualifiers;
+    TypeCode Qualifiers;
 
     /* Initialize the DeclSpec struct */
     InitDeclSpec (D);
@@ -1271,7 +1281,7 @@ static void DefineData (ExprDesc* Expr)
 
 
 
-static unsigned ParseScalarInit (type* T)
+static unsigned ParseScalarInit (Type* T)
 /* Parse initializaton for scalar data types. Return the number of data bytes. */
 {
     ExprDesc ED;
@@ -1302,7 +1312,7 @@ static unsigned ParseScalarInit (type* T)
 
 
 
-static unsigned ParsePointerInit (type* T)
+static unsigned ParsePointerInit (Type* T)
 /* Parse initializaton for pointer data types. Return the number of data bytes. */
 {
     /* Optional opening brace */
@@ -1325,13 +1335,13 @@ static unsigned ParsePointerInit (type* T)
 
 
 
-static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
+static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
 /* Parse initializaton for arrays. Return the number of data bytes. */
 {
     int Count;
 
     /* Get the array data */
-    type* ElementType    = GetElementType (T);
+    Type* ElementType    = GetElementType (T);
     unsigned ElementSize = CheckedSizeOf (ElementType);
     long ElementCount    = GetElementCount (T);
 
@@ -1406,10 +1416,9 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
         ConsumeRCurly ();
     }
 
-
     if (ElementCount == UNSPECIFIED) {
         /* Number of elements determined by initializer */
-        Encode (T + 1, Count);
+        SetElementCount (T, Count);
         ElementCount = Count;
     } else if (ElementCount == FLEXIBLE && AllowFlexibleMembers) {
         /* In non ANSI mode, allow initialization of flexible array
@@ -1426,7 +1435,7 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
 
 
 
-static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
+static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
 /* Parse initialization of a struct or union. Return the number of data bytes. */
 {
     SymEntry* Entry;
@@ -1439,7 +1448,7 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
     ConsumeLCurly ();
 
     /* Get a pointer to the struct entry from the type */
-    Entry = DecodePtr (Type + 1);
+    Entry = GetSymEntry (T);
 
     /* Get the size of the struct from the symbol table entry */
     StructSize = Entry->V.S.Size;
@@ -1511,7 +1520,7 @@ static unsigned ParseVoidInit (void)
     Size = 0;
     do {
 	ConstExpr (hie1, &Expr);
-	switch (UnqualifiedType (Expr.Type[0])) {
+	switch (UnqualifiedType (Expr.Type[0].C)) {
 
 	    case T_SCHAR:
 	    case T_UCHAR:
@@ -1569,10 +1578,10 @@ static unsigned ParseVoidInit (void)
 
 
 
-static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
+static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    switch (UnqualifiedType (*T)) {
+    switch (UnqualifiedType (T->C)) {
 
      	case T_SCHAR:
      	case T_UCHAR:
@@ -1610,7 +1619,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 
 
 
-unsigned ParseInit (type* T)
+unsigned ParseInit (Type* T)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
     /* Parse the initialization. Flexible array members can only be initialized

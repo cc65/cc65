@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -93,9 +93,9 @@ static struct StdFuncDesc {
 
 typedef struct ArgDesc ArgDesc;
 struct ArgDesc {
-    const type* ArgType;        /* Required argument type */
+    const Type* ArgType;        /* Required argument type */
     ExprDesc    Expr;           /* Argument expression */
-    const type* Type;           /* The original type before conversion */
+    const Type* Type;           /* The original type before conversion */
     CodeMark    Start;          /* Start of the code for calculation */
     CodeMark    Push;           /* Start of argument push code */
     CodeMark    End;            /* End of the code for calculation+push */
@@ -139,7 +139,7 @@ static long ArrayElementCount (const ArgDesc* Arg)
 
 
 
-static void ParseArg (ArgDesc* Arg, type* Type)
+static void ParseArg (ArgDesc* Arg, Type* Type)
 /* Parse one argument but do not push it onto the stack. Make all fields in
  * Arg valid.
  */
@@ -192,10 +192,10 @@ static void ParseArg (ArgDesc* Arg, type* Type)
 static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memcpy function */
 {
-    /* Argument types */
-    static type Arg1Type[] = { T_PTR, T_VOID, T_END };              /* void* */
-    static type Arg2Type[] = { T_PTR, T_VOID|T_QUAL_CONST, T_END }; /* const void* */
-    static type Arg3Type[] = { T_SIZE_T, T_END };                   /* size_t */
+    /* Argument types: (void*, const void*, size_t) */
+    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
+    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_VOID|T_QUAL_CONST), TYPE(T_END) };
+    static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
 
     CodeMark Start;
     ArgDesc  Arg1, Arg2, Arg3;
@@ -486,10 +486,10 @@ ExitPoint:
 static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memset function */
 {
-    /* Argument types */
-    static type Arg1Type[] = { T_PTR, T_VOID, T_END };  /* void* */
-    static type Arg2Type[] = { T_INT, T_END };          /* int */
-    static type Arg3Type[] = { T_SIZE_T, T_END };       /* size_t */
+    /* Argument types: (void*, int, size_t) */
+    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_VOID), TYPE(T_END) };
+    static Type Arg2Type[] = { TYPE(T_INT), TYPE(T_END) };
+    static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
 
     CodeMark Start;
     ArgDesc  Arg1, Arg2, Arg3;
@@ -702,9 +702,9 @@ ExitPoint:
 static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strcpy function */
 {
-    /* Argument types */
-    static type Arg1Type[] = { T_PTR, T_CHAR, T_END };              /* char* */
-    static type Arg2Type[] = { T_PTR, T_CHAR|T_QUAL_CONST, T_END }; /* const char* */
+    /* Argument types: (char*, const char*) */
+    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR), TYPE(T_END) };
+    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
 
     CodeMark Start;
     ArgDesc  Arg1, Arg2;
@@ -713,8 +713,8 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned L1;
 
     /* Setup the argument type string */
-    Arg1Type[1] = GetDefaultChar ();
-    Arg2Type[1] = GetDefaultChar () | T_QUAL_CONST;
+    Arg1Type[1].C = GetDefaultChar ();
+    Arg2Type[1].C = GetDefaultChar () | T_QUAL_CONST;
 
     /* Remember where we are now */
     GetCodePos (&Start);
@@ -893,7 +893,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strlen function */
 {
-    static type ArgType[] = { T_PTR, T_SCHAR, T_END };
+    static Type ArgType[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
     ExprDesc    Arg;
     int         IsArray;
     int         IsPtr;
@@ -904,7 +904,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
 
     /* Setup the argument type string */
-    ArgType[1] = GetDefaultChar () | T_QUAL_CONST;
+    ArgType[1].C = GetDefaultChar () | T_QUAL_CONST;
 
     /* Evaluate the parameter */
     hie1 (&Arg);

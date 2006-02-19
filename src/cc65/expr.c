@@ -115,7 +115,7 @@ void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc *Expr)
 
 
 
-static type* promoteint (type* lhst, type* rhst)
+static Type* promoteint (Type* lhst, Type* rhst)
 /* In an expression with two ints, return the type of the result */
 {
     /* Rules for integer types:
@@ -154,8 +154,8 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     unsigned flags;
 
     /* Get the type strings */
-    type* lhst = lhs->Type;
-    type* rhst = rhs->Type;
+    Type* lhst = lhs->Type;
+    Type* rhst = rhs->Type;
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
@@ -805,8 +805,8 @@ static void ArrayRef (ExprDesc* Expr)
     ExprDesc    SubScript;
     CodeMark    Mark1;
     CodeMark    Mark2;
-    type*       ElementType;
-    type*       tptr1;
+    Type*       ElementType;
+    Type*       tptr1;
 
 
     /* Skip the bracket */
@@ -1183,7 +1183,7 @@ static void hie11 (ExprDesc *Expr)
 
 
 
-void Store (ExprDesc* Expr, const type* StoreType)
+void Store (ExprDesc* Expr, const Type* StoreType)
 /* Store the primary register into the location denoted by Expr. If StoreType
  * is given, use this type when storing instead of Expr->Type. If StoreType
  * is NULL, use Expr->Type instead.
@@ -1216,7 +1216,7 @@ void Store (ExprDesc* Expr, const type* StoreType)
         case E_LOC_LITERAL:
             /* Static variable or literal in the literal pool */
             g_putstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal);
-            break;
+            break;                 
 
         case E_LOC_REGISTER:
             /* Register variable */
@@ -1560,9 +1560,9 @@ void hie10 (ExprDesc* Expr)
      	case TOK_SIZEOF:
      	    NextToken ();
        	    if (TypeSpecAhead ()) {
-    	       	type Type[MAXTYPELEN];
+    	       	Type T[MAXTYPELEN];
      	       	NextToken ();
-	       	Size = CheckedSizeOf (ParseType (Type));
+	       	Size = CheckedSizeOf (ParseType (T));
      	       	ConsumeRParen ();
      	    } else {
     	       	/* Remember the output queue pointer */
@@ -1757,9 +1757,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	   	/* Both pointers are allowed in comparison if they point to
 	   	 * the same type, or if one of them is a void pointer.
 	         */
-       	       	type* left  = Indirect (Expr->Type);
-	   	type* right = Indirect (Expr2.Type);
-	   	if (TypeCmp (left, right) < TC_EQUAL && *left != T_VOID && *right != T_VOID) {
+       	       	Type* left  = Indirect (Expr->Type);
+	   	Type* right = Indirect (Expr2.Type);
+	   	if (TypeCmp (left, right) < TC_EQUAL && left->C != T_VOID && right->C != T_VOID) {
 	   	    /* Incomatible pointers */
 	   	    Error ("Incompatible types");
 	   	}
@@ -1853,8 +1853,8 @@ static void parseadd (ExprDesc* Expr)
     ExprDesc Expr2;
     unsigned flags;          	/* Operation flags */
     CodeMark Mark;    	     	/* Remember code position */
-    type* lhst;	      	     	/* Type of left hand side */
-    type* rhst;	      	     	/* Type of right hand side */
+    Type* lhst;	      	     	/* Type of left hand side */
+    Type* rhst;	      	     	/* Type of right hand side */
 
 
     /* Skip the PLUS token */
@@ -2077,8 +2077,8 @@ static void parsesub (ExprDesc* Expr)
 {
     ExprDesc Expr2;
     unsigned flags;         	/* Operation flags */
-    type* lhst;	    	    	/* Type of left hand side */
-    type* rhst;	    	    	/* Type of right hand side */
+    Type* lhst;	    	    	/* Type of left hand side */
+    Type* rhst;	    	    	/* Type of right hand side */
     CodeMark Mark1;	   	/* Save position of output queue */
     CodeMark Mark2;    	       	/* Another position in the queue */
     int rscale;     	    	/* Scale factor for the result */
@@ -2505,7 +2505,7 @@ static void hieQuest (ExprDesc* Expr)
     ExprDesc 	Expr3;          /* Expression 3 */
     int         Expr2IsNULL;    /* Expression 2 is a NULL pointer */
     int         Expr3IsNULL;    /* Expression 3 is a NULL pointer */
-    type* 	ResultType;     /* Type of result */
+    Type* 	ResultType;     /* Type of result */
 
 
     /* Call the lower level eval routine */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -135,14 +135,25 @@ enum {
 
 
 
+/* Type code entry */
+typedef unsigned long TypeCode;
+
 /* Type entry */
-typedef unsigned short type;
+typedef struct Type Type;
+struct Type {
+    TypeCode            C;      /* Code for this entry */
+    union {
+        void*           P;      /* Arbitrary attribute pointer */
+        long            L;      /* Numeric attribute value */
+        unsigned long   U;      /* Dito, unsigned */
+    } A;                        /* Type attribute if necessary */
+};
+
+/* A macro that expands to a full initializer for struct Type */
+#define TYPE(T)         { (T), { 0 } }
 
 /* Maximum length of a type string */
 #define MAXTYPELEN   	30
-
-/* Type elements needed for Encode/Decode */
-#define DECODE_SIZE    	5
 
 /* Special encodings for element counts of an array */
 #define UNSPECIFIED     -1L     /* Element count was not specified */
@@ -159,16 +170,19 @@ typedef unsigned short type;
 #define SIZEOF_PTR      2
 
 /* Predefined type strings */
-extern type type_schar[];
-extern type type_uchar[];
-extern type type_int[];
-extern type type_uint[];
-extern type type_long[];
-extern type type_ulong[];
-extern type type_void[];
-extern type type_size_t[];
-extern type type_float[];
-extern type type_double[];
+extern Type type_schar[];
+extern Type type_uchar[];
+extern Type type_int[];
+extern Type type_uint[];
+extern Type type_long[];
+extern Type type_ulong[];
+extern Type type_void[];
+extern Type type_size_t[];
+extern Type type_float[];
+extern Type type_double[];
+
+/* Forward for the SymEntry struct */
+struct SymEntry;
 
 
 
@@ -178,73 +192,65 @@ extern type type_double[];
 
 
 
-unsigned TypeLen (const type* Type);
+unsigned TypeLen (const Type* T);
 /* Return the length of the type string */
 
-type* TypeCpy (type* Dest, const type* Src);
+Type* TypeCpy (Type* Dest, const Type* Src);
 /* Copy a type string */
 
-type* TypeCat (type* Dest, const type* Src);
-/* Append Src */
-
-type* TypeDup (const type* Type);
+Type* TypeDup (const Type* T);
 /* Create a copy of the given type on the heap */
 
-type* TypeAlloc (unsigned Len);
+Type* TypeAlloc (unsigned Len);
 /* Allocate memory for a type string of length Len. Len *must* include the
  * trailing T_END.
  */
 
-void TypeFree (type* Type);
+void TypeFree (Type* T);
 /* Free a type string */
 
 int SignExtendChar (int C);
 /* Do correct sign extension of a character */
 
-type GetDefaultChar (void);
+TypeCode GetDefaultChar (void);
 /* Return the default char type (signed/unsigned) depending on the settings */
 
-type* GetCharArrayType (unsigned Len);
+Type* GetCharArrayType (unsigned Len);
 /* Return the type for a char array of the given length */
 
-type* GetImplicitFuncType (void);
+Type* GetImplicitFuncType (void);
 /* Return a type string for an inplicitly declared function */
 
-type* PointerTo (const type* T);
+Type* PointerTo (const Type* T);
 /* Return a type string that is "pointer to T". The type string is allocated
  * on the heap and may be freed after use.
  */
 
-void PrintType (FILE* F, const type* Type);
+void PrintType (FILE* F, const Type* T);
 /* Output translation of type array. */
 
-void PrintRawType (FILE* F, const type* Type);
+void PrintRawType (FILE* F, const Type* T);
 /* Print a type string in raw format (for debugging) */
 
-void PrintFuncSig (FILE* F, const char* Name, type* Type);
+void PrintFuncSig (FILE* F, const char* Name, Type* T);
 /* Print a function signature. */
 
-void Encode (type* Type, unsigned long Val);
-/* Encode Val into the given type string */
-
-void EncodePtr (type* Type, void* P);
-/* Encode a pointer into a type array */
-
-unsigned long Decode (const type* Type);
-/* Decode an unsigned long from a type array */
-
-void* DecodePtr (const type* Type);
-/* Decode a pointer from a type array */
-
-int HasEncode (const type* Type);
-/* Return true if the given type has encoded data */
-
-void CopyEncode (const type* Source, type* Target);
-/* Copy encoded data from Source to Target */
+int TypeHasAttr (const Type* T);
+/* Return true if the given type has attribute data */
 
 #if defined(HAVE_INLINE)
-INLINE type UnqualifiedType (type T)
-/* Return the unqalified type */
+INLINE void CopyTypeAttr (const Type* Src, Type* Dest)
+/* Copy attribute data from Src to Dest */
+{
+    Dest->A = Src->A;
+}
+#else
+#  define CopyTypeAttr(Src, Dest)       ((Dest)->A = (Src)->A)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode UnqualifiedType (TypeCode T)
+/* Return the unqalified type code */
 {
     return (T & ~T_MASK_QUAL);
 }
@@ -252,249 +258,322 @@ INLINE type UnqualifiedType (type T)
 #  define UnqualifiedType(T)    ((T) & ~T_MASK_QUAL)
 #endif
 
-unsigned SizeOf (const type* Type);
+unsigned SizeOf (const Type* T);
 /* Compute size of object represented by type array. */
 
-unsigned PSizeOf (const type* Type);
+unsigned PSizeOf (const Type* T);
 /* Compute size of pointer object. */
 
-unsigned CheckedSizeOf (const type* T);
+unsigned CheckedSizeOf (const Type* T);
 /* Return the size of a data type. If the size is zero, emit an error and
  * return some valid size instead (so the rest of the compiler doesn't have
  * to work with invalid sizes).
  */
-unsigned CheckedPSizeOf (const type* T);
+unsigned CheckedPSizeOf (const Type* T);
 /* Return the size of a data type that is pointed to by a pointer. If the
  * size is zero, emit an error and return some valid size instead (so the
  * rest of the compiler doesn't have to work with invalid sizes).
  */
 
-unsigned TypeOf (const type* Type);
+unsigned TypeOf (const Type* T);
 /* Get the code generator base type of the object */
 
-type* Indirect (type* Type);
+Type* Indirect (Type* T);
 /* Do one indirection for the given type, that is, return the type where the
  * given type points to.
  */
 
-type* ArrayToPtr (const type* Type);
+Type* ArrayToPtr (const Type* T);
 /* Convert an array to a pointer to it's first element */
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeChar (const type* T)
+INLINE int IsTypeChar (const Type* T)
 /* Return true if this is a character type */
 {
-    return (T[0] & T_MASK_TYPE) == T_TYPE_CHAR;
+    return (T->C & T_MASK_TYPE) == T_TYPE_CHAR;
 }
 #else
-#  define IsTypeChar(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_CHAR)
+#  define IsTypeChar(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_CHAR)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeInt (const type* T)
+INLINE int IsTypeInt (const Type* T)
 /* Return true if this is an int type (signed or unsigned) */
 {
-    return (T[0] & T_MASK_TYPE) == T_TYPE_INT;
+    return (T->C & T_MASK_TYPE) == T_TYPE_INT;
 }
 #else
-#  define IsTypeInt(T)          (((T)[0] & T_MASK_TYPE) == T_TYPE_INT)
+#  define IsTypeInt(T)          (((T)->C & T_MASK_TYPE) == T_TYPE_INT)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeLong (const type* T)
+INLINE int IsTypeLong (const Type* T)
 /* Return true if this is a long type (signed or unsigned) */
 {
-    return (T[0] & T_MASK_TYPE) == T_TYPE_LONG;
+    return (T->C & T_MASK_TYPE) == T_TYPE_LONG;
 }
 #else
-#  define IsTypeLong(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_LONG)
+#  define IsTypeLong(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_LONG)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeFloat (const type* T)
+INLINE int IsTypeFloat (const Type* T)
 /* Return true if this is a float type */
 {
-    return (T[0] & T_MASK_TYPE) == T_TYPE_FLOAT;
+    return (T->C & T_MASK_TYPE) == T_TYPE_FLOAT;
 }
 #else
-#  define IsTypeFloat(T)        (((T)[0] & T_MASK_TYPE) == T_TYPE_FLOAT)
+#  define IsTypeFloat(T)        (((T)->C & T_MASK_TYPE) == T_TYPE_FLOAT)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeDouble (const type* T)
+INLINE int IsTypeDouble (const Type* T)
 /* Return true if this is a double type */
 {
-    return (T[0] & T_MASK_TYPE) == T_TYPE_DOUBLE;
+    return (T->C & T_MASK_TYPE) == T_TYPE_DOUBLE;
 }
 #else
-#  define IsTypeDouble(T)       (((T)[0] & T_MASK_TYPE) == T_TYPE_DOUBLE)
+#  define IsTypeDouble(T)       (((T)->C & T_MASK_TYPE) == T_TYPE_DOUBLE)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypePtr (const type* T)
+INLINE int IsTypePtr (const Type* T)
 /* Return true if this is a pointer type */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR);
+    return ((T->C & T_MASK_TYPE) == T_TYPE_PTR);
 }
 #else
-#  define IsTypePtr(T)          (((T)[0] & T_MASK_TYPE) == T_TYPE_PTR)
+#  define IsTypePtr(T)          (((T)->C & T_MASK_TYPE) == T_TYPE_PTR)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeStruct (const type* T)
+INLINE int IsTypeStruct (const Type* T)
 /* Return true if this is a struct type */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_STRUCT);
+    return ((T->C & T_MASK_TYPE) == T_TYPE_STRUCT);
 }
 #else
-#  define IsTypeStruct(T)       (((T)[0] & T_MASK_TYPE) == T_TYPE_STRUCT)
+#  define IsTypeStruct(T)       (((T)->C & T_MASK_TYPE) == T_TYPE_STRUCT)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeUnion (const type* T)
+INLINE int IsTypeUnion (const Type* T)
 /* Return true if this is a union type */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_UNION);
+    return ((T->C & T_MASK_TYPE) == T_TYPE_UNION);
 }
 #else
-#  define IsTypeUnion(T)       (((T)[0] & T_MASK_TYPE) == T_TYPE_UNION)
+#  define IsTypeUnion(T)       (((T)->C & T_MASK_TYPE) == T_TYPE_UNION)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeArray (const type* T)
+INLINE int IsTypeArray (const Type* T)
 /* Return true if this is an array type */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
+    return ((T->C & T_MASK_TYPE) == T_TYPE_ARRAY);
 }
 #else
-#  define IsTypeArray(T)        (((T)[0] & T_MASK_TYPE) == T_TYPE_ARRAY)
+#  define IsTypeArray(T)        (((T)->C & T_MASK_TYPE) == T_TYPE_ARRAY)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeVoid (const type* T)
+INLINE int IsTypeVoid (const Type* T)
 /* Return true if this is a void type */
 {
-    return (T[0] & T_MASK_TYPE) == T_TYPE_VOID;
+    return (T->C & T_MASK_TYPE) == T_TYPE_VOID;
 }
 #else
-#  define IsTypeVoid(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_VOID)
+#  define IsTypeVoid(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_VOID)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeFunc (const type* T)
+INLINE int IsTypeFunc (const Type* T)
 /* Return true if this is a function class */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_FUNC);
+    return ((T->C & T_MASK_TYPE) == T_TYPE_FUNC);
 }
 #else
-#  define IsTypeFunc(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_FUNC)
+#  define IsTypeFunc(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_FUNC)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeFuncPtr (const type* T)
+INLINE int IsTypeFuncPtr (const Type* T)
 /* Return true if this is a function pointer */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR && (T[1] & T_MASK_TYPE) == T_TYPE_FUNC);
+    return ((T[0].C & T_MASK_TYPE) == T_TYPE_PTR && (T[1].C & T_MASK_TYPE) == T_TYPE_FUNC);
 }
 #else
 #  define IsTypeFuncPtr(T)      \
-        ((((T)[0] & T_MASK_TYPE) == T_TYPE_PTR) && (((T)[1] & T_MASK_TYPE) == T_TYPE_FUNC))
+        ((((T)[0].C & T_MASK_TYPE) == T_TYPE_PTR) && (((T)[1].C & T_MASK_TYPE) == T_TYPE_FUNC))
 #endif
 
-int IsClassInt (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsClassInt (const Type* T)
 /* Return true if this is an integer type */
+{
+    return (T->C & T_MASK_CLASS) == T_CLASS_INT;
+}
+#else
+#  define IsClassInt(T)         (((T)->C & T_MASK_CLASS) == T_CLASS_INT)
+#endif
 
-int IsClassFloat (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsClassFloat (const Type* T)
 /* Return true if this is a float type */
+{
+    return (T->C & T_MASK_CLASS) == T_CLASS_FLOAT;
+}
+#else
+#  define IsClassFloat(T)       (((T)->C & T_MASK_CLASS) == T_CLASS_FLOAT)
+#endif
 
-int IsClassPtr (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsClassPtr (const Type* T)
 /* Return true if this is a pointer type */
+{
+    return (T->C & T_MASK_CLASS) == T_CLASS_PTR;
+}
+#else
+#  define IsClassPtr(T)         (((T)->C & T_MASK_CLASS) == T_CLASS_PTR)
+#endif
 
-int IsClassStruct (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsClassStruct (const Type* T)
 /* Return true if this is a struct type */
+{
+    return (T->C & T_MASK_CLASS) == T_CLASS_STRUCT;
+}
+#else
+#  define IsClassStruct(T)      (((T)->C & T_MASK_CLASS) == T_CLASS_STRUCT)
+#endif
 
-int IsSignUnsigned (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsClassFunc (const Type* T)
+/* Return true if this is a function type */
+{
+    return (T->C & T_MASK_CLASS) == T_CLASS_FUNC;
+}
+#else
+#  define IsClassFunc(T)        (((T)->C & T_MASK_CLASS) == T_CLASS_FUNC)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsSignUnsigned (const Type* T)
 /* Return true if this is an unsigned type */
+{
+    return (T->C & T_MASK_SIGN) == T_SIGN_UNSIGNED;
+}
+#else
+#  define IsSignUnsigned(T)     (((T)->C & T_MASK_SIGN) == T_SIGN_UNSIGNED)
+#endif
 
-int IsQualConst (const type* T) attribute ((const));
+TypeCode GetQualifier (const Type* T) attribute ((const));
+/* Get the qualifier from the given type string */
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualConst (const Type* T)
 /* Return true if the given type has a const memory image */
+{
+    return (GetQualifier (T) & T_QUAL_CONST) != 0;
+}
+#else
+#  define IsQualConst(T)        (((T)->C & T_QUAL_CONST) != 0)
+#endif
 
-int IsQualVolatile (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsQualVolatile (const Type* T)
 /* Return true if the given type has a volatile type qualifier */
+{
+    return (GetQualifier (T) & T_QUAL_VOLATILE) != 0;
+}
+#else
+#  define IsQualVolatile(T)     (((T)->C & T_QUAL_VOLATILE) != 0)
+#endif
 
-int IsFastCallFunc (const type* T) attribute ((const));
+int IsFastCallFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function with
  * __fastcall__ calling conventions
  */
 
-int IsVariadicFunc (const type* T) attribute ((const));
+int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
  * variable parameter list
  */
 
 #if defined(HAVE_INLINE)
-INLINE type GetType (const type* T)
+INLINE TypeCode GetType (const Type* T)
 /* Get the raw type */
 {
-    return (T[0] & T_MASK_TYPE);
+    return (T->C & T_MASK_TYPE);
 }
 #else
-#  define GetType(T)    ((T)[0] & T_MASK_TYPE)
+#  define GetType(T)    ((T)->C & T_MASK_TYPE)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE type GetClass (const type* T)
+INLINE TypeCode GetClass (const Type* T)
 /* Get the class of a type string */
 {
-    return (T[0] & T_MASK_CLASS);
+    return (T->C & T_MASK_CLASS);
 }
 #else
-#  define GetClass(T)    ((T)[0] & T_MASK_CLASS)
+#  define GetClass(T)    ((T)->C & T_MASK_CLASS)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE type GetSignedness (const type* T)
+INLINE TypeCode GetSignedness (const Type* T)
 /* Get the sign of a type */
 {
-    return (T[0] & T_MASK_SIGN);
+    return (T->C & T_MASK_SIGN);
 }
 #else
-#  define GetSignedness(T)      ((T)[0] & T_MASK_SIGN)
+#  define GetSignedness(T)      ((T)->C & T_MASK_SIGN)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE type GetSizeModifier (const type* T)
+INLINE TypeCode GetSizeModifier (const Type* T)
 /* Get the size modifier of a type */
 {
-    return (T[0] & T_MASK_SIZE);
+    return (T->C & T_MASK_SIZE);
 }
 #else
-#  define GetSizeModifier(T)      ((T)[0] & T_MASK_SIZE)
+#  define GetSizeModifier(T)      ((T)->C & T_MASK_SIZE)
 #endif
 
-type GetQualifier (const type* T) attribute ((const));
-/* Get the qualifier from the given type string */
-
-FuncDesc* GetFuncDesc (const type* T) attribute ((const));
+FuncDesc* GetFuncDesc (const Type* T) attribute ((const));
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 
-type* GetFuncReturn (type* T) attribute ((const));
+void SetFuncDesc (Type* T, FuncDesc* F);
+/* Set the FuncDesc pointer in a function or pointer-to-function type */
+
+Type* GetFuncReturn (Type* T) attribute ((const));
 /* Return a pointer to the return type of a function or pointer-to-function type */
 
-long GetElementCount (const type* T);
+long GetElementCount (const Type* T);
 /* Get the element count of the array specified in T (which must be of
  * array type).
  */
 
-type* GetElementType (type* T);
+void SetElementCount (Type* T, long Count);
+/* Set the element count of the array specified in T (which must be of
+ * array type).
+ */
+
+Type* GetElementType (Type* T);
 /* Return the element type of the given array type. */
 
-type* IntPromotion (type* T);
+struct SymEntry* GetSymEntry (const Type* T) attribute ((const));
+/* Return a SymEntry pointer from a type */
+
+void SetSymEntry (Type* T, struct SymEntry* S);
+/* Set the SymEntry pointer for a type */
+
+Type* IntPromotion (Type* T);
 /* Apply the integer promotions to T and return the result. The returned type
  * string may be T if there is no need to change it.
  */
 
-type* PtrConversion (type* T);
+Type* PtrConversion (Type* T);
 /* If the type is a function, convert it to pointer to function. If the
  * expression is an array, convert it to pointer to first element. Otherwise
  * return T.

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2004      Ullrich von Bassewitz                                       */
+/* (C) 2004-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -65,8 +65,8 @@ void ShiftExpr (struct ExprDesc* Expr)
     CodeMark Mark1;
     CodeMark Mark2;
     token_t Tok;       	      	 	/* The operator token */
-    type* EffType;                      /* Effective lhs type */
-    type* ResultType;                   /* Type of the result */
+    Type* EffType;                      /* Effective lhs type */
+    Type* ResultType;                   /* Type of the result */
     unsigned ExprBits;                  /* Bits of the lhs operand */
     unsigned GenFlags;                  /* Generator flags */
     unsigned ltype;
@@ -185,7 +185,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                 (ED_IsLocConst (Expr) || ED_IsLocStack (Expr)) &&
                 Expr2.IVal >= 8) {
 
-                type* OldType;
+                Type* OldType; 
 
                 /* Increase the address by one and decrease the shift count */
                 ++Expr->IVal;

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -67,7 +67,7 @@ void SwitchStatement (void)
     Collection* Nodes;          /* CaseNode tree */
     ExprDesc SwitchExpr;       	/* Switch statement expression */
     ExprDesc CaseExpr;          /* Case label expression */
-    type SwitchExprType;        /* Basic switch expression type */
+    TypeCode SwitchExprType;    /* Basic switch expression type */
     CodeMark CaseCodeStart;     /* Start of code marker */
     CodeMark SwitchCodeStart;   /* Start of switch code */
     CodeMark SwitchCodeEnd;     /* End of switch code */
@@ -116,7 +116,7 @@ void SwitchStatement (void)
     ConsumeLCurly ();
 
     /* Get the unqualified type of the switch expression */
-    SwitchExprType = UnqualifiedType (SwitchExpr.Type[0]);
+    SwitchExprType = UnqualifiedType (SwitchExpr.Type[0].C);
 
     /* Get the number of bytes the selector type has */
     Depth = SizeOf (SwitchExpr.Type);
@@ -184,7 +184,7 @@ void SwitchStatement (void)
 		        break;
 
 	 	    default:
-		      	Internal ("Invalid type: %04X", SwitchExprType);
+		      	Internal ("Invalid type: %06lX", SwitchExprType);
 		}
 
 		/* Insert the case selector into the selector table */

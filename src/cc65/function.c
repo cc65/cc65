@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -65,7 +65,7 @@
 /* Structure that holds all data needed for function activation */
 struct Function {
     struct SymEntry*   	FuncEntry;  	/* Symbol table entry */
-    type*		ReturnType; 	/* Function return type */
+    Type*		ReturnType; 	/* Function return type */
     struct FuncDesc*	Desc;	    	/* Function descriptor */
     int			Reserved;   	/* Reserved local space */
     unsigned	  	RetLab;	    	/* Return code label */
@@ -93,7 +93,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     /* Initialize the fields */
     F->FuncEntry  = Sym;
     F->ReturnType = GetFuncReturn (Sym->Type);
-    F->Desc   	  = (FuncDesc*) DecodePtr (Sym->Type + 1);
+    F->Desc   	  = GetFuncDesc (Sym->Type);
     F->Reserved	  = 0;
     F->RetLab	  = GetLocalLabel ();
     F->TopLevelSP = 0;
@@ -137,7 +137,7 @@ unsigned F_GetParamSize (const Function* F)
 
 
 
-type* F_GetReturnType (Function* F)
+Type* F_GetReturnType (Function* F)
 /* Get the return type for the function */
 {
     return F->ReturnType;
@@ -224,7 +224,7 @@ void F_AllocLocalSpace (Function* F)
 
 
 
-int F_AllocRegVar (Function* F, const type* Type)
+int F_AllocRegVar (Function* F, const Type* Type)
 /* Allocate a register variable for the given variable type. If the allocation
  * was successful, return the offset of the register variable in the register
  * bank (zero page storage). If there is no register space left, return -1.
@@ -354,7 +354,7 @@ void NewFunc (SymEntry* Func)
     AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
     if (D->Flags & FD_VARIADIC) {
      	/* Variadic function. The variable must be const. */
-     	static const type T [] = { T_UCHAR | T_QUAL_CONST, T_END };
+     	static const Type T[] = { TYPE(T_UCHAR | T_QUAL_CONST), TYPE(T_END) };
      	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
     } else {
      	/* Non variadic */
@@ -374,10 +374,10 @@ void NewFunc (SymEntry* Func)
             Error ("`main' cannot be declared as __fastcall__");
         }
 
-        /* If cc65 extensions aren't enabled, don't allow a main function that 
+        /* If cc65 extensions aren't enabled, don't allow a main function that
          * doesn't return an int.
          */
-        if (IS_Get (&Standard) != STD_CC65 && CurrentFunc->ReturnType[0] != T_INT) {
+        if (IS_Get (&Standard) != STD_CC65 && CurrentFunc->ReturnType[0].C != T_INT) {
             Error ("`main' must always return an int");
         }
 

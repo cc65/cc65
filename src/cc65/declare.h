@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -59,7 +59,7 @@
 typedef struct DeclSpec DeclSpec;
 struct DeclSpec {
     unsigned	StorageClass;  	 	/* One of the SC_xxx flags 	*/
-    type  	Type [MAXTYPELEN];	/* Type of the declaration spec */
+    Type       	Type[MAXTYPELEN];       /* Type of the declaration spec */
     unsigned	Flags;			/* Bitmapped flags 		*/
 };
 
@@ -67,7 +67,7 @@ struct DeclSpec {
 typedef struct Declaration Declaration;
 struct Declaration {
     ident     	Ident;			/* The identifier if any, else empty */
-    type      	Type [MAXTYPELEN];	/* The type */
+    Type      	Type[MAXTYPELEN];       /* The type */
 
     /* Working variables */
     unsigned	Index;			/* Used to build Type */
@@ -86,7 +86,7 @@ struct Declaration {
 
 
 
-type* ParseType (type* Type);
+Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
 void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode);
@@ -101,7 +101,7 @@ void CheckEmptyDecl (const DeclSpec* D);
  * warning if not.
  */
 
-unsigned ParseInit (type* T);
+unsigned ParseInit (Type* T);
 /* Parse initialization of variables. Return the number of initialized data
  * bytes.
  */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -472,23 +472,23 @@ SymEntry* FindTagSym (const char* Name)
 
 
 
-SymEntry* FindStructField (const type* Type, const char* Name)
+SymEntry* FindStructField (const Type* T, const char* Name)
 /* Find a struct field in the fields list */
 {
     SymEntry* Field = 0;
 
     /* The given type may actually be a pointer to struct */
-    if (Type[0] == T_PTR) {
-    	++Type;
+    if (T->C == T_PTR) {
+    	++T;
     }
 
     /* Non-structs do not have any struct fields... */
-    if (IsClassStruct (Type)) {
+    if (IsClassStruct (T)) {
 
     	const SymTable* Tab;
 
     	/* Get a pointer to the struct/union type */
-     	const SymEntry* Struct = (const SymEntry*) Decode (Type+1);
+     	const SymEntry* Struct = GetSymEntry (T);
     	CHECK (Struct != 0);
 
     	/* Get the field symbol table from the struct entry.
@@ -582,7 +582,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
 
 
 
-SymEntry* AddConstSym (const char* Name, const type* Type, unsigned Flags, long Val)
+SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val)
 /* Add an constant symbol to the symbol table and return it */
 {
     /* Enums must be inserted in the global symbol table */
@@ -603,7 +603,7 @@ SymEntry* AddConstSym (const char* Name, const type* Type, unsigned Flags, long 
     Entry = NewSymEntry (Name, Flags);
 
     /* Enum values are ints */
-    Entry->Type	= TypeDup (Type);
+    Entry->Type	= TypeDup (T);
 
     /* Set the enum data */
     Entry->V.ConstVal = Val;
@@ -652,7 +652,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
 
 
-SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int Offs)
+SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs)
 /* Add a local symbol and return the symbol entry */
 {
     /* Do we have an entry with this name already? */
@@ -668,12 +668,12 @@ SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int O
      	Entry = NewSymEntry (Name, Flags);
 
      	/* Set the symbol attributes */
-     	Entry->Type   = TypeDup (Type);
+     	Entry->Type = TypeDup (T);
         if ((Flags & SC_AUTO) == SC_AUTO) {
             Entry->V.Offs = Offs;
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
-            Entry->V.R.SaveOffs = StackPtr;      
+            Entry->V.R.SaveOffs = StackPtr;
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
             /* Generate the assembler name from the label number */
             Entry->V.Label = Offs;
@@ -695,11 +695,11 @@ SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int O
 
 
 
-SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
+SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 /* Add an external or global symbol to the symbol table and return the entry */
 {
     /* There is some special handling for functions, so check if it is one */
-    int IsFunc = IsTypeFunc (Type);
+    int IsFunc = IsTypeFunc (T);
 
     /* Functions must be inserted in the global symbol table */
     SymTable* Tab = IsFunc? SymTab0 : SymTab;
@@ -708,7 +708,7 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
     if (Entry) {
 
-    	type* EType;
+    	Type* EType;
 
     	/* We have a symbol with this name already */
      	if (Entry->Flags & SC_TYPE) {
@@ -723,28 +723,28 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
     	 * incomplete declaration. Accept this, and if the exsting entry is
     	 * incomplete, complete it.
     	 */
-    	if (IsTypeArray (Type) && IsTypeArray (EType)) {
+    	if (IsTypeArray (T) && IsTypeArray (EType)) {
 
     	    /* Get the array sizes */
-    	    long Size  = GetElementCount (Type);
+    	    long Size  = GetElementCount (T);
     	    long ESize = GetElementCount (EType);
 
        	    if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
-    	  	TypeCmp (Type+DECODE_SIZE+1, EType+DECODE_SIZE+1) < TC_EQUAL) {
+    	  	TypeCmp (T + 1, EType + 1) < TC_EQUAL) {
     	  	/* Types not identical: Conflicting types */
     	  	Error ("Conflicting types for `%s'", Name);
-		return Entry;
+	 	return Entry;
     	    } else {
     	  	/* Check if we have a size in the existing definition */
     	  	if (ESize == UNSPECIFIED) {
     	  	    /* Existing, size not given, use size from new def */
-    	  	    Encode (EType + 1, Size);
+    	  	    SetElementCount (EType, Size);
     	  	}
     	    }
 
        	} else {
 	    /* New type must be identical */
-	    if (TypeCmp (EType, Type) < TC_EQUAL) {
+	    if (TypeCmp (EType, T) < TC_EQUAL) {
      	     	Error ("Conflicting types for `%s'", Name);
 		return Entry;
 	    }
@@ -755,10 +755,10 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 	     */
 	    if (IsFunc) {
 		/* Get the function descriptor from the new type */
-		FuncDesc* F = GetFuncDesc (Type);
+		FuncDesc* F = GetFuncDesc (T);
 		/* Use this new function descriptor */
 		Entry->V.F.Func = F;
-		EncodePtr (EType+1, F);
+		SetFuncDesc (EType, F);
 	    }
      	}
 
@@ -773,7 +773,7 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
      	Entry = NewSymEntry (Name, Flags);
 
      	/* Set the symbol attributes */
-     	Entry->Type = TypeDup (Type);
+     	Entry->Type = TypeDup (T);
 
 	/* If this is a function, set the function descriptor and clear
 	 * additional fields.

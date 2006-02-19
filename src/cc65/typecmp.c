@@ -125,7 +125,7 @@ static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
 
 
 
-static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
+static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 /* Recursively compare two types. */
 {
     unsigned	Indirections;
@@ -144,15 +144,15 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
     ElementCount = 0;
 
     /* Compare two types. Determine, where they differ */
-    while (*lhs != T_END) {
+    while (lhs->C != T_END) {
 
-       	type LeftType, RightType;
-	type LeftSign, RightSign;
-	type LeftQual, RightQual;
+       	TypeCode LeftType, RightType;
+	TypeCode LeftSign, RightSign;
+	TypeCode LeftQual, RightQual;
 	long LeftCount, RightCount;
 
        	/* Check if the end of the type string is reached */
-       	if (*rhs == T_END) {
+       	if (rhs->C == T_END) {
        	    /* End of comparison reached */
        	    return;
        	}
@@ -170,7 +170,6 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
 	 */
 	if (LeftType == T_TYPE_PTR && RightType == T_TYPE_ARRAY) {
 	    RightType = T_TYPE_PTR;
-	    rhs += DECODE_SIZE;
 	}
 
 	/* If the raw types are not identical, the types are incompatible */
@@ -231,8 +230,8 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
 
        	    case T_TYPE_FUNC:
        	       	/* Compare the function descriptors */
-       		F1 = DecodePtr (lhs+1);
-       		F2 = DecodePtr (rhs+1);
+       		F1 = GetFuncDesc (lhs);
+       		F2 = GetFuncDesc (rhs);
 
        		/* If one of the functions is implicitly declared, both
        		 * functions are considered equal. If one of the functions is
@@ -267,9 +266,7 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
        		    }
 		}
 
-		/* Skip the FuncDesc pointers to compare the return type */
-    	       	lhs += DECODE_SIZE;
-    	       	rhs += DECODE_SIZE;
+		/* Keep on and compare the return type */
     	       	break;
 
     	    case T_TYPE_ARRAY:
@@ -283,8 +280,6 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
 		    SetResult (Result, TC_INCOMPATIBLE);
     	       	    return;
     	       	}
-    	       	lhs += DECODE_SIZE;
-     	       	rhs += DECODE_SIZE;
     	       	break;
 
     	    case T_TYPE_STRUCT:
@@ -293,8 +288,8 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
     	       	 * pointer to the struct definition from the type, and compare
     	       	 * the fields.
     	       	 */
-    	       	Sym1 = DecodePtr (lhs+1);
-    	       	Sym2 = DecodePtr (rhs+1);
+    	       	Sym1 = GetSymEntry (lhs);
+                Sym2 = GetSymEntry (rhs);
 
                 /* If one symbol has a name, the names must be identical */
                 if (!HasAnonName (Sym1) || !HasAnonName (Sym2)) {
@@ -324,8 +319,6 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
 		}
 
     		/* Structs are equal */
-    		lhs += DECODE_SIZE;
-    	       	rhs += DECODE_SIZE;
      	      	break;
     	}
 
@@ -336,7 +329,7 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
     }
 
     /* Check if end of rhs reached */
-    if (*rhs == T_END) {
+    if (rhs->C == T_END) {
      	SetResult (Result, TC_EQUAL);
     } else {
 	SetResult (Result, TC_INCOMPATIBLE);
@@ -345,7 +338,7 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
 
 
 
-typecmp_t TypeCmp (const type* lhs, const type* rhs)
+typecmp_t TypeCmp (const Type* lhs, const Type* rhs)
 /* Compare two types and return the result */
 {
     /* Assume the types are identical */
@@ -364,6 +357,7 @@ typecmp_t TypeCmp (const type* lhs, const type* rhs)
     /* Return the result */
     return Result;
 }
+
 
 
 

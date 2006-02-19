@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -67,7 +67,7 @@ unsigned F_GetParamCount (const Function* F);
 unsigned F_GetParamSize (const Function* F);
 /* Return the parameter size for the current function */
 
-type* F_GetReturnType (Function* F);
+Type* F_GetReturnType (Function* F);
 /* Get the return type for the function */
 
 int F_HasVoidReturn (const Function* F);
@@ -98,7 +98,7 @@ void F_AllocLocalSpace (Function* F);
  * nothing if there is no reserved local space.
  */
 
-int F_AllocRegVar (Function* F, const type* Type);
+int F_AllocRegVar (Function* F, const Type* Type);
 /* Allocate a register variable for the given variable type. If the allocation
  * was successful, return the offset of the register variable in the register
  * bank (zero page storage). If there is no register space left, return -1.

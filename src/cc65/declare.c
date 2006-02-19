@@ -1146,7 +1146,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 
 
 
-void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, int DefType)
+void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType)
 /* Parse a declaration specification */
 {
     TypeCode Qualifiers;

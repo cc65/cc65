@@ -56,11 +56,13 @@ typedef enum token_t {
     TOK_CEOF,
 
     /* Storage specifiers */
-    TOK_AUTO,
+    TOK_FIRST_STORAGE_CLASS,
+    TOK_AUTO            = TOK_FIRST_STORAGE_CLASS,
     TOK_EXTERN,
     TOK_REGISTER,
     TOK_STATIC,
     TOK_TYPEDEF,
+    TOK_LAST_STORAGE_CLASS = TOK_TYPEDEF,
 
     /* Tokens denoting type qualifiers */
     TOK_FIRST_TYPEQUAL,
@@ -71,6 +73,7 @@ typedef enum token_t {
 
     /* Function specifiers */
     TOK_INLINE,
+    TOK_FASTCALL,
 
     /* Tokens denoting types */
     TOK_FIRST_TYPE,
@@ -167,7 +170,6 @@ typedef enum token_t {
     TOK_ATTRIBUTE,
     TOK_FAR,
     TOK_NEAR,
-    TOK_FASTCALL,
     TOK_A,
     TOK_X,
     TOK_Y,
@@ -208,6 +210,17 @@ extern Token NextTok;		/* The next token */
 
 
 #if defined(HAVE_INLINE)
+INLINE int TokIsStorageClass (const Token* T)
+/* Return true if the token is a storage class specifier */
+{
+    return (T->Tok >= TOK_FIRST_STORAGE_CLASS && T->Tok <= TOK_LAST_STORAGE_CLASS);
+}
+#else
+#  define TokIsStorageClass(T)  \
+        ((T)->Tok >= TOK_FIRST_STORAGE_CLASS && (T)->Tok <= TOK_LAST_STORAGE_CLASS)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int TokIsType (const Token* T)
 /* Return true if the token is a type */
 {
@@ -226,6 +239,9 @@ INLINE int TokIsTypeQual (const Token* T)
 #else
 #  define TokIsTypeQual(T)  ((T)->Tok >= TOK_FIRST_TYPEQUAL && (T)->Tok <= TOK_LAST_TYPEQUAL)
 #endif
+
+int TokIsFuncSpec (const Token* T);
+/* Return true if the token is a function specifier */
 
 void SymName (char* S);
 /* Read a symbol from the input stream. The first character must have been

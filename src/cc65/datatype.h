@@ -287,220 +287,6 @@ Type* ArrayToPtr (const Type* T);
 /* Convert an array to a pointer to it's first element */
 
 #if defined(HAVE_INLINE)
-INLINE int IsTypeChar (const Type* T)
-/* Return true if this is a character type */
-{
-    return (T->C & T_MASK_TYPE) == T_TYPE_CHAR;
-}
-#else
-#  define IsTypeChar(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_CHAR)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeInt (const Type* T)
-/* Return true if this is an int type (signed or unsigned) */
-{
-    return (T->C & T_MASK_TYPE) == T_TYPE_INT;
-}
-#else
-#  define IsTypeInt(T)          (((T)->C & T_MASK_TYPE) == T_TYPE_INT)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeLong (const Type* T)
-/* Return true if this is a long type (signed or unsigned) */
-{
-    return (T->C & T_MASK_TYPE) == T_TYPE_LONG;
-}
-#else
-#  define IsTypeLong(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_LONG)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeFloat (const Type* T)
-/* Return true if this is a float type */
-{
-    return (T->C & T_MASK_TYPE) == T_TYPE_FLOAT;
-}
-#else
-#  define IsTypeFloat(T)        (((T)->C & T_MASK_TYPE) == T_TYPE_FLOAT)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeDouble (const Type* T)
-/* Return true if this is a double type */
-{
-    return (T->C & T_MASK_TYPE) == T_TYPE_DOUBLE;
-}
-#else
-#  define IsTypeDouble(T)       (((T)->C & T_MASK_TYPE) == T_TYPE_DOUBLE)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypePtr (const Type* T)
-/* Return true if this is a pointer type */
-{
-    return ((T->C & T_MASK_TYPE) == T_TYPE_PTR);
-}
-#else
-#  define IsTypePtr(T)          (((T)->C & T_MASK_TYPE) == T_TYPE_PTR)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeStruct (const Type* T)
-/* Return true if this is a struct type */
-{
-    return ((T->C & T_MASK_TYPE) == T_TYPE_STRUCT);
-}
-#else
-#  define IsTypeStruct(T)       (((T)->C & T_MASK_TYPE) == T_TYPE_STRUCT)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeUnion (const Type* T)
-/* Return true if this is a union type */
-{
-    return ((T->C & T_MASK_TYPE) == T_TYPE_UNION);
-}
-#else
-#  define IsTypeUnion(T)       (((T)->C & T_MASK_TYPE) == T_TYPE_UNION)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeArray (const Type* T)
-/* Return true if this is an array type */
-{
-    return ((T->C & T_MASK_TYPE) == T_TYPE_ARRAY);
-}
-#else
-#  define IsTypeArray(T)        (((T)->C & T_MASK_TYPE) == T_TYPE_ARRAY)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeVoid (const Type* T)
-/* Return true if this is a void type */
-{
-    return (T->C & T_MASK_TYPE) == T_TYPE_VOID;
-}
-#else
-#  define IsTypeVoid(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_VOID)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeFunc (const Type* T)
-/* Return true if this is a function class */
-{
-    return ((T->C & T_MASK_TYPE) == T_TYPE_FUNC);
-}
-#else
-#  define IsTypeFunc(T)         (((T)->C & T_MASK_TYPE) == T_TYPE_FUNC)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsTypeFuncPtr (const Type* T)
-/* Return true if this is a function pointer */
-{
-    return ((T[0].C & T_MASK_TYPE) == T_TYPE_PTR && (T[1].C & T_MASK_TYPE) == T_TYPE_FUNC);
-}
-#else
-#  define IsTypeFuncPtr(T)      \
-        ((((T)[0].C & T_MASK_TYPE) == T_TYPE_PTR) && (((T)[1].C & T_MASK_TYPE) == T_TYPE_FUNC))
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsClassInt (const Type* T)
-/* Return true if this is an integer type */
-{
-    return (T->C & T_MASK_CLASS) == T_CLASS_INT;
-}
-#else
-#  define IsClassInt(T)         (((T)->C & T_MASK_CLASS) == T_CLASS_INT)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsClassFloat (const Type* T)
-/* Return true if this is a float type */
-{
-    return (T->C & T_MASK_CLASS) == T_CLASS_FLOAT;
-}
-#else
-#  define IsClassFloat(T)       (((T)->C & T_MASK_CLASS) == T_CLASS_FLOAT)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsClassPtr (const Type* T)
-/* Return true if this is a pointer type */
-{
-    return (T->C & T_MASK_CLASS) == T_CLASS_PTR;
-}
-#else
-#  define IsClassPtr(T)         (((T)->C & T_MASK_CLASS) == T_CLASS_PTR)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsClassStruct (const Type* T)
-/* Return true if this is a struct type */
-{
-    return (T->C & T_MASK_CLASS) == T_CLASS_STRUCT;
-}
-#else
-#  define IsClassStruct(T)      (((T)->C & T_MASK_CLASS) == T_CLASS_STRUCT)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsClassFunc (const Type* T)
-/* Return true if this is a function type */
-{
-    return (T->C & T_MASK_CLASS) == T_CLASS_FUNC;
-}
-#else
-#  define IsClassFunc(T)        (((T)->C & T_MASK_CLASS) == T_CLASS_FUNC)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsSignUnsigned (const Type* T)
-/* Return true if this is an unsigned type */
-{
-    return (T->C & T_MASK_SIGN) == T_SIGN_UNSIGNED;
-}
-#else
-#  define IsSignUnsigned(T)     (((T)->C & T_MASK_SIGN) == T_SIGN_UNSIGNED)
-#endif
-
-TypeCode GetQualifier (const Type* T) attribute ((const));
-/* Get the qualifier from the given type string */
-
-#if defined(HAVE_INLINE)
-INLINE int IsQualConst (const Type* T)
-/* Return true if the given type has a const memory image */
-{
-    return (GetQualifier (T) & T_QUAL_CONST) != 0;
-}
-#else
-#  define IsQualConst(T)        (((T)->C & T_QUAL_CONST) != 0)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE int IsQualVolatile (const Type* T)
-/* Return true if the given type has a volatile type qualifier */
-{
-    return (GetQualifier (T) & T_QUAL_VOLATILE) != 0;
-}
-#else
-#  define IsQualVolatile(T)     (((T)->C & T_QUAL_VOLATILE) != 0)
-#endif
-
-int IsFastCallFunc (const Type* T) attribute ((const));
-/* Return true if this is a function type or pointer to function with
- * __fastcall__ calling conventions
- */
-
-int IsVariadicFunc (const Type* T) attribute ((const));
-/* Return true if this is a function type or pointer to function type with
- * variable parameter list
- */
-
-#if defined(HAVE_INLINE)
 INLINE TypeCode GetType (const Type* T)
 /* Get the raw type */
 {
@@ -508,6 +294,126 @@ INLINE TypeCode GetType (const Type* T)
 }
 #else
 #  define GetType(T)    ((T)->C & T_MASK_TYPE)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeChar (const Type* T)
+/* Return true if this is a character type */
+{
+    return (GetType (T) == T_TYPE_CHAR);
+}
+#else
+#  define IsTypeChar(T)         (GetType (T) == T_TYPE_CHAR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeInt (const Type* T)
+/* Return true if this is an int type (signed or unsigned) */
+{
+    return (GetType (T) == T_TYPE_INT);
+}
+#else
+#  define IsTypeInt(T)          (GetType (T) == T_TYPE_INT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeLong (const Type* T)
+/* Return true if this is a long type (signed or unsigned) */
+{
+    return (GetType (T) == T_TYPE_LONG);
+}
+#else
+#  define IsTypeLong(T)         (GetType (T) == T_TYPE_LONG)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeFloat (const Type* T)
+/* Return true if this is a float type */
+{
+    return (GetType (T) == T_TYPE_FLOAT);
+}
+#else
+#  define IsTypeFloat(T)        (GetType (T) == T_TYPE_FLOAT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeDouble (const Type* T)
+/* Return true if this is a double type */
+{
+    return (GetType (T) == T_TYPE_DOUBLE);
+}
+#else
+#  define IsTypeDouble(T)       (GetType (T) == T_TYPE_DOUBLE)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypePtr (const Type* T)
+/* Return true if this is a pointer type */
+{
+    return (GetType (T) == T_TYPE_PTR);
+}
+#else
+#  define IsTypePtr(T)          (GetType (T) == T_TYPE_PTR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeStruct (const Type* T)
+/* Return true if this is a struct type */
+{
+    return (GetType (T) == T_TYPE_STRUCT);
+}
+#else
+#  define IsTypeStruct(T)       (GetType (T) == T_TYPE_STRUCT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeUnion (const Type* T)
+/* Return true if this is a union type */
+{
+    return (GetType (T) == T_TYPE_UNION);
+}
+#else
+#  define IsTypeUnion(T)       (GetType (T) == T_TYPE_UNION)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeArray (const Type* T)
+/* Return true if this is an array type */
+{
+    return (GetType (T) == T_TYPE_ARRAY);
+}
+#else
+#  define IsTypeArray(T)        (GetType (T) == T_TYPE_ARRAY)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeVoid (const Type* T)
+/* Return true if this is a void type */
+{
+    return (GetType (T) == T_TYPE_VOID);
+}
+#else
+#  define IsTypeVoid(T)         (GetType (T) == T_TYPE_VOID)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeFunc (const Type* T)
+/* Return true if this is a function class */
+{
+    return (GetType (T) == T_TYPE_FUNC);
+}
+#else
+#  define IsTypeFunc(T)         (GetType (T) == T_TYPE_FUNC)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeFuncPtr (const Type* T)
+/* Return true if this is a function pointer */
+{
+    return (IsTypePtr (T) && IsTypeFunc (T+1));
+}
+#else
+#  define IsTypeFuncPtr(T)      (IsTypePtr (T) && IsTypeFunc (T+1))
 #endif
 
 #if defined(HAVE_INLINE)
@@ -521,6 +427,56 @@ INLINE TypeCode GetClass (const Type* T)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int IsClassInt (const Type* T)
+/* Return true if this is an integer type */
+{
+    return (GetClass (T) == T_CLASS_INT);
+}
+#else
+#  define IsClassInt(T)         (GetClass (T) == T_CLASS_INT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsClassFloat (const Type* T)
+/* Return true if this is a float type */
+{
+    return (GetClass (T) == T_CLASS_FLOAT);
+}
+#else
+#  define IsClassFloat(T)       (GetClass (T) == T_CLASS_FLOAT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsClassPtr (const Type* T)
+/* Return true if this is a pointer type */
+{
+    return (GetClass (T) == T_CLASS_PTR);
+}
+#else
+#  define IsClassPtr(T)         (GetClass (T) == T_CLASS_PTR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsClassStruct (const Type* T)
+/* Return true if this is a struct type */
+{
+    return (GetClass (T) == T_CLASS_STRUCT);
+}
+#else
+#  define IsClassStruct(T)      (GetClass (T) == T_CLASS_STRUCT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsClassFunc (const Type* T)
+/* Return true if this is a function type */
+{
+    return (GetClass (T) == T_CLASS_FUNC);
+}
+#else
+#  define IsClassFunc(T)        (GetClass (T) == T_CLASS_FUNC)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE TypeCode GetSignedness (const Type* T)
 /* Get the sign of a type */
 {
@@ -529,6 +485,59 @@ INLINE TypeCode GetSignedness (const Type* T)
 #else
 #  define GetSignedness(T)      ((T)->C & T_MASK_SIGN)
 #endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsSignUnsigned (const Type* T)
+/* Return true if this is an unsigned type */
+{
+    return (GetSignedness (T) == T_SIGN_UNSIGNED);
+}
+#else
+#  define IsSignUnsigned(T)     (GetSignedness (T) == T_SIGN_UNSIGNED)
+#endif
+
+TypeCode GetQualifier (const Type* T) attribute ((const));
+/* Get the qualifier from the given type string */
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualConst (const Type* T)
+/* Return true if the given type has a const memory image */
+{
+    return (GetQualifier (T) & T_QUAL_CONST) != 0;
+}
+#else
+#  define IsQualConst(T)        (GetQualifier (T) & T_QUAL_CONST) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualVolatile (const Type* T)
+/* Return true if the given type has a volatile type qualifier */
+{
+    return (GetQualifier (T) & T_QUAL_VOLATILE) != 0;
+}
+#else
+#  define IsQualVolatile(T)     (GetQualifier (T) & T_QUAL_VOLATILE) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualRestrict (const Type* T)
+/* Return true if the given type has a restrict qualifier */
+{
+    return (GetQualifier (T) & T_QUAL_RESTRICT) != 0;
+}
+#else
+#  define IsQualRestrict(T)     (GetQualifier (T) & T_QUAL_RESTRICT) != 0)
+#endif
+
+int IsFastCallFunc (const Type* T) attribute ((const));
+/* Return true if this is a function type or pointer to function with
+ * __fastcall__ calling conventions
+ */
+
+int IsVariadicFunc (const Type* T) attribute ((const));
+/* Return true if this is a function type or pointer to function type with
+ * variable parameter list
+ */
 
 #if defined(HAVE_INLINE)
 INLINE TypeCode GetSizeModifier (const Type* T)

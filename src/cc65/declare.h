@@ -92,7 +92,7 @@ Type* ParseType (Type* Type);
 void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode);
 /* Parse a variable, type or function declaration */
 
-void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, int DefType);
+void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType);
 /* Parse a declaration specification */
 
 void CheckEmptyDecl (const DeclSpec* D);
@@ -104,7 +104,7 @@ void CheckEmptyDecl (const DeclSpec* D);
 unsigned ParseInit (Type* T);
 /* Parse initialization of variables. Return the number of initialized data
  * bytes.
- */
+ */                                                        
 
 
 

@@ -199,6 +199,15 @@ static int SkipWhite (void)
 
 
 
+int TokIsFuncSpec (const Token* T)
+/* Return true if the token is a function specifier */
+{
+    return (T->Tok == TOK_INLINE) || (T->Tok == TOK_FASTCALL) ||
+           (T->Tok == TOK_NEAR)   || (T->Tok == TOK_FAR);
+}
+
+
+
 void SymName (char* S)
 /* Read a symbol from the input stream. The first character must have been
  * checked before calling this function. The buffer is expected to be at

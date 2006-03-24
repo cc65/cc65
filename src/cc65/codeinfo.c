@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2006, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,6 +39,7 @@
 /* common */
 #include "chartype.h"
 #include "coll.h"
+#include "debugflag.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -114,6 +115,12 @@ static const FuncInfo FuncInfoTable[] = {
     { "decsp8",        	REG_NONE,      	      REG_A			     },
     { "incax1",         REG_AX,               REG_AX			     },
     { "incax2",         REG_AX,               REG_AX			     },
+    { "incax3",         REG_AX,               REG_AX			     },
+    { "incax4",         REG_AX,               REG_AX			     },
+    { "incax5",         REG_AX,               REG_AX			     },
+    { "incax6",         REG_AX,               REG_AX			     },
+    { "incax7",         REG_AX,               REG_AX			     },
+    { "incax8",         REG_AX,               REG_AX			     },
     { "incsp1",	       	REG_NONE,      	      REG_NONE			     },
     { "incsp2",	       	REG_NONE,      	      REG_Y			     },
     { "incsp3",	       	REG_NONE,      	      REG_Y			     },
@@ -337,8 +344,19 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 	    /* Use the information we have */
 	    *Use = Info->Use;
 	    *Chg = Info->Chg;
-	    return;
-	}
+	} else {
+            /* It's an internal function we have no information for. If in
+             * debug mode, output an additional warning, so we have a chance
+             * to fix it. Otherwise assume that the internal function will
+             * use and change all registers.
+             */
+            if (Debug) {
+                fprintf (stderr, "No info about internal function `%s'", Name);
+            }
+            *Use = REG_ALL;
+            *Chg = REG_ALL;
+        }
+        return;
     }
 
     /* Function not found - assume that the primary register is input, and all
@@ -483,7 +501,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 
             } else {
 
-                /* Jump to external label. This will effectively exit the 
+                /* Jump to external label. This will effectively exit the
                  * function, so we use the exitregs information here.
                  */
                 U1 = S->ExitRegs;
@@ -496,7 +514,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
             }
             if ((E = CS_GetEntry (S, ++Index)) == 0) {
                 Internal ("GetRegInfo2: No next entry!");
-            }                       
+            }
 
             /* Follow flow if branch not taken */
             U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused, Wanted);

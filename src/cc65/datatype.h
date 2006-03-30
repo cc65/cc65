@@ -381,7 +381,7 @@ INLINE int IsTypeArray (const Type* T)
 /* Return true if this is an array type */
 {
     return (GetType (T) == T_TYPE_ARRAY);
-}
+}                                 
 #else
 #  define IsTypeArray(T)        (GetType (T) == T_TYPE_ARRAY)
 #endif
@@ -506,7 +506,7 @@ INLINE int IsQualConst (const Type* T)
     return (GetQualifier (T) & T_QUAL_CONST) != 0;
 }
 #else
-#  define IsQualConst(T)        (GetQualifier (T) & T_QUAL_CONST) != 0)
+#  define IsQualConst(T)        ((GetQualifier (T) & T_QUAL_CONST) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -516,7 +516,7 @@ INLINE int IsQualVolatile (const Type* T)
     return (GetQualifier (T) & T_QUAL_VOLATILE) != 0;
 }
 #else
-#  define IsQualVolatile(T)     (GetQualifier (T) & T_QUAL_VOLATILE) != 0)
+#  define IsQualVolatile(T)     ((GetQualifier (T) & T_QUAL_VOLATILE) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -526,7 +526,7 @@ INLINE int IsQualRestrict (const Type* T)
     return (GetQualifier (T) & T_QUAL_RESTRICT) != 0;
 }
 #else
-#  define IsQualRestrict(T)     (GetQualifier (T) & T_QUAL_RESTRICT) != 0)
+#  define IsQualRestrict(T)     ((GetQualifier (T) & T_QUAL_RESTRICT) != 0)
 #endif
 
 int IsFastCallFunc (const Type* T) attribute ((const));

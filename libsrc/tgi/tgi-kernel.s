@@ -67,6 +67,7 @@ tgi_irq:            .byte   $60, $00, $00       ; RTS plus two dummy bytes
 tgi_sig:        .byte   $74, $67, $69, TGI_API_VERSION  ; "tgi", version
 
 
+.code
 ;----------------------------------------------------------------------------
 ; void __fastcall__ tgi_install (void* driver);
 ; /* Install an already loaded driver. */
@@ -188,3 +189,4 @@ _tgi_uninstall:
         rts
 
 
+     

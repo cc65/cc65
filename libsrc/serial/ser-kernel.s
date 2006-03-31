@@ -37,6 +37,7 @@ ser_irq:	.byte	$60, $00, $00	; RTS plus two dummy bytes
 ser_sig:        .byte   $73, $65, $72, SER_API_VERSION  ; "ser", version
 
 
+.code
 ;----------------------------------------------------------------------------
 ; unsigned char __fastcall__ ser_install (void* driver);
 ; /* Install the driver once it is loaded */
@@ -44,9 +45,9 @@ ser_sig:        .byte   $73, $65, $72, SER_API_VERSION  ; "ser", version
 
 _ser_install:
        	sta     _ser_drv
-  	sta	ptr1
-  	stx     _ser_drv+1
-  	stx    	ptr1+1
+     	sta	ptr1
+     	stx     _ser_drv+1
+     	stx    	ptr1+1
 
 ; Check the driver signature
 

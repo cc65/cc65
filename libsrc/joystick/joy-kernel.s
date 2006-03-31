@@ -36,6 +36,7 @@ joy_irq:        .byte   $60, $00, $00   ; RTS plus two dummy bytes
 joy_sig:        .byte   $6A, $6F, $79, JOY_API_VERSION	; "joy", version
 
 
+.code
 ;----------------------------------------------------------------------------
 ; unsigned char __fastcall__ joy_install (void* driver);
 ; /* Install the driver once it is loaded */

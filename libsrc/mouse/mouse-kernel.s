@@ -41,6 +41,7 @@ mouse_irq:	.byte	$60, $00, $00	; RTS plus two dummy bytes
 mouse_sig:      .byte   $6d, $6f, $75, MOUSE_API_VERSION    ; "mou", version
 
 
+.code
 ;----------------------------------------------------------------------------
 ; unsigned char __fastcall__ mouse_install (const struct mouse_callbacks* c,
 ;                                           void* driver);

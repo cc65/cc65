@@ -189,6 +189,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "shreax4",        REG_EAX,              REG_AX | REG_TMP1		     },
     { "staspidx",       REG_A | REG_Y,        REG_Y | REG_TMP1 | REG_PTR1    },
     { "stax0sp",        REG_AX,               REG_Y   			     },
+    { "staxspidx",      REG_AXY,              REG_TMP1 | REG_PTR1            },
     { "staxysp",        REG_AXY,              REG_Y   			     },
     { "steax0sp",       REG_EAX,              REG_Y                          },
     { "steaxysp",       REG_EAXY,             REG_Y                          },

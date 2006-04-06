@@ -42,13 +42,14 @@ all:
 # Apple ][
 
 apple2lib:
-	for i in apple2 common runtime conio dbg em joystick serial tgi zlib; do \
+	for i in apple2 common runtime conio dbg em joystick mouse serial tgi zlib; do \
        	    $(MAKE) SYS=apple2 -C $$i || exit 1; \
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
 	mv apple2/crt0.o apple2.o
 	cp apple2/apple2-lc.emd a2.lc.emd
 	cp apple2/apple2-stdjoy.joy a2.stdjoy.joy
+	cp apple2/apple2-stdmou.mou a2.stdmou.mou
 	cp apple2/apple2-ssc.ser a2.ssc.ser
 	cp apple2/apple2-40-40-16.tgi a2.lo.tgi
 	cp apple2/apple2-280-192-6.tgi a2.hi.tgi
@@ -57,13 +58,14 @@ apple2lib:
 # Apple //e
 
 apple2enhlib:
-	for i in apple2enh common runtime conio dbg em joystick serial tgi zlib; do \
+	for i in apple2enh common runtime conio dbg em joystick mouse serial tgi zlib; do \
 	    $(MAKE) SYS=apple2enh -C $$i || exit 1; \
 	    $(AR) a apple2enh.lib $$i/*.o;\
 	done
 	mv apple2enh/crt0.o apple2enh.o
 	cp apple2enh/apple2-lc.emd a2e.lc.emd
 	cp apple2enh/apple2-stdjoy.joy a2e.stdjoy.joy
+	cp apple2enh/apple2-stdmou.mou a2e.stdmou.mou
 	cp apple2enh/apple2-ssc.ser a2e.ssc.ser
 	cp apple2enh/apple2-40-40-16.tgi a2e.lo.tgi
 	cp apple2enh/apple2-280-192-6.tgi a2e.hi.tgi

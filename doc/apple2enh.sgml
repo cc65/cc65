@@ -132,9 +132,9 @@ you cannot do it, it just means that there's no help.
 
   <tag><tt/a2e.lc.emd/</tag>
   Gives access to 12KB RAM (48 pages of 256 bytes each) on the
-  Apple2 language card. The driver was contributed by Stefan Haubenthal.
-  Note that this driver is incompatible with any DOS using the language
-  card memory!
+  Apple&nbsp;II Language Card. The driver was contributed by Stefan Haubenthal.
+  Note that this driver is incompatible with any DOS using the Language
+  Card memory!
 
 </descrip><p>
 
@@ -152,8 +152,17 @@ you cannot do it, it just means that there's no help.
 
 <sect1>Mouse drivers<p>
 
-Currently no drivers available (in fact, the API for loadable mouse drivers
-does not exist).
+<descrip>
+
+  <tag><tt/a2e.stdmou.mou/</tag>
+  Driver for the AppleMouse&nbsp;II Card. Searches all Apple&nbsp;II slots
+  for an AppleMouse&nbsp;II Card compatible firmware. The default bounding
+  box is &lsqb;0..279,0..191&rsqb;.
+  
+  Note that the enhanced&nbsp;Apple&nbsp;//e default mouse callbacks support
+  text mode only.
+
+</descrip><p>
 
 
 <sect1>RS232 device drivers<p>
@@ -161,11 +170,16 @@ does not exist).
 <descrip>
 
   <tag><tt/a2e.ssc.ser/</tag>
-  Driver for the Apple2 Super Serial Card. Supports up to 19200 baud,
+  Driver for the Apple&nbsp;II Super Serial Card. Supports up to 19200 baud,
   hardware flow control (RTS/CTS) and interrupt driven receives. Note
   that because of the peculiarities of the 6551 chip transmits are not
   interrupt driven, and the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
+
+  The driver defaults to slot 2. Call ser_ioctl(0, <slot>) prior to ser_open
+  in order to select a different slot. ser_ioctl succeeds for all Apple&nbsp;II
+  slots, but ser_open fails with SER_ERR_NO_DEVICE if there's no SSC firmware
+  found in the selected slot.
 
 </descrip><p>
 

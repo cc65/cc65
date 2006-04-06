@@ -1,5 +1,5 @@
 /*
- * Demo program for mouse usage. Will work for the C64/C128/CBM510/Atari
+ * Demo program for mouse usage. Will work for the C64/C128/CBM510/Atari/Apple2
  *
  * Ullrich von Bassewitz, 13.09.2001
  *
@@ -12,6 +12,7 @@
 #include <string.h>
 #include <mouse.h>
 #include <conio.h>
+#include <ctype.h>
 #include <dbg.h>
 
 
@@ -61,6 +62,14 @@ static const unsigned char MouseSprite[64] = {
 
 #endif  /* __C64__ or __C128__ */
 
+#ifdef __APPLE2__
+#  define DRIVER  "a2.stdmou.mou"
+#endif
+
+#ifdef __APPLE2ENH__
+#  define DRIVER  "a2e.stdmou.mou"
+#endif
+
 
 
 static void CheckError (const char* S, unsigned char Error)
@@ -81,7 +90,7 @@ static void DoWarning (void)
             "    %s\n"
             "on disk! Press 'y' if you have it or\n"
             "any other key to exit.\n", DRIVER);
-    if (cgetc () != 'y') {
+    if (tolower (cgetc ()) != 'y') {
         exit (EXIT_SUCCESS);
     }
     printf ("Ok. Please wait patiently...\n");
@@ -113,9 +122,9 @@ int main (void)
     DoWarning ();
 
     /* Clear the screen, set white on black */
-    bordercolor (COLOR_BLACK);
-    bgcolor (COLOR_BLACK);
-    textcolor (COLOR_GRAY3);
+    (void) bordercolor (COLOR_BLACK);
+    (void) bgcolor (COLOR_BLACK);
+    (void) textcolor (COLOR_GRAY3);
     cursor (0);
     clrscr ();
 

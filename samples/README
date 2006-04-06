@@ -66,7 +66,7 @@ Platforms:	All systems with TGI support. You may have to change the
 Name:           mousedemo
 Description:	Shows how to use the mouse.
 Platforms:     	All systems with mouse and conio support:
-		C64, C128
+		C64, C128, CBM510, Atari, Apple2
 
 -----------------------------------------------------------------------------
 Name:           nachtm

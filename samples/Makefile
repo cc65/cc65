@@ -71,7 +71,7 @@ all:   	$(EXELIST)
 ascii: 	       	$(CRT0) ascii.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-diodemo:  	       	$(CRT0) diodemo.o $(CLIB)
+diodemo:        $(CRT0) diodemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
 fire:  	       	$(CRT0) fire.o $(CLIB)
@@ -85,20 +85,26 @@ hello: 	       	$(CRT0) hello.o $(CLIB)
 
 # The apple machines need the start address adjusted for the mandelbrot demo
 ifeq "$(SYS)" "apple2"
-mandelbrot:     	$(CRT0) mandelbrot.o $(CLIB)
+mandelbrot:     $(CRT0) mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
 else
 ifeq "$(SYS)" "apple2enh"
-mandelbrot:     	$(CRT0) mandelbrot.o $(CLIB)
+mandelbrot:     $(CRT0) mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
 else
-mandelbrot:     	$(CRT0) mandelbrot.o $(CLIB)
+mandelbrot:     $(CRT0) mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 endif
 endif
 
+# The Apple ][ needs the start address adjusted for the mousedemo
+ifeq "$(SYS)" "apple2"
+mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
+	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
+else
 mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
+endif
 
 nachtm:	       	$(CRT0) nachtm.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -Ln $(basename $@).lbl -o $@ $^

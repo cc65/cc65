@@ -20,7 +20,7 @@
 ; ProDOS 8 2.0.3 - $23
 ;
 
-        .constructor    initdostype, 25
+        .constructor    initdostype, 19
         .export         __dos_type
 
         .include        "mli.inc"

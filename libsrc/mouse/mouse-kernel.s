@@ -92,20 +92,25 @@ _mouse_install:
         ldy     tmp1
         bpl     @L2
 
+; Install the IRQ vector if the driver needs it
+
+        lda     mouse_irq+2             ; Check high byte of IRQ vector
+        beq     @L3                     ; Jump if vector invalid
+   	lda	#$4C			; Jump opcode
+       	sta    	mouse_irq               ; Activate IRQ routine
+
 ; Call driver install routine and check for errors
 
-        jsr     mouse_install
+@L3:    jsr     mouse_install
         tay                             ; Test error code
-        bne     @L3                     ; Bail out if install had errors
+        beq     @L4			; Jump if no error
 
-; Install the IRQ vector if the driver needs it. A/X contains the error code
-; from mouse_install, so don't use it.
+; Uninstall IRQ vector if install routine had errors. A/X contains the error
+; code from mouse_install, so don't use it.
 
-        ldy     mouse_irq+2             ; Check high byte of IRQ vector
-        beq     @L3                     ; Jump if vector invalid
-   	ldy	#$4C			; Jump opcode
-       	sty    	mouse_irq               ; Activate IRQ routine
-@L3:    rts
+	ldy	#$60                    ; RTS opcode
+	sty	mouse_irq               ; Disable IRQ entry point
+@L4:    rts
 
 ; Driver signature invalid. One word is still on the stack
 

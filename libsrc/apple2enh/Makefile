@@ -32,6 +32,9 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I ../apple2 -I ../../include
 %.joy:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
+%.mou:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
 %.ser:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
@@ -76,6 +79,7 @@ S_OBJS=	_scrsize.o	\
         joy_stddrv.o    \
      	kbhit.o		\
         mainargs.o      \
+	mcbdefault.o	\
 	mli.o		\
 	open.o		\
         oserrlist.o     \
@@ -110,6 +114,8 @@ EMDS = apple2-lc.emd
 
 JOYS = apple2-stdjoy.joy
 
+MOUS = apple2-stdmou.mou
+
 SERS = apple2-ssc.ser
 
 TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
@@ -119,15 +125,13 @@ TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
 
 .PHONY:	all clean zap
 
-all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
+all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:   	clean
-	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)
-
-
+	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)

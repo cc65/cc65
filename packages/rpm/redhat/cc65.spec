@@ -112,7 +112,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/apple2.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/a2.*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2.*.joy
-%attr(644,root,root) 		/usr/lib/cc65/joy/a2.*.mou
+%attr(644,root,root) 		/usr/lib/cc65/mou/a2.*.mou
 %attr(644,root,root) 		/usr/lib/cc65/ser/a2.*.ser
 %attr(644,root,root) 		/usr/lib/cc65/tgi/a2.*.tgi
 
@@ -137,7 +137,7 @@ programs for the Apple //e using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/apple2enh.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/a2e.*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2e.*.joy
-%attr(644,root,root) 		/usr/lib/cc65/joy/a2e.*.mou
+%attr(644,root,root) 		/usr/lib/cc65/mou/a2e.*.mou
 %attr(644,root,root) 		/usr/lib/cc65/ser/a2e.*.ser
 %attr(644,root,root) 		/usr/lib/cc65/tgi/a2e.*.tgi
 

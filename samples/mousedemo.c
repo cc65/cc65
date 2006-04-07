@@ -156,8 +156,8 @@ int main (void)
     Done = 0;
     ShowState (Invisible = 1);
     while (!Done) {
-     	if (kbhit()) {
-     	    switch (cgetc()) {
+     	if (kbhit ()) {                
+     	    switch (tolower (cgetc ())) {
 		case 'd':
 		    BREAK();
 		    break;

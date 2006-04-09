@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000	Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -59,6 +59,9 @@ void xfree (void* Block);
 
 char* xstrdup (const char* S);
 /* Duplicate a string on the heap. The function checks for out of memory */
+
+void* xdup (const void* Buf, size_t Size);
+/* Create a copy of Buf on the heap and return a pointer to it. */
 
 
 

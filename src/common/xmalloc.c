@@ -6,7 +6,7 @@
 /*					    				     */
 /*					    				     */
 /*					    				     */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -35,7 +35,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-           
+
 /* common */
 #include "abend.h"
 #include "debugflag.h"
@@ -118,6 +118,13 @@ char* xstrdup (const char* S)
     }
 }
 
+
+
+void* xdup (const void* Buf, size_t Size)
+/* Create a copy of Buf on the heap and return a pointer to it. */
+{
+    return memcpy (xmalloc (Size), Buf, Size);
+}
 
 
 

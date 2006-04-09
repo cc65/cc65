@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
+/* (C) 1998-2006, Ullrich von Bassewitz                                      */
 /*                Römerstrasse 52                                            */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -946,11 +946,19 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         /* Simplify it if possible */
         A->Expr = SimplifyExpr (A->Expr, &ED);
 
-        /* If we don't know how big the expression is, assume the default
-         * address size for data.
-         */
         if (ED.AddrSize == ADDR_SIZE_DEFAULT) {
+            /* If we don't know how big the expression is, assume the
+             * default address size for data. If this default address
+             * size is unequal to zero page addressing, but zero page
+             * addressing is allowed by the instruction, mark all symbols
+             * in the expression tree. This mark will be checked at end
+             * of assembly, and a warning is issued, if a zero page symbol
+             * was guessed wrong here.
+             */
             ED.AddrSize = DataAddrSize;
+            if (ED.AddrSize > ADDR_SIZE_ZP && (A->AddrModeSet & AM65_SET_ZP)) {
+                ExprGuessedAddrSize (A->Expr, ADDR_SIZE_ZP);
+            }
         }
 
         /* Check the size */

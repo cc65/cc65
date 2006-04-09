@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -75,16 +75,21 @@ SymEntry* SymLast = 0;
 SymEntry* NewSymEntry (const char* Name, unsigned Flags)
 /* Allocate a symbol table entry, initialize and return it */
 {
+    unsigned I;
+
     /* Allocate memory */
     SymEntry* S = xmalloc (sizeof (SymEntry));
 
     /* Initialize the entry */
-    S->Left	  = 0;
-    S->Right	  = 0;
-    S->Locals	  = 0;
-    S->SymTab	  = 0;
-    S->Pos	  = CurPos;
-    S->Flags	  = Flags;
+    S->Left    	  = 0;
+    S->Right   	  = 0;
+    S->Locals  	  = 0;
+    S->SymTab  	  = 0;
+    S->Pos     	  = CurPos;
+    for (I = 0; I < sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0]); ++I) {
+        S->GuessedUse[I] = 0;
+    }
+    S->Flags   	  = Flags;
     S->Expr       = 0;
     S->ExprRefs   = AUTO_COLLECTION_INITIALIZER;
     S->ExportSize = ADDR_SIZE_DEFAULT;
@@ -193,7 +198,7 @@ static void SymReplaceExprRefs (SymEntry* S)
         /* Safety */
         CHECK (E->Op == EXPR_SYMBOL && E->V.Sym == S);
 
-        /* We cannot touch the root node, since there are pointers to it. 
+        /* We cannot touch the root node, since there are pointers to it.
          * Replace it by a literal node.
          */
         E->Op = EXPR_LITERAL;
@@ -252,7 +257,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     /* Set the symbol value */
     S->Expr = Expr;
 
-    /* In case of a variable symbol, walk over all expressions containing 
+    /* In case of a variable symbol, walk over all expressions containing
      * this symbol and replace the (sub-)expression by the literal value of
      * the tree. Be sure to replace the expression node in place, since there
      * may be pointers to it.
@@ -545,6 +550,32 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
 
     /* Set the symbol data */
     S->Flags |= (SF_EXPORT | SF_REFERENCED);
+}
+
+
+
+void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize)
+/* Mark the address size of the given symbol as guessed. The address size
+ * passed as argument is the one NOT used, because the actual address size
+ * wasn't known. Example: Zero page addressing was not used because symbol
+ * is undefined, and absolute addressing was available.
+ */
+{
+    /* We must have a valid address size passed */
+    PRECONDITION (AddrSize != ADDR_SIZE_DEFAULT);
+
+    /* We do not support all address sizes currently */
+    if (AddrSize > sizeof (Sym->GuessedUse) / sizeof (Sym->GuessedUse[0])) {
+        return;
+    }
+
+    /* We can only remember one such occurance */
+    if (Sym->GuessedUse[AddrSize-1]) {
+        return;
+    }
+
+    /* Ok, remember the file position */
+    Sym->GuessedUse[AddrSize-1] = xdup (&CurPos, sizeof (CurPos));
 }
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -1695,11 +1695,11 @@ void WriteExpr (ExprNode* Expr)
 
         case EXPR_LITERAL:
             ObjWrite8 (EXPR_LITERAL);
-	    ObjWrite32 (Expr->V.Val);
-	    break;
+    	    ObjWrite32 (Expr->V.Val);
+    	    break;
 
         case EXPR_SYMBOL:
-	    if (SymIsImport (Expr->V.Sym)) {
+    	    if (SymIsImport (Expr->V.Sym)) {
                 ObjWrite8 (EXPR_SYMBOL);
                 ObjWriteVar (GetSymIndex (Expr->V.Sym));
             } else {
@@ -1726,6 +1726,43 @@ void WriteExpr (ExprNode* Expr)
     }
 }
 
+
+
+void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
+/* Mark the address size of the given expression tree as guessed. The address
+ * size passed as argument is the one NOT used, because the actual address
+ * size wasn't known. Example: Zero page addressing was not used because symbol
+ * is undefined, and absolute addressing was available.
+ * This function will actually parse the expression tree for undefined symbols,
+ * and mark these symbols accordingly.
+ */
+{
+    /* Accept NULL expressions */
+    if (Expr == 0) {
+        return;
+    }
+
+    /* Check the type code */
+    switch (Expr->Op & EXPR_TYPEMASK) {
+
+        case EXPR_LEAFNODE:
+            if (Expr->Op == EXPR_SYMBOL) {
+                if (!SymIsDef (Expr->V.Sym)) {
+                    /* Symbol is undefined, mark it */
+                    SymGuessedAddrSize (Expr->V.Sym, AddrSize);
+                }
+            }
+            return;
+
+        case EXPR_BINARYNODE:
+            ExprGuessedAddrSize (Expr->Right, AddrSize);
+            /* FALLTHROUGH */
+
+        case EXPR_UNARYNODE:
+            ExprGuessedAddrSize (Expr->Left, AddrSize);
+            break;
+    }
+}
 
 
 

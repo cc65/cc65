@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -136,6 +136,15 @@ ExprNode* CloneExpr (ExprNode* Expr);
 
 void WriteExpr (ExprNode* Expr);
 /* Write the given expression to the object file */
+
+void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize);
+/* Mark the address size of the given expression tree as guessed. The address
+ * size passed as argument is the one NOT used, because the actual address
+ * size wasn't known. Example: Zero page addressing was not used because symbol
+ * is undefined, and absolute addressing was available.
+ * This function will actually parse the expression tree for undefined symbols,
+ * and mark these symbols accordingly.
+ */
 
 
 

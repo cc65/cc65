@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -78,21 +78,27 @@
 /* Structure of a symbol table entry */
 typedef struct SymEntry SymEntry;
 struct SymEntry {
-    SymEntry*  	      	    Left;      	/* Lexically smaller entry */
-    SymEntry*  	    	    Right; 	/* Lexically larger entry */
-    SymEntry*  	    	    List;	/* List of all entries */
-    SymEntry*  	       	    Locals;  	/* Root of subtree for local symbols */
-    struct SymTable*	    SymTab;	/* Table this symbol is in, 0 for locals */
-    FilePos    	       	    Pos;  	/* File position for this symbol */
-    unsigned                Flags;	/* Symbol flags */
-    unsigned	    	    Index;	/* Index of import/export entries */
-    struct ExprNode*        Expr;      	/* Symbol expression */
-    Collection              ExprRefs;   /* Expressions using this symbol */
-    unsigned char           ExportSize; /* Export address size */
-    unsigned char           AddrSize;   /* Address size of label */
-    unsigned char      	    ConDesPrio[CD_TYPE_COUNT]; 	/* ConDes priorities... */
+    SymEntry*  	      	Left;           /* Lexically smaller entry */
+    SymEntry*  	    	Right; 	        /* Lexically larger entry */
+    SymEntry*  	    	List;	        /* List of all entries */
+    SymEntry*  	       	Locals;         /* Root of subtree for local symbols */
+    struct SymTable*	SymTab;	        /* Table this symbol is in, 0 for locals */
+    FilePos    	       	Pos;  	        /* File position for this symbol */
+    FilePos*            GuessedUse[1];  /* File position where symbol
+                                         * address size was guessed, and the
+                                         * smallest possible addressing was NOT
+                                         * used. Currently only for zero page
+                                         * addressing
+                                         */
+    unsigned            Flags;	        /* Symbol flags */
+    unsigned	    	Index;	        /* Index of import/export entries */
+    struct ExprNode*    Expr;      	/* Symbol expression */
+    Collection          ExprRefs;       /* Expressions using this symbol */
+    unsigned char       ExportSize;     /* Export address size */
+    unsigned char       AddrSize;       /* Address size of label */
+    unsigned char      	ConDesPrio[CD_TYPE_COUNT]; 	/* ConDes priorities... */
 					/* ...actually value+1 (used as flag) */
-    unsigned                Name;      	/* Name index in global string pool */
+    unsigned            Name;      	/* Name index in global string pool */
 };
 
 /* List of all symbol table entries */
@@ -164,6 +170,13 @@ void SymGlobal (SymEntry* Sym, unsigned char AddrSize, unsigned Flags);
 void SymConDes (SymEntry* Sym, unsigned char AddrSize, unsigned Type, unsigned Prio);
 /* Mark the given symbol as a module constructor/destructor. This will also
  * mark the symbol as an export. Initializers may never be zero page symbols.
+ */
+
+void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize);
+/* Mark the address size of the given symbol as guessed. The address size
+ * passed as argument is the one NOT used, because the actual address size
+ * wasn't known. Example: Zero page addressing was not used because symbol
+ * is undefined, and absolute addressing was available.
  */
 
 void SymExportFromGlobal (SymEntry* S);

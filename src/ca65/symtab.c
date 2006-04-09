@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -600,6 +600,25 @@ void SymCheck (void)
                 }
                 ED_Done (&ED);
             }
+
+            /* If the address size of the symbol was guessed, check the guess
+             * against the actual address size and print a warning if the two
+             * differ.
+             */
+            if (S->AddrSize != ADDR_SIZE_DEFAULT) {
+                /* Do we have data for this address size? */
+                if (S->AddrSize <= sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0])) {
+                    /* Get the file position where the symbol was used */
+                    const FilePos* P = S->GuessedUse[S->AddrSize - 1];
+                    if (P) {
+                        PWarning (P, 0,
+                                  "Didn't use %s addressing for `%s'",
+                                  AddrSizeToStr (S->AddrSize),
+                                  GetSymName (S));
+                    }
+                }
+            }
+
 	}
 
 	/* Next symbol */

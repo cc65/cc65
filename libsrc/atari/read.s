@@ -8,42 +8,56 @@
 	.import __rwsetup,__do_oserror,__inviocb,__oserror
 	.export	_read
 
-_read:	jsr	__rwsetup	; do common setup for read and write
-	beq	done		; if size 0, it's a no-op
-	cpx	#$FF		; invalid iocb?
-	beq	_inviocb
+_read:	jsr  	__rwsetup	; do common setup for read and write
+	beq  	done		; if size 0, it's a no-op
+	cpx  	#$FF		; invalid iocb?
+	beq  	_inviocb
 
 .ifdef	LINEBUF
 	; E: should be always at IOCB #0
 	; fixme: what happens when user closes and reopens stdin?
-	cpx	#0		; E: handler (line oriented keyboard input)?
-	beq	do_line
+	cpx  	#0		; E: handler (line oriented keyboard input)?
+	beq  	do_line
 .endif
 
-	lda	#GETCHR		; iocb command code
-	sta	ICCOM,x
-	jsr	CIOV		; read it
-	bpl	done
-	cpy	#EOFERR		; eof is treated specially
-	beq	done
-	jmp	__do_oserror	; update errno
+	lda  	#GETCHR		; iocb command code
+	sta  	ICCOM,x
+	jsr  	CIOV		; read it
+	bpl  	done
+	cpy  	#EOFERR		; eof is treated specially
+	beq  	done
+	jmp  	__do_oserror	; update errno
 
-done:	lda	ICBLL,x		; buf len lo
-	pha			; save
-	lda	ICBLH,x		; get buf len hi
-	tax			; to X
-okdone:	lda	#0
-	sta	__oserror	; clear system dependend error code
-	pla			; get buf len lo
+done:	lda  	ICBLL,x		; buf len lo
+	pha  			; save
+	lda  	ICBLH,x		; get buf len hi
+	tax  			; to X
+okdone:	lda  	#0
+	sta  	__oserror	; clear system dependend error code
+	pla  			; get buf len lo
 	rts
 
 _inviocb:
-	jmp	__inviocb
+	jmp  	__inviocb
 
 
 .ifdef	LINEBUF
 
 ; line oriented input
+
+	.segment	"EXTZP" : zeropage
+
+index:	.res 	1		; index into line buffer
+buflen:	.res 	1		; length of used part of buffer
+cbs:	.res 	1		; current buffer size: buflen - index
+dataptr:.res 	2		; temp pointer to user buffer
+copylen:.res 	1		; temp counter
+
+	.bss
+
+linebuf:.res	LINEBUF		; the line buffer
+
+        .code
 
 do_line:
 	lda	buflen		; line buffer active?
@@ -86,7 +100,7 @@ do_line:
 newbuf:
 	lda	ICBLL,x		; get # of bytes read
 	sta	buflen
-	lda	#0
+	lda  	#0
 	sta	index		; fresh buffer
 
 	; restore user buffer address & length
@@ -129,7 +143,7 @@ icbll_copy:
 
 	lda	ICBAL,x		; buffer address
 	sta	dataptr
-	lda	ICBAH,x		; buffer address
+	lda  	ICBAH,x		; buffer address
 	sta	dataptr+1
 	lda	ICBLL,x
 	sta	copylen
@@ -163,18 +177,6 @@ btsmall:
 	lda	cbs
 	sta	ICBLL,x
 	bpl	icbll_copy
-
-	.segment	"EXTZP" : zeropage
-
-index:	.res	1		; index into line buffer
-buflen:	.res	1		; length of used part of buffer
-cbs:	.res	1		; current buffer size: buflen - index
-dataptr:.res	2		; temp pointer to user buffer
-copylen:.res	1		; temp counter
-
-	.bss
-
-linebuf:.res	LINEBUF		; the line buffer
 
 .endif		; .ifdef LINEBUF
 

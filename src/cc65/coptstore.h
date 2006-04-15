@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2006, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -83,6 +83,25 @@ unsigned OptStore4 (CodeSeg* S);
  *
  * and remove the useless load, provided that the next insn doesn't use flags
  * from the load.
+ */
+
+unsigned OptStore5 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *      lda     foo
+ *      ldx     bar
+ *      sta     something
+ *      stx     something-else
+ *
+ * and replace it by
+ *
+ *      lda     foo
+ *      sta     something
+ *      lda     bar
+ *      sta     something-else
+ *
+ * if X is not used later. This replacement doesn't save any cycles or bytes,
+ * but it keeps the value of X, which may be reused later.
  */
 
 

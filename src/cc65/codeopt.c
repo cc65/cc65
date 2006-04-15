@@ -1865,6 +1865,7 @@ static OptFunc DOptStore1       = { OptStore1,       "OptStore1",        70, 0, 
 static OptFunc DOptStore2       = { OptStore2,       "OptStore2",       220, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore3       = { OptStore3,       "OptStore3",       120, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore4       = { OptStore4,       "OptStore4",        50, 0, 0, 0, 0, 0 };
+static OptFunc DOptStore5       = { OptStore5,       "OptStore5",       100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",        	100, 0, 0, 0, 0, 0 };
@@ -1939,6 +1940,7 @@ static OptFunc* OptFuncs[] = {
     &DOptStore2,
     &DOptStore3,
     &DOptStore4,
+    &DOptStore5,
     &DOptStoreLoad,
     &DOptSub1,
     &DOptSub2,
@@ -2200,6 +2202,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptAdd2, 1);
     Changes += RunOptFunc (S, &DOptAdd4, 1);
     Changes += RunOptFunc (S, &DOptStore4, 1);
+    Changes += RunOptFunc (S, &DOptStore5, 1);
     Changes += RunOptFunc (S, &DOptShift1, 1);
     Changes += RunOptFunc (S, &DOptShift2, 1);
     Changes += RunOptFunc (S, &DOptShift3, 1);
@@ -2274,6 +2277,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptDupLoads, 1);
        	C += RunOptFunc (S, &DOptStoreLoad, 1);
        	C += RunOptFunc (S, &DOptTransfers1, 1);
+       	C += RunOptFunc (S, &DOptStore5, 1);
         C += RunOptFunc (S, &DOptPushPop, 1);
         C += RunOptFunc (S, &DOptPrecalc, 1);
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2006 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -1868,6 +1868,7 @@ static OptFunc DOptStore4       = { OptStore4,       "OptStore4",        50, 0, 
 static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",        	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptSub3	       	= { OptSub3,   	     "OptSub3",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",       	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers1  	= { OptTransfers1,   "OptTransfers1",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers2  	= { OptTransfers2,   "OptTransfers2",    60, 0, 0, 0, 0, 0 };
@@ -1941,6 +1942,7 @@ static OptFunc* OptFuncs[] = {
     &DOptStoreLoad,
     &DOptSub1,
     &DOptSub2,
+    &DOptSub3,
     &DOptTest1,
     &DOptTransfers1,
     &DOptTransfers2,
@@ -2245,6 +2247,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptNegA2, 1);
        	C += RunOptFunc (S, &DOptSub1, 1);
        	C += RunOptFunc (S, &DOptSub2, 1);
+       	C += RunOptFunc (S, &DOptSub3, 1);
        	C += RunOptFunc (S, &DOptAdd5, 1);
        	C += RunOptFunc (S, &DOptAdd6, 1);
        	C += RunOptFunc (S, &DOptStackOps, 1);

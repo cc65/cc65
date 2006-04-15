@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2006, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -76,6 +76,11 @@ unsigned OptSub2 (CodeSeg* S);
  *      lda     yy
  *     	sbc     xx
  *      sta     yy
+ */
+
+unsigned OptSub3 (CodeSeg* S);
+/* Search for a call to decaxn and replace it by an 8 bit sub if the X register
+ * is not used later.
  */
 
 

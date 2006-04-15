@@ -2277,6 +2277,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptDupLoads, 1);
        	C += RunOptFunc (S, &DOptStoreLoad, 1);
        	C += RunOptFunc (S, &DOptTransfers1, 1);
+       	C += RunOptFunc (S, &DOptStore1, 1);
        	C += RunOptFunc (S, &DOptStore5, 1);
         C += RunOptFunc (S, &DOptPushPop, 1);
         C += RunOptFunc (S, &DOptPrecalc, 1);
@@ -2319,7 +2320,7 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 /* Run another round of pattern replacements. These are done late, since there
  * may be better replacements before.
  */
-{
+{                                      
     unsigned Changes = 0;
 
     Changes += RunOptFunc (S, &DOptPush1, 1);
@@ -2353,6 +2354,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
              */
             Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
             Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+            Changes += RunOptFunc (S, &DOptStore5, 1);
         }
     }
     C = RunOptFunc (S, &DOptSize2, 1);
@@ -2363,6 +2365,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
          */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+        Changes += RunOptFunc (S, &DOptStore5, 1);
     }
 
     /* Adjust branch distances */

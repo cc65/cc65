@@ -62,8 +62,7 @@ unsigned OptStore1 (CodeSeg* S)
  *      ldy     #n+1
  *      jsr     ldaxysp
  *
- * and remove the useless load, provided that the next insn doesn't use flags
- * from the load.
+ * and remove the useless load.
  */
 {
     unsigned Changes = 0;
@@ -72,7 +71,7 @@ unsigned OptStore1 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[5];
+	CodeEntry* L[4];
 
       	/* Get next entry */
        	L[0] = CS_GetEntry (S, I);
@@ -82,12 +81,11 @@ unsigned OptStore1 (CodeSeg* S)
 	    CE_IsConstImm (L[0])                            &&
             L[0]->Num < 0xFF                                &&
 	    !CS_RangeHasLabel (S, I+1, 3)                   &&
-       	    CS_GetEntries (S, L+1, I+1, 4)                  &&
+       	    CS_GetEntries (S, L+1, I+1, 3)                  &&
             CE_IsCallTo (L[1], "staxysp")                   &&
             L[2]->OPC == OP65_LDY                           &&
             CE_IsKnownImm (L[2], L[0]->Num + 1)             &&
-            CE_IsCallTo (L[3], "ldaxysp")                   &&
-            !CE_UseLoadFlags (L[4])) {
+            CE_IsCallTo (L[3], "ldaxysp")) {
 
        	    /* Register has already the correct value, remove the loads */
 	    CS_DelEntries (S, I+2, 2);

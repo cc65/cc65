@@ -501,7 +501,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
     X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+4);
 
-    /* Remove the push and the call to the staspidx function */
+    /* Remove the push and the call to the staxspidx function */
     RemovePushAndOp (D);
 
     /* We changed the sequence */

@@ -16,7 +16,7 @@
 ; call2048 : rem
 ; call2048:rem arg1 " arg 2 is quoted "  arg3 "" arg5
 ;
-; "call" and "rem" are entokenned; the args. are not.  Leading and trailing
+; "call" and "rem" are entokenned; the args. are not. Leading and trailing
 ; spaces outside of quotes are ignored.
 
 ; TO-DO:
@@ -69,10 +69,19 @@ initmainargs:
         bne	:-
         ldy	#$01 * 2	; Start with argv[1]
 
-; Find the next argument.
+; Find the next argument. Stop if the end of the string or a character with the
+; hibit set is reached. The later is true if the string isn't already parsed by
+; BASIC (as expected) but is a still unprocessed input string. In this case the
+; string isn't the expected command-line at all. We found this out the hard way
+; by BRUNing the program with ProDOS on a machine with a slot-based clock (like
+; the Thunder Clock). ProDOS called the clock firmware which places the current
+; date as BASIC input string with hibits set in the input buffer. While looking
+; for the REM token we stumbled across the first '2' character ($32+$80 = $B2)
+; and interpreted the rest of the date as a spurious command-line parameter.
 
 next:   lda	BASIC_BUF,x
         beq	done
+        bmi	done
         inx
         cmp	#' '		; Skip leading spaces
         beq	next

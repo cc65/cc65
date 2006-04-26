@@ -65,13 +65,19 @@ function.
 <sect1><tt/apple2.h/<label id="apple2.h"><p>
 
 <itemize>
+<item>_dos_type
 <item><ref id="get_ostype" name="get_ostype">
 </itemize>
 
 
 <sect1><tt/apple2enh.h/<label id="apple2enh.h"><p>
 
-(incomplete)
+<itemize>
+<item>_dos_type
+<item>_textframe
+<item>_textframexy
+<item><ref id="get_ostype" name="get_ostype">
+</itemize>
 
 
 <sect1><tt/assert.h/<label id="assert.h"><p>
@@ -4974,5 +4980,3 @@ cursor. Zero is returned for the uppermost screen position.
 
 
 </article>
-
-

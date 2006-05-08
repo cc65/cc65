@@ -33,20 +33,28 @@
 
 MAXARGS = 10
 
+; ProDOS stores the filename in the second half of BASIC's input buffer, so
+; there are 128 characters left. At least 7 characters are necessary for the
+; CALLxxxx:REM so 121 characters may be used before overwriting the ProDOS
+; filename. As we don't want to put further restrictions on the command-line
+; length we reserve those 121 characters terminated by a zero.
+
+BUF_LEN = 122
+
 BASIC_BUF = $200
 FNAM_LEN  = $280
 FNAM      = $281
 REM       = $B2			; BASIC token-code
 
 ; Get possible command-line arguments. Goes into the special INIT segment,
-; which may be reused after the startup code is run
+; which may be reused after the startup code is run.
 
         .segment        "INIT"
 
 initmainargs:
 
 ; Assume that the program was loaded, a moment ago, by the traditional BLOAD
-; statement of BASIC.SYSTEM. Save the "most-recent filename" as argument #0.
+; statement of BASIC.SYSTEM. Save the filename as argument #0 if available.
 
         ldx	__dos_type	; No ProDOS -> argv[0] = ""
         beq	:+
@@ -67,7 +75,25 @@ initmainargs:
         inx
         cmp	#REM
         bne	:-
-        ldy	#$01 * 2	; Start with argv[1]
+
+; If a clock is present it is called by ProDOS on file operations. On machines
+; with a slot-based clock (like the Thunder Clock) the clock firmware places
+; the current date in BASIC's input buffer. Therefore we have to create a copy
+; of the command-line in a different buffer before the original is potentially
+; destroyed.
+
+	ldy	#$00
+:	lda	BASIC_BUF,x
+	sta	buffer,y
+	inx
+	iny
+	cpy	#BUF_LEN - 1	; Keep the terminating zero intact
+	bcc	:-
+
+; Start processing the arguments.
+
+	ldx	#$00
+	ldy	#$01 * 2	; Start with argv[1]
 
 ; Find the next argument. Stop if the end of the string or a character with the
 ; hibit set is reached. The later is true if the string isn't already parsed by
@@ -79,7 +105,7 @@ initmainargs:
 ; for the REM token we stumbled across the first '2' character ($32+$80 = $B2)
 ; and interpreted the rest of the date as a spurious command-line parameter.
 
-next:   lda	BASIC_BUF,x
+next:   lda	buffer,x
         beq	done
         bmi	done
         inx
@@ -92,39 +118,40 @@ next:   lda	BASIC_BUF,x
 ; first character.
 
         cmp	#'"'		; Is the argument quoted?
-        beq	setterm		; Jump if so
+        beq	:+		; Jump if so
         dex			; Reset pointer to first argument character
         lda	#' '		; A space ends the argument
-setterm:sta     tmp1		; Set end of argument marker
+:       sta     tmp1		; Set end of argument marker
 
-; Now store a pointer to the argument into the next slot. Since the BASIC
-; input buffer is located at the start of a RAM page, no calculations are
-; necessary.
+; Now store a pointer to the argument into the next slot.
 
         txa			; Get low byte
+        clc
+        adc	#<buffer
         sta	argv,y		; argv[y] = &arg
         iny
-        lda	#>BASIC_BUF
+        lda	#$00
+        adc	#>buffer
         sta	argv,y
         iny
         inc	__argc		; Found another arg
 
-; Search for the end of the argument
+; Search for the end of the argument.
 
-argloop:lda     BASIC_BUF,x
+:       lda     buffer,x
         beq	done
         inx
         cmp	tmp1
-        bne	argloop
+        bne	:-
 
 ; We've found the end of the argument. X points one character behind it, and
 ; A contains the terminating character. To make the argument a valid C string,
 ; replace the terminating character by a zero.
 
         lda	#$00
-        sta	BASIC_BUF-1,x
+        sta	buffer-1,x
 
-; Check if the maximum number of command line arguments is reached. If not,
+; Check if the maximum number of command-line arguments is reached. If not,
 ; parse the next one.
 
         lda	__argc		; Get low byte of argument count
@@ -146,3 +173,7 @@ done:   lda	#<argv
 
 argv:   .addr	FNAM
         .res	MAXARGS * 2
+
+	.bss
+
+buffer:	.res	BUF_LEN

@@ -187,7 +187,7 @@ configuration.
 
   <tag><tt/c64-vdc.emd/</tag>
   A driver for the VDC memory of the C128. Written and contributed by Maciej
-  WitkowiakCan be used if the program is running in C64 mode of the C128.
+  Witkowiak. Can be used if the program is running in C64 mode of the C128.
   Autodetects the amount of memory available (16 or 64K) and offers 64 or 256
   pages of 256 bytes each.
 
@@ -214,14 +214,24 @@ configuration.
   Supports up to two standard joysticks connected to the joysticks port of
   the C64.
 
-</descrip><p>
+  <tag><tt/c64-numpad.joy/</tag>
+  Supports one joystick emulated by the numberpad of the C128 in C64 mode,
+  the firebutton is labeled &dquot;5&dquot; and ENTER.
 
+</descrip><p>
 
 
 <sect1>Mouse drivers<p>
 
-Currently no drivers available (in fact, the API for loadable mouse drivers
-does not exist).
+<descrip>
+
+  <tag><tt/c64-1351.mou/</tag>
+  Supports a standard mouse connected to port #0 of the C64.
+
+  <tag><tt/c64-joy.mou/</tag>
+  Supports a mouse emulated by a standard joystick in port #0 of the C64.
+
+</descrip><p>
 
 
 <sect1>RS232 device drivers<p>

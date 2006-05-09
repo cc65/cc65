@@ -50,9 +50,9 @@ linker config.
 <sect>Memory layout<p>
 
 cc65 generated programs with the default setup run with the kernal and basic
-banked out. This gives a usable memory range of &dollar;1000 - &dollar;4000
-(or &dollar;8000 i the machine is equipped with 32K RAM or more). Having the
-kernal and basic ROMs banked out means, that no ROM entry points may be called
+banked in. This gives a usable memory range of &dollar;1000 - &dollar;4000
+(or &dollar;8000 if the machine is equipped with 32K RAM or more). Having the
+kernal and basic ROMs banked in means, that ROM entry points may be called
 directly from user code.
 
 Special locations:

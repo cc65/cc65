@@ -1211,27 +1211,31 @@ CharAgain:
 	    return;
 
         case EOF:
-	    /* Check if we have any open .IFs in this file */
-	    CheckOpenIfs ();
-	    /* Check if we have any open token lists in this file */
-	    CheckInputStack ();
-
-	    /* If this was an include file, then close it and read the next
-             * token. When an include file is opened, the last token of the
-             * old file is not skipped, to prevent the lookahead to read
-             * the next line of the old input file. So we do effectively
-             * skip the last token in the old file (the file name of the
-             * include statement).
-	     * In case of the main file, do not close it, but return EOF.
-	     */
+            CheckInputStack ();
             if (IData) {
                 /* Input came from internal data */
                 DoneInputData ();
                 goto Again;
 	    } else if (ICount > 1) {
+                /* We're at the end of an include file. Check if we have any
+                 * open .IFs, or any open token lists in this file. This
+                 * enforcement is artificial, using conditionals that start
+                 * in one file and end in another are uncommon, and don't
+                 * allowing these things will help finding errors.
+                 */
+                CheckOpenIfs ();
+
+                /* Close the include file and read the next token. When an
+                 * include file is opened, the last token of the old file is
+                 * not skipped, to prevent the lookahead to read the next line
+                 * of the old input file. So we do effectively skip the last
+                 * token in the old file (the file name of the include
+                 * statement).
+                 */
 	    	DoneInputFile ();
                 goto Again;
 	    } else {
+       	        /* In case of the main file, do not close it, but return EOF. */
 		Tok = TOK_EOF;
 	    }
 	    return;

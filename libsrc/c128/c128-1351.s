@@ -37,6 +37,10 @@ HEADER:
         .addr   IOCTL
         .addr   IRQ
 
+; Mouse driver flags
+
+        .byte   MOUSE_FLAG_LATE_IRQ
+
 ; Callback table, set by the kernel before INSTALL is called
 
 CHIDE:  jmp     $0000                   ; Hide the cursor

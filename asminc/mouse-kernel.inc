@@ -2,11 +2,11 @@
 ;/*                                                                           */
 ;/*                            mouse-kernel.inc                               */
 ;/*                                                                           */
-;/*				   Mouse API				      */
+;/*			     	   Mouse API				      */
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */
-;/* (C) 2003-2004 Ullrich von Bassewitz                                       */
+;/* (C) 2003-2006 Ullrich von Bassewitz                                       */
 ;/*               Römerstraße 52                                              */
 ;/*               D-70794 Filderstadt                                         */
 ;/* EMail:        uz@cc65.org                                                 */
@@ -69,6 +69,7 @@
             IOCTL       .addr
 	    IRQ	     	.addr
 	.endstruct
+        FLAGS           .byte           ; Mouse driver flags
         CALLBACKS .struct               ; Jump instructions
                         .byte           ; JMP opcode
             CHIDE       .addr           ; Jump address
@@ -94,7 +95,16 @@
 ;------------------------------------------------------------------------------
 ; The mouse API version, stored in MOUSE_HDR::VERSION
 
-MOUSE_API_VERSION       = $00
+MOUSE_API_VERSION       = $01
+
+;------------------------------------------------------------------------------
+; Bitmapped mouse driver flags, stored in MOUSE_HDR::FLAGS.
+; Note: If neither of MOUSE_FLAG_XXX_IRQ is set, no interrupts are supplied
+; to the driver. If one of the bits is set, the interrupt vector MUST be
+; valid.
+
+MOUSE_FLAG_EARLY_IRQ    = $40           ; Enable IRQ *before* calling INSTALL
+MOUSE_FLAG_LATE_IRQ     = $80           ; Enable IRQ *after* calling INSTALL
 
 ;------------------------------------------------------------------------------
 ; Mouse button definitions

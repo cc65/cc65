@@ -35,6 +35,7 @@ mouse_pos:      jmp     return0
 mouse_info:     jmp     return0
 mouse_ioctl:    jmp     return0
 mouse_irq:	.byte	$60, $00, $00	; RTS plus two dummy bytes
+mouse_flags:    .byte   $00
 
 ; Driver header signature
 .rodata
@@ -77,6 +78,12 @@ _mouse_install:
         cpy     #(MOUSE_HDR::JUMPTAB + .sizeof(MOUSE_HDR::JUMPTAB))
         bne     @L1
 
+; Copy the flags byte. It is located directly behind the jump vectors, so Y
+; is already correct when we come here. To save code, we use copyjv - crude
+; but effective.
+
+        jsr     copyjv
+
 ; Copy the callback vectors into the driver space
 
         jsr     popsreg
@@ -94,23 +101,34 @@ _mouse_install:
 
 ; Install the IRQ vector if the driver needs it
 
-        lda     mouse_irq+2             ; Check high byte of IRQ vector
-        beq     @L3                     ; Jump if vector invalid
-   	lda	#$4C			; Jump opcode
-       	sta    	mouse_irq               ; Activate IRQ routine
+        bit     mouse_flags             ; Test MOUSE_FLAG_EARLY_IRQ
+        bvc     @L3                     ; Jump if no interrupts at this time
+       	jsr     install_irq             ; Activate IRQ routine
 
 ; Call driver install routine and check for errors
 
 @L3:    jsr     mouse_install
         tay                             ; Test error code
-        beq     @L4			; Jump if no error
+        bne     uninstall_irq           ; Jump on error
 
-; Uninstall IRQ vector if install routine had errors. A/X contains the error
-; code from mouse_install, so don't use it.
+; No errors on INSTALL. If the driver needs late IRQs, enable them now. Be
+; careful not to use A/X since these registers contain the error code from
+; INSTALL.
 
+        bit     mouse_flags             ; Test MOUSE_FLAG_LATE_IRQ
+        bpl     Exit                    ; Jump if vector not needed
+install_irq:
+       	ldy	#$4C			; Jump opcode
+       	sty    	mouse_irq               ; Activate IRQ routine
+Exit:   rts
+
+; Uninstall IRQ vector if install routine had errors. A/X may contain the
+; error code from mouse_install, so don't use it.
+
+uninstall_irq:
 	ldy	#$60                    ; RTS opcode
 	sty	mouse_irq               ; Disable IRQ entry point
-@L4:    rts
+        rts
 
 ; Driver signature invalid. One word is still on the stack
 
@@ -141,9 +159,7 @@ copycb: lda     (sreg),y
 ; /* Uninstall the currently loaded driver. Returns an error code. */
 
 _mouse_uninstall:
-	lda	#$60                    ; RTS opcode
-	sta	mouse_irq               ; Disable IRQ entry point
-
+	jsr     uninstall_irq           ; Disable driver interrupts
         jsr     mouse_uninstall         ; Call driver routine
 
 mouse_clear_ptr:                        ; External entry point

@@ -46,6 +46,9 @@ status		:= $0778
 	.addr	IOCTL
 	.addr	IRQ
 
+        ; Mouse driver flags
+        .byte   MOUSE_FLAG_EARLY_IRQ
+
 	; Callback table, set by the kernel before INSTALL is called
 CHIDE:	jmp	$0000			; Hide the cursor
 CSHOW:	jmp	$0000			; Show the cursor
@@ -55,10 +58,10 @@ CMOVEY: jmp	$0000			; Move the cursor to Y coord
 ; ------------------------------------------------------------------------
 
 	.bss
-	
+
 slot:	.res	1
 visible:.res	1
-		
+
 ; ------------------------------------------------------------------------
 
 	.rodata
@@ -78,7 +81,7 @@ size	= * - values
 ; ------------------------------------------------------------------------
 
 	.data
-	
+
 info:	.word	279 / 2		; MOUSE_INFO::MOUSE_POS::XCOORD
 	.word	191 / 2		; MOUSE_INFO::MOUSE_POS::YCOORD
 	.byte	%00000000	; MOUSE_INFO::BUTTONS
@@ -95,7 +98,7 @@ xparam: ldx	#$FF		; Patched at runtime
 yparam: ldy	#$FF		; Patched at runtime
 
 jump:	jmp	$FFFF		; Patched at runtime
-	
+
 ; ------------------------------------------------------------------------
 
 	.code
@@ -127,13 +130,13 @@ next:	inc	ptr1+1
 	bne	next
 	dex
 	bpl	:-
-	
+
 	; Get and patch firmware address hibyte
 	lda	ptr1+1
 	sta	lookup+2
 	sta	xparam+1
 	sta	jump+2
-	
+
 	; Convert to and save slot number
 	and	#$0F
 	sta	slot
@@ -158,7 +161,7 @@ next:	inc	ptr1+1
 	ldx	#SETMOUSE
 	jsr	firmware
 
-	; Set initial mouse clamps	
+	; Set initial mouse clamps
 	lda	#<279
 	ldx	#>279
 	sta	pos2_lo
@@ -206,7 +209,7 @@ UNINSTALL:
 	; Hide cursor
 	sei
 	jsr	CHIDE
-	
+
 	; Turn mouse off
 	lda	#%00000000
 	ldx	#SETMOUSE
@@ -252,7 +255,7 @@ BOX:
 	ldx	#$01		; Set y clamps
 	ldy	#$00		; Start at top of stack
 	jsr	:+
-	
+
 	ldx	#$00		; Set x clamps
 	ldy	#$00		; Start at top of stack
 
@@ -307,7 +310,7 @@ MOVE:
 
 	; Update cursor
 	jsr	update
-	
+
 	ldx	#POSMOUSE
 	bne	common		; Branch always
 
@@ -345,7 +348,7 @@ IOCTL:
 	lda     #<MOUSE_ERR_INV_IOCTL
 	ldx     #>MOUSE_ERR_INV_IOCTL
 	rts
-	
+
 ; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All
 ; registers are already saved, no parameters are passed, but the carry flag
 ; is clear on entry. The routine must return with carry set if the interrupt
@@ -365,7 +368,7 @@ IRQ:
 	ldy	slot
 	lda	status,y
 	tax			; Save status
-	
+
 	; Extract button down values
 	asl			;  C = Button 0 is currently down
 	and	#%00100000	; !Z = Button 1 is currently down
@@ -376,7 +379,7 @@ IRQ:
 :	bcc	:+
 	ora	#MOUSE_BTN_LEFT
 :	sta	info + MOUSE_INFO::BUTTONS
-	
+
 	; Check for mouse movement
 	txa			; Restore status
 	and	#%00100000	; X or Y changed since last READMOUSE
@@ -384,7 +387,7 @@ IRQ:
 
 	; Remove the cursor at the old position
 update:	jsr	CHIDE
-	
+
 	; Get and set the new X position
 	ldy	slot
 	lda	pos1_lo,y
@@ -392,7 +395,7 @@ update:	jsr	CHIDE
 	sta	info + MOUSE_POS::XCOORD
 	stx	info + MOUSE_POS::XCOORD+1
 	jsr	CMOVEX
-	
+
 	; Get and set the new Y position
 	ldy	slot
 	lda	pos2_lo,y

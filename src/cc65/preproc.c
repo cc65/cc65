@@ -1064,6 +1064,7 @@ static int DoIf (int Skip)
      * the following line.
      */
     SB_AppendStr (Line, ";;");
+    SB_Terminate (Line);
 
     /* Load CurTok and NextTok with tokens from the new input */
     NextToken ();

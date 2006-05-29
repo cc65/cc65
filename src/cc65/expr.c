@@ -70,7 +70,7 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 
 
 /*****************************************************************************/
-/*			       Helper functions				     */
+/*   			       Helper functions				     */
 /*****************************************************************************/
 
 
@@ -127,7 +127,7 @@ static Type* promoteint (Type* lhst, Type* rhst)
        	if (IsSignUnsigned (lhst) || IsSignUnsigned (rhst)) {
        	    return type_ulong;
 	} else {
-	    return type_long;
+     	    return type_long;
 	}
     } else {
 	if (IsSignUnsigned (lhst) || IsSignUnsigned (rhst)) {
@@ -328,7 +328,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	    --FrameParams;
 	}
 
-	/* Do we have more than one parameter in the frame? */
+     	/* Do we have more than one parameter in the frame? */
 	if (FrameParams > 1) {
 	    /* Okeydokey, setup the frame */
 	    FrameOffs = StackPtr;
@@ -371,7 +371,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	    if ((Func->Flags & FD_VARIADIC) == 0) {
 	      	/* End of param list reached, no ellipsis */
      	      	Error ("Too many arguments in function call");
-	    }
+     	    }
 	    /* Assume an ellipsis even in case of errors to avoid an error
 	     * message for each other argument.
 	     */
@@ -543,7 +543,7 @@ static void FunctionCall (ExprDesc* Expr)
 	    	    RemoveCode (&Mark);
 	    	    PtrOnStack = 0;
 	    	} else {
-	    	    /* Load from the saved copy */
+     	    	    /* Load from the saved copy */
 	    	    g_getlocal (CF_PTR, PtrOffs);
 	    	}
 	    } else {
@@ -627,6 +627,7 @@ static void Primary (ExprDesc* E)
      * is an undefined macro and replace it by a constant value of zero.
      */
     if (Preprocessing && CurTok.Tok == TOK_IDENT) {
+	NextToken ();
         ED_MakeConstAbsInt (E, 0);
         return;
     }
@@ -1216,7 +1217,7 @@ void Store (ExprDesc* Expr, const Type* StoreType)
         case E_LOC_LITERAL:
             /* Static variable or literal in the literal pool */
             g_putstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal);
-            break;                 
+            break;
 
         case E_LOC_REGISTER:
             /* Register variable */

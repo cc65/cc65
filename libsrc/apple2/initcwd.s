@@ -4,21 +4,14 @@
 
         .export         initcwd
         .import		__cwd
-        .import		subysp, addysp
 
         .include	"zeropage.inc"
         .include        "mli.inc"
 
-        .segment	"INIT"
-
 initcwd:
-        ; Alloc prefix buffer
-        ldy	#1 + 64+1	; Length byte + max pathname length+trailing slash
-        jsr	subysp
-
-        ; Use allocated prefix buffer
-        lda	sp
-        ldx	sp+1
+        ; Set static prefix buffer
+        lda	#<__cwd
+        ldx	#>__cwd
         sta     mliparam + MLI::PREFIX::PATHNAME
         stx     mliparam + MLI::PREFIX::PATHNAME+1
 
@@ -26,24 +19,22 @@ initcwd:
         lda     #GET_PREFIX_CALL
         ldx     #PREFIX_COUNT
         jsr     callmli
-        bcs	done
 
         ; Check for null prefix
-        ldy	#$00
-        lda	(sp),y
-        beq	done
+	lda	__cwd
+	beq	done
 
-        ; Set current working directory
-        ; - omit trailing slash and length byte
-        ; - terminating zero already in place
-        tay
-        dey
-:       lda	(sp),y
-        sta	__cwd-1,y
-        dey
-        bne	:-
+	; Remove length byte and trailing slash
+	sta	tmp1
+	ldx	#$01
+:	lda	__cwd,x
+	sta	__cwd - 1,x
+	inx
+	cpx	tmp1
+	bcc	:-
 
-        ; Cleanup stack
-done:   ldy	#1 + 64+1	; Length byte + max pathname length+trailing slash
-        jmp     addysp
-
+	; Add terminating zero
+	lda	#$00
+	sta	__cwd - 1,x
+	
+done:	rts

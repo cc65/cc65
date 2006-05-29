@@ -6,7 +6,7 @@
 
         .export         __syschdir
         .import		pushname, popname
-	.import		__cwd
+	.import		initcwd
 
 	.include	"zeropage.inc"
 	.include	"mli.inc"
@@ -28,12 +28,8 @@ __syschdir:
         jsr	callmli
 	bcs	cleanup
 
-	ldy	#$01
-:	lda	(sp),y
-	sta	__cwd-1,y
-	beq	cleanup
-	iny
-	bne	:-		; Branch always
+	; Update current working directory
+	jsr	initcwd		; Returns with A = 0
 
         ; Cleanup name
 cleanup:jsr	popname		; Preserves A

@@ -102,6 +102,8 @@ MOUSE_API_VERSION       = $01
 ; Note: If neither of MOUSE_FLAG_XXX_IRQ is set, no interrupts are supplied
 ; to the driver. If one of the bits is set, the interrupt vector MUST be
 ; valid.
+; Beware: Some of the bits are tested using the BIT instruction, so do not
+; change the values without checking the code!
 
 MOUSE_FLAG_EARLY_IRQ    = $40           ; Enable IRQ *before* calling INSTALL
 MOUSE_FLAG_LATE_IRQ     = $80           ; Enable IRQ *after* calling INSTALL

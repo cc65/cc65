@@ -249,14 +249,14 @@ as each target varies in it's start and exit conditions.
 
 <sect1>Apple
 
-<sect2>AppleWin 1.10.4<p>
-Available at <url url="http://www.jantzer-schmidt.de/applewin/">:
+<sect2>AppleWin 1.x<p>
+Available at <url url="http://applewin.berlios.de/">:
 
-Emulates Apple II+/IIe computers, with sound, video, joysticks, serial port,
+Emulates Apple II/IIe computers, with sound, video, joysticks, serial port,
 and disk images. Includes monitor. Only for Windows. The package comes with
-ROM and DOS 3.3 disk (called "master.dsk") images; however, you will need
-<bf/a2tools/ (available at <url
-url="http://hotel04.ausys.se/pausch/apple2/#a2tools">).
+DOS 3.3 disk (called "master.dsk") images; however, you will need <bf/a2tools/
+(available at <url
+url="ftp://ftp.apple.asimov.net/pub/apple_II/unsorted/a2tools.zip">).
 
 Compile the tutorial with
 
@@ -292,8 +292,8 @@ BRUN TEST
 </verb></tscreen>
 
 You will see the "Hello, World!" appear on the same line.  Thanks to Oliver
-Schmidt, <htmlurl url="mailto:oliver@jantzer-schmidt.de"
-name="oliver@jantzer-schmidt.de"> for his help in completing this section.
+Schmidt, <htmlurl url="mailto:ol.sc@web.de" name="ol.sc@web.de"> for his help
+in completing this section.
 
 
 <sect1>Atari

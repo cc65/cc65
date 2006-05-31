@@ -59,6 +59,7 @@ CMOVEY: jmp	$0000			; Move the cursor to Y coord
 
 	.bss
 
+info:	.tag	MOUSE_INFO
 slot:	.res	1
 visible:.res	1
 
@@ -81,10 +82,6 @@ size	= * - values
 ; ------------------------------------------------------------------------
 
 	.data
-
-info:	.word	279 / 2		; MOUSE_INFO::MOUSE_POS::XCOORD
-	.word	191 / 2		; MOUSE_INFO::MOUSE_POS::YCOORD
-	.byte	%00000000	; MOUSE_INFO::BUTTONS
 
 firmware:
 	; Lookup and patch firmware address lobyte
@@ -191,6 +188,9 @@ next:	inc	ptr1+1
 	sta	pos2_hi,x
 	ldx	#POSMOUSE
 	jsr	firmware
+
+	; Update cursor
+	jsr	update
 
 	; Turn VBL interrupt on
 	lda	#%00001001

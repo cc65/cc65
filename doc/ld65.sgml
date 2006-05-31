@@ -153,6 +153,7 @@ Here is a description of all the command line options:
   <itemize>
   <item>none
   <item>apple2
+  <item>apple2enh
   <item>atari
   <item>atmos
   <item>c16 (works also for the c116 with memory up to 32K)

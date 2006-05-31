@@ -26,6 +26,7 @@ SGML =	apple2.sgml	\
 	c64.sgml	\
 	ca65.sgml	\
 	ca65html.sgml	\
+	cbm510.sgml	\
 	cbm610.sgml	\
 	cc65.sgml	\
 	cl65.sgml	\
@@ -111,13 +112,13 @@ zap:	clean
 
 # ------------------------------------------------------------------------------
 # Special target rules
-
+			 
 coding.html:	coding.sgml
 	sgml2html --split=0 $<
 
 # funcref.sgml's third section is huge.
 # So, funcref.html is split into sub-section files.
-#			 
+#
 funcref.html:	funcref.sgml
 	sgml2html --split=2 $(BUTTONS) $<
 

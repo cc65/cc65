@@ -151,8 +151,10 @@ MOUSE_BTN_RIGHT         = $01
         .global _mouse_info
         .global _mouse_ioctl
 
+	.global _mouse_clear_ptr
+
 ;------------------------------------------------------------------------------
-; Driver entry points
+; Driver entry points (asm callable)
 
         .global mouse_install
         .global mouse_uninstall

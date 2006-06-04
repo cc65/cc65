@@ -75,9 +75,22 @@ unsigned char __fastcall__ mouse_load_driver (const struct mouse_callbacks* c,
         if (Res == MLOAD_OK) {
 
             /* Check the driver signature, install the driver */
-            return mouse_install (c, ctrl.module);
+            Res = mouse_install (c, ctrl.module);
 
+	    /* If the driver did not install correctly, remove it from
+	     * memory again.
+	     */
+	    if (Res != MLOAD_OK) { 
+                /* Do not call mouse_uninstall here, since the driver is not
+                 * correctly installed.
+                 */
+                mod_free (mouse_drv);
+                mouse_clear_ptr ();
+            }
         }
+
+        /* Return the error code */
+        return Res;
     }
 
     /* Error loading the driver */

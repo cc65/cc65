@@ -162,7 +162,7 @@ _mouse_uninstall:
 	jsr     uninstall_irq           ; Disable driver interrupts
         jsr     mouse_uninstall         ; Call driver routine
 
-mouse_clear_ptr:                        ; External entry point
+_mouse_clear_ptr:                       ; External entry point
         lda     #0
         sta     _mouse_drv
         sta     _mouse_drv+1            ; Clear the driver pointer
@@ -170,3 +170,4 @@ mouse_clear_ptr:                        ; External entry point
         tax
         rts                             ; Return zero
 
+		   

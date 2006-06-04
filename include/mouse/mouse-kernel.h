@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2006, Ullrich von Bassewitz                                      */
+/*                Römerstraße 52                                             */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,6 +46,17 @@
 
 /* Mouse kernel variables */
 extern void*   	mouse_drv;       	/* Pointer to driver */
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+void mouse_clear_ptr (void);
+/* Clear the mouse_drv pointer */
 
 
 

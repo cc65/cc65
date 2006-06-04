@@ -8,26 +8,29 @@
         .include        "mouse-kernel.inc"
         .include        "modload.inc"
 
+        .import         return0
+
+
 
 _mouse_unload:
       	lda	_mouse_drv
+        pha                             ; Save pointer to driver
 	ora	_mouse_drv+1
        	beq    	no_driver		; No driver
-
-	lda	_mouse_drv
-	pha
 	lda	_mouse_drv+1
-	pha	      			; Save pointer to driver
+       	pha
 
        	jsr    	_mouse_uninstall        ; Uninstall the driver
 
 	pla
 	tax
 	pla				; Get pointer to driver
-        jmp	_mod_free               ; Free the driver
+        jsr     _mod_free               ; Free the driver
+        jmp     return0                 ; Return MOUSE_ERR_OK
 
 no_driver:
        	tax				; X = 0
+        pla                             ; Remove pushed junk
 	lda	#<MOUSE_ERR_NO_DRIVER
 	rts
 

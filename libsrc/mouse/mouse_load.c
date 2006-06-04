@@ -80,17 +80,17 @@ unsigned char __fastcall__ mouse_load_driver (const struct mouse_callbacks* c,
 	    /* If the driver did not install correctly, remove it from
 	     * memory again.
 	     */
-	    if (Res != MLOAD_OK) { 
+	    if (Res != MOUSE_ERR_OK) {
                 /* Do not call mouse_uninstall here, since the driver is not
                  * correctly installed.
                  */
                 mod_free (mouse_drv);
                 mouse_clear_ptr ();
             }
-        }
 
-        /* Return the error code */
-        return Res;
+            /* Return the error code */
+            return Res;
+        }
     }
 
     /* Error loading the driver */

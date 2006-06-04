@@ -4,8 +4,6 @@
 ; Common functions of the joystick API.
 ;
 
-        .export         joy_clear_ptr
-
         .importzp       ptr1
        	.interruptor    joy_irq		; Export as IRQ handler
 
@@ -117,7 +115,7 @@ _joy_uninstall:
 
         jsr     joy_uninstall           ; Call the driver routine
 
-joy_clear_ptr:                          ; External entry point
+_joy_clear_ptr:                         ; External entry point
         lda     #0
         sta     _joy_drv
         sta     _joy_drv+1              ; Clear the driver pointer

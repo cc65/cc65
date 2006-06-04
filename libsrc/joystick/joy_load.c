@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2006, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,6 +41,11 @@
 
 
 
+/* Use static local variables, since the module is not reentrant anyway */
+#pragma staticlocals (on);
+
+
+
 unsigned char __fastcall__ joy_load_driver (const char* name)
 /* Load a joystick driver and return an error code */
 {
@@ -68,8 +73,21 @@ unsigned char __fastcall__ joy_load_driver (const char* name)
         if (Res == MLOAD_OK) {
 
             /* Check the driver signature, install the driver */
-            return joy_install (ctrl.module);
+            Res = joy_install (ctrl.module);
 
+	    /* If the driver did not install correctly, remove it from
+	     * memory again.
+	     */
+	    if (Res != JOY_ERR_OK) {
+                /* Do not call mouse_uninstall here, since the driver is not
+                 * correctly installed.
+                 */
+                mod_free (joy_drv);
+                joy_clear_ptr ();
+            }
+
+            /* Return the error code */
+            return Res;
         }
     }
 

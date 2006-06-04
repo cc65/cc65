@@ -103,6 +103,7 @@ _ser_uninstall:
 	lda	#$60			; RTS opcode
 	sta	ser_irq			; Disable IRQ entry point
 
+_ser_clear_ptr:                         ; External entry point
         lda     #0
         sta     _ser_drv
         sta     _ser_drv+1              ; Clear the driver pointer

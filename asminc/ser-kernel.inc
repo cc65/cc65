@@ -6,10 +6,10 @@
 ;*                                                                          *
 ;*                                                                          *
 ;*                                                                          *
-;*(C) 2003      Ullrich von Bassewitz                                       *
-;*              Römerstrasse 52                                             *
-;*              D-70794 Filderstadt                                         *
-;*EMail:        uz@cc65.org                                                 *
+;*(C) 2003-2006, Ullrich von Bassewitz                                      *
+;*               Römerstrasse 52                                            *
+;*               D-70794 Filderstadt                                        *
+;*EMail:         uz@cc65.org                                                *
 ;*                                                                          *
 ;*                                                                          *
 ;*This software is provided 'as-is', without any expressed or implied       *
@@ -142,7 +142,7 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
 	.global	ser_irq
 
 ;------------------------------------------------------------------------------
-; ASM functions
+; C callable functions
 
         .global _ser_unload
         .global _ser_install
@@ -154,4 +154,5 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
         .global _ser_status
         .global _ser_ioctl
 
+        .global _ser_clear_ptr
 

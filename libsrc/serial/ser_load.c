@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2006, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,11 +50,19 @@
 /* Pointer to serial driver, exported from ser-kernel.s */
 extern void* ser_drv;
 
+/* Function that clears the driver pointer (ser-kernel.s) */
+void ser_clear_ptr (void);
+
 
 
 /*****************************************************************************/
 /*     	      	    	  	     Code	     			     */
 /*****************************************************************************/
+
+
+
+/* Use static local variables, since the module is not reentrant anyway */
+#pragma staticlocals (on);
 
 
 
@@ -77,7 +85,7 @@ unsigned char __fastcall__ ser_load_driver (const char* name)
 
         /* Load the module */
         Res = mod_load (&ctrl);
-                   
+
         /* Close the input file */
         close (ctrl.callerdata);
 
@@ -85,8 +93,21 @@ unsigned char __fastcall__ ser_load_driver (const char* name)
         if (Res == MLOAD_OK) {
 
             /* Check the driver signature, install the driver */
-            return ser_install (ctrl.module);
+            Res = ser_install (ctrl.module);
 
+	    /* If the driver did not install correctly, remove it from
+	     * memory again.
+	     */
+	    if (Res != SER_ERR_OK) {
+                /* Do not call ser_uninstall here, since the driver is not
+                 * correctly installed.
+                 */
+                mod_free (ser_drv);
+                ser_clear_ptr ();
+            }
+
+            /* Return the error code */
+            return Res;
         }
     }
 

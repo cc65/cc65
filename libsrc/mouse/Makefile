@@ -29,7 +29,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-C_OBJS =        mouse_load.o
+C_OBJS =
 
 S_OBJS =        mouse-kernel.o          \
                 mouse_box.o             \
@@ -38,6 +38,7 @@ S_OBJS =        mouse-kernel.o          \
                 mouse_hide.o            \
                 mouse_info.o            \
                 mouse_ioctl.o           \
+                mouse_load.o            \
                 mouse_move.o            \
                 mouse_pos.o             \
                 mouse_show.o            \

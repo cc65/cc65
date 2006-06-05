@@ -29,12 +29,13 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-C_OBJS =        ser_load.o
+C_OBJS =        
 
 S_OBJS =       	ser-kernel.o	\
                 ser_close.o     \
                 ser_get.o       \
                 ser_ioctl.o     \
+                ser_load.o      \
                 ser_open.o      \
                 ser_put.o       \
                 ser_status.o    \

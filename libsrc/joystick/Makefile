@@ -29,11 +29,12 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-C_OBJS =        joy_load.o
+C_OBJS =        
 
 S_OBJS =       	joy-kernel.o	\
        	       	joy_read.o	\
        	       	joy_count.o	\
+                joy_load.o      \
 		joy_unload.o
 
 #--------------------------------------------------------------------------

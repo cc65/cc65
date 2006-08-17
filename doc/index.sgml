@@ -138,6 +138,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="plus4.html" name="plus4.html"></tag>
   Topics specific to the Commodore Plus/4.
 
+  <tag><htmlurl url="supervision.html" name="supervision.html"></tag>
+  Topics specific to the Supervision Console.
+
   <tag><htmlurl url="vic20.html" name="vic20.html"></tag>
   Topics specific to the Commodore VIC20.
 

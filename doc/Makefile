@@ -46,6 +46,7 @@ SGML =	apple2.sgml	\
 	nes.sgml	\
 	pet.sgml	\
 	plus4.sgml	\
+        supervision.sgml\
 	vic20.sgml
 
 TXT  =	$(SGML:.sgml=.txt)
@@ -112,7 +113,7 @@ zap:	clean
 
 # ------------------------------------------------------------------------------
 # Special target rules
-			 
+
 coding.html:	coding.sgml
 	sgml2html --split=0 $<
 

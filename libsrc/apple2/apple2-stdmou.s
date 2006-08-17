@@ -6,6 +6,7 @@
 
 	.include	"zeropage.inc"
 	.include	"mouse-kernel.inc"
+	.include	"apple2.inc"
 
 ; ------------------------------------------------------------------------
 
@@ -136,6 +137,7 @@ next:	inc	ptr1+1
 
 	; Convert to and save slot number
 	and	#$0F
+	sei
 	sta	slot
 
 	; Convert to and patch I/O register index
@@ -144,14 +146,32 @@ next:	inc	ptr1+1
 	asl
 	asl
 	sta	yparam+1
-
-	; Apple II Mouse TechNote #1, Interrupt Environment with the Mouse:
-	; "Disable interrupts when calling any mouse routine."
-	sei
+	
+	.ifdef	__APPLE2ENH__
+	; Save LC read state
+	ldx	#<ROMIN
+	bit	RDLCRAM
+	bpl	:+
+	ldx	#<LCBANK1
+	bit	RDLCBNK2
+	bpl	:+
+	ldx	#<LCBANK2
+:	phx
+	
+	; The AppleMouse II Card needs the ROM swapped in
+	; to be able to detect an Apple //e and use RDVBL
+	sta	ROMIN		; STA keeps LC write state
+	.endif
 
 	; Reset mouse hardware
 	ldx	#INITMOUSE
 	jsr	firmware
+	
+	.ifdef	__APPLE2ENH__
+	; Restore LC read state
+	plx
+	sta	$C000,x		; STA keeps LC write state
+	.endif	
 
 	; Turn mouse on
 	lda	#%00000001
@@ -354,12 +374,16 @@ IOCTL:
 ; is clear on entry. The routine must return with carry set if the interrupt
 ; was handled, otherwise with carry clear.
 IRQ:
+	; Check for installed mouse
+	lda	slot
+	beq	done
+
 	; Check for mouse interrupt
 	ldx	#SERVEMOUSE
 	jsr	firmware
 	bcc	:+
 	clc			; Interrupt not handled
-	rts
+done:	rts
 
 :	ldx	#READMOUSE
 	jsr	firmware

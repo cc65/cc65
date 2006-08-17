@@ -31,15 +31,24 @@ PWREDUP :=      $03F4	; This must be = EOR #$A5 of SOFTEV+1
 KBD     :=      $C000	; Read keyboard
 KBDSTRB :=      $C010	; Clear keyboard strobe
 
-; 80 column card switches
+; 80 column video switches
 CLR80COL:=      $C000	; Disable 80 column store
 SET80COL:=      $C001	; Enable 80 column store
+RD80VID :=      $C01F   ; >127 if 80 column video enabled
+
+; Character set switches
 CLRALTCHAR :=   $C00E   ; Normal Apple II char set
 SETALTCHAR :=   $C00F   ; Norm/inv LC, no flash
 ALTCHARSET :=   $C01E   ; >127 if alt charset switched in
-RD80VID :=      $C01F   ; >127 if 80 column video enabled
 
-; Video soft switches
+; Language card switches
+RDLCBNK2 :=	$C011	; >127 if LC bank 2 in use
+RDLCRAM	:=	$C012	; >127 if LC is read enabled
+ROMIN	:=	$C081	; Swap in D000-FFFF ROM
+LCBANK2	:=	$C083	; Swap in LC bank 2
+LCBANK1	:=	$C08B	; Swap in LC bank 1
+
+; Video mode switches
 MIXCLR  :=      $C052	; Disable 4 lines of text
 MIXSET  :=      $C053	; Enable 4 lines of text
 LOWSCR  :=      $C054	; Page 1

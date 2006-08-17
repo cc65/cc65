@@ -720,10 +720,10 @@ file, so that the new segment starts at an address that is divideable by the
 given number without a remainder. All addresses are adjusted accordingly. To
 fill the unused space, bytes of zero are used, or, if the memory area has a
 "<tt/fillval/" attribute, that value. Alignment is always needed, if you have
-the used the <tt/.ALIGN/ command in the assembler. The alignment of a segment
+used the <tt/.ALIGN/ command in the assembler. The alignment of a segment
 must be equal or greater than the alignment used in the <tt/.ALIGN/ command.
 The linker will check that, and issue a warning, if the alignment of a segment
-is lower than the alignment requested in a <tt/.ALIGN/ command of one of the
+is lower than the alignment requested in an <tt/.ALIGN/ command of one of the
 modules making up this segment.
 
 For a given segment you may also specify a fixed offset into a memory area or

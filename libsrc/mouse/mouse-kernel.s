@@ -159,8 +159,20 @@ copycb: lda     (sreg),y
 ; /* Uninstall the currently loaded driver. Returns an error code. */
 
 _mouse_uninstall:
+
+; Depending on the late/early IRQ flag, we will disable IRQs before or after
+; calling the driver mouse_uninstall routine.
+
+        bit     mouse_flags             ; Test MOUSE_FLAG_LATE_IRQ
+        bpl     @L1                     ; Don't disable interrupts now
 	jsr     uninstall_irq           ; Disable driver interrupts
-        jsr     mouse_uninstall         ; Call driver routine
+@L1:    jsr     mouse_uninstall         ; Call driver routine
+
+; We don't check the flag a second time here, since disabling IRQs twice,
+; or disabling them if they weren't enabled will do no harm, and the missing
+; check will save a few bytes.
+
+        jsr     uninstall_irq           ; Disable driver interrupts
 
 _mouse_clear_ptr:                       ; External entry point
         lda     #0
@@ -170,4 +182,4 @@ _mouse_clear_ptr:                       ; External entry point
         tax
         rts                             ; Return zero
 
-		   
+

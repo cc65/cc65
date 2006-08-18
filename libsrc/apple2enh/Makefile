@@ -110,7 +110,7 @@ S_OBJS=	_scrsize.o	\
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS = apple2-lc.emd
+EMDS = apple2-auxmem.emd apple2-lc.emd
 
 JOYS = apple2-stdjoy.joy
 

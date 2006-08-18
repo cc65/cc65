@@ -47,6 +47,7 @@ apple2lib:
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
 	mv apple2/crt0.o apple2.o
+	cp apple2/apple2-auxmem.emd a2.auxmem.emd
 	cp apple2/apple2-lc.emd a2.lc.emd
 	cp apple2/apple2-stdjoy.joy a2.stdjoy.joy
 	cp apple2/apple2-stdmou.mou a2.stdmou.mou
@@ -63,6 +64,7 @@ apple2enhlib:
 	    $(AR) a apple2enh.lib $$i/*.o;\
 	done
 	mv apple2enh/crt0.o apple2enh.o
+	cp apple2enh/apple2-auxmem.emd a2e.auxmem.emd
 	cp apple2enh/apple2-lc.emd a2e.lc.emd
 	cp apple2enh/apple2-stdjoy.joy a2e.stdjoy.joy
 	cp apple2enh/apple2-stdmou.mou a2e.stdmou.mou

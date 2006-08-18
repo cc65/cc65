@@ -1,3 +1,7 @@
+closedir.s
+opendir.s
+readdir.s
+rewinddir.s
 *.emd
 *.joy
 *.mou

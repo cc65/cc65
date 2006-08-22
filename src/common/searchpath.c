@@ -33,7 +33,6 @@
 
 
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #if defined(_MSC_VER)
@@ -46,6 +45,7 @@
 
 /* common */
 #include "searchpath.h"
+#include "strbuf.h"
 #include "xmalloc.h"
 
 
@@ -107,14 +107,9 @@ static char* Find (const char* Path, const char* File)
  */
 {
     const char* P;
-    int Max;
-    char PathName [FILENAME_MAX];
+    StrBuf PathName = AUTO_STRBUF_INITIALIZER;
 
     /* Initialize variables */
-    Max = sizeof (PathName) - strlen (File) - 2;
-    if (Max < 0) {
-	return 0;
-    }
     P = Path;
 
     /* Handle a NULL pointer as replacement for an empty string */
@@ -124,22 +119,27 @@ static char* Find (const char* Path, const char* File)
 
     /* Start the search */
     while (*P) {
+	/* Clear the string buffer */
+	SB_Clear (&PathName);
+
         /* Copy the next path element into the buffer */
-     	int Count = 0;
-     	while (*P != '\0' && *P != ';' && Count < Max) {
-     	    PathName [Count++] = *P++;
+     	while (*P != '\0' && *P != ';') {
+	    SB_AppendChar (&PathName, *P++);
      	}
 
 	/* Add a path separator and the filename */
-	if (Count) {
-     	    PathName [Count++] = '/';
+       	if (SB_NotEmpty (&PathName)) {
+     	    SB_AppendChar (&PathName, '/');
 	}
-	strcpy (PathName + Count, File);
+	SB_AppendStr (&PathName, File);
+	SB_Terminate (&PathName);
 
 	/* Check if this file exists */
-	if (access (PathName, 0) == 0) {
-	    /* The file exists */
-	    return xstrdup (PathName);
+       	if (access (SB_GetBuf (&PathName), 0) == 0) {
+	    /* The file exists, return its name */
+	    char* Name = xstrdup (SB_GetBuf (&PathName));
+	    DoneStrBuf (&PathName);
+	    return Name;
 	}
 
 	/* Skip a list separator if we have one */
@@ -149,6 +149,7 @@ static char* Find (const char* Path, const char* File)
     }
 
     /* Not found */
+    DoneStrBuf (&PathName);
     return 0;
 }
 

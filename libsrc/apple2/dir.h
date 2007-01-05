@@ -49,9 +49,9 @@ struct DIR {
     union {
 	unsigned char bytes[512];
 	struct {
-	    unsigned prev_block;
-	    unsigned next_block;
-	    char     entries[1];
+	    unsigned      prev_block;
+	    unsigned      next_block;
+	    unsigned char entries[1];
 	} content;
     } block;
 };

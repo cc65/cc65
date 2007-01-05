@@ -43,9 +43,35 @@
 
 typedef struct DIR DIR;
 
+#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+
+struct dirent {
+    char          d_name[16];
+    unsigned      d_ino;
+    unsigned      d_blocks;
+    unsigned long d_size;
+    unsigned char d_type;
+    unsigned      d_cdate;
+    struct {
+	unsigned char mins;
+        unsigned char hours;
+    }             d_ctime;
+    unsigned char d_access;
+    unsigned      d_auxtype;
+    unsigned      d_mdate;
+    struct {
+	unsigned char mins;
+        unsigned char hours;
+    }             d_mtime;
+};
+
+#else  /* __APPLE2__ or __APPLE2ENH__ */
+
 struct dirent {
     char d_name[1];
 };
+
+#endif  /* __APPLE2__ or __APPLE2ENH__ */
 
 
 

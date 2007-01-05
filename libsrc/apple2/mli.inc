@@ -8,6 +8,9 @@ READ_BLOCK_CALL = $80
 WRITE_BLOCK_CALL= $81
 RW_BLOCK_COUNT  = 3
 
+GET_TIME_CALL   = $82
+GET_TIME_COUNT  = 0
+
 CREATE_CALL     = $C0
 CREATE_COUNT    = 7
 
@@ -113,5 +116,7 @@ EOF_COUNT       = 2
 
 ENTRY   :=      $BF00		; MLI call entry point
 DEVNUM  :=      $BF30		; Most recent accessed device
+DATELO  :=      $BF90		; Bits 15-9 = Year, 8-5 = Month, 4-0 = Day
+TIMELO  :=      $BF92		; Bits 12-8 = Hour, 5-0 = Minute
 PFIXPTR :=      $BF9A		; If = 0, no prefix active
 KVERSION:=      $BFFF           ; Kernel version number

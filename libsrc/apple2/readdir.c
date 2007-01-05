@@ -45,7 +45,7 @@
 
 struct dirent* __fastcall__ readdir (DIR* dir)
 {
-    char* entry;
+    unsigned char* entry;
 
     /* Search for the next active directory entry */
     do {
@@ -73,9 +73,18 @@ struct dirent* __fastcall__ readdir (DIR* dir)
 	++dir->current_entry;
     } while (entry[0] == 0);
 
-    /* Zero-terminate name */
-    entry[1 + (entry[0] & 15)] = '\0';
+    /* Move creation date/time to allow for next step below */
+    *(unsigned long*)&entry[0x1A] = *(unsigned long*)&entry[0x18];
+
+    /* Feature unsigned long access to EOF by extending from 3 to 4 bytes */
+    entry[0x18] = 0;
+
+    /* Move file type to allow for next step below */
+    entry[0x19] = entry[0x10];
+
+    /* Zero-terminate file name */
+    entry[0x01 + (entry[0x00] & 0x0F)] = 0;
 
     /* Return success */
-    return (struct dirent*)&entry[1];
+    return (struct dirent*)&entry[0x01];
 }

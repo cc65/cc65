@@ -71,12 +71,12 @@ struct dirent* __fastcall__ readdir (DIR* dir)
 
 	/* Switch to next entry */
 	++dir->current_entry;
-    } while (entry[0] == 0);
+    } while (entry[0x00] == 0);
 
     /* Move creation date/time to allow for next step below */
     *(unsigned long*)&entry[0x1A] = *(unsigned long*)&entry[0x18];
 
-    /* Feature unsigned long access to EOF by extending from 3 to 4 bytes */
+    /* Feature unsigned long access to EOF by extension from 3 to 4 bytes */
     entry[0x18] = 0;
 
     /* Move file type to allow for next step below */

@@ -388,7 +388,7 @@ sub Process1 {
        	chop ($Line);
 
        	# Check for a label
-       	if ($Line =~ /^\s*(\@?)([_a-zA-Z]\w*)\s*(:|=)/) {
+        if ($Line =~ /^\s*(\@?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)/)
 
 	    # Is this a local label?
 	    if ($1 eq "\@") {
@@ -559,7 +559,7 @@ sub Process2 {
 
        	# Check for a label at the start of the line. If we have one, process
         # it and remove it from the line
-	if ($Line =~ s/^\s*?(\@?)([_a-zA-Z]\w*)(\s*)(:|=)//) {
+        if ($Line =~ s/^\s*?(\@?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)//) {
 
 	    # Is this a local label?
        	    if ($1 eq "\@") {
@@ -825,7 +825,7 @@ sub Process2 {
 	    $OutLine .= Cleanup ($Line);
 
      	# Check for instructions with labels
-     	} elsif ($Line =~ /^($LabelIns)(\s+)(.*)$/) {
+        } elsif ($Line =~ /^($LabelIns)\b(\s+)(.*)$/) {
 
 	    # Print the instruction and white space
             $OutLine .= ColorizeKeyword ($1) . $2;
@@ -854,7 +854,7 @@ sub Process2 {
        	    $OutLine .= $Operand;
 
      	# Check for all other instructions
-     	} elsif ($Line =~ /^($AllIns)(.*)$/) {
+        } elsif ($Line =~ /^($AllIns)\b(.*)$/) {
 
 	    # Colorize and print
             $OutLine .= ColorizeKeyword ($1) . Cleanup ($2);

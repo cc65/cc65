@@ -1894,7 +1894,7 @@ static void parseadd (ExprDesc* Expr)
     	    	Error ("Invalid operands for binary operator `+'");
     	    }
 
-    	} else {
+       	} else {
 
 	    /* lhs is a constant and rhs is not constant. Load rhs into
 	     * the primary.
@@ -1974,6 +1974,7 @@ static void parseadd (ExprDesc* Expr)
     	    } else {
        	       	/* OOPS */
     	    	Error ("Invalid operands for binary operator `+'");
+                flags = CF_INT;
        	    }
 
     	    /* Result is a rvalue in primary register */
@@ -2014,6 +2015,7 @@ static void parseadd (ExprDesc* Expr)
        	    } else {
        	       	/* OOPS */
     	    	Error ("Invalid operands for binary operator `+'");
+                flags = CF_INT;
     	    }
 
     	    /* Generate code for the add */
@@ -2052,6 +2054,7 @@ static void parseadd (ExprDesc* Expr)
     	    } else {
        	       	/* OOPS */
     	    	Error ("Invalid operands for binary operator `+'");
+                flags = CF_INT;
     	    }
 
     	    /* Generate code for the add */
@@ -2077,12 +2080,12 @@ static void parsesub (ExprDesc* Expr)
  */
 {
     ExprDesc Expr2;
-    unsigned flags;         	/* Operation flags */
-    Type* lhst;	    	    	/* Type of left hand side */
-    Type* rhst;	    	    	/* Type of right hand side */
-    CodeMark Mark1;	   	/* Save position of output queue */
+    unsigned flags;            	/* Operation flags */
+    Type* lhst;	    	       	/* Type of left hand side */
+    Type* rhst;	    	       	/* Type of right hand side */
+    CodeMark Mark1;	       	/* Save position of output queue */
     CodeMark Mark2;    	       	/* Another position in the queue */
-    int rscale;     	    	/* Scale factor for the result */
+    int rscale;     	       	/* Scale factor for the result */
 
 
     /* Skip the MINUS token */
@@ -2090,7 +2093,6 @@ static void parsesub (ExprDesc* Expr)
 
     /* Get the left hand side type, initialize operation flags */
     lhst = Expr->Type;
-    flags = 0;
     rscale = 1;	     	    	/* Scale by 1, that is, don't scale */
 
     /* Remember the output queue position, then bring the value onto the stack */
@@ -2166,6 +2168,7 @@ static void parsesub (ExprDesc* Expr)
     	    } else {
     	    	/* OOPS */
     	    	Error ("Invalid operands for binary operator `-'");
+                flags = CF_INT;
     	    }
 
     	    /* Do the subtraction */
@@ -2216,6 +2219,7 @@ static void parsesub (ExprDesc* Expr)
     	} else {
  	    /* OOPS */
 	    Error ("Invalid operands for binary operator `-'");
+            flags = CF_INT;
  	}
 
  	/* Generate code for the sub (the & is a hack here) */

@@ -269,8 +269,9 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
        	/* Target will be empty */
 	SB_Clear (Target);
 	return;
-    } else if (Start + Len > Source->Len) {
-       	Len = (Start + Len) - Source->Len;
+    } 
+    if (Start + Len > Source->Len) {
+       	Len = Source->Len - Start;
     }
 
     /* Make sure we have enough room in the target string buffer */

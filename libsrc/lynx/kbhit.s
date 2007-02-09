@@ -1,11 +1,12 @@
 ;
-; Karri Kaksonen, 2004-11-01
+; Karri Kaksonen, Harry Dodgson 2006-01-06
 ;
 ; unsigned char kbhit (void);
 ;
 
 	.export		_kbhit
-	.export		KBBUF
+	.export		KBEDG
+	.export		KBSTL
 	.import		return0, return1
 
 ; --------------------------------------------------------------------------
@@ -19,61 +20,36 @@
 ; So the keyboard returns '1', '2', '3', 'P', 'R', 'F' or '?'.
 
 	.data
-KBBUF:		.byte	0
-DEBOUNCE:	.byte	0	; Contains char until key is freed
+KBTMP:		.byte	0
+KBPRV:		.byte	0
+KBEDG:		.byte	0
+KBSTL:		.byte	0
+KBDEB:		.byte	0
+KBNPR:		.byte	0
 
 	.code
 _kbhit:
-	lda	$FCB1		; Read the Pause key
+	lda	$FCB0		; Read the Opt buttons
+	and	#$0c
+	sta	KBTMP
+	lda	$FCB1		; Read Pause
 	and	#1
-	bne	@L4
-	lda	$FCB0		; No Pause pressed
-	and	#$0c
-	bne	@L1
-	stz	DEBOUNCE	; No keys pressed at all
-	lda	KBBUF		; But we may have some old key in the buffer
-	bne	@L9
-	jmp	return0		; No key has been pressed
+	ora	KBTMP		; 0000210P
+	tax
+	and	KBPRV
+	sta	KBSTL		; for multibutton
+	txa
+	and	KBDEB
+	sta	KBEDG		; for just depressed
+	txa
+	and	KBNPR
+	sta	KBDEB		; for debouncing
+	txa
+	eor	#$ff
+	sta	KBNPR		; inverted previous ones pressed
+	stx	KBPRV
+	lda	KBEDG
+	beq @L1
+	jmp	return1		; Key hit
 @L1:
-	cmp	#$0c
-	bne	@L2
-	ldx	#'3'		; Opt 1 + Opt 2 pressed
-	bra	@L8
-@L2:
-	cmp	#$08
-	bne	@L3
-	ldx	#'1'		; Opt 1 pressed
-	bra	@L8
-@L3:
-	ldx	#'2'		; Opt 2 pressed
-	bra	@L8
-@L4:
-	lda	$FCB0
-	and	#$0c
-	bne	@L5
-	ldx	#'P'		; Pause pressed
-	bra	@L8
-@L5:
-	cmp	#$0c
-	bne	@L6
-	ldx	#'?'	; Opt 1 + Opt 2 + Pause pressed
-	bra	@L8
-@L6:
-	cmp	#$08
-	bne	@L7
-	ldx	#'R'	; Restart pressed
-	bra	@L8
-@L7:
-	ldx	#'F'	; Flip pressed
-@L8:
-	lda	KBBUF
-	bne	@L10
-	lda	DEBOUNCE
-	beq	@L10
-	jmp	return0	; Return no key pressed until keys are released
-@L10:
-	stx	KBBUF
-	sta	DEBOUNCE
-@L9:	jmp	return1
-
-                
+	jmp	return0		; No new keys hit

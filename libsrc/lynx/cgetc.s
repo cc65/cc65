@@ -1,12 +1,13 @@
 ;
-; Karri Kaksonen, 2004-11-01
+; Karri Kaksonen, Harry Dodgson 2006-01-07
 ;
 ; char cgetc (void);
 ;
 
        	.export		_cgetc
        	.import		_kbhit
-       	.import		KBBUF
+	.import		KBEDG
+	.import		KBSTL
 
 ; --------------------------------------------------------------------------
 ; The Atari Lynx has a very small keyboard - only 3 keys
@@ -19,23 +20,51 @@
 ; So the keyboard returns '1', '2', '3', 'P', 'R', 'F' or '?'.
 
 _cgetc:
-    	jsr    	_kbhit	       	; Check for char available
-        tax                     ; Test result
-	beq	_cgetc
-
-	ldx	#5		; Wait for some time... 0.2 seconds or so.
-@L1:	ldy	#255
-@L2:	lda	#255
-@L3:	dec
-	bne	@L3
-	dey
-	bne	@L2
-	dex
+	lda	KBSTL
+	ora	KBEDG
 	bne	@L1
-
-    	jsr    	_kbhit	       	; Check for double pressed buttons
-	lda	KBBUF
-	stz	KBBUF
+    	jsr	_kbhit	       	; Check for char available
+        tax				; Test result
+	bra	_cgetc
+@L1:
        	ldx	#0
+	and	#1
+	beq	@L6
+	lda	KBEDG		; Pause button is pressed
+	and	#$0c
+	beq	@L3
+	ora	KBSTL
+@L2:
+	bit	#$04
+	beq	@L4			; Pause + Opt 1 = Reset
+	bit	#$08
+	beq	@L5			; Pause + Opt 2 = Flip
+	lda	#'?'			; All buttons pressed
        	rts
-
+@L3:
+	lda	KBSTL		; Pause alone was the last placed button
+	and	#$0c
+	bne	@L2
+	lda	#'P'			; Pause pressed
+       	rts
+@L4:
+	lda	#'R'			; Reset pressed
+       	rts
+@L5:
+	lda	#'F'			; Flip pressed
+       	rts
+@L6:
+	lda	KBEDG		; No Pause pressed
+	ora	KBSTL
+	bit	#$08
+	beq	@L8
+	bit	#$04
+	beq	@L7
+	lda	#'3'			; opt 1 + opt 2 pressed
+	rts
+@L7:
+	lda	#'1'			; opt 1 pressed
+	rts
+@L8:
+	lda	#'2'			; opt 2 pressed
+	rts

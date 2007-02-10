@@ -7,7 +7,7 @@
 #                                                                             #
 #                                                                             #
 #                                                                             #
-#  (C) 2000-2003 Ullrich von Bassewitz                                        #
+#  (C) 2000-2007 Ullrich von Bassewitz                                        #
 #                R÷merstrasse 52                                              #
 #                D-70794 Filderstadt                                          #
 #  EMail:        uz@cc65.org                                                  #
@@ -388,7 +388,7 @@ sub Process1 {
        	chop ($Line);
 
        	# Check for a label
-        if ($Line =~ /^\s*(\@?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)/)
+        if ($Line =~ /^\s*(\@?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)/) {
 
 	    # Is this a local label?
 	    if ($1 eq "\@") {

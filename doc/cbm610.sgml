@@ -48,10 +48,9 @@ config.
 <sect>Memory layout<p>
 
 cc65 generated programs for the Commodore 610 run in bank 1, the memory bank
-reserved for BASIC programs. Since there are no ROMs in this memory bank, the
-program has almost full 64K for its own. A disadvantage is that kernal
-subroutines cannot be called (at least not in a fast and effective manner), so
-the runtime has replace kernal functionality.
+reserved for BASIC programs. Since there are no ROMs in this memory bank,
+kernal subroutines are either emulated or called by bank switching, which has
+the disadvantage of being slow compared to a direct call.
 
 The default memory configuration for the CBM 610 allocates all memory between
 &dollar;0002 and &dollar;FFF0 in bank 1 for the compiled program. Some space

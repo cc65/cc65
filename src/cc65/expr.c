@@ -1547,11 +1547,8 @@ void hie10 (ExprDesc* Expr)
 	    /* The & operator may be applied to any lvalue, and it may be
 	     * applied to functions, even if they're no lvalues.
 	     */
-     	    if (ED_IsRVal (Expr) && !IsTypeFunc (Expr->Type)) {
-	       	/* Allow the & operator with an array */
-	       	if (!IsTypeArray (Expr->Type)) {
-     	       	    Error ("Illegal address");
-	       	}
+     	    if (ED_IsRVal (Expr) && !IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
+                Error ("Illegal address");
      	    } else {
                 Expr->Type = PointerTo (Expr->Type);
                 ED_MakeRVal (Expr);

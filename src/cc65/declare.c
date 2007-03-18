@@ -125,7 +125,7 @@ static TypeCode OptionalQualifiers (TypeCode Q)
 
 
 
-static void optionalint (void)
+static void OptionalInt (void)
 /* Eat an optional "int" token */
 {
     if (CurTok.Tok == TOK_INT) {
@@ -136,7 +136,7 @@ static void optionalint (void)
 
 
 
-static void optionalsigned (void)
+static void OptionalSigned (void)
 /* Eat an optional "signed" token */
 {
     if (CurTok.Tok == TOK_SIGNED) {
@@ -208,6 +208,32 @@ static void AddArrayToDeclaration (Declaration* D, long Size)
     D->Type[D->Index].C = T_ARRAY;
     D->Type[D->Index].A.L = Size;
     ++D->Index;
+}
+
+
+
+static void FixArrayQualifiers (Type* T)
+/* Using typedefs, it is possible to generate declarations that have
+ * type qualifiers attached to an array, not the element type. Go and
+ * fix these here.
+ */
+{
+    TypeCode Q = T_QUAL_NONE;
+    while (T->C != T_END) {
+        if (IsTypeArray (T)) {
+            /* Extract any type qualifiers */
+            Q |= T->C & T_MASK_QUAL;
+            T->C = UnqualifiedType (T->C);
+        } else {
+            /* Add extracted type qualifiers here */
+            T->C |= Q;
+            Q = T_QUAL_NONE;
+        }
+        ++T;
+    }
+
+    /* Q must be empty now */
+    CHECK (Q == T_QUAL_NONE);
 }
 
 
@@ -453,12 +479,12 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     	    NextToken ();
     	    if (CurTok.Tok == TOK_UNSIGNED) {
     	      	NextToken ();
-    	      	optionalint ();
+    	      	OptionalInt ();
     	      	D->Type[0].C = T_ULONG;
 	      	D->Type[1].C = T_END;
     	    } else {
-    	      	optionalsigned ();
-    	      	optionalint ();
+    	      	OptionalSigned ();
+    	      	OptionalInt ();
 	      	D->Type[0].C = T_LONG;
 	      	D->Type[1].C = T_END;
     	    }
@@ -468,12 +494,12 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     	    NextToken ();
     	    if (CurTok.Tok == TOK_UNSIGNED) {
     	      	NextToken ();
-    	      	optionalint ();
+    	      	OptionalInt ();
 	      	D->Type[0].C = T_USHORT;
 	      	D->Type[1].C = T_END;
     	    } else {
-    	      	optionalsigned ();
-    	      	optionalint ();
+    	      	OptionalSigned ();
+    	      	OptionalInt ();
 	      	D->Type[0].C = T_SHORT;
 	    	D->Type[1].C = T_END;
     	    }
@@ -497,14 +523,14 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 
     		case TOK_SHORT:
     		    NextToken ();
-    		    optionalint ();
+    		    OptionalInt ();
 		    D->Type[0].C = T_SHORT;
 		    D->Type[1].C = T_END;
     		    break;
 
     		case TOK_LONG:
     		    NextToken ();
-    	 	    optionalint ();
+    	 	    OptionalInt ();
 		    D->Type[0].C = T_LONG;
 		    D->Type[1].C = T_END;
     	     	    break;
@@ -532,14 +558,14 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 
     	    	case TOK_SHORT:
     		    NextToken ();
-    		    optionalint ();
+    		    OptionalInt ();
 		    D->Type[0].C = T_USHORT;
 		    D->Type[1].C = T_END;
     		    break;
 
     		case TOK_LONG:
     		    NextToken ();
-    		    optionalint ();
+    		    OptionalInt ();
     		    D->Type[0].C = T_ULONG;
 		    D->Type[1].C = T_END;
     		    break;
@@ -1131,16 +1157,19 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     NeedTypeSpace (D, TypeLen (Spec->Type) + 1);	/* Bounds check */
     TypeCpy (D->Type + D->Index, Spec->Type);
 
+    /* Fix any type qualifiers attached to an array type */
+    FixArrayQualifiers (D->Type);
+
     /* Check the size of the generated type */
     if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type)) {
-	unsigned Size = SizeOf (D->Type);
-	if (Size >= 0x10000) {
-	    if (D->Ident[0] != '\0') {
-	       	Error ("Size of `%s' is invalid (0x%06X)", D->Ident, Size);
-	    } else {
-	 	Error ("Invalid size in declaration (0x%06X)", Size);
-	    }
-	}
+       	unsigned Size = SizeOf (D->Type);
+       	if (Size >= 0x10000) {
+       	    if (D->Ident[0] != '\0') {
+       	       	Error ("Size of `%s' is invalid (0x%06X)", D->Ident, Size);
+       	    } else {
+       	 	Error ("Invalid size in declaration (0x%06X)", Size);
+       	    }
+       	}
     }
 }
 

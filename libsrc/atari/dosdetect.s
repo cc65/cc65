@@ -1,5 +1,5 @@
 ;
-; Freddy Offenga & Christian Groessler, June 2004
+; Freddy Offenga, Stefan Haubenthal, Christian Groessler, March 2007
 ;
 ; detect the DOS version we're running on
 ;
@@ -35,16 +35,14 @@ detect:	lda	#ATARIDOS
 	cmp	(DOSVEC),y
 	beq	done
 	lda	#OSADOS
-	sta	__dos_type
-	rts
+	.byte	$2C		; BIT <abs>
 
 spdos:	lda	#SPARTADOS
-	sta	__dos_type
-done:	rts
+	.byte	$2C		; BIT <abs>
 
 mydos:	lda	#MYDOS
 	sta	__dos_type
-	rts
+done:	rts
 
 ; ------------------------------------------------------------------------
 ; Data

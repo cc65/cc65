@@ -576,7 +576,7 @@ sub Process2 {
 	    $Label = $Labels{$OutName}{$Id};
 
 	    # Print the label with a tag
-       	    $OutLine .= sprintf ("<a name=\"%s\">%s%s</a>%s%s", $Label, $1, $2, $3, $4);
+       	    $OutLine .= sprintf ("<a name=\"%s\">%s%s</a>%s", $Label, $1, $2, $3);
 	}
 
 	# Print any leading whitespace and remove it, so we don't have to

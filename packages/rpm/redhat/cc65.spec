@@ -14,7 +14,7 @@ Name: %{name}
 %define version 2.11.0
 Version: %{version}
 Release: 1
-Copyright: Freeware with exceptions - see docs
+License: Freeware with exceptions - see docs
 Group: Development/Languages
 Source: ftp://ftp.musoftware.de/uz/cc65/%{name}-sources-%{version}.tar.bz2
 Vendor: MU Softwareentwicklung

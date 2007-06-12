@@ -243,7 +243,7 @@ void DataDByteLine (unsigned ByteCount)
     unsigned I;
 
     Indent (MCol);
-    Output (".dbyte");
+    Output (".dbyt");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
 	if (I > 0) {

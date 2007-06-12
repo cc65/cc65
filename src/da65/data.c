@@ -88,6 +88,7 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
      */
     if (Count < MemberSize) {
 	DataByteLine (Count);
+        PC += Count;
 	return Count;
     }
 
@@ -172,6 +173,7 @@ unsigned AddrTable (void)
         /* If just one byte is left, define it and bail out */
         if (BytesLeft == 1 || GetStyleAttr (PC+1) != atAddrTab) {
             DataByteLine (1);
+            ++PC;
             break;
         }
 
@@ -237,6 +239,7 @@ unsigned RtsTable (void)
         /* If just one byte is left, define it and bail out */
         if (BytesLeft == 1 || GetStyleAttr (PC+1) != atRtsTab) {
             DataByteLine (1);
+            ++PC;
             break;
         }
 

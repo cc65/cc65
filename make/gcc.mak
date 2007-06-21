@@ -14,7 +14,7 @@
 MAKEOVERRIDES=
 
 # The install prefix and directories
-prefix		= /usr
+prefix		= /usr/local
 exec_prefix	= $(prefix)
 
 bindir		= $(exec_prefix)/bin
@@ -35,11 +35,15 @@ MKDIR		= mkdir -m 755
 
 # BSD-like install-script/-program
 INSTALL		= make/install-sh
-#INSTALL		= install
 
 INSTALL_DATA	= $(INSTALL) -c -m 644
 INSTALL_PROG	= $(INSTALL) -c -m 755
 INSTALL_STRIP	= $(INSTALL_PROG) -s
+
+# This file-name extension is needed on DOS/Windows systems.
+ifdef COMSPEC
+EXT	= .exe
+endif
 
 # Rules
 
@@ -51,7 +55,7 @@ INSTALL_STRIP	= $(INSTALL_PROG) -s
 all:	bins libs docs $(SYS:%=samples tests)
 
 bins:
-	@$(MAKE) -C src -f make/gcc.mak
+	@$(MAKE) -C src -f make/gcc.mak CC65_INC=\\\"${CC65INC}/\\\" CC65_LIB=\\\"${CC65LIB}/\\\"
 
 libs:
 	@$(MAKE) -C libsrc
@@ -81,12 +85,13 @@ clean zap:
 #	$(MAKE) -C testcode/lib $@ $(SYS:%=SYS=%)
 
 uninstall:	install-test
-	cd $(bindir) && $(RM) ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc ca65html
+	cd $(bindir) && $(RM) ar65${EXT} ca65${EXT} cc65${EXT} cl65${EXT} \
+	  co65${EXT} da65${EXT} ld65${EXT} od65${EXT} grc${EXT} ca65html
 	$(RM) -R $(CC65DATA) $(CC65DOC)
 
 install:	install-test install-dirs install-bins install-libs install-docs
 	@echo
-	@echo 'You should export some shell environment variables:'
+	@echo 'You can export some shell environment variables:'
 	@echo
 	@echo 'CC65_INC=$(CC65INC)'
 	@echo 'CC65_LIB=$(CC65LIB)'
@@ -104,16 +109,30 @@ install-test:
 
 .PHONY:	install-dirs
 install-dirs:
-	-$(MKDIR) -p $(bindir) $(docdir) $(libdir)
-	-$(MKDIR) $(CC65DATA) $(CC65ASM) $(CC65DOC) $(CC65INC)
-	-$(MKDIR) $(CC65INC)/em $(CC65INC)/geos $(CC65INC)/joystick \
-	  $(CC65INC)/mouse $(CC65INC)/sys $(CC65INC)/tgi
-	-$(MKDIR) $(CC65LIB) $(CC65DATA)/emd $(CC65DATA)/joy \
-	  $(CC65DATA)/mou $(CC65DATA)/ser $(CC65DATA)/tgi
+	[ -d $(bindir) ] || $(MKDIR) $(bindir)
+	[ -d $(datadir) ] || $(MKDIR) $(datadir)
+	[ -d $(docdir) ] || $(MKDIR) $(docdir)
+	[ -d $(libdir) ] || $(MKDIR) $(libdir)
+	[ -d $(CC65DOC) ] || $(MKDIR) $(CC65DOC)
+	[ -d $(CC65DATA) ] || $(MKDIR) $(CC65DATA)
+	[ -d $(CC65ASM) ] || $(MKDIR) $(CC65ASM)
+	[ -d $(CC65LIB) ] || $(MKDIR) $(CC65LIB)
+	[ -d $(CC65INC) ] || $(MKDIR) $(CC65INC)
+	[ -d $(CC65INC)/em ] || $(MKDIR) $(CC65INC)/em
+	[ -d $(CC65INC)/geos ] || $(MKDIR) $(CC65INC)/geos
+	[ -d $(CC65INC)/joystick ] || $(MKDIR) $(CC65INC)/joystick
+	[ -d $(CC65INC)/mouse ] || $(MKDIR) $(CC65INC)/mouse
+	[ -d $(CC65INC)/sys ] || $(MKDIR) $(CC65INC)/sys
+	[ -d $(CC65INC)/tgi ] || $(MKDIR) $(CC65INC)/tgi
+	[ -d $(CC65DATA)/emd ] || $(MKDIR) $(CC65DATA)/emd
+	[ -d $(CC65DATA)/joy ] || $(MKDIR) $(CC65DATA)/joy
+	[ -d $(CC65DATA)/mou ] || $(MKDIR) $(CC65DATA)/mou
+	[ -d $(CC65DATA)/ser ] || $(MKDIR) $(CC65DATA)/ser
+	[ -d $(CC65DATA)/tgi ] || $(MKDIR) $(CC65DATA)/tgi
 
 install-bins:
 	for f in ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc; \
-	  do $(INSTALL_STRIP) src/$$f/$$f $(bindir) || exit 1; \
+	  do $(INSTALL_STRIP) src/$$f/$$f${EXT} $(bindir) || exit 1; \
 	  done
 	$(INSTALL_PROG) src/ca65html/ca65html $(bindir)
 
@@ -142,7 +161,7 @@ install-docs:
 	for f in src/ld65/cfg/*.cfg src/ca65/macpack/*.mac; \
 	  do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
 	  done
-	for f in readme.1st compile.txt BUGS internal.txt newvers.txt; \
+	for f in readme.1st compile.txt CREDITS BUGS internal.txt newvers.txt; \
 	  do $(INSTALL_DATA) doc/$$f $(CC65DOC) || exit 1; \
 	  done
 	if [ -e doc/index.htm* ]; \

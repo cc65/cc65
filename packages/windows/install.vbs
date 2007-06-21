@@ -6,9 +6,9 @@ Option Explicit                 ' Variables must be declared explicitly
 ' Installer defaults.
 '******************************************************************************
 const AppName     = "cc65"
-const Version     = "2.10.5.20050325"
+const Version     = "2.11.9"
 const Installer   = "cc65 Installer"
-const SpaceNeeded = 20                  ' Free space needed on drive in MB
+const SpaceNeeded = 20                  ' Free space needed on drive in MiB.
 const Shortcut    = true                ' Create shortcut on desktop
 
 
@@ -24,7 +24,7 @@ const SysPath = "HKLM\System\CurrentControlSet\Control\Session Manager\Environme
 '******************************************************************************
 ' Global variables
 '******************************************************************************
-dim Tab, NewLine                ' String constants
+dim Tab, NewLine, Quote         ' String constants
 dim Shell, FSO                  ' Global objects
 dim ProgArgs                    ' Program arguments
 dim Dbg                         ' Output debugging stuff
@@ -195,7 +195,7 @@ end function
 
 
 '******************************************************************************
-' Return an environment string. Fix up Microsofts "innovative" ideas.
+' Return an environment string. Fix up Microsoft's "innovative" ideas.
 '******************************************************************************
 function GetEnv (Key)
     dim Value
@@ -475,6 +475,7 @@ sub InitializeGlobals ()
     ' String stuff used for formatting
     Tab     = Chr (9)
     NewLine = Chr (13)
+    Quote   = Chr (34)
 
     ' Global objects
     set Shell = WScript.CreateObject ("WScript.Shell")
@@ -530,9 +531,9 @@ sub InitializeGlobals ()
 
     ' Uninstaller
     set UninstallCtrlFile = nothing
-    Uninstaller = BuildPath (InstallTarget, "uninstall.vbs")
+    Uninstaller = Quote & BuildPath (InstallTarget, "uninstall.vbs") & Quote
     UninstallCtrlFileName = BuildPath (InstallTarget, "uninstall.lst")
-    UninstallerCmdLine = "-" & Language & " " & AppName & " " & UninstallCtrlFileName
+    UninstallerCmdLine = "-" & Language & " " & AppName & " " & Quote & UninstallCtrlFileName & Quote
 
     ' Registry paths
     RegUninstall = "HKLM\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & AppName & "\"
@@ -632,7 +633,7 @@ sub ShowPathsAndLocations ()
     dim Msg
     Msg = Msg & OneLoc ("SystemDrive",   SystemDrive)
     Msg = Msg & OneLoc ("SystemRoot",    SystemRoot)
-    Msg = Msg & OneLoc ("UserName",      UserName)
+    Msg = Msg & OneLoc ("User Name",     UserName)
     Msg = Msg & OneLoc ("UserProfile",   UserProfile)
     Msg = Msg & OneLoc ("ProgramFiles",  ProgramFiles)
     Msg = Msg & OneLoc ("AppData",       AppData)
@@ -938,7 +939,7 @@ sub CreateRegEntries ()
         call Abort (GetMsg ("MSG_REGWRITEERR"))
     end if
     call RegWriteStr (RegUninstall & "DisplayName", AppName & " " & Version)
-    call RegWriteStr (RegUninstall & "UninstallString", "wscript //nologo " & Uninstaller & " " & UninstallerCmdLine)
+    call RegWriteStr (RegUninstall & "UninstallString", "wscript /nologo " & Uninstaller & " " & UninstallerCmdLine)
 
 end sub
 
@@ -1087,11 +1088,11 @@ sub AddEnvironment ()
     ' Add the bin directory to the path if it's not already there
     if not DirInPath (BinDir) then
 	call AddToSysPath (BinDir)
-
-	' Run the wm_envchange program to notify other running programs
-	' of the changed environment. Ignore errors.
-	call Run (BuildPath (BinDir, "wm_envchange.exe"), 0)
     end if
+
+    ' Run the wm_envchange program to notify other running programs
+    ' of the changed environment. Ignore errors.
+    call Run (BuildPath (BinDir, "wm_envchange.exe"), 0)
 
 end sub
 

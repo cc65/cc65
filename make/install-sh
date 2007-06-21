@@ -5,6 +5,11 @@
 # This isn't a full install-script; it does only what is needed by the cc65
 # package.  It can install only one file at a time.
 
+# If the system has an "install" command, then use it; otherwise, emulate it.
+if type install >/dev/null 2>&1
+then exec install "$@"
+fi
+
 # Don't use ":-" because 4.3BSD and earlier shells don't like it.
 # Put in absolute paths if you don't have these commands in your PATH;
 # or, set these upper-case variables in your environment.

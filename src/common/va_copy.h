@@ -60,7 +60,7 @@
 
 /* If we don't have va_copy now, use a generic version */
 #if !defined(va_copy)
-#define va_copy(dest,src)       ((src)=(dest))
+#define va_copy(dest,src)       ((dest)=(src))
 #endif
 
 

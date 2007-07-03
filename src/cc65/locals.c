@@ -427,6 +427,12 @@ static void ParseOneDecl (const DeclSpec* Spec)
        	} else if ((SC & SC_AUTO) == SC_AUTO) {
             /* Auto variable */
             SymData = ParseAutoDecl (&Decl, &SC);
+        } else if ((SC & SC_EXTERN) == SC_EXTERN) {
+            /* External identifier - may not get initialized */
+            if (CurTok.Tok == TOK_ASSIGN) {
+                Error ("Cannot initialize externals");
+            }
+            SymData = 0;
        	} else if ((SC & SC_STATIC) == SC_STATIC) {
             /* Static variable */
             SymData = ParseStaticDecl (&Decl, &SC);
@@ -451,7 +457,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
     AddLocalSym (Decl.Ident, Decl.Type, SC, SymData);
 }
 
-
+                        
 
 void DeclareLocals (void)
 /* Declare local variables and types. */
@@ -462,38 +468,38 @@ void DeclareLocals (void)
     /* Loop until we don't find any more variables */
     while (1) {
 
-	/* Check variable declarations. We need to distinguish between a
-    	 * default int type and the end of variable declarations. So we
-	 * will do the following: If there is no explicit storage class
-	 * specifier *and* no explicit type given, *and* no type qualifiers
+     	/* Check variable declarations. We need to distinguish between a
+     	 * default int type and the end of variable declarations. So we
+     	 * will do the following: If there is no explicit storage class
+     	 * specifier *and* no explicit type given, *and* no type qualifiers
          * have been read, it is assumed that we have reached the end of
          * declarations.
-	 */
-	DeclSpec Spec;
-	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+     	 */
+     	DeclSpec Spec;
+     	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
        	if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
             (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */
             GetQualifier (Spec.Type) == T_QUAL_NONE) {  /* No type qualifier */
-	    break;
-	}
+     	    break;
+     	}
 
-	/* Accept type only declarations */
-	if (CurTok.Tok == TOK_SEMI) {
-	    /* Type declaration only */
-	    CheckEmptyDecl (&Spec);
-	    NextToken ();
-	    continue;
-	}
+     	/* Accept type only declarations */
+     	if (CurTok.Tok == TOK_SEMI) {
+     	    /* Type declaration only */
+     	    CheckEmptyDecl (&Spec);
+     	    NextToken ();
+     	    continue;
+     	}
 
       	/* Parse a comma separated variable list */
       	while (1) {
 
-	    /* Parse one declaration */
-	    ParseOneDecl (&Spec);
+     	    /* Parse one declaration */
+     	    ParseOneDecl (&Spec);
 
-	    /* Check if there is more */
+     	    /* Check if there is more */
      	    if (CurTok.Tok == TOK_COMMA) {
-		/* More to come */
+     		/* More to come */
 		NextToken ();
 	    } else {
 		/* Done */

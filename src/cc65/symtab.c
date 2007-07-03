@@ -674,6 +674,8 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
             Entry->V.R.SaveOffs = StackPtr;
+        } else if ((Flags & SC_EXTERN) == SC_EXTERN) {
+            Entry->V.Label = Offs;
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
             /* Generate the assembler name from the label number */
             Entry->V.Label = Offs;

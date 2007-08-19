@@ -1,0 +1,42 @@
+; $VER: Install_cc65 0.9 (Jul  9 2007) © Stefan Haubenthal
+
+(set #help-bin "Choose location of archiver, assembler, compiler, compiler driver, disassembler, resource compiler, linker and object dumper.")
+(set #help-inc "Choose location of ANSI and target platform headers. The new directory is called 'include'.")
+(set #help-lib "Choose location of runtime objects and target platform libraries. The new directory is called 'lib'.")
+
+(copyfiles
+	(source "//src/")
+	(dest
+		(set #dir-bin (askdir (prompt "Copy binaries (should be part of execution path)") (help #help-bin) (default @default-dest)))
+	(choices "ar65/ar65" "ca65/ca65" "cc65/cc65" "cl65/cl65" "da65/da65" "grc/grc" "ld65/ld65" "od65/od65")
+	)
+)
+
+(complete 25)
+(copyfiles
+	(source "//include/")
+	(dest
+		(set #dir-inc (tackon (set #dir-inc0 (askdir (prompt "Copy headers (directory will be created)") (help #help-inc) (default @default-dest))) "include"))
+	(all)
+	)
+)
+
+(complete 50)
+(copyfiles
+	(source "//libsrc/")
+	(dest
+		(set #dir-lib (tackon (askdir (prompt "Copy libraries (directory will be created)") (help #help-lib) (default #dir-inc0)) "lib"))
+	(pattern "#?.(lib|o)")
+	)
+)
+
+(complete 75)
+(run "setenv CC65_INC SAVE" #dir-inc (confirm) (prompt "Set environment variable for headers?") (help "CC65_INC will be saved in 'ENVARC:'."))
+(complete 90)
+(run "setenv CC65_LIB SAVE" #dir-lib (confirm) (prompt "Set environment variable for libraries?") (help "CC65_LIB will be saved in 'ENVARC:'".))
+(run "setenv CC65_INC" #dir-inc)
+(run "setenv CC65_LIB" #dir-lib)
+(run "resident cc" (tackon #dir-bin "cl65"))
+
+(complete 100)
+(message "The cross-compiler is now ready, just type 'cc -h' in a shell.")

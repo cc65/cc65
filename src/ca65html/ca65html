@@ -180,22 +180,60 @@ sub StripPath {
 sub DocHeader {
     my $OUT = shift (@_);
     my $Asm = shift (@_);
-    if (not $Colorize) {
-        # Colorization generates invalid HTML. Common browsers display it
-        # correctly, but we don't claim it adheres to some standard ...
-        print $OUT "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n";
-    }
+    print $OUT "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
     print $OUT <<"EOF";
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <meta name="GENERATOR" content="ca65html">
 <title>$Asm</title>
+<style type=\"text/css\">
+body {
+    background-color: $BGColor;
+    color: $TextColor;
+}
+h1 {
+    text-align: center;
+}
+#top {
+    margin: 2em 0 3em 0;
+    border-bottom: 1px solid grey;
+}
+#bottom {
+    margin: 3em 0 1em 0;
+    padding-top: 1em;
+    border-top: 1px solid grey;
+}
+img {
+    border: 0;
+    margin: 0;
+    float: right;
+}
+.ctrl {
+    color: $CtrlColor;
+}
+.keyword {
+    color: $KeywordColor;
+}
+.string {
+    color: $StringColor;
+}
+.comment {
+    color: $CommentColor;
+}
+a:link {
+    color: #0000d0;
+}
+a:visited {
+    color: #000060;
+}
+a:active {
+    color: #00d0d0;
+}
+</style>
 </head>
-<body bgcolor="$BGColor" text="$TextColor" link="#0000d0" vlink="#000060" alink="#00d0d0">
-<p><br><p>
-<center><h1>$Asm</h1></center>
-<hr size="1" noshade><p><br><p>
+<body>
+<div id=\"top\"><h1>$Asm</h1></div>
 EOF
 }
 
@@ -208,15 +246,13 @@ sub DocFooter {
     my $Today = localtime;
 
     # Print
-    print $OUT "<p><br><p>\n";
-    print $OUT "<hr size=\"1\" noshade>\n";
+    print $OUT "<div id=\"bottom\">\n";
     print $OUT "<address>\n";
-    if (not $Colorize) {
-        print $OUT "<a href=\"http://validator.w3.org/check/referer\"><img border=\"0\" src=\"http://www.w3.org/Icons/valid-html401\" alt=\"Valid HTML 4.01!\" height=\"31\" width=\"88\" align=\"right\"></a>\n";
-    }
+    print $OUT "<a href=\"http://validator.w3.org/check?uri=referer\"><img src=\"http://www.w3.org/Icons/valid-xhtml10-blue\" alt=\"Valid XHTML 1.0 Strict\" height=\"31\" width=\"88\" /></a>";
     print $OUT "$Name; generated on $Today by ca65html<br>\n";
     print $OUT "<a href=\"mailto:uz&#64;cc65.org\">uz&#64;cc65.org</a>\n";
     print $OUT "</address>\n";
+    print $OUT "</div>\n";
     print $OUT "</body>\n";
     print $OUT "</html>\n";
 }
@@ -231,7 +267,7 @@ sub DocFooter {
 
 sub ColorizeComment {
     if ($Colorize && $_[0] ne "") {
-        return "<font color=\"$CommentColor\">$_[0]</font>";
+        return "<span class=\"comment\">$_[0]</span>";
     } else {
         return $_[0];
     }
@@ -241,7 +277,7 @@ sub ColorizeComment {
 
 sub ColorizeCtrl {
     if ($Colorize) {
-        return "<font color=\"$CtrlColor\">$_[0]</font>";
+        return "<span class=\"ctrl\">$_[0]</span>";
     } else {
         return $_[0];
     }
@@ -251,7 +287,7 @@ sub ColorizeCtrl {
 
 sub ColorizeKeyword {
     if ($Colorize) {
-        return "<font color=\"$KeywordColor\">$_[0]</font>";
+        return "<span class=\"keyword\">$_[0]</span>";
     } else {
         return $_[0];
     }
@@ -261,7 +297,7 @@ sub ColorizeKeyword {
 
 sub ColorizeString {
     if ($Colorize) {
-        return "<font color=\"$StringColor\">$_[0]</font>";
+        return "<span class=\"string\">$_[0]</span>";
     } else {
         return $_[0];
     }
@@ -385,7 +421,7 @@ sub Process1 {
     while ($Line = <INPUT>) {
 
        	# Remove the newline
-       	chop ($Line);
+       	chomp ($Line);
 
        	# Check for a label
         if ($Line =~ /^\s*(\@?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)/) {
@@ -520,7 +556,7 @@ sub Process2 {
         $LineNo++;
 
  	# Remove the newline
-	chop ($Line);
+	chomp ($Line);
 
         # If requested, convert tabs to spaces
 	if ($CvtTabs) {

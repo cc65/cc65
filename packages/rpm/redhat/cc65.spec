@@ -487,7 +487,7 @@ mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{em,geos,joystick
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/ca65/ca65 $RPM_BUILD_ROOT/usr/bin
-install -s -m 755 src/ca65html/ca65html $RPM_BUILD_ROOT/usr/bin
+install    -m 755 src/ca65html/ca65html $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/cc65/cc65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/cl65/cl65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/co65/co65 $RPM_BUILD_ROOT/usr/bin

@@ -19,6 +19,7 @@ Group: Development/Languages
 Source: ftp://ftp.musoftware.de/uz/cc65/%{name}-sources-%{version}.tar.bz2
 Vendor: MU Softwareentwicklung
 Packager: Ullrich von Bassewitz <uz@musoftware.de>
+URL: http://www.cc65.org/
 %ifos linux
 BuildRequires: perl
 BuildRequires: sgml-tools

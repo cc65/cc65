@@ -75,7 +75,7 @@ machines, you have to install at least one of the library packages.
 %package doc
 
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Documentation for the cc65 C compiler
 Group: Development/Languages
 
@@ -99,7 +99,7 @@ in HTML format. Other formats can be generated from the sources.
 
 %package apple2
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Apple ][ specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -124,7 +124,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 
 %package apple2enh
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Apple //e specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -149,7 +149,7 @@ programs for the Apple //e using the cc65 crosscompiler.
 
 %package atari
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Atari specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -170,7 +170,7 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 %package atmos
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Oric Atmos specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -191,7 +191,7 @@ programs for the Oric Atmos using the cc65 crosscompiler.
 
 %package c128
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: C128 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -216,7 +216,7 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 
 %package c16
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: C16/116 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -238,7 +238,7 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 
 %package c64
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: C64 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -264,7 +264,7 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 
 %package cbm510
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: CBM 510 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -288,7 +288,7 @@ crosscompiler.
 
 %package cbm610
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: CBM 610 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -311,7 +311,7 @@ the cc65 crosscompiler.
 
 %package geos
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: GEOS specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -337,7 +337,7 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 
 %package lynx
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Lynx specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -359,7 +359,7 @@ programs for the Lynx Game Console using the cc65 crosscompiler.
 
 %package nes
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: NES specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -381,7 +381,7 @@ crosscompiler.
 
 %package pet
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: PET specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -403,7 +403,7 @@ crosscompiler.
 
 %package plus4
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Plus/4 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -426,7 +426,7 @@ crosscompiler.
 
 %package supervision
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: Supervision specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -446,7 +446,7 @@ programs for the Supervision Game console using the cc65 crosscompiler.
 
 %package vic20
 Requires: %{name} = %{version}
-Copyright: Freeware
+License: Freeware
 Summary: VIC20 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 

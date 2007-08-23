@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 typedef enum {
-    FEAT_UNKNOWN		= -1,
+    FEAT_UNKNOWN 		= -1,
     FEAT_DOLLAR_IS_PC,
     FEAT_LABELS_WITHOUT_COLONS,
     FEAT_LOOSE_STRING_TERM,
@@ -53,6 +53,7 @@ typedef enum {
     FEAT_AT_IN_IDENTIFIERS,
     FEAT_DOLLAR_IN_IDENTIFIERS,
     FEAT_LEADING_DOT_IN_IDENTIFIERS,
+    FEAT_ORG_PER_SEG,
     FEAT_PC_ASSIGNMENT,
     FEAT_MISSING_CHAR_TERM,
     FEAT_UBIQUITOUS_IDENTS,

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -1482,7 +1482,7 @@ ExprNode* GenCurrentPC (void)
 {
     ExprNode* Root;
 
-    if (RelocMode) {
+    if (GetRelocMode ()) {
 	/* Create SegmentBase + Offset */
        	Root = GenAddExpr (GenSectionExpr (GetCurrentSegNum ()),
                            GenLiteralExpr (GetPC ()));
@@ -1531,7 +1531,7 @@ ExprNode* GenBranchExpr (unsigned Offs)
          * (Val - PC - Offs) - Seg
          */
         Root = GenLiteralExpr (Val - GetPC () - Offs);
-        if (RelocMode) {
+        if (GetRelocMode ()) {
             N = Root;
             Root = NewExprNode (EXPR_MINUS);
             Root->Left  = N;
@@ -1549,7 +1549,7 @@ ExprNode* GenBranchExpr (unsigned Offs)
         Root = NewExprNode (EXPR_MINUS);
         Root->Left  = N;
         Root->Right = GenLiteralExpr (GetPC () + Offs);
-        if (RelocMode) {
+        if (GetRelocMode ()) {
             N = Root;
             Root = NewExprNode (EXPR_MINUS);
             Root->Left  = N;

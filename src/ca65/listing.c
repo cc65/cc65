@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -105,7 +105,7 @@ void NewListingLine (const char* Line, unsigned char File, unsigned char Depth)
 	L->FragList	= 0;
 	L->FragLast 	= 0;
 	L->PC  		= GetPC ();
-	L->Reloc	= RelocMode;
+	L->Reloc	= GetRelocMode ();
 	L->File		= File;
      	L->Depth	= Depth;
 	L->Output	= (ListingEnabled > 0);
@@ -181,7 +181,7 @@ void InitListingLine (void)
 		/* Set the values for this line */
 		CHECK (L != 0);
 		L->PC    	 = GetPC ();
-		L->Reloc	 = RelocMode;
+		L->Reloc	 = GetRelocMode ();
 		L->Output  	 = (ListingEnabled > 0);
 		L->ListBytes = (unsigned char) ListBytes;
 	    } while (L->Next != LineLast);
@@ -191,7 +191,7 @@ void InitListingLine (void)
       	/* Set the values for this line */
       	CHECK (LineCur != 0);
       	LineCur->PC    	    = GetPC ();
-      	LineCur->Reloc	    = RelocMode;
+      	LineCur->Reloc	    = GetRelocMode ();
       	LineCur->Output	    = (ListingEnabled > 0);
        	LineCur->ListBytes  = (unsigned char) ListBytes;
     }

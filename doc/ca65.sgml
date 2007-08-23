@@ -2273,6 +2273,13 @@ Here's a list of all control commands and a description, what they do:
     <bf/Note:/ This does not work in conjunction with <tt/.FEATURE
     loose_string_term/, since in this case the input would be ambiguous.
 
+  <tag><tt>org_per_seg</tt><label id="org_per_seg"></tag>
+
+    This feature makes relocatable/absolute mode local to the current segment.
+    Using <tt><ref id=".ORG" name=".ORG"></tt> when <tt/org_per_seg/ is in
+    effect will only enable absolute mode for the current segment. Dito for
+    <tt><ref id=".RELOC" name=".RELOC"></tt>.
+
   <tag><tt>pc_assignment</tt></tag>
 
     Allow assignments to the PC symbol (`*' or `&dollar;' if <tt/dollar_is_pc/
@@ -2798,11 +2805,13 @@ Here's a list of all control commands and a description, what they do:
   assembled. Use <tt><ref id=".RELOC" name=".RELOC"></tt> to switch back to
   relocatable code.
 
-  Please note that you <em/do not need/ this command in most cases. Placing
+  By default, absolute/relocatable mode is global (valid even when switching
+  segments). Using <tt>.FEATURE <ref id="org_per_seg" name="org_per_seg"></tt>
+  it can be made segment local.
+
+  Please note that you <em/do not need/ <tt/.ORG/ in most cases. Placing
   code at a specific address is the job of the linker, not the assembler, so
   there is usually no reason to assemble code to a specific address.
-
-  You may not switch segments while inside a section of absolute code.
 
   Example:
 

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -63,13 +63,15 @@
 
 
 
-/* Are we in absolute mode or in relocatable mode? */
-int 		RelocMode = 1;
-unsigned long	AbsPC	  = 0;		/* PC if in absolute mode */
+/* If OrgPerSeg is false, all segments share the RelocMode flag and a PC
+ * used when in absolute mode. OrgPerSeg may be set by .feature org_per_seg
+ */
+static int              RelocMode = 1;
+static unsigned long    AbsPC	  = 0;		/* PC if in absolute mode */
 
 /* Segment initializer macro */
 #define SEG(segdef, num, prev)      \
-    { prev, 0, 0, 0, num, 0, 0, segdef }
+    { prev, 0, 0, 0, num, 0, 1, 0, 0, segdef }
 
 /* Definitions for predefined segments */
 SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_NULL,     ADDR_SIZE_ABS);
@@ -130,7 +132,9 @@ static Segment* NewSegment (const char* Name, unsigned char AddrSize)
     S->FragCount = 0;
     S->Num       = SegmentCount++;
     S->Align     = 0;
+    S->RelocMode = 1;
     S->PC        = 0;
+    S->AbsPC     = 0;
     S->Def       = NewSegDef (Name, AddrSize);
 
     /* Insert it into the segment list */
@@ -170,8 +174,16 @@ Fragment* GenFragment (unsigned char Type, unsigned short Len)
 
     /* Increment the program counter */
     ActiveSeg->PC += F->Len;
-    if (!RelocMode) {
-	AbsPC += F->Len;
+    if (OrgPerSeg) {
+        /* Relocatable mode is switched per segment */
+        if (!ActiveSeg->RelocMode) {
+            ActiveSeg->AbsPC += F->Len;
+        }
+    } else {
+        /* Relocatable mode is switched globally */
+        if (!RelocMode) {
+            AbsPC += F->Len;
+        }
     }
 
     /* Return the fragment */
@@ -214,16 +226,61 @@ void UseSeg (const SegDef* D)
 unsigned long GetPC (void)
 /* Get the program counter of the current segment */
 {
-    return RelocMode? ActiveSeg->PC : AbsPC;
+    if (OrgPerSeg) {
+        /* Relocatable mode is switched per segment */
+        return ActiveSeg->RelocMode? ActiveSeg->PC : ActiveSeg->AbsPC;
+    } else {
+        /* Relocatable mode is switched globally */
+        return RelocMode? ActiveSeg->PC : AbsPC;
+    }
 }
 
 
 
-void SetAbsPC (unsigned long PC)
-/* Set the program counter in absolute mode */
+void EnterAbsoluteMode (unsigned long PC)
+/* Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
+ * this will either switch the mode globally or for the current segment.
+ */
 {
-    RelocMode = 0;
-    AbsPC = PC;
+    if (OrgPerSeg) {
+        /* Relocatable mode is switched per segment */
+        ActiveSeg->RelocMode = 0;
+        ActiveSeg->AbsPC = PC;
+    } else {
+        /* Relocatable mode is switched globally */
+        RelocMode = 0;
+        AbsPC = PC;
+    }
+}
+
+
+
+int GetRelocMode (void)
+/* Return true if we're currently in relocatable mode */
+{
+    if (OrgPerSeg) {
+        /* Relocatable mode is switched per segment */
+        return ActiveSeg->RelocMode;
+    } else {
+        /* Relocatable mode is switched globally */
+        return RelocMode;
+    }
+}
+
+
+
+void EnterRelocMode (void)
+/* Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
+ * switch the mode globally or for the current segment.
+ */
+{
+    if (OrgPerSeg) {
+        /* Relocatable mode is switched per segment */
+        ActiveSeg->RelocMode = 1;
+    } else {
+        /* Relocatable mode is switched globally */
+        RelocMode = 1;
+    }
 }
 
 

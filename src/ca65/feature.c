@@ -56,6 +56,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "at_in_identifiers",
     "dollar_in_identifiers",
     "leading_dot_in_identifiers",
+    "org_per_seg",
     "pc_assignment",
     "missing_char_term",
     "ubiquitous_idents",
@@ -108,10 +109,11 @@ feature_t SetFeature (const char* Key)
      	case FEAT_AT_IN_IDENTIFIERS:	      AtInIdents	= 1;	break;
      	case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents	= 1;	break;
        	case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= 1;    break;
+        case FEAT_ORG_PER_SEG:                OrgPerSeg         = 1;    break;
      	case FEAT_PC_ASSIGNMENT:	      PCAssignment	= 1;	break;
         case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = 1;    break;
         case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = 1;    break;
-	default:     			 /* Keep gcc silent */	        break;
+	default:      			 /* Keep gcc silent */	        break;
     }
 
     /* Return the value found */

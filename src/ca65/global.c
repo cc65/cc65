@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -65,7 +65,7 @@ unsigned char DbgSyms	         = 0;   /* Add debug symbols */
 unsigned char Listing  	         = 0;   /* Create listing file */
 unsigned char LineCont	         = 0;   /* Allow line continuation */
 
-/* Emulation features */
+/* Emulation features */                
 unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */
 unsigned char NoColonLabels      = 0;   /* Allow labels without a colon */
 unsigned char LooseStringTerm    = 0;	/* Allow ' as string terminator */
@@ -76,6 +76,7 @@ unsigned char LeadingDotInIdents = 0;   /* Allow '.' to start an identifier */
 unsigned char PCAssignment       = 0;	/* Allow "* = $XXX" or "$ = $XXX" */
 unsigned char MissingCharTerm    = 0;   /* Allow lda #'a (no closing term) */
 unsigned char UbiquitousIdents   = 0;   /* Allow ubiquitous identifiers */
+unsigned char OrgPerSeg          = 0;   /* Make .org local to current seg */
 
 /* Misc stuff */
 const char Copyright[]           = "(C) Copyright 1998-2005 Ullrich von Bassewitz";

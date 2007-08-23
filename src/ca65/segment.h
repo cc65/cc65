@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -63,12 +63,12 @@ struct Segment {
     unsigned long   FragCount;          /* Number of fragments */
     unsigned        Num;       		/* Segment number */
     unsigned        Align;     		/* Segment alignment */
-    unsigned long   PC;
+    int             RelocMode;          /* Relocatable mode if OrgPerSeg */
+    unsigned long   PC;                 /* PC if in relocatable mode */
+    unsigned long   AbsPC;              /* PC if in local absolute mode */
+                                        /* (OrgPerSeg is true) */
     SegDef*         Def;                /* Segment definition (name and type) */
 };
-
-/* Are we in absolute mode or in relocatable mode? */
-extern int RelocMode;
 
 /* Definitions for predefined segments */
 extern SegDef NullSegDef;
@@ -140,8 +140,18 @@ unsigned char GetSegAddrSize (unsigned SegNum);
 unsigned long GetPC (void);
 /* Get the program counter of the current segment */
 
-void SetAbsPC (unsigned long AbsPC);
-/* Set the program counter in absolute mode */
+int GetRelocMode (void);
+/* Return true if we're currently in relocatable mode */
+
+void EnterAbsoluteMode (unsigned long AbsPC);
+/* Enter absolute (non relocatable mode). Depending on the OrgPerSeg flag,
+ * this will either switch the mode globally or for the current segment.
+ */
+
+void EnterRelocMode (void);
+/* Enter relocatable mode. Depending on the OrgPerSeg flag, this will either
+ * switch the mode globally or for the current segment.
+ */
 
 void SegCheck (void);
 /* Check the segments for range and other errors */

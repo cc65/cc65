@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/* (C) 1998-2007, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -1248,7 +1248,7 @@ static void DoOrg (void)
 	Error ("Range error");
     	return;
     }
-    SetAbsPC (PC);
+    EnterAbsoluteMode (PC);
 }
 
 
@@ -1391,7 +1391,7 @@ static void DoPushSeg (void)
 static void DoReloc (void)
 /* Enter relocatable mode */
 {
-    RelocMode = 1;
+    EnterRelocMode ();
 }
 
 

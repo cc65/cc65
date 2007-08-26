@@ -381,7 +381,7 @@ INLINE int IsTypeArray (const Type* T)
 /* Return true if this is an array type */
 {
     return (GetType (T) == T_TYPE_ARRAY);
-}                                 
+}
 #else
 #  define IsTypeArray(T)        (GetType (T) == T_TYPE_ARRAY)
 #endif
@@ -496,8 +496,18 @@ INLINE int IsSignUnsigned (const Type* T)
 #  define IsSignUnsigned(T)     (GetSignedness (T) == T_SIGN_UNSIGNED)
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE int IsSignSigned (const Type* T)
+/* Return true if this is a signed type */
+{
+    return (GetSignedness (T) == T_SIGN_SIGNED);
+}
+#else
+#  define IsSignSigned(T)       (GetSignedness (T) == T_SIGN_SIGNED)
+#endif
+
 TypeCode GetQualifier (const Type* T) attribute ((const));
-/* Get the qualifier from the given type string */
+/* Get the qualifier from the given type string */           
 
 #if defined(HAVE_INLINE)
 INLINE int IsQualConst (const Type* T)

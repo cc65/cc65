@@ -181,50 +181,6 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
 
 
-static int kcalc (token_t tok, long val1, long val2)
-/* Calculate an operation with left and right operand constant. */
-{
-    switch (tok) {
-       	case TOK_EQ:
-  	    return (val1 == val2);
-       	case TOK_NE:
-	    return (val1 != val2);
-       	case TOK_LT:
-	    return (val1 < val2);
-       	case TOK_LE:
-	    return (val1 <= val2);
-       	case TOK_GE:
-	    return (val1 >= val2);
-       	case TOK_GT:
-	    return (val1 > val2);
-       	case TOK_OR:
-  	    return (val1 | val2);
-       	case TOK_XOR:
-  	    return (val1 ^ val2);
-       	case TOK_AND:
-  	    return (val1 & val2);
-       	case TOK_STAR:
-  	    return (val1 * val2);
-       	case TOK_DIV:
-	    if (val2 == 0) {
-	   	Error ("Division by zero");
-	   	return 0x7FFFFFFF;
-	    }
-  	    return (val1 / val2);
-       	case TOK_MOD:
-	    if (val2 == 0) {
-	   	Error ("Modulo operation with zero");
-	       	return 0;
-	    }
-  	    return (val1 % val2);
-  	default:
-  	    Internal ("kcalc: got token 0x%X\n", tok);
-  	    return 0;
-    }
-}
-
-
-
 static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
 /* Find a token in a generator table */
 {
@@ -1662,11 +1618,85 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	    /* Both operands are constant, remove the generated code */
     	    RemoveCode (&Mark1);
 
-	    /* Evaluate the result */
-	    Expr->IVal = kcalc (Tok, Expr->IVal, Expr2.IVal);
-
 	    /* Get the type of the result */
 	    Expr->Type = promoteint (Expr->Type, Expr2.Type);
+
+            /* Handle the op differently for signed and unsigned types */
+            if (IsSignSigned (Expr->Type)) {
+
+                /* Evaluate the result for signed operands */
+                signed long Val1 = Expr->IVal;
+                signed long Val2 = Expr2.IVal;
+                switch (Tok) {
+                    case TOK_OR:
+                        Expr->IVal = (Val1 | Val2);
+                        break;
+                    case TOK_XOR:
+                        Expr->IVal = (Val1 ^ Val2);
+                        break;
+                    case TOK_AND:
+                        Expr->IVal = (Val1 & Val2);
+                        break;
+                    case TOK_STAR:
+                        Expr->IVal = (Val1 * Val2);
+                        break;
+                    case TOK_DIV:
+                        if (Val2 == 0) {
+                            Error ("Division by zero");
+                            Expr->IVal = 0x7FFFFFFF;
+                        } else {
+                            Expr->IVal = (Val1 / Val2);
+                        }
+                        break;
+                    case TOK_MOD:
+                        if (Val2 == 0) {
+                            Error ("Modulo operation with zero");
+                            Expr->IVal = 0;
+                        } else {
+                            Expr->IVal = (Val1 % Val2);
+                        }
+                        break;
+                    default:
+                        Internal ("hie_internal: got token 0x%X\n", Tok);
+                }
+            } else {
+
+                /* Evaluate the result for unsigned operands */
+                unsigned long Val1 = Expr->IVal;
+                unsigned long Val2 = Expr2.IVal;
+                switch (Tok) {
+                    case TOK_OR:
+                        Expr->IVal = (Val1 | Val2);
+                        break;
+                    case TOK_XOR:
+                        Expr->IVal = (Val1 ^ Val2);
+                        break;
+                    case TOK_AND:
+                        Expr->IVal = (Val1 & Val2);
+                        break;
+                    case TOK_STAR:
+                        Expr->IVal = (Val1 * Val2);
+                        break;
+                    case TOK_DIV:
+                        if (Val2 == 0) {
+                            Error ("Division by zero");
+                            Expr->IVal = 0xFFFFFFFF;
+                        } else {
+                            Expr->IVal = (Val1 / Val2);
+                        }
+                        break;
+                    case TOK_MOD:
+                        if (Val2 == 0) {
+                            Error ("Modulo operation with zero");
+                            Expr->IVal = 0;
+                        } else {
+                            Expr->IVal = (Val1 % Val2);
+                        }
+                        break;
+                    default:
+                        Internal ("hie_internal: got token 0x%X\n", Tok);
+                }
+            }
 
 	} else {
 
@@ -1715,7 +1745,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     CodeMark Mark1;
     CodeMark Mark2;
     const GenDesc* Gen;
-    token_t tok; 	  		/* The operator token */
+    token_t Tok; 	  		/* The operator token */
     unsigned ltype;
     int rconst;	       	       	       	/* Operand is a constant */
 
@@ -1725,7 +1755,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
 
     	/* Remember the operator token, then skip it */
-       	tok = CurTok.Tok;
+       	Tok = CurTok.Tok;
     	NextToken ();
 
     	/* Get the lhs on stack */
@@ -1759,21 +1789,51 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	   	Type* right = Indirect (Expr2.Type);
 	   	if (TypeCmp (left, right) < TC_EQUAL && left->C != T_VOID && right->C != T_VOID) {
 	   	    /* Incomatible pointers */
-	   	    Error ("Incompatible types");
-	   	}
+	    	    Error ("Incompatible types");
+	    	}
 	    } else if (!ED_IsNullPtr (&Expr2)) {
-	   	Error ("Incompatible types");
+	    	Error ("Incompatible types");
 	    }
 	}
 
 	/* Check for const operands */
 	if (ED_IsConstAbs (Expr) && rconst) {
 
-	    /* Both operands are constant, remove the generated code */
-    	    RemoveCode (&Mark1);
+       	    /* Both operands are constant, remove the generated code */
+       	    RemoveCode (&Mark1);
 
-	    /* Evaluate the result */
-	    Expr->IVal = kcalc (tok, Expr->IVal, Expr2.IVal);
+            /* Determine if this is a signed or unsigned compare */
+            if (IsClassInt (Expr->Type) && IsSignSigned (Expr->Type) &&
+                IsClassInt (Expr2.Type) && IsSignSigned (Expr2.Type)) {
+
+                /* Evaluate the result for signed operands */
+                signed long Val1 = Expr->IVal;
+                signed long Val2 = Expr2.IVal;
+                switch (Tok) {
+                    case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                    case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                    case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                    case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                    case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                    case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                    default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                }
+
+            } else {
+
+                /* Evaluate the result for unsigned operands */
+                unsigned long Val1 = Expr->IVal;
+                unsigned long Val2 = Expr2.IVal;
+                switch (Tok) {
+                    case TOK_EQ: Expr->IVal = (Val1 == Val2);   break;
+                    case TOK_NE: Expr->IVal = (Val1 != Val2);   break;
+                    case TOK_LT: Expr->IVal = (Val1 < Val2);    break;
+                    case TOK_LE: Expr->IVal = (Val1 <= Val2);   break;
+                    case TOK_GE: Expr->IVal = (Val1 >= Val2);   break;
+                    case TOK_GT: Expr->IVal = (Val1 > Val2);    break;
+                    default:     Internal ("hie_compare: got token 0x%X\n", Tok);
+                }
+            }
 
 	} else {
 

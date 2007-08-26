@@ -14,7 +14,7 @@ tosumodeax:
  	lda	tmp3		; Remainder is in ptr2:tmp3:tmp4
 	sta	sreg
 	lda	tmp4
-	sta	sreg
+	sta	sreg+1
 	lda	ptr2
 	ldx	ptr2+1
 	rts

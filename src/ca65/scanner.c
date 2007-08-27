@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -43,6 +43,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "attrib.h"
 #include "chartype.h"
 #include "check.h"
 #include "fname.h"
@@ -92,7 +93,7 @@ struct InputFile {
 /* Struct to handle textual input data */
 typedef struct InputData InputData;
 struct InputData {
-    char*	    Data;		/* Pointer to the data */
+    char*      	    Text;               /* Pointer to the text data */
     const char*     Pos;		/* Pointer to current position */
     int		    Malloced;		/* Memory was malloced */
     enum Token	    Tok;	    	/* Last token */
@@ -100,11 +101,33 @@ struct InputData {
     InputData*	    Next;		/* Linked list of input data */
 };
 
+/* Input source: Either file or data */
+typedef struct CharSource CharSource;
+
+/* Set of input functions */
+typedef struct CharSourceFunctions CharSourceFunctions;
+struct CharSourceFunctions {
+    void (*MarkStart) (CharSource*);    /* Mark the start pos of a token */
+    void (*NextChar) (CharSource*);     /* Read next char from input */
+    void (*Done) (CharSource*);         /* Close input source */
+};
+
+/* Input source: Either file or data */
+struct CharSource {
+    CharSource*                 Next;   /* Linked list of char sources */
+    enum Token	                Tok;	/* Last token */
+    int		                C;	/* Last character */
+    const CharSourceFunctions*  Func;   /* Pointer to function table */
+    union {
+        InputFile               File;   /* File data */
+        InputData               Data;   /* Textual data */
+    }                           V;
+};
+
 /* Current input variables */
-static InputFile* IFile        	= 0;	/* Current input file */
-static InputData* IData        	= 0;	/* Current input memory data */
-static unsigned	  ICount 	= 0;  	/* Count of input files */
-static int	  C 		= 0;	/* Current input character */
+static CharSource* Source       = 0;    /* Current char source */
+static unsigned	    FCount      = 0;  	/* Count of input files */
+static int	    C           = 0;	/* Current input character */
 
 /* Force end of assembly */
 int 		  ForcedEnd     = 0;
@@ -213,7 +236,7 @@ struct DotKeyword {
     { ".MID",   	TOK_MID		},
     { ".MOD", 		TOK_MOD		},
     { ".NOT", 		TOK_BOOLNOT 	},
-    { ".NULL",		TOK_NULL	},
+    { ".NULL",		TOK_NULL      	},
     { ".OR",  		TOK_BOOLOR  	},
     { ".ORG",  		TOK_ORG		},
     { ".OUT",  		TOK_OUT		},
@@ -263,18 +286,287 @@ struct DotKeyword {
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*                            CharSource functions                           */
 /*****************************************************************************/
 
 
 
-static void NextChar (void);
+static void UseCharSource (CharSource* S)
+/* Initialize a new input source and start to use it. */
+{
+    /* Remember the current input char and token */
+    S->Tok      = Tok;
+    S->C        = C;
+
+    /* Use the new input source */
+    S->Next   	= Source;
+    Source      = S;
+
+    /* Read the first character from the new file */
+    S->Func->NextChar (S);
+
+    /* Setup the next token so it will be skipped on the next call to
+     * NextRawTok().
+     */
+    Tok = TOK_SEP;
+}
+
+
+
+static void DoneCharSource (void)
+/* Close the top level character source */
+{
+    CharSource* S;
+
+    /* First, call the type specific function */
+    Source->Func->Done (Source);
+
+    /* Restore the old token */
+    Tok = Source->Tok;
+    C   = Source->C;
+
+    /* Remember the last stacked input source */
+    S = Source->Next;
+
+    /* Delete the top level one ... */
+    xfree (Source);
+
+    /* ... and use the one before */
+    Source = S;
+}
+
+
+
+/*****************************************************************************/
+/*                            InputFile functions                            */
+/*****************************************************************************/
+
+
+
+static void IFMarkStart (CharSource* S)
+/* Mark the start of the next token */
+{
+    CurPos = S->V.File.Pos;
+}
+
+
+
+static void IFNextChar (CharSource* S)
 /* Read the next character from the input file */
+{
+    /* Check for end of line, read the next line if needed */
+    while (S->V.File.Line [S->V.File.Pos.Col] == '\0') {
+
+        unsigned Len, Removed;
+
+        /* End of current line reached, read next line */
+        if (fgets (S->V.File.Line, sizeof (S->V.File.Line), S->V.File.F) == 0) {
+            /* End of file. Add an empty line to the listing. This is a
+             * small hack needed to keep the PC output in sync.
+             */
+            NewListingLine ("", S->V.File.Pos.Name, FCount);
+            C = EOF;
+            return;
+        }
+
+        /* For better handling of files with unusual line endings (DOS
+         * files that are accidently translated on Unix for example),
+         * first remove all whitespace at the end, then add a single
+         * newline.
+         */
+        Len = strlen (S->V.File.Line);
+        Removed = 0;
+        while (Len > 0 && IsSpace (S->V.File.Line[Len-1])) {
+            ++Removed;
+            --Len;
+        }
+        if (Removed) {
+            S->V.File.Line[Len+0] = '\n';
+            S->V.File.Line[Len+1] = '\0';
+        }
+
+        /* One more line */
+        S->V.File.Pos.Line++;
+        S->V.File.Pos.Col = 0;
+
+        /* Remember the new line for the listing */
+        NewListingLine (S->V.File.Line, S->V.File.Pos.Name, FCount);
+
+    }
+
+    /* Return the next character from the file */
+    C = S->V.File.Line [S->V.File.Pos.Col++];
+}
+
+
+
+void IFDone (CharSource* S)
+/* Close the current input file */
+{
+    /* We're at the end of an include file. Check if we have any
+     * open .IFs, or any open token lists in this file. This
+     * enforcement is artificial, using conditionals that start
+     * in one file and end in another are uncommon, and don't
+     * allowing these things will help finding errors.
+     */
+    CheckOpenIfs ();
+
+    /* Close the input file and decrement the file count. We will ignore
+     * errors here, since we were just reading from the file.
+     */
+    (void) fclose (S->V.File.F);
+    --FCount;
+}
+
+
+
+/* Set of input file handling functions */
+static const CharSourceFunctions IFFunc = {
+    IFMarkStart,
+    IFNextChar,
+    IFDone
+};
+
+
+
+void NewInputFile (const char* Name)
+/* Open a new input file */
+{
+    char* PathName = 0;
+
+    /* First try to open the file */
+    FILE* F = fopen (Name, "r");
+    if (F == 0) {
+
+     	/* Error (fatal error if this is the main file) */
+       	if (FCount == 0) {
+     	    Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
+       	}
+
+       	/* We are on include level. Search for the file in the include
+     	 * directories.
+     	 */
+     	PathName = FindInclude (Name);
+       	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
+     	    /* Not found or cannot open, print an error and bail out */
+     	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
+     	}
+
+       	/* Use the path name from now on */
+        Name = PathName;
+    }
+
+    /* check again if we do now have an open file */
+    if (F != 0) {
+
+     	unsigned        FileIdx;
+        CharSource*     S;
+
+     	/* Stat the file and remember the values. There a race condition here,
+         * since we cannot use fileno() (non standard identifier in standard
+         * header file), and therefore not fstat. When using stat with the
+         * file name, there's a risk that the file was deleted and recreated
+         * while it was open. Since mtime and size are only used to check
+         * if a file has changed in the debugger, we will ignore this problem
+         * here.
+         */
+     	struct stat Buf;
+     	if (stat (Name, &Buf) != 0) {
+     	    Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
+     	}
+
+     	/* Add the file to the input file table and remember the index */
+     	FileIdx = AddFile (Name, Buf.st_size, Buf.st_mtime);
+
+       	/* Create a new input source variable and initialize it */
+     	S                   = xmalloc (sizeof (*S));
+        S->Func             = &IFFunc;
+     	S->V.File.F         = F;
+     	S->V.File.Pos.Line  = 0;
+     	S->V.File.Pos.Col   = 0;
+     	S->V.File.Pos.Name  = FileIdx;
+       	S->V.File.Line[0]   = '\0';
+
+        /* Count active input files */
+       	++FCount;
+
+        /* Use this input source */
+        UseCharSource (S);
+    }
+
+    /* Free an allocated name buffer */
+    xfree (PathName);
+}
 
 
 
 /*****************************************************************************/
-/*		      Character classification functions		     */
+/*                            InputData functions                            */
+/*****************************************************************************/
+
+
+
+static void IDMarkStart (CharSource* S attribute ((unused)))
+/* Mark the start of the next token */
+{
+    /* Nothing to do here */
+}
+
+
+
+static void IDNextChar (CharSource* S)
+/* Read the next character from the input text */
+{
+    C = *S->V.Data.Pos++;
+    if (C == '\0') {
+        /* End of input data */
+        --S->V.Data.Pos;
+        C = EOF;
+    }
+}
+
+
+
+void IDDone (CharSource* S)
+/* Close the current input data */
+{
+    /* Cleanup the current stuff */
+    if (S->V.Data.Malloced) {
+       	xfree (S->V.Data.Text);
+    }
+}
+
+
+
+/* Set of input data handling functions */
+static const CharSourceFunctions IDFunc = {
+    IDMarkStart,
+    IDNextChar,
+    IDDone
+};
+
+
+
+void NewInputData (char* Text, int Malloced)
+/* Add a chunk of input data to the input stream */
+{
+    CharSource* S;
+
+    /* Create a new input source variable and initialize it */
+    S                   = xmalloc (sizeof (*S));
+    S->Func             = &IDFunc;
+    S->V.Data.Text      = Text;
+    S->V.Data.Pos       = Text;
+    S->V.Data.Malloced  = Malloced;
+
+    /* Use this input source */
+    UseCharSource (S);
+}
+
+
+
+/*****************************************************************************/
+/*	      	      Character classification functions		     */
 /*****************************************************************************/
 
 
@@ -282,8 +574,8 @@ static void NextChar (void);
 int IsIdChar (int C)
 /* Return true if the character is a valid character for an identifier */
 {
-    return IsAlNum (C) 			||
-	   (C == '_')			||
+    return IsAlNum (C) 	     		||
+	   (C == '_')	     		||
 	   (C == '@' && AtInIdents)	||
 	   (C == '$' && DollarInIdents);
 }
@@ -304,157 +596,6 @@ int IsIdStart (int C)
 
 
 
-void NewInputFile (const char* Name)
-/* Open a new input file */
-{
-    char* PathName = 0;
-
-    /* First try to open the file */
-    FILE* F = fopen (Name, "r");
-    if (F == 0) {
-
-     	/* Error (fatal error if this is the main file) */
-     	if (ICount == 0) {
-     	    Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
-       	}
-
-       	/* We are on include level. Search for the file in the include
-     	 * directories.
-     	 */
-     	PathName = FindInclude (Name);
-       	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
-     	    /* Not found or cannot open, print an error and bail out */
-     	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
-     	}
-
-       	/* Use the path name from now on */
-        Name = PathName;
-    }
-
-    /* check again if we do now have an open file */
-    if (F != 0) {
-
-     	unsigned FileIdx;
-        InputFile* IF;
-
-     	/* Stat the file and remember the values. There a race condition here,
-         * since we cannot use fileno() (non standard identifier in standard
-         * header file), and therefore not fstat. When using stat with the
-         * file name, there's a risk that the file was deleted and recreated
-         * while it was open. Since mtime and size are only used to check
-         * if a file has changed in the debugger, we will ignore this problem
-         * here.
-         */
-     	struct stat Buf;
-     	if (stat (Name, &Buf) != 0) {
-     	    Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
-     	}
-
-     	/* Add the file to the input file table and remember the index */
-     	FileIdx = AddFile (Name, Buf.st_size, Buf.st_mtime);
-
-     	/* Create a new state variable and initialize it */
-     	IF           = xmalloc (sizeof (*IF));
-     	IF->F        = F;
-     	IF->Pos.Line = 0;
-     	IF->Pos.Col  = 0;
-     	IF->Pos.Name = FileIdx;
-     	IF->Tok      = Tok;
-     	IF->C        = C;
-     	IF->Line[0]  = '\0';
-
-     	/* Use the new file */
-     	IF->Next     = IFile;
-     	IFile  	     = IF;
-     	++ICount;
-
-        /* Read the first character from the new file */
-        NextChar ();
-
-     	/* Setup the next token so it will be skipped on the next call to
-         * NextRawTok().
-         */
-        Tok = TOK_SEP;
-
-    }
-
-    /* Free an allocated name buffer */
-    xfree (PathName);
-}
-
-
-
-void DoneInputFile (void)
-/* Close the current input file */
-{
-    InputFile* I;
-
-    /* Restore the old token */
-    Tok = IFile->Tok;
-    C   = IFile->C;
-
-    /* Save a pointer to the current struct, then set it back */
-    I     = IFile;
-    IFile = I->Next;
-
-    /* Cleanup the current stuff */
-    fclose (I->F);
-    xfree (I);
-    --ICount;
-}
-
-
-
-void NewInputData (char* Data, int Malloced)
-/* Add a chunk of input data to the input stream */
-{
-    InputData* I;
-
-    /* Create a new state variable and initialize it */
-    I  	      	= xmalloc (sizeof (*I));
-    I->Data   	= Data;
-    I->Pos    	= Data;
-    I->Malloced = Malloced;
-    I->Tok     	= Tok;
-    I->C        = C;
-
-    /* Use the new data */
-    I->Next   	= IData;
-    IData     	= I;
-
-    /* Read the first character from the new file */
-    NextChar ();
-
-    /* Setup the next token so it will be skipped on the next call to
-     * NextRawTok().
-     */
-    Tok = TOK_SEP;
-}
-
-
-
-static void DoneInputData (void)
-/* End the current input data stream */
-{
-    InputData* I;
-
-    /* Restore the old token */
-    Tok = IData->Tok;
-    C   = IData->C;
-
-    /* Save a pointer to the current struct, then set it back */
-    I     = IData;
-    IData = I->Next;
-
-    /* Cleanup the current stuff */
-    if (I->Malloced) {
-	xfree (I->Data);
-    }
-    xfree (I);
-}
-
-
-
 static unsigned DigitVal (unsigned char C)
 /* Convert a digit into it's numerical representation */
 {
@@ -470,61 +611,7 @@ static unsigned DigitVal (unsigned char C)
 static void NextChar (void)
 /* Read the next character from the input file */
 {
-    /* If we have an input data structure, read from there */
-    if (IData) {
-
-       	C = *IData->Pos++;
-       	if (C == '\0') {
-       	    /* End of input data */
-            C = EOF;
-       	}
-
-    } else {
-
-      	/* Check for end of line, read the next line if needed */
-       	while (IFile->Line [IFile->Pos.Col] == '\0') {
-
-            unsigned Len, Removed;
-
-      	    /* End of current line reached, read next line */
-      	    if (fgets (IFile->Line, sizeof (IFile->Line), IFile->F) == 0) {
-      	       	/* End of file. Add an empty line to the listing. This is a
-      	    	 * small hack needed to keep the PC output in sync.
-      	    	 */
-      	      	NewListingLine ("", IFile->Pos.Name, ICount);
-      	       	C = EOF;
-      	       	return;
-      	    }
-
-            /* For better handling of files with unusual line endings (DOS
-             * files that are accidently translated on Unix for example),
-             * first remove all whitespace at the end, then add a single
-             * newline.
-             */
-            Len = strlen (IFile->Line);
-            Removed = 0;
-            while (Len > 0 && IsSpace (IFile->Line[Len-1])) {
-                ++Removed;
-                --Len;
-            }
-            if (Removed) {
-                IFile->Line[Len+0] = '\n';
-                IFile->Line[Len+1] = '\0';
-            }
-
-      	    /* One more line */
-      	    IFile->Pos.Line++;
-      	    IFile->Pos.Col = 0;
-
-      	    /* Remember the new line for the listing */
-      	    NewListingLine (IFile->Line, IFile->Pos.Name, ICount);
-
-      	}
-
-      	/* Return the next character from the file */
-      	C = IFile->Line [IFile->Pos.Col++];
-
-    }
+    Source->Func->NextChar (Source);
 }
 
 
@@ -706,13 +793,8 @@ Again:
         } while (IsBlank (C));
     }
 
-    /* If we're reading from the file, update the location from where the
-     * next token will be read. If we're reading from input data, keep the
-     * current position.
-     */
-    if (IData == 0) {
-        CurPos = IFile->Pos;
-    }
+    /* Mark the file position of the next token */
+    Source->Func->MarkStart (Source);
 
     /* Hex number or PC symbol? */
     if (C == '$') {
@@ -1197,49 +1279,29 @@ CharAgain:
 	    if (LineCont) {
 		NextChar ();
 		if (C == '\n') {
-		    /* Handle as white space */
-		    NextChar ();
-		    C = ' ';
- 	     	    goto Again;
-	       	}
-	    }
-	    break;
+     		    /* Handle as white space */
+     		    NextChar ();
+     		    C = ' ';
+     	     	    goto Again;
+     	       	}
+     	    }
+     	    break;
 
         case '\n':
-	    NextChar ();
-	    Tok = TOK_SEP;
-	    return;
+     	    NextChar ();
+     	    Tok = TOK_SEP;
+     	    return;
 
         case EOF:
             CheckInputStack ();
-            if (IData) {
-                /* Input came from internal data */
-                DoneInputData ();
+            /* In case of the main file, do not close it, but return EOF. */
+            if (Source && Source->Next) {
+                DoneCharSource ();
                 goto Again;
-	    } else if (ICount > 1) {
-                /* We're at the end of an include file. Check if we have any
-                 * open .IFs, or any open token lists in this file. This
-                 * enforcement is artificial, using conditionals that start
-                 * in one file and end in another are uncommon, and don't
-                 * allowing these things will help finding errors.
-                 */
-                CheckOpenIfs ();
-
-                /* Close the include file and read the next token. When an
-                 * include file is opened, the last token of the old file is
-                 * not skipped, to prevent the lookahead to read the next line
-                 * of the old input file. So we do effectively skip the last
-                 * token in the old file (the file name of the include
-                 * statement).
-                 */
-	    	DoneInputFile ();
-                goto Again;
-	    } else {
-       	        /* In case of the main file, do not close it, but return EOF. */
-		Tok = TOK_EOF;
-	    }
-	    return;
-
+            } else {
+     	     	Tok = TOK_EOF;
+            }
+            return;
     }
 
     /* If we go here, we could not identify the current character. Skip it
@@ -1349,7 +1411,7 @@ void InitScanner (const char* InFile)
 void DoneScanner (void)
 /* Release scanner resources */
 {
-    DoneInputFile ();
+    DoneCharSource ();
 }
 
 

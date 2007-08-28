@@ -70,7 +70,7 @@
 
 
 
-enum Token Tok = TOK_NONE;		/* Current token */
+Token Tok = TOK_NONE;                   /* Current token */
 int WS;	  				/* Flag: Whitespace before token */
 long IVal;	       	       	    	/* Integer token attribute */
 char SVal[MAX_STR_LEN+1];               /* String token attribute */
@@ -84,7 +84,7 @@ typedef struct InputFile InputFile;
 struct InputFile {
     FILE*      	    F;		       	/* Input file descriptor */
     FilePos	    Pos;	       	/* Position in file */
-    enum Token	    Tok;	       	/* Last token */
+    Token           Tok;	       	/* Last token */
     int		    C;			/* Last character */
     char       	    Line[256];		/* The current input line */
     InputFile*	    Next;      	       	/* Linked list of input files */
@@ -96,7 +96,7 @@ struct InputData {
     char*      	    Text;               /* Pointer to the text data */
     const char*     Pos;		/* Pointer to current position */
     int		    Malloced;		/* Memory was malloced */
-    enum Token	    Tok;	    	/* Last token */
+    Token           Tok;	    	/* Last token */
     int		    C;			/* Last character */
     InputData*	    Next;		/* Linked list of input data */
 };
@@ -115,7 +115,7 @@ struct CharSourceFunctions {
 /* Input source: Either file or data */
 struct CharSource {
     CharSource*                 Next;   /* Linked list of char sources */
-    enum Token	                Tok;	/* Last token */
+    Token                       Tok;	/* Last token */
     int		                C;	/* Last character */
     const CharSourceFunctions*  Func;   /* Pointer to function table */
     union {
@@ -135,7 +135,7 @@ int 		  ForcedEnd     = 0;
 /* List of dot keywords with the corresponding tokens */
 struct DotKeyword {
     const char*	Key;			/* MUST be first field */
-    enum Token  Tok;
+    Token       Tok;
 } DotKeywords [] = {
     { ".A16",  	    	TOK_A16		},
     { ".A8",   	    	TOK_A8		},
@@ -810,7 +810,7 @@ Again:
 	    }
      	}
 
-     	/* Read the number */
+      	/* Read the number */
      	IVal = 0;
      	while (IsXDigit (C)) {
      	    if (IVal & 0xF0000000) {
@@ -835,7 +835,7 @@ Again:
 	    Error ("Binary digit expected");
 	}
 
-	/* Read the number */
+      	/* Read the number */
 	IVal = 0;
 	while (IsBDigit (C)) {
 	    if (IVal & 0x80000000) {
@@ -910,7 +910,7 @@ Again:
 
 	/* This is an integer constant */
        	Tok = TOK_INTCON;
-	return;
+      	return;
     }
 
     /* Control command? */
@@ -935,7 +935,7 @@ Again:
 	    Tok = FindDotKeyword ();
 	    if (Tok == TOK_NONE) {
 
-	    	/* Not found */
+      	    	/* Not found */
 		if (!LeadingDotInIdents) {
 		    /* Invalid pseudo instruction */
 		    Error ("`%s' is not a recognized control command", SVal);
@@ -1035,7 +1035,7 @@ Again:
                     }
                     break;
 
-	      	default:
+      	      	default:
 	     	    break;
    	    }
 
@@ -1085,7 +1085,7 @@ CharAgain:
 
 	case '^':
 	    NextChar ();
-	    Tok = TOK_XOR;
+      	    Tok = TOK_XOR;
 	    return;
 
 	case '&':
@@ -1110,7 +1110,7 @@ CharAgain:
 
 	case ':':
 	    NextChar ();
-	    switch (C) {
+      	    switch (C) {
 
 		case ':':
 		    NextChar ();
@@ -1160,7 +1160,7 @@ CharAgain:
 
 	case '#':
 	    NextChar ();
-	    Tok = TOK_HASH;
+      	    Tok = TOK_HASH;
 	    return;
 
 	case '(':
@@ -1185,7 +1185,7 @@ CharAgain:
 
 	case '{':
 	    NextChar ();
-	    Tok = TOK_LCURLY;
+      	    Tok = TOK_LCURLY;
 	    return;
 
 	case '}':
@@ -1210,7 +1210,7 @@ CharAgain:
 	    return;
 
 	case '=':
-	    NextChar ();
+      	    NextChar ();
        	    Tok = TOK_EQ;
 	    return;
 
@@ -1235,7 +1235,7 @@ CharAgain:
         case '~':
 	    NextChar ();
 	    Tok = TOK_NOT;
-	    return;
+      	    return;
 
  	case '\'':
 	    /* Hack: If we allow ' as terminating character for strings, read
@@ -1285,7 +1285,7 @@ CharAgain:
      	     	    goto Again;
      	       	}
      	    }
-     	    break;
+      	    break;
 
         case '\n':
      	    NextChar ();
@@ -1310,22 +1310,6 @@ CharAgain:
     Error ("Invalid input character: 0x%02X", C & 0xFF);
     NextChar ();
     goto Again;
-}
-
-
-
-int TokHasSVal (enum Token Tok)
-/* Return true if the given token has an attached SVal */
-{
-    return (Tok == TOK_IDENT || TOK_LOCAL_IDENT || Tok == TOK_STRCON);
-}
-
-
-
-int TokHasIVal (enum Token Tok)
-/* Return true if the given token has an attached IVal */
-{
-    return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);
 }
 
 

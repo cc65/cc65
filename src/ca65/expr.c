@@ -333,7 +333,7 @@ static ExprNode* FuncBlank (void)
     /* We have a list of tokens that ends with the closing paren. Skip
      * the tokens, and count them. Allow optionally curly braces.
      */
-    enum Token Term = GetTokListTerm (TOK_RPAREN);
+    Token Term = GetTokListTerm (TOK_RPAREN);
     unsigned Count = 0;
     while (Tok != Term) {
 
@@ -437,7 +437,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
      * single linked list of tokens including attributes. The list is
      * either enclosed in curly braces, or terminated by a comma.
      */
-    enum Token Term = GetTokListTerm (TOK_COMMA);
+    Token Term = GetTokListTerm (TOK_COMMA);
     while (Tok != Term) {
 
     	/* We may not end-of-line of end-of-file here */
@@ -717,7 +717,7 @@ static ExprNode* FuncTCount (void)
     /* We have a list of tokens that ends with the closing paren. Skip
      * the tokens, and count them. Allow optionally curly braces.
      */
-    enum Token Term = GetTokListTerm (TOK_RPAREN);
+    Token Term = GetTokListTerm (TOK_RPAREN);
     int Count = 0;
     while (Tok != Term) {
 
@@ -978,7 +978,7 @@ static ExprNode* Term (void)
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        enum Token T = Tok;
+        Token T = Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1079,7 +1079,7 @@ static ExprNode* SimpleExpr (void)
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        enum Token T = Tok;
+        Token T = Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1141,7 +1141,7 @@ static ExprNode* BoolExpr (void)
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        enum Token T = Tok;
+        Token T = Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1208,7 +1208,7 @@ static ExprNode* Expr2 (void)
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        enum Token T = Tok;
+        Token T = Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1267,7 +1267,7 @@ static ExprNode* Expr1 (void)
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        enum Token T = Tok;
+        Token T = Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */

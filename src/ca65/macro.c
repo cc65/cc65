@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -662,7 +662,7 @@ static void StartExpClassic (Macro* M)
 /* Start expanding the classic macro M */
 {
     MacExp*     E;
-    enum Token  Term;
+    Token       Term;
 
 
     /* Skip the macro name */
@@ -764,7 +764,7 @@ static void StartExpDefine (Macro* M)
        	TokNode*   Last;
 
         /* The macro may optionally be enclosed in curly braces */
-        enum Token Term = GetTokListTerm (TOK_COMMA);
+        Token Term = GetTokListTerm (TOK_COMMA);
 
        	/* Check if there is really a parameter */
        	if (TokIsSep (Tok) || Tok == Term) {

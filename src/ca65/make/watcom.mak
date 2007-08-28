@@ -97,6 +97,7 @@ OBJS = 	anonname.obj    \
 	symbol.obj	\
         symentry.obj    \
 	symtab.obj	\
+        token.obj       \
 	toklist.obj	\
 	ulabel.obj
 

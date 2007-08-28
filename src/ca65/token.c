@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.h				     */
+/*                                  token.c                                  */
 /*                                                                           */
-/*		    The scanner for the ca65 macroassembler		     */
+/*                  Token list for the ca65 macro assembler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/* (C) 2007      Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,35 +33,8 @@
 
 
 
-#ifndef SCANNER_H
-#define SCANNER_H
-
-
-
-/* common */
-#include "filepos.h"
-
 /* ca65 */
 #include "token.h"
-
-
-
-/*****************************************************************************/
-/*     	       	    	       	     Data				     */
-/*****************************************************************************/
-
-
-
-/* Scanner variables */
-#define MAX_INPUT_FILES	254		/* No more than this files total */
-#define MAX_STR_LEN    	255		/* Maximum length of any string */
-extern Token Tok;                       /* Current token */
-extern int WS; 	 			/* Flag: Whitespace before token */
-extern long IVal;      	 		/* Integer token attribute */
-extern char SVal[MAX_STR_LEN+1];        /* String token attribute */
-
-extern FilePos 	CurPos;			/* Name and position in file */
-extern int     	ForcedEnd;		/* Force end of assembly */
 
 
 
@@ -71,52 +44,19 @@ extern int     	ForcedEnd;		/* Force end of assembly */
 
 
 
-int IsIdChar (int C);
-/* Return true if the character is a valid character for an identifier */
-
-int IsIdStart (int C);
-/* Return true if the character may start an identifier */
-
-void NewInputFile (const char* Name);
-/* Open a new input file */
-
-void NewInputData (char* Text, int Malloced);
-/* Add a chunk of input data to the input stream */
-
-void LocaseSVal (void);
-/* Make SVal lower case */
-
-void UpcaseSVal (void);
-/* Make SVal upper case */
-
-void NextRawTok (void);
-/* Read the next raw token from the input stream */
-
-int GetSubKey (const char** Keys, unsigned Count);
-/* Search for a subkey in a table of keywords. The current token must be an
- * identifier and all keys must be in upper case. The identifier will be
- * uppercased in the process. The function returns the index of the keyword,
- * or -1 if the keyword was not found.
- */
-
-unsigned char ParseAddrSize (void);
-/* Check if the next token is a keyword that denotes an address size specifier.
- * If so, return the corresponding address size constant, otherwise output an
- * error message and return ADDR_SIZE_DEFAULT.
- */
-
-void InitScanner (const char* InFile);
-/* Initialize the scanner, open the given input file */
-
-void DoneScanner (void);
-/* Release scanner resources */
+int TokHasSVal (Token Tok)
+/* Return true if the given token has an attached SVal */
+{
+    return (Tok == TOK_IDENT || TOK_LOCAL_IDENT || Tok == TOK_STRCON);
+}
 
 
 
-/* End of scanner.h */
+int TokHasIVal (Token Tok)
+/* Return true if the given token has an attached IVal */
+{
+    return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);
+}
 
-#endif
 
 
-
-                                        

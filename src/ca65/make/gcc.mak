@@ -53,6 +53,7 @@ OBJS =  anonname.o      \
         symentry.o      \
         symbol.o        \
         symtab.o	\
+        token.o         \
        	toklist.o      	\
 	ulabel.o
 

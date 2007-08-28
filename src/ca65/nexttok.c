@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -102,7 +102,7 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
     TokList* List = NewTokList ();
 
     /* Determine if the list is enclosed in curly braces. */
-    enum Token Term = GetTokListTerm (TOK_RPAREN);
+    Token Term = GetTokListTerm (TOK_RPAREN);
 
     /* Read the token list */
     unsigned Current = 0;
@@ -218,10 +218,10 @@ static void NoIdent (void)
 static void FuncIdent (void)
 /* Handle the .IDENT function */
 {
-    char       Buf[sizeof(SVal)];
-    enum Token Id;
-    unsigned   Len;
-    unsigned   I;
+    char      Buf[sizeof(SVal)];
+    Token     Id;
+    unsigned  Len;
+    unsigned  I;
 
     /* Skip it */
     NextTok ();
@@ -337,7 +337,7 @@ static void FuncMid (void)
     /* Left paren expected */
     ConsumeLParen ();
 
-    /* Start argument. Since the start argument can get negative with 
+    /* Start argument. Since the start argument can get negative with
      * expressions like ".tcount(arg)-2", we correct it to zero silently.
      */
     Start = ConstExpression ();
@@ -726,7 +726,7 @@ void NextTok (void)
 
 
 
-void Consume (enum Token Expected, const char* ErrMsg)
+void Consume (Token Expected, const char* ErrMsg)
 /* Consume Expected, print an error if we don't find it */
 {
     if (Tok == Expected) {

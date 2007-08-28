@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  token.c                                  */
+/*                                  token.h                                  */
 /*                                                                           */
 /*                  Token list for the ca65 macro assembler                  */
 /*                                                                           */
@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "inline.h"
+
+
+
 /*****************************************************************************/
 /*     	       	    	       	     Data				     */
 /*****************************************************************************/
@@ -45,7 +50,7 @@
 
 
 /* Tokens */
-enum Token {
+typedef enum Token {
     TOK_NONE,	 	/* Start value, invalid */
     TOK_EOF,           	/* End of input file */
     TOK_SEP, 	 	/* Separator (usually newline) */
@@ -98,7 +103,7 @@ enum Token {
     TOK_HASH,	  	/* # */
     TOK_COLON, 	  	/* : */
     TOK_LPAREN,	  	/* ( */
-    TOK_RPAREN,	  	/* ) */
+    TOK_RPAREN,	    	/* ) */
     TOK_LBRACK,	  	/* [ */
     TOK_RBRACK,	  	/* ] */
     TOK_LCURLY,         /* { */
@@ -241,13 +246,31 @@ enum Token {
     TOK_LASTPSEUDO	= TOK_ZEROPAGE,
 
     TOK_COUNT  	  	/* Count of tokens */
-};
+} Token;
 
 
 
 /*****************************************************************************/
 /*     	       	       	       	     Code    				     */
 /*****************************************************************************/
+
+
+
+int TokHasSVal (Token Tok);
+/* Return true if the given token has an attached SVal */
+
+int TokHasIVal (Token Tok);
+/* Return true if the given token has an attached IVal */
+
+#if defined(HAVE_INLINE)
+INLINE int TokIsSep (enum Token T)
+/* Return true if this is a separator token */
+{
+    return (T == TOK_SEP || T == TOK_EOF);
+}
+#else
+#  define TokIsSep(T)   (T == TOK_SEP || T == TOK_EOF)
+#endif
 
 
 

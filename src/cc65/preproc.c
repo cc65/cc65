@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/* (C) 1998-2007, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -128,7 +128,8 @@ typedef enum {
     PP_INCLUDE,
     PP_LINE,
     PP_PRAGMA,
-    PP_UNDEF
+    PP_UNDEF,
+    PP_WARNING,
 } pptoken_t;
 
 
@@ -150,6 +151,7 @@ static const struct PPToken {
     {   "line",	       	PP_LINE		},
     {  	"pragma",      	PP_PRAGMA	},
     {  	"undef",       	PP_UNDEF	},
+    {  	"warning",      PP_WARNING      },
 };
 
 /* Number of preprocessor tokens */
@@ -983,19 +985,6 @@ static void PreprocessLine (void)
 
 
 
-static void DoUndef (void)
-/* Process the #undef directive */
-{
-    ident Ident;
-
-    SkipWhitespace ();
-    if (MacName (Ident)) {
-	UndefineMacro (Ident);
-    }
-}
-
-
-
 static int PushIf (int Skip, int Invert, int Cond)
 /* Push a new if level onto the if stack */
 {
@@ -1014,6 +1003,22 @@ static int PushIf (int Skip, int Invert, int Cond)
      	IfStack[IfIndex] = IFCOND_NONE | IFCOND_NEEDTERM;
      	return (Invert ^ Cond);
     }
+}
+
+
+
+static void DoError (void)
+/* Print an error */
+{
+    SkipWhitespace ();
+    if (CurC == '\0') {
+ 	PPError ("Invalid #error directive");
+    } else {
+        PPError ("#error: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
+    }
+
+    /* Clear the rest of line */
+    ClearLine ();
 }
 
 
@@ -1162,22 +1167,6 @@ Done:
 
 
 
-static void DoError (void)
-/* Print an error */
-{
-    SkipWhitespace ();
-    if (CurC == '\0') {
- 	PPError ("Invalid #error directive");
-    } else {
-        PPError ("#error: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
-    }
-
-    /* Clear the rest of line */
-    ClearLine ();
-}
-
-
-
 static void DoPragma (void)
 /* Handle a #pragma line by converting the #pragma preprocessor directive into
  * the _Pragma() compiler operator.
@@ -1199,6 +1188,35 @@ static void DoPragma (void)
     /* Initialize reading from line */
     SB_Reset (Line);
     InitLine (Line);
+}
+
+
+
+static void DoUndef (void)
+/* Process the #undef directive */
+{
+    ident Ident;
+
+    SkipWhitespace ();
+    if (MacName (Ident)) {
+	UndefineMacro (Ident);
+    }
+}
+
+
+
+static void DoWarning (void)
+/* Print a warning */
+{
+    SkipWhitespace ();
+    if (CurC == '\0') {
+ 	PPError ("Invalid #warning directive");
+    } else {
+        PPWarning ("#warning: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
+    }
+
+    /* Clear the rest of line */
+    ClearLine ();
 }
 
 
@@ -1339,6 +1357,18 @@ void Preprocess (void)
     	    	    	    DoUndef ();
     	    	    	}
     	    	    	break;
+
+                    case PP_WARNING:
+                        /* #warning is a non standard extension */
+                        if (IS_Get (&Standard) > STD_C99) {
+                            if (!Skip) {
+                                DoWarning ();
+                            }
+                        } else {
+                            PPError ("Preprocessor directive expected");
+                            ClearLine ();
+                        }
+                        break;
 
     	    	    default:
     	    	    	PPError ("Preprocessor directive expected");

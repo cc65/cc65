@@ -16,7 +16,7 @@ CRT0 = $(SYS).o
 CLIB = $(SYS).lib
 CL   = cl65
 CC   = cc65
-AS   = as65
+AS   = ca65
 LD   = ld65
 
 else

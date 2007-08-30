@@ -59,7 +59,7 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 
 	case EXPR_LITERAL:
 	case EXPR_ULABEL:
-       	    printf (" $%04lX", Expr->V.Val);
+       	    printf (" $%04lX", Expr->V.IVal);
 	    break;
 
 	case EXPR_SYMBOL:

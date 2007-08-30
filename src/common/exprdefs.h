@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -105,7 +105,7 @@ struct ExprNode {
     ExprNode*  	     	    Right;     	/* Right leaf */
     struct ObjData* 	    Obj;	/* Object file reference (linker) */
     union {
-       	long         	    Val;	/* If this is a value */
+       	long           	    IVal;	/* If this is a int value */
        	struct SymEntry*    Sym;	/* If this is a symbol */
 	unsigned       	    SegNum;  	/* If this is a segment */
 	unsigned    	    ImpNum;	/* If this is an import */

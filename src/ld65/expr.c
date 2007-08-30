@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -62,7 +62,7 @@ static ExprNode* NewExprNode (ObjData* O)
     N->Left 	= 0;
     N->Right 	= 0;
     N->Obj	= O;
-    N->V.Val	= 0;
+    N->V.IVal	= 0;
 
     return N;
 }
@@ -248,7 +248,7 @@ long GetExprVal (ExprNode* Expr)
     switch (Expr->Op) {
 
        	case EXPR_LITERAL:
-     	    return Expr->V.Val;
+     	    return Expr->V.IVal;
 
        	case EXPR_SYMBOL:
      	    /* Get the referenced export */
@@ -389,7 +389,7 @@ ExprNode* LiteralExpr (long Val, ObjData* O)
 {
     ExprNode* Expr = NewExprNode (O);
     Expr->Op = EXPR_LITERAL;
-    Expr->V.Val = Val;
+    Expr->V.IVal = Val;
     return Expr;
 }
 
@@ -484,7 +484,7 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 	switch (Op) {
 
 	    case EXPR_LITERAL:
-	   	Expr->V.Val = Read32Signed (F);
+	   	Expr->V.IVal = Read32Signed (F);
 	   	break;
 
 	    case EXPR_SYMBOL:
@@ -537,7 +537,7 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
 
 	case EXPR_LITERAL:
 	    /* Value must be identical */
-	    return (E1->V.Val == E2->V.Val);
+	    return (E1->V.IVal == E2->V.IVal);
 
 	case EXPR_SYMBOL:
 	    /* Import number must be identical */

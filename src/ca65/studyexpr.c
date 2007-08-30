@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2003-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -487,7 +487,7 @@ static void StudyLiteral (ExprNode* Expr, ExprDesc* D)
 /* Study a literal expression node */
 {
     /* This one is easy */
-    D->Val      = Expr->V.Val;
+    D->Val      = Expr->V.IVal;
     D->AddrSize = GetConstAddrSize (D->Val);
 }
 
@@ -598,7 +598,7 @@ static void StudyULabel (ExprNode* Expr, ExprDesc* D)
      */
     if (ULabCanResolve ()) {
         /* We can resolve the label */
-        StudyExprInternal (ULabResolve (Expr->V.Val), D);
+        StudyExprInternal (ULabResolve (Expr->V.IVal), D);
     } else {
         ED_Invalidate (D);
     }

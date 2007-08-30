@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -202,7 +202,7 @@ static void SymReplaceExprRefs (SymEntry* S)
          * Replace it by a literal node.
          */
         E->Op = EXPR_LITERAL;
-        E->V.Val = Val;
+        E->V.IVal = Val;
     }
 
     /* Remove all symbol references from the symbol */

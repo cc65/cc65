@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1999-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -353,7 +353,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     switch (Expr->Op) {
 
 	case EXPR_LITERAL:
-            D->Val += (Sign * Expr->V.Val);
+            D->Val += (Sign * Expr->V.IVal);
 	    break;
 
 	case EXPR_SYMBOL:

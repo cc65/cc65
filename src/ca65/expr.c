@@ -185,7 +185,7 @@ static int IsEasyConst (const ExprNode* E, long* Val)
     /* Symbols resolved, check for a literal */
     if (E->Op == EXPR_LITERAL) {
         if (Val) {
-            *Val = E->V.Val;
+            *Val = E->V.IVal;
         }
         return 1;
     }
@@ -1422,7 +1422,7 @@ ExprNode* GenLiteralExpr (long Val)
 /* Return an expression tree that encodes the given literal value */
 {
     ExprNode* Expr = NewExprNode (EXPR_LITERAL);
-    Expr->V.Val = Val;
+    Expr->V.IVal = Val;
     return Expr;
 }
 
@@ -1567,7 +1567,7 @@ ExprNode* GenULabelExpr (unsigned Num)
 /* Return an expression for an unnamed label with the given index */
 {
     ExprNode* Node = NewExprNode (EXPR_ULABEL);
-    Node->V.Val	= Num;
+    Node->V.IVal	= Num;
 
     /* Return the new node */
     return Node;
@@ -1649,11 +1649,11 @@ ExprNode* CloneExpr (ExprNode* Expr)
     switch (Expr->Op) {
 
 	case EXPR_LITERAL:
-            Clone = GenLiteralExpr (Expr->V.Val);
+            Clone = GenLiteralExpr (Expr->V.IVal);
             break;
 
 	case EXPR_ULABEL:
-	    Clone = GenULabelExpr (Expr->V.Val);
+	    Clone = GenULabelExpr (Expr->V.IVal);
 	    break;
 
 	case EXPR_SYMBOL:
@@ -1695,7 +1695,7 @@ void WriteExpr (ExprNode* Expr)
 
         case EXPR_LITERAL:
             ObjWrite8 (EXPR_LITERAL);
-    	    ObjWrite32 (Expr->V.Val);
+    	    ObjWrite32 (Expr->V.IVal);
     	    break;
 
         case EXPR_SYMBOL:
@@ -1713,7 +1713,7 @@ void WriteExpr (ExprNode* Expr)
 	    break;
 
 	case EXPR_ULABEL:
-            WriteExpr (ULabResolve (Expr->V.Val));
+            WriteExpr (ULabResolve (Expr->V.IVal));
 	    break;
 
         default:

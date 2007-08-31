@@ -77,7 +77,8 @@ OBJS = 	asminc.obj      \
         opc65sc02.obj   \
   	opctable.obj 	\
 	output.obj 	\
-	scanner.obj
+	scanner.obj     \
+        segment.obj
 
 
 LIBS = ../common/common.lib

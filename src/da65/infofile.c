@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -58,6 +58,7 @@
 #include "labels.h"
 #include "opctable.h"
 #include "scanner.h"
+#include "segment.h"
 
 
 
@@ -75,6 +76,99 @@ static void AddAttr (const char* Name, unsigned* Set, unsigned Attr)
         InfoError ("%s given twice", Name);
     }
     *Set |= Attr;
+}
+
+
+
+static void AsmIncSection (void)
+/* Parse a asminc section */
+{
+    static const IdentTok LabelDefs[] = {
+        {   "COMMENTSTART",     INFOTOK_COMMENTSTART    },
+       	{   "FILE",    	        INFOTOK_FILE            },                     
+        {   "IGNOREUNKNOWN",    INFOTOK_IGNOREUNKNOWN   },
+    };
+
+    /* Locals - initialize to avoid gcc warnings */
+    char* Name = 0;
+    int CommentStart = EOF;
+    int IgnoreUnknown = -1;
+
+    /* Skip the token */
+    InfoNextTok ();
+
+    /* Expect the opening curly brace */
+    InfoConsumeLCurly ();
+
+    /* Look for section tokens */
+    while (InfoTok != INFOTOK_RCURLY) {
+
+	/* Convert to special token */
+       	InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Asminc directive");
+
+	/* Look at the token */
+	switch (InfoTok) {
+
+            case INFOTOK_COMMENTSTART:
+                InfoNextTok ();
+                if (CommentStart != EOF) {
+                    InfoError ("Commentstart already given");
+                }
+                InfoAssureChar ();
+                CommentStart = (char) InfoIVal;
+                InfoNextTok ();
+                break;
+
+	    case INFOTOK_FILE:
+	        InfoNextTok ();
+	       	if (Name) {
+	       	    InfoError ("File name already given");
+	       	}
+	       	InfoAssureStr ();
+		if (InfoSVal[0] == '\0') {
+		    InfoError ("File name may not be empty");
+		}
+	       	Name = xstrdup (InfoSVal);
+	       	InfoNextTok ();
+	       	break;
+
+            case INFOTOK_IGNOREUNKNOWN:
+                InfoNextTok ();
+                if (IgnoreUnknown != -1) {
+                    InfoError ("Ignoreunknown already specified");
+                }
+                InfoBoolToken ();
+                IgnoreUnknown = (InfoTok != INFOTOK_FALSE);
+                InfoNextTok ();
+                break;
+
+            default:
+                Internal ("Unexpected token: %u", InfoTok);
+	}
+
+	/* Directive is followed by a semicolon */
+	InfoConsumeSemi ();
+    }
+
+    /* Check for the necessary data and assume defaults */
+    if (Name == 0) {
+	InfoError ("File name is missing");
+    }
+    if (CommentStart == EOF) {
+	CommentStart = ';';
+    }
+    if (IgnoreUnknown == -1) {
+        IgnoreUnknown = 0;
+    }
+
+    /* Open the file and read the symbol definitions */
+    AsmInc (Name, CommentStart, IgnoreUnknown);
+
+    /* Delete the dynamically allocated memory for Name */
+    xfree (Name);
+
+    /* Consume the closing brace */
+    InfoConsumeRCurly ();
 }
 
 
@@ -256,6 +350,134 @@ static void GlobalSection (void)
 
 
 
+static void LabelSection (void)
+/* Parse a label section */
+{
+    static const IdentTok LabelDefs[] = {
+       	{   "COMMENT",  INFOTOK_COMMENT },
+	{   "ADDR",	INFOTOK_ADDR	},
+       	{   "NAME",	INFOTOK_NAME	},
+       	{   "SIZE",    	INFOTOK_SIZE	},
+    };
+
+    /* Locals - initialize to avoid gcc warnings */
+    char* Name    = 0;
+    char* Comment = 0;
+    long Value    = -1;
+    long Size     = -1;
+
+    /* Skip the token */
+    InfoNextTok ();
+
+    /* Expect the opening curly brace */
+    InfoConsumeLCurly ();
+
+    /* Look for section tokens */
+    while (InfoTok != INFOTOK_RCURLY) {
+
+	/* Convert to special token */
+       	InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Label attribute");
+
+	/* Look at the token */
+	switch (InfoTok) {
+
+	    case INFOTOK_ADDR:
+	       	InfoNextTok ();
+	       	if (Value >= 0) {
+	       	    InfoError ("Value already given");
+	       	}
+     	       	InfoAssureInt ();
+		InfoRangeCheck (0, 0xFFFF);
+	       	Value = InfoIVal;
+	       	InfoNextTok ();
+	       	break;
+
+	    case INFOTOK_COMMENT:
+	        InfoNextTok ();
+	       	if (Comment) {
+	       	    InfoError ("Comment already given");
+	       	}
+	       	InfoAssureStr ();
+		if (InfoSVal[0] == '\0') {
+		    InfoError ("Comment may not be empty");
+		}
+	       	Comment = xstrdup (InfoSVal);
+	       	InfoNextTok ();
+	       	break;
+
+	    case INFOTOK_NAME:
+	        InfoNextTok ();
+	       	if (Name) {
+	       	    InfoError ("Name already given");
+	       	}
+     	       	InfoAssureStr ();
+	       	Name = xstrdup (InfoSVal);
+	       	InfoNextTok ();
+	       	break;
+
+	    case INFOTOK_SIZE:
+	       	InfoNextTok ();
+	       	if (Size >= 0) {
+	       	    InfoError ("Size already given");
+	       	}
+	       	InfoAssureInt ();
+	    	InfoRangeCheck (1, 0x10000);
+	       	Size = InfoIVal;
+	       	InfoNextTok ();
+     	       	break;
+
+            default:
+                Internal ("Unexpected token: %u", InfoTok);
+     	}
+
+     	/* Directive is followed by a semicolon */
+     	InfoConsumeSemi ();
+    }
+
+    /* Did we get the necessary data */
+    if (Name == 0) {
+     	InfoError ("Label name is missing");
+    }
+    if (Name[0] == '\0' && Size > 1) {
+        InfoError ("Unnamed labels must not have a size > 1");
+    }
+    if (Value < 0) {
+	InfoError ("Label value is missing");
+    }
+    if (Size < 0) {
+	/* Use default */
+	Size = 1;
+    }
+    if (Value + Size > 0x10000) {
+    	InfoError ("Invalid size (address out of range)");
+    }
+    if (HaveLabel ((unsigned) Value)) {
+    	InfoError ("Label for address $%04lX already defined", Value);
+    }
+
+    /* Define the label(s) */
+    if (Name[0] == '\0') {
+        /* Size has already beed checked */
+        AddUnnamedLabel (Value);
+    } else {
+        AddExtLabelRange ((unsigned) Value, Name, Size);
+    }
+
+    /* Define the comment */
+    if (Comment) {
+        SetComment (Value, Comment);
+    }
+
+    /* Delete the dynamically allocated memory for Name and Comment */
+    xfree (Name);
+    xfree (Comment);
+
+    /* Consume the closing brace */
+    InfoConsumeRCurly ();
+}
+
+
+
 static void RangeSection (void)
 /* Parse a range section */
 {
@@ -311,7 +533,7 @@ static void RangeSection (void)
     while (InfoTok != INFOTOK_RCURLY) {
 
 	/* Convert to special token */
-       	InfoSpecialToken (RangeDefs, ENTRY_COUNT (RangeDefs), "Range directive");
+       	InfoSpecialToken (RangeDefs, ENTRY_COUNT (RangeDefs), "Range attribute");
 
 	/* Look at the token */
 	switch (InfoTok) {
@@ -425,21 +647,19 @@ static void RangeSection (void)
 
 
 
-static void LabelSection (void)
-/* Parse a label section */
+static void SegmentSection (void)
+/* Parse a segment section */
 {
     static const IdentTok LabelDefs[] = {
-       	{   "COMMENT",  INFOTOK_COMMENT },
-	{   "ADDR",	INFOTOK_ADDR	},
+       	{   "END",     	INFOTOK_END     },
        	{   "NAME",	INFOTOK_NAME	},
-       	{   "SIZE",    	INFOTOK_SIZE	},
+	{   "START",    INFOTOK_START   },
     };
 
     /* Locals - initialize to avoid gcc warnings */
-    char* Name    = 0;
-    char* Comment = 0;
-    long Value    = -1;
-    long Size     = -1;
+    long End    = -1;
+    long Start  = -1;
+    char* Name  = 0;
 
     /* Skip the token */
     InfoNextTok ();
@@ -450,34 +670,21 @@ static void LabelSection (void)
     /* Look for section tokens */
     while (InfoTok != INFOTOK_RCURLY) {
 
-	/* Convert to special token */
-       	InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Label directive");
+    	/* Convert to special token */
+       	InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Segment attribute");
 
-	/* Look at the token */
-	switch (InfoTok) {
+    	/* Look at the token */
+    	switch (InfoTok) {
 
-	    case INFOTOK_ADDR:
-	       	InfoNextTok ();
-	       	if (Value >= 0) {
-	       	    InfoError ("Value already given");
-	       	}
+    	    case INFOTOK_END:
+    	       	InfoNextTok ();
+    	       	if (End >= 0) {
+    	       	    InfoError ("Value already given");
+    	       	}
      	       	InfoAssureInt ();
-		InfoRangeCheck (0, 0xFFFF);
-	       	Value = InfoIVal;
-	       	InfoNextTok ();
-	       	break;
-
-	    case INFOTOK_COMMENT:
-	        InfoNextTok ();
-	       	if (Comment) {
-	       	    InfoError ("Comment already given");
-	       	}
-	       	InfoAssureStr ();
-		if (InfoSVal[0] == '\0') {
-		    InfoError ("Comment may not be empty");
-		}
-	       	Comment = xstrdup (InfoSVal);
-	       	InfoNextTok ();
+    		InfoRangeCheck (0, 0xFFFF);
+    	       	End = InfoIVal;
+    	       	InfoNextTok ();
 	       	break;
 
 	    case INFOTOK_NAME:
@@ -490,16 +697,16 @@ static void LabelSection (void)
 	       	InfoNextTok ();
 	       	break;
 
-	    case INFOTOK_SIZE:
-	       	InfoNextTok ();
-	       	if (Size >= 0) {
-	       	    InfoError ("Size already given");
-	       	}
-	       	InfoAssureInt ();
-	    	InfoRangeCheck (1, 0x10000);
-	       	Size = InfoIVal;
-	       	InfoNextTok ();
-     	       	break;
+    	    case INFOTOK_START:
+    	       	InfoNextTok ();
+    	       	if (Start >= 0) {
+    	       	    InfoError ("Value already given");
+    	       	}
+     	       	InfoAssureInt ();
+    		InfoRangeCheck (0, 0xFFFF);
+    	       	Start = InfoIVal;
+    	       	InfoNextTok ();
+	       	break;
 
             default:
                 Internal ("Unexpected token: %u", InfoTok);
@@ -509,133 +716,30 @@ static void LabelSection (void)
      	InfoConsumeSemi ();
     }
 
-    /* Did we get the necessary data */
-    if (Name == 0) {
-     	InfoError ("Label name is missing");
+    /* Did we get the necessary data, and is it correct? */
+    if (Name == 0 || Name[0] == '\0') {
+       	InfoError ("Segment name is missing");
     }
-    if (Name[0] == '\0' && Size > 1) {
-        InfoError ("Unnamed labels must not have a size > 1");
+    if (End < 0) {
+        InfoError ("End address is missing");
     }
-    if (Value < 0) {
-	InfoError ("Label value is missing");
+    if (Start < 0) {
+	InfoError ("Start address is missing");
     }
-    if (Size < 0) {
-	/* Use default */
-	Size = 1;
+    if (Start == End) {
+        InfoError ("Segment is empty");
     }
-    if (Value + Size > 0x10000) {
-    	InfoError ("Invalid size (address out of range)");
-    }
-    if (HaveLabel ((unsigned) Value)) {
-    	InfoError ("Label for address $%04lX already defined", Value);
+    if (Start > End) {
+        InfoError ("Start address of segment is greater than end address");
     }
 
-    /* Define the label(s) */
-    if (Name[0] == '\0') {
-        /* Size has already beed checked */
-        AddUnnamedLabel (Value);
-    } else {
-        AddExtLabelRange ((unsigned) Value, Name, Size);
+    /* Check that segments do not overlap */
+    if (SegmentDefined ((unsigned) Start, (unsigned) End)) {
+        InfoError ("Segments cannot overlap");
     }
 
-    /* Define the comment */
-    if (Comment) {
-        SetComment (Value, Comment);
-    }
-
-    /* Delete the dynamically allocated memory for Name and Comment */
-    xfree (Name);
-    xfree (Comment);
-
-    /* Consume the closing brace */
-    InfoConsumeRCurly ();
-}
-
-
-
-static void AsmIncSection (void)
-/* Parse a asminc section */
-{
-    static const IdentTok LabelDefs[] = {
-        {   "COMMENTSTART",     INFOTOK_COMMENTSTART    },
-       	{   "FILE",    	        INFOTOK_FILE            },
-        {   "IGNOREUNKNOWN",    INFOTOK_IGNOREUNKNOWN   },
-    };
-
-    /* Locals - initialize to avoid gcc warnings */
-    char* Name = 0;
-    int CommentStart = EOF;
-    int IgnoreUnknown = -1;
-
-    /* Skip the token */
-    InfoNextTok ();
-
-    /* Expect the opening curly brace */
-    InfoConsumeLCurly ();
-
-    /* Look for section tokens */
-    while (InfoTok != INFOTOK_RCURLY) {
-
-	/* Convert to special token */
-       	InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Asminc directive");
-
-	/* Look at the token */
-	switch (InfoTok) {
-
-            case INFOTOK_COMMENTSTART:
-                InfoNextTok ();
-                if (CommentStart != EOF) {
-                    InfoError ("Commentstart already given");
-                }
-                InfoAssureChar ();
-                CommentStart = (char) InfoIVal;
-                InfoNextTok ();
-                break;
-
-	    case INFOTOK_FILE:
-	        InfoNextTok ();
-	       	if (Name) {
-	       	    InfoError ("File name already given");
-	       	}
-	       	InfoAssureStr ();
-		if (InfoSVal[0] == '\0') {
-		    InfoError ("File name may not be empty");
-		}
-	       	Name = xstrdup (InfoSVal);
-	       	InfoNextTok ();
-	       	break;
-
-            case INFOTOK_IGNOREUNKNOWN:
-                InfoNextTok ();
-                if (IgnoreUnknown != -1) {
-                    InfoError ("Ignoreunknown already specified");
-                }
-                InfoBoolToken ();
-                IgnoreUnknown = (InfoTok != INFOTOK_FALSE);
-                InfoNextTok ();
-                break;
-
-            default:
-                Internal ("Unexpected token: %u", InfoTok);
-	}
-
-	/* Directive is followed by a semicolon */
-	InfoConsumeSemi ();
-    }
-
-    /* Check for the necessary data and assume defaults */
-    if (Name == 0) {
-	InfoError ("File name is missing");
-    }
-    if (CommentStart == EOF) {
-	CommentStart = ';';
-    }
-    if (IgnoreUnknown == -1) {
-        IgnoreUnknown = 0;
-    }
-
-    /* Open the file and read the symbol definitions */
-    AsmInc (Name, CommentStart, IgnoreUnknown);
+    /* Remember the segment data */
+    AddAbsSegment ((unsigned) Start, (unsigned) End, Name);
 
     /* Delete the dynamically allocated memory for Name */
     xfree (Name);
@@ -650,10 +754,11 @@ static void InfoParse (void)
 /* Parse the config file */
 {
     static const IdentTok Globals[] = {
-     	{   "GLOBAL", 	INFOTOK_GLOBAL  },
-     	{   "RANGE",	INFOTOK_RANGE 	},
-	{   "LABEL",	INFOTOK_LABEL 	},
         {   "ASMINC",   INFOTOK_ASMINC  },
+     	{   "GLOBAL", 	INFOTOK_GLOBAL  },
+	{   "LABEL",	INFOTOK_LABEL 	},
+     	{   "RANGE",	INFOTOK_RANGE 	},
+        {   "SEGMENT",  INFOTOK_SEGMENT },
     };
 
     while (InfoTok != INFOTOK_EOF) {
@@ -664,20 +769,24 @@ static void InfoParse (void)
 	/* Check the token */
 	switch (InfoTok) {
 
+            case INFOTOK_ASMINC:
+                AsmIncSection ();
+                break;
+
 	    case INFOTOK_GLOBAL:
 		GlobalSection ();
-		break;
-
-	    case INFOTOK_RANGE:
-		RangeSection ();
 		break;
 
 	    case INFOTOK_LABEL:
 		LabelSection ();
 		break;
 
-            case INFOTOK_ASMINC:
-                AsmIncSection ();
+	    case INFOTOK_RANGE:
+		RangeSection ();
+		break;
+
+            case INFOTOK_SEGMENT:
+                SegmentSection ();
                 break;
 
             default:

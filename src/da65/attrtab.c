@@ -66,6 +66,19 @@ void AddrCheck (unsigned Addr)
 
 
 
+int SegmentDefined (unsigned Start, unsigned End)
+/* Return true if the atSegment bit is set somewhere in the given range */
+{
+    while (Start <= End) {
+        if (AttrTab[Start++] & atSegment) {
+            return 1;
+        }
+    }
+    return 0;
+}            
+
+
+
 unsigned GetGranularity (attr_t Style)
 /* Get the granularity for the given style */
 {

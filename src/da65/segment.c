@@ -1,13 +1,13 @@
 /*****************************************************************************/
 /*                                                                           */
-/*     				   attrtab.h				     */
+/*                                 segment.c                                 */
 /*                                                                           */
-/*     			 Disassembler attribute table			     */
+/*                         Segment handling for da65                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2007      Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -33,81 +33,77 @@
 
 
 
-#ifndef ATTRTAB_H
-#define ATTRTAB_H
+#include <string.h>
+
+/* common */
+#include "addrsize.h"
+#include "xmalloc.h"
+
+/* da65 */
+#include "attrtab.h"
+#include "segment.h"
 
 
 
 /*****************************************************************************/
-/*     				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-typedef enum attr_t {
+/* Hash definitions */
+#define HASH_SIZE       64              /* Must be power of two */
+#define HASH_MASK       (HASH_SIZE-1)
 
-    /* Styles */
-    atDefault  	    = 0x0000,   /* Default style */
-    atCode     	    = 0x0001,
-    atIllegal  	    = 0x0002,
-    atByteTab  	    = 0x0003,	/* Same as illegal */
-    atDByteTab      = 0x0004,
-    atWordTab  	    = 0x0005,
-    atDWordTab 	    = 0x0006,
-    atAddrTab  	    = 0x0007,
-    atRtsTab   	    = 0x0008,
-    atTextTab       = 0x0009,
-    atSkip          = 0x000A,   /* Skip code completely */
+/* Segment definition */
+typedef struct Segment Segment;
+struct Segment {
+    Segment*            NextStart;      /* Pointer to next segment */
+    Segment*            NextEnd;        /* Pointer to next segment */
+    unsigned long       Start;
+    unsigned long       End;
+    unsigned            AddrSize;
+    char                Name[1];        /* Name, dynamically allocated */
+};
 
-    /* Label flags */
-    atNoLabel  	    = 0x0000,	/* No label for this address */
-    atExtLabel 	    = 0x0010,	/* External label */
-    atIntLabel      = 0x0020,	/* Internally generated label */
-    atDepLabel 	    = 0x0040,	/* Dependent label */
-    atUnnamedLabel  = 0x0080,   /* Unnamed label */
-
-    atLabelDefined  = 0x0100,   /* True if we defined the label */
-
-    atStyleMask     = 0x000F,	/* Output style */
-    atLabelMask     = 0x00F0,   /* Label information */
-
-    /* Segment */
-    atSegment       = 0x0100,   /* Code is in a segment */
-} attr_t;
+/* Tables containing the segments. A segment is inserted using it's hash
+ * value. Collision is done by single linked lists.
+ */
+static Segment* StartTab[HASH_SIZE];    /* Table containing segment starts */
+static Segment* EndTab[HASH_SIZE];      /* Table containing segment ends */
 
 
 
 /*****************************************************************************/
-/*     				     Code	   			     */
+/*     	       	       	       	     Code    				     */
 /*****************************************************************************/
 
 
 
-void AddrCheck (unsigned Addr);
-/* Check if the given address has a valid range */
+void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
+/* Add an absolute segment to the segment table */
+{
+    /* Get the length of the name */
+    unsigned Len = strlen (Name);
 
-int SegmentDefined (unsigned Start, unsigned End);
-/* Return true if the atSegment bit is set somewhere in the given range */
+    /* Create a new segment */
+    Segment* S = xmalloc (sizeof (Segment) + Len);
 
-unsigned GetGranularity (attr_t Style);
-/* Get the granularity for the given style */
+    /* Fill in the data */
+    S->Start    = Start;
+    S->End      = End;
+    S->AddrSize = ADDR_SIZE_ABS;
+    memcpy (S->Name, Name, Len + 1);
 
-void MarkRange (unsigned Start, unsigned End, attr_t Attr);
-/* Mark a range with the given attribute */
+    /* Insert the segment into the hash tables */
+    S->NextStart = StartTab[Start & HASH_MASK];
+    StartTab[Start & HASH_MASK] = S;
+    S->NextEnd = EndTab[End & HASH_MASK];
+    EndTab[End & HASH_MASK] = S;
 
-void MarkAddr (unsigned Addr, attr_t Attr);
-/* Mark an address with an attribute */
-
-attr_t GetStyleAttr (unsigned Addr);
-/* Return the style attribute for the given address */
-
-attr_t GetLabelAttr (unsigned Addr);
-/* Return the label attribute for the given address */
-
-
-
-/* End of attrtab.h */
-#endif
+    /* Mark the addresses within the segment */
+    MarkRange (Start, End, atSegment);
+}
 
 
 

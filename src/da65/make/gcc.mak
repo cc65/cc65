@@ -1,4 +1,4 @@
-#
+#                
 # gcc Makefile for da65
 #
 
@@ -27,7 +27,8 @@ OBJS = 	asminc.o        \
         opc65sc02.o     \
   	opctable.o	\
 	output.o 	\
-	scanner.o
+	scanner.o       \
+        segment.o
 
 LIBS = $(COMMON)/common.a
 

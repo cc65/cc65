@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -65,6 +65,7 @@ typedef enum token_t {
     INFOTOK_RANGE,
     INFOTOK_LABEL,
     INFOTOK_ASMINC,
+    INFOTOK_SEGMENT,
 
     /* Global section */
     INFOTOK_ARGUMENT_COLUMN,
@@ -75,11 +76,11 @@ typedef enum token_t {
     INFOTOK_INPUTNAME,
     INFOTOK_INPUTOFFS,
     INFOTOK_INPUTSIZE,
-    INFOTOK_LABELBREAK,    
+    INFOTOK_LABELBREAK,
     INFOTOK_MNEMONIC_COLUMN,
     INFOTOK_OUTPUTNAME,
     INFOTOK_PAGELENGTH,
-    INFOTOK_STARTADDR,      
+    INFOTOK_STARTADDR,
     INFOTOK_TEXT_COLUMN,
 
     /* Range section */

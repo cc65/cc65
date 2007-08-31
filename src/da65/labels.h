@@ -94,6 +94,9 @@ void ForwardLabel (unsigned Offs);
  * bytes and is therefore output as "label = * + x".
  */
 
+void ForwardLabels (unsigned Size);
+/* Define forward labels for the range PC to PC+Size-1 if necessary */
+
 void DefOutOfRangeLabels (void);
 /* Output any labels that are out of the loaded code range */
 

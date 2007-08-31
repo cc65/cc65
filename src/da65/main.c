@@ -408,10 +408,8 @@ static void OneOpcode (unsigned RemainingBytes)
              */
             if (D->Size <= RemainingBytes) {
                 /* Output labels within the next insn */
-                unsigned I;
-                for (I = 1; I < D->Size; ++I) {
-                    ForwardLabel (I);
-                }
+                ForwardLabels (D->Size);
+                /* Output the insn */
                 D->Handler (D);
                 PC += D->Size;
                 break;

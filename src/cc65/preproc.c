@@ -1044,20 +1044,6 @@ static int DoIf (int Skip)
     	UseLineInfo (SavedNextTok.LI);
     }
 
-#if 0
-    /* Remove the #if from the line */
-    SkipWhitespace ();
-    S = line;
-    while (CurC != '\0') {
-     	*S++ = CurC;
-     	NextChar ();
-    }
-    *S = '\0';
-
-    /* Start over parsing from line */
-    InitLine (line);
-#endif
-
     /* Switch into special preprocessing mode */
     Preprocessing = 1;
 
@@ -1114,6 +1100,9 @@ static void DoInclude (void)
     StrBuf      Filename = STATIC_STRBUF_INITIALIZER;
 
 
+    /* Preprocess the remainder of the line */
+    PreprocessLine ();
+
     /* Skip blanks */
     SkipWhitespace ();
 
@@ -1146,14 +1135,13 @@ static void DoInclude (void)
     SB_Terminate (&Filename);
 
     /* Check if we got a terminator */
-    if (CurC != RTerm) {
+    if (CurC == RTerm) {
+        /* Open the include file */
+        OpenIncludeFile (SB_GetConstBuf (&Filename), DirSpec);
+    } else if (CurC == '\0') {
        	/* No terminator found */
-       	PPError ("Missing terminator or file name too long");
-       	goto Done;
+       	PPError ("#include expects \"FILENAME\" or <FILENAME>");
     }
-
-    /* Open the include file */
-    OpenIncludeFile (SB_GetConstBuf (&Filename), DirSpec);
 
 Done:
     /* Free the allocated filename data */

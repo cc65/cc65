@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -67,13 +67,19 @@ void LineFeed (void);
 void DefLabel (const char* Name);
 /* Define a label with the given name */
 
-void DefForward (const char* Name, const char* Comment, unsigned Offs);                
+void DefForward (const char* Name, const char* Comment, unsigned Offs);
 /* Define a label as "* + x", where x is the offset relative to the
  * current PC.
  */
 
-void DefineConst (const char* Name, const char* Comment, unsigned Addr);
+void DefConst (const char* Name, const char* Comment, unsigned Addr);
 /* Define an address constant */
+        
+void StartSegment (const char* Name, unsigned AddrSize);
+/* Start a segment */
+
+void EndSegment (void);
+/* End a segment */
 
 void OneDataByte (void);
 /* Output a .byte line with the current code byte */

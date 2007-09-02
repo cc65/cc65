@@ -75,7 +75,19 @@ int SegmentDefined (unsigned Start, unsigned End)
         }
     }
     return 0;
-}            
+}
+
+
+
+int HaveSegmentChange (unsigned Addr)
+/* Return true if the segment change attribute is set for the given address */
+{
+    /* Check the given address */
+    AddrCheck (Addr);
+
+    /* Return the attribute */
+    return (AttrTab[Addr] & atSegmentChange) != 0;
+}
 
 
 
@@ -129,6 +141,18 @@ void MarkAddr (unsigned Addr, attr_t Attr)
 
     /* Set the style */
     AttrTab[Addr] |= Attr;
+}
+
+
+
+attr_t GetAttr (unsigned Addr)
+/* Return the attribute for the given address */
+{
+    /* Check the given address */
+    AddrCheck (Addr);
+
+    /* Return the attribute */
+    return AttrTab[Addr];
 }
 
 

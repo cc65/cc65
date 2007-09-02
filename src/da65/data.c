@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -57,14 +57,22 @@ static unsigned GetSpan (attr_t Style)
     unsigned RemainingBytes = GetRemainingBytes ();
 
     /* Count how many bytes are available. This number is limited by the
-     * number of remaining bytes, a label, or the end of the given Style
-     * attribute.
+     * number of remaining bytes, a label, a segment change, or the end of
+     * the given Style attribute.
      */
     unsigned Count = 1;
     while (Count < RemainingBytes) {
-	if (MustDefLabel(PC+Count) || GetStyleAttr (PC+Count) != Style) {
+        attr_t Attr;
+       	if (MustDefLabel(PC+Count)) {
 	    break;
-     	}
+     	}           
+        Attr = GetAttr (PC+Count);
+        if ((Attr & atStyleMask) != Style) {
+            break;
+        }
+        if ((Attr & atSegmentChange)) {
+            break;
+        }
 	++Count;
     }
 

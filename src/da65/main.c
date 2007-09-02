@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -385,7 +385,7 @@ static void OneOpcode (unsigned RemainingBytes)
 	} else {
 	    unsigned I;
 	    for (I = 1; I < D->Size; ++I) {
-	     	if (HaveLabel (PC+I)) {
+	     	if (HaveLabel (PC+I) || HaveSegmentChange (PC+I)) {
 	    	    Style = atIllegal;
      	     	    MarkAddr (PC, Style);
 	     	    break;

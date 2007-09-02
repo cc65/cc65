@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -40,6 +40,7 @@
 #include <errno.h>
 
 /* common */
+#include "addrsize.h"
 #include "cpu.h"
 #include "version.h"
 
@@ -199,7 +200,7 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
 
 
 
-void DefineConst (const char* Name, const char* Comment, unsigned Addr)
+void DefConst (const char* Name, const char* Comment, unsigned Addr)
 /* Define an address constant */
 {
     if (Pass == PassCount) {
@@ -209,6 +210,23 @@ void DefineConst (const char* Name, const char* Comment, unsigned Addr)
         if (Comment) {
             Indent (CCol);
             Output ("; %s", Comment);
+        }
+        LineFeed ();
+    }
+}
+
+
+
+void StartSegment (const char* Name, unsigned AddrSize)
+/* Start a segment */
+{
+    if (Pass == PassCount) {
+        Output (".segment");
+        Indent (ACol);
+        if (AddrSize == ADDR_SIZE_DEFAULT) {
+            Output ("\"%s\"", Name);
+        } else {
+            Output ("\"%s\": %s", Name, AddrSizeToStr (AddrSize));
         }
         LineFeed ();
     }

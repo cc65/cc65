@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2006      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2006-2007 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -378,7 +378,7 @@ static void DefOutOfRangeLabel (unsigned long Addr)
 
         case atIntLabel:
         case atExtLabel:
-            DefineConst (SymTab[Addr], GetComment (Addr), Addr);
+            DefConst (SymTab[Addr], GetComment (Addr), Addr);
             break;
 
         case atUnnamedLabel:

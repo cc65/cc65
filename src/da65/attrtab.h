@@ -73,6 +73,7 @@ typedef enum attr_t {
 
     /* Segment */
     atSegment       = 0x0100,   /* Code is in a segment */
+    atSegmentChange = 0x0200,   /* Either segment start or segment end */
 } attr_t;
 
 
@@ -89,6 +90,9 @@ void AddrCheck (unsigned Addr);
 int SegmentDefined (unsigned Start, unsigned End);
 /* Return true if the atSegment bit is set somewhere in the given range */
 
+int HaveSegmentChange (unsigned Addr);
+/* Return true if the segment change attribute is set for the given address */
+
 unsigned GetGranularity (attr_t Style);
 /* Get the granularity for the given style */
 
@@ -97,6 +101,9 @@ void MarkRange (unsigned Start, unsigned End, attr_t Attr);
 
 void MarkAddr (unsigned Addr, attr_t Attr);
 /* Mark an address with an attribute */
+
+attr_t GetAttr (unsigned Addr);
+/* Return the attribute for the given address */
 
 attr_t GetStyleAttr (unsigned Addr);
 /* Return the style attribute for the given address */

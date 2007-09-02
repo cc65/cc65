@@ -52,8 +52,7 @@
 
 
 /* Hash definitions */
-#define HASH_SIZE       64              /* Must be power of two */
-#define HASH_MASK       (HASH_SIZE-1)
+#define HASH_SIZE       53
 
 /* Segment definition */
 typedef struct Segment Segment;
@@ -96,10 +95,14 @@ void AddAbsSegment (unsigned Start, unsigned End, const char* Name)
     memcpy (S->Name, Name, Len + 1);
 
     /* Insert the segment into the hash tables */
-    S->NextStart = StartTab[Start & HASH_MASK];
-    StartTab[Start & HASH_MASK] = S;
-    S->NextEnd = EndTab[End & HASH_MASK];
-    EndTab[End & HASH_MASK] = S;
+    S->NextStart = StartTab[Start % HASH_SIZE];
+    StartTab[Start % HASH_SIZE] = S;
+    S->NextEnd = EndTab[End % HASH_SIZE];
+    EndTab[End % HASH_SIZE] = S;
+
+    /* Mark start and end of the segment */
+    MarkAddr (Start, atSegmentChange);
+    MarkAddr (End, atSegmentChange);
 
     /* Mark the addresses within the segment */
     MarkRange (Start, End, atSegment);

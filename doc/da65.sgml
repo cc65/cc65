@@ -293,7 +293,7 @@ following attributes are recognized:
   <tag><tt/ARGUMENTCOLUMN/</tag>
   This attribute specifies the column in the output, where the argument for
   an opcode or pseudo instruction starts. The corresponding command line
-  option is 
+  option is
   <tt><ref id="option--argument-column" name="--argument-column"></tt>.
 
 
@@ -380,7 +380,7 @@ following attributes are recognized:
 
 
   <tag><tt/TEXTCOLUMN/</tag>
-  This attribute specifies the column, where the data bytes are output 
+  This attribute specifies the column, where the data bytes are output
   translated into ASCII text. It is only used if
   <tt><ref id="COMMENTS" name="COMMENTS"></tt> is set to at least 4. The
   corresponding command line option is
@@ -506,6 +506,32 @@ code. The following attributes are recognized:
 </descrip>
 
 
+<sect1>Specifying Segments<label id="infofile-segment"><p>
+
+The <tt/SEGMENT/ directive is used to specify a segment within the
+disassembled code. The following attributes are recognized:
+
+<descrip>
+
+  <tag><tt>START</tt></tag>
+  Followed by a numerical value. Specifies the start address of the segment.
+
+  <tag><tt>END</tt></tag>
+  Followed by a numerical value. Specifies the end address of the segment. The
+  end address is last the address that is part of the segment.
+
+  <tag><tt>NAME</tt></tag>
+  The attribute is followed by a string value which gives the name of the
+  segment.
+</descrip>
+
+All attributes are mandatory. Segments may not overlap. Since there is no
+explicit "end this segment" pseudo op, the disassembler cannot notify the
+assembler that one segment has ended. This may lead to errors if you don't
+define your segments carefully. As a rule of thumb, if you're using segments,
+your should define segments for all disassembled code.
+
+
 <sect1>Specifying Assembler Includes<label id="infofile-asminc"><p>
 
 The <tt/ASMINC/ directive is used to give the names of input files containing
@@ -561,6 +587,8 @@ directives explained above:
             CPU             "6502";
         };
 
+        # One segment for the whole stuff
+        SEGMENT { START $E000;  END   $FFFF; NAME kernal; };
 
         RANGE {	START $E612;   	END   $E631; TYPE Code;      };
         RANGE {	START $E632;	END   $E640; TYPE ByteTable; };
@@ -609,7 +637,7 @@ name="uz@cc65.org">).
 
 <sect>Copyright<p>
 
-da65 (and all cc65 binutils) are (C) Copyright 1998-2003 Ullrich von
+da65 (and all cc65 binutils) are (C) Copyright 1998-2007 Ullrich von
 Bassewitz. For usage of the binaries and/or sources the following
 conditions do apply:
 

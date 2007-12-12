@@ -48,7 +48,7 @@ code that does this. The memory configuration register at &dollar;FF00 should
 be saved and restored instead of relying on the memory configuration index
 stored in the zero page.
 
-The setup gives a usable memory range of &dollar;1C00 - &dollar;CFFF. Having
+The setup gives a usable memory range of &dollar;1C00 - &dollar;BFFF. Having
 just the kernal ROM mapped in means, that kernal entry points may be called
 directly, but using the BASIC ROM is not possible without additional code.
 
@@ -57,7 +57,7 @@ Special locations:
 <descrip>
   <tag/Text screen/
   The text screen is located at &dollar;400 (as in the standard setup).
-
+                                                                 
   <tag/Stack/
   The C runtime stack is located at &dollar;CFFF and growing downwards.
 

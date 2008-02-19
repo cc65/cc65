@@ -2158,18 +2158,24 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.EXPORT</tt><label id=".EXPORT"><p>
 
   Make symbols accessible from other modules. Must be followed by a comma
-  separated list of symbols to export, with each one optionally followed by
-  an address specification. The default is to export the symbol with the
-  address size it actually has. The assembler will issue a warning, if the
-  symbol is exported with an address size smaller than the actual address
-  size.
+  separated list of symbols to export, with each one optionally followed by an
+  address specification and (also optional) an assignment. Using an additional
+  assignment in the export statement allows to define and export a symbol in
+  one statement. The default is to export the symbol with the address size it
+  actually has. The assembler will issue a warning, if the symbol is exported
+  with an address size smaller than the actual address size.
 
-  Example:
+  Examples:
 
   <tscreen><verb>
 	.export	foo
         .export bar: far
+        .export foobar: far = foo * bar
+        .export baz := foobar, zap: far = baz - bar
   </verb></tscreen>
+
+  As with constant definitions, using <tt/:=/ instead of <tt/=/ marks the
+  symbols as a label.
 
   See: <tt><ref id=".EXPORTZP" name=".EXPORTZP"></tt>
 
@@ -2178,12 +2184,15 @@ Here's a list of all control commands and a description, what they do:
 
   Make symbols accessible from other modules. Must be followed by a comma
   separated list of symbols to export. The exported symbols are explicitly
-  marked as zero page symbols.
+  marked as zero page symbols. An assignment may be included in the
+  <tt/.EXPORTZP/ statement. This allows to define and export a symbol in one
+  statement.
 
-  Example:
+  Examples:
 
   <tscreen><verb>
   	.exportzp  foo, bar
+        .exportzp  baz := &dollar;02
   </verb></tscreen>
 
   See: <tt><ref id=".EXPORT" name=".EXPORT"></tt>

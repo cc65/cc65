@@ -165,6 +165,33 @@ static void SetBoolOption (unsigned char* Flag)
 
 
 
+static void ExportWithAssign (SymEntry* Sym, unsigned char AddrSize, unsigned Flags)
+/* Allow to assign the value of an export in an .export statement */
+{
+    /* The name and optional address size spec may be followed by an assignment
+     * or equal token.
+     */
+    if (Tok == TOK_ASSIGN || Tok == TOK_EQ) {
+
+        /* Assignment means the symbol is a label */
+        if (Tok == TOK_ASSIGN) {
+            Flags |= SF_LABEL;
+        }
+
+        /* Skip the assignment token */
+        NextTok ();
+
+        /* Define the symbol with the expression following the '=' */
+        SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
+
+    }
+
+    /* Now export the symbol */
+    SymExport (Sym, AddrSize, Flags);
+}
+
+
+
 static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
                           unsigned char DefAddrSize, unsigned Flags)
 /* Export or import symbols */
@@ -782,7 +809,7 @@ static void DoExitMacro (void)
 static void DoExport (void)
 /* Export a symbol */
 {
-    ExportImport (SymExport, ADDR_SIZE_DEFAULT, SF_NONE);
+    ExportImport (ExportWithAssign, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
 
@@ -790,7 +817,7 @@ static void DoExport (void)
 static void DoExportZP (void)
 /* Export a zeropage symbol */
 {
-    ExportImport (SymExport, ADDR_SIZE_ZP, SF_NONE);
+    ExportImport (ExportWithAssign, ADDR_SIZE_ZP, SF_NONE);
 }
 
 

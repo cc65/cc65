@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ###############################################################################
 #                                                                             #
-# 				    main.c				      #
+#                                  ca65html                                   #
 #                                                                             #
 # 		       Convert a ca65 source into HTML			      #
 #                                                                             #
@@ -36,10 +36,10 @@
 
 # Things currently missing:
 #
-#   - Scoping with .proc/.endproc
+#   - Scoping with .proc/.endproc, .scope/.endscope, .enum/.endenum,
+#     .struct/.endstruct, .union/endunion, .repeat/.endrep, .local
 #   - .global is ignored
-#   - .constructor/.destructor/.condes dito
-#   - .ignorecase is ignored, labels are always case sensitive
+#   - .case is ignored, labels are always case-sensitive
 #   - .include handling (difficult)
 #   - The global namespace operator ::
 #
@@ -92,10 +92,7 @@ my $TextColor  	    = "#000000";    # Text color
 my $Verbose    	    = 0;       	    # Be quiet
 
 # Table used to convert the label number into names
-my @NameTab    	    = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
-               	       "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
-       	       	       "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6",
-       	       	       "7", "8", "9");
+my @NameTab         = ('A' .. 'Z', '0' .. '9');
 
 
 
@@ -147,7 +144,7 @@ sub GetOutName {
     }
 }
 
-# Remove illegal characters from a string
+# Translate some HTML characters into harmless names.
 sub Cleanup {
     my $S = shift (@_);
     $S =~ s/&/&amp;/g;
@@ -246,15 +243,13 @@ sub DocFooter {
     my $Today = localtime;
 
     # Print
-    print $OUT "<div id=\"bottom\">\n";
-    print $OUT "<address>\n";
-    print $OUT "<a href=\"http://validator.w3.org/check?uri=referer\"><img src=\"http://www.w3.org/Icons/valid-xhtml10-blue\" alt=\"Valid XHTML 1.0 Strict\" height=\"31\" width=\"88\" /></a>";
+    print $OUT "<div id=\"bottom\"><address>\n";
+    print $OUT "<a href=\"http://validator.w3.org/check?uri=referer\">\n";
+    print $OUT "<img src=\"http://www.w3.org/Icons/valid-xhtml10-blue\" alt=\"Valid XHTML 1.0 Strict\" height=\"31\" width=\"88\" /></a><br>\n";
     print $OUT "$Name; generated on $Today by ca65html<br>\n";
     print $OUT "<a href=\"mailto:uz&#64;cc65.org\">uz&#64;cc65.org</a>\n";
-    print $OUT "</address>\n";
-    print $OUT "</div>\n";
-    print $OUT "</body>\n";
-    print $OUT "</html>\n";
+    print $OUT "</address></div>\n";
+    print $OUT "</body></html>\n";
 }
 
 
@@ -424,15 +419,15 @@ sub Process1 {
        	chomp ($Line);
 
        	# Check for a label
-        if ($Line =~ /^\s*(\@?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)/) {
+        if ($Line =~ /^\s*(([\@?]?)[_a-zA-Z]\w*)\s*(?::=?|=)/) {
 
 	    # Is this a local label?
-	    if ($1 eq "\@") {
+	    if ($2 ne "") {
 	       	# Use the prefix
-	       	$Id = "$CheapPrefix$1$2";
+	       	$Id = "$CheapPrefix$1";
 	    } else {
 	       	# Use as is
-	       	$Id = $2;
+	       	$Id = $1;
 	       	# Remember the id as new cheap local prefix
 	       	$CheapPrefix = $Id;
 	    }
@@ -441,32 +436,43 @@ sub Process1 {
 	    $Labels{$OutName}{$Id} = GenLabel();
 
       	# Check for an import statement
-	} elsif ($Line =~ /^\s*(\.import|\.importzp)\s+(.*?)(\s*)(;.*$|$)/) {
+	} elsif ($Line =~ /^\s*\.(?:(?:force)?import|importzp)\s+(.*?)\s*(?:;.*)?$/i) {
 
 	    # Split into a list of identifiers
-	    my @Ids = split (/\s*,\s*/, $2);
+	    my @Ids = split (/\s*(?::\s*[A-Za-z]+\s*)?,\s*/, $1);
+
+	    # Remove an address-size specifier, from the last identifier,
+	    # if there is one.
+	    $Ids[$#Ids] =~ s/\s*:\s*[A-Za-z]+//;
+
 	    for $Id (@Ids) {
 	       	$Imports{$OutName}{$Id} = GenLabel();
 	    }
 
 	# Check for an export statement
-	} elsif ($Line =~ /^\s*(\.export|\.exportzp)\s+(.*?)(\s*)(;.*$|$)/) {
+	} elsif ($Line =~ /^\s*\.export(?:zp)?\s+(.*?)\s*(?:;.*)?$/i) {
 
 	    # Split into a list of identifiers
-	    my @Ids = split (/\s*,\s*/, $2);
+	    my @Ids = split (/\s*(?::\s*[A-Za-z]+\s*)?,\s*/, $1);
+
+	    # Remove an address-size specifier, from the last identifier,
+	    # if there is one.
+	    $Ids[$#Ids] =~ s/\s*:\s*[A-Za-z]+//;
+
        	    for $Id (@Ids) {
 	       	$Exports{$Id} = sprintf ("%s#%s", $OutName, GenLabel());
 	    }
 
+	# Check for an actor statement.
+       	} elsif ($Line =~ /^\s*\.(?:(?:(?:con|de)struc|interrup)tor|condes)\s+([_a-z]\w*)/i) {
+	    $Exports{$1} = sprintf ("%s#%s", $OutName, GenLabel());
+
 	# Check for a .proc statement
-       	} elsif ($Line =~ /^\s*\.proc\s+([_a-zA-Z]\w*)?.*$/) {
+       	} elsif ($Line =~ /^\s*\.proc\s+([_a-z]\w*)/i) {
 
-	    # Do we have an id?
-	    $Id = $1;
-	    if ($Id ne "") {
-	       	$Labels{$OutName}{$Id} = GenLabel();
-	    }
-
+	    # Remember the ID as the new cheap-local prefix.
+	    $CheapPrefix = $1;
+	    $Labels{$OutName}{$1} = GenLabel();
      	}
     }
 
@@ -507,7 +513,6 @@ sub Process2 {
     my $OutLine;
     my $Id;
     my $Label;
-    my $Operand;
     my $Comment;
     my $Trailer;
 
@@ -532,25 +537,25 @@ sub Process2 {
     # Keep the user happy
     Gabble ("$FileName => $OutName");
 
-    # The instructions that will have hyperlinks if a label is used
-    my $LabelIns = "adc|add|and|asl|bcc|bcs|beq|bit|bmi|bne|bpl|bra|bvc|bvs|".
-	           "cmp|cpx|cpy|dec|eor|inc|jmp|jsr|lda|ldx|ldy|lsr|ora|rol|".
-	           "ror|sbc|sta|stx|sty|stz|sub|";
+    # The instructions that will have hyperlinks if a label is used.
+    # And, they will be highlighted when color is used.
+    my $LabelIns = "adc|add|and|asl|bb[rs][0-7]|b[cv][cs]|beq|bge|bit|blt|".
+		 "bmi|bne|bpl|br[akl]|bsr|cmp|cop|cp[axy]|dec|eor|inc|jml|".
+		 "jmp|jsl|jsr|ld[axy]|lsr|mvn|mvp|ora|pe[air]|rep|".
+		 "[rs]mb[0-7]|rol|ror|sbc|sep|st[012axyz]|sub|tai|tam|tdd|".
+		 "ti[ain]|tma|trb|tsb|tst";
 
-    # The instructions that will have hyperlinks if a label is used
-    my $AllIns = "adc|add|and|asl|bcc|bcs|beq|bge|bit|blt|bmi|bne|bpl|bvc|".
-		 "bra|brk|brl|bvs|clc|cld|cli|clv|cmp|cop|cpa|cpx|cpy|dea|".
-		 "dec|dex|dey|eor|ina|inc|inx|iny|jml|jmp|jsl|jsr|lda|ldx|".
-		 "ldy|lsr|mvn|mvp|nop|ora|pea|pei|per|pha|phb|phd|phk|php|".
-		 "phx|phy|pla|plb|pld|plp|plx|ply|rep|rol|ror|rti|rtl|rts|".
-		 "sbc|sec|sed|sei|sep|sta|stx|sty|stz|sub|swa|tad|tax|tay|".
-		 "tcd|tcs|tda|tdc|trb|tsa|tsb|tsc|tsx|txa|txs|txy|tya|tyx|".
+    # Instructions that have only the implied-addressing mode -- therefore,
+    # no hyperlinking.  They will be highlighted only, when color is used.
+    my $OtherIns = "cl[acdivxy]|csh|csl|de[axy]|in[axy]|nop|ph[abdkpxy]|".
+		 "pl[abdpxy]|rt[ils]|sax|say|se[cdit]|stp|swa|sxy|ta[dsxy]|".
+		 "tam[0-7]|tcd|tcs|tda|tdc|tma[0-7]|ts[acx]|tx[asy]|tya|tyx|".
 		 "wai|xba|xce";
 
-    # Read the input file, replacing references by hyperlinks and mark
+    # Read the input file, replacing references with hyperlinks; and, mark
     # labels as link targets.
     my $LineNo = 0;
-    while ($Line = <INPUT>) {
+    LINE: while ($Line = <INPUT>) {
 
         # Count input lines
         $LineNo++;
@@ -594,16 +599,16 @@ sub Process2 {
 	$Trailer = $& . ColorizeComment (Cleanup ($Comment));
 
        	# Check for a label at the start of the line. If we have one, process
-        # it and remove it from the line
-        if ($Line =~ s/^\s*?(\@?)([_a-zA-Z]\w*)(:(?!=)|\s*:?=)//) {
+        # it, and remove it from the line.
+        if ($Line =~ s/^\s*?(([\@?]?)[_a-zA-Z]\w*)(\s*(?::=?|=))//) {
 
 	    # Is this a local label?
-       	    if ($1 eq "\@") {
+       	    if ($2 ne "") {
 		# Use the prefix
-	     	$Id = "$CheapPrefix$1$2";
+	     	$Id = "$CheapPrefix$1";
 	    } else {
 	      	# Use as is
-	      	$Id = $2;
+	      	$Id = $1;
 	      	# Remember the id as new cheap local prefix
 	      	$CheapPrefix = $Id;
 	    }
@@ -612,7 +617,26 @@ sub Process2 {
 	    $Label = $Labels{$OutName}{$Id};
 
 	    # Print the label with a tag
-       	    $OutLine .= sprintf ("<a name=\"%s\">%s%s</a>%s", $Label, $1, $2, $3);
+	    $OutLine .= "<a name=\"$Label\">$1</a>$3";
+
+	    # Is the name explicitly assigned a value?
+	    if ($3 =~ /=$/) {
+		# Print all identifiers if there are any.
+		while ($Line =~ s/^([^_a-zA-Z]*?)(([\@?]?)[_a-zA-Z]\w*)//) {
+		    # Add the non-label stuff.
+		    $OutLine .= Cleanup ($1);
+
+		    # Use the prefix if the label is local.
+		    # Get the reference to that label if we find it.
+		    $OutLine .= RefLabel ($OutName, ($3 ne "") ? "$CheapPrefix$2" : $2, $2);
+		}
+
+		# Add a remainder if there is one.
+		$OutLine .= Cleanup ($Line);
+
+		# The line is complete; print it.
+		next LINE;
+	    }
 	}
 
 	# Print any leading whitespace and remove it, so we don't have to
@@ -622,7 +646,7 @@ sub Process2 {
 	}
 
 	# Handle the import statements
-	if ($Line =~ s/^(\.import|\.importzp)\s+//) {
+	if ($Line =~ s/^\.(?:(?:force)?import|importzp)\s+//i) {
 
 	    # Print any fixed stuff from the line and remove it
        	    $OutLine .= $&;
@@ -657,7 +681,7 @@ sub Process2 {
 		}
 
 	     	# Check if another identifier follows
-		if ($Line =~ s/^\s*,\s*//) {
+		if ($Line =~ s/^\s*(?::\s*[A-Za-z]+\s*)?,\s*//) {
      		    $OutLine .= $&;
        	     	} else {
 		    last;
@@ -668,9 +692,9 @@ sub Process2 {
 	    $OutLine .= Cleanup ($Line);
 
        	# Handle export statements
-	} elsif ($Line =~ s/^(\.export|\.exportzp)\s+//) {
+	} elsif ($Line =~ s/^\.export(?:zp)?\s+//i) {
 
-	    # Print the command the and white space
+	    # Print the command and the whitespace.
 	    $OutLine .= $&;
 
 	    # Print all identifiers if there are any
@@ -706,7 +730,7 @@ sub Process2 {
 		}
 
      		# Check if another identifier follows
-      	      	if ($Line =~ s/^\s*,\s*//) {
+      	      	if ($Line =~ s/^\s*(?::\s*[A-Za-z]+\s*)?,\s*//) {
      	    	    $OutLine .= $&;
      		} else {
      		    last;
@@ -716,37 +740,62 @@ sub Process2 {
      	    # Add an remainder if there is one
      	    $OutLine .= Cleanup ($Line);
 
-     	# Check for .addr and .word
-     	} elsif ($Line =~ s/^(\.addr|\.word)\s+//) {
+	# Handle actor statements.
+	} elsif ($Line =~ s/^(\.(?:(?:(?:con|de)struc|interrup)tor|condes)\s+)([_a-z]\w*)//i) {
+
+	    # Print the command and the whitespace.
+	    $OutLine .= $1;
+
+	    # Remember the identifier.
+	    $Id = $2;
+
+	    # Variable to assemble HTML representation
+	    my $Contents = "";
+
+	    # If we have a definition for this actor, in this file,
+	    # then add a link to that definition.
+	    if (exists ($Labels{$OutName}{$Id})) {
+		$Contents = sprintf (" href=\"#%s\"", $Labels{$OutName}{$Id});
+	    }
+
+	    # Get the target, for linking from imports in other files.
+	    $Label = $Exports{$Id};
+	    # Be sure to use only the label part.
+	    $Label =~ s/^.*#//;
+
+	    # Add the HTML stuff and the remainder of the actor
+	    # to the output line.
+	    $OutLine .= sprintf ("<a name=\"%s\"%s>%s</a>%s", $Label,
+				 $Contents, $Id, Cleanup ($Line));
+
+     	# Check for .faraddr, .addr, .dword, .word, .dbyt, .byt, .byte, .res,
+	# .elseif, .if, .align, and .org.
+     	} elsif ($Line =~ s/^\.(?:(?:far)?addr|d?word|d?byte?|res|(?:else)?if|align|org)\s+//i) {
 
      	    # Print the command and the white space
        	    $OutLine .= $&;
 
      	    # Print all identifiers if there are any
-       	    while ($Line =~ /^([^_a-zA-Z]*)([_a-zA-Z]\w*)(.*)$/) {
+       	    while ($Line =~ s/^([^_a-zA-Z]*?)(([\@?]?)[_a-zA-Z]\w*)//) {
                 # Add the non label stuff
                 $OutLine .= Cleanup ($1);
 
-                # If the identifier is a known label, add a link
-     		if (exists ($Labels{$OutName}{$2})) {
-     		    $Label = $Labels{$OutName}{$2};
-       	       	    $OutLine .= sprintf ("<a href=\"#%s\">%s</a>", $Label, $2);
-     		} else {
-     		    $OutLine .= $2;
-     		}
-
-                # Proceed with the remainder of the line
-     		$Line = $3;
+		# Use the prefix if the label is local.
+		# Get the reference to that label if we find it.
+		$OutLine .= RefLabel ($OutName, ($3 ne "") ? "$CheapPrefix$2" : $2, $2);
      	    }
 
      	    # Add an remainder if there is one
      	    $OutLine .= Cleanup ($Line);
 
 	# Handle .proc
-       	} elsif ($Line =~ /^(\.proc)(\s+)([_a-zA-Z]\w*)?(.*)$/) {
+       	} elsif ($Line =~ /^(\.proc)(\s+)([_a-z]\w*)?(.*)$/i) {
 
 	    # Do we have an identifier?
 	    if ($3 ne "") {
+		# Remember the ID as the new cheap-local prefix.
+		$CheapPrefix = $3;
+
       	      	# Get the label for the id
 	    	$Label = $Labels{$OutName}{$3};
 
@@ -755,16 +804,16 @@ sub Process2 {
 
 	    } else {
 
-		# Print the label
-       	       	$OutLine .= "$1$2$3";
-
+		# Print a line that has invalid syntax (its operand isn't
+		# a correctly formed name).
+		$OutLine .= "$1$2";
             }
 
             # Add the remainder
             $OutLine .= Cleanup ($4);
 
 	# Handle .include
-	} elsif ($Line =~ /^(\.include)(\s+)\"((?:[^\"]+?|\\\")+)(\".*)$/) {
+	} elsif ($Line =~ /^(\.include)(\s*)\"((?:[^\"]+?|\\\")+)(\".*)$/i) {
 
 	    # Add the fixed stuff to the output line
 	    $OutLine .= "$1$2&quot;";
@@ -860,37 +909,72 @@ sub Process2 {
 	    # Add the remainder
 	    $OutLine .= Cleanup ($Line);
 
+     	# Check for .ifdef, .ifndef, .ifref, and .ifnref.
+     	} elsif ($Line =~ s/^(\.ifn?[dr]ef\s+)(([\@?]?)[_a-z]\w*)?//i) {
+
+     	    # Print the command and the whitespace.
+       	    $OutLine .= $1;
+
+       	    if ($2 ne "") {
+		# Use the prefix if the label is local.
+		# Get the reference to that label if we find it.
+		$OutLine .= RefLabel ($OutName, ($3 ne "") ? "$CheapPrefix$2" : $2, $2);
+     	    }
+
+     	    # Add a remainder if there is one.
+     	    $OutLine .= Cleanup ($Line);
+
+	# Check for assertions.
+	} elsif ($Line =~ s/^(\.assert\s+)(.+?)(,\s*(?:error|warning)\s*(?:,.*)?)$/$2/i) {
+
+	    # Print the command and the whitespace.
+	    $OutLine .= $1;
+
+	    $Comment = $3;
+
+	    # Print all identifiers if there are any.
+	    while ($Line =~ s/^([^_a-zA-Z]*?)(([\@?]?)[_a-zA-Z]\w*)//) {
+		# Add the non-label stuff.
+		$OutLine .= Cleanup ($1);
+
+		# Use the prefix if the label is local.
+		# Get the reference to that label if we find it.
+		$OutLine .= RefLabel ($OutName, ($3 ne "") ? "$CheapPrefix$2" : $2, $2);
+	    }
+
+	    # Add a remainder if there is one.
+	    $OutLine .= Cleanup ($Line . $Comment);
+
      	# Check for instructions with labels
-        } elsif ($Line =~ /^($LabelIns)\b(\s+)(.*)$/) {
+        } elsif ($Line =~ s/^($LabelIns)\b(\s*)//io) {
 
 	    # Print the instruction and white space
             $OutLine .= ColorizeKeyword ($1) . $2;
 
-	    # Remember the remaining parts
-	    $Operand = $3;
+	    # Print all identifiers if there are any.
+	    while ($Line =~ s/^([^_a-zA-Z]*?)(([\@?]?)[_a-zA-Z]\w*)//) {
 
-  	    # Check for the first identifier in the operand and replace it
-    	    # by a hyperlink
-       	    if ($Operand =~ /^([^_a-zA-Z]*?)(\@?)([_a-zA-Z]\w*)(.*)$/) {
+		# Add the non-label stuff.
+		$OutLine .= Cleanup ($1);
 
 		# Is this a local label?
-		if ($2 eq "\@") {
+		if ($3 ne "") {
 		    # Use the prefix
-		    $Id = "$CheapPrefix$2$3";
+		    $Id = "$CheapPrefix$2";
 	     	} else {
 	     	    # Use as is
-	     	    $Id = $3;
+	     	    $Id = $2;
 	     	}
 
 	     	# Get the reference to this label if we find it
-	     	$Operand = Cleanup($1) . RefLabel($OutName, $Id, $2 . $3) . Cleanup($4);
+		$OutLine .= RefLabel ($OutName, $Id, $2);
 	    }
 
 	    # Reassemble and print the line
-       	    $OutLine .= $Operand;
+     	    $OutLine .= Cleanup ($Line);
 
      	# Check for all other instructions
-        } elsif ($Line =~ /^($AllIns)\b(.*)$/) {
+        } elsif ($Line =~ /^($OtherIns)\b(.*)$/io) {
 
 	    # Colorize and print
             $OutLine .= ColorizeKeyword ($1) . Cleanup ($2);
@@ -902,14 +986,12 @@ sub Process2 {
 
 	}
 
+    } continue {
         # Colorize all keywords
        	$OutLine =~ s/(?<![\w;])\.[_a-zA-Z]\w*/ColorizeCtrl ($&)/ge;
 
-        # Add the trailer
-        $OutLine .= $Trailer;
-
-	# Print the result
-     	print OUTPUT "$OutLine\n";
+	# Print the result with the trailer.
+	print OUTPUT "$OutLine$Trailer\n";
     }
 
     # Print the HTML footer
@@ -1046,7 +1128,7 @@ sub Usage {
     print "Usage: ca65html [options] file ...\n";
     print "Options:\n";
     print "  --bgcolor c        Use background color c instead of $BGColor\n";
-    print "  --colorize         Colorize the output (generates non standard HTML)\n";
+    print "  --colorize         Add color highlights to the output\n";
     print "  --commentcolor c   Use color c for comments instead of $CommentColor\n";
     print "  --crefs            Generate references to the C source file(s)\n";
     print "  --ctrlcolor c      Use color c for directives instead of $CtrlColor\n";
@@ -1129,4 +1211,3 @@ if ($IndexPage) {
 
 # Done
 exit 0;
-

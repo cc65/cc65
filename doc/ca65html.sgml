@@ -3,10 +3,10 @@
 <article>
 <title>ca65html Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>2003-10-16
+<date>2007-10-2
 
 <abstract>
-ca65html is an assembler source to HTML converter. It is very useful if you
+ca65html is an assembly-source-to-HTML converter.  It is very useful if you
 want to publish your assembler sources in the web.
 </abstract>
 
@@ -17,11 +17,11 @@ want to publish your assembler sources in the web.
 
 <sect>Overview<p>
 
-ca65html converts assembler source files written for use with the <tt/<htmlurl
+ca65html converts assembly source files written for use with the <tt/<url
 url="ca65.html" name="ca65">/ crossassembler into HTML. It is a standalone
-tool written in Perl, and as such it does not understand the structure of
+tool written in PERL; and as such, it does not understand the structure of
 assembler sources in the same depth as ca65 does, so it may fail in very rare
-cases. In all other cases it generates very nice output.
+cases. In all other cases, it generates very nice output.
 
 
 <sect>Usage<p>
@@ -36,7 +36,7 @@ The HTML converter accepts the following options:
 Usage: ca65html [options] file ...
 Options:
   --bgcolor c        Use background color c instead of #FFFFFF
-  --colorize         Colorize the output (generates non standard HTML)
+  --colorize         Add color highlights to the output
   --commentcolor c   Use color c for comments instead of #B22222
   --crefs            Generate references to the C source file(s)
   --ctrlcolor c      Use color c for directives instead of #228B22
@@ -67,28 +67,23 @@ Here is a description of all the command line options:
   <tag><tt>--bgcolor c</tt></tag>
 
   Set the background color. The argument c must be a valid HTML color, usually
-  given as RGB triplet in the form <tt/#rrggbb/, where r, g and b are the
-  respective red, green and blue parts as two digit hex values. The default is
-  <tt/#FFFFFF/ (white). This color is used in the <tt/&lt;body&gt;/ tag of the
+  given as RGB triplet in the form <tt/#rrggbb/, where r, g, and b are the
+  respective red, green, and blue parts as two-digit hex values. The default is
+  <tt/#FFFFFF/ (white). That color is used in the <tt/&lt;body&gt;/ of the
   generated HTML output.
 
 
   <tag><tt>--colorize</tt></tag>
 
   Colorize the output. The converter outputs processor instructions, assembler
-  control commands and comments in different colors.
-
-  While this make the output look very nice, it generates invalid HTML,
-  because using colors in a <tt/&lt;pre&gt;/ environment is not allowed.
-  However, most browsers display it well, and it is used by several other
-  tools, so it's up to you.
+  control commands, and comments in different colors.
 
 
   <tag><tt>--commentcolor c</tt></tag>
 
   Set the color used for comments. The argument c must be a valid HTML color,
-  usually given as RGB triplet in the form <tt/#rrggbb/, where r, g and b are
-  the respective red, green and blue parts as two digit hex values. The
+  usually given as RGB triplet in the form <tt/#rrggbb/, where r, g, and b are
+  the respective red, green, and blue parts as two-digit hex values. The
   default is <tt/#B22222/ (red).
 
   Note that this option has no effect if <tt/--colorize/ is not also given.
@@ -109,7 +104,7 @@ Here is a description of all the command line options:
 
   Set the color used for assembler control commands. The argument c must be a
   valid HTML color, usually given as RGB triplet in the form <tt/#rrggbb/,
-  where r, g and b are the respective red, green and blue parts as two digit
+  where r, g, and b are the respective red, green, and blue parts as two-digit
   hex values. The default is <tt/#228B22/ (green).
 
   Note that this option has no effect if <tt/--colorize/ is not also given.
@@ -146,7 +141,7 @@ Here is a description of all the command line options:
 
   <tag><tt>--indexpage</tt></tag>
 
-  Causes the converter to generate an index page listing all label names and
+  Causes the converter to generate an index page listing file names, and all
   exports found in the converted files.
 
 
@@ -160,7 +155,7 @@ Here is a description of all the command line options:
 
   Set the color used for processor instructions. The argument c must be a
   valid HTML color, usually given as RGB triplet in the form <tt/#rrggbb/,
-  where r, g and b are the respective red, green and blue parts as two digit
+  where r, g, and b are the respective red, green, and blue parts as two-digit
   hex values. The default is <tt/#A020F0/ (purple).
 
   Note that this option has no effect if <tt/--colorize/ is not also given.
@@ -197,17 +192,17 @@ Here is a description of all the command line options:
   <tag><tt>--textcolor c</tt></tag>
 
   Set the color for normal text. The argument c must be a valid HTML color,
-  usually given as RGB triplet in the form <tt/#rrggbb/, where r, g and b are
-  the respective red, green and blue parts as two digit hex values. The
+  usually given as RGB triplet in the form <tt/#rrggbb/, where r, g, and b are
+  the respective red, green, and blue parts as two-digit hex values. The
   default is <tt/#000000/ (black). This color is used in the <tt/&lt;body&gt;/
-  tag of the generated HTML output.
+  of the generated HTML output.
 
 
   <tag><tt>--verbose</tt></tag>
 
   Increase the converter verbosity. Without this option, ca65html is quiet
   when working. If you have a slow machine and lots of files to convert, you
-  may like a little bit more progress information.
+  might like a little bit more progress information.
 
 </descrip>
 <p>
@@ -233,26 +228,22 @@ cases.
 
 Since ca65html does not really parse the input, but does most of its work
 applying text patterns, it doesn't know anything about scoping and advanced
-features of the assembler. This means that it may miss a label may choose the
-wrong color for an item in rare cases. Since it's just a tool for displaying
-sources in a nice form, I think that's ok. Anyway, if you find a conversion
-problem, you can send me a short piece of example input code. If possible, I
-will fix it.
+features of the assembler. This means that it might miss a label.  And, it
+might choose the wrong color for an item, in rare cases. Because it's just a
+tool for displaying sources in a nice form, I think that's OK. Anyway, if you
+find a conversion problem, you can send me a short piece of example input code.
+If possible, I will fix it.
 
 
 <sect1>Colorization<p>
 
-While having colors in the output looks really nice, it has two drawbacks:
+While having colors in the output looks really nice, it has one drawback:
 
 <enum>
 
-<item>The output is not standard compliant HTML, because <tt/&lt;font&gt;/
-tags are use in a <tt/&lt;pre&gt;/ environment. This works with all browsers
-I've tested, but it may not work with the one you're using.
-
-<item>Since lots of <tt/&lt;font&gt;/ tags are created in the output, the size
-of the output file will literally explode. This seems to be the price, you
-have to pay for color...
+<item>Because lots of <tt/&lt;span&gt;/ tags are created in the output,
+the size of the output file literally will explode.  It seems to be the price
+that you have to pay for color.
 
 </enum>
 
@@ -268,7 +259,7 @@ name="uz@cc65.org">).
 
 <sect>Copyright<p>
 
-ca65html is (C) Copyright 2000-2003 Ullrich von Bassewitz. For its use the
+ca65html is (c) Copyright 2000-2007 Ullrich von Bassewitz. For its use, the
 following conditions apply:
 
 This software is provided 'as-is', without any expressed or implied

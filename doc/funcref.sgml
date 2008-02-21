@@ -811,8 +811,8 @@ is present.
 <tag/Header/<tt/<ref id="6502.h" name="6502.h">/
 <tag/Declaration/<tt/void CLI (void);/
 <tag/Description/The function will insert a 6502 CLI instruction into the code,
-so interrupts are disabled. Note that non maskable interrupts cannot be
-disabled.
+so interrupts are enabled. Enabling interrupts has no effects if they are
+already enabled (the default). 
 <tag/Limits/<itemize>
 <item>The function is actually a macro.
 <item>Disabling interrupts may lead to unexpected results.
@@ -932,10 +932,11 @@ depend of the address expression used.
 <tag/Header/<tt/<ref id="6502.h" name="6502.h">/
 <tag/Declaration/<tt/void SEI (void);/
 <tag/Description/The function will insert a 6502 SEI instruction into the code,
-so interrupts are enabled. Enabling interrupts has no effects if they are
-already enabled (the default).
+so interrupts are disabled. Note that non maskable interrupts cannot be
+disabled.
 <tag/Limits/<itemize>
 <item>The function is actually a macro.
+<item>Disabling interrupts may lead to unexpected results.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

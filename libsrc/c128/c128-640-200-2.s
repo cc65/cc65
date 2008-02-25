@@ -141,6 +141,7 @@ NY:		 .res	2
 Y3:
 DX:		 .res	1
 DY:		 .res	1
+AX:		 .res	1
 AY:		 .res	1
 
 ; Text output stuff
@@ -508,25 +509,25 @@ SETPIXELCLIP:
 	bmi	@finito		; y<0
 	lda	X1+1
 	bmi	@finito		; x<0
-	lda	xres
-	ldx	xres+1
-	sta	ADDR
-	stx	ADDR+1
-	ldx	#ADDR
 	lda	X1
-	ldy	X1+1
-	jsr	icmp		; if (xres<x1)
-	bcs	@cont		; !(xres<x1)
-@finito:rts
-@cont:	lda	yres
-	ldx	yres+1
+	ldx	X1+1
 	sta	ADDR
 	stx	ADDR+1
 	ldx	#ADDR
+	lda	xres
+	ldy	xres+1
+	jsr	icmp		; ( x < xres ) ...
+	bcs	@finito
 	lda	Y1
-	ldy	Y1+1
-	jsr	icmp		; if (yres<y1)
-	bcc	@finito
+	ldx	Y1+1
+	sta	ADDR
+	stx	ADDR+1
+	ldx	#ADDR
+	lda	yres
+	ldy	yres+1
+	jsr	icmp		; ... && ( y < yres )
+	bcc	SETPIXEL
+@finito:rts
 
 SETPIXEL:
         jsr     CALC            ; Calculate coordinates
@@ -634,10 +635,11 @@ LINE:
 	; dy = -1;
 @L024A:	lda	#$ff
 @L024B:	sta	DY
-	; err = ay = 0;
+	; err = ax = ay = 0;
 	lda	#0
 	sta	ERR
 	sta	ERR+1
+	sta	AX
 	sta	AY
 
 	; if (nx<ny) {
@@ -655,8 +657,11 @@ LINE:
 	ldx	NY+1
 	sta	NY+1
 	stx	NX+1
-	; ay = dx
+	; ax = dx
 	lda	DX
+	sta	AX
+	; ay = dy
+	lda	DY
 	sta	AY
 	; dx = dy = 0;
 	lda	#0
@@ -734,10 +739,10 @@ LINE:
 	lda	PB
 	ldx	PB+1
 	jmp	@L0312
-	; } else { x1 = x1 + ay
+	; } else { x1 = x1 + ax
 @L027F:
 	ldx	#0
-	lda	AY
+	lda	AX
 	bpl	@L0288
 	dex
 @L0288:	clc

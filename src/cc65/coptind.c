@@ -1105,7 +1105,7 @@ unsigned OptTransfers1 (CodeSeg* S)
 	 	    if (I == 0) {
 		   	/* No preceeding entry */
 			goto NextEntry;
-		    }
+	 	    }
 		    P = CS_GetEntry (S, I-1);
 		    if ((P->Info & OF_SETF) == 0) {
 			/* Does not set the flags */
@@ -1312,8 +1312,9 @@ unsigned OptPrecalc (CodeSeg* S)
        	/* Get a pointer to the output registers of the insn */
        	const RegContents* Out = &E->RI->Out;
 
-        /* Argument for LDA and flag */
+        /* Argument for LDn and flag */
         const char* Arg = 0;
+        opc_t OPC = OP65_LDA;
 
         /* Handle the different instructions */
         switch (E->OPC) {
@@ -1327,15 +1328,17 @@ unsigned OptPrecalc (CodeSeg* S)
 
             case OP65_LDX:
                 if (E->AM != AM65_IMM && RegValIsKnown (Out->RegX)) {
-                    /* Result of load is known */
+                    /* Result of load is known but register is X */
                     Arg = MakeHexArg (Out->RegX);
+                    OPC = OP65_LDX;
                 }
                 break;
 
             case OP65_LDY:
                 if (E->AM != AM65_IMM && RegValIsKnown (Out->RegY)) {
-                    /* Result of load is known */
+                    /* Result of load is known but register is Y */
                     Arg = MakeHexArg (Out->RegY);
+                    OPC = OP65_LDY;
                 }
                 break;
 
@@ -1379,7 +1382,7 @@ unsigned OptPrecalc (CodeSeg* S)
 
         /* Check if we have to replace the insn by LDA */
         if (Arg) {
-            CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+            CodeEntry* X = NewCodeEntry (OPC, AM65_IMM, Arg, 0, E->LI);
             CS_InsertEntry (S, X, I+1);
             CS_DelEntry (S, I);
             ++Changes;

@@ -26,13 +26,14 @@ int main (void)
 	for (i = 0; i < count; ++i) {
 	    gotoxy (0, i+1);
 	    j = joy_read (i);
-	    cprintf ("%2d: %-6s%-6s%-6s%-6s%-6s",
+	    cprintf ("%2d: %-6s%-6s%-6s%-6s%-6s%-6s",
 		     i,
        	       	     (j & joy_masks[JOY_UP])?    "  up  " : " ---- ",
 	    	     (j & joy_masks[JOY_DOWN])?	 " down " : " ---- ",
 	    	     (j & joy_masks[JOY_LEFT])?  " left " : " ---- ",
 	    	     (j & joy_masks[JOY_RIGHT])? "right " : " ---- ",
-	    	     (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ");
+	    	     (j & joy_masks[JOY_FIRE])?  " fire " : " ---- ",
+	    	     (j & joy_masks[JOY_FIRE2])? "fire2 " : " ---- ");
 	}
     }
     return 0;

@@ -14,16 +14,14 @@
 ; BEWARE: The current implementation of tgi_map_mode does not work with tables
 ; larger that 255 bytes!
 
-.rodata
+	.rodata
 
 _tgi_mode_table:
         .ifdef	__APPLE2ENH__
-        .byte   TGI_MODE_280_192_6, "A2E.HI.TGI", 0
-        .byte   TGI_MODE_40_40_16,  "A2E.LO.TGI", 0
-;       .byte   TGI_MODE_560_192_2, "A2E.DHI.TGI", 0
+        .byte   TGI_MODE_280_192_8, "A2E.HI.TGI", 0
+        .byte   TGI_MODE_40_48_16,  "A2E.LO.TGI", 0
         .else
-        .byte   TGI_MODE_280_192_6, "A2.HI.TGI", 0
-        .byte   TGI_MODE_40_40_16,  "A2.LO.TGI", 0
-;       .byte   TGI_MODE_560_192_2, "A2.DHI.TGI", 0
+        .byte   TGI_MODE_280_192_8, "A2.HI.TGI", 0
+        .byte   TGI_MODE_40_48_16,  "A2.LO.TGI", 0
         .endif
-        .byte   0       ; End marker
+        .byte   0		; End marker

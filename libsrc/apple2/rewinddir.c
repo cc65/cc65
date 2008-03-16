@@ -44,7 +44,7 @@
 
 
 
-void __fastcall__ rewinddir (DIR* dir)
+void __fastcall__ rewinddir (register DIR* dir)
 {
     /* Rewind directory file */
     if (lseek (dir->fd, 0, SEEK_SET)) {

@@ -57,9 +57,9 @@ extern char _cwd[FILENAME_MAX];
 
 
 
-DIR* __fastcall__ opendir (const char* name) 
+DIR* __fastcall__ opendir (register const char* name) 
 {
-    DIR* dir;
+    register DIR* dir;
 
     /* Alloc DIR */
     if ((dir = malloc (sizeof (*dir))) == NULL) {

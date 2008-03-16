@@ -74,6 +74,7 @@ JOY_API_VERSION         = $01
 ;------------------------------------------------------------------------------
 ; C callable functions
 
+        .global _joy_load_driver
         .global _joy_unload
        	.global	_joy_install
        	.global _joy_uninstall

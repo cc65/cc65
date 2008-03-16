@@ -17,7 +17,6 @@ getfd:
         cmp	#MAX_FDS
         bcs	error
 
-
         ; Convert handle to fdtab slot
         .assert .sizeof(FD) = 4, error
         asl

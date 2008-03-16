@@ -8,20 +8,24 @@
         .import         zerobss
         .import    	initlib, donelib
         .import    	callmain, callirq
-        .import         COUT
-        .import        	__STARTUP_LOAD__, __BSS_LOAD__	; Linker generated
+        .import        	__RAM_START__ , __RAM_LAST__	; Linker generated
+        .import         __MOVE_START__, __MOVE_LAST__	; Linker generated
+        .import         __LC_START__  , __LC_LAST__	; Linker generated
+        .import        	__BSS_RUN__   , __INIT_SIZE__	; Linker generated
         .import        	__INTERRUPTOR_COUNT__		; Linker generated
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
-        .include        "mli.inc"
+
+        .linecont	+
 
 ; ------------------------------------------------------------------------
 
         .segment        "EXEHDR"
 
-        .addr           __STARTUP_LOAD__                ; Start address
-        .word           __BSS_LOAD__ - __STARTUP_LOAD__	; Size
+        .addr           __RAM_START__			; Start address
+        .word           __BSS_RUN__   - __RAM_START__ + \
+			__MOVE_LAST__ - __MOVE_START__	; Size
 
 ; ------------------------------------------------------------------------
 
@@ -33,13 +37,64 @@
         ldx     #$FF
         txs            		; Init stack pointer
 
-        ; Delegate all further processing to keep STARTUP small
+	; Switch in LC bank 2 for W/O
+	bit	$C081
+	bit	$C081
+	
+	; Set source start address
+	lda	#<(__BSS_RUN__ + __INIT_SIZE__)
+	ldy	#>(__BSS_RUN__ + __INIT_SIZE__)
+	sta	$9B
+	sty	$9C
+	
+	; Set source last address
+	lda	#<(__BSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
+	ldy	#>(__BSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
+	sta	$96
+	sty	$97
+
+	; Set destination last address
+	lda	#<__LC_LAST__
+	ldy	#>__LC_LAST__
+	sta	$94
+	sty	$95
+
+	; Call into Applesoft Block Transfer Utility - which handles zero
+	; sized blocks well - to move content of the LC memory area
+	jsr	$D396		; BLTU + 3
+
+	; Set source start address
+	lda	#<__BSS_RUN__
+	ldy	#>__BSS_RUN__
+	sta	$9B
+	sty	$9C
+	
+	; Set source last address
+	lda	#<(__BSS_RUN__ + __INIT_SIZE__)
+	ldy	#>(__BSS_RUN__ + __INIT_SIZE__)
+	sta	$96
+	sty	$97
+
+	; Set destination last address
+	lda	#<__RAM_LAST__
+	ldy	#>__RAM_LAST__
+	sta	$94
+	sty	$95
+
+	; Call into Applesoft Block Transfer Utility - which handles moving
+	; overlapping blocks upwards well - to move the INIT segment
+	jsr	$D396		; BLTU + 3
+
+        ; Delegate all further processing to keep the STARTUP segment small
         jsr     init
 
         ; Avoid re-entrance of donelib. This is also the _exit entry
 _exit:  ldx     #<exit
         lda     #>exit
         jsr     reset		; Setup RESET vector
+        
+        ; Switch in ROM in case it wasn't already switched in by a RESET
+	bit	$C082
 
         ; Call module destructors
         jsr     donelib
@@ -50,7 +105,7 @@ _exit:  ldx     #<exit
 
         ; Deallocate interrupt vector table entry
         dec     params		; Adjust parameter count
-        jsr     ENTRY
+        jsr     $BF00		; MLI call entry point
         .byte   $41		; Dealloc interrupt
         .addr   params
 
@@ -88,6 +143,9 @@ init:   ldx     #zpspace-1
         dex
         bpl     :-
 
+        ; Clear the BSS data
+        jsr     zerobss
+
         ; Save the original RESET vector
         ldx     #$02
 :       lda     SOFTEV,x
@@ -102,9 +160,6 @@ init:   ldx     #zpspace-1
         lda     #>_exit
         jsr     reset		; Setup RESET vector
                 
-        ; Clear the BSS data
-        jsr     zerobss
-
         ; Setup the stack
         lda     HIMEM
         sta     sp
@@ -116,12 +171,12 @@ init:   ldx     #zpspace-1
         beq     :+
 
         ; Check for ProDOS
-        lda     ENTRY
+        lda     $BF00		; MLI call entry point
         cmp     #$4C		; Is MLI present? (JMP opcode)
         bne     prterr
 
         ; Allocate interrupt vector table entry
-        jsr     ENTRY
+        jsr     $BF00		; MLI call entry point
         .byte   $40		; Alloc interrupt
         .addr   params
         bcs     prterr
@@ -133,13 +188,16 @@ init:   ldx     #zpspace-1
         ; Call module constructors
 :       jsr     initlib
 
+	; Switch in LC bank 2 for R/O
+	bit	$C080
+
         ; Push arguments and call main()
         jmp     callmain
 
         ; Print error message and return
 prterr: ldx     #msglen-1
 :       lda     errmsg,x
-        jsr     COUT
+        jsr     $FDED		; COUT
         dex
         bpl     :-
         rts
@@ -184,10 +242,6 @@ intrpt: cld
 :       sec
         rts
 
-; ------------------------------------------------------------------------
-
-        .code
-
         ; Setup RESET vector
 reset:  stx     SOFTEV
         sta     SOFTEV+1
@@ -201,8 +255,12 @@ reset:  stx     SOFTEV
 
 zpsave: .res    zpspace
 
-rvsave: .res    3
-
 params: .byte   $02		; Parameter count
 intnum: .byte   $00		; Interrupt number
         .addr   intrpt		; Interrupt handler
+
+; ------------------------------------------------------------------------
+
+        .bss
+
+rvsave: .res    3

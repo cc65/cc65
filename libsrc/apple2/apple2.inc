@@ -34,6 +34,7 @@ KBDSTRB :=      $C010	; Clear keyboard strobe
 ; 80 column video switches
 CLR80COL:=      $C000	; Disable 80 column store
 SET80COL:=      $C001	; Enable 80 column store
+RD80COL	:=	$C018	; >127 if 80 column store enabled
 RD80VID :=      $C01F   ; >127 if 80 column video enabled
 
 ; Character set switches
@@ -49,6 +50,8 @@ LCBANK2	:=	$C083	; Swap in LC bank 2
 LCBANK1	:=	$C08B	; Swap in LC bank 1
 
 ; Video mode switches
+TXTCLR	:=	$C050	; Display graphics
+TXTSET	:=	$C051	; Display text
 MIXCLR  :=      $C052	; Disable 4 lines of text
 MIXSET  :=      $C053	; Enable 4 lines of text
 LOWSCR  :=      $C054	; Page 1

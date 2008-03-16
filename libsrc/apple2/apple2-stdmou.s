@@ -147,31 +147,16 @@ next:	inc	ptr1+1
 	asl
 	sta	yparam+1
 	
-	.ifdef	__APPLE2ENH__
-	; Save LC read state
-	ldx	#<ROMIN
-	bit	RDLCRAM
-	bpl	:+
-	ldx	#<LCBANK1
-	bit	RDLCBNK2
-	bpl	:+
-	ldx	#<LCBANK2
-:	phx
-	
-	; The AppleMouse II Card needs the ROM swapped in
+	; The AppleMouse II Card needs the ROM switched in
 	; to be able to detect an Apple //e and use RDVBL
-	sta	ROMIN		; STA keeps LC write state
-	.endif
+	bit	$C082
 
 	; Reset mouse hardware
 	ldx	#INITMOUSE
 	jsr	firmware
 	
-	.ifdef	__APPLE2ENH__
-	; Restore LC read state
-	plx
-	sta	$C000,x		; STA keeps LC write state
-	.endif	
+	; Switch in LC bank 2 for R/O
+	bit	$C080
 
 	; Turn mouse on
 	lda	#%00000001

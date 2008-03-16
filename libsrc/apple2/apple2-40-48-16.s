@@ -1,7 +1,8 @@
 ;
-; Graphics driver for the 40x40x16 mode on the Apple II
+; Graphics driver for the 40x48x16 mode on the Apple II
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
+; Oliver Schmidt <ol.sc@web.de>
 ; Based on Maciej Witkowiak's line and circle routine
 ;
 
@@ -15,40 +16,72 @@
 	.macpack	generic
 
 ; ------------------------------------------------------------------------
-; Constants
 
-H2		= $2C
-PLOT		= $F800
-HLINE		= $F819
-CLRTOP		= $F836
-SETCOL		= $F864
-SCRN		= $F871
-SETGR		= $FB40
-VTABZ		= $FC24
+; Zero page stuff
 
-; ------------------------------------------------------------------------
+H2	:=	$2C
+
 ; ROM entry points
 
-COUT   	:=	$FDED	; Vector to user output routine
-TEXT    :=	$F399	; Return to text screen
+TEXT    :=	$F399
+PLOT	:=	$F800
+HLINE	:=	$F819
+CLRSCR	:=	$F832
+SETCOL	:=	$F864
+SCRN	:=	$F871
+SETGR	:=	$FB40
+HOME	:=	$FC58
 
 ; ------------------------------------------------------------------------
-; Header. Includes jump table and constants.
 
-.segment	"JUMPTABLE"
+; Variables mapped to the zero page segment variables. Some of these are
+; used for passing parameters to the driver.
+
+X1	:=	ptr1
+Y1	:=	ptr2
+X2	:=	ptr3
+Y2	:=	ptr4
+RADIUS	:=	tmp1
+
+ADDR	:=	tmp1
+TEMP	:=	tmp3
+TEMP2	:=	tmp4
+TEMP3	:=	sreg
+TEMP4	:=	sreg+1
+
+; Line routine stuff (must be on zpage)
+
+PB 	:=	ptr3 		; (2)	LINE
+UB	:=	ptr4 		; (2)	LINE
+ERR	:=	regsave 	; (2)	LINE
+NX	:=	regsave+2 	; (2)	LINE
+
+; Circle routine stuff (must be on zpage)
+
+XX	:=	ptr3		; (2)	CIRCLE
+YY	:=	ptr4		; (2)	CIRCLE
+MaxO	:=	sreg		; (overwritten by TEMP3+TEMP4, but restored from OG/OU anyway)
+XS	:=	regsave		; (2)	CIRCLE
+YS	:=	regsave+2	; (2)	CIRCLE
+
+; ------------------------------------------------------------------------
+
+	.segment	"JUMPTABLE"
+
+; Header. Includes jump table and constants.
 
 ; First part of the header is a structure that has a magic and defines the
 ; capabilities of the driver
 
-	.byte	$74, $67, $69		; "tgi"
-	.byte	TGI_API_VERSION		; TGI API version number
-xres:	.word	40			; X resolution
-yres:	.word	40			; Y resolution
-	.byte	16			; Number of drawing colors
-	.byte	1			; Number of screens available
-	.byte	8			; System font X size
-	.byte	8			; System font Y size
-	.res	4, $00			; Reserved for future extensions
+	.byte	$74, $67, $69	; "tgi"
+	.byte	TGI_API_VERSION	; TGI API version number
+xres:	.word	40		; X resolution
+yres:	.word	48		; Y resolution
+	.byte	16		; Number of drawing colors
+	.byte	1		; Number of screens available
+	.byte	8		; System font X size
+	.byte	8		; System font Y size
+	.res	4, $00		; Reserved for future extensions
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).
@@ -73,89 +106,42 @@ yres:	.word	40			; Y resolution
        	.addr   CIRCLE
        	.addr   TEXTSTYLE
        	.addr   OUTTEXT
-        .addr   0                       ; IRQ entry is unused
+        .addr   0               ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
-; Data.
 
-; Variables mapped to the zero page segment variables. Some of these are
-; used for passing parameters to the driver.
-
-X1		= ptr1
-Y1		= ptr2
-X2		= ptr3
-Y2		= ptr4
-RADIUS		= tmp1
-
-ADDR		= tmp1
-TEMP		= tmp3
-TEMP2		= tmp4
-TEMP3		= sreg
-TEMP4		= sreg+1
-
-; Line routine stuff (must be on zpage)
-PB 		= ptr3 		; (2)	LINE
-UB		= ptr4 		; (2)	LINE
-ERR		= regsave 	; (2)	LINE
-NX		= regsave+2 	; (2)	LINE
-; Circle stuff
-XX		= ptr3		; (2)	CIRCLE
-YY		= ptr4		; (2)	CIRCLE
-MaxO		= sreg		; (overwritten by TEMP3+TEMP4, but restored from OG/OU anyway)
-XS		= regsave	; (2)	CIRCLE
-YS		= regsave+2	; (2)	CIRCLE
+	.bss
 
 ; Absolute variables used in the code
 
-.bss
+ERROR:	.res	1		; Error code
 
-ERROR:		.res	1	; Error code
-
-; Line routine stuff (combined with CIRCLE to save space)
+; Line routine stuff (combined with circle routine stuff to save space)
 
 OGora:
-COUNT:		.res	2
+COUNT:	.res	2
 OUkos:
-NY:		.res	2
+NY:	.res	2
 Y3:
-DX:		.res	1
-DY:		.res	1
-AY:		.res	1
+DX:	.res	1
+DY:	.res	1
+AX:	.res	1
+AY:	.res	1
+
+; ------------------------------------------------------------------------
+
+	.rodata
 
 ; Constants and tables
 
-.rodata
-
-DEFPALETTE:	.byte	$00, $0F, $01, $0E, $03, $04, $02, $0D
-		.byte	$09, $08, $0B, $05, $0A, $0C, $06, $07
-
-.code
+DEFPALETTE: .byte $00, $01, $02, $03, $04, $05, $06, $07
+	    .byte $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
 
 ; ------------------------------------------------------------------------
-; INSTALL routine. Is called after the driver is loaded into memory. May
-; initialize anything that has to be done just once. Is probably empty
-; most of the time.
-;
-; Must set an error code: NO
-;
 
-INSTALL:
+	.code
 
-
-; ------------------------------------------------------------------------
-; UNINSTALL routine. Is called before the driver is removed from memory. May
-; clean up anything done by INSTALL but is probably empty most of the time.
-;
-; Must set an error code: NO
-;
-
-UNINSTALL:
-	rts
-
-
-; ------------------------------------------------------------------------
-; INIT: Changes an already installed device from text mode to graphics
-; mode.
+; INIT: Changes an already installed device from text mode to graphics mode.
 ; Note that INIT/DONE may be called multiple times while the driver
 ; is loaded, while INSTALL is only called once, so any code that is needed
 ; to initializes variables and so on must go here. Setting palette and
@@ -163,138 +149,141 @@ UNINSTALL:
 ; kernel later.
 ; The graphics kernel will never call INIT when a graphics mode is already
 ; active, so there is no need to protect against that.
-;
 ; Must set an error code: YES
-;
-
 INIT:
-
-; Switch into graphics mode
-
+	; Switch into graphics mode
+	bit	$C082		; Switch in ROM
 	jsr	SETGR
+	bit	MIXCLR
+	bit	$C080		; Switch in LC bank 2 for R/O
 
-; Done, reset the error code
-
+	; Done, reset the error code
 	lda	#TGI_ERR_OK
 	sta	ERROR
+
+	; Fall through
+
+; INSTALL routine. Is called after the driver is loaded into memory. May
+; initialize anything that has to be done just once. Is probably empty
+; most of the time.
+; Must set an error code: NO
+INSTALL:
+	; Fall through
+
+; UNINSTALL routine. Is called before the driver is removed from memory. May
+; clean up anything done by INSTALL but is probably empty most of the time.
+; Must set an error code: NO
+UNINSTALL:
+	; Fall through
+
+; SETVIEWPAGE: Set the visible page. Called with the new page in A (0..n).
+; The page number is already checked to be valid by the graphics kernel.
+; Must set an error code: NO (will only be called if page ok)
+SETVIEWPAGE:
+	; Fall through
+
+; SETDRAWPAGE: Set the drawable page. Called with the new page in A (0..n).
+; The page number is already checked to be valid by the graphics kernel.
+; Must set an error code: NO (will only be called if page ok)
+SETDRAWPAGE:
+	; Fall through
+
+; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y
+; direction is passend in X/Y, the text direction is passed in A.
+; Must set an error code: NO
+TEXTSTYLE:
+	; Fall through
+
+; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
+; current text style. The text to output is given as a zero terminated
+; string with address in ptr3.
+; Must set an error code: NO
+OUTTEXT:
 	rts
 
-; ------------------------------------------------------------------------
 ; DONE: Will be called to switch the graphics device back into text mode.
 ; The graphics kernel will never call DONE when no graphics mode is active,
 ; so there is no need to protect against that.
-;
 ; Must set an error code: NO
-;
+DONE:
+	bit	$C082		; Switch in ROM
+	jsr	TEXT
+	jsr	HOME
+	bit	$C080		; Switch in LC bank 2 for R/O
+	rts
 
-DONE		= TEXT
-
-; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.
-
 GETERROR:
-	ldx	#TGI_ERR_OK
 	lda	ERROR
+	ldx	#TGI_ERR_OK
 	stx	ERROR
 	rts
 
-; ------------------------------------------------------------------------
-; CONTROL: Platform/driver specific entry point.
-;
-; Must set an error code: YES
-;
-
-CONTROL:
-	lda	#TGI_ERR_INV_FUNC
-	sta	ERROR
-	rts
-
-; ------------------------------------------------------------------------
 ; CLEAR: Clears the screen.
-;
 ; Must set an error code: NO
-;
-
-CLEAR		= CLRTOP
-
-; ------------------------------------------------------------------------
-; SETVIEWPAGE: Set the visible page. Called with the new page in A (0..n).
-; The page number is already checked to be valid by the graphics kernel.
-;
-; Must set an error code: NO (will only be called if page ok)
-;
-
-SETVIEWPAGE:
-
-; ------------------------------------------------------------------------
-; SETDRAWPAGE: Set the drawable page. Called with the new page in A (0..n).
-; The page number is already checked to be valid by the graphics kernel.
-;
-; Must set an error code: NO (will only be called if page ok)
-;
-
-SETDRAWPAGE:
+CLEAR:
+	bit	$C082		; Switch in ROM
+	jsr	CLRSCR
+	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
 
-; ------------------------------------------------------------------------
 ; SETCOLOR: Set the drawing color (in A). The new color is already checked
 ; to be in a valid range (0..maxcolor-1).
-;
 ; Must set an error code: NO (will only be called if color ok)
-;
+SETCOLOR:
+	bit	$C082		; Switch in ROM
+	jsr	SETCOL
+	bit	$C080		; Switch in LC bank 2 for R/O
+	rts
 
-SETCOLOR	= SETCOL
+; CONTROL: Platform/driver specific entry point.
+; Must set an error code: YES
+CONTROL:
+	; Fall through
 
-; ------------------------------------------------------------------------
 ; SETPALETTE: Set the palette (not available with all drivers/hardware).
 ; A pointer to the palette is passed in ptr1. Must set an error if palettes
 ; are not supported
-;
 ; Must set an error code: YES
-;
-
 SETPALETTE:
 	lda	#TGI_ERR_INV_FUNC
 	sta	ERROR
 	rts
 
-; ------------------------------------------------------------------------
 ; GETPALETTE: Return the current palette in A/X. Even drivers that cannot
 ; set the palette should return the default palette here, so there's no
 ; way for this function to fail.
-;
 ; Must set an error code: NO
-;
-
 GETPALETTE:
+	; Fall through
 
-; ------------------------------------------------------------------------
 ; GETDEFPALETTE: Return the default palette for the driver in A/X. All
 ; drivers should return something reasonable here, even drivers that don't
 ; support palettes, otherwise the caller has no way to determine the colors
 ; of the (not changeable) palette.
-;
 ; Must set an error code: NO (all drivers must have a default palette)
-;
-
 GETDEFPALETTE:
 	lda	#<DEFPALETTE
 	ldx	#>DEFPALETTE
 	rts
 
-; ------------------------------------------------------------------------
 ; SETPIXEL: Draw one pixel at X1/Y1 = ptr1/ptr2 with the current drawing
 ; color. The coordinates passed to this function are never outside the
 ; visible screen area, so there is no need for clipping inside this function.
-;
 ; Must set an error code: NO
-;
+SETPIXEL:
+	bit	$C082		; Switch in ROM
+	ldy	X1
+	lda	Y1
+	jsr	PLOT
+	bit	$C080		; Switch in LC bank 2 for R/O
+	rts
 
 SETPIXELCLIP:
 	lda	Y1+1
-	bmi	@finito		; y<0
+	bmi	:+		; y < 0
 	lda	X1+1
-	bmi	@finito		; x<0
+	bmi	:+		; x < 0
 	lda	X1
 	ldx	X1+1
 	sta	ADDR
@@ -303,7 +292,7 @@ SETPIXELCLIP:
 	lda	xres
 	ldy	xres+1
 	jsr	icmp		; ( x < xres ) ...
-	bcs	@finito
+	bcs	:+
 	lda	Y1
 	ldx	Y1+1
 	sta	ADDR
@@ -313,35 +302,25 @@ SETPIXELCLIP:
 	ldy	yres+1
 	jsr	icmp		; ... && ( y < yres )
 	bcc	SETPIXEL
-@finito:rts
+:	rts
 
-SETPIXEL:
-	lda	X1
-	ldy	Y1
-	jmp	PLOT
-
-; ------------------------------------------------------------------------
 ; GETPIXEL: Read the color value of a pixel and return it in A/X. The
 ; coordinates passed to this function are never outside the visible screen
 ; area, so there is no need for clipping inside this function.
-
-
 GETPIXEL:
-	lda	X1
-	ldy	Y1
+	bit	$C082		; Switch in ROM
+	ldy	X1
+	lda	Y1
 	jsr	SCRN
 	ldx	#$00
+	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
 
-; ------------------------------------------------------------------------
 ; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
 ; X2/Y2 = ptr3/ptr4 using the current drawing color.
-;
 ; Must set an error code: NO
-;
-
 LINE:
-	; nx = abs(x2 - x1)
+	; nx = abs (x2 - x1)
 	lda	X2
 	sub	X1
 	sta	NX
@@ -352,7 +331,8 @@ LINE:
 	jsr	abs
 	sta	NX
 	sty	NX+1
-	; ny = abs(y2 - y1)
+
+	; ny = abs (y2 - y1)
 	lda	Y2
 	sub	Y1
 	sta	NY
@@ -363,47 +343,54 @@ LINE:
 	jsr	abs
 	sta	NY
 	sty	NY+1
-	; if (x2>x1)
+
+	; if (x2 >= x1)
 	ldx	#X2
 	lda	X1
 	ldy	X1+1
 	jsr	icmp
-	bcc	@L0243
-	beq	@L0243
-	; dx = 1;
+	bcc	:+
+
+	;    dx = 1
 	lda	#$01
-	bne	@L0244
+	bne	:++
+
 	; else
-	; dx = -1;
-@L0243:	lda	#$FF
-@L0244:	sta	DX
-	; if (y2>y1)
+	;    dx = -1
+:	lda	#$FF
+:	sta	DX
+
+	; if (y2 >= y1)
 	ldx	#Y2
 	lda	Y1
 	ldy	Y1+1
 	jsr	icmp
-	bcc	@L024A
-	beq	@L024A
-	; dy = 1;
+	bcc	:+
+
+	;    dy = 1
 	lda	#$01
-	bne	@L024B
+	bne	:++
+
 	; else
-	; dy = -1;
-@L024A:	lda	#$FF
-@L024B:	sta	DY
-	; err = ay = 0;
+	;    dy = -1
+:	lda	#$FF
+:	sta	DY
+
+	; err = ax = ay = 0
 	lda	#$00
 	sta	ERR
 	sta	ERR+1
+	sta	AX
 	sta	AY
 
-	; if (nx<ny) {
+	; if (nx < ny) {
 	ldx	#NX
 	lda	NY
 	ldy	NY+1
 	jsr	icmp
-	bcs	@L0255
-	;  nx <-> ny
+	bcs	:+
+
+	;    nx <-> ny
 	lda	NX
 	ldx	NY
 	sta	NY
@@ -412,30 +399,40 @@ LINE:
 	ldx	NY+1
 	sta	NY+1
 	stx	NX+1
-	; ay = dx
+
+	;    ax = dx
 	lda	DX
+	sta	AX
+
+	;    ay = dy
+	lda	DY
 	sta	AY
-	; dx = dy = 0;
+
+	;    dx = dy = 0 }
 	lda	#$00
 	sta	DX
 	sta	DY
-	; ny = - ny;
-@L0255:	lda	NY
+
+	; ny = - ny
+:	lda	NY
 	ldy	NY+1
 	jsr	neg
 	sta	NY
 	sty	NY+1
-	; for (count=nx;count>0;--count) {
+
+	; for (count = nx; count > 0; --count) {
 	lda	NX
 	ldx	NX+1
 	sta	COUNT
 	stx	COUNT+1
-@L0166:	lda	COUNT		; count>0
+for:	lda	COUNT		; count > 0
 	ora	COUNT+1
-	bne	@L0167
+	bne	:+
 	rts
-	;    setpixel(X1,Y1)
-@L0167:	jsr	SETPIXELCLIP
+
+	;    setpixel (X1, Y1)
+:	jsr	SETPIXELCLIP
+
 	;    pb = err + ny
 	lda	ERR
 	add	NY
@@ -444,6 +441,7 @@ LINE:
 	adc	NY+1
 	sta	PB+1
 	tax
+
 	;    ub = pb + nx
 	lda	PB
 	add	NX
@@ -451,27 +449,30 @@ LINE:
 	txa
 	adc	NX+1
 	sta	UB+1
+
 	;    x1 = x1 + dx
 	ldx	#$00
 	lda	DX
-	bpl	@L027B
+	bpl	:+
 	dex
-@L027B:	add	X1
+:	add	X1
 	sta	X1
 	txa
 	adc	X1+1
 	sta	X1+1
-	;   y1 = y1 + ay
+
+	;    y1 = y1 + ay
 	ldx	#$00
 	lda	AY
-	bpl	@L027E
+	bpl	:+
 	dex
-@L027E:	add	Y1
+:	add	Y1
 	sta	Y1
 	txa
 	adc	Y1+1
 	sta	Y1+1
-	; if (abs(pb)<abs(ub)) {
+
+	;    if (abs (pb) < abs (ub)) {
 	lda	PB
 	ldy	PB+1
 	jsr	abs
@@ -482,49 +483,50 @@ LINE:
 	jsr	abs
 	ldx	#TEMP3
 	jsr	icmp
-	bpl	@L027F
-	;   err = pb
+	bpl	:+
+
+	;       err = pb }
 	lda	PB
 	ldx	PB+1
-	jmp	@L0312
-	; } else { x1 = x1 + ay
-@L027F:
-	ldx	#$00
-	lda	AY
-	bpl	@L0288
+	jmp	next
+
+	;    else { x1 = x1 + ax
+:	ldx	#$00
+	lda	AX
+	bpl	:+
 	dex
-@L0288:	add	X1
+:	add	X1
 	sta	X1
 	txa
 	adc	X1+1
 	sta	X1+1
-	;	y1 = y1 + dy
+
+	;       y1 = y1 + dy
 	ldx	#$00
 	lda	DY
-	bpl	@L028B
+	bpl	:+
 	dex
-@L028B:	add	Y1
+:	add	Y1
 	sta	Y1
 	txa
 	adc	Y1+1
 	sta	Y1+1
+
 	;	err = ub }
 	lda	UB
 	ldx	UB+1
-@L0312:
-	sta	ERR
+next:	sta	ERR
 	stx	ERR+1
-	; } (--count)
-	sec
-	lda	COUNT
-	sbc	#$01
-	sta	COUNT
-	bcc	@L0260
-	jmp	@L0166
-@L0260:	dec	COUNT+1
-	jmp	@L0166
 
-; ------------------------------------------------------------------------
+	; } (--count)
+	lda	COUNT
+	sub	#$01
+	sta	COUNT
+	bcc	:+
+	jmp	for
+:	dec	COUNT+1
+	jmp	for
+
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
 ; X1/Y1 = ptr1/ptr2 and X2/Y2 = ptr3/ptr4 using the current drawing color.
 ; Contrary to most other functions, the graphics kernel will sort and clip
@@ -536,44 +538,40 @@ LINE:
 ;	(X2 >= 0) && (X2 < XRES)
 ;	(Y1 >= 0) && (Y1 < YRES)
 ;	(Y2 >= 0) && (Y2 < YRES)
-;
 ; Must set an error code: NO
-;
-
 BAR:
+	bit	$C082		; Switch in ROM
 	inc	Y2
 	ldx	X2
 	stx	H2
-@L1:	ldy	X1
+:	ldy	X1
 	lda	Y1
 	jsr	HLINE
 	inc	Y1
 	lda	Y2
 	cmp	Y1
-	bne	@L1
+	bne	:-
+	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
 
-; ------------------------------------------------------------------------
 ; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the
 ; radius in tmp1 and the current drawing color.
-;
 ; Must set an error code: NO
-;
-
 CIRCLE:
 	lda	RADIUS
-	bne	@L1
+	bne	:+
 	jmp	SETPIXELCLIP	; Plot as a point
+:	sta	XX
 
-@L1:	sta	XX
-	; x = r;
+	; x = r
 	lda	#$00
 	sta	XX+1
 	sta	YY
 	sta	YY+1
 	sta	MaxO
 	sta	MaxO+1
-	; y =0; mo=0;
+
+	; y = 0, mo = 0
 	lda	X1
 	ldx	X1+1
 	sta	XS
@@ -583,97 +581,98 @@ CIRCLE:
 	sta	YS
 	stx	YS+1		; XS/YS to remember the center
 
-	; while (y<x) {
-@L013B: ldx	#YY
+	; while (y < x) {
+while:	ldx	#YY
 	lda	XX
 	ldy	XX+1
 	jsr	icmp
-	bcc	@L12
+	bcc	:+
 	rts
-@L12:	; plot points in 8 slices...
-	lda	XS
+
+	; Plot points in 8 slices...
+:	lda	XS
 	add	XX
 	sta	X1
 	lda	XS+1
 	adc	XX+1
-	sta	X1+1		; x1 = xs+x
+	sta	X1+1		; x1 = xs + x
 	lda	YS
 	add	YY
 	sta	Y1
 	pha
 	lda	YS+1
 	adc	YY+1
-	sta	Y1+1		; (stack)=ys+y, y1=(stack)
+	sta	Y1+1		; (stack) = ys + y, y1 = (stack)
 	pha
-	jsr	SETPIXELCLIP	; plot(xs+x,ys+y)
+	jsr	SETPIXELCLIP	; plot (xs + x, ys + y)
 	lda	YS
 	sub	YY
 	sta	Y1
 	sta	Y3
 	lda	YS+1
 	sbc	YY+1
-	sta	Y1+1		; y3 = y1 = ys-y
+	sta	Y1+1		; y3 = y1 = ys - y
 	sta	Y3+1
-	jsr	SETPIXELCLIP	; plot(xs+x,ys-y)
+	jsr	SETPIXELCLIP	; plot (xs + x, ys - y)
 	pla
 	sta	Y1+1
 	pla
-	sta	Y1		; y1 = ys+y
+	sta	Y1		; y1 = ys + y
 	lda	XS
 	sub	XX
 	sta	X1
 	lda	XS+1
 	sbc	XX+1
 	sta	X1+1
-	jsr	SETPIXELCLIP	; plot (xs-x,ys+y)
+	jsr	SETPIXELCLIP	; plot (xs - x, ys + y)
 	lda	Y3
 	sta	Y1
 	lda	Y3+1
 	sta	Y1+1
-	jsr	SETPIXELCLIP	; plot (xs-x,ys-y)
+	jsr	SETPIXELCLIP	; plot (xs - x, ys - y)
 
 	lda	XS
 	add	YY
 	sta	X1
 	lda	XS+1
 	adc	YY+1
-	sta	X1+1		; x1 = xs+y
+	sta	X1+1		; x1 = xs + y
 	lda	YS
 	add	XX
 	sta	Y1
 	pha
 	lda	YS+1
 	adc	XX+1
-	sta	Y1+1		; (stack)=ys+x, y1=(stack)
+	sta	Y1+1		; (stack) = ys + x, y1 = (stack)
 	pha
-	jsr	SETPIXELCLIP	; plot(xs+y,ys+x)
+	jsr	SETPIXELCLIP	; plot (xs + y, ys + x)
 	lda	YS
 	sub	XX
 	sta	Y1
 	sta	Y3
 	lda	YS+1
 	sbc	XX+1
-	sta	Y1+1		; y3 = y1 = ys-x
+	sta	Y1+1		; y3 = y1 = ys - x
 	sta	Y3+1
-	jsr	SETPIXELCLIP	; plot(xs+y,ys-x)
+	jsr	SETPIXELCLIP	; plot (xs + y, ys - x)
 	pla
 	sta	Y1+1
 	pla
-	sta	Y1		; y1 = ys+x(stack)
+	sta	Y1		; y1 = ys + x(stack)
 	lda	XS
 	sub	YY
 	sta	X1
 	lda	XS+1
 	sbc	YY+1
 	sta	X1+1
-	jsr	SETPIXELCLIP	; plot (xs-y,ys+x)
+	jsr	SETPIXELCLIP	; plot (xs - y, ys + x)
 	lda	Y3
 	sta	Y1
 	lda	Y3+1
 	sta	Y1+1
-	jsr	SETPIXELCLIP	; plot (xs-y,ys-x)
+	jsr	SETPIXELCLIP	; plot (xs - y, ys - x)
 
-	; og = mo+y+y+1
+	;    og = mo + y + y + 1
 	lda	MaxO
 	ldx	MaxO+1
 	add	YY
@@ -689,11 +688,12 @@ CIRCLE:
 	tax
 	tya
 	add	#$01
-	bcc	@L0143
+	bcc	:+
 	inx
-@L0143: sta	OGora
+:	sta	OGora
 	stx	OGora+1
-	; ou = og-x-x+1
+
+	;    ou = og - x - x + 1
 	sub	XX
 	tay
 	txa
@@ -707,16 +707,18 @@ CIRCLE:
 	tax
 	tya
 	add	#$01
-	bcc	@L0146
+	bcc	:+
 	inx
-@L0146: sta	OUkos
+:	sta	OUkos
 	stx	OUkos+1
-	; ++y
+
+	;    ++y
 	inc	YY
-	bne	@L0148
+	bne	:+
 	inc	YY+1
-@L0148: ; if (abs(ou)<abs(og))
-	lda	OUkos
+
+	;    if (abs (ou) < abs (og)) {
+:	lda	OUkos
 	ldy	OUkos+1
 	jsr	abs
 	sta	TEMP3
@@ -726,66 +728,37 @@ CIRCLE:
 	jsr	abs
 	ldx	#TEMP3
 	jsr	icmp
-	bpl	@L0149
-	; { --x;
+	bpl	:++
+
+	;       --x
 	lda	XX
 	sub	#$01
 	sta	XX
-	bcs	@L014E
+	bcs	:+
 	dec	XX+1
-@L014E: ; mo = ou; }
-	lda	OUkos
+
+	;       mo = ou }
+:	lda	OUkos
 	ldx	OUkos+1
-	jmp	@L014G
-	; else { mo = og }
-@L0149: lda	OGora
+	jmp	:++
+
+	;    else mo = og
+:	lda	OGora
 	ldx	OGora+1
-@L014G: sta	MaxO
+:	sta	MaxO
 	stx	MaxO+1
+
 	; }
-	jmp	@L013B
+	jmp	while
 
-; ------------------------------------------------------------------------
-; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y
-; direction is passend in X/Y, the text direction is passed in A.
-;
-; Must set an error code: NO
-;
-
-TEXTSTYLE:
-	rts
-
-
-; ------------------------------------------------------------------------
-; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
-; current text style. The text to output is given as a zero terminated
-; string with address in ptr3.
-;
-; Must set an error code: NO
-;
-
-OUTTEXT:
-	lda	ptr1
-	sta	CH
-	lda	ptr2
-	jsr	VTABZ
-	ldy	#$00
-@L1:	lda	(ptr3),y
-	ora	#$80
-	jsr	COUT
-	iny
-	cmp	#$80
-	bne	@L1
-	rts
-
-;-------------
-; copies of some runtime routines
+; Copies of some runtime routines
 
 abs:
-	; a/y := abs(a/y)
+	; A/Y := abs (A/Y)
 	cpy	#$00
-	bpl	absend
-	; negay
+	bpl	:+
+	
+	; A/Y := neg (A/Y)
 neg:	clc
 	eor	#$FF
 	adc	#$01
@@ -795,10 +768,10 @@ neg:	clc
 	adc	#$00
 	tay
 	pla
-absend:	rts
+:	rts
 
 icmp:
-	; compare a/y to zp,x
+	; Compare A/Y to zp,X
 	sta	TEMP		; TEMP/TEMP2 - arg2
 	sty	TEMP2
 	lda	$00,x
@@ -807,16 +780,16 @@ icmp:
 	tay
 	pla
 	tax
-	tya			; x/a - arg1 (a=high)
+	tya			; X/A - arg1 (a = high)
 
 	sub	TEMP2
-	bne	@L4
+	bne	:++
 	cpx	TEMP
-	beq	@L3
+	beq	:+
 	adc	#$FF
 	ora	#$01
-@L3:	rts
-@L4:	bvc	@L3
+:	rts
+:	bvc	:+
 	eor	#$FF
 	ora	#$01
-	rts
+:	rts

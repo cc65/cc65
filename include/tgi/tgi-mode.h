@@ -49,7 +49,8 @@
 #define TGI_MODE_160_200_4      2U      /* 160x200, 4 colors */
 #define TGI_MODE_640_200_2	3U	/* 640x200, 2 colors (b/w) */
 #define TGI_MODE_640_480_2	4U	/* 640x480, 2 colors (b/w) */
-#define TGI_MODE_280_192_6      5U      /* 280x192, 6 colors */
+#define TGI_MODE_280_192_8      5U      /* 280x192, 8 colors */
+#define TGI_MODE_40_48_16       6U      /* 40x48,  16 colors */
 
 
 

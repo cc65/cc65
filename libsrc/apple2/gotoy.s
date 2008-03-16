@@ -5,7 +5,6 @@
 ;
 
         .export         _gotoy
-
         .import         VTABZ
 
         .include        "apple2.inc"

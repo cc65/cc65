@@ -49,13 +49,32 @@
 
 
 
-/* Color Defines
- * Since Apple2 does not support color text these defines are only
- * used to get the library to compile correctly.  They should not be used
- * in user code
- */
+/* Color Defines */
 #define COLOR_BLACK     0x00
-#define COLOR_WHITE     0x01
+#define COLOR_GREEN     0x01
+#define COLOR_VIOLET    0x02
+#define COLOR_WHITE     0x03
+#define COLOR_BLACK2    0x04
+#define COLOR_ORANGE    0x05
+#define COLOR_BLUE      0x06
+#define COLOR_WHITE2    0x07
+
+#define LORES_BLACK     0x00
+#define LORES_MAGENTA   0x01
+#define LORES_DARKBLUE  0x02
+#define LORES_VIOLET    0x03
+#define LORES_DARKGREEN 0x04
+#define LORES_GRAY      0x05
+#define LORES_BLUE      0x06
+#define LORES_CYAN      0x07
+#define LORES_BROWN     0x08
+#define LORES_ORANGE    0x09
+#define LORES_GRAY2     0x0A
+#define LORES_PINK      0x0B
+#define LORES_GREEN     0x0C
+#define LORES_YELLOW    0x0D
+#define LORES_AQUA      0x0E
+#define LORES_WHITE     0x0F
 
 /* Characters codes */
 #define CH_ENTER        0x0D
@@ -104,7 +123,7 @@ extern unsigned char _dos_type;
  * ProDOS 8 1.6   - 0x16
  * ProDOS 8 1.7   - 0x17
  * ProDOS 8 1.8   - 0x18
- * ProDOS 8 1.9   - 0x18
+ * ProDOS 8 1.9   - 0x18 (!)
  * ProDOS 8 2.0.1 - 0x21
  * ProDOS 8 2.0.2 - 0x22
  * ProDOS 8 2.0.3 - 0x23

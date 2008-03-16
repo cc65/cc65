@@ -231,8 +231,8 @@ Here is a description of all the command line options:
 
   Using -S you may define the default starting address. If and how this
   address is used depends on the config file in use. For the builtin
-  configurations, only the "none" system honors an explicit start address,
-  all other builtin config provide their own.
+  configurations, only the "none", "apple2" and "apple2enh" systems honor an
+  explicit start address, all other builtin config provide their own.
 
 
   <tag><tt>-V, --version</tt></tag>
@@ -935,7 +935,7 @@ distributed together with the machine specific binary packages (usually in the
 doc directory) and don't have a special format. So if you need a special
 configuration, it's a good idea to start with the builtin configuration for
 your system. In a first step, just replace <tt/-t target/ by <tt/-C
-configfile/. The go on and modify the config file to suit your needs.
+configfile/. Then go on and modify the config file to suit your needs.
 
 
 

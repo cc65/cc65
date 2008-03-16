@@ -8,15 +8,12 @@
 
 
 #if defined(__APPLE2__) || defined(__APPLE2ENH__)
-#  define TGI_MODE	  TGI_MODE_280_192_6
-#  define PAL_BACK	  0
-#  define PAL_FORE	  3
-#  define COLOR_LIGHTRED  0 /* Dummy */
+#  define TGI_MODE	TGI_MODE_280_192_8
 #else
-#  define TGI_MODE	  TGI_MODE_320_200_2
-#  define PAL_BACK	  0
-#  define PAL_FORE	  1
+#  define TGI_MODE	TGI_MODE_320_200_2
 #endif
+#define COLOR_BACK	COLOR_BLACK
+#define COLOR_FORE	COLOR_WHITE
 
 
 /*****************************************************************************/
@@ -33,7 +30,7 @@ static const unsigned char SinusTable[] = {
     0x22,0x20,0x1F,0x1E,0x1D,0x1C,0x1B,0x1A,0x19,0x18,
     0x17,0x16,0x15,0x14,0x13,0x12,0x12,0x11,0x10,0x10,
     0x0F,0x0E,0x0E,0x0D,0x0D,0x0C,0x0C,0x0C,0x0B,0x0B,
-    0x0B,0x0B,0x0B,0x0B,0x0B,0x0A,0x0B,0x0B,0x0B,0x0B,
+    0x0B,0x0B,0x0B,0x0B,0x0B,0x0B,0x0B,0x0B,0x0B,0x0B,
     0x0B,0x0B,0x0B,0x0C,0x0C,0x0C,0x0D,0x0D,0x0E,0x0E,
     0x0F,0x10,0x10,0x11,0x12,0x12,0x13,0x14,0x15,0x16,
     0x17,0x18,0x19,0x1A,0x1B,0x1C,0x1D,0x1E,0x1F,0x20,
@@ -48,7 +45,7 @@ static const unsigned char SinusTable[] = {
     0xA6,0xA8,0xA9,0xAA,0xAB,0xAC,0xAD,0xAE,0xAF,0xB0,
     0xB1,0xB2,0xB3,0xB4,0xB5,0xB6,0xB6,0xB7,0xB8,0xB8,
     0xB9,0xBA,0xBA,0xBB,0xBB,0xBC,0xBC,0xBC,0xBD,0xBD,
-    0xBD,0xBD,0xBD,0xBD,0xBD,0xBE,0xBD,0xBD,0xBD,0xBD,
+    0xBD,0xBD,0xBD,0xBD,0xBD,0xBD,0xBD,0xBD,0xBD,0xBD,
     0xBD,0xBD,0xBD,0xBC,0xBC,0xBC,0xBB,0xBB,0xBA,0xBA,
     0xB9,0xB8,0xB8,0xB7,0xB6,0xB6,0xB5,0xB4,0xB3,0xB2,
     0xB1,0xB0,0xAF,0xAE,0xAD,0xAC,0xAB,0xAA,0xA9,0xA8,
@@ -61,8 +58,8 @@ static const unsigned char SinusTable[] = {
 
 
 /* Driver stuff */
-static unsigned XRes;
-static unsigned YRes;
+static unsigned MaxX;
+static unsigned MaxY;
 
 
 
@@ -99,22 +96,22 @@ static void DoWarning (void)
 
 static void DoCircles (void)
 {
-    static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_LIGHTRED };
+    static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_ORANGE };
     unsigned char I;
-    unsigned char Color = PAL_FORE;
-    unsigned X = XRes / 2;
-    unsigned Y = YRes / 2;
+    unsigned char Color = COLOR_FORE;
+    unsigned X = MaxX / 2;
+    unsigned Y = MaxY / 2;
 
     tgi_setpalette (Palette);
     while (!kbhit ()) {
-        tgi_setcolor (PAL_FORE);
-        tgi_line (0, 0, XRes-1, YRes-1);
-        tgi_line (0, YRes-1, XRes-1, 0);
+        tgi_setcolor (COLOR_FORE);
+        tgi_line (0, 0, MaxX, MaxY);
+        tgi_line (0, MaxY, MaxX, 0);
         tgi_setcolor (Color);
         for (I = 10; I < 240; I += 10) {
             tgi_circle (X, Y, I);
         }
-	Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
+	Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }
 
     cgetc ();
@@ -130,22 +127,22 @@ static void DoCheckerboard (void)
     unsigned char Color;
 
     tgi_setpalette (Palette);
-    Color = PAL_BACK;
+    Color = COLOR_BACK;
     while (1) {
-        for (Y = 0; Y < YRes; Y += 10) {
-            for (X = 0; X < XRes; X += 10) {
+        for (Y = 0; Y <= MaxY; Y += 10) {
+            for (X = 0; X <= MaxX; X += 10) {
                 tgi_setcolor (Color);
                 tgi_bar (X, Y, X+9, Y+9);
-		Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
+		Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
                 if (kbhit ()) {
                     cgetc ();
                     tgi_clear ();
                     return;
                 }
             }
-	    Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
+	    Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
         }
-	Color = Color == PAL_FORE ? PAL_BACK : PAL_FORE;
+	Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }
 }
 
@@ -157,14 +154,14 @@ static void DoDiagram (void)
     unsigned X, I;
 
     tgi_setpalette (Palette);
-    tgi_setcolor (PAL_FORE);
-    tgi_line (10, 10, 10, YRes-10);
-    tgi_lineto (XRes-10, YRes-10);
+    tgi_setcolor (COLOR_FORE);
+    tgi_line (10, 10, 10, MaxY-10);
+    tgi_lineto (MaxX-10, MaxY-10);
     tgi_line (8, 12, 10, 10);
     tgi_lineto (12, 12);
-    tgi_line (XRes-12, YRes-12, XRes-10, YRes-10);
-    tgi_lineto (XRes-12, YRes-8);
-    for (I = 0, X = 10; X < XRes-10; ++X) {
+    tgi_line (MaxX-12, MaxY-12, MaxX-10, MaxY-10);
+    tgi_lineto (MaxX-12, MaxY-8);
+    for (I = 0, X = 10; X < MaxX-10; ++X) {
         tgi_setpixel (X, SinusTable[I]);
 	if (++I >= sizeof (SinusTable)) {
 	    I = 0;
@@ -183,13 +180,13 @@ static void DoLines (void)
     unsigned X;
 
     tgi_setpalette (Palette);
-    tgi_setcolor (PAL_FORE);
+    tgi_setcolor (COLOR_FORE);
 
-    for	(X = 0; X < YRes; X+=10) {
-	tgi_line (0, 0, YRes, X);
-	tgi_line (0, 0, X, YRes);
-	tgi_line (YRes, YRes, 0, YRes-X);
-	tgi_line (YRes, YRes, YRes-X, 0);
+    for	(X = 0; X <= MaxY; X += 10) {
+	tgi_line (0, 0, MaxY, X);
+	tgi_line (0, 0, X, MaxY);
+	tgi_line (MaxY, MaxY, 0, MaxY-X);
+	tgi_line (MaxY, MaxY, MaxY-X, 0);
     }
 
     cgetc ();
@@ -212,8 +209,8 @@ int main (void)
     CheckError ("tgi_init");
 
     /* Get stuff from the driver */
-    XRes = tgi_getxres ();
-    YRes = tgi_getyres ();
+    MaxX = tgi_getmaxx ();
+    MaxY = tgi_getmaxy ();
 
     /* Set the palette, set the border color */
     Border = bordercolor (COLOR_BLACK);

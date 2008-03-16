@@ -6,7 +6,6 @@
 ;
 
         .export         _gotoxy, _gotox
-
         .import         popa, VTABZ
 
         .include        "apple2.inc"

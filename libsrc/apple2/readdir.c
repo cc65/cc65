@@ -43,9 +43,9 @@
 
 
 
-struct dirent* __fastcall__ readdir (DIR* dir)
+struct dirent* __fastcall__ readdir (register DIR* dir)
 {
-    unsigned char* entry;
+    register unsigned char* entry;
 
     /* Search for the next active directory entry */
     do {

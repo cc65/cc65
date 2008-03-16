@@ -57,6 +57,7 @@ S_OBJS=	_scrsize.o	\
 	close.o		\
      	clrscr.o	\
      	color.o		\
+        cout.o          \
      	cputc.o		\
      	crt0.o		\
      	ctype.o		\
@@ -75,6 +76,7 @@ S_OBJS=	_scrsize.o	\
         get_ostype.o    \
 	gotoxy.o	\
 	gotoy.o		\
+        home.o          \
 	initcwd.o	\
         joy_stddrv.o    \
      	kbhit.o		\
@@ -85,14 +87,9 @@ S_OBJS=	_scrsize.o	\
         oserrlist.o     \
 	oserror.o	\
         randomize.o     \
-        rcout.o         \
+        rdkey.o         \
      	read.o          \
      	revers.o	\
-        rhome.o         \
-        rom.o           \
-        rpread.o        \
-        rrdkey.o        \
-        rvtabz.o        \
 	rwcommon.o	\
 	syschdir.o	\
 	sysmkdir.o	\
@@ -102,6 +99,7 @@ S_OBJS=	_scrsize.o	\
         systime.o       \
         sysuname.o      \
         tgi_mode_table.o\
+        vtabz.o         \
      	wherex.o       	\
        	wherey.o        \
 	write.o
@@ -109,7 +107,7 @@ S_OBJS=	_scrsize.o	\
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS = apple2-auxmem.emd apple2-lc.emd 
+EMDS = apple2-auxmem.emd
 
 JOYS = apple2-stdjoy.joy
 
@@ -117,7 +115,7 @@ MOUS = apple2-stdmou.mou
 
 SERS = apple2-ssc.ser
 
-TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
+TGIS = apple2-280-192-8.tgi apple2-40-48-16.tgi
 
 #--------------------------------------------------------------------------
 # Targets

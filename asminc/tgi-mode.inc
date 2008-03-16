@@ -40,9 +40,8 @@
         TGI_MODE_160_200_4      ; 160x200,  4 colors
         TGI_MODE_640_200_2	; 640x200,  2 colors (b/w)
         TGI_MODE_640_480_2	; 640x480,  2 colors (b/w)
-        TGI_MODE_280_192_6      ; 280x192,  6 colors
-        TGI_MODE_560_192_2      ; 560x192,  2 colors
-        TGI_MODE_40_40_16       ; 40x40,   16 colors
+        TGI_MODE_280_192_8      ; 280x192,  8 colors
+        TGI_MODE_40_48_16       ; 40x48,   16 colors
 .endenum
 
 

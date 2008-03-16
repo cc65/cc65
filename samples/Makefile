@@ -83,7 +83,7 @@ gunzip65:      	$(CRT0) gunzip65.o $(CLIB)
 hello: 	       	$(CRT0) hello.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-# The apple machines need the start address adjusted for the mandelbrot demo
+# The Apple machines need the start address adjusted for the mandelbrot demo
 ifeq "$(SYS)" "apple2"
 mandelbrot:     $(CRT0) mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
@@ -115,7 +115,7 @@ plasma:	       	$(CRT0) plasma.o $(CLIB)
 sieve: 	       	$(CRT0) sieve.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-# The apple machines need the start address adjusted for the tgidemo
+# The Apple machines need the start address adjusted for the tgidemo
 ifeq "$(SYS)" "apple2"
 tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^

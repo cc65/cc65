@@ -15,13 +15,13 @@
 
 /* Graphics definitions */
 #if defined(__APPLE2__) || defined(__APPLE2ENH__)
-#  define GRAPHMODE	TGI_MODE_280_192_6
+#  define GRAPHMODE	TGI_MODE_280_192_8
 #else
 #  define GRAPHMODE	TGI_MODE_320_200_2
 #endif
-#define SCREEN_X        (tgi_getmaxx()+1)
-#define SCREEN_Y        (tgi_getmaxy()+1)
-#define MAXCOL          (tgi_getmaxcolor()+1)
+#define SCREEN_X        (tgi_getxres())
+#define SCREEN_Y        (tgi_getyres())
+#define MAXCOL          (tgi_getcolorcount())
 
 #define maxiterations   32
 #define fpshift         (10)

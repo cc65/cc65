@@ -7,10 +7,15 @@
 ;
 
         .export		_textcolor, _bgcolor, _bordercolor
-        .import	       	return0, return1
+        .import	       	return0
 
-_textcolor      := return1
+_bgcolor     := return0
 
-_bgcolor        := return0
+_bordercolor := return0
 
-_bordercolor    := return0
+_textcolor:
+	ldx	#$00
+	lda	#$03		; COLOR_WHITE
+	rts
+
+

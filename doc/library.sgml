@@ -43,8 +43,6 @@ Functions that are <em/not/ available:
 <itemize>
   <item><tt>tmpfile/tmpnam</tt>
   <p>
-  <item>The <tt/scanf/ family of functions
-  <p>
   <item><tt>system</tt>
   <p>
   <item>All functions that handle floating point numbers in some manner.
@@ -57,7 +55,7 @@ Functions that are <em/not/ available:
   <item>Signals and all related functions (having <tt/SIGSEGV/ would be
   cool:-)
   <p>
-  <item><tt>setbuf/setvbuf/ungetc</tt>
+  <item><tt>setbuf/setvbuf</tt>
 </itemize>
 
 Functions not available on all supported systems:
@@ -166,12 +164,15 @@ portable. conio implementations exist for the following targets:
   <item>apple2
   <item>apple2enh
   <item>atari
+  <item>atmos
   <item>c16 (works also for the c116 with up to 32K memory)
   <item>c64
   <item>c128
   <item>plus4 (or expanded c16/c116)
   <item>cbm510 (40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
+  <item>geos
+  <item>nes
   <item>pet (all CBM PET systems except the 2001)
   <item>vic20
   </itemize>

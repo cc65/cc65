@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2001-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -34,8 +34,10 @@
 
 
 #include <string.h>
+#include <ctype.h>
 
 /* common */
+#include "chartype.h"
 #include "strbuf.h"
 #include "va_copy.h"
 #include "xmalloc.h"
@@ -269,7 +271,7 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
        	/* Target will be empty */
 	SB_Clear (Target);
 	return;
-    } 
+    }
     if (Start + Len > Source->Len) {
        	Len = Source->Len - Start;
     }
@@ -301,6 +303,34 @@ void SB_Move (StrBuf* Target, StrBuf* Source)
 
     /* Clear Source */
     InitStrBuf (Source);
+}
+
+
+
+void SB_ToLower (StrBuf* S)
+/* Convert all characters in S to lower case */
+{
+    unsigned I;
+    char* B = S->Buf;
+    for (I = 0; I < S->Len; ++I, ++B) {
+        if (IsUpper (*B)) {
+            *B = tolower (*B);
+        }
+    }
+}
+
+
+
+void SB_ToUpper (StrBuf* S)
+/* Convert all characters in S to upper case */
+{
+    unsigned I;
+    char* B = S->Buf;
+    for (I = 0; I < S->Len; ++I, ++B) {
+        if (IsLower (*B)) {
+            *B = toupper (*B);
+        }
+    }
 }
 
 

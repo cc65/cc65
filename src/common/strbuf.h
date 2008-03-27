@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2001-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -60,7 +60,7 @@ struct StrBuf {
     unsigned    Len;                    /* Length of the string */
     unsigned    Index;                  /* Used for reading (Get and friends) */
     char*       Buf;                    /* Pointer to buffer */
-};
+};                               
 
 /* An empty string buf */
 extern const StrBuf EmptyStrBuf;
@@ -348,6 +348,12 @@ void SB_Move (StrBuf* Target, StrBuf* Source);
 /* Move the complete contents of Source to target. This will delete the old
  * contents of Target, and Source will be empty after the call.
  */
+
+void SB_ToLower (StrBuf* S);
+/* Convert all characters in S to lower case */
+
+void SB_ToUpper (StrBuf* S);
+/* Convert all characters in S to upper case */
 
 int SB_Compare (const StrBuf* S1, const StrBuf* S2);
 /* Do a lexical compare of S1 and S2. See strcmp for result codes. */

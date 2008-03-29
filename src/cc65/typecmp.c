@@ -258,9 +258,8 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
        		    }
 
        		    /* Compare the parameter lists */
-       		    if (EqualFuncParams (F1->SymTab, F2->SymTab) == 0 ||
-       		    	EqualSymTables (F1->TagTab, F2->TagTab) == 0) {
-       		    	/* One of the tables is not identical */
+       		    if (EqualFuncParams (F1->SymTab, F2->SymTab) == 0) {
+       		    	/* Parameter list is not identical */
 			SetResult (Result, TC_INCOMPATIBLE);
        		    	return;
        		    }

@@ -42,6 +42,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "inttypes.h"
+#include "strbuf.h"
 #include "va_copy.h"
 #include "xsprintf.h"
 
@@ -374,6 +375,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
     char F;
     char SBuf[2];
     const char* SPtr;
+    int UseStrBuf = 0;
 
 
     /* Initialize the control structure */
@@ -571,11 +573,38 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                 break;
 
             case 'p':
-                /* Use hex format for pointers */
-                P.Flags |= (fUnsigned | fPrec);
-                P.Prec = ((sizeof (void*) * CHAR_BIT) + 3) / 4;
-                P.Base = 16;
-                FormatInt (&P, (uintptr_t) va_arg (P.ap, void*));
+                /* See comment at top of header file */
+                if (UseStrBuf) {
+                    /* Argument is StrBuf */
+                    const StrBuf* S = va_arg (P.ap, const StrBuf*);
+                    CHECK (S != 0);
+                    /* Handle the length by using a precision */
+                    if ((P.Flags & fPrec) != 0) {
+                        /* Precision already specified, use length of string 
+                         * if less.
+                         */
+                        if ((unsigned) P.Prec > SB_GetLen (S)) {
+                            P.Prec = SB_GetLen (S);
+                        }
+                    } else {
+                        /* No precision, add it */
+                        P.Flags |= fPrec;
+                        P.Prec  = SB_GetLen (S);
+                    }
+                    FormatStr (&P, SB_GetConstBuf (S));
+                    UseStrBuf = 0;              /* Reset flag */
+                } else {
+                    /* Use hex format for pointers */
+                    P.Flags |= (fUnsigned | fPrec);
+                    P.Prec = ((sizeof (void*) * CHAR_BIT) + 3) / 4;
+                    P.Base = 16;
+                    FormatInt (&P, (uintptr_t) va_arg (P.ap, void*));
+                }
+                break;
+
+            case 'm':
+                /* See comment at top of header file */
+                UseStrBuf = 1;
                 break;
 
             case 'n':

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -30,6 +30,18 @@
 /*    distribution.                                                          */
 /*                                                                           */
 /*****************************************************************************/
+
+
+
+/* We need a way to output a StrBuf, but on the other side, we don't want to 
+ * switch off gcc's printf format string checking. So we cheat as follows: 
+ * %m (which is a gcc extension and doesn't take an argument) switches %p 
+ * between outputting a pointer and a string buf. This works just one time,
+ * so each StrBuf needs in fact a %m%p spec. There's no way to apply a width
+ * and precision to such a StrBuf, but *not* using %p would bring up a warning
+ * about a wrong argument type each time. Maybe gcc will one day allow custom
+ * format specifiers and we can change this ...
+ */
 
 
 

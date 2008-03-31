@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -283,34 +283,23 @@ unsigned ReadStr (FILE* F)
  */
 {
     unsigned    Id;
-    char*       B;
-    char        Buf[256];
+    StrBuf      Buf = STATIC_STRBUF_INITIALIZER;
 
     /* Read the length */
     unsigned Len = ReadVar (F);
 
-    /* If the string is short enough, use our buffer on the stack, otherwise
-     * allocate space on the heap.
-     */
-    if (Len < sizeof (Buf)) {
-        B = Buf;
-    } else {
-        B = xmalloc (Len + 1);
-    }
+    /* Expand the string buffer memory */
+    SB_Realloc (&Buf, Len);
 
     /* Read the string */
-    ReadData (F, B, Len);
-
-    /* Terminate the string */
-    B[Len] = '\0';
+    ReadData (F, SB_GetBuf (&Buf), Len);
+    Buf.Len = Len;
 
     /* Insert it into the string pool and remember the id */
-    Id = GetStringId (B);
+    Id = GetStrBufId (&Buf);
 
-    /* If we had allocated memory before, free it now */
-    if (B != Buf) {
-        xfree (B);
-    }
+    /* Free the memory buffer */
+    SB_Done (&Buf);
 
     /* Return the string id */
     return Id;

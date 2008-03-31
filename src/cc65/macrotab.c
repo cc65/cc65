@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/* (C) 2000-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -81,7 +81,7 @@ Macro* NewMacro (const char* Name)
     M->ArgCount    = -1;	/* Flag: Not a function like macro */
     M->MaxArgs	   = 0;
     InitCollection (&M->FormalArgs);
-    InitStrBuf (&M->Replacement);
+    SB_Init (&M->Replacement);
     M->Variadic    = 0;
     memcpy (M->Name, Name, Len+1);
 
@@ -102,7 +102,7 @@ void FreeMacro (Macro* M)
 	xfree (CollAtUnchecked (&M->FormalArgs, I));
     }
     DoneCollection (&M->FormalArgs);
-    DoneStrBuf (&M->Replacement);
+    SB_Done (&M->Replacement);
     xfree (M);
 }
 

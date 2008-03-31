@@ -1,13 +1,13 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	       			    instr.h				     */
+/*	       		   	    instr.h				     */
 /*                                                                           */
 /*	       Instruction encoding for the ca65 macroassembler		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -40,6 +40,7 @@
 
 /* common */
 #include "cpu.h"
+#include "strbuf.h"
 
 
 
@@ -152,7 +153,7 @@ void SetCPU (cpu_t NewCPU);
 cpu_t GetCPU (void);
 /* Return the current CPU */
 
-int FindInstruction (const char* Ident);
+int FindInstruction (const StrBuf* Ident);
 /* Check if Ident is a valid mnemonic. If so, return the index in the
  * instruction table. If not, return -1.
  */
@@ -165,6 +166,7 @@ void HandleInstruction (unsigned Index);
 /* End of instr.h */
 
 #endif
+
 
 
 

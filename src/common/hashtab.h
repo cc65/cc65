@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2003-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -112,7 +112,7 @@ INLINE void InitHashNode (HashNode* N, void* Entry)
 #define InitHashNode(N, E)  	\
     (N)->Next   = 0,            \
     (N)->Owner  = 0,            \
-    (N)->Entry  = (E)	
+    (N)->Entry  = (E)
 #endif
 
 #if defined(HAVE_INLINE)

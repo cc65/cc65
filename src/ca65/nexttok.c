@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -142,10 +142,7 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
 static void FuncConcat (void)
 /* Handle the .CONCAT function */
 {
-    char    	Buf[MAX_STR_LEN+1];
-    char*	B;
-    unsigned 	Length;
-    unsigned	L;
+    StrBuf      Buf = STATIC_STRBUF_INITIALIZER;
 
     /* Skip it */
     NextTok ();
@@ -154,29 +151,16 @@ static void FuncConcat (void)
     ConsumeLParen ();
 
     /* Concatenate any number of strings */
-    B = Buf;
-    B[0] = '\0';
-    Length = 0;
     while (1) {
 
      	/* Next token must be a string */
         if (!LookAtStrCon ()) {
+            SB_Done (&Buf);
      	    return;
      	}
 
-     	/* Get the length of the string const and check total length */
-     	L = strlen (SVal);
-     	if (Length + L > MAX_STR_LEN) {
-     	    Error ("String is too long");
-     	    /* Try to recover */
-     	    SkipUntilSep ();
-     	    return;
-     	}
-
-     	/* Add the new string */
-     	memcpy (B, SVal, L);
-     	Length += L;
-     	B      += L;
+        /* Append the string */
+        SB_Append (&Buf, &SVal);
 
      	/* Skip the string token */
      	NextTok ();
@@ -190,9 +174,6 @@ static void FuncConcat (void)
      	}
     }
 
-    /* Terminate the string */
-    *B = '\0';
-
     /* We expect a closing parenthesis, but will not skip it but replace it
      * by the string token just created.
      */
@@ -200,8 +181,11 @@ static void FuncConcat (void)
      	Error ("`)' expected");
     } else {
      	Tok = TOK_STRCON;
-     	strcpy (SVal, Buf);
+     	SB_Copy (&SVal, &Buf);
     }
+
+    /* Free the string buffer */
+    SB_Done (&Buf);
 }
 
 
@@ -218,9 +202,8 @@ static void NoIdent (void)
 static void FuncIdent (void)
 /* Handle the .IDENT function */
 {
-    char      Buf[sizeof(SVal)];
+    StrBuf    Buf = STATIC_STRBUF_INITIALIZER;
     Token     Id;
-    unsigned  Len;
     unsigned  I;
 
     /* Skip it */
@@ -237,49 +220,45 @@ static void FuncIdent (void)
     /* Check that the string contains a valid identifier. While doing so,
      * determine if it is a cheap local, or global one.
      */
-    Len = strlen (SVal);
-    if (Len == 0) {
-        NoIdent ();
-        return;
-    }
-    I = 0;
-    if (SVal[0] == LocalStart) {
-        if (Len < 2) {
-            NoIdent ();
-            return;
-        }
-        I = 1;
+    SB_Reset (&SVal);
+
+    /* Check for a cheap local symbol */
+    if (SB_Peek (&SVal) == LocalStart) {
+        SB_Skip (&SVal);
         Id = TOK_LOCAL_IDENT;
     } else {
         Id = TOK_IDENT;
     }
-    if (!IsIdStart (SVal[I])) {
+
+    /* Next character must be a valid identifier start */
+    if (!IsIdStart (SB_Get (&SVal))) {
         NoIdent ();
         return;
     }
-    while (I < Len) {
-        if (!IsIdChar (SVal[I])) {
+    for (I = SB_GetIndex (&SVal); I < SB_GetLen (&SVal); ++I) {
+        if (!IsIdChar (SB_AtUnchecked (&SVal, I))) {
             NoIdent ();
             return;
         }
-        ++I;
     }
     if (IgnoreCase) {
         UpcaseSVal ();
     }
 
     /* If anything is ok, save and skip the string. Check that the next token
-     * is a right paren, in which case SVal is untouched. Replace the token by
-     * a identifier token.
+     * is a right paren, then replace the token by an identifier token.
      */
-    memcpy (Buf, SVal, Len+1);
+    SB_Copy (&Buf, &SVal);
     NextTok ();
     if (Tok != TOK_RPAREN) {
      	Error ("`)' expected");
     } else {
         Tok = Id;
-        memcpy (SVal, Buf, Len+1);
+        SB_Copy (&SVal, &Buf);
     }
+
+    /* Free buffer memory */
+    SB_Done (&Buf);
 }
 
 
@@ -443,11 +422,11 @@ static void InvalidFormatString (void)
 static void FuncSPrintF (void)
 /* Handle the .SPRINTF function */
 {
-    char        Format[sizeof (SVal)];              /* User given format */
-    const char* F = Format;                         /* User format pointer */
-    StrBuf      R = AUTO_STRBUF_INITIALIZER;        /* Result string */
-    StrBuf      F1 = AUTO_STRBUF_INITIALIZER;       /* One format spec from F */
-    StrBuf      R1 = AUTO_STRBUF_INITIALIZER;       /* One result */
+    StrBuf      Format = STATIC_STRBUF_INITIALIZER; /* User supplied format */
+    StrBuf      R = STATIC_STRBUF_INITIALIZER;      /* Result string */
+    StrBuf      F1 = STATIC_STRBUF_INITIALIZER;     /* One format spec from F */
+    StrBuf      R1 = STATIC_STRBUF_INITIALIZER;     /* One result */
+    char        C;
     int         Done;
     long        IVal;                               /* Integer value */
 
@@ -463,30 +442,31 @@ static void FuncSPrintF (void)
     if (!LookAtStrCon ()) {
         return;
     }
-    strcpy (Format, SVal);
+    SB_Copy (&Format, &SVal);
     NextTok ();
 
     /* Walk over the format string, generating the function result in R */
     while (1) {
 
         /* Get the next char from the format string and check for EOS */
-        if (*F == '\0') {
+        if (SB_Peek (&Format) == '\0') {
             break;
         }
 
         /* Check for a format specifier */
-        if (*F != '%') {
+        if (SB_Peek (&Format) != '%') {
             /* No format specifier, just copy */
-            SB_AppendChar (&R, *F++);
+            SB_AppendChar (&R, SB_Get (&Format));
             continue;
         }
-        if (*++F == '%') {
+        SB_Skip (&Format);
+        if (SB_Peek (&Format) == '%') {
             /* %% */
             SB_AppendChar (&R, '%');
-            ++F;
+            SB_Skip (&Format);
             continue;
         }
-        if (*F == '\0') {
+        if (SB_Peek (&Format) == '\0') {
             InvalidFormatString ();
             break;
         }
@@ -505,32 +485,32 @@ static void FuncSPrintF (void)
 
         /* Check for flags */
         Done = 0;
-        while (*F != '\0' && !Done) {
-            switch (*F) {
+        while ((C = SB_Peek (&Format)) != '\0' && !Done) {
+            switch (C) {
                 case '-': /* FALLTHROUGH */
                 case '+': /* FALLTHROUGH */
                 case ' ': /* FALLTHROUGH */
                 case '#': /* FALLTHROUGH */
-                case '0': SB_AppendChar (&F1, *F++);    break;
-                default:  Done = 1;                     break;
+                case '0': SB_AppendChar (&F1, SB_Get (&Format));  break;
+                default:  Done = 1;                               break;
             }
         }
 
         /* We do only support a numerical width field */
-        while (IsDigit (*F)) {
-            SB_AppendChar (&F1, *F++);
+        while (IsDigit (SB_Peek (&Format))) {
+            SB_AppendChar (&F1, SB_Get (&Format));
         }
 
         /* Precision - only positive numerical fields supported */
-        if (*F == '.') {
-            SB_AppendChar (&F1, *F++);
-            while (IsDigit (*F)) {
-                SB_AppendChar (&F1, *F++);
+        if (SB_Peek (&Format) == '.') {
+            SB_AppendChar (&F1, SB_Get (&Format));
+            while (IsDigit (SB_Peek (&Format))) {
+                SB_AppendChar (&F1, SB_Get (&Format));
             }
         }
 
         /* Length modifiers aren't supported, so read the conversion specs */
-        switch (*F) {
+        switch (SB_Peek (&Format)) {
 
             case 'd':
             case 'i':
@@ -542,7 +522,7 @@ static void FuncSPrintF (void)
                  * calling xsprintf later. Terminate the format string.
                  */
                 SB_AppendChar (&F1, 'l');
-                SB_AppendChar (&F1, *F++);
+                SB_AppendChar (&F1, SB_Get (&Format));
                 SB_Terminate (&F1);
 
                 /* The argument must be a constant expression */
@@ -558,13 +538,13 @@ static void FuncSPrintF (void)
 
             case 's':
                 /* Add the format spec and terminate the format */
-                SB_AppendChar (&F1, *F++);
+                SB_AppendChar (&F1, SB_Get (&Format));
                 SB_Terminate (&F1);
 
                 /* The argument must be a string constant */
                 if (!LookAtStrCon ()) {
                     /* Make it one */
-                    strcpy (SVal, "**undefined**");
+                    SB_CopyStr (&SVal, "**undefined**");
                 }
 
                 /* Format this argument according to the spec */
@@ -580,7 +560,7 @@ static void FuncSPrintF (void)
 
             case 'c':
                 /* Add the format spec and terminate the format */
-                SB_AppendChar (&F1, *F++);
+                SB_AppendChar (&F1, SB_Get (&Format));
                 SB_Terminate (&F1);
 
                 /* The argument must be a constant expression */
@@ -604,19 +584,10 @@ static void FuncSPrintF (void)
 
             default:
                 Error ("Invalid format string");
-                if (*F) {
-                    /* Don't skip beyond end of string */
-                    ++F;
-                }
+                SB_Skip (&Format);
                 break;
         }
 
-    }
-
-    /* The length of the final result may not exceed the size of a string */
-    if (SB_GetLen (&R) >= sizeof (SVal)) {
-        Error ("Resulting string is too long");
-        SB_Cut (&R, sizeof (SVal) - 1);
     }
 
     /* Terminate the result string */
@@ -629,14 +600,15 @@ static void FuncSPrintF (void)
      	Error ("`)' expected");
     } else {
      	Tok = TOK_STRCON;
-     	memcpy (SVal, SB_GetConstBuf (&R), SB_GetLen (&R) + 1);
+        SB_Copy (&SVal, &R);
     }
 
 
     /* Delete the string buffers */
-    DoneStrBuf (&R);
-    DoneStrBuf (&F1);
-    DoneStrBuf (&R1);
+    SB_Done (&Format);
+    SB_Done (&R);
+    SB_Done (&F1);
+    SB_Done (&R1);
 }
 
 
@@ -644,7 +616,7 @@ static void FuncSPrintF (void)
 static void FuncString (void)
 /* Handle the .STRING function */
 {
-    char Buf[MAX_STR_LEN+1];
+    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
     /* Skip it */
     NextTok ();
@@ -655,12 +627,12 @@ static void FuncString (void)
     /* Accept identifiers or numeric expressions */
     if (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT) {
      	/* Save the identifier, then skip it */
-     	strcpy (Buf, SVal);
+       	SB_Copy (&Buf, &SVal);
      	NextTok ();
     } else {
      	/* Numeric expression */
      	long Val = ConstExpression ();
-     	sprintf (Buf, "%ld", Val);
+       	SB_Printf (&Buf, "%ld", Val);
     }
 
     /* We expect a closing parenthesis, but will not skip it but replace it
@@ -670,8 +642,11 @@ static void FuncString (void)
      	Error ("`)' expected");
     } else {
      	Tok = TOK_STRCON;
-     	strcpy (SVal, Buf);
+     	SB_Copy (&SVal, &Buf);
     }
+
+    /* Free string memory */
+    SB_Done (&Buf);
 }
 
 

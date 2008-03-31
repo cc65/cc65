@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2001-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
@@ -415,8 +415,8 @@ static void ParseAsm (void)
 
 Done:
     /* Call the string buf destructors */
-    DoneStrBuf (&S);
-    DoneStrBuf (&T);
+    SB_Done (&S);
+    SB_Done (&T);
 }
 
 

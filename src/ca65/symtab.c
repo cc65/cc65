@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -97,7 +97,7 @@ static unsigned ScopeTableSize (unsigned Level)
 
 
 
-static SymTable* NewSymTable (SymTable* Parent, const char* Name)
+static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
 /* Allocate a symbol table on the heap and return it */
 {
     /* Determine the lexical level and the number of table slots */
@@ -119,7 +119,7 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
     S->TableSlots   = Slots;
     S->TableEntries = 0;
     S->Parent       = Parent;
-    S->Name         = GetStringId (Name);
+    S->Name         = GetStrBufId (Name);
     while (Slots--) {
        	S->Table[Slots] = 0;
     }
@@ -133,7 +133,7 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
         } else {
             while (1) {
                 /* Choose next entry */
-                int Cmp = strcmp (Name, GetString (T->Name));
+                int Cmp = SB_Compare (Name, GetStrBuf (T->Name));
                 if (Cmp < 0) {
                     if (T->Left) {
                         T = T->Left;
@@ -150,7 +150,7 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
                     }
                 } else {
                     /* Duplicate scope name */
-                    Internal ("Duplicate scope name: `%s'", Name);
+                    Internal ("Duplicate scope name: `%m%p'", Name);
                 }
             }
         }
@@ -163,12 +163,12 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
 
 
 /*****************************************************************************/
-/*     	       	   	   	     Code			   	     */
+/*     	       	   	   	     Code		  	   	     */
 /*****************************************************************************/
 
 
 
-void SymEnterLevel (const char* ScopeName, unsigned char Type, unsigned char AddrSize)
+void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type, unsigned char AddrSize)
 /* Enter a new lexical level */
 {
     /* Map a default address size to something real */
@@ -187,7 +187,7 @@ void SymEnterLevel (const char* ScopeName, unsigned char Type, unsigned char Add
 
         /* Check if the scope has been defined before */
         if (CurrentScope->Flags & ST_DEFINED) {
-            Error ("Duplicate scope `%s'", ScopeName);
+            Error ("Duplicate scope `%m%p'", ScopeName);
         }
 
     } else {
@@ -235,12 +235,12 @@ void SymLeaveLevel (void)
 
 
 
-SymTable* SymFindScope (SymTable* Parent, const char* Name, int AllocNew)
+SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, int AllocNew)
 /* Find a scope in the given enclosing scope */
 {
     SymTable** T = &Parent->Childs;
     while (*T) {
-        int Cmp = strcmp (Name, GetString ((*T)->Name));
+        int Cmp = SB_Compare (Name, GetStrBuf ((*T)->Name));
         if (Cmp < 0) {
             T = &(*T)->Left;
         } else if (Cmp > 0) {
@@ -262,7 +262,7 @@ SymTable* SymFindScope (SymTable* Parent, const char* Name, int AllocNew)
 
 
 
-SymTable* SymFindAnyScope (SymTable* Parent, const char* Name)
+SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name)
 /* Find a scope in the given or any of its parent scopes. The function will
  * never create a new symbol, since this can only be done in one specific
  * scope.
@@ -283,7 +283,7 @@ SymTable* SymFindAnyScope (SymTable* Parent, const char* Name)
 
 
 
-SymEntry* SymFindLocal (SymEntry* Parent, const char* Name, int AllocNew)
+SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, int AllocNew)
 /* Find a cheap local symbol. If AllocNew is given and the entry is not
  * found, create a new one. Return the entry found, or the new entry created,
  * or - in case AllocNew is zero - return 0.
@@ -331,7 +331,7 @@ SymEntry* SymFindLocal (SymEntry* Parent, const char* Name, int AllocNew)
 
 
 
-SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
+SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew)
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
  * new entry created, or - in case AllocNew is zero - return 0.
@@ -340,7 +340,7 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
     SymEntry* S;
 
     /* Global symbol: Get the hash value for the name */
-    unsigned Hash = HashStr (Name) % Scope->TableSlots;
+    unsigned Hash = HashBuf (Name) % Scope->TableSlots;
 
     /* Search for the entry */
     int Cmp = SymSearchTree (Scope->Table[Hash], Name, &S);
@@ -373,7 +373,7 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
 
 
 
-SymEntry* SymFindAny (SymTable* Scope, const char* Name)
+SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
 /* Find a symbol in the given or any of its parent scopes. The function will
  * never create a new symbol, since this can only be done in one specific
  * scope.
@@ -424,7 +424,7 @@ static void SymCheckUndefined (SymEntry* S)
     SymEntry* Sym = 0;
     SymTable* Tab = GetSymParentScope (S);
     while (Tab) {
-        Sym = SymFind (Tab, GetString (S->Name), SYM_FIND_EXISTING);
+        Sym = SymFind (Tab, GetStrBuf (S->Name), SYM_FIND_EXISTING);
         if (Sym && (Sym->Flags & (SF_DEFINED | SF_IMPORT)) != 0) {
             /* We've found a symbol in a higher level that is
              * either defined in the source, or an import.
@@ -451,8 +451,9 @@ static void SymCheckUndefined (SymEntry* S)
                 /* The symbol is already marked as an export. */
                 if (Sym->AddrSize > S->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    PWarning (&S->Pos, 1, "Symbol `%s' is %s but exported %s",
-                              GetSymName (Sym), AddrSizeToStr (Sym->AddrSize),
+                    PWarning (&S->Pos, 1, "Symbol `%m%p' is %s but exported %s",
+                              GetSymName (Sym),
+                              AddrSizeToStr (Sym->AddrSize),
                               AddrSizeToStr (S->ExportSize));
                 }
             } else {
@@ -465,8 +466,9 @@ static void SymCheckUndefined (SymEntry* S)
                 }
                 if (Sym->AddrSize > Sym->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    PWarning (&S->Pos, 1, "Symbol `%s' is %s but exported %s",
-                              GetSymName (Sym), AddrSizeToStr (Sym->AddrSize),
+                    PWarning (&S->Pos, 1, "Symbol `%m%p' is %s but exported %s",
+                              GetSymName (Sym),
+                              AddrSizeToStr (Sym->AddrSize),
                               AddrSizeToStr (Sym->ExportSize));
                 }
             }
@@ -483,8 +485,8 @@ static void SymCheckUndefined (SymEntry* S)
 	/* The symbol is definitely undefined */
 	if (S->Flags & SF_EXPORT) {
 	    /* We will not auto-import an export */
-	    PError (&S->Pos, "Exported symbol `%s' was never defined",
-                    GetString (S->Name));
+	    PError (&S->Pos, "Exported symbol `%m%p' was never defined",
+                    GetSymName (S));
 	} else {
 	    if (AutoImport) {
 	    	/* Mark as import, will be indexed later */
@@ -493,7 +495,7 @@ static void SymCheckUndefined (SymEntry* S)
                 S->AddrSize = CodeAddrSize;
 	    } else {
 	    	/* Error */
-	        PError (&S->Pos, "Symbol `%s' is undefined", GetString (S->Name));
+	        PError (&S->Pos, "Symbol `%m%p' is undefined", GetSymName (S));
 	    }
 	}
     }
@@ -549,11 +551,11 @@ void SymCheck (void)
 
             /* Check for defined symbols that were never referenced */
 	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
-                const char* Name = GetString (S->Name);
-                if (Name[0] != '.') {           /* Ignore internals */
+                const StrBuf* Name = GetStrBuf (S->Name);
+                if (SB_At (Name, 0) != '.') {           /* Ignore internals */
                     PWarning (&S->Pos, 2,
-                              "Symbol `%s' is defined but never used",
-                              GetString (S->Name));
+                              "Symbol `%m%p' is defined but never used",
+                              GetSymName (S));
                 }
 	    }
 
@@ -562,8 +564,8 @@ void SymCheck (void)
 	    	if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
 	    	    /* Imported symbol is not referenced */
 	    	    PWarning (&S->Pos, 2,
-                              "Symbol `%s' is imported but never used",
-                              GetString (S->Name));
+                              "Symbol `%m%p' is imported but never used",
+                              GetSymName (S));
 	    	} else {
 	    	    /* Give the import an index, count imports */
 	    	    S->Index = ImportCount++;
@@ -593,8 +595,9 @@ void SymCheck (void)
                     } else if (S->AddrSize > S->ExportSize) {
                         /* We're exporting a symbol smaller than it actually is */
                         PWarning (&S->Pos, 1,
-                                  "Symbol `%s' is %s but exported %s",
-                                  GetSymName (S), AddrSizeToStr (S->AddrSize),
+                                  "Symbol `%m%p' is %s but exported %s",
+                                  GetSymName (S),
+                                  AddrSizeToStr (S->AddrSize),
                                   AddrSizeToStr (S->ExportSize));
                     }
                 }
@@ -612,7 +615,7 @@ void SymCheck (void)
                     const FilePos* P = S->GuessedUse[S->AddrSize - 1];
                     if (P) {
                         PWarning (P, 0,
-                                  "Didn't use %s addressing for `%s'",
+                                  "Didn't use %s addressing for `%m%p'",
                                   AddrSizeToStr (S->AddrSize),
                                   GetSymName (S));
                     }
@@ -637,8 +640,8 @@ void SymDump (FILE* F)
 	/* Ignore unused symbols */
 	if ((S->Flags & SF_UNUSED) != 0) {
 	    fprintf (F,
-		     "%-24s %s %s %s %s %s\n",
-		     GetString (S->Name),
+		     "%m%-24p %s %s %s %s %s\n",
+		     GetSymName (S),
 		     (S->Flags & SF_DEFINED)? "DEF" : "---",
 		     (S->Flags & SF_REFERENCED)? "REF" : "---",
 		     (S->Flags & SF_IMPORT)? "IMP" : "---",
@@ -839,6 +842,8 @@ void WriteScopes (void)
     /* Done writing the scopes */
     ObjEndScopes ();
 }
+
+
 
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -550,8 +550,8 @@ static ExprNode* FuncReferenced (void)
 static ExprNode* FuncSizeOf (void)
 /* Handle the .SIZEOF function */
 {
-    StrBuf    ScopeName = AUTO_STRBUF_INITIALIZER;
-    char      Name[sizeof (SVal)];
+    StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf    Name = STATIC_STRBUF_INITIALIZER;
     SymTable* Scope;
     SymEntry* Sym;
     SymEntry* SizeSym;
@@ -566,27 +566,28 @@ static ExprNode* FuncSizeOf (void)
     if (Tok == TOK_LOCAL_IDENT) {
 
         /* Cheap local symbol */
-        Sym = SymFindLocal (SymLast, SVal, SYM_FIND_EXISTING);
+        Sym = SymFindLocal (SymLast, &SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%s'", SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
 
         /* Remember and skip SVal, terminate ScopeName so it is empty */
-        strcpy (Name, SVal);
+        SB_Copy (&Name, &SVal);
         NextTok ();
         SB_Terminate (&ScopeName);
 
     } else {
 
         /* Parse the scope and the name */
-        SymTable* ParentScope = ParseScopedIdent (Name, &ScopeName);
+        SymTable* ParentScope = ParseScopedIdent (&Name, &ScopeName);
 
         /* Check if the parent scope is valid */
         if (ParentScope == 0) {
             /* No such scope */
-            DoneStrBuf (&ScopeName);
+            SB_Done (&ScopeName);
+            SB_Done (&Name);
             return GenLiteral0 ();
         }
 
@@ -597,9 +598,9 @@ static ExprNode* FuncSizeOf (void)
 
         /* First search for a scope with the given name */
         if (NoScope) {
-            Scope = SymFindAnyScope (ParentScope, Name);
+            Scope = SymFindAnyScope (ParentScope, &Name);
         } else {
-            Scope = SymFindScope (ParentScope, Name, SYM_FIND_EXISTING);
+            Scope = SymFindScope (ParentScope, &Name, SYM_FIND_EXISTING);
         }
 
         /* If we did find a scope with the name, read the symbol defining the
@@ -610,29 +611,30 @@ static ExprNode* FuncSizeOf (void)
             SizeSym = GetSizeOfScope (Scope);
         } else {
             if (NoScope) {
-                Sym = SymFindAny (ParentScope, Name);
+                Sym = SymFindAny (ParentScope, &Name);
             } else {
-                Sym = SymFind (ParentScope, Name, SYM_FIND_EXISTING);
+                Sym = SymFind (ParentScope, &Name, SYM_FIND_EXISTING);
             }
 
             /* If we found the symbol retrieve the size, otherwise complain */
             if (Sym) {
                 SizeSym = GetSizeOfSymbol (Sym);
             } else {
-                Error ("Unknown symbol or scope: `%s%s'",
-                       SB_GetConstBuf (&ScopeName), Name);
+                Error ("Unknown symbol or scope: `%m%p%m%p'",
+                       &ScopeName, &Name);
             }
         }
     }
 
     /* Check if we have a size */
     if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
-        Error ("Size of `%s%s' is unknown", SB_GetConstBuf (&ScopeName), Name);
+        Error ("Size of `%m%p%m%p' is unknown", &ScopeName, &Name);
         Size = 0;
     }
 
-    /* Free the scope name */
-    DoneStrBuf (&ScopeName);
+    /* Free the string buffers */
+    SB_Done (&ScopeName);
+    SB_Done (&Name);
 
     /* Return the size */
     return GenLiteralExpr (Size);
@@ -643,19 +645,19 @@ static ExprNode* FuncSizeOf (void)
 static ExprNode* FuncStrAt (void)
 /* Handle the .STRAT function */
 {
-    char Str [sizeof(SVal)];
+    StrBuf Str = STATIC_STRBUF_INITIALIZER;
     long Index;
-    unsigned char C;
+    unsigned char C = 0;
 
     /* String constant expected */
     if (Tok != TOK_STRCON) {
       	Error ("String constant expected");
       	NextTok ();
-       	return GenLiteral0 ();
+       	goto ExitPoint;
     }
 
     /* Remember the string and skip it */
-    strcpy (Str, SVal);
+    SB_Copy (&Str, &SVal);
     NextTok ();
 
     /* Comma must follow */
@@ -665,15 +667,19 @@ static ExprNode* FuncStrAt (void)
     Index = ConstExpression ();
 
     /* Must be a valid index */
-    if (Index >= (long) strlen (Str)) {
+    if (Index >= (long) SB_GetLen (&Str)) {
 	Error ("Range error");
-	return GenLiteral0 ();
+        goto ExitPoint;
     }
 
     /* Get the char, handle as unsigned. Be sure to translate it into
      * the target character set.
      */
-    C = TgtTranslateChar (Str [(size_t)Index]);
+    C = TgtTranslateChar (SB_At (&Str, (unsigned)Index));
+
+ExitPoint:
+    /* Free string buffer memory */
+    SB_Done (&Str);
 
     /* Return the char expression */
     return GenLiteralExpr (C);
@@ -699,7 +705,7 @@ static ExprNode* FuncStrLen (void)
     } else {
 
         /* Get the length of the string */
-     	Len = strlen (SVal);
+       	Len = SB_GetLen (&SVal);
 
 	/* Skip the string */
 	NextTok ();
@@ -807,7 +813,7 @@ static ExprNode* Factor (void)
 	    break;
 
         case TOK_LOCAL_IDENT:
-            N = Symbol (SymFindLocal (SymLast, SVal, SYM_ALLOC_NEW));
+            N = Symbol (SymFindLocal (SymLast, &SVal, SYM_ALLOC_NEW));
             NextTok ();
             break;
 
@@ -948,9 +954,9 @@ static ExprNode* Factor (void)
 	    break;
 
 	default:
-	    if (LooseCharTerm && Tok == TOK_STRCON && strlen(SVal) == 1) {
+	    if (LooseCharTerm && Tok == TOK_STRCON && SB_GetLen (&SVal) == 1) {
 		/* A character constant */
-		N = GenLiteralExpr (TgtTranslateChar (SVal[0]));
+		N = GenLiteralExpr (TgtTranslateChar (SB_At (&SVal, 0)));
 	    } else {
 		N = GenLiteral0 ();	/* Dummy */
 		Error ("Syntax error");

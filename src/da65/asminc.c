@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2005      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2005-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -228,7 +228,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
     }
 
     /* Delete the string buffer contents */
-    DoneStrBuf (&Ident);
+    SB_Done (&Ident);
 
     /* Close the include file ignoring errors (we were just reading). */
     (void) fclose (F);

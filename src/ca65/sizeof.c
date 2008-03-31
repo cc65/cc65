@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2008, Ullrich von Bassewit                                       */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -52,13 +52,12 @@
 /* The name of the symbol used to encode the size. The name of this entry is
  * choosen so that it cannot be accessed by the user.
  */
-static const char SizeEntryName[] = ".size";
-
+const StrBuf SizeEntryName = LIT_STRBUF_INITIALIZER (".size");
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code	   			     */
+/*     	       	       		     Code	   			     */
 /*****************************************************************************/
 
 
@@ -68,7 +67,7 @@ SymEntry* GetSizeOfScope (SymTable* Scope)
  * encodes the size, and will create a new entry if it does not exist.
  */
 {
-    return SymFind (Scope, SizeEntryName, SYM_ALLOC_NEW);
+    return SymFind (Scope, &SizeEntryName, SYM_ALLOC_NEW);
 }
 
 
@@ -79,7 +78,7 @@ SymEntry* GetSizeOfSymbol (SymEntry* Sym)
  * does not exist.
  */
 {
-    return SymFindLocal (Sym, SizeEntryName, SYM_ALLOC_NEW);
+    return SymFindLocal (Sym, &SizeEntryName, SYM_ALLOC_NEW);
 }
 
 

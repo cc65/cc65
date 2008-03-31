@@ -47,7 +47,7 @@
 int TokHasSVal (Token Tok)
 /* Return true if the given token has an attached SVal */
 {
-    return (Tok == TOK_IDENT || TOK_LOCAL_IDENT || Tok == TOK_STRCON);
+    return (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT || Tok == TOK_STRCON);
 }
 
 

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2003-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -65,7 +65,7 @@ void DoEnum (void)
     int Anon = (Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (SVal, ST_ENUM, ADDR_SIZE_ABS);
+        SymEnterLevel (&SVal, ST_ENUM, ADDR_SIZE_ABS);
         NextTok ();
     }
 
@@ -94,7 +94,7 @@ void DoEnum (void)
         }
 
         /* We have an identifier, generate a symbol */
-        Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
+        Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
 
         /* Skip the member name */
         NextTok ();

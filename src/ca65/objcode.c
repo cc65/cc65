@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -104,15 +104,18 @@ void EmitPCRel (unsigned char OPC, ExprNode* Expr, unsigned Size)
 
 
 
-void EmitData (const unsigned char* Data, unsigned Size)
+void EmitData (const void* D, unsigned Size)
 /* Emit data into the current segment */
 {
+    /* Make a useful pointer from Data */
+    const unsigned char* Data = D;
+
     /* Create lots of fragments for the data */
     while (Size) {
-	Fragment* F;
+     	Fragment* F;
 
-	/* Determine the length of the next fragment */
-	unsigned Len = Size;
+     	/* Determine the length of the next fragment */
+     	unsigned Len = Size;
        	if (Len > sizeof (F->V.Data)) {
      	    Len = sizeof (F->V.Data);
        	}
@@ -128,6 +131,15 @@ void EmitData (const unsigned char* Data, unsigned Size)
      	Size -= Len;
 
     }
+}
+
+
+
+void EmitStrBuf (const StrBuf* Data)
+/* Emit a string into the current segment */
+{
+    /* Use EmitData to output the data */
+    EmitData (SB_GetConstBuf (Data), SB_GetLen (Data));
 }
 
 

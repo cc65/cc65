@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -38,22 +38,27 @@
 
 
 
+/* common */
+#include "strbuf.h"
+
+
+
 /*****************************************************************************/
 /*				     Code				     */
 /*****************************************************************************/
 
 
 
-char* AnonName (char* Buf, unsigned Size, const char* Spec);
+StrBuf* AnonName (StrBuf* Buf, const char* Spec);
 /* Get a name for an anonymous scope, variable or type. Size is the size of
  * the buffer passed to the function, Spec will be used as part of the
  * identifier if given. A pointer to the buffer is returned.
  */
 
-int IsAnonName (const char* Name);
+int IsAnonName (const StrBuf* Name);
 /* Check if the given symbol name is that of an anonymous symbol */
 
-
+      
 
 /* End of anonname.h */
 #endif

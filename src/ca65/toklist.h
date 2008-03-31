@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,10 @@
 
 
 
+/* common */
+#include "strbuf.h"
+
+/* ca65 */
 #include "scanner.h"
 
 
@@ -55,7 +59,7 @@ struct TokNode {
     Token	Tok;	      		/* Token value */
     int	       	WS;    	      		/* Whitespace before token? */
     long       	IVal;	      		/* Integer token attribute */
-    char       	SVal [1];     		/* String attribute, dyn. allocated */
+    StrBuf      SVal;                   /* String attribute, dyn. allocated */
 };
 
 /* Struct holding a token list */

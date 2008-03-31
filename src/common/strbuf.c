@@ -62,22 +62,37 @@ const StrBuf EmptyStrBuf = STATIC_STRBUF_INITIALIZER;
 
 
 
-StrBuf* InitStrBuf (StrBuf* B)
+#if !defined(HAVE_INLINE)
+StrBuf* SB_Init (StrBuf* B)
 /* Initialize a string buffer */
 {
+    *B = EmptyStrBuf;
+    return B;
+}
+#endif
+
+
+
+StrBuf* SB_InitFromString (StrBuf* B, const char* S)
+/* Initialize a string buffer from a literal string. Beware: The buffer won't
+ * store a copy but a pointer to the actual string.
+ */
+{
     B->Allocated = 0;
-    B->Len       = 0;
+    B->Len       = strlen (S);
     B->Index     = 0;
-    B->Buf       = 0;
+    B->Buf       = (char*) S;
     return B;
 }
 
 
 
-void DoneStrBuf (StrBuf* B)
+void SB_Done (StrBuf* B)
 /* Free the data of a string buffer (but not the struct itself) */
 {
-    xfree (B->Buf);
+    if (B->Allocated) {
+        xfree (B->Buf);
+    }
 }
 
 
@@ -89,7 +104,7 @@ StrBuf* NewStrBuf (void)
     StrBuf* B = xmalloc (sizeof (StrBuf));
 
     /* Initialize the struct... */
-    InitStrBuf (B);
+    SB_Init (B);
 
     /* ...and return it */
     return B;
@@ -100,7 +115,7 @@ StrBuf* NewStrBuf (void)
 void FreeStrBuf (StrBuf* B)
 /* Free a string buffer */
 {
-    DoneStrBuf (B);
+    SB_Done (B);
     xfree (B);
 }
 
@@ -122,8 +137,50 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
      	NewAllocated *= 2;
     }
 
-    /* Reallocate the buffer */
-    B->Buf       = xrealloc (B->Buf, NewAllocated);
+    /* Reallocate the buffer. Beware: The allocated size may be zero while the
+     * length is not. This means that we have a buffer that wasn't allocated
+     * on the heap.
+     */
+    if (B->Allocated) {
+        /* Just reallocate the block */
+        B->Buf   = xrealloc (B->Buf, NewAllocated);
+    } else {
+        /* Allocate a new block and copy */
+        B->Buf   = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
+    }
+
+    /* Remember the new block size */
+    B->Allocated = NewAllocated;
+}
+
+
+
+static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
+/* Reallocate the string buffer space, make sure at least NewSize bytes are
+ * available. This function won't copy the old buffer contents over to the new
+ * buffer and may be used if the old contents are overwritten later.
+ */
+{
+    /* Get the current size, use a minimum of 8 bytes */
+    unsigned NewAllocated = B->Allocated;
+    if (NewAllocated == 0) {
+     	NewAllocated = 8;
+    }
+
+    /* Round up to the next power of two */
+    while (NewAllocated < NewSize) {
+     	NewAllocated *= 2;
+    }
+
+    /* Free the old buffer if there is one */
+    if (B->Allocated) {
+        xfree (B->Buf);
+    }
+
+    /* Allocate a fresh block */
+    B->Buf = xmalloc (NewAllocated);
+
+    /* Remember the new block size */
     B->Allocated = NewAllocated;
 }
 
@@ -170,7 +227,7 @@ void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
 /* Copy Buf to Target, discarding the old contents of Target */
 {
     if (Target->Allocated < Size) {
-	SB_Realloc (Target, Size);
+       	SB_CheapRealloc (Target, Size);
     }
     memcpy (Target->Buf, Buf, Size);
     Target->Len = Size;
@@ -294,7 +351,7 @@ void SB_Move (StrBuf* Target, StrBuf* Source)
  */
 {
     /* Free the target string */
-    if (Target->Buf) {
+    if (Target->Allocated) {
         xfree (Target->Buf);
     }
 
@@ -302,7 +359,7 @@ void SB_Move (StrBuf* Target, StrBuf* Source)
     *Target = *Source;
 
     /* Clear Source */
-    InitStrBuf (Source);
+    SB_Init (Source);
 }
 
 
@@ -359,6 +416,31 @@ int SB_Compare (const StrBuf* S1, const StrBuf* S2)
 
 
 
+int SB_CompareStr (const StrBuf* S1, const char* S2)
+/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+{
+    int Result;
+    unsigned S2Len = strlen (S2);
+    if (S1->Len < S2Len) {
+        Result = memcmp (S1->Buf, S2, S1->Len);
+        if (Result == 0) {
+            /* S1 considered lesser because it's shorter */
+            Result = -1;
+        }
+    } else if (S1->Len > S2Len) {
+        Result = memcmp (S1->Buf, S2, S2Len);
+        if (Result == 0) {
+            /* S2 considered lesser because it's shorter */
+            Result = 1;
+        }
+    } else {
+        Result = memcmp (S1->Buf, S2, S1->Len);
+    }
+    return Result;
+}
+
+
+
 void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
 /* printf function with S as target. The function is safe, which means that
  * the current contents of S are discarded, and are allocated again with
@@ -382,10 +464,8 @@ void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
 
     /* Check if we must reallocate */
     if ((unsigned) SizeNeeded >= S->Allocated) {
-        /* Must retry. Don't use Realloc to avoid copying */
-        xfree (S->Buf);
-        S->Allocated = SizeNeeded + 1;          /* Account for '\0' */
-        S->Buf = xmalloc (S->Allocated);
+        /* Must retry. Use CheapRealloc to avoid copying */
+        SB_CheapRealloc (S, SizeNeeded + 1);    /* Account for '\0' */
         (void) xvsnprintf (S->Buf, S->Allocated, Format, ap);
     }
 

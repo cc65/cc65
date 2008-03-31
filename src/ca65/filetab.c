@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -180,9 +180,11 @@ static FileEntry* NewFileEntry (unsigned Name, unsigned long Size, unsigned long
 
 
 
-const char* GetFileName (unsigned Name)
+const StrBuf* GetFileName (unsigned Name)
 /* Get the name of a file where the name index is known */
 {
+    static StrBuf ErrorMsg = LIT_STRBUF_INITIALIZER ("(outside file scope)");
+
     const FileEntry* F;
 
     if (Name == 0) {
@@ -192,30 +194,30 @@ const char* GetFileName (unsigned Name)
 	 */
 	if (CollCount (&FileTab) == 0) {
     	    /* No files defined until now */
-       	    return "(outside file scope)";
+            return &ErrorMsg;
 	} else {
             F = CollConstAt (&FileTab, 0);
 	}
     } else {
         F = CollConstAt (&FileTab, Name-1);
     }
-    return GetString (F->Name);
+    return GetStrBuf (F->Name);
 }
 
 
 
-unsigned GetFileIndex (const char* Name)
+unsigned GetFileIndex (const StrBuf* Name)
 /* Return the file index for the given file name. */
 {
     /* Get the string pool index from the name */
-    unsigned NameIdx = GetStringId (Name);
+    unsigned NameIdx = GetStrBufId (Name);
 
     /* Search in the hash table for the name */
     FileEntry* F = HT_FindEntry (&HashTab, &NameIdx);
 
     /* If we don't have this index, print a diagnostic and use the main file */
     if (F == 0) {
-        Error ("File name `%s' not found in file table", Name);
+        Error ("File name `%m%p' not found in file table", Name);
         return 0;
     } else {
         return F->Index;
@@ -224,13 +226,13 @@ unsigned GetFileIndex (const char* Name)
 
 
 
-unsigned AddFile (const char* Name, unsigned long Size, unsigned long MTime)
+unsigned AddFile (const StrBuf* Name, unsigned long Size, unsigned long MTime)
 /* Add a new file to the list of input files. Return the index of the file in
  * the table.
  */
 {
     /* Create a new file entry and insert it into the tables */
-    FileEntry* F = NewFileEntry (GetStringId (Name), Size, MTime);
+    FileEntry* F = NewFileEntry (GetStrBufId (Name), Size, MTime);
 
     /* Return the index */
     return F->Index;
@@ -265,4 +267,4 @@ void WriteFiles (void)
 
 
 
-                                          
+

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -36,9 +36,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-                
+
 /* common */
 #include "cmdline.h"
+#include "strbuf.h"
 
 /* ld65 */
 #include "error.h"
@@ -54,12 +55,17 @@
 void Warning (const char* Format, ...)
 /* Print a warning message */
 {
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
     va_list ap;
+
     va_start (ap, Format);
-    fprintf (stderr, "%s: Warning: ", ProgName);
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
+    SB_VPrintf (&S, Format, ap);
     va_end (ap);
+    SB_Terminate (&S);
+
+    fprintf (stderr, "%s: Warning: %s\n", ProgName, SB_GetConstBuf (&S));
+
+    SB_Done (&S);
 }
 
 
@@ -67,12 +73,18 @@ void Warning (const char* Format, ...)
 void Error (const char* Format, ...)
 /* Print an error message and die */
 {
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
     va_list ap;
+
     va_start (ap, Format);
-    fprintf (stderr, "%s: Error: ", ProgName);
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
+    SB_VPrintf (&S, Format, ap);
     va_end (ap);
+    SB_Terminate (&S);
+
+    fprintf (stderr, "%s: Error: %s\n", ProgName, SB_GetConstBuf (&S));
+
+    SB_Done (&S);
+
     exit (EXIT_FAILURE);
 }
 
@@ -81,14 +93,20 @@ void Error (const char* Format, ...)
 void Internal (const char* Format, ...)
 /* Print an internal error message and die */
 {
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
     va_list ap;
+
     va_start (ap, Format);
-    fprintf (stderr, "%s: Internal error: ", ProgName);
-    vfprintf (stderr, Format, ap);
-    putc ('\n', stderr);
+    SB_VPrintf (&S, Format, ap);
     va_end (ap);
+    SB_Terminate (&S);
+
+    fprintf (stderr, "%s: Internal Error: %s\n", ProgName, SB_GetConstBuf (&S));
+
+    SB_Done (&S);
+
     exit (EXIT_FAILURE);
 }
 
 
-                                                     
+

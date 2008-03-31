@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -34,7 +34,12 @@
 
 
 #ifndef TGTTRANS_H
-#define TGTTRANS_H
+#define TGTTRANS_H  
+
+
+
+/* common */
+#include "strbuf.h"
 
 
 
@@ -60,6 +65,11 @@ char* TgtTranslateStr (char* S);
 void TgtTranslateBuf (void* Buf, unsigned Len);
 /* Translate a buffer of the given length from the source character set into
  * the target system character set.
+ */
+
+void TgtTranslateStrBuf (StrBuf* Buf);
+/* Translate a string buffer from the source character set into the target 
+ * system character set.
  */
 
 void TgtTranslateSet (unsigned Index, unsigned char C);

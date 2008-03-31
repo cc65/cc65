@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007, Ullrich von Bassewitz                                      */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -84,7 +84,7 @@
 
 
 /* Keyword we're about to handle */
-static char Keyword [sizeof (SVal)+1];
+static StrBuf Keyword = STATIC_STRBUF_INITIALIZER;
 
 /* Segment stack */
 #define MAX_PUSHED_SEGMENTS     16
@@ -208,7 +208,7 @@ static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
      	}
 
         /* Find the symbol table entry, allocate a new one if necessary */
-        Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
+        Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
 
         /* Skip the name */
         NextTok ();
@@ -238,7 +238,7 @@ static long IntArg (long Min, long Max)
  * and return -1 in this case.
  */
 {
-    if (Tok == TOK_IDENT && strcmp (SVal, "unlimited") == 0) {
+    if (Tok == TOK_IDENT && SB_CompareStr (&SVal, "unlimited") == 0) {
 	NextTok ();
 	return -1;
     } else {
@@ -253,7 +253,7 @@ static long IntArg (long Min, long Max)
 
 
 
-static void ConDes (const char* Name, unsigned Type)
+static void ConDes (const StrBuf* Name, unsigned Type)
 /* Parse remaining line for constructor/destructor of the remaining type */
 {
     long Prio;
@@ -376,8 +376,6 @@ static void DoAlign (void)
 static void DoASCIIZ (void)
 /* Define text with a zero terminator */
 {
-    unsigned Len;
-
     while (1) {
 	/* Must have a string constant */
 	if (Tok != TOK_STRCON) {
@@ -385,12 +383,9 @@ static void DoASCIIZ (void)
 	    return;
 	}
 
-	/* Get the length of the string constant */
-	Len = strlen (SVal);
-
 	/* Translate into target charset and emit */
-	TgtTranslateBuf (SVal, Len);
-       	EmitData ((unsigned char*) SVal, Len);
+       	TgtTranslateStrBuf (&SVal);
+       	EmitStrBuf (&SVal);
 	NextTok ();
 	if (Tok == TOK_COMMA) {
 	    NextTok ();
@@ -459,7 +454,7 @@ static void DoAssert (void)
         /* Translate the message into a string id. We can then skip the input
          * string.
          */
-        Msg = GetStringId (SVal);
+        Msg = GetStrBufId (&SVal);
         NextTok ();
 
     } else {
@@ -497,9 +492,8 @@ static void DoByte (void)
     while (1) {
 	if (Tok == TOK_STRCON) {
 	    /* A string, translate into target charset and emit */
-	    unsigned Len = strlen (SVal);
-	    TgtTranslateBuf (SVal, Len);
-	    EmitData ((unsigned char*) SVal, Len);
+       	    TgtTranslateStrBuf (&SVal);
+	    EmitStrBuf (&SVal);
 	    NextTok ();
 	} else {
 	    EmitByte (Expression ());
@@ -575,7 +569,7 @@ static void DoConDes (void)
 	"DESTRUCTOR",
         "INTERRUPTOR",
     };
-    char Name [sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
     long Type;
 
     /* Symbol name follows */
@@ -583,7 +577,7 @@ static void DoConDes (void)
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    strcpy (Name, SVal);
+    SB_Copy (&Name, &SVal);
     NextTok ();
 
     /* Type follows. May be encoded as identifier or numerical */
@@ -596,9 +590,8 @@ static void DoConDes (void)
 
 	/* Check if we got a valid keyword */
 	if (Type < 0) {
-	    Error ("Syntax error");
-	    SkipUntilSep ();
-	    return;
+       	    ErrorSkip ("Syntax error");
+	    goto ExitPoint;
 	}
 
     } else {
@@ -607,14 +600,18 @@ static void DoConDes (void)
        	Type = ConstExpression ();
     	if (Type < CD_TYPE_MIN || Type > CD_TYPE_MAX) {
     	    /* Value out of range */
-    	    Error ("Range error");
-    	    return;
+       	    ErrorSkip ("Range error");
+    	    goto ExitPoint;
     	}
 
     }
 
     /* Parse the remainder of the line and export the symbol */
-    ConDes (Name, (unsigned) Type);
+    ConDes (&Name, (unsigned) Type);
+
+ExitPoint:
+    /* Free string memory */
+    SB_Done (&Name);
 }
 
 
@@ -622,18 +619,21 @@ static void DoConDes (void)
 static void DoConstructor (void)
 /* Export a symbol as constructor */
 {
-    char Name [sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
     if (Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    strcpy (Name, SVal);
+    SB_Copy (&Name, &SVal);
     NextTok ();
 
     /* Parse the remainder of the line and export the symbol */
-    ConDes (Name, CD_TYPE_CON);
+    ConDes (&Name, CD_TYPE_CON);
+
+    /* Free string memory */
+    SB_Done (&Name);
 }
 
 
@@ -714,18 +714,21 @@ static void DoDefine (void)
 static void DoDestructor (void)
 /* Export a symbol as destructor */
 {
-    char Name [sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
     if (Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    strcpy (Name, SVal);
+    SB_Copy (&Name, &SVal);
     NextTok ();
 
     /* Parse the remainder of the line and export the symbol */
-    ConDes (Name, CD_TYPE_DES);
+    ConDes (&Name, CD_TYPE_DES);
+
+    /* Free string memory */
+    SB_Done (&Name);
 }
 
 
@@ -786,7 +789,7 @@ static void DoError (void)
     if (Tok != TOK_STRCON) {
  	ErrorSkip ("String constant expected");
     } else {
-       	Error ("User error: %s", SVal);
+       	Error ("User error: %m%p", &SVal);
 	SkipUntilSep ();
     }
 }
@@ -853,9 +856,9 @@ static void DoFeature (void)
 	LocaseSVal ();
 
      	/* Set the feature and check for errors */
-	if (SetFeature (SVal) == FEAT_UNKNOWN) {
+	if (SetFeature (&SVal) == FEAT_UNKNOWN) {
      	    /* Not found */
-     	    ErrorSkip ("Invalid feature: `%s'", SVal);
+     	    ErrorSkip ("Invalid feature: `%m%p'", &SVal);
      	    return;
      	} else {
 	    /* Skip the keyword */
@@ -911,17 +914,17 @@ static void DoFileOpt (void)
 
 	    case 0:
 		/* Author */
-		OptAuthor (SVal);
+		OptAuthor (&SVal);
 		break;
 
 	    case 1:
 		/* Comment */
-		OptComment (SVal);
+		OptComment (&SVal);
 		break;
 
 	    case 2:
 		/* Compiler */
-		OptCompiler (SVal);
+		OptCompiler (&SVal);
 		break;
 
 	    default:
@@ -951,7 +954,7 @@ static void DoFileOpt (void)
 	}
 
 	/* Insert the option */
-	OptStr ((unsigned char) OptNum, SVal);
+	OptStr ((unsigned char) OptNum, &SVal);
 
 	/* Done */
 	NextTok ();
@@ -1029,7 +1032,7 @@ static void DoImportZP (void)
 static void DoIncBin (void)
 /* Include a binary file */
 {
-    char Name [sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
     long Start = 0L;
     long Count = -1L;
     long Size;
@@ -1040,7 +1043,8 @@ static void DoIncBin (void)
     	ErrorSkip ("String constant expected");
     	return;
     }
-    strcpy (Name, SVal);
+    SB_Copy (&Name, &SVal);
+    SB_Terminate (&Name);
     NextTok ();
 
     /* A starting offset may follow */
@@ -1057,14 +1061,14 @@ static void DoIncBin (void)
     }
 
     /* Try to open the file */
-    F = fopen (Name, "rb");
+    F = fopen (SB_GetConstBuf (&Name), "rb");
     if (F == 0) {
 
        	/* Search for the file in the include directories. */
-     	char* PathName = FindInclude (Name);
+     	char* PathName = FindInclude (SB_GetConstBuf (&Name));
        	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
-       	    ErrorSkip ("Cannot open include file `%s': %s", Name, strerror (errno));
+       	    ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
      	}
 
      	/* Free the allocated memory */
@@ -1072,7 +1076,7 @@ static void DoIncBin (void)
 
         /* If we had an error before, bail out now */
         if (F == 0) {
-            return;
+            goto ExitPoint;
         }
     }
 
@@ -1111,8 +1115,8 @@ static void DoIncBin (void)
 	size_t BytesRead = fread (Buf, 1, BytesToRead, F);
 	if (BytesToRead != BytesRead) {
 	    /* Some sort of error */
-	    ErrorSkip ("Cannot read from include file `%s': %s",
-                       Name, strerror (errno));
+	    ErrorSkip ("Cannot read from include file `%m%p': %s",
+                       &Name, strerror (errno));
 	    break;
 	}
 
@@ -1126,6 +1130,10 @@ static void DoIncBin (void)
 Done:
     /* Close the file, ignore errors since it's r/o */
     (void) fclose (F);
+
+ExitPoint:
+    /* Free string memory */
+    SB_Done (&Name);
 }
 
 
@@ -1136,8 +1144,9 @@ static void DoInclude (void)
     /* Name must follow */
     if (Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
-    } else {
-    	NewInputFile (SVal);
+    } else {          
+        SB_Terminate (&SVal);
+    	NewInputFile (SB_GetConstBuf (&SVal));
     }
 }
 
@@ -1146,18 +1155,21 @@ static void DoInclude (void)
 static void DoInterruptor (void)
 /* Export a symbol as interruptor */
 {
-    char Name [sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
     if (Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    strcpy (Name, SVal);
+    SB_Copy (&Name, &SVal);
     NextTok ();
 
     /* Parse the remainder of the line and export the symbol */
-    ConDes (Name, CD_TYPE_INT);
+    ConDes (&Name, CD_TYPE_INT);
+
+    /* Free string memory */
+    SB_Done (&Name);
 }
 
 
@@ -1171,7 +1183,7 @@ static void DoInvalid (void)
  * an error in the assembler itself, while DoInvalid is.
  */
 {
-    Internal ("Unexpected token: %s", Keyword);
+    Internal ("Unexpected token: %m%p", &Keyword);
 }
 
 
@@ -1238,7 +1250,8 @@ static void DoMacPack (void)
     }
 
     /* Search for the macro package name */
-    Package = MacPackFind (SVal);
+    LocaseSVal ();
+    Package = MacPackFind (&SVal);
     if (Package < 0) {
     	/* Not found */
     	ErrorSkip ("Invalid macro package");
@@ -1289,7 +1302,7 @@ static void DoOut (void)
 	/* Output the string and be sure to flush the output to keep it in
 	 * sync with any error messages if the output is redirected to a file.
 	 */
-	printf ("%s\n", SVal);
+	printf ("%m%p\n", &SVal);
 	fflush (stdout);
 	NextTok ();
     }
@@ -1355,7 +1368,7 @@ static void DoPopSeg (void)
 static void DoProc (void)
 /* Start a new lexical scope */
 {
-    char Name[sizeof(SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned char AddrSize;
 
     if (Tok == TOK_IDENT) {
@@ -1363,10 +1376,10 @@ static void DoProc (void)
         SymEntry* Sym;
 
 	/* The new scope has a name. Remember it. */
-        strcpy (Name, SVal);
+        SB_Copy (&Name, &SVal);
 
         /* Search for the symbol, generate a new one if needed */
-       	Sym = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
+       	Sym = SymFind (CurrentScope, &Name, SYM_ALLOC_NEW);
 
         /* Skip the scope name */
         NextTok ();
@@ -1381,13 +1394,16 @@ static void DoProc (void)
 
         /* A .PROC statement without a name */
         Warning (1, "Unnamed .PROCs are deprecated, please use .SCOPE");
-        AnonName (Name, sizeof (Name), "PROC");
+        AnonName (&Name, "PROC");
         AddrSize = ADDR_SIZE_DEFAULT;
 
     }
 
     /* Enter a new scope */
-    SymEnterLevel (Name, ST_PROC, AddrSize);
+    SymEnterLevel (&Name, ST_PROC, AddrSize);
+
+    /* Free memory for Name */
+    SB_Done (&Name);
 }
 
 
@@ -1475,20 +1491,20 @@ static void DoROData (void)
 static void DoScope (void)
 /* Start a local scope */
 {
-    char Name[sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned char AddrSize;
 
 
     if (Tok == TOK_IDENT) {
 
     	/* The new scope has a name. Remember and skip it. */
-        strcpy (Name, SVal);
+        SB_Copy (&Name, &SVal);
         NextTok ();
 
     } else {
 
         /* An unnamed scope */
-        AnonName (Name, sizeof (Name), "SCOPE");
+        AnonName (&Name, "SCOPE");
 
     }
 
@@ -1496,8 +1512,10 @@ static void DoScope (void)
     AddrSize = OptionalAddrSize ();
 
     /* Enter the new scope */
-    SymEnterLevel (Name, ST_SCOPE, AddrSize);
+    SymEnterLevel (&Name, ST_SCOPE, AddrSize);
 
+    /* Free memory for Name */
+    SB_Done (&Name);
 }
 
 
@@ -1505,17 +1523,20 @@ static void DoScope (void)
 static void DoSegment (void)
 /* Switch to another segment */
 {
-    char Name [sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
     SegDef Def;
-    Def.Name = Name;
 
     if (Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
 
 	/* Save the name of the segment and skip it */
-	strcpy (Name, SVal);
+	SB_Copy (&Name, &SVal);
 	NextTok ();
+
+        /* Use the name for the segment definition */
+        SB_Terminate (&Name);
+        Def.Name = SB_GetBuf (&Name);
 
     	/* Check for an optional address size modifier */
         Def.AddrSize = OptionalAddrSize ();
@@ -1523,6 +1544,9 @@ static void DoSegment (void)
 	/* Set the segment */
      	UseSeg (&Def);
     }
+
+    /* Free memory for Name */
+    SB_Done (&Name);
 }
 
 
@@ -1535,7 +1559,8 @@ static void DoSetCPU (void)
 	ErrorSkip ("String constant expected");
     } else {
         /* Try to find the CPU */
-        cpu_t CPU = FindCPU (SVal);
+        SB_Terminate (&SVal);
+        cpu_t CPU = FindCPU (SB_GetConstBuf (&SVal));
 
         /* Switch to the new CPU */
         SetCPU (CPU);
@@ -1615,7 +1640,7 @@ static void DoTag (void)
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
-    Error ("Unexpected `%s'", Keyword);
+    Error ("Unexpected `%m%p'", &Keyword);
     SkipUntilSep ();
 }
 
@@ -1627,7 +1652,7 @@ static void DoWarning (void)
     if (Tok != TOK_STRCON) {
  	ErrorSkip ("String constant expected");
     } else {
-       	Warning (0, "User warning: %s", SVal);
+       	Warning (0, "User warning: %m%p", &SVal);
 	SkipUntilSep ();
     }
 }
@@ -1832,7 +1857,7 @@ void HandlePseudo (void)
 
     /* Remember the instruction, then skip it if needed */
     if ((D->Flags & ccKeepToken) == 0) {
-    	strcpy (Keyword, SVal);
+    	SB_Copy (&Keyword, &SVal);
      	NextTok ();
     }
 

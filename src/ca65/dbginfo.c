@@ -2,12 +2,12 @@
 /*                                                                           */
 /*		     		   dbginfo.c				     */
 /*                                                                           */
-/*		     	   Handle the .dbg commands			     */
+/*  		     	   Handle the .dbg commands			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -35,6 +35,9 @@
 
 #include <string.h>
 
+/* common */
+#include "strbuf.h"
+
 /* ca65 */
 #include "error.h"
 #include "expr.h"
@@ -54,7 +57,7 @@
 void DbgInfoFile (void)
 /* Parse and handle FILE subcommand of the .dbg pseudo instruction */
 {
-    char Name [sizeof (SVal)];
+    StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned long Size;
     unsigned long MTime;
 
@@ -66,7 +69,7 @@ void DbgInfoFile (void)
        	ErrorSkip ("String constant expected");
        	return;
     }
-    strcpy (Name, SVal);
+    SB_Copy (&Name, &SVal);
     NextTok ();
 
     /* Comma expected */
@@ -82,7 +85,10 @@ void DbgInfoFile (void)
     MTime = ConstExpression ();
 
     /* Insert the file into the table */
-    AddFile (Name, Size, MTime);
+    AddFile (&Name, Size, MTime);
+
+    /* Free memory used for Name */
+    SB_Done (&Name);
 }
 
 
@@ -111,7 +117,7 @@ void DbgInfoLine (void)
     }
 
     /* Get the index in the file table for the name */
-    Index = GetFileIndex (SVal);
+    Index = GetFileIndex (&SVal);
 
     /* Skip the name */
     NextTok ();

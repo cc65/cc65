@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -218,17 +218,20 @@ static void PrintPageHeader (FILE* F, const ListLine* L)
 /* Print the header for a new page. It is assumed that the given line is the
  * last line of the previous page.
  */
-{
+{                         
+    /* Gte a pointer to the current input file */
+    const StrBuf* CurFile = GetFileName (L->File);
+
     /* Print the header on the new page */
     fprintf (F,
 	     "ca65 V%u.%u.%u - %s\n"
     	     "Main file   : %s\n"
-    	     "Current file: %s\n"
+    	     "Current file: %.*s\n"
 	     "\n",
      	     VER_MAJOR, VER_MINOR, VER_PATCH,
              Copyright,
 	     InFile,
-	     GetFileName (L->File));
+	     SB_GetLen (CurFile), SB_GetConstBuf (CurFile));
 
     /* Count pages, reset lines */
     ++PageNumber;

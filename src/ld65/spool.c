@@ -57,12 +57,12 @@ StringPool StrPool = STATIC_STRINGPOOL_INITIALIZER;
 void InitStrPool (void)
 /* Initialize the string pool */
 {
-    /* We insert a first string here, which will have id zero. This means 
+    /* We insert a first string here, which will have id zero. This means
      * that we can treat index zero later as invalid.
-     */
-    SP_Add (&StrPool, "<invalid message #0>");
+     */               
+    SP_AddStr (&StrPool, "<invalid message #0>");
 }
 
 
 
-     
+

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -37,10 +37,13 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+/* common */
+#include "strbuf.h"
+
 /* ca65 */
+#include "error.h"
 #include "filetab.h"
 #include "nexttok.h"
-#include "error.h"
 
 
 
@@ -69,11 +72,18 @@ void WarningMsg (const FilePos* Pos, unsigned Level, const char* Format, va_list
 /* Print warning message. */
 {
     if (Level <= WarnLevel) {
-	fprintf (stderr, "%s(%lu): Warning: ",
-		 GetFileName (Pos->Name), Pos->Line);
-	vfprintf (stderr, Format, ap);
-	fprintf (stderr, "\n");
+
+        StrBuf S = STATIC_STRBUF_INITIALIZER;
+        SB_VPrintf (&S, Format, ap);
+        SB_Terminate (&S);
+
+       	fprintf (stderr, "%s(%lu): Warning: %s\n",
+                 SB_GetConstBuf (GetFileName (Pos->Name)),
+                 Pos->Line,
+                 SB_GetConstBuf (&S));
 	++WarningCount;
+
+        SB_Done (&S);
     }
 }
 
@@ -110,11 +120,17 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
 void ErrorMsg (const FilePos* Pos, const char* Format, va_list ap)
 /* Print an error message */
 {
-    fprintf (stderr, "%s(%lu): Error: ",
-	     GetFileName (Pos->Name), Pos->Line);
-    vfprintf (stderr, Format, ap);
-    fprintf (stderr, "\n");
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
+    SB_VPrintf (&S, Format, ap);
+    SB_Terminate (&S);
+
+    fprintf (stderr, "%s(%lu): Error: %s\n",
+             SB_GetConstBuf (GetFileName (Pos->Name)),
+             Pos->Line,
+             SB_GetConstBuf (&S));
     ++ErrorCount;
+
+    SB_Done (&S);
 }
 
 
@@ -164,12 +180,16 @@ void Fatal (const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
     va_list ap;
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
 
     va_start (ap, Format);
-    fprintf (stderr, "Fatal error: ");
-    vfprintf (stderr, Format, ap);
-    fprintf (stderr, "\n");
+    SB_VPrintf (&S, Format, ap);
+    SB_Terminate (&S);
     va_end (ap);
+
+    fprintf (stderr, "Fatal error: %s\n", SB_GetConstBuf (&S));
+
+    SB_Done (&S);
 
     /* And die... */
     exit (EXIT_FAILURE);
@@ -178,14 +198,19 @@ void Fatal (const char* Format, ...)
 
 
 void Internal (const char* Format, ...)
-/* Print a message about an internal compiler error and die. */
+/* Print a message about an internal assembler error and die. */
 {
     va_list ap;
+    StrBuf S = STATIC_STRBUF_INITIALIZER;
+
     va_start (ap, Format);
-    fprintf (stderr, "Internal assembler error:\n");
-    vfprintf (stderr, Format, ap);
+    SB_VPrintf (&S, Format, ap);
+    SB_Terminate (&S);
     va_end (ap);
-    fprintf (stderr, "\n");
+
+    fprintf (stderr, "Internal assembler error: %s\n", SB_GetConstBuf (&S));
+
+    SB_Done (&S);
 
     exit (EXIT_FAILURE);
 }

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -60,16 +60,15 @@ TokNode* NewTokNode (void)
     TokNode* T;
 
     /* Allocate memory */
-    unsigned Len = TokHasSVal (Tok)? strlen (SVal) : 0;
-    T = xmalloc (sizeof (TokNode) + Len);
+    T = xmalloc (sizeof (TokNode));
 
     /* Initialize the token contents */
     T->Next   	= 0;
     T->Tok	= Tok;
     T->WS 	= WS;
     T->IVal	= IVal;
-    memcpy (T->SVal, SVal, Len);
-    T->SVal [Len] = '\0';
+    T->SVal     = AUTO_STRBUF_INITIALIZER;
+    SB_Copy (&T->SVal, &SVal);
 
     /* Return the node */
     return T;
@@ -80,6 +79,7 @@ TokNode* NewTokNode (void)
 void FreeTokNode (TokNode* T)
 /* Free the given token node */
 {
+    SB_Done (&T->SVal);
     xfree (T);
 }
 
@@ -92,7 +92,7 @@ void TokSet (TokNode* T)
     Tok  = T->Tok;
     WS   = T->WS;
     IVal = T->IVal;
-    strcpy (SVal, T->SVal);
+    SB_Copy (&SVal, &T->SVal);
 }
 
 
@@ -107,7 +107,7 @@ enum TC TokCmp (const TokNode* T)
 
     /* If the token has string attribute, check it */
     if (TokHasSVal (T->Tok)) {
-	if (strcmp  (T->SVal, SVal) != 0) {
+       	if (SB_Compare (&SVal, &T->SVal) != 0) {
      	    return tcSameToken;
 	}
     } else if (TokHasIVal (T->Tok)) {

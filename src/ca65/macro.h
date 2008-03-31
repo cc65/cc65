@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -65,10 +65,10 @@ void MacExpandStart (void);
 void MacAbort (void);
 /* Abort the current macro expansion */
 
-int IsMacro (const char* Name);
+int IsMacro (const StrBuf* Name);
 /* Return true if the given name is the name of a macro */
 
-int IsDefine (const char* Name);
+int IsDefine (const StrBuf* Name);
 /* Return true if the given name is the name of a define style macro */
 
 int InMacExpansion (void);

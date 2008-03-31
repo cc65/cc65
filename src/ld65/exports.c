@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -620,7 +620,7 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 	    /* Unresolved external */
 	    Import* Imp = E->ImpList;
 	    fprintf (stderr,
-		     "Unresolved external `%s' referenced in:\n",
+	    	     "Unresolved external `%s' referenced in:\n",
 		     GetString (E->Name));
 	    while (Imp) {
 		const char* Name = GetSourceFileName (Imp->Obj, Imp->Pos.Name);
@@ -636,8 +636,8 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 static int CmpExpName (const void* K1, const void* K2)
 /* Compare function for qsort */
 {
-    return strcmp (GetString ((*(Export**)K1)->Name),
-                   GetString ((*(Export**)K2)->Name));
+    return SB_Compare (GetStrBuf ((*(Export**)K1)->Name),
+                       GetStrBuf ((*(Export**)K2)->Name));
 }
 
 
@@ -728,7 +728,7 @@ void PrintExportMap (FILE* F)
 	/* Print unreferenced symbols only if explictly requested */
 	if (VerboseMap || E->ImpCount > 0 || IS_EXP_CONDES (E->Type)) {
 	    fprintf (F,
-	      	     "%-25s %06lX %c%c%c%c   ",
+	       	     "%-25s %06lX %c%c%c%c   ",
 	      	     GetString (E->Name),
 	      	     GetExportVal (E),
 	      	     E->ImpCount? 'R' : ' ',

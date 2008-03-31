@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -73,7 +73,7 @@
 Token Tok = TOK_NONE;                   /* Current token */
 int WS;	  				/* Flag: Whitespace before token */
 long IVal;	       	       	    	/* Integer token attribute */
-char SVal[MAX_STR_LEN+1];               /* String token attribute */
+StrBuf SVal = STATIC_STRBUF_INITIALIZER;/* String token attribute */
 
 FilePos	CurPos = { 0, 0, 0 };		/* Name and position in current file */
 
@@ -459,6 +459,7 @@ void NewInputFile (const char* Name)
     /* check again if we do now have an open file */
     if (F != 0) {
 
+        StrBuf          NameBuf;
      	unsigned        FileIdx;
         CharSource*     S;
 
@@ -476,7 +477,7 @@ void NewInputFile (const char* Name)
      	}
 
      	/* Add the file to the input file table and remember the index */
-     	FileIdx = AddFile (Name, Buf.st_size, Buf.st_mtime);
+     	FileIdx = AddFile (SB_InitFromString (&NameBuf, Name), Buf.st_size, Buf.st_mtime);
 
        	/* Create a new input source variable and initialize it */
      	S                   = xmalloc (sizeof (*S));
@@ -619,11 +620,7 @@ static void NextChar (void)
 void LocaseSVal (void)
 /* Make SVal lower case */
 {
-    unsigned I = 0;
-    while (SVal [I]) {
-	SVal [I] = tolower (SVal [I]);
-     	++I;
-    }
+    SB_ToLower (&SVal);
 }
 
 
@@ -631,11 +628,7 @@ void LocaseSVal (void)
 void UpcaseSVal (void)
 /* Make SVal upper case */
 {
-    unsigned I = 0;
-    while (SVal [I]) {
-	SVal [I] = toupper (SVal [I]);
-     	++I;
-    }
+    SB_ToUpper (&SVal);
 }
 
 
@@ -653,7 +646,7 @@ static unsigned char FindDotKeyword (void)
  * return TOK_NONE if not found.
  */
 {
-    static const struct DotKeyword K = { SVal, 0 };
+    struct DotKeyword K = { SB_GetConstBuf (&SVal), 0 };
     struct DotKeyword* R;
 
     /* If we aren't in ignore case mode, we have to uppercase the keyword */
@@ -673,20 +666,19 @@ static unsigned char FindDotKeyword (void)
 
 
 
-static void ReadIdent (unsigned Index)
+static void ReadIdent (void)
 /* Read an identifier from the current input position into Ident. Filling SVal
- * starts at Index with the current character in C. It is assumed that any
- * characters already filled in are ok, and the character in C is checked.
+ * starts at the current position with the next character in C. It is assumed
+ * that any characters already filled in are ok, and the character in C is
+ * checked.
  */
 {
     /* Read the identifier */
     do {
-   	if (Index < MAX_STR_LEN) {
-	    SVal [Index++] = C;
-	}
-	NextChar ();
+        SB_AppendChar (&SVal, C);
+    	NextChar ();
     } while (IsIdChar (C));
-    SVal [Index] = '\0';
+    SB_Terminate (&SVal);
 
     /* If we should ignore case, convert the identifier to upper case */
     if (IgnoreCase) {
@@ -696,18 +688,13 @@ static void ReadIdent (unsigned Index)
 
 
 
-static unsigned ReadStringConst (int StringTerm)
-/* Read a string constant into SVal. Check for maximum string length and all
- * other stuff.	The length of the string is returned.
- */
+static void ReadStringConst (int StringTerm)
+/* Read a string constant into SVal. */
 {
-    unsigned I;
-
     /* Skip the leading string terminator */
     NextChar ();
 
     /* Read the string */
-    I = 0;
     while (1) {
 	if (C == StringTerm) {
 	    break;
@@ -717,13 +704,8 @@ static unsigned ReadStringConst (int StringTerm)
 	    break;
       	}
 
-	/* Check for string length, print an error message once */
-	if (I == MAX_STR_LEN) {
-	    Error ("Maximum string size exceeded");
-	} else if (I < MAX_STR_LEN) {
-	    SVal [I] = C;
-	}
-	++I;
+       	/* Append the char to the string */
+        SB_AppendChar (&SVal, C);
 
      	/* Skip the character */
 	NextChar ();
@@ -733,18 +715,12 @@ static unsigned ReadStringConst (int StringTerm)
     NextChar ();
 
     /* Terminate the string */
-    if (I >= MAX_STR_LEN) {
-	I = MAX_STR_LEN;
-    }
-    SVal [I] = '\0';
-
-    /* Return the length of the string */
-    return I;
+    SB_Terminate (&SVal);
 }
 
 
 
-static int Sweet16Reg (const char* Ident)
+static int Sweet16Reg (const StrBuf* Id)
 /* Check if the given identifier is a sweet16 register. Return -1 if this is
  * not the case, return the register number otherwise.
  */
@@ -752,14 +728,17 @@ static int Sweet16Reg (const char* Ident)
     unsigned RegNum;
     char Check;
 
-    if (Ident[0] != 'r' && Ident[0] != 'R') {
+    if (SB_GetLen (Id) < 2) {
         return -1;
     }
-    if (!IsDigit (Ident[1])) {
+    if (toupper (SB_AtUnchecked (Id, 0)) != 'R') {
+        return -1;
+    }
+    if (!IsDigit (SB_AtUnchecked (Id, 1))) {
         return -1;
     }
 
-    if (sscanf (Ident+1, "%u%c", &RegNum, &Check) != 1 || RegNum > 15) {
+    if (sscanf (SB_GetConstBuf (Id)+1, "%u%c", &RegNum, &Check) != 1 || RegNum > 15) {
         /* Invalid register */
         return -1;
     }
@@ -795,6 +774,9 @@ Again:
 
     /* Mark the file position of the next token */
     Source->Func->MarkStart (Source);
+
+    /* Clear the string attribute */
+    SB_Clear (&SVal);
 
     /* Hex number or PC symbol? */
     if (C == '$') {
@@ -928,8 +910,8 @@ Again:
 	} else {
 
 	    /* Read the remainder of the identifier */
-            SVal[0] = '.';
-	    ReadIdent (1);
+            SB_AppendChar (&SVal, '.');
+	    ReadIdent ();
 
 	    /* Dot keyword, search for it */
 	    Tok = FindDotKeyword ();
@@ -938,14 +920,14 @@ Again:
       	    	/* Not found */
 		if (!LeadingDotInIdents) {
 		    /* Invalid pseudo instruction */
-		    Error ("`%s' is not a recognized control command", SVal);
+		    Error ("`%m%p' is not a recognized control command", &SVal);
 		    goto Again;
 		}
 
 		/* An identifier with a dot. Check if it's a define style
 		 * macro.
 		 */
-       	       	if (IsDefine (SVal)) {
+       	       	if (IsDefine (&SVal)) {
  		    /* This is a define style macro - expand it */
 		    MacExpandStart ();
 		    goto Restart;
@@ -971,11 +953,11 @@ Again:
     /* Local symbol? */
     if (C == LocalStart) {
 
-    	/* Read the identifier */
-    	ReadIdent (0);
+    	/* Read the identifier. */
+    	ReadIdent ();
 
      	/* Start character alone is not enough */
-        if (SVal [1] == '\0') {
+        if (SB_GetLen (&SVal) == 1) {
 	    Error ("Invalid cheap local symbol");
        	    goto Again;
 	}
@@ -990,13 +972,13 @@ Again:
     if (IsIdStart (C)) {
 
     	/* Read the identifier */
-    	ReadIdent (0);
+    	ReadIdent ();
 
        	/* Check for special names. Bail out if we have identified the type of
 	 * the token. Go on if the token is an identifier.
 	 */
-        if (SVal[1] == '\0') {
-    	    switch (toupper (SVal [0])) {
+        if (SB_GetLen (&SVal) == 1) {
+    	    switch (toupper (SB_AtUnchecked (&SVal, 0))) {
 
     	     	case 'A':
                     if (C == ':') {
@@ -1039,7 +1021,7 @@ Again:
 	     	    break;
    	    }
 
-	} else if (CPU == CPU_SWEET16 && (IVal = Sweet16Reg (SVal)) >= 0) {
+	} else if (CPU == CPU_SWEET16 && (IVal = Sweet16Reg (&SVal)) >= 0) {
 
             /* A sweet16 register number in sweet16 mode */
             Tok = TOK_REG;
@@ -1048,7 +1030,7 @@ Again:
         }
 
 	/* Check for define style macro */
-       	if (IsDefine (SVal)) {
+       	if (IsDefine (&SVal)) {
 	    /* Macro - expand it */
 	    MacExpandStart ();
 	    goto Restart;
@@ -1243,8 +1225,9 @@ CharAgain:
 	     * string later.
 	     */
 	    if (LooseStringTerm) {
-		if (ReadStringConst ('\'') == 1) {
-		    IVal = SVal[0];
+		ReadStringConst ('\'');
+                if (SB_GetLen (&SVal) == 1) {
+		    IVal = SB_AtUnchecked (&SVal, 0);
 	      	    Tok = TOK_CHARCON;
 		} else {
 		    Tok = TOK_STRCON;
@@ -1277,8 +1260,8 @@ CharAgain:
 	case '\\':
 	    /* Line continuation? */
 	    if (LineCont) {
-		NextChar ();
-		if (C == '\n') {
+	    	NextChar ();
+	    	if (C == '\n') {
      		    /* Handle as white space */
      		    NextChar ();
      		    C = ' ';
@@ -1333,7 +1316,7 @@ int GetSubKey (const char** Keys, unsigned Count)
 
     /* Do a linear search (a binary search is not worth the effort) */
     for (I = 0; I < Count; ++I) {
-     	if (strcmp (SVal, Keys [I]) == 0) {
+       	if (SB_CompareStr (&SVal, Keys [I]) == 0) {
      	    /* Found it */
      	    return I;
      	}

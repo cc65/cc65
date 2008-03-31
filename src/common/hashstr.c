@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2008  Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,6 +33,11 @@
 
 
 
+/* common */
+#include "hashstr.h"
+
+
+
 /*****************************************************************************/
 /*     	       	       	       	     Code				     */
 /*****************************************************************************/
@@ -48,6 +53,21 @@ unsigned HashStr (const char* S)
     H = L = 0;
     while (*S) {
     	H = ((H << 3) ^ ((unsigned char) *S++)) + L++;
+    }
+    return H;
+}
+
+
+
+unsigned HashBuf (const StrBuf* S)
+/* Return a hash value for the given string buffer */
+{
+    unsigned I, L, H;
+
+    /* Do the hash */
+    H = L = 0;
+    for (I = 0; I < SB_GetLen (S); ++I) {
+    	H = ((H << 3) ^ ((unsigned char) SB_AtUnchecked (S, I))) + L++;
     }
     return H;
 }

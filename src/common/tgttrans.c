@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -35,6 +35,7 @@
 
 #include <string.h>
 
+/* common */
 #include "abend.h"
 #include "check.h"
 #include "target.h"
@@ -208,6 +209,16 @@ void TgtTranslateBuf (void* Buf, unsigned Len)
 	*B = Tab[*B];
 	++B;
     }
+}
+
+
+
+void TgtTranslateStrBuf (StrBuf* Buf)
+/* Translate a string buffer from the source character set into the target
+ * system character set.
+ */                                  
+{
+    TgtTranslateBuf (SB_GetBuf (Buf), SB_GetLen (Buf));
 }
 
 

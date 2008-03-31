@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -70,7 +70,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
 
 
 
-feature_t FindFeature (const char* Key)
+feature_t FindFeature (const StrBuf* Key)
 /* Find the feature in a table and return the corresponding enum value. If the
  * feature is invalid, return FEAT_UNKNOWN.
  */
@@ -79,7 +79,7 @@ feature_t FindFeature (const char* Key)
 
     /* This is not time critical, so do a linear search */
     for (F = (feature_t) 0; F < FEAT_COUNT; ++F) {
-	if (strcmp (Key, FeatureKeys[F]) == 0) {
+       	if (SB_CompareStr (Key, FeatureKeys[F]) == 0) {
 	    /* Found, index is enum value */
 	    return F;
 	}
@@ -91,7 +91,7 @@ feature_t FindFeature (const char* Key)
 
 
 
-feature_t SetFeature (const char* Key)
+feature_t SetFeature (const StrBuf* Key)
 /* Find the feature and set the corresponding flag if the feature is known.
  * In any case, return the feature found. An invalid Key will return
  * FEAT_UNKNOWN.

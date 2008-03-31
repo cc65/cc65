@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -43,6 +43,7 @@
 #include "coll.h"
 #include "filepos.h"
 #include "inline.h"
+#include "strbuf.h"
 
 /* ca65 */
 #include "spool.h"
@@ -97,7 +98,7 @@ struct SymEntry {
     unsigned char       ExportSize;     /* Export address size */
     unsigned char       AddrSize;       /* Address size of label */
     unsigned char      	ConDesPrio[CD_TYPE_COUNT]; 	/* ConDes priorities... */
-					/* ...actually value+1 (used as flag) */
+		   			/* ...actually value+1 (used as flag) */
     unsigned            Name;      	/* Name index in global string pool */
 };
 
@@ -115,10 +116,10 @@ extern SymEntry* SymLast;
 
 
 
-SymEntry* NewSymEntry (const char* Name, unsigned Flags);
+SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags);
 /* Allocate a symbol table entry, initialize and return it */
 
-int SymSearchTree (SymEntry* T, const char* Name, SymEntry** E);
+int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E);
 /* Search in the given tree for a name. If we find the symbol, the function
  * will return 0 and put the entry pointer into E. If we did not find the
  * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
@@ -305,10 +306,10 @@ const struct ExprNode* SymResolve (const SymEntry* Sym);
  */
 
 #if defined(HAVE_INLINE)
-INLINE const char* GetSymName (const SymEntry* S)
+INLINE const StrBuf* GetSymName (const SymEntry* S)
 /* Return the name of the symbol */
 {
-    return GetString (S->Name);
+    return GetStrBuf (S->Name);
 }
 #else
 #  define GetSymName(S)   GetString ((S)->Name)

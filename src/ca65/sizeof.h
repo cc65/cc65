@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,6 +35,11 @@
 
 #ifndef SIZEOF_H
 #define SIZEOF_H
+                                          
+
+
+/* common */
+#include "strbuf.h"
 
 
 
@@ -46,6 +51,16 @@
 
 struct SymEntry;
 struct SymTable;
+
+
+
+/*****************************************************************************/
+/*     	       	    		     Data	   			     */
+/*****************************************************************************/
+
+
+
+extern const StrBuf SizeEntryName;      /* Contains name of symbol with size */
 
 
 

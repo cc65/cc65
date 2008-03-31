@@ -40,6 +40,7 @@
 
 /* common */
 #include "filepos.h"
+#include "strbuf.h"
 
 /* ca65 */
 #include "token.h"
@@ -58,7 +59,7 @@
 extern Token Tok;                       /* Current token */
 extern int WS; 	 			/* Flag: Whitespace before token */
 extern long IVal;      	 		/* Integer token attribute */
-extern char SVal[MAX_STR_LEN+1];        /* String token attribute */
+extern StrBuf SVal;                     /* String token attribute */
 
 extern FilePos 	CurPos;			/* Name and position in file */
 extern int     	ForcedEnd;		/* Force end of assembly */
@@ -119,4 +120,4 @@ void DoneScanner (void);
 
 
 
-                                        
+

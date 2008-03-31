@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -1453,7 +1453,7 @@ cpu_t GetCPU (void)
 
 
 
-int FindInstruction (const char* Ident)
+int FindInstruction (const StrBuf* Ident)
 /* Check if Ident is a valid mnemonic. If so, return the index in the
  * instruction table. If not, return -1.
  */
@@ -1472,7 +1472,7 @@ int FindInstruction (const char* Ident)
 
     /* Make a copy, and uppercase that copy */
     I = 0;
-    while (Ident[I] != '\0') {
+    while (I < SB_GetLen (Ident)) {
         /* If the identifier is longer than the longest mnemonic, it cannot
          * be one.
          */
@@ -1480,7 +1480,7 @@ int FindInstruction (const char* Ident)
             /* Not found, no need for further action */
             return -1;
         }
-        Key[I] = toupper ((unsigned char)Ident[I]);
+        Key[I] = toupper ((unsigned char)SB_AtUnchecked (Ident, I));
         ++I;
     }
     Key[I] = '\0';

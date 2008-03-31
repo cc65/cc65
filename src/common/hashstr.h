@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   hashstr.h				     */
+/*	    			   hashstr.h				     */
 /*                                                                           */
-/*			   Hash function for strings			     */
+/*	    		   Hash function for strings			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2008  Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,7 +38,9 @@
 
 
 
+/* common */
 #include "attrib.h"
+#include "strbuf.h"
 
 
 
@@ -50,6 +52,9 @@
 
 unsigned HashStr (const char* S) attribute ((const));
 /* Return a hash value for the given string */
+
+unsigned HashBuf (const StrBuf* S) attribute ((const));
+/* Return a hash value for the given string buffer */
 
 
 

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1999-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -62,9 +62,9 @@
 
 
 struct BinDesc {
-    unsigned	Undef;	  	/* Count of undefined externals */
-    FILE*    	F;		/* Output file */
-    const char* Filename;	/* Name of output file */
+    unsigned	Undef;          /* Count of undefined externals */
+    FILE*      	F;              /* Output file */
+    const char* Filename;       /* Name of output file */
 };
 
 
@@ -148,9 +148,9 @@ static void BinWriteMem (BinDesc* D, Memory* M)
        	Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
 
 	/* Writes do only occur in the load area and not for BSS segments */
-       	DoWrite = (S->Flags & SF_BSS) == 0 	&& 	/* No BSS segment */
-	       	   S->Load == M 		&&	/* LOAD segment */
-	       	   S->Seg->Dumped == 0;			/* Not already written */
+       	DoWrite = (S->Flags & SF_BSS) == 0  	&& 	/* No BSS segment */
+	       	   S->Load == M 	    	&&	/* LOAD segment */
+	       	   S->Seg->Dumped == 0;	    		/* Not already written */
 
 	/* Output debugging stuff */
         PrintBoolVal ("bss", S->Flags & SF_BSS);
@@ -311,6 +311,7 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     D->F        = 0;
     D->Filename = 0;
 }
+
 
 
 

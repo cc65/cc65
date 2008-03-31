@@ -511,7 +511,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
                 DumpExpr (Expr, SymResolve);
             }
             PError (GetSymPos (Sym),
-                    "Circular reference in definition of symbol `%s'",
+                    "Circular reference in definition of symbol `%m%p'",
                     GetSymName (Sym));
             ED_Invalidate (D);
         } else {

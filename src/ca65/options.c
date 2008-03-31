@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -96,50 +96,50 @@ static Option* NewOption (unsigned char Type, unsigned long Val)
 
 
 
-void OptStr (unsigned char Type, const char* Text)
+void OptStr (unsigned char Type, const StrBuf* Text)
 /* Add a string option */
 {
-    NewOption (Type, GetStringId (Text));
+    NewOption (Type, GetStrBufId (Text));
 }
 
 
 
-void OptComment (const char* Comment)
+void OptComment (const StrBuf* Comment)
 /* Add a comment */
 {
-    NewOption (OPT_COMMENT, GetStringId (Comment));
+    NewOption (OPT_COMMENT, GetStrBufId (Comment));
 }
 
 
 
-void OptAuthor (const char* Author)
+void OptAuthor (const StrBuf* Author)
 /* Add an author statement */
 {
-    NewOption (OPT_AUTHOR, GetStringId (Author));
+    NewOption (OPT_AUTHOR, GetStrBufId (Author));
 }
 
 
 
-void OptTranslator (const char* Translator)
+void OptTranslator (const StrBuf* Translator)
 /* Add a translator option */
 {
-    NewOption (OPT_TRANSLATOR, GetStringId (Translator));
+    NewOption (OPT_TRANSLATOR, GetStrBufId (Translator));
 }
 
 
 
-void OptCompiler (const char* Compiler)
+void OptCompiler (const StrBuf* Compiler)
 /* Add a compiler option */
 {
-    NewOption (OPT_COMPILER, GetStringId (Compiler));
+    NewOption (OPT_COMPILER, GetStrBufId (Compiler));
 }
 
 
 
-void OptOS (const char* OS)
+void OptOS (const StrBuf* OS)
 /* Add an operating system option */
 {
-    NewOption (OPT_OS, GetStringId (OS));
+    NewOption (OPT_OS, GetStrBufId (OS));
 }
 
 
@@ -182,3 +182,4 @@ void WriteOptions (void)
 
 
 
+                        

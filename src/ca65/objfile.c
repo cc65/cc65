@@ -296,6 +296,19 @@ void ObjWriteStr (const char* S)
 
 
 
+void ObjWriteBuf (const StrBuf* S)
+/* Write a string to the object file */
+{
+    /* Write the string with the length preceeded (this is easier for
+     * the reading routine than the C format since the length is known in
+     * advance).
+     */
+    ObjWriteVar (SB_GetLen (S));
+    ObjWriteData (SB_GetConstBuf (S), SB_GetLen (S));    
+}
+
+
+
 void ObjWriteData (const void* Data, unsigned Size)
 /* Write literal data to the file */
 {

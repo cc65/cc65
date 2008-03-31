@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -442,7 +442,7 @@ static void NumericConst (void)
 {
     unsigned Base;              /* Temporary number base */
     unsigned Prefix;            /* Base according to prefix */
-    StrBuf   S;
+    StrBuf   S = STATIC_STRBUF_INITIALIZER;
     int      IsFloat;
     char     C;
     unsigned DigitVal;
@@ -470,7 +470,6 @@ static void NumericConst (void)
      * before converting it, so we can determine if it's a float or an
      * integer.
      */
-    InitStrBuf (&S);
     while (IsXDigit (CurC) && HexVal (CurC) < Base) {
         SB_AppendChar (&S, CurC);
         NextChar ();
@@ -506,7 +505,7 @@ static void NumericConst (void)
     }
 
     /* We don't need the string buffer any longer */
-    DoneStrBuf (&S);
+    SB_Done (&S);
 
     /* Distinguish between integer and floating point constants */
     if (!IsFloat) {

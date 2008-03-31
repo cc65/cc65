@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2005,      Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2005-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -91,7 +91,7 @@ static void CE_Done (CfgExpr* E)
 {
     /* If the type is a string, we must delete the string buffer */
     if (E->Type == ceString) {
-        DoneStrBuf (&E->SVal);
+        SB_Done (&E->SVal);
     }
 }
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -109,7 +109,7 @@ static void RepeatTokenCheck (TokList* L)
  * for and replace identifiers that are the repeat counter.
  */
 {
-    if (Tok == TOK_IDENT && L->Data != 0 && strcmp (SVal, L->Data) == 0) {
+    if (Tok == TOK_IDENT && L->Data != 0 && SB_CompareStr (&SVal, L->Data) == 0) {
  	/* Must replace by the repeat counter */
  	Tok  = TOK_INTCON;
  	IVal = L->RepCount;
@@ -143,7 +143,8 @@ void ParseRepeat (void)
        	    ErrorSkip ("Identifier expected");
        	} else {
        	    /* Remember the name and skip it */
-       	    Name = xstrdup (SVal);
+            SB_Terminate (&SVal);
+       	    Name = xstrdup (SB_GetConstBuf (&SVal));
        	    NextTok ();
        	}
     }

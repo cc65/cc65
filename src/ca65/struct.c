@@ -106,7 +106,7 @@ static long DoStructInternal (long Offs, unsigned Type)
     int Anon = (Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (SVal, ST_STRUCT, ADDR_SIZE_ABS);
+        SymEnterLevel (&SVal, ST_STRUCT, ADDR_SIZE_ABS);
         NextTok ();
         /* Start at zero offset in the new scope */
         Offs = 0;
@@ -132,7 +132,7 @@ static long DoStructInternal (long Offs, unsigned Type)
         Sym = 0;
         if (Tok == TOK_IDENT) {
             /* We have an identifier, generate a symbol */
-            Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
+            Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
 
             /* Assign the symbol the offset of the current member */
             SymDef (Sym, GenLiteralExpr (Offs), ADDR_SIZE_DEFAULT, SF_NONE);
@@ -261,7 +261,7 @@ static long DoStructInternal (long Offs, unsigned Type)
 long GetStructSize (SymTable* Struct)
 /* Get the size of a struct or union */
 {
-    SymEntry* Sym = SymFind (Struct, ".size", SYM_FIND_EXISTING);
+    SymEntry* Sym = SymFind (Struct, &SizeEntryName, SYM_FIND_EXISTING);
     if (Sym == 0) {
         Error ("Size of struct/union is unknown");
         return 0;

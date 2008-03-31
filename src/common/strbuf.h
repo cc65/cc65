@@ -49,18 +49,18 @@
 
 
 /*****************************************************************************/
-/*				     Data                                    */
+/* 	       			     Data                                    */
 /*****************************************************************************/
 
 
 
 typedef struct StrBuf StrBuf;
 struct StrBuf {
-    unsigned    Allocated;              /* Size of allocated memory */
+    char*       Buf;                    /* Pointer to buffer */
     unsigned    Len;                    /* Length of the string */
     unsigned    Index;                  /* Used for reading (Get and friends) */
-    char*       Buf;                    /* Pointer to buffer */
-};                               
+    unsigned    Allocated;              /* Size of allocated memory */
+};
 
 /* An empty string buf */
 extern const StrBuf EmptyStrBuf;
@@ -71,18 +71,36 @@ extern const StrBuf EmptyStrBuf;
 /* Initializer for auto string bufs */
 #define AUTO_STRBUF_INITIALIZER         EmptyStrBuf
 
+/* Initialize with a string literal (beware: evaluates str twice!) */
+#define LIT_STRBUF_INITIALIZER(str)     { (char*)str, sizeof(str)-1, 0, 0 }
+
 
 
 /*****************************************************************************/
-/*	      			     Code    	   	     		     */
+/* 	      	      		     Code    	   	     		     */
 /*****************************************************************************/
 
 
 
-StrBuf* InitStrBuf (StrBuf* B);
+#if defined(HAVE_INLINE)
+INLINE StrBuf* SB_Init (StrBuf* B)
 /* Initialize a string buffer */
+{
+    *B = EmptyStrBuf;
+    return B;
+}
+#else
+StrBuf* SB_Init (StrBuf* B);
+#endif
 
-void DoneStrBuf (StrBuf* B);
+StrBuf* SB_InitFromString (StrBuf* B, const char* S);
+/* Initialize a string buffer from a literal string. Beware: The buffer won't
+ * store a copy but a pointer to the actual string. A buffer initialized with
+ * this routine may be "forgotten" without calling SB_Done, since no memory
+ * has been allocated.
+ */
+
+void SB_Done (StrBuf* B);
 /* Free the data of a string buffer (but not the struct itself) */
 
 StrBuf* NewStrBuf (void);
@@ -358,14 +376,17 @@ void SB_ToUpper (StrBuf* S);
 int SB_Compare (const StrBuf* S1, const StrBuf* S2);
 /* Do a lexical compare of S1 and S2. See strcmp for result codes. */
 
-void SB_VPrintf (StrBuf* S, const char* Format, va_list ap);
+int SB_CompareStr (const StrBuf* S1, const char* S2);
+/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+
+void SB_VPrintf (StrBuf* S, const char* Format, va_list ap) attribute ((format (printf, 2, 0)));
 /* printf function with S as target. The function is safe, which means that
  * the current contents of S are discarded, and are allocated again with
  * a matching size for the output. The function will call FAIL when problems
  * are detected (anything that let xsnprintf return -1).
  */
 
-void SB_Printf (StrBuf* S, const char* Format, ...);
+void SB_Printf (StrBuf* S, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* vprintf function with S as target. The function is safe, which means that
  * the current contents of S are discarded, and are allocated again with
  * a matching size for the output. The function will call FAIL when problems

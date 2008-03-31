@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                            */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -82,7 +82,7 @@ static StrBuf MacPackDir = STATIC_STRBUF_INITIALIZER;
 
 
 
-int MacPackFind (const char* Name)
+int MacPackFind (const StrBuf* Name)
 /* Find a macro package by name. The function will either return the id or
  * -1 if the package name was not found.
  */
@@ -90,7 +90,7 @@ int MacPackFind (const char* Name)
     int I;
 
     for (I = 0; I < MAC_COUNT; ++I) {
-        if (StrCaseCmp (Name, MacPackages[I].Name) == 0) {
+        if (SB_CompareStr (Name, MacPackages[I].Name) == 0) {
             /* Found */
             return I;
         }
@@ -130,21 +130,21 @@ void MacPackInsert (int Id)
         NewInputFile (SB_GetConstBuf (&Filename));
 
         /* Destroy the contents of Filename */
-        DoneStrBuf (&Filename);
+        SB_Done (&Filename);
 
     }
 }
 
 
 
-void MacPackSetDir (const char* Dir)
+void MacPackSetDir (const StrBuf* Dir)
 /* Set a directory where files for macro packages can be found. Standard is
  * to use the builtin packages. For debugging macro packages, external files
  * can be used.
  */
 {
     /* Copy the directory name to the buffer */
-    SB_CopyStr (&MacPackDir, Dir);
+    SB_Copy (&MacPackDir, Dir);
 
     /* Make sure that the last character is a path delimiter */
     if (SB_NotEmpty (&MacPackDir)) {

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2003-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -64,8 +64,8 @@ extern StringPool StrPool;
 
 
 #if defined(HAVE_INLINE)
-INLINE unsigned GetStringId (const char* S)
-/* Return the id of the given string */
+INLINE unsigned GetStrBufId (const StrBuf* S)
+/* Return the id of the given string buffer */
 {
     return SP_Add (&StrPool, S);
 }
@@ -74,13 +74,33 @@ INLINE unsigned GetStringId (const char* S)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE const char* GetString (unsigned Index)
+INLINE unsigned GetStringId (const char* S)
+/* Return the id of the given string */
+{
+    return SP_AddStr (&StrPool, S);
+}
+#else
+#  define GetStringId(S)        SP_Add (&StrPool, (S))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE const StrBuf* GetStrBuf (unsigned Index)
 /* Convert a string index into a string */
 {
     return SP_Get (&StrPool, Index);
 }
 #else
-#  define GetString(Index)      SP_Get (&StrPool, (Index))
+#  define GetStrBuf(Index)      SP_Get (&StrPool, (Index))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE const char* GetString (unsigned Index)
+/* Convert a string index into a string */
+{
+    return SB_GetConstBuf (SP_Get (&StrPool, Index));
+}
+#else
+#  define GetString(Index)      SB_GetConstBuf (SP_Get (&StrPool, (Index)))
 #endif
 
 void InitStrPool (void);

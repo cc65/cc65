@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "strbuf.h"
+
+
+
 /*****************************************************************************/
 /*     	       	    	       	     Data				     */
 /*****************************************************************************/
@@ -64,7 +69,7 @@ enum {
 
 
 
-int MacPackFind (const char* Name);
+int MacPackFind (const StrBuf* Name);
 /* Find a macro package by name. The function will either return the id or
  * -1 if the package name was not found.
  */
@@ -72,7 +77,7 @@ int MacPackFind (const char* Name);
 void MacPackInsert (int Id);
 /* Insert the macro package with the given id in the input stream */
 
-void MacPackSetDir (const char* Dir);
+void MacPackSetDir (const StrBuf* Dir);
 /* Set a directory where files for macro packages can be found. Standard is
  * to use the builtin packages. For debugging macro packages, external files
  * can be used.

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007, Ullrich von Bassewitz                                      */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -189,7 +189,7 @@ static MacroExp* InitMacroExp (MacroExp* E, Macro* M)
 /* Initialize a MacroExp structure */
 {
     InitCollection (&E->ActualArgs);
-    InitStrBuf (&E->Replacement);
+    SB_Init (&E->Replacement);
     E->M = M;
     return E;
 }
@@ -206,7 +206,7 @@ static void DoneMacroExp (MacroExp* E)
         FreeStrBuf (CollAtUnchecked (&E->ActualArgs, I));
     }
     DoneCollection (&E->ActualArgs);
-    DoneStrBuf (&E->Replacement);
+    SB_Done (&E->Replacement);
 }
 
 
@@ -488,7 +488,7 @@ static void ReadMacroArgs (MacroExp* E)
     }
 
     /* Deallocate string buf resources */
-    DoneStrBuf (&Arg);
+    SB_Done (&Arg);
 }
 
 
@@ -1145,7 +1145,7 @@ static void DoInclude (void)
 
 Done:
     /* Free the allocated filename data */
-    DoneStrBuf (&Filename);
+    SB_Done (&Filename);
 
     /* Clear the remaining line so the next input will come from the new
      * file (if open)

@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -73,7 +73,7 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...) attr
 
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
-                
+
 void PError (const FilePos* Pos, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print an error message giving an explicit file and position. */
 
@@ -84,7 +84,7 @@ void Fatal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print a message about a fatal error and die */
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
-/* Print a message about an internal compiler error and die. */
+/* Print a message about an internal assembler error and die. */
 
 
 

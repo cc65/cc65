@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -95,7 +95,7 @@ void CfgWarning (const char* Format, ...)
     va_end (ap);
 
     Warning ("%s(%u): %s", CfgGetName(), CfgErrorLine, SB_GetConstBuf (&Buf));
-    DoneStrBuf (&Buf);
+    SB_Done (&Buf);
 }
 
 
@@ -111,7 +111,7 @@ void CfgError (const char* Format, ...)
     va_end (ap);
 
     Error ("%s(%u): %s", CfgGetName(), CfgErrorLine, SB_GetConstBuf (&Buf));
-    DoneStrBuf (&Buf);
+    SB_Done (&Buf);
 }
 
 

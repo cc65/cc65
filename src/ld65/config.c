@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -203,7 +203,7 @@ static Memory* CfgFindMemory (unsigned Name)
 static Memory* CfgGetMemory (unsigned Name)
 /* Find the memory are with the given name. Print an error on an invalid name */
 {
-    Memory* M = CfgFindMemory (Name);
+    Memory* M = CfgFindMemory (Name);   
     if (M == 0) {
  	CfgError ("Invalid memory area `%s'", GetString (Name));
     }
@@ -1557,13 +1557,14 @@ void CfgRead (void)
 static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a RUN segment */
 {
-    char Buf [256];
+    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
-    xsprintf (Buf, sizeof (Buf), "__%s_RUN__", GetString (S->Name));
-    CreateMemoryExport (GetStringId (Buf), S->Run, SegAddr - S->Run->Start);
-    xsprintf (Buf, sizeof (Buf), "__%s_SIZE__", GetString (S->Name));
-    CreateConstExport (GetStringId (Buf), S->Seg->Size);
+    SB_Printf (&Buf, "__%s_RUN__", GetString (S->Name));
+    CreateMemoryExport (GetStrBufId (&Buf), S->Run, SegAddr - S->Run->Start);
+    SB_Printf (&Buf, "__%s_SIZE__", GetString (S->Name));
+    CreateConstExport (GetStrBufId (&Buf), S->Seg->Size);
     S->Flags |= SF_RUN_DEF;
+    SB_Done (&Buf);
 }
 
 
@@ -1571,11 +1572,12 @@ static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a LOAD segment */
 {
-    char Buf [256];
+    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
-    xsprintf (Buf, sizeof (Buf), "__%s_LOAD__", GetString (S->Name));
-    CreateMemoryExport (GetStringId (Buf), S->Load, SegAddr - S->Load->Start);
+    SB_Printf (&Buf, "__%s_LOAD__", GetString (S->Name));
+    CreateMemoryExport (GetStrBufId (&Buf), S->Load, SegAddr - S->Load->Start);
     S->Flags |= SF_LOAD_DEF;
+    SB_Done (&Buf);
 }
 
 
@@ -1697,13 +1699,14 @@ unsigned CfgAssignSegments (void)
 
 	/* If requested, define symbols for start and size of the memory area */
 	if (M->Flags & MF_DEFINE) {
-	    char Buf [256];
-	    sprintf (Buf, "__%s_START__", GetString (M->Name));
-	    CreateMemoryExport (GetStringId (Buf), M, 0);
-	    sprintf (Buf, "__%s_SIZE__", GetString (M->Name));
-	    CreateConstExport (GetStringId (Buf), M->Size);
-	    sprintf (Buf, "__%s_LAST__", GetString (M->Name));
-	    CreateMemoryExport (GetStringId (Buf), M, M->FillLevel);
+	    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+	    SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
+	    CreateMemoryExport (GetStrBufId (&Buf), M, 0);
+	    SB_Printf (&Buf, "__%s_SIZE__", GetString (M->Name));
+	    CreateConstExport (GetStrBufId (&Buf), M->Size);
+	    SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
+	    CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
+            SB_Done (&Buf);
 	}
 
 	/* Next memory area */
@@ -1728,7 +1731,7 @@ void CfgWriteTarget (void)
   	if (F->MemList) {
 
   	    /* Is there an output file? */
-  	    if (strlen (GetString (F->Name)) > 0) {
+  	    if (SB_GetLen (GetStrBuf (F->Name)) > 0) {
 
   		/* Assign a proper binary format */
   		if (F->Format == BINFMT_DEFAULT) {

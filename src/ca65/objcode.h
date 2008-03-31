@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -40,6 +40,7 @@
 
 /* ca65 */
 #include "expr.h"
+#include "strbuf.h"
 
 
 
@@ -67,8 +68,11 @@ void EmitSigned (ExprNode* Expr, unsigned Size);
 void EmitPCRel (unsigned char OPC, ExprNode* Expr, unsigned Size);
 /* Emit an opcode with a PC relative argument of one or two bytes */
 
-void EmitData (const unsigned char* Data, unsigned Size);
+void EmitData (const void* Data, unsigned Size);
 /* Emit data into the current segment */
+
+void EmitStrBuf (const StrBuf* Data);
+/* Emit a string into the current segment */
 
 void EmitByte (ExprNode* Expr);
 /* Emit one byte */

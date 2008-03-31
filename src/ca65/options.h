@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,22 +44,22 @@
 
 
 
-void OptStr (unsigned char Type, const char* Text);
+void OptStr (unsigned char Type, const StrBuf* Text);
 /* Add a string option */
 
-void OptComment (const char* Comment);
+void OptComment (const StrBuf* Comment);
 /* Add a comment */
 
-void OptAuthor (const char* Author);
+void OptAuthor (const StrBuf* Author);
 /* Add an author statement */
 
-void OptTranslator (const char* Translator);
+void OptTranslator (const StrBuf* Translator);
 /* Add a translator option */
 
-void OptCompiler (const char* Compiler);
+void OptCompiler (const StrBuf* Compiler);
 /* Add a compiler option */
 
-void OptOS (const char* OS);
+void OptOS (const StrBuf* OS);
 /* Add an operating system option */
 
 void OptDateTime (unsigned long DateTime);
@@ -68,7 +68,7 @@ void OptDateTime (unsigned long DateTime);
 void WriteOptions (void);
 /* Write the options to the object file */
 
-	       
+
 
 /* End of options.h */
 

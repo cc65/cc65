@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -153,7 +153,7 @@ static void StringPragma (StrBuf* B, void (*Func) (const char*))
     }
 
     /* Call the string buf destructor */
-    DoneStrBuf (&S);
+    SB_Done (&S);
 }
 
 
@@ -223,7 +223,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
     g_segname (Seg);
 
     /* Call the string buf destructor */
-    DoneStrBuf (&S);
+    SB_Done (&S);
 }
 
 
@@ -494,7 +494,7 @@ static void ParsePragma (void)
             FlagPragma (&B, &WarnDisable);
             break;
 
-     	case PR_ZPSYM:                    
+     	case PR_ZPSYM:
      	    StringPragma (&B, MakeZPSym);
      	    break;
 
@@ -522,7 +522,7 @@ static void ParsePragma (void)
     }
 
     /* Release the StrBuf */
-    DoneStrBuf (&B);
+    SB_Done (&B);
 }
 
 

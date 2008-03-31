@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -88,7 +88,7 @@ static int HT_Compare (const void* Key1, const void* Key2);
 typedef struct IdDesc IdDesc;
 struct IdDesc {
     IdDesc*  	    Next;     	/* Linked list */
-    char       	    Id [1];	/* Identifier, dynamically allocated */
+    StrBuf          Id;         /* Identifier, dynamically allocated */
 };
 
 
@@ -106,7 +106,7 @@ struct Macro {
     TokNode* 	    TokRoot;	/* Root of token list */
     TokNode* 	    TokLast;	/* Pointer to last token in list */
     unsigned char   Style;	/* Macro style */
-    char       	    Name [1];	/* Macro name, dynamically allocated */
+    StrBuf          Name;	/* Macro name, dynamically allocated */
 };
 
 /* Hash table functions */
@@ -157,7 +157,7 @@ static unsigned LocalName = 0;
 static unsigned HT_GenHash (const void* Key)
 /* Generate the hash over a key. */
 {
-    return HashStr (Key);
+    return HashBuf (Key);
 }
 
 
@@ -165,7 +165,7 @@ static unsigned HT_GenHash (const void* Key)
 static const void* HT_GetKey (void* Entry)
 /* Given a pointer to the user entry data, return a pointer to the index */
 {
-    return ((Macro*) Entry)->Name;
+    return &((Macro*) Entry)->Name;
 }
 
 
@@ -184,7 +184,7 @@ static int HT_Compare (const void* Key1, const void* Key2)
  * than zero if Key1 is greater then Key2.
  */
 {
-    return strcmp (Key1, Key2);
+    return SB_Compare (Key1, Key2);
 }
 
 
@@ -195,17 +195,16 @@ static int HT_Compare (const void* Key1, const void* Key2)
 
 
 
-static IdDesc* NewIdDesc (const char* Id)
+static IdDesc* NewIdDesc (const StrBuf* Id)
 /* Create a new IdDesc, initialize and return it */
 {
     /* Allocate memory */
-    unsigned Len = strlen (Id);
-    IdDesc* I = xmalloc (sizeof (IdDesc) + Len);
+    IdDesc* I = xmalloc (sizeof (IdDesc));
 
     /* Initialize the struct */
     I->Next = 0;
-    memcpy (I->Id, Id, Len);
-    I->Id [Len] = '\0';
+    I->Id   = AUTO_STRBUF_INITIALIZER;
+    SB_Copy (&I->Id, Id);
 
     /* Return the new struct */
     return I;
@@ -213,12 +212,11 @@ static IdDesc* NewIdDesc (const char* Id)
 
 
 
-static Macro* NewMacro (const char* Name, unsigned char Style)
+static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
 /* Generate a new macro entry, initialize and return it */
 {
     /* Allocate memory */
-    unsigned Len = strlen (Name);
-    Macro* M = xmalloc (sizeof (Macro) + Len);
+    Macro* M = xmalloc (sizeof (Macro));
 
     /* Initialize the macro struct */
     InitHashNode (&M->Node, M);
@@ -230,7 +228,8 @@ static Macro* NewMacro (const char* Name, unsigned char Style)
     M->TokRoot    = 0;
     M->TokLast    = 0;
     M->Style	  = Style;
-    memcpy (M->Name, Name, Len+1);
+    M->Name       = AUTO_STRBUF_INITIALIZER;
+    SB_Copy (&M->Name, Name);
 
     /* Insert the macro into the global macro list */
     M->List = MacroRoot;
@@ -340,7 +339,7 @@ void MacDef (unsigned Style)
 	Error ("Identifier expected");
 	MacSkipDef (Style);
     	return;
-    } else if (!UbiquitousIdents && FindInstruction (SVal) >= 0) {
+    } else if (!UbiquitousIdents && FindInstruction (&SVal) >= 0) {
         /* The identifier is a name of a 6502 instruction, which is not
          * allowed if not explicitly enabled.
          */
@@ -350,16 +349,16 @@ void MacDef (unsigned Style)
     }
 
     /* Did we already define that macro? */
-    if (HT_Find (&MacroTab, SVal) != 0) {
+    if (HT_Find (&MacroTab, &SVal) != 0) {
        	/* Macro is already defined */
-     	Error ("A macro named `%s' is already defined", SVal);
+       	Error ("A macro named `%m%p' is already defined", &SVal);
      	/* Skip tokens until we reach the final .endmacro */
      	MacSkipDef (Style);
        	return;
     }
 
     /* Define the macro */
-    M = NewMacro (SVal, Style);
+    M = NewMacro (&SVal, Style);
 
     /* Switch to raw token mode and skip the macro name */
     EnterRawTokenMode ();
@@ -369,45 +368,45 @@ void MacDef (unsigned Style)
      * otherwise we may have parameters without braces.
      */
     if (Style == MAC_STYLE_CLASSIC) {
-	HaveParams = 1;
+     	HaveParams = 1;
     } else {
-	if (Tok == TOK_LPAREN) {
-	    HaveParams = 1;
-	    NextTok ();
-	} else {
-	    HaveParams = 0;
-	}
+     	if (Tok == TOK_LPAREN) {
+     	    HaveParams = 1;
+     	    NextTok ();
+     	} else {
+     	    HaveParams = 0;
+     	}
     }
 
     /* Parse the parameter list */
     if (HaveParams) {
 
-    	while (Tok == TOK_IDENT) {
+     	while (Tok == TOK_IDENT) {
 
-	    /* Create a struct holding the identifier */
-	    IdDesc* I = NewIdDesc (SVal);
+     	    /* Create a struct holding the identifier */
+     	    IdDesc* I = NewIdDesc (&SVal);
 
-	    /* Insert the struct into the list, checking for duplicate idents */
-	    if (M->ParamCount == 0) {
-		M->Params = I;
-	    } else {
-		IdDesc* List = M->Params;
-		while (1) {
-		    if (strcmp (List->Id, SVal) == 0) {
-			Error ("Duplicate symbol `%s'", SVal);
-		    }
-		    if (List->Next == 0) {
-			break;
-		    } else {
-			List = List->Next;
-		    }
-		}
-		List->Next = I;
-	    }
-	    ++M->ParamCount;
+     	    /* Insert the struct into the list, checking for duplicate idents */
+     	    if (M->ParamCount == 0) {
+     		M->Params = I;
+     	    } else {
+     		IdDesc* List = M->Params;
+     		while (1) {
+     		    if (SB_Compare (&List->Id, &SVal) == 0) {
+     		   	Error ("Duplicate symbol `%m%p'", &SVal);
+     		    }
+     		    if (List->Next == 0) {
+     			break;
+     		    } else {
+     			List = List->Next;
+     		    }
+     		}
+     		List->Next = I;
+     	    }
+     	    ++M->ParamCount;
 
        	    /* Skip the name */
-	    NextTok ();
+     	    NextTok ();
 
 	    /* Maybe there are more params... */
 	    if (Tok == TOK_COMMA) {
@@ -471,7 +470,7 @@ void MacDef (unsigned Style)
      		}
 
      		/* Put the identifier into the locals list and skip it */
-       	       	I = NewIdDesc (SVal);
+       	       	I = NewIdDesc (&SVal);
      		I->Next = M->Locals;
      		M->Locals = I;
      		++M->LocalCount;
@@ -497,7 +496,7 @@ void MacDef (unsigned Style)
      	    unsigned Count = 0;
      	    IdDesc* I = M->Params;
      	    while (I) {
-     	       	if (strcmp (I->Id, SVal) == 0) {
+     	       	if (SB_Compare (&I->Id, &SVal) == 0) {
      	       	    /* Local param name, replace it */
      	       	    T->Tok  = TOK_MACPARAM;
      	       	    T->IVal = Count;
@@ -607,15 +606,21 @@ static int MacExpand (void* Data)
        	    unsigned Index = 0;
        	    IdDesc* I = Mac->M->Locals;
        	    while (I) {
-       	       	if (strcmp (SVal, I->Id) == 0) {
+       	       	if (SB_Compare (&SVal, &I->Id) == 0) {
        	       	    /* This is in fact a local symbol, change the name. Be sure
                      * to generate a local label name if the original name was
                      * a local label, and also generate a name that cannot be
                      * generated by a user.
                      */
-                    unsigned PrefixLen = (I->Id[0] == LocalStart);
-       	       	    sprintf (SVal, "%.*sLOCAL-MACRO-SYMBOL-%04X", PrefixLen,
-                             I->Id, Mac->LocalStart + Index);
+                    if (SB_At (&I->Id, 0) == LocalStart) {
+                        /* Must generate a local symbol */
+                        SB_Printf (&SVal, "%cLOCAL-MACRO_SYMBOL-%04X",
+                                   LocalStart, Mac->LocalStart + Index);
+                    } else {
+                        /* Global symbol */
+                        SB_Printf (&SVal, "LOCAL-MACRO_SYMBOL-%04X",
+                                   Mac->LocalStart + Index);
+                    }
        	       	    break;
        	       	}
        	       	/* Next symbol */
@@ -836,7 +841,7 @@ void MacExpandStart (void)
 /* Start expanding the macro in SVal */
 {
     /* Search for the macro */
-    Macro* M = HT_FindEntry (&MacroTab, SVal);
+    Macro* M = HT_FindEntry (&MacroTab, &SVal);
     CHECK (M != 0);
 
     /* Call the apropriate subroutine */
@@ -861,7 +866,7 @@ void MacAbort (void)
 
 
 
-int IsMacro (const char* Name)
+int IsMacro (const StrBuf* Name)
 /* Return true if the given name is the name of a macro */
 {
     return (HT_Find (&MacroTab, Name) != 0);
@@ -869,7 +874,7 @@ int IsMacro (const char* Name)
 
 
 
-int IsDefine (const char* Name)
+int IsDefine (const StrBuf* Name)
 /* Return true if the given name is the name of a define style macro */
 {
     Macro* M = HT_FindEntry (&MacroTab, Name);
@@ -883,9 +888,6 @@ int InMacExpansion (void)
 {
     return (MacExpansions > 0);
 }
-
-
-
 
 
 

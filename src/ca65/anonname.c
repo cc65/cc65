@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -36,9 +36,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* common */
-#include "xsprintf.h"
-
 /* ca65 */
 #include "anonname.h"
 
@@ -60,23 +57,27 @@ static const char AnonTag[] = "$anon";
 
 
 
-char* AnonName (char* Buf, unsigned Size, const char* Spec)
+StrBuf* AnonName (StrBuf* Buf, const char* Spec)
 /* Get a name for an anonymous scope, variable or type. Size is the size of
  * the buffer passed to the function, Spec will be used as part of the
  * identifier if given. A pointer to the buffer is returned.
  */
 {
     static unsigned ACount = 0;
-    xsprintf (Buf, Size, "%s-%s-%04X", AnonTag, Spec, ++ACount);
+    SB_Printf (Buf, "%s-%s-%04X", AnonTag, Spec, ++ACount);
     return Buf;
 }
 
 
 
-int IsAnonName (const char* Name)
+int IsAnonName (const StrBuf* Name)
 /* Check if the given symbol name is that of an anonymous symbol */
-{
-    return (strncmp (Name, AnonTag, sizeof (AnonTag) - 1) == 0);
+{           
+    if (SB_GetLen (Name) < sizeof (AnonTag) - 1) {
+        /* Too short */
+        return 0;
+    }
+    return (strncmp (SB_GetConstBuf (Name), AnonTag, sizeof (AnonTag) - 1) == 0);
 }
 
 

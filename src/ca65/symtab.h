@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -101,34 +101,34 @@ extern SymTable*	RootScope;      /* Root symbol table */
 
 
 
-void SymEnterLevel (const char* ScopeName, unsigned char Type, unsigned char AddrSize);
+void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type, unsigned char AddrSize);
 /* Enter a new lexical level */
 
 void SymLeaveLevel (void);
 /* Leave the current lexical level */
 
-SymTable* SymFindScope (SymTable* Parent, const char* Name, int AllocNew);
+SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, int AllocNew);
 /* Find a scope in the given enclosing scope */
 
-SymTable* SymFindAnyScope (SymTable* Parent, const char* Name);
+SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name);
 /* Find a scope in the given or any of its parent scopes. The function will
  * never create a new symbol, since this can only be done in one specific
  * scope.
  */
 
-SymEntry* SymFindLocal (SymEntry* Parent, const char* Name, int AllocNew);
+SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* StrBuf, int AllocNew);
 /* Find a cheap local symbol. If AllocNew is given and the entry is not
  * found, create a new one. Return the entry found, or the new entry created,
  * or - in case AllocNew is zero - return 0.
  */
 
-SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew);
+SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew);
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
  * new entry created, or - in case AllocNew is zero - return 0.
  */
 
-SymEntry* SymFindAny (SymTable* Scope, const char* Name);
+SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name);
 /* Find a symbol in the given or any of its parent scopes. The function will
  * never create a new symbol, since this can only be done in one specific
  * scope.

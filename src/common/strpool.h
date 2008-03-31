@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2003-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -48,6 +48,7 @@
 
 
 /* common */
+#include "attrib.h"
 #include "coll.h"
 #include "inline.h"
 #include "strbuf.h"
@@ -100,10 +101,16 @@ StringPool* NewStringPool (void);
 void FreeStringPool (StringPool* P);
 /* Free a string pool */
 
-const char* SP_Get (const StringPool* P, unsigned Index);
+const StrBuf* SP_Get (const StringPool* P, unsigned Index);
 /* Return a string from the pool. Index must exist, otherwise FAIL is called. */
 
-unsigned SP_Add (StringPool* P, const char* S);
+unsigned SP_Add (StringPool* P, const StrBuf* S);
+/* Add a string buffer to the buffer and return the index. If the string does
+ * already exist in the pool, SP_AddBuf will just return the index of the
+ * existing string.
+ */
+
+unsigned SP_AddStr (StringPool* P, const char* S);
 /* Add a string to the buffer and return the index. If the string does already
  * exist in the pool, SP_Add will just return the index of the existing string.
  */

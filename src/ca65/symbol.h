@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -55,14 +55,13 @@ struct SymTable;
 
 
 
-struct SymTable* ParseScopedIdent (char* Name, struct StrBuf* FullName);
-/* Parse a (possibly scoped) identifer. Name must point to a buffer big enough
- * to hold such an identifier. The scope of the name must exist and is returned
- * as function result, while the last part (the identifier) which may be either
- * a symbol or a scope depending on the context is returned in Name. FullName
- * is a string buffer that is used to store the full name of the identifier
- * including the scope. It is used internally and may be used by the caller
- * for error messages or similar.
+struct SymTable* ParseScopedIdent (struct StrBuf* Name, struct StrBuf* FullName);
+/* Parse a (possibly scoped) identifer. The scope of the name must exist and
+ * is returned as function result, while the last part (the identifier) which
+ * may be either a symbol or a scope depending on the context is returned in
+ * Name. FullName is a string buffer that is used to store the full name of
+ * the identifier including the scope. It is used internally and may be used
+ * by the caller for error messages or similar.
  */
 
 struct SymEntry* ParseScopedSymName (int AllowNew);

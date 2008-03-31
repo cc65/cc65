@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -35,6 +35,11 @@
 
 #ifndef FEATURE_H
 #define	FEATURE_H
+
+
+
+/* common */
+#include "strbuf.h"
 
 
 
@@ -70,12 +75,12 @@ typedef enum {
 
 
 
-feature_t FindFeature (const char* Key);
+feature_t FindFeature (const StrBuf* Key);
 /* Find the feature in a table and return the corresponding enum value. If the
  * feature is invalid, return FEAT_UNKNOWN.
  */
 
-feature_t SetFeature (const char* Key);
+feature_t SetFeature (const StrBuf* Key);
 /* Find the feature and set the corresponding flag if the feature is known.
  * In any case, return the feature found. An invalid Key will return
  * FEAT_UNKNOWN.

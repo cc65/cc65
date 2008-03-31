@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -112,7 +112,7 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
     	Cmp = 1;
     } else {
     	/* Use the name in this case */
-       	Cmp = strcmp (GetString (Exp1->Name), GetString (Exp2->Name));
+       	Cmp = SB_Compare (GetStrBuf (Exp1->Name), GetStrBuf (Exp2->Name));
     }
 
     /* Reverse the result for decreasing order */

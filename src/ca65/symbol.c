@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -53,17 +53,19 @@
 
 
 
-SymTable* ParseScopedIdent (char* Name, StrBuf* ScopeName)
-/* Parse a (possibly scoped) identifer. Name must point to a buffer big enough
- * to hold such an identifier. The scope of the name must exist and is returned
- * as function result, while the last part (the identifier) which may be either
- * a symbol or a scope depending on the context is returned in Name. ScopeName
- * is a string buffer that is used to store the name of the scope, the
- * identifier lives in. It does contain anything but the identifier itself, so
- * if ScopeName is empty on return, no explicit scope was specified. The full
- * name of the identifier (including the scope) is ScopeName+Name.
+SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
+/* Parse a (possibly scoped) identifer. The scope of the name must exist and
+ * is returned as function result, while the last part (the identifier) which
+ * may be either a symbol or a scope depending on the context is returned in
+ * Name. FullName is a string buffer that is used to store the full name of
+ * the identifier including the scope. It is used internally and may be used
+ * by the caller for error messages or similar.
  */
 {
+    /* Clear both passed string buffers */
+    SB_Clear (Name);
+    SB_Clear (FullName);
+
     /* Get the starting table */
     SymTable* Scope;
     if (Tok == TOK_NAMESPACE) {
@@ -74,17 +76,17 @@ SymTable* ParseScopedIdent (char* Name, StrBuf* ScopeName)
     } else if (Tok == TOK_IDENT) {
 
         /* Remember the name and skip it */
-        strcpy (Name, SVal);
+        SB_Copy (Name, &SVal);
         NextTok ();
 
         /* If no namespace symbol follows, we're already done */
         if (Tok != TOK_NAMESPACE) {
-            SB_Terminate (ScopeName);
+            SB_Terminate (FullName);
             return CurrentScope;
         }
 
         /* Pass the scope back to the caller */
-        SB_AppendStr (ScopeName, Name);
+        SB_Append (FullName, Name);
 
         /* The scope must exist, so search for it starting with the current
          * scope.
@@ -92,8 +94,8 @@ SymTable* ParseScopedIdent (char* Name, StrBuf* ScopeName)
         Scope = SymFindAnyScope (CurrentScope, Name);
         if (Scope == 0) {
             /* Scope not found */
-            SB_Terminate (ScopeName);
-            Error ("No such scope: `%s'", SB_GetConstBuf (ScopeName));
+            SB_Terminate (FullName);
+            Error ("No such scope: `%m%p'", FullName);
             return 0;
         }
 
@@ -101,14 +103,12 @@ SymTable* ParseScopedIdent (char* Name, StrBuf* ScopeName)
 
         /* Invalid token */
         Error ("Identifier expected");
-        SB_Terminate (ScopeName);
-        Name[0] = '\0';
         return 0;
 
     }
 
     /* Skip the namespace token that follows */
-    SB_AppendStr (ScopeName, "::");
+    SB_AppendStr (FullName, "::");
     NextTok ();
 
     /* Resolve scopes. */
@@ -117,13 +117,11 @@ SymTable* ParseScopedIdent (char* Name, StrBuf* ScopeName)
         /* Next token must be an identifier. */
         if (Tok != TOK_IDENT) {
             Error ("Identifier expected");
-            SB_Terminate (ScopeName);
-            Name[0] = '\0';
             return 0;
         }
 
         /* Remember and skip the identifier */
-        strcpy (Name, SVal);
+        SB_Copy (Name, &SVal);
         NextTok ();
 
         /* If a namespace token follows, we search for another scope, otherwise
@@ -131,24 +129,22 @@ SymTable* ParseScopedIdent (char* Name, StrBuf* ScopeName)
          */
         if (Tok != TOK_NAMESPACE) {
             /* Symbol */
-            SB_Terminate (ScopeName);
             return Scope;
         }
 
         /* Pass the scope back to the caller */
-        SB_AppendStr (ScopeName, Name);
+        SB_Append (FullName, Name);
 
         /* Search for the child scope */
         Scope = SymFindScope (Scope, Name, SYM_FIND_EXISTING);
         if (Scope == 0) {
             /* Scope not found */
-            SB_Terminate (ScopeName);
-            Error ("No such scope: `%s'", SB_GetConstBuf (ScopeName));
+            Error ("No such scope: `%m%p'", FullName);
             return 0;
         }
 
         /* Skip the namespace token that follows */
-        SB_AppendStr (ScopeName, "::");
+        SB_AppendStr (FullName, "::");
         NextTok ();
     }
 }
@@ -160,19 +156,19 @@ SymEntry* ParseScopedSymName (int AllocNew)
  * and return the symbol table entry.
  */
 {
-    StrBuf    ScopeName = AUTO_STRBUF_INITIALIZER;
-    char      Ident[sizeof (SVal)];
+    StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf    Ident = STATIC_STRBUF_INITIALIZER;
     int       NoScope;
     SymEntry* Sym;
 
     /* Parse the scoped symbol name */
-    SymTable* Scope = ParseScopedIdent (Ident, &ScopeName);
+    SymTable* Scope = ParseScopedIdent (&Ident, &ScopeName);
 
     /* If ScopeName is empty, no scope was specified */
     NoScope = SB_IsEmpty (&ScopeName);
 
     /* We don't need ScopeName any longer */
-    DoneStrBuf (&ScopeName);
+    SB_Done (&ScopeName);
 
     /* Check if the scope is valid. Errors have already been diagnosed by
      * the routine, so just exit.
@@ -182,9 +178,9 @@ SymEntry* ParseScopedSymName (int AllocNew)
          * search also in the upper levels.
          */
         if (NoScope && !AllocNew) {
-            Sym = SymFindAny (Scope, Ident);
+            Sym = SymFindAny (Scope, &Ident);
         } else {
-            Sym = SymFind (Scope, Ident, AllocNew);
+            Sym = SymFind (Scope, &Ident, AllocNew);
         }
     } else {
         /* No scope ==> no symbol. To avoid errors in the calling routine that
@@ -192,11 +188,14 @@ SymEntry* ParseScopedSymName (int AllocNew)
          * symbol.
          */
         if (AllocNew) {
-            Sym = NewSymEntry (Ident, SF_NONE);
+            Sym = NewSymEntry (&Ident, SF_NONE);
         } else {
             Sym = 0;
         }
     }
+
+    /* Deallocate memory for ident */
+    SB_Done (&Ident);
 
     /* Return the symbol found */
     return Sym;
@@ -209,19 +208,19 @@ SymTable* ParseScopedSymTable (void)
  * symbol space and return the symbol table struct.
  */
 {
-    StrBuf    ScopeName = AUTO_STRBUF_INITIALIZER;
-    char      Name[sizeof (SVal)];
+    StrBuf    ScopeName = STATIC_STRBUF_INITIALIZER;
+    StrBuf    Name = STATIC_STRBUF_INITIALIZER;
     int       NoScope;
 
 
     /* Parse the scoped symbol name */
-    SymTable* Scope = ParseScopedIdent (Name, &ScopeName);
+    SymTable* Scope = ParseScopedIdent (&Name, &ScopeName);
 
     /* If ScopeName is empty, no scope was specified */
     NoScope = SB_IsEmpty (&ScopeName);
 
     /* We don't need FullName any longer */
-    DoneStrBuf (&ScopeName);
+    SB_Done (&ScopeName);
 
     /* If we got no error, search for the child scope withint the enclosing one.
      * Beware: If no explicit parent scope was specified, search in all upper
@@ -230,11 +229,16 @@ SymTable* ParseScopedSymTable (void)
     if (Scope) {
         /* Search for the last scope */
         if (NoScope) {
-            Scope = SymFindAnyScope (Scope, Name);
+            Scope = SymFindAnyScope (Scope, &Name);
         } else {
-            Scope = SymFindScope (Scope, Name, SYM_FIND_EXISTING);
+            Scope = SymFindScope (Scope, &Name, SYM_FIND_EXISTING);
         }
     }
+
+    /* Free memory for name */
+    SB_Done (&Name);
+
+    /* Return the scope found */
     return Scope;
 }
 

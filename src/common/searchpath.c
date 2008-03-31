@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -138,7 +138,7 @@ static char* Find (const char* Path, const char* File)
        	if (access (SB_GetBuf (&PathName), 0) == 0) {
 	    /* The file exists, return its name */
 	    char* Name = xstrdup (SB_GetBuf (&PathName));
-	    DoneStrBuf (&PathName);
+	    SB_Done (&PathName);
 	    return Name;
 	}
 
@@ -149,7 +149,7 @@ static char* Find (const char* Path, const char* File)
     }
 
     /* Not found */
-    DoneStrBuf (&PathName);
+    SB_Done (&PathName);
     return 0;
 }
 

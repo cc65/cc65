@@ -40,6 +40,7 @@
 
 /* common */
 #include "filepos.h"
+#include "strbuf.h"
 
 
 
@@ -77,6 +78,9 @@ void ObjWriteVar (unsigned long V);
 /* Write a variable sized value to the file in special encoding */
 
 void ObjWriteStr (const char* S);
+/* Write a string to the object file */
+
+void ObjWriteBuf (const StrBuf* S);
 /* Write a string to the object file */
 
 void ObjWriteData (const void* Data, unsigned Size);

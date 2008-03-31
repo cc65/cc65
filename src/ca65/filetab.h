@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -38,19 +38,24 @@
 
 
 
+/* common */
+#include "strbuf.h"
+
+
+
 /*****************************************************************************/
 /*     	       	    		     Code			   	     */
 /*****************************************************************************/
 
 
 
-const char* GetFileName (unsigned Name);
+const StrBuf* GetFileName (unsigned Name);
 /* Get the name of a file where the name index is known */
 
-unsigned GetFileIndex (const char* Name);
+unsigned GetFileIndex (const StrBuf* Name);
 /* Return the file index for the given file name. */
 
-unsigned AddFile (const char* Name, unsigned long Size, unsigned long MTime);
+unsigned AddFile (const StrBuf* Name, unsigned long Size, unsigned long MTime);
 /* Add a new file to the list of input files. Return the index of the file in
  * the table.
  */

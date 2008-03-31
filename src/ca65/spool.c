@@ -57,7 +57,7 @@ StringPool StrPool = STATIC_STRINGPOOL_INITIALIZER;
 
 void WriteStrPool (void)
 /* Write the string pool to the object file */
-{                  
+{
     unsigned I;
 
     /* Get the number of strings in the string pool */
@@ -71,7 +71,7 @@ void WriteStrPool (void)
 
     /* Write the strings in id order */
     for (I = 0; I < Count; ++I) {
-        ObjWriteStr (SP_Get (&StrPool, I));
+        ObjWriteBuf (SP_Get (&StrPool, I));
     }
 
     /* Done writing the string pool */

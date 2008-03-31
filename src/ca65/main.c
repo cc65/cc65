@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007, Ullrich von Bassewitz                                      */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -44,6 +44,7 @@
 #include "cmdline.h"
 #include "mmodel.h"
 #include "print.h"
+#include "strbuf.h"
 #include "target.h"
 #include "tgttrans.h"
 #include "version.h"
@@ -127,14 +128,17 @@ static void Usage (void)
 static void SetOptions (void)
 /* Set the option for the translator */
 {
-    char Buf [256];
+    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
     /* Set the translator */
-    sprintf (Buf, "ca65 V%u.%u.%u", VER_MAJOR, VER_MINOR, VER_PATCH);
-    OptTranslator (Buf);
+    SB_Printf (&Buf, "ca65 V%u.%u.%u", VER_MAJOR, VER_MINOR, VER_PATCH);
+    OptTranslator (&Buf);
 
     /* Set date and time */
     OptDateTime ((unsigned long) time(0));
+
+    /* Release memory for the string */
+    SB_Done (&Buf);
 }
 
 
@@ -144,8 +148,12 @@ static void NewSymbol (const char* SymName, long Val)
 {
     ExprNode* Expr;
 
+    /* Convert the name to a string buffer */
+    StrBuf SymBuf = STATIC_STRBUF_INITIALIZER;
+    SB_CopyStr (&SymBuf, SymName);
+
     /* Search for the symbol, allocate a new one if it doesn't exist */
-    SymEntry* Sym = SymFind (CurrentScope, SymName, SYM_ALLOC_NEW);
+    SymEntry* Sym = SymFind (CurrentScope, &SymBuf, SYM_ALLOC_NEW);
 
     /* Check if have already a symbol with this name */
     if (SymIsDef (Sym)) {
@@ -157,6 +165,9 @@ static void NewSymbol (const char* SymName, long Val)
 
     /* Mark the symbol as defined */
     SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_NONE);
+
+    /* Free string buffer memory */
+    SB_Done (&SymBuf);
 }
 
 
@@ -276,24 +287,21 @@ static void DefineSymbol (const char* Def)
     const char* P;
     unsigned I;
     long Val;
-    char SymName [MAX_STR_LEN+1];
+    StrBuf SymName = AUTO_STRBUF_INITIALIZER;
 
 
     /* The symbol must start with a character or underline */
-    if (Def [0] != '_' && !IsAlpha (Def [0])) {
+    if (!IsIdStart (Def [0])) {
 	InvDef (Def);
     }
     P = Def;
-
+         
     /* Copy the symbol, checking the rest */
     I = 0;
-    while (IsAlNum (*P) || *P == '_') {
-	if (I <= MAX_STR_LEN) {
-	    SymName [I++] = *P;
-	}
-	++P;
+    while (IsIdChar (*P)) {
+        SB_AppendChar (&SymName, *P++);
     }
-    SymName [I] = '\0';
+    SB_Terminate (&SymName);
 
     /* Do we have a value given? */
     if (*P != '=') {
@@ -317,7 +325,10 @@ static void DefineSymbol (const char* Def)
     }
 
     /* Define the new symbol */
-    NewSymbol (SymName, Val);
+    NewSymbol (SB_GetConstBuf (&SymName), Val);
+
+    /* Release string memory */
+    SB_Done (&SymName);
 }
 
 
@@ -356,8 +367,11 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Set an emulation feature */
 {
+    /* Make a string buffer from Arg */
+    StrBuf Feature;
+
     /* Set the feature, check for errors */
-    if (SetFeature (Arg) == FEAT_UNKNOWN) {
+    if (SetFeature (SB_InitFromString (&Feature, Arg)) == FEAT_UNKNOWN) {
       	AbEnd ("Illegal emulation feature: `%s'", Arg);
     }
 }
@@ -425,8 +439,11 @@ static void OptListing (const char* Opt attribute ((unused)),
 static void OptMacPackDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Set a macro package directory */
 {
+    /* Make a string buffer from Arg */
+    StrBuf Dir;
+
     /* Use the directory */
-    MacPackSetDir (Arg);
+    MacPackSetDir (SB_InitFromString (&Dir, Arg));
 }
 
 
@@ -545,13 +562,13 @@ static void OneLine (void)
     if (Tok == TOK_IDENT) {
         if (!UbiquitousIdents) {
             /* Macros and symbols cannot use instruction names */
-            Instr = FindInstruction (SVal);
+            Instr = FindInstruction (&SVal);
             if (Instr < 0) {
-                Macro = IsMacro (SVal);
+                Macro = IsMacro (&SVal);
             }
         } else {
             /* Macros and symbols may use the names of instructions */
-            Macro = IsMacro (SVal);
+            Macro = IsMacro (&SVal);
         }
     }
 
@@ -563,9 +580,9 @@ static void OneLine (void)
 
         /* Generate the symbol table entry, then skip the name */
         if (Tok == TOK_IDENT) {
-            Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
+            Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
         } else {
-            Sym = SymFindLocal (SymLast, SVal, SYM_ALLOC_NEW);
+            Sym = SymFindLocal (SymLast, &SVal, SYM_ALLOC_NEW);
         }
         NextTok ();
 
@@ -640,13 +657,13 @@ static void OneLine (void)
             if (Tok == TOK_IDENT) {
                 if (!UbiquitousIdents) {
                     /* Macros and symbols cannot use instruction names */
-                    Instr = FindInstruction (SVal);
+                    Instr = FindInstruction (&SVal);
                     if (Instr < 0) {
-                        Macro = IsMacro (SVal);
+                        Macro = IsMacro (&SVal);
                     }
                 } else {
                     /* Macros and symbols may use the names of instructions */
-                    Macro = IsMacro (SVal);
+                    Macro = IsMacro (&SVal);
                 }
             }
         }
@@ -660,7 +677,7 @@ static void OneLine (void)
         /* A macro expansion */
         MacExpandStart ();
     } else if (Instr >= 0 ||
-               (UbiquitousIdents && ((Instr = FindInstruction (SVal)) >= 0))) {
+               (UbiquitousIdents && ((Instr = FindInstruction (&SVal)) >= 0))) {
         /* A mnemonic - assemble one instruction */
         HandleInstruction (Instr);
     } else if (PCAssignment && (Tok == TOK_STAR || Tok == TOK_PC)) {
@@ -774,6 +791,9 @@ int main (int argc, char* argv [])
 	{ "--version", 	       	0,	OptVersion		},
     };
 
+    /* Name of the global name space */
+    static const StrBuf GlobalNameSpace = STATIC_STRBUF_INITIALIZER;
+
     unsigned I;
 
     /* Initialize the cmdline module */
@@ -782,7 +802,7 @@ int main (int argc, char* argv [])
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
-    SymEnterLevel ("", ST_GLOBAL, ADDR_SIZE_DEFAULT);
+    SymEnterLevel (&GlobalNameSpace, ST_GLOBAL, ADDR_SIZE_DEFAULT);
 
     /* Check the parameters */
     I = 1;

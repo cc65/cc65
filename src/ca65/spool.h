@@ -66,7 +66,7 @@ INLINE unsigned GetStrBufId (const StrBuf* S)
     return SP_Add (&StrPool, S);
 }
 #else
-#  define GetStringId(S)        SP_Add (&StrPool, (S))
+#  define GetStrBufId(S)        SP_Add (&StrPool, (S))
 #endif
 
 #if defined(HAVE_INLINE)
@@ -101,7 +101,7 @@ INLINE const char* GetString (unsigned Index)
 
 void WriteStrPool (void);
 /* Write the string pool to the object file */
-                                         
+
 
 
 /* End of spool.h */

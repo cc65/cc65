@@ -1144,7 +1144,7 @@ static void DoInclude (void)
     /* Name must follow */
     if (Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
-    } else {          
+    } else {
         SB_Terminate (&SVal);
     	NewInputFile (SB_GetConstBuf (&SVal));
     }
@@ -1558,9 +1558,11 @@ static void DoSetCPU (void)
     if (Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
+        cpu_t CPU;
+
         /* Try to find the CPU */
         SB_Terminate (&SVal);
-        cpu_t CPU = FindCPU (SB_GetConstBuf (&SVal));
+        CPU = FindCPU (SB_GetConstBuf (&SVal));
 
         /* Switch to the new CPU */
         SetCPU (CPU);

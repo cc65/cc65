@@ -147,13 +147,14 @@ static void NewSymbol (const char* SymName, long Val)
 /* Define a symbol with a fixed numeric value in the current scope */
 {
     ExprNode* Expr;
+    SymEntry* Sym;
 
     /* Convert the name to a string buffer */
     StrBuf SymBuf = STATIC_STRBUF_INITIALIZER;
     SB_CopyStr (&SymBuf, SymName);
 
     /* Search for the symbol, allocate a new one if it doesn't exist */
-    SymEntry* Sym = SymFind (CurrentScope, &SymBuf, SYM_ALLOC_NEW);
+    Sym = SymFind (CurrentScope, &SymBuf, SYM_ALLOC_NEW);
 
     /* Check if have already a symbol with this name */
     if (SymIsDef (Sym)) {
@@ -295,7 +296,7 @@ static void DefineSymbol (const char* Def)
 	InvDef (Def);
     }
     P = Def;
-         
+
     /* Copy the symbol, checking the rest */
     I = 0;
     while (IsIdChar (*P)) {

@@ -312,7 +312,7 @@ INLINE const StrBuf* GetSymName (const SymEntry* S)
     return GetStrBuf (S->Name);
 }
 #else
-#  define GetSymName(S)   GetString ((S)->Name)
+#  define GetSymName(S)   GetStrBuf ((S)->Name)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -353,3 +353,4 @@ INLINE const FilePos* GetSymPos (const SymEntry* S)
 
 
 
+                                    

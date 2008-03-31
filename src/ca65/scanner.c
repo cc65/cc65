@@ -646,8 +646,12 @@ static unsigned char FindDotKeyword (void)
  * return TOK_NONE if not found.
  */
 {
-    struct DotKeyword K = { SB_GetConstBuf (&SVal), 0 };
+    struct DotKeyword K;
     struct DotKeyword* R;
+
+    /* Initialize K */
+    K.Key = SB_GetConstBuf (&SVal);
+    K.Tok = 0;
 
     /* If we aren't in ignore case mode, we have to uppercase the keyword */
     if (!IgnoreCase) {

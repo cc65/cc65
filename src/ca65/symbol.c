@@ -62,12 +62,13 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
  * by the caller for error messages or similar.
  */
 {
+    SymTable* Scope;
+
     /* Clear both passed string buffers */
     SB_Clear (Name);
     SB_Clear (FullName);
 
     /* Get the starting table */
-    SymTable* Scope;
     if (Tok == TOK_NAMESPACE) {
 
         /* Start from the root scope */

@@ -80,7 +80,7 @@ INLINE unsigned GetStringId (const char* S)
     return SP_AddStr (&StrPool, S);
 }
 #else
-#  define GetStringId(S)        SP_Add (&StrPool, (S))
+#  define GetStringId(S)        SP_AddStr (&StrPool, (S))
 #endif
 
 #if defined(HAVE_INLINE)

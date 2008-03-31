@@ -634,6 +634,8 @@ static void NumericConst (void)
             if (CurC == '-') {
                 Sign = -1;
                 NextChar ();
+            } else if (CurC == '+') {
+                NextChar ();
             }
 
             /* Read exponent digits. Since we support only 32 bit floats

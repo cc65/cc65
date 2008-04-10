@@ -69,6 +69,7 @@ Programs containing NES specific code may use the <tt/nes.h/ header file.
 
 <itemize>
 <item>waitvblank
+<item>get_tv
 </itemize>
 
 

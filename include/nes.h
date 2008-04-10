@@ -83,10 +83,18 @@
 #define COLOR_LIGHTBLUE      	0x0E
 #define COLOR_GRAY3  	       	0x0F
 
+/* Return codes of get_tv */
+#define TV_NTSC         0
+#define TV_PAL          1
+#define TV_OTHER        2
+
 
 
 void __fastcall__ waitvblank (void);
 /* Wait for the vertical blanking */
+
+unsigned char __fastcall__ get_tv (void);
+/* Return the video mode the machine is using. */
 
 
 

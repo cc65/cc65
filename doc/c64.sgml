@@ -191,6 +191,10 @@ configuration.
   Autodetects the amount of memory available (16 or 64K) and offers 64 or 256
   pages of 256 bytes each.
 
+  <tag><tt/dtv-himem.emd/</tag>
+  A driver for the C64 D2TV (the second or PAL version). This driver offers
+  indeed 7680 pages of 256 bytes each.
+
 </descrip><p>
 
 

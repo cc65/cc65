@@ -1,20 +1,24 @@
 ;
 ; Ullrich von Bassewitz, 2003-04-14
+; Stefan Haubenthal, 2007-01-21
 ;
 ; Screen size function
 ;
 
-	.export	   	screensize
+	.export		screensize
 
-        .include        "nes.inc"
+	.include	"nes.inc"
+	.include	"get_tv.inc"
 
 
-.proc   screensize
+.proc	screensize
 
-        ldx     #charsperline
-        ldy     #screenrows
-        rts
+	jsr	_get_tv
+	ldx	#charsperline
+	ldy	#screenrows
+	cmp	#TV::NTSC
+	beq	nopal
+	dey
+nopal:	rts
 
 .endproc
-
-

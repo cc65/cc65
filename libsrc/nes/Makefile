@@ -54,6 +54,7 @@ OBJS =  _scrsize.o      \
         crt0.o          \
         ctype.o         \
         cvline.o        \
+        get_tv.o        \
         gotox.o         \
         gotoxy.o        \
         gotoy.o         \

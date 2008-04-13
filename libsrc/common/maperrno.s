@@ -4,6 +4,9 @@
 ; void _maperrno(void);
 ; /* Map an OS error to a system independent error code */
 ;
+; Second entry setoserror maps the OS error code in A to an errno code
+; and stores it into errno. _oserror is cleared.
+
 
         .include        "errno.inc"
 
@@ -13,6 +16,7 @@
 __maperrno:
 	lda	__oserror		; Get the error code
 	beq	@L1			; Jump if no error
+setoserror:       
 	ldx	#$00			; Clear error
 	stx	__oserror
 	jsr	__osmaperrno		; Map the code

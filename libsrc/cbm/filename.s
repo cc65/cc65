@@ -4,7 +4,7 @@
 ; File name handling for CBM file I/O
 ;
 
-        .export         fnparse, fnset, fnaddmode, fncomplete
+        .export         fnparse, fnset, fnaddmode, fncomplete, fndefunit
         .export         fnunit, fnlen, fncmd, fnbuf
 
         .import         SETNAM
@@ -21,17 +21,17 @@
 ;       fnlen   -> length of filename
 ;       fnbuf   -> filename including drive spec
 ;       fnunit  -> unit from spec or default unit
-
+;
+; Returns an error code in A or zero if all is ok.
 
 .proc   fnparse
 
         sta     ptr1
         stx     ptr1+1          ; Save pointer to name
 
-; For now we're always using the default unit
+; For now we will always use the default unit
 
-        lda     __curunit
-        sta     fnunit
+        jsr     fndefunit
 
 ; Check the name for a drive spec
 
@@ -110,6 +110,16 @@ namedone:
 
 .endproc
 
+;--------------------------------------------------------------------------
+; fndefunit: Use the default unit
+
+.proc   fndefunit
+
+        lda     __curunit
+        sta     fnunit
+        rts
+
+.endproc
 
 ;--------------------------------------------------------------------------
 ; fnset: Tell the kernal about the file name

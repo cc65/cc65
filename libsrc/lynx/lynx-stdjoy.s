@@ -65,38 +65,10 @@ JOY_COUNT       = 1             ; Number of joysticks we support
 ; memory available.
 ; Must return an JOY_ERR_xx code in a/x.
 ;
-; Here we also flip the joypad in case the display is flipped.
-; This install routine should be called after you send the flip code
-; to the display hardware.
 
 INSTALL:
-	lda	__viddma	; Process flipped displays
-	and	#2
-	beq	@L2
-
-; Set joypad for flipped display
-
-        lda     #$10
-        ldx     #$00
-@L1:    sta     joy_mask,x
-        inx
-        asl     a
-        bcc     @L1
-        bra     @L4
-
-; Set joypad for normal display
-
-@L2:    lda     #$10
-        ldx     #$03
-@L3:    sta     joy_mask,x
-        dex
-        asl     a
-        bcc     @L3
-
-; Done
-
-@L4:    lda     #<JOY_ERR_OK
-        ldx     #>JOY_ERR_OK
+        lda #<JOY_ERR_OK
+        ldx #>JOY_ERR_OK
 ;	rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

@@ -15,14 +15,14 @@
 
 __maperrno:
 	lda	__oserror		; Get the error code
-	beq	@L1			; Jump if no error
-setoserror:       
+       	beq    	L9			; Jump if no error
+setoserror:
 	ldx	#$00			; Clear error
 	stx	__oserror
 	jsr	__osmaperrno		; Map the code
        	sta    	__errno
 	stx	__errno+1
-@L1:	rts
+L9:	rts       
 
 
 

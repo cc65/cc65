@@ -8,6 +8,7 @@
         .global         __maperrno, __osmaperrno
         .global         __seterrno
         .global         oserrcheck, setoserror
+        .global         seterrnofromoserror
 
 ; Error codes, must match the values in the C headers
 .enum

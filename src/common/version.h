@@ -6,8 +6,8 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*									     */
@@ -45,8 +45,8 @@
 
 
 #define VER_MAJOR	2U
-#define VER_MINOR	11U
-#define VER_PATCH	9U
+#define VER_MINOR	12U
+#define VER_PATCH	0U
 
 #define VERSION         ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH)
 
@@ -58,3 +58,4 @@
 
 
 
+                         

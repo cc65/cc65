@@ -24,12 +24,12 @@ tools and the VICE CBM emulator.
 
 <sect>What is VICE?<p>
 
-VICE is an emulator for many of the CBM machines. It runs on Unix, DOS and
-Windows 95. It emulates the Commodore 64, 128, VIC20, PET and the 600/700
-machines. For more information see the VICE home page:
+VICE is an emulator for many of the CBM machines. It runs on Unix, MS-DOS,
+Win32, OS/2, Acorn RISC OS, BeOS, QNX 6.x, Amiga, GP2X and Mac OS X. It emulates
+the Commodore 64, 128, VIC20, PET and the 600/700 machines. For more information
+see the VICE home page:
 
-<htmlurl url="http://www.cs.cmu.edu/~dsladic/vice/vice.html"
-name="http://www.cs.cmu.edu/~dsladic/vice/vice.html">
+<htmlurl url="http://www.viceteam.org/">
 
 VICE has a builtin machine language monitor that may be used for debugging
 your programs. Using an emulator for debugging has some advantages:
@@ -48,11 +48,6 @@ inside the 1541 floppy.
 from the monitor.     
 
 </itemize>
-
-Please note that you need at least VICE version 0.16 for the label file
-feature to work. This version has still some problems (see <ref id="problems"
-name="Problems and workarounds">), but older versions had even more problems
-and do <em/not/ work correctly.
 
 
 
@@ -128,37 +123,6 @@ and you may use them whereever you need to specify an address. Try
 
 as an example (note that VICE needs a leading dot before all labels, and that
 the compiler prepends an underline under most named labels).
-
-
-
-<sect>Problems and workarounds<label id="problems"><p>
-
-Older versions of VICE had several problems with labels. However, even those
-versions were still tremendously useful, and all known problems are gone in
-current versions. So, here is a list of the problems known to me as of version
-0.16.1:
-
-<itemize>
-
-<item>The "<tt/ll/" command does not work. Worse, it seems that internal
-memory gets corrupted when using this command, so VICE will crash after use.
-Use the "<tt/pb/" command to load the label file in this case.
-
-<item>VICE will crash if you use a label that is undefined. This is probably
-the worst problem of all, since it needs just one typo to kill VICE. So, watch
-your steps:-)
-
-<item>Cheap labels, that is, labels starting with '@' or '?' are not accepted.
-
-<item>The disassembly output is somewhat suboptimal. However, most things are
-just cosmetical, e.g. labels appended to the right side of the disassembled
-code.
-
-</itemize>
-
-<bf>Note</bf>: All these problems are fixed in current (&gt;= 1.0) VICE
-versions. If you're really using such an old version, you should think about
-an upgrade.
 
 
 

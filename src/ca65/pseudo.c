@@ -1302,7 +1302,7 @@ static void DoOut (void)
 	/* Output the string and be sure to flush the output to keep it in
 	 * sync with any error messages if the output is redirected to a file.
 	 */
-	printf ("%m%p\n", &SVal);
+	printf ("%*s\n", SB_GetLen (&SVal), SB_GetConstBuf (&SVal));
 	fflush (stdout);
 	NextTok ();
     }

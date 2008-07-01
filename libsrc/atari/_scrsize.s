@@ -5,10 +5,12 @@
 ;
 
 	.export		screensize
+	.include	"atari.inc"
 
 .proc   screensize
 
-        ldx     #40
+        ldx     RMARGN
+        inx
         ldy     #24
         rts
 

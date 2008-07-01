@@ -344,8 +344,8 @@ COLRSH	= $4F		;ATRACT COLOR SHIFTER (EOR'ED WITH PLAYFIELD
 
 TMPCHR	= $50		;1-byte temporary character
 HOLD1	= $51		;1-byte temporary
-LMARGN	= $52		;LEFT MARGIN (SET TO 1 AT POWER ON>
-RMARGN	= $53		;RIGHT MARGIN (SET TO 38 AT POWER ON)
+LMARGN	= $52		;left margin (normally 2, cc65 C startup code sets it to 0)
+RMARGN	= $53		;right margin (normally 39 if no XEP80 is used)
 ROWCRS	= $54		;1-byte cursor row
 COLCRS	= $55		;2-byte cursor column
 DINDEX	= $57		;1-byte display mode

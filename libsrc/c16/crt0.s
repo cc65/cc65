@@ -102,10 +102,12 @@ L2:	lda	zpsave,x
 	jmp	RESTOR
 
 
-.data
+.segment        "ZPSAVE"
+
 zpsave:	.res	zpspace
 
 .bss
+
 spsave:	.res	1
 
 

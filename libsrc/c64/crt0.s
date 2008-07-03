@@ -150,8 +150,11 @@ IRQStub:
 
 .data
 
-zpsave:	.res	zpspace
 IRQInd: jmp     $0000
+
+.segment        "ZPSAVE"
+
+zpsave:	.res	zpspace
 
 .bss
 

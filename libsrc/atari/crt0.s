@@ -174,7 +174,7 @@ initsp:
 	sta	sp+1
 	rts
 
-	.data         
+.segment        "ZPSAVE"
 
 zpsave:	.res	zpspace
 

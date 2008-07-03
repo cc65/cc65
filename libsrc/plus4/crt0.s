@@ -147,8 +147,8 @@ IRQ:    cld			; Just to be sure
         bne     dobreak
 
 ; It's an IRQ and RAM is enabled. If we have handlers, call them. We will use
-; a flag here instead of loading __INTERRUPTOR_COUNT__ directly, since the 
-; condes function is not reentrant. The irqcount flag will be set/reset from 
+; a flag here instead of loading __INTERRUPTOR_COUNT__ directly, since the
+; condes function is not reentrant. The irqcount flag will be set/reset from
 ; the main code, to avoid races.
 
    	ldy    	irqcount
@@ -194,12 +194,15 @@ nohandler:
 ; Data
 
 .data
-zpsave:	        .res	zpspace
 
 ; BRK handling
 brk_jmp:        jmp     $0000
 
 spsave:	        .res	1
+
+.segment        "ZPSAVE"
+
+zpsave:	        .res	zpspace
 
 .bss
 irqcount:       .byte   0

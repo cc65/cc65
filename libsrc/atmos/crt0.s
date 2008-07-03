@@ -27,7 +27,7 @@
         .byte   $00                             ; $2AF
         .byte   $80                             ; $2AE Machine code flag
         .byte   $C7                             ; $2AD Autoload flag
-        .dbyt   __BSS_LOAD__                    ; $2AB           
+        .dbyt   __BSS_LOAD__                    ; $2AB
         .dbyt   __RAM_START__                   ; $2A9
         .byte   $00                             ; $2A8
         .byte   $00                             ; Zero terminated name
@@ -100,7 +100,7 @@ L2:	lda	zpsave,x
 ; ------------------------------------------------------------------------
 ; Data
 
-.data
+.segment        "ZPSAVE"
 
 zpsave:	.res	zpspace
 

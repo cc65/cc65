@@ -182,7 +182,8 @@ IRQStub:
 ; ------------------------------------------------------------------------
 ; Data
 
-.data
+.segment        "ZPSAVE"
+
 zpsave:	.res	zpspace
 
 .bss

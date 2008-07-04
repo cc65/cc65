@@ -15,7 +15,7 @@
 	.import		initlib, donelib, callmain
        	.import	       	zerobss, pushax
 	.import		_main, __filetab, getfd
-	.import		__LOWCODE_LOAD__, __BSS_LOAD__
+	.import		__LOWCODE_LOAD__, __ZPSAVE_LOAD__
 	.import		__RESERVED_MEMORY__
 .ifdef	DYNAMIC_DD
 	.import		__getdefdev
@@ -31,7 +31,7 @@
 	.segment "EXEHDR"
 	.word	$FFFF
 	.word	__LOWCODE_LOAD__
-	.word	__BSS_LOAD__ - 1
+	.word	__ZPSAVE_LOAD__ - 1
 
 ; ------------------------------------------------------------------------
 ; Actual code

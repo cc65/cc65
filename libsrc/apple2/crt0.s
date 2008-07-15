@@ -11,7 +11,7 @@
         .import        	__RAM_START__ , __RAM_LAST__	; Linker generated
         .import         __MOVE_START__, __MOVE_LAST__	; Linker generated
         .import         __LC_START__  , __LC_LAST__	; Linker generated
-        .import        	__BSS_RUN__   , __INIT_SIZE__	; Linker generated
+        .import        	__ZPSAVE_RUN__, __INIT_SIZE__	; Linker generated
         .import        	__INTERRUPTOR_COUNT__		; Linker generated
 
         .include        "zeropage.inc"
@@ -24,8 +24,8 @@
         .segment        "EXEHDR"
 
         .addr           __RAM_START__			; Start address
-        .word           __BSS_RUN__   - __RAM_START__ + \
-			__MOVE_LAST__ - __MOVE_START__	; Size
+        .word           __ZPSAVE_RUN__ - __RAM_START__ + \
+			__MOVE_LAST__  - __MOVE_START__	; Size
 
 ; ------------------------------------------------------------------------
 
@@ -42,14 +42,14 @@
 	bit	$C081
 	
 	; Set source start address
-	lda	#<(__BSS_RUN__ + __INIT_SIZE__)
-	ldy	#>(__BSS_RUN__ + __INIT_SIZE__)
+	lda	#<(__ZPSAVE_RUN__ + __INIT_SIZE__)
+	ldy	#>(__ZPSAVE_RUN__ + __INIT_SIZE__)
 	sta	$9B
 	sty	$9C
 	
 	; Set source last address
-	lda	#<(__BSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
-	ldy	#>(__BSS_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
+	lda	#<(__ZPSAVE_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
+	ldy	#>(__ZPSAVE_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
 	sta	$96
 	sty	$97
 
@@ -64,14 +64,14 @@
 	jsr	$D396		; BLTU + 3
 
 	; Set source start address
-	lda	#<__BSS_RUN__
-	ldy	#>__BSS_RUN__
+	lda	#<__ZPSAVE_RUN__
+	ldy	#>__ZPSAVE_RUN__
 	sta	$9B
 	sty	$9C
 	
 	; Set source last address
-	lda	#<(__BSS_RUN__ + __INIT_SIZE__)
-	ldy	#>(__BSS_RUN__ + __INIT_SIZE__)
+	lda	#<(__ZPSAVE_RUN__ + __INIT_SIZE__)
+	ldy	#>(__ZPSAVE_RUN__ + __INIT_SIZE__)
 	sta	$96
 	sty	$97
 
@@ -253,11 +253,15 @@ reset:  stx     SOFTEV
 
         .data
 
-zpsave: .res    zpspace
-
 params: .byte   $02		; Parameter count
 intnum: .byte   $00		; Interrupt number
         .addr   intrpt		; Interrupt handler
+
+; ------------------------------------------------------------------------
+
+        .segment        "ZPSAVE"
+
+zpsave: .res    zpspace
 
 ; ------------------------------------------------------------------------
 

@@ -258,6 +258,12 @@ Therefore the DIO read and write functions transfer only 128 bytes
 for sectors 1 to 3, regardless of the type of diskette.
 
 
+<sect>CONIO implementation<label id="conio"><p>
+
+The console I/O is speed optimized therefore support for XEP80 hardware
+or f80.com software is missing. Of course you may use stdio.h functions.
+
+
 <sect>Other hints<p>
 
 <sect1>Function keys<p>

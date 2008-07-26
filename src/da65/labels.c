@@ -360,17 +360,6 @@ void ForwardLabel (unsigned Offs)
 
 
 
-void ForwardLabels (unsigned Size)
-/* Define forward labels for the range PC to PC+Size-1 if necessary */
-{
-    unsigned I;
-    for (I = 0; I < Size; ++I) {
-        ForwardLabel (I);
-    }
-}
-
-
-
 static void DefOutOfRangeLabel (unsigned long Addr)
 /* Define one label that is outside code range. */
 {

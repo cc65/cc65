@@ -31,6 +31,7 @@
 #include "scanner.h"
 #include "shiftexpr.h"
 #include "stackptr.h"
+#include "standard.h"
 #include "stdfunc.h"
 #include "symtab.h"
 #include "typecmp.h"
@@ -688,11 +689,17 @@ static void Primary (ExprDesc* E)
 
                 /* IDENT is either an auto-declared function or an undefined variable. */
                 if (CurTok.Tok == TOK_LPAREN) {
-                    /* Declare a function returning int. For that purpose, prepare a
+                    /* C99 doesn't allow calls to undefined functions, so
+                     * generate an error and otherwise a warning. Declare a
+                     * function returning int. For that purpose, prepare a
                      * function signature for a function having an empty param list
                      * and returning int.
                      */
-                    Warning ("Function call without a prototype");
+                    if (IS_Get (&Standard) >= STD_C99) {
+                        Error ("Call to undefined function `%s'", Ident);
+                    } else {
+                        Warning ("Call to undefined function `%s'", Ident);
+                    }
                     Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
                     E->Type  = Sym->Type;
                     E->Flags = E_LOC_GLOBAL | E_RTYPE_RVAL;

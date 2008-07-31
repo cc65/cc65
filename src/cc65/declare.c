@@ -303,7 +303,7 @@ static void ParseEnumDecl (void)
 	/* We expect an identifier */
    	if (CurTok.Tok != TOK_IDENT) {
    	    Error ("Identifier expected");
-   	    continue;
+    	    continue;
    	}
 
 	/* Remember the identifier and skip it */
@@ -503,7 +503,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 	      	D->Type[0].C = T_SHORT;
 	    	D->Type[1].C = T_END;
     	    }
-	    break;
+    	    break;
 
     	case TOK_INT:
     	    NextToken ();
@@ -530,7 +530,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 
     		case TOK_LONG:
     		    NextToken ();
-    	 	    OptionalInt ();
+    	    	    OptionalInt ();
 		    D->Type[0].C = T_LONG;
 		    D->Type[1].C = T_END;
     	     	    break;
@@ -609,7 +609,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 	    /* Declare the struct in the current scope */
     	    Entry = ParseStructDecl (Ident, StructType);
        	    /* Encode the struct entry into the type */
-	    D->Type[0].C = StructType;
+    	    D->Type[0].C = StructType;
 	    SetSymEntry (D->Type, Entry);
 	    D->Type[1].C = T_END;
 	    break;
@@ -742,7 +742,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
 	    if (Decl.Ident[0] != '\0') {
 
-		/* We have a name given. Search for the symbol */
+	    	/* We have a name given. Search for the symbol */
 		SymEntry* Sym = FindLocalSym (Decl.Ident);
 		if (Sym) {
 		    /* Found it, change the default type to the one given */
@@ -849,7 +849,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 
 
-static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
+static FuncDesc* ParseFuncDecl (void)
 /* Parse the argument list of a function. */
 {
     unsigned Offs;
@@ -879,19 +879,6 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
      	    /* Old style (K&R) function. */
      	    F->Flags |= FD_OLDSTYLE;
      	}
-    }
-
-    /* Check for an implicit int return in the function */
-    if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
-        Spec->Type[0].C == T_INT         &&
-        Spec->Type[1].C == T_END) {
-        /* Function has an implicit int return. Output a warning if we don't
-         * have the C89 standard enabled explicitly.
-         */
-        if (IS_Get (&Standard) >= STD_C99) {
-            Warning ("Implicit `int' return type is an obsolete feature");
-        }
-        F->Flags |= FD_OLDSTYLE_INTRET;
     }
 
     /* Parse params */
@@ -1031,21 +1018,21 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 	/* Remember the current type pointer */
     	Type* T = D->Type + D->Index;
 
-	/* Read the flags */
-	unsigned Flags = FunctionModifierFlags ();
+    	/* Read the flags */
+    	unsigned Flags = FunctionModifierFlags ();
 
-	/* Parse the function */
-	Decl (Spec, D, Mode);
+    	/* Parse the function */
+    	Decl (Spec, D, Mode);
 
-	/* Check that we have a function */
-	if (!IsTypeFunc (T) && !IsTypeFuncPtr (T)) {
-	    Error ("Function modifier applied to non function");
-	} else {
+    	/* Check that we have a function */
+    	if (!IsTypeFunc (T) && !IsTypeFuncPtr (T)) {
+    	    Error ("Function modifier applied to non function");
+    	} else {
             ApplyFunctionModifiers (T, Flags);
         }
 
-	/* Done */
-	return;
+    	/* Done */
+    	return;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
@@ -1080,19 +1067,19 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
        	if (CurTok.Tok == TOK_LPAREN) {
 
        	    /* Function declaration */
-	    FuncDesc* F;
+    	    FuncDesc* F;
        	    NextToken ();
 
-	    /* Parse the function declaration */
-       	    F = ParseFuncDecl (Spec);
+    	    /* Parse the function declaration */
+       	    F = ParseFuncDecl ();
 
-	    /* Add the function type. Be sure to bounds check the type buffer */
-	    AddFuncTypeToDeclaration (D, F);
+    	    /* Add the function type. Be sure to bounds check the type buffer */
+    	    AddFuncTypeToDeclaration (D, F);
        	} else {
-	    /* Array declaration */
+    	    /* Array declaration */
        	    long Size = UNSPECIFIED;
        	    NextToken ();
-	    /* Read the size if it is given */
+    	    /* Read the size if it is given */
        	    if (CurTok.Tok != TOK_RBRACK) {
     	     	ExprDesc Expr;
        	       	ConstAbsIntExpr (hie1, &Expr);
@@ -1108,8 +1095,8 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
        	    }
        	    ConsumeRBrack ();
 
-	    /* Add the array type with the size */
-	    AddArrayToDeclaration (D, Size);
+    	    /* Add the array type with the size */
+    	    AddArrayToDeclaration (D, Size);
        	}
     }
 }
@@ -1160,17 +1147,58 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     /* Fix any type qualifiers attached to an array type */
     FixArrayQualifiers (D->Type);
 
+    /* Check several things for function or function pointer types */
+    if (IsTypeFunc (D->Type) || IsTypeFuncPtr (D->Type)) {
+
+        /* A function. Check the return type */
+        Type* RetType = GetFuncReturn (D->Type);
+
+        /* Functions may not return functions or arrays */
+        if (IsTypeFunc (RetType)) {
+            Error ("Functions are not allowed to return functions");
+        } else if (IsTypeArray (RetType)) {
+            Error ("Functions are not allowed to return arrays");
+        }
+
+        /* The return type must not be qualified */
+        if (GetQualifier (RetType) != T_QUAL_NONE && RetType[1].C == T_END) {
+
+            if (GetType (RetType) == T_TYPE_VOID) {
+                /* A qualified void type is always an error */
+                Error ("function definition has qualified void return type");
+            } else {
+                /* For others, qualifiers are ignored */
+                Warning ("type qualifiers ignored on function return type");
+                RetType[0].C = UnqualifiedType (RetType[0].C);
+            }
+        }
+
+        /* Warn about an implicit int return in the function */
+        if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
+            RetType[0].C == T_INT && RetType[1].C == T_END) {
+            /* Function has an implicit int return. Output a warning if we don't
+             * have the C89 standard enabled explicitly.
+             */
+            if (IS_Get (&Standard) >= STD_C99) {
+                Warning ("Implicit `int' return type is an obsolete feature");
+            }
+            GetFuncDesc (D->Type)->Flags |= FD_OLDSTYLE_INTRET;
+        }
+
+    }
+
     /* Check the size of the generated type */
     if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type)) {
-       	unsigned Size = SizeOf (D->Type);
-       	if (Size >= 0x10000) {
-       	    if (D->Ident[0] != '\0') {
-       	       	Error ("Size of `%s' is invalid (0x%06X)", D->Ident, Size);
-       	    } else {
-       	 	Error ("Invalid size in declaration (0x%06X)", Size);
-       	    }
-       	}
+        unsigned Size = SizeOf (D->Type);
+        if (Size >= 0x10000) {
+            if (D->Ident[0] != '\0') {
+                Error ("Size of `%s' is invalid (0x%06X)", D->Ident, Size);
+            } else {
+                Error ("Invalid size in declaration (0x%06X)", Size);
+            }
+        }
     }
+
 }
 
 

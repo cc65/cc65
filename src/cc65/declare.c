@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -696,7 +696,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	}
 
 	/* Create a symbol table entry with type int */
-	AddLocalSym (CurTok.Ident, type_int, SC_AUTO | SC_PARAM | SC_DEF, 0);
+	AddLocalSym (CurTok.Ident, type_int, SC_AUTO | SC_PARAM | SC_DEF | SC_DEFTYPE, 0);
 
 	/* Count arguments */
        	++F->ParamCount;
@@ -736,7 +736,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	/* Parse a comma separated variable list */
 	while (1) {
 
-	    Declaration 	Decl;
+	    Declaration       	Decl;
 
 	    /* Read the parameter */
 	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
@@ -745,8 +745,18 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	    	/* We have a name given. Search for the symbol */
 		SymEntry* Sym = FindLocalSym (Decl.Ident);
 		if (Sym) {
-		    /* Found it, change the default type to the one given */
-		    ChangeSymType (Sym, ParamTypeCvt (Decl.Type));
+                    /* Check if we already changed the type for this
+                     * parameter
+                     */
+                    if (Sym->Flags & SC_DEFTYPE) {
+                        /* Found it, change the default type to the one given */
+                        ChangeSymType (Sym, ParamTypeCvt (Decl.Type));
+                        /* Reset the "default type" flag */
+                        Sym->Flags &= ~SC_DEFTYPE;
+                    } else {
+                        /* Type has already been changed */
+                        Error ("Redefinition for parameter `%s'", Sym->Name);
+                    }
 		} else {
 		    Error ("Unknown identifier: `%s'", Decl.Ident);
 		}

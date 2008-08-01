@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -76,6 +76,7 @@ struct Segments;
 #define SC_PARAM       	0x0080U	/* This is a function parameter */
 #define SC_FUNC	     	0x0100U	/* Function entry */
 
+#define SC_DEFTYPE      0x0200U /* Parameter has default type (=int, old style) */
 #define SC_STORAGE     	0x0400U	/* Symbol with associated storage */
 #define SC_DEFAULT     	0x0800U	/* Flag: default storage class was used */
 

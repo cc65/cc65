@@ -71,6 +71,19 @@
 
 
 
+static void CheckLabelWithoutStatement (void)
+/* Called from Statement() after a label definition. Will check for a
+ * following closing curly brace. This means that a label is not followed
+ * by a statement which is required by the standard. Output an error if so.
+ */
+{
+    if (CurTok.Tok == TOK_RCURLY) {
+        Error ("Label at end of compound statement");
+    }
+}
+
+
+
 static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
 /* Helper function for Statement. Will check for Tok and print Msg if not
  * found. If PendingToken is NULL, it will the skip the token, otherwise
@@ -534,6 +547,7 @@ int Statement (int* PendingToken)
 
 	/* Special handling for a label */
 	DoLabel ();
+        CheckLabelWithoutStatement ();
 
     } else {
 
@@ -595,10 +609,12 @@ int Statement (int* PendingToken)
 
             case TOK_CASE:
                 CaseLabel ();
+                CheckLabelWithoutStatement ();
                 break;
 
             case TOK_DEFAULT:
                 DefaultLabel ();
+                CheckLabelWithoutStatement ();
                 break;
 
 	    default:

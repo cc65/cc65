@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -56,7 +56,29 @@
 
 
 /*****************************************************************************/
-/*	  	    		     Code  		     		     */
+/*	  	    		     Data  		     		     */
+/*****************************************************************************/
+
+
+
+typedef struct SwitchCtrl SwitchCtrl;
+struct SwitchCtrl {
+    Collection* Nodes;          /* CaseNode tree */
+    TypeCode    ExprType;       /* Basic switch expression type */
+    unsigned    Depth;          /* Number of bytes the selector type has */
+    unsigned    DefaultLabel;   /* Label for the default branch */
+
+
+
+};
+
+/* Pointer to current switch control struct */
+static SwitchCtrl* Switch = 0;
+
+
+
+/*****************************************************************************/
+/*  	       	    		     Code  		     		     */
 /*****************************************************************************/
 
 
@@ -64,20 +86,15 @@
 void SwitchStatement (void)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
-    Collection* Nodes;          /* CaseNode tree */
-    ExprDesc SwitchExpr;       	/* Switch statement expression */
-    ExprDesc CaseExpr;          /* Case label expression */
-    TypeCode SwitchExprType;    /* Basic switch expression type */
-    CodeMark CaseCodeStart;     /* Start of code marker */
-    CodeMark SwitchCodeStart;   /* Start of switch code */
-    CodeMark SwitchCodeEnd;     /* End of switch code */
-    unsigned Depth;             /* Number of bytes the selector type has */
-    unsigned ExitLabel;	       	/* Exit label */
-    unsigned CaseLabel;         /* Label for case */
-    unsigned DefaultLabel;      /* Label for the default branch */
-    unsigned SwitchCodeLabel;   /* Label for the switch code */
-    long     Val;               /* Case label value */
-    int      HaveBreak = 0;     /* True if the last statement had a break */
+    ExprDesc    SwitchExpr;     /* Switch statement expression */
+    CodeMark    CaseCodeStart;  /* Start of code marker */
+    CodeMark    SwitchCodeStart;/* Start of switch code */
+    CodeMark    SwitchCodeEnd;  /* End of switch code */
+    unsigned    ExitLabel;	/* Exit label */
+    unsigned    SwitchCodeLabel;/* Label for the switch code */
+    int         HaveBreak = 0;  /* True if the last statement had a break */
+    SwitchCtrl* OldSwitch;      /* Pointer to old switch control data */
+    SwitchCtrl  SwitchData;     /* New switch data */
 
 
     /* Eat the "switch" token */
@@ -112,15 +129,13 @@ void SwitchStatement (void)
      */
     GetCodePos (&CaseCodeStart);
 
-    /* Opening curly brace */
-    ConsumeLCurly ();
-
-    /* Get the unqualified type of the switch expression */
-    SwitchExprType = UnqualifiedType (SwitchExpr.Type[0].C);
-
-    /* Get the number of bytes the selector type has */
-    Depth = SizeOf (SwitchExpr.Type);
-    CHECK (Depth == SIZEOF_CHAR || Depth == SIZEOF_INT || Depth == SIZEOF_LONG);
+    /* Setup the control structure, save the old and activate the new one */
+    SwitchData.Nodes        = NewCollection ();
+    SwitchData.ExprType     = UnqualifiedType (SwitchExpr.Type[0].C);
+    SwitchData.Depth        = SizeOf (SwitchExpr.Type);
+    SwitchData.DefaultLabel = 0;
+    OldSwitch = Switch;
+    Switch = &SwitchData;
 
     /* Get the exit label for the switch statement */
     ExitLabel = GetLocalLabel ();
@@ -128,109 +143,19 @@ void SwitchStatement (void)
     /* Create a loop so we may use break. */
     AddLoop (ExitLabel, 0);
 
-    /* Create the collection for the case node tree */
-    Nodes = NewCollection ();
-
-    /* Clear the label for the default branch */
-    DefaultLabel = 0;
-
-    /* Parse the labels */
-    while (CurTok.Tok != TOK_RCURLY) {
-
-	while (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT) {
-
-	    /* Parse the selector */
-	    if (CurTok.Tok == TOK_CASE) {
-
-		/* Skip the "case" token */
-		NextToken ();
-
-		/* Read the selector expression */
-		ConstAbsIntExpr (hie1, &CaseExpr);
-
-		/* Check the range of the expression */
-		Val = CaseExpr.IVal;
-		switch (SwitchExprType) {
-
-		    case T_SCHAR:
-		      	/* Signed char */
-		      	if (Val < -128 || Val > 127) {
-		      	    Error ("Range error");
-		      	}
-		      	break;
-
-		    case T_UCHAR:
-		      	if (Val < 0 || Val > 255) {
-		      	    Error ("Range error");
-		      	}
-		      	break;
-
-		    case T_SHORT:
-		    case T_INT:
-		      	if (Val < -32768 || Val > 32767) {
-		      	    Error ("Range error");
-		      	}
-		      	break;
-
-		    case T_USHORT:
-		    case T_UINT:
-		      	if (Val < 0 || Val > 65535) {
-     		      	    Error ("Range error");
-		      	}
-		      	break;
-
-		    case T_LONG:
-		    case T_ULONG:
-		        break;
-
-	 	    default:
-		      	Internal ("Invalid type: %06lX", SwitchExprType);
-		}
-
-		/* Insert the case selector into the selector table */
-       		CaseLabel = InsertCaseValue (Nodes, Val, Depth);
-
-		/* Define this label */
-		g_defcodelabel (CaseLabel);
-
-		/* Skip the colon */
-     		ConsumeColon ();
-
-     	    } else {
-
-     		/* Default case */
-     		NextToken ();
-
-     		/* Check if we do already have a default branch */
-     		if (DefaultLabel == 0) {
-
-     		    /* Generate and emit the default label */
-     		    DefaultLabel = GetLocalLabel ();
-     		    g_defcodelabel (DefaultLabel);
-
-     		} else {
-     		    /* We had the default label already */
-     		    Error ("Duplicate `default' case");
-     		}
-
-     		/* Skip the colon */
-     		ConsumeColon ();
-
-     	    }
-
-     	}
-
-     	/* Parse statements */
-     	if (CurTok.Tok != TOK_RCURLY) {
-       	    HaveBreak = Statement (0);
-     	}
+    /* Make sure a curly brace follows */
+    if (CurTok.Tok != TOK_LCURLY) {
+        Error ("`{' expected");
     }
 
+    /* Parse the following statement, which will actually be a compound
+     * statement because of the curly brace at the current input position
+     */
+    HaveBreak = Statement (0);
+
     /* Check if we had any labels */
-    if (CollCount (Nodes) == 0 && DefaultLabel == 0) {
-
+    if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
 	Warning ("No case labels");
-
     }
 
     /* If the last statement did not have a break, we may have an open
@@ -251,7 +176,11 @@ void SwitchStatement (void)
     g_defcodelabel (SwitchCodeLabel);
 
     /* Generate code */
-    g_switch (Nodes, DefaultLabel? DefaultLabel : ExitLabel, Depth);
+    if (SwitchData.DefaultLabel == 0) {
+        /* No default label, use switch exit */
+        SwitchData.DefaultLabel = ExitLabel;
+    }
+    g_switch (SwitchData.Nodes, SwitchData.DefaultLabel, SwitchData.Depth);
 
     /* Move the code to the front */
     GetCodePos (&SwitchCodeEnd);
@@ -259,15 +188,124 @@ void SwitchStatement (void)
 
     /* Define the exit label */
     g_defcodelabel (ExitLabel);
+                                                                    
+    /* Exit the loop */
+    DelLoop ();
 
-    /* Eat the closing curly brace */
-    NextToken ();
+    /* Switch back to the enclosing switch statement if any */
+    Switch = OldSwitch;
 
     /* Free the case value tree */
-    FreeCaseNodeColl (Nodes);
+    FreeCaseNodeColl (SwitchData.Nodes);
+}
 
-    /* End the loop */
-    DelLoop ();
+
+
+void CaseLabel (void)
+/* Handle a case sabel */
+{
+    ExprDesc CaseExpr;          /* Case label expression */
+    long     Val;               /* Case label value */
+    unsigned CodeLabel;         /* Code label for this case */
+
+
+    /* Skip the "case" token */
+    NextToken ();
+
+    /* Read the selector expression */
+    ConstAbsIntExpr (hie1, &CaseExpr);
+    Val = CaseExpr.IVal;
+
+    /* Now check if we're inside a switch statement */
+    if (Switch != 0) {
+
+        /* Check the range of the expression */
+        switch (Switch->ExprType) {
+
+            case T_SCHAR:
+                /* Signed char */
+                if (Val < -128 || Val > 127) {
+                    Error ("Range error");
+                }
+                break;
+
+            case T_UCHAR:
+                if (Val < 0 || Val > 255) {
+                    Error ("Range error");
+                }
+                break;
+
+            case T_SHORT:
+            case T_INT:
+                if (Val < -32768 || Val > 32767) {
+                    Error ("Range error");
+                }
+                break;
+
+            case T_USHORT:
+            case T_UINT:
+                if (Val < 0 || Val > 65535) {
+                    Error ("Range error");
+                }
+                break;
+
+            case T_LONG:
+            case T_ULONG:
+                break;
+
+            default:
+                Internal ("Invalid type: %06lX", Switch->ExprType);
+        }
+
+        /* Insert the case selector into the selector table */
+        CodeLabel = InsertCaseValue (Switch->Nodes, Val, Switch->Depth);
+
+        /* Define this label */
+        g_defcodelabel (CodeLabel);
+
+    } else {
+
+        /* case keyword outside a switch statement */
+        Error ("Case label not within a switch statement");
+
+    }
+
+    /* Skip the colon */
+    ConsumeColon ();
+}
+
+
+
+void DefaultLabel (void)
+/* Handle a default label */
+{
+    /* Default case */
+    NextToken ();
+
+    /* Now check if we're inside a switch statement */
+    if (Switch != 0) {
+
+        /* Check if we do already have a default branch */
+        if (Switch->DefaultLabel == 0) {
+
+            /* Generate and emit the default label */
+            Switch->DefaultLabel = GetLocalLabel ();
+            g_defcodelabel (Switch->DefaultLabel);
+
+        } else {
+            /* We had the default label already */
+            Error ("Multiple default labels in one switch");
+        }
+
+    } else {
+
+        /* case keyword outside a switch statement */
+        Error ("`default' label not within a switch statement");
+
+    }
+
+    /* Skip the colon */
+    ConsumeColon ();
 }
 
 

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -46,6 +46,12 @@
 
 void SwitchStatement (void);
 /* Handle a 'switch' statement */
+
+void CaseLabel (void);
+/* Handle a case label */
+
+void DefaultLabel (void);
+/* Handle a default label */
 
 
 

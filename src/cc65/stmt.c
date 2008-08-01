@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -57,9 +57,9 @@
 #include "pragma.h"
 #include "scanner.h"
 #include "stackptr.h"
+#include "stmt.h"
 #include "swstmt.h"
 #include "symtab.h"
-#include "stmt.h"
 #include "testexpr.h"
 #include "typeconv.h"
 
@@ -542,7 +542,7 @@ int Statement (int* PendingToken)
      	    case TOK_LCURLY:
 	        NextToken ();
 		GotBreak = CompoundStatement ();
-	        CheckTok (TOK_RCURLY, "`{' expected", PendingToken);
+       	        CheckTok (TOK_RCURLY, "`{' expected", PendingToken);
 	        return GotBreak;
 
      	    case TOK_IF:
@@ -567,7 +567,7 @@ int Statement (int* PendingToken)
 
 	    case TOK_BREAK:
 		BreakStatement ();
-	    	CheckSemi (PendingToken);
+       	    	CheckSemi (PendingToken);
 		return 1;
 
 	    case TOK_CONTINUE:
@@ -593,6 +593,14 @@ int Statement (int* PendingToken)
 		DoPragma ();
      		break;
 
+            case TOK_CASE:
+                CaseLabel ();
+                break;
+
+            case TOK_DEFAULT:
+                DefaultLabel ();
+                break;
+
 	    default:
                 /* Remember the current code position */
                 GetCodePos (&Start);
@@ -606,7 +614,7 @@ int Statement (int* PendingToken)
                 }
                 /* If the statement didn't generate code, and is not of type
                  * void, emit a warning.
-                 */     
+                 */
                 GetCodePos (&End);
                 if (CodeRangeIsEmpty (&Start, &End) && !IsTypeVoid (Expr.Type)) {
                     Warning ("Statement has no effect");

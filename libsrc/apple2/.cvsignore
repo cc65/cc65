@@ -1,9 +1,0 @@
-*.emd
-*.joy
-*.mou
-*.ser
-*.tgi
-closedir.s
-opendir.s
-readdir.s
-rewinddir.s

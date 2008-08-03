@@ -215,6 +215,7 @@ Yank:
     asm ("dec %v", CharCount);
 
 Done:
+    ;
 }
 
 
@@ -262,6 +263,7 @@ static void ReadChar (void)
     asm ("inc %v+1", CharCount);
 
 Done:
+    ;
 }
 
 
@@ -292,6 +294,7 @@ static void CheckEnd (void)
 
         Error (RC_EOF);
 Done:
+    ;
 }
 
 
@@ -407,7 +410,7 @@ Loop:   asm ("lda %v,y", IntVal);
         asm ("inc %v", Assignments);
         asm ("bne %g", Done);
         asm ("inc %v+1", Assignments);
-Done:
+Done:   ;
     }
 }
 

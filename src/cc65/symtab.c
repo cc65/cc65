@@ -753,14 +753,20 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 
 	    /* In case of a function, use the new type descriptor, since it
 	     * contains pointers to the new symbol tables that are needed if
-	     * an actual function definition follows.
+	     * an actual function definition follows. Be sure not to use the
+             * new descriptor if it contains a function declaration with an
+             * empty parameter list.
 	     */
 	    if (IsFunc) {
 		/* Get the function descriptor from the new type */
 		FuncDesc* F = GetFuncDesc (T);
-		/* Use this new function descriptor */
-		Entry->V.F.Func = F;
-		SetFuncDesc (EType, F);
+		/* Use this new function descriptor if it doesn't contain
+                 * an empty parameter list.
+                 */
+                if ((F->Flags & FD_EMPTY) == 0) {
+                    Entry->V.F.Func = F;
+                    SetFuncDesc (EType, F);
+                }
 	    }
      	}
 

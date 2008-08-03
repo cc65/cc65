@@ -1,13 +1,13 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   typecmp.c				     */
+/*   				   typecmp.c				     */
 /*                                                                           */
-/*		 Type compare function for the cc65 C compiler		     */
+/*   		 Type compare function for the cc65 C compiler		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -58,20 +58,76 @@ static void SetResult (typecmp_t* Result, typecmp_t Val)
 
 
 
-static int EqualFuncParams (SymTable* Tab1, SymTable* Tab2)
+static int ParamsHaveDefaultPromotions (const FuncDesc* F)
+/* Check if any of the parameters of function F has a default promotion. In
+ * this case, the function is not compatible with an empty parameter name list
+ * declaration.
+ */
+{
+    /* Get the symbol table */
+    const SymTable* Tab = F->SymTab;
+
+    /* Get the first parameter in the list */
+    const SymEntry* Sym = Tab->SymHead;
+
+    /* Walk over all parameters */
+    while (Sym && (Sym->Flags & SC_PARAM)) {
+
+        /* If this is an integer type, check if the promoted type is equal
+         * to the original type. If not, we have a default promotion.
+         */
+        if (IsClassInt (Sym->Type)) {
+            if (IntPromotion (Sym->Type) != Sym->Type) {
+                return 1;
+            }
+        }
+
+	/* Get the pointer to the next param */
+	Sym = Sym->NextSym;
+    }
+
+    /* No default promotions in the parameter list */
+    return 0;
+}
+
+
+
+static int EqualFuncParams (const FuncDesc* F1, const FuncDesc* F2)
 /* Compare two function symbol tables regarding function parameters. Return 1
  * if they are equal and 0 otherwise.
  */
 {
+    /* Get the symbol tables */
+    const SymTable* Tab1 = F1->SymTab;
+    const SymTable* Tab2 = F2->SymTab;
+
     /* Compare the parameter lists */
-    SymEntry* Sym1 = Tab1->SymHead;
-    SymEntry* Sym2 = Tab2->SymHead;
+    const SymEntry* Sym1 = Tab1->SymHead;
+    const SymEntry* Sym2 = Tab2->SymHead;
 
     /* Compare the fields */
     while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
 
+        /* Get the symbol types */
+        Type* Type1 = Sym1->Type;
+        Type* Type2 = Sym2->Type;
+
+        /* If either of both functions is old style, apply the default
+         * promotions to the parameter type.
+         */
+        if (F1->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type1)) {
+                Type1 = IntPromotion (Type1);
+            }
+        }
+        if (F2->Flags & FD_OLDSTYLE) {
+            if (IsClassInt (Type2)) {
+                Type2 = IntPromotion (Type2);
+            }
+        }
+
 	/* Compare this field */
-       	if (TypeCmp (Sym1->Type, Sym2->Type) < TC_EQUAL) {
+       	if (TypeCmp (Type1, Type2) < TC_EQUAL) {
 	    /* Field types not equal */
 	    return 0;
 	}
@@ -136,7 +192,6 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
     SymTable* 	Tab2;
     FuncDesc* 	F1;
     FuncDesc* 	F2;
-    int	      	Ok;
 
 
     /* Initialize stuff */
@@ -175,7 +230,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
 	/* If the raw types are not identical, the types are incompatible */
 	if (LeftType != RightType) {
 	    SetResult (Result, TC_INCOMPATIBLE);
-	    return;
+     	    return;
 	}
 
 	/* On indirection level zero, a qualifier or sign difference is
@@ -233,22 +288,29 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
        		F1 = GetFuncDesc (lhs);
        		F2 = GetFuncDesc (rhs);
 
-       		/* If one of the functions is implicitly declared, both
-       		 * functions are considered equal. If one of the functions is
-       		 * old style, and the other is empty, the functions are
-       		 * considered equal.
-       		 */
-       	       	if ((F1->Flags & FD_IMPLICIT) != 0 || (F2->Flags & FD_IMPLICIT) != 0) {
-       		    Ok = 1;
-       		} else if ((F1->Flags & FD_OLDSTYLE) != 0 && (F2->Flags & FD_EMPTY) != 0) {
-       		    Ok = 1;
-       		} else if ((F1->Flags & FD_EMPTY) != 0 && (F2->Flags & FD_OLDSTYLE) != 0) {
-       		    Ok = 1;
-       		} else {
-       		    Ok = 0;
-       		}
-
-       		if (!Ok) {
+                /* If one of both functions has an empty parameter list (which
+                 * does also mean, it is not a function definition, because the
+                 * flag is reset in this case), it is considered equal to any
+                 * other definition, provided that the other has no default
+                 * promotions in the parameter list. If none of both parameter
+                 * lists is empty, we have to check the parameter lists and
+                 * other attributes.
+                 */
+                if (F1->Flags & FD_EMPTY) {
+                    if ((F2->Flags & FD_EMPTY) == 0) {
+                        if (ParamsHaveDefaultPromotions (F2)) {
+                            /* Flags differ */
+                            SetResult (Result, TC_INCOMPATIBLE);
+                            return;
+                        }
+                    }
+                } else if (F2->Flags & FD_EMPTY) {
+                    if (ParamsHaveDefaultPromotions (F1)) {
+                        /* Flags differ */
+                        SetResult (Result, TC_INCOMPATIBLE);
+                        return;
+                    }
+                } else {
 
        		    /* Check the remaining flags */
        		    if ((F1->Flags & ~FD_IGNORE) != (F2->Flags & ~FD_IGNORE)) {
@@ -258,7 +320,7 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
        		    }
 
        		    /* Compare the parameter lists */
-       		    if (EqualFuncParams (F1->SymTab, F2->SymTab) == 0) {
+       		    if (EqualFuncParams (F1, F2) == 0) {
        		    	/* Parameter list is not identical */
 			SetResult (Result, TC_INCOMPATIBLE);
        		    	return;

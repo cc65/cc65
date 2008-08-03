@@ -149,6 +149,21 @@ static void Parse (void)
 		Decl.StorageClass |= SC_STORAGE | SC_DEF;
 	    }
 
+            /* If this is a function declarator that is not followed by a comma
+             * or semicolon, it must be followed by a function body. If this is
+             * the case, convert an empty parameter list into one accepting no
+             * parameters (same as void) as required by the standard.
+             */
+            if ((Decl.StorageClass & SC_FUNC) != 0 &&
+                (CurTok.Tok != TOK_COMMA)          &&
+                (CurTok.Tok != TOK_SEMI)) {
+
+                FuncDesc* D = GetFuncDesc (Decl.Type);
+                if (D->Flags & FD_EMPTY) {
+                    D->Flags = (D->Flags & ~(FD_EMPTY | FD_VARIADIC)) | FD_VOID_PARAM;
+                }
+            }
+
 	    /* Add an entry to the symbol table */
 	    Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
 
@@ -240,23 +255,10 @@ static void Parse (void)
 	     	    NextToken ();
 	     	} else {
 
-                    FuncDesc* D;
-
                     /* Function body. Check for duplicate function definitions */
                     if (SymIsDef (Entry)) {
                         Error ("Body for function `%s' has already been defined",
                                Entry->Name);
-                    }
-
-                    /* An empty parameter list in a function definition means
-                     * that the function doesn't take any parameters. The same
-                     * in a declarator means that the function can take any
-                     * number of parameters. This seems weird but is necessary
-                     * to support old K&R style programs.
-                     */
-                    D = Entry->V.F.Func;
-                    if (D->Flags & FD_EMPTY) {
-                        D->Flags = (D->Flags & ~(FD_EMPTY | FD_VARIADIC)) | FD_VOID_PARAM;
                     }
 
                     /* Parse the function body */

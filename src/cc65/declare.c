@@ -820,14 +820,14 @@ static void ParseAnsiParamList (FuncDesc* F)
     	    F->Flags |= FD_UNNAMED_PARAMS;
 
     	    /* Clear defined bit on nonames */
-    	    Spec.StorageClass &= ~SC_DEF;
+    	    Decl.StorageClass &= ~SC_DEF;
     	}
 
 	/* Parse an attribute ### */
 	ParseAttribute (&Decl, &Attr);
 
 	/* Create a symbol table entry */
-	AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Spec.StorageClass, 0);
+	AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
 
 	/* Count arguments */
        	++F->ParamCount;
@@ -1153,6 +1153,9 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     /* Add the base type. */
     NeedTypeSpace (D, TypeLen (Spec->Type) + 1);	/* Bounds check */
     TypeCpy (D->Type + D->Index, Spec->Type);
+
+    /* Use the storage class from the declspec */
+    D->StorageClass = Spec->StorageClass;
 
     /* Fix any type qualifiers attached to an array type */
     FixArrayQualifiers (D->Type);

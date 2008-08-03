@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -66,8 +66,9 @@ struct DeclSpec {
 /* Result of ParseDecl */
 typedef struct Declaration Declaration;
 struct Declaration {
-    ident     	Ident;			/* The identifier if any, else empty */
+    unsigned    StorageClass;           /* A set of SC_xxx flags */
     Type      	Type[MAXTYPELEN];       /* The type */
+    ident     	Ident;			/* The identifier if any, else empty */
 
     /* Working variables */
     unsigned	Index;			/* Used to build Type */
@@ -104,7 +105,7 @@ void CheckEmptyDecl (const DeclSpec* D);
 unsigned ParseInit (Type* T);
 /* Parse initialization of variables. Return the number of initialized data
  * bytes.
- */                                                        
+ */
 
 
 

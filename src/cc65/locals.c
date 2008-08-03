@@ -380,13 +380,9 @@ static unsigned ParseStaticDecl (Declaration* Decl, unsigned* SC)
 static void ParseOneDecl (const DeclSpec* Spec)
 /* Parse one variable declaration */
 {
-    unsigned    SC;       	/* Storage class for symbol */
     unsigned    SymData = 0;    /* Symbol data (offset, label name, ...) */
     Declaration Decl;	       	/* Declaration data structure */
 
-
-    /* Remember the storage class for the new symbol */
-    SC = Spec->StorageClass;
 
     /* Read the declaration */
     ParseDecl (Spec, &Decl, DM_NEED_IDENT);
@@ -394,10 +390,10 @@ static void ParseOneDecl (const DeclSpec* Spec)
     /* Set the correct storage class for functions */
     if (IsTypeFunc (Decl.Type)) {
     	/* Function prototypes are always external */
-    	if ((SC & SC_EXTERN) == 0) {
+       	if ((Decl.StorageClass & SC_EXTERN) == 0) {
        	    Warning ("Function must be extern");
     	}
-       	SC |= SC_FUNC | SC_EXTERN;
+       	Decl.StorageClass |= SC_FUNC | SC_EXTERN;
 
     }
 
@@ -409,35 +405,37 @@ static void ParseOneDecl (const DeclSpec* Spec)
     }
 
     /* Handle anything that needs storage (no functions, no typdefs) */
-    if ((SC & SC_FUNC) != SC_FUNC && (SC & SC_TYPEDEF) != SC_TYPEDEF) {
+    if ((Decl.StorageClass & SC_FUNC) != SC_FUNC &&
+         (Decl.StorageClass & SC_TYPEDEF) != SC_TYPEDEF) {
 
         /* If we have a register variable, try to allocate a register and
          * convert the declaration to "auto" if this is not possible.
          */
         int Reg = 0;    /* Initialize to avoid gcc complains */
-        if ((SC & SC_REGISTER) != 0 && (Reg = F_AllocRegVar (CurrentFunc, Decl.Type)) < 0) {
+        if ((Decl.StorageClass & SC_REGISTER) != 0 &&
+            (Reg = F_AllocRegVar (CurrentFunc, Decl.Type)) < 0) {
             /* No space for this register variable, convert to auto */
-            SC = (SC & ~SC_REGISTER) | SC_AUTO;
+            Decl.StorageClass = (Decl.StorageClass & ~SC_REGISTER) | SC_AUTO;
         }
 
         /* Check the variable type */
-        if ((SC & SC_REGISTER) == SC_REGISTER) {
+        if ((Decl.StorageClass & SC_REGISTER) == SC_REGISTER) {
             /* Register variable */
-            SymData = ParseRegisterDecl (&Decl, &SC, Reg);
-       	} else if ((SC & SC_AUTO) == SC_AUTO) {
+            SymData = ParseRegisterDecl (&Decl, &Decl.StorageClass, Reg);
+       	} else if ((Decl.StorageClass & SC_AUTO) == SC_AUTO) {
             /* Auto variable */
-            SymData = ParseAutoDecl (&Decl, &SC);
-        } else if ((SC & SC_EXTERN) == SC_EXTERN) {
+            SymData = ParseAutoDecl (&Decl, &Decl.StorageClass);
+        } else if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN) {
             /* External identifier - may not get initialized */
             if (CurTok.Tok == TOK_ASSIGN) {
                 Error ("Cannot initialize externals");
             }
             SymData = 0;
-       	} else if ((SC & SC_STATIC) == SC_STATIC) {
+       	} else if ((Decl.StorageClass & SC_STATIC) == SC_STATIC) {
             /* Static variable */
-            SymData = ParseStaticDecl (&Decl, &SC);
+            SymData = ParseStaticDecl (&Decl, &Decl.StorageClass);
        	} else {
-            Internal ("Invalid storage class in ParseOneDecl: %04X", SC);
+            Internal ("Invalid storage class in ParseOneDecl: %04X", Decl.StorageClass);
         }
 
         /* If the standard was not set explicitly to C89, print a warning
@@ -449,15 +447,15 @@ static void ParseOneDecl (const DeclSpec* Spec)
     }
 
     /* If the symbol is not marked as external, it will be defined now */
-    if ((SC & SC_EXTERN) == 0) {
-       	SC |= SC_DEF;
+    if ((Decl.StorageClass & SC_EXTERN) == 0) {
+       	Decl.StorageClass |= SC_DEF;
     }
 
     /* Add the symbol to the symbol table */
-    AddLocalSym (Decl.Ident, Decl.Type, SC, SymData);
+    AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, SymData);
 }
 
-                        
+
 
 void DeclareLocals (void)
 /* Declare local variables and types. */

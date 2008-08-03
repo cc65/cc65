@@ -138,8 +138,6 @@ static void Parse (void)
 	comma = 0;
        	while (1) {
 
-	    unsigned SymFlags;
-
 	    /* Read the next declaration */
 	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
 	    if (Decl.Ident[0] == '\0') {
@@ -148,24 +146,23 @@ static void Parse (void)
 	    }
 
 	    /* Get the symbol flags */
-	    SymFlags = Spec.StorageClass;
 	    if (IsTypeFunc (Decl.Type)) {
-		SymFlags |= SC_FUNC;
-	    } else if ((SymFlags & SC_TYPEDEF) == 0) {
+	       	Decl.StorageClass |= SC_FUNC;
+	    } else if ((Decl.StorageClass & SC_TYPEDEF) == 0) {
                 if ((Spec.Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
                     Warning ("Implicit `int' is an obsolete feature");
                 }
 	    	if (NeedStorage) {
 		    /* We will allocate storage, variable is defined */
-		    SymFlags |= SC_STORAGE | SC_DEF;
+		    Decl.StorageClass |= SC_STORAGE | SC_DEF;
 		}
 	    }
 
 	    /* Add an entry to the symbol table */
-	    Entry = AddGlobalSym (Decl.Ident, Decl.Type, SymFlags);
+	    Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
 
 	    /* Reserve storage for the variable if we need to */
-       	    if (SymFlags & SC_STORAGE) {
+       	    if (Decl.StorageClass & SC_STORAGE) {
 
 	     	/* Get the size of the variable */
 	     	unsigned Size = SizeOf (Decl.Type);
@@ -252,7 +249,7 @@ static void Parse (void)
 	     	    NextToken ();
 	     	} else {
 
-                    FuncDesc* D;                 
+                    FuncDesc* D;
 
                     /* Function body. Check for duplicate function definitions */
                     if (SymIsDef (Entry)) {

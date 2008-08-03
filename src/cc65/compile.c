@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -250,12 +250,28 @@ static void Parse (void)
 	     	if (CurTok.Tok == TOK_SEMI) {
 	     	    /* Prototype only */
 	     	    NextToken ();
-	     	} else if (Entry) {
-                    /* Function body definition */
+	     	} else {
+
+                    FuncDesc* D;                 
+
+                    /* Function body. Check for duplicate function definitions */
                     if (SymIsDef (Entry)) {
                         Error ("Body for function `%s' has already been defined",
                                Entry->Name);
                     }
+
+                    /* An empty parameter list in a function definition means
+                     * that the function doesn't take any parameters. The same
+                     * in a declarator means that the function can take any
+                     * number of parameters. This seems weird but is necessary
+                     * to support old K&R style programs.
+                     */
+                    D = Entry->V.F.Func;
+                    if (D->Flags & FD_EMPTY) {
+                        D->Flags = (D->Flags & ~(FD_EMPTY | FD_VARIADIC)) | FD_VOID_PARAM;
+                    }
+
+                    /* Parse the function body */
                     NewFunc (Entry);
 	     	}
 	    }

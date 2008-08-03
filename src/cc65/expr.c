@@ -692,8 +692,8 @@ static void Primary (ExprDesc* E)
                     /* C99 doesn't allow calls to undefined functions, so
                      * generate an error and otherwise a warning. Declare a
                      * function returning int. For that purpose, prepare a
-                     * function signature for a function having an empty param list
-                     * and returning int.
+                     * function signature for a function having an empty param
+                     * list and returning int.
                      */
                     if (IS_Get (&Standard) >= STD_C99) {
                         Error ("Call to undefined function `%s'", Ident);

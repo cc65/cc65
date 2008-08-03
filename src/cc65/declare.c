@@ -1160,6 +1160,11 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     /* Fix any type qualifiers attached to an array type */
     FixArrayQualifiers (D->Type);
 
+    /* If we have a function, add a special storage class */
+    if (IsTypeFunc (D->Type)) {
+        D->StorageClass |= SC_FUNC;
+    }
+
     /* Check several things for function or function pointer types */
     if (IsTypeFunc (D->Type) || IsTypeFuncPtr (D->Type)) {
 
@@ -1198,6 +1203,19 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
             GetFuncDesc (D->Type)->Flags |= FD_OLDSTYLE_INTRET;
         }
 
+    }
+
+    /* For anthing that is not a function or typedef, check for an implicit
+     * int declaration.
+     */
+    if ((D->StorageClass & SC_FUNC) != SC_FUNC && 
+        (D->StorageClass & SC_TYPEDEF) != SC_TYPEDEF) {
+        /* If the standard was not set explicitly to C89, print a warning
+         * for variables with implicit int type.
+         */
+        if ((Spec->Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
+            Warning ("Implicit `int' is an obsolete feature");
+        }
     }
 
     /* Check the size of the generated type */

@@ -83,7 +83,6 @@ static void Parse (void)
 
 	DeclSpec  	Spec;
 	Declaration 	Decl;
-	int	  	NeedStorage;
 
 	/* Check for empty statements */
 	if (CurTok.Tok == TOK_SEMI) {
@@ -123,16 +122,6 @@ static void Parse (void)
 	    continue;
 	}
 
-       	/* Check if we must reserve storage for the variable. We do
-	 * this if we don't had a storage class given ("int i") or
-	 * if the storage class is explicitly specified as static.
-	 * This means that "extern int i" will not get storage
-	 * allocated.
-	 */
-	NeedStorage = (Spec.StorageClass & SC_TYPEDEF) == 0 &&
-		      ((Spec.Flags & DS_DEF_STORAGE) != 0  ||
-	   	      (Spec.StorageClass & (SC_STATIC | SC_EXTERN)) == SC_STATIC);
-
 	/* Read declarations for this type */
 	Entry = 0;
 	comma = 0;
@@ -145,17 +134,19 @@ static void Parse (void)
 	    	break;
 	    }
 
-	    /* Get the symbol flags */
-	    if (IsTypeFunc (Decl.Type)) {
-	       	Decl.StorageClass |= SC_FUNC;
-	    } else if ((Decl.StorageClass & SC_TYPEDEF) == 0) {
-                if ((Spec.Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
-                    Warning ("Implicit `int' is an obsolete feature");
-                }
-	    	if (NeedStorage) {
-		    /* We will allocate storage, variable is defined */
-		    Decl.StorageClass |= SC_STORAGE | SC_DEF;
-		}
+            /* Check if we must reserve storage for the variable. We do this,
+             * if it is not a typedef or function, if we don't had a storage
+             * class given ("int i") or if the storage class is explicitly
+             * specified as static. This means that "extern int i" will not
+             * get storage allocated.
+             */
+	    if ((Decl.StorageClass & SC_FUNC) == 0      &&
+                (Decl.StorageClass & SC_TYPEDEF) == 0   &&
+                ((Spec.Flags & DS_DEF_STORAGE) != 0  ||
+                 (Decl.StorageClass & (SC_STATIC | SC_EXTERN)) == SC_STATIC)) {
+
+                /* We will allocate storage */
+		Decl.StorageClass |= SC_STORAGE | SC_DEF;
 	    }
 
 	    /* Add an entry to the symbol table */

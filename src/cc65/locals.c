@@ -388,13 +388,12 @@ static void ParseOneDecl (const DeclSpec* Spec)
     ParseDecl (Spec, &Decl, DM_NEED_IDENT);
 
     /* Set the correct storage class for functions */
-    if (IsTypeFunc (Decl.Type)) {
+    if ((Decl.StorageClass & SC_FUNC) == SC_FUNC) {
     	/* Function prototypes are always external */
        	if ((Decl.StorageClass & SC_EXTERN) == 0) {
        	    Warning ("Function must be extern");
     	}
-       	Decl.StorageClass |= SC_FUNC | SC_EXTERN;
-
+       	Decl.StorageClass |= SC_EXTERN;
     }
 
     /* If we don't have a name, this was flagged as an error earlier.
@@ -436,13 +435,6 @@ static void ParseOneDecl (const DeclSpec* Spec)
             SymData = ParseStaticDecl (&Decl, &Decl.StorageClass);
        	} else {
             Internal ("Invalid storage class in ParseOneDecl: %04X", Decl.StorageClass);
-        }
-
-        /* If the standard was not set explicitly to C89, print a warning
-         * for variables with implicit int type.
-         */
-        if ((Spec->Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
-            Warning ("Implicit `int' is an obsolete feature");
         }
     }
 

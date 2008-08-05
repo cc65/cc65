@@ -233,7 +233,12 @@ configuration.
   Supports a standard mouse connected to port #0 of the C64.
 
   <tag><tt/c64-joy.mou/</tag>
-  Supports a mouse emulated by a standard joystick in port #0 of the C64.
+  Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
+  #1 of the C64.
+
+  <tag><tt/c64-pot.mou/</tag>
+  Supports a potentiometer device e.g. Koala Pad connected to port #1 of
+  the C64.
 
 </descrip><p>
 

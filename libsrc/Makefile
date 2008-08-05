@@ -117,6 +117,7 @@ c64lib:
 	cp c64/*.joy .
 	cp c64/c64-1351.mou .
 	cp c64/c64-joymouse.mou c64-joy.mou
+	cp c64/c64-potmouse.mou c64-pot.mou
 	cp c64/*.ser .
 	cp c64/c64-320-200-2.tgi c64-hi.tgi
 
@@ -133,6 +134,7 @@ c128lib:
 	cp c128/*.joy .
 	cp c128/c128-1351.mou .
 	cp c128/c128-joymouse.mou c128-joy.mou
+	cp c128/c128-potmouse.mou c128-pot.mou
 	cp c128/*.ser .
 	cp c128/c128-640-200-2.tgi c128-vdc.tgi
 	cp c128/c128-640-480-2.tgi c128-vdc2.tgi

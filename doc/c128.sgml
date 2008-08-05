@@ -57,7 +57,7 @@ Special locations:
 <descrip>
   <tag/Text screen/
   The text screen is located at &dollar;400 (as in the standard setup).
-                                                                 
+
   <tag/Stack/
   The C runtime stack is located at &dollar;CFFF and growing downwards.
 
@@ -235,8 +235,20 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 <sect1>Mouse drivers<p>
 
-Currently no drivers available (in fact, the API for loadable mouse drivers
-does not exist).
+<descrip>
+
+  <tag><tt/c128-1351.mou/</tag>
+  Supports a standard mouse connected to port #0 of the C128.
+
+  <tag><tt/c128-joy.mou/</tag>
+  Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
+  #1 of the C128.
+
+  <tag><tt/c128-pot.mou/</tag>
+  Supports a potentiometer device e.g. Koala Pad connected to port #1 of
+  the C128.
+
+</descrip><p>
 
 
 <sect1>RS232 device drivers<p>

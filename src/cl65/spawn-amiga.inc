@@ -77,7 +77,7 @@ int spawnvp (int Mode attribute ((unused)),
     Status = system (SB_GetConstBuf (&Command));
 
     /* Free the string buf data */
-    DoneStrBuf (&Command);
+    SB_Done (&Command);
 
     /* Return the result */
     return Status;

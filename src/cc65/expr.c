@@ -938,7 +938,7 @@ static void ArrayRef (ExprDesc* Expr)
 	 * constant, we call special functions to add the address to the
 	 * offset value.
 	 */
-	if (!ConstBaseAddr) {
+    	if (!ConstBaseAddr) {
 
        	    /* The array base address is on stack and the subscript is in the
              * primary. Add both.
@@ -952,15 +952,15 @@ static void ArrayRef (ExprDesc* Expr)
              * often a better idea to reverse again the order of the
              * evaluation. This will generate better code if the subscript is
              * a byte sized variable. But beware: This is only possible if the
-	     * subscript was not scaled, that is, if this was a byte array
-	     * or pointer.
-	     */
+    	     * subscript was not scaled, that is, if this was a byte array
+    	     * or pointer.
+    	     */
             if ((ED_IsLocConst (&SubScript) || ED_IsLocStack (&SubScript)) &&
                 CheckedSizeOf (ElementType) == SIZEOF_CHAR) {
 
                 unsigned Flags;
 
-	    	/* Reverse the order of evaluation */
+    	    	/* Reverse the order of evaluation */
                 if (CheckedSizeOf (SubScript.Type) == SIZEOF_CHAR) {
                     Flags = CF_CHAR;
                 } else {
@@ -968,33 +968,36 @@ static void ArrayRef (ExprDesc* Expr)
                 }
     	     	RemoveCode (&Mark2);
 
-	    	/* Get a pointer to the array into the primary. */
-	    	LoadExpr (CF_NONE, Expr);
+    	    	/* Get a pointer to the array into the primary. */
+    	    	LoadExpr (CF_NONE, Expr);
 
-	    	/* Add the variable */
-	    	if (ED_IsLocStack (&SubScript)) {
-	    	    g_addlocal (Flags, SubScript.IVal);
-	    	} else {
-	   	    Flags |= GlobalModeFlags (SubScript.Flags);
-	    	    g_addstatic (Flags, SubScript.Name, SubScript.IVal);
-	    	}
-	    } else {
-	     	if (ED_IsLocAbs (Expr)) {
-	     	    /* Constant numeric address. Just add it */
-	     	    g_inc (CF_INT, Expr->IVal);
-	     	} else if (ED_IsLocStack (Expr)) {
-	       	    /* Base address is a local variable address */
-	   	    if (IsTypeArray (Expr->Type)) {
-	     	        g_addaddr_local (CF_INT, Expr->IVal);
+    	    	/* Add the variable */
+    	    	if (ED_IsLocStack (&SubScript)) {
+    	    	    g_addlocal (Flags, SubScript.IVal);
+    	    	} else {
+    	   	    Flags |= GlobalModeFlags (SubScript.Flags);
+    	    	    g_addstatic (Flags, SubScript.Name, SubScript.IVal);
+    	    	}
+    	    } else {
+
+    	     	if (ED_IsLocAbs (Expr)) {
+    	     	    /* Constant numeric address. Just add it */
+    	     	    g_inc (CF_INT, Expr->IVal);
+    	     	} else if (ED_IsLocStack (Expr)) {
+    	       	    /* Base address is a local variable address */
+    	   	    if (IsTypeArray (Expr->Type)) {
+    	     	        g_addaddr_local (CF_INT, Expr->IVal);
 	   	    } else {
-	   		g_addlocal (CF_PTR, Expr->IVal);
+	   	       	g_addlocal (CF_PTR, Expr->IVal);
 	   	    }
 	     	} else {
 	     	    /* Base address is a static variable address */
 	     	    unsigned Flags = CF_INT | GlobalModeFlags (Expr->Flags);
-	   	    if (IsTypeArray (Expr->Type)) {
+                    if (ED_IsRVal (Expr)) {
+                        /* Add the address of the location */
 	     	        g_addaddr_static (Flags, Expr->Name, Expr->IVal);
 	   	    } else {
+                        /* Add the contents of the location */
 	   		g_addstatic (Flags, Expr->Name, Expr->IVal);
 	   	    }
 	     	}

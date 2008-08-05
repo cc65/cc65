@@ -80,7 +80,9 @@ static unsigned GlobalModeFlags (const ExprDesc* Expr)
 /* Return the addressing mode flags for the given expression */
 {
     switch (ED_GetLoc (Expr)) {
+        case E_LOC_ABS:         return CF_ABSOLUTE;
         case E_LOC_GLOBAL:      return CF_EXTERNAL;
+        case E_LOC_LITERAL:     /* Same as static */
         case E_LOC_STATIC:      return CF_STATIC;
         case E_LOC_REGISTER:    return CF_REGVAR;
         default:
@@ -1165,7 +1167,7 @@ void Store (ExprDesc* Expr, const Type* StoreType)
 
     /* Prepare the code generator flags */
     Flags = TypeOf (StoreType);
-
+                   
     /* Do the store depending on the location */
     switch (ED_GetLoc (Expr)) {
 

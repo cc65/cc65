@@ -76,15 +76,15 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 
 
 
-static unsigned GlobalModeFlags (unsigned Flags)
-/* Return the addressing mode flags for the variable with the given flags */
+static unsigned GlobalModeFlags (const ExprDesc* Expr)
+/* Return the addressing mode flags for the given expression */
 {
-    switch (Flags & E_MASK_LOC) {
+    switch (ED_GetLoc (Expr)) {
         case E_LOC_GLOBAL:      return CF_EXTERNAL;
         case E_LOC_STATIC:      return CF_STATIC;
         case E_LOC_REGISTER:    return CF_REGVAR;
         default:
-            Internal ("GlobalModeFlags: Invalid flags value: %u", Flags);
+            Internal ("GlobalModeFlags: Invalid location flags value: 0x%04X", Expr->Flags);
             /* NOTREACHED */
             return 0;
     }
@@ -975,7 +975,7 @@ static void ArrayRef (ExprDesc* Expr)
     	    	if (ED_IsLocStack (&SubScript)) {
     	    	    g_addlocal (Flags, SubScript.IVal);
     	    	} else {
-    	   	    Flags |= GlobalModeFlags (SubScript.Flags);
+    	   	    Flags |= GlobalModeFlags (&SubScript);
     	    	    g_addstatic (Flags, SubScript.Name, SubScript.IVal);
     	    	}
     	    } else {
@@ -992,7 +992,7 @@ static void ArrayRef (ExprDesc* Expr)
 	   	    }
 	     	} else {
 	     	    /* Base address is a static variable address */
-	     	    unsigned Flags = CF_INT | GlobalModeFlags (Expr->Flags);
+	     	    unsigned Flags = CF_INT | GlobalModeFlags (Expr);
                     if (ED_IsRVal (Expr)) {
                         /* Add the address of the location */
 	     	        g_addaddr_static (Flags, Expr->Name, Expr->IVal);
@@ -1982,7 +1982,7 @@ static void parseadd (ExprDesc* Expr)
 	    	flags |= CF_CONST;
 	    } else {
 	    	/* Constant address label */
-	    	flags |= GlobalModeFlags (Expr->Flags) | CF_CONSTADDR;
+	    	flags |= GlobalModeFlags (Expr) | CF_CONSTADDR;
 	    }
 
     	    /* Check for pointer arithmetic */

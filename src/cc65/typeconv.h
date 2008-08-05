@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2002-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -56,9 +56,7 @@ void TypeConversion (ExprDesc* Expr, Type* NewType);
  */
 
 void TypeCast (ExprDesc* Expr);
-/* Handle an explicit cast. The function returns true if the resulting
- * expression is an lvalue and false if not.
- */
+/* Handle an explicit cast. */
 
 
 

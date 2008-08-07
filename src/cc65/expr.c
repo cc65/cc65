@@ -1167,7 +1167,7 @@ void Store (ExprDesc* Expr, const Type* StoreType)
 
     /* Prepare the code generator flags */
     Flags = TypeOf (StoreType);
-                   
+
     /* Do the store depending on the location */
     switch (ED_GetLoc (Expr)) {
 
@@ -1231,6 +1231,11 @@ static void PreInc (ExprDesc* Expr)
     if (!ED_IsLVal (Expr)) {
      	Error ("Invalid lvalue");
      	return;
+    }
+
+    /* We cannot modify const values */
+    if (IsQualConst (Expr->Type)) {
+        Error ("Increment of read-only variable");
     }
 
     /* Get the data type */
@@ -1304,6 +1309,11 @@ static void PreDec (ExprDesc* Expr)
      	return;
     }
 
+    /* We cannot modify const values */
+    if (IsQualConst (Expr->Type)) {
+        Error ("Decrement of read-only variable");
+    }
+
     /* Get the data type */
     Flags = TypeOf (Expr->Type) | CF_FORCECHAR | CF_CONST;
 
@@ -1359,8 +1369,8 @@ static void PreDec (ExprDesc* Expr)
 
 
 
-static void PostIncDec (ExprDesc* Expr, void (*inc) (unsigned, unsigned long))
-/* Handle i-- and i++ */
+static void PostInc (ExprDesc* Expr)
+/* Handle the postincrement operator */
 {
     unsigned Flags;
 
@@ -1370,6 +1380,11 @@ static void PostIncDec (ExprDesc* Expr, void (*inc) (unsigned, unsigned long))
     if (!ED_IsLVal (Expr)) {
     	Error ("Invalid lvalue");
        	return;
+    }
+
+    /* We cannot modify const values */
+    if (IsQualConst (Expr->Type)) {
+        Error ("Increment of read-only variable");
     }
 
     /* Get the data type */
@@ -1384,9 +1399,56 @@ static void PostIncDec (ExprDesc* Expr, void (*inc) (unsigned, unsigned long))
 
     /* If we have a pointer expression, increment by the size of the type */
     if (IsTypePtr (Expr->Type)) {
-     	inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+     	g_inc (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
     } else {
-     	inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+     	g_inc (Flags | CF_CONST | CF_FORCECHAR, 1);
+    }
+
+    /* Store the result back */
+    Store (Expr, 0);
+
+    /* Restore the original value in the primary register */
+    g_restore (Flags | CF_FORCECHAR);
+
+    /* The result is always an expression, no reference */
+    ED_MakeRValExpr (Expr);
+}
+
+
+
+static void PostDec (ExprDesc* Expr)
+/* Handle the postdecrement operator */
+{
+    unsigned Flags;
+
+    NextToken ();
+
+    /* The expression to increment must be an lvalue */
+    if (!ED_IsLVal (Expr)) {
+    	Error ("Invalid lvalue");
+       	return;
+    }
+
+    /* We cannot modify const values */
+    if (IsQualConst (Expr->Type)) {
+        Error ("Decrement of read-only variable");
+    }
+
+    /* Get the data type */
+    Flags = TypeOf (Expr->Type);
+
+    /* Push the address if needed */
+    PushAddr (Expr);
+
+    /* Fetch the value and save it (since it's the result of the expression) */
+    LoadExpr (CF_NONE, Expr);
+    g_save (Flags | CF_FORCECHAR);
+
+    /* If we have a pointer expression, increment by the size of the type */
+    if (IsTypePtr (Expr->Type)) {
+     	g_dec (Flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (Expr->Type + 1));
+    } else {
+     	g_dec (Flags | CF_CONST | CF_FORCECHAR, 1);
     }
 
     /* Store the result back */
@@ -1505,6 +1567,7 @@ void hie10 (ExprDesc* Expr)
                 } else {
                     Error ("Illegal indirection");
                 }
+                /* The * operator yields an lvalue */
                 ED_MakeLVal (Expr);
             }
             break;
@@ -1519,6 +1582,7 @@ void hie10 (ExprDesc* Expr)
                 Error ("Illegal address");
      	    } else {
                 Expr->Type = PointerTo (Expr->Type);
+                /* The & operator yields an rvalue */
                 ED_MakeRVal (Expr);
 	    }
      	    break;
@@ -1555,10 +1619,10 @@ void hie10 (ExprDesc* Expr)
                 hie11 (Expr);
 
                 /* Handle post increment */
-                if (CurTok.Tok == TOK_INC) {
-                    PostIncDec (Expr, g_inc);
-                } else if (CurTok.Tok == TOK_DEC) {
-                    PostIncDec (Expr, g_dec);
+                switch (CurTok.Tok) {
+                    case TOK_INC:   PostInc (Expr); break;
+                    case TOK_DEC:   PostDec (Expr); break;
+                    default:                        break;
                 }
 
             }

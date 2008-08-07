@@ -2777,6 +2777,11 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr)
      	return;
     }
 
+    /* The left side must not be const qualified */
+    if (IsQualConst (Expr->Type)) {
+    	Error ("Assignment to const");
+    }
+
     /* There must be an integer or pointer on the left side */
     if (!IsClassInt (Expr->Type) && !IsTypePtr (Expr->Type)) {
         Error ("Invalid left operand type");
@@ -2873,6 +2878,11 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
     if (ED_IsRVal (Expr)) {
      	Error ("Invalid lvalue in assignment");
      	return;
+    }
+
+    /* The left side must not be const qualified */
+    if (IsQualConst (Expr->Type)) {
+    	Error ("Assignment to const");
     }
 
     /* There must be an integer or pointer on the left side */

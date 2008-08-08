@@ -96,8 +96,9 @@ void Assignment (ExprDesc* Expr)
         }
         if (UseReg) {
             PushAddr (Expr);
-        } else {
-    	    LoadExpr (CF_NONE, Expr);
+        } else {  
+            ED_MakeRVal (Expr);
+      	    LoadExpr (CF_NONE, Expr);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
 

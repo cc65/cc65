@@ -82,9 +82,12 @@ static unsigned GlobalModeFlags (const ExprDesc* Expr)
     switch (ED_GetLoc (Expr)) {
         case E_LOC_ABS:         return CF_ABSOLUTE;
         case E_LOC_GLOBAL:      return CF_EXTERNAL;
-        case E_LOC_LITERAL:     /* Same as static */
         case E_LOC_STATIC:      return CF_STATIC;
         case E_LOC_REGISTER:    return CF_REGVAR;
+        case E_LOC_STACK:       return CF_NONE;
+        case E_LOC_PRIMARY:     return CF_NONE;
+        case E_LOC_EXPR:        return CF_NONE;
+        case E_LOC_LITERAL:     return CF_STATIC;       /* Same as static */
         default:
             Internal ("GlobalModeFlags: Invalid location flags value: 0x%04X", Expr->Flags);
             /* NOTREACHED */
@@ -1166,30 +1169,30 @@ void Store (ExprDesc* Expr, const Type* StoreType)
     }
 
     /* Prepare the code generator flags */
-    Flags = TypeOf (StoreType);
+    Flags = TypeOf (StoreType) | GlobalModeFlags (Expr);
 
     /* Do the store depending on the location */
     switch (ED_GetLoc (Expr)) {
 
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
-            g_putstatic (Flags | CF_ABSOLUTE, Expr->IVal, 0);
+            g_putstatic (Flags, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:
             /* Global variable */
-            g_putstatic (Flags | CF_EXTERNAL, Expr->Name, Expr->IVal);
+            g_putstatic (Flags, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
             /* Static variable or literal in the literal pool */
-            g_putstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal);
+            g_putstatic (Flags, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_REGISTER:
             /* Register variable */
-            g_putstatic (Flags | CF_REGVAR, Expr->Name, Expr->IVal);
+            g_putstatic (Flags, Expr->Name, Expr->IVal);
             break;
 
         case E_LOC_STACK:
@@ -1199,7 +1202,6 @@ void Store (ExprDesc* Expr, const Type* StoreType)
 
         case E_LOC_PRIMARY:
             /* The primary register (value is already there) */
-            /* ### Do we need a test here if the flag is set? */
             break;
 
         case E_LOC_EXPR:
@@ -1239,7 +1241,7 @@ static void PreInc (ExprDesc* Expr)
     }
 
     /* Get the data type */
-    Flags = TypeOf (Expr->Type) | CF_FORCECHAR | CF_CONST;
+    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST;
 
     /* Get the increment value in bytes */
     Val = IsTypePtr (Expr->Type)? CheckedPSizeOf (Expr->Type) : 1;
@@ -1249,23 +1251,23 @@ static void PreInc (ExprDesc* Expr)
 
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
-            g_addeqstatic (Flags | CF_ABSOLUTE, Expr->IVal, 0, Val);
+            g_addeqstatic (Flags, Expr->IVal, 0, Val);
             break;
 
         case E_LOC_GLOBAL:
             /* Global variable */
-            g_addeqstatic (Flags | CF_EXTERNAL, Expr->Name, Expr->IVal, Val);
+            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
             /* Static variable or literal in the literal pool */
-            g_addeqstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal, Val);
+            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
         case E_LOC_REGISTER:
             /* Register variable */
-            g_addeqstatic (Flags | CF_REGVAR, Expr->Name, Expr->IVal, Val);
+            g_addeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
         case E_LOC_STACK:
@@ -1288,7 +1290,7 @@ static void PreInc (ExprDesc* Expr)
     }
 
     /* Result is an expression, no reference */
-    ED_MakeRValExpr (Expr);
+    ED_MakeRValExpr (Expr);     
 }
 
 
@@ -1315,7 +1317,7 @@ static void PreDec (ExprDesc* Expr)
     }
 
     /* Get the data type */
-    Flags = TypeOf (Expr->Type) | CF_FORCECHAR | CF_CONST;
+    Flags = TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR | CF_CONST;
 
     /* Get the increment value in bytes */
     Val = IsTypePtr (Expr->Type)? CheckedPSizeOf (Expr->Type) : 1;
@@ -1325,23 +1327,23 @@ static void PreDec (ExprDesc* Expr)
 
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
-            g_subeqstatic (Flags | CF_ABSOLUTE, Expr->IVal, 0, Val);
+            g_subeqstatic (Flags, Expr->IVal, 0, Val);
             break;
 
         case E_LOC_GLOBAL:
             /* Global variable */
-            g_subeqstatic (Flags | CF_EXTERNAL, Expr->Name, Expr->IVal, Val);
+            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
             /* Static variable or literal in the literal pool */
-            g_subeqstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal, Val);
+            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
         case E_LOC_REGISTER:
             /* Register variable */
-            g_subeqstatic (Flags | CF_REGVAR, Expr->Name, Expr->IVal, Val);
+            g_subeqstatic (Flags, Expr->Name, Expr->IVal, Val);
             break;
 
         case E_LOC_STACK:
@@ -1365,7 +1367,7 @@ static void PreDec (ExprDesc* Expr)
 
     /* Result is an expression, no reference */
     ED_MakeRValExpr (Expr);
-}
+}                               
 
 
 
@@ -2922,7 +2924,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
     }
 
     /* Setup the code generator flags */
-    lflags |= TypeOf (Expr->Type) | CF_FORCECHAR;
+    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
     rflags |= TypeOf (Expr2.Type);
 
     /* Convert the type of the lhs to that of the rhs */
@@ -2933,7 +2935,6 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
 
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
-            lflags |= CF_ABSOLUTE;
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {
@@ -2943,7 +2944,6 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
 
         case E_LOC_GLOBAL:
             /* Global variable */
-            lflags |= CF_EXTERNAL;
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {
@@ -2954,7 +2954,6 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
         case E_LOC_STATIC:
         case E_LOC_LITERAL:
             /* Static variable or literal in the literal pool */
-            lflags |= CF_STATIC;
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {
@@ -2964,7 +2963,6 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
 
         case E_LOC_REGISTER:
             /* Register variable */
-            lflags |= CF_REGVAR;
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->IVal, Expr2.IVal);
             } else {

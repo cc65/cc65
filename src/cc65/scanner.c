@@ -42,6 +42,7 @@
 
 /* common */
 #include "chartype.h"
+#include "fp.h"
 #include "tgttrans.h"
 
 /* cc65 */
@@ -583,38 +584,27 @@ static void NumericConst (void)
     } else {
 
         /* Float constant */
-        double FVal = IVal;             /* Convert to float */
+        Double FVal = FP_D_FromInt (IVal);      /* Convert to double */
 
         /* Check for a fractional part and read it */
         if (CurC == '.') {
 
-            unsigned Digits;
-            unsigned long Frac;
-            unsigned long Scale;
+            Double Scale;
 
             /* Skip the dot */
             NextChar ();
 
-            /* Read fractional digits. Since we support only 32 bit floats
-             * with a maximum of 7 fractional digits, we read the fractional
-             * part as integer with up to 8 digits and drop the remainder.
-             * This avoids an overflow of Frac and Scale.
-             */
-            Digits = 0;
-            Frac   = 0;
-            Scale  = 1;
+            /* Read fractional digits */
+            Scale  = FP_D_Make (1.0);
             while (IsXDigit (CurC) && (DigitVal = HexVal (CurC)) < Base) {
-                if (Digits < 8) {
-                    Frac = Frac * Base + DigitVal;
-                    ++Digits;
-                    Scale *= Base;
-                }
+                /* Get the value of this digit */
+                Double FracVal = FP_D_Div (FP_D_FromInt (DigitVal * Base), Scale);
+                /* Add it to the float value */
+                FVal = FP_D_Add (FVal, FracVal);
+                /* Scale base */
+                Scale = FP_D_Mul (Scale, FP_D_FromInt (DigitVal));
+                /* Skip the digit */
                 NextChar ();
-            }
-
-            /* Scale the fractional part and add it */
-            if (Frac) {
-                FVal += ((double) Frac) / ((double) Scale);
             }
         }
 
@@ -664,7 +654,7 @@ static void NumericConst (void)
 
             /* Scale the exponent and adjust the value accordingly */
             if (Exp) {
-                FVal *= pow (10, Exp);
+                FVal = FP_D_Mul (FVal, FP_D_Make (pow (10, Exp)));
             }
         }
 

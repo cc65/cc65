@@ -22,6 +22,7 @@ OBJS =	abend.o		\
 	filepos.o	\
         filetype.o      \
 	fname.o		\
+        fp.o            \
 	hashstr.o	\
         hashtab.o       \
         intstack.o      \

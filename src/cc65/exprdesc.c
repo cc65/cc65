@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2002-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -41,6 +41,7 @@
 #include "asmlabel.h"
 #include "datatype.h"
 #include "error.h"
+#include "exprdesc.h"
 #include "stackptr.h"
 #include "symentry.h"
 #include "exprdesc.h"
@@ -61,7 +62,7 @@ ExprDesc* ED_Init (ExprDesc* Expr)
     Expr->Flags = 0;
     Expr->Name  = 0;
     Expr->IVal  = 0;
-    Expr->FVal  = 0.0;
+    Expr->FVal  = FP_D_Make (0.0);
     return Expr;
 }
 
@@ -141,7 +142,7 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
     Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
     Expr->Name  = 0;
     Expr->IVal  = Value;
-    Expr->FVal  = 0.0;
+    Expr->FVal  = FP_D_Make (0.0);
     return Expr;
 }
 
@@ -155,7 +156,7 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
     Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
     Expr->Name  = 0;
     Expr->IVal  = Value;
-    Expr->FVal  = 0.0;
+    Expr->FVal  = FP_D_Make (0.0);
     return Expr;
 }
 
@@ -171,7 +172,7 @@ ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
     Expr->Flags |= (E_LOC_EXPR | E_RTYPE_RVAL);
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */
-    Expr->FVal  = 0.0;
+    Expr->FVal  = FP_D_Make (0.0);
     return Expr;
 }
 
@@ -187,7 +188,7 @@ ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
     Expr->Flags |= (E_LOC_EXPR | E_RTYPE_LVAL);
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */
-    Expr->FVal  = 0.0;
+    Expr->FVal  = FP_D_Make (0.0);
     return Expr;
 }
 
@@ -253,7 +254,7 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
                     "Raw type: (unknown)\n");
     }
     fprintf (F, "IVal:     0x%08lX\n", E->IVal);
-    fprintf (F, "FVal:     %f\n", E->FVal);
+    fprintf (F, "FVal:     %f\n", FP_D_ToFloat (E->FVal));
 
     Flags = E->Flags;
     Sep   = '(';

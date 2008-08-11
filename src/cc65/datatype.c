@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -43,6 +43,7 @@
 #include "codegen.h"
 #include "datatype.h"
 #include "error.h"
+#include "fp.h"
 #include "funcdesc.h"
 #include "global.h"
 #include "symtab.h"

@@ -38,6 +38,9 @@
 
 
 
+/* common */
+#include "fp.h"
+
 /* cc65 */
 #include "datatype.h"
 #include "ident.h"
@@ -192,7 +195,7 @@ typedef struct Token Token;
 struct Token {
     token_t 	Tok;		/* The token itself */
     long    	IVal;		/* The integer attribute */
-    double  	FVal;		/* The float attribute */
+    Double      FVal;		/* The float attribute */
     ident   	Ident;		/* Identifier if IDENT */
     LineInfo*   LI;		/* Source line where the token comes from */
     Type*	Type;		/* Type if integer or float constant */

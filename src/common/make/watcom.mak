@@ -68,6 +68,7 @@ OBJS =	abend.obj	\
 	filepos.obj	\
         filetype.obj    \
 	fname.obj	\
+        fp.obj          \
 	hashstr.obj	\
         hashtab.obj     \
         intstack.obj    \

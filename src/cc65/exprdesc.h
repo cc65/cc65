@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 2002-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -41,6 +41,7 @@
 #include <string.h>
 
 /* common */
+#include "fp.h"
 #include "inline.h"
 
 /* cc65 */
@@ -89,7 +90,7 @@ struct ExprDesc {
     unsigned            Flags;
     unsigned long 	Name;	/* Name or label number */
     long       	       	IVal;   /* Integer value if expression constant */
-    float               FVal;   /* Floating point value */
+    Double              FVal;   /* Floating point value */
 };
 
 

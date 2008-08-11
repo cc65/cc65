@@ -1208,7 +1208,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     /* For anthing that is not a function or typedef, check for an implicit
      * int declaration.
      */
-    if ((D->StorageClass & SC_FUNC) != SC_FUNC && 
+    if ((D->StorageClass & SC_FUNC) != SC_FUNC &&
         (D->StorageClass & SC_TYPEDEF) != SC_TYPEDEF) {
         /* If the standard was not set explicitly to C89, print a warning
          * for variables with implicit int type.
@@ -1612,11 +1612,11 @@ static unsigned ParseVoidInit (void)
 
 	    case T_SCHAR:
 	    case T_UCHAR:
-		if (ED_IsConstAbsInt (&Expr)) {
-		    /* Make it byte sized */
-		    Expr.IVal &= 0xFF;
-		}
-		DefineData (&Expr);
+	    	if (ED_IsConstAbsInt (&Expr)) {
+	    	    /* Make it byte sized */
+	    	    Expr.IVal &= 0xFF;
+	    	}
+	    	DefineData (&Expr);
                 Size += SIZEOF_CHAR;
                 break;
 
@@ -1626,26 +1626,26 @@ static unsigned ParseVoidInit (void)
 	    case T_UINT:
 	    case T_PTR:
 	    case T_ARRAY:
-	   	if (ED_IsConstAbsInt (&Expr)) {
+	    	if (ED_IsConstAbsInt (&Expr)) {
     	      	    /* Make it word sized */
-	   	    Expr.IVal &= 0xFFFF;
-	   	}
-	   	DefineData (&Expr);
-	   	Size += SIZEOF_INT;
+	    	    Expr.IVal &= 0xFFFF;
+	    	}
+	    	DefineData (&Expr);
+	    	Size += SIZEOF_INT;
                 break;
 
 	    case T_LONG:
 	    case T_ULONG:
-	   	if (ED_IsConstAbsInt (&Expr)) {
+	    	if (ED_IsConstAbsInt (&Expr)) {
     	      	    /* Make it dword sized */
-	   	    Expr.IVal &= 0xFFFFFFFF;
-	   	}
-	   	DefineData (&Expr);
-	   	Size += SIZEOF_LONG;
+	    	    Expr.IVal &= 0xFFFFFFFF;
+	    	}
+	    	DefineData (&Expr);
+	    	Size += SIZEOF_LONG;
                 break;
 
 	    default:
-	   	Error ("Illegal type in initialization");
+	    	Error ("Illegal type in initialization");
 	    	break;
 
     	}
@@ -1679,6 +1679,8 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
      	case T_UINT:
     	case T_LONG:
     	case T_ULONG:
+        case T_FLOAT:
+        case T_DOUBLE:
             return ParseScalarInit (T);
 
      	case T_PTR:

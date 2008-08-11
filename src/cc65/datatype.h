@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -159,14 +159,14 @@ struct Type {
 #define UNSPECIFIED     -1L     /* Element count was not specified */
 #define FLEXIBLE        0L      /* Flexible array struct member */
 
-/* Sizes */
+/* Sizes. Floating point sizes come from fp.h */
 #define SIZEOF_CHAR     1
 #define SIZEOF_SHORT    2
 #define SIZEOF_INT      2
 #define SIZEOF_LONG     4
 #define SIZEOF_LONGLONG 8
-#define SIZEOF_FLOAT    4
-#define SIZEOF_DOUBLE   4
+#define SIZEOF_FLOAT    (FP_F_Size())
+#define SIZEOF_DOUBLE   (FP_D_Size())
 #define SIZEOF_PTR      2
 
 /* Predefined type strings */
@@ -507,7 +507,7 @@ INLINE int IsSignSigned (const Type* T)
 #endif
 
 TypeCode GetQualifier (const Type* T) attribute ((const));
-/* Get the qualifier from the given type string */           
+/* Get the qualifier from the given type string */
 
 #if defined(HAVE_INLINE)
 INLINE int IsQualConst (const Type* T)

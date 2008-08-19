@@ -1061,7 +1061,25 @@ CharAgain:
 
 	case '/':
 	    NextChar ();
-	    Tok = TOK_DIV;
+            if (C != '*') {
+                Tok = TOK_DIV;
+            } else {
+                /* Remember the position, then skip the '*' */
+                FilePos Pos = CurPos;
+                NextChar ();
+                do {
+                    while (C !=  '*') {
+                        if (C == EOF) {
+                            PError (&Pos, "Unterminated comment");
+                            goto Again;
+                        }
+                        NextChar ();
+                    }
+                    NextChar ();
+                } while (C != '/');
+                NextChar ();
+                goto Again;  
+            }
 	    return;
 
 	case '*':

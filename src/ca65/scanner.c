@@ -1063,7 +1063,7 @@ CharAgain:
 	    NextChar ();
             if (C != '*') {
                 Tok = TOK_DIV;
-            } else {
+            } else if (CComments) {
                 /* Remember the position, then skip the '*' */
                 FilePos Pos = CurPos;
                 NextChar ();
@@ -1071,14 +1071,14 @@ CharAgain:
                     while (C !=  '*') {
                         if (C == EOF) {
                             PError (&Pos, "Unterminated comment");
-                            goto Again;
+                            goto CharAgain;
                         }
                         NextChar ();
                     }
                     NextChar ();
                 } while (C != '/');
                 NextChar ();
-                goto Again;  
+                goto Again;
             }
 	    return;
 

@@ -60,6 +60,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "pc_assignment",
     "missing_char_term",
     "ubiquitous_idents",
+    "c_comments",
 };
 
 
@@ -113,6 +114,7 @@ feature_t SetFeature (const StrBuf* Key)
      	case FEAT_PC_ASSIGNMENT:	      PCAssignment	= 1;	break;
         case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = 1;    break;
         case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = 1;    break;
+        case FEAT_C_COMMENTS:                 CComments         = 1;    break;
 	default:      			 /* Keep gcc silent */	        break;
     }
 

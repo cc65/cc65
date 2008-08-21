@@ -2236,6 +2236,19 @@ Here's a list of all control commands and a description, what they do:
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
+  <tag><tt>c_comments</tt></tag>
+
+    Allow C like comments using <tt>/*</tt> and <tt>*/</tt> as left and right
+    comment terminators. Note that C comments may not be nested. There's also a
+    pitfall when using C like comments: All statements must be terminated by
+    "end-of-line". Using C like comments, it is possible to hide the newline,
+    which results in error messages. See the following non working example:
+
+    <tscreen><verb>
+        lda     #$00  /* This comment hides the newline
+*/      sta     $82
+    </verb></tscreen>
+
   <tag><tt>dollar_in_identifiers</tt></tag>
 
     Accept the dollar sign (`&dollar;') as a valid character in identifiers. The

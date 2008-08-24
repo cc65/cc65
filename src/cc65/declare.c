@@ -77,41 +77,94 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers);
 
 
 /*****************************************************************************/
-/*			      internal functions			     */
+/*		 	      internal functions			     */
 /*****************************************************************************/
 
 
 
-static TypeCode OptionalQualifiers (TypeCode Q)
+static void DuplicateQualifier (const char* Name)
+/* Print an error message */
+{
+    Warning ("Duplicate qualifier: `%s'", Name);
+}
+
+
+
+static TypeCode OptionalQualifiers (TypeCode Q, TypeCode Allowed)
 /* Read type qualifiers if we have any */
 {
-    while (TokIsTypeQual (&CurTok)) {
+    while (1) {
 
-	switch (CurTok.Tok) {
+ 	switch (CurTok.Tok) {
 
-	    case TOK_CONST:
-	    	if (Q & T_QUAL_CONST) {
-		    Error ("Duplicate qualifier: `const'");
-		}
-		Q |= T_QUAL_CONST;
-		break;
+ 	    case TOK_CONST:
+                if (Allowed & T_QUAL_CONST) {
+                    if (Q & T_QUAL_CONST) {
+                        DuplicateQualifier ("const");
+                    }
+                    Q |= T_QUAL_CONST;
+                } else {
+                    goto Done;
+                }
+                break;
 
 	    case TOK_VOLATILE:
-		if (Q & T_QUAL_VOLATILE) {
-		    Error ("Duplicate qualifier: `volatile'");
-		}
-		Q |= T_QUAL_VOLATILE;
-		break;
+                if (Allowed & T_QUAL_VOLATILE) {
+                    if (Q & T_QUAL_VOLATILE) {
+                        DuplicateQualifier ("volatile");
+                    }
+                    Q |= T_QUAL_VOLATILE;
+                } else {
+                    goto Done;
+                }
+	       	break;
 
             case TOK_RESTRICT:
-                if (Q & T_QUAL_RESTRICT) {
-                    Error ("Duplicate qualifier: `restrict'");
+                if (Allowed & T_QUAL_RESTRICT) {
+                    if (Q & T_QUAL_RESTRICT) {
+                        DuplicateQualifier ("restrict");
+                    }
+                    Q |= T_QUAL_RESTRICT;
+                } else {
+                    goto Done;
                 }
-                Q |= T_QUAL_RESTRICT;
+                break;
+
+            case TOK_NEAR:
+                if (Allowed & T_QUAL_NEAR) {
+                    if (Q & T_QUAL_NEAR) {
+                        DuplicateQualifier ("near");
+                    }
+                    Q |= T_QUAL_NEAR;
+                } else {
+                    goto Done;
+                }
+                break;
+
+            case TOK_FAR:
+                if (Allowed & T_QUAL_FAR) {
+                    if (Q & T_QUAL_FAR) {
+                        DuplicateQualifier ("far");
+                    }
+                    Q |= T_QUAL_FAR;
+                } else {
+                    goto Done;
+                }
+                break;
+
+            case TOK_FASTCALL:
+                if (Allowed & T_QUAL_FASTCALL) {
+                    if (Q & T_QUAL_FASTCALL) {
+                        DuplicateQualifier ("fastcall");
+                    }
+                    Q |= T_QUAL_FASTCALL;
+                } else {
+                    goto Done;
+                }
                 break;
 
 	    default:
-		Internal ("Unexpected type qualifier token: %d", CurTok.Tok);
+	       	goto Done;
 
 	}
 
@@ -119,6 +172,7 @@ static TypeCode OptionalQualifiers (TypeCode Q)
 	NextToken ();
     }
 
+Done:
     /* Return the qualifiers read */
     return Q;
 }
@@ -190,35 +244,18 @@ static void AddTypeToDeclaration (Declaration* D, TypeCode T)
 
 
 
-static void AddFuncTypeToDeclaration (Declaration* D, FuncDesc* F)
-/* Add a function type plus function descriptor to the type of a declaration */
+static void FixQualifiers (Type* DataType)
+/* Apply several fixes to qualifiers */
 {
-    NeedTypeSpace (D, 1);
-    D->Type[D->Index].C = T_FUNC;
-    SetFuncDesc (D->Type + D->Index, F);
-    ++D->Index;
-}
+    Type*    T;
+    TypeCode Q;
 
-
-
-static void AddArrayToDeclaration (Declaration* D, long Size)
-/* Add an array type plus size to the type of a declaration */
-{
-    NeedTypeSpace (D, 1);
-    D->Type[D->Index].C = T_ARRAY;
-    D->Type[D->Index].A.L = Size;
-    ++D->Index;
-}
-
-
-
-static void FixArrayQualifiers (Type* T)
-/* Using typedefs, it is possible to generate declarations that have
- * type qualifiers attached to an array, not the element type. Go and
- * fix these here.
- */
-{
-    TypeCode Q = T_QUAL_NONE;
+    /* Using typedefs, it is possible to generate declarations that have
+     * type qualifiers attached to an array, not the element type. Go and
+     * fix these here.
+     */
+    T = DataType;
+    Q = T_QUAL_NONE;
     while (T->C != T_END) {
         if (IsTypeArray (T)) {
             /* Extract any type qualifiers */
@@ -231,9 +268,69 @@ static void FixArrayQualifiers (Type* T)
         }
         ++T;
     }
-
     /* Q must be empty now */
     CHECK (Q == T_QUAL_NONE);
+
+    /* Do some fixes on pointers and functions. */
+    T = DataType;
+    while (T->C != T_END) {
+        if (IsTypePtr (T)) {
+
+            /* Fastcall qualifier on the pointer? */
+            if (IsQualFastcall (T)) {
+                /* Pointer to function which is not fastcall? */
+                if (IsTypeFunc (T+1) && !IsQualFastcall (T+1)) {
+                    /* Move the fastcall qualifier from the pointer to
+                     * the function.
+                     */
+                    T[0].C &= ~T_QUAL_FASTCALL;
+                    T[1].C |= T_QUAL_FASTCALL;
+                } else {
+                    Error ("Invalid `_fastcall__' qualifier for pointer");
+                }
+            }
+
+            /* Apply the default far and near qualifiers if none are given */
+            Q = (T[0].C & T_QUAL_ADDRSIZE);
+            if (Q == T_QUAL_NONE) {
+                /* No address size qualifiers specified */
+                if (IsTypeFunc (T+1)) {
+                    /* Pointer to function. Use the qualifier from the function
+                     * or the default if the function don't has one.
+                     */
+                    Q = (T[1].C & T_QUAL_ADDRSIZE);
+                    if (Q == T_QUAL_NONE) {
+                        Q = CodeAddrSizeQualifier ();
+                    }
+                } else {
+                    Q = DataAddrSizeQualifier ();
+                }
+                T[0].C |= Q;
+            } else {
+                /* We have address size qualifiers. If followed by a function,
+                 * apply these also to the function.
+                 */
+                if (IsTypeFunc (T+1)) {
+                    TypeCode FQ = (T[1].C & T_QUAL_ADDRSIZE);
+                    if (FQ == T_QUAL_NONE) {
+                        T[1].C |= Q;
+                    } else if (FQ != Q) {
+                        Error ("Address size qualifier mismatch");
+                        T[1].C = (T[1].C & ~T_QUAL_ADDRSIZE) | Q;
+                    }
+                }
+            }
+
+        } else if (IsTypeFunc (T)) {
+
+            /* Apply the default far and near qualifiers if none are given */
+            if ((T[0].C & T_QUAL_ADDRSIZE) == 0) {
+                T[0].C |= CodeAddrSizeQualifier ();
+            }
+
+        }
+        ++T;
+    }
 }
 
 
@@ -458,7 +555,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     D->Flags &= ~DS_DEF_TYPE;
 
     /* Read type qualifiers if we have any */
-    Qualifiers = OptionalQualifiers (Qualifiers);
+    Qualifiers = OptionalQualifiers (Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
 
     /* Look at the data type */
     switch (CurTok.Tok) {
@@ -666,7 +763,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     }
 
     /* There may also be qualifiers *after* the initial type */
-    D->Type[0].C |= OptionalQualifiers (Qualifiers);
+    D->Type[0].C |= OptionalQualifiers (Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
 }
 
 
@@ -924,13 +1021,6 @@ static FuncDesc* ParseFuncDecl (void)
      	Sym = Sym->PrevSym;
     }
 
-    /* Add the default address size for the function */
-    if (CodeAddrSize == ADDR_SIZE_FAR) {
-        F->Flags |= FD_FAR;
-    } else {
-        F->Flags |= FD_NEAR;
-    }
-
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
 
@@ -940,109 +1030,46 @@ static FuncDesc* ParseFuncDecl (void)
 
 
 
-static unsigned FunctionModifierFlags (void)
-/* Parse __fastcall__, __near__ and __far__ and return the matching FD_ flags */
-{
-    /* Read the flags */
-    unsigned Flags = FD_NONE;
-    while (CurTok.Tok == TOK_FASTCALL || CurTok.Tok == TOK_NEAR || CurTok.Tok == TOK_FAR) {
-
-        /* Get the flag bit for the next token */
-        unsigned F = FD_NONE;
-        switch (CurTok.Tok) {
-            case TOK_FASTCALL:  F = FD_FASTCALL; break;
-            case TOK_NEAR:     	F = FD_NEAR;     break;
-            case TOK_FAR:	F = FD_FAR;	 break;
-            default:            Internal ("Unexpected token: %d", CurTok.Tok);
-        }
-
-        /* Remember the flag for this modifier */
-        if (Flags & F) {
-            Error ("Duplicate modifier");
-        }
-        Flags |= F;
-
-        /* Skip the token */
-        NextToken ();
-    }
-
-    /* Sanity check */
-    if ((Flags & (FD_NEAR | FD_FAR)) == (FD_NEAR | FD_FAR)) {
-        Error ("Cannot specify both, `__near__' and `__far__' modifiers");
-        Flags &= ~(FD_NEAR | FD_FAR);
-    }
-
-    /* Return the flags read */
-    return Flags;
-}
-
-
-
-static void ApplyFunctionModifiers (Type* T, unsigned Flags)
-/* Apply a set of function modifier flags to a function */
-{
-    /* Get the function descriptor */
-    FuncDesc* F = GetFuncDesc (T);
-
-    /* Special check for __fastcall__ */
-    if ((Flags & FD_FASTCALL) != 0 && IsVariadicFunc (T)) {
-        Error ("Cannot apply `__fastcall__' to functions with "
-               "variable parameter list");
-        Flags &= ~FD_FASTCALL;
-    }
-
-    /* Remove the default function address size modifiers */
-    F->Flags &= ~(FD_NEAR | FD_FAR);
-
-    /* Add the new modifers */
-    F->Flags |= Flags;
-}
-
-
-
 static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
+    /* Read optional function or pointer qualifiers. These modify the
+     * identifier or token to the right. For convenience, we allow the fastcall
+     * qualifier also for pointers here. If it is a pointer-to-function, the
+     * qualifier will later be transfered to the function itself. If it's a
+     * pointer to something else, it will be flagged as an error.
+     */
+    TypeCode Qualifiers =
+        OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_FASTCALL);
+
+    /* We cannot have more than one address size far qualifier */
+    switch (Qualifiers & T_QUAL_ADDRSIZE) {
+                  
+        case T_QUAL_NONE:
+        case T_QUAL_NEAR:
+        case T_QUAL_FAR:
+            break;
+
+        default:
+            Error ("Cannot specify more than one address size qualifier");
+            Qualifiers &= ~T_QUAL_ADDRSIZE;
+    }
+
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
-
-    	TypeCode C;
 
         /* Skip the star */
        	NextToken ();
 
-    	/* Allow optional const or volatile qualifiers */
-       	C = T_PTR | OptionalQualifiers (T_QUAL_NONE);
+    	/* Allow optional pointer qualifiers */
+        Qualifiers = OptionalQualifiers (Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
 
         /* Parse the type, the pointer points to */
        	Decl (Spec, D, Mode);
 
 	/* Add the type */
-	AddTypeToDeclaration (D, C);
+	AddTypeToDeclaration (D, T_PTR | Qualifiers);
        	return;
-    }
-
-    /* Function modifiers */
-    if (CurTok.Tok == TOK_FASTCALL || CurTok.Tok == TOK_NEAR || CurTok.Tok == TOK_FAR) {
-
-	/* Remember the current type pointer */
-    	Type* T = D->Type + D->Index;
-
-    	/* Read the flags */
-    	unsigned Flags = FunctionModifierFlags ();
-
-    	/* Parse the function */
-    	Decl (Spec, D, Mode);
-
-    	/* Check that we have a function */
-    	if (!IsTypeFunc (T) && !IsTypeFuncPtr (T)) {
-    	    Error ("Function modifier applied to non function");
-    	} else {
-            ApplyFunctionModifiers (T, Flags);
-        }
-
-    	/* Done */
-    	return;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
@@ -1078,17 +1105,41 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 
        	    /* Function declaration */
     	    FuncDesc* F;
+
+            /* Skip the opening paren */
        	    NextToken ();
 
     	    /* Parse the function declaration */
        	    F = ParseFuncDecl ();
 
+            /* We cannot specify fastcall for variadic functions */
+            if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
+                Error ("Variadic functions cannot be `__fastcall'");
+                Qualifiers &= ~T_QUAL_FASTCALL;
+            }
+
     	    /* Add the function type. Be sure to bounds check the type buffer */
-    	    AddFuncTypeToDeclaration (D, F);
+            NeedTypeSpace (D, 1);
+            D->Type[D->Index].C = T_FUNC | Qualifiers;
+            D->Type[D->Index].A.P = F;
+            ++D->Index;
+
+            /* Qualifiers now used */
+            Qualifiers = T_QUAL_NONE;
+
        	} else {
-    	    /* Array declaration */
+    	    /* Array declaration. */
        	    long Size = UNSPECIFIED;
+
+            /* We cannot have any qualifiers for an array */
+            if (Qualifiers != T_QUAL_NONE) {
+                Error ("Invalid qualifiers for array");
+                Qualifiers = T_QUAL_NONE;
+            }
+
+            /* Skip the left bracket */
        	    NextToken ();
+
     	    /* Read the size if it is given */
        	    if (CurTok.Tok != TOK_RBRACK) {
     	     	ExprDesc Expr;
@@ -1103,11 +1154,27 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
                 }
        	       	Size = Expr.IVal;
        	    }
+
+            /* Skip the right bracket */
        	    ConsumeRBrack ();
 
-    	    /* Add the array type with the size */
-    	    AddArrayToDeclaration (D, Size);
+    	    /* Add the array type with the size to the type */
+            NeedTypeSpace (D, 1);
+            D->Type[D->Index].C = T_ARRAY;
+            D->Type[D->Index].A.L = Size;
+            ++D->Index;
        	}
+    }
+
+    /* If we have remaining qualifiers, flag them as invalid */
+    if (Qualifiers & T_QUAL_NEAR) {
+        Error ("Invalid `__near__' qualifier");
+    }
+    if (Qualifiers & T_QUAL_FAR) {
+        Error ("Invalid `__far__' qualifier");
+    }
+    if (Qualifiers & T_QUAL_FASTCALL) {
+        Error ("Invalid `__fastcall__' qualifier");
     }
 }
 
@@ -1157,8 +1224,8 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     /* Use the storage class from the declspec */
     D->StorageClass = Spec->StorageClass;
 
-    /* Fix any type qualifiers attached to an array type */
-    FixArrayQualifiers (D->Type);
+    /* Do several fixes on qualifiers */
+    FixQualifiers (D->Type);
 
     /* If we have a function, add a special storage class */
     if (IsTypeFunc (D->Type)) {
@@ -1243,7 +1310,7 @@ void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType)
     InitDeclSpec (D);
 
     /* There may be qualifiers *before* the storage class specifier */
-    Qualifiers = OptionalQualifiers (T_QUAL_NONE);
+    Qualifiers = OptionalQualifiers (T_QUAL_NONE, T_QUAL_CONST | T_QUAL_VOLATILE);
 
     /* Now get the storage class specifier for this declaration */
     ParseStorageClass (D, DefStorage);

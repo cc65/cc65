@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -370,7 +370,7 @@ void NewFunc (SymEntry* Func)
     /* Special handling for main() */
     if (strcmp (Func->Name, "main") == 0) {
         /* Main cannot be a fastcall function */
-        if (IsFastCallFunc (Func->Type)) {
+        if (IsQualFastcall (Func->Type)) {
             Error ("`main' cannot be declared as __fastcall__");
         }
 
@@ -391,7 +391,7 @@ void NewFunc (SymEntry* Func)
     }
 
     /* If this is a fastcall function, push the last parameter onto the stack */
-    if (IsFastCallFunc (Func->Type) && D->ParamCount > 0) {
+    if (IsQualFastcall (Func->Type) && D->ParamCount > 0) {
 
      	unsigned Flags;
 

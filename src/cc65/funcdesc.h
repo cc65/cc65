@@ -49,12 +49,9 @@
 #define FD_EMPTY       	       	0x0001U	/* Function with empty param list    */
 #define FD_VOID_PARAM   	0x0002U	/* Function with a void param list   */
 #define FD_VARIADIC		0x0004U	/* Function with variable param list */
-#define FD_FASTCALL		0x0010U	/* __fastcall__ function 	     */
-#define FD_FAR			0x0020U /* __far__ function		     */
-#define FD_NEAR			0x0040U /* __near__ function		     */
-#define FD_OLDSTYLE    	       	0x0100U	/* Old style (K&R) function	     */
-#define FD_OLDSTYLE_INTRET    	0x0200U	/* K&R func has implicit int return  */
-#define FD_UNNAMED_PARAMS      	0x0400U	/* Function has unnamed params	     */
+#define FD_OLDSTYLE    	       	0x0010U	/* Old style (K&R) function	     */
+#define FD_OLDSTYLE_INTRET    	0x0020U	/* K&R func has implicit int return  */
+#define FD_UNNAMED_PARAMS      	0x0040U	/* Function has unnamed params	     */
 
 /* Bits that must be ignored when comparing funcs */
 #define FD_IGNORE       (FD_OLDSTYLE | FD_OLDSTYLE_INTRET | FD_UNNAMED_PARAMS)

@@ -58,54 +58,58 @@
 
 /* Basic data types */
 enum {
-    T_END	    = 0x0000,
+    T_END      	    = 0x000000,
 
     /* Basic types */
-    T_TYPE_NONE	    = 0x0000,
-    T_TYPE_CHAR	    = 0x0001,
-    T_TYPE_SHORT    = 0x0002,
-    T_TYPE_INT 	    = 0x0003,
-    T_TYPE_LONG	    = 0x0004,
-    T_TYPE_LONGLONG = 0x0005,
-    T_TYPE_ENUM	    = 0x0006,
-    T_TYPE_FLOAT    = 0x0007,
-    T_TYPE_DOUBLE   = 0x0008,
-    T_TYPE_VOID     = 0x0009,
-    T_TYPE_STRUCT   = 0x000A,
-    T_TYPE_UNION    = 0x000B,
-    T_TYPE_ARRAY    = 0x000C,
-    T_TYPE_PTR      = 0x000D,
-    T_TYPE_FUNC     = 0x000E,
-    T_MASK_TYPE	    = 0x001F,
+    T_TYPE_NONE	    = 0x000000,
+    T_TYPE_CHAR	    = 0x000001,
+    T_TYPE_SHORT    = 0x000002,
+    T_TYPE_INT 	    = 0x000003,
+    T_TYPE_LONG	    = 0x000004,
+    T_TYPE_LONGLONG = 0x000005,
+    T_TYPE_ENUM	    = 0x000006,
+    T_TYPE_FLOAT    = 0x000007,
+    T_TYPE_DOUBLE   = 0x000008,
+    T_TYPE_VOID     = 0x000009,
+    T_TYPE_STRUCT   = 0x00000A,
+    T_TYPE_UNION    = 0x00000B,
+    T_TYPE_ARRAY    = 0x00000C,
+    T_TYPE_PTR      = 0x00000D,
+    T_TYPE_FUNC     = 0x00000E,
+    T_MASK_TYPE	    = 0x00000F,
 
     /* Type classes */
-    T_CLASS_NONE    = 0x0000,
-    T_CLASS_INT	    = 0x0020,
-    T_CLASS_FLOAT   = 0x0040,
-    T_CLASS_PTR	    = 0x0060,
-    T_CLASS_STRUCT  = 0x0080,
-    T_CLASS_FUNC    = 0x00A0,
-    T_MASK_CLASS    = 0x00E0,
+    T_CLASS_NONE    = 0x000000,
+    T_CLASS_INT	    = 0x000010,
+    T_CLASS_FLOAT   = 0x000020,
+    T_CLASS_PTR	    = 0x000030,
+    T_CLASS_STRUCT  = 0x000040,
+    T_CLASS_FUNC    = 0x000050,
+    T_MASK_CLASS    = 0x000070,
 
     /* Type signedness */
-    T_SIGN_NONE	    = 0x0000,
-    T_SIGN_UNSIGNED = 0x0100,
-    T_SIGN_SIGNED   = 0x0200,
-    T_MASK_SIGN     = 0x0300,
+    T_SIGN_NONE	    = 0x000000,
+    T_SIGN_UNSIGNED = 0x000080,
+    T_SIGN_SIGNED   = 0x000100,
+    T_MASK_SIGN     = 0x000180,
 
     /* Type size modifiers */
-    T_SIZE_NONE	    = 0x0000,
-    T_SIZE_SHORT    = 0x0400,
-    T_SIZE_LONG     = 0x0800,
-    T_SIZE_LONGLONG = 0x0C00,
-    T_MASK_SIZE	    = 0x0C00,
+    T_SIZE_NONE	    = 0x000000,
+    T_SIZE_SHORT    = 0x000200,
+    T_SIZE_LONG     = 0x000400,
+    T_SIZE_LONGLONG = 0x000600,
+    T_MASK_SIZE	    = 0x000600,
 
     /* Type qualifiers */
-    T_QUAL_NONE     = 0x0000,
-    T_QUAL_CONST    = 0x1000,
-    T_QUAL_VOLATILE = 0x2000,
-    T_QUAL_RESTRICT = 0x4000,
-    T_MASK_QUAL	    = 0x7000,
+    T_QUAL_NONE     = 0x000000,
+    T_QUAL_CONST    = 0x000800,
+    T_QUAL_VOLATILE = 0x001000,
+    T_QUAL_RESTRICT = 0x002000,
+    T_QUAL_NEAR     = 0x004000,
+    T_QUAL_FAR      = 0x008000,
+    T_QUAL_ADDRSIZE = T_QUAL_NEAR | T_QUAL_FAR,
+    T_QUAL_FASTCALL = 0x010000,
+    T_MASK_QUAL	    = 0x01F800,
 
     /* Types */
     T_CHAR     	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
@@ -506,43 +510,75 @@ INLINE int IsSignSigned (const Type* T)
 #  define IsSignSigned(T)       (GetSignedness (T) == T_SIGN_SIGNED)
 #endif
 
-TypeCode GetQualifier (const Type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE TypeCode GetQualifier (const Type* T)
 /* Get the qualifier from the given type string */
+{
+    return (T->C & T_MASK_QUAL);
+}
+#else
+#  define GetQualifier(T)      ((T)->C & T_MASK_QUAL)
+#endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsQualConst (const Type* T)
 /* Return true if the given type has a const memory image */
 {
-    return (GetQualifier (T) & T_QUAL_CONST) != 0;
+    return (T->C & T_QUAL_CONST) != 0;
 }
 #else
-#  define IsQualConst(T)        ((GetQualifier (T) & T_QUAL_CONST) != 0)
+#  define IsQualConst(T)        ((T->C & T_QUAL_CONST) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsQualVolatile (const Type* T)
 /* Return true if the given type has a volatile type qualifier */
 {
-    return (GetQualifier (T) & T_QUAL_VOLATILE) != 0;
+    return (T->C & T_QUAL_VOLATILE) != 0;
 }
 #else
-#  define IsQualVolatile(T)     ((GetQualifier (T) & T_QUAL_VOLATILE) != 0)
+#  define IsQualVolatile(T)     (T->C & T_QUAL_VOLATILE) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int IsQualRestrict (const Type* T)
 /* Return true if the given type has a restrict qualifier */
 {
-    return (GetQualifier (T) & T_QUAL_RESTRICT) != 0;
+    return (T->C & T_QUAL_RESTRICT) != 0;
 }
 #else
-#  define IsQualRestrict(T)     ((GetQualifier (T) & T_QUAL_RESTRICT) != 0)
+#  define IsQualRestrict(T)     (T->C & T_QUAL_RESTRICT) != 0)
 #endif
 
-int IsFastCallFunc (const Type* T) attribute ((const));
-/* Return true if this is a function type or pointer to function with
- * __fastcall__ calling conventions
- */
+#if defined(HAVE_INLINE)
+INLINE int IsQualNear (const Type* T)
+/* Return true if the given type has a near qualifier */
+{
+    return (T->C & T_QUAL_NEAR) != 0;
+}
+#else
+#  define IsQualNear(T)         (T->C & T_QUAL_NEAR) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualFar (const Type* T)
+/* Return true if the given type has a far qualifier */
+{
+    return (T->C & T_QUAL_FAR) != 0;
+}
+#else
+#  define IsQualFar(T)          (T->C & T_QUAL_FAR) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualFastcall (const Type* T)
+/* Return true if the given type has a fastcall qualifier */
+{
+    return (T->C & T_QUAL_FASTCALL) != 0;
+}
+#else
+#  define IsQualFastcall(T)     (T->C & T_QUAL_FASTCALL) != 0)
+#endif
 
 int IsVariadicFunc (const Type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
@@ -597,6 +633,12 @@ Type* PtrConversion (Type* T);
  * expression is an array, convert it to pointer to first element. Otherwise
  * return T.
  */
+
+TypeCode CodeAddrSizeQualifier (void);
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
+
+TypeCode DataAddrSizeQualifier (void);
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the data address size */
 
 
 

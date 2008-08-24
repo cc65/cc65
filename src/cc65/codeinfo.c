@@ -340,14 +340,15 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
      	/* Did we find it in the top level table? */
      	if (E && IsTypeFunc (E->Type)) {
 
+            FuncDesc* D = E->V.F.Func;
+
      	    /* A function may use the A or A/X registers if it is a fastcall
      	     * function. If it is not a fastcall function but a variadic one,
 	     * it will use the Y register (the parameter size is passed here).
 	     * In all other cases, no registers are used. However, we assume
 	     * that any function will destroy all registers.
      	     */
-     	    FuncDesc* D = E->V.F.Func;
-     	    if ((D->Flags & FD_FASTCALL) != 0 && D->ParamCount > 0) {
+     	    if (IsQualFastcall (E->Type) && D->ParamCount > 0) {
      		/* Will use registers depending on the last param */
                 unsigned LastParamSize = CheckedSizeOf (D->LastParam->Type);
      		if (LastParamSize == 1) {

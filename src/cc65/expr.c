@@ -242,12 +242,12 @@ void PushAddr (const ExprDesc* Expr)
 
 
 /*****************************************************************************/
-/*   	     	     		     code				     */
+/*   	     	     	  	     code				     */
 /*****************************************************************************/
 
 
 
-static unsigned FunctionParamList (FuncDesc* Func)
+static unsigned FunctionParamList (FuncDesc* Func, int IsFastcall)
 /* Parse a function parameter list and pass the parameters to the called
  * function. Depending on several criteria this may be done by just pushing
  * each parameter separately, or creating the parameter frame once and then
@@ -284,7 +284,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	/* Calculate the number and size of the parameters */
 	FrameParams = Func->ParamCount;
 	FrameSize   = Func->ParamSize;
-	if (FrameParams > 0 && (Func->Flags & FD_FASTCALL) != 0) {
+	if (FrameParams > 0 && IsFastcall) {
 	    /* Last parameter is not pushed */
 	    FrameSize -= CheckedSizeOf (Func->LastParam->Type);
 	    --FrameParams;
@@ -371,7 +371,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
        	Flags |= TypeOf (Expr.Type);
 
 	/* If this is a fastcall function, don't push the last argument */
-       	if (ParamCount != Func->ParamCount || (Func->Flags & FD_FASTCALL) == 0) {
+       	if (ParamCount != Func->ParamCount || !IsFastcall) {
 	    unsigned ArgSize = sizeofarg (Flags);
 	    if (FrameSize > 0) {
 	    	/* We have the space already allocated, store in the frame.
@@ -430,7 +430,7 @@ static void FunctionCall (ExprDesc* Expr)
     unsigned 	  ParamSize;	  /* Number of parameter bytes */
     CodeMark   	  Mark;
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
-    int           IsFastCall = 0; /* True if it's a fast call function */
+    int           IsFastcall = 0; /* True if it's a fast call function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
 
     /* Skip the left paren */
@@ -444,7 +444,7 @@ static void FunctionCall (ExprDesc* Expr)
     if (IsFuncPtr) {
 
 	/* Check wether it's a fastcall function that has parameters */
-	IsFastCall = IsFastCallFunc (Expr->Type + 1) && (Func->ParamCount > 0);
+	IsFastcall = IsQualFastcall (Expr->Type + 1) && (Func->ParamCount > 0);
 
 	/* Things may be difficult, depending on where the function pointer
 	 * resides. If the function pointer is an expression of some sort
@@ -454,7 +454,7 @@ static void FunctionCall (ExprDesc* Expr)
 	 * For fastcall functions we do also need to place a copy of the
 	 * pointer on stack, since we cannot use a/x.
 	 */
-	PtrOnStack = IsFastCall || !ED_IsConst (Expr);
+	PtrOnStack = IsFastcall || !ED_IsConst (Expr);
 	if (PtrOnStack) {
 
 	    /* Not a global or local variable, or a fastcall function. Load
@@ -471,18 +471,23 @@ static void FunctionCall (ExprDesc* Expr)
 	    PtrOffs = StackPtr;
 	}
 
-    /* Check for known standard functions and inline them */
-    } else if (Expr->Name != 0) {
-        int StdFunc = FindStdFunc ((const char*) Expr->Name);
-        if (StdFunc >= 0) {
-            /* Inline this function */
-            HandleStdFunc (StdFunc, Func, Expr);
-            return;
+    } else {
+        /* Check for known standard functions and inline them */
+        if (Expr->Name != 0) {
+            int StdFunc = FindStdFunc ((const char*) Expr->Name);
+            if (StdFunc >= 0) {
+                /* Inline this function */
+                HandleStdFunc (StdFunc, Func, Expr);
+                return;
+            }
         }
+
+        /* If we didn't inline the function, get fastcall info */
+        IsFastcall = IsQualFastcall (Expr->Type);
     }
 
     /* Parse the parameter list */
-    ParamSize = FunctionParamList (Func);
+    ParamSize = FunctionParamList (Func, IsFastcall);
 
     /* We need the closing paren here */
     ConsumeRParen ();
@@ -493,7 +498,7 @@ static void FunctionCall (ExprDesc* Expr)
 	/* If the function is not a fastcall function, load the pointer to
 	 * the function into the primary.
 	 */
-	if (!IsFastCall) {
+	if (!IsFastcall) {
 
 	    /* Not a fastcall function - we may use the primary */
        	    if (PtrOnStack) {
@@ -1290,7 +1295,7 @@ static void PreInc (ExprDesc* Expr)
     }
 
     /* Result is an expression, no reference */
-    ED_MakeRValExpr (Expr);     
+    ED_MakeRValExpr (Expr);
 }
 
 
@@ -1367,7 +1372,7 @@ static void PreDec (ExprDesc* Expr)
 
     /* Result is an expression, no reference */
     ED_MakeRValExpr (Expr);
-}                               
+}
 
 
 

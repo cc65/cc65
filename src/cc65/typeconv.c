@@ -168,11 +168,6 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
  * impossible.
  */
 {
-    /* Get the type of the right hand side. Treat function types as
-     * pointer-to-function
-     */
-    Expr->Type = PtrConversion (Expr->Type);
-
     /* First, do some type checking */
     if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
      	/* If one of the sides are of type void, output a more apropriate
@@ -192,7 +187,10 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
 
         /* Handle conversions to int type */
        	if (IsClassPtr (Expr->Type)) {
-     	    /* Pointer -> int conversion */
+     	    /* Pointer -> int conversion. Convert array to pointer */
+            if (IsTypeArray (Expr->Type)) {
+                Expr->Type = ArrayToPtr (Expr->Type);
+            }
      	    Warning ("Converting pointer to integer without a cast");
        	} else if (!IsClassInt (Expr->Type) && !IsClassFloat (Expr->Type)) {
      	    Error ("Incompatible types");
@@ -207,7 +205,13 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     } else if (IsClassPtr (NewType)) {
 
         /* Handle conversions to pointer type */
-     	if (IsClassPtr (Expr->Type)) {
+       	if (IsClassPtr (Expr->Type)) {
+
+            /* Convert array to pointer */
+            if (IsTypeArray (Expr->Type)) {
+                Expr->Type = ArrayToPtr (Expr->Type);
+            }
+
      	    /* Pointer to pointer assignment is valid, if:
      	     *   - both point to the same types, or
      	     *   - the rhs pointer is a void pointer, or
@@ -230,16 +234,20 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     	 	 	break;
     	 	}
     	    }
+
      	} else if (IsClassInt (Expr->Type)) {
      	    /* Int to pointer assignment is valid only for constant zero */
      	    if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
      	       	Warning ("Converting integer to pointer without a cast");
      	    }
     	} else if (IsTypeFuncPtr (NewType) && IsTypeFunc(Expr->Type)) {
+            /* Function -> Function pointer. First convert rhs to pointer */
+            Expr->Type = PointerTo (Expr->Type);
+
     	    /* Assignment of function to function pointer is allowed, provided
     	     * that both functions have the same parameter list.
     	     */
-    	    if (TypeCmp (Indirect (NewType), Expr->Type) < TC_EQUAL) {
+       	    if (TypeCmp (NewType, Expr->Type) < TC_EQUAL) {
     	 	Error ("Incompatible types");
     	    }
      	} else {

@@ -1241,12 +1241,11 @@ void CS_OutputPrologue (const CodeSeg* S, FILE* F)
      */
     if (Func) {
         /* Get the function descriptor */
-        const FuncDesc* D = GetFuncDesc (Func->Type);
        	CS_PrintFunctionHeader (S, F);
         fprintf (F, ".segment\t\"%s\"\n\n.proc\t_%s", S->SegName, Func->Name);
-        if (D->Flags & FD_NEAR) {
+        if (IsQualNear (Func->Type)) {
             fputs (": near", F);
-        } else if (D->Flags & FD_FAR) {
+        } else if (IsQualFar (Func->Type)) {
             fputs (": far", F);
         }
         fputs ("\n\n", F);

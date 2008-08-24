@@ -52,6 +52,7 @@ static void SetResult (typecmp_t* Result, typecmp_t Val)
 /* Set a new result value if it is less than the existing one */
 {
     if (Val < *Result) {
+        /* printf ("SetResult = %d\n", Val); */
 	*Result = Val;
     }
 }
@@ -246,13 +247,14 @@ static void DoCompare (const Type* lhs, const Type* rhs, typecmp_t* Result)
        	}
        	if (LeftQual != RightQual) {
 	    /* On the first indirection level, different qualifiers mean
-	     * that the types are still compatible. On the second level,
-	     * this is a (maybe minor) error, so we create a special
-	     * return code, since a qualifier is dropped from a pointer.
-	     * Starting from the next level, the types are incompatible
-	     * if the qualifiers differ.
-	     */
-	    switch (Indirections) {
+     	     * that the types are still compatible. On the second level,
+     	     * this is a (maybe minor) error, so we create a special
+     	     * return code, since a qualifier is dropped from a pointer.
+     	     * Starting from the next level, the types are incompatible
+     	     * if the qualifiers differ.
+     	     */
+            /* printf ("Ind = %d    %06X != %06X\n", Indirections, LeftQual, RightQual); */
+     	    switch (Indirections) {
 
 		case 0:
 		    SetResult (Result, TC_STRICT_COMPATIBLE);

@@ -36,7 +36,9 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "check.h"
+#include "mmodel.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -208,7 +210,7 @@ Type* PointerTo (const Type* T)
     Type* P = TypeAlloc	(Size + 1);
 
     /* Create the return type... */
-    P[0].C = T_PTR;
+    P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
     memcpy (P+1, T, Size * sizeof (Type));
 
     /* ...and return it */
@@ -240,69 +242,72 @@ void PrintType (FILE* F, const Type* T)
         /* Get the type code */
         TypeCode C = T->C;
 
-	/* Print any qualifiers */
+     	/* Print any qualifiers */
        	C = PrintTypeComp (F, C, T_QUAL_CONST, "const");
-	C = PrintTypeComp (F, C, T_QUAL_VOLATILE, "volatile");
+     	C = PrintTypeComp (F, C, T_QUAL_VOLATILE, "volatile");
         C = PrintTypeComp (F, C, T_QUAL_RESTRICT, "restrict");
+        C = PrintTypeComp (F, C, T_QUAL_NEAR, "__near__");
+        C = PrintTypeComp (F, C, T_QUAL_FAR, "__far__");
+        C = PrintTypeComp (F, C, T_QUAL_FASTCALL, "__fastcall__");
 
-    	/* Signedness. Omit the signedness specifier for long and int */
+     	/* Signedness. Omit the signedness specifier for long and int */
        	if ((C & T_MASK_TYPE) != T_TYPE_INT && (C & T_MASK_TYPE) != T_TYPE_LONG) {
-	    C = PrintTypeComp (F, C, T_SIGN_SIGNED, "signed");
-	}
-    	C = PrintTypeComp (F, C, T_SIGN_UNSIGNED, "unsigned");
+     	    C = PrintTypeComp (F, C, T_SIGN_SIGNED, "signed");
+     	}
+     	C = PrintTypeComp (F, C, T_SIGN_UNSIGNED, "unsigned");
 
-    	/* Now check the real type */
+     	/* Now check the real type */
      	switch (C & T_MASK_TYPE) {
-    	    case T_TYPE_CHAR:
-    	  	fprintf (F, "char");
-    	  	break;
-	    case T_TYPE_SHORT:
-		fprintf (F, "short");
-		break;
-    	    case T_TYPE_INT:
-    	  	fprintf (F, "int");
-    	  	break;
-	    case T_TYPE_LONG:
-		fprintf (F, "long");
-		break;
-	    case T_TYPE_LONGLONG:
-		fprintf (F, "long long");
-		break;
-    	    case T_TYPE_FLOAT:
-    	     	fprintf (F, "float");
-    	     	break;
-    	    case T_TYPE_DOUBLE:
-    	     	fprintf (F, "double");
-    	     	break;
+     	    case T_TYPE_CHAR:
+     	  	fprintf (F, "char");
+     	  	break;
+     	    case T_TYPE_SHORT:
+     		fprintf (F, "short");
+     		break;
+     	    case T_TYPE_INT:
+     	  	fprintf (F, "int");
+     	  	break;
+     	    case T_TYPE_LONG:
+     		fprintf (F, "long");
+     		break;
+     	    case T_TYPE_LONGLONG:
+     		fprintf (F, "long long");
+     		break;
+     	    case T_TYPE_FLOAT:
+     	     	fprintf (F, "float");
+     	     	break;
+     	    case T_TYPE_DOUBLE:
+     	     	fprintf (F, "double");
+     	     	break;
      	    case T_TYPE_VOID:
      	  	fprintf (F, "void");
-    	  	break;
-    	    case T_TYPE_STRUCT:
-    	     	fprintf (F, "struct %s", ((SymEntry*) T->A.P)->Name);
-	     	break;
-	    case T_TYPE_UNION:
-	     	fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
-	     	break;
-	    case T_TYPE_ARRAY:
-		/* Recursive call */
-		PrintType (F, T + 1);
-		if (T->A.L == UNSPECIFIED) {
-		    fprintf (F, "[]");
-		} else {
-		    fprintf (F, "[%ld]", T->A.L);
-		}
-	     	return;
-	    case T_TYPE_PTR:
- 		/* Recursive call */
-		PrintType (F, T + 1);
-		fprintf (F, "*");
-	     	return;
-	    case T_TYPE_FUNC:
-	     	fprintf (F, "function returning ");
-	     	break;
-	    default:
-	     	fprintf (F, "unknown type: %04lX", T->C);
-	}
+     	  	break;
+     	    case T_TYPE_STRUCT:
+     	     	fprintf (F, "struct %s", ((SymEntry*) T->A.P)->Name);
+     	     	break;
+     	    case T_TYPE_UNION:
+     	     	fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
+     	     	break;
+     	    case T_TYPE_ARRAY:
+     		/* Recursive call */
+     		PrintType (F, T + 1);
+     		if (T->A.L == UNSPECIFIED) {
+     		    fprintf (F, "[]");
+     		} else {
+     		    fprintf (F, "[%ld]", T->A.L);
+     		}
+     	     	return;
+     	    case T_TYPE_PTR:
+     		/* Recursive call */
+     		PrintType (F, T + 1);
+     		fprintf (F, "*");
+     	     	return;
+     	    case T_TYPE_FUNC:
+     	     	fprintf (F, "function returning ");
+     	     	break;
+     	    default:
+     	     	fprintf (F, "unknown type: %04lX", T->C);
+     	}
 
         /* Next element */
         ++T;
@@ -319,33 +324,33 @@ void PrintFuncSig (FILE* F, const char* Name, Type* T)
 
     /* Print a comment with the function signature */
     PrintType (F, GetFuncReturn (T));
-    if (D->Flags & FD_NEAR) {
+    if (IsQualNear (T)) {
         fprintf (F, " __near__");
     }
-    if (D->Flags & FD_FAR) {
+    if (IsQualFar (T)) {
         fprintf (F, " __far__");
     }
-    if (D->Flags & FD_FASTCALL) {
+    if (IsQualFastcall (T)) {
      	fprintf (F, " __fastcall__");
     }
     fprintf (F, " %s (", Name);
 
     /* Parameters */
     if (D->Flags & FD_VOID_PARAM) {
- 	fprintf (F, "void");
+     	fprintf (F, "void");
     } else {
- 	unsigned I;
- 	SymEntry* E = D->SymTab->SymHead;
- 	for (I = 0; I < D->ParamCount; ++I) {
- 	    if (I > 0) {
- 		fprintf (F, ", ");
- 	    }
+     	unsigned I;
+     	SymEntry* E = D->SymTab->SymHead;
+     	for (I = 0; I < D->ParamCount; ++I) {
+     	    if (I > 0) {
+     		fprintf (F, ", ");
+     	    }
             if (SymIsRegVar (E)) {
                 fprintf (F, "register ");
             }
- 	    PrintType (F, E->Type);
- 	    E = E->NextSym;
- 	}
+     	    PrintType (F, E->Type);
+     	    E = E->NextSym;
+     	}
     }
 
     /* End of parameter list */
@@ -555,31 +560,6 @@ Type* ArrayToPtr (const Type* T)
 
 
 
-TypeCode GetQualifier (const Type* T)
-/* Get the qualifier from the given type string */
-{
-    /* If this is an array, look at the element type, otherwise look at the
-     * type itself.
-     */
-    if (IsTypeArray (T)) {
-     	++T;
-    }
-    return (T->C & T_MASK_QUAL);
-}
-
-
-
-int IsFastCallFunc (const Type* T)
-/* Return true if this is a function type or pointer to function with
- * __fastcall__ calling conventions
- */
-{
-    FuncDesc* F	= GetFuncDesc (T);
-    return (F->Flags & FD_FASTCALL) != 0;
-}
-
-
-
 int IsVariadicFunc (const Type* T)
 /* Return true if this is a function type or pointer to function type with
  * variable parameter list
@@ -723,15 +703,36 @@ Type* PtrConversion (Type* T)
  * return T.
  */
 {
-    if (IsTypeFunc (T)) {
+    if (IsTypeFunc (T) || IsTypeArray (T)) {
        	return PointerTo (T);
-    } else if (IsTypeArray (T)) {
-        return ArrayToPtr (T);
     } else {
         return T;
     }
 }
 
+
+
+TypeCode CodeAddrSizeQualifier (void)
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
+{
+    if (CodeAddrSize == ADDR_SIZE_FAR) {
+        return T_QUAL_FAR;
+    } else {
+        return T_QUAL_NEAR;
+    }
+}
+
+
+
+TypeCode DataAddrSizeQualifier (void)
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the data address size */
+{
+    if (DataAddrSize == ADDR_SIZE_FAR) {
+        return T_QUAL_FAR;
+    } else {
+        return T_QUAL_NEAR;
+    }
+}
 
 
 

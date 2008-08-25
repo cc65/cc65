@@ -78,7 +78,7 @@ Ex 1:  Function call:  Assuming 'i' declared int and 'c' declared
        	lda	_i  	      	; get 'i', low byte
        	ldx	_i+1	      	; get 'i', hi byte
        	jsr	pushax	      	; push it
-       	lda	_c  	      	; get 'c'
+       	lda 	_c  	      	; get 'c'
        	jsr    	pusha 	      	; push it
        	jsr	_baz	      	; call the function
        	sta	_i  	      	; store the result
@@ -131,10 +131,8 @@ C128: 	The startup code will reprogram the MMU, so that only the kernal ROM
       	is enabled. This means, there are 41K of memory available to the
       	program.
 
-Plus/4:	Unfortunately, the Plus/4 is not able to disable only part of it's
-      	ROM, it's an all or nothing approach. So, on the Plus/4, the program
-       	has only 28K available (16K machines are detected and the amount of
-      	free memory is reduced to 12K).
+Plus/4:	Works with bank switching so 59K of memory are available to the 
+        program.
 
 CBM 500:
     	The C program runs in bank #0 and has a total of 48K memory available.

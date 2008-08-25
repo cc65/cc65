@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -138,11 +138,6 @@ void __fastcall__ _poserror (const char* msg);  	/* cc65 */
 /* Masking macros for some functions */
 #define getc(f)	       	fgetc (f)     		/* ANSI */
 #define putc(c, f)     	fputc (c, f)  		/* ANSI */
-
-/* Non-standard function like macros */
-#if __CC65_STD__ == __CC65_STD_CC65__
-#define flushall()     		      		/* Unix */
-#endif
 
 
 

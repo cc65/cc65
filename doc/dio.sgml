@@ -67,15 +67,21 @@ This function will write the memory contents at buffer to the sector specified
 by <tt>sect_num</tt>. A verification is performed.
 <p>
 
-Use the <tt><ref name="dio_query_sectsize" id="sectsize"></tt> function to query the size of a sector.
+Use the <tt><ref name="dio_query_sectsize" id="sectsizecount"></tt> function to query
+the size of a sector and the <tt><ref name="dio_query_sectcount" id="sectsizecount"></tt>
+function to query the number of available sectors.
+<p>
 
 All these functions will return 0 for success and an OS specific error code in
 case of failure.
 <p>
 
-<sect>Querying sector size<label id="sectsize"><p>
+<sect>Querying sector size and count<label id="sectsizecount"><p>
 
-Some systems support multiple diskette formats which have different sector sizes.
+Some systems support multiple diskette formats which have different sector sizes
+and/or different sector counts.
+<p>
+
 The following function returns the sector size of the currently inserted disk:
 
 <tscreen><verb>
@@ -85,6 +91,13 @@ The following function returns the sector size of the currently inserted disk:
 On the Atari platform, the sector size is handled specially. Please refer
 to the DIO section in the <htmlurl url="atari.html" name="Atari">
 specific platform documentation.
+<p>
+
+The following function returns the sector count of the currently inserted disk:
+
+<tscreen><verb>
+    sectnum_t __fastcall__ dio_query_sectcount(dhandle_t handle);
+</verb></tscreen>
 
 <sect>Converting sector numbers<p>
 

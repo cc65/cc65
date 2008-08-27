@@ -10,7 +10,7 @@
 
 
 
-size_t strxfrm (char* dest, const char* src, size_t count)
+size_t __fastcall__ strxfrm (char* dest, const char* src, size_t count)
 {
     strncpy (dest, src, count);
     return strlen (src);

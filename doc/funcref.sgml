@@ -388,7 +388,6 @@ It does not declare any functions.
 <!-- <item><ref id="fgetpos" name="fgetpos"> -->
 <!-- <item><ref id="fgets" name="fgets"> -->
 <item><ref id="fileno" name="fileno">
-<!-- <item><ref id="flushall" name="flushall"> -->
 <!-- <item><ref id="fopen" name="fopen"> -->
 <!-- <item><ref id="fprintf" name="fprintf"> -->
 <!-- <item><ref id="fputc" name="fputc"> -->
@@ -488,7 +487,7 @@ It does not declare any functions.
 <item><ref id="strspn" name="strspn">
 <item><ref id="strstr" name="strstr">
 <item><ref id="strtok" name="strtok">
-<!-- <item><ref id="strxfrm" name="strxfrm"> -->
+<item><ref id="strxfrm" name="strxfrm"> 
 <item><ref id="strupper" name="strupper">
 <item><ref id="strupr" name="strupr">
 </itemize>
@@ -812,7 +811,7 @@ is present.
 <tag/Declaration/<tt/void CLI (void);/
 <tag/Description/The function will insert a 6502 CLI instruction into the code,
 so interrupts are enabled. Enabling interrupts has no effects if they are
-already enabled (the default). 
+already enabled (the default).
 <tag/Limits/<itemize>
 <item>The function is actually a macro.
 <item>Disabling interrupts may lead to unexpected results.
@@ -4068,6 +4067,7 @@ different locale has no effect.
 <tag/See also/
 <ref id="localeconv" name="localeconv">,
 <ref id="strcoll" name="strcoll">
+<ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4183,6 +4183,7 @@ be used in presence of a prototype.
 <ref id="strcoll" name="strcoll">,
 <ref id="stricmp" name="stricmp">,
 <ref id="strncmp" name="strncmp">
+<ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4260,6 +4261,7 @@ be used in presence of a prototype.
 <ref id="strcoll" name="strcoll">,
 <ref id="stricmp" name="stricmp">,
 <ref id="strncmp" name="strncmp">
+<ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4288,6 +4290,7 @@ be used in presence of a prototype.
 <ref id="strcmp" name="strcmp">,
 <ref id="stricmp" name="stricmp">,
 <ref id="strncmp" name="strncmp">
+<ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4422,6 +4425,7 @@ be used in presence of a prototype.
 <ref id="strcmp" name="strcmp">,
 <ref id="strcoll" name="strcoll">,
 <ref id="strncmp" name="strncmp">
+<ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4530,6 +4534,7 @@ be used in presence of a prototype.
 <ref id="strcmp" name="strcmp">,
 <ref id="strcoll" name="strcoll">,
 <ref id="stricmp" name="stricmp">
+<ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4663,6 +4668,39 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="strcspn" name="strcspn">,
 <!-- <ref id="strpbrk" name="strpbrk"> -->
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strxfrm<label id="strxfrm"><p>
+
+<quote>
+<descrip>
+<tag/Function/Transform a string.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/size_t __fastcall__ strxfrm (char* s1, const char* s2, size_t n);/
+<tag/Description/The <tt/strxfrm/ function transforms the string pointed to by
+s2 and places the resulting string into the string pointed to by s1. The
+transformation is such that if the <tt/strcmp/ function is applied to two
+transformed strings, it returns a value greater than, equal to, or less than
+zero, corresponding to the result of the <tt/strcoll/ function applied to the
+same two original strings. No more than n characters are placed into the
+resulting array pointed to by s1, including the terminating null character.
+<tag/Limits/<itemize>
+<item><tt/s1/ and <tt/s2/ must not point to the same memory area, otherwise
+the behaviour is undefined.
+<item>If <tt/n/ is zero, <tt/s1/ may be a NULL pointer.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>Since cc65 doesn't support different charcter sets, <tt/strxfrm/ will
+just copy s2 to s1 using <tt><ref id="strncpy" name="strncpy"></tt>.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="strncpy" name="strncpy">,
 <tag/Example/None.
 </descrip>
 </quote>

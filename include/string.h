@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,7 +57,7 @@ char* __fastcall__ strrchr (const char* s, int c);
 size_t __fastcall__ strspn (const char* s1, const char* s2);
 char* __fastcall__ strstr (const char* str, const char* substr);
 char* __fastcall__ strtok (char* s1, const char* s2);
-size_t strxfrm (char* s1, const char* s2, size_t count);
+size_t __fastcall__ strxfrm (char* s1, const char* s2, size_t count);
 void* __fastcall__ memchr (const void* mem, int c, size_t count);
 int __fastcall__ memcmp (const void* p1, const void* p2, size_t count);
 void* __fastcall__ memcpy (void* dest, const void* src, size_t count);

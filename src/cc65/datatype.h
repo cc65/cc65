@@ -467,7 +467,7 @@ INLINE int IsClassStruct (const Type* T)
 {
     return (GetClass (T) == T_CLASS_STRUCT);
 }
-#else
+#else                                
 #  define IsClassStruct(T)      (GetClass (T) == T_CLASS_STRUCT)
 #endif
 
@@ -528,7 +528,7 @@ INLINE int IsQualConst (const Type* T)
     return (T->C & T_QUAL_CONST) != 0;
 }
 #else
-#  define IsQualConst(T)        ((T->C & T_QUAL_CONST) != 0)
+#  define IsQualConst(T)        (((T)->C & T_QUAL_CONST) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -538,7 +538,7 @@ INLINE int IsQualVolatile (const Type* T)
     return (T->C & T_QUAL_VOLATILE) != 0;
 }
 #else
-#  define IsQualVolatile(T)     (T->C & T_QUAL_VOLATILE) != 0)
+#  define IsQualVolatile(T)     (((T)->C & T_QUAL_VOLATILE) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -548,7 +548,7 @@ INLINE int IsQualRestrict (const Type* T)
     return (T->C & T_QUAL_RESTRICT) != 0;
 }
 #else
-#  define IsQualRestrict(T)     (T->C & T_QUAL_RESTRICT) != 0)
+#  define IsQualRestrict(T)     (((T)->C & T_QUAL_RESTRICT) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -558,7 +558,7 @@ INLINE int IsQualNear (const Type* T)
     return (T->C & T_QUAL_NEAR) != 0;
 }
 #else
-#  define IsQualNear(T)         (T->C & T_QUAL_NEAR) != 0)
+#  define IsQualNear(T)         (((T)->C & T_QUAL_NEAR) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -568,7 +568,7 @@ INLINE int IsQualFar (const Type* T)
     return (T->C & T_QUAL_FAR) != 0;
 }
 #else
-#  define IsQualFar(T)          (T->C & T_QUAL_FAR) != 0)
+#  define IsQualFar(T)          (((T)->C & T_QUAL_FAR) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -578,7 +578,7 @@ INLINE int IsQualFastcall (const Type* T)
     return (T->C & T_QUAL_FASTCALL) != 0;
 }
 #else
-#  define IsQualFastcall(T)     (T->C & T_QUAL_FASTCALL) != 0)
+#  define IsQualFastcall(T)     (((T)->C & T_QUAL_FASTCALL) != 0)
 #endif
 
 int IsVariadicFunc (const Type* T) attribute ((const));

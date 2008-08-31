@@ -90,7 +90,7 @@ unsigned TypeLen (const Type* T)
 
 
 
-Type* TypeCpy (Type* Dest, const Type* Src)
+Type* TypeCopy (Type* Dest, const Type* Src)
 /* Copy a type string */
 {
     Type* Orig = Dest;
@@ -712,25 +712,21 @@ Type* PtrConversion (Type* T)
 
 
 
-TypeCode CodeAddrSizeQualifier (void)
-/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
+TypeCode AddrSizeQualifier (unsigned AddrSize)
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
 {
-    if (CodeAddrSize == ADDR_SIZE_FAR) {
-        return T_QUAL_FAR;
-    } else {
-        return T_QUAL_NEAR;
-    }
-}
+    switch (AddrSize) {
 
+        case ADDR_SIZE_ABS:
+            return T_QUAL_NEAR;
 
+        case ADDR_SIZE_FAR:
+            return T_QUAL_FAR;
 
-TypeCode DataAddrSizeQualifier (void)
-/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the data address size */
-{
-    if (DataAddrSize == ADDR_SIZE_FAR) {
-        return T_QUAL_FAR;
-    } else {
-        return T_QUAL_NEAR;
+        default:
+            Error ("Invalid address size");
+            return T_QUAL_NEAR;
+
     }
 }
 

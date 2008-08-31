@@ -43,6 +43,7 @@
 /* common */
 #include "attrib.h"
 #include "inline.h"
+#include "mmodel.h"
 
 /* cc65 */
 #include "funcdesc.h"
@@ -199,7 +200,7 @@ struct SymEntry;
 unsigned TypeLen (const Type* T);
 /* Return the length of the type string */
 
-Type* TypeCpy (Type* Dest, const Type* Src);
+Type* TypeCopy (Type* Dest, const Type* Src);
 /* Copy a type string */
 
 Type* TypeDup (const Type* T);
@@ -634,11 +635,28 @@ Type* PtrConversion (Type* T);
  * return T.
  */
 
-TypeCode CodeAddrSizeQualifier (void);
-/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
+TypeCode AddrSizeQualifier (unsigned AddrSize);
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the address size */
 
-TypeCode DataAddrSizeQualifier (void);
+#if defined(HAVE_INLINE)
+INLINE TypeCode CodeAddrSizeQualifier (void)
+/* Return T_QUAL_NEAR or T_QUAL_FAR depending on the code address size */
+{
+    return AddrSizeQualifier (CodeAddrSize);
+}
+#else
+#  define CodeAddrSizeQualifier()      (AddrSizeQualifier (CodeAddrSize))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE TypeCode DataAddrSizeQualifier (void)
 /* Return T_QUAL_NEAR or T_QUAL_FAR depending on the data address size */
+{
+    return AddrSizeQualifier (DataAddrSize);
+}
+#else
+#  define DataAddrSizeQualifier()      (AddrSizeQualifier (DataAddrSize))
+#endif
 
 
 

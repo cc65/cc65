@@ -90,9 +90,15 @@ static void DuplicateQualifier (const char* Name)
 
 
 
-static TypeCode OptionalQualifiers (TypeCode Q, TypeCode Allowed)
-/* Read type qualifiers if we have any */
+static TypeCode OptionalQualifiers (TypeCode Allowed)
+/* Read type qualifiers if we have any. Allowed specifies the allowed
+ * qualifiers.
+ */
 {
+    /* We start without any qualifiers */
+    TypeCode Q = T_QUAL_NONE;
+
+    /* Check for more qualifiers */
     while (1) {
 
  	switch (CurTok.Tok) {
@@ -173,6 +179,19 @@ static TypeCode OptionalQualifiers (TypeCode Q, TypeCode Allowed)
     }
 
 Done:
+    /* We cannot have more than one address size far qualifier */
+    switch (Q & T_QUAL_ADDRSIZE) {
+
+        case T_QUAL_NONE:
+        case T_QUAL_NEAR:
+        case T_QUAL_FAR:
+            break;
+
+        default:
+            Error ("Cannot specify more than one address size qualifier");
+            Q &= ~T_QUAL_ADDRSIZE;
+    }
+
     /* Return the qualifiers read */
     return Q;
 }
@@ -555,7 +574,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     D->Flags &= ~DS_DEF_TYPE;
 
     /* Read type qualifiers if we have any */
-    Qualifiers = OptionalQualifiers (Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
+    Qualifiers |= OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE);
 
     /* Look at the data type */
     switch (CurTok.Tok) {
@@ -744,7 +763,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     	    if (Entry && SymIsTypeDef (Entry)) {
        	       	/* It's a typedef */
     	      	NextToken ();
-    		TypeCpy (D->Type, Entry->Type);
+    		TypeCopy (D->Type, Entry->Type);
     	      	break;
     	    }
     	    /* FALL THROUGH */
@@ -763,7 +782,7 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     }
 
     /* There may also be qualifiers *after* the initial type */
-    D->Type[0].C |= OptionalQualifiers (Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
+    D->Type[0].C |= (Qualifiers | OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE));
 }
 
 
@@ -1030,7 +1049,7 @@ static FuncDesc* ParseFuncDecl (void)
 
 
 
-static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
+static void Declarator (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
     /* Read optional function or pointer qualifiers. These modify the
@@ -1039,21 +1058,7 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
      * qualifier will later be transfered to the function itself. If it's a
      * pointer to something else, it will be flagged as an error.
      */
-    TypeCode Qualifiers =
-        OptionalQualifiers (T_QUAL_NONE, T_QUAL_ADDRSIZE | T_QUAL_FASTCALL);
-
-    /* We cannot have more than one address size far qualifier */
-    switch (Qualifiers & T_QUAL_ADDRSIZE) {
-                  
-        case T_QUAL_NONE:
-        case T_QUAL_NEAR:
-        case T_QUAL_FAR:
-            break;
-
-        default:
-            Error ("Cannot specify more than one address size qualifier");
-            Qualifiers &= ~T_QUAL_ADDRSIZE;
-    }
+    TypeCode Qualifiers = OptionalQualifiers (T_QUAL_ADDRSIZE | T_QUAL_FASTCALL);
 
     /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
@@ -1061,11 +1066,11 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
         /* Skip the star */
        	NextToken ();
 
-    	/* Allow optional pointer qualifiers */
-        Qualifiers = OptionalQualifiers (Qualifiers, T_QUAL_CONST | T_QUAL_VOLATILE);
+    	/* Allow const, restrict and volatile qualifiers */
+        Qualifiers |= OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE | T_QUAL_RESTRICT);
 
         /* Parse the type, the pointer points to */
-       	Decl (Spec, D, Mode);
+       	Declarator (Spec, D, Mode);
 
 	/* Add the type */
 	AddTypeToDeclaration (D, T_PTR | Qualifiers);
@@ -1074,7 +1079,7 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 
     if (CurTok.Tok == TOK_LPAREN) {
        	NextToken ();
-       	Decl (Spec, D, Mode);
+       	Declarator (Spec, D, Mode);
        	ConsumeRParen ();
     } else {
      	/* Things depend on Mode now:
@@ -1200,7 +1205,7 @@ Type* ParseType (Type* T)
     ParseDecl (&Spec, &Decl, DM_NO_IDENT);
 
     /* Copy the type to the target buffer */
-    TypeCpy (T, Decl.Type);
+    TypeCopy (T, Decl.Type);
 
     /* Return a pointer to the target buffer */
     return T;
@@ -1215,11 +1220,11 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     InitDeclaration (D);
 
     /* Get additional declarators and the identifier */
-    Decl (Spec, D, Mode);
+    Declarator (Spec, D, Mode);
 
     /* Add the base type. */
     NeedTypeSpace (D, TypeLen (Spec->Type) + 1);	/* Bounds check */
-    TypeCpy (D->Type + D->Index, Spec->Type);
+    TypeCopy (D->Type + D->Index, Spec->Type);
 
     /* Use the storage class from the declspec */
     D->StorageClass = Spec->StorageClass;
@@ -1310,7 +1315,7 @@ void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType)
     InitDeclSpec (D);
 
     /* There may be qualifiers *before* the storage class specifier */
-    Qualifiers = OptionalQualifiers (T_QUAL_NONE, T_QUAL_CONST | T_QUAL_VOLATILE);
+    Qualifiers = OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE);
 
     /* Now get the storage class specifier for this declaration */
     ParseStorageClass (D, DefStorage);

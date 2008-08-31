@@ -478,7 +478,7 @@ SymEntry* FindStructField (const Type* T, const char* Name)
     SymEntry* Field = 0;
 
     /* The given type may actually be a pointer to struct */
-    if (T->C == T_PTR) {
+    if (IsTypePtr (T)) {
     	++T;
     }
 

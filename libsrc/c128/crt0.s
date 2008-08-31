@@ -84,17 +84,6 @@ L1:	lda    	sp,x
 	lda	#>(__RAM_START__ + __RAM_SIZE__)
        	sta	sp+1   		; Set argument stack ptr
 
-; Call module constructors
-
-	jsr	initlib
-
-; Set the bank for the file name to our execution bank. We must do this,
-; *after* calling constructors, because some of them may depend on the
-; original value of this register.
-
-        lda     #0
-        sta     FNAM_BANK
-
 ; If we have IRQ functions, chain our stub into the IRQ vector
 
         lda     #<__INTERRUPTOR_COUNT__
@@ -110,14 +99,28 @@ L1:	lda    	sp,x
       	stx	IRQVec+1
       	cli
 
+; Call module constructors
+
+NoIRQ1: jsr     initlib
+
+; Set the bank for the file name to our execution bank. We must do this,
+; *after* calling constructors, because some of them may depend on the
+; original value of this register.
+
+        lda     #0
+        sta     FNAM_BANK
+
 ; Push arguments and call main()
 
-NoIRQ1:	jsr	callmain
+        jsr     callmain
 
-; Back from main (this is also the _exit entry). Reset the IRQ vector if we
-; chained it.
+; Back from main (this is also the _exit entry). Run module destructors
 
-_exit:	pha				; Save the return code on stack
+_exit:  jsr     donelib
+
+; Reset the IRQ vector if we chained it.
+
+        pha		     		; Save the return code on stack
 	lda     #<__INTERRUPTOR_COUNT__
 	beq	NoIRQ2
 	lda	IRQInd+1
@@ -127,13 +130,9 @@ _exit:	pha				; Save the return code on stack
 	stx	IRQVec+1
 	cli
 
-; Run module destructors
-
-NoIRQ2: jsr    	donelib
-
 ; Copy back the zero page stuff
 
- 	ldx	#zpspace-1
+NoIRQ2: ldx     #zpspace-1
 L2:	lda	zpsave,x
      	sta	sp,x
      	dex

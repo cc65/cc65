@@ -1146,6 +1146,7 @@ sub Usage {
     print "  --linenumbers      Add line numbers to the output\n";
     print "  --linkstyle style  Use the given link style\n";
     print "  --replaceext       Replace source extension instead of appending .html\n";
+    print "  --tabsize n        Use n spaces when replacing tabs (default $TabSize)\n";
     print "  --textcolor c      Use text color c instead of $TextColor\n";
     print "  --verbose          Be more verbose\n";
 }

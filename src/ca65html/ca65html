@@ -560,8 +560,9 @@ sub Process2 {
         # Count input lines
         $LineNo++;
 
- 	# Remove the newline
-	chomp ($Line);
+ 	# Remove the newline at the end of line. Don't use chomp to be able to
+        # read dos/windows sources on unices.
+        $Line =~ s/[\r\n]*$//;
 
         # If requested, convert tabs to spaces
 	if ($CvtTabs) {

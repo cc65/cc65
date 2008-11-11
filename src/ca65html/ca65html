@@ -75,6 +75,7 @@ my $CommentColor    = "#B22222";    # Color for comments
 my $CRefs           = 0;            # Add references to the C file
 my $CtrlColor       = "#228B22";    # Color for control directives
 my $CvtTabs	    = 0;	    # Convert tabs to spaces
+my $TabSize         = 8;            # This is how god created them
 my $Debug      	    = 0;       	    # No debugging
 my $Help       	    = 0;       	    # Help flag
 my $HTMLDir    	    = "";      	    # Directory in which to create the files
@@ -567,7 +568,7 @@ sub Process2 {
         # If requested, convert tabs to spaces
 	if ($CvtTabs) {
 	    # Don't ask me - this is from the perl manual page
-	    1 while ($Line =~ s/\t+/' ' x (length($&)*8 - length($`)%8)/e) ;
+	    1 while ($Line =~ s/\t+/' ' x (length($&) * $TabSize - length($`) % $TabSize)/e) ;
 	}
 
        	# Clear the output line
@@ -1176,6 +1177,7 @@ GetOptions ("bgcolor=s"	      	=> \$BGColor,
             "linenumbers"       => \$LineNumbers,
 	    "linkstyle=i"     	=> \$LinkStyle,
 	    "replaceext"      	=> \$ReplaceExt,
+            "tabsize=i"         => \$TabSize,
 	    "textcolor=s"     	=> \$TextColor,
        	    "verbose!" 	      	=> \$Verbose,
 	    "<>"	      	=> \&AddFile);
@@ -1183,6 +1185,9 @@ GetOptions ("bgcolor=s"	      	=> \$BGColor,
 # Check some arguments
 if ($IndexCols <= 0 || $IndexCols >= 20) {
     Abort ("Invalid value for --indexcols option");
+}
+if ($TabSize < 1 || $TabSize > 16) {
+    Abort ("Invalid value for --tabsize option");
 }
 if ($HTMLDir ne "" && $HTMLDir =~ /[^\/]$/) {
     # Add a trailing path separator

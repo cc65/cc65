@@ -2929,8 +2929,8 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
     }
 
     /* Setup the code generator flags */
-    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
-    rflags |= TypeOf (Expr2.Type);
+    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr);
+    rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
 
     /* Convert the type of the lhs to that of the rhs */
     g_typecast (lflags, rflags);

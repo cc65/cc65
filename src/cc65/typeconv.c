@@ -102,7 +102,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code */
-            g_typecast (TypeOf (NewType), TypeOf (OldType));
+            g_typecast (TypeOf (NewType), TypeOf (OldType) | CF_FORCECHAR);
 
             /* Value is now in primary and an rvalue */
             ED_MakeRValExpr (Expr);
@@ -148,7 +148,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code. */
-            g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));
+            g_typecast (TypeOf (NewType), TypeOf (OldType) | CF_FORCECHAR);
 
             /* Value is now a rvalue in the primary */
             ED_MakeRValExpr (Expr);

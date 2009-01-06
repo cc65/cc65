@@ -12,7 +12,12 @@ int main (void)
     unsigned char count;
     unsigned char i;
 
+#ifdef __NES__
+    extern void *co65_joy;
+    unsigned char Res = joy_install (&co65_joy);
+#else
     unsigned char Res = joy_load_driver (joy_stddrv);
+#endif
     if (Res != JOY_ERR_OK) {
        	cprintf ("Error in joy_load_driver: %u\r\n", Res);
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));

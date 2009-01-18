@@ -102,9 +102,14 @@ int MacPackFind (const StrBuf* Name)
 
 
 
-void MacPackInsert (int Id)
-/* Insert the macro package with the given id in the input stream */
-{
+int MacPackInsert (int Id)
+/* Insert the macro package with the given id in the input stream. Returns
+ * true if the macro package was found and successfully inserted. Returns
+ * false otherwise.
+ */
+{                   
+    int RetCode;
+
     /* Check the parameter */
     CHECK (Id >= 0 && Id < MAC_COUNT);
 
@@ -115,6 +120,9 @@ void MacPackInsert (int Id)
 
         /* Insert the builtin package */
         NewInputData (MacPackages[Id].Package, 0);
+
+        /* Always successful */
+        RetCode = 1;
 
     } else {
 
@@ -127,12 +135,15 @@ void MacPackInsert (int Id)
         SB_Terminate (&Filename);
 
         /* Open the macro package as include file */
-        NewInputFile (SB_GetConstBuf (&Filename));
+        RetCode = NewInputFile (SB_GetConstBuf (&Filename));
 
         /* Destroy the contents of Filename */
         SB_Done (&Filename);
 
     }
+
+    /* Return the success code */
+    return RetCode;
 }
 
 

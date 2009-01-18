@@ -429,9 +429,12 @@ static const CharSourceFunctions IFFunc = {
 
 
 
-void NewInputFile (const char* Name)
-/* Open a new input file */
+int NewInputFile (const char* Name)
+/* Open a new input file. Returns true if the file could be successfully opened
+ * and false otherwise.
+ */
 {
+    int RetCode = 0;            /* Return code. Assume an error. */
     char* PathName = 0;
 
     /* First try to open the file */
@@ -450,6 +453,7 @@ void NewInputFile (const char* Name)
        	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
      	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
+            goto ExitPoint;
      	}
 
        	/* Use the path name from now on */
@@ -495,8 +499,15 @@ void NewInputFile (const char* Name)
         UseCharSource (S);
     }
 
+    /* File successfully opened */
+    RetCode = 1;
+
+ExitPoint:
     /* Free an allocated name buffer */
     xfree (PathName);
+
+    /* Return the success code */
+    return RetCode;
 }
 
 

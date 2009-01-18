@@ -74,8 +74,11 @@ int MacPackFind (const StrBuf* Name);
  * -1 if the package name was not found.
  */
 
-void MacPackInsert (int Id);
-/* Insert the macro package with the given id in the input stream */
+int MacPackInsert (int Id);
+/* Insert the macro package with the given id in the input stream. Returns
+ * true if the macro package was found and successfully inserted. Returns
+ * false otherwise.
+ */
 
 void MacPackSetDir (const StrBuf* Dir);
 /* Set a directory where files for macro packages can be found. Standard is

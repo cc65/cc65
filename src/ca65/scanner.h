@@ -78,8 +78,10 @@ int IsIdChar (int C);
 int IsIdStart (int C);
 /* Return true if the character may start an identifier */
 
-void NewInputFile (const char* Name);
-/* Open a new input file */
+int NewInputFile (const char* Name);
+/* Open a new input file. Returns true if the file could be successfully opened
+ * and false otherwise.
+ */
 
 void NewInputData (char* Text, int Malloced);
 /* Add a chunk of input data to the input stream */

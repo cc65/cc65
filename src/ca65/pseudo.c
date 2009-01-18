@@ -1146,7 +1146,10 @@ static void DoInclude (void)
 	ErrorSkip ("String constant expected");
     } else {
         SB_Terminate (&SVal);
-    	NewInputFile (SB_GetConstBuf (&SVal));
+    	if (NewInputFile (SB_GetConstBuf (&SVal)) == 0) {
+            /* Error opening the file, skip remainder of line */
+            SkipUntilSep ();
+        }
     }
 }
 
@@ -1258,8 +1261,12 @@ static void DoMacPack (void)
     	return;
     }
 
-    /* Insert the package */
-    MacPackInsert (Package);
+    /* Insert the package. If this fails, skip the remainder of the line to
+     * avoid additional error messages.
+     */
+    if (MacPackInsert (Package) == 0) {
+        SkipUntilSep ();
+    }
 }
 
 

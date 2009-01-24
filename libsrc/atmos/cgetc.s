@@ -41,10 +41,14 @@
 
 @L2:    and     #$7F            ; Mask out avail flag
         sta     KEYBUF
+        ldy     $209
+        cpy     #$A5
+        bne     @L3
+        ora     #$80            ; FUNCT pressed
 
 ; Done
 
-        rts
+@L3:    rts
 
 .endproc
 

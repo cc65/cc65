@@ -446,7 +446,7 @@ static void ReadMacroArgs (MacroExp* E)
     	    	}
 
     	    	/* Check for end of macro param list */
-    	    	if (CurC == ')') {
+    	     	if (CurC == ')') {
     	    	    NextChar ();
     	    	    break;
     	    	}
@@ -504,6 +504,7 @@ static void MacroArgSubst (MacroExp* E)
 
 
     /* Remember the current input and switch to the macro replacement. */
+    int OldIndex = SB_GetIndex (&E->M->Replacement);
     SB_Reset (&E->M->Replacement);
     OldSource = InitLine (&E->M->Replacement);
 
@@ -623,6 +624,7 @@ static void MacroArgSubst (MacroExp* E)
 
     /* Switch back the input */
     InitLine (OldSource);
+    SB_SetIndex (&E->M->Replacement, OldIndex);
 }
 
 
@@ -674,7 +676,10 @@ static void MacroCall (StrBuf* Target, Macro* M)
 static void ExpandMacro (StrBuf* Target, Macro* M)
 /* Expand a macro into Target */
 {
-    /* ### printf ("Expanding %s(%u)\n", M->Name, ++V); */
+#if 0
+    static unsigned V = 0;
+    printf ("Expanding %s(%u)\n", M->Name, ++V);
+#endif
 
     /* Check if this is a function like macro */
     if (M->ArgCount >= 0) {
@@ -713,7 +718,9 @@ static void ExpandMacro (StrBuf* Target, Macro* M)
         DoneMacroExp (&E);
 
     }
-    /* ### printf ("Done with %s(%u)\n", M->Name, V--); */
+#if 0
+    printf ("Done with %s(%u)\n", M->Name, V--);
+#endif
 }
 
 
@@ -829,8 +836,9 @@ static void DefineMacro (void)
     while (IsSpace (SB_LookAtLast (&M->Replacement))) {
         SB_Drop (&M->Replacement, 1);
     }
-
-    /* ### printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement)); */
+#if 0
+    printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement));
+#endif
 
     /* If we have an existing macro, check if the redefinition is identical.
      * Print a diagnostic if not.

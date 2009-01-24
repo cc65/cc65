@@ -64,6 +64,20 @@
 
 
 
+/* These are defined to be FUNCT + NumberKey */
+#define CH_F1		0xB1
+#define CH_F2		0xB2
+#define CH_F3		0xB3
+#define CH_F4		0xB4
+#define CH_F5		0xB5
+#define CH_F6		0xB6
+#define CH_F7		0xB7
+#define CH_F8		0xB8
+#define CH_F9		0xB9
+#define CH_F10		0xB0
+
+
+
 /* Character codes */
 #define CH_ULCORNER 	'+'
 #define CH_URCORNER 	'+'

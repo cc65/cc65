@@ -135,6 +135,16 @@ INLINE unsigned SB_GetIndex (const StrBuf* B)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE void SB_SetIndex (StrBuf* B, unsigned Index)
+/* Set the user index of the string buffer */
+{
+    B->Index = Index;
+}
+#else
+#  define SB_SetIndex(B)  ((B)->Index = (Index))
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE const char* SB_GetConstBuf (const StrBuf* B)
 /* Return a buffer pointer */
 {

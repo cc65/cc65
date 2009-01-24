@@ -38,15 +38,14 @@
 
 
 
-/* No action if we're using a C99 compiler */
-#if (__STDC_VERSION__ < 199901)
+#include <stdarg.h>
 
 
+                   
+/* No action if we have a working va_copy */
+#if !defined(va_copy)
 
-/* va_copy is not allowed to be defined */
-#if defined(va_copy)
-#error "The compiler is broken!"
-#endif
+
 
 /* The watcom compiler doesn't have va_copy and a problematic va_list definition */
 #if defined(__WATCOMC__)
@@ -58,14 +57,14 @@
 #define va_copy(dest,src)       __va_copy(dest, src)
 #endif
 
-/* If we don't have va_copy now, use a generic version */
+/* If va_copy is not defined now, we have a problem */
 #if !defined(va_copy)
-#define va_copy(dest,src)       ((dest)=(src))
+#error "Need a working va_copy!"
 #endif
 
 
 
-#endif  /* #if (__STDC_VERSION__ < 199901) */
+#endif
 
 
 

@@ -6,9 +6,9 @@ the supported platforms.
 
 Please note:
 
-  * The supplied makefile needs with GNU make. It works out of the box on
-    Linux and similar systems. If you're using Windows, you will have to
-    compile the programs manually.
+  * The supplied makefile needs GNU make. It works out of the box on Linux
+    and similar systems. If you're using Windows, you will have to compile
+    the programs manually.
 
   * The makefile specifies the C64 as the default target platform, because all
     of the programs run on this platform. When compiling for another platform,

@@ -141,7 +141,7 @@ INLINE void SB_SetIndex (StrBuf* B, unsigned Index)
     B->Index = Index;
 }
 #else
-#  define SB_SetIndex(B)  ((B)->Index = (Index))
+#  define SB_SetIndex(B, Index) ((B)->Index = (Index))
 #endif
 
 #if defined(HAVE_INLINE)

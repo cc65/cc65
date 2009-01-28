@@ -1,23 +1,31 @@
 ;
-; Stefan Haubenthal, 2005-12-24
-; Based on Christian Groessler
+; Initial version: Stefan Haubenthal, 2005-12-24
+; Some fixes: Christian Groessler, 2009-01-28
 ;
 ; unsigned char _sysmkdir (const char* name, ...);
+; for SpartaDOS and MYDOS
 ;
 
 	.include "atari.inc"
 	.include "errno.inc"
+	.import	addysp
+	.import	popax
 	.import	findfreeiocb
 	.importzp tmp4
 .ifdef	UCASE_FILENAME
 	.importzp tmp3
-	.import	addysp
 	.import	ucase_fn
 .endif
 	.export	__sysmkdir
 
 .proc	__sysmkdir
 
+	dey			; parm count < 2 shouldn't be needed to be...
+	dey			; ...checked (it generates a C compiler warning)
+	beq	parmok		; branch if parameter count ok
+	jsr	addysp		; fix stack, throw away unused parameters
+
+parmok:	jsr	popax		; get name
 	pha			; save input parameter
 	txa
 	pha
@@ -53,10 +61,11 @@ ucok1:
 	sta	ICBAH,y
 	tya
 	tax
-	lda	#34
+	lda	#42
 	sta	ICCOM,x
-	lda	#0
+	lda	#8
 	sta	ICAX1,x
+	lda	#0
 	sta	ICAX2,x
 	sta	ICBLL,x
 	sta	ICBLH,x

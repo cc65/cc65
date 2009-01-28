@@ -48,7 +48,7 @@
 	iny
 	cmp	(ptr4),y
 	beq	hasdev
-	sta	tmp2		; set flag: no device is passed string
+	sta	tmp2		; set flag: no device in passed string
 hasdev:
 .endif
 
@@ -108,7 +108,7 @@ hasdev2:
 	lda	sp
 	jsr	_strupr
 
-	; leave X and Y pointing to the modified filename
+	; leave A and X pointing to the modified filename
 	lda	sp
 	ldx	sp+1
 	clc			; indicate success

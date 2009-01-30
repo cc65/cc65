@@ -238,7 +238,12 @@ static void CharMapPragma (StrBuf* B)
         return;
     }
     if (Index < 1 || Index > 255) {
-     	Error ("Character index out of range");
+        if (Index == 0) {
+            /* For groepaz */
+            Error ("Remapping 0 is not allowed");
+        } else {
+            Error ("Character index out of range");
+        }
      	return;
     }
 
@@ -255,7 +260,12 @@ static void CharMapPragma (StrBuf* B)
         return;
     }
     if (C < 1 || C > 255) {
-    	Error ("Character code out of range");
+        if (C == 0) {
+            /* For groepaz */
+            Error ("Remapping 0 is not allowed");
+        } else {
+            Error ("Character code out of range");
+        }
     	return;
     }
 

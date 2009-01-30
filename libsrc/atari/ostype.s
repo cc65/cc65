@@ -107,13 +107,13 @@ _400800:
 ; 400/800 NTSC Rev. A
 
 	lda	#%00011001
-	bne	_400800_done
+	bne	_fin
 
 ; 400/800 unknown
 
 _400800_unknown:
 	lda	#%00000001
-	bne	_400800_done
+	bne	_fin
 
 _400800_1:
 	cmp	#$d6
@@ -124,7 +124,7 @@ _400800_1:
 ; 400/800 PAL Rev. A
 
 	lda	#%00001001
-	bne	_400800_done
+	bne	_fin
 
 _400800_2:
 	cmp	#$f3
@@ -135,7 +135,7 @@ _400800_2:
 ; 400/800 NTSC Rev. B
 
 	lda	#%00100001
-	bne	_400800_done
+	bne	_fin
 
 _400800_3:
 
@@ -147,8 +147,6 @@ _400800_3:
 ; 400/800 PAL Rev. B
 
 	lda	#%00010001
-
-_400800_done:
 	bne	_fin
 
 .endproc

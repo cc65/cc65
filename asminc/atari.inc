@@ -911,7 +911,7 @@ PMBASE	= $D407		;player-missile base address
 CHBASE	= $D409		;character base address
 WSYNC	= $D40A		;wait for HBLANK synchronization
 NMIEN	= $D40E		;NMI enable
-NMIRES	= $D40F		;NMI iterrupt reset
+NMIRES	= $D40F		;NMI interrupt reset
 
 ;-------------------------------------------------------------------------
 ; Floating Point Package Address Equates

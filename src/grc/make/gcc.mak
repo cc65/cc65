@@ -2,6 +2,11 @@
 # gcc Makefile for grc
 #
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= grc
+
 COMMON = ../common
 
 CFLAGS 	= -g -O2 -Wall -W -std=c89 -I$(COMMON)
@@ -11,30 +16,30 @@ EBIND	= emxbind
 
 OBJS =  grc.o
 
-EXECS = grc
-
 LIBS = $(COMMON)/common.a
 
+# ------------------------------------------------------------------------------
+# Makefile targets
+
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-
-grc:	$(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core *.lst
+	$(RM) *~ core.* *.map
 
 zap:	clean
-	$(RM) *.o $(EXECS) .depend
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

@@ -3,6 +3,11 @@
 #
 
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= od65
+
 # Library dir
 COMMON	= ../common
 
@@ -19,25 +24,25 @@ OBJS = 	dump.o		\
 
 LIBS = $(COMMON)/common.a
 
-EXE	= od65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
-
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all: 	$(EXE)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-$(EXE):	$(OBJS)
-	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core *.map
+	$(RM) *~ core.* *.map
 
 zap:	clean
 	$(RM) *.o $(EXE) .depend

@@ -2,6 +2,11 @@
 # gcc Makefile for co65
 #
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= co65
+
 # Library dir
 COMMON	= ../common
 
@@ -20,28 +25,28 @@ OBJS =	convert.o       \
 
 LIBS = $(COMMON)/common.a
 
-EXECS = co65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-
-co65:   $(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core *.lst
+	$(RM) *~ core.* *.map
 
 zap:	clean
-	$(RM) *.o $(EXECS) .depend
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

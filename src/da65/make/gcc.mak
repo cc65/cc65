@@ -1,6 +1,11 @@
-#                
+#
 # gcc Makefile for da65
 #
+
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= da65
 
 # Library dir
 COMMON	= ../common
@@ -33,29 +38,28 @@ OBJS = 	asminc.o        \
 LIBS = $(COMMON)/common.a
 
 
-EXECS = da65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-
-da65:   $(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core *.map
+	$(RM) *~ core.* *.map
 
 zap:	clean
-	$(RM) *.o $(EXECS) .depend
-
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

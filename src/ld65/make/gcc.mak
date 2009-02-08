@@ -2,6 +2,11 @@
 # gcc Makefile for ld65
 #
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= ld65
+
 # Library dir
 COMMON	= ../common
 
@@ -75,37 +80,31 @@ INCS =	apple2.inc	\
         supervision.inc \
 	vic20.inc
 
-# -----------------------------------------------------------------------------
-#
-
 LIBS = $(COMMON)/common.a
 
 
-EXECS = ld65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-
-ld65:   $(INCS) $(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
-
-inc:	$(INCS)
+$(EXE):	$(INCS) $(OBJS) $(LIBS)
+	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core *.map
+	$(RM) *~ core.* *.map
 
-zap:   	clean
-	$(RM) *.o $(INCS) $(EXECS) .depend
-
+zap:	clean
+	$(RM) *.o $(INCS) $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

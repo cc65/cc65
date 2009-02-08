@@ -110,11 +110,11 @@ all:	depend
 endif
 
 $(EXE):	$(OBJS) $(LIBS)
-	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core *.map
+	$(RM) *~ core.* *.map
 
 zap:	clean
 	$(RM) *.o $(EXE) .depend

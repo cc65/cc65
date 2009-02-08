@@ -2,6 +2,11 @@
 # gcc Makefile for sim65
 #
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= sim65
+
 # Library dir
 COMMON	= ../common
 
@@ -28,34 +33,32 @@ OBJS = 	addrspace.o     \
 
 LIBS = $(COMMON)/common.a
 
-EXECS = sim65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all:	$(EXECS) chips
+all:	$(EXE) chips
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-sim65:	$(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS) -ldl
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 .PHONY:	chips
 chips:
 	@$(MAKE) -C chips -f make/gcc.mak
 
-
 clean:
-	@$(MAKE) -C chips -f make/gcc.mak clean
-	$(RM) *~ core *.lst
+	$(RM) *~ core.* *.map
 
-zap:  	clean
-	@$(MAKE) -C chips -f make/gcc.mak zap
-	$(RM) *.o $(EXECS) .depend
+zap:	clean
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

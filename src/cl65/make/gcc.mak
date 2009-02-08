@@ -2,6 +2,11 @@
 # Makefile for the cl65 compile&link utility
 #
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= cl65
+
 # Library dir
 COMMON	= ../common
 
@@ -23,29 +28,28 @@ OBJS =	error.o	 	\
 
 LIBS = $(COMMON)/common.a
 
-EXECS = cl65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
-
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-cl65:	$(OBJS) $(LIBS)
-	$(CC) $(LDFLAGS) -o cl65 $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) cl65 ; fi
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core
+	$(RM) *~ core.* *.map
 
 zap:	clean
-	$(RM) *.o $(EXECS) .depend
-
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

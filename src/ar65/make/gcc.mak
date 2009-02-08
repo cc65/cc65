@@ -2,6 +2,11 @@
 # gcc Makefile for ar65
 #
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= ar65
+
 # Library dir
 COMMON	= ../common
 
@@ -27,28 +32,28 @@ OBJS = 	add.o		\
 LIBS = $(COMMON)/common.a
 
 
-EXECS = ar65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-
-ar65:   $(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $^ $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	$(RM) *~ core
+	$(RM) *~ core.* *.map
 
 zap:	clean
-	$(RM) *.o $(EXECS) .depend
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

@@ -2,6 +2,11 @@
 # gcc Makefile for ca65
 #
 
+# ------------------------------------------------------------------------------
+
+# The executable to build
+EXE  	= ca65
+
 # Library dir
 COMMON	= ../common
 
@@ -55,43 +60,43 @@ OBJS =  anonname.o      \
         symtab.o	\
         token.o         \
        	toklist.o      	\
-	ulabel.o
+      	ulabel.o
 
 # -----------------------------------------------------------------------------
 # List of all macro files
 
 INCS =	atari.inc       \
         cbm.inc		\
-	cpu.inc		\
-	generic.inc	\
+      	cpu.inc		\
+      	generic.inc	\
         longbranch.inc
-
-# -----------------------------------------------------------------------------
 
 LIBS = $(COMMON)/common.a
 
-EXECS = ca65
+# ------------------------------------------------------------------------------
+# Makefile targets
 
+# Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:  	$(EXE)
 include .depend
 else
 all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-ca65:   $(INCS) $(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+$(EXE):	$(INCS) $(OBJS) $(LIBS)
+	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 inc:	$(INCS)
 
 clean:
-	rm -f *~ core *.lst
+	$(RM) *~ core.* *.map
 
 zap:	clean
-	rm -f *.o $(EXECS) $(INCS) .depend
+	$(RM) *.o $(EXE) $(INCS) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

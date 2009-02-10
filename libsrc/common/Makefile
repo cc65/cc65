@@ -84,7 +84,7 @@ S_OBJS = 	_cwd.o          \
 	 	_file.o  	\
 		_fopen.o	\
 	 	_heap.o	 	\
-       	       	_heapadd.o 	\
+	       	_heapadd.o 	\
                 _heapblocksize.o\
                 _heapmaxavail.o \
                 _heapmemavail.o \
@@ -170,6 +170,7 @@ S_OBJS = 	_cwd.o          \
 		strncat.o	\
 		strncmp.o	\
 		strncpy.o	\
+		strnicmp.o	\
                 stroserr.o      \
 		strpbrk.o	\
 		strrchr.o	\

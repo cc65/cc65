@@ -7,7 +7,6 @@
   	.export	  	__printf
 
 	.import	  	popax, pushax, pusheax, decsp6, push1, axlong, axulong
-	.import		__ctype
 	.import		_ltoa, _ultoa
 	.import		_strlower, _strlen
 	.importzp	sp, ptr1, ptr2, tmp1, regbank, sreg

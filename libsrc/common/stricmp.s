@@ -10,6 +10,7 @@
 	.import		__ctype
 	.importzp	ptr1, ptr2, tmp1
 
+        .include        "ctype.inc"
 
 _stricmp:
 _strcasecmp:
@@ -23,7 +24,7 @@ _strcasecmp:
 loop:  	lda	(ptr2),y       	; get char from second string
 	tax
 	lda	__ctype,x      	; get character classification
-	and	#$01	       	; lower case char?
+       	and    	#CT_LOWER       ; lower case char?
 	beq	L1	       	; jump if no
 	txa		       	; get character back
 	clc
@@ -34,13 +35,13 @@ L1:	stx    	tmp1   	       	; remember upper case equivalent
 	lda	(ptr1),y	; get character from first string
 	tax
 	lda	__ctype,x	; get character classification
-	and	#$01		; lower case char?
+	and	#CT_LOWER       ; lower case char?
        	beq    	L2		; jump if no
 	txa	  		; get character back
 	clc
        	adc    	#<('A'-'a')     ; make upper case char
 	tax
-
+                                
 L2:	cpx	tmp1		; compare characters
 	bne    	L3
 	txa	  		; end of strings?

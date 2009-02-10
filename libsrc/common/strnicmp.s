@@ -10,6 +10,7 @@
 	.import		popax, __ctype
 	.importzp	ptr1, ptr2, ptr3, tmp1
 
+        .include        "ctype.inc"
 
 _strnicmp:
 _strncasecmp:
@@ -49,27 +50,27 @@ Loop:  	inc	ptr3
 Comp:	lda   	(ptr2),y
 	tax
 	lda	__ctype,x      	; get character classification
-	and	#$01	       	; lower case char?
+       	and    	#CT_LOWER      	; lower case char?
 	beq	L1	       	; jump if no
 	txa		       	; get character back
 	sec
 	sbc	#<('a'-'A')     ; make upper case char
-	tax			;
+	tax		 	;
 L1:	stx    	tmp1   	       	; remember upper case equivalent
 
-	lda	(ptr1),y	; get character from first string
+	lda	(ptr1),y 	; get character from first string
 	tax
 	lda	__ctype,x	; get character classification
-	and	#$01		; lower case char?
-       	beq    	L2		; jump if no
-	txa	  		; get character back
+	and	#CT_LOWER       ; lower case char?
+       	beq    	L2	 	; jump if no
+	txa	  	 	; get character back
 	sec
        	sbc    	#<('a'-'A')     ; make upper case char
 	tax
 
-L2:	cpx	tmp1		; compare characters
-       	bne    	NotEqual	; Jump if strings different
-	txa   	  		; End of strings?
+L2:	cpx	tmp1	 	; compare characters
+       	bne    	NotEqual 	; Jump if strings different
+	txa   	  	 	; End of strings?
        	beq    	Equal1 	       	; Jump if EOS reached, a/x == 0
 
 ; Increment the pointers

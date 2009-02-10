@@ -12,6 +12,8 @@
 	.import		__ctype
 	.importzp	ptr1, ptr2
 
+        .include        "ctype.inc"
+
 _strlower:
 _strlwr:
 	sta	ptr1	       	; Save s (working copy)
@@ -24,7 +26,7 @@ loop:	lda    	(ptr1),y       	; get character
 	beq	L9	       	; jump if done
 	tax
 	lda	__ctype,x      	; get character classification
-	and	#$02	       	; upper case char?
+       	and    	#CT_UPPER       ; upper case char?
 	beq	L1	       	; jump if no
 	txa		       	; get character back into accu
 	sec

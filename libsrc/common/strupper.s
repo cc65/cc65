@@ -12,6 +12,8 @@
 	.import		__ctype
 	.importzp	ptr1, ptr2
 
+        .include        "ctype.inc"
+
 _strupper:
 _strupr:
 	sta	ptr1		; Save s (working copy)
@@ -24,7 +26,7 @@ loop:	lda    	(ptr1),y	; get character
 	beq	L9		; jump if done
 	tax
 	lda	__ctype,x	; get character classification
-	and    	#$01   	       	; lower case char?
+       	and    	#CT_LOWER       ; lower case char?
 	beq	L1		; jump if no
 	txa			; get character back into accu
 	clc

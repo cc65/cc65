@@ -9,6 +9,8 @@
        	.import	       	__ctype
 	.importzp	sreg, ptr1, ptr2, tmp1
 
+        .include        "ctype.inc"
+
 ;
 ; Conversion routine (32 bit)
 ;
@@ -27,7 +29,7 @@ _atol:	sta	ptr1		; Store s
 L1:	lda	(ptr1),y
 	tax
 	lda    	__ctype,x	; get character classification
-	and	#$80	 	; tab or space?
+       	and    	#CT_SPACE_TAB   ; tab or space?
 	beq	L2		; jump if no
 	iny
 	bne	L1

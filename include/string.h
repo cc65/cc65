@@ -75,6 +75,8 @@ void __fastcall__ bzero (void* ptr, size_t n);                /* BSD */
 char* __fastcall__ strdup (const char* s);		      /* SYSV/BSD */
 int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
+int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);     /* DOS/Windows */
+int __fastcall__ strncasecmp (const char* s1, const char* s2, size_t count);  /* Same for Unix */
 char* __fastcall__ strlwr (char* s);
 char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);

@@ -127,6 +127,11 @@ static unsigned char OptionalAddrSize (void)
     if (Tok == TOK_COLON) {
         NextTok ();
         AddrSize = ParseAddrSize ();
+        if (!ValidAddrSizeForCPU (AddrSize)) {
+            /* Print an error and reset to default */
+            Error ("Invalid address size specification for current CPU");
+            AddrSize = ADDR_SIZE_DEFAULT;
+        }
         NextTok ();
     }
     return AddrSize;

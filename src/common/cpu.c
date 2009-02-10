@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -34,6 +34,8 @@
 
 
 /* common */
+#include "addrsize.h"
+#include "check.h"
 #include "cpu.h"
 #include "strutil.h"
 
@@ -79,6 +81,37 @@ const unsigned CPUIsets[CPU_COUNT] = {
 /*****************************************************************************/
 /*     	       	     		     Code			    	     */
 /*****************************************************************************/
+
+
+
+int ValidAddrSizeForCPU (unsigned char AddrSize)
+/* Check if the given address size is valid for the current CPU */
+{
+    switch (AddrSize) {
+        case ADDR_SIZE_DEFAULT:
+            /* Always supported */
+            return 1;
+
+        case ADDR_SIZE_ZP:
+            /* Not supported by None and Sweet16 */
+            return (CPU != CPU_NONE && CPU != CPU_SWEET16);
+
+        case ADDR_SIZE_ABS:
+            /* Not supported by None */
+            return (CPU != CPU_NONE);
+
+        case ADDR_SIZE_FAR:
+            /* Only supported by 65816 */
+            return (CPU == CPU_65816);
+
+        case ADDR_SIZE_LONG:
+            /* Not supported by any CPU */
+            return 0;
+
+        default:
+            FAIL ("Invalid address size");
+    }
+}
 
 
 

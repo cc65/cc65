@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -88,6 +88,9 @@ extern const unsigned CPUIsets[CPU_COUNT];
 /*****************************************************************************/
 
 
+
+int ValidAddrSizeForCPU (unsigned char AddrSize);
+/* Check if the given address size is valid for the current CPU */
 
 cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if

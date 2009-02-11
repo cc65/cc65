@@ -27,13 +27,25 @@
 #  define CHARSET               0xE000
 #  define outb(addr,val)	pokebsys ((unsigned)(addr), val)
 #  define inb(addr)             peekbsys ((unsigned)(addr))
+#elif defined(__PLUS4__)
+#  define SCREEN1               0x6400
+#  define SCREEN2               0x6C00
+#  define CHARSET               0x7000
+#  define outb(addr,val)       	(*(addr)) = (val)
+#  define inb(addr)             (*(addr))
 #endif
 
 
 
 /* Values for the VIC address register to switch between the two pages */
+#if defined(__PLUS4__)
+#define PAGE1                   ((SCREEN1 >> 8) & 0xF8)
+#define PAGE2                   ((SCREEN2 >> 8) & 0xF8)
+#define CHARADR			((CHARSET >> 8) & 0xFC)
+#else
 #define PAGE1                   ((SCREEN1 >> 6) & 0xF0) | ((CHARSET >> 10) & 0x0E)
 #define PAGE2                   ((SCREEN2 >> 6) & 0xF0) | ((CHARSET >> 10) & 0x0E)
+#endif
 
 
 
@@ -170,6 +182,10 @@ int main (void)
     unsigned char initflag;
     unsigned char graphflag;
 #endif
+#if defined(__PLUS4__)
+    unsigned int i;
+    unsigned char v2;
+#endif
 
     clrscr ();
     cprintf ("Making charset, mompls");
@@ -197,18 +213,39 @@ int main (void)
 #endif
 
     /* Remember the VIC address register */
+#if defined(__PLUS4__)
+    v = inb (&TED.char_addr);
+    v2 = inb (&TED.video_addr);
+#else
     v = inb (&VIC.addr);
+#endif
+
+#if defined(__PLUS4__)
+    for (i=0;i<1000;i++) {
+    	((unsigned char *) (SCREEN1-0x0400))[i] = 0;
+    	((unsigned char *) (SCREEN2-0x0400))[i] = 0;
+    }
+    outb (&TED.char_addr, CHARADR);
+#endif
 
     /* Run the demo until a key was hit */
     t = clock ();
     while (!kbhit()) {
       	/* Build page 1, then make it visible */
         doplasma ((unsigned char*)SCREEN1);
+#if defined(__PLUS4__)
+      	outb (&TED.video_addr, PAGE1);
+#else
       	outb (&VIC.addr, PAGE1);
+#endif
 
       	/* Build page 2, then make it visible */
         doplasma ((unsigned char*)SCREEN2);
+#if defined(__PLUS4__)
+      	outb (&TED.video_addr, PAGE2);
+#else
       	outb (&VIC.addr, PAGE2);
+#endif
 
       	/* Count frames */
         f += 2;
@@ -216,7 +253,12 @@ int main (void)
     t = clock() - t;
 
     /* Switch back the VIC screen */
+#if defined(__PLUS4__)
+    outb (&TED.video_addr, v2);
+    outb (&TED.char_addr, v);
+#else
     outb (&VIC.addr, v);
+#endif
 
 #if defined(__C64__) || defined(__C128__)
     /* Move back the VIC 16K block */

@@ -78,8 +78,9 @@ Platforms:	All systems that have the Commodore SID (Sound Interface
 -----------------------------------------------------------------------------
 Name:           plasma
 Description:	A fancy graphics demo written by groepaz/hitmen.
-Platforms:     	The program needs a VIC, so it runs on the following systems:
-		C64, C128, CBM510
+Platforms:     	The program needs a VIC, or a TED, so it runs on the following
+                systems:
+		C64, C128, CBM510, Plus/4
 
 -----------------------------------------------------------------------------
 Name:           sieve
@@ -88,6 +89,7 @@ Description:	Implements the "Sieve of Eratosthenes" as a way to find all
 		a benchmark program.
 Platforms:	All systems with conio and clock support:
 		Atari, C16, C64, C128, CBM510, CBM610, PET, Plus/4
+
 -----------------------------------------------------------------------------
 Name:           tgidemo
 Description:	Shows some of the graphics capabilities of the "tiny graphics

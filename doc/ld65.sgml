@@ -782,7 +782,8 @@ look like this:
 </verb></tscreen>
 
 The only other available output format is the o65 format specified by Andre
-Fachat. It is defined like this:
+Fachat (see the <htmlurl url="http://www.6502.org/users/andre/o65/fileformat.html"
+name="6502 binary relocation format specification">). It is defined like this:
 
 <tscreen><verb>
      	FILES {

@@ -274,9 +274,9 @@ it from C code. In your code, define an arbitrary variable with this name. Use
 the address of this variable as the address of the code segment of the driver.
 Be sure to never modify the variable which is in reality the start of your
 driver!
-                          
 
-<sect1>Example: Convert and link a graphics driver<p>
+
+<sect1>Example - Convert and link a graphics driver<p>
 
 As an example, here are some instructions to convert and use the c64-hi.tgi
 graphics driver:

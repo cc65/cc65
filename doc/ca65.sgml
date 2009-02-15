@@ -3823,7 +3823,7 @@ compiler, depending on the target system selected:
 
 <sect>Structs and unions<label id="structs"><p>
 
-<sect1>Overview<p>
+<sect1>Structs and unions Overview<p>
 
 Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
 are to some degree comparable to their C counterparts. Both have a list of
@@ -3918,7 +3918,7 @@ below uses examples from the C libraries. However, the feature may also be
 useful for assembler programs.
 
 
-<sect1>Overview<p>
+<sect1>Module constructors/destructors Overview<p>
 
 Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
 id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"

@@ -167,6 +167,7 @@ Here is a description of all the command line options:
   <item>lunix
   <item>atmos
   <item>nes
+  <item>supervision
   </itemize>
 
   There are a few more targets defined but neither of them is actually
@@ -716,7 +717,7 @@ page boundary, use
 </verb></tscreen>
 
 If an alignment is requested, the linker will add enough space to the output
-file, so that the new segment starts at an address that is divideable by the
+file, so that the new segment starts at an address that is dividable by the
 given number without a remainder. All addresses are adjusted accordingly. To
 fill the unused space, bytes of zero are used, or, if the memory area has a
 "<tt/fillval/" attribute, that value. Alignment is always needed, if you have
@@ -754,7 +755,7 @@ The "<tt/align/", "<tt/start/" and "<tt/offset/" attributes change placement
 of the segment in the run memory area, because this is what is usually
 desired. If load and run memory areas are equal (which is the case if only the
 load memory area has been specified), the attributes will also work. There is
-also a "<tt/align_load/" attribute that may be used to align the start of the
+also an "<tt/align_load/" attribute that may be used to align the start of the
 segment in the load memory area, in case different load and run areas have
 been specified. There are no special attributes to set start or offset for
 just the load memory area.

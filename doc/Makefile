@@ -59,19 +59,19 @@ TEX  =	$(SGML:.sgml=.tex)
 # Pattern-rules, to make targets
 
 %.txt:	%.sgml
-	sgml2txt $(TXT_OPTIONS) $<
+	linuxdoc -B txt -f $(TXT_OPTIONS) $<
 
 %.html:	%.sgml
-	sgml2html --split=1 $(BUTTONS) $<
+	linuxdoc -B info --split=1 $(BUTTONS) $<
 
 %.info:	%.sgml
-	sgml2info $<
+	linuxdoc -B info $<
 
 %.dvi:	%.sgml
-	sgml2latex $<
+	linuxdoc -B latex --output=dvi $<
 
 %.tex:	%.sgml
-	sgml2latex --output=tex $<
+	linuxdoc -B latex --output=tex $<
 
 # ------------------------------------------------------------------------------
 # Targets

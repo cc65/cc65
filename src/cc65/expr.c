@@ -1878,7 +1878,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	    	    Error ("Incompatible types");
 	    	}
 	    } else if (!ED_IsNullPtr (&Expr2)) {
-	    	Error ("Incompatible types");
+	     	Error ("Incompatible types");
 	    }
 	}
 
@@ -1931,7 +1931,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	    if (rconst) {
 	    	flags |= CF_CONST;
 	    	if ((Gen->Flags & GEN_NOPUSH) != 0) {
-	    	    RemoveCode (&Mark2);
+	     	    RemoveCode (&Mark2);
 	    	    ltype |= CF_REG;	/* Value is in register */
 	    	}
 	    }
@@ -2090,7 +2090,7 @@ static void parseadd (ExprDesc* Expr)
 	    	 */
 	    	if (ED_IsLocAbs (Expr)) {
 	    	    /* Numeric constant, scale lhs */
-	    	    Expr->IVal *= ScaleFactor;
+	     	    Expr->IVal *= ScaleFactor;
 	    	    /* Generate the code for the add */
 	    	    g_inc (flags, Expr->IVal);
 	    	} else if (ScaleFactor == 1) {
@@ -2196,7 +2196,7 @@ static void parseadd (ExprDesc* Expr)
        	       	flags = typeadjust (Expr, &Expr2, 0) & ~CF_CONST;
     	    } else {
        	       	/* OOPS */
-    	    	Error ("Invalid operands for binary operator `+'");
+    	     	Error ("Invalid operands for binary operator `+'");
                 flags = CF_INT;
     	    }
 
@@ -2302,7 +2302,7 @@ static void parsesub (ExprDesc* Expr)
     	    	} else {
     	    	    rscale = CheckedPSizeOf (lhst);
     	    	}
-    	    	/* Operate on pointers, result type is an integer */
+    	     	/* Operate on pointers, result type is an integer */
     	    	flags = CF_PTR;
     	    	Expr->Type = type_int;
     	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
@@ -2355,7 +2355,7 @@ static void parsesub (ExprDesc* Expr)
 	     * longer true, lhs is on stack instead.
 	     */
 	    if (ED_IsLocAbs (Expr)) {
-		ED_MakeRValExpr (Expr);
+	     	ED_MakeRValExpr (Expr);
 	    }
 	    /* Adjust operand types */
  	    flags = typeadjust (Expr, &Expr2, 0);
@@ -2842,7 +2842,15 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr)
 	    g_inc (flags | CF_CONST, Expr2.IVal);
 	} else if (Gen->Func == g_sub) {
 	    g_dec (flags | CF_CONST, Expr2.IVal);
-	} else {
+	} else {                          
+            if (Expr2.IVal == 0) {
+                /* Check for div by zero/mod by zero */
+                if (Gen->Func == g_div) {
+                    Error ("Division by zero");
+                } else if (Gen->Func == g_mod) {
+                    Error ("Modulo operation with zero");
+                }
+            }
        	    Gen->Func (flags | CF_CONST, Expr2.IVal);
 	}
     } else {

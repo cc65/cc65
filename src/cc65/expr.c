@@ -763,8 +763,11 @@ static void Primary (ExprDesc* E)
             break;
 
         default:
-            /* Illegal primary. */
+            /* Illegal primary. Be sure to skip the token to avoid endless
+             * error loops.
+             */
             Error ("Expression expected");
+            NextToken ();
             ED_MakeConstAbsInt (E, 1);
             break;
     }

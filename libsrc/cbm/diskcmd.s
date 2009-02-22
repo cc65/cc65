@@ -188,13 +188,13 @@ writefndiskcmd:
 
 ;--------------------------------------------------------------------------
 ; writediskcmd: Gets pointer to data in ptr1, length in A. Writes all data
-; to the command channel of the given drive. Returns an error code in A,
+; to the command channel of the drive in X. Returns an error code in A,
 ; flags are set according to the contents of A.
 
 writediskcmd:
 
         jsr     isdisk
-        bcs     success
+        bcs     success         ; No disk - already done
 
 ; Remember the length
 

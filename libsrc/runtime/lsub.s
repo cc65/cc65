@@ -11,13 +11,20 @@
 	.import		addysp1
 	.importzp   	sp, sreg
 
+        .macpack        cpu
+
 tossubeax:
-      	ldy	#0
-       	sec
+      	sec
 	eor	#$FF
-       	adc	(sp),y		; byte 0
+.if (.cpu .bitand CPU_ISET_65SC02)
+     	adc	(sp)	       	; 65SC02 version - saves 2 cycles
+	ldy	#1
+.else
+      	ldy	#0
+      	adc	(sp),y	   	; lo byte
+      	iny
+.endif
        	pha			; Save low byte
-	iny
 	txa
 	eor	#$FF
 	adc	(sp),y		; byte 1

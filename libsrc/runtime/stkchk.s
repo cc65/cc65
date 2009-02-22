@@ -21,6 +21,7 @@
 
 	; Use macros for better readability
 	.macpack	generic
+        .macpack        cpu
 
 
 ; ----------------------------------------------------------------------------
@@ -38,7 +39,11 @@
      	lda  	sp+1
      	sta  	initialsp+1
      	sbc  	#>__STACKSIZE__
-     	add  	#1	 		; Add 256 bytes safety area
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+       	ina                     ; Add 256 bytes safety area
+.else
+       	add    	#1     	        ; Add 256 bytes safety area
+.endif
      	sta  	lowwater+1
      	rts
 

@@ -8,9 +8,10 @@
 ;
 
 	.export		_exit
-	.import		initlib, donelib
-	.import	     	push0, callmain, zerobss
+	.import		initlib, donelib, callirq
+	.import	     	callmain, zerobss
         .import         MEMTOP, RESTOR, BSOUT, CLRCH
+	.import	       	__INTERRUPTOR_COUNT__
 
         .include        "zeropage.inc"
 	.include	"../plus4/plus4.inc"
@@ -66,9 +67,24 @@ L1:	lda	sp,x
 MemOk:	stx	sp
       	sty	sp+1  		; set argument stack ptr
 
+; If we have IRQ functions, chain our stub into the IRQ vector
+
+        lda     #<__INTERRUPTOR_COUNT__
+      	beq	NoIRQ1
+      	lda	IRQVec
+       	ldx	IRQVec+1
+      	sta	IRQInd+1
+      	stx	IRQInd+2
+      	lda	#<IRQStub
+      	ldx	#>IRQStub
+      	sei
+      	sta	IRQVec
+      	stx	IRQVec+1
+      	cli
+
 ; Call module constructors
 
-	jsr	initlib
+NoIRQ1: jsr     initlib
 
 ; Push arguments and call main()
 
@@ -79,9 +95,21 @@ MemOk:	stx	sp
 _exit: 	pha			; Save the return code on stack
 	jsr	donelib		; Run module destructors
 
+; Reset the IRQ vector if we chained it.
+
+        pha  			; Save the return code on stack
+	lda     #<__INTERRUPTOR_COUNT__
+	beq	NoIRQ2
+	lda	IRQInd+1
+	ldx	IRQInd+2
+	sei
+	sta	IRQVec
+	stx	IRQVec+1
+	cli
+
 ; Copy back the zero page stuff
 
-	ldx	#zpspace-1
+NoIRQ2: ldx     #zpspace-1
 L2:	lda	zpsave,x
 	sta	sp,x
 	dex
@@ -101,6 +129,20 @@ L2:	lda	zpsave,x
 
 	jmp	RESTOR
 
+; ------------------------------------------------------------------------
+; The IRQ vector jumps here, if condes routines are defined with type 2.
+
+IRQStub:
+	cld    	       		   	; Just to be sure
+       	jsr    	callirq                 ; Call the functions
+       	jmp    	IRQInd			; Jump to the saved IRQ vector
+
+; ------------------------------------------------------------------------
+; Data
+
+.data
+
+IRQInd: jmp     $0000
 
 .segment        "ZPSAVE"
 

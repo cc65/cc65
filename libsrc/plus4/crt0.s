@@ -8,7 +8,7 @@
         .export         brk_jmp
 
 	.import		callirq_y, initlib, donelib
-	.import	     	push0, callmain, zerobss
+	.import	     	callmain, zerobss
 	.import	       	__INTERRUPTOR_COUNT__
 
         .include        "zeropage.inc"

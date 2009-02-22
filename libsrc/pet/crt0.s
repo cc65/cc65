@@ -42,11 +42,19 @@ L1:	lda	sp,x
 
 	jsr	CLRCH
 
-; Switch to second charset
+; Switch to second charset. The routine that is called by BSOUT to switch the
+; character set will use FNLEN as temporary storage - YUCK! Since the
+; initmainargs routine, which parses the command line for arguments needs this
+; information, we need to save and restore it here.
+; Thanks to Stefan Haubenthal for this information!
 
+        lda     FNLEN
+        pha                     ; Save FNLEN
 	lda	#14
 ;	sta	$E84C		; See PET FAQ
 	jsr	BSOUT
+        pla
+        sta     FNLEN           ; Restore FNLEN
 
 ; Clear the BSS data
 

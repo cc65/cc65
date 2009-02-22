@@ -406,7 +406,8 @@ It does not declare any functions.
 <!-- <item><ref id="putc" name="putc"> -->
 <!-- <item><ref id="putchar" name="putchar"> -->
 <!-- <item><ref id="puts" name="puts"> -->
-<!-- <item><ref id="rename" name="rename"> -->
+<item><ref id="rename" name="rename">
+<item><ref id="remove" name="remove">
 <!-- <item><ref id="rewind" name="rewind"> -->
 <!-- <item><ref id="scanf" name="scanf"> -->
 <!-- <item><ref id="sprintf" name="sprintf"> -->
@@ -451,7 +452,6 @@ It does not declare any functions.
 <item><ref id="qsort" name="qsort">
 <item><ref id="rand" name="rand">
 <item><ref id="realloc" name="realloc">
-<item><ref id="remove" name="remove">
 <item><ref id="srand" name="srand">
 <item><ref id="ultoa" name="ultoa">
 <item><ref id="utoa" name="utoa">
@@ -487,7 +487,7 @@ It does not declare any functions.
 <item><ref id="strspn" name="strspn">
 <item><ref id="strstr" name="strstr">
 <item><ref id="strtok" name="strtok">
-<item><ref id="strxfrm" name="strxfrm"> 
+<item><ref id="strxfrm" name="strxfrm">
 <item><ref id="strupper" name="strupper">
 <item><ref id="strupr" name="strupr">
 </itemize>
@@ -3902,8 +3902,10 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="rename" name="rename">,
 <ref id="unlink" name="unlink">
 <tag/Example/
+<verb>
 #include &lt;stdio.h&gt;
 
 #define FILENAME "helloworld"
@@ -3913,6 +3915,44 @@ if (remove (FILENAME) == 0) {
 } else {
     printf ("There was a problem deleting %s\n", FILENAME);
 }
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>rename<label id="rename"><p>
+
+<quote>
+<descrip>
+<tag/Function/Rename a file.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/int __fastcall__ rename (const char* oldname, const char* newname);/
+<tag/Description/<tt/rename/ renames a file (gives it a new name). On success,
+zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
+code describing the reason for the failure.
+<tag/Limits/
+<itemize>
+<item>This function is not available on all cc65 targets (depends on the
+capabilities of the storage devices).
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="remove" name="remove">
+<tag/Example/
+<verb>
+#include &lt;stdio.h&gt;
+
+#define OLDNAME "textfile.txt"
+#define NEWNAME "textfile.bak"
+
+if (rename (OLDNAME, NEWNAME) == 0) {
+    printf ("Renamed %s to %s\n", OLDNAME, NEWNAME);
+} else {
+    printf ("Error renaming %s to %s\n", OLDNAME, NEWNAME);
+}
+</verb>
 </descrip>
 </quote>
 
@@ -4907,6 +4947,7 @@ to the ISO C standard.
 <tag/See also/
 <ref id="remove" name="remove">
 <tag/Example/
+<verb>
 #include &lt;stdio.h&gt;
 #include &lt;unistd.h&gt;
 
@@ -4916,7 +4957,8 @@ if (unlink (FILENAME) == 0) {
     printf ("We deleted %s successfully\n", FILENAME);
 } else {
     printf ("There was a problem deleting %s\n", FILENAME);
-}
+}     
+</verb>
 </descrip>
 </quote>
 

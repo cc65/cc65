@@ -7,7 +7,7 @@
         .export         __sysrename
 
         .import         fnparse, fnadd, fnparsename
-        .import         writefndiskcmd, closecmdchannel
+        .import         opencmdchannel, closecmdchannel, writefndiskcmd
         .import         popax
 
         .import         fncmd, fnunit
@@ -26,6 +26,10 @@
 
         jsr     popax
         jsr     fnparsename     ; Parse second filename
+        bne     done
+
+        ldx     fnunit
+        jsr     opencmdchannel
         bne     done
 
         lda     #'r'            ; Rename command

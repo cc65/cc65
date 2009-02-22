@@ -200,10 +200,10 @@ brk_jmp:        jmp     $0000
 
 spsave:	        .res	1
 
+irqcount:       .byte   0
+
 .segment        "ZPSAVE"
 
 zpsave:	        .res	zpspace
 
-.bss
-irqcount:       .byte   0
 

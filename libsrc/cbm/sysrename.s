@@ -11,6 +11,7 @@
         .import         popax
 
         .import         fncmd, fnunit
+        .importzp       ptr1
 
 
 ;--------------------------------------------------------------------------
@@ -25,6 +26,9 @@
         jsr     fnadd
 
         jsr     popax
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #0
         jsr     fnparsename     ; Parse second filename
         bne     done
 

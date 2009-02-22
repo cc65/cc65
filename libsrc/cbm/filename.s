@@ -4,7 +4,8 @@
 ; File name handling for CBM file I/O
 ;
 
-        .export         fnparse, fnset, fnaddmode, fncomplete, fndefunit
+        .export         fnparse, fnparsename, fnset
+        .export         fnadd, fnaddmode, fncomplete, fndefunit
         .export         fnunit, fnlen, fncmd, fnbuf
 
         .import         SETNAM
@@ -12,7 +13,7 @@
         .importzp       ptr1, tmp1
 
         .include        "ctype.inc"
-                  
+
 
 ;------------------------------------------------------------------------------
 ; fnparsename: Parse a filename (without drive spec) passed in in ptr1 and y.

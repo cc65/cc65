@@ -77,6 +77,7 @@ S_OBJS =	c_acptr.o	\
                 rwcommon.o      \
                 scratch.o       \
                 sysremove.o     \
+                sysrename.o     \
                 systime.o       \
 		wherex.o        \
                 wherey.o        \

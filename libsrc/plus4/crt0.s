@@ -80,15 +80,15 @@ L1:	lda	sp,x
 
   	jsr	zerobss
 
-; Call module constructors
-
-  	jsr	initlib
-
 ; Initialize irqcount, which means that from now own custom linked in IRQ
 ; handlers (via condes) will be called.
 
         lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
         sta     irqcount
+
+; Call module constructors
+
+  	jsr	initlib
 
 ; Push arguments and call main()
 
@@ -97,9 +97,12 @@ L1:	lda	sp,x
 ; Back from main (this is also the _exit entry). Run module destructors.
 
 _exit: 	pha		       	; Save the return code
+        jsr	donelib         ; Run module destructors
+
+; Disable chained IRQ handlers
+
 	lda     #0
         sta     irqcount        ; Disable custom IRQ handlers
-        jsr	donelib         ; Run module destructors
 
 ; Copy back the zero page stuff
 

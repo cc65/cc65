@@ -187,7 +187,7 @@ Type* GetImplicitFuncType (void)
     F->TagTab = &EmptySymTab;
 
     /* Fill the type string */
-    T[0].C   = T_FUNC;
+    T[0].C   = T_FUNC | CodeAddrSizeQualifier ();
     T[0].A.P = F;
     T[1].C   = T_INT;
     T[2].C   = T_END;

@@ -1,5 +1,5 @@
 ;
-; Ullrich von Bassewitz, 17.11.2002
+; Ullrich von Bassewitz, 2002-11-17, 2009-02-22
 ;
 ; Handle disk command channels
 ;
@@ -9,9 +9,11 @@
         .export         closecmdchannel
         .export         readdiskerror
         .export         writediskcmd
+        .export         writefndiskcmd
 
         .import         SETLFS, SETNAM, OPEN, CLOSE, BSOUT, BASIN
         .import         CHKIN, CKOUT, CLRCH
+        .import         fncmd, fnlen, fnunit
         .importzp       tmp1, ptr1
 
         .include        "cbm.inc"
@@ -165,6 +167,26 @@ readdiskerror:
         rts
 
 ;--------------------------------------------------------------------------
+; writefndiskcmd: Write the contents of fncmd to the command channel of the
+; drive in fnunit. Returns an error code in A, flags are set according to
+; the contents of A.
+
+writefndiskcmd:
+        lda     #<fncmd
+        sta     ptr1
+        lda     #>fncmd
+        sta     ptr1+1
+
+        ldx     fnlen
+        inx                     ; Account for command char in fncmd
+        txa                     ; Length of name into A
+        ldx     fnunit          ; Unit
+
+; Run directly into writediskcmd
+
+;       jmp     writediskcmd
+
+;--------------------------------------------------------------------------
 ; writediskcmd: Gets pointer to data in ptr1, length in A. Writes all data
 ; to the command channel of the given drive. Returns an error code in A,
 ; flags are set according to the contents of A.
@@ -203,7 +225,6 @@ writediskcmd:
 @L3:    jsr     CLRCH
         lda     #$00
         rts
-
 
 
 ;--------------------------------------------------------------------------

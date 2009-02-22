@@ -1,13 +1,12 @@
 ;
-; Ullrich von Bassewitz, 16.11.2002
+; Ullrich von Bassewitz, 2002-11-16, 2009-02-22
 ;
 ; Scratch a file on disk
 ;
 
         .export         scratch
-        .import         opencmdchannel, closecmdchannel, writediskcmd
-        .import         fnunit, fnlen, fncmd
-        .importzp       ptr1
+        .import         opencmdchannel, closecmdchannel, writefndiskcmd
+        .import         fnunit, fncmd
 
         .include        "cbm.inc"
 
@@ -25,17 +24,7 @@
 
         lda     #'s'            ; Scratch command
         sta     fncmd
-
-        lda     #<fncmd
-        sta     ptr1
-        lda     #>fncmd
-        sta     ptr1+1
-
-        ldx     fnlen
-        inx                     ; Account for "S"
-        txa                     ; Length of name into A
-        ldx     fnunit          ; Unit
-        jsr     writediskcmd
+        jsr     writefndiskcmd
 
         pha
         ldx     fnunit

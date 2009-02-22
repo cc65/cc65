@@ -14,7 +14,6 @@
 .proc   __sysremove
 
         jsr     fnparse         ; Parse the given file name
-        cmp     #0              ; Do we have an error?
         bne     err             ; Jump if yes
         jmp     scratch         ; Scratch the file, return an error code
 err:    rts

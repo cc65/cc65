@@ -346,15 +346,15 @@ Z4:     jmp     Init
 
 .segment        "PAGE2"
 
-; Call module constructors, enable chained IRQs afterwards.
+; Activate chained interrupt handlers, then enable interrupts.
 
-Init:  	jsr	initlib
-        lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
+Init:   lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
         sta     irqcount
-
-; Enable interrupts
-
       	cli
+
+; Call module constructors.
+
+        jsr	initlib
 
 ; Push arguments and call main()
 
@@ -364,9 +364,9 @@ Init:  	jsr	initlib
 ; point for the break vector.
 
 _exit:  pha			; Save the return code
+        jsr	donelib	     	; Run module destructors
 	lda     #$00
         sta     irqcount        ; Disable custom irq handlers
-        jsr	donelib	     	; Run module destructors
 
 ; Address the system bank
 

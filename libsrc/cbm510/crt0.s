@@ -425,15 +425,15 @@ ccopy2:	lda	__VIDRAM_START__,y
         lda     ExecReg
        	sta	IndReg
 
-; Call module constructors, enable chained IRQs afterwards.
+; Activate chained interrupt handlers, then enable interrupts.
 
-        jsr	initlib
         lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
         sta     irqcount
-
-; Enable interrupts
-
       	cli
+
+; Call module constructors.
+
+        jsr	initlib
 
 ; Push arguments and call main()
 
@@ -443,9 +443,9 @@ ccopy2:	lda	__VIDRAM_START__,y
 ; point for the break vector.
 
 _exit:  pha			; Save the return code on stack
+        jsr	donelib	     	; Run module destructors
 	lda     #$00
         sta     irqcount        ; Disable custom irq handlers
-        jsr	donelib	     	; Run module destructors
 
 ; Address the system bank
 

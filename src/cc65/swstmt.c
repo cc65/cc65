@@ -93,6 +93,7 @@ void SwitchStatement (void)
     unsigned    ExitLabel;	/* Exit label */
     unsigned    SwitchCodeLabel;/* Label for the switch code */
     int         HaveBreak = 0;  /* True if the last statement had a break */
+    int         RCurlyBrace;    /* True if last token is right curly brace */
     SwitchCtrl* OldSwitch;      /* Pointer to old switch control data */
     SwitchCtrl  SwitchData;     /* New switch data */
 
@@ -151,7 +152,7 @@ void SwitchStatement (void)
     /* Parse the following statement, which will actually be a compound
      * statement because of the curly brace at the current input position
      */
-    HaveBreak = Statement (0);
+    HaveBreak = Statement (&RCurlyBrace);
 
     /* Check if we had any labels */
     if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
@@ -188,7 +189,7 @@ void SwitchStatement (void)
 
     /* Define the exit label */
     g_defcodelabel (ExitLabel);
-                                                                    
+
     /* Exit the loop */
     DelLoop ();
 
@@ -197,6 +198,13 @@ void SwitchStatement (void)
 
     /* Free the case value tree */
     FreeCaseNodeColl (SwitchData.Nodes);
+
+    /* If the case statement was (correctly) terminated by a closing curly
+     * brace, skip it now.
+     */
+    if (RCurlyBrace) {
+        NextToken ();
+    }
 }
 
 

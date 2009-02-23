@@ -17,7 +17,7 @@ WINE = wine
 AR     	= $(WINE) WLIB
 CC      = $(WINE) WCC386
 LD     	= $(WINE) WLINK
-WSTRIP	= $(WINE) WSTRIP -q 
+WSTRIP	= $(WINE) WSTRIP -q
 
 LNKCFG  = ld.tmp
 
@@ -107,6 +107,7 @@ OBJS =	anonname.obj	\
 	macrotab.obj	\
 	main.obj	\
 	opcodes.obj	\
+        output.obj      \
 	preproc.obj	\
 	pragma.obj	\
 	reginfo.obj	\

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -62,6 +62,7 @@
 #include "incpath.h"
 #include "input.h"
 #include "macrotab.h"
+#include "output.h"
 #include "scanner.h"
 #include "standard.h"
 #include "segments.h"
@@ -720,8 +721,7 @@ int main (int argc, char* argv[])
 
     unsigned I;
 
-    /* Initialize the output file name */
-    const char* OutputFile = 0;
+    /* Initialize the input file name */
     const char* InputFile  = 0;
 
     /* Initialize the cmdline module */
@@ -769,7 +769,7 @@ int main (int argc, char* argv[])
 	       	    break;
 
     		case 'o':
-		    OutputFile = GetArg (&I, 2);
+		    SetOutputName (GetArg (&I, 2));
 		    break;
 
                 case 'r':
@@ -866,9 +866,7 @@ int main (int argc, char* argv[])
     }
 
     /* Create the output file name if it was not explicitly given */
-    if (OutputFile == 0) {
-	OutputFile = MakeFilename (InputFile, ".s");
-    }
+    MakeDefaultOutputName (InputFile);
 
     /* If no CPU given, use the default CPU for the target */
     if (CPU == CPU_UNKNOWN) {
@@ -893,29 +891,21 @@ int main (int argc, char* argv[])
     Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
-    if (ErrorCount == 0 || Debug) {
+    if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
 
 	/* Open the file */
-	FILE* F = fopen (OutputFile, "w");
-	if (F == 0) {
-	    Fatal ("Cannot open output file `%s': %s", OutputFile, strerror (errno));
-	}
-	Print (stdout, 1, "Opened output file `%s'\n", OutputFile);
+        OpenOutputFile ();
 
 	/* Write the output to the file */
-	WriteOutput (F);
-       	Print (stdout, 1, "Wrote output to `%s'\n", OutputFile);
+       	WriteAsmOutput ();
+       	Print (stdout, 1, "Wrote output to `%s'\n", OutputFilename);
 
 	/* Close the file, check for errors */
-	if (fclose (F) != 0) {
-	    remove (OutputFile);
-	    Fatal ("Cannot write to output file (disk full?)");
-	}
-       	Print (stdout, 1, "Closed output file `%s'\n", OutputFile);
+        CloseOutputFile ();
 
 	/* Create dependencies if requested */
 	if (CreateDep) {
-	    DoCreateDep (OutputFile);
+	    DoCreateDep (OutputFilename);
 	    Print (stdout, 1, "Creating dependeny file\n");
 	}
 

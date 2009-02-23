@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,8 +37,6 @@
 #define CODELAB_H
 
 
-
-#include <stdio.h>
 
 /* common */
 #include "coll.h"
@@ -113,8 +111,8 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
  * more references on return.
  */
 
-void CL_Output (const CodeLabel* L, FILE* F);
-/* Output the code label to a file */
+void CL_Output (const CodeLabel* L);
+/* Output the code label to the output file */
 
 
 

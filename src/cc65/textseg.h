@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,7 +45,6 @@
 
 
 #include <stdarg.h>
-#include <stdio.h>
 
 /* common */
 #include "attrib.h"
@@ -85,8 +84,8 @@ void TS_AddVLine (TextSeg* S, const char* Format, va_list ap) attribute ((format
 void TS_AddLine (TextSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given text segment */
 
-void TS_Output (const TextSeg* S, FILE* F);
-/* Output the text segment data to a file */
+void TS_Output (const TextSeg* S);
+/* Output the text segment data to the output file */
 
 
 

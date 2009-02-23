@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,8 +39,9 @@
 #include "xsprintf.h"
 
 /* cc65 */
-#include "error.h"
 #include "dataseg.h"
+#include "error.h"
+#include "output.h"
 
 
 
@@ -105,8 +106,8 @@ void DS_AddLine (DataSeg* S, const char* Format, ...)
 
 
 
-void DS_Output (const DataSeg* S, FILE* F)
-/* Output the data segment data to a file */
+void DS_Output (const DataSeg* S)
+/* Output the data segment data to the output file */
 {
     unsigned I;
 
@@ -119,15 +120,15 @@ void DS_Output (const DataSeg* S, FILE* F)
     }
 
     /* Output the segment directive */
-    fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
+    WriteOutput (".segment\t\"%s\"\n\n", S->SegName);
 
     /* Output all entries */
     for (I = 0; I < Count; ++I) {
-	fprintf (F, "%s\n", (const char*) CollConstAt (&S->Lines, I));
+	WriteOutput ("%s\n", (const char*) CollConstAt (&S->Lines, I));
     }
 
     /* Add an additional newline after the segment output */
-    fprintf (F, "\n");
+    WriteOutput ("\n");
 }
 
 

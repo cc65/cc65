@@ -72,6 +72,7 @@ OBJS =	anonname.o	\
 	macrotab.o	\
 	main.o		\
 	opcodes.o	\
+        output.o        \
 	preproc.o      	\
 	pragma.o       	\
 	reginfo.o	\

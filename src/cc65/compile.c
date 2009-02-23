@@ -2,11 +2,11 @@
 /*                                                                           */
 /*				   compile.c				     */
 /*                                                                           */
-/*			 Top level compiler subroutine			     */
+/*		   	 Top level compiler subroutine			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/* (C) 2000-2009 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -55,6 +55,7 @@
 #include "input.h"
 #include "litpool.h"
 #include "macrotab.h"
+#include "output.h"
 #include "pragma.h"
 #include "preproc.h"
 #include "standard.h"
@@ -344,10 +345,17 @@ void Compile (const char* FileName)
     /* Are we supposed to compile or just preprocess the input? */
     if (PreprocessOnly) {
 
+	/* Open the file */
+        OpenOutputFile ();
+
+        /* Preprocess each line and write it to the output file */
         while (NextLine ()) {
             Preprocess ();
-            printf ("%.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+            WriteOutput ("%.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
         }
+
+        /* Close the output file */
+        CloseOutputFile ();
 
         if (Debug) {
             PrintMacroStats (stdout);

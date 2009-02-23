@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -272,25 +272,25 @@ void RemoveGlobalCode (void)
 
 
 
-void OutputSegments (const Segments* S, FILE* F)
-/* Output the given segments to the file */
+void OutputSegments (const Segments* S)
+/* Output the given segments to the output file */
 {
     /* Output the function prologue if the segments came from a function */
-    CS_OutputPrologue (S->Code, F);
+    CS_OutputPrologue (S->Code);
 
     /* Output the text segment */
-    TS_Output (S->Text, F);
+    TS_Output (S->Text);
 
     /* Output the three data segments */
-    DS_Output (S->Data, F);
-    DS_Output (S->ROData, F);
-    DS_Output (S->BSS, F);
+    DS_Output (S->Data);
+    DS_Output (S->ROData);
+    DS_Output (S->BSS);
 
     /* Output the code segment */
-    CS_Output (S->Code, F);
+    CS_Output (S->Code);
 
     /* Output the code segment epiloque */
-    CS_OutputEpilogue (S->Code, F);
+    CS_OutputEpilogue (S->Code);
 }
 
 

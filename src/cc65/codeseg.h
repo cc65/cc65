@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,6 @@
 
 
 #include <stdarg.h>
-#include <stdio.h>
 
 /* common */
 #include "attrib.h"
@@ -267,19 +266,19 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last);
  * Last, and that no insn may jump into this block from the outside.
  */
 
-void CS_OutputPrologue (const CodeSeg* S, FILE* F);
+void CS_OutputPrologue (const CodeSeg* S);
 /* If the given code segment is a code segment for a function, output the
  * assembler prologue into the file. That is: Output a comment header, switch
  * to the correct segment and enter the local function scope. If the code
  * segment is global, do nothing.
  */
 
-void CS_OutputEpilogue (const CodeSeg* S, FILE* F);
+void CS_OutputEpilogue (const CodeSeg* S);
 /* If the given code segment is a code segment for a function, output the
  * assembler epilogue into the file. That is: Close the local function scope.
  */
 
-void CS_Output (CodeSeg* S, FILE* F);
+void CS_Output (CodeSeg* S);
 /* Output the code segment data to a file */
 
 void CS_FreeRegInfo (CodeSeg* S);
@@ -291,7 +290,7 @@ void CS_GenRegInfo (CodeSeg* S);
 
 
 /* End of codeseg.h */
-#endif                                          
+#endif
 
 
 

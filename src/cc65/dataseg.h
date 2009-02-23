@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,6 @@
 
 
 #include <stdarg.h>
-#include <stdio.h>
 
 /* common */
 #include "attrib.h"
@@ -83,8 +82,8 @@ void DS_AddVLine (DataSeg* S, const char* Format, va_list ap) attribute ((format
 void DS_AddLine (DataSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given data segment */
 
-void DS_Output (const DataSeg* S, FILE* F);
-/* Output the data segment data to a file */
+void DS_Output (const DataSeg* S);
+/* Output the data segment data to the output file */
 
 
 

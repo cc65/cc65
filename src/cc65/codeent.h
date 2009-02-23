@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -38,7 +38,6 @@
 
 
 
-#include <stdio.h>
 #include <string.h>
 
 /* common */
@@ -223,8 +222,8 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs);
  * overwritten.
  */
 
-void CE_Output (const CodeEntry* E, FILE* F);
-/* Output the code entry to a file */
+void CE_Output (const CodeEntry* E);
+/* Output the code entry to the output file */
 
 
 

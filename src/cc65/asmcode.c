@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -96,15 +96,15 @@ int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End)
 
 
 
-void WriteOutput (FILE* F)
-/* Write the final output to a file */
+void WriteAsmOutput (void)
+/* Write the final assembler output to the output file */
 {
     SymTable* SymTab;
     SymEntry* Entry;
 
     /* Output the global data segment */
     CHECK (!HaveGlobalCode ());
-    OutputSegments (CS, F);
+    OutputSegments (CS);
 
     /* Output all global or referenced functions */
     SymTab = GetGlobalSymTab ();
@@ -116,7 +116,7 @@ void WriteOutput (FILE* F)
        	    /* Function which is defined and referenced or extern */
        	    CS_MergeLabels (Entry->V.F.Seg->Code);
        	    RunOpt (Entry->V.F.Seg->Code);
-       	    OutputSegments (Entry->V.F.Seg, F);
+       	    OutputSegments (Entry->V.F.Seg);
        	}
        	Entry = Entry->NextSym;
     }

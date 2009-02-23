@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -79,8 +79,8 @@ void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Targe
 int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End);
 /* Return true if the given code range is empty (no code between Start and End) */
 
-void WriteOutput (FILE* F);
-/* Write the final output to a file */
+void WriteAsmOutput (void);
+/* Write the final assembler output to the output file */
 
 
 

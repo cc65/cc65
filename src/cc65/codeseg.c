@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2008, Ullrich von Bassewitz                                      */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -55,6 +55,7 @@
 #include "error.h"
 #include "global.h"
 #include "ident.h"
+#include "output.h"
 #include "symentry.h"
 
 
@@ -65,22 +66,20 @@
 
 
 
-static void CS_PrintFunctionHeader (const CodeSeg* S, FILE* F)
-/* Print a comment with the function signature to the given file */
+static void CS_PrintFunctionHeader (const CodeSeg* S)
+/* Print a comment with the function signature to the output file */
 {
     /* Get the associated function */
     const SymEntry* Func = S->Func;
 
     /* If this is a global code segment, do nothing */
     if (Func) {
-        fprintf (F,
-                 "; ---------------------------------------------------------------\n"
-                 "; ");
-        PrintFuncSig (F, Func->Name, Func->Type);
-        fprintf (F,
-                 "\n"
-                 "; ---------------------------------------------------------------\n"
-                 "\n");
+        WriteOutput ("; ---------------------------------------------------------------\n"
+                     "; ");
+        PrintFuncSig (OutputFile, Func->Name, Func->Type);
+        WriteOutput ("\n"
+                     "; ---------------------------------------------------------------\n"
+                     "\n");
     }
 }
 
@@ -1225,7 +1224,7 @@ int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
 
 
 
-void CS_OutputPrologue (const CodeSeg* S, FILE* F)
+void CS_OutputPrologue (const CodeSeg* S)
 /* If the given code segment is a code segment for a function, output the
  * assembler prologue into the file. That is: Output a comment header, switch
  * to the correct segment and enter the local function scope. If the code
@@ -1241,34 +1240,34 @@ void CS_OutputPrologue (const CodeSeg* S, FILE* F)
      */
     if (Func) {
         /* Get the function descriptor */
-       	CS_PrintFunctionHeader (S, F);
-        fprintf (F, ".segment\t\"%s\"\n\n.proc\t_%s", S->SegName, Func->Name);
+       	CS_PrintFunctionHeader (S);
+        WriteOutput (".segment\t\"%s\"\n\n.proc\t_%s", S->SegName, Func->Name);
         if (IsQualNear (Func->Type)) {
-            fputs (": near", F);
+            WriteOutput (": near");
         } else if (IsQualFar (Func->Type)) {
-            fputs (": far", F);
+            WriteOutput (": far");
         }
-        fputs ("\n\n", F);
+        WriteOutput ("\n\n");
     }
 
 }
 
 
 
-void CS_OutputEpilogue (const CodeSeg* S, FILE* F)
+void CS_OutputEpilogue (const CodeSeg* S)
 /* If the given code segment is a code segment for a function, output the
  * assembler epilogue into the file. That is: Close the local function scope.
  */
 {
     if (S->Func) {
-       	fputs ("\n.endproc\n\n", F);
+       	WriteOutput ("\n.endproc\n\n");
     }
 }
 
 
 
-void CS_Output (CodeSeg* S, FILE* F)
-/* Output the code segment data to a file */
+void CS_Output (CodeSeg* S)
+/* Output the code segment data to the output file */
 {
     unsigned I;
     const LineInfo* LI;
@@ -1285,51 +1284,55 @@ void CS_Output (CodeSeg* S, FILE* F)
     CS_GenRegInfo (S);
 
     /* Output the segment directive */
-    fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
+    WriteOutput (".segment\t\"%s\"\n\n", S->SegName);
 
     /* Output all entries, prepended by the line information if it has changed */
     LI = 0;
     for (I = 0; I < Count; ++I) {
-	/* Get the next entry */
-	const CodeEntry* E = CollConstAt (&S->Entries, I);
-	/* Check if the line info has changed. If so, output the source line
-	 * if the option is enabled and output debug line info if the debug
-	 * option is enabled.
-	 */
-	if (E->LI != LI) {
-	    /* Line info has changed, remember the new line info */
-	    LI = E->LI;
+    	/* Get the next entry */
+    	const CodeEntry* E = CollConstAt (&S->Entries, I);
+    	/* Check if the line info has changed. If so, output the source line
+    	 * if the option is enabled and output debug line info if the debug
+    	 * option is enabled.
+    	 */
+    	if (E->LI != LI) {
+    	    /* Line info has changed, remember the new line info */
+    	    LI = E->LI;
 
-	    /* Add the source line as a comment. Beware: When line continuation
+    	    /* Add the source line as a comment. Beware: When line continuation
              * was used, the line may contain newlines.
              */
-	    if (AddSource) {
+    	    if (AddSource) {
                 const char* L = LI->Line;
-                fputs (";\n; ", F);
+                WriteOutput (";\n; ");
                 while (*L) {
-                    if (*L == '\n') {
-                        fputs ("\n; ", F);
+                    const char* N = strchr (L, '\n');
+                    if (N) {
+                        /* We have a newline, just write the first part */
+                        WriteOutput ("%.*s\n; ", N - L, L);
+                        L = N+1;
                     } else {
-                        fputc (*L, F);
+                        /* No Newline, write as is */
+                        WriteOutput ("%s\n", L);
+                        break;
                     }
-                    ++L;
                 }
-                fputs ("\n;\n", F);
-	    }
+                WriteOutput ("\n;\n");
+    	    }
 
-	    /* Add line debug info */
+    	    /* Add line debug info */
 	    if (DebugInfo) {
-	       	fprintf (F, "\t.dbg\tline, \"%s\", %u\n",
-	       	      	 GetInputName (LI), GetInputLine (LI));
+	       	WriteOutput ("\t.dbg\tline, \"%s\", %u\n",
+	       	      	     GetInputName (LI), GetInputLine (LI));
 	    }
 	}
 	/* Output the code */
-	CE_Output (E, F);
+	CE_Output (E);
     }
 
     /* If debug info is enabled, terminate the last line number information */
     if (DebugInfo) {
-       	fputs ("\t.dbg\tline\n", F);
+       	WriteOutput ("\t.dbg\tline\n");
     }
 
     /* Free register info */

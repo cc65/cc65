@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   textseg.c				     */
+/*                                 output.h                                  */
 /*                                                                           */
-/*			    Text segment structure			     */
+/*                           Output file handling                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2009,     Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,89 +33,60 @@
 
 
 
-/* Note: This is NOT some sort of code segment, it is used to store lines of
- * output that are textual (not real code) instead.
+#ifndef OUTPUT_H
+#define OUTPUT_H
+
+
+
+#include <stdio.h>
+
+/* common */
+#include "attrib.h"
+
+
+
+/*****************************************************************************/
+/*     	       	     	     	     Data		     		     */
+/*****************************************************************************/
+
+
+
+/* Name of the output file. Dynamically allocated and read only. */
+extern const char* OutputFilename;
+
+/* Output file handle. Use WriteOutput if possible. Read only. */
+extern FILE* OutputFile;
+
+
+
+/*****************************************************************************/
+/*     	       	     	     	     Code		     		     */
+/*****************************************************************************/
+
+
+
+void SetOutputName (const char* Name);
+/* Sets the name of the output file. */
+
+void MakeDefaultOutputName (const char* InputFilename);
+/* If the name of the output file is empty or NULL, the name of the output
+ * file is derived from the input file by adjusting the file name extension.
+ */
+
+void OpenOutputFile ();
+/* Open the output file. Will call Fatal() in case of failures. */
+
+void CloseOutputFile ();
+/* Close the output file. Will call Fatal() in case of failures. */
+
+int WriteOutput (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Write to the output file using printf like formatting. Returns the number
+ * of chars written.
  */
 
 
-
-/* common */
-#include "xmalloc.h"
-#include "xsprintf.h"
-
-/* cc65 */
-#include "output.h"
-#include "textseg.h"
-
-
-
-/*****************************************************************************/
-/*     	       	       	  	     Code 				     */
-/*****************************************************************************/
-
-
-
-TextSeg* NewTextSeg (SymEntry* Func)
-/* Create a new text segment, initialize and return it */
-{
-    /* Allocate memory for the structure */
-    TextSeg* S 	= xmalloc (sizeof (TextSeg));
-
-    /* Initialize the fields */
-    S->Func	= Func;
-    InitCollection (&S->Lines);
-
-    /* Return the new struct */
-    return S;
-}
-
-
-
-void TS_AddVLine (TextSeg* S, const char* Format, va_list ap)
-/* Add a line to the given text segment */
-{
-    /* Format the line */
-    char Buf [256];
-    xvsprintf (Buf, sizeof (Buf), Format, ap);
-
-    /* Add a copy to the data segment */
-    CollAppend (&S->Lines, xstrdup (Buf));
-}
-
-
-
-void TS_AddLine (TextSeg* S, const char* Format, ...)
-/* Add a line to the given text segment */
-{
-    va_list ap;
-    va_start (ap, Format);
-    TS_AddVLine (S, Format, ap);
-    va_end (ap);
-}
-
-
-
-void TS_Output (const TextSeg* S)
-/* Output the text segment data to the output file */
-{
-    unsigned I;
-
-    /* Get the number of entries in this segment */
-    unsigned Count = CollCount (&S->Lines);
-
-    /* If the segment is actually empty, bail out */
-    if (Count == 0) {
-	return;
-    }
-
-    /* Output all entries */
-    for (I = 0; I < Count; ++I) {
-        WriteOutput ("%s\n", (const char*) CollConstAt (&S->Lines, I));
-    }
-
-    /* Add an additional newline after the segment output */
-    WriteOutput ("\n");
-}
+/* End of output.h */
+#endif
 
 
 

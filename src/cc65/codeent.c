@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -34,7 +34,6 @@
 
 
 #include <stdlib.h>
-#include <string.h>
 
 /* common */
 #include "chartype.h"
@@ -44,12 +43,13 @@
 #include "xsprintf.h"
 
 /* cc65 */
+#include "codeent.h"
 #include "codeinfo.h"
 #include "error.h"
 #include "global.h"
 #include "codelab.h"
 #include "opcodes.h"
-#include "codeent.h"
+#include "output.h"
 
 
 
@@ -1362,8 +1362,8 @@ static char* RegContentDesc (const RegContents* RC, char* Buf)
 
 
 
-void CE_Output (const CodeEntry* E, FILE* F)
-/* Output the code entry to a file */
+void CE_Output (const CodeEntry* E)
+/* Output the code entry to the output file */
 {
     const OPCDesc* D;
     unsigned Chars;
@@ -1373,14 +1373,14 @@ void CE_Output (const CodeEntry* E, FILE* F)
     unsigned LabelCount = CollCount (&E->Labels);
     unsigned I;
     for (I = 0; I < LabelCount; ++I) {
-    	CL_Output (CollConstAt (&E->Labels, I), F);
+    	CL_Output (CollConstAt (&E->Labels, I));
     }
 
     /* Get the opcode description */
     D = GetOPCDesc (E->OPC);
 
     /* Print the mnemonic */
-    Chars = fprintf (F, "\t%s", D->Mnemo);
+    Chars = WriteOutput ("\t%s", D->Mnemo);
 
     /* Print the operand */
     switch (E->AM) {
@@ -1391,50 +1391,50 @@ void CE_Output (const CodeEntry* E, FILE* F)
 
     	case AM65_ACC:
     	    /* accumulator */
-    	    Chars += fprintf (F, "%*sa", 9-Chars, "");
+    	    Chars += WriteOutput ("%*sa", 9-Chars, "");
     	    break;
 
 	case AM65_IMM:
     	    /* immidiate */
-    	    Chars += fprintf (F, "%*s#%s", 9-Chars, "", E->Arg);
+    	    Chars += WriteOutput ("%*s#%s", 9-Chars, "", E->Arg);
     	    break;
 
     	case AM65_ZP:
     	case AM65_ABS:
 	    /* zeropage and absolute */
-	    Chars += fprintf (F, "%*s%s", 9-Chars, "", E->Arg);
+	    Chars += WriteOutput ("%*s%s", 9-Chars, "", E->Arg);
        	    break;
 
 	case AM65_ZPX:
 	case AM65_ABSX:
 	    /* zeropage,X and absolute,X */
-	    Chars += fprintf (F, "%*s%s,x", 9-Chars, "", E->Arg);
+	    Chars += WriteOutput ("%*s%s,x", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM65_ABSY:
 	    /* absolute,Y */
-	    Chars += fprintf (F, "%*s%s,y", 9-Chars, "", E->Arg);
+	    Chars += WriteOutput ("%*s%s,y", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM65_ZPX_IND:
 	    /* (zeropage,x) */
-       	    Chars += fprintf (F, "%*s(%s,x)", 9-Chars, "", E->Arg);
+       	    Chars += WriteOutput ("%*s(%s,x)", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM65_ZP_INDY:
 	    /* (zeropage),y */
-       	    Chars += fprintf (F, "%*s(%s),y", 9-Chars, "", E->Arg);
+       	    Chars += WriteOutput ("%*s(%s),y", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM65_ZP_IND:
 	    /* (zeropage) */
-       	    Chars += fprintf (F, "%*s(%s)", 9-Chars, "", E->Arg);
+       	    Chars += WriteOutput ("%*s(%s)", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM65_BRA:
 	    /* branch */
 	    Target = E->JumpTo? E->JumpTo->Name : E->Arg;
-	    Chars += fprintf (F, "%*s%s", 9-Chars, "", Target);
+	    Chars += WriteOutput ("%*s%s", 9-Chars, "", Target);
 	    break;
 
 	default:
@@ -1446,25 +1446,23 @@ void CE_Output (const CodeEntry* E, FILE* F)
     if (Debug) {
 	char Use [128];
 	char Chg [128];
-       	fprintf (F,
-       	       	 "%*s; USE: %-12s CHG: %-12s SIZE: %u",
-       	       	 30-Chars, "",
-	    	 RegInfoDesc (E->Use, Use),
-	    	 RegInfoDesc (E->Chg, Chg),
-	       	 E->Size);
+       	WriteOutput ("%*s; USE: %-12s CHG: %-12s SIZE: %u",
+       	       	     30-Chars, "",
+	    	     RegInfoDesc (E->Use, Use),
+	    	     RegInfoDesc (E->Chg, Chg),
+	       	     E->Size);
 
         if (E->RI) {
             char RegIn[32];
             char RegOut[32];
-            fprintf (F,
-                     "    In %s  Out %s",
-                     RegContentDesc (&E->RI->In, RegIn),
-                     RegContentDesc (&E->RI->Out, RegOut));
+            WriteOutput ("    In %s  Out %s",
+                         RegContentDesc (&E->RI->In, RegIn),
+                         RegContentDesc (&E->RI->Out, RegOut));
         }
     }
 
     /* Terminate the line */
-    fprintf (F, "\n");
+    WriteOutput ("\n");
 }
 
 

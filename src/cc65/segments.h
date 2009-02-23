@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -147,8 +147,8 @@ int HaveGlobalCode (void);
 void RemoveGlobalCode (void);
 /* Remove all code from the global code segment. Used for error recovery. */
 
-void OutputSegments (const Segments* S, FILE* F);
-/* Output the given segments to the file */
+void OutputSegments (const Segments* S);
+/* Output the given segments to the output file */
 
 
 

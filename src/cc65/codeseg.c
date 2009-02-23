@@ -1317,7 +1317,7 @@ void CS_Output (CodeSeg* S)
                         break;
                     }
                 }
-                WriteOutput ("\n;\n");
+                WriteOutput (";\n");
     	    }
 
     	    /* Add line debug info */

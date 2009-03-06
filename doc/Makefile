@@ -62,7 +62,7 @@ TEX  =	$(SGML:.sgml=.tex)
 	linuxdoc -B txt -f $(TXT_OPTIONS) $<
 
 %.html:	%.sgml
-	linuxdoc -B info --split=1 $(BUTTONS) $<
+	linuxdoc -B html --split=1 $(BUTTONS) $<
 
 %.info:	%.sgml
 	linuxdoc -B info $<

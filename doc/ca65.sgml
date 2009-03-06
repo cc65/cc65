@@ -574,10 +574,19 @@ To force a specific order of evaluation, parentheses may be used, as usual.
 
 <sect>Symbols and labels<p>
 
+A symbol or label is an identifier that starts with a letter and is followed
+by letters and digits. Depending on some features enabled (see
+<tt><ref id="at_in_identifiers" name="at_in_identifiers"></tt>,
+<tt><ref id="dollar_in_identifiers" name="dollar_in_identifiers"></tt> and
+<tt><ref id="leading_dot_in_identifiers" name="leading_dot_in_identifiers"></tt>)
+other characters may be present. Use of identifiers consisting of a single
+character will not work in all cases, because some of these identifiers are
+reserved keywords (for example "A" is not a valid identifier for a label,
+because it is the keyword for the accumulator).
+
 The assembler allows you to use symbols instead of naked values to make
 the source more readable. There are a lot of different ways to define and
 use symbols and labels, giving a lot of flexibility.
-
 
 <sect1>Numeric constants<p>
 
@@ -2230,7 +2239,7 @@ Here's a list of all control commands and a description, what they do:
 
   <descrip>
 
-  <tag><tt>at_in_identifiers</tt></tag>
+  <tag><tt>at_in_identifiers</tt><label id="at_in_identifiers"></tag>
 
     Accept the at character (`@') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
@@ -2249,10 +2258,10 @@ Here's a list of all control commands and a description, what they do:
 */      sta     $82
     </verb></tscreen>
 
-  <tag><tt>dollar_in_identifiers</tt></tag>
+  <tag><tt>dollar_in_identifiers</tt><label id="dollar_in_identifiers"></tag>
 
     Accept the dollar sign (`&dollar;') as a valid character in identifiers. The
-    at character is not allowed to start an identifier, even with this
+    dollar character is not allowed to start an identifier, even with this
     feature enabled.
 
   <tag><tt>dollar_is_pc</tt></tag>
@@ -2266,7 +2275,7 @@ Here's a list of all control commands and a description, what they do:
     Allow labels without a trailing colon. These labels are only accepted,
     if they start at the beginning of a line (no leading white space).
 
-  <tag><tt>leading_dot_in_identifiers</tt></tag>
+  <tag><tt>leading_dot_in_identifiers</tt><label id="leading_dot_in_identifiers"></tag>
 
     Accept the dot (`.') as the first character of an identifier. This may be
     used for example to create macro names that start with a dot emulating

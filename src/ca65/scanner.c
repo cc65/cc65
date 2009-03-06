@@ -680,7 +680,7 @@ static unsigned char FindDotKeyword (void)
 }
 
 
-
+           
 static void ReadIdent (void)
 /* Read an identifier from the current input position into Ident. Filling SVal
  * starts at the current position with the next character in C. It is assumed
@@ -1013,8 +1013,11 @@ Again:
 		    break;
 
 	        case 'S':
-	     	    Tok = TOK_S;
-	     	    return;
+                    if (CPU == CPU_65816) {
+                        Tok = TOK_S;
+                        return;
+                    }
+                    break;
 
     	     	case 'X':
      	     	    Tok = TOK_X;

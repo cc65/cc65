@@ -96,6 +96,17 @@ void Warning (const char* Format, ...)
 
 
 
+void LIWarning (const LineInfo* LI, const char* Format, ...)
+/* Print a warning message with the line info given explicitly */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntWarning (GetInputName (LI), GetInputLine (LI), Format, ap);
+    va_end (ap);
+}
+
+
+
 void PPWarning (const char* Format, ...)
 /* Print warning message. For use within the preprocessor. */
 {
@@ -131,6 +142,17 @@ void Error (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     IntError (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
+    va_end (ap);
+}
+
+
+
+void LIError (const LineInfo* LI, const char* Format, ...)
+/* Print an error message with the line info given explicitly */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntError (GetInputName (LI), GetInputLine (LI), Format, ap);
     va_end (ap);
 }
 

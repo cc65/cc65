@@ -41,6 +41,9 @@
 /* common */
 #include "attrib.h"
 
+/* cc65 */
+#include "lineinfo.h"
+
 
 
 /*****************************************************************************/
@@ -64,11 +67,17 @@ extern unsigned WarningCount;
 void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print warning message. */
 
+void LIWarning (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
+/* Print a warning message with the line info given explicitly */
+
 void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print warning message. For use within the preprocessor. */
 
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
+
+void LIError (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
+/* Print an error message with the line info given explicitly */
 
 void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message. For use within the preprocessor.  */

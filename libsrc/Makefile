@@ -80,6 +80,7 @@ atarilib:
 	done
 	mv atari/crt0.o atari.o
 	cp atari/atari-stdjoy.joy ataristd.joy
+	cp atari/atari-multijoy.joy atarimj8.joy
 
 #-----------------------------------------------------------------------------
 # Oric Atmos

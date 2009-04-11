@@ -119,7 +119,7 @@ OBJS = 	_scrsize.o      \
 
 EMDS =
 
-JOYS = atari-stdjoy.joy
+JOYS = atari-stdjoy.joy atari-multijoy.joy
 
 TGIS =
 

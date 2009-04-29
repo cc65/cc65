@@ -186,6 +186,6 @@ old_shflok:	.res	1
 old_lmargin:	.res	1
 
 	.segment "AUTOSTRT"
-	.word	$02E0
-	.word	$02E1
+	.word	RUNAD
+	.word	RUNAD+1
 	.word	__LOWCODE_LOAD__ + 1

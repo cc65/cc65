@@ -319,7 +319,7 @@ static ExprNode* Symbol (SymEntry* S)
 
 
 
-static ExprNode* FuncBankByte (void)
+ExprNode* FuncBankByte (void)
 /* Handle the .BANKBYTE builtin function */
 {
     return BankByte (Expression ());
@@ -393,7 +393,7 @@ static ExprNode* FuncDefined (void)
 
 
 
-static ExprNode* FuncHiByte (void)
+ExprNode* FuncHiByte (void)
 /* Handle the .HIBYTE builtin function */
 {
     return HiByte (Expression ());
@@ -409,7 +409,7 @@ static ExprNode* FuncHiWord (void)
 
 
 
-static ExprNode* FuncLoByte (void)
+ExprNode* FuncLoByte (void)
 /* Handle the .LOBYTE builtin function */
 {
     return LoByte (Expression ());

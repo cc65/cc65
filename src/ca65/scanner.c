@@ -146,6 +146,7 @@ struct DotKeyword {
     { ".ASSERT",        TOK_ASSERT      },
     { ".AUTOIMPORT", 	TOK_AUTOIMPORT	},
     { ".BANKBYTE",      TOK_BANKBYTE    },
+    { ".BANKBYTES",     TOK_BANKBYTES   },
     { ".BITAND",	TOK_AND		},
     { ".BITNOT",	TOK_NOT		},
     { ".BITOR",	    	TOK_OR		},
@@ -199,6 +200,7 @@ struct DotKeyword {
     { ".GLOBAL",	TOK_GLOBAL	},
     { ".GLOBALZP",	TOK_GLOBALZP	},
     { ".HIBYTE",        TOK_HIBYTE      },
+    { ".HIBYTES",       TOK_HIBYTES     },
     { ".HIWORD",        TOK_HIWORD      },
     { ".I16",   	TOK_I16		},
     { ".I8",    	TOK_I8		},
@@ -226,6 +228,7 @@ struct DotKeyword {
     { ".LIST",		TOK_LIST	},
     { ".LISTBYTES",	TOK_LISTBYTES	},
     { ".LOBYTE",        TOK_LOBYTE      },
+    { ".LOBYTES",       TOK_LOBYTES     },
     { ".LOCAL",		TOK_LOCAL	},
     { ".LOCALCHAR",	TOK_LOCALCHAR	},
     { ".LOWORD",        TOK_LOWORD      },
@@ -680,7 +683,7 @@ static unsigned char FindDotKeyword (void)
 }
 
 
-           
+
 static void ReadIdent (void)
 /* Read an identifier from the current input position into Ident. Filling SVal
  * starts at the current position with the next character in C. It is assumed

@@ -482,6 +482,20 @@ static void DoAutoImport (void)
 }
 
 
+static void DoBankBytes (void)
+/* Define bytes, extracting the bank byte from each expression in the list */
+{
+    while (1) {
+        EmitByte (FuncBankByte ());
+        if (Tok != TOK_COMMA) {
+            break;
+        } else {
+            NextTok ();
+        }
+    }
+}
+
+
 
 static void DoBss (void)
 /* Switch to the BSS segment */
@@ -991,6 +1005,20 @@ static void DoGlobalZP (void)
 }
 
 
+static void DoHiBytes (void)
+/* Define bytes, extracting the hi byte from each expression in the list */
+{
+    while (1) {
+        EmitByte (FuncHiByte ());
+        if (Tok != TOK_COMMA) {
+            break;
+        } else {
+            NextTok ();
+        }
+    }
+}
+
+
 
 static void DoI16 (void)
 /* Switch the index registers to 16 bit mode (assembler only) */
@@ -1219,6 +1247,20 @@ static void DoList (void)
     }
 }
 
+
+
+static void DoLoBytes (void)
+/* Define bytes, extracting the lo byte from each expression in the list */
+{
+    while (1) {
+        EmitByte (FuncLoByte ());
+        if (Tok != TOK_COMMA) {
+            break;
+        } else {
+            NextTok ();
+        }
+    }
+}
 
 
 static void DoListBytes (void)
@@ -1725,6 +1767,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoAssert        },
     { ccNone,       	DoAutoImport	},
     { ccNone,        	DoUnexpected	},	/* .BANKBYTE */
+    { ccNone,           DoBankBytes     },
     { ccNone,        	DoUnexpected	},	/* .BLANK */
     { ccNone,       	DoBss		},
     { ccNone,       	DoByte		},
@@ -1768,6 +1811,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoGlobal	},
     { ccNone,		DoGlobalZP	},
     { ccNone,        	DoUnexpected	},	/* .HIBYTE */
+    { ccNone,           DoHiBytes       },
     { ccNone,        	DoUnexpected	},	/* .HIWORD */
     { ccNone,		DoI16	  	},
     { ccNone,		DoI8	  	},
@@ -1795,6 +1839,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoList		},
     { ccNone,  	       	DoListBytes	},
     { ccNone,        	DoUnexpected	},	/* .LOBYTE */
+    { ccNone,           DoLoBytes       },
     { ccNone,		DoUnexpected	},	/* .LOCAL */
     { ccNone,		DoLocalChar	},
     { ccNone,        	DoUnexpected	},	/* .LOWORD */

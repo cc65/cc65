@@ -1767,6 +1767,34 @@ Here's a list of all control commands and a description, what they do:
   	.autoimport    	+   	; Switch on auto import
   </verb></tscreen>
 
+<sect1><tt>.BANKBYTES</tt><label id=".BANKBYTES"><p>
+
+  Define byte sized data by extracting only the bank byte (that is, bits 16-23) from
+  each expression.  This is equivalent to <tt><ref id=".BYTE" name=".BYTE"></tt> with
+  the operator '^' prepended to each expression in its list.
+
+  Example:
+
+  <tscreen><verb>
+        .define MyTable TableItem0, TableItem1, TableItem2, TableItem3
+
+	TableLookupLo:   .lobytes   MyTable
+	TableLookupHi:   .hibytes   MyTable
+	TableLookupBank: .bankbytes MyTable
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        TableLookupLo:   .byte &lt;TableItem0, &lt;TableItem1, &lt;TableItem2, &lt;TableItem3
+	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
+	TableLookupBank: .byte ^TableItem0, ^TableItem1, ^TableItem2, ^TableItem3
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>, 
+            <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
+            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>
+
 
 <sect1><tt>.BSS</tt><label id=".BSS"><p>
 
@@ -2424,6 +2452,46 @@ Here's a list of all control commands and a description, what they do:
        	.globalzp foo, bar
   </verb></tscreen>
 
+<sect1><tt>.HIBYTES</tt><label id=".HIBYTES"><p>
+
+  Define byte sized data by extracting only the high byte (that is, bits 8-15) from
+  each expression.  This is equivalent to <tt><ref id=".BYTE" name=".BYTE"></tt> with
+  the operator '>' prepended to each expression in its list.
+
+  Example:
+
+  <tscreen><verb>
+        .lobytes         $1234, $2345, $3456, $4567
+	.hibytes         $fedc, $edcb, $dcba, $cba9
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        .byte            $34, $45, $56, $67
+	.byte            $fe, $ed, $dc, $cb
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        .define MyTable TableItem0, TableItem1, TableItem2, TableItem3
+
+	TableLookupLo:   .lobytes MyTable
+	TableLookupHi:   .hibytes MyTable
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        TableLookupLo:   .byte &lt;TableItem0, &lt;TableItem1, &lt;TableItem2, &lt;TableItem3
+	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>, 
+            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>, 
+            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
+
 
 <sect1><tt>.I16</tt><label id=".I16"><p>
 
@@ -2743,6 +2811,47 @@ Here's a list of all control commands and a description, what they do:
 	.listbytes	12		; List the first 12 bytes
 	.incbin		"data.bin"	; Include large binary file
   </verb></tscreen>
+
+
+<sect1><tt>.LOBYTES</tt><label id=".LOBYTES"><p>
+
+  Define byte sized data by extracting only the low byte (that is, bits 0-7) from
+  each expression.  This is equivalent to <tt><ref id=".BYTE" name=".BYTE"></tt> with
+  the operator '<' prepended to each expression in its list.
+
+  Example:
+
+  <tscreen><verb>
+        .lobytes         $1234, $2345, $3456, $4567
+	.hibytes         $fedc, $edcb, $dcba, $cba9
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        .byte            $34, $45, $56, $67
+	.byte            $fe, $ed, $dc, $cb
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        .define MyTable TableItem0, TableItem1, TableItem2, TableItem3
+
+	TableLookupLo:   .lobytes MyTable
+	TableLookupHi:   .hibytes MyTable
+  </verb></tscreen>
+
+  which is equivalent to
+
+  <tscreen><verb>
+        TableLookupLo:   .byte &lt;TableItem0, &lt;TableItem1, &lt;TableItem2, &lt;TableItem3
+	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
+  </verb></tscreen>
+
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>, 
+            <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>, 
+            <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
 
 
 <sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>

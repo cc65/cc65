@@ -321,7 +321,7 @@ The function <htmlurl url="dio-1.html" name="dio_open()"> has the single paramet
 slot and drive pair is mapped to that <tt/drive_id/ according to the formula
 
 <verb>
-    <tt/drive_id/ = (slot * 2) + (drive - 1)
+    drive_id = (slot * 2) + (drive - 1)
 </verb>
 
 so that for example slot 6 drive 1 is mapped to <tt/drive_id/ 12.

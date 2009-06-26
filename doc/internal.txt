@@ -149,8 +149,9 @@ PET:  	The startup code will adjust the upper memory limit to the installed
       	$8000, so on a 8032 or similar machine, 31K of memory are available to
       	the program.
 
-APPLE2:	The program starts at $800, end of RAM is $8E00, so 33.5K of memory
-	(including stack) are available.
+Apple ][:
+        The program starts at $803, end of RAM is $95FF, so 35.5K of memory
+        (including stack) are available to the program.
 
 Atari:  The startup code will adjust the upper memory limit to the installed
         memory detected at runtime. The programmer can adjust the upper memory

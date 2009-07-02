@@ -110,9 +110,9 @@ if you don't help. Look at this example:
 </verb></tscreen>
 
 The expression is parsed from left to right, that means, the compiler sees 'i',
-and puts it contents into the secondary register. Next is OFFS, which is 
+and puts it contents into the secondary register. Next is OFFS, which is
 constant. The compiler emits code to add a constant to the secondary register.
-Same thing again for the constant 3. So the code produced contains a fetch 
+Same thing again for the constant 3. So the code produced contains a fetch
 of 'i', two additions of constants, and a store (into 'i'). Unfortunately, the
 compiler does not see, that "OFFS + 3" is a constant for itself, since it does
 it's evaluation from left to right. There are some ways to help the compiler
@@ -163,7 +163,7 @@ The compiler produces optimized code, if the value of a pointer is a constant.
 So, to access direct memory locations, use
 
 <tscreen><verb>
-    	#define VDC_DATA   0xD601
+    	#define VDC_STATUS 0xD601
     	*(char*)VDC_STATUS = 0x01;
 </verb></tscreen>
 
@@ -171,7 +171,7 @@ That will be translated to
 
 <tscreen><verb>
 	lda	#$01
-	sta	$D600
+	sta	$D601
 </verb></tscreen>
 
 The constant value detection works also for struct pointers and arrays, if the

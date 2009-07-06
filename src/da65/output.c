@@ -183,6 +183,12 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
  */
 {
     if (Pass == PassCount) {
+        /* Flush existing output if necessary */
+        if (Col > 1) {
+            LineFeed ();
+        }
+
+        /* Output the forward definition */ 
         Output ("%s", Name);
         Indent (ACol);
         if (UseHexOffs) {

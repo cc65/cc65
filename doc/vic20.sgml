@@ -41,9 +41,9 @@ config.
 
 <sect>Memory layout<p>
 
-cc65 generated programs with the default setup run with the I/O area and the
-kernal and BASIC ROM enabled (RAM at &dollar;A000 - &dollar;BFFF may be used
-for the heap), which gives a usable memory range of &dollar;1000 - &dollar;1DFF.
+cc65 generated programs with the default setup run with unexpanded memory
+(RAM at &dollar;A000 - &dollar;BFFF may be used for the heap),
+which gives a usable memory range of &dollar;1000 - &dollar;1DFF.
 All ROM entry points may be called directly without additional code.
 
 Special locations:
@@ -152,6 +152,12 @@ No extended memory drivers are currently available for the VIC20.
 
   <tag><tt/vic20-stdjoy.joy/</tag>
   Supports one standard joystick connected to the joysticks port of the VIC20.
+
+  <tag><tt/vic20-ptvjoy.joy/</tag>
+  Driver for the Protovision 4-player adapter contributed by Groepaz. See
+  <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
+  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
+  building instructions. Up to three joysticks are supported.
 
 </descrip><p>
 

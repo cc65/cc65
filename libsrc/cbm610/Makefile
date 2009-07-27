@@ -65,6 +65,7 @@ OBJS =	_scrsize.o	\
 	pokesys.o	\
         randomize.o     \
 	revers.o	\
+        systime.o       \
         sysuname.o
 
 #--------------------------------------------------------------------------

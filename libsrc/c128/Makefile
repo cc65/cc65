@@ -63,6 +63,7 @@ OBJS =	_scrsize.o		\
         randomize.o     	\
         revers.o        	\
 	slow.o			\
+        systime.o               \
         sysuname.o              \
 	tgi_mode_table.o	\
 	toggle_videomode.o

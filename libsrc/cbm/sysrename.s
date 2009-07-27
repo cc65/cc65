@@ -7,7 +7,8 @@
         .export         __sysrename
 
         .import         fnparse, fnadd, fnparsename
-        .import         opencmdchannel, closecmdchannel, writefndiskcmd
+        .import         opencmdchannel, closecmdchannel
+        .import         writefndiskcmd, readdiskerror
         .import         popax
 
         .import         fncmd, fnunit
@@ -39,6 +40,9 @@
         lda     #'r'            ; Rename command
         sta     fncmd
         jsr     writefndiskcmd
+
+;       ldx     fnunit
+;       jsr     readdiskerror
 
         pha
         ldx     fnunit

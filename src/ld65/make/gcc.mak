@@ -100,6 +100,8 @@ $(EXE):	$(INCS) $(OBJS) $(LIBS)
 	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
+inc:	$(INCS)
+
 clean:
 	$(RM) *~ core.* *.map
 

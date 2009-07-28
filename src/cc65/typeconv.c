@@ -168,6 +168,16 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
  * impossible.
  */
 {
+#if 0
+    /* Debugging */
+    printf ("Expr:\n=======================================\n");
+    PrintExprDesc (stdout, Expr);
+    printf ("Type:\n=======================================\n");
+    PrintType (stdout, NewType);
+    printf ("\n");
+    PrintRawType (stdout, NewType);
+#endif
+
     /* First, do some type checking */
     if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
      	/* If one of the sides are of type void, output a more apropriate
@@ -247,8 +257,8 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     	    /* Assignment of function to function pointer is allowed, provided
     	     * that both functions have the same parameter list.
     	     */
-       	    if (TypeCmp (NewType, Expr->Type) < TC_EQUAL) {
-    	 	Error ("Incompatible types");
+       	    if (TypeCmp (NewType, Expr->Type) < TC_COMPATIBLE) {
+                Error ("Incompatible types");
     	    }
      	} else {
     	    Error ("Incompatible types");

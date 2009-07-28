@@ -385,6 +385,16 @@ void g_defimport (const char* Name, int ZP)
 
 
 
+void g_importstartup (void)
+/* Forced import of the startup segment */
+{   
+#if 0 
+    AddTextLine ("\t.forceimport\t__STARTUP_RUN__");
+#endif
+}
+
+
+
 void g_importmainargs (void)
 /* Forced import of a special symbol that handles arguments to main */
 {

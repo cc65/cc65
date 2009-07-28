@@ -381,6 +381,11 @@ void NewFunc (SymEntry* Func)
             Error ("`main' must always return an int");
         }
 
+        /* Add a forced import of a symbol that is contained in the startup
+         * code. This will force the startup code to be linked in.
+         */
+        g_importstartup ();
+
         /* If main() takes parameters, generate a forced import to a function
          * that will setup these parameters. This way, programs that do not
          * need the additional code will not get it.

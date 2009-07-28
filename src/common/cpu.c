@@ -110,6 +110,8 @@ int ValidAddrSizeForCPU (unsigned char AddrSize)
 
         default:
             FAIL ("Invalid address size");
+            /* NOTREACHED */
+            return 0;
     }
 }
 

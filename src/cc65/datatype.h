@@ -288,7 +288,7 @@ Type* Indirect (Type* T);
  * given type points to.
  */
 
-Type* ArrayToPtr (const Type* T);
+Type* ArrayToPtr (Type* T);
 /* Convert an array to a pointer to it's first element */
 
 #if defined(HAVE_INLINE)
@@ -467,7 +467,7 @@ INLINE int IsClassStruct (const Type* T)
 {
     return (GetClass (T) == T_CLASS_STRUCT);
 }
-#else                                
+#else
 #  define IsClassStruct(T)      (GetClass (T) == T_CLASS_STRUCT)
 #endif
 

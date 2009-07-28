@@ -548,14 +548,11 @@ Type* Indirect (Type* T)
 
 
 
-Type* ArrayToPtr (const Type* T)
+Type* ArrayToPtr (Type* T)
 /* Convert an array to a pointer to it's first element */
 {
-    /* Function must only be called for an array */
-    CHECK (IsTypeArray (T));
-
     /* Return pointer to first element */
-    return PointerTo (T + 1);
+    return PointerTo (GetElementType (T));
 }
 
 
@@ -703,8 +700,10 @@ Type* PtrConversion (Type* T)
  * return T.
  */
 {
-    if (IsTypeFunc (T) || IsTypeArray (T)) {
+    if (IsTypeFunc (T)) {
        	return PointerTo (T);
+    } else if (IsTypeArray (T)) {
+        return ArrayToPtr (T);
     } else {
         return T;
     }

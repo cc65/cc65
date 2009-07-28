@@ -171,6 +171,11 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             ED_TestDone (Expr);
         }
     }
+
+    /* Do standard pointer conversions since the expression is now in the 
+     * primary.
+     */
+    Expr->Type = PtrConversion (Expr->Type);
 }
 
 

@@ -625,7 +625,7 @@ static const struct {
         { "ST",   AMSW16_REG | AMSW16_IND, 0x10, 1, PutSweet16 },
         { "STD",  AMSW16_IND,              0x70, 0, PutSweet16 },
         { "STP",  AMSW16_IND,              0x90, 0, PutSweet16 },
-        { "SUB",  AMSW16_IMM,              0xB0, 0, PutSweet16 },
+        { "SUB",  AMSW16_REG,              0xB0, 0, PutSweet16 },
     }
 };
 

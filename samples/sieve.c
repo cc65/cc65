@@ -35,10 +35,20 @@ static unsigned char Sieve[COUNT];
 
 
 
+static char ReadUpperKey (void)
+/* Read a key from console, convert to upper case and return */
+{
+    return toupper (cgetc ());
+}
+
+
+
 int main (void)
 {
     /* Clock variable */
     clock_t Ticks;
+    unsigned Sec;
+    unsigned Milli;
 
     /* This is an example where register variables make sense */
     register unsigned char* S;
@@ -70,19 +80,29 @@ int main (void)
 
     /* Calculate the time used */
     Ticks = clock() - Ticks;
+    Sec = (unsigned) (Ticks / CLOCKS_PER_SEC);
+    Milli = ((Ticks % CLOCKS_PER_SEC) * 1000) / CLOCKS_PER_SEC;
 
     /* Print the time used */
-    printf ("Time used: %lu ticks\n", Ticks);
-    printf ("Press Q to quit, any other key for list\n");
+    printf ("Time used: %u.%03u seconds\n", Sec, Milli);
+    printf ("Q to quit, any other key for list\n");
 
     /* Wait for a key and print the list if not 'Q' */
-    if (toupper (cgetc()) != 'Q') {
+    if (ReadUpperKey () != 'Q') {
      	/* Print the result */
+        J = 0;
      	for (I = 2; I < COUNT; ++I) {
      	    if (Sieve[I] == 0) {
-     		printf ("%4d\n", I);
+     	      	printf ("%4d\n", I);
+                if (++J == 23) {
+                    printf ("Q to quit, any other key continues\n");
+                    if (ReadUpperKey () == 'Q') {
+                        break;
+                    }
+                    J = 0;
+                }
      	    }
-     	    if (kbhit() && toupper (cgetc()) == 'Q') {
+       	    if (kbhit() && ReadUpperKey == 'Q') {
      		break;
      	    }
      	}

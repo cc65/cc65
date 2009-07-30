@@ -2683,6 +2683,7 @@ static void hieQuest (ExprDesc* Expr)
             /* Load it into the primary */
             LoadExpr (CF_NONE, &Expr2);
             ED_MakeRValExpr (&Expr2);
+            Expr2.Type = PtrConversion (Expr2.Type);
         }
     	labt = GetLocalLabel ();
     	ConsumeColon ();
@@ -2700,6 +2701,7 @@ static void hieQuest (ExprDesc* Expr)
             /* Load it into the primary */
             LoadExpr (CF_NONE, &Expr3);
             ED_MakeRValExpr (&Expr3);
+            Expr3.Type = PtrConversion (Expr3.Type);
         }
 
     	/* Check if any conversions are needed, if so, do them.
@@ -2842,7 +2844,7 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr)
 	    g_inc (flags | CF_CONST, Expr2.IVal);
 	} else if (Gen->Func == g_sub) {
 	    g_dec (flags | CF_CONST, Expr2.IVal);
-	} else {                          
+	} else {
             if (Expr2.IVal == 0) {
                 /* Check for div by zero/mod by zero */
                 if (Gen->Func == g_div) {

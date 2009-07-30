@@ -387,8 +387,8 @@ void g_defimport (const char* Name, int ZP)
 
 void g_importstartup (void)
 /* Forced import of the startup segment */
-{   
-#if 0 
+{
+#if 0
     AddTextLine ("\t.forceimport\t__STARTUP_RUN__");
 #endif
 }
@@ -3119,11 +3119,20 @@ void g_asl (unsigned flags, unsigned long val)
                     /* Done */
                     return;
                 } else if (val >= 1 && val <= 4) {
-                    if (flags & CF_UNSIGNED) {
-                       	AddCodeLine ("jsr shlax%ld", val);
-                    } else {
-             	       	AddCodeLine ("jsr aslax%ld", val);
-                    }
+                    if (IS_Get (&CodeSizeFactor) >= (long) (val+1)*130) {
+             		AddCodeLine ("stx tmp1");
+             	  	while (val--) {
+             		    AddCodeLine ("asl a");
+             		    AddCodeLine ("rol tmp1");
+             		}
+             		AddCodeLine ("ldx tmp1");
+             	    } else {
+             	       	if (flags & CF_UNSIGNED) {
+             	     	    AddCodeLine ("jsr shlax%ld", val);
+             	     	} else {
+             	     	    AddCodeLine ("jsr aslax%ld", val);
+             	     	}
+             	    }
                     return;
                 }
                 break;

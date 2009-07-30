@@ -2940,9 +2940,9 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
        	    g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
      	}
     }
-
+            
     /* Setup the code generator flags */
-    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr);
+    lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
     rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
 
     /* Convert the type of the lhs to that of the rhs */
@@ -2950,7 +2950,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
 
     /* Output apropriate code depending on the location */
     switch (ED_GetLoc (Expr)) {
-
+                                                                         
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
             if (Gen->Tok == TOK_PLUS_ASSIGN) {

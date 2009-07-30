@@ -49,9 +49,31 @@
 
 
 
+static long RegNum ()
+/* Try to read a register number specified not as a register (Rx) but as a
+ * numeric value between 0 and 15. Return the register number or -1 on
+ * failure.
+ */
+{
+    long Val;
+    ExprNode* Expr = Expression ();
+    if (!IsConstExpr (Expr, &Val) || Val < 0 || Val > 15) {
+        /* Invalid register */
+        Val = -1L;
+    }
+
+    /* Free the expression and return the register number */
+    FreeExpr (Expr);
+    return Val;
+}
+
+
+
 void GetSweet16EA (EffAddr* A)
 /* Parse an effective address, return the result in A */
 {
+    long Reg;
+
     /* Clear the output struct */
     A->AddrModeSet = 0;
     A->Expr = 0;
@@ -64,15 +86,18 @@ void GetSweet16EA (EffAddr* A)
 
     } else if (Tok == TOK_AT) {
 
-	/* @reg */
+       	/* @reg or @regnumber */
 	A->AddrModeSet = AMSW16_IND;
 	NextTok ();
-        if (Tok != TOK_REG) {
-            ErrorSkip ("Register expected");
-            A->Reg = 0;
-        } else {
+        if (Tok == TOK_REG) {
             A->Reg = (unsigned) IVal;
             NextTok ();
+        } else if ((Reg = RegNum ()) >= 0) {
+            /* Register number */
+            A->Reg = (unsigned) Reg;
+        } else {
+            ErrorSkip ("Register or register number expected");
+            A->Reg = 0;
         }
 
     } else if (Tok == TOK_REG) {
@@ -82,7 +107,7 @@ void GetSweet16EA (EffAddr* A)
 
         if (Tok == TOK_COMMA) {
 
-            /* Rx, Constant */
+            /* Rx, constant */
             NextTok ();
             A->Expr = Expression ();
 
@@ -96,9 +121,27 @@ void GetSweet16EA (EffAddr* A)
 
     } else {
 
-        /* OPC  ea */
+        /* OPC ea  or: OPC regnum, constant */
         A->Expr = Expression ();
         A->AddrModeSet = AMSW16_BRA;
+
+        /* If the value is a constant between 0 and 15, it may also be a
+         * register number.
+         */
+        if (IsConstExpr (A->Expr, &Reg) && Reg >= 0 && Reg <= 15) {
+            FreeExpr (A->Expr);
+            A->Reg = (unsigned) Reg;
+
+            /* If a comma follows, it is: OPC Rx, constant */
+            if (Tok == TOK_COMMA) {
+                NextTok ();
+                A->Expr = Expression ();
+                A->AddrModeSet = AMSW16_IMM;
+            } else {
+                A->Expr = 0;
+                A->AddrModeSet |= AMSW16_REG;
+            }
+        }
 
     }
 }

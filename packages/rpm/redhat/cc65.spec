@@ -480,7 +480,7 @@ install -s -m 755 src/grc/grc $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT/usr/bin
 # Libraries and includes
-install -m 644 libsrc/*.lib libsrc/*.o $RPM_BUILD_ROOT/usr/lib/cc65/lib
+install -m 644 libsrc/*.lib $RPM_BUILD_ROOT/usr/lib/cc65/lib
 install -m 644 include/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include
 install -m 644 include/geos/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/geos
 install -m 644 include/em/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/em

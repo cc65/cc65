@@ -118,8 +118,7 @@ static int Module = 0;
 /* Extension used for a module */
 #define MODULE_EXT      ".o65"
 
-/* Name of the crt0 object file and the runtime library */
-static char* TargetCRT0 = 0;
+/* Name of the target specific runtime library */
 static char* TargetLib	= 0;
 
 
@@ -328,17 +327,12 @@ static void CmdPrint (CmdDesc* Cmd, FILE* F)
 static void SetTargetFiles (void)
 /* Set the target system files */
 {
-    /* Determine the names of the default startup and library file */
+    /* Determine the names of the target specific library file */
     if (Target != TGT_NONE) {
 
  	/* Get a pointer to the system name and its length */
  	const char* TargetName = TargetNames [Target];
  	unsigned    TargetNameLen = strlen (TargetName);
-
- 	/* Set the startup file */
- 	TargetCRT0 = xmalloc (TargetNameLen + 2 + 1);
-       	memcpy (TargetCRT0, TargetName, TargetNameLen);
-       	strcpy (TargetCRT0 + TargetNameLen, ".o");
 
  	/* Set the library file */
  	TargetLib = xmalloc (TargetNameLen + 4 + 1);
@@ -420,13 +414,6 @@ static void Link (void)
     	CmdSetOutput (&LD65, Output);
     	xfree (Output);
 
-    }
-
-    /* If we have a startup file and if we are not linking a module, add its
-     * name as a parameter
-     */
-    if (TargetCRT0 && !Module) {
-    	CmdAddArg (&LD65, TargetCRT0);
     }
 
     /* Add all object files as parameters */

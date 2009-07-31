@@ -1,13 +1,12 @@
 ;
 ; Startup code for cc65 (C16 version)
 ;
-; This must be the *first* file on the linker command line
-;
 ; Note: The C16 is actually the Plus/4 with just 16KB of memory. So many
 ; things are similar here, and we even use the plus4.inc include file.
 ;
 
 	.export		_exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 	.import		initlib, donelib, callirq
 	.import	     	callmain, zerobss
         .import         MEMTOP, RESTOR, BSOUT, CLRCH

@@ -6,10 +6,9 @@
 ;	Freddy Offenga
 ;	Christian Groessler
 ;
-; This must be the *first* file on the linker command line
-;
 
 	.export		_exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 	.constructor	initsp, 26
 
 	.import		initlib, donelib, callmain

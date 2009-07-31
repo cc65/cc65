@@ -1,11 +1,10 @@
 ;
 ; Startup code for cc65 (Plus/4 version)
 ;
-; This must be the *first* file on the linker command line
-;
 
 	.export		_exit
         .export         brk_jmp
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
 	.import		callirq_y, initlib, donelib
 	.import	     	callmain, zerobss

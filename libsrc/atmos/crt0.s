@@ -3,10 +3,9 @@
 ;
 ; By Debrune Jérôme <jede@oric.org> and Ullrich von Bassewitz <uz@cc65.org>
 ;
-; This must be the *first* file on the linker command line
-;
 
 	.export		_exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 	.import		initlib, donelib
 	.import	     	callmain, zerobss
        	.import	       	__RAM_START__, __RAM_SIZE__, __BSS_LOAD__

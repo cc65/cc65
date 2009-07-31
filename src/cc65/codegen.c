@@ -386,11 +386,9 @@ void g_defimport (const char* Name, int ZP)
 
 
 void g_importstartup (void)
-/* Forced import of the startup segment */
+/* Forced import of the startup module */
 {
-#if 0
-    AddTextLine ("\t.forceimport\t__STARTUP_RUN__");
-#endif
+    AddTextLine ("\t.forceimport\t__STARTUP__");
 }
 
 

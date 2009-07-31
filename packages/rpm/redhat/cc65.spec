@@ -110,7 +110,6 @@ programs for the Apple ][ using the cc65 crosscompiler.
 
 %files apple2
 %attr(644,root,root) 		/usr/lib/cc65/lib/apple2.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/apple2.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/a2.*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2.*.joy
 %attr(644,root,root) 		/usr/lib/cc65/mou/a2.*.mou
@@ -135,7 +134,6 @@ programs for the Apple //e using the cc65 crosscompiler.
 
 %files apple2enh
 %attr(644,root,root) 		/usr/lib/cc65/lib/apple2enh.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/apple2enh.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/a2e.*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2e.*.joy
 %attr(644,root,root) 		/usr/lib/cc65/mou/a2e.*.mou
@@ -160,7 +158,6 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 %files atari
 %attr(644,root,root)  	       	/usr/lib/cc65/lib/atari.lib
-%attr(644,root,root)  	       	/usr/lib/cc65/lib/atari.o
 %attr(644,root,root) 	       	/usr/lib/cc65/joy/atari*.joy
 
 
@@ -181,7 +178,6 @@ programs for the Oric Atmos using the cc65 crosscompiler.
 
 %files atmos
 %attr(644,root,root)		/usr/lib/cc65/lib/atmos.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/atmos.o
 %attr(644,root,root) 		/usr/lib/cc65/tgi/atmos-*.tgi
 
 
@@ -202,7 +198,6 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 
 %files c128
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/c128.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/c128-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c128-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/mou/c128-*.mou
@@ -227,7 +222,6 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 
 %files c16
 %attr(644,root,root) 		/usr/lib/cc65/lib/c16.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/c16.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/c16-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c16-*.joy
 
@@ -249,7 +243,6 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 
 %files c64
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/c64.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/dtv-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/emd/c64-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c64-*.joy
@@ -276,7 +269,6 @@ crosscompiler.
 
 %files cbm510
 %attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm510.lib
-%attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm510.o
 %attr(644,root,root) 	       	/usr/lib/cc65/emd/cbm510-*.emd
 %attr(644,root,root) 	       	/usr/lib/cc65/joy/cbm510-*.joy
 %attr(644,root,root) 	       	/usr/lib/cc65/ser/cbm510-*.ser
@@ -300,7 +292,6 @@ the cc65 crosscompiler.
 
 %files cbm610
 %attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.lib
-%attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.o
 %attr(644,root,root) 	       	/usr/lib/cc65/emd/cbm610-*.emd
 %attr(644,root,root) 	       	/usr/lib/cc65/ser/cbm610-*.ser
 
@@ -323,7 +314,6 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 %files geos
 %attr(755,root,root)   		/usr/bin/grc
 %attr(644,root,root)		/usr/lib/cc65/lib/geos.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/geos.o
 %attr(755,root,root) %dir	/usr/lib/cc65/include/geos
 %attr(644,root,root)   		/usr/lib/cc65/include/geos/*.h
 %attr(644,root,root) 		/usr/lib/cc65/emd/geos-*.emd
@@ -348,7 +338,6 @@ programs for the Lynx Game Console using the cc65 crosscompiler.
 
 %files lynx
 %attr(644,root,root)		/usr/lib/cc65/lib/lynx.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/lynx.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/lynx-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/tgi/lynx-*.tgi
 
@@ -371,7 +360,6 @@ crosscompiler.
 
 %files nes
 %attr(644,root,root)		/usr/lib/cc65/lib/nes.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/nes.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/nes-*.joy
 
 
@@ -393,7 +381,6 @@ crosscompiler.
 
 %files pet
 %attr(644,root,root)		/usr/lib/cc65/lib/pet.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/pet.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/pet-*.joy
 
 
@@ -415,7 +402,6 @@ crosscompiler.
 
 %files plus4
 %attr(644,root,root)   		/usr/lib/cc65/lib/plus4.lib
-%attr(644,root,root)   		/usr/lib/cc65/lib/plus4.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/plus4-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/ser/plus4-*.ser
 
@@ -437,7 +423,6 @@ programs for the Supervision Game console using the cc65 crosscompiler.
 
 %files supervision
 %attr(644,root,root)		/usr/lib/cc65/lib/supervision.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/supervision.o
 
 
 
@@ -457,7 +442,6 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 
 %files vic20
 %attr(644,root,root) 		/usr/lib/cc65/lib/vic20.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/vic20.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/vic20-*.joy
 
 

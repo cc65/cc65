@@ -12,7 +12,6 @@ SYS	= c64
 # source tree, otherwise use the "official" directories.
 ifeq "$(wildcard ../src)" ""
 # No source tree
-CRT0 = $(SYS).o
 CLIB = $(SYS).lib
 CL   = cl65
 CC   = cc65
@@ -21,7 +20,6 @@ LD   = ld65
 
 else
 # Samples is part of a complete source tree
-CRT0 = ../libsrc/$(SYS).o
 CLIB = ../libsrc/$(SYS).lib
 CL   = ../src/cl65/cl65
 CC   = ../src/cc65/cc65
@@ -68,63 +66,63 @@ EXELIST	=	ascii 		\
 .PHONY:	all
 all:   	$(EXELIST)
 
-ascii: 	       	$(CRT0) ascii.o $(CLIB)
+ascii: 	       	ascii.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-diodemo:        $(CRT0) diodemo.o $(CLIB)
+diodemo:        diodemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-fire:  	       	$(CRT0) fire.o $(CLIB)
+fire:  	       	fire.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-gunzip65:      	$(CRT0) gunzip65.o $(CLIB)
+gunzip65:      	gunzip65.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-hello: 	       	$(CRT0) hello.o $(CLIB)
+hello: 	       	hello.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
 # The Apple machines need the start address adjusted for the mandelbrot demo
 ifeq "$(SYS)" "apple2"
-mandelbrot:     $(CRT0) mandelbrot.o $(CLIB)
+mandelbrot:     mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
 else
 ifeq "$(SYS)" "apple2enh"
-mandelbrot:     $(CRT0) mandelbrot.o $(CLIB)
+mandelbrot:     mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
 else
-mandelbrot:     $(CRT0) mandelbrot.o $(CLIB)
+mandelbrot:     mandelbrot.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 endif
 endif
 
 # The Apple ][ needs the start address adjusted for the mousedemo
 ifeq "$(SYS)" "apple2"
-mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
+mousedemo:     	mousedemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
 else
-mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
+mousedemo:     	mousedemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 endif
 
-nachtm:	       	$(CRT0) nachtm.o $(CLIB)
+nachtm:	       	nachtm.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -Ln $(basename $@).lbl -o $@ $^
 
-plasma:	       	$(CRT0) plasma.o $(CLIB)
+plasma:	       	plasma.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
-sieve: 	       	$(CRT0) sieve.o $(CLIB)
+sieve: 	       	sieve.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
 # The Apple machines need the start address adjusted for the tgidemo
 ifeq "$(SYS)" "apple2"
-tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
+tgidemo:       	tgidemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
 else
 ifeq "$(SYS)" "apple2enh"
-tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
+tgidemo:       	tgidemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map --start-addr 0x4000 -o $@ $^
 else
-tgidemo:       	$(CRT0) tgidemo.o $(CLIB)
+tgidemo:       	tgidemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 endif
 endif

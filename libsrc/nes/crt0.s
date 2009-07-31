@@ -4,10 +4,9 @@
 ; by Groepaz/Hitmen <groepaz@gmx.net>
 ; based on code by Ullrich von Bassewitz <uz@cc65.org>
 ;
-; This must be the *first* file on the linker command line
-;
 
         .export         _exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 	.import		initlib, donelib, callmain
 	.import	        push0, _main, zerobss, copydata
         .import         ppubuf_flush

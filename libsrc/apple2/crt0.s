@@ -1,10 +1,9 @@
 ;
 ; Startup code for cc65 (Apple2 version)
 ;
-; This must be the *first* file on the linker command line
-;
 
         .export         _exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
         .import         zerobss
         .import    	initlib, donelib
         .import    	callmain, callirq
@@ -40,13 +39,13 @@
 	; Switch in LC bank 2 for W/O
 	bit	$C081
 	bit	$C081
-	
+
 	; Set source start address
 	lda	#<(__ZPSAVE_RUN__ + __INIT_SIZE__)
 	ldy	#>(__ZPSAVE_RUN__ + __INIT_SIZE__)
 	sta	$9B
 	sty	$9C
-	
+
 	; Set source last address
 	lda	#<(__ZPSAVE_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
 	ldy	#>(__ZPSAVE_RUN__ + __INIT_SIZE__ + __LC_LAST__ - __LC_START__)
@@ -68,7 +67,7 @@
 	ldy	#>__ZPSAVE_RUN__
 	sta	$9B
 	sty	$9C
-	
+
 	; Set source last address
 	lda	#<(__ZPSAVE_RUN__ + __INIT_SIZE__)
 	ldy	#>(__ZPSAVE_RUN__ + __INIT_SIZE__)
@@ -92,7 +91,7 @@
 _exit:  ldx     #<exit
         lda     #>exit
         jsr     reset		; Setup RESET vector
-        
+
         ; Switch in ROM in case it wasn't already switched in by a RESET
 	bit	$C082
 
@@ -159,7 +158,7 @@ init:   ldx     #zpspace-1
         ldx     #<_exit
         lda     #>_exit
         jsr     reset		; Setup RESET vector
-                
+
         ; Setup the stack
         lda     HIMEM
         sta     sp

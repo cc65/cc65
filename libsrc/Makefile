@@ -46,7 +46,6 @@ apple2lib:
        	    $(MAKE) SYS=apple2 -C $$i || exit 1; \
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
-	mv apple2/crt0.o apple2.o
 	cp apple2/apple2-auxmem.emd a2.auxmem.emd
 	cp apple2/apple2-stdjoy.joy a2.stdjoy.joy
 	cp apple2/apple2-stdmou.mou a2.stdmou.mou
@@ -62,7 +61,6 @@ apple2enhlib:
 	    $(MAKE) SYS=apple2enh -C $$i || exit 1; \
 	    $(AR) a apple2enh.lib $$i/*.o;\
 	done
-	mv apple2enh/crt0.o apple2enh.o
 	cp apple2enh/apple2-auxmem.emd a2e.auxmem.emd
 	cp apple2enh/apple2-stdjoy.joy a2e.stdjoy.joy
 	cp apple2enh/apple2-stdmou.mou a2e.stdmou.mou
@@ -78,7 +76,6 @@ atarilib:
        	    $(MAKE) SYS=atari -C $$i || exit 1; \
 	    $(AR) a atari.lib $$i/*.o;\
 	done
-	mv atari/crt0.o atari.o
 	cp atari/atari-stdjoy.joy ataristd.joy
 	cp atari/atari-multijoy.joy atarimj8.joy
 
@@ -90,7 +87,6 @@ atmoslib:
        	    $(MAKE) SYS=atmos -C $$i || exit 1; \
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
-	mv atmos/crt0.o atmos.o
 	cp atmos/*.tgi .
 
 #-----------------------------------------------------------------------------
@@ -101,7 +97,6 @@ c16lib:
        	    $(MAKE) SYS=c16 -C $$i || exit 1; \
 	    $(AR) a c16.lib $$i/*.o;\
 	done
-	mv c16/crt0.o c16.o
 	cp c16/*.joy .
 	cp c16/*.emd .
 
@@ -113,7 +108,6 @@ c64lib:
 	    $(MAKE) SYS=c64 -C $$i || exit 1; \
 	    $(AR) a c64.lib $$i/*.o;\
 	done
-	mv c64/crt0.o c64.o
 	cp c64/*.emd .
 	cp c64/*.joy .
 	cp c64/c64-1351.mou .
@@ -130,7 +124,6 @@ c128lib:
 	    $(MAKE) SYS=c128 -C $$i || exit 1; \
 	    $(AR) a c128.lib $$i/*.o;\
 	done
-	mv c128/crt0.o c128.o
 	cp c128/*.emd .
 	cp c128/*.joy .
 	cp c128/c128-1351.mou .
@@ -148,7 +141,6 @@ cbm510lib:
 	    $(MAKE) SYS=cbm510 -C $$i || exit 1; \
 	    $(AR) a cbm510.lib $$i/*.o;\
 	done
-	mv cbm510/crt0.o cbm510.o
 	cp cbm510/*.emd .
 	cp cbm510/cbm510-stdjoy.joy cbm510-std.joy
 	cp cbm510/cbm510-stdser.ser cbm510-std.ser
@@ -161,7 +153,6 @@ cbm610lib:
 	    $(MAKE) SYS=cbm610 -C $$i || exit 1; \
 	    $(AR) a cbm610.lib $$i/*.o;\
 	done
-	mv cbm610/crt0.o cbm610.o
 	cp cbm610/*.emd .
 	cp cbm610/cbm610-stdser.ser cbm610-std.ser
 
@@ -204,7 +195,6 @@ lynxlib:
 	    $(MAKE) SYS=lynx -C $$i || exit 1; \
 	    $(AR) a lynx.lib $$i/*.o;\
 	done
-	mv lynx/crt0.o lynx.o
 	cp lynx/*.joy .
 	cp lynx/*.tgi .
 
@@ -216,7 +206,6 @@ neslib:
 	    $(MAKE) SYS=nes -C $$i || exit 1; \
 	    $(AR) a nes.lib $$i/*.o;\
 	done
-	mv nes/crt0.o nes.o
 	cp nes/*.joy .
 
 #-----------------------------------------------------------------------------
@@ -227,7 +216,6 @@ petlib:
 	    $(MAKE) SYS=pet -C $$i || exit 1; \
 	    $(AR) a pet.lib $$i/*.o;\
 	done
-	mv pet/crt0.o pet.o
 	cp pet/*.joy .
 
 #-----------------------------------------------------------------------------
@@ -238,7 +226,6 @@ plus4lib:
 	    $(MAKE) SYS=plus4 -C $$i || exit 1; \
 	    $(AR) a plus4.lib $$i/*.o;\
 	done
-	mv plus4/crt0.o plus4.o
 	cp plus4/*.joy .
 	cp plus4/*.ser .
 
@@ -250,7 +237,6 @@ supervisionlib:
 	    $(MAKE) SYS=supervision -C $$i || exit 1; \
 	    $(AR) a supervision.lib $$i/*.o;\
 	done
-	mv supervision/crt0.o supervision.o
 
 #-----------------------------------------------------------------------------
 # Vic20
@@ -260,7 +246,6 @@ vic20lib:
 	    $(MAKE) SYS=vic20 -C $$i || exit 1; \
 	    $(AR) a vic20.lib $$i/*.o;\
 	done
-	mv vic20/crt0.o vic20.o
 	cp vic20/*.joy .
 
 #-----------------------------------------------------------------------------

@@ -1,10 +1,9 @@
 ;
 ; Startup code for cc65 (C64 version)
 ;
-; This must be the *first* file on the linker command line
-;
 
 	.export		_exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 	.import		initlib, donelib, callirq
        	.import	       	zerobss
 	.import	     	callmain

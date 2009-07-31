@@ -1,10 +1,9 @@
 ;
 ; Startup code for cc65 (CBM 600/700 version)
 ;
-; This must be the *first* file on the linker command line
-;
 
 	.export	     	_exit, BRKVec
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
 	.import		callirq_y, initlib, donelib
 	.import	     	push0, callmain

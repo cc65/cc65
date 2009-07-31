@@ -1,10 +1,9 @@
 ;
 ; Startup code for cc65 (CBM 500 version)
 ;
-; This must be the *first* file on the linker command line
-;
 
    	.export	     	_exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
      	.import	   	_clrscr, initlib, donelib, callirq_y
      	.import	     	push0, callmain

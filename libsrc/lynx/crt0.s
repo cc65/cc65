@@ -14,11 +14,10 @@
 ; segment and grows downward.  Bastian Schick's executable header is put
 ; on the front of the fully linked binary (see EXEHDR segment.)
 ;
-; This must be the *first* file on the linker command line
-;
 
 	.include        "lynx.inc"
 	.export         _exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
 	.import         initlib, donelib
 	.import         zerobss

@@ -1,16 +1,17 @@
 ;
-; This must be the *second* file on the linker command line
-; (.cvt header must be the *first* one)
-
+; Startup code for geos
+;
 ; Maciej 'YTM/Elysium' Witkowiak
 ; 26.10.99, 10.3.2000, 15.8.2001, 23.12.2002
+
+	.export		_exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 	.import		initlib, donelib
 	.import		callmain
 	.import		zerobss
 	.importzp	sp
-	.export		_exit
 	.include	"../inc/jumptab.inc"
 
 ; ------------------------------------------------------------------------

@@ -8,7 +8,6 @@ OBJ_DIRS=common conio devel disk dlgbox file graph menuicon memory mousesprite p
 
 all:
 	@for i in $(OBJ_DIRS); do $(MAKE) -C $$i; done
-	@mv devel/crt0.o ../geos.o
 	@for i in $(OBJ_DIRS); do $(AR) a ../geos.lib $$i/*.o; done
 
 rebuild: zap all clean
@@ -24,5 +23,5 @@ clean:
 
 .PHONY: zap
 zap:	clean
-	@$(RM) ../geos.lib ../geos.o
+	@$(RM) ../geos.lib 
 

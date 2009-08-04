@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2009 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,9 +34,14 @@
 
 
 #include <stdio.h>
+#include <string.h>
+
+/* common */
+#include "chartype.h"
 
 /* cc65 */
 #include "asmlabel.h"
+#include "error.h"
 
 
 
@@ -51,6 +56,13 @@ unsigned GetLocalLabel (void)
 {
     /* Number to generate unique labels */
     static unsigned NextLabel = 0;
+
+    /* Check for an overflow */
+    if (NextLabel > 0xFFFF) {
+        Internal ("Local label overflow");
+    }
+
+    /* Return the next label */
     return ++NextLabel;
 }
 
@@ -61,11 +73,32 @@ const char* LocalLabelName (unsigned L)
  * created in static storage and overwritten when calling the function
  * again.
  */
-{		 
+{
     static char Buf[64];
     sprintf (Buf, "L%04X", L);
     return Buf;
 }
+
+
+
+int IsLocalLabelName (const char* Name)
+/* Return true if Name is the name of a local label */
+{
+    unsigned I;
+
+    if (Name[0] != 'L' || strlen (Name) != 5) {
+        return 0;
+    }
+    for (I = 1; I <= 5; ++I) {
+        if (!IsXDigit (Name[I])) {
+            return 0;
+        }
+    }
+
+    /* Local label name */
+    return 1;
+}
+
 
 
 

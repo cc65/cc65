@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2009 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -52,6 +52,9 @@ const char* LocalLabelName (unsigned L);
  * created in static storage and overwritten when calling the function
  * again.
  */
+
+int IsLocalLabelName (const char* Name);
+/* Return true if Name is the name of a local label */
 
 
 

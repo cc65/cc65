@@ -337,13 +337,13 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	      	if (*L == ',') {
 	     	    L = SkipSpace (L+1);
 	     	    if (toupper (*L) != 'Y') {
-	     		Error ("ASM code error: `Y' expected");
+	     	      	Error ("ASM code error: `Y' expected");
 	     	      	return 0;
 	     	    }
 	     	    L = SkipSpace (L+1);
 	     	    if (*L != '\0') {
-	       	    	Error ("ASM code error: syntax error");
-	     	    	return 0;
+	       	       	Error ("ASM code error: syntax error");
+	     	      	return 0;
 	     	    }
 	     	    AM = AM65_ZP_INDY;
 	     	} else if (*L == '\0') {
@@ -375,6 +375,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 		} else if (GetZPInfo(Arg) != 0) {
 		    AM = AM65_ZP;
 		} else {
+                    /* Check for subroutine call to local label */
+                    if ((OPC->Info & OF_CALL) && IsLocalLabelName (Arg)) {
+                        Error ("ASM code error: "
+                               "Cannot use local label `%s' in subroutine call",
+                               Arg);
+                    }
 		    AM = AM65_ABS;
 		}
 	    } else if (*L == ',') {
@@ -387,20 +393,20 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	      	    Reg = toupper (*L);
 		    L = SkipSpace (L+1);
 		    if (Reg == 'X') {
-			if (GetZPInfo(Arg) != 0) {
-			    AM = AM65_ZPX;
-			} else {
-			    AM = AM65_ABSX;
-	    		}
+		      	if (GetZPInfo(Arg) != 0) {
+		      	    AM = AM65_ZPX;
+		      	} else {
+		      	    AM = AM65_ABSX;
+	    	      	}
 		    } else if (Reg == 'Y') {
-   		     	AM = AM65_ABSY;
+   		      	AM = AM65_ABSY;
 		    } else {
-		     	Error ("ASM code error: syntax error");
-	       	     	return 0;
+		       	Error ("ASM code error: syntax error");
+	       	       	return 0;
 		    }
 		    if (*L != '\0') {
-	    	     	Error ("ASM code error: syntax error");
-	    	     	return 0;
+	    	       	Error ("ASM code error: syntax error");
+	    	       	return 0;
 	    	    }
 	    	}
 	    }

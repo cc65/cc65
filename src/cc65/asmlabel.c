@@ -89,7 +89,7 @@ int IsLocalLabelName (const char* Name)
     if (Name[0] != 'L' || strlen (Name) != 5) {
         return 0;
     }
-    for (I = 1; I <= 5; ++I) {
+    for (I = 1; I <= 4; ++I) {
         if (!IsXDigit (Name[I])) {
             return 0;
         }

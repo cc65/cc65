@@ -14,7 +14,7 @@
 	.import		initlib, donelib, callmain
        	.import	       	zerobss, pushax
 	.import		_main, __filetab, getfd
-	.import		__LOWCODE_LOAD__, __ZPSAVE_LOAD__
+	.import		__STARTUP_LOAD__, __ZPSAVE_LOAD__
 	.import		__RESERVED_MEMORY__
 .ifdef	DYNAMIC_DD
 	.import		__getdefdev
@@ -29,13 +29,13 @@
 
 	.segment "EXEHDR"
 	.word	$FFFF
-	.word	__LOWCODE_LOAD__
+	.word	__STARTUP_LOAD__
 	.word	__ZPSAVE_LOAD__ - 1
 
 ; ------------------------------------------------------------------------
 ; Actual code
 
-	.segment	"LOWCODE"
+	.segment	"STARTUP"
 
 	rts	; fix for SpartaDOS / OS/A+
 		; they first call the entry point from AUTOSTRT and
@@ -185,6 +185,6 @@ old_shflok:	.res	1
 old_lmargin:	.res	1
 
 	.segment "AUTOSTRT"
-	.word	RUNAD
+	.word	RUNAD			; defined in atari.h
 	.word	RUNAD+1
-	.word	__LOWCODE_LOAD__ + 1
+	.word	__STARTUP_LOAD__ + 1

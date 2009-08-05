@@ -1,8 +1,8 @@
 #! /usr/bin/make -f
-# -*- makefile -*-
+# -*- make -*-
 #
 # Main gcc Makefile.
-# This makefile is maintained by Greg King <gngking@erols.com>.
+# This makefile is maintained by Greg King <greg.king4@verizon.net>.
 
 # Goals that are supported by the cc65 package
 .PHONY:	all bins libs docs samples tests clean zap
@@ -63,7 +63,7 @@ libs:
 # This rule won't try to generate HTML files
 # if a host system doesn't have LinuxDoc Tools.
 docs:
-	@if sgmlcheck doc/index >/dev/null 2>&1; \
+	@if linuxdoc -B check doc/index >/dev/null 2>&1; \
 	  then $(MAKE) -C doc html; \
 	  else echo '"LinuxDoc Tools" is not installed; skipping HTML documentation.'; \
 	  fi
@@ -72,10 +72,10 @@ docs:
 # So, these rules ignore errors.
 
 samples:
-	-@$(MAKE) -k -C samples $(SYS:%=SYS=%)
+	-@$(MAKE) -k -C samples prefix=$(prefix) $(SYS:%=SYS=%)
 
 tests:
-	-@$(MAKE) -k -C testcode/lib $(SYS:%=SYS=%)
+	-@$(MAKE) -k -C testcode/lib prefix=$(prefix) $(SYS:%=SYS=%)
 
 clean zap:
 	$(MAKE) -C src -f make/gcc.mak $@
@@ -148,7 +148,7 @@ install-libs:
 	    do $(INSTALL_DATA) $$f $(CC65INC)/$$d || exit 1; \
 	    done || exit 1; \
 	  done
-	for f in libsrc/*.lib libsrc/*.o; \
+	for f in libsrc/*.lib; \
 	  do $(INSTALL_DATA) $$f $(CC65LIB) || exit 1; \
 	  done
 	for d in emd joy mou ser tgi; \
@@ -164,7 +164,7 @@ install-docs:
 	for f in readme.1st compile.txt CREDITS BUGS internal.txt newvers.txt; \
 	  do $(INSTALL_DATA) doc/$$f $(CC65DOC) || exit 1; \
 	  done
-	if [ -e doc/index.htm* ]; \
+	if [ -f doc/index.htm* ]; \
 	  then for f in doc/*.htm*; \
 	    do $(INSTALL_DATA) $$f $(CC65DOC) || exit 1; \
 	    done; \

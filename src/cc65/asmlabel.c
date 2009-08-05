@@ -58,7 +58,7 @@ unsigned GetLocalLabel (void)
     static unsigned NextLabel = 0;
 
     /* Check for an overflow */
-    if (NextLabel > 0xFFFF) {
+    if (NextLabel >= 0xFFFF) {
         Internal ("Local label overflow");
     }
 

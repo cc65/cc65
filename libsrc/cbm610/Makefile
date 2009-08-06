@@ -48,6 +48,7 @@ OBJS =	_scrsize.o	\
        	crt0.o 		\
        	crtc.o 		\
         extzp.o         \
+        get_tv.o        \
        	kbhit.o		\
 	kclose.o	\
         kernal.o        \

@@ -229,8 +229,6 @@ unsigned OptSize1 (CodeSeg* S)
      	/* Check if it's a subroutine call */
      	if (E->OPC == OP65_JSR && (D = FindCall (E->Arg)) != 0) {
 
-            printf ("Found \"%s\" for \"%s\"\n", D->LongFunc, D->ShortFunc);
-
             /* FindCall finds the first entry that matches our function name.
              * The names are listed in "best match" order, so search for the
              * first one, that fulfills our conditions.

@@ -43,6 +43,7 @@ OBJS =	anonname.o	\
 	coptcmp.o	\
 	coptind.o	\
 	coptneg.o	\
+        coptptrload.o   \
 	coptpush.o	\
         coptsize.o      \
 	coptstop.o	\

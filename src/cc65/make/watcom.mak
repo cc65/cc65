@@ -78,6 +78,7 @@ OBJS =	anonname.obj	\
 	coptcmp.obj	\
 	coptind.obj	\
 	coptneg.obj	\
+        coptptrload.obj \
 	coptpush.obj	\
         coptsize.obj    \
 	coptstop.obj	\

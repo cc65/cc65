@@ -52,11 +52,16 @@
 
 
 
+/* Flags for CallDesc */
+#define F_NONE          0x0000U /* No extra flags */
+#define F_SLOWER        0x0001U /* Function call is slower */
+
 typedef struct CallDesc CallDesc;
 struct CallDesc {
-    const char*     LongFunc;       /* Long function name */
-    short           A, X, Y;        /* Register contents */
-    const char*     ShortFunc;      /* Short function name */
+    const char* LongFunc;       /* Long function name */
+    short       A, X, Y;        /* Register contents */
+    unsigned    Flags;          /* Flags from above */
+    const char* ShortFunc;      /* Short function name */
 };
 
 /* Note: The table is sorted. If there is more than one entry with the same
@@ -65,55 +70,60 @@ struct CallDesc {
  * at least none of the following ones are better).
  */
 static const CallDesc CallTable [] = {
-    /* Name          A register      X register     Y register     replacement */
-    { "addeqysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "addeq0sp"  },
-    { "laddeqysp", UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "laddeq0sp" },
-    { "ldaxidx",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, "ldaxi"     },
-    { "ldaxysp",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, "ldax0sp"   },
-    { "ldeaxidx",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, "ldeaxi"    },
-    { "ldeaxysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, "ldeax0sp"  },
-    { "pusha",                  0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, "pushc0"    },
-    { "pusha",                  1, UNKNOWN_REGVAL, UNKNOWN_REGVAL, "pushc1"    },
-    { "pusha",                  2, UNKNOWN_REGVAL, UNKNOWN_REGVAL, "pushc2"    },
-    { "pushax",                 0,              0, UNKNOWN_REGVAL, "push0"     },
-    { "pushax",                 1,              0, UNKNOWN_REGVAL, "push1"     },
-    { "pushax",                 2,              0, UNKNOWN_REGVAL, "push2"     },
-    { "pushax",                 3,              0, UNKNOWN_REGVAL, "push3"     },
-    { "pushax",                 4,              0, UNKNOWN_REGVAL, "push4"     },
-    { "pushax",                 5,              0, UNKNOWN_REGVAL, "push5"     },
-    { "pushax",                 6,              0, UNKNOWN_REGVAL, "push6"     },
-    { "pushax",                 7,              0, UNKNOWN_REGVAL, "push7"     },
-    { "pushax",    UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "pusha0"    },
-    { "pushax",    UNKNOWN_REGVAL,           0xFF, UNKNOWN_REGVAL, "pushaFF"   },
-    { "pushaysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "pusha0sp"  },
-    { "pushwidx",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, "pushw"     },
-    { "pushwysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, "pushw0sp"  },
-    { "staxysp",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "stax0sp"   },
-    { "tosaddax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosadda0"  },
-    { "tosandax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosanda0"  },
-    { "tosdivax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosdiva0"  },
-    { "toseqax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "toseqa0"   },
-    { "tosgeax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosgea0"   },
-    { "tosgtax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosgta0"   },
-    { "tosleax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "toslea0"   },
-    { "tosorax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosora0"   },
-    { "lsubeqysp", UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "lsubeq0sp" },
-    { "steaxysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "steax0sp"  },
-    { "subeqysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "subeq0sp"  },
-    { "tosltax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "toslta0"   },
-    { "tosmodax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosmoda0"  },
-    { "tosmulax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosmula0"  },
-    { "tosneax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosnea0"   },
-    { "tosrsubax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosrsuba0" },
-    { "tossubax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tossuba0"  },
-    { "tosudivax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosudiva0" },
-    { "tosugeax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosugea0"  },
-    { "tosugtax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosugta0"  },
-    { "tosuleax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosulea0"  },
-    { "tosultax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosulta0"  },
-    { "tosumodax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosumoda0" },
-    { "tosumulax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosumula0" },
-    { "tosxorax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosxora0"  },
+    /* Name          A register      X register     Y register     flags     replacement */
+    { "addeqysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, F_NONE,   "addeq0sp"  },
+    { "laddeqysp", UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, F_NONE,   "laddeq0sp" },
+    { "ldaxidx",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, F_NONE,   "ldaxi"     },
+    { "ldaxysp",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, F_NONE,   "ldax0sp"   },
+    { "ldeaxidx",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, F_NONE,   "ldeaxi"    },
+    { "ldeaxysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, F_NONE,   "ldeax0sp"  },
+    { "lsubeqysp", UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, F_NONE,   "lsubeq0sp" },
+    { "pusha",                  0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, F_SLOWER, "pushc0"    },
+    { "pusha",                  1, UNKNOWN_REGVAL, UNKNOWN_REGVAL, F_SLOWER, "pushc1"    },
+    { "pusha",                  2, UNKNOWN_REGVAL, UNKNOWN_REGVAL, F_SLOWER, "pushc2"    },
+    { "pushax",                 0,              0, UNKNOWN_REGVAL, F_NONE,   "push0"     },
+    { "pushax",                 1,              0, UNKNOWN_REGVAL, F_SLOWER, "push1"     },
+    { "pushax",                 2,              0, UNKNOWN_REGVAL, F_SLOWER, "push2"     },
+    { "pushax",                 3,              0, UNKNOWN_REGVAL, F_SLOWER, "push3"     },
+    { "pushax",                 4,              0, UNKNOWN_REGVAL, F_SLOWER, "push4"     },
+    { "pushax",                 5,              0, UNKNOWN_REGVAL, F_SLOWER, "push5"     },
+    { "pushax",                 6,              0, UNKNOWN_REGVAL, F_SLOWER, "push6"     },
+    { "pushax",                 7,              0, UNKNOWN_REGVAL, F_SLOWER, "push7"     },
+    { "pushax",    UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "pusha0"    },
+    { "pushax",    UNKNOWN_REGVAL,           0xFF, UNKNOWN_REGVAL, F_SLOWER, "pushaFF"   },
+    { "pushaysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, F_NONE,   "pusha0sp"  },
+    { "pushwidx",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, F_NONE,   "pushw"     },
+    { "pushwysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, F_NONE,   "pushw0sp"  },
+    { "staxysp",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, F_NONE,   "stax0sp"   },
+    { "steaxysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, F_NONE,   "steax0sp"  },
+    { "subeqysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, F_NONE,   "subeq0sp"  },
+    { "tosaddax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosadda0"  },
+    { "tosandax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosanda0"  },
+    { "tosdivax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosdiva0"  },
+    { "toseqax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "toseq00"   },
+    { "toseqax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "toseqa0"   },
+    { "tosgeax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "tosge00"   },
+    { "tosgeax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosgea0"   },
+    { "tosgtax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "tosgt00"   },
+    { "tosgtax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosgta0"   },
+    { "tosleax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "tosle00"   },
+    { "tosleax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "toslea0"   },
+    { "tosltax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "toslt00"   },
+    { "tosltax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "toslta0"   },
+    { "tosmodax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosmoda0"  },
+    { "tosmulax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosmula0"  },
+    { "tosneax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosnea0"   },
+    { "tosorax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosora0"   },
+    { "tosrsubax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosrsuba0" },
+    { "tossubax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tossuba0"  },
+    { "tosudivax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosudiva0" },
+    { "tosugeax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosugea0"  },
+    { "tosugtax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosugta0"  },
+    { "tosuleax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosulea0"  },
+    { "tosultax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosulta0"  },
+    { "tosumodax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosumoda0" },
+    { "tosumulax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosumula0" },
+    { "tosxorax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosxora0"  },
 
 #if 0
     "tosadd0ax",         /* tosaddeax, sreg = 0 */
@@ -201,6 +211,9 @@ unsigned OptSize1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
+    /* Are we optimizing for size */
+    int OptForSize = (S->CodeSizeFactor < 100);
+
     /* Generate register info for the following step */
     CS_GenRegInfo (S);
 
@@ -216,15 +229,23 @@ unsigned OptSize1 (CodeSeg* S)
      	/* Check if it's a subroutine call */
      	if (E->OPC == OP65_JSR && (D = FindCall (E->Arg)) != 0) {
 
-     	    /* Check for any of the known functions. */
+            printf ("Found \"%s\" for \"%s\"\n", D->LongFunc, D->ShortFunc);
+
+            /* FindCall finds the first entry that matches our function name.
+             * The names are listed in "best match" order, so search for the
+             * first one, that fulfills our conditions.
+             */
             while (1) {
 
-                /* Check the registers */
+                /* Check the registers and allow slower code only if
+                 * optimizing for size.
+                 */
                 if ((D->A < 0 || D->A == E->RI->In.RegA) &&
                     (D->X < 0 || D->X == E->RI->In.RegX) &&
-                    (D->Y < 0 || D->Y == E->RI->In.RegY)) {
+                    (D->Y < 0 || D->Y == E->RI->In.RegY) &&
+                    (OptForSize || (D->Flags & F_SLOWER) == 0)) {
 
-                    /* Ok, match for all registers */
+                    /* Ok, match for all conditions */
                     CodeEntry* X;
                     X = NewCodeEntry (E->OPC, E->AM, D->ShortFunc, 0, E->LI);
                     CS_InsertEntry (S, X, I+1);
@@ -246,8 +267,8 @@ unsigned OptSize1 (CodeSeg* S)
             }
         }
 
-	/* Next entry */
-	++I;
+    	/* Next entry */
+    	++I;
 
     }
 

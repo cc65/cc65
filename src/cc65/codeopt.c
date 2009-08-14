@@ -1489,22 +1489,21 @@ static unsigned RunOptGroup6 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned C;
 
-    if (S->CodeSizeFactor <= 100) {
-        /* Optimize for size, that is replace operations by shorter ones, even
-         * if this does hinder further optimizations (no problem since we're
-         * done soon).
+    /* Optimize for size, that is replace operations by shorter ones, even
+     * if this does hinder further optimizations (no problem since we're
+     * done soon).
+     */
+    C = RunOptFunc (S, &DOptSize1, 1);
+    if (C) {
+        Changes += C;
+        /* Run some optimization passes again, since the size optimizations
+         * may have opened new oportunities.
          */
-        C = RunOptFunc (S, &DOptSize1, 1);
-        if (C) {
-            Changes += C;
-            /* Run some optimization passes again, since the size optimizations
-             * may have opened new oportunities.
-             */
-            Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
-            Changes += RunOptFunc (S, &DOptJumpTarget, 5);
-            Changes += RunOptFunc (S, &DOptStore5, 1);
-        }
+        Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+        Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+        Changes += RunOptFunc (S, &DOptStore5, 1);
     }
+
     C = RunOptFunc (S, &DOptSize2, 1);
     if (C) {
         Changes += C;

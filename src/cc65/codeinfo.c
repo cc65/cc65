@@ -212,12 +212,13 @@ static const FuncInfo FuncInfoTable[] = {
     { "subeqysp",       REG_AXY,              REG_AXY                        },
     { "tosadda0",       REG_A,                REG_AXY                        },
     { "tosaddax",       REG_AX,               REG_AXY                        },
+    { "tosaddeax",      REG_EAX,              REG_EAXY | REG_TMP1            },
     { "tosanda0",       REG_A,                REG_AXY                        },
     { "tosandax",       REG_AX,               REG_AXY                        },
-    { "tosaslax",       REG_A,                REG_AXY | REG_TMP1             },
-    { "tosasleax",      REG_A,         	      REG_EAXY | REG_TMP1            },
-    { "tosasrax",       REG_A,                REG_AXY | REG_TMP1             },
-    { "tosasreax",      REG_A,         	      REG_EAXY | REG_TMP1            },
+    { "tosaslax",       REG_AX,               REG_AXY | REG_TMP1             },
+    { "tosasleax",      REG_EAX,              REG_EAXY | REG_TMP1            },
+    { "tosasrax",       REG_AX,               REG_AXY | REG_TMP1             },
+    { "tosasreax",      REG_EAX,              REG_EAXY | REG_TMP1            },
     { "tosdiva0",       REG_AY,       	      REG_ALL 			     },
     { "tosdivax",       REG_AXY,              REG_ALL 			     },
     { "tosdiveax",      REG_EAXY,             REG_ALL 			     },
@@ -259,6 +260,9 @@ static const FuncInfo FuncInfoTable[] = {
     { "tossuba0",       REG_A,                REG_AXY                        },
     { "tossubax",       REG_AX,               REG_AXY                        },
     { "tossubeax",      REG_EAX,              REG_EAXY                       },
+    { "tosudiva0",      REG_A,                REG_EAXY | REG_PTR1            }, /* also ptr4 */
+    { "tosudivax",      REG_AX,               REG_EAXY | REG_PTR1            }, /* also ptr4 */
+    { "tosudiveax",     REG_EAX,              REG_ALL & ~REG_SAVE            },
     { "tosuge00",       REG_NONE,      	      REG_AXY | REG_SREG             },
     { "tosugea0",       REG_A,        	      REG_AXY | REG_SREG             },
     { "tosugeax",       REG_AX,        	      REG_AXY | REG_SREG             },
@@ -275,6 +279,9 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosulta0",       REG_A,        	      REG_AXY | REG_SREG             },
     { "tosultax",       REG_AX,        	      REG_AXY | REG_SREG             },
     { "tosulteax",      REG_EAX,       	      REG_AXY | REG_PTR1             },
+    { "tosumoda0",      REG_A,                REG_EAXY | REG_PTR1            }, /* also ptr4 */
+    { "tosumodax",      REG_AX,               REG_EAXY | REG_PTR1            }, /* also ptr4 */
+    { "tosumodeax",     REG_EAX,              REG_ALL & ~REG_SAVE            },
     { "tosumula0",      REG_AX,	       	      REG_ALL			     },
     { "tosumulax",      REG_AX,	       	      REG_ALL			     },
     { "tosumuleax",     REG_EAX,       	      REG_ALL			     },

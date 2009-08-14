@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -106,6 +106,7 @@ static const CallDesc CallTable [] = {
     { "tosgeax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosgea0"   },
     { "tosgtax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "tosgt00"   },
     { "tosgtax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosgta0"   },
+    { "tosicmp",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "tosicmp0"  },
     { "tosleax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "tosle00"   },
     { "tosleax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, F_NONE,   "toslea0"   },
     { "tosltax",                0,              0, UNKNOWN_REGVAL, F_NONE,   "toslt00"   },

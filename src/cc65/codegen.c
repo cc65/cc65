@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
+/* (C) 1998-2009 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -2267,58 +2267,33 @@ void g_cmp (unsigned flags, unsigned long val)
 
 
 
-static void oper (unsigned flags, unsigned long val, char** subs)
-/* Encode a binary operation. subs is a pointer to four groups of three
- * strings:
- *      0-2	--> Operate on ints
- *      3-5	--> Operate on unsigneds
- *      6-8	--> Operate on longs
- *      9-11	--> Operate on unsigned longs
- *
- * The first subroutine names in each string group is used to encode an
- * operation with a zero constant, the second to encode an operation with
- * a 8 bit constant, and the third is used in all other cases.
+static void oper (unsigned Flags, unsigned long Val, const char** Subs)
+/* Encode a binary operation. subs is a pointer to four strings:
+ *      0   	--> Operate on ints
+ *      1   	--> Operate on unsigneds
+ *      2   	--> Operate on longs
+ *      3   	--> Operate on unsigned longs
  */
 {
-    unsigned offs;
-
     /* Determine the offset into the array */
-    offs = (flags & CF_UNSIGNED)? 3 : 0;
-    switch (flags & CF_TYPE) {
-        case CF_CHAR:
-        case CF_INT:
-            break;
-
-        case CF_LONG:
-            offs += 6;
-            break;
-
-        default:
-            typeerror (flags);
+    if (Flags & CF_UNSIGNED) {
+        ++Subs;
+    }
+    if ((Flags & CF_TYPE) == CF_LONG) {
+        Subs += 2;
     }
 
-    /* Encode the operation */
-    if (flags & CF_CONST) {
-        /* Constant value given */
-        if (val == 0 && subs [offs+0]) {
-            /* Special case: constant with value zero */
-            AddCodeLine ("jsr %s", subs [offs+0]);
-        } else if (val < 0x100 && subs [offs+1]) {
-            /* Special case: constant with high byte zero */
-            ldaconst (val);		/* Load low byte */
-            AddCodeLine ("jsr %s", subs [offs+1]);
-        } else {
-            /* Others: arbitrary constant value */
-            g_getimmed (flags, val, 0);   	       	/* Load value */
-            AddCodeLine ("jsr %s", subs [offs+2]);
-        }
-    } else {
-        /* Value not constant (is already in (e)ax) */
-        AddCodeLine ("jsr %s", subs [offs+2]);
+    /* Load the value if it is not already in the primary */
+    if (Flags & CF_CONST) {
+        /* Load value */
+        g_getimmed (Flags, Val, 0);
     }
+
+    /* Output the operation */
+    AddCodeLine ("jsr %s", *Subs);
 
     /* The operation will pop it's argument */
-    pop (flags);
+    pop (Flags);
 }
 
 
@@ -2550,11 +2525,8 @@ void g_stackcheck (void)
 void g_add (unsigned flags, unsigned long val)
 /* Primary = TOS + Primary */
 {
-    static char* ops [12] = {
-        0,		"tosadda0",	"tosaddax",
-        0,		"tosadda0",	"tosaddax",
-        0,		0,	 	"tosaddeax",
-        0,		0,	 	"tosaddeax",
+    static const char* ops[12] = {
+        "tosaddax", "tosaddax", "tosaddeax", "tosaddeax"
     };
 
     if (flags & CF_CONST) {
@@ -2569,11 +2541,8 @@ void g_add (unsigned flags, unsigned long val)
 void g_sub (unsigned flags, unsigned long val)
 /* Primary = TOS - Primary */
 {
-    static char* ops [12] = {
-        0,		"tossuba0",	"tossubax",
-        0,		"tossuba0",	"tossubax",
-        0,		0,	 	"tossubeax",
-        0,		0,	 	"tossubeax",
+    static const char* ops[12] = {
+        "tossubax", "tossubax", "tossubeax", "tossubeax",
     };
 
     if (flags & CF_CONST) {
@@ -2588,11 +2557,8 @@ void g_sub (unsigned flags, unsigned long val)
 void g_rsub (unsigned flags, unsigned long val)
 /* Primary = Primary - TOS */
 {
-    static char* ops [12] = {
-        0,		"tosrsuba0",	"tosrsubax",
-        0,		"tosrsuba0",	"tosrsubax",
-        0,		0,	 	"tosrsubeax",
-        0,		0,	 	"tosrsubeax",
+    static const char* ops[12] = {
+        "tosrsubax", "tosrsubax", "tosrsubeax", "tosrsubeax",
     };
     oper (flags, val, ops);
 }
@@ -2602,11 +2568,8 @@ void g_rsub (unsigned flags, unsigned long val)
 void g_mul (unsigned flags, unsigned long val)
 /* Primary = TOS * Primary */
 {
-    static char* ops [12] = {
-        0,		"tosmula0",	"tosmulax",
-        0,   		"tosumula0",	"tosumulax",
-        0,		0,	 	"tosmuleax",
-        0,		0,	 	"tosumuleax",
+    static const char* ops[12] = {
+        "tosmulax", "tosumulax", "tosmuleax", "tosumuleax",
     };
 
     int p2;
@@ -2712,11 +2675,8 @@ void g_mul (unsigned flags, unsigned long val)
 void g_div (unsigned flags, unsigned long val)
 /* Primary = TOS / Primary */
 {
-    static char* ops [12] = {
-        0,		"tosdiva0",	"tosdivax",
-        0,		"tosudiva0",	"tosudivax",
-        0,		0,  		"tosdiveax",
-        0,		0,  		"tosudiveax",
+    static const char* ops[12] = {
+        "tosdivax", "tosudivax", "tosdiveax", "tosudiveax",
     };
 
     /* Do strength reduction if the value is constant and a power of two */
@@ -2740,11 +2700,8 @@ void g_div (unsigned flags, unsigned long val)
 void g_mod (unsigned flags, unsigned long val)
 /* Primary = TOS % Primary */
 {
-    static char* ops [12] = {
-        0,		"tosmoda0",	"tosmodax",
-        0,		"tosumoda0",	"tosumodax",
-        0,		0,  		"tosmodeax",
-        0,		0,  		"tosumodeax",
+    static const char* ops[12] = {
+        "tosmodax", "tosumodax", "tosmodeax", "tosumodeax",
     };
     int p2;
 
@@ -2768,11 +2725,8 @@ void g_mod (unsigned flags, unsigned long val)
 void g_or (unsigned flags, unsigned long val)
 /* Primary = TOS | Primary */
 {
-    static char* ops [12] = {
-        0,  	     	"tosora0",	"tosorax",
-        0,  	     	"tosora0",	"tosorax",
-        0,  	     	0,  		"tosoreax",
-        0,  	     	0,     		"tosoreax",
+    static const char* ops[12] = {
+        "tosorax", "tosorax", "tosoreax", "tosoreax",
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -2841,11 +2795,8 @@ void g_or (unsigned flags, unsigned long val)
 void g_xor (unsigned flags, unsigned long val)
 /* Primary = TOS ^ Primary */
 {
-    static char* ops [12] = {
-        0,		"tosxora0",	"tosxorax",
-        0,		"tosxora0",	"tosxorax",
-        0,		0,	   	"tosxoreax",
-        0,		0,	   	"tosxoreax",
+    static const char* ops[12] = {
+        "tosxorax", "tosxorax", "tosxoreax", "tosxoreax",
     };
 
 
@@ -2912,11 +2863,8 @@ void g_xor (unsigned flags, unsigned long val)
 void g_and (unsigned Flags, unsigned long Val)
 /* Primary = TOS & Primary */
 {
-    static char* ops [12] = {
-        0,	      	"tosanda0",	"tosandax",
-        0,	      	"tosanda0",	"tosandax",
-        0,	      	0,  		"tosandeax",
-        0,	      	0,  		"tosandeax",
+    static const char* ops[12] = {
+        "tosandax", "tosandax", "tosandeax", "tosandeax",
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -3001,11 +2949,8 @@ void g_and (unsigned Flags, unsigned long Val)
 void g_asr (unsigned flags, unsigned long val)
 /* Primary = TOS >> Primary */
 {
-    static char* ops [12] = {
-        0,	       	0,	        "tosasrax",
-        0,	       	0,     	        "tosshrax",
-        0,	       	0,		"tosasreax",
-        0,	       	0,		"tosshreax",
+    static const char* ops[12] = {
+        "tosasrax", "tosshrax", "tosasreax", "tosshreax",
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -3091,11 +3036,8 @@ void g_asr (unsigned flags, unsigned long val)
 void g_asl (unsigned flags, unsigned long val)
 /* Primary = TOS << Primary */
 {
-    static char* ops [12] = {
-        0,     	       	0,     	        "tosaslax",
-        0,	       	0,    	        "tosshlax",
-        0,	       	0,     	       	"tosasleax",
-        0,	       	0,     	       	"tosshleax",
+    static const char* ops[12] = {
+        "tosaslax", "tosshlax", "tosasleax", "tosshleax",
     };
 
 
@@ -3450,11 +3392,8 @@ void g_dec (unsigned flags, unsigned long val)
 void g_eq (unsigned flags, unsigned long val)
 /* Test for equal */
 {
-    static char* ops [12] = {
-        "toseq00",	"toseqa0",	"toseqax",
-        "toseq00", 	"toseqa0",	"toseqax",
-        0,	   	0,	  	"toseqeax",
-        0,	   	0,	  	"toseqeax",
+    static const char* ops[12] = {
+        "toseqax", "toseqax", "toseqeax", "toseqeax",
     };
 
     unsigned L;
@@ -3507,11 +3446,8 @@ void g_eq (unsigned flags, unsigned long val)
 void g_ne (unsigned flags, unsigned long val)
 /* Test for not equal */
 {
-    static char* ops [12] = {
-        "tosne00",	"tosnea0",	"tosneax",
-        "tosne00",	"tosnea0",	"tosneax",
-        0,		0,		"tosneeax",
-        0,		0,		"tosneeax",
+    static const char* ops[12] = {
+        "tosneax", "tosneax", "tosneeax", "tosneeax",
     };
 
     unsigned L;
@@ -3564,11 +3500,8 @@ void g_ne (unsigned flags, unsigned long val)
 void g_lt (unsigned flags, unsigned long val)
 /* Test for less than */
 {
-    static char* ops [12] = {
-        "toslt00",	"toslta0",    	"tosltax",
-        "tosult00",	"tosulta0",   	"tosultax",
-        0,	   	0,    	      	"toslteax",
-        0,		0,    	      	"tosulteax",
+    static const char* ops[12] = {
+        "tosltax", "tosultax", "toslteax", "tosulteax",
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -3675,11 +3608,8 @@ void g_lt (unsigned flags, unsigned long val)
 void g_le (unsigned flags, unsigned long val)
 /* Test for less than or equal to */
 {
-    static char* ops [12] = {
-        "tosle00",   	"toslea0",	"tosleax",
-        "tosule00",  	"tosulea0",	"tosuleax",
-        0,	     	0,    		"tosleeax",
-        0,	     	0,    		"tosuleeax",
+    static const char* ops[12] = {
+        "tosleax", "tosuleax", "tosleeax", "tosuleeax",
     };
 
 
@@ -3793,11 +3723,8 @@ void g_le (unsigned flags, unsigned long val)
 void g_gt (unsigned flags, unsigned long val)
 /* Test for greater than */
 {
-    static char* ops [12] = {
-        "tosgt00",    	"tosgta0", 	"tosgtax",
-        "tosugt00",   	"tosugta0",	"tosugtax",
-        0,	      	0,  	    	"tosgteax",
-        0,	      	0,  	    	"tosugteax",
+    static const char* ops[12] = {
+        "tosgtax", "tosugtax", "tosgteax", "tosugteax",
     };
 
 
@@ -3927,11 +3854,8 @@ void g_gt (unsigned flags, unsigned long val)
 void g_ge (unsigned flags, unsigned long val)
 /* Test for greater than or equal to */
 {
-    static char* ops [12] = {
-        "tosge00",	"tosgea0",  	"tosgeax",
-        "tosuge00",	"tosugea0",	"tosugeax",
-        0,		0,		"tosgeeax",
-        0,		0,		"tosugeeax",
+    static const char* ops[12] = {
+        "tosgeax", "tosugeax", "tosgeeax", "tosugeeax",
     };
 
 

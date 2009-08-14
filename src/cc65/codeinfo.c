@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2006, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -235,6 +235,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosgtax",        REG_AX,        	      REG_AXY | REG_SREG             },
     { "tosgteax",       REG_EAX,       	      REG_AXY | REG_PTR1             },
     { "tosicmp",       	REG_AX,	       	      REG_AXY | REG_SREG	     },
+    { "tosicmp0",       REG_A,                REG_AXY | REG_SREG             },
     { "toslcmp",        REG_EAX,       	      REG_A | REG_Y | REG_PTR1       },
     { "tosle00",        REG_NONE,      	      REG_AXY | REG_SREG             },
     { "toslea0",        REG_A,        	      REG_AXY | REG_SREG             },

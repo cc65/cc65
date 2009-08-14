@@ -5,9 +5,12 @@
 ; Integer compare function - used by the compare operators
 ;
 
-	.export		tosicmp
-	.importzp	sp, sreg
+	.export	    	tosicmp, tosicmp0
+	.importzp   	sp, sreg
 
+
+tosicmp0:
+        ldx     #$00
 
 tosicmp:
 	sta	sreg

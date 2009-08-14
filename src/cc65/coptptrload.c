@@ -61,19 +61,18 @@ unsigned OptPtrLoad1 (CodeSeg* S)
  *      adc     yyy
  *      tax
  *      tya
- *      ldy
+ *      ldy     #$00
  *  	jsr    	ldauidx
  *
  * and replace it by:
  *
- *      clc
- *      adc    	xxx
  *      sta     ptr1
  *      txa
+ *      clc
  *      adc     yyy
  *      sta     ptr1+1
- *      ldy
- *     	ldx     #$00
+ *      ldy     xxx
+ *      ldx     #$00
  *      lda     (ptr1),y
  */
 {
@@ -92,12 +91,16 @@ unsigned OptPtrLoad1 (CodeSeg* S)
        	if (L[0]->OPC == OP65_CLC               &&
        	    CS_GetEntries (S, L+1, I+1, 8)     	&&
 	    L[1]->OPC == OP65_ADC      	       	&&
+            (L[1]->AM == AM65_ABS          ||
+             L[1]->AM == AM65_ZP           ||
+             L[1]->AM == AM65_IMM)              &&
        	    L[2]->OPC == OP65_TAY              	&&
 	    L[3]->OPC == OP65_TXA               &&
 	    L[4]->OPC == OP65_ADC               &&
 	    L[5]->OPC == OP65_TAX               &&
 	    L[6]->OPC == OP65_TYA               &&
 	    L[7]->OPC == OP65_LDY               &&
+            CE_IsKnownImm (L[7], 0)             &&
        	    CE_IsCallTo (L[8], "ldauidx")       &&
             !CS_RangeHasLabel (S, I+1, 8)) {
 
@@ -105,7 +108,7 @@ unsigned OptPtrLoad1 (CodeSeg* S)
 	    CodeEntry* P;
 
             /* Track the insertion point */
-            unsigned IP = I+2;
+            unsigned IP = I;
 
             /* sta ptr1 */
             X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[2]->LI);
@@ -116,13 +119,16 @@ unsigned OptPtrLoad1 (CodeSeg* S)
              * transfer the value in X to A.
 	     */
 	    if ((P = CS_GetPrevEntry (S, I)) != 0 &&
-   	    	P->OPC == OP65_LDX                &&
-	    	!CE_HasLabel (P)) {
-	    	X = NewCodeEntry (OP65_LDA, P->AM, P->Arg, 0, P->LI);
+   	       	P->OPC == OP65_LDX                &&
+	       	!CE_HasLabel (P)) {
+	       	X = NewCodeEntry (OP65_LDA, P->AM, P->Arg, 0, P->LI);
 	    } else {
                 X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[3]->LI);
             }
             CS_InsertEntry (S, X, IP++);
+
+            /* clc is now in the right place */
+            ++IP;
 
             /* adc yyy */
             X = NewCodeEntry (OP65_ADC, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
@@ -132,8 +138,8 @@ unsigned OptPtrLoad1 (CodeSeg* S)
             X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[5]->LI);
             CS_InsertEntry (S, X, IP++);
 
-            /* ldy ... */
-            X = NewCodeEntry (OP65_LDY, L[7]->AM, L[7]->Arg, 0, L[7]->LI);
+            /* ldy xxx */
+            X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
             CS_InsertEntry (S, X, IP++);
 
             /* ldx #$00 */
@@ -145,7 +151,7 @@ unsigned OptPtrLoad1 (CodeSeg* S)
 	    CS_InsertEntry (S, X, IP++);
 
             /* Remove the old instructions */
-            CS_DelEntries (S, IP, 7);
+            CS_DelEntries (S, IP, 8);
 
 	    /* Remember, we had changes */
 	    ++Changes;

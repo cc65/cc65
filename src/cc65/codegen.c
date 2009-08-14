@@ -1437,20 +1437,11 @@ void g_scale (unsigned flags, long val)
              	    /* FALLTHROUGH */
 
              	case CF_INT:
-                    if (IS_Get (&CodeSizeFactor) >= (p2+1)*130) {
-             		AddCodeLine ("stx tmp1");
-             	  	while (p2--) {
-             		    AddCodeLine ("asl a");
-             		    AddCodeLine ("rol tmp1");
-             		}
-             		AddCodeLine ("ldx tmp1");
-             	    } else {
-             	       	if (flags & CF_UNSIGNED) {
-             	     	    AddCodeLine ("jsr shlax%d", p2);
-             	     	} else {
-             	     	    AddCodeLine ("jsr aslax%d", p2);
-             	     	}
-             	    }
+                    if (flags & CF_UNSIGNED) {
+                        AddCodeLine ("jsr shlax%d", p2);
+                    } else {
+                        AddCodeLine ("jsr aslax%d", p2);
+                    }
              	    break;
 
              	case CF_LONG:
@@ -1499,28 +1490,9 @@ void g_scale (unsigned flags, long val)
 
                 case CF_INT:
                     if (flags & CF_UNSIGNED) {
-                        if (IS_Get (&CodeSizeFactor) >= (p2+1)*130) {
-                            AddCodeLine ("stx tmp1");
-                            while (p2--) {
-             		    	AddCodeLine ("lsr tmp1");
-                                AddCodeLine ("ror a");
-                            }
-                            AddCodeLine ("ldx tmp1");
-                        } else {
-                            AddCodeLine ("jsr lsrax%d", p2);
-                        }
+                        AddCodeLine ("jsr lsrax%d", p2);
                     } else {
-                        if (IS_Get (&CodeSizeFactor) >= (p2+1)*150) {
-                            AddCodeLine ("stx tmp1");
-                            while (p2--) {
-                            	AddCodeLine ("cpx #$80");
-                            	AddCodeLine ("ror tmp1");
-                            	AddCodeLine ("ror a");
-                            }
-                            AddCodeLine ("ldx tmp1");
-                        } else {
-                            AddCodeLine ("jsr asrax%d", p2);
-            	     	}
+                        AddCodeLine ("jsr asrax%d", p2);
                     }
                     break;
 
@@ -2992,7 +2964,7 @@ void g_asr (unsigned flags, unsigned long val)
                     }
                     return;
                 } else if (val == 8 && (flags & CF_UNSIGNED)) {
-                    AddCodeLine ("txa");
+                    AddCodeLine ("txa");  
                     AddCodeLine ("ldx sreg");
                     AddCodeLine ("ldy sreg+1");
                     AddCodeLine ("sty sreg");
@@ -3059,20 +3031,11 @@ void g_asl (unsigned flags, unsigned long val)
                     /* Done */
                     return;
                 } else if (val >= 1 && val <= 4) {
-                    if (IS_Get (&CodeSizeFactor) >= (long) (val+1)*130) {
-             		AddCodeLine ("stx tmp1");
-             	  	while (val--) {
-             		    AddCodeLine ("asl a");
-             		    AddCodeLine ("rol tmp1");
-             		}
-             		AddCodeLine ("ldx tmp1");
-             	    } else {
-             	       	if (flags & CF_UNSIGNED) {
-             	     	    AddCodeLine ("jsr shlax%ld", val);
-             	     	} else {
-             	     	    AddCodeLine ("jsr aslax%ld", val);
-             	     	}
-             	    }
+                    if (flags & CF_UNSIGNED) {
+                        AddCodeLine ("jsr shlax%ld", val);
+                    } else {
+                        AddCodeLine ("jsr aslax%ld", val);
+                    }
                     return;
                 }
                 break;

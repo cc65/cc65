@@ -109,6 +109,7 @@ static unsigned OptShift1 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
+        CodeEntry* N;
         CodeEntry* X;
         CodeLabel* L;
 
@@ -138,23 +139,24 @@ static unsigned OptShift1 (CodeSeg* S)
                 ++Changes;
 
             } else if (E->RI->In.RegX == 0              &&
-                       E->Arg[5] == '1') {
+                       E->Arg[5] == '1'                 &&
+                       (N = CS_GetNextEntry (S, I)) != 0) {
 
                 /* asl a */
                 X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
-                CS_InsertEntry (S, X, I);
+                CS_InsertEntry (S, X, I+1);
 
                 /* bcc L1 */
-                L = CS_GenLabel (S, E);
+                L = CS_GenLabel (S, N);
                 X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, E->LI);
-                CS_InsertEntry (S, X, I+1);
+                CS_InsertEntry (S, X, I+2);
 
                 /* inx */
                 X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
-                CS_InsertEntry (S, X, I+2);
+                CS_InsertEntry (S, X, I+3);
 
                 /* Delete the call to shlax */
-                CS_DelEntry (S, I+3);
+                CS_DelEntry (S, I);
 
                 /* Remember, we had changes */
                 ++Changes;

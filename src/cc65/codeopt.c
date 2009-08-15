@@ -1554,6 +1554,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
          * may have opened new oportunities.
          */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+        Changes += RunOptFunc (S, &DOptUnusedStores, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
     }

@@ -898,7 +898,9 @@ unsigned OptUnusedStores (CodeSeg* S)
 
 	 	/* Remember, we had changes */
 	 	++Changes;
-
+                            
+                /* Continue with next insn */
+                continue;
 	    }
 	}
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -109,17 +109,17 @@ void __fastcall__ pokebsys (unsigned addr, unsigned char val);
 void __fastcall__ pokewsys (unsigned addr, unsigned val);
 
 #if defined(__OPT_i__) && (__OPT_i__ >= 600)
-#define peekbsys(addr)          \
-        __AX__ = (addr),        \
-        asm ("sta ptr1"),       \
-        asm ("stx ptr1+1"),     \
-        asm ("ldx $01"),        \
-        asm ("lda #$0F"),       \
-        asm ("sta $01"),        \
-        asm ("ldy #$00"),       \
-        asm ("lda (ptr1),y"),   \
-        asm ("stx $01"),        \
-        asm ("ldx #$00"),       \
+#define peekbsys(addr)                  \
+        __AX__ = (addr),                \
+        __asm__ ("sta ptr1"),           \
+        __asm__ ("stx ptr1+1"),         \
+        __asm__ ("ldx $01"),            \
+        __asm__ ("lda #$0F"),           \
+        __asm__ ("sta $01"),            \
+        __asm__ ("ldy #$00"),           \
+        __asm__ ("lda (ptr1),y"),       \
+        __asm__ ("stx $01"),            \
+        __asm__ ("ldx #$00"),           \
         __AX__
 #endif
 

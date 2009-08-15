@@ -90,14 +90,27 @@ enum {
 
 static unsigned OptShift1 (CodeSeg* S)
 /* A call to the shlaxN routine may get replaced by one or more asl insns
- * if the value of X is not used later.
+ * if the value of X is not used later. If X is used later, but it is zero
+ * on entry and it's a shift by one, it may get replaced by:
+ *
+ *      asl     a
+ *      bcc     L1
+ *      inx
+ *  L1:
+ *
  */
 {
     unsigned Changes = 0;
 
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
     /* Walk over the entries */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* X;
+        CodeLabel* L;
 
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
@@ -107,21 +120,45 @@ static unsigned OptShift1 (CodeSeg* S)
        	    (strncmp (E->Arg, "shlax", 5) == 0 ||
 	     strncmp (E->Arg, "aslax", 5) == 0)	     &&
 	    strlen (E->Arg) == 6                     &&
-	    IsDigit (E->Arg[5])                      &&
-	    !RegXUsed (S, I+1)) {
+	    IsDigit (E->Arg[5])) {
 
-	    /* Insert shift insns */
-	    unsigned Count = E->Arg[5] - '0';
-	    while (Count--) {
-	    	CodeEntry* X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
-	    	CS_InsertEntry (S, X, I+1);
-	    }
+            if (!RegXUsed (S, I+1)) {
 
-	    /* Delete the call to shlax */
-	    CS_DelEntry (S, I);
+                /* Insert shift insns */
+                unsigned Count = E->Arg[5] - '0';
+                while (Count--) {
+                    X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
+                    CS_InsertEntry (S, X, I+1);
+                }
 
-	    /* Remember, we had changes */
-	    ++Changes;
+                /* Delete the call to shlax */
+                CS_DelEntry (S, I);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+            } else if (E->RI->In.RegX == 0              &&
+                       E->Arg[5] == '1') {
+
+                /* asl a */
+                X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
+                CS_InsertEntry (S, X, I);
+
+                /* bcc L1 */
+                L = CS_GenLabel (S, E);
+                X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, E->LI);
+                CS_InsertEntry (S, X, I+1);
+
+                /* inx */
+                X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, I+2);
+
+                /* Delete the call to shlax */
+                CS_DelEntry (S, I+3);
+
+                /* Remember, we had changes */
+                ++Changes;
+            }
 
 	}
 
@@ -129,6 +166,9 @@ static unsigned OptShift1 (CodeSeg* S)
 	++I;
 
     }
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

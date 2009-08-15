@@ -1014,7 +1014,8 @@ static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    100, 0, 
 static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",       0, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 100, 0, 0, 0, 0, 0 };
-static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   100, 0, 0, 0, 0, 0 };
+static OptFunc DOptJumpTarget1  = { OptJumpTarget1,  "OptJumpTarget1",  100, 0, 0, 0, 0, 0 };
+static OptFunc DOptJumpTarget2  = { OptJumpTarget2,  "OptJumpTarget2",  100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",         	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps1    = { OptRTSJumps1,    "OptRTSJumps1",   	100, 0, 0, 0, 0, 0 };
@@ -1093,7 +1094,8 @@ static OptFunc* OptFuncs[] = {
     &DOptDecouple,
     &DOptDupLoads,
     &DOptJumpCascades,
-    &DOptJumpTarget,
+    &DOptJumpTarget1,
+    &DOptJumpTarget2,
     &DOptLoad1,
     &DOptNegA1,
     &DOptNegA2,
@@ -1453,7 +1455,8 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptDeadJumps, 1);
        	C += RunOptFunc (S, &DOptRTS, 1);
        	C += RunOptFunc (S, &DOptDeadCode, 1);
-       	C += RunOptFunc (S, &DOptJumpTarget, 1);
+       	C += RunOptFunc (S, &DOptJumpTarget1, 1);
+       	C += RunOptFunc (S, &DOptJumpTarget2, 1);
        	C += RunOptFunc (S, &DOptCondBranches, 1);
        	C += RunOptFunc (S, &DOptRTSJumps1, 1);
        	C += RunOptFunc (S, &DOptBoolTrans, 1);
@@ -1549,7 +1552,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
          * may have opened new oportunities.
          */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
-        Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+        Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
     }
 
@@ -1560,7 +1563,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
          * may have opened new oportunities.
          */
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
-        Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+        Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
     }
 

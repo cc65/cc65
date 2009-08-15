@@ -77,11 +77,16 @@ unsigned OptRTS (CodeSeg* S);
  * label, the dead code elimination should take care of it.
  */
 
-unsigned OptJumpTarget (CodeSeg* S);
+unsigned OptJumpTarget1 (CodeSeg* S);
 /* If the instruction preceeding an unconditional branch is the same as the
  * instruction preceeding the jump target, the jump target may be moved
  * one entry back. This is a size optimization, since the instruction before
  * the branch gets removed.
+ */
+
+unsigned OptJumpTarget2 (CodeSeg* S);
+/* If a bcs jumps to a sec insn or a bcc jumps to clc, skip this insn, since
+ * it's job is already done.
  */
 
 unsigned OptCondBranches (CodeSeg* S);

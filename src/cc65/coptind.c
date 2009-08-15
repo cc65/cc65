@@ -544,7 +544,7 @@ unsigned OptRTS (CodeSeg* S)
 
 
 
-unsigned OptJumpTarget (CodeSeg* S)
+unsigned OptJumpTarget1 (CodeSeg* S)
 /* If the instruction preceeding an unconditional branch is the same as the
  * instruction preceeding the jump target, the jump target may be moved
  * one entry back. This is a size optimization, since the instruction before
@@ -615,6 +615,83 @@ NextEntry:
             /* Next entry */
             ++I;
         }
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptJumpTarget2 (CodeSeg* S)
+/* If a bcs jumps to a sec insn or a bcc jumps to clc, skip this insn, since
+ * it's job is already done.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        /* OP that may be skipped */
+        opc_t OPC;
+
+        /* Jump target insn, old and new */
+        CodeEntry* T;
+        CodeEntry* N;
+                           
+        /* New jump label */
+        CodeLabel* L;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check if this is a bcc insn */
+        if (E->OPC == OP65_BCC || E->OPC == OP65_JCC) {
+            OPC = OP65_CLC;
+        } else if (E->OPC == OP65_BCS || E->OPC == OP65_JCS) {
+            OPC = OP65_SEC;
+        } else {
+            /* Not what we're looking for */
+            goto NextEntry;
+        }
+
+        /* Must have a jump target */
+        if (E->JumpTo == 0) {
+            goto NextEntry;
+        }
+
+        /* Get the owner insn of the jump target and check if it's the one, we
+         * will skip if present.
+         */
+        T = E->JumpTo->Owner;
+        if (T->OPC != OPC) {
+            goto NextEntry;
+        }
+
+        /* Get the entry following the branch target */
+        N = CS_GetNextEntry (S, CS_GetEntryIndex (S, T));
+        if (N == 0) {
+            /* There is no such entry */
+            goto NextEntry;
+        }
+
+        /* Get the label for the instruction following the jump target.
+         * This routine will create a new label if the instruction does
+         * not already have one.
+         */
+        L = CS_GenLabel (S, N);
+
+        /* Change the jump target to point to this new label */
+        CS_MoveLabelRef (S, E, L);
+
+        /* Remember that we had changes */
+        ++Changes;
+
+NextEntry:
+        /* Next entry */
+        ++I;
     }
 
     /* Return the number of changes made */
@@ -1481,7 +1558,7 @@ unsigned OptTransfers4 (CodeSeg* S)
                     (LoadEntry->AM == AM65_ABS          ||
                      LoadEntry->AM == AM65_ZP           ||
                      LoadEntry->AM == AM65_IMM)                                 &&
-                    !MemAccess (S, Load+1, Xfer-1, LoadEntry->Arg)) { 
+                    !MemAccess (S, Load+1, Xfer-1, LoadEntry->Arg)) {
 
                     /* Generate the replacement load insn */
                     CodeEntry* X = 0;

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -108,6 +108,11 @@ unsigned OptTransfers1 (CodeSeg* S);
 unsigned OptTransfers2 (CodeSeg* S);
 /* Replace loads followed by a register transfer by a load with the second
  * register if possible.
+ */
+
+unsigned OptTransfers3 (CodeSeg* S);
+/* Replace a register transfer followed by a store of the second register by a
+ * store of the first register if this is possible.
  */
 
 unsigned OptPushPop (CodeSeg* S);

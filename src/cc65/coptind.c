@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005, Ullrich von Bassewitz                                      */
-/*                Römerstraße 52                                             */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -1234,6 +1234,169 @@ unsigned OptTransfers2 (CodeSeg* S)
 
 
 
+unsigned OptTransfers3 (CodeSeg* S)
+/* Replace a register transfer followed by a store of the second register by a
+ * store of the first register if this is possible.
+ */
+{
+    unsigned Changes      = 0;
+    unsigned Xfer         = 0;  /* Index of transfer insn */
+    unsigned Store        = 0;  /* Index of store insn */
+    CodeEntry* XferEntry  = 0;  /* Pointer to xfer insn */
+    CodeEntry* StoreEntry = 0;  /* Pointer to store insn */
+
+    enum {
+        Searching,
+        FoundXfer,
+        FoundStore
+    } State = Searching;
+
+    /* Walk over the entries. Look for a xfer instruction that is followed by
+     * a store later, where the value of the register is not used later.
+     */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+        switch (State) {
+
+            case Searching:
+                if (E->Info & OF_XFR) {
+                    /* Found start of sequence */
+                    Xfer = I;
+                    XferEntry = E;
+                    State = FoundXfer;
+                }
+                break;
+
+            case FoundXfer:
+                /* If we find a conditional jump, abort the sequence, since
+                 * handling them makes things really complicated.
+                 */
+                if (E->Info & OF_CBRA) {
+
+                    /* Switch back to searching */
+                    I = Xfer;
+                    State = Searching;
+
+                /* Does this insn use the target register of the transfer? */
+                } else if ((E->Use & XferEntry->Chg) != 0) {
+
+                    /* It it's a store instruction, and the block is a basic
+                     * block, proceed. Otherwise restart
+                     */
+                    if ((E->Info & OF_STORE) != 0       &&
+                        CS_IsBasicBlock (S, Xfer, I)) {
+                        Store = I;
+                        StoreEntry = E;
+                        State = FoundStore;
+                    } else {
+                        I = Xfer;
+                        State = Searching;
+                    }
+
+                /* Does this insn change the target register of the transfer? */
+                } else if (E->Chg & XferEntry->Chg) {
+
+                    /* We *may* add code here to remove the transfer, but I'm
+                     * currently not sure about the consequences, so I won't
+                     * do that and bail out instead.
+                     */
+                    I = Xfer;
+                    State = Searching;
+                }
+                break;
+
+            case FoundStore:
+                /* We are at the instruction behind the store. If the register
+                 * isn't used later, and we have an address mode match, we can
+                 * replace the transfer by a store and remove the store here.
+                 */
+                if ((GetRegInfo (S, I, XferEntry->Chg) & XferEntry->Chg) == 0   &&
+                    (StoreEntry->AM == AM65_ABS || StoreEntry->AM == AM65_ZP)   &&
+                    !MemAccess (S, Xfer+1, Store-1, E->Arg)) {
+
+                    /* Generate the replacement store insn */
+                    CodeEntry* X = 0;
+                    switch (XferEntry->OPC) {
+
+                        case OP65_TXA:
+                            X = NewCodeEntry (OP65_STX,
+                                              StoreEntry->AM,
+                                              StoreEntry->Arg,
+                                              0,
+                                              StoreEntry->LI);
+                            break;
+
+                        case OP65_TAX:
+                            X = NewCodeEntry (OP65_STA,
+                                              StoreEntry->AM,
+                                              StoreEntry->Arg,
+                                              0,
+                                              StoreEntry->LI);
+                            break;
+
+                        case OP65_TYA:
+                            X = NewCodeEntry (OP65_STY,
+                                              StoreEntry->AM,
+                                              StoreEntry->Arg,
+                                              0,
+                                              StoreEntry->LI);
+                            break;
+
+                        case OP65_TAY:
+                            X = NewCodeEntry (OP65_STA,
+                                              StoreEntry->AM,
+                                              StoreEntry->Arg,
+                                              0,
+                                              StoreEntry->LI);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    /* If we have a replacement store, change the code */
+                    if (X) {
+                        /* Insert before the xfer insn */
+                        CS_InsertEntry (S, X, Xfer);
+
+                        /* Remove the xfer instead */
+                        CS_DelEntry (S, Xfer+1);
+
+                        /* Remove the final store */
+                        CS_DelEntry (S, Store);
+
+                        /* Correct I so we continue with the next insn */
+                        I -= 2;
+
+                        /* Remember we had changes */
+                        ++Changes;
+                    } else {
+                        /* Restart after last xfer insn */
+                        I = Xfer;
+                    }
+                } else {
+                    /* Restart after last xfer insn */
+                    I = Xfer;
+                }
+                State = Searching;
+                break;
+
+        }
+
+	/* Next entry */
+	++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 unsigned OptPushPop (CodeSeg* S)
 /* Remove a PHA/PLA sequence were A is not used later */
 {
@@ -1315,6 +1478,9 @@ unsigned OptPushPop (CodeSeg* S)
                     /* Remove the PLA/STA sequence */
                     CS_DelEntries (S, Pop, 2);
 
+                    /* Correct I so we continue with the next insn */
+                    I -= 2;
+
                     /* Remember we had changes */
                     ++Changes;
 
@@ -1324,8 +1490,10 @@ unsigned OptPushPop (CodeSeg* S)
                     /* We can remove the PHA and PLA instructions */
                     CS_DelEntry (S, Pop);
                     CS_DelEntry (S, Push);
+
                     /* Correct I so we continue with the next insn */
                     I -= 2;
+
                     /* Remember we had changes */
                     ++Changes;
 

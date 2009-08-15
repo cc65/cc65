@@ -927,9 +927,9 @@ unsigned OptPtrLoad10 (CodeSeg* S)
  *
  * and replace it by:
  *
- *      ldy     ...
  *      stx     ptr1+1
  *      sta     ptr1
+ *      ldy     ...                  
  *      ldx     #$00
  *      lda     (ptr1),y
  *
@@ -957,11 +957,11 @@ unsigned OptPtrLoad10 (CodeSeg* S)
 
        	    /* Store the high byte */
        	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-    	    CS_InsertEntry (S, X, I+1);
+    	    CS_InsertEntry (S, X, I);
 
     	    /* Store the low byte */
     	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
-    	    CS_InsertEntry (S, X, I+2);
+    	    CS_InsertEntry (S, X, I+1);
 
     	    /* Delete the call to ldauidx */
     	    CS_DelEntry (S, I+3);

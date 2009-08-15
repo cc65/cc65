@@ -63,8 +63,8 @@ unsigned OptAdd1 (CodeSeg* S)
  *
  *      ldy     #xx-1
  *      lda     (sp),y
- *      clc
  *      ldy     #yy-3
+ *      clc
  *      adc     (sp),y
  *      pha
  *      ldy     #xx
@@ -108,13 +108,13 @@ unsigned OptAdd1 (CodeSeg* S)
             X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
             CS_InsertEntry (S, X, I+1);
 
-       	    /* clc */
-	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[5]->LI);
-	    CS_InsertEntry (S, X, I+2);
-
             /* ldy #yy-3 */
 	    Arg = MakeHexArg (L[3]->Num - 3);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+2);
+
+       	    /* clc */
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[5]->LI);
 	    CS_InsertEntry (S, X, I+3);
 
 	    /* adc (sp),y */

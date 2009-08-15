@@ -929,7 +929,7 @@ unsigned OptPtrLoad10 (CodeSeg* S)
  *
  *      stx     ptr1+1
  *      sta     ptr1
- *      ldy     ...                  
+ *      ldy     ...
  *      ldx     #$00
  *      lda     (ptr1),y
  *
@@ -971,6 +971,90 @@ unsigned OptPtrLoad10 (CodeSeg* S)
 	    CS_InsertEntry (S, X, I+3);
 	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+4);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPtrLoad11 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *      ldy     ...
+ *      jsr     ldaxidx
+ *
+ * and replace it by:
+ *
+ *      ldy     ...
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      lda     (ptr1),y
+ *      tax
+ *      dey
+ *      lda     (ptr1),y
+ *
+ * This step must be executed *after* OptPtrLoad9! While code size increases
+ * by more than 200%, inlining will greatly improve visibility for the
+ * optimizer, so often part of the code gets improved later. So we will mark
+ * the step with less than 200% so it gets executed when -Oi is in effect.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+    	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_LDY      	       	&&
+       	    CS_GetEntries (S, L+1, I+1, 1)     	&&
+       	    CE_IsCallTo (L[1], "ldaxidx")       &&
+    	    !CE_HasLabel (L[1])) {
+
+    	    CodeEntry* X;
+
+       	    /* Store the high byte */
+       	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+    	    CS_InsertEntry (S, X, I+1);
+
+    	    /* Store the low byte */
+    	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+    	    CS_InsertEntry (S, X, I+2);
+
+            /* lda (ptr1),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+3);
+
+            /* tax */
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+4);
+
+            /* dey */
+            X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+5);
+
+            /* lda (ptr1),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+6);
+
+    	    /* Delete the call to ldaxidx */
+    	    CS_DelEntry (S, I+7);
 
 	    /* Remember, we had changes */
 	    ++Changes;

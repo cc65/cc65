@@ -118,7 +118,7 @@ unsigned OptPtrLoad3 (CodeSeg* S);
  *      ldy     xxx
  *      ldx     #$00
  *      lda     label,y
- */                               
+ */
 
 unsigned OptPtrLoad4 (CodeSeg* S);
 /* Search for the sequence:
@@ -261,6 +261,28 @@ unsigned OptPtrLoad10 (CodeSeg* S);
  *      lda     (ptr1),y
  *
  * This step must be executed *after* OptPtrLoad1!
+ */
+
+unsigned OptPtrLoad11 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *      ldy     ...
+ *      jsr     ldaxidx
+ *
+ * and replace it by:
+ *
+ *      ldy     ...
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      lda     (ptr1),y
+ *      tax
+ *      dey
+ *      lda     (ptr1),y
+ *
+ * This step must be executed *after* OptPtrLoad9! While code size increases
+ * by more than 200%, inlining will greatly improve visibility for the
+ * optimizer, so often part of the code gets improved later. So we will mark
+ * the step with less than 200% so it gets executed when -Oi is in effect.
  */
 
 

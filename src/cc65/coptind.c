@@ -1478,14 +1478,16 @@ unsigned OptTransfers4 (CodeSeg* S)
                  * replace the transfer by a load and remove the initial load.
                  */
                 if ((GetRegInfo (S, I, LoadEntry->Chg) & LoadEntry->Chg) == 0   &&
-                    (LoadEntry->AM == AM65_ABS || LoadEntry->AM == AM65_ZP)   &&
+                    (LoadEntry->AM == AM65_ABS          || 
+                     LoadEntry->AM == AM65_ZP           ||
+                     LoadEntry->AM == AM65_IMM)                                 &&
                     !MemAccess (S, Load+1, Xfer-1, E->Arg)) {
 
                     /* Generate the replacement load insn */
                     CodeEntry* X = 0;
                     switch (XferEntry->OPC) {
 
-                        case OP65_TXA:                
+                        case OP65_TXA:
                         case OP65_TYA:
                             X = NewCodeEntry (OP65_LDA,
                                               LoadEntry->AM,

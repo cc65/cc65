@@ -1316,7 +1316,7 @@ unsigned OptTransfers3 (CodeSeg* S)
                  */
                 if ((GetRegInfo (S, I, XferEntry->Chg) & XferEntry->Chg) == 0   &&
                     (StoreEntry->AM == AM65_ABS || StoreEntry->AM == AM65_ZP)   &&
-                    !MemAccess (S, Xfer+1, Store-1, E->Arg)) {
+                    !MemAccess (S, Xfer+1, Store-1, StoreEntry->Arg)) {
 
                     /* Generate the replacement store insn */
                     CodeEntry* X = 0;
@@ -1478,10 +1478,10 @@ unsigned OptTransfers4 (CodeSeg* S)
                  * replace the transfer by a load and remove the initial load.
                  */
                 if ((GetRegInfo (S, I, LoadEntry->Chg) & LoadEntry->Chg) == 0   &&
-                    (LoadEntry->AM == AM65_ABS          || 
+                    (LoadEntry->AM == AM65_ABS          ||
                      LoadEntry->AM == AM65_ZP           ||
                      LoadEntry->AM == AM65_IMM)                                 &&
-                    !MemAccess (S, Load+1, Xfer-1, E->Arg)) {
+                    !MemAccess (S, Load+1, Xfer-1, LoadEntry->Arg)) { 
 
                     /* Generate the replacement load insn */
                     CodeEntry* X = 0;

@@ -7,9 +7,14 @@
 ; When negating values, we will ignore the possibility here, that one of the
 ; values if $80000000, in which case the negate will fail.
 
-       	.export		tosdiveax
-	.import		poplsargs, udiv32, negeax
-	.importzp	ptr1, tmp1, tmp2
+       	.export		tosdiv0ax, tosdiveax
+      	.import		poplsargs, udiv32, negeax
+      	.importzp	sreg, ptr1, tmp1, tmp2
+
+tosdiv0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
 
 tosdiveax:
        	jsr	poplsargs  	; Get arguments from stack, adjust sign

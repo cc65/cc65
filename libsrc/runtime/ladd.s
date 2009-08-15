@@ -4,13 +4,18 @@
 ; CC65 runtime: long add
 ;
 
-	.export		tosaddeax
+	.export		tosadd0ax, tosaddeax
 	.import		addysp1
 	.importzp	sp, sreg, tmp1
 
         .macpack        cpu
 
 ; EAX = TOS + EAX
+
+tosadd0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
 
 tosaddeax:
       	clc

@@ -7,11 +7,16 @@
 ; When negating values, we will ignore the possibility here, that one of the
 ; values if $8000, in which case the negate will fail.
 
-       	.export		tosmodeax
+       	.export		tosmod0ax, tosmodeax
   	.import		poplsargs, udiv32, negeax
   	.importzp	sreg, ptr1, ptr2, tmp1, tmp3, tmp4
 
-tosmodeax:
+tosmod0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
+
+tosmodeax:                         
        	jsr    	poplsargs	; Get arguments from stack, adjust sign
       	jsr	udiv32		; Do the division, remainder is in (ptr2:tmp3:tmp4)
 

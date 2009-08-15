@@ -4,9 +4,14 @@
 ; CC65 runtime: modulo operation for long unsigned ints
 ;
 
-       	.export		tosumodeax
+       	.export		tosumod0ax, tosumodeax
        	.import		getlop, udiv32
        	.importzp	sreg, tmp3, tmp4, ptr2
+
+tosumod0ax:                          
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
 
 tosumodeax:
 	jsr	getlop		; Get the paramameters

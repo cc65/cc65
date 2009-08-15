@@ -4,9 +4,15 @@
 ; CC65 runtime: multiplication for long (unsigned) ints
 ;
 
-       	.export		tosumuleax, tosmuleax
+       	.export		tosumul0ax, tosumuleax, tosmul0ax, tosmuleax
 	.import		addysp1
 	.importzp	sp, sreg, tmp1, tmp2, tmp3, tmp4, ptr1, ptr3, ptr4
+
+tosmul0ax:
+tosumul0ax:
+        ldy     #$00    
+        sty     sreg
+        sty     sreg+1
 
 tosmuleax:
 tosumuleax:

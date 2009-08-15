@@ -7,11 +7,16 @@
 ;
 ; EAX = TOS - EAX
 ;
-	.export		tossubeax
-	.import		addysp1
-	.importzp   	sp, sreg
+	.export	      	tossub0ax, tossubeax
+	.import	      	addysp1
+	.importzp     	sp, sreg
 
         .macpack        cpu
+
+tossub0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
 
 tossubeax:
       	sec

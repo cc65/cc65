@@ -4,11 +4,16 @@
 ; CC65 runtime: division for long unsigned ints
 ;
 
-       	.export		tosudiveax, getlop, udiv32
+       	.export		tosudiv0ax, tosudiveax, getlop, udiv32
 	.import		addysp1
 	.importzp	sp, sreg, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 
-tosudiveax:
+tosudiv0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
+
+tosudiveax:                         
 	jsr	getlop		; Get the paramameters
  	jsr	udiv32		; Do the division
  	lda	ptr1		; Result is in ptr1:sreg

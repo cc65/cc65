@@ -4,9 +4,15 @@
 ; CC65 runtime: or on longs
 ;
 
-	.export		tosoreax
+	.export		tosor0ax, tosoreax
 	.import		addysp1
 	.importzp	sp, sreg, tmp1
+                                  
+
+tosor0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1 
 
 tosoreax:
        	ldy	#0

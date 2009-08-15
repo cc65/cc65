@@ -4,9 +4,15 @@
 ; CC65 runtime: and on longs
 ;
 
-	.export		tosandeax
+	.export		tosand0ax, tosandeax
 	.import		addysp1
 	.importzp	sp, sreg, tmp1
+
+                                   
+tosand0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
 
 tosandeax:
        	ldy	#0

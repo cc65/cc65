@@ -115,6 +115,11 @@ unsigned OptTransfers3 (CodeSeg* S);
  * store of the first register if this is possible.
  */
 
+unsigned OptTransfers4 (CodeSeg* S);
+/* Replace a load of a register followed by a transfer insn of the same register
+ * by a load of the second register if possible.
+ */
+
 unsigned OptPushPop (CodeSeg* S);
 /* Remove a PHA/PLA sequence were A is not used later */
 

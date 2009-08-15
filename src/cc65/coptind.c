@@ -1397,6 +1397,162 @@ unsigned OptTransfers3 (CodeSeg* S)
 
 
 
+unsigned OptTransfers4 (CodeSeg* S)
+/* Replace a load of a register followed by a transfer insn of the same register
+ * by a load of the second register if possible.
+ */
+{
+    unsigned Changes      = 0;
+    unsigned Load         = 0;  /* Index of load insn */
+    unsigned Xfer         = 0;  /* Index of transfer insn */
+    CodeEntry* LoadEntry  = 0;  /* Pointer to load insn */
+    CodeEntry* XferEntry  = 0;  /* Pointer to xfer insn */
+
+    enum {
+        Searching,
+        FoundLoad,
+        FoundXfer
+    } State = Searching;
+
+    /* Walk over the entries. Look for a load instruction that is followed by
+     * a load later.
+     */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+        switch (State) {
+
+            case Searching:
+                if (E->Info & OF_LOAD) {
+                    /* Found start of sequence */
+                    Load = I;
+                    LoadEntry = E;
+                    State = FoundLoad;
+                }
+                break;
+
+            case FoundLoad:
+                /* If we find a conditional jump, abort the sequence, since
+                 * handling them makes things really complicated.
+                 */
+                if (E->Info & OF_CBRA) {
+
+                    /* Switch back to searching */
+                    I = Load;
+                    State = Searching;
+
+                /* Does this insn use the target register of the load? */
+                } else if ((E->Use & LoadEntry->Chg) != 0) {
+
+                    /* It it's a xfer instruction, and the block is a basic
+                     * block, proceed. Otherwise restart
+                     */
+                    if ((E->Info & OF_XFR) != 0       &&
+                        CS_IsBasicBlock (S, Load, I)) {
+                        Xfer = I;
+                        XferEntry = E;
+                        State = FoundXfer;
+                    } else {
+                        I = Load;
+                        State = Searching;
+                    }
+
+                /* Does this insn change the target register of the load? */
+                } else if (E->Chg & LoadEntry->Chg) {
+
+                    /* We *may* add code here to remove the load, but I'm
+                     * currently not sure about the consequences, so I won't
+                     * do that and bail out instead.
+                     */
+                    I = Load;
+                    State = Searching;
+                }
+                break;
+
+            case FoundXfer:
+                /* We are at the instruction behind the xfer. If the register
+                 * isn't used later, and we have an address mode match, we can
+                 * replace the transfer by a load and remove the initial load.
+                 */
+                if ((GetRegInfo (S, I, LoadEntry->Chg) & LoadEntry->Chg) == 0   &&
+                    (LoadEntry->AM == AM65_ABS || LoadEntry->AM == AM65_ZP)   &&
+                    !MemAccess (S, Load+1, Xfer-1, E->Arg)) {
+
+                    /* Generate the replacement load insn */
+                    CodeEntry* X = 0;
+                    switch (XferEntry->OPC) {
+
+                        case OP65_TXA:                
+                        case OP65_TYA:
+                            X = NewCodeEntry (OP65_LDA,
+                                              LoadEntry->AM,
+                                              LoadEntry->Arg,
+                                              0,
+                                              LoadEntry->LI);
+                            break;
+
+                        case OP65_TAX:
+                            X = NewCodeEntry (OP65_LDX,
+                                              LoadEntry->AM,
+                                              LoadEntry->Arg,
+                                              0,
+                                              LoadEntry->LI);
+                            break;
+
+                        case OP65_TAY:
+                            X = NewCodeEntry (OP65_LDY,
+                                              LoadEntry->AM,
+                                              LoadEntry->Arg,
+                                              0,
+                                              LoadEntry->LI);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    /* If we have a replacement load, change the code */
+                    if (X) {
+                        /* Insert before the xfer insn */
+                        CS_InsertEntry (S, X, Xfer);
+
+                        /* Remove the xfer instead */
+                        CS_DelEntry (S, Xfer+1);
+
+                        /* Remove the initial load */
+                        CS_DelEntry (S, Load);
+
+                        /* Correct I so we continue with the next insn */
+                        I -= 2;
+
+                        /* Remember we had changes */
+                        ++Changes;
+                    } else {
+                        /* Restart after last xfer insn */
+                        I = Xfer;
+                    }
+                } else {
+                    /* Restart after last xfer insn */
+                    I = Xfer;
+                }
+                State = Searching;
+                break;
+
+        }
+
+	/* Next entry */
+	++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 unsigned OptPushPop (CodeSeg* S)
 /* Remove a PHA/PLA sequence were A is not used later */
 {

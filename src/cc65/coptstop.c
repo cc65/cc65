@@ -821,9 +821,17 @@ static int HarmlessCall (const char* Name)
  */
 {
     static const char* Tab[] = {
+        "aslax1",
+        "aslax2",
+        "asrax1",
+        "asrax2",
         "ldaxidx",
         "ldaxysp",
         "negax",
+        "shlax1",
+        "shlax2",
+        "shrax1",
+        "shrax2",
     };
 
     void* R = bsearch (Name,
@@ -837,7 +845,7 @@ static int HarmlessCall (const char* Name)
 
 
 /*****************************************************************************/
-/*  		      	     	     Code                                    */
+/*  	      	      	     	     Code                                    */
 /*****************************************************************************/
 
 

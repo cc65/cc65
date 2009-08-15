@@ -1885,8 +1885,8 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
                         AddCodeLine ("dec %s", lbuf);
                         AddCodeLine ("lda %s", lbuf);
                     } else {
-                       	AddCodeLine ("sec");
                      	AddCodeLine ("lda %s", lbuf);
+                       	AddCodeLine ("sec");
                      	AddCodeLine ("sbc #$%02X", (int)(val & 0xFF));
                      	AddCodeLine ("sta %s", lbuf);
                     }
@@ -1907,9 +1907,9 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
             /* FALLTHROUGH */
 
         case CF_INT:
-            AddCodeLine ("sec");
             if (flags & CF_CONST) {
                	AddCodeLine ("lda %s", lbuf);
+                AddCodeLine ("sec");
           	AddCodeLine ("sbc #$%02X", (unsigned char)val);
           	AddCodeLine ("sta %s", lbuf);
            	if (val < 0x100) {
@@ -1927,6 +1927,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
                 }
             } else {
                 AddCodeLine ("eor #$FF");
+                AddCodeLine ("sec");
                	AddCodeLine ("adc %s", lbuf);
                 AddCodeLine ("sta %s", lbuf);
                 AddCodeLine ("txa");
@@ -1980,12 +1981,13 @@ void g_subeqlocal (unsigned flags, int offs, unsigned long val)
             if (flags & CF_FORCECHAR) {
          	ldyconst (offs);
                 AddCodeLine ("ldx #$00");
-         	AddCodeLine ("sec");
                 if (flags & CF_CONST) {
                     AddCodeLine ("lda (sp),y");
+                    AddCodeLine ("sec");
                     AddCodeLine ("sbc #$%02X", (unsigned char)val);
                 } else {
                     AddCodeLine ("eor #$FF");
+                    AddCodeLine ("sec");
              	    AddCodeLine ("adc (sp),y");
                 }
          	AddCodeLine ("sta (sp),y");
@@ -2964,7 +2966,7 @@ void g_asr (unsigned flags, unsigned long val)
                     }
                     return;
                 } else if (val == 8 && (flags & CF_UNSIGNED)) {
-                    AddCodeLine ("txa");  
+                    AddCodeLine ("txa");
                     AddCodeLine ("ldx sreg");
                     AddCodeLine ("ldy sreg+1");
                     AddCodeLine ("sty sreg");
@@ -3314,15 +3316,22 @@ void g_dec (unsigned flags, unsigned long val)
                        	AddCodeLine ("dex");
                     }
                 } else {
-                    AddCodeLine ("sec");
                     if ((val & 0xFF) != 0) {
+                        AddCodeLine ("sec");
              	       	AddCodeLine ("sbc #$%02X", (unsigned char) val);
+                        AddCodeLine ("pha");
+                        AddCodeLine ("txa");
+                        AddCodeLine ("sbc #$%02X", (unsigned char) (val >> 8));
+                        AddCodeLine ("tax");
+                        AddCodeLine ("pla");
+                    } else {
+                        AddCodeLine ("pha");
+                        AddCodeLine ("txa");
+                        AddCodeLine ("sec");
+                        AddCodeLine ("sbc #$%02X", (unsigned char) (val >> 8));
+                        AddCodeLine ("tax");
+                        AddCodeLine ("pla");
                     }
-                    AddCodeLine ("pha");
-                    AddCodeLine ("txa");
-                    AddCodeLine ("sbc #$%02X", (unsigned char) (val >> 8));
-                    AddCodeLine ("tax");
-                    AddCodeLine ("pla");
                 }
             }
             break;

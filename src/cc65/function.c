@@ -364,9 +364,6 @@ void NewFunc (SymEntry* Func)
     /* Function body now defined */
     Func->Flags |= SC_DEF;
 
-    /* Allocate code and data segments for this function */
-    Func->V.F.Seg = PushSegments (Func);
-
     /* Special handling for main() */
     if (strcmp (Func->Name, "main") == 0) {
         /* Main cannot be a fastcall function */
@@ -394,6 +391,9 @@ void NewFunc (SymEntry* Func)
             g_importmainargs ();
         }
     }
+
+    /* Allocate code and data segments for this function */
+    Func->V.F.Seg = PushSegments (Func);
 
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsQualFastcall (Func->Type) && D->ParamCount > 0) {

@@ -73,6 +73,10 @@ struct FuncInfo {
     unsigned short  Chg;   	/* Changed/destroyed registers */
 };
 
+/* Note for the shift functions: Shifts are done modulo 32, so all shift
+ * routines are marked to use only the A register. The remainder is ignored
+ * anyway.
+ */
 static const FuncInfo FuncInfoTable[] = {
     { "addeq0sp",       REG_AX,               REG_AXY                        },
     { "addeqysp",       REG_AXY,              REG_AXY                        },
@@ -215,12 +219,14 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosadda0",       REG_A,                REG_AXY                        },
     { "tosaddax",       REG_AX,               REG_AXY                        },
     { "tosaddeax",      REG_EAX,              REG_EAXY | REG_TMP1            },
+    { "tosand0ax",      REG_AX,               REG_EAX | REG_TMP1             },
     { "tosanda0",       REG_A,                REG_AXY                        },
     { "tosandax",       REG_AX,               REG_AXY                        },
-    { "tosaslax",       REG_AX,               REG_AXY | REG_TMP1             },
-    { "tosasleax",      REG_EAX,              REG_EAXY | REG_TMP1            },
-    { "tosasrax",       REG_AX,               REG_AXY | REG_TMP1             },
-    { "tosasreax",      REG_EAX,              REG_EAXY | REG_TMP1            },
+    { "tosandeax",      REG_EAX,              REG_EAX | REG_TMP1             },
+    { "tosaslax",       REG_A,                REG_AXY | REG_TMP1             },
+    { "tosasleax",      REG_A,                REG_EAXY | REG_TMP1            },
+    { "tosasrax",       REG_A,                REG_AXY | REG_TMP1             },
+    { "tosasreax",      REG_A,                REG_EAXY | REG_TMP1            },
     { "tosdiv0ax",      REG_AX,               REG_ALL 			     },
     { "tosdiva0",       REG_AY,       	      REG_ALL 			     },
     { "tosdivax",       REG_AXY,              REG_ALL 			     },
@@ -258,8 +264,14 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosnea0",        REG_A,        	      REG_AXY | REG_SREG             },
     { "tosneax",        REG_AX,        	      REG_AXY | REG_SREG             },
     { "tosneeax",       REG_EAX,       	      REG_AXY | REG_PTR1             },
+    { "tosor0ax",       REG_AX,               REG_EAX | REG_TMP1             },
     { "tosora0",        REG_A,        	      REG_AXY | REG_TMP1             },
     { "tosorax",        REG_AX,        	      REG_AXY | REG_TMP1             },
+    { "tosoreax",       REG_EAX,              REG_EAX | REG_TMP1             },
+    { "tosrsub0ax",     REG_AX,               REG_EAX | REG_TMP1             },
+    { "tosrsuba0",      REG_A,                REG_AX | REG_TMP1              },
+    { "tosrsubax",      REG_AX,               REG_AX | REG_TMP1              },
+    { "tosrsubeax",     REG_EAX,              REG_EAX | REG_TMP1             },
     { "tosshlax",       REG_A,                REG_AXY | REG_TMP1             },
     { "tosshleax",      REG_A,         	      REG_EAXY | REG_TMP1            },
     { "tosshrax",       REG_A,                REG_AXY | REG_TMP1             },
@@ -296,6 +308,10 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosumula0",      REG_AX,	       	      REG_ALL			     },
     { "tosumulax",      REG_AX,	       	      REG_ALL			     },
     { "tosumuleax",     REG_EAX,       	      REG_ALL			     },
+    { "tosxor0ax",      REG_AX,               REG_EAX | REG_TMP1             },
+    { "tosxora0",       REG_A,                REG_AX | REG_TMP1              },
+    { "tosxorax",       REG_AX,               REG_AX | REG_TMP1              },
+    { "tosxoreax",      REG_EAX,              REG_EAX | REG_TMP1             },
     { "tsteax",         REG_EAX,              REG_Y                          },
     { "utsteax",        REG_EAX,              REG_Y                          },
 };

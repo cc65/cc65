@@ -84,6 +84,26 @@ static const CallDesc CallTable [] = {
         F_NONE,
         "addeq0sp"
     },{
+        "laddeq",
+        {
+            /*     A               X               Y             SRegLo   */
+                         1,              0, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "laddeq1"
+    },{
+        "laddeq",
+        {
+            /*     A               X               Y             SRegLo   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "laddeqa"
+    },{
         "laddeqysp",
         {
             /*     A               X               Y             SRegLo   */
@@ -133,6 +153,26 @@ static const CallDesc CallTable [] = {
         },
         F_NONE,
         "ldeax0sp"
+    },{
+        "lsubeq",
+        {
+            /*     A               X               Y             SRegLo   */
+                         1,              0, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "lsubeq1"
+    },{
+        "lsubeq",
+        {
+            /*     A               X               Y             SRegLo   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "lsubeqa"
     },{
         "lsubeqysp",
         {
@@ -374,6 +414,16 @@ static const CallDesc CallTable [] = {
         F_NONE,
         "tosanda0"
     },{
+        "tosandeax",
+        {
+            /*     A               X               Y             SRegLo   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "tosand0ax"
+    },{
         "tosdivax",
         {
             /*     A               X               Y             SRegLo   */
@@ -564,6 +614,16 @@ static const CallDesc CallTable [] = {
         F_NONE,
         "tosora0"
     },{
+        "tosoreax",
+        {
+            /*     A               X               Y             SRegLo   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "tosor0ax"
+    },{
         "tosrsubax",
         {
             /*     A               X               Y             SRegLo   */
@@ -573,6 +633,16 @@ static const CallDesc CallTable [] = {
         },
         F_NONE,
         "tosrsuba0"
+    },{
+        "tosrsubeax",
+        {
+            /*     A               X               Y             SRegLo   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "tosrsub0ax"
     },{
         "tossubax",
         {
@@ -703,22 +773,18 @@ static const CallDesc CallTable [] = {
         },
         F_NONE,
         "tosxora0"
+    },{
+        "tosxoreax",
+        {
+            /*     A               X               Y             SRegLo   */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "tosxor0ax"
     },
 
-#if 0
-    "laddeqa",           /* laddeq, sreg = 0, x = 0 */
-    "laddeq1",           /* laddeq, sreg = 0, x = 0, a = 1 */
-    "tosand0ax",         /* tosandeax, sreg = 0 */
-    "tosor0ax",          /* tosoreax, sreg = 0 */
-    "tosrsub0ax",        /* tosrsubeax, sreg = 0 */
-    "tosshl0ax",         /* tosshleax, sreg = 0 */
-    "tosasl0ax",         /* tosasleax, sreg = 0 */
-    "tosshr0ax",         /* tosshreax, sreg = 0 */
-    "tosasr0ax",         /* tosasreax, sreg = 0 */
-    "lsubeqa",           /* lsubeq, sreg = 0, x = 0 */
-    "lsubeq1",           /* lsubeq, sreg = 0, x = 0, a = 1 */
-    "tosxor0ax",         /* tosxoreax, sreg = 0 */
-#endif
 };
 #define CALL_COUNT (sizeof(CallTable) / sizeof(CallTable[0]))
 

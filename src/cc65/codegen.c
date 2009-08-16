@@ -70,7 +70,12 @@
 static void typeerror (unsigned type)
 /* Print an error message about an invalid operand type */
 {
-    Internal ("Invalid type in CF flags: %04X, type = %u", type, type & CF_TYPE);
+    /* Special handling for floats here: */
+    if ((type & CF_TYPE) == CF_FLOAT) {
+        Fatal ("Floating point type is currently unsupported");
+    } else {
+        Internal ("Invalid type in CF flags: %04X, type = %u", type, type & CF_TYPE);
+    }
 }
 
 

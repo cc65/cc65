@@ -7,11 +7,16 @@
 ;
 ; EAX = EAX - TOS
 ;
-	.export		tosrsubeax
+	.export		tosrsub0ax, tosrsubeax
 	.import		addysp1
 	.importzp	sp, sreg, tmp1
 
-tosrsubeax:
+tosrsub0ax:
+        ldy     #$00
+        sty     sreg
+        sty     sreg+1
+
+tosrsubeax:                         
       	ldy	#0
        	sec
 	sbc	(sp),y	       	; byte 0

@@ -728,7 +728,7 @@ unsigned OptPtrLoad7 (CodeSeg* S)
                 CodeLabel* Lab;
 
                 /* asl a */
-                X = NewCodeEntry (OP65_ASL, AM65_IMP, "a", 0, L[0]->LI);
+                X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, L[0]->LI);
                 CS_InsertEntry (S, X, IP++);
 
                 /* Generate clc first, since we need the label */
@@ -756,7 +756,7 @@ unsigned OptPtrLoad7 (CodeSeg* S)
                 CS_InsertEntry (S, X, IP++);
 
                 /* asl a */
-                X = NewCodeEntry (OP65_ASL, AM65_IMP, "a", 0, L[0]->LI);
+                X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, L[0]->LI);
                 CS_InsertEntry (S, X, IP++);
 
                 /* rol tmp1 */

@@ -463,6 +463,382 @@ unsigned OptPtrLoad4 (CodeSeg* S)
 unsigned OptPtrLoad5 (CodeSeg* S)
 /* Search for the sequence:
  *
+ *      jsr     pushax
+ *      ldx     #$00
+ *      lda     yyy
+ *      jsr     tosaddax
+ *      ldy     #$00
+ *      jsr     ldauidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      ldy     yyy
+ *      ldx     #$00
+ *      lda     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[6];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (CE_IsCallTo (L[0], "pushax")                &&
+       	    CS_GetEntries (S, L+1, I+1, 5)     	        &&
+       	    L[1]->OPC == OP65_LDX                       &&
+            CE_IsKnownImm (L[1], 0)                     &&
+            L[2]->OPC == OP65_LDA                       &&
+	    (L[2]->AM == AM65_ABS       ||
+             L[2]->AM == AM65_ZP        ||
+             L[2]->AM == AM65_IMM)                      &&
+            CE_IsCallTo (L[3], "tosaddax")              &&
+            L[4]->OPC == OP65_LDY                       &&
+            CE_IsKnownImm (L[4], 0)                     &&
+            CE_IsCallTo (L[5], "ldauidx")               &&
+       	    !CS_RangeHasLabel (S, I+1, 5)) {
+
+	    CodeEntry* X;
+
+            /* sta ptr1 */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+6);
+
+            /* stx ptr1+1 */
+            X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+7);
+
+            /* ldy yyy */
+            X = NewCodeEntry (OP65_LDY, L[2]->AM, L[2]->Arg, 0, L[2]->LI);
+            CS_InsertEntry (S, X, I+8);
+
+            /* ldx #$00 */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[5]->LI);
+	    CS_InsertEntry (S, X, I+9);
+
+            /* lda (ptr1),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[5]->LI);
+	    CS_InsertEntry (S, X, I+10);
+
+	    /* Remove the old code */
+	    CS_DelEntries (S, I, 6);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPtrLoad6 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      jsr     pushax
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      jsr     tosaddax
+ *      ldy     #$00
+ *      jsr     ldauidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      ldy     xxx
+ *      lda     (sp),y
+ *      tay
+ *      ldx     #$00
+ *      lda     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[7];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (CE_IsCallTo (L[0], "pushax")                &&
+       	    CS_GetEntries (S, L+1, I+1, 6)     	        &&
+            L[1]->OPC == OP65_LDY                       &&
+       	    L[2]->OPC == OP65_LDX                       &&
+            CE_IsKnownImm (L[2], 0)                     &&
+            L[3]->OPC == OP65_LDA                       &&
+	    L[3]->AM == AM65_ZP_INDY                    &&
+            CE_IsCallTo (L[4], "tosaddax")              &&
+            L[5]->OPC == OP65_LDY                       &&
+            CE_IsKnownImm (L[5], 0)                     &&
+            CE_IsCallTo (L[6], "ldauidx")               &&
+       	    !CS_RangeHasLabel (S, I+1, 6)) {
+
+	    CodeEntry* X;
+
+            /* sta ptr1 */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+7);
+
+            /* stx ptr1+1 */
+            X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+8);
+
+            /* ldy yyy */
+            X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+9);
+
+            /* lda (sp),y */
+            X = NewCodeEntry (OP65_LDA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
+            CS_InsertEntry (S, X, I+10);
+
+            /* tay */
+            X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[3]->LI);
+            CS_InsertEntry (S, X, I+11);
+
+            /* ldx #$00 */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[5]->LI);
+	    CS_InsertEntry (S, X, I+12);
+
+            /* lda (ptr1),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+13);
+
+	    /* Remove the old code */
+	    CS_DelEntries (S, I, 7);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPtrLoad7 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      jsr     aslax1/shlax1
+ *      clc
+ *      adc     xxx
+ *      tay
+ *      txa
+ *      adc     yyy
+ *      tax
+ *      tya
+ *      ldy     zzz
+ *      jsr     ldaxidx
+ *
+ * and replace it by:
+ *
+ *      stx     tmp1
+ *      asl     a
+ *      rol     tmp1
+ *      clc
+ *      adc     xxx
+ *      sta     ptr1
+ *      lda     tmp1
+ *      adc     yyy
+ *      sta     ptr1+1
+ *      ldy     zzz
+ *      lda     (ptr1),y
+ *      tax
+ *      dey
+ *      lda     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[10];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+        if (L[0]->OPC == OP65_JSR                               &&
+            (strcmp (L[0]->Arg, "aslax1") == 0          ||
+             strcmp (L[0]->Arg, "shlax1") == 0)                 &&
+       	    CS_GetEntries (S, L+1, I+1, 9)     	                &&
+            L[1]->OPC == OP65_CLC                               &&
+       	    L[2]->OPC == OP65_ADC                               &&
+            L[3]->OPC == OP65_TAY                               &&
+            L[4]->OPC == OP65_TXA                               &&
+            L[5]->OPC == OP65_ADC                               &&
+            L[6]->OPC == OP65_TAX                               &&
+            L[7]->OPC == OP65_TYA                               &&
+            L[8]->OPC == OP65_LDY                               &&
+            CE_IsCallTo (L[9], "ldaxidx")                       &&
+       	    !CS_RangeHasLabel (S, I+1, 9)) {
+
+	    CodeEntry* X;
+
+            /* Track the insertion point */
+            unsigned IP = I + 10;
+
+
+            /* If X is zero on entry to aslax1, we can generate:
+             *
+             *      asl     a
+             *      bcc     L1
+             *      inx
+             * L1:  clc
+             *
+             * instead of the code above. "lda tmp1" needs to be changed
+             * to "txa" in this case.
+             */
+            int ShortCode = (L[0]->RI->In.RegX == 0);
+
+            if (ShortCode) {
+
+                CodeLabel* Lab;
+
+                /* asl a */
+                X = NewCodeEntry (OP65_ASL, AM65_IMP, "a", 0, L[0]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                /* Generate clc first, since we need the label */
+                X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[1]->LI);
+                CS_InsertEntry (S, X, IP);
+
+                /* Get the label */
+                Lab = CS_GenLabel (S, X);
+
+                /* bcc Lab */
+                X = NewCodeEntry (OP65_BCC, AM65_BRA, Lab->Name, Lab, L[0]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                /* inx */
+                X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, L[0]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                /* Skip the clc insn */
+                ++IP;
+
+            } else {
+
+                /* stx tmp1 */
+                X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                /* asl a */
+                X = NewCodeEntry (OP65_ASL, AM65_IMP, "a", 0, L[0]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                /* rol tmp1 */
+                X = NewCodeEntry (OP65_ROL, AM65_ZP, "tmp1", 0, L[0]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                /* clc */
+                X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[1]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+            }
+
+            /* adc xxx */
+            X = NewCodeEntry (L[2]->OPC, L[2]->AM, L[2]->Arg, 0, L[2]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* sta ptr1 */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[9]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            if (ShortCode) {
+                /* txa */
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[4]->LI);
+            } else {
+                /* lda tmp1 */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP, "tmp1", 0, L[4]->LI);
+            }
+            CS_InsertEntry (S, X, IP++);
+
+            /* adc xxx */
+            X = NewCodeEntry (L[5]->OPC, L[5]->AM, L[5]->Arg, 0, L[5]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* sta ptr1+1 */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[9]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* ldy zzz */
+            X = NewCodeEntry (L[8]->OPC, L[8]->AM, L[8]->Arg, 0, L[8]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* lda (ptr1),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[9]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* tax */
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[9]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* dey */
+            X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[9]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* lda (ptr1),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[9]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+	    /* Remove the old code */
+	    CS_DelEntries (S, I, 10);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPtrLoad11 (CodeSeg* S)
+/* Search for the sequence:
+ *
  *      clc
  *      adc     xxx
  *      bcc     L
@@ -547,7 +923,7 @@ unsigned OptPtrLoad5 (CodeSeg* S)
 
 
 
-unsigned OptPtrLoad6 (CodeSeg* S)
+unsigned OptPtrLoad12 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      lda     regbank+n
@@ -692,7 +1068,7 @@ unsigned OptPtrLoad6 (CodeSeg* S)
 
 
 
-unsigned OptPtrLoad7 (CodeSeg* S)
+unsigned OptPtrLoad13 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      lda     zp
@@ -760,7 +1136,7 @@ unsigned OptPtrLoad7 (CodeSeg* S)
 
 
 
-unsigned OptPtrLoad8 (CodeSeg* S)
+unsigned OptPtrLoad14 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      lda     zp
@@ -778,7 +1154,6 @@ unsigned OptPtrLoad8 (CodeSeg* S)
  *      ldx     #$00
  *      lda     (zp),y
  *
- * Must execute before OptPtrLoad10!
  */
 {
     unsigned Changes = 0;
@@ -841,7 +1216,7 @@ unsigned OptPtrLoad8 (CodeSeg* S)
 
 
 
-unsigned OptPtrLoad9 (CodeSeg* S)
+unsigned OptPtrLoad15 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      lda     zp
@@ -919,7 +1294,7 @@ unsigned OptPtrLoad9 (CodeSeg* S)
 
 
 
-unsigned OptPtrLoad10 (CodeSeg* S)
+unsigned OptPtrLoad16 (CodeSeg* S)
 /* Search for the sequence
  *
  *      ldy     ...
@@ -988,7 +1363,7 @@ unsigned OptPtrLoad10 (CodeSeg* S)
 
 
 
-unsigned OptPtrLoad11 (CodeSeg* S)
+unsigned OptPtrLoad17 (CodeSeg* S)
 /* Search for the sequence
  *
  *      ldy     ...

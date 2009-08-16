@@ -1033,13 +1033,16 @@ static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",    	100, 0, 
 static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",    	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	 92, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	 50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad7    	= { OptPtrLoad7,     "OptPtrLoad7",    	 65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad8    	= { OptPtrLoad8,     "OptPtrLoad8",    	108, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad9    	= { OptPtrLoad9,     "OptPtrLoad9",    	 86, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad10   	= { OptPtrLoad10,    "OptPtrLoad10",   	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad11   	= { OptPtrLoad11,    "OptPtrLoad11",    190, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	 50, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	 60, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad7    	= { OptPtrLoad7,     "OptPtrLoad7",    	140, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad11   	= { OptPtrLoad11,    "OptPtrLoad11",     92, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad12   	= { OptPtrLoad12,    "OptPtrLoad12",    50, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad13   	= { OptPtrLoad13,    "OptPtrLoad13",    65, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad14   	= { OptPtrLoad14,    "OptPtrLoad14",   	108, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad15   	= { OptPtrLoad15,    "OptPtrLoad15",   	 86, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad16   	= { OptPtrLoad16,    "OptPtrLoad16",   	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad17   	= { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",     40, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
@@ -1107,16 +1110,19 @@ static OptFunc* OptFuncs[] = {
     &DOptNegAX4,
     &DOptPrecalc,
     &DOptPtrLoad1,
-    &DOptPtrLoad10,
     &DOptPtrLoad11,
+    &DOptPtrLoad12,
+    &DOptPtrLoad13,
+    &DOptPtrLoad14,
+    &DOptPtrLoad15,
+    &DOptPtrLoad16,
+    &DOptPtrLoad17,
     &DOptPtrLoad2,
     &DOptPtrLoad3,
     &DOptPtrLoad4,
     &DOptPtrLoad5,
     &DOptPtrLoad6,
     &DOptPtrLoad7,
-    &DOptPtrLoad8,
-    &DOptPtrLoad9,
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPush1,
@@ -1390,10 +1396,13 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad5, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad7, 1);
-    Changes += RunOptFunc (S, &DOptPtrLoad8, 1);
-    Changes += RunOptFunc (S, &DOptPtrLoad9, 1);
-    Changes += RunOptFunc (S, &DOptPtrLoad10, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad11, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad12, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad13, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad14, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad15, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad16, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad17, 1);
     Changes += RunOptFunc (S, &DOptNegAX1, 1);
     Changes += RunOptFunc (S, &DOptNegAX2, 1);
     Changes += RunOptFunc (S, &DOptNegAX3, 1);

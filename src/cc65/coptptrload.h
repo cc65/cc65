@@ -145,6 +145,77 @@ unsigned OptPtrLoad4 (CodeSeg* S);
 unsigned OptPtrLoad5 (CodeSeg* S);
 /* Search for the sequence:
  *
+ *      jsr     pushax
+ *      ldx     #$00
+ *      lda     yyy
+ *      jsr     tosaddax
+ *      ldy     #$00
+ *      jsr     ldauidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      ldy     yyy
+ *      lda     (ptr1),y
+ */
+
+unsigned OptPtrLoad6 (CodeSeg* S);
+/* Search for the sequence:
+ *
+ *      jsr     pushax
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      jsr     tosaddax
+ *      ldy     #$00
+ *      jsr     ldauidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      ldy     xxx
+ *      lda     (sp),y
+ *      tay
+ *      lda     (ptr1),y
+ */
+
+unsigned OptPtrLoad7 (CodeSeg* S);
+/* Search for the sequence:
+ *
+ *      jsr     aslax1/shlax1
+ *      clc
+ *      adc     xxx
+ *      tay
+ *      txa
+ *      adc     yyy
+ *      tax
+ *      tya
+ *      ldy     zzz
+ *      jsr     ldaxidx
+ *
+ * and replace it by:
+ *
+ *      stx     tmp1
+ *      asl     a
+ *      rol     tmp1
+ *      clc
+ *      adc     xxx
+ *      sta     ptr1
+ *      lda     tmp1
+ *      adc     yyy
+ *      sta     ptr1+1
+ *      ldy     zzz
+ *      lda     (ptr1),y
+ *      tax
+ *      dey
+ *      lda     (ptr1),y
+ */
+
+unsigned OptPtrLoad11 (CodeSeg* S);
+/* Search for the sequence:
+ *
  *      clc
  *      adc     xxx
  *      bcc     L
@@ -161,8 +232,8 @@ unsigned OptPtrLoad5 (CodeSeg* S);
  *      lda     (ptr1),y
  */
 
-unsigned OptPtrLoad6 (CodeSeg* S);
-/* Search for the sequence:
+unsigned OptPtrLoad12 (CodeSeg* S);
+/* Search for the sequence:       
  *
  *      lda     regbank+n
  *      ldx     regbank+n+1
@@ -193,7 +264,7 @@ unsigned OptPtrLoad6 (CodeSeg* S);
  *
  */
 
-unsigned OptPtrLoad7 (CodeSeg* S);
+unsigned OptPtrLoad13 (CodeSeg* S);
 /* Search for the sequence:
  *
  *      lda     zp
@@ -208,7 +279,7 @@ unsigned OptPtrLoad7 (CodeSeg* S);
  *      lda     (zp),y
  */
 
-unsigned OptPtrLoad8 (CodeSeg* S);
+unsigned OptPtrLoad14 (CodeSeg* S);
 /* Search for the sequence:
  *
  *      lda     zp
@@ -229,7 +300,7 @@ unsigned OptPtrLoad8 (CodeSeg* S);
  * Must execute before OptPtrLoad10!
  */
 
-unsigned OptPtrLoad9 (CodeSeg* S);
+unsigned OptPtrLoad15 (CodeSeg* S);
 /* Search for the sequence:
  *
  *      lda     zp
@@ -246,7 +317,7 @@ unsigned OptPtrLoad9 (CodeSeg* S);
  *      lda     (zp),y
  */
 
-unsigned OptPtrLoad10 (CodeSeg* S);
+unsigned OptPtrLoad16 (CodeSeg* S);
 /* Search for the sequence
  *
  *      ldy     ...
@@ -263,7 +334,7 @@ unsigned OptPtrLoad10 (CodeSeg* S);
  * This step must be executed *after* OptPtrLoad1!
  */
 
-unsigned OptPtrLoad11 (CodeSeg* S);
+unsigned OptPtrLoad17 (CodeSeg* S);
 /* Search for the sequence
  *
  *      ldy     ...

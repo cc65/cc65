@@ -1371,9 +1371,9 @@ unsigned OptPtrLoad17 (CodeSeg* S)
  *
  * and replace it by:
  *
- *      ldy     ...
  *      sta     ptr1
  *      stx     ptr1+1
+ *      ldy     ...
  *      lda     (ptr1),y
  *      tax
  *      dey
@@ -1406,30 +1406,34 @@ unsigned OptPtrLoad17 (CodeSeg* S)
 
        	    /* Store the high byte */
        	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-    	    CS_InsertEntry (S, X, I+1);
+    	    CS_InsertEntry (S, X, I+2);
 
     	    /* Store the low byte */
     	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
-    	    CS_InsertEntry (S, X, I+2);
+    	    CS_InsertEntry (S, X, I+3);
+
+            /* ldy ... */
+            X = NewCodeEntry (L[0]->OPC, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+4);
 
             /* lda (ptr1),y */
             X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[1]->LI);
-            CS_InsertEntry (S, X, I+3);
+            CS_InsertEntry (S, X, I+5);
 
             /* tax */
             X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[1]->LI);
-            CS_InsertEntry (S, X, I+4);
+            CS_InsertEntry (S, X, I+6);
 
             /* dey */
             X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[1]->LI);
-            CS_InsertEntry (S, X, I+5);
+            CS_InsertEntry (S, X, I+7);
 
             /* lda (ptr1),y */
             X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[1]->LI);
-            CS_InsertEntry (S, X, I+6);
+            CS_InsertEntry (S, X, I+8);
 
-    	    /* Delete the call to ldaxidx */
-    	    CS_DelEntry (S, I+7);
+    	    /* Delete original sequence */
+    	    CS_DelEntries (S, I, 2);
 
 	    /* Remember, we had changes */
 	    ++Changes;

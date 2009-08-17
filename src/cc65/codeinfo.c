@@ -68,15 +68,15 @@ static const char CmpSuffixTab [][4] = {
  */
 typedef struct FuncInfo FuncInfo;
 struct FuncInfo {
-    const char*	    Name;	/* Function name */
-    unsigned short  Use;	/* Register usage */
-    unsigned short  Chg;   	/* Changed/destroyed registers */
+    const char*	    Name;    	/* Function name */
+    unsigned short  Use;     	/* Register usage */
+    unsigned short  Chg;     	/* Changed/destroyed registers */
 };
 
 /* Note for the shift functions: Shifts are done modulo 32, so all shift
  * routines are marked to use only the A register. The remainder is ignored
  * anyway.
- */
+ */                          
 static const FuncInfo FuncInfoTable[] = {
     { "addeq0sp",       REG_AX,               REG_AXY                        },
     { "addeqysp",       REG_AXY,              REG_AXY                        },
@@ -228,8 +228,8 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosasrax",       REG_A,                REG_AXY | REG_TMP1             },
     { "tosasreax",      REG_A,                REG_EAXY | REG_TMP1            },
     { "tosdiv0ax",      REG_AX,               REG_ALL 			     },
-    { "tosdiva0",       REG_AY,       	      REG_ALL 			     },
-    { "tosdivax",       REG_AXY,              REG_ALL 			     },
+    { "tosdiva0",       REG_A,                REG_ALL 			     },
+    { "tosdivax",       REG_AX,               REG_ALL 			     },
     { "tosdiveax",      REG_EAX,              REG_ALL 			     },
     { "toseq00",        REG_NONE,      	      REG_AXY | REG_SREG             },
     { "toseqa0",        REG_A,        	      REG_AXY | REG_SREG             },
@@ -257,7 +257,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosmod0ax",      REG_AX,               REG_ALL 			     },
     { "tosmodeax",      REG_EAX,              REG_ALL 			     },
     { "tosmul0ax",      REG_AX,       	      REG_ALL 			     },
-    { "tosmula0",       REG_AX,	       	      REG_ALL 			     },
+    { "tosmula0",       REG_A,	       	      REG_ALL 			     },
     { "tosmulax",       REG_AX,	       	      REG_ALL 			     },
     { "tosmuleax",      REG_EAX,       	      REG_ALL 			     },
     { "tosne00",        REG_NONE,      	      REG_AXY | REG_SREG             },
@@ -305,7 +305,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "tosumodax",      REG_AX,               REG_EAXY | REG_PTR1            }, /* also ptr4 */
     { "tosumodeax",     REG_EAX,              REG_ALL & ~REG_SAVE            },
     { "tosumul0ax",     REG_AX,       	      REG_ALL			     },
-    { "tosumula0",      REG_AX,	       	      REG_ALL			     },
+    { "tosumula0",      REG_A,                REG_ALL			     },
     { "tosumulax",      REG_AX,	       	      REG_ALL			     },
     { "tosumuleax",     REG_EAX,       	      REG_ALL			     },
     { "tosxor0ax",      REG_AX,               REG_EAX | REG_TMP1             },

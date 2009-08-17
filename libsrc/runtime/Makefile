@@ -152,6 +152,7 @@ OBJS = 	add.o		\
        	makebool.o	\
        	mod.o  		\
        	mul.o  		\
+        mul8.o          \
 	mulax3.o	\
 	mulax5.o	\
 	mulax6.o	\

@@ -82,25 +82,31 @@ struct StackOpData {
     /* ZP register usage inside the sequence */
     unsigned            UsedRegs;
 
-    /* Several indices if insns in the code segment */
+    /* Several indices of insns in the code segment */
     int                 LoadAIndex;     /* Index of load insns, -1 = invalid */
     int                 LoadXIndex;
     int                 LoadYIndex;
     int                 PushIndex;      /* Index of call to pushax in codeseg */
     int                 OpIndex;        /* Index of actual operation */
 
+    /* Pointers to insns in the code segment */
+    CodeEntry*          LoadAEntry;     /* Entry that loads A or NULL */
+    CodeEntry*          LoadXEntry;     /* Entry that loads X or NULL */
     CodeEntry*          PrevEntry;      /* Entry before the call to pushax */
     CodeEntry*          PushEntry;      /* Pointer to entry with call to pushax */
     CodeEntry*          OpEntry;        /* Pointer to entry with op */
     CodeEntry*          NextEntry;      /* Entry after the op */
+
     const char*         ZPLo;           /* Lo byte of zero page loc to use */
     const char*         ZPHi;           /* Hi byte of zero page loc to use */
     unsigned            IP;             /* Insertion point used by some routines */
 };
 
-/* Flags returned by DirectOp */
-#define OP_DIRECT       0x01            /* Direct op may be used */
-#define OP_RELOAD_Y     0x02            /* Must reload index register Y */
+/* Flags set by DirectOp */
+#define OP_LO_DIRECT    0x01            /* Direct op may be used for lo byte */
+#define OP_LO_RELOAD_Y  0x02            /* Reload index register Y for lo byte */
+#define OP_HI_DIRECT    0x04            /* Direct op may be used for hi byte */
+#define OP_HI_RELOAD_Y  0x08            /* Reload index register Y for hi byte */
 
 
 
@@ -224,22 +230,20 @@ static void DelEntry (StackOpData* D, int Index)
 
 
 
-static void CheckDirectOp (StackOpData* D)
+static unsigned CheckOneDirectOp (CodeEntry* E, unsigned Direct, unsigned Reload)
 /* Check if the given entry is a lda instruction with an addressing mode
  * that allows us to replace it by another operation (like ora). If so, we may
  * use this location for the or and must not save the value in the zero
  * page location.
  */
 {
-    /* We need the entry before the push */
-    CodeEntry* E;
-    CHECK ((E = D->PrevEntry) != 0);
-
-    if (E->OPC == OP65_LDA) {
+    /* Check the load entry */
+    if (E) {
         if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
             /* These insns are all ok and replaceable */
-            D->Flags |= OP_DIRECT;
-        } else if (E->AM == AM65_ZP_INDY && RegValIsKnown (E->RI->In.RegY) &&
+            return Direct;
+        } else if (E->AM == AM65_ZP_INDY &&
+                   RegValIsKnown (E->RI->In.RegY) &&
                    strcmp (E->Arg, "sp") == 0) {
             /* A load from the stack with known offset is also ok, but in this
              * case we must reload the index register later. Please note that
@@ -247,9 +251,26 @@ static void CheckDirectOp (StackOpData* D)
              * these locations may change between the push and the actual
              * operation.
              */
-            D->Flags |= (OP_DIRECT | OP_RELOAD_Y);
+            return Reload;
         }
     }
+
+    /* Nothing found */
+    return 0;
+}
+
+
+
+static void CheckDirectOp (StackOpData* D)
+/* Check if the given entry is a lda instruction with an addressing mode
+ * that allows us to replace it by another operation (like ora). If so, we may
+ * use this location for the or and must not save the value in the zero
+ * page location.
+ */
+{
+    /* Check flags for A and X load instructions */
+    D->Flags |= CheckOneDirectOp (D->LoadAEntry, OP_LO_DIRECT, OP_LO_RELOAD_Y);
+    D->Flags |= CheckOneDirectOp (D->LoadXEntry, OP_HI_DIRECT, OP_HI_RELOAD_Y);
 }
 
 
@@ -263,10 +284,14 @@ static void ReplacePushByStore (StackOpData* D)
 {
     CodeEntry* X;
 
-    /* Store the value into the zeropage instead of pushing it */
-    X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
-    InsertEntry (D, X, D->PushIndex+1);
-    if ((D->Flags & OP_DIRECT) == 0) {
+    /* Store the value into the zeropage instead of pushing it. Check high
+     * byte first so that the store is later in A/X order.
+     */
+    if ((D->Flags & OP_HI_DIRECT) == 0) {
+        X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
+        InsertEntry (D, X, D->PushIndex+1);
+    }
+    if ((D->Flags & OP_LO_DIRECT) == 0) {
      	X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
        	InsertEntry (D, X, D->PushIndex+1);
     }
@@ -282,19 +307,20 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
 {
     CodeEntry* X;
 
-    if ((D->Flags & OP_DIRECT) != 0) {
+    if ((D->Flags & OP_LO_DIRECT) != 0) {
        	/* Op with a variable location. If the location is on the stack, we
          * need to reload the Y register.
          */
-        if ((D->Flags & OP_RELOAD_Y) != 0) {
-            const char* Arg = MakeHexArg (D->PrevEntry->RI->In.RegY);
+        CodeEntry* LoadA = D->LoadAEntry;
+        if ((D->Flags & OP_LO_RELOAD_Y) != 0) {
+            const char* Arg = MakeHexArg (LoadA->RI->In.RegY);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
         }
-	X = NewCodeEntry (OPC, D->PrevEntry->AM, D->PrevEntry->Arg, 0, D->OpEntry->LI);
+   	X = NewCodeEntry (OPC, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
     } else {
-	/* Op with temp storage */
-	X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+   	/* Op with temp storage */
+   	X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->IP++);
 }
@@ -309,16 +335,37 @@ static void AddOpHigh (StackOpData* D, opc_t OPC)
 {
     CodeEntry* X;
 
-    /* High byte is unknown */
-    X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+    /* pha */
+    X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
+
+    /* txa */
     X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
-    X = NewCodeEntry (OPC, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
+
+    if ((D->Flags & OP_HI_DIRECT) != 0) {
+        CodeEntry* LoadX = D->LoadXEntry;
+        if ((D->Flags & OP_HI_RELOAD_Y) != 0) {
+            /* ldy #const */
+            const char* Arg = MakeHexArg (LoadX->RI->In.RegY);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        }
+        /* opc xxx */
+   	X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    } else {
+        /* opc zphi */
+        X = NewCodeEntry (OPC, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* tax */
     X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
-    X = NewCodeEntry (OP65_LDA, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+
+    /* pla */
+    X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 }
 
@@ -334,31 +381,36 @@ static void RemovePushAndOp (StackOpData* D)
 
 
 static int IsRegVar (StackOpData* D)
-/* If the value pushed is that of a register variable, replace ZPLo and ZPHi
- * in the given StackOpData struct by the register variables and return true.
- * Otherwise leave D untouched and return false.
+/* If the value pushed is that of a zeropage variable, replace ZPLo and ZPHi
+ * in the given StackOpData struct by the variable and return true. Otherwise
+ * leave D untouched and return false.
  */
 {
-    CodeEntry* P;
+    CodeEntry*  LoadA = D->LoadAEntry;
+    CodeEntry*  LoadX = D->LoadXEntry;
+    unsigned    Len;
 
-    if (D->PushIndex >= 2                                &&
-        (P = D->PrevEntry) != 0                          &&
-        P->OPC == OP65_LDX                               &&
-        P->AM == AM65_ZP                                 &&
-        strncmp (P->Arg, "regbank+", 7) == 0             &&
-        IsDigit (P->Arg[8])                              &&
-        (P = CS_GetEntry (D->Code, D->PushIndex-2)) != 0 &&
-        P->OPC == OP65_LDA                               &&
-        P->AM == AM65_ZP                                 &&
-        strncmp (P->Arg, "regbank+", 7) == 0             &&
-        IsDigit (P->Arg[8])) {
-        /* Ok, it loads the register variable */
-        D->ZPHi = D->PrevEntry->Arg;
-        D->ZPLo = P->Arg;
-        return 1;
-    } else {
+    /* Must have both load insns */
+    if (LoadA == 0 || LoadX == 0) {
         return 0;
     }
+
+    /* Must be loads from zp */
+    if (LoadA->AM != AM65_ZP || LoadX->AM != AM65_ZP) {
+        return 0;
+    }
+
+    /* Must be the same zp loc with high byte in X */
+    Len = strlen (LoadA->Arg);
+    if (strncmp (LoadA->Arg, LoadX->Arg, Len) != 0      ||
+        strcmp (LoadX->Arg + Len, "+1") != 0) {
+        return 0;
+    }
+
+    /* Use the zero page location directly */
+    D->ZPLo = LoadA->Arg;
+    D->ZPHi = LoadX->Arg;
+    return 1;
 }
 
 
@@ -397,48 +449,57 @@ static unsigned Opt___bzero (StackOpData* D)
      */
     if (D->OpEntry->RI->In.RegA != 0) {
 
+        /* lda #$00 */
+        X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->OpIndex+1);
+
         /* The value of A is known */
         if (D->OpEntry->RI->In.RegA <= 0x81) {
 
             /* Loop using the sign bit */
-            X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->OpIndex+1);
 
+            /* ldy #count-1 */
 	    Arg = MakeHexArg (D->OpEntry->RI->In.RegA - 1);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+2);
 
+            /* L: sta (zp),y */
             X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+3);
             L = CS_GenLabel (D->Code, X);
 
+            /* dey */
             X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+4);
 
+            /* bpl L */
             X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+5);
 
         } else {
 
             /* Loop using an explicit compare */
-            X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->OpIndex+1);
 
+            /* ldy #$00 */
             X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+2);
 
+            /* L: sta (zp),y */
             X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+3);
             L = CS_GenLabel (D->Code, X);
 
+            /* iny */
             X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+4);
 
+            /* cpy #count */
 	    Arg = MakeHexArg (D->OpEntry->RI->In.RegA);
             X = NewCodeEntry (OP65_CPY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+5);
 
-            X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, D->OpEntry->LI);
+            /* bne L */
+            X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+6);
         }
 
@@ -489,27 +550,39 @@ static unsigned Opt_staxspidx (StackOpData* D)
     }
 
     /* Inline the store */
+
+    /* sta (zp),y */
     X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+1);
+
     if (RegValIsKnown (D->OpEntry->RI->In.RegY)) {
         /* Value of Y is known */
-	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
+       	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
        	X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
         X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->OpIndex+2);
+
     if (RegValIsKnown (D->OpEntry->RI->In.RegX)) {
-	/* Value of X is known */
-	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
+       	/* Value of X is known */
+       	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
        	X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
-     	/* Value unknown */
-     	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
+       	/* Value unknown */
+       	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->OpIndex+3);
+
+    /* sta (zp),y */
     X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+4);
+
+    /* If we remove staspidx, we must restore the Y register to what the
+     * function would return.
+     */
+    X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->OpIndex+5);
 
     /* Remove the push and the call to the staxspidx function */
     RemovePushAndOp (D);
@@ -598,6 +671,8 @@ static unsigned Opt_tosaddax (StackOpData* D)
 
         /* Inline the add */
         D->IP = D->OpIndex+1;
+
+        /* clc */
         X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
@@ -723,6 +798,43 @@ static unsigned Opt_tosorax (StackOpData* D)
 
 
 
+static unsigned Opt_tossubax (StackOpData* D)
+/* Optimize the tossubax sequence if possible */
+{
+    CodeEntry*  X;
+
+    /* Check the load entry before the push. If it's a lda instruction with an
+     * addressing mode that allows us to replace it, we may use this
+     * location for the op and must not save the value in the zero page
+     * location.
+     */
+    CheckDirectOp (D);
+
+    /* Store the value into the zeropage instead of pushing it */
+    ReplacePushByStore (D);
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* sec */
+    X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Low byte */
+    AddOpLow (D, OP65_SBC);
+
+    /* High byte */
+    AddOpHigh (D, OP65_SBC);
+
+    /* Remove the push and the call to the tosaddax function */
+    RemovePushAndOp (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_tosxorax (StackOpData* D)
 /* Optimize the tosxorax sequence if possible */
 {
@@ -776,6 +888,7 @@ static const OptFuncDesc FuncTable[] = {
     { "tosaddax",   Opt_tosaddax,  STOP_NONE                    },
     { "tosandax",   Opt_tosandax,  STOP_NONE                    },
     { "tosorax",    Opt_tosorax,   STOP_NONE                    },
+    { "tossubax",   Opt_tossubax,  STOP_NONE                    },
     { "tosxorax",   Opt_tosxorax,  STOP_NONE                    },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
@@ -849,6 +962,9 @@ static void ResetStackOpData (StackOpData* Data)
     Data->PushIndex  = -1;
     Data->OpIndex    = -1;
 
+    Data->LoadAEntry = 0;
+    Data->LoadXEntry = 0;
+
     Data->UsedRegs   = REG_NONE;
 }
 
@@ -876,7 +992,10 @@ static int PreCondOk (StackOpData* D)
     }
 
     /* Determine the zero page locations to use */
-    if ((D->UsedRegs & REG_SREG) == REG_NONE) {
+    if ((D->UsedRegs & REG_PTR1) == REG_NONE) {
+        D->ZPLo = "ptr1";
+        D->ZPHi = "ptr1+1";
+    } else if ((D->UsedRegs & REG_SREG) == REG_NONE) {
         D->ZPLo = "sreg";
         D->ZPHi = "sreg+1";
     } else if ((D->UsedRegs & REG_PTR1) == REG_NONE) {
@@ -1061,6 +1180,12 @@ unsigned OptStackOps (CodeSeg* S)
                 AdjustStackOffset (&Data, 2);
 
                 /* Prepare the remainder of the data structure */
+                if (Data.LoadAIndex >= 0) {
+                    Data.LoadAEntry = CS_GetEntry (S, Data.LoadAIndex);
+                }
+                if (Data.LoadXIndex >= 0) {
+                    Data.LoadXEntry = CS_GetEntry (S, Data.LoadXIndex);
+                }
                 Data.PrevEntry = CS_GetPrevEntry (S, Data.PushIndex);
                 Data.PushEntry = CS_GetEntry (S, Data.PushIndex);
                 Data.OpEntry   = CS_GetEntry (S, Data.OpIndex);

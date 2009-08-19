@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 2001-2009 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -66,9 +66,21 @@ typedef struct StackOpData StackOpData;
 typedef unsigned (*OptFunc) (StackOpData* D);
 typedef struct OptFuncDesc OptFuncDesc;
 struct OptFuncDesc {
-    const char*     Name;   /* Name of the replaced runtime function */
-    OptFunc         Func;   /* Function pointer */
-    STOP_FLAGS      Flags;  /* Flags */
+    const char*         Name;           /* Name of the replaced runtime function */
+    OptFunc             Func;           /* Function pointer */
+    STOP_FLAGS          Flags;          /* Flags */
+};
+
+/* LoadData flags set by DirectOp */
+#define LD_DIRECT       0x01            /* Direct op may be used */
+#define LD_RELOAD_Y     0x02            /* Reload index register Y */
+#define LD_REMOVE       0x04            /* Load may be removed */
+
+/* Structure that tells us how to load the lhs values */
+typedef struct LoadData LoadData;
+struct LoadData {
+    unsigned char       Flags;          /* Tells us how to load */
+    unsigned char       Offs;           /* Stack offset if data is on stack */
 };
 
 /* Structure that holds the needed data */
@@ -97,16 +109,15 @@ struct StackOpData {
     CodeEntry*          OpEntry;        /* Pointer to entry with op */
     CodeEntry*          NextEntry;      /* Entry after the op */
 
+    /* Stack offsets if the lhs is loaded from stack */
+    LoadData            AData;
+    LoadData            XData;
+
+
     const char*         ZPLo;           /* Lo byte of zero page loc to use */
     const char*         ZPHi;           /* Hi byte of zero page loc to use */
     unsigned            IP;             /* Insertion point used by some routines */
 };
-
-/* Flags set by DirectOp */
-#define OP_LO_DIRECT    0x01            /* Direct op may be used for lo byte */
-#define OP_LO_RELOAD_Y  0x02            /* Reload index register Y for lo byte */
-#define OP_HI_DIRECT    0x04            /* Direct op may be used for hi byte */
-#define OP_HI_RELOAD_Y  0x08            /* Reload index register Y for hi byte */
 
 
 
@@ -230,7 +241,7 @@ static void DelEntry (StackOpData* D, int Index)
 
 
 
-static unsigned CheckOneDirectOp (CodeEntry* E, unsigned Direct, unsigned Reload)
+static void CheckOneDirectOp (CodeEntry* E, LoadData* L, unsigned char Offs)
 /* Check if the given entry is a lda instruction with an addressing mode
  * that allows us to replace it by another operation (like ora). If so, we may
  * use this location for the or and must not save the value in the zero
@@ -239,9 +250,19 @@ static unsigned CheckOneDirectOp (CodeEntry* E, unsigned Direct, unsigned Reload
 {
     /* Check the load entry */
     if (E) {
-        if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
+        /* Must check the call first since addressing mode is ABS, so second
+         * "if" will catch otherwise.
+         */
+        if (CE_IsCallTo (E, "ldaxysp")) {
+            /* Same as single loads from stack. Since we must distinguish
+             * between A and X here, the necessary offset is passed to the
+             * function as a parameter.
+             */
+            L->Offs = (unsigned char) E->RI->In.RegY - Offs;
+            L->Flags |= (LD_DIRECT | LD_RELOAD_Y);
+        } else if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
             /* These insns are all ok and replaceable */
-            return Direct;
+            L->Flags |= LD_DIRECT;
         } else if (E->AM == AM65_ZP_INDY &&
                    RegValIsKnown (E->RI->In.RegY) &&
                    strcmp (E->Arg, "sp") == 0) {
@@ -251,12 +272,10 @@ static unsigned CheckOneDirectOp (CodeEntry* E, unsigned Direct, unsigned Reload
              * these locations may change between the push and the actual
              * operation.
              */
-            return Reload;
+            L->Offs  = (unsigned char) E->RI->In.RegY;
+            L->Flags |= (LD_DIRECT | LD_RELOAD_Y);
         }
     }
-
-    /* Nothing found */
-    return 0;
 }
 
 
@@ -269,8 +288,8 @@ static void CheckDirectOp (StackOpData* D)
  */
 {
     /* Check flags for A and X load instructions */
-    D->Flags |= CheckOneDirectOp (D->LoadAEntry, OP_LO_DIRECT, OP_LO_RELOAD_Y);
-    D->Flags |= CheckOneDirectOp (D->LoadXEntry, OP_HI_DIRECT, OP_HI_RELOAD_Y);
+    CheckOneDirectOp (D->LoadAEntry, &D->AData, 1);
+    CheckOneDirectOp (D->LoadXEntry, &D->XData, 0);
 }
 
 
@@ -287,11 +306,11 @@ static void ReplacePushByStore (StackOpData* D)
     /* Store the value into the zeropage instead of pushing it. Check high
      * byte first so that the store is later in A/X order.
      */
-    if ((D->Flags & OP_HI_DIRECT) == 0) {
+    if ((D->XData.Flags & LD_DIRECT) == 0) {
         X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
         InsertEntry (D, X, D->PushIndex+1);
     }
-    if ((D->Flags & OP_LO_DIRECT) == 0) {
+    if ((D->AData.Flags & LD_DIRECT) == 0) {
      	X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
        	InsertEntry (D, X, D->PushIndex+1);
     }
@@ -307,22 +326,40 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
 {
     CodeEntry* X;
 
-    if ((D->Flags & OP_LO_DIRECT) != 0) {
+    if ((D->AData.Flags & LD_DIRECT) != 0) {
        	/* Op with a variable location. If the location is on the stack, we
          * need to reload the Y register.
          */
-        CodeEntry* LoadA = D->LoadAEntry;
-        if ((D->Flags & OP_LO_RELOAD_Y) != 0) {
-            const char* Arg = MakeHexArg (LoadA->RI->In.RegY);
+        if ((D->AData.Flags & LD_RELOAD_Y) == 0) {
+
+            /* opc ... */
+            CodeEntry* LoadA = D->LoadAEntry;
+            X = NewCodeEntry (OPC, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+
+        } else {
+
+            /* ldy #offs */
+            const char* Arg = MakeHexArg (D->AData.Offs);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
+
+            /* opc (sp),y */
+            X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+
         }
-   	X = NewCodeEntry (OPC, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+
+        /* In both cases, we can remove the load */
+        D->AData.Flags |= LD_REMOVE;
+
     } else {
+
    	/* Op with temp storage */
    	X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
     }
-    InsertEntry (D, X, D->IP++);
 }
 
 
@@ -343,17 +380,30 @@ static void AddOpHigh (StackOpData* D, opc_t OPC)
     X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    if ((D->Flags & OP_HI_DIRECT) != 0) {
-        CodeEntry* LoadX = D->LoadXEntry;
-        if ((D->Flags & OP_HI_RELOAD_Y) != 0) {
+    if ((D->XData.Flags & LD_DIRECT) != 0) {
+
+        if ((D->XData.Flags & LD_RELOAD_Y) == 0) {
+
+            /* opc xxx */
+            CodeEntry* LoadX = D->LoadXEntry;
+   	    X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+
+        } else {
+
             /* ldy #const */
-            const char* Arg = MakeHexArg (LoadX->RI->In.RegY);
+            const char* Arg = MakeHexArg (D->XData.Offs);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
+
+            /* opc (sp),y */
+            X = NewCodeEntry (OPC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
         }
-        /* opc xxx */
-   	X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
+
+        /* In both cases, we can remove the load */
+        D->XData.Flags |= LD_REMOVE;
+
     } else {
         /* opc zphi */
         X = NewCodeEntry (OPC, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
@@ -371,11 +421,27 @@ static void AddOpHigh (StackOpData* D, opc_t OPC)
 
 
 
-static void RemovePushAndOp (StackOpData* D)
-/* Remove the call to pushax and the call to the operator subroutine */
+static void RemoveRemainders (StackOpData* D)
+/* Remove the code that is unnecessary after translation of the sequence */
 {
+    /* Remove the push and the operator routine */
     DelEntry (D, D->OpIndex);
     DelEntry (D, D->PushIndex);
+
+    /* Remove the register loads before the push. Beware: There may only be
+     * one!
+     */
+    if (D->LoadAIndex >= 0 && D->LoadAIndex == D->LoadXIndex) {
+        /* Common load routine */
+        if ((D->AData.Flags & D->XData.Flags) & LD_REMOVE) {
+            /* Both say: remove */
+            DelEntry (D, D->LoadAIndex);
+        }
+    } else if (D->LoadAIndex >= 0 && (D->AData.Flags & LD_REMOVE)) {
+        DelEntry (D, D->LoadAIndex);
+    } else if (D->LoadXIndex >= 0 && (D->XData.Flags & LD_REMOVE)) {
+        DelEntry (D, D->LoadXIndex);
+    }
 }
 
 
@@ -506,7 +572,7 @@ static unsigned Opt___bzero (StackOpData* D)
     }
 
     /* Remove the push and the call to the __bzero function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -530,7 +596,7 @@ static unsigned Opt_staspidx (StackOpData* D)
     InsertEntry (D, X, D->OpIndex+1);
 
     /* Remove the push and the call to the staspidx function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -585,7 +651,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
     InsertEntry (D, X, D->OpIndex+5);
 
     /* Remove the push and the call to the staxspidx function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -699,9 +765,13 @@ static unsigned Opt_tosaddax (StackOpData* D)
                 X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
             }
             InsertEntry (D, X, D->IP++);
+
+            /* bcc label */
             L = CS_GenLabel (D->Code, D->NextEntry);
             X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
+
+            /* inx */
             X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
         } else {
@@ -711,7 +781,7 @@ static unsigned Opt_tosaddax (StackOpData* D)
     }
 
     /* Remove the push and the call to the tosaddax function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -749,7 +819,7 @@ static unsigned Opt_tosandax (StackOpData* D)
     }
 
     /* Remove the push and the call to the tosandax function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -790,7 +860,7 @@ static unsigned Opt_tosorax (StackOpData* D)
     }
 
     /* Remove the push and the call to the tosorax function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -827,7 +897,7 @@ static unsigned Opt_tossubax (StackOpData* D)
     AddOpHigh (D, OP65_SBC);
 
     /* Remove the push and the call to the tosaddax function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -867,7 +937,7 @@ static unsigned Opt_tosxorax (StackOpData* D)
     }
 
     /* Remove the push and the call to the tosandax function */
-    RemovePushAndOp (D);
+    RemoveRemainders (D);
 
     /* We changed the sequence */
     return 1;
@@ -953,19 +1023,20 @@ static int HarmlessCall (const char* Name)
 static void ResetStackOpData (StackOpData* Data)
 /* Reset the given data structure */
 {
-    Data->Flags      = 0;
-    Data->OptFunc    = 0;
+    Data->AData.Flags   = 0;
+    Data->XData.Flags   = 0;
+    Data->OptFunc       = 0;
 
-    Data->LoadAIndex = -1;
-    Data->LoadXIndex = -1;
-    Data->LoadYIndex = -1;
-    Data->PushIndex  = -1;
-    Data->OpIndex    = -1;
+    Data->LoadAIndex    = -1;
+    Data->LoadXIndex    = -1;
+    Data->LoadYIndex    = -1;
+    Data->PushIndex     = -1;
+    Data->OpIndex       = -1;
 
-    Data->LoadAEntry = 0;
-    Data->LoadXEntry = 0;
+    Data->LoadAEntry    = 0;
+    Data->LoadXEntry    = 0;
 
-    Data->UsedRegs   = REG_NONE;
+    Data->UsedRegs      = REG_NONE;
 }
 
 
@@ -1091,6 +1162,10 @@ unsigned OptStackOps (CodeSeg* S)
                         case OP65_TYA: Data.LoadAIndex = Data.LoadYIndex; break;
                         default:                                          break;
                     }
+                } else if (CE_IsCallTo (E, "ldaxysp")) {
+                    /* Both registers set */
+                    Data.LoadAIndex = I;
+                    Data.LoadXIndex = I;
                 } else {
                     if (E->Chg & REG_A) {
                         Data.LoadAIndex = -1;

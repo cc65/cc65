@@ -1536,6 +1536,7 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 
     Changes += RunOptFunc (S, &DOptPush1, 1);
     Changes += RunOptFunc (S, &DOptPush2, 1);
+    /* Repeat some of the other optimizations now */
     Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
     Changes += RunOptFunc (S, &DOptTransfers2, 1);
 
@@ -1577,6 +1578,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
+        Changes += RunOptFunc (S, &DOptTransfers3, 1);  
     }
 
     /* Adjust branch distances */

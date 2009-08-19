@@ -945,8 +945,8 @@ void g_leasp (int offs)
              	AddCodeLine ("inx");
             } else {
              	ldaconst (offs);
-             	AddCodeLine ("clc");
              	AddCodeLine ("ldx sp+1");
+             	AddCodeLine ("clc");
              	AddCodeLine ("adc sp");
              	AddCodeLine ("bcc %s", LocalLabelName (L));
              	AddCodeLine ("inx");

@@ -374,6 +374,93 @@ static unsigned OptShift3 (CodeSeg* S)
 
 
 
+static unsigned OptShift4 (CodeSeg* S)
+/* Inline the shift subroutines. */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* X;
+        unsigned   IP;
+
+      	/* Get next entry */
+     	CodeEntry* E = CS_GetEntry (S, I);
+
+     	/* Check for a call to one of the shift routine */
+	if (E->OPC == OP65_JSR                          &&
+       	    (strncmp (E->Arg, "shlax", 5) == 0  ||
+             strncmp (E->Arg, "aslax", 5) == 0)         &&
+	    strlen (E->Arg) == 6                        &&
+	    IsDigit (E->Arg[5])) {
+
+            /* Get number of shifts */
+            unsigned ShiftCount = (E->Arg[5] - '0');
+
+            /* Code is:
+             *
+             *      stx     tmp1
+             *      asl     a
+             *      rol     tmp1
+             *      (repeat ShiftCount-1 times)
+             *      ldx     tmp1
+             *
+             * which makes 4 + 3 * ShiftCount bytes, compared to the original
+             * 3 bytes for the subroutine call. However, in most cases, the 
+             * final load of the X register gets merged with some other insn
+             * and replaces a txa, so for a shift count of 1, we get a factor
+             * of 200, which matches nicely the CodeSizeFactor enabled with -Oi
+             */                                                                
+            if (ShiftCount > 1 || S->CodeSizeFactor > 200) {
+                unsigned Size = 4 + 3 * ShiftCount;
+                if ((Size * 100 / 3) > S->CodeSizeFactor) {
+                    /* Not acceptable */
+                    goto NextEntry;
+                }
+            }
+
+            /* Inline the code. Insertion point is behind the subroutine call */
+            IP = (I + 1);
+
+            /* stx tmp1 */
+            X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, E->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            while (ShiftCount--) {
+                /* asl a */
+                X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                /* rol tmp1 */
+                X = NewCodeEntry (OP65_ROL, AM65_ZP, "tmp1", 0, E->LI);
+                CS_InsertEntry (S, X, IP++);
+            }
+
+            /* ldx tmp1 */
+            X = NewCodeEntry (OP65_LDX, AM65_ZP, "tmp1", 0, E->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* Remove the subroutine call */
+            CS_DelEntry (S, I);
+
+	    /* Remember, we had changes */
+            ++Changes;
+	}
+
+NextEntry:
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*                              Optimize loads                               */
 /*****************************************************************************/
@@ -1051,6 +1138,7 @@ static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift3      	= { OptShift3,       "OptShift3",      	110, 0, 0, 0, 0, 0 };
+static OptFunc DOptShift4      	= { OptShift4,       "OptShift4",      	200, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",    	100, 0, 0, 0, 0, 0 };
@@ -1134,6 +1222,7 @@ static OptFunc* OptFuncs[] = {
     &DOptShift1,
     &DOptShift2,
     &DOptShift3,
+    &DOptShift4,
     &DOptSize1,
     &DOptSize2,
     &DOptStackOps,
@@ -1415,6 +1504,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptShift1, 1);
     Changes += RunOptFunc (S, &DOptShift2, 1);
     Changes += RunOptFunc (S, &DOptShift3, 1);
+    Changes += RunOptFunc (S, &DOptShift4, 1);
     Changes += RunOptFunc (S, &DOptStore1, 1);
     Changes += RunOptFunc (S, &DOptStore2, 5);
     Changes += RunOptFunc (S, &DOptStore3, 5);
@@ -1578,7 +1668,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
-        Changes += RunOptFunc (S, &DOptTransfers3, 1);  
+        Changes += RunOptFunc (S, &DOptTransfers3, 1);
     }
 
     /* Adjust branch distances */

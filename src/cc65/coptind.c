@@ -898,7 +898,7 @@ unsigned OptUnusedStores (CodeSeg* S)
 
 	 	/* Remember, we had changes */
 	 	++Changes;
-                            
+
                 /* Continue with next insn */
                 continue;
 	    }
@@ -1385,6 +1385,14 @@ unsigned OptTransfers3 (CodeSeg* S)
                      */
                     I = Xfer;
                     State = Searching;
+
+                /* Does this insn have a label? */
+                } else if (CE_HasLabel (E)) {
+
+                    /* Too complex to handle - bail out */
+                    I = Xfer;
+                    State = Searching;
+
                 }
                 break;
 

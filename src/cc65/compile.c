@@ -192,9 +192,14 @@ static void Parse (void)
 	     	    	}
 	     	    }
 
-	     	    /* Switch to the data or rodata segment */
-		    if (IsQualConst (Decl.Type)) {
-			g_userodata ();
+	     	    /* Switch to the data or rodata segment. For arrays, check
+                      * the element qualifiers, since not the array but its
+                      * elements are const.
+                      */
+		    if (IsQualConst (Decl.Type) ||
+                        (IsTypeArray (Decl.Type) &&
+                         IsQualConst (GetElementType (Decl.Type)))) {
+		      	g_userodata ();
 		    } else {
 			g_usedata ();
 		    }

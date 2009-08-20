@@ -1319,16 +1319,18 @@ unsigned OptTransfers3 (CodeSeg* S)
  */
 {
     unsigned Changes      = 0;
-    unsigned Xfer         = 0;  /* Index of transfer insn */
-    unsigned Store        = 0;  /* Index of store insn */
-    CodeEntry* XferEntry  = 0;  /* Pointer to xfer insn */
-    CodeEntry* StoreEntry = 0;  /* Pointer to store insn */
+    unsigned UsedRegs     = REG_NONE;   /* Track used registers */
+    unsigned Xfer         = 0;          /* Index of transfer insn */
+    unsigned Store        = 0;          /* Index of store insn */
+    CodeEntry* XferEntry  = 0;          /* Pointer to xfer insn */
+    CodeEntry* StoreEntry = 0;          /* Pointer to store insn */
 
     enum {
-        Searching,
+        Initialize,
+        Search,
         FoundXfer,
         FoundStore
-    } State = Searching;
+    } State = Initialize;
 
     /* Walk over the entries. Look for a xfer instruction that is followed by
      * a store later, where the value of the register is not used later.
@@ -1341,7 +1343,12 @@ unsigned OptTransfers3 (CodeSeg* S)
 
         switch (State) {
 
-            case Searching:
+            case Initialize:
+                /* Clear the list of used registers */
+                UsedRegs = REG_NONE;
+                /* FALLTHROUGH */
+
+            case Search:
                 if (E->Info & OF_XFR) {
                     /* Found start of sequence */
                     Xfer = I;
@@ -1358,7 +1365,7 @@ unsigned OptTransfers3 (CodeSeg* S)
 
                     /* Switch back to searching */
                     I = Xfer;
-                    State = Searching;
+                    State = Initialize;
 
                 /* Does this insn use the target register of the transfer? */
                 } else if ((E->Use & XferEntry->Chg) != 0) {
@@ -1373,7 +1380,7 @@ unsigned OptTransfers3 (CodeSeg* S)
                         State = FoundStore;
                     } else {
                         I = Xfer;
-                        State = Searching;
+                        State = Initialize;
                     }
 
                 /* Does this insn change the target register of the transfer? */
@@ -1384,15 +1391,18 @@ unsigned OptTransfers3 (CodeSeg* S)
                      * do that and bail out instead.
                      */
                     I = Xfer;
-                    State = Searching;
+                    State = Initialize;
 
                 /* Does this insn have a label? */
                 } else if (CE_HasLabel (E)) {
 
                     /* Too complex to handle - bail out */
                     I = Xfer;
-                    State = Searching;
+                    State = Initialize;
 
+                } else {
+                    /* Track used registers */
+                    UsedRegs |= E->Use;
                 }
                 break;
 
@@ -1402,7 +1412,10 @@ unsigned OptTransfers3 (CodeSeg* S)
                  * replace the transfer by a store and remove the store here.
                  */
                 if ((GetRegInfo (S, I, XferEntry->Chg) & XferEntry->Chg) == 0   &&
-                    (StoreEntry->AM == AM65_ABS || StoreEntry->AM == AM65_ZP)   &&
+                    (StoreEntry->AM == AM65_ABS         ||
+                     StoreEntry->AM == AM65_ZP)                                 &&
+                    (StoreEntry->AM != AM65_ZP ||
+                     (StoreEntry->Chg & UsedRegs) == 0)                         &&
                     !MemAccess (S, Xfer+1, Store-1, StoreEntry->Arg)) {
 
                     /* Generate the replacement store insn */
@@ -1469,7 +1482,7 @@ unsigned OptTransfers3 (CodeSeg* S)
                     /* Restart after last xfer insn */
                     I = Xfer;
                 }
-                State = Searching;
+                State = Initialize;
                 break;
 
         }
@@ -1496,10 +1509,10 @@ unsigned OptTransfers4 (CodeSeg* S)
     CodeEntry* XferEntry  = 0;  /* Pointer to xfer insn */
 
     enum {
-        Searching,
+        Search,
         FoundLoad,
         FoundXfer
-    } State = Searching;
+    } State = Search;
 
     /* Walk over the entries. Look for a load instruction that is followed by
      * a load later.
@@ -1512,7 +1525,7 @@ unsigned OptTransfers4 (CodeSeg* S)
 
         switch (State) {
 
-            case Searching:
+            case Search:
                 if (E->Info & OF_LOAD) {
                     /* Found start of sequence */
                     Load = I;
@@ -1529,7 +1542,7 @@ unsigned OptTransfers4 (CodeSeg* S)
 
                     /* Switch back to searching */
                     I = Load;
-                    State = Searching;
+                    State = Search;
 
                 /* Does this insn use the target register of the load? */
                 } else if ((E->Use & LoadEntry->Chg) != 0) {
@@ -1544,7 +1557,7 @@ unsigned OptTransfers4 (CodeSeg* S)
                         State = FoundXfer;
                     } else {
                         I = Load;
-                        State = Searching;
+                        State = Search;
                     }
 
                 /* Does this insn change the target register of the load? */
@@ -1555,7 +1568,7 @@ unsigned OptTransfers4 (CodeSeg* S)
                      * do that and bail out instead.
                      */
                     I = Load;
-                    State = Searching;
+                    State = Search;
                 }
                 break;
 
@@ -1627,7 +1640,7 @@ unsigned OptTransfers4 (CodeSeg* S)
                     /* Restart after last xfer insn */
                     I = Xfer;
                 }
-                State = Searching;
+                State = Search;
                 break;
 
         }

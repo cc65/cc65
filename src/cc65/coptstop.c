@@ -54,9 +54,8 @@
 /* Flags for the functions */
 typedef enum {
     STOP_NONE       = 0x00,     /* Nothing special */
-    STOP_A_UNUSED   = 0x01,     /* Call only if a unused later */
-    STOP_A_KNOWN    = 0x02,     /* Call only if A is known */
-    STOP_X_ZERO     = 0x04      /* Call only if X is zero */
+    STOP_A_KNOWN    = 0x01,     /* Call only if A is known */
+    STOP_X_ZERO     = 0x02      /* Call only if X is zero */
 } STOP_FLAGS;
 
 /* Structure forward decl */
@@ -68,6 +67,7 @@ typedef struct OptFuncDesc OptFuncDesc;
 struct OptFuncDesc {
     const char*         Name;           /* Name of the replaced runtime function */
     OptFunc             Func;           /* Function pointer */
+    unsigned            UnusedRegs;     /* Regs that must not be used later */
     STOP_FLAGS          Flags;          /* Flags */
 };
 
@@ -180,7 +180,7 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
 
             /* If we need the value of Y later, be sure to reload it */
             if (RegYUsed (D->Code, I+1)) {
-     	   	const char* Arg = MakeHexArg (E->RI->In.RegY);
+     	    	const char* Arg = MakeHexArg (E->RI->In.RegY);
      	   	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
      	   	CS_InsertEntry (D->Code, X, I+1);
 
@@ -644,7 +644,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
     X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+4);
 
-    /* If we remove staspidx, we must restore the Y register to what the
+    /* If we remove staxspidx, we must restore the Y register to what the
      * function would return.
      */
     X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, D->OpEntry->LI);
@@ -952,14 +952,14 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
 
 static const OptFuncDesc FuncTable[] = {
-    { "__bzero",    Opt___bzero,   STOP_X_ZERO | STOP_A_KNOWN   },
-    { "staspidx",   Opt_staspidx,  STOP_NONE                    },
-    { "staxspidx",  Opt_staxspidx, STOP_A_UNUSED                },
-    { "tosaddax",   Opt_tosaddax,  STOP_NONE                    },
-    { "tosandax",   Opt_tosandax,  STOP_NONE                    },
-    { "tosorax",    Opt_tosorax,   STOP_NONE                    },
-    { "tossubax",   Opt_tossubax,  STOP_NONE                    },
-    { "tosxorax",   Opt_tosxorax,  STOP_NONE                    },
+    { "__bzero",    Opt___bzero,   REG_NONE, STOP_X_ZERO | STOP_A_KNOWN   },
+    { "staspidx",   Opt_staspidx,  REG_NONE, STOP_NONE                    },
+    { "staxspidx",  Opt_staxspidx, REG_AX,   STOP_NONE                    },
+    { "tosaddax",   Opt_tosaddax,  REG_NONE, STOP_NONE                    },
+    { "tosandax",   Opt_tosandax,  REG_NONE, STOP_NONE                    },
+    { "tosorax",    Opt_tosorax,   REG_NONE, STOP_NONE                    },
+    { "tossubax",   Opt_tossubax,  REG_NONE, STOP_NONE                    },
+    { "tosxorax",   Opt_tosxorax,  REG_NONE, STOP_NONE                    },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
 
@@ -1048,16 +1048,19 @@ static int PreCondOk (StackOpData* D)
  */
 {
     /* Check the flags */
-    if ((D->OptFunc->Flags & STOP_A_UNUSED) != 0 &&
-         RegAUsed (D->Code, D->OpIndex+1)) {
+    unsigned UnusedRegs = D->OptFunc->UnusedRegs;
+    if (UnusedRegs != REG_NONE &&
+        (GetRegInfo (D->Code, D->OpIndex+1, UnusedRegs) & UnusedRegs) != 0) {
         /* Cannot optimize */
         return 0;
-    } else if ((D->OptFunc->Flags & STOP_A_KNOWN) != 0 &&
-               RegValIsUnknown (D->OpEntry->RI->In.RegA)) {
+    }
+    if ((D->OptFunc->Flags & STOP_A_KNOWN) != 0 &&
+        RegValIsUnknown (D->OpEntry->RI->In.RegA)) {
         /* Cannot optimize */
         return 0;
-    } else if ((D->OptFunc->Flags & STOP_X_ZERO) != 0 &&
-               D->OpEntry->RI->In.RegX != 0) {
+    }
+    if ((D->OptFunc->Flags & STOP_X_ZERO) != 0 &&
+        D->OpEntry->RI->In.RegX != 0) {
         /* Cannot optimize */
         return 0;
     }
@@ -1237,6 +1240,23 @@ unsigned OptStackOps (CodeSeg* S)
                 /* Track zero page location usage beyond this point */
                 Data.UsedRegs |= GetRegInfo (S, I, REG_SREG | REG_PTR1 | REG_PTR2);
 
+                /* Get the entry pointers to the load insns. If these insns
+                 * load from zero page, we have to include them into UsedRegs
+                 * registers used.
+                 */
+                if (Data.LoadAIndex >= 0) {
+                    Data.LoadAEntry = CS_GetEntry (S, Data.LoadAIndex);
+                    if (Data.LoadAEntry->AM == AM65_ZP) {
+                        Data.UsedRegs |= Data.LoadAEntry->Use;
+                    }
+                }
+                if (Data.LoadXIndex >= 0) {
+                    Data.LoadXEntry = CS_GetEntry (S, Data.LoadXIndex);
+                    if (Data.LoadXEntry->AM == AM65_ZP) {
+                        Data.UsedRegs |= Data.LoadXEntry->Use;
+                    }
+                }
+
                 /* Check the preconditions. If they aren't ok, reset the insn
                  * pointer to the pushax and start over. We will loose part of
                  * load tracking but at least a/x has probably lost between
@@ -1249,18 +1269,10 @@ unsigned OptStackOps (CodeSeg* S)
                     break;
                 }
 
-                /* Preconditions are ok, so call the optimizer function */
-
                 /* Adjust stack offsets to account for the upcoming removal */
                 AdjustStackOffset (&Data, 2);
 
-                /* Prepare the remainder of the data structure */
-                if (Data.LoadAIndex >= 0) {
-                    Data.LoadAEntry = CS_GetEntry (S, Data.LoadAIndex);
-                }
-                if (Data.LoadXIndex >= 0) {
-                    Data.LoadXEntry = CS_GetEntry (S, Data.LoadXIndex);
-                }
+                /* Prepare the remainder of the data structure. */
                 Data.PrevEntry = CS_GetPrevEntry (S, Data.PushIndex);
                 Data.PushEntry = CS_GetEntry (S, Data.PushIndex);
                 Data.OpEntry   = CS_GetEntry (S, Data.OpIndex);

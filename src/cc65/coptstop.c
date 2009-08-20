@@ -958,7 +958,7 @@ static const OptFuncDesc FuncTable[] = {
     { "tosaddax",   Opt_tosaddax,  REG_NONE, STOP_NONE                    },
     { "tosandax",   Opt_tosandax,  REG_NONE, STOP_NONE                    },
     { "tosorax",    Opt_tosorax,   REG_NONE, STOP_NONE                    },
-    { "tossubax",   Opt_tossubax,  REG_NONE, STOP_NONE                    },
+/*    { "tossubax",   Opt_tossubax,  REG_NONE, STOP_NONE                    }, */
     { "tosxorax",   Opt_tosxorax,  REG_NONE, STOP_NONE                    },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))

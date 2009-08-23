@@ -10,7 +10,8 @@
 _cbm_k_chkin:
 	tax
        	jsr    	CHKIN
+	ldx     #0              ; Clear high byte
 	bcs	@NotOk
-        lda     #0
+        txa
 @NotOk:	rts
 

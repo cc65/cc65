@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -106,6 +106,7 @@ static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
     /* Initialize the fields */
     I->Next	= 0;
     I->Obj	= Obj;
+    InitFilePos (&I->Pos);
     I->Exp      = 0;
     I->Name     = INVALID_STRING_ID;
     I->Flags    = 0;
@@ -113,60 +114,6 @@ static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
 
     /* Return the new structure */
     return I;
-}
-
-
-
-void InsertImport (Import* I)
-/* Insert an import into the table */
-{
-    Export* E;
-
-    /* As long as the import is not inserted, V.Name is valid */
-    unsigned Name = I->Name;
-
-    /* Create a hash value for the given name */
-    unsigned Hash = (Name & HASHTAB_MASK);
-
-    /* Search through the list in that slot and print matching duplicates */
-    if (HashTab[Hash] == 0) {
-    	/* The slot is empty, we need to insert a dummy export */
-       	E = HashTab[Hash] = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
-	++ExpCount;
-    } else {
-    	E = HashTab [Hash];
-    	while (1) {
-    	    if (E->Name == Name) {
-    	  	/* We have an entry, L points to it */
-       	       	break;
-    	    }
-    	    if (E->Next == 0) {
-    	  	/* End of list an entry not found, insert a dummy */
-    	  	E->Next = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
-    	  	E = E->Next;   		/* Point to dummy */
-		++ExpCount;    		/* One export more */
-       	  	break;
-    	    } else {
-    	  	E = E->Next;
-    	    }
-    	}
-    }
-
-    /* Ok, E now points to a valid exports entry for the given import. Insert
-     * the import into the imports list and update the counters.
-     */
-    I->Exp     = E;
-    I->Next    = E->ImpList;
-    E->ImpList = I;
-    E->ImpCount++;
-    ++ImpCount;	   	       	/* Total import count */
-    if (E->Expr == 0) {
-       	/* This is a dummy export */
-    	++ImpOpen;
-    }
-
-    /* Mark the import so we know it's in the list */
-    I->Flags |= IMP_INLIST;
 }
 
 
@@ -225,6 +172,95 @@ Import* ReadImport (FILE* F, ObjData* Obj)
 
     /* Return the new import */
     return I;
+}
+
+
+
+Import* GenImport (const char* Name, unsigned char AddrSize)
+/* Generate a new import with the given name and address size and return it */
+{
+    /* Create a new import */
+    Import* I = NewImport (AddrSize, 0);
+
+    /* Read the name */
+    I->Name = GetStringId (Name);
+
+    /* Check the address size */
+    if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
+        /* Beware: This function may be called in cases where the object file
+         * is not read completely into memory. In this case, the file list is
+         * invalid. Be sure not to access it in this case.
+         */
+        if (ObjHasFiles (I->Obj)) {
+            Error ("Invalid import size in for `%s', imported from %s(%lu): 0x%02X",
+                   GetString (I->Name),
+                   GetSourceFileName (I->Obj, I->Pos.Name),
+                   I->Pos.Line,
+                   I->AddrSize);
+        } else {
+            Error ("Invalid import size in for `%s', imported from %s: 0x%02X",
+                   GetString (I->Name),
+                   GetObjFileName (I->Obj),
+                   I->AddrSize);
+        }
+    }
+
+    /* Return the new import */
+    return I;
+}
+
+
+
+void InsertImport (Import* I)
+/* Insert an import into the table */
+{
+    Export* E;
+
+    /* As long as the import is not inserted, V.Name is valid */
+    unsigned Name = I->Name;
+
+    /* Create a hash value for the given name */
+    unsigned Hash = (Name & HASHTAB_MASK);
+
+    /* Search through the list in that slot and print matching duplicates */
+    if (HashTab[Hash] == 0) {
+    	/* The slot is empty, we need to insert a dummy export */
+       	E = HashTab[Hash] = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
+	++ExpCount;
+    } else {
+    	E = HashTab [Hash];
+    	while (1) {
+    	    if (E->Name == Name) {
+    	  	/* We have an entry, L points to it */
+       	       	break;
+    	    }
+    	    if (E->Next == 0) {
+    	  	/* End of list an entry not found, insert a dummy */
+    	  	E->Next = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
+    	  	E = E->Next;   		/* Point to dummy */
+		++ExpCount;    		/* One export more */
+       	  	break;
+    	    } else {
+    	  	E = E->Next;
+    	    }
+    	}
+    }
+
+    /* Ok, E now points to a valid exports entry for the given import. Insert
+     * the import into the imports list and update the counters.
+     */
+    I->Exp     = E;
+    I->Next    = E->ImpList;
+    E->ImpList = I;
+    E->ImpCount++;
+    ++ImpCount;	   	       	/* Total import count */
+    if (E->Expr == 0) {
+       	/* This is a dummy export */
+    	++ImpOpen;
+    }
+
+    /* Mark the import so we know it's in the list */
+    I->Flags |= IMP_INLIST;
 }
 
 

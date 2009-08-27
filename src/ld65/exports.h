@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -113,6 +113,9 @@ void FreeImport (Import* I);
 
 Import* ReadImport (FILE* F, ObjData* Obj);
 /* Read an import from a file and insert it into the table */
+
+Import* GenImport (const char* Name, unsigned char AddrSize);
+/* Generate a new import with the given name and address size and return it */
 
 void InsertImport (Import* I);
 /* Insert an import into the table */

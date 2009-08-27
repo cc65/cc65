@@ -1,15 +1,15 @@
 /*****************************************************************************/
-/*									     */
-/*				    main.c				     */
-/*									     */
+/*		     							     */
+/*		     		    main.c				     */
+/*		     							     */
 /*		       Main program for the ld65 linker			     */
-/*									     */
-/*									     */
-/*									     */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/*		     							     */
+/*		     							     */
+/*		     							     */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -39,6 +39,7 @@
 #include <errno.h>
 
 /* common */
+#include "addrsize.h"
 #include "chartype.h"
 #include "cmdline.h"
 #include "filetype.h"
@@ -114,6 +115,7 @@ static void Usage (void)
             "  --define sym=val\tDefine a symbol\n"
             "  --dump-config name\tDump a builtin configuration\n"
             "  --end-group\t\tEnd a library group\n"
+            "  --force-import sym\tForce an import of symbol `sym'\n"
             "  --help\t\tHelp (this text)\n"
             "  --lib file\t\tLink this library\n"
             "  --lib-path path\tSpecify a library search path\n"
@@ -335,10 +337,48 @@ static void OptDumpConfig (const char* Opt attribute ((unused)), const char* Arg
 
 
 static void OptEndGroup (const char* Opt attribute ((unused)),
-		         const char* Arg attribute ((unused)))
+	 	         const char* Arg attribute ((unused)))
 /* End a library group */
 {
     LibEndGroup ();
+}
+
+
+
+static void OptForceImport (const char* Opt attribute ((unused)), const char* Arg)
+/* Force an import of a symbol */
+{
+    /* An optional address size may be specified */
+    const char* ColPos = strchr (Arg, ':');
+    if (ColPos == 0) {
+
+        /* Use default address size (which for now is always absolute
+         * addressing) 
+         */
+        InsertImport (GenImport (Arg, ADDR_SIZE_ABS));
+
+    } else {
+
+        char* A;
+
+        /* Get the address size and check it */
+        unsigned char AddrSize = AddrSizeFromStr (ColPos+1);
+        if (AddrSize == ADDR_SIZE_INVALID) {
+            Error ("Invalid address size `%s'", ColPos+1);
+        }
+
+        /* Create a copy of the argument */
+        A = xstrdup (Arg);
+
+        /* We need just the symbol */
+        A[ColPos - Arg] = '\0';
+
+        /* Generate the import */
+        InsertImport (GenImport (A, AddrSize));
+
+        /* Delete the copy of the argument */
+        xfree (A);
+    }
 }
 
 
@@ -466,6 +506,7 @@ int main (int argc, char* argv [])
         { "--define",           1,      OptDefine               },
        	{ "--dump-config",     	1,     	OptDumpConfig           },
         { "--end-group",        0,      OptEndGroup             },
+        { "--force-import",     1,      OptForceImport          },
      	{ "--help",	       	0,     	OptHelp	     	    	},
         { "--lib",              1,      OptLib                  },
        	{ "--lib-path",         1,     	OptLibPath              },

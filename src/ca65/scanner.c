@@ -1373,12 +1373,7 @@ unsigned char ParseAddrSize (void)
  * error message and return ADDR_SIZE_DEFAULT.
  */
 {
-    static const char* Keys[] = {
-        "DIRECT", "ZEROPAGE", "ZP",
-        "ABSOLUTE", "ABS", "NEAR",
-        "FAR",
-        "LONG", "DWORD",
-    };
+    unsigned char AddrSize;
 
     /* Check for an identifier */
     if (Tok != TOK_IDENT) {
@@ -1386,21 +1381,15 @@ unsigned char ParseAddrSize (void)
         return ADDR_SIZE_DEFAULT;
     }
 
-    /* Search for the attribute */
-    switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
-        case 0:
-        case 1:
-        case 2: return ADDR_SIZE_ZP;
-        case 3:
-        case 4:
-        case 5: return ADDR_SIZE_ABS;
-        case 6: return ADDR_SIZE_FAR;
-        case 7:
-        case 8: return ADDR_SIZE_LONG;
-        default:
-            Error ("Address size specifier expected");
-            return ADDR_SIZE_DEFAULT;
+    /* Convert the attribute */
+    AddrSize = AddrSizeFromStr (SB_GetConstBuf (&SVal));
+    if (AddrSize == ADDR_SIZE_INVALID) {
+        Error ("Address size specifier expected");
+        AddrSize = ADDR_SIZE_DEFAULT;
     }
+
+    /* Done */
+    return AddrSize;
 }
 
 

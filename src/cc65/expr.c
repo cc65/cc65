@@ -1864,17 +1864,17 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	/* Make sure, the types are compatible */
 	if (IsClassInt (Expr->Type)) {
 	    if (!IsClassInt (Expr2.Type) && !(IsClassPtr(Expr2.Type) && ED_IsNullPtr(Expr))) {
-	   	Error ("Incompatible types");
+	    	Error ("Incompatible types");
 	    }
 	} else if (IsClassPtr (Expr->Type)) {
 	    if (IsClassPtr (Expr2.Type)) {
-	   	/* Both pointers are allowed in comparison if they point to
-	   	 * the same type, or if one of them is a void pointer.
+	    	/* Both pointers are allowed in comparison if they point to
+	    	 * the same type, or if one of them is a void pointer.
 	         */
        	       	Type* left  = Indirect (Expr->Type);
-	   	Type* right = Indirect (Expr2.Type);
-	   	if (TypeCmp (left, right) < TC_EQUAL && left->C != T_VOID && right->C != T_VOID) {
-	   	    /* Incomatible pointers */
+	    	Type* right = Indirect (Expr2.Type);
+	    	if (TypeCmp (left, right) < TC_EQUAL && left->C != T_VOID && right->C != T_VOID) {
+	    	    /* Incomatible pointers */
 	    	    Error ("Incompatible types");
 	    	}
 	    } else if (!ED_IsNullPtr (&Expr2)) {
@@ -1884,6 +1884,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
 	/* Check for const operands */
 	if (ED_IsConstAbs (Expr) && rconst) {
+
+            Warning ("Result of comparison is constant");
 
        	    /* Both operands are constant, remove the generated code */
        	    RemoveCode (&Mark1);
@@ -2940,7 +2942,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
        	    g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
      	}
     }
-            
+
     /* Setup the code generator flags */
     lflags |= TypeOf (Expr->Type) | GlobalModeFlags (Expr) | CF_FORCECHAR;
     rflags |= TypeOf (Expr2.Type) | CF_FORCECHAR;
@@ -2950,7 +2952,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
 
     /* Output apropriate code depending on the location */
     switch (ED_GetLoc (Expr)) {
-                                                                         
+
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
             if (Gen->Tok == TOK_PLUS_ASSIGN) {

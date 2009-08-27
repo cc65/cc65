@@ -550,7 +550,7 @@ unsigned OptPtrLoad6 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      jsr     pushax
- *      ldy     xxx
+ *      ldy     #xxx
  *      ldx     #$00
  *      lda     (sp),y
  *      jsr     tosaddax
@@ -561,11 +561,12 @@ unsigned OptPtrLoad6 (CodeSeg* S)
  *
  *      sta     ptr1
  *      stx     ptr1+1
- *      ldy     xxx
+ *      ldy     #xxx-2
  *      lda     (sp),y
  *      tay
  *      ldx     #$00
  *      lda     (ptr1),y
+ *      ldy     #$00
  */
 {
     unsigned Changes = 0;
@@ -583,6 +584,8 @@ unsigned OptPtrLoad6 (CodeSeg* S)
        	if (CE_IsCallTo (L[0], "pushax")                &&
        	    CS_GetEntries (S, L+1, I+1, 6)     	        &&
             L[1]->OPC == OP65_LDY                       &&
+            CE_IsConstImm (L[1])                        &&
+            L[1]->Num >= 2                              &&
        	    L[2]->OPC == OP65_LDX                       &&
             CE_IsKnownImm (L[2], 0)                     &&
             L[3]->OPC == OP65_LDA                       &&
@@ -593,7 +596,8 @@ unsigned OptPtrLoad6 (CodeSeg* S)
             CE_IsCallTo (L[6], "ldauidx")               &&
        	    !CS_RangeHasLabel (S, I+1, 6)) {
 
-	    CodeEntry* X;
+	    CodeEntry*  X;
+            const char* Arg;
 
             /* sta ptr1 */
             X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
@@ -603,8 +607,9 @@ unsigned OptPtrLoad6 (CodeSeg* S)
             X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
             CS_InsertEntry (S, X, I+8);
 
-            /* ldy yyy */
-            X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+            /* ldy #xxx-2 */
+            Arg = MakeHexArg (L[1]->Num - 2);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
             CS_InsertEntry (S, X, I+9);
 
             /* lda (sp),y */
@@ -622,6 +627,10 @@ unsigned OptPtrLoad6 (CodeSeg* S)
             /* lda (ptr1),y */
 	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
 	    CS_InsertEntry (S, X, I+13);
+
+            /* ldy #$00 (will eventually get removed later) */
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, L[5]->LI);
+            CS_InsertEntry (S, X, I+14);
 
 	    /* Remove the old code */
 	    CS_DelEntries (S, I, 7);

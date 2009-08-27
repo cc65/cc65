@@ -3235,13 +3235,18 @@ void g_inc (unsigned flags, unsigned long val)
                     if (val >= 0x300) {
                        	AddCodeLine ("inx");
                     }
-                } else {
+                } else if ((val & 0xFF) != 0) {
                     AddCodeLine ("clc");
-                    if ((val & 0xFF) != 0) {
-             	       	AddCodeLine ("adc #$%02X", (unsigned char) val);
-                    }
+                    AddCodeLine ("adc #$%02X", (unsigned char) val);
                     AddCodeLine ("pha");
                     AddCodeLine ("txa");
+                    AddCodeLine ("adc #$%02X", (unsigned char) (val >> 8));
+                    AddCodeLine ("tax");
+                    AddCodeLine ("pla");
+                } else {
+                    AddCodeLine ("pha");
+                    AddCodeLine ("txa");
+                    AddCodeLine ("clc");
                     AddCodeLine ("adc #$%02X", (unsigned char) (val >> 8));
                     AddCodeLine ("tax");
                     AddCodeLine ("pla");

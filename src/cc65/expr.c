@@ -1884,8 +1884,13 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
 	/* Check for const operands */
 	if (ED_IsConstAbs (Expr) && rconst) {
-
-            Warning ("Result of comparison is constant");
+             
+            /* If the result is constant, this is suspicious when not in 
+             * preprocessor mode.
+             */
+            if (!Preprocessing) {
+                Warning ("Result of comparison is constant");
+            }
 
        	    /* Both operands are constant, remove the generated code */
        	    RemoveCode (&Mark1);

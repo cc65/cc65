@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,11 +39,12 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*     	       	    	  	     Data				     */
 /*****************************************************************************/
 
 
 
+#define ADDR_SIZE_INVALID       0xFF
 #define ADDR_SIZE_DEFAULT       0x00
 #define ADDR_SIZE_ZP            0x01
 #define ADDR_SIZE_ABS           0x02
@@ -53,13 +54,18 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*     	       	    	  	     Code				     */
 /*****************************************************************************/
 
 
 
 const char* AddrSizeToStr (unsigned char AddrSize);
 /* Return the name for an address size specifier */
+
+unsigned char AddrSizeFromStr (const char* Str);
+/* Return the address size for a given string. Returns ADDR_SIZE_INVALID if
+ * the string cannot be mapped to an address size.
+ */
 
 
 

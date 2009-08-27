@@ -566,7 +566,6 @@ unsigned OptPtrLoad6 (CodeSeg* S)
  *      tay
  *      ldx     #$00
  *      lda     (ptr1),y
- *      ldy     #$00
  */
 {
     unsigned Changes = 0;
@@ -594,7 +593,8 @@ unsigned OptPtrLoad6 (CodeSeg* S)
             L[5]->OPC == OP65_LDY                       &&
             CE_IsKnownImm (L[5], 0)                     &&
             CE_IsCallTo (L[6], "ldauidx")               &&
-       	    !CS_RangeHasLabel (S, I+1, 6)) {
+       	    !CS_RangeHasLabel (S, I+1, 6)               &&
+            !RegYUsed (S, I+7)) {
 
 	    CodeEntry*  X;
             const char* Arg;
@@ -627,10 +627,6 @@ unsigned OptPtrLoad6 (CodeSeg* S)
             /* lda (ptr1),y */
 	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
 	    CS_InsertEntry (S, X, I+13);
-
-            /* ldy #$00 (will eventually get removed later) */
-            X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, L[5]->LI);
-            CS_InsertEntry (S, X, I+14);
 
 	    /* Remove the old code */
 	    CS_DelEntries (S, I, 7);

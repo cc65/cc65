@@ -6,8 +6,8 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 1999-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*									     */
@@ -877,6 +877,14 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptForceImport (const char* Opt attribute ((unused)), const char* Arg)
+/* Emulation features for the assembler */
+{
+    CmdAddArg2 (&LD65, "--force-import", Arg);
+}                                     
+
+
+
 static void OptForgetIncPaths (const char* Opt attribute ((unused)),
                                const char* Arg attribute ((unused)))
 /* Forget all currently defined include paths */
@@ -1164,6 +1172,7 @@ int main (int argc, char* argv [])
 	{ "--debug",	     	0,	OptDebug		},
 	{ "--debug-info",    	0,	OptDebugInfo		},
 	{ "--feature",	     	1,	OptFeature		},
+        { "--force-import",     1,      OptForceImport          },
        	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
 	{ "--help",	     	0,	OptHelp			},
 	{ "--include-dir",   	1,	OptIncludeDir		},

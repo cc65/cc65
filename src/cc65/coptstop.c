@@ -667,8 +667,163 @@ static int IsRegVar (StackOpData* D)
 
 
 
+static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer)
+/* Optimize the toseqax and tosneax sequences. */
+{
+    CodeEntry*  X;
+    CodeLabel* L;
+
+    /* Create a call to the boolean transformer function and a label for this
+     * insn. This is needed for all variants. Other insns are inserted *before*
+     * the call.
+     */
+    X = NewCodeEntry (OP65_JSR, AM65_ABS, BoolTransformer, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->OpIndex + 1);
+    L = CS_GenLabel (D->Code, X);
+
+    /* If the lhs is direct (but not stack relative), encode compares with lhs
+     * effectively reverting the order (which doesn't matter for ==).
+     */
+    if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
+        (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+
+        CodeEntry* LoadX = D->Lhs.X.LoadEntry;
+        CodeEntry* LoadA = D->Lhs.A.LoadEntry;
+
+        D->IP = D->OpIndex+1;
+
+        /* cpx */
+        X = NewCodeEntry (OP65_CPX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* bne L */
+        X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* cmp */
+        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* Lhs load entries can be removed */
+        D->Lhs.X.Flags |= LI_REMOVE;
+        D->Lhs.A.Flags |= LI_REMOVE;
+
+    } else if ((D->Rhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
+               (D->Rhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+
+        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
+        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
+
+        D->IP = D->OpIndex+1;
+
+        /* cpx */
+        X = NewCodeEntry (OP65_CPX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* bne L */
+        X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* cmp */
+        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* Rhs load entries can be removed */
+        D->Rhs.X.Flags |= LI_REMOVE;
+        D->Rhs.A.Flags |= LI_REMOVE;
+
+    } else if ((D->Rhs.A.Flags & LI_DIRECT) != 0 &&
+               (D->Rhs.X.Flags & LI_DIRECT) != 0) {
+
+        D->IP = D->OpIndex+1;
+
+        /* If the location is on the stack, we need to reload the Y register. */
+        if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+
+            /* cmp ... */
+            CodeEntry* LoadA = D->Rhs.A.LoadEntry;
+            X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+
+        } else {
+
+            /* ldy #offs */
+            const char* Arg = MakeHexArg (D->Rhs.A.Offs);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+
+            /* cmp (sp),y */
+            X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        }
+
+        /* In both cases, we can remove the load */
+        D->Rhs.A.Flags |= LI_REMOVE;
+
+        /* bne L */
+        X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* txa */
+        X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* If the location is on the stack, we need to reload the Y register. */
+        if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
+
+            /* cmp ... */
+            CodeEntry* LoadX = D->Rhs.X.LoadEntry;
+            X = NewCodeEntry (OP65_CMP, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+
+        } else {
+
+            /* ldy #offs */
+            const char* Arg = MakeHexArg (D->Rhs.X.Offs);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+
+            /* cmp (sp),y */
+            X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->IP++);
+        }
+
+        /* In both cases, we can remove the load */
+        D->Rhs.X.Flags |= LI_REMOVE;
+
+    } else {
+
+        /* Save lhs into zeropage, then compare */
+        AddStoreX (D);
+        AddStoreA (D);
+
+        D->IP = D->OpIndex+1;
+
+        /* cpx */
+        X = NewCodeEntry (OP65_CPX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* bne L */
+        X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* cmp */
+        X = NewCodeEntry (OP65_CMP, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    }
+
+    /* Remove the push and the call to the tosgeax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt___bzero (StackOpData* D)
-/* Optimize the __bzero sequence if possible */
+/* Optimize the __bzero sequence */
 {
     CodeEntry*  X;
     const char* Arg;
@@ -762,7 +917,7 @@ static unsigned Opt___bzero (StackOpData* D)
 
 
 static unsigned Opt_staspidx (StackOpData* D)
-/* Optimize the staspidx sequence if possible */
+/* Optimize the staspidx sequence */
 {
     CodeEntry* X;
 
@@ -787,7 +942,7 @@ static unsigned Opt_staspidx (StackOpData* D)
 
 
 static unsigned Opt_staxspidx (StackOpData* D)
-/* Optimize the staxspidx sequence if possible */
+/* Optimize the staxspidx sequence */
 {
     CodeEntry* X;
 
@@ -843,7 +998,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
 
 
 static unsigned Opt_tosaddax (StackOpData* D)
-/* Optimize the tosaddax sequence if possible */
+/* Optimize the tosaddax sequence */
 {
     CodeEntry*  X;
     CodeEntry*  N;
@@ -967,7 +1122,7 @@ static unsigned Opt_tosaddax (StackOpData* D)
 
 
 static unsigned Opt_tosandax (StackOpData* D)
-/* Optimize the tosandax sequence if possible */
+/* Optimize the tosandax sequence */
 {
     CodeEntry*  X;
 
@@ -997,8 +1152,16 @@ static unsigned Opt_tosandax (StackOpData* D)
 
 
 
+static unsigned Opt_toseqax (StackOpData* D)
+/* Optimize the toseqax sequence */
+{
+    return Opt_toseqax_tosneax (D, "booleq");
+}
+
+
+
 static unsigned Opt_tosgeax (StackOpData* D)
-/* Optimize the tosgeax sequence if possible. */
+/* Optimize the tosgeax sequence */
 {
     CodeEntry*  X;
     CodeLabel* L;
@@ -1098,7 +1261,7 @@ static unsigned Opt_tosgeax (StackOpData* D)
 
 
 static unsigned Opt_tosltax (StackOpData* D)
-/* Optimize the tosltax sequence if possible. */
+/* Optimize the tosltax sequence */
 {
     CodeEntry*  X;
     CodeLabel* L;
@@ -1198,8 +1361,16 @@ static unsigned Opt_tosltax (StackOpData* D)
 
 
 
+static unsigned Opt_tosneax (StackOpData* D)
+/* Optimize the tosneax sequence */
+{
+    return Opt_toseqax_tosneax (D, "boolne");
+}
+
+
+
 static unsigned Opt_tosorax (StackOpData* D)
-/* Optimize the tosorax sequence if possible */
+/* Optimize the tosorax sequence */
 {
     CodeEntry*  X;
 
@@ -1233,9 +1404,7 @@ static unsigned Opt_tosorax (StackOpData* D)
 
 
 static unsigned Opt_tossubax (StackOpData* D)
-/* Optimize the tossubax sequence if possible. Note: subtraction is not
- * commutative!
- */
+/* Optimize the tossubax sequence. Note: subtraction is not commutative! */
 {
     CodeEntry*  X;
 
@@ -1325,7 +1494,7 @@ static unsigned Opt_tossubax (StackOpData* D)
 
 
 static unsigned Opt_tosugeax (StackOpData* D)
-/* Optimize the tosugeax sequence if possible. */
+/* Optimize the tosugeax sequence */
 {
     CodeEntry*  X;
 
@@ -1411,7 +1580,7 @@ static unsigned Opt_tosugeax (StackOpData* D)
 
 
 static unsigned Opt_tosxorax (StackOpData* D)
-/* Optimize the tosxorax sequence if possible */
+/* Optimize the tosxorax sequence */
 {
     CodeEntry*  X;
 
@@ -1456,8 +1625,10 @@ static const OptFuncDesc FuncTable[] = {
     { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                    },
     { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                    },
     { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                    },
+    { "toseqax",    Opt_toseqax,   REG_NONE, OP_NONE                    },
     { "tosgeax",    Opt_tosgeax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosltax",    Opt_tosltax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
+    { "tosneax",    Opt_tosneax,   REG_NONE, OP_NONE                    },
     { "tosorax",    Opt_tosorax,   REG_NONE, OP_NONE                    },
     { "tossubax",   Opt_tossubax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosugeax",   Opt_tosugeax,  REG_NONE, OP_RHS_LOAD_DIRECT         },

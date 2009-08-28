@@ -67,6 +67,7 @@ Short options:
   -m name               Create a map file
   -o name               Name the default output file
   -t sys                Set the target system
+  -u sym                Force an import of symbol `sym'
   -v                    Verbose mode
   -vm                   Verbose map file
 
@@ -175,6 +176,22 @@ Here is a description of all the command line options:
   supported.
 
 
+  <tag><tt>-u sym[:addrsize], --force-import sym[:addrsize]</tt></tag>
+
+  Force an import of a symbol. While object files are always linked to the
+  output file, regardless if there are any references, object modules from
+  libraries get only linked in if an import can be satisfied by this module.
+  The <tt/--fore-import/ option may be used to add a reference to a symbol and
+  as a result force linkage of the module that exports the identifier.
+
+  The name of the symbol may optionally be followed by a colon and an address
+  size specifier. If no address size is specified, the default address size
+  for the target machine is used.
+
+  Please note that the symbol name needs to have the internal representation,
+  meaning you have to prepend an underline for C identifiers.
+
+
   <label id="option-v">
   <tag><tt>-v, --verbose</tt></tag>
 
@@ -262,22 +279,6 @@ Here is a description of all the command line options:
   will increase the amount of information available. Please note that debug
   information generation is currently being developed, so the format of the
   file and it's contents are subject to change without further notice.
-
-
-  <tag><tt>--force-import sym[:addrsize]</tt></tag>
-
-  Force an import of a symbol. While object files are always linked to the
-  output file, regardless if there are any references, object modules from
-  libraries get only linked in if an import can be satisfied by this module.
-  The <tt/--fore-import/ option may be used to add a reference to a symbol and
-  as a result force linkage of the module that exports the identifier.
-
-  The name of the symbol may be followed by a colon and an address size
-  specifier. If no address size is specified, the default address size
-  for the target machine is used.
-
-  Please note that the symbol name needs to have the internal representation,
-  meaning you have to prepend an underline for C identifiers.
 
 
   <tag><tt>--lib file</tt></tag>

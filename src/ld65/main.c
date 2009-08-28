@@ -105,6 +105,7 @@ static void Usage (void)
             "  -m name\t\tCreate a map file\n"
             "  -o name\t\tName the default output file\n"
             "  -t sys\t\tSet the target system\n"
+            "  -u sym\t\tForce an import of symbol `sym'\n"
             "  -v\t\t\tVerbose mode\n"
             "  -vm\t\t\tVerbose map file\n"
             "\n"
@@ -353,7 +354,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
     if (ColPos == 0) {
 
         /* Use default address size (which for now is always absolute
-         * addressing) 
+         * addressing)
          */
         InsertImport (GenImport (Arg, ADDR_SIZE_ABS));
 
@@ -572,16 +573,20 @@ int main (int argc, char* argv [])
 
 	       	case 't':
 	       	    if (CfgAvail ()) {
-	       		Error ("Cannot use -C/-t twice");
+	       	       	Error ("Cannot use -C/-t twice");
 	       	    }
 	       	    OptTarget (Arg, GetArg (&I, 2));
 	       	    break;
 
+                case 'u':
+                    OptForceImport (Arg, GetArg (&I, 2));
+                    break;
+
 	       	case 'v':
 	       	    switch (Arg [2]) {
 	       	       	case 'm':   VerboseMap = 1; 	break;
-    		      	case '\0':  ++Verbosity;    	break;
-		      	default:    UnknownOption (Arg);
+    		       	case '\0':  ++Verbosity;    	break;
+		       	default:    UnknownOption (Arg);
 		    }
 		    break;
 
@@ -596,8 +601,8 @@ int main (int argc, char* argv [])
     		case 'L':
 		    switch (Arg [2]) {
                         /* ## The first one is obsolete and will go */
-		      	case 'n': LabelFileName = GetArg (&I, 3);   break;
-		      	default:  OptLibPath (Arg, GetArg (&I, 2)); break;
+		       	case 'n': LabelFileName = GetArg (&I, 3);   break;
+		       	default:  OptLibPath (Arg, GetArg (&I, 2)); break;
 		    }
 		    break;
 

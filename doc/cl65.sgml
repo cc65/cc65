@@ -44,6 +44,7 @@ Short options:
   -o name		Name the output file
   -r			Enable register variables
   -t sys		Set the target system
+  -u sym                Force an import of symbol `sym'
   -v			Verbose mode
   -vm			Verbose map file
   -C name		Use linker config file
@@ -83,6 +84,7 @@ Long options:
   --debug		Debug mode
   --debug-info		Add debug info
   --feature name	Set an emulation feature
+  --force-import sym    Force an import of symbol `sym'
   --forget-inc-paths	Forget include search paths (compiler)
   --help		Help (this text)
   --include-dir dir	Set a compiler include directory path

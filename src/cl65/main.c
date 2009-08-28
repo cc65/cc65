@@ -636,6 +636,7 @@ static void Usage (void)
             "  -o name\t\tName the output file\n"
             "  -r\t\t\tEnable register variables\n"
             "  -t sys\t\tSet the target system\n"
+            "  -u sym\t\tForce an import of symbol `sym'\n"
             "  -v\t\t\tVerbose mode\n"
             "  -vm\t\t\tVerbose map file\n"
             "  -C name\t\tUse linker config file\n"
@@ -675,6 +676,7 @@ static void Usage (void)
             "  --debug\t\tDebug mode\n"
             "  --debug-info\t\tAdd debug info\n"
             "  --feature name\tSet an emulation feature\n"
+            "  --force-import sym\tForce an import of symbol `sym'\n"
             "  --forget-inc-paths\tForget include search paths (compiler)\n"
             "  --help\t\tHelp (this text)\n"
             "  --include-dir dir\tSet a compiler include directory path\n"
@@ -880,8 +882,8 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 static void OptForceImport (const char* Opt attribute ((unused)), const char* Arg)
 /* Emulation features for the assembler */
 {
-    CmdAddArg2 (&LD65, "--force-import", Arg);
-}                                     
+    CmdAddArg2 (&LD65, "-u", Arg);
+}
 
 
 
@@ -1356,6 +1358,11 @@ int main (int argc, char* argv [])
 		case 't':
 		    /* Set target system - compiler, assembler and linker */
 		    OptTarget (Arg, GetArg (&I, 2));
+		    break;
+
+		case 'u':
+		    /* Force an import (linker) */
+		    OptForceImport (Arg, GetArg (&I, 2));
 		    break;
 
 		case 'v':

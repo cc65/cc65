@@ -52,17 +52,19 @@
 
 
 /* LoadRegInfo flags set by DirectOp */
-#define LI_NONE         0x00
-#define LI_DIRECT       0x01            /* Direct op may be used */
-#define LI_RELOAD_Y     0x02            /* Reload index register Y */
-#define LI_REMOVE       0x04            /* Load may be removed */
+typedef enum {
+  LI_NONE               = 0x00,
+  LI_DIRECT             = 0x01,         /* Direct op may be used */
+  LI_RELOAD_Y           = 0x02,         /* Reload index register Y */
+  LI_REMOVE             = 0x04,         /* Load may be removed */
+} LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
 typedef struct LoadRegInfo LoadRegInfo;
 struct LoadRegInfo {
     int                 LoadIndex;      /* Index of load insn, -1 if invalid */
     CodeEntry*          LoadEntry;      /* The actual entry, 0 if invalid */
-    unsigned char       Flags;          /* Tells us how to load */
+    LI_FLAGS            Flags;          /* Tells us how to load */
     unsigned char       Offs;           /* Stack offset if data is on stack */
 };
 
@@ -453,6 +455,24 @@ static void CheckDirectOp (StackOpData* D)
 
 
 
+static void AddStoreA (StackOpData* D)
+/* Add a store to zero page after the push insn */
+{
+    CodeEntry* X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
+    InsertEntry (D, X, D->PushIndex+1);
+}
+
+
+
+static void AddStoreX (StackOpData* D)
+/* Add a store to zero page after the push insn */
+{
+    CodeEntry* X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
+    InsertEntry (D, X, D->PushIndex+1);
+}
+
+
+
 static void ReplacePushByStore (StackOpData* D)
 /* Replace the call to the push subroutine by a store into the zero page
  * location (actually, the push is not replaced, because we need it for
@@ -460,18 +480,14 @@ static void ReplacePushByStore (StackOpData* D)
  * end of each routine).
  */
 {
-    CodeEntry* X;
-
     /* Store the value into the zeropage instead of pushing it. Check high
      * byte first so that the store is later in A/X order.
      */
     if ((D->Lhs.X.Flags & LI_DIRECT) == 0) {
-        X = NewCodeEntry (OP65_STX, AM65_ZP, D->ZPHi, 0, D->PushEntry->LI);
-        InsertEntry (D, X, D->PushIndex+1);
+        AddStoreX (D);
     }
     if ((D->Lhs.A.Flags & LI_DIRECT) == 0) {
-     	X = NewCodeEntry (OP65_STA, AM65_ZP, D->ZPLo, 0, D->PushEntry->LI);
-       	InsertEntry (D, X, D->PushIndex+1);
+        AddStoreA (D);
     }
 }
 
@@ -661,7 +677,8 @@ static unsigned Opt___bzero (StackOpData* D)
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
-        ReplacePushByStore (D);
+        AddStoreX (D);
+        AddStoreA (D);
     }
 
     /* If the return value of __bzero is used, we have to add code to reload
@@ -752,7 +769,8 @@ static unsigned Opt_staspidx (StackOpData* D)
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
-        ReplacePushByStore (D);
+        AddStoreX (D);
+        AddStoreA (D);
     }
 
     /* Replace the store subroutine call by a direct op */
@@ -776,7 +794,8 @@ static unsigned Opt_staxspidx (StackOpData* D)
     /* Check if we're using a register variable */
     if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
-        ReplacePushByStore (D);
+        AddStoreX (D);
+        AddStoreA (D);
     }
 
     /* Inline the store */
@@ -854,7 +873,8 @@ static unsigned Opt_tosaddax (StackOpData* D)
         int Signed = (strcmp (N->Arg, "ldaidx") == 0);
 
         /* Store the value into the zeropage instead of pushing it */
-        ReplacePushByStore (D);
+        AddStoreX (D);
+        AddStoreA (D);
 
         /* Replace the ldy by a tay. Be sure to create the new entry before
          * deleting the ldy, since we will reference the line info from this

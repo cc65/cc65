@@ -18,8 +18,8 @@
 
 
 
-#define COUNT		8192		/* Up to what number? */
-#define SQRT_COUNT	91		/* Sqrt of COUNT */
+#define COUNT		16384		/* Up to what number? */
+#define SQRT_COUNT	128  		/* Sqrt of COUNT */
 
 static unsigned char Sieve[COUNT];
 
@@ -68,7 +68,8 @@ int main (void)
     while (I < SQRT_COUNT) {
 	if (Sieve[I] == 0) {
 	    /* Prime number - mark multiples */
-	    S = &Sieve[J = I*2];
+            J = I*2;
+	    S = &Sieve[J];
        	    while (J < COUNT) {
 	      	*S = 1;
 	      	S += I;

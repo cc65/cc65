@@ -706,7 +706,7 @@ NextEntry:
 
 
 
-unsigned OptCondBranches (CodeSeg* S)
+unsigned OptCondBranches1 (CodeSeg* S)
 /* Performs several optimization steps:
  *
  *  - If an immidiate load of a register is followed by a conditional jump that
@@ -792,6 +792,63 @@ unsigned OptCondBranches (CodeSeg* S)
      	++I;
 
     }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptCondBranches2 (CodeSeg* S)
+/* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
+ * we can remove the rol and branch on the state of the carry.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+       	CodeEntry* N;
+
+       	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if it's a rol insn with A in accu and a branch follows */
+       	if (E->OPC == OP65_ROL                  &&
+            E->AM == AM65_ACC                   &&
+            E->RI->In.RegA == 0                 &&
+            !CE_HasLabel (E)                    &&
+            (N = CS_GetNextEntry (S, I)) != 0   &&
+            (N->Info & OF_ZBRA) != 0            &&
+            !RegAUsed (S, I+1)) {
+
+	    /* Replace the branch condition */
+	    switch (GetBranchCond (N->OPC)) {
+                case BC_EQ:     CE_ReplaceOPC (N, OP65_JCC); break;
+                case BC_NE:     CE_ReplaceOPC (N, OP65_JCS); break;
+                default:        Internal ("Unknown branch condition in OptCondBranches2");
+            }
+
+            /* Delete the rol insn */
+            CS_DelEntry (S, I);
+
+            /* Remember, we had changes */
+            ++Changes;
+
+	}
+
+       	/* Next entry */
+       	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -975,7 +1032,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * remove the store.
 		 */
 	        if (RegValIsKnown (In->RegA)          && /* Value of A is known */
-		    E->AM == AM65_ZP                  && /* Store into zp */
+       		    E->AM == AM65_ZP                  && /* Store into zp */
 		    In->RegA == ZPRegVal (E->Chg, In)) { /* Value identical */
 
 		    Delete = 1;
@@ -1028,7 +1085,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
        	        } else if (RegValIsKnown (In->RegY)) {
 		    if (In->RegY == In->RegA) {
-		     	CE_ReplaceOPC (E, OP65_STA);
+       		     	CE_ReplaceOPC (E, OP65_STA);
 		    } else if (In->RegY == In->RegX   &&
 		     	       E->AM != AM65_ABSX     &&
 		     	       E->AM != AM65_ZPX) {
@@ -1081,7 +1138,7 @@ unsigned OptDupLoads (CodeSeg* S)
 
 	    case OP65_TYA:
                 if (RegValIsKnown (In->RegY)            &&
-		    In->RegY == In->RegA                &&
+       		    In->RegY == In->RegA                &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
        	       	    !CE_UseLoadFlags (N)) {
 		    /* Value is identical and not followed by a branch */
@@ -1130,10 +1187,10 @@ unsigned OptStoreLoad (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* N;
-	CodeEntry* X;
+       	CodeEntry* N;
+       	CodeEntry* X;
 
-      	/* Get next entry */
+       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it is a store instruction followed by a load from the
@@ -1887,7 +1944,7 @@ unsigned OptPrecalc (CodeSeg* S)
 /*****************************************************************************/
 
 
-
+       
 unsigned OptBranchDist (CodeSeg* S)
 /* Change branches for the distance needed. */
 {

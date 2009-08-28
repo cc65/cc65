@@ -408,11 +408,11 @@ static unsigned OptShift4 (CodeSeg* S)
              *      ldx     tmp1
              *
              * which makes 4 + 3 * ShiftCount bytes, compared to the original
-             * 3 bytes for the subroutine call. However, in most cases, the 
+             * 3 bytes for the subroutine call. However, in most cases, the
              * final load of the X register gets merged with some other insn
              * and replaces a txa, so for a shift count of 1, we get a factor
              * of 200, which matches nicely the CodeSizeFactor enabled with -Oi
-             */                                                                
+             */
             if (ShiftCount > 1 || S->CodeSizeFactor > 200) {
                 unsigned Size = 4 + 3 * ShiftCount;
                 if ((Size * 100 / 3) > S->CodeSizeFactor) {
@@ -1097,7 +1097,8 @@ static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",        	100, 0, 
 static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",        	 85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp8	       	= { OptCmp8,   	     "OptCmp8",        	 50, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches",  80, 0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranches1= { OptCondBranches1,"OptCondBranches1", 80, 0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranches2= { OptCondBranches2,"OptCondBranches2",  0, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 0, 0, 0, 0 };
@@ -1181,7 +1182,8 @@ static OptFunc* OptFuncs[] = {
     &DOptCmp6,
     &DOptCmp7,
     &DOptCmp8,
-    &DOptCondBranches,
+    &DOptCondBranches1,
+    &DOptCondBranches2,
     &DOptDeadCode,
     &DOptDeadJumps,
     &DOptDecouple,
@@ -1558,7 +1560,8 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptDeadCode, 1);
        	C += RunOptFunc (S, &DOptJumpTarget1, 1);
        	C += RunOptFunc (S, &DOptJumpTarget2, 1);
-       	C += RunOptFunc (S, &DOptCondBranches, 1);
+       	C += RunOptFunc (S, &DOptCondBranches1, 1);
+       	C += RunOptFunc (S, &DOptCondBranches2, 1);
        	C += RunOptFunc (S, &DOptRTSJumps1, 1);
        	C += RunOptFunc (S, &DOptBoolTrans, 1);
        	C += RunOptFunc (S, &DOptCmp1, 1);

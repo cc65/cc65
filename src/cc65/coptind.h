@@ -89,10 +89,15 @@ unsigned OptJumpTarget2 (CodeSeg* S);
  * it's job is already done.
  */
 
-unsigned OptCondBranches (CodeSeg* S);
+unsigned OptCondBranches1 (CodeSeg* S);
 /* If an immidiate load of a register is followed by a conditional jump that
  * is never taken because the load of the register sets the flags in such a
  * manner, remove the conditional branch.
+ */
+
+unsigned OptCondBranches2 (CodeSeg* S);
+/* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
+ * we can remove the rol and branch on the state of the carry.
  */
 
 unsigned OptUnusedLoads (CodeSeg* S);

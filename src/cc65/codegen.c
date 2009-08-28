@@ -3486,6 +3486,8 @@ void g_lt (unsigned flags, unsigned long val)
         "tosltax", "tosultax", "toslteax", "tosulteax",
     };
 
+    unsigned Label;
+
     /* If the right hand side is const, the lhs is not on stack but still
      * in the primary register.
      */
@@ -3545,32 +3547,84 @@ void g_lt (unsigned flags, unsigned long val)
 
         } else if (val == 0) {
 
-            /* Look at the type */
+            /* A signed compare against zero must only look at the sign bit */
             switch (flags & CF_TYPE) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
-                        AddCodeLine ("tax");
-                        AddCodeLine ("jsr boollt");
+                        AddCodeLine ("asl a");          /* Bit 7 -> carry */
+                        AddCodeLine ("ldx #$00");
+                        AddCodeLine ("lda #$00");
+                        AddCodeLine ("rol a");
                         return;
                     }
                     /* FALLTHROUGH */
 
                 case CF_INT:
                     /* Just check the high byte */
-                    AddCodeLine ("txa");
-                    AddCodeLine ("jsr boollt");
+                    AddCodeLine ("cpx #$80");           /* Bit 7 -> carry */
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("rol a");
                     return;
 
                 case CF_LONG:
                     /* Just check the high byte */
                     AddCodeLine ("lda sreg+1");
-                    AddCodeLine ("jsr boollt");
+                    AddCodeLine ("asl a");              /* Bit 7 -> carry */
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("rol a");
                     return;
 
                 default:
                     typeerror (flags);
             }
+
+        } else {
+
+            /* Signed compare against a constant != zero */
+            switch (flags & CF_TYPE) {
+
+                case CF_CHAR:
+                    if (flags & CF_FORCECHAR) {
+                        Label = GetLocalLabel ();
+                        AddCodeLine ("sec");
+                        AddCodeLine ("sbc #$%02X", (unsigned char)val);
+                        AddCodeLine ("bvc %s", LocalLabelName (Label));
+                        AddCodeLine ("eor #$80");
+                        g_defcodelabel (Label);
+                        AddCodeLine ("asl a");          /* Bit 7 -> carry */
+                        AddCodeLine ("ldx #$00");
+                        AddCodeLine ("lda #$00");
+                        AddCodeLine ("rol a");
+                        return;
+                    }
+                    /* FALLTHROUGH */
+
+                case CF_INT:
+                    /* Do a subtraction */
+                    Label = GetLocalLabel ();
+                    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+                    AddCodeLine ("txa");
+                    AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
+                    AddCodeLine ("bvc %s", LocalLabelName (Label));
+                    AddCodeLine ("eor #$80");
+                    g_defcodelabel (Label);
+                    AddCodeLine ("asl a");          /* Bit 7 -> carry */
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("rol a");
+                    return;
+
+                case CF_LONG:
+                    /* This one is too costly */
+                    break;
+
+                default:
+                    typeerror (flags);
+            }
+
         }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
@@ -3864,26 +3918,27 @@ void g_ge (unsigned flags, unsigned long val)
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
+                        /* Do a subtraction. Condition is true if carry set */
                         AddCodeLine ("cmp #$%02X", (unsigned char)val);
-                        AddCodeLine ("jsr booluge");
+                        AddCodeLine ("lda #$00");
+                        AddCodeLine ("ldx #$00");
+                        AddCodeLine ("rol a");
                         return;
                     }
                     /* FALLTHROUGH */
 
                 case CF_INT:
-                    /* If the low byte is zero, we must only test the high byte */
-                    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
-                    if ((val & 0xFF) != 0) {
-                        unsigned L = GetLocalLabel();
-                        AddCodeLine ("bne %s", LocalLabelName (L));
-                        AddCodeLine ("cmp #$%02X", (unsigned char)val);
-                        g_defcodelabel (L);
-                    }
-                    AddCodeLine ("jsr booluge");
+                    /* Do a subtraction. Condition is true if carry set */
+                    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+                    AddCodeLine ("txa");
+                    AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("rol a");              
                     return;
 
                 case CF_LONG:
-                    /* Do a subtraction */
+                    /* Do a subtraction. Condition is true if carry set */
                     AddCodeLine ("cmp #$%02X", (unsigned char)val);
                     AddCodeLine ("txa");
                     AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
@@ -3891,7 +3946,9 @@ void g_ge (unsigned flags, unsigned long val)
                     AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 16));
                     AddCodeLine ("lda sreg+1");
                     AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 24));
-                    AddCodeLine ("jsr booluge");
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("rol a");
                     return;
 
                 default:
@@ -3900,7 +3957,7 @@ void g_ge (unsigned flags, unsigned long val)
 
         } else if (val == 0) {
 
-            /* Look at the type */
+            /* A signed compare against zero must only look at the sign bit */
             switch (flags & CF_TYPE) {
 
                 case CF_CHAR:

@@ -3553,8 +3553,8 @@ void g_lt (unsigned flags, unsigned long val)
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
                         AddCodeLine ("asl a");          /* Bit 7 -> carry */
-                        AddCodeLine ("ldx #$00");
                         AddCodeLine ("lda #$00");
+                        AddCodeLine ("ldx #$00");
                         AddCodeLine ("rol a");
                         return;
                     }
@@ -3563,8 +3563,8 @@ void g_lt (unsigned flags, unsigned long val)
                 case CF_INT:
                     /* Just check the high byte */
                     AddCodeLine ("cpx #$80");           /* Bit 7 -> carry */
-                    AddCodeLine ("ldx #$00");
                     AddCodeLine ("lda #$00");
+                    AddCodeLine ("ldx #$00");
                     AddCodeLine ("rol a");
                     return;
 
@@ -3572,8 +3572,8 @@ void g_lt (unsigned flags, unsigned long val)
                     /* Just check the high byte */
                     AddCodeLine ("lda sreg+1");
                     AddCodeLine ("asl a");              /* Bit 7 -> carry */
-                    AddCodeLine ("ldx #$00");
                     AddCodeLine ("lda #$00");
+                    AddCodeLine ("ldx #$00");
                     AddCodeLine ("rol a");
                     return;
 
@@ -3595,8 +3595,8 @@ void g_lt (unsigned flags, unsigned long val)
                         AddCodeLine ("eor #$80");
                         g_defcodelabel (Label);
                         AddCodeLine ("asl a");          /* Bit 7 -> carry */
-                        AddCodeLine ("ldx #$00");
                         AddCodeLine ("lda #$00");
+                        AddCodeLine ("ldx #$00");
                         AddCodeLine ("rol a");
                         return;
                     }
@@ -3612,8 +3612,8 @@ void g_lt (unsigned flags, unsigned long val)
                     AddCodeLine ("eor #$80");
                     g_defcodelabel (Label);
                     AddCodeLine ("asl a");          /* Bit 7 -> carry */
-                    AddCodeLine ("ldx #$00");
                     AddCodeLine ("lda #$00");
+                    AddCodeLine ("ldx #$00");
                     AddCodeLine ("rol a");
                     return;
 
@@ -3894,6 +3894,8 @@ void g_ge (unsigned flags, unsigned long val)
         "tosgeax", "tosugeax", "tosgeeax", "tosugeeax",
     };
 
+    unsigned Label;
+
 
     /* If the right hand side is const, the lhs is not on stack but still
      * in the primary register.
@@ -3934,7 +3936,7 @@ void g_ge (unsigned flags, unsigned long val)
                     AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
                     AddCodeLine ("lda #$00");
                     AddCodeLine ("ldx #$00");
-                    AddCodeLine ("rol a");              
+                    AddCodeLine ("rol a");
                     return;
 
                 case CF_LONG:
@@ -3983,8 +3985,51 @@ void g_ge (unsigned flags, unsigned long val)
                 default:
                     typeerror (flags);
             }
-        }
 
+        } else {
+
+            /* Signed compare against a constant != zero */
+            switch (flags & CF_TYPE) {
+
+                case CF_CHAR:
+                    if (flags & CF_FORCECHAR) {
+                        Label = GetLocalLabel ();
+                        AddCodeLine ("sec");
+                        AddCodeLine ("sbc #$%02X", (unsigned char)val);
+                        AddCodeLine ("bvs %s", LocalLabelName (Label));
+                        AddCodeLine ("eor #$80");
+                        g_defcodelabel (Label);
+                        AddCodeLine ("asl a");          /* Bit 7 -> carry */
+                        AddCodeLine ("lda #$00");
+                        AddCodeLine ("ldx #$00");
+                        AddCodeLine ("rol a");
+                        return;
+                    }
+                    /* FALLTHROUGH */
+
+                case CF_INT:
+                    /* Do a subtraction */
+                    Label = GetLocalLabel ();
+                    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+                    AddCodeLine ("txa");
+                    AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
+                    AddCodeLine ("bvs %s", LocalLabelName (Label));
+                    AddCodeLine ("eor #$80");
+                    g_defcodelabel (Label);
+                    AddCodeLine ("asl a");          /* Bit 7 -> carry */
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("rol a");
+                    return;
+
+                case CF_LONG:
+                    /* This one is too costly */
+                    break;
+
+                default:
+                    typeerror (flags);
+            }
+        }
 
         /* If we go here, we didn't emit code. Push the lhs on stack and fall
          * into the normal, non-optimized stuff. Note: The standard stuff will

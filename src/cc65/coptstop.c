@@ -88,7 +88,9 @@ typedef enum {
     OP_A_KNOWN          = 0x01,         /* Value of A must be known */
     OP_X_ZERO           = 0x02,         /* X must be zero */
     OP_LHS_LOAD         = 0x04,         /* Must have load insns for LHS */
-    OP_RHS_LOAD         = 0x08,         /* Must have load insns for RHS */
+    OP_LHS_LOAD_DIRECT  = 0x0C,         /* Must have direct load insn for LHS */
+    OP_RHS_LOAD         = 0x10,         /* Must have load insns for RHS */
+    OP_RHS_LOAD_DIRECT  = 0x30,         /* Must have direct load insn for RHS */
 } OP_FLAGS;
 
 /* Structure forward decl */
@@ -887,13 +889,6 @@ static unsigned Opt_tosaddax (StackOpData* D)
 
     } else {
 
-        /* Check the entry before the push. If it's a lda instruction with an
-         * addressing mode that allows us to replace it, we may use this
-         * location for the op and must not save the value in the zero page
-         * location.
-         */
-        CheckDirectOp (D);
-
         /* Store the value into the zeropage instead of pushing it */
         ReplacePushByStore (D);
 
@@ -956,13 +951,6 @@ static unsigned Opt_tosandax (StackOpData* D)
 {
     CodeEntry*  X;
 
-    /* Check the entry before the push. If it's a lda instruction with an
-     * addressing mode that allows us to replace it, we may use this
-     * location for the op and must not save the value in the zero page
-     * location.
-     */
-    CheckDirectOp (D);
-
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
 
@@ -989,17 +977,211 @@ static unsigned Opt_tosandax (StackOpData* D)
 
 
 
+static unsigned Opt_tosgeax (StackOpData* D)
+/* Optimize the tosgeax sequence if possible. */
+{
+    CodeEntry*  X;
+    CodeLabel* L;
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & LI_DIRECT) != 0);
+
+    /* If the location is on the stack, we need to reload the Y register. */
+    if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+
+        /* cmp ... */
+        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
+        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    } else {
+
+        /* ldy #offs */
+        const char* Arg = MakeHexArg (D->Rhs.A.Offs);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* cmp (sp),y */
+        X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* In both cases, we can remove the load */
+    D->Rhs.A.Flags |= LI_REMOVE;
+
+    /* txa */
+    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* If the location is on the stack, we need to reload the Y register. */
+    if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
+
+        /* sbc ... */
+        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
+        X = NewCodeEntry (OP65_SBC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    } else {
+
+        /* ldy #offs */
+        const char* Arg = MakeHexArg (D->Rhs.X.Offs);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* sbc (sp),y */
+        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* In both cases, we can remove the load */
+    D->Rhs.X.Flags |= LI_REMOVE;
+
+    /* eor #$80 */
+    X = NewCodeEntry (OP65_EOR, AM65_IMM, "$80", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* asl a */
+    X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+    L = CS_GenLabel (D->Code, X);
+
+    /* Insert a bvs L before the eor insn */
+    X = NewCodeEntry (OP65_BVS, AM65_BRA, L->Name, L, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP - 2);
+    ++D->IP;
+
+    /* lda #$00 */
+    X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* ldx #$00 */
+    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* rol a */
+    X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the tosgeax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
+static unsigned Opt_tosltax (StackOpData* D)
+/* Optimize the tosltax sequence if possible. */
+{
+    CodeEntry*  X;
+    CodeLabel* L;
+
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & LI_DIRECT) != 0);
+
+    /* If the location is on the stack, we need to reload the Y register. */
+    if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+
+        /* cmp ... */
+        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
+        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    } else {
+
+        /* ldy #offs */
+        const char* Arg = MakeHexArg (D->Rhs.A.Offs);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* cmp (sp),y */
+        X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* In both cases, we can remove the load */
+    D->Rhs.A.Flags |= LI_REMOVE;
+
+    /* txa */
+    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* If the location is on the stack, we need to reload the Y register. */
+    if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
+
+        /* sbc ... */
+        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
+        X = NewCodeEntry (OP65_SBC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    } else {
+
+        /* ldy #offs */
+        const char* Arg = MakeHexArg (D->Rhs.X.Offs);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* sbc (sp),y */
+        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* In both cases, we can remove the load */
+    D->Rhs.X.Flags |= LI_REMOVE;
+
+    /* eor #$80 */
+    X = NewCodeEntry (OP65_EOR, AM65_IMM, "$80", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* asl a */
+    X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+    L = CS_GenLabel (D->Code, X);
+
+    /* Insert a bvc L before the eor insn */
+    X = NewCodeEntry (OP65_BVC, AM65_BRA, L->Name, L, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP - 2);
+    ++D->IP;
+
+    /* lda #$00 */
+    X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* ldx #$00 */
+    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* rol a */
+    X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the tosltax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_tosorax (StackOpData* D)
 /* Optimize the tosorax sequence if possible */
 {
     CodeEntry*  X;
-
-    /* Check the entry before the push. If it's a lda instruction with an
-     * addressing mode that allows us to replace it, we may use this
-     * location for the op and must not save the value in the zero page
-     * location.
-     */
-    CheckDirectOp (D);
 
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
@@ -1037,12 +1219,6 @@ static unsigned Opt_tossubax (StackOpData* D)
 {
     CodeEntry*  X;
 
-    /* Check the load entry before the push. If it's a lda instruction with an
-     * addressing mode that allows us to replace it, we may use this
-     * location for the op and must not save the value in the zero page
-     * location.
-     */
-    CheckDirectOp (D);
 
     /* Inline the sbc */
     D->IP = D->OpIndex+1;
@@ -1128,17 +1304,97 @@ static unsigned Opt_tossubax (StackOpData* D)
 
 
 
+static unsigned Opt_tosugeax (StackOpData* D)
+/* Optimize the tosugeax sequence if possible. */
+{
+    CodeEntry*  X;
+
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & LI_DIRECT) != 0);
+
+    /* If the location is on the stack, we need to reload the Y register. */
+    if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+
+        /* cmp ... */
+        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
+        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    } else {
+
+        /* ldy #offs */
+        const char* Arg = MakeHexArg (D->Rhs.A.Offs);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* cmp (sp),y */
+        X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* In both cases, we can remove the load */
+    D->Rhs.A.Flags |= LI_REMOVE;
+
+    /* txa */
+    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* If the location is on the stack, we need to reload the Y register. */
+    if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
+
+        /* sbc ... */
+        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
+        X = NewCodeEntry (OP65_SBC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    } else {
+
+        /* ldy #offs */
+        const char* Arg = MakeHexArg (D->Rhs.X.Offs);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* sbc (sp),y */
+        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+    }
+
+    /* In both cases, we can remove the load */
+    D->Rhs.X.Flags |= LI_REMOVE;
+
+    /* lda #$00 */
+    X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* ldx #$00 */
+    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* rol a */
+    X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the tosugeax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_tosxorax (StackOpData* D)
 /* Optimize the tosxorax sequence if possible */
 {
     CodeEntry*  X;
 
-    /* Check the entry before the push. If it's a lda instruction with an
-     * addressing mode that allows us to replace it, we may use this
-     * location for the op and must not save the value in the zero page
-     * location.
-     */
-    CheckDirectOp (D);
 
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
@@ -1180,10 +1436,11 @@ static const OptFuncDesc FuncTable[] = {
     { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                    },
     { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                    },
     { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                    },
+    { "tosgeax",    Opt_tosgeax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
+    { "tosltax",    Opt_tosltax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosorax",    Opt_tosorax,   REG_NONE, OP_NONE                    },
-#if 1
-    { "tossubax",   Opt_tossubax,  REG_NONE, OP_NONE                    },
-#endif
+    { "tossubax",   Opt_tossubax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
+    { "tosugeax",   Opt_tosugeax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                    },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
@@ -1284,15 +1541,27 @@ static int PreCondOk (StackOpData* D)
         /* Cannot optimize */
         return 0;
     }
-    if ((D->OptFunc->Flags & OP_LHS_LOAD) != 0 &&
-        (D->Lhs.A.LoadIndex < 0 || D->Lhs.X.LoadIndex < 0)) {
-        /* Cannot optimize */
-        return 0;
+    if ((D->OptFunc->Flags & OP_LHS_LOAD) != 0) {
+        if (D->Lhs.A.LoadIndex < 0 || D->Lhs.X.LoadIndex < 0) {
+            /* Cannot optimize */
+            return 0;
+        } else if ((D->OptFunc->Flags & OP_LHS_LOAD_DIRECT) != 0) {
+            if ((D->Lhs.A.Flags & D->Lhs.X.Flags & LI_DIRECT) == 0) {
+                /* Cannot optimize */
+                return 0;
+            }
+        }
     }
-    if ((D->OptFunc->Flags & OP_RHS_LOAD) != 0 &&
-        (D->Rhs.A.LoadIndex < 0 || D->Rhs.X.LoadIndex < 0)) {
-        /* Cannot optimize */
-        return 0;
+    if ((D->OptFunc->Flags & OP_RHS_LOAD) != 0) {
+        if (D->Rhs.A.LoadIndex < 0 || D->Rhs.X.LoadIndex < 0) {
+            /* Cannot optimize */
+            return 0;
+        } else if ((D->OptFunc->Flags & OP_RHS_LOAD_DIRECT) != 0) {
+            if ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) == 0) {
+                /* Cannot optimize */
+                return 0;
+            }
+        }
     }
 
     /* Determine the zero page locations to use */
@@ -1369,6 +1638,7 @@ unsigned OptStackOps (CodeSeg* S)
 
             case Initialize:
                 ResetStackOpData (&Data);
+                State = Search;
                 /* FALLTHROUGH */
 
             case Search:
@@ -1456,6 +1726,9 @@ unsigned OptStackOps (CodeSeg* S)
                 FinalizeLoadInfo (&Data.Lhs, S);
                 FinalizeLoadInfo (&Data.Rhs, S);
 
+                /* Set flags for direct operations */
+                CheckDirectOp (&Data);
+
                 /* If the Lhs loads do load from zeropage, we have to include
                  * them into UsedRegs registers used. The Rhs loads have already
                  * been tracked.
@@ -1491,11 +1764,6 @@ unsigned OptStackOps (CodeSeg* S)
                 Data.PushEntry = CS_GetEntry (S, Data.PushIndex);
                 Data.OpEntry   = CS_GetEntry (S, Data.OpIndex);
                 Data.NextEntry = CS_GetNextEntry (S, Data.OpIndex);
-
-                /* Regenerate register info, since AdjustStackOffset changed
-                 * the code
-                 */
-                CS_GenRegInfo (S);
 
                 /* Call the optimizer function */
                 Changes += Data.OptFunc->Func (&Data);

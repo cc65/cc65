@@ -75,9 +75,11 @@ struct Declaration {
 };
 
 /* Modes for ParseDecl */
-#define DM_NEED_IDENT	0U		/* We must have an identifier */
-#define DM_NO_IDENT	1U		/* We won't read an identifier */
-#define DM_ACCEPT_IDENT	2U		/* We will accept an id if there is one */
+typedef enum {                                                   
+    DM_NEED_IDENT,                      /* We must have an identifier */
+    DM_NO_IDENT,                        /* We won't read an identifier */
+    DM_ACCEPT_IDENT,                    /* We will accept an id if there is one */
+} declmode_t;
 
 
 
@@ -90,7 +92,7 @@ struct Declaration {
 Type* ParseType (Type* Type);
 /* Parse a complete type specification */
 
-void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode);
+void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode);
 /* Parse a variable, type or function declaration */
 
 void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, long DefType);

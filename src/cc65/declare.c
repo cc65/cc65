@@ -507,7 +507,7 @@ static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
             }
 
 	    /* Get type and name of the struct field */
-	    ParseDecl (&Spec, &Decl, 0);
+	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
 
             /* Get the offset of this field */
             Offs = (StructType == T_STRUCT)? StructSize : 0;
@@ -1049,7 +1049,7 @@ static FuncDesc* ParseFuncDecl (void)
 
 
 
-static void Declarator (const DeclSpec* Spec, Declaration* D, unsigned Mode)
+static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
     /* Read optional function or pointer qualifiers. These modify the
@@ -1213,7 +1213,7 @@ Type* ParseType (Type* T)
 
 
 
-void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
+void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 /* Parse a variable, type or function declaration */
 {
     /* Initialize the Declaration struct */

@@ -1302,9 +1302,6 @@ static int PreCondOk (StackOpData* D)
     } else if ((D->UsedRegs & REG_SREG) == REG_NONE) {
         D->ZPLo = "sreg";
         D->ZPHi = "sreg+1";
-    } else if ((D->UsedRegs & REG_PTR1) == REG_NONE) {
-        D->ZPLo = "ptr1";
-        D->ZPHi = "ptr1+1";
     } else if ((D->UsedRegs & REG_PTR2) == REG_NONE) {
         D->ZPLo = "ptr2";
         D->ZPHi = "ptr2+1";
@@ -1418,7 +1415,7 @@ unsigned OptStackOps (CodeSeg* S)
                         TrackLoads (&Data.Rhs, E, I);
                     }
 
-                } else if (E->Info & OF_STORE) {
+                } else if (E->Info & OF_STORE && (E->Chg & REG_ZP) == 0) {
 
                     /* Too dangerous - there may be a change of a variable
                      * within the sequence.

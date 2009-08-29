@@ -769,7 +769,7 @@ unsigned OptCondBranches1 (CodeSeg* S)
 	}
 
       	if ((E->Info & OF_CBRA) != 0	     	  &&  /* It's a conditional branch */
-      	    (L = E->JumpTo) != 0	     	  &&  /* ..referencing a local label */
+      	    (L = E->JumpTo) != 0    	     	  &&  /* ..referencing a local label */
        	    (N = CS_GetNextEntry (S, I)) != 0     &&  /* There is a following entry */
       	    (N->Info & OF_UBRA) != 0	     	  &&  /* ..which is an uncond branch, */
       	    !CE_HasLabel (N) 	     	          &&  /* ..has no label attached */
@@ -801,7 +801,7 @@ unsigned OptCondBranches1 (CodeSeg* S)
 
 unsigned OptCondBranches2 (CodeSeg* S)
 /* If on entry to a "rol a" instruction the accu is zero, and a beq/bne follows,
- * we can remove the rol and branch on the state of the carry.
+ * we can remove the rol and branch on the state of the carry flag.
  */
 {
     unsigned Changes = 0;
@@ -839,12 +839,10 @@ unsigned OptCondBranches2 (CodeSeg* S)
 
             /* Remember, we had changes */
             ++Changes;
-
 	}
 
        	/* Next entry */
        	++I;
-
     }
 
     /* Free register info */
@@ -1944,7 +1942,7 @@ unsigned OptPrecalc (CodeSeg* S)
 /*****************************************************************************/
 
 
-       
+
 unsigned OptBranchDist (CodeSeg* S)
 /* Change branches for the distance needed. */
 {

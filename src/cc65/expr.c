@@ -779,7 +779,7 @@ static void ArrayRef (ExprDesc* Expr)
 /* Handle an array reference. This function needs a rewrite. */
 {
     int         ConstBaseAddr;
-    ExprDesc    SubScript;
+    ExprDesc    Subscript;
     CodeMark    Mark1;
     CodeMark    Mark2;
     Type*       ElementType;
@@ -814,7 +814,7 @@ static void ArrayRef (ExprDesc* Expr)
     }
 
     /* TOS now contains ptr to array elements. Get the subscript. */
-    ExprWithCheck (hie0, &SubScript);
+    ExprWithCheck (hie0, &Subscript);
 
     /* Check the types of array and subscript. We can either have a
      * pointer/array to the left, in which case the subscript must be of an
@@ -824,33 +824,39 @@ static void ArrayRef (ExprDesc* Expr)
      * correct types.
      */
     if (IsClassPtr (Expr->Type)) {
-        if (!IsClassInt (SubScript.Type))  {
+        if (!IsClassInt (Subscript.Type))  {
             Error ("Array subscript is not an integer");
             /* To avoid any compiler errors, make the expression a valid int */
-            ED_MakeConstAbsInt (&SubScript, 0);
+            ED_MakeConstAbsInt (&Subscript, 0);
         }
         ElementType = Indirect (Expr->Type);
     } else if (IsClassInt (Expr->Type)) {
-        if (!IsClassPtr (SubScript.Type)) {
+        if (!IsClassPtr (Subscript.Type)) {
             Error ("Subscripted value is neither array nor pointer");
             /* To avoid compiler errors, make the subscript a char[] at
              * address 0.
              */
-            ED_MakeConstAbs (&SubScript, 0, GetCharArrayType (1));
+            ED_MakeConstAbs (&Subscript, 0, GetCharArrayType (1));
         }
-        ElementType = Indirect (SubScript.Type);
+        ElementType = Indirect (Subscript.Type);
     } else {
         Error ("Cannot subscript");
         /* To avoid compiler errors, fake both the array and the subscript, so
          * we can just proceed.
          */
         ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
-        ED_MakeConstAbsInt (&SubScript, 0);
+        ED_MakeConstAbsInt (&Subscript, 0);
         ElementType = Indirect (Expr->Type);
     }
 
+    /* If the subscript is a bit-field, load it and make it an rvalue */
+    if (ED_IsBitField (&Subscript)) {
+        LoadExpr (CF_NONE, &Subscript);
+        ED_MakeRValExpr (&Subscript);
+    }
+
     /* Check if the subscript is constant absolute value */
-    if (ED_IsConstAbs (&SubScript)) {
+    if (ED_IsConstAbs (&Subscript)) {
 
        	/* The array subscript is a numeric constant. If we had pushed the
          * array base address onto the stack before, we can remove this value,
@@ -868,7 +874,7 @@ static void ArrayRef (ExprDesc* Expr)
        	    /* Lhs is pointer/array. Scale the subscript value according to
              * the element size.
              */
-     	    SubScript.IVal *= CheckedSizeOf (ElementType);
+     	    Subscript.IVal *= CheckedSizeOf (ElementType);
 
             /* Remove the address load code */
             RemoveCode (&Mark1);
@@ -880,7 +886,7 @@ static void ArrayRef (ExprDesc* Expr)
             if (IsTypeArray (Expr->Type)) {
 
                 /* Adjust the offset */
-                Expr->IVal += SubScript.IVal;
+                Expr->IVal += Subscript.IVal;
 
             } else {
 
@@ -893,7 +899,7 @@ static void ArrayRef (ExprDesc* Expr)
                 }
 
                 /* Use the offset */
-                Expr->IVal = SubScript.IVal;
+                Expr->IVal = Subscript.IVal;
             }
 
        	} else {
@@ -905,7 +911,7 @@ static void ArrayRef (ExprDesc* Expr)
              * we will ignore the true type of the subscript here and
              * use always an int. #### Use offset but beware of LoadExpr!
              */
-            g_inc (CF_INT | CF_CONST, SubScript.IVal);
+            g_inc (CF_INT | CF_CONST, Subscript.IVal);
 
     	}
 
@@ -913,7 +919,7 @@ static void ArrayRef (ExprDesc* Expr)
 
     	/* Array subscript is not constant. Load it into the primary */
 	GetCodePos (&Mark2);
-        LoadExpr (CF_NONE, &SubScript);
+        LoadExpr (CF_NONE, &Subscript);
 
         /* Do scaling */
 	if (IsClassPtr (Expr->Type)) {
@@ -968,13 +974,13 @@ static void ArrayRef (ExprDesc* Expr)
     	     * subscript was not scaled, that is, if this was a byte array
     	     * or pointer.
     	     */
-            if ((ED_IsLocConst (&SubScript) || ED_IsLocStack (&SubScript)) &&
+            if ((ED_IsLocConst (&Subscript) || ED_IsLocStack (&Subscript)) &&
                 CheckedSizeOf (ElementType) == SIZEOF_CHAR) {
 
                 unsigned Flags;
 
     	    	/* Reverse the order of evaluation */
-                if (CheckedSizeOf (SubScript.Type) == SIZEOF_CHAR) {
+                if (CheckedSizeOf (Subscript.Type) == SIZEOF_CHAR) {
                     Flags = CF_CHAR;
                 } else {
                     Flags = CF_INT;
@@ -985,11 +991,11 @@ static void ArrayRef (ExprDesc* Expr)
     	    	LoadExpr (CF_NONE, Expr);
 
     	    	/* Add the variable */
-    	    	if (ED_IsLocStack (&SubScript)) {
-    	    	    g_addlocal (Flags, SubScript.IVal);
+    	    	if (ED_IsLocStack (&Subscript)) {
+    	    	    g_addlocal (Flags, Subscript.IVal);
     	    	} else {
-    	   	    Flags |= GlobalModeFlags (&SubScript);
-    	    	    g_addstatic (Flags, SubScript.Name, SubScript.IVal);
+    	   	    Flags |= GlobalModeFlags (&Subscript);
+    	    	    g_addstatic (Flags, Subscript.Name, Subscript.IVal);
     	    	}
     	    } else {
 
@@ -1066,11 +1072,6 @@ static void StructRef (ExprDesc* Expr)
      	Error ("Struct/union has no field named `%s'", Ident);
        	Expr->Type = type_int;
      	return;
-    }       
-    if ((Field->Flags & SC_BITFIELD) == SC_BITFIELD) {
-        Error ("Bit-fields are currently unsupported - sorry");
-        Expr->Type = type_int;
-        return;
     }
 
     /* If we have a struct pointer that is an lvalue and not already in the
@@ -1100,6 +1101,11 @@ static void StructRef (ExprDesc* Expr)
         ED_MakeRVal (Expr);
     } else {
         ED_MakeLVal (Expr);
+    }
+
+    /* Make the expression a bit field if necessary */
+    if ((Field->Flags & SC_BITFIELD) == SC_BITFIELD) {
+        ED_MakeBitField (Expr, Field->V.B.BitOffs, Field->V.B.BitWidth);
     }
 }
 
@@ -1595,7 +1601,12 @@ void hie10 (ExprDesc* Expr)
 	     */
      	    if (ED_IsRVal (Expr) && !IsTypeFunc (Expr->Type) && !IsTypeArray (Expr->Type)) {
                 Error ("Illegal address");
-     	    } else {
+            } else {
+                if (ED_IsBitField (Expr)) {
+                    Error ("Cannot take address of bit-field");
+                    /* Do it anyway, just to avoid further warnings */
+                    Expr->Flags &= ~E_BITFIELD;
+                }
                 Expr->Type = PointerTo (Expr->Type);
                 /* The & operator yields an rvalue */
                 ED_MakeRVal (Expr);

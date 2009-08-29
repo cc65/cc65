@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -77,26 +77,32 @@ enum {
     E_RTYPE_RVAL        = 0x0000,
     E_RTYPE_LVAL        = 0x0100,
 
+    /* Bit-field? */
+    E_BITFIELD          = 0x0200,
+
     /* Test */
-    E_NEED_TEST         = 0x0200,       /* Expression needs a test to set cc */
-    E_CC_SET            = 0x0400        /* Condition codes are set */
+    E_NEED_TEST         = 0x0400,       /* Expression needs a test to set cc */
+    E_CC_SET            = 0x0800        /* Condition codes are set */
 };
 
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-    struct SymEntry*	Sym;	/* Symbol table entry if known */
-    Type*	       	Type;   /* Type array of expression */
+    struct SymEntry*	Sym;   	        /* Symbol table entry if known */
+    Type*    	       	Type;           /* Type array of expression */
     unsigned            Flags;
-    unsigned long 	Name;	/* Name or label number */
-    long       	       	IVal;   /* Integer value if expression constant */
-    Double              FVal;   /* Floating point value */
+    unsigned long 	Name;	        /* Name or label number */
+    long       	       	IVal;           /* Integer value if expression constant */
+    Double              FVal;           /* Floating point value */
+
+    unsigned            BitOffs;        /* Bit offset for bit fields */
+    unsigned            BitWidth;       /* Bit width for bit fields */
 };
 
 
 
 /*****************************************************************************/
-/*    		   		     Code                                    */
+/*    	     	   		     Code                                    */
 /*****************************************************************************/
 
 
@@ -223,6 +229,19 @@ INLINE void ED_MakeRVal (ExprDesc* Expr)
 #else
 #  define ED_MakeRVal(Expr)     do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
 #endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsBitField (const ExprDesc* Expr)
+/* Return true if the expression is a bit field */
+{
+    return (Expr->Flags & E_BITFIELD) != 0;
+}
+#else
+#  define ED_IsBitField(Expr)   (((Expr)->Flags & E_BITFIELD) != 0)
+#endif
+
+void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth);
+/* Make this expression a bit field expression */
 
 #if defined(HAVE_INLINE)
 INLINE void ED_MarkForTest (ExprDesc* Expr)

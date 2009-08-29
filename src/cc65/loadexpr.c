@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2004-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -143,6 +143,18 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 
             default:
                 Internal ("Invalid location in LoadExpr: 0x%04X", ED_GetLoc (Expr));
+        }
+
+        /* Handle bit fields. The actual type may have been casted or
+         * converted, so be sure to always use unsigned ints for the
+         * operations.
+         */
+        if (ED_IsBitField (Expr)) {
+            unsigned F = CF_INT | CF_UNSIGNED | CF_CONST | (Flags & CF_TEST);
+            /* Shift right by the bit offset */
+            g_asr (F, Expr->BitOffs);
+            /* And by the width */
+            g_and (F, (0x0001U << Expr->BitWidth) - 1U);
         }
 
         /* Expression was tested */

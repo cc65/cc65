@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,13 +57,25 @@
 ExprDesc* ED_Init (ExprDesc* Expr)
 /* Initialize an ExprDesc */
 {
-    Expr->Sym   = 0;
-    Expr->Type  = 0;
-    Expr->Flags = 0;
-    Expr->Name  = 0;
-    Expr->IVal  = 0;
-    Expr->FVal  = FP_D_Make (0.0);
+    Expr->Sym       = 0;
+    Expr->Type      = 0;
+    Expr->Flags     = 0;
+    Expr->Name      = 0;
+    Expr->IVal      = 0;
+    Expr->FVal      = FP_D_Make (0.0);
+    Expr->BitOffs   = 0;
+    Expr->BitWidth  = 0;
     return Expr;
+}
+
+
+
+void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth)
+/* Make this expression a bit field expression */
+{
+    Expr->Flags   |= E_BITFIELD;
+    Expr->BitOffs  = BitOffs;
+    Expr->BitWidth = BitWidth;
 }
 
 
@@ -168,7 +180,7 @@ ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
  */
 {
     Expr->Sym   = 0;
-    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_NEED_TEST | E_CC_SET);
+    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_NEED_TEST | E_CC_SET);
     Expr->Flags |= (E_LOC_EXPR | E_RTYPE_RVAL);
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */
@@ -184,7 +196,7 @@ ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
  */
 {
     Expr->Sym   = 0;
-    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_NEED_TEST | E_CC_SET);
+    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_BITFIELD | E_NEED_TEST | E_CC_SET);
     Expr->Flags |= (E_LOC_EXPR | E_RTYPE_LVAL);
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */
@@ -217,8 +229,9 @@ int ED_IsConstAbsInt (const ExprDesc* Expr)
 int ED_IsNullPtr (const ExprDesc* Expr)
 /* Return true if the given expression is a NULL pointer constant */
 {
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL) &&
-           Expr->IVal == 0                                                        &&
+    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE|E_BITFIELD)) == 
+                                (E_LOC_ABS|E_RTYPE_RVAL) &&
+           Expr->IVal == 0                               &&
            IsClassInt (Expr->Type);
 }
 
@@ -302,6 +315,11 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     if (Flags & E_RTYPE_LVAL) {
         fprintf (F, "%cE_RTYPE_LVAL", Sep);
         Flags &= ~E_RTYPE_LVAL;
+        Sep = ',';
+    }
+    if (Flags & E_BITFIELD) {
+        fprintf (F, "%cE_BITFIELD", Sep);
+        Flags &= ~E_BITFIELD;
         Sep = ',';
     }
     if (Flags & E_NEED_TEST) {

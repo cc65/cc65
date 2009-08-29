@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -96,7 +96,7 @@ void Assignment (ExprDesc* Expr)
         }
         if (UseReg) {
             PushAddr (Expr);
-        } else {  
+        } else {
             ED_MakeRVal (Expr);
       	    LoadExpr (CF_NONE, Expr);
             g_push (CF_PTR | CF_UNSIGNED, 0);
@@ -157,6 +157,46 @@ void Assignment (ExprDesc* Expr)
             }
 
         }
+
+    } else if (ED_IsBitField (Expr)) {
+
+        unsigned Mask;
+        unsigned Flags = TypeOf (Expr->Type);
+
+        /* Assignment to a bit field. Get the address on stack for the store. */
+        PushAddr (Expr);
+
+        /* Load the value from the location as an unsigned */
+        Expr->Flags &= ~E_BITFIELD;
+        LoadExpr (CF_NONE, Expr);
+
+        /* Mask unwanted bits */
+        Mask = (0x0001U << Expr->BitWidth) - 1U;
+        g_and (Flags | CF_CONST, ~(Mask << Expr->BitOffs));
+
+        /* Push it on stack */
+        g_push (Flags, 0);
+
+     	/* Read the expression on the right side of the '=' */
+     	hie1 (&Expr2);
+
+     	/* Do type conversion if necessary */
+     	TypeConversion (&Expr2, ltype);
+
+     	/* If necessary, load the value into the primary register */
+     	LoadExpr (CF_NONE, &Expr2);
+
+        /* Apply the mask */
+        g_and (Flags | CF_CONST, Mask);
+
+        /* Shift it into the right position */
+        g_asl (Flags | CF_CONST, Expr->BitOffs);
+
+        /* Or both values */
+        g_or (Flags, 0);
+
+     	/* Generate a store instruction */
+     	Store (Expr, 0);
 
     } else {
 

@@ -1690,8 +1690,12 @@ static int HarmlessCall (const char* Name)
         "negax",
         "shlax1",
         "shlax2",
+        "shlax3",
+        "shlax4",
         "shrax1",
         "shrax2",
+        "shrax3",
+        "shrax4",
     };
 
     void* R = bsearch (Name,

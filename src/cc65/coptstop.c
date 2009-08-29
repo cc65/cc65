@@ -1682,8 +1682,12 @@ static int HarmlessCall (const char* Name)
     static const char* Tab[] = {
         "aslax1",
         "aslax2",
+        "aslax3",
+        "aslax4",
         "asrax1",
         "asrax2",
+        "asrax3",
+        "asrax4",
         "bnegax",
         "ldaxidx",
         "ldaxysp",

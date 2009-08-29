@@ -403,36 +403,18 @@ search path for include files on startup.
 
 <sect>Differences to the ISO standard<p>
 
+Apart from the things listed below, the compiler does support additional
+keywords, has several functions in the standard headers with names outside the
+reserved namespace and a few syntax extensions. All these can be disabled with
+the <tt><ref id="option--standard" name="--standard"></tt> command line
+option. Its use for maximum standards compatibility is advised.
+
 Here is a list of differences between the language, the compiler accepts,
 and the one defined by the ISO standard:
 
 <itemize>
 
-<item>	The compiler allows unnamed parameters in parameter lists. The
-      	compiler will not issue warnings about unused parameters that don't
-      	have a name. This feature can be disabled with the <tt><ref
-        id="option--standard" name="--standard"></tt> command line option.
-      	<p>
-<item>	The compiler has some additional keywords:
-      	<p>
-      	<itemize>
-      	<item><tt/asm/
-      	<item><tt/__asm__/
-      	<item><tt/fastcall/
-      	<item><tt/__fastcall__/
-      	<item><tt/__AX__/
-      	<item><tt/__EAX__/
-      	<item><tt/__func__/
-      	<item><tt/__attribute__/
-      	</itemize>
-      	<p>
-      	The keywords without the underlines can be disabled with the
-        <tt><ref id="option--standard" name="--standard"></tt> command line
-        option.
-      	<p>
 <item>	The datatypes "float" and "double" are not available.
-      	<p>
-<item>	The compiler does not support bit fields.
       	<p>
 <item> 	C Functions may not return structs (or unions), and structs may not
         be passed as parameters by value. However, struct assignment *is*

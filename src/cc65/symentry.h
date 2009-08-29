@@ -135,7 +135,7 @@ struct SymEntry {
         struct {
             unsigned            Offs;     /* Byte offset into struct */
             unsigned            BitOffs;  /* Bit offset into last byte */
-            unsigned            Width;    /* Width in bits */
+            unsigned            BitWidth; /* Width in bits */
         } B;
 
 	/* Data for functions */

@@ -593,10 +593,10 @@ SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsign
      	Entry = NewSymEntry (Name, SC_BITFIELD);
 
      	/* Set the symbol attributes. Bit-fields are always of type unsigned */
-     	Entry->Type        = type_uint;
-        Entry->V.B.Offs    = Offs;
-        Entry->V.B.BitOffs = BitOffs;
-        Entry->V.B.Width   = Width;
+     	Entry->Type         = type_uint;
+        Entry->V.B.Offs     = Offs;
+        Entry->V.B.BitOffs  = BitOffs;
+        Entry->V.B.BitWidth = Width;
 
      	/* Add the entry to the symbol table */
      	AddSymEntry (SymTab, Entry);

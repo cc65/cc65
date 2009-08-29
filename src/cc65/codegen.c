@@ -2855,7 +2855,9 @@ void g_and (unsigned Flags, unsigned long Val)
 
             case CF_CHAR:
                 if (Flags & CF_FORCECHAR) {
-                    if ((Val & 0xFF) != 0xFF) {
+                    if ((Val & 0xFF) == 0x00) {
+                        AddCodeLine ("lda #$00");
+                    } else if ((Val & 0xFF) != 0xFF) {
                         AddCodeLine ("and #$%02X", (unsigned char)Val);
                     }
                	    return;
@@ -2866,26 +2868,30 @@ void g_and (unsigned Flags, unsigned long Val)
                	    if (Val <= 0xFF) {
                	     	ldxconst (0);
                	     	if (Val == 0) {
-               	     	    ldaconst (0);
+                            AddCodeLine ("lda #$00");
                	     	} else if (Val != 0xFF) {
                	       	    AddCodeLine ("and #$%02X", (unsigned char)Val);
                	     	}
-               	    } else if ((Val & 0xFF00) == 0xFF00) {
+               	    } else if ((Val & 0xFFFF) == 0xFF00) {
+                        AddCodeLine ("lda #$00");
+                    } else if ((Val & 0xFF00) == 0xFF00) {
                	     	AddCodeLine ("and #$%02X", (unsigned char)Val);
                	    } else if ((Val & 0x00FF) == 0x0000) {
                	     	AddCodeLine ("txa");
                	     	AddCodeLine ("and #$%02X", (unsigned char)(Val >> 8));
                      	AddCodeLine ("tax");
-                     	ldaconst (0);
+                     	AddCodeLine ("lda #$00");
                     } else {
                      	AddCodeLine ("tay");
                      	AddCodeLine ("txa");
                      	AddCodeLine ("and #$%02X", (unsigned char)(Val >> 8));
                      	AddCodeLine ("tax");
                      	AddCodeLine ("tya");
-                     	if ((Val & 0x00FF) != 0x00FF) {
+                     	if ((Val & 0x00FF) == 0x0000) {
+                            AddCodeLine ("lda #$00");
+                     	} else if ((Val & 0x00FF) != 0x00FF) {
                        	    AddCodeLine ("and #$%02X", (unsigned char)Val);
-                     	}
+                        }
                     }
                 }
                 return;

@@ -1845,8 +1845,9 @@ unsigned OptPrecalc (CodeSeg* S)
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Get a pointer to the output registers of the insn */
+       	/* Get pointers to the input and output registers of the insn */
        	const RegContents* Out = &E->RI->Out;
+        const RegContents* In  = &E->RI->In;
 
         /* Argument for LDn and flag */
         const char* Arg = 0;
@@ -1894,9 +1895,16 @@ unsigned OptPrecalc (CodeSeg* S)
                     /* AND with 0xFF, remove */
                     CS_DelEntry (S, I);
                     ++Changes;
+                } else if (CE_IsKnownImm (E, 0x00)) {
+                    /* AND with 0x00, replace by lda #$00 */
+                    Arg = MakeHexArg (0x00);
                 } else if (RegValIsKnown (Out->RegA)) {
                     /* Accu AND zp with known contents */
                     Arg = MakeHexArg (Out->RegA);
+                } else if (In->RegA == 0xFF) {
+                    /* AND but A contains 0xFF - replace by lda */
+                    CE_ReplaceOPC (E, OP65_LDA);
+                    ++Changes;
                 }
                 break;
 
@@ -1905,9 +1913,16 @@ unsigned OptPrecalc (CodeSeg* S)
                     /* ORA with zero, remove */
                     CS_DelEntry (S, I);
                     ++Changes;
+                } else if (CE_IsKnownImm (E, 0xFF)) {
+                    /* ORA with 0xFF, replace by lda #$ff */
+                    Arg = MakeHexArg (0xFF);
                 } else if (RegValIsKnown (Out->RegA)) {
                     /* Accu AND zp with known contents */
                     Arg = MakeHexArg (Out->RegA);
+                } else if (In->RegA == 0) {
+                    /* ORA but A contains 0x00 - replace by lda */
+                    CE_ReplaceOPC (E, OP65_LDA);
+                    ++Changes;
                 }
                 break;
 

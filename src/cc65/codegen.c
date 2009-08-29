@@ -2941,44 +2941,55 @@ void g_asr (unsigned flags, unsigned long val)
 
             case CF_CHAR:
             case CF_INT:
-               	if (val >= 8 && (flags & CF_UNSIGNED)) {
-                    AddCodeLine ("txa");
-                    ldxconst (0);
+                val &= 0x0F;
+               	if (val >= 8) {
+                    if (flags & CF_UNSIGNED) {
+                        AddCodeLine ("txa");
+                        ldxconst (0);
+                    } else {
+                       	unsigned L = GetLocalLabel();
+                        AddCodeLine ("cpx #$80");   /* Sign bit into carry */
+                        AddCodeLine ("txa");
+                        AddCodeLine ("ldx #$00");
+                        AddCodeLine ("bcc %s", LocalLabelName (L));
+                        AddCodeLine ("dex");        /* Make $FF */
+                       	g_defcodelabel (L);
+                    }
                     val -= 8;
                 }
-                if (val == 0) {
-                    /* Done */
-                    return;
-                } else if (val >= 1 && val <= 4) {
+                if (val >= 4) {
+                    if (flags & CF_UNSIGNED) {
+                       	AddCodeLine ("jsr shrax4");
+                    } else {
+                       	AddCodeLine ("jsr asrax4");
+                    }
+                    val -= 4;
+                }
+                if (val > 0) {
                     if (flags & CF_UNSIGNED) {
                        	AddCodeLine ("jsr shrax%ld", val);
                     } else {
                        	AddCodeLine ("jsr asrax%ld", val);
                     }
-                    return;
                	}
-                break;
+                return;
 
             case CF_LONG:
-                if (val == 0) {
-                    /* Nothing to do */
-                    return;
-                } else if (val >= 1 && val <= 4) {
-                    if (flags & CF_UNSIGNED) {
-                       	AddCodeLine ("jsr shreax%ld", val);
-                    } else {
-                       	AddCodeLine ("jsr asreax%ld", val);
+                val &= 0x1F;
+                if (val >= 24) {
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("lda sreg+1");
+                    if ((flags & CF_UNSIGNED) == 0) {
+                        unsigned L = GetLocalLabel();
+                        AddCodeLine ("bpl %s", LocalLabelName (L));
+                        AddCodeLine ("dex");
+                        g_defcodelabel (L);
                     }
-                    return;
-                } else if (val == 8 && (flags & CF_UNSIGNED)) {
-                    AddCodeLine ("txa");
-                    AddCodeLine ("ldx sreg");
-                    AddCodeLine ("ldy sreg+1");
-                    AddCodeLine ("sty sreg");
-                    AddCodeLine ("ldy #$00");
-                    AddCodeLine ("sty sreg+1");
-                    return;
-                } else if (val == 16) {
+                    AddCodeLine ("stx sreg");
+                    AddCodeLine ("stx sreg+1");
+                    val -= 24;
+                }
+                if (val >= 16) {
                     AddCodeLine ("ldy #$00");
                     AddCodeLine ("ldx sreg+1");
                     if ((flags & CF_UNSIGNED) == 0) {
@@ -2990,9 +3001,42 @@ void g_asr (unsigned flags, unsigned long val)
                     AddCodeLine ("lda sreg");
                     AddCodeLine ("sty sreg+1");
                     AddCodeLine ("sty sreg");
-             	    return;
+                    val -= 16;
                 }
-                break;
+                if (val >= 8) {
+                    AddCodeLine ("txa");
+                    AddCodeLine ("ldx sreg");
+                    AddCodeLine ("ldy sreg+1");
+                    AddCodeLine ("sty sreg");
+                    if ((flags & CF_UNSIGNED) == 0) {
+                       	unsigned L = GetLocalLabel();
+                        AddCodeLine ("cpy #$80");
+                        AddCodeLine ("ldy #$00");
+                        AddCodeLine ("bcc %s", LocalLabelName (L));
+                        AddCodeLine ("dey");
+                       	g_defcodelabel (L);
+                    } else {
+                        AddCodeLine ("ldy #$00");
+                    }
+                    AddCodeLine ("sty sreg+1");
+                    val -= 8;
+                }
+                if (val >= 4) {
+                    if (flags & CF_UNSIGNED) {
+                       	AddCodeLine ("jsr shreax4");
+                    } else {
+                       	AddCodeLine ("jsr asreax4");
+                    }
+                    val -= 4;
+                }
+                if (val > 0) {
+                    if (flags & CF_UNSIGNED) {
+                       	AddCodeLine ("jsr shreax%ld", val);
+                    } else {
+                       	AddCodeLine ("jsr asreax%ld", val);
+                    }
+                }
+                return;
 
             default:
                 typeerror (flags);
@@ -3029,50 +3073,69 @@ void g_asl (unsigned flags, unsigned long val)
 
             case CF_CHAR:
             case CF_INT:
+                val &= 0x0F;
                 if (val >= 8) {
                     AddCodeLine ("tax");
                     AddCodeLine ("lda #$00");
                     val -= 8;
                 }
-                if (val == 0) {
-                    /* Done */
-                    return;
-                } else if (val >= 1 && val <= 4) {
+                if (val >= 4) {
+                    if (flags & CF_UNSIGNED) {
+                        AddCodeLine ("jsr shlax4");
+                    } else {
+                        AddCodeLine ("jsr aslax4");
+                    }
+                    val -= 4;
+                }
+                if (val > 0) {
                     if (flags & CF_UNSIGNED) {
                         AddCodeLine ("jsr shlax%ld", val);
                     } else {
                         AddCodeLine ("jsr aslax%ld", val);
                     }
-                    return;
                 }
-                break;
+                return;
 
             case CF_LONG:
-                if (val == 0) {
-                    /* Nothing to do */
-                    return;
-                } else if (val >= 1 && val <= 4) {
-                    if (flags & CF_UNSIGNED) {
-                       	AddCodeLine ("jsr shleax%ld", val);
-                    } else {
-                       	AddCodeLine ("jsr asleax%ld", val);
-                    }
-                    return;
-                } else if (val == 8) {
+                val &= 0x1F;
+                if (val >= 24) {
+                    AddCodeLine ("sta sreg+1");
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("tax");
+                    AddCodeLine ("sta sreg");
+                    val -= 24;
+                }
+                if (val >= 16) {
+                    AddCodeLine ("stx sreg+1");
+                    AddCodeLine ("sta sreg");
+                    AddCodeLine ("lda #$00");
+                    AddCodeLine ("tax");
+                    val -= 16;
+                }
+                if (val >= 8) {
                     AddCodeLine ("ldy sreg");
                     AddCodeLine ("sty sreg+1");
                     AddCodeLine ("stx sreg");
                     AddCodeLine ("tax");
                     AddCodeLine ("lda #$00");
-                    return;
-                } else if (val == 16) {
-                    AddCodeLine ("stx sreg+1");
-                    AddCodeLine ("sta sreg");
-                    AddCodeLine ("lda #$00");
-                    AddCodeLine ("tax");
-                    return;
+                    val -= 8;
                 }
-                break;
+                if (val > 4) {
+                    if (flags & CF_UNSIGNED) {
+                       	AddCodeLine ("jsr shleax4");
+                    } else {
+                       	AddCodeLine ("jsr asleax4");
+                    }
+                    val -= 4;
+                }
+                if (val > 0) {
+                    if (flags & CF_UNSIGNED) {
+                       	AddCodeLine ("jsr shleax%ld", val);
+                    } else {
+                       	AddCodeLine ("jsr asleax%ld", val);
+                    }
+                }
+                return;
 
             default:
                 typeerror (flags);

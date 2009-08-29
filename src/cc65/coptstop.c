@@ -307,37 +307,47 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
      	    CodeEntry* P = CS_GetPrevEntry (D->Code, I);
      	    if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
 
-     	      	/* The Y load is just before the stack access, adjust it */
-     	      	CE_SetNumArg (P, P->Num - Offs);
+      	      	/* The Y load is just before the stack access, adjust it */
+      	      	CE_SetNumArg (P, P->Num - Offs);
 
-     	    } else {
+      	    } else {
 
-     	      	/* Insert a new load instruction before the stack access */
-     	      	const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
-     	      	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-     	   	CS_InsertEntry (D->Code, X, I++);
+      	      	/* Insert a new load instruction before the stack access */
+      	      	const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
+      	      	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+      	    	CS_InsertEntry (D->Code, X, I++);
 
-     	   	/* One more inserted entries */
-     	   	++D->OpIndex;
+      	    	/* One more inserted entries */
+      	    	++D->OpIndex;
 
-     	    }
+      	    }
 
             /* If we need the value of Y later, be sure to reload it */
             if (RegYUsed (D->Code, I+1)) {
-     	    	const char* Arg = MakeHexArg (E->RI->In.RegY);
-     	   	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-     	   	CS_InsertEntry (D->Code, X, I+1);
+      	    	const char* Arg = MakeHexArg (E->RI->In.RegY);
+      	    	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+      	    	CS_InsertEntry (D->Code, X, I+1);
 
-     	   	/* One more inserted entries */
-     	   	++D->OpIndex;
+      	    	/* One more inserted entries */
+      	    	++D->OpIndex;
 
-     	   	/* Skip this instruction in the next round */
-     	   	++I;
+      	    	/* Skip this instruction in the next round */
+      	    	++I;
             }
-     	}
+      	}
 
-     	/* Next entry */
-     	++I;
+      	/* Next entry */
+      	++I;
+    }
+
+    /* If we have rhs load insns that load from stack, we'll have to adjust
+     * the offsets for these also.
+     */
+    if (D->Rhs.A.Flags & LI_RELOAD_Y) {
+        D->Rhs.A.Offs -= Offs;
+    }
+    if (D->Rhs.X.Flags & LI_RELOAD_Y) {
+        D->Rhs.X.Offs -= Offs;
     }
 }
 

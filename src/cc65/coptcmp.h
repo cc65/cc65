@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -151,6 +151,19 @@ unsigned OptCmp7 (CodeSeg* S);
 unsigned OptCmp8 (CodeSeg* S);
 /* Check for register compares where the contents of the register and therefore
  * the result of the compare is known.
+ */
+
+unsigned OptCmp9 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *    sbc       xx
+ *    bvs/bvc   L
+ *    eor       #$80
+ * L: asl       a
+ *    bcc/bcs   somewhere
+ *
+ * If A is not used later (which should be the case), we can branch on the N
+ * flag instead of the carry flag and remove the asl.
  */
 
 

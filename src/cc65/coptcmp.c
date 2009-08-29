@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -918,6 +918,75 @@ NextEntry:
     return Changes;
 }
 
+
+
+unsigned OptCmp9 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *    sbc       xx
+ *    bvs/bvc   L
+ *    eor       #$80
+ * L: asl       a
+ *    bcc/bcs   somewhere
+ *
+ * If A is not used later (which should be the case), we can branch on the N
+ * flag instead of the carry flag and remove the asl.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+       	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_SBC                       &&
+       	    CS_GetEntries (S, L+1, I+1, 4)	        &&
+            (L[1]->OPC == OP65_BVC              ||
+             L[1]->OPC == OP65_BVS)                     &&
+            L[1]->JumpTo != 0                           &&
+            L[1]->JumpTo->Owner == L[3]                 &&
+            L[2]->OPC == OP65_EOR                       &&
+            CE_IsKnownImm (L[2], 0x80)                  &&
+            L[3]->OPC == OP65_ASL                       &&
+            L[3]->AM == AM65_ACC                        &&
+            (L[4]->OPC == OP65_BCC              ||
+             L[4]->OPC == OP65_BCS              ||
+             L[4]->OPC == OP65_JCC              ||
+             L[4]->OPC == OP65_JCS)                     &&
+            !CE_HasLabel (L[4])                         &&
+            !RegAUsed (S, I+4)) {
+
+	    /* Replace the branch condition */
+	    switch (GetBranchCond (L[4]->OPC)) {
+                case BC_CC:     CE_ReplaceOPC (L[4], OP65_JPL); break;
+                case BC_CS:     CE_ReplaceOPC (L[4], OP65_JMI); break;
+                default:        Internal ("Unknown branch condition in OptCmp9");
+            }
+
+            /* Delete the asl insn */
+            CS_DelEntry (S, I+3);
+
+            /* Next sequence is somewhat ahead (if any) */
+            I += 3;
+
+            /* Remember, we had changes */
+            ++Changes;
+	}
+
+     	/* Next entry */
+	++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
 
 
 

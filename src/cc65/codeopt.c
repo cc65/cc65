@@ -1097,6 +1097,7 @@ static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",        	100, 0, 
 static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",        	 85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp8	       	= { OptCmp8,   	     "OptCmp8",        	 50, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp9	       	= { OptCmp9,   	     "OptCmp9",        	 85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCondBranches1= { OptCondBranches1,"OptCondBranches1", 80, 0, 0, 0, 0, 0 };
 static OptFunc DOptCondBranches2= { OptCondBranches2,"OptCondBranches2",  0, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",    	100, 0, 0, 0, 0, 0 };
@@ -1182,6 +1183,7 @@ static OptFunc* OptFuncs[] = {
     &DOptCmp6,
     &DOptCmp7,
     &DOptCmp8,
+    &DOptCmp9,
     &DOptCondBranches1,
     &DOptCondBranches2,
     &DOptDeadCode,
@@ -1572,6 +1574,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptCmp6, 1);
        	C += RunOptFunc (S, &DOptCmp7, 1);
        	C += RunOptFunc (S, &DOptCmp8, 1);
+       	C += RunOptFunc (S, &DOptCmp9, 1);
        	C += RunOptFunc (S, &DOptTest1, 1);
         C += RunOptFunc (S, &DOptLoad1, 1);
        	C += RunOptFunc (S, &DOptUnusedLoads, 1);

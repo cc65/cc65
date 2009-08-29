@@ -243,6 +243,10 @@ Here is a description of all the command line options:
   <item>cc65
   </itemize>
 
+  Please note that the compiler does not support the c99 standard and never
+  will. c99 mode is actually c89 mode with a few selected c99 extensions
+  (// comments for example).
+
 
   <tag><tt>-t target, --target target</tt></tag>
 
@@ -1060,6 +1064,13 @@ a future version. Instead use the format specifiers from the table above:
 </verb></tscreen>
 <p>
 
+
+<sect>Implementation-defined behavior<p>
+
+This section describes the behavior of cc65 when the standard describes the
+behavior as implementation-defined.                                       
+
+(to be done)
 
 <sect>Bugs/Feedback<p>
 

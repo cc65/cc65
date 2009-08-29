@@ -174,6 +174,16 @@ struct Type {
 #define SIZEOF_DOUBLE   (FP_D_Size())
 #define SIZEOF_PTR      2
 
+/* Bit sizes */
+#define CHAR_BITS       (8 * SIZEOF_CHAR)
+#define SHORT_BITS      (8 * SIZEOF_SHORT)
+#define INT_BITS        (8 * SIZEOF_INT)
+#define LONG_BITS       (8 * SIZEOF_LONG)
+#define LONGLONG_BITS   (8 * SIZEOF_LONGLONG)
+#define FLOAT_BITS      (8 * SIZEOF_FLOAT)
+#define DOUBLE_BITS     (8 * SIZEOF_DOUBLE)
+#define PTR_BITS        (8 * SIZEOF_PTR)
+
 /* Predefined type strings */
 extern Type type_schar[];
 extern Type type_uchar[];

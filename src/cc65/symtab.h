@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -146,6 +146,9 @@ SymEntry* FindStructField (const Type* TypeArray, const char* Name);
 
 SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
+
+SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width);
+/* Add a bit field to the local symbol table and return the symbol entry */
 
 SymEntry* AddConstSym (const char* Name, const Type* T, unsigned Flags, long Val);
 /* Add an constant symbol to the symbol table and return it */

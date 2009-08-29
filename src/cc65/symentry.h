@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
+/* (C) 2000-2009 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -86,7 +86,8 @@ struct Segments;
 #define SC_TYPE	       	0x4000U	/* This is a type, struct, typedef, etc. */
 #define SC_STRUCT      	0x4001U	/* Struct or union */
 #define SC_STRUCTFIELD  0x4002U	/* Struct or union field */
-#define SC_TYPEDEF     	0x4003U	/* A typedef */
+#define SC_BITFIELD     0x4004U /* A bit-field inside a struct or union */
+#define SC_TYPEDEF     	0x4008U	/* A typedef */
 
 #define SC_ZEROPAGE  	0x8000U	/* Symbol marked as zeropage */
 
@@ -129,6 +130,13 @@ struct SymEntry {
 	    struct SymTable*	SymTab;	  /* Member symbol table */
 	    unsigned		Size;  	  /* Size of the union/struct */
 	} S;
+
+        /* Data for bit fields */
+        struct {
+            unsigned            Offs;     /* Byte offset into struct */
+            unsigned            BitOffs;  /* Bit offset into last byte */
+            unsigned            Width;    /* Width in bits */
+        } B;
 
 	/* Data for functions */
 	struct {

@@ -1066,6 +1066,11 @@ static void StructRef (ExprDesc* Expr)
      	Error ("Struct/union has no field named `%s'", Ident);
        	Expr->Type = type_int;
      	return;
+    }       
+    if ((Field->Flags & SC_BITFIELD) == SC_BITFIELD) {
+        Error ("Bit-fields are currently unsupported - sorry");
+        Expr->Type = type_int;
+        return;
     }
 
     /* If we have a struct pointer that is an lvalue and not already in the
@@ -1884,8 +1889,8 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
 	/* Check for const operands */
 	if (ED_IsConstAbs (Expr) && rconst) {
-             
-            /* If the result is constant, this is suspicious when not in 
+
+            /* If the result is constant, this is suspicious when not in
              * preprocessor mode.
              */
             if (!Preprocessing) {

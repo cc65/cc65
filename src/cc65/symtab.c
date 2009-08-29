@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -485,19 +485,14 @@ SymEntry* FindStructField (const Type* T, const char* Name)
     /* Non-structs do not have any struct fields... */
     if (IsClassStruct (T)) {
 
-    	const SymTable* Tab;
-
     	/* Get a pointer to the struct/union type */
      	const SymEntry* Struct = GetSymEntry (T);
     	CHECK (Struct != 0);
 
-    	/* Get the field symbol table from the struct entry.
-    	 * Beware: The table may not exist.
+    	/* Now search in the struct symbol table. Beware: The table may not
+         * exist.
     	 */
-    	Tab = Struct->V.S.SymTab;
-
-    	/* Now search in the struct symbol table */
-    	if (Tab) {
+    	if (Struct->V.S.SymTab) {
        	    Field = FindSymInTable (Struct->V.S.SymTab, Name, HashStr (Name));
     	}
     }
@@ -574,6 +569,38 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
 
     	/* Add it to the current table */
     	AddSymEntry (TagTab, Entry);
+    }
+
+    /* Return the entry */
+    return Entry;
+}
+
+
+
+SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width)
+/* Add a bit field to the local symbol table and return the symbol entry */
+{
+    /* Do we have an entry with this name already? */
+    SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
+    if (Entry) {
+
+    	/* We have a symbol with this name already */
+     	Error ("Multiple definition for `%s'", Name);
+
+    } else {
+
+	/* Create a new entry */
+     	Entry = NewSymEntry (Name, SC_BITFIELD);
+
+     	/* Set the symbol attributes. Bit-fields are always of type unsigned */
+     	Entry->Type        = type_uint;
+        Entry->V.B.Offs    = Offs;
+        Entry->V.B.BitOffs = BitOffs;
+        Entry->V.B.Width   = Width;
+
+     	/* Add the entry to the symbol table */
+     	AddSymEntry (SymTab, Entry);
+
     }
 
     /* Return the entry */

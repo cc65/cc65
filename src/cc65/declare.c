@@ -447,14 +447,55 @@ static void ParseEnumDecl (void)
 
 
 
+static int ParseFieldWidth (Declaration* Decl)
+/* Parse an optional field width. Returns -1 if no field width is speficied,
+ * otherwise the width of the field.
+ */
+{
+    ExprDesc Expr;
+
+    if (CurTok.Tok != TOK_COLON) {
+        /* No bit-field declaration */
+        return -1;
+    }
+
+    /* Read the width */
+    NextToken ();
+    ConstAbsIntExpr (hie1, &Expr);
+    if (Expr.IVal < 0) {
+        Error ("Negative width in bit-field");
+        return -1;
+    }
+    if (Expr.IVal > INT_BITS) {
+        Error ("Width of bit-field exceeds its type");
+        return -1;
+    }
+    if (Expr.IVal == 0 && Decl->Ident[0] != '\0') {
+        Error ("Zero width for named bit-field");
+        return -1;
+    }
+    if (!IsTypeInt (Decl->Type)) {
+        /* Only integer types may be used for bit-fields */
+        Error ("Bit-field has invalid type");
+        return -1;
+    }
+
+    /* Return the field width */
+    return (int) Expr.IVal;
+}
+
+
+
 static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
 /* Parse a struct/union declaration. */
 {
 
     unsigned  StructSize;
     unsigned  FieldSize;
-    unsigned  Offs;
     int       FlexibleMember;
+    unsigned  Offs;
+    int       BitOffs;          /* Bit offset for bit-fields */
+    int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
     SymEntry* Entry;
 
@@ -486,6 +527,7 @@ static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
     /* Parse struct fields */
     FlexibleMember = 0;
     StructSize     = 0;
+    BitOffs        = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
 	/* Get the type of the entry */
@@ -507,16 +549,52 @@ static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
             }
 
 	    /* Get type and name of the struct field */
-	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
+	    ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
 
-            /* Get the offset of this field */
-            Offs = (StructType == T_STRUCT)? StructSize : 0;
+            /* Check for a bit-field declaration */
+            FieldWidth = ParseFieldWidth (&Decl);
+
+            /* A non bit-field without a name is legal but useless */
+            if (FieldWidth < 0 && Decl.Ident[0] == '\0') {
+                Warning ("Declaration does not declare anything");
+                goto NextMember;
+            }
+
+            /* If this is not a bit field, or the bit field is too large for
+             * the remainder of the current member, or we have a bit field
+             * with width zero, align the struct to the next member
+             */
+            if (BitOffs > 0) {
+                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
+                    /* BitOffs > 0, so this can only be a struct */
+                    StructSize += SIZEOF_INT;
+                    BitOffs = 0;
+                }
+            }
+
+            /* Apart from the above, a bit field with width 0 is not processed
+             * further. An unnamed bit field will just increase the bit offset.
+             */
+            if (FieldWidth == 0) {
+                goto NextMember;
+            } else if (FieldWidth > 0 && Decl.Ident[0] == '\0') {
+                if (StructType == T_STRUCT) {
+                    BitOffs += FieldWidth;
+                }
+                goto NextMember;
+            }
 
             /* Calculate the sizes, handle flexible array members */
             if (StructType == T_STRUCT) {
 
-                /* It's a struct. Check if this field is a flexible array
-                 * member, and calculate the size of the field.
+                /* It's a struct. Offset of this member is the current struct
+                 * size plus any full bytes from the bit offset in case of
+                 * bit-fields.
+                 */
+                Offs = StructSize + (BitOffs >> 3);
+
+                /* Check if this field is a flexible array member, and
+                 * calculate the size of the field.
                  */
                 if (IsTypeArray (Decl.Type) && GetElementCount (Decl.Type) == UNSPECIFIED) {
                     /* Array with unspecified size */
@@ -526,28 +604,41 @@ static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
                     FlexibleMember = 1;
                     /* Assume zero for size calculations */
                     SetElementCount (Decl.Type, FLEXIBLE);
-                } else {
+                } else if (FieldWidth < 0) {
                     StructSize += CheckedSizeOf (Decl.Type);
                 }
 
-	    } else {
+                /* Add a field entry to the table */
+                if (FieldWidth > 0) {
+                    AddBitField (Decl.Ident, Offs, BitOffs & 0x07, FieldWidth);
+                    BitOffs += FieldWidth;
+                } else {
+                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
+                }
 
-                /* It's a union */
+     	    } else {
+
+                /* It's a union. Offset of this member is always zero */
+                Offs = 0;
                 FieldSize = CheckedSizeOf (Decl.Type);
-	       	if (FieldSize > StructSize) {
-	       	    StructSize = FieldSize;
-	       	}
-    	    }
+     	       	if (FieldSize > StructSize) {
+     	       	    StructSize = FieldSize;
+     	       	}
 
-	    /* Add a field entry to the table */
-	    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
+                /* Add a field entry to the table */
+                if (FieldWidth > 0) {
+                    AddBitField (Decl.Ident, 0, 0, FieldWidth);
+                } else {
+                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
+                }
+     	    }
 
-	    if (CurTok.Tok != TOK_COMMA) {
-	       	break;
+NextMember: if (CurTok.Tok != TOK_COMMA) {
+     	       	break;
             }
-	    NextToken ();
-	}
-    	ConsumeSemi ();
+     	    NextToken ();
+     	}
+     	ConsumeSemi ();
     }
 
     /* Skip the closing brace */

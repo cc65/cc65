@@ -486,12 +486,125 @@ static int ParseFieldWidth (Declaration* Decl)
 
 
 
-static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
-/* Parse a struct/union declaration. */
+static SymEntry* StructOrUnionForwardDecl (const char* Name)
+/* Handle a struct or union forward decl */
+{
+    /* Try to find a struct with the given name. If there is none,
+     * insert a forward declaration into the current lexical level.
+     */
+    SymEntry* Entry = FindTagSym (Name);
+    if (Entry == 0) {
+        Entry = AddStructSym (Name, 0, 0);
+    } else if (SymIsLocal (Entry) && (Entry->Flags & SC_STRUCT) != SC_STRUCT) {
+        /* Already defined in the level, but no struct */
+        Error ("Symbol `%s' is already different kind", Name);
+    }
+    return Entry;
+}
+
+
+
+static SymEntry* ParseUnionDecl (const char* Name)
+/* Parse a union declaration. */
+{
+
+    unsigned  UnionSize;
+    unsigned  FieldSize;
+    int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
+    SymTable* FieldTab;
+    SymEntry* Entry;
+
+
+    if (CurTok.Tok != TOK_LCURLY) {
+    	/* Just a forward declaration. */
+    	return StructOrUnionForwardDecl (Name);
+    }
+
+    /* Add a forward declaration for the struct in the current lexical level */
+    Entry = AddStructSym (Name, 0, 0);
+
+    /* Skip the curly brace */
+    NextToken ();
+
+    /* Enter a new lexical level for the struct */
+    EnterStructLevel ();
+
+    /* Parse union fields */
+    UnionSize      = 0;
+    while (CurTok.Tok != TOK_RCURLY) {
+
+	/* Get the type of the entry */
+	DeclSpec Spec;
+	InitDeclSpec (&Spec);
+	ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
+
+	/* Read fields with this type */
+	while (1) {
+
+	    Declaration Decl;
+
+	    /* Get type and name of the struct field */
+	    ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+
+            /* Check for a bit-field declaration */
+            FieldWidth = ParseFieldWidth (&Decl);
+
+            /* Ignore zero sized bit fields in a union */
+            if (FieldWidth == 0) {
+                goto NextMember;
+            }
+
+            /* Check for fields without a name */
+            if (Decl.Ident[0] == '\0') {
+                if (FieldWidth < 0) {
+                    /* A non bit-field without a name is legal but useless */
+                    Warning ("Declaration does not declare anything");
+                    goto NextMember;
+                } else {
+                    /* A bit-field without a name does nothing in a union */
+                    goto NextMember;
+                }
+            }
+
+            /* Handle sizes */
+            FieldSize = CheckedSizeOf (Decl.Type);
+            if (FieldSize > UnionSize) {
+                UnionSize = FieldSize;
+            }
+
+            /* Add a field entry to the table */
+            if (FieldWidth > 0) {
+                AddBitField (Decl.Ident, 0, 0, FieldWidth);
+            } else {
+                AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, 0);
+            }
+
+NextMember: if (CurTok.Tok != TOK_COMMA) {
+     	       	break;
+            }
+     	    NextToken ();
+     	}
+     	ConsumeSemi ();
+    }
+
+    /* Skip the closing brace */
+    NextToken ();
+
+    /* Remember the symbol table and leave the struct level */
+    FieldTab = GetSymTab ();
+    LeaveStructLevel ();
+
+    /* Make a real entry from the forward decl and return it */
+    return AddStructSym (Name, UnionSize, FieldTab);
+}
+
+
+
+static SymEntry* ParseStructDecl (const char* Name)
+/* Parse a struct declaration. */
 {
 
     unsigned  StructSize;
-    unsigned  FieldSize;
     int       FlexibleMember;
     unsigned  Offs;
     int       BitOffs;          /* Bit offset for bit-fields */
@@ -501,18 +614,8 @@ static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
 
 
     if (CurTok.Tok != TOK_LCURLY) {
-    	/* Just a forward declaration. Try to find a struct with the given
-	 * name. If there is none, insert a forward declaration into the
-	 * current lexical level.
-	 */
-	Entry = FindTagSym (Name);
-       	if (Entry == 0) {
-	    Entry = AddStructSym (Name, 0, 0);
-	} else if (SymIsLocal (Entry) && (Entry->Flags & SC_STRUCT) == 0) {
-	    /* Already defined in the level but no struct */
-	    Error ("Symbol `%s' is already different kind", Name);
-	}
-    	return Entry;
+    	/* Just a forward declaration. */
+    	return StructOrUnionForwardDecl (Name);
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
@@ -554,84 +657,66 @@ static SymEntry* ParseStructDecl (const char* Name, TypeCode StructType)
             /* Check for a bit-field declaration */
             FieldWidth = ParseFieldWidth (&Decl);
 
-            /* A non bit-field without a name is legal but useless */
-            if (FieldWidth < 0 && Decl.Ident[0] == '\0') {
-                Warning ("Declaration does not declare anything");
-                goto NextMember;
-            }
-
             /* If this is not a bit field, or the bit field is too large for
              * the remainder of the current member, or we have a bit field
              * with width zero, align the struct to the next member
              */
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
-                    /* BitOffs > 0, so this can only be a struct */
                     StructSize += SIZEOF_INT;
                     BitOffs = 0;
                 }
             }
 
             /* Apart from the above, a bit field with width 0 is not processed
-             * further. An unnamed bit field will just increase the bit offset.
+             * further.
              */
             if (FieldWidth == 0) {
                 goto NextMember;
-            } else if (FieldWidth > 0 && Decl.Ident[0] == '\0') {
-                if (StructType == T_STRUCT) {
-                    BitOffs += FieldWidth;
-                }
-                goto NextMember;
             }
 
-            /* Calculate the sizes, handle flexible array members */
-            if (StructType == T_STRUCT) {
-
-                /* It's a struct. Offset of this member is the current struct
-                 * size plus any full bytes from the bit offset in case of
-                 * bit-fields.
-                 */
-                Offs = StructSize + (BitOffs >> 3);
-
-                /* Check if this field is a flexible array member, and
-                 * calculate the size of the field.
-                 */
-                if (IsTypeArray (Decl.Type) && GetElementCount (Decl.Type) == UNSPECIFIED) {
-                    /* Array with unspecified size */
-                    if (StructSize == 0) {
-                        Error ("Flexible array member cannot be first struct field");
-                    }
-                    FlexibleMember = 1;
-                    /* Assume zero for size calculations */
-                    SetElementCount (Decl.Type, FLEXIBLE);
-                } else if (FieldWidth < 0) {
-                    StructSize += CheckedSizeOf (Decl.Type);
-                }
-
-                /* Add a field entry to the table */
-                if (FieldWidth > 0) {
-                    AddBitField (Decl.Ident, Offs, BitOffs & 0x07, FieldWidth);
+            /* Check for fields without names */
+            if (Decl.Ident[0] == '\0') {
+                if (FieldWidth < 0) {
+                    /* A non bit-field without a name is legal but useless */
+                    Warning ("Declaration does not declare anything");
+                    goto NextMember;
+                } else {
+                    /* A bit-field without a name will just increase the
+                     * offset
+                     */
                     BitOffs += FieldWidth;
-                } else {
-                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
+                    goto NextMember;
                 }
+            }
 
-     	    } else {
+            /* Byte offset of this member is the current struct size plus any
+             * full bytes from the bit offset in case of bit-fields.
+             */
+            Offs = StructSize + (BitOffs >> 3);
 
-                /* It's a union. Offset of this member is always zero */
-                Offs = 0;
-                FieldSize = CheckedSizeOf (Decl.Type);
-     	       	if (FieldSize > StructSize) {
-     	       	    StructSize = FieldSize;
-     	       	}
-
-                /* Add a field entry to the table */
-                if (FieldWidth > 0) {
-                    AddBitField (Decl.Ident, 0, 0, FieldWidth);
-                } else {
-                    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
+            /* Check if this field is a flexible array member, and
+             * calculate the size of the field.
+             */
+            if (IsTypeArray (Decl.Type) && GetElementCount (Decl.Type) == UNSPECIFIED) {
+                /* Array with unspecified size */
+                if (StructSize == 0) {
+                    Error ("Flexible array member cannot be first struct field");
                 }
-     	    }
+                FlexibleMember = 1;
+                /* Assume zero for size calculations */
+                SetElementCount (Decl.Type, FLEXIBLE);
+            } else if (FieldWidth < 0) {
+                StructSize += CheckedSizeOf (Decl.Type);
+            }
+
+            /* Add a field entry to the table */
+            if (FieldWidth > 0) {
+                AddBitField (Decl.Ident, Offs, BitOffs & 0x07, FieldWidth);
+                BitOffs += FieldWidth;
+            } else {
+                AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
+            }
 
 NextMember: if (CurTok.Tok != TOK_COMMA) {
      	       	break;
@@ -639,6 +724,11 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
      	    NextToken ();
      	}
      	ConsumeSemi ();
+    }
+
+    /* If we have bits from bit-fields left, add them to the size. */
+    if (BitOffs > 0) {
+        StructSize += ((BitOffs + CHAR_BITS - 1) >> 3);
     }
 
     /* Skip the closing brace */
@@ -659,7 +749,6 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 {
     ident     	Ident;
     SymEntry* 	Entry;
-    TypeCode    StructType;
 
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
@@ -800,23 +889,40 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 	    D->Type[1].C = T_END;
     	    break;
 
-    	case TOK_STRUCT:
     	case TOK_UNION:
-    	    StructType = (CurTok.Tok == TOK_STRUCT)? T_STRUCT : T_UNION;
     	    NextToken ();
 	    /* */
     	    if (CurTok.Tok == TOK_IDENT) {
 	 	strcpy (Ident, CurTok.Ident);
     	 	NextToken ();
     	    } else {
-	 	AnonName (Ident, (StructType == T_STRUCT)? "struct" : "union");
+       	       	AnonName (Ident, "union");
+    	    }
+	    /* Remember we have an extra type decl */
+	    D->Flags |= DS_EXTRA_TYPE;
+	    /* Declare the union in the current scope */
+    	    Entry = ParseUnionDecl (Ident);
+       	    /* Encode the union entry into the type */
+    	    D->Type[0].C = T_UNION;
+	    SetSymEntry (D->Type, Entry);
+	    D->Type[1].C = T_END;
+	    break;
+
+    	case TOK_STRUCT:
+    	    NextToken ();
+	    /* */
+    	    if (CurTok.Tok == TOK_IDENT) {
+	 	strcpy (Ident, CurTok.Ident);
+    	 	NextToken ();
+    	    } else {
+       	       	AnonName (Ident, "struct");
     	    }
 	    /* Remember we have an extra type decl */
 	    D->Flags |= DS_EXTRA_TYPE;
 	    /* Declare the struct in the current scope */
-    	    Entry = ParseStructDecl (Ident, StructType);
+    	    Entry = ParseStructDecl (Ident);
        	    /* Encode the struct entry into the type */
-    	    D->Type[0].C = StructType;
+    	    D->Type[0].C = T_STRUCT;
 	    SetSymEntry (D->Type, Entry);
 	    D->Type[1].C = T_END;
 	    break;

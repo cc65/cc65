@@ -556,14 +556,9 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
             /* Check for fields without a name */
             if (Decl.Ident[0] == '\0') {
-                if (FieldWidth < 0) {
-                    /* A non bit-field without a name is legal but useless */
-                    Warning ("Declaration does not declare anything");
-                    goto NextMember;
-                } else {
-                    /* A bit-field without a name does nothing in a union */
-                    goto NextMember;
-                }
+                /* Any field without a name is legal but useless in a union */
+                Warning ("Declaration does not declare anything");
+                goto NextMember;
             }
 
             /* Handle sizes */

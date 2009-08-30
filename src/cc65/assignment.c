@@ -161,12 +161,22 @@ void Assignment (ExprDesc* Expr)
     } else if (ED_IsBitField (Expr)) {
 
         unsigned Mask;
-        unsigned Flags = TypeOf (Expr->Type);
+        unsigned Flags;
+
+        /* If the bit-field fits within one byte, do the following operations
+         * with bytes.
+         */
+        if (Expr->BitOffs / CHAR_BITS == (Expr->BitOffs + Expr->BitWidth - 1) / CHAR_BITS) {
+            Expr->Type = type_uchar;
+        }
+
+        /* Determine code generator flags */
+        Flags = TypeOf (Expr->Type);
 
         /* Assignment to a bit field. Get the address on stack for the store. */
         PushAddr (Expr);
 
-        /* Load the value from the location as an unsigned */
+        /* Load the value from the location */
         Expr->Flags &= ~E_BITFIELD;
         LoadExpr (CF_NONE, Expr);
 
@@ -180,7 +190,9 @@ void Assignment (ExprDesc* Expr)
      	/* Read the expression on the right side of the '=' */
      	hie1 (&Expr2);
 
-     	/* Do type conversion if necessary */
+     	/* Do type conversion if necessary. Beware: Do not use char type 
+         * here!
+         */
      	TypeConversion (&Expr2, ltype);
 
      	/* If necessary, load the value into the primary register */
@@ -197,6 +209,9 @@ void Assignment (ExprDesc* Expr)
 
      	/* Generate a store instruction */
      	Store (Expr, 0);
+
+        /* Restore the expression type */
+        Expr->Type = ltype;
 
     } else {
 

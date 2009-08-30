@@ -466,7 +466,7 @@ static int ParseFieldWidth (Declaration* Decl)
         Error ("Negative width in bit-field");
         return -1;
     }
-    if (Expr.IVal > INT_BITS) {
+    if (Expr.IVal > (int) INT_BITS) {
         Error ("Width of bit-field exceeds its type");
         return -1;
     }
@@ -567,7 +567,7 @@ static SymEntry* ParseUnionDecl (const char* Name)
                 UnionSize = FieldSize;
             }
 
-            /* Add a field entry to the table */
+            /* Add a field entry to the table. */
             if (FieldWidth > 0) {
                 AddBitField (Decl.Ident, 0, 0, FieldWidth);
             } else {
@@ -657,7 +657,7 @@ static SymEntry* ParseStructDecl (const char* Name)
              * with width zero, align the struct to the next member
              */
             if (BitOffs > 0) {
-                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > INT_BITS) {
+                if (FieldWidth <= 0 || (BitOffs + FieldWidth) > (int) INT_BITS) {
                     StructSize += SIZEOF_INT;
                     BitOffs = 0;
                 }
@@ -688,7 +688,7 @@ static SymEntry* ParseStructDecl (const char* Name)
             /* Byte offset of this member is the current struct size plus any
              * full bytes from the bit offset in case of bit-fields.
              */
-            Offs = StructSize + (BitOffs >> 3);
+            Offs = StructSize + (BitOffs / CHAR_BITS);
 
             /* Check if this field is a flexible array member, and
              * calculate the size of the field.
@@ -707,7 +707,7 @@ static SymEntry* ParseStructDecl (const char* Name)
 
             /* Add a field entry to the table */
             if (FieldWidth > 0) {
-                AddBitField (Decl.Ident, Offs, BitOffs & 0x07, FieldWidth);
+                AddBitField (Decl.Ident, Offs, BitOffs % CHAR_BITS, FieldWidth);
                 BitOffs += FieldWidth;
             } else {
                 AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
@@ -723,7 +723,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
 
     /* If we have bits from bit-fields left, add them to the size. */
     if (BitOffs > 0) {
-        StructSize += ((BitOffs + CHAR_BITS - 1) >> 3);
+        StructSize += ((BitOffs + CHAR_BITS - 1) / CHAR_BITS);
     }
 
     /* Skip the closing brace */

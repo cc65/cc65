@@ -165,14 +165,14 @@ struct Type {
 #define FLEXIBLE        0L      /* Flexible array struct member */
 
 /* Sizes. Floating point sizes come from fp.h */
-#define SIZEOF_CHAR     1
-#define SIZEOF_SHORT    2
-#define SIZEOF_INT      2
-#define SIZEOF_LONG     4
-#define SIZEOF_LONGLONG 8
+#define SIZEOF_CHAR     1U
+#define SIZEOF_SHORT    2U
+#define SIZEOF_INT      2U
+#define SIZEOF_LONG     4U
+#define SIZEOF_LONGLONG 8U
 #define SIZEOF_FLOAT    (FP_F_Size())
 #define SIZEOF_DOUBLE   (FP_D_Size())
-#define SIZEOF_PTR      2
+#define SIZEOF_PTR      SIZEOF_INT
 
 /* Bit sizes */
 #define CHAR_BITS       (8 * SIZEOF_CHAR)

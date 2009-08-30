@@ -428,6 +428,10 @@ and the one defined by the ISO standard:
 	conventions (see below).  It means that you must not mix pointers to
 	those functions with pointers to user-written, not-fastcall functions.
 	<p>
+<item>	The <tt/volatile/ keyword doesn't have an effect. This is not as bad
+        as it sounds, since the 6502 has so few registers that it isn't 
+        possible to keep values in registers anyway.
+	<p>
 </itemize>
 
 There may be some more minor differences I'm currently not aware of. The
@@ -1068,7 +1072,7 @@ a future version. Instead use the format specifiers from the table above:
 <sect>Implementation-defined behavior<p>
 
 This section describes the behavior of cc65 when the standard describes the
-behavior as implementation-defined.                                       
+behavior as implementation-defined.
 
 (to be done)
 

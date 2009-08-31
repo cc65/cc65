@@ -503,7 +503,7 @@ static void ReplacePushByStore (StackOpData* D)
 
 
 
-static void AddOpLow (StackOpData* D, opc_t OPC)
+static void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 /* Add an op for the low byte of an operator. This function honours the
  * OP_DIRECT and OP_RELOAD_Y flags and generates the necessary instructions.
  * All code is inserted at the current insertion point.
@@ -511,21 +511,21 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
 {
     CodeEntry* X;
 
-    if ((D->Lhs.A.Flags & LI_DIRECT) != 0) {
+    if ((LI->A.Flags & LI_DIRECT) != 0) {
        	/* Op with a variable location. If the location is on the stack, we
          * need to reload the Y register.
          */
-        if ((D->Lhs.A.Flags & LI_RELOAD_Y) == 0) {
+        if ((LI->A.Flags & LI_RELOAD_Y) == 0) {
 
             /* opc ... */
-            CodeEntry* LoadA = D->Lhs.A.LoadEntry;
+            CodeEntry* LoadA = LI->A.LoadEntry;
             X = NewCodeEntry (OPC, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
         } else {
 
             /* ldy #offs */
-            const char* Arg = MakeHexArg (D->Lhs.A.Offs);
+            const char* Arg = MakeHexArg (LI->A.Offs);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
@@ -536,7 +536,7 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
         }
 
         /* In both cases, we can remove the load */
-        D->Lhs.A.Flags |= LI_REMOVE;
+        LI->A.Flags |= LI_REMOVE;
 
     } else {
 
@@ -549,7 +549,7 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
 
 
 
-static void AddOpHigh (StackOpData* D, opc_t OPC)
+static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI)
 /* Add an op for the high byte of an operator. Special cases (constant values
  * or similar) have to be checked separately, the function covers only the
  * generic case. Code is inserted at the insertion point.
@@ -565,19 +565,19 @@ static void AddOpHigh (StackOpData* D, opc_t OPC)
     X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    if ((D->Lhs.X.Flags & LI_DIRECT) != 0) {
+    if ((LI->X.Flags & LI_DIRECT) != 0) {
 
-        if ((D->Lhs.X.Flags & LI_RELOAD_Y) == 0) {
+        if ((LI->X.Flags & LI_RELOAD_Y) == 0) {
 
             /* opc xxx */
-            CodeEntry* LoadX = D->Lhs.X.LoadEntry;
+            CodeEntry* LoadX = LI->X.LoadEntry;
    	    X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
         } else {
 
             /* ldy #const */
-            const char* Arg = MakeHexArg (D->Lhs.X.Offs);
+            const char* Arg = MakeHexArg (LI->X.Offs);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
@@ -587,7 +587,7 @@ static void AddOpHigh (StackOpData* D, opc_t OPC)
         }
 
         /* In both cases, we can remove the load */
-        D->Lhs.X.Flags |= LI_REMOVE;
+        LI->X.Flags |= LI_REMOVE;
 
     } else {
         /* opc zphi */
@@ -602,7 +602,7 @@ static void AddOpHigh (StackOpData* D, opc_t OPC)
     /* pla */
     X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
-}
+}	    
 
 
 
@@ -1085,17 +1085,23 @@ static unsigned Opt_tosaddax (StackOpData* D)
         InsertEntry (D, X, D->IP++);
 
         /* Low byte */
-        AddOpLow (D, OP65_ADC);
+        AddOpLow (D, OP65_ADC, &D->Lhs);
 
         /* High byte */
         if (D->PushEntry->RI->In.RegX == 0) {
             /* The high byte is the value in X plus the carry */
             CodeLabel* L = CS_GenLabel (D->Code, D->NextEntry);
+
+            /* bcc L */
             X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
+
+            /* inx */
             X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
+
         } else if (D->OpEntry->RI->In.RegX == 0) {
+
             /* The high byte is that of the first operand plus carry */
             CodeLabel* L;
             if (RegValIsKnown (D->PushEntry->RI->In.RegX)) {
@@ -1118,7 +1124,7 @@ static unsigned Opt_tosaddax (StackOpData* D)
             InsertEntry (D, X, D->IP++);
         } else {
             /* High byte is unknown */
-            AddOpHigh (D, OP65_ADC);
+            AddOpHigh (D, OP65_ADC, &D->Lhs);
         }
     }
 
@@ -1141,7 +1147,7 @@ static unsigned Opt_tosandax (StackOpData* D)
 
     /* Inline the and, low byte */
     D->IP = D->OpIndex + 1;
-    AddOpLow (D, OP65_AND);
+    AddOpLow (D, OP65_AND, &D->Lhs);
 
     /* High byte */
     if (D->PushEntry->RI->In.RegX == 0 || D->OpEntry->RI->In.RegX == 0) {
@@ -1150,7 +1156,7 @@ static unsigned Opt_tosandax (StackOpData* D)
        	InsertEntry (D, X, D->IP++);
     } else {
      	/* High byte is unknown */
-        AddOpHigh (D, OP65_AND);
+        AddOpHigh (D, OP65_AND, &D->Lhs);
     }
 
     /* Remove the push and the call to the tosandax function */
@@ -1389,7 +1395,7 @@ static unsigned Opt_tosorax (StackOpData* D)
 
     /* Inline the or, low byte */
     D->IP = D->OpIndex + 1;
-    AddOpLow (D, OP65_ORA);
+    AddOpLow (D, OP65_ORA, &D->Lhs);
 
     /* High byte */
     if (RegValIsKnown (D->PushEntry->RI->In.RegX) &&
@@ -1401,7 +1407,7 @@ static unsigned Opt_tosorax (StackOpData* D)
         InsertEntry (D, X, D->IP++);
     } else if (D->PushEntry->RI->In.RegX != 0) {
        	/* High byte is unknown */
-        AddOpHigh (D, OP65_ORA);
+        AddOpHigh (D, OP65_ORA, &D->Lhs);
     }
 
     /* Remove the push and the call to the tosorax function */
@@ -1600,7 +1606,7 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
     /* Inline the xor, low byte */
     D->IP = D->OpIndex + 1;
-    AddOpLow (D, OP65_EOR);
+    AddOpLow (D, OP65_EOR, &D->Lhs);
 
     /* High byte */
     if (RegValIsKnown (D->PushEntry->RI->In.RegX) &&
@@ -1611,7 +1617,7 @@ static unsigned Opt_tosxorax (StackOpData* D)
      	InsertEntry (D, X, D->IP++);
     } else if (D->PushEntry->RI->In.RegX != 0) {
      	/* High byte is unknown */
-        AddOpHigh (D, OP65_EOR);
+        AddOpHigh (D, OP65_EOR, &D->Lhs);
     }
 
     /* Remove the push and the call to the tosandax function */

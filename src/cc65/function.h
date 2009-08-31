@@ -73,8 +73,11 @@ Type* F_GetReturnType (Function* F);
 int F_HasVoidReturn (const Function* F);
 /* Return true if the function does not have a return value */
 
-void F_HasReturn (Function* F);
+void F_ReturnFound (Function* F);
 /* Mark the function as having a return statement */
+
+int F_HasReturn (const Function* F);
+/* Return true if the function contains a return statement*/
 
 int F_IsVariadic (const Function* F);
 /* Return true if this is a variadic function */

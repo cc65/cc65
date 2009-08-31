@@ -314,7 +314,7 @@ static void ReturnStatement (void)
     }
 
     /* Mark the function as having a return statement */
-    F_HasReturn (CurrentFunc);
+    F_ReturnFound (CurrentFunc);
 
     /* Cleanup the stack in case we're inside a block with locals */
     g_space (StackPtr - F_GetTopLevelSP (CurrentFunc));

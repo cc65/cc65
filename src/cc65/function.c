@@ -62,16 +62,24 @@
 
 
 
+/* Enumeration for function flags */
+typedef enum {
+    FF_NONE             = 0x0000,
+    FF_HAS_RETURN       = 0x0001,       /* Function has a return statement */
+    FF_IS_MAIN          = 0x0002,       /* This is the main function */
+    FF_VOID_RETURN      = 0x0004,       /* Function returning void */
+} funcflags_t;
+
 /* Structure that holds all data needed for function activation */
 struct Function {
     struct SymEntry*   	FuncEntry;  	/* Symbol table entry */
-    Type*		ReturnType; 	/* Function return type */
+    Type*     		ReturnType; 	/* Function return type */
     struct FuncDesc*	Desc;	    	/* Function descriptor */
-    int			Reserved;   	/* Reserved local space */
-    unsigned	  	RetLab;	    	/* Return code label */
-    int			TopLevelSP;	/* SP at function top level */
+    int	      		Reserved;   	/* Reserved local space */
+    unsigned  	  	RetLab;	    	/* Return code label */
+    int	      		TopLevelSP;	/* SP at function top level */
     unsigned            RegOffs;        /* Register variable space offset */
-    int                 HasRetStmt;     /* Function has a return statement */
+    funcflags_t		Flags;     	/* Function flags */
 };
 
 /* Pointer to current function */
@@ -99,7 +107,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->RetLab	  = GetLocalLabel ();
     F->TopLevelSP = 0;
     F->RegOffs    = RegisterSpace;
-    F->HasRetStmt = 0;
+    F->Flags	  = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
 
     /* Return the new structure */
     return F;
@@ -150,15 +158,31 @@ Type* F_GetReturnType (Function* F)
 int F_HasVoidReturn (const Function* F)
 /* Return true if the function does not have a return value */
 {
-    return IsTypeVoid (F->ReturnType);
+    return (F->Flags & FF_VOID_RETURN) != 0;
 }
 
 
 
-void F_HasReturn (Function* F)
+void F_ReturnFound (Function* F)
 /* Mark the function as having a return statement */
 {
-    F->HasRetStmt = 1;
+    F->Flags |= FF_HAS_RETURN;
+}
+
+
+
+int F_HasReturn (const Function* F)
+/* Return true if the function contains a return statement*/
+{
+    return (F->Flags & FF_HAS_RETURN) != 0;
+}
+
+
+
+int F_IsMainFunc (const Function* F)
+/* Return true if this is the main function */
+{
+    return (F->Flags & FF_IS_MAIN) != 0;
 }
 
 
@@ -375,6 +399,10 @@ void NewFunc (SymEntry* Func)
 
     /* Special handling for main() */
     if (strcmp (Func->Name, "main") == 0) {
+
+        /* Mark this as the main function */
+        CurrentFunc->Flags |= FF_IS_MAIN;
+
         /* Main cannot be a fastcall function */
         if (IsQualFastcall (Func->Type)) {
             Error ("`main' cannot be declared as __fastcall__");
@@ -456,7 +484,6 @@ void NewFunc (SymEntry* Func)
 
                 /* Generate swap code */
                 g_swap_regvars (Param->V.R.SaveOffs, Reg, CheckedSizeOf (Param->Type));
-
             }
         }
 
@@ -483,7 +510,7 @@ void NewFunc (SymEntry* Func)
     /* If this is not a void function, output a warning if we didn't see a
      * return statement.
      */
-    if (!F_HasVoidReturn (CurrentFunc) && !CurrentFunc->HasRetStmt) {
+    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc)) {
         Warning ("Control reaches end of non-void function");
     }
 

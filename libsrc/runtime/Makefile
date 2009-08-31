@@ -117,7 +117,7 @@ OBJS = 	add.o		\
        	ldec.o		\
        	ldiv.o		\
        	le.o		\
-       	leasp.o		\
+       	leaasp.o	\
        	leave.o		\
        	leq.o		\
        	lge.o		\

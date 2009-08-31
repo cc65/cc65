@@ -162,7 +162,6 @@ OBJS = 	add.o		\
        	ne.o   		\
        	neg.o  		\
        	or.o   		\
-	pleasp.o	\
 	popa.o 		\
        	popsreg.o	\
 	push1.o	       	\

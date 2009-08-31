@@ -4,11 +4,12 @@
 ; CC65 runtime: Load effective address with offset in A/X relative to SP
 ;
 
-    	.export		leaaxsp
+    	.export		leaaxsp, leaa0sp
      	.importzp	sp
 
-.proc	leaaxsp
-             
+leaa0sp:
+        ldx     #$00
+leaaxsp:
         clc
         adc     sp
         pha
@@ -18,6 +19,5 @@
         pla
         rts
 
-.endproc
 
 

@@ -615,7 +615,7 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 {
     /* Both registers may be loaded with one insn, but DelEntry will in this
      * case clear the other one.
-     */	    
+     */
     if (LI->A.LoadIndex >= 0 && (LI->A.Flags & LI_REMOVE)) {
         DelEntry (D, LI->A.LoadIndex);
     }
@@ -757,7 +757,7 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
         /* bne L */
         X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
-	
+
 	/* Add operand for high byte */
 	AddOpHigh (D, OP65_CMP, &D->Rhs, 0);
 
@@ -1049,6 +1049,7 @@ static unsigned Opt_tosaddax (StackOpData* D)
 
         /* High byte */
         if (D->PushEntry->RI->In.RegX == 0) {
+
             /* The high byte is the value in X plus the carry */
             CodeLabel* L = CS_GenLabel (D->Code, D->NextEntry);
 
@@ -1060,7 +1061,9 @@ static unsigned Opt_tosaddax (StackOpData* D)
             X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
-        } else if (D->OpEntry->RI->In.RegX == 0) {
+        } else if (D->OpEntry->RI->In.RegX == 0 			&&
+		   (RegValIsKnown (D->PushEntry->RI->In.RegX)  	||
+		    (D->Lhs.X.Flags & LI_RELOAD_Y) == 0)) {
 
             /* The high byte is that of the first operand plus carry */
             CodeLabel* L;
@@ -1069,8 +1072,15 @@ static unsigned Opt_tosaddax (StackOpData* D)
                 const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX);
                 X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
             } else {
-                /* Value of first op high byte is unknown */
-                X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+                /* Value of first op high byte is unknown. Load from ZP or
+		 * original storage.
+		 */
+		if (D->Lhs.X.Flags & LI_DIRECT) {
+		    CodeEntry* LoadX = D->Lhs.X.LoadEntry;
+		    X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+		} else {
+                    X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+		}
             }
             InsertEntry (D, X, D->IP++);
 
@@ -1100,8 +1110,6 @@ static unsigned Opt_tosaddax (StackOpData* D)
 static unsigned Opt_tosandax (StackOpData* D)
 /* Optimize the tosandax sequence */
 {
-    CodeEntry*  X;
-
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
 
@@ -1110,14 +1118,7 @@ static unsigned Opt_tosandax (StackOpData* D)
     AddOpLow (D, OP65_AND, &D->Lhs);
 
     /* High byte */
-    if (D->PushEntry->RI->In.RegX == 0 || D->OpEntry->RI->In.RegX == 0) {
-     	/* The high byte is zero */
-       	X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, D->OpEntry->LI);
-       	InsertEntry (D, X, D->IP++);
-    } else {
-     	/* High byte is unknown */
-        AddOpHigh (D, OP65_AND, &D->Lhs, 1);
-    }
+    AddOpHigh (D, OP65_AND, &D->Lhs, 1);
 
     /* Remove the push and the call to the tosandax function */
     RemoveRemainders (D);
@@ -1254,8 +1255,6 @@ static unsigned Opt_tosneax (StackOpData* D)
 static unsigned Opt_tosorax (StackOpData* D)
 /* Optimize the tosorax sequence */
 {
-    CodeEntry*  X;
-
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
 
@@ -1264,17 +1263,7 @@ static unsigned Opt_tosorax (StackOpData* D)
     AddOpLow (D, OP65_ORA, &D->Lhs);
 
     /* High byte */
-    if (RegValIsKnown (D->PushEntry->RI->In.RegX) &&
-        RegValIsKnown (D->OpEntry->RI->In.RegX)) {
-       	/* Both values known, precalculate the result */
-        unsigned char Result = D->PushEntry->RI->In.RegX | D->OpEntry->RI->In.RegX;
-        const char* Arg = MakeHexArg (Result);
-        X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    } else if (D->PushEntry->RI->In.RegX != 0) {
-       	/* High byte is unknown */
-        AddOpHigh (D, OP65_ORA, &D->Lhs, 1);
-    }
+    AddOpHigh (D, OP65_ORA, &D->Lhs, 1);
 
     /* Remove the push and the call to the tosorax function */
     RemoveRemainders (D);

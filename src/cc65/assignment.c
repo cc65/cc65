@@ -34,6 +34,7 @@
 
 
 /* cc65 */
+#include "asmcode.h"
 #include "assignment.h"
 #include "codegen.h"
 #include "datatype.h"
@@ -160,6 +161,9 @@ void Assignment (ExprDesc* Expr)
 
     } else if (ED_IsBitField (Expr)) {
 
+        CodeMark AndPos;
+        CodeMark PushPos;
+
         unsigned Mask;
         unsigned Flags;
 
@@ -182,30 +186,54 @@ void Assignment (ExprDesc* Expr)
 
         /* Mask unwanted bits */
         Mask = (0x0001U << Expr->BitWidth) - 1U;
+        GetCodePos (&AndPos);
         g_and (Flags | CF_CONST, ~(Mask << Expr->BitOffs));
 
         /* Push it on stack */
+        GetCodePos (&PushPos);
         g_push (Flags, 0);
 
      	/* Read the expression on the right side of the '=' */
      	hie1 (&Expr2);
 
-     	/* Do type conversion if necessary. Beware: Do not use char type 
+     	/* Do type conversion if necessary. Beware: Do not use char type
          * here!
          */
      	TypeConversion (&Expr2, ltype);
 
-     	/* If necessary, load the value into the primary register */
-     	LoadExpr (CF_NONE, &Expr2);
+        /* Special treatment if the value is constant */
+        if (ED_IsConstAbsInt (&Expr2)) {
 
-        /* Apply the mask */
-        g_and (Flags | CF_CONST, Mask);
+            /* Get the value and apply the mask */
+            unsigned Val = (unsigned) (Expr2.IVal & Mask);
 
-        /* Shift it into the right position */
-        g_asl (Flags | CF_CONST, Expr->BitOffs);
+            /* Since we will do the OR with a constant, we can remove the push */
+            RemoveCode (&PushPos);
 
-        /* Or both values */
-        g_or (Flags, 0);
+            /* If the value is equal to the mask now, all bits are one, and we
+             * can remove the mask operation from above.
+             */
+            if (Val == Mask) {
+                RemoveCode (&AndPos);
+            }
+
+            /* Generate the or operation */
+            g_or (Flags | CF_CONST, Val << Expr->BitOffs);
+
+        } else {
+
+            /* If necessary, load the value into the primary register */
+            LoadExpr (CF_NONE, &Expr2);
+
+            /* Apply the mask */
+            g_and (Flags | CF_CONST, Mask);
+
+            /* Shift it into the right position */
+            g_asl (Flags | CF_CONST, Expr->BitOffs);
+
+            /* Or both values */
+            g_or (Flags, 0);
+        }
 
      	/* Generate a store instruction */
      	Store (Expr, 0);

@@ -62,6 +62,25 @@ void GetCodePos (CodeMark* M)
 
 
 
+void RemoveCodeRange (const CodeMark* Start, const CodeMark* End)
+/* Remove all code between two code markers */
+{
+    /* Nothing to do if the range is empty */
+    if (Start->Pos == End->Pos) {
+        return;
+    }
+
+    /* We can only delete the range if End is the end of the code segment or
+     * if both SP values are identical.
+     */
+    CHECK (Start->SP == End->SP || End->Pos == CS_GetEntryCount (CS->Code));
+
+    /* Delete the range */
+    CS_DelCodeRange (CS->Code, Start->Pos, End->Pos-1);
+}
+
+
+
 void RemoveCode (const CodeMark* M)
 /* Remove all code after the given code marker */
 {

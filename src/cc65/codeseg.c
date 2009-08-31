@@ -1050,6 +1050,86 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
 
 
 
+void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
+/* Delete all entries between first and last, both inclusive. The function
+ * can only handle basic blocks (First is the only entry, Last the only exit)
+ * and no open labels. It will call FAIL if any of these preconditions are
+ * violated.
+ */
+{
+    unsigned   I;
+    CodeEntry* FirstEntry;
+
+    /* Do some sanity checks */
+    CHECK (First <= Last && Last < CS_GetEntryCount (S));
+
+    /* If Last is actually the last insn, call CS_DelCodeAfter instead, which
+     * is more flexible in this case.
+     */
+    if (Last == CS_GetEntryCount (S) - 1) {
+        CS_DelCodeAfter (S, First);
+        return;
+    }
+
+    /* Get the first entry and check if it has any labels. If it has, move
+     * them to the insn following Last. If Last is the last insn of the code
+     * segment, make them ownerless and move them to the label pool.
+     */
+    FirstEntry = CS_GetEntry (S, First);
+    if (CE_HasLabel (FirstEntry)) {
+        /* Get the entry following last */
+        CodeEntry* FollowingEntry = CS_GetNextEntry (S, Last);
+        if (FollowingEntry) {       
+            /* There is an entry after Last - move the labels */
+            CS_MoveLabels (S, FirstEntry, FollowingEntry);
+        } else {
+     	    /* Move the labels to the pool and clear the owner pointer */
+     	    CS_MoveLabelsToPool (S, FirstEntry);
+        }
+    }
+
+    /* First pass: Delete all references to labels. If the reference count
+     * for a label drops to zero, delete it.
+     */
+    for (I = Last; I >= First; --I) {
+
+       	/* Get the next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+       	/* Check if this entry has a label reference */
+       	if (E->JumpTo) {
+
+       	    /* If the label is a label in the label pool, this is an error */
+       	    CodeLabel* L = E->JumpTo;
+       	    CHECK (CollIndex (&S->Labels, L) < 0);
+
+ 	    /* Remove the reference to the label */
+ 	    CS_RemoveLabelRef (S, E);
+ 	}
+    }
+
+    /* Second pass: Delete the instructions. If a label attached to an
+     * instruction still has references, it must be references from outside
+     * the deleted area, which is an error.
+     */
+    for (I = Last; I >= First; --I) {
+
+    	/* Get the next entry */
+    	CodeEntry* E = CS_GetEntry (S, I);
+
+       	/* Check if this entry has a label attached */
+    	CHECK (!CE_HasLabel (E));
+
+	/* Delete the pointer to the entry */
+	CollDelete (&S->Entries, I);
+
+	/* Delete the entry itself */
+	FreeCodeEntry (E);
+    }
+}
+
+
+
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
 /* Delete all entries including the given one */
 {

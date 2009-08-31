@@ -68,6 +68,9 @@ typedef struct {
 void GetCodePos (CodeMark* M);
 /* Get a marker pointing to the current output position */
 
+void RemoveCodeRange (const CodeMark* Start, const CodeMark* End);
+/* Remove all code between two code markers */
+
 void RemoveCode (const CodeMark* M);
 /* Remove all code after the given code marker */
 

@@ -240,6 +240,13 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L);
  * deleted.
  */
 
+void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last);
+/* Delete all entries between first and last, both inclusive. The function
+ * can only handle basic blocks (First is the only entry, Last the only exit)
+ * and no open labels. It will call FAIL if any of these preconditions are
+ * violated.
+ */
+
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */
 

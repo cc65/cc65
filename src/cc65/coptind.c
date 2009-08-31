@@ -805,12 +805,13 @@ unsigned OptCondBranches2 (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
+    unsigned I;
 
     /* Generate register info for this step */
     CS_GenRegInfo (S);
 
     /* Walk over the entries */
-    unsigned I = 0;
+    I = 0;
     while (I < CS_GetEntryCount (S)) {
 
        	CodeEntry* N;

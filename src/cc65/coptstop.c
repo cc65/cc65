@@ -549,7 +549,7 @@ static void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
 
 
-static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI)
+static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 /* Add an op for the high byte of an operator. Special cases (constant values
  * or similar) have to be checked separately, the function covers only the
  * generic case. Code is inserted at the insertion point.
@@ -557,9 +557,11 @@ static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI)
 {
     CodeEntry* X;
 
-    /* pha */
-    X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
+    if (KeepResult) {
+	/* pha */
+	X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, D->OpEntry->LI);
+	InsertEntry (D, X, D->IP++);
+    }
 
     /* txa */
     X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
@@ -571,7 +573,7 @@ static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
             /* opc xxx */
             CodeEntry* LoadX = LI->X.LoadEntry;
-   	    X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+     	    X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
         } else {
@@ -595,14 +597,16 @@ static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI)
         InsertEntry (D, X, D->IP++);
     }
 
-    /* tax */
-    X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
+    if (KeepResult) {
+	/* tax */
+	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, D->OpEntry->LI);
+	InsertEntry (D, X, D->IP++);
 
-    /* pla */
-    X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-}	    
+	/* pla */
+	X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
+	InsertEntry (D, X, D->IP++);
+    }
+}
 
 
 
@@ -611,7 +615,7 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
 {
     /* Both registers may be loaded with one insn, but DelEntry will in this
      * case clear the other one.
-     */
+     */	    
     if (LI->A.LoadIndex >= 0 && (LI->A.Flags & LI_REMOVE)) {
         DelEntry (D, LI->A.LoadIndex);
     }
@@ -747,59 +751,15 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
 
         D->IP = D->OpIndex+1;
 
-        /* If the location is on the stack, we need to reload the Y register. */
-        if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
-
-            /* cmp ... */
-            CodeEntry* LoadA = D->Rhs.A.LoadEntry;
-            X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-
-        } else {
-
-            /* ldy #offs */
-            const char* Arg = MakeHexArg (D->Rhs.A.Offs);
-            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-
-            /* cmp (sp),y */
-            X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-        }
-
-        /* In both cases, we can remove the load */
-        D->Rhs.A.Flags |= LI_REMOVE;
+	/* Add operand for low byte */
+	AddOpLow (D, OP65_CMP, &D->Rhs);
 
         /* bne L */
         X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
-
-        /* txa */
-        X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* If the location is on the stack, we need to reload the Y register. */
-        if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
-
-            /* cmp ... */
-            CodeEntry* LoadX = D->Rhs.X.LoadEntry;
-            X = NewCodeEntry (OP65_CMP, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-
-        } else {
-
-            /* ldy #offs */
-            const char* Arg = MakeHexArg (D->Rhs.X.Offs);
-            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-
-            /* cmp (sp),y */
-            X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-            InsertEntry (D, X, D->IP++);
-        }
-
-        /* In both cases, we can remove the load */
-        D->Rhs.X.Flags |= LI_REMOVE;
+	
+	/* Add operand for high byte */
+	AddOpHigh (D, OP65_CMP, &D->Rhs, 0);
 
     } else {
 
@@ -1124,7 +1084,7 @@ static unsigned Opt_tosaddax (StackOpData* D)
             InsertEntry (D, X, D->IP++);
         } else {
             /* High byte is unknown */
-            AddOpHigh (D, OP65_ADC, &D->Lhs);
+            AddOpHigh (D, OP65_ADC, &D->Lhs, 1);
         }
     }
 
@@ -1156,7 +1116,7 @@ static unsigned Opt_tosandax (StackOpData* D)
        	InsertEntry (D, X, D->IP++);
     } else {
      	/* High byte is unknown */
-        AddOpHigh (D, OP65_AND, &D->Lhs);
+        AddOpHigh (D, OP65_AND, &D->Lhs, 1);
     }
 
     /* Remove the push and the call to the tosandax function */
@@ -1186,60 +1146,13 @@ static unsigned Opt_tosgeax (StackOpData* D)
     D->IP = D->OpIndex+1;
 
     /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & LI_DIRECT) != 0);
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+    /* Add code for low operand */
+    AddOpLow (D, OP65_CMP, &D->Rhs);
 
-        /* cmp ... */
-        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
-        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.A.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* cmp (sp),y */
-        X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.A.Flags |= LI_REMOVE;
-
-    /* txa */
-    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.X.Flags & LI_DIRECT) != 0);
-
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
-
-        /* sbc ... */
-        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
-        X = NewCodeEntry (OP65_SBC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.X.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* sbc (sp),y */
-        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.X.Flags |= LI_REMOVE;
+    /* Add code for high operand */
+    AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
 
     /* eor #$80 */
     X = NewCodeEntry (OP65_EOR, AM65_IMM, "$80", 0, D->OpEntry->LI);
@@ -1287,60 +1200,13 @@ static unsigned Opt_tosltax (StackOpData* D)
     D->IP = D->OpIndex+1;
 
     /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & LI_DIRECT) != 0);
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+    /* Add code for low operand */
+    AddOpLow (D, OP65_CMP, &D->Rhs);
 
-        /* cmp ... */
-        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
-        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.A.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* cmp (sp),y */
-        X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.A.Flags |= LI_REMOVE;
-
-    /* txa */
-    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.X.Flags & LI_DIRECT) != 0);
-
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
-
-        /* sbc ... */
-        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
-        X = NewCodeEntry (OP65_SBC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.X.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* sbc (sp),y */
-        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.X.Flags |= LI_REMOVE;
+    /* Add code for high operand */
+    AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
 
     /* eor #$80 */
     X = NewCodeEntry (OP65_EOR, AM65_IMM, "$80", 0, D->OpEntry->LI);
@@ -1407,7 +1273,7 @@ static unsigned Opt_tosorax (StackOpData* D)
         InsertEntry (D, X, D->IP++);
     } else if (D->PushEntry->RI->In.RegX != 0) {
        	/* High byte is unknown */
-        AddOpHigh (D, OP65_ORA, &D->Lhs);
+        AddOpHigh (D, OP65_ORA, &D->Lhs, 1);
     }
 
     /* Remove the push and the call to the tosorax function */
@@ -1433,72 +1299,13 @@ static unsigned Opt_tossubax (StackOpData* D)
     InsertEntry (D, X, D->IP++);
 
     /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & LI_DIRECT) != 0);
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+    /* Add code for low operand */
+    AddOpLow (D, OP65_SBC, &D->Rhs);
 
-        /* sbc ... */
-        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
-        X = NewCodeEntry (OP65_SBC, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.A.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* sbc (sp),y */
-        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.A.Flags |= LI_REMOVE;
-
-    /* pha */
-    X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-
-    /* txa */
-    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.X.Flags & LI_DIRECT) != 0);
-
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
-
-        /* sbc ... */
-        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
-        X = NewCodeEntry (OP65_SBC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.X.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* sbc (sp),y */
-        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.X.Flags |= LI_REMOVE;
-
-    /* tax */
-    X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-
-    /* pla */
-    X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
+    /* Add code for high operand */
+    AddOpHigh (D, OP65_SBC, &D->Rhs, 1);
 
     /* Remove the push and the call to the tossubax function */
     RemoveRemainders (D);
@@ -1519,60 +1326,13 @@ static unsigned Opt_tosugeax (StackOpData* D)
     D->IP = D->OpIndex+1;
 
     /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.A.Flags & LI_DIRECT) != 0);
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.A.Flags & LI_RELOAD_Y) == 0) {
+    /* Add code for low operand */
+    AddOpLow (D, OP65_CMP, &D->Rhs);
 
-        /* cmp ... */
-        CodeEntry* LoadA = D->Rhs.A.LoadEntry;
-        X = NewCodeEntry (OP65_CMP, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.A.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* cmp (sp),y */
-        X = NewCodeEntry (OP65_CMP, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.A.Flags |= LI_REMOVE;
-
-    /* txa */
-    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-
-    /* Must be true because of OP_RHS_LOAD */
-    CHECK ((D->Rhs.X.Flags & LI_DIRECT) != 0);
-
-    /* If the location is on the stack, we need to reload the Y register. */
-    if ((D->Rhs.X.Flags & LI_RELOAD_Y) == 0) {
-
-        /* sbc ... */
-        CodeEntry* LoadX = D->Rhs.X.LoadEntry;
-        X = NewCodeEntry (OP65_SBC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-    } else {
-
-        /* ldy #offs */
-        const char* Arg = MakeHexArg (D->Rhs.X.Offs);
-        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-
-        /* sbc (sp),y */
-        X = NewCodeEntry (OP65_SBC, AM65_ZP_INDY, "sp", 0, D->OpEntry->LI);
-        InsertEntry (D, X, D->IP++);
-    }
-
-    /* In both cases, we can remove the load */
-    D->Rhs.X.Flags |= LI_REMOVE;
+    /* Add code for high operand */
+    AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
 
     /* lda #$00 */
     X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
@@ -1617,7 +1377,7 @@ static unsigned Opt_tosxorax (StackOpData* D)
      	InsertEntry (D, X, D->IP++);
     } else if (D->PushEntry->RI->In.RegX != 0) {
      	/* High byte is unknown */
-        AddOpHigh (D, OP65_EOR, &D->Lhs);
+        AddOpHigh (D, OP65_EOR, &D->Lhs, 1);
     }
 
     /* Remove the push and the call to the tosandax function */

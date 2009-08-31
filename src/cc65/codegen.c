@@ -921,38 +921,63 @@ void g_getind (unsigned flags, unsigned offs)
 
 
 
-void g_leasp (int offs)
+void g_leasp (int Offs)
 /* Fetch the address of the specified symbol into the primary register */
 {
-    /* Calculate the offset relative to sp */
-    offs -= StackPtr;
+    /* Get low and high byte */
+    unsigned char Lo = (unsigned char) Offs;
+    unsigned char Hi = (unsigned char) (Offs >> 8);
 
-    /* For value 0 we do direct code */
-    if (offs == 0) {
-        AddCodeLine ("lda sp");
-        AddCodeLine ("ldx sp+1");
-    } else {
-        if (IS_Get (&CodeSizeFactor) < 300) {
-            ldaconst (offs);         		/* Load A with offset value */
-            AddCodeLine ("jsr leaasp");	/* Load effective address */
-        } else {
-            unsigned L = GetLocalLabel ();
-            if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && offs == 1) {
-             	AddCodeLine ("lda sp");
-             	AddCodeLine ("ldx sp+1");
-            	AddCodeLine ("ina");
-             	AddCodeLine ("bne %s", LocalLabelName (L));
-             	AddCodeLine ("inx");
-            } else {
-             	ldaconst (offs);
-             	AddCodeLine ("ldx sp+1");
-             	AddCodeLine ("clc");
-             	AddCodeLine ("adc sp");
-             	AddCodeLine ("bcc %s", LocalLabelName (L));
-             	AddCodeLine ("inx");
+    /* Calculate the offset relative to sp */
+    Offs -= StackPtr;
+
+    /* Generate code */
+    if (Lo == 0) {
+        if (Hi <= 3) {
+            AddCodeLine ("lda sp");
+            AddCodeLine ("ldx sp+1");
+            while (Hi--) {
+                AddCodeLine ("inx");
             }
+        } else {
+            AddCodeLine ("lda sp+1");
+            AddCodeLine ("clc");
+            AddCodeLine ("adc #$%02X", Hi);
+            AddCodeLine ("tax");
+            AddCodeLine ("lda sp");
+        }
+    } else if (Hi == 0) {
+        /* 8 bit offset */
+        if (IS_Get (&CodeSizeFactor) < 200) {
+            /* 8 bit offset with subroutine call */
+            AddCodeLine ("lda #$%02X", Lo);
+            AddCodeLine ("jsr leaa0sp");
+        } else {
+            /* 8 bit offset inlined */
+            unsigned L = GetLocalLabel ();
+            AddCodeLine ("lda sp");
+            AddCodeLine ("ldx sp+1");
+            AddCodeLine ("clc");
+            AddCodeLine ("adc #$%02X", Lo);
+            AddCodeLine ("bcc %s", LocalLabelName (L));
+            AddCodeLine ("inx");
             g_defcodelabel (L);
         }
+    } else if (IS_Get (&CodeSizeFactor) < 170) {
+        /* Full 16 bit offset with subroutine call */
+        AddCodeLine ("lda #$%02X", Lo);
+        AddCodeLine ("ldx #$%02X", Hi);
+        AddCodeLine ("jsr leaaxsp");
+    } else {
+        /* Full 16 bit offset inlined */
+        AddCodeLine ("lda sp");
+        AddCodeLine ("clc");
+        AddCodeLine ("adc #$%02X", (unsigned char) Offs);
+        AddCodeLine ("pha");
+        AddCodeLine ("lda sp+1");
+        AddCodeLine ("adc #$%02X", (unsigned char) (Offs >> 8));
+        AddCodeLine ("tax");
+        AddCodeLine ("pla");
     }
 }
 
@@ -989,7 +1014,8 @@ void g_leavariadic (int Offs)
         AddCodeLine ("inx");
         g_defcodelabel (L);
     } else {
-        AddCodeLine ("jsr leaasp");
+        AddCodeLine ("ldx #$00");
+        AddCodeLine ("jsr leaaxsp");
     }
 
     /* Add the offset to the primary */

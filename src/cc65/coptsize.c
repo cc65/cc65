@@ -154,6 +154,16 @@ static const CallDesc CallTable [] = {
         F_NONE,
         "ldeax0sp"
     },{
+        "leaaxsp",
+        {
+            /*     A               X               Y             SRegLo   */
+            UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, UNKNOWN_REGVAL,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+            UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "leaa0sp"
+    },{
         "lsubeq",
         {
             /*     A               X               Y             SRegLo   */

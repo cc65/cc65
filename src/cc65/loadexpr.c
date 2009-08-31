@@ -95,8 +95,16 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 {
     if (ED_IsLVal (Expr)) {
 
-       	/* Dereferenced lvalue */
-       	Flags |= TypeOf (Expr->Type);
+       	/* Dereferenced lvalue. If this is a bit field its type is unsigned.
+         * But if the field is completely contained in the lower byte, we will
+         * throw away the high byte anyway and may therefore load just the
+         * low byte.
+         */
+        if (ED_IsBitField (Expr) && Expr->BitOffs + Expr->BitWidth <= CHAR_BITS) {
+            Flags |= CF_CHAR | CF_UNSIGNED;
+        } else {
+            Flags |= TypeOf (Expr->Type);
+        }
      	if (ED_NeedsTest (Expr)) {
      	    Flags |= CF_TEST;
      	}

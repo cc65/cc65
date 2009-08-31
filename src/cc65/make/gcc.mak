@@ -4,6 +4,7 @@
 
 
 
+
 # ------------------------------------------------------------------------------
 
 # The executable to build
@@ -21,6 +22,17 @@ CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON) -DCC65_INC=$(CC65_INC)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=-lm
+
+# Determine the svn version number if possible
+ifneq "$(shell which svnversion 2>/dev/null)" ""
+ifneq "$(wildcard .svn)" ""
+SVNVERSION=$(shell svnversion)
+else
+SVNVERSION=unknown
+endif
+else
+SVNVERSION=unknown
+endif
 
 # ------------------------------------------------------------------------------
 # Object files and libraries to link
@@ -86,6 +98,7 @@ OBJS =	anonname.o	\
     	stdfunc.o	\
         stdnames.o      \
         stmt.o 	 	\
+        svnversion.o    \
 	swstmt.o	\
     	symentry.o	\
     	symtab.o       	\
@@ -104,7 +117,7 @@ LIBS =	$(COMMON)/common.a
 # Main target - must be first
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all:	$(EXE)
+all:	svnversion $(EXE)
 include .depend
 else
 all:	depend
@@ -112,14 +125,23 @@ all:	depend
 endif
 
 $(EXE):	$(OBJS) $(LIBS)
-	$(CC) $^ $(LDFLAGS) -o $@
+	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
+
+.PHONY:	svnversion
+svnversion:
+	@$(RM) svnversion.c
+	@echo "/* This file is auto-generated - do not modify! */" >> svnversion.c
+	@echo "" >> svnversion.c
+	@echo "const char SVNVersion[] = \"$(SVNVERSION)\";" >> svnversion.c
+
+svnversion.c:	svnversion
 
 clean:
 	$(RM) *~ core.* *.map
 
 zap:	clean
-	$(RM) *.o $(EXE) .depend
+	$(RM) $(OBJS) $(EXE) .depend svnversion.c
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

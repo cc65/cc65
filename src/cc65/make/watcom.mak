@@ -27,6 +27,17 @@ CFLAGS  = -d1 -onatx -zp4 -5 -zq -w2 -i=..\\common
 # Target files
 EXE	= cc65.exe
 
+# Determine the svn version number if possible
+ifneq "$(shell which svnversion 2>/dev/null)" ""
+ifneq "$(wildcard .svn)" ""
+SVNVERSION=$(shell svnversion)
+else
+SVNVERSION=unknown
+endif
+else
+SVNVERSION=unknown
+endif
+
 # Create NT programs by default
 ifndef TARGET
 TARGET = NT
@@ -121,6 +132,7 @@ OBJS =	anonname.obj	\
     	stdfunc.obj	\
         stdnames.obj    \
     	stmt.obj	\
+	svnversion.obj	\
 	swstmt.obj	\
     	symentry.obj	\
     	symtab.obj	\
@@ -136,7 +148,7 @@ LIBS = ../common/common.lib
 # ------------------------------------------------------------------------------
 # Main targets
 
-all:	  	$(EXE)
+all:	  	svnversion $(EXE)
 
 
 # ------------------------------------------------------------------------------
@@ -152,11 +164,20 @@ $(EXE): 	$(OBJS) $(LIBS)
 	@$(LD) system $(SYSTEM) @$(LNKCFG)
 	@rm $(LNKCFG)
 
+.PHONY:	svnversion
+svnversion:
+	@$(RM) svnversion.c
+	@echo "/* This file is auto-generated - do not modify! */" >> svnversion.c
+	@echo "" >> svnversion.c
+	@echo "const char SVNVersion[] = \"$(SVNVERSION)\";" >> svnversion.c
+
+svnversion.c:	svnversion
+
 clean:
 	@rm -f *~ core
 
 zap:	clean
-	@rm -f *.obj $(EXE)
+	@rm -f $(OBJS) $(EXE) svnversion.c
 
 strip:
 	@-$(WSTRIP) $(EXE)

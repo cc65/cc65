@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -72,6 +72,9 @@ Type* F_GetReturnType (Function* F);
 
 int F_HasVoidReturn (const Function* F);
 /* Return true if the function does not have a return value */
+
+void F_HasReturn (Function* F);
+/* Mark the function as having a return statement */
 
 int F_IsVariadic (const Function* F);
 /* Return true if this is a variadic function */

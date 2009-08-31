@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -292,17 +292,16 @@ static void ReturnStatement (void)
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
 
-        /* Check if the function has a return value declared */
-       	if (F_HasVoidReturn (CurrentFunc)) {
-       	    Error ("Returning a value in function with return type void");
-       	}
-
 	/* Evaluate the return expression */
 	hie0 (&Expr);
 
-	/* Ignore the return expression if the function returns void */
-    	if (!F_HasVoidReturn (CurrentFunc)) {
-
+        /* If we return something in a void function, print an error and
+         * ignore the value. Otherwise convert the value to the type of the
+         * return.
+         */
+       	if (F_HasVoidReturn (CurrentFunc)) {
+       	    Error ("Returning a value in function with return type void");
+       	} else {
 	    /* Convert the return value to the type of the function result */
 	    TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
@@ -313,6 +312,9 @@ static void ReturnStatement (void)
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
     	Error ("Function `%s' must return a value", F_GetFuncName (CurrentFunc));
     }
+
+    /* Mark the function as having a return statement */
+    F_HasReturn (CurrentFunc);
 
     /* Cleanup the stack in case we're inside a block with locals */
     g_space (StackPtr - F_GetTopLevelSP (CurrentFunc));

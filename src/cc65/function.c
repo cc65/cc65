@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -71,6 +71,7 @@ struct Function {
     unsigned	  	RetLab;	    	/* Return code label */
     int			TopLevelSP;	/* SP at function top level */
     unsigned            RegOffs;        /* Register variable space offset */
+    int                 HasRetStmt;     /* Function has a return statement */
 };
 
 /* Pointer to current function */
@@ -79,7 +80,7 @@ Function* CurrentFunc = 0;
 
 
 /*****************************************************************************/
-/*		   Subroutines working with struct Function		     */
+/*     		   Subroutines working with struct Function		     */
 /*****************************************************************************/
 
 
@@ -98,6 +99,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->RetLab	  = GetLocalLabel ();
     F->TopLevelSP = 0;
     F->RegOffs    = RegisterSpace;
+    F->HasRetStmt = 0;
 
     /* Return the new structure */
     return F;
@@ -149,6 +151,14 @@ int F_HasVoidReturn (const Function* F)
 /* Return true if the function does not have a return value */
 {
     return IsTypeVoid (F->ReturnType);
+}
+
+
+
+void F_HasReturn (Function* F)
+/* Mark the function as having a return statement */
+{
+    F->HasRetStmt = 1;
 }
 
 
@@ -335,7 +345,6 @@ static void F_RestoreRegVars (Function* F)
 void NewFunc (SymEntry* Func)
 /* Parse argument declarations and function body. */
 {
-    int HadReturn;
     SymEntry* Param;
 
     /* Get the function descriptor from the function entry */
@@ -467,13 +476,15 @@ void NewFunc (SymEntry* Func)
     CurrentFunc->TopLevelSP = StackPtr;
 
     /* Now process statements in this block */
-    HadReturn = 0;
-    while (CurTok.Tok != TOK_RCURLY) {
-     	if (CurTok.Tok != TOK_CEOF) {
-     	    HadReturn = Statement (0);
-     	} else {
-     	    break;
-     	}
+    while (CurTok.Tok != TOK_RCURLY && CurTok.Tok != TOK_CEOF) {
+        Statement (0);
+    }
+
+    /* If this is not a void function, output a warning if we didn't see a
+     * return statement.
+     */
+    if (!F_HasVoidReturn (CurrentFunc) && !CurrentFunc->HasRetStmt) {
+        Warning ("Control reaches end of non-void function");
     }
 
     /* Output the function exit code label */

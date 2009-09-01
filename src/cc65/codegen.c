@@ -814,22 +814,22 @@ void g_getstatic (unsigned flags, unsigned long label, long offs)
 
 
 
-void g_getlocal (unsigned flags, int offs)
+void g_getlocal (unsigned Flags, int Offs)
 /* Fetch specified local object (local var). */
 {
-    offs -= StackPtr;
-    CheckLocalOffs (offs);
-    switch (flags & CF_TYPE) {
+    Offs -= StackPtr;
+    switch (Flags & CF_TYPE) {
 
         case CF_CHAR:
-            if ((flags & CF_FORCECHAR) || (flags & CF_TEST)) {
-                ldyconst (offs);
+            CheckLocalOffs (Offs);
+            if ((Flags & CF_FORCECHAR) || (Flags & CF_TEST)) {
+                ldyconst (Offs);
                 AddCodeLine ("lda (sp),y");
             } else {
-                ldyconst (offs);
+                ldyconst (Offs);
                 AddCodeLine ("ldx #$00");
                 AddCodeLine ("lda (sp),y");
-            	if ((flags & CF_UNSIGNED) == 0) {
+            	if ((Flags & CF_UNSIGNED) == 0) {
                     unsigned L = GetLocalLabel();
             	    AddCodeLine ("bpl %s", LocalLabelName (L));
          	    AddCodeLine ("dex");
@@ -839,34 +839,39 @@ void g_getlocal (unsigned flags, int offs)
             break;
 
         case CF_INT:
-            CheckLocalOffs (offs + 1);
-            if (flags & CF_TEST) {
-            	ldyconst (offs + 1);
+            CheckLocalOffs (Offs + 1);
+            AddCodeLine ("ldy #$%02X", (unsigned char) (Offs+1));
+            if (Flags & CF_TEST) {
             	AddCodeLine ("lda (sp),y");
                 AddCodeLine ("dey");
                 AddCodeLine ("ora (sp),y");
-            } else {
-                ldyconst (offs+1);
+            } else if (IS_Get (&CodeSizeFactor) < 165) {
                 AddCodeLine ("jsr ldaxysp");
+            } else {
+            	AddCodeLine ("lda (sp),y");
+                AddCodeLine ("tax");
+                AddCodeLine ("dey");
+                AddCodeLine ("lda (sp),y");
             }
             break;
 
         case CF_LONG:
-            ldyconst (offs+3);
+            CheckLocalOffs (Offs + 3);
+            AddCodeLine ("ldy #$%02X", (unsigned char) (Offs+3));
             AddCodeLine ("jsr ldeaxysp");
-            if (flags & CF_TEST) {
-            	g_test (flags);
+            if (Flags & CF_TEST) {
+            	g_test (Flags);
             }
             break;
 
         default:
-            typeerror (flags);
+            typeerror (Flags);
     }
 }
 
 
 
-void g_getind (unsigned flags, unsigned offs)
+void g_getind (unsigned Flags, unsigned Offs)
 /* Fetch the specified object type indirect through the primary register
  * into the primary register
  */
@@ -875,46 +880,46 @@ void g_getind (unsigned flags, unsigned offs)
      * the primary. This way we get an easy addition and use the low byte
      * as the offset
      */
-    offs = MakeByteOffs (flags, offs);
+    Offs = MakeByteOffs (Flags, Offs);
 
     /* Handle the indirect fetch */
-    switch (flags & CF_TYPE) {
+    switch (Flags & CF_TYPE) {
 
         case CF_CHAR:
             /* Character sized */
-            if (flags & CF_UNSIGNED) {
-                ldyconst (offs);
+            if (Flags & CF_UNSIGNED) {
+                ldyconst (Offs);
                 AddCodeLine ("jsr ldauidx");
             } else {
-                ldyconst (offs);
+                ldyconst (Offs);
                 AddCodeLine ("jsr ldaidx");
             }
             break;
 
         case CF_INT:
-            if (flags & CF_TEST) {
-             	ldyconst (offs);
+            if (Flags & CF_TEST) {
+             	ldyconst (Offs);
                 AddCodeLine ("sta ptr1");
                 AddCodeLine ("stx ptr1+1");
                 AddCodeLine ("lda (ptr1),y");
                 AddCodeLine ("iny");
                 AddCodeLine ("ora (ptr1),y");
             } else {
-                ldyconst (offs+1);
+                ldyconst (Offs+1);
                 AddCodeLine ("jsr ldaxidx");
             }
             break;
 
         case CF_LONG:
-            ldyconst (offs+3);
+            ldyconst (Offs+3);
             AddCodeLine ("jsr ldeaxidx");
-            if (flags & CF_TEST) {
-                g_test (flags);
+            if (Flags & CF_TEST) {
+                g_test (Flags);
             }
             break;
 
         default:
-            typeerror (flags);
+            typeerror (Flags);
 
     }
 }

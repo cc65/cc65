@@ -531,33 +531,36 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_AND:
        	    if (RegValIsKnown (In->RegA)) {
-		if (CE_IsConstImm (E)) {
-		    Out->RegA = In->RegA & (short) E->Num;
-		} else if (E->AM == AM65_ZP) {
-		    switch (GetKnownReg (E->Use & REG_ZP, In)) {
-		    	case REG_TMP1:
-		    	    Out->RegA = In->RegA & In->Tmp1;
-		    	    break;
-			case REG_PTR1_LO:
-			    Out->RegA = In->RegA & In->Ptr1Lo;
-			    break;
-			case REG_PTR1_HI:
-			    Out->RegA = In->RegA & In->Ptr1Hi;
-			    break;
-			case REG_SREG_LO:
-			    Out->RegA = In->RegA & In->SRegLo;
-			    break;
-			case REG_SREG_HI:
-			    Out->RegA = In->RegA & In->SRegHi;
-			    break;
-		    	default:
-		    	    Out->RegA = UNKNOWN_REGVAL;
-		     	    break;
-		    }
-		} else {
-		    Out->RegA = UNKNOWN_REGVAL;
-		}
-	    }
+	    	if (CE_IsConstImm (E)) {
+	    	    Out->RegA = In->RegA & (short) E->Num;
+	    	} else if (E->AM == AM65_ZP) {
+	    	    switch (GetKnownReg (E->Use & REG_ZP, In)) {
+	    	    	case REG_TMP1:
+	    	    	    Out->RegA = In->RegA & In->Tmp1;
+	    	    	    break;
+	    		case REG_PTR1_LO:
+	    		    Out->RegA = In->RegA & In->Ptr1Lo;
+	    		    break;
+	    		case REG_PTR1_HI:
+	    		    Out->RegA = In->RegA & In->Ptr1Hi;
+	    		    break;
+	    		case REG_SREG_LO:
+	    		    Out->RegA = In->RegA & In->SRegLo;
+	    		    break;
+	    		case REG_SREG_HI:
+	    		    Out->RegA = In->RegA & In->SRegHi;
+	    		    break;
+	    	    	default:
+	    	    	    Out->RegA = UNKNOWN_REGVAL;
+	    	     	    break;
+	    	    }
+                } else {
+	    	    Out->RegA = UNKNOWN_REGVAL;
+	    	}
+	    } else if (CE_IsKnownImm (E, 0)) {
+                /* A and $00 does always give zero */
+                Out->RegA = 0;
+            }
 	    break;
 
 	case OP65_ASL:
@@ -663,7 +666,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			break;
 		    case REG_SREG_LO:
 			Out->SRegLo = (In->SRegLo - 1) & 0xFF;
-			break;
+	     		break;
 		    case REG_SREG_HI:
 			Out->SRegHi = (In->SRegHi - 1) & 0xFF;
 			break;
@@ -822,7 +825,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		if (In->RegA == 0xFF) {
 		    Out->RegA = 0xFF;
 		}
-		if (In->RegX == 0xFF) {
+	     	if (In->RegX == 0xFF) {
                     Out->RegX = 0xFF;
                 }
             } else if (FindBoolCmpCond (E->Arg) != CMP_INV) {
@@ -875,7 +878,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			Out->RegX = In->Tmp1;
 			break;
 		    case REG_PTR1_LO:
-			Out->RegX = In->Ptr1Lo;
+	     		Out->RegX = In->Ptr1Lo;
 			break;
 		    case REG_PTR1_HI:
 			Out->RegX = In->Ptr1Hi;
@@ -928,7 +931,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_LSR:
 	    if (E->AM == AM65_ACC && RegValIsKnown (In->RegA)) {
-		Out->RegA = (In->RegA >> 1) & 0xFF;
+	     	Out->RegA = (In->RegA >> 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Chg & REG_ZP, In)) {
 		    case REG_TMP1:
@@ -981,11 +984,14 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	 	    	    Out->RegA = UNKNOWN_REGVAL;
 	 	    	    break;
 	 	    }
-	 	} else {
-	 	    /* A is now unknown */
-	 	    Out->RegA = UNKNOWN_REGVAL;
-	 	}
-	    }
+	     	} else {
+	     	    /* A is now unknown */
+	     	    Out->RegA = UNKNOWN_REGVAL;
+	     	}
+	    } else if (CE_IsKnownImm (E, 0xFF)) {
+                /* ORA with 0xFF does always give 0xFF */
+                Out->RegA = 0xFF;
+            }
 	    break;
 
 	case OP65_PHA:
@@ -1034,7 +1040,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			Out->SRegLo = UNKNOWN_REGVAL;
 			break;
 		    case REG_SREG_HI:
-			Out->SRegHi = UNKNOWN_REGVAL;
+	     		Out->SRegHi = UNKNOWN_REGVAL;
 			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {

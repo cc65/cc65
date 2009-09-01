@@ -2538,7 +2538,7 @@ static void hieOrPP (ExprDesc *Expr)
 static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
 /* Process "exp && exp" */
 {
-    int lab;
+    int FalseLab;
     ExprDesc Expr2;
 
     hie2 (Expr);
@@ -2548,7 +2548,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
        	*BoolOp = 1;
 
        	/* Get a label that we will use for false expressions */
-       	lab = GetLocalLabel ();
+       	FalseLab = GetLocalLabel ();
 
        	/* If the expr hasn't set condition codes, set the force-test flag */
        	if (!ED_IsTested (Expr)) {
@@ -2559,7 +2559,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
        	LoadExpr (CF_FORCECHAR, Expr);
 
        	/* Generate the jump */
-       	g_falsejump (CF_NONE, lab);
+       	g_falsejump (CF_NONE, FalseLab);
 
        	/* Parse more boolean and's */
        	while (CurTok.Tok == TOK_BOOL_AND) {
@@ -2576,7 +2576,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
 
        	    /* Do short circuit evaluation */
     	    if (CurTok.Tok == TOK_BOOL_AND) {
-    	        g_falsejump (CF_NONE, lab);
+    	        g_falsejump (CF_NONE, FalseLab);
        	    } else {
        		/* Last expression - will evaluate to true */
        	     	g_truejump (CF_NONE, TrueLab);
@@ -2584,7 +2584,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
        	}
 
        	/* Define the false jump label here */
-       	g_defcodelabel (lab);
+       	g_defcodelabel (FalseLab);
 
        	/* The result is an rvalue in primary */
        	ED_MakeRValExpr (Expr);
@@ -2670,8 +2670,9 @@ static void hieOr (ExprDesc *Expr)
 static void hieQuest (ExprDesc* Expr)
 /* Parse the ternary operator */
 {
-    int         labf;
-    int         labt;
+    int         FalseLab;
+    int         TrueLab;
+    CodeMark    TrueCodeEnd;
     ExprDesc 	Expr2;          /* Expression 2 */
     ExprDesc 	Expr3;          /* Expression 3 */
     int         Expr2IsNULL;    /* Expression 2 is a NULL pointer */
@@ -2694,8 +2695,8 @@ static void hieQuest (ExprDesc* Expr)
     	    ED_MarkForTest (Expr);
     	}
     	LoadExpr (CF_NONE, Expr);
-    	labf = GetLocalLabel ();
-    	g_falsejump (CF_NONE, labf);
+    	FalseLab = GetLocalLabel ();
+    	g_falsejump (CF_NONE, FalseLab);
 
     	/* Parse second expression. Remember for later if it is a NULL pointer
          * expression, then load it into the primary.
@@ -2708,14 +2709,19 @@ static void hieQuest (ExprDesc* Expr)
             ED_MakeRValExpr (&Expr2);
             Expr2.Type = PtrConversion (Expr2.Type);
         }
-    	labt = GetLocalLabel ();
+
+        /* Remember the current code position */
+        GetCodePos (&TrueCodeEnd);
+
+        /* Jump around the evaluation of the third expression */
+    	TrueLab = GetLocalLabel ();
     	ConsumeColon ();
-    	g_jump (labt);
+    	g_jump (TrueLab);
 
         /* Jump here if the first expression was false */
-    	g_defcodelabel (labf);
+    	g_defcodelabel (FalseLab);
 
-    	/* Parse second expression. Remember for later if it is a NULL pointer
+    	/* Parse third expression. Remember for later if it is a NULL pointer
          * expression, then load it into the primary.
          */
         ExprWithCheck (hie1, &Expr3);
@@ -2742,27 +2748,27 @@ static void hieQuest (ExprDesc* Expr)
 	 */
 	if (IsClassInt (Expr2.Type) && IsClassInt (Expr3.Type)) {
 
+            CodeMark    CvtCodeStart;
+            CodeMark    CvtCodeEnd;
+
+
 	    /* Get common type */
 	    ResultType = promoteint (Expr2.Type, Expr3.Type);
 
 	    /* Convert the third expression to this type if needed */
 	    TypeConversion (&Expr3, ResultType);
 
-	    /* Setup a new label so that the expr3 code will jump around
-	     * the type cast code for expr2.
-	     */
-       	    labf = GetLocalLabel (); 	/* Get new label */
-	    g_jump (labf);     	    	/* Jump around code */
-
-	    /* The jump for expr2 goes here */
-    	    g_defcodelabel (labt);
-
-	    /* Create the typecast code for expr2 */
+            /* Emit conversion code for the second expression, but remember
+             * where it starts end ends.
+             */
+            GetCodePos (&CvtCodeStart);
     	    TypeConversion (&Expr2, ResultType);
+            GetCodePos (&CvtCodeEnd);
 
-	    /* Jump here around the typecase code. */
-	    g_defcodelabel (labf);
-	    labt = 0;	       	/* Mark other label as invalid */
+            /* If we had conversion code, move it to the right place */
+            if (!CodeRangeIsEmpty (&CvtCodeStart, &CvtCodeEnd)) {
+                MoveCode (&CvtCodeStart, &CvtCodeEnd, &TrueCodeEnd);
+            }
 
 	} else if (IsClassPtr (Expr2.Type) && IsClassPtr (Expr3.Type)) {
 	    /* Must point to same type */
@@ -2785,10 +2791,8 @@ static void hieQuest (ExprDesc* Expr)
       	    ResultType = Expr2.Type;		/* Doesn't matter here */
       	}
 
-      	/* If we don't have the label defined until now, do it */
-      	if (labt) {
-      	    g_defcodelabel (labt);
-      	}
+       	/* Define the final label */
+        g_defcodelabel (TrueLab);
 
       	/* Setup the target expression */
        	ED_MakeRValExpr (Expr);

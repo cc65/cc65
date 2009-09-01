@@ -667,13 +667,14 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+	    		const char* Arg attribute ((unused)))
 /* Print the compiler version */
 {
     fprintf (stderr,
        	     "cc65 V%u.%u.%u\n"
 	     "SVN version: %s\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH, SVNVersion);
+    exit (EXIT_SUCCESS);
 }
 
 

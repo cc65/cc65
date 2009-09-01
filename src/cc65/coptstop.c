@@ -56,18 +56,21 @@ typedef enum {
   LI_NONE               = 0x00,
   LI_DIRECT             = 0x01,         /* Direct op may be used */
   LI_RELOAD_Y           = 0x02,         /* Reload index register Y */
-  LI_REMOVE             = 0x04,         /* Load may be removed */
+  LI_TRANSFER           = 0x04,         /* Loaded value is transfered */
+  LI_REMOVE             = 0x08,         /* Load may be removed */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
 typedef struct LoadRegInfo LoadRegInfo;
 struct LoadRegInfo {
+    LI_FLAGS            Flags;          /* Tells us how to load */
     int                 LoadIndex;      /* Index of load insn, -1 if invalid */
     CodeEntry*          LoadEntry;      /* The actual entry, 0 if invalid */
-    LI_FLAGS            Flags;          /* Tells us how to load */
+    int                 XferIndex;      /* Index of transfer insn  */
+    CodeEntry*          XferEntry;      /* The actual transfer entry */
     unsigned char       Offs;           /* Stack offset if data is on stack */
 };
-
+                                        
 /* Now combined for both registers */
 typedef struct LoadInfo LoadInfo;
 struct LoadInfo {
@@ -150,6 +153,17 @@ static void ClearLoadRegInfo (LoadRegInfo* RI)
 /* Clear a LoadRegInfo struct */
 {
     RI->LoadIndex = -1;
+    RI->XferIndex = -1;
+    RI->Flags     = LI_NONE;
+}
+
+
+
+static void InvalidateLoadRegInfo (LoadRegInfo* RI)
+/* Invalidate a LoadRegInfo struct */
+{
+    RI->LoadIndex = -1;
+    RI->XferIndex = -1;
 }
 
 
@@ -157,13 +171,17 @@ static void ClearLoadRegInfo (LoadRegInfo* RI)
 static void FinalizeLoadRegInfo (LoadRegInfo* RI, CodeSeg* S)
 /* Prepare a LoadRegInfo struct for use */
 {
-    /* Get the entry */
+    /* Get the entries */
     if (RI->LoadIndex >= 0) {
         RI->LoadEntry = CS_GetEntry (S, RI->LoadIndex);
     } else {
         RI->LoadEntry = 0;
     }
-    RI->Flags = LI_NONE;
+    if (RI->XferIndex >= 0) {
+        RI->XferEntry = CS_GetEntry (S, RI->XferIndex);
+    } else {
+        RI->XferEntry = 0;
+    }
 }
 
 
@@ -178,7 +196,7 @@ static void ClearLoadInfo (LoadInfo* LI)
 
 
 
-static void AdjustLoadRegInfo (LoadRegInfo* RI, int DelIndex, int Change)
+static void AdjustLoadRegInfo (LoadRegInfo* RI, int Index, int Change)
 /* Adjust a load register info struct after deleting or inserting an entry
  * with a given index
  */
@@ -186,17 +204,27 @@ static void AdjustLoadRegInfo (LoadRegInfo* RI, int DelIndex, int Change)
     CHECK (abs (Change) == 1);
     if (Change < 0) {
         /* Deletion */
-        if (DelIndex < RI->LoadIndex) {
+        if (Index < RI->LoadIndex) {
             --RI->LoadIndex;
-        } else if (DelIndex == RI->LoadIndex) {
+        } else if (Index == RI->LoadIndex) {
             /* Has been removed */
             RI->LoadIndex = -1;
             RI->LoadEntry = 0;
         }
+        if (Index < RI->XferIndex) {
+            --RI->XferIndex;
+        } else if (Index == RI->XferIndex) {
+            /* Has been removed */
+            RI->XferIndex = -1;
+            RI->XferEntry = 0;
+        }
     } else {
         /* Insertion */
-        if (DelIndex <= RI->LoadIndex) {
+        if (Index <= RI->LoadIndex) {
             ++RI->LoadIndex;
+        }
+        if (Index <= RI->XferIndex) {
+            ++RI->XferIndex;
         }
     }
 }
@@ -214,12 +242,12 @@ static void FinalizeLoadInfo (LoadInfo* LI, CodeSeg* S)
 
 
 
-static void AdjustLoadInfo (LoadInfo* LI, int DelIndex, int Change)
+static void AdjustLoadInfo (LoadInfo* LI, int Index, int Change)
 /* Adjust a load info struct after deleting entry with a given index */
 {
-    AdjustLoadRegInfo (&LI->A, DelIndex, Change);
-    AdjustLoadRegInfo (&LI->X, DelIndex, Change);
-    AdjustLoadRegInfo (&LI->Y, DelIndex, Change);
+    AdjustLoadRegInfo (&LI->A, Index, Change);
+    AdjustLoadRegInfo (&LI->X, Index, Change);
+    AdjustLoadRegInfo (&LI->Y, Index, Change);
 }
 
 
@@ -230,35 +258,53 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
     if (E->Info & OF_LOAD) {
         if (E->Chg & REG_A) {
             LI->A.LoadIndex = I;
+            LI->A.XferIndex = -1;
         }
         if (E->Chg & REG_X) {
             LI->X.LoadIndex = I;
+            LI->X.XferIndex = -1;
         }
         if (E->Chg & REG_Y) {
             LI->Y.LoadIndex = I;
+            LI->Y.XferIndex = -1;
         }
     } else if (E->Info & OF_XFR) {
         switch (E->OPC) {
-            case OP65_TAX: LI->X.LoadIndex = LI->A.LoadIndex; break;
-            case OP65_TAY: LI->Y.LoadIndex = LI->A.LoadIndex; break;
-            case OP65_TXA: LI->A.LoadIndex = LI->X.LoadIndex; break;
-            case OP65_TYA: LI->A.LoadIndex = LI->Y.LoadIndex; break;
-            default:                                          break;
+            case OP65_TAX:
+                LI->X.LoadIndex = LI->A.LoadIndex;
+                LI->X.XferIndex = I;
+                break;
+            case OP65_TAY:
+                LI->Y.LoadIndex = LI->A.LoadIndex;
+                LI->Y.XferIndex = I;
+                break;
+            case OP65_TXA:
+                LI->A.LoadIndex = LI->X.LoadIndex;
+                LI->A.XferIndex = I;
+                break;
+            case OP65_TYA:
+                LI->A.LoadIndex = LI->Y.LoadIndex;
+                LI->A.XferIndex = I;
+                break;
+            default:
+                break;
         }
     } else if (CE_IsCallTo (E, "ldaxysp")) {
         /* Both registers set, Y changed */
         LI->A.LoadIndex = I;
-        LI->X.LoadIndex = I;
-        LI->Y.LoadIndex = -1;
+        LI->A.XferIndex = -1;
+        LI->X.LoadIndex = I; 
+        LI->X.XferIndex = -1;
+        InvalidateLoadRegInfo (&LI->Y);
     } else {
         if (E->Chg & REG_A) {
-            LI->A.LoadIndex = -1;
+            InvalidateLoadRegInfo (&LI->A);
         }
         if (E->Chg & REG_X) {
-            LI->X.LoadIndex = -1;
+            InvalidateLoadRegInfo (&LI->X);
         }
         if (E->Chg & REG_Y) {
-            LI->Y.LoadIndex = -1;
+            InvalidateLoadRegInfo (&LI->Y);
         }
     }
 }
@@ -268,88 +314,6 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
 /*****************************************************************************/
 /*     	   	      	       	    Helpers                                  */
 /*****************************************************************************/
-
-
-
-static void AdjustStackOffset (StackOpData* D, unsigned Offs)
-/* Adjust the offset for all stack accesses in the range PushIndex to OpIndex.
- * OpIndex is adjusted according to the insertions.
- */
-{
-    /* Walk over all entries */
-    int I = D->PushIndex + 1;
-    while (I < D->OpIndex) {
-
-     	CodeEntry* E = CS_GetEntry (D->Code, I);
-
-        int NeedCorrection = 0;
-     	if ((E->Use & REG_SP) != 0) {
-
-     	    /* Check for some things that should not happen */
-     	    CHECK (E->AM == AM65_ZP_INDY || E->RI->In.RegY >= (short) Offs);
-	    CHECK (strcmp (E->Arg, "sp") == 0);
-
-            /* We need to correct this one */
-            NeedCorrection = 1;
-
-        } else if (CE_IsCallTo (E, "ldaxysp")) {
-
-            /* We need to correct this one */
-            NeedCorrection = 1;
-
-        }
-
-        if (NeedCorrection) {
-
-     	    /* Get the code entry before this one. If it's a LDY, adjust the
-     	     * value.
-     	     */
-     	    CodeEntry* P = CS_GetPrevEntry (D->Code, I);
-     	    if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
-
-      	      	/* The Y load is just before the stack access, adjust it */
-      	      	CE_SetNumArg (P, P->Num - Offs);
-
-      	    } else {
-
-      	      	/* Insert a new load instruction before the stack access */
-      	      	const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
-      	      	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-      	    	CS_InsertEntry (D->Code, X, I++);
-
-      	    	/* One more inserted entries */
-      	    	++D->OpIndex;
-
-      	    }
-
-            /* If we need the value of Y later, be sure to reload it */
-            if (RegYUsed (D->Code, I+1)) {
-      	    	const char* Arg = MakeHexArg (E->RI->In.RegY);
-      	    	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-      	    	CS_InsertEntry (D->Code, X, I+1);
-
-      	    	/* One more inserted entries */
-      	    	++D->OpIndex;
-
-      	    	/* Skip this instruction in the next round */
-      	    	++I;
-            }
-      	}
-
-      	/* Next entry */
-      	++I;
-    }
-
-    /* If we have rhs load insns that load from stack, we'll have to adjust
-     * the offsets for these also.
-     */
-    if (D->Rhs.A.Flags & LI_RELOAD_Y) {
-        D->Rhs.A.Offs -= Offs;
-    }
-    if (D->Rhs.X.Flags & LI_RELOAD_Y) {
-        D->Rhs.X.Offs -= Offs;
-    }
-}
 
 
 
@@ -398,6 +362,82 @@ static void DelEntry (StackOpData* D, int Index)
         --D->OpIndex;
     } else if (Index == D->OpIndex) {
         D->OpEntry = 0;
+    }
+}
+
+
+
+static void AdjustStackOffset (StackOpData* D, unsigned Offs)
+/* Adjust the offset for all stack accesses in the range PushIndex to OpIndex.
+ * OpIndex is adjusted according to the insertions.
+ */
+{
+    /* Walk over all entries */
+    int I = D->PushIndex + 1;
+    while (I < D->OpIndex) {
+
+     	CodeEntry* E = CS_GetEntry (D->Code, I);
+
+        int NeedCorrection = 0;
+     	if ((E->Use & REG_SP) != 0) {
+
+     	    /* Check for some things that should not happen */
+     	    CHECK (E->AM == AM65_ZP_INDY || E->RI->In.RegY >= (short) Offs);
+	    CHECK (strcmp (E->Arg, "sp") == 0);
+
+            /* We need to correct this one */
+            NeedCorrection = 1;
+
+        } else if (CE_IsCallTo (E, "ldaxysp")) {
+
+            /* We need to correct this one */
+            NeedCorrection = 1;
+
+        }
+
+        if (NeedCorrection) {
+
+     	    /* Get the code entry before this one. If it's a LDY, adjust the
+     	     * value.
+     	     */
+     	    CodeEntry* P = CS_GetPrevEntry (D->Code, I);
+     	    if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
+
+      	      	/* The Y load is just before the stack access, adjust it */
+      	      	CE_SetNumArg (P, P->Num - Offs);
+
+      	    } else {
+
+      	      	/* Insert a new load instruction before the stack access */
+      	      	const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
+      	      	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+      	    	InsertEntry (D, X, I++);
+
+      	    }
+
+            /* If we need the value of Y later, be sure to reload it */
+            if (RegYUsed (D->Code, I+1)) {
+      	    	const char* Arg = MakeHexArg (E->RI->In.RegY);
+      	    	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+      	    	InsertEntry (D, X, I+1);
+
+      	    	/* Skip this instruction in the next round */
+      	    	++I;
+            }
+      	}
+
+      	/* Next entry */
+      	++I;
+    }
+
+    /* If we have rhs load insns that load from stack, we'll have to adjust
+     * the offsets for these also.
+     */
+    if (D->Rhs.A.Flags & LI_RELOAD_Y) {
+        D->Rhs.A.Offs -= Offs;
+    }
+    if (D->Rhs.X.Flags & LI_RELOAD_Y) {
+        D->Rhs.X.Offs -= Offs;
     }
 }
 
@@ -616,11 +656,21 @@ static void RemoveRegLoads (StackOpData* D, LoadInfo* LI)
     /* Both registers may be loaded with one insn, but DelEntry will in this
      * case clear the other one.
      */
-    if (LI->A.LoadIndex >= 0 && (LI->A.Flags & LI_REMOVE)) {
-        DelEntry (D, LI->A.LoadIndex);
+    if (LI->A.Flags & LI_REMOVE) {
+        if (LI->A.LoadIndex >= 0) {
+            DelEntry (D, LI->A.LoadIndex);
+        }
+        if (LI->A.XferIndex >= 0) {
+            DelEntry (D, LI->A.XferIndex);
+        }
     }
-    if (LI->X.LoadIndex >= 0 && (LI->X.Flags & LI_REMOVE)) {
-        DelEntry (D, LI->X.LoadIndex);
+    if (LI->X.Flags & LI_REMOVE) {
+        if (LI->X.LoadIndex >= 0) {
+            DelEntry (D, LI->X.LoadIndex);
+        }
+        if (LI->X.XferIndex >= 0) {
+            DelEntry (D, LI->X.XferIndex);
+        }
     }
 }
 
@@ -1344,6 +1394,99 @@ static unsigned Opt_tosugeax (StackOpData* D)
 
 
 
+static unsigned Opt_tosugtax (StackOpData* D)
+/* Optimize the tosugtax sequence */
+{
+    CodeEntry*  X;
+
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* Add code for low operand */
+    AddOpLow (D, OP65_CMP, &D->Rhs);
+
+    /* Add code for high operand */
+    AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
+
+    /* Transform to boolean */
+    X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolugt", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the operator function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
+static unsigned Opt_tosuleax (StackOpData* D)
+/* Optimize the tosuleax sequence */
+{
+    CodeEntry*  X;
+
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* Add code for low operand */
+    AddOpLow (D, OP65_CMP, &D->Rhs);
+
+    /* Add code for high operand */
+    AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
+
+    /* Transform to boolean */
+    X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolule", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the operator function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
+static unsigned Opt_tosultax (StackOpData* D)
+/* Optimize the tosultax sequence */
+{
+    CodeEntry*  X;
+
+
+    /* Inline the sbc */
+    D->IP = D->OpIndex+1;
+
+    /* Must be true because of OP_RHS_LOAD */
+    CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
+
+    /* Add code for low operand */
+    AddOpLow (D, OP65_CMP, &D->Rhs);
+
+    /* Add code for high operand */
+    AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
+
+    /* Transform to boolean */
+    X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolult", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the operator function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_tosxorax (StackOpData* D)
 /* Optimize the tosxorax sequence */
 {
@@ -1397,6 +1540,9 @@ static const OptFuncDesc FuncTable[] = {
     { "tosorax",    Opt_tosorax,   REG_NONE, OP_NONE                    },
     { "tossubax",   Opt_tossubax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosugeax",   Opt_tosugeax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
+    { "tosugtax",   Opt_tosugtax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
+    { "tosuleax",   Opt_tosuleax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
+    { "tosultax",   Opt_tosultax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosxorax",   Opt_tosxorax,  REG_NONE, OP_NONE                    },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
@@ -1715,6 +1861,12 @@ unsigned OptStackOps (CodeSeg* S)
                     break;
                 }
 
+                /* Prepare the remainder of the data structure. */
+                Data.PrevEntry = CS_GetPrevEntry (S, Data.PushIndex);
+                Data.PushEntry = CS_GetEntry (S, Data.PushIndex);
+                Data.OpEntry   = CS_GetEntry (S, Data.OpIndex);
+                Data.NextEntry = CS_GetNextEntry (S, Data.OpIndex);
+
                 /* Adjust stack offsets to account for the upcoming removal */
                 AdjustStackOffset (&Data, 2);
 
@@ -1722,12 +1874,6 @@ unsigned OptStackOps (CodeSeg* S)
                  * the code
                  */
                 CS_GenRegInfo (S);
-
-                /* Prepare the remainder of the data structure. */
-                Data.PrevEntry = CS_GetPrevEntry (S, Data.PushIndex);
-                Data.PushEntry = CS_GetEntry (S, Data.PushIndex);
-                Data.OpEntry   = CS_GetEntry (S, Data.OpIndex);
-                Data.NextEntry = CS_GetNextEntry (S, Data.OpIndex);
 
                 /* Call the optimizer function */
                 Changes += Data.OptFunc->Func (&Data);

@@ -434,70 +434,48 @@ unsigned OptCmp3 (CodeSeg* S)
 	    L[1]->OPC == OP65_CMP           &&
 	    CE_IsKnownImm (L[1], 0)) {
 
+            int Delete = 0;
+
 	    /* Check for the call to boolxx. We only remove the compare if
 	     * the carry flag is evaluated later, because the load will not
 	     * set the carry flag.
 	     */
 	    if (L[2]->OPC == OP65_JSR) {
-		switch (FindBoolCmpCond (L[2]->Arg)) {
+	    	switch (FindBoolCmpCond (L[2]->Arg)) {
 
-		    case CMP_EQ:
-		    case CMP_NE:
-		    case CMP_GT:
-		    case CMP_GE:
-		    case CMP_LT:
-		    case CMP_LE:
-		        /* Remove the compare */
-		        CS_DelEntry (S, I+1);
-		        ++Changes;
-		        break;
+	    	    case CMP_EQ:
+	    	    case CMP_NE:
+	    	    case CMP_GT:
+	    	    case CMP_GE:
+	    	    case CMP_LT:
+	    	    case CMP_LE:
+	    	        /* Remove the compare */
+                        Delete = 1;
+	    	        break;
 
-		    case CMP_UGT:
+	    	    case CMP_UGT:
 	     	    case CMP_UGE:
-		    case CMP_ULT:
-		    case CMP_ULE:
-		    case CMP_INV:
-		        /* Leave it alone */
-		        break;
-		}
+	    	    case CMP_ULT:
+	    	    case CMP_ULE:
+	    	    case CMP_INV:
+	    	        /* Leave it alone */
+	    	        break;
+	    	}
 
-	    } else {
+	    } else if ((L[2]->Info & OF_FBRA) != 0) {
 
-		/* Check for a branch on conditions that are set by the load.
-       	       	 * Beware: The insn may branch to another conditional branch
-		 * that evaluates other flags, so check that.
-		 */
-		CodeEntry* E = L[2];
-		int Delete = 0;
-       	       	while (1) {
-		    if ((E->Info & (OF_CBRA|OF_UBRA)) != 0) {
-			/* A conditional branch. Check if it jumps on a
-			 * condition not set by the load.
-			 */
-			if ((E->Info & (OF_FBRA|OF_UBRA)) == 0) {
-			    /* Invalid branch */
-			    break;
-			} else if (E->JumpTo == 0) {
-			    /* Jump to external */
-			    Delete = 1;
-			    break;
-			} else {
-			    /* Check target of branch */
-			    E = E->JumpTo->Owner;
-			}
-		    } else {
-			/* Some other insn */
-			Delete = 1;
-		 	break;
-		    }
-		}
+                /* The following insn branches on the condition of a load, so
+                 * the compare instruction can be removed.
+                 */
+                Delete = 1;
 
-		/* Delete the compare if we can */
-		if (Delete) {
-		    CS_DelEntry (S, I+1);
-		    ++Changes;
-		}
-	    }
+            }
+
+            /* Delete the compare if we can */
+            if (Delete) {
+                CS_DelEntry (S, I+1);
+                ++Changes;
+            }
 	}
 
 	/* Next entry */

@@ -752,7 +752,7 @@ unsigned OptCondBranches1 (CodeSeg* S)
 	    	CS_DelEntry (S, I+1);
 
 	    	/* Remember, we had changes */
-	    	++Changes;
+	       	++Changes;
 
      	    } else if ((BC == BC_EQ && E->Num == 0) 		||
      	    	       (BC == BC_NE && E->Num != 0) 		||
@@ -1880,12 +1880,28 @@ unsigned OptPrecalc (CodeSeg* S)
                 }
                 break;
 
-            case OP65_ADC:
             case OP65_ASL:
             case OP65_EOR:
             case OP65_LSR:
-            case OP65_SBC:
                 if (RegValIsKnown (Out->RegA)) {
+                    /* Accu op zp with known contents */
+                    Arg = MakeHexArg (Out->RegA);
+                }
+                break;
+
+            case OP65_ADC:
+            case OP65_SBC:
+                /* If this is an operation with an immediate operand of zero,
+                 * and the register is zero, the operation won't give us any
+                 * results we don't already have (including the flags), so
+                 * remove it. Something like this is generated as a result of
+                 * a compare where parts of the values are known to be zero.
+                 */
+                if (In->RegA == 0 && CE_IsKnownImm (E, 0x00)) {
+                    /* 0-0 or 0+0 -> remove */
+                    CS_DelEntry (S, I);
+                    ++Changes;
+                } else if (RegValIsKnown (Out->RegA)) {
                     /* Accu op zp with known contents */
                     Arg = MakeHexArg (Out->RegA);
                 }

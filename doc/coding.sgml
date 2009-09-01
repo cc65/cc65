@@ -3,11 +3,13 @@
 <article>
 <title>cc65 coding hints
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>03.12.2000
+<date>2000-12-03, 2009-09-01
 
 <abstract>
 How to generate the most effective code with cc65.
 </abstract>
+
+
 
 <sect>Use prototypes<p>
 
@@ -28,13 +30,14 @@ code.
 
 
 
-<sect>Remember that the compiler does not optimize<p>
+<sect>Remember that the compiler does no high level optimizations<p>
 
-The compiler needs hints from you about the code to generate. When accessing
-indexed data structures, get a pointer to the element and use this pointer
-instead of calculating the index again and again. If you want to have your
-loops unrolled, or loop invariant code moved outside the loop, you have to do
-that yourself.
+The compiler needs hints from you about the code to generate. It will try to
+optimize the generated code, but follow the outline you gave in your C
+program. So for example, when accessing indexed data structures, get a pointer
+to the element and use this pointer instead of calculating the index again and
+again. If you want to have your loops unrolled, or loop invariant code moved
+outside the loop, you have to do that yourself.
 
 
 
@@ -48,10 +51,10 @@ operation works on double the data compared to an int.
 
 <sect>Use unsigned types wherever possible<p>
 
-The CPU has no opcodes to handle signed values greater than 8 bit. So sign
-extension, test of signedness etc. has to be done by hand. The code to handle
-signed operations is usually a bit slower than the same code for unsigned
-types.
+The 6502 CPU has no opcodes to handle signed values greater than 8 bit. So
+sign extension, test of signedness etc. has to be done with extra code. As a
+consequence, the code to handle signed operations is usually a bit larger and
+slower than the same code for unsigned types.
 
 
 
@@ -64,25 +67,8 @@ accessing chars is faster. For several operations, the generated code may be
 better if intermediate results that are known not to be larger than 8 bit are
 casted to chars.
 
-When doing
-
-<tscreen><verb>
-	unsigned char a;
-	...
-	if ((a & 0x0F) == 0)
-</verb></tscreen>
-
-the result of the & operator is an int because of the int promotion rules of
-the language. So the compare is also done with 16 bits. When using
-
-<tscreen><verb>
-	unsigned char a;
-	...
-	if ((unsigned char)(a & 0x0F) == 0)
-</verb></tscreen>
-
-the generated code is much shorter, since the operation is done with 8 bits
-instead of 16.
+You should especially use unsigned chars for loop control variables if the
+loop is known not to execute more than 255 times.
 
 
 
@@ -180,7 +166,7 @@ subscript is a constant. So
 <tscreen><verb>
 	#define VDC    	((unsigned char*)0xD600)
 	#define STATUS	0x01
-    	VDC [STATUS] = 0x01;
+       	VDC[STATUS] = 0x01;
 </verb></tscreen>
 
 will also work.
@@ -191,7 +177,7 @@ compiler does not know anything about the contents of the variable.
 
 
 
-<sect>Use initialized local variables - but use it with care<p>
+<sect>Use initialized local variables<p>
 
 Initialization of local variables when declaring them gives shorter and faster
 code. So, use
@@ -234,44 +220,6 @@ The latter will work, but will create larger and slower code.
 
 
 
-<sect>When using the ternary operator, cast values that are not ints<p>
-
-The result type of the <tt/?:/ operator is a long, if one of the second or
-third operands is a long. If the second operand has been evaluated and it was
-of type int, and the compiler detects that the third operand is a long, it has
-to add an additional <tt/int/ &rarr; <tt/long/ conversion for the second
-operand. However, since the code for the second operand has already been
-emitted, this gives much worse code.
-
-Look at this:
-
-<tscreen><verb>
-	long f (long a)
-	{
-	    return (a != 0)? 1 : a;
-	}
-</verb></tscreen>
-
-When the compiler sees the literal "1", it does not know, that the result type
-of the <tt/?:/ operator is a long, so it will emit code to load a integer
-constant 1. After parsing "a", which is a long, a <tt/int/ &rarr; <tt/long/
-conversion has to be applied to the second operand. This creates one
-additional jump, and an additional code for the conversion.
-
-A better way would have been to write:
-
-<tscreen><verb>
-	long f (long a)
-	{
-	    return (a != 0)? 1L : a;
-	}
-</verb></tscreen>
-
-By forcing the literal "1" to be of type long, the correct code is created in
-the first place, and no additional conversion code is needed.
-
-
-
 <sect>Use the array operator &lsqb;&rsqb; even for pointers<p>
 
 When addressing an array via a pointer, don't use the plus and dereference
@@ -302,11 +250,12 @@ instead.
 
 Register variables may give faster and shorter code, but they do also have an
 overhead. Register variables are actually zero page locations, so using them
-saves roughly one cycle per access. Since the old values have to be saved and
-restored, there is an overhead of about 70 cycles per 2 byte variable. It is
-easy to see, that - apart from the additional code that is needed to save and
-restore the values - you need to make heavy use of a variable to justify the
-overhead.
+saves roughly one cycle per access. The calling routine may also use register
+variables, so the old values have to be saved on function entry and restored
+on exit. Saving an d restoring has an overhead of about 70 cycles per 2 byte
+variable. It is easy to see, that - apart from the additional code that is
+needed to save and restore the values - you need to make heavy use of a
+variable to justify the overhead.
 
 As a general rule: Use register variables only for pointers that are
 dereferenced several times in your function, or for heavily used induction
@@ -324,43 +273,18 @@ And remember: Register variables must be enabled with <tt/-r/ or <tt/-Or/.
 
 The language rules for constant numeric values specify that decimal constants
 without a type suffix that are not in integer range must be of type long int
-or unsigned long int. This means that a simple constant like 40000 is of type
-long int, and may cause an expression to be evaluated with 32 bits.
-
-An example is:
-
-<tscreen><verb>
-	unsigned val;
-	...
-	if (val < 65535) {
-	    ...
-	}
-</verb></tscreen>
-
-Here, the compare is evaluated using 32 bit precision. This makes the code
-larger and a lot slower.
-
-Using
+or unsigned long int. So a simple constant like 40000 is of type long int!
+This is often unexpected and may cause an expression to be evaluated with 32
+bits. While in many cases the compiler takes care about it, in some places it
+can't. So be careful when you get a warning like
 
 <tscreen><verb>
-    	unsigned val;
-    	...
-    	if (val < 0xFFFF) {
-    	    ...
-	}
+        test.c(7): Warning: Constant is long
 </verb></tscreen>
 
-or
+Use the <tt/U/, <tt/L/ or <tt/UL/ suffixes to tell the compiler the desired
+type of a numeric constant.
 
-<tscreen><verb>
-      	unsigned val;
-      	...
-    	if (val < 65535U) {
-    	    ...
-	}
-</verb></tscreen>
-
-instead will give shorter and faster code.
 
 
 <sect>Access to parameters in variadic functions is expensive<p>

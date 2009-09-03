@@ -141,6 +141,30 @@ unsigned OptPrecalc (CodeSeg* S);
 unsigned OptBranchDist (CodeSeg* S);
 /* Change branches for the distance needed. */
 
+unsigned OptIndLoads1 (CodeSeg* S);
+/* Change
+ *
+ *     lda      (zp),y
+ *
+ * into
+ *
+ *     lda      (zp,x)
+ *
+ * provided that x and y are both zero.
+ */
+
+unsigned OptIndLoads2 (CodeSeg* S);
+/* Change
+ *
+ *     lda      (zp,x)
+ *
+ * into
+ *
+ *     lda      (zp),y
+ *
+ * provided that x and y are both zero.
+ */
+
 
 
 /* End of coptind.h */

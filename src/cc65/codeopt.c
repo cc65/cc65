@@ -1105,6 +1105,8 @@ static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",    	100, 0, 
 static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",       0, 0, 0, 0, 0, 0 };
+static OptFunc DOptIndLoads1    = { OptIndLoads1,    "OptIndLoads1",      0, 0, 0, 0, 0, 0 };
+static OptFunc DOptIndLoads2    = { OptIndLoads2,    "OptIndLoads2",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 100, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpTarget1  = { OptJumpTarget1,  "OptJumpTarget1",  100, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpTarget2  = { OptJumpTarget2,  "OptJumpTarget2",  100, 0, 0, 0, 0, 0 };
@@ -1191,6 +1193,8 @@ static OptFunc* OptFuncs[] = {
     &DOptDeadJumps,
     &DOptDecouple,
     &DOptDupLoads,
+    &DOptIndLoads1,
+    &DOptIndLoads2,
     &DOptJumpCascades,
     &DOptJumpTarget1,
     &DOptJumpTarget2,
@@ -1644,6 +1648,32 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 
 
 static unsigned RunOptGroup6 (CodeSeg* S)
+/* This one is quite special. It tries to replace "lda (sp),y" by "lda (sp,x)".
+ * The latter is ony cycle slower, but if we're able to remove the necessary
+ * load of the Y register, because X is zero anyway, we gain 1 cycle and
+ * shorten the code by one (transfer) or two bytes (load). So what we do is
+ * to replace the insns, remove unused loads, and then change back all insns
+ * where Y is still zero (meaning that the load has not been removed).
+ */
+{
+    unsigned Changes = 0;
+
+    /* This group will only run for a standard 6502, because the 65C02 has a
+     * better addressing mode that covers this case.
+     */
+    if ((CPUIsets[CPU] & CPU_ISET_65SC02) == 0) {
+        Changes += RunOptFunc (S, &DOptIndLoads1, 1);
+        Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+        Changes += RunOptFunc (S, &DOptIndLoads2, 1);
+    }
+
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
+static unsigned RunOptGroup7 (CodeSeg* S)
 /* The last group of optimization steps. Adjust branches, do size optimizations.
  */
 {
@@ -1726,6 +1756,7 @@ void RunOpt (CodeSeg* S)
     RunOptGroup4 (S);
     RunOptGroup5 (S);
     RunOptGroup6 (S);
+    RunOptGroup7 (S);
 
     /* Write statistics */
     if (StatFileName) {

@@ -883,17 +883,17 @@ unsigned OptUnusedLoads (CodeSeg* S)
 	    /* Check which sort of load or transfer it is */
 	    unsigned R;
 	    switch (E->OPC) {
-	 	case OP65_DEA:
-	 	case OP65_INA:
-	 	case OP65_LDA:
+	    	case OP65_DEA:
+	    	case OP65_INA:
+	    	case OP65_LDA:
 	    	case OP65_TXA:
 	    	case OP65_TYA: 	R = REG_A;	break;
-	 	case OP65_DEX:
-	 	case OP65_INX:
-	 	case OP65_LDX:
+	    	case OP65_DEX:
+	    	case OP65_INX:
+	    	case OP65_LDX:
 	    	case OP65_TAX: 	R = REG_X;     	break;
-	 	case OP65_DEY:
-	 	case OP65_INY:
+	    	case OP65_DEY:
+	    	case OP65_INY:
        	       	case OP65_LDY:
 	    	case OP65_TAY: 	R = REG_Y;	break;
 	    	default:     	goto NextEntry;	      	/* OOPS */
@@ -903,11 +903,11 @@ unsigned OptUnusedLoads (CodeSeg* S)
 	    if ((GetRegInfo (S, I+1, R) & R) == 0) {
 
 	    	/* Register value is not used, remove the load */
-		CS_DelEntry (S, I);
+	    	CS_DelEntry (S, I);
 
-		/* Remember, we had changes. Account the deleted entry in I. */
-		++Changes;
-		--I;
+	    	/* Remember, we had changes. Account the deleted entry in I. */
+	    	++Changes;
+	    	--I;
 
 	    }
 	}
@@ -2029,6 +2029,120 @@ unsigned OptBranchDist (CodeSeg* S)
 	++I;
 
     }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*                          Optimize indirect loads                          */
+/*****************************************************************************/
+
+
+
+unsigned OptIndLoads1 (CodeSeg* S)
+/* Change
+ *
+ *     lda      (zp),y
+ *
+ * into
+ *
+ *     lda      (zp,x)
+ *
+ * provided that x and y are both zero.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if it's what we're looking for */
+       	if (E->OPC == OP65_LDA          &&
+            E->AM == AM65_ZP_INDY       &&
+            E->RI->In.RegY == 0         &&
+            E->RI->In.RegX == 0) {
+
+	    /* Replace by the same insn with other addressing mode */
+            CodeEntry* X = NewCodeEntry (E->OPC, AM65_ZPX_IND, E->Arg, 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
+
+            /* Remove the old insn */
+            CS_DelEntry (S, I);
+            ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptIndLoads2 (CodeSeg* S)
+/* Change
+ *
+ *     lda      (zp,x)
+ *
+ * into
+ *
+ *     lda      (zp),y
+ *
+ * provided that x and y are both zero.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if it's what we're looking for */
+       	if (E->OPC == OP65_LDA          &&
+            E->AM == AM65_ZPX_IND       &&
+            E->RI->In.RegY == 0         &&
+            E->RI->In.RegX == 0) {
+
+	    /* Replace by the same insn with other addressing mode */
+            CodeEntry* X = NewCodeEntry (E->OPC, AM65_ZP_INDY, E->Arg, 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
+
+            /* Remove the old insn */
+            CS_DelEntry (S, I);
+            ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

@@ -70,7 +70,7 @@ struct LoadRegInfo {
     CodeEntry*          XferEntry;      /* The actual transfer entry */
     unsigned char       Offs;           /* Stack offset if data is on stack */
 };
-                                        
+
 /* Now combined for both registers */
 typedef struct LoadInfo LoadInfo;
 struct LoadInfo {
@@ -293,7 +293,7 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         /* Both registers set, Y changed */
         LI->A.LoadIndex = I;
         LI->A.XferIndex = -1;
-        LI->X.LoadIndex = I; 
+        LI->X.LoadIndex = I;
         LI->X.XferIndex = -1;
         InvalidateLoadRegInfo (&LI->Y);
     } else {
@@ -1406,11 +1406,23 @@ static unsigned Opt_tosugtax (StackOpData* D)
     /* Must be true because of OP_RHS_LOAD */
     CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
+    /* sec */
+    X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
     /* Add code for low operand */
-    AddOpLow (D, OP65_CMP, &D->Rhs);
+    AddOpLow (D, OP65_SBC, &D->Rhs);
+
+    /* We need the zero flag, so remember the immediate result */
+    X = NewCodeEntry (OP65_STA, AM65_ZP, "tmp1", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
 
     /* Add code for high operand */
     AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
+
+    /* Set Z flag */
+    X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
 
     /* Transform to boolean */
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolugt", 0, D->OpEntry->LI);
@@ -1437,11 +1449,23 @@ static unsigned Opt_tosuleax (StackOpData* D)
     /* Must be true because of OP_RHS_LOAD */
     CHECK ((D->Rhs.A.Flags & D->Rhs.X.Flags & LI_DIRECT) != 0);
 
+    /* sec */
+    X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
     /* Add code for low operand */
-    AddOpLow (D, OP65_CMP, &D->Rhs);
+    AddOpLow (D, OP65_SBC, &D->Rhs);
+
+    /* We need the zero flag, so remember the immediate result */
+    X = NewCodeEntry (OP65_STA, AM65_ZP, "tmp1", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
 
     /* Add code for high operand */
     AddOpHigh (D, OP65_SBC, &D->Rhs, 0);
+
+    /* Set Z flag */
+    X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
 
     /* Transform to boolean */
     X = NewCodeEntry (OP65_JSR, AM65_ABS, "boolule", 0, D->OpEntry->LI);

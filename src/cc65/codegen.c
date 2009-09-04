@@ -929,12 +929,14 @@ void g_getind (unsigned Flags, unsigned Offs)
 void g_leasp (int Offs)
 /* Fetch the address of the specified symbol into the primary register */
 {
-    /* Get low and high byte */
-    unsigned char Lo = (unsigned char) Offs;
-    unsigned char Hi = (unsigned char) (Offs >> 8);
+    unsigned char Lo, Hi;              
 
     /* Calculate the offset relative to sp */
     Offs -= StackPtr;
+
+    /* Get low and high byte */
+    Lo = (unsigned char) Offs;
+    Hi = (unsigned char) (Offs >> 8);
 
     /* Generate code */
     if (Lo == 0) {
@@ -977,10 +979,10 @@ void g_leasp (int Offs)
         /* Full 16 bit offset inlined */
         AddCodeLine ("lda sp");
         AddCodeLine ("clc");
-        AddCodeLine ("adc #$%02X", (unsigned char) Offs);
+        AddCodeLine ("adc #$%02X", Lo);
         AddCodeLine ("pha");
         AddCodeLine ("lda sp+1");
-        AddCodeLine ("adc #$%02X", (unsigned char) (Offs >> 8));
+        AddCodeLine ("adc #$%02X", Hi);
         AddCodeLine ("tax");
         AddCodeLine ("pla");
     }

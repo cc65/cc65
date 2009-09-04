@@ -211,7 +211,7 @@ static unsigned OptShift2 (CodeSeg* S)
     	    	CS_InsertEntry (S, X, I+1);
 	    }
 
-	    /* Delete the call to shlax */
+	    /* Delete the call to shrax */
 	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
@@ -447,7 +447,7 @@ static unsigned OptShift4 (CodeSeg* S)
             CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
-            ++Changes;
+            ++Changes;         
 	}
 
 NextEntry:

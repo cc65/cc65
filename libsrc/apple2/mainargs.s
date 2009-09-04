@@ -12,9 +12,9 @@
 
 ; Command-lines look like these lines:
 ;
-; call2048
-; call2048 : rem
-; call2048:rem arg1 " arg 2 is quoted "  arg3 "" arg5
+; call2051
+; call2051 : rem
+; call2051:rem arg1 " arg 2 is quoted "  arg3 "" arg5
 ;
 ; "call" and "rem" are entokenned; the args. are not. Leading and trailing
 ; spaces outside of quotes are ignored.

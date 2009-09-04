@@ -312,7 +312,7 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
 
 
 /*****************************************************************************/
-/*     	   	      	       	    Helpers                                  */
+/*     	    	      	       	    Helpers                                  */
 /*****************************************************************************/
 
 
@@ -1779,6 +1779,12 @@ unsigned OptStackOps (CodeSeg* S)
                 /* While searching, track register load insns, so we can tell
                  * what is in a register once pushax is encountered.
                  */
+                if (CE_HasLabel (E)) {
+                    /* Currently we don't track across branches */
+                    InvalidateLoadRegInfo (&Data.Lhs.A);
+                    InvalidateLoadRegInfo (&Data.Lhs.X);
+                    InvalidateLoadRegInfo (&Data.Lhs.Y);
+                }
                 if (CE_IsCallTo (E, "pushax")) {
                     Data.PushIndex = I;
                     State = FoundPush;
@@ -1793,6 +1799,12 @@ unsigned OptStackOps (CodeSeg* S)
                  * follow and in the meantime, track zeropage usage and check
                  * for code that will disable us from translating the sequence.
                  */
+                if (CE_HasLabel (E)) {
+                    /* Currently we don't track across branches */
+                    InvalidateLoadRegInfo (&Data.Rhs.A);
+                    InvalidateLoadRegInfo (&Data.Rhs.X);
+                    InvalidateLoadRegInfo (&Data.Rhs.Y);
+                }
                 if (E->OPC == OP65_JSR) {
 
                     /* Subroutine call: Check if this is one of the functions,

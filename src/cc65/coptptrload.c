@@ -108,7 +108,7 @@ unsigned OptPtrLoad1 (CodeSeg* S)
 	    CodeEntry* P;
 
             /* Track the insertion point */
-            unsigned IP = I;
+            unsigned IP = I+9;
 
             /* sta ptr1 */
             X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[2]->LI);
@@ -127,8 +127,9 @@ unsigned OptPtrLoad1 (CodeSeg* S)
             }
             CS_InsertEntry (S, X, IP++);
 
-            /* clc is now in the right place */
-            ++IP;
+            /* clc */
+            X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[0]->LI);
+            CS_InsertEntry (S, X, IP++);
 
             /* adc yyy */
             X = NewCodeEntry (OP65_ADC, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
@@ -151,7 +152,7 @@ unsigned OptPtrLoad1 (CodeSeg* S)
 	    CS_InsertEntry (S, X, IP++);
 
             /* Remove the old instructions */
-            CS_DelEntries (S, IP, 8);
+            CS_DelEntries (S, I, 9);
 
 	    /* Remember, we had changes */
 	    ++Changes;

@@ -25,7 +25,6 @@
 	.include	"ser-kernel.inc"
 	.include	"ser-error.inc"
 
-
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 

@@ -44,10 +44,8 @@ _write:
         jsr	callmli
         bcs	oserr
 
-
         ; REF_NUM already set
         .assert MLI::MARK::REF_NUM = MLI::EOF::REF_NUM, error
-
 
         ; POSITION already set
         .assert MLI::MARK::POSITION = MLI::EOF::EOF, error

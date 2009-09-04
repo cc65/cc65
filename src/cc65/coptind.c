@@ -1059,7 +1059,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		    	   In->RegX == In->RegA       &&
 		    	   E->AM != AM65_ABSY         &&
 		    	   E->AM != AM65_ZPY) {
-		    /* Use the A register instead */
+	 	    /* Use the A register instead */
        		    CE_ReplaceOPC (E, OP65_STA);
 		}
 	        break;
@@ -1112,7 +1112,7 @@ unsigned OptDupLoads (CodeSeg* S)
        	       	    !CE_UseLoadFlags (N)) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
-		}
+	 	}
 	        break;
 
 	    case OP65_TAY:
@@ -1880,9 +1880,7 @@ unsigned OptPrecalc (CodeSeg* S)
                 }
                 break;
 
-            case OP65_ASL:
             case OP65_EOR:
-            case OP65_LSR:
                 if (RegValIsKnown (Out->RegA)) {
                     /* Accu op zp with known contents */
                     Arg = MakeHexArg (Out->RegA);
@@ -1901,9 +1899,6 @@ unsigned OptPrecalc (CodeSeg* S)
                     /* 0-0 or 0+0 -> remove */
                     CS_DelEntry (S, I);
                     ++Changes;
-                } else if (RegValIsKnown (Out->RegA)) {
-                    /* Accu op zp with known contents */
-                    Arg = MakeHexArg (Out->RegA);
                 }
                 break;
 

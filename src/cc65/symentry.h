@@ -166,6 +166,16 @@ void DumpSymEntry (FILE* F, const SymEntry* E);
 /* Dump the given symbol table entry to the file in readable form */
 
 #if defined(HAVE_INLINE)
+INLINE int SymIsBitField (const SymEntry* Sym)
+/* Return true if the given entry is a bit-field entry */
+{
+    return ((Sym->Flags & SC_BITFIELD) == SC_BITFIELD);
+}
+#else
+#  define SymIsBitField(Sym)    (((Sym)->Flags & SC_BITFIELD) == SC_BITFIELD)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int SymIsTypeDef (const SymEntry* Sym)
 /* Return true if the given entry is a typedef entry */
 {

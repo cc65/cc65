@@ -156,7 +156,7 @@ static void CheckSymTable (SymTable* Tab)
      	unsigned Flags = Entry->Flags;
 
 	/* Ignore typedef entries */
-	if ((Flags & SC_TYPEDEF) != SC_TYPEDEF) {
+	if (!SymIsTypeDef (Entry)) {
 
 	    /* Check if the symbol is one with storage, and it if it was
 	     * defined but not used.

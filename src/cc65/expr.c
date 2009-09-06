@@ -1104,7 +1104,7 @@ static void StructRef (ExprDesc* Expr)
     }
 
     /* Make the expression a bit field if necessary */
-    if ((Field->Flags & SC_BITFIELD) == SC_BITFIELD) {
+    if (SymIsBitField (Field)) {
         ED_MakeBitField (Expr, Field->V.B.BitOffs, Field->V.B.BitWidth);
     }
 }

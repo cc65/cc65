@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  anonname.c				     */
+/*		     		  anonname.c				     */
 /*                                                                           */
 /*		  Create names for anonymous variables/types		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,8 +36,12 @@
 #include <stdio.h>
 #include <string.h>
 
+/* common */
+#include "xsprintf.h"
+
 /* cc65 */
 #include "anonname.h"
+#include "ident.h"
 
 
 
@@ -63,7 +67,7 @@ char* AnonName (char* Buf, const char* Spec)
  */
 {
     static unsigned ACount = 0;
-    sprintf (Buf, "%s-%s-%04X", AnonTag, Spec, ++ACount);
+    xsprintf (Buf, IDENTSIZE, "%s-%s-%04X", AnonTag, Spec, ++ACount);
     return Buf;
 }
 

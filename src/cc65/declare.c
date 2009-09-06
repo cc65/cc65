@@ -1833,10 +1833,22 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
          * last struct field).
          */
     	Size += ParseInitInternal (Entry->Type, AllowFlexibleMembers && Entry->NextSym == 0);
-    	Entry = Entry->NextSym;
-    	if (CurTok.Tok != TOK_COMMA)
+
+        /* For unions, only the first member can be initialized */
+        if (IsTypeStruct (T)) {
+            /* Struct */
+            Entry = Entry->NextSym;
+        } else {        
+            /* Union */
+            Entry = 0;
+        }
+
+        /* More initializers? */
+    	if (CurTok.Tok == TOK_COMMA) {
+    	    NextToken ();
+        } else {
     	    break;
-    	NextToken ();
+        }
     }
 
     /* Consume the closing curly brace */

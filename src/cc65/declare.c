@@ -63,7 +63,23 @@
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+typedef struct StructInitData StructInitData;
+struct StructInitData {
+    unsigned    Size;                   /* Size of struct */
+    unsigned    Offs;                   /* Current offset in struct */
+    unsigned    BitVal;                 /* Summed up bit-field value */
+    unsigned    ValBits;                /* Valid bits in Val */
+};
+
+
+
+/*****************************************************************************/
+/*			       	   Forwards				     */
 /*****************************************************************************/
 
 
@@ -77,7 +93,7 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers);
 
 
 /*****************************************************************************/
-/*		 	      internal functions			     */
+/*		 	      Internal functions			     */
 /*****************************************************************************/
 
 
@@ -601,7 +617,6 @@ static SymEntry* ParseStructDecl (const char* Name)
 
     unsigned  StructSize;
     int       FlexibleMember;
-    unsigned  Offs;
     int       BitOffs;          /* Bit offset for bit-fields */
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
@@ -637,6 +652,7 @@ static SymEntry* ParseStructDecl (const char* Name)
 	while (1) {
 
 	    Declaration Decl;
+            ident       Ident;
 
             /* If we had a flexible array member before, no other fields can
              * follow.
@@ -654,10 +670,21 @@ static SymEntry* ParseStructDecl (const char* Name)
 
             /* If this is not a bit field, or the bit field is too large for
              * the remainder of the current member, or we have a bit field
-             * with width zero, align the struct to the next member
+             * with width zero, align the struct to the next member by adding
+             * a member with an anonymous name.
              */
             if (BitOffs > 0) {
                 if (FieldWidth <= 0 || (BitOffs + FieldWidth) > (int) INT_BITS) {
+
+                    /* We need an anonymous name */
+                    AnonName (Ident, "bit-field");
+
+                    /* Add an anonymous bit-field that aligns to the next
+                     * storage unit.
+                     */
+                    AddBitField (Ident, StructSize, BitOffs, INT_BITS - BitOffs);
+
+                    /* No bits left */
                     StructSize += SIZEOF_INT;
                     BitOffs = 0;
                 }
@@ -677,18 +704,10 @@ static SymEntry* ParseStructDecl (const char* Name)
                     Warning ("Declaration does not declare anything");
                     goto NextMember;
                 } else {
-                    /* A bit-field without a name will just increase the
-                     * offset
-                     */
-                    BitOffs += FieldWidth;
-                    goto NextMember;
+                    /* A bit-field without a name will get an anonymous one */
+                    AnonName (Decl.Ident, "bit-field");
                 }
             }
-
-            /* Byte offset of this member is the current struct size plus any
-             * full bytes from the bit offset in case of bit-fields.
-             */
-            Offs = StructSize + (BitOffs / CHAR_BITS);
 
             /* Check if this field is a flexible array member, and
              * calculate the size of the field.
@@ -701,16 +720,25 @@ static SymEntry* ParseStructDecl (const char* Name)
                 FlexibleMember = 1;
                 /* Assume zero for size calculations */
                 SetElementCount (Decl.Type, FLEXIBLE);
-            } else if (FieldWidth < 0) {
-                StructSize += CheckedSizeOf (Decl.Type);
             }
 
             /* Add a field entry to the table */
-            if (FieldWidth > 0) {
+            if (FieldWidth > 0) {                  
+                /* Add full byte from the bit offset to the variable offset. 
+                 * This simplifies handling he bit-field as a char type
+                 * in expressions.
+                 */
+                unsigned Offs = StructSize + (BitOffs / CHAR_BITS);
                 AddBitField (Decl.Ident, Offs, BitOffs % CHAR_BITS, FieldWidth);
                 BitOffs += FieldWidth;
+                CHECK (BitOffs <= (int) INT_BITS);
+                if (BitOffs == INT_BITS) {
+                    StructSize += SIZEOF_INT;
+                    BitOffs = 0;
+                }
             } else {
-                AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
+                AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
+                StructSize += CheckedSizeOf (Decl.Type);
             }
 
 NextMember: if (CurTok.Tok != TOK_COMMA) {
@@ -1633,11 +1661,29 @@ static void DefineData (ExprDesc* Expr)
 
 
 
-static unsigned ParseScalarInit (Type* T)
-/* Parse initializaton for scalar data types. Return the number of data bytes. */
+static void OutputBitFieldData (StructInitData* SI)
+/* Output bit field data */
 {
-    ExprDesc ED;
+    /* Ignore if we have no data */
+    if (SI->ValBits > 0) {
 
+        /* Output the data */
+        g_defdata (CF_INT | CF_UNSIGNED | CF_CONST, SI->BitVal, 0);
+
+        /* Clear the data from SI and account for the size */
+        SI->BitVal  = 0;
+        SI->ValBits = 0;
+        SI->Offs   += SIZEOF_INT;
+    }
+}
+
+
+
+static void ParseScalarInitInternal (Type* T, ExprDesc* ED)
+/* Parse initializaton for scalar data types. This function will not output the
+ * data but return it in ED.
+ */
+{
     /* Optional opening brace */
     unsigned BraceCount = OpeningCurlyBraces (0);
 
@@ -1649,14 +1695,25 @@ static unsigned ParseScalarInit (Type* T)
     }
 
     /* Get the expression and convert it to the target type */
-    ConstExpr (hie1, &ED);
-    TypeConversion (&ED, T);
-
-    /* Output the data */
-    DefineData (&ED);
+    ConstExpr (hie1, ED);
+    TypeConversion (ED, T);
 
     /* Close eventually opening braces */
     ClosingCurlyBraces (BraceCount);
+}
+
+
+
+static unsigned ParseScalarInit (Type* T)
+/* Parse initializaton for scalar data types. Return the number of data bytes. */
+{
+    ExprDesc ED;
+
+    /* Parse initialization */
+    ParseScalarInitInternal (T, &ED);
+
+    /* Output the data */
+    DefineData (&ED);
 
     /* Done */
     return SizeOf (T);
@@ -1790,10 +1847,9 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
 static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
 /* Parse initialization of a struct or union. Return the number of data bytes. */
 {
-    SymEntry* Entry;
-    SymTable* Tab;
-    unsigned  StructSize;
-    unsigned  Size;
+    SymEntry*       Entry;
+    SymTable*       Tab;
+    StructInitData  SI;
 
 
     /* Consume the opening curly brace */
@@ -1803,68 +1859,139 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
     Entry = GetSymEntry (T);
 
     /* Get the size of the struct from the symbol table entry */
-    StructSize = Entry->V.S.Size;
+    SI.Size = Entry->V.S.Size;
 
     /* Check if this struct definition has a field table. If it doesn't, it
      * is an incomplete definition.
      */
     Tab = Entry->V.S.SymTab;
     if (Tab == 0) {
-     	Error ("Cannot initialize variables with incomplete type");
+      	Error ("Cannot initialize variables with incomplete type");
         /* Try error recovery */
         SkipInitializer (1);
-    	/* Nothing initialized */
-    	return 0;
+      	/* Nothing initialized */
+      	return 0;
     }
 
     /* Get a pointer to the list of symbols */
     Entry = Tab->SymHead;
 
     /* Initialize fields */
-    Size = 0;
+    SI.Offs    = 0;
+    SI.BitVal  = 0;
+    SI.ValBits = 0;
     while (CurTok.Tok != TOK_RCURLY) {
-    	if (Entry == 0) {
-    	    Error ("Too many initializers");
-            SkipInitializer (1);
-    	    return Size;
-    	}
-        /* Parse initialization of one field. Flexible array members may
-         * only be initialized if they are the last field (or part of the
-         * last struct field).
-         */
-    	Size += ParseInitInternal (Entry->Type, AllowFlexibleMembers && Entry->NextSym == 0);
 
-        /* For unions, only the first member can be initialized */
-        if (IsTypeStruct (T)) {
-            /* Struct */
-            Entry = Entry->NextSym;
-        } else {        
-            /* Union */
-            Entry = 0;
+        /* */
+      	if (Entry == 0) {
+      	    Error ("Too many initializers");
+            SkipInitializer (1);
+      	    return SI.Offs;
+    	}
+
+        /* Parse initialization of one field. Bit-fields need a special
+         * handling.
+         */
+        if (SymIsBitField (Entry)) {
+
+            ExprDesc ED;
+            unsigned Val;
+            unsigned Shift;
+
+            /* Calculate the bitmask from the bit-field data */
+            unsigned Mask = (1U << Entry->V.B.BitWidth) - 1U;
+
+            /* Safety ... */
+            CHECK (Entry->V.B.Offs * CHAR_BITS + Entry->V.B.BitOffs ==
+                   SI.Offs         * CHAR_BITS + SI.ValBits);
+
+            /* This may be an anonymous bit-field, in which case it doesn't
+             * have an initializer.
+             */
+            if (IsAnonName (Entry->Name)) {
+                /* Account for the data and output it if we have a full word */
+                SI.ValBits += Entry->V.B.BitWidth;
+                CHECK (SI.ValBits <= INT_BITS);
+                if (SI.ValBits == INT_BITS) {
+                    OutputBitFieldData (&SI);
+                }
+                goto NextMember;
+            } else {
+                /* Read the data, check for a constant integer, do a range
+                 * check.
+                 */
+                ParseScalarInitInternal (type_uint, &ED);
+                if (!ED_IsConstAbsInt (&ED)) {
+                    Error ("Constant initializer expected");
+                    ED_MakeConstAbsInt (&ED, 1);
+                }
+                if (ED.IVal > (long) Mask) {
+                    Warning ("Truncating value in bit-field initializer");
+                    ED.IVal &= (long) Mask;
+                }
+                Val = (unsigned) ED.IVal;
+            }
+
+            /* Add the value to the currently stored bit-field value */
+            Shift = (Entry->V.B.Offs - SI.Offs) * CHAR_BITS + Entry->V.B.BitOffs;
+            SI.BitVal |= (Val << Shift);
+
+            /* Account for the data and output it if we have a full word */
+            SI.ValBits += Entry->V.B.BitWidth;
+            CHECK (SI.ValBits <= INT_BITS);
+            if (SI.ValBits == INT_BITS) {
+                OutputBitFieldData (&SI);
+            }
+
+        } else {
+
+            /* Standard member. We should never have stuff from a
+             * bit-field left
+             */
+            CHECK (SI.ValBits == 0);
+
+            /* Flexible array members may only be initialized if they are
+             * the last field (or part of the last struct field).
+             */
+            SI.Offs += ParseInitInternal (Entry->Type, AllowFlexibleMembers && Entry->NextSym == 0);
         }
 
         /* More initializers? */
-    	if (CurTok.Tok == TOK_COMMA) {
-    	    NextToken ();
-        } else {
+       	if (CurTok.Tok != TOK_COMMA) {
     	    break;
+        }
+
+        /* Skip the comma */
+        NextToken ();
+
+NextMember:
+        /* Next member. For unions, only the first one can be initialized */
+        if (IsTypeUnion (T)) {
+            /* Union */
+            Entry = 0;
+        } else {
+            /* Struct */
+            Entry = Entry->NextSym;
         }
     }
 
     /* Consume the closing curly brace */
     ConsumeRCurly ();
 
+    /* If we have data from a bit-field left, output it now */
+    OutputBitFieldData (&SI);
+
     /* If there are struct fields left, reserve additional storage */
-    if (Size < StructSize) {
-    	g_zerobytes (StructSize - Size);
-        Size = StructSize;
+    if (SI.Offs < SI.Size) {
+    	g_zerobytes (SI.Size - SI.Offs);
+        SI.Offs = SI.Size;
     }
 
     /* Return the actual number of bytes initialized. This number may be
-     * larger than StructSize if flexible array members are present and were
-     * initialized (possible in non ANSI mode).
+     * larger than sizeof (Struct) if flexible array members are present and
+     * were initialized (possible in non ANSI mode).
      */
-    return Size;
+    return SI.Offs;
 }
 
 

@@ -66,7 +66,8 @@ OBJS =	_scrsize.o		\
         systime.o               \
         sysuname.o              \
 	tgi_mode_table.o	\
-	toggle_videomode.o
+	toggle_videomode.o      \
+        videomode.o
 
 #--------------------------------------------------------------------------
 # Drivers

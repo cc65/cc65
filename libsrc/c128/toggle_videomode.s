@@ -8,6 +8,11 @@
 	.export		_toggle_videomode
         .import         SWAPPER, BSOUT
 
+; This function is deprecated
+.assert         0, warning, "toggle_videomode() is deprecated, please use videomode() instead!"
+
+
+
 .proc   _toggle_videomode
 
         jsr     SWAPPER                 ; Toggle the mode

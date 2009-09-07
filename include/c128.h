@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -55,8 +55,6 @@
 #define CH_F7			136
 #define CH_F8			140
 
-
-
 /* Color defines */
 #define COLOR_BLACK  	       	0x00
 #define COLOR_WHITE  	       	0x01
@@ -64,7 +62,7 @@
 #define COLOR_CYAN      	0x03
 #define COLOR_VIOLET 	       	0x04
 #define COLOR_GREEN  	       	0x05
-#define COLOR_BLUE   	       	0x06
+#define COLOR_BLUE   	       	0x06       
 #define COLOR_YELLOW 	       	0x07
 #define COLOR_ORANGE 	       	0x08
 #define COLOR_BROWN  	       	0x09
@@ -74,6 +72,10 @@
 #define COLOR_LIGHTGREEN     	0x0D
 #define COLOR_LIGHTBLUE      	0x0E
 #define COLOR_GRAY3  	       	0x0F
+
+/* Video mode defines */
+#define VIDEOMODE_40COL         0x00
+#define VIDEOMODE_80COL         0x80
 
 
 
@@ -98,8 +100,15 @@
 
 
 
+unsigned char __fastcall__ videomode (unsigned char Mode);
+/* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
+ * constants.
+ */
+
 void toggle_videomode (void);
-/* Toggle the video mode between 40 and 80 chars (calls SWAPPER) */
+/* Toggle the video mode between 40 and 80 chars (calls SWAPPER).
+ * THIS FUNCTION IS DEPRECATED, please use videomode instead!
+ */
 
 void c64mode (void);
 /* Switch the C128 into C64 mode. Note: This function will not return! */

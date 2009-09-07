@@ -7,9 +7,6 @@
 ; be called from an interrupt handler
 ;
 
-	.ifdef	__APPLE2ENH__
-	.constructor	initmcb
-	.endif
 	.export		_mouse_def_callbacks
 	
 	.include	"apple2.inc"
@@ -33,21 +30,13 @@ _mouse_def_callbacks:
 
 ; ------------------------------------------------------------------------
 
-	.segment	"INIT"
-
-	.ifdef	__APPLE2ENH__
-initmcb:
-	lda	ALTCHARSET	; Alternate charset switched in?
-	bpl	:+		; No, normal charset
-	lda	#'B'		; MouseText character
-	sta	cmpcur+1
-	sta	getcur+1
-:	rts
-	.endif
-
-; ------------------------------------------------------------------------
-
 	.data
+
+        .ifdef	__APPLE2ENH__
+cursor = 'B'                    ; MouseText character
+        .else
+cursor = '+' | $40              ; Flashing crosshair
+        .endif
 
 getcursor:
         .ifdef  __APPLE2ENH__
@@ -57,11 +46,11 @@ switch:	bit	LOWSCR		; Patched at runtime
         .endif
 column:	ldx	#$00		; Patched at runtime
 getscr:	lda	$0400,x		; Patched at runtime
-cmpcur:	cmp	#'+' | $40	; Possibly patched by initialization
+        cmp	#cursor
 	rts
 
 setcursor:
-getcur:	lda	#'+' | $40	; Possibly patched by initialization
+        lda	#cursor
 setscr:	sta	$0400,x		; Patched at runtime
 	.ifdef  __APPLE2ENH__
         bit	LOWSCR		; Doesn't hurt in 40 column mode

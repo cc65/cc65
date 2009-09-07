@@ -70,11 +70,6 @@ void RemoveCodeRange (const CodeMark* Start, const CodeMark* End)
         return;
     }
 
-    /* We can only delete the range if End is the end of the code segment or
-     * if both SP values are identical.
-     */
-    CHECK (Start->SP == End->SP || End->Pos == CS_GetEntryCount (CS->Code));
-
     /* Delete the range */
     CS_DelCodeRange (CS->Code, Start->Pos, End->Pos-1);
 }

@@ -1739,7 +1739,7 @@ Here's a list of all control commands and a description, what they do:
   when the output file is written, and abort with an error if this is not
   the case. More complex expressions are possible. The action specifier
   <tt/warning/ outputs a warning, while the <tt/error/ specifier outputs
-  an error message. In the latter case, generation if the output file is
+  an error message. In the latter case, generation of the output file is
   suppressed in both the assembler and linker.
 
 
@@ -1791,7 +1791,7 @@ Here's a list of all control commands and a description, what they do:
 	TableLookupBank: .byte ^TableItem0, ^TableItem1, ^TableItem2, ^TableItem3
   </verb></tscreen>
 
-  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>, 
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
             <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
             <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>
 
@@ -2488,8 +2488,8 @@ Here's a list of all control commands and a description, what they do:
 	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
   </verb></tscreen>
 
-  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>, 
-            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>, 
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
+            <tt><ref id=".LOBYTES" name=".LOBYTES"></tt>,
             <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
 
 
@@ -2849,8 +2849,8 @@ Here's a list of all control commands and a description, what they do:
 	TableLookupHi:   .byte &gt;TableItem0, &gt;TableItem1, &gt;TableItem2, &gt;TableItem3
   </verb></tscreen>
 
-  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>, 
-            <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>, 
+  See also: <tt><ref id=".BYTE" name=".BYTE"></tt>,
+            <tt><ref id=".HIBYTES" name=".HIBYTES"></tt>,
             <tt><ref id=".BANKBYTES" name=".BANKBYTES"></tt>
 
 

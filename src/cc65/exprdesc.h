@@ -45,6 +45,7 @@
 #include "inline.h"
 
 /* cc65 */
+#include "asmcode.h"
 #include "datatype.h"
 
 
@@ -82,7 +83,10 @@ enum {
 
     /* Test */
     E_NEED_TEST         = 0x0400,       /* Expression needs a test to set cc */
-    E_CC_SET            = 0x0800        /* Condition codes are set */
+    E_CC_SET            = 0x0800,       /* Condition codes are set */
+
+    E_HAVE_MARKS        = 0x1000,       /* Code marks are valid */
+
 };
 
 /* Describe the result of an expression */
@@ -91,12 +95,17 @@ struct ExprDesc {
     struct SymEntry*	Sym;   	        /* Symbol table entry if known */
     Type*    	       	Type;           /* Type array of expression */
     unsigned            Flags;
-    unsigned long 	Name;	        /* Name or label number */
+    unsigned long   	Name;	        /* Name or label number */
     long       	       	IVal;           /* Integer value if expression constant */
     Double              FVal;           /* Floating point value */
 
+    /* Bit field stuff */
     unsigned            BitOffs;        /* Bit offset for bit fields */
     unsigned            BitWidth;       /* Bit width for bit fields */
+
+    /* Start and end of generated code */
+    CodeMark            Start;
+    CodeMark            End;
 };
 
 
@@ -293,6 +302,12 @@ INLINE void ED_MarkAsUntested (ExprDesc* Expr)
 #else
 #  define ED_MarkAsUntested(Expr)   do { (Expr)->Flags &= ~E_CC_SET; } while (0)
 #endif
+
+void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End);
+/* Set the code range for this expression */
+
+int ED_CodeRangeIsEmpty (const ExprDesc* Expr);
+/* Return true if no code was output for this expression */
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs);
 /* Return the assembler label name of the given expression. Beware: This

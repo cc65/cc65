@@ -80,6 +80,27 @@ void ED_MakeBitField (ExprDesc* Expr, unsigned BitOffs, unsigned BitWidth)
 
 
 
+void ED_SetCodeRange (ExprDesc* Expr, const CodeMark* Start, const CodeMark* End)
+/* Set the code range for this expression */
+{
+    Expr->Flags |= E_HAVE_MARKS;
+    Expr->Start = *Start;
+    Expr->End   = *End;
+}
+
+
+
+int ED_CodeRangeIsEmpty (const ExprDesc* Expr)
+/* Return true if no code was output for this expression */
+{
+    /* We must have code marks */
+    PRECONDITION (Expr->Flags & E_HAVE_MARKS);
+
+    return CodeRangeIsEmpty (&Expr->Start, &Expr->End);
+}
+
+
+
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 /* Return the assembler label name of the given expression. Beware: This
  * function may use a static buffer, so the name may get "lost" on the second
@@ -229,7 +250,7 @@ int ED_IsConstAbsInt (const ExprDesc* Expr)
 int ED_IsNullPtr (const ExprDesc* Expr)
 /* Return true if the given expression is a NULL pointer constant */
 {
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE|E_BITFIELD)) == 
+    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE|E_BITFIELD)) ==
                                 (E_LOC_ABS|E_RTYPE_RVAL) &&
            Expr->IVal == 0                               &&
            IsClassInt (Expr->Type);

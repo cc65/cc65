@@ -71,7 +71,7 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 
 
 /*****************************************************************************/
-/*   			       Helper functions				     */
+/*   			       Helper functions		      		     */
 /*****************************************************************************/
 
 
@@ -97,7 +97,7 @@ static unsigned GlobalModeFlags (const ExprDesc* Expr)
 
 
 
-void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc *Expr)
+void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
 /* Call an expression function with checks. */
 {
     /* Remember the stack pointer */
@@ -117,6 +117,20 @@ void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc *Expr)
        	    Internal ("StackPtr is %d, should be %d\n", StackPtr, OldSP);
      	}
     }
+}
+
+
+
+void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
+/* Call an expression function with checks and record start and end of the
+ * generated code.
+ */
+{
+    CodeMark Start, End;
+    GetCodePos (&Start);
+    ExprWithCheck (Func, Expr);
+    GetCodePos (&End);
+    ED_SetCodeRange (Expr, &Start, &End);
 }
 
 

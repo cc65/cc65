@@ -23,8 +23,13 @@
 
 
 
-void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc *Expr);
+void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Call an expression function with checks. */
+
+void MarkedExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr);
+/* Call an expression function with checks and record start and end of the
+ * generated code.
+ */
 
 void PushAddr (const ExprDesc* Expr);
 /* If the expression contains an address that was somehow evaluated,
@@ -41,7 +46,7 @@ void Store (ExprDesc* Expr, const Type* StoreType);
 
 int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Will evaluate an expression via the given function. If the result is a
- * constant, 0 is returned and the value is put in the lval struct. If the
+ * constant, 0 is returned and the value is put in the Expr struct. If the
  * result is not constant, LoadExpr is called to bring the value into the
  * primary register and 1 is returned.
  */

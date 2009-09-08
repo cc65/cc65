@@ -723,8 +723,8 @@ static SymEntry* ParseStructDecl (const char* Name)
             }
 
             /* Add a field entry to the table */
-            if (FieldWidth > 0) {                  
-                /* Add full byte from the bit offset to the variable offset. 
+            if (FieldWidth > 0) {
+                /* Add full byte from the bit offset to the variable offset.
                  * This simplifies handling he bit-field as a char type
                  * in expressions.
                  */
@@ -738,7 +738,9 @@ static SymEntry* ParseStructDecl (const char* Name)
                 }
             } else {
                 AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, StructSize);
-                StructSize += CheckedSizeOf (Decl.Type);
+                if (!FlexibleMember) {
+                    StructSize += CheckedSizeOf (Decl.Type);
+                }
             }
 
 NextMember: if (CurTok.Tok != TOK_COMMA) {

@@ -102,7 +102,7 @@
 
 
 
-unsigned char __fastcall__ videomode (unsigned char Mode);
+unsigned __fastcall__ videomode (unsigned Mode);
 /* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
  * constants.
  */

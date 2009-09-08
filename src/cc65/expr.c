@@ -1721,7 +1721,14 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	}
 
 	/* Get the right hand side */
-	rconst = (evalexpr (CF_NONE, hienext, &Expr2) == 0);
+        MarkedExprWithCheck (hienext, &Expr2);
+
+        /* Check for a constant expression */
+        rconst = (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2));
+        if (!rconst) {
+            /* Not constant, load into the primary */
+            LoadExpr (CF_NONE, &Expr2);
+        }
 
 	/* Check the type of the rhs */
 	if (!IsClassInt (Expr2.Type)) {

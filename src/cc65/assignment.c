@@ -163,8 +163,6 @@ void Assignment (ExprDesc* Expr)
 
         CodeMark AndPos;
         CodeMark PushPos;
-        CodeMark RhsPos;
-        CodeMark RhsEndPos;
 
         unsigned Mask;
         unsigned Flags;
@@ -196,9 +194,7 @@ void Assignment (ExprDesc* Expr)
         g_push (Flags, 0);
 
      	/* Read the expression on the right side of the '=' */
-        GetCodePos (&RhsPos);
-     	hie1 (&Expr2);
-        GetCodePos (&RhsEndPos);
+       	MarkedExprWithCheck (hie1, &Expr2);
 
      	/* Do type conversion if necessary. Beware: Do not use char type
          * here!
@@ -209,7 +205,7 @@ void Assignment (ExprDesc* Expr)
         /* Beware: Expr2 may contain side effects, so there must not be
          * code generated for Expr2.
          */
-        if (ED_IsConstAbsInt (&Expr2) && CodeRangeIsEmpty (&RhsPos, &RhsEndPos)) {
+        if (ED_IsConstAbsInt (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
 
             /* Get the value and apply the mask */
             unsigned Val = (unsigned) (Expr2.IVal & Mask);

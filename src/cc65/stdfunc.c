@@ -154,7 +154,7 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
     GetCodePos (&Arg->Start);
 
     /* Read the expression we're going to pass to the function */
-    ExprWithCheck (hie1, &Arg->Expr);
+    MarkedExprWithCheck (hie1, &Arg->Expr);
 
     /* Remember the actual argument type */
     Arg->Type = Arg->Expr.Type;
@@ -165,7 +165,7 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
     /* If the value is a constant, set the flag, otherwise load it into the
      * primary register.
      */
-    if (ED_IsConstAbsInt (&Arg->Expr)) {
+    if (ED_IsConstAbsInt (&Arg->Expr) && ED_CodeRangeIsEmpty (&Arg->Expr)) {
         /* Remember that we have a constant value */
         Arg->Flags |= CF_CONST;
     } else {

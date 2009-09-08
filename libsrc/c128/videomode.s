@@ -1,12 +1,12 @@
 ;
 ; Ullrich von Bassewitz, 2009-09-07
 ;
-; unsigned char __fastcall__ videomode (unsigned char Mode);
+; unsigned __fastcall__ videomode (unsigned Mode);
 ; /* Set the video mode, return the old mode */
 ;
 
 	.export		_videomode
-        .import         SWAPPER, BSOUT  
+        .import         SWAPPER, BSOUT
 
         .include        "c128.inc"
 

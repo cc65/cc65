@@ -62,7 +62,7 @@
 #define COLOR_CYAN      	0x03
 #define COLOR_VIOLET 	       	0x04
 #define COLOR_GREEN  	       	0x05
-#define COLOR_BLUE   	       	0x06       
+#define COLOR_BLUE   	       	0x06
 #define COLOR_YELLOW 	       	0x07
 #define COLOR_ORANGE 	       	0x08
 #define COLOR_BROWN  	       	0x09
@@ -74,8 +74,10 @@
 #define COLOR_GRAY3  	       	0x0F
 
 /* Video mode defines */
-#define VIDEOMODE_40COL         0x00
-#define VIDEOMODE_80COL         0x80
+#define VIDEOMODE_40x25         0x00
+#define VIDEOMODE_80x25         0x80
+#define VIDEOMODE_40COL         VIDEOMODE_40x25
+#define VIDEOMODE_80COL         VIDEOMODE_80x25
 
 
 

@@ -5032,7 +5032,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Switch to either 40 or 80 column mode.
 <tag/Header/<tt/<ref id="c128.h" name="c128.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ videomode (unsigned char Mode);/
+<tag/Declaration/<tt/unsigned __fastcall__ videomode (unsigned Mode);/
 <tag/Description/Switch to 40 or 80 column mode depending on the argument. If
 the requested mode is already active, nothing happens. The old mode is returned
 from the call.

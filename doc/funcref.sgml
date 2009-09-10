@@ -77,6 +77,7 @@ function.
 <item>_textframe
 <item>_textframexy
 <item><ref id="get_ostype" name="get_ostype">
+<item><ref id="videomode" name="videomode">
 </itemize>
 
 
@@ -5031,19 +5032,20 @@ used in presence of a prototype.
 <quote>
 <descrip>
 <tag/Function/Switch to either 40 or 80 column mode.
-<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Header/<tt/<ref id="apple2enh.h" name="apple2enh.h">,
+<ref id="c128.h" name="c128.h">/
 <tag/Declaration/<tt/unsigned __fastcall__ videomode (unsigned Mode);/
 <tag/Description/Switch to 40 or 80 column mode depending on the argument. If
 the requested mode is already active, nothing happens. The old mode is returned
 from the call.
 <tag/Limits/<itemize>
-<item>The function is specific to the C128.
-<item>This function is replaces <ref id="toggle_videomode"
+<item>The function is specific to the C128 and enhanced Apple //e.
+<item>This function replaces <ref id="toggle_videomode"
 name="toggle_videomode">.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
-<tag/Availability/C128
+<tag/Availability/C128 and enhanced Apple //e
 <tag/See also/
 <ref id="fast" name="fast">,
 <ref id="slow" name="slow">,

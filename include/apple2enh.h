@@ -76,6 +76,12 @@
 #define _TEXTFRAME_WIDE	0x00
 #define _TEXTFRAME_TALL	0x04
 
+/* Video modes */
+#define VIDEOMODE_40x24 0x0011
+#define VIDEOMODE_80x24 0x0012
+#define VIDEOMODE_40COL VIDEOMODE_40x24
+#define VIDEOMODE_80COL VIDEOMODE_80x24
+
 
 
 /*****************************************************************************/
@@ -87,13 +93,18 @@
 void __fastcall__ _textframe (unsigned char width, unsigned char height,
 		    	      unsigned char style);
 /* Output a frame on the text screen with the given width and height
- * starting at the current cursor position and using the given style
+ * starting at the current cursor position and using the given style.
  */
 
 void __fastcall__ _textframexy (unsigned char x, unsigned char y,
 		    		unsigned char width, unsigned char height,
 		    		unsigned char style);
 /* Same as "gotoxy (x, y); _textframe (width, height, style);" */
+
+unsigned __fastcall__ videomode (unsigned mode);
+/* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
+ * constants.
+ */
 
 
 

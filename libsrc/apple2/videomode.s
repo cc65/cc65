@@ -32,7 +32,7 @@ _videomode:
         ; If we are in 40 column mode and want to set 80 column mode
         ; then we first presume the 80 column firmware being already
         ; active and print the ctrl-char code (this causes a garbage
-        : char to be printed on the screen if isn't already active)
+        ; char to be printed on the screen if isn't already active)
         jsr     COUT
         
         ; If we successfully switched to 80 column mode then the 80

@@ -74,9 +74,9 @@ function.
 
 <itemize>
 <item>_dos_type
-<item>_textframe
-<item>_textframexy
 <item><ref id="get_ostype" name="get_ostype">
+<item>textframe
+<item>textframexy
 <item><ref id="videomode" name="videomode">
 </itemize>
 

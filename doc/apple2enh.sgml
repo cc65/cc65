@@ -126,9 +126,10 @@ usage.
 
 <itemize>
 <item>_dos_type
-<item>_textframe
-<item>_textframexy
 <item>get_ostype
+<item>textframe
+<item>textframexy
+<item>videomode
 </itemize>
 
 

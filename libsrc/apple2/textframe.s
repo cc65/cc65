@@ -1,14 +1,14 @@
 ;
 ; Oliver Schmidt, 10.03.2004
 ;
-; void __fastcall__ _textframexy (unsigned char x, unsigned char y,
-;                                 unsigned char width, unsigned char height,
-;                                 unsigned char style);
-; void __fastcall__ _textframe (unsigned char width, unsigned char height);
-;                               unsigned char style);
+; void __fastcall__ textframexy (unsigned char x, unsigned char y,
+;                                unsigned char width, unsigned char height,
+;                                unsigned char style);
+; void __fastcall__ textframe (unsigned char width, unsigned char height,
+;                              unsigned char style);
 ;
 
-        .export 	__textframexy, __textframe
+        .export 	_textframexy, _textframe
         .import 	popa, pusha, _gotoxy
         .import		chlinedirect, cvlinedirect
 
@@ -20,11 +20,11 @@ HEIGHT  = tmp3
 XORIGIN = tmp4
 YORIGIN = ptr1
 
-__textframexy:
+_textframexy:
         sec
         bra	:+
 
-__textframe:
+_textframe:
         clc
 :       ldx	INVFLG
         phx			; Save character display mode

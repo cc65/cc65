@@ -78,6 +78,7 @@ S_OBJS=	_scrsize.o	\
 	gotoy.o		\
         home.o          \
 	initcwd.o	\
+	iobuf.o         \
         joy_stddrv.o    \
      	kbhit.o		\
         mainargs.o      \

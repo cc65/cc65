@@ -12,7 +12,7 @@
 
         .import		pushname, popname
         .import 	errnoexit, oserrexit
-        .import		_posix_memalign, _free
+        .import		iobuf_alloc, iobuf_free
         .import 	addysp, incsp4, incaxy, pushax, popax
 
         .include	"zeropage.inc"
@@ -70,7 +70,7 @@ found:  tya
         ldx	#>$0100
         jsr	pushax		; Preserves A
         ldx	#>$0400
-        jsr	_posix_memalign
+        jsr	iobuf_alloc
 	tay			; Save errno code
 
         ; Restore fdtab slot
@@ -206,7 +206,7 @@ freebuffer:
         ; Free I/O buffer
         lda	#$00
         ldx	fdtab + FD::BUFFER+1,y
-        jmp	_free
+        jmp	iobuf_free
 
 closeallfiles:
         ; All open files

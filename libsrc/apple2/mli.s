@@ -5,8 +5,7 @@
 ;
 
         .import         __dos_type
-        .import         iobuf_init, iobuf_done
-        .export         iobuf_nop
+        .import         iobuf_mli
 
         .include        "mli.inc"
 
@@ -26,16 +25,12 @@ callmli:
         beq     oserr
 
         ; Call MLI and return
-        jsr     iobuf_init
-        jsr     ENTRY
+        jsr     iobuf_mli
 call:   .byte   $00
         .addr   mliparam
-        jmp     iobuf_done
+        rts
 
         ; Load oserror code and return
 oserr:  lda     #$01		; "Invalid MLI function code number"
         sec
-        ; Fall through
-
-iobuf_nop:
         rts

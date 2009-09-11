@@ -84,6 +84,7 @@ S_OBJS=	_scrsize.o	\
         mainargs.o      \
 	mcbdefault.o	\
 	mli.o		\
+        mouse_stddrv.o  \
 	open.o		\
         oserrlist.o     \
 	oserror.o	\

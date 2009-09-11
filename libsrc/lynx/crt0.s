@@ -19,11 +19,12 @@
 	.export         _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-	.import         initlib, donelib
+	.import         callirq, initlib, donelib
 	.import         zerobss
 	.import	     	callmain
 	.import         _main
 	.import         __BSS_LOAD__
+	.import	       	__INTERRUPTOR_COUNT__
 	.import         __RAM_START__, __RAM_SIZE__
 
 	.include        "zeropage.inc"
@@ -132,9 +133,21 @@ sloop:  ldy     SuzyInitReg,x
 
 	jsr     zerobss
 
+; If we have IRQ functions, set the IRQ vector
+; as Lynx is a console there is not much point in releasing the IRQ
+
+        lda     #<__INTERRUPTOR_COUNT__
+      	beq	NoIRQ1
+      	lda	#<IRQStub
+      	ldx	#>IRQStub
+      	sei
+      	sta	INTVECTL
+      	stx	INTVECTH
+      	cli
+
 ; Call module constructors
 
-	jsr     initlib
+NoIRQ1: jsr     initlib
 
 ; Push arguments and call main
 
@@ -148,4 +161,15 @@ _exit:  jsr     donelib         ; Run module destructors
 
 noret:  bra     noret
 
+
+IRQStub:
+	phy
+	phx
+	pha
+	cld
+       	jsr    	callirq
+	pla
+	plx
+	ply
+	rti
 

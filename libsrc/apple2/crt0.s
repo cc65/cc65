@@ -99,14 +99,14 @@ _exit:  ldx     #<exit
         jsr     donelib
 
         ; Check for valid interrupt vector table entry number
-        lda     intnum
+        lda     int_num
         beq     exit
 
         ; Deallocate interrupt vector table entry
-        dec     params		; Adjust parameter count
+        dec     i_param		; Adjust parameter count
         jsr     $BF00		; MLI call entry point
         .byte   $41		; Dealloc interrupt
-        .addr   params
+        .addr   i_param
 
         ; Restore the original RESET vector
 exit:   ldx     #$02
@@ -128,8 +128,8 @@ exit:   ldx     #$02
         ldx     #$FF
         txs                     ; Re-init stack pointer
 
-        ; Back to DOS
-        jmp     DOSWARM
+        ; We're done
+        jmp     (done)
 
 ; ------------------------------------------------------------------------
 
@@ -159,25 +159,47 @@ init:   ldx     #zpspace-1
         lda     #>_exit
         jsr     reset		; Setup RESET vector
 
-        ; Setup the stack
-        lda     HIMEM
-        sta     sp
-        lda     HIMEM+1
-        sta     sp+1   	    	; Set argument stack ptr
+        ; Check for ProDOS
+        ldy     $BF00		; MLI call entry point
+        cpy     #$4C		; Is MLI present? (JMP opcode)
+        bne     basic
+        
+        ; Check ProDOS system bit map
+        lda     $BF6F           ; protection for pages $B8 - $BF
+        cmp     #%00000001      ; exactly page $BF is protected
+        bne     basic
+
+        ; No BASIC.SYSTEM so quit to ProDOS dispatcher instead
+        lda     #<quit
+        ldx     #>quit
+        sta     done
+        stx     done+1
+        
+        ; No BASIC.SYSTEM so use addr of ProDOS system global page
+        lda     #<$BF00
+        ldx     #>$BF00
+        bne     :+              ; Branch always
+
+        ; Get highest available mem addr from BASIC interpreter
+basic:  lda     HIMEM
+        ldx     HIMEM+1
+
+        ; Setup the C stack
+:       sta     sp
+        stx     sp+1
 
         ; Check for interruptors
         lda     #<__INTERRUPTOR_COUNT__
         beq     :+
 
         ; Check for ProDOS
-        lda     $BF00		; MLI call entry point
-        cmp     #$4C		; Is MLI present? (JMP opcode)
+        cpy     #$4C		; Is MLI present? (JMP opcode)
         bne     prterr
 
         ; Allocate interrupt vector table entry
         jsr     $BF00		; MLI call entry point
         .byte   $40		; Alloc interrupt
-        .addr   params
+        .addr   i_param
         bcs     prterr
 
 	; Enable interrupts as old ProDOS versions (i.e. 1.1.1)
@@ -223,7 +245,7 @@ msglen = * - errmsg
 
         ; ProDOS TechRefMan, chapter 6.2:
         ; "Each installed routine must begin with a CLD instruction."
-intrpt: cld
+intptr: cld
 
         ; Call interruptors and check for success
         jsr     callirq
@@ -248,13 +270,33 @@ reset:  stx     SOFTEV
         sta     PWREDUP
         rts
 
+        ; Quit to ProDOS dispatcher
+quit:   jsr     $BF00           ; MLI call entry point
+        .byte   $65             ; Quit
+        .word   q_param
+
+; ------------------------------------------------------------------------
+
+        .rodata
+
+        ; MLI parameter list for quit        
+q_param:.byte   $04		; param_count
+        .byte   $00		; quit_type
+        .word   $0000		; reserved
+        .byte   $00		; reserved
+        .word   $0000		; reserved
+	
 ; ------------------------------------------------------------------------
 
         .data
 
-params: .byte   $02		; Parameter count
-intnum: .byte   $00		; Interrupt number
-        .addr   intrpt		; Interrupt handler
+        ; MLI parameter list for (de)alloc interrupt
+i_param:.byte   $02		; param_count
+int_num:.byte   $00		; int_num
+        .addr   intptr		; int_code
+
+        ; Location to jump to when we're done
+done:   .addr   DOSWARM
 
 ; ------------------------------------------------------------------------
 

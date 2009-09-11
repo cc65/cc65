@@ -60,6 +60,7 @@ OBJS =	_scrsize.o		\
         kernal.o        	\
         mainargs.o              \
 	mcbdefault.o		\
+        mouse_stddrv.o          \
         randomize.o     	\
         revers.o        	\
 	slow.o			\

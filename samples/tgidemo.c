@@ -7,11 +7,6 @@
 
 
 
-#if defined(__APPLE2__) || defined(__APPLE2ENH__)
-#  define TGI_MODE	TGI_MODE_280_192_8
-#else
-#  define TGI_MODE	TGI_MODE_320_200_2
-#endif
 #define COLOR_BACK	COLOR_BLACK
 #define COLOR_FORE	COLOR_WHITE
 
@@ -203,7 +198,7 @@ int main (void)
     DoWarning ();
 
     /* Load and initialize the driver */
-    tgi_load (TGI_MODE);
+    tgi_load_driver (tgi_stddrv);
     CheckError ("tgi_load");
     tgi_init ();
     CheckError ("tgi_init");

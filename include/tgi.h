@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,6 +57,12 @@
 #define TGI_TEXT_HORIZONTAL     0
 #define TGI_TEXT_VERTICAL       1
 
+/* The name of the standard tgi driver for a platform */
+extern const char tgi_stddrv[];
+
+/* The default tgi mode for a platform */
+extern const unsigned char tgi_stdmode;
+
 
 
 /*****************************************************************************/
@@ -74,8 +80,7 @@ void __fastcall__ tgi_load (unsigned char mode);
 void __fastcall__ tgi_load_driver (const char* name);
 /* Load and install the given driver. This function is identical to tgi_load
  * with the only difference that the name of the driver is specified
- * explicitly. You should NOT use this function in most cases, use tgi_load()
- * instead.
+ * explicitly.
  */
 
 void __fastcall__ tgi_unload (void);

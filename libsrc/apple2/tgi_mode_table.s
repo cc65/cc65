@@ -10,7 +10,8 @@
 
 ;----------------------------------------------------------------------------
 ; Mode table. Contains entries of mode and driver name, the driver name being
-; null terminated. A mode with code zero terminates the list.
+; null terminated. A mode with code zero terminates the list. The first entry
+; defines also the default mode and driver for the system.
 ; BEWARE: The current implementation of tgi_map_mode does not work with tables
 ; larger that 255 bytes!
 

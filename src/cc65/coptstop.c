@@ -42,6 +42,7 @@
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptstop.h"
+#include "error.h"
 
 
 
@@ -56,8 +57,7 @@ typedef enum {
   LI_NONE               = 0x00,
   LI_DIRECT             = 0x01,         /* Direct op may be used */
   LI_RELOAD_Y           = 0x02,         /* Reload index register Y */
-  LI_TRANSFER           = 0x04,         /* Loaded value is transfered */
-  LI_REMOVE             = 0x08,         /* Load may be removed */
+  LI_REMOVE             = 0x04,         /* Load may be removed */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
@@ -68,7 +68,7 @@ struct LoadRegInfo {
     CodeEntry*          LoadEntry;      /* The actual entry, 0 if invalid */
     int                 XferIndex;      /* Index of transfer insn  */
     CodeEntry*          XferEntry;      /* The actual transfer entry */
-    unsigned char       Offs;           /* Stack offset if data is on stack */
+    int                 Offs;           /* Stack offset if data is on stack */
 };
 
 /* Now combined for both registers */
@@ -152,18 +152,10 @@ struct StackOpData {
 static void ClearLoadRegInfo (LoadRegInfo* RI)
 /* Clear a LoadRegInfo struct */
 {
-    RI->LoadIndex = -1;
-    RI->XferIndex = -1;
     RI->Flags     = LI_NONE;
-}
-
-
-
-static void InvalidateLoadRegInfo (LoadRegInfo* RI)
-/* Invalidate a LoadRegInfo struct */
-{
     RI->LoadIndex = -1;
     RI->XferIndex = -1;
+    RI->Offs      = 0;
 }
 
 
@@ -256,55 +248,87 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
 /* Track loads for a code entry */
 {
     if (E->Info & OF_LOAD) {
+
+        LoadRegInfo* RI = 0;
+
+        /* Determine, which register was loaded */
         if (E->Chg & REG_A) {
-            LI->A.LoadIndex = I;
-            LI->A.XferIndex = -1;
+            RI = &LI->A;
+        } else if (E->Chg & REG_X) {
+            RI = &LI->X;
+        } else if (E->Chg & REG_Y) {
+            RI = &LI->Y;
+        } 
+        CHECK (RI != 0);
+
+        /* Remember the load */
+        RI->LoadIndex = I;
+        RI->XferIndex = -1;
+
+        /* Set load flags */
+        RI->Flags    &= ~(LI_DIRECT | LI_RELOAD_Y);
+        if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
+            /* These insns are all ok and replaceable */
+            RI->Flags |= LI_DIRECT;
+        } else if (E->AM == AM65_ZP_INDY &&
+                   RegValIsKnown (E->RI->In.RegY) &&
+                   strcmp (E->Arg, "sp") == 0) {
+            /* A load from the stack with known offset is also ok, but in this
+             * case we must reload the index register later. Please note that
+             * a load indirect via other zero page locations is not ok, since
+             * these locations may change between the push and the actual
+             * operation.
+             */
+            RI->Offs  = (unsigned char) E->RI->In.RegY;
+            RI->Flags |= (LI_DIRECT | LI_RELOAD_Y);
         }
-        if (E->Chg & REG_X) {
-            LI->X.LoadIndex = I;
-            LI->X.XferIndex = -1;
-        }
-        if (E->Chg & REG_Y) {
-            LI->Y.LoadIndex = I;
-            LI->Y.XferIndex = -1;
-        }
+
+
     } else if (E->Info & OF_XFR) {
+
+        /* Determine source and target of the transfer and handle the TSX insn */
+        LoadRegInfo* Src;
+        LoadRegInfo* Tgt;
         switch (E->OPC) {
-            case OP65_TAX:
-                LI->X.LoadIndex = LI->A.LoadIndex;
-                LI->X.XferIndex = I;
-                break;
-            case OP65_TAY:
-                LI->Y.LoadIndex = LI->A.LoadIndex;
-                LI->Y.XferIndex = I;
-                break;
-            case OP65_TXA:
-                LI->A.LoadIndex = LI->X.LoadIndex;
-                LI->A.XferIndex = I;
-                break;
-            case OP65_TYA:
-                LI->A.LoadIndex = LI->Y.LoadIndex;
-                LI->A.XferIndex = I;
-                break;
-            default:
-                break;
+            case OP65_TAX:      Src = &LI->A; Tgt = &LI->X; break;
+            case OP65_TAY:      Src = &LI->A; Tgt = &LI->Y; break;
+            case OP65_TXA:      Src = &LI->X; Tgt = &LI->A; break;
+            case OP65_TYA:      Src = &LI->Y; Tgt = &LI->A; break;
+            case OP65_TSX:      ClearLoadRegInfo (&LI->X);  return;
+            case OP65_TXS:                                  return;
+            default:            Internal ("Unknown XFR insn in TrackLoads");
         }
-    } else if (CE_IsCallTo (E, "ldaxysp")) {
+
+        /* Transfer the data */
+        Tgt->LoadIndex  = Src->LoadIndex;
+        Tgt->XferIndex  = I;
+        Tgt->Offs       = Src->Offs;
+        Tgt->Flags     &= ~(LI_DIRECT | LI_RELOAD_Y);
+        Tgt->Flags     |= Src->Flags & (LI_DIRECT | LI_RELOAD_Y);
+
+    } else if (CE_IsCallTo (E, "ldaxysp") && RegValIsKnown (E->RI->In.RegY)) {
+
         /* Both registers set, Y changed */
         LI->A.LoadIndex = I;
         LI->A.XferIndex = -1;
+        LI->A.Flags    |= (LI_DIRECT | LI_RELOAD_Y);
+        LI->A.Offs      = (unsigned char) E->RI->In.RegY - 1;
+
         LI->X.LoadIndex = I;
         LI->X.XferIndex = -1;
-        InvalidateLoadRegInfo (&LI->Y);
+        LI->X.Flags    |= (LI_DIRECT | LI_RELOAD_Y);
+        LI->X.Offs      = (unsigned char) E->RI->In.RegY;
+
+        ClearLoadRegInfo (&LI->Y);
     } else {
         if (E->Chg & REG_A) {
-            InvalidateLoadRegInfo (&LI->A);
+            ClearLoadRegInfo (&LI->A);
         }
         if (E->Chg & REG_X) {
-            InvalidateLoadRegInfo (&LI->X);
+            ClearLoadRegInfo (&LI->X);
         }
         if (E->Chg & REG_Y) {
-            InvalidateLoadRegInfo (&LI->Y);
+            ClearLoadRegInfo (&LI->Y);
         }
     }
 }
@@ -439,68 +463,6 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
     if (D->Rhs.X.Flags & LI_RELOAD_Y) {
         D->Rhs.X.Offs -= Offs;
     }
-}
-
-
-
-static void CheckOneDirectOp (LoadRegInfo* LI, unsigned char Offs)
-/* Check if the given entry is a lda instruction with an addressing mode
- * that allows us to replace it by another operation (like ora). If so, we may
- * use this location for the or and must not save the value in the zero
- * page location.
- */
-{
-    /* Get the load entry */
-    CodeEntry* E = LI->LoadEntry;
-    if (E == 0) {
-        /* No load insn */
-        return;
-    }
-
-    /* Check the load entry */
-    if (E) {
-        /* Must check the call first since addressing mode is ABS, so second
-         * "if" will catch otherwise.
-         */
-        if (CE_IsCallTo (E, "ldaxysp")) {
-            /* Same as single loads from stack. Since we must distinguish
-             * between A and X here, the necessary offset is passed to the
-             * function as a parameter.
-             */
-            LI->Offs = (unsigned char) E->RI->In.RegY - Offs;
-            LI->Flags |= (LI_DIRECT | LI_RELOAD_Y);
-        } else if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
-            /* These insns are all ok and replaceable */
-            LI->Flags |= LI_DIRECT;
-        } else if (E->AM == AM65_ZP_INDY &&
-                   RegValIsKnown (E->RI->In.RegY) &&
-                   strcmp (E->Arg, "sp") == 0) {
-            /* A load from the stack with known offset is also ok, but in this
-             * case we must reload the index register later. Please note that
-             * a load indirect via other zero page locations is not ok, since
-             * these locations may change between the push and the actual
-             * operation.
-             */
-            LI->Offs  = (unsigned char) E->RI->In.RegY;
-            LI->Flags |= (LI_DIRECT | LI_RELOAD_Y);
-        }
-    }
-}
-
-
-
-static void CheckDirectOp (StackOpData* D)
-/* Check if the given entry is a lda instruction with an addressing mode
- * that allows us to replace it by another operation (like ora). If so, we may
- * use this location for the or and must not save the value in the zero
- * page location.
- */
-{
-    /* Check flags for all load instructions */
-    CheckOneDirectOp (&D->Lhs.A, 1);
-    CheckOneDirectOp (&D->Lhs.X, 0);
-    CheckOneDirectOp (&D->Rhs.A, 1);
-    CheckOneDirectOp (&D->Rhs.X, 0);
 }
 
 
@@ -1781,9 +1743,7 @@ unsigned OptStackOps (CodeSeg* S)
                  */
                 if (CE_HasLabel (E)) {
                     /* Currently we don't track across branches */
-                    InvalidateLoadRegInfo (&Data.Lhs.A);
-                    InvalidateLoadRegInfo (&Data.Lhs.X);
-                    InvalidateLoadRegInfo (&Data.Lhs.Y);
+                    ClearLoadInfo (&Data.Lhs);
                 }
                 if (CE_IsCallTo (E, "pushax")) {
                     Data.PushIndex = I;
@@ -1801,9 +1761,7 @@ unsigned OptStackOps (CodeSeg* S)
                  */
                 if (CE_HasLabel (E)) {
                     /* Currently we don't track across branches */
-                    InvalidateLoadRegInfo (&Data.Rhs.A);
-                    InvalidateLoadRegInfo (&Data.Rhs.X);
-                    InvalidateLoadRegInfo (&Data.Rhs.Y);
+                    ClearLoadInfo (&Data.Rhs);
                 }
                 if (E->OPC == OP65_JSR) {
 
@@ -1871,9 +1829,6 @@ unsigned OptStackOps (CodeSeg* S)
                 /* Finalize the load info */
                 FinalizeLoadInfo (&Data.Lhs, S);
                 FinalizeLoadInfo (&Data.Rhs, S);
-
-                /* Set flags for direct operations */
-                CheckDirectOp (&Data);
 
                 /* If the Lhs loads do load from zeropage, we have to include
                  * them into UsedRegs registers used. The Rhs loads have already

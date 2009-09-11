@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -95,6 +95,9 @@ struct mouse_callbacks {
 
 /* The default mouse callbacks */
 extern const struct mouse_callbacks mouse_def_callbacks;
+
+/* The name of the standard joystick driver for a platform */
+extern const char mouse_stddrv[];
 
 
 

@@ -17,21 +17,15 @@
 
 
 
-#if defined(__C64__) || defined(__C128__) || defined(__CBM510__)
+#if defined(__C64__) || defined(__C128__)
 
 /* Address of data for sprite 0 */
 #if defined(__C64__)
 #  define SPRITE0_DATA    0x0340
 #  define SPRITE0_PTR  	  0x07F8
-#  define DRIVER          "c64-1351.mou"
 #elif defined(__C128__)
 #  define SPRITE0_DATA    0x0E00
 #  define SPRITE0_PTR     0x07F8
-#  define DRIVER          "c128-1351.mou"
-#elif defined(__CBM510__)
-#  define SPRITE0_DATA    0xF400
-#  define SPRITE0_PTR     0xF3F8
-#  define DRIVER          ""            /* Currently unavailable */
 #endif
 
 /* The mouse sprite (an arrow) */
@@ -62,14 +56,6 @@ static const unsigned char MouseSprite[64] = {
 
 #endif  /* __C64__ or __C128__ */
 
-#ifdef __APPLE2__
-#  define DRIVER  "a2.stdmou.mou"
-#endif
-
-#ifdef __APPLE2ENH__
-#  define DRIVER  "a2e.stdmou.mou"
-#endif
-
 
 
 static void CheckError (const char* S, unsigned char Error)
@@ -89,7 +75,7 @@ static void DoWarning (void)
             "driver with the name\n"
             "    %s\n"
             "on disk! Press 'y' if you have it or\n"
-            "any other key to exit.\n", DRIVER);
+            "any other key to exit.\n", mouse_stddrv);
     if (tolower (cgetc ()) != 'y') {
         exit (EXIT_SUCCESS);
     }
@@ -145,7 +131,8 @@ int main (void)
 #endif
 
     /* Load and install the mouse driver */
-    CheckError ("mouse_load_driver", mouse_load_driver (&mouse_def_callbacks, DRIVER));
+    CheckError ("mouse_load_driver",
+                mouse_load_driver (&mouse_def_callbacks, mouse_stddrv));
 
     /* Print a help line */
     revers (1);
@@ -156,7 +143,7 @@ int main (void)
     Done = 0;
     ShowState (Invisible = 1);
     while (!Done) {
-     	if (kbhit ()) {                
+     	if (kbhit ()) {
      	    switch (tolower (cgetc ())) {
 		case 'd':
 		    BREAK();

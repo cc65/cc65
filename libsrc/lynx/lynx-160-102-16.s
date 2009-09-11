@@ -67,7 +67,7 @@
         .addr   CIRCLE
         .addr   TEXTSTYLE
         .addr   OUTTEXT
-        .addr   0                       ; IRQ entry is unused
+        .addr   IRQ
 
 
 ; ------------------------------------------------------------------------
@@ -103,6 +103,11 @@ TEXTMAGX:       .res    1
 TEXTMAGY:       .res    1
 TEXTDIR:        .res    1
 BGINDEX:        .res    1	; Pen to use for text background
+
+; Double buffer IRQ stuff
+DRAWPAGE:	.res	1
+SWAPREQUEST:	.res	1
+VBLHOOK:	.res    3
 
 text_bitmap:    .res	8*(1+20+1)+1
 ; 8 rows with (one offset-byte plus 20 character bytes plus one fill-byte) plus one 0-offset-byte
@@ -161,6 +166,10 @@ INSTALL:
 	sta	TEXTMAGX
 	sta	TEXTMAGY
 	stz	BGINDEX
+	stz	DRAWPAGE
+	stz	SWAPREQUEST
+	lda	#$60		; rts op-code
+	sta	VBLHOOK
         rts
 
 
@@ -228,23 +237,86 @@ GETERROR:
 ; To do a flip-screen call tgi_ioctl(1, 0)
 ;
 ; To set the background index for text outputs call tgi_ioctl(2, bgindex)
+;
+; To set the frame rate for the display hardware call tgi_ioctl(3, rate)
+;
+; To make a request for swapping the display buffers call tgi_ioctl(4, dataptr)
+; If the value of the char pointed to by the dataptr is 0 then fill in the
+; value of the char with the current state of the swap buffer 0 = idle, 1 = busy
+; If the value is not 0 then activate the swap function at next VBL interrupt
+;
+; Set an address for a subroutine you want to call at every VBL
+; tgi_ioctl(5, hook)
 
 CONTROL:
-	cmp	#2
-	bne	@L0
-	lda	ptr1
-	sta	BGINDEX
+        pha			; Almost all control routines succeed
         lda     #TGI_ERR_OK
 	sta	ERROR
+	pla
+	cmp	#5
+	bne ControlSwapRequest
+
+	lda	ptr1		; Set IRQ routine to be called at VBL
+	sta	VBLHOOK+1
+	lda	ptr1+1
+	sta	VBLHOOK+2
+	lda	#$43		; jmp op-code
+	sta	VBLHOOK
+	rts
+
+ControlSwapRequest:
+	cmp	#4
+	bne	ControlFramerate
+
+	lda	ptr1		; Swap request
+	bne	@L0
+	lda	SWAPREQUEST
+	rts
+@L0:    sta	SWAPREQUEST
+	rts
+
+ControlFramerate:
+	cmp	#3
+	bne	ControlTextBG
+
+       	cmp     #75		; Set framerate
+       	beq     rate75
+       	cmp     #60
+       	beq     rate60
+        cmp     #50
+       	beq     rate50
+        lda     #TGI_ERR_INV_ARG
+	sta	ERROR
         rts
-@L0:
+rate50: lda     #$bd		; 50 Hz
+       	ldx     #$31
+       	bra     setRate
+rate60: lda     #$9e		; 60 Hz
+       	ldx     #$29
+       	bra     setRate
+rate75: lda     #$7e		; 75 Hz
+       	ldx     #$20
+setRate:
+        sta     HTIMBKUP
+       	stx     PBKUP
+	rts
+
+ControlTextBG:
+	cmp	#2
+	bne	ControlFlipScreen
+
+	lda	ptr1		; Set text background color
+	sta	BGINDEX
+	rts
+
+ControlFlipScreen:
 	cmp	#1
-	bne	@L2
-	lda	__sprsys
+	bne	ControlDrawSprite
+
+	lda	__sprsys	; Flip screen
 	eor	#8
 	sta	__sprsys
 	sta	SPRSYS
-
 	lda	__viddma
 	eor	#2
 	sta	__viddma
@@ -252,7 +324,7 @@ CONTROL:
 	ldy	VIEWPAGEL
 	ldx	VIEWPAGEH
 	and	#2
-	beq	@L1
+	beq	NotFlipped
 	clc
 	tya
 	adc	#<8159
@@ -260,13 +332,12 @@ CONTROL:
 	txa
 	adc	#>8159
 	tax
-@L1:
+NotFlipped:
 	sty	DISPADRL
 	stx	DISPADRH
-        lda     #TGI_ERR_OK
-	sta	ERROR
         rts
-@L2:
+
+ControlDrawSprite:
 	lda	ptr1		; Get the sprite address
 	ldx	ptr1+1
 
@@ -280,10 +351,10 @@ draw_sprite:			; Draw it in render buffer
        	lda     #1
        	sta     SPRGO
        	stz     SDONEACK
-@L3:    stz     CPUSLEEP
+@L0:    stz     CPUSLEEP
        	lda     SPRSYS
        	lsr
-       	bcs     @L3
+       	bcs     @L0
        	stz     SDONEACK
         lda     #TGI_ERR_OK
 	sta	ERROR
@@ -373,6 +444,44 @@ SETDRAWPAGE:
         sta     DRAWPAGEL
        	stx     DRAWPAGEH
         rts
+
+; ------------------------------------------------------------------------
+; IRQ: VBL interrupt handler
+;
+
+TIMER0_INTERRUPT = $01
+TIMER1_INTERRUPT = $02
+TIMER2_INTERRUPT = $04
+TIMER3_INTERRUPT = $08
+TIMER4_INTERRUPT = $10
+TIMER5_INTERRUPT = $20
+TIMER6_INTERRUPT = $40
+TIMER7_INTERRUPT = $80
+
+HBL_INTERRUPT = TIMER0_INTERRUPT
+VBL_INTERRUPT = TIMER2_INTERRUPT
+SERIAL_INTERRUPT = TIMER4_INTERRUPT
+
+IRQ:
+	lda	INTSET		; Poll all pending interrupts
+	and	#VBL_INTERRUPT
+        bne	IRQVBL
+	clc			; Not a VBL interrupt - exit
+	rts
+IRQVBL: sta	INTRST		; Clear interrupt
+	lda	SWAPREQUEST
+	bne	@L0
+	lda	DRAWPAGE
+	jsr	SETVIEWPAGE
+	lda	DRAWPAGE
+	eor	#1
+	sta	DRAWPAGE
+	jsr	SETDRAWPAGE
+	stz	SWAPREQUEST
+@L0:
+	jsr	VBLHOOK
+	sec
+	rts
 
 ; ------------------------------------------------------------------------
 ; SETCOLOR: Set the drawing color (in A). The new color is already checked

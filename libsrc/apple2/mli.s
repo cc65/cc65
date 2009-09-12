@@ -5,7 +5,6 @@
 ;
 
         .import         __dos_type
-        .import         iobuf_mli
 
         .include        "mli.inc"
 
@@ -25,7 +24,7 @@ callmli:
         beq     oserr
 
         ; Call MLI and return
-        jsr     iobuf_mli
+        jsr     $BF00		; MLI call entry point
 call:   .byte   $00
         .addr   mliparam
         rts

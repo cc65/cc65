@@ -43,7 +43,7 @@ config.
 cc65 generated programs with the default setup run with the I/O area and the
 kernal ROM enabled. Note that this is a non standard memory layout, and that
 there is no "memory configuration index" for this layout. This means that
-special case has to be taken when changing the configuration, or calling any
+special care has to be taken when changing the configuration, or calling any
 code that does this. The memory configuration register at &dollar;FF00 should
 be saved and restored instead of relying on the memory configuration index
 stored in the zero page.

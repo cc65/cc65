@@ -67,7 +67,7 @@ void InitSearchPaths (void)
     AddSearchPath ("", SEARCH_LIB | SEARCH_OBJ | SEARCH_CFG);
 
     /* Add a standard path for the libraries and objects */
-    AddSearchPath (CC65_LIB, SEARCH_LIB | SEARCH_OBJ);
+    AddSearchPath (CC65_LIB, SEARCH_LIB | SEARCH_OBJ | SEARCH_CFG);
 
     /* Add paths from the environment */
     AddSearchPathFromEnv ("LD65_LIB", SEARCH_LIB);
@@ -75,7 +75,7 @@ void InitSearchPaths (void)
     AddSearchPathFromEnv ("LD65_CFG", SEARCH_CFG);
 
     /* Add compatibility stuff */
-    AddSearchPathFromEnv ("CC65_LIB", SEARCH_LIB | SEARCH_OBJ);
+    AddSearchPathFromEnv ("CC65_LIB", SEARCH_LIB | SEARCH_OBJ | SEARCH_CFG);
 }
 
 

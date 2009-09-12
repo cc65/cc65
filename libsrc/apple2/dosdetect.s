@@ -33,7 +33,7 @@
         .segment        "INIT"
 
 initdostype:
-        lda     ENTRY
+        lda     $BF00
         cmp     #$4C		; Is MLI present? (JMP opcode)
         bne     done
         lda     KVERSION	; ProDOS 8 kernel version

@@ -433,7 +433,7 @@ SETVIEWPAGE:
 ;
 
 SETDRAWPAGE:
-	cmp	#1
+       	cmp	#1
        	beq     @L1                 ; page == maxpages-1
        	lda     #<$de20             ; page 0
        	ldx     #>$de20
@@ -464,25 +464,24 @@ VBL_INTERRUPT = TIMER2_INTERRUPT
 SERIAL_INTERRUPT = TIMER4_INTERRUPT
 
 IRQ:
-	lda	INTSET		; Poll all pending interrupts
-	and	#VBL_INTERRUPT
-        bne	IRQVBL
-	clc			; Not a VBL interrupt - exit
-	rts
-IRQVBL: 
-	lda	SWAPREQUEST
-	beq	@L0
-	lda	DRAWPAGE
-	jsr	SETVIEWPAGE
-	lda	DRAWPAGE
-	eor	#1
-	sta	DRAWPAGE
-	jsr	SETDRAWPAGE
-	stz	SWAPREQUEST
+       	lda	INTSET		; Poll all pending interrupts
+       	and	#VBL_INTERRUPT
+        beq    	IRQEND          ; Exit if not a VBL interrupt
+
+       	lda	SWAPREQUEST
+       	beq	@L0
+       	lda	DRAWPAGE
+       	jsr	SETVIEWPAGE
+       	lda	DRAWPAGE
+       	eor	#1
+       	sta	DRAWPAGE
+       	jsr	SETDRAWPAGE
+       	stz	SWAPREQUEST
 @L0:
-	jsr	VBLHOOK
-	clc
-	rts
+       	jsr	VBLHOOK
+IRQEND:
+       	clc
+       	rts
 
 ; ------------------------------------------------------------------------
 ; SETCOLOR: Set the drawing color (in A). The new color is already checked
@@ -1003,7 +1002,7 @@ text_c:
 ; The Font
 ; 96 characters from ASCII 32 to 127
 ; 8 pixels wide, 8 pixels high
-; bit value 0 = foreground, bit value 1 = background / transparent 
+; bit value 0 = foreground, bit value 1 = background / transparent
 font:
 ; VERSAIL
      	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF  ;32

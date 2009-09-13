@@ -100,6 +100,33 @@ void __fastcall__ lynx_eeprom_erase (unsigned char cell);
 
 
 
+/*****************************************************************************/
+/*                                TGI extras                                 */
+/*****************************************************************************/
+
+
+
+#define tgi_sprite(spr) tgi_ioctl(0, (unsigned)(spr))
+#define tgi_flip() tgi_ioctl(1, 0)
+#define tgi_setbgcolor(bgcol) tgi_ioctl(2, (unsigned)(bgcol))
+#define tgi_setframerate(rate) tgi_ioctl(3, (unsigned)(rate))
+#define tgi_busy() tgi_ioctl(4, 0)
+#define tgi_updatedisplay() tgi_ioctl(4, 1)
+#define tgi_setvblhook(addr) tgi_ioctl(5, (unsigned)(addr))
+
+
+/*****************************************************************************/
+/*                           TGI extras                                      */
+/*****************************************************************************/
+
+#define tgi_sprite(spr) tgi_ioctl(0, (unsigned)(spr))
+#define tgi_flip() tgi_ioctl(1, 0)
+#define tgi_setbgcolor(bgcol) tgi_ioctl(2, (unsigned)(bgcol))
+#define tgi_setframerate(rate) tgi_ioctl(3, (unsigned)(rate))
+#define tgi_busy() tgi_ioctl(4, 0)
+#define tgi_updatedisplay() tgi_ioctl(4, 1)
+#define tgi_setvblhook(addr) tgi_ioctl(5, (unsigned)(addr))
+
 /* End of lynx.h */
 #endif
 

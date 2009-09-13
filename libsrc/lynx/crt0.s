@@ -168,6 +168,8 @@ IRQStub:
 	pha
 	cld
        	jsr    	callirq
+	lda	INTSET
+	sta	INTRST
 	pla
 	plx
 	ply

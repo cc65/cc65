@@ -240,10 +240,11 @@ GETERROR:
 ;
 ; To set the frame rate for the display hardware call tgi_ioctl(3, rate)
 ;
-; To make a request for swapping the display buffers call tgi_ioctl(4, dataptr)
-; If the value of the char pointed to by the dataptr is 0 then fill in the
-; value of the char with the current state of the swap buffer 0 = idle, 1 = busy
-; If the value is not 0 then activate the swap function at next VBL interrupt
+; To check if the drawing engine is busy with the previous swap you can
+; call tgi_ioctl(4, 0). It returns 0 if idle and 1 if busy
+;
+; To update displays you can call tgi_ioctl(4, 1) it will wait for the
+; next VBL interrupt and swap draw and view buffers.
 ;
 ; Set an address for a subroutine you want to call at every VBL
 ; tgi_ioctl(5, hook)
@@ -468,9 +469,9 @@ IRQ:
         bne	IRQVBL
 	clc			; Not a VBL interrupt - exit
 	rts
-IRQVBL: sta	INTRST		; Clear interrupt
+IRQVBL: 
 	lda	SWAPREQUEST
-	bne	@L0
+	beq	@L0
 	lda	DRAWPAGE
 	jsr	SETVIEWPAGE
 	lda	DRAWPAGE
@@ -480,7 +481,7 @@ IRQVBL: sta	INTRST		; Clear interrupt
 	stz	SWAPREQUEST
 @L0:
 	jsr	VBLHOOK
-	sec
+	clc
 	rts
 
 ; ------------------------------------------------------------------------

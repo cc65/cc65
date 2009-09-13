@@ -125,14 +125,29 @@ single-buffer device set draw page and view page to the same value 0 or 1;
 
 The TGI driver has a few Lynx-specific extensions.
 
-Calling tgi_ioctl(0, spr) will display a standard Lynx sprite on screen.
+Calling tgi_sprite(spr) or tgi_ioctl(0, spr) will display a standard Lynx
+sprite on screen.
 
-Calling tgi_ioctl(1, 0) will do a flip screen. If you decide to flip the
-screen then it may be a good idea to call the install-routine for the
-joystick to get that flipped too.
+Calling tgi_flip() or tgi_ioctl(1, 0) will do a flip screen.
 
-Calling tgi_ioctl(2, bgindex) will set the text background color to the index
-defined by bgindex. If bgindex is 0 then the background color is transparent.
+Calling tgi_setbgcolor(bgcolor) or tgi_ioctl(2, bgindex) will set the text
+background color to the index defined by bgindex. If bgindex is 0 then the
+background color is transparent.
+
+To set the framerate of the display hardware call tgi_setframerate(rate) or
+tgi_ioctl(3, rate). The supported framerates are 50, 60 and 75 frames per
+second. Actually there is no real reason to use anything else than 75 frames
+per second.
+
+To check if the drawing engine is busy with the previous swap you can
+call tgi_busy or tgi_ioctl(4, 0). It returns 0 if idle and 1 if busy
+
+To update displays you can call tgi_updatedisplay() or tgi_ioctl(4, 1) it
+will wait for the next VBL interrupt and set the draw buffer to the
+view buffer. The draw buffer is also changed to (drawbuffer xor 1).
+
+Set an address for a subroutine you want to call at every VBL by calling
+tgi_setvblhook(addr) or tgi_ioctl(5, addr).
 
 <sect1>Extended memory drivers<p>
 

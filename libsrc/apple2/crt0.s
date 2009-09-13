@@ -165,8 +165,12 @@ init:   ldx     #zpspace-1
         bne     basic
         
         ; Check ProDOS system bit map
+        lda     $BF58           ; protection for pages $00 - $07
+        and     #%11110000      ; ignore protection of text pages
+        cmp     #%11000000      ; only zero and stack pages are protected
+        bne     basic
         lda     $BF6F           ; protection for pages $B8 - $BF
-        cmp     #%00000001      ; exactly page $BF is protected
+        cmp     #%00000001      ; exactly system global page is protected
         bne     basic
 
         ; No BASIC.SYSTEM so quit to ProDOS dispatcher instead

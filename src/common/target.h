@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -59,7 +59,6 @@ typedef enum {
     TGT_C16,
     TGT_C64,
     TGT_C128,
-    TGT_ACE,
     TGT_PLUS4,
     TGT_CBM510,
     TGT_CBM610,

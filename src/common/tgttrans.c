@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -148,7 +148,6 @@ void TgtTranslateInit (void)
        	case TGT_C16:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
 	case TGT_C64:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
 	case TGT_C128:		memcpy (Tab, CTPET, sizeof (Tab));	break;
-	case TGT_ACE:		memcpy (Tab, CTPET, sizeof (Tab));	break;
 	case TGT_PLUS4:		memcpy (Tab, CTPET, sizeof (Tab));	break;
        	case TGT_CBM510:	memcpy (Tab, CTPET, sizeof (Tab));	break;
 	case TGT_CBM610:	memcpy (Tab, CTPET, sizeof (Tab));	break;
@@ -216,7 +215,7 @@ void TgtTranslateBuf (void* Buf, unsigned Len)
 void TgtTranslateStrBuf (StrBuf* Buf)
 /* Translate a string buffer from the source character set into the target
  * system character set.
- */                                  
+ */
 {
     TgtTranslateBuf (SB_GetBuf (Buf), SB_GetLen (Buf));
 }

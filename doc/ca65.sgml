@@ -3917,7 +3917,6 @@ For better orthogonality, the assembler defines similar symbols as the
 compiler, depending on the target system selected:
 
 <itemize>
-<item><tt/__ACE__/ - Target system is <tt/ace/
 <item><tt/__APPLE2__/ - Target system is <tt/apple2/
 <item><tt/__APPLE2ENH__/ - Target system is <tt/apple2enh/
 <item><tt/__ATARI__/ - Target system is <tt/atari/

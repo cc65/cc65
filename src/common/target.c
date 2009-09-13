@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -59,7 +59,6 @@ const char* TargetNames [TGT_COUNT] = {
     "c16",
     "c64",
     "c128",
-    "ace",
     "plus4",
     "cbm510",
     "cbm610",
@@ -86,7 +85,6 @@ const cpu_t DefaultCPU[TGT_COUNT] = {
     CPU_6502,           /* c16 */
     CPU_6502,           /* c64 */
     CPU_6502,           /* c128 */
-    CPU_6502,           /* ace */
     CPU_6502,           /* plus4 */
     CPU_6502,           /* cbm510 */
     CPU_6502,           /* cbm610 */
@@ -140,4 +138,4 @@ target_t FindTarget (const char* Name)
 
 
 
-                        
+

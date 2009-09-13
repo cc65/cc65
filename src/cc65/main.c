@@ -177,10 +177,6 @@ static void SetSys (const char* Sys)
 	    cbmsys ("__C128__");
 	    break;
 
-	case TGT_ACE:
-	    cbmsys ("__ACE__");
-	    break;
-
 	case TGT_PLUS4:
 	    cbmsys ("__PLUS4__");
 	    break;

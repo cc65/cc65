@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -90,7 +90,6 @@ const TargetDesc Targets[TGT_COUNT] = {
     {   BINFMT_BINARY,  CfgC16          },
     {  	BINFMT_BINARY,	CfgC64          },
     {  	BINFMT_BINARY,	CfgC128         },
-    {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */
     {  	BINFMT_BINARY,	CfgPlus4        },
     {  	BINFMT_BINARY,  CfgCBM510       },
     {  	BINFMT_BINARY,  CfgCBM610       },

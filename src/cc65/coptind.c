@@ -1717,6 +1717,7 @@ unsigned OptPushPop (CodeSeg* S)
     unsigned Changes = 0;
     unsigned Push    = 0;       /* Index of push insn */
     unsigned Pop     = 0;       /* Index of pop insn */
+    unsigned ChgA    = 0;       /* Flag for A changed */
     enum {
         Searching,
         FoundPush,
@@ -1746,6 +1747,7 @@ unsigned OptPushPop (CodeSeg* S)
                 if (E->OPC == OP65_PHA) {
                     /* Found start of sequence */
                     Push  = I;
+                    ChgA  = 0;
                     State = FoundPush;
                 }
                 break;
@@ -1754,6 +1756,7 @@ unsigned OptPushPop (CodeSeg* S)
                 if (E->OPC == OP65_PHA) {
                     /* Inner push/pop, restart */
                     Push = I;
+                    ChgA = 0;
                 } else if (E->OPC == OP65_PLA) {
                     /* Found a matching pop */
                     Pop = I;
@@ -1766,6 +1769,8 @@ unsigned OptPushPop (CodeSeg* S)
                         /* Go into searching mode again */
                         State = Searching;
                     }
+                } else if (E->Chg & REG_A) {
+                    ChgA = 1;
                 }
                 break;
 
@@ -1776,7 +1781,8 @@ unsigned OptPushPop (CodeSeg* S)
                  *     later, we may replace the PHA by the store and remove
                  *     pla if several other conditions are met.
                  *   - If this instruction is not a conditional branch, and A
-                 *     is unused later, we may remove PHA and PLA.
+                 *     is either unused later, or not changed by the code
+                 *     between push and pop, we may remove PHA and PLA.
                  */
                 if (E->OPC == OP65_STA                  &&
                     !RegAUsed (S, I+1)                  &&
@@ -1799,7 +1805,7 @@ unsigned OptPushPop (CodeSeg* S)
                     ++Changes;
 
                 } else if ((E->Info & OF_CBRA) == 0     &&
-                           !RegAUsed (S, I)) {
+                           (!RegAUsed (S, I) || !ChgA)) {          
 
                     /* We can remove the PHA and PLA instructions */
                     CS_DelEntry (S, Pop);

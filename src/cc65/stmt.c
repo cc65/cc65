@@ -544,101 +544,100 @@ int Statement (int* PendingToken)
 	*PendingToken = 0;
     }
 
-    /* Check for a label */
-    if (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
-
-	/* Special handling for a label */
+    /* Check for a label. A label is always part of a statement, it does not
+     * replace one.
+     */
+    while (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
+	/* Handle the label */
 	DoLabel ();
         CheckLabelWithoutStatement ();
+    }
 
-    } else {
+    switch (CurTok.Tok) {
 
-     	switch (CurTok.Tok) {
+        case TOK_LCURLY:
+            NextToken ();
+            GotBreak = CompoundStatement ();
+            CheckTok (TOK_RCURLY, "`{' expected", PendingToken);
+            return GotBreak;
 
-     	    case TOK_LCURLY:
-	        NextToken ();
-		GotBreak = CompoundStatement ();
-       	        CheckTok (TOK_RCURLY, "`{' expected", PendingToken);
-	        return GotBreak;
+        case TOK_IF:
+            return IfStatement ();
 
-     	    case TOK_IF:
-     	    	return IfStatement ();
+        case TOK_WHILE:
+            WhileStatement ();
+            break;
 
-     	    case TOK_WHILE:
-     	    	WhileStatement ();
-	    	break;
+        case TOK_DO:
+            DoStatement ();
+            break;
 
-	    case TOK_DO:
-	    	DoStatement ();
-	    	break;
+        case TOK_SWITCH:
+            SwitchStatement ();
+            break;
 
-	    case TOK_SWITCH:
-	    	SwitchStatement ();
-	    	break;
+        case TOK_RETURN:
+            ReturnStatement ();
+            CheckSemi (PendingToken);
+            return 1;
 
-	    case TOK_RETURN:
-	    	ReturnStatement ();
-	    	CheckSemi (PendingToken);
-	    	return 1;
+        case TOK_BREAK:
+            BreakStatement ();
+            CheckSemi (PendingToken);
+            return 1;
 
-	    case TOK_BREAK:
-		BreakStatement ();
-       	    	CheckSemi (PendingToken);
-		return 1;
+        case TOK_CONTINUE:
+            ContinueStatement ();
+            CheckSemi (PendingToken);
+            return 1;
 
-	    case TOK_CONTINUE:
-		ContinueStatement ();
-	    	CheckSemi (PendingToken);
-		return 1;
+        case TOK_FOR:
+            ForStatement ();
+            break;
 
-	    case TOK_FOR:
-		ForStatement ();
-		break;
+        case TOK_GOTO:
+            GotoStatement ();
+            CheckSemi (PendingToken);
+            return 1;
 
-	    case TOK_GOTO:
-		GotoStatement ();
-	    	CheckSemi (PendingToken);
-		return 1;
+        case TOK_SEMI:
+            /* Ignore it */
+            CheckSemi (PendingToken);
+            break;
 
-	    case TOK_SEMI:
-		/* Ignore it */
-		CheckSemi (PendingToken);
-		break;
+        case TOK_PRAGMA:
+            DoPragma ();
+            break;
 
-	    case TOK_PRAGMA:
-		DoPragma ();
-     		break;
+        case TOK_CASE:
+            CaseLabel ();
+            CheckLabelWithoutStatement ();
+            break;
 
-            case TOK_CASE:
-                CaseLabel ();
-                CheckLabelWithoutStatement ();
-                break;
+        case TOK_DEFAULT:
+            DefaultLabel ();
+            CheckLabelWithoutStatement ();
+            break;
 
-            case TOK_DEFAULT:
-                DefaultLabel ();
-                CheckLabelWithoutStatement ();
-                break;
-
-	    default:
-                /* Remember the current code position */
-                GetCodePos (&Start);
-	        /* Actual statement */
-                ExprWithCheck (hie0, &Expr);
-                /* Load the result only if it is an lvalue and the type is
-                 * marked as volatile. Otherwise the load is useless.
-                 */
-                if (ED_IsLVal (&Expr) && IsQualVolatile (Expr.Type)) {
-                    LoadExpr (CF_NONE, &Expr);
-                }
-                /* If the statement didn't generate code, and is not of type
-                 * void, emit a warning.
-                 */
-                GetCodePos (&End);
-                if (CodeRangeIsEmpty (&Start, &End) && !IsTypeVoid (Expr.Type)) {
-                    Warning ("Statement has no effect");
-                }
-	    	CheckSemi (PendingToken);
-	}
+        default:
+            /* Remember the current code position */
+            GetCodePos (&Start);
+            /* Actual statement */
+            ExprWithCheck (hie0, &Expr);
+            /* Load the result only if it is an lvalue and the type is
+             * marked as volatile. Otherwise the load is useless.
+             */
+            if (ED_IsLVal (&Expr) && IsQualVolatile (Expr.Type)) {
+                LoadExpr (CF_NONE, &Expr);
+            }
+            /* If the statement didn't generate code, and is not of type
+             * void, emit a warning.
+             */
+            GetCodePos (&End);
+            if (CodeRangeIsEmpty (&Start, &End) && !IsTypeVoid (Expr.Type)) {
+                Warning ("Statement has no effect");
+            }
+            CheckSemi (PendingToken);
     }
     return 0;
 }

@@ -67,6 +67,7 @@ function.
 <itemize>
 <item>_dos_type
 <item><ref id="get_ostype" name="get_ostype">
+<item>rebootafterexit
 </itemize>
 
 
@@ -75,6 +76,7 @@ function.
 <itemize>
 <item>_dos_type
 <item><ref id="get_ostype" name="get_ostype">
+<item>rebootafterexit
 <item>textframe
 <item>textframexy
 <item><ref id="videomode" name="videomode">

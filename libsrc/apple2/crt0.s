@@ -2,7 +2,7 @@
 ; Startup code for cc65 (Apple2 version)
 ;
 
-        .export         _exit
+        .export         _exit, done, return
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
         .import         zerobss
         .import    	initlib, donelib
@@ -165,10 +165,6 @@ init:   ldx     #zpspace-1
         bne     basic
         
         ; Check ProDOS system bit map
-        lda     $BF58           ; protection for pages $00 - $07
-        and     #%11110000      ; ignore protection of text pages
-        cmp     #%11000000      ; only zero and stack pages are protected
-        bne     basic
         lda     $BF6F           ; protection for pages $B8 - $BF
         cmp     #%00000001      ; exactly system global page is protected
         bne     basic
@@ -272,7 +268,7 @@ reset:  stx     SOFTEV
         sta     SOFTEV+1
         eor     #$A5
         sta     PWREDUP
-        rts
+return: rts
 
         ; Quit to ProDOS dispatcher
 quit:   jsr     $BF00           ; MLI call entry point

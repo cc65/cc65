@@ -91,6 +91,7 @@ S_OBJS=	_scrsize.o	\
         randomize.o     \
         rdkey.o         \
      	read.o          \
+     	reboot.o        \
      	revers.o	\
 	rwcommon.o	\
 	syschdir.o	\

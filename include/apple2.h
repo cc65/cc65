@@ -140,6 +140,9 @@ extern unsigned char _dos_type;
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */
 
+void rebootafterexit (void);
+/* Reboot machine after program termination has completed. */
+
 /* The following #defines will cause the matching functions calls in conio.h
  * to be overlaid by macros with the same names, saving the function call
  * overhead.

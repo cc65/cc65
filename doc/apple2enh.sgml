@@ -127,6 +127,7 @@ usage.
 <itemize>
 <item>_dos_type
 <item>get_ostype
+<item>rebootafterexit
 <item>textframe
 <item>textframexy
 <item>videomode

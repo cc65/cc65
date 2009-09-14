@@ -580,6 +580,13 @@ unsigned OptJumpTarget1 (CodeSeg* S)
 	       	goto NextEntry;
 	    }
 
+            /* The entry preceeding the branch target may not be the branch
+             * insn.
+             */
+            if (T1 == E2) {
+                goto NextEntry;
+            }
+
 	    /* Get the entry preceeding the jump */
 	    E1 = CS_GetEntry (S, I);
 
@@ -594,6 +601,7 @@ unsigned OptJumpTarget1 (CodeSeg* S)
 	     * not already have one.
 	     */
       	    TL1 = CS_GenLabel (S, T1);
+            printf ("Generated label %s\n", TL1->Name);
 
 	    /* Change the jump target to point to this new label */
 	    CS_MoveLabelRef (S, E2, TL1);

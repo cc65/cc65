@@ -601,7 +601,6 @@ unsigned OptJumpTarget1 (CodeSeg* S)
 	     * not already have one.
 	     */
       	    TL1 = CS_GenLabel (S, T1);
-            printf ("Generated label %s\n", TL1->Name);
 
 	    /* Change the jump target to point to this new label */
 	    CS_MoveLabelRef (S, E2, TL1);

@@ -564,12 +564,13 @@ unsigned OptJumpTarget1 (CodeSeg* S)
       	/* Get next entry */
        	E2 = CS_GetNextEntry (S, I);
 
-	/* Check if we have a jump or branch, and a matching label, which
-	 * is not attached to the jump itself
+	/* Check if we have a jump or branch without a label attached, and
+         * a jump target, which is not attached to the jump itself
 	 */
-       	if (E2 != 0 	 		&&
+       	if (E2 != 0 	     		&&
 	    (E2->Info & OF_UBRA) != 0 	&&
-	    E2->JumpTo	 		&&
+            !CE_HasLabel (E2)           &&
+	    E2->JumpTo	     		&&
 	    E2->JumpTo->Owner != E2) {
 
 	    /* Get the entry preceeding the branch target */
@@ -1805,7 +1806,7 @@ unsigned OptPushPop (CodeSeg* S)
                     ++Changes;
 
                 } else if ((E->Info & OF_CBRA) == 0     &&
-                           (!RegAUsed (S, I) || !ChgA)) {          
+                           (!RegAUsed (S, I) || !ChgA)) {
 
                     /* We can remove the PHA and PLA instructions */
                     CS_DelEntry (S, Pop);

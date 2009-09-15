@@ -72,8 +72,9 @@ C_OBJS =	_afailed.o	        \
 		rewind.o	        \
 		sleep.o		        \
                 strftime.o              \
-		strxfrm.o	        \
 		strtok.o	        \
+                strtol.o                \
+		strxfrm.o	        \
                 system.o                \
                 timezone.o
 

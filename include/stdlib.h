@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -53,6 +53,12 @@ typedef struct {
     int rem;
     int quot;
 } div_t;
+
+/* Return type of the ldiv function (which currently doesn't exist) */
+typedef struct {
+    long rem;
+    long quot;
+} ldiv_t;
 
 /* Memory management */
 void* __fastcall__ malloc (size_t size);
@@ -107,6 +113,8 @@ void __fastcall__ exit (int ret);
 char* __fastcall__ getenv (const char* name);
 void __fastcall__ qsort (void* base, size_t count, size_t size,
 	                 int (*compare) (const void*, const void*));
+long __fastcall__ strtol (const char* nptr, char** endptr, int base);
+unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base); 
 int system (const char* s);
 
 /* Non-ANSI functions */

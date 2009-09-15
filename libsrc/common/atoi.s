@@ -6,7 +6,7 @@
 ;
 
 	.export		_atoi, _atol
-       	.import	       	__ctype
+       	.import	       	negeax, __ctype
 	.importzp	sreg, ptr1, ptr2, tmp1
 
         .include        "ctype.inc"
@@ -111,48 +111,28 @@ L7:	iny
    	inc	ptr1+1
    	bne	L6
 
-; Conversion done. Be shure to negate the value if needed.
+; Conversion done. Load the low 16 bit into A/X
 
-L8:	lda	ptr2
-	ldx	ptr2+1
+L8:     lda     ptr2
+        ldx     ptr2+1
+
+; Negate the value if necessary, otherwise we're done
+
 	ldy	tmp1		; sign
-	beq	L9
+	beq	L9              ; Branch if positive
 
 ; Negate the 32 bit value in ptr2/sreg
 
-	sec
-	lda	ptr2
-	eor	#$FF
-	adc	#0
-	sta	ptr2
-	lda	ptr2+1
-	eor	#$FF
-	adc	#0
-	sta	ptr2+1
-	lda	sreg
-	eor	#$FF
-	adc	#0
-	sta	sreg
-	lda	sreg+1
-	eor	#$FF
-	adc	#0
-	sta	sreg+1
-
-; Done, load the low 16 bit into A/X
-
-L9:	lda	ptr2
-	ldx	ptr2+1		; get value
-	rts
+        jmp     negeax
 
 ;
 ; Helper functions
 ;
 
-mul2:
-	asl	ptr2
+mul2:   asl	ptr2
     	rol	ptr2+1
     	rol	sreg
     	rol	sreg+1		; * 2
-    	rts
+L9:     rts
 
 

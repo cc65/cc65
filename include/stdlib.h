@@ -114,8 +114,8 @@ char* __fastcall__ getenv (const char* name);
 void __fastcall__ qsort (void* base, size_t count, size_t size,
 	                 int (*compare) (const void*, const void*));
 long __fastcall__ strtol (const char* nptr, char** endptr, int base);
-unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base); 
-int system (const char* s);
+unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base);
+int __fastcall__ system (const char* s);
 
 /* Non-ANSI functions */
 void __fastcall__ _swap (void* p, void* q, size_t size);

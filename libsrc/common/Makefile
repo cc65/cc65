@@ -74,6 +74,7 @@ C_OBJS =	_afailed.o	        \
                 strftime.o              \
 		strtok.o	        \
                 strtol.o                \
+                strtoul.o               \
 		strxfrm.o	        \
                 system.o                \
                 timezone.o

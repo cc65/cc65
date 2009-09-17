@@ -162,6 +162,7 @@ _exit:  jsr     donelib         ; Run module destructors
 noret:  bra     noret
 
 
+	.segment "CODE"
 IRQStub:
 	phy
 	phx

@@ -146,9 +146,6 @@ To update displays you can call tgi_updatedisplay() or tgi_ioctl(4, 1) it
 will wait for the next VBL interrupt and set the draw buffer to the
 view buffer. The draw buffer is also changed to (drawbuffer xor 1).
 
-Set an address for a subroutine you want to call at every VBL by calling
-tgi_setvblhook(addr) or tgi_ioctl(5, addr).
-
 <sect1>Extended memory drivers<p>
 
 No extended memory drivers are currently available for the Lynx.

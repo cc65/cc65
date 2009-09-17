@@ -107,7 +107,6 @@ BGINDEX:        .res    1	; Pen to use for text background
 ; Double buffer IRQ stuff
 DRAWPAGE:	.res	1
 SWAPREQUEST:	.res	1
-VBLHOOK:	.res    3
 
 text_bitmap:    .res	8*(1+20+1)+1
 ; 8 rows with (one offset-byte plus 20 character bytes plus one fill-byte) plus one 0-offset-byte
@@ -168,8 +167,6 @@ INSTALL:
 	stz	BGINDEX
 	stz	DRAWPAGE
 	stz	SWAPREQUEST
-	lda	#$60		; rts op-code
-	sta	VBLHOOK
         rts
 
 
@@ -245,27 +242,13 @@ GETERROR:
 ;
 ; To update displays you can call tgi_ioctl(4, 1) it will wait for the
 ; next VBL interrupt and swap draw and view buffers.
-;
-; Set an address for a subroutine you want to call at every VBL
-; tgi_ioctl(5, hook)
 
 CONTROL:
         pha			; Almost all control routines succeed
         lda     #TGI_ERR_OK
 	sta	ERROR
 	pla
-	cmp	#5
-	bne ControlSwapRequest
 
-	lda	ptr1		; Set IRQ routine to be called at VBL
-	sta	VBLHOOK+1
-	lda	ptr1+1
-	sta	VBLHOOK+2
-	lda	#$43		; jmp op-code
-	sta	VBLHOOK
-	rts
-
-ControlSwapRequest:
 	cmp	#4
 	bne	ControlFramerate
 
@@ -280,6 +263,7 @@ ControlFramerate:
 	cmp	#3
 	bne	ControlTextBG
 
+	lda	ptr1
        	cmp     #75		; Set framerate
        	beq     rate75
        	cmp     #60
@@ -478,7 +462,6 @@ IRQ:
        	jsr	SETDRAWPAGE
        	stz	SWAPREQUEST
 @L0:
-       	jsr	VBLHOOK
 IRQEND:
        	clc
        	rts

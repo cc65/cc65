@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	 			   stddef.h				     */
+/*	     			   stddef.h				     */
 /*                                                                           */
-/*	 		      Common definitions			     */
+/*	     		      Common definitions			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,7 +45,7 @@ typedef int ptrdiff_t;
 #endif
 #ifndef _HAVE_wchar_t
 #define _HAVE_wchar_t
-typedef unsigned short wchar_t;
+typedef char wchar_t;
 #endif
 #ifndef _HAVE_size_t
 #define _HAVE_size_t

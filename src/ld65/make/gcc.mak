@@ -10,12 +10,14 @@ EXE  	= ld65
 # Library dir
 COMMON	= ../common
 
-# The linker library search path. Default is "/usr/lib/cc65/lib/" if nothing
-# is defined. You may use CC65_LIB=foo on the command line to override it.
-CC65_LIB = \"/usr/lib/cc65/lib/\"
+# Several search paths. You may redefine these on the command line
+LD65_LIB = \"/usr/lib/cc65/lib/\"
+LD65_OBJ = \"/usr/lib/cc65/lib/\"
+LD65_CFG = \"/usr/lib/cc65/cfg/\"
 
 #
-CFLAGS = -g -O2 -Wall -W -std=c89 -I$(COMMON) -DCC65_LIB=$(CC65_LIB)
+CFLAGS = -g -O2 -Wall -W -std=c89 -I$(COMMON) 
+CFLAGS += -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=

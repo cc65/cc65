@@ -42,19 +42,6 @@
 
 
 /*****************************************************************************/
-/*	       	     	     	     Data		     		     */
-/*****************************************************************************/
-
-
-
-/* If the standard library search path is not given, use a hardcoded one */
-#ifndef CC65_LIB
-#define CC65_LIB        "/usr/lib/cc65/lib/"
-#endif
-
-
-
-/*****************************************************************************/
 /*	       	     	     	     Code		     		     */
 /*****************************************************************************/
 
@@ -66,8 +53,16 @@ void InitSearchPaths (void)
     /* Always search all stuff in the current directory */
     AddSearchPath ("", SEARCH_LIB | SEARCH_OBJ | SEARCH_CFG);
 
-    /* Add a standard path for the libraries and objects */
-    AddSearchPath (CC65_LIB, SEARCH_LIB | SEARCH_OBJ | SEARCH_CFG);
+    /* Add some compiled in search paths if defined on the command line */
+#if defined(LD65_LIB)
+    AddSearchPath (LD65_LIB, SEARCH_LIB);
+#endif
+#if defined(LD65_OBJ)
+    AddSearchPath (LD65_OBJ, SEARCH_OBJ);
+#endif
+#if defined(LD65_CFG)
+    AddSearchPath (LD65_CFG, SEARCH_CFG);
+#endif
 
     /* Add paths from the environment */
     AddSearchPathFromEnv ("LD65_LIB", SEARCH_LIB);

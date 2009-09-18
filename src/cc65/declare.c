@@ -1758,8 +1758,9 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
 
     /* Special handling for a character array initialized by a literal */
     if (IsTypeChar (ElementType) &&
-        (CurTok.Tok == TOK_SCONST ||
-        (CurTok.Tok == TOK_LCURLY && NextTok.Tok == TOK_SCONST))) {
+        (CurTok.Tok == TOK_SCONST || CurTok.Tok == TOK_WCSCONST ||
+        (CurTok.Tok == TOK_LCURLY &&
+         (NextTok.Tok == TOK_SCONST || NextTok.Tok == TOK_WCSCONST)))) {
 
         /* Char array initialized by string constant */
         int NeedParen;

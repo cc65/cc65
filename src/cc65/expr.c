@@ -740,6 +740,7 @@ static void Primary (ExprDesc* E)
             break;
 
         case TOK_SCONST:
+        case TOK_WCSCONST:
             /* String literal */
             E->Type  = GetCharArrayType (GetLiteralPoolOffs () - CurTok.IVal);
             E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL;

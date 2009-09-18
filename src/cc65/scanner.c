@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -410,21 +410,36 @@ static void StringConst (void)
     NextTok.IVal = GetLiteralPoolOffs ();
     NextTok.Tok  = TOK_SCONST;
 
-    /* Be sure to concatenate strings */
-    while (CurC == '\"') {
+    /* Concatenate strings. If at least one of the concenated strings is a wide
+     * character literal, the whole string is a wide char literal, otherwise
+     * it's a normal string literal.
+     */
+    while (1) {
 
-	/* Skip the quote char */
-	NextChar ();
+        /* Check if this is a normal or a wide char string */
+        if (CurC == 'L' && NextC == '\"') {
+            /* Wide character literal */
+            NextTok.Tok = TOK_WCSCONST;
+            NextChar ();
+            NextChar ();
+        } else if (CurC == '\"') {
+            /* Skip the quote char */
+    	    NextChar ();
+        } else {
+            /* No string */
+            break;
+        }
 
-	while (CurC != '\"') {
-	    if (CurC == '\0') {
-	     	Error ("Unexpected newline");
-	     	break;
-	    }
-	    AddLiteralChar (ParseChar ());
-	}
+        /* Read until end of string */
+    	while (CurC != '\"') {
+    	    if (CurC == '\0') {
+    	     	Error ("Unexpected newline");
+    	     	break;
+    	    }
+    	    AddLiteralChar (ParseChar ());
+    	}
 
-	/* Skip closing quote char if there was one */
+    	/* Skip closing quote char if there was one */
      	NextChar ();
 
 	/* Skip white space, read new input */
@@ -718,6 +733,13 @@ void NextToken (void)
      	return;
     }
 
+    /* Check for wide character literals */
+    if (CurC == 'L' && NextC == '\"') {
+        StringConst ();
+        return;
+    }
+
+    /* Check for keywords and identifiers */
     if (IsSym (token)) {
 
      	/* Check for a keyword */

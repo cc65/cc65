@@ -72,11 +72,9 @@ C_OBJS =	_afailed.o	        \
 		rewind.o	        \
 		sleep.o		        \
                 strftime.o              \
-                strtoimax.o             \
 		strtok.o	        \
                 strtol.o                \
                 strtoul.o               \
-                strtoumax.o             \
 		strxfrm.o	        \
                 system.o                \
                 timezone.o
@@ -180,6 +178,8 @@ S_OBJS = 	_cwd.o          \
 		strrchr.o	\
 		strspn.o	\
 		strstr.o	\
+                strtoimax.o     \
+                strtoumax.o     \
 		strupper.o	\
                 time.o          \
 		tolower.o	\

@@ -11,7 +11,7 @@
 Summary: Crosscompiler/Crossassembler for 6502 systems
 %define name cc65
 Name: %{name}
-%define version 2.11.0
+%define version 2.13.0
 Version: %{version}
 Release: 1
 License: Freeware with exceptions - see docs
@@ -423,6 +423,7 @@ programs for the Supervision Game console using the cc65 crosscompiler.
 
 %files supervision
 %attr(644,root,root)		/usr/lib/cc65/lib/supervision.lib
+%attr(644,root,root)		/usr/lib/cc65/cfg/supervision-*.cfg
 
 
 
@@ -466,7 +467,7 @@ make -C doc html
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,ser,tgi}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,cfg,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,ser,tgi}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin
@@ -479,6 +480,7 @@ install -s -m 755 src/da65/da65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/grc/grc $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT/usr/bin
+
 # Libraries and includes
 install -m 644 libsrc/*.lib $RPM_BUILD_ROOT/usr/lib/cc65/lib
 install -m 644 include/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include
@@ -489,6 +491,11 @@ install -m 644 include/mouse/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/mouse
 install -m 644 include/sys/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/sys
 install -m 644 include/tgi/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/tgi
 install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
+
+# Additional linker configurations
+for config in src/ld65/cfg/*-*.cfg; do
+    install -m 644 ${config} $RPM_BUILD_ROOT/usr/lib/cc65/cfg
+done
 
 # Drivers
 install -m 644 libsrc/*.emd $RPM_BUILD_ROOT/usr/lib/cc65/emd

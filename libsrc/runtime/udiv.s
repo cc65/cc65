@@ -64,10 +64,6 @@ L1:	pla
 ;---------------------------------------------------------------------------
 ; 16by8 division
 
-udiv16by8:
-        lda	#0
- 	sta	ptr1+1
- 	ldy	#16
 udiv16by8a:
 @L0:	asl	sreg
   	rol	sreg+1

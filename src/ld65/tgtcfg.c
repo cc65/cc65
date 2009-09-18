@@ -48,9 +48,6 @@
 
 
 
-/* An empty config */
-static const char CfgEmpty[] = "";
-
 /* Actual target configurations, converted into C strings by a perl script */
 #include "apple2.inc"
 #include "apple2enh.inc"

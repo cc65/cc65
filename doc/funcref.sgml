@@ -1847,7 +1847,7 @@ extended memory that should be supported. There is no autodetect capability.
 memory and returns a pointer to the page frame. Depending on the hardware
 and driver, the data is either mapped into the address space or transfered
 into a buffer. If you don't need the actual contents of the page (for example
-because you're going to overwrite it completely, it is better to call
+because you're going to overwrite it completely), it is better to call
 <tt/<ref id="em_use" name="em_use">/ instead. <tt/em_use/ will not transfer the
 data if it is possible to avoid that.
 <tag/Limits/<itemize>

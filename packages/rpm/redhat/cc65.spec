@@ -115,6 +115,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/mou/a2.*.mou
 %attr(644,root,root) 		/usr/lib/cc65/ser/a2.*.ser
 %attr(644,root,root) 		/usr/lib/cc65/tgi/a2.*.tgi
+%attr(644,root,root)   	       	/usr/lib/cc65/cfg/apple2-*.cfg
 
 
 

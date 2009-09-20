@@ -46,7 +46,6 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 # Object files
 
 OBJS =  cgetc.o         \
-        comlynx.o       \
         crt0.o          \
 	ctype.o		\
         eeprom.o        \
@@ -65,7 +64,7 @@ JOYS = lynx-stdjoy.joy
 
 MOUS =
 
-SERS =
+SERS = lynx-comlynx.ser
 
 TGIS = lynx-160-102-16.tgi
 

@@ -93,6 +93,8 @@ SER_BAUD_38400         	=       $10
 SER_BAUD_57600         	=       $11
 SER_BAUD_115200        	=       $12
 SER_BAUD_230400        	=       $13
+SER_BAUD_31250		=	$14
+SER_BAUD_62500		=	$15
 
 ; Data bit settings
 SER_BITS_5             	=       $00

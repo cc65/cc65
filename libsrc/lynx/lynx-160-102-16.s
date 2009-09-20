@@ -196,6 +196,9 @@ UNINSTALL:
 ;
 
 INIT:
+; Enable interrupts for VBL
+	lda	#$80
+	tsb	VTIMCTLA
 ; Done, reset the error code
         lda     #TGI_ERR_OK
         sta     ERROR
@@ -433,19 +436,6 @@ SETDRAWPAGE:
 ; ------------------------------------------------------------------------
 ; IRQ: VBL interrupt handler
 ;
-
-TIMER0_INTERRUPT = $01
-TIMER1_INTERRUPT = $02
-TIMER2_INTERRUPT = $04
-TIMER3_INTERRUPT = $08
-TIMER4_INTERRUPT = $10
-TIMER5_INTERRUPT = $20
-TIMER6_INTERRUPT = $40
-TIMER7_INTERRUPT = $80
-
-HBL_INTERRUPT = TIMER0_INTERRUPT
-VBL_INTERRUPT = TIMER2_INTERRUPT
-SERIAL_INTERRUPT = TIMER4_INTERRUPT
 
 IRQ:
        	lda	INTSET		; Poll all pending interrupts

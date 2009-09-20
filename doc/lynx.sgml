@@ -168,8 +168,54 @@ No mouse drivers are currently available for the Lynx.
 
 <sect1>RS232 device drivers<p>
 
-No serial drivers are currently available for the Lynx.
+<descrip>
 
+  The ComLynx port has Tx and Rx wired together. Every byte is sent
+  to all connected Lynxes. Only one Lynx can send at a time. There is no
+  protocol created for communication. You are on your own.
+
+  If the Lynx returns framing error then it is likely that another Lynx is
+  sending data at the same time.
+
+  The Lynx can also send a break and receive a break. The Lynx break is
+  recognized if the bit is down for 24 bit cycles or more.
+
+  To send a break you just set the break bit. The length of the break depends
+  on how long this bit is down.
+
+  The driver supports the baudrates:
+  <itemize>
+  <item>62500
+  <item>31250
+  <item>9600
+  <item>7200
+  <item>4800
+  <item>3600
+  <item>2400
+  <item>1800
+  <item>1200
+  <item>600
+  <item>300
+  <item>150
+  <item>134.5
+  <item>110
+  <item>75
+  </itemize>
+  The parity bit supports MARK and SPACE. It also supports EVEN and ODD parity
+  but the parity bit is included in the calculation. Most of us don't want it
+  this way. But there is nothing we can do about it. Just don't use EVEN or ODD
+  when communicating to other equipment than the Lynx. 
+
+  There is always only one stop bit. And the data length is always 8 bits.
+
+  We have no handshaking available. Even software handshake is impossible
+  as ComLynx has only one wire for the data.
+
+  Both transmit and receive are interrupt driven. The driver reserves a fixed
+  area $200-$2ff for the transmit ring buffer and $300-$3ff for the receive
+  ring buffer. This area can not be used at startup for anything as the Lynx
+  ROM needs this area for decryption purposes.
+</descrip><p>
 
 
 <sect>Limitations<p>

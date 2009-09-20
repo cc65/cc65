@@ -191,12 +191,13 @@ geoslib:
 # Lynx
 
 lynxlib:
-	for i in lynx common conio runtime em joystick tgi zlib; do \
+	for i in lynx common conio runtime em joystick serial tgi zlib; do \
 	    $(MAKE) SYS=lynx -C $$i || exit 1; \
 	    $(AR) a lynx.lib $$i/*.o;\
 	done
 	cp lynx/*.joy .
 	cp lynx/*.tgi .
+	cp lynx/*.ser .
 
 #-----------------------------------------------------------------------------
 # NES

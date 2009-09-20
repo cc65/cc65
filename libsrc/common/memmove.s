@@ -1,5 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2003-08-20
+; Performance increase (about 20%) by
+; Christian Krueger, 2009-09-13
 ;
 ; void* __fastcall__ memmove (void* dest, const void* src, size_t size);
 ;
@@ -7,7 +9,7 @@
 ;
 
        	.export	    	_memmove
-        .import         memcpy_getparams, memcpy_upwards
+        .import         memcpy_getparams, memcpy_upwards, popax
        	.importzp      	ptr1, ptr2, ptr3, ptr4, tmp1
 
         .macpack        generic
@@ -15,9 +17,6 @@
 
 ; ----------------------------------------------------------------------
 _memmove:
-        sta     ptr4
-        stx     ptr4+1          ; Size -> ptr4
-
         jsr     memcpy_getparams
 
 ; Check for the copy direction. If dest < src, we must copy upwards (start at
@@ -33,35 +32,53 @@ _memmove:
 ; Copy downwards. Adjust the pointers to the end of the memory regions.
 
         lda	ptr1+1
-       	add	ptr4+1
+       	add	ptr3+1
 	sta	ptr1+1
 
 	lda	ptr2+1
-	add	ptr4+1
+	add	ptr3+1
 	sta	ptr2+1
 
-; Load the low offset into Y, and the counter low byte into X.
+; handle fractions of a page size first
 
-        ldy     ptr4
-        ldx     ptr3
-        jmp     @L2
+	ldy	ptr3		; count, low byte
+	bne	@entry		; something to copy?
+	beq	PageSizeCopy	; here like bra...
 
-; Copy loop
+@copyByte:
+	lda	(ptr1),y
+	sta     (ptr2),y
+@entry:
+	dey
+	bne	@copyByte
+	lda	(ptr1),y	; copy remaining byte
+	sta     (ptr2),y
 
-@L1:    dey
+PageSizeCopy:			; assert Y = 0
+	ldx	ptr3+1		; number of pages
+	beq	done		; none? -> done
+
+@initBase:
+	dec	ptr1+1		; adjust base...
+	dec	ptr2+1
+	dey			; in entry case: 0 -> FF
+        lda     (ptr1),y	; need to copy this 'intro byte'
+        sta     (ptr2),y	; to 'land' later on Y=0! (as a result of the '.repeat'-block!)
+	dey			; FF ->FE
+@copyBytes:
+	.repeat 2		; Unroll this a bit to make it faster...
         lda     (ptr1),y
         sta     (ptr2),y
-
-@L2:    inx                     ; Bump counter low byte
-        bne     @L1
-        dec     ptr1+1
-        dec     ptr2+1
-        inc     ptr3+1          ; Bump counter high byte
-        bne     @L1
+	dey
+	.endrepeat
+@copyEntry:			; in entry case: 0 -> FF
+	bne	@copyBytes
+	lda     (ptr1),y	; Y = 0, copy last byte
+        sta     (ptr2),y
+	dex			; one page to copy less
+	bne	@initBase	; still a page to copy?
 
 ; Done, return dest
 
-done:  	lda	ptr2
-       	ldx    	tmp1            ; get function result (dest)
-       	rts
-
+done:  	jmp	popax		; Pop ptr and return as result
+                

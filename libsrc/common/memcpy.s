@@ -1,5 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2003-08-20
+; Performance increase (about 20%) by
+; Christian Krueger, 2009-09-13
 ;
 ; void* __fastcall__ memcpy (void* dest, const void* src, size_t n);
 ;
@@ -10,61 +12,69 @@
 
        	.export	    	_memcpy, memcpy_upwards, memcpy_getparams
        	.import	    	popax
-       	.importzp      	ptr1, ptr2, ptr3, tmp1
+       	.importzp      	sp, ptr1, ptr2, ptr3
 
 ; ----------------------------------------------------------------------
 _memcpy:
         jsr     memcpy_getparams
 
-memcpy_upwards:
-        ldy     #0
-        ldx     ptr3            ; Get low counter byte
+memcpy_upwards:			; assert Y = 0
+	ldx	ptr3+1 		; Get high byte of n
+       	beq    	L2		; Jump if zero
 
-; Copy loop
+L1:	.repeat 2		; Unroll this a bit to make it faster...
+	lda	(ptr1),Y	; copy a byte
+	sta	(ptr2),Y
+	iny
+	.endrepeat
+	bne	L1
+	inc	ptr1+1
+	inc	ptr2+1
+	dex			; Next 256 byte block
+	bne	L1		; Repeat if any
 
-@L1:    inx                     ; Bump low counter byte
-        beq     @L3             ; Jump on overflow
-@L2:    lda     (ptr1),y
-        sta     (ptr2),y
-        iny
-        bne     @L1
-       	inc   	ptr1+1		; Bump pointers
-       	inc   	ptr2+1
-        bne     @L1             ; Branch always
-@L3:    inc     ptr3+1          ; Bump high counter byte
-        bne     @L2
+	; the following section could be 10% faster if we were able to copy
+	; back to front - unfortunately we are forced to copy strict from
+	; low to high since this function is also used for
+	; memmove and blocks could be overlapping!
+	; {
+L2:				; assert Y = 0
+	ldx	ptr3		; Get the low byte of n
+	beq	done		; something to copy
 
-; Done. The low byte of dest is still in ptr2
+L3:	lda	(ptr1),Y	; copy a byte
+	sta	(ptr2),Y
+	iny
+	dex
+	bne	L3
 
-done:  	lda	ptr2
-       	ldx    	tmp1            ; get function result (dest)
-       	rts
+	; }
+
+done:	jmp	popax		; Pop ptr and return as result
 
 ; ----------------------------------------------------------------------
 ; Get the parameters from stack as follows:
 ;
-;       -(size-1)       --> ptr3
+;       size      	--> ptr3
 ;       src             --> ptr1
 ;       dest            --> ptr2
-;       high(dest)      --> tmp1
-;
-; dest is returned in a/x.
+;	First argument (dest) will remain on stack and is returned in a/x!
 
-memcpy_getparams:
-        eor     #$FF
-        sta     ptr3
-        txa
-        eor     #$FF
-        sta     ptr3+1          ; Save -(size-1)
+memcpy_getparams:		; IMPORTANT! Function has to leave with Y=0!
+	sta     ptr3
+        stx     ptr3+1          ; save n to ptr3
 
-       	jsr	popax		; src
-       	sta	ptr1
-       	stx	ptr1+1
+	jsr	popax
+	sta	ptr1
+	stx	ptr1+1		; save src to ptr1
 
-       	jsr	popax		; dest
-  	sta	ptr2
-  	stx	ptr2+1		; Save work copy
-        stx     tmp1            ; Save for function result
-
-        rts
-
+				; save dest to ptr2
+       	ldy     #1     	       	; (direct stack access is three cycles faster
+                                ; (total cycle count with return))
+        lda     (sp),y
+	tax
+        stx	ptr2+1		; save high byte of ptr2
+        dey			; Y = 0
+        lda     (sp),y          ; Get ptr2 low
+ 	sta	ptr2
+	rts

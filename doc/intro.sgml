@@ -25,13 +25,19 @@ one assembly modules. This file does <em/not/ contain a complete reference for
 the tools used in the process. There are separate files describing those tools,
 in detail (see <url url="index.html">).
 
-You are assumed to have downloaded and extracted the executables and the
-target-specific files. For example: for Windows users targeting C64, you need
-<bf/cc65-win32-2.10.1.zip/ and <bf/cc65-c64-2.10.1.zip/ (or, whatever the
-current cc65 version is) extracted to the same directory. If you received the
-files as a bzip2 archive (extension <bf/.bz2/), you will need to get <url
-url="http://sources.redhat.com/bzip2/#bzip2-latest" name="the bzip2 package">
-to decompress it.
+I do assume that you have downloaded and installed the compiler and
+target-specific files. Windows users should use the friendly .exe installer
+(named cc65-2.13.0-1.exe for version 2.13.0 of the package - adjust the
+version number if necessary). It does not only install the target files, but
+will also set up necessary environment variables for you.
+
+If you're going for the .ZIP archives, please note that there is one file for
+the host platform (Windows, DOS or OS/2), one file for each target platform
+(C64 or whatever) and a separate file containing the docs (which include the
+file you're currently reading). So for most uses, you will need at least 3
+files and unpack all three into one directory. In case of the .ZIP archives,
+you will also need to set the environment variables <tt/CC65_INC/,
+<tt/LD65_LIB/ and <tt/LD65_CFG/ as described below.
 
 <bf/Note/: There is a much simpler way to compile this example, by using the
 <bf/cl65/ compile-and-link utility. However, it makes sense to understand how
@@ -42,9 +48,11 @@ described <ref id="using-cl65" name="later">.
 <sect1>Before we start<p>
 
 You will find a copy of the sample modules, used in the next section, in the
-"<tt>cc65/samples/tutorial</tt>" directory. Please make sure that the compiler
-and linker can find the include and library files, by setting the environment
-variables <tt/CC65_INC/ and <tt/CC65_LIB/, respectively.
+"<tt>cc65/samples/tutorial</tt>" directory. If you encounter problems with
+missing include files and/or libraries, please check the environment variables
+<tt/CC65_INC/, <tt/LD65_LIB/ and <tt/LD65_CFG/. They should point to the
+<tt/include/, <tt/lib/ and <tt/cfg/ subdirectories of the directory, where you
+installed cc65.
 
 
 <sect1>The sample modules<p>
@@ -102,7 +110,8 @@ is the C64.
 </verb></tscreen>
 
 <tt/c64.o/ (the startup code) and <tt/c64.lib/ (the C64 version of the runtime
-and C library) are provided in binary form in the cc65 package.
+and C library) are provided in binary form in the cc65 package. Actually, the
+startup code is contained in the library, so you won't need to care about it.
 
 
 
@@ -116,16 +125,13 @@ In the example above, we would use the following command line, to translate
 <tt/hello.c/ into <tt/hello.s/:
 
 <tscreen><verb>
-        cc65 -O -I ../../include -t c64 hello.c
+        cc65 -O -t c64 hello.c
 </verb></tscreen>
 
 The <tt/-O/ switch tells the compiler to do an additional optimizer run, which
 is usually a good idea, since it makes the code smaller. If you don't care
 about the size, but want to have slightly faster code, use <tt/-Oi/ to inline
 some runtime functions.
-
-The <tt/-I/ switch gives a search path for the include files. You may also set
-the environment variable <tt/CC65_INC/ to the search path.
 
 The <tt/-t/ switch is followed by the target system name.
 
@@ -176,22 +182,16 @@ C library, are in an object-file archive named after the system, in this case,
 "<tt/c64.lib/". We have to specify that file on the command line, so that the
 linker can resolve those functions.
 
-A second file (this time, an object file) needed is the startup code that
-prepares the grounds for the C program to run. The startup file must be
-executed first, so it must be the first file on the linker command line.
-
 Let's link our files to get the final executable:
 
 <tscreen><verb>
-        ld65 -t c64 -o hello c64.o hello.o text.o c64.lib
+        ld65 -t c64 -o hello hello.o text.o c64.lib
 </verb></tscreen>
 
 The argument after <tt/-o/ specifies the name of the output file, the argument
-after <tt/-t/ gives the target system. As discussed, the startup file must be
-the first input file on the command line (you may have to add a path here, if
-<tt/c64.o/ is not in your current directory). Since the library resolves
-imports in <tt/hello.o/ and <tt/text.o/, it must be specified <em/after/ those
-files.
+after <tt/-t/ gives the target system. The following arguments are object
+files or libraries. Since the target library resolves imports in <tt/hello.o/
+and <tt/text.o/, it must be specified <em/after/ those files.
 
 After a successful linker run, we have a file named "<tt/hello/", ready for
 our C64!
@@ -209,18 +209,11 @@ well-suited for our example.
 To compile both files into one executable, enter:
 
 <tscreen><verb>
-        cl65 -O -I ../../include -L ../../lib hello.c text.s
+        cl65 -O hello.c text.s
 </verb></tscreen>
 
-(The <tt/-I/ option is not needed if you are working under a Unix-like system
-with the include files in their default path, or if the <tt/CC65_INC/
-environment variable is set correctly. The <tt/-L/ option is not needed if the
-libraries are in their default path, or if the <tt/CC65_LIB/ environment
-variable is set correctly. &lsqb;Those two environment variables should be set to
-absolute paths.&rsqb;)
-
 The <bf/cl65/ utility knows how to translate C files into object files (it will
-call the compiler, and then, the assembler). It does know also how to create
+call the compiler, and then the assembler). It does know also how to create
 object files from assembly files (it will call only the assembler, for that).
 It knows how to build an executable (it will pass all object files to the
 linker). And finally, it has the C64 as a default target, and will supply the
@@ -239,12 +232,12 @@ url="cl65.html">.
 
 <em/Note: this section is incomplete!/
 
-Depending on the target, cc65 chooses several methods of making a
-program available for execution.  Here, we list sample emulators and
-instructions for running the program.  Unless noted, similar instructions
-would also apply to a real machine.  One word of advice: we suggest you clear
-the screen at the start, and wait for a keypress at the end of your program,
-as each target varies in it's start and exit conditions.
+Depending on the target, cc65 chooses several methods of making a program
+available for execution. Here, we list sample emulators and instructions for
+running the program. Unless noted, similar instructions would also apply to a
+real machine. One word of advice: we suggest you clear the screen at the
+start, and wait for a keypress at the end of your program, as each target
+varies in it's start and exit conditions.
 
 
 <sect1>Apple

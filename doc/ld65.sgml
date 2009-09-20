@@ -355,9 +355,12 @@ The config file search path contains in this order:
 
 <enum>
 <item>The current directory.
-<item>A compiled in directory which is often <tt>/usr/lib/cc65/lib</tt> on
+<item>A compiled in directory which is often <tt>/usr/lib/cc65/cfg</tt> on
       Linux systems.
 <item>The value of the environment variable <tt/LD65_CFG/ if it is defined.
+<item>The value of the environment variable <tt/CC65_LIB/ if it is defined.
+      Please note that use of this environment variable is obsolete and may
+      get removed in future versions.
 <item>Any directory added with the <tt><ref id="option--cfg-path"
       name="--cfg-path"></tt> option on the command line.
 </enum>

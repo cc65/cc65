@@ -90,7 +90,6 @@ in HTML format. Other formats can be generated from the sources.
 %doc doc/internal.txt
 %doc doc/newvers.txt
 %doc samples
-%doc src/ld65/cfg/*.cfg
 
 
 
@@ -446,6 +445,7 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 %files vic20
 %attr(644,root,root) 		/usr/lib/cc65/lib/vic20.lib
 %attr(644,root,root) 		/usr/lib/cc65/joy/vic20-*.joy
+%attr(644,root,root)   	       	/usr/lib/cc65/cfg/vic20-*.cfg
 
 
 

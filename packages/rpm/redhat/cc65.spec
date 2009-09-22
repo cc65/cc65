@@ -139,6 +139,7 @@ programs for the Apple //e using the cc65 crosscompiler.
 
 %files apple2enh
 %attr(644,root,root) 		/usr/lib/cc65/lib/apple2enh.lib
+%attr(644,root,root) 		/usr/lib/cc65/obj/apple2enh-*.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/a2e.*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2e.*.joy
 %attr(644,root,root) 		/usr/lib/cc65/mou/a2e.*.mou

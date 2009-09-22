@@ -398,10 +398,23 @@ The compiler will accept one C file per invocation and create a file with
 the same base name, but with the extension replaced by ".s". The output
 file contains assembler code suitable for the use with the ca65 macro
 assembler.
+						
+Include files in single quotes are searched in the following places:
+<enum>
+<item>The current directory.
+<item>The value of the environment variable <tt/CC65_INC/ if it is defined.
+<item>Any directory added with the <tt/-I/ option on the command line.
+</enum>
 
-In addition to the paths named in the <tt/-I/ option on the command line, the
-directory named in the environment variable <tt/CC65_INC/ is added to the
-search path for include files on startup.
+Include files in angle brackets are searched in the following places:
+<enum>
+<item>A compiled in directory which is often <tt>/usr/lib/cc65/include</tt> on
+      Linux systems.
+<item>The value of the environment variable <tt/CC65_INC/ if it is defined.
+<item>A subdirectory named <tt/include/ of the directory defined in the 
+      environment variable <tt/CC65_HOME/, if it is defined.
+<item>Any directory added with the <tt/-I/ option on the command line.
+</enum>
 
 
 

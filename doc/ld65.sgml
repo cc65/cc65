@@ -324,9 +324,8 @@ The library search path contains in this order:
 <item>A compiled in library path which is often <tt>/usr/lib/cc65/lib</tt> on
       Linux systems.
 <item>The value of the environment variable <tt/LD65_LIB/ if it is defined.
-<item>The value of the environment variable <tt/CC65_LIB/ if it is defined.
-      Please note that use of this environment variable is obsolete and may
-      get removed in future versions.
+<item>A subdirectory named <tt/lib/ of the directory defined in the environment
+      variable <tt/CC65_HOME/, if it is defined.
 <item>Any directory added with the <tt><ref id="option--lib-path"
       name="--lib-path"></tt> option on the command line.
 </enum>
@@ -338,12 +337,11 @@ The object file search path contains in this order:
 
 <enum>
 <item>The current directory.
-<item>A compiled in directory which is often <tt>/usr/lib/cc65/lib</tt> on
+<item>A compiled in directory which is often <tt>/usr/lib/cc65/obj</tt> on
       Linux systems.
 <item>The value of the environment variable <tt/LD65_OBJ/ if it is defined.
-<item>The value of the environment variable <tt/CC65_LIB/ if it is defined.
-      Please note that use of this environment variable is obsolete and may
-      get removed in future versions.
+<item>A subdirectory named <tt/obj/ of the directory defined in the environment
+      variable <tt/CC65_HOME/, if it is defined.
 <item>Any directory added with the <tt><ref id="option--obj-path"
       name="--obj-path"></tt> option on the command line.
 </enum>
@@ -358,9 +356,8 @@ The config file search path contains in this order:
 <item>A compiled in directory which is often <tt>/usr/lib/cc65/cfg</tt> on
       Linux systems.
 <item>The value of the environment variable <tt/LD65_CFG/ if it is defined.
-<item>The value of the environment variable <tt/CC65_LIB/ if it is defined.
-      Please note that use of this environment variable is obsolete and may
-      get removed in future versions.
+<item>A subdirectory named <tt/cfg/ of the directory defined in the environment
+      variable <tt/CC65_HOME/, if it is defined.
 <item>Any directory added with the <tt><ref id="option--cfg-path"
       name="--cfg-path"></tt> option on the command line.
 </enum>

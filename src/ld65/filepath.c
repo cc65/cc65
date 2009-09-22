@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*	       	     	     	     Code		     		     */
+/*	       	     	     	     Code      		     		     */
 /*****************************************************************************/
 
 
@@ -53,7 +53,7 @@ void InitSearchPaths (void)
     /* Always search all stuff in the current directory */
     AddSearchPath ("", SEARCH_LIB | SEARCH_OBJ | SEARCH_CFG);
 
-    /* Add some compiled in search paths if defined on the command line */
+    /* Add some compiled in search paths if defined at compile time */
 #if defined(LD65_LIB)
     AddSearchPath (LD65_LIB, SEARCH_LIB);
 #endif
@@ -64,13 +64,15 @@ void InitSearchPaths (void)
     AddSearchPath (LD65_CFG, SEARCH_CFG);
 #endif
 
-    /* Add paths from the environment */
+    /* Add specific paths from the environment */
+    AddSearchPathFromEnv ("LD65_CFG", SEARCH_CFG);
     AddSearchPathFromEnv ("LD65_LIB", SEARCH_LIB);
     AddSearchPathFromEnv ("LD65_OBJ", SEARCH_OBJ);
-    AddSearchPathFromEnv ("LD65_CFG", SEARCH_CFG);
 
-    /* Add compatibility stuff */
-    AddSearchPathFromEnv ("CC65_LIB", SEARCH_LIB | SEARCH_OBJ | SEARCH_CFG);
+    /* Add paths relative to a main directory defined in an env var */
+    AddSubSearchPathFromEnv ("CC65_HOME", "cfg", SEARCH_CFG);
+    AddSubSearchPathFromEnv ("CC65_HOME", "lib", SEARCH_LIB);
+    AddSubSearchPathFromEnv ("CC65_HOME", "obj", SEARCH_OBJ);
 }
 
 

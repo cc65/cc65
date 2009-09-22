@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -78,13 +78,17 @@ void InitIncludePaths (void)
 {
     /* Add some standard paths to the include search path */
     AddSearchPath ("", INC_USER);		/* Current directory */
-    AddSearchPath ("include", INC_SYS);
+
+    /* Add some compiled in search paths if defined at compile time */
 #ifdef CC65_INC
     AddSearchPath (CC65_INC, INC_SYS);
-#else
-    AddSearchPath ("/usr/lib/cc65/include", INC_SYS);
 #endif
+
+    /* Add specific paths from the environment */
     AddSearchPathFromEnv ("CC65_INC", INC_SYS | INC_USER);
+
+    /* Add paths relative to a main directory defined in an env var */
+    AddSubSearchPathFromEnv ("CC65_HOME", "include", INC_SYS);
 }
 
 

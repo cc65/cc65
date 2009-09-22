@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -67,7 +67,12 @@ void AddSearchPath (const char* NewPath, unsigned Where);
 /* Add a new search path to the existing one */
 
 void AddSearchPathFromEnv (const char* EnvVar, unsigned Where);
-/* Add a search from an environment variable */
+/* Add a search path from an environment variable */
+
+void AddSubSearchPathFromEnv (const char* EnvVar, const char* SubDir, unsigned Where);
+/* Add a search path from an environment variable, adding a subdirectory to
+ * the environment variable value.
+ */
 
 void ForgetAllSearchPaths (unsigned Where);
 /* Forget all search paths in the given lists. */

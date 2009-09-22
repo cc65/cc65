@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -132,7 +132,7 @@ static char* Find (const char* Path, const char* File)
      	    SB_AppendChar (&PathName, '/');
 	}
 	SB_AppendStr (&PathName, File);
-	SB_Terminate (&PathName);
+    	SB_Terminate (&PathName);
 
 	/* Check if this file exists */
        	if (access (SB_GetBuf (&PathName), 0) == 0) {
@@ -173,9 +173,47 @@ void AddSearchPath (const char* NewPath, unsigned Where)
 
 
 void AddSearchPathFromEnv (const char* EnvVar, unsigned Where)
-/* Add a search from an environment variable */
+/* Add a search path from an environment variable */
 {
     AddSearchPath (getenv (EnvVar), Where);
+}
+
+
+
+void AddSubSearchPathFromEnv (const char* EnvVar, const char* SubDir, unsigned Where)
+/* Add a search path from an environment variable, adding a subdirectory to
+ * the environment variable value.
+ */
+{
+    StrBuf Dir = AUTO_STRBUF_INITIALIZER;
+
+    const char* EnvVal = getenv (EnvVar);
+    if (EnvVal == 0) {
+    	/* Not found */
+    	return;
+    }
+
+    /* Copy the environment variable to the buffer */
+    SB_CopyStr (&Dir, EnvVal);
+
+    /* Add a path separator if necessary */
+    if (SB_NotEmpty (&Dir)) {
+	if (SB_LookAtLast (&Dir) != '\\' && SB_LookAtLast (&Dir) != '/') {
+	    SB_AppendChar (&Dir, '/');
+	}
+    }
+
+    /* Add the subdirectory */
+    SB_AppendStr (&Dir, SubDir);
+
+    /* Terminate the string */
+    SB_Terminate (&Dir);
+
+    /* Add the search path */
+    AddSearchPath (SB_GetConstBuf (&Dir), Where);
+
+    /* Free the temp buffer */
+    SB_Done (&Dir);
 }
 
 

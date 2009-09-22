@@ -1,4 +1,6 @@
 ;
+; Oliver Schmidt, 15.09.2009
+;
 ; Startup code for cc65 (Apple2 version)
 ;
 

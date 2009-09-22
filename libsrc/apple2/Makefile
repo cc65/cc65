@@ -107,6 +107,9 @@ S_OBJS=	_scrsize.o	\
        	wherey.o        \
 	write.o
 
+S_EXTRA_OBJS=			\
+	extra/iobuf-0800.o
+
 #--------------------------------------------------------------------------
 # Drivers
 
@@ -131,7 +134,7 @@ all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:   	clean
 	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)

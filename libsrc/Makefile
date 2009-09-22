@@ -52,6 +52,11 @@ apple2lib:
 	cp apple2/apple2-ssc.ser a2.ssc.ser
 	cp apple2/apple2-280-192-8.tgi a2.hi.tgi
 	cp apple2/apple2-40-48-16.tgi a2.lo.tgi
+	if [ -d apple2/extra ]; then \
+	    for i in apple2/extra/*.o; do \
+	       	cp $$i apple2-`basename $$i`; \
+	    done \
+	fi \
 
 #-----------------------------------------------------------------------------
 # Apple //e

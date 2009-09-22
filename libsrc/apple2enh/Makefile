@@ -26,6 +26,9 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I ../apple2 -I ../../include
 %.o:	../apple2/%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
+extra/%.o: ../apple2/extra/%.s
+	@$(AS) -g -o $@ $(AFLAGS) $<
+
 %.emd:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
@@ -109,6 +112,9 @@ S_OBJS=	_scrsize.o	\
        	wherey.o        \
 	write.o
 
+S_EXTRA_OBJS=			\
+	extra/iobuf-0800.o
+
 #--------------------------------------------------------------------------
 # Drivers
 
@@ -127,13 +133,13 @@ TGIS = apple2-280-192-8.tgi apple2-40-48-16.tgi
 
 .PHONY:	all clean zap
 
-all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
+all: 	$(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:   	clean
 	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)

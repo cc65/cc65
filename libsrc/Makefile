@@ -59,7 +59,7 @@ apple2lib:
 	fi \
 
 #-----------------------------------------------------------------------------
-# Apple //e
+# enhanced Apple //e
 
 apple2enhlib:
 	for i in apple2enh common runtime conio dbg em joystick mouse serial tgi zlib; do \
@@ -72,6 +72,11 @@ apple2enhlib:
 	cp apple2enh/apple2-ssc.ser a2e.ssc.ser
 	cp apple2enh/apple2-280-192-8.tgi a2e.hi.tgi
 	cp apple2enh/apple2-40-48-16.tgi a2e.lo.tgi
+	if [ -d apple2enh/extra ]; then \
+	    for i in apple2enh/extra/*.o; do \
+	       	cp $$i apple2enh-`basename $$i`; \
+	    done \
+	fi \
 
 #-----------------------------------------------------------------------------
 # Atari

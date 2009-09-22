@@ -128,7 +128,7 @@ TGIS = apple2-280-192-8.tgi apple2-40-48-16.tgi
 
 .PHONY:	all clean zap
 
-all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
+all: 	$(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)

@@ -30,7 +30,8 @@ BuildRoot: /var/tmp/%{name}-%{version}
 A C crosscompiler for 6502 systems, including a macroassembler that
 supports 6502, 65SC02 and 65816 CPUs, a linker, an archiver and some
 other tools. To create programs for one of the supported target
-machines, you have to install at least one of the library packages.
+machines, you have to install at least one of the target platform
+packages in addition to the main package.
 
 %files
 %defattr(644,root,root,755)
@@ -48,9 +49,12 @@ machines, you have to install at least one of the library packages.
 %attr(755,root,root)   		/usr/bin/ld65
 %attr(755,root,root)   		/usr/bin/od65
 %attr(755,root,root) %dir	/usr/lib/cc65
+%attr(755,root,root) %dir	/usr/lib/cc65/cfg
 %attr(755,root,root) %dir	/usr/lib/cc65/emd
 %attr(755,root,root) %dir	/usr/lib/cc65/joy
 %attr(755,root,root) %dir	/usr/lib/cc65/lib
+%attr(755,root,root) %dir	/usr/lib/cc65/obj
+%attr(755,root,root) %dir	/usr/lib/cc65/ser
 %attr(755,root,root) %dir	/usr/lib/cc65/tgi
 %attr(755,root,root) %dir	/usr/lib/cc65/include
 %attr(644,root,root)   		/usr/lib/cc65/include/*.h
@@ -469,7 +473,7 @@ make -C doc html
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,cfg,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,ser,tgi}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,cfg,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,obj,ser,tgi}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin
@@ -493,6 +497,11 @@ install -m 644 include/mouse/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/mouse
 install -m 644 include/sys/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/sys
 install -m 644 include/tgi/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/tgi
 install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
+
+# Extra object files
+for extra in libsrc/*-*.o; do
+    install -m 644 ${extra} $RPM_BUILD_ROOT/usr/lib/cc65/obj
+done
 
 # Additional linker configurations
 for config in src/ld65/cfg/*-*.cfg; do

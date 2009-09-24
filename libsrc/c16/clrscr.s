@@ -6,7 +6,7 @@
 
 	.export		_clrscr
 
-	.include	"../plus4/plus4.inc"
+	.include	"plus4.inc"
 
 _clrscr	= CLRSCR
 

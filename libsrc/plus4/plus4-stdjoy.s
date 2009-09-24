@@ -9,7 +9,7 @@
 
       	.include 	"joy-kernel.inc"
         .include        "joy-error.inc"
-        .include        "../plus4/plus4.inc"
+        .include        "plus4.inc"
 
         .macpack        generic
 

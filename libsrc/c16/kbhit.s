@@ -7,7 +7,7 @@
 	.export		_kbhit
 	.import		return0, return1
 
-	.include	"../plus4/plus4.inc"
+	.include	"plus4.inc"
 
 _kbhit:
 	lda	KEY_COUNT	; Get number of characters

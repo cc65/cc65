@@ -8,7 +8,7 @@
 
  	.export		_textcolor, _bgcolor, _bordercolor
 
-	.include	"../plus4/plus4.inc"
+	.include	"plus4.inc"
 
 _textcolor:
 	ldx	CHARCOLOR	; get old value

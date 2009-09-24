@@ -7,7 +7,7 @@
        	.export		_cgetc
        	.import		cursor
 
-       	.include	"../plus4/plus4.inc"
+       	.include	"plus4.inc"
 
 
 ; --------------------------------------------------------------------------

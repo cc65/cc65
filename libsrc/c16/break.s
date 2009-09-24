@@ -9,7 +9,7 @@
 	.destructor	_reset_brk
 	.export	       	_brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
 
-	.include      	"../plus4/plus4.inc"
+	.include      	"plus4.inc"
 
 
 .bss

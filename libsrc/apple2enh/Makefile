@@ -13,7 +13,7 @@ AS	= ../../src/ca65/ca65
 CC	= ../../src/cc65/cc65
 LD	= ../../src/ld65/ld65
 
-AFLAGS	= -t $(SYS) -I../apple2 -I../../asminc
+AFLAGS	= -t $(SYS) --forget-inc-paths -I../apple2 -I../../asminc
 CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I ../apple2 -I ../../include
 
 #--------------------------------------------------------------------------

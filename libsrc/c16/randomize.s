@@ -8,7 +8,7 @@
     	.export	       	__randomize
 	.import		_srand
 
-	.include	"../plus4/plus4.inc"
+	.include	"plus4.inc"
 
 __randomize:
         ldx     TED_VLINELO     ; Use TED rasterline as high byte

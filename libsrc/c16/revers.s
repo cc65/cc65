@@ -6,7 +6,7 @@
 
       	.export		_revers
 
-        .include        "../plus4/plus4.inc"
+        .include        "plus4.inc"
 
 .proc   _revers
 

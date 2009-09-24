@@ -25,7 +25,7 @@
 	.constructor	initmainargs, 24
 	.import		__argc, __argv
 
-	.include	"../plus4/plus4.inc"
+	.include	"plus4.inc"
 
 
 

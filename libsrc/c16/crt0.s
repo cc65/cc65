@@ -13,7 +13,7 @@
 	.import	       	__INTERRUPTOR_COUNT__
 
         .include        "zeropage.inc"
-	.include	"../plus4/plus4.inc"
+	.include	"plus4.inc"
 
 
 ; ------------------------------------------------------------------------

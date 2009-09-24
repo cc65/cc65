@@ -9,7 +9,7 @@
 
       	.include 	"em-kernel.inc"
         .include        "em-error.inc"
-	.include	"../plus4/plus4.inc"
+	.include	"plus4.inc"
 
         .macpack        generic
 

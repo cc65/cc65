@@ -16,11 +16,13 @@ ifneq ($(Kickstart),)
 SPAWN   = SPAWN_AMIGA
 endif
 
-
-CC=gcc
-CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON) -D$(SPAWN)
-EBIND  = emxbind
-LDFLAGS=
+#
+CC      = gcc
+CFLAGS  = -O2 -g -Wall -W -std=c89
+CFLAGS += -I$(COMMON)
+CFLAGS += -D$(SPAWN)
+EBIND   = emxbind
+LDFLAGS =
 
 OBJS =	error.o	 	\
 	global.o 	\

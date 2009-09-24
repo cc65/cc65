@@ -11,10 +11,16 @@ EXE  	= od65
 # Library dir
 COMMON	= ../common
 
-CFLAGS = -O2 -g -Wall -W -std=c89 -I$(COMMON)
-CC=gcc
-EBIND=emxbind
-LDFLAGS=
+#
+CC      = gcc
+CFLAGS  = -O2 -g -Wall -W -std=c89 
+CFLAGS += -I$(COMMON)
+EBIND   = emxbind
+LDFLAGS =
+
+
+# -----------------------------------------------------------------------------
+# List of all object files
 
 OBJS = 	dump.o		\
 	error.o		\

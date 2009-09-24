@@ -10,10 +10,16 @@ EXE  	= da65
 # Library dir
 COMMON	= ../common
 
-CFLAGS = -g -O2 -Wall -W -std=c89 -I$(COMMON)
-CC=gcc
-EBIND=emxbind
-LDFLAGS=
+#
+CC      = gcc
+CFLAGS  = -g -O2 -Wall -W -std=c89 
+CFLAGS += -I$(COMMON)
+EBIND   = emxbind
+LDFLAGS =
+        
+
+# -----------------------------------------------------------------------------
+# List of all object files
 
 OBJS = 	asminc.o        \
         attrtab.o	\

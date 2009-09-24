@@ -9,10 +9,16 @@ EXE  	= grc
 
 COMMON = ../common
 
-CFLAGS 	= -g -O2 -Wall -W -std=c89 -I$(COMMON)
+#
 CC	= gcc
+CFLAGS 	= -g -O2 -Wall -W -std=c89
+CFLAGS += -I$(COMMON)
 LDFLAGS	=
 EBIND	= emxbind
+
+
+# -----------------------------------------------------------------------------
+# List of all object files
 
 OBJS =  grc.o
 

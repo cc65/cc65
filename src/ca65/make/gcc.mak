@@ -13,10 +13,11 @@ COMMON	= ../common
 # Several search paths. You may redefine these on the command line
 CA65_INC = \"/usr/lib/cc65/asminc/\"
 
+#
+CC	= gcc
 CFLAGS 	= -g -O2 -Wall -W -std=c89
 CFLAGS += -I$(COMMON)
 CFLAGS += -DCA65_INC=$(CA65_INC)
-CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 

@@ -16,11 +16,12 @@ LD65_OBJ = \"/usr/lib/cc65/lib/\"
 LD65_CFG = \"/usr/lib/cc65/cfg/\"
 
 #
-CFLAGS = -g -O2 -Wall -W -std=c89 -I$(COMMON) 
+CC      = gcc
+CFLAGS  = -g -O2 -Wall -W -std=c89
+CFLAGS += -I$(COMMON)
 CFLAGS += -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
-CC=gcc
-EBIND=emxbind
-LDFLAGS=
+EBIND   = emxbind
+LDFLAGS =
 
 # Perl script for config file conversion
 CVT=cfg/cvt-cfg.pl

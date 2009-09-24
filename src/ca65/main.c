@@ -796,6 +796,9 @@ int main (int argc, char* argv [])
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ca65");
 
+    /* Initialize the include search paths */
+    InitIncludePaths ();
+
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */

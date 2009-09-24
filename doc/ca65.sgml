@@ -267,7 +267,8 @@ Here is a description of all the command line options:
   Name a directory which is searched for include files. The option may be
   used more than once to specify more than one directory to search. The
   current directory is always searched first before considering any
-  additional directories.
+  additional directories. See also the section about <ref id="search-paths"
+  name="search paths">.
 
 
   <tag><tt>-U, --auto-import</tt></tag>
@@ -297,6 +298,21 @@ Here is a description of all the command line options:
 
 </descrip>
 <p>
+
+
+
+<sect>Search paths<label id="search-paths"><p>
+
+Include files are searched in the following places:
+
+<enum>
+<item>The current directory.
+<item>The value of the environment variable <tt/CA65_INC/ if it is defined.
+<item>A subdirectory named <tt/asminc/ of the directory defined in the
+      environment variable <tt/CC65_HOME/, if it is defined.
+<item>Any directory added with the <tt/-I/ option on the command line.
+</enum>
+
 
 
 <sect>Input format<p>

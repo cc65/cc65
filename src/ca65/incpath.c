@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -72,6 +72,26 @@ char* FindInclude (const char* Name)
 {
     /* Search in the include directories */
     return SearchFile (Name, INC_STD);
+}
+
+
+
+void InitIncludePaths (void)
+/* Initialize the include path search list */
+{
+    /* Add some standard paths to the include search path */
+    AddSearchPath ("", INC_STD);		/* Current directory */
+
+    /* Add some compiled in search paths if defined at compile time */
+#ifdef CA65_INC
+    AddSearchPath (CA65_INC, INC_STD);
+#endif
+
+    /* Add specific paths from the environment */
+    AddSearchPathFromEnv ("CA65_INC", INC_STD);
+
+    /* Add paths relative to a main directory defined in an env var */
+    AddSubSearchPathFromEnv ("CC65_HOME", "asminc", INC_STD);
 }
 
 

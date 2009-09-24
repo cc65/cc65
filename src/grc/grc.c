@@ -31,6 +31,7 @@
 #include "fname.h"
 #include "abend.h"
 #include "chartype.h"
+#include "xmalloc.h"
 
 void VLIRLinker(int argc, char *argv[]) {
 FILE *outCVT, *input;
@@ -60,7 +61,7 @@ int blocks,rest;
 	if (input==NULL)
 	    AbEnd("can't open input:%s\n",strerror(errno));
 
-	buffer = malloc(THIS_BUFFER_IS_SOOO_HUGE);
+	buffer = xmalloc(THIS_BUFFER_IS_SOOO_HUGE);
 	memset(buffer,0,THIS_BUFFER_IS_SOOO_HUGE);
 
 	bytes = fread(buffer,1,1024,input);
@@ -296,8 +297,8 @@ struct menuitem *curItem, *newItem;
 
     if (strcmp(nextWord(),"{")!=0) {
 	AbEnd ("menu '%s' description has no opening bracket!\n", myMenu.name);
-	};
-    curItem=malloc(sizeof(struct menuitem));
+	}
+    curItem = xmalloc(sizeof(struct menuitem));
     myMenu.item=curItem;
     do {
 	token = nextWord();
@@ -309,13 +310,13 @@ struct menuitem *curItem, *newItem;
 		strcat (namebuff, " ");
 		strcat (namebuff, token);
 		} while (token[strlen(token)-1]!='"');
-	    token = malloc(strlen(namebuff));
+	    token = xmalloc(strlen(namebuff));
 	    strcpy (token, namebuff);
 	}
 	curItem->name=token;
 	curItem->type=nextWord();
 	curItem->target=nextWord();
-	newItem=malloc(sizeof(struct menuitem));
+	newItem=xmalloc(sizeof(struct menuitem));
 	curItem->next=newItem;
 	curItem=newItem;
 	item++;
@@ -390,13 +391,11 @@ int a, b;
 
     a = findToken (hdrFTypes, token);
 
-    if (a>1)
-	   AbEnd("filetype '%s' is not supported yet\n", token);
-
     switch (a) {
-	case 0: myHead.geostype = 6; break;
-	case 1: myHead.geostype = 14; break;
-	}
+    	case 0:  myHead.geostype = 6; break;
+    	case 1:  myHead.geostype = 14; break;
+        default: AbEnd("filetype '%s' is not supported yet\n", token);
+    	}
 
     myHead.dosname = nextPhrase();
     nextPhrase();
@@ -621,7 +620,7 @@ int a, prevchar=-1, i=0, bracket=0, quote=1;
 	    if ((a=='{')||(a=='(')) bracket++;
 	    if ((a=='}')||(a==')')) bracket--;
 	}
-	if (a==EOF) { tbl[i]='\0'; realloc(tbl, i+1); break; };
+	if (a==EOF) { tbl[i]='\0'; xrealloc(tbl, i+1); break; };
 	if (IsSpace(a)) {
 	    if ((prevchar!=' ') && (prevchar!=-1)) { tbl[i++]=' '; prevchar=' '; }
 	} else {
@@ -649,7 +648,7 @@ int vlir=0;	/* number of processed VLIR sections */
     if ((F = fopen (filename,"r"))==0)
 		AbEnd("can't open file %s for reading: %s\n",filename,strerror (errno));
 
-    str=filterInput(F, malloc(BLOODY_BIG_BUFFER));
+    str=filterInput(F, xmalloc(BLOODY_BIG_BUFFER));
 
     token = strtok (str," ");
 

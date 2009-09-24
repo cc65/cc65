@@ -12,17 +12,15 @@
         .include        "time.inc"
         .include        "c128.inc"
 
-	.importzp		tmp1, tmp2
+        .constructor    initsystime
+	.importzp	tmp1, tmp2
 
+
+;----------------------------------------------------------------------------
 .code
 
-; Jan 1st 1970, CIA #1 TOD
 .proc	__systime
 
-	lda	#70
-	sta	TM + tm::tm_year
-	lda	#1
-	sta	TM + tm::tm_mday
 	lda	CIA1_TODHR
 	bpl	AM
 	and	#%01111111
@@ -59,6 +57,31 @@ BCD2dec:tax
 
 .endproc
 
-.bss
+;----------------------------------------------------------------------------
+; Constructor that writes to the 1/10 sec register of the TOD to kick it
+; into action. If this is not done, the clock hangs. We will read the register
+; and write it again, ignoring a possible change in between.
 
-TM:	.tag	tm
+.proc   initsystime
+
+        lda     CIA1_TOD10
+        sta     CIA1_TOD10
+        rts
+
+.endproc
+
+
+;----------------------------------------------------------------------------
+; TM struct with date set to 1970-01-01
+.data
+
+TM:    	.word           0       ; tm_sec
+        .word           0       ; tm_min
+        .word           0       ; tm_hour
+        .word           1       ; tm_mday
+        .word           0       ; tm_mon
+        .word           70      ; tm_year
+        .word           0       ; tm_wday
+        .word           0       ; tm_yday
+        .word           0       ; tm_isdst
+

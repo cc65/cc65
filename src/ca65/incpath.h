@@ -52,6 +52,9 @@ char* FindInclude (const char* Name);
  * the complete path, if found, return 0 otherwise.
  */
 
+void ForgetAllIncludePaths (void);
+/* Remove all include search paths. */
+
 void InitIncludePaths (void);
 /* Initialize the include path search list */
 

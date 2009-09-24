@@ -76,6 +76,14 @@ char* FindInclude (const char* Name)
 
 
 
+void ForgetAllIncludePaths (void)
+/* Remove all include search paths. */
+{
+    ForgetAllSearchPaths (INC_STD);
+}
+
+
+
 void InitIncludePaths (void)
 /* Initialize the include path search list */
 {

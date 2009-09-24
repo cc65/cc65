@@ -1,4 +1,4 @@
-/* A small test for atoi/strtol. Assumes twos complement */
+/* A small test for strtol. Assumes twos complement */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

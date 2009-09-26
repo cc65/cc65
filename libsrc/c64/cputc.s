@@ -1,8 +1,8 @@
 ;
-; Ullrich von Bassewitz, 06.08.1998
+; Ullrich von Bassewitz, 1998-08-06, 2009-09-26
 ;
-; void cputcxy (unsigned char x, unsigned char y, char c);
-; void cputc (char c);
+; void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
+; void __fastcall__ cputc (char c);
 ;
 
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
@@ -84,12 +84,20 @@ L11:	ora	#$40
 
 
 
-; Set cursor position, calculate RAM pointers
+; Set cursor position, calculate RAM pointers. Because kernal -02 doesn't
+; update the color RAM pointer, we have to do that manually here.
 
 plot:	ldy	CURS_X
 	ldx	CURS_Y
 	clc
-	jmp	PLOT		; Set the new cursor
+       	jsr	PLOT		; Set the new cursor
+        lda     SCREEN_PTR      ; Low byte of color RAM ...
+        sta     CRAM_PTR        ; ... is same as text screen pointer
+        lda     SCREEN_PTR+1    ; While high byte of color RAM
+        and     #$03
+        ora     #$D8            ; ... needs to be adjusted
+        sta     CRAM_PTR+1
+        rts
 
 
 

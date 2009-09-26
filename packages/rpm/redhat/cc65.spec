@@ -145,6 +145,7 @@ programs for the Apple //e using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/mou/a2e.*.mou
 %attr(644,root,root) 		/usr/lib/cc65/ser/a2e.*.ser
 %attr(644,root,root) 		/usr/lib/cc65/tgi/a2e.*.tgi
+%attr(644,root,root)   	       	/usr/lib/cc65/cfg/apple2enh-*.cfg
 
 
 

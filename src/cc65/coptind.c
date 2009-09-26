@@ -183,7 +183,8 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
 }
 
 
-
+               
+#if 0   /* Currently unused */
 static short RegVal (unsigned short Use, const RegContents* RC)
 /* Return the contents of the given register */
 {
@@ -197,6 +198,7 @@ static short RegVal (unsigned short Use, const RegContents* RC)
         return ZPRegVal (Use, RC);
     }
 }
+#endif
 
 
 

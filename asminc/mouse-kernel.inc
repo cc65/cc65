@@ -6,10 +6,10 @@
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */
-;/* (C) 2003-2006 Ullrich von Bassewitz                                       */
-;/*               Römerstraße 52                                              */
-;/*               D-70794 Filderstadt                                         */
-;/* EMail:        uz@cc65.org                                                 */
+;/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+;/*                Roemerstrasse 52                                           */
+;/*                D-70794 Filderstadt                                        */
+;/* EMail:         uz@cc65.org                                                */
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */
@@ -61,7 +61,8 @@
 	    UNINSTALL	.addr
        	    HIDE        .addr
 	    SHOW        .addr
-	    BOX         .addr
+       	    SETBOX      .addr
+	    GETBOX	.addr
 	    MOVE        .addr
 	    BUTTONS     .addr
 	    POS         .addr
@@ -95,7 +96,7 @@
 ;------------------------------------------------------------------------------
 ; The mouse API version, stored in MOUSE_HDR::VERSION
 
-MOUSE_API_VERSION       = $01
+MOUSE_API_VERSION       = $02
 
 ;------------------------------------------------------------------------------
 ; Bitmapped mouse driver flags, stored in MOUSE_HDR::FLAGS.
@@ -127,6 +128,12 @@ MOUSE_BTN_RIGHT         = $01
         BUTTONS .byte
 .endstruct
 
+.struct MOUSE_BOX
+	MINX	.word
+    	MINY	.word
+	MAXX	.word
+	MAXY	.word
+.endstruct
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -144,7 +151,8 @@ MOUSE_BTN_RIGHT         = $01
         .global _mouse_geterrormsg
         .global _mouse_hide
         .global _mouse_show
-        .global _mouse_box
+        .global _mouse_setbox
+	.global	_mouse_getbox
         .global _mouse_move
         .global _mouse_buttons
         .global _mouse_pos
@@ -160,7 +168,8 @@ MOUSE_BTN_RIGHT         = $01
         .global mouse_uninstall
         .global mouse_hide
         .global mouse_show
-        .global mouse_box
+        .global mouse_setbox			 
+	.global mouse_getbox
         .global mouse_move
         .global mouse_buttons
         .global mouse_pos

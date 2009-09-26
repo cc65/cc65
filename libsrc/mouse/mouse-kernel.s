@@ -1,5 +1,5 @@
 ;
-; Ullrich von Bassewitz, 2003-12-28
+; Ullrich von Bassewitz, 2003-12-28, 2009-09-26
 ;
 ; Common functions of the mouse driver API.
 ;
@@ -28,7 +28,8 @@ mouse_install:  jmp     return0
 mouse_uninstall:jmp     return0
 mouse_hide:     jmp     return0
 mouse_show:     jmp     return0
-mouse_box:      jmp     return0
+mouse_setbox:   jmp     return0
+mouse_getbox:	jmp	return0
 mouse_move:     jmp     return0
 mouse_buttons:  jmp     return0
 mouse_pos:      jmp     return0

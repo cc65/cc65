@@ -60,14 +60,22 @@
 
 /* Structure containing the mouse coordinates */
 struct mouse_pos {
-    int x;
-    int y;
+    int 		x;
+    int 		y;
 };
 
 /* Structure containing information about the mouse */
 struct mouse_info {
     struct mouse_pos    pos;           /* Mouse position */
     unsigned char       buttons;       /* Mouse button mask */
+};
+
+/* Structure used for getbox/setbox */
+struct mouse_box {
+    int         	minx;
+    int         	miny;
+    int         	maxx;
+    int         	maxy;
 };
 
 /* Structure containing mouse callback functions. These functions are declared
@@ -133,7 +141,7 @@ void __fastcall__ mouse_hide (void);
 void __fastcall__ mouse_show (void);
 /* Show the mouse. See mouse_hide for more information. */
 
-void __fastcall__ mouse_box (int minx, int miny, int maxx, int maxy);
+void __fastcall__ mouse_setbox (const struct mouse_box* box);
 /* Set the bounding box for the mouse pointer movement. The mouse X and Y
  * coordinates will never go outside the given box.
  * NOTE: The function does *not* check if the mouse is currently inside the
@@ -148,6 +156,9 @@ void __fastcall__ mouse_box (int minx, int miny, int maxx, int maxy);
  * screen, the positioning of the mouse cursor can fail. If such margins
  * are really what you want, you have to use your own cursor routines.
  */
+
+void __fastcall__ mouse_getbox (struct mouse_box* box);
+/* Get the current bounding box for the mouse pointer movement. */
 
 void __fastcall__ mouse_move (int x, int y);
 /* Set the mouse cursor to the given position. If a mouse cursor is defined

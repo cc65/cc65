@@ -282,7 +282,8 @@ function.
 <item><ref id="mouse_uninstall" name="mouse_uninstall">
 <item><ref id="mouse_hide" name="mouse_hide">
 <item><ref id="mouse_show" name="mouse_show">
-<item><ref id="mouse_box" name="mouse_box">
+<item><ref id="mouse_setbox" name="mouse_setbox">
+<item><ref id="mouse_getbox" name="mouse_getbox">
 <item><ref id="mouse_move" name="mouse_move">
 <item><ref id="mouse_buttons" name="mouse_buttons">
 <item><ref id="mouse_pos" name="mouse_pos">
@@ -291,7 +292,7 @@ function.
 </itemize>
 
 (incomplete)
-
+                                          
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
@@ -3253,14 +3254,13 @@ relocatable o65 modules for use with this function.
 </quote>
 
 
-<sect1>mouse_box<label id="mouse_box"><p>
+<sect1>mouse_setbox<label id="mouse_setbox"><p>
 
 <quote>
 <descrip>
 <tag/Function/Specify a bounding box for the mouse cursor.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
-<tag/Declaration/<tt/void __fastcall__ mouse_box (int minx, int miny,
-int maxx, int maxy);/
+<tag/Declaration/<tt/void __fastcall__ mouse_setbox (const struct mouse_box* box);/
 <tag/Description/The function allows to set a bounding box for mouse movement.
 <tag/Limits/<itemize>
 <item>The function does not check if the mouse cursor is currently within the
@@ -3275,7 +3275,30 @@ used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="mouse_getbox" name="mouse_getbox">,
 <ref id="mouse_move" name="mouse_move">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mouse_getbox<label id="mouse_getbox"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the current bounding box for the mouse cursor.
+<tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
+<tag/Declaration/<tt/void __fastcall__ mouse_getbox (struct mouse_box* box);/
+<tag/Description/The function queries the current bounding box for mouse 
+movement.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mouse_move" name="mouse_move">,
+<ref id="mouse_setbox" name="mouse_setbox">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3480,13 +3503,14 @@ used in presence of a prototype.
 is visible, it is shown at the new position.
 <tag/Limits/<itemize>
 <item>The function does not check if the new position is within the bounding
-box specified with <tt/<ref id="mouse_box" name="mouse_box">/.
+box specified with <tt/<ref id="mouse_setbox" name="mouse_setbox">/.
 <item>The function is only available as fastcall function, so it may only be
 used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="mouse_box" name="mouse_box">
+<ref id="mouse_getbox" name="mouse_getbox">,
+<ref id="mouse_setbox" name="mouse_setbox">
 <tag/Example/None.
 </descrip>
 </quote>

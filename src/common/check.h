@@ -78,10 +78,10 @@ extern void (*CheckFailed) (const char* Msg, const char* Cond,
  */
 
 #define PRECONDITION(c) \
-    ((c)? 0 : (CheckFailed (MsgPrecondition, #c, __FILE__, __LINE__), 0))
+    ((void) ((c)? 0 : (CheckFailed (MsgPrecondition, #c, __FILE__, __LINE__), 0)))
 
 #define CHECK(c)	\
-    ((c)? 0 : (CheckFailed (MsgCheckFailed, #c, __FILE__, __LINE__), 0))
+    ((void) ((c)? 0 : (CheckFailed (MsgCheckFailed, #c, __FILE__, __LINE__), 0)))
 
 
 

@@ -27,11 +27,12 @@ initiobuf:
         ; Mark all remaining table entries as used
         tax
         lda     #$FF
+:       cpx     #MAX_FDS
+        bcc     :+
+        rts
 :       sta     table,x
         inx
-        cpx     #MAX_FDS
-        bcc     :-
-        rts
+        bne     :--             ; Branch always
 
 ; ------------------------------------------------------------------------
 

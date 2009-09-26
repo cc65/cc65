@@ -34,7 +34,7 @@ struct outdesc {
 
 
 /* Internal formatting routine */
-int __fastcall__ _printf (struct outdesc* d, const char* format, va_list ap);
+void __fastcall__ _printf (struct outdesc* d, const char* format, va_list ap);
 
 
 

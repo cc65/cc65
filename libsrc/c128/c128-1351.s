@@ -2,7 +2,7 @@
 ; Driver for the 1351 proportional mouse. Parts of the code are from
 ; the Commodore 1351 mouse users guide.
 ;
-; Ullrich von Bassewitz, 2003-12-29
+; Ullrich von Bassewitz, 2003-12-29, 2009-09-26
 ;
 
         .include        "zeropage.inc"
@@ -29,7 +29,8 @@ HEADER:
         .addr   UNINSTALL
         .addr   HIDE
         .addr   SHOW
-        .addr   BOX
+        .addr   SETBOX
+        .addr   GETBOX
         .addr   MOVE
         .addr   BUTTONS
         .addr   POS
@@ -57,7 +58,8 @@ SCREEN_WIDTH    = 320
 
 ;----------------------------------------------------------------------------
 ; Global variables. The bounding box values are sorted so that they can be
-; written with the least effort in the BOX routine, so don't reorder them.
+; written with the least effort in the SETBOX and GETBOX routines, so don't
+; reorder them.
 
 .bss
 
@@ -67,10 +69,10 @@ OldPotY:	.res   	1
 
 YPos:           .res    2               ; Current mouse position, Y
 XPos:           .res    2               ; Current mouse position, X
-YMax:		.res	2	     	; Y2 value of bounding box
-XMax:		.res	2	     	; X2 value of bounding box
-YMin:		.res	2	     	; Y1 value of bounding box
 XMin:		.res	2	     	; X1 value of bounding box
+YMin:		.res	2	     	; Y1 value of bounding box
+XMax:		.res	2	     	; X2 value of bounding box
+YMax:		.res	2	     	; Y2 value of bounding box
 
 OldValue:	.res   	1	     	; Temp for MoveCheck routine
 NewValue:	.res   	1	     	; Temp for MoveCheck routine
@@ -83,10 +85,10 @@ NewValue:	.res   	1	     	; Temp for MoveCheck routine
         .byte   0, 0                    ; OldPotX/OldPotY
         .word   SCREEN_HEIGHT/2         ; YPos
         .word   SCREEN_WIDTH/2          ; XPos
-        .word   SCREEN_HEIGHT           ; YMax
-        .word   SCREEN_WIDTH            ; XMax
-        .word   0                       ; YMin
         .word   0                       ; XMin
+        .word   0                       ; YMin
+        .word   SCREEN_WIDTH            ; XMax
+        .word   SCREEN_HEIGHT           ; YMax
 .endproc
 
 .code
@@ -157,21 +159,38 @@ SHOW:   sei
         rts
 
 ;----------------------------------------------------------------------------
-; BOX: Set the mouse bounding box. The parameters are passed as they come from
-; the C program, that is, maxy in a/x and the other parameters on the stack.
-; The C wrapper will remove the parameters from the stack when the driver
-; routine returns.
+; SETBOX: Set the mouse bounding box. The parameters are passed as they come
+; from the C program, that is, a pointer to a mouse_box struct in a/x.
 ; No checks are done if the mouse is currently inside the box, this is the job
 ; of the caller. It is not necessary to validate the parameters, trust the
 ; caller and save some code here. No return code required.
 
-BOX:    ldy     #5
-        sei
-        sta     YMax
-        stx     YMax+1
+SETBOX: sta     ptr1
+        stx     ptr1+1                  ; Save data pointer
 
-@L1:    lda     (sp),y
-        sta     XMax,y
+        ldy     #.sizeof (MOUSE_BOX)-1
+        sei
+
+@L1:    lda     (ptr1),y
+        sta     XMin,y
+        dey
+        bpl     @L1
+
+        cli
+       	rts
+
+;----------------------------------------------------------------------------
+; GETBOX: Return the mouse bounding box. The parameters are passed as they
+; come from the C program, that is, a pointer to a mouse_box struct in a/x.
+
+GETBOX: sta     ptr1
+        stx     ptr1+1                  ; Save data pointer
+
+        ldy     #.sizeof (MOUSE_BOX)-1
+        sei
+
+@L1:    lda     XMin,y
+        sta     (ptr1),y
         dey
         bpl     @L1
 

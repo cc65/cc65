@@ -84,13 +84,13 @@ static void DoWarning (void)
 
 
 
-static void ShowState (unsigned char Invisible)
-/* Display cursor visibility */
+static void ShowState (unsigned char Jailed, unsigned char Invisible)
+/* Display jail and cursor state */
 {
     gotoxy (0, 6);
     cclear (40);
     gotoxy (0, 6);
-    cprintf ("Mouse cursor %svisible", Invisible? "in" : "");
+    cprintf ("Mouse cursor %svisible%s", Invisible? "in" : "", Jailed? ", jailed" : "");
 }
 
 
@@ -98,8 +98,11 @@ static void ShowState (unsigned char Invisible)
 int main (void)
 {
     struct mouse_info info;
+    struct mouse_box full_box;
+    struct mouse_box small_box;
     unsigned char Invisible;
     unsigned char Done;
+    unsigned char Jailed;
 
     /* Initialize the debugger */
     DbgInit (0);
@@ -134,35 +137,20 @@ int main (void)
     CheckError ("mouse_load_driver",
                 mouse_load_driver (&mouse_def_callbacks, mouse_stddrv));
 
+    /* Get the initial mouse bounding box */
+    mouse_getbox (&full_box);
+
     /* Print a help line */
     revers (1);
-    cputsxy (0, 0, "d: debug   h: hide   q: quit   s: show  ");
+    cputsxy (0, 0, "d)ebug  h)ide   q)uit   s)how   j)ail   ");
     revers (0);
 
     /* Test loop */
     Done = 0;
-    ShowState (Invisible = 1);
+    Jailed = 0;
+    Invisible = 1;
+    ShowState (Jailed, Invisible);
     while (!Done) {
-     	if (kbhit ()) {
-     	    switch (tolower (cgetc ())) {
-		case 'd':
-		    BREAK();
-		    break;
-		case 'h':
- 	   	    ShowState (++Invisible);
-	   	    mouse_hide ();
-	   	    break;
-		case 's':
-     	   	    if (Invisible) {
-     	   	     	ShowState (--Invisible);
-     	   	 	mouse_show ();
-	       	    }
-	   	    break;
-	   	case 'q':
-		    Done = 1;
-		    break;
-	    }
-	}
 
 	/* Get the current mouse coordinates and button states and print them */
 	mouse_info (&info);
@@ -174,6 +162,47 @@ int main (void)
       	cprintf ("LB = %c", (info.buttons & MOUSE_BTN_LEFT)? '1' : '0');
       	gotoxy (0, 5);
       	cprintf ("RB = %c", (info.buttons & MOUSE_BTN_RIGHT)? '1' : '0');
+
+        /* Handle user input */
+     	if (kbhit ()) {
+     	    switch (tolower (cgetc ())) {
+
+		case 'd':
+		    BREAK();
+		    break;
+
+		case 'h':
+ 	   	    ShowState (Jailed, ++Invisible);
+	   	    mouse_hide ();
+	   	    break;
+
+                case 'j':
+                    if (Jailed) {
+                        Jailed = 0;
+                        mouse_setbox (&full_box);
+                    } else {
+                        Jailed = 1;
+                        small_box.minx = info.pos.x - 10;
+                        small_box.miny = info.pos.y - 10;
+                        small_box.maxx = info.pos.x + 10;
+                        small_box.maxy = info.pos.y + 10;
+                        mouse_setbox (&small_box);
+                    }
+                    ShowState (Jailed, Invisible);
+                    break;
+
+		case 's':
+     	   	    if (Invisible) {
+     	   	     	ShowState (Jailed, --Invisible);
+     	   	 	mouse_show ();
+	       	    }
+	   	    break;
+
+	   	case 'q':
+		    Done = 1;
+		    break;
+	    }
+	}
 
     }
 

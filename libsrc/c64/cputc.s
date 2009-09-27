@@ -84,20 +84,12 @@ L11:	ora	#$40
 
 
 
-; Set cursor position, calculate RAM pointers. Because kernal -02 doesn't
-; update the color RAM pointer, we have to do that manually here.
+; Set cursor position, calculate RAM pointers.
 
 plot:	ldy	CURS_X
 	ldx	CURS_Y
 	clc
-       	jsr	PLOT		; Set the new cursor
-        lda     SCREEN_PTR      ; Low byte of color RAM ...
-        sta     CRAM_PTR        ; ... is same as text screen pointer
-        lda     SCREEN_PTR+1    ; While high byte of color RAM
-        and     #$03
-        ora     #$D8            ; ... needs to be adjusted
-        sta     CRAM_PTR+1
-        rts
+       	jmp     PLOT		; Set the new cursor
 
 
 

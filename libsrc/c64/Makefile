@@ -58,6 +58,7 @@ OBJS = 	_scrsize.o     	 	\
 	joy_stddrv.o		\
        	kbhit.o	       	 	\
         kernal.o                \
+        kplot.o                 \
         mainargs.o              \
         mcbdefault.o            \
         mouse_stddrv.o          \

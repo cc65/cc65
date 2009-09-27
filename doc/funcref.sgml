@@ -292,7 +292,7 @@ function.
 </itemize>
 
 (incomplete)
-                                          
+
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
@@ -415,12 +415,14 @@ It does not declare any functions.
 <item><ref id="remove" name="remove">
 <!-- <item><ref id="rewind" name="rewind"> -->
 <!-- <item><ref id="scanf" name="scanf"> -->
+<!-- <item><ref id="snprintf" name="snprintf"> -->
 <!-- <item><ref id="sprintf" name="sprintf"> -->
 <!-- <item><ref id="sscanf" name="sscanf"> -->
 <!-- <item><ref id="vfprintf" name="vfprintf"> -->
 <!-- <item><ref id="vfscanf" name="vfscanf"> -->
 <!-- <item><ref id="vprintf" name="vprintf"> -->
 <!-- <item><ref id="vscanf" name="vscanf"> -->
+<!-- <item><ref id="vsnprintf" name="vsnprintf"> -->
 <!-- <item><ref id="vsprintf" name="vsprintf"> -->
 <!-- <item><ref id="vsscanf" name="vsscanf"> -->
 </itemize>
@@ -464,7 +466,7 @@ It does not declare any functions.
 
 
 <sect1><tt/string.h/<label id="string.h"><p>
-
+           
 <itemize>
 <item><ref id="_stroserror" name="_stroserror">
 <item><ref id="bzero" name="bzero">
@@ -3289,7 +3291,7 @@ used in presence of a prototype.
 <tag/Function/Return the current bounding box for the mouse cursor.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
 <tag/Declaration/<tt/void __fastcall__ mouse_getbox (struct mouse_box* box);/
-<tag/Description/The function queries the current bounding box for mouse 
+<tag/Description/The function queries the current bounding box for mouse
 movement.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only be

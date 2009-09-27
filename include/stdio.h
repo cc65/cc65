@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -116,10 +116,12 @@ int __fastcall__ putchar (int c);
 int __fastcall__ puts (const char* s);
 int __fastcall__ remove (const char* name);
 int __fastcall__ rename (const char* oldname, const char* newname);
+int snprintf (char* buf, size_t size, const char* format, ...);
 int sprintf (char* buf, const char* format, ...);
 int __fastcall__ ungetc (int c, FILE* f);
 int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
 int __fastcall__ vprintf (const char* format, va_list ap);
+int __fastcall__ vsnprintf (char* buf, size_t size, const char* format, va_list ap);
 int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);
 
 int scanf (const char* format, ...);

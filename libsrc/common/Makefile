@@ -192,6 +192,7 @@ S_OBJS = 	_cwd.o          \
                 vfscanf.o       \
 		vprintf.o       \
                 vscanf.o        \
+                vsnprintf.o     \
 		vsprintf.o	\
                 vsscanf.o       \
 		zerobss.o

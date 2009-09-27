@@ -57,6 +57,10 @@ static const unsigned char MouseSprite[64] = {
 #endif  /* __C64__ or __C128__ */
 
 
+#define max(a,b)  (((a) > (b)) ? (a) : (b))
+#define min(a,b)  (((a) < (b)) ? (a) : (b))
+
+
 
 static void CheckError (const char* S, unsigned char Error)
 {
@@ -182,10 +186,10 @@ int main (void)
                         mouse_setbox (&full_box);
                     } else {
                         Jailed = 1;
-                        small_box.minx = info.pos.x - 10;
-                        small_box.miny = info.pos.y - 10;
-                        small_box.maxx = info.pos.x + 10;
-                        small_box.maxy = info.pos.y + 10;
+                        small_box.minx = max (info.pos.x - 10, full_box.minx);
+                        small_box.miny = max (info.pos.y - 10, full_box.miny);
+                        small_box.maxx = min (info.pos.x + 10, full_box.maxx);
+                        small_box.maxy = min (info.pos.y + 10, full_box.maxy);
                         mouse_setbox (&small_box);
                     }
                     ShowState (Jailed, Invisible);

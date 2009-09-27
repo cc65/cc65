@@ -14,10 +14,10 @@ export WINEDEBUG=fixme-all
 WINE = wine
 
 # Programs
-AR     	= $(WINE) WLIB
-CC      = $(WINE) WCC386
-LD     	= $(WINE) WLINK
-WSTRIP	= $(WINE) WSTRIP -q
+AR     	= $(WINE) wlib
+CC      = $(WINE) wcc386
+LD     	= $(WINE) wlink
+WSTRIP	= $(WINE) wstrip -q
 
 LNKCFG  = ld.tmp
 
@@ -54,7 +54,7 @@ endif
 # Implicit rules
 
 %.obj:  %.c
-	$(CC) $(CFLAGS) $^
+	$(CC) $(CFLAGS) -fo=$@ $^
 
 
 # ------------------------------------------------------------------------------

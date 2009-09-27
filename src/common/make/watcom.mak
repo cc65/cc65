@@ -14,9 +14,9 @@ export WINEDEBUG=fixme-all
 WINE    = wine
 
 # Programs
-AR     	= $(WINE) WLIB
-CC      = $(WINE) WCC386
-LD     	= $(WINE) WLINK
+AR     	= $(WINE) wlib
+CC      = $(WINE) wcc386
+LD     	= $(WINE) wlink
 LIB	= common.lib
 
 # Program arguments
@@ -49,7 +49,7 @@ endif
 # Implicit rules
 
 %.obj:  %.c
-	$(CC) $(CFLAGS) $^
+	$(CC) $(CFLAGS) -fo=$@ $^
 
 
 # ------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ $(LIB): $(OBJS)
 	@echo Done!
 
 wildargv.obj:
-	$(CC) $(CFLAGS) $(WATCOM)\\src\\startup\\wildargv.c
+	$(CC) $(CFLAGS) -fo=$@ $(WATCOM)\\src\\startup\\wildargv.c
 
 clean:
 	@rm -f *~ core

@@ -39,7 +39,8 @@ status		:= $0778
 	.addr	UNINSTALL
 	.addr	HIDE
 	.addr	SHOW
-	.addr	BOX
+	.addr	SETBOX
+	.addr	GETBOX
 	.addr	MOVE
 	.addr	BUTTONS
 	.addr	POS
@@ -60,6 +61,7 @@ CMOVEY: jmp	$0000			; Move the cursor to Y coord
 
 	.bss
 
+box:	.tag	MOUSE_BOX
 info:	.tag	MOUSE_INFO
 slot:	.res	1
 visible:.res	1
@@ -79,6 +81,11 @@ values: .byte	$38		; Fixed
 	.byte	$20		; X-Y pointing device type 0
 
 size	= * - values
+
+inibox:	.word	  0		; MinX
+	.word	  0		; MinY
+	.word	279		; MaxX
+	.word	191		; MaxY
 
 ; ------------------------------------------------------------------------
 
@@ -135,9 +142,13 @@ next:	inc	ptr1+1
 	sta	xparam+1
 	sta	jump+2
 
+	; Disable interrupts now because setting the slot number makes 
+	; the IRQ handler (maybe called due to some non-mouse IRQ) try
+	; calling the firmware which isn't correctly set up yet
+	sei
+
 	; Convert to and save slot number
 	and	#$0F
-	sei
 	sta	slot
 
 	; Convert to and patch I/O register index
@@ -164,22 +175,9 @@ next:	inc	ptr1+1
 	jsr	firmware
 
 	; Set initial mouse clamps
-	lda	#<279
-	ldx	#>279
-	sta	pos2_lo
-	stx	pos2_hi
-	lda	#$00		; Set x clamps
-	sta	pos1_lo
-	sta	pos1_hi
-	ldx	#CLAMPMOUSE
-	jsr	firmware
-	lda	#<191
-	ldx	#>191
-	sta	pos2_lo
-	stx	pos2_hi
-	lda	#$01		; Set y clamps
-	ldx	#CLAMPMOUSE
-	jsr	firmware
+	lda	#<inibox
+	ldx	#>inibox
+	jsr	SETBOX
 
 	; Set initial mouse position
 	ldx	slot
@@ -220,73 +218,68 @@ UNINSTALL:
 	ldx	#SETMOUSE
 	bne	common		; Branch always
 
-; HIDE: Is called to hide the mouse cursor. The mouse kernel manages a
-; counter for calls to show/hide, and the driver entry point is only called
-; if the mouse is currently visible and should get hidden. For most drivers,
-; no special action is required	besides	hiding the mouse cursor.
-; No return code required.
-HIDE:
-	dec	visible
-	sei
-	jsr	CHIDE
-	cli
-	rts
-
-; SHOW:	Is called to show the mouse cursor. The mouse kernel manages a
-; counter for calls to show/hide, and the driver entry point is	only called
-; if the mouse is currently hidden and should become visible. For most drivers,
-; no special action is required	besides	enabling the mouse cursor.
-; No return code required.
-SHOW:
-	inc	visible
-	rts
-
-; BOX: Set the mouse bounding box. The parameters are passed as	they come from
-; the C	program, that is, maxy in A/X and the other parameters on the stack.
-; The C	wrapper	will remove the	parameters from	the stack when the driver
-; routine returns.
+; SETBOX: Set the mouse bounding box. The parameters are passed as they come
+; from the C program, that is, a pointer to a mouse_box struct in A/X.
 ; No checks are done if the mouse is currently inside the box, this is the job
 ; of the caller. It is not necessary to validate the parameters, trust the
 ; caller and save some code here. No return code required.
-BOX:
-	; Apple II Mouse TechNote #1, Interrupt Environment with the Mouse:
-	; "Disable interrupts before placing position information in the screen holes."
-	sei
-
-	; Set high clamp
-	sta	pos2_lo
-	txa
-
-	ldx	#$01		; Set y clamps
-	ldy	#$00		; Start at top of stack
+SETBOX:
+	sta	ptr1
+	stx	ptr1+1
+        
+	; Set x clamps
+	ldx	#$00
+	ldy	#MOUSE_BOX::MINX
 	jsr	:+
+	
+	; Set y clamps
+	ldx	#$01
+	ldy	#MOUSE_BOX::MINY
 
-	ldx	#$00		; Set x clamps
-	ldy	#$00		; Start at top of stack
-
-	; Set high clamp
-	lda	(sp),y
-	iny
-	sei
-	sta	pos2_lo
-	lda	(sp),y
-	iny
-:	sta	pos2_hi
-
-	; Skip one parameter
-	iny
-	iny
+	; Apple II Mouse TechNote #1, Interrupt Environment with the Mouse:
+	; "Disable interrupts before placing position information in the
+	;  screen holes."
+:	sei
 
 	; Set low clamp
-	lda	(sp),y
-	iny
+	lda	(ptr1),y
+	sta	box,y
 	sta	pos1_lo
-	lda	(sp),y
+	iny
+	lda	(ptr1),y
+	sta	box,y 	
 	sta	pos1_hi
+
+	; Skip one word
+	iny
+	iny
+
+	; Set high clamp
+	iny
+	lda	(ptr1),y
+	sta	box,y 	
+	sta	pos2_lo
+	iny
+	lda	(ptr1),y
+	sta	box,y 	
+	sta	pos2_hi
 
 	txa
 	ldx	#CLAMPMOUSE
 	bne	common		; Branch always
+
+; GETBOX: Return the mouse bounding box. The parameters are passed as they
+; come from the C program, that is, a pointer to a mouse_box struct in A/X.
+GETBOX:
+	sta	ptr1
+	stx	ptr1+1
+
+	ldy	#.sizeof(MOUSE_BOX)-1
+:	lda	box,y
+	sta	(ptr1),y
+	dey
+	bpl	:-
+	rts
 
 ; MOVE: Move the mouse to a new position. The position is passed as it comes
 ; from the C program, that is: x on the stack and y in A/X. The C wrapper will
@@ -319,6 +312,27 @@ MOVE:
 	ldx	#POSMOUSE
 	bne	common		; Branch always
 
+; HIDE: Is called to hide the mouse cursor. The mouse kernel manages a
+; counter for calls to show/hide, and the driver entry point is only called
+; if the mouse is currently visible and should get hidden. For most drivers,
+; no special action is required	besides	hiding the mouse cursor.
+; No return code required.
+HIDE:
+	dec	visible
+	sei
+	jsr	CHIDE
+	cli
+	rts
+
+; SHOW:	Is called to show the mouse cursor. The mouse kernel manages a
+; counter for calls to show/hide, and the driver entry point is	only called
+; if the mouse is currently hidden and should become visible. For most drivers,
+; no special action is required	besides	enabling the mouse cursor.
+; No return code required.
+SHOW:
+	inc	visible
+	rts
+
 ; BUTTONS: Return the button mask in A/X.
 BUTTONS:
 	lda	info + MOUSE_INFO::BUTTONS
@@ -328,19 +342,16 @@ BUTTONS:
 ; POS: Return the mouse position in the MOUSE_POS struct pointed to by ptr1.
 ; No return code required.
 POS:
-	ldx	#.sizeof(MOUSE_POS)-1
+	ldy	#.sizeof(MOUSE_POS)-1
 	bne	copy		; Branch always
 
 ; INFO: Returns mouse position and current button mask in the MOUSE_INFO
 ; struct pointed to by ptr1. No return code required.
 INFO:
-	ldx	#.sizeof(MOUSE_INFO)-1
-copy:	txa
-	tay
-	sei
-:	lda	info,x
+	ldy	#.sizeof(MOUSE_INFO)-1
+copy:	sei
+:	lda	info,y
 	sta	(ptr1),y
-	dex
 	dey
 	bpl	:-
 	cli

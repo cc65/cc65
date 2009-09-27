@@ -156,6 +156,7 @@ S_OBJS = 	_cwd.o          \
 	 	setjmp.o      	\
                 signal.o        \
                 sigtable.o      \
+                snprintf.o      \
 		sprintf.o	\
 		sscanf.o	\
 		strcat.o    	\

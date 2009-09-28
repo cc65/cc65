@@ -929,7 +929,7 @@ void g_getind (unsigned Flags, unsigned Offs)
 void g_leasp (int Offs)
 /* Fetch the address of the specified symbol into the primary register */
 {
-    unsigned char Lo, Hi;              
+    unsigned char Lo, Hi;
 
     /* Calculate the offset relative to sp */
     Offs -= StackPtr;
@@ -4230,7 +4230,7 @@ void g_defbytes (const void* Bytes, unsigned Count)
         } while (Chunk);
 
         /* Output the line */
-        AddDataLine (Buf);
+        AddDataLine ("%s", Buf);
     }
 }
 
@@ -4407,7 +4407,7 @@ void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
 void g_asmcode (struct StrBuf* B)
 /* Output one line of assembler code. */
 {
-    AddCodeLine ("%.*s", SB_GetLen (B), SB_GetConstBuf (B));
+    AddCodeLine ("%.*s", (int) SB_GetLen (B), SB_GetConstBuf (B));
 }
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -317,7 +317,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
     	    case OPT_ARGSTR:
     	     	ArgStr = GetString (&StrPool, Val);
     	    	ArgLen = strlen (ArgStr);
-    	     	printf ("      Data:%*s\"%s\"\n", 24-ArgLen, "", ArgStr);
+    	     	printf ("      Data:%*s\"%s\"\n", (int)(24-ArgLen), "", ArgStr);
     	     	break;
 
     	    case OPT_ARGNUM:
@@ -383,7 +383,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
        	printf ("      Size:%26lu\n", Size);
 	printf ("      Modification time:%13lu  (%s)\n", MTime, TimeToStr (MTime));
     }
@@ -437,7 +437,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
        	printf ("      Size:%26lu\n", Size);
 	printf ("      Alignment:%21u\n", Align);
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
@@ -496,7 +496,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 	/* Print the data */
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
-	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
     }
 
     /* Destroy the string pool */
@@ -564,7 +564,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
        	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, ConDes));
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
-	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
 	}
@@ -637,7 +637,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
        	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, 0));
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
-	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
 	}
@@ -745,7 +745,7 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
         (void) ReadVar (F);
 
 	/* Print the size for this segment */
-	printf ("    %s:%*s%6lu\n", Name, 24-Len, "", Size);
+	printf ("    %s:%*s%6lu\n", Name, (int)(24-Len), "", Size);
 
         /* Seek to the end of the segment data (start of next) */
         FileSetPos (F, NextSeg);

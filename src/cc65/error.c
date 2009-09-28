@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -77,7 +77,7 @@ static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, 
      	fprintf (stderr, "\n");
 
         if (Line) {
-     	    Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+     	    Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
         }
      	++WarningCount;
     }
@@ -126,7 +126,7 @@ static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va
     fprintf (stderr, "\n");
 
     if (Line) {
-        Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+        Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
     ++ErrorCount;
     if (ErrorCount > 10) {
@@ -192,7 +192,7 @@ void Fatal (const char* Format, ...)
     fprintf (stderr, "\n");
 
     if (Line) {
-        Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+        Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
     exit (EXIT_FAILURE);
 }
@@ -223,7 +223,7 @@ void Internal (const char* Format, ...)
     fprintf (stderr, "\n");
 
     if (Line) {
-        fprintf (stderr, "\nInput: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+        fprintf (stderr, "\nInput: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
     }
 
     /* Use abort to create a core dump */

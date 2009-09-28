@@ -1373,6 +1373,7 @@ void CE_Output (const CodeEntry* E)
 {
     const OPCDesc* D;
     unsigned Chars;
+    int Space;
     const char* Target;
 
     /* If we have a label, print that */
@@ -1387,6 +1388,9 @@ void CE_Output (const CodeEntry* E)
 
     /* Print the mnemonic */
     Chars = WriteOutput ("\t%s", D->Mnemo);
+              
+    /* Space to leave before the operand */
+    Space = 9 - Chars;
 
     /* Print the operand */
     switch (E->AM) {
@@ -1397,50 +1401,50 @@ void CE_Output (const CodeEntry* E)
 
     	case AM65_ACC:
     	    /* accumulator */
-    	    Chars += WriteOutput ("%*sa", 9-Chars, "");
+    	    Chars += WriteOutput ("%*sa", Space, "");
     	    break;
 
 	case AM65_IMM:
     	    /* immidiate */
-    	    Chars += WriteOutput ("%*s#%s", 9-Chars, "", E->Arg);
+    	    Chars += WriteOutput ("%*s#%s", Space, "", E->Arg);
     	    break;
 
     	case AM65_ZP:
     	case AM65_ABS:
 	    /* zeropage and absolute */
-	    Chars += WriteOutput ("%*s%s", 9-Chars, "", E->Arg);
+	    Chars += WriteOutput ("%*s%s", Space, "", E->Arg);
        	    break;
 
 	case AM65_ZPX:
 	case AM65_ABSX:
 	    /* zeropage,X and absolute,X */
-	    Chars += WriteOutput ("%*s%s,x", 9-Chars, "", E->Arg);
+	    Chars += WriteOutput ("%*s%s,x", Space, "", E->Arg);
 	    break;
 
 	case AM65_ABSY:
 	    /* absolute,Y */
-	    Chars += WriteOutput ("%*s%s,y", 9-Chars, "", E->Arg);
+	    Chars += WriteOutput ("%*s%s,y", Space, "", E->Arg);
 	    break;
 
 	case AM65_ZPX_IND:
 	    /* (zeropage,x) */
-       	    Chars += WriteOutput ("%*s(%s,x)", 9-Chars, "", E->Arg);
+       	    Chars += WriteOutput ("%*s(%s,x)", Space, "", E->Arg);
 	    break;
 
 	case AM65_ZP_INDY:
 	    /* (zeropage),y */
-       	    Chars += WriteOutput ("%*s(%s),y", 9-Chars, "", E->Arg);
+       	    Chars += WriteOutput ("%*s(%s),y", Space, "", E->Arg);
 	    break;
 
 	case AM65_ZP_IND:
 	    /* (zeropage) */
-       	    Chars += WriteOutput ("%*s(%s)", 9-Chars, "", E->Arg);
+       	    Chars += WriteOutput ("%*s(%s)", Space, "", E->Arg);
 	    break;
 
 	case AM65_BRA:
 	    /* branch */
 	    Target = E->JumpTo? E->JumpTo->Name : E->Arg;
-	    Chars += WriteOutput ("%*s%s", 9-Chars, "", Target);
+	    Chars += WriteOutput ("%*s%s", Space, "", Target);
 	    break;
 
 	default:
@@ -1449,11 +1453,11 @@ void CE_Output (const CodeEntry* E)
     }
 
     /* Print usage info if requested by the debugging flag */
-    if (Debug) {
+    if (Debug) {                    
 	char Use [128];
 	char Chg [128];
        	WriteOutput ("%*s; USE: %-12s CHG: %-12s SIZE: %u",
-       	       	     30-Chars, "",
+       	       	     (int)(30-Chars), "",
 	    	     RegInfoDesc (E->Use, Use),
 	    	     RegInfoDesc (E->Chg, Chg),
 	       	     E->Size);

@@ -356,7 +356,7 @@ void Compile (const char* FileName)
         /* Preprocess each line and write it to the output file */
         while (NextLine ()) {
             Preprocess ();
-            WriteOutput ("%.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+            WriteOutput ("%.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
         }
 
         /* Close the output file */

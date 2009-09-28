@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -1356,7 +1356,7 @@ static void DoOut (void)
 	/* Output the string and be sure to flush the output to keep it in
 	 * sync with any error messages if the output is redirected to a file.
 	 */
-	printf ("%*s\n", SB_GetLen (&SVal), SB_GetConstBuf (&SVal));
+	printf ("%.*s\n", (int) SB_GetLen (&SVal), SB_GetConstBuf (&SVal));
 	fflush (stdout);
 	NextTok ();
     }

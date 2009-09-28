@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -80,7 +80,7 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
     xvsprintf (Buf, sizeof (Buf), Arg, ap);
     va_end (ap);
     Indent (ACol);
-    Output (Buf);
+    Output ("%s", Buf);
 
     /* Add the code stuff as comment */
     LineComment (PC, D->Size);

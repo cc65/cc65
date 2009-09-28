@@ -1079,7 +1079,7 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
     if (CE_HasLabel (FirstEntry)) {
         /* Get the entry following last */
         CodeEntry* FollowingEntry = CS_GetNextEntry (S, Last);
-        if (FollowingEntry) {       
+        if (FollowingEntry) {
             /* There is an entry after Last - move the labels */
             CS_MoveLabels (S, FirstEntry, FollowingEntry);
         } else {
@@ -1395,7 +1395,7 @@ void CS_Output (CodeSeg* S)
                     const char* N = strchr (L, '\n');
                     if (N) {
                         /* We have a newline, just write the first part */
-                        WriteOutput ("%.*s\n; ", N - L, L);
+                        WriteOutput ("%.*s\n; ", (int) (N - L), L);
                         L = N+1;
                     } else {
                         /* No Newline, write as is */

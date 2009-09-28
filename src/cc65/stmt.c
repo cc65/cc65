@@ -91,7 +91,7 @@ static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
  */
 {
     if (CurTok.Tok != Tok) {
-   	Error (Msg);
+   	Error ("%s", Msg);
     } else if (PendingToken) {
    	*PendingToken = 1;
     } else {

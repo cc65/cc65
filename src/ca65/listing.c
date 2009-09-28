@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -218,7 +218,7 @@ static void PrintPageHeader (FILE* F, const ListLine* L)
 /* Print the header for a new page. It is assumed that the given line is the
  * last line of the previous page.
  */
-{                         
+{
     /* Gte a pointer to the current input file */
     const StrBuf* CurFile = GetFileName (L->File);
 
@@ -231,7 +231,7 @@ static void PrintPageHeader (FILE* F, const ListLine* L)
      	     VER_MAJOR, VER_MINOR, VER_PATCH,
              Copyright,
 	     InFile,
-	     SB_GetLen (CurFile), SB_GetConstBuf (CurFile));
+	     (int) SB_GetLen (CurFile), SB_GetConstBuf (CurFile));
 
     /* Count pages, reset lines */
     ++PageNumber;

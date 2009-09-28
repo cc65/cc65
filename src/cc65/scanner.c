@@ -1037,7 +1037,7 @@ int Consume (token_t Token, const char* ErrorMsg)
 	NextToken ();
         return 1;
     } else {
-       	Error (ErrorMsg);
+       	Error ("%s", ErrorMsg);
         return 0;
     }
 }

@@ -2,10 +2,6 @@
 # gcc Makefile for the program sources
 #
 
-CFLAGS 	= -g -O2 -Wall -std=c89
-CC	= gcc
-LDFLAGS	=
-
 SUBDIRS	=		\
 	common		\
 	ar65		\
@@ -18,19 +14,7 @@ SUBDIRS	=		\
 	ld65		\
 	od65
 
-.PHONY: all
-all:
-	for i in $(SUBDIRS); do $(MAKE) -C $$i -f make/gcc.mak all || exit $$?; done
-
-.PHONY: dist
-dist:
-	for i in $(SUBDIRS); do $(MAKE) -C $$i -f make/gcc.mak dist || exit $$?; done
-
-.PHONY: clean
-clean:
-	for i in $(SUBDIRS); do $(MAKE) -C $$i -f make/gcc.mak clean || exit $$?; done
-
-.PHONY: zap
-zap:
-	for i in $(SUBDIRS); do $(MAKE) -C $$i -f make/gcc.mak zap || exit $$?; done
+.PHONY: all dist clean zap
+all dist clean zap:
+	for i in $(SUBDIRS); do $(MAKE) -C $$i -f make/gcc.mak $@ || exit $$?; done
 

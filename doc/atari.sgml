@@ -229,6 +229,9 @@ platform.
   Supports up to four standard joysticks connected to the joystick ports of
   the Atari.
 
+  <tag><tt/multijoy.joy/</tag>
+  Supports up to eight standard joysticks connected to a MultiJoy adapter.
+
 </descrip><p>
 
 

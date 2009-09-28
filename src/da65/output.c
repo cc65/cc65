@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -75,11 +75,11 @@ static void PageHeader (void)
 /* Print a page header */
 {
     fprintf (F,
-       	     "; da65 V%u.%u.%u - (C) Copyright 2000-2005,  Ullrich von Bassewitz\n"
+       	     "; da65 V%s - (C) Copyright 2000-2009,  Ullrich von Bassewitz\n"
              "; Created:    %s\n"
      	     "; Input file: %s\n"
      	     "; Page:       %u\n\n",
-       	     VER_MAJOR, VER_MINOR, VER_PATCH,
+       	     GetVersionAsString (),
              Now,
      	     InFile,
      	     Page);
@@ -188,7 +188,7 @@ void DefForward (const char* Name, const char* Comment, unsigned Offs)
             LineFeed ();
         }
 
-        /* Output the forward definition */ 
+        /* Output the forward definition */
         Output ("%s", Name);
         Indent (ACol);
         if (UseHexOffs) {

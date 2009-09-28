@@ -132,7 +132,7 @@ static void SetOptions (void)
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
     /* Set the translator */
-    SB_Printf (&Buf, "ca65 V%u.%u.%u", VER_MAJOR, VER_MINOR, VER_PATCH);
+    SB_Printf (&Buf, "ca65 V%s", GetVersionAsString ());
     OptTranslator (&Buf);
 
     /* Set date and time */
@@ -521,9 +521,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr,
-       	     "ca65 V%u.%u.%u - %s\n",
-       	     VER_MAJOR, VER_MINOR, VER_PATCH, Copyright);
+    fprintf (stderr, "ca65 V%s - %s\n", GetVersionAsString (), Copyright);
 }
 
 

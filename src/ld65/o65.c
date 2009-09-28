@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1999-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -1385,7 +1385,7 @@ void O65WriteTarget (O65Desc* D, File* F)
     }
     OptBuf[OptLen] = '\0';
     O65SetOption (D, O65OPT_TIMESTAMP, OptBuf, OptLen + 1);
-    sprintf (OptBuf, "ld65 V%u.%u.%u", VER_MAJOR, VER_MINOR, VER_PATCH);
+    sprintf (OptBuf, "ld65 V%s", GetVersionAsString ());
     O65SetOption (D, O65OPT_ASM, OptBuf, strlen (OptBuf) + 1);
 
     /* Write the header */

@@ -667,9 +667,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the compiler version */
 {
     fprintf (stderr,
-       	     "cc65 V%u.%u.%u\n"
-	     "SVN version: %s\n",
-       	     VER_MAJOR, VER_MINOR, VER_PATCH, SVNVersion);
+       	     "cc65 V%s\nSVN version: %s\n",
+       	     GetVersionAsString (), SVNVersion);
     exit (EXIT_SUCCESS);
 }
 

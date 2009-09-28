@@ -39,6 +39,7 @@ OBJS =	abend.o		\
 	strutil.o	\
 	target.o	\
 	tgttrans.o	\
+        version.o       \
 	xmalloc.o	\
 	xsprintf.o
 

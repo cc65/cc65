@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*									     */
-/*				   version.h				     */
+/*				   version.c				     */
 /*									     */
 /*	       Version information for the cc65 compiler package	     */
 /*									     */
@@ -14,7 +14,7 @@
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
 /* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.				     */
+/* arising from the use of this software.		     		     */
 /*									     */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
@@ -28,13 +28,27 @@
 /*    be misrepresented as being the original software.			     */
 /* 3. This notice may not be removed or altered from any source		     */
 /*    distribution.							     */
-/*									     */
+/*							     		     */
 /*****************************************************************************/
 
 
 
-#ifndef VERSION_H
-#define VERSION_H
+#include "version.h"
+#include "xsprintf.h"
+
+
+
+/*****************************************************************************/
+/*				     Data		     		     */
+/*****************************************************************************/
+
+
+
+#define VER_MAJOR	2U
+#define VER_MINOR      	13U
+#define VER_PATCH       0U
+#define VER_RC          0U
+
 
 
 
@@ -44,18 +58,25 @@
 
 
 
-const char* GetVersionAsString (void);
+const char* GetVersionAsString (void)
 /* Returns the version number as a string in a static buffer */
-
-unsigned GetVersionAsNumber (void);
-/* Returns the version number as a combined unsigned for use in a #define */
-
-
-
-/* End of version.h */
-
+{
+    static char Buf[20];
+#if defined(VER_RC) && (VER_RC > 0U)
+    xsnprintf (Buf, sizeof (Buf), "%u.%u.%u-rc%u", VER_MAJOR, VER_MINOR, VER_PATCH, VER_RC);
+#else
+    xsnprintf (Buf, sizeof (Buf), "%u.%u.%u", VER_MAJOR, VER_MINOR, VER_PATCH);
 #endif
+    return Buf;
+}
 
+
+
+unsigned GetVersionAsNumber (void)
+/* Returns the version number as a combined unsigned for use in a #define */
+{
+    return ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);
+}
 
 
 

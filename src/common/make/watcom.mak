@@ -85,6 +85,7 @@ OBJS =	abend.obj	\
 	strutil.obj	\
 	target.obj	\
 	tgttrans.obj	\
+        version.obj     \
         wildargv.obj    \
 	xmalloc.obj	\
 	xsprintf.obj

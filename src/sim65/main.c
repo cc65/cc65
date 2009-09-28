@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -207,9 +207,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr,
-       	     "sim65 V%u.%u.%u\n",
-       	     VER_MAJOR, VER_MINOR, VER_PATCH);
+    fprintf (stderr, "sim65 V%s\n", GetVersionAsString ());
 }
 
 

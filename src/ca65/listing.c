@@ -224,12 +224,11 @@ static void PrintPageHeader (FILE* F, const ListLine* L)
 
     /* Print the header on the new page */
     fprintf (F,
-	     "ca65 V%u.%u.%u - %s\n"
+       	     "ca65 V%s - %s\n"
     	     "Main file   : %s\n"
     	     "Current file: %.*s\n"
 	     "\n",
-     	     VER_MAJOR, VER_MINOR, VER_PATCH,
-             Copyright,
+     	     GetVersionAsString (), Copyright,
 	     InFile,
 	     (int) SB_GetLen (CurFile), SB_GetConstBuf (CurFile));
 

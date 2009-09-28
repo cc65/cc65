@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                       */
+/*                Roemerstrasse 52                                            */
+/*                D-70794 Filderstadt                                         */
+/* EMail:         uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -340,8 +340,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the disassembler version */
 {
     fprintf (stderr,
-       	     "da65 V%u.%u.%u - (C) Copyright 2000-2006, Ullrich von Bassewitz\n",
-       	     VER_MAJOR, VER_MINOR, VER_PATCH);
+       	     "da65 V%s - (C) Copyright 2000-2009, Ullrich von Bassewitz\n",
+       	     GetVersionAsString ());  
 }
 
 

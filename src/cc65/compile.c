@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -300,7 +300,7 @@ void Compile (const char* FileName)
     };
 
     /* Add macros that are always defined */
-    DefineNumericMacro ("__CC65__", VERSION);
+    DefineNumericMacro ("__CC65__", GetVersionAsNumber ());
 
     /* Language standard that is supported */
     DefineNumericMacro ("__CC65_STD_C89__", STD_C89);

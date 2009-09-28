@@ -4,9 +4,9 @@
 ; Ullrich von Bassewitz, 2009-09-26
 ;
 
-   	.export	      	_vsprintf
-	.import	      	pushw0sp, staxysp
-	.import	      	_vsnprintf
+   	.export	       	_vsprintf
+	.import	       	pushw0sp, staxysp
+	.import	       	vsnprintf
 
 
 ; ----------------------------------------------------------------------------
@@ -30,10 +30,8 @@ _vsprintf:
         ldy     #2
         jsr     staxysp
 
-; Retrieve ap and contine by jumping to _vsnprintf, which will cleanup the stack
+; Contine by jumping to vsnprintf, which expects ap on the CPU stack and will 
+; cleanup the C stack
 
-        pla
-        tax
-        pla
-        jmp     _vsnprintf
+        jmp     vsnprintf
 

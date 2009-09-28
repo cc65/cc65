@@ -38,40 +38,62 @@ unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device)
 unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_dirent* l_dirent)
 {
     unsigned char byte, i;
+    unsigned char rv;
+    unsigned char is_header;
+    static const unsigned char types[] = { 
+        CBM_T_OTHER, CBM_T_OTHER, CBM_T_CBM,   CBM_T_DIR,   /* a b c d */
+        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* e f g h */
+        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* i j k l */
+        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_PRG,   /* m n o p */
+        CBM_T_OTHER, CBM_T_REL,   CBM_T_SEQ,   CBM_T_OTHER, /* q r s t */
+        CBM_T_USR,   CBM_T_VRP                              /* u v     */
+    };
 
-    if (cbm_k_chkin (lfn) == 0) {
-        if (cbm_k_readst () == 0) {
-            cbm_k_basin ();                    /* 0x01, 0x01, next basic line */
-            cbm_k_basin ();
+    rv = 1;
+    is_header = 0;
 
-            byte = cbm_k_basin();             /* File-size */
-            l_dirent->size = byte | ((cbm_k_basin()) << 8);
+    if (!cbm_k_chkin(lfn)) {
+        if (!cbm_k_readst()) {
+            /* skip 2 bytes, next basic line pointer */
+            cbm_k_basin();
+            cbm_k_basin();
+
+            /* File-size */
+            l_dirent->size = cbm_k_basin() | ((cbm_k_basin()) << 8);
 
             byte = cbm_k_basin();
 
-            if (byte == 'b') {                 /* "B" BLOCKS FREE. */
-                while (cbm_k_readst () == 0) { /* Read until end */
-                    cbm_k_basin ();
+            /* "B" BLOCKS FREE. */
+            if (byte == 'b') {
+                /* Read until end, careless callers may call us again */
+                while (!cbm_k_readst()) {
+                    cbm_k_basin();
                 }
-                cbm_k_clrch ();
-                return 2;                       /* END */
+                rv = 2; /* EOF */
+                goto ret_val;
             }
 
-            if (byte != '\"') {
-                while (cbm_k_basin() != '\"') {
-                    if (cbm_k_readst () != 0) {   /* ### Included to prevent */
-                        cbm_k_clrch ();           /* ### Endless loop */
-                        return 3;                 /* ### Should be probably removed */
-                    }                             /* ### */
+            /* reverse text shows that this is the directory header */
+            if (byte == 0x12) { /* RVS_ON */
+                is_header = 1;
+            }
+
+            while (byte != '\"') {
+                byte = cbm_k_basin();
+                /* prevent endless loop */
+                if (cbm_k_readst()) {
+                    rv = 3;
+                    goto ret_val;
                 }
             }
 
             i = 0;
-            while ((byte = cbm_k_basin ()) != '\"') {
-                if (cbm_k_readst () != 0) {     /* ### Included to prevent */
-                    cbm_k_clrch ();             /* ### Endless loop */
-                    return 4;                   /* ### Should be probably removed */
-                }                               /* ### */
+            while ((byte = cbm_k_basin()) != '\"') {
+                /* prevent endless loop */
+                if (cbm_k_readst()) {
+                    rv = 4;
+                    goto ret_val;
+                }
 
                 if (i < sizeof (l_dirent->name) - 1) {
                     l_dirent->name[i] = byte;
@@ -80,61 +102,49 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
             }
             l_dirent->name[i] = '\0';
 
-            while ((byte=cbm_k_basin ()) == ' ') {
-                if (cbm_k_readst ()) {          /* ### Included to prevent */
-                    cbm_k_clrch ();             /* ### Endless loop */
-                    return 5;                   /* ### Should be probably removed */
-                }                               /* ### */
-            }
-
-            switch (byte) {
-                case 's':
-                    l_dirent->type = CBM_T_SEQ;
-                    break;
-                case 'p':
-                    l_dirent->type = CBM_T_PRG;
-                    break;
-                case 'u':
-                    l_dirent->type = CBM_T_USR;
-                    break;
-                case 'r':
-                    l_dirent->type = CBM_T_REL;
-                    break;
-                case 'c':
-                    l_dirent->type = CBM_T_CBM;
-                    break;
-                case 'd':
-                    l_dirent->type = CBM_T_DIR;
-                    break;
-                case 'v':
-                    l_dirent->type = CBM_T_VRP;
-                    break;
-                default:
-                    l_dirent->type = CBM_T_OTHER;
-            }
-
-            cbm_k_basin ();
-            cbm_k_basin ();
-
-            byte = cbm_k_basin ();
-
-            l_dirent->access = (byte == 0x3C)? CBM_A_RO : CBM_A_RW;
-
-            if (byte != 0) {
-                while (cbm_k_basin() != 0) {
-                    if (cbm_k_readst () != 0) { /* ### Included to prevent */
-                        cbm_k_clrch ();         /* ### Endless loop */
-                        return 6;               /* ### Should be probably removed */
-                    }                           /* ### */
+            while ((byte = cbm_k_basin()) == ' ') {
+                /* prevent endless loop */
+                if (cbm_k_readst()) {
+                    rv = 5;
+                    goto ret_val;
                 }
             }
 
-            cbm_k_clrch ();
-            return 0;                         /* Line read successfuly */
+            if (is_header) {
+                l_dirent->type = CBM_T_HEADER;
+            } else {
+                if (byte >= 'a' && byte < 'a' + sizeof(types)) {
+                    l_dirent->type = types[byte - 'a'];
+                } else {
+                    l_dirent->type = CBM_T_OTHER;
+                }
+
+                cbm_k_basin();
+                cbm_k_basin();
+
+                byte = cbm_k_basin();
+
+                l_dirent->access = (byte == 0x3C)? CBM_A_RO : CBM_A_RW;
+            }
+
+            /* read to end of line */
+            while (byte != 0) {
+                byte = cbm_k_basin();
+                /* prevent endless loop */
+                if (cbm_k_readst()) {
+                    rv = 6;
+                    goto ret_val;
+                }
+            }
+
+            rv = 0;
+            goto ret_val;
         }
     }
-    cbm_k_clrch ();
-    return 1;
+
+ret_val:
+    cbm_k_clrch();
+    return rv;
 }
 
 

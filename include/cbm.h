@@ -117,15 +117,17 @@ extern unsigned char _filetype;         /* Default 'u' */
 
 
 /* CBM FILE TYPES */
-#define CBM_T_DEL   0
-#define CBM_T_SEQ   1
-#define CBM_T_PRG   2
-#define CBM_T_USR   3
-#define CBM_T_REL   4
-#define CBM_T_CBM   5           /* 1581 sub-partition */
-#define CBM_T_DIR   6           /* IDE64 and CMD sub-directory */
-#define CBM_T_VRP   8           /* Vorpal fast-loadable format */
-#define CBM_T_OTHER 5           /* Other file-types not yet defined */
+#define CBM_T_DEL       0
+#define CBM_T_SEQ       1
+#define CBM_T_PRG       2
+#define CBM_T_USR       3
+#define CBM_T_REL       4
+#define CBM_T_CBM       5       /* 1581 sub-partition */
+#define CBM_T_DIR       6       /* IDE64 and CMD sub-directory */
+#define CBM_T_RESERVED  7       /* Not used, but kept free for compatibility */
+#define CBM_T_VRP       8       /* Vorpal fast-loadable format */
+#define CBM_T_OTHER     9       /* Other file-types not yet defined */
+#define CBM_T_HEADER   10       /* Disk header / title */
 
 /* CBM FILE ACCESS */
 #define CBM_A_RO    1           /* Read only   */

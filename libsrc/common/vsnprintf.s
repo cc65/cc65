@@ -18,11 +18,11 @@
 ; Static data for the _vsnprintf routine
 ;
 
-outdesc:		 	; Static outdesc structure
-	.word	0	 	; ccount
-	.word	out	 	; Output function pointer
-	.word	0	 	; ptr
-       	.word  	0               ; Buffer size
+outdesc:	 	 	; Static outdesc structure
+ccount: .word   0               ; ccount
+func:   .word   out	 	; Output function pointer
+bufptr: .word   0	 	; ptr
+bufsize:.word   0               ; Buffer size
 
 .code
 
@@ -40,12 +40,12 @@ out:
 ; Calculate the space left in the buffer. If no space is left, don't copy
 ; any characters
 
-        lda     outdesc+6               ; Low byte of buffer size
+        lda     bufsize                 ; Low byte of buffer size
         sec
-        sbc     outdesc+0               ; Low byte of bytes already written
+        sbc     ccount+0                ; Low byte of bytes already written
         sta     ptr1
-        lda     outdesc+7
-        sbc     outdesc+1
+        lda     bufsize+1
+        sbc     ccount+1
         sta     ptr1+1
         bcs     @L0                     ; Space left
         lda     #0
@@ -55,14 +55,14 @@ out:
 ; Replace the pointer to d by a pointer to the write position in the buffer
 ; for the call to memcpy that follows.
 
-@L0:    lda     outdesc+0
+@L0:    lda     bufptr+0
         clc
-        adc     outdesc+4
+        adc     ccount+0
         ldy     #4
         sta     (sp),y
 
-        lda     outdesc+1
-        adc     outdesc+5
+        lda     bufptr+1
+        adc     ccount+1
         iny
         sta     (sp),y
 
@@ -74,19 +74,19 @@ out:
 
         pha
         clc
-        adc     outdesc+0
-        sta     outdesc+0
+        adc     ccount+0
+        sta     ccount+0
         txa
-        adc     outdesc+1
-        sta     outdesc+1
+        adc     ccount+1
+        sta     ccount+1
         pla
 
 ; if (Count > Left) Count = Left;
 
-        cmp     ptr1
-        bne     @L1
         cpx     ptr1+1
-@L1:    bcs     @L2
+        bne     @L1
+        cmp     ptr1
+@L1:    bcc     @L2
         lda     ptr1
         ldx     ptr1+1
 
@@ -107,8 +107,8 @@ _vsnprintf:
 ; Setup the outdesc structure
 
     	lda	#0
-    	sta	outdesc
-    	sta	outdesc+1	; Clear ccount
+    	sta	ccount+0
+    	sta	ccount+1        ; Clear ccount
 
 ; Get the size parameter and replace it by a pointer to outdesc. This is to
 ; build a stack frame for the call to _printf.
@@ -128,22 +128,22 @@ _vsnprintf:
         lda     #>outdesc
         sta     (sp),y
 
-; Write size-1 to the outdesc structure
+; Write size-1 to outdesc.uns
 
         ldx     ptr1
         ldy     ptr1+1
         dex
         bne     L1
         dey
-L1:     stx     outdesc+6
-        sty     outdesc+7
+L1:     stx     bufsize+0
+        sty     bufsize+1
 
-; Copy buf to the outdesc structure
+; Copy buf to the outdesc.ptr
 
         ldy     #5
         jsr     ldaxysp
-        sta     outdesc+4
-        stx     outdesc+5
+        sta     bufptr+0
+        stx     bufptr+1
 
 ; Restore low byte of ap and call _printf
 
@@ -152,19 +152,19 @@ L1:     stx     outdesc+6
 
 ; Terminate the string
 
-        lda     outdesc+0
-        ldx     outdesc+1
-        cpx     outdesc+7
+        lda     ccount+0
+        ldx     ccount+1
+        cpx     bufsize+1
         bne     L2
-        cmp     outdesc+6
+        cmp     bufsize+0
 L2:     bcc     L3
-        lda     outdesc+6
-        ldx     outdesc+7
+        lda     bufsize+0
+        ldx     bufsize+1
         clc
-L3:     adc     outdesc+4
+L3:     adc     bufptr+0
         sta     ptr1
         txa
-        adc     outdesc+5
+        adc     bufptr+1
         sta     ptr1+1
 
         lda     #0
@@ -173,8 +173,8 @@ L3:     adc     outdesc+4
 
 ; Return the number of bytes written and drop buf
 
-        lda     outdesc         ; ccount
-        ldx     outdesc+1
+        lda     ccount+0
+        ldx     ccount+1
 	jmp     incsp2
 
 ; Bail out if size is zero

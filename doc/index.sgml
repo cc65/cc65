@@ -62,6 +62,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
   How to compile cc65 and the support tools.
 
+  <tag><htmlurl url="make.html" name="make.html"></tag>
+  Build programs, using the GNU Make utility.
+
   <tag><htmlurl url="debugging.html" name="debugging.html"></tag>
   Debug programs, using the VICE emulator.
 

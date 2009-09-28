@@ -43,6 +43,7 @@ SGML =	apple2.sgml	\
 	ld65.sgml	\
 	library.sgml	\
 	lynx.sgml	\
+	make.sgml	\
 	nes.sgml	\
 	pet.sgml	\
 	plus4.sgml	\

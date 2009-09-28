@@ -43,7 +43,7 @@ _videomode:
         ; The 80 column firmware isn't already active so we need to
         ; initialize it - causing the screen to be cleared and thus
         ; the garbage char printed above to be erased (but for some
-        ; reason the cursor horizontal position not not be zeroed)
+        ; reason the cursor horizontal position will not be zeroed)
         stz     CH
 
         ; Initializing the 80 column firmware needs the ROM switched

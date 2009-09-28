@@ -83,7 +83,7 @@ The functions listed below are special for the C128. See the <htmlurl
 url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
-<item>toggle_videomode
+<item>videomode
 <item>c64mode
 <item>fast
 <item>slow

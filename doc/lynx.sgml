@@ -159,7 +159,7 @@ the <htmlurl url="co65.html" name="co65 utility"> for information on how to do
 that.
 
 The joystick will check to see if the screen is flipped or not in the install
-routine and adapt itself to the currect state.
+routine and adapt itself to the correct state.
 
 <sect1>Mouse drivers<p>
 

@@ -22,7 +22,7 @@ WSTRIP	= $(WINE) wstrip -q
 LNKCFG  = ld.tmp
 
 # Program arguments
-CFLAGS  = -d1 -onatx -zp4 -5 -zq -w2 -i=..\\common
+CFLAGS  = -d1 -obeilr -zp4 -5 -zq -w2 -i=..\\common
 
 # Target files
 EXE	= cc65.exe
@@ -158,6 +158,8 @@ all:	  	svnversion $(EXE)
 $(EXE): 	$(OBJS) $(LIBS)
 	@echo "DEBUG ALL" > $(LNKCFG)
 	@echo "OPTION QUIET" >> $(LNKCFG)
+	@echo "OPTION MAP" >> $(LNKCFG)
+	@echo "OPTION STACK=65536" >> $(LNKCFG)
 	@echo "NAME $@" >> $(LNKCFG)
 	@for i in $(OBJS); do echo "FILE $${i}"; done >> $(LNKCFG)
 	@for i in $(LIBS); do echo "LIBRARY $${i}"; done >> $(LNKCFG)
@@ -177,7 +179,7 @@ clean:
 	@rm -f *~ core
 
 zap:	clean
-	@rm -f $(OBJS) $(EXE) svnversion.c
+	@rm -f $(OBJS) $(EXE) $(EXE:.exe=.map) svnversion.c
 
 strip:
 	@-$(WSTRIP) $(EXE)

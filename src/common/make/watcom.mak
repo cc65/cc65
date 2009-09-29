@@ -20,7 +20,7 @@ LD     	= $(WINE) wlink
 LIB	= common.lib
 
 # Program arguments
-CFLAGS  = -d1 -onatx -zp4 -5 -zq -w2
+CFLAGS  = -d1 -obeilr -zp4 -5 -zq -w2
 
 # Create NT programs by default
 ifndef TARGET

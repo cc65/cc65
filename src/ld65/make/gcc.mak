@@ -115,9 +115,9 @@ zap:	clean
 # Make the dependencies
 
 .PHONY: depend dep
-depend dep:	$(OBJS:.o=.c)
+depend dep:	$(INCS) $(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) $(CFLAGS) -MM -MG $^ > .depend
+	$(CC) $(CFLAGS) -MM $(OBJS:.o=.c) > .depend
 
 # -----------------------------------------------------------------------------
 # Rules to make config includes

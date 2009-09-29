@@ -10,36 +10,36 @@ LIB	= common.a
 
 
 OBJS =	abend.o		\
-        addrsize.o      \
+	addrsize.o      \
 	bitops.o	\
 	chartype.o	\
 	check.o		\
 	cmdline.o	\
 	coll.o		\
-        cpu.o           \
-        debugflag.o     \
+	cpu.o           \
+	debugflag.o     \
 	exprdefs.o	\
 	filepos.o	\
-        filetype.o      \
+	filetype.o      \
 	fname.o		\
-        fp.o            \
+	fp.o            \
 	hashstr.o	\
-        hashtab.o       \
-        intstack.o      \
-        matchpat.o      \
-        mmodel.o        \
+	hashtab.o       \
+	intstack.o      \
+	matchpat.o      \
+	mmodel.o        \
 	print.o		\
-        searchpath.o    \
-        segdefs.o       \
-        segnames.o      \
-        shift.o         \
+	searchpath.o    \
+	segdefs.o       \
+	segnames.o      \
+	shift.o         \
 	strbuf.o	\
-        strpool.o       \
-        strstack.o      \
+	strpool.o       \
+	strstack.o      \
 	strutil.o	\
 	target.o	\
 	tgttrans.o	\
-        version.o       \
+	version.o       \
 	xmalloc.o	\
 	xsprintf.o
 

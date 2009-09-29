@@ -40,10 +40,10 @@ endif
 # Object files and libraries to link
 
 OBJS =	anonname.o	\
-     	asmcode.o 	\
+	asmcode.o 	\
 	asmlabel.o	\
 	asmstmt.o	\
-        assignment.o    \
+	assignment.o    \
 	casenode.o	\
 	codeent.o	\
 	codegen.o 	\
@@ -57,11 +57,11 @@ OBJS =	anonname.o	\
 	coptcmp.o	\
 	coptind.o	\
 	coptneg.o	\
-        coptptrload.o   \
+	coptptrload.o   \
 	coptpush.o	\
-        coptsize.o      \
+	coptsize.o      \
 	coptstop.o	\
-        coptstore.o     \
+	coptstore.o     \
 	coptsub.o	\
 	copttest.o	\
 	dataseg.o	\
@@ -70,45 +70,45 @@ OBJS =	anonname.o	\
 	declattr.o	\
 	error.o	  	\
 	expr.o	 	\
-        exprdesc.o      \
+	exprdesc.o      \
 	funcdesc.o	\
 	function.o     	\
 	global.o 	\
 	goto.o	   	\
-        hexval.o        \
+	hexval.o        \
 	ident.o		\
 	incpath.o      	\
 	input.o		\
 	lineinfo.o	\
 	litpool.o      	\
-        loadexpr.o      \
+	loadexpr.o      \
 	locals.o	\
 	loop.o		\
 	macrotab.o	\
 	main.o		\
 	opcodes.o	\
-        output.o        \
+	output.o        \
 	preproc.o      	\
 	pragma.o       	\
 	reginfo.o	\
-    	scanner.o      	\
-        scanstrbuf.o    \
+	scanner.o      	\
+	scanstrbuf.o    \
 	segments.o	\
-        shiftexpr.o     \
-        stackptr.o      \
-        standard.o      \
-    	stdfunc.o	\
-        stdnames.o      \
-        stmt.o 	 	\
-        svnversion.o    \
+	shiftexpr.o     \
+	stackptr.o      \
+	standard.o      \
+	stdfunc.o	\
+	stdnames.o      \
+	stmt.o 	 	\
+	svnversion.o    \
 	swstmt.o	\
-    	symentry.o	\
-    	symtab.o       	\
-        testexpr.o      \
+	symentry.o	\
+	symtab.o       	\
+	testexpr.o      \
 	textseg.o	\
-    	typecmp.o	\
-        typeconv.o      \
-    	util.o
+	typecmp.o	\
+	typeconv.o      \
+	util.o
 
 LIBS =	$(COMMON)/common.a
 

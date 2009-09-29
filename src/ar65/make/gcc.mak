@@ -22,17 +22,17 @@ LDFLAGS	=
 # List of all object files
 
 OBJS = 	add.o		\
-    	del.o		\
-    	error.o		\
-    	exports.o	\
-    	extract.o	\
-    	fileio.o	\
-    	global.o	\
-    	library.o	\
-    	list.o		\
-    	main.o		\
-    	objdata.o	\
-    	objfile.o
+	del.o		\
+	error.o		\
+	exports.o	\
+	extract.o	\
+	fileio.o	\
+	global.o	\
+	library.o	\
+	list.o		\
+	main.o		\
+	objdata.o	\
+	objfile.o
 
 LIBS = $(COMMON)/common.a
 

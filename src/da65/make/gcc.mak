@@ -22,24 +22,24 @@ LDFLAGS =
 # List of all object files
 
 OBJS = 	asminc.o        \
-        attrtab.o	\
+	attrtab.o	\
 	code.o	 	\
-        comments.o      \
+	comments.o      \
 	data.o		\
 	error.o	 	\
 	global.o 	\
-  	handler.o	\
+	handler.o	\
 	infofile.o	\
-        labels.o        \
+	labels.o        \
 	main.o	 	\
-        opc6502.o       \
-        opc65816.o      \
-        opc65c02.o      \
-        opc65sc02.o     \
-  	opctable.o	\
+	opc6502.o       \
+	opc65816.o      \
+	opc65c02.o      \
+	opc65sc02.o     \
+	opctable.o	\
 	output.o 	\
 	scanner.o       \
-        segment.o
+	segment.o
 
 LIBS = $(COMMON)/common.a
 

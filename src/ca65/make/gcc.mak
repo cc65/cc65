@@ -28,54 +28,54 @@ CVT=macpack/cvt-mac.pl
 # List of all object files
 
 OBJS =  anonname.o      \
-        asserts.o       \
-        condasm.o	\
+	asserts.o       \
+	condasm.o	\
 	dbginfo.o	\
-       	ea65.o	      	\
-        easw16.o        \
-        enum.o          \
-        error.o	      	\
-        expr.o	      	\
+	ea65.o	      	\
+	easw16.o        \
+	enum.o          \
+	error.o	      	\
+	expr.o	      	\
 	feature.o	\
 	filetab.o	\
 	fragment.o	\
-        global.o       	\
+	global.o       	\
 	incpath.o      	\
-        instr.o	       	\
+	instr.o	       	\
 	istack.o       	\
 	lineinfo.o	\
 	listing.o      	\
 	macpack.o      	\
-       	macro.o	       	\
-        main.o 	       	\
+	macro.o	       	\
+	main.o 	       	\
 	nexttok.o      	\
-        objcode.o      	\
-        objfile.o      	\
-       	options.o      	\
-        pseudo.o       	\
+	objcode.o      	\
+	objfile.o      	\
+	options.o      	\
+	pseudo.o       	\
 	repeat.o	\
-        scanner.o	\
-        segment.o       \
-        segrange.o      \
-        sizeof.o        \
-        spool.o         \
-        struct.o        \
-        studyexpr.o     \
-        symentry.o      \
-        symbol.o        \
-        symtab.o	\
-        token.o         \
-       	toklist.o      	\
-      	ulabel.o
+	scanner.o	\
+	segment.o       \
+	segrange.o      \
+	sizeof.o        \
+	spool.o         \
+	struct.o        \
+	studyexpr.o     \
+	symentry.o      \
+	symbol.o        \
+	symtab.o	\
+	token.o         \
+	toklist.o      	\
+	ulabel.o
 
 # -----------------------------------------------------------------------------
 # List of all macro files
 
 INCS =	atari.inc       \
-        cbm.inc		\
-      	cpu.inc		\
-      	generic.inc	\
-        longbranch.inc
+	cbm.inc		\
+	cpu.inc		\
+	generic.inc	\
+	longbranch.inc
 
 LIBS = $(COMMON)/common.a
 

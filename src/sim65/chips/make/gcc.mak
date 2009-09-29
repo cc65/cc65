@@ -6,7 +6,8 @@
 COMMON  = ../../common
 SIM65	= ..
 
-CFLAGS 	= -g -O2 -Wall -W -std=c89 -I$(COMMON) -I$(SIM65) -fpic
+CFLAGS 	= -g -O2 -Wall -W -std=c89
+override CFLAGS += -I$(COMMON) -I$(SIM65) -fpic
 CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
@@ -14,9 +15,9 @@ LDFLAGS	=
 #LIBS 	= $(COMMON)/common.a
 
 CHIPS  	=      	ram.so		\
- 		rom.so		\
- 		stdio.so        \
-                vic2.so
+		rom.so		\
+		stdio.so        \
+		vic2.so
 
 OBJS	= $(CHIPS:.so=.o)
 

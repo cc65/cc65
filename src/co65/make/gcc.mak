@@ -21,12 +21,12 @@ LDFLAGS	=
 # List of all object files
 
 OBJS =	convert.o       \
-        error.o         \
-        fileio.o        \
-        global.o        \
-        main.o          \
-        model.o         \
-        o65.o
+	error.o         \
+	fileio.o        \
+	global.o        \
+	main.o          \
+	model.o         \
+	o65.o
 
 LIBS = $(COMMON)/common.a
 

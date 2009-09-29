@@ -30,12 +30,12 @@ CVT=cfg/cvt-cfg.pl
 # List of all object files
 
 OBJS = 	asserts.o       \
-        bin.o		\
+	bin.o		\
 	binfmt.o	\
-        cfgexpr.o       \
+	cfgexpr.o       \
 	condes.o	\
 	config.o	\
-        dbgfile.o       \
+	dbgfile.o       \
 	dbginfo.o	\
 	dbgsyms.o	\
 	error.o		\
@@ -44,7 +44,7 @@ OBJS = 	asserts.o       \
 	extsyms.o	\
 	fileinfo.o	\
 	fileio.o	\
-        filepath.o      \
+	filepath.o      \
 	fragment.o	\
 	global.o        \
 	library.o	\
@@ -56,7 +56,7 @@ OBJS = 	asserts.o       \
 	objfile.o	\
 	scanner.o	\
 	segments.o	\
-        spool.o         \
+	spool.o         \
 	tgtcfg.o
 
 # -----------------------------------------------------------------------------
@@ -65,7 +65,7 @@ OBJS = 	asserts.o       \
 INCS =	apple2.inc	\
 	apple2enh.inc	\
 	atari.inc	\
-        atmos.inc       \
+	atmos.inc       \
 	bbc.inc		\
 	c128.inc	\
 	c16.inc		\
@@ -75,12 +75,12 @@ INCS =	apple2.inc	\
 	geos.inc	\
 	lunix.inc	\
 	lynx.inc	\
-        module.inc      \
+	module.inc      \
 	nes.inc		\
 	none.inc	\
 	pet.inc		\
 	plus4.inc	\
-        supervision.inc \
+	supervision.inc \
 	vic20.inc
 
 LIBS = $(COMMON)/common.a

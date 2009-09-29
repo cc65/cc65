@@ -22,20 +22,20 @@ LDFLAGS	=
 # List of all object files
 
 OBJS = 	addrspace.o     \
-        callback.o      \
-        cfgdata.o       \
-        chip.o          \
-        chippath.o      \
-        config.o        \
-        cpucore.o     	\
+	callback.o      \
+	cfgdata.o       \
+	chip.o          \
+	chippath.o      \
+	config.o        \
+	cpucore.o     	\
 	cputype.o     	\
-        error.o         \
+	error.o         \
 	global.o      	\
-        location.o      \
+	location.o      \
 	main.o          \
-        memory.o        \
-        scanner.o       \
-        system.o
+	memory.o        \
+	scanner.o       \
+	system.o
 
 LIBS = $(COMMON)/common.a
 

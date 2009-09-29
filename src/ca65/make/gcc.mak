@@ -16,8 +16,8 @@ CA65_INC = \"/usr/lib/cc65/asminc/\"
 #
 CC	= gcc
 CFLAGS 	= -g -O2 -Wall -W -std=c89
-CFLAGS += -I$(COMMON)
-CFLAGS += -DCA65_INC=$(CA65_INC)
+override CFLAGS += -I$(COMMON)
+override CFLAGS += -DCA65_INC=$(CA65_INC)
 EBIND	= emxbind
 LDFLAGS	=
 

@@ -12,7 +12,7 @@ COMMON = ../common
 #
 CC	= gcc
 CFLAGS 	= -g -O2 -Wall -W -std=c89
-CFLAGS += -I$(COMMON)
+override CFLAGS += -I$(COMMON)
 LDFLAGS	=
 EBIND	= emxbind
 

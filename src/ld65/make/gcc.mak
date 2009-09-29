@@ -18,8 +18,8 @@ LD65_CFG = \"/usr/lib/cc65/cfg/\"
 #
 CC      = gcc
 CFLAGS  = -g -O2 -Wall -W -std=c89
-CFLAGS += -I$(COMMON)
-CFLAGS += -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
+override CFLAGS += -I$(COMMON)
+override CFLAGS += -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
 EBIND   = emxbind
 LDFLAGS =
 

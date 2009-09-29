@@ -19,8 +19,8 @@ endif
 #
 CC      = gcc
 CFLAGS  = -O2 -g -Wall -W -std=c89
-CFLAGS += -I$(COMMON)
-CFLAGS += -D$(SPAWN)
+override CFLAGS += -I$(COMMON)
+override CFLAGS += -D$(SPAWN)
 EBIND   = emxbind
 LDFLAGS =
 

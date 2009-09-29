@@ -12,11 +12,11 @@ COMMON	= ../common
 
 #
 CC      = gcc
-CFLAGS  = -g -O2 -Wall -W -std=c89 
-CFLAGS += -I$(COMMON)
+CFLAGS  = -g -O2 -Wall -W -std=c89
+override CFLAGS += -I$(COMMON)
 EBIND   = emxbind
 LDFLAGS =
-        
+
 
 # -----------------------------------------------------------------------------
 # List of all object files

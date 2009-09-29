@@ -20,8 +20,8 @@ CC65_INC = \"/usr/lib/cc65/include/\"
 #
 CC      = gcc
 CFLAGS  = -O2 -g -Wall -W -std=c89
-CFLAGS += -I$(COMMON)
-CFLAGS += -DCC65_INC=$(CC65_INC)
+override CFLAGS += -I$(COMMON)
+override CFLAGS += -DCC65_INC=$(CC65_INC)
 EBIND   = emxbind
 LDFLAGS = -lm
 

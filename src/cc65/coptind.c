@@ -183,8 +183,7 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
 }
 
 
-               
-#if 0   /* Currently unused */
+
 static short RegVal (unsigned short Use, const RegContents* RC)
 /* Return the contents of the given register */
 {
@@ -198,7 +197,6 @@ static short RegVal (unsigned short Use, const RegContents* RC)
         return ZPRegVal (Use, RC);
     }
 }
-#endif
 
 
 
@@ -750,6 +748,82 @@ NextEntry:
 
 
 
+unsigned OptJumpTarget3 (CodeSeg* S)
+/* Jumps to load instructions of a register, that do already have the matching
+ * register contents may skip the load instruction, since it's job is already
+ * done.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        unsigned J, K;
+        CodeEntry* N;
+
+        /* New jump label */
+        CodeLabel* LN = 0;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);  
+
+        /* Check if this is a load insn with a label */
+        if ((E->Info & OF_LOAD) != 0            &&
+            CE_IsConstImm (E)                   &&
+            CE_HasLabel (E)                     &&
+            (N = CS_GetNextEntry (S, I)) != 0)    {
+
+            /* Walk over all insn that jump here */
+            for (J = 0; J < CE_GetLabelCount (E); ++J) {
+
+                /* Get the label */
+                CodeLabel* L = CE_GetLabel (E, J);
+                for (K = 0; K < CL_GetRefCount (L); ++K) {
+
+                    /* Get the entry that jumps here */
+                    CodeEntry* Jump = CL_GetRef (L, K);
+
+                    /* Get the register info from this insn */
+                    short Val = RegVal (E->Chg, &Jump->RI->Out2);
+
+                    /* Check if the outgoing value is the one thatr's loaded */
+                    if (Val == (unsigned char) E->Num) {
+
+                        /* Ok, skip the insn. First, generate a label */
+                        if (LN == 0) {
+                            LN = CS_GenLabel (S, N);
+                        }
+
+                        /* Change the jump target to point to this new label */
+                        CS_MoveLabelRef (S, Jump, LN);
+
+                        /* Remember that we had changes */
+                        ++Changes;
+                    }
+                }
+            }
+
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*		   	 Optimize conditional branches			     */
 /*****************************************************************************/
@@ -1076,7 +1150,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_STA:
-	        /* If we store into a known zero page location, and this
+    	        /* If we store into a known zero page location, and this
 		 * location does already contain the value to be stored,
 		 * remove the store.
 		 */
@@ -1129,7 +1203,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * that in the A register, replace the store by a STA. The
 		 * optimizer will then remove the load instruction for Y
 		 * later. If replacement by A is not possible try a
-	 	 * replacement by X, but check for invalid addressing modes
+    	 	 * replacement by X, but check for invalid addressing modes
 		 * in this case.
 		 */
        	        } else if (RegValIsKnown (In->RegY)) {
@@ -1182,39 +1256,39 @@ unsigned OptDupLoads (CodeSeg* S)
        	       	    !CE_UseLoadFlags (N)) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
-		}
-	        break;
+    		}
+    	        break;
 
-	    case OP65_TYA:
+    	    case OP65_TYA:
                 if (RegValIsKnown (In->RegY)            &&
        		    In->RegY == In->RegA                &&
-		    (N = CS_GetNextEntry (S, I)) != 0   &&
+    		    (N = CS_GetNextEntry (S, I)) != 0   &&
        	       	    !CE_UseLoadFlags (N)) {
-		    /* Value is identical and not followed by a branch */
-		    Delete = 1;
-		}
-	        break;
+    		    /* Value is identical and not followed by a branch */
+    		    Delete = 1;
+    		}
+    	        break;
 
-	    default:
-	        break;
+    	    default:
+    	        break;
 
-	}
+    	}
 
-	/* Delete the entry if requested */
-	if (Delete) {
+    	/* Delete the entry if requested */
+    	if (Delete) {
 
-	    /* Register value is not used, remove the load */
-	    CS_DelEntry (S, I);
+    	    /* Register value is not used, remove the load */
+    	    CS_DelEntry (S, I);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+    	    /* Remember, we had changes */
+    	    ++Changes;
 
-	} else {
+    	} else {
 
-	    /* Next entry */
-	    ++I;
+    	    /* Next entry */
+    	    ++I;
 
-	}
+    	}
 
     }
 

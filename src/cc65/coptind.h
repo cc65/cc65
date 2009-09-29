@@ -89,6 +89,12 @@ unsigned OptJumpTarget2 (CodeSeg* S);
  * it's job is already done.
  */
 
+unsigned OptJumpTarget3 (CodeSeg* S);
+/* Jumps to load instructions of a register, that do already have the matching
+ * register contents may skip the load instruction, since it's job is already
+ * done.
+ */
+
 unsigned OptCondBranches1 (CodeSeg* S);
 /* If an immidiate load of a register is followed by a conditional jump that
  * is never taken because the load of the register sets the flags in such a

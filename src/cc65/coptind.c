@@ -771,13 +771,14 @@ unsigned OptJumpTarget3 (CodeSeg* S)
         CodeLabel* LN = 0;
 
       	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);  
+       	CodeEntry* E = CS_GetEntry (S, I);
 
         /* Check if this is a load insn with a label */
         if ((E->Info & OF_LOAD) != 0            &&
             CE_IsConstImm (E)                   &&
             CE_HasLabel (E)                     &&
-            (N = CS_GetNextEntry (S, I)) != 0)    {
+            (N = CS_GetNextEntry (S, I)) != 0   &&
+            (N->Info & OF_FBRA) == 0)    {
 
             /* Walk over all insn that jump here */
             for (J = 0; J < CE_GetLabelCount (E); ++J) {

@@ -950,12 +950,19 @@ __STACKSIZE__=xxx/ on the command line.
 
 <sect1>Builtin configurations<p>
 
-The builtin configurations are part of the linker source. They are also
-distributed together with the machine specific binary packages (usually in the
-doc directory) and don't have a special format. So if you need a special
-configuration, it's a good idea to start with the builtin configuration for
-your system. In a first step, just replace <tt/-t target/ by <tt/-C
+The builtin configurations are part of the linker source. They can be retrieved
+with <tt/--dump-config/ and don't have a special format. So if you need a
+special configuration, it's a good idea to start with the builtin configuration
+for your system. In a first step, just replace <tt/-t target/ by <tt/-C
 configfile/. Then go on and modify the config file to suit your needs.
+
+
+
+<sect1>Secondary configurations<p>
+
+Several machine specific binary packages are distributed together with secondary
+configurations (in the cfg directory). These configurations can be used with
+<tt/-C configfile/ too.
 
 
 
@@ -983,10 +990,11 @@ This segment contains the startup code which initializes the C software stack
 and the libraries. It is placed in its own segment because it needs to be
 loaded at the lowest possible program address on several platforms.
 
-<sect1>HEAP<p>
+<sect1>ZPSAVE<p>
 
-This segment defines the location of the memory heap used by the malloc
-routine.
+The ZPSAVE segment contains the original values of the zeropage locations used
+by the ZEROPAGE segment. It is placed in its own segment because it must not be
+initialized.
 
 
 

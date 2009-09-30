@@ -773,12 +773,14 @@ unsigned OptJumpTarget3 (CodeSeg* S)
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-        /* Check if this is a load insn with a label */
+        /* Check if this is a load insn with a label and the next insn is not
+         * a conditional branch that needs the flags from the load.
+         */
         if ((E->Info & OF_LOAD) != 0            &&
             CE_IsConstImm (E)                   &&
             CE_HasLabel (E)                     &&
             (N = CS_GetNextEntry (S, I)) != 0   &&
-            (N->Info & OF_FBRA) == 0)    {
+            !CE_UseLoadFlags (N)) {
 
             /* Walk over all insn that jump here */
             for (J = 0; J < CE_GetLabelCount (E); ++J) {

@@ -2843,7 +2843,7 @@ static void hieQuest (ExprDesc* Expr)
 
 
 
-static void opeq (const GenDesc* Gen, ExprDesc* Expr)
+static void opeq (const GenDesc* Gen, ExprDesc* Expr, const char* Op)
 /* Process "op=" operators. */
 {
     ExprDesc Expr2;
@@ -2889,6 +2889,14 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr)
 
     /* Evaluate the rhs */
     MarkedExprWithCheck (hie1, &Expr2);
+
+    /* The rhs must be an integer (or a float, but we don't support that yet */
+    if (!IsClassInt (Expr2.Type)) {
+        Error ("Invalid right operand for binary operator `%s'", Op);
+        /* Continue. Wrong code will be generated, but the compiler won't
+         * break, so this is the best error recovery.
+         */
+    }
 
     /* Check for a constant expression */
     if (ED_IsConstAbs (&Expr2) && ED_CodeRangeIsEmpty (&Expr2)) {
@@ -2951,7 +2959,7 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr)
 
 
 
-static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
+static void addsubeq (const GenDesc* Gen, ExprDesc *Expr, const char* Op)
 /* Process the += and -= operators */
 {
     ExprDesc Expr2;
@@ -2963,7 +2971,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
     /* We're currently only able to handle some adressing modes */
     if (ED_GetLoc (Expr) == E_LOC_EXPR || ED_GetLoc (Expr) == E_LOC_PRIMARY) {
 	/* Use generic routine */
-       	opeq (Gen, Expr);
+       	opeq (Gen, Expr, Op);
 	return;
     }
 
@@ -2996,8 +3004,16 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
     lflags = 0;
     rflags = 0;
 
-    /* Evaluate the rhs */
+    /* Evaluate the rhs. We expect an integer here, since float is not
+     * supported
+     */
     hie1 (&Expr2);
+    if (!IsClassInt (Expr2.Type)) {
+        Error ("Invalid right operand for binary operator `%s'", Op);
+        /* Continue. Wrong code will be generated, but the compiler won't
+         * break, so this is the best error recovery.
+         */
+    }
     if (ED_IsConstAbs (&Expr2)) {
     	/* The resulting value is a constant. Scale it. */
         if (MustScale) {
@@ -3091,43 +3107,43 @@ void hie1 (ExprDesc* Expr)
     	    break;
 
     	case TOK_PLUS_ASSIGN:
-       	    addsubeq (&GenPASGN, Expr);
+       	    addsubeq (&GenPASGN, Expr, "+=");
     	    break;
 
     	case TOK_MINUS_ASSIGN:
-       	    addsubeq (&GenSASGN, Expr);
+       	    addsubeq (&GenSASGN, Expr, "-=");
     	    break;
 
     	case TOK_MUL_ASSIGN:
-       	    opeq (&GenMASGN, Expr);
+       	    opeq (&GenMASGN, Expr, "*=");
      	    break;
 
      	case TOK_DIV_ASSIGN:
-       	    opeq (&GenDASGN, Expr);
+       	    opeq (&GenDASGN, Expr, "/=");
      	    break;
 
      	case TOK_MOD_ASSIGN:
-       	    opeq (&GenMOASGN, Expr);
+       	    opeq (&GenMOASGN, Expr, "%=");
      	    break;
 
      	case TOK_SHL_ASSIGN:
-       	    opeq (&GenSLASGN, Expr);
+       	    opeq (&GenSLASGN, Expr, "<<=");
      	    break;
 
      	case TOK_SHR_ASSIGN:
-       	    opeq (&GenSRASGN, Expr);
+       	    opeq (&GenSRASGN, Expr, ">>=");
      	    break;
 
      	case TOK_AND_ASSIGN:
-       	    opeq (&GenAASGN, Expr);
+       	    opeq (&GenAASGN, Expr, "&=");
      	    break;
 
      	case TOK_XOR_ASSIGN:
-       	    opeq (&GenXOASGN, Expr);
+       	    opeq (&GenXOASGN, Expr, "^=");
      	    break;
 
      	case TOK_OR_ASSIGN:
-       	    opeq (&GenOASGN, Expr);
+       	    opeq (&GenOASGN, Expr, "|=");
      	    break;
 
      	default:

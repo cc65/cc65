@@ -4,7 +4,7 @@
 
 <title>Using GNU Make with cc65
 <author>Oliver Schmidt, <htmlurl url="mailto:ol.sc@web.de" name="ol.sc@web.de">
-<date>26.06.2009
+<date>2009-06-26
 
 <abstract>
 How to build your program using the GNU Make utility.
@@ -39,7 +39,7 @@ for GNU Make so a cc65-based project coming with a GNU Make Makefile can easily
 be built by any cc65 developer no matter what host system is used.
 
 Because of the strong alignment of the cc65 compiler with the ISO C standard it
-is very well feasable to compile a single C code base both with the cc65
+is very well feasible to compile a single C code base both with the cc65
 compiler and other C compilers like for example GCC. GNU Make turns out to be
 very well suited to build projects for several target systems using multiple
 compilers as it isn't tied to any C compiler.
@@ -117,7 +117,7 @@ environment variable.
 
 <sect1>Understanding the sample Makefile<p>
 
-Most parts of the sample Makefile follow the guidlines in the
+Most parts of the sample Makefile follow the guidelines in the
 <htmlurl url="http://www.gnu.org/software/make/manual/make.html" name="GNU Make Manual">
 that can be searched online for background information. The automatic generation of
 dependency however rather works as described by the GNU Make maintainer Paul D. Smith in

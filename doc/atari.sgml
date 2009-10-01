@@ -5,7 +5,7 @@
 <title>Atari specific information for cc65
 <author>Shawn Jefferson, <htmlurl
 url="mailto:shawnjefferson@24fightingchickens.com"
-name="shawnjefferson@24fightingchickens.com"> and 
+name="shawnjefferson@24fightingchickens.com"> and
 Christian Groessler, <htmlurl url="mailto:cpg@aladdin.de" name="cpg@aladdin.de">
 <date>03-Jan-2006
 
@@ -161,7 +161,7 @@ memory. The access must be implemented manually.
 Many graphics modes require more memory than the text screen which is
 in effect when the program starts up. Therefore the programmer has to
 tell the program beforehand the memory requirements of the graphics
-modes the program intends to use. 
+modes the program intends to use.
 This can be done by using the __RESERVED_MEMORY__ linker config
 variable. The number specified there describes the number of bytes to
 subtract from the top of available memory as seen from the runtime
@@ -229,7 +229,7 @@ platform.
   Supports up to four standard joysticks connected to the joystick ports of
   the Atari.
 
-  <tag><tt/multijoy.joy/</tag>
+  <tag><tt/atarim8.joy/</tag>
   Supports up to eight standard joysticks connected to a MultiJoy adapter.
 
 </descrip><p>

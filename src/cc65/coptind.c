@@ -1643,11 +1643,11 @@ unsigned OptTransfers3 (CodeSeg* S)
 
                     /* If we have a replacement store, change the code */
                     if (X) {
-                        /* Insert before the xfer insn */
-                        CS_InsertEntry (S, X, Xfer);
+                        /* Insert after the xfer insn */
+                        CS_InsertEntry (S, X, Xfer+1);
 
                         /* Remove the xfer instead */
-                        CS_DelEntry (S, Xfer+1);
+                        CS_DelEntry (S, Xfer);
 
                         /* Remove the final store */
                         CS_DelEntry (S, Store);
@@ -1801,11 +1801,11 @@ unsigned OptTransfers4 (CodeSeg* S)
 
                     /* If we have a replacement load, change the code */
                     if (X) {
-                        /* Insert before the xfer insn */
-                        CS_InsertEntry (S, X, Xfer);
+                        /* Insert after the xfer insn */
+                        CS_InsertEntry (S, X, Xfer+1);
 
                         /* Remove the xfer instead */
-                        CS_DelEntry (S, Xfer+1);
+                        CS_DelEntry (S, Xfer);
 
                         /* Remove the initial load */
                         CS_DelEntry (S, Load);
@@ -1917,12 +1917,12 @@ unsigned OptPushPop (CodeSeg* S)
                     !RegAUsed (S, I+1)                  &&
                     !MemAccess (S, Push+1, Pop-1, E)) {
 
-                    /* Insert a STA before the PHA */
+                    /* Insert a STA after the PHA */
                     X = NewCodeEntry (E->OPC, E->AM, E->Arg, E->JumpTo, E->LI);
-                    CS_InsertEntry (S, X, Push);
+                    CS_InsertEntry (S, X, Push+1);
 
                     /* Remove the PHA instead */
-                    CS_DelEntry (S, Push+1);
+                    CS_DelEntry (S, Push);
 
                     /* Remove the PLA/STA sequence */
                     CS_DelEntries (S, Pop, 2);

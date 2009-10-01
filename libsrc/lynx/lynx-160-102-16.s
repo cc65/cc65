@@ -387,12 +387,12 @@ CLEAR:  lda     #<cls_sprite
 SETVIEWPAGE:
 	cmp	#1
        	beq     @L1             ; page == maxpages-1
-       	ldy     #<$de20         ; page 0
-       	ldx     #>$de20
+       	ldy     #<$e018         ; page 0
+       	ldx     #>$e018
        	bra     @L2
 @L1:
-	ldy     #<$be40         ; page 1
-       	ldx     #>$be40
+	ldy     #<$c038         ; page 1
+       	ldx     #>$c038
 @L2:
        	sty     VIEWPAGEL	; Save viewpage for getpixel
        	stx     VIEWPAGEH
@@ -422,12 +422,12 @@ SETVIEWPAGE:
 SETDRAWPAGE:
        	cmp	#1
        	beq     @L1                 ; page == maxpages-1
-       	lda     #<$de20             ; page 0
-       	ldx     #>$de20
+       	lda     #<$e018             ; page 0
+       	ldx     #>$e018
        	bra     @L2
 @L1:
-        lda     #<$be40             ; page 1
-       	ldx     #>$be40
+        lda     #<$c038             ; page 1
+       	ldx     #>$c038
 @L2:
         sta     DRAWPAGEL
        	stx     DRAWPAGEH

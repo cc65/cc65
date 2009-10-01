@@ -52,8 +52,7 @@ OBJS =  cgetc.o         \
         extzp.o         \
         kbhit.o         \
 	mainargs.o	\
-	sysuname.o	\
-        upload.o
+	sysuname.o
 
 #--------------------------------------------------------------------------
 # Drivers

@@ -1643,11 +1643,11 @@ unsigned OptTransfers3 (CodeSeg* S)
 
                     /* If we have a replacement store, change the code */
                     if (X) {
-                        /* Insert after the xfer insn */
-                        CS_InsertEntry (S, X, Xfer+1);
+                        /* Insert before the xfer insn */
+                        CS_InsertEntry (S, X, Xfer);
 
                         /* Remove the xfer instead */
-                        CS_DelEntry (S, Xfer);
+                        CS_DelEntry (S, Xfer+1);
 
                         /* Remove the final store */
                         CS_DelEntry (S, Store);
@@ -1801,11 +1801,11 @@ unsigned OptTransfers4 (CodeSeg* S)
 
                     /* If we have a replacement load, change the code */
                     if (X) {
-                        /* Insert after the xfer insn */
-                        CS_InsertEntry (S, X, Xfer+1);
+                        /* Insert before the xfer insn */
+                        CS_InsertEntry (S, X, Xfer);
 
                         /* Remove the xfer instead */
-                        CS_DelEntry (S, Xfer);
+                        CS_DelEntry (S, Xfer+1);
 
                         /* Remove the initial load */
                         CS_DelEntry (S, Load);
@@ -1904,23 +1904,25 @@ unsigned OptPushPop (CodeSeg* S)
             case FoundPop:
                 /* We're at the instruction after the PLA.
                  * Check for the following conditions:
-                 *   - If this instruction is a store of A, and A is not used
-                 *     later, we may replace the PHA by the store and remove
-                 *     pla if several other conditions are met.
+                 *   - If this instruction is a store of A, does not have a
+                 *     label, and A is not used later, we may replace the PHA
+                 *     by the store and remove pla if several other conditions
+                 *     are met.
                  *   - If this instruction is not a conditional branch, and A
                  *     is either unused later, or not changed by the code
                  *     between push and pop, we may remove PHA and PLA.
                  */
                 if (E->OPC == OP65_STA                  &&
+                    !CE_HasLabel (E)                    &&
                     !RegAUsed (S, I+1)                  &&
                     !MemAccess (S, Push+1, Pop-1, E)) {
 
-                    /* Insert a STA after the PHA */
+                    /* Insert a STA before the PHA */
                     X = NewCodeEntry (E->OPC, E->AM, E->Arg, E->JumpTo, E->LI);
-                    CS_InsertEntry (S, X, Push+1);
+                    CS_InsertEntry (S, X, Push);
 
                     /* Remove the PHA instead */
-                    CS_DelEntry (S, Push);
+                    CS_DelEntry (S, Push+1);
 
                     /* Remove the PLA/STA sequence */
                     CS_DelEntries (S, Pop, 2);

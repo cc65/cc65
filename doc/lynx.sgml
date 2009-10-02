@@ -46,8 +46,7 @@ that shows how to create a complete bootable Lynx cart.
 <sect>Memory layout<p>
 
 cc65 generated programs with the default setup run with the I/O area and the
-kernal enabled, which gives a usable memory range of &dollar;400 - &dollar;BE3F.
-All boot ROM entry points may be called directly without additional code.
+kernal enabled, which gives a usable memory range of &dollar;400 - &dollar;C038.
 
 Special locations:
 
@@ -63,7 +62,7 @@ Special locations:
   '?' for all keys down at the same time.
 
   <tag/Stack/
-  The C runtime stack is located at &dollar;BE3F and growing downwards.
+  The C runtime stack is located at &dollar;C037 and growing downwards.
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C
@@ -81,7 +80,6 @@ Programs containing Lynx specific code may use the <tt/lynx.h/ header file.
 <sect1>Lynx specific functions<p>
 
 <itemize>
-<item>lynx_change_framerate
 <item>lynx_eeprom_erase
 <item>lynx_eeprom_read
 <item>lynx_eeprom_write
@@ -120,8 +118,9 @@ available, but must be statically linked, because no file I/O is available.
 See the documentation for the <htmlurl url="co65.html" name="co65 utility">
 for information on how to do that.
 
-The TGI driver is implemented as a dual buffering device. To use it as a
-single-buffer device set draw page and view page to the same value 0 or 1;
+The TGI driver is implemented as an interrupt driven dual buffering device.
+To use it as a single-buffer device set draw page and view page to the same
+value 0 or 1;
 
 The TGI driver has a few Lynx-specific extensions.
 
@@ -203,8 +202,13 @@ No mouse drivers are currently available for the Lynx.
   </itemize>
   The parity bit supports MARK and SPACE. It also supports EVEN and ODD parity
   but the parity bit is included in the calculation. Most of us don't want it
-  this way. But there is nothing we can do about it. Just don't use EVEN or ODD
-  when communicating to other equipment than the Lynx. 
+  this way. But there is nothing we can do about it.
+
+  The Lynx hardware will always check parity on incoming traffic. Currently
+  the driver cannot receive data from standard PC's due to this parity bug.
+  For working with Lynx to Lynx communication use EVEN parity.
+
+  To send data to standard PC's use MARK or SPACE as parity setting.
 
   There is always only one stop bit. And the data length is always 8 bits.
 
@@ -215,6 +219,7 @@ No mouse drivers are currently available for the Lynx.
   area $200-$2ff for the transmit ring buffer and $300-$3ff for the receive
   ring buffer. This area can not be used at startup for anything as the Lynx
   ROM needs this area for decryption purposes.
+
 </descrip><p>
 
 

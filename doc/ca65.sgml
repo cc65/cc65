@@ -315,6 +315,8 @@ Include files are searched in the following places:
 
 <enum>
 <item>The current directory.
+<item>A compiled-in directory, which is often <tt>/usr/lib/cc65/asminc</tt>
+      on Linux systems.
 <item>The value of the environment variable <tt/CA65_INC/ if it is defined.
 <item>A subdirectory named <tt/asminc/ of the directory defined in the
       environment variable <tt/CC65_HOME/, if it is defined.

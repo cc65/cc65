@@ -11,6 +11,13 @@
 #include <conio.h>
 
 
+/* Workaround missing clock stuff */
+#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#  define clock()		0
+#  define CLOCKS_PER_SEC	1
+#endif
+
+
 
 /*****************************************************************************/
 /*     	      	    	  	     Data				     */

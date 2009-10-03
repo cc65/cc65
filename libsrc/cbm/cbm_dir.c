@@ -13,20 +13,21 @@
 
 
 
-unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device)
-{
+unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned
+char device) {
     unsigned char status;
     if ((status = cbm_open (lfn, device, CBM_READ, "$")) == 0) {
         if (cbm_k_chkin (lfn) == 0) {
-            if (cbm_k_basin () == 0x01) {         /* Start address */
-                if (cbm_k_basin () == 0x04) {
-                    cbm_k_clrch ();
-                    return 0;
-                }
+            /* Ignore start address */
+            cbm_k_basin();
+            cbm_k_basin();
+            if (cbm_k_readst()) {
+                cbm_close(lfn);
+                status = 2;
+                cbm_k_clrch();
             } else {
-                cbm_close (lfn);
-                cbm_k_clrch ();
-                return 2;
+                status = 0;
+                cbm_k_clrch();
             }
         }
     }
@@ -40,7 +41,7 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
     unsigned char byte, i;
     unsigned char rv;
     unsigned char is_header;
-    static const unsigned char types[] = { 
+    static const unsigned char types[] = {
         CBM_T_OTHER, CBM_T_OTHER, CBM_T_CBM,   CBM_T_DIR,   /* a b c d */
         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* e f g h */
         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* i j k l */

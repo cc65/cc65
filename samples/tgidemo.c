@@ -199,7 +199,7 @@ int main (void)
 
     /* Load and initialize the driver */
     tgi_load_driver (tgi_stddrv);
-    CheckError ("tgi_load");
+    CheckError ("tgi_load_driver");
     tgi_init ();
     CheckError ("tgi_init");
 

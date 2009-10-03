@@ -23,14 +23,7 @@ Name:           ascii
 Description:	Shows the ASCII (or ATASCII, PETSCII) codes of typed
 		characters. Written and contributed by Greg King
 		<gngking@erols.com>.
-Platforms:     	All platforms with conio or stdio (compile time
-		configurable).
-
------------------------------------------------------------------------------
-Name:           fire
-Description:	Another graphics demo written by groepaz/hitmen.
-Platforms:     	The program is currently only running on the C64, but should
-		be portable to the C128 and CBM510 (and maybe more machines).
+Platforms:     	All platforms with conio or stdio (compile time configurable).
 
 -----------------------------------------------------------------------------
 Name:           diodemo
@@ -41,11 +34,17 @@ Platforms:     	The program does depend on conio and dio (direct disk i/o),
                 machines.
 
 -----------------------------------------------------------------------------
+Name:           fire
+Description:	Another graphics demo written by groepaz/hitmen.
+Platforms:     	The program is currently only running on the C64, but should
+		be portable to the C128 and CBM510 (and maybe more machines).
+
+-----------------------------------------------------------------------------
 Name:           gunzip65
 Description:	A gunzip utility for 6502 based machines written by Piotr
                 Fusik <fox@scene.pl>.
-Platforms:     	Runs on all platforms with file I/O (currently the Atari and
-                most Commodore machines).
+Platforms:     	Runs on all platforms with file I/O (currently the Atari, the
+                Apple ][ and most Commodore machines).
 
 -----------------------------------------------------------------------------
 Name:	        hello
@@ -59,14 +58,14 @@ Name:           mandelbrot
 Description:	A mandelbrot demo using integer arithmetic. The demo was
                 written by groepaz/hitmen and converted to cc65 using TGI
                 graphics by Stephan Haubenthal.
-Platforms:	All systems with TGI support. You may have to change the
-                driver/resolution definition in the source.
+Platforms:	Runs on all platforms that have TGI support:
+		Apple ][, C64, C128, Oric Atmos, Geos and Lynx.
 
 -----------------------------------------------------------------------------
 Name:           mousedemo
 Description:	Shows how to use the mouse.
 Platforms:     	All systems with mouse and conio support:
-		C64, C128, CBM510, Atari, Apple2
+		C64, C128, CBM510, Atari, Apple ][
 
 -----------------------------------------------------------------------------
 Name:           nachtm
@@ -88,7 +87,8 @@ Description:	Implements the "Sieve of Eratosthenes" as a way to find all
 		prime numbers in a specific number interval. Often used as
 		a benchmark program.
 Platforms:	All systems with conio and clock support:
-		Atari, C16, C64, C128, CBM510, CBM610, PET, Plus/4
+		Atari, C16, C64, C128, CBM510, CBM610, PET, Plus/4,
+		Apple ][ (without timing due to missing clock support)
 
 -----------------------------------------------------------------------------
 Name:           tgidemo

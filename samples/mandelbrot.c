@@ -14,11 +14,6 @@
 
 
 /* Graphics definitions */
-#if defined(__APPLE2__) || defined(__APPLE2ENH__)
-#  define GRAPHMODE	TGI_MODE_280_192_8
-#else
-#  define GRAPHMODE	TGI_MODE_320_200_2
-#endif
 #define SCREEN_X        (tgi_getxres())
 #define SCREEN_Y        (tgi_getyres())
 #define MAXCOL          (tgi_getcolorcount())
@@ -97,7 +92,7 @@ int main (void)
 
     /* Load the graphics driver */                       
     cprintf ("initializing... mompls\r\n");
-    tgi_load (GRAPHMODE);
+    tgi_load_driver (tgi_stddrv);
     err = tgi_geterror ();
     if (err  != TGI_ERR_OK) {
 	cprintf ("Error #%d initializing graphics.\r\n%s\r\n",

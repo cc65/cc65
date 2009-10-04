@@ -9,7 +9,7 @@
         .import         SWAPPER, BSOUT
 
 ; This function is deprecated
-.assert         * < 0, warning, "toggle_videomode() is deprecated, please use videomode() instead!"
+.assert         * < 0, ldwarning, "toggle_videomode() is deprecated, please use videomode() instead!"
 
 
 

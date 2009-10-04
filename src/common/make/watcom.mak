@@ -57,6 +57,7 @@ endif
 
 OBJS =	abend.obj	\
         addrsize.obj    \
+        assertion.obj   \
 	bitops.obj	\
 	chartype.obj	\
 	check.obj	\

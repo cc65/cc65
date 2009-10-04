@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "assertion.h"
+
+
+
 /*****************************************************************************/
 /*     	     	    		     Data     				     */
 /*****************************************************************************/
@@ -55,7 +60,7 @@ struct ExprNode;
 
 
 
-void AddAssertion (struct ExprNode* Expr, unsigned Action, unsigned Msg);
+void AddAssertion (struct ExprNode* Expr, AssertAction Action, unsigned Msg);
 /* Add an assertion to the assertion table */
 
 void CheckAssertions (void);

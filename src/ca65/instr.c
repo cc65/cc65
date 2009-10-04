@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008, Ullrich von Bassewitz                                      */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -39,7 +39,6 @@
 
 /* common */
 #include "addrsize.h"
-#include "assertdefs.h"
 #include "attrib.h"
 #include "bitops.h"
 #include "check.h"
@@ -60,7 +59,7 @@
 #include "studyexpr.h"
 #include "symtab.h"
 
-
+                
 
 /*****************************************************************************/
 /*                                 Forwards                                  */

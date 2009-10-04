@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 asserts.h                                 */
+/*                                assertion.c                                */
 /*                                                                           */
-/*                      Assertions for the ld65 linker                       */
+/*                     Definitions for linker assertions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,49 +33,30 @@
 
 
 
-#ifndef ASSERTS_H
-#define ASSERTS_H
-
-
-
-#include <stdio.h>
-
-/* common */
-#include "filepos.h"
+#include "assertion.h"
 
 
 
 /*****************************************************************************/
-/*     	       	     	 	     Data     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-/* Assertion object forward decl */
-typedef struct Assertion Assertion;
-
-/* ObjData forward decl */
-struct ObjData;
-
-
-
-/*****************************************************************************/
-/*     	       	     	 	     Code     				     */
-/*****************************************************************************/
+int AssertAtLinkTime (AssertAction A)
+/* Return true if this assertion should be evaluated at link time */
+{
+    /* Currently all assertions are evaluated at link time */
+    return 1;
+}
 
 
 
-Assertion* ReadAssertion (FILE* F, struct ObjData* O);
-/* Read an assertion from the given file */
-
-void CheckAssertions (void);
-/* Check all assertions */
-
-
-
-/* End of asserts.h */
-
-#endif
+int AssertAtAsmTime (AssertAction A)
+/* Return true if this assertion should be evaluated at assembly time */
+{            
+    return (A & 0x02U) == 0;
+}
 
 
 

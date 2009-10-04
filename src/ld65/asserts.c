@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2008, Ullrich von Bassewitz                                      */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -34,7 +34,7 @@
 
 
 /* common */
-#include "assertdefs.h"
+#include "assertion.h"
 #include "coll.h"
 #include "xmalloc.h"
 
@@ -53,6 +53,15 @@
 /*****************************************************************************/
 
 
+
+/* Assertion struct decl */
+struct Assertion {
+    FilePos             Pos;            /* File position of assertion */
+    ExprNode*           Expr;           /* Expression to evaluate */
+    AssertAction        Action;         /* What to do */
+    unsigned            Msg;            /* Message to print */
+    ObjData*            Obj;            /* Object file containing the assertion */
+};
 
 /* List with all assertions */
 static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
@@ -73,7 +82,7 @@ Assertion* ReadAssertion (FILE* F, struct ObjData* O)
 
     /* Read the fields from the file */
     A->Expr = ReadExpr (F, O);
-    A->Action = ReadVar (F);
+    A->Action = (AssertAction) ReadVar (F);
     A->Msg = MakeGlobalStringId (O, ReadVar (F));
     ReadFilePos (F, &A->Pos);
 
@@ -100,6 +109,11 @@ void CheckAssertions (void)
         /* Get the assertion */
         Assertion* A = CollAtUnchecked (&Assertions, I);
 
+        /* Ignore assertions that shouldn't be handled at link time */
+        if (!AssertAtLinkTime (A->Action)) {
+            continue;
+        }
+
         /* If the expression is not constant, we're not able to handle it */
         if (!IsConstExpr (A->Expr)) {
             Warning ("Cannot evaluate assertion in module `%s', line %lu",
@@ -113,10 +127,12 @@ void CheckAssertions (void)
             switch (A->Action) {
 
                 case ASSERT_ACT_WARN:
+                case ASSERT_ACT_LDWARN:
                     Warning ("%s(%lu): %s", Module, A->Pos.Line, Message);
                     break;
 
                 case ASSERT_ACT_ERROR:
+                case ASSERT_ACT_LDERROR:
                     Error ("%s(%lu): %s", Module, A->Pos.Line, Message);
                     break;
 

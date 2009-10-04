@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  assertdefs.h  	       	       	     */
+/*                                assertion.h                                */
 /*                                                                           */
 /*                     Definitions for linker assertions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,24 +33,42 @@
 
 
 
-#ifndef ASSERTDEFS_H
-#define ASSERTDEFS_H
+#ifndef ASSERTION_H
+#define ASSERTION_H
 
 
 
 /*****************************************************************************/
-/*     	       	    	    	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-/* Assertion actions */
-#define ASSERT_ACT_WARN         0x00    /* Print a warning */
-#define ASSERT_ACT_ERROR        0x01    /* Print an error (no output) */
+/* Assertion actions. The second two are linker only (not evaluated by ca65) */
+typedef enum {
+    ASSERT_ACT_WARN     =   0x00U,  /* Print a warning */
+    ASSERT_ACT_ERROR    =   0x01U,  /* Print an error */
+    ASSERT_ACT_LDWARN   =   0x02U,  /* Print a warning (linker only) */
+    ASSERT_ACT_LDERROR  =   0x03U,  /* Print an error (linker only) */
+} AssertAction;
 
 
 
-/* End of assertdefs.h */
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+int AssertAtLinkTime (AssertAction A);
+/* Return true if this assertion should be evaluated at link time */
+
+int AssertAtAsmTime (AssertAction A);
+/* Return true if this assertion should be evaluated at assembly time */
+
+
+
+/* End of assertion.h */
 
 #endif
 

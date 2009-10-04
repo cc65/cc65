@@ -11,6 +11,7 @@ LIB	= common.a
 
 OBJS =	abend.o		\
 	addrsize.o      \
+        assertion.o     \
 	bitops.o	\
 	chartype.o	\
 	check.o		\

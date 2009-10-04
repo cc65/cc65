@@ -40,7 +40,7 @@
 #include <errno.h>
 
 /* common */
-#include "assertdefs.h"
+#include "assertion.h"
 #include "bitops.h"
 #include "cddefs.h"
 #include "coll.h"
@@ -408,11 +408,13 @@ static void DoAssert (void)
 {
     static const char* ActionTab [] = {
 	"WARN", "WARNING",
-        "ERROR"
+        "ERROR",
+        "LDWARN", "LDWARNING",
+        "LDERROR",
     };
 
-    int      Action;
-    unsigned Msg;
+    AssertAction Action;
+    unsigned     Msg;
 
     /* First we have the expression that has to evaluated */
     ExprNode* Expr = Expression ();
@@ -423,8 +425,7 @@ static void DoAssert (void)
         ErrorSkip ("Identifier expected");
         return;
     }
-    Action = GetSubKey (ActionTab, sizeof (ActionTab) / sizeof (ActionTab[0]));
-    switch (Action) {
+    switch (GetSubKey (ActionTab, sizeof (ActionTab) / sizeof (ActionTab[0]))) {
 
         case 0:
         case 1:
@@ -437,8 +438,23 @@ static void DoAssert (void)
             Action = ASSERT_ACT_ERROR;
             break;
 
+        case 3:
+        case 4:
+            /* Linker warning */
+            Action = ASSERT_ACT_LDWARN;
+            break;
+
+        case 5:
+            /* Linker error */
+            Action = ASSERT_ACT_LDERROR;
+            break;
+
         default:
             Error ("Illegal assert action specifier");
+            /* Use lderror - there won't be an .o file anyway */
+            Action = ASSERT_ACT_LDERROR;
+            break;
+
     }
     NextTok ();
 
@@ -470,7 +486,7 @@ static void DoAssert (void)
     }
 
     /* Remember the assertion */
-    AddAssertion (Expr, Action, Msg);
+    AddAssertion (Expr, (AssertAction) Action, Msg);
 }
 
 

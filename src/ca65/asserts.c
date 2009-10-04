@@ -34,7 +34,6 @@
 
 
 /* common */
-#include "assertdefs.h"
 #include "coll.h"
 #include "xmalloc.h"
 
@@ -57,10 +56,10 @@
 /* An assertion entry */
 typedef struct Assertion Assertion;
 struct Assertion {
-    ExprNode*   Expr;           /* Expression to evaluate */
-    unsigned    Action;         /* Action to take */
-    unsigned    Msg;            /* Message to print (if any) */
-    FilePos     Pos;            /* File position of assertion */
+    ExprNode*       Expr;       /* Expression to evaluate */
+    AssertAction    Action;     /* Action to take */
+    unsigned        Msg;        /* Message to print (if any) */
+    FilePos         Pos;        /* File position of assertion */
 };
 
 /* Collection with all assertions for a module */
@@ -74,7 +73,7 @@ static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
 
 
 
-static Assertion* NewAssertion (ExprNode* Expr, unsigned Action, unsigned Msg)
+static Assertion* NewAssertion (ExprNode* Expr, AssertAction Action, unsigned Msg)
 /* Create a new Assertion struct and return it */
 {
     /* Allocate memory */
@@ -92,7 +91,7 @@ static Assertion* NewAssertion (ExprNode* Expr, unsigned Action, unsigned Msg)
 
 
 
-void AddAssertion (ExprNode* Expr, unsigned Action, unsigned Msg)
+void AddAssertion (ExprNode* Expr, AssertAction Action, unsigned Msg)
 /* Add an assertion to the assertion table */
 {
     /* Add an assertion object to the table */
@@ -112,11 +111,17 @@ void CheckAssertions (void)
     /* Check the assertions */
     for (I = 0; I < Count; ++I) {
 
+        long Val;
+
         /* Get the next assertion */
         Assertion* A = CollAtUnchecked (&Assertions, I);
 
+        /* Ignore it, if it should only be evaluated by the linker */
+        if (!AssertAtAsmTime (A->Action)) {
+            continue;
+        }
+
         /* Can we evaluate the expression? */
-        long Val;
         if (IsConstExpr (A->Expr, &Val) && Val == 0) {
             /* Apply the action */
             const char* Msg = GetString (A->Msg);
@@ -162,7 +167,7 @@ void WriteAssertions (void)
 
         /* Write it to the file */
         WriteExpr (A->Expr);
-        ObjWriteVar (A->Action);
+        ObjWriteVar ((unsigned) A->Action);
         ObjWriteVar (A->Msg);
         ObjWritePos (&A->Pos);
     }

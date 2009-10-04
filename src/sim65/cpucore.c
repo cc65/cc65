@@ -124,11 +124,11 @@ static char BreakMsg[1024];
 #define PAGE_CROSS(addr,offs)   ((((addr) & 0xFF) + offs) >= 0x100)
 
 /* #imm */
-#define AC_OP_IMM(op)                                   \
-    Cycles = 2;                                         \
-    Regs.AC = Regs.AC op MemReadByte (Regs.PC+1);       \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_IMM(op)                                           \
+    Cycles = 2;                                                 \
+    Regs.AC = Regs.AC op MemReadByte (Regs.PC+1);               \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 2
 
 /* zp */
@@ -140,163 +140,196 @@ static char BreakMsg[1024];
     Regs.PC += 2
 
 /* zp,x */
-#define AC_OP_ZPX(op)                                   \
-    unsigned char ZPAddr;                               \
-    Cycles = 4;                                         \
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;         \
-    Regs.AC = Regs.AC op MemReadByte (ZPAddr);          \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_ZPX(op)                                           \
+    unsigned char ZPAddr;                                       \
+    Cycles = 4;                                                 \
+    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;                 \
+    Regs.AC = Regs.AC op MemReadByte (ZPAddr);                  \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 2
 
 /* zp,y */
-#define AC_OP_ZPY(op)                                   \
-    unsigned char ZPAddr;                               \
-    Cycles = 4;                                         \
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.YR;         \
-    Regs.AC = Regs.AC op MemReadByte (ZPAddr);          \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_ZPY(op)                                           \
+    unsigned char ZPAddr;                                       \
+    Cycles = 4;                                                 \
+    ZPAddr = MemReadByte (Regs.PC+1) + Regs.YR;                 \
+    Regs.AC = Regs.AC op MemReadByte (ZPAddr);                  \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 2
 
 /* abs */
-#define AC_OP_ABS(op)                                   \
-    unsigned Addr;                                      \
-    Cycles = 4;                                         \
-    Addr = MemReadWord (Regs.PC+1);                     \
-    Regs.AC = Regs.AC op MemReadByte (Addr);            \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_ABS(op)                                           \
+    unsigned Addr;                                              \
+    Cycles = 4;                                                 \
+    Addr = MemReadWord (Regs.PC+1);                             \
+    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 3
 
 /* abs,x */
-#define AC_OP_ABSX(op)                                  \
-    unsigned Addr;                                      \
-    Cycles = 4;                                         \
-    Addr = MemReadWord (Regs.PC+1);                     \
-    if (PAGE_CROSS (Addr, Regs.XR)) {                   \
-        ++Cycles;                                       \
-    }                                                   \
-    Regs.AC = Regs.AC op MemReadByte (Addr + Regs.XR);  \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_ABSX(op)                                          \
+    unsigned Addr;                                              \
+    Cycles = 4;                                                 \
+    Addr = MemReadWord (Regs.PC+1);                             \
+    if (PAGE_CROSS (Addr, Regs.XR)) {                           \
+        ++Cycles;                                               \
+    }                                                           \
+    Regs.AC = Regs.AC op MemReadByte (Addr + Regs.XR);          \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 3
 
 /* abs,y */
-#define AC_OP_ABSY(op)                                  \
-    unsigned Addr;                                      \
-    Cycles = 4;                                         \
-    Addr = MemReadWord (Regs.PC+1);                     \
-    if (PAGE_CROSS (Addr, Regs.YR)) {                   \
-        ++Cycles;                                       \
-    }                                                   \
-    Regs.AC = Regs.AC op MemReadByte (Addr + Regs.YR);  \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_ABSY(op)                                          \
+    unsigned Addr;                                              \
+    Cycles = 4;                                                 \
+    Addr = MemReadWord (Regs.PC+1);                             \
+    if (PAGE_CROSS (Addr, Regs.YR)) {                           \
+        ++Cycles;                                               \
+    }                                                           \
+    Regs.AC = Regs.AC op MemReadByte (Addr + Regs.YR);          \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 3
 
 /* (zp,x) */
-#define AC_OP_ZPXIND(op)                                \
-    unsigned char ZPAddr;                               \
-    unsigned Addr;                                      \
-    Cycles = 6;                                         \
-    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;         \
-    Addr = MemReadZPWord (ZPAddr);                      \
-    Regs.AC = Regs.AC op MemReadByte (Addr);            \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_ZPXIND(op)                                        \
+    unsigned char ZPAddr;                                       \
+    unsigned Addr;                                              \
+    Cycles = 6;                                                 \
+    ZPAddr = MemReadByte (Regs.PC+1) + Regs.XR;                 \
+    Addr = MemReadZPWord (ZPAddr);                              \
+    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 2
 
 /* (zp),y */
-#define AC_OP_ZPINDY(op)                                \
-    unsigned char ZPAddr;                               \
-    unsigned Addr;                                      \
-    Cycles = 5;                                         \
-    ZPAddr = MemReadByte (Regs.PC+1);                   \
-    Addr = MemReadZPWord (ZPAddr) + Regs.YR;            \
-    Regs.AC = Regs.AC op MemReadByte (Addr);            \
-    TEST_ZF (Regs.AC);                                  \
-    TEST_SF (Regs.AC);                                  \
+#define AC_OP_ZPINDY(op)                                        \
+    unsigned char ZPAddr;                                       \
+    unsigned Addr;                                              \
+    Cycles = 5;                                                 \
+    ZPAddr = MemReadByte (Regs.PC+1);                           \
+    Addr = MemReadZPWord (ZPAddr) + Regs.YR;                    \
+    Regs.AC = Regs.AC op MemReadByte (Addr);                    \
+    TEST_ZF (Regs.AC);                                          \
+    TEST_SF (Regs.AC);                                          \
     Regs.PC += 2
 
 /* ADC */
-#define ADC(v)                                          \
-    if (GET_DF ()) {                                    \
-        Warning ("Decimal mode not available");         \
-    } else {                                            \
-        unsigned old = Regs.AC;                         \
-        unsigned rhs = (v & 0xFF);                      \
-        Regs.AC += rhs + GET_CF ();                     \
-        TEST_ZF (Regs.AC);                              \
-        TEST_SF (Regs.AC);                              \
-        TEST_CF (Regs.AC);                              \
-        SET_OF (!((old ^ rhs) & 0x80) &&                \
-                ((old ^ Regs.AC) & 0x80));              \
-        Regs.AC &= 0xFF;                                \
-    }
+#define ADC(v)                                                  \
+    do {                                                        \
+        unsigned old = Regs.AC;                                 \
+        unsigned rhs = (v & 0xFF);                              \
+        if (GET_DF ()) {                                        \
+            unsigned lo;                                        \
+            int res;                                            \
+            lo = (old & 0x0F) + (rhs & 0x0F) + GET_CF ();       \
+            if (lo >= 0x0A) {                                   \
+                lo = ((lo + 0x06) & 0x0F) + 0x10;               \
+            }                                                   \
+            Regs.AC = (old & 0xF0) + (rhs & 0xF0) + lo;         \
+            res = (signed char)(old & 0xF0) +                   \
+                  (signed char)(rhs & 0xF0) +                   \
+                  (signed char)lo;                              \
+            TEST_ZF (old + rhs + GET_CF ());                    \
+            TEST_SF (Regs.AC);                                  \
+            if (Regs.AC >= 0xA0) {                              \
+                Regs.AC += 0x60;                                \
+            }                                                   \
+            TEST_CF (Regs.AC);                                  \
+            SET_OF ((res < -128) || (res > 127));               \
+        } else {                                                \
+            Regs.AC += rhs + GET_CF ();                         \
+            TEST_ZF (Regs.AC);                                  \
+            TEST_SF (Regs.AC);                                  \
+            TEST_CF (Regs.AC);                                  \
+            SET_OF (!((old ^ rhs) & 0x80) &&                    \
+                    ((old ^ Regs.AC) & 0x80));                  \
+            Regs.AC &= 0xFF;                                    \
+        }                                                       \
+    } while (0)
 
 /* branches */
-#define BRANCH(cond)                                    \
-    Cycles = 2;                                         \
-    if (cond) {                                         \
-        signed char Offs;                               \
-        unsigned char OldPCH;                           \
-        ++Cycles;                                       \
-        Offs = (signed char) MemReadByte (Regs.PC+1);   \
-        OldPCH = PCH;                                   \
-        Regs.PC += 2 + (int) Offs;                      \
-        if (PCH != OldPCH) {                            \
-            ++Cycles;                                   \
-        }                                               \
-    } else {                                            \
-        Regs.PC += 2;                                   \
+#define BRANCH(cond)                                            \
+    Cycles = 2;                                                 \
+    if (cond) {                                                 \
+        signed char Offs;                                       \
+        unsigned char OldPCH;                                   \
+        ++Cycles;                                               \
+        Offs = (signed char) MemReadByte (Regs.PC+1);           \
+        OldPCH = PCH;                                           \
+        Regs.PC += 2 + (int) Offs;                              \
+        if (PCH != OldPCH) {                                    \
+            ++Cycles;                                           \
+        }                                                       \
+    } else {                                                    \
+        Regs.PC += 2;                                           \
     }
 
 /* compares */
-#define CMP(v1,v2)                                      \
-    {                                                   \
-        unsigned Result = v1 - v2;                      \
-        TEST_ZF (Result & 0xFF);                        \
-        TEST_SF (Result);                               \
-        SET_CF (Result <= 0xFF);                        \
-    }
+#define CMP(v1,v2)                                              \
+    do {                                                        \
+        unsigned Result = v1 - v2;                              \
+        TEST_ZF (Result & 0xFF);                                \
+        TEST_SF (Result);                                       \
+        SET_CF (Result <= 0xFF);                                \
+    } while (0)
 
 
 /* ROL */
-#define ROL(Val)                                        \
-    Val <<= 1;                                          \
-    if (GET_CF ()) {                                    \
-        Val |= 0x01;                                    \
-    }                                                   \
-    TEST_ZF (Val);                                      \
-    TEST_SF (Val);                                      \
+#define ROL(Val)                                                \
+    Val <<= 1;                                                  \
+    if (GET_CF ()) {                                            \
+        Val |= 0x01;                                            \
+    }                                                           \
+    TEST_ZF (Val);                                              \
+    TEST_SF (Val);                                              \
     TEST_CF (Val)
 
 /* ROR */
-#define ROR(Val)                                        \
-    if (GET_CF ()) {                                    \
-        Val |= 0x100;                                   \
-    }                                                   \
-    SET_CF (Val & 0x01);                                \
-    Val >>= 1;                                          \
-    TEST_ZF (Val);                                      \
+#define ROR(Val)                                                \
+    if (GET_CF ()) {                                            \
+        Val |= 0x100;                                           \
+    }                                                           \
+    SET_CF (Val & 0x01);                                        \
+    Val >>= 1;                                                  \
+    TEST_ZF (Val);                                              \
     TEST_SF (Val)
 
 /* SBC */
-#define SBC(v)                                          \
-    if (GET_DF ()) {                                    \
-        Warning ("Decimal mode not available");         \
-    } else {                                            \
-        unsigned old = Regs.AC;                         \
-        unsigned rhs = (v & 0xFF);                      \
-        Regs.AC -= rhs - (!GET_CF ());                  \
-        TEST_ZF (Regs.AC);                              \
-        TEST_SF (Regs.AC);                              \
-        SET_CF (Regs.AC <= 0xFF);                       \
-        SET_OF (((old^rhs) & (old^Regs.AC) & 0x80));    \
-        Regs.AC &= 0xFF;                                \
-    }
-
+#define SBC(v)                                                  \
+    do {                                                        \
+        unsigned old = Regs.AC;                                 \
+        unsigned rhs = (v & 0xFF);                              \
+        if (GET_DF ()) {                                        \
+            unsigned lo;                                        \
+            int res;                                            \
+            lo = (old & 0x0F) - (rhs & 0x0F) + GET_CF () - 1;   \
+            if (lo & 0x80) {                                    \
+                lo = ((lo - 0x06) & 0x0F) - 0x10;               \
+            }                                                   \
+            Regs.AC = (old & 0xF0) - (rhs & 0xF0) + lo;         \
+            if (Regs.AC & 0x80) {                               \
+                Regs.AC -= 0x60;                                \
+            }                                                   \
+            res = Regs.AC - rhs + (!GET_CF ());                 \
+            TEST_ZF (res);                                      \
+            TEST_SF (res);                                      \
+            SET_CF (res <= 0xFF);                               \
+            SET_OF (((old^rhs) & (old^res) & 0x80));            \
+        } else {                                                \
+            Regs.AC -= rhs - (!GET_CF ());                      \
+            TEST_ZF (Regs.AC);                                  \
+            TEST_SF (Regs.AC);                                  \
+            SET_CF (Regs.AC <= 0xFF);                           \
+            SET_OF (((old^rhs) & (old^Regs.AC) & 0x80));        \
+            Regs.AC &= 0xFF;                                    \
+        }                                                       \
+    } while (0)
 
 
 /*****************************************************************************/

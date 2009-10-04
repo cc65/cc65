@@ -1750,9 +1750,10 @@ Here's a list of all control commands and a description, what they do:
   Add an assertion. The command is followed by an expression, an action
   specifier, and an optional message that is output in case the assertion
   fails. If no message was given, the string "Assertion failed" is used. The
-  action specifier may be one of <tt/warning/ or <tt/error/. The assertion is
-  evaluated by the assembler if possible, and also passed to the linker in the
-  object file (if one is generated). The linker will then evaluate the
+  action specifier may be one of <tt/warning/, <tt/error/, <tt/ldwarning/ or
+  <tt/lderror/. In the former two cases, the assertion is evaluated by the
+  assembler if possible, and in any case, it's also passed to the linker in
+  the object file (if one is generated). The linker will then evaluate the
   expression when segment placement has been done.
 
   Example:

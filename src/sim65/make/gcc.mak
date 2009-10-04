@@ -15,7 +15,7 @@ CC	= gcc
 CFLAGS 	= -g -O2 -Wall -W -std=c89
 override CFLAGS += -I$(COMMON)
 EBIND	= emxbind
-LDFLAGS	=
+LDFLAGS	= -ldl
 
 
 # -----------------------------------------------------------------------------

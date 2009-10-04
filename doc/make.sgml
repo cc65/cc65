@@ -95,6 +95,10 @@ $(PROGRAM): $(SOURCES:.c=.o)
 	$(CC) $(LDFLAGS) $^ -o $@
 </verb></tscreen>
 
+<bf/Important:/ When using the sample Makefile above via copy & paste it is
+necessary to replace the eight spaces at the beginning of command lines (lines
+33, 36, 37 and 40) with a tab character (ASCII code 9).
+
 
 <sect1>Invoking the sample Makefile<p>
 

@@ -797,6 +797,7 @@ static void ArrayRef (ExprDesc* Expr)
     ExprDesc    Subscript;
     CodeMark    Mark1;
     CodeMark    Mark2;
+    TypeCode    Qualifiers;
     Type*       ElementType;
     Type*       tptr1;
 
@@ -838,11 +839,15 @@ static void ArrayRef (ExprDesc* Expr)
      * Since we do the necessary checking here, we can rely later on the
      * correct types.
      */
+    Qualifiers = T_QUAL_NONE;
     if (IsClassPtr (Expr->Type)) {
         if (!IsClassInt (Subscript.Type))  {
             Error ("Array subscript is not an integer");
             /* To avoid any compiler errors, make the expression a valid int */
             ED_MakeConstAbsInt (&Subscript, 0);
+        }
+        if (IsTypeArray (Expr->Type)) {
+            Qualifiers = GetQualifier (Expr->Type);
         }
         ElementType = Indirect (Expr->Type);
     } else if (IsClassInt (Expr->Type)) {
@@ -852,6 +857,8 @@ static void ArrayRef (ExprDesc* Expr)
              * address 0.
              */
             ED_MakeConstAbs (&Subscript, 0, GetCharArrayType (1));
+        } else if (IsTypeArray (Subscript.Type)) {
+            Qualifiers = GetQualifier (Subscript.Type);
         }
         ElementType = Indirect (Subscript.Type);
     } else {
@@ -862,6 +869,14 @@ static void ArrayRef (ExprDesc* Expr)
         ED_MakeConstAbs (Expr, 0, GetCharArrayType (1));
         ED_MakeConstAbsInt (&Subscript, 0);
         ElementType = Indirect (Expr->Type);
+    }
+         
+    /* The element type has the combined qualifiers from itself and the array,
+     * it is a member of (if any).
+     */
+    if (GetQualifier (ElementType) != (GetQualifier (ElementType) | Qualifiers)) {
+        ElementType = TypeDup (ElementType);
+        ElementType->C |= Qualifiers;
     }
 
     /* If the subscript is a bit-field, load it and make it an rvalue */

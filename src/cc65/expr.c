@@ -1070,6 +1070,7 @@ static void StructRef (ExprDesc* Expr)
 {
     ident Ident;
     SymEntry* Field;
+    TypeCode Q;
 
     /* Skip the token and check for an identifier */
     NextToken ();
@@ -1104,8 +1105,14 @@ static void StructRef (ExprDesc* Expr)
     /* Set the struct field offset */
     Expr->IVal += Field->V.Offs;
 
-    /* The type is now the type of the field */
-    Expr->Type = Field->Type;
+    /* The type is the type of the field plus any qualifiers from the struct */
+    Q = GetQualifier (Expr->Type);
+    if (Q == T_QUAL_NONE) {
+        Expr->Type = Field->Type;
+    } else {
+        Expr->Type = TypeDup (Field->Type);
+        Expr->Type->C |= Q;
+    }
 
     /* An struct member is actually a variable. So the rules for variables
      * with respect to the reference type apply: If it's an array, it is

@@ -1107,7 +1107,7 @@ static void StructRef (ExprDesc* Expr)
 
     /* The type is the type of the field plus any qualifiers from the struct */
     Q = GetQualifier (Expr->Type);
-    if (Q == T_QUAL_NONE) {
+    if (GetQualifier (Field->Type) == (GetQualifier (Field->Type) | Q)) {
         Expr->Type = Field->Type;
     } else {
         Expr->Type = TypeDup (Field->Type);
@@ -1599,9 +1599,9 @@ void hie10 (ExprDesc* Expr)
                 ED_MakeRValExpr (Expr);
             }
             /* If the expression is already a pointer to function, the
-             * additional dereferencing operator must be ignored. A function 
+             * additional dereferencing operator must be ignored. A function
              * itself is represented as "pointer to function", so any number
-             * of dereference operators is legal, since the result will 
+             * of dereference operators is legal, since the result will
              * always be converted to "pointer to function".
              */
             if (IsTypeFuncPtr (Expr->Type) || IsTypeFunc (Expr->Type)) {

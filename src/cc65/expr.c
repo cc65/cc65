@@ -1599,9 +1599,12 @@ void hie10 (ExprDesc* Expr)
                 ED_MakeRValExpr (Expr);
             }
             /* If the expression is already a pointer to function, the
-             * additional dereferencing operator must be ignored.
+             * additional dereferencing operator must be ignored. A function 
+             * itself is represented as "pointer to function", so any number
+             * of dereference operators is legal, since the result will 
+             * always be converted to "pointer to function".
              */
-            if (IsTypeFuncPtr (Expr->Type)) {
+            if (IsTypeFuncPtr (Expr->Type) || IsTypeFunc (Expr->Type)) {
                 /* Expression not storable */
                 ED_MakeRVal (Expr);
             } else {

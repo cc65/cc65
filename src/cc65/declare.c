@@ -294,7 +294,7 @@ static void FixQualifiers (Type* DataType)
     while (T->C != T_END) {
         if (IsTypeArray (T)) {
             /* Extract any type qualifiers */
-            Q |= GetQualifier (T->C);
+            Q |= GetQualifier (T);
             T->C = UnqualifiedType (T->C);
         } else {
             /* Add extracted type qualifiers here */

@@ -411,14 +411,6 @@ void g_importmainargs (void)
 
 
 
-static void ldaconst (unsigned val)
-/* Load a with a constant */
-{
-    AddCodeLine ("lda #$%02X", val & 0xFF);
-}
-
-
-
 static void ldxconst (unsigned val)
 /* Load x with a constant */
 {
@@ -493,7 +485,7 @@ void g_leave (void)
         } else {
             /* We've a stack frame to drop */
             while (k > 255) {
-                ldyconst (255);
+                AddCodeLine ("ldy #$FF");
                 AddCodeLine ("jsr addysp");
                 k -= 255;
             }
@@ -522,14 +514,13 @@ void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     CheckLocalOffs (StackOffs);
 
     /* Generate code */
+    AddCodeLine ("ldy #$%02X", StackOffs & 0xFF);
     if (Bytes == 1) {
 
         if (IS_Get (&CodeSizeFactor) < 165) {
-            ldyconst (StackOffs);
-            ldxconst (RegOffs);
+            AddCodeLine ("ldx #$%02X", RegOffs & 0xFF);
             AddCodeLine ("jsr regswap1");
         } else {
-            ldyconst (StackOffs);
             AddCodeLine ("lda (sp),y");
             AddCodeLine ("ldx regbank%+d", RegOffs);
             AddCodeLine ("sta regbank%+d", RegOffs);
@@ -539,15 +530,13 @@ void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
     } else if (Bytes == 2) {
 
-        ldyconst (StackOffs);
-        ldxconst (RegOffs);
+        AddCodeLine ("ldx #$%02X", RegOffs & 0xFF);
         AddCodeLine ("jsr regswap2");
 
     } else {
 
-        ldyconst (StackOffs);
-        ldxconst (RegOffs);
-        ldaconst (Bytes);
+        AddCodeLine ("ldx #$%02X", RegOffs & 0xFF);
+        AddCodeLine ("lda #$%02X", Bytes & 0xFF);
         AddCodeLine ("jsr regswap");
     }
 }
@@ -683,13 +672,13 @@ void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
 
             case CF_CHAR:
                 if ((Flags & CF_FORCECHAR) != 0) {
-                    ldaconst (Val);
+                    AddCodeLine ("lda #$%02X", (unsigned char) Val);
                     break;
                 }
                 /* FALL THROUGH */
             case CF_INT:
-                ldxconst ((Val >> 8) & 0xFF);
-                ldaconst (Val & 0xFF);
+                AddCodeLine ("ldx #$%02X", (unsigned char) (Val >> 8));
+                AddCodeLine ("lda #$%02X", (unsigned char) Val);
                 break;
 
             case CF_LONG:
@@ -1334,7 +1323,7 @@ void g_reglong (unsigned Flags)
         case CF_INT:
             if (Flags & CF_UNSIGNED) {
             	if (IS_Get (&CodeSizeFactor) >= 200) {
-            	    ldyconst (0);
+                    AddCodeLine ("ldy #$00");
             	    AddCodeLine ("sty sreg");
           	    AddCodeLine ("sty sreg+1");
             	} else {
@@ -2351,7 +2340,7 @@ void g_push (unsigned flags, unsigned long val)
         if ((flags & CF_TYPE) == CF_CHAR && (flags & CF_FORCECHAR)) {
 
             /* Handle as 8 bit value */
-            ldaconst (val);
+            AddCodeLine ("lda #$%02X", (unsigned char) val);
             AddCodeLine ("jsr pusha");
 
         } else {
@@ -2930,7 +2919,7 @@ void g_and (unsigned Flags, unsigned long Val)
 
             case CF_LONG:
                 if (Val <= 0xFF) {
-                    ldxconst (0);
+                    AddCodeLine ("ldx #$00");
                     AddCodeLine ("stx sreg+1");
              	    AddCodeLine ("stx sreg");
                     if ((Val & 0xFF) != 0xFF) {
@@ -2938,7 +2927,7 @@ void g_and (unsigned Flags, unsigned long Val)
                     }
                     return;
                 } else if (Val == 0xFF00) {
-                    ldaconst (0);
+                    AddCodeLine ("lda #$00");
                     AddCodeLine ("sta sreg+1");
                     AddCodeLine ("sta sreg");
                     return;
@@ -3311,7 +3300,7 @@ void g_inc (unsigned flags, unsigned long val)
                 if (val <= 8) {
                     AddCodeLine ("jsr incax%lu", val);
                 } else if (val <= 255) {
-                    ldyconst (val);
+                    AddCodeLine ("ldy #$%02X", (unsigned char) val);
                     AddCodeLine ("jsr incaxy");
                 } else {
                     g_add (flags | CF_CONST, val);
@@ -3357,7 +3346,7 @@ void g_inc (unsigned flags, unsigned long val)
 
         case CF_LONG:
             if (val <= 255) {
-                ldyconst (val);
+                AddCodeLine ("ldy #$%02X", (unsigned char) val);
                 AddCodeLine ("jsr inceaxy");
             } else {
                 g_add (flags | CF_CONST, val);
@@ -3404,7 +3393,7 @@ void g_dec (unsigned flags, unsigned long val)
                 if (val <= 8) {
                     AddCodeLine ("jsr decax%d", (int) val);
                 } else if (val <= 255) {
-                    ldyconst (val);
+                    AddCodeLine ("ldy #$%02X", (unsigned char) val);
                     AddCodeLine ("jsr decaxy");
                 } else {
                     g_sub (flags | CF_CONST, val);
@@ -3449,7 +3438,7 @@ void g_dec (unsigned flags, unsigned long val)
 
         case CF_LONG:
             if (val <= 255) {
-                ldyconst (val);
+                AddCodeLine ("ldy #$%02X", (unsigned char) val);
                 AddCodeLine ("jsr deceaxy");
             } else {
                 g_sub (flags | CF_CONST, val);
@@ -4274,7 +4263,7 @@ void g_initauto (unsigned Label, unsigned Size)
         AddCodeLine ("dey");
         AddCodeLine ("bpl %s", LocalLabelName (CodeLabel));
     } else if (Size <= 256) {
-        ldyconst (0);
+        AddCodeLine ("ldy #$00");
         g_defcodelabel (CodeLabel);
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
         AddCodeLine ("sta (sp),y");
@@ -4299,7 +4288,7 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
         AddCodeLine ("bpl %s", LocalLabelName (CodeLabel));
     } else if (Size <= 256) {
         unsigned CodeLabel = GetLocalLabel ();
-        ldyconst (0);
+        AddCodeLine ("ldy #$00");
         g_defcodelabel (CodeLabel);
         AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, InitLabel, 0));
         AddCodeLine ("sta %s,y", GetLabelName (CF_STATIC, VarLabel, 0));

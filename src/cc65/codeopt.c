@@ -42,6 +42,7 @@
 #include "cpu.h"
 #include "print.h"
 #include "xmalloc.h"
+#include "xsprintf.h"
 
 /* cc65 */
 #include "asmlabel.h"
@@ -914,7 +915,7 @@ static unsigned OptDecouple (CodeSeg* S)
 
 			case REG_PTR1_LO:
 			    Arg = MakeHexArg (In->Ptr1Lo);
-			    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+	       		    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
 			    break;
 
 			case REG_PTR1_HI:
@@ -1020,7 +1021,7 @@ static unsigned OptDecouple (CodeSeg* S)
 
 	    case OP65_TYA:
 	        if (E->RI->In.RegY >= 0) {
-		    Arg = MakeHexArg (In->RegY);
+	       	    Arg = MakeHexArg (In->RegY);
 	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
@@ -1040,6 +1041,106 @@ static unsigned OptDecouple (CodeSeg* S)
 
 	/* Next entry */
 	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*                        Optimize stack pointer ops                         */
+/*****************************************************************************/
+
+
+
+static unsigned IsDecSP (const CodeEntry* E)
+/* Check if this is an insn that decrements the stack pointer. If so, return
+ * the decrement. If not, return zero.
+ * The function expects E to be a subroutine call.
+ */
+{
+    if (strncmp (E->Arg, "decsp", 5) == 0) {
+        if (E->Arg[5] >= '1' && E->Arg[5] <= '8') {
+            return (E->Arg[5] - '0');
+        }
+    } else if (strcmp (E->Arg, "subysp") == 0 && RegValIsKnown (E->RI->In.RegY)) {
+        return E->RI->In.RegY;
+    }
+
+    /* If we come here, it's not a decsp op */
+    return 0;
+}
+
+
+
+static unsigned OptStackPtrOps (CodeSeg* S)
+/* Merge adjacent calls to decsp into one. NOTE: This function won't merge all
+ * known cases!
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for the following step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        unsigned Dec1;
+        unsigned Dec2;
+        const CodeEntry* N;
+
+        /* Get the next entry */
+        const CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check for decspn or subysp */
+        if (E->OPC == OP65_JSR                          &&
+            (Dec1 = IsDecSP (E)) > 0                    &&
+            (N = CS_GetNextEntry (S, I)) != 0           &&
+            (Dec2 = IsDecSP (N)) > 0                    &&
+            (Dec1 += Dec2) <= 255                       &&
+            !CE_HasLabel (N)) {
+
+            CodeEntry* X;
+            char Buf[20];
+
+            /* We can combine the two */
+            if (Dec1 <= 8) {
+                /* Insert a call to decsp */
+                xsprintf (Buf, sizeof (Buf), "decsp%u", Dec1);
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, Buf, 0, N->LI);
+                CS_InsertEntry (S, X, I+2);
+            } else {
+                /* Insert a call to subysp */
+                const char* Arg = MakeHexArg (Dec1);
+                X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, N->LI);
+                CS_InsertEntry (S, X, I+2);
+                X = NewCodeEntry (OP65_JSR, AM65_ABS, "subysp", 0, N->LI);
+                CS_InsertEntry (S, X, I+3);
+            }
+
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
+
+            /* Regenerate register info */
+            CS_GenRegInfo (S);
+
+            /* Remember we had changes */
+	    ++Changes;
+
+	} else {
+
+            /* Next entry */
+	    ++I;
+        }
 
     }
 
@@ -1148,6 +1249,7 @@ static OptFunc DOptShift4      	= { OptShift4,       "OptShift4",      	200, 0, 
 static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",    	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStackPtrOps  = { OptStackPtrOps,  "OptStackPtrOps",   50, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore1       = { OptStore1,       "OptStore1",        70, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore2       = { OptStore2,       "OptStore2",       220, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore3       = { OptStore3,       "OptStore3",       120, 0, 0, 0, 0, 0 };
@@ -1237,6 +1339,7 @@ static OptFunc* OptFuncs[] = {
     &DOptSize1,
     &DOptSize2,
     &DOptStackOps,
+    &DOptStackPtrOps,
     &DOptStore1,
     &DOptStore2,
     &DOptStore3,
@@ -1486,6 +1589,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
+    Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
     Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */

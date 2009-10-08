@@ -373,7 +373,7 @@ static void OptCodeSize (const char* Opt, const char* Arg)
     /* Numeric argument expected */
     if (sscanf (Arg, "%u%c", &Factor, &BoundsCheck) != 1 ||
         Factor < 10 || Factor > 1000) {
-	AbEnd ("Argument for %s is invalid", Opt);
+        InvArg (Opt, Arg);
     }
     IS_Set (&CodeSizeFactor, Factor);
 }
@@ -396,7 +396,7 @@ static void OptCPU (const char* Opt, const char* Arg)
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
         CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
-       	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+        InvArg (Opt, Arg);
     }
 }
 
@@ -584,7 +584,7 @@ static void OptRegisterSpace (const char* Opt, const char* Arg)
 {
     /* Numeric argument expected */
     if (sscanf (Arg, "%u", &RegisterSpace) != 1 || RegisterSpace > 256) {
-       	AbEnd ("Argument for option %s is invalid", Opt);
+        InvArg (Opt, Arg);
     }
 }
 
@@ -626,7 +626,7 @@ static void OptStandard (const char* Opt, const char* Arg)
     /* Find the standard from the given name */
     standard_t Std = FindStandard (Arg);
     if (Std == STD_UNKNOWN) {
-       	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+        InvArg (Opt, Arg);
     } else if (IS_Get (&Standard) != STD_UNKNOWN) {
         AbEnd ("Option %s given more than once", Opt);
     } else {

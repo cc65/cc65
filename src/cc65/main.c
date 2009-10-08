@@ -48,6 +48,7 @@
 #include "mmodel.h"
 #include "print.h"
 #include "segnames.h"
+#include "strbuf.h"
 #include "target.h"
 #include "tgttrans.h"
 #include "version.h"
@@ -373,7 +374,7 @@ static void OptCodeSize (const char* Opt, const char* Arg)
     /* Numeric argument expected */
     if (sscanf (Arg, "%u%c", &Factor, &BoundsCheck) != 1 ||
         Factor < 10 || Factor > 1000) {
-        InvArg (Opt, Arg);
+	AbEnd ("Argument for %s is invalid", Opt);
     }
     IS_Set (&CodeSizeFactor, Factor);
 }
@@ -396,7 +397,7 @@ static void OptCPU (const char* Opt, const char* Arg)
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_6502X && CPU != CPU_65SC02 &&
         CPU != CPU_65C02 && CPU != CPU_65816 && CPU != CPU_HUC6280) {
-        InvArg (Opt, Arg);
+       	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
     }
 }
 
@@ -584,7 +585,7 @@ static void OptRegisterSpace (const char* Opt, const char* Arg)
 {
     /* Numeric argument expected */
     if (sscanf (Arg, "%u", &RegisterSpace) != 1 || RegisterSpace > 256) {
-        InvArg (Opt, Arg);
+       	AbEnd ("Argument for option %s is invalid", Opt);
     }
 }
 
@@ -626,7 +627,7 @@ static void OptStandard (const char* Opt, const char* Arg)
     /* Find the standard from the given name */
     standard_t Std = FindStandard (Arg);
     if (Std == STD_UNKNOWN) {
-        InvArg (Opt, Arg);
+       	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
     } else if (IS_Get (&Standard) != STD_UNKNOWN) {
         AbEnd ("Option %s given more than once", Opt);
     } else {
@@ -670,6 +671,52 @@ static void OptVersion (const char* Opt attribute ((unused)),
        	     "cc65 V%s\nSVN version: %s\n",
        	     GetVersionAsString (), SVNVersion);
     exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptWarning (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the -W option */
+{
+    StrBuf W = AUTO_STRBUF_INITIALIZER;
+
+    /* Arg is a list of suboptions, separated by commas */
+    while (Arg) {
+
+        const char* Pos;
+        int         Enabled = 1;
+        IntStack*   S;
+
+        /* The suboption may be prefixed with '-' or '+' */
+        if (*Arg == '-') {
+            Enabled = 0;
+            ++Arg;
+        } else if (*Arg == '+') {
+            /* This is the default */
+            ++Arg;
+        }
+
+        /* Get the next suboption */
+        Pos = strchr (Arg, ',');
+        if (Pos) {
+            SB_CopyBuf (&W, Arg, Pos - Arg);
+            Arg = Pos + 1;
+        } else {
+            SB_CopyStr (&W, Arg);
+            Arg = 0;
+        }
+        SB_Terminate (&W);
+
+        /* Search for the warning */
+        S = FindWarning (SB_GetConstBuf (&W));
+        if (S == 0) {
+            InvArg (Opt, SB_GetConstBuf (&W));
+        }
+        IS_Set (S, Enabled);
+    }
+
+    /* Free allocated memory */
+    SB_Done (&W);
 }
 
 
@@ -741,9 +788,9 @@ int main (int argc, char* argv[])
        	const char* Arg = ArgVec[I];
 
        	/* Check for an option */
-       	if (Arg [0] == '-') {
+       	if (Arg[0] == '-') {
 
-       	    switch (Arg [1]) {
+       	    switch (Arg[1]) {
 
 		case '-':
 		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
@@ -796,7 +843,7 @@ int main (int argc, char* argv[])
 		  	    default:
 		  	  	UnknownOption (Arg);
 		  	  	break;
-		    	}
+		       	}
 		    }
 		    break;
 
@@ -839,7 +886,7 @@ int main (int argc, char* argv[])
        	       	    break;
 
        	       	case 'W':
-       	       	    IS_Set (&WarnDisable, 1);
+                    OptWarning (Arg, GetArg (&I, 2));
        	       	    break;
 
        	       	default:

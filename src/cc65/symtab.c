@@ -164,9 +164,13 @@ static void CheckSymTable (SymTable* Tab)
 	    if (((Flags & SC_AUTO) || (Flags & SC_STATIC)) && (Flags & SC_EXTERN) == 0) {
 		if (SymIsDef (Entry) && !SymIsRef (Entry)) {
 		    if (Flags & SC_PARAM) {
-			Warning ("Parameter `%s' is never used", Entry->Name);
+                        if (IS_Get (&WarnUnusedParam)) {
+			    Warning ("Parameter `%s' is never used", Entry->Name);
+                        }
 		    } else {
-			Warning ("`%s' is defined but never used", Entry->Name);
+                        if (IS_Get (&WarnUnusedVar)) {
+                            Warning ("`%s' is defined but never used", Entry->Name);
+                        }
 		    }
 		}
 	    }
@@ -177,8 +181,10 @@ static void CheckSymTable (SymTable* Tab)
 		    /* Undefined label */
 		    Error ("Undefined label: `%s'", Entry->Name);
 		} else if (!SymIsRef (Entry)) {
-		    /* Defined but not used */
-		    Warning ("`%s' is defined but never used", Entry->Name);
+		    /* Defined but not used */ 
+                    if (IS_Get (&WarnUnusedLabel)) {
+		        Warning ("`%s' is defined but never used", Entry->Name);
+                    }
 		}
 	    }
 

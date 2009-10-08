@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,6 +40,7 @@
 
 /* common */
 #include "attrib.h"
+#include "intstack.h"
 
 /* cc65 */
 #include "lineinfo.h"
@@ -56,6 +57,14 @@
 extern unsigned ErrorCount;
 extern unsigned WarningCount;
 
+/* Warning and error options */
+extern IntStack WarnEnable;             /* Enable warnings */
+extern IntStack WarningsAreErrors;      /* Treat warnings as errors */
+extern IntStack WarnUnusedLabel;        /* Warn about unused labels */
+extern IntStack WarnUnusedParam;        /* Warn about unused parameters */
+extern IntStack WarnUnusedVar;          /* Warn about unused variables */
+extern IntStack WarnUnknownPragma;      /* Warn about unknown #pragmas */
+
 
 
 /*****************************************************************************/
@@ -64,14 +73,11 @@ extern unsigned WarningCount;
 
 
 
-void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
-/* Print warning message. */
+void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
+/* Print a message about a fatal error and die */
 
-void LIWarning (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
-/* Print a warning message with the line info given explicitly */
-
-void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
-/* Print warning message. For use within the preprocessor. */
+void Internal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
+/* Print a message about an internal compiler error and die. */
 
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
@@ -82,11 +88,19 @@ void LIError (const LineInfo* LI, const char* Format, ...) attribute ((format (p
 void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message. For use within the preprocessor.  */
 
-void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
-/* Print a message about a fatal error and die */
+void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Print warning message. */
 
-void Internal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
-/* Print a message about an internal compiler error and die. */
+void LIWarning (const LineInfo* LI, const char* Format, ...) attribute ((format (printf, 2, 3)));
+/* Print a warning message with the line info given explicitly */
+
+void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Print warning message. For use within the preprocessor. */
+
+IntStack* FindWarning (const char* Name);
+/* Search for a warning in the WarnMap table and return a pointer to the
+ * intstack that holds its state. Return NULL if there is no such warning.
+ */
 
 void ErrorReport (void);
 /* Report errors (called at end of compile) */

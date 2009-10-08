@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,7 +57,6 @@ extern unsigned char    PreprocessOnly;         /* Just preprocess the input */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
 
 /* Stackable options */
-extern IntStack         WarnDisable;            /* Suppress warnings */
 extern IntStack         WritableStrings;	/* Literal strings are r/w */
 extern IntStack         InlineStdFuncs;	       	/* Inline some known functions */
 extern IntStack         EnableRegVars;		/* Enable register variables */

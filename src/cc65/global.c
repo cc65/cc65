@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,7 +50,6 @@ unsigned char PreprocessOnly    = 0;    /* Just preprocess the input */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 
 /* Stackable options */
-IntStack WarnDisable        = INTSTACK(0);  /* Suppress warnings */
 IntStack WritableStrings    = INTSTACK(0);  /* Literal strings are r/w */
 IntStack InlineStdFuncs     = INTSTACK(0);  /* Inline some known functions */
 IntStack EnableRegVars      = INTSTACK(0);  /* Enable register variables */

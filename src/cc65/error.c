@@ -60,112 +60,34 @@
 unsigned ErrorCount	= 0;
 unsigned WarningCount	= 0;
 
+/* Warning and error options */
+IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
+IntStack WarningsAreErrors  = INTSTACK(0);  /* Treat warnings as errors */
+IntStack WarnUnusedLabel    = INTSTACK(1);  /* Warn about unused labels */
+IntStack WarnUnusedParam    = INTSTACK(1);  /* Warn about unused parameters */
+IntStack WarnUnusedVar      = INTSTACK(1);  /* Warn about unused variables */
+IntStack WarnUnknownPragma  = INTSTACK(1);  /* Warn about unknown #pragmas */
+
+/* Map the name of a warning to the intstack that holds its state */
+typedef struct WarnMapEntry WarnMapEntry;
+struct WarnMapEntry {
+    IntStack*   Stack;
+    const char* Name;
+};
+static WarnMapEntry WarnMap[] = {
+    /* Keep sorted, even if this isn't used for now */
+    { &WarningsAreErrors,       "error"                 },
+    { &WarnUnknownPragma,       "unknown-pragma"        },
+    { &WarnUnusedLabel,         "unused-label"          },
+    { &WarnUnusedParam,         "unused-param"          },
+    { &WarnUnusedVar,           "unused-var"            },
+};
+
 
 
 /*****************************************************************************/
-/*	    	       		     Code		     		     */
+/*                         Handling of fatal errors                          */
 /*****************************************************************************/
-
-
-
-static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
-/* Print warning message - internal function. */
-{
-    if (!IS_Get (&WarnDisable)) {
-       	fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
-     	vfprintf (stderr, Msg, ap);
-     	fprintf (stderr, "\n");
-
-        if (Line) {
-     	    Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-        }
-     	++WarningCount;
-    }
-}
-
-
-
-void Warning (const char* Format, ...)
-/* Print warning message. */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntWarning (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
-    va_end (ap);
-}
-
-
-
-void LIWarning (const LineInfo* LI, const char* Format, ...)
-/* Print a warning message with the line info given explicitly */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntWarning (GetInputName (LI), GetInputLine (LI), Format, ap);
-    va_end (ap);
-}
-
-
-
-void PPWarning (const char* Format, ...)
-/* Print warning message. For use within the preprocessor. */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntWarning (GetCurrentFile(), GetCurrentLine(), Format, ap);
-    va_end (ap);
-}
-
-
-
-static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
-/* Print an error message - internal function*/
-{
-    fprintf (stderr, "%s(%u): Error: ", Filename, LineNo);
-    vfprintf (stderr, Msg, ap);
-    fprintf (stderr, "\n");
-
-    if (Line) {
-        Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
-    }
-    ++ErrorCount;
-    if (ErrorCount > 10) {
-       	Fatal ("Too many errors");
-    }
-}
-
-
-
-void Error (const char* Format, ...)
-/* Print an error message */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntError (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
-    va_end (ap);
-}
-
-
-
-void LIError (const LineInfo* LI, const char* Format, ...)
-/* Print an error message with the line info given explicitly */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntError (GetInputName (LI), GetInputLine (LI), Format, ap);
-    va_end (ap);
-}
-
-
-
-void PPError (const char* Format, ...)
-/* Print an error message. For use within the preprocessor.  */
-{
-    va_list ap;
-    va_start (ap, Format);
-    IntError (GetCurrentFile(), GetCurrentLine(), Format, ap);
-    va_end (ap);
-}
 
 
 
@@ -229,6 +151,150 @@ void Internal (const char* Format, ...)
     /* Use abort to create a core dump */
     abort ();
 }
+
+
+
+/*****************************************************************************/
+/*                            Handling of errors                             */
+/*****************************************************************************/
+
+
+
+static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
+/* Print an error message - internal function*/
+{
+    fprintf (stderr, "%s(%u): Error: ", Filename, LineNo);
+    vfprintf (stderr, Msg, ap);
+    fprintf (stderr, "\n");
+
+    if (Line) {
+        Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
+    }
+    ++ErrorCount;
+    if (ErrorCount > 10) {
+       	Fatal ("Too many errors");
+    }
+}
+
+
+
+void Error (const char* Format, ...)
+/* Print an error message */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntError (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
+    va_end (ap);
+}
+
+
+
+void LIError (const LineInfo* LI, const char* Format, ...)
+/* Print an error message with the line info given explicitly */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntError (GetInputName (LI), GetInputLine (LI), Format, ap);
+    va_end (ap);
+}
+
+
+
+void PPError (const char* Format, ...)
+/* Print an error message. For use within the preprocessor.  */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntError (GetCurrentFile(), GetCurrentLine(), Format, ap);
+    va_end (ap);
+}
+
+
+
+/*****************************************************************************/
+/*                           Handling of warnings                            */
+/*****************************************************************************/
+
+
+
+static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
+/* Print warning message - internal function. */
+{
+    if (IS_Get (&WarningsAreErrors)) {
+
+        /* Treat the warning as an error */
+        IntError (Filename, LineNo, Msg, ap);
+
+    } else if (IS_Get (&WarnEnable)) {
+
+       	fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
+     	vfprintf (stderr, Msg, ap);
+     	fprintf (stderr, "\n");
+
+        if (Line) {
+     	    Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
+        }
+     	++WarningCount;
+
+    }
+}
+
+
+
+void Warning (const char* Format, ...)
+/* Print warning message. */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntWarning (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
+    va_end (ap);
+}
+
+
+
+void LIWarning (const LineInfo* LI, const char* Format, ...)
+/* Print a warning message with the line info given explicitly */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntWarning (GetInputName (LI), GetInputLine (LI), Format, ap);
+    va_end (ap);
+}
+
+
+
+void PPWarning (const char* Format, ...)
+/* Print warning message. For use within the preprocessor. */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntWarning (GetCurrentFile(), GetCurrentLine(), Format, ap);
+    va_end (ap);
+}
+
+
+
+IntStack* FindWarning (const char* Name)
+/* Search for a warning in the WarnMap table and return a pointer to the
+ * intstack that holds its state. Return NULL if there is no such warning.
+ */
+{
+    unsigned I;
+
+    /* For now, do a linear search */
+    for (I = 0; I < sizeof(WarnMap) / sizeof (WarnMap[0]); ++I) {
+        if (strcmp (WarnMap[I].Name, Name) == 0) {
+            return WarnMap[I].Stack;
+        }
+    }
+    return 0;
+}
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
 
 
 

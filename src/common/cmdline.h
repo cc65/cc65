@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -82,6 +82,9 @@ void UnknownOption (const char* Opt) attribute ((noreturn));
 
 void NeedArg (const char* Opt) attribute ((noreturn));
 /* Print an error about a missing option argument and exit. */
+
+void InvArg (const char* Opt, const char* Arg) attribute ((noreturn));
+/* Print an error about an invalid option argument and exit. */
 
 void InvDef (const char* Def) attribute ((noreturn));
 /* Print an error about an invalid definition and die */

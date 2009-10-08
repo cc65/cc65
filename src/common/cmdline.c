@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -102,7 +102,7 @@ static void AddArg (CmdLine* L, char* Arg)
     L->Vec[L->Count++] = Arg;
 }
 
-    
+
 
 static void ExpandFile (CmdLine* L, const char* Name)
 /* Add the contents of a file to the command line. Each line is a separate
@@ -232,6 +232,14 @@ void NeedArg (const char* Opt)
 /* Print an error about a missing option argument and exit. */
 {
     AbEnd ("Option requires an argument: %s", Opt);
+}
+
+
+
+void InvArg (const char* Opt, const char* Arg)
+/* Print an error about an invalid option argument and exit. */
+{
+    AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
 }
 
 

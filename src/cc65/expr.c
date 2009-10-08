@@ -870,7 +870,7 @@ static void ArrayRef (ExprDesc* Expr)
         ED_MakeConstAbsInt (&Subscript, 0);
         ElementType = Indirect (Expr->Type);
     }
-         
+
     /* The element type has the combined qualifiers from itself and the array,
      * it is a member of (if any).
      */
@@ -1121,7 +1121,11 @@ static void StructRef (ExprDesc* Expr)
     Expr->IVal += Field->V.Offs;
 
     /* The type is the type of the field plus any qualifiers from the struct */
-    Q = GetQualifier (Expr->Type);
+    if (IsClassStruct (Expr->Type)) {
+        Q = GetQualifier (Expr->Type);
+    } else {
+        Q = GetQualifier (Indirect (Expr->Type));
+    }
     if (GetQualifier (Field->Type) == (GetQualifier (Field->Type) | Q)) {
         Expr->Type = Field->Type;
     } else {

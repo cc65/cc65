@@ -217,7 +217,7 @@ int CfgDataGetNum (Collection* Attributes, const char* Name, long* Val)
  * true. If not found, return false.
  */
 {
-    CfgData* D = CfgDataGetTyped (Attributes, Name, CfgDataString);
+    CfgData* D = CfgDataGetTyped (Attributes, Name, CfgDataNumber);
     if (D == 0) {
         /* Not found or wrong type */
         return 0;

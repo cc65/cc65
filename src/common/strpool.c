@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -84,8 +84,8 @@ static StringPoolEntry* NewStringPoolEntry (const StrBuf* S, unsigned Hash, unsi
     /* Initialize the fields */
     E->Next = 0;
     E->Hash = Hash;
-    E->Id   = Id;
-    E->Buf  = AUTO_STRBUF_INITIALIZER;
+    E->Id   = Id;                                                       
+    SB_Init (&E->Buf);
     SB_Copy (&E->Buf, S);
 
     /* Always zero terminate the string */

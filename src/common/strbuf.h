@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -69,7 +69,7 @@ extern const StrBuf EmptyStrBuf;
 #define STATIC_STRBUF_INITIALIZER 	{ 0, 0, 0, 0 }
 
 /* Initializer for auto string bufs */
-#define AUTO_STRBUF_INITIALIZER         EmptyStrBuf
+#define AUTO_STRBUF_INITIALIZER         { 0, 0, 0, 0 }
 
 /* Initialize with a string literal (beware: evaluates str twice!) */
 #define LIT_STRBUF_INITIALIZER(str)     { (char*)str, sizeof(str)-1, 0, 0 }

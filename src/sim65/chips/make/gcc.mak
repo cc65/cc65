@@ -14,7 +14,8 @@ LDFLAGS	=
 
 #LIBS 	= $(COMMON)/common.a
 
-CHIPS  	=      	ram.so		\
+CHIPS  	=      	console.so      \
+                ram.so		\
 		rom.so		\
 		stdio.so        \
 		vic2.so

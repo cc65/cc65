@@ -420,7 +420,7 @@ static void OptListBytes (const char* Opt, const char* Arg)
 
     /* Convert the argument to a number */
     if (sscanf (Arg, "%u%c", &Num, &Check) != 1) {
-        AbEnd ("Invalid argument for option `%s'", Opt);
+        InvArg (Opt, Arg);
     }
 
     /* Check the bounds */

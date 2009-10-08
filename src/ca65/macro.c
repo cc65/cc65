@@ -203,7 +203,7 @@ static IdDesc* NewIdDesc (const StrBuf* Id)
 
     /* Initialize the struct */
     I->Next = 0;
-    I->Id   = AUTO_STRBUF_INITIALIZER;
+    SB_Init (&I->Id);
     SB_Copy (&I->Id, Id);
 
     /* Return the new struct */
@@ -228,7 +228,7 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
     M->TokRoot    = 0;
     M->TokLast    = 0;
     M->Style	  = Style;
-    M->Name       = AUTO_STRBUF_INITIALIZER;
+    SB_Init (&M->Name);
     SB_Copy (&M->Name, Name);
 
     /* Insert the macro into the global macro list */

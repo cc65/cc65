@@ -67,7 +67,7 @@ TokNode* NewTokNode (void)
     T->Tok	= Tok;
     T->WS 	= WS;
     T->IVal	= IVal;
-    T->SVal     = AUTO_STRBUF_INITIALIZER;
+    SB_Init (&T->SVal);
     SB_Copy (&T->SVal, &SVal);
 
     /* Return the node */

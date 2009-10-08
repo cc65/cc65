@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -55,7 +55,7 @@
 static int ParseChar (StrBuf* B)
 /* Parse a character. Converts \n into EOL, etc. */
 {
-    unsigned I;       
+    unsigned I;
     unsigned Val;
     int C;
 
@@ -196,7 +196,7 @@ int SB_GetString (StrBuf* B, StrBuf* S)
     char C;
 
     /* Initialize S */
-    *S = AUTO_STRBUF_INITIALIZER;
+    SB_Init (S);
     if (SB_Peek (B) == '\"') {
 
         /* String follows, be sure to concatenate strings */

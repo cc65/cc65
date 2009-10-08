@@ -334,6 +334,10 @@ void Compile (const char* FileName)
     strftime (TimeStr, sizeof (TimeStr), "\"%H:%M:%S\"", TM);
     DefineTextMacro ("__DATE__", DateStr);
     DefineTextMacro ("__TIME__", TimeStr);
+                    
+    /* Other standard macros */
+    /* DefineNumericMacro ("__STDC__", 1);      <- not now */
+    DefineNumericMacro ("__STDC_HOSTED__", 1);
 
     /* Initialize the literal pool */
     InitLiteralPool ();

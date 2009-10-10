@@ -410,7 +410,7 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
   may be converted to statically linked drivers using the co65 object-file
   converter.
 
-  <tag>Interrupts</tag>
+  <tag/Interrupts/
   There's no <tt/interruptor/ support. Any attempt to use it yields the message
   'Failed to alloc interrupt' on program startup. This implicitly means that
   <tt/a2e.stdmou.mou/ and <tt/a2e.ssc.ser/ are not functional as they depend on
@@ -430,13 +430,13 @@ simply always return 280 (which is only correct for a 140 KB disk).
 
 <descrip>
 
-  <tag>Color</tag>
+  <tag/Color/
   The enhanced&nbsp;Apple&nbsp;//e has no color text mode. Therefore the functions
   <htmlurl url="funcref-205.html" name="textcolor()">,
   <htmlurl url="funcref-68.html" name="bgcolor()"> and
   <htmlurl url="funcref-69.html" name="bordercolor()"> have no effect.
 
-  <tag>Cursor</tag>
+  <tag/Cursor/
   The enhanced&nbsp;Apple&nbsp;//e has no hardware cursor. Therefore the function
   <htmlurl url="funcref-88.html" name="cursor()"> has no effect.
 

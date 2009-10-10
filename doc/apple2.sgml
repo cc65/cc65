@@ -44,9 +44,10 @@ that allows to put binary files with a DOS 3.3 header onto disk images
 containing DOS 3.3 as well as ProDOS 8.
 
 For ProDOS 8 system programs the load address is fixed to &dollar;2000 so there
-is no need for a header. Therefore the linker configuration
+is no need for a header. Thus the linker configuration
 <htmlurl url="apple2-4.html#ss4.3" name="apple2-system.cfg"> for those programs
-omits the DOS 3.3 header.
+omits the DOS 3.3 header. The right AppleCommander option to put system files
+without a header on a ProDOS 8 disk image is </-p/.
 
 
 <sect>Memory layout<p>
@@ -89,7 +90,7 @@ on the chosen <htmlurl url="apple2-4.html" name="linker configuration">.
 The ld65 linker comes with a builtin config file for the Apple&nbsp;&rsqb;&lsqb;,
 which is used via <tt/-t apple2/ (and displayed via <tt/--dump-config apple2/).
 The apple2 package comes with additional secondary linker config files, which
-are used via <tt/-C <configfile>/.
+are used via <tt/-C &lt;configfile&gt;/.
 
 
 <sect1>builtin config file<p>
@@ -253,9 +254,9 @@ the memory from &dollar;800 to &dollar;2000 can be added to the heap by calling
 
 ProDOS 8 requires for every open file a page-aligned 1 KB I/O buffer. By default
 these buffers are allocated by the cc65 runtime system on the heap using
-<tt/posix_memalign()/. While in general this is the best solution it means quite
+<tt/posix_memalign()/. While this is generally the best solution it means quite
 some overhead for (especially rather small) cc65 programs which do open files
-but do not make use of the heap otherwise.
+but don't make use of the heap otherwise.
 
 The apple2 package comes with the alternative ProDOS 8 I/O buffer allocation
 module <tt/apple2-iobuf-0800.o/ which uses the memory between &dollar;800 and
@@ -265,8 +266,8 @@ concurrently open files.
 
 While using <tt/_heapadd()/ as described in the section above together with the
 default I/O buffer allocation basically yields the same placement of I/O buffers
-the primary benefit of <tt/apple2-iobuf-0800.o/ is a reduction in code size -
-and thus program file size - of more than 1400 bytes.
+in memory the primary benefit of <tt/apple2-iobuf-0800.o/ is a reduction in code
+size - and thus program file size - of more than 1400 bytes.
 
 Using <tt/apple2-iobuf-0800.o/ is as simple as placing it on the linker command 
 line like this:

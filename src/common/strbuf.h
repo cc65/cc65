@@ -286,6 +286,18 @@ INLINE void SB_Skip (StrBuf* B)
 #  define SB_Skip(B)     do { if ((B)->Index < (B)->Len) ++(B)->Index; } while (0)
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE void SB_SkipMultiple (StrBuf* B, unsigned Count)
+/* Skip a number of characters in the string buffer if this is possible. */
+{
+    if ((B->Index += Count) > B->Len) {
+        B->Index = B->Len;
+    }
+}
+#else
+#  define SB_SkipMultiple(B)   do { if (((B)->Index += (Count)) > (B)->Len) (B)->Index = (B)->Len; } while (0)
+#endif
+
 void SB_Drop (StrBuf* B, unsigned Count);
 /* Drop characters from the end of the string. */
 

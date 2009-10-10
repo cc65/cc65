@@ -13,8 +13,8 @@
 
 
 
-unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned
-char device) {
+unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device) 
+{
     unsigned char status;
     if ((status = cbm_open (lfn, device, CBM_READ, "$")) == 0) {
         if (cbm_k_chkin (lfn) == 0) {

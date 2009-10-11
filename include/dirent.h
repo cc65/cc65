@@ -51,17 +51,25 @@ struct dirent {
     unsigned      d_blocks;
     unsigned long d_size;
     unsigned char d_type;
-    unsigned      d_cdate;
     struct {
-	unsigned char mins;
-        unsigned char hours;
+        unsigned day  :5;
+        unsigned mon  :4;
+        unsigned year :7;
+    }             d_cdate;
+    struct {
+        unsigned char min;
+        unsigned char hour;
     }             d_ctime;
     unsigned char d_access;
     unsigned      d_auxtype;
-    unsigned      d_mdate;
     struct {
-	unsigned char mins;
-        unsigned char hours;
+        unsigned day  :5;
+        unsigned mon  :4;
+        unsigned year :7;
+    }             d_mdate;
+    struct {
+        unsigned char min;
+        unsigned char hour;
     }             d_mtime;
 };
 

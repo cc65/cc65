@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -401,19 +401,6 @@ StrBuf* InitLine (StrBuf* Buf)
 
 
 
-void PushLine (const StrBuf* Buf)
-/* Push a copy of Buf onto the input stack */
-{
-    CollAppend (&InputStack, Line);
-    Line = NewStrBuf ();
-    SB_Copy (Line, Buf);
-
-    /* Make CurC and NextC valid */
-    GetInputChar ();
-}
-
-
-
 int NextLine (void)
 /* Get a line from the current input. Returns 0 on end of file. */
 {
@@ -424,7 +411,7 @@ int NextLine (void)
 
     /* If there is no file open, bail out, otherwise get the current input file */
     if (CollCount (&AFiles) == 0) {
-	return 0;
+     	return 0;
     }
     Input = CollLast (&AFiles);
 
@@ -507,17 +494,17 @@ const char* GetCurrentFile (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-    	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
-    	return AF->Input->Name;
+     	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
+     	return AF->Input->Name;
     } else {
-    	/* No open file. Use the main file if we have one. */
-    	unsigned IFileCount = CollCount (&IFiles);
-    	if (IFileCount > 0) {
-    	    const IFile* IF = (const IFile*) CollAt (&IFiles, 0);
-    	    return IF->Name;
-    	} else {
+     	/* No open file. Use the main file if we have one. */
+     	unsigned IFileCount = CollCount (&IFiles);
+     	if (IFileCount > 0) {
+     	    const IFile* IF = (const IFile*) CollAt (&IFiles, 0);
+     	    return IF->Name;
+     	} else {
       	    return "(outside file scope)";
-    	}
+     	}
     }
 }
 
@@ -528,11 +515,11 @@ unsigned GetCurrentLine (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
-	return AF->Line;
+     	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
+     	return AF->Line;
     } else {
-	/* No open file */
-	return 0;
+     	/* No open file */
+     	return 0;
     }
 }
 

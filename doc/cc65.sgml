@@ -118,7 +118,7 @@ Here is a description of all the command line options:
   Tells the compiler to generate code that checks for stack overflows. See
   <tt><ref id="pragma-checkstack" name="#pragma&nbsp;checkstack"></tt> for an
   explanation of this feature.
-                                
+
 
   <tag><tt>--code-name seg</tt></tag>
 
@@ -731,7 +731,7 @@ If the first parameter is <tt/push/, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <tt/pop/
 parameter with the <tt/#pragma/.
 
-<sect1><tt>#pragma bssseg (&lsqb;push,&rsqb;&lt;name&gt;)</tt><p>
+<sect1><tt>#pragma bssseg (&lsqb;push,&rsqb; &lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the BSS segment (the BSS segment
   is used to store uninitialized data). The argument is a string enclosed
@@ -787,7 +787,7 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma checkstack ([push,]on|off)</tt><label id="pragma-checkstack"><p>
+<sect1><tt>#pragma checkstack ([push,] on|off)</tt><label id="pragma-checkstack"><p>
 
   Tells the compiler to insert calls to a stack checking subroutine to detect
   stack overflows. The stack checking code will lead to somewhat larger and
@@ -800,7 +800,7 @@ parameter with the <tt/#pragma/.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
-<sect1><tt>#pragma codeseg ([push,]&lt;name&gt;)</tt><p>
+<sect1><tt>#pragma codeseg ([push,] &lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the CODE segment (the CODE segment
   is used to store executable code). The argument is a string enclosed in
@@ -818,7 +818,7 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma codesize ([push,]&lt;int&gt;)</tt><label id="pragma-codesize"><p>
+<sect1><tt>#pragma codesize ([push,] &lt;int&gt;)</tt><label id="pragma-codesize"><p>
 
   This pragma allows finer control about speed vs. size decisions in the code
   generation and optimization phase. It gives the allowed size increase factor
@@ -828,7 +828,7 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma dataseg ([push,]&lt;name&gt;)</tt><p>
+<sect1><tt>#pragma dataseg ([push,] &lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the DATA segment (the DATA segment
   is used to store initialized data). The argument is a string enclosed in
@@ -846,7 +846,7 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma optimize ([push,]on|off)</tt><label id="pragma-optimize"><p>
+<sect1><tt>#pragma optimize ([push,] on|off)</tt><label id="pragma-optimize"><p>
 
   Switch optimization on or off. If the argument is "off", optimization is
   disabled, otherwise it is enabled. Please note that this pragma only effects
@@ -862,7 +862,7 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma rodataseg ([push,]&lt;name&gt;)</tt><p>
+<sect1><tt>#pragma rodataseg ([push,] &lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the RODATA segment (the RODATA
   segment is used to store readonly data). The argument is a string
@@ -880,7 +880,7 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma regvaraddr ([push,]on|off)</tt><p>
+<sect1><tt>#pragma regvaraddr ([push,] on|off)</tt><p>
 
   The compiler does not allow to take the address of register variables.
   The regvaraddr pragma changes this. Taking the address of a register
@@ -904,7 +904,7 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma regvars ([push,]on|off)</tt><label id="pragma-regvars"><p>
+<sect1><tt>#pragma regvars ([push,] on|off)</tt><label id="pragma-regvars"><p>
 
   Enables or disables use of register variables. If register variables are
   disabled (the default), the <tt/register/ keyword is ignored. Register
@@ -914,7 +914,7 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma signedchars ([push,]on|off)</tt><label id="pragma-signedchars"><p>
+<sect1><tt>#pragma signedchars ([push,] on|off)</tt><label id="pragma-signedchars"><p>
 
   Changes the signedness of the default character type. If the argument is
   "on", default characters are signed, otherwise characters are unsigned.
@@ -925,7 +925,7 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma staticlocals ([push,]on|off)</tt><label id="pragma-staticlocals"<p>
+<sect1><tt>#pragma staticlocals ([push,] on|off)</tt><label id="pragma-staticlocals"<p>
 
   Use variables in the bss segment instead of variables on the stack. This
   pragma changes the default set by the compiler option <tt/-Cl/. If the
@@ -935,13 +935,13 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma warn ([push,]on|off)</tt><label id="pragma-warn"><p>
+<sect1><tt>#pragma warn (name, [push,] on|off)</tt><label id="pragma-warn"><p>
 
-  Switch compiler warnings on or off. If the argument is "off", warnings are
-  disabled, otherwise they're enabled. The default is "on", but may be changed
-  with the <tt/<ref name="-W" id="option-W">/ compiler option.
-
-  The <tt/#pragma/ understands the push and pop parameters as explained above.
+  Switch compiler warnings on or off. "name" is the name of a warning (see the
+  <tt/<ref name="-W" id="option-W">/ compiler option for a list). The name is
+  either followed by "pop", which restores the last pushed state, or by "on" or
+  "off", optionally preceeded by "push" to push the current state before
+  changing it.
 
 
 <sect1><tt>#pragma zpsym (&lt;name&gt;)</tt><p>

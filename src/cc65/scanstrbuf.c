@@ -162,23 +162,31 @@ void SB_SkipWhite (StrBuf* B)
 
 
 
-int SB_GetSym (StrBuf* B, char* S)
-/* Get a symbol from the string buffer. S must be able to hold MAX_IDENTLEN
- * characters. Returns 1 if a symbol was found and 0 otherwise.
+int SB_GetSym (StrBuf* B, StrBuf* Ident, const char* SpecialChars)
+/* Get a symbol from the string buffer. If SpecialChars is not NULL, it
+ * points to a string that contains characters allowed within the string in
+ * addition to letters, digits and the underline. Note: The identifier must
+ * still begin with a letter.
+ * Returns 1 if a symbol was found and 0 otherwise but doesn't output any
+ * errors.
  */
 {
+    /* Handle a NULL argument for SpecialChars transparently */
+    if (SpecialChars == 0) {
+        SpecialChars = "";
+    }
+
+    /* Clear Ident */
+    SB_Clear (Ident);
+
     if (IsIdent (SB_Peek (B))) {
-        unsigned I = 0;
         char C = SB_Peek (B);
         do {
-            if (I < MAX_IDENTLEN) {
-                ++I;
-                *S++ = C;
-            }
+            SB_AppendChar (Ident, C);
             SB_Skip (B);
             C = SB_Peek (B);
-        } while (IsIdent (C) || IsDigit (C));
-        *S = '\0';
+        } while (IsIdent (C) || IsDigit (C) || strchr (SpecialChars, C) != 0);
+        SB_Terminate (Ident);
      	return 1;
     } else {
      	return 0;
@@ -188,15 +196,17 @@ int SB_GetSym (StrBuf* B, char* S)
 
 
 int SB_GetString (StrBuf* B, StrBuf* S)
-/* Get a string from the string buffer. S will be initialized by the function
- * and will return the correctly terminated string on return. The function
- * returns 1 if a string was found and 0 otherwise.
+/* Get a string from the string buffer. Returns 1 if a string was found and 0
+ * otherwise. Errors are only output in case of invalid strings (missing end
+ * of string).
  */
 {
     char C;
 
-    /* Initialize S */
-    SB_Init (S);
+    /* Clear S */
+    SB_Clear (S);
+
+    /* A string starts with quote marks */
     if (SB_Peek (B) == '\"') {
 
         /* String follows, be sure to concatenate strings */
@@ -241,7 +251,7 @@ int SB_GetNumber (StrBuf* B, long* Val)
 /* Get a number from the string buffer. Accepted formats are decimal, octal,
  * hex and character constants. Numeric constants may be preceeded by a
  * minus or plus sign. The function returns 1 if a number was found and
- * zero otherwise.
+ * zero otherwise. Errors are only output for invalid numbers.
  */
 {
     int      Sign;
@@ -249,65 +259,12 @@ int SB_GetNumber (StrBuf* B, long* Val)
     unsigned Base;
     unsigned DigitVal;
 
+
     /* Initialize Val */
     *Val = 0;
 
-    /* Check for a sign */
-    Sign = 1;
-    switch (SB_Peek (B)) {
-        case '-':
-            Sign = -1;
-            /* FALLTHROUGH */
-        case '+':
-            SB_Skip (B);
-            SB_SkipWhite (B);
-            break;
-    }
-
-    /* Check for the different formats */
-    C = SB_Peek (B);
-    if (IsDigit (C)) {
-
-        if (C == '0') {
-            /* Hex or octal */
-            SB_Skip (B);
-            if (tolower (SB_Peek (B)) == 'x') {
-                SB_Skip (B);
-                Base = 16;
-                if (!IsXDigit (SB_Peek (B))) {
-                    Error ("Invalid hexadecimal number");
-                    return 0;
-                }
-            } else {
-                Base = 8;
-            }
-        } else {
-            Base = 10;
-        }
-
-        /* Read the number */
-        while (IsXDigit (C = SB_Peek (B)) && (DigitVal = HexVal (C)) < Base) {
-            *Val = (*Val * Base) + DigitVal;
-            SB_Skip (B);
-        }
-
-        /* Allow optional 'U' and 'L' modifiers */
-        C = SB_Peek (B);
-        if (C == 'u' || C == 'U') {
-            SB_Skip (B);
-            C = SB_Peek (B);
-            if (C == 'l' || C == 'L') {
-                SB_Skip (B);
-            }
-        } else if (C == 'l' || C == 'L') {
-            SB_Skip (B);
-            C = SB_Peek (B);
-            if (C == 'u' || C == 'U') {
-                SB_Skip (B);
-            }
-        }
-
-    } else if (C == '\'') {
+    /* Handle character constants */
+    if (SB_Peek (B) == '\'') {
 
         /* Character constant */
         SB_Skip (B);
@@ -318,14 +275,70 @@ int SB_GetNumber (StrBuf* B, long* Val)
         } else {
             /* Skip the quote */
             SB_Skip (B);
+            return 1;
         }
+    }
 
-    } else {
+    /* Check for a sign. A sign must be followed by a digit, otherwise it's
+     * not a number
+     */
+    Sign = 1;
+    switch (SB_Peek (B)) {
+        case '-':
+            Sign = -1;
+            /* FALLTHROUGH */
+        case '+':
+            if (!IsDigit (SB_LookAt (B, SB_GetIndex (B) + 1))) {
+                return 0;
+            }
+            SB_Skip (B);
+            break;
+    }
 
-        /* Invalid number */
-        Error ("Numeric constant expected");
+    /* We must have a digit now, otherwise its not a number */
+    C = SB_Peek (B);
+    if (!IsDigit (C)) {
         return 0;
+    }
 
+    /* Determine the base */
+    if (C == '0') {
+        /* Hex or octal */
+        SB_Skip (B);
+        if (tolower (SB_Peek (B)) == 'x') {
+            SB_Skip (B);
+            Base = 16;
+            if (!IsXDigit (SB_Peek (B))) {
+                Error ("Invalid hexadecimal number");
+                return 0;
+            }
+        } else {
+            Base = 8;
+        }
+    } else {
+        Base = 10;
+    }
+
+    /* Read the number */
+    while (IsXDigit (C = SB_Peek (B)) && (DigitVal = HexVal (C)) < Base) {
+        *Val = (*Val * Base) + DigitVal;
+        SB_Skip (B);
+    }
+
+    /* Allow optional 'U' and 'L' modifiers */
+    C = SB_Peek (B);
+    if (C == 'u' || C == 'U') {
+        SB_Skip (B);
+        C = SB_Peek (B);
+        if (C == 'l' || C == 'L') {
+            SB_Skip (B);
+        }
+    } else if (C == 'l' || C == 'L') {
+        SB_Skip (B);
+        C = SB_Peek (B);
+        if (C == 'u' || C == 'U') {
+            SB_Skip (B);
+        }
     }
 
     /* Success, value read is in Val */

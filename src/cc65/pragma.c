@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "segnames.h"
 #include "tgttrans.h"
 
@@ -84,9 +85,9 @@ static const struct Pragma {
     const char*	Key;		/* Keyword */
     pragma_t   	Tok;		/* Token */
 } Pragmas[PR_COUNT] = {
-    { 	"bssseg",       PR_BSSSEG	},
+    {  	"bssseg",       PR_BSSSEG	},
     {   "charmap",      PR_CHARMAP      },
-    {	"checkstack",	PR_CHECKSTACK	},
+    {  	"checkstack",	PR_CHECKSTACK	},
     {   "codeseg",    	PR_CODESEG	},
     {   "codesize",     PR_CODESIZE     },
     {   "dataseg",    	PR_DATASEG	},
@@ -94,16 +95,24 @@ static const struct Pragma {
     {   "regvaraddr", 	PR_REGVARADDR	},
     {   "regvars",      PR_REGVARS      },
     {   "rodataseg",  	PR_RODATASEG	},
-    {	"signedchars",	PR_SIGNEDCHARS	},
-    {	"staticlocals",	PR_STATICLOCALS	},
+    {  	"signedchars",	PR_SIGNEDCHARS	},
+    {  	"staticlocals",	PR_STATICLOCALS	},
     {   "warn",         PR_WARN         },
     {   "zpsym",       	PR_ZPSYM  	},
 };
 
+/* Result of ParsePushPop */
+typedef enum {
+    PP_NONE,
+    PP_POP,
+    PP_PUSH,
+    PP_ERROR,
+} PushPopResult;
+
 
 
 /*****************************************************************************/
-/*    	      	     	   	     Code  				     */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -127,29 +136,214 @@ static int CmpKey (const void* Key, const void* Elem)
 
 
 
-static pragma_t FindPragma (const char* Key)
+static pragma_t FindPragma (const StrBuf* Key)
 /* Find a pragma and return the token. Return PR_ILLEGAL if the keyword is
  * not a valid pragma.
  */
 {
     struct Pragma* P;
-    P = bsearch (Key, Pragmas, PR_COUNT, sizeof (Pragmas[0]), CmpKey);
+    P = bsearch (SB_GetConstBuf (Key), Pragmas, PR_COUNT, sizeof (Pragmas[0]), CmpKey);
     return P? P->Tok : PR_ILLEGAL;
 }
+
+
+
+static int GetComma (StrBuf* B)
+/* Expects and skips a comma in B. Prints an error and returns zero if no
+ * comma is found. Return a value <> 0 otherwise.
+ */
+{
+    SB_SkipWhite (B);
+    if (SB_Get (B) != ',') {
+        Error ("Comma expected");
+        return 0;
+    }
+    SB_SkipWhite (B);
+    return 1;
+}
+
+
+
+static int GetString (StrBuf* B, StrBuf* S)
+/* Expects and skips a string in B. Prints an error and returns zero if no
+ * string is found. Returns a value <> 0 otherwise.
+ */
+{
+    if (!SB_GetString (B, S)) {
+	Error ("String literal expected");
+        return 0;
+    }
+    return 1;
+}
+
+
+
+static int GetNumber (StrBuf* B, long* Val)
+/* Expects and skips a number in B. Prints an eror and returns zero if no
+ * number is found. Returns a value <> 0 otherwise.
+ */
+{
+    if (!SB_GetNumber (B, Val)) {
+	Error ("Constant integer expected");
+        return 0;
+    }
+    return 1;
+}
+
+
+
+static IntStack* GetWarning (StrBuf* B)
+/* Get a warning name from the string buffer. Returns a pointer to the intstack
+ * that holds the state of the warning, and NULL in case of errors. The
+ * function will output error messages in case of problems.
+ */
+{
+    IntStack* S = 0;
+    StrBuf W = AUTO_STRBUF_INITIALIZER;
+
+    /* The warning name is a symbol but the '-' char is allowed within */
+    if (SB_GetSym (B, &W, "-")) {
+
+        /* Map the warning name to an IntStack that contains its state */
+        S = FindWarning (SB_GetConstBuf (&W));
+
+        /* Handle errors */
+        if (S == 0) {
+            Error ("Pragma expects a warning name as first argument");
+        }
+    }
+
+    /* Deallocate the string */
+    SB_Done (&W);
+
+    /* Done */
+    return S;
+}
+
+
+
+static int HasStr (StrBuf* B, const char* E)
+/* Checks if E follows in B. If so, skips it and returns true */
+{
+    unsigned Len = strlen (E);
+    if (SB_GetLen (B) - SB_GetIndex (B) >= Len) {
+        if (strncmp (SB_GetConstBuf (B) + SB_GetIndex (B), E, Len) == 0) {
+            /* Found */
+            SB_SkipMultiple (B, Len);
+            return 1;
+        }
+    }
+    return 0;
+}
+
+
+
+static PushPopResult ParsePushPop (StrBuf* B)
+/* Check for and parse the "push" and "pop" keywords. In case of "push", a
+ * following comma is expected and skipped.
+ */
+{
+    StrBuf Ident      = AUTO_STRBUF_INITIALIZER;
+    PushPopResult Res = PP_NONE;
+
+
+    /* Try to read an identifier */
+    if (SB_GetSym (B, &Ident, 0)) {
+
+        /* Check if we have a first argument named "pop" */
+        if (SB_CompareStr (&Ident, "pop") == 0) {
+
+            Res = PP_POP;
+
+        /* Check if we have a first argument named "push" */
+        } else if (SB_CompareStr (&Ident, "push") == 0) {
+
+            Res = PP_PUSH;
+
+            /* Skip the following comma */
+            if (!GetComma (B)) {
+                Res = PP_ERROR;
+            }
+
+        } else {
+
+            /* Unknown keyword */
+            Error ("Invalid pragma arguments");
+            Res = PP_ERROR;
+        }
+    }
+
+    /* Free the string buffer and return the result */
+    SB_Done (&Ident);
+    return Res;
+}
+
+
+
+static void PopInt (IntStack* S)
+/* Pops an integer from an IntStack. Prints an error if the stack is empty */
+{
+    if (IS_GetCount (S) < 2) {
+        Error ("Cannot pop, stack is empty");
+    } else {
+        IS_Drop (S);
+    }
+}
+
+
+
+static void PushInt (IntStack* S, long Val)
+/* Pushes an integer onto an IntStack. Prints an error if the stack is full */
+{
+    if (IS_IsFull (S)) {
+        Error ("Cannot push: stack overflow");
+    } else {
+        IS_Push (S, Val);
+    }
+}
+
+
+
+static int BoolKeyword (StrBuf* Ident)
+/* Check if the identifier in Ident is a keyword for a boolean value. Currently
+ * accepted are true/false/on/off.
+ */
+{
+    if (SB_CompareStr (Ident, "true") == 0) {
+        return 1;
+    }
+    if (SB_CompareStr (Ident, "on") == 0) {
+        return 1;
+    }
+    if (SB_CompareStr (Ident, "false") == 0) {
+        return 0;
+    }
+    if (SB_CompareStr (Ident, "off") == 0) {
+        return 0;
+    }
+
+    /* Error */
+    Error ("Pragma argument must be one of `on', `off', `true' or `false'");
+    return 0;
+}
+
+
+
+/*****************************************************************************/
+/*                         Pragma handling functions                         */
+/*****************************************************************************/
 
 
 
 static void StringPragma (StrBuf* B, void (*Func) (const char*))
 /* Handle a pragma that expects a string parameter */
 {
-    StrBuf S;
+    StrBuf S = AUTO_STRBUF_INITIALIZER;
 
     /* We expect a string here */
-    if (SB_GetString (B, &S)) {
+    if (GetString (B, &S)) {
        	/* Call the given function with the string argument */
 	Func (SB_GetConstBuf (&S));
-    } else {
-	Error ("String literal expected");
     }
 
     /* Call the string buf destructor */
@@ -161,67 +355,64 @@ static void StringPragma (StrBuf* B, void (*Func) (const char*))
 static void SegNamePragma (StrBuf* B, segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
-    ident       Ident;
-    StrBuf      S;
+    StrBuf      S = AUTO_STRBUF_INITIALIZER;
     const char* Name;
 
-    /* Try to read an identifier */
+    /* Check for the "push" or "pop" keywords */
     int Push = 0;
-    if (SB_GetSym (B, Ident)) {
+    switch (ParsePushPop (B)) {
 
-        /* Check if we have a first argument named "pop" */
-        if (strcmp (Ident, "pop") == 0) {
+        case PP_NONE:
+            break;
 
-            /* Pop the old value */
+        case PP_PUSH:
+            Push = 1;
+            break;
+
+        case PP_POP:
+            /* Pop the old value and output it */
             PopSegName (Seg);
-
-            /* Set the segment name */
             g_segname (Seg);
 
             /* Done */
-            return;
+            goto ExitPoint;
 
-        /* Check if we have a first argument named "push" */
-        } else if (strcmp (Ident, "push") == 0) {
+        case PP_ERROR:
+            /* Bail out */
+            goto ExitPoint;
 
-            Push = 1;
-            SB_SkipWhite (B);
-            if (SB_Get (B) != ',') {
-                Error ("Comma expected");
-                return;
-            }
-            SB_SkipWhite (B);
+        default:
+            Internal ("Invalid result from ParsePushPop");
 
-        } else {
-            Error ("Invalid pragma arguments");
-            return;
-        }
     }
 
     /* A string argument must follow */
-    if (!SB_GetString (B, &S)) {
-	Error ("String literal expected");
-        return;
+    if (!GetString (B, &S)) {
+        goto ExitPoint;
     }
 
     /* Get the string */
     Name = SB_GetConstBuf (&S);
 
     /* Check if the name is valid */
-    if (!ValidSegName (Name)) {
+    if (ValidSegName (Name)) {
+
+        /* Set the new name */
+        if (Push) {
+            PushSegName (Seg, Name);
+        } else {
+            SetSegName (Seg, Name);
+        }
+        g_segname (Seg);
+
+    } else {
+
         /* Segment name is invalid */
         Error ("Illegal segment name: `%s'", Name);
-        return;
+
     }
 
-    /* Set the new name */
-    if (Push) {
-        PushSegName (Seg, Name);
-    } else {
-        SetSegName (Seg, Name);
-    }
-    g_segname (Seg);
-
+ExitPoint:
     /* Call the string buf destructor */
     SB_Done (&S);
 }
@@ -234,7 +425,7 @@ static void CharMapPragma (StrBuf* B)
     long Index, C;
 
     /* Read the character index */
-    if (!SB_GetNumber (B, &Index)) {
+    if (!GetNumber (B, &Index)) {
         return;
     }
     if (Index < 1 || Index > 255) {
@@ -248,15 +439,12 @@ static void CharMapPragma (StrBuf* B)
     }
 
     /* Comma follows */
-    SB_SkipWhite (B);
-    if (SB_Get (B) != ',') {
-        Error ("Comma expected");
+    if (!GetComma (B)) {
         return;
     }
-    SB_SkipWhite (B);
 
     /* Read the character code */
-    if (!SB_GetNumber (B, &C)) {
+    if (!GetNumber (B, &C)) {
         return;
     }
     if (C < 1 || C > 255) {
@@ -275,50 +463,52 @@ static void CharMapPragma (StrBuf* B)
 
 
 
-static void FlagPragma (StrBuf* B, IntStack* Stack)
-/* Handle a pragma that expects a boolean paramater */
+static void WarnPragma (StrBuf* B)
+/* Enable/disable warnings */
 {
-    ident Ident;
-    long  Val;
-    int   Push;
+    long   Val;
+    int    Push;
 
-    /* Try to read an identifier */
-    int IsIdent = SB_GetSym (B, Ident);
-
-    /* Check if we have a first argument named "pop" */
-    if (IsIdent && strcmp (Ident, "pop") == 0) {
-        if (IS_GetCount (Stack) < 2) {
-            Error ("Cannot pop, stack is empty");
-        } else {
-            IS_Drop (Stack);
-        }
-        /* No other arguments allowed */
+    /* A warning name must follow */
+    IntStack* S =GetWarning (B);
+    if (S == 0) {
         return;
     }
 
-    /* Check if we have a first argument named "push" */
-    if (IsIdent && strcmp (Ident, "push") == 0) {
-        Push = 1;
-        SB_SkipWhite (B);
-        if (SB_Get (B) != ',') {
-            Error ("Comma expected");
+    /* Comma follows */
+    if (!GetComma (B)) {
+        return;
+    }
+
+    /* Check for the "push" or "pop" keywords */
+    switch (ParsePushPop (B)) {
+
+        case PP_NONE:
+            Push = 0;
+            break;
+
+        case PP_PUSH:
+            Push = 1;
+            break;
+
+        case PP_POP:
+            /* Pop the old value and bail out */
+            PopInt (S);
             return;
-        }
-        SB_SkipWhite (B);
-        IsIdent = SB_GetSym (B, Ident);
-    } else {
-        Push = 0;
+
+        case PP_ERROR:
+            /* Bail out */
+            return;
+
+        default:
+            Internal ("Invalid result from ParsePushPop");
     }
 
     /* Boolean argument follows */
-    if (IsIdent) {
-        if (strcmp (Ident, "true") == 0 || strcmp (Ident, "on") == 0) {
-            Val = 1;
-        } else if (strcmp (Ident, "false") == 0 || strcmp (Ident, "off") == 0) {
-            Val = 0;
-        } else {
-            Error ("Pragma argument must be one of `on', `off', `true' or `false'");
-        }
+    if (HasStr (B, "true") || HasStr (B, "on")) {
+        Val = 1;
+    } else if (HasStr (B, "false") || HasStr (B, "off")) {
+        Val = 0;
     } else if (!SB_GetNumber (B, &Val)) {
         Error ("Invalid pragma argument");
         return;
@@ -326,14 +516,60 @@ static void FlagPragma (StrBuf* B, IntStack* Stack)
 
     /* Set/push the new value */
     if (Push) {
-        if (IS_IsFull (Stack)) {
-            Error ("Cannot push: stack overflow");
-        } else {
-            IS_Push (Stack, Val);
+        PushInt (S, Val);
+    } else {
+        IS_Set (S, Val);
+    }
+}
+
+
+
+static void FlagPragma (StrBuf* B, IntStack* Stack)
+/* Handle a pragma that expects a boolean paramater */
+{
+    StrBuf Ident = AUTO_STRBUF_INITIALIZER;
+    long   Val;
+    int    Push;
+
+
+    /* Try to read an identifier */
+    int IsIdent = SB_GetSym (B, &Ident, 0);
+
+    /* Check if we have a first argument named "pop" */
+    if (IsIdent && SB_CompareStr (&Ident, "pop") == 0) {
+        PopInt (Stack);
+        /* No other arguments allowed */
+        return;
+    }
+
+    /* Check if we have a first argument named "push" */
+    if (IsIdent && SB_CompareStr (&Ident, "push") == 0) {
+        Push = 1;
+        if (!GetComma (B)) {
+            goto ExitPoint;
         }
+        IsIdent = SB_GetSym (B, &Ident, 0);
+    } else {
+        Push = 0;
+    }
+
+    /* Boolean argument follows */
+    if (IsIdent) {
+        Val = BoolKeyword (&Ident);
+    } else if (!GetNumber (B, &Val)) {
+        goto ExitPoint;
+    }
+
+    /* Set/push the new value */
+    if (Push) {
+        PushInt (Stack, Val);
     } else {
         IS_Set (Stack, Val);
     }
+
+ExitPoint:
+    /* Free the identifier */
+    SB_Done (&Ident);
 }
 
 
@@ -341,41 +577,36 @@ static void FlagPragma (StrBuf* B, IntStack* Stack)
 static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
 /* Handle a pragma that expects an int paramater */
 {
-    ident Ident;
     long  Val;
     int   Push;
 
-    /* Try to read an identifier */
-    int IsIdent = SB_GetSym (B, Ident);
+    /* Check for the "push" or "pop" keywords */
+    switch (ParsePushPop (B)) {
 
-    /* Check if we have a first argument named "pop" */
-    if (IsIdent && strcmp (Ident, "pop") == 0) {
-        if (IS_GetCount (Stack) < 2) {
-            Error ("Cannot pop, stack is empty");
-        } else {
-            IS_Drop (Stack);
-        }
-        /* No other arguments allowed */
-        return;
-    }
+        case PP_NONE:
+            Push = 0;
+            break;
 
-    /* Check if we have a first argument named "push" */
-    if (IsIdent && strcmp (Ident, "push") == 0) {
-        Push = 1;
-        SB_SkipWhite (B);
-        if (SB_Get (B) != ',') {
-            Error ("Comma expected");
+        case PP_PUSH:
+            Push = 1;
+            break;
+
+        case PP_POP:
+            /* Pop the old value and bail out */
+            PopInt (Stack);
             return;
-        }
-        SB_SkipWhite (B);
-        IsIdent = 0;
-    } else {
-        Push = 0;
+
+        case PP_ERROR:
+            /* Bail out */
+            return;
+
+        default:
+            Internal ("Invalid result from ParsePushPop");
+
     }
 
     /* Integer argument follows */
-    if (IsIdent || !SB_GetNumber (B, &Val)) {
-        Error ("Pragma argument must be numeric");
+    if (!GetNumber (B, &Val)) {
         return;
     }
 
@@ -387,11 +618,7 @@ static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
 
     /* Set/push the new value */
     if (Push) {
-        if (IS_IsFull (Stack)) {
-            Error ("Cannot push: stack overflow");
-        } else {
-            IS_Push (Stack, Val);
-        }
+        PushInt (Stack, Val);
     } else {
         IS_Set (Stack, Val);
     }
@@ -403,7 +630,7 @@ static void ParsePragma (void)
 /* Parse the contents of the _Pragma statement */
 {
     pragma_t Pragma;
-    ident    Ident;
+    StrBuf   Ident = AUTO_STRBUF_INITIALIZER;
 
     /* Create a string buffer from the string literal */
     StrBuf B = AUTO_STRBUF_INITIALIZER;
@@ -421,13 +648,13 @@ static void ParsePragma (void)
 
     /* Get the pragma name from the string */
     SB_SkipWhite (&B);
-    if (!SB_GetSym (&B, Ident)) {
+    if (!SB_GetSym (&B, &Ident, "-")) {
         Error ("Invalid pragma");
-        return;
+        goto ExitPoint;
     }
 
     /* Search for the name */
-    Pragma = FindPragma (Ident);
+    Pragma = FindPragma (&Ident);
 
     /* Do we know this pragma? */
     if (Pragma == PR_ILLEGAL) {
@@ -435,15 +662,15 @@ static void ParsePragma (void)
        	 * for unknown pragmas, however, we're allowed to warn - and we will
        	 * do so. Otherwise one typo may give you hours of bug hunting...
        	 */
-       	Warning ("Unknown pragma `%s'", Ident);
-       	return;
+       	Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
+       	goto ExitPoint;
     }
 
     /* Check for an open paren */
     SB_SkipWhite (&B);
     if (SB_Get (&B) != '(') {
         Error ("'(' expected");
-        return;
+        goto ExitPoint;
     }
 
     /* Skip white space before the argument */
@@ -501,7 +728,7 @@ static void ParsePragma (void)
      	    break;
 
         case PR_WARN:
-            FlagPragma (&B, &WarnEnable);
+            WarnPragma (&B);
             break;
 
      	case PR_ZPSYM:
@@ -516,7 +743,7 @@ static void ParsePragma (void)
     SB_SkipWhite (&B);
     if (SB_Get (&B) != ')') {
         Error ("')' expected");
-        return;
+        goto ExitPoint;
     }
     SB_SkipWhite (&B);
 
@@ -531,8 +758,10 @@ static void ParsePragma (void)
         Error ("Unexpected input following pragma directive");
     }
 
-    /* Release the StrBuf */
+ExitPoint:
+    /* Release the string buffers */
     SB_Done (&B);
+    SB_Done (&Ident);
 }
 
 

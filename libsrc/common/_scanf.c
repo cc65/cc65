@@ -31,7 +31,7 @@
 
 extern void __fastcall__ _seterrno (unsigned char code);
 
-#pragma staticlocals(on)
+#pragma static-locals(on)
 
 
 

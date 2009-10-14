@@ -62,43 +62,59 @@
 
 /* Tokens for the #pragmas */
 typedef enum {
-    PR_ILLEGAL = -1,
-    PR_BSSSEG,
-    PR_CHARMAP,
-    PR_CHECKSTACK,
-    PR_CODESEG,
-    PR_CODESIZE,
-    PR_DATASEG,
-    PR_OPTIMIZE,
-    PR_REGVARADDR,
-    PR_REGVARS,
-    PR_RODATASEG,
-    PR_SIGNEDCHARS,
-    PR_STATICLOCALS,
-    PR_WARN,
-    PR_ZPSYM,
-    PR_COUNT
+    PRAGMA_ILLEGAL = -1,
+    PRAGMA_BSS_NAME,
+    PRAGMA_BSSSEG,                                      /* obsolete */
+    PRAGMA_CHARMAP,
+    PRAGMA_CHECK_STACK,
+    PRAGMA_CHECKSTACK,                                  /* obsolete */
+    PRAGMA_CODE_NAME,
+    PRAGMA_CODESEG,                                     /* obsolete */
+    PRAGMA_CODESIZE,
+    PRAGMA_DATA_NAME,
+    PRAGMA_DATASEG,                                     /* obsolete */
+    PRAGMA_OPTIMIZE,
+    PRAGMA_REGVARADDR,
+    PRAGMA_REGISTER_VARS,
+    PRAGMA_REGVARS,                                     /* obsolete */
+    PRAGMA_RODATA_NAME,
+    PRAGMA_RODATASEG,                                   /* obsolete */
+    PRAGMA_SIGNED_CHARS,
+    PRAGMA_SIGNEDCHARS,                                 /* obsolete */
+    PRAGMA_STATIC_LOCALS,
+    PRAGMA_STATICLOCALS,                                /* obsolete */
+    PRAGMA_WARN,
+    PRAGMA_ZPSYM,
+    PRAGMA_COUNT
 } pragma_t;
 
 /* Pragma table */
 static const struct Pragma {
     const char*	Key;		/* Keyword */
     pragma_t   	Tok;		/* Token */
-} Pragmas[PR_COUNT] = {
-    {  	"bssseg",       PR_BSSSEG	},
-    {   "charmap",      PR_CHARMAP      },
-    {  	"checkstack",	PR_CHECKSTACK	},
-    {   "codeseg",    	PR_CODESEG	},
-    {   "codesize",     PR_CODESIZE     },
-    {   "dataseg",    	PR_DATASEG	},
-    {   "optimize",     PR_OPTIMIZE     },
-    {   "regvaraddr", 	PR_REGVARADDR	},
-    {   "regvars",      PR_REGVARS      },
-    {   "rodataseg",  	PR_RODATASEG	},
-    {  	"signedchars",	PR_SIGNEDCHARS	},
-    {  	"staticlocals",	PR_STATICLOCALS	},
-    {   "warn",         PR_WARN         },
-    {   "zpsym",       	PR_ZPSYM  	},
+} Pragmas[PRAGMA_COUNT] = {
+    { "bss-name",       PRAGMA_BSS_NAME         },
+    { "bssseg",         PRAGMA_BSSSEG           },      /* obsolete */
+    { "charmap",        PRAGMA_CHARMAP          },
+    { "check-stack",    PRAGMA_CHECK_STACK      },
+    { "checkstack",     PRAGMA_CHECKSTACK  	},      /* obsolete */
+    { "code-name",      PRAGMA_CODE_NAME        },
+    { "codeseg",        PRAGMA_CODESEG     	},      /* obsolete */
+    { "codesize",       PRAGMA_CODESIZE         },
+    { "data-name",      PRAGMA_DATA_NAME        },
+    { "dataseg",        PRAGMA_DATASEG     	},      /* obsolete */
+    { "optimize",       PRAGMA_OPTIMIZE         },
+    { "register-vars",  PRAGMA_REGISTER_VARS    },
+    { "regvaraddr",     PRAGMA_REGVARADDR  	},
+    { "regvars",        PRAGMA_REGVARS          },      /* obsolete */
+    { "rodata-name",    PRAGMA_RODATA_NAME      },
+    { "rodataseg",      PRAGMA_RODATASEG   	},      /* obsolete */
+    { "signed-chars",   PRAGMA_SIGNED_CHARS     },
+    { "signedchars",    PRAGMA_SIGNEDCHARS 	},      /* obsolete */
+    { "static-locals",  PRAGMA_STATIC_LOCALS    },
+    { "staticlocals",   PRAGMA_STATICLOCALS	},      /* obsolete */
+    { "warn",           PRAGMA_WARN             },
+    { "zpsym",          PRAGMA_ZPSYM       	},
 };
 
 /* Result of ParsePushPop */
@@ -137,13 +153,13 @@ static int CmpKey (const void* Key, const void* Elem)
 
 
 static pragma_t FindPragma (const StrBuf* Key)
-/* Find a pragma and return the token. Return PR_ILLEGAL if the keyword is
+/* Find a pragma and return the token. Return PRAGMA_ILLEGAL if the keyword is
  * not a valid pragma.
  */
 {
     struct Pragma* P;
-    P = bsearch (SB_GetConstBuf (Key), Pragmas, PR_COUNT, sizeof (Pragmas[0]), CmpKey);
-    return P? P->Tok : PR_ILLEGAL;
+    P = bsearch (SB_GetConstBuf (Key), Pragmas, PRAGMA_COUNT, sizeof (Pragmas[0]), CmpKey);
+    return P? P->Tok : PRAGMA_ILLEGAL;
 }
 
 
@@ -158,7 +174,7 @@ static int GetComma (StrBuf* B)
         Error ("Comma expected");
         return 0;
     }
-    SB_SkipWhite (B);
+    SB_SkipWhite (B);                                   
     return 1;
 }
 
@@ -657,7 +673,7 @@ static void ParsePragma (void)
     Pragma = FindPragma (&Ident);
 
     /* Do we know this pragma? */
-    if (Pragma == PR_ILLEGAL) {
+    if (Pragma == PRAGMA_ILLEGAL) {
        	/* According to the ANSI standard, we're not allowed to generate errors
        	 * for unknown pragmas, however, we're allowed to warn - and we will
        	 * do so. Otherwise one typo may give you hours of bug hunting...
@@ -679,59 +695,83 @@ static void ParsePragma (void)
     /* Switch for the different pragmas */
     switch (Pragma) {
 
-     	case PR_BSSSEG:
+     	case PRAGMA_BSSSEG:
+            Warning ("#pragma bssseg is obsolete, please use #pragma bss-name instead");
+            /* FALLTHROUGH */
+        case PRAGMA_BSS_NAME:
      	    SegNamePragma (&B, SEG_BSS);
      	    break;
 
-     	case PR_CHARMAP:
+     	case PRAGMA_CHARMAP:
      	    CharMapPragma (&B);
      	    break;
 
-     	case PR_CHECKSTACK:
+     	case PRAGMA_CHECKSTACK:
+            Warning ("#pragma checkstack is obsolete, please use #pragma check-stack instead");
+            /* FALLTHROUGH */
+        case PRAGMA_CHECK_STACK:
      	    FlagPragma (&B, &CheckStack);
      	    break;
 
-     	case PR_CODESEG:
+     	case PRAGMA_CODESEG:
+            Warning ("#pragma codeseg is obsolete, please use #pragma code-name instead");
+            /* FALLTHROUGH */
+        case PRAGMA_CODE_NAME:
      	    SegNamePragma (&B, SEG_CODE);
      	    break;
 
-     	case PR_CODESIZE:
+     	case PRAGMA_CODESIZE:
      	    IntPragma (&B, &CodeSizeFactor, 10, 1000);
      	    break;
 
-     	case PR_DATASEG:
+     	case PRAGMA_DATASEG:
+            Warning ("#pragma dataseg is obsolete, please use #pragma data-name instead");
+            /* FALLTHROUGH */
+        case PRAGMA_DATA_NAME:
      	    SegNamePragma (&B, SEG_DATA);
      	    break;
 
-        case PR_OPTIMIZE:
+        case PRAGMA_OPTIMIZE:
             FlagPragma (&B, &Optimize);
             break;
 
-     	case PR_REGVARADDR:
+     	case PRAGMA_REGVARADDR:
        	    FlagPragma (&B, &AllowRegVarAddr);
      	    break;
 
-     	case PR_REGVARS:
+     	case PRAGMA_REGVARS:
+            Warning ("#pragma regvars is obsolete, please use #pragma register-vars instead");
+            /* FALLTHROUGH */
+        case PRAGMA_REGISTER_VARS:
        	    FlagPragma (&B, &EnableRegVars);
      	    break;
 
-     	case PR_RODATASEG:
+     	case PRAGMA_RODATASEG:
+            Warning ("#pragma rodataseg is obsolete, please use #pragma rodata-name instead");
+            /* FALLTHROUGH */
+        case PRAGMA_RODATA_NAME:
      	    SegNamePragma (&B, SEG_RODATA);
      	    break;
 
-     	case PR_SIGNEDCHARS:
+     	case PRAGMA_SIGNEDCHARS:
+            Warning ("#pragma signedchars is obsolete, please use #pragma signed-chars instead");
+            /* FALLTHROUGH */
+        case PRAGMA_SIGNED_CHARS:
        	    FlagPragma (&B, &SignedChars);
      	    break;
 
-     	case PR_STATICLOCALS:
+     	case PRAGMA_STATICLOCALS:
+            Warning ("#pragma staticlocals is obsolete, please use #pragma static-locals instead");
+            /* FALLTHROUGH */
+        case PRAGMA_STATIC_LOCALS:
      	    FlagPragma (&B, &StaticLocals);
      	    break;
 
-        case PR_WARN:
+        case PRAGMA_WARN:
             WarnPragma (&B);
             break;
 
-     	case PR_ZPSYM:
+     	case PRAGMA_ZPSYM:
      	    StringPragma (&B, MakeZPSym);
      	    break;
 

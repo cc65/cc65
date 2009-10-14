@@ -40,7 +40,7 @@
 
 
 /* Use static local variables for speed */
-#pragma staticlocals (on);
+#pragma static-locals (on);
 
 
 
@@ -135,7 +135,7 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format,
                     break;
 
                 case 'W':
-                    sprintf (arg, "%02d", 
+                    sprintf (arg, "%02d",
                              (tm->tm_yday + 7 - (tm->tm_wday? tm->tm_wday - 1 : 6)) / 7);
                     break;
 

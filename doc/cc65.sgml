@@ -3,7 +3,7 @@
 <article>
 <title>cc65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>03.09.2000, 02.10.2001, 2005-8-1
+<date>2000-09-03, 2001-10-02, 2005-08-01
 
 <abstract>
 cc65 is a C compiler for 6502 targets. It supports several 6502 based home
@@ -23,11 +23,7 @@ John R. Dunning. In prior releases I've described the compiler by listing
 up the changes made by me. I have made many more changes in the meantime
 (and rewritten major parts of the compiler), so I will no longer do that,
 since the list would be too large and of no use to anyone. Instead I will
-describe the compiler in respect to the ANSI/ISO C standard. In fact, I'm
-planning a complete rewrite (that is, a complete new compiler) for the
-next release, since there are too many limitations in the current code,
-and removing these limitations would mean a rewrite of many more parts of
-the compiler.
+describe the compiler in respect to the ANSI/ISO C standard.
 
 There are separate documents named <url url="library.html"> and <url
 url="funcref.html"> that cover the library that is available for the compiler.
@@ -108,21 +104,26 @@ Here is a description of all the command line options:
 
 <descrip>
 
+  <label id="option-bss-name">
   <tag><tt>--bss-name seg</tt></tag>
 
-  Set the name of the bss segment.
+  Set the name of the bss segment. See also <tt/<ref id="pragma-bss-name"
+  name="#pragma&nbsp;bss-name">/.
 
 
+  <label id="option-check-stack">
   <tag><tt>--check-stack</tt></tag>
 
   Tells the compiler to generate code that checks for stack overflows. See
-  <tt><ref id="pragma-checkstack" name="#pragma&nbsp;checkstack"></tt> for an
+  <tt/<ref id="pragma-check-stack" name="#pragma&nbsp;check-stack">/ for an
   explanation of this feature.
 
 
+  <label id="option-code-name">
   <tag><tt>--code-name seg</tt></tag>
 
-  Set the name of the code segment.
+  Set the name of the code segment. See also <tt/<ref id="pragma-code-name"
+  name="#pragma&nbsp;code-name">/
 
 
   <label id="option-codesize">
@@ -134,6 +135,7 @@ Here is a description of all the command line options:
   using <tt/-Oi/ (<tt/-Oi/ is the same as <tt/-O --codesize&nbsp;200/).
 
 
+  <label id="option-cpu">
   <tag><tt>--cpu CPU</tt></tag>
 
   A new, still experimental option. You may specify "6502" or "65C02" as
@@ -144,11 +146,19 @@ Here is a description of all the command line options:
   overwhelming.
 
 
+  <label id="option-create-dep">
   <tag><tt>--create-dep</tt></tag>
 
   Tells the compiler to generate a file containing the dependency list for
   the compiled module in makefile syntax. The file is named as the C input
   file with the extension replaced by <tt/.u/.
+
+
+  <label id="option-data-name">
+  <tag><tt>--data-name seg</tt></tag>
+
+  Set the name of the data segment. See also <tt/<ref id="pragma-data-name"
+  name="#pragma&nbsp;data-name">/
 
 
   <tag><tt>-d, --debug</tt></tag>
@@ -188,6 +198,7 @@ Here is a description of all the command line options:
   name of the C input file is used, with the extension replaced by ".s".
 
 
+  <label id="option-register-vars">
   <tag><tt>-r, --register-vars</tt></tag>
 
   <tt/-r/ will make the compiler honor the <tt/register/ keyword. Local
@@ -197,13 +208,14 @@ Here is a description of all the command line options:
   variables are of limited use without the optimizer, there is also a combined
   switch: <tt/-Or/ will enable both, the optimizer and register variables.
 
-  For more information about register variables see <ref id="regvars"
+  For more information about register variables see <ref id="register-vars"
   name="register variables">.
 
   The compiler setting can also be changed within the source file by using
-  <tt><ref id="pragma-regvars" name="#pragma&nbsp;regvars"></tt>.
+  <tt/<ref id="pragma-register-vars" name="#pragma&nbsp;register-vars">/.
 
 
+  <label id="option-register-space">
   <tag><tt>--register-space</tt></tag>
 
   This option takes a numeric parameter and is used to specify, how much
@@ -217,19 +229,21 @@ Here is a description of all the command line options:
   If you don't know what all this means, please don't use this option.
 
 
+  <label id="option-rodata-name">
   <tag><tt>--rodata-name seg</tt></tag>
 
   Set the name of the rodata segment (the segment used for readonly data).
+  See also <tt/<ref id="pragma-rodata-name" name="#pragma&nbsp;rodata-name">/
 
-
+  <label id="option-signed-chars">
   <tag><tt>-j, --signed-chars</tt></tag>
 
   Using this option, you can make the default characters signed. Since the
   6502 has no provisions for sign extending characters (which is needed on
   almost any load operation), this will make the code larger and slower. A
   better way is to declare characters explicitly as "signed" if needed. You
-  can also use <tt><ref id="pragma-signedchars"
-  name="#pragma&nbsp;signedchars"></tt> for better control of this option.
+  can also use <tt><ref id="pragma-signed-chars"
+  name="#pragma&nbsp;signed-chars"></tt> for better control of this option.
 
 
   <label id="option--standard">
@@ -248,6 +262,7 @@ Here is a description of all the command line options:
   (// comments for example).
 
 
+  <label id="option-standard">
   <tag><tt>-t target, --target target</tt></tag>
 
   This option is used to set the target system. The target system
@@ -281,12 +296,14 @@ Here is a description of all the command line options:
   or warnings are encountered.
 
 
+  <label id="option-writable-strings">
   <tag><tt>--writable-strings</tt></tag>
 
   Make string literals writable by placing them into the data segment instead
   of the rodata segment.
 
 
+  <label id="option-static-locals">
   <tag><tt>-Cl, --static-locals</tt></tag>
 
   Use static storage for local variables instead of storage on the stack.
@@ -319,11 +336,12 @@ Here is a description of all the command line options:
   function is entered, and will keep the old value from one call of the
   function to the next.
 
-  You may also use <tt><ref id="pragma-staticlocals"
-  name="#pragma&nbsp;staticlocals"></tt> to change this setting in your
+  You may also use <tt><ref id="pragma-static-locals"
+  name="#pragma&nbsp;static-locals"></tt> to change this setting in your
   sources.
 
 
+  <label id="option-include-dir">
   <tag><tt>-I dir, --include-dir dir</tt></tag>
 
   Set a directory where the compiler searches for include files. You may
@@ -344,10 +362,9 @@ Here is a description of all the command line options:
 
   <tt/-Or/ will make the compiler honor the <tt/register/ keyword. Local
   variables may be placed in registers (which are actually zero page
-  locations). There is some overhead involved with register variables, since
-  the old contents of the registers must be saved and restored. In addition,
-  the current implementation does not make good use of register variables, so
-  using <tt/-Or/ may make your program even slower and larger. Use with care!
+  locations). See also the <tt/<ref id="option-register-vars"
+  name="--register-vars">/ command line option, and the <ref
+  id="register-vars" name="discussion of register variables"> below.
 
   Using <tt/-Os/ will force the compiler to inline some known functions from
   the C library like strlen. Note: This has two consequences:
@@ -404,6 +421,9 @@ Here is a description of all the command line options:
   <tag><tt/unused-var/</tag>
         Warn about unused variables.
   </descrip>
+
+  You may also use <tt><ref id="pragma-warn" name="#pragma&nbsp;warn"></tt> to
+  control this setting for smaller pieces of code from within your code.
 
 </descrip><p>
 
@@ -731,7 +751,7 @@ If the first parameter is <tt/push/, the old value is saved onto a stack
 before changing it. The value may later be restored by using the <tt/pop/
 parameter with the <tt/#pragma/.
 
-<sect1><tt>#pragma bssseg (&lsqb;push,&rsqb; &lt;name&gt;)</tt><p>
+<sect1><tt>#pragma bss-name (&lsqb;push,&rsqb; &lt;name&gt;)</tt><label id="pragma-bss-name"><p>
 
   This pragma changes the name used for the BSS segment (the BSS segment
   is used to store uninitialized data). The argument is a string enclosed
@@ -749,11 +769,11 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-       	#pragma bssseg ("MyBSS")
+       	#pragma bss-name ("MyBSS")
   </verb></tscreen>
 
 
-<sect1><tt>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</tt><p>
+<sect1><tt>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</tt><label id="pragma-charmap"><p>
 
   Each literal string and each literal character in the source is translated
   by use of a translation table. This translation table is preset when the
@@ -787,7 +807,7 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma checkstack ([push,] on|off)</tt><label id="pragma-checkstack"><p>
+<sect1><tt>#pragma check-stack ([push,] on|off)</tt><label id="pragma-check-stack"><p>
 
   Tells the compiler to insert calls to a stack checking subroutine to detect
   stack overflows. The stack checking code will lead to somewhat larger and
@@ -800,7 +820,7 @@ parameter with the <tt/#pragma/.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
-<sect1><tt>#pragma codeseg ([push,] &lt;name&gt;)</tt><p>
+<sect1><tt>#pragma code-name ([push,] &lt;name&gt;)</tt><label id="pragma-code-name"><p>
 
   This pragma changes the name used for the CODE segment (the CODE segment
   is used to store executable code). The argument is a string enclosed in
@@ -814,7 +834,7 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-      	#pragma codeseg ("MyCODE")
+       	#pragma code-name ("MyCODE")
   </verb></tscreen>
 
 
@@ -828,7 +848,7 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma dataseg ([push,] &lt;name&gt;)</tt><p>
+<sect1><tt>#pragma data-name ([push,] &lt;name&gt;)</tt><label id="pragma-data-name"><p>
 
   This pragma changes the name used for the DATA segment (the DATA segment
   is used to store initialized data). The argument is a string enclosed in
@@ -842,7 +862,7 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-      	#pragma dataseg ("MyDATA")
+       	#pragma data-name ("MyDATA")
   </verb></tscreen>
 
 
@@ -862,7 +882,7 @@ parameter with the <tt/#pragma/.
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma rodataseg ([push,] &lt;name&gt;)</tt><p>
+<sect1><tt>#pragma rodata-name ([push,] &lt;name&gt;)</tt><label id="pragma-rodata-name"><p>
 
   This pragma changes the name used for the RODATA segment (the RODATA
   segment is used to store readonly data). The argument is a string
@@ -876,11 +896,11 @@ parameter with the <tt/#pragma/.
 
   Example:
   <tscreen><verb>
-      	#pragma rodataseg ("MyRODATA")
+       	#pragma rodata-name ("MyRODATA")
   </verb></tscreen>
 
 
-<sect1><tt>#pragma regvaraddr ([push,] on|off)</tt><p>
+<sect1><tt>#pragma regvaraddr ([push,] on|off)</tt><label id="pragma-regvaraddr"><p>
 
   The compiler does not allow to take the address of register variables.
   The regvaraddr pragma changes this. Taking the address of a register
@@ -904,33 +924,34 @@ parameter with the <tt/#pragma/.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma regvars ([push,] on|off)</tt><label id="pragma-regvars"><p>
+<sect1><tt>#pragma register-vars ([push,] on|off)</tt><label id="pragma-register-vars"><p>
 
   Enables or disables use of register variables. If register variables are
   disabled (the default), the <tt/register/ keyword is ignored. Register
-  variables are explained in more detail in <ref id="regvars" name="a separate
+  variables are explained in more detail in <ref id="register-vars" name="a separate
   chapter">.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma signedchars ([push,] on|off)</tt><label id="pragma-signedchars"><p>
+<sect1><tt>#pragma signed-chars ([push,] on|off)</tt><label id="pragma-signed-chars"><p>
 
   Changes the signedness of the default character type. If the argument is
-  "on", default characters are signed, otherwise characters are unsigned.
-  The compiler default is to make characters unsigned since this creates a
-  lot better code. This default may be overridden by the <tt/--signed-chars/
-  command line option.
+  "on", default characters are signed, otherwise characters are unsigned. The
+  compiler default is to make characters unsigned since this creates a lot
+  better code. This default may be overridden by the <tt/<ref
+  name="--signed-chars" id="option-signed-chars">/ command line option.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
 
-<sect1><tt>#pragma staticlocals ([push,] on|off)</tt><label id="pragma-staticlocals"<p>
+<sect1><tt>#pragma static-locals ([push,] on|off)</tt><label id="pragma-static-locals"<p>
 
   Use variables in the bss segment instead of variables on the stack. This
-  pragma changes the default set by the compiler option <tt/-Cl/. If the
-  argument is "on", local variables are allocated in the BSS segment,
-  leading to shorter and in most cases faster, but non-reentrant code.
+  pragma changes the default set by the compiler option <tt/<ref
+  name="--static-locals" id="option-static-locals">/. If the argument is "on",
+  local variables are allocated in the BSS segment, leading to shorter and in
+  most cases faster, but non-reentrant code.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 
@@ -943,6 +964,16 @@ parameter with the <tt/#pragma/.
   "off", optionally preceeded by "push" to push the current state before
   changing it.
 
+  Example:
+  <tscreen><verb>
+        /* Don't warn about the unused parameter in function func */
+      	#pragma warn (unused-param, push, off)
+        static int func (int unused)
+        {
+            return 0;
+        }
+        #pragma warn (unused-param, pop)
+  </verb></tscreen>
 
 <sect1><tt>#pragma zpsym (&lt;name&gt;)</tt><p>
 
@@ -959,7 +990,7 @@ parameter with the <tt/#pragma/.
 
 
 
-<sect>Register variables<label id="regvars"><p>
+<sect>Register variables<label id="register-vars"><p>
 
 The runtime for all supported platforms has 6 bytes of zero page space
 available for register variables (this could be increased, but I think it's a
@@ -989,11 +1020,13 @@ much difference in the code generated for counters, so you will need at least
 trouble. The only savings you get here are by the use of a zero page variable
 instead of one on the stack or in the data segment.
 
-Register variables must be explicitly enabled by using <tt/-Or/ or <tt/-r/ on
-the command line. Register variables are only accepted on function top level,
-register variables declared in interior blocks are silently converted to
-<tt/auto/. With register variables disabled, all variables declared as
-<tt/register/ are actually auto variables.
+Register variables must be explicitly enabled, either by using <tt/<ref
+name="-Or" id="option-O">/ or <tt/<ref name="--register-vars"
+id="option-register-vars">/ on the command line or by use of <tt/<ref
+name="#pragma register-vars" id="pragma-register-vars">/. Register variables
+are only accepted on function top level, register variables declared in
+interior blocks are silently converted to <tt/auto/. With register variables
+disabled, all variables declared as <tt/register/ are actually auto variables.
 
 Please take care when using register variables: While they are helpful and can
 lead to a tremendous speedup when used correctly, improper usage will cause

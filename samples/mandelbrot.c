@@ -34,7 +34,7 @@
 #endif
 
 /* Use static local variables for speed */
-#pragma staticlocals (1);
+#pragma static-locals (1);
 
 
 
@@ -90,7 +90,7 @@ int main (void)
 
     clrscr ();
 
-    /* Load the graphics driver */                       
+    /* Load the graphics driver */
     cprintf ("initializing... mompls\r\n");
     tgi_load_driver (tgi_stddrv);
     err = tgi_geterror ();

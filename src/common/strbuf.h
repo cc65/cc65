@@ -295,7 +295,8 @@ INLINE void SB_SkipMultiple (StrBuf* B, unsigned Count)
     }
 }
 #else
-#  define SB_SkipMultiple(B)   do { if (((B)->Index += (Count)) > (B)->Len) (B)->Index = (B)->Len; } while (0)
+#  define SB_SkipMultiple(B, Count)     \
+        do { if (((B)->Index += (Count)) > (B)->Len) (B)->Index = (B)->Len; } while (0)
 #endif
 
 void SB_Drop (StrBuf* B, unsigned Count);

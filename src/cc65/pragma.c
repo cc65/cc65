@@ -174,7 +174,7 @@ static int GetComma (StrBuf* B)
         Error ("Comma expected");
         return 0;
     }
-    SB_SkipWhite (B);                                   
+    SB_SkipWhite (B);
     return 1;
 }
 
@@ -675,10 +675,11 @@ static void ParsePragma (void)
     /* Do we know this pragma? */
     if (Pragma == PRAGMA_ILLEGAL) {
        	/* According to the ANSI standard, we're not allowed to generate errors
-       	 * for unknown pragmas, however, we're allowed to warn - and we will
-       	 * do so. Otherwise one typo may give you hours of bug hunting...
+       	 * for unknown pragmas, but warn about them if enabled (the default).
        	 */
-       	Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
+        if (IS_Get (&WarnUnknownPragma)) {
+       	    Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
+        }
        	goto ExitPoint;
     }
 

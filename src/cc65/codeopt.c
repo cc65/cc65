@@ -1674,7 +1674,6 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptBoolTrans, 1);
        	C += RunOptFunc (S, &DOptJumpTarget1, 1);
        	C += RunOptFunc (S, &DOptJumpTarget2, 1);
-       	C += RunOptFunc (S, &DOptJumpTarget3, 1);
        	C += RunOptFunc (S, &DOptCondBranches1, 1);
        	C += RunOptFunc (S, &DOptCondBranches2, 1);
        	C += RunOptFunc (S, &DOptRTSJumps1, 1);
@@ -1689,6 +1688,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptCmp9, 1);
        	C += RunOptFunc (S, &DOptTest1, 1);
         C += RunOptFunc (S, &DOptLoad1, 1);
+       	C += RunOptFunc (S, &DOptJumpTarget3, 1);       /* After OptCondBranches2 */
        	C += RunOptFunc (S, &DOptUnusedLoads, 1);
        	C += RunOptFunc (S, &DOptUnusedStores, 1);
        	C += RunOptFunc (S, &DOptDupLoads, 1);

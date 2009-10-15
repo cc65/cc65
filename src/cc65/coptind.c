@@ -430,14 +430,24 @@ unsigned OptJumpCascades (CodeSeg* S)
 	/* Get this entry */
 	CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Check if it's a branch, if it has a jump label, if this jump
-	 * label is not attached to the instruction itself, and if the
-	 * target instruction is itself a branch.
+       	/* Check:
+         *   - if it's a branch,
+         *   - if it has a jump label,
+         *   - if this jump label is not attached to the instruction itself,
+         *   - if the target instruction is itself a branch,
+         *   - if either the first branch is unconditional or the target of
+         *     the second branch is internal to the function.
+         * The latter condition will avoid conditional branches to targets
+         * outside of the function (usually incspx), which won't simplify the
+         * code, since conditional far branches are emulated by a short branch
+         * around a jump.
 	 */
-     	if ((E->Info & OF_BRA) != 0        &&
-	    (OldLabel = E->JumpTo) != 0    &&
-	    (N = OldLabel->Owner) != E     &&
-	    (N->Info & OF_BRA) != 0) {
+     	if ((E->Info & OF_BRA) != 0             &&
+	    (OldLabel = E->JumpTo) != 0         &&
+	    (N = OldLabel->Owner) != E          &&
+	    (N->Info & OF_BRA) != 0             &&
+            ((E->Info & OF_CBRA) == 0   ||
+             N->JumpTo != 0)) {        
 
 	    /* Check if we can use the final target label. This is the case,
 	     * if the target branch is an absolut branch, or if it is a

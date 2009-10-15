@@ -247,50 +247,77 @@ unsigned OptRTSJumps1 (CodeSeg* S)
 
 
 unsigned OptRTSJumps2 (CodeSeg* S)
-/* Replace long conditional jumps to RTS */
+/* Replace long conditional jumps to RTS or to a final target */
 {
     unsigned Changes = 0;
 
     /* Walk over all entries minus the last one */
     unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* N;
+    while (I < CS_GetEntryCount (S) - 1) {
 
 	/* Get the next entry */
 	CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Check if it's an unconditional branch to a local target */
+       	/* Check if it's an conditional branch to a local target */
        	if ((E->Info & OF_CBRA) != 0 		&&   /* Conditional branch */
 	    (E->Info & OF_LBRA) != 0            &&   /* Long branch */
-	    E->JumpTo != 0    			&&   /* Local label */
-	    E->JumpTo->Owner->OPC == OP65_RTS   &&   /* Target is an RTS */
-	    (N = CS_GetNextEntry (S, I)) != 0) {     /* There is a next entry */
+	    E->JumpTo != 0) {                        /* Local label */
 
-	    CodeEntry* X;
-	    CodeLabel* LN;
-	    opc_t      NewBranch;
 
-	    /* We will create a jump around an RTS instead of the long branch */
-	    X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->JumpTo->Owner->LI);
-	    CS_InsertEntry (S, X, I+1);
+            /* Get the jump target and the next entry. There's always a next
+             * entry, because we don't cover the last entry in the loop.
+             */
+            CodeEntry* X = 0;
+            CodeEntry* T = E->JumpTo->Owner;
+            CodeEntry* N = CS_GetNextEntry (S, I);
 
-	    /* Get the new branch opcode */
-	    NewBranch = MakeShortBranch (GetInverseBranch (E->OPC));
+            /* Check if it's a jump to an RTS insn */
+            if (T->OPC == OP65_RTS) {
 
-	    /* Get the label attached to N, create a new one if needed */
-	    LN = CS_GenLabel (S, N);
+                /* It's a jump to RTS. Create a conditional branch around an
+                 * RTS insn.
+                 */
+                X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, T->LI);
 
-	    /* Generate the branch */
-	    X = NewCodeEntry (NewBranch, AM65_BRA, LN->Name, LN, E->LI);
-	    CS_InsertEntry (S, X, I+1);
+            } else if (T->OPC == OP65_JMP && T->JumpTo == 0) {
 
-	    /* Delete the long branch */
-	    CS_DelEntry (S, I);
+                /* It's a jump to a label outside the function. Create a
+                 * conditional branch around a jump to the external label.
+                 */
+                X = NewCodeEntry (OP65_JMP, AM65_ABS, T->Arg, T->JumpTo, T->LI);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            }
 
+            /* If we have a replacement insn, insert it */
+            if (X) {
+
+                CodeLabel* LN;
+                opc_t      NewBranch;
+
+                /* Insert the new insn */
+                CS_InsertEntry (S, X, I+1);
+
+                /* Create a conditional branch with the inverse condition
+                 * around the replacement insn
+                 */
+
+                /* Get the new branch opcode */
+                NewBranch = MakeShortBranch (GetInverseBranch (E->OPC));
+
+                /* Get the label attached to N, create a new one if needed */
+                LN = CS_GenLabel (S, N);
+
+                /* Generate the branch */
+                X = NewCodeEntry (NewBranch, AM65_BRA, LN->Name, LN, E->LI);
+                CS_InsertEntry (S, X, I+1);
+
+                /* Delete the long branch */
+                CS_DelEntry (S, I);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+            }
 	}
 
 	/* Next entry */
@@ -447,7 +474,7 @@ unsigned OptJumpCascades (CodeSeg* S)
 	    (N = OldLabel->Owner) != E          &&
 	    (N->Info & OF_BRA) != 0             &&
             ((E->Info & OF_CBRA) == 0   ||
-             N->JumpTo != 0)) {        
+             N->JumpTo != 0)) {
 
 	    /* Check if we can use the final target label. This is the case,
 	     * if the target branch is an absolut branch, or if it is a

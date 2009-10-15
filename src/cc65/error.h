@@ -60,6 +60,7 @@ extern unsigned WarningCount;
 /* Warning and error options */
 extern IntStack WarnEnable;             /* Enable warnings */
 extern IntStack WarningsAreErrors;      /* Treat warnings as errors */
+extern IntStack WarnStructParam;        /* Warn about structs passed by val */
 extern IntStack WarnUnusedLabel;        /* Warn about unused labels */
 extern IntStack WarnUnusedParam;        /* Warn about unused parameters */
 extern IntStack WarnUnusedVar;          /* Warn about unused variables */

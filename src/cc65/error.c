@@ -63,6 +63,7 @@ unsigned WarningCount	= 0;
 /* Warning and error options */
 IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
 IntStack WarningsAreErrors  = INTSTACK(0);  /* Treat warnings as errors */
+IntStack WarnStructParam    = INTSTACK(1);  /* Warn about structs passed by val */
 IntStack WarnUnusedLabel    = INTSTACK(1);  /* Warn about unused labels */
 IntStack WarnUnusedParam    = INTSTACK(1);  /* Warn about unused parameters */
 IntStack WarnUnusedVar      = INTSTACK(1);  /* Warn about unused variables */
@@ -77,6 +78,7 @@ struct WarnMapEntry {
 static WarnMapEntry WarnMap[] = {
     /* Keep sorted, even if this isn't used for now */
     { &WarningsAreErrors,       "error"                 },
+    { &WarnStructParam,         "struct-param"          },
     { &WarnUnknownPragma,       "unknown-pragma"        },
     { &WarnUnusedLabel,         "unused-label"          },
     { &WarnUnusedParam,         "unused-param"          },

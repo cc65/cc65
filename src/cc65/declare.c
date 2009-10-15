@@ -1167,6 +1167,13 @@ static void ParseAnsiParamList (FuncDesc* F)
 	/* Create a symbol table entry */
 	AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
 
+        /* If the parameter is a struct or union, emit a warning */
+        if (IsClassStruct (Decl.Type)) {
+            if (IS_Get (&WarnStructParam)) {
+                Warning ("Passing struct by value for parameter `%s'", Decl.Ident);
+            }
+        }
+
 	/* Count arguments */
        	++F->ParamCount;
 

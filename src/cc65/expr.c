@@ -547,7 +547,7 @@ static void FunctionCall (ExprDesc* Expr)
 
 	/* If we have a pointer on stack, remove it */
 	if (PtrOnStack) {
-	    g_space (- (int) sizeofarg (CF_PTR));
+	    g_drop (SIZEOF_PTR);
 	    pop (CF_PTR);
 	}
 

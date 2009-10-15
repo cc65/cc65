@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -394,6 +394,9 @@ void g_truejump (unsigned flags, unsigned label);
 
 void g_falsejump (unsigned flags, unsigned label);
 /* Jump to label if zero flag set */
+
+void g_drop (unsigned Space);
+/* Drop space allocated on the stack */
 
 void g_space (int space);
 /* Create or drop space on the stack */

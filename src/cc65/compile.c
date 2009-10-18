@@ -83,7 +83,6 @@ static void Parse (void)
     while (CurTok.Tok != TOK_CEOF) {
 
 	DeclSpec  	Spec;
-	Declaration 	Decl;
 
 	/* Check for empty statements */
 	if (CurTok.Tok == TOK_SEMI) {
@@ -128,6 +127,8 @@ static void Parse (void)
 	comma = 0;
        	while (1) {
 
+            Declaration         Decl;
+
 	    /* Read the next declaration */
 	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
 	    if (Decl.Ident[0] == '\0') {
@@ -167,6 +168,9 @@ static void Parse (void)
 
 	    /* Add an entry to the symbol table */
 	    Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
+
+            /* Add declaration attributes */
+            SymUseAttributes (Entry, &Decl);
 
 	    /* Reserve storage for the variable if we need to */
        	    if (Decl.StorageClass & SC_STORAGE) {
@@ -334,7 +338,7 @@ void Compile (const char* FileName)
     strftime (TimeStr, sizeof (TimeStr), "\"%H:%M:%S\"", TM);
     DefineTextMacro ("__DATE__", DateStr);
     DefineTextMacro ("__TIME__", TimeStr);
-                    
+
     /* Other standard macros */
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);

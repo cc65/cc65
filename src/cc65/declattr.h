@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,45 +38,38 @@
 
 
 
-#include "declare.h"
-
-
-
 /*****************************************************************************/
-/*	   	    		     Data				     */
+/*	   	    	    	     Data				     */
 /*****************************************************************************/
 
 
+
+/* Forward */
+struct Declaration;
 
 /* Supported attribute types */
 typedef enum {
-    atNone	= -1,	   	/* No attribute */
-    atAlias,  	    	   	/* Alias declaration */
-    atUnused,			/* Variable is unused */
-    atZeroPage,			/* Zero page symbol */
+    atNone	= -1,	    	/* No attribute */
+    atNoReturn,	    	    	/* Function does not return */
 
-    atCount	    	   	/* Number of attributes */
-} attrib_t;
+    atCount	    	    	/* Number of attributes */
+} DeclAttrType;
 
 /* An actual attribute description */
 typedef struct DeclAttr DeclAttr;
 struct DeclAttr {
-    attrib_t			AttrType;	/* Type of attribute */
-
-    union {
-	struct SymEntry*	Sym;		/* Symbol for alias */
-    } V;
+    DeclAttrType                AttrType;       /* Type of attribute */
 };
 
 
 
 /*****************************************************************************/
-/* 	   	    		     Code				     */
+/* 	   	    	    	     Code				     */
 /*****************************************************************************/
 
 
 
-void ParseAttribute (const Declaration* D, DeclAttr* A);
+void ParseAttribute (struct Declaration* D);
 /* Parse an additional __attribute__ modifier */
 
 

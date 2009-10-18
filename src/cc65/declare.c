@@ -249,9 +249,10 @@ static void InitDeclSpec (DeclSpec* D)
 static void InitDeclaration (Declaration* D)
 /* Initialize the Declaration struct for use */
 {
-    D->Ident[0]  = '\0';
-    D->Type[0].C = T_END;
-    D->Index     = 0;
+    D->Ident[0]   = '\0';
+    D->Type[0].C  = T_END;
+    D->Index      = 0;
+    D->Attributes = 0;
 }
 
 
@@ -1123,7 +1124,6 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 	DeclSpec 	Spec;
 	Declaration 	Decl;
-	DeclAttr	Attr;
 
       	/* Allow an ellipsis as last parameter */
 	if (CurTok.Tok == TOK_ELLIPSIS) {
@@ -1161,8 +1161,8 @@ static void ParseAnsiParamList (FuncDesc* F)
     	    Decl.StorageClass &= ~SC_DEF;
     	}
 
-	/* Parse an attribute ### */
-	ParseAttribute (&Decl, &Attr);
+	/* Parse attributes for this parameter */
+	ParseAttribute (&Decl);
 
 	/* Create a symbol table entry */
 	AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
@@ -1195,8 +1195,7 @@ static void ParseAnsiParamList (FuncDesc* F)
      	/* Print an error if we have unnamed parameters and cc65 extensions
          * are disabled.
      	 */
-       	if (IS_Get (&Standard) != STD_CC65 &&
-            (F->Flags & FD_UNNAMED_PARAMS) != 0) {
+       	if (IS_Get (&Standard) != STD_CC65 && (F->Flags & FD_UNNAMED_PARAMS)) {
      	    Error ("Parameter name omitted");
      	}
     }
@@ -1204,7 +1203,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 
 
-static FuncDesc* ParseFuncDecl (void)
+static FuncDesc* ParseFuncDecl (Declaration* D)
 /* Parse the argument list of a function. */
 {
     unsigned Offs;
@@ -1238,8 +1237,24 @@ static FuncDesc* ParseFuncDecl (void)
 
     /* Parse params */
     if ((F->Flags & FD_OLDSTYLE) == 0) {
+
 	/* New style function */
      	ParseAnsiParamList (F);
+
+        /* Allow attributes */
+        ParseAttribute (D);
+
+        /* Check if this is a function definition */
+        if (CurTok.Tok == TOK_LCURLY) {
+            /* Print an error if we have unnamed parameters and cc65 extensions
+             * are disabled.
+             */
+            if (IS_Get (&Standard) != STD_CC65 &&
+                (F->Flags & FD_UNNAMED_PARAMS)) {
+                Error ("Parameter name omitted");
+            }
+        }
+
     } else {
 	/* Old style function */
 	ParseOldStyleParamList (F);
@@ -1344,7 +1359,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
        	    NextToken ();
 
     	    /* Parse the function declaration */
-       	    F = ParseFuncDecl ();
+       	    F = ParseFuncDecl (D);
 
             /* We cannot specify fastcall for variadic functions */
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {

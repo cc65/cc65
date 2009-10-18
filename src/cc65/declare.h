@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,9 @@
 
 
 
+/* common */
+#include "coll.h"
+
 /* cc65 */
 #include "scanner.h"
 #include "symtab.h"
@@ -58,9 +61,9 @@
 /* Result of ParseDeclSpec */
 typedef struct DeclSpec DeclSpec;
 struct DeclSpec {
-    unsigned	StorageClass;  	 	/* One of the SC_xxx flags 	*/
+    unsigned	StorageClass;           /* One of the SC_xxx flags      */
     Type       	Type[MAXTYPELEN];       /* Type of the declaration spec */
-    unsigned	Flags;			/* Bitmapped flags 		*/
+    unsigned	Flags;                  /* Bitmapped flags              */
 };
 
 /* Result of ParseDecl */
@@ -68,14 +71,15 @@ typedef struct Declaration Declaration;
 struct Declaration {
     unsigned    StorageClass;           /* A set of SC_xxx flags */
     Type      	Type[MAXTYPELEN];       /* The type */
-    ident     	Ident;			/* The identifier if any, else empty */
+    ident     	Ident;                  /* The identifier, if any*/
+    Collection* Attributes;             /* Attributes if any */
 
     /* Working variables */
-    unsigned	Index;			/* Used to build Type */
+    unsigned	Index;              /* Used to build Type */
 };
 
 /* Modes for ParseDecl */
-typedef enum {                                                   
+typedef enum {
     DM_NEED_IDENT,                      /* We must have an identifier */
     DM_NO_IDENT,                        /* We won't read an identifier */
     DM_ACCEPT_IDENT,                    /* We will accept an id if there is one */

@@ -109,7 +109,7 @@ int __fastcall__ atexit (void (*exitfunc) (void));
 void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
 	                    size_t size, int (*cmp) (const void*, const void*));
 div_t __fastcall__ div (int numer, int denom);
-void __fastcall__ exit (int ret);
+void __fastcall__ exit (int ret) __attribute__ ((noreturn));
 char* __fastcall__ getenv (const char* name);
 void __fastcall__ qsort (void* base, size_t count, size_t size,
 	                 int (*compare) (const void*, const void*));

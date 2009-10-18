@@ -181,7 +181,7 @@ static void CheckSymTable (SymTable* Tab)
 		    /* Undefined label */
 		    Error ("Undefined label: `%s'", Entry->Name);
 		} else if (!SymIsRef (Entry)) {
-		    /* Defined but not used */ 
+		    /* Defined but not used */
                     if (IS_Get (&WarnUnusedLabel)) {
 		        Warning ("`%s' is defined but never used", Entry->Name);
                     }
@@ -768,7 +768,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
     	  	TypeCmp (T + 1, EType + 1) < TC_EQUAL) {
     	  	/* Types not identical: Conflicting types */
     	  	Error ("Conflicting types for `%s'", Name);
-	 	return Entry;
+	  	return Entry;
     	    } else {
     	  	/* Check if we have a size in the existing definition */
     	  	if (ESize == UNSPECIFIED) {
@@ -781,7 +781,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 	    /* New type must be identical */
 	    if (TypeCmp (EType, T) < TC_EQUAL) {
      	     	Error ("Conflicting types for `%s'", Name);
-		return Entry;
+	  	return Entry;
 	    }
 
 	    /* In case of a function, use the new type descriptor, since it
@@ -791,9 +791,9 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
              * empty parameter list.
 	     */
 	    if (IsFunc) {
-		/* Get the function descriptor from the new type */
-		FuncDesc* F = GetFuncDesc (T);
-		/* Use this new function descriptor if it doesn't contain
+	  	/* Get the function descriptor from the new type */
+	  	FuncDesc* F = GetFuncDesc (T);
+	  	/* Use this new function descriptor if it doesn't contain
                  * an empty parameter list.
                  */
                 if ((F->Flags & FD_EMPTY) == 0) {

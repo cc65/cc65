@@ -40,6 +40,8 @@
 
 /* cc65 */
 #include "anonname.h"
+#include "declare.h"
+#include "error.h"
 #include "symentry.h"
 
 
@@ -67,6 +69,7 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     E->Owner	= 0;
     E->Flags	= Flags;
     E->Type	= 0;
+    E->Attr     = 0;
     E->AsmName  = 0;
     memcpy (E->Name, Name, Len+1);
 
@@ -146,6 +149,49 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
      	fprintf (F, "(none)");
     }
     fprintf (F, "\n");
+}
+
+
+
+const DeclAttr* SymGetAttribute (const SymEntry* Sym, DeclAttrType AttrType)
+/* Return an attribute for this symbol or NULL if the attribute does not exist */
+{
+    /* Beware: We may not even have a collection */
+    if (Sym->Attr) {
+        unsigned I;
+        for (I = 0; I < CollCount (Sym->Attr); ++I) {
+
+            /* Get the next attribute */
+            const DeclAttr* A = CollConstAt (Sym->Attr, I);
+
+            /* If this is the one we're searching for, return it */
+            if (A->AttrType == AttrType) {
+                return A;
+            }
+        }
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
+void SymUseAttributes (SymEntry* Sym, struct Declaration* D)
+/* Use the attributes from the declaration for this symbol */
+{
+    /* We cannot specify attributes twice */
+    if ((Sym->Flags & SC_HAVEATTR) != 0) {
+        if (D->Attributes != 0) {
+            Error ("Attributes must be specified in the first declaration");
+        }
+        return;
+    }
+
+    /* Move the attributes */
+    Sym->Attr = D->Attributes;
+    D->Attributes = 0;
+    Sym->Flags |= SC_HAVEATTR;
 }
 
 

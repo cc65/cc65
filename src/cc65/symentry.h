@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,10 +41,12 @@
 #include <stdio.h>
 
 /* common */
+#include "coll.h"
 #include "inline.h"
 
 /* cc65 */
 #include "datatype.h"
+#include "declattr.h"
 
 
 
@@ -65,31 +67,33 @@ struct Segments;
 
 
 /* Storage classes and flags */
-#define SC_AUTO      	0x0001U
-#define SC_REGISTER    	0x0002U	/* Register variable, is in static storage */
-#define SC_STATIC    	0x0004U
-#define SC_EXTERN    	0x0008U
+#define SC_AUTO      	0x0001U         /* Auto variable */
+#define SC_REGISTER    	0x0002U	        /* Register variable */
+#define SC_STATIC    	0x0004U         /* Static */
+#define SC_EXTERN    	0x0008U         /* Extern linkage */
 
-#define SC_ENUM	     	0x0030U	/* An enum (numeric constant) */
-#define SC_CONST     	0x0020U	/* A numeric constant with a type */
-#define SC_LABEL       	0x0040U	/* A goto label */
-#define SC_PARAM       	0x0080U	/* This is a function parameter */
-#define SC_FUNC	     	0x0100U	/* Function entry */
+#define SC_ENUM	     	0x0030U	        /* An enum */
+#define SC_CONST     	0x0020U	        /* A numeric constant with a type */
+#define SC_LABEL       	0x0040U	        /* A goto label */
+#define SC_PARAM       	0x0080U	        /* A function parameter */
+#define SC_FUNC	     	0x0100U	        /* A function */
 
-#define SC_DEFTYPE      0x0200U /* Parameter has default type (=int, old style) */
-#define SC_STORAGE     	0x0400U	/* Symbol with associated storage */
-#define SC_DEFAULT     	0x0800U	/* Flag: default storage class was used */
+#define SC_DEFTYPE      0x0200U         /* Parameter has default type (=int, old style) */
+#define SC_STORAGE     	0x0400U	        /* Symbol with associated storage */
+#define SC_DEFAULT     	0x0800U	        /* Flag: default storage class was used */
 
-#define SC_DEF       	0x1000U	/* Symbol is defined */
-#define SC_REF 	     	0x2000U /* Symbol is referenced */
+#define SC_DEF       	0x1000U	        /* Symbol is defined */
+#define SC_REF 	     	0x2000U         /* Symbol is referenced */
 
-#define SC_TYPE	       	0x4000U	/* This is a type, struct, typedef, etc. */
-#define SC_STRUCT      	0x4001U	/* Struct or union */
-#define SC_STRUCTFIELD  0x4002U	/* Struct or union field */
-#define SC_BITFIELD     0x4004U /* A bit-field inside a struct or union */
-#define SC_TYPEDEF     	0x4008U	/* A typedef */
+#define SC_TYPE	       	0x4000U	        /* This is a type, struct, typedef, etc. */
+#define SC_STRUCT      	0x4001U	        /* Struct or union */
+#define SC_STRUCTFIELD  0x4002U	        /* Struct or union field */
+#define SC_BITFIELD     0x4004U         /* A bit-field inside a struct or union */
+#define SC_TYPEDEF     	0x4008U	        /* A typedef */
 
-#define SC_ZEROPAGE  	0x8000U	/* Symbol marked as zeropage */
+#define SC_ZEROPAGE  	0x8000U	        /* Symbol marked as zeropage */
+
+#define SC_HAVEATTR     0x10000U        /* Symbol has attributes */
 
 
 
@@ -103,6 +107,7 @@ struct SymEntry {
     struct SymTable*		Owner; 	  /* Symbol table the symbol is in */
     unsigned   			Flags; 	  /* Symbol flags */
     Type*      			Type;  	  /* Symbol type */
+    Collection*                 Attr;     /* Attribute list if any */
     char*                       AsmName;  /* Assembler name if any */
 
     /* Data that differs for the different symbol types */
@@ -225,6 +230,12 @@ INLINE const char* SymGetAsmName (const SymEntry* Sym)
 #else
 #  define SymGetAsmName(Sym)      ((Sym)->AsmName)
 #endif
+
+const DeclAttr* SymGetAttribute (const SymEntry* Sym, DeclAttrType AttrType);
+/* Return an attribute for this symbol or NULL if the attribute does not exist */
+
+void SymUseAttributes (SymEntry* Sym, struct Declaration* D);
+/* Use the attributes from the declaration for this symbol */
 
 void CvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */

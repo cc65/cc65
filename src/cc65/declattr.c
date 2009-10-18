@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,12 +35,16 @@
 
 #include <string.h>
 
+/* common */
+#include "xmalloc.h"
+
 /* cc65 */
+#include "declare.h"
+#include "declattr.h"
 #include "error.h"
 #include "scanner.h"
 #include "symtab.h"
 #include "typecmp.h"
-#include "declattr.h"
 
 
 
@@ -51,28 +55,46 @@
 
 
 /* Forwards for attribute handlers */
-static void AliasAttr (const Declaration* D, DeclAttr* A);
-static void UnusedAttr (const Declaration* D, DeclAttr* A);
-static void ZeroPageAttr (const Declaration* D, DeclAttr* A);
+static void NoReturnAttr (Declaration* D);
 
 
 
 /* Attribute table */
 typedef struct AttrDesc AttrDesc;
 struct AttrDesc {
-    const char	Name[12];
-    void	(*Handler) (const Declaration*, DeclAttr*);
+    const char	Name[15];
+    void      	(*Handler) (Declaration*);
 };
-static const AttrDesc AttrTable [atCount] = {
-    { "alias",	       	AliasAttr	},
-    { "unused",	       	UnusedAttr	},
-    { "zeropage",      	ZeroPageAttr	},
+static const AttrDesc AttrTable [] = {
+    { "__noreturn__",   NoReturnAttr    },
+    { "noreturn",       NoReturnAttr    },
 };
 
 
 
 /*****************************************************************************/
-/* 	   	    	  	     Code				     */
+/*                              Struct DeclAttr                              */
+/*****************************************************************************/
+
+
+
+static DeclAttr* NewDeclAttr (DeclAttrType AttrType)
+/* Create a new DeclAttr struct and return it */
+{
+    /* Allocate memory */
+    DeclAttr* A = xmalloc (sizeof (DeclAttr));
+
+    /* Initialize the fields */
+    A->AttrType = AttrType;
+
+    /* Return the new struct */
+    return A;
+}
+
+
+
+/*****************************************************************************/
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -85,7 +107,7 @@ static const AttrDesc* FindAttribute (const char* Attr)
     unsigned A;
 
     /* For now do a linear search */
-    for (A = 0; A < atCount; ++A) {
+    for (A = 0; A < sizeof (AttrTable) / sizeof (AttrTable[0]); ++A) {
        	if (strcmp (Attr, AttrTable[A].Name) == 0) {
 	    /* Found */
        	    return AttrTable + A;
@@ -98,72 +120,54 @@ static const AttrDesc* FindAttribute (const char* Attr)
 
 
 
-static void AliasAttr (const Declaration* D, DeclAttr* A)
-/* Handle the "alias" attribute */
+static void ErrorSkip (void)
 {
-    SymEntry* Sym;
+    /* List of tokens to skip */
+    static const token_t SkipList[] = { TOK_RPAREN, TOK_SEMI };
 
-    /* Comma expected */
-    ConsumeComma ();
+    /* Skip until closing brace or semicolon */
+    SkipTokens (SkipList, sizeof (SkipList) / sizeof (SkipList[0]));
 
-    /* The next identifier is the name of the alias symbol */
-    if (CurTok.Tok != TOK_IDENT) {
-       	Error ("Identifier expected");
-    	return;
+    /* If we have a closing brace, read it, otherwise bail out */
+    if (CurTok.Tok == TOK_RPAREN) {
+        /* Read the two closing braces */
+        ConsumeRParen ();
+        ConsumeRParen ();
     }
-
-    /* Lookup the symbol for this name, it must exist */
-    Sym = FindSym (CurTok.Ident);
-    if (Sym == 0) {
-    	Error ("Unknown identifier: `%s'", CurTok.Ident);
-    	NextToken ();
-    	return;
-    }
-
-    /* Since we have the symbol entry now, skip the name */
-    NextToken ();
-
-    /* Check if the types of the symbols are identical */
-    if (TypeCmp (D->Type, Sym->Type) < TC_EQUAL) {
-	/* Types are not identical */
-	Error ("Incompatible types");
-	return;
-    }
-
-    /* Attribute is verified, set the stuff in the attribute description */
-    A->AttrType = atAlias;
-    A->V.Sym	= Sym;
 }
 
 
 
-static void UnusedAttr (const Declaration* D attribute ((unused)), DeclAttr* A)
-/* Handle the "unused" attribute */
+static void AddAttr (Declaration* D, DeclAttr* A)
+/* Add an attribute to a declaration */
 {
-    /* No parameters */
-    A->AttrType = atUnused;
+    /* Allocate the list if necessary, the add the attribute */
+    if (D->Attributes == 0) {
+        D->Attributes = NewCollection ();
+    }
+    CollAppend (D->Attributes, A);
 }
 
 
 
-static void ZeroPageAttr (const Declaration* D attribute ((unused)), DeclAttr* A)
-/* Handle the "zeropage" attribute */
+/*****************************************************************************/
+/*                          Attribute handling code                          */
+/*****************************************************************************/
+
+
+
+void NoReturnAttr (Declaration* D)
+/* Parse the "noreturn" attribute */
 {
-    /* No parameters */
-    A->AttrType = atZeroPage;
+    /* Add the noreturn attribute */
+    AddAttr (D, NewDeclAttr (atNoReturn));
 }
 
 
 
-void ParseAttribute (const Declaration* D, DeclAttr* A)
+void ParseAttribute (Declaration* D)
 /* Parse an additional __attribute__ modifier */
 {
-    ident    	    AttrName;
-    const AttrDesc* Attr;
-
-    /* Initialize the attribute description with "no attribute" */
-    A->AttrType = atNone;
-
     /* Do we have an attribute? */
     if (CurTok.Tok != TOK_ATTRIBUTE) {
     	/* No attribute, bail out */
@@ -177,45 +181,59 @@ void ParseAttribute (const Declaration* D, DeclAttr* A)
     ConsumeLParen ();
     ConsumeLParen ();
 
-    /* Identifier follows */
-    if (CurTok.Tok != TOK_IDENT) {
-       	Error ("Identifier expected");
-    	/* We should *really* try to recover here, but for now: */
-    	return;
+    /* Read a list of attributes */
+    while (1) {
+
+        ident           AttrName;
+        const AttrDesc* Attr = 0;
+
+        /* Identifier follows */
+        if (CurTok.Tok != TOK_IDENT) {
+
+            /* No attribute name */
+            Error ("Attribute name expected");
+
+            /* Skip until end of attribute */
+            ErrorSkip ();
+
+            /* Bail out */
+            return;
+        }
+
+        /* Map the attribute name to its id, then skip the identifier */
+        strcpy (AttrName, CurTok.Ident);
+        Attr = FindAttribute (AttrName);
+        NextToken ();
+
+        /* Did we find a valid attribute? */
+        if (Attr) {
+
+            /* Call the handler */
+            Attr->Handler (D);
+
+        } else {
+            /* Attribute not known, maybe typo */
+            Error ("Illegal attribute: `%s'", AttrName);
+
+            /* Skip until end of attribute */
+            ErrorSkip ();
+
+            /* Bail out */
+            return;
+        }
+
+        /* If a comma follows, there's a next attribute. Otherwise this is the
+         * end of the attribute list.
+         */
+        if (CurTok.Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken ();
     }
 
-    /* Map the attribute name to its id, then skip the identifier */
-    strcpy (AttrName, CurTok.Ident);
-    Attr = FindAttribute (AttrName);
-    NextToken ();
-
-    /* Did we find a valid attribute? */
-    if (Attr) {
-
-	/* Call the handler */
-	Attr->Handler (D, A);
-
-	/* Read the two closing braces */
-	ConsumeRParen ();
-	ConsumeRParen ();
-
-    } else {
-	/* List of tokens to skip */
-	static const token_t SkipList[] = { TOK_LPAREN, TOK_SEMI };
-
-	/* Attribute not known, maybe typo */
-	Error ("Illegal attribute: `%s'", AttrName);
-
-	/* Skip until closing brace or semicolon */
-	SkipTokens (SkipList, sizeof (SkipList) / sizeof (SkipList[0]));
-
-	/* If we have a closing brace, read it, otherwise bail out */
-	if (CurTok.Tok == TOK_LPAREN) {
-	    /* Read the two closing braces */
-	    ConsumeRParen ();
-	    ConsumeRParen ();
-	}
-    }
+    /* The declaration is terminated with two closing braces */
+    ConsumeRParen ();
+    ConsumeRParen ();
 }
 
 

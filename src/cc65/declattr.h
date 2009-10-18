@@ -49,10 +49,8 @@ struct Declaration;
 
 /* Supported attribute types */
 typedef enum {
-    atNone	= -1,	    	/* No attribute */
     atNoReturn,	    	    	/* Function does not return */
-
-    atCount	    	    	/* Number of attributes */
+    atUnused,                   /* Symbol is unused - don't warn */
 } DeclAttrType;
 
 /* An actual attribute description */

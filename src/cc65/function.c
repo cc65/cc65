@@ -380,17 +380,24 @@ void NewFunc (SymEntry* Func)
     /* Reenter the lexical level */
     ReenterFunctionLevel (D);
 
+    /* Check if the function header contains unnamed parameters. These are 
+     * only allowed in cc65 mode.
+     */ 
+    if ((D->Flags & FD_UNNAMED_PARAMS) != 0 && (IS_Get (&Standard) != STD_CC65)) {
+        Error ("Parameter name omitted");
+    }
+
     /* Declare two special functions symbols: __fixargs__ and __argsize__.
      * The latter is different depending on the type of the function (variadic
      * or not).
      */
     AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
     if (D->Flags & FD_VARIADIC) {
-     	/* Variadic function. The variable must be const. */
-     	static const Type T[] = { TYPE(T_UCHAR | T_QUAL_CONST), TYPE(T_END) };
-     	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
+      	/* Variadic function. The variable must be const. */
+      	static const Type T[] = { TYPE(T_UCHAR | T_QUAL_CONST), TYPE(T_END) };
+      	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
     } else {
-     	/* Non variadic */
+      	/* Non variadic */
        	AddConstSym ("__argsize__", type_uchar, SC_DEF | SC_CONST, D->ParamSize);
     }
 
@@ -435,13 +442,13 @@ void NewFunc (SymEntry* Func)
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsQualFastcall (Func->Type) && D->ParamCount > 0) {
 
-     	unsigned Flags;
+      	unsigned Flags;
 
-     	/* Fastcall functions may never have an ellipsis or the compiler is buggy */
-     	CHECK ((D->Flags & FD_VARIADIC) == 0);
+      	/* Fastcall functions may never have an ellipsis or the compiler is buggy */
+      	CHECK ((D->Flags & FD_VARIADIC) == 0);
 
-     	/* Generate the push */
-     	if (IsTypeFunc (D->LastParam->Type)) {
+      	/* Generate the push */
+      	if (IsTypeFunc (D->LastParam->Type)) {
 	    /* Pointer to function */
 	    Flags = CF_PTR;
 	} else {

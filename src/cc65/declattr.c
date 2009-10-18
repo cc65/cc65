@@ -56,6 +56,7 @@
 
 /* Forwards for attribute handlers */
 static void NoReturnAttr (Declaration* D);
+static void UnusedAttr (Declaration* D);
 
 
 
@@ -67,7 +68,9 @@ struct AttrDesc {
 };
 static const AttrDesc AttrTable [] = {
     { "__noreturn__",   NoReturnAttr    },
+    { "__unused__",     UnusedAttr      },
     { "noreturn",       NoReturnAttr    },
+    { "unused",         UnusedAttr      },
 };
 
 
@@ -156,11 +159,20 @@ static void AddAttr (Declaration* D, DeclAttr* A)
 
 
 
-void NoReturnAttr (Declaration* D)
+static void NoReturnAttr (Declaration* D)
 /* Parse the "noreturn" attribute */
 {
     /* Add the noreturn attribute */
     AddAttr (D, NewDeclAttr (atNoReturn));
+}
+
+
+
+static void UnusedAttr (Declaration* D)
+/* Parse the "unused" attribute */
+{
+    /* Add the noreturn attribute */
+    AddAttr (D, NewDeclAttr (atUnused));
 }
 
 

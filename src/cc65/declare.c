@@ -1124,6 +1124,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 	DeclSpec 	Spec;
 	Declaration 	Decl;
+        SymEntry*       Sym;
 
       	/* Allow an ellipsis as last parameter */
 	if (CurTok.Tok == TOK_ELLIPSIS) {
@@ -1165,7 +1166,10 @@ static void ParseAnsiParamList (FuncDesc* F)
 	ParseAttribute (&Decl);
 
 	/* Create a symbol table entry */
-	AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
+        Sym = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
+
+        /* Add attributes if we have any */
+        SymUseAttributes (Sym, &Decl);
 
         /* If the parameter is a struct or union, emit a warning */
         if (IsClassStruct (Decl.Type)) {
@@ -1189,21 +1193,11 @@ static void ParseAnsiParamList (FuncDesc* F)
      * the breaks above bail out without checking.
      */
     ConsumeRParen ();
-
-    /* Check if this is a function definition */
-    if (CurTok.Tok == TOK_LCURLY) {
-     	/* Print an error if we have unnamed parameters and cc65 extensions
-         * are disabled.
-     	 */
-       	if (IS_Get (&Standard) != STD_CC65 && (F->Flags & FD_UNNAMED_PARAMS)) {
-     	    Error ("Parameter name omitted");
-     	}
-    }
 }
 
 
 
-static FuncDesc* ParseFuncDecl (Declaration* D)
+static FuncDesc* ParseFuncDecl (void)
 /* Parse the argument list of a function. */
 {
     unsigned Offs;
@@ -1240,20 +1234,6 @@ static FuncDesc* ParseFuncDecl (Declaration* D)
 
 	/* New style function */
      	ParseAnsiParamList (F);
-
-        /* Allow attributes */
-        ParseAttribute (D);
-
-        /* Check if this is a function definition */
-        if (CurTok.Tok == TOK_LCURLY) {
-            /* Print an error if we have unnamed parameters and cc65 extensions
-             * are disabled.
-             */
-            if (IS_Get (&Standard) != STD_CC65 &&
-                (F->Flags & FD_UNNAMED_PARAMS)) {
-                Error ("Parameter name omitted");
-            }
-        }
 
     } else {
 	/* Old style function */
@@ -1359,7 +1339,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
        	    NextToken ();
 
     	    /* Parse the function declaration */
-       	    F = ParseFuncDecl (D);
+       	    F = ParseFuncDecl ();
 
             /* We cannot specify fastcall for variadic functions */
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
@@ -1480,6 +1460,9 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     if (IsTypeFunc (D->Type)) {
         D->StorageClass |= SC_FUNC;
     }
+
+    /* Parse attributes for this declaration */
+    ParseAttribute (D);
 
     /* Check several things for function or function pointer types */
     if (IsTypeFunc (D->Type) || IsTypeFuncPtr (D->Type)) {

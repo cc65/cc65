@@ -34,6 +34,7 @@
 
 
 #include "assertion.h"
+#include "attrib.h"
 
 
 
@@ -43,7 +44,7 @@
 
 
 
-int AssertAtLinkTime (AssertAction A)
+int AssertAtLinkTime (AssertAction A attribute ((unused)))
 /* Return true if this assertion should be evaluated at link time */
 {
     /* Currently all assertions are evaluated at link time */
@@ -54,7 +55,7 @@ int AssertAtLinkTime (AssertAction A)
 
 int AssertAtAsmTime (AssertAction A)
 /* Return true if this assertion should be evaluated at assembly time */
-{            
+{
     return (A & 0x02U) == 0;
 }
 

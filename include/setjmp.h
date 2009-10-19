@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,11 +44,11 @@ typedef char jmp_buf [5];
 
 int __fastcall__ _setjmp (jmp_buf buf);
 #define setjmp	_setjmp		/* ISO insists on a macro */
-void __fastcall__ longjmp (jmp_buf buf, int retval);
+void __fastcall__ longjmp (jmp_buf buf, int retval) __attribute__((noreturn));
 
 
 
-/* End of stddef.h */
+/* End of setjmp.h */
 #endif
 
 

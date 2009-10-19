@@ -100,7 +100,7 @@ void __fastcall__ srand (unsigned seed);
 void _randomize (void);         /* Non-standard */
 
 /* Other standard stuff */
-void abort (void);
+void abort (void) __attribute__ ((noreturn));
 int __fastcall__ abs (int val);
 long __fastcall__ labs (long val);
 int __fastcall__ atoi (const char* s);

@@ -817,6 +817,121 @@ static unsigned OptPtrStore2 (CodeSeg* S)
 
 
 
+static unsigned OptPtrStore3 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      lda     #<(label+0)
+ *      ldx     #>(label+0)
+ *      ldy     aaa
+ *      clc
+ *      adc     (sp),y
+ *      bcc     L
+ *      inx
+ * L:   jsr	pushax
+ *	ldx	#$00
+ *	lda	yyy
+ *	ldy     #$00
+ *      jsr     staspidx
+ *
+ * and replace it by:
+ *
+ *      ldy     aaa
+ *	ldx	#$00
+ *	lda	(sp),y
+ *      tay
+ *      lda     yyy
+ *      sta	label,y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[11];
+	unsigned Len;
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_LDA      	       	             &&
+	    L[0]->AM == AM65_IMM                             &&
+       	    CS_GetEntries (S, L+1, I+1, 11)                  &&
+       	    L[1]->OPC == OP65_LDX              	             &&
+	    L[1]->AM == AM65_IMM                             &&
+            L[2]->OPC == OP65_LDY                            &&
+       	    L[3]->OPC == OP65_CLC                            &&
+	    L[4]->OPC == OP65_ADC                            &&
+       	    L[4]->AM == AM65_ZP_INDY                         &&
+            strcmp (L[4]->Arg, "sp") == 0                    &&
+       	    (L[5]->OPC == OP65_BCC || L[5]->OPC == OP65_JCC) &&
+       	    L[5]->JumpTo != 0                                &&
+       	    L[5]->JumpTo->Owner == L[7]                      &&
+	    L[6]->OPC == OP65_INX                            &&
+            CE_IsCallTo (L[7], "pushax")                     &&
+            L[8]->OPC == OP65_LDX                            &&
+            L[9]->OPC == OP65_LDA                            &&
+       	    L[10]->OPC == OP65_LDY                           &&
+       	    CE_IsKnownImm (L[10], 0)                         &&
+       	    CE_IsCallTo (L[11], "staspidx")                  &&
+       	    !CS_RangeHasLabel (S, I+1, 6)                    &&
+            !CS_RangeHasLabel (S, I+8, 4)                    &&
+	    /* Check the label last because this is quite costly */
+	    (Len = strlen (L[0]->Arg)) > 3                   &&
+	    L[0]->Arg[0] == '<'                              &&
+	    L[0]->Arg[1] == '('                              &&
+	    strlen (L[1]->Arg) == Len                        &&
+	    L[1]->Arg[0] == '>'                              &&
+       	    memcmp (L[0]->Arg+1, L[1]->Arg+1, Len-1) == 0) {
+
+	    CodeEntry* X;
+	    char* Label;
+
+	    /* We will create all the new stuff behind the current one so
+	     * we keep the line references.
+	     */
+	    X = NewCodeEntry (OP65_LDY,	L[2]->AM, L[2]->Arg, 0, L[2]->LI);
+	    CS_InsertEntry (S, X, I+12);
+
+       	    X = NewCodeEntry (OP65_LDX, L[8]->AM, L[8]->Arg, 0, L[8]->LI);
+	    CS_InsertEntry (S, X, I+13);
+
+            X = NewCodeEntry (OP65_LDA, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
+            CS_InsertEntry (S, X, I+14);
+
+       	    X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+15);
+
+            X = NewCodeEntry (OP65_LDA, L[8]->AM, L[8]->Arg, 0, L[8]->LI);
+            CS_InsertEntry (S, X, I+16);
+
+	    Label = memcpy (xmalloc (Len-2), L[0]->Arg+2, Len-3);
+	    Label[Len-3] = '\0';
+       	    X = NewCodeEntry (OP65_STA, AM65_ABSY, Label, 0, L[11]->LI);
+	    CS_InsertEntry (S, X, I+17);
+	    xfree (Label);
+
+	    /* Remove the old code */
+	    CS_DelEntries (S, I, 12);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*			      Decouple operations                            */
 /*****************************************************************************/
@@ -1239,6 +1354,7 @@ static OptFunc DOptPtrLoad16   	= { OptPtrLoad16,    "OptPtrLoad16",   	100, 0, 
 static OptFunc DOptPtrLoad17   	= { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",     40, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrStore3   	= { OptPtrStore3,    "OptPtrStore3",     50, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush2       	= { OptPush2,        "OptPush2",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
@@ -1326,6 +1442,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad7,
     &DOptPtrStore1,
     &DOptPtrStore2,
+    &DOptPtrStore3,
     &DOptPush1,
     &DOptPush2,
     &DOptPushPop,
@@ -1592,6 +1709,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
+    Changes += RunOptFunc (S, &DOptPtrStore3, 1);
     Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */
     Changes += RunOptFunc (S, &DOptPtrLoad1, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad2, 1);

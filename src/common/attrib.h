@@ -44,7 +44,7 @@
 
 
 
-#if defined(__GNUC__) || defined(__CC65__)
+#if defined(__GNUC__)
 #  define attribute(a)	__attribute__(a)
 #else
 #  define attribute(a)

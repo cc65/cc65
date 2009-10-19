@@ -1,13 +1,17 @@
 #
-# gcc Makefile for the binutils common stuff
+# gcc Makefile for the cc65 common directory
 #
 
+RM	= rm -f
+AR	= ar
 CFLAGS 	= -g -O2 -Wall -W -std=c89
 CC	= gcc
 LDFLAGS	=
 LIB	= common.a
 
 
+# ------------------------------------------------------------------------------
+# Object files for the library
 
 OBJS =	abend.o		\
 	addrsize.o      \

@@ -153,7 +153,7 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
 
 
 
-const DeclAttr* SymGetAttribute (const SymEntry* Sym, DeclAttrType AttrType)
+const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
 /* Return an attribute for this symbol or NULL if the attribute does not exist */
 {
     /* Beware: We may not even have a collection */
@@ -177,7 +177,7 @@ const DeclAttr* SymGetAttribute (const SymEntry* Sym, DeclAttrType AttrType)
 
 
 
-void SymUseAttributes (SymEntry* Sym, struct Declaration* D)
+void SymUseAttr (SymEntry* Sym, struct Declaration* D)
 /* Use the attributes from the declaration for this symbol */
 {
     /* We cannot specify attributes twice */

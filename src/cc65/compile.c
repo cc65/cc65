@@ -170,7 +170,7 @@ static void Parse (void)
 	    Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
 
             /* Add declaration attributes */
-            SymUseAttributes (Entry, &Decl);
+            SymUseAttr (Entry, &Decl);
 
 	    /* Reserve storage for the variable if we need to */
        	    if (Decl.StorageClass & SC_STORAGE) {

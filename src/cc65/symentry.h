@@ -231,10 +231,20 @@ INLINE const char* SymGetAsmName (const SymEntry* Sym)
 #  define SymGetAsmName(Sym)      ((Sym)->AsmName)
 #endif
 
-const DeclAttr* SymGetAttribute (const SymEntry* Sym, DeclAttrType AttrType);
+const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType);
 /* Return an attribute for this symbol or NULL if the attribute does not exist */
 
-void SymUseAttributes (SymEntry* Sym, struct Declaration* D);
+#if defined(HAVE_INLINE)
+INLINE int SymHasAttr (const SymEntry* Sym, DeclAttrType A)
+/* Return true if the symbol has the given attribute */
+{
+    return (SymGetAttr (Sym, A) != 0);    
+}
+#else
+#  define SymHasAttr(Sym, A)       (SymGetAttr (Sym, A) != 0)
+#endif
+
+void SymUseAttr (SymEntry* Sym, struct Declaration* D);
 /* Use the attributes from the declaration for this symbol */
 
 void CvtRegVarToAuto (SymEntry* Sym);

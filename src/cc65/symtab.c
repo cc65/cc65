@@ -162,8 +162,8 @@ static void CheckSymTable (SymTable* Tab)
 	     * defined but not used.
 	     */
 	    if (((Flags & SC_AUTO) || (Flags & SC_STATIC)) && (Flags & SC_EXTERN) == 0) {
-		if (SymIsDef (Entry) && !SymIsRef (Entry) &&
-                    SymGetAttribute (Entry, atUnused) == 0) {
+		if (SymIsDef (Entry) && !SymIsRef (Entry) && 
+                    !SymHasAttr (Entry, atUnused)) {
 		    if (Flags & SC_PARAM) {
                         if (IS_Get (&WarnUnusedParam)) {
 			    Warning ("Parameter `%s' is never used", Entry->Name);

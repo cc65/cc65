@@ -487,7 +487,7 @@ static void FunctionCall (ExprDesc* Expr)
 
     } else {
         /* Check function attributes */
-        if (Expr->Sym && SymGetAttribute (Expr->Sym, atNoReturn)) {
+        if (Expr->Sym && SymHasAttr (Expr->Sym, atNoReturn)) {
             /* For now, handle as if a return statement was encountered */
             F_ReturnFound (CurrentFunc);
         }

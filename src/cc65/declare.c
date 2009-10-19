@@ -1169,7 +1169,7 @@ static void ParseAnsiParamList (FuncDesc* F)
         Sym = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
 
         /* Add attributes if we have any */
-        SymUseAttributes (Sym, &Decl);
+        SymUseAttr (Sym, &Decl);
 
         /* If the parameter is a struct or union, emit a warning */
         if (IsClassStruct (Decl.Type)) {

@@ -849,7 +849,7 @@ static unsigned OptPtrStore3 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[11];
+	CodeEntry* L[12];
 	unsigned Len;
 
       	/* Get next entry */

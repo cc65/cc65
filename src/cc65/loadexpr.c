@@ -100,8 +100,9 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
          * throw away the high byte anyway and may therefore load just the
          * low byte.
          */
-        if (ED_IsBitField (Expr) && Expr->BitOffs + Expr->BitWidth <= CHAR_BITS) {
-            Flags |= CF_CHAR | CF_UNSIGNED;
+        if (ED_IsBitField (Expr)) {
+            Flags |= (Expr->BitOffs + Expr->BitWidth <= CHAR_BITS)? CF_CHAR : CF_INT;
+            Flags |= CF_UNSIGNED;
         } else {
             Flags |= TypeOf (Expr->Type);
         }

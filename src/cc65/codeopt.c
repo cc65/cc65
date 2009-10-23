@@ -1732,6 +1732,11 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptAdd1, 1);
     Changes += RunOptFunc (S, &DOptAdd2, 1);
     Changes += RunOptFunc (S, &DOptAdd4, 1);
+    Changes += RunOptFunc (S, &DOptAdd5, 1);
+    Changes += RunOptFunc (S, &DOptAdd6, 1);
+    Changes += RunOptFunc (S, &DOptAdd6, 1);
+    Changes += RunOptFunc (S, &DOptSub1, 1);
+    Changes += RunOptFunc (S, &DOptSub3, 1);
     Changes += RunOptFunc (S, &DOptStore4, 1);
     Changes += RunOptFunc (S, &DOptStore5, 1);
     Changes += RunOptFunc (S, &DOptShift1, 1);
@@ -1779,12 +1784,12 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
        	C += RunOptFunc (S, &DOptNegA1, 1);
        	C += RunOptFunc (S, &DOptNegA2, 1);
+       	C += RunOptFunc (S, &DOptStackOps, 1);
        	C += RunOptFunc (S, &DOptSub1, 1);
        	C += RunOptFunc (S, &DOptSub2, 1);
        	C += RunOptFunc (S, &DOptSub3, 1);
        	C += RunOptFunc (S, &DOptAdd5, 1);
        	C += RunOptFunc (S, &DOptAdd6, 1);
-       	C += RunOptFunc (S, &DOptStackOps, 1);
        	C += RunOptFunc (S, &DOptJumpCascades, 1);
        	C += RunOptFunc (S, &DOptDeadJumps, 1);
        	C += RunOptFunc (S, &DOptRTS, 1);

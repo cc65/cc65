@@ -61,6 +61,41 @@
 
 
 
+static unsigned AllocLabel (void (*UseSeg) ())
+/* Switch to a segment, define a local label and return it */
+{
+    unsigned Label;
+
+    /* Switch to the segment */
+    UseSeg ();
+
+    /* Define the variable label */
+    Label = GetLocalLabel ();
+    g_defdatalabel (Label);
+
+    /* Return the label */
+    return Label;
+}
+
+
+
+static unsigned AllocStorage (void (*UseSeg) (), unsigned Size)
+/* Reserve Size bytes of BSS storage prefixed by a local label. Return the
+ * label.
+ */
+{
+    /* Switch to the segment and define the label */
+    unsigned Label = AllocLabel (UseSeg);
+
+    /* Reserve space for the data */
+    g_res (Size);
+
+    /* Return the label */
+    return Label;
+}
+
+
+
 static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
 /* Parse the declaration of a register variable. The function returns the
  * symbol data, which is the offset of the variable in the register bank.
@@ -89,12 +124,10 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
         /* Special handling for compound types */
         if (IsCompound) {
 
-            /* Switch to read only data */
-            g_userodata ();
-
-            /* Define a label for the initialization data */
-            InitLabel = GetLocalLabel ();
-            g_defdatalabel (InitLabel);
+            /* Switch to read only data and define a label for the
+             * initialization data.
+             */
+            InitLabel = AllocLabel (g_userodata);
 
             /* Parse the initialization generating a memory image of the
              * data in the RODATA segment. The function does return the size
@@ -150,7 +183,6 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 {
     unsigned Flags;
     unsigned SymData;
-    unsigned InitLabel;
 
     /* Determine if this is a compound variable */
     int IsCompound = IsClassStruct (Decl->Type) || IsTypeArray (Decl->Type);
@@ -172,12 +204,10 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
             /* Special handling for compound types */
             if (IsCompound) {
 
-                /* Switch to read only data */
-                g_userodata ();
-
-                /* Define a label for the initialization data */
-                InitLabel = GetLocalLabel ();
-                g_defdatalabel (InitLabel);
+                /* Switch to read only data and define a label for the
+                 * initialization data.
+                 */
+                unsigned InitLabel = AllocLabel (g_userodata);
 
                 /* Parse the initialization generating a memory image of the
                  * data in the RODATA segment. The function will return the
@@ -248,16 +278,6 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
         /* Static local variables. */
         *SC = (*SC & ~SC_AUTO) | SC_STATIC;
 
-        /* Put them into the BSS */
-        g_usebss ();
-
-        /* Define the variable label */
-        SymData = GetLocalLabel ();
-        g_defdatalabel (SymData);
-
-        /* Reserve space for the data */
-        g_res (Size);
-
         /* Allow assignments */
         if (CurTok.Tok == TOK_ASSIGN) {
 
@@ -268,22 +288,26 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 
             if (IsCompound) {
 
-                /* Switch to read only data */
-                g_userodata ();
-
-                /* Define a label for the initialization data */
-                InitLabel = GetLocalLabel ();
-                g_defdatalabel (InitLabel);
+                /* Switch to read only data and define a label for the
+                 * initialization data.
+                 */
+                unsigned InitLabel = AllocLabel (g_userodata);
 
                 /* Parse the initialization generating a memory image of the
                  * data in the RODATA segment.
                  */
-                ParseInit (Decl->Type);
+                Size = ParseInit (Decl->Type);
+
+                /* Allocate a label and space for the variable */
+                SymData = AllocStorage (g_usebss, Size);
 
                 /* Generate code to copy this data into the variable space */
                 g_initstatic (InitLabel, SymData, Size);
 
             } else {
+
+                /* Allocate a label and space for the variable */
+                SymData = AllocStorage (g_usebss, Size);
 
                 /* Parse the expression */
                 hie1 (&Expr);
@@ -320,49 +344,34 @@ static unsigned ParseStaticDecl (Declaration* Decl, unsigned* SC)
  */
 {
     unsigned SymData;
-
-    /* Get the size of the variable */
-    unsigned Size = SizeOf (Decl->Type);
+    unsigned Size;
 
     /* Static data */
     if (CurTok.Tok == TOK_ASSIGN) {
 
-        /* Initialization ahead, switch to data segment */
+        /* Initialization ahead, switch to data segment and define a label */
         if (IsQualConst (Decl->Type)) {
-            g_userodata ();
+            SymData = AllocLabel (g_userodata);
         } else {
-            g_usedata ();
+            SymData = AllocLabel (g_usedata);
         }
-
-        /* Define the variable label */
-        SymData = GetLocalLabel ();
-        g_defdatalabel (SymData);
 
         /* Skip the '=' */
         NextToken ();
 
         /* Allow initialization of static vars */
-        ParseInit (Decl->Type);
-
-        /* If the previous size has been unknown, it must be known now */
-        if (Size == 0) {
-            Size = SizeOf (Decl->Type);
-        }
+        Size = ParseInit (Decl->Type);
 
         /* Mark the variable as referenced */
         *SC |= SC_REF;
 
     } else {
 
-        /* Uninitialized data, use BSS segment */
-        g_usebss ();
+        /* Get the size of the variable */
+        Size = SizeOf (Decl->Type);
 
-        /* Define the variable label */
-        SymData = GetLocalLabel ();
-        g_defdatalabel (SymData);
-
-        /* Reserve space for the data */
-        g_res (Size);
+        /* Allocate a label and space for the variable in the BSS segment */
+        SymData = AllocStorage (g_usebss, Size);
 
     }
 

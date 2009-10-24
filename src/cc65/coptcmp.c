@@ -56,11 +56,6 @@ static const unsigned char CmpInvertTab [] = {
     CMP_ULE, CMP_ULT, CMP_UGE, CMP_UGT
 };
 
-/* Table to show which compares are signed (use the N flag) */
-static const char CmpSignedTab [] = {
-    0, 0, 1, 1, 1, 1, 0, 0, 0, 0
-};
-
 
 
 /*****************************************************************************/

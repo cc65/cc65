@@ -36,6 +36,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_bar.o               \
                 tgi_circle.o            \
                 tgi_clear.o             \
+                tgi_clipline.o          \
                 tgi_curtoxy.o           \
                 tgi_done.o              \
                 tgi_getcolor.o          \

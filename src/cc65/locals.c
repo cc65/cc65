@@ -324,6 +324,12 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 
             /* Mark the variable as referenced */
             *SC |= SC_REF;
+
+        } else {
+
+            /* No assignment - allocate a label and space for the variable */
+            SymData = AllocStorage (g_usebss, Size);
+
         }
     }
 

@@ -46,7 +46,7 @@ that shows how to create a complete bootable Lynx cart.
 <sect>Memory layout<p>
 
 cc65 generated programs with the default setup run with the I/O area and the
-kernal enabled, which gives a usable memory range of &dollar;400 - &dollar;C038.
+kernal enabled, which gives a usable memory range of &dollar;400 - &dollar;C037.
 
 Special locations:
 
@@ -62,11 +62,16 @@ Special locations:
   '?' for all keys down at the same time.
 
   <tag/Stack/
-  The C runtime stack is located at &dollar;C037 and growing downwards.
+  The C runtime stack is located at &dollar;C037 (or &dollar;A057 if collision
+  detection is enabled) and growing downwards.
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C
   runtime stack.
+
+  <tag/Screen/
+  The collision detection screen is at &dollar;A058 if it is enabled. The
+  double buffered screens are at &dollar;C038 and &dollar;E018.
 
 </descrip><p>
 
@@ -144,6 +149,10 @@ call tgi_busy or tgi_ioctl(4, 0). It returns 0 if idle and 1 if busy
 To update displays you can call tgi_updatedisplay() or tgi_ioctl(4, 1) it
 will wait for the next VBL interrupt and set the draw buffer to the
 view buffer. The draw buffer is also changed to (drawbuffer xor 1).
+
+You can also enable or disable collision detection by a call to
+tgi_setcollisiondetection(active) or tgi_ioctl(5, active). The collision
+result is located before the sprite structure by default in this driver.
 
 <sect1>Extended memory drivers<p>
 

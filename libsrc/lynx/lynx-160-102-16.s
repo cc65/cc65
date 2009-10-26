@@ -199,6 +199,16 @@ INIT:
 ; Enable interrupts for VBL
 	lda	#$80
 	tsb	VTIMCTLA
+; Set up collision buffer to $A058
+	lda	#$58
+	sta	COLLBASL
+	lda	#$A0
+	sta	COLLBASH
+; Put collision index before sprite data
+	lda	#$FE
+	sta	COLLOFFL
+	lda	#$FF
+	sta	COLLOFFH
 ; Done, reset the error code
         lda     #TGI_ERR_OK
         sta     ERROR
@@ -245,6 +255,8 @@ GETERROR:
 ;
 ; To update displays you can call tgi_ioctl(4, 1) it will wait for the
 ; next VBL interrupt and swap draw and view buffers.
+;
+; Activate or deactivate collision detection by calling tgi_ioctl(5, 0/1).
 
 CONTROL:
         pha			; Almost all control routines succeed
@@ -252,6 +264,20 @@ CONTROL:
 	sta	ERROR
 	pla
 
+	cmp	#5
+	bne	ControlSwap
+	lda	ptr1
+	bne	@L0
+	lda	__sprsys
+	ora	#$20
+	bra	@L1
+@L0:	lda	__sprsys
+	and	#$df
+@L1:	sta	__sprsys
+	sta	SPRSYS
+	rts
+
+ControlSwap:
 	cmp	#4
 	bne	ControlFramerate
 

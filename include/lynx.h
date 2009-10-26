@@ -109,6 +109,7 @@ void __fastcall__ lynx_eeprom_erase (unsigned char cell);
 #define tgi_setframerate(rate) tgi_ioctl(3, (unsigned)(rate))
 #define tgi_busy() tgi_ioctl(4, 0)
 #define tgi_updatedisplay() tgi_ioctl(4, 1)
+#define tgi_setcollisiondetection(active) tgi_ioctl(5, (unsigned)(active))
 
 /* End of lynx.h */
 #endif

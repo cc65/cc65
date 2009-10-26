@@ -1375,7 +1375,8 @@ static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",      0, 0, 
 static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub3	       	= { OptSub3,   	     "OptSub3",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",       	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",       	 65, 0, 0, 0, 0, 0 };
+static OptFunc DOptTest2       	= { OptTest2,  	     "OptTest2",       	 50, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers1  	= { OptTransfers1,   "OptTransfers1",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers2  	= { OptTransfers2,   "OptTransfers2",    60, 0, 0, 0, 0, 0 };
 static OptFunc DOptTransfers3  	= { OptTransfers3,   "OptTransfers3",    65, 0, 0, 0, 0, 0 };
@@ -1467,6 +1468,7 @@ static OptFunc* OptFuncs[] = {
     &DOptSub2,
     &DOptSub3,
     &DOptTest1,
+    &DOptTest2,
     &DOptTransfers1,
     &DOptTransfers2,
     &DOptTransfers3,
@@ -1865,10 +1867,11 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
+    /* Repeat some of the steps here */
     Changes += RunOptFunc (S, &DOptPush1, 1);
     Changes += RunOptFunc (S, &DOptPush2, 1);
-    /* Repeat some of the other optimizations now */
     Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+    Changes += RunOptFunc (S, &DOptTest2, 1);
     Changes += RunOptFunc (S, &DOptTransfers2, 1);
 
     /* Return the number of changes */

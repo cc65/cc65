@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -68,6 +68,12 @@ unsigned OptTest1 (CodeSeg* S);
  *     txa
  *     beq/bne ...
  *
+ */
+
+unsigned OptTest2 (CodeSeg* S);
+/* Search for an inc/dec operation followed by a load and a conditional
+ * branch based on the flags from the load. Remove the load if the insn
+ * isn't used later.
  */
 
 

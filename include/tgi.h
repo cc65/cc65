@@ -113,7 +113,7 @@ const char* __fastcall__ tgi_geterrormsg (unsigned char code);
 /* Get an error message describing the error in code. */
 
 void __fastcall__ tgi_clear (void);
-/* Clear the screen. */
+/* Clear the drawpage. */
 
 unsigned __fastcall__ tgi_getpagecount (void);
 /* Returns the number of screen pages available. */

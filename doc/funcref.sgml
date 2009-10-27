@@ -4919,10 +4919,10 @@ tgi_circle(50, 40, 40);
 
 <quote>
 <descrip>
-<tag/Function/Clear the screen
+<tag/Function/Clear the drawpage
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_clear (void);/
-<tag/Description/Clear the screen
+<tag/Description/Clear the drawpage
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.

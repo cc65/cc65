@@ -99,6 +99,9 @@ S_OBJS = 	_cwd.o          \
 		atexit.o  	\
 		atoi.o	  	\
 		calloc.o  	\
+                cc65_cos.o      \
+                cc65_sin.o      \
+                cc65_sintab.o   \
                 chdir.o         \
 		copydata.o	\
                 creat.o         \

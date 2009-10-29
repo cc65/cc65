@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +44,7 @@
 
 
 
-/* TGI kernel variables */
+/* TGI kernel variables */              
 extern void*   	        tgi_drv;       	/* Pointer to driver */
 extern unsigned char  	tgi_error;     	/* Last error code */
 extern unsigned char    tgi_gmode;      /* Flag: Graphics mode active */
@@ -55,6 +55,7 @@ extern unsigned         tgi_xres;       /* X resolution of the current mode */
 extern unsigned         tgi_yres;       /* Y resolution of the current mode */
 extern unsigned char    tgi_colorcount; /* Number of available colors */
 extern unsigned char    tgi_pagecount;  /* Number of available screens */
+extern unsigned         tgi_aspectratio;/* Aspect ratio as fixed point 8.8 */
 
 
 

@@ -29,7 +29,7 @@
 	.byte	1			; Number of screens available
 xsize:	.byte	6			; System font X size
 	.byte	8			; System font Y size
-	.res	4, $00			; Reserved for future extensions
+        .word   $100                    ; Aspect ratio
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).
@@ -51,7 +51,6 @@ xsize:	.byte	6			; System font X size
        	.addr   GETPIXEL
        	.addr   LINE
        	.addr   BAR
-       	.addr   _CIRCLE
        	.addr   TEXTSTYLE
        	.addr   OUTTEXT
         .addr   0                       ; IRQ entry is unused
@@ -88,7 +87,6 @@ CHAR		= $F12D
 POINT		= $F1C8
 PAPER		= $F204
 INK		= $F210
-CIRCLE		= $F37F
 
 .rodata
 
@@ -349,22 +347,6 @@ BAR:
 	cmp	Y1
 	bne	@L1
 	rts
-
-; ------------------------------------------------------------------------
-; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the
-; radius in tmp1 and the current drawing color.
-;
-; Must set an error code: NO
-;
-
-_CIRCLE:
-	lda	#3
-	jsr	mymode
-	lda	RADIUS
-	sta	PARAM1
-	lda	MODE
-	sta	PARAM2
-	jmp	CIRCLE
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y

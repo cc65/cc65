@@ -30,13 +30,10 @@
         .byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .res    4, $00                  ; Reserved for future extensions
+        .word   $100                    ; Aspect ratio
 
-; Next comes the jump table. Currently all entries must be valid and may point
-; to an RTS for test versions (function not implemented). A future version may
-; allow for emulation: In this case the vector will be zero. Emulation means
-; that the graphics kernel will emulate the function by using lower level
-; primitives - for example ploting a line by using calls to SETPIXEL.
+; Next comes the jump table. With the exception of IRQ, all entries must be
+; valid and may point to an RTS for test versions (function not implemented).
 
         .addr   INSTALL
         .addr   UNINSTALL
@@ -55,7 +52,6 @@
         .addr   GETPIXEL
         .addr   LINE
         .addr   BAR
-        .addr   CIRCLE
         .addr   TEXTSTYLE
         .addr   OUTTEXT
         .addr   0                       ; IRQ entry is unused
@@ -70,7 +66,6 @@ X1              := ptr1
 Y1              := ptr2
 X2              := ptr3
 Y2              := ptr4
-RADIUS          := tmp1
 
 ROW             := tmp2         ; Bitmap row...
 COL             := tmp3         ; ...and column, both set by PLOT
@@ -98,21 +93,11 @@ OLDD018:        .res    1       ; Old register value
 DX:             .res    2
 DY:             .res    2
 
-; Circle routine stuff, overlaid by BAR variables
-X1SAVE:
-CURX:           .res    1
-CURY:           .res    1
-Y1SAVE:
-BROW:           .res    1       ; Bottom row
-TROW:           .res    1       ; Top row
-X2SAVE:
-LCOL:           .res    1       ; Left column
-RCOL:           .res    1       ; Right column
-Y2SAVE:
-CHUNK1:         .res    1
-OLDCH1:         .res    1
-CHUNK2:         .res    1
-OLDCH2:         .res    1
+; BAR variables
+X1SAVE:         .res    2
+Y1SAVE:         .res    2
+X2SAVE:         .res    2
+Y2SAVE:         .res    2
 
 ; Text output stuff
 TEXTMAGX:       .res    1
@@ -858,334 +843,6 @@ BAR:	lda     Y2
 
 @L4:    rts
 
-
-; ------------------------------------------------------------------------
-; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the
-; radius in tmp1 and the current drawing color.
-;
-; Must set an error code: NO
-;
-
-CIRCLE: lda     RADIUS
-        sta     CURY
-        bne     @L1
-        jmp     SETPIXEL        ; Plot as a point
-
-@L1:    clc
-        adc     Y1
-        sta     Y1
-        bcc     @L2
-        inc     Y1+1
-@L2:    jsr     CALC            ; Compute XC, YC+R
-
-        lda     ROW
-        sta     BROW
-        lda     COL
-        sta     LCOL
-        sta     RCOL
-
-        sty     Y2              ; Y AND 07
-        lda     BITCHUNK,X
-        sta     CHUNK1          ; Forwards chunk
-        sta     OLDCH1
-        lsr
-        eor     #$FF
-        sta     CHUNK2          ; Backwards chunk
-        sta     OLDCH2
-        lda     POINT
-        sta     TEMP2           ; TEMP2 = forwards high pointer
-        sta     X2              ; X2 = backwards high pointer
-        lda     POINT+1
-        sta     TEMP2+1
-        sta     X2+1
-
-; Next compute CY-R
-
-        lda     Y1
-        sec
-        sbc     RADIUS
-        bcs     @C3
-        dec     Y1+1
-        sec
-@C3:    sbc     RADIUS
-        bcs     @C4
-        dec     Y1+1
-@C4:    sta     Y1
-
-        jsr     CALC            ; Compute new coords
-        sty     Y1
-        lda     POINT
-        sta     X1              ; X1 will be the backwards
-        lda     POINT+1         ; low-pointer
-        sta     X1+1            ; POINT will be forwards
-        lda     ROW
-        sta     TROW
-
-        sei                     ; Get underneath ROM
-        lda     #$34
-        sta     $01
-
-        lda     RADIUS
-        lsr                     ; A=r/2
-        ldx     #00
-        stx     CURX            ; y=0
-
-; Main loop
-
-@LOOP:  inc     CURX            ; x=x+1
-
-        lsr     CHUNK1          ; Right chunk
-        bne     @CONT1
-        jsr     UPCHUNK1        ; Update if we move past a column
-@CONT1: asl     CHUNK2
-        bne     @CONT2
-        jsr     UPCHUNK2
-@CONT2: sec
-        sbc     CURX            ; a=a-x
-        bcs     @LOOP
-
-        adc     CURY         ;if a<0 then a=a+y; y=y-1
-        tax
-        jsr     PCHUNK1
-        jsr     PCHUNK2
-        lda     CHUNK1
-        sta     OLDCH1
-        lda     CHUNK2
-        sta     OLDCH2
-        txa
-
-        dec     CURY         ;(y=y-1)
-
-        dec     Y2           ;Decrement y-offest for upper
-        bpl     @CONT3       ;points
-        jsr     DECYOFF
-@CONT3: ldy     Y1
-        iny
-        sty     Y1
-        cpy     #8
-        bcc     @CONT4
-        jsr     INCYOFF
-@CONT4: ldy     CURX
-        cpy     CURY         ;if y<=x then punt
-        bcc     @LOOP        ;Now draw the other half
-;
-; Draw the other half of the circle by exactly reversing
-; the above!
-;
-NEXTHALF:
-        lsr     OLDCH1       ;Only plot a bit at a time
-        asl     OLDCH2
-        lda     RADIUS       ;A=-R/2-1
-        lsr
-        eor     #$FF
-@LOOP:
-        tax
-        jsr     PCHUNK1      ;Plot points
-        jsr     PCHUNK2
-        txa
-        dec     Y2           ;Y2=bottom
-        bpl     @CONT1
-        jsr     DECYOFF
-@CONT1: inc     Y1
-        ldy     Y1
-        cpy     #8
-        bcc     @CONT2
-        jsr     INCYOFF
-@CONT2: ldx     CURY
-        beq     @DONE
-        clc
-        adc     CURY         ;a=a+y
-        dec     CURY         ;y=y-1
-        bcc     @LOOP
-
-        inc     CURX
-        sbc     CURX         ;if a<0 then x=x+1; a=a+x
-        lsr     CHUNK1
-        bne     @CONT3
-        tax
-        jsr     UPCH1        ;Upchunk, but no plot
-@CONT3: lsr     OLDCH1       ;Only the bits...
-        asl     CHUNK2       ;Fix chunks
-        bne     @CONT4
-        tax
-        jsr     UPCH2
-@CONT4: asl     OLDCH2
-        bcs     @LOOP
-@DONE:
-CIRCEXIT:                    ;Restore interrupts
-        lda     #$37
-        sta     $01
-        cli
-        rts
-;
-; Decrement lower pointers
-;
-DECYOFF:
-        tay
-        lda     #7
-        sta     Y2
-
-        lda     X2           ;If we pass through zero, then
-        sec
-        sbc     #<320        ;subtract 320
-        sta     X2
-        lda     X2+1
-        sbc     #>320
-        sta     X2+1
-        lda     TEMP2
-        sec
-        sbc     #<320
-        sta     TEMP2
-        lda     TEMP2+1
-        sbc     #>320
-        sta     TEMP2+1
-
-        tya
-        dec     BROW
-        bmi     EXIT2
-        rts
-EXIT2:  pla                  ;Grab return address
-        pla
-        jmp     CIRCEXIT     ;Restore interrupts, etc.
-
-; Increment upper pointers
-INCYOFF:
-        tay
-        lda     #00
-        sta     Y1
-        lda     X1
-        clc
-        adc     #<320
-        sta     X1
-        lda     X1+1
-        adc     #>320
-        sta     X1+1
-        lda     POINT
-        clc
-        adc     #<320
-        sta     POINT
-        lda     POINT+1
-        adc     #>320
-        sta     POINT+1
-@ISKIP: inc     TROW
-        bmi     @DONE
-        lda     TROW
-        cmp     #25
-        bcs     EXIT2
-@DONE:  tya
-        rts
-
-;
-; UPCHUNK1 -- Update right-moving chunk pointers
-;             Due to passing through a column
-;
-UPCHUNK1:
-        tax
-        jsr     PCHUNK1
-UPCH1:  lda     #$FF         ;Alternative entry point
-        sta     CHUNK1
-        sta     OLDCH1
-        lda     TEMP2
-        clc
-        adc     #8
-        sta     TEMP2
-        bcc     @CONT
-        inc     TEMP2+1
-        clc
-@CONT:  lda     POINT
-        adc     #8
-        sta     POINT
-        bcc     @DONE
-        inc     POINT+1
-@DONE:  txa
-        inc     RCOL
-        rts
-
-;
-; UPCHUNK2 -- Update left-moving chunk pointers
-;
-UPCHUNK2:
-        tax
-        jsr     PCHUNK2
-UPCH2:  lda     #$FF
-        sta     CHUNK2
-        sta     OLDCH2
-        lda     X2
-        sec
-        sbc     #8
-        sta     X2
-        bcs     @CONT
-        dec     X2+1
-        sec
-@CONT:  lda     X1
-        sbc     #8
-        sta     X1
-        bcs     @DONE
-        dec     X1+1
-@DONE:  txa
-        dec     LCOL
-        rts
-;
-; Plot right-moving chunk pairs for circle routine
-;
-PCHUNK1:
-
-        lda     RCOL         ;Make sure we're in range
-        cmp     #40
-        bcs     @SKIP2
-        lda     CHUNK1       ;Otherwise plot
-        eor     OLDCH1
-        sta     TEMP
-        lda     TROW         ;Check for underflow
-        bmi     @SKIP
-        ldy     Y1
-        lda     (POINT),y
-        eor     BITMASK
-        and     TEMP
-        eor     (POINT),y
-        sta     (POINT),y
-
-@SKIP:  lda     BROW         ;If CY+Y >= 200...
-        cmp     #25
-        bcs     @SKIP2
-        ldy     Y2
-        lda     (TEMP2),y
-        eor     BITMASK
-        and     TEMP
-        eor     (TEMP2),y
-        sta     (TEMP2),y
-@SKIP2: rts
-
-;
-; Plot left-moving chunk pairs for circle routine
-;
-
-PCHUNK2:
-        lda     LCOL         ;Range check in X
-        cmp     #40
-        bcs     EXIT3
-        lda     CHUNK2       ;Otherwise plot
-        eor     OLDCH2
-        sta     TEMP
-        lda     TROW         ;Check for underflow
-        bmi     @SKIP
-        ldy     Y1
-        lda     (X1),y
-        eor     BITMASK
-        and     TEMP
-        eor     (X1),y
-        sta     (X1),y
-
-@SKIP:  lda     BROW         ;If CY+Y >= 200...
-        cmp     #25
-        bcs     EXIT3
-        ldy     Y2
-        lda     (X2),y
-        eor     BITMASK
-        and     TEMP
-        eor     (X2),y
-        sta     (X2),y
-EXIT3:  rts
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y

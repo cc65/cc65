@@ -63,7 +63,7 @@ yres:   .word   480                     ; Y resolution
 pages:	.byte   0                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .res    4, $00                  ; Reserved for future extensions
+        .word   $100                    ; Aspect ratio
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).
@@ -85,7 +85,6 @@ pages:	.byte   0                       ; Number of screens available
         .addr   GETPIXEL
         .addr   LINE
         .addr   BAR
-        .addr   CIRCLE
         .addr   TEXTSTYLE
         .addr   OUTTEXT
         .addr   0                       ; IRQ entry is unused
@@ -100,7 +99,6 @@ X1              = ptr1
 Y1              = ptr2
 X2              = ptr3
 Y2              = ptr4
-RADIUS		= tmp1
 
 ADDR		= tmp1		; (2)	CALC
 TEMP		= tmp3		;	CALC icmp
@@ -113,12 +111,6 @@ PB 		= ptr3 		; (2)	LINE
 UB		= ptr4 		; (2)	LINE
 ERR		= regsave 	; (2)	LINE
 NX		= regsave+2 	; (2)	LINE
-; Circle stuff
-XX		= ptr3		; (2)	CIRCLE
-YY		= ptr4		; (2)	CIRCLE
-MaxO		= sreg		; (overwritten by TEMP3+TEMP4, but restored from OG/OU anyway)
-XS		= regsave	; (2)	CIRCLE
-YS		= regsave+2	; (2)	CIRCLE
 
 ; Absolute variables used in the code
 
@@ -133,11 +125,8 @@ OLDCOLOR:	.res	1	; colors before entering gfx mode
 
 ; Line routine stuff (combined with CIRCLE to save space)
 
-OGora:
 COUNT:		 .res	2
-OUkos:
 NY:		 .res	2
-Y3:
 DX:		 .res	1
 DY:		 .res	1
 AX:		 .res	1
@@ -183,7 +172,7 @@ InitVDCTab:
 		.byte 27, $00
 		.byte $ff
 
-SCN80CLR:	.byte 27,88,147,27,88,0
+SCN80CLR: 	.byte 27,88,147,27,88,0
 
 .code
 
@@ -502,51 +491,26 @@ GETDEFPALETTE:
 ; Must set an error code: NO
 ;
 
-SETPIXELCLIP:
-	lda	Y1+1
-	bmi	@finito		; y<0
-	lda	X1+1
-	bmi	@finito		; x<0
-	lda	X1
-	ldx	X1+1
-	sta	ADDR
-	stx	ADDR+1
-	ldx	#ADDR
-	lda	xres
-	ldy	xres+1
-	jsr	icmp		; ( x < xres ) ...
-	bcs	@finito
-	lda	Y1
-	ldx	Y1+1
-	sta	ADDR
-	stx	ADDR+1
-	ldx	#ADDR
-	lda	yres
-	ldy	yres+1
-	jsr	icmp		; ... && ( y < yres )
-	bcc	SETPIXEL
-@finito:rts
-
 SETPIXEL:
         jsr     CALC            ; Calculate coordinates
 
-	stx	TEMP
-	lda	ADDR
-	ldy	ADDR+1
-	jsr	VDCSetSourceAddr
-	jsr	VDCReadByte
-	ldx	TEMP
+  	stx	TEMP
+  	lda	ADDR
+  	ldy	ADDR+1
+  	jsr	VDCSetSourceAddr
+  	jsr	VDCReadByte
+  	ldx	TEMP
 
-	sta	TEMP
+  	sta	TEMP
         eor     BITMASK
         and     BITTAB,X
-	eor	TEMP
-	pha
-	lda	ADDR
-	ldy	ADDR+1
-	jsr	VDCSetSourceAddr
-	pla
-	jsr	VDCWriteByte
+  	eor	TEMP
+  	pha
+  	lda	ADDR
+  	ldy	ADDR+1
+  	jsr	VDCSetSourceAddr
+  	pla
+  	jsr	VDCWriteByte
 
 @L9:    rts
 
@@ -681,7 +645,7 @@ LINE:
 	bne	@L0167
 	rts
 	;    setpixel(X1,Y1)
-@L0167:	jsr	SETPIXELCLIP
+@L0167:	jsr  	SETPIXEL
 	;    pb = err + ny
 	lda	ERR
 	clc
@@ -915,213 +879,6 @@ HORLINE:
 
 @L5:	jmp	HORLINE
 
-
-; ------------------------------------------------------------------------
-; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the
-; radius in tmp1 and the current drawing color.
-;
-; Must set an error code: NO
-;
-
-CIRCLE:
-	lda     RADIUS
-        bne     @L1
-        jmp     SETPIXELCLIP    ; Plot as a point
-
-@L1:	sta	XX
-	; x = r;
-	lda	#0
-	sta	XX+1
-	sta	YY
-	sta	YY+1
-	sta	MaxO
-	sta	MaxO+1
-	; y =0; mo=0;
-	lda	X1
-	ldx	X1+1
-	sta	XS
-	stx	XS+1
-	lda	Y1
-	ldx	Y1+1
-	sta	YS
-	stx	YS+1		; XS/YS to remember the center
-
-	; while (y<x) {
-@L013B:	ldx	#YY
-	lda	XX
-	ldy	XX+1
-	jsr	icmp
-	bcc	@L12
-	rts
-@L12:	; plot points in 8 slices...
-	lda	XS
-	clc
-	adc	XX
-	sta	X1
-	lda	XS+1
-	adc	XX+1
-	sta	X1+1		; x1 = xs+x
-	lda	YS
-	clc
-	adc	YY
-	sta	Y1
-	pha
-	lda	YS+1
-	adc	YY+1
-	sta	Y1+1		; (stack)=ys+y, y1=(stack)
-	pha
-	jsr	SETPIXELCLIP	; plot(xs+x,ys+y)
-	lda	YS
-	sec
-	sbc	YY
-	sta	Y1
-	sta	Y3
-	lda	YS+1
-	sbc	YY+1
-	sta	Y1+1		; y3 = y1 = ys-y
-	sta	Y3+1
-	jsr	SETPIXELCLIP	; plot(xs+x,ys-y)
-	pla
-	sta	Y1+1
-	pla
-	sta	Y1		; y1 = ys+y
-	lda	XS
-	sec
-	sbc	XX
-	sta	X1
-	lda	XS+1
-	sbc	XX+1
-	sta	X1+1
-	jsr	SETPIXELCLIP	; plot (xs-x,ys+y)
-	lda	Y3
-	sta	Y1
-	lda	Y3+1
-	sta	Y1+1
-	jsr	SETPIXELCLIP	; plot (xs-x,ys-y)
-
-	lda	XS
-	clc
-	adc	YY
-	sta	X1
-	lda	XS+1
-	adc	YY+1
-	sta	X1+1		; x1 = xs+y
-	lda	YS
-	clc
-	adc	XX
-	sta	Y1
-	pha
-	lda	YS+1
-	adc	XX+1
-	sta	Y1+1		; (stack)=ys+x, y1=(stack)
-	pha
-	jsr	SETPIXELCLIP	; plot(xs+y,ys+x)
-	lda	YS
-	sec
-	sbc	XX
-	sta	Y1
-	sta	Y3
-	lda	YS+1
-	sbc	XX+1
-	sta	Y1+1		; y3 = y1 = ys-x
-	sta	Y3+1
-	jsr	SETPIXELCLIP	; plot(xs+y,ys-x)
-	pla
-	sta	Y1+1
-	pla
-	sta	Y1		; y1 = ys+x(stack)
-	lda	XS
-	sec
-	sbc	YY
-	sta	X1
-	lda	XS+1
-	sbc	YY+1
-	sta	X1+1
-	jsr	SETPIXELCLIP	; plot (xs-y,ys+x)
-	lda	Y3
-	sta	Y1
-	lda	Y3+1
-	sta	Y1+1
-	jsr	SETPIXELCLIP	; plot (xs-y,ys-x)
-
-	; og = mo+y+y+1
-	lda	MaxO
-	ldx	MaxO+1
-	clc
-	adc	YY
-	tay
-	txa
-	adc	YY+1
-	tax
-	tya
-	clc
-	adc	YY
-	tay
-	txa
-	adc	YY+1
-	tax
-	tya
-	clc
-	adc	#1
-	bcc	@L0143
-	inx
-@L0143:	sta	OGora
-	stx	OGora+1
-	; ou = og-x-x+1
-	sec
-	sbc	XX
-	tay
-	txa
-	sbc	XX+1
-	tax
-	tya
-	sec
-	sbc	XX
-	tay
-	txa
-	sbc	XX+1
-	tax
-	tya
-	clc
-	adc	#1
-	bcc	@L0146
-	inx
-@L0146:	sta	OUkos
-	stx	OUkos+1
-	; ++y
-	inc	YY
-	bne	@L0148
-	inc	YY+1
-@L0148:	; if (abs(ou)<abs(og))
-	lda	OUkos
-	ldy	OUkos+1
-	jsr	abs
-	sta	TEMP3
-	sty	TEMP4
-	lda	OGora
-	ldy	OGora+1
-	jsr	abs
-	ldx	#TEMP3
-	jsr	icmp
-	bpl	@L0149
-	; { --x;
-	sec
-	lda	XX
-	sbc	#1
-	sta	XX
-	bcs	@L014E
-	dec	XX+1
-@L014E:	; mo = ou; }
-	lda	OUkos
-	ldx	OUkos+1
-	jmp	@L014G
-	; else { mo = og }
-@L0149:	lda	OGora
-	ldx	OGora+1
-@L014G:	sta	MaxO
-	stx	MaxO+1
-	; }
-        jmp	@L013B
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y

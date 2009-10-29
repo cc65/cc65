@@ -46,8 +46,8 @@
             PAGECOUNT       .byte   1   ; Number of screens available
             FONTSIZE_X      .byte   1   ; System font size in X direction
             FONTSIZE_Y      .byte   1   ; System font size in Y direction
+            ASPECTRATIO     .word   1   ; Fixed point 8.8 format
         .endstruct
-        RESERVED            .byte   4   ; Reserved for extensions
         JUMPTAB             .struct
             INSTALL         .addr       ; INSTALL routine
             UNINSTALL       .addr       ; UNINSTALL routine
@@ -66,7 +66,6 @@
             GETPIXEL        .addr       ; GETPIXEL routine
             LINE            .addr       ; LINE routine
             BAR             .addr       ; BAR routine
-            CIRCLE          .addr       ; CIRCLE routine
             TEXTSTYLE       .addr       ; TEXTSTYLE routine
             OUTTEXT         .addr       ; OUTTEXT routine
             IRQ             .addr       ; IRQ routine
@@ -76,7 +75,7 @@
 ;------------------------------------------------------------------------------
 ; The TGI API version, stored at TGI_HDR_VERSION
 
-TGI_API_VERSION         = $02
+TGI_API_VERSION         = $03
 
 ;------------------------------------------------------------------------------
 ; Text style constants
@@ -102,6 +101,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_pagecount          ; Number of available screen pages
         .global _tgi_fontsizex          ; System font X size
         .global _tgi_fontsizey          ; System font Y size
+        .global _tgi_aspectratio        ; Aspect ratio, fixed point 8.8
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -123,7 +123,6 @@ TGI_TEXT_VERTICAL       = 1
         .global tgi_getpixel
         .global tgi_line
         .global tgi_bar
-        .global tgi_circle
         .global tgi_textstyle
         .global tgi_outtext
 

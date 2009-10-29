@@ -34,6 +34,7 @@ _tgi_colorcount:    .res    1           ; Number of available colors
 _tgi_pagecount:     .res    1           ; Number of available screen pages
 _tgi_fontsizex:     .res    1           ; System font X size
 _tgi_fontsizey:     .res    1           ; System font Y size
+_tgi_aspectratio:   .res    2           ; Aspect ratio in 8.8 fixed point
 
 
 .data
@@ -57,7 +58,6 @@ tgi_setpixel:       jmp     $0000
 tgi_getpixel:       jmp     $0000
 tgi_line:           jmp     $0000
 tgi_bar:            jmp     $0000
-tgi_circle:         jmp     $0000
 tgi_textstyle:      jmp     $0000
 tgi_outtext:        jmp     $0000
 tgi_irq:            .byte   $60, $00, $00       ; RTS plus two dummy bytes
@@ -189,4 +189,4 @@ _tgi_uninstall:
         rts
 
 
-     
+

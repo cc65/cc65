@@ -6,14 +6,11 @@
 
         .include        "tgi-kernel.inc"
 
-        .import         popax
-        .importzp       tmp1
+        .import         incsp4
 
 .proc   _tgi_circle
 
-        sta     tmp1            ; Get the coordinates
-        jsr     popax
-        jsr     tgi_popxy       ; Pop X/Y into ptr1/ptr2
-        jmp     tgi_circle      ; Call the driver
+        ; For now
+        jmp     incsp4
 
 .endproc

@@ -72,6 +72,7 @@
 #include "segment.h"
 #include "sizeof.h"
 #include "spool.h"
+#include "symbol.h"
 #include "symtab.h"
 #include "ulabel.h"
 
@@ -577,19 +578,24 @@ static void OneLine (void)
         }
     }
 
-    /* Handle an identifier */
-    if (Tok == TOK_LOCAL_IDENT || (Tok == TOK_IDENT && Instr < 0 && !Macro)) {
+    /* Handle an identifier. This may be a cheap local symbol, or a fully
+     * scoped identifier which may start with a namespace token (for global
+     * namespace)
+     */
+    if (Tok == TOK_LOCAL_IDENT ||
+        Tok == TOK_NAMESPACE   ||
+        (Tok == TOK_IDENT && Instr < 0 && !Macro)) {
 
         /* Did we have whitespace before the ident? */
         int HadWS = WS;
 
         /* Generate the symbol table entry, then skip the name */
-        if (Tok == TOK_IDENT) {
-            Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
-        } else {
+        if (Tok == TOK_LOCAL_IDENT) {
             Sym = SymFindLocal (SymLast, &SVal, SYM_ALLOC_NEW);
+            NextTok ();
+        } else {
+            Sym = ParseScopedSymName (SYM_ALLOC_NEW);
         }
-        NextTok ();
 
         /* If a colon follows, this is a label definition. If there
          * is no colon, it's an assignment.

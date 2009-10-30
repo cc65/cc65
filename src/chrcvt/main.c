@@ -40,6 +40,8 @@
 
 /* common */
 #include "cmdline.h"
+#include "print.h"
+#include "xmalloc.h"
 #include "version.h"
 
 /* chrcvt */
@@ -47,8 +49,114 @@
 
 
 
+/*
+ * The following is a corrected doc from the BGI font editor toolkit:
+ *
+ *                      BGI Stroke File Format
+ *
+ * The structure of Borland .CHR (stroke) files is as follows:
+ *
+ * ;  offset 0h is a Borland header:
+ * ;
+ *         HeaderSize      equ     080h
+ *         DataSize        equ     (size of font file)
+ *         descr           equ     "Triplex font"
+ *         fname           equ     "TRIP"
+ *         MajorVersion    equ     1
+ *         MinorVersion    equ     0
+ *
+ *         db      'PK',8,8
+ *         db      'BGI ',descr,'  V'
+ *         db      MajorVersion+'0'
+ *         db      (MinorVersion / 10)+'0',(MinorVersion mod 10)+'0'
+ *         db      ' - 19 October 1987',0DH,0AH
+ *         db      'Copyright (c) 1987 Borland International', 0dh,0ah
+ *         db      0,1ah                           ; null & ctrl-Z = end
+ *
+ *         dw      HeaderSize                      ; size of header
+ *         db      fname                           ; font name
+ *         dw      DataSize                        ; font file size
+ *         db      MajorVersion,MinorVersion       ; version #'s
+ *         db      1,0                             ; minimal version #'s
+ *
+ *         db      (HeaderSize - $) DUP (0)        ; pad out to header size
+ *
+ * At offset 80h starts data for the file:
+ *
+ * ;               80h     '+'  flags stroke file type
+ * ;               81h-82h  number chars in font file (n)
+ * ;               83h      undefined
+ * ;               84h      ASCII value of first char in file
+ * ;               85h-86h  offset to stroke definitions (8+3n)
+ * ;               87h      scan flag (normally 0)
+ * ;               88h      distance from origin to top of capital
+ * ;               89h      distance from origin to baseline
+ * ;               8Ah      distance from origin to bottom descender
+ * ;               8Bh-8Fh  undefined
+ * ;               90h      offsets to individual character definitions
+ * ;               90h+2n   width table (one word per character)
+ * ;               90h+3n   start of character definitions
+ * ;
+ * The individual character definitions consist of a variable number of words
+ * describing the operations required to render a character. Each word
+ * consists of an (x,y) coordinate pair and a two-bit opcode, encoded as shown
+ * here:
+ *
+ * Byte 1          7   6   5   4   3   2   1   0     bit #
+ *                op1  <seven bit signed X coord>
+ *
+ * Byte 2          7   6   5   4   3   2   1   0     bit #
+ *                op2  <seven bit signed Y coord>
+ *
+ *
+ *           Opcodes
+ *
+ *         op1=0  op2=0  End of character definition.
+ *         op1=1  op2=0  Move the pointer to (x,y)
+ *         op1=1  op2=1  Draw from current pointer to (x,y)
+ */
+
+
+
+/* The target file format is designed to be read by a cc65 compiled program
+ * more easily. It should not be necessary to load the whole file into a
+ * buffer to parse it, or seek within the file. Also using less memory if
+ * possible would be fine. Therefore we use the following structure:
+ *
+ * Header portion:
+ *      .byte   $54, $43, $48, $00              ; "TCH" version
+ *      .word   <size of following data>
+ * Data portion:
+ *      .byte   <number of chars in font>       ; Value from $81
+ *      .byte   <ascii value of first char>     ; Value from $84
+ *      .byte   <top>                           ; Value from $88
+ *      .byte   <baseline>                      ; Value from $89
+ *      .byte   <bottom>                        ; Negative value from $8A
+ *      .word   <char definition offsets>, ...  ; Relative to data portion
+ * Character definitions:
+ *      .byte   <width>
+ *      .word   <converted opcode>, ...         
+ *      .byte   $80
+ *
+ * The opcodes get converted for easier handling: END is marked by bit 7 
+ * set in the first byte. The second byte of this opcode is not needed.
+ * Bit 7 of the second byte marks a MOVE (bit 7 = 0) or DRAW (bit 7 = 1).
+ *
+ * The parsing code does not expect the file to contain more than $7D
+ * characters (most will contain $5E or similar), therefore the character
+ * definition offset will be accessed using the pointer to the data portion
+ * plus an offset in an 8 bit index register.
+ *
+ * Above structure allows a program to read the header portion of the file,
+ * validate it, allocate memory for the data portion and read the data portion
+ * in one chunk into memory. The character definition offsets will then be
+ * converted into pointers by adding the data portion pointer to each.
+ */
+
+
+
 /*****************************************************************************/
-/*     	       	     	       	     Data			  	     */
+/*     	       	       	       	     Data  			  	     */
 /*****************************************************************************/
 
 
@@ -58,7 +166,7 @@ static unsigned FilesProcessed = 0;
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Code			  	     */
+/*     	       	     	       	     Code  			  	     */
 /*****************************************************************************/
 
 
@@ -70,21 +178,9 @@ static void Usage (void)
     	     "Usage: %s [options] file [options] [file]\n"
     	     "Short options:\n"
        	     "  -h\t\t\tHelp (this text)\n"
-       	     "  -H\t\t\tDump the object file header\n"
-       	     "  -S\t\t\tDump segments sizes\n"
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
-	     "  --dump-all\t\tDump all object file information\n"
-	     "  --dump-dbgsyms\tDump debug symbols\n"
-       	     "  --dump-exports\tDump exported symbols\n"
-	     "  --dump-files\t\tDump the source files\n"
-	     "  --dump-header\t\tDump the object file header\n"
-	     "  --dump-imports\tDump imported symbols\n"
-	     "  --dump-lineinfo\tDump line information\n"
-	     "  --dump-options\tDump object file options\n"
-	     "  --dump-segments\tDump the segments in the file\n"
-       	     "  --dump-segsize\tDump segments sizes\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --version\t\tPrint the version number and exit\n",
     	     ProgName);
@@ -98,6 +194,15 @@ static void OptHelp (const char* Opt attribute ((unused)),
 {
     Usage ();
     exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptVerbose (const char* Opt attribute ((unused)),
+		       	const char* Arg attribute ((unused)))
+/* Increase verbosity */
+{
+    ++Verbosity;
 }
 
 
@@ -116,14 +221,63 @@ static void OptVersion (const char* Opt attribute ((unused)),
 static void ConvertFile (const char* Name)
 /* Convert one vector font file */
 {
-    /* Try to open the file */
+    static const unsigned char ChrHeader[] = {
+        0x50, 0x4B, 0x08, 0x08, 0x42, 0x47, 0x49, 0x20
+    };
+
+    long           Size;
+    unsigned char* Buf;
+    unsigned char* MsgEnd;
+
+    /* Try to open the file for reading */
     FILE* F = fopen (Name, "rb");
     if (F == 0) {
-	Error ("Cannot open `%s': %s", Name, strerror (errno));
+    	Error ("Cannot open `%s': %s", Name, strerror (errno));
+    }
+
+    /* Seek to the end and determine the size */
+    fseek (F, 0, SEEK_END);
+    Size = ftell (F);
+
+    /* Seek back to the start of the file */
+    fseek (F, 0, SEEK_SET);
+
+    /* Check if the size is reasonable */
+    if (Size > 32*1024) {
+        Error ("File `%s' is too large (max = 32k)", Name);
+    } else if (Size < 0x100) {
+        Error ("File `%s' is too small to be a vector font file", Name);
+    }
+
+    /* Allocate memory for the file */
+    Buf = xmalloc ((size_t) Size);
+
+    /* Read the file contents into the buffer */
+    if (fread (Buf, 1, (size_t) Size, F) != (size_t) Size) {
+        Error ("Error reading from `%s'", Name);
     }
 
     /* Close the file */
     fclose (F);
+
+    /* Verify the header */
+    if (memcmp (Buf, ChrHeader, sizeof (ChrHeader)) != 0) {
+        Error ("Invalid format for `%s': invalid header", Name);
+    }
+    MsgEnd = memchr (Buf + sizeof (ChrHeader), 0x1A, 0x80);
+    if (MsgEnd == 0) {
+        Error ("Invalid format for `%s': description not found", Name);
+    }
+    if (MsgEnd[1] != 0x80 || MsgEnd[2] != 0x00) {
+        Error ("Invalid format for `%s': wrong header size", Name);
+    }
+
+    /* Print the copyright from the header */
+    Print (stderr, 1, "%.*s\n", (int) (MsgEnd - Buf - 4), Buf+4);
+
+    /* Convert the buffer into a strokefont structure */
+
+
 }
 
 
@@ -134,6 +288,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--help",    		0,	OptHelp			},
+       	{ "--verbose", 	       	0,	OptVerbose     	       	},
 	{ "--version", 	       	0,	OptVersion		},
     };
 

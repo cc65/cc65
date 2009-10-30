@@ -7,6 +7,7 @@ SUBDIRS	=		\
 	ar65		\
 	ca65		\
 	cc65		\
+        chrcvt          \
 	cl65		\
 	co65            \
 	da65		\

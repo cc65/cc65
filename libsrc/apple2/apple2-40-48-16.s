@@ -3,7 +3,6 @@
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
 ; Oliver Schmidt <ol.sc@web.de>
-; Based on Maciej Witkowiak's line and circle routine
 ;
 
 	.include	"zeropage.inc"
@@ -41,9 +40,7 @@ X1	:=	ptr1
 Y1	:=	ptr2
 X2	:=	ptr3
 Y2	:=	ptr4
-RADIUS	:=	tmp1
 
-ADDR	:=	tmp1
 TEMP	:=	tmp3
 TEMP2	:=	tmp4
 TEMP3	:=	sreg
@@ -55,14 +52,6 @@ PB 	:=	ptr3 		; (2)	LINE
 UB	:=	ptr4 		; (2)	LINE
 ERR	:=	regsave 	; (2)	LINE
 NX	:=	regsave+2 	; (2)	LINE
-
-; Circle routine stuff (must be on zpage)
-
-XX	:=	ptr3		; (2)	CIRCLE
-YY	:=	ptr4		; (2)	CIRCLE
-MaxO	:=	sreg		; (overwritten by TEMP3+TEMP4, but restored from OG/OU anyway)
-XS	:=	regsave		; (2)	CIRCLE
-YS	:=	regsave+2	; (2)	CIRCLE
 
 ; ------------------------------------------------------------------------
 
@@ -81,10 +70,10 @@ yres:	.word	48		; Y resolution
 	.byte	1		; Number of screens available
 	.byte	8		; System font X size
 	.byte	8		; System font Y size
-	.res	4, $00		; Reserved for future extensions
+	.word   $100		; Aspect ratio
 
-; Next comes the jump table. Currently all entries must be valid and may point
-; to an RTS for test versions (function not implemented).
+; Next comes the jump table. With the exception of IRQ, all entries must be
+; valid and may point to an RTS for test versions (function not implemented).
 
        	.addr   INSTALL
        	.addr   UNINSTALL
@@ -103,7 +92,6 @@ yres:	.word	48		; Y resolution
        	.addr   GETPIXEL
        	.addr   LINE
        	.addr   BAR
-       	.addr   CIRCLE
        	.addr   TEXTSTYLE
        	.addr   OUTTEXT
         .addr   0               ; IRQ entry is unused
@@ -279,31 +267,6 @@ SETPIXEL:
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
 
-SETPIXELCLIP:
-	lda	Y1+1
-	bmi	:+		; y < 0
-	lda	X1+1
-	bmi	:+		; x < 0
-	lda	X1
-	ldx	X1+1
-	sta	ADDR
-	stx	ADDR+1
-	ldx	#ADDR
-	lda	xres
-	ldy	xres+1
-	jsr	icmp		; ( x < xres ) ...
-	bcs	:+
-	lda	Y1
-	ldx	Y1+1
-	sta	ADDR
-	stx	ADDR+1
-	ldx	#ADDR
-	lda	yres
-	ldy	yres+1
-	jsr	icmp		; ... && ( y < yres )
-	bcc	SETPIXEL
-:	rts
-
 ; GETPIXEL: Read the color value of a pixel and return it in A/X. The
 ; coordinates passed to this function are never outside the visible screen
 ; area, so there is no need for clipping inside this function.
@@ -431,7 +394,7 @@ for:	lda	COUNT		; count > 0
 	rts
 
 	;    setpixel (X1, Y1)
-:	jsr	SETPIXELCLIP
+:	jsr	SETPIXEL
 
 	;    pb = err + ny
 	lda	ERR
@@ -553,203 +516,6 @@ BAR:
 	bne	:-
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
-
-; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the
-; radius in tmp1 and the current drawing color.
-; Must set an error code: NO
-CIRCLE:
-	lda	RADIUS
-	bne	:+
-	jmp	SETPIXELCLIP	; Plot as a point
-:	sta	XX
-
-	; x = r
-	lda	#$00
-	sta	XX+1
-	sta	YY
-	sta	YY+1
-	sta	MaxO
-	sta	MaxO+1
-
-	; y = 0, mo = 0
-	lda	X1
-	ldx	X1+1
-	sta	XS
-	stx	XS+1
-	lda	Y1
-	ldx	Y1+1
-	sta	YS
-	stx	YS+1		; XS/YS to remember the center
-
-	; while (y < x) {
-while:	ldx	#YY
-	lda	XX
-	ldy	XX+1
-	jsr	icmp
-	bcc	:+
-	rts
-
-	; Plot points in 8 slices...
-:	lda	XS
-	add	XX
-	sta	X1
-	lda	XS+1
-	adc	XX+1
-	sta	X1+1		; x1 = xs + x
-	lda	YS
-	add	YY
-	sta	Y1
-	pha
-	lda	YS+1
-	adc	YY+1
-	sta	Y1+1		; (stack) = ys + y, y1 = (stack)
-	pha
-	jsr	SETPIXELCLIP	; plot (xs + x, ys + y)
-	lda	YS
-	sub	YY
-	sta	Y1
-	sta	Y3
-	lda	YS+1
-	sbc	YY+1
-	sta	Y1+1		; y3 = y1 = ys - y
-	sta	Y3+1
-	jsr	SETPIXELCLIP	; plot (xs + x, ys - y)
-	pla
-	sta	Y1+1
-	pla
-	sta	Y1		; y1 = ys + y
-	lda	XS
-	sub	XX
-	sta	X1
-	lda	XS+1
-	sbc	XX+1
-	sta	X1+1
-	jsr	SETPIXELCLIP	; plot (xs - x, ys + y)
-	lda	Y3
-	sta	Y1
-	lda	Y3+1
-	sta	Y1+1
-	jsr	SETPIXELCLIP	; plot (xs - x, ys - y)
-
-	lda	XS
-	add	YY
-	sta	X1
-	lda	XS+1
-	adc	YY+1
-	sta	X1+1		; x1 = xs + y
-	lda	YS
-	add	XX
-	sta	Y1
-	pha
-	lda	YS+1
-	adc	XX+1
-	sta	Y1+1		; (stack) = ys + x, y1 = (stack)
-	pha
-	jsr	SETPIXELCLIP	; plot (xs + y, ys + x)
-	lda	YS
-	sub	XX
-	sta	Y1
-	sta	Y3
-	lda	YS+1
-	sbc	XX+1
-	sta	Y1+1		; y3 = y1 = ys - x
-	sta	Y3+1
-	jsr	SETPIXELCLIP	; plot (xs + y, ys - x)
-	pla
-	sta	Y1+1
-	pla
-	sta	Y1		; y1 = ys + x(stack)
-	lda	XS
-	sub	YY
-	sta	X1
-	lda	XS+1
-	sbc	YY+1
-	sta	X1+1
-	jsr	SETPIXELCLIP	; plot (xs - y, ys + x)
-	lda	Y3
-	sta	Y1
-	lda	Y3+1
-	sta	Y1+1
-	jsr	SETPIXELCLIP	; plot (xs - y, ys - x)
-
-	;    og = mo + y + y + 1
-	lda	MaxO
-	ldx	MaxO+1
-	add	YY
-	tay
-	txa
-	adc	YY+1
-	tax
-	tya
-	add	YY
-	tay
-	txa
-	adc	YY+1
-	tax
-	tya
-	add	#$01
-	bcc	:+
-	inx
-:	sta	OGora
-	stx	OGora+1
-
-	;    ou = og - x - x + 1
-	sub	XX
-	tay
-	txa
-	sbc	XX+1
-	tax
-	tya
-	sub	XX
-	tay
-	txa
-	sbc	XX+1
-	tax
-	tya
-	add	#$01
-	bcc	:+
-	inx
-:	sta	OUkos
-	stx	OUkos+1
-
-	;    ++y
-	inc	YY
-	bne	:+
-	inc	YY+1
-
-	;    if (abs (ou) < abs (og)) {
-:	lda	OUkos
-	ldy	OUkos+1
-	jsr	abs
-	sta	TEMP3
-	sty	TEMP4
-	lda	OGora
-	ldy	OGora+1
-	jsr	abs
-	ldx	#TEMP3
-	jsr	icmp
-	bpl	:++
-
-	;       --x
-	lda	XX
-	sub	#$01
-	sta	XX
-	bcs	:+
-	dec	XX+1
-
-	;       mo = ou }
-:	lda	OUkos
-	ldx	OUkos+1
-	jmp	:++
-
-	;    else mo = og
-:	lda	OGora
-	ldx	OGora+1
-:	sta	MaxO
-	stx	MaxO+1
-
-	; }
-	jmp	while
 
 ; Copies of some runtime routines
 

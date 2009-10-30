@@ -1,6 +1,9 @@
 ;
 ; Fixed point cosine/sine functions.
 ;
+; int __fastcall__ cc65_sin (unsigned x);
+; int __fastcall__ cc65_cos (unsigned x);
+;
 ; Returns the cosine/sine for the given argument as angular degree.
 ; Valid argument range is 0..360 for both functions. They will return
 ; garbage if the argument is not in a valid range. Result is in 8.8 fixed

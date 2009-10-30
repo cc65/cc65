@@ -44,12 +44,12 @@
 
 
 
-extern unsigned __fastcall__ cc65_sin (unsigned x);
+extern int __fastcall__ cc65_sin (unsigned x);
 /* Return the sine of the argument, which must be in range 0..360. The result
  * is in 8.8 fixed point format, which means that 1.0 = $100 and -1.0 = $FF00.
  */
 
-extern unsigned __fastcall__ cc65_cos (unsigned x);
+extern int __fastcall__ cc65_cos (unsigned x);
 /* Return the cosine of the argument, which must be in range 0..360. The result
  * is in 8.8 fixed point format, which means that 1.0 = $100 and -1.0 = $FF00.
  */

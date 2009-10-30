@@ -190,9 +190,11 @@ void __fastcall__ tgi_circle (int x, int y, unsigned char radius);
 void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
 /* Draw a bar (a filled rectangle) using the current color. */
 
-void __fastcall__ tgi_textstyle (unsigned char magx, unsigned char magy,
+void __fastcall__ tgi_textstyle (unsigned magwidth, unsigned magheight,
                                  unsigned char dir);
-/* Set the style for text output. */
+/* Set the style for text output. The scaling factors for width and height
+ * are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
+ */
 
 unsigned __fastcall__ tgi_textwidth (const char* s);
 /* Calculate the width of the text in pixels according to the current text

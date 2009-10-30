@@ -23,17 +23,26 @@ _tgi_curx:          .res    2           ; Current drawing cursor X
 _tgi_cury:          .res    2           ; Current drawing cursor Y
 _tgi_color:         .res    1           ; Current drawing color
 _tgi_textdir:       .res    1           ; Current text direction
-_tgi_textmagx:      .res    1           ; Text magnification in X dir
-_tgi_textmagy:      .res    1           ; Text magnification in Y dir
+; The following two store an 8.8 fixed point value in the first two bytes,
+; and a rounded integer value in the third byte. The latter is passed to the
+; driver to scale the bitmap font. The variables are expected to be in 
+; this order and adjacent.
+_tgi_textmagw:      .res    3           ; Text magnification for the width
+_tgi_textmagh:      .res    3           ; Text magnification for the height
+                          
+; The following two must also be in exactly this order
+_tgi_charheight:    .res    1           ; Char height of system font
+_tgi_charwidth:     .res    1           ; Char width of system font
 
 ; The following variables are copied from the driver header for faster access
+; fontwidth and fontheight are expected to be in order and adjacent.
 tgi_driver_vars:
 _tgi_xres:          .res    2           ; X resolution of the current mode
 _tgi_yres:          .res    2           ; Y resolution of the current mode
 _tgi_colorcount:    .res    1           ; Number of available colors
 _tgi_pagecount:     .res    1           ; Number of available screen pages
-_tgi_fontsizex:     .res    1           ; System font X size
-_tgi_fontsizey:     .res    1           ; System font Y size
+_tgi_fontwidth:     .res    1           ; System font width in pixels
+_tgi_fontheight:    .res    1           ; System font height in pixels
 _tgi_aspectratio:   .res    2           ; Aspect ratio in 8.8 fixed point
 
 

@@ -71,7 +71,8 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_setviewpage.o       \
                 tgi_stddrv.o            \
                 tgi_stdmode.o           \
-                tgi_textsize.o          \
+                tgi_textheight.o        \
+                tgi_textwidth.o         \
                 tgi_textstyle.o         \
                 tgi_unload.o
 

@@ -6,10 +6,10 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002-2004 Ullrich von Bassewitz                                       */
-;*               Römerstraße 52                                              */
-;*               D-70794 Filderstadt                                         */
-;* EMail:        uz@cc65.org                                                 */
+;* (C) 2002-2009, Ullrich von Bassewitz                                      */
+;*                Roemerstrasse 52                                           */
+;*                D-70794 Filderstadt                                        */
+;* EMail:         uz@cc65.org                                                */
 ;*                                                                           */
 ;*                                                                           */
 ;* This software is provided 'as-is', without any expressed or implied       */
@@ -44,8 +44,8 @@
             YRES            .word   1   ; Y resolution
             COLORCOUNT      .byte   1   ; Number of available colors
             PAGECOUNT       .byte   1   ; Number of screens available
-            FONTSIZE_X      .byte   1   ; System font size in X direction
-            FONTSIZE_Y      .byte   1   ; System font size in Y direction
+            FONTWIDTH       .byte   1   ; System font width
+            FONTHEIGHT      .byte   1   ; System font height
             ASPECTRATIO     .word   1   ; Fixed point 8.8 format
         .endstruct
         JUMPTAB             .struct
@@ -93,14 +93,16 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_cury               ; Current drawing cursor Y
         .global _tgi_color              ; Current drawing color
         .global _tgi_textdir            ; Current text direction
-        .global _tgi_textmagx           ; Text magnification in X dir
-        .global _tgi_textmagy           ; Text magnification in Y dir
+        .global _tgi_textmagw           ; Text magnification for the width
+        .global _tgi_textmagh           ; Text magnification for the height
+        .global _tgi_charwidth          ; Width of scaled system font char
+        .global _tgi_charheight         ; Height of scaled system font char
         .global _tgi_xres               ; X resolution of the current mode
         .global _tgi_yres               ; Y resolution of the current mode
         .global _tgi_colorcount         ; Number of available colors
         .global _tgi_pagecount          ; Number of available screen pages
-        .global _tgi_fontsizex          ; System font X size
-        .global _tgi_fontsizey          ; System font Y size
+        .global _tgi_fontwidth          ; System font width
+        .global _tgi_fontheight         ; System font height
         .global _tgi_aspectratio        ; Aspect ratio, fixed point 8.8
 
 ;------------------------------------------------------------------------------

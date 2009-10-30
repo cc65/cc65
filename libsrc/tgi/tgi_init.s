@@ -8,6 +8,7 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
+        .import         pushax
         .importzp       ptr1
 
 .proc   _tgi_init
@@ -45,13 +46,11 @@
 
 ; Set the text style
 
-        lda     #TGI_TEXT_HORIZONTAL
-        sta     _tgi_textdir
-        ldx     #1
-        stx     _tgi_textmagx
-        ldy     #1
-        sty     _tgi_textmagy
-        jsr     tgi_textstyle           ; Tell the driver about the text style
+        lda     #<$100
+        ldx     #>$100
+        jsr     pushax                  ; Width scale
+        jsr     pushax                  ; Heigh scale
+        jsr     _tgi_textstyle          ; A = Direction = TEXT_VERTICAL
 
 ; Clear the screen
 

@@ -831,7 +831,7 @@ unsigned OptJumpTarget3 (CodeSeg* S)
                  * eventually remove a reference in the loop, we must loop
                  * from end down to start.
                  */
-                for (K = CL_GetRefCount (L) - 1; K >= 0; ++K) {
+                for (K = CL_GetRefCount (L) - 1; K >= 0; --K) {
 
                     /* Get the entry that jumps here */
                     CodeEntry* Jump = CL_GetRef (L, K);

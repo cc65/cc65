@@ -41,6 +41,7 @@
 /* common */
 #include "cmdline.h"
 #include "print.h"
+#include "strbuf.h"
 #include "xmalloc.h"
 #include "version.h"
 
@@ -125,32 +126,31 @@
  *
  * Header portion:
  *      .byte   $54, $43, $48, $00              ; "TCH" version
- *      .word   <size of following data>
+ *      .word   <size of char definitions>
  * Data portion:
- *      .byte   <number of chars in font>       ; Value from $81
- *      .byte   <ascii value of first char>     ; Value from $84
  *      .byte   <top>                           ; Value from $88
  *      .byte   <baseline>                      ; Value from $89
  *      .byte   <bottom>                        ; Negative value from $8A
- *      .word   <char definition offsets>, ...  ; Relative to data portion
+ *      .byte   <width>, ...                    ; $5F width bytes
+ *      .word   <char definition offset>, ...   ; $5F char def offsets
  * Character definitions:
- *      .byte   <width>
- *      .word   <converted opcode>, ...         
+ *      .word   <converted opcode>, ...
  *      .byte   $80
  *
- * The opcodes get converted for easier handling: END is marked by bit 7 
+ * The opcodes get converted for easier handling: END is marked by bit 7
  * set in the first byte. The second byte of this opcode is not needed.
  * Bit 7 of the second byte marks a MOVE (bit 7 = 0) or DRAW (bit 7 = 1).
  *
- * The parsing code does not expect the file to contain more than $7D
- * characters (most will contain $5E or similar), therefore the character
- * definition offset will be accessed using the pointer to the data portion
- * plus an offset in an 8 bit index register.
+ * The number of characters is fixed to $20..$7E (space to tilde), so character
+ * widths and offsets can be stored in fixed size preallocated tables. The
+ * space for the character definitions is allocated on the heap, it's size
+ * is stored in the header.
  *
  * Above structure allows a program to read the header portion of the file,
- * validate it, allocate memory for the data portion and read the data portion
- * in one chunk into memory. The character definition offsets will then be
- * converted into pointers by adding the data portion pointer to each.
+ * validate it, read the width and offset tables into static storage, allocate
+ * memory for the character definitions read them into memory in one chunk.
+ * The character definition offsets will then be converted into pointers by
+ * adding the character definition base pointer to each.
  */
 
 
@@ -208,7 +208,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+		   	const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr,
@@ -218,21 +218,88 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
-static void ConvertFile (const char* Name)
+static void ConvertChar (StrBuf* Data, const unsigned char* Buf)
+/* Convert data for one character. Original data is in Buf, converted data
+ * will be placed in Data.
+ */
+{
+    /* We should check here for reading past the end of the buffer in case the
+     * input data is not sane.
+     */
+    while (1) {
+
+        /* Get the next op word */
+        unsigned Op = (Buf[0] + (Buf[1] << 8)) & 0x8080;
+
+        /* Check the opcode */
+        switch (Op) {
+
+            case 0x0000:
+                /* End */
+                SB_AppendChar (Data, 0x80);
+                return;
+
+            case 0x0080:
+                /* Move */
+                SB_AppendChar (Data, Buf[0] & 0x7F);
+                SB_AppendChar (Data, Buf[1] & 0x7F);
+                break;
+
+            case 0x8000:
+                /* Invalid opcode */
+                Error ("Input file contains invalid opcode 0x8000");
+                break;
+
+            case 0x8080:
+                /* Draw */
+                SB_AppendChar (Data, Buf[0] & 0x7F);
+                SB_AppendChar (Data, Buf[1] | 0x80);
+                break;
+        }
+
+        /* Next Op */
+        Buf += 2;
+    }
+}
+
+
+
+static void ConvertFile (const char* Input, const char* Output)
 /* Convert one vector font file */
 {
+    /* The header of a BGI vector font file */
     static const unsigned char ChrHeader[] = {
         0x50, 0x4B, 0x08, 0x08, 0x42, 0x47, 0x49, 0x20
+    };
+
+    /* The header of a TGI vector font file */
+    unsigned char TchHeader[] = {
+        0x54, 0x43, 0x48, 0x00,         /* "TCH" version */
+        0x00, 0x00,                     /* size of char definitions */
+        0x00,                           /* Top */
+        0x00,                           /* Baseline */
+        0x00,                           /* Bottom */
     };
 
     long           Size;
     unsigned char* Buf;
     unsigned char* MsgEnd;
+    unsigned       FirstChar;
+    unsigned       CharCount;
+    unsigned       LastChar;
+    unsigned       Char;
+    unsigned       Offs;
+    const unsigned char* OffsetBuf;
+    const unsigned char* WidthBuf;
+    const unsigned char* VectorBuf;
+    StrBuf         Offsets  = AUTO_STRBUF_INITIALIZER;
+    StrBuf         VectorData = AUTO_STRBUF_INITIALIZER;
+
 
     /* Try to open the file for reading */
-    FILE* F = fopen (Name, "rb");
+    FILE* F = fopen (Input, "rb");
     if (F == 0) {
-    	Error ("Cannot open `%s': %s", Name, strerror (errno));
+    	Error ("Cannot open input file `%s': %s", Input, strerror (errno));
     }
 
     /* Seek to the end and determine the size */
@@ -244,9 +311,9 @@ static void ConvertFile (const char* Name)
 
     /* Check if the size is reasonable */
     if (Size > 32*1024) {
-        Error ("File `%s' is too large (max = 32k)", Name);
+        Error ("Input file `%s' is too large (max = 32k)", Input);
     } else if (Size < 0x100) {
-        Error ("File `%s' is too small to be a vector font file", Name);
+        Error ("Input file `%s' is too small to be a vector font file", Input);
     }
 
     /* Allocate memory for the file */
@@ -254,30 +321,104 @@ static void ConvertFile (const char* Name)
 
     /* Read the file contents into the buffer */
     if (fread (Buf, 1, (size_t) Size, F) != (size_t) Size) {
-        Error ("Error reading from `%s'", Name);
+        Error ("Error reading from input file `%s'", Input);
     }
 
     /* Close the file */
-    fclose (F);
+    (void) fclose (F);
 
     /* Verify the header */
     if (memcmp (Buf, ChrHeader, sizeof (ChrHeader)) != 0) {
-        Error ("Invalid format for `%s': invalid header", Name);
+        Error ("Invalid format for `%s': invalid header", Input);
     }
     MsgEnd = memchr (Buf + sizeof (ChrHeader), 0x1A, 0x80);
     if (MsgEnd == 0) {
-        Error ("Invalid format for `%s': description not found", Name);
+        Error ("Invalid format for `%s': description not found", Input);
     }
     if (MsgEnd[1] != 0x80 || MsgEnd[2] != 0x00) {
-        Error ("Invalid format for `%s': wrong header size", Name);
+        Error ("Invalid format for `%s': wrong header size", Input);
+    }
+
+    /* We expect the file to hold chars from 0x20 (space) to 0x7E (tilde) */
+    FirstChar = Buf[0x84];
+    CharCount = Buf[0x81] + (Buf[0x82] << 8);
+    LastChar  = FirstChar + CharCount - 1;
+    if (FirstChar < 0x20 || LastChar < 0x7E) {
+        Error ("File `%s' doesn't contain the chars we need", Input);
+    } else if (LastChar >= 0x100) {
+        Error ("File `%s' contains too many character definitions", Input);
     }
 
     /* Print the copyright from the header */
     Print (stderr, 1, "%.*s\n", (int) (MsgEnd - Buf - 4), Buf+4);
 
-    /* Convert the buffer into a strokefont structure */
+    /* Get pointers to the width table, the offset table and the vector data
+     * table. The first two corrected for 0x20 as first entry.
+     */
+    OffsetBuf = Buf + 0x90 + ((0x20 - FirstChar) * 2);
+    WidthBuf  = Buf + 0x90 + (CharCount * 2) + (0x20 - FirstChar);
+    VectorBuf = Buf + 0x90 + (CharCount * 3);
 
+    /* Convert the characters */
+    for (Char = 0x20; Char <= 0x7E; ++Char, OffsetBuf += 2) {
 
+        /* Add the offset to the offset table */
+        Offs = SB_GetLen (&VectorData);
+        SB_AppendChar (&Offsets, Offs & 0xFF);
+        SB_AppendChar (&Offsets, (Offs >> 8) & 0xFF);
+
+        /* Get the offset of the vector data in the BGI data buffer */
+        Offs = OffsetBuf[0] + (OffsetBuf[1] << 8);
+
+        /* Check if the offset is valid */
+        if (Offs + (VectorBuf - Buf) > Size) {
+            Error ("Invalid data offset in input file `%s'", Input);
+        }
+
+        /* Convert the vector data and place it into the buffer */
+        ConvertChar (&VectorData, VectorBuf + Offs);
+    }
+
+    /* Complete the TCH header */
+    Offs = SB_GetLen (&VectorData);
+    TchHeader[4] = Offs & 0xFF;
+    TchHeader[5] = (Offs >> 8) & 0xFF;
+    TchHeader[6] = Buf[0x88];
+    TchHeader[7] = Buf[0x89];
+    TchHeader[8] = (unsigned char) -(signed char)(Buf[0x8A]);
+
+    /* Open the output file */
+    F = fopen (Output, "wb");
+    if (F == 0) {
+       	Error ("Cannot open output file `%s': %s", Output, strerror (errno));
+    }
+
+    /* Write the header to the output file */
+    if (fwrite (TchHeader, 1, sizeof (TchHeader), F) != sizeof (TchHeader)) {
+        Error ("Error writing to `%s' (disk full?)", Output);
+    }
+
+    /* Write the width table to the output file */
+    if (fwrite (WidthBuf, 1, 0x5F, F) != 0x5F) {
+        Error ("Error writing to `%s' (disk full?)", Output);
+    }
+
+    /* Write the offsets to the output file */
+    if (fwrite (SB_GetConstBuf (&Offsets), 1, 0x5F * 2, F) != 0x5F * 2) {
+        Error ("Error writing to `%s' (disk full?)", Output);
+    }
+
+    /* Write the data to the output file */
+    if (fwrite (SB_GetConstBuf (&VectorData), 1, Offs, F) != Offs) {
+        Error ("Error writing to `%s' (disk full?)", Output);
+    }
+
+    /* Close the output file */
+    if (fclose (F) != 0) {
+        Error ("Error closing to `%s': %s", Output, strerror (errno));
+    }
+
+    /* Done */
 }
 
 
@@ -287,7 +428,7 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-	{ "--help",    		0,	OptHelp			},
+	{ "--help",    	 	0,	OptHelp			},
        	{ "--verbose", 	       	0,	OptVerbose     	       	},
 	{ "--version", 	       	0,	OptVersion		},
     };
@@ -327,7 +468,7 @@ int main (int argc, char* argv [])
      	    }
        	} else {
     	    /* Filename. Dump it. */
-	    ConvertFile (Arg);
+	    ConvertFile (Arg, "out.tch"); 
 	    ++FilesProcessed;
      	}
 

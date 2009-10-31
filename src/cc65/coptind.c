@@ -801,11 +801,7 @@ unsigned OptJumpTarget3 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-        unsigned J, K;
         CodeEntry* N;
-
-        /* New jump label */
-        CodeLabel* LN = 0;
 
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
@@ -819,12 +815,23 @@ unsigned OptJumpTarget3 (CodeSeg* S)
             (N = CS_GetNextEntry (S, I)) != 0   &&
             !CE_UseLoadFlags (N)) {
 
+            unsigned J;
+            int      K;
+
+            /* New jump label */
+            CodeLabel* LN = 0;
+
             /* Walk over all insn that jump here */
             for (J = 0; J < CE_GetLabelCount (E); ++J) {
 
                 /* Get the label */
                 CodeLabel* L = CE_GetLabel (E, J);
-                for (K = 0; K < CL_GetRefCount (L); ++K) {
+
+                /* Loop over all insn that reference this label. Since we may
+                 * eventually remove a reference in the loop, we must loop
+                 * from end down to start.
+                 */
+                for (K = CL_GetRefCount (L) - 1; K >= 0; ++K) {
 
                     /* Get the entry that jumps here */
                     CodeEntry* Jump = CL_GetRef (L, K);
@@ -832,10 +839,12 @@ unsigned OptJumpTarget3 (CodeSeg* S)
                     /* Get the register info from this insn */
                     short Val = RegVal (E->Chg, &Jump->RI->Out2);
 
-                    /* Check if the outgoing value is the one thatr's loaded */
+                    /* Check if the outgoing value is the one thats's loaded */
                     if (Val == (unsigned char) E->Num) {
 
-                        /* Ok, skip the insn. First, generate a label */
+                        /* Ok, skip the insn. First, generate a label for the
+                         * next insn after E.
+                         */
                         if (LN == 0) {
                             LN = CS_GenLabel (S, N);
                         }

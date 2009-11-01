@@ -6,10 +6,10 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002-2004 Ullrich von Bassewitz                                       */
-;*               Römerstraße 52                                              */
-;*               D-70794 Filderstadt                                         */
-;* EMail:        uz@cc65.org                                                 */
+;* (C) 2002-2009, Ullrich von Bassewitz                                      */
+;*                Roemerstrasse 52                                           */
+;*                D-70794 Filderstadt                                        */
+;* EMail:         uz@cc65.org                                                */
 ;*                                                                           */
 ;*                                                                           */
 ;* This software is provided 'as-is', without any expressed or implied       */
@@ -42,6 +42,7 @@
         TGI_ERR_INV_MODE        ; Mode not supported by driver
         TGI_ERR_INV_ARG         ; Invalid function argument
         TGI_ERR_INV_FUNC       	; Function not supported
+        TGI_ERR_INV_FONT        ; Font file is invalid
 
         TGI_ERR_COUNT           ; Special: Number of error messages
 .endenum

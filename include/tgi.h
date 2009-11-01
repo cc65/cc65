@@ -118,16 +118,17 @@ void __fastcall__ tgi_done (void);
 const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name);
 /* Load a vector font into memory and return it. In case of errors, NULL is
  * returned and an error is set, which can be retrieved using tgi_geterror.
+ * To use the font, it has to be installed using tgi_install_vectorfont.
  */
 
-void __fastcall__ tgi_register_vectorfont (const tgi_vectorfont* font);
-/* Register a vector font for use. More than one vector font can be loaded,
+void __fastcall__ tgi_install_vectorfont (const tgi_vectorfont* font);
+/* Install a vector font for use. More than one vector font can be loaded,
  * but only one can be active. This function is used to tell which one. Call
- * with a NULL pointer to unregister the currently registered font.
+ * with a NULL pointer to uninstall the currently installed font.
  */
 
 void tgi_free_vectorfont (const tgi_vectorfont* font);
-/* Free a vector font that was previously loaded. */
+/* Free a vector font that was previously loaded into memory. */
 
 unsigned char __fastcall__ tgi_geterror (void);
 /* Return the error code for the last operation. This will also clear the

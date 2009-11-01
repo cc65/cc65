@@ -76,7 +76,7 @@ Enabling the Language Card allows to use it as additional memory for cc65
 generated code. However code is never automatically placed there. Rather code
 needs to be explicitly placed in the Language Card either per file by compiling
 with <tt/--code-name HIGHCODE/ or per function by enclosing in <tt/#pragma
-codeseg (push, "HIGHCODE")/ and <tt/#pragma codeseg (pop)/. In either case the
+code-name (push, "HIGHCODE")/ and <tt/#pragma code-name (pop)/. In either case the
 cc65 runtime system takes care of actually moving the code into the Language
 Card.
 

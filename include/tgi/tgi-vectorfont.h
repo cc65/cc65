@@ -51,6 +51,7 @@
 #define TGI_VF_VERSION          0x00            /* File version number */
 
 /* TCH file header */
+typedef struct tgi_vectorfont_header tgi_vectorfont_header;
 struct tgi_vectorfont_header {
     unsigned char       magic[3];               /* "TCH" */
     unsigned char       version;                /* Version number */

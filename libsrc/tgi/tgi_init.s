@@ -37,12 +37,10 @@
         jsr     tgi_setpalette          ; Set the default palette.
         jsr     tgi_geterror            ; Clear a possible error code
 
-; Set the drawing color to the maximum color
+; Set the drawing color to white
 
-@L1:    ldx     _tgi_colorcount
-        dex
-        txa
-        jsr     _tgi_setcolor           ; tgi_setcolor (tgi_getmaxcolor ());
+@L1:    lda     TGI_COLOR_WHITE
+        jsr     _tgi_setcolor           ; tgi_setcolor (TGI_COLOR_WHITE);
 
 ; Set the text style
 

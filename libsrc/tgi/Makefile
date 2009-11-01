@@ -39,6 +39,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_clipline.o          \
                 tgi_curtoxy.o           \
                 tgi_done.o              \
+                tgi_free_vectorfont.o   \
                 tgi_getcolor.o          \
                 tgi_getcolorcount.o     \
                 tgi_getdefpalette.o     \

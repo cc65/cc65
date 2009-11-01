@@ -7,5 +7,6 @@
 ; This function is identical to free(void*)
 ;
 
-        .export _tgi_free_vectorfont := free
+        .import _free
+        .export _tgi_free_vectorfont := _free
 

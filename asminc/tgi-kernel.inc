@@ -78,7 +78,13 @@
 TGI_API_VERSION         = $03
 
 ;------------------------------------------------------------------------------
-; Text style constants
+; Color and text constants
+                           
+TGI_COLOR_BLACK         = 0
+TGI_COLOR_WHITE         = 1
+
+TGI_FONT_BITMAP         = 0
+TGI_FONT_VECTOR         = 1
 
 TGI_TEXT_HORIZONTAL     = 0
 TGI_TEXT_VERTICAL       = 1

@@ -25,14 +25,14 @@ _tgi_color:         .res    1           ; Current drawing color
 _tgi_textdir:       .res    1           ; Current text direction
 ; The following two store an 8.8 fixed point value in the first two bytes,
 ; and a rounded integer value in the third byte. The latter is passed to the
-; driver to scale the bitmap font. The variables are expected to be in 
+; driver to scale the bitmap font. The variables are expected to be in
 ; this order and adjacent.
 _tgi_textmagw:      .res    3           ; Text magnification for the width
 _tgi_textmagh:      .res    3           ; Text magnification for the height
-                          
+
 ; The following two must also be in exactly this order
-_tgi_charheight:    .res    1           ; Char height of system font
 _tgi_charwidth:     .res    1           ; Char width of system font
+_tgi_charheight:    .res    1           ; Char height of system font
 
 ; The following variables are copied from the driver header for faster access
 ; fontwidth and fontheight are expected to be in order and adjacent.

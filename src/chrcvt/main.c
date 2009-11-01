@@ -40,6 +40,7 @@
 
 /* common */
 #include "cmdline.h"
+#include "fname.h"
 #include "print.h"
 #include "strbuf.h"
 #include "xmalloc.h"
@@ -126,7 +127,7 @@
  *
  * Header portion:
  *      .byte   $54, $43, $48, $00              ; "TCH" version
- *      .word   <size of char definitions>
+ *      .word   <size of data portion>
  * Data portion:
  *      .byte   <top>                           ; Value from $88
  *      .byte   <baseline>                      ; Value from $89
@@ -147,8 +148,7 @@
  * is stored in the header.
  *
  * Above structure allows a program to read the header portion of the file,
- * validate it, read the width and offset tables into static storage, allocate
- * memory for the character definitions read them into memory in one chunk.
+ * validate it, then read the remainder of the file into memory in one chunk.
  * The character definition offsets will then be converted into pointers by
  * adding the character definition base pointer to each.
  */
@@ -178,10 +178,12 @@ static void Usage (void)
     	     "Usage: %s [options] file [options] [file]\n"
     	     "Short options:\n"
        	     "  -h\t\t\tHelp (this text)\n"
+             "  -v\t\t\tBe more verbose\n"
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
 	     "  --help\t\tHelp (this text)\n"
+             "  --verbose\t\tBe more verbose\n"
        	     "  --version\t\tPrint the version number and exit\n",
     	     ProgName);
 }
@@ -343,7 +345,9 @@ static void ConvertFile (const char* Input, const char* Output)
     FirstChar = Buf[0x84];
     CharCount = Buf[0x81] + (Buf[0x82] << 8);
     LastChar  = FirstChar + CharCount - 1;
-    if (FirstChar < 0x20 || LastChar < 0x7E) {
+    if (FirstChar > 0x20 || LastChar < 0x7E) {
+        Print (stderr, 1, "FirstChar = $%04X, CharCount = %u\n",
+               FirstChar, CharCount);
         Error ("File `%s' doesn't contain the chars we need", Input);
     } else if (LastChar >= 0x100) {
         Error ("File `%s' contains too many character definitions", Input);
@@ -380,12 +384,19 @@ static void ConvertFile (const char* Input, const char* Output)
     }
 
     /* Complete the TCH header */
-    Offs = SB_GetLen (&VectorData);
+    Offs = 3 + 0x5F + 2*0x5F + SB_GetLen (&VectorData);
     TchHeader[4] = Offs & 0xFF;
     TchHeader[5] = (Offs >> 8) & 0xFF;
     TchHeader[6] = Buf[0x88];
     TchHeader[7] = Buf[0x89];
     TchHeader[8] = (unsigned char) -(signed char)(Buf[0x8A]);
+
+    /* If the output file is NULL, use the name of the input file with ".tch"
+     * appended.
+     */
+    if (Output == 0) {
+        Output = MakeFilename (Input, ".tch");
+    }
 
     /* Open the output file */
     F = fopen (Output, "wb");
@@ -409,6 +420,7 @@ static void ConvertFile (const char* Input, const char* Output)
     }
 
     /* Write the data to the output file */
+    Offs = SB_GetLen (&VectorData);
     if (fwrite (SB_GetConstBuf (&VectorData), 1, Offs, F) != Offs) {
         Error ("Error writing to `%s' (disk full?)", Output);
     }
@@ -457,6 +469,10 @@ int main (int argc, char* argv [])
 	 	    OptHelp (Arg, 0);
 	 	    break;
 
+	 	case 'v':
+	 	    OptVerbose (Arg, 0);
+	 	    break;
+
        	        case 'V':
     		    OptVersion (Arg, 0);
        		    break;
@@ -468,7 +484,7 @@ int main (int argc, char* argv [])
      	    }
        	} else {
     	    /* Filename. Dump it. */
-	    ConvertFile (Arg, "out.tch"); 
+	    ConvertFile (Arg, 0);
 	    ++FilesProcessed;
      	}
 

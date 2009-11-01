@@ -53,7 +53,15 @@
 
 
 
-/* Constants used for tgi_textstyle */
+/* Color constants */
+#define TGI_COLOR_BLACK         0
+#define TGI_COLOR_WHITE         1
+
+/* Font constants for use with tgi_textstyle */
+#define TGI_FONT_BITMAP         0
+#define TGI_FONT_VECTOR         1
+
+/* Direction constants for use with tgi_textstyle */
 #define TGI_TEXT_HORIZONTAL     0
 #define TGI_TEXT_VERTICAL       1
 
@@ -62,6 +70,9 @@ extern const char tgi_stddrv[];
 
 /* The default tgi mode for a platform */
 extern const unsigned char tgi_stdmode;
+
+/* A vector font definition */
+typedef struct tgi_vectorfont tgi_vectorfont;
 
 
 
@@ -103,6 +114,20 @@ void __fastcall__ tgi_done (void);
 /* End graphics mode, switch back to text mode. Will NOT uninstall or unload
  * the driver!
  */
+
+const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name);
+/* Load a vector font into memory and return it. In case of errors, NULL is
+ * returned and an error is set, which can be retrieved using tgi_geterror.
+ */
+
+void __fastcall__ tgi_register_vectorfont (const tgi_vectorfont* font);
+/* Register a vector font for use. More than one vector font can be loaded,
+ * but only one can be active. This function is used to tell which one. Call
+ * with a NULL pointer to unregister the currently registered font.
+ */
+
+void tgi_free_vectorfont (const tgi_vectorfont* font);
+/* Free a vector font that was previously loaded. */
 
 unsigned char __fastcall__ tgi_geterror (void);
 /* Return the error code for the last operation. This will also clear the

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -76,6 +76,11 @@ int __fastcall__ isblank (int c);      	/* New in C99 */
 
 int __fastcall__ toupper (int c); 	/* Always external */
 int __fastcall__ tolower (int c); 	/* Always external */
+
+#if __CC65_STD__ >= __CC65_STD_CC65__
+unsigned char __fastcall__ toascii (unsigned char c);
+/* Convert a target specific character to ascii */
+#endif
 
 
 

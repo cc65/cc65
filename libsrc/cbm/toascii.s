@@ -11,6 +11,10 @@
 
 .proc   _toascii
 
+; X must be zero on return
+
+        ldx     #0
+
 ; Check for code between 65 and 90
 
         cmp     #$41

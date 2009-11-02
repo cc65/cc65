@@ -12,8 +12,6 @@
 	.include	"tgi-error.inc"
 	.include	"apple2.inc"
 
-	.macpack	generic
-
 ; ------------------------------------------------------------------------
 
 ; Zero page stuff
@@ -284,8 +282,9 @@ GETPIXEL:
 ; Must set an error code: NO
 LINE:
 	; nx = abs (x2 - x1)
+	sec
 	lda	X2
-	sub	X1
+	sbc	X1
 	sta	NX
 	lda	X2+1
 	sbc	X1+1
@@ -296,8 +295,9 @@ LINE:
 	sty	NX+1
 
 	; ny = abs (y2 - y1)
+	sec
 	lda	Y2
-	sub	Y1
+	sbc	Y1
 	sta	NY
 	lda	Y2+1
 	sbc	Y1+1
@@ -397,8 +397,9 @@ for:	lda	COUNT		; count > 0
 :	jsr	SETPIXEL
 
 	;    pb = err + ny
+	clc
 	lda	ERR
-	add	NY
+	adc	NY
 	sta	PB
 	lda	ERR+1
 	adc	NY+1
@@ -406,8 +407,9 @@ for:	lda	COUNT		; count > 0
 	tax
 
 	;    ub = pb + nx
+	clc
 	lda	PB
-	add	NX
+	adc	NX
 	sta	UB
 	txa
 	adc	NX+1
@@ -418,7 +420,8 @@ for:	lda	COUNT		; count > 0
 	lda	DX
 	bpl	:+
 	dex
-:	add	X1
+:	clc
+	adc	X1
 	sta	X1
 	txa
 	adc	X1+1
@@ -429,7 +432,8 @@ for:	lda	COUNT		; count > 0
 	lda	AY
 	bpl	:+
 	dex
-:	add	Y1
+:	clc
+	adc	Y1
 	sta	Y1
 	txa
 	adc	Y1+1
@@ -458,7 +462,8 @@ for:	lda	COUNT		; count > 0
 	lda	AX
 	bpl	:+
 	dex
-:	add	X1
+:	clc
+	adc	X1
 	sta	X1
 	txa
 	adc	X1+1
@@ -469,7 +474,8 @@ for:	lda	COUNT		; count > 0
 	lda	DY
 	bpl	:+
 	dex
-:	add	Y1
+:	clc
+	adc	Y1
 	sta	Y1
 	txa
 	adc	Y1+1
@@ -483,7 +489,8 @@ next:	sta	ERR
 
 	; } (--count)
 	lda	COUNT
-	sub	#$01
+	sec
+	sbc	#$01
 	sta	COUNT
 	bcc	:+
 	jmp	for
@@ -548,7 +555,8 @@ icmp:
 	tax
 	tya			; X/A - arg1 (a = high)
 
-	sub	TEMP2
+	sec
+	sbc	TEMP2
 	bne	:++
 	cpx	TEMP
 	beq	:+

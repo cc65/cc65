@@ -10,10 +10,6 @@
 	.include	"em-kernel.inc"
 	.include	"em-error.inc"
 
-
-	.macpack	generic
-
-
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
@@ -98,7 +94,8 @@ PAGECOUNT:
 
 MAP:	sta	curpage			; Remember the new page
 
-	add	#>BASE
+	clc
+	adc	#>BASE
 	sta	ptr1+1
 	ldy	#$00
 	sty	ptr1
@@ -137,7 +134,8 @@ COMMIT: lda	curpage			; Get the current page
 	cmp	#$FF
 	beq	done			; Jump if no page mapped
 
-	add	#>BASE
+	clc
+	adc	#>BASE
 	sta	ptr2+1
 	ldy	#$00
 	sty	ptr2
@@ -156,9 +154,10 @@ COMMIT: lda	curpage			; Get the current page
 
 transfer:
 	php
+	clc
 	lda	ptr1
 	sta	$3C
-	add	ptr4
+	adc	ptr4
 	sta	$3E
 	lda	ptr1+1
 	sta	$3D
@@ -186,7 +185,8 @@ COPYFROM:
 	sta	ptr1
 	ldy	#EM_COPY::PAGE
 	lda	(ptr3),y
-	add	#>BASE
+	clc
+	adc	#>BASE
 	sta	ptr1+1			; From
 
 	ldy	#EM_COPY::BUF
@@ -220,7 +220,8 @@ COPYTO: sta	ptr3
 	sta	ptr2
 	ldy	#EM_COPY::PAGE
 	lda	(ptr3),y
-	add	#>BASE
+	clc
+	adc	#>BASE
 	sta	ptr2+1			; To
 
 	ldy	#EM_COPY::BUF

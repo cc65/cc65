@@ -13,8 +13,6 @@
         .include        "joy-error.inc"
         .include        "apple2.inc"
 
-        .macpack        generic
-
 ; ------------------------------------------------------------------------
 
 ; Constants

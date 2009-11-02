@@ -238,7 +238,13 @@ static void ConvertChar (StrBuf* Data, const unsigned char* Buf)
 
             case 0x0000:
                 /* End */
-                SB_AppendChar (Data, 0x80);
+                if (SB_IsEmpty (Data)) {
+                    /* No ops. We need to add an empty one */
+                    SB_AppendChar (Data, 0x00);
+                    SB_AppendChar (Data, 0x00);
+                }
+                /* Add an end marker to the last op in the buffer */
+                SB_GetBuf (Data)[SB_GetLen (Data) - 2] |= 0x80;
                 return;
 
             case 0x0080:

@@ -19,3 +19,27 @@
         .endif
 .endmacro
 
+; bge - jump if unsigned greater or equal
+.macro  bge     Arg
+        bcs     Arg
+.endmacro
+
+; blt - Jump if unsigned less
+.macro  blt     Arg
+        bcc     Arg
+.endmacro
+
+; bgt - jump if unsigned greater
+.macro  bgt     Arg
+        .local  L
+        beq     L
+        bcs     Arg
+L:
+.endmacro
+
+; ble - jump if unsigned less or equal
+.macro  ble     Arg
+        beq     Arg
+        bcc     Arg
+.endmacro
+

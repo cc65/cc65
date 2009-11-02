@@ -79,6 +79,7 @@ S_OBJS =	c_acptr.o	\
                 scratch.o       \
                 sysremove.o     \
                 sysrename.o     \
+                toascii.o       \
 		wherex.o        \
                 wherey.o        \
                 write.o

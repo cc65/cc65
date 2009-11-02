@@ -12,8 +12,6 @@
 	.include	"tgi-error.inc"
 	.include	"apple2.inc"
 
-	.macpack	generic
-
 ; ------------------------------------------------------------------------
 
 ; Zero page stuff
@@ -41,6 +39,7 @@ HPLOT   :=	$F457	; Calls HPOSN and tries to plot a dot at
                         ; trying to plot a non-white color at
                         ; a complementary color position, no
                         ; dot will be plotted.
+LRUD    :=	$F4D1	; ???
 HLIN    :=	$F53A	; Draws a line from the last plotted
                         ; point or line destination to:
                         ; (X,A) = X-coordinate, and
@@ -132,7 +131,9 @@ Set80:	.res	1		; Set 80 column store
 
 DEFPALETTE: .byte $00, $01, $02, $03, $04, $05, $06, $07
 
-SHAPE:	.byte	$64,$01,$D0,$00,$D5,$00,$DA,$00,$E0,$00,$EF,$00,$FE,$00,$0C,$01
+SHAPE:
+	; Beagle Bros Shape Mechanic font F.ASCII.SMALL
+	.byte	$64,$01,$D0,$00,$D5,$00,$DA,$00,$E0,$00,$EF,$00,$FE,$00,$0C,$01
 	.byte	$19,$01,$1D,$01,$25,$01,$2D,$01,$3D,$01,$46,$01,$4B,$01,$52,$01
 	.byte	$56,$01,$60,$01,$70,$01,$77,$01,$83,$01,$8E,$01,$9A,$01,$A7,$01
 	.byte	$B6,$01,$BF,$01,$CE,$01,$DD,$01,$E2,$01,$E7,$01,$F9,$01,$03,$02
@@ -241,6 +242,11 @@ INIT:
 	bit	HIRES
 	bit	MIXCLR
 	bit	TXTCLR
+
+	; Beagle Bros Shape Mechanic fonts don't
+	; scale well so use fixed scaling factor
+	lda	#1
+	sta	SCALE
 
 	; Done, reset the error code
 	lda	#TGI_ERR_OK
@@ -435,12 +441,10 @@ BAR:
 ; direction is passend in X/Y, the text direction is passed in A.
 ; Must set an error code: NO
 TEXTSTYLE:
-	stx	SCALE
-	asl			; 16 <=> 90þ
-	asl
-	asl
-	asl
-	sta	ROT
+	cmp	#TGI_TEXT_VERTICAL
+	bne	:+
+	lda	#48
+:	sta	ROT
 	rts
 
 ; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
@@ -449,42 +453,52 @@ TEXTSTYLE:
 ; Must set an error code: NO
 OUTTEXT:
 	bit	$C082		; Switch in ROM
-	ldx	X1
+	lda	X1
 	ldy	X1+1
+	ldx	ROT
+	php			; Save Z flag
+	beq	:+		; Not horizontal
+	sec
+	sbc	#7		; Adjust X
+	bcs	:+
+	dey
+:	tax
 	lda	Y1
-	jsr	HPOSN
-	lda	SHAPE+2*99
-	add	#<SHAPE
-	sta	tmp3
-	lda	SHAPE+2*99+1
+	plp			; Restore Z flag
+	bne	:+		; Not vertical
+	sec
+	sbc	#7		; Adjust Y
+:	jsr	HPOSN
+	clc
+	lda	SHAPE+2*99	; "connection char"
+	adc	#<SHAPE
+	sta	ptr4
+	lda	SHAPE+2*99+1	; "connection char"
 	adc	#>SHAPE
-	sta	tmp3+1
-
+	sta	ptr4+1
 	ldy	#$00
 :	lda	(ptr3),y
 	beq	:+
-	sub	#$1F		; No controls
+	sty	tmp1		; Save string index
+	sec
+	sbc	#$1F		; No control chars
 	asl			; Offset * 2
-	tax
-	lda	SHAPE,x
-	add	#<SHAPE
-	sta	tmp1
-	lda	SHAPE+1,x
-	adc	#>SHAPE
-	sta	tmp1+1
-	tya
-	pha
-	ldx	tmp1
-	ldy	tmp1+1
-	lda	ROT
-	jsr	DRAW
-	ldx	tmp3
-	ldy	tmp3+1
-	lda	ROT
-	jsr	DRAW
-	pla
 	tay
+	clc
+	lda	SHAPE,y
+	adc	#<SHAPE
+	tax
+	lda	SHAPE+1,y
+	adc	#>SHAPE
+	tay
+	lda	ROT
+	jsr	DRAW		; Draw char from string
+	ldx	ptr4
+	ldy	ptr4+1
+	lda	ROT
+	jsr	DRAW		; Draw "connection char"
+	ldy	tmp1		; Restore string index
 	iny
-	bne	:-
+	bne	:-		; Branch always
 :	bit	$C080		; Switch in LC bank 2 for R/O
 	rts

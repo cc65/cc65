@@ -1,16 +1,11 @@
 ;
-; Ullrich von Bassewitz, 2009-20-30
+; Ullrich von Bassewitz, 2009-10-30
 ;
-; void __fastcall__ tgi_textstyle (unsigned magwidth, unsigned magheight,
-;                                  unsigned char dir);
-; /* Set the style for text output. The scaling factors for width and height
-;  * are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
-;  */
 
 
         .include        "tgi-kernel.inc"
 
-        .import         popax
+        .import         popa, popax
 
 
 ;-----------------------------------------------------------------------------
@@ -32,40 +27,61 @@
 
 .endproc
 
-
 ;-----------------------------------------------------------------------------
+; void __fastcall__ tgi_textstyle (unsigned width, unsigned height,
+;                                  unsigned char dir, unsigned char font);
+; /* Set the style for text output. The scaling factors for width and height
+;  * are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
+;  * dir is one of the TGI_TEXT_XXX constants. font is one of the TGI_FONT_XXX
+;  * constants.
+;  */
 ;
 
 .proc   _tgi_textstyle
 
+        sta     _tgi_font               ; Remember the font to use
+        jsr     popa
         sta     _tgi_textdir            ; Remember the direction
 
-; The magheight value is in 8.8 fixed point. Store it and calculate a rounded
+; Pop the height and run directly into tgi_textscale
+
+        jsr     popax
+
+.endproc
+
+;-----------------------------------------------------------------------------
+; void __fastcall__ tgi_textscale (unsigned width, unsigned height);
+; /* Set the scaling for text output. The scaling factors for width and height
+;  * are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
+;  */
+
+.proc   _tgi_textscale
+
+; The height value is in 8.8 fixed point. Store it and calculate a rounded
 ; value for scaling the bitmapped system font in the driver.
 
-        jsr     popax                   ; magheight
-        sta     _tgi_textmagh+0
-        stx     _tgi_textmagh+1
+        sta     _tgi_textscaleh+0
+        stx     _tgi_textscaleh+1
         asl     a                       ; Check value behind comma
         bcc     @L1
         inx                             ; Round
-@L1:    stx     _tgi_textmagh+2         ; Store rounded value
+@L1:    stx     _tgi_textscaleh+2       ; Store rounded value
 
 ; Calculate the total height of the bitmapped font and remember it.
 
         ldy     #1
         jsr     charsize_helper
 
-; The magwidth value is in 8.8 fixed point. Store it and calculate a rounded
+; The width value is in 8.8 fixed point. Store it and calculate a rounded
 ; value for scaling the bitmapped system font in the driver.
 
-        jsr     popax                   ; magheight
-        sta     _tgi_textmagw+0
-        stx     _tgi_textmagw+1
+        jsr     popax                   ; height
+        sta     _tgi_textscalew+0
+        stx     _tgi_textscalew+1
         asl     a                       ; Check value behind comma
         bcc     @L2
         inx                             ; Round
-@L2:    stx     _tgi_textmagw+2         ; Store rounded value
+@L2:    stx     _tgi_textscalew+2       ; Store rounded value
 
 ; Calculate the total width of the bitmapped font and remember it.
 
@@ -74,10 +90,11 @@
 
 ; Load values and call the driver, parameters are passed in registers
 
-        ldx     _tgi_textmagw+2
-        ldy     _tgi_textmagh+2
+        ldx     _tgi_textscalew+2
+        ldy     _tgi_textscaleh+2
         lda     _tgi_textdir
         jmp     tgi_textstyle
 
 .endproc
+
 

@@ -22,13 +22,14 @@ _tgi_gmode:         .res    1           ; Flag: Graphics mode active
 _tgi_curx:          .res    2           ; Current drawing cursor X
 _tgi_cury:          .res    2           ; Current drawing cursor Y
 _tgi_color:         .res    1           ; Current drawing color
+_tgi_font:          .res    1           ; Which font to use
 _tgi_textdir:       .res    1           ; Current text direction
 ; The following two store an 8.8 fixed point value in the first two bytes,
 ; and a rounded integer value in the third byte. The latter is passed to the
 ; driver to scale the bitmap font. The variables are expected to be in
 ; this order and adjacent.
-_tgi_textmagw:      .res    3           ; Text magnification for the width
-_tgi_textmagh:      .res    3           ; Text magnification for the height
+_tgi_textscalew:    .res    3           ; Text scale for the width
+_tgi_textscaleh:    .res    3           ; Text scale for the height
 
 ; The following two must also be in exactly this order
 _tgi_charwidth:     .res    1           ; Char width of system font

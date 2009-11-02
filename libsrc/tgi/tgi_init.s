@@ -8,7 +8,7 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
-        .import         pushax
+        .import         pushax, pusha
         .importzp       ptr1
 
 .proc   _tgi_init
@@ -48,7 +48,8 @@
         ldx     #>$100
         jsr     pushax                  ; Width scale
         jsr     pushax                  ; Heigh scale
-        jsr     _tgi_textstyle          ; A = Direction = TEXT_VERTICAL
+        jsr     pusha                   ; Text direction = TGI_TEXT_VERTICAL
+        jsr     _tgi_textstyle          ; A = Font = TGI_FONT_BITMAP
 
 ; Clear the screen
 

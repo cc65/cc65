@@ -70,6 +70,19 @@ struct tgi_vectorfont {
 
 
 
+/*****************************************************************************/
+/*		  		     Code                                    */
+/*****************************************************************************/
+
+
+
+void __fastcall__ tgi_vectorchar (const unsigned char* Ops);
+/* Draw one character of the vector font at the current graphics cursor
+ * position using the current font magnification.
+ */
+
+
+
 /* End of tgi-vectorfont.h */
 #endif
 

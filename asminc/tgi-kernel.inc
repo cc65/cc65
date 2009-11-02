@@ -79,7 +79,7 @@ TGI_API_VERSION         = $03
 
 ;------------------------------------------------------------------------------
 ; Color and text constants
-                           
+
 TGI_COLOR_BLACK         = 0
 TGI_COLOR_WHITE         = 1
 
@@ -98,9 +98,10 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_curx               ; Current drawing cursor X
         .global _tgi_cury               ; Current drawing cursor Y
         .global _tgi_color              ; Current drawing color
+        .global _tgi_font               ; Which font to use
         .global _tgi_textdir            ; Current text direction
-        .global _tgi_textmagw           ; Text magnification for the width
-        .global _tgi_textmagh           ; Text magnification for the height
+        .global _tgi_textscalew         ; Text magnification for the width
+        .global _tgi_textscaleh         ; Text magnification for the height
         .global _tgi_charwidth          ; Width of scaled system font char
         .global _tgi_charheight         ; Height of scaled system font char
         .global _tgi_xres               ; X resolution of the current mode
@@ -181,6 +182,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_lineto
         .global _tgi_circle
         .global _tgi_bar
+        .global _tgi_textscale
         .global _tgi_textstyle
         .global _tgi_textwidth
         .global _tgi_textheight

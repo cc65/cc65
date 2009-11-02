@@ -76,7 +76,8 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_textheight.o        \
                 tgi_textwidth.o         \
                 tgi_textstyle.o         \
-                tgi_unload.o
+                tgi_unload.o            \
+                tgi_vectorchar.o
 
 
 #--------------------------------------------------------------------------

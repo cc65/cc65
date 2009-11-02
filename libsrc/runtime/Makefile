@@ -153,6 +153,7 @@ OBJS = 	add.o		\
        	mod.o  		\
        	mul.o  		\
         mul8.o          \
+        mul8x8r16.o     \
 	mulax3.o	\
 	mulax5.o	\
 	mulax6.o	\

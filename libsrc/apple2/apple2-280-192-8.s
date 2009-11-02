@@ -39,7 +39,6 @@ HPLOT   :=	$F457	; Calls HPOSN and tries to plot a dot at
                         ; trying to plot a non-white color at
                         ; a complementary color position, no
                         ; dot will be plotted.
-LRUD    :=	$F4D1	; ???
 HLIN    :=	$F53A	; Draws a line from the last plotted
                         ; point or line destination to:
                         ; (X,A) = X-coordinate, and

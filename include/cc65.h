@@ -44,8 +44,17 @@
 
 
 
-unsigned long __fastcall__ cc65_umul16x16r32 (unsigned rhs, unsigned lhs);
+unsigned __fastcall__ cc65_umul8x8r16 (unsigned char lhs, unsigned char rhs);
+/* Multiplicate two unsigned 8 bit to yield an unsigned 16 bit result */
+
+int __fastcall__ cc65_imul8x8r16 (signed char lhs, signed char rhs);
+/* Multiplicate two signed 8 bit to yield an signed 16 bit result */
+
+unsigned long __fastcall__ cc65_umul16x16r32 (unsigned lhs, unsigned rhs);
 /* Multiplicate two unsigned 16 bit to yield an unsigned 32 bit result */
+
+long __fastcall__ cc65_imul16x16r32 (int lhs, int rhs);
+/* Multiplicate two signed 16 bit to yield a signed 32 bit result */
 
 int __fastcall__ cc65_sin (unsigned x);
 /* Return the sine of the argument, which must be in range 0..360. The result

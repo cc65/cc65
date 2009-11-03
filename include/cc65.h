@@ -44,12 +44,15 @@
 
 
 
-extern int __fastcall__ cc65_sin (unsigned x);
+unsigned long __fastcall__ cc65_umul16x16r32 (unsigned rhs, unsigned lhs);
+/* Multiplicate two unsigned 16 bit to yield an unsigned 32 bit result */
+
+int __fastcall__ cc65_sin (unsigned x);
 /* Return the sine of the argument, which must be in range 0..360. The result
  * is in 8.8 fixed point format, which means that 1.0 = $100 and -1.0 = $FF00.
  */
 
-extern int __fastcall__ cc65_cos (unsigned x);
+int __fastcall__ cc65_cos (unsigned x);
 /* Return the cosine of the argument, which must be in range 0..360. The result
  * is in 8.8 fixed point format, which means that 1.0 = $100 and -1.0 = $FF00.
  */

@@ -4,8 +4,9 @@
 ; CC65 runtime: 16x16 => 32 multiplication
 ;
 
-        .export         umul16x16r32
+        .export         umul16x16r32, _cc65_umul16x16r32
        	.export	       	mul16x16r32 := umul16x16r32
+        .import         popax
     	.importzp   	ptr1, ptr2, ptr3, ptr4, sreg
 
 
@@ -14,12 +15,18 @@
 ;
 ;   lhs         rhs           result          result also in
 ; -------------------------------------------------------------
-;   ptr1        ptr3           ax:sreg          ptr1:sreg
+;   ptr1        ax            ax:sreg          ptr1:sreg
 ;
 
+_cc65_umul16x16r32:
+        sta     ptr1
+        stx     ptr1+1
+        jsr     popax
+
 umul16x16r32:
+        sta     ptr3
+        stx     ptr3+1
        	lda	#0
-       	ldx	ptr3+1	       	; Get high byte into register for speed
        	sta    	sreg+1
        	ldy    	#16   	       	; Number of bits
 

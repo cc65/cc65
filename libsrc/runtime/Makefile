@@ -152,6 +152,7 @@ OBJS = 	add.o		\
        	makebool.o	\
        	mod.o  		\
        	mul.o  		\
+        mul16x16r32.o   \
         mul8.o          \
         mul8x8r16.o     \
 	mulax3.o	\

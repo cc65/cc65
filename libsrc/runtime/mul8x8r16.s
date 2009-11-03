@@ -4,7 +4,8 @@
 ; CC65 runtime: 8x8 => 16 multiplication
 ;
 
-       	.export		mul8x8r16, umul8x8r16
+       	.export		umul8x8r16
+        .export         mul8x8r16 := umul8x8r16
     	.importzp	ptr1, ptr3
 
 
@@ -13,10 +14,9 @@
 ;
 ;   lhs         rhs           result          result also in
 ; -------------------------------------------------------------
-;   ptr1-lo     ptr3-lo         a/x             ptr1
+;   ptr1-lo     ptr3-lo         ax              ptr1
 ;
 
-mul8x8r16:
 umul8x8r16:
     	lda   	#0              ; Clear byte 1
        	ldy    	#8    	       	; Number of bits
@@ -28,7 +28,7 @@ umul8x8r16:
         ror     ptr1
         dey
         bne     @L0
-        tax         
+        tax
         stx     ptr1+1          ; Result in a/x and ptr1
     	lda	ptr1  	       	; Load the result
     	rts	   		; Done

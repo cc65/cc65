@@ -1,11 +1,11 @@
 ;
 ; Ullrich von Bassewitz, 2009-11-04
 ;
-; CC65 library: 32by16 => 16 unsigned division
+; CC65 library: 32by16 => 16 signed division
 ;
 
-       	.export	       	_cc65_udiv32by16r16
-        .import         udiv32by16r16m, incsp4
+       	.export	       	_cc65_idiv32by16r16
+        .import         idiv32by16r16, incsp4
 
         .include        "zeropage.inc"
 
@@ -13,10 +13,9 @@
 ;---------------------------------------------------------------------------
 ; 32by16 division.
 
-.proc   _cc65_udiv32by16r16
+.proc   _cc65_idiv32by16r16
 
-        sta     ptr3
-        stx     ptr3+1                  ; Store rhs
+        pha                     ; Save rhs
 
 ; Copy from stack to zeropage. This assumes ptr1 and ptr2 are adjacent.
 
@@ -33,7 +32,8 @@
         bcc     @L2
         inc     sp+1
 
-@L2:    jmp     udiv32by16r16m
+@L2:    pla                     ; Old rhs
+        jmp     idiv32by16r16
 
 .endproc
 

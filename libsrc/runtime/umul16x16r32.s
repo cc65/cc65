@@ -5,7 +5,8 @@
 ;
 
         .export         umul16x16r32, umul16x16r32m
-    	.importzp      	ptr1, ptr3, sreg
+
+        .include        "zeropage.inc"
 
 
 ;---------------------------------------------------------------------------

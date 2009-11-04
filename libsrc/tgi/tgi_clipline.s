@@ -11,10 +11,12 @@
         .export _tgi_clip_dx, _tgi_clip_dy
         .export _tgi_xmax, _tgi_ymax
 
-        .import negax, pushax, tosmulax, tosdivax
+        .import negax, pushax
+        .import imul16x16r32, idiv32by16r16
         .import return0, return1
 
         .include "tgi-kernel.inc"
+        .include "zeropage.inc"
 
         .macpack longbranch
 
@@ -65,7 +67,7 @@ CLIP_TOP        = $08
         sbc     _tgi_yres+1
         bvs     L1
         eor     #$80
-L1:     bmi     L2
+L1:     bmi     L2             
 
         ldy     #CLIP_NONE              ; No clipping actually
 
@@ -201,17 +203,26 @@ L4:     tya
 
 .proc   muldiv_dydx
 
-        tax
-        tya                             ; Move value into a/x
-
-        jsr     pushax
+        sty     ptr1                    ; lhs
+        sta     ptr1+1
         lda     _tgi_clip_dy
-        ldx     _tgi_clip_dy+1
-        jsr     tosmulax
-        jsr     pushax
+        ldx     _tgi_clip_dy+1          ; rhs
+        jsr     imul16x16r32            ; Multiplicate
+
+; Move the result of the multiplication into ptr1:ptr2
+
+        sta     ptr1
+        stx     ptr1+1
+        ldy     sreg
+        sty     ptr2
+        ldy     sreg+1
+        sty     ptr2+1
+
+; Load divisor and divide
+
         lda     _tgi_clip_dx
         ldx     _tgi_clip_dx+1
-        jmp     tosdivax
+        jmp     idiv32by16r16
 
 .endproc
 
@@ -223,17 +234,26 @@ L4:     tya
 
 .proc   muldiv_dxdy
 
-        tax
-        tya                             ; Move value into a/x
-
-        jsr     pushax
+        sty     ptr1                    ; lhs
+        sta     ptr1+1
         lda     _tgi_clip_dx
-        ldx     _tgi_clip_dx+1
-        jsr     tosmulax
-        jsr     pushax
+        ldx     _tgi_clip_dx+1          ; rhs
+        jsr     imul16x16r32            ; Multiplicate
+
+; Move the result of the multiplication into ptr1:ptr2
+
+        sta     ptr1
+        stx     ptr1+1
+        ldy     sreg
+        sty     ptr2
+        ldy     sreg+1
+        sty     ptr2+1
+
+; Load divisor and divide
+
         lda     _tgi_clip_dy
         ldx     _tgi_clip_dy+1
-        jmp     tosdivax
+        jmp     idiv32by16r16
 
 .endproc
 

@@ -99,6 +99,7 @@ S_OBJS = 	_cwd.o                  \
 		atexit.o  	        \
 		atoi.o	  	        \
 		calloc.o  	        \
+                cc65_idiv32by16r16.o    \
                 cc65_imul16x16r32.o     \
                 cc65_sincos.o           \
                 cc65_udiv32by16r16.o    \

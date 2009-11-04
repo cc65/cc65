@@ -81,6 +81,7 @@ OBJS = 	add.o		\
        	ge.o		\
        	gt.o		\
        	icmp.o		\
+        idiv32by16r16.o \
         imul16x16r32.o  \
 	incax1.o	\
 	incax2.o	\

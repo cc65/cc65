@@ -6,7 +6,8 @@
 
         .export         imul16x16r32
         .import         negax, umul16x16r32m, negeax
-    	.importzp     	ptr1, ptr3, tmp1
+
+        .include        "zeropage.inc"
 
 
 ;---------------------------------------------------------------------------

@@ -6,7 +6,8 @@
 
         .export         _cc65_imul16x16r32
         .import         imul16x16r32, popax
-    	.importzp     	ptr1
+
+        .include        "zeropage.inc"
 
 
 ;---------------------------------------------------------------------------

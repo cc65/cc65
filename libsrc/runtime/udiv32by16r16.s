@@ -5,7 +5,8 @@
 ;
 
        	.export	       	udiv32by16r16, udiv32by16r16m
- 	.importzp   	ptr1, ptr2, ptr3, sreg
+
+        .include        "zeropage.inc"
 
 
 ;---------------------------------------------------------------------------

@@ -9,7 +9,7 @@
 
         .export         _tgi_vectorchar
 
-        .import         push0ax, tosmuleax
+        .import         imul16x16r32, umul16x16r32, negax, negeax
 
         .include        "tgi-kernel.inc"
         .include        "zeropage.inc"
@@ -127,9 +127,10 @@ Loop:   lda     _tgi_textscalew+0
 
 .proc   GetProcessedCoord
 
-; Push the scale factor
+; Save scale factor as left operand for multiplication
 
-        jsr     push0ax
+        sta     ptr1
+        stx     ptr1+1
 
 ; Load delta value
 
@@ -144,23 +145,28 @@ Loop:   lda     _tgi_textscalew+0
 :       asl     a                       ; Flag into carry
         ror     Flag
 
-; Sign extend the value
+; Since we know that the scale factor is always positive, we will remember
+; the sign of the coordinate offset, make it positive, do an unsigned mul
+; and negate the result if the vector was negative. This is faster than
+; relying on the signed multiplication, which will do the same, but for
+; both operands.
 
-        ldx     #0
+        sta     tmp1                    ; Remember sign of vector offset
         cmp     #$80                    ; Sign bit into carry
-        bcc     :+
-        dex
-:       ror     a                       ; Sign extend the value
+        ror     a                       ; Sign extend the value
+        bpl     :+
+        eor     #$FF
+        clc
+        adc     #$01                    ; Negate
+:       ldx     #$00                    ; High byte is always zero
 
 ; Multiplicate with the scale factor.
 
-        stx     sreg
-        stx     sreg+1
-        jsr     tosmuleax               ; Multiplicate
+        jsr     umul16x16r32            ; Multiplicate
 
-; The result is a 16.8 fixed point value. Round and return it.
+; The result is a 16.8 fixed point value. Round it.
 
-        cmp     #$80                    ; Check digits after the dec point
+        cmp     #$80                    ; frac(val) >= 0.5?
         txa
         adc     #$00
         tay
@@ -168,7 +174,10 @@ Loop:   lda     _tgi_textscalew+0
         adc     #$00
         tax
         tya
-        rts
+        bit     tmp1                    ; Check sign
+        bpl     :+
+        jmp     negax                   ; Negate result if necessary
+:       rts
 
 .endproc
 

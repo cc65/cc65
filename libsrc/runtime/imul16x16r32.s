@@ -4,8 +4,8 @@
 ; CC65 runtime: 16x16 => 32 signed multiplication
 ;
 
-        .export         imul16x16r32, _cc65_imul16x16r32
-        .import         popax, negax, umul16x16r32m, negeax
+        .export         imul16x16r32
+        .import         negax, umul16x16r32m, negeax
     	.importzp     	ptr1, ptr3, tmp1
 
 
@@ -18,12 +18,6 @@
 ;
 ; There is probably a faster way to do this.
 ;
-
-
-_cc65_imul16x16r32:
-        sta     ptr1
-        stx     ptr1+1
-        jsr     popax
 
 imul16x16r32:
         stx     tmp1

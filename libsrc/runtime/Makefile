@@ -218,6 +218,7 @@ OBJS = 	add.o		\
        	ugt.o		\
        	ule.o		\
        	ult.o		\
+        udiv32by16r16.o \
        	umod.o		\
         umul16x16r32.o  \
        	xor.o           \

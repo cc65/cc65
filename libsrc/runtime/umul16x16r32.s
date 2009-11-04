@@ -4,8 +4,7 @@
 ; CC65 runtime: 16x16 => 32 unsigned multiplication
 ;
 
-        .export         _cc65_umul16x16r32, umul16x16r32, umul16x16r32m
-        .import         popax
+        .export         umul16x16r32, umul16x16r32m
     	.importzp      	ptr1, ptr3, sreg
 
 
@@ -16,11 +15,6 @@
 ; -------------------------------------------------------------
 ;   ptr1        ax            ax:sreg          ptr1:sreg
 ;
-
-_cc65_umul16x16r32:
-        sta     ptr1
-        stx     ptr1+1
-        jsr     popax
 
 umul16x16r32:
         sta     ptr3

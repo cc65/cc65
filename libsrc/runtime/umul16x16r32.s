@@ -1,17 +1,16 @@
 ;
 ; Ullrich von Bassewitz, 2010-11-03
 ;
-; CC65 runtime: 16x16 => 32 multiplication
+; CC65 runtime: 16x16 => 32 unsigned multiplication
 ;
 
-        .export         umul16x16r32, _cc65_umul16x16r32
-       	.export	       	mul16x16r32 := umul16x16r32
+        .export         _cc65_umul16x16r32, umul16x16r32, umul16x16r32m
         .import         popax
-    	.importzp   	ptr1, ptr2, ptr3, ptr4, sreg
+    	.importzp      	ptr1, ptr3, sreg
 
 
 ;---------------------------------------------------------------------------
-; 16x16 => 32 multiplication routine.
+; 16x16 => 32 unsigned multiplication routine.
 ;
 ;   lhs         rhs           result          result also in
 ; -------------------------------------------------------------
@@ -26,6 +25,8 @@ _cc65_umul16x16r32:
 umul16x16r32:
         sta     ptr3
         stx     ptr3+1
+
+umul16x16r32m:
        	lda	#0
        	sta    	sreg+1
        	ldy    	#16   	       	; Number of bits
@@ -37,7 +38,7 @@ umul16x16r32:
       	clc
       	adc	ptr3
       	pha
-       	txa	      	       	; hi byte of left op
+       	lda     ptr3+1
       	adc	sreg+1
       	sta	sreg+1
       	pla

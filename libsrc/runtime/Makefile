@@ -81,6 +81,7 @@ OBJS = 	add.o		\
        	ge.o		\
        	gt.o		\
        	icmp.o		\
+        imul16x16r32.o  \
 	incax1.o	\
 	incax2.o	\
        	incax3.o	\
@@ -152,7 +153,6 @@ OBJS = 	add.o		\
        	makebool.o	\
        	mod.o  		\
        	mul.o  		\
-        mul16x16r32.o   \
         mul8.o          \
         mul8x8r16.o     \
 	mulax3.o	\
@@ -219,6 +219,7 @@ OBJS = 	add.o		\
        	ule.o		\
        	ult.o		\
        	umod.o		\
+        umul16x16r32.o  \
        	xor.o           \
         zeropage.o
 

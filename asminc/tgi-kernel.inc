@@ -170,6 +170,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_getxres
         .global _tgi_getyres
         .global _tgi_gotoxy
+        .global _tgi_imulround
         .global _tgi_init
         .global _tgi_install
         .global _tgi_ioctl

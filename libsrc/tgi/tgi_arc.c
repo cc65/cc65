@@ -34,6 +34,7 @@
 
 
 #include <tgi.h>
+#include <tgi/tgi-kernel.h>
 #include <cc65.h>
 
 
@@ -41,18 +42,6 @@
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
-
-
-
-static int RoundMul (int rhs, int lhs)
-{
-    long res = cc65_imul16x16r32 (rhs, lhs);
-    if ((unsigned char)res & 0x80) {
-        return (int)(res >> 8) + 1;
-    } else {
-        return (int)(res >> 8);
-    }
-}
 
 
 
@@ -81,16 +70,16 @@ void __fastcall__ tgi_arc (int x, int y, unsigned char rx, unsigned char ry,
     }
 
     /* Calculate the start coords */
-    x1 = x + RoundMul (rx, cc65_cos (sa));
-    y1 = y + RoundMul (ry, cc65_sin (sa));
+    x1 = x + tgi_imulround (rx, cc65_cos (sa));
+    y1 = y + tgi_imulround (ry, cc65_sin (sa));
     do {
         sa += inc;
         if (sa >= ea) {
             sa = ea;
             done = 1;
         }
-        x2 = x + RoundMul (rx, cc65_cos (sa));
-        y2 = y - RoundMul (ry, cc65_sin (sa));
+        x2 = x + tgi_imulround (rx, cc65_cos (sa));
+        y2 = y - tgi_imulround (ry, cc65_sin (sa));
         tgi_line (x1, y1, x2, y2);
         x1 = x2;
         y1 = y2;

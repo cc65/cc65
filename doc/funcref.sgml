@@ -505,6 +505,7 @@ It does not declare any functions.
 <sect1><tt/tgi.h/<label id="tgi.h"><p>
 
 <itemize>
+<item><ref id="tgi_arc" name="tgi_arc">
 <item><ref id="tgi_bar" name="tgi_bar">
 <item><ref id="tgi_circle" name="tgi_circle">
 <item><ref id="tgi_clear" name="tgi_clear">
@@ -4872,6 +4873,39 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>tgi_arc<label id="tgi_arc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Draw an elliptic arc in the current color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_arc (int x, int y, 
+unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
+<tag/Description/The function draws an elliptic arc with center at x/y and
+radii rx/ry using the current drawing color. The arc covers the angle 
+between sa and ea (startangle and endangle), which must be in the range
+0..360.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function behaves unexpectedly or may crash if the angles are out
+of range.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_bar" name="tgi_bar">,
+<ref id="tgi_circle" name="tgi_circle">,
+<ref id="tgi_ellipse" name="tgi_ellipse">,
+<ref id="tgi_setcolor" name="tgi_setcolor">
+<tag/Example/<verb>
+/* Draw the upper half of an ellipse */
+tgi_setcolor(TGI_COLOR_BLUE);
+tgi_arc (50, 50, 40, 20, 0, 180);
+</verb>
+</descrip>
+</quote>
+
+
 <sect1>tgi_bar<label id="tgi_bar"><p>
 
 <quote>
@@ -4910,6 +4944,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="tgi_arc" name="tgi_arc">,
 <ref id="tgi_bar" name="tgi_bar">,
 <ref id="tgi_ellipse" name="tgi_ellipse">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
@@ -4975,6 +5010,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="tgi_arc" name="tgi_arc">,
 <ref id="tgi_bar" name="tgi_bar">,
 <ref id="tgi_circle" name="tgi_circle">,
 <ref id="tgi_setcolor" name="tgi_setcolor">
@@ -5042,7 +5078,7 @@ if (tgi_getcolorcount() == 2) {
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/const unsigned char* __fastcall__ tgi_getdefpalette (void);/
 <tag/Description/The tgi driver has a default palette that is active at startup.
-The named colors TGI_COLOR_BLACK, TGI_COLOR_WHITE, TGI_COLOR_RED... need this 
+The named colors TGI_COLOR_BLACK, TGI_COLOR_WHITE, TGI_COLOR_RED... need this
 palette to work correctly.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only

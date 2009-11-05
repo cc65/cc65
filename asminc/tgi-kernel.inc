@@ -150,44 +150,43 @@ TGI_TEXT_VERTICAL       = 1
 ;------------------------------------------------------------------------------
 ; C callable functions
 
-        .global _tgi_load
-        .global _tgi_load_driver
-        .global _tgi_unload
-        .global _tgi_install
-        .global _tgi_uninstall
-        .global _tgi_init
-        .global _tgi_ioctl
+        .global _tgi_arc
+        .global _tgi_bar
+        .global _tgi_circle
+        .global _tgi_clear
         .global _tgi_done
+        .global _tgi_ellipse
+        .global _tgi_getcolor
+        .global _tgi_getcolorcount
+        .global _tgi_getdefpalette
         .global _tgi_geterror
         .global _tgi_geterrormsg
-        .global _tgi_clear
-        .global _tgi_getpagecount
-        .global _tgi_setviewpage
-        .global _tgi_setdrawpage
-        .global _tgi_getcolorcount
         .global _tgi_getmaxcolor
-        .global _tgi_setcolor
-        .global _tgi_getcolor
-        .global _tgi_setpalette
-        .global _tgi_getpalette
-        .global _tgi_getdefpalette
-        .global _tgi_getxres
         .global _tgi_getmaxx
-        .global _tgi_getyres
         .global _tgi_getmaxy
+        .global _tgi_getpagecount
+        .global _tgi_getpalette
         .global _tgi_getpixel
-        .global _tgi_setpixel
+        .global _tgi_getxres
+        .global _tgi_getyres
         .global _tgi_gotoxy
+        .global _tgi_init
+        .global _tgi_install
+        .global _tgi_ioctl
         .global _tgi_line
         .global _tgi_lineto
-        .global _tgi_circle
-        .global _tgi_ellipse
-        .global _tgi_bar
+        .global _tgi_load
+        .global _tgi_load_driver
+        .global _tgi_outtext
+        .global _tgi_outtextxy
+        .global _tgi_setcolor
+        .global _tgi_setdrawpage
+        .global _tgi_setpalette
+        .global _tgi_setpixel
+        .global _tgi_setviewpage
+        .global _tgi_textheight
         .global _tgi_textscale
         .global _tgi_textstyle
         .global _tgi_textwidth
-        .global _tgi_textheight
-        .global _tgi_outtext
-        .global _tgi_outtextxy
-
-
+        .global _tgi_uninstall
+        .global _tgi_unload

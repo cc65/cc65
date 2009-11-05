@@ -29,7 +29,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-C_OBJS =        tgi_ellipse.o           \
+C_OBJS =        tgi_arc.o               \
                 tgi_load.o              \
                 tgi_load_driver.o       \
                 tgi_load_vectorfont.o
@@ -41,6 +41,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_clipline.o          \
                 tgi_curtoxy.o           \
                 tgi_done.o              \
+                tgi_ellipse.o           \
                 tgi_free_vectorfont.o   \
                 tgi_getcolor.o          \
                 tgi_getcolorcount.o     \

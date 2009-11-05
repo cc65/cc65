@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                               tgi_ellipse.c                               */
+/*                                 tgi_arc.c                                 */
 /*                                                                           */
-/*                            Draw a full ellipse                            */
+/*                            Draw an ellipse arc                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -56,36 +56,45 @@ static int RoundMul (int rhs, int lhs)
 
 
 
-void __fastcall__ tgi_ellipse (int x, int y, unsigned char rx, unsigned char ry)
-/* Draw a full ellipse with center at x/y and radii rx/ry using the current
- * drawing color.
+void __fastcall__ tgi_arc (int x, int y, unsigned char rx, unsigned char ry,
+                           unsigned sa, unsigned ea)
+/* Draw an ellipse arc with center at x/y and radii rx/ry using the current
+ * drawing color. The arc covers the angle between sa and ea (startangle and
+ * endangle), which must be in the range 0..360 (otherwise the function may
+ * bevave unextectedly).
  */
 {
     int x1, y1, x2, y2;
-    unsigned angle;
     unsigned char inc;
-    unsigned size = rx + ry;
+    unsigned char done = 0;
 
-    if (size >= 128) {
-        inc = 12;
-    } else if (size >= 32) {
-        inc = 15;
-    } else if (size >= 12) {
-        inc = 20;
-    } else {
-        inc = 45;
+    /* Bail out if there's nothing to do */
+    if (sa > ea) {
+        return;
     }
 
-    x1 = x + rx;
-    y1 = y;
-    angle = 0;
-    for (angle = 0; angle <= 360; angle += inc) {
-        x2 = x + RoundMul (rx, cc65_cos (angle));
-        y2 = y + RoundMul (ry, cc65_sin (angle));
+    /* Determine the number of segments to use. This may be refined ... */
+    if (rx + ry >= 25) {
+        inc = 12;
+    } else {
+        inc = 24;
+    }
+
+    /* Calculate the start coords */
+    x1 = x + RoundMul (rx, cc65_cos (sa));
+    y1 = y + RoundMul (ry, cc65_sin (sa));
+    do {
+        sa += inc;
+        if (sa >= ea) {
+            sa = ea;
+            done = 1;
+        }
+        x2 = x + RoundMul (rx, cc65_cos (sa));
+        y2 = y - RoundMul (ry, cc65_sin (sa));
         tgi_line (x1, y1, x2, y2);
         x1 = x2;
         y1 = y2;
-    }
+    } while (!done);
 }
 
 

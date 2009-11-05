@@ -44,17 +44,31 @@
 
 
 
-unsigned __fastcall__ cc65_umul8x8r16 (unsigned char lhs, unsigned char rhs);
-/* Multiplicate two unsigned 8 bit to yield an unsigned 16 bit result */
+long __fastcall__ cc65_idiv32by16r16 (long rhs, int lhs);
+/* Divide a 32 bit signed value by a 16 bit signed value yielding a 16
+ * bit result and a 16 bit remainder. The former is returned in the lower 16
+ * bit of the result, the latter in the upper. If you don't need the
+ * remainder, just assign (or cast) to an int.
+ */
+
+unsigned long __fastcall__ cc65_udiv32by16r16 (unsigned long rhs, unsigned lhs);
+/* Divide a 32 bit unsigned value by a 16 bit unsigned value yielding a 16
+ * bit result and a 16 bit remainder. The former is returned in the lower 16
+ * bit of the result, the latter in the upper. If you don't need the
+ * remainder, just assign (or cast) to an unsigned.
+ */
 
 int __fastcall__ cc65_imul8x8r16 (signed char lhs, signed char rhs);
 /* Multiplicate two signed 8 bit to yield an signed 16 bit result */
 
-unsigned long __fastcall__ cc65_umul16x16r32 (unsigned lhs, unsigned rhs);
-/* Multiplicate two unsigned 16 bit to yield an unsigned 32 bit result */
-
 long __fastcall__ cc65_imul16x16r32 (int lhs, int rhs);
 /* Multiplicate two signed 16 bit to yield a signed 32 bit result */
+
+unsigned __fastcall__ cc65_umul8x8r16 (unsigned char lhs, unsigned char rhs);
+/* Multiplicate two unsigned 8 bit to yield an unsigned 16 bit result */
+
+unsigned long __fastcall__ cc65_umul16x16r32 (unsigned lhs, unsigned rhs);
+/* Multiplicate two unsigned 16 bit to yield an unsigned 32 bit result */
 
 int __fastcall__ cc65_sin (unsigned x);
 /* Return the sine of the argument, which must be in range 0..360. The result

@@ -466,7 +466,7 @@ It does not declare any functions.
 
 
 <sect1><tt/string.h/<label id="string.h"><p>
-           
+
 <itemize>
 <item><ref id="_stroserror" name="_stroserror">
 <item><ref id="bzero" name="bzero">
@@ -512,6 +512,7 @@ It does not declare any functions.
 <item><ref id="tgi_getcolorcount" name="tgi_getcolorcount">
 <item><ref id="tgi_getdefpalette" name="tgi_getdefpalette">
 <item><ref id="tgi_done" name="tgi_done">
+<item><ref id="tgi_ellipse" name="tgi_ellipse">
 <item><ref id="tgi_geterror" name="tgi_geterror">
 <item><ref id="tgi_geterrormsg" name="tgi_geterrormsg">
 <item><ref id="tgi_getmaxcolor" name="tgi_getmaxcolor">
@@ -4888,11 +4889,12 @@ be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/Other tgi function
 <tag/Example/<verb>
-tgi_setcolor(COLOR_GREEN);
+tgi_setcolor(TGI_COLOR_GREEN);
 tgi_bar(10, 10, 100, 60);
 </verb>
 </descrip>
 </quote>
+
 
 <sect1>tgi_circle<label id="tgi_circle"><p>
 
@@ -4907,13 +4909,17 @@ tgi_bar(10, 10, 100, 60);
 be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
-<tag/See also/Other tgi functions
+<tag/See also/
+<ref id="tgi_bar" name="tgi_bar">,
+<ref id="tgi_ellipse" name="tgi_ellipse">,
+<ref id="tgi_setcolor" name="tgi_setcolor">
 <tag/Example/<verb>
-tgi_setcolor(COLOR_BLACK);
+tgi_setcolor(TGI_COLOR_BLACK);
 tgi_circle(50, 40, 40);
 </verb>
 </descrip>
 </quote>
+
 
 <sect1>tgi_clear<label id="tgi_clear"><p>
 
@@ -4938,11 +4944,11 @@ be used in presence of a prototype.
 <quote>
 <descrip>
 <tag/Function/End graphics mode, switch back to text mode.
-Will NOT uninstall or unload the driver! 
+Will NOT uninstall or unload the driver!
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_done (void);/
 <tag/Description/End graphics mode, switch back to text mode.
-Will NOT uninstall or unload the driver! 
+Will NOT uninstall or unload the driver!
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -4953,6 +4959,33 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
+<sect1>tgi_ellipse<label id="tgi_ellipse"><p>
+
+<quote>
+<descrip>
+<tag/Function/The function draws an ellipse in the current color.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_ellipse (int x, int y, unsigned char rx, unsigned char ry);/
+<tag/Description/The function draws an ellipse at position x/y with radii
+rx and ry, using the current drawing color.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_bar" name="tgi_bar">,
+<ref id="tgi_circle" name="tgi_circle">,
+<ref id="tgi_setcolor" name="tgi_setcolor">
+<tag/Example/<verb>
+tgi_setcolor(TGI_COLOR_RED);
+tgi_ellipse (50, 40, 40, 20);
+</verb>
+</descrip>
+</quote>
+
+
 <sect1>tgi_getcolor<label id="tgi_getcolor"><p>
 
 <quote>
@@ -4962,10 +4995,10 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char __fastcall__ tgi_getcolor (void);/
 <tag/Description/The actual color is an index to a palette. During tgi_init
 you will get a default palette. The number of colors depend on the platform.
-All platforms recognize at least COLOR_BLACK and COLOR_WHITE. But some
-platforms have many more predefined colors. If you paint using COLOR_GREEN
+All platforms recognize at least TGI_COLOR_BLACK and TGI_COLOR_WHITE. But some
+platforms have many more predefined colors. If you paint using TGI_COLOR_GREEN
 and then you change the green of the palette to blue using tgi_setpalette then
-after this painting in COLOR_GREEN will actually be blue.
+after this painting in TGI_COLOR_GREEN will actually be blue.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -5009,8 +5042,8 @@ if (tgi_getcolorcount() == 2) {
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/const unsigned char* __fastcall__ tgi_getdefpalette (void);/
 <tag/Description/The tgi driver has a default palette that is active at startup.
-The named colors COLOR_BLACK, COLOR_WHITE, COLOR_RED... need this palette to
-work correctly.
+The named colors TGI_COLOR_BLACK, TGI_COLOR_WHITE, TGI_COLOR_RED... need this 
+palette to work correctly.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -5303,7 +5336,7 @@ be used in presence of a prototype.
 #define tgi_updatedisplay() tgi_ioctl(4, 1)
 if (!tgi_busy()) {
   tgi_sprite(&amp;background);
-  tgi_setcolor(COLOR_BLUE);
+  tgi_setcolor(TGI_COLOR_BLUE);
   tgi_outttextxy(20,40,"Hello World");
   tgi_updatedisplay();
 }
@@ -5448,9 +5481,9 @@ be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
 <tag/Example/<verb>
-tgi_setcolor(COLOR_BLACK);
+tgi_setcolor(TGI_COLOR_BLACK);
 tgi_bar(0,0,30,30);
-tgi_setcolor(COLOR_WHITE);
+tgi_setcolor(TGI_COLOR_WHITE);
 tgi_bar(10,10,20,20);
 </verb>
 </descrip>

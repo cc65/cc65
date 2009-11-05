@@ -181,6 +181,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_line
         .global _tgi_lineto
         .global _tgi_circle
+        .global _tgi_ellipse
         .global _tgi_bar
         .global _tgi_textscale
         .global _tgi_textstyle

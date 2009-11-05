@@ -213,6 +213,11 @@ void __fastcall__ tgi_lineto (int x2, int y2);
 void __fastcall__ tgi_circle (int x, int y, unsigned char radius);
 /* Draw a circle in the current drawing color. */
 
+void __fastcall__ tgi_ellipse (int x, int y, unsigned char rx, unsigned char ry);
+/* Draw a full ellipse with center at x/y and radii rx/ry using the current
+ * drawing color.
+ */
+
 void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
 /* Draw a bar (a filled rectangle) using the current color. */
 
@@ -228,7 +233,7 @@ void __fastcall__ tgi_textstyle (unsigned width, unsigned height,
  * dir is one of the TGI_TEXT_XXX constants. font is one of the TGI_FONT_XXX
  * constants.
  */
-             
+
 unsigned __fastcall__ tgi_textwidth (const char* s);
 /* Calculate the width of the text in pixels according to the current text
  * style.

@@ -226,6 +226,14 @@ void __fastcall__ tgi_arc (int x, int y, unsigned char rx, unsigned char ry,
  * bevave unextectedly).
  */
 
+void __fastcall__ tgi_pieslice (int x, int y, unsigned char rx, unsigned char ry,
+                                unsigned sa, unsigned ea);
+/* Draw an ellipse pie slice with center at x/y and radii rx/ry using the
+ * current drawing color. The pie slice covers the angle between sa and ea
+ * (startangle and endangle), which must be in the range 0..360 (otherwise the
+ * function may behave unextectedly).
+ */
+
 void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
 /* Draw a bar (a filled rectangle) using the current color. */
 

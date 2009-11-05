@@ -32,7 +32,8 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 C_OBJS =        tgi_arc.o               \
                 tgi_load.o              \
                 tgi_load_driver.o       \
-                tgi_load_vectorfont.o
+                tgi_load_vectorfont.o   \
+                tgi_pieslice.o  
 
 S_OBJS =       	tgi-kernel.o   	        \
                 tgi_bar.o               \

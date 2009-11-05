@@ -180,6 +180,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_load_driver
         .global _tgi_outtext
         .global _tgi_outtextxy
+        .global _tgi_pieslice
         .global _tgi_setcolor
         .global _tgi_setdrawpage
         .global _tgi_setpalette

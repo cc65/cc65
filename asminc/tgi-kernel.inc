@@ -90,7 +90,7 @@ TGI_TEXT_HORIZONTAL     = 0
 TGI_TEXT_VERTICAL       = 1
 
 ;------------------------------------------------------------------------------
-; Variables
+; C accessible Variables
 
 	.global	_tgi_drv      		; Pointer to driver
 	.global	_tgi_error    		; Last error code
@@ -106,11 +106,21 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_charheight         ; Height of scaled system font char
         .global _tgi_xres               ; X resolution of the current mode
         .global _tgi_yres               ; Y resolution of the current mode
+        .global _tgi_xmax               ; Maximum X coordinate
+        .global _tgi_ymax               ; Maximum Y coordinate
         .global _tgi_colorcount         ; Number of available colors
         .global _tgi_pagecount          ; Number of available screen pages
         .global _tgi_fontwidth          ; System font width
         .global _tgi_fontheight         ; System font height
         .global _tgi_aspectratio        ; Aspect ratio, fixed point 8.8
+
+;------------------------------------------------------------------------------
+; ASM accessible Variables
+
+       	.global	tgi_clip_x1             ; Coordinate for line clipper
+       	.global	tgi_clip_y1             ; Coordinate for line clipper
+       	.global	tgi_clip_x2             ; Coordinate for line clipper
+       	.global	tgi_clip_y2             ; Coordinate for line clipper
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -138,14 +148,15 @@ TGI_TEXT_VERTICAL       = 1
 ;------------------------------------------------------------------------------
 ; ASM functions
 
+        .global tgi_clippedline
+        .global tgi_curtoxy
         .global tgi_getset
         .global tgi_inv_arg
         .global tgi_inv_drv
         .global tgi_linepop
-        .global tgi_set_ptr
         .global tgi_popxy
         .global tgi_popxy2
-        .global tgi_curtoxy
+        .global tgi_set_ptr
 
 ;------------------------------------------------------------------------------
 ; C callable functions

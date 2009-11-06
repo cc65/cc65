@@ -17,6 +17,8 @@
 .bss
 
 _tgi_drv:      	    .res    2		; Pointer to driver
+; From here on, variables get cleared when a new driver is loaded
+cstart:
 _tgi_error:    	    .res    1		; Last error code
 _tgi_gmode:         .res    1           ; Flag: Graphics mode active
 _tgi_curx:          .res    2           ; Current drawing cursor X
@@ -35,6 +37,13 @@ _tgi_textscaleh:    .res    3           ; Text scale for the height
 _tgi_charwidth:     .res    1           ; Char width of system font
 _tgi_charheight:    .res    1           ; Char height of system font
 
+; End of section that gets cleared when a new driver is loaded
+csize   = * - cstart
+
+; Maximum X and Y coordinate (that is, xres-1 and yres-1)
+_tgi_xmax:          .res    2
+_tgi_ymax:          .res    2
+
 ; The following variables are copied from the driver header for faster access
 ; fontwidth and fontheight are expected to be in order and adjacent.
 tgi_driver_vars:
@@ -51,6 +60,7 @@ _tgi_aspectratio:   .res    2           ; Aspect ratio in 8.8 fixed point
 
 ; Jump table for the driver functions.
 
+jumpvectors:
 tgi_install:   	    jmp     $0000
 tgi_uninstall: 	    jmp     $0000
 tgi_init:           jmp     $0000
@@ -134,17 +144,17 @@ _tgi_install:
 ; Initialize some other variables
 
         lda     #$00
-@L4:    ldx     #8-1
-@L5:    sta     _tgi_error,x            ; Clear error/mode/curx/cury/textdir
+@L4:    ldx     #csize-1
+@L5:    sta     cstart,x                ; Clear error/mode/curx/cury/...
         dex
         bpl     @L5
 
 	rts
 
-; Copy one byte from the jump vectors
+; Copy one byte to the jump vectors
 
 copy:   lda     (ptr1),y
-        sta     tgi_install,x
+        sta     jumpvectors,x
         iny
         inx
         rts

@@ -8,9 +8,13 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
-        .import         pushax, pusha
+        .import         pushax, pusha, decax1
         .importzp       ptr1
 
+
+;----------------------------------------------------------------------------
+
+.code
 .proc   _tgi_init
 
         jsr     _tgi_done               ; Switch off graphics if needed
@@ -21,6 +25,18 @@
         bne     @L9                     ; Jump on error
 
         inc     _tgi_gmode              ; Remember that graph mode is active
+
+; Get the maximum X and Y coordinate
+
+        jsr     _tgi_getxres
+        jsr     decax1
+        sta     _tgi_xmax
+        stx     _tgi_xmax+1
+
+        jsr     _tgi_getyres
+        jsr     decax1
+        sta     _tgi_ymax
+        stx     _tgi_ymax+1
 
 ; Do driver initialization. Set draw and view pages.
 

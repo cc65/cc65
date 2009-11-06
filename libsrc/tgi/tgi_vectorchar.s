@@ -84,7 +84,7 @@ Loop:   lda     _tgi_textscalew+0
         adc     _tgi_cury+1
         sta     Y2+1
 
-; Do the actual operation
+; Draw, then move - or just move
 
         bit     Flag
         bpl     @Move                   ; Jump if move only

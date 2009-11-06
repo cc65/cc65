@@ -11,10 +11,14 @@
 
 .proc   _tgi_line
 
-        jsr     tgi_linepop     ; Pop/store Y2/X2
-        jsr     popax
-        jsr     tgi_popxy       ; Pop/store X1/Y1 into ptr1/ptr2
-        jmp     tgi_line        ; Call the driver
+        jsr     tgi_linepop             ; Pop/store Y2/X2
+        jsr     popax                   ; Y1
+        sta     tgi_clip_y1
+        stx     tgi_clip_y1+1
+        jsr     popax                   ; X1
+        sta     tgi_clip_x1
+        stx     tgi_clip_x1+1
+        jmp     tgi_clippedline         ; Call the line clipper
 
 .endproc
 

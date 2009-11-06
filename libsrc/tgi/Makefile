@@ -33,13 +33,13 @@ C_OBJS =        tgi_arc.o               \
                 tgi_load.o              \
                 tgi_load_driver.o       \
                 tgi_load_vectorfont.o   \
-                tgi_pieslice.o  
+                tgi_pieslice.o
 
 S_OBJS =       	tgi-kernel.o   	        \
                 tgi_bar.o               \
                 tgi_circle.o            \
                 tgi_clear.o             \
-                tgi_clipline.o          \
+                tgi_clippedline.o       \
                 tgi_curtoxy.o           \
                 tgi_done.o              \
                 tgi_ellipse.o           \

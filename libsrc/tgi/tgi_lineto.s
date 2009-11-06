@@ -12,9 +12,15 @@
 
 .proc   _tgi_lineto
 
-        jsr     tgi_curtoxy     ; Copy curx/cury into ptr1/ptr2
-        jsr     tgi_linepop     ; Pop x2/y2 into ptr3/ptr4 and curx/cury
-        jmp     tgi_line        ; Call the driver
+        pha
+        ldy     #3              ; Copy curx/cury to tgi_clip_x1/tgi_clip_y1
+@L1:    lda     _tgi_curx,y
+        sta     tgi_clip_x1,y
+        dey
+        bpl     @L1  
+        pla
+        jsr     tgi_linepop     ; Pop x2/y2
+        jmp     tgi_clippedline ; Call the line clipper
 
 .endproc
 

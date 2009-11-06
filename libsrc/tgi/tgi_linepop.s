@@ -7,17 +7,18 @@
         .include        "tgi-kernel.inc"
 
         .import         popax
-        .importzp       ptr3, ptr4
 
 .proc   tgi_linepop
 
-        sta     ptr4            ; Y2
-        stx     ptr4+1
+        sta     tgi_clip_y2     ; Y2
+        stx     tgi_clip_y2+1
         sta     _tgi_cury
         stx     _tgi_cury+1
+
         jsr     popax
-        sta     ptr3            ; X2
-        stx     ptr3+1
+
+        sta     tgi_clip_x2     ; X2
+        stx     tgi_clip_x2+1
         sta     _tgi_curx
         stx     _tgi_curx+1
         rts

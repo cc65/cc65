@@ -7,13 +7,13 @@
 ;  */
 ;
 
-        .export         _tgi_vectorchar
-
-        .import         imul16x16r32, umul16x16r32, negax, negeax
+        .import         _toascii, imul16x16r32, umul16x16r32, negax, negeax
 
         .include        "tgi-kernel.inc"
+        .include        "tgi-vectorfont.inc"
         .include        "zeropage.inc"
-
+                    
+        .macpack        longbranch
 
 ;----------------------------------------------------------------------------
 ; Data
@@ -28,17 +28,21 @@ X2:     .res    2
 Y2:     .res    2
 
 
-
 ;----------------------------------------------------------------------------
 ;
 
 .code
 .proc   _tgi_vectorchar
 
+; Convert the character to ASCII, multiplicate by two and save into Y
+
+        jsr     _toascii
+        asl     a
+        tay
+
 ; Since we will call tgi_lineto, which uses the zero page, and we do also
 ; need the zero page, make room in the register bank.
 
-        tay
         lda     Ops
         pha
         lda     Ops+1
@@ -46,9 +50,26 @@ Y2:     .res    2
         lda     Flag
         pha
 
-; Save the pointer
+; Calculate a pointer to the vector ops for the given char (now in Y).
 
-        sty     Ops
+        lda     _tgi_vectorfont+1
+        tax
+        ora     _tgi_vectorfont
+        jeq     Done                    ; Bail out if no font installed
+        lda     _tgi_vectorfont
+        clc
+        adc     #<(TGI_VECTORFONT::CHARS - 2*TGI_VF_FIRSTCHAR)
+        sta     Ops
+        lda     _tgi_vectorfont+1
+        adc     #>(TGI_VECTORFONT::CHARS - 2*TGI_VF_FIRSTCHAR)
+        sta     Ops+1
+
+        iny
+        lda     (Ops),y
+        tax
+        dey
+        lda     (Ops),y
+        sta     Ops
         stx     Ops+1
 
 ; Main loop executing vector operations
@@ -112,7 +133,7 @@ Loop:   lda     _tgi_textscalew+0
 
 ; Done. Restore zp and return.
 
-@Done:  pla
+Done:   pla
         sta     Flag
         pla
         sta     Ops+1

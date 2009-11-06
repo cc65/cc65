@@ -61,6 +61,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_gotoxy.o            \
                 tgi_imulround.o         \
                 tgi_init.o              \
+                tgi_install_vectorfont.o\
                 tgi_ioctl.o             \
                 tgi_line.o              \
                 tgi_linepop.o           \

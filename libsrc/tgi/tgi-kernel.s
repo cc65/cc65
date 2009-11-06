@@ -26,6 +26,7 @@ _tgi_cury:          .res    2           ; Current drawing cursor Y
 _tgi_color:         .res    1           ; Current drawing color
 _tgi_font:          .res    1           ; Which font to use
 _tgi_textdir:       .res    1           ; Current text direction
+_tgi_vectorfont:    .res    2           ; Pointer to vector font
 ; The following two store an 8.8 fixed point value in the first two bytes,
 ; and a rounded integer value in the third byte. The latter is passed to the
 ; driver to scale the bitmap font. The variables are expected to be in

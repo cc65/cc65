@@ -100,6 +100,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_color              ; Current drawing color
         .global _tgi_font               ; Which font to use
         .global _tgi_textdir            ; Current text direction
+        .global _tgi_vectorfont         ; Pointer to vector font
         .global _tgi_textscalew         ; Text magnification for the width
         .global _tgi_textscaleh         ; Text magnification for the height
         .global _tgi_charwidth          ; Width of scaled system font char
@@ -184,6 +185,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_imulround
         .global _tgi_init
         .global _tgi_install
+        .global _tgi_install_vectorfont
         .global _tgi_ioctl
         .global _tgi_line
         .global _tgi_lineto

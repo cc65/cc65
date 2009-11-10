@@ -49,8 +49,9 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 %.joy:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
-%.tgi:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+%.tgi:	%.o ../runtime/zeropage.o atari_tgi_common.inc
+	@$(LD) -t module -o $@ $< ../runtime/zeropage.o
+
 
 #--------------------------------------------------------------------------
 # Object files
@@ -107,6 +108,7 @@ OBJS = 	_scrsize.o      \
 	sysrmdir.o      \
 	systime.o       \
 	sysuname.o      \
+	tgi_mode_table.o\
 	tvtype.o        \
 	ucase_fn.o      \
 	wherex.o        \
@@ -121,7 +123,9 @@ EMDS =
 
 JOYS = atari-stdjoy.joy atari-multijoy.joy
 
-TGIS =
+TGIS = atari-3.tgi atari-4.tgi atari-5.tgi atari-6.tgi atari-7.tgi atari-8.tgi \
+       atari-9.tgi atari-10.tgi atari-11.tgi atari-14.tgi atari-15.tgi atari-8p2.tgi \
+       atari-9p2.tgi atari-10p2.tgi atari-15p2.tgi
 
 #--------------------------------------------------------------------------
 # Targets

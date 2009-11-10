@@ -44,6 +44,12 @@
         TGI_ERR_INV_FUNC       	; Function not supported
         TGI_ERR_INV_FONT        ; Font file is invalid
 
+        ; Atari specific error codes
+
+        TGI_ERR_NO_IOCB         ; No free IOCB to open the screen device
+        TGI_ERR_NO_MEM          ; Not enough memory
+        TGI_ERR_UNKNOWN         ; Unknown error
+
         TGI_ERR_COUNT           ; Special: Number of error messages
 .endenum
 

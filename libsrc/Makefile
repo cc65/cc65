@@ -15,18 +15,18 @@ LD = ../../src/ld65/ld65
 # List of all targets
 ALLTARGETS =   	apple2 		\
 		apple2enh	\
-       	       	atari  		\
-       	       	atmos  		\
+	       	atari  		\
+	       	atmos  		\
                 c16    		\
-       	       	c128   		\
-       	       	c64    		\
-       	       	cbm510 		\
-       	       	cbm610 		\
-       	       	geos   		\
+	       	c128   		\
+	       	c64    		\
+	       	cbm510 		\
+	       	cbm610 		\
+	       	geos   		\
 		lynx		\
                 nes     	\
-       	       	pet    		\
-       	       	plus4   	\
+	       	pet    		\
+	       	plus4   	\
 		supervision	\
 		vic20
 
@@ -43,7 +43,7 @@ all:
 
 apple2lib:
 	for i in apple2 common runtime conio dbg em joystick mouse serial tgi zlib; do \
-       	    $(MAKE) SYS=apple2 -C $$i || exit 1; \
+	    $(MAKE) SYS=apple2 -C $$i || exit 1; \
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
 	cp apple2/apple2-auxmem.emd a2.auxmem.emd
@@ -83,18 +83,34 @@ apple2enhlib:
 
 atarilib:
 	for i in atari common runtime conio dbg em joystick tgi zlib; do \
-       	    $(MAKE) SYS=atari -C $$i || exit 1; \
+	    $(MAKE) SYS=atari -C $$i || exit 1; \
 	    $(AR) a atari.lib $$i/*.o;\
 	done
 	cp atari/atari-stdjoy.joy ataristd.joy
 	cp atari/atari-multijoy.joy atarimj8.joy
+	cp atari/atari-10.tgi atari10.tgi
+	cp atari/atari-10p2.tgi atr10p2.tgi
+	cp atari/atari-11.tgi atari11.tgi
+	cp atari/atari-14.tgi atari14.tgi
+	cp atari/atari-15.tgi atari15.tgi
+	cp atari/atari-15p2.tgi atr15p2.tgi
+	cp atari/atari-3.tgi atari3.tgi
+	cp atari/atari-4.tgi atari4.tgi
+	cp atari/atari-5.tgi atari5.tgi
+	cp atari/atari-6.tgi atari6.tgi
+	cp atari/atari-7.tgi atari7.tgi
+	cp atari/atari-8.tgi atari8.tgi
+	cp atari/atari-8p2.tgi atr8p2.tgi
+	cp atari/atari-9.tgi atari9.tgi
+	cp atari/atari-9p2.tgi atr9p2.tgi
+
 
 #-----------------------------------------------------------------------------
 # Oric Atmos
 
 atmoslib:
 	for i in atmos common conio runtime em joystick tgi zlib; do \
-       	    $(MAKE) SYS=atmos -C $$i || exit 1; \
+	    $(MAKE) SYS=atmos -C $$i || exit 1; \
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
 	cp atmos/*.tgi .
@@ -104,7 +120,7 @@ atmoslib:
 
 c16lib:
 	for i in c16 cbm common runtime conio dbg em joystick tgi zlib; do \
-       	    $(MAKE) SYS=c16 -C $$i || exit 1; \
+	    $(MAKE) SYS=c16 -C $$i || exit 1; \
 	    $(AR) a c16.lib $$i/*.o;\
 	done
 	cp c16/*.joy .
@@ -173,7 +189,7 @@ geoslib:
 	CC=../$(CC) \
 	AS=../$(AS) \
 	AR=../$(AR) \
-       	LD=../$(LD) \
+	LD=../$(LD) \
 	AFLAGS="-t geos -I../../../asminc" \
 	CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../../include" \
 	$(MAKE) -C geos || exit 1
@@ -265,7 +281,7 @@ vic20lib:
 .PHONY: clean
 clean:
 	@for i in cbm common conio dbg em joystick mouse runtime serial tgi zlib $(ALLTARGETS); do\
-       	   $(MAKE) -C $$i clean;			      		   	\
+	   $(MAKE) -C $$i clean;			      		   	\
 	done
 
 .PHONY: zap

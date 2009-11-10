@@ -6,11 +6,26 @@
 
 
         .include        "tgi-kernel.inc"
+        .include        "tgi-vectorfont.inc"
+        .include        "zeropage.inc"
 
         .import         popax, negax
-        .importzp       ptr3
+
+
+;----------------------------------------------------------------------------
+; Data
+
+text    := regbank
+
+;----------------------------------------------------------------------------
+;
 
 .proc   _tgi_outtext
+
+        ldy     _tgi_font       ; Bit or vectorfont?
+        bne     VectorFont
+
+; Handle bitmapped font output
 
         sta     ptr3
         stx     ptr3+1          ; Pass s in ptr3 to driver
@@ -42,6 +57,42 @@
         adc     _tgi_curx+1,y
         sta     _tgi_curx+1,y
         rts
+
+; Handle vector font output
+
+VectorFont:
+        tay
+        lda     _tgi_vectorfont         ; Do we have a vector font?
+        ora     _tgi_vectorfont+1
+        beq     Done                    ; Bail out if not
+
+        lda     text                    ; Save zero page variable on stack
+        pha
+        lda     text+1
+        pha
+
+        sty     text
+        stx     text+1                  ; Store pointer to string
+
+; Output the text string
+
+@L1:    ldy     #0
+        lda     (text),y                ; Get next character from string
+        beq     EndOfText
+        jsr     _tgi_vectorchar         ; Output it
+        inc     text
+        bne     @L1
+        inc     text+1
+        bne     @L1
+
+; Done. Restore registers and return
+
+EndOfText:
+        pla
+        sta     text+1
+        pla
+        sta     text
+Done:   rts
 
 .endproc
 

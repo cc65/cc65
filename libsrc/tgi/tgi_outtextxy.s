@@ -7,16 +7,31 @@
 
         .include        "tgi-kernel.inc"
 
-        .import         popax
-        .importzp       ptr3
+        .import         addysp1
+        .importzp       sp
 
 .proc   _tgi_outtextxy
 
-        sta     ptr3
-        stx     ptr3+1          ; Save s
-	jsr	popax		; get y from stack
-        jsr     tgi_popxy       ; Pop x/y into ptr1/ptr2
-        jmp     tgi_outtext     ; Call the driver
+; Get the X/Y parameters and store them into curx/cury. This enables us
+; to use tgi_outtext for the actual output
+
+        pha                     ;
+        ldy     #0
+        lda     (sp),y
+        sta     _tgi_cury
+        iny
+        lda     (sp),y
+        sta     _tgi_cury+1
+        iny
+        lda     (sp),y
+        sta     _tgi_curx
+        iny
+        lda     (sp),y
+        sta     _tgi_curx+1
+        pla
+        jsr     addysp1         ; Drop arguments from stack
+
+        jmp     _tgi_outtext
 
 .endproc
 

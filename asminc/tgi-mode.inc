@@ -51,9 +51,9 @@
         TGI_MODE_80_48_4
         TGI_MODE_80_48_2
         TGI_MODE_40_24_4
-        TGI_MODE_80_192_16b
+        TGI_MODE_80_192_16b     ; 80x192, 16 shades of the same color
         TGI_MODE_80_192_9
-        TGI_MODE_80_192_16h
+        TGI_MODE_80_192_16h     ; 80x192, 16 colors with the same brightness
         TGI_MODE_320_192_2_2p
         TGI_MODE_80_192_16b_2p
         TGI_MODE_160_192_4_2p

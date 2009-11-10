@@ -1,7 +1,5 @@
 ;
-; Ullrich von Bassewitz, 31.05.2002
-;
-; C64 mode table for tgi_map_mode
+; Atari mode table for tgi_map_mode
 ;
 
  	.export	       	_tgi_mode_table

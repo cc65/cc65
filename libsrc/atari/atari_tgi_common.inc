@@ -554,7 +554,7 @@ exit:	.if grmode = 9
 
 	; Mode 10 mapping
 	.if grmode = 10
-	; Map out of range colors like this:
+	; Map out-of-range colors like this:
 	;  9 -> 8
 	; 10 -> 8
 	; 11 -> 8
@@ -562,8 +562,8 @@ exit:	.if grmode = 9
 	; 13 -> 1
 	; 14 -> 2
 	; 15 -> 3
-	cmp	#8
-	bcs	@cont
+	cmp	#9
+	bcc	@cont
 	sub	#12
 	bcs	@cont
 	lda	#8

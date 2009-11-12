@@ -7,7 +7,7 @@
 ;  */
 ;
 
-        .import         _toascii, imul16x16r32, umul16x16r32, negax, negeax
+        .import         imul16x16r32, umul16x16r32, negax, negeax
 
         .include        "tgi-kernel.inc"
         .include        "tgi-vectorfont.inc"
@@ -26,13 +26,10 @@ X1:     .res    2
 Y1:     .res    2
 X2:     .res    2
 Y2:     .res    2
-BaseX:  .res    2
-BaseY:  .res    2
-Char:   .res    1
 
 ;----------------------------------------------------------------------------
 ; Get the next operation from the Ops pointer, remove the flag bit and sign
-; extend the 8 bit value. On return, the flags are set for the value in A.
+; extend the 8 bit value to 16 bits.
 
 .code
 .proc   GetOp
@@ -45,78 +42,88 @@ Char:   .res    1
         bne     :+
         inc     Ops+1
 
-; Move bit 7 into Flag, then sign extend the value in A
+; Move bit 7 into Flag, then sign extend the value in A and extend the sign
+; into X.
 
 :       asl     a                       ; Flag into carry
         ror     Flag
+        ldx     #0
         cmp     #$80                    ; Sign bit into carry
         ror     a                       ; Sign extend the value
+        bpl     :+
+        dex                             ; Value is negative
 
 ; Done
 
-        rts
+:       rts
 
 .endproc
 
-
-;----------------------------------------------------------------------------
-; Round a 16.8 fixed point value in eax
-
-.code
-.proc   RoundFix
-
-        cmp     #$80                    ; frac(val) >= 0.5?
-        txa
-        ldx     sreg
-        adc     #$00
-        bcc     @L1
-        inx
-@L1:    rts
-
-.endproc
 
 ;----------------------------------------------------------------------------
 ; Get and process one coordinate value. The scale factor is passed in a/x
 
 .code
-.proc   GetProcessedCoord
+GetProcessedYCoord:
+        lda     _tgi_textscaleh+0
+        ldx     _tgi_textscaleh+1
+
+GetProcessedCoord:
 
 ; Save scale factor as left operand for multiplication
 
         sta     ptr1
         stx     ptr1+1
 
-; Load next operation value. This will set the flags for the value in A.
+; Load next operation value.
 
         jsr     GetOp
 
-; Since we know that the scale factor is always positive, we will remember
-; the sign of the coordinate offset, make it positive, do an unsigned mul
-; and negate the result if the vector was negative. This is faster than
-; relying on the signed multiplication, which will do the same, but for
-; both operands.
-
-        sta     tmp1                    ; Remember sign of vector offset
-        bpl     :+
-        eor     #$FF
-        clc
-        adc     #$01                    ; Negate
-:       ldx     #$00                    ; High byte is always zero
-
 ; Multiplicate with the scale factor.
 
-        jsr     umul16x16r32            ; Multiplicate
+        jmp     tgi_imulround           ; Multiplicate, round and scale
 
-; The result is a 16.8 fixed point value. Round it.
+;----------------------------------------------------------------------------
+; Add the base coordinate with offset in Y to the value in A/X
 
-        jsr     RoundFix
+.code
+.proc   AddBaseCoord
 
-; Check the sign and negate if necessary
+        clc
+        adc     _tgi_curx+0,y
+        pha
+        txa
+        adc     _tgi_curx+1,y
+        tax
+        pla
+        rts
 
-        bit     tmp1                    ; Check sign
-        bpl     :+
-        jmp     negax                   ; Negate result if necessary
-:       rts
+.endproc
+
+;----------------------------------------------------------------------------
+; Subtract the value in a/x from the base coordinate with offset in Y
+; This is
+;
+;   ax = _tgi_cur[xy] - ax
+;
+; which can be transformed to
+;
+;   ax = _tgi_cur[xy] + (~ax + 1);
+
+
+.code
+.proc   SubBaseCoord
+
+        eor     #$FF
+        sec                             ; + 1
+        adc     _tgi_curx+0,y
+        pha
+        txa
+        eor     #$FF
+        adc     _tgi_curx+1,y
+        tax
+        pla
+        rts
 
 .endproc
 
@@ -126,9 +133,8 @@ Char:   .res    1
 .code
 .proc   _tgi_vectorchar
 
-; Convert the character to ASCII, multiplicate by two and save into Y
+; Multiplicate the char value by two and save into Y
 
-        jsr     _toascii
         asl     a
         tay
 
@@ -142,59 +148,6 @@ Char:   .res    1
         lda     Flag
         pha
 
-; Get the width of the char in question
-
-        lda     _tgi_vectorfont
-        clc
-        adc     #<(TGI_VECTORFONT::WIDTHS - TGI_VF_FIRSTCHAR)
-        sta     Ops
-        lda     _tgi_vectorfont+1
-        adc     #>(TGI_VECTORFONT::WIDTHS - TGI_VF_FIRSTCHAR)
-        sta     Ops+1
-        lda     (Ops),y
-
-; Save the character
-
-        sty     Char
-
-; Calculate the width of the character by multiplying with the scale
-; factor for the width
-
-        sta     ptr1
-        lda     #0
-        sta     ptr1+1
-
-        lda     _tgi_textscalew
-        ldx     _tgi_textscalew+1
-        jsr     umul16x16r32
-        jsr     RoundFix
-
-; Store the current value of the graphics cursor into BaseX/BaseY, then
-; move it to the next character position
-
-        pha
-        ldy     #3
-:       lda     _tgi_curx,y
-        sta     BaseX,y
-        dey
-        bpl     :-
-        pla
-
-        ldy     _tgi_textdir
-        beq     :+                      ; Jump if horizontal text
-
-        jsr     negax
-        ldy     #2                      ; Offset of tgi_cury
-
-; Advance graphics cursor
-
-:       clc
-        adc     _tgi_curx,y
-        sta     _tgi_curx,y
-        txa
-        adc     _tgi_curx+1,y
-        sta     _tgi_curx+1,y
-
 ; Calculate a pointer to the vector ops for the given char (now in Y). We
 ; definitely expect a font here, that has to be checked by the caller.
 
@@ -206,7 +159,6 @@ Char:   .res    1
         adc     #>(TGI_VECTORFONT::CHARS - 2*TGI_VF_FIRSTCHAR)
         sta     Ops+1
 
-        ldy     Char
         iny
         lda     (Ops),y
         tax
@@ -221,38 +173,84 @@ Loop:   lda     _tgi_textscalew+0
         ldx     _tgi_textscalew+1
         jsr     GetProcessedCoord       ; Get X vector
 
-; X2 = BaseX + XMag * XDelta.
+; Depending on the text direction, the X vector is either applied to X as
+;
+;   X2 = _tgi_curx + XMag * XDelta
+;
+; or applied to Y as
+;
+;   Y2 = _tgi_cury - XMag * XDelta
+;
+; which can be transformed to
+;
+;   Y2 = _tgi_cury + (~(XMag * XDelta) + 1);
+;
+;
+; For the Y component we have
+;
+;   Y2 = _tgi_cury - YMag * YDelta
+;
+; which can be transformed to
+;
+;   Y2 = _tgi_cury + (~(YMag * YDelta) + 1);
+;
+; or applied to X as
+;
+;   X2 = _tgi_curx - YMag * YDelta
+;
+; which can be transformed to
+;
+;   X2 = _tgi_curx + (~(YMag * YDelta) + 1);
+;
 
-        clc
-        adc     BaseX+0
-        sta     X2+0
-        txa
-        adc     BaseX+1
-        sta     X2+1
+        ldy     _tgi_textdir    ; Horizontal or vertical text?
+        bne     @Vertical       ; Jump if vertical
 
-; Process the Y value
+; Process horizontal text
 
-        lda     _tgi_textscaleh+0
-        ldx     _tgi_textscaleh+1
-        jsr     GetProcessedCoord
+        ldy     #0
+        jsr     AddBaseCoord
+        sta     X2
+        stx     X2+1
 
-; Y2 = BaseY - YMag * YDelta;
-; Y2 = BaseY + (~(YMag * YDelta) + 1);
+; Get Y vector
 
-        eor     #$FF
-        sec                             ; + 1
-        adc     BaseY+0
-        sta     Y2+0
-        txa
-        eor     #$FF
-        adc     BaseY+1
-        sta     Y2+1
+        jsr     GetProcessedYCoord
+
+; Apply to Y
+
+        ldy     #2
+        jsr     SubBaseCoord
+        sta     Y2
+        stx     Y2+1
+        jmp     @DrawMove
+
+; Process vertical text
+
+@Vertical:
+        ldy     #2
+        jsr     SubBaseCoord
+        sta     Y2
+        stx     Y2+1
+
+; Get Y vector
+
+        jsr     GetProcessedYCoord
+
+; Apply to X
+
+        ldy     #0
+        jsr     SubBaseCoord
+        sta     X2
+        stx     X2+1
 
 ; Draw, then move - or just move
 
+@DrawMove:
         bit     Flag
         bpl     @Move                   ; Jump if move only
 
+.if     0
         ldy     #7                      ; Copy start coords into zp
 :       lda     X1,y
         sta     ptr1,y
@@ -260,6 +258,15 @@ Loop:   lda     _tgi_textscalew+0
         bpl     :-
 
         jsr     tgi_line                ; Call the driver
+.else
+        ldy     #7                      ; Copy start coords
+:       lda     X1,y
+        sta     tgi_clip_x1,y
+        dey
+        bpl     :-
+
+        jsr     tgi_clippedline         ; Call line clipper
+.endif
 
 ; Move the start position
 
@@ -276,7 +283,7 @@ Loop:   lda     _tgi_textscalew+0
 
 ; Done. Restore zp and return.
 
-Done:   pla
+        pla
         sta     Flag
         pla
         sta     Ops+1

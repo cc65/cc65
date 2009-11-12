@@ -12,7 +12,7 @@
 
 .bss
 
-; Clipping coordinates.
+; Clipping coordinates. They must be in this order!
 tgi_clip_x1:    .res    2
 tgi_clip_y1:    .res    2
 tgi_clip_x2:    .res    2
@@ -42,7 +42,7 @@ tgi_clip_y2:    .res    2
 ;
 
 .code
-.proc   tgi_outcode           
+.proc   tgi_outcode
 
         lda     #TGI_CLIP_NONE
         sta     tmp1

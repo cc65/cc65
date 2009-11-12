@@ -1,12 +1,16 @@
 ;
 ; Ullrich von Bassewitz, 2009-11-05
 ;
-; Helper function for functions using sine/cosine: Multiply two values, one
-; being an 8.8 fixed point one, and return the rounded and scaled result.
+; Helper function for graphics functions: Multiply two values, one being 
+; an 8.8 fixed point one, and return the rounded and scaled result.
+;
+; The module has two entry points: One is C callable and expects the
+; parameters in ax and the stack, the second is assembler callable and
+; expects the parameters in ax and ptr1
 ;
 
 
-        .export         _tgi_imulround
+        .export         _tgi_imulround, tgi_imulround
         .import         popax, imul16x16r32
 
         .include        "zeropage.inc"
@@ -16,13 +20,18 @@
 ;
 
 .code
-.proc   _tgi_imulround
+
+; C callable entry point
+_tgi_imulround:
 
 ; Get arguments
 
         sta     ptr1
         stx     ptr1+1                  ; Save lhs
         jsr     popax                   ; Get rhs
+
+; ASM callable entry point
+tgi_imulround:
 
 ; Multiplicate
 
@@ -51,4 +60,4 @@
         tya
         rts
 
-.endproc
+     

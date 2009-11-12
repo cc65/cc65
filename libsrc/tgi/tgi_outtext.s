@@ -9,6 +9,7 @@
         .include        "tgi-vectorfont.inc"
         .include        "zeropage.inc"
 
+        .import         _toascii
         .import         popax, negax
 
 
@@ -16,6 +17,8 @@
 ; Data
 
 text    := regbank
+font    := regbank              ; Same as text
+widths  := regbank+2
 
 ;----------------------------------------------------------------------------
 ;
@@ -40,6 +43,10 @@ text    := regbank
         tax
         pla                     ; Restore s
         jsr     _tgi_textwidth  ; Get width of text string
+
+; Move the graphics cursor by the amount in a/x
+
+MoveCursor:
         ldy     _tgi_textdir    ; Horizontal or vertical text?
         beq     @L1             ; Jump if horizontal
 
@@ -56,9 +63,10 @@ text    := regbank
         txa
         adc     _tgi_curx+1,y
         sta     _tgi_curx+1,y
-        rts
+Done:   rts
 
-; Handle vector font output
+; Handle vector font output. First, check if we really have a registered
+; vector font. Bail out if this is not the case.
 
 VectorFont:
         tay
@@ -66,20 +74,58 @@ VectorFont:
         ora     _tgi_vectorfont+1
         beq     Done                    ; Bail out if not
 
-        lda     text                    ; Save zero page variable on stack
+; Check if the font in the given size is partially out of the screen. We
+; do this in vertical direction here, and in horizontal direction before
+; outputting a character.
+
+        ; (todo)
+
+; Save zero page variable on stack and save
+
+        lda     text
         pha
         lda     text+1
+        pha
+        lda     widths
+        pha
+        lda     widths+1
         pha
 
         sty     text
         stx     text+1                  ; Store pointer to string
+
+        lda     _tgi_vectorfont
+        clc
+        adc     #<(TGI_VECTORFONT::WIDTHS - TGI_VF_FIRSTCHAR)
+        sta     widths
+        lda     _tgi_vectorfont+1
+        adc     #>(TGI_VECTORFONT::WIDTHS - TGI_VF_FIRSTCHAR)
+        sta     widths+1
 
 ; Output the text string
 
 @L1:    ldy     #0
         lda     (text),y                ; Get next character from string
         beq     EndOfText
+        jsr     _toascii                ; Convert to ascii
+        pha                             ; Save char in A
         jsr     _tgi_vectorchar         ; Output it
+        pla
+
+; Move the graphics cursor by the width of the char
+
+        tay
+        lda     (widths),y              ; Get width of this char
+        sta     ptr1
+        lda     #0
+        sta     ptr1+1
+        lda     _tgi_textscalew
+        ldx     _tgi_textscalew+1       ; Get scale factor
+        jsr     tgi_imulround           ; Multiplcate and round
+        jsr     MoveCursor              ; Move the graphics cursor
+
+; Next char in string
+
         inc     text
         bne     @L1
         inc     text+1
@@ -89,10 +135,14 @@ VectorFont:
 
 EndOfText:
         pla
+        sta     widths+1
+        pla
+        sta     widths
+        pla
         sta     text+1
         pla
         sta     text
-Done:   rts
+        rts
 
 .endproc
 

@@ -18,105 +18,16 @@
 
 .bss
 
-; Line coordinates. Must be set before calling tgi_clippedline
-tgi_clip_x1:    .res    2
-tgi_clip_y1:    .res    2
-tgi_clip_x2:    .res    2
-tgi_clip_y2:    .res    2
-
+; Outcodes for both ends
 tgi_clip_o1:    .res    1
 tgi_clip_o2:    .res    1
 
+; Line deltas
 tgi_clip_d:     .res    1
 tgi_clip_dx:    .res    2
 tgi_clip_dy:    .res    2
 
 tgi_clip_sign:  .res    1
-
-
-;----------------------------------------------------------------------------
-; outcode constants.
-
-CLIP_NONE       = $00
-CLIP_LEFT       = $01
-CLIP_RIGHT      = $02
-CLIP_BOTTOM     = $04
-CLIP_TOP        = $08
-
-
-
-;----------------------------------------------------------------------------
-; Generate a Cohen Sutherland outcode
-;
-; void outcode ()
-; {
-;     unsigned char o = 0;
-;     if (Y < 0) {
-;         o = CLIP_BOTTOM;
-;     } else if (Y >= yres) {
-;         o = CLIP_TOP;
-;     }
-;     if (X < 0) {
-;         o |= CLIP_LEFT;
-;     } else if (X >= xres) {
-;         o |= CLIP_RIGHT;
-;     }
-;     return o;
-; }
-
-.code
-.proc   outcode
-
-        lda     #CLIP_NONE
-        sta     tmp1
-
-; Check Y coordinate
-
-        lda     tgi_clip_y1+1,y         ; High byte of Y1
-        bmi     L2                      ; Jump if bottom clip
-
-        ldx     tgi_clip_y1,y           ; Low byte of Y1
-        cpx     _tgi_yres
-        sbc     _tgi_yres+1
-        bvs     L1
-        eor     #$80
-L1:     bpl     L4
-        lda     #CLIP_TOP               ; Top clipping necessary
-        bne     L3
-L2:     lda     #CLIP_BOTTOM
-L3:     sta     tmp1                    ; Save temp outcode
-
-
-; Check X coordinate
-
-L4:     lda     tgi_clip_x1+1,y         ; High byte of X1
-        bmi     L7                      ; Jump if left clip
-
-        ldx     tgi_clip_x1,y           ; Low byte of X1
-        cpx     _tgi_xres
-        sbc     _tgi_xres+1
-        bvs     L5
-        eor     #$80
-L5:     bmi     L6
-
-; No right or left clipping necessary
-
-        lda     tmp1
-        rts
-
-; Need right clipping
-
-L6:     lda     #CLIP_RIGHT
-        ora     tmp1
-        rts
-
-; Need left clipping
-
-L7:     lda     #CLIP_LEFT
-        ora     tmp1
-        rts
-
-.endproc
 
 
 ;----------------------------------------------------------------------------
@@ -127,7 +38,7 @@ L7:     lda     #CLIP_LEFT
 .proc   outcode1
 
         ldy     #0
-        jsr     outcode
+        jsr     tgi_outcode
         sta     tgi_clip_o1
         rts
 
@@ -136,8 +47,8 @@ L7:     lda     #CLIP_LEFT
 .code
 .proc   outcode2
 
-        ldy     #(tgi_clip_y2 - tgi_clip_y1)
-        jsr     outcode
+        ldy     #<(tgi_clip_y2 - tgi_clip_y1)
+        jsr     tgi_outcode
         sta     tgi_clip_o2
         rts
 
@@ -256,7 +167,7 @@ L7:     lda     #CLIP_LEFT
 
 ; Generate the absolute value of y/a and calculate the sign of the final
 ; result
-                      
+
         jsr     prepare_coord
 
 ; All values are positive now (dx/dy have been made positive in calcdeltas)
@@ -381,7 +292,7 @@ HaveDeltas:
 
 ; Need to clip X1/Y1
 
-        lsr     a                       ; Check for CLIP_LEFT
+        lsr     a                       ; Check for TGI_CLIP_LEFT
         bcc     L3
 
 ; tgi_clip_y1 += (0 - tgi_clip_x1) * tgi_clip_dy / tgi_clip_dx;
@@ -391,7 +302,7 @@ HaveDeltas:
         tax
         beq     L4
 
-L3:     lsr     a                       ; Check for CLIP_RIGHT
+L3:     lsr     a                       ; Check for TGI_CLIP_RIGHT
         bcc     L5
 
 ; tgi_clip_y1 += (tgi_xmax - tgi_clip_x1) * tgi_clip_dy / tgi_clip_dx;
@@ -423,7 +334,7 @@ L4:     tay
         lda     tgi_clip_o1
         lsr     a
         lsr     a
-L5:     lsr     a                               ; Check for CLIP_BOTTOM
+L5:     lsr     a                               ; Check for TGI_CLIP_BOTTOM
         bcc     L6
 
 ; tgi_clip_x1 = (0 - tgi_clip_y1) * tgi_clip_dx / tgi_clip_dy;
@@ -433,7 +344,7 @@ L5:     lsr     a                               ; Check for CLIP_BOTTOM
         tax
         beq     L7
 
-L6:     lsr     a                               ; Check for CLIP_TOP
+L6:     lsr     a                               ; Check for TGI_CLIP_TOP
         bcc     L8
 
 ; tgi_clip_x1 += (tgi_ymax - tgi_clip_y1) * tgi_clip_dx / tgi_clip_dy;
@@ -471,7 +382,7 @@ L10:    lda     tgi_clip_o2
 
 ; Need to clip X2/Y2
 
-        lsr     a                       ; Check for CLIP_LEFT
+        lsr     a                       ; Check for TGI_CLIP_LEFT
         bcc     L11
 
 ; tgi_clip_y2 += (0 - tgi_clip_x2) * tgi_clip_dy / tgi_clip_dx;
@@ -481,7 +392,7 @@ L10:    lda     tgi_clip_o2
         tax
         beq     L12
 
-L11:    lsr     a                       ; Check for CLIP_RIGHT
+L11:    lsr     a                       ; Check for TGI_CLIP_RIGHT
         bcc     L13
 
 ; tgi_clip_y2 += (tgi_xmax - tgi_clip_x2) * tgi_clip_dy / tgi_clip_dx;
@@ -513,7 +424,7 @@ L12:    tay
         lda     tgi_clip_o2
         lsr     a
         lsr     a
-L13:    lsr     a                       ; Check for CLIP_BOTTOM
+L13:    lsr     a                       ; Check for TGI_CLIP_BOTTOM
         bcc     L14
 
 ; tgi_clip_x2 += (0 - tgi_clip_y2) * tgi_clip_dx / tgi_clip_dy;
@@ -523,7 +434,7 @@ L13:    lsr     a                       ; Check for CLIP_BOTTOM
         tax
         beq     L15
 
-L14:    lsr     a                               ; Check for CLIP_TOP
+L14:    lsr     a                       ; Check for TGI_CLIP_TOP
         bcc     L16
 
 ; tgi_clip_x2 += (tgi_ymax - tgi_clip_y2) * tgi_clip_dx / tgi_clip_dy;

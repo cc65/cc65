@@ -410,7 +410,7 @@ static void* ScreenCreateInstance (unsigned Addr, unsigned Range, void* CfgInfo)
     XDefineCursor (V->ScreenDisplay, V->ScreenWindow, C);
 
     /* Select input events */
-    XSelectInput (V->ScreenDisplay, V->ScreenWindow, ExposureMask | StructureNotifyMask);
+    XSelectInput (V->ScreenDisplay, V->ScreenWindow, ExposureMask | StructureNotifyMask | KeyPressMask);
 
     /* Show the window */
     XMapRaised (V->ScreenDisplay, V->ScreenWindow);
@@ -626,8 +626,15 @@ static void ScreenEventLoop (void)
                 XRefreshKeyboardMapping (&Event.xmapping);
                 break;
 
+            case KeyPress:
+                break;
+
+            default:
+                /* Ignore anything else */
+                break;
+
         }
-    }
+    }                 
 
     /* Flush the outgoing event queue */
     XFlush (VScreen->ScreenDisplay);

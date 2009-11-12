@@ -155,7 +155,6 @@ OBJS = 	add.o		\
        	mod.o  		\
        	mul.o  		\
         mul8.o          \
-        mul8x8r16.o     \
 	mulax3.o	\
 	mulax5.o	\
 	mulax6.o	\
@@ -222,6 +221,7 @@ OBJS = 	add.o		\
         udiv32by16r16.o \
        	umod.o		\
         umul16x16r32.o  \
+        umul8x8r16.o    \
        	xor.o           \
         zeropage.o
 

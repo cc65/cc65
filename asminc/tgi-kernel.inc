@@ -87,7 +87,16 @@ TGI_FONT_BITMAP         = 0
 TGI_FONT_VECTOR         = 1
 
 TGI_TEXT_HORIZONTAL     = 0
-TGI_TEXT_VERTICAL       = 1
+TGI_TEXT_VERTICAL       = 1  
+
+;----------------------------------------------------------------------------
+; Results of tgi_outcode
+
+TGI_CLIP_NONE           = $00
+TGI_CLIP_LEFT           = $01
+TGI_CLIP_RIGHT          = $02
+TGI_CLIP_BOTTOM         = $04
+TGI_CLIP_TOP            = $08
 
 ;------------------------------------------------------------------------------
 ; C accessible Variables
@@ -152,9 +161,11 @@ TGI_TEXT_VERTICAL       = 1
         .global tgi_clippedline
         .global tgi_curtoxy
         .global tgi_getset
+        .global tgi_imulround
         .global tgi_inv_arg
         .global tgi_inv_drv
         .global tgi_linepop
+        .global tgi_outcode
         .global tgi_popxy
         .global tgi_popxy2
         .global tgi_set_ptr

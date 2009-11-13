@@ -52,6 +52,7 @@
 #define TGI_ERR_INV_ARG         5       /* Invalid function argument */
 #define TGI_ERR_INV_FUNC	6	/* Function not supported */
 #define TGI_ERR_INV_FONT        7       /* Font file is invalid */
+#define TGI_ERR_NO_MEM          8       /* Out of memory */
 
 
 

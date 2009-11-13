@@ -1,4 +1,4 @@
-;                     
+;
 ; Ullrich von Bassewitz, 2004-06-15
 ;
 ; const char* __fastcall__ tgi_geterrormsg (unsigned char code);
@@ -40,6 +40,7 @@ offs:   .byte   <(msg0-msgtab)
         .byte   <(msg6-msgtab)
         .byte   <(msg7-msgtab)
         .byte   <(msg8-msgtab)
+        .byte   <(msg9-msgtab)
 
 msgtab:
 msg0:   .asciiz         "No error"
@@ -50,5 +51,6 @@ msg4:   .asciiz         "Mode not supported by driver"
 msg5:   .asciiz         "Invalid function argument"
 msg6:   .asciiz         "Function not supported"
 msg7:   .asciiz         "Invalid font file"
-msg8:   .asciiz         "Unknown error"
+msg8:   .asciiz         "Out of memory"
+msg9:   .asciiz         "Unknown error"
 

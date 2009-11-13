@@ -67,6 +67,9 @@ const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name)
     unsigned char         I;
 
 
+    /* Assume we have an error loading the font */
+    tgi_error = TGI_ERR_CANNOT_LOAD;
+
     /* Open the file */
     F = open (name, O_RDONLY);
     if (F < 0) {
@@ -90,6 +93,7 @@ const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name)
     Font = malloc (H.size);
     if (Font == 0) {
         /* Out of memory */
+        tgi_error = TGI_ERR_NO_MEM;
         goto LoadError;
     }
 
@@ -113,6 +117,9 @@ const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name)
         Font->chars[I] += V;
     }
 
+    /* Clear the error */
+    tgi_error = TGI_ERR_OK;
+
     /* Return the vector font loaded */
     return Font;
 
@@ -123,7 +130,6 @@ LoadError:
     if (F >= 0) {
         close (F);
     }
-    tgi_error = TGI_ERR_CANNOT_LOAD;
     return 0;
 }
 

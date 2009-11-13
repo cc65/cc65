@@ -37,16 +37,12 @@
 .enum
         TGI_ERR_OK              ; No error
         TGI_ERR_NO_DRIVER       ; No driver available
-        TGI_ERR_LOAD_ERROR      ; Error loading driver
+        TGI_ERR_CANNOT_LOAD     ; Error loading driver or font
         TGI_ERR_INV_DRIVER      ; Invalid driver
         TGI_ERR_INV_MODE        ; Mode not supported by driver
         TGI_ERR_INV_ARG         ; Invalid function argument
         TGI_ERR_INV_FUNC       	; Function not supported
         TGI_ERR_INV_FONT        ; Font file is invalid
-
-        ; Atari specific error codes
-
-        TGI_ERR_NO_IOCB         ; No free IOCB to open the screen device
         TGI_ERR_NO_MEM          ; Not enough memory
         TGI_ERR_UNKNOWN         ; Unknown error
 

@@ -93,7 +93,7 @@ const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name)
     Font = malloc (H.size);
     if (Font == 0) {
         /* Out of memory */
-        tgi_error = TGI_ERR_NO_MEM;
+        tgi_error = TGI_ERR_NO_RES;
         goto LoadError;
     }
 

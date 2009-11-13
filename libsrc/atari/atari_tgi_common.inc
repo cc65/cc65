@@ -157,8 +157,8 @@ search: tax
 	sbc	#$10
 	bcs	search
 
-	; No free IOCB
-	lda	#TGI_ERR_NO_IOCB
+      	; Out of resources
+nores:	lda	#TGI_ERR_NO_RES
 	sta	error
 	rts
 
@@ -169,15 +169,10 @@ found:	; Check if enough RAM is available
 	lda	RAMTOP
 	sbc	#>mem_needed
 	cmp	APPMHI + 1
-	bcc	nomem
+	bcc	nores
 	bne	switch
 	cpy	APPMHI
-	bcs	switch
-
-	; No memory
-nomem:	lda	#TGI_ERR_NO_MEM
-	sta	error
-	rts
+	bcc    	nores
 
 	; Switch into graphics mode
 switch:	lda	#OPEN

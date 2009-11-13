@@ -51,6 +51,6 @@ msg4:   .asciiz         "Mode not supported by driver"
 msg5:   .asciiz         "Invalid function argument"
 msg6:   .asciiz         "Function not supported"
 msg7:   .asciiz         "Invalid font file"
-msg8:   .asciiz         "Out of memory"
+msg8:   .asciiz         "Out of resources"
 msg9:   .asciiz         "Unknown error"
 

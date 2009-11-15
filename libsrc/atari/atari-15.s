@@ -22,23 +22,23 @@
 	; ----------------------------------------------------------------------
 
 ; Graphics mode
-	.define grmode 15
+	grmode = 15
 ; X resolution
-	.define x_res 160
+	x_res = 160
 ; Y resolution
-	.define y_res 192
+	y_res = 192
 ; Number of colors
-	.define	colors 4
+	colors = 4
 ; Pixels per byte
-	.define	ppb 4
+	ppb = 4
 ; Screen memory size in bytes
-	.define	scrsize x_res * y_res / ppb
+	scrsize = x_res * y_res / ppb
 ; Pixel aspect ratio
-	.define	aspect $0200				; 2:1
+	aspect = $0200				; 2:1
 ; Free memory needed
-	.define	mem_needed 7147
+	mem_needed = 7147
 ; Number of screen pages
-	.define	pages 1
+	pages = 1
 
 .rodata
 	mask_table:				; Mask table to set pixels

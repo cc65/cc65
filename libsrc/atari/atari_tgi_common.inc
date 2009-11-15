@@ -2,6 +2,8 @@
 ; Generic Atari graphics driver
 ;
 
+.macpack longbranch
+
 ; ******************************************************************************
 
 	; ----------------------------------------------------------------------
@@ -74,12 +76,14 @@
 .bss
 	error:
 		.res	1	; Error code
-	.if grmode = 9 || grmode = 11
+
+.if ::grmode = 9 || ::grmode = 11
 	palette = default_palette
-	.else
+.else
 	palette:
 		.res	colors	; The current palette
-	.endif
+.endif
+
 	mask:
 		.res	1	; Current pixel mask
 	griocb:
@@ -144,23 +148,29 @@ screen_device_length := * - screen_device
 
 .code
 	; Initialize drawing color
+
+.if ::ppb = 8
 	ldx	#$FF
+.elseif ::ppb = 4
+	ldx	#$55
+.elseif ::ppb = 2
+	ldx	#$11
+.endif
+
 	stx	mask
 
 	; Find a free IOCB
-	clc
 	lda	#$70
 search: tax
 	ldy	ICHID,x
 	cpy	#$FF
 	beq	found
-	sbc	#$10
+	sub	#$10
 	bcs	search
 
-      	; Out of resources
-nores:	lda	#TGI_ERR_NO_RES
-	sta	error
-	rts
+	; No free IOCB
+	lda	#TGI_ERR_NO_IOCB
+	jmp	exit
 
 found:	; Check if enough RAM is available
 	lda	#0
@@ -169,17 +179,21 @@ found:	; Check if enough RAM is available
 	lda	RAMTOP
 	sbc	#>mem_needed
 	cmp	APPMHI + 1
-	bcc	nores
+	bcc	nomem
 	bne	switch
 	cpy	APPMHI
-	bcc    	nores
+	bcs	switch
+
+	; No memory
+nomem:	lda	#TGI_ERR_NO_MEM
+	jmp	exit
 
 	; Switch into graphics mode
 switch:	lda	#OPEN
 	sta	ICCOM,x
 	lda	#OPNIN | OPNOT
 	sta	ICAX1,x
-	lda	#grmode
+	lda	#::grmode
 	sta	ICAX2,x
 	lda	#<screen_device
 	sta	ICBAL,x
@@ -191,7 +205,7 @@ switch:	lda	#OPEN
 	sta	ICBLH,x
 	jsr	CIOV
 
-	.if pages = 2
+.if ::pages = 2
 	; Reserve 8K of high memory
 	lda	RAMTOP
 	sub	#32
@@ -205,7 +219,7 @@ switch:	lda	#OPEN
 	sta	ICCOM,x
 	lda	#OPNIN | OPNOT
 	sta	ICAX1,x
-	lda	#grmode
+	lda	#::grmode
 	sta	ICAX2,x
 	lda	#<screen_device
 	sta	ICBAL,x
@@ -216,17 +230,18 @@ switch:	lda	#OPEN
 	lda	#>screen_device_length
 	sta	ICBLH,x
 	jsr	CIOV
-	; Save screen poniters
+	; Save screen pointers
 	lda	SAVMSC + 1
 	sta	p0scr
 	lda	SDLSTH
 	sta	p0dls
-	.endif
+.endif ; ::pages = 2
 
 	stx	griocb
+
 	; Reset the error code and return
         lda     #TGI_ERR_OK
-        sta     error
+exit:	sta     error
         rts
 .endproc
 
@@ -241,12 +256,13 @@ switch:	lda	#OPEN
 	; ----------------------------------------------------------------------
 
 .code
-	.if pages = 2
+
+.if ::pages = 2
 	; Free 8K of high memory
 	lda	RAMTOP
 	add	#32
 	sta	RAMTOP
-	.endif
+.endif
 
 	; Clear griocb
 	lda	#$FF
@@ -275,7 +291,7 @@ switch:	lda	#OPEN
 	sta	ICBLH,x
 	jsr	CIOV
 
-	; Now close it again; we don't need it anymore
+	; Now close it again; we don't need it anymore :)
 	lda	#CLOSE
 	sta	ICCOM,x
 	jmp	CIOV
@@ -319,24 +335,24 @@ switch:	lda	#OPEN
 	lda	#0
 	tay
 
+.if >::scrsize > 0
 	; Clear full pages if any
-	.if >(scrsize) > 0
-	ldx	#>(scrsize)
+	ldx	#>::scrsize
 loop1:	sta	(sptr),y
 	iny
 	bne	loop1
 	inc	sptr + 1
 	dex
 	bne	loop1
-	.endif
+.endif
 
+.if <::scrsize > 0
 	; Clear the rest, if any
-	.if <(scrsize) > 0
 loop2:	sta	(sptr),y
 	iny
-	cpy	#<(scrsize)
+	cpy	#<::scrsize
 	bne	loop2
-	.endif
+.endif
 
         rts
 .endproc
@@ -385,14 +401,17 @@ loop2:	sta	(sptr),y
 
 .code
 	tax
-	.if grmode = 9
+
+.if ::grmode = 9
 	; Map colors like this: 0 -> 0, 1 -> 15, 2 -> 1, 3 -> 2 etc.
-	beq	@cont
+	beq	cont
 	cpx	#1
-	bne	@map
+	bne	map
 	ldx	#16
-@map:	dex
-@cont:	.endif
+map:	dex
+cont:
+.endif
+
 	lda	masks,x
 	sta	mask
 	rts
@@ -422,25 +441,28 @@ loop2:	sta	(sptr),y
 	sta	temp
 	lda	y1
 
-	.if x_res / ppb = 40
-	.define yrep 3
-	.elseif x_res / ppb = 20
-	.define yrep 2
-	.elseif x_res / ppb = 10
-	.define yrep 1
-	.endif
+.if ::x_res / ::ppb = 40
+	yrep = 3
+.elseif ::x_res / ::ppb = 20
+	yrep = 2
+.elseif ::x_res / ::ppb = 10
+	yrep = 1
+.endif
 
-	.repeat	yrep
-	  asl	a
-	  rol	temp
-	.endrepeat
+.repeat	yrep
+	asl	a
+	rol	temp
+.endrepeat
+
 	sta	sptr
 	ldx	temp
 	stx	sptr + 1
-	.repeat	2
+
+.repeat	2
 	  asl	a
 	  rol	temp
-	.endrepeat
+.endrepeat
+
 	add	sptr
 	sta	sptr
 	lda	temp
@@ -457,17 +479,19 @@ loop2:	sta	(sptr),y
 	sta	temp
 	lda	x1
 
-	.if ppb = 8
-	.define xrep 3
-	.elseif ppb = 4
-	.define xrep 2
-	.elseif ppb = 2
-	.define xrep 1
-	.endif
-	.repeat	xrep
+.if ::ppb = 8
+	xrep = 3
+.elseif ::ppb = 4
+	xrep = 2
+.elseif ::ppb = 2
+	xrep = 1
+.endif
+
+.repeat	xrep
 	lsr	temp
 	ror	a
-	.endrepeat
+.endrepeat
+
 	tay
 
 	; sptr += SAVMSC
@@ -495,7 +519,7 @@ loop2:	sta	(sptr),y
 .code
 	jsr	CALC
 	put_pixel
-        rts
+	rts
 .endproc
 
 ; ******************************************************************************
@@ -512,44 +536,48 @@ loop2:	sta	(sptr),y
 	jsr	CALC
 	lda	(sptr),y
 	and	mask_table,x
-	.if ppb = 8
+
+.if ::ppb = 8
 	beq	zero
 	lda	#1
 zero:	ldx	#0
 	rts
-	.elseif ppb = 4
+.elseif ::ppb = 4
 loop:	cpx	#3
-	beq	cont
+	beq	done4
 	lsr	a
 	lsr	a
 	inx
 	bne	loop
-cont:	and	#$03
+done4:	and	#$03
+	ldx	#0
 	rts
-	.elseif ppb = 2
+.elseif ::ppb = 2
 	dex
 	bne	shift
 	and	#$0F
 	jmp	exit
-shift:	ldx	#0
-	lsr	a
+shift:	lsr	a
 	lsr	a
 	lsr	a
 	lsr	a
 
+exit:
+
+.if ::grmode = 9
 	; Mode 9 mapping
-exit:	.if grmode = 9
 	; Map colors like this: 0 -> 0, 15 -> 1, 2 -> 3, 3 -> 4 etc.
-	beq	@cont
+	beq	done9
 	cmp	#15
-	bne	@map
+	bne	map9
 	lda	#0
-@map:	add	#1
-@cont:	.endif
+map9:	add	#1
+done9:
+.endif
 
+.if ::grmode = 10
 	; Mode 10 mapping
-	.if grmode = 10
-	; Map out-of-range colors like this:
+	; Map out of range colors like this:
 	;  9 -> 8
 	; 10 -> 8
 	; 11 -> 8
@@ -558,15 +586,18 @@ exit:	.if grmode = 9
 	; 14 -> 2
 	; 15 -> 3
 	cmp	#9
-	bcc	@cont
+	bcc	done10
 	sub	#12
-	bcs	@cont
+	bcs	done10
 	lda	#8
-@cont:	.endif
+done10:
+.endif ; ::grmode = 10
 
 	; Done!
+	ldx	#0
 	rts
-	.endif
+.endif	; ::ppb = 2
+
 .endproc
 
 ; ******************************************************************************
@@ -578,6 +609,41 @@ exit:	.if grmode = 9
 	; LINE: Draw a line from x1,y1 to x2,y2
 	;
 	; ----------------------------------------------------------------------
+
+.ifdef USE_CIO_LINE
+
+	; position ptr1, ptr2
+	lda	x1
+	sta	OLDCOL
+	lda	x1 + 1
+	sta	OLDCOL + 1
+	lda	y1
+	sta	OLDROW
+	; plot
+	jsr	SETPIXEL
+	; position ptr3,ptr4
+	lda	x2
+	sta	COLCRS
+	lda	x2 + 1
+	sta	COLCRS + 1
+	lda	y2
+	sta	ROWCRS
+	; drawto
+	ldx	griocb
+	lda	#DRAWLN
+	sta	ICCOM,x
+	lda	mask
+
+.if ::grmode = 10
+	and	#$0f
+.else
+	and	#colors - 1
+.endif
+
+	sta	ATACHR
+	jmp	CIOV
+
+.else	; USE_CIO_LINE
 
 ; locals
 
@@ -797,6 +863,7 @@ end_move:
 	jmp	loop
 exit:	rts
 	.endscope
+.endif	; USE_CIO_LINE
 .endproc
 
 ; ******************************************************************************
@@ -805,7 +872,8 @@ exit:	rts
 
 	; ----------------------------------------------------------------------
 	;
-	; Clip and draw bar
+	; Clip and draw bar, this function will disappear when text clipping
+	; will be done int the TGI kernel
 	;
 	; ----------------------------------------------------------------------
 
@@ -817,10 +885,12 @@ exit:	rts
 	bcs	off
 
 	lda	x1 + 1
-	.if >(x_res - 1) > 0
+
+.if >(::x_res - 1) > 0
 	cmp	#>x_res
 	bcc	check2
-	.endif
+.endif
+
 	bne	off
 	lda	x1
 	cmp	#<x_res
@@ -834,10 +904,12 @@ check2:	lda	y2 + 1
 	bcs	off
 
 	lda	x2 + 1
-	.if >(x_res - 1) > 0
+
+.if >(::x_res - 1) > 0
 	cmp	#>x_res
 	bcc	BAR
-	.endif
+.endif
+
 	bne	off
 	lda	x2
 	cmp	#<x_res
@@ -882,10 +954,12 @@ check2:	lda	y2 + 1
 	; Calculate upper right corner
 	lda	x2
 	sta	x1
-	.if >(x_res - 1) > 0
+
+.if >(::x_res - 1) > 0
 	lda	x2 + 1
 	sta	x1 + 1
-	.endif
+.endif
+
 	jsr	CALC
 	; Save the values
 	tya
@@ -972,17 +1046,21 @@ skipm:	; Loop while --dy > 0
 	sta	mag_y8 + 1
 	; Save 8 * mag_x
 	txa
+
 	.repeat	3
 	asl	a
 	rol	mag_x8 + 1
 	.endrepeat
+
 	sta	mag_x8
 	; Save 8 * mag_y
 	tya
+
 	.repeat	3
 	asl	a
 	rol	mag_y8 + 1
 	.endrepeat
+
 	sta	mag_y8
 	; Done!
 	rts
@@ -1007,24 +1085,27 @@ skipm:	; Loop while --dy > 0
 	ataint:	.byte	64,0,32,96
 .bss
 	rows:	.res	1
-	.if >(x_res - 1) > 0
+
+.if >(::x_res - 1) > 0
 	oldx1:	.res	2
 	oldx2:	.res	2
-	.else
+.else
 	oldx1:	.res	1
 	oldx2:	.res	1
-	.endif
+.endif
+
 	oldy1:	.res	1
 	oldy2:	.res	1
 	inv:	.res	1
+
 .code
 	; Don't draw zero sized characters
 	lda	mag_x
-	beq	@exit
-	lda	mag_y
-	bne	@cont
-@exit:	rts
-@cont:	; Save string address, ptr3 is needed by BAR
+	ora	mag_y
+	bne	not0
+	rts
+
+not0:	; Save string address, ptr3 is needed by BAR
 	lda	ptr3
 	sta	string
 	lda	ptr3 + 1
@@ -1038,14 +1119,15 @@ skipm:	; Loop while --dy > 0
 	sub	#1
 	add	x1
 	sta	x2
-	.if >(x_res - 1) > 0
+
+.if >(::x_res - 1) > 0
 	lda	x1 + 1
 	adc	#0
 	sta	x2 + 1
-	.else
+.else
 	lda	#0
 	sta	x2 + 1
-	.endif
+.endif
 
 	; Calculate y2 and adjust y1
 	dec	y1
@@ -1079,29 +1161,37 @@ vert:	lda	x1
 	sta	y2
 	lda	#0
 	sta	y2 + 1
-	beq	while		; Always
+	jmp	while
 
 	; Main loop
 loop:	inc	string
 	bne	skiph
 	inc	string + 1
 skiph:	; Save coords
-	jsr	save_text_y
-	; Draw one character
-	jsr	outchar
-	; Restore coords
-	jsr	restore_text_y
-	; End of loop
-while:	ldy	#0
-	lda	(string),y
-	bne	loop		; Check for null character
-	rts
+	bit	text_dir
+	bmi	scvert
 
-	; --------------------
-	; Output one character
-outchar:
+	ldx	y1
+	stx	oldy1
+	ldx	y2
+	stx	oldy2
+	jmp	draw
+
+scvert:	ldx	x1
+	stx	oldx1
+	ldx	x2
+	stx	oldx2
+
+.if >(::x_res - 1) > 0
+	ldx	x1 + 1
+	stx	oldx1 + 1
+	ldx	x2 + 1
+	stx	oldx2 + 1
+.endif
+
+	; Draw one character
 	; Convert to ANTIC code
-	tay
+draw:	tay
 	rol	a
 	rol	a
 	rol	a
@@ -1118,32 +1208,36 @@ outchar:
 	sta	font
 	lda	#0
 	sta	font + 1
+
 	.repeat 3
 	asl	font
 	rol	a
 	.endrepeat
+
 	adc	CHBAS
 	sta	font + 1
 	; Save old coords
 	bit	text_dir
-	bpl	@hor
+	bpl	hor
 	lda	y1
 	sta	oldy1
 	lda	y2
 	sta	oldy2
-	jmp	@cont
-@hor:	lda	x1
+	jmp	cont
+hor:	lda	x1
 	sta	oldx1
 	lda	x2
 	sta	oldx2
-	.if >(x_res - 1) > 0
+
+.if >(::x_res - 1) > 0
 	lda	x1 + 1
 	sta	oldx1 + 1
 	lda	x2 + 1
 	sta	oldx2 + 1
-	.endif
+.endif
+
 	; Get glyph pixels
-@cont:	ldy	#7
+cont:	ldy	#7
 	; Put one row of the glyph
 putrow:	sty	rows
 	lda	(font),y
@@ -1167,118 +1261,89 @@ putcol:	asl	pixels
 	sta	x1
 next_col:
 	; Go to next column
-	jsr	inc_x
-	dec	cols
-	bpl	putcol
-next_row:
-	; Go to next row
-	jsr	dec_y
-	; Restore old values
+	; increase x coords
 	bit	text_dir
-	bpl	@hor
-	lda	oldy1
-	sta	y1
-	lda	oldy2
-	sta	y2
-	jmp	@cont
-@hor:	lda	oldx1
-	sta	x1
-	lda	oldx2
-	sta	x2
-	.if >(x_res - 1) > 0
-	lda	oldx1 + 1
-	sta	x1 + 1
-	lda	oldx2 + 1
-	sta	x2 + 1
-	.endif
-	; Next row
-@cont:	ldy	rows
-	dey
-	bpl	putrow
-
-	; We're done!
-	rts
-
-
-; -------------------------
-inc_x:	; increase x coords
-	bit	text_dir
-	bmi	@vert
+	bmi	vertinc
 
 	lda	mag_x
 	add	x1
 	sta	x1
-	bcc	@1
+	bcc	L1
 	inc	x1 + 1
-@1:	lda	mag_x
+L1:	lda	mag_x
 	add	x2
 	sta	x2
-	bcc	@2
+	bcc	L2
 	inc	x2 + 1
-@2:	rts
+	jmp	L2
 
-@vert:	lda	y1
+vertinc:
+	lda	y1
 	sub	mag_x
 	sta	y1
 	lda	y2
 	sub	mag_x
 	sta	y2
-	rts
-
-; -------------------------
-dec_y:	; decrease y coords
+L2:
+	dec	cols
+	bpl	putcol
+next_row:
+	; Go to next row
 	bit	text_dir
-	bmi	@vert
+	bmi	verty
 
 	lda	y1
 	sub	mag_y
 	sta	y1
-	bcs	@1
+	bcs	L3
 	dec	y1 + 1
-@1:	lda	y2
+L3:	lda	y2
 	sub	mag_y
 	sta	y2
-	bcs	@2
+	bcs	L6
 	dec	y2 + 1
-@2:	rts
+L4:	jmp	L6
 
-@vert:	lda	x1
+verty:	lda	x1
 	sub	mag_y
 	sta	x1
-	bcs	@3
+	bcs	L5
 	dec	x1 + 1
-@3:	lda	x2
+L5:	lda	x2
 	sub	mag_y
 	sta	x2
-	bcs	@4
+	bcs	L6
 	dec	x2 + 1
-@4:	rts
-
-; -------------------------
-save_text_y: ; Save text's height coords
+L6:
+	; Restore old values
 	bit	text_dir
-	bmi	@vert
-	ldx	y1
-	stx	oldy1
-	ldx	y2
-	stx	oldy2
-	rts
-@vert:	ldx	x1
-	stx	oldx1
-	ldx	x2
-	stx	oldx2
-	.if >(x_res - 1) > 0
-	ldx	x1 + 1
-	stx	oldx1 + 1
-	ldx	x2 + 1
-	stx	oldx2 + 1
-	.endif
-	rts
+	bpl	reshor
+	lda	oldy1
+	sta	y1
+	lda	oldy2
+	sta	y2
+	jmp	nextrow
+reshor:	lda	oldx1
+	sta	x1
+	lda	oldx2
+	sta	x2
 
-; -------------------------
-restore_text_y: ; Position to next char
+.if >(::x_res - 1) > 0
+	lda	oldx1 + 1
+	sta	x1 + 1
+	lda	oldx2 + 1
+	sta	x2 + 1
+.endif
+
+	; Next row
+nextrow:
+	ldy	rows
+	dey
+	jpl	putrow
+
+	; Restore coords
 	bit	text_dir
-	bmi	@vert
+	bmi	resvert
 
 	ldx	oldy1
 	stx	y1
@@ -1301,18 +1366,20 @@ restore_text_y: ; Position to next char
 	adc	x2 + 1
 	sta	x2 + 1
 
-	rts
+	jmp	while
 
-@vert:	ldx	oldx1
+resvert:
+	ldx	oldx1
 	stx	x1
 	ldx	oldx2
 	stx	x2
-	.if >(x_res - 1) > 0
+
+.if >(::x_res - 1) > 0
 	ldx	oldx1 + 1
 	stx	x1 + 1
 	ldx	oldx2 + 1
 	stx	x2 + 1
-	.endif
+.endif
 
 	lda	y1
 	sub	mag_x8
@@ -1327,6 +1394,10 @@ restore_text_y: ; Position to next char
 	sbc	mag_x8 + 1
 	sta	y2 + 1
 
+	; End of loop
+while:	ldy	#0
+	lda	(string),y
+	jne	loop		; Check for null character
 	rts
 
 .endproc
@@ -1374,9 +1445,9 @@ done:	rts
 
 .code
 	tax
-	beq	@cont
+	beq	cont
 	lda	#32
-@cont:	add	p0scr
+cont:	add	p0scr
 	sta	SAVMSC + 1
 	rts
 .endproc
@@ -1405,8 +1476,10 @@ CONTROL:
 
 INSTALL:
 UNINSTALL:
+
 .if pages = 1
 SETVIEWPAGE:
 SETDRAWPAGE:
 .endif
+
         rts

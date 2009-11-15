@@ -168,9 +168,10 @@ search: tax
 	sub	#$10
 	bcs	search
 
-	; No free IOCB
-	lda	#TGI_ERR_NO_IOCB
-	jmp	exit
+	; Not enough resources available (free IOCB or memory)
+	; enter with C cleared!
+nores:	lda	#TGI_ERR_NO_RES
+	bcc	exit
 
 found:	; Check if enough RAM is available
 	lda	#0
@@ -179,14 +180,10 @@ found:	; Check if enough RAM is available
 	lda	RAMTOP
 	sbc	#>mem_needed
 	cmp	APPMHI + 1
-	bcc	nomem
+	bcc	nores
 	bne	switch
 	cpy	APPMHI
-	bcs	switch
-
-	; No memory
-nomem:	lda	#TGI_ERR_NO_MEM
-	jmp	exit
+	bcc	nores			; not enough memory
 
 	; Switch into graphics mode
 switch:	lda	#OPEN

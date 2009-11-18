@@ -2,6 +2,11 @@
 
 ; Freddy Offenga, 4/21/2000
 
+; initmainargs is forcibly included by the C compiler if it encounters a
+; main() function with arguments. Therefore it isn't referenced by the
+; startup code but is nevertheless included in the compiled program when
+; needed.
+
 MAXARGS	= 16		; max. amount of arguments in arg. table
 CL_SIZE = 64		; command line buffer size
 SPACE	= 32		; SPACE char.

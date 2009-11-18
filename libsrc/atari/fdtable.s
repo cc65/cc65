@@ -291,7 +291,7 @@ l2:	sta	fd_table+ft_dev,x	; set device
 	sta	fd_table+ft_flag,x
 	lda	tmp2
 	jsr	fdt_to_fdi		; get new index
-	bcs	noslot			; no one available
+noslot1:bcs	noslot			; no one available (noslot1: helper label for branch out of range)
 	;cmp	#$ff			; no one available
 	;beq	noslot	;@@@ cleanup needed
 	sta	tmp2			; return index
@@ -335,9 +335,6 @@ srch2:	txa
 
 ; not found, open new iocb
 	jmp	do_open
-
-; helper for branch out of range
-noslot1:jmp	noslot
 
 ; found device in table, check device number (e.g R0 - R3)
 fnddev:	lda	fd_table+ft_flag,x

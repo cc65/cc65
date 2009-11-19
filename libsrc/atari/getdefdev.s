@@ -19,6 +19,7 @@
 	.export		__getdefdev		; get default device (e.g. "D1:")
 .ifdef	DYNAMIC_DD
 	.export		__defdev
+	.constructor	__getdefdev,24
 .endif
 
 ; Get default device (LBUF will be destroyed!!)

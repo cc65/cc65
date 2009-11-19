@@ -22,7 +22,6 @@
 
         .include        "zeropage.inc"
 	.include	"atari.inc"
-        .include        "_file.inc"
 
 ; ------------------------------------------------------------------------
 ; EXE header
@@ -100,18 +99,6 @@ L1:	lda	sp,x
 
 	lda	#$FF
 	sta	CH
-
-; set stdio stream handles
-
-	lda	#0
-	jsr	getfd
-       	sta    	__filetab + (0 * .sizeof(_FILE)); setup stdin
-	lda	#0
-	jsr	getfd
-	sta	__filetab + (1 * .sizeof(_FILE)); setup stdout
-	lda	#0
-	jsr	getfd
-	sta	__filetab + (2 * .sizeof(_FILE)); setup stderr
 
 ; Push arguments and call main
 

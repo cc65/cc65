@@ -78,6 +78,7 @@ OBJS = 	_scrsize.o      \
 	diowritev.o     \
 	dosdetect.o     \
 	fdtable.o       \
+	fdtoiocb.o      \
 	getargs.o       \
 	getdefdev.o     \
 	getfd.o         \

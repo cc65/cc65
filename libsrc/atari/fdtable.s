@@ -10,7 +10,6 @@
 	.import fd_table,fd_index
 	.import fdt_to_fdi
 	.export	clriocb
-	.export	fdtoiocb
 	.export	fdtoiocb_down
 	.export	findfreeiocb
 	.export	fddecusage
@@ -88,31 +87,6 @@ loop:	sta	ICHID,x
 .endproc
 
 
-; gets fd in ax
-; return iocb index in A, fd_table index in X
-; return N bit set for invalid fd
-; all registers destroyed
-.proc	fdtoiocb
-
-	cpx	#0
-	bne	inval
-	cmp	#MAX_FD_INDEX
-	bcs	inval
-	tax
-	lda	fd_index,x
-	asl	a			; create index into fd table
-	asl	a
-	tax
-	lda	#$ff
-	cmp	fd_table+ft_iocb,x	; entry in use?
-	beq	inval			; no, return error
-	lda	fd_table+ft_usa,x	; get usage counter
-	beq	inval			; 0? should not happen
-	lda	fd_table+ft_iocb,x	; get iocb
-	rts
-
-.endproc	; fdtoiocb
-
 ; find a free iocb
 ; no entry parameters
 ; return ZF = 0/1 for not found/found
@@ -136,6 +110,7 @@ loop:	tya
 found:	rts
 
 .endproc	; findfreeiocb
+
 
 ; decrements usage counter for fd
 ; if 0 reached, it's marked as unused
@@ -169,6 +144,7 @@ found:	rts
 ret:	rts
 
 .endproc	; fddecusage
+
 
 ; newfd
 ;

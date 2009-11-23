@@ -27,12 +27,11 @@
 
 .proc	_open
 
-	cpy	#4		; correct # of arguments (bytes)?
+	dey			; parm count < 4 shouldn't be needed to be checked
+	dey			;	(it generates a c compiler warning)
+	dey
+	dey
 	beq	parmok		; parameter count ok
-	tya			; parm count < 4 shouldn't be needed to be checked
-	sec			;	(it generates a c compiler warning)
-	sbc	#4
-	tay
 	jsr	addysp		; fix stack, throw away unused parameters
 
 parmok:	jsr	findfreeiocb

@@ -28,52 +28,56 @@ IRQInd		= $2FD	; JMP $0000 - used as indirect IRQ vector
 
 ; BASIC header with a SYS call
 
-	.org	$1BFF
+      	.org	$1BFF
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   .version        ; Line number
-        .byte   $9E,"7181"      ; SYS 7181
+        .byte   $9E             ; SYS token
+        .byte   <(((Start / 1000) .mod 10) + $30)
+        .byte   <(((Start /  100) .mod 10) + $30)
+        .byte   <(((Start /   10) .mod 10) + $30)
+        .byte   <(((Start /    1) .mod 10) + $30)
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
-	.reloc
+      	.reloc
 
 ; ------------------------------------------------------------------------
 ; Actual code
 
 ; Close open files
 
- 	jsr	CLRCH
+Start: 	jsr	CLRCH
 
 ; Switch to the second charset
 
- 	lda	#14
- 	jsr	BSOUT
+      	lda	#14
+      	jsr	BSOUT
 
 ; Before doing anything else, we have to setup our banking configuration.
 ; Otherwise just the lowest 16K are actually RAM. Writing through the ROM
 ; to the underlying RAM works, but it is bad style.
 
-	lda	MMU_CR	 	; Get current memory configuration...
+      	lda	MMU_CR	 	; Get current memory configuration...
        	pha		 	; ...and save it for later
        	lda    	#MMU_CFG_CC65	; Bank0 with kernal ROM
-    	sta	MMU_CR
+      	sta	MMU_CR
 
 ; Save the zero page locations we need
 
        	ldx	#zpspace-1
-L1:	lda    	sp,x
-   	sta	zpsave,x
- 	dex
+L1:   	lda    	sp,x
+      	sta	zpsave,x
+      	dex
        	bpl	L1
 
 ; Clear the BSS data
 
-	jsr	zerobss
+      	jsr	zerobss
 
 ; Save system stuff and setup the stack
 
-	pla		 	; Get MMU setting
-	sta	mmusave
+      	pla		 	; Get MMU setting
+      	sta	mmusave
 
        	tsx
        	stx    	spsave	 	; Save the system stack pointer

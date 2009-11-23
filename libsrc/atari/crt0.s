@@ -9,7 +9,6 @@
 
 	.export		_exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
-	.constructor	initsp, 26
 
 	.import		initlib, donelib, callmain
        	.import	       	zerobss, pushax
@@ -68,9 +67,11 @@ L1:	lda	sp,x
 	lda	MEMTOP
 	sbc	#<__RESERVED_MEMORY__
 	sta	APPMHI			; initialize our APPMHI value
+	sta	sp			; setup runtime stack part 1
 	lda	MEMTOP+1
 	sbc	#>__RESERVED_MEMORY__
 	sta	APPMHI+1
+	sta	sp+1			; setup runtime stack part 2
 
 ; Call module constructors
 
@@ -142,17 +143,6 @@ L2:	lda	zpsave,x
 	rts
 
 ; *** end of main startup code
-
-; setup sp
-
-.segment        "INIT"
-
-initsp:
-	lda	APPMHI
-	sta	sp
-	lda	APPMHI+1
-	sta	sp+1
-	rts
 
 .segment        "ZPSAVE"
 

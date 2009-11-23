@@ -80,19 +80,19 @@ L1:	lda	sp,x
 
 	lda	LMARGN
 	sta	old_lmargin
-	lda	#0
-	sta	LMARGN
+	ldy	#0
+	sty	LMARGN
 
 ; set keyb to upper/lowercase mode
 
 	ldx	SHFLOK
 	stx	old_shflok
-	sta	SHFLOK
+	sty	SHFLOK
 
 ; Initialize conio stuff
 
-	lda	#$FF
-	sta	CH
+	dey                             ; Set X to $FF
+	sty	CH
 
 ; Push arguments and call main
 

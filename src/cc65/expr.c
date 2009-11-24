@@ -1097,7 +1097,8 @@ static void StructRef (ExprDesc* Expr)
     NextToken ();
     if (CurTok.Tok != TOK_IDENT) {
     	Error ("Identifier expected");
-    	Expr->Type = type_int;
+        /* Make the expression an integer at address zero */
+        ED_MakeConstAbs (Expr, 0, type_int);
         return;
     }
 
@@ -1107,7 +1108,8 @@ static void StructRef (ExprDesc* Expr)
     Field = FindStructField (Expr->Type, Ident);
     if (Field == 0) {
      	Error ("Struct/union has no field named `%s'", Ident);
-       	Expr->Type = type_int;
+        /* Make the expression an integer at address zero */
+        ED_MakeConstAbs (Expr, 0, type_int);
      	return;
     }
 

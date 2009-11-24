@@ -1,13 +1,13 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  opctable.c				     */
+/*		       	       	  opchuc6280.h				     */
 /*                                                                           */
-/*		     Disassembler opcode description table		     */
+/*                     HuC6280 opcode description table                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               R?merstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -33,46 +33,28 @@
 
 
 
-/* da65 */
-#include "error.h"
-#include "opc6502.h"
-#include "opc65816.h"
-#include "opc65c02.h"
-#include "opc65sc02.h"
-#include "opchuc6280.h"
-#include "opctable.h"
+#ifndef OPCHUC6280_H
+#define OPCHUC6280_H
+
+
+
+#include "opcdesc.h"
 
 
 
 /*****************************************************************************/
-/*			       	     Data				     */
+/*	       			     Data				     */
 /*****************************************************************************/
 
 
 
 /* Descriptions for all opcodes */
-const OpcDesc* OpcTable = OpcTable_6502;
+extern const OpcDesc OpcTable_HuC6280[256];
 
 
 
-/*****************************************************************************/
-/*	 	    		     Code				     */
-/*****************************************************************************/
+/* End of opchuc6280.h */
+#endif
 
 
 
-void SetOpcTable (cpu_t CPU)
-/* Set the correct opcode table for the given CPU */
-{
-    switch (CPU) {
-        case CPU_6502:    OpcTable = OpcTable_6502;     break;
-        case CPU_65SC02:  OpcTable = OpcTable_65SC02;   break;
-        case CPU_65C02:   OpcTable = OpcTable_65C02;    break;
-        case CPU_HUC6280: OpcTable = OpcTable_HuC6280;  break;
-        default:          Error ("Unsupported CPU");
-    }
-}
-
-
-
-                

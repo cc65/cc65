@@ -427,6 +427,62 @@ void OH_BitBranch (const OpcDesc* D)
 
 
 
+void OH_ImmidiateDirect (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+2);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "#$%02X,%s", GetCodeByte (PC+1), GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_ImmidiateDirectX (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+2);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "#$%02X,%s,x", GetCodeByte (PC+1), GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_ImmidiateAbsolute (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeWord (PC+2);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "#$%02X,%s%s", GetCodeByte (PC+1), GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_ImmidiateAbsoluteX (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeWord (PC+2);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "#$%02X,%s%s,x", GetCodeByte (PC+1), GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
+}
+
+
+
 void OH_StackRelative (const OpcDesc* D attribute ((unused)))
 {
     Error ("Not implemented");
@@ -464,7 +520,20 @@ void OH_DirectIndirectLongY (const OpcDesc* D attribute ((unused)))
 
 void OH_BlockMove (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get source operand */
+    unsigned Src = GetCodeWord (PC+1);
+    /* Get destination operand */
+    unsigned Dst = GetCodeWord (PC+3);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Src);
+    GenerateLabel (D->Flags, Dst);
+
+    /* Output the line */
+    OneLine (D, "%s%s,%s%s,#$%02X",
+             GetAbsOverride (D->Flags, Src), GetAddrArg (D->Flags, Src),
+             GetAbsOverride (D->Flags, Dst), GetAddrArg (D->Flags, Dst),
+             GetCodeWord (PC+5));
 }
 
 

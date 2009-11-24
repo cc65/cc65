@@ -75,6 +75,7 @@ OBJS = 	asminc.obj      \
         opc65816.obj    \
         opc65c02.obj    \
         opc65sc02.obj   \
+        opchuc6280.obj  \
   	opctable.obj 	\
 	output.obj 	\
 	scanner.obj     \

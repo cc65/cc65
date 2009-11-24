@@ -74,6 +74,11 @@ void OH_AbsoluteIndirect (const OpcDesc*);
 
 void OH_BitBranch (const OpcDesc*);
 
+void OH_ImmidiateDirect (const OpcDesc*);
+void OH_ImmidiateDirectX (const OpcDesc*);
+void OH_ImmidiateAbsolute (const OpcDesc*);
+void OH_ImmidiateAbsoluteX (const OpcDesc*);
+
 void OH_StackRelative (const OpcDesc*);
 void OH_DirectIndirectLongX (const OpcDesc*);
 void OH_StackRelativeIndirectY (const OpcDesc*);

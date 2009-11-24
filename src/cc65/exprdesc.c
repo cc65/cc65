@@ -172,7 +172,7 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, Type* Type)
 {
     Expr->Sym   = 0;
     Expr->Type  = Type;
-    Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
+    Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
     Expr->Name  = 0;
     Expr->IVal  = Value;
     Expr->FVal  = FP_D_Make (0.0);
@@ -186,7 +186,7 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 {
     Expr->Sym   = 0;
     Expr->Type  = type_int;
-    Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
+    Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL | (Expr->Flags & E_HAVE_MARKS);
     Expr->Name  = 0;
     Expr->IVal  = Value;
     Expr->FVal  = FP_D_Make (0.0);

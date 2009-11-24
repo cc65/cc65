@@ -7,12 +7,16 @@
 ; unsigned char kbhit (void);
 
 	    .export _kbhit
-	    .import return0, return1
 
 	    .include "../inc/geossym.inc"
 
-_kbhit:
-	    lda pressFlag
-	    bmi L1
-	    jmp return0
-L1:	    jmp return1
+.proc   _kbhit
+
+        ldx     #0              ; High byte of result
+        lda     pressFlag
+        rol                     ; Bit 7 is new key flag
+        txa                     ; A = 0
+        rol
+        rts
+
+.endproc

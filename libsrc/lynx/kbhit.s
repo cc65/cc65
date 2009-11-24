@@ -7,7 +7,7 @@
 	.export		_kbhit
 	.export		KBEDG
 	.export		KBSTL
-	.import		return0, return1
+	.import		return1
 
 ; --------------------------------------------------------------------------
 ; The Atari Lynx has a very small keyboard - only 3 keys
@@ -49,7 +49,8 @@ _kbhit:
 	sta	KBNPR		; inverted previous ones pressed
 	stx	KBPRV
 	lda	KBEDG
-	beq @L1
+       	beq     @L1
 	jmp	return1		; Key hit
-@L1:
-	jmp	return0		; No new keys hit
+
+@L1:    tax                     ; No new keys hit
+        rts

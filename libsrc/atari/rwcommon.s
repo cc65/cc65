@@ -5,7 +5,7 @@
 	.include "atari.inc"
 	.include "errno.inc"
 	.import popax
-	.import __errno,__oserror
+	.import __oserror
 	.import	fdtoiocb
 
 	.export __rwsetup

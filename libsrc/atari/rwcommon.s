@@ -4,7 +4,6 @@
 ;
 	.include "atari.inc"
 	.include "errno.inc"
-	.importzp tmp2,tmp3
 	.import popax
 	.import __errno,__oserror
 	.import	fdtoiocb

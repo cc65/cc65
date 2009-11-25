@@ -20,6 +20,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <conio.h>
+#include <unistd.h>
 
 extern int getsp(void);  /* is provided in getsp.s */
 

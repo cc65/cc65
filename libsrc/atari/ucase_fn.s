@@ -56,8 +56,8 @@ hasdev:
 	ldy	#0
 loop:	lda	(ptr4),y
 	beq	str_end
-	cmp	#ATEOL		; we also accept Atari EOF char as end of string
-	beq	str_end
+;	cmp	#ATEOL		; we also accept Atari EOF char as end of string (not!)
+;	beq	str_end
 	iny
 	bne	loop		; not longer than 255 chars (127 real limit)
 toolong:sec			; indicate error

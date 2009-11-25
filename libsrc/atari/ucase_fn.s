@@ -64,8 +64,7 @@ toolong:sec			; indicate error
 	rts
 
 str_end:iny			; room for terminating zero
-	cpy	#128		; we only can handle lenght < 128
-	bcs	toolong
+	bmi	toolong		; we only can handle lenght < 128
 	sty	tmp3		; save size
 	jsr	subysp		; make room on the stack
 

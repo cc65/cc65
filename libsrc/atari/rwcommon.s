@@ -5,7 +5,6 @@
 	.include "atari.inc"
 	.include "errno.inc"
 	.import popax
-	.import __oserror
 	.import	fdtoiocb
 
 	.export __rwsetup
@@ -42,23 +41,3 @@ iocberr:pla
 	ldx	#$FF		; indicate error + clear ZF
 	rts
 
-;
-; this routine updates errno.  do a JMP here right after calling
-; CIOV.	 we expect status in Y.
-;
-	.export __do_oserror,__inviocb
-__do_oserror:
-	sty	__oserror	; save os dependent error code
-retminus:
-	lda	#$FF
-	tax			; return -1
-	rts
-
-;
-; sets EINVAL error code and returns -1
-;
-
-__inviocb:
-	lda	#<EINVAL
-	jsr	__seterrno
-	jmp	retminus	; return -1

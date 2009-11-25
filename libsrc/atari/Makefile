@@ -76,6 +76,7 @@ OBJS = 	_scrsize.o      \
 	dioread.o       \
 	diowrite.o      \
 	diowritev.o     \
+	do_oserr.o      \
 	dosdetect.o     \
 	fdtable.o       \
 	fdtoiocb.o      \
@@ -86,6 +87,7 @@ OBJS = 	_scrsize.o      \
 	gotoy.o         \
 	gotoxy.o        \
 	graphics.o      \
+	inviocb.o       \
 	joy_stddrv.o    \
 	kbhit.o         \
 	lseek.o         \

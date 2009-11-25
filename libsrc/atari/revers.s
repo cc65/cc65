@@ -22,7 +22,7 @@ L2:	ldx	#$00		; Load high byte of result
 	tya			; Load low byte, set CC
 	rts
 
-	.data
+	.bss
 
 _revflag:
-	.byte	0
+	.res	1

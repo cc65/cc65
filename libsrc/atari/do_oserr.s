@@ -1,7 +1,9 @@
 ;
-; this routine updates errno.  do a JMP here right after calling
-; CIOV.	 we expect status in Y.
-; __retminus is a routine with returns AX with $FFFF
+; __do_oserror updates __oserror.  Do a JMP here right after calling
+; CIOV.	 It will return with AX set to -1 ($FFFF).  It expects the CIO
+; status in Y.
+;
+; __retminus is a routine whitch returns with AX set to -1 ($FFFF).
 ;
 	.include "errno.inc"
 

@@ -2,7 +2,10 @@
 Test programs for the Atari runtime lib:
 ----------------------------------------
 
+defdev.c	-	displays default device as determined by the runtime lib
+
 mem.c		-	displays size of available memory
 
 ostype.c	-	demo program for get_ostype() function
 
+scrcode.s	-	testprogram for the scrcode macro

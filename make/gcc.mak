@@ -14,6 +14,10 @@
 #MAKEOVERRIDES=
 # (That trick has been disabled.)
 
+# To compile with custom make-options, set them here; for example:
+#MAKEOPTS = -j 2 CFLAGS=-O4 CC=clang
+MAKEOPTS =
+
 # The install prefix and directories
 prefix		= /usr/local
 exec_prefix	= $(prefix)
@@ -58,9 +62,10 @@ endif
 all:	bins libs docs $(SYS:%=samples tests)
 
 bins:
-	@$(MAKE) -C src -f make/gcc.mak CA65_INC=\\\"${CA65_INC}/\\\" \
-	  CC65_INC=\\\"${CC65_INC}/\\\" LD65_CFG=\\\"${LD65_CFG}/\\\" \
-	  LD65_LIB=\\\"${LD65_LIB}/\\\" LD65_OBJ=\\\"${LD65_OBJ}/\\\"
+	@$(MAKE) -C src -f make/gcc.mak $(MAKEOPTS) \
+	  CA65_INC=\\\"${CA65_INC}/\\\" CC65_INC=\\\"${CC65_INC}/\\\" \
+	  LD65_CFG=\\\"${LD65_CFG}/\\\" LD65_LIB=\\\"${LD65_LIB}/\\\" \
+	  LD65_OBJ=\\\"${LD65_OBJ}/\\\"
 
 libs:
 	@$(MAKE) -C libsrc
@@ -69,7 +74,7 @@ libs:
 # if a host system doesn't have LinuxDoc Tools.
 docs:
 	@if linuxdoc -B check doc/index >/dev/null 2>&1; \
-	  then $(MAKE) -C doc html; \
+	  then $(MAKE) -C doc $(MAKEOPTS) html; \
 	  else echo '"LinuxDoc Tools" is not installed; skipping HTML documentation.'; \
 	  fi
 

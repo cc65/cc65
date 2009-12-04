@@ -343,11 +343,14 @@ void Compile (const char* FileName)
     /* DefineNumericMacro ("__STDC__", 1);      <- not now */
     DefineNumericMacro ("__STDC_HOSTED__", 1);
 
-    /* Initialize the literal pool */
-    InitLiteralPool ();
-
     /* Create the base lexical level */
     EnterGlobalLevel ();
+
+    /* Create the global code and data segments */
+    CreateGlobalSegments ();
+
+    /* Initialize the literal pool */
+    InitLiteralPool ();
 
     /* Generate the code generator preamble */
     g_preamble ();

@@ -183,6 +183,14 @@ void PopSegments (void)
 
 
 
+void CreateGlobalSegments (void)
+/* Create the global segments and remember them in GS */
+{
+    GS = PushSegments (0);
+}
+
+
+
 void UseDataSeg (segment_t DSeg)
 /* For the current segment list, use the data segment DSeg */
 {

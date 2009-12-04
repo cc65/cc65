@@ -123,6 +123,9 @@ Segments* PushSegments (struct SymEntry* Func);
 void PopSegments (void);
 /* Pop the old segment list (make it current) */
 
+void CreateGlobalSegments (void);
+/* Create the global segments and remember them in GS */
+
 void UseDataSeg (segment_t DSeg);
 /* For the current segment list, use the data segment DSeg */
 

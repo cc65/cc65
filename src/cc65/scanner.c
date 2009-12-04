@@ -406,9 +406,9 @@ static void CharConst (void)
 
 static void StringConst (void)
 /* Parse a quoted string */
-{
-    NextTok.IVal = GetLiteralPoolOffs ();
-    NextTok.Tok  = TOK_SCONST;
+{        
+    /* String buffer */
+    StrBuf S = AUTO_STRBUF_INITIALIZER;
 
     /* Concatenate strings. If at least one of the concenated strings is a wide
      * character literal, the whole string is a wide char literal, otherwise
@@ -436,7 +436,7 @@ static void StringConst (void)
     	     	Error ("Unexpected newline");
     	     	break;
     	    }
-    	    AddLiteralChar (ParseChar ());
+       	    SB_AppendChar (&S, ParseChar ());
     	}
 
     	/* Skip closing quote char if there was one */
@@ -448,7 +448,14 @@ static void StringConst (void)
     }
 
     /* Terminate the string */
-    AddLiteralChar ('\0');
+    SB_AppendChar (&S, '\0');
+
+    /* Add the whole string to the literal pool */
+    NextTok.IVal = AddLiteralStr (&S);
+    NextTok.Tok  = TOK_SCONST;
+
+    /* Free the buffer */
+    SB_Done (&S);
 }
 
 

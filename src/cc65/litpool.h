@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org	                                             */
+/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,7 +51,8 @@
 
 
 
-extern unsigned LiteralPoolLabel;		/* Pool asm label */
+/* Forward for struct SymEntry */
+struct SymEntry;
 
 
 
@@ -64,6 +65,12 @@ extern unsigned LiteralPoolLabel;		/* Pool asm label */
 void InitLiteralPool (void);
 /* Initialize the literal pool */
 
+void PushLiteralPool (struct SymEntry* Func);
+/* Push the current literal pool onto the stack and create a new one */
+
+void PopLiteralPool (void);
+/* Free the current literal pool and restore the one from TOS */
+
 void TranslateLiteralPool (unsigned Offs);
 /* Translate the literals starting from the given offset into the target
  * charset.
@@ -71,6 +78,9 @@ void TranslateLiteralPool (unsigned Offs);
 
 void DumpLiteralPool (void);
 /* Dump the literal pool */
+
+unsigned GetLiteralPoolLabel (void);
+/* Return the asm label for the current literal pool */
 
 unsigned GetLiteralPoolOffs (void);
 /* Return the current offset into the literal pool */
@@ -80,10 +90,17 @@ void ResetLiteralPoolOffs (unsigned Offs);
  * removing values from the pool.
  */
 
-void AddLiteralChar (char C);
-/* Add one character to the literal pool */
-
 unsigned AddLiteral (const char* S);
+/* Add a literal string to the literal pool. Return the starting offset into
+ * the pool for this string.
+ */
+
+unsigned AddLiteralBuf (const void* Buf, unsigned Len);
+/* Add a buffer containing a literal string to the literal pool. Return the
+ * starting offset into the pool for this string.
+ */
+
+unsigned AddLiteralStr (const StrBuf* S);
 /* Add a literal string to the literal pool. Return the starting offset into
  * the pool for this string.
  */

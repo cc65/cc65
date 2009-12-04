@@ -751,7 +751,7 @@ static void Primary (ExprDesc* E)
             E->Type  = GetCharArrayType (GetLiteralPoolOffs () - CurTok.IVal);
             E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL;
             E->IVal  = CurTok.IVal;
-            E->Name  = LiteralPoolLabel;
+            E->Name  = GetLiteralPoolLabel ();
             NextToken ();
             break;
 

@@ -380,9 +380,9 @@ void NewFunc (SymEntry* Func)
     /* Reenter the lexical level */
     ReenterFunctionLevel (D);
 
-    /* Check if the function header contains unnamed parameters. These are 
+    /* Check if the function header contains unnamed parameters. These are
      * only allowed in cc65 mode.
-     */ 
+     */
     if ((D->Flags & FD_UNNAMED_PARAMS) != 0 && (IS_Get (&Standard) != STD_CC65)) {
         Error ("Parameter name omitted");
     }
@@ -438,6 +438,9 @@ void NewFunc (SymEntry* Func)
 
     /* Allocate code and data segments for this function */
     Func->V.F.Seg = PushSegments (Func);
+
+    /* Allocate a new literal pool */
+    PushLiteralPool (Func);
 
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsQualFastcall (Func->Type) && D->ParamCount > 0) {
@@ -538,6 +541,10 @@ void NewFunc (SymEntry* Func)
 
     /* Eat the closing brace */
     ConsumeRCurly ();
+
+    /* Dump the literal pool, the restore the old one */
+    DumpLiteralPool ();
+    PopLiteralPool ();
 
     /* Switch back to the old segments */
     PopSegments ();

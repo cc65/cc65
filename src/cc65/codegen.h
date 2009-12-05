@@ -136,6 +136,9 @@ void g_defcodelabel (unsigned label);
 void g_defdatalabel (unsigned label);
 /* Define a local data label */
 
+void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
+/* Define label as a local alias for baselabel+offs */
+
 
 
 /*****************************************************************************/

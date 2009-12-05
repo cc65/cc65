@@ -57,6 +57,7 @@
 
 
 struct Segments;
+struct LiteralPool;
 
 
 
@@ -147,6 +148,7 @@ struct SymEntry {
 	struct {
 	    struct FuncDesc*	Func;	  /* Function descriptor */
        	    struct Segments*	Seg;	  /* Segments for this function */
+            struct LiteralPool* LitPool;  /* Literal pool for this function */
        	} F;
 
     } V;
@@ -221,6 +223,9 @@ INLINE int SymIsRegVar (const SymEntry* Sym)
 #  define SymIsRegVar(Sym)      (((Sym)->Flags & (SC_REGISTER|SC_TYPE)) == SC_REGISTER)
 #endif
 
+int SymIsOutputFunc (const SymEntry* Sym);
+/* Return true if this is a function that must be output */
+
 #if defined(HAVE_INLINE)
 INLINE const char* SymGetAsmName (const SymEntry* Sym)
 /* Return the assembler label name for the symbol (beware: may be NULL!) */
@@ -238,7 +243,7 @@ const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType);
 INLINE int SymHasAttr (const SymEntry* Sym, DeclAttrType A)
 /* Return true if the symbol has the given attribute */
 {
-    return (SymGetAttr (Sym, A) != 0);    
+    return (SymGetAttr (Sym, A) != 0);
 }
 #else
 #  define SymHasAttr(Sym, A)       (SymGetAttr (Sym, A) != 0)

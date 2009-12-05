@@ -54,10 +54,45 @@
 /* Forward for struct SymEntry */
 struct SymEntry;
 
+/* Forward for a literal */
+typedef struct Literal Literal;
+
+/* Forward for a literal pool */
+typedef struct LiteralPool LiteralPool;
+
 
 
 /*****************************************************************************/
-/*		 	    	     Code				     */
+/*                              struct Literal                               */
+/*****************************************************************************/
+
+
+
+Literal* UseLiteral (Literal* L);
+/* Increase the reference counter for the literal and return it */
+
+void ReleaseLiteral (Literal* L);
+/* Decrement the reference counter for the literal */
+
+void TranslateLiteral (Literal* L);
+/* Translate a literal into the target charset. */
+
+unsigned GetLiteralLabel (const Literal* L);
+/* Return the asm label for a literal */
+
+const char* GetLiteralStr (const Literal* L);
+/* Return the data for a literal as pointer to char */
+
+const StrBuf* GetLiteralStrBuf (const Literal* L);
+/* Return the data for a literal as pointer to the string buffer */
+
+unsigned GetLiteralSize (const Literal* L);
+/* Get the size of a literal string */
+
+
+
+/*****************************************************************************/
+/*  	       	       	   	     Code		     		     */
 /*****************************************************************************/
 
 
@@ -68,53 +103,29 @@ void InitLiteralPool (void);
 void PushLiteralPool (struct SymEntry* Func);
 /* Push the current literal pool onto the stack and create a new one */
 
-void PopLiteralPool (void);
-/* Free the current literal pool and restore the one from TOS */
+LiteralPool* PopLiteralPool (void);
+/* Pop the last literal pool from TOS and activate it. Return the old
+ * literal pool.
+ */
 
-void TranslateLiteralPool (unsigned Offs);
-/* Translate the literals starting from the given offset into the target
- * charset.
+void MoveLiteralPool (LiteralPool* LocalPool);
+/* Move all referenced literals in LocalPool to the global literal pool. This
+ * function will free LocalPool after moving the used string literals.
  */
 
 void DumpLiteralPool (void);
 /* Dump the literal pool */
 
-unsigned GetLiteralPoolLabel (void);
-/* Return the asm label for the current literal pool */
+Literal* AddLiteral (const char* S);
+/* Add a literal string to the literal pool. Return the literal. */
 
-unsigned GetLiteralPoolOffs (void);
-/* Return the current offset into the literal pool */
-
-void ResetLiteralPoolOffs (unsigned Offs);
-/* Reset the offset into the literal pool to some earlier value, effectively
- * removing values from the pool.
- */
-
-unsigned AddLiteral (const char* S);
-/* Add a literal string to the literal pool. Return the starting offset into
- * the pool for this string.
- */
-
-unsigned AddLiteralBuf (const void* Buf, unsigned Len);
+Literal* AddLiteralBuf (const void* Buf, unsigned Len);
 /* Add a buffer containing a literal string to the literal pool. Return the
- * starting offset into the pool for this string.
+ * literal.
  */
 
-unsigned AddLiteralStr (const StrBuf* S);
-/* Add a literal string to the literal pool. Return the starting offset into
- * the pool for this string.
- */
-
-const char* GetLiteral (unsigned Offs);
-/* Get a pointer to the literal with the given offset in the pool */
-
-void GetLiteralStrBuf (StrBuf* Target, unsigned Offs);
-/* Copy the string starting at Offs and lasting to the end of the buffer
- * into Target.
- */
-
-void PrintLiteralPoolStats (FILE* F);
-/* Print statistics about the literal space used */
+Literal* AddLiteralStr (const StrBuf* S);
+/* Add a literal string to the literal pool. Return the literal. */
 
 
 

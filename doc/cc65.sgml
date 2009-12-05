@@ -244,7 +244,7 @@ Here is a description of all the command line options:
   better way is to declare characters explicitly as "signed" if needed. You
   can also use <tt><ref id="pragma-signed-chars"
   name="#pragma&nbsp;signed-chars"></tt> for better control of this option.
-                                                                        
+
 
   <label id="option--standard">
   <tag><tt>--standard std</tt></tag>
@@ -301,8 +301,8 @@ Here is a description of all the command line options:
 
   Make string literals writable by placing them into the data segment instead
   of the rodata segment. You can also use <tt><ref id="pragma-writable-strings"
-  name="#pragma&nbsp;writable-strings"></tt> to control this option on a
-  per function basis.
+  name="#pragma&nbsp;writable-strings"></tt> to control this option from within
+  the source file.
 
 
   <label id="option-static-locals">
@@ -979,9 +979,9 @@ parameter with the <tt/#pragma/.
 
 <sect1><tt>#pragma writable-strings ([push,] on|off)</tt><label id="pragma-writable-strings"><p>
 
-  Changes the storage location of string literals. For historical reasons, 
-  the C standard defines that string literals are of type "char[]", but 
-  writing to such a literal causes undefined behaviour. Most compilers 
+  Changes the storage location of string literals. For historical reasons,
+  the C standard defines that string literals are of type "char[]", but
+  writing to such a literal causes undefined behaviour. Most compilers
   (including cc65) place string literals in the read-only data segment, which
   may cause problems with old C code that writes to string literals.
 
@@ -989,10 +989,6 @@ parameter with the <tt/#pragma/.
   name="--writable-strings" id="option-writable-strings">/) causes the
   literals to be placed in the data segment so they can be written to without
   worry.
-
-  Please note that the value of this flag that is in effect when a function
-  is encountered, determines where the literals are stored. Changing the 
-  <tt/#pragma/ within a function doesn't have an effect for this function.
 
   The <tt/#pragma/ understands the push and pop parameters as explained above.
 

@@ -321,8 +321,7 @@ static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
 
         case TOK_SCONST:
             /* String constant */
-            SB_AppendStr (T, GetLiteral (CurTok.IVal));
-            ResetLiteralPoolOffs (CurTok.IVal);
+            SB_Append (T, GetLiteralStrBuf (CurTok.SVal));
             NextToken ();
             break;
 
@@ -347,14 +346,7 @@ static void ParseAsm (void)
 
     /* Create a string buffer from the string literal */
     StrBuf S = AUTO_STRBUF_INITIALIZER;
-    GetLiteralStrBuf (&S, CurTok.IVal);
-
-    /* Reset the string pointer, effectivly clearing the string from the
-     * string table. Since we're working with one token lookahead, this
-     * will fail if the next token is also a string token, but that's a
-     * syntax error anyway, because we expect a right paren.
-     */
-    ResetLiteralPoolOffs (CurTok.IVal);
+    SB_Append (&S, GetLiteralStrBuf (CurTok.SVal));
 
     /* Skip the string token */
     NextToken ();

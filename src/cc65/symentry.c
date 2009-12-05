@@ -153,6 +153,19 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
 
 
 
+int SymIsOutputFunc (const SymEntry* Sym)
+/* Return true if this is a function that must be output */
+{
+    /* Symbol must be a function which is defined and either extern or
+     * static and referenced.
+     */
+    return IsTypeFunc (Sym->Type)               &&
+           SymIsDef (Sym)                       &&
+           (Sym->Flags & (SC_REF | SC_EXTERN));
+}                                               
+
+
+
 const DeclAttr* SymGetAttr (const SymEntry* Sym, DeclAttrType AttrType)
 /* Return an attribute for this symbol or NULL if the attribute does not exist */
 {

@@ -652,14 +652,7 @@ static void ParsePragma (void)
 
     /* Create a string buffer from the string literal */
     StrBuf B = AUTO_STRBUF_INITIALIZER;
-    GetLiteralStrBuf (&B, CurTok.IVal);
-
-    /* Reset the string pointer, effectivly clearing the string from the
-     * string table. Since we're working with one token lookahead, this
-     * will fail if the next token is also a string token, but that's a
-     * syntax error anyway, because we expect a right paren.
-     */
-    ResetLiteralPoolOffs (CurTok.IVal);
+    SB_Append (&B, GetLiteralStrBuf (CurTok.SVal));
 
     /* Skip the string token */
     NextToken ();

@@ -938,10 +938,13 @@ int main (int argc, char* argv[])
     /* Create the output file if we didn't had any errors */
     if (PreprocessOnly == 0 && (ErrorCount == 0 || Debug)) {
 
-	/* Open the file */
+        /* Emit literals, externals, do cleanup and optimizations */
+        FinishCompile ();
+
+     	/* Open the file */
         OpenOutputFile ();
 
-	/* Write the output to the file */
+     	/* Write the output to the file */
        	WriteAsmOutput ();
        	Print (stdout, 1, "Wrote output to `%s'\n", OutputFilename);
 

@@ -454,7 +454,7 @@ static void StringConst (void)
     SB_AppendChar (&S, '\0');
 
     /* Add the whole string to the literal pool */
-    NextTok.IVal = AddLiteralStr (&S);
+    NextTok.SVal = AddLiteralStr (&S);
 
     /* Free the buffer */
     SB_Done (&S);
@@ -760,7 +760,7 @@ void NextToken (void)
      	if (token[0] == '_' && token[1] == '_') {
      	    /* Special symbols */
             if (strcmp (token+2, "FILE__") == 0) {
-	       	NextTok.IVal = AddLiteral (GetCurrentFile());
+	       	NextTok.SVal = AddLiteral (GetCurrentFile());
 	       	NextTok.Tok  = TOK_SCONST;
 	       	return;
 	    } else if (strcmp (token+2, "LINE__") == 0) {
@@ -771,7 +771,7 @@ void NextToken (void)
        	    } else if (strcmp (token+2, "func__") == 0) {
 	       	/* __func__ is only defined in functions */
 	       	if (CurrentFunc) {
-	       	    NextTok.IVal = AddLiteral (F_GetFuncName (CurrentFunc));
+	       	    NextTok.SVal = AddLiteral (F_GetFuncName (CurrentFunc));
 	       	    NextTok.Tok  = TOK_SCONST;
 	       	    return;
 	       	}

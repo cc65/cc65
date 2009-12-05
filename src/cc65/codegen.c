@@ -41,9 +41,9 @@
 #include "check.h"
 #include "cpu.h"
 #include "strbuf.h"
-#include "version.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
+#include "version.h"
 
 /* cc65 */
 #include "asmcode.h"
@@ -342,6 +342,24 @@ void g_defdatalabel (unsigned label)
 /* Define a local data label */
 {
     AddDataLine ("%s:", LocalLabelName (label));
+}
+
+
+
+void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs)
+/* Define label as a local alias for baselabel+offs */
+{
+    /* We need an intermediate buffer here since LocalLabelName uses a
+     * static buffer which changes with each call.
+     */
+    StrBuf L = AUTO_STRBUF_INITIALIZER;
+    SB_AppendStr (&L, LocalLabelName (label));
+    SB_Terminate (&L);
+    AddDataLine ("%s\t:=\t%s+%ld",
+                 SB_GetConstBuf (&L),
+                 LocalLabelName (baselabel),
+                 offs);
+    SB_Done (&L);
 }
 
 

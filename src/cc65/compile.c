@@ -46,6 +46,7 @@
 #include "asmlabel.h"
 #include "asmstmt.h"
 #include "codegen.h"
+#include "codeopt.h"
 #include "compile.h"
 #include "declare.h"
 #include "error.h"
@@ -373,35 +374,51 @@ void Compile (const char* FileName)
         /* Close the output file */
         CloseOutputFile ();
 
-        if (Debug) {
-            PrintMacroStats (stdout);
-        }
-
     } else {
 
         /* Ok, start the ball rolling... */
         Parse ();
 
-        /* Dump the literal pool. */
-        DumpLiteralPool ();
-
-        /* Write imported/exported symbols */
-        EmitExternals ();
-
-        if (Debug) {
-            PrintLiteralPoolStats (stdout);
-            PrintMacroStats (stdout);
-        }
-
     }
 
-    /* Leave the main lexical level */
-    LeaveGlobalLevel ();
+    if (Debug) {
+        PrintMacroStats (stdout);
+    }
 
     /* Print an error report */
     ErrorReport ();
 }
 
+
+
+void FinishCompile (void)
+/* Emit literals, externals, do cleanup and optimizations */
+{
+    SymTable* SymTab;
+    SymEntry* Func;
+
+    /* Walk over all functions, doing cleanup, optimizations ... */
+    SymTab = GetGlobalSymTab ();
+    Func   = SymTab->SymHead;
+    while (Func) {
+        if (SymIsOutputFunc (Func)) {
+            /* Function which is defined and referenced or extern */
+            MoveLiteralPool (Func->V.F.LitPool);
+            CS_MergeLabels (Func->V.F.Seg->Code);
+            RunOpt (Func->V.F.Seg->Code);
+        }
+        Func = Func->NextSym;
+    }
+
+    /* Dump the literal pool */
+    DumpLiteralPool ();
+
+    /* Write imported/exported symbols */
+    EmitExternals ();
+
+    /* Leave the main lexical level */
+    LeaveGlobalLevel ();
+}
 
 
 

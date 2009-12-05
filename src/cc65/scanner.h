@@ -186,20 +186,24 @@ typedef enum token_t {
 
 
 /*****************************************************************************/
-/*				     data				     */
+/*				     Data		   		     */
 /*****************************************************************************/
 
 
 
-/* Token stuff */
+/* Forward for struct Literal */
+struct Literal;
+
+/* Token stuff */                     
 typedef struct Token Token;
 struct Token {
-    token_t 	Tok;		/* The token itself */
-    long    	IVal;		/* The integer attribute */
-    Double      FVal;		/* The float attribute */
-    ident   	Ident;		/* Identifier if IDENT */
-    LineInfo*   LI;		/* Source line where the token comes from */
-    Type*	Type;		/* Type if integer or float constant */
+    token_t    	    Tok;        /* The token itself */
+    long    	    IVal;  	/* The integer attribute */
+    Double          FVal;  	/* The float attribute */
+    struct Literal* SVal;       /* String literal is any */
+    ident   	    Ident; 	/* Identifier if IDENT */
+    LineInfo*       LI;    	/* Source line where the token comes from */
+    Type*      	    Type;  	/* Type if integer or float constant */
 };
 
 extern Token CurTok;		/* The current token */
@@ -208,7 +212,7 @@ extern Token NextTok;		/* The next token */
 
 
 /*****************************************************************************/
-/*	   			     code     				     */
+/*	   			     Code     				     */
 /*****************************************************************************/
 
 

@@ -1769,7 +1769,6 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
 
         /* Char array initialized by string constant */
         int NeedParen;
-        const char* Str;
 
         /* If we initializer is enclosed in brackets, remember this fact and
          * skip the opening bracket.
@@ -1779,16 +1778,13 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
             NextToken ();
         }
 
-        /* Get the initializer string and its size */
-        Str = GetLiteral (CurTok.IVal);
-        Count = GetLiteralPoolOffs () - CurTok.IVal;
-
         /* Translate into target charset */
-        TranslateLiteralPool (CurTok.IVal);
+        TranslateLiteral (CurTok.SVal);
 
         /* If the array is one too small for the string literal, omit the
          * trailing zero.
          */
+        Count = GetLiteralSize (CurTok.SVal);
         if (ElementCount != UNSPECIFIED &&
             ElementCount != FLEXIBLE    &&
             Count        == ElementCount + 1) {
@@ -1797,10 +1793,9 @@ static unsigned ParseArrayInit (Type* T, int AllowFlexibleMembers)
         }
 
         /* Output the data */
-        g_defbytes (Str, Count);
+        g_defbytes (GetLiteralStr (CurTok.SVal), Count);
 
-        /* Remove string from pool */
-        ResetLiteralPoolOffs (CurTok.IVal);
+        /* Skip the string */
         NextToken ();
 
         /* If the initializer was enclosed in curly braces, we need a closing

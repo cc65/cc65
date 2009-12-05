@@ -38,7 +38,6 @@
 
 /* cc65 */
 #include "asmcode.h"
-#include "codeopt.h"
 #include "codeseg.h"
 #include "dataseg.h"
 #include "segments.h"
@@ -124,12 +123,8 @@ void WriteAsmOutput (void)
     SymTab = GetGlobalSymTab ();
     Entry  = SymTab->SymHead;
     while (Entry) {
-       	if (IsTypeFunc (Entry->Type) 	  	&&
-       	    SymIsDef (Entry)   	                &&
-       	    (Entry->Flags & (SC_REF | SC_EXTERN)) != 0) {
-       	    /* Function which is defined and referenced or extern */
-       	    CS_MergeLabels (Entry->V.F.Seg->Code);
-       	    RunOpt (Entry->V.F.Seg->Code);
+       	if (SymIsOutputFunc (Entry)) {
+            /* Function which is defined and referenced or extern */
        	    OutputSegments (Entry->V.F.Seg);
        	}
        	Entry = Entry->NextSym;

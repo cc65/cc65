@@ -359,7 +359,7 @@ static void F_RestoreRegVars (Function* F)
 }
 
 
-
+    
 /*****************************************************************************/
 /*     	      	  	    	     code	      		 	     */
 /*****************************************************************************/
@@ -542,9 +542,8 @@ void NewFunc (SymEntry* Func)
     /* Eat the closing brace */
     ConsumeRCurly ();
 
-    /* Dump the literal pool, the restore the old one */
-    DumpLiteralPool ();
-    PopLiteralPool ();
+    /* Restore the old literal pool, remembering the one for the function */
+    Func->V.F.LitPool = PopLiteralPool ();
 
     /* Switch back to the old segments */
     PopSegments ();

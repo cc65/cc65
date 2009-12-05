@@ -406,9 +406,12 @@ static void CharConst (void)
 
 static void StringConst (void)
 /* Parse a quoted string */
-{        
+{
     /* String buffer */
     StrBuf S = AUTO_STRBUF_INITIALIZER;
+
+    /* Assume next token is a string constant */
+    NextTok.Tok  = TOK_SCONST;
 
     /* Concatenate strings. If at least one of the concenated strings is a wide
      * character literal, the whole string is a wide char literal, otherwise
@@ -452,7 +455,6 @@ static void StringConst (void)
 
     /* Add the whole string to the literal pool */
     NextTok.IVal = AddLiteralStr (&S);
-    NextTok.Tok  = TOK_SCONST;
 
     /* Free the buffer */
     SB_Done (&S);

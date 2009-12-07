@@ -2,55 +2,17 @@
 ; Christian Groessler, Oct-2000
 ;
 ; allocates a new fd in the indirection table
-; the fdtable itself is defined here
 ;
 
 	.include "atari.inc"
 	.include "fd.inc"
 	.include "_file.inc"
 	.importzp tmp1
+	.import fd_table, fd_index
 
 	.export fdt_to_fdi,getfd
-	.export	fd_table,fd_index
-	.export	___fd_table,___fd_index	; for test(debug purposes only
-
-	.constructor	initfds,24
-
-	.data
-
-___fd_index:
-fd_index:	; fd number is index into this table, entry's value specifies the fd_table entry
-	.res	MAX_FD_INDEX,$ff
-
-___fd_table:
-fd_table:	; each entry represents an open iocb
-	.byte	0,0,'E',0	; system console, app starts with opened iocb #0 for E:
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
 
 	.code
-
-; set stdio stream handles
-
-.proc 	initfds
-
-	lda	#0
-	jsr	getfd
-	sta	__filetab + (0 * .sizeof(_FILE)); setup stdin
-	lda	#0
-	jsr	getfd
-	sta	__filetab + (1 * .sizeof(_FILE)); setup stdout
-	lda	#0
-	jsr	getfd
-	sta	__filetab + (2 * .sizeof(_FILE)); setup stderr
-	rts
-
-.endproc
 
 ; fdt_to_fdi
 ; returns a fd_index entry pointing to the given ft_table entry

@@ -23,7 +23,7 @@
 	.import	__defdev
 .endif
 	.importzp tmp3,ptr4,sp
-	.import	_strupr,subysp
+	.import	subysp,addysp
 	.export	ucase_fn
 
 .proc   ucase_fn
@@ -50,56 +50,48 @@
 hasdev:
 .endif
 
-	; now we need the length of the name
-	ldy	#0
-loop:	lda	(ptr4),y
-	beq	str_end
-;	cmp	#ATEOL		; we also accept Atari EOF char as end of string (not!)
-;	beq	str_end
-	iny
-	bne	loop		; not longer than 255 chars (127 real limit)
-toolong:sec			; indicate error
-	rts
-
-str_end:iny			; room for terminating zero
-	bmi	toolong		; we only can handle lenght < 128
+	ldy	#128
 	sty	tmp3		; save size
 	jsr	subysp		; make room on the stack
 
-	; copy filename to the temp. place on the stack
-	lda	#0		; end-of-string
-	sta	(sp),y		; Y still contains length + 1
-	dey
+	; copy filename to the temp. place on the stack, also uppercasing it
+	ldy	#0
+
 loop2:	lda	(ptr4),y
 	sta	(sp),y
-	dey
+	beq	copy_end
+	bmi	L1		; Not lowercase (also, invalid, should reject)
+	cmp	#'a'
+	bcc	L1		; Not lowercase
+	and	#$DF		; make upper case char, assume ASCII chars
+	sta	(sp),y		; store back
+L1:
+	iny
 	bpl	loop2		; bpl: this way we only support a max. length of 127
+
+	; Filename too long
+	jsr	addysp		; restore the stack
+	sec			; indicate error
+	rts
+
+copy_end:
 
 .ifdef	DEFAULT_DEVICE
 	lda	tmp2
 	cmp	#1		; was device present in passed string?
 	beq	hasdev2		; yes, don't prepend something
 
-	inc	tmp3		; no, prepend "D:" (or other device)
-	inc	tmp3		; adjust stack size used
-	inc	tmp3
+	ldy	#128+3		; no, prepend "D:" (or other device)
+	sty	tmp3		; adjust stack size used
 	ldy	#3
 	jsr	subysp		; adjust stack pointer
-	ldy	#2
-	lda	#':'
-	sta	(sp),y		; insert ':'
 	dey
-	lda	__defdev+1
-	sta	(sp),y		; insert device number
+cpdev:	lda	__defdev,y
+	sta	(sp),y		; insert device name, number and ':'
 	dey
-	lda	__defdev
-	sta	(sp),y		; insert device name (normally 'D' or 'H')
+	bpl	cpdev
 hasdev2:
 .endif
-	; uppercase the temp. filename
-	ldx	sp+1
-	lda	sp
-	jsr	_strupr
 
 	; leave A and X pointing to the modified filename
 	lda	sp

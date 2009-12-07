@@ -26,10 +26,6 @@
 
 __getdefdev:
 
-.ifdef	DEFAULT_DEVICE
-	lda	#'0'+DEFAULT_DEVICE
-	sta	__defdev+1
-.endif
 	lda	__dos_type	; which DOS?
 	cmp	#ATARIDOS
 	beq	finish
@@ -86,5 +82,9 @@ finish:	lda	#<__defdev
 ; Default device
 
 __defdev:
+.ifdef	DEFAULT_DEVICE
+	.byte	'D', '0'+DEFAULT_DEVICE, ':', 0
+.else
 	.byte	"D1:", 0
+.endif
 

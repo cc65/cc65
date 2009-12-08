@@ -410,8 +410,8 @@ void FinishCompile (void)
         Func = Func->NextSym;
     }
 
-    /* Dump the literal pool */
-    DumpLiteralPool ();
+    /* Output the literal pool */
+    OutputLiteralPool ();
 
     /* Write imported/exported symbols */
     EmitExternals ();

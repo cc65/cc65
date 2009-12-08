@@ -84,6 +84,7 @@ Long options:
   --forget-inc-paths    Forget include search paths
   --help                Help (this text)
   --include-dir dir     Set an include directory search path
+  --local-strings       Emit string literals immediately
   --register-space b    Set space available for register variables
   --register-vars       Enable register variables
   --rodata-name seg     Set the name of the RODATA segment
@@ -190,6 +191,20 @@ Here is a description of all the command line options:
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <label id="option-local-strings">
+  <tag><tt>--local-strings</tt></tag>
+
+  Emit string literals to the data segment when they're encountered in the
+  source. The default is to keep string literals until end of assembly, merge
+  read only literals if possible, and then output the literals into the data
+  or rodata segment that is active at that point. Use of this option prevents
+  merging of duplicate strings, but the options that change the name of one of
+  the data segments will work.
+
+  You can also use <tt><ref id="pragma-local-strings"
+  name="#pragma&nbsp;local-strings"></tt> for fine grained control.
 
 
   <tag><tt>-o name</tt></tag>
@@ -866,6 +881,20 @@ parameter with the <tt/#pragma/.
   <tscreen><verb>
        	#pragma data-name ("MyDATA")
   </verb></tscreen>
+
+
+<sect1><tt>#pragma local-strings ([push,] on|off)</tt><label id="pragma-local-strings"><p>
+
+  When "on", emit string literals to the data segment when they're encountered
+  in the source. The default ("off") is to keep string literals until end of
+  assembly, merge read only literals if possible, and then output the literals
+  into the data or rodata segment that is active at that point.
+
+  Using this <tt/#pragma/ it is possible to control the behaviour from within
+  the source. When <tt/#pragma local-strings/ is active, string literals are
+  output immediately, which means that they go into the currently active data
+  or rodata segment, but cannot be merged. When inactive, string literals are
+  remembered and output as a whole when translation is finished.
 
 
 <sect1><tt>#pragma optimize ([push,] on|off)</tt><label id="pragma-optimize"><p>

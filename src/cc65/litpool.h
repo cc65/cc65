@@ -113,8 +113,8 @@ void MoveLiteralPool (LiteralPool* LocalPool);
  * function will free LocalPool after moving the used string literals.
  */
 
-void DumpLiteralPool (void);
-/* Dump the literal pool */
+void OutputLiteralPool (void);
+/* Output the literal pool */
 
 Literal* AddLiteral (const char* S);
 /* Add a literal string to the literal pool. Return the literal. */

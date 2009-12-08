@@ -73,6 +73,7 @@ typedef enum {
     PRAGMA_CODESIZE,
     PRAGMA_DATA_NAME,
     PRAGMA_DATASEG,                                     /* obsolete */
+    PRAGMA_LOCAL_STRINGS,
     PRAGMA_OPTIMIZE,
     PRAGMA_REGVARADDR,
     PRAGMA_REGISTER_VARS,
@@ -104,6 +105,7 @@ static const struct Pragma {
     { "codesize",               PRAGMA_CODESIZE         },
     { "data-name",              PRAGMA_DATA_NAME        },
     { "dataseg",                PRAGMA_DATASEG     	},      /* obsolete */
+    { "local-strings",          PRAGMA_LOCAL_STRINGS    },
     { "optimize",               PRAGMA_OPTIMIZE         },
     { "register-vars",          PRAGMA_REGISTER_VARS    },
     { "regvaraddr",             PRAGMA_REGVARADDR  	},
@@ -726,6 +728,10 @@ static void ParsePragma (void)
         case PRAGMA_DATA_NAME:
      	    SegNamePragma (&B, SEG_DATA);
      	    break;
+
+        case PRAGMA_LOCAL_STRINGS:
+            FlagPragma (&B, &LocalStrings);
+            break;
 
         case PRAGMA_OPTIMIZE:
             FlagPragma (&B, &Optimize);

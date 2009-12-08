@@ -51,6 +51,7 @@ unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 
 /* Stackable options */
 IntStack WritableStrings    = INTSTACK(0);  /* Literal strings are r/w */
+IntStack LocalStrings       = INTSTACK(0);  /* Emit string literals immediately */
 IntStack InlineStdFuncs     = INTSTACK(0);  /* Inline some known functions */
 IntStack EnableRegVars      = INTSTACK(0);  /* Enable register variables */
 IntStack AllowRegVarAddr    = INTSTACK(0);  /* Allow taking addresses of register vars */
@@ -60,6 +61,5 @@ IntStack SignedChars        = INTSTACK(0);  /* Make characters signed by default
 IntStack CheckStack         = INTSTACK(0);  /* Generate stack overflow checks */
 IntStack Optimize      	    = INTSTACK(0);  /* Optimize flag */
 IntStack CodeSizeFactor	    = INTSTACK(100);/* Size factor for generated code */
-
 
 

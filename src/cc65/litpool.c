@@ -62,6 +62,7 @@
 struct Literal {
     unsigned    Label;                  /* Asm label for this literal */
     int         RefCount;               /* Reference count */
+    int         Output;                 /* True if output has been generated */
     StrBuf      Data;                   /* Literal data */
 };
 
@@ -100,6 +101,7 @@ static Literal* NewLiteral (const void* Buf, unsigned Len)
     /* Initialize the fields */
     L->Label    = GetLocalLabel ();
     L->RefCount = 0;
+    L->Output   = 0;
     SB_Init (&L->Data);
     SB_AppendBuf (&L->Data, Buf, Len);
 
@@ -121,10 +123,43 @@ static void FreeLiteral (Literal* L)
 
 
 
+static void OutputLiteral (Literal* L)
+/* Output one literal to the currently active data segment */
+{
+    /* Translate the literal into the target charset */
+    TranslateLiteral (L);
+
+    /* Define the label for the literal */
+    g_defdatalabel (L->Label);
+
+    /* Output the literal data */
+    g_defbytes (SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data));
+
+    /* Mark the literal as output */
+    L->Output = 1;
+}
+
+
+
 Literal* UseLiteral (Literal* L)
 /* Increase the reference counter for the literal and return it */
 {
+    /* Increase the reference count */
     ++L->RefCount;
+
+    /* If --local-strings was given, immediately output the literal */
+    if (IS_Get (&LocalStrings)) {
+        /* Switch to the proper data segment */
+        if (IS_Get (&WritableStrings)) {
+            g_usedata ();
+        } else {
+            g_userodata ();
+        }
+        /* Output the literal */
+        OutputLiteral (L);
+    }
+
+    /* Return the literal */
     return L;
 }
 
@@ -133,7 +168,8 @@ Literal* UseLiteral (Literal* L)
 void ReleaseLiteral (Literal* L)
 /* Decrement the reference counter for the literal */
 {
-    CHECK (--L->RefCount >= 0);
+    --L->RefCount;
+    CHECK (L->RefCount >= 0 && (L->RefCount > 0 || !L->Output));
 }
 
 
@@ -276,8 +312,10 @@ static void MoveLiterals (Collection* Source, Collection* Target)
         /* Get the literal */
         Literal* L = CollAt (Source, I);
 
-        /* If it is referenced, add it to the Target pool, otherwise free it */
-        if (L->RefCount) {
+        /* If it is referenced and not output, add it to the Target pool,
+         * otherwise free it
+         */
+        if (L->RefCount && !L->Output) {
             CollAppend (Target, L);
         } else {
             FreeLiteral (L);
@@ -302,8 +340,8 @@ void MoveLiteralPool (LiteralPool* LocalPool)
 
 
 
-static void DumpWritableLiterals (Collection* Literals)
-/* Dump the given writable literals */
+static void OutputWritableLiterals (Collection* Literals)
+/* Output the given writable literals */
 {
     unsigned I;
 
@@ -318,30 +356,21 @@ static void DumpWritableLiterals (Collection* Literals)
     /* Emit all literals that have a reference */
     for (I = 0; I < CollCount (Literals); ++I) {
 
-        /* Get the next literal */
-        Literal* L = CollAt (Literals, I);
+        /* Get a pointer to the literal */
+        Literal* L = CollAtUnchecked (Literals, I);
 
-        /* Ignore it, if it doesn't have references */
-        if (L->RefCount == 0) {
-            continue;
+        /* Output this one, if it has references and wasn't already output */
+        if (L->RefCount > 0 && !L->Output) {
+            OutputLiteral (L);
         }
-
-        /* Translate the literal into the target charset */
-        TranslateLiteral (L);
-
-        /* Define the label for the literal */
-        g_defdatalabel (L->Label);
-
-        /* Output the literal data */
-        g_defbytes (SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data));
 
     }
 }
 
 
 
-static void DumpReadOnlyLiterals (Collection* Literals)
-/* Dump the given readonly literals merging (even partial) duplicates */
+static void OutputReadOnlyLiterals (Collection* Literals)
+/* Output the given readonly literals merging (even partial) duplicates */
 {
     unsigned I;
 
@@ -365,8 +394,8 @@ static void DumpReadOnlyLiterals (Collection* Literals)
         /* Get the next literal */
         Literal* L = CollAt (Literals, I);
 
-        /* Ignore it, if it doesn't have references */
-        if (L->RefCount == 0) {
+        /* Ignore it, if it doesn't have references or was already output */
+        if (L->RefCount == 0 || L->Output) {
             continue;
         }
 
@@ -408,7 +437,6 @@ static void DumpReadOnlyLiterals (Collection* Literals)
             /* This literal is part of a longer literal, merge them */
             g_aliasdatalabel (L->Label, C->Label, GetLiteralSize (C) - GetLiteralSize (L));
 
-
         } else {
 
             /* Define the label for the literal */
@@ -418,17 +446,20 @@ static void DumpReadOnlyLiterals (Collection* Literals)
             g_defbytes (SB_GetConstBuf (&L->Data), SB_GetLen (&L->Data));
 
         }
+
+        /* Mark the literal */
+        L->Output = 1;
     }
 }
 
 
 
-void DumpLiteralPool (void)
-/* Dump the global literal pool */
+void OutputLiteralPool (void)
+/* Output the global literal pool */
 {
-    /* Dump both sorts of literals */
-    DumpWritableLiterals (&GlobalPool->WritableLiterals);
-    DumpReadOnlyLiterals (&GlobalPool->ReadOnlyLiterals);
+    /* Output both sorts of literals */
+    OutputWritableLiterals (&GlobalPool->WritableLiterals);
+    OutputReadOnlyLiterals (&GlobalPool->ReadOnlyLiterals);
 }
 
 

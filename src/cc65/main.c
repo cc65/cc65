@@ -121,7 +121,8 @@ static void Usage (void)
             "  --help\t\tHelp (this text)\n"
             "  --include-dir dir\tSet an include directory search path\n"
             "  --list-opt-steps\tList all optimizer steps and exit\n"
-            "  --memory-model model\tSet the memory model\n"
+            "  --local-strings\tEmit string literals immediately\n"
+            "  --memory-model model\tSet the memory model\n"       
             "  --register-space b\tSet space available for register variables\n"
             "  --register-vars\tEnable register variables\n"
             "  --rodata-name seg\tSet the name of the RODATA segment\n"
@@ -556,6 +557,15 @@ static void OptListOptSteps (const char* Opt attribute ((unused)),
 
 
 
+static void OptLocalStrings (const char* Opt attribute ((unused)),
+			     const char* Arg attribute ((unused)))
+/* Emit string literals immediately */
+{
+    IS_Set (&LocalStrings, 1);
+}
+
+
+
 static void OptMemoryModel (const char* Opt, const char* Arg)
 /* Set the memory model */
 {
@@ -751,6 +761,7 @@ int main (int argc, char* argv[])
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--list-opt-steps",   0,      OptListOptSteps         },
+        { "--local-strings",    0,      OptLocalStrings         },
         { "--memory-model",     1,      OptMemoryModel          },
         { "--register-space",   1,      OptRegisterSpace        },
         { "--register-vars",    0,      OptRegisterVars         },

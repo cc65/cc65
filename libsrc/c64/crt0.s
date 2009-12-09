@@ -16,11 +16,9 @@
 
 
 ; ------------------------------------------------------------------------
-; Place the startup code in a special segment.
-
-.segment       	"STARTUP"
-
 ; BASIC header with a SYS call
+
+.segment       	"EXEHDR"
 
         .word   Head            ; Load address
 Head:   .word   @Next
@@ -34,17 +32,23 @@ Head:   .word   @Next
 @Next:  .word   0               ; BASIC end marker
 
 ; ------------------------------------------------------------------------
-; Actual code
+; Startup code
 
-Start:  ldx    	#zpspace-1
-L1:	lda	sp,x
-   	sta	zpsave,x	; Save the zero page locations we need
-	dex
-       	bpl	L1
+.segment       	"STARTUP"
+
+Start:
 
 ; Close open files
 
 	jsr	CLRCH
+
+; Save the zero page locations we need
+
+        ldx    	#zpspace-1
+L1:	lda	sp,x
+       	sta    	zpsave,x
+	dex
+       	bpl	L1
 
 ; Switch to second charset
 

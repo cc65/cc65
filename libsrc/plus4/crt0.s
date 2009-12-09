@@ -20,10 +20,9 @@
 IRQInd 	       	= $500	; JMP $0000 - used as indirect IRQ vector
 
 ; ------------------------------------------------------------------------
-; Place the startup code in a special segment to cope with the quirks of
-; plus/4 banking.
+; BASIC header with a SYS call
 
-.segment       	"STARTUP"
+.segment       	"EXEHDR"
 
         .word   Head            ; Load address
 Head:   .word   @Next
@@ -37,21 +36,27 @@ Head:   .word   @Next
 @Next:  .word   0               ; BASIC end marker
 
 ; ------------------------------------------------------------------------
-; Actual code
+; Startup code
 
-Start:  sei                     ; No interrupts since we're banking out the ROM
-        sta     ENABLE_RAM
-       	ldx   	#zpspace-1
-L1:	lda	sp,x
-   	sta	zpsave,x	; save the zero page locations we need
-  	dex
-       	bpl	L1
-        sta     ENABLE_ROM
-        cli
+.segment       	"STARTUP"
+
+Start:
 
 ; Close open files
 
   	jsr	$FFCC           ; CLRCH
+
+; Save the zero page locations we need
+
+        sei                     ; No interrupts since we're banking out the ROM
+        sta     ENABLE_RAM
+       	ldx   	#zpspace-1
+L1:	lda	sp,x
+   	sta	zpsave,x
+  	dex
+       	bpl	L1
+        sta     ENABLE_ROM
+        cli
 
 ; Switch to second charset
 

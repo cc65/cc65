@@ -18,17 +18,13 @@
 ; ------------------------------------------------------------------------
 ; Constants
 
-IRQInd		= $2FD	; JMP $0000 - used as indirect IRQ vector
+IRQInd	      	= $2FD	; JMP $0000 - used as indirect IRQ vector
 
 ; ------------------------------------------------------------------------
-; Place the startup code in a special segment to cope with the quirks of
-; c128 banking.
-
-.segment       	"STARTUP"
-
 ; BASIC header with a SYS call
 
-      	.org	$1BFF
+.segment       	"EXEHDR"
+
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   .version        ; Line number
@@ -39,14 +35,17 @@ Head:   .word   @Next
         .byte   <(((Start /    1) .mod 10) + $30)
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
-      	.reloc
 
 ; ------------------------------------------------------------------------
-; Actual code
+; Startup code
+
+.segment       	"STARTUP"
+
+Start:
 
 ; Close open files
 
-Start: 	jsr	CLRCH
+        jsr	CLRCH
 
 ; Switch to the second charset
 

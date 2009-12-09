@@ -325,7 +325,7 @@ HIDE:
 	rts
 
 ; SHOW:	Is called to show the mouse cursor. The mouse kernel manages a
-; counter for calls to show/hide, and the driver entry point is	only called
+; counter for calls to show/hide, and the driver entry point is only called
 ; if the mouse is currently hidden and should become visible. For most drivers,
 ; no special action is required	besides	enabling the mouse cursor.
 ; No return code required.

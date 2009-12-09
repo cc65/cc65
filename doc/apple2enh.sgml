@@ -47,7 +47,7 @@ For ProDOS 8 system programs the load address is fixed to &dollar;2000 so there
 is no need for a header. Thus the linker configuration
 <htmlurl url="apple2enh-4.html#ss4.3" name="apple2enh-system.cfg"> for those programs
 omits the DOS 3.3 header. The right AppleCommander option to put system files
-without a header on a ProDOS 8 disk image is </-p/.
+without a header on a ProDOS 8 disk image is <tt/-p/.
 
 
 <sect>Memory layout<p>

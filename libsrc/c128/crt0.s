@@ -43,10 +43,6 @@ Head:   .word   @Next
 
 Start:
 
-; Close open files
-
-        jsr	CLRCH
-
 ; Switch to the second charset
 
       	lda	#14

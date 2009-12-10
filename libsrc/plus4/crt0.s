@@ -42,10 +42,6 @@ Head:   .word   @Next
 
 Start:
 
-; Close open files
-
-  	jsr	$FFCC           ; CLRCH
-
 ; Save the zero page locations we need
 
         sei                     ; No interrupts since we're banking out the ROM

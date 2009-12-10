@@ -39,10 +39,6 @@ Head:   .word   @Next
 
 Start:
 
-; Close open files
-
-	jsr	CLRCH
-
 ; Save the zero page locations we need
 
         ldx   	#zpspace-1

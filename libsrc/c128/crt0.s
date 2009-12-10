@@ -29,10 +29,10 @@ IRQInd	      	= $2FD	; JMP $0000 - used as indirect IRQ vector
 Head:   .word   @Next
         .word   .version        ; Line number
         .byte   $9E             ; SYS token
-        .byte   <(((Start / 1000) .mod 10) + $30)
-        .byte   <(((Start /  100) .mod 10) + $30)
-        .byte   <(((Start /   10) .mod 10) + $30)
-        .byte   <(((Start /    1) .mod 10) + $30)
+        .byte   <(((Start / 1000) .mod 10) + '0')
+        .byte   <(((Start /  100) .mod 10) + '0')
+        .byte   <(((Start /   10) .mod 10) + '0')
+        .byte   <(((Start /    1) .mod 10) + '0')
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
 

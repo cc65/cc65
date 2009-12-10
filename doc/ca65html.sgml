@@ -180,7 +180,7 @@ Here is a description of all the command line options:
   (the default), the converter creates a link to the actual symbol if it is
   defined somewhere in the input files. If not, it creates a link to the
   <tt/.import/ statement. If n is one, the converter will always generate a
-  HTML link to <tt/.import/ statement.
+  HTML link to the <tt/.import/ statement.
 
 
   <tag><tt>--replaceext</tt></tag>

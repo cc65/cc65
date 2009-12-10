@@ -6,10 +6,10 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002      Ullrich von Bassewitz                                       */
-;*               Wacholderweg 14                                             */
-;*               D-70597 Stuttgart                                           */
-;* EMail:        uz@musoftware.de                                            */
+;* (C) 2002-2009, Ullrich von Bassewitz                                      */
+;*                Roemerstrasse 52                                           */
+;*                D-70794 Filderstadt                                        */
+;* EMail:         uz@cc65.org                                                */
 ;*                                                                           */
 ;*                                                                           */
 ;* This software is provided 'as-is', without any expressed or implied       */
@@ -83,6 +83,21 @@ O65_FTYPE_MASK          =       $1000   ; Mask to extract type
 O65_ADDR_SIMPLE         =       $0800   ; Simple addressing
 O65_ADDR_DEFAULT        =       $0000   ; Default addressing
 O65_ADDR_MASK           =       $0800   ; Mask to extract addressing
+
+O65_CHAIN               =       $0400   ; Chained file, another one follows
+O65_CHAIN_MASK          =       $0400   ; Mask to extract chain flag
+
+O65_BSSZERO             =       $0200   ; BSS segment must be zeroed
+O65_BSSZERO_MASK        =       $0200   ; Mask to extract bss zero flag
+
+; The following is used if O65_CPU == 6502
+O65_CPU2_6502  	       	=       $0000   ; Executable is for 6502
+O65_CPU2_65C02          =       $0010   ; Executable is for 65C02
+O65_CPU2_65SC02         =       $0020   ; Executable is for 65SC02
+O65_CPU2_65CE02         =       $0030   ; Executable is for 65CE02
+O65_CPU2_6502X          =       $0040   ; Executable is for NMOS 6502
+O65_CPU2_65816_EMU      =       $0050   ; Executable is for 65816 in emul mode
+O65_CPU2_MASK           =       $00F0   ; Mask to extract CPU2 field
 
 O65_ALIGN_1             =       $0000   ; Bytewise alignment
 O65_ALIGN_2             =       $0001   ; Align words

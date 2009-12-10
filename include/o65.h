@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -100,6 +100,21 @@ struct o65_header {
 #define O65_ADDR_SIMPLE         0x0800  /* Simple addressing */
 #define O65_ADDR_DEFAULT        0x0000  /* Default addressing */
 #define O65_ADDR_MASK           0x0800  /* Mask to extract addressing */
+
+#define O65_CHAIN               0x0400  /* Chained file, another one follows */
+#define O65_CHAIN_MASK          0x0400  /* Mask to extract chain flag */
+
+#define O65_BSSZERO             0x0200  /* BSS segment must be zeroed */
+#define O65_BSSZERO_MASK        0x0200  /* Mask to extract bss zero flag */
+
+/* The following is used if O65_CPU == 6502 */
+#define O65_CPU2_6502		0x0000  /* Executable is for 6502 */
+#define O65_CPU2_65C02          0x0010  /* Executable is for 65C02 */
+#define O65_CPU2_65SC02         0x0020  /* Executable is for 65SC02 */
+#define O65_CPU2_65CE02         0x0030  /* Executable is for 65CE02 */
+#define O65_CPU2_6502X          0x0040  /* Executable is for NMOS 6502 */
+#define O65_CPU2_65816_EMU      0x0050  /* Executable is for 65816 in emul mode */
+#define O65_CPU2_MASK           0x00F0  /* Mask to extract CPU2 field */
 
 #define O65_ALIGN_1             0x0000  /* Bytewise alignment */
 #define O65_ALIGN_2             0x0001  /* Align words */

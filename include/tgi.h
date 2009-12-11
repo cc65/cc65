@@ -270,7 +270,7 @@ void __fastcall__ tgi_outtextxy (int x, int y, const char* s);
  * the end of the text.
  */
 
-unsigned __fastcall__ tgi_ioctl (unsigned char code, unsigned val);
+unsigned __fastcall__ tgi_ioctl (unsigned char code, void* data);
 /* Call the driver specific control function. What this function does for
  * a specific code depends on the driver. The driver will set an error
  * for unknown codes or values.

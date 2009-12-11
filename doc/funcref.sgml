@@ -5357,7 +5357,7 @@ tgi_init(); //Set up the default palette and clear the screen.
 <descrip>
 <tag/Function/Platform dependent code extensions.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_ioctl (unsigned char code, unsigned val);/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_ioctl (unsigned char code, void* data);/
 <tag/Description/Some platforms have extra display hardware that is not
 supported by standard tgi functions. You can extend the driver to support
 this extra hardware using tgi_ioctl functions.
@@ -5369,12 +5369,12 @@ be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
 <tag/Example/<verb>
-#define tgi_sprite(spr) tgi_ioctl(0, (unsigned)(spr))
-#define tgi_flip() tgi_ioctl(1, 0)
-#define tgi_setbgcolor(bgcol) tgi_ioctl(2, (unsigned)(bgcol))
-#define tgi_setframerate(rate) tgi_ioctl(3, (unsigned)(rate))
-#define tgi_busy() tgi_ioctl(4, 0)
-#define tgi_updatedisplay() tgi_ioctl(4, 1)
+#define tgi_sprite(spr) tgi_ioctl(0, (void*)(spr))
+#define tgi_flip() tgi_ioctl(1, (void*)0)
+#define tgi_setbgcolor(bgcol) tgi_ioctl(2, (void*)(bgcol))
+#define tgi_setframerate(rate) tgi_ioctl(3, (void*)(rate))
+#define tgi_busy() tgi_ioctl(4, (void*)0)
+#define tgi_updatedisplay() tgi_ioctl(4, (void*)1)
 if (!tgi_busy()) {
   tgi_sprite(&amp;background);
   tgi_setcolor(TGI_COLOR_BLUE);
@@ -5522,7 +5522,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_pie slice (int x, int y,
 unsigned char rx, unsigned char ry, unsigned sa, unsigned ea);/
-<tag/Description/The function draws an elliptic pie slice with center at x/y 
+<tag/Description/The function draws an elliptic pie slice with center at x/y
 and radii rx/ry using the current drawing color. The pie slice covers the angle
 between sa and ea (startangle and endangle), which must be in the range
 0..360.

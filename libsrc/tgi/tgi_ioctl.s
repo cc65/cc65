@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2004-10-14
 ;
-; unsigned __fastcall__ tgi_ioctl (unsigned char code, unsigned val);
+; unsigned __fastcall__ tgi_ioctl (unsigned char code, void* data);
 ; /* Call the driver specific control function. What this function does for
 ;  * a specific code depends on the driver. The driver will set an error
 ;  * for unknown codes or values.

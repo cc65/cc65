@@ -81,7 +81,7 @@ Y2	:=	ptr4
 	.word	280		; X resolution
 	.word	192		; Y resolution
 	.byte	8		; Number of drawing colors
-	.byte	2		; Number of screens available
+pages:	.byte	2		; Number of screens available
 	.byte	7		; System font X size
 	.byte	8		; System font Y size
 	.word   $100		; Aspect ratio
@@ -118,10 +118,6 @@ Y2	:=	ptr4
 
 ERROR:	.res	1		; Error code
 
-        .ifdef  __APPLE2ENH__
-Set80:	.res	1		; Set 80 column store
-        .endif
-
 ; ------------------------------------------------------------------------
 
 	.rodata
@@ -139,6 +135,28 @@ FONT:
 
 	.code
 
+; INSTALL routine. Is called after the driver is loaded into memory. May
+; initialize anything that has to be done just once. Is probably empty
+; most of the time.
+; Must set an error code: NO
+INSTALL:
+	.ifdef  __APPLE2ENH__
+	; No page switching if 80 column store is enabled
+	lda	#$02
+	bit	RD80COL
+	bpl	:+
+	lda	#$01
+:	sta	pages
+	.endif
+
+	; Fall through
+
+; UNINSTALL routine. Is called before the driver is removed from memory. May
+; clean up anything done by INSTALL but is probably empty most of the time.
+; Must set an error code: NO
+UNINSTALL:
+	rts
+
 ; INIT: Changes an already installed device from text mode to graphics mode.
 ; Note that INIT/DONE may be called multiple times while the driver
 ; is loaded, while INSTALL is only called once, so any code that is needed
@@ -149,16 +167,10 @@ FONT:
 ; active, so there is no need to protect against that.
 ; Must set an error code: YES
 INIT:
-        .ifdef  __APPLE2ENH__
-	; Save and clear 80 column store
-        lda	RD80COL
-        sta	Set80
-        sta	CLR80COL
-        .endif
-
 	; Switch into graphics mode
-	bit	HIRES
 	bit	MIXCLR
+	bit	LOWSCR
+	bit	HIRES
 	bit	TXTCLR
 
 	; Beagle Bros Shape Mechanic fonts don't
@@ -169,20 +181,6 @@ INIT:
 	; Done, reset the error code
 	lda	#TGI_ERR_OK
 	sta	ERROR
-
-	; Fall through
-
-; INSTALL routine. Is called after the driver is loaded into memory. May
-; initialize anything that has to be done just once. Is probably empty
-; most of the time.
-; Must set an error code: NO
-INSTALL:
-	; Fall through
-
-; UNINSTALL routine. Is called before the driver is removed from memory. May
-; clean up anything done by INSTALL but is probably empty most of the time.
-; Must set an error code: NO
-UNINSTALL:
 	rts
 
 ; DONE: Will be called to switch the graphics device back into text mode.
@@ -194,13 +192,14 @@ DONE:
 	bit	TXTSET
 	bit	LOWSCR
 
-        .ifdef  __APPLE2ENH__
-	; Restore 80 column store
-        lda	Set80
-        bpl	:+
-        sta	SET80COL
-:	bit	LORES		; Limit SET80COL-HISCR to text
-        .endif
+	.ifdef  __APPLE2ENH__
+	; Limit SET80COL-HISCR to text
+	bit	LORES
+	.endif
+
+	; Reset the text window top
+	lda	#$00
+	sta	WNDTOP
 	rts
 
 ; GETERROR: Return the error code in A and clear it.
@@ -208,6 +207,36 @@ GETERROR:
 	lda	ERROR
 	ldx	#TGI_ERR_OK
 	stx	ERROR
+	rts
+
+; CONTROL: Platform/driver specific entry point.
+; Must set an error code: YES
+CONTROL:
+	; Check val msb and code to be 0
+	ora	ptr1+1
+	bne	err
+	
+	; Check val lsb to be [0..1]
+	lda	ptr1
+	cmp	#1+1
+	bcs	err
+	
+	; Set text window top
+	tax
+	beq	:+
+	lda	#20
+:	sta	WNDTOP
+
+	; Switch 4 lines of text
+	.assert MIXCLR + 1 = MIXSET, error
+	lda	MIXCLR,x	; No BIT absolute,X available
+	
+	lda	#TGI_ERR_OK
+	beq	:+		; Branch always
+	
+	; Done, set the error code
+err:	lda	#TGI_ERR_INV_ARG
+:	sta	ERROR
 	rts
 
 ; CLEAR: Clears the screen.
@@ -248,11 +277,6 @@ SETCOLOR:
 	jsr	SETHCOL
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
-
-; CONTROL: Platform/driver specific entry point.
-; Must set an error code: YES
-CONTROL:
-	; Fall through
 
 ; SETPALETTE: Set the palette (not available with all drivers/hardware).
 ; A pointer to the palette is passed in ptr1. Must set an error if palettes

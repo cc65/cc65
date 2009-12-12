@@ -167,7 +167,7 @@ Apple&nbsp;&rsqb;&lsqb; ProDOS 8 loader for cc65 programs/, which is available
 in the cc65 User Contributions section.
 
 A program loaded by LOADER.SYSTEM works like a ProDOS 8 system program but
-isn't tied to the start adress &dollar;2000. Thus with the default start
+isn't tied to the start address &dollar;2000. Thus with the default start
 address &dollar;800 the main memory area is increased by 6 KB.
 
 <descrip>
@@ -220,7 +220,7 @@ This setup makes nearly 50 KB available to a cc65 program - on a 64 KB machine!
 
 <sect>ProDOS 8 system programs<p>
 
-ProDOS 8 system programs are always loaded to the start adress &dollar;2000.
+ProDOS 8 system programs are always loaded to the start address &dollar;2000.
 For cc65 programs this means that the 6 KB from &dollar;800 to &dollar;2000 are
 by default unused. There are however several options to make use of that memory
 range.

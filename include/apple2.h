@@ -143,6 +143,11 @@ unsigned char get_ostype (void);
 void rebootafterexit (void);
 /* Reboot machine after program termination has completed. */
 
+#define tgi_apple2_mix(onoff)   tgi_ioctl (0, (void *) (onoff))
+/* If onoff is 1, graphics/text mixed mode is enabled.
+ * If onoff is 0, graphics/text mixed mode is disabled.
+ */
+
 /* The following #defines will cause the matching functions calls in conio.h
  * to be overlaid by macros with the same names, saving the function call
  * overhead.

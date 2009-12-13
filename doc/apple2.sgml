@@ -294,6 +294,7 @@ usage.
 <item>_dos_type
 <item>get_ostype
 <item>rebootafterexit
+<item>ser_apple2_slot
 <item>tgi_apple2_mix
 </itemize>
 
@@ -387,8 +388,8 @@ you cannot do it, it just means that there's no help.
   interrupt driven, and the transceiver blocks if the receiver asserts
   flow control because of a full buffer.
 
-  The driver defaults to slot 2. Call <tt/ser_ioctl(0, &lt;slot&gt;)/ prior to
-  <tt/ser_open()/ in order to select a different slot. <tt/ser_ioctl()/
+  The driver defaults to slot 2. Call <tt/ser_apple2_slot()/ prior to
+  <tt/ser_open()/ in order to select a different slot. <tt/ser_apple2_slot()/
   succeeds for all Apple&nbsp;II slots, but <tt/ser_open()/ fails with
   <tt/SER_ERR_NO_DEVICE/ if there's no SSC firmware found in the selected slot.
 

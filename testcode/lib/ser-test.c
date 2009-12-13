@@ -13,6 +13,10 @@
 #define DRIVERNAME	"plus4-stdser.ser"
 #elif defined(__CBM610__)
 #define DRIVERNAME	"cbm610-std.ser"
+#elif defined(__APPLE2__)
+#define DRIVERNAME	"a2.ssc.ser"
+#elif defined(__APPLE2ENH__)
+#define DRIVERNAME	"a2e.ssc.ser"
 #else
 #define DRIVERNAME	"unknown"
 #error "Unknown target system"
@@ -64,7 +68,3 @@ int main (void)
 
     return EXIT_SUCCESS;
 }
-
-
-
-

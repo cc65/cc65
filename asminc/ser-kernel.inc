@@ -146,6 +146,7 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
 ;------------------------------------------------------------------------------
 ; C callable functions
 
+        .global _ser_load_driver
         .global _ser_unload
         .global _ser_install
         .global _ser_uninstall

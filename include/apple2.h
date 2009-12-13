@@ -143,6 +143,11 @@ unsigned char get_ostype (void);
 void rebootafterexit (void);
 /* Reboot machine after program termination has completed. */
 
+#define ser_apple2_slot(num)    ser_ioctl (0, (void *) (num))
+/* Select a slot number from 1 to 7 prior to ser_open.
+ * The default slot number is 2.
+ */
+
 #define tgi_apple2_mix(onoff)   tgi_ioctl (0, (void *) (onoff))
 /* If onoff is 1, graphics/text mixed mode is enabled.
  * If onoff is 0, graphics/text mixed mode is disabled.

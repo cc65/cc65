@@ -356,18 +356,18 @@ STATUS:
 ; Must return an SER_ERR_xx code in a/x.
 
 IOCTL:
-	; Check code to be 0
-	tax
+	; Check data msb and code to be 0
+	ora	ptr1+1
 	bne	:+
 
-	; Check data to be [1..7]
-	lda	(ptr1,x)
+	; Check data lsb to be [1..7]
+	ldx	ptr1
 	beq	:+
-	cmp	#7+1
+	cpx	#7+1
 	bcs	:+
 
-	sta	Slot
-	txa			; SER_ERR_OK
+	stx	Slot
+	tax			; SER_ERR_OK
 	rts
 
 :	lda	#<SER_ERR_INV_IOCTL

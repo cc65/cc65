@@ -212,11 +212,11 @@ GETERROR:
 ; CONTROL: Platform/driver specific entry point.
 ; Must set an error code: YES
 CONTROL:
-	; Check val msb and code to be 0
+	; Check data msb and code to be 0
 	ora	ptr1+1
 	bne	err
 	
-	; Check val lsb to be [0..1]
+	; Check data lsb to be [0..1]
 	lda	ptr1
 	cmp	#1+1
 	bcs	err

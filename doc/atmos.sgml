@@ -112,14 +112,14 @@ this may seem overhead, it has two advantages:
 No extended memory drivers are currently available for the Atmos.
 
 
-<!--<sect1>Joystick drivers<p>
+<sect1>Joystick drivers<p>
 
 <descrip>
 
   <tag><tt/atmos-pase.joy/</tag>
   Supports two standard joystick connected to the P.A.S.E. interface of the Atmos.
 
-</descrip><p>-->
+</descrip><p>
 
 
 

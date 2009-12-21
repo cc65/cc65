@@ -113,6 +113,7 @@ atmoslib:
 	    $(MAKE) SYS=atmos -C $$i || exit 1; \
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
+	cp atmos/*.joy .
 	cp atmos/*.tgi .
 
 #-----------------------------------------------------------------------------

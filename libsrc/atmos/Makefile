@@ -73,7 +73,7 @@ OBJS  =	_scrsize.o      \
 
 EMDS =
 
-JOYS =
+JOYS = atmos-pase.joy
 
 MOUS =
 

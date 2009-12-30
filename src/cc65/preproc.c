@@ -1361,13 +1361,17 @@ void Preprocess (void)
                                 DoWarning ();
                             }
                         } else {
-                            PPError ("Preprocessor directive expected");
+                            if (!Skip) {
+                                PPError ("Preprocessor directive expected");
+                            }
                             ClearLine ();
                         }
                         break;
 
-    	    	    default:
-    	    	    	PPError ("Preprocessor directive expected");
+    	    	    default: 
+                        if (!Skip) {
+    	    	    	    PPError ("Preprocessor directive expected");
+                        }
     	    	    	ClearLine ();
     	    	}
     	    }

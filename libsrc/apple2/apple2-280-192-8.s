@@ -215,12 +215,12 @@ CONTROL:
 	; Check data msb and code to be 0
 	ora	ptr1+1
 	bne	err
-	
+
 	; Check data lsb to be [0..1]
 	lda	ptr1
 	cmp	#1+1
 	bcs	err
-	
+
 	; Set text window top
 	tax
 	beq	:+
@@ -230,10 +230,11 @@ CONTROL:
 	; Switch 4 lines of text
 	.assert MIXCLR + 1 = MIXSET, error
 	lda	MIXCLR,x	; No BIT absolute,X available
-	
+
+	; Done, reset the error code
 	lda	#TGI_ERR_OK
 	beq	:+		; Branch always
-	
+
 	; Done, set the error code
 err:	lda	#TGI_ERR_INV_ARG
 :	sta	ERROR

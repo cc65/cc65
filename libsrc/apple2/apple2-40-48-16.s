@@ -17,13 +17,14 @@
 ; Zero page stuff
 
 H2	:=	$2C
+COLOR	:=	$30
 
 ; ROM entry points
 
 TEXT    :=	$F399
 PLOT	:=	$F800
 HLINE	:=	$F819
-CLRSCR	:=	$F832
+CLRSC2	:=	$F838
 SETCOL	:=	$F864
 SCRN	:=	$F871
 SETGR	:=	$FB40
@@ -62,8 +63,8 @@ NX	:=	regsave+2 	; (2)	LINE
 
 	.byte	$74, $67, $69	; "tgi"
 	.byte	TGI_API_VERSION	; TGI API version number
-xres:	.word	40		; X resolution
-yres:	.word	48		; Y resolution
+	.word	40		; X resolution
+	.word	48		; Y resolution
 	.byte	16		; Number of drawing colors
 	.byte	1		; Number of screens available
 	.byte	8		; System font X size
@@ -101,14 +102,12 @@ yres:	.word	48		; Y resolution
 ; Absolute variables used in the code
 
 ERROR:	.res	1		; Error code
+MIX:	.res	1		; 4 lines of text
 
-; Line routine stuff (combined with circle routine stuff to save space)
+; Line routine stuff
 
-OGora:
 COUNT:	.res	2
-OUkos:
 NY:	.res	2
-Y3:
 DX:	.res	1
 DY:	.res	1
 AX:	.res	1
@@ -122,6 +121,8 @@ AY:	.res	1
 
 DEFPALETTE: .byte $00, $01, $02, $03, $04, $05, $06, $07
 	    .byte $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
+
+MAXY:	.byte 47, 39
 
 ; ------------------------------------------------------------------------
 
@@ -146,6 +147,7 @@ INIT:
 	; Done, reset the error code
 	lda	#TGI_ERR_OK
 	sta	ERROR
+	sta	MIX
 
 	; Fall through
 
@@ -209,7 +211,13 @@ GETERROR:
 ; Must set an error code: NO
 CLEAR:
 	bit	$C082		; Switch in ROM
-	jsr	CLRSCR
+	lda	COLOR		; Save current drawing color
+	pha
+	ldx	MIX
+	ldy	MAXY,x		; Max Y depends on 4 lines of text
+	jsr	CLRSC2
+	pla
+	sta	COLOR		; Save current drawing color
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
 
@@ -225,7 +233,55 @@ SETCOLOR:
 ; CONTROL: Platform/driver specific entry point.
 ; Must set an error code: YES
 CONTROL:
-	; Fall through
+	; Check data msb and code to be 0
+	ora	ptr1+1
+	bne	err
+
+	; Check data lsb to be [0..1]
+	lda	ptr1
+	cmp	#1+1
+	bcs	err
+	bit	$C082		; Switch in ROM
+
+	; Switch 4 lines of text
+	tax
+	.assert MIXCLR + 1 = MIXSET, error
+	lda	MIXCLR,x	; No BIT absolute,X available
+
+	; Save current switch setting
+	txa
+	sta	MIX
+	bne	text
+
+	; Clear 8 lines of graphics
+	lda	COLOR		; Save current drawing color
+	pha
+	lda	#39		; Rightmost column
+	sta	H2
+	ldx	#40		; First line
+:	txa
+	ldy	#$00		; Leftmost column
+	sty	COLOR		; Black
+	jsr	HLINE		; Preserves X
+	inx
+	cpx	#47+1		; Last line
+	bcc	:-
+	pla
+	sta	COLOR		; Save current drawing color
+	bcs	:+		; Branch always
+
+	; Clear 4 lines of text
+text:	jsr	HOME
+:	bit	$C080		; Switch in LC bank 2 for R/O
+
+	; Done, reset the error code
+	lda	#TGI_ERR_OK
+	beq	:+		; Branch always
+	
+	; Done, set the error code
+err:	lda	#TGI_ERR_INV_ARG
+:	sta	ERROR
+	rts
 
 ; SETPALETTE: Set the palette (not available with all drivers/hardware).
 ; A pointer to the palette is passed in ptr1. Must set an error if palettes

@@ -567,16 +567,16 @@ next:	sta	ERR
 ; Must set an error code: NO
 BAR:
 	bit	$C082		; Switch in ROM
+	lda	X2
+	sta	H2
 	inc	Y2
-	ldx	X2
-	stx	H2
-:	ldy	X1
-	lda	Y1
-	jsr	HLINE
-	inc	Y1
-	lda	Y2
-	cmp	Y1
-	bne	:-
+	ldx	Y1
+:	txa
+	ldy	X1
+	jsr	HLINE		; Preserves X
+	inx
+	cpx	Y2
+	bcc	:-
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
 

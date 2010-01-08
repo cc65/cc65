@@ -6,6 +6,26 @@
 #include <em.h>
 
 
+#if defined(__C64__)
+#define DRIVERNAME      "c64-ram.emd"
+#elif defined(__C128__)
+#define DRIVERNAME      "c128-ram.emd"
+#elif defined(__C16__)
+#define DRIVERNAME	"c16-ram.emd"
+#elif defined(__CBM510__)
+#define DRIVERNAME	"cbm510-ram.emd"
+#elif defined(__CBM610__)
+#define DRIVERNAME	"cbm610-ram.emd"
+#elif defined(__APPLE2__)
+#define DRIVERNAME	"a2.auxmem.emd"
+#elif defined(__APPLE2ENH__)
+#define DRIVERNAME	"a2e.auxmem.emd"
+#else
+#define DRIVERNAME	"unknown"
+#error "Unknown target system"
+#endif
+
+
 #define FORCE_ERROR1 0
 #define FORCE_ERROR2 0
 
@@ -60,7 +80,7 @@ int main (void)
     struct em_copy c;
 
     clrscr ();
-    Res = em_load_driver ("c64-ram.emd");
+    Res = em_load_driver (DRIVERNAME);
     if (Res != EM_ERR_OK) {
        	cprintf ("Error in em_load_driver: %u\r\n", Res);
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));

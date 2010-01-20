@@ -58,6 +58,7 @@ typedef enum {
   LI_DIRECT             = 0x01,         /* Direct op may be used */
   LI_RELOAD_Y           = 0x02,         /* Reload index register Y */
   LI_REMOVE             = 0x04,         /* Load may be removed */
+  LI_DUP_LOAD           = 0x08,         /* Duplicate load */
 } LI_FLAGS;
 
 /* Structure that tells us how to load the lhs values */
@@ -258,8 +259,16 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
             RI = &LI->X;
         } else if (E->Chg & REG_Y) {
             RI = &LI->Y;
-        } 
+        }
         CHECK (RI != 0);
+
+        /* If we had a load or xfer op before, this is a duplicate load which
+         * can cause problems if it encountered between the pushax and the op,
+         * so remember it.
+         */
+        if (RI->LoadIndex >= 0 || RI->XferIndex >= 0) {
+            RI->Flags |= LI_DUP_LOAD;
+        }
 
         /* Remember the load */
         RI->LoadIndex = I;
@@ -299,6 +308,14 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
             default:            Internal ("Unknown XFR insn in TrackLoads");
         }
 
+        /* If we had a load or xfer op before, this is a duplicate load which
+         * can cause problems if it encountered between the pushax and the op,
+         * so remember it.
+         */
+        if (Tgt->LoadIndex >= 0 || Tgt->XferIndex >= 0) {
+            Tgt->Flags |= LI_DUP_LOAD;
+        }
+
         /* Transfer the data */
         Tgt->LoadIndex  = Src->LoadIndex;
         Tgt->XferIndex  = I;
@@ -307,6 +324,17 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
         Tgt->Flags     |= Src->Flags & (LI_DIRECT | LI_RELOAD_Y);
 
     } else if (CE_IsCallTo (E, "ldaxysp") && RegValIsKnown (E->RI->In.RegY)) {
+
+        /* If we had a load or xfer op before, this is a duplicate load which
+         * can cause problems if it encountered between the pushax and the op,
+         * so remember it for both registers involved.
+         */
+        if (LI->A.LoadIndex >= 0 || LI->A.XferIndex >= 0) {
+            LI->A.Flags |= LI_DUP_LOAD;
+        }
+        if (LI->X.LoadIndex >= 0 || LI->X.XferIndex >= 0) {
+            LI->X.Flags |= LI_DUP_LOAD;
+        }
 
         /* Both registers set, Y changed */
         LI->A.LoadIndex = I;
@@ -1658,6 +1686,10 @@ static int PreCondOk (StackOpData* D)
                 return 0;
             }
         }
+    }
+    if ((D->Rhs.A.Flags | D->Rhs.X.Flags) & LI_DUP_LOAD) {
+        /* Cannot optimize */
+        return 0;
     }
 
     /* Determine the zero page locations to use */

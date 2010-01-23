@@ -56,7 +56,7 @@ VDC_DATA	  = 31
 ; capabilities of the driver
 
         .byte   $74, $67, $69           ; "tgi"
-        .byte   TGI_API_VERSION         ; TGI version number
+        .byte   TGI_API_VERSION         ; TGI API version number
 xres:   .word   640                     ; X resolution
 yres:   .word   480                     ; Y resolution
         .byte   2                       ; Number of drawing colors
@@ -123,7 +123,7 @@ BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
 
 OLDCOLOR:	.res	1	; colors before entering gfx mode
 
-; Line routine stuff (combined with CIRCLE to save space)
+; Line routine stuff
 
 COUNT:		 .res	2
 NY:		 .res	2
@@ -283,13 +283,13 @@ UNINSTALL:
 
 INIT:
 	lda	pages			; is there enough memory?
-	bne	@L11			; Jump if there is one screen
+	bne	@L1			; Jump if there is one screen
 	lda	#TGI_ERR_INV_MODE	; Error
 	bne	@L9
 
 ; Initialize variables
 
-@L11:   ldx     #$FF
+@L1:    ldx     #$FF
         stx     BITMASK
 
 ; Remeber current color value
@@ -494,23 +494,23 @@ GETDEFPALETTE:
 SETPIXEL:
         jsr     CALC            ; Calculate coordinates
 
-  	stx	TEMP
-  	lda	ADDR
-  	ldy	ADDR+1
-  	jsr	VDCSetSourceAddr
-  	jsr	VDCReadByte
-  	ldx	TEMP
+	stx	TEMP
+	lda	ADDR
+	ldy	ADDR+1
+	jsr	VDCSetSourceAddr
+	jsr	VDCReadByte
+	ldx	TEMP
 
-  	sta	TEMP
+	sta	TEMP
         eor     BITMASK
         and     BITTAB,X
-  	eor	TEMP
-  	pha
-  	lda	ADDR
-  	ldy	ADDR+1
-  	jsr	VDCSetSourceAddr
-  	pla
-  	jsr	VDCWriteByte
+	eor	TEMP
+	pha
+	lda	ADDR
+	ldy	ADDR+1
+	jsr	VDCSetSourceAddr
+	pla
+	jsr	VDCWriteByte
 
 @L9:    rts
 
@@ -645,7 +645,7 @@ LINE:
 	bne	@L0167
 	rts
 	;    setpixel(X1,Y1)
-@L0167:	jsr  	SETPIXEL
+@L0167:	jsr	SETPIXEL
 	;    pb = err + ny
 	lda	ERR
 	clc

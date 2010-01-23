@@ -453,8 +453,8 @@ SETPALETTE:
 	ora	COLTRANS,y
 
 	ldx	#VDC_COLORS
-       	jsr     VDCWriteReg     ; Clear error code
-        lda     #TGI_ERR_OK
+       	jsr     VDCWriteReg
+        lda     #TGI_ERR_OK     ; Clear error code
         sta     ERROR
         rts
 
@@ -766,59 +766,59 @@ BAR:
 ; Original code for a horizontal line
 
 HORLINE:
-  	lda X1
-  	pha
-  	lda X1+1
-  	pha
-  	jsr CALC		; get data for LEFT
-  	lda BITMASKL,x		; remember left address and bitmask
-  	pha
-  	lda ADDR
-  	pha
-  	lda ADDR+1
-  	pha
+	lda X1
+	pha
+	lda X1+1
+	pha
+	jsr CALC		; get data for LEFT
+	lda BITMASKL,x		; remember left address and bitmask
+	pha
+	lda ADDR
+	pha
+	lda ADDR+1
+	pha
 
-  	lda X2
-  	sta X1
-  	lda X2+1
-  	sta X1+1
-  	jsr CALC		; get data for RIGHT
-  	lda BITMASKR,x
-  	sta TEMP3
+	lda X2
+	sta X1
+	lda X2+1
+	sta X1+1
+	jsr CALC		; get data for RIGHT
+	lda BITMASKR,x
+	sta TEMP3
 
-  	pla			; recall data for LEFT
-  	sta X1+1
-  	pla
-  	sta X1			; put left address into X1
-  	pla
+	pla			; recall data for LEFT
+	sta X1+1
+	pla
+	sta X1			; put left address into X1
+	pla
 
-  	cmp #%11111111		; if left bit <> 0
-  	beq @L1
-  	sta TEMP2		; do left byte only...
-  	lda X1
-  	ldy X1+1
-  	jsr VDCSetSourceAddr
-  	jsr VDCReadByte
-  	sta TEMP
-  	eor BITMASK
-  	and TEMP2
-  	eor TEMP
-  	pha
-  	lda X1
-  	ldy X1+1
-  	jsr VDCSetSourceAddr
-  	pla
-  	jsr VDCWriteByte
-  	inc X1			; ... and proceed
-  	bne @L1
-  	inc X1+1
+	cmp #%11111111		; if left bit <> 0
+	beq @L1
+	sta TEMP2		; do left byte only...
+	lda X1
+	ldy X1+1
+	jsr VDCSetSourceAddr
+	jsr VDCReadByte
+	sta TEMP
+	eor BITMASK
+	and TEMP2
+	eor TEMP
+	pha
+	lda X1
+	ldy X1+1
+	jsr VDCSetSourceAddr
+	pla
+	jsr VDCWriteByte
+	inc X1			; ... and proceed
+	bne @L1
+	inc X1+1
 
-  	; do right byte (if Y2=0 ++ADDR and skip)
+	; do right byte (if Y2=0 ++ADDR and skip)
 @L1:	lda TEMP3
-  	cmp #%11111111		; if right bit <> 7
-  	bne @L11
-  	inc ADDR		; right bit = 7 - the next one is the last
-  	bne @L10
+	cmp #%11111111		; if right bit <> 7
+	bne @L11
+	inc ADDR		; right bit = 7 - the next one is the last
+	bne @L10
 	inc ADDR+1
 @L10:	bne @L2
 
@@ -880,6 +880,7 @@ HORLINE:
 	rts
 
 @L5:	jmp	HORLINE
+
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y

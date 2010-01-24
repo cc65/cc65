@@ -319,15 +319,22 @@ you cannot do it, it just means that there's no help.
   <tag><tt/a2e.lo.tgi/</tag>
   This driver features a resolution of 40&times;48 with 16 colors.
 
+	The function <tt/tgi_apple2_mix()/ allows to activate 4 lines of text. The
+	function clears the corresponding area at the bottom of the screen.
+
   <tag><tt/a2e.hi.tgi/</tag>
   This driver features a resolution of 280&times;192 with 8 colors and two
   hires pages. Note that programs using this driver will have to be linked
   with <tt/--start-addr $4000/ to reserve the first hires page or with
-  <tt/--start-addr $6000/ to reserve both hires pages. Note that the second
-  hires page is only available if the text display is not in 80 column mode.
-  This can be asserted by calling <tt/videomode (VIDEOMODE_40COL);/ before
-  installing the driver.
+  <tt/--start-addr $6000/ to reserve both hires pages.
+	
+	Note that the second hires page is only available if the text display is not in
+	80 column mode. This can be asserted by calling <tt/videomode (VIDEOMODE_40COL);/
+	before installing the driver.
   
+	The function <tt/tgi_apple2_mix()/ allows to activate 4 lines of text. The
+	function doesn't clear the corresponding area at the bottom of the screen.
+
   In memory constrained situations the memory from &dollar;803 to &dollar;1FFF
   can be made available to a program by calling <tt/_heapadd ((void *) 0x0803, 0x17FD);/
   at the beginning of <tt/main()/. Doing so is beneficial even if the program

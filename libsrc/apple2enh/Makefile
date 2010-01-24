@@ -112,7 +112,7 @@ S_OBJS=	_scrsize.o	\
        	wherey.o        \
 	write.o
 
-S_EXTRA_OBJS=			\
+S_EXTRA_OBJS=		\
 	extra/iobuf-0800.o
 
 #--------------------------------------------------------------------------

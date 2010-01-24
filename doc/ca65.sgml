@@ -867,7 +867,7 @@ So
 <tscreen><verb>
         .proc   foo
                 ...
-        .endscope
+        .endproc
 </verb></tscreen>
 
 is actually the same as

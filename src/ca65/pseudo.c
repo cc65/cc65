@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -1113,8 +1113,8 @@ static void DoIncBin (void)
     F = fopen (SB_GetConstBuf (&Name), "rb");
     if (F == 0) {
 
-       	/* Search for the file in the include directories. */
-     	char* PathName = FindInclude (SB_GetConstBuf (&Name));
+       	/* Search for the file in the binary include directory */
+     	char* PathName = FindInclude (SB_GetConstBuf (&Name), INC_BIN);
        	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
        	    ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
@@ -1135,18 +1135,18 @@ static void DoIncBin (void)
 
     /* If a count was not given, calculate it now */
     if (Count < 0) {
-	Count = Size - Start;
-	if (Count < 0) {
-	    /* Nothing to read - flag this as a range error */
-	    ErrorSkip ("Range error");
-	    goto Done;
-	}
+ 	Count = Size - Start;
+ 	if (Count < 0) {
+ 	    /* Nothing to read - flag this as a range error */
+ 	    ErrorSkip ("Range error");
+ 	    goto Done;
+ 	}
     } else {
-	/* Count was given, check if it is valid */
-	if (Start + Count > Size) {
-	    ErrorSkip ("Range error");
-	    goto Done;
-	}
+ 	/* Count was given, check if it is valid */
+ 	if (Start + Count > Size) {
+ 	    ErrorSkip ("Range error");
+ 	    goto Done;
+ 	}
     }
 
     /* Seek to the start position */
@@ -1155,12 +1155,12 @@ static void DoIncBin (void)
     /* Read chunks and insert them into the output */
     while (Count > 0) {
 
-	unsigned char Buf [1024];
+ 	unsigned char Buf [1024];
 
-	/* Calculate the number of bytes to read */
+ 	/* Calculate the number of bytes to read */
        	size_t BytesToRead = (Count > (long)sizeof(Buf))? sizeof(Buf) : (size_t) Count;
 
-	/* Read chunk */
+ 	/* Read chunk */
 	size_t BytesRead = fread (Buf, 1, BytesToRead, F);
 	if (BytesToRead != BytesRead) {
 	    /* Some sort of error */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -106,6 +106,7 @@ static void Usage (void)
             "\n"
             "Long options:\n"
             "  --auto-import\t\tMark unresolved symbols as import\n"
+            "  --bin-include-dir dir\tSet a search path for binary includes\n"
             "  --cpu type\t\tSet cpu type\n"
             "  --debug-info\t\tAdd debug info to object file\n"
             "  --feature name\tSet an emulation feature\n"
@@ -341,6 +342,14 @@ static void OptAutoImport (const char* Opt attribute ((unused)),
 
 
 
+static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
+/* Add an include search path for binaries */
+{
+    AddIncludePath (Arg, INC_BIN);
+}
+
+
+
 static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --cpu option */
 {
@@ -408,7 +417,7 @@ static void OptIgnoreCase (const char* Opt attribute ((unused)),
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path */
 {
-    AddIncludePath (Arg);
+    AddIncludePath (Arg, INC_STD);
 }
 
 
@@ -785,6 +794,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--auto-import",     	0,	OptAutoImport		},
+        { "--bin-include-dir",  1,      OptBinIncludeDir        },
         { "--cpu",     	       	1,	OptCPU 			},
 	{ "--debug-info",      	0,	OptDebugInfo		},
 	{ "--feature",		1,	OptFeature		},

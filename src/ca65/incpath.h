@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -39,15 +39,26 @@
 
 
 /*****************************************************************************/
+/*	      	     	       	     Data		     		     */
+/*****************************************************************************/
+
+
+
+#define INC_STD         0x0001U         /* Add to standard include path */
+#define INC_BIN         0x0002U         /* Add to binary include path */
+
+
+
+/*****************************************************************************/
 /*     	     	    		     Code   				     */
 /*****************************************************************************/
 
 
 
-void AddIncludePath (const char* NewPath);
+void AddIncludePath (const char* NewPath, unsigned Where);
 /* Add a new include path to the existing one */
 
-char* FindInclude (const char* Name);
+char* FindInclude (const char* Name, unsigned Where);
 /* Find an include file. Return a pointer to a malloced area that contains
  * the complete path, if found, return 0 otherwise.
  */

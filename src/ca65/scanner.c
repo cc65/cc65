@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -452,7 +452,7 @@ int NewInputFile (const char* Name)
        	/* We are on include level. Search for the file in the include
      	 * directories.
      	 */
-     	PathName = FindInclude (Name);
+     	PathName = FindInclude (Name, INC_STD);
        	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
      	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));

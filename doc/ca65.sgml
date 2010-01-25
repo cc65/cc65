@@ -104,6 +104,7 @@ Short options:
 
 Long options:
   --auto-import		Mark unresolved symbols as import
+  --bin-include-dir dir Set a search path for binary includes
   --cpu type		Set cpu type
   --debug-info		Add debug info to object file
   --feature name	Set an emulation feature
@@ -123,12 +124,22 @@ Long options:
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
-
+                                     
 <sect1>Command line options in detail<p>
 
 Here is a description of all the command line options:
 
 <descrip>
+
+  <label id="option--bin-include-dir">
+  <tag><tt>--bin-include-dir dir</tt></tag>
+
+  Name a directory which is searched for binary include files. The option
+  may be used more than once to specify more than one directory to search. The
+  current directory is always searched first before considering any
+  additional directories. See also the section about <ref id="search-paths"
+  name="search paths">.
+
 
   <label id="option--cpu">
   <tag><tt>--cpu type</tt></tag>
@@ -154,6 +165,7 @@ Here is a description of all the command line options:
   command for a list of emulation features.
 
 
+  <label id="option--forget-inc-paths">
   <tag><tt>--forget-inc-paths</tt></tag>
 
   Forget the builtin include paths. This is most useful when building
@@ -172,11 +184,13 @@ Here is a description of all the command line options:
   monitor.
 
 
+  <label id="option-h">
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
 
 
+  <label id="option-i">
   <tag><tt>-i, --ignore-case</tt></tag>
 
   This option makes the assembler case insensitive on identifiers and labels.
@@ -184,6 +198,7 @@ Here is a description of all the command line options:
   <tt><ref id=".CASE" name=".CASE"></tt> control command.
 
 
+  <label id="option-l">
   <tag><tt>-l, --listing</tt></tag>
 
   Generate an assembler listing. The listing file will always have the
@@ -191,6 +206,7 @@ Here is a description of all the command line options:
   may change in future versions.
 
 
+  <label id="option--list-bytes">
   <tag><tt>--list-bytes n</tt></tag>
 
   Set the maximum number of bytes printed in the listing for one line of
@@ -199,6 +215,7 @@ Here is a description of all the command line options:
   number of printed bytes.
 
 
+  <label id="option--macpack-dir">
   <tag><tt>--macpack-dir dir</tt></tag>
 
   This options allows to specify a directory containing macro files that are
@@ -209,12 +226,14 @@ Here is a description of all the command line options:
   when debugging the builtin macro packages.
 
 
+  <label id="option-mm">
   <tag><tt>-mm model, --memory-model model</tt></tag>
 
   Define the default memory model. Possible model specifiers are near, far and
   huge.
 
 
+  <label id="option-o">
   <tag><tt>-o name</tt></tag>
 
   The default output name is the name of the input file with the extension
@@ -223,12 +242,14 @@ Here is a description of all the command line options:
   the source file, or, if -o is given, the full path in this name is used.
 
 
+  <label id="option--pagelength">
   <tag><tt>--pagelength n</tt></tag>
 
   sets the length of a listing page in lines. See the <tt><ref
   id=".PAGELENGTH" name=".PAGELENGTH"></tt> directive for more information.
 
 
+  <label id="option-s">
   <tag><tt>-s, --smart-mode</tt></tag>
 
   In smart mode (enabled by -s or the <tt><ref id=".SMART" name=".SMART"></tt>
@@ -254,6 +275,7 @@ Here is a description of all the command line options:
   compiler, see there for a list.
 
 
+  <label id="option-v">
   <tag><tt>-v, --verbose</tt></tag>
 
   Increase the assembler verbosity. Usually only needed for debugging
@@ -261,6 +283,7 @@ Here is a description of all the command line options:
   verbose output.
 
 
+  <label id="option-D">
   <tag><tt>-D</tt></tag>
 
   This option allows you to define symbols on the command line. Without a
@@ -270,6 +293,7 @@ Here is a description of all the command line options:
   you may have to quote the expression.
 
 
+  <label id="option-I">
   <tag><tt>-I dir, --include-dir dir</tt></tag>
 
   Name a directory which is searched for include files. The option may be
@@ -279,6 +303,7 @@ Here is a description of all the command line options:
   name="search paths">.
 
 
+  <label id="option-U">
   <tag><tt>-U, --auto-import</tt></tag>
 
   Mark symbols that are not defined in the sources as imported symbols. This
@@ -290,6 +315,7 @@ Here is a description of all the command line options:
   which is not always true for assembler programmers.
 
 
+  <label id="option-V">
   <tag><tt>-V, --version</tt></tag>
 
   Print the version number of the assembler. If you send any suggestions
@@ -311,7 +337,7 @@ Here is a description of all the command line options:
 
 <sect>Search paths<label id="search-paths"><p>
 
-Include files are searched in the following places:
+Normal include files are searched in the following places:
 
 <enum>
 <item>The current directory.
@@ -320,7 +346,16 @@ Include files are searched in the following places:
 <item>The value of the environment variable <tt/CA65_INC/ if it is defined.
 <item>A subdirectory named <tt/asminc/ of the directory defined in the
       environment variable <tt/CC65_HOME/, if it is defined.
-<item>Any directory added with the <tt/-I/ option on the command line.
+<item>Any directory added with the <tt/<ref id="option-I" name="-I">/ option
+on the command line.
+</enum>
+
+Binary include files are searched in the following places:
+
+<enum>
+<item>The current directory.
+<item>Any directory added with the <tt/<ref id="option--bin-include-dir"
+name="--bin-include-dir">/ option on the command line.
 </enum>
 
 

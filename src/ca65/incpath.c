@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -42,36 +42,26 @@
 
 
 /*****************************************************************************/
-/*	      	     	       	     Data		     		     */
-/*****************************************************************************/
-
-
-
-#define INC_STD         0x0001U
-
-
-
-/*****************************************************************************/
 /*     	     	    		     Code   				     */
 /*****************************************************************************/
 
 
 
-void AddIncludePath (const char* NewPath)
+void AddIncludePath (const char* NewPath, unsigned Where)
 /* Add a new include path to the existing one */
 {
-    AddSearchPath (NewPath, INC_STD);
+    AddSearchPath (NewPath, Where);
 }
 
 
 
-char* FindInclude (const char* Name)
+char* FindInclude (const char* Name, unsigned Where)
 /* Find an include file. Return a pointer to a malloced area that contains
  * the complete path, if found, return 0 otherwise.
  */
 {
     /* Search in the include directories */
-    return SearchFile (Name, INC_STD);
+    return SearchFile (Name, Where);
 }
 
 
@@ -79,7 +69,7 @@ char* FindInclude (const char* Name)
 void ForgetAllIncludePaths (void)
 /* Remove all include search paths. */
 {
-    ForgetAllSearchPaths (INC_STD);
+    ForgetAllSearchPaths (INC_STD | INC_BIN);
 }
 
 
@@ -88,7 +78,8 @@ void InitIncludePaths (void)
 /* Initialize the include path search list */
 {
     /* Add some standard paths to the include search path */
-    AddSearchPath ("", INC_STD);		/* Current directory */
+    AddSearchPath ("", INC_STD);  		/* Current directory */
+    AddSearchPath ("", INC_BIN);
 
     /* Add some compiled in search paths if defined at compile time */
 #ifdef CA65_INC

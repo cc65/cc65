@@ -186,6 +186,7 @@ int main (void)
     CheckError ("tgi_load_driver");
     tgi_init ();
     CheckError ("tgi_init");
+    tgi_clear ();
 
     /* Get stuff from the driver */
     MaxX = tgi_getmaxx ();

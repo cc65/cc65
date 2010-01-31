@@ -1115,7 +1115,7 @@ static void DoIncBin (void)
 
        	/* Search for the file in the binary include directory */
      	char* PathName = FindInclude (SB_GetConstBuf (&Name), INC_BIN);
-       	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
+       	if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
        	    ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
      	}

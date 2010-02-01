@@ -4,6 +4,9 @@
 ;
 ; Ullrich von Bassewitz, 2002-11-29
 ;
+; GEORAM page size checking routine by
+; Marco van den Heuvel, 2010-01-21
+;
 
 	.include 	"zeropage.inc"
 
@@ -47,7 +50,7 @@ GR_PAGE_HI      = $DFFF                 ; Page register high
 
 .data
 
-pagecount:      .word   2048            ; Currently fixed
+pagecount:      .res    2               ; Number of available pages
 
 .code
 
@@ -59,9 +62,89 @@ pagecount:      .word   2048            ; Currently fixed
 ;
 
 INSTALL:
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
-;       rts                     ; Run into UNINSTALL instead
+	tya
+	pha
+       	ldx     GR_WINDOW
+        cpx     GR_WINDOW
+        bne     @notpresent
+        inc     GR_WINDOW
+       	cpx     GR_WINDOW
+       	beq     @notpresent
+
+       	lda     #4
+       	jsr     check
+       	cpy     GR_WINDOW
+       	beq     @has64k
+       	lda     #8
+       	jsr     check
+       	cpy     GR_WINDOW
+       	beq     @has128k
+       	lda     #16
+       	jsr     check
+       	cpy     GR_WINDOW
+       	beq     @has256k
+       	lda     #32
+       	jsr     check
+       	cpy     GR_WINDOW
+       	beq     @has512k
+       	lda     #64
+       	jsr     check
+       	cpy     GR_WINDOW
+       	beq     @has1024k
+       	lda     #128
+       	jsr     check
+       	cpy     GR_WINDOW
+       	beq     @has2048k
+       	ldx     #>16384
+        bne     @setok
+
+@has64k:
+       	ldx     #>256
+       	bne     @setok
+@has128k:
+       	ldx     #>512
+       	bne     @setok
+@has256k:
+       	ldx     #>1024
+       	bne     @setok
+@has512k:
+       	ldx     #>2048
+       	bne     @setok
+@has1024k:
+       	ldx     #>4096
+       	bne     @setok
+@has2048k:
+       	ldx     #>8192
+       	bne     @setok
+
+@notpresent:
+	pla
+	tay
+       	lda     #<EM_ERR_NO_DEVICE
+       	ldx     #>EM_ERR_NO_DEVICE
+	rts
+
+@setok:
+       	lda     #0
+       	sta     pagecount
+       	stx     pagecount+1
+	pla
+	tay
+       	lda     #<EM_ERR_OK
+       	ldx     #>EM_ERR_OK
+	rts
+
+check:
+       	ldx     #0
+       	stx     GR_PAGE_LO
+       	stx     GR_PAGE_HI
+       	ldy     GR_WINDOW
+       	iny
+       	sta     GR_PAGE_HI
+       	sty     GR_WINDOW
+       	ldx     #0
+       	stx     GR_PAGE_HI
+;	rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -86,7 +169,7 @@ PAGECOUNT:
 ; The GeoRAM cartridge does not copy but actually map the window, so USE is
 ; identical to MAP.
 
-USE     = MAP		  
+USE     = MAP
 
 ; ------------------------------------------------------------------------
 ; MAP: Map the page in a/x into memory and return a pointer to the page in

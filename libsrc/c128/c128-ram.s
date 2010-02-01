@@ -1,8 +1,11 @@
 ;
-; Extended memory driver for the C128 RAM in bank #1. Driver works without
+; Extended memory driver for the C128 RAM in banks #1, #2 and #3. Driver works without
 ; problems when statically linked.
 ;
 ; Ullrich von Bassewitz, 2002-12-04
+;
+; Updated to use banks 2 and 3 as well by
+; Marco van den Heuvel, 2010-01-21
 ;
 
 	.include  	"zeropage.inc"
@@ -40,16 +43,18 @@
 ; Constants
 
 BASE	= $400
-TOPMEM  = $FF00
-PAGES  	= (TOPMEM - BASE) / 256
 
 ; ------------------------------------------------------------------------
 ; Data.
 
 .bss
-curpage:        .res    1               ; Current page number
+curpage:        .res    2               ; Current page number
+curbank:        .res    1               ; Current bank number
+copybank:       .res    2               ; temp bank number
 
 window:         .res    256             ; Memory "window"
+
+pagecount:      .res    2               ; Number of available pages
 
 .code
 
@@ -61,12 +66,46 @@ window:         .res    256             ; Memory "window"
 ;
 
 INSTALL:
+        ldx     #0
+        stx     ptr1
+        ldx     #4
+        stx     ptr1+1
+        ldx     #<ptr1
+        stx     FETVEC
+        stx     STAVEC
+        ldy     #0
+        ldx     #MMU_CFG_RAM1
+        jsr     FETCH
+        sta     tmp1
+        ldx     #MMU_CFG_RAM3
+        jsr     FETCH
+        cmp     tmp1
+        bne     @has_4_banks
+        tax
+        inx
+        txa
+        ldx     #MMU_CFG_RAM1
+        jsr     STASH
+        ldx     #MMU_CFG_RAM3
+        jsr     FETCH
+        cmp     tmp1
+        beq     @has_4_banks
+        ldx     #0
+        lda     #251
+        bne     @setok
+
+@has_4_banks:
+        ldx     #2
+        lda     #241
+@setok:
+        sta     pagecount
+        stx     pagecount+1
         ldx     #$FF
         stx     curpage
-        stx     curpage+1               ; Invalidate the current page
-        inx
-        txa                             ; A = X = EM_ERR_OK
-        rts
+        stx     curpage+1       ; Invalidate the current page
+	inx
+       	txa                     ; A = X = EM_ERR_OK
+;	rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -82,8 +121,8 @@ UNINSTALL:
 ;
 
 PAGECOUNT:
-        lda     #<PAGES
-        ldx     #>PAGES
+        lda     pagecount
+        ldx     pagecount+1
         rts
 
 ; ------------------------------------------------------------------------
@@ -92,21 +131,25 @@ PAGECOUNT:
 ; by the driver.
 ;
 
-MAP:    sta     curpage
+MAP:    sei
+        sta     curpage
         stx     curpage+1               ; Remember the new page
 
-        clc
-        adc	#>BASE
-        sta	ptr1+1
-        ldy	#$00
-        sty    	ptr1
+        jsr     calculate_bank_and_correct_page
+        stx     curbank
 
+        clc
+        adc     #>BASE
+        sta     ptr1+1
+        ldy     #$00
+        sty     ptr1
         lda     #<ptr1
         sta     FETVEC
 
 ; Transfer one page
 
-@L1:    ldx     #MMU_CFG_RAM1
+@L1:    ldx     curbank
+        jsr     getcurbankmmu
         jsr     FETCH
         sta     window,y
         iny
@@ -116,6 +159,7 @@ MAP:    sta     curpage
 
         lda     #<window
         ldx     #>window                ; Return the window address
+        cli
         rts
 
 ; ------------------------------------------------------------------------
@@ -130,15 +174,19 @@ USE:    sta     curpage
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.
 
-COMMIT: lda     curpage			; Get the current page
+COMMIT: sei
+        lda     curpage			; Get the current page
         ldx     curpage+1
         bmi     done                    ; Jump if no page mapped
+
+        jsr     calculate_bank_and_correct_page
+        stx     curbank
 
         clc
         adc	#>BASE
         sta	ptr1+1
         ldy	#$00
-        sty    	ptr1
+        sty     ptr1
 
         lda     #<ptr1
         sta     STAVEC
@@ -146,10 +194,12 @@ COMMIT: lda     curpage			; Get the current page
 ; Transfer one page. Y must be zero on entry
 
 @L1:    lda     window,y
-        ldx     #MMU_CFG_RAM1
+        ldx     curbank
+        jsr     getcurbankmmu
         jsr     STASH
         iny
         bne     @L1
+        cli
 
 ; Done
 
@@ -162,64 +212,55 @@ done:   rts
 ;
 
 COPYFROM:
-        sta     ptr3
-        stx     ptr3+1                  ; Save the passed em_copy pointer
+        sei
+        jsr     setup
 
-        ldy     #EM_COPY::OFFS
-        lda     (ptr3),y
-        sta     ptr1
-        ldy     #EM_COPY::PAGE
-        lda     (ptr3),y
-        clc
-        adc     #>BASE
-        sta     ptr1+1                  ; From
+; Setup is:
+;
+;   - ptr1 contains the struct pointer
+;   - ptr2 contains the linear memory buffer
+;   - ptr3 contains -(count-1)
+;   - ptr4 contains the page buffer and offset
+;   - tmp1 contains the bank
+;   - tmp2 contains zero (used for linear memory buffer offset)
 
-        ldy     #EM_COPY::BUF
-        lda     (ptr3),y
-        sta     ptr2
-        iny
-        lda     (ptr3),y
-        sta     ptr2+1                  ; To
-
-        lda     #<ptr1
+        lda     #<ptr4
         sta     FETVEC
+        jmp     @L3
 
-        ldy     #EM_COPY::COUNT+1
-        lda     (ptr3),y                ; Get number of pages
-        beq     @L2                     ; Skip if no full pages
-        sta     tmp1
-
-; Copy full pages
-
-        ldy     #$00
-@L1:    ldx     #MMU_CFG_RAM1
+@L1:    ldx     tmp1
+        jsr     getcurbankmmu
+        ldy     #0
         jsr     FETCH
+        ldy     tmp2
         sta     (ptr2),y
-        iny
-        bne     @L1
-        inc     ptr1+1
+        inc     tmp2
+        bne     @L2
         inc     ptr2+1
-        dec     tmp1
-        bne     @L1
-
-; Copy the remainder of the page
-
-@L2:    ldy     #EM_COPY::COUNT
-        lda     (ptr3),y                ; Get bytes in last page
+@L2:    inc     ptr4
         beq     @L4
-        sta     tmp1
 
-        ldy     #$00
-@L3:    ldx     #MMU_CFG_RAM1
-        jsr     FETCH
-        sta	(ptr2),y
-        iny
-        dec     tmp1
+; Bump count and repeat
+
+@L3:    inc     ptr3
+        bne     @L1
+        inc     ptr3+1
+        bne     @L1
+        cli
+        rts
+
+; Bump page register
+
+@L4:    inc     ptr4+1
+        lda     ptr4+1
+        cmp     #$ff
         bne     @L3
+        lda     #4
+        sta     ptr4+1
+        inc     tmp1
+@L5:
+        jmp     @L3
 
-; Done
-
-@L4:    rts
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure
@@ -227,62 +268,159 @@ COPYFROM:
 ; The function must not return anything.
 ;
 
-COPYTO: sta     ptr3
-        stx     ptr3+1                  ; Save the passed em_copy pointer
+COPYTO:
+        sei
+        jsr     setup
 
-        ldy     #EM_COPY::OFFS
-        lda     (ptr3),y
-        sta     ptr1
-        ldy     #EM_COPY::PAGE
-        lda     (ptr3),y
+; Setup is:
+;
+;   - ptr1 contains the struct pointer
+;   - ptr2 contains the linear memory buffer
+;   - ptr3 contains -(count-1)
+;   - ptr4 contains the page buffer and offset
+;   - tmp1 contains the bank
+;   - tmp2 contains zero (used for linear memory buffer offset)
+
+        lda     #<ptr4
+        sta     STAVEC
+        jmp     @L3
+
+@L1:
+        ldy     tmp2
+        lda     (ptr2),y
+        ldx     tmp1
+        jsr     getcurbankmmu
+        ldy     #0
+        jsr     STASH
+        inc     tmp2
+        bne     @L2
+        inc     ptr2+1
+@L2:    inc     ptr4
+        beq     @L4
+
+; Bump count and repeat
+
+@L3:    inc     ptr3
+        bne     @L1
+        inc     ptr3+1
+        bne     @L1
+        cli
+        rts
+
+; Bump page register
+
+@L4:    inc     ptr4+1
+        lda     ptr4+1
+        cmp     #$ff
+        bne     @L3
+        inc     tmp1
+        lda     #4
+        sta     ptr4+1
+@L5:
+        jmp     @L3
+
+; ------------------------------------------------------------------------
+; Helper function to calculate the correct bank and page
+; when addressing bank 2 or 3
+
+calculate_bank_and_correct_page:
+        cpx     #2
+        beq     @calculate_bank_3_with_2
+        cpx     #1
+        beq     @calculate_bank_2_or_3_with_1
+        sec
+        sbc     #251
+        bcs     @calculate_bank_2_with_0
+        ldx     #1
+        lda     curpage
+        rts
+
+@calculate_bank_3_with_2:
+        lda     curpage
         clc
-        adc     #>BASE
-        sta     ptr1+1                  ; To
+        adc     #10
+@calculate_bank_3_with_1:
+        ldx     #3
+        rts
+
+@calculate_bank_2_or_3_with_1:
+        sec
+        sbc     #246
+        bcs     @calculate_bank_3_with_1
+        lda     curpage
+        clc
+        adc     #5
+@calculate_bank_2_with_0:
+        ldx     #2
+        rts
+
+; ------------------------------------------------------------------------
+; Helper function to get the correct mmu value in x
+
+getcurbankmmu:
+        cpx     #1
+        beq     @bank1
+        cpx     #2
+        beq     @bank2
+        ldx     #MMU_CFG_RAM3
+        rts
+@bank2:
+        ldx     #MMU_CFG_RAM2
+        rts
+@bank1:
+        ldx     #MMU_CFG_RAM1
+        rts
+
+; ------------------------------------------------------------------------
+; Helper function for COPYFROM and COPYTO: Store the pointer to the request
+; structure and prepare data for the copy
+
+setup:  sta     ptr1
+        stx     ptr1+1          ; Save passed pointer
+
+; Get the page number from the struct and adjust it so that it may be used
+; with the hardware. That is: page pointer in ptr4 and bank in tmp1
+
+        ldy     #EM_COPY::PAGE+1
+        lda     (ptr1),y
+        tax
+        dey
+        lda     (ptr1),y
+        sta     curpage
+        jsr     calculate_bank_and_correct_page
+        clc
+        adc     #4
+        sta     ptr4+1
+        stx     tmp1
+
+; Get the buffer pointer into ptr2
 
         ldy     #EM_COPY::BUF
-        lda     (ptr3),y
+        lda     (ptr1),y
         sta     ptr2
         iny
-        lda     (ptr3),y
-        sta     ptr2+1                  ; From
+        lda     (ptr1),y
+        sta     ptr2+1
 
-        lda     #<ptr1
-        sta     STAVEC
+; Get the count, calculate -(count-1) and store it into ptr3
 
-        ldy     #EM_COPY::COUNT+1
-        lda     (ptr3),y                ; Get number of pages
-        beq     @L2                     ; Skip if no full pages
-        sta     tmp1
-
-; Copy full pages
-
-        ldy     #$00
-@L1:    lda     (ptr2),y
-        ldx     #MMU_CFG_RAM1
-        jsr     STASH
+        ldy     #EM_COPY::COUNT
+        lda     (ptr1),y
+        eor     #$FF
+        sta     ptr3
         iny
-        bne     @L1
-        inc     ptr1+1
-        inc     ptr2+1
-        dec     tmp1
-        bne     @L1
+        lda     (ptr1),y
+        eor     #$FF
+        sta     ptr3+1
 
-; Copy the remainder of the page
+; Get the page offset into the low byte of ptr4 clear tmp2
 
-@L2:    ldy     #EM_COPY::COUNT
-        lda     (ptr3),y                ; Get bytes in last page
-        beq     @L4
-        sta     tmp1
-
-        ldy     #$00
-@L3:    lda     (ptr2),y
-        ldx     #MMU_CFG_RAM1
-        jsr     STASH
-        iny
-        dec     tmp1
-        bne     @L3
+        ldy     #EM_COPY::OFFS
+        lda     (ptr1),y
+        sta     ptr4
+        lda     #0
+        sta     tmp2
 
 ; Done
 
-@L4:    rts
-
+        rts

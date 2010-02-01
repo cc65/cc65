@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2010 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -100,8 +100,9 @@
 #define C64_OS_SX64     0x43            /* SX-64 */
 #define C64_EU_NEW      0x03
 #define C64_EU_OLD      0x00
+#define C64_DTV         0xFF            /* C64 DTV */
 
-
+                
 
 /*****************************************************************************/
 /*	       	   		     Code				     */

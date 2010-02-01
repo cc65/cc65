@@ -62,8 +62,6 @@ pagecount:      .res    2               ; Number of available pages
 ;
 
 INSTALL:
-	tya
-	pha
        	ldx     GR_WINDOW
         cpx     GR_WINDOW
         bne     @notpresent
@@ -118,8 +116,6 @@ INSTALL:
        	bne     @setok
 
 @notpresent:
-	pla
-	tay
        	lda     #<EM_ERR_NO_DEVICE
        	ldx     #>EM_ERR_NO_DEVICE
 	rts
@@ -128,8 +124,6 @@ INSTALL:
        	lda     #0
        	sta     pagecount
        	stx     pagecount+1
-	pla
-	tay
        	lda     #<EM_ERR_OK
        	ldx     #>EM_ERR_OK
 	rts

@@ -3,6 +3,10 @@
 ; (based on code by Ullrich von Bassewitz)
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 06,20.12.2002
+;
+; VDC test added by
+; Marco van den Heuvel, 2010-01-22
+;
 
 	.include	"zeropage.inc"
 
@@ -67,35 +71,49 @@ window:		.res	256		   ; memory window
 ;
 
 INSTALL:
-	; do test for VDC presence here???
+        ldx     #0
+        ldy     #0
+       	lda     #VDC_CSET	; determine size of RAM...
+       	sta     VDC_ADDR_REG
 
-	ldx	#VDC_CSET	; determine size of RAM...
-	jsr	vdcgetreg
-	sta	tmp1
-	ora	#%00010000
-	jsr	vdcputreg	; turn on 64k
+@L0:    bit     VDC_ADDR_REG
+        bmi     @present
+        inx
+        bne     @L0
+        iny
+        bne     @L0
+	lda    	#<EM_ERR_NO_DEVICE
+	ldx    	#>EM_ERR_NO_DEVICE
+	rts
 
-	jsr	settestadr1	; save original value of test byte
-	jsr	vdcgetbyte
-	sta	tmp2
+@present:
+	ldx    	#VDC_CSET	; determine size of RAM...
+	jsr    	vdcgetreg
+	sta    	tmp1
+	ora    	#%00010000
+	jsr    	vdcputreg	; turn on 64k
 
-	lda	#$55		; write $55 here
-	ldy	#ptr1
-	jsr	test64k		; read it here and there
-	lda	#$aa		; write $aa here
-	ldy	#ptr2
-	jsr	test64k		; read it here and there
+	jsr    	settestadr1	; save original value of test byte
+	jsr    	vdcgetbyte
+	sta    	tmp2
 
-	jsr	settestadr1
-	lda	tmp2
-	jsr	vdcputbyte	; restore original value of test byte
+	lda    	#$55		; write $55 here
+	ldy    	#ptr1
+	jsr    	test64k		; read it here and there
+	lda    	#$aa		; write $aa here
+	ldy    	#ptr2
+	jsr    	test64k		; read it here and there
 
-	lda	ptr1		; do bytes match?
-	cmp	ptr1+1
-	bne	@have64k
-	lda	ptr2
-	cmp	ptr2+1
-	bne	@have64k
+	jsr    	settestadr1
+	lda    	tmp2
+	jsr    	vdcputbyte	; restore original value of test byte
+
+	lda    	ptr1		; do bytes match?
+	cmp    	ptr1+1
+	bne    	@have64k
+	lda    	ptr2
+	cmp    	ptr2+1
+	bne    	@have64k
 
 	ldx	#VDC_CSET
 	lda	tmp1

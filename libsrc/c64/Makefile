@@ -71,15 +71,26 @@ OBJS = 	_scrsize.o     	 	\
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS = c64-georam.emd c64-ram.emd c64-ramcart.emd c64-reu.emd c64-vdc.emd dtv-himem.emd
+EMDS =  c64-georam.emd          \
+        c64-isepic.emd          \
+        c64-ram.emd             \
+        c64-ramcart.emd         \
+        c64-reu.emd             \
+        c64-vdc.emd             \
+        dtv-himem.emd
 
-JOYS = c64-hitjoy.joy c64-numpad.joy c64-ptvjoy.joy c64-stdjoy.joy
+JOYS =  c64-hitjoy.joy          \
+        c64-numpad.joy          \
+        c64-ptvjoy.joy          \
+        c64-stdjoy.joy
 
-MOUS = c64-1351.mou c64-joymouse.mou c64-potmouse.mou
+MOUS =  c64-1351.mou            \
+        c64-joymouse.mou        \
+        c64-potmouse.mou
 
-SERS = c64-swlink.ser
+SERS =  c64-swlink.ser
 
-TGIS = c64-320-200-2.tgi
+TGIS =  c64-320-200-2.tgi
 
 #--------------------------------------------------------------------------
 # Targets

@@ -116,10 +116,11 @@ joy2:   dex
 
 ; Read joystick 3
 
+joy3:
         lda     #%10000000      ; cia 2 port B Data-Direction
         sta     CIA2_DDRB       ; bit 7: out    bit 6-0: in
 
-joy3:   dex
+        dex
         bne     joy4
 
         lda     #$80            ; cia 2 port B read/write
@@ -127,6 +128,7 @@ joy3:   dex
 
         lda     CIA2_PRB        ; cia 2 port B read/write
         and     #$1f            ; get bit 4-0 (PB4-PB0)
+        eor     #$1f
         rts
 
 ; Read joystick 4
@@ -142,6 +144,7 @@ joy4:   lda     #$00            ; cia 2 port B read/write
         and     #%00100000      ; get bit 5 (PB5)
         lsr
         ora     tmp1
+        eor     #$1f
 
         ldx #0
         rts

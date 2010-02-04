@@ -12,9 +12,12 @@
 ;---------------------------------------------------------------------------
 ; 16x16 => 32 unsigned multiplication routine.
 ;
-;   lhs         rhs           result          result also in
-; -------------------------------------------------------------
-;   ptr1        ax            ax:sreg          ptr1:sreg
+;  routine         lhs         rhs        result          result also in
+; -----------------------------------------------------------------------
+;  umul16x16r32    ptr1        ax         ax:sreg          ptr1:sreg
+;  umul16x16r32m   ptr1        ptr3       ax:sreg          ptr1:sreg
+;
+; ptr3 is left intact by the routine.
 ;
 
 umul16x16r32:

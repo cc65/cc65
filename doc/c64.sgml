@@ -166,9 +166,9 @@ configuration.
 <descrip>
 
   <tag><tt/c64-georam.emd/</tag>
-  A driver for the GeoRam cartridge. The driver will always assume 2048 pages
-  of 256 bytes each. There are no checks, so if your program knows better,
-  just go ahead.
+  A driver for the Berkeley Softworks GeoRam cartridge. The driver will
+  determine the available RAM from the connected cartridge. It supports 64KB
+  up to 2048KB of RAM.
 
   <tag><tt/c64-ram.emd/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 48

@@ -165,6 +165,10 @@ configuration.
 
 <descrip>
 
+  <tag><tt/c64-c256k.emd/</tag>
+  A driver for the C64 256K memory expansion. This driver offers 768 pages of
+  256 bytes each. Written and contributed by Marco van den Heuvel.
+
   <tag><tt/c64-georam.emd/</tag>
   A driver for the Berkeley Softworks GeoRam cartridge. The driver will
   determine the available RAM from the connected cartridge. It supports 64KB

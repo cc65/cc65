@@ -71,7 +71,8 @@ OBJS = 	_scrsize.o     	 	\
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS =  c64-georam.emd          \
+EMDS =  c64-c256k.emd           \
+        c64-georam.emd          \
         c64-isepic.emd          \
         c64-ram.emd             \
         c64-ramcart.emd         \

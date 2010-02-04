@@ -174,6 +174,10 @@ configuration.
   determine the available RAM from the connected cartridge. It supports 64KB
   up to 2048KB of RAM.
 
+  <tag><tt/c64-isepic.emd/</tag>
+  A driver for the ISEPIC cartridge. This driver offers just 8 pages of 256
+  bytes each. Written and contributed by Marco van den Heuvel.
+
   <tag><tt/c64-ram.emd/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 48
   256 byte pages. Please note that this driver is incompatible with any of the

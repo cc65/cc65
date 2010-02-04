@@ -151,7 +151,7 @@ INSTALL:
         jsr	backup_and_setup_check_routine
         jsr	CHECKC256K
         cli
-        ldx	#$29
+        ldx	#.sizeof (c256kcheckcode) - 1
         jsr	restore_data
         cpy	#$01
         beq	@present
@@ -212,8 +212,7 @@ MAP:
 
 ; Return the memory window
 
-        ldx	#$0A
-        jsr	restore_data
+        jsr	restore_copy_routine
         lda	#<window
         ldx	#>window		; Return the window address
         cli
@@ -258,8 +257,7 @@ COMMIT:
 
 ; Return the memory window
 
-        ldx	#$0A
-        jsr	restore_data
+        jsr	restore_copy_routine
 done:
         cli
         rts
@@ -309,8 +307,7 @@ COPYFROM:
         bne	@L1
         inc	ptr3+1
         bne	@L1
-        ldx	#$0A
-        jsr	restore_data
+        jsr	restore_copy_routine
         cli
         rts
 
@@ -375,8 +372,7 @@ COPYTO:
         bne  	@L1
         inc  	ptr3+1
         bne  	@L1
-        ldx  	#$0A
-        jsr  	restore_data
+        jsr  	restore_copy_routine
         cli
         rts
 
@@ -474,6 +470,8 @@ backup_and_setup_check_routine:
         bpl	@L1
         rts
 
+restore_copy_routine:
+        ldx	#.sizeof (c256kcopycode) - 1
 restore_data:
         lda	backup,x
         sta	CHECKC256K,x

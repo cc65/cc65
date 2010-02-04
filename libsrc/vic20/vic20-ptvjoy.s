@@ -125,6 +125,7 @@ joy2:	lda	#%10000000	; via port B Data-Direction
 
 	lda	VIA1_PRB	; via port B read/write
 	and	#$1f		; get bit 4-0 (PB4-PB0)
+	eor	#$1f
 	rts
 
 ; Read joystick 3
@@ -140,6 +141,7 @@ joy3:	lda	#$00		; via port B read/write
 	and	#%00100000	; get bit 5 (PB5)
 	lsr
 	ora	tmp1
+	eor	#$1f
 
 	ldx	#0
 	rts

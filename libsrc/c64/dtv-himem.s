@@ -5,10 +5,12 @@
 ; Ullrich von Bassewitz, 2005-11-27
 ;
 
+
 	.include 	"zeropage.inc"
 
       	.include 	"em-kernel.inc"
         .include        "em-error.inc"
+	.import	_get_ostype
 
 
         .macpack        generic
@@ -71,8 +73,26 @@ curpage:        .word  	$0000  	       	; Page
 ;
 
 INSTALL:
-        lda     #$01
-        sta     $d03f                   ; Enable extended register access
+
+; Check for a DTV
+
+        ldx     #1
+        stx     $d03f
+        ldx     $d040
+        cpx     $d000
+        bne     @present
+        inc     $d000
+        cpx     $d040
+        beq     @present
+        dec     $d000
+
+; DTV not found
+
+        lda     #<EM_ERR_NO_DEVICE
+        ldx     #>EM_ERR_NO_DEVICE
+        rts
+
+@present:
         ldx     #$FF
         stx     curpage+1               ; Invalidate curpage
         inx                             ; X = 0

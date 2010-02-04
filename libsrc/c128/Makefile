@@ -73,15 +73,24 @@ OBJS =	_scrsize.o		\
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS = c128-georam.emd c128-ram.emd c128-ramcart.emd c128-reu.emd c128-vdc.emd
+EMDS =  c128-georam.emd         \
+        c128-ram.emd            \
+        c128-ram2.emd           \
+        c128-ramcart.emd        \
+        c128-reu.emd            \
+        c128-vdc.emd
 
-JOYS = c128-ptvjoy.joy c128-stdjoy.joy
+JOYS =  c128-ptvjoy.joy         \
+        c128-stdjoy.joy
 
-MOUS = c128-1351.mou c128-joymouse.mou c128-potmouse.mou
+MOUS =  c128-1351.mou           \
+        c128-joymouse.mou       \
+        c128-potmouse.mou
 
-SERS = c128-swlink.ser
+SERS =  c128-swlink.ser
 
-TGIS = c128-640-200-2.tgi c128-640-480-2.tgi
+TGIS =  c128-640-200-2.tgi      \
+        c128-640-480-2.tgi
 
 #--------------------------------------------------------------------------
 # Targets

@@ -195,6 +195,15 @@ missing on VDC and are translated to the two colors missing from VIC palette.
   An extended memory driver for the RAM in page 1. The common memory area is
   excluded, so this driver supports 251 pages of 256 bytes each.
 
+  <tag><tt/c128-ram2.emd/</tag>
+
+  An extended memory driver for the RAM in pages 1-3. The common memory area
+  is excluded, so this driver supports up to 731 pages of 256 bytes each. The
+  driver can be used as a full replacement for <tt/c128-ram.emd/, because RAM
+  in pages 2+3 is autodetected, but it's larger and there are not many
+  machines with RAM in banks 2+3, so it has been made a separate driver. The
+  additional code was contributed by Marco van den Heuvel.
+
   <tag><tt/c128-ramcart.emd/</tag>
   A driver for the RamCart 64/128 written and contributed by Maciej Witkowiak.
   Will test the hardware for the available RAM.

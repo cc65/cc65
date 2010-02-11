@@ -1862,8 +1862,10 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoMacPack	},
     { ccNone,		DoMacro		},
     { ccNone,  	       	DoUnexpected	},	/* .MATCH */
+    { ccNone,  	       	DoUnexpected	},	/* .MAX */
     { ccNone,  	       	DoInvalid	},	/* .MID	*/
-    { ccNone,		DoNull		},
+    { ccNone,  	       	DoUnexpected	},	/* .MIN */
+    { ccNone,		DoNull		},             
     { ccNone,		DoOrg		},
     { ccNone,		DoOut		},
     { ccNone,		DoP02		},

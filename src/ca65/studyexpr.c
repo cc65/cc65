@@ -481,7 +481,7 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
     ED_Done (&Right);
 }
 
-
+            
 
 static void StudyLiteral (ExprNode* Expr, ExprDesc* D)
 /* Study a literal expression node */
@@ -1002,6 +1002,34 @@ static void StudyBoolXor (ExprNode* Expr, ExprDesc* D)
 
 
 
+static void StudyMax (ExprNode* Expr, ExprDesc* D)
+/* Study an MAX binary expression node */
+{
+    /* Use helper function */
+    StudyBinaryExpr (Expr, D);
+
+    /* If the result is valid, apply the operation */
+    if (ED_IsValid (D)) {
+        D->Val = (D->Val > D->Right)? D->Val : D->Right;
+    }
+}
+
+
+
+static void StudyMin (ExprNode* Expr, ExprDesc* D)
+/* Study an MIN binary expression node */
+{
+    /* Use helper function */
+    StudyBinaryExpr (Expr, D);
+
+    /* If the result is valid, apply the operation */
+    if (ED_IsValid (D)) {
+        D->Val = (D->Val < D->Right)? D->Val : D->Right;
+    }
+}
+
+
+
 static void StudyUnaryMinus (ExprNode* Expr, ExprDesc* D)
 /* Study an EXPR_UNARY_MINUS expression node */
 {
@@ -1279,6 +1307,14 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
             StudyBoolXor (Expr, D);
             break;
 
+        case EXPR_MAX:
+            StudyMax (Expr, D);
+            break;
+
+        case EXPR_MIN:
+            StudyMin (Expr, D);
+            break;
+
         case EXPR_UNARY_MINUS:
             StudyUnaryMinus (Expr, D);
             break;
@@ -1368,7 +1404,7 @@ void StudyExpr (ExprNode* Expr, ExprDesc* D)
      */
     if (D->AddrSize == ADDR_SIZE_DEFAULT && ED_IsConst (D)) {
         D->AddrSize = GetConstAddrSize (D->Val);
-    }
+    }               
 
     /* If the expression is valid, throw away the address size and recalculate
      * it using the data we have. This is more exact than the on-the-fly

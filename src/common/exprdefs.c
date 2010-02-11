@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -153,6 +153,14 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 	case EXPR_BOOLXOR:
 	    printf (" BOOL_XOR");
 	    break;
+
+        case EXPR_MAX:
+            printf (" MAX");
+            break;
+
+        case EXPR_MIN:
+            printf (" MIN");
+            break;
 
        	case EXPR_UNARY_MINUS:
 	    printf (" NEG");

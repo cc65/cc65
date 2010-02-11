@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -81,6 +81,8 @@
 #define EXPR_BOOLAND		(EXPR_BINARYNODE | 0x11)
 #define EXPR_BOOLOR 		(EXPR_BINARYNODE | 0x12)
 #define EXPR_BOOLXOR		(EXPR_BINARYNODE | 0x13)
+#define EXPR_MAX                (EXPR_BINARYNODE | 0x14)
+#define EXPR_MIN                (EXPR_BINARYNODE | 0x15)
 
 /* Unary operations, right hand side is empty */
 #define EXPR_UNARY_MINUS       	(EXPR_UNARYNODE | 0x01)

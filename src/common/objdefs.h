@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objdefs.h   	       	       	       	     */
+/*			      	   objdefs.h   	       	       	       	     */
 /*                                                                           */
 /*			    Object file definitions			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,14 +39,14 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*     	       	    	      	     Data				     */
 /*****************************************************************************/
 
 
 
 /* Defines for magic and version */
 #define OBJ_MAGIC	0x616E7A55
-#define OBJ_VERSION	0x000B
+#define OBJ_VERSION	0x000C
 
 /* Size of an object file header */
 #define	OBJ_HDR_SIZE	(22*4)

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -535,6 +535,64 @@ static ExprNode* FuncMatch (void)
 
 
 
+static ExprNode* FuncMax (void)
+/* Handle the .MAX function */
+{
+    ExprNode* Left;
+    ExprNode* Right;
+    ExprNode* Expr;
+    long LeftVal, RightVal;
+
+    /* Two arguments to the pseudo function */
+    Left = Expression ();
+    ConsumeComma ();
+    Right = Expression ();
+
+    /* Check if we can evaluate the value immediately */
+    if (IsEasyConst (Left, &LeftVal) && IsEasyConst (Right, &RightVal)) {
+        FreeExpr (Left);
+        FreeExpr (Right);
+        Expr = GenLiteralExpr ((LeftVal > RightVal)? LeftVal : RightVal);
+    } else {
+        /* Make an expression node */
+        Expr = NewExprNode (EXPR_MAX);
+        Expr->Left = Left;
+        Expr->Right = Right;
+    }
+    return Expr;
+}
+
+
+
+static ExprNode* FuncMin (void)
+/* Handle the .MIN function */
+{
+    ExprNode* Left;
+    ExprNode* Right;
+    ExprNode* Expr;
+    long LeftVal, RightVal;
+
+    /* Two arguments to the pseudo function */
+    Left = Expression ();
+    ConsumeComma ();
+    Right = Expression ();
+
+    /* Check if we can evaluate the value immediately */
+    if (IsEasyConst (Left, &LeftVal) && IsEasyConst (Right, &RightVal)) {
+        FreeExpr (Left);
+        FreeExpr (Right);
+        Expr = GenLiteralExpr ((LeftVal < RightVal)? LeftVal : RightVal);
+    } else {
+        /* Make an expression node */
+        Expr = NewExprNode (EXPR_MIN);
+        Expr->Left = Left;
+        Expr->Right = Right;
+    }
+    return Expr;
+}
+
+
+
 static ExprNode* FuncReferenced (void)
 /* Handle the .REFERENCED builtin function */
 {
@@ -918,6 +976,14 @@ static ExprNode* Factor (void)
 	case TOK_MATCH:
 	    N = Function (FuncMatch);
 	    break;
+
+        case TOK_MAX:
+            N = Function (FuncMax);
+            break;
+
+        case TOK_MIN:
+            N = Function (FuncMin);
+            break;
 
         case TOK_REFERENCED:
 	    N = Function (FuncReferenced);

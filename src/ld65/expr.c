@@ -343,6 +343,16 @@ long GetExprVal (ExprNode* Expr)
 
 	case EXPR_BOOLXOR:
 	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
+                  
+        case EXPR_MAX:
+            Left = GetExprVal (Expr->Left);
+            Right = GetExprVal (Expr->Right);
+            return (Left > Right)? Left : Right;
+
+        case EXPR_MIN:
+            Left = GetExprVal (Expr->Left);
+            Right = GetExprVal (Expr->Right);
+            return (Left < Right)? Left : Right;
 
        	case EXPR_UNARY_MINUS:
 	    return -GetExprVal (Expr->Left);
@@ -561,20 +571,6 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

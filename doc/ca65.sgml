@@ -124,7 +124,7 @@ Long options:
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
-                                     
+
 <sect1>Command line options in detail<p>
 
 Here is a description of all the command line options:
@@ -1420,6 +1420,26 @@ either a string or an expression.
   See: <tt><ref id=".XMATCH" name=".XMATCH"></tt>
 
 
+<sect1><tt>.MAX</tt><label id=".MAX"><p>
+
+  Builtin function. The result is the larger of two values.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.MAX (&lt;value #1&gt;, &lt;value #2&gt;)
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        ; Reserve space for the larger of two data blocks
+       	savearea:       .max (.sizeof (foo), .sizeof (bar))
+  </verb></tscreen>
+
+  See: <tt><ref id=".MIN" name=".MIN"></tt>
+
+
 <sect1><tt>.MID</tt><label id=".MID"><p>
 
   Builtin function. Takes a starting index, a count and a token list as
@@ -1458,6 +1478,26 @@ either a string or an expression.
 
   See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".RIGHT"
   name=".RIGHT"></tt> builtin functions.
+
+
+<sect1><tt>.MIN</tt><label id=".MIN"><p>
+
+  Builtin function. The result is the smaller of two values.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.MIN (&lt;value #1&gt;, &lt;value #2&gt;)
+  </verb></tscreen>
+
+  Example:
+
+  <tscreen><verb>
+        ; Reserve space for some data, but 256 bytes minimum
+       	savearea:       .min (.sizeof (foo), 256)
+  </verb></tscreen>
+
+  See: <tt><ref id=".MAX" name=".MAX"></tt>
 
 
 <sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>

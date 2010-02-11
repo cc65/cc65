@@ -89,23 +89,18 @@ done:   stx     $01
 .reloc
 .endproc
 
-; Since the functions above are copied to $200, the current contents of this
-; memory area must be saved into backup storage. Calculate the amount of
-; space necessary.
-.if     .sizeof (c256kcopycode) > .sizeof (c256kcheckcode)
-backupspace     = .sizeof (c256kcopycode)
-.else
-backupspace     = .sizeof (c256kcheckcode)
-.endif
 
 
 .bss
 
 curpage:        .res   	2       ; Current page number
 curbank:        .res	1	; Current bank
-backup:         .res   	backupspace     ; Backup area of data in the location
-                                ; where the copy and check routines will be
 window:         .res   	256    	; Memory "window"
+
+; Since the functions above are copied to $200, the current contents of this
+; memory area must be saved into backup storage. Allocate enough space.
+backup:         .res   	.max (.sizeof (c256kcopycode), .sizeof (c256kcheckcode))
+
 
 
 .code

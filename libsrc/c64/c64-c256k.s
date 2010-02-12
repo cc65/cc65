@@ -38,9 +38,7 @@
 
 BASE                    = $4000
 PAGES                   = 3 * 256
-CHECKC256K              = $0200
-TRANSFERC256K           = $0200
-STASHOPCODE             = $91
+TARGETLOC               = $200          ; Target location for copy/check code
 pia                     = $DFC0
 
 ; ------------------------------------------------------------------------
@@ -50,11 +48,14 @@ pia                     = $DFC0
 
 
 ; This function is used to copy code from and to the extended memory
-.proc   c256kcopycode
-.org    ::TRANSFERC256K         ; Assemble for target location
+.proc   copy
+template:
+.org    ::TARGETLOC             ; Assemble for target location
+entry:
         stx     pia
-::STASHC256K    := *            ; Location and opcode is patched at runtime
-::VECC256K      := *+1
+stashop         = $91           ; 'sta' opcode
+operation       := *            ; Location and opcode is patched at runtime
+address         := *+1
         lda     ($00),y
         ldx     #$dc
         stx     pia
@@ -63,8 +64,10 @@ pia                     = $DFC0
 .endproc
 
 ; This function is used to check for the existence of the extended memory
-.proc   c256kcheckcode
-.org    ::CHECKC256K
+.proc   check
+template:
+.org    ::TARGETLOC
+entry:
         ldy     #$00            ; Assume hardware not present
 
         lda     #$fc
@@ -99,7 +102,7 @@ window:         .res   	256    	; Memory "window"
 
 ; Since the functions above are copied to $200, the current contents of this
 ; memory area must be saved into backup storage. Allocate enough space.
-backup:         .res   	.max (.sizeof (c256kcopycode), .sizeof (c256kcheckcode))
+backup:         .res   	.max (.sizeof (copy), .sizeof (check))
 
 
 
@@ -144,9 +147,9 @@ INSTALL:
         sty	pia+3
 
         jsr	backup_and_setup_check_routine
-        jsr	CHECKC256K
+        jsr	check::entry
         cli
-        ldx	#.sizeof (c256kcheckcode) - 1
+        ldx	#.sizeof (check) - 1
         jsr	restore_data
         cpy	#$01
         beq	@present
@@ -157,7 +160,7 @@ INSTALL:
 @present:
         lda	#<EM_ERR_OK
         ldx	#>EM_ERR_OK
-;       rts			; Run into UNINSTALL instead
+;       rts		  	; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -185,7 +188,7 @@ PAGECOUNT:
 
 MAP:
         sei
-        sta	curpage		; Remember the new page
+        sta	curpage	  	; Remember the new page
         stx	curpage+1
         jsr	adjust_page_and_bank
         stx	curbank
@@ -196,10 +199,10 @@ MAP:
         sty	ptr1
         jsr	backup_and_setup_copy_routine
         ldx	#<ptr1
-        stx     VECC256K
+        stx     copy::address
 @L1:
         ldx	curbank
-        jsr	TRANSFERC256K
+        jsr	copy::entry
         ldx	ptr1
         sta	window,x
         inc	ptr1
@@ -209,17 +212,17 @@ MAP:
 
         jsr	restore_copy_routine
         lda	#<window
-        ldx	#>window		; Return the window address
+        ldx	#>window      		; Return the window address
         cli
         rts
 
 ; ------------------------------------------------------------------------
 ; USE: Tell the driver that the window is now associated with a given page.
 
-USE:    sta	curpage		; Remember the page
+USE:    sta	curpage	      	; Remember the page
         stx	curpage+1
         lda	#<window
-        ldx	#>window		; Return the window
+        ldx	#>window      		; Return the window
         rts
 
 ; ------------------------------------------------------------------------
@@ -227,7 +230,7 @@ USE:    sta	curpage		; Remember the page
 
 COMMIT:
         sei
-        lda	curpage		; Get the current page
+        lda	curpage	      	; Get the current page
         ldx	curpage+1
 
         jsr	adjust_page_and_bank
@@ -239,14 +242,14 @@ COMMIT:
         sty	ptr1
         jsr	backup_and_setup_copy_routine
         ldx	#<ptr1
-        stx     VECC256K
-        ldx	#<STASHOPCODE
-        stx	STASHC256K
+        stx     copy::address
+        ldx	#<copy::stashop
+        stx	copy::operation
 @L1:
         ldx	ptr1
         lda	window,x
         ldx	curbank
-        jsr	TRANSFERC256K
+        jsr	copy::entry
         inc	ptr1
         bne	@L1
 
@@ -279,13 +282,13 @@ COPYFROM:
 ;   - tmp2 contains the bank value
 
         lda	#<ptr4
-        sta     VECC256K
+        sta     copy::address
         jmp	@L3
 
 @L1:
         ldx	tmp2
         ldy	#0
-        jsr	TRANSFERC256K
+        jsr	copy::entry
         ldy	tmp1
         sta	(ptr2),y
         inc	tmp1
@@ -342,9 +345,9 @@ COPYTO:
 ;   - tmp2 contains the bank value
 
         lda	#<ptr4
-        sta     VECC256K
-        lda  	#<STASHOPCODE
-        sta  	STASHC256K
+        sta     copy::address
+        lda  	#<copy::stashop
+        sta  	copy::operation
         jmp  	@L3
 
 @L1:
@@ -352,7 +355,7 @@ COPYTO:
         lda  	(ptr2),y
         ldx  	tmp2
         ldy  	#0
-        jsr  	TRANSFERC256K
+        jsr  	copy::entry
         inc  	tmp1
         bne  	@L2
         inc  	ptr2+1
@@ -392,7 +395,7 @@ COPYTO:
 
 setup:
         sta	ptr1
-        stx	ptr1+1					; Save passed pointer
+        stx	ptr1+1	      				; Save passed pointer
 
 ; Get the page number from the struct and adjust it so that it may be used
 ; with the hardware. That is: ptr4 has the page address and page offset
@@ -444,32 +447,32 @@ setup:
 ; Helper routines for copying to and from the +256k ram
 
 backup_and_setup_copy_routine:
-        ldx	#.sizeof (c256kcopycode) - 1
+        ldx	#.sizeof (copy) - 1
 @L1:
-        lda    	TRANSFERC256K,x
+        lda    	copy::entry,x
         sta	backup,x
-        lda	c256kcopycode,x
-        sta	TRANSFERC256K,x
+        lda	copy::template,x
+        sta	copy::entry,x
         dex
         bpl	@L1
         rts
 
 backup_and_setup_check_routine:
-        ldx	#.sizeof (c256kcheckcode) - 1
+        ldx	#.sizeof (check) - 1
 @L1:
-        lda	CHECKC256K,x
+        lda	check::entry,x
         sta	backup,x
-        lda	c256kcheckcode,x
-        sta	CHECKC256K,x
+        lda	check::template,x
+        sta	check::entry,x
         dex
         bpl	@L1
         rts
 
 restore_copy_routine:
-        ldx	#.sizeof (c256kcopycode) - 1
+        ldx	#.sizeof (copy) - 1
 restore_data:
         lda	backup,x
-        sta	CHECKC256K,x
+        sta	TARGETLOC,x
         dex
         bpl	restore_data
         rts

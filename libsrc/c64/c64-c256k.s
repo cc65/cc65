@@ -39,7 +39,7 @@
 BASE                    = $4000
 PAGES                   = 3 * 256
 TARGETLOC               = $200          ; Target location for copy/check code
-pia                     = $DFC0
+PIA                     = $DFC0
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -52,13 +52,13 @@ pia                     = $DFC0
 template:
 .org    ::TARGETLOC             ; Assemble for target location
 entry:
-        stx     pia
+        stx     PIA
 stashop         = $91           ; 'sta' opcode
 operation       := *            ; Location and opcode is patched at runtime
 address         := *+1
         lda     ($00),y
         ldx     #$dc
-        stx     pia
+        stx     PIA
         rts
 .reloc
 .endproc
@@ -71,7 +71,7 @@ entry:
         ldy     #$00            ; Assume hardware not present
 
         lda     #$fc
-        sta     pia
+        sta     PIA
         lda     $01
         tax
         and     #$f8
@@ -87,7 +87,7 @@ entry:
         iny
 done:   stx     $01
         ldx     #$dc
-        stx     pia
+        stx     PIA
         rts
 .reloc
 .endproc
@@ -115,36 +115,36 @@ backup:         .res   	.max (.sizeof (copy), .sizeof (check))
 ;
 
 INSTALL:
-        lda	pia+1		; Select Peripheral Registers
+        lda	PIA+1		; Select Peripheral Registers
         ora	#4
-        sta	pia+1
+        sta	PIA+1
         tax
-        lda	pia+3
+        lda	PIA+3
         ora	#4
-        sta	pia+3
+        sta	PIA+3
         tay
 
         lda	#$DC		; Set the default memory bank data
-        sta	pia
+        sta	PIA
         lda	#$FE
-        sta	pia+2
+        sta	PIA+2
 
         txa			; Select Data Direction Registers
         and	#$FB
-        sta	pia+1
+        sta	PIA+1
         tya
         and	#$FB
-        sta	pia+3
+        sta	PIA+3
 
         lda	#$FF		; Set the ports to output
-        sta	pia
-        sta	pia+2
+        sta	PIA
+        sta	PIA+2
 
         txa
         and	#$C7
         ora	#$30		; Set CA1 and
-        sta	pia+1		; select Peripheral Registers
-        sty	pia+3
+        sta	PIA+1		; select Peripheral Registers
+        sty	PIA+3
 
         jsr	backup_and_setup_check_routine
         jsr	check::entry

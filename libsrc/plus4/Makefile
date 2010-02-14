@@ -49,6 +49,7 @@ OBJS =	_scrsize.o	\
        	conio.o		\
        	cputc.o		\
        	crt0.o		\
+       	devnum.o	\
         get_tv.o        \
 	joy_stddrv.o	\
         kacptr.o        \

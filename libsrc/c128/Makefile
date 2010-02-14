@@ -53,6 +53,7 @@ OBJS =	_scrsize.o		\
      	crt0.o	       		\
        	color.o	       		\
      	cputc.o	       		\
+       	devnum.o       	 	\
 	fast.o			\
         get_tv.o        	\
 	joy_stddrv.o		\

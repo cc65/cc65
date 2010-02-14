@@ -56,6 +56,7 @@ OBJS =	_scrsize.o	\
        	color.o	 	\
 	cputc.o		\
        	crt0.o 	 	\
+       	devnum.o       	\
         extzp.o         \
        	kbhit.o	 	\
         kclose.o        \

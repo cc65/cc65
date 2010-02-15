@@ -22,6 +22,8 @@
         jsr     SWAPPER                 ; Toggle the mode
  	lda     #14
        	jsr     BSOUT                   ; Switch to lower case chars
+        lda     #$C0
+        sta     SCROLL                  ; Disable scrolling
         pla                             ; Get old mode into A
 
 ; Done, old mode is in A

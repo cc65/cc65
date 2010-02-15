@@ -2,6 +2,7 @@
 ; Driver for a "joystick mouse".
 ;
 ; Ullrich von Bassewitz, 2004-03-29, 2009-09-26
+; 2010-02-08, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -193,14 +194,12 @@ GETBOX: sta     ptr1
         stx     ptr1+1                  ; Save data pointer
 
         ldy     #.sizeof (MOUSE_BOX)-1
-        sei
 
 @L1:    lda     XMin,y
         sta     (ptr1),y
         dey
         bpl     @L1
 
-        cli
        	rts
 
 ;----------------------------------------------------------------------------
@@ -297,12 +296,18 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:	lda	#$7F
-     	sta	CIA1_PRA
-     	lda	CIA1_PRB                ; Read joystick #0
-        and     #$1F
-	eor	#$1F  	       		; Make all bits active high
-        sta     Temp
+; Avoid crosstalk between the keyboard and a joystick.
+
+IRQ:	ldy	#%00000000		; Set ports A and B to input
+	sty	CIA1_DDRB
+	sty	CIA1_DDRA		; Keyboard won't look like joystick
+	lda	CIA1_PRB		; Read Control-Port 1
+	dec	CIA1_DDRA		; Set port A back to output
+	eor	#%11111111		; Bit goes up when switch goes down
+	beq	@Save			;(bze)
+	dec	CIA1_DDRB		; Joystick won't look like keyboard
+	sty	CIA1_PRB		; Set "all keys pushed"
+@Save:  sta     Temp
 
 ; Check for a pressed button and place the result into Buttons
 

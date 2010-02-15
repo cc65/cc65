@@ -2,7 +2,8 @@
 ; Driver for the 1351 proportional mouse. Parts of the code are from
 ; the Commodore 1351 mouse users guide.
 ;
-; Ullrich von Bassewitz, 2003-12-29, 2009-09-26
+; 2009-09-26, Ullrich von Bassewitz
+; 2010-02-06, Greg King
 ;
 
         .include        "zeropage.inc"
@@ -53,8 +54,8 @@ CMOVEY: jmp     $0000                   ; Move the cursor to Y coord
 ;----------------------------------------------------------------------------
 ; Constants
 
-SCREEN_HEIGHT   = 200
-SCREEN_WIDTH    = 320
+SCREEN_HEIGHT   = YSIZE * 8 - 1		; (origin is zero)
+SCREEN_WIDTH    = XSIZE * 8 - 1
 
 ;----------------------------------------------------------------------------
 ; Global variables. The bounding box values are sorted so that they can be
@@ -67,12 +68,13 @@ Vars:
 OldPotX:   	.res   	1	     	; Old hw counter values
 OldPotY:	.res   	1
 
-YPos:           .res    2               ; Current mouse position, Y
 XPos:           .res    2               ; Current mouse position, X
+YPos:           .res    2               ; Current mouse position, Y
 XMin:		.res	2	     	; X1 value of bounding box
 YMin:		.res	2	     	; Y1 value of bounding box
 XMax:		.res	2	     	; X2 value of bounding box
 YMax:		.res	2	     	; Y2 value of bounding box
+Buttons:	.res	1		; button status bits
 
 OldValue:	.res   	1	     	; Temp for MoveCheck routine
 NewValue:	.res   	1	     	; Temp for MoveCheck routine
@@ -81,14 +83,17 @@ NewValue:	.res   	1	     	; Temp for MoveCheck routine
 
 .rodata
 
+; (We use ".proc" because we want to define both a label and a scope.)
+
 .proc   DefVars
         .byte   0, 0                    ; OldPotX/OldPotY
-        .word   SCREEN_HEIGHT/2         ; YPos
         .word   SCREEN_WIDTH/2          ; XPos
+        .word   SCREEN_HEIGHT/2         ; YPos
         .word   0                       ; XMin
         .word   0                       ; YMin
         .word   SCREEN_WIDTH            ; XMax
         .word   SCREEN_HEIGHT           ; YMax
+	.byte	%00000000		; Buttons
 .endproc
 
 .code
@@ -126,7 +131,7 @@ INSTALL:
 
         ldx     #$00
         txa
-        rts                             ; Run into UNINSTALL instead
+        rts
 
 ;----------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -187,14 +192,10 @@ GETBOX: sta     ptr1
         stx     ptr1+1                  ; Save data pointer
 
         ldy     #.sizeof (MOUSE_BOX)-1
-        sei
-
 @L1:    lda     XMin,y
         sta     (ptr1),y
         dey
         bpl     @L1
-
-        cli
        	rts
 
 ;----------------------------------------------------------------------------
@@ -228,14 +229,9 @@ MOVE:   sei                             ; No interrupts
 ; BUTTONS: Return the button mask in a/x.
 
 BUTTONS:
-        lda	#$7F
-     	sei
-     	sta	CIA1_PRA
-     	lda	CIA1_PRB                ; Read joystick #0
-     	cli
+	lda	Buttons
         ldx     #0
      	and	#$1F
-     	eor	#$1F
         rts
 
 ;----------------------------------------------------------------------------
@@ -297,14 +293,30 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:    lda	SID_ADConv1		; Get mouse X movement
+IRQ:
+
+; Record the state of the buttons.
+; Avoid crosstalk between the keyboard and the mouse.
+
+	ldy	#%00000000		; Set ports A and B to input
+	sty	CIA1_DDRB
+	sty	CIA1_DDRA		; Keyboard won't look like mouse
+	lda	CIA1_PRB		; Read Control-Port 1
+	dec	CIA1_DDRA		; Set port A back to output
+	eor	#%11111111		; Bit goes up when button goes down
+	sta	Buttons
+	beq	@L0			;(bze)
+	dec	CIA1_DDRB		; Mouse won't look like keyboard
+	sty	CIA1_PRB		; Set "all keys pushed"
+
+@L0:    lda	SID_ADConv1		; Get mouse X movement
       	ldy	OldPotX
       	jsr	MoveCheck  		; Calculate movement vector
-      	sty	OldPotX
 
 ; Skip processing if nothing has changed
 
         bcc     @SkipX
+      	sty	OldPotX
 
 ; Calculate the new X coordinate (--> a/y)
 
@@ -342,11 +354,11 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 @SkipX: lda	SID_ADConv2	 	; Get mouse Y movement
  	ldy	OldPotY
  	jsr	MoveCheck	 	; Calculate movement
- 	sty	OldPotY
 
 ; Skip processing if nothing has changed
 
         bcc     @SkipY
+ 	sty	OldPotY
 
 ; Calculate the new Y coordinate (--> a/y)
 
@@ -377,14 +389,14 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 @L4:	sty	YPos
  	stx	YPos+1
 
-; Move the mouse pointer to the new X pos
+; Move the mouse pointer to the new Y pos
 
         tya
         jsr     CMOVEY
 
 ; Done
 
-        clc                             ; Interrupt not handled
+        clc                             ; Interrupt not "handled"
 @SkipY: rts
 
 ; --------------------------------------------------------------------------
@@ -412,7 +424,7 @@ MoveCheck:
         sec
       	rts   	    		   	;   return
 
-@L1:  	ora   	#%11000000	   	; else or in high order bits
+@L1:  	ora   	#%11000000	   	; else, "or" in high-order bits
       	cmp   	#$FF		   	; if (a != -1)
       	beq   	@L2
       	sec

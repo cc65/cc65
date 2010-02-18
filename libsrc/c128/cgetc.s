@@ -15,23 +15,25 @@
 ;--------------------------------------------------------------------------
 
 _cgetc:	lda	KEY_COUNT 	; Get number of characters
-	bne	L2	  	; Jump if there are already chars waiting
+       	bne    	L2	  	; Jump if there are already chars waiting
 
-; Switch on the cursor if needed
+; Switch on the cursor if needed. We MUST always switch the cursor on, 
+; before switching it off, because switching it off will restore the 
+; character attribute remembered when it was switched on. So just switching
+; it off will restore the wrong character attribute.
 
-	lda	cursor
-       	beq	L1
         jsr     CURS_SET        ; Set cursor to current position
 	jsr	CURS_ON
-	jmp	L2
-L1:    	lda	#$01
+	lda	cursor
+       	bne     L1
+        lda	#$01
 	jsr	CURS_OFF
-L2:    	lda	KEY_COUNT	; Check characters again
-	beq	L2
-	jsr	CURS_OFF	; Switch cursor off, if characters available
+L1:     lda	KEY_COUNT       ; Check characters again
+  	beq    	L1
+	jsr     CURS_OFF        ; Switch cursor off, if characters available
 
-       	jsr	KBDREAD		; Read char and return in A
-	ldx	#0
+L2:     jsr     KBDREAD		; Read char and return in A
+        ldx     #0
 	rts
 
 ;--------------------------------------------------------------------------

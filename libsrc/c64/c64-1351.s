@@ -5,6 +5,24 @@
 ; 2009-09-26, Ullrich von Bassewitz
 ; 2010-02-06, Greg King
 ;
+; The driver prevents the keyboard from interfering by changing the
+; keyboard's output port into an input port while the driver reads its
+; controller device.  That disables a wire that is left active by the
+; Kernal.  That wire is used by the STOP-key to break out of BASIC
+; programs -- CC65 programs don't use that feature.  The wire is shared
+; by these keys: STOP, "Q", Commodore, Space, "2", CTRL, Left-Arrow, and
+; "1".  I listed them, in order, from bit 7 over to bit 0.  The
+; rightmost five keys can look like joystick switches.
+;
+; The driver prevents the mouse/joystick from interfering by "blinding"
+; the keyboard scanner while any button/switch is active.  It changes
+; the input port into an output port, then stores all zero-bits in that
+; port's latch.  Reading from an output port sees the bitwise-AND of the
+; latch and the input signals.  Therefore, the scanner thinks that eight
+; keys are being pushed at the same time.  It doesn't know what to do
+; about that condition; so, it does nothing.  The driver lets the
+; scanner see normally, again, when no buttons/switches are active.
+;
 
         .include        "zeropage.inc"
         .include        "mouse-kernel.inc"

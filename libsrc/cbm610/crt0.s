@@ -63,6 +63,7 @@
 
 .proc   transfer_table
 
+        .byte   $9F, DEVNUM
         .byte   $CA, CURS_Y
         .byte   $CB, CURS_X
         .byte   $CC, graphmode

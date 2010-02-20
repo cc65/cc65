@@ -2,6 +2,6 @@
 ; Oliver Schmidt, 2010-02-14
 ;
 
-	.include	"cbm510.inc"
+	.include	"extzp.inc"
 
 	.exportzp	devnum := DEVNUM

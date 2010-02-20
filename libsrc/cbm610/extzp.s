@@ -37,6 +37,7 @@ ktmp:           .byte   0
 CURS_X:         .byte   0
 CURS_Y:         .byte   0
 RVS:            .byte   0
+DEVNUM:         .byte   0
 config:         .byte   0
 CharPtr:        .word   0
 ; Stuff for our own kbd polling routine

@@ -43,6 +43,7 @@ CURS_BLINK:     .byte   0
 CURS_COLOR:     .byte   0
 CHARCOLOR:      .byte   0
 RVS:            .byte   0
+DEVNUM:         .byte   0
 SCREEN_PTR:     .word   0
 CRAM_PTR:       .word   0
 ; Stuff for our own kbd polling routine

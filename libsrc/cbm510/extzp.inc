@@ -11,7 +11,7 @@
 
         .globalzp       sysp0, time, segsave, ktmp, CURS_X, CURS_Y, CURS_FLAG
         .globalzp       CURS_STATE, CURS_BLINK, CURS_COLOR, CHARCOLOR, RVS
-        .globalzp       SCREEN_PTR, CRAM_PTR
+        .globalzp       DEVNUM, SCREEN_PTR, CRAM_PTR
         .globalzp       keyidx, keybuf, keyscanbuf, keysave, modkey
         .globalzp       norkey, graphmode, lastidx, rptdelay, rptcount
 

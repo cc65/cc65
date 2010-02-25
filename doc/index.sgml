@@ -65,6 +65,10 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="make.html" name="make.html"></tag>
   Build programs, using the GNU Make utility.
 
+  <tag><htmlurl url="customizing.html" name="customizing.html"></tag>
+  How to use the cc65 toolset for a custom hardware platform (a target system
+  not currently supported by the cc65 library set).
+
   <tag><htmlurl url="debugging.html" name="debugging.html"></tag>
   Debug programs, using the VICE emulator.
 

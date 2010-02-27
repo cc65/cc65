@@ -28,10 +28,12 @@ char get_ostype(void);
    be combined with OR */
   /* machine flags */
 #define GEOS64		0x00
+#define GEOS4           0x04    /* plus4 geos is not or'ed with version */
 #define GEOS128		0x80
   /* version flags */
 #define GEOS_V10	0x10
-#define GEOS_V12	0x12	/* ??? not sure */
+#define GEOS_V11        0x11
+#define GEOS_V12	0x12   	/* ??? not sure */
 #define GEOS_V20	0x20
 #define WHEELS		0x40	/* only Wheels? */
 

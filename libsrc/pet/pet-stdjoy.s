@@ -1,18 +1,15 @@
 ;
-; PTV-2 Player joystick driver for the PET
+; Standard PET userport joystick driver for the PET
 ;
-; Stefan Haubenthal, 2005-05-25
-; Groepaz/Hitmen, 2002-12-23
-; obviously based on Ullrichs driver :)
+; Marco van den Heuvel, 2010-01-23
 ;
 
-	.include "zeropage.inc"
+	.include	"zeropage.inc"
 
-	.include "joy-kernel.inc"
-	.include "joy-error.inc"
-;	.include "pet.inc"
-VIA_PRA		:= $E841		; Port register A
-VIA_DDRA	:= $E843		; Data direction register A
+	.include	"joy-kernel.inc"
+	.include	"joy-error.inc"
+        .include	"pet.inc"
+
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
@@ -21,19 +18,19 @@ VIA_DDRA	:= $E843		; Data direction register A
 
 ; Driver signature
 
-	.byte	$6A, $6F, $79	; "joy"
-	.byte	JOY_API_VERSION ; Driver API version number
+	.byte	$6A, $6F, $79		; "joy"
+	.byte	JOY_API_VERSION		; Driver API version number
 
 ; Button state masks (8 values)
 
-	.byte	$01			; JOY_UP
-	.byte	$02			; JOY_DOWN
-	.byte	$04			; JOY_LEFT
-	.byte	$08			; JOY_RIGHT
-	.byte	$10			; JOY_FIRE
-	.byte	$00			; JOY_FIRE2 unavailable
-	.byte	$00			; Future expansion
-	.byte	$00			; Future expansion
+	.byte	$01		; JOY_UP
+	.byte	$02		; JOY_DOWN
+	.byte	$04		; JOY_LEFT
+	.byte	$08		; JOY_RIGHT
+	.byte	$10		; JOY_FIRE
+	.byte	$00		; JOY_FIRE2 unavailable
+	.byte	$00		; Future expansion
+	.byte	$00		; Future expansion
 
 ; Jump table.
 
@@ -41,7 +38,7 @@ VIA_DDRA	:= $E843		; Data direction register A
 	.addr	UNINSTALL
 	.addr	COUNT
 	.addr	READ
-	.addr	0			; IRQ entry unused
+	.addr	0		; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -85,36 +82,44 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:	lda	#%10000000	; via port A Data-Direction
-	sta	VIA_DDRA	; bit 7: out	bit 6-0: in
-
+READ:
 	tax			; Joystick number into X
 	bne	joy2
 
 ; Read joystick 1
 
-joy1:	lda	#$80		; via port A read/write
-	sta	VIA_PRA		; (output one at PA7)
-
-	lda	VIA_PRA		; via port A read/write
-	and	#$1f		; get bit 4-0 (PA4-PA0)
+joy1:
+	lda	#0
+	sta	VIA_DDRA
+	lda	VIA_PRA
+	and	#$0f
+	cmp	#$0c
+	bne	@notc1
+	lda	#$0f
+	bne	@end1
+@notc1:
+	ora	#$10
+@end1:
 	eor	#$1f
 	rts
 
 ; Read joystick 2
 
-joy2:	lda	#$00		; via port A read/write
-	sta	VIA_PRA		; (output zero at PA7)
-
-	lda	VIA_PRA		; via port A read/write
-	and	#$0f		; get bit 3-0 (PA3-PA0)
-	sta	tmp1		; joy 4 directions
-
-	lda	VIA_PRA		; via port A read/write
-	and	#%00100000	; get bit 5 (PA5)
+joy2:
+	lda	#0
+	sta	VIA_DDRA
+	lda	VIA_PRA
 	lsr
-	ora	tmp1
+	lsr
+	lsr
+	lsr
+	cmp	#$0c
+	bne	@notc2
+	lda	#$0f
+	bne	@end2
+@notc2:
+	ora	#$10
+@end2:
 	eor	#$1f
-
 	ldx	#0
 	rts

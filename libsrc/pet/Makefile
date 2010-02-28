@@ -71,7 +71,7 @@ OBJS =	_scrsize.o	\
 
 EMDS =
 
-JOYS = pet-ptvjoy.joy
+JOYS = pet-ptvjoy.joy pet-stdjoy.joy
 
 TGIS =
 

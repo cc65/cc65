@@ -10,5 +10,5 @@
 
 .rodata
 
-_joy_stddrv:	.asciiz	"pet-ptvjoy.joy"
+_joy_stddrv:	.asciiz	"pet-stdjoy.joy"
 

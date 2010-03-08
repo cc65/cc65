@@ -49,13 +49,15 @@ L3: 	and	#$3F
 ; Output one character to the screen. We will disable scrolling while doing so
 
 cputdirect:
-        ldx     SCROLL
-        stx     ScrollSave      ; Save scroll flag
-        ldx     #$C0
-        stx     SCROLL          ; Disable scrolling
-        jsr     PRINT           ; Call kernal entry point
-        ldx     ScrollSave
-        stx     SCROLL          ; Restore old scroll flag
+        tax                     ; Save output char
+        lda     SCROLL
+        pha                     ; Save scroll flag
+        lda     #$C0
+        sta     SCROLL          ; Disable scrolling
+        txa                     ; Restore output char
+        jsr     PRINT
+        pla
+        sta     SCROLL          ; Restore old scroll flag
         rts
 
 ; Handle character if high bit set

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -335,12 +335,31 @@ static void NewStyleComment (void)
 
 
 
-static void SkipWhitespace (void)
-/* Skip white space in the input stream. */
+static int SkipWhitespace (int SkipLines)
+/* Skip white space in the input stream. Do also skip newlines if SkipLines
+ * is true. Return zero if nothing was skipped, otherwise return a
+ * value != zero.
+ */
 {
-    while (IsSpace (CurC)) {
-	NextChar ();
+    int Skipped = 0;
+    while (1) {
+        if (IsSpace (CurC)) {
+            NextChar ();
+            Skipped = 1;
+        } else if (CurC == '\0' && SkipLines) {
+            /* End of line, read next */
+            if (NextLine () != 0) {
+                Skipped = 1;
+            } else {
+                /* End of input */
+                break;
+            }
+        } else {
+            /* No more white space */
+            break;
+        }
     }
+    return Skipped;
 }
 
 
@@ -455,12 +474,11 @@ static void ReadMacroArgs (MacroExp* E)
     	    	NextChar ();
                 SB_Clear (&Arg);
      	    }
-     	} else if (IsSpace (CurC)) {
+     	} else if (SkipWhitespace (1)) {
     	    /* Squeeze runs of blanks within an arg */
             if (SB_NotEmpty (&Arg)) {
                 SB_AppendChar (&Arg, ' ');
             }
-     	    SkipWhitespace ();
     	} else if (CurC == '/' && NextC == '*') {
             if (SB_NotEmpty (&Arg)) {
                 SB_AppendChar (&Arg, ' ');
@@ -472,14 +490,11 @@ static void ReadMacroArgs (MacroExp* E)
             }
     	    NewStyleComment ();
      	} else if (CurC == '\0') {
-    	    /* End of line inside macro argument list - read next line */
-            if (SB_NotEmpty (&Arg)) {
-                SB_AppendChar (&Arg, ' ');
-            }
-     	    if (NextLine () == 0) {
-                ClearLine ();
-     	       	break;
-     	    }
+    	    /* End of input inside macro argument list */
+            PPError ("Unterminated argument list invoking macro `%s'", E->M->Name);
+
+            ClearLine ();
+            break;
      	} else {
     	    /* Just copy the character */
        	    SB_AppendChar (&Arg, CurC);
@@ -521,10 +536,7 @@ static void MacroArgSubst (MacroExp* E)
                 Arg = ME_GetActual (E, ArgIdx);
 
                 /* Copy any following whitespace */
-                HaveSpace = IsSpace (CurC);
-                if (HaveSpace) {
-                    SkipWhitespace ();
-                }
+                HaveSpace = SkipWhitespace (0);
 
                 /* If a ## operator follows, we have to insert the actual
                  * argument as is, otherwise it must be macro replaced.
@@ -561,7 +573,7 @@ static void MacroArgSubst (MacroExp* E)
             /* ## operator. */
             NextChar ();
             NextChar ();
-            SkipWhitespace ();
+            SkipWhitespace (0);
 
             /* Since we need to concatenate the token sequences, remove
              * any whitespace that was added to target, since it must come
@@ -597,7 +609,7 @@ static void MacroArgSubst (MacroExp* E)
              * macro parameter.
              */
             NextChar ();
-            SkipWhitespace ();
+            SkipWhitespace (0);
             if (!IsSym (Ident) || (ArgIdx = FindMacroArg (E->M, Ident)) < 0) {
                 PPError ("`#' is not followed by a macro parameter");
             } else {
@@ -684,10 +696,7 @@ static void ExpandMacro (StrBuf* Target, Macro* M)
     /* Check if this is a function like macro */
     if (M->ArgCount >= 0) {
 
-        int Whitespace = IsSpace (CurC);
-        if (Whitespace) {
-            SkipWhitespace ();
-        }
+        int Whitespace = SkipWhitespace (1);
         if (CurC != '(') {
             /* Function like macro but no parameter list */
             SB_AppendStr (Target, M->Name);
@@ -734,7 +743,7 @@ static void DefineMacro (void)
     int         C89;
 
     /* Read the macro name */
-    SkipWhitespace ();
+    SkipWhitespace (0);
     if (!MacName (Ident)) {
     	return;
     }
@@ -761,7 +770,7 @@ static void DefineMacro (void)
      	while (1) {
 
             /* Skip white space and check for end of parameter list */
-     	    SkipWhitespace ();
+     	    SkipWhitespace (0);
      	    if (CurC == ')') {
      	     	break;
             }
@@ -805,7 +814,7 @@ static void DefineMacro (void)
             /* If we had an ellipsis, or the next char is not a comma, we've
              * reached the end of the macro argument list.
              */
-     	    SkipWhitespace ();
+     	    SkipWhitespace (0);
        	    if (M->Variadic || CurC != ',') {
      	       	break;
             }
@@ -822,7 +831,7 @@ static void DefineMacro (void)
     }
 
     /* Skip whitespace before the macro replacement */
-    SkipWhitespace ();
+    SkipWhitespace (0);
 
     /* Insert the macro into the macro table and allocate the ActualArgs array */
     InsertMacro (M);
@@ -871,26 +880,25 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
     /* Loop removing ws and comments */
     IdentCount = 0;
     while (CurC != '\0') {
-       	if (IsSpace (CurC)) {
+       	if (SkipWhitespace (0)) {
             /* Squeeze runs of blanks */
             if (!IsSpace (SB_LookAtLast (Target))) {
                 SB_AppendChar (Target, ' ');
             }
-     	    SkipWhitespace ();
        	} else if (IsSym (Ident)) {
      	    if (Preprocessing && strcmp (Ident, "defined") == 0) {
      	     	/* Handle the "defined" operator */
-     	     	SkipWhitespace ();
+     	     	SkipWhitespace (0);
      	     	HaveParen = 0;
      	     	if (CurC == '(') {
      	     	    HaveParen = 1;
      	     	    NextChar ();
-     	     	    SkipWhitespace ();
+     	     	    SkipWhitespace (0);
      	     	}
      	     	if (IsSym (Ident)) {
      	     	    SB_AppendChar (Target, IsMacro (Ident)? '1' : '0');
      	     	    if (HaveParen) {
-     	     	       	SkipWhitespace ();
+     	     	       	SkipWhitespace (0);
      	     	       	if (CurC != ')') {
      	     	       	    PPError ("`)' expected");
      	     	       	} else {
@@ -1018,7 +1026,7 @@ static int PushIf (int Skip, int Invert, int Cond)
 static void DoError (void)
 /* Print an error */
 {
-    SkipWhitespace ();
+    SkipWhitespace (0);
     if (CurC == '\0') {
  	PPError ("Invalid #error directive");
     } else {
@@ -1090,7 +1098,7 @@ static int DoIfDef (int skip, int flag)
 {
     ident Ident;
 
-    SkipWhitespace ();
+    SkipWhitespace (0);
     if (MacName (Ident) == 0) {
        	return 0;
     } else {
@@ -1112,7 +1120,7 @@ static void DoInclude (void)
     PreprocessLine ();
 
     /* Skip blanks */
-    SkipWhitespace ();
+    SkipWhitespace (0);
 
     /* Get the next char and check for a valid file name terminator. Setup
      * the include directory spec (SYS/USR) by looking at the terminator.
@@ -1169,7 +1177,7 @@ static void DoPragma (void)
  */
 {
     /* Skip blanks following the #pragma directive */
-    SkipWhitespace ();
+    SkipWhitespace (0);
 
     /* Copy the remainder of the line into MLine removing comments and ws */
     SB_Clear (MLine);
@@ -1193,7 +1201,7 @@ static void DoUndef (void)
 {
     ident Ident;
 
-    SkipWhitespace ();
+    SkipWhitespace (0);
     if (MacName (Ident)) {
 	UndefineMacro (Ident);
     }
@@ -1204,7 +1212,7 @@ static void DoUndef (void)
 static void DoWarning (void)
 /* Print a warning */
 {
-    SkipWhitespace ();
+    SkipWhitespace (0);
     if (CurC == '\0') {
  	PPError ("Invalid #warning directive");
     } else {
@@ -1229,7 +1237,7 @@ void Preprocess (void)
     }
 
     /* Skip white space at the beginning of the line */
-    SkipWhitespace ();
+    SkipWhitespace (0);
 
     /* Check for stuff to skip */
     Skip = 0;
@@ -1238,7 +1246,7 @@ void Preprocess (void)
        	/* Check for preprocessor lines lines */
        	if (CurC == '#') {
        	    NextChar ();
-       	    SkipWhitespace ();
+       	    SkipWhitespace (0);
        	    if (CurC == '\0') {
        	    	/* Ignore the empty preprocessor directive */
        	    	continue;
@@ -1368,7 +1376,7 @@ void Preprocess (void)
                         }
                         break;
 
-    	    	    default: 
+    	    	    default:
                         if (!Skip) {
     	    	    	    PPError ("Preprocessor directive expected");
                         }
@@ -1383,7 +1391,7 @@ void Preprocess (void)
     	    }
     	    return;
     	}
-    	SkipWhitespace ();
+    	SkipWhitespace (0);
     }
 
     PreprocessLine ();

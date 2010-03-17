@@ -87,10 +87,3 @@ plot:	ldy	CURS_X
 
 putchar	= $CC2F
 
-;--------------------------------------------------------------------------
-; Data
-.bss
-
-ScrollSave:     .res    1       ; Save location for scroll byte
-
-

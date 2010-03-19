@@ -11,9 +11,11 @@
 
         .include        "time.inc"
         .include        "c64.inc"
+	.include	"get_tv.inc"
 
         .constructor    initsystime
 	.importzp	tmp1, tmp2
+	.import		_get_tv, _get_ostype
 
 
 ;----------------------------------------------------------------------------
@@ -66,7 +68,16 @@ BCD2dec:tax
 
         lda     CIA1_TOD10
         sta     CIA1_TOD10
-        rts
+	jsr     _get_tv
+	cmp     #TV::PAL
+	bne     @60Hz
+	jsr     _get_ostype
+	cmp     #$43
+	beq     @60Hz
+	lda     CIA1_CRA
+	ora     #$80
+	sta     CIA1_CRA
+@60Hz:	rts
 
 .endproc
 

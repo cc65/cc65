@@ -164,6 +164,72 @@ static unsigned DigitVal (int C)
 
 
 
+static void StrVal (void)
+/* Parse a string value and expand escape sequences */
+{
+    /* Skip the starting double quotes */
+    NextChar ();
+
+    /* Read input chars */
+    SB_Clear (&CfgSVal);
+    while (C != '\"') {
+        switch (C) {
+
+            case EOF:
+            case '\n':
+                CfgError ("Unterminated string");
+                break;
+
+            case '%':
+                NextChar ();
+                switch (C) {
+
+                    case EOF:
+                    case '\n':
+                    case '\"':
+                        CfgError ("Unterminated '%%' escape sequence");
+                        break;
+
+                    case '%':
+                        SB_AppendChar (&CfgSVal, '%');
+                        NextChar ();
+                        break;
+
+                    case 'O':
+                        /* Replace by output file */
+                        if (OutputName) {
+                            SB_AppendStr (&CfgSVal, OutputName);
+                        }
+                        NextChar ();
+                        break;
+
+                    default:
+                        CfgWarning ("Unkown escape sequence `%%%c'", C);
+                        SB_AppendChar (&CfgSVal, '%');
+                        SB_AppendChar (&CfgSVal, C);
+                        NextChar ();
+                        break;
+                }
+                break;
+
+            default:
+                SB_AppendChar (&CfgSVal, C);
+                NextChar ();
+        }
+    }
+
+    /* Skip the terminating double quotes */
+    NextChar ();
+
+    /* Terminate the string */
+    SB_Terminate (&CfgSVal);
+
+    /* We've read a string value */
+    CfgTok = CFGTOK_STRCON;
+}
+
+
+
 void CfgNextTok (void)
 /* Read the next token from the input stream */
 {
@@ -286,18 +352,7 @@ Again:
      	    break;
 
         case '\"':
-	    NextChar ();
-	    SB_Clear (&CfgSVal);
-	    while (C != '\"') {
-		if (C == EOF || C == '\n') {
-		    CfgError ("Unterminated string");
-		}
-                SB_AppendChar (&CfgSVal, C);
-		NextChar ();
-	    }
-       	    NextChar ();
-	    SB_Terminate (&CfgSVal);
-	    CfgTok = CFGTOK_STRCON;
+            StrVal ();
 	    break;
 
         case '#':

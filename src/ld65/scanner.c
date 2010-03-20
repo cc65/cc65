@@ -59,7 +59,7 @@
 
 /* Current token and attributes */
 cfgtok_t	CfgTok;
-char   	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
+StrBuf          CfgSVal = STATIC_STRBUF_INITIALIZER;
 unsigned long   CfgIVal;
 
 /* Error location */
@@ -167,9 +167,6 @@ static unsigned DigitVal (int C)
 void CfgNextTok (void)
 /* Read the next token from the input stream */
 {
-    unsigned I;
-
-
 Again:
     /* Skip whitespace */
     while (isspace (C)) {
@@ -184,14 +181,12 @@ Again:
     if (C == '_' || IsAlpha (C)) {
 
 	/* Read the identifier */
-	I = 0;
+	SB_Clear (&CfgSVal);
 	while (C == '_' || IsAlNum (C)) {
-	    if (I < CFG_MAX_IDENT_LEN) {
-	        CfgSVal [I++] = C;
-	    }
+            SB_AppendChar (&CfgSVal, C);
 	    NextChar ();
      	}
-	CfgSVal [I] = '\0';
+       	SB_Terminate (&CfgSVal);
      	CfgTok = CFGTOK_IDENT;
 	return;
     }
@@ -292,18 +287,16 @@ Again:
 
         case '\"':
 	    NextChar ();
-	    I = 0;
+	    SB_Clear (&CfgSVal);
 	    while (C != '\"') {
 		if (C == EOF || C == '\n') {
 		    CfgError ("Unterminated string");
 		}
-	       	if (I < CFG_MAX_IDENT_LEN) {
-		    CfgSVal [I++] = C;
-		}
+                SB_AppendChar (&CfgSVal, C);
 		NextChar ();
 	    }
        	    NextChar ();
-	    CfgSVal [I] = '\0';
+	    SB_Terminate (&CfgSVal);
 	    CfgTok = CFGTOK_STRCON;
 	    break;
 
@@ -325,11 +318,11 @@ Again:
 	        case 'O':
 		    NextChar ();
 		    if (OutputName) {
-		        strncpy (CfgSVal, OutputName, CFG_MAX_IDENT_LEN);
-		    	CfgSVal [CFG_MAX_IDENT_LEN] = '\0';
+                        SB_CopyStr (&CfgSVal, OutputName);
 		    } else {
-		    	CfgSVal [0] = '\0';
+		    	SB_Clear (&CfgSVal);
 		    }
+                    SB_Terminate (&CfgSVal);
 		    CfgTok = CFGTOK_STRCON;
      		    break;
 
@@ -452,16 +445,12 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     if (CfgTok == CFGTOK_IDENT) {
 
 	/* Make it upper case */
-	I = 0;
-	while (CfgSVal [I]) {
-	    CfgSVal [I] = toupper (CfgSVal [I]);
-	    ++I;
-	}
+        SB_ToUpper (&CfgSVal);
 
        	/* Linear search */
 	for (I = 0; I < Size; ++I) {
-     	    if (strcmp (CfgSVal, Table [I].Ident) == 0) {
-	    	CfgTok = Table [I].Tok;
+       	    if (SB_CompareStr (&CfgSVal, Table[I].Ident) == 0) {
+	    	CfgTok = Table[I].Tok;
 	    	return;
 	    }
 	}

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2005-2008, Ullrich von Bassewitz                                      */
+/* (C) 2005-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -123,13 +123,15 @@ static void Factor (CfgExpr* E)
 
 	case CFGTOK_IDENT:
 	    /* An identifier - search an export with the given name */
-            Sym = FindExport (GetStringId (CfgSVal));
+            Sym = FindExport (GetStrBufId (&CfgSVal));
             if (Sym == 0) {
-                CfgError ("Unknown symbol in expression: `%s'", CfgSVal);
+                CfgError ("Unknown symbol in expression: `%s'",
+                          SB_GetConstBuf (&CfgSVal));
             }
             /* We can only handle constants */
             if (!IsConstExport (Sym)) {
-                CfgError ("Value for symbol `%s' is not constant", CfgSVal);
+                CfgError ("Value for symbol `%s' is not constant",
+                          SB_GetConstBuf (&CfgSVal));
             }
 
             /* Use the symbol value */
@@ -149,7 +151,7 @@ static void Factor (CfgExpr* E)
 
 	case CFGTOK_STRCON:
 	    /* A string constant */
-            SB_CopyStr (&E->SVal, CfgSVal);
+            SB_Copy (&E->SVal, &CfgSVal);
             E->Type = ceString;
 	    CfgNextTok ();
 	    break;

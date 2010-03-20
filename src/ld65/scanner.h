@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2010 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -35,6 +35,10 @@
 
 #ifndef SCANNER_H
 #define SCANNER_H
+
+
+
+#include "strbuf.h"
 
 
 
@@ -148,9 +152,8 @@ struct IdentTok {
 
 
 /* Current token and attributes */
-#define CFG_MAX_IDENT_LEN  255
 extern cfgtok_t		CfgTok;
-extern char    	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
+extern StrBuf           CfgSVal;
 extern unsigned long	CfgIVal;
 
 /* Error location */

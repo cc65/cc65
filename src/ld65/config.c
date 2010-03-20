@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
+/* (C) 1998-2010 Ullrich von Bassewitz                                       */
 /*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -203,7 +203,7 @@ static Memory* CfgFindMemory (unsigned Name)
 static Memory* CfgGetMemory (unsigned Name)
 /* Find the memory are with the given name. Print an error on an invalid name */
 {
-    Memory* M = CfgFindMemory (Name);   
+    Memory* M = CfgFindMemory (Name);
     if (M == 0) {
  	CfgError ("Invalid memory area `%s'", GetString (Name));
     }
@@ -423,7 +423,7 @@ static void ParseMemory (void)
     while (CfgTok == CFGTOK_IDENT) {
 
 	/* Create a new entry on the heap */
-       	Memory* M = NewMemory (GetStringId (CfgSVal));
+       	Memory* M = NewMemory (GetStrBufId (&CfgSVal));
 
 	/* Skip the name and the following colon */
 	CfgNextTok ();
@@ -467,7 +467,7 @@ static void ParseMemory (void)
 		    FlagAttr (&M->Attr, MA_FILE, "FILE");
 		    CfgAssureStr ();
        	       	    /* Get the file entry and insert the memory area */
-	    	    FileInsert (GetFile (GetStringId (CfgSVal)), M);
+	    	    FileInsert (GetFile (GetStrBufId (&CfgSVal)), M);
                     CfgNextTok ();
 		    break;
 
@@ -553,9 +553,10 @@ static void ParseFiles (void)
 	CfgAssureStr ();
 
 	/* Search for the file, it must exist */
-       	F = FindFile (GetStringId (CfgSVal));
+       	F = FindFile (GetStrBufId (&CfgSVal));
 	if (F == 0) {
-       	    CfgError ("File `%s' not found in MEMORY section", CfgSVal);
+       	    CfgError ("File `%s' not found in MEMORY section", 
+                      SB_GetConstBuf (&CfgSVal));
 	}
 
 	/* Skip the token and the following colon */
@@ -654,7 +655,7 @@ static void ParseSegments (void)
 	SegDesc* S;
 
 	/* Create a new entry on the heap */
-       	S = NewSegDesc (GetStringId (CfgSVal));
+       	S = NewSegDesc (GetStrBufId (&CfgSVal));
 
 	/* Skip the name and the following colon */
 	CfgNextTok ();
@@ -707,7 +708,7 @@ static void ParseSegments (void)
 
 	    	case CFGTOK_LOAD:
 	      	    FlagAttr (&S->Attr, SA_LOAD, "LOAD");
-	    	    S->Load = CfgGetMemory (GetStringId (CfgSVal));
+	    	    S->Load = CfgGetMemory (GetStrBufId (&CfgSVal));
                     CfgNextTok ();
 	    	    break;
 
@@ -728,7 +729,7 @@ static void ParseSegments (void)
 
 	    	case CFGTOK_RUN:
       	    	    FlagAttr (&S->Attr, SA_RUN, "RUN");
- 	    	    S->Run = CfgGetMemory (GetStringId (CfgSVal));
+ 	    	    S->Run = CfgGetMemory (GetStrBufId (&CfgSVal));
                     CfgNextTok ();
 	    	    break;
 
@@ -907,17 +908,19 @@ static void ParseO65 (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
                 /* Convert the string into a string index */
-                CfgSValId = GetStringId (CfgSVal);
+                CfgSValId = GetStrBufId (&CfgSVal);
 	        /* Check if the export symbol is also defined as an import. */
 	       	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
-		    CfgError ("Exported symbol `%s' cannot be an import", CfgSVal);
+		    CfgError ("Exported symbol `%s' cannot be an import", 
+                              SB_GetConstBuf (&CfgSVal));
 		}
       		/* Check if we have this symbol defined already. The entry
       	     	 * routine will check this also, but we get a more verbose
       		 * error message when checking it here.
       		 */
       	 	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
-      	  	    CfgError ("Duplicate exported symbol: `%s'", CfgSVal);
+      	  	    CfgError ("Duplicate exported symbol: `%s'", 
+                              SB_GetConstBuf (&CfgSVal));
       	 	}
 		/* Insert the symbol into the table */
 	  	O65SetExport (O65FmtDesc, CfgSValId);
@@ -931,17 +934,19 @@ static void ParseO65 (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
                 /* Convert the string into a string index */
-                CfgSValId = GetStringId (CfgSVal);
+                CfgSValId = GetStrBufId (&CfgSVal);
 	        /* Check if the imported symbol is also defined as an export. */
 	       	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
-		    CfgError ("Imported symbol `%s' cannot be an export", CfgSVal);
+		    CfgError ("Imported symbol `%s' cannot be an export", 
+                              SB_GetConstBuf (&CfgSVal));
 		}
       	    	/* Check if we have this symbol defined already. The entry
       	    	 * routine will check this also, but we get a more verbose
       	    	 * error message when checking it here.
       	    	 */
       	    	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
-      	    	    CfgError ("Duplicate imported symbol: `%s'", CfgSVal);
+      	    	    CfgError ("Duplicate imported symbol: `%s'", 
+                              SB_GetConstBuf (&CfgSVal));
       	    	}
 	    	/* Insert the symbol into the table */
 	    	O65SetImport (O65FmtDesc, CfgSValId);
@@ -1144,7 +1149,7 @@ static void ParseConDes (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 		/* Remember the value for later */
-		SegName = GetStringId (CfgSVal);
+		SegName = GetStrBufId (&CfgSVal);
 	    	break;
 
 	    case CFGTOK_LABEL:
@@ -1153,7 +1158,7 @@ static void ParseConDes (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 		/* Remember the value for later */
-		Label = GetStringId (CfgSVal);
+		Label = GetStrBufId (&CfgSVal);
 		break;
 
 	    case CFGTOK_COUNT:
@@ -1162,8 +1167,8 @@ static void ParseConDes (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 		/* Remember the value for later */
-		Count = GetStringId (CfgSVal);
-		break;
+		Count = GetStrBufId (&CfgSVal);
+		break;                
 
 	    case CFGTOK_TYPE:
 	  	/* Don't allow this twice */
@@ -1359,7 +1364,7 @@ static void ParseSymbols (void)
         Export* E;
 
 	/* Remember the name */
-	unsigned Name = GetStringId (CfgSVal);
+	unsigned Name = GetStrBufId (&CfgSVal);
 	CfgNextTok ();
 
         /* Support both, old and new syntax here. New syntax is a colon

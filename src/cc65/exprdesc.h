@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/* (C) 2002-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -89,6 +89,9 @@ enum {
 
 };
 
+/* Forward */
+struct Literal;
+
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
@@ -98,6 +101,7 @@ struct ExprDesc {
     unsigned long   	Name;	        /* Name or label number */
     long       	       	IVal;           /* Integer value if expression constant */
     Double              FVal;           /* Floating point value */
+    struct Literal*     LVal;           /* Literal value */
 
     /* Bit field stuff */
     unsigned            BitOffs;        /* Bit offset for bit fields */
@@ -182,7 +186,7 @@ INLINE int ED_IsLocExpr (const ExprDesc* Expr)
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLocLiteral (const ExprDesc* Expr)
 /* Return true if the expression is a string from the literal pool */
-{
+{               
     return (Expr->Flags & E_MASK_LOC) == E_LOC_LITERAL;
 }
 #else

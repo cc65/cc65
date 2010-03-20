@@ -578,7 +578,6 @@ static void Primary (ExprDesc* E)
 /* This is the lowest level of the expression parser. */
 {
     SymEntry* Sym;
-    Literal*  L;
 
     /* Initialize fields in the expression stucture */
     ED_Init (E);
@@ -749,11 +748,11 @@ static void Primary (ExprDesc* E)
         case TOK_SCONST:
         case TOK_WCSCONST:
             /* String literal */
-            L = UseLiteral (CurTok.SVal);
+            E->LVal  = UseLiteral (CurTok.SVal);
             E->Type  = GetCharArrayType (GetLiteralSize (CurTok.SVal));
             E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL;
             E->IVal  = 0;
-            E->Name  = GetLiteralLabel (CurTok.SVal);                         
+            E->Name  = GetLiteralLabel (CurTok.SVal);
             NextToken ();
             break;
 

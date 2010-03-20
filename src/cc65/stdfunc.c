@@ -933,8 +933,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     /* Do type conversion */
     TypeConversion (&Arg, ArgType);
-      
-#if 0
+
     /* If the expression is a literal, and if string literals are read
      * only, we can calculate the length of the string and remove it
      * from the literal pool. Otherwise we have to calculate the length
@@ -943,15 +942,16 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     if (ED_IsLocLiteral (&Arg) && IS_Get (&WritableStrings) == 0) {
 
         /* Constant string literal */
-        ED_MakeConstAbs (Expr, GetLiteralSize (GetLiteral (Arg.IVal)), type_size_t);
+        ED_MakeConstAbs (Expr, GetLiteralSize (Arg.LVal) - 1, type_size_t);
+
+        /* We don't need the literal any longer */
+        ReleaseLiteral (Arg.LVal);
 
     /* We will inline strlen for arrays with constant addresses, if either the
      * inlining was forced on the command line, or the array is smaller than
      * 256, so the inlining is considered safe.
      */
-    } else
-#endif
-    if (ED_IsLocConst (&Arg) && IsArray &&
+    } else if (ED_IsLocConst (&Arg) && IsArray &&
                (IS_Get (&InlineStdFuncs) || IsByteIndex)) {
 
         /* Generate the strlen code */

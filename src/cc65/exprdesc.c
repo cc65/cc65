@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/* (C) 2002-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -63,6 +63,7 @@ ExprDesc* ED_Init (ExprDesc* Expr)
     Expr->Name      = 0;
     Expr->IVal      = 0;
     Expr->FVal      = FP_D_Make (0.0);
+    Expr->LVal      = 0;
     Expr->BitOffs   = 0;
     Expr->BitWidth  = 0;
     return Expr;

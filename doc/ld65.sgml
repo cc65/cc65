@@ -598,6 +598,19 @@ empty (for example because they are of type bss). In that case, the linker
 will create an empty output file. This may be suppressed by assigning an empty
 file name to that memory area.
 
+The <tt/%O/ sequence is also allowed inside a string. So using
+
+<tscreen><verb>
+      	MEMORY {
+       	    ROM1:  start = $A000, size = $2000, file = "%O-1.bin";
+      	    ROM2:  start = $E000, size = $2000, file = "%O-2.bin";
+      	}
+</verb></tscreen>
+
+would write two files that start with the name of the output file specified on
+the command line, with "-1.bin" and "-2.bin" appended respectively. Because
+'%' is used as an escape char, the sequence "%%" has to be used if a single
+percent sign is required.
 
 <sect1>LOAD and RUN addresses (ROMable code)<p>
 

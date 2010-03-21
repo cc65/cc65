@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -904,14 +904,14 @@ static unsigned OptPtrStore3 (CodeSeg* S)
        	    X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[4]->LI);
 	    CS_InsertEntry (S, X, I+15);
 
-            X = NewCodeEntry (OP65_LDA, L[8]->AM, L[8]->Arg, 0, L[8]->LI);
+            X = NewCodeEntry (OP65_LDA, L[9]->AM, L[9]->Arg, 0, L[9]->LI);
             CS_InsertEntry (S, X, I+16);
 
 	    Label = memcpy (xmalloc (Len-2), L[0]->Arg+2, Len-3);
 	    Label[Len-3] = '\0';
        	    X = NewCodeEntry (OP65_STA, AM65_ABSY, Label, 0, L[11]->LI);
 	    CS_InsertEntry (S, X, I+17);
-	    xfree (Label);
+            xfree (Label);
 
 	    /* Remove the old code */
 	    CS_DelEntries (S, I, 12);

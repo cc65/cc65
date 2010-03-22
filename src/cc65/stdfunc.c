@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/* (C) 1998-2010 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -65,6 +65,7 @@
 
 static void StdFunc_memcpy (FuncDesc*, ExprDesc*);
 static void StdFunc_memset (FuncDesc*, ExprDesc*);
+static void StdFunc_strcmp (FuncDesc*, ExprDesc*);
 static void StdFunc_strcpy (FuncDesc*, ExprDesc*);
 static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
@@ -85,6 +86,7 @@ static struct StdFuncDesc {
 } StdFuncs[] = {
     {  	"memcpy",      	StdFunc_memcpy 	       	},
     {  	"memset",      	StdFunc_memset	  	},
+    {  	"strcmp",      	StdFunc_strcmp 	       	},
     {  	"strcpy",	StdFunc_strcpy 	       	},
     {  	"strlen",	StdFunc_strlen	  	},
 
@@ -96,7 +98,7 @@ struct ArgDesc {
     const Type* ArgType;        /* Required argument type */
     ExprDesc    Expr;           /* Argument expression */
     const Type* Type;           /* The original type before conversion */
-    CodeMark    Start;          /* Start of the code for calculation */
+    CodeMark    Load;           /* Start of argument load code */
     CodeMark    Push;           /* Start of argument push code */
     CodeMark    End;            /* End of the code for calculation+push */
     unsigned    Flags;          /* Code generation flags */
@@ -150,9 +152,6 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
     /* Remember the required argument type */
     Arg->ArgType = Type;
 
-    /* Remember the current code position */
-    GetCodePos (&Arg->Start);
-
     /* Read the expression we're going to pass to the function */
     MarkedExprWithCheck (hie1, &Arg->Expr);
 
@@ -161,6 +160,9 @@ static void ParseArg (ArgDesc* Arg, Type* Type)
 
     /* Convert this expression to the expected type */
     TypeConversion (&Arg->Expr, Type);
+
+    /* Remember the following code position */
+    GetCodePos (&Arg->Load);
 
     /* If the value is a constant, set the flag, otherwise load it into the
      * primary register.
@@ -197,13 +199,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_VOID|T_QUAL_CONST), TYPE(T_END) };
     static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
 
-    CodeMark Start;
     ArgDesc  Arg1, Arg2, Arg3;
     unsigned ParamSize = 0;
     unsigned Label;
-
-    /* Remember where we are now */
-    GetCodePos (&Start);
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
@@ -264,7 +262,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Reg2 = ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr);
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -333,7 +331,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -407,7 +405,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -491,14 +489,10 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     static Type Arg2Type[] = { TYPE(T_INT), TYPE(T_END) };
     static Type Arg3Type[] = { TYPE(T_SIZE_T), TYPE(T_END) };
 
-    CodeMark Start;
     ArgDesc  Arg1, Arg2, Arg3;
     int      MemSet    = 1;             /* Use real memset if true */
     unsigned ParamSize = 0;
     unsigned Label;
-
-    /* Remember where we are now */
-    GetCodePos (&Start);
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
@@ -569,7 +563,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Reg = ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr);
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -618,7 +612,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -694,6 +688,165 @@ ExitPoint:
 
 
 /*****************************************************************************/
+/*                                  strcmp                                   */
+/*****************************************************************************/
+
+
+
+static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
+/* Handle the strcmp function */
+{
+    /* Argument types: (const char*, const char*) */
+    static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+    static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
+
+    ArgDesc  Arg1, Arg2;
+    unsigned ParamSize = 0;
+    long     ECount1;
+    long     ECount2;
+    int      IsArray;
+    int      Offs;
+
+    /* Setup the argument type string */
+    Arg1Type[1].C = GetDefaultChar () | T_QUAL_CONST;
+    Arg2Type[1].C = GetDefaultChar () | T_QUAL_CONST;
+
+    /* Argument #1 */
+    ParseArg (&Arg1, Arg1Type);
+    g_push (Arg1.Flags, Arg1.Expr.IVal);
+    ParamSize += SizeOf (Arg1Type);
+    ConsumeComma ();
+
+    /* Argument #2. */
+    ParseArg (&Arg2, Arg2Type);
+
+    /* Since strcmp is a fastcall function, we must load the
+     * arg into the primary if it is not already there. This parameter is
+     * also ignored for the calculation of the parameter size, since it is
+     * not passed via the stack.
+     */
+    if (Arg2.Flags & CF_CONST) {
+        LoadExpr (CF_NONE, &Arg2.Expr);
+    }
+
+    /* Emit the actual function call. This will also cleanup the stack. */
+    g_call (CF_FIXARGC, Func_strcmp, ParamSize);
+
+    /* Get the element counts of the arguments. Then get the larger of the
+     * two into ECount1. This removes FLEXIBLE and UNSPECIFIED automatically
+     */
+    ECount1 = ArrayElementCount (&Arg1);
+    ECount2 = ArrayElementCount (&Arg2);
+    if (ECount2 > ECount1) {
+        ECount1 = ECount2;
+    }
+
+    /* If the second argument is the empty string literal, we can generate
+     * more efficient code.
+     */
+    if (ED_IsLocLiteral (&Arg2.Expr) &&
+        IS_Get (&WritableStrings) == 0 &&
+        GetLiteralSize (Arg2.Expr.LVal) == 1 &&
+        GetLiteralStr (Arg2.Expr.LVal)[0] == '\0') {
+
+        /* Drop the generated code so we have the first argument in the
+         * primary
+         */
+        RemoveCode (&Arg1.Push);
+
+        /* We don't need the literal any longer */
+        ReleaseLiteral (Arg2.Expr.LVal);
+
+        /* We do now have Arg1 in the primary. Load the first character from
+         * this string and cast to int. This is the function result.
+         */
+        IsArray = IsTypeArray (Arg1.Type) && ED_IsRVal (&Arg1.Expr);
+        if (IsArray && ED_IsLocStack (&Arg1.Expr) &&
+            (Offs = ED_GetStackOffs (&Arg1.Expr, 0) < 256)) {
+            /* Drop the generated code */
+            RemoveCode (&Arg1.Load);
+
+            /* Generate code */
+            AddCodeLine ("ldy #$%02X", Offs);
+            AddCodeLine ("ldx #$00");
+            AddCodeLine ("lda (sp),y");
+        } else if (IsArray && ED_IsLocConst (&Arg1.Expr)) {
+            /* Drop the generated code */
+            RemoveCode (&Arg1.Load);
+
+            /* Generate code */
+            AddCodeLine ("ldx #$00");
+            AddCodeLine ("lda %s", ED_GetLabelName (&Arg1.Expr, 0));
+        } else {
+            /* Drop part of the generated code so we have the first argument
+             * in the primary
+             */
+            RemoveCode (&Arg1.Push);
+
+            /* Fetch the first char */
+            g_getind (CF_CHAR | CF_UNSIGNED, 0);
+        }
+
+    } else if ((IS_Get (&CodeSizeFactor) > 160) &&
+               ((ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr)) ||
+                (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr))) &&
+               ((ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) ||
+                (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr))) &&
+               (IS_Get (&InlineStdFuncs) || (ECount1 > 0 && ECount1 < 256))) {
+
+
+        unsigned    Entry, Loop, Fin;   /* Labels */
+        const char* Load;
+        const char* Compare;
+
+        if (ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr)) {
+            Load = "lda (%s),y";
+        } else {
+            Load = "lda %s,y";
+        }
+        if (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr)) {
+            Compare = "cmp (%s),y";
+        } else {
+            Compare = "cmp %s,y";
+        }
+
+        /* Drop the generated code */
+        RemoveCode (&Arg1.Expr.Start);
+
+        /* We need labels */
+        Entry = GetLocalLabel ();
+        Loop  = GetLocalLabel ();
+        Fin   = GetLocalLabel ();
+
+        /* Generate strcmp code */
+        AddCodeLine ("ldy #$00");
+        AddCodeLine ("beq %s", LocalLabelName (Entry));
+        g_defcodelabel (Loop);
+        AddCodeLine ("tax");
+        AddCodeLine ("beq %s", LocalLabelName (Fin));
+        AddCodeLine ("iny");
+        g_defcodelabel (Entry);
+        AddCodeLine (Load, ED_GetLabelName (&Arg1.Expr, 0));
+        AddCodeLine (Compare, ED_GetLabelName (&Arg2.Expr, 0));
+        AddCodeLine ("beq %s", LocalLabelName (Loop));
+        AddCodeLine ("ldx #$01");
+        AddCodeLine ("bcs %s", LocalLabelName (Fin));
+        AddCodeLine ("ldx #$FF");
+        g_defcodelabel (Fin);
+
+    }
+
+    /* The function result is an rvalue in the primary register */
+    ED_MakeRValExpr (Expr);
+    Expr->Type = GetFuncReturn (Expr->Type);
+
+    /* We expect the closing brace */
+    ConsumeRParen ();
+}
+
+
+
+/*****************************************************************************/
 /*                                  strcpy                                   */
 /*****************************************************************************/
 
@@ -706,7 +859,6 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     static Type Arg1Type[] = { TYPE(T_PTR), TYPE(T_CHAR), TYPE(T_END) };
     static Type Arg2Type[] = { TYPE(T_PTR), TYPE(T_CHAR|T_QUAL_CONST), TYPE(T_END) };
 
-    CodeMark Start;
     ArgDesc  Arg1, Arg2;
     unsigned ParamSize = 0;
     long     ECount;
@@ -715,9 +867,6 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     /* Setup the argument type string */
     Arg1Type[1].C = GetDefaultChar ();
     Arg2Type[1].C = GetDefaultChar () | T_QUAL_CONST;
-
-    /* Remember where we are now */
-    GetCodePos (&Start);
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
@@ -739,7 +888,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     /* Emit the actual function call. This will also cleanup the stack. */
     g_call (CF_FIXARGC, Func_strcpy, ParamSize);
 
-    /* Get the element count of argument 2 if it is an array */
+    /* Get the element count of argument 1 if it is an array */
     ECount = ArrayElementCount (&Arg1);
 
     /* We've generated the complete code for the function now and know the
@@ -768,7 +917,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         }
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need labels */
         L1 = GetLocalLabel ();
@@ -802,7 +951,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need labels */
         L1 = GetLocalLabel ();
@@ -845,7 +994,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (&Start);
+        RemoveCode (&Arg1.Expr.Start);
 
         /* We need labels */
         L1 = GetLocalLabel ();

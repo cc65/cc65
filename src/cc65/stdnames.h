@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2004-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -47,6 +47,7 @@
 extern const char Func__bzero[];        /* Asm name of "_bzero" */
 extern const char Func_memcpy[];        /* Asm name of "memcpy" */
 extern const char Func_memset[];        /* Asm name of "memset" */
+extern const char Func_strcmp[];        /* Asm name of "strcmp" */
 extern const char Func_strcpy[];        /* Asm name of "strcpy" */
 extern const char Func_strlen[];        /* Asm name of "strlen" */
 

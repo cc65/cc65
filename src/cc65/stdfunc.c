@@ -787,7 +787,7 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
             g_getind (CF_CHAR | CF_UNSIGNED, 0);
         }
 
-    } else if ((IS_Get (&CodeSizeFactor) > 160) &&
+    } else if ((IS_Get (&CodeSizeFactor) >= 165) &&
                ((ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr)) ||
                 (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr))) &&
                ((ED_IsRVal (&Arg1.Expr) && ED_IsLocConst (&Arg1.Expr)) ||
@@ -827,6 +827,49 @@ static void StdFunc_strcmp (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         AddCodeLine ("iny");
         g_defcodelabel (Entry);
         AddCodeLine (Load, ED_GetLabelName (&Arg1.Expr, 0));
+        AddCodeLine (Compare, ED_GetLabelName (&Arg2.Expr, 0));
+        AddCodeLine ("beq %s", LocalLabelName (Loop));
+        AddCodeLine ("ldx #$01");
+        AddCodeLine ("bcs %s", LocalLabelName (Fin));
+        AddCodeLine ("ldx #$FF");
+        g_defcodelabel (Fin);
+
+    } else if ((IS_Get (&CodeSizeFactor) > 190) &&
+               ((ED_IsRVal (&Arg2.Expr) && ED_IsLocConst (&Arg2.Expr)) ||
+                (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr))) &&
+               (IS_Get (&InlineStdFuncs) || (ECount1 > 0 && ECount1 < 256))) {
+
+
+        unsigned    Entry, Loop, Fin;   /* Labels */
+        const char* Compare;
+
+        if (ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr)) {
+            Compare = "cmp (%s),y";
+        } else {
+            Compare = "cmp %s,y";
+        }
+
+        /* Drop the generated code */
+        RemoveCode (&Arg1.Push);
+
+        /* We need labels */
+        Entry = GetLocalLabel ();
+        Loop  = GetLocalLabel ();
+        Fin   = GetLocalLabel ();
+
+        /* Store Arg1 into ptr1 */
+        AddCodeLine ("sta ptr1");
+        AddCodeLine ("stx ptr1+1");
+
+        /* Generate strcmp code */
+        AddCodeLine ("ldy #$00");
+        AddCodeLine ("beq %s", LocalLabelName (Entry));
+        g_defcodelabel (Loop);
+        AddCodeLine ("tax");
+        AddCodeLine ("beq %s", LocalLabelName (Fin));
+        AddCodeLine ("iny");
+        g_defcodelabel (Entry);
+        AddCodeLine ("lda (ptr1),y");
         AddCodeLine (Compare, ED_GetLabelName (&Arg2.Expr, 0));
         AddCodeLine ("beq %s", LocalLabelName (Loop));
         AddCodeLine ("ldx #$01");

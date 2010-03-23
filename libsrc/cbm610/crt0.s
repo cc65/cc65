@@ -84,7 +84,7 @@ BRKVec: .addr   _exit           ; BRK indirect vector
 
 .proc   callbank15
 
-        excrts  = $FF05
+        excrts  := $FF05        ; In bank 15 rom
 
 .org    $FECB
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -77,6 +77,7 @@ typedef enum token_t {
     /* Function specifiers */
     TOK_INLINE,
     TOK_FASTCALL,
+    TOK_CDECL,
 
     /* Tokens denoting types */
     TOK_FIRST_TYPE,
@@ -194,7 +195,7 @@ typedef enum token_t {
 /* Forward for struct Literal */
 struct Literal;
 
-/* Token stuff */                     
+/* Token stuff */
 typedef struct Token Token;
 struct Token {
     token_t    	    Tok;        /* The token itself */

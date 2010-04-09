@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -93,6 +93,7 @@ static const struct Keyword {
     { "__Y__", 	       	TOK_Y, 	       	TT_C89 | TT_C99 | TT_CC65  },
     { "__asm__",       	TOK_ASM,       	TT_C89 | TT_C99 | TT_CC65  },
     { "__attribute__", 	TOK_ATTRIBUTE, 	TT_C89 | TT_C99 | TT_CC65  },
+    { "__cdecl__",     	TOK_CDECL,      TT_C89 | TT_C99 | TT_CC65  },
     { "__far__",       	TOK_FAR,       	TT_C89 | TT_C99 | TT_CC65  },
     { "__fastcall__",  	TOK_FASTCALL,   TT_C89 | TT_C99 | TT_CC65  },
     { "__inline__",     TOK_INLINE,    	TT_C89 | TT_C99 | TT_CC65  },
@@ -101,6 +102,7 @@ static const struct Keyword {
     { "auto",  	       	TOK_AUTO,      	TT_C89 | TT_C99 | TT_CC65  },
     { "break", 	       	TOK_BREAK,     	TT_C89 | TT_C99 | TT_CC65  },
     { "case",  	       	TOK_CASE,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "cdecl",         	TOK_CDECL,                        TT_CC65  },
     { "char",  	       	TOK_CHAR,      	TT_C89 | TT_C99 | TT_CC65  },
     { "const", 	       	TOK_CONST,     	TT_C89 | TT_C99 | TT_CC65  },
     { "continue",      	TOK_CONTINUE,   TT_C89 | TT_C99 | TT_CC65  },

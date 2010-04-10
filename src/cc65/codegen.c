@@ -816,13 +816,8 @@ void g_getlocal (unsigned Flags, int Offs)
             	AddCodeLine ("lda (sp),y");
                 AddCodeLine ("dey");
                 AddCodeLine ("ora (sp),y");
-            } else if (IS_Get (&CodeSizeFactor) < 165) {
-                AddCodeLine ("jsr ldaxysp");
             } else {
-            	AddCodeLine ("lda (sp),y");
-                AddCodeLine ("tax");
-                AddCodeLine ("dey");
-                AddCodeLine ("lda (sp),y");
+                AddCodeLine ("jsr ldaxysp");
             }
             break;
 

@@ -527,6 +527,60 @@ static unsigned OptLoad1 (CodeSeg* S)
 
 
 
+static unsigned OptLoad2 (CodeSeg* S)
+/* Replace calls to ldaxysp by inline code */
+{
+    unsigned I;
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+     	CodeEntry* E;
+
+      	/* Get next entry */
+       	E = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (CE_IsCallTo (E, "ldaxysp")) {
+
+            CodeEntry* X;
+
+            /* lda (sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
+
+            /* tax */
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, I+2);
+
+            /* dey */
+            X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, I+3);
+
+            /* lda (sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, E->LI);
+            CS_InsertEntry (S, X, I+4);
+
+            /* Now remove the call to the subroutine */
+	    CS_DelEntry (S, I);
+
+	    /* Remember, we had changes */
+            ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*		       Optimize stores through pointers                      */
 /*****************************************************************************/
@@ -1328,6 +1382,7 @@ static OptFunc DOptJumpTarget1  = { OptJumpTarget1,  "OptJumpTarget1",  100, 0, 
 static OptFunc DOptJumpTarget2  = { OptJumpTarget2,  "OptJumpTarget2",  100, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpTarget3  = { OptJumpTarget3,  "OptJumpTarget3",  100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
+static OptFunc DOptLoad2        = { OptLoad2,        "OptLoad2",        200, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",         	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps1    = { OptRTSJumps1,    "OptRTSJumps1",   	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps2    = { OptRTSJumps2,    "OptRTSJumps2",   	100, 0, 0, 0, 0, 0 };
@@ -1346,8 +1401,8 @@ static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	 50, 0, 
 static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	 60, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad7    	= { OptPtrLoad7,     "OptPtrLoad7",    	140, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad11   	= { OptPtrLoad11,    "OptPtrLoad11",     92, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad12   	= { OptPtrLoad12,    "OptPtrLoad12",    50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad13   	= { OptPtrLoad13,    "OptPtrLoad13",    65, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad12   	= { OptPtrLoad12,    "OptPtrLoad12",     50, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad13   	= { OptPtrLoad13,    "OptPtrLoad13",     65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad14   	= { OptPtrLoad14,    "OptPtrLoad14",   	108, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad15   	= { OptPtrLoad15,    "OptPtrLoad15",   	 86, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad16   	= { OptPtrLoad16,    "OptPtrLoad16",   	100, 0, 0, 0, 0, 0 };
@@ -1367,7 +1422,7 @@ static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackPtrOps  = { OptStackPtrOps,  "OptStackPtrOps",   50, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore1       = { OptStore1,       "OptStore1",        70, 0, 0, 0, 0, 0 };
-static OptFunc DOptStore2       = { OptStore2,       "OptStore2",       220, 0, 0, 0, 0, 0 };
+static OptFunc DOptStore2       = { OptStore2,       "OptStore2",       115, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore3       = { OptStore3,       "OptStore3",       120, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore4       = { OptStore4,       "OptStore4",        50, 0, 0, 0, 0, 0 };
 static OptFunc DOptStore5       = { OptStore5,       "OptStore5",       100, 0, 0, 0, 0, 0 };
@@ -1420,6 +1475,7 @@ static OptFunc* OptFuncs[] = {
     &DOptJumpTarget2,
     &DOptJumpTarget3,
     &DOptLoad1,
+    &DOptLoad2,
     &DOptNegA1,
     &DOptNegA2,
     &DOptNegAX1,
@@ -1837,6 +1893,27 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
 
 static unsigned RunOptGroup4 (CodeSeg* S)
+/* Run another round of pattern replacements. These are done late, since there
+ * may be better replacements before.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Repeat some of the steps here */
+    Changes += RunOptFunc (S, &DOptPush1, 1);
+    Changes += RunOptFunc (S, &DOptPush2, 1);
+    Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+    Changes += RunOptFunc (S, &DOptTest2, 1);
+    Changes += RunOptFunc (S, &DOptTransfers2, 1);
+    Changes += RunOptFunc (S, &DOptLoad2, 1);
+
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
+static unsigned RunOptGroup5 (CodeSeg* S)
 /* 65C02 specific optimizations. */
 {
     unsigned Changes = 0;
@@ -1853,26 +1930,6 @@ static unsigned RunOptGroup4 (CodeSeg* S)
     	    Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
     	}
     }
-
-    /* Return the number of changes */
-    return Changes;
-}
-
-
-
-static unsigned RunOptGroup5 (CodeSeg* S)
-/* Run another round of pattern replacements. These are done late, since there
- * may be better replacements before.
- */
-{
-    unsigned Changes = 0;
-
-    /* Repeat some of the steps here */
-    Changes += RunOptFunc (S, &DOptPush1, 1);
-    Changes += RunOptFunc (S, &DOptPush2, 1);
-    Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
-    Changes += RunOptFunc (S, &DOptTest2, 1);
-    Changes += RunOptFunc (S, &DOptTransfers2, 1);
 
     /* Return the number of changes */
     return Changes;

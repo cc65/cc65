@@ -244,31 +244,50 @@ static void DoStatement (void)
 static void WhileStatement (void)
 /* Handle the 'while' statement */
 {
-    int PendingToken;
+    int         PendingToken;
+    CodeMark    CondCodeStart;  /* Start of condition evaluation code */
+    CodeMark    CondCodeEnd;    /* End of condition evaluation code */
+    CodeMark    Here;           /* "Here" location of code */
 
     /* Get the loop control labels */
     unsigned LoopLabel  = GetLocalLabel ();
     unsigned BreakLabel = GetLocalLabel ();
+    unsigned CondLabel  = GetLocalLabel ();
 
     /* Skip the while token */
     NextToken ();
 
-    /* Add the loop to the loop stack. In case of a while loop, the loop head
+    /* Add the loop to the loop stack. In case of a while loop, the condition
      * label is used for continue statements.
      */
-    AddLoop (BreakLabel, LoopLabel);
+    AddLoop (BreakLabel, CondLabel);
+
+    /* We will move the code that evaluates the while condition to the end of
+     * the loop, so generate a jump here.
+     */
+    g_jump (CondLabel);
+
+    /* Remember the current position */
+    GetCodePos (&CondCodeStart);
+
+    /* Emit the code position label */
+    g_defcodelabel (CondLabel);
+
+    /* Test the loop condition */
+    TestInParens (LoopLabel, 1);
+
+    /* Remember the end of the condition evaluation code */
+    GetCodePos (&CondCodeEnd);
 
     /* Define the head label */
     g_defcodelabel (LoopLabel);
 
-    /* Test the loop condition */
-    TestInParens (BreakLabel, 0);
-
     /* Loop body */
     Statement (&PendingToken);
 
-    /* Jump back to loop top */
-    g_jump (LoopLabel);
+    /* Move the test code here */
+    GetCodePos (&Here);
+    MoveCode (&CondCodeStart, &CondCodeEnd, &Here);
 
     /* Exit label */
     g_defcodelabel (BreakLabel);

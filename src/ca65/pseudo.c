@@ -44,6 +44,7 @@
 #include "bitops.h"
 #include "cddefs.h"
 #include "coll.h"
+#include "intstack.h"
 #include "symdefs.h"
 #include "tgttrans.h"
 #include "xmalloc.h"
@@ -85,6 +86,9 @@
 
 /* Keyword we're about to handle */
 static StrBuf Keyword = STATIC_STRBUF_INITIALIZER;
+
+/* CPU stack */
+static IntStack CPUStack = STATIC_INTSTACK_INITIALIZER;
 
 /* Segment stack */
 #define MAX_PUSHED_SEGMENTS     16
@@ -1412,6 +1416,21 @@ static void DoPageLength (void)
 
 
 
+static void DoPopCPU (void)
+/* Pop an old CPU setting from the CPU stack */
+{
+    /* Must have a CPU on the stack */
+    if (IS_IsEmpty (&CPUStack)) {
+        ErrorSkip ("CPU stack is empty");
+        return;
+    }
+
+    /* Set the CPU to the value popped from stack */
+    SetCPU (IS_Pop (&CPUStack));
+}
+
+
+
 static void DoPopSeg (void)
 /* Pop an old segment from the segment stack */
 {
@@ -1482,6 +1501,21 @@ static void DoPSC02 (void)
 /* Switch to 65SC02 CPU */
 {
     SetCPU (CPU_65SC02);
+}
+
+
+
+static void DoPushCPU (void)
+/* Push the current CPU setting onto the CPU stack */
+{
+    /* Can only push a limited size of segments */
+    if (IS_IsFull (&CPUStack)) {
+        ErrorSkip ("CPU stack overflow");
+        return;
+    }
+
+    /* Get the current segment and push it */
+    IS_Push (&CPUStack, GetCPU ());
 }
 
 
@@ -1865,7 +1899,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,  	       	DoUnexpected	},	/* .MAX */
     { ccNone,  	       	DoInvalid	},	/* .MID	*/
     { ccNone,  	       	DoUnexpected	},	/* .MIN */
-    { ccNone,		DoNull		},             
+    { ccNone,		DoNull		},
     { ccNone,		DoOrg		},
     { ccNone,		DoOut		},
     { ccNone,		DoP02		},
@@ -1873,9 +1907,11 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,  	       	DoPageLength	},
     { ccNone,       	DoUnexpected   	},   	/* .PARAMCOUNT */
     { ccNone,		DoPC02		},
+    { ccNone,           DoPopCPU        },
     { ccNone,           DoPopSeg        },
     { ccNone,		DoProc		},
     { ccNone,  	       	DoPSC02		},
+    { ccNone,           DoPushCPU       },
     { ccNone,           DoPushSeg       },
     { ccNone,    	DoUnexpected   	},   	/* .REFERENCED */
     { ccNone,		DoReloc		},
@@ -1944,11 +1980,14 @@ void HandlePseudo (void)
 
 
 
-void SegStackCheck (void)
-/* Check if the segment stack is empty at end of assembly */
+void CheckPseudo (void)
+/* Check if the stacks are empty at end of assembly */
 {
     if (CollCount (&SegStack) != 0) {
-        Error ("Segment stack is not empty");
+        Warning (1, "Segment stack is not empty");
+    }
+    if (!IS_IsEmpty (&CPUStack)) {
+        Warning (1, "CPU stack is not empty");
     }
 }
 

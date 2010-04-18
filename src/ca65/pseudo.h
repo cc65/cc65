@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   pseudo.h				     */
+/*	  			   pseudo.h				     */
 /*                                                                           */
-/*		Pseudo instructions for the ca65 macroassembler		     */
+/*	  	Pseudo instructions for the ca65 macroassembler		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,8 +61,8 @@ extern unsigned OpenIfs;
 void HandlePseudo (void);
 /* Handle a pseudo instruction */
 
-void SegStackCheck (void);
-/* Check if the segment stack is empty at end of assembly */
+void CheckPseudo (void);
+/* Check if the stacks are empty at end of assembly */
 
 
 

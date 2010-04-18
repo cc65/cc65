@@ -956,9 +956,9 @@ int main (int argc, char* argv [])
     /* Assemble the input */
     Assemble ();
 
-    /* If we didn't have any errors, check the segment stack */
+    /* If we didn't have any errors, check the pseudo insn stacks */
     if (ErrorCount == 0) {
-        SegStackCheck ();
+        CheckPseudo ();                                        
     }
 
     /* If we didn't have any errors, check the unnamed labels */

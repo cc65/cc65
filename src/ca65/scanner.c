@@ -251,9 +251,11 @@ struct DotKeyword {
     { ".PAGELENGTH",	TOK_PAGELENGTH	},
     { ".PARAMCOUNT", 	TOK_PARAMCOUNT  },
     { ".PC02", 		TOK_PC02	},
+    { ".POPCPU",        TOK_POPCPU      },
     { ".POPSEG", 	TOK_POPSEG	},
     { ".PROC", 		TOK_PROC	},
     { ".PSC02",	       	TOK_PSC02	},
+    { ".PUSHCPU",       TOK_PUSHCPU     },
     { ".PUSHSEG",      	TOK_PUSHSEG	},
     { ".REF", 		TOK_REFERENCED  },
     { ".REFERENCED",	TOK_REFERENCED  },
@@ -345,7 +347,7 @@ static void DoneCharSource (void)
 /*****************************************************************************/
 /*                            InputFile functions                            */
 /*****************************************************************************/
-
+                                          
 
 
 static void IFMarkStart (CharSource* S)

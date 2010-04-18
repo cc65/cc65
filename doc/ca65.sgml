@@ -3125,6 +3125,21 @@ Here's a list of all control commands and a description, what they do:
   name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
 
 
+<sect1><tt>.POPCPU</tt><label id=".POPCPU"><p>
+
+  Pop the last CPU setting from the stack, and activate it.
+
+  This command will switch back to the CPU that was last pushed onto the CPU
+  stack using the <tt><ref id=".PUSHCPU" name=".PUSHCPU"></tt> command, and
+  remove this entry from the stack.
+
+  The assembler will print an error message if the CPU stack is empty when
+  this command is issued.
+
+  See: <tt><ref id=".CPU" name=".CPU"></tt>, <tt><ref id=".PUSHCPU"
+  name=".PUSHCPU"></tt>, <tt><ref id=".SETCPU" name=".SETCPU"></tt>
+
+
 <sect1><tt>.POPSEG</tt><label id=".POPSEG"><p>
 
   Pop the last pushed segment from the stack, and set it.
@@ -3181,6 +3196,22 @@ Here's a list of all control commands and a description, what they do:
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
   name=".PC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
+
+
+<sect1><tt>.PUSHCPU</tt><label id=".PUSHCPU"><p>
+
+  Push the currently active CPU onto a stack. The stack has a size of 8
+  entries.
+
+  <tt/.PUSHCPU/ allows together with <tt><ref id=".POPCPU"
+  name=".POPCPU"></tt> to switch to another CPU and to restore the old CPU
+  later, without knowledge of the current CPU setting.
+
+  The assembler will print an error message if the CPU stack is already full,
+  when this command is issued.
+
+  See: <tt><ref id=".CPU" name=".CPU"></tt>, <tt><ref id=".POPCPU"
+  name=".POPCPU"></tt>, <tt><ref id=".SETCPU" name=".SETCPU"></tt>
 
 
 <sect1><tt>.PUSHSEG</tt><label id=".PUSHSEG"><p>

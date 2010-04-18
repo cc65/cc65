@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2007      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2007-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -217,9 +217,11 @@ typedef enum Token {
     TOK_PAGELENGTH,
     TOK_PARAMCOUNT,
     TOK_PC02,
+    TOK_POPCPU,
     TOK_POPSEG,
     TOK_PROC,
-    TOK_PSC02,
+    TOK_PSC02, 
+    TOK_PUSHCPU,
     TOK_PUSHSEG,
     TOK_REFERENCED,
     TOK_RELOC,

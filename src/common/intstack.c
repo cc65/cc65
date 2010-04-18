@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2004-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -48,7 +48,7 @@
 long IS_Get (const IntStack* S)
 /* Get the value on top of an int stack */
 {
-    CHECK (S->Count > 0);
+    PRECONDITION (S->Count > 0);
     return S->Stack[S->Count-1];
 }
 
@@ -57,7 +57,7 @@ long IS_Get (const IntStack* S)
 void IS_Set (IntStack* S, long Val)
 /* Set the value on top of an int stack */
 {
-    CHECK (S->Count > 0);
+    PRECONDITION (S->Count > 0);
     S->Stack[S->Count-1] = Val;
 }
 
@@ -66,7 +66,7 @@ void IS_Set (IntStack* S, long Val)
 void IS_Drop (IntStack* S)
 /* Drop a value from an int stack */
 {
-    CHECK (S->Count > 1);
+    PRECONDITION (S->Count > 0);
     --S->Count;
 }
 
@@ -75,8 +75,17 @@ void IS_Drop (IntStack* S)
 void IS_Push (IntStack* S, long Val)
 /* Push a value onto an int stack */
 {
-    CHECK (S->Count < sizeof (S->Stack) / sizeof (S->Stack[0]));
+    PRECONDITION (S->Count < sizeof (S->Stack) / sizeof (S->Stack[0]));
     S->Stack[S->Count++] = Val;
+}
+
+
+
+long IS_Pop (IntStack* S)
+/* Pop a value from an int stack */
+{
+    PRECONDITION (S->Count > 0);
+    return S->Stack[--S->Count];
 }
 
 

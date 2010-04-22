@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -95,7 +95,7 @@ static Collection InputStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
-static IFile* NewIFile (const char* Name)
+static IFile* NewIFile (const char* Name, InputType Type)
 /* Create and return a new IFile */
 {
     /* Get the length of the name */
@@ -109,6 +109,7 @@ static IFile* NewIFile (const char* Name)
     IF->Usage = 0;
     IF->Size  = 0;
     IF->MTime = 0;
+    IF->Type  = Type;
     memcpy (IF->Name, Name, Len+1);
 
     /* Insert the new structure into the IFile collection */
@@ -200,7 +201,7 @@ static IFile* FindFile (const char* Name)
 	if (strcmp (Name, IF->Name) == 0) {
 	    /* Found, return the struct */
 	    return IF;
-	}
+       	}
     }
 
     /* Not found */
@@ -216,7 +217,7 @@ void OpenMainFile (const char* Name)
 
 
     /* Setup a new IFile structure for the main file */
-    IFile* IF = NewIFile (Name);
+    IFile* IF = NewIFile (Name, IT_MAIN);
 
     /* Open the file for reading */
     FILE* F = fopen (Name, "r");
@@ -264,7 +265,7 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
      */
     IF = FindFile (N);
     if (IF == 0) {
-	IF = NewIFile (N);
+	IF = NewIFile (N, (DirSpec == INC_SYS)? IT_SYSINC : IT_USERINC);
     }
 
     /* We don't need N any longer, since we may now use IF->Name */

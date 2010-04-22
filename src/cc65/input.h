@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,10 +46,17 @@
 
 
 /*****************************************************************************/
-/*	 			     data				     */
+/*	       			     data				     */
 /*****************************************************************************/
 
 
+
+/* An enum that describes different types of input files */
+typedef enum {
+    IT_MAIN,                    /* Main input file */
+    IT_SYSINC,                  /* System include file (using <>) */
+    IT_USERINC,                 /* User include file (using "") */
+} InputType;
 
 /* The current input line */
 extern StrBuf* Line;
@@ -65,6 +72,7 @@ struct IFile {
     unsigned	    Usage;     	/* Usage counter */
     unsigned long   Size;       /* File size */
     unsigned long   MTime;      /* Time of last modification */
+    InputType       Type;       /* Type of input file */
     char       	    Name[1];  	/* Name of file (dynamically allocated) */
 };
 

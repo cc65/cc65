@@ -54,6 +54,6 @@ __sysrename:
 	jsr	popname		; Preserves A
 
         ; Cleanup oldname
-oserr2:	jsr	popname		; Preserves A
+oserr2:	jmp	popname		; Preserves A
 
 oserr1:	rts

@@ -205,6 +205,19 @@ package, it tries to be smart about several things.
 	cases, just give the name of your "main" file as first input file.
 </itemize>
 
+The command line is parsed from left to right, and the actual processing tool
+(compiler, assembler, ...) is invoked whenever a file name is encountered.
+This means that only the options to the left of a file name are in effect when
+this file is processed. It does also mean that you're able to specify
+different options for different files on the command line. As an example.
+
+<tscreen><verb>
+        cl65 -Oirs main.c -O -g module.c
+</verb></tscreen>
+
+translates main.c with full optimization and module.c with less optimization
+and debug info enabled.
+
 The type of an input file is derived from its extension:
 
 <itemize>

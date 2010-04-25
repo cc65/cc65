@@ -1724,7 +1724,8 @@ unsigned OptStackOps (CodeSeg* S)
 {
     unsigned            Changes = 0;    /* Number of changes in one run */
     StackOpData         Data;
-    unsigned            I;
+    int                 I;
+    int                 OldEntryCount;  /* Old number of entries */
 
     enum {
         Initialize,
@@ -1756,7 +1757,7 @@ unsigned OptStackOps (CodeSeg* S)
      * intermediate code for zero page use.
      */
     I = 0;
-    while (I < CS_GetEntryCount (S)) {
+    while (I < (int)CS_GetEntryCount (S)) {
 
     	/* Get the next entry */
     	CodeEntry* E = CS_GetEntry (S, I);
@@ -1890,6 +1891,9 @@ unsigned OptStackOps (CodeSeg* S)
                 Data.OpEntry   = CS_GetEntry (S, Data.OpIndex);
                 Data.NextEntry = CS_GetNextEntry (S, Data.OpIndex);
 
+                /* Remember the current number of code lines */
+                OldEntryCount = CS_GetEntryCount (S);
+
                 /* Adjust stack offsets to account for the upcoming removal */
                 AdjustStackOffset (&Data, 2);
 
@@ -1901,12 +1905,17 @@ unsigned OptStackOps (CodeSeg* S)
                 /* Call the optimizer function */
                 Changes += Data.OptFunc->Func (&Data);
 
+                /* Since the function may have added or deleted entries,
+                 * correct the index.
+                 */
+                I += CS_GetEntryCount (S) - OldEntryCount;
+
                 /* Regenerate register info */
                 CS_GenRegInfo (S);
 
                 /* Done */
                 State = Initialize;
-                break;
+                continue;
 
 	}
 

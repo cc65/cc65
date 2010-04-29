@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -110,7 +110,9 @@ enum {
     T_QUAL_FAR      = 0x008000,
     T_QUAL_ADDRSIZE = T_QUAL_NEAR | T_QUAL_FAR,
     T_QUAL_FASTCALL = 0x010000,
-    T_MASK_QUAL	    = 0x01F800,
+    T_QUAL_CDECL    = 0x020000,
+    T_QUAL_CCONV    = T_QUAL_FASTCALL | T_QUAL_CDECL,
+    T_MASK_QUAL	    = 0x03F800,
 
     /* Types */
     T_CHAR     	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
@@ -589,6 +591,16 @@ INLINE int IsQualFastcall (const Type* T)
 }
 #else
 #  define IsQualFastcall(T)     (((T)->C & T_QUAL_FASTCALL) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsQualCDecl (const Type* T)
+/* Return true if the given type has a cdecl qualifier */
+{
+    return (T->C & T_QUAL_CDECL) != 0;
+}
+#else
+#  define IsQualCDecl(T)        (((T)->C & T_QUAL_CDECL) != 0)
 #endif
 
 int IsVariadicFunc (const Type* T) attribute ((const));

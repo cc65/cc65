@@ -249,6 +249,7 @@ void PrintType (FILE* F, const Type* T)
         C = PrintTypeComp (F, C, T_QUAL_NEAR, "__near__");
         C = PrintTypeComp (F, C, T_QUAL_FAR, "__far__");
         C = PrintTypeComp (F, C, T_QUAL_FASTCALL, "__fastcall__");
+        C = PrintTypeComp (F, C, T_QUAL_CDECL, "__cdecl__");
 
      	/* Signedness. Omit the signedness specifier for long and int */
        	if ((C & T_MASK_TYPE) != T_TYPE_INT && (C & T_MASK_TYPE) != T_TYPE_LONG) {
@@ -332,6 +333,9 @@ void PrintFuncSig (FILE* F, const char* Name, Type* T)
     }
     if (IsQualFastcall (T)) {
      	fprintf (F, " __fastcall__");
+    }
+    if (IsQualCDecl (T)) {
+     	fprintf (F, " __cdecl__");
     }
     fprintf (F, " %s (", Name);
 

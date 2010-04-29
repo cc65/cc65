@@ -205,8 +205,9 @@ static int SkipWhite (void)
 int TokIsFuncSpec (const Token* T)
 /* Return true if the token is a function specifier */
 {
-    return (T->Tok == TOK_INLINE) || (T->Tok == TOK_FASTCALL) ||
-           (T->Tok == TOK_NEAR)   || (T->Tok == TOK_FAR);
+    return (T->Tok == TOK_INLINE)   ||
+           (T->Tok == TOK_FASTCALL) || (T->Tok == TOK_CDECL) ||
+           (T->Tok == TOK_NEAR)     || (T->Tok == TOK_FAR);
 }
 
 

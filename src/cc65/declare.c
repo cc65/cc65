@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -185,6 +185,17 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
                 }
                 break;
 
+            case TOK_CDECL:
+                if (Allowed & T_QUAL_CDECL) {
+                    if (Q & T_QUAL_CDECL) {
+                        DuplicateQualifier ("cdecl");
+                    }
+                    Q |= T_QUAL_CDECL;
+                } else {
+                    goto Done;
+                }
+                break;
+
 	    default:
 	       	goto Done;
 
@@ -206,6 +217,19 @@ Done:
         default:
             Error ("Cannot specify more than one address size qualifier");
             Q &= ~T_QUAL_ADDRSIZE;
+    }
+
+    /* We cannot have more than one calling convention specifier */
+    switch (Q & T_QUAL_CCONV) {
+
+        case T_QUAL_NONE:
+        case T_QUAL_FASTCALL:
+        case T_QUAL_CDECL:
+            break;
+
+        default:
+            Error ("Cannot specify more than one calling convention qualifier");
+            Q &= ~T_QUAL_CCONV;
     }
 
     /* Return the qualifiers read */
@@ -1404,6 +1428,9 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     }
     if (Qualifiers & T_QUAL_FASTCALL) {
         Error ("Invalid `__fastcall__' qualifier");
+    }
+    if (Qualifiers & T_QUAL_CDECL) {
+        Error ("Invalid `__cdecl__' qualifier");
     }
 }
 

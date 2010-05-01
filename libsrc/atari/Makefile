@@ -88,6 +88,7 @@ OBJS = 	_scrsize.o      \
 	gotoy.o         \
 	gotoxy.o        \
 	graphics.o      \
+	initcwd.o       \
 	inviocb.o       \
 	joy_stddrv.o    \
 	kbhit.o         \
@@ -107,6 +108,7 @@ OBJS = 	_scrsize.o      \
 	scroll.o        \
 	setcolor.o      \
 	siocall.o       \
+	syschdir.o      \
 	sysmkdir.o      \
 	sysremove.o     \
 	sysrmdir.o      \

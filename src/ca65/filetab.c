@@ -33,7 +33,9 @@
 
 
 
+#include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 /* common */
 #include "check.h"
@@ -44,6 +46,7 @@
 /* ca65 */
 #include "error.h"
 #include "filetab.h"
+#include "global.h"
 #include "objfile.h"
 #include "spool.h"
 
@@ -88,6 +91,7 @@ struct FileEntry {
     HashNode            Node;
     unsigned            Name;           /* File name */
     unsigned  	      	Index;		/* Index of entry */
+    FileType            Type;           /* Type of file */
     unsigned long     	Size;		/* Size of file */
     unsigned long     	MTime;		/* Time of last modification */
 };
@@ -155,7 +159,8 @@ static int HT_Compare (const void* Key1, const void* Key2)
 
 
 
-static FileEntry* NewFileEntry (unsigned Name, unsigned long Size, unsigned long MTime)
+static FileEntry* NewFileEntry (unsigned Name, FileType Type,
+                                unsigned long Size, unsigned long MTime)
 /* Create a new FileEntry, insert it into the tables and return it */
 {
     /* Allocate memory for the entry */
@@ -165,6 +170,7 @@ static FileEntry* NewFileEntry (unsigned Name, unsigned long Size, unsigned long
     InitHashNode (&F->Node, F);
     F->Name     = Name;
     F->Index  	= CollCount (&FileTab) + 1;     /* First file has index #1 */
+    F->Type     = Type;
     F->Size   	= Size;
     F->MTime  	= MTime;
 
@@ -183,7 +189,7 @@ static FileEntry* NewFileEntry (unsigned Name, unsigned long Size, unsigned long
 const StrBuf* GetFileName (unsigned Name)
 /* Get the name of a file where the name index is known */
 {
-    static StrBuf ErrorMsg = LIT_STRBUF_INITIALIZER ("(outside file scope)");
+    static const StrBuf ErrorMsg = LIT_STRBUF_INITIALIZER ("(outside file scope)");
 
     const FileEntry* F;
 
@@ -226,13 +232,14 @@ unsigned GetFileIndex (const StrBuf* Name)
 
 
 
-unsigned AddFile (const StrBuf* Name, unsigned long Size, unsigned long MTime)
+unsigned AddFile (const StrBuf* Name, FileType Type,
+                  unsigned long Size, unsigned long MTime)
 /* Add a new file to the list of input files. Return the index of the file in
  * the table.
  */
 {
     /* Create a new file entry and insert it into the tables */
-    FileEntry* F = NewFileEntry (GetStrBufId (Name), Size, MTime);
+    FileEntry* F = NewFileEntry (GetStrBufId (Name), Type, Size, MTime);
 
     /* Return the index */
     return F->Index;
@@ -266,5 +273,80 @@ void WriteFiles (void)
 }
 
 
+
+static void WriteDep (FILE* F, FileType Types)
+/* Helper function. Writes all file names that match Types to the output */
+{
+    unsigned I;
+
+    /* Loop over all files */
+    for (I = 0; I < CollCount (&FileTab); ++I) {
+
+        const StrBuf* Filename;
+
+    	/* Get the next input file */
+       	const FileEntry* E = (const FileEntry*) CollAt (&FileTab, I);
+
+        /* Ignore it if it is not of the correct type */
+        if ((E->Type & Types) == 0) {
+            continue;
+        }
+
+    	/* If this is not the first file, add a space */
+       	if (I > 0) {
+            fputc (' ', F);
+        }
+
+    	/* Print the dependency */
+        Filename = GetStrBuf (E->Name);
+        fprintf (F, "%*s", SB_GetLen (Filename), SB_GetConstBuf (Filename));
+    }
+}
+
+
+
+static void CreateDepFile (const char* Name, FileType Types)
+/* Create a dependency file with the given name and place dependencies for
+ * all files with the given types there.
+ */
+{
+    /* Open the file */
+    FILE* F = fopen (Name, "w");
+    if (F == 0) {
+     	Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
+    }
+
+    /* Print the output file followed by a tab char */
+    fprintf (F, "%s:\t", OutFile);
+
+    /* Write out the dependencies for the output file */
+    WriteDep (F, Types);
+    fputs ("\n\n", F);
+
+    /* Write out a phony dependency for the included files */
+    WriteDep (F, Types);
+    fputs (":\n\n", F);
+
+    /* Close the file, check for errors */
+    if (fclose (F) != 0) {
+    	remove (Name);
+    	Fatal ("Cannot write to dependeny file (disk full?)");
+    }
+}
+
+
+
+void CreateDependencies (void)
+/* Create dependency files requested by the user */
+{
+    if (SB_NotEmpty (&DepName)) {
+        CreateDepFile (SB_GetConstBuf (&DepName),
+                       FT_MAIN | FT_INCLUDE | FT_BINARY);
+    }
+    if (SB_NotEmpty (&FullDepName)) {
+        CreateDepFile (SB_GetConstBuf (&FullDepName),
+                       FT_MAIN | FT_INCLUDE | FT_BINARY | FT_DBGINFO);
+    }
+}
 
 

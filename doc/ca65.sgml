@@ -87,40 +87,42 @@ The assembler accepts the following options:
 ---------------------------------------------------------------------------
 Usage: ca65 [options] file
 Short options:
-  -D name[=value]	Define a symbol
-  -I dir		Set an include directory search path
-  -U			Mark unresolved symbols as import
-  -V		      	Print the assembler version
-  -W n			Set warning level n
-  -g			Add debug info to object file
-  -h			Help (this text)
-  -i			Ignore case of symbols
-  -l			Create a listing if assembly was ok
-  -mm model		Set the memory model
-  -o name		Name the output file
-  -s			Enable smart mode
-  -t sys		Set the target system
-  -v			Increase verbosity
+  -D name[=value]               Define a symbol
+  -I dir                        Set an include directory search path
+  -U                            Mark unresolved symbols as import
+  -V                            Print the assembler version
+  -W n                          Set warning level n
+  -g                            Add debug info to object file
+  -h                            Help (this text)
+  -i                            Ignore case of symbols
+  -l                            Create a listing if assembly was ok
+  -mm model                     Set the memory model
+  -o name                       Name the output file
+  -s                            Enable smart mode
+  -t sys                        Set the target system
+  -v                            Increase verbosity
 
 Long options:
-  --auto-import		Mark unresolved symbols as import
-  --bin-include-dir dir Set a search path for binary includes
-  --cpu type		Set cpu type
-  --debug-info		Add debug info to object file
-  --feature name	Set an emulation feature
-  --forget-inc-paths    Forget include search paths
-  --help		Help (this text)
-  --ignore-case		Ignore case of symbols
-  --include-dir dir	Set an include directory search path
-  --listing		Create a listing if assembly was ok
-  --list-bytes n	Maximum number of bytes per listing line
-  --macpack-dir dir	Set a macro package directory
-  --memory-model model	Set the memory model
-  --pagelength n	Set the page length for the listing
-  --smart		Enable smart mode
-  --target sys		Set the target system
-  --verbose		Increase verbosity
-  --version		Print the assembler version
+  --auto-import                 Mark unresolved symbols as import
+  --bin-include-dir dir         Set a search path for binary includes
+  --cpu type                    Set cpu type
+  --create-dep name             Create a make dependency file
+  --create-full-dep name        Create a full make dependency file
+  --debug-info                  Add debug info to object file
+  --feature name                Set an emulation feature
+  --forget-inc-paths            Forget include search paths
+  --help                        Help (this text)
+  --ignore-case                 Ignore case of symbols
+  --include-dir dir             Set an include directory search path
+  --listing                     Create a listing if assembly was ok
+  --list-bytes n                Maximum number of bytes per listing line
+  --macpack-dir dir             Set a macro package directory
+  --memory-model model          Set the memory model
+  --pagelength n                Set the page length for the listing
+  --smart                       Enable smart mode
+  --target sys                  Set the target system
+  --verbose                     Increase verbosity
+  --version                     Print the assembler version
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -151,6 +153,24 @@ Here is a description of all the command line options:
 
   The sunplus cpu is not available in the freeware version, because the
   instruction set is "proprietary and confidential".
+
+
+  <label id="option-create-dep">
+  <tag><tt>--create-dep name</tt></tag>
+
+  Tells the assembler to generate a file containing the dependency list for
+  the assembled module in makefile syntax. The output is written to a file
+  with the given name. The output does not include files passed via debug
+  information to the assembler.
+
+
+  <label id="option-create-full-dep">
+  <tag><tt>--create-full-dep name</tt></tag>
+
+  Tells the assembler to generate a file containing the dependency list for
+  the assembled module in makefile syntax. The output is written to a file
+  with the given name. The output does include files passed via debug
+  information to the assembler.
 
 
   <label id="option--feature">

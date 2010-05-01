@@ -89,40 +89,42 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] file\n"
             "Short options:\n"
-            "  -D name[=value]\tDefine a symbol\n"
-            "  -I dir\t\tSet an include directory search path\n"
-            "  -U\t\t\tMark unresolved symbols as import\n"
-            "  -V\t\t\tPrint the assembler version\n"
-            "  -W n\t\t\tSet warning level n\n"
-            "  -g\t\t\tAdd debug info to object file\n"
-            "  -h\t\t\tHelp (this text)\n"
-            "  -i\t\t\tIgnore case of symbols\n"
-            "  -l\t\t\tCreate a listing if assembly was ok\n"
-            "  -mm model\t\tSet the memory model\n"
-            "  -o name\t\tName the output file\n"
-            "  -s\t\t\tEnable smart mode\n"
-            "  -t sys\t\tSet the target system\n"
-            "  -v\t\t\tIncrease verbosity\n"
+            "  -D name[=value]\t\tDefine a symbol\n"
+            "  -I dir\t\t\tSet an include directory search path\n"
+            "  -U\t\t\t\tMark unresolved symbols as import\n"
+            "  -V\t\t\t\tPrint the assembler version\n"
+            "  -W n\t\t\t\tSet warning level n\n"
+            "  -g\t\t\t\tAdd debug info to object file\n"
+            "  -h\t\t\t\tHelp (this text)\n"
+            "  -i\t\t\t\tIgnore case of symbols\n"
+            "  -l\t\t\t\tCreate a listing if assembly was ok\n"
+            "  -mm model\t\t\tSet the memory model\n"
+            "  -o name\t\t\tName the output file\n"
+            "  -s\t\t\t\tEnable smart mode\n"
+            "  -t sys\t\t\tSet the target system\n"
+            "  -v\t\t\t\tIncrease verbosity\n"
             "\n"
             "Long options:\n"
-            "  --auto-import\t\tMark unresolved symbols as import\n"
-            "  --bin-include-dir dir\tSet a search path for binary includes\n"
-            "  --cpu type\t\tSet cpu type\n"
-            "  --debug-info\t\tAdd debug info to object file\n"
-            "  --feature name\tSet an emulation feature\n"
-            "  --forget-inc-paths\tForget include search paths\n"
-            "  --help\t\tHelp (this text)\n"
-            "  --ignore-case\t\tIgnore case of symbols\n"
-            "  --include-dir dir\tSet an include directory search path\n"
-            "  --listing\t\tCreate a listing if assembly was ok\n"
-            "  --list-bytes n\tMaximum number of bytes per listing line\n"
-            "  --macpack-dir dir\tSet a macro package directory\n"
-            "  --memory-model model\tSet the memory model\n"
-            "  --pagelength n\tSet the page length for the listing\n"
-            "  --smart\t\tEnable smart mode\n"
-            "  --target sys\t\tSet the target system\n"
-            "  --verbose\t\tIncrease verbosity\n"
-            "  --version\t\tPrint the assembler version\n",
+            "  --auto-import\t\t\tMark unresolved symbols as import\n"
+            "  --bin-include-dir dir\t\tSet a search path for binary includes\n"
+            "  --cpu type\t\t\tSet cpu type\n"
+            "  --create-dep name\t\tCreate a make dependency file\n"
+            "  --create-full-dep name\tCreate a full make dependency file\n"
+            "  --debug-info\t\t\tAdd debug info to object file\n"
+            "  --feature name\t\tSet an emulation feature\n"
+            "  --forget-inc-paths\t\tForget include search paths\n"
+            "  --help\t\t\tHelp (this text)\n"
+            "  --ignore-case\t\t\tIgnore case of symbols\n"
+            "  --include-dir dir\t\tSet an include directory search path\n"
+            "  --listing\t\t\tCreate a listing if assembly was ok\n"
+            "  --list-bytes n\t\tMaximum number of bytes per listing line\n"
+            "  --macpack-dir dir\t\tSet a macro package directory\n"
+            "  --memory-model model\t\tSet the memory model\n"
+            "  --pagelength n\t\tSet the page length for the listing\n"
+            "  --smart\t\t\tEnable smart mode\n"
+            "  --target sys\t\t\tSet the target system\n"
+            "  --verbose\t\t\tIncrease verbosity\n"
+            "  --version\t\t\tPrint the assembler version\n",
             ProgName);
 }
 
@@ -281,6 +283,20 @@ static void SetSys (const char* Sys)
 
 
 
+static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
+/* Handle an option that remembers a file name for later */
+{
+    /* Cannot have the option twice */
+    if (SB_NotEmpty (Name)) {
+        AbEnd ("Cannot use option `%s' twice", Opt);
+    }
+    /* Remember the file name for later */
+    SB_CopyStr (Name, Arg);
+    SB_Terminate (Name);
+}
+
+
+
 static void DefineSymbol (const char* Def)
 /* Define a symbol from the command line */
 {
@@ -359,6 +375,23 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
     } else {
 	SetCPU (CPU);
     }
+}
+
+
+
+static void OptCreateDep (const char* Opt, const char* Arg)
+/* Handle the --create-dep option */
+{
+    FileNameOption (Opt, Arg, &DepName);
+}
+
+
+
+static void OptCreateFullDep (const char* Opt attribute ((unused)),
+		      	      const char* Arg)
+/* Handle the --create-full-dep option */
+{
+    FileNameOption (Opt, Arg, &FullDepName);
 }
 
 
@@ -796,6 +829,8 @@ int main (int argc, char* argv [])
         { "--auto-import",     	0,	OptAutoImport		},
         { "--bin-include-dir",  1,      OptBinIncludeDir        },
         { "--cpu",     	       	1,	OptCPU 			},
+        { "--create-dep",       1,      OptCreateDep            },
+        { "--create-full-dep",  1,      OptCreateFullDep        },
 	{ "--debug-info",      	0,	OptDebugInfo		},
 	{ "--feature",		1,	OptFeature		},
        	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
@@ -958,7 +993,7 @@ int main (int argc, char* argv [])
 
     /* If we didn't have any errors, check the pseudo insn stacks */
     if (ErrorCount == 0) {
-        CheckPseudo ();                                        
+        CheckPseudo ();
     }
 
     /* If we didn't have any errors, check the unnamed labels */
@@ -990,12 +1025,15 @@ int main (int argc, char* argv [])
         SegDump ();
     }
 
-    /* If we didn't have any errors, create the object and listing files */
+    /* If we didn't have any errors, create the object, listing and 
+     * dependency files 
+     */
     if (ErrorCount == 0) {
-	CreateObjFile ();
-	if (Listing) {
-	    CreateListing ();
-	}
+     	CreateObjFile ();
+     	if (Listing) {
+     	    CreateListing ();
+     	}
+       CreateDependencies ();
     }
 
     /* Close the input file */

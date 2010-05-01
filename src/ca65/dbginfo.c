@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -85,7 +85,7 @@ void DbgInfoFile (void)
     MTime = ConstExpression ();
 
     /* Insert the file into the table */
-    AddFile (&Name, Size, MTime);
+    AddFile (&Name, FT_DBGINFO, Size, MTime);
 
     /* Free memory used for Name */
     SB_Done (&Name);

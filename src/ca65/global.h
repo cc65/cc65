@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "strbuf.h"
+
+
+
 /*****************************************************************************/
 /*     	      	    		     Data   			    	     */
 /*****************************************************************************/
@@ -48,6 +53,8 @@
 extern const char*     	InFile;	       	    /* Name of input file */
 extern const char*     	OutFile;       	    /* Name of output file */
 extern const char*     	ListFile;      	    /* Name of listing file */
+extern StrBuf           DepName;            /* Name of dependencies file */
+extern StrBuf           FullDepName;        /* Name of full dependencies file */
 
 /* Default extensions */
 extern const char      	ObjExt[];      	    /* Default object extension */

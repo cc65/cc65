@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,6 +51,8 @@
 const char* InFile     	         = 0;   /* Name of input file */
 const char* OutFile    	         = 0;   /* Name of output file */
 const char* ListFile   	         = 0;   /* Name of listing file */
+StrBuf DepName     = STATIC_STRBUF_INITIALIZER; /* Dependency file */
+StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Full dependency file */
 
 /* Default extensions */
 const char ObjExt[]    	         = ".o";/* Default object extension */

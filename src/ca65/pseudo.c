@@ -38,6 +38,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/types.h>		/* EMX needs this */
+#include <sys/stat.h>
 
 /* common */
 #include "assertion.h"
@@ -58,6 +60,7 @@
 #include "error.h"
 #include "expr.h"
 #include "feature.h"
+#include "filetab.h"
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
@@ -1086,6 +1089,7 @@ static void DoIncBin (void)
 /* Include a binary file */
 {
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
+    struct stat StatBuf;
     long Start = 0L;
     long Count = -1L;
     long Size;
@@ -1122,26 +1126,42 @@ static void DoIncBin (void)
        	if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
        	    ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
+            xfree (PathName);
+            goto ExitPoint;
      	}
+
+        /* Remember the new file name */
+        SB_CopyStr (&Name, PathName);
 
      	/* Free the allocated memory */
      	xfree (PathName);
-
-        /* If we had an error before, bail out now */
-        if (F == 0) {
-            goto ExitPoint;
-        }
     }
 
     /* Get the size of the file */
     fseek (F, 0, SEEK_END);
     Size = ftell (F);
 
+    /* Stat the file and remember the values. There a race condition here,
+     * since we cannot use fileno() (non standard identifier in standard
+     * header file), and therefore not fstat. When using stat with the
+     * file name, there's a risk that the file was deleted and recreated
+     * while it was open. Since mtime and size are only used to check
+     * if a file has changed in the debugger, we will ignore this problem
+     * here.
+     */               
+    SB_Terminate (&Name);
+    if (stat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
+        Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));
+    }
+
+    /* Add the file to the input file table */
+    AddFile (&Name, FT_BINARY, Size, StatBuf.st_mtime);
+
     /* If a count was not given, calculate it now */
     if (Count < 0) {
- 	Count = Size - Start;
- 	if (Count < 0) {
- 	    /* Nothing to read - flag this as a range error */
+    	Count = Size - Start;
+    	if (Count < 0) {
+    	    /* Nothing to read - flag this as a range error */
  	    ErrorSkip ("Range error");
  	    goto Done;
  	}

@@ -347,7 +347,7 @@ static void DoneCharSource (void)
 /*****************************************************************************/
 /*                            InputFile functions                            */
 /*****************************************************************************/
-                                          
+
 
 
 static void IFMarkStart (CharSource* S)
@@ -488,7 +488,9 @@ int NewInputFile (const char* Name)
      	}
 
      	/* Add the file to the input file table and remember the index */
-     	FileIdx = AddFile (SB_InitFromString (&NameBuf, Name), Buf.st_size, Buf.st_mtime);
+     	FileIdx = AddFile (SB_InitFromString (&NameBuf, Name),
+                           (FCount == 0)? FT_MAIN : FT_INCLUDE,
+                           Buf.st_size, Buf.st_mtime);
 
        	/* Create a new input source variable and initialize it */
      	S                   = xmalloc (sizeof (*S));

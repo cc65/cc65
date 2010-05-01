@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -44,6 +44,7 @@
 #endif
 
 /* common */
+#include "coll.h"
 #include "searchpath.h"
 #include "strbuf.h"
 #include "xmalloc.h"
@@ -56,7 +57,19 @@
 
 
 
-static char* SearchPaths[MAX_SEARCH_PATHS];
+/* A search path list is a collection containing path elements. We have
+ * several of those.
+ */
+static Collection SearchPaths[MAX_SEARCH_PATHS] = {
+    STATIC_COLLECTION_INITIALIZER,
+    STATIC_COLLECTION_INITIALIZER,
+    STATIC_COLLECTION_INITIALIZER,
+    STATIC_COLLECTION_INITIALIZER,
+    STATIC_COLLECTION_INITIALIZER,
+    STATIC_COLLECTION_INITIALIZER,
+    STATIC_COLLECTION_INITIALIZER,
+    STATIC_COLLECTION_INITIALIZER,
+};
 
 
 
@@ -66,66 +79,47 @@ static char* SearchPaths[MAX_SEARCH_PATHS];
 
 
 
-static char* Add (char* Orig, const char* New)
-/* Create a new path from Orig and New, delete Orig, return the result */
+static void Add (Collection* Paths, const char* New)
+/* Cleanup a new search path and add it to the list */
 {
-    unsigned OrigLen, NewLen;
-    char* NewPath;
-
-    /* Get the length of the original string */
-    OrigLen = Orig? strlen (Orig) : 0;
+    unsigned NewLen;
+    char*    NewPath;
 
     /* Get the length of the new path */
     NewLen = strlen (New);
 
     /* Check for a trailing path separator and remove it */
-    if (NewLen > 0 && (New [NewLen-1] == '\\' || New [NewLen-1] == '/')) {
+    if (NewLen > 0 && (New[NewLen-1] == '\\' || New[NewLen-1] == '/')) {
     	--NewLen;
     }
 
     /* Allocate memory for the new string */
-    NewPath = (char*) xmalloc (OrigLen + NewLen + 2);
+    NewPath = (char*) xmalloc (NewLen + 1);
 
-    /* Copy the strings */
-    memcpy (NewPath, Orig, OrigLen);
-    memcpy (NewPath+OrigLen, New, NewLen);
-    NewPath [OrigLen+NewLen+0] = ';';
-    NewPath [OrigLen+NewLen+1] = '\0';
+    /* Copy the path and terminate it */
+    memcpy (NewPath, New, NewLen);
+    NewPath [NewLen] = '\0';
 
-    /* Delete the original path */
-    xfree (Orig);
-
-    /* Return the new path */
-    return NewPath;
+    /* Add the path to the collection */
+    CollAppend (Paths, NewPath);
 }
 
 
 
-static char* Find (const char* Path, const char* File)
+static char* Find (const Collection* PathList, const char* File)
 /* Search for a file in a list of directories. If found, return the complete
  * name including the path in a malloced data area, if not found, return 0.
  */
-{
-    const char* P;
+{               
+    char* Name = 0;
     StrBuf PathName = AUTO_STRBUF_INITIALIZER;
 
-    /* Initialize variables */
-    P = Path;
-
-    /* Handle a NULL pointer as replacement for an empty string */
-    if (P == 0) {
-	P = "";
-    }
-
     /* Start the search */
-    while (*P) {
-	/* Clear the string buffer */
-	SB_Clear (&PathName);
+    unsigned I;
+    for (I = 0; I < CollCount (PathList); ++I) {
 
         /* Copy the next path element into the buffer */
-     	while (*P != '\0' && *P != ';') {
-	    SB_AppendChar (&PathName, *P++);
-     	}
+        SB_CopyStr (&PathName, CollConstAt (PathList, I));
 
 	/* Add a path separator and the filename */
        	if (SB_NotEmpty (&PathName)) {
@@ -136,21 +130,15 @@ static char* Find (const char* Path, const char* File)
 
 	/* Check if this file exists */
        	if (access (SB_GetBuf (&PathName), 0) == 0) {
-	    /* The file exists, return its name */
-	    char* Name = xstrdup (SB_GetBuf (&PathName));
-	    SB_Done (&PathName);
-	    return Name;
-	}
-
-	/* Skip a list separator if we have one */
-	if (*P == ';') {
-	    ++P;
+	    /* The file exists, we're done */
+	    Name = xstrdup (SB_GetBuf (&PathName));
+            break;
 	}
     }
 
-    /* Not found */
+    /* Cleanup and return the result of the search */
     SB_Done (&PathName);
-    return 0;
+    return Name;
 }
 
 
@@ -162,9 +150,8 @@ void AddSearchPath (const char* NewPath, unsigned Where)
     if (NewPath) {
         unsigned I;
         for (I = 0; I < MAX_SEARCH_PATHS; ++I) {
-            unsigned Mask = (0x01U << I);
-            if (Where & Mask) {
-                SearchPaths[I] = Add (SearchPaths[I], NewPath);
+            if (Where & (0x01U << I)) {
+                Add (&SearchPaths[I], NewPath);
             }
         }
     }
@@ -223,10 +210,13 @@ void ForgetAllSearchPaths (unsigned Where)
 {
     unsigned I;
     for (I = 0; I < MAX_SEARCH_PATHS; ++I) {
-        unsigned Mask = (0x01U << I);
-        if (Where & Mask) {
-            xfree (SearchPaths[I]);
-            SearchPaths[I] = 0;
+        if (Where & (0x01U << I)) {
+            unsigned J;
+            Collection* P = &SearchPaths[I];
+            for (J = 0; J < CollCount (P); ++J) {
+                xfree (CollAt (P, J));
+            }
+            CollDeleteAll (P);
         }
     }
 }
@@ -240,9 +230,8 @@ char* SearchFile (const char* Name, unsigned Where)
 {
     unsigned I;
     for (I = 0; I < MAX_SEARCH_PATHS; ++I) {
-        unsigned Mask = (0x01U << I);
-        if (Where & Mask) {
-            char* Path = Find (SearchPaths[I], Name);
+        if (Where & (0x01U << I)) {
+            char* Path = Find (&SearchPaths[I], Name);
             if (Path) {
                 /* Found the file */
                 return Path;

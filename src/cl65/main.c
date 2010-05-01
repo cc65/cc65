@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2009, Ullrich von Bassewitz                                      */
+/* (C) 1999-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -111,6 +111,10 @@ static const char* LinkerConfig = 0;
  * executable file name if no explicit name is given.
  */
 static const char* FirstInput = 0;
+
+/* The names of the files for dependency generation */
+static const char* DepName = 0;
+static const char* FullDepName = 0;
 
 /* Remember if we should link a module */
 static int Module = 0;
@@ -435,12 +439,12 @@ static void Link (void)
 
 
 
-static void Assemble (const char* File)
-/* Assemble the given file */
+static void AssembleFile (const char* File, unsigned ArgCount)
+/* Common routine to assemble a file. Will be called by Assemble() and
+ * AssembleIntermediate(). Adds options common for both routines and
+ * assembles the file. Will remove excess arguments after assembly.
+ */
 {
-    /* Remember the current assembler argument count */
-    unsigned ArgCount = CA65.ArgCount;
-
     /* Set the target system */
     CmdSetTarget (&CA65, Target);
 
@@ -448,15 +452,15 @@ static void Assemble (const char* File)
      * output name.
      */
     if (DontLink && OutputName) {
-	CmdSetOutput (&CA65, OutputName);
+    	CmdSetOutput (&CA65, OutputName);
     } else {
-	/* The object file name will be the name of the source file
-	 * with .s replaced by ".o". Add this file to the list of
-	 * linker files.
-	 */
-	char* ObjName = MakeFilename (File, ".o");
-	CmdAddFile (&LD65, ObjName);
-	xfree (ObjName);
+    	/* The object file name will be the name of the source file
+    	 * with .s replaced by ".o". Add this file to the list of
+    	 * linker files.
+    	 */
+    	char* ObjName = MakeFilename (File, ".o");
+    	CmdAddFile (&LD65, ObjName);
+   	xfree (ObjName);
     }
 
     /* Add the file as argument for the assembler */
@@ -474,6 +478,46 @@ static void Assemble (const char* File)
 
 
 
+static void AssembleIntermediate (const char* File)
+/* Assemble an intermediate file. The -dep options won't be added and
+ * the file is removed after assembly.
+ */
+{
+    /* Use common routine */
+    AssembleFile (File, CA65.ArgCount);
+
+    /* Remove the generated file */
+    if (remove (File) < 0) {
+        Warning ("Cannot remove temporary file `%s': %s",
+                 File, strerror (errno));
+    }
+}
+
+
+
+static void Assemble (const char* File)
+/* Assemble the given file */
+{
+    /* Remember the current assembler argument count */
+    unsigned ArgCount = CA65.ArgCount;
+
+    /* We aren't assembling an intermediate file, but one requested by the
+     * user. So add a few options here if they were given on the command
+     * line.
+     */
+    if (DepName && *DepName) {
+        CmdAddArg2 (&CA65, "--create-dep", DepName);
+    }
+    if (FullDepName && *FullDepName) {
+        CmdAddArg2 (&CA65, "--create-full-dep", FullDepName);
+    }
+
+    /* Use the common routine */
+    AssembleFile (File, ArgCount);
+}
+
+
+
 static void Compile (const char* File)
 /* Compile the given file */
 {
@@ -485,16 +529,16 @@ static void Compile (const char* File)
     /* Set the target system */
     CmdSetTarget (&CC65, Target);
 
-    /* If we won't link, this is the final step. In this case, set the
+    /* If we won't assemble, this is the final step. In this case, set the
      * output name.
      */
     if (DontAssemble && OutputName) {
 	CmdSetOutput (&CC65, OutputName);
     } else {
-	/* The assembler file name will be the name of the source file
-	 * with .c replaced by ".s".
-	 */
-	AsmName = MakeFilename (File, ".s");
+   	/* The assembler file name will be the name of the source file
+   	 * with .c replaced by ".s".
+   	 */
+   	AsmName = MakeFilename (File, ".s");
     }
 
     /* Add the file as argument for the compiler */
@@ -513,13 +557,11 @@ static void Compile (const char* File)
      * remove it
      */
     if (!DontAssemble) {
-	Assemble (AsmName);
-	if (remove (AsmName) < 0) {
-	    Warning ("Cannot remove temporary file `%s': %s",
-		     AsmName, strerror (errno));
-	}
-	xfree (AsmName);
+   	AssembleIntermediate (AsmName);
     }
+
+    /* Free the assembler file name which was allocated from the heap */
+    xfree (AsmName);
 }
 
 
@@ -553,11 +595,7 @@ static void CompileRes (const char* File)
      * remove it
      */
     if (!DontAssemble) {
-	Assemble (AsmName);
-	if (remove (AsmName) < 0) {
-	    Warning ("Cannot remove temporary file `%s': %s",
-		     AsmName, strerror (errno));
-	}
+	AssembleIntermediate (AsmName);
     }
 
     /* Free the assembler file name which was allocated from the heap */
@@ -574,7 +612,7 @@ static void ConvertO65 (const char* File)
     /* Remember the current converter argument count */
     unsigned ArgCount = CO65.ArgCount;
 
-    /* If we won't link, this is the final step. In this case, set the
+    /* If we won't assemble, this is the final step. In this case, set the
      * output name.
      */
     if (DontAssemble && OutputName) {
@@ -602,11 +640,7 @@ static void ConvertO65 (const char* File)
      * remove it
      */
     if (!DontAssemble) {
-	Assemble (AsmName);
-	if (remove (AsmName) < 0) {
-	    Warning ("Cannot remove temporary file `%s': %s",
-		     AsmName, strerror (errno));
-	}
+       	AssembleIntermediate (AsmName);
     }
 
     /* Free the assembler file name which was allocated from the heap */
@@ -626,85 +660,86 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] file [...]\n"
             "Short options:\n"
-            "  -c\t\t\tCompile and assemble but don't link\n"
-            "  -d\t\t\tDebug mode\n"
-            "  -g\t\t\tAdd debug info\n"
-            "  -h\t\t\tHelp (this text)\n"
-            "  -l\t\t\tCreate an assembler listing\n"
-            "  -m name\t\tCreate a map file\n"
-            "  -mm model\t\tSet the memory model\n"
-            "  -o name\t\tName the output file\n"
-            "  -r\t\t\tEnable register variables\n"
-            "  -t sys\t\tSet the target system\n"
-            "  -u sym\t\tForce an import of symbol `sym'\n"
-            "  -v\t\t\tVerbose mode\n"
-            "  -vm\t\t\tVerbose map file\n"
-            "  -C name\t\tUse linker config file\n"
-            "  -Cl\t\t\tMake local variables static\n"
-            "  -D sym[=defn]\t\tDefine a preprocessor symbol\n"
-            "  -I dir\t\tSet a compiler include directory path\n"
-            "  -L path\t\tSpecify a library search path\n"
-            "  -Ln name\t\tCreate a VICE label file\n"
-            "  -O\t\t\tOptimize code\n"
-            "  -Oi\t\t\tOptimize code, inline functions\n"
-            "  -Or\t\t\tOptimize code, honour the register keyword\n"
-            "  -Os\t\t\tOptimize code, inline known C funtions\n"
-            "  -S\t\t\tCompile but don't assemble and link\n"
-            "  -T\t\t\tInclude source as comment\n"
-            "  -V\t\t\tPrint the version number\n"
-            "  -W\t\t\tSuppress warnings\n"
-            "  -Wa options\t\tPass options to the assembler\n"
-            "  -Wl options\t\tPass options to the linker\n"
+            "  -c\t\t\t\tCompile and assemble but don't link\n"
+            "  -d\t\t\t\tDebug mode\n"
+            "  -g\t\t\t\tAdd debug info\n"
+            "  -h\t\t\t\tHelp (this text)\n"
+            "  -l\t\t\t\tCreate an assembler listing\n"
+            "  -m name\t\t\tCreate a map file\n"
+            "  -mm model\t\t\tSet the memory model\n"
+            "  -o name\t\t\tName the output file\n"
+            "  -r\t\t\t\tEnable register variables\n"
+            "  -t sys\t\t\tSet the target system\n"
+            "  -u sym\t\t\tForce an import of symbol `sym'\n"
+            "  -v\t\t\t\tVerbose mode\n"
+            "  -vm\t\t\t\tVerbose map file\n"
+            "  -C name\t\t\tUse linker config file\n"
+            "  -Cl\t\t\t\tMake local variables static\n"
+            "  -D sym[=defn]\t\t\tDefine a preprocessor symbol\n"
+            "  -I dir\t\t\tSet a compiler include directory path\n"
+            "  -L path\t\t\tSpecify a library search path\n"
+            "  -Ln name\t\t\tCreate a VICE label file\n"
+            "  -O\t\t\t\tOptimize code\n"
+            "  -Oi\t\t\t\tOptimize code, inline functions\n"
+            "  -Or\t\t\t\tOptimize code, honour the register keyword\n"
+            "  -Os\t\t\t\tOptimize code, inline known C funtions\n"
+            "  -S\t\t\t\tCompile but don't assemble and link\n"
+            "  -T\t\t\t\tInclude source as comment\n"
+            "  -V\t\t\t\tPrint the version number\n"
+            "  -W\t\t\t\tSuppress warnings\n"
+            "  -Wa options\t\t\tPass options to the assembler\n"
+            "  -Wl options\t\t\tPass options to the linker\n"
             "\n"
             "Long options:\n"
-            "  --add-source\t\tInclude source as comment\n"
-            "  --asm-args options\tPass options to the assembler\n"
-            "  --asm-define sym[=v]\tDefine an assembler symbol\n"
-            "  --asm-include-dir dir\tSet an assembler include directory\n"
-            "  --bss-label name\tDefine and export a BSS segment label\n"
-            "  --bss-name seg\tSet the name of the BSS segment\n"
-            "  --cfg-path path\tSpecify a config file search path\n"
-            "  --check-stack\t\tGenerate stack overflow checks\n"
-            "  --code-label name\tDefine and export a CODE segment label\n"
-            "  --code-name seg\tSet the name of the CODE segment\n"
-            "  --codesize x\t\tAccept larger code by factor x\n"
-            "  --config name\t\tUse linker config file\n"
-            "  --cpu type\t\tSet cpu type\n"
-            "  --create-dep\t\tCreate a make dependency file\n"
-            "  --data-label name\tDefine and export a DATA segment label\n"
-            "  --data-name seg\tSet the name of the DATA segment\n"
-            "  --debug\t\tDebug mode\n"
-            "  --debug-info\t\tAdd debug info\n"
-            "  --feature name\tSet an emulation feature\n"
-            "  --force-import sym\tForce an import of symbol `sym'\n"
-            "  --forget-inc-paths\tForget include search paths (compiler)\n"
-            "  --help\t\tHelp (this text)\n"
-            "  --include-dir dir\tSet a compiler include directory path\n"
-            "  --ld-args options\tPass options to the linker\n"
-            "  --lib file\t\tLink this library\n"
-            "  --lib-path path\tSpecify a library search path\n"
-            "  --list-targets\tList all available targets\n"
-            "  --listing\t\tCreate an assembler listing\n"
-            "  --list-bytes n\tNumber of bytes per assembler listing line\n"
-            "  --mapfile name\tCreate a map file\n"
-            "  --memory-model model\tSet the memory model\n"
-            "  --module\t\tLink as a module\n"
-            "  --module-id id\tSpecify a module id for the linker\n"
-            "  --o65-model model\tOverride the o65 model\n"
-            "  --obj file\t\tLink this object file\n"
-            "  --obj-path path\tSpecify an object file search path\n"
-            "  --register-space b\tSet space available for register variables\n"
-            "  --register-vars\tEnable register variables\n"
-            "  --rodata-name seg\tSet the name of the RODATA segment\n"
-            "  --signed-chars\tDefault characters are signed\n"
-            "  --standard std\tLanguage standard (c89, c99, cc65)\n"
-            "  --start-addr addr\tSet the default start address\n"
-            "  --static-locals\tMake local variables static\n"
-            "  --target sys\t\tSet the target system\n"
-            "  --version\t\tPrint the version number\n"
-            "  --verbose\t\tVerbose mode\n"
-            "  --zeropage-label name\tDefine and export a ZEROPAGE segment label\n"
-            "  --zeropage-name seg\tSet the name of the ZEROPAGE segment\n",
+            "  --add-source\t\t\tInclude source as comment\n"
+            "  --asm-args options\t\tPass options to the assembler\n"
+            "  --asm-define sym[=v]\t\tDefine an assembler symbol\n"
+            "  --asm-include-dir dir\t\tSet an assembler include directory\n"
+            "  --bss-label name\t\tDefine and export a BSS segment label\n"
+            "  --bss-name seg\t\tSet the name of the BSS segment\n"
+            "  --cfg-path path\t\tSpecify a config file search path\n"
+            "  --check-stack\t\t\tGenerate stack overflow checks\n"
+            "  --code-label name\t\tDefine and export a CODE segment label\n"
+            "  --code-name seg\t\tSet the name of the CODE segment\n"
+            "  --codesize x\t\t\tAccept larger code by factor x\n"
+            "  --config name\t\t\tUse linker config file\n"
+            "  --cpu type\t\t\tSet cpu type\n"
+            "  --create-dep name\t\tCreate a make dependency file\n"
+            "  --create-full-dep name\tCreate a full make dependency file\n"
+            "  --data-label name\t\tDefine and export a DATA segment label\n"
+            "  --data-name seg\t\tSet the name of the DATA segment\n"
+            "  --debug\t\t\tDebug mode\n"
+            "  --debug-info\t\t\tAdd debug info\n"
+            "  --feature name\t\tSet an emulation feature\n"
+            "  --force-import sym\t\tForce an import of symbol `sym'\n"
+            "  --forget-inc-paths\t\tForget include search paths (compiler)\n"
+            "  --help\t\t\tHelp (this text)\n"
+            "  --include-dir dir\t\tSet a compiler include directory path\n"
+            "  --ld-args options\t\tPass options to the linker\n"
+            "  --lib file\t\t\tLink this library\n"
+            "  --lib-path path\t\tSpecify a library search path\n"
+            "  --list-targets\t\tList all available targets\n"
+            "  --listing\t\t\tCreate an assembler listing\n"
+            "  --list-bytes n\t\tNumber of bytes per assembler listing line\n"
+            "  --mapfile name\t\tCreate a map file\n"
+            "  --memory-model model\t\tSet the memory model\n"
+            "  --module\t\t\tLink as a module\n"
+            "  --module-id id\t\tSpecify a module id for the linker\n"
+            "  --o65-model model\t\tOverride the o65 model\n"
+            "  --obj file\t\t\tLink this object file\n"
+            "  --obj-path path\t\tSpecify an object file search path\n"
+            "  --register-space b\t\tSet space available for register variables\n"
+            "  --register-vars\t\tEnable register variables\n"
+            "  --rodata-name seg\t\tSet the name of the RODATA segment\n"
+            "  --signed-chars\t\tDefault characters are signed\n"
+            "  --standard std\t\tLanguage standard (c89, c99, cc65)\n"
+            "  --start-addr addr\t\tSet the default start address\n"
+            "  --static-locals\t\tMake local variables static\n"
+            "  --target sys\t\t\tSet the target system\n"
+            "  --version\t\t\tPrint the version number\n"
+            "  --verbose\t\t\tVerbose mode\n"
+            "  --zeropage-label name\t\tDefine and export a ZEROPAGE segment label\n"
+            "  --zeropage-name seg\t\tSet the name of the ZEROPAGE segment\n",
             ProgName);
 }
 
@@ -823,11 +858,26 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptCreateDep (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+static void OptCreateDep (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --create-dep option */
 {
-    CmdAddArg (&CC65, "--create-dep");
+    /* Add the file name to the compiler */
+    CmdAddArg2 (&CC65, "--create-dep", Arg);
+
+    /* Remember the file name for the assembler */
+    DepName = Arg;
+}
+
+
+
+static void OptCreateFullDep (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --create-full-dep option */
+{
+    /* Add the file name to the compiler */
+    CmdAddArg2 (&CC65, "--create-full-dep", Arg);
+
+    /* Remember the file name for the assembler */
+    FullDepName = Arg;
 }
 
 
@@ -1168,7 +1218,8 @@ int main (int argc, char* argv [])
 	{ "--codesize",	 	1,	OptCodeSize		},
         { "--config",           1,      OptConfig               },
         { "--cpu",     	       	1, 	OptCPU 			},
-	{ "--create-dep",    	0,	OptCreateDep 		},
+ 	{ "--create-dep",       1,      OptCreateDep            },
+	{ "--create-full-dep",  1,      OptCreateFullDep        },
        	{ "--data-label",      	1,     	OptDataLabel            },
 	{ "--data-name",     	1, 	OptDataName  		},
 	{ "--debug",	     	0,	OptDebug		},

@@ -51,12 +51,8 @@
 
 
 
-/* An enum that describes different types of input files */
-typedef enum {
-    IT_MAIN,                    /* Main input file */
-    IT_SYSINC,                  /* System include file (using <>) */
-    IT_USERINC,                 /* User include file (using "") */
-} InputType;
+/* Forward for an IFile structure */
+struct IFile;
 
 /* The current input line */
 extern StrBuf* Line;
@@ -64,17 +60,6 @@ extern StrBuf* Line;
 /* Current and next input character */
 extern char CurC;
 extern char NextC;
-
-/* Struct that describes an input file */
-typedef struct IFile IFile;
-struct IFile {
-    unsigned	    Index;     	/* File index */
-    unsigned	    Usage;     	/* Usage counter */
-    unsigned long   Size;       /* File size */
-    unsigned long   MTime;      /* Time of last modification */
-    InputType       Type;       /* Type of input file */
-    char       	    Name[1];  	/* Name of file (dynamically allocated) */
-};
 
 
 
@@ -107,14 +92,17 @@ StrBuf* InitLine (StrBuf* Buf);
 int NextLine (void);
 /* Get a line from the current input. Returns 0 on end of file. */
 
+const char* GetInputFile (const struct IFile* IF);
+/* Return a filename from an IFile struct */
+
 const char* GetCurrentFile (void);
 /* Return the name of the current input file */
 
 unsigned GetCurrentLine (void);
 /* Return the line number in the current input file */
 
-void WriteDependencies (FILE* F, const char* OutputFile);
-/* Write a makefile dependency list to the given file */
+void CreateDependencies (void);
+/* Create dependency files requested by the user */
 
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -82,57 +82,58 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] file\n"
             "Short options:\n"
-            "  -Cl\t\t\tMake local variables static\n"
-            "  -Dsym[=defn]\t\tDefine a symbol\n"
-            "  -E\t\t\tStop after the preprocessing stage\n"
-            "  -I dir\t\tSet an include directory search path\n"
-            "  -O\t\t\tOptimize code\n"
-            "  -Oi\t\t\tOptimize code, inline more code\n"
-            "  -Or\t\t\tEnable register variables\n"
-            "  -Os\t\t\tInline some known functions\n"
-            "  -T\t\t\tInclude source as comment\n"
-            "  -V\t\t\tPrint the compiler version number\n"
-            "  -W\t\t\tSuppress warnings\n"
-            "  -d\t\t\tDebug mode\n"
-            "  -g\t\t\tAdd debug info to object file\n"
-            "  -h\t\t\tHelp (this text)\n"
-            "  -j\t\t\tDefault characters are signed\n"
-            "  -mm model\t\tSet the memory model\n"
-            "  -o name\t\tName the output file\n"
-            "  -r\t\t\tEnable register variables\n"
-            "  -t sys\t\tSet the target system\n"
-            "  -v\t\t\tIncrease verbosity\n"
+            "  -Cl\t\t\t\tMake local variables static\n"
+            "  -Dsym[=defn]\t\t\tDefine a symbol\n"
+            "  -E\t\t\t\tStop after the preprocessing stage\n"
+            "  -I dir\t\t\tSet an include directory search path\n"
+            "  -O\t\t\t\tOptimize code\n"
+            "  -Oi\t\t\t\tOptimize code, inline more code\n"
+            "  -Or\t\t\t\tEnable register variables\n"
+            "  -Os\t\t\t\tInline some known functions\n"
+            "  -T\t\t\t\tInclude source as comment\n"
+            "  -V\t\t\t\tPrint the compiler version number\n"
+            "  -W\t\t\t\tSuppress warnings\n"
+            "  -d\t\t\t\tDebug mode\n"
+            "  -g\t\t\t\tAdd debug info to object file\n"
+            "  -h\t\t\t\tHelp (this text)\n"
+            "  -j\t\t\t\tDefault characters are signed\n"
+            "  -mm model\t\t\tSet the memory model\n"
+            "  -o name\t\t\tName the output file\n"
+            "  -r\t\t\t\tEnable register variables\n"
+            "  -t sys\t\t\tSet the target system\n"
+            "  -v\t\t\t\tIncrease verbosity\n"
             "\n"
             "Long options:\n"
-            "  --add-source\t\tInclude source as comment\n"
-            "  --bss-name seg\tSet the name of the BSS segment\n"
-            "  --check-stack\t\tGenerate stack overflow checks\n"
-            "  --code-name seg\tSet the name of the CODE segment\n"
-            "  --codesize x\t\tAccept larger code by factor x\n"
-            "  --cpu type\t\tSet cpu type (6502, 65c02)\n"
-            "  --create-dep\t\tCreate a make dependency file\n"
-            "  --data-name seg\tSet the name of the DATA segment\n"
-            "  --debug\t\tDebug mode\n"
-            "  --debug-info\t\tAdd debug info to object file\n"
-            "  --debug-opt name\tDebug optimization steps\n"
-            "  --disable-opt name\tDisable an optimization step\n"
-            "  --enable-opt name\tEnable an optimization step\n"
-            "  --forget-inc-paths\tForget include search paths\n"
-            "  --help\t\tHelp (this text)\n"
-            "  --include-dir dir\tSet an include directory search path\n"
-            "  --list-opt-steps\tList all optimizer steps and exit\n"
-            "  --local-strings\tEmit string literals immediately\n"
-            "  --memory-model model\tSet the memory model\n"       
-            "  --register-space b\tSet space available for register variables\n"
-            "  --register-vars\tEnable register variables\n"
-            "  --rodata-name seg\tSet the name of the RODATA segment\n"
-            "  --signed-chars\tDefault characters are signed\n"
-            "  --standard std\tLanguage standard (c89, c99, cc65)\n"
-            "  --static-locals\tMake local variables static\n"
-            "  --target sys\t\tSet the target system\n"
-            "  --verbose\t\tIncrease verbosity\n"
-            "  --version\t\tPrint the compiler version number\n"
-            "  --writable-strings\tMake string literals writable\n",
+            "  --add-source\t\t\tInclude source as comment\n"
+            "  --bss-name seg\t\tSet the name of the BSS segment\n"
+            "  --check-stack\t\t\tGenerate stack overflow checks\n"
+            "  --code-name seg\t\tSet the name of the CODE segment\n"
+            "  --codesize x\t\t\tAccept larger code by factor x\n"
+            "  --cpu type\t\t\tSet cpu type (6502, 65c02)\n"
+            "  --create-dep name\t\tCreate a make dependency file\n"
+            "  --create-full-dep name\tCreate a full make dependency file\n"
+            "  --data-name seg\t\tSet the name of the DATA segment\n"
+            "  --debug\t\t\tDebug mode\n"
+            "  --debug-info\t\t\tAdd debug info to object file\n"
+            "  --debug-opt name\t\tDebug optimization steps\n"
+            "  --disable-opt name\t\tDisable an optimization step\n"
+            "  --enable-opt name\t\tEnable an optimization step\n"
+            "  --forget-inc-paths\t\tForget include search paths\n"
+            "  --help\t\t\tHelp (this text)\n"
+            "  --include-dir dir\t\tSet an include directory search path\n"
+            "  --list-opt-steps\t\tList all optimizer steps and exit\n"
+            "  --local-strings\t\tEmit string literals immediately\n"
+            "  --memory-model model\t\tSet the memory model\n"
+            "  --register-space b\t\tSet space available for register variables\n"
+            "  --register-vars\t\tEnable register variables\n"
+            "  --rodata-name seg\t\tSet the name of the RODATA segment\n"
+            "  --signed-chars\t\tDefault characters are signed\n"
+            "  --standard std\t\tLanguage standard (c89, c99, cc65)\n"
+            "  --static-locals\t\tMake local variables static\n"
+            "  --target sys\t\t\tSet the target system\n"
+            "  --verbose\t\t\tIncrease verbosity\n"
+            "  --version\t\t\tPrint the compiler version number\n"
+            "  --writable-strings\t\tMake string literals writable\n",
             ProgName);
 }
 
@@ -242,29 +243,16 @@ static void SetSys (const char* Sys)
 
 
 
-static void DoCreateDep (const char* OutputName)
-/* Create the dependency file */
+static void FileNameOption (const char* Opt, const char* Arg, StrBuf* Name)
+/* Handle an option that remembers a file name for later */
 {
-    /* Make the dependency file name from the output file name */
-    char* DepName = MakeFilename (OutputName, ".u");
-
-    /* Open the file */
-    FILE* F = fopen (DepName, "w");
-    if (F == 0) {
-    	Fatal ("Cannot open dependency file `%s': %s", DepName, strerror (errno));
+    /* Cannot have the option twice */
+    if (SB_NotEmpty (Name)) {
+        AbEnd ("Cannot use option `%s' twice", Opt);
     }
-
-    /* Write the dependencies to the file */
-    WriteDependencies (F, OutputName);
-
-    /* Close the file, check for errors */
-    if (fclose (F) != 0) {
-    	remove (DepName);
-    	Fatal ("Cannot write to dependeny file (disk full?)");
-    }
-
-    /* Free the name */
-    xfree (DepName);
+    /* Remember the file name for later */
+    SB_CopyStr (Name, Arg);
+    SB_Terminate (Name);
 }
 
 
@@ -325,7 +313,7 @@ static void CheckSegName (const char* Seg)
 
 
 static void OptAddSource (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+	     		  const char* Arg attribute ((unused)))
 /* Add source lines as comments in generated assembler file */
 {
     AddSource = 1;
@@ -382,11 +370,19 @@ static void OptCodeSize (const char* Opt, const char* Arg)
 
 
 
-static void OptCreateDep (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+static void OptCreateDep (const char* Opt, const char* Arg)
 /* Handle the --create-dep option */
 {
-    CreateDep = 1;
+    FileNameOption (Opt, Arg, &DepName);
+}
+
+
+
+static void OptCreateFullDep (const char* Opt attribute ((unused)),
+		      	      const char* Arg)
+/* Handle the --create-full-dep option */
+{
+    FileNameOption (Opt, Arg, &FullDepName);
 }
 
 
@@ -750,7 +746,8 @@ int main (int argc, char* argv[])
 	{ "--code-name",	1, 	OptCodeName  		},
 	{ "--codesize",		1,	OptCodeSize		},
         { "--cpu",     	       	1, 	OptCPU 	     		},
-	{ "--create-dep",	0,	OptCreateDep 		},
+	{ "--create-dep",      	1,	OptCreateDep 		},
+        { "--create-full-dep",  1,      OptCreateFullDep        },
 	{ "--data-name",	1, 	OptDataName  		},
        	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
@@ -868,7 +865,7 @@ int main (int argc, char* argv[])
 
        		case 'I':
 		    OptIncludeDir (Arg, GetArg (&I, 2));
-		    break;
+	     	    break;
 
 		case 'O':
 		    IS_Set (&Optimize, 1);
@@ -963,11 +960,7 @@ int main (int argc, char* argv[])
         CloseOutputFile ();
 
 	/* Create dependencies if requested */
-	if (CreateDep) {
-	    DoCreateDep (OutputFilename);
-	    Print (stdout, 1, "Creating dependeny file\n");
-	}
-
+        CreateDependencies ();
     }
 
     /* Return an apropriate exit code */

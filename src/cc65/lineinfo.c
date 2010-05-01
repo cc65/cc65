@@ -181,7 +181,7 @@ const char* GetInputName (const LineInfo* LI)
 /* Return the file name from a line info */
 {
     PRECONDITION (LI != 0);
-    return LI->InputFile->Name;
+    return GetInputFile (LI->InputFile);
 }
 
 

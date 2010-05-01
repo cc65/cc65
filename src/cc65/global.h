@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -40,6 +40,7 @@
 
 /* common */
 #include "intstack.h"
+#include "strbuf.h"
 
 
 
@@ -52,7 +53,6 @@
 /* Options */
 extern unsigned char	AddSource;		/* Add source lines as comments */
 extern unsigned char	DebugInfo;		/* Add debug info to the obj */
-extern unsigned char	CreateDep;		/* Create a dependency file */
 extern unsigned char    PreprocessOnly;         /* Just preprocess the input */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
 
@@ -68,6 +68,10 @@ extern IntStack         SignedChars;		/* Make characters signed by default */
 extern IntStack         CheckStack;		/* Generate stack overflow checks */
 extern IntStack         Optimize;		/* Optimize flag */
 extern IntStack         CodeSizeFactor;		/* Size factor for generated code */
+
+/* File names */
+extern StrBuf           DepName;                /* Name of dependencies file */
+extern StrBuf           FullDepName;            /* Name of full dependencies file */
 
 
 

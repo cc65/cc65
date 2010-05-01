@@ -49,52 +49,60 @@ The compiler may be called as follows:
 
 <tscreen><verb>
 ---------------------------------------------------------------------------
-Usage: cc65 [options] file
-Short options:
-  -Cl                   Make local variables static
-  -Dsym[=defn]          Define a symbol
-  -I dir                Set an include directory search path
-  -O                    Optimize code
-  -Oi                   Optimize code, inline more code
-  -Or                   Enable register variables
-  -Os                   Inline some known functions
-  -T                    Include source as comment
-  -V                    Print the compiler version number
-  -W name[,name]        Enable or disable warnings
-  -d                    Debug mode
-  -g                    Add debug info to object file
-  -h                    Help (this text)
-  -j                    Default characters are signed
-  -o name               Name the output file
-  -r                    Enable register variables
-  -t sys                Set the target system
-  -v                    Increase verbosity
+Usage: cc65 [options] file                                                 
+Short options:                                                             
+  -Cl                           Make local variables static                
+  -Dsym[=defn]                  Define a symbol                            
+  -E                            Stop after the preprocessing stage         
+  -I dir                        Set an include directory search path       
+  -O                            Optimize code
+  -Oi                           Optimize code, inline more code
+  -Or                           Enable register variables
+  -Os                           Inline some known functions
+  -T                            Include source as comment
+  -V                            Print the compiler version number
+  -W                            Suppress warnings
+  -d                            Debug mode
+  -g                            Add debug info to object file
+  -h                            Help (this text)
+  -j                            Default characters are signed
+  -mm model                     Set the memory model
+  -o name                       Name the output file
+  -r                            Enable register variables
+  -t sys                        Set the target system
+  -v                            Increase verbosity
 
 Long options:
-  --add-source          Include source as comment
-  --bss-name seg        Set the name of the BSS segment
-  --check-stack         Generate stack overflow checks
-  --code-name seg       Set the name of the CODE segment
-  --codesize x          Accept larger code by factor x
-  --cpu type            Set cpu type
-  --create-dep          Create a make dependency file
-  --data-name seg       Set the name of the DATA segment
-  --debug               Debug mode
-  --debug-info          Add debug info to object file
-  --forget-inc-paths    Forget include search paths
-  --help                Help (this text)
-  --include-dir dir     Set an include directory search path
-  --local-strings       Emit string literals immediately
-  --register-space b    Set space available for register variables
-  --register-vars       Enable register variables
-  --rodata-name seg     Set the name of the RODATA segment
-  --signed-chars        Default characters are signed
-  --standard std        Language standard (c89, c99, cc65)
-  --static-locals       Make local variables static
-  --target sys          Set the target system
-  --verbose             Increase verbosity
-  --version             Print the compiler version number
-  --writable-strings    Make string literals writable
+  --add-source                  Include source as comment
+  --bss-name seg                Set the name of the BSS segment
+  --check-stack                 Generate stack overflow checks
+  --code-name seg               Set the name of the CODE segment
+  --codesize x                  Accept larger code by factor x
+  --cpu type                    Set cpu type (6502, 65c02)
+  --create-dep name             Create a make dependency file
+  --create-full-dep name        Create a full make dependency file
+  --data-name seg               Set the name of the DATA segment
+  --debug                       Debug mode
+  --debug-info                  Add debug info to object file
+  --debug-opt name              Debug optimization steps
+  --disable-opt name            Disable an optimization step
+  --enable-opt name             Enable an optimization step
+  --forget-inc-paths            Forget include search paths
+  --help                        Help (this text)
+  --include-dir dir             Set an include directory search path
+  --list-opt-steps              List all optimizer steps and exit
+  --local-strings               Emit string literals immediately
+  --memory-model model          Set the memory model
+  --register-space b            Set space available for register variables
+  --register-vars               Enable register variables
+  --rodata-name seg             Set the name of the RODATA segment
+  --signed-chars                Default characters are signed
+  --standard std                Language standard (c89, c99, cc65)
+  --static-locals               Make local variables static
+  --target sys                  Set the target system
+  --verbose                     Increase verbosity
+  --version                     Print the compiler version number
+  --writable-strings            Make string literals writable
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -139,20 +147,29 @@ Here is a description of all the command line options:
   <label id="option-cpu">
   <tag><tt>--cpu CPU</tt></tag>
 
-  A new, still experimental option. You may specify "6502" or "65C02" as
-  the CPU. 6502 is the default, so this will not change anything.
-  Specifying 65C02 will use a few 65C02 instructions when generating code.
-  Don't expect too much from this option: It is still new (and may have
-  bugs), and the additional instructions for the 65C02 are not that
-  overwhelming.
+  A new, still experimental option. You may specify "6502" or "65C02" as the
+  CPU. 6502 is the default, so this will not change anything. Specifying 65C02
+  will use a few 65C02 instructions when generating code. Don't expect too
+  much from this option: It is still new (and may have bugs), and the
+  additional instructions for the 65C02 are not that overwhelming.
 
 
   <label id="option-create-dep">
-  <tag><tt>--create-dep</tt></tag>
+  <tag><tt>--create-dep name</tt></tag>
 
-  Tells the compiler to generate a file containing the dependency list for
-  the compiled module in makefile syntax. The file is named as the C input
-  file with the extension replaced by <tt/.u/.
+  Tells the compiler to generate a file containing the dependency list for the
+  compiled module in makefile syntax. The output is written to a file with the
+  given name. The output does not include system include files (in angle
+  brackets).
+
+
+  <label id="option-create-full-dep">
+  <tag><tt>--create-full-dep name</tt></tag>
+
+  Tells the compiler to generate a file containing the dependency list for the
+  compiled module in makefile syntax. The output is written to a file with the
+  given name. The output does include system include files (in angle
+  brackets).
 
 
   <label id="option-data-name">

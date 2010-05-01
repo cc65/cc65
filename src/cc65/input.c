@@ -43,14 +43,17 @@
 #include "check.h"
 #include "coll.h"
 #include "print.h"
+#include "strbuf.h"
 #include "xmalloc.h"
 
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
+#include "global.h"
 #include "incpath.h"
-#include "lineinfo.h"
 #include "input.h"
+#include "lineinfo.h"
+#include "output.h"
 
 
 
@@ -59,6 +62,15 @@
 /*****************************************************************************/
 
 
+
+/* An enum that describes different types of input files. The members are
+ * choosen so that it is possible to combine them to bitsets
+ */
+typedef enum {
+    IT_MAIN     = 0x01,         /* Main input file */
+    IT_SYSINC   = 0x02,         /* System include file (using <>) */
+    IT_USERINC  = 0x04,         /* User include file (using "") */
+} InputType;
 
 /* The current input line */
 StrBuf* Line;
@@ -69,6 +81,17 @@ char NextC = '\0';
 
 /* Maximum count of nested includes */
 #define MAX_INC_NESTING 	16
+
+/* Struct that describes an input file */
+typedef struct IFile IFile;
+struct IFile {
+    unsigned	    Index;     	/* File index */
+    unsigned	    Usage;     	/* Usage counter */
+    unsigned long   Size;       /* File size */
+    unsigned long   MTime;      /* Time of last modification */
+    InputType       Type;       /* Type of input file */
+    char       	    Name[1];  	/* Name of file (dynamically allocated) */
+};
 
 /* Struct that describes an active input file */
 typedef struct AFile AFile;
@@ -490,6 +513,14 @@ int NextLine (void)
 
 
 
+const char* GetInputFile (const struct IFile* IF)
+/* Return a filename from an IFile struct */
+{
+    return IF->Name;
+}
+
+
+
 const char* GetCurrentFile (void)
 /* Return the name of the current input file */
 {
@@ -526,30 +557,77 @@ unsigned GetCurrentLine (void)
 
 
 
-void WriteDependencies (FILE* F, const char* OutputFile)
-/* Write a makefile dependency list to the given file */
+static void WriteDep (FILE* F, InputType Types)
+/* Helper function. Writes all file names that match Types to the output */
 {
     unsigned I;
 
-    /* Get the number of input files */
-    unsigned IFileCount = CollCount (&IFiles);
-
-    /* Print the output file followed by a tab char */
-    fprintf (F, "%s:\t", OutputFile);
-
     /* Loop over all files */
-    for (I = 0; I < IFileCount; ++I) {
-	/* Get the next input file */
-	const IFile* IF = (const IFile*) CollAt (&IFiles, I);
-	/* If this is not the first file, add a space */
-	const char* Format = (I == 0)? "%s" : " %s";
-	/* Print the dependency */
-	fprintf (F, Format, IF->Name);
-    }
+    unsigned FileCount = CollCount (&IFiles);
+    for (I = 0; I < FileCount; ++I) {
 
-    /* End the line */
-    fprintf (F, "\n\n");
+    	/* Get the next input file */
+    	const IFile* IF = (const IFile*) CollAt (&IFiles, I);
+
+        /* Ignore it if it is not of the correct type */
+        if ((IF->Type & Types) == 0) {
+            continue;
+        }
+
+    	/* If this is not the first file, add a space */
+       	if (I > 0) {
+            fputc (' ', F);
+        }
+
+    	/* Print the dependency */
+        fputs (IF->Name, F);
+    }
 }
 
+
+
+static void CreateDepFile (const char* Name, InputType Types)
+/* Create a dependency file with the given name and place dependencies for
+ * all files with the given types there.
+ */
+{
+    /* Open the file */
+    FILE* F = fopen (Name, "w");
+    if (F == 0) {
+     	Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
+    }
+
+    /* Print the output file followed by a tab char */
+    fprintf (F, "%s:\t", OutputFilename);
+
+    /* Write out the dependencies for the output file */
+    WriteDep (F, Types);
+    fputs ("\n\n", F);
+
+    /* Write out a phony dependency for the included files */
+    WriteDep (F, Types);
+    fputs (":\n\n", F);
+
+    /* Close the file, check for errors */
+    if (fclose (F) != 0) {
+    	remove (Name);
+    	Fatal ("Cannot write to dependeny file (disk full?)");
+    }
+}
+
+
+
+void CreateDependencies (void)
+/* Create dependency files requested by the user */
+{
+    if (SB_NotEmpty (&DepName)) {
+        CreateDepFile (SB_GetConstBuf (&DepName),
+                       IT_MAIN | IT_USERINC);
+    }
+    if (SB_NotEmpty (&FullDepName)) {
+        CreateDepFile (SB_GetConstBuf (&FullDepName),
+                       IT_MAIN | IT_SYSINC | IT_USERINC);
+    }
+}
 
 

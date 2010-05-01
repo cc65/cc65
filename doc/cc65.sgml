@@ -49,12 +49,12 @@ The compiler may be called as follows:
 
 <tscreen><verb>
 ---------------------------------------------------------------------------
-Usage: cc65 [options] file                                                 
-Short options:                                                             
-  -Cl                           Make local variables static                
-  -Dsym[=defn]                  Define a symbol                            
-  -E                            Stop after the preprocessing stage         
-  -I dir                        Set an include directory search path       
+Usage: cc65 [options] file
+Short options:
+  -Cl                           Make local variables static
+  -Dsym[=defn]                  Define a symbol
+  -E                            Stop after the preprocessing stage
+  -I dir                        Set an include directory search path
   -O                            Optimize code
   -Oi                           Optimize code, inline more code
   -Or                           Enable register variables
@@ -283,15 +283,29 @@ Here is a description of all the command line options:
 
   This option allows to set the language standard supported. The argument is
   one of
-  <itemize>
-  <item>c89
-  <item>c99
-  <item>cc65
-  </itemize>
+  <descrip>
+    <tag/c89/
+      This disables anything that is illegal in C89/C90. Among those things
+      are <tt>//</tt> comments and the non-standard keywords without
+      underscores. Please note that cc65 is not a fully C89 compliant compiler
+      despite this option. A few more things (like floats) are missing.
 
-  Please note that the compiler does not support the c99 standard and never
-  will. c99 mode is actually c89 mode with a few selected c99 extensions
-  (// comments for example).
+    <tag/c99/
+      This enables a few features from the C99 standard. With this option,
+      <tt>//</tt> comments are allowed. It will also cause warnings and even
+      errors in a few situations that are allowed with <tt/--standard c89/.
+      For example, a call to a function without a prototype is an error in
+      this mode.
+
+    <tag/cc65/
+      This is the default mode. It is like c99 mode, but additional features
+      are enabled. Among these are "void data", non-standard keywords without
+      the underlines, unnamed function parameters and the requirement for
+      main() to return an int.
+  </descrip>
+
+  Please note that the compiler does not support the C99 standard and never
+  will. c99 mode is actually c89 mode with a few selected C99 extensions.
 
 
   <label id="option-standard">

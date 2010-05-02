@@ -85,6 +85,7 @@ Long options:
   --debug                       Debug mode
   --debug-info                  Add debug info to object file
   --debug-opt name              Debug optimization steps
+  --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
   --enable-opt name             Enable an optimization step
   --forget-inc-paths            Forget include search paths
@@ -183,6 +184,16 @@ Here is a description of all the command line options:
 
   Enables debug mode, something that should not be needed for mere
   mortals:-)
+
+
+  <label id="option-dep-target">
+  <tag><tt>--dep-target target</tt></tag>
+
+  When generating a dependency file, don't use the actual output file as the
+  target of the dependency, but the file specified with this option. The
+  option has no effect if neither <tt/<ref id="option-create-dep"
+  name="--create-dep">/ nor <tt/<ref id="option-create-full-dep"
+  name="--create-full-dep">/ is specified.
 
 
   <tag><tt>-D sym[=definition]</tt></tag>

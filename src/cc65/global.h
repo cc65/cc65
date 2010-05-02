@@ -72,6 +72,7 @@ extern IntStack         CodeSizeFactor;		/* Size factor for generated code */
 /* File names */
 extern StrBuf           DepName;                /* Name of dependencies file */
 extern StrBuf           FullDepName;            /* Name of full dependencies file */
+extern StrBuf           DepTarget;              /* Name of dependency target */
 
 
 

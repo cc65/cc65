@@ -590,15 +590,24 @@ static void CreateDepFile (const char* Name, InputType Types)
 /* Create a dependency file with the given name and place dependencies for
  * all files with the given types there.
  */
-{
+{      
+    const char* Target;
+
     /* Open the file */
     FILE* F = fopen (Name, "w");
     if (F == 0) {
-     	Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
+       	Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
     }
 
-    /* Print the output file followed by a tab char */
-    fprintf (F, "%s:\t", OutputFilename);
+    /* If a dependency target was given, use it, otherwise use the output
+     * file name as target, followed by a tab character.
+     */
+    if (SB_IsEmpty (&DepTarget)) {
+        Target = OutputFilename;
+    } else {
+        Target = SB_GetConstBuf (&DepTarget);
+    }
+    fprintf (F, "%s:\t", Target);
 
     /* Write out the dependencies for the output file */
     WriteDep (F, Types);

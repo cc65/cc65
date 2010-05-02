@@ -64,6 +64,7 @@ IntStack CodeSizeFactor	    = INTSTACK(100);/* Size factor for generated code */
 /* File names */
 StrBuf DepName     = STATIC_STRBUF_INITIALIZER; /* Name of dependencies file */
 StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Name of full dependencies file */
+StrBuf DepTarget   = STATIC_STRBUF_INITIALIZER; /* Name of dependency target */
 
 
 

@@ -116,6 +116,7 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --debug-opt name\t\tDebug optimization steps\n"
+            "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
             "  --enable-opt name\t\tEnable an optimization step\n"
             "  --forget-inc-paths\t\tForget include search paths\n"
@@ -497,6 +498,14 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptDepTarget (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --dep-target option */
+{
+    FileNameOption (Opt, Arg, &DepTarget);
+}
+
+
+
 static void OptDisableOpt (const char* Opt attribute ((unused)), const char* Arg)
 /* Disable an optimization step */
 {
@@ -752,6 +761,7 @@ int main (int argc, char* argv[])
        	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
         { "--debug-opt",        1,      OptDebugOpt             },
+        { "--dep-target",       1,      OptDepTarget            },
 	{ "--disable-opt",	1,	OptDisableOpt		},
 	{ "--enable-opt",	1,	OptEnableOpt  	       	},
        	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },

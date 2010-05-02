@@ -537,11 +537,32 @@ static void Compile (const char* File)
     /* Set the target system */
     CmdSetTarget (&CC65, Target);
 
-    /* If we won't assemble, this is the final step. In this case, set the
-     * output name.
-     */
-    if (!DoAssemble && OutputName) {
-	CmdSetOutput (&CC65, OutputName);
+    /* Check if this is the final step */
+    if (DoAssemble) {
+        /* We will assemble this file later. If a dependency file is to be
+         * generated, set the dependency target to be the final object file,
+         * not the intermediate assembler file. But beware: There may be an
+         * output name specified for the assembler.
+         */
+        if (DepName || FullDepName) {
+            /* Was an output name for the assembler specified? */
+            if (!DoLink && OutputName) {
+                /* Use this name as the dependency target */
+                CmdAddArg2 (&CC65, "--dep-target", OutputName);
+            } else {
+                /* Use the object file name as the dependency target */
+                char* ObjName = MakeFilename (File, ".o");
+                CmdAddArg2 (&CC65, "--dep-target", ObjName);
+                xfree (ObjName);
+            }
+        }
+    } else {
+        /* If we won't assemble, this is the final step. In this case, set
+         * the output name if it was given.
+         */
+        if (OutputName) {
+            CmdSetOutput (&CC65, OutputName);
+        }
     }
 
     /* Add the file as argument for the compiler */

@@ -699,6 +699,7 @@ static void Usage (void)
             "  --asm-args options\t\tPass options to the assembler\n"
             "  --asm-define sym[=v]\t\tDefine an assembler symbol\n"
             "  --asm-include-dir dir\t\tSet an assembler include directory\n"
+            "  --bin-include-dir dir\t\tSet an assembker binary include directory\n"
             "  --bss-label name\t\tDefine and export a BSS segment label\n"
             "  --bss-name seg\t\tSet the name of the BSS segment\n"
             "  --cfg-path path\t\tSpecify a config file search path\n"
@@ -778,6 +779,14 @@ static void OptAsmIncludeDir (const char* Opt attribute ((unused)), const char* 
 /* Include directory (assembler) */
 {
     CmdAddArg2 (&CA65, "-I", Arg);
+}
+
+
+
+static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
+/* Binary include directory (assembler) */
+{
+    CmdAddArg2 (&CA65, "--bin-include-dir", Arg);
 }
 
 
@@ -1213,6 +1222,7 @@ int main (int argc, char* argv [])
         { "--asm-args",         1,      OptAsmArgs              },
        	{ "--asm-define",      	1,     	OptAsmDefine            },
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
+        { "--bin-include-dir",  1,      OptBinIncludeDir        },
        	{ "--bss-label",       	1,     	OptBssLabel             },
 	{ "--bss-name",	 	1, 	OptBssName   		},
        	{ "--cfg-path",	       	1,     	OptCfgPath              },

@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                               searchpath.h                                */
 /*                                                                           */
-/*                    Search path path handling for ld65                     */
+/*                         Handling of search paths                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -52,34 +52,12 @@
 
 
 /*****************************************************************************/
-/*	      	     	      	     Data		     		     */
+/*	      	     	      	     Code    		     		     */
 /*****************************************************************************/
 
 
 
-/* A search path list is a collection containing path elements. We have
- * several of those.
- */
-static Collection SearchPaths[MAX_SEARCH_PATHS] = {
-    STATIC_COLLECTION_INITIALIZER,
-    STATIC_COLLECTION_INITIALIZER,
-    STATIC_COLLECTION_INITIALIZER,
-    STATIC_COLLECTION_INITIALIZER,
-    STATIC_COLLECTION_INITIALIZER,
-    STATIC_COLLECTION_INITIALIZER,
-    STATIC_COLLECTION_INITIALIZER,
-    STATIC_COLLECTION_INITIALIZER,
-};
-
-
-
-/*****************************************************************************/
-/*	      	     	      	     Code		     		     */
-/*****************************************************************************/
-
-
-
-static void Add (Collection* Paths, const char* New)
+static void Add (SearchPath* P, const char* New)
 /* Cleanup a new search path and add it to the list */
 {
     unsigned NewLen;
@@ -101,73 +79,41 @@ static void Add (Collection* Paths, const char* New)
     NewPath [NewLen] = '\0';
 
     /* Add the path to the collection */
-    CollAppend (Paths, NewPath);
+    CollAppend (P, NewPath);
 }
 
 
 
-static char* Find (const Collection* PathList, const char* File)
-/* Search for a file in a list of directories. If found, return the complete
- * name including the path in a malloced data area, if not found, return 0.
- */
-{               
-    char* Name = 0;
-    StrBuf PathName = AUTO_STRBUF_INITIALIZER;
-
-    /* Start the search */
-    unsigned I;
-    for (I = 0; I < CollCount (PathList); ++I) {
-
-        /* Copy the next path element into the buffer */
-        SB_CopyStr (&PathName, CollConstAt (PathList, I));
-
-	/* Add a path separator and the filename */
-       	if (SB_NotEmpty (&PathName)) {
-     	    SB_AppendChar (&PathName, '/');
-	}
-	SB_AppendStr (&PathName, File);
-    	SB_Terminate (&PathName);
-
-	/* Check if this file exists */
-       	if (access (SB_GetBuf (&PathName), 0) == 0) {
-	    /* The file exists, we're done */
-	    Name = xstrdup (SB_GetBuf (&PathName));
-            break;
-	}
-    }
-
-    /* Cleanup and return the result of the search */
-    SB_Done (&PathName);
-    return Name;
+SearchPath* NewSearchPath (void)
+/* Create a new, empty search path list */
+{
+    return NewCollection ();
 }
 
 
 
-void AddSearchPath (const char* NewPath, unsigned Where)
-/* Add a new search path to the existing one */
+void AddSearchPath (SearchPath* P, const char* NewPath)
+/* Add a new search path to the end of an existing list */
 {
     /* Allow a NULL path */
     if (NewPath) {
-        unsigned I;
-        for (I = 0; I < MAX_SEARCH_PATHS; ++I) {
-            if (Where & (0x01U << I)) {
-                Add (&SearchPaths[I], NewPath);
-            }
-        }
+        Add (P, NewPath);
     }
 }
 
 
 
-void AddSearchPathFromEnv (const char* EnvVar, unsigned Where)
-/* Add a search path from an environment variable */
+void AddSearchPathFromEnv (SearchPath* P, const char* EnvVar)
+/* Add a search path from an environment variable to the end of an existing
+ * list.
+ */
 {
-    AddSearchPath (getenv (EnvVar), Where);
+    AddSearchPath (P, getenv (EnvVar));
 }
 
 
 
-void AddSubSearchPathFromEnv (const char* EnvVar, const char* SubDir, unsigned Where)
+void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* SubDir)
 /* Add a search path from an environment variable, adding a subdirectory to
  * the environment variable value.
  */
@@ -190,14 +136,12 @@ void AddSubSearchPathFromEnv (const char* EnvVar, const char* SubDir, unsigned W
 	}
     }
 
-    /* Add the subdirectory */
+    /* Add the subdirectory and terminate the string */
     SB_AppendStr (&Dir, SubDir);
-
-    /* Terminate the string */
     SB_Terminate (&Dir);
 
     /* Add the search path */
-    AddSearchPath (SB_GetConstBuf (&Dir), Where);
+    AddSearchPath (P, SB_GetConstBuf (&Dir));
 
     /* Free the temp buffer */
     SB_Done (&Dir);
@@ -205,40 +149,51 @@ void AddSubSearchPathFromEnv (const char* EnvVar, const char* SubDir, unsigned W
 
 
 
-void ForgetAllSearchPaths (unsigned Where)
-/* Forget all search paths in the given lists. */
+void ForgetSearchPath (SearchPath* P)
+/* Forget all search paths in the given list */
 {
     unsigned I;
-    for (I = 0; I < MAX_SEARCH_PATHS; ++I) {
-        if (Where & (0x01U << I)) {
-            unsigned J;
-            Collection* P = &SearchPaths[I];
-            for (J = 0; J < CollCount (P); ++J) {
-                xfree (CollAt (P, J));
-            }
-            CollDeleteAll (P);
-        }
+    for (I = 0; I < CollCount (P); ++I) {
+        xfree (CollAt (P, I));
     }
+    CollDeleteAll (P);
 }
 
 
 
-char* SearchFile (const char* Name, unsigned Where)
+char* SearchFile (const SearchPath* P, const char* File)
 /* Search for a file in a list of directories. Return a pointer to a malloced
  * area that contains the complete path, if found, return 0 otherwise.
  */
 {
+    char* Name = 0;
+    StrBuf PathName = AUTO_STRBUF_INITIALIZER;
+
+    /* Start the search */
     unsigned I;
-    for (I = 0; I < MAX_SEARCH_PATHS; ++I) {
-        if (Where & (0x01U << I)) {
-            char* Path = Find (&SearchPaths[I], Name);
-            if (Path) {
-                /* Found the file */
-                return Path;
-            }
-        }
+    for (I = 0; I < CollCount (P); ++I) {
+
+        /* Copy the next path element into the buffer */
+        SB_CopyStr (&PathName, CollConstAt (P, I));
+
+	/* Add a path separator and the filename */
+       	if (SB_NotEmpty (&PathName)) {
+     	    SB_AppendChar (&PathName, '/');
+	}
+	SB_AppendStr (&PathName, File);
+    	SB_Terminate (&PathName);
+
+	/* Check if this file exists */
+       	if (access (SB_GetBuf (&PathName), 0) == 0) {
+	    /* The file exists, we're done */
+	    Name = xstrdup (SB_GetBuf (&PathName));
+            break;
+	}
     }
-    return 0;
+
+    /* Cleanup and return the result of the search */
+    SB_Done (&PathName);
+    return Name;
 }
 
 

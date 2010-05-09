@@ -305,7 +305,7 @@ void CfgConsume (cfgtok_t T, const char* Msg)
 /* Skip a token, print an error message if not found */
 {
     if (CfgTok != T) {
-       	CfgError (Msg);
+       	CfgError ("%s", Msg);
     }
     CfgNextTok ();
 }

@@ -1112,7 +1112,7 @@ static void DoInclude (void)
 /* Open an include file. */
 {
     char    	RTerm;
-    unsigned	DirSpec;
+    InputType   IT;
     StrBuf      Filename = STATIC_STRBUF_INITIALIZER;
 
 
@@ -1129,12 +1129,12 @@ static void DoInclude (void)
 
        	case '\"':
        	    RTerm   = '\"';
-       	    DirSpec = INC_USER;
+       	    IT = IT_USRINC;
        	    break;
 
        	case '<':
        	    RTerm   = '>';
-       	    DirSpec = INC_SYS;
+       	    IT = IT_SYSINC;
        	    break;
 
        	default:
@@ -1153,7 +1153,7 @@ static void DoInclude (void)
     /* Check if we got a terminator */
     if (CurC == RTerm) {
         /* Open the include file */
-        OpenIncludeFile (SB_GetConstBuf (&Filename), DirSpec);
+        OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
     } else if (CurC == '\0') {
        	/* No terminator found */
        	PPError ("#include expects \"FILENAME\" or <FILENAME>");

@@ -233,6 +233,9 @@ int main (int argc, char* argv[])
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "sim65");
 
+    /* Initialize the chip library search paths */
+    InitChipPaths ();
+
     /* Parse the command line */
     I = 1;
     while (I < ArgCount) {

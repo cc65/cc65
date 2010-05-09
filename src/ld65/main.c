@@ -6,7 +6,7 @@
 /*		     							     */
 /*		     							     */
 /*		     							     */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -177,11 +177,11 @@ static void LinkFile (const char* Name, FILETYPE Type)
     switch (Type) {
 
         case FILETYPE_LIB:
-            PathName = SearchFile (Name, SEARCH_LIB);
+            PathName = SearchFile (LibSearchPath, Name);
             break;
 
         case FILETYPE_OBJ:
-            PathName = SearchFile (Name, SEARCH_OBJ);
+            PathName = SearchFile (ObjSearchPath, Name);
             break;
 
         default:
@@ -282,7 +282,7 @@ static void DefineSymbol (const char* Def)
 static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 /* Specify a config file search path */
 {
-    AddSearchPath (Arg, SEARCH_CFG);
+    AddSearchPath (CfgSearchPath, Arg);
 }
 
 
@@ -296,7 +296,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 	Error ("Cannot use -C/-t twice");
     }
     /* Search for the file */
-    PathName = SearchFile (Arg, SEARCH_CFG);
+    PathName = SearchFile (CfgSearchPath, Arg);
     if (PathName == 0) {
         Error ("Cannot find config file `%s'", Arg);
     } else {
@@ -405,7 +405,7 @@ static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
 static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 /* Specify a library file search path */
 {
-    AddSearchPath (Arg, SEARCH_LIB);
+    AddSearchPath (LibSearchPath, Arg);
 }
 
 
@@ -441,7 +441,7 @@ static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
 static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 /* Specify an object file search path */
 {
-    AddSearchPath (Arg, SEARCH_OBJ);
+    AddSearchPath (ObjSearchPath, Arg);
 }
 
 

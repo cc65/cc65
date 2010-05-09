@@ -1122,7 +1122,7 @@ static void DoIncBin (void)
     if (F == 0) {
 
        	/* Search for the file in the binary include directory */
-     	char* PathName = FindInclude (SB_GetConstBuf (&Name), INC_BIN);
+     	char* PathName = SearchFile (BinSearchPath, SB_GetConstBuf (&Name));
        	if (PathName == 0 || (F = fopen (PathName, "rb")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
        	    ErrorSkip ("Cannot open include file `%m%p': %s", &Name, strerror (errno));
@@ -1148,7 +1148,7 @@ static void DoIncBin (void)
      * while it was open. Since mtime and size are only used to check
      * if a file has changed in the debugger, we will ignore this problem
      * here.
-     */               
+     */
     SB_Terminate (&Name);
     if (stat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
         Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));

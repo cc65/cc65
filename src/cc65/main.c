@@ -543,8 +543,9 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path */
-{
-    AddIncludePath (Arg, INC_SYS | INC_USER);
+{                        
+    AddSearchPath (SysIncSearchPath, Arg);
+    AddSearchPath (UsrIncSearchPath, Arg);
 }
 
 

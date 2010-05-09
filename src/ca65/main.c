@@ -360,8 +360,8 @@ static void OptAutoImport (const char* Opt attribute ((unused)),
 
 static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path for binaries */
-{
-    AddIncludePath (Arg, INC_BIN);
+{                        
+    AddSearchPath (BinSearchPath, Arg);
 }
 
 
@@ -450,7 +450,7 @@ static void OptIgnoreCase (const char* Opt attribute ((unused)),
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path */
 {
-    AddIncludePath (Arg, INC_STD);
+    AddSearchPath (IncSearchPath, Arg);
 }
 
 
@@ -1025,8 +1025,8 @@ int main (int argc, char* argv [])
         SegDump ();
     }
 
-    /* If we didn't have any errors, create the object, listing and 
-     * dependency files 
+    /* If we didn't have any errors, create the object, listing and
+     * dependency files
      */
     if (ErrorCount == 0) {
      	CreateObjFile ();

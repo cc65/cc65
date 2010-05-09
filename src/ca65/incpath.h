@@ -38,14 +38,19 @@
 
 
 
+/* common */
+#include "searchpath.h"
+
+
+
 /*****************************************************************************/
 /*	      	     	       	     Data		     		     */
 /*****************************************************************************/
 
 
 
-#define INC_STD         0x0001U         /* Add to standard include path */
-#define INC_BIN         0x0002U         /* Add to binary include path */
+extern SearchPath*      IncSearchPath;          /* Standard include path */
+extern SearchPath*      BinSearchPath;          /* Binary include path */
 
 
 
@@ -54,14 +59,6 @@
 /*****************************************************************************/
 
 
-
-void AddIncludePath (const char* NewPath, unsigned Where);
-/* Add a new include path to the existing one */
-
-char* FindInclude (const char* Name, unsigned Where);
-/* Find an include file. Return a pointer to a malloced area that contains
- * the complete path, if found, return 0 otherwise.
- */
 
 void ForgetAllIncludePaths (void);
 /* Remove all include search paths. */

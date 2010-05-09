@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,42 +33,33 @@
 
 
 
-/* common */
-#include "searchpath.h"
-
 /* cc65 */
 #include "incpath.h"
 
 
 
 /*****************************************************************************/
-/*	      	     	      	     Code		     		     */
+/*     	       	     		     Data		     		     */
 /*****************************************************************************/
 
 
 
-void AddIncludePath (const char* NewPath, unsigned Where)
-/* Add a new include path to the existing one */
-{
-    AddSearchPath (NewPath, Where);
-}
+SearchPath*     SysIncSearchPath;       /* System include path */
+SearchPath*     UsrIncSearchPath;       /* User include path */
 
 
 
-char* FindInclude (const char* Name, unsigned Where)
-/* Find an include file. Return a pointer to a malloced area that contains
- * the complete path, if found, return 0 otherwise.
- */
-{
-    return SearchFile (Name, Where);
-}
+/*****************************************************************************/
+/*    	      	     	      	     Code		     		     */
+/*****************************************************************************/
 
 
 
 void ForgetAllIncludePaths (void)
 /* Remove all include search paths. */
 {
-    ForgetAllSearchPaths (INC_SYS | INC_USER);
+    ForgetSearchPath (SysIncSearchPath);
+    ForgetSearchPath (UsrIncSearchPath);
 }
 
 
@@ -76,19 +67,24 @@ void ForgetAllIncludePaths (void)
 void InitIncludePaths (void)
 /* Initialize the include path search list */
 {
-    /* Add some standard paths to the include search path */
-    AddSearchPath ("", INC_USER);		/* Current directory */
+    /* Create the search path lists */
+    SysIncSearchPath = NewSearchPath ();
+    UsrIncSearchPath = NewSearchPath ();
+
+    /* Add the current path to the user search path list */
+    AddSearchPath (UsrIncSearchPath, "");
 
     /* Add some compiled in search paths if defined at compile time */
 #ifdef CC65_INC
-    AddSearchPath (CC65_INC, INC_SYS);
+    AddSearchPath (SysIncSearchPath, CC65_INC);
 #endif
 
     /* Add specific paths from the environment */
-    AddSearchPathFromEnv ("CC65_INC", INC_SYS | INC_USER);
+    AddSearchPathFromEnv (SysIncSearchPath, "CC65_INC");
+    AddSearchPathFromEnv (UsrIncSearchPath, "CC65_INC");
 
     /* Add paths relative to a main directory defined in an env var */
-    AddSubSearchPathFromEnv ("CC65_HOME", "include", INC_SYS);
+    AddSubSearchPathFromEnv (SysIncSearchPath, "CC65_HOME", "include");
 }
 
 

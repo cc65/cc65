@@ -2,11 +2,11 @@
 /*                                                                           */
 /*                               searchpath.h                                */
 /*                                                                           */
-/*                    Search path path handling for ld65                     */
+/*                         Handling of search paths                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,11 +33,7 @@
 
 
 
-/* Exports facilities to search files in a list of directories. 8 of these
- * lists are managed, and each list can contain an arbitrary number of
- * directories. The "Where" argument is actually a bitset, specifying which
- * of the search lists should be used when adding paths or searching files.
- */
+/* Exports facilities to search files in a list of directories. */
 
 
 
@@ -52,8 +48,8 @@
 
 
 
-/* Maximum number of search paths */
-#define MAX_SEARCH_PATHS        8
+/* A search path is a pointer to the list */
+typedef struct Collection SearchPath;
 
 
 
@@ -63,21 +59,26 @@
 
 
 
-void AddSearchPath (const char* NewPath, unsigned Where);
-/* Add a new search path to the existing one */
+SearchPath* NewSearchPath (void);
+/* Create a new, empty search path list */
 
-void AddSearchPathFromEnv (const char* EnvVar, unsigned Where);
-/* Add a search path from an environment variable */
+void AddSearchPath (SearchPath* P, const char* NewPath);
+/* Add a new search path to the end of an existing list */
 
-void AddSubSearchPathFromEnv (const char* EnvVar, const char* SubDir, unsigned Where);
+void AddSearchPathFromEnv (SearchPath* P, const char* EnvVar);
+/* Add a search path from an environment variable to the end of an existing
+ * list.
+ */
+
+void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* SubDir);
 /* Add a search path from an environment variable, adding a subdirectory to
  * the environment variable value.
  */
 
-void ForgetAllSearchPaths (unsigned Where);
-/* Forget all search paths in the given lists. */
+void ForgetSearchPath (SearchPath* P);
+/* Forget all search paths in the given list */
 
-char* SearchFile (const char* Name, unsigned Where);
+char* SearchFile (const SearchPath* P, const char* File);
 /* Search for a file in a list of directories. Return a pointer to a malloced
  * area that contains the complete path, if found, return 0 otherwise.
  */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -38,14 +38,19 @@
 
 
 
+/* common */
+#include "searchpath.h"
+
+
+
 /*****************************************************************************/
-/*	       	     		     Data		     		     */
+/*     	       	     		     Data		     		     */
 /*****************************************************************************/
 
 
 
-#define INC_SYS		0x0001	      	/* Add to system include path */
-#define INC_USER	0x0002	      	/* Add to user include path */
+extern SearchPath*      SysIncSearchPath;       /* System include path */
+extern SearchPath*      UsrIncSearchPath;       /* User include path */
 
 
 
@@ -54,14 +59,6 @@
 /*****************************************************************************/
 
 
-
-void AddIncludePath (const char* NewPath, unsigned Where);
-/* Add a new include path to the existing one */
-
-char* FindInclude (const char* Name, unsigned Where);
-/* Find an include file. Return a pointer to a malloced area that contains
- * the complete path, if found, return 0 otherwise.
- */
 
 void ForgetAllIncludePaths (void);
 /* Remove all include search paths. */

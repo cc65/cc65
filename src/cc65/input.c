@@ -63,15 +63,6 @@
 
 
 
-/* An enum that describes different types of input files. The members are
- * choosen so that it is possible to combine them to bitsets
- */
-typedef enum {
-    IT_MAIN     = 0x01,         /* Main input file */
-    IT_SYSINC   = 0x02,         /* System include file (using <>) */
-    IT_USERINC  = 0x04,         /* User include file (using "") */
-} InputType;
-
 /* The current input line */
 StrBuf* Line;
 
@@ -263,7 +254,7 @@ void OpenMainFile (const char* Name)
 
 
 
-void OpenIncludeFile (const char* Name, unsigned DirSpec)
+void OpenIncludeFile (const char* Name, InputType IT)
 /* Open an include file and insert it into the tables. */
 {
     char*  N;
@@ -277,7 +268,7 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
     }
 
     /* Search for the file */
-    N = FindInclude (Name, DirSpec);
+    N = SearchFile ((IT == IT_SYSINC)? SysIncSearchPath : UsrIncSearchPath, Name);
     if (N == 0) {
 	PPError ("Include file `%s' not found", Name);
      	return;
@@ -288,7 +279,7 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
      */
     IF = FindFile (N);
     if (IF == 0) {
-	IF = NewIFile (N, (DirSpec == INC_SYS)? IT_SYSINC : IT_USERINC);
+	IF = NewIFile (N, IT);
     }
 
     /* We don't need N any longer, since we may now use IF->Name */
@@ -590,7 +581,7 @@ static void CreateDepFile (const char* Name, InputType Types)
 /* Create a dependency file with the given name and place dependencies for
  * all files with the given types there.
  */
-{      
+{
     const char* Target;
 
     /* Open the file */
@@ -631,11 +622,11 @@ void CreateDependencies (void)
 {
     if (SB_NotEmpty (&DepName)) {
         CreateDepFile (SB_GetConstBuf (&DepName),
-                       IT_MAIN | IT_USERINC);
+                       IT_MAIN | IT_USRINC);
     }
     if (SB_NotEmpty (&FullDepName)) {
         CreateDepFile (SB_GetConstBuf (&FullDepName),
-                       IT_MAIN | IT_SYSINC | IT_USERINC);
+                       IT_MAIN | IT_SYSINC | IT_USRINC);
     }
 }
 

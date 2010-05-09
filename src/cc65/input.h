@@ -51,6 +51,15 @@
 
 
 
+/* An enum that describes different types of input files. The members are
+ * choosen so that it is possible to combine them to bitsets
+ */
+typedef enum {
+    IT_MAIN     = 0x01,         /* Main input file */
+    IT_SYSINC   = 0x02,         /* System include file (using <>) */
+    IT_USRINC  = 0x04,          /* User include file (using "") */
+} InputType;
+
 /* Forward for an IFile structure */
 struct IFile;
 
@@ -72,7 +81,7 @@ extern char NextC;
 void OpenMainFile (const char* Name);
 /* Open the main file. Will call Fatal() in case of failures. */
 
-void OpenIncludeFile (const char* Name, unsigned DirSpec);
+void OpenIncludeFile (const char* Name, InputType IT);
 /* Open an include file and insert it into the tables. */
 
 void NextChar (void);

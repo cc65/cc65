@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,7 +37,7 @@
 #define FILEPATH_H
 
 
-                       
+
 /* common */
 #include "searchpath.h"
 
@@ -49,9 +49,9 @@
 
 
 
-#define SEARCH_LIB      0x0001U         /* Library path */
-#define SEARCH_OBJ      0x0002U         /* Object file path */
-#define SEARCH_CFG      0x0004U         /* Config file path */
+extern SearchPath*      LibSearchPath;          /* Library path */
+extern SearchPath*      ObjSearchPath;          /* Object file path */
+extern SearchPath*      CfgSearchPath;          /* Config file path */
 
 
 

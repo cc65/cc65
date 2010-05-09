@@ -33,11 +33,19 @@
 
 
 
-/* common */
-#include "searchpath.h"
-
 /* ca65 */
 #include "incpath.h"
+
+
+
+/*****************************************************************************/
+/*	      	     	       	     Data		     		     */
+/*****************************************************************************/
+
+
+
+SearchPath*     IncSearchPath;          /* Standard include path */
+SearchPath*     BinSearchPath;          /* Binary include path */
 
 
 
@@ -47,29 +55,11 @@
 
 
 
-void AddIncludePath (const char* NewPath, unsigned Where)
-/* Add a new include path to the existing one */
-{
-    AddSearchPath (NewPath, Where);
-}
-
-
-
-char* FindInclude (const char* Name, unsigned Where)
-/* Find an include file. Return a pointer to a malloced area that contains
- * the complete path, if found, return 0 otherwise.
- */
-{
-    /* Search in the include directories */
-    return SearchFile (Name, Where);
-}
-
-
-
 void ForgetAllIncludePaths (void)
 /* Remove all include search paths. */
 {
-    ForgetAllSearchPaths (INC_STD | INC_BIN);
+    ForgetSearchPath (IncSearchPath);
+    ForgetSearchPath (BinSearchPath);
 }
 
 
@@ -77,20 +67,24 @@ void ForgetAllIncludePaths (void)
 void InitIncludePaths (void)
 /* Initialize the include path search list */
 {
-    /* Add some standard paths to the include search path */
-    AddSearchPath ("", INC_STD);  		/* Current directory */
-    AddSearchPath ("", INC_BIN);
+    /* Create the search path lists */
+    IncSearchPath = NewSearchPath ();
+    BinSearchPath = NewSearchPath ();
+
+    /* Add the current directory to the search paths */
+    AddSearchPath (IncSearchPath, "");
+    AddSearchPath (BinSearchPath, "");
 
     /* Add some compiled in search paths if defined at compile time */
 #ifdef CA65_INC
-    AddSearchPath (CA65_INC, INC_STD);
+    AddSearchPath (IncSearchPath, CA65_INC);
 #endif
 
     /* Add specific paths from the environment */
-    AddSearchPathFromEnv ("CA65_INC", INC_STD);
+    AddSearchPathFromEnv (IncSearchPath, "CA65_INC");
 
     /* Add paths relative to a main directory defined in an env var */
-    AddSubSearchPathFromEnv ("CC65_HOME", "asminc", INC_STD);
+    AddSubSearchPathFromEnv (IncSearchPath, "CC65_HOME", "asminc");
 }
 
 

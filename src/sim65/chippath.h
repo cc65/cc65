@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,19 +38,29 @@
 
 
 
+/* common */
+#include "searchpath.h"
+
+
+
+/*****************************************************************************/
+/*     	     	    		     Data                                    */
+/*****************************************************************************/
+
+
+
+extern SearchPath*      ChipSearchPath; /* Search paths for chip libs */
+
+
+
 /*****************************************************************************/
 /*     	     	    		     Code   				     */
 /*****************************************************************************/
 
 
 
-void AddChipPath (const char* NewPath);
-/* Add a search path for chips */
-
-char* FindChipLib (const char* LibName);
-/* Find a chip library. Return a pointer to a malloced area that contains
- * the complete path, if found, return 0 otherwise.
- */
+void InitChipPaths (void);
+/* Initialize the chip search path list */
 
 
 

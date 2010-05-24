@@ -115,6 +115,8 @@ EOF_COUNT       = 2
         .global         callmli
 
 DEVNUM  :=      $BF30		; Most recent accessed device
+DEVCNT  :=      $BF31		; Number of on-line devices (minus 1)
+DEVLST  :=      $BF32		; Up to 14 units may be active
 DATELO  :=      $BF90		; Bits 15-9 = Year, 8-5 = Month, 4-0 = Day
 TIMELO  :=      $BF92		; Bits 12-8 = Hour, 5-0 = Minute
 PFIXPTR :=      $BF9A		; If = 0, no prefix active

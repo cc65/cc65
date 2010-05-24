@@ -143,6 +143,12 @@ unsigned char get_ostype (void);
 void rebootafterexit (void);
 /* Reboot machine after program termination has completed. */
 
+unsigned char drivecount (void);
+/* Returns the number of ProDOS 8 drives. */
+
+unsigned char* drivelist (void);
+/* Returns a pointer to the list of ProDOS 8 drives. */
+
 #define ser_apple2_slot(num)    ser_ioctl (0, (void *) (num))
 /* Select a slot number from 1 to 7 prior to ser_open.
  * The default slot number is 2.

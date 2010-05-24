@@ -73,6 +73,7 @@ S_OBJS=	_scrsize.o	\
 	diosectsize.o	\
 	diowrite.o	\
 	dosdetect.o	\
+	drives.o	\
 	filedes.o	\
 	fileerr.o	\
 	filename.o	\

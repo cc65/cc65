@@ -832,8 +832,9 @@ The necessary o65 attributes are defined in a special section labeled
 
 The <tt/FORMAT/ section is used to describe file formats. The default (binary)
 format has currently no attributes, so, while it may be listed in this
-section, the attribute list is empty. The second supported format, o65, has
-several attributes that may be defined here.
+section, the attribute list is empty. The second supported format, 
+<htmlurl url="http://www.6502.org/users/andre/o65/fileformat.html" name="o65">, 
+has several attributes that may be defined here.
 
 <tscreen><verb>
     FORMATS {

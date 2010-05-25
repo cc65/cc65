@@ -684,13 +684,6 @@ This cc65 version has some extensions to the ISO C standard.
 The compiler defines several macros at startup:
 
 <descrip>
-
-  <tag><tt>__CC65__</tt></tag>
-
-  This macro is always defined. Its value is the version number of the
-  compiler in hex.  For example, version 2.10.1 of the compiler has this macro
-  defined as <tt/0x02A1/.
-
   <tag><tt>__APPLE2__</tt></tag>
 
   This macro is defined if the target is the Apple ][ (-t apple2).
@@ -708,9 +701,9 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the Oric Atmos (-t atmos).
 
-  <tag><tt>__CBM__</tt></tag>
+  <tag><tt>__C128__</tt></tag>
 
-  This macro is defined if the target system is one of the CBM targets.
+  This macro is defined if the target is the c128 (-t c128).
 
   <tag><tt>__C16__</tt></tag>
 
@@ -720,9 +713,9 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the c64 (-t c64).
 
-  <tag><tt>__C128__</tt></tag>
+  <tag><tt>__CBM__</tt></tag>
 
-  This macro is defined if the target is the c128 (-t c128).
+  This macro is defined if the target system is one of the CBM targets.
 
   <tag><tt>__CBM510__</tt></tag>
 
@@ -733,9 +726,38 @@ The compiler defines several macros at startup:
   This macro is defined if the target is one of the CBM 600/700 family of
   computers (called B series in the US).
 
+  <tag><tt>__CC65__</tt></tag>
+
+  This macro is always defined. Its value is the version number of the
+  compiler in hex.  For example, version 2.10.1 of the compiler has this macro
+  defined as <tt/0x02A1/.
+
+  <tag><tt>__CC65_STD__</tt></tag>
+
+  This macro is defined to one of the following depending on the <tt><ref
+  id="option--standard" name="--standard"></tt> command line option:
+  <itemize>
+  <item><tt/__CC65_STD_C89__/
+  <item><tt/__CC65_STD_C99__/
+  <item><tt/__CC65_STD_CC65__/
+  </itemize>
+
+  <tag><tt>__DATE__</tt></tag>
+
+  This macro expands to the date of translation of the preprocessing
+  translation unit in the form "Mmm dd yyyy".
+
+  <tag><tt>__FILE__</tt></tag>
+
+  This macro expands to a string containing the name of the C source file.
+
   <tag><tt>__GEOS__</tt></tag>
 
   This macro is defined if you are compiling for the GEOS system (-t geos).
+
+  <tag><tt>__LINE__</tt></tag>
+
+  This macro expands to the current line number.
 
   <tag><tt>__LUNIX__</tt></tag>
 
@@ -748,40 +770,6 @@ The compiler defines several macros at startup:
   <tag><tt>__NES__</tt></tag>
 
   This macro is defined if the target is the NES (-t nes).
-
-  <tag><tt>__PET__</tt></tag>
-
-  This macro is defined if the target is the PET family of computers (-t pet).
-
-  <tag><tt>__PLUS4__</tt></tag>
-
-  This macro is defined if the target is the plus/4 (-t plus4).
-
-  <tag><tt>__SUPERVISION__</tt></tag>
-
-  This macro is defined if the target is the supervision (-t supervision).
-
-  <tag><tt>__VIC20__</tt></tag>
-
-  This macro is defined if the target is the vic20 (-t vic20).
-
-  <tag><tt>__FILE__</tt></tag>
-
-  This macro expands to a string containing the name of the C source file.
-
-  <tag><tt>__LINE__</tt></tag>
-
-  This macro expands to the current line number.
-
-  <tag><tt>__CC65_STD__</tt></tag>
-
-  This macro is defined to one of the following depending on the <tt><ref
-  id="option--standard" name="--standard"></tt> command line option:
-  <itemize>
-  <item><tt/__CC65_STD_C89__/
-  <item><tt/__CC65_STD_C99__/
-  <item><tt/__CC65_STD_CC65__/
-  </itemize>
 
   <tag><tt>__OPT__</tt></tag>
 
@@ -799,6 +787,30 @@ The compiler defines several macros at startup:
 
   Is defined if the compiler was called with the <tt/-Os/ command line option.
 
+  <tag><tt>__PET__</tt></tag>
+
+  This macro is defined if the target is the PET family of computers (-t pet).
+
+  <tag><tt>__PLUS4__</tt></tag>
+
+  This macro is defined if the target is the plus/4 (-t plus4).
+
+  <tag><tt>__STDC_HOSTED__</tt></tag>
+
+  This macro is expands to the integer constant 1.
+
+  <tag><tt>__SUPERVISION__</tt></tag>
+
+  This macro is defined if the target is the supervision (-t supervision).
+
+  <tag><tt>__TIME__</tt></tag>
+
+  This macro expands to the time of translation of the preprocessing
+  translation unit in the form "hh:mm:ss".
+
+  <tag><tt>__VIC20__</tt></tag>
+
+  This macro is defined if the target is the vic20 (-t vic20).
 </descrip>
 
 

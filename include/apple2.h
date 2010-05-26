@@ -137,24 +137,29 @@ extern unsigned char _dos_type;
 
 
 
-unsigned char get_ostype (void);
-/* Get the machine type. Returns one of the APPLE_xxx codes. */
-
-void rebootafterexit (void);
-/* Reboot machine after program termination has completed. */
-
 unsigned char drivecount (void);
 /* Returns the number of ProDOS 8 drives. */
 
 unsigned char* drivelist (void);
 /* Returns a pointer to the list of ProDOS 8 drives. */
 
-#define ser_apple2_slot(num)    ser_ioctl (0, (void *) (num))
+unsigned char get_ostype (void);
+/* Get the machine type. Returns one of the APPLE_xxx codes. */
+
+void rebootafterexit (void);
+/* Reboot machine after program termination has completed. */
+
+unsigned char __fastcall__ rootdir (unsigned char drive, char* buf);
+/* Fill buffer with root directory name of ProDOS 8 disk in ProDOS 8 drive.
+ * Returns 0 for success and an OS specific error code in case of failure.
+ */
+
+#define ser_apple2_slot(num)    ser_ioctl (0, (void*) (num))
 /* Select a slot number from 1 to 7 prior to ser_open.
  * The default slot number is 2.
  */
 
-#define tgi_apple2_mix(onoff)   tgi_ioctl (0, (void *) (onoff))
+#define tgi_apple2_mix(onoff)   tgi_ioctl (0, (void*) (onoff))
 /* If onoff is 1, graphics/text mixed mode is enabled.
  * If onoff is 0, graphics/text mixed mode is disabled.
  */

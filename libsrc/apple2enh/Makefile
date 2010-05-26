@@ -97,6 +97,7 @@ S_OBJS=	_scrsize.o	\
      	read.o          \
      	reboot.o        \
      	revers.o	\
+     	rootdir.o	\
 	rwcommon.o	\
 	syschdir.o	\
 	sysmkdir.o	\

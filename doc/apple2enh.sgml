@@ -292,8 +292,11 @@ usage.
 
 <itemize>
 <item>_dos_type
+<item>drivecount
+<item>drivelist
 <item>get_ostype
 <item>rebootafterexit
+<item>rootdir
 <item>ser_apple2_slot
 <item>textframe
 <item>textframexy

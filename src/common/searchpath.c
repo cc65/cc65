@@ -57,29 +57,36 @@
 
 
 
-static void Add (SearchPath* P, const char* New)
-/* Cleanup a new search path and add it to the list */
+static char* CleanupPath (const char* Path)
+/* Prepare and return a clean copy of Path */
 {
-    unsigned NewLen;
+    unsigned Len;
     char*    NewPath;
 
-    /* Get the length of the new path */
-    NewLen = strlen (New);
+    /* Get the length of the path */
+    Len = strlen (Path);
 
     /* Check for a trailing path separator and remove it */
-    if (NewLen > 0 && (New[NewLen-1] == '\\' || New[NewLen-1] == '/')) {
-    	--NewLen;
+    if (Len > 0 && (Path[Len-1] == '\\' || Path[Len-1] == '/')) {
+    	--Len;
     }
 
     /* Allocate memory for the new string */
-    NewPath = (char*) xmalloc (NewLen + 1);
+    NewPath = (char*) xmalloc (Len + 1);
 
-    /* Copy the path and terminate it */
-    memcpy (NewPath, New, NewLen);
-    NewPath [NewLen] = '\0';
+    /* Copy the path and terminate it, then return the copy */
+    memcpy (NewPath, Path, Len);
+    NewPath [Len] = '\0';
+    return NewPath;
+}
 
-    /* Add the path to the collection */
-    CollAppend (P, NewPath);
+
+
+static void Add (SearchPath* P, const char* New)
+/* Cleanup a new search path and add it to the list */
+{
+    /* Add a clean copy of the path to the collection */
+    CollAppend (P, CleanupPath (New));
 }
 
 
@@ -145,6 +152,25 @@ void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* Sub
 
     /* Free the temp buffer */
     SB_Done (&Dir);
+}
+
+
+
+void PushSearchPath (SearchPath* P, const char* NewPath)
+/* Add a new search path to the head of an existing search path list */
+{
+    /* Insert a clean copy of the path at position 0 */
+    CollInsert (P, CleanupPath (NewPath), 0);
+}
+
+
+
+void PopSearchPath (SearchPath* P)
+/* Remove a search path from the head of an existing search path list */
+{
+    /* Remove the path at position 0 */
+    xfree (CollAt (P, 0));
+    CollDelete (P, 0);
 }
 
 

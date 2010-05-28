@@ -42,6 +42,7 @@
 /* common */
 #include "check.h"
 #include "coll.h"
+#include "fname.h"
 #include "print.h"
 #include "strbuf.h"
 #include "xmalloc.h"
@@ -87,9 +88,10 @@ struct IFile {
 /* Struct that describes an active input file */
 typedef struct AFile AFile;
 struct AFile {
-    unsigned	Line; 	 	/* Line number for this file 		*/
-    FILE*   	F;    	 	/* Input file stream 			*/
-    IFile*      Input;          /* Points to corresponding IFile        */
+    unsigned	Line; 	 	/* Line number for this file */
+    FILE*   	F;    	 	/* Input file stream */
+    IFile*      Input;          /* Points to corresponding IFile */
+    int         SearchPath;     /* True if we've added a path for this file */
 };
 
 /* List of all input files */
@@ -142,8 +144,12 @@ static IFile* NewIFile (const char* Name, InputType Type)
 
 
 static AFile* NewAFile (IFile* IF, FILE* F)
-/* Create and return a new AFile */
+/* Create a new AFile, push it onto the stack, add the path of the file to
+ * the path search list, and finally return a pointer to the new AFile struct.
+ */
 {
+    const char* Filename;
+
     /* Allocate a AFile structure */
     AFile* AF = (AFile*) xmalloc (sizeof (AFile));
 
@@ -158,7 +164,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
      */
     if (IF->Usage++ == 0) {
 
-	/* Get file size and modification time. There a race condition here,
+ 	/* Get file size and modification time. There a race condition here,
          * since we cannot use fileno() (non standard identifier in standard
          * header file), and therefore not fstat. When using stat with the
          * file name, there's a risk that the file was deleted and recreated
@@ -166,20 +172,39 @@ static AFile* NewAFile (IFile* IF, FILE* F)
          * if a file has changed in the debugger, we will ignore this problem
          * here.
          */
-	struct stat Buf;
-	if (stat (IF->Name, &Buf) != 0) {
-	    /* Error */
-	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
-	}
+ 	struct stat Buf;
+ 	if (stat (IF->Name, &Buf) != 0) {
+ 	    /* Error */
+ 	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
+ 	}
        	IF->Size  = (unsigned long) Buf.st_size;
-	IF->MTime = (unsigned long) Buf.st_mtime;
+ 	IF->MTime = (unsigned long) Buf.st_mtime;
 
-	/* Set the debug data */
-	g_fileinfo (IF->Name, IF->Size, IF->MTime);
+ 	/* Set the debug data */
+ 	g_fileinfo (IF->Name, IF->Size, IF->MTime);
     }
 
     /* Insert the new structure into the AFile collection */
     CollAppend (&AFiles, AF);
+
+    /* Get the path of this file. If it is not empty, add it as an extra
+     * search path. To avoid file search overhead, we will not add empty
+     * paths, since the search path list is initialized with an empty
+     * path, so files in the current directory are always found first.
+     */
+    Filename = FindName (IF->Name);
+    AF->SearchPath = (Filename - IF->Name);     /* Actually the length */
+    if (AF->SearchPath) {
+        /* We have a path, extract and push it to the search path list */
+        StrBuf Path = AUTO_STRBUF_INITIALIZER;
+        SB_CopyBuf (&Path, IF->Name, AF->SearchPath);
+        SB_Terminate (&Path);
+        if (PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path)) == 0) {
+            /* The path is already there ... */
+            AF->SearchPath = 0;
+        }
+        SB_Done (&Path);
+    }
 
     /* Return the new struct */
     return AF;
@@ -323,6 +348,11 @@ static void CloseIncludeFile (void)
 
     /* Delete the last active file from the active file collection */
     CollDelete (&AFiles, AFileCount-1);
+
+    /* If we had added an extra search path for this AFile, remove it */
+    if (Input->SearchPath) {
+        PopSearchPath (UsrIncSearchPath);
+    }
 
     /* Delete the active file structure */
     FreeAFile (Input);

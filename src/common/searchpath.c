@@ -156,11 +156,25 @@ void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* Sub
 
 
 
-void PushSearchPath (SearchPath* P, const char* NewPath)
-/* Add a new search path to the head of an existing search path list */
-{
-    /* Insert a clean copy of the path at position 0 */
-    CollInsert (P, CleanupPath (NewPath), 0);
+int PushSearchPath (SearchPath* P, const char* NewPath)
+/* Add a new search path to the head of an existing search path list, provided
+ * that it's not already there. If the path is already at the first position,
+ * return zero, otherwise return a non zero value.
+ */
+{                                      
+    /* Generate a clean copy of NewPath */
+    char* Path = CleanupPath (NewPath);   
+
+    /* If we have paths, check if Path is already at position zero */
+    if (CollCount (P) > 0 && strcmp (CollConstAt (P, 0), Path) == 0) {
+        /* Match. Delete the copy and return to the caller */
+        xfree (Path);
+        return 0;
+    }
+
+    /* Insert a clean copy of the path at position 0, return success */
+    CollInsert (P, Path, 0);
+    return 1;
 }
 
 

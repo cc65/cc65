@@ -75,8 +75,11 @@ void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* Sub
  * the environment variable value.
  */
 
-void PushSearchPath (SearchPath* P, const char* NewPath);
-/* Add a new search path to the head of an existing search path list */
+int PushSearchPath (SearchPath* P, const char* NewPath);
+/* Add a new search path to the head of an existing search path list, provided
+ * that it's not already there. If the path is already at the first position,
+ * return zero, otherwise return a non zero value.
+ */
 
 void PopSearchPath (SearchPath* P);
 /* Remove a search path from the head of an existing search path list */

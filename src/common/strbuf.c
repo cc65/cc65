@@ -179,7 +179,7 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
 
     /* Allocate a fresh block */
     B->Buf = xmalloc (NewAllocated);
-
+               
     /* Remember the new block size */
     B->Allocated = NewAllocated;
 }
@@ -225,11 +225,13 @@ void SB_Terminate (StrBuf* B)
 
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
 /* Copy Buf to Target, discarding the old contents of Target */
-{
-    if (Target->Allocated < Size) {
-       	SB_CheapRealloc (Target, Size);
+{    
+    if (Size) {
+        if (Target->Allocated < Size) {
+            SB_CheapRealloc (Target, Size);
+        }
+        memcpy (Target->Buf, Buf, Size);
     }
-    memcpy (Target->Buf, Buf, Size);
     Target->Len = Size;
 }
 

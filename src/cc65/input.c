@@ -148,7 +148,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
  * the path search list, and finally return a pointer to the new AFile struct.
  */
 {
-    const char* Filename;
+    StrBuf Path = AUTO_STRBUF_INITIALIZER;
 
     /* Allocate a AFile structure */
     AFile* AF = (AFile*) xmalloc (sizeof (AFile));
@@ -172,7 +172,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
          * if a file has changed in the debugger, we will ignore this problem
          * here.
          */
- 	struct stat Buf;
+     	struct stat Buf;
  	if (stat (IF->Name, &Buf) != 0) {
  	    /* Error */
  	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
@@ -187,24 +187,14 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     /* Insert the new structure into the AFile collection */
     CollAppend (&AFiles, AF);
 
-    /* Get the path of this file. If it is not empty, add it as an extra
-     * search path. To avoid file search overhead, we will not add empty
-     * paths, since the search path list is initialized with an empty
-     * path, so files in the current directory are always found first.
+    /* Get the path of this file and add it as an extra search path.
+     * To avoid file search overhead, we will add one path only once.
+     * This is checked by the PushSearchPath function.
      */
-    Filename = FindName (IF->Name);
-    AF->SearchPath = (Filename - IF->Name);     /* Actually the length */
-    if (AF->SearchPath) {
-        /* We have a path, extract and push it to the search path list */
-        StrBuf Path = AUTO_STRBUF_INITIALIZER;
-        SB_CopyBuf (&Path, IF->Name, AF->SearchPath);
-        SB_Terminate (&Path);
-        if (PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path)) == 0) {
-            /* The path is already there ... */
-            AF->SearchPath = 0;
-        }
-        SB_Done (&Path);
-    }
+    SB_CopyBuf (&Path, IF->Name, FindName (IF->Name) - IF->Name);
+    SB_Terminate (&Path);
+    AF->SearchPath = PushSearchPath (UsrIncSearchPath, SB_GetConstBuf (&Path));
+    SB_Done (&Path);
 
     /* Return the new struct */
     return AF;

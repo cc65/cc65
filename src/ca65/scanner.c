@@ -87,6 +87,8 @@ struct InputFile {
     Token           Tok;	       	/* Last token */
     int		    C;			/* Last character */
     char       	    Line[256];		/* The current input line */
+    int             IncSearchPath;      /* True if we've added a search path */
+    int             BinSearchPath;      /* True if we've added a search path */
     InputFile*	    Next;      	       	/* Linked list of input files */
 };
 
@@ -418,6 +420,14 @@ void IFDone (CharSource* S)
      */
     CheckOpenIfs ();
 
+    /* If we've added search paths for this file, remove them */
+    if (S->V.File.IncSearchPath) {
+        PopSearchPath (IncSearchPath);
+    }
+    if (S->V.File.BinSearchPath) {
+        PopSearchPath (BinSearchPath);
+    }
+
     /* Close the input file and decrement the file count. We will ignore
      * errors here, since we were just reading from the file.
      */
@@ -441,72 +451,78 @@ int NewInputFile (const char* Name)
  * and false otherwise.
  */
 {
-    int RetCode = 0;            /* Return code. Assume an error. */
-    char* PathName = 0;
+    int         RetCode = 0;            /* Return code. Assume an error. */
+    char*       PathName = 0;
+    FILE*       F;
+    struct stat Buf;
+    StrBuf      NameBuf;                /* No need to initialize */
+    StrBuf      Path = AUTO_STRBUF_INITIALIZER;
+    unsigned    FileIdx;
+    CharSource* S;
 
-    /* First try to open the file */
-    FILE* F = fopen (Name, "r");
-    if (F == 0) {
 
-     	/* Error (fatal error if this is the main file) */
-       	if (FCount == 0) {
-     	    Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
-       	}
-
+    /* If this is the main file, just try to open it. If it's an include file,
+     * search for it using the include path list.
+     */
+    if (FCount == 0) {
+        /* Main file */
+        F = fopen (Name, "r");
+        if (F == 0) {
+      	    Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
+        }
+    } else {
        	/* We are on include level. Search for the file in the include
-     	 * directories.
-     	 */
-     	PathName = SearchFile (IncSearchPath, Name);
+      	 * directories.
+      	 */
+      	PathName = SearchFile (IncSearchPath, Name);
        	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
-     	    /* Not found or cannot open, print an error and bail out */
-     	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
+      	    /* Not found or cannot open, print an error and bail out */
+      	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
             goto ExitPoint;
-     	}
+      	}
 
        	/* Use the path name from now on */
         Name = PathName;
     }
 
-    /* check again if we do now have an open file */
-    if (F != 0) {
-
-        StrBuf          NameBuf;
-     	unsigned        FileIdx;
-        CharSource*     S;
-
-     	/* Stat the file and remember the values. There a race condition here,
-         * since we cannot use fileno() (non standard identifier in standard
-         * header file), and therefore not fstat. When using stat with the
-         * file name, there's a risk that the file was deleted and recreated
-         * while it was open. Since mtime and size are only used to check
-         * if a file has changed in the debugger, we will ignore this problem
-         * here.
-         */
-     	struct stat Buf;
-     	if (stat (Name, &Buf) != 0) {
-     	    Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
-     	}
-
-     	/* Add the file to the input file table and remember the index */
-     	FileIdx = AddFile (SB_InitFromString (&NameBuf, Name),
-                           (FCount == 0)? FT_MAIN : FT_INCLUDE,
-                           Buf.st_size, Buf.st_mtime);
-
-       	/* Create a new input source variable and initialize it */
-     	S                   = xmalloc (sizeof (*S));
-        S->Func             = &IFFunc;
-     	S->V.File.F         = F;
-     	S->V.File.Pos.Line  = 0;
-     	S->V.File.Pos.Col   = 0;
-     	S->V.File.Pos.Name  = FileIdx;
-       	S->V.File.Line[0]   = '\0';
-
-        /* Count active input files */
-       	++FCount;
-
-        /* Use this input source */
-        UseCharSource (S);
+    /* Stat the file and remember the values. There a race condition here,
+     * since we cannot use fileno() (non standard identifier in standard
+     * header file), and therefore not fstat. When using stat with the
+     * file name, there's a risk that the file was deleted and recreated
+     * while it was open. Since mtime and size are only used to check
+     * if a file has changed in the debugger, we will ignore this problem
+     * here.
+     */
+    if (stat (Name, &Buf) != 0) {
+        Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
     }
+
+    /* Add the file to the input file table and remember the index */
+    FileIdx = AddFile (SB_InitFromString (&NameBuf, Name),
+                       (FCount == 0)? FT_MAIN : FT_INCLUDE,
+                       Buf.st_size, Buf.st_mtime);
+
+    /* Create a new input source variable and initialize it */
+    S                   = xmalloc (sizeof (*S));
+    S->Func             = &IFFunc;
+    S->V.File.F         = F;
+    S->V.File.Pos.Line  = 0;
+    S->V.File.Pos.Col   = 0;
+    S->V.File.Pos.Name  = FileIdx;
+    S->V.File.Line[0]   = '\0';
+
+    /* Push the path for this file onto the include search lists */
+    SB_CopyBuf (&Path, Name, FindName (Name) - Name);
+    SB_Terminate (&Path);
+    S->V.File.IncSearchPath = PushSearchPath (IncSearchPath, SB_GetConstBuf (&Path));
+    S->V.File.BinSearchPath = PushSearchPath (BinSearchPath, SB_GetConstBuf (&Path));
+    SB_Done (&Path);
+
+    /* Count active input files */
+    ++FCount;
+
+    /* Use this input source */
+    UseCharSource (S);
 
     /* File successfully opened */
     RetCode = 1;

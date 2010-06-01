@@ -28,7 +28,7 @@ _rootdir:
         lda	#ON_LINE_CALL
         ldx	#ON_LINE_COUNT
         jsr	callmli
-        bcs	:+
+        bcs	oserr
 
         ; Get volume name length
         ldy	#$00
@@ -46,7 +46,11 @@ _rootdir:
         lda	#$00
         sta	(ptr1),y
         
-        ; Return success or error
-:       sta	__oserror
+        ; Return success
+        tax
+        rts
+        
+        ; Return error
+oserr:  sta	__oserror
         ldx	#$00
         rts

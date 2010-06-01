@@ -383,6 +383,7 @@ It does not declare any functions.
 <sect1><tt/stdio.h/<label id="stdio.h"><p>
 
 <itemize>
+<item><ref id="_poserror" name="_poserror">
 <item><ref id="clearerr" name="clearerr">
 <!-- <item><ref id="fclose" name="fclose"> -->
 <!-- <item><ref id="fdopen" name="fdopen"> -->
@@ -437,7 +438,6 @@ It does not declare any functions.
 <item><ref id="_heapblocksize" name="_heapblocksize">
 <item><ref id="_heapmaxavail" name="_heapmaxavail">
 <item><ref id="_heapmemavail" name="_heapmemavail">
-<item><ref id="_poserror" name="_poserror">
 <item><ref id="_randomize" name="_randomize">
 <item><ref id="_swap" name="_swap">
 <item><ref id="abort" name="abort">
@@ -704,21 +704,21 @@ id="malloc" name="malloc"> may still return <tt/NULL/.
 <sect1>_poserror<label id="_poserror"><p>
 
 <quote>
-<descrip>
-<tag/Function/Print an error message for the error in <tt/_oserrno/.
+<descrip>                                                 
+<tag/Function/Print an error message for the error in <tt/_oserror/.
 <tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
 <tag/Declaration/<tt/void __fastcall__ _poserror (const char* msg);/
 <tag/Description/<tt/_poserror/ prints an error message to <tt/stderr/. If
 <tt/msg/ is not <tt/NULL/ and not an empty string, it is printed followed by
 a colon and a blank. Then the error message for the current contents of
-<tt/_oserrno/ are printed followed by a newline. The message output is the
+<tt/_oserror/ are printed followed by a newline. The message output is the
 same as returned by <tt/<ref id="_stroserror" name="_stroserror">/ with an
-argument of <tt/_oserrno/.
+argument of <tt/_oserror/.
 <tag/Limits/
 <itemize>
 <item>Since operating system specific error code are - you guessed it -
 operating system specific, the value in <tt/_oserror/ and the message that is
-printed depend on the cc65 target.
+printed depends on the cc65 target.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>

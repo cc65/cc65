@@ -149,9 +149,9 @@ unsigned char get_ostype (void);
 void rebootafterexit (void);
 /* Reboot machine after program termination has completed. */
 
-unsigned char __fastcall__ rootdir (unsigned char drive, char* buf);
-/* Fill buffer with root directory name of ProDOS 8 disk in ProDOS 8 drive.
- * Returns 0 for success and an OS specific error code in case of failure.
+int __fastcall__ rootdir (unsigned char drive, char* buf);
+/* Fill buffer with root directory name of ProDOS 8 disk in
+ * ProDOS 8 drive. Returns 0 on success and -1 on error.
  */
 
 #define ser_apple2_slot(num)    ser_ioctl (0, (void*) (num))

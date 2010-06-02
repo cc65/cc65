@@ -1,11 +1,11 @@
 ;
 ; Oliver Schmidt, 2010-05-24
 ;
-; unsigned char __fastcall__ rootdir (unsigned char drive, char* buf);
+; int __fastcall__ rootdir (unsigned char drive, char* buf);
 ;
 
         .export 	_rootdir
-        .import		popax
+        .import		popax, oserrexit
 
         .include	"zeropage.inc"
         .include	"errno.inc"
@@ -50,7 +50,5 @@ _rootdir:
         tax
         rts
         
-        ; Return error
-oserr:  sta	__oserror
-        ldx	#$00
-        rts
+        ; Return oserror
+oserr:  jmp	oserrexit

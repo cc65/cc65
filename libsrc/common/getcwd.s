@@ -53,12 +53,10 @@ loop:   inc     ptr2
 
 overflow:
         lda     #<ERANGE
-        sta     __errno
-        lda     #>ERANGE
-        sta     __errno+1
-        tax                     ; High byte of ERANGE is zero, return zero
-        rts
- 
+        jsr     __seterrno      ; Returns 0 in A
+        tax                     ; Return zero
+        rts                        
+
 ; Success, return buf
 
 done:   lda     ptr1

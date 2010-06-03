@@ -47,6 +47,9 @@ extern unsigned char _oserror;
  */
 int __fastcall__ _osmaperrno (unsigned char oserror);
 
+/* Set errno to a specific error code. Used by the library */
+void __fastcall__ _seterrno (unsigned char code);
+
 /* System error codes go here */
 extern int _errno;
 

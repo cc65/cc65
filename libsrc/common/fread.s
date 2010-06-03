@@ -115,7 +115,7 @@
 
         pha
 
-; Copy the buffer pointer into ptr1, and increment the pointer value passed 
+; Copy the buffer pointer into ptr1, and increment the pointer value passed
 ; to read() by one, so read() starts to store data at buf+1.
 
         ldy     #0
@@ -160,8 +160,8 @@
         cmp     #$FF
         bne     @L8
 
-; Error in read. Set the stream error flag and bail out. _oserror and/or
-; errno are already set by read(). On entry to label @L7, X must be zero.
+; Error in read. Set the stream error flag and bail out. errno has already
+; been set by read(). On entry to label @L7, X must be zero. 
 
         inx                             ; X = 0
         lda     #_FERROR

@@ -18,10 +18,10 @@ __osmaperrno:
     	dex
     	bne	@L1	        ; Next entry
 
-; Code not found, return EINVAL
+; Code not found, return EUNKNOWN
 
-	lda	#<EINVAL
-	ldx	#>EINVAL
+	lda	#<EUNKNOWN
+	ldx	#>EUNKNOWN
 	rts
 
 ; Found the code

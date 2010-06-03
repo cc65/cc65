@@ -9,69 +9,80 @@
 	.importzp 	ptr1
 
         .include        "_file.inc"
+        .include        "errno.inc"
 
 ;
-; Get the FILE* parameter, check if the file is open
-;
+; Get the FILE* parameter, check if the file is open. Returns zero in A
+; and zero flag set in case of an error.
 
-getf:	sta	ptr1
-	stx	ptr1+1
-	ldy	#_FILE::f_flags
-	lda	(ptr1),y      	; get f->f_flags
-	and	#_FOPEN         ; file open?
-	beq    	@L1   		; jump if no
-	clc	      		; ok
+.proc   getf
+        sta    	ptr1
+	stx    	ptr1+1
+	ldy    	#_FILE::f_flags
+	lda    	(ptr1),y      	; get f->f_flags
+	and    	#_FOPEN         ; file open?
 	rts
-@L1:	sec
-	rts
+.endproc
 
 ;
 ; void clearerr (FILE* f);
 ;
 
-_clearerr:
+.proc   _clearerr
        	jsr	getf
-       	bcs	err
+       	beq     err
        	lda	(ptr1),y
        	and	#<~(_FEOF | _FERROR)
        	sta	(ptr1),y
 err:	rts
+.endproc
 
 ;
 ; int feof (FILE* f);
 ;
 
-_feof:
- 	jsr	getf
-;	bcs	err
- 	lda	(ptr1),y
- 	and	#_FEOF
- 	ldx	#0
+.proc   _feof
+ 	jsr  	getf
+        beq     @L1             ; Return 0 on error
+ 	lda  	(ptr1),y
+ 	and  	#_FEOF
+@L1:    ldx  	#0
  	rts
+.endproc
 
 ;
 ; int ferror (FILE* f);
 ;
 
-_ferror:
- 	jsr	getf
-;	bcs	err
+.proc   _ferror
+ 	jsr    	getf
+        beq     @L1             ; Return 0 on error
  	lda	(ptr1),y
  	and	#_FERROR
- 	ldx	#0
+@L1:    ldx	#0
  	rts
+.endproc
 
 ;
 ; int fileno (FILE* f);
 ;
 
-_fileno:
- 	jsr	getf
-; 	bcs	err
+.proc   _fileno
+ 	jsr    	getf
+        beq     error
 	ldy	#_FILE::f_fd
  	lda	(ptr1),y
  	ldx	#0
  	rts
+
+; If the file is not valid, fileno must set errno and return -1
+
+error:  lda     #<EBADF
+        jsr     __seterrno
+        lda     #$FF
+        tax
+        rts
+.endproc
 
 ;
 ; int __fastcall__ fflush (FILE* f);

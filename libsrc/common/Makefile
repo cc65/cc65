@@ -138,7 +138,6 @@ S_OBJS = 	_cwd.o                  \
 	 	longjmp.o	        \
 	 	ltoa.o	    	        \
 		malloc.o	        \
-		maperrno.o  	        \
 		memchr.o    	        \
 		memcmp.o    	        \
 	 	memcpy.o      	        \

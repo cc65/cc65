@@ -26,7 +26,7 @@ int __fastcall__ fseek (register FILE* f, long offset, int whence)
 
     /* Is the file open? */
     if ((f->f_flags & _FOPEN) == 0) {
-        _errno = EINVAL;                /* File not open */
+        _seterrno (EINVAL);             /* File not open */
         return -1;
     }
 
@@ -40,21 +40,18 @@ int __fastcall__ fseek (register FILE* f, long offset, int whence)
     /* Do the seek */
     res = lseek(f->f_fd, offset, whence);
 
-    /* If we had an error, set the error indicator on the stream, and
-     * return -1. We will check for < 0 here, because that saves some code,
-     * and we don't have files with 2 gigabytes in size anyway:-)
+    /* If the seek was successful. Discard any effects of the ungetc function,
+     * and clear the end-of-file indicator. Otherwise set the error indicator
+     * on the stream, and return -1. We will check for >= 0 here, because that
+     * saves some code, and we don't have files with 2 gigabytes in size
+     * anyway:-)
      */
-    if (res < 0) {
+    if (res >= 0) {
+        f->f_flags &= ~(_FEOF | _FPUSHBACK);
+        return 0;
+    } else {
         f->f_flags |= _FERROR;
         return -1;
     }
-
-    /* The seek was successful. Discard any effects of the ungetc function,
-     * and clear the end-of-file indicator.
-     */
-    f->f_flags &= ~(_FEOF | _FPUSHBACK);
-
-    /* Done */
-    return 0;
 }
 

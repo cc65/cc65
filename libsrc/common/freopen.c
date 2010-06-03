@@ -24,15 +24,14 @@ FILE* __fastcall__ freopen (const char* name, const char* mode, FILE* f)
     /* Check if the file is open, if so, close it */
     if ((f->f_flags & _FOPEN) == 0) {
 	/* File is not open */
-	_errno = EINVAL;		/* File not input */
-	return 0;
+        return (FILE*) _seterrno (EINVAL);      /* File not input */
     }
 
     /* Close the file. Don't bother setting the flag, it will get
      * overwritten by _fopen.
      */
     if (close (f->f_fd) < 0) {
-	/* An error occured, _oserror is set */
+        /* An error occured, errno is already set */
 	return 0;
     }
 

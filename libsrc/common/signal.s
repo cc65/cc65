@@ -61,9 +61,7 @@ __sig_ign:
 
 invalidsig:
         lda     #<EINVAL
-        sta     __errno
-        lda     #>EINVAL        ; A = 0
-        sta     __errno+1
+        jsr     __seterrno      ; Returns 0 in A
         tax                     ; A/X = 0
 __sig_dfl:
         rts

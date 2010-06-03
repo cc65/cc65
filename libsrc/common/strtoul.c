@@ -105,7 +105,7 @@ unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base)
 
     /* Handle overflow */
     if (Ovf) {
-        errno = ERANGE;
+        _seterrno (ERANGE);
         return ULONG_MAX;
     }
 

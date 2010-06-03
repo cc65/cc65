@@ -71,7 +71,7 @@ long __fastcall__ strtol (const char* nptr, char** endptr, int base)
         } else if (isupper (*S)) {
             DigitVal = *S - ('A' - 10);
         } else if (islower (*S)) {
-            DigitVal = *S - ('a' - 10);      
+            DigitVal = *S - ('a' - 10);
         } else {
             /* Unknown character */
             break;
@@ -110,7 +110,7 @@ long __fastcall__ strtol (const char* nptr, char** endptr, int base)
 
     /* Handle overflow */
     if (Ovf) {
-        errno = ERANGE;
+        _seterrno (ERANGE);
         if (Minus) {
             return LONG_MIN;
         } else {

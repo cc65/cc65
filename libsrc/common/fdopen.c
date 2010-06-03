@@ -26,8 +26,7 @@ FILE* __fastcall__ fdopen (int handle, const char* /*mode*/)
     /* Find a free file slot */
     if (!(f = _fdesc ())) {
        	/* No slots */
-       	_errno = EMFILE;    	      	/* Too many files */
-       	return 0;
+       	return (FILE*) _seterrno (EMFILE);      /* Too many files */
     }
 
     /* Insert the handle, and return the descriptor */

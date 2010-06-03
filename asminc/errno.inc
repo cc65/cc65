@@ -28,6 +28,7 @@
         ENOSYS 	       	        ; Function not implemented
         ESPIPE 	       	        ; Illegal seek
         ERANGE                  ; Range error
+        EBADF                   ; Bad file number
         EUNKNOWN       	        ; Unknown OS specific error - must be last!
 
         EMAX    = EUNKNOWN      ; Highest error code

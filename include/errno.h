@@ -74,7 +74,8 @@ extern int _errno;
 #define ENOSYS		13	/* Function not implemented */
 #define ESPIPE		14	/* Illegal seek */
 #define ERANGE          15      /* Range error */
-#define EUNKNOWN       	16	/* Unknown OS specific error */
+#define EBADF           16      /* Bad file number */
+#define EUNKNOWN       	17	/* Unknown OS specific error */
 
 
 

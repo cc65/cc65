@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,17 +41,17 @@
 /* Operating system specific error codes */
 extern unsigned char _oserror;
 
-/* Mapper function, don't call directly */
-void _maperrno (void);
-
-/* This one is called under the hood. User callable. */
+/* The following functions maps an operating system specific error code (for
+ * example from _oserror) into one of the E... codes below. It is user
+ * callable.
+ */
 int __fastcall__ _osmaperrno (unsigned char oserror);
 
 /* System error codes go here */
 extern int _errno;
 
-/* errno must be a macro, here the mapper is called */
-#define errno  	(_maperrno(), _errno)
+/* errno must be a macro */
+#define errno   _errno
 
 
 

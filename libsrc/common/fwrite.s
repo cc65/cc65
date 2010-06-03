@@ -19,7 +19,7 @@
 
 ; ------------------------------------------------------------------------
 ; Code
-
+                                                          
 .proc   _fwrite
 
 ; Save file and place it into ptr1
@@ -38,10 +38,10 @@
 
 ; File not open
 
-   	lda	#EINVAL
-        jsr     __seterrno
-@L1:    jsr     incsp6
-        jmp     return0
+@L1:    lda	#EBADF
+        jsr     __seterrno              ; Returns with A = 0
+        tax                             ; A = X = 0
+        jmp     incsp6
 
 ; Check if the stream is in an error state
 
@@ -93,8 +93,8 @@
         cmp     #$FF
         bne     @L4
 
-; Error in write. Set the stream error flag and bail out. _oserror and/or
-; errno are already set by write().
+; Error in write. Set the stream error flag and bail out. errno is already
+; set by write().
 
         lda     file
         sta     ptr1

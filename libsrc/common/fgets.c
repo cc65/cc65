@@ -25,8 +25,7 @@ char* __fastcall__ fgets (char* s, unsigned size, FILE* f)
 
     if (size == 0) {
         /* Invalid size */
-        _errno = EINVAL;
-        return 0;
+        return (char*) _seterrno (EINVAL);
     }
 
     /* Read input */

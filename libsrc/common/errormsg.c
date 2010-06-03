@@ -10,22 +10,24 @@
 
 
 const char* const _sys_errlist[] = {
-    "Unknown error",                /*  0 */
-    "No such file or directory",    /*  1 */
-    "Out of memory",                /*  2 */
-    "Permission denied",            /*  3 */
-    "No such device",               /*  4 */
-    "Too many open files",          /*  5 */
-    "Device or resource busy",      /*  6 */
-    "Invalid argument",             /*  7 */
-    "No space left on device",      /*  8 */
-    "File exists",                  /*  9 */
-    "Try again",                    /* 10 */
-    "I/O error",                    /* 11 */
-    "Interrupted system call",      /* 12 */
-    "Function not implemented",     /* 13 */
-    "Illegal seek",                 /* 14 */
-    "Range error",                  /* 15 */
+    "Unknown error",                /* 0 */
+    "No such file or directory",    /* ENOENT */
+    "Out of memory",                /* ENOMEM */
+    "Permission denied",            /* EACCES */
+    "No such device",               /* ENODEV */
+    "Too many open files",          /* EMFILE */
+    "Device or resource busy",      /* EBUSY */
+    "Invalid argument",             /* EINVAL */
+    "No space left on device",      /* ENOSPC */
+    "File exists",                  /* EEXIST */
+    "Try again",                    /* EAGAIN */
+    "I/O error",                    /* EIO */
+    "Interrupted system call",      /* EINTR */
+    "Function not implemented",     /* ENOSYS */
+    "Illegal seek",                 /* ESPIPE */
+    "Range error",                  /* ERANGE */
+    "Bad file number",              /* EBADF */
+    "Unknown OS error code",        /* EUNKNOWN */
 };
 
 

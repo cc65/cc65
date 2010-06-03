@@ -59,7 +59,7 @@ PROGRAM = foobar
 
 ifdef CC65_TARGET
 CC      = $(CC65_HOME)/bin/cl65
-CFLAGS  = -t $(CC65_TARGET) --create-dep -O
+CFLAGS  = -t $(CC65_TARGET) --create-dep $(<:.c=.d) -O
 LDFLAGS = -t $(CC65_TARGET) -m $(PROGRAM).map
 else
 CC      = gcc
@@ -69,35 +69,27 @@ endif
 
 ########################################
 
-ifdef CC65_TARGET
-define MAKEDEPEND
-sed -e"s!.s:!.o:!p" -e"s![^\t]*\t\(.*\)!\1:!" < $(<:.c=.u) > $(@:.o=.d)
-rm -f $(<:.c=.u)
-endef
-endif
-
 .SUFFIXES:
-.PHONY: all
+.PHONY: all clean
 all: $(PROGRAM)
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(SOURCES:.c=.d)
 endif
 
-clean:
-	rm -f $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map
-
 %.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
-	@$(MAKEDEPEND)
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 $(PROGRAM): $(SOURCES:.c=.o)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) -o $@ $^
+
+clean:
+	$(RM) $(SOURCES:.c=.o) $(SOURCES:.c=.d) $(PROGRAM) $(PROGRAM).map
 </verb></tscreen>
 
 <bf/Important:/ When using the sample Makefile above via copy & paste it is
 necessary to replace the eight spaces at the beginning of command lines (lines
-33, 36, 37 and 40) with a tab character (ASCII code 9).
+26, 29 and 32) with a tab character (ASCII code 9).
 
 
 <sect1>Invoking the sample Makefile<p>
@@ -112,11 +104,11 @@ best done on the GNU Make command line like this:
 make CC65_TARGET=c64
 </verb></tscreen>
 
-The sample Makefile doesn't require cc65 to be "installed" in any way. Rather it
-only presumes the single variable <tt/CC65_HOME/ to point to the directory the
-cc65 packages were unpacked into. Again there are several ways to define this
+The sample Makefile presumes the variable <tt/CC65_HOME/ to point to the
+directory cc65 is located in. Again there are several ways to define this
 variable but as its value typically won't change often it is best done as an
-environment variable.
+environment variable. On Windows the cc65 .exe installer package takes care
+of creating a <tt/CC65_HOME/ environment variable.
 
 
 <sect1>Understanding the sample Makefile<p>
@@ -126,15 +118,7 @@ Most parts of the sample Makefile follow the guidelines in the
 that can be searched online for background information. The automatic generation of
 dependency however rather works as described by the GNU Make maintainer Paul D. Smith in
 <htmlurl url="http://make.paulandlesley.org/autodep.html#advanced" name="Advanced Auto-Dependencies">.
-
-In the meantime GCC supports this method directly with the preprocessor option
-<tt/-MP/ while cc65 requires some post-processing of the dependency file with
-<tt/sed/ adding a second line like in this example:
-
-<tscreen><verb>
-foo.o:  foo.c foo.h bar.h
-foo.c foo.h bar.h:
-</verb></tscreen>
+Fortunately both GCC and cc65 directly support this method in the meantime.
 
 
 <sect1>Invoking the sample Makefile on Windows<p>
@@ -150,7 +134,6 @@ by downloading the following programs:
 
 <itemize>
 <item>make.exe: <url url="http://gnuwin32.sourceforge.net/packages/make.htm">
-<item>sed.exe: <url url="http://gnuwin32.sourceforge.net/packages/sed.htm">
 <item>rm.exe: <url url="http://gnuwin32.sourceforge.net/packages/coreutils.htm">
 </itemize>
 

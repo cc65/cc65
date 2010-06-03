@@ -26,7 +26,7 @@ long __fastcall__ ftell (register FILE* f)
 
     /* Is the file open? */
     if ((f->f_flags & _FOPEN) == 0) {
-        _errno = EINVAL;                /* File not open */
+        _seterrno (EINVAL);                /* File not open */
         return -1L;
     }
 

@@ -12,7 +12,7 @@
 
         .include	"zeropage.inc"
         .include	"errno.inc"
-        .include	"filedes.inc"
+        .include	"../filedes.inc"
 
         .segment	"INIT"
 

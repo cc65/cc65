@@ -6,7 +6,13 @@
 
         .export 	_dio_query_sectsize
 
+        .include	"errno.inc"
+
 _dio_query_sectsize:
+        ; Clear error
+        stx	__oserror	; X = 0
+
+        ; Return ProDOS 8 block size
         lda	#<512
         ldx	#>512
         rts

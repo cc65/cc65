@@ -69,10 +69,10 @@ typedef struct {
 
 
 sectsize_t __fastcall__ dio_query_sectsize(dhandle_t handle);
-/* queries sector size, currently hardcoded */
+/* returns sector size */
 
 sectnum_t __fastcall__ dio_query_sectcount(dhandle_t handle);
-/* Return the sector count for a disk. */
+/* returns sector count */
 
 dhandle_t __fastcall__ dio_open(driveid_t drive_id);
 /* open drive for subsequent dio access */

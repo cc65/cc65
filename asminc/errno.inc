@@ -5,10 +5,9 @@
 ; Variables and functions
 
         .global         __errno, __oserror
-        .global         __maperrno, __osmaperrno
+        .global         __osmaperrno
         .global         __seterrno
         .global         oserrcheck
-        .global         seterrnofromoserror
 
 ; Error codes, must match the values in the C headers
 .enum

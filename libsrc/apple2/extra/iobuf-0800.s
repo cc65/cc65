@@ -70,7 +70,7 @@ iobuf_alloc:
 	ldy	#$01
 	sta	(ptr1),y
 	dey
-	lda	#$00
+	tya
 	sta	(ptr1),y
         rts
 

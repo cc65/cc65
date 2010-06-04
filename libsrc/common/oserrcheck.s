@@ -16,17 +16,13 @@
 .proc   oserrcheck
 
         sta     __oserror               ; Store the error code
-        tay                             ; Did we have an error?
+        tax                             ; Did we have an error?
         beq     ok                      ; Branch if no
         jsr     __osmaperrno            ; Map os error into errno code
-        sta     __errno
-        stx     __errno+1               ; Save in errno
+        jsr     __seterrno              ; Save in errno
         lda     #$FF                    ; Return -1
-
-; Error free, A contains zero
-
-ok:     tax                             ; Make high byte also zero
-        rts
+        tax                             ; Make high byte also zero
+ok:     rts
 
 .endproc
 

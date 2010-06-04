@@ -219,8 +219,10 @@ unsigned int cbm_load (const char* name, unsigned char device, void* data);
  * otherwise 0. "_oserror" contains an errorcode then (see table below).
  */
 
-unsigned char cbm_save (const char* name, unsigned char device,
-                        const void* data, unsigned int size);
+unsigned char __fastcall__ cbm_save (const char* name, 
+                                     unsigned char device,
+                                     const void* data, 
+                                     unsigned int size);
 /* Saves "size" bytes starting at "data" to a file.
  * Returns 0 if saving was successful, otherwise an errorcode (see table
  * below).

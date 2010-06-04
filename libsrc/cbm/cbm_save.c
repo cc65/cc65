@@ -12,8 +12,10 @@
 
 /* saves a memory area from start to end-1 to a file.
  */
-unsigned char cbm_save(const char* name, unsigned char device,
-                       const void* data, unsigned int size)
+unsigned char __fastcall__ cbm_save (const char* name, 
+                                     unsigned char device,
+                                     const void* data, 
+                                     unsigned int size)
 {
     cbm_k_setlfs(0, device, 0);
     cbm_k_setnam(name);

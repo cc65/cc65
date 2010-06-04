@@ -30,14 +30,13 @@
 
 .proc	__clocks_per_sec
 
+        ldx     #$00            ; Clear high byte of return value
 	lda	PAL		; use hw register, PALNTS is only supported on XL/XE ROM
 	and	#$0e
 	bne	@NTSC
-	tax
 	lda	#50
 	rts
-@NTSC:	ldx	#0
-	lda	#60
+@NTSC: 	lda	#60
 	rts
 
 .endproc

@@ -8,7 +8,6 @@
 
         .import         CLOSE
         .import         readdiskerror, closecmdchannel
-        .import         __oserror
         .importzp       tmp2
 
         .include        "errno.inc"
@@ -34,7 +33,7 @@
         tax
         lda     fdtab,x         ; Get flags for this handle
         and     #LFN_OPEN
-        beq     notopen
+        beq     invalidfd
 
 ; Valid lfn, close it. The close call is always error free, at least as far
 ; as the kernal is involved
@@ -49,39 +48,25 @@
 ; Read the drive error channel, then close it
 
         ldy     tmp2            ; Get the handle
-        ldx     unittab,y       ; Get teh disk for this handle
+        ldx     unittab,y       ; Get the disk for this handle
         jsr     readdiskerror   ; Read the disk error code
         pha                     ; Save it on stack
         ldy     tmp2
         ldx     unittab,y
         jsr     closecmdchannel ; Close the disk command channel
         pla                     ; Get the error code from the disk
-        bne     error           ; Jump if error
+        jmp     oserrcheck      ; Set _oserror and _errno, returns 0/-1
 
-; Successful
-
-        tax                     ; Return zero in a/x
-        rts
-
-; Error entry, file descriptor is invalid
+; Error entry: The given file descriptor is not valid or not open
 
 invalidfd:
-        lda     #EINVAL
-        sta     __errno
-        lda     #0
-        sta     __errno+1
-        beq     errout
+        lda     #EBADF
 
-; Error entry, file is not open
+; Error entry. Sets _errno, clears _oserror, returns -1
 
-notopen:
-        lda     #3              ; File not open
-        bne     error
-
-; Error entry, status not ok
-
-error:  sta     __oserror
-errout: lda     #$FF
+error:  jsr     __seterrno      ; Returns 0 in A
+        sta     __oserror
+        lda     #$FF
         tax                     ; Return -1
         rts
 

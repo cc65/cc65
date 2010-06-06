@@ -21,7 +21,7 @@
         jsr     __osmaperrno            ; Map os error into errno code
         jsr     __seterrno              ; Save in errno
         lda     #$FF                    ; Return -1
-        tax                             ; Make high byte also zero
+        tax
 ok:     rts
 
 .endproc

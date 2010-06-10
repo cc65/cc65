@@ -7,7 +7,7 @@
         .export         _chdir
 
         .import         __syschdir
-        .import         oserrcheck
+        .import         __mappederrno
 
 
 ;--------------------------------------------------------------------------
@@ -17,7 +17,7 @@
 .proc   _chdir
 
         jsr     __syschdir      ; Call the machine specific function
-        jmp     oserrcheck      ; Store into _oserror, set errno, return 0/-1
+        jmp     __mappederrno   ; Store into _oserror, set errno, return 0/-1
 
 .endproc
 

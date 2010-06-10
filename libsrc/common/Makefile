@@ -146,7 +146,6 @@ S_OBJS = 	_cwd.o                  \
 		mkdir.o		        \
 		modfree.o               \
 		modload.o               \
-                oserrcheck.o            \
 		printf.o      	        \
 		putchar.o	        \
 		putenv.o	        \

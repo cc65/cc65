@@ -38,23 +38,20 @@
 
 
 
-/* Operating system specific error codes */
+/*****************************************************************************/
+/*	       	   	  	     Data				     */
+/*****************************************************************************/
+
+
+
+/* Operating system specific error code */
 extern unsigned char _oserror;
 
-/* The following functions maps an operating system specific error code (for
- * example from _oserror) into one of the E... codes below. It is user
- * callable.
- */
-int __fastcall__ _osmaperrno (unsigned char oserror);
-
-/* Set errno to a specific error code and return zero. Used by the library */
-unsigned char __fastcall__ _seterrno (unsigned char code);
-
-/* System error codes go here */
 extern int _errno;
+/* System errors go here */
 
-/* errno must be a macro */
 #define errno   _errno
+/* errno must be a macro */
 
 
 
@@ -79,6 +76,35 @@ extern int _errno;
 
 
 
+/*****************************************************************************/
+/*                                     Code                                  */
+/*****************************************************************************/
+
+
+
+int __fastcall__ _osmaperrno (unsigned char oserror);
+/* Map an operating system specific error code (for example from _oserror) 
+ * into one of the E... codes above. It is user callable.
+ */
+
+unsigned char __fastcall__ _seterrno (unsigned char code);
+/* Set errno to a specific error code and return zero. Used by the library */
+
+int __fastcall__ _directerrno (unsigned char code);
+/* Set errno to a specific error code, clear _oserror and return -1. Used
+ * by the library.
+ */
+
+int __fastcall__ _mappederrno (unsigned char code);
+/* Set _oserror to the given platform specific error code. If it is a real
+ * error code (not zero) set errno to the corresponding system error code
+ * and return -1. Otherwise return zero.
+ * Used by the library.
+ */
+
+
+
+/* End of errno.h */
 #endif
 
 

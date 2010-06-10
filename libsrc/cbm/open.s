@@ -15,7 +15,6 @@
         .import         addysp, popax
         .import         scratch, fnparse, fnaddmode, fncomplete, fnset
         .import         opencmdchannel, closecmdchannel, readdiskerror
-        .import         __oserror
         .import         fnunit
         .import         _close
         .importzp       sp, tmp2, tmp3
@@ -76,12 +75,13 @@ parmok: jsr     popax           ; Get flags
         jsr     popax           ; Get name
         jsr     fnparse         ; Parse it
         cmp     #0
-        bne     error           ; Bail out if problem with name
+        bne     oserror         ; Bail out if problem with name
 
 ; Get a free file handle and remember it in tmp2
 
         jsr     freefd
-        bcs     nofile
+        lda     #EMFILE         ; Load error code
+        bcs     seterrno        ; Jump in case of errors
         stx     tmp2
 
 ; Check the flags. We cannot have both, read and write flags set, and we cannot
@@ -92,10 +92,36 @@ parmok: jsr     popax           ; Get flags
         cmp     #O_RDONLY       ; Open for reading?
         beq     doread          ; Yes: Branch
         cmp     #(O_WRONLY | O_CREAT)   ; Open for writing?
-        bne     invflags        ; No: Invalid open mode
+        beq     flagsok
+
+; Invalid open mode
+
+        lda     #EINVAL
+
+; Error entry. Sets _errno, clears _oserror, returns -1
+
+seterrno:                    
+        jmp     __directerrno
+
+; Error entry: Close the file and exit. OS error code is in A on entry
+
+closeandexit:
+        pha
+        lda     tmp2
+        clc
+        adc     #LFN_OFFS
+        jsr     CLOSE
+        ldx     fnunit
+        jsr     closecmdchannel
+        pla
+
+; Error entry: Set oserror and errno using error code in A and return -1
+
+oserror:jmp     __mappederrno
 
 ; If O_TRUNC is set, scratch the file, but ignore any errors
 
+flagsok:
         lda     tmp3
         and     #O_TRUNC
         beq     notrunc
@@ -136,7 +162,7 @@ common: sta     tmp3
         jsr     SETLFS          ; Set the file params
 
         jsr     OPEN
-        bcs     error
+        bcs     oserror
 
 ; Open the the drive command channel and read it
 
@@ -159,40 +185,8 @@ common: sta     tmp3
 
         txa                     ; Handle
         ldx     #0
+        stx     __oserror       ; Clear _oserror
         rts
-
-; Error entry: No more file handles
-
-nofile: lda     #1              ; Too many open files
-
-; Error entry. Error code is in A.
-
-error:  sta     __oserror
-errout: lda     #$FF
-        tax                     ; Return -1
-        rts
-
-; Error entry: Invalid flag parameter
-
-invflags:
-        lda     #EINVAL
-        sta     __errno
-        lda     #0
-        sta     __errno+1
-        beq     errout
-
-; Error entry: Close the file and exit
-
-closeandexit:
-        pha
-        lda     tmp2
-        clc
-        adc     #LFN_OFFS
-        jsr     CLOSE
-        ldx     fnunit
-        jsr     closecmdchannel
-        pla
-        bne     error           ; Branch always
 
 .endproc
 

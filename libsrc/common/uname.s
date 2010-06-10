@@ -7,7 +7,7 @@
         .export         _uname
 
         .import         __sysuname
-        .import         oserrcheck
+        .import         __mappederrno
 
 
 ;--------------------------------------------------------------------------
@@ -15,7 +15,7 @@
 .proc   _uname
 
         jsr     __sysuname      ; Call the machine specific function
-        jmp     oserrcheck      ; Store into _oserror, set errno, return 0/-1
+        jmp     __mappederrno   ; Store into _oserror, set errno, return 0/-1
 
 .endproc
 

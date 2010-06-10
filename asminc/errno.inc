@@ -1,4 +1,4 @@
-;
+;                                                   
 ; Ullrich von Bassewitz, 16.05.2000
 ;
 
@@ -7,7 +7,7 @@
         .global         __errno, __oserror
         .global         __osmaperrno
         .global         __seterrno
-        .global         oserrcheck
+        .global         __directerrno, __mappederrno
 
 ; Error codes, must match the values in the C headers
 .enum

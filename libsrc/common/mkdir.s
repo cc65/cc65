@@ -7,7 +7,7 @@
         .export         _mkdir
 
         .import         __sysmkdir
-        .import         oserrcheck
+        .import         __mappederrno
 
 
 ;--------------------------------------------------------------------------
@@ -15,6 +15,6 @@
 .proc   _mkdir
 
         jsr     __sysmkdir      ; Call the machine specific function
-        jmp     oserrcheck      ; Store into _oserror, set errno, return 0/-1
+        jmp     __mappederrno   ; Store into _oserror, set errno, return 0/-1
 
 .endproc

@@ -47,8 +47,11 @@ _read:
         ldy	#READ_CALL
         jmp	rwcommon
 
-        ; Set counter to zero
+        ; Device succeeds always
 device: lda	#$00
+        sta	__oserror
+
+        ; Set counter to zero
         sta	ptr3
         sta	ptr3+1
 

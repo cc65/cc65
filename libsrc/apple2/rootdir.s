@@ -46,9 +46,7 @@ _rootdir:
         lda	#$00
         sta	(ptr1),y
         
-        ; Return success
-        tax
-        rts
+        ; Return success	; A = 0
         
         ; Set __oserror
 oserr:  jmp	__mappederrno

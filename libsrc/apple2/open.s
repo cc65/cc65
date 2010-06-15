@@ -199,6 +199,7 @@ done:   lda	tmp1		; Restore fd
 
         ; Return success
         ldx	#$00
+        stx	__oserror
         rts
 
 freebuffer:

@@ -100,7 +100,8 @@ output: jsr	COUT		; Preserves X and Y
         bpl	next
 
         ; Return success
-done:   jmp	rwepilog
+done:   lda	#$00
+        jmp	rwepilog
 
         ; Load errno code
 einval: lda	#EINVAL

@@ -7,7 +7,6 @@
         .export 	_close
 
         .import		closedirect, freebuffer
-        .import 	return0
 
         .include	"errno.inc"
         .include	"filedes.inc"
@@ -32,10 +31,10 @@ zerofd: lda	#$00
         jsr	freebuffer
 
         ; Return success
-        jmp	return0
-
-        ; Set __errno
-errno:  jmp	__directerrno
+        lda	#$00
 
         ; Set __oserror
 oserr:  jmp	__mappederrno
+
+        ; Set __errno
+errno:  jmp	__directerrno

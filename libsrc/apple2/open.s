@@ -11,7 +11,6 @@
         .destructor	closeallfiles, 17
 
         .import		pushname, popname
-        .import 	errnoexit, oserrexit
         .import		iobuf_alloc, iobuf_free
         .import 	addysp, incsp4, incaxy, pushax, popax
 
@@ -54,8 +53,8 @@ _open:
         ; Cleanup stack
 errno:  jsr	incsp4		; Preserves A
 
-        ; Return errno
-        jmp	errnoexit
+        ; Set __errno
+        jmp	__directerrno
 
         ; Save fdtab slot
 found:  tya
@@ -138,8 +137,8 @@ oserr1: ldy	tmp2		; Restore fdtab slot
         jsr	freebuffer
         pla			; Restore oserror code
 
-        ; Return oserror
-        jmp	oserrexit
+        ; Set __oserror
+        jmp	__mappederrno
 
 open:   ldy	tmp2		; Restore fdtab slot
 

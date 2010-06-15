@@ -5,7 +5,7 @@
 ;
 
         .export 	_rootdir
-        .import		popax, oserrexit
+        .import		popax
 
         .include	"zeropage.inc"
         .include	"errno.inc"
@@ -50,5 +50,5 @@ _rootdir:
         tax
         rts
         
-        ; Return oserror
-oserr:  jmp	oserrexit
+        ; Set __oserror
+oserr:  jmp	__mappederrno

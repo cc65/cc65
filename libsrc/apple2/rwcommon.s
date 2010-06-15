@@ -3,10 +3,10 @@
 ;
 
         .export		rwprolog, rwcommon, rwepilog
-        .import		oserrexit
         .import		popax
 
         .include	"zeropage.inc"
+        .include	"errno.inc"
         .include	"fcntl.inc"
         .include	"mli.inc"
         .include	"filedes.inc"
@@ -55,5 +55,5 @@ rwepilog:
         ldx	mliparam + MLI::RW::TRANS_COUNT+1
         rts
 
-        ; Return oserror
-oserr:  jmp	oserrexit
+        ; Set __oserror
+oserr:  jmp	__mappederrno

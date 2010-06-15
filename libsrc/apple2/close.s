@@ -7,9 +7,9 @@
         .export 	_close
 
         .import		closedirect, freebuffer
-        .import 	errnoexit, oserrexit
         .import 	return0
 
+        .include	"errno.inc"
         .include	"filedes.inc"
 
 _close:
@@ -34,8 +34,8 @@ zerofd: lda	#$00
         ; Return success
         jmp	return0
 
-        ; Return errno
-errno:  jmp	errnoexit
+        ; Set __errno
+errno:  jmp	__directerrno
 
-        ; Return oserror
-oserr:  jmp	oserrexit
+        ; Set __oserror
+oserr:  jmp	__mappederrno

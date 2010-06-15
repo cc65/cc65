@@ -7,7 +7,6 @@
         .constructor	initprompt
         .export		_read
         .import		rwprolog, rwcommon
-        .import		errnoexit
         .import		RDKEY, COUT
 
         .include	"zeropage.inc"
@@ -101,5 +100,5 @@ check:  lda	ptr3
         ; Load errno code
 einval: lda	#EINVAL
 
-        ; Return errno
-errno:  jmp	errnoexit
+        ; Set __errno
+errno:  jmp	__directerrno

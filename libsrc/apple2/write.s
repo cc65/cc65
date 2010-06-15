@@ -6,7 +6,6 @@
 
         .export		_write
         .import		rwprolog, rwcommon, rwepilog
-        .import		errnoexit, oserrexit
         .import		COUT
 
         .include	"zeropage.inc"
@@ -106,9 +105,9 @@ done:   jmp	rwepilog
         ; Load errno code
 einval: lda	#EINVAL
 
-        ; Return errno
-errno:  jmp	errnoexit
+        ; Set __errno
+errno:  jmp	__directerrno
 
-        ; Return oserror
-oserr:  jmp	oserrexit
+        ; Set __oserror
+oserr:  jmp	__mappederrno
                                                           

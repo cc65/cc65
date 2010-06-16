@@ -3,55 +3,33 @@
 ;
 ; dhandle_t __fastcall__ dio_open (driveid_t drive_id);
 ;
-; drive_id = (slot * 2) + (drive - 1)
 
         .export 	_dio_open
-        .import		return0
+        .import 	return0, __dos_type
 
-        .include	"zeropage.inc"
         .include	"errno.inc"
         .include	"mli.inc"
 
 _dio_open:
-        ; Convert drive id into unit number
-        lsr
-        bcc	:+
-        ora	#%00001000
-:       asl
-        asl
-        asl
-        asl
-        tay			; Save handle
+        ; Check for ProDOS 8
+        ldx	__dos_type
+        bne	:+
+        lda	#$01		; "Bad system call number"
+        bne	oserr		; Branch always
 
-        ; Set handle
-        sta	mliparam + MLI::ON_LINE::UNIT_NUM
-
-        ; Alloc 16-byte buffer just below stack
-        lda	sp
-        sec
-        sbc	#16
-        sta	mliparam + MLI::ON_LINE::DATA_BUFFER
-        lda	sp+1
-        sbc	#$00
-        sta	mliparam + MLI::ON_LINE::DATA_BUFFER+1
-
-        ; Get device state
-        lda	#ON_LINE_CALL
-        ldx	#ON_LINE_COUNT
-        jsr	callmli
-        bcc	:+
-
-        ; DIO level access doesn't necessarily need a
-        ; ProDOS 8 disk so ignore "high level" errors
-        cmp	#$40
-        bcc	oserr
+        ; Walk device list
+:       ldx	DEVCNT
+:       cmp	DEVLST,x
+        beq	:+		; Found drive_id in device list
+        dex
+        bpl	:-
+        lda	#$28		; "No device connected"
+        
+        ; Return oserror
+oserr:  sta	__oserror
+        jmp	return0
 
         ; Return success
-:       tya			; Restore handle
-        ldx	#$00
+:       ldx	#$00
         stx	__oserror
         rts
-
-        ; Return oserror
-oserr:  sta     __oserror
-        jmp	return0

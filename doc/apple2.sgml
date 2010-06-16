@@ -498,15 +498,10 @@ The function <htmlurl url="dio-1.html" name="dio_open()"> has the single paramet
 slot and drive pair is mapped to that <tt/drive_id/ according to the formula
 
 <verb>
-    drive_id = (slot * 2) + (drive - 1)
+    drive_id = slot * 16 + (drive - 1) * 128
 </verb>
 
-so that for example slot 6 drive 1 is mapped to <tt/drive_id/ 12.
-
-The function <htmlurl url="dio-1.html" name="dio_open()"> succeeds only if a
-formatted disk is present in the drive. However intentionally no check is
-performed on the presence of a ProDOS 8 disk. Therefore access to all standard
-16-sector disks (as for instance DOS 3.3) is possible.
+so that for example slot 6 drive 2 is mapped to <tt/drive_id/ 224.
 
 
 

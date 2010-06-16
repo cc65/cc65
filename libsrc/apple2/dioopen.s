@@ -23,7 +23,7 @@ _dio_open:
         beq	:+		; Found drive_id in device list
         dex
         bpl	:-
-        lda	#$28		; "No device connected"
+        lda	#$28		; "No device detected/connected"
         
         ; Return oserror
 oserr:  sta	__oserror

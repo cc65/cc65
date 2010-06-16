@@ -30,6 +30,6 @@ call:   .byte   $00
         rts
 
         ; Load oserror code and return
-oserr:  lda     #$01		; "Invalid MLI function code number"
+oserr:  lda     #$01		; "Bad system call number"
         sec
         rts

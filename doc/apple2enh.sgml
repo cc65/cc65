@@ -502,7 +502,7 @@ name="assembler manual">.
 The function <htmlurl url="dio-1.html" name="dio_open()"> has the single parameter
 <tt/drive_id/ to identify the drive to be opened. Therefore an Apple&nbsp;II
 slot and drive pair is mapped to that <tt/drive_id/ according to the formula
-  
+
 <verb>
     drive_id = slot * 16 + (drive - 1) * 128
 </verb>

@@ -44,7 +44,7 @@ all:
 apple2lib:
 	for i in apple2 common runtime conio dbg em joystick mouse serial tgi zlib; do \
 	    $(MAKE) SYS=apple2 -C $$i || exit 1; \
-	    $(AR) a apple2.lib $$i/*.o;\
+	    $(AR) a apple2.lib $$i/*.o || exit 1; \
 	done
 	cp apple2/apple2-auxmem.emd a2.auxmem.emd
 	cp apple2/apple2-stdjoy.joy a2.stdjoy.joy
@@ -64,7 +64,7 @@ apple2lib:
 apple2enhlib:
 	for i in apple2enh common runtime conio dbg em joystick mouse serial tgi zlib; do \
 	    $(MAKE) SYS=apple2enh -C $$i || exit 1; \
-	    $(AR) a apple2enh.lib $$i/*.o;\
+	    $(AR) a apple2enh.lib $$i/*.o || exit 1; \
 	done
 	cp apple2enh/apple2-auxmem.emd a2e.auxmem.emd
 	cp apple2enh/apple2-stdjoy.joy a2e.stdjoy.joy
@@ -84,7 +84,7 @@ apple2enhlib:
 atarilib:
 	for i in atari common runtime conio dbg em joystick tgi zlib; do \
 	    $(MAKE) SYS=atari -C $$i || exit 1; \
-	    $(AR) a atari.lib $$i/*.o;\
+	    $(AR) a atari.lib $$i/*.o || exit 1; \
 	done
 	cp atari/atari-stdjoy.joy ataristd.joy
 	cp atari/atari-multijoy.joy atarimj8.joy
@@ -111,7 +111,7 @@ atarilib:
 atmoslib:
 	for i in atmos common conio runtime em joystick tgi zlib; do \
 	    $(MAKE) SYS=atmos -C $$i || exit 1; \
-	    $(AR) a atmos.lib $$i/*.o;\
+	    $(AR) a atmos.lib $$i/*.o || exit 1; \
 	done
 	cp atmos/*.joy .
 	cp atmos/*.tgi .
@@ -122,7 +122,7 @@ atmoslib:
 c16lib:
 	for i in c16 cbm common runtime conio dbg em joystick tgi zlib; do \
 	    $(MAKE) SYS=c16 -C $$i || exit 1; \
-	    $(AR) a c16.lib $$i/*.o;\
+	    $(AR) a c16.lib $$i/*.o || exit 1; \
 	done
 	cp c16/*.joy .
 	cp c16/*.emd .
@@ -133,7 +133,7 @@ c16lib:
 c64lib:
 	for i in c64 cbm common runtime conio dbg em joystick mouse serial tgi zlib; do \
 	    $(MAKE) SYS=c64 -C $$i || exit 1; \
-	    $(AR) a c64.lib $$i/*.o;\
+	    $(AR) a c64.lib $$i/*.o || exit 1; \
 	done
 	cp c64/*.emd .
 	cp c64/*.joy .
@@ -149,7 +149,7 @@ c64lib:
 c128lib:
 	for i in c128 cbm common runtime conio dbg em joystick mouse serial tgi zlib; do \
 	    $(MAKE) SYS=c128 -C $$i || exit 1; \
-	    $(AR) a c128.lib $$i/*.o;\
+	    $(AR) a c128.lib $$i/*.o || exit 1; \
 	done
 	cp c128/*.emd .
 	cp c128/*.joy .
@@ -166,7 +166,7 @@ c128lib:
 cbm510lib:
 	for i in cbm510 cbm common runtime conio dbg em joystick serial tgi zlib; do \
 	    $(MAKE) SYS=cbm510 -C $$i || exit 1; \
-	    $(AR) a cbm510.lib $$i/*.o;\
+	    $(AR) a cbm510.lib $$i/*.o || exit 1; \
 	done
 	cp cbm510/*.emd .
 	cp cbm510/cbm510-stdjoy.joy cbm510-std.joy
@@ -178,7 +178,7 @@ cbm510lib:
 cbm610lib:
 	for i in cbm610 cbm common runtime conio dbg em joystick serial tgi zlib; do \
 	    $(MAKE) SYS=cbm610 -C $$i || exit 1; \
-	    $(AR) a cbm610.lib $$i/*.o;\
+	    $(AR) a cbm610.lib $$i/*.o || exit 1; \
 	done
 	cp cbm610/*.emd .
 	cp cbm610/cbm610-stdser.ser cbm610-std.ser
@@ -204,9 +204,9 @@ geoslib:
 	    $(MAKE) SYS=geos -C $$i || exit 1; \
 	    for objfile in $$i/*.o; do \
 	        if [ -f geos/$$objfile ]; then \
-	      	    $(AR) a geos.lib geos/$$objfile; \
+	      	    $(AR) a geos.lib geos/$$objfile || exit 1; \
 	      	else \
-	      	    $(AR) a geos.lib $$objfile; \
+	      	    $(AR) a geos.lib $$objfile || exit 1; \
 	      	fi; \
 	    done \
 	done
@@ -220,7 +220,7 @@ geoslib:
 lynxlib:
 	for i in lynx common conio runtime em joystick serial tgi zlib; do \
 	    $(MAKE) SYS=lynx -C $$i || exit 1; \
-	    $(AR) a lynx.lib $$i/*.o;\
+	    $(AR) a lynx.lib $$i/*.o || exit 1; \
 	done
 	cp lynx/*.joy .
 	cp lynx/*.tgi .
@@ -232,7 +232,7 @@ lynxlib:
 neslib:
 	for i in nes common runtime conio em joystick tgi zlib; do \
 	    $(MAKE) SYS=nes -C $$i || exit 1; \
-	    $(AR) a nes.lib $$i/*.o;\
+	    $(AR) a nes.lib $$i/*.o || exit 1; \
 	done
 	cp nes/*.joy .
 
@@ -242,7 +242,7 @@ neslib:
 petlib:
 	for i in pet cbm common runtime conio dbg em joystick tgi zlib; do \
 	    $(MAKE) SYS=pet -C $$i || exit 1; \
-	    $(AR) a pet.lib $$i/*.o;\
+	    $(AR) a pet.lib $$i/*.o || exit 1; \
 	done
 	cp pet/*.joy .
 
@@ -252,7 +252,7 @@ petlib:
 plus4lib:
 	for i in plus4 cbm common runtime conio dbg em joystick serial tgi zlib; do \
 	    $(MAKE) SYS=plus4 -C $$i || exit 1; \
-	    $(AR) a plus4.lib $$i/*.o;\
+	    $(AR) a plus4.lib $$i/*.o || exit 1; \
 	done
 	cp plus4/*.joy .
 	cp plus4/*.ser .
@@ -263,7 +263,7 @@ plus4lib:
 supervisionlib:
 	for i in supervision common runtime; do \
 	    $(MAKE) SYS=supervision -C $$i || exit 1; \
-	    $(AR) a supervision.lib $$i/*.o;\
+	    $(AR) a supervision.lib $$i/*.o || exit 1; \
 	done
 
 #-----------------------------------------------------------------------------
@@ -272,7 +272,7 @@ supervisionlib:
 vic20lib:
 	for i in vic20 cbm common runtime conio dbg em joystick tgi zlib; do \
 	    $(MAKE) SYS=vic20 -C $$i || exit 1; \
-	    $(AR) a vic20.lib $$i/*.o;\
+	    $(AR) a vic20.lib $$i/*.o || exit 1; \
 	done
 	cp vic20/*.joy .
 
@@ -291,6 +291,3 @@ zap:	clean
 	   $(MAKE) -C $$i zap;     	    	       	      	   		\
 	done
 	@$(RM) *.o *.emd *.joy *.lib *.tgi *.ser *.mou
-
-
-

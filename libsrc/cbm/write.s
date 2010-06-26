@@ -9,11 +9,11 @@
 
         .import         SETLFS, OPEN, CKOUT, BSOUT, CLRCH
         .import         rwcommon
-        .import         __oserror
         .importzp       sp, ptr1, ptr2, ptr3
 
-        .include        "fcntl.inc"
         .include        "cbm.inc"
+        .include        "errno.inc"
+        .include        "fcntl.inc"
         .include        "filedes.inc"
 
 
@@ -42,13 +42,13 @@
 
 ;--------------------------------------------------------------------------
 ; _write
-                      
+
 .code
 
 .proc   _write
 
         jsr     rwcommon        ; Pop params, check handle
-        bcs     errout          ; Invalid handle, errno already set
+        bcs     invalidfd       ; Invalid handle
 
 ; Check if the LFN is valid and the file is open for writing
 
@@ -56,13 +56,13 @@
         tax
         lda     fdtab-LFN_OFFS,x; Get flags for this handle
         and     #LFN_WRITE      ; File open for writing?
-        beq     notopen
+        beq     invalidfd
 
 ; Valid lfn. Make it the output file
 
         jsr     CKOUT
-        bcs     error
         bcc     @L2
+@error: jmp     __mappederrno   ; Store into __oserror, map to errno, return -1
 
 ; Output the next character from the buffer
 
@@ -72,7 +72,7 @@
         bne     @L1
         inc     ptr2+1          ; A = *buf++;
 @L1:    jsr     BSOUT
-        bcs     error           ; Bail out on errors
+        bcs     @error          ; Bail out on errors
 
 ; Count characters written
 
@@ -91,25 +91,25 @@
 
         jsr     CLRCH
 
-; Return the number of chars written
+; Clear _oserror and return the number of chars written
 
+        lda     #0
+        sta     __oserror
         lda     ptr3
         ldx     ptr3+1
         rts
 
-; Error entry, file is not open
+; Error entry: Device not present
 
-notopen:
-        lda     #3              ; File not open
-        bne     error
+devnotpresent:
+        lda     #ENODEV
+        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
 
-; Error entry, status not ok
+; Error entry: The given file descriptor is not valid or not open
 
-error5: lda     #5              ; Device not present
-error:  sta     __oserror
-errout: lda     #$FF
-        tax                     ; Return -1
-        rts
+invalidfd:
+        lda     #EBADF
+        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
 
 .endproc
 

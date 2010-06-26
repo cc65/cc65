@@ -37,18 +37,10 @@
 
         jsr     popax           ; Get the handle
         cpx     #$01
-        bcs     invhandle
-        cmp     #MAX_FDS
-        bcs     invhandle
+        bcs     @L9
+        cmp     #MAX_FDS        ; Set carry if fd too large
         sta     tmp2
-        rts                     ; Return with carry clear
-
-invhandle:
-        lda     #EINVAL
-        sta     __errno
-        lda     #0
-        sta     __errno+1
-        rts                     ; Return with carry set
+@L9:    rts                     ; Return with result in carry
 
 .endproc
 

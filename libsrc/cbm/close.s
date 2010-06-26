@@ -17,7 +17,7 @@
 
 ;--------------------------------------------------------------------------
 ; _close
-                                      
+                                                   
 .proc   _close
 
 ; Check if we have a valid handle
@@ -55,13 +55,13 @@
         ldx     unittab,y
         jsr     closecmdchannel ; Close the disk command channel
         pla                     ; Get the error code from the disk
-        jmp     __mappederrno   ; Set _oserror and _errno, returns 0/-1
+        jmp     __mappederrno   ; Set _oserror and _errno, return 0/-1
 
 ; Error entry: The given file descriptor is not valid or not open
 
 invalidfd:
         lda     #EBADF
-        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
+        jmp     __directerrno   ; Set _errno, clear _oserror, return -1
 
 .endproc
 

@@ -10,17 +10,17 @@
         .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, READST
         .import         rwcommon
         .import         popax
-        .import         __oserror
         .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3
 
-        .include        "fcntl.inc"
         .include        "cbm.inc"
+        .include        "errno.inc"
+        .include        "fcntl.inc"
         .include        "filedes.inc"
 
 
 ;--------------------------------------------------------------------------
 ; initstdin: Open the stdin file descriptors for the keyboard
-     
+
 .segment        "INIT"
 
 .proc   initstdin
@@ -44,7 +44,7 @@
 .proc   _read
 
         jsr     rwcommon        ; Pop params, check handle
-        bcs     errout          ; Invalid handle, errno already set
+        bcs     invalidfd       ; Invalid handle
 
 ; Check if the LFN is valid and the file is open for writing
 
@@ -52,7 +52,7 @@
         tax
         lda     fdtab-LFN_OFFS,x; Get flags for this handle
         and     #LFN_READ       ; File open for writing?
-        beq     notopen
+        beq     invalidfd
 
 ; Check the EOF flag. If it is set, don't read anything
 
@@ -62,11 +62,8 @@
 ; Valid lfn. Make it the input file
 
         jsr     CHKIN
-        bcs     error
-
-; Go looping...
-
-        bcc     @L3             ; Branch always
+        bcc     @L3             ; Branch if ok
+        jmp     __mappederrno   ; Store into __oserror, map to errno, return -1
 
 ; Read the next byte
 
@@ -76,7 +73,7 @@
         jsr     READST          ; Read the IEEE status
         sta     tmp3            ; Save it
         and     #%10111111      ; Check anything but the EOI bit
-        bne     error5          ; Assume device not present
+        bne     devnotpresent   ; Assume device not present
 
 ; Store the byte just read
 
@@ -118,25 +115,25 @@
 
 done:   jsr     CLRCH
 
-; Return the number of chars read
+; Clear _oserror and return the number of chars read
 
-eof:    lda     ptr3
+eof:    lda     #0
+        sta     __oserror
+        lda     ptr3
         ldx     ptr3+1
         rts
 
-; Error entry, file is not open
+; Error entry: Device not present
 
-notopen:
-        lda     #3              ; File not open
-        bne     error
+devnotpresent:
+        lda     #ENODEV
+        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
 
-; Error entry, status not ok
+; Error entry: The given file descriptor is not valid or not open
 
-error5: lda     #5              ; Device not present
-error:  sta     __oserror
-errout: lda     #$FF
-        tax                     ; Return -1
-        rts
+invalidfd:
+        lda     #EBADF
+        jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
 
 .endproc
 

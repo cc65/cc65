@@ -3042,7 +3042,7 @@ Here's a list of all control commands and a description, what they do:
 
   <tscreen><verb>
        	.macpack	longbranch	; Include macro package
-
+                         
        		cmp	#$20		; Set condition codes
        		jne    	Label		; Jump long on condition
   </verb></tscreen>
@@ -3954,18 +3954,38 @@ are:
 <sect1><tt>.MACPACK generic</tt><p>
 
 This macro package defines macros that are useful in almost any program.
-Currently, two macros are defined:
+Currently defined macros are:
 
 <tscreen><verb>
       	.macro  add     Arg
       	     	clc
-   	     	adc     Arg
-   	.endmacro
+      	     	adc     Arg
+      	.endmacro
 
-   	.macro  sub     Arg
-   	     	sec
-   	     	sbc     Arg
-   	.endmacro
+      	.macro  sub     Arg
+      	     	sec
+      	     	sbc     Arg
+      	.endmacro
+
+        .macro  bge     Arg
+                bcs     Arg
+        .endmacro
+
+        .macro  blt     Arg
+                bcc     Arg
+        .endmacro
+
+        .macro  bgt     Arg
+                .local  L
+                beq     L
+                bcs     Arg
+        L:
+        .endmacro
+
+        .macro  ble     Arg
+                beq     Arg
+                bcc     Arg
+        .endmacro
 </verb></tscreen>
 
 

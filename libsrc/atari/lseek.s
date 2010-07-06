@@ -21,10 +21,7 @@
 ; seeking not supported, return -1 and ENOSYS errno value
 no_supp:jsr	incsp6
 	lda	#<ENOSYS
-	jsr	__seterrno      ; set __errno, return zero in A
-       	sta	__oserror
-	lda     #$FF
-	tax
+	jsr	__directerrno	; returns with $FFFF in AX
 	sta	sreg
 	sta	sreg+1
 	rts
@@ -93,8 +90,14 @@ end:	ldx	tmp3
 	bpl	l01
 
 ; error returned from CIO
-xxerr:	sty	__oserror
-	bmi	iocberr
+xxerr:	tya
+	pha
+	jsr	incsp6
+	pla
+	jsr	__mappederrno	; returns with $FFFF in AX
+	sta	sreg
+	sta	sreg+1
+	rts
 
 ; check for offset 0, SEEK_CUR (get current position)
 cont:	ldy	#3

@@ -16,7 +16,7 @@
 	.import	clriocb
 	.import	fddecusage,newfd
 	.import	findfreeiocb
-	.import	__do_oserror,incsp4
+	.import	incsp4
 	.import	ldaxysp,addysp
 	.import	__oserror
 	.importzp tmp4,tmp2
@@ -38,7 +38,7 @@ parmok:	jsr	findfreeiocb
 	beq	iocbok		; we found one
 
 	lda	#<EMFILE	; "too many open files"
-seterr:	jsr	__seterrno
+seterr:	jsr	__directerrno
 	jsr	incsp4		; clean up stack
 	lda	#$FF
 	tax
@@ -143,7 +143,8 @@ finish:	php
 
 	bpl	ok
 	jsr	fddecusage	; decrement usage counter of fd as open failed
-	jmp	__do_oserror
+	tya			; put error code into A
+	jmp	__mappederrno
 
 ok:	lda	tmp2		; get fd
 	ldx	#0

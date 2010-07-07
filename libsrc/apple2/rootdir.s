@@ -5,7 +5,7 @@
 ;
 
         .export 	_rootdir
-        .import		popax
+        .import		popa
 
         .include	"zeropage.inc"
         .include	"errno.inc"
@@ -21,7 +21,7 @@ _rootdir:
         stx	mliparam + MLI::ON_LINE::DATA_BUFFER+1
 
         ; Set drive
-        jsr	popax
+        jsr	popa
         sta	mliparam + MLI::ON_LINE::UNIT_NUM
 
         ; Get volume name

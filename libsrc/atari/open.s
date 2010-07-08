@@ -65,7 +65,6 @@ iocbok:	stx	tmp4
 
 .ifndef	UCASE_FILENAME
 invret:	lda	#<EINVAL	; file name is too long
-	ldx	#>EINVAL
 	jmp	seterr
 .endif
 
@@ -96,7 +95,6 @@ cont:	ldy	#3
 	jsr	ucase_fn
 	bcc	ucok1
 invret:	lda	#<EINVAL	; file name is too long
-	ldx	#>EINVAL
 	jmp	seterr
 ucok1:
 

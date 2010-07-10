@@ -186,6 +186,11 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
        	Error ("Illegal type");
     }
 
+    /* If Expr is a function, convert it to pointer to function */
+    if (IsTypeFunc(Expr->Type)) {
+        Expr->Type = PointerTo (Expr->Type);
+    }
+
     /* If both types are equal, no conversion is needed */
     if (TypeCmp (Expr->Type, NewType) >= TC_EQUAL) {
         /* We're already done */
@@ -229,7 +234,7 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
      	     */
     	    if (!IsTypeVoid (Indirect (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
     	 	/* Compare the types */
-    	 	switch (TypeCmp (NewType, Expr->Type)) {
+                switch (TypeCmp (NewType, Expr->Type)) {
 
     	 	    case TC_INCOMPATIBLE:
     	 	 	Error ("Incompatible pointer types");
@@ -250,16 +255,6 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
      	    if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
      	       	Warning ("Converting integer to pointer without a cast");
      	    }
-    	} else if (IsTypeFuncPtr (NewType) && IsTypeFunc(Expr->Type)) {
-            /* Function -> Function pointer. First convert rhs to pointer */
-            Expr->Type = PointerTo (Expr->Type);
-
-    	    /* Assignment of function to function pointer is allowed, provided
-    	     * that both functions have the same parameter list.
-    	     */
-       	    if (TypeCmp (NewType, Expr->Type) < TC_COMPATIBLE) {
-                Error ("Incompatible types");
-    	    }
      	} else {
     	    Error ("Incompatible types");
     	}

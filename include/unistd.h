@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,6 +61,10 @@ typedef unsigned size_t;
 typedef long int off_t;
 #endif
 
+/* Stuff for getopt */
+extern char *optarg;
+extern int optind, opterr, optopt;
+
 
 
 /*****************************************************************************/
@@ -83,6 +87,7 @@ int __fastcall__ rmdir (const char* name);
 
 /* Others */
 unsigned __fastcall__ sleep (unsigned seconds);
+int __fastcall__ getopt (int argc, char* const* argv, const char* optstring);
 
 
 

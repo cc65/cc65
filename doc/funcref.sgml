@@ -568,6 +568,7 @@ It does not declare any functions.
 <itemize>
 <!-- <item><ref id="chdir" name="chdir"> -->
 <!-- <item><ref id="getcwd" name="getcwd"> -->
+<item><ref id="getopt" name="getopt">
 <!-- <item><ref id="lseek" name="lseek"> -->
 <!-- <item><ref id="mkdir" name="mkdir"> -->
 <!-- <item><ref id="read" name="read"> -->
@@ -704,7 +705,7 @@ id="malloc" name="malloc"> may still return <tt/NULL/.
 <sect1>_poserror<label id="_poserror"><p>
 
 <quote>
-<descrip>                                                 
+<descrip>
 <tag/Function/Print an error message for the error in <tt/_oserror/.
 <tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
 <tag/Declaration/<tt/void __fastcall__ _poserror (const char* msg);/
@@ -2188,6 +2189,28 @@ header files define constants that can be used to check the return code.
 </quote>
 
 
+<sect1>getcpu<label id="getcpu"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine on which CPU the program is running.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/unsigned char getcpu (void);/
+<tag/Description/The function checks on which CPU the code is running. It
+returns one of the constants<itemize>
+<item><tt/CPU_6502/
+<item><tt/CPU_65C02/
+<item><tt/CPU_65816/
+</itemize>
+<tag/Limits/<itemize>
+<item>Other, more exotic CPU types are not disinguished.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>getenv<label id="getenv"><p>
 
 <quote>
@@ -2211,23 +2234,32 @@ be used in presence of a prototype.
 </quote>
 
 
-<sect1>getcpu<label id="getcpu"><p>
+<sect1>getopt<label id="getopt"><p>
 
 <quote>
 <descrip>
-<tag/Function/Determine on which CPU the program is running.
-<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
-<tag/Declaration/<tt/unsigned char getcpu (void);/
-<tag/Description/The function checks on which CPU the code is running. It
-returns one of the constants<itemize>
-<item><tt/CPU_6502/
-<item><tt/CPU_65C02/
-<item><tt/CPU_65816/
-</itemize>
+<tag/Function/Parse command line options.
+<tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
+<tag/Declaration/<tt/int __fastcall__ getopt (int argc, char* const* argv,
+const char* optstring);/
+<tag/Description/The function parses command line arguments, <tt/argc/ and 
+<tt/argv/ are the argument count and array passed to <tt/main/. <tt/optstring/
+is a string that contains command line option characters. If a character in
+<tt/optstring/ is followed by a colon, the option requires an argument. An
+option on the command line is recognized if it is one of the option characters
+preceeded by a '-'.
+<tt/getopt/ must be called repeatedly. It will return each option character
+found on the command line and <tt/EOF/ (-1) if there is no other option. An
+option argument is placed in <tt/optarg/, the index of the next element on the
+command line to be processed is placed in <tt/optind/.
 <tag/Limits/<itemize>
-<item>Other, more exotic CPU types are not disinguished.
+<item>The implementation will not reorder options. A non option on the command
+line will terminate option processing. All remaining arguments are not
+recognized as options, even if the start with a '-' character.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
 </itemize>
-<tag/Availability/cc65
+<tag/Availability/POSIX.2
 <tag/Example/None.
 </descrip>
 </quote>

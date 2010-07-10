@@ -59,6 +59,7 @@ C_OBJS =	_afailed.o	        \
 		fsetpos.o	        \
 		ftell.o		        \
 		getchar.o	        \
+                getopt.o                \
 		gets.o		        \
                 gmtime.o                \
 		locale.o	        \

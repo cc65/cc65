@@ -334,6 +334,39 @@ to the DOS menu.  Your C program should wait for a keypress if you want to see
 any output.
 
 
+<sect1>Atmos
+
+<sect2>Oricutron<p>
+Available at <url
+url="http://code.google.com/p/oriculator/">:
+
+Emulates Oric-1 and Atmos computers, with sound, disk images,
+scanline-exact NTSC/PAL video, and movie export. Includes monitor.
+Fortunately for all SDL platforms. You will just need the emulator, all
+ROMs are supplied.
+
+Compile the tutorial with
+
+<tscreen><verb>
+cl65 -O -t atmos hello.c text.s -o hello.tap
+</verb></tscreen>
+
+Start the emulator, choose <bf/F1/ and <bf/Insert tape.../, and point to
+the "<bf/hello.tap/" executable. The file has an auto start header meant to
+be loaded directly from tape.
+
+On a real Atmos, you would need a tape drive.
+Turn on the computer, type
+
+<tscreen><verb>
+CLOAD""
+</verb></tscreen>
+
+at the BASIC prompt.
+
+The emulation, also, supports that method.
+
+
 <sect1>Commodore
 
 <sect2>VICE<p>

@@ -109,12 +109,13 @@ void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc* Expr)
     /* Do some checks if code generation is still constistent */
     if (StackPtr != OldSP) {
      	if (Debug) {
-       	    fprintf (stderr,
-                     "Code generation messed up!\n"
-                     "StackPtr is %d, should be %d",
-                     StackPtr, OldSP);
+       	    Error ("Code generation messed up: "
+                   "StackPtr is %d, should be %d",
+                   StackPtr, OldSP);
      	} else {
-       	    Internal ("StackPtr is %d, should be %d\n", StackPtr, OldSP);
+       	    Internal ("Code generation messed up: "
+                      "StackPtr is %d, should be %d",
+                      StackPtr, OldSP);
      	}
     }
 }
@@ -250,6 +251,18 @@ void PushAddr (const ExprDesc* Expr)
     if (ED_IsLocExpr (Expr)) {
      	/* Push the address (always a pointer) */
      	g_push (CF_PTR, 0);
+    }
+}
+
+
+
+static void WarnConstCompareResult (void)
+/* If the result of a comparison is constant, this is suspicious when not in
+ * preprocessor mode.
+ */
+{
+    if (!Preprocessing) {
+        Warning ("Result of comparison is constant");
     }
 }
 
@@ -1904,17 +1917,22 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 /* Helper function for the compare operators */
 {
     ExprDesc Expr2;
+    CodeMark Mark0;
     CodeMark Mark1;
     CodeMark Mark2;
     const GenDesc* Gen;
-    token_t Tok; 	  		/* The operator token */
+    token_t Tok;   	  		/* The operator token */
     unsigned ltype;
     int rconst;	       	       	       	/* Operand is a constant */
 
 
+    GetCodePos (&Mark0);
     hienext (Expr);
 
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
+
+        /* Remember the generator function */
+        void (*GenFunc) (unsigned, unsigned long) = Gen->Func;
 
     	/* Remember the operator token, then skip it */
        	Tok = CurTok.Tok;
@@ -1971,9 +1989,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
             /* If the result is constant, this is suspicious when not in
              * preprocessor mode.
              */
-            if (!Preprocessing) {
-                Warning ("Result of comparison is constant");
-            }
+            WarnConstCompareResult ();
 
        	    /* Both operands are constant, remove the generated code */
        	    RemoveCode (&Mark1);
@@ -2011,7 +2027,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 }
             }
 
-	} else {
+       	} else {
 
 	    /* If the right hand side is constant, and the generator function
 	     * expects the lhs in the primary, remove the push of the primary
@@ -2026,27 +2042,139 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	    	}
 	    }
 
- 	    /* Determine the type of the operation result. If the left
-	     * operand is of type char and the right is a constant, or
-	     * if both operands are of type char, we will encode the
-	     * operation as char operation. Otherwise the default
-	     * promotions are used.
-	     */
-	    if (IsTypeChar (Expr->Type) && (IsTypeChar (Expr2.Type) || rconst)) {
-	       	flags |= CF_CHAR;
-	       	if (IsSignUnsigned (Expr->Type) || IsSignUnsigned (Expr2.Type)) {
-	       	    flags |= CF_UNSIGNED;
-	       	}
-	       	if (rconst) {
-	       	    flags |= CF_FORCECHAR;
-	       	}
+ 	    /* Determine the type of the operation. */
+            if (IsTypeChar (Expr->Type) && rconst) {
+
+                /* Left side is unsigned char, right side is constant */
+                int LeftSigned  = IsSignSigned (Expr->Type);
+                int RightSigned = IsSignSigned (Expr2.Type);
+
+                /* Determine the minimum and maximum values */
+                int LeftMin, LeftMax;
+                if (LeftSigned) {
+                    LeftMin = -128;
+                    LeftMax = 127;
+                } else {
+                    LeftMin = 0;
+                    LeftMax = 255;
+                }
+                /* An integer value is always represented as a signed in the
+                 * ExprDesc structure. This may lead to false results below,
+                 * if it is actually unsigned, but interpreted as signed
+                 * because of the representation. Fortunately, in this case,
+                 * the actual value doesn't matter, since it's always greater
+                 * than what can be represented in a char. So correct the
+                 * value accordingly.
+                 */
+                if (!RightSigned && Expr2.IVal < 0) {
+                    /* Correct the value so it is an unsigned. It will then
+                     * anyway match one of the cases below.
+                     */
+                    Expr2.IVal = LeftMax + 1;
+                }
+
+                /* Comparing a char against a constant may have a constant
+                 * result.
+                 */
+                switch (Tok) {
+
+                    case TOK_EQ:
+                        if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
+                            ED_MakeConstAbsInt (Expr, 0);
+                            WarnConstCompareResult ();
+                            RemoveCode (&Mark0);
+                            goto Done;
+                        }
+                        break;
+
+                    case TOK_NE:
+                        if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
+                            ED_MakeConstAbsInt (Expr, 1);
+                            WarnConstCompareResult ();
+                            RemoveCode (&Mark0);
+                            goto Done;
+                        }
+                        break;
+
+                    case TOK_LT:
+                        if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
+                            ED_MakeConstAbsInt (Expr, Expr2.IVal > LeftMax);
+                            WarnConstCompareResult ();
+                            RemoveCode (&Mark0);
+                            goto Done;
+                        }
+                        break;
+
+                    case TOK_LE:
+                        if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
+                            ED_MakeConstAbsInt (Expr, Expr2.IVal >= LeftMax);
+                            WarnConstCompareResult ();
+                            RemoveCode (&Mark0);
+                            goto Done;
+                        } else if (!LeftSigned && Expr2.IVal == 0) {
+                            /* We can replace this by a compare to zero, because
+                             * the value of lhs may never be negative.
+                             */
+                            GenFunc = g_eq;
+                        }
+                        break;
+
+                    case TOK_GE:
+                        if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
+                            ED_MakeConstAbsInt (Expr, Expr2.IVal <= LeftMin);
+                            WarnConstCompareResult ();
+                            RemoveCode (&Mark0);
+                            goto Done;
+                        }
+                        break;
+
+                    case TOK_GT:
+                        if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
+                            ED_MakeConstAbsInt (Expr, Expr2.IVal < LeftMin);
+                            WarnConstCompareResult ();
+                            RemoveCode (&Mark0);
+                            goto Done;
+                        } else if (!LeftSigned && Expr2.IVal == 0) {
+                            /* We can replace this by a compare to zero, because
+                             * the value of lhs may never be negative.
+                             */
+                            GenFunc = g_ne;
+                        }
+                        break;
+
+                    default:
+                        Internal ("hie_compare: got token 0x%X\n", Tok);
+                }
+
+                /* If the result is not already constant (as evaluated in the
+                 * switch above), we can execute the operation as a char op,
+                 * since the right side constant is in a valid range.
+                 */
+                flags |= (CF_CHAR | CF_FORCECHAR);
+                if (!LeftSigned) {
+                    flags |= CF_UNSIGNED;
+                }
+
+            } else if (IsTypeChar (Expr->Type) && IsTypeChar (Expr2.Type) &&
+                GetSignedness (Expr->Type) == GetSignedness (Expr2.Type)) {
+
+                /* Both are chars with the same signedness. We can encode the
+                 * operation as a char operation.
+                 */
+                flags |= CF_CHAR;
+                if (rconst) {
+                    flags |= CF_FORCECHAR;
+                }
+                if (IsSignUnsigned (Expr->Type)) {
+                    flags |= CF_UNSIGNED;
+                }
 	    } else {
-		unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
+	    	unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
        	        flags |= g_typeadjust (ltype, rtype);
 	    }
 
 	    /* Generate code */
-	    Gen->Func (flags, Expr2.IVal);
+       	    GenFunc (flags, Expr2.IVal);
 
             /* The result is an rvalue in the primary */
 	    ED_MakeRValExpr (Expr);
@@ -2055,7 +2183,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	/* Result type is always int */
        	Expr->Type = type_int;
 
-	/* Condition codes are set */
+Done:   /* Condition codes are set */
 	ED_TestDone (Expr);
     }
 }

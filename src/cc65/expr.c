@@ -2029,6 +2029,10 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
        	} else {
 
+            /* Determine the signedness of the operands */
+            int LeftSigned  = IsSignSigned (Expr->Type);
+            int RightSigned = IsSignSigned (Expr2.Type);
+
 	    /* If the right hand side is constant, and the generator function
 	     * expects the lhs in the primary, remove the push of the primary
 	     * now.
@@ -2045,11 +2049,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
  	    /* Determine the type of the operation. */
             if (IsTypeChar (Expr->Type) && rconst) {
 
-                /* Left side is unsigned char, right side is constant */
-                int LeftSigned  = IsSignSigned (Expr->Type);
-                int RightSigned = IsSignSigned (Expr2.Type);
-
-                /* Determine the minimum and maximum values */
+                /* Left side is unsigned char, right side is constant.
+                 * Determine the minimum and maximum values
+                 */
                 int LeftMin, LeftMax;
                 if (LeftSigned) {
                     LeftMin = -128;
@@ -2111,11 +2113,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                             WarnConstCompareResult ();
                             RemoveCode (&Mark0);
                             goto Done;
-                        } else if (!LeftSigned && Expr2.IVal == 0) {
-                            /* We can replace this by a compare to zero, because
-                             * the value of lhs may never be negative.
-                             */
-                            GenFunc = g_eq;
                         }
                         break;
 
@@ -2134,11 +2131,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                             WarnConstCompareResult ();
                             RemoveCode (&Mark0);
                             goto Done;
-                        } else if (!LeftSigned && Expr2.IVal == 0) {
-                            /* We can replace this by a compare to zero, because
-                             * the value of lhs may never be negative.
-                             */
-                            GenFunc = g_ne;
                         }
                         break;
 
@@ -2165,13 +2157,66 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 if (rconst) {
                     flags |= CF_FORCECHAR;
                 }
-                if (IsSignUnsigned (Expr->Type)) {
+                if (!LeftSigned) {
                     flags |= CF_UNSIGNED;
                 }
 	    } else {
 	    	unsigned rtype = TypeOf (Expr2.Type) | (flags & CF_CONST);
        	        flags |= g_typeadjust (ltype, rtype);
 	    }
+
+            /* If the left side is an unsigned and the right is a constant,
+             * we may be able to change the compares to something more
+             * effective.
+             */
+            if (!LeftSigned && rconst) {
+
+                switch (Tok) {
+
+                    case TOK_LT:
+                        if (Expr2.IVal == 1) {
+                            /* An unsigned compare to one means that the value
+                             * must be zero.
+                             */
+                            GenFunc = g_eq;
+                            Expr2.IVal = 0;
+                        }
+                        break;
+
+                    case TOK_LE:
+                        if (Expr2.IVal == 0) {
+                            /* An unsigned compare to zero means that the value
+                             * must be zero.
+                             */
+                            GenFunc = g_eq;
+                        }
+                        break;
+
+                    case TOK_GE:
+                        if (Expr2.IVal == 1) {
+                            /* An unsigned compare to one means that the value
+                             * must not be zero.
+                             */
+                            GenFunc = g_ne;
+                            Expr2.IVal = 0;
+                        }
+                        break;
+
+                    case TOK_GT:
+                        if (Expr2.IVal == 0) {
+                            /* An unsigned compare to zero means that the value
+                             * must not be zero.
+                             */
+                            GenFunc = g_ne;
+                        }
+                        break;
+
+                    default:
+                        break;
+
+                }
+
+            }
 
 	    /* Generate code */
        	    GenFunc (flags, Expr2.IVal);

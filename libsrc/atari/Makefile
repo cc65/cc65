@@ -102,7 +102,6 @@ OBJS = 	_scrsize.o      \
 	randomize.o     \
 	read.o 	        \
 	revers.o        \
-	rs232.o	        \
 	rwcommon.o      \
 	savevec.o       \
 	scroll.o        \

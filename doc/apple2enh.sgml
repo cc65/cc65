@@ -434,13 +434,6 @@ BASIC.SYSTEM) there are some limitations for DOS 3.3:
 </descrip><p>
 
 
-<sect1>DIO<p>
-
-Although <htmlurl url="dio.html" name="DIO"> generally works with all ProDOS 8
-devices, the function <htmlurl url="dio-3.html" name="dio_query_sectcount()">
-simply always return 280 (which is only correct for a 140 KB disk).
-
-
 <sect1>Direct console I/O<p>
 
 <descrip>
@@ -499,15 +492,27 @@ name="assembler manual">.
 
 <sect1>DIO<p>
 
-The function <htmlurl url="dio-1.html" name="dio_open()"> has the single parameter
-<tt/drive_id/ to identify the drive to be opened. Therefore an Apple&nbsp;II
-slot and drive pair is mapped to that <tt/drive_id/ according to the formula
+<descrip>
 
-<verb>
+  <tag/Drive ID/
+  The function <htmlurl url="dio-1.html" name="dio_open()"> has the single
+  parameter <tt/drive_id/ to identify the drive to be opened. Therefore an
+  Apple&nbsp;II slot and drive pair is mapped to that <tt/drive_id/ according
+  to the formula
+
+  <verb>
     drive_id = slot * 16 + (drive - 1) * 128
-</verb>
+  </verb>
 
-so that for example slot 6 drive 2 is mapped to <tt/drive_id/ 224.
+  so that for example slot 6 drive 2 is mapped to <tt/drive_id/ 224.
+
+  <tag/Sector count/
+  The function <htmlurl url="dio-3.html" name="dio_query_sectcount()"> returns
+  the correct sector count for all ProDOS 8 disks. However for any non-ProDOS 8
+  disk it simply always return 280 (which is only correct for a 140 KB disk).
+  This condition is indicated by the _oserror value 82.
+
+</descrip><p>
 
 
 

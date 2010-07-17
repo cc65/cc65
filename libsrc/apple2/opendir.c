@@ -65,7 +65,7 @@ DIR* __fastcall__ opendir (register const char* name)
     if ((dir = malloc (sizeof (*dir))) == NULL) {
 
 	/* May not have been done by malloc() */
-	errno = ENOMEM;
+	_directerrno (ENOMEM);
 
 	/* Return failure */
 	return NULL;
@@ -96,8 +96,8 @@ DIR* __fastcall__ opendir (register const char* name)
 	}
 
 	/* EOF: Most probably no directory file at all */
-	if (errno == 0) {
-	    errno = EINVAL;
+	if (_oserror == 0) {
+	    _directerrno (EINVAL);
 	}
 
 	/* Cleanup directory file */

@@ -13,6 +13,6 @@ _dio_query_sectsize:
         stx	__oserror	; X = 0
 
         ; Return ProDOS 8 block size
-        lda	#<512
+        txa			; X = 0
         ldx	#>512
         rts

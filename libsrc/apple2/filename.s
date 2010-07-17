@@ -75,7 +75,7 @@ copy:   lda	(ptr1),y
         bcc	copy
 
         ; Load oserror code
-        lda	#$40		; "Invalid pathname syntax"
+        lda	#$40		; "Invalid pathname"
 
         ; Free pathname buffer
 addsp65:ldy     #64+1

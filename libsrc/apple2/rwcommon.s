@@ -46,7 +46,7 @@ rwcommon:
         ldx	#RW_COUNT
         jsr	callmli
         bcc	rwepilog
-        cmp	#$4C		; "End of file"
+        cmp	#$4C		; "End of file encountered"
         bne	oserr
 
 rwepilog:

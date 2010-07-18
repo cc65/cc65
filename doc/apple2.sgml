@@ -494,9 +494,9 @@ name="assembler manual">.
   Apple&nbsp;II slot and drive pair is mapped to that <tt/drive_id/ according
   to the formula
 
-  <verb>
+  <tscreen>
     drive_id = slot * 16 + (drive - 1) * 128
-  </verb>
+  </tscreen>
 
   so that for example slot 6 drive 2 is mapped to <tt/drive_id/ 224.
 

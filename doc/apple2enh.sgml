@@ -510,7 +510,7 @@ name="assembler manual">.
   The function <htmlurl url="dio-3.html" name="dio_query_sectcount()"> returns
   the correct sector count for all ProDOS 8 disks. However for any non-ProDOS 8
   disk it simply always returns 280 (which is only correct for a 140 KB disk).
-  This condition is indicated by the _oserror value 82.
+  This condition is indicated by the <tt/_oserror/ value 82.
 
 </descrip><p>
 

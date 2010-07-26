@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -72,6 +72,11 @@ struct SymEntry* ParseScopedSymName (int AllowNew);
 struct SymTable* ParseScopedSymTable (void);
 /* Parse a (possibly scoped) symbol table (scope) name, search for it in the
  * symbol space and return the symbol table struct.
+ */
+
+struct SymEntry* ParseAnySymName (int AllocNew);
+/* Parse a cheap local symbol or a a (possibly scoped) symbol name, search
+ * for it in the symbol table and return the symbol table entry.
  */
 
 

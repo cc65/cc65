@@ -360,7 +360,7 @@ static void OptAutoImport (const char* Opt attribute ((unused)),
 
 static void OptBinIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path for binaries */
-{                        
+{
     AddSearchPath (BinSearchPath, Arg);
 }
 
@@ -632,12 +632,7 @@ static void OneLine (void)
         int HadWS = WS;
 
         /* Generate the symbol table entry, then skip the name */
-        if (Tok == TOK_LOCAL_IDENT) {
-            Sym = SymFindLocal (SymLast, &SVal, SYM_ALLOC_NEW);
-            NextTok ();
-        } else {
-            Sym = ParseScopedSymName (SYM_ALLOC_NEW);
-        }
+        Sym = ParseAnySymName (SYM_ALLOC_NEW);
 
         /* If a colon follows, this is a label definition. If there
          * is no colon, it's an assignment.

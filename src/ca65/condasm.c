@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -310,7 +310,7 @@ void DoConditionals (void)
 	        D = AllocIf (".IFDEF", 1);
 		NextTok ();
 		if (IfCond) {
-		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+       	       	    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym != 0 && SymIsDef (Sym));
 		}
 	        IfCond = GetCurrentIfCond ();
@@ -346,7 +346,7 @@ void DoConditionals (void)
 	        D = AllocIf (".IFNDEF", 1);
 		NextTok ();
 		if (IfCond) {
-		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+		    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym == 0 || !SymIsDef (Sym));
 		    ExpectSep ();
 		}
@@ -357,7 +357,7 @@ void DoConditionals (void)
 	        D = AllocIf (".IFNREF", 1);
 		NextTok ();
 		if (IfCond) {
-		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+		    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym == 0 || !SymIsRef (Sym));
 		    ExpectSep ();
 	     	}
@@ -408,7 +408,7 @@ void DoConditionals (void)
 	        D = AllocIf (".IFREF", 1);
      		NextTok ();
      		if (IfCond) {
-		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+		    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym != 0 && SymIsRef (Sym));
 		    ExpectSep ();
      		}

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -241,6 +241,27 @@ SymTable* ParseScopedSymTable (void)
 
     /* Return the scope found */
     return Scope;
+}
+
+
+
+SymEntry* ParseAnySymName (int AllocNew)
+/* Parse a cheap local symbol or a a (possibly scoped) symbol name, search
+ * for it in the symbol table and return the symbol table entry.
+ */
+{
+    SymEntry* Sym;
+
+    /* Distinguish cheap locals and other symbols */
+    if (Tok == TOK_LOCAL_IDENT) {
+        Sym = SymFindLocal (SymLast, &SVal, AllocNew);
+        NextTok ();
+    } else {
+        Sym = ParseScopedSymName (AllocNew);
+    }
+
+    /* Return the symbol found */
+    return Sym;
 }
 
 

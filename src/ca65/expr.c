@@ -385,7 +385,7 @@ static ExprNode* FuncDefined (void)
 /* Handle the .DEFINED builtin function */
 {
     /* Parse the symbol name and search for the symbol */
-    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 
     /* Check if the symbol is defined */
     return GenLiteralExpr (Sym != 0 && SymIsDef (Sym));
@@ -597,7 +597,7 @@ static ExprNode* FuncReferenced (void)
 /* Handle the .REFERENCED builtin function */
 {
     /* Parse the symbol name and search for the symbol */
-    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 
     /* Check if the symbol is referenced */
     return GenLiteralExpr (Sym != 0 && SymIsRef (Sym));
@@ -867,13 +867,9 @@ static ExprNode* Factor (void)
 
 	case TOK_NAMESPACE:
 	case TOK_IDENT:
-            N = Symbol (ParseScopedSymName (SYM_ALLOC_NEW));
-	    break;
-
         case TOK_LOCAL_IDENT:
-            N = Symbol (SymFindLocal (SymLast, &SVal, SYM_ALLOC_NEW));
-            NextTok ();
-            break;
+            N = Symbol (ParseAnySymName (SYM_ALLOC_NEW));
+	    break;
 
 	case TOK_ULABEL:
 	    N = ULabRef (IVal);

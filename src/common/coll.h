@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -89,6 +89,12 @@ Collection* NewCollection (void);
 
 void FreeCollection (Collection* C);
 /* Free a collection */
+
+void CollGrow (Collection* C, unsigned Size);
+/* Grow the collection C so it is able to hold Size items without a resize
+ * being necessary. This can be called for performance reasons if the number
+ * of items to be placed in the collection is known in advance.
+ */
 
 #if defined(HAVE_INLINE)
 INLINE unsigned CollCount (const Collection* C)

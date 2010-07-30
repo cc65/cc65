@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -108,6 +108,29 @@ void FreeCollection (Collection* C)
 
 
 
+void CollGrow (Collection* C, unsigned Size)
+/* Grow the collection C so it is able to hold Size items without a resize
+ * being necessary. This can be called for performance reasons if the number
+ * of items to be placed in the collection is known in advance.
+ */
+{
+    void** NewItems;
+
+    /* Ignore the call if the collection is already large enough */
+    if (Size <= C->Size) {
+        return;
+    }
+
+    /* Grow the collection */
+    C->Size = Size;
+    NewItems = xmalloc (C->Size * sizeof (void*));
+    memcpy (NewItems, C->Items, C->Count * sizeof (void*));
+    xfree (C->Items);
+    C->Items = NewItems;
+}
+
+
+
 void CollInsert (Collection* C, void* Item, unsigned Index)
 /* Insert the data at the given position in the collection */
 {
@@ -117,16 +140,7 @@ void CollInsert (Collection* C, void* Item, unsigned Index)
     /* Grow the array if necessary */
     if (C->Count >= C->Size) {
      	/* Must grow */
-       	void** NewItems;
-     	if (C->Size > 0) {
-     	    C->Size *= 2;
-     	} else {
-     	    C->Size = 8;
-     	}
-     	NewItems = xmalloc (C->Size * sizeof (void*));
-     	memcpy (NewItems, C->Items, C->Count * sizeof (void*));
-     	xfree (C->Items);
-     	C->Items = NewItems;
+        CollGrow (C, (C->Size == 0)? 8 : C->Size * 2);
     }
 
     /* Move the existing elements if needed */

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -82,7 +82,7 @@ static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O
     D->Flags	= 0;
     D->Obj      = O;
     D->Expr    	= 0;
-    D->Name	= 0;
+    D->Name 	= 0;
     D->Type    	= Type;
     D->AddrSize = AddrSize;
 
@@ -99,9 +99,9 @@ static DbgSym* GetDbgSym (DbgSym* D, long Val)
 {
     /* Create the hash. We hash over the symbol value */
     unsigned Hash = ((Val >> 24) & 0xFF) ^
-	    	    ((Val >> 16) & 0xFF) ^
-	    	    ((Val >>  8) & 0xFF) ^
-	    	    ((Val >>  0) & 0xFF);
+	       	    ((Val >> 16) & 0xFF) ^
+	       	    ((Val >>  8) & 0xFF) ^
+	       	    ((Val >>  0) & 0xFF);
 
     /* Check for this symbol */
     DbgSym* Sym = DbgSymPool[Hash];
@@ -184,7 +184,7 @@ void ClearDbgSymTable (void)
 
 
 
-long GetDbgSymVal (DbgSym* D)
+long GetDbgSymVal (const DbgSym* D)
 /* Get the value of this symbol */
 {
     CHECK (D->Expr != 0);
@@ -199,12 +199,12 @@ void PrintDbgSyms (ObjData* O, FILE* F)
     unsigned I;
 
     /* Walk through all debug symbols in this module */
-    for (I = 0; I < O->DbgSymCount; ++I) {
+    for (I = 0; I < CollCount (&O->DbgSyms); ++I) {
 
 	long Val;
 
 	/* Get the next debug symbol */
- 	DbgSym* D = O->DbgSyms [I];
+ 	DbgSym* D = CollAt (&O->DbgSyms, I);
 
 	/* Get the symbol value */
 	Val = GetDbgSymVal (D);
@@ -237,12 +237,12 @@ void PrintDbgSymLabels (ObjData* O, FILE* F)
     unsigned I;
 
     /* Walk through all debug symbols in this module */
-    for (I = 0; I < O->DbgSymCount; ++I) {
+    for (I = 0; I < CollCount (&O->DbgSyms); ++I) {
 
 	long Val;
 
 	/* Get the next debug symbol */
- 	DbgSym* D = O->DbgSyms [I];
+ 	DbgSym* D = CollAt (&O->DbgSyms, I);
 
         /* Emit this symbol only if it is a label (ignore equates) */
         if (IS_EXP_EQUATE (D->Type)) {

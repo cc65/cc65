@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -86,8 +86,8 @@ void CreateMapFile (int ShortMap)
         } else {
             fprintf (F, "%s:\n", GetObjFileName (O));
         }
-        for (J = 0; J < O->SectionCount; ++J) {
-            const Section* S = O->Sections [J];
+        for (J = 0; J < CollCount (&O->Sections); ++J) {
+            const Section* S = CollConstAt (&O->Sections, J);
             /* Don't include zero sized sections if not explicitly
              * requested
              */

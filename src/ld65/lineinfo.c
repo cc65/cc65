@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -95,8 +95,8 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
     ReadFilePos (F, &LI->Pos);
 
     /* Resolve the file index to a pointer to FileInfo struct */
-    CHECK (LI->Pos.Name < O->FileCount);
-    LI->File = O->Files[LI->Pos.Name];
+    CHECK (LI->Pos.Name < CollCount (&O->Files));
+    LI->File = CollAt (&O->Files, LI->Pos.Name);
 
     /* Return the new LineInfo */
     return LI;
@@ -186,6 +186,7 @@ void RelocLineInfo (Segment* S)
        	Sec = Sec->Next;
     }
 }
+
 
 
 

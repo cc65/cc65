@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -65,23 +65,23 @@ struct ObjData {
     unsigned long  	Start;		/* Start offset of data in library */
     unsigned 	     	Flags;
     unsigned 	 	FileCount;	/* Input file count */
-    struct FileInfo**  	Files;		/* List of input files */
+    Collection          Files;		/* List of input files */
     unsigned	 	SectionCount;	/* Count of sections in this object */
-    struct Section**  	Sections;  	/* List of all sections */
+    Collection          Sections;  	/* List of all sections */
     unsigned	  	ExportCount;	/* Count of exports */
-    struct Export**	Exports;       	/* List of all exports */
+    Collection          Exports;       	/* List of all exports */
     unsigned	 	ImportCount;	/* Count of imports */
-    struct Import**	Imports;   	/* List of all imports */
+    Collection          Imports;   	/* List of all imports */
     unsigned	 	DbgSymCount;	/* Count of debug symbols */
-    struct DbgSym**   	DbgSyms;       	/* List of debug symbols */
+    Collection          DbgSyms;       	/* List of debug symbols */
     unsigned            LineInfoCount;  /* Count of additional line infos */
-    struct LineInfo**   LineInfos;      /* List of additional line infos */
+    Collection          LineInfos;      /* List of additional line infos */
     unsigned            StringCount;    /* Count of strings */
     unsigned*           Strings;        /* List of global string indices */
     unsigned            AssertionCount; /* Count of module assertions */
-    struct Assertion**  Assertions;     /* List of module assertions */
+    Collection          Assertions;     /* List of module assertions */
     unsigned            ScopeCount;     /* Count of scopes */
-    struct Scope**      Scopes;         /* List of scopes */
+    Collection          Scopes;         /* List of scopes */
 };
 
 
@@ -131,10 +131,10 @@ const char* GetObjFileName (const ObjData* O);
 INLINE int ObjHasFiles (const ObjData* O)
 /* Return true if the files list does exist */
 {
-    return (O != 0 && O->Files != 0);
+    return (O != 0 && CollCount (&O->Files) != 0);
 }
 #else
-#  define ObjHasFiles(O)       ((O) != 0 && (O)->Files != 0)
+#  define ObjHasFiles(O)       ((O) != 0 && CollCount ((O)->Files) != 0)
 #endif
 
 const char* GetSourceFileName (const ObjData* O, unsigned Index);

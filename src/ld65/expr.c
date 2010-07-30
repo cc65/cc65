@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -201,7 +201,7 @@ Import* GetExprImport (ExprNode* Expr)
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
     /* Return the import */
-    return Expr->Obj->Imports [Expr->V.ImpNum];
+    return CollAt (&Expr->Obj->Imports, Expr->V.ImpNum);
 }
 
 
@@ -212,8 +212,8 @@ Export* GetExprExport (ExprNode* Expr)
     /* Check that this is really a symbol */
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
-    /* Return the export */
-    return Expr->Obj->Imports [Expr->V.ImpNum]->Exp;
+    /* Return the export for an import*/
+    return GetExprImport (Expr)->Exp;
 }
 
 
@@ -230,7 +230,7 @@ Section* GetExprSection (ExprNode* Expr)
      */
     if (Expr->Obj) {
 	/* Return the export */
-	return Expr->Obj->Sections[Expr->V.SegNum];
+       	return CollAt (&Expr->Obj->Sections, Expr->V.SegNum);
     } else {
 	return Expr->V.Sec;
     }
@@ -343,7 +343,7 @@ long GetExprVal (ExprNode* Expr)
 
 	case EXPR_BOOLXOR:
 	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
-                  
+
         case EXPR_MAX:
             Left = GetExprVal (Expr->Left);
             Right = GetExprVal (Expr->Right);

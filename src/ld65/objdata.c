@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*     	      	    	  	     Data				     */
 /*****************************************************************************/
 
 
@@ -60,7 +60,7 @@ Collection       ObjDataList = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*     	      	    	  	     Code				     */
 /*****************************************************************************/
 
 
@@ -79,19 +79,19 @@ ObjData* NewObjData (void)
     O->Flags   	   	= 0;
     O->Start	   	= 0;
     O->ExportCount 	= 0;
-    O->Exports     	= 0;
+    O->Exports     	= EmptyCollection;
     O->ImportCount 	= 0;
-    O->Imports     	= 0;
+    O->Imports     	= EmptyCollection;
     O->DbgSymCount	= 0;
-    O->DbgSyms		= 0;
+    O->DbgSyms		= EmptyCollection;
     O->LineInfoCount    = 0;
-    O->LineInfos        = 0;
+    O->LineInfos        = EmptyCollection;
     O->StringCount      = 0;
     O->Strings          = 0;
     O->AssertionCount   = 0;
-    O->Assertions       = 0;
+    O->Assertions       = EmptyCollection;
     O->ScopeCount       = 0;
-    O->Scopes           = 0;
+    O->Scopes           = EmptyCollection;
 
     /* Return the new entry */
     return O;
@@ -105,16 +105,22 @@ void FreeObjData (ObjData* O)
  * referenced.
  */
 {
+    unsigned I;
+
     /* Unused ObjData do only have the string pool, Exports and Imports. */
-    while (O->ExportCount) {
-        FreeExport (O->Exports[--O->ExportCount]);
+    for (I = 0; I < CollCount (&O->Exports); ++I) {
+        FreeExport (CollAt (&O->Exports, I));
     }
-    xfree (O->Exports);
-    while (O->ImportCount) {
-        FreeImport (O->Imports[--O->ImportCount]);
+    DoneCollection (&O->Exports);
+    for (I = 0; I < CollCount (&O->Imports); ++I) {
+        FreeImport (CollAt (&O->Imports, I));
     }
-    xfree (O->Imports);
+    DoneCollection (&O->Imports);
+    DoneCollection (&O->DbgSyms);
+    DoneCollection (&O->LineInfos);
     xfree (O->Strings);
+    DoneCollection (&O->Assertions);
+    DoneCollection (&O->Scopes);
     xfree (O);
 }
 
@@ -147,11 +153,11 @@ void InsertObjGlobals (ObjData* O)
     unsigned I;
 
     /* Insert exports and imports */
-    for (I = 0; I < O->ExportCount; ++I) {
-        InsertExport (O->Exports[I]);
+    for (I = 0; I < CollCount (&O->Exports); ++I) {
+        InsertExport (CollAt (&O->Exports, I));
     }
-    for (I = 0; I < O->ImportCount; ++I) {
-        InsertImport (O->Imports[I]);
+    for (I = 0; I < CollCount (&O->Imports); ++I) {
+        InsertImport (CollAt (&O->Imports, I));
     }
 }
 
@@ -193,16 +199,21 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
     } else {
 
 	/* Check the parameter */
-        if (Index >= O->FileCount) {
+        if (Index >= CollCount (&O->Files)) {
             /* Error() will terminate the program */
             Warning ("Invalid file index (%u) in module `%s' (input file corrupt?)",
                    Index, GetObjFileName (O));
             return "[invalid]";         /* ### */
+
+        } else {
+
+            /* Get a pointer to the file info struct */
+            const FileInfo* FI = CollAt (&O->Files, Index);
+
+            /* Return the name */
+            return GetString (FI->Name);
+
         }
-
-	/* Return the name */
-	return GetString (O->Files[Index]->Name);
-
     }
 }
 

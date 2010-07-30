@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -120,9 +120,9 @@ void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->FileCount  = ReadVar (F);
-    O->Files      = xmalloc (O->FileCount * sizeof (O->Files[0]));
+    CollGrow (&O->Files, O->FileCount);
     for (I = 0; I < O->FileCount; ++I) {
-       	O->Files[I] = ReadFileInfo (F, O);
+       	CollAppend (&O->Files, ReadFileInfo (F, O));
     }
 }
 
@@ -138,9 +138,9 @@ void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->SectionCount = ReadVar (F);
-    O->Sections     = xmalloc (O->SectionCount * sizeof (O->Sections[0]));
+    CollGrow (&O->Sections, O->SectionCount);
     for (I = 0; I < O->SectionCount; ++I) {
-	O->Sections [I] = ReadSection (F, O);
+       	CollAppend (&O->Sections, ReadSection (F, O));
     }
 }
 
@@ -156,9 +156,9 @@ void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->ImportCount = ReadVar (F);
-    O->Imports     = xmalloc (O->ImportCount * sizeof (O->Imports[0]));
+    CollGrow (&O->Imports, O->ImportCount);
     for (I = 0; I < O->ImportCount; ++I) {
-   	O->Imports [I] = ReadImport (F, O);
+       	CollAppend (&O->Imports, ReadImport (F, O));
     }
 }
 
@@ -174,9 +174,9 @@ void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->ExportCount = ReadVar (F);
-    O->Exports     = xmalloc (O->ExportCount * sizeof (O->Exports[0]));
+    CollGrow (&O->Exports, O->ExportCount);
     for (I = 0; I < O->ExportCount; ++I) {
-	O->Exports [I] = ReadExport (F, O);
+       	CollAppend (&O->Exports, ReadExport (F, O));
     }
 }
 
@@ -192,9 +192,9 @@ void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->DbgSymCount = ReadVar (F);
-    O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (O->DbgSyms[0]));
+    CollGrow (&O->DbgSyms, O->DbgSymCount);
     for (I = 0; I < O->DbgSymCount; ++I) {
-	O->DbgSyms [I] = ReadDbgSym (F, O);
+	CollAppend (&O->DbgSyms, ReadDbgSym (F, O));
     }
 }
 
@@ -210,9 +210,9 @@ void ObjReadLineInfos (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->LineInfoCount = ReadVar (F);
-    O->LineInfos     = xmalloc (O->LineInfoCount * sizeof (O->LineInfos[0]));
+    CollGrow (&O->LineInfos, O->LineInfoCount);
     for (I = 0; I < O->LineInfoCount; ++I) {
-       	O->LineInfos[I] = ReadLineInfo (F, O);
+       	CollAppend (&O->LineInfos, ReadLineInfo (F, O));
     }
 }
 
@@ -246,9 +246,9 @@ void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->AssertionCount = ReadVar (F);
-    O->Assertions     = xmalloc (O->AssertionCount * sizeof (O->Assertions[0]));
+    CollGrow (&O->Assertions, O->AssertionCount);
     for (I = 0; I < O->AssertionCount; ++I) {
-        O->Assertions[I] = ReadAssertion (F, O);
+        CollAppend (&O->Assertions, ReadAssertion (F, O));
     }
 }
 
@@ -264,9 +264,9 @@ void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
 
     /* Read the data */
     O->ScopeCount = ReadVar (F);
-    O->Scopes     = xmalloc (O->ScopeCount * sizeof (O->Scopes[0]));
+    CollGrow (&O->Scopes, O->ScopeCount);
     for (I = 0; I < O->ScopeCount; ++I) {
-        O->Scopes[I] = 0;       /* ReadScope (F, O); ### not implemented */
+        CollAppend (&O->Scopes, 0);     /* ReadScope (F, O); ### not implemented */
     }
 }
 

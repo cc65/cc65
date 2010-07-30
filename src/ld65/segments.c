@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -276,15 +276,16 @@ Section* ReadSection (FILE* F, ObjData* O)
 	LineInfoIndex = ReadVar (F);
 	if (LineInfoIndex) {
 	    --LineInfoIndex;
-	    if (LineInfoIndex >= O->LineInfoCount) {
+	    if (LineInfoIndex >= CollCount (&O->LineInfos)) {
        	       	Internal ("In module `%s', file `%s', line %lu: Invalid line "
 			  "info with index %u (max count %u)",
 			  GetObjFileName (O),
 			  GetSourceFileName (O, Frag->Pos.Name),
-       	       	       	  Frag->Pos.Line, LineInfoIndex, O->LineInfoCount);
+       	       	       	  Frag->Pos.Line, LineInfoIndex, 
+                          CollCount (&O->LineInfos));
 	    }
 	    /* Point from the fragment to the line info... */
-	    Frag->LI = O->LineInfos[LineInfoIndex];
+	    Frag->LI = CollAt (&O->LineInfos, LineInfoIndex);
 	    /* ...and back from the line info to the fragment */
 	    CollAppend (&Frag->LI->Fragments, Frag);
 	}

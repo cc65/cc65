@@ -6,10 +6,10 @@
 /*					   				     */
 /*					   				     */
 /*					   				     */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -259,16 +259,14 @@ static void LibCheckExports (ObjData* O)
     unsigned I;
 
     /* Check all exports */
-    for (I = 0; I < O->ExportCount; ++I) {
-	if (IsUnresolved (O->Exports[I]->Name)) {
-	    /* We need this module */
-	    O->Flags |= OBJ_REF;    	    break;
+    for (I = 0; I < CollCount (&O->Exports); ++I) {
+        const Export* E = CollConstAt (&O->Exports, I);
+	if (IsUnresolved (E->Name)) {
+           /* We need this module, insert the imports and exports */
+	    O->Flags |= OBJ_REF;
+            InsertObjGlobals (O);
+            break;
     	}
-    }
-
-    /* If we need this module, insert the imports and exports */
-    if (O->Flags & OBJ_REF) {
-        InsertObjGlobals (O);
     }
 }
 

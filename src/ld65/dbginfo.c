@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -53,17 +53,17 @@ void PrintDbgInfo (ObjData* O, FILE* F)
     unsigned I, J;
 
     /* Output the files section */
-    for (I = 0; I < O->FileCount; ++I) {
-	const FileInfo* FI = O->Files[I];
+    for (I = 0; I < CollCount (&O->Files); ++I) {
+	const FileInfo* FI = CollConstAt (&O->Files, I);
 	fprintf (F, "file\t\"%s\",size=%lu,mtime=0x%08lX\n",
                  GetString (FI->Name), FI->Size, FI->MTime);
     }
 
     /* Output the line infos */
-    for (I = 0; I < O->LineInfoCount; ++I) {
+    for (I = 0; I < CollCount (&O->LineInfos); ++I) {
 
 	/* Get this line info */
-	const LineInfo* LI = O->LineInfos[I];
+	const LineInfo* LI = CollConstAt (&O->LineInfos, I);
 
 	/* Get a pointer to the code ranges */
 	const Collection* CodeRanges = &LI->CodeRanges;

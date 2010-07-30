@@ -79,7 +79,7 @@ struct DbgSym {
 DbgSym* ReadDbgSym (FILE* F, ObjData* Obj);
 /* Read a debug symbol from a file, insert and return it */
 
-long GetDbgSymVal (DbgSym* D);
+long GetDbgSymVal (const DbgSym* D);
 /* Get the value of this symbol */
 
 void ClearDbgSymTable (void);

@@ -46,6 +46,7 @@ SGML =	apple2.sgml	\
 	lynx.sgml	\
 	make.sgml	\
 	nes.sgml	\
+        od65.sgml       \
 	pet.sgml	\
 	plus4.sgml	\
         supervision.sgml\

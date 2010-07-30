@@ -40,6 +40,7 @@
 /* ld65 */
 #include "fileio.h"
 #include "fragment.h"
+#include "objdata.h"
 #include "segments.h"
 #include "lineinfo.h"
 
@@ -67,15 +68,18 @@ static CodeRange* NewCodeRange (unsigned long Offs, unsigned long Size)
 
 
 
-static LineInfo* NewLineInfo (void)
+LineInfo* NewLineInfo (ObjData* O, const FilePos* Pos)
 /* Create and return a new LineInfo struct */
 {
     /* Allocate memory */
     LineInfo* LI = xmalloc (sizeof (LineInfo));
 
+    /* Make sure the name index is valid */
+    CHECK (Pos->Name < CollCount (&O->Files));
+
     /* Initialize the fields */
-    LI->File = 0;
-    InitFilePos (&LI->Pos);
+    LI->File = CollAt (&O->Files, Pos->Name);
+    LI->Pos = *Pos;
     InitCollection (&LI->Fragments);
     InitCollection (&LI->CodeRanges);
 
@@ -88,18 +92,12 @@ static LineInfo* NewLineInfo (void)
 LineInfo* ReadLineInfo (FILE* F, ObjData* O)
 /* Read a line info from a file and return it */
 {
-    /* Allocate a new LineInfo struct and initialize it */
-    LineInfo* LI = NewLineInfo ();
-
     /* Read the file position */
-    ReadFilePos (F, &LI->Pos);
+    FilePos Pos;
+    ReadFilePos (F, &Pos);
 
-    /* Resolve the file index to a pointer to FileInfo struct */
-    CHECK (LI->Pos.Name < CollCount (&O->Files));
-    LI->File = CollAt (&O->Files, LI->Pos.Name);
-
-    /* Return the new LineInfo */
-    return LI;
+    /* Allocate a new LineInfo struct, initialize and return it */
+    return NewLineInfo (O, &Pos);
 }
 
 
@@ -168,11 +166,11 @@ void RelocLineInfo (Segment* S)
        	Frag = Sec->FragRoot;
        	while (Frag) {
 
-       	    /* Add the range for this fragment to the line info if there
-       	     * is any
-       	     */
-       	    if (Frag->LI) {
-       	     	AddCodeRange (Frag->LI, Offs, Frag->Size);
+            unsigned I;
+
+       	    /* Add the range for this fragment to all line infos */
+            for (I = 0; I < CollCount (&Frag->LineInfos); ++I) {
+       	       	AddCodeRange (CollAt (&Frag->LineInfos, I), Offs, Frag->Size);
        	    }
 
        	    /* Update the offset */

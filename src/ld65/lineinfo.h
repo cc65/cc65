@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,21 +38,21 @@
 
 
 
+#include <stdio.h>
+
 /* common */
 #include "coll.h"
 #include "filepos.h"
 
-/* ld65 */
-#include "objdata.h"
-
 
 
 /*****************************************************************************/
-/*				   Forwards                                  */
+/*	       			   Forwards                                  */
 /*****************************************************************************/
 
 
 
+struct ObjData;
 struct Segment;
 
 
@@ -87,7 +87,10 @@ struct LineInfo {
 
 
 
-LineInfo* ReadLineInfo (FILE* F, ObjData* O);
+LineInfo* NewLineInfo (struct ObjData* O, const FilePos* Pos);
+/* Create and return a new LineInfo struct */
+
+LineInfo* ReadLineInfo (FILE* F, struct ObjData* O);
 /* Read a line info from a file and return it */
 
 void RelocLineInfo (struct Segment* S);

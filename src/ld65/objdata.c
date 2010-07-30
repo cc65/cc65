@@ -208,7 +208,7 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
         } else {
 
             /* Get a pointer to the file info struct */
-            const FileInfo* FI = CollAt (&O->Files, Index);
+            const FileInfo* FI = CollConstAt (&O->Files, Index);
 
             /* Return the name */
             return GetString (FI->Name);

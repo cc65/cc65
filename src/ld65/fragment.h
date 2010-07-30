@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,6 +39,7 @@
 
 
 /* common */
+#include "coll.h"
 #include "filepos.h"
 
 
@@ -68,8 +69,7 @@ struct Fragment {
     struct ObjData*	Obj;		/* Source of fragment */
     unsigned            Size;  		/* Size of data/expression */
     struct ExprNode*	Expr;		/* Expression if FRAG_EXPR */
-    FilePos  	 	Pos;		/* File position in source */
-    struct LineInfo*    LI;             /* Additional line info */
+    Collection          LineInfos;      /* Line info for this fragment */
     unsigned char    	Type;  		/* Type of fragment */
     unsigned char      	LitBuf [1]; 	/* Dynamically alloc'ed literal buffer */
 };
@@ -84,6 +84,15 @@ struct Fragment {
 
 Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
 /* Create a new fragment and insert it into the section S */
+
+void AddLineInfo (Fragment* F, struct LineInfo* LI);
+/* Add the line info to the given fragment */
+
+const char* GetFragmentSourceName (const Fragment* F);
+/* Return the name of the source file for this fragment */
+
+unsigned long GetFragmentSourceLine (const Fragment* F);
+/* Return the source file line for this fragment */
 
 
 

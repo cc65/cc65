@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,6 +40,8 @@
 /* ld65 */
 #include "error.h"
 #include "fragment.h"
+#include "lineinfo.h"
+#include "objdata.h"
 #include "segments.h"
 
 
@@ -71,8 +73,7 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
     F->Obj       = 0;
     F->Size      = Size;
     F->Expr      = 0;
-    InitFilePos (&F->Pos);
-    F->LI        = 0;
+    F->LineInfos = EmptyCollection;
     F->Type      = Type;
 
     /* Insert the code fragment into the section */
@@ -92,6 +93,42 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
 
     /* Return the new fragment */
     return F;
+}
+
+
+
+void AddLineInfo (Fragment* F, LineInfo* LI)
+/* Add the line info to the given fragment */
+{
+    /* Point from the fragment to the line info ... */
+    CollAppend (&F->LineInfos, LI);
+
+    /* ... and back from the line info to the fragment */
+    CollAppend (&LI->Fragments, F);
+}
+
+
+
+const char* GetFragmentSourceName (const Fragment* F)
+/* Return the name of the source file for this fragment */
+{
+    /* Each fragment has the basic info in line info #0 */
+    const LineInfo* LI = CollConstAt (&F->LineInfos, 0);
+
+    /* Return the source file name */
+    return GetSourceFileName (F->Obj, LI->Pos.Name);
+}
+
+
+
+unsigned long GetFragmentSourceLine (const Fragment* F)
+/* Return the source file line for this fragment */
+{
+    /* Each fragment has the basic info in line info #0 */
+    const LineInfo* LI = CollConstAt (&F->LineInfos, 0);
+
+    /* Return the source file line */
+    return LI->Pos.Line;
 }
 
 

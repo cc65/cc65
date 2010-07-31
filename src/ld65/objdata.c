@@ -76,8 +76,12 @@ ObjData* NewObjData (void)
     O->Name  	   	= INVALID_STRING_ID;
     O->LibName    	= INVALID_STRING_ID;
     O->MTime            = 0;
-    O->Flags   	   	= 0;
     O->Start	   	= 0;
+    O->Flags   	   	= 0;
+    O->FileCount        = 0;
+    O->Files            = EmptyCollection;
+    O->SectionCount     = 0;
+    O->Sections         = EmptyCollection;                
     O->ExportCount 	= 0;
     O->Exports     	= EmptyCollection;
     O->ImportCount 	= 0;

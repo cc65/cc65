@@ -134,7 +134,7 @@ INLINE int ObjHasFiles (const ObjData* O)
     return (O != 0 && CollCount (&O->Files) != 0);
 }
 #else
-#  define ObjHasFiles(O)       ((O) != 0 && CollCount ((O)->Files) != 0)
+#  define ObjHasFiles(O)       ((O) != 0 && CollCount (&(O)->Files) != 0)
 #endif
 
 const char* GetSourceFileName (const ObjData* O, unsigned Index);

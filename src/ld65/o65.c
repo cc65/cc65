@@ -783,12 +783,14 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 	/* Get the segment from the list node */
        	S = Seg [I];
 
+        /* Relocate line info for this segment */
+        RelocLineInfo (S->Seg);
+
 	/* Keep the user happy */
 	Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
 
 	/* Write this segment */
        	if (DoWrite) {
-       	    RelocLineInfo (S->Seg);
        	    SegWrite (D->F, S->Seg, O65WriteExpr, D);
        	}
 

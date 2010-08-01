@@ -200,6 +200,9 @@ static void BinWriteMem (BinDesc* D, Memory* M)
                 Addr = NewAddr;
             }
 
+            /* Relocate line information for this segment */
+	    RelocLineInfo (S->Seg);
+
         } else if (S->Load == M) {
 
             /* Handle ALIGN_LOAD */
@@ -221,7 +224,6 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	 */
        	if (DoWrite) {
             unsigned long P = ftell (D->F);
-	    RelocLineInfo (S->Seg);
             S->Seg->FillVal = M->FillVal;
 	    SegWrite (D->F, S->Seg, BinWriteExpr, D);
             PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));

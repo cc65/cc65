@@ -287,7 +287,7 @@ Section* ReadSection (FILE* F, ObjData* O)
         }
         AddLineInfo (Frag, LI);
 
-	/* Read the additional line info and resolve it */
+        /* Read additional line info and resolve it */
 	LineInfoIndex = ReadVar (F);
 	if (LineInfoIndex) {
 	    --LineInfoIndex;

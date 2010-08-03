@@ -68,15 +68,6 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	/* Get a pointer to the code ranges */
 	const Collection* CodeRanges = &LI->CodeRanges;
 
-	/* We must have code ranges, otherwise ignore the entry */
-	if (CollCount (CodeRanges) == 0) {
-	    continue;
-	}
-
-	/* Name and line number */
-	fprintf (F, "line\t\"%s\",line=%lu", GetString (LI->File->Name),
-                 LI->Pos.Line);
-
 	/* Code ranges */
 	for (J = 0; J < CollCount (CodeRanges); ++J) {
 
@@ -84,7 +75,11 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	    const CodeRange* R = CollConstAt (CodeRanges, J);
 
 	    /* Print it */
-       	    fprintf (F, ",range=0x%06lX-0x%06lX", R->Offs, R->Offs + R->Size - 1);
+           fprintf (F,
+                    "line\t\"%s\",line=%lu,range=0x%06lX-0x%06lX",
+                    GetString (LI->File->Name),
+                    LI->Pos.Line,
+                    R->Offs, R->Offs + R->Size - 1);
 	}
 
 	/* Terminate the line */

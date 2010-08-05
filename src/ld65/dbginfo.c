@@ -75,7 +75,7 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	    const CodeRange* R = CollConstAt (CodeRanges, J);
 
 	    /* Print it */
-           fprintf (F,
+            fprintf (F,
                     "line\t\"%s\",line=%lu,range=0x%06lX-0x%06lX",
                     GetString (LI->File->Name),
                     LI->Pos.Line,

@@ -38,6 +38,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <assert.h>
 #include <errno.h>
 
@@ -81,20 +82,12 @@ static const Collection EmptyCollection = COLLECTION_INITIALIZER;
 
 
 
-/* ### Parseerror */
-enum {
-    CC65_WARNING,
-    CC65_ERROR,
-};
-
 /* Data structure containing information from the debug info file. A pointer
  * to this structure is passed as handle to callers from the outside.
  */
 typedef struct DbgInfo DbgInfo;
 struct DbgInfo {
-    Collection          FileInfo;       /* Collection with file infos */
-    Collection          LineInfo;       /* Collection with line infos */
-
+    Collection          FileInfos;      /* Collection with file infos */
 };
 
 /* Input tokens */
@@ -119,6 +112,9 @@ enum Token {
     TOK_FILE,                           /* FILE keyword */
     TOK_LABEL,                          /* LABEL keyword */
     TOK_LINE,                           /* LINE keyword */
+    TOK_LONG,                           /* LONG_keyword */
+    TOK_MAJOR,                          /* MAJOR keyword */
+    TOK_MINOR,                          /* MINOR keyword */
     TOK_MTIME,                          /* MTIME keyword */
     TOK_RANGE,                          /* RANGE keyword */
     TOK_RO,                             /* RO keyword */
@@ -131,15 +127,17 @@ enum Token {
     TOK_VALUE,                          /* VALUE keyword */
     TOK_VERSION,                        /* VERSION keyword */
     TOK_ZEROPAGE,                       /* ZEROPAGE keyword */
+
+    TOK_IDENT,                          /* To catch unknown keywords */
 };
 
 /* Data used when parsing the debug info file */
 typedef struct InputData InputData;
 struct InputData {
     const char*         FileName;       /* Name of input file */
-    unsigned long       Line;           /* Current line number */
+    cc65_line           Line;           /* Current line number */
     unsigned            Col;            /* Current column number */
-    unsigned long       SLine;          /* Line number at start of token */
+    cc65_line           SLine;          /* Line number at start of token */
     unsigned            SCol;           /* Column number at start of token */
     unsigned            Errors;         /* Number of errors */
     FILE*               F;              /* Input file */
@@ -148,6 +146,9 @@ struct InputData {
     unsigned long       IVal;           /* Integer constant */
     StrBuf              SVal;           /* String constant */
     cc65_errorfunc      Error;          /* Function called in case of errors */
+    unsigned            MajorVersion;   /* Major version number */
+    unsigned            MinorVersion;   /* Minor version number */
+    Collection          LineInfos;      /* Line information */
     DbgInfo*            Info;           /* Pointer to debug info */
 };
 
@@ -156,15 +157,18 @@ typedef struct FileInfo FileInfo;
 struct FileInfo {
     unsigned long       Size;           /* Size of file */
     unsigned long       MTime;          /* Modification time */
+    cc65_addr           Start;          /* Start address of line infos */
+    cc65_addr           End;            /* End address of line infos */
+    Collection          LineInfos;      /* Line infos for this file */
     char                FileName[1];    /* Name of file with full path */
 };
 
 /* Internally used line info struct */
 typedef struct LineInfo LineInfo;
 struct LineInfo {
-    unsigned long       Start;          /* Start of data range */
-    unsigned long       End;            /* End of data range */
-    unsigned long       Line;           /* Line number */
+    cc65_addr           Start;          /* Start of data range */
+    cc65_addr           End;            /* End of data range */
+    cc65_line           Line;           /* Line number */
     FileInfo*           FileInfo;       /* Pointer to file info */
     char                FileName[1];    /* Name of file */
 };
@@ -200,9 +204,7 @@ static void* xmalloc (size_t Size)
         P = malloc (Size);
 
         /* Check for errors */
-        if (P == 0) {
-            /* ####### */
-        }
+        assert (P != 0);
     }
 
     /* Return a pointer to the block */
@@ -442,6 +444,30 @@ static void* CollAt (Collection* C, unsigned Index)
 
 
 
+static void* CollFirst (Collection* C)
+/* Return the first item in a collection */
+{
+    /* We must have at least one entry */
+    assert (C->Count > 0);
+
+    /* Return the element */
+    return C->Items[0];
+}
+
+
+
+static void* CollLast (Collection* C)
+/* Return the last item in a collection */
+{
+    /* We must have at least one entry */
+    assert (C->Count > 0);
+
+    /* Return the element */
+    return C->Items[C->Count-1];
+}
+
+
+
 static void CollDelete (Collection* C, unsigned Index)
 /* Remove the item with the given index from the collection. This will not
  * free the item itself, just the pointer. All items with higher indices
@@ -528,47 +554,6 @@ void CollSort (Collection* C, int (*Compare) (const void*, const void*))
 
 
 /*****************************************************************************/
-/*                                 File info                                 */
-/*****************************************************************************/
-
-
-
-static FileInfo* NewFileInfo (const StrBuf* FileName)
-/* Create a new FileInfo struct and return it */
-{
-    /* Allocate memory */
-    FileInfo* F = xmalloc (sizeof (FileInfo) + SB_GetLen (FileName));
-
-    /* Initialize it */
-    F->Size  = 0;
-    F->MTime = 0;
-    memcpy (F->FileName, SB_GetConstBuf (FileName), SB_GetLen (FileName) + 1);
-
-    /* Return it */
-    return F;
-}
-
-
-
-static void FreeFileInfo (FileInfo* F)
-/* Free a FileInfo struct */
-{
-    xfree (F);
-}
-
-
-
-static int CompareFileInfo (const void* L, const void* R)
-/* Helper function to sort file infos in a collection */
-{
-    /* Sort by file name */
-    return strcmp (((const FileInfo*) L)->FileName,
-                   ((const FileInfo*) R)->FileName);
-}
-
-
-
-/*****************************************************************************/
 /*                                 Line info                                 */
 /*****************************************************************************/
 
@@ -616,6 +601,74 @@ static LineInfo* PreenLineInfo (LineInfo* L, FileInfo* F)
 
 
 
+static int CompareLineInfo (const void* L, const void* R)
+/* Helper function to sort line infos in a collection */
+{
+    /* Sort by start of range */
+    if (((const LineInfo*) L)->Start > ((const LineInfo*) R)->Start) {
+        return 1;
+    } else if (((const LineInfo*) L)->Start < ((const LineInfo*) R)->Start) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+
+
+/*****************************************************************************/
+/*                                 File info                                 */
+/*****************************************************************************/
+
+
+
+static FileInfo* NewFileInfo (const StrBuf* FileName)
+/* Create a new FileInfo struct and return it */
+{
+    /* Allocate memory */
+    FileInfo* F = xmalloc (sizeof (FileInfo) + SB_GetLen (FileName));
+
+    /* Initialize it */
+    F->Size  = 0;
+    F->MTime = 0;
+    F->Start = ~(cc65_addr)0;
+    F->End   = 0;
+    InitCollection (&F->LineInfos);
+    memcpy (F->FileName, SB_GetConstBuf (FileName), SB_GetLen (FileName) + 1);
+
+    /* Return it */
+    return F;
+}
+
+
+
+static void FreeFileInfo (FileInfo* F)
+/* Free a FileInfo struct */
+{
+    unsigned I;
+
+    /* Walk through the collection with line infos and delete them */
+    for (I = 0; I < CollCount (&F->LineInfos); ++I) {
+        FreeLineInfo (CollAt (&F->LineInfos, I));
+    }
+    DoneCollection (&F->LineInfos);
+
+    /* Free the file info structure itself */
+    xfree (F);
+}
+
+
+
+static int CompareFileInfo (const void* L, const void* R)
+/* Helper function to sort file infos in a collection */
+{
+    /* Sort by file name */
+    return strcmp (((const FileInfo*) L)->FileName,
+                   ((const FileInfo*) R)->FileName);
+}
+
+
+
 /*****************************************************************************/
 /*                                Debug info                                 */
 /*****************************************************************************/
@@ -629,8 +682,7 @@ static DbgInfo* NewDbgInfo (void)
     DbgInfo* Info = xmalloc (sizeof (DbgInfo));
 
     /* Initialize it */
-    InitCollection (&Info->FileInfo);
-    InitCollection (&Info->LineInfo);
+    InitCollection (&Info->FileInfos);
 
     /* Return it */
     return Info;
@@ -644,16 +696,10 @@ static void FreeDbgInfo (DbgInfo* Info)
     unsigned I;
 
     /* Free file info */
-    for (I = 0; I < CollCount (&Info->FileInfo); ++I) {
-        FreeFileInfo (CollAt (&Info->FileInfo, I));
+    for (I = 0; I < CollCount (&Info->FileInfos); ++I) {
+        FreeFileInfo (CollAt (&Info->FileInfos, I));
     }
-    DoneCollection (&Info->FileInfo);
-
-    /* Free line info */
-    for (I = 0; I < CollCount (&Info->LineInfo); ++I) {
-        FreeLineInfo (CollAt (&Info->LineInfo, I));
-    }
-    DoneCollection (&Info->LineInfo);
+    DoneCollection (&Info->FileInfos);
 
     /* Free the structure itself */
     xfree (Info);
@@ -667,7 +713,7 @@ static void FreeDbgInfo (DbgInfo* Info)
 
 
 
-static void ParseError (InputData* D, unsigned Type, const char* Msg, ...)
+static void ParseError (InputData* D, cc65_error_severity Type, const char* Msg, ...)
 /* Call the user supplied parse error function */
 {
     va_list             ap;
@@ -782,6 +828,9 @@ static void NextToken (InputData* D)
         { "file",       TOK_FILE        },
         { "label",      TOK_LABEL       },
         { "line",       TOK_LINE        },
+        { "long",       TOK_LONG        },
+        { "major",      TOK_MAJOR       },
+        { "minor",      TOK_MINOR       },
         { "mtime",      TOK_MTIME       },
         { "range",      TOK_RANGE       },
         { "ro",         TOK_RO          },
@@ -826,8 +875,7 @@ static void NextToken (InputData* D)
                          sizeof (KeywordTable[0]),
                          (int (*)(const void*, const void*)) strcmp);
         if (Entry == 0) {
-            ParseError (D, CC65_ERROR, "Unknown keyword `%s'", SB_GetConstBuf (&D->SVal));
-            D->Tok = TOK_INVALID;
+            D->Tok = TOK_IDENT;
         } else {
             D->Tok = Entry->Tok;
         }
@@ -1061,7 +1109,7 @@ static void ParseFile (InputData* D)
     }
 
     /* Remember the file info */
-    CollAppend (&D->Info->FileInfo, F);
+    CollAppend (&D->Info->FileInfos, F);
 
     /* Done */
     return;
@@ -1124,7 +1172,7 @@ static void ParseLine (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                L->Start = D->IVal;
+                L->Start = (cc65_addr) D->IVal;
                 NextToken (D);
                 if (!ConsumeMinus (D)) {
                     goto ErrorExit;
@@ -1132,7 +1180,7 @@ static void ParseLine (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                L->Start = D->IVal;
+                L->End = (cc65_addr) D->IVal;
                 NextToken (D);
                 InfoBits |= Range;
                 break;
@@ -1156,7 +1204,7 @@ static void ParseLine (InputData* D)
     }
 
     /* Remember the line info */
-    CollAppend (&D->Info->LineInfo, L);
+    CollAppend (&D->LineInfos, L);
 
     /* Done */
     return;
@@ -1195,11 +1243,72 @@ static void ParseSym (InputData* D)
 static void ParseVersion (InputData* D)
 /* Parse a VERSION line */
 {
+    enum { None = 0x00, Major = 0x01, Minor = 0x02 } InfoBits = None;
+
     /* Skip the VERSION token */
     NextToken (D);
 
-    /* ### */
-    SkipLine (D);
+    /* More stuff follows */
+    while (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+
+        switch (D->Tok) {
+
+            case TOK_MAJOR:
+                NextToken (D);
+                if (!ConsumeEqual (D)) {
+                    goto ErrorExit;
+                }
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                D->MajorVersion = D->IVal;
+                NextToken (D);
+                InfoBits |= Major;
+                break;
+
+            case TOK_MINOR:
+                NextToken (D);
+                if (!ConsumeEqual (D)) {
+                    goto ErrorExit;
+                }
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                D->MinorVersion = D->IVal;
+                NextToken (D);
+                InfoBits |= Minor;
+                break;
+
+            default:
+                UnexpectedToken (D);
+                SkipLine (D);
+                goto ErrorExit;
+        }
+
+        /* Comma follows before next attribute */
+        if (D->Tok == TOK_COMMA) {
+            NextToken (D);
+        } else if (D->Tok == TOK_EOL || D->Tok == TOK_EOF) {
+            break;
+        } else {
+            UnexpectedToken (D);
+            goto ErrorExit;
+        }
+    }
+
+    /* Check for required information */
+    if ((InfoBits & Major) == None) {
+        MissingAttribute (D, "major");
+        goto ErrorExit;
+    }
+    if ((InfoBits & Minor) == None) {
+        MissingAttribute (D, "minor");
+        goto ErrorExit;
+    }
+
+ErrorExit:
+    /* Entry point in case of errors */
+    return;
 }
 
 
@@ -1214,7 +1323,7 @@ static FileInfo* FindFileInfo (InputData* D, const char* FileName)
 /* Find the FileInfo for a given file name */
 {
     /* Get a pointer to the file info collection */
-    Collection* FileInfos = &D->Info->FileInfo;
+    Collection* FileInfos = &D->Info->FileInfos;
 
     /* Do a binary search */
     int Lo = 0;
@@ -1251,7 +1360,7 @@ static void ProcessFileInfo (InputData* D)
 /* Postprocess file infos */
 {
     /* Get a pointer to the file info collection */
-    Collection* FileInfos = &D->Info->FileInfo;
+    Collection* FileInfos = &D->Info->FileInfos;
 
     /* First, sort the file infos, so we can check for duplicates and do
      * binary search.
@@ -1262,7 +1371,7 @@ static void ProcessFileInfo (InputData* D)
     if (CollCount (FileInfos) > 0) {
 
         /* Walk through the file infos and check for duplicates. If we find
-         * some, remove all but the first, so the file infos are unique after
+         * some, warn and remove them, so the file infos are unique after
          * that step.
          */
         FileInfo* F = CollAt (FileInfos, 0);
@@ -1294,12 +1403,13 @@ static void ProcessFileInfo (InputData* D)
 static void ProcessLineInfo (InputData* D)
 /* Postprocess line infos */
 {
-    /* Get a pointer to the line info collection */
-    Collection* LineInfos = &D->Info->LineInfo;
+    /* Get pointers to the collections */
+    Collection* LineInfos = &D->LineInfos;
+    Collection* FileInfos = &D->Info->FileInfos;
 
     /* Walk over the line infos and replace the name by a pointer to the
      * corresponding file info struct. The LineInfo structs will get shrinked
-     * in this process.
+     * in this process. Add the line info to each file where it is defined.
      */
     unsigned I = 0;
     while (I < CollCount (LineInfos)) {
@@ -1326,11 +1436,83 @@ static void ProcessLineInfo (InputData* D)
         /* Shrink the line info struct effectively removing the file name
          * but set the pointer to the file info now.
          */
-        CollReplace (LineInfos, PreenLineInfo (L, F), I);
+        L = PreenLineInfo (L, F);
+        CollReplace (LineInfos, L, I);
+
+        /* Add this line info to the file where it is defined */
+        CollAppend (&F->LineInfos, L);
 
         /* Next one */
         ++I;
     }
+
+    /* Walk over all files and sort the line infos for each file by ascending
+     * start address of the range, so we can do a binary search later.
+     */
+    for (I = 0; I < CollCount (FileInfos); ++I) {
+
+        /* Get a pointer to this file info */
+        FileInfo* F = CollAt (FileInfos, I);
+
+        /* Sort the line infos for this file */
+        CollSort (&F->LineInfos, CompareLineInfo);
+
+        /* If there are line info entries, place the first and last address
+         * of into the FileInfo struct itself, so we can rule out a FileInfo
+         * quickly when mapping an address to a line info.
+         */
+        if (CollCount (&F->LineInfos) > 0) {
+            F->Start = ((const LineInfo*) CollFirst (&F->LineInfos))->Start;
+            F->End   = ((const LineInfo*) CollLast (&F->LineInfos))->End;
+        }
+
+    }
+}
+
+
+
+static LineInfo* FindLineInfo (FileInfo* F, cc65_addr Addr)
+/* Find the LineInfo for a given address */
+{
+    Collection* LineInfos;
+    int         Hi;
+    int         Lo;
+
+
+    /* Each file info contains the first and last address for which line
+     * info is available, so we can rule out non matching ones quickly.
+     */
+    if (Addr < F->Start || Addr > F->End) {
+        return 0;
+    }
+
+    /* Get a pointer to the line info collection for this file */
+    LineInfos = &F->LineInfos;
+
+    /* Do a binary search */
+    Lo = 0;
+    Hi = (int) CollCount (LineInfos) - 1;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        LineInfo* CurItem = CollAt (LineInfos, Cur);
+
+        /* Found? */
+        if (Addr < CurItem->Start) {
+            Hi = Cur - 1;
+        } else if (Addr > CurItem->End) {
+            Lo = Cur + 1;
+        } else {
+            /* Found! */
+            return CurItem;
+        }
+    }
+
+    /* Not found */
+    return 0;
 }
 
 
@@ -1363,6 +1545,9 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc)
         0,                      /* Integer constant */
         STRBUF_INITIALIZER,     /* String constant */
         errorfunc,              /* Function called in case of errors */
+        0,                      /* Major version number */
+        0,                      /* Minor version number */
+        COLLECTION_INITIALIZER, /* Line information */
         0,                      /* Pointer to debug info */
     };
 
@@ -1432,7 +1617,12 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc)
      * return NULL
      */
     if (D.Errors > 0) {
-        /* Free the allocated debug info */
+        /* Free allocated stuff */
+        unsigned I;
+        for (I = 0; I < CollCount (&D.LineInfos); ++I) {
+            FreeLineInfo (CollAt (&D.LineInfos, I));
+        }
+        DoneCollection (&D.LineInfos);
         FreeDbgInfo (D.Info);
         return 0;
     }
@@ -1441,39 +1631,90 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc)
     ProcessFileInfo (&D);
     ProcessLineInfo (&D);
 
+    /* Free the collection that contained the line info */
+    DoneCollection (&D.LineInfos);
+
     /* Return the debug info struct that was created */
     return D.Info;
 }
 
 
 
-cc65_lineinfo* cc65_get_lineinfo (cc65_dbginfo handle, unsigned long addr)
-/* Return line information for the given address */
+void cc65_free_dbginfo (cc65_dbginfo Handle)
+/* Free debug information read from a file */
 {
-    /* The passed handle is actually a pointer to a DbgInfo struct */
-    DbgInfo* Info = handle;
-    assert (Info != 0);
-
-
+    if (Handle) {
+        FreeDbgInfo (Handle);
+    }
 }
 
 
 
-void cc65_free_lineinfo (cc65_dbginfo handle, cc65_lineinfo* info)
+cc65_lineinfo* cc65_get_lineinfo (cc65_dbginfo Handle, unsigned long Addr)
+/* Return line information for the given address. The function returns 0
+ * if no line information was found.
+ */
+{
+    unsigned        I;
+    Collection*     FileInfos;
+    cc65_lineinfo*  D = 0;
+
+    /* We will place a list of line infos in a collection */
+    Collection LineInfos = COLLECTION_INITIALIZER;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* Walk over all files and search for matching line infos */
+    FileInfos = &((DbgInfo*) Handle)->FileInfos;
+    for (I = 0; I < CollCount (FileInfos); ++I) {
+        /* Check if the file contains line info for this address */
+        LineInfo* L = FindLineInfo (CollAt (FileInfos, I), Addr);
+        if (L != 0) {
+            CollAppend (&LineInfos, L);
+        }
+    }
+
+    /* Do we have line infos? */
+    if (CollCount (&LineInfos) > 0) {
+
+        /* Prepare the struct we will return to the caller */
+        D = xmalloc (sizeof (*D) +
+                     (CollCount (&LineInfos) - 1) * sizeof (D->data[0]));
+        D->count = CollCount (&LineInfos);
+        for (I = 0; I < D->count; ++I) {
+
+            /* Pointer to this info */
+            LineInfo* L = CollAt (&LineInfos, I);
+
+            /* Copy data */
+            D->data[I].name  = L->FileInfo->FileName;
+            D->data[I].size  = L->FileInfo->Size;
+            D->data[I].mtime = L->FileInfo->MTime;
+            D->data[I].line  = L->Line;
+            D->data[I].start = L->Start;
+            D->data[I].end   = L->End;
+        }
+    }
+
+    /* Free the line info collection */
+    DoneCollection (&LineInfos);
+
+    /* Return the struct we've created */
+    return D;
+}
+
+
+
+void cc65_free_lineinfo (cc65_dbginfo Handle, cc65_lineinfo* Info)
 /* Free line info returned by cc65_get_lineinfo() */
 {
-    /* The passed handle is actually a pointer to a DbgInfo struct */
-    DbgInfo* Info = handle;
-    assert (Info != 0);
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
 
+    /* Just free the memory */
+    xfree (Info);
 }
-
-
-
-
-
-
-
 
 
 

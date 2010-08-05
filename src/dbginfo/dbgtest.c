@@ -46,7 +46,7 @@ static void ErrorFunc (const struct cc65_parseerror* E)
              "%s:%s(%lu): %s\n",
              E->type? "Error" : "Warning",
              E->name,
-             E->line,
+             (unsigned long) E->line,
              E->errormsg);
 }
 
@@ -63,8 +63,9 @@ static void Usage (void)
 
 int main (int argc, char** argv)
 {
-    const char* Input;
-    cc65_dbginfo Handle;
+    const char*    Input;
+    cc65_dbginfo   Info;
+    unsigned long  Addr;
 
 
     /* Input file is argument */
@@ -73,11 +74,37 @@ int main (int argc, char** argv)
     }
     Input = argv[1];
 
-
-    Handle = cc65_read_dbginfo (Input, ErrorFunc);
-    if (Handle == 0) {
-        fprintf (stderr, "No handle\n");
+    /* Read the file */
+    Info = cc65_read_dbginfo (Input, ErrorFunc);
+    if (Info == 0) {
+        fprintf (stderr, "Error reading input file - aborting\n");
+        return 1;
     }
+    printf ("Input file \"%s\" successfully read\n", Input);
+
+    /* Output debug information for all addresses in the complete 6502 address
+     * space. This is also sort of a benchmark for the search algorithms.
+     */
+    for (Addr = 0; Addr < 0x10000; ++Addr) {
+        cc65_lineinfo* L = cc65_get_lineinfo (Info, Addr);
+        if (L) {
+            unsigned I;
+            printf ("$%04lX: ", Addr);
+            for (I = 0; I < L->count; ++I) {
+                if (I > 0) {
+                    printf (", ");
+                }
+                printf ("%s(%lu)", L->data[I].name,
+                        (unsigned long) L->data[I].line);
+            }
+            printf ("\n");
+            cc65_free_lineinfo (Info, L);
+        }
+    }
+
+    /* Free the debug info */
+    cc65_free_dbginfo (Info);
+
     return 0;
 }
 

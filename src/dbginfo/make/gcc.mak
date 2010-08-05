@@ -12,9 +12,9 @@ EXE  	= dbgtest
 
 #
 CC      = gcc
-CFLAGS  = -O2 -g -Wall -W 
+CFLAGS  = -g -O2 -Wall -W
 EBIND   = emxbind
-LDFLAGS =
+LDFLAGS = -g
 
 # ------------------------------------------------------------------------------
 # Object files and libraries to link

@@ -39,22 +39,35 @@
 
 
 /*****************************************************************************/
-/*     	      	       		     Data				     */
+/*     	      	       		     Data    				     */
 /*****************************************************************************/
 
 
+
+/* Data types used for addresses and line numbers. Change to "unsigned long"
+ * if you ever want to run the code on a 16-bit machine.
+ */
+typedef unsigned cc65_line;             /* Used to store line numbers */
+typedef unsigned cc65_addr;             /* Use to store (65xx) addresses */
 
 /* Pointer to an opaque data structure containing information from the debug
  * info file. Actually a handle to the data in the file.
  */
 typedef void* cc65_dbginfo;
 
+/* ### Parseerror */
+typedef enum cc65_error_severity cc65_error_severity;
+enum cc65_error_severity {
+    CC65_WARNING,
+    CC65_ERROR,
+};
+
 /* Warnings/errors in cc65_read_dbginfo are passed via this struct */
 typedef struct cc65_parseerror cc65_parseerror;
 struct cc65_parseerror {
-    unsigned            type;           /* 0 = warning, 1 = error */
+    cc65_error_severity type;           /* Type of error */
     const char*         name;           /* Name of input file */
-    unsigned long       line;           /* Error line */
+    cc65_line           line;           /* Error line */
     unsigned            column;         /* Error column */
     char                errormsg[1];    /* Error message */
 };
@@ -62,21 +75,17 @@ struct cc65_parseerror {
 /* Function that is called in case of parse errors */
 typedef void (*cc65_errorfunc) (const struct cc65_parseerror*);
 
-/* File information */
-typedef struct cc65_fileinfo cc65_fileinfo;
-struct cc65_fileinfo {
-    char*               name;           /* Name of file with full path */
-    unsigned long       size;           /* Size of file */
-    unsigned long       mtime;          /* Modification time */
-};
-
 /* Line information */
 typedef struct cc65_lineinfo cc65_lineinfo;
 struct cc65_lineinfo {
     unsigned            count;          /* Count of data sets that follow */
     struct {
-        cc65_fileinfo*  fileinfo;       /* File information including name */
-        unsigned long   line;           /* Line number */
+        const char*     name;           /* Name of the file */
+        unsigned long   size;           /* Size of file */
+        unsigned long   mtime;          /* Modification time */
+        cc65_line       line;           /* Line number */
+        cc65_addr       start;          /* Start address for this line */
+        cc65_addr       end;            /* End address for this line */
     }                   data[1];
 };
 
@@ -96,8 +105,13 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc);
  * read successfully, NULL is returned.
  */
 
+void cc65_free_dbginfo (cc65_dbginfo Handle);
+/* Free debug information read from a file */
+
 cc65_lineinfo* cc65_get_lineinfo (cc65_dbginfo handle, unsigned long addr);
-/* Return line information for the given address */
+/* Return line information for the given address. The function returns NULL
+ * if no line information was found.
+ */
 
 void cc65_free_lineinfo (cc65_dbginfo handle, cc65_lineinfo* info);
 /* Free line info returned by cc65_get_lineinfo() */

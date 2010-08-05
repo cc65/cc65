@@ -63,9 +63,6 @@ struct StrBuf {
 /* Initializer for a string buffer */
 #define STRBUF_INITIALIZER      { 0, 0, 0 }
 
-/* An empty string buf */
-static const StrBuf EmptyStrBuf = STRBUF_INITIALIZER;
-
 /* An array of pointers that grows if needed */
 typedef struct Collection Collection;
 struct Collection {
@@ -76,9 +73,6 @@ struct Collection {
 
 /* Initializer for static collections */
 #define COLLECTION_INITIALIZER  { 0, 0, 0 }
-
-/* An empty collection */
-static const Collection EmptyCollection = COLLECTION_INITIALIZER;
 
 
 
@@ -91,8 +85,7 @@ struct DbgInfo {
 };
 
 /* Input tokens */
-typedef enum Token Token;
-enum Token {
+typedef enum {
 
     TOK_INVALID,                        /* Invalid token */
     TOK_EOF,                            /* End of file reached */
@@ -129,7 +122,7 @@ enum Token {
     TOK_ZEROPAGE,                       /* ZEROPAGE keyword */
 
     TOK_IDENT,                          /* To catch unknown keywords */
-};
+} Token;
 
 /* Data used when parsing the debug info file */
 typedef struct InputData InputData;
@@ -1523,7 +1516,7 @@ static LineInfo* FindLineInfo (FileInfo* F, cc65_addr Addr)
 
 
 
-cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc)
+cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
 /* Parse the debug info file with the given name. On success, the function
  * will return a pointer to an opaque cc65_dbginfo structure, that must be
  * passed to the other functions in this module to retrieve information.
@@ -1533,7 +1526,7 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc)
 {
     /* Data structure used to control scanning and parsing */
     InputData D = {
-        filename,               /* Name of input file */
+        0,                      /* Name of input file */
         1,                      /* Line number */
         0,                      /* Input file */
         0,                      /* Line at start of current token */
@@ -1544,12 +1537,14 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc)
         TOK_INVALID,            /* Input token */
         0,                      /* Integer constant */
         STRBUF_INITIALIZER,     /* String constant */
-        errorfunc,              /* Function called in case of errors */
+        0,                      /* Function called in case of errors */
         0,                      /* Major version number */
         0,                      /* Minor version number */
         COLLECTION_INITIALIZER, /* Line information */
         0,                      /* Pointer to debug info */
     };
+    D.FileName = FileName;
+    D.Error    = ErrFunc;
 
     /* Open the input file */
     D.F = fopen (D.FileName, "r");

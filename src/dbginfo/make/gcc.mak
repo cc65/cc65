@@ -1,5 +1,5 @@
 #
-# Makefile for debug info test executable
+# Makefile for the debug info test executable
 #
 
 
@@ -14,10 +14,10 @@ EXE  	= dbgtest
 CC      = gcc
 CFLAGS  = -g -O2 -Wall -W
 EBIND   = emxbind
-LDFLAGS = -g
+LDFLAGS =
 
 # ------------------------------------------------------------------------------
-# Object files and libraries to link
+# Object files to link
 
 OBJS = 	dbginfo.o     	\
 	dbgtest.o
@@ -52,7 +52,7 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -MM $^ > .depend
+	$(CC) -MM $^ > .depend
 
 
 

@@ -55,12 +55,11 @@ typedef unsigned cc65_addr;             /* Use to store (65xx) addresses */
  */
 typedef void* cc65_dbginfo;
 
-/* ### Parseerror */
-typedef enum cc65_error_severity cc65_error_severity;
-enum cc65_error_severity {
+/* Severity for cc65_parseerror */
+typedef enum {
     CC65_WARNING,
     CC65_ERROR,
-};
+} cc65_error_severity;
 
 /* Warnings/errors in cc65_read_dbginfo are passed via this struct */
 typedef struct cc65_parseerror cc65_parseerror;

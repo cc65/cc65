@@ -152,7 +152,7 @@ static void AddCodeRange (LineInfo* LI, unsigned long Offs, unsigned long Size)
 void RelocLineInfo (Segment* S)
 /* Relocate the line info for a segment. */
 {
-    unsigned long Offs = 0;
+    unsigned long Offs = S->PC;
 
     /* Loop over all sections in this segment */
     Section* Sec = S->SecRoot;

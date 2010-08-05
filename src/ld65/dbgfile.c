@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -63,6 +63,9 @@ void CreateDbgFile (void)
     if (F == 0) {
        	Error ("Cannot create debug file `%s': %s", DbgFileName, strerror (errno));
     }
+
+    /* Output version information */
+    fprintf (F, "version\tmajor=1,minor=0\n");
 
     /* Clear the debug sym table (used to detect duplicates) */
     ClearDbgSymTable ();

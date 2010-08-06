@@ -771,6 +771,35 @@ static void MissingAttribute (InputData* D, const char* AttrName)
 
 
 
+static void UnknownKeyword (InputData* D)
+/* Print a warning about an unknown keyword in the file. Try to do smart
+ * recovery, so if later versions of the debug information add additional
+ * keywords, this code may be able to at least ignore them.
+ */
+{
+    /* Output a warning */
+    ParseError (D, CC65_WARNING, "Unknown keyword \"%s\" - skipping",
+                SB_GetConstBuf (&D->SVal));
+
+    /* Skip the identifier */
+    NextToken (D);
+
+    /* If an equal sign follows, ignore anything up to the next line end
+     * or comma. If a comma or line end follows, we're already done. If
+     * we have none of both, we ignore the remainder of the line.
+     */
+    if (D->Tok == TOK_EQUAL) {
+        NextToken (D);
+        while (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+            NextToken (D);
+        }
+    } else if (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        SkipLine (D);
+    }
+}
+
+
+
 /*****************************************************************************/
 /*                            Scanner and parser                             */
 /*****************************************************************************/
@@ -1083,7 +1112,14 @@ static void ParseFile (InputData* D)
                 InfoBits |= MTime;
                 break;
 
-            default:
+            case TOK_IDENT:
+                /* Try to skip unknown keywords that may have been added by
+                 * a later version.
+                 */
+                UnknownKeyword (D);
+                break;
+
+                default:
                 UnexpectedToken (D);
                 SkipLine (D);
                 goto ErrorExit;
@@ -1178,6 +1214,13 @@ static void ParseLine (InputData* D)
                 InfoBits |= Range;
                 break;
 
+            case TOK_IDENT:
+                /* Try to skip unknown keywords that may have been added by
+                 * a later version.
+                 */
+                UnknownKeyword (D);
+                break;
+
             default:
                 UnexpectedToken (D);
                 SkipLine (D);
@@ -1270,6 +1313,13 @@ static void ParseVersion (InputData* D)
                 D->MinorVersion = D->IVal;
                 NextToken (D);
                 InfoBits |= Minor;
+                break;
+
+            case TOK_IDENT:
+                /* Try to skip unknown keywords that may have been added by
+                 * a later version.
+                 */
+                UnknownKeyword (D);
                 break;
 
             default:
@@ -1585,6 +1635,17 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
 
             case TOK_VERSION:
                 ParseVersion (&D);
+                break;
+
+            case TOK_IDENT:
+                /* Output a warning, then skip the line with the unknown
+                 * keyword that may have been added by a later version.
+                 */
+                ParseError (&D, CC65_WARNING, 
+                            "Unknown keyword \"%s\" - skipping",
+                            SB_GetConstBuf (&D.SVal));
+
+                SkipLine (&D);
                 break;
 
             default:

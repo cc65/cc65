@@ -77,7 +77,7 @@ typedef void (*cc65_errorfunc) (const struct cc65_parseerror*);
 /* Line information */
 typedef struct cc65_lineinfo cc65_lineinfo;
 struct cc65_lineinfo {
-    unsigned            count;          /* Count of data sets that follow */
+    unsigned            count;          /* Number of data sets that follow */
     struct {
         const char*     name;           /* Name of the file */
         unsigned long   size;           /* Size of file */
@@ -85,6 +85,17 @@ struct cc65_lineinfo {
         cc65_line       line;           /* Line number */
         cc65_addr       start;          /* Start address for this line */
         cc65_addr       end;            /* End address for this line */
+    }                   data[1];
+};
+
+/* A list of files with some information */
+typedef struct cc65_filelist cc65_filelist;
+struct cc65_filelist {
+    unsigned            count;          /* Number of data sets that follow */
+    struct {
+        const char*     name;           /* Name of the file */
+        unsigned long   size;           /* Size of file */
+        unsigned long   mtime;          /* Modification time */
     }                   data[1];
 };
 
@@ -107,13 +118,25 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc);
 void cc65_free_dbginfo (cc65_dbginfo Handle);
 /* Free debug information read from a file */
 
-cc65_lineinfo* cc65_get_lineinfo (cc65_dbginfo handle, unsigned long addr);
+cc65_lineinfo* cc65_lineinfo_byaddr (cc65_dbginfo handle, unsigned long addr);
 /* Return line information for the given address. The function returns NULL
  * if no line information was found.
  */
 
+cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo handle, const char* filename,
+                                     cc65_line line);
+/* Return line information for a file/line number combination. The function
+ * returns NULL if no line information was found.
+ */
+
 void cc65_free_lineinfo (cc65_dbginfo handle, cc65_lineinfo* info);
-/* Free line info returned by cc65_get_lineinfo() */
+/* Free line info returned by one of the other functions */
+
+cc65_filelist* cc65_get_filelist (cc65_dbginfo handle);
+/* Return a list of all files referenced in the debug information */
+
+void cc65_free_filelist (cc65_dbginfo handle, cc65_filelist* list);
+/* free a file list returned by cc65_get_filelist() */
 
 
 

@@ -65,6 +65,8 @@ int main (int argc, char** argv)
 {
     const char*    Input;
     cc65_dbginfo   Info;
+    cc65_filelist* Files;
+    unsigned       I;
     unsigned long  Addr;
 
 
@@ -82,14 +84,23 @@ int main (int argc, char** argv)
     }
     printf ("Input file \"%s\" successfully read\n", Input);
 
+    /* Output a list of files */
+    printf ("Files used in compilation:\n");
+    Files = cc65_get_filelist (Info);
+    for (I = 0; I < Files->count; ++I) {
+        printf ("  %s\n", Files->data[I].name);
+    }
+    cc65_free_filelist (Info, Files);
+
     /* Output debug information for all addresses in the complete 6502 address
      * space. This is also sort of a benchmark for the search algorithms.
      */
+    printf ("Line info:\n");
     for (Addr = 0; Addr < 0x10000; ++Addr) {
-        cc65_lineinfo* L = cc65_get_lineinfo (Info, Addr);
+        cc65_lineinfo* L = cc65_lineinfo_byaddr (Info, Addr);
         if (L) {
             unsigned I;
-            printf ("$%04lX: ", Addr);
+            printf ("  $%04lX: ", Addr);
             for (I = 0; I < L->count; ++I) {
                 if (I > 0) {
                     printf (", ");

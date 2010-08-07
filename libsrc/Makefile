@@ -191,7 +191,7 @@ geoslib:
 	AS=../$(AS) \
 	AR=../$(AR) \
 	LD=../$(LD) \
-	AFLAGS="-t geos -I../../../asminc" \
+       	AFLAGS="-t geos --forget-inc-paths -I../../../asminc" \
 	CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../../include" \
 	$(MAKE) -C geos || exit 1
 	for i in em joystick tgi conio common runtime zlib; do \
@@ -199,7 +199,7 @@ geoslib:
 	    AS=$(AS) \
 	    LD=$(LD) \
 	    AR=$(AR) \
-	    AFLAGS="-t geos -I../../asminc" \
+	    AFLAGS="-t geos --forget-inc-paths -I../../asminc" \
 	    CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) SYS=geos -C $$i || exit 1; \
 	    for objfile in $$i/*.o; do \

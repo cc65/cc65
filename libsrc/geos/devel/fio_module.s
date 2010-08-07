@@ -14,6 +14,7 @@ FILEDES	= 3	; first free to use file descriptor
 
 	.include	"../inc/geossym.inc"
 	.include	"../inc/const.inc"
+       	.include        "errno.inc"
 	.include	"fcntl.inc"
 
         .importzp       ptr1, ptr2, ptr3, tmp1
@@ -58,7 +59,7 @@ _open:
 	ldx	ptr1+1
 	jsr	_FindFile	; try to find the file
 	tax
-	bne	@error
+	bne	@oserror
 
 	lda	dirEntryBuf + OFF_DE_TR_SC		; tr&se for ReadByte (r1)
 	sta	f_track
@@ -71,21 +72,27 @@ _open:
 	ldx	#0					; offset for ReadByte (r5)
 	stx	f_offset
 	stx	f_offset+1
+	lda	#0					; clear errors
+	sta	__oserror
+	jsr	__seterrno
 	lda	#FILEDES	; return fd
 	sta	filedesc
 	rts
 @badmode:
+	lda	#EINVAL		; invalid parameters - invalid open mode
+	.byte	$2c		; skip
 @alreadyopen:
-	lda	#70		; no channel
-	sta	__oserror
-@error:
-	lda	#$ff
-	tax
-	rts
+	lda	#EMFILE		; too many opened files (there can be only one)
+	jmp     __directerrno	; set errno, clear oserror, return -1
+@oserror:
+	jmp	__mappederrno	; set platform error code, return -1
 
 _close:
-	lda #0			; clear fd
-	sta filedesc
+	lda	#0
+	sta	__oserror
+	jsr	__seterrno	; clear errors
+	lda	#0		; clear fd
+	sta	filedesc
 	tax
 	rts
 
@@ -104,14 +111,21 @@ _read:
 	sta	ptr2
 	stx	ptr2+1		; buffer ptr
 	jsr	popax
-	cmp	#FILEDES
-	bne	@notopen
-	txa
-	bne	@notopen	; fd must be == FILEDES
+	cmp	#FILEDES	; lo-byte == FILEDES
+	bne	@filenotopen
+	txa			; hi-byte == 0
+	beq	@fileok		; fd must be == FILEDES
 
+@filenotopen:
+	lda     #EBADF
+	jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1
+
+@fileok:
 	lda	#0
 	sta	ptr3
 	sta	ptr3+1		; put 0 into ptr3 (number of bytes read)
+	sta	__oserror	; clear error flags
+	jsr	__seterrno
 
 	lda	f_track		; restore stuff for ReadByte
 	ldx	f_sector
@@ -143,8 +157,8 @@ _read:
 @L2:	lda	__oserror	; was there error ?
 	beq	@L3
 	cmp	#BFR_OVERFLOW	; EOF?
-	bne	@error
-	beq	@done
+	beq	@done		; yes, we're done
+	jmp	__mappederrno	; no, we're screwed
 
 @L3:	inc	ptr1		; decrement the count
 	bne	@L0
@@ -164,17 +178,9 @@ _read:
 	ldx	r5H
 	sta	f_offset
 	stx	f_offset+1
-	
+
 	lda	ptr3		; return byte count
 	ldx	ptr3+1
-	rts
-
-@notopen:
-	lda	#61		; File not open
-@error:
-	sta	__oserror
-	lda	#$ff
-	tax
 	rts
 
 .bss

@@ -103,7 +103,12 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->Relocatable = 0;
     S->Dumped      = 0;
 
-    /* Insert the segment into the segment list */
+    /* Insert the segment into the segment list and assign the segment id */
+    if (SegRoot == 0) {
+        S->Id = 0;
+    } else {
+        S->Id = SegRoot->Id + 1;
+    }
     S->List = SegRoot;
     SegRoot = S;
     ++SegCount;
@@ -656,8 +661,9 @@ void PrintDbgSegments (FILE* F)
         if (S->Size > 0) {
 
      	    /* Print the segment data */
-       	    fprintf (F, "segment\t\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s\n",
-       	       	     GetString (S->Name), S->PC, S->Size,
+       	    fprintf (F, 
+                     "segment\tid=%u,name=\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s\n",
+       	       	     S->Id, GetString (S->Name), S->PC, S->Size,
                      AddrSizeToStr (S->AddrSize),
                      S->ReadOnly? "ro" : "rw");
      	}

@@ -67,6 +67,7 @@ typedef struct Fragment Fragment;
 struct Fragment {
     Fragment*	   	Next;  		/* Next fragment in list */
     struct ObjData*	Obj;		/* Source of fragment */
+    struct Section*     Sec;            /* Section for this fragment */
     unsigned            Size;  		/* Size of data/expression */
     struct ExprNode*	Expr;		/* Expression if FRAG_EXPR */
     Collection          LineInfos;      /* Line info for this fragment */

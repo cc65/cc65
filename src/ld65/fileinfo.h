@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,9 +57,10 @@
 
 typedef struct FileInfo FileInfo;
 struct FileInfo {
-    unsigned        Name;      	       	  /* File name index */
-    unsigned long   MTime;                /* Time of last modification */
-    unsigned long   Size;                 /* Size of the file */
+    unsigned        Name;      	       	/* File name index */
+    unsigned long   MTime;              /* Time of last modification */
+    unsigned long   Size;               /* Size of the file */
+    unsigned        Id;                 /* Id of file for debug info */
 };
 
 

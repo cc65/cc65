@@ -37,12 +37,13 @@
 #include "dbginfo.h"
 #include "fileinfo.h"
 #include "lineinfo.h"
+#include "segments.h"
 #include "spool.h"
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code			       	     */
+/*     	      	     		     Code			       	     */
 /*****************************************************************************/
 
 
@@ -55,8 +56,9 @@ void PrintDbgInfo (ObjData* O, FILE* F)
     /* Output the files section */
     for (I = 0; I < CollCount (&O->Files); ++I) {
 	const FileInfo* FI = CollConstAt (&O->Files, I);
-	fprintf (F, "file\t\"%s\",size=%lu,mtime=0x%08lX\n",
-                 GetString (FI->Name), FI->Size, FI->MTime);
+	fprintf (F,
+                 "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX\n",
+                 FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
     }
 
     /* Output the line infos */
@@ -76,10 +78,9 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 
 	    /* Print it */
             fprintf (F,
-                    "line\t\"%s\",line=%lu,range=0x%06lX-0x%06lX",
-                    GetString (LI->File->Name),
-                    LI->Pos.Line,
-                    R->Offs, R->Offs + R->Size - 1);
+                     "line\tfile=%u,line=%lu,segment=%u,range=0x%06lX-0x%06lX",
+                     LI->File->Id, LI->Pos.Line, R->Seg->Id,
+                     R->Offs, R->Offs + R->Size - 1);
 	}
 
 	/* Terminate the line */

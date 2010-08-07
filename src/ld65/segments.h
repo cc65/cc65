@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -55,6 +55,7 @@
 typedef struct Segment Segment;
 struct Segment {
     unsigned            Name;           /* Name index of the segment */
+    unsigned            Id;             /* Segment id for debug info */
     Segment*	      	Next;		/* Hash list */
     Segment*  	      	List;		/* List of all segments */
     struct Section*	SecRoot;	/* Section list */

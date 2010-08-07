@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,8 +51,14 @@
 static FileInfo* NewFileInfo (void)
 /* Allocate and initialize a new FileInfo struct and return it */
 {
+    /* We will assign file info ids in increasing order of creation */
+    static unsigned Id = 0;
+
     /* Allocate memory */
     FileInfo* FI = xmalloc (sizeof (FileInfo));
+
+    /* Initialize stuff */
+    FI->Id = Id++;
 
     /* Return the new struct */
     return FI;

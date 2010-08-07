@@ -71,6 +71,7 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
     /* Initialize the data */
     F->Next      = 0;
     F->Obj       = 0;
+    F->Sec       = S;
     F->Size      = Size;
     F->Expr      = 0;
     F->LineInfos = EmptyCollection;

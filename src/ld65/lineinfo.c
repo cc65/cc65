@@ -52,13 +52,14 @@
 
 
 
-static CodeRange* NewCodeRange (unsigned long Offs, unsigned long Size)
+static CodeRange* NewCodeRange (Segment* Seg, unsigned long Offs, unsigned long Size)
 /* Create and return a new CodeRange struct */
 {
     /* Allocate memory */
     CodeRange* R = xmalloc (sizeof (CodeRange));
 
     /* Initialize the fields */
+    R->Seg  = Seg;
     R->Offs = Offs;
     R->Size = Size;
 
@@ -102,7 +103,8 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
 
 
 
-static void AddCodeRange (LineInfo* LI, unsigned long Offs, unsigned long Size)
+static void AddCodeRange (LineInfo* LI, Segment* Seg, unsigned long Offs,
+                          unsigned long Size)
 /* Add a range of code to this line */
 {
     unsigned I;
@@ -117,34 +119,35 @@ static void AddCodeRange (LineInfo* LI, unsigned long Offs, unsigned long Size)
      */
     for (I = 0; I < CollCount (CodeRanges); ++I) {
 	CodeRange* R = CollAtUnchecked (CodeRanges, I);
-       	if (Offs < R->Offs) {
+        /* Must be same segment */
+        if (R->Seg == Seg) {
+            if (Offs < R->Offs) {
 
-       	    /* Got the insert position */
-       	    if (Offs + Size == R->Offs) {
-    		/* Merge the two */
-       	     	R->Offs = Offs;
-       	     	R->Size += Size;
-       	    } else {
-       	     	/* Insert a new entry */
-       	     	CollInsert (CodeRanges, NewCodeRange (Offs, Size), I);
-       	    }
+                /* Got the insert position */
+                if (Offs + Size == R->Offs) {
+                    /* Merge the two */
+                    R->Offs = Offs;
+                    R->Size += Size;
+                } else {
+                    /* Insert a new entry */
+                    CollInsert (CodeRanges, NewCodeRange (Seg, Offs, Size), I);
+                }
 
-       	    /* Done */
-       	    return;
+                /* Done */
+                return;
 
-       	} else if (R->Offs + R->Size == Offs) {
+            } else if (R->Offs + R->Size == Offs) {
+                /* This is the regular case. Merge the two. */
+                R->Size += Size;
 
-	    /* This is the regular case. Merge the two. */
-       	    R->Size += Size;
-
-       	    /* Done */
-       	    return;
-
-       	}
+                /* Done */
+                return;
+            }
+        }
     }
 
     /* We must append an entry */
-    CollAppend (CodeRanges, NewCodeRange (Offs, Size));
+    CollAppend (CodeRanges, NewCodeRange (Seg, Offs, Size));
 }
 
 
@@ -170,7 +173,7 @@ void RelocLineInfo (Segment* S)
 
        	    /* Add the range for this fragment to all line infos */
             for (I = 0; I < CollCount (&Frag->LineInfos); ++I) {
-       	       	AddCodeRange (CollAt (&Frag->LineInfos, I), Offs, Frag->Size);
+       	       	AddCodeRange (CollAt (&Frag->LineInfos, I), S, Offs, Frag->Size);
        	    }
 
        	    /* Update the offset */

@@ -65,18 +65,19 @@ struct Segment;
 
 typedef struct CodeRange CodeRange;
 struct CodeRange {
-    unsigned long Offs;
-    unsigned long Size;
+    struct Segment*     Seg;            /* Segment of this code range */
+    unsigned long       Offs;           /* Offset of code range */
+    unsigned long       Size;           /* Size of code range */
 };
 
 
 
 typedef struct LineInfo LineInfo;
 struct LineInfo {
-    struct FileInfo*    File;		      /* File struct for this line */
-    FilePos             Pos;                  /* File position */
-    Collection          Fragments;            /* Fragments for this line */
-    Collection          CodeRanges;           /* Code ranges for this line */
+    struct FileInfo*    File;	        /* File struct for this line */
+    FilePos             Pos;            /* File position */
+    Collection          Fragments;      /* Fragments for this line */
+    Collection          CodeRanges;     /* Code ranges for this line */
 };
 
 

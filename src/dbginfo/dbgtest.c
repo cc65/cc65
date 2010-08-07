@@ -66,6 +66,7 @@ int main (int argc, char** argv)
     const char*    Input;
     cc65_dbginfo   Info;
     cc65_filelist* Files;
+    cc65_lineinfo* L;
     unsigned       I;
     unsigned long  Addr;
 
@@ -92,12 +93,24 @@ int main (int argc, char** argv)
     }
     cc65_free_filelist (Info, Files);
 
+    /* Check one line */
+    printf ("Requesting line info for crt0.s(59):\n");
+    L = cc65_lineinfo_byname (Info, "crt0.s", 59);
+    if (L == 0) {
+        printf ("  Not found\n");
+    } else {
+        printf ("  Code range is $%04X-$%04X\n", L->data[0].start, L->data[0].end);
+        cc65_free_lineinfo (Info, L);
+    }
+
+
+
     /* Output debug information for all addresses in the complete 6502 address
      * space. This is also sort of a benchmark for the search algorithms.
      */
     printf ("Line info:\n");
     for (Addr = 0; Addr < 0x10000; ++Addr) {
-        cc65_lineinfo* L = cc65_lineinfo_byaddr (Info, Addr);
+        L = cc65_lineinfo_byaddr (Info, Addr);
         if (L) {
             unsigned I;
             printf ("  $%04lX: ", Addr);

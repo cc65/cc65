@@ -96,6 +96,8 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->PC   	   = 0;
     S->Size    	   = 0;
     S->AlignObj	   = 0;
+    S->OutputName  = 0;
+    S->OutputOffs  = 0;
     S->Align       = 0;
     S->FillVal	   = 0;
     S->AddrSize    = AddrSize;
@@ -481,7 +483,7 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
 
 
 
-void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
+void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 /* Write the data from the given segment to a file. For expressions, F is
  * called (see description of SegWriteFunc above).
  */
@@ -489,18 +491,22 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
     int Sign;
     unsigned long Offs = 0;
 
+    /* Remember the output file and offset for the segment */
+    S->OutputName = TgtName;
+    S->OutputOffs = (unsigned long) ftell (Tgt);
+
     /* Loop over all sections in this segment */
     Section* Sec = S->SecRoot;
     while (Sec) {
-	Fragment* Frag;
+     	Fragment* Frag;
 
-	/* If we have fill bytes, write them now */
-	WriteMult (Tgt, S->FillVal, Sec->Fill);
-	Offs += Sec->Fill;
+     	/* If we have fill bytes, write them now */
+     	WriteMult (Tgt, S->FillVal, Sec->Fill);
+     	Offs += Sec->Fill;
 
-	/* Loop over all fragments in this section */
-	Frag = Sec->FragRoot;
-	while (Frag) {
+     	/* Loop over all fragments in this section */
+     	Frag = Sec->FragRoot;
+     	while (Frag) {
 
             /* Do fragment alignment checks */
 
@@ -523,13 +529,13 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 		   	    break;
 
 		   	case SEG_EXPR_RANGE_ERROR:
-		   	    Error ("Range error in module `%s', line %lu",
+     		   	    Error ("Range error in module `%s', line %lu",
 		   	    	   GetFragmentSourceName (Frag),
 		   	 	   GetFragmentSourceLine (Frag));
 		   	    break;
 
 		   	case SEG_EXPR_TOO_COMPLEX:
-		   	    Error ("Expression too complex in module `%s', line %lu",
+     		   	    Error ("Expression too complex in module `%s', line %lu",
 		   	    	   GetFragmentSourceName (Frag),
 		   	 	   GetFragmentSourceLine (Frag));
 			    break;
@@ -553,7 +559,7 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 		    Internal ("Invalid fragment type: %02X", Frag->Type);
 	    }
 
-	    /* Update the offset */
+     	    /* Update the offset */
 	    Offs += Frag->Size;
 
 	    /* Next fragment */
@@ -651,22 +657,21 @@ void PrintSegmentMap (FILE* F)
 void PrintDbgSegments (FILE* F)
 /* Output the segments to the debug file */
 {
-    Segment* S;
-
     /* Walk over all segments */
-    S = SegRoot;
+    Segment* S = SegRoot;
     while (S) {
 
-     	/* Ignore empty segments */
-        if (S->Size > 0) {
-
-     	    /* Print the segment data */
-       	    fprintf (F, 
-                     "segment\tid=%u,name=\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s\n",
-       	       	     S->Id, GetString (S->Name), S->PC, S->Size,
-                     AddrSizeToStr (S->AddrSize),
-                     S->ReadOnly? "ro" : "rw");
-     	}
+        /* Print the segment data */
+        fprintf (F,
+                 "segment\tid=%u,name=\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s",
+                 S->Id, GetString (S->Name), S->PC, S->Size,
+                 AddrSizeToStr (S->AddrSize),
+                 S->ReadOnly? "ro" : "rw");
+        if (S->OutputName) {
+            fprintf (F, ",outputname=\"%s\",outputoffs=%lu",
+                     S->OutputName, S->OutputOffs);
+        }
+        fputc ('\n', F);
 
      	/* Follow the linked list */
      	S = S->List;

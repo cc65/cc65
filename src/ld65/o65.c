@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2009, Ullrich von Bassewitz                                      */
+/* (C) 1999-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -786,7 +786,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 
 	/* Write this segment */
        	if (DoWrite) {
-       	    SegWrite (D->F, S->Seg, O65WriteExpr, D);
+       	    SegWrite (D->Filename, D->F, S->Seg, O65WriteExpr, D);
        	}
 
        	/* Mark the segment as dumped */

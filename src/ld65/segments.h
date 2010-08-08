@@ -63,6 +63,8 @@ struct Segment {
     unsigned long     	PC;    		/* PC were this segment is located */
     unsigned long     	Size;		/* Size of data so far */
     struct ObjData*	AlignObj;	/* Module that requested the alignment */
+    const char*         OutputName;     /* Name of output file or NULL */
+    unsigned long       OutputOffs;     /* Offset in output file */
     unsigned char     	Align;		/* Alignment needed */
     unsigned char     	FillVal;	/* Value to use for fill bytes */
     unsigned char     	AddrSize;      	/* Address size of segment */
@@ -139,7 +141,7 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size);
  * check and return one of the SEG_EXPR_xxx codes.
  */
 
-void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data);
+void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void* Data);
 /* Write the data from the given segment to a file. For expressions, F is
  * called (see description of SegWriteFunc above).
  */

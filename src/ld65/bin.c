@@ -225,7 +225,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
        	if (DoWrite) {
             unsigned long P = ftell (D->F);
             S->Seg->FillVal = M->FillVal;
-	    SegWrite (D->F, S->Seg, BinWriteExpr, D);
+	    SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
             PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
 	} else if (M->Flags & MF_FILL) {
 	    WriteMult (D->F, M->FillVal, S->Seg->Size);

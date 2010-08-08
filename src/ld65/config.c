@@ -230,18 +230,8 @@ static void SegDescInsert (SegDesc* S)
 static void MemoryInsert (Memory* M, SegDesc* S)
 /* Insert the segment descriptor into the memory area list */
 {
-    /* Create a new node for the entry */
-    MemListNode* N = xmalloc (sizeof (MemListNode));
-    N->Seg  = S;
-    N->Next = 0;
-
-    if (M->SegLast == 0) {
-       	/* First entry */
-       	M->SegList = N;
-    } else {
- 	M->SegLast->Next = N;
-    }
-    M->SegLast = N;
+    /* Insert the segment into the segment list of the memory area */
+    CollAppend (&M->SegList, S);
 }
 
 
@@ -294,8 +284,7 @@ static Memory* NewMemory (unsigned Name)
     M->FillLevel   = 0;
     M->FillVal     = 0;
     M->Relocatable = 0;
-    M->SegList     = 0;
-    M->SegLast     = 0;
+    InitCollection (&M->SegList);
     M->F           = 0;
 
     /* Insert the struct into the list */
@@ -1576,7 +1565,7 @@ unsigned CfgAssignSegments (void)
     unsigned I;
     for (I = 0; I < CollCount (&MemoryList); ++I) {
 
-        MemListNode* N;
+        unsigned J;
 
         /* Get this entry */
         Memory* M = CollAtUnchecked (&MemoryList, I);
@@ -1588,11 +1577,10 @@ unsigned CfgAssignSegments (void)
         M->Relocatable = RelocatableBinFmt (M->F->Format);
 
      	/* Walk through the segments in this memory area */
-     	N = M->SegList;
-     	while (N) {
+        for (J = 0; J < CollCount (&M->SegList); ++J) {
 
-     	    /* Get the segment from the node */
-     	    SegDesc* S = N->Seg;
+     	    /* Get the segment */
+     	    SegDesc* S = CollAtUnchecked (&M->SegList, J);
 
             /* Some actions depend on wether this is the load or run memory
              * area.
@@ -1674,8 +1662,6 @@ unsigned CfgAssignSegments (void)
      	    /* Calculate the new address */
      	    Addr += S->Seg->Size;
 
-	    /* Next segment */
-	    N = N->Next;
 	}
 
 	/* If requested, define symbols for start and size of the memory area */
@@ -1744,7 +1730,7 @@ void CfgWriteTarget (void)
                 unsigned J;
                 for (J = 0; J < CollCount (&F->MemList); ++J) {
 
-		    MemListNode* N;
+                    unsigned K;
 
                     /* Get this entry */
   		    Memory* M = CollAtUnchecked (&F->MemList, J);
@@ -1753,15 +1739,12 @@ void CfgWriteTarget (void)
        	       	    Print (stdout, 2, "Skipping `%s'...\n", GetString (M->Name));
 
   		    /* Walk throught the segments */
-  		    N = M->SegList;
-  		    while (N) {
-		       	if (N->Seg->Load == M) {
+                    for (K = 0; K < CollCount (&M->SegList); ++K) {
+                        SegDesc* S = CollAtUnchecked (&M->SegList, K);
+		       	if (S->Load == M) {
   		       	    /* Load area - mark the segment as dumped */
-  		       	    N->Seg->Seg->Dumped = 1;
+  		       	    S->Seg->Dumped = 1;
   		       	}
-
-		       	/* Next segment node */
-		       	N = N->Next;
 		    }
 		}
 	    }

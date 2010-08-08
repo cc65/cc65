@@ -61,13 +61,6 @@ struct File {
     Collection          MemList;        /* List of memory areas in this file */
 };
 
-/* Segment list node. Needed because there are two lists (RUN & LOAD) */
-typedef struct MemListNode MemListNode;
-struct MemListNode {
-    MemListNode*  	Next;	 	/* Next entry */
-    struct SegDesc*	Seg;	 	/* Segment */
-};
-
 /* Memory list entry */
 typedef struct Memory Memory;
 struct Memory {
@@ -79,8 +72,7 @@ struct Memory {
     unsigned long      	FillLevel;	/* Actual fill level of segment */
     unsigned char   	FillVal;  	/* Value used to fill rest of seg */
     unsigned char       Relocatable;    /* Memory area is relocatable */
-    MemListNode* 	SegList;  	/* List of segments for this section */
-    MemListNode* 	SegLast;  	/* Last segment in this section */
+    Collection          SegList;  	/* List of segments for this section */
     File*    	    	F;    	  	/* File that contains the entry */
 };
 

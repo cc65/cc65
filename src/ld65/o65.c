@@ -246,18 +246,16 @@ static void CvtMemoryToSegment (ExprDesc* ED)
     /* Get the memory area from the expression */
     Memory* M = ED->MemRef;
 
-    /* Get the list of segments in this memory area */
-    MemListNode* N = M->SegList;
-
     /* Remember the "nearest" segment and its offset */
     Segment* Nearest   = 0;
     unsigned long Offs = ULONG_MAX;
 
     /* Walk over all segments */
-    while (N != 0) {
+    unsigned I;
+    for (I = 0; I < CollCount (&M->SegList); ++I) {
 
-        /* Get the segment from this node and check if it's a run segment */
-        SegDesc* S = N->Seg;
+        /* Get the segment and check if it's a run segment */
+    	SegDesc* S = CollAtUnchecked (&M->SegList, I);
         if (S->Run == M) {
 
             unsigned long O;
@@ -277,9 +275,6 @@ static void CvtMemoryToSegment (ExprDesc* ED)
                 }
             }
         }
-
-        /* Next segment */
-        N = N->Next;
     }
 
     /* If we found a segment, use it and adjust the offset */
@@ -1221,7 +1216,7 @@ void O65SetExport (O65Desc* D, unsigned Ident)
 
 static void O65SetupSegments (O65Desc* D, File* F)
 /* Setup segment assignments */
-{          
+{
     unsigned I;
     unsigned TextIdx, DataIdx, BssIdx, ZPIdx;
 
@@ -1237,11 +1232,11 @@ static void O65SetupSegments (O65Desc* D, File* F)
         Memory* M = CollAtUnchecked (&F->MemList, I);
 
         /* Walk through the segment list and count the segment types */
-        MemListNode* N = M->SegList;
-        while (N) {
+        unsigned J;
+        for (J = 0; J < CollCount (&M->SegList); ++J) {
 
-            /* Get the segment from the list node */
-            SegDesc* S = N->Seg;
+            /* Get the segment */
+            SegDesc* S = CollAtUnchecked (&M->SegList, J);
 
             /* Check the segment type. */
             switch (O65SegType (S)) {
@@ -1249,11 +1244,8 @@ static void O65SetupSegments (O65Desc* D, File* F)
                 case O65SEG_DATA:   D->DataCount++; break;
                 case O65SEG_BSS:    D->BssCount++;  break;
                 case O65SEG_ZP:	    D->ZPCount++;   break;
-                default:	    Internal ("Invalid return from O65SegType");
+                default:       	    Internal ("Invalid return from O65SegType");
             }
-
-            /* Next segment node */
-            N = N->Next;
         }
     }
 
@@ -1270,11 +1262,11 @@ static void O65SetupSegments (O65Desc* D, File* F)
         Memory* M = CollAtUnchecked (&F->MemList, I);
 
         /* Walk over the segment list and check the segment types */
-        MemListNode* N = M->SegList;
-        while (N) {
+        unsigned J;
+        for (J = 0; J < CollCount (&M->SegList); ++J) {
 
-            /* Get the segment from the list node */
-            SegDesc* S = N->Seg;
+            /* Get the segment */
+            SegDesc* S = CollAtUnchecked (&M->SegList, J);
 
             /* Check the segment type. */
             switch (O65SegType (S)) {
@@ -1284,9 +1276,6 @@ static void O65SetupSegments (O65Desc* D, File* F)
                 case O65SEG_ZP:	    D->ZPSeg [ZPIdx++]     = S; break;
                 default:	    Internal ("Invalid return from O65SegType");
             }
-
-            /* Next segment node */
-            N = N->Next;
         }
     }
 }

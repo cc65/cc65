@@ -135,14 +135,14 @@ static void BinWriteMem (BinDesc* D, Memory* M)
     /* Get the start address of this memory area */
     unsigned long Addr = M->Start;
 
-    /* Get a pointer to the first segment node */
-    MemListNode* N = M->SegList;
-    while (N) {
+    /* Walk over all segments in this memory area */
+    unsigned I;
+    for (I = 0; I < CollCount (&M->SegList); ++I) {
 
 	int DoWrite;
 
-	/* Get the segment from the list node */
-    	SegDesc* S = N->Seg;
+	/* Get the segment */
+    	SegDesc* S = CollAtUnchecked (&M->SegList, I);
 
 	/* Keep the user happy */
        	Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
@@ -239,9 +239,6 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 
 	/* Calculate the new address */
 	Addr += S->Seg->Size;
-
-	/* Next segment node */
-	N = N->Next;
     }
 
     /* If a fill was requested, fill the remaining space */
@@ -271,7 +268,7 @@ static int BinUnresolved (unsigned Name attribute ((unused)), void* D)
 
 void BinWriteTarget (BinDesc* D, struct File* F)
 /* Write a binary output file */
-{          
+{
     unsigned I;
 
     /* Place the filename in the control structure */
@@ -297,7 +294,7 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
     /* Dump all memory areas */
-    for (I = 0; I < CollCount (&F->MemList); ++I) {  
+    for (I = 0; I < CollCount (&F->MemList); ++I) {
         /* Get this entry */
         Memory* M = CollAtUnchecked (&F->MemList, I);
 	Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));

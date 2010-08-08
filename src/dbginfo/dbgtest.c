@@ -63,12 +63,13 @@ static void Usage (void)
 
 int main (int argc, char** argv)
 {
-    const char*    Input;
-    cc65_dbginfo   Info;
-    cc65_filelist* Files;
-    cc65_lineinfo* L;
-    unsigned       I;
-    unsigned long  Addr;
+    const char*         Input;
+    cc65_dbginfo        Info;
+    cc65_filelist*      Files;
+    cc65_segmentlist*   Segments;
+    cc65_lineinfo*      L;
+    unsigned            I;
+    unsigned long       Addr;
 
 
     /* Input file is argument */
@@ -92,6 +93,17 @@ int main (int argc, char** argv)
         printf ("  %s\n", Files->data[I].name);
     }
     cc65_free_filelist (Info, Files);
+
+    /* Output a list of segments */
+    printf ("Segments processed when linking:\n");
+    Segments = cc65_get_segmentlist (Info);
+    for (I = 0; I < Segments->count; ++I) {
+        printf ("  %-20s $%06lX-$%06lX\n",
+                Segments->data[I].name,
+                (unsigned long) Segments->data[I].start,
+                (unsigned long) Segments->data[I].end);
+    }
+    cc65_free_segmentlist (Info, Segments);
 
     /* Check one line */
     printf ("Requesting line info for crt0.s(59):\n");

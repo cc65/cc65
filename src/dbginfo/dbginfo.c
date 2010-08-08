@@ -2376,6 +2376,55 @@ void cc65_free_filelist (cc65_dbginfo Handle, cc65_filelist* List)
 
 
 
+cc65_segmentlist* cc65_get_segmentlist (cc65_dbginfo Handle)
+/* Return a list of all segments referenced in the debug information */
+{
+    DbgInfo*            Info;
+    Collection*         SegInfoByName;
+    cc65_segmentlist*   D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Get a pointer to the file list */
+    SegInfoByName = &Info->SegInfoByName;
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = xmalloc (sizeof (*D) - sizeof (D->data[0]) +
+                 CollCount (SegInfoByName) * sizeof (D->data[0]));
+
+    /* Fill in the data */
+    D->count = CollCount (SegInfoByName);
+    for (I = 0; I < CollCount (SegInfoByName); ++I) {
+
+        /* Get this item */
+        SegInfo* S = CollAt (SegInfoByName, I);
+
+        /* Copy the data */
+        D->data[I].name  = S->SegName;
+        D->data[I].start = S->Start;
+        D->data[I].end   = S->Start + S->Size - 1;
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void cc65_free_segmentlist (cc65_dbginfo Handle, cc65_segmentlist* List)
+/* Free a file list returned by cc65_get_filelist() */
+{
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
+
+    /* Just free the memory */
+    xfree (List);
+}
 
 
 

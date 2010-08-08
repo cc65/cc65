@@ -101,6 +101,19 @@ struct cc65_filelist {
 
 
 
+/* A list of segments with some information */
+typedef struct cc65_segmentlist cc65_segmentlist;
+struct cc65_segmentlist {
+    unsigned            count;          /* Number of data sets that follow */
+    struct {
+        const char*     name;           /* Name of the file */
+        cc65_addr       start;          /* Start address of segment */
+        cc65_addr       end;            /* End address of segment */
+    }                   data[1];
+};
+
+
+
 /*****************************************************************************/
 /*     	      	       		     Code  				     */
 /*****************************************************************************/
@@ -137,6 +150,12 @@ cc65_filelist* cc65_get_filelist (cc65_dbginfo handle);
 
 void cc65_free_filelist (cc65_dbginfo handle, cc65_filelist* list);
 /* free a file list returned by cc65_get_filelist() */
+
+cc65_segmentlist* cc65_get_segmentlist (cc65_dbginfo handle);
+/* Return a list of all segments referenced in the debug information */
+
+void cc65_free_segmentlist (cc65_dbginfo handle, cc65_segmentlist* list);
+/* Free a file list returned by cc65_get_filelist() */
 
 
 

@@ -271,8 +271,8 @@ static int BinUnresolved (unsigned Name attribute ((unused)), void* D)
 
 void BinWriteTarget (BinDesc* D, struct File* F)
 /* Write a binary output file */
-{
-    Memory* M;
+{          
+    unsigned I;
 
     /* Place the filename in the control structure */
     D->Filename = GetString (F->Name);
@@ -297,11 +297,11 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
     /* Dump all memory areas */
-    M = F->MemList;
-    while (M) {
+    for (I = 0; I < CollCount (&F->MemList); ++I) {  
+        /* Get this entry */
+        Memory* M = CollAtUnchecked (&F->MemList, I);
 	Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));
 	BinWriteMem (D, M);
-	M = M->FNext;
     }
 
     /* Close the file */

@@ -38,6 +38,9 @@
 
 
 
+/* common */
+#include "coll.h"
+
 /* ld65 */
 #include "segments.h"
 
@@ -53,10 +56,9 @@
 typedef struct File File;
 struct File {
     unsigned            Name;           /* Name index of the file */
-    unsigned		Flags;
-    unsigned		Format;		/* Output format */
-    struct Memory*	MemList;  	/* List of memory areas in this file */
-    struct Memory* 	MemLast;  	/* Last memory area in this file */
+    unsigned	 	Flags;
+    unsigned	 	Format;		/* Output format */
+    Collection          MemList;        /* List of memory areas in this file */
 };
 
 /* Segment list node. Needed because there are two lists (RUN & LOAD) */
@@ -70,7 +72,6 @@ struct MemListNode {
 typedef struct Memory Memory;
 struct Memory {
     unsigned            Name;           /* Name index of the memory section */
-    Memory*    	       	FNext;	  	/* Next in file list */
     unsigned   	       	Attr;	  	/* Which values are valid? */
     unsigned 		Flags;	  	/* Set of bitmapped flags */
     unsigned long   	Start;	  	/* Start address */

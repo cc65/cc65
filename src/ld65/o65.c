@@ -1221,10 +1221,8 @@ void O65SetExport (O65Desc* D, unsigned Ident)
 
 static void O65SetupSegments (O65Desc* D, File* F)
 /* Setup segment assignments */
-{
-    Memory* M;
-    MemListNode* N;
-    SegDesc* S;
+{          
+    unsigned I;
     unsigned TextIdx, DataIdx, BssIdx, ZPIdx;
 
     /* Initialize the counters */
@@ -1234,14 +1232,16 @@ static void O65SetupSegments (O65Desc* D, File* F)
     D->ZPCount   = 0;
 
     /* Walk over the memory list */
-    M = F->MemList;
-    while (M) {
+    for (I = 0; I < CollCount (&F->MemList); ++I) {
+        /* Get this entry */
+        Memory* M = CollAtUnchecked (&F->MemList, I);
+
         /* Walk through the segment list and count the segment types */
-        N = M->SegList;
+        MemListNode* N = M->SegList;
         while (N) {
 
             /* Get the segment from the list node */
-            S = N->Seg;
+            SegDesc* S = N->Seg;
 
             /* Check the segment type. */
             switch (O65SegType (S)) {
@@ -1255,8 +1255,6 @@ static void O65SetupSegments (O65Desc* D, File* F)
             /* Next segment node */
             N = N->Next;
         }
-        /* Next memory area */
-        M = M->FNext;
     }
 
     /* Allocate memory according to the numbers */
@@ -1267,14 +1265,16 @@ static void O65SetupSegments (O65Desc* D, File* F)
 
     /* Walk again through the list and setup the segment arrays */
     TextIdx = DataIdx = BssIdx = ZPIdx = 0;
-    M = F->MemList;
-    while (M) {
+    for (I = 0; I < CollCount (&F->MemList); ++I) {
+        /* Get this entry */
+        Memory* M = CollAtUnchecked (&F->MemList, I);
 
-        N = M->SegList;
+        /* Walk over the segment list and check the segment types */
+        MemListNode* N = M->SegList;
         while (N) {
 
             /* Get the segment from the list node */
-            S = N->Seg;
+            SegDesc* S = N->Seg;
 
             /* Check the segment type. */
             switch (O65SegType (S)) {
@@ -1288,8 +1288,6 @@ static void O65SetupSegments (O65Desc* D, File* F)
             /* Next segment node */
             N = N->Next;
         }
-        /* Next memory area */
-        M = M->FNext;
     }
 }
 

@@ -41,7 +41,6 @@
 /* common */
 #include "bitops.h"
 #include "check.h"
-#include "coll.h"
 #include "print.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -170,13 +169,7 @@ static void FileInsert (File* F, Memory* M)
 /* Insert the memory area into the files list */
 {
     M->F = F;
-    if (F->MemList == 0) {
-	/* First entry */
-	F->MemList = M;
-    } else {
-	F->MemLast->FNext = M;
-    }
-    F->MemLast = M;
+    CollAppend (&F->MemList, M);
 }
 
 
@@ -272,8 +265,7 @@ static File* NewFile (unsigned Name)
     F->Name    = Name;
     F->Flags   = 0;
     F->Format  = BINFMT_DEFAULT;
-    F->MemList = 0;
-    F->MemLast = 0;
+    InitCollection (&F->MemList);
 
     /* Insert the struct into the list */
     CollAppend (&FileList, F);
@@ -298,7 +290,6 @@ static Memory* NewMemory (unsigned Name)
 
     /* Initialize the fields */
     M->Name        = Name;
-    M->FNext       = 0;
     M->Attr        = 0;
     M->Flags       = 0;
     M->Start       = 0;
@@ -1723,7 +1714,7 @@ void CfgWriteTarget (void)
         File* F = CollAtUnchecked (&FileList, I);
 
     	/* We don't need to look at files with no memory areas */
-  	if (F->MemList) {
+  	if (CollCount (&F->MemList) > 0) {
 
   	    /* Is there an output file? */
   	    if (SB_GetLen (GetStrBuf (F->Name)) > 0) {
@@ -1753,11 +1744,14 @@ void CfgWriteTarget (void)
 
   		/* No output file. Walk through the list and mark all segments
        	       	 * loading into these memory areas in this file as dumped.
-  		 */
-  		Memory* M = F->MemList;
-  		while (M) {
+  		 */ 
+                unsigned J;
+                for (J = 0; J < CollCount (&F->MemList); ++J) {
 
 		    MemListNode* N;
+
+                    /* Get this entry */
+  		    Memory* M = CollAtUnchecked (&F->MemList, J);
 
 		    /* Debugging */
        	       	    Print (stdout, 2, "Skipping `%s'...\n", GetString (M->Name));
@@ -1773,8 +1767,6 @@ void CfgWriteTarget (void)
 		       	/* Next segment node */
 		       	N = N->Next;
 		    }
-		    /* Next memory area */
-		    M = M->FNext;
 		}
 	    }
 	}

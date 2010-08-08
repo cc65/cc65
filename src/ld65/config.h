@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -53,7 +53,6 @@
 typedef struct File File;
 struct File {
     unsigned            Name;           /* Name index of the file */
-    File*     		Next;	  	/* Pointer to next entry in list */
     unsigned		Flags;
     unsigned		Format;		/* Output format */
     struct Memory*	MemList;  	/* List of memory areas in this file */
@@ -71,7 +70,6 @@ struct MemListNode {
 typedef struct Memory Memory;
 struct Memory {
     unsigned            Name;           /* Name index of the memory section */
-    Memory*  	    	Next;	  	/* Pointer to next entry in list */
     Memory*    	       	FNext;	  	/* Next in file list */
     unsigned   	       	Attr;	  	/* Which values are valid? */
     unsigned 		Flags;	  	/* Set of bitmapped flags */

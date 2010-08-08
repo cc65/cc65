@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,8 +39,9 @@
 #include <errno.h>
 
 /* common */
-#include "check.h"
 #include "bitops.h"
+#include "check.h"
+#include "coll.h"
 #include "print.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -81,15 +82,10 @@ static enum {
 
 
 /* File list */
-static File*	    	FileList; 	/* Single linked list */
-static unsigned	    	FileCount;  	/* Number of entries in the list */
-
-
+static Collection       FileList = STATIC_COLLECTION_INITIALIZER;
 
 /* Memory list */
-static Memory*	    	MemoryList; 	/* Single linked list */
-static Memory*		MemoryLast;	/* Last element in list */
-static unsigned	    	MemoryCount;	/* Number of entries in the list */
+static Collection       MemoryList = STATIC_COLLECTION_INITIALIZER;
 
 /* Memory attributes */
 #define MA_START       	0x0001
@@ -145,12 +141,12 @@ static File* NewFile (unsigned Name);
 static File* FindFile (unsigned Name)
 /* Find a file with a given name. */
 {
-    File* F = FileList;
-    while (F) {
- 	if (F->Name == Name) {
- 	    return F;
- 	}
- 	F = F->Next;
+    unsigned I;
+    for (I = 0; I < CollCount (&FileList); ++I) {
+        File* F = CollAtUnchecked (&FileList, I);
+       	if (F->Name == Name) {
+       	    return F;
+       	}
     }
     return 0;
 }
@@ -188,12 +184,12 @@ static void FileInsert (File* F, Memory* M)
 static Memory* CfgFindMemory (unsigned Name)
 /* Find the memory are with the given name. Return NULL if not found */
 {
-    Memory* M = MemoryList;
-    while (M) {
+    unsigned I;
+    for (I = 0; I < CollCount (&MemoryList); ++I) {
+        Memory* M = CollAt (&MemoryList, I);
        	if (M->Name == Name) {
        	    return M;
        	}
-       	M = M->Next;
     }
     return 0;
 }
@@ -280,9 +276,7 @@ static File* NewFile (unsigned Name)
     F->MemLast = 0;
 
     /* Insert the struct into the list */
-    F->Next  = FileList;
-    FileList = F;
-    ++FileCount;
+    CollAppend (&FileList, F);
 
     /* ...and return it */
     return F;
@@ -304,7 +298,6 @@ static Memory* NewMemory (unsigned Name)
 
     /* Initialize the fields */
     M->Name        = Name;
-    M->Next    	   = 0;
     M->FNext       = 0;
     M->Attr        = 0;
     M->Flags       = 0;
@@ -318,14 +311,7 @@ static Memory* NewMemory (unsigned Name)
     M->F           = 0;
 
     /* Insert the struct into the list */
-    if (MemoryLast == 0) {
-	/* First element */
-	MemoryList = M;
-    } else {
-	MemoryLast->Next = M;
-    }
-    MemoryLast = M;
-    ++MemoryCount;
+    CollAppend (&MemoryList, M);
 
     /* ...and return it */
     return M;
@@ -555,7 +541,7 @@ static void ParseFiles (void)
 	/* Search for the file, it must exist */
        	F = FindFile (GetStrBufId (&CfgSVal));
 	if (F == 0) {
-       	    CfgError ("File `%s' not found in MEMORY section", 
+       	    CfgError ("File `%s' not found in MEMORY section",
                       SB_GetConstBuf (&CfgSVal));
 	}
 
@@ -911,7 +897,7 @@ static void ParseO65 (void)
                 CfgSValId = GetStrBufId (&CfgSVal);
 	        /* Check if the export symbol is also defined as an import. */
 	       	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
-		    CfgError ("Exported symbol `%s' cannot be an import", 
+		    CfgError ("Exported symbol `%s' cannot be an import",
                               SB_GetConstBuf (&CfgSVal));
 		}
       		/* Check if we have this symbol defined already. The entry
@@ -919,7 +905,7 @@ static void ParseO65 (void)
       		 * error message when checking it here.
       		 */
       	 	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
-      	  	    CfgError ("Duplicate exported symbol: `%s'", 
+      	  	    CfgError ("Duplicate exported symbol: `%s'",
                               SB_GetConstBuf (&CfgSVal));
       	 	}
 		/* Insert the symbol into the table */
@@ -937,7 +923,7 @@ static void ParseO65 (void)
                 CfgSValId = GetStrBufId (&CfgSVal);
 	        /* Check if the imported symbol is also defined as an export. */
 	       	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
-		    CfgError ("Imported symbol `%s' cannot be an export", 
+		    CfgError ("Imported symbol `%s' cannot be an export",
                               SB_GetConstBuf (&CfgSVal));
 		}
       	    	/* Check if we have this symbol defined already. The entry
@@ -945,7 +931,7 @@ static void ParseO65 (void)
       	    	 * error message when checking it here.
       	    	 */
       	    	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
-      	    	    CfgError ("Duplicate imported symbol: `%s'", 
+      	    	    CfgError ("Duplicate imported symbol: `%s'",
                               SB_GetConstBuf (&CfgSVal));
       	    	}
 	    	/* Insert the symbol into the table */
@@ -1168,7 +1154,7 @@ static void ParseConDes (void)
 		CfgAssureIdent ();
 		/* Remember the value for later */
 		Count = GetStrBufId (&CfgSVal);
-		break;                
+		break;
 
 	    case CFGTOK_TYPE:
 	  	/* Don't allow this twice */
@@ -1600,10 +1586,13 @@ unsigned CfgAssignSegments (void)
      * for an overflow of the section. Assign the start addresses of the
      * segments while doing this.
      */
-    Memory* M = MemoryList;
-    while (M) {
+    unsigned I;
+    for (I = 0; I < CollCount (&MemoryList); ++I) {
 
         MemListNode* N;
+
+        /* Get this entry */
+        Memory* M = CollAtUnchecked (&MemoryList, I);
 
      	/* Get the start address of this memory area */
      	unsigned long Addr = M->Start;
@@ -1714,8 +1703,6 @@ unsigned CfgAssignSegments (void)
             SB_Done (&Buf);
 	}
 
-	/* Next memory area */
-	M = M->Next;
     }
 
     /* Return the number of memory area overflows */
@@ -1727,12 +1714,15 @@ unsigned CfgAssignSegments (void)
 void CfgWriteTarget (void)
 /* Write the target file(s) */
 {
-    Memory* M;
+    unsigned I;
 
     /* Walk through the files list */
-    File* F = FileList;
-    while (F) {
-  	/* We don't need to look at files with no memory areas */
+    for (I = 0; I < CollCount (&FileList); ++I) {
+
+        /* Get this entry */
+        File* F = CollAtUnchecked (&FileList, I);
+
+    	/* We don't need to look at files with no memory areas */
   	if (F->MemList) {
 
   	    /* Is there an output file? */
@@ -1764,7 +1754,7 @@ void CfgWriteTarget (void)
   		/* No output file. Walk through the list and mark all segments
        	       	 * loading into these memory areas in this file as dumped.
   		 */
-  		M = F->MemList;
+  		Memory* M = F->MemList;
   		while (M) {
 
 		    MemListNode* N;
@@ -1788,9 +1778,6 @@ void CfgWriteTarget (void)
 		}
 	    }
 	}
-
-	/* Next file */
-	F = F->Next;
     }
 }
 

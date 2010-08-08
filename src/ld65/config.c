@@ -98,8 +98,7 @@ static Collection       MemoryList = STATIC_COLLECTION_INITIALIZER;
 
 
 /* Segment list */
-SegDesc*	       	SegDescList;	/* Single linked list */
-unsigned	       	SegDescCount;	/* Number of entries in list */
+static Collection       SegDescList = STATIC_COLLECTION_INITIALIZER;
 
 /* Segment attributes */
 #define SA_TYPE	       	0x0001
@@ -179,7 +178,7 @@ static Memory* CfgFindMemory (unsigned Name)
 {
     unsigned I;
     for (I = 0; I < CollCount (&MemoryList); ++I) {
-        Memory* M = CollAt (&MemoryList, I);
+        Memory* M = CollAtUnchecked (&MemoryList, I);
        	if (M->Name == Name) {
        	    return M;
        	}
@@ -204,13 +203,13 @@ static Memory* CfgGetMemory (unsigned Name)
 static SegDesc* CfgFindSegDesc (unsigned Name)
 /* Find the segment descriptor with the given name, return NULL if not found. */
 {
-    SegDesc* S = SegDescList;
-    while (S) {
+    unsigned I;
+    for (I = 0; I < CollCount (&SegDescList); ++I) {
+        SegDesc* S = CollAtUnchecked (&SegDescList, I);
        	if (S->Name == Name) {
     	    /* Found */
     	    return S;
        	}
-     	S = S->Next;
     }
 
     /* Not found */
@@ -223,9 +222,7 @@ static void SegDescInsert (SegDesc* S)
 /* Insert a segment descriptor into the list of segment descriptors */
 {
     /* Insert the struct into the list */
-    S->Next = SegDescList;
-    SegDescList = S;
-    ++SegDescCount;
+    CollAppend (&SegDescList, S);
 }
 
 
@@ -331,7 +328,6 @@ static SegDesc* NewSegDesc (unsigned Name)
 
     /* Initialize the fields */
     S->Name    = Name;
-    S->Next    = 0;
     S->Seg     = Seg;
     S->Attr    = 0;
     S->Flags   = 0;
@@ -1744,7 +1740,7 @@ void CfgWriteTarget (void)
 
   		/* No output file. Walk through the list and mark all segments
        	       	 * loading into these memory areas in this file as dumped.
-  		 */ 
+  		 */
                 unsigned J;
                 for (J = 0; J < CollCount (&F->MemList); ++J) {
 

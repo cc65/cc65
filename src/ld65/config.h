@@ -88,7 +88,6 @@ struct Memory {
 typedef struct SegDesc SegDesc;
 struct SegDesc {
     unsigned            Name;           /* Index of the name */
-    SegDesc*   	      	Next;	  	/* Pointer to next entry in list */
     Segment*   	      	Seg; 	  	/* Pointer to segment structure */
     unsigned   	      	Attr;	  	/* Attributes for segment */
     unsigned   	      	Flags;	  	/* Set of bitmapped flags */
@@ -98,10 +97,6 @@ struct SegDesc {
     unsigned char     	Align;	  	/* Run area alignment if given */
     unsigned char       AlignLoad;      /* Load area alignment if given */
 };
-
-/* Segment list */
-extern SegDesc*	       	SegDescList;	/* Single linked list */
-extern unsigned	       	SegDescCount;	/* Number of entries in list */
 
 /* Memory flags */
 #define MF_DEFINE      	0x0001	  	/* Define start and size */

@@ -74,42 +74,66 @@ struct cc65_parseerror {
 /* Function that is called in case of parse errors */
 typedef void (*cc65_errorfunc) (const struct cc65_parseerror*);
 
-/* Line information */
+/* Line information.
+ * Notes:
+ *   - line_end is inclusive
+ *   - output_name may be NULL if the data wasn't written to the output file
+ *     (example: bss segment)
+ *   - output_offs is invalid if there is no output_name, and may not be of
+ *     much use in case of a relocatable output file
+ */
+typedef struct cc65_linedata cc65_linedata;
+struct cc65_linedata {
+    const char*     source_name;        /* Name of the file */
+    unsigned long   source_size;        /* Size of file */
+    unsigned long   source_mtime;       /* Modification time */
+    cc65_line       source_line;        /* Line number */
+    cc65_addr       line_start;         /* Start address for this line */
+    cc65_addr       line_end;           /* End address for this line */
+    const char*     output_name;        /* Output file */
+    unsigned long   output_offs;        /* Offset in output file */
+};
+
 typedef struct cc65_lineinfo cc65_lineinfo;
 struct cc65_lineinfo {
     unsigned            count;          /* Number of data sets that follow */
-    struct {
-        const char*     name;           /* Name of the file */
-        unsigned long   size;           /* Size of file */
-        unsigned long   mtime;          /* Modification time */
-        cc65_line       line;           /* Line number */
-        cc65_addr       start;          /* Start address for this line */
-        cc65_addr       end;            /* End address for this line */
-    }                   data[1];
+    cc65_linedata       data[1];        /* Data sets, number is dynamic */
 };
 
-/* A list of files with some information */
-typedef struct cc65_filelist cc65_filelist;
-struct cc65_filelist {
-    unsigned            count;          /* Number of data sets that follow */
-    struct {
-        const char*     name;           /* Name of the file */
-        unsigned long   size;           /* Size of file */
-        unsigned long   mtime;          /* Modification time */
-    }                   data[1];
+/* Source file information */
+typedef struct cc65_sourcedata cc65_sourcedata;
+struct cc65_sourcedata {
+    const char*     source_name;        /* Name of the file */
+    unsigned long   source_size;        /* Size of file */
+    unsigned long   source_mtime;       /* Modification time */
 };
 
-
-
-/* A list of segments with some information */
-typedef struct cc65_segmentlist cc65_segmentlist;
-struct cc65_segmentlist {
+typedef struct cc65_sourceinfo cc65_sourceinfo;
+struct cc65_sourceinfo {
     unsigned            count;          /* Number of data sets that follow */
-    struct {
-        const char*     name;           /* Name of the file */
-        cc65_addr       start;          /* Start address of segment */
-        cc65_addr       end;            /* End address of segment */
-    }                   data[1];
+    cc65_sourcedata     data[1];        /* Data sets, number is dynamic */
+};
+
+/* Segment information.
+ * Notes:
+ *   - output_name may be NULL if the data wasn't written to the output file
+ *     (example: bss segment)
+ *   - output_offs is invalid if there is no output_name, and may not be of
+ *     much use in case of a relocatable output file
+ */
+typedef struct cc65_segmentdata cc65_segmentdata;
+struct cc65_segmentdata {
+    const char*     segment_name;       /* Name of the segment */
+    cc65_addr       segment_start;      /* Start address of segment */
+    cc65_addr       segment_size;       /* Size of segment */
+    const char*     output_name;        /* Output file this seg was written to */
+    unsigned long   output_offs;        /* Offset of this seg in output file */
+};
+
+typedef struct cc65_segmentinfo cc65_segmentinfo;
+struct cc65_segmentinfo {
+    unsigned            count;          /* Number of data sets that follow */
+    cc65_segmentdata    data[1];        /* Data sets, number is dynamic */
 };
 
 
@@ -145,17 +169,17 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo handle, const char* filename,
 void cc65_free_lineinfo (cc65_dbginfo handle, cc65_lineinfo* info);
 /* Free line info returned by one of the other functions */
 
-cc65_filelist* cc65_get_filelist (cc65_dbginfo handle);
-/* Return a list of all files referenced in the debug information */
+cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo handle);
+/* Return a list of all source files */
 
-void cc65_free_filelist (cc65_dbginfo handle, cc65_filelist* list);
-/* free a file list returned by cc65_get_filelist() */
+void cc65_free_sourceinfo (cc65_dbginfo handle, cc65_sourceinfo* info);
+/* Free a source info record */
 
-cc65_segmentlist* cc65_get_segmentlist (cc65_dbginfo handle);
+cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo handle);
 /* Return a list of all segments referenced in the debug information */
 
-void cc65_free_segmentlist (cc65_dbginfo handle, cc65_segmentlist* list);
-/* Free a file list returned by cc65_get_filelist() */
+void cc65_free_segmentinfo (cc65_dbginfo handle, cc65_segmentinfo* info);
+/* Free a segment info record */
 
 
 

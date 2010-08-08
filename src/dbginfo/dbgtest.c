@@ -65,8 +65,8 @@ int main (int argc, char** argv)
 {
     const char*         Input;
     cc65_dbginfo        Info;
-    cc65_filelist*      Files;
-    cc65_segmentlist*   Segments;
+    cc65_sourceinfo*    Sources;
+    cc65_segmentinfo*   Segments;
     cc65_lineinfo*      L;
     unsigned            I;
     unsigned long       Addr;
@@ -87,23 +87,29 @@ int main (int argc, char** argv)
     printf ("Input file \"%s\" successfully read\n", Input);
 
     /* Output a list of files */
-    printf ("Files used in compilation:\n");
-    Files = cc65_get_filelist (Info);
-    for (I = 0; I < Files->count; ++I) {
-        printf ("  %s\n", Files->data[I].name);
+    printf ("List of source files:\n");
+    Sources = cc65_get_sourcelist (Info);
+    for (I = 0; I < Sources->count; ++I) {
+        printf ("  %s\n", Sources->data[I].source_name);
     }
-    cc65_free_filelist (Info, Files);
+    cc65_free_sourceinfo (Info, Sources);
 
     /* Output a list of segments */
     printf ("Segments processed when linking:\n");
     Segments = cc65_get_segmentlist (Info);
     for (I = 0; I < Segments->count; ++I) {
-        printf ("  %-20s $%06lX-$%06lX\n",
-                Segments->data[I].name,
-                (unsigned long) Segments->data[I].start,
-                (unsigned long) Segments->data[I].end);
+        printf ("  %-20s $%06lX $%04lX",
+                Segments->data[I].segment_name,
+                (unsigned long) Segments->data[I].segment_start,
+                (unsigned long) Segments->data[I].segment_size);
+        if (Segments->data[I].output_name) {
+            printf ("  %-20s $%06lX",
+                    Segments->data[I].output_name,
+                    Segments->data[I].output_offs);
+        }
+        putchar ('\n');
     }
-    cc65_free_segmentlist (Info, Segments);
+    cc65_free_segmentinfo (Info, Segments);
 
     /* Check one line */
     printf ("Requesting line info for crt0.s(59):\n");
@@ -111,11 +117,11 @@ int main (int argc, char** argv)
     if (L == 0) {
         printf ("  Not found\n");
     } else {
-        printf ("  Code range is $%04X-$%04X\n", L->data[0].start, L->data[0].end);
+        printf ("  Code range is $%04X-$%04X\n",
+                L->data[0].line_start,
+                L->data[0].line_end);
         cc65_free_lineinfo (Info, L);
     }
-
-
 
     /* Output debug information for all addresses in the complete 6502 address
      * space. This is also sort of a benchmark for the search algorithms.
@@ -130,8 +136,15 @@ int main (int argc, char** argv)
                 if (I > 0) {
                     printf (", ");
                 }
-                printf ("%s(%lu)", L->data[I].name,
-                        (unsigned long) L->data[I].line);
+                printf ("%s(%lu)", 
+                        L->data[I].source_name,
+                        (unsigned long) L->data[I].source_line);
+                if (L->data[I].output_name) {
+                    printf ("  %s($%06lX)",
+                            L->data[I].output_name,
+                            L->data[I].output_offs);
+
+                }
             }
             printf ("\n");
             cc65_free_lineinfo (Info, L);

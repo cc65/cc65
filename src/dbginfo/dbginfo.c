@@ -52,6 +52,10 @@
 
 
 
+/* Version numbers of the debug format we understand */
+#define VER_MAJOR       1U
+#define VER_MINOR       0U 
+
 /* Dynamic strings */
 typedef struct StrBuf StrBuf;
 struct StrBuf {
@@ -114,6 +118,8 @@ typedef enum {
     TOK_MINOR,                          /* MINOR keyword */
     TOK_MTIME,                          /* MTIME keyword */
     TOK_NAME,                           /* NAME keyword */
+    TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
+    TOK_OUTPUTOFFS,                     /* OUTPUTOFFS keyword */
     TOK_RANGE,                          /* RANGE keyword */
     TOK_RO,                             /* RO keyword */
     TOK_RW,                             /* RW keyword */
@@ -156,6 +162,8 @@ struct SegInfo {
     unsigned            Id;             /* Id of segment */
     cc65_addr           Start;          /* Start address of segment */
     cc65_addr           Size;           /* Size of segment */
+    char*               OutputName;     /* Name of output file */
+    unsigned long       OutputOffs;     /* Offset in output file */
     char                SegName[1];     /* Name of segment */
 };
 
@@ -405,6 +413,26 @@ static void SB_AppendChar (StrBuf* B, int C)
 
 
 
+static char* SB_StrDup (const StrBuf* B)
+/* Return the contents of B as a dynamically allocated string. The string
+ * will always be NUL terminated.
+ */
+{
+    /* Allocate memory */
+    char* S = xmalloc (B->Len + 1);
+
+    /* Copy the string */
+    memcpy (S, B->Buf, B->Len);
+
+    /* Terminate it */
+    S[B->Len] = '\0';
+
+    /* And return the result */
+    return S;
+}
+
+
+
 /*****************************************************************************/
 /*                                Collections                                */
 /*****************************************************************************/
@@ -614,16 +642,26 @@ void CollSort (Collection* C, int (*Compare) (const void*, const void*))
 
 
 static SegInfo* NewSegInfo (const StrBuf* SegName, unsigned Id,
-                            cc65_addr Start, cc65_addr Size)
+                            cc65_addr Start, cc65_addr Size,
+                            const StrBuf* OutputName, unsigned long OutputOffs)
 /* Create a new SegInfo struct and return it */
 {
     /* Allocate memory */
     SegInfo* S = xmalloc (sizeof (SegInfo) + SB_GetLen (SegName));
 
     /* Initialize it */
-    S->Id    = Id;
-    S->Start = Start;
-    S->Size  = Size;
+    S->Id         = Id;
+    S->Start      = Start;
+    S->Size       = Size;
+    if (SB_GetLen (OutputName) > 0) {
+        /* Output file given */
+        S->OutputName = SB_StrDup (OutputName);
+        S->OutputOffs = OutputOffs;
+    } else {
+        /* No output file given */
+        S->OutputName = 0;
+        S->OutputOffs = 0;
+    }
     memcpy (S->SegName, SB_GetConstBuf (SegName), SB_GetLen (SegName) + 1);
 
     /* Return it */
@@ -853,6 +891,28 @@ static void FreeDbgInfo (DbgInfo* Info)
 
 
 
+static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
+/* Copy data from a LineInfo struct to the cc65_linedata struct returned to
+ * the caller.
+ */
+{
+    D->source_name  = L->File.Info->FileName;
+    D->source_size  = L->File.Info->Size;
+    D->source_mtime = L->File.Info->MTime;
+    D->source_line  = L->Line;
+    D->line_start   = L->Start;
+    D->line_end     = L->End;
+    if (L->Seg.Info->OutputName) {
+        D->output_name  = L->Seg.Info->OutputName;
+        D->output_offs  = L->Seg.Info->OutputOffs + L->Start - L->Seg.Info->Start;
+    } else {
+        D->output_name  = 0;
+        D->output_offs  = 0;
+    }
+}
+
+
+
 static void ParseError (InputData* D, cc65_error_severity Type, const char* Msg, ...)
 /* Call the user supplied parse error function */
 {
@@ -906,14 +966,6 @@ static void UnexpectedToken (InputData* D)
 {
     ParseError (D, CC65_ERROR, "Unexpected input token %d", D->Tok);
     SkipLine (D);
-}
-
-
-
-static void MissingAttribute (InputData* D, const char* AttrName)
-/* Print an error about a missing attribute */
-{
-    ParseError (D, CC65_ERROR, "Attribute \"%s\" is mising", AttrName);
 }
 
 
@@ -988,7 +1040,7 @@ static void NextToken (InputData* D)
 /* Read the next token from the input stream */
 {
     static const struct KeywordEntry  {
-        const char      Keyword[10];
+        const char      Keyword[16];
         Token           Tok;
     } KeywordTable[] = {
         { "absolute",   TOK_ABSOLUTE    },
@@ -1003,6 +1055,8 @@ static void NextToken (InputData* D)
         { "minor",      TOK_MINOR       },
         { "mtime",      TOK_MTIME       },
         { "name",       TOK_NAME        },
+        { "outputname", TOK_OUTPUTNAME  },
+        { "outputoffs", TOK_OUTPUTOFFS  },
         { "range",      TOK_RANGE       },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
@@ -1197,6 +1251,20 @@ static int ConsumeMinus (InputData* D)
 
 
 
+static void ConsumeEOL (InputData* D)
+/* Consume an end-of-line token, if we aren't at end-of-file */
+{
+    if (D->Tok != TOK_EOF) {
+        if (D->Tok != TOK_EOL) {
+            ParseError (D, CC65_ERROR, "Extra tokens in line");
+            SkipLine (D);
+        }
+        NextToken (D);
+    }
+}
+
+
+
 static void ParseFile (InputData* D)
 /* Parse a FILE line */
 {
@@ -1304,7 +1372,7 @@ static void ParseFile (InputData* D)
     }
 
     /* Check for required information */
-    if (InfoBits != ibRequired) {
+    if ((InfoBits & ibRequired) != ibRequired) {
         ParseError (D, CC65_ERROR, "Required attributes missing");
         goto ErrorExit;
     }
@@ -1436,7 +1504,7 @@ static void ParseLine (InputData* D)
     }
 
     /* Check for required information */
-    if (InfoBits != ibRequired) {
+    if ((InfoBits & ibRequired) != ibRequired) {
         ParseError (D, CC65_ERROR, "Required attributes missing");
         goto ErrorExit;
     }
@@ -1455,11 +1523,13 @@ ErrorExit:
 static void ParseSegment (InputData* D)
 /* Parse a SEGMENT line */
 {
-    unsigned    Id;
-    cc65_addr   Start;
-    cc65_addr   Size;
-    StrBuf      SegName = STRBUF_INITIALIZER;
-    SegInfo*    S;
+    unsigned        Id;
+    cc65_addr       Start;
+    cc65_addr       Size;
+    StrBuf          SegName = STRBUF_INITIALIZER;
+    StrBuf          OutputName = STRBUF_INITIALIZER;
+    unsigned long   OutputOffs;
+    SegInfo*        S;
     enum {
         ibNone      = 0x00,
         ibId        = 0x01,
@@ -1468,6 +1538,8 @@ static void ParseSegment (InputData* D)
         ibSize      = 0x08,
         ibAddrSize  = 0x10,
         ibType      = 0x20,
+        ibOutputName= 0x40,
+        ibOutputOffs= 0x80,
         ibRequired  = ibId | ibSegName | ibStart | ibSize | ibAddrSize | ibType,
     } InfoBits = ibNone;
 
@@ -1486,9 +1558,10 @@ static void ParseSegment (InputData* D)
         }
 
         /* Something we know? */
-        if (D->Tok != TOK_ID       && D->Tok != TOK_NAME  &&
-            D->Tok != TOK_START    && D->Tok != TOK_SIZE  &&
-            D->Tok != TOK_ADDRSIZE && D->Tok != TOK_TYPE) {
+        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_ID         &&
+            D->Tok != TOK_NAME          && D->Tok != TOK_OUTPUTNAME &&
+            D->Tok != TOK_OUTPUTOFFS    && D->Tok != TOK_SIZE       &&
+            D->Tok != TOK_START         && D->Tok != TOK_TYPE) {
             /* Done */
             break;
         }
@@ -1520,6 +1593,25 @@ static void ParseSegment (InputData* D)
                 SB_Terminate (&SegName);
                 InfoBits |= ibSegName;
                 NextToken (D);
+                break;
+
+            case TOK_OUTPUTNAME:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&OutputName, &D->SVal);
+                SB_Terminate (&OutputName);
+                InfoBits |= ibOutputName;
+                NextToken (D);
+                break;
+
+            case TOK_OUTPUTOFFS:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                OutputOffs = D->IVal;
+                NextToken (D);
+                InfoBits |= ibOutputOffs;
                 break;
 
             case TOK_START:
@@ -1572,18 +1664,19 @@ static void ParseSegment (InputData* D)
     }
 
     /* Check for required information */
-    if (InfoBits != ibRequired) {
+    if ((InfoBits & ibRequired) != ibRequired) {
         ParseError (D, CC65_ERROR, "Required attributes missing");
         goto ErrorExit;
     }
 
     /* Create the segment info and remember it */
-    S = NewSegInfo (&SegName, Id, Start, Size);
+    S = NewSegInfo (&SegName, Id, Start, Size, &OutputName, OutputOffs);
     CollAppend (&D->Info->SegInfoByName, S);
 
 ErrorExit:
     /* Entry point in case of errors */
     SB_Done (&SegName);
+    SB_Done (&OutputName);
     return;
 }
 
@@ -1604,7 +1697,12 @@ static void ParseSym (InputData* D)
 static void ParseVersion (InputData* D)
 /* Parse a VERSION line */
 {
-    enum { None = 0x00, Major = 0x01, Minor = 0x02 } InfoBits = None;
+    enum {
+        ibNone      = 0x00,
+        ibMajor     = 0x01,
+        ibMinor     = 0x02,
+        ibRequired  = ibMajor | ibMinor,
+    } InfoBits = ibNone;
 
     /* Skip the VERSION token */
     NextToken (D);
@@ -1624,7 +1722,7 @@ static void ParseVersion (InputData* D)
                 }
                 D->MajorVersion = D->IVal;
                 NextToken (D);
-                InfoBits |= Major;
+                InfoBits |= ibMajor;
                 break;
 
             case TOK_MINOR:
@@ -1637,7 +1735,7 @@ static void ParseVersion (InputData* D)
                 }
                 D->MinorVersion = D->IVal;
                 NextToken (D);
-                InfoBits |= Minor;
+                InfoBits |= ibMinor;
                 break;
 
             case TOK_IDENT:
@@ -1665,12 +1763,8 @@ static void ParseVersion (InputData* D)
     }
 
     /* Check for required information */
-    if ((InfoBits & Major) == None) {
-        MissingAttribute (D, "major");
-        goto ErrorExit;
-    }
-    if ((InfoBits & Minor) == None) {
-        MissingAttribute (D, "minor");
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
         goto ErrorExit;
     }
 
@@ -2110,54 +2204,63 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
     /* Prime the pump */
     NextToken (&D);
 
-    /* Parse lines */
-    while (D.Tok != TOK_EOF) {
+    /* The first line in the file must specify version information */
+    if (D.Tok != TOK_VERSION) {
+        ParseError (&D, CC65_ERROR,
+                    "\"version\" keyword missing in first line - this is not "
+                    "a valid debug info file");
+    } else {
 
-        switch (D.Tok) {
-
-            case TOK_FILE:
-                ParseFile (&D);
-                break;
-
-            case TOK_LINE:
-                ParseLine (&D);
-                break;
-
-            case TOK_SEGMENT:
-                ParseSegment (&D);
-                break;
-
-            case TOK_SYM:
-                ParseSym (&D);
-                break;
-
-            case TOK_VERSION:
-                ParseVersion (&D);
-                break;
-
-            case TOK_IDENT:
-                /* Output a warning, then skip the line with the unknown
-                 * keyword that may have been added by a later version.
-                 */
-                ParseError (&D, CC65_WARNING,
-                            "Unknown keyword \"%s\" - skipping",
-                            SB_GetConstBuf (&D.SVal));
-
-                SkipLine (&D);
-                break;
-
-            default:
-                UnexpectedToken (&D);
-
+        /* Parse the version directive and check the version */
+        ParseVersion (&D);
+        if (D.MajorVersion > VER_MAJOR) {
+            ParseError (&D, CC65_WARNING,
+                        "The format of this debug info file is newer than what we "
+                        "know. Will proceed but probably fail. Version found = %u, "
+                        "version supported = %u",
+                        D.MajorVersion, VER_MAJOR);
         }
+        ConsumeEOL (&D);
 
-        /* EOL or EOF must follow */
-        if (D.Tok != TOK_EOF) {
-            if (D.Tok != TOK_EOL) {
-                ParseError (&D, 1, "Extra tokens in line");
-                SkipLine (&D);
+        /* Parse lines */
+        while (D.Tok != TOK_EOF) {
+
+            switch (D.Tok) {
+
+                case TOK_FILE:
+                    ParseFile (&D);
+                    break;
+
+                case TOK_LINE:
+                    ParseLine (&D);
+                    break;
+
+                case TOK_SEGMENT:
+                    ParseSegment (&D);
+                    break;
+
+                case TOK_SYM:
+                    ParseSym (&D);
+                    break;
+
+                case TOK_IDENT:
+                    /* Output a warning, then skip the line with the unknown
+                     * keyword that may have been added by a later version.
+                     */
+                    ParseError (&D, CC65_WARNING,
+                                "Unknown keyword \"%s\" - skipping",
+                                SB_GetConstBuf (&D.SVal));
+
+                    SkipLine (&D);
+                    break;
+
+                default:
+                    UnexpectedToken (&D);
+
             }
-            NextToken (&D);
+
+            /* EOL or EOF must follow */
+            ConsumeEOL (&D);
         }
     }
 
@@ -2240,17 +2343,8 @@ cc65_lineinfo* cc65_lineinfo_byaddr (cc65_dbginfo Handle, unsigned long Addr)
                      (CollCount (&LineInfos) - 1) * sizeof (D->data[0]));
         D->count = CollCount (&LineInfos);
         for (I = 0; I < D->count; ++I) {
-
-            /* Pointer to this info */
-            LineInfo* L = CollAt (&LineInfos, I);
-
             /* Copy data */
-            D->data[I].name  = L->File.Info->FileName;
-            D->data[I].size  = L->File.Info->Size;
-            D->data[I].mtime = L->File.Info->MTime;
-            D->data[I].line  = L->Line;
-            D->data[I].start = L->Start;
-            D->data[I].end   = L->End;
+            CopyLineInfo (D->data + I, CollAt (&LineInfos, I));
         }
     }
 
@@ -2299,12 +2393,7 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
     D->count = 1;
 
     /* Copy data */
-    D->data[0].name  = L->File.Info->FileName;
-    D->data[0].size  = L->File.Info->Size;
-    D->data[0].mtime = L->File.Info->MTime;
-    D->data[0].line  = L->Line;
-    D->data[0].start = L->Start;
-    D->data[0].end   = L->End;
+    CopyLineInfo (D->data, L);
 
     /* Return the allocated struct */
     return D;
@@ -2324,13 +2413,13 @@ void cc65_free_lineinfo (cc65_dbginfo Handle, cc65_lineinfo* Info)
 
 
 
-cc65_filelist* cc65_get_filelist (cc65_dbginfo Handle)
-/* Return a list of all files referenced in the debug information */
+cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
+/* Return a list of all source files */
 {
-    DbgInfo*        Info;
-    Collection*     FileInfoByName;
-    cc65_filelist*  D;
-    unsigned        I;
+    DbgInfo*            Info;
+    Collection*         FileInfoByName;
+    cc65_sourceinfo*    D;
+    unsigned            I;
 
     /* Check the parameter */
     assert (Handle != 0);
@@ -2353,9 +2442,9 @@ cc65_filelist* cc65_get_filelist (cc65_dbginfo Handle)
         FileInfo* F = CollAt (FileInfoByName, I);
 
         /* Copy the data */
-        D->data[I].name  = F->FileName;
-        D->data[I].size  = F->Size;
-        D->data[I].mtime = F->MTime;
+        D->data[I].source_name  = F->FileName;
+        D->data[I].source_size  = F->Size;
+        D->data[I].source_mtime = F->MTime;
     }
 
     /* Return the result */
@@ -2364,24 +2453,24 @@ cc65_filelist* cc65_get_filelist (cc65_dbginfo Handle)
 
 
 
-void cc65_free_filelist (cc65_dbginfo Handle, cc65_filelist* List)
-/* Free a file list returned by cc65_get_filelist() */
+void cc65_free_sourceinfo (cc65_dbginfo Handle, cc65_sourceinfo* Info)
+/* Free a source info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
-    /* Just free the memory */
-    xfree (List);
+    /* Free the memory */
+    xfree (Info);
 }
 
 
 
-cc65_segmentlist* cc65_get_segmentlist (cc65_dbginfo Handle)
+cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 /* Return a list of all segments referenced in the debug information */
 {
     DbgInfo*            Info;
     Collection*         SegInfoByName;
-    cc65_segmentlist*   D;
+    cc65_segmentinfo*   D;
     unsigned            I;
 
     /* Check the parameter */
@@ -2405,9 +2494,11 @@ cc65_segmentlist* cc65_get_segmentlist (cc65_dbginfo Handle)
         SegInfo* S = CollAt (SegInfoByName, I);
 
         /* Copy the data */
-        D->data[I].name  = S->SegName;
-        D->data[I].start = S->Start;
-        D->data[I].end   = S->Start + S->Size - 1;
+        D->data[I].segment_name  = S->SegName;
+        D->data[I].segment_start = S->Start;
+        D->data[I].segment_size  = S->Size;
+        D->data[I].output_name   = S->OutputName;
+        D->data[I].output_offs   = S->OutputOffs;
     }
 
     /* Return the result */
@@ -2416,14 +2507,14 @@ cc65_segmentlist* cc65_get_segmentlist (cc65_dbginfo Handle)
 
 
 
-void cc65_free_segmentlist (cc65_dbginfo Handle, cc65_segmentlist* List)
-/* Free a file list returned by cc65_get_filelist() */
+void cc65_free_segmentinfo (cc65_dbginfo Handle, cc65_segmentinfo* Info)
+/* Free a segment info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
-    /* Just free the memory */
-    xfree (List);
+    /* Free the memory */
+    xfree (Info);
 }
 
 

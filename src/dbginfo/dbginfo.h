@@ -207,6 +207,14 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo handle);
 void cc65_free_segmentinfo (cc65_dbginfo handle, cc65_segmentinfo* info);
 /* Free a segment info record */
 
+cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name);
+/* Return a list of symbols with a given name. The function returns NULL if
+ * no symbol with this name was found.
+ */
+                                                                            
+void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info);
+/* Free a symbol info record */
+
 
 
 /* Allow usage from C++ */

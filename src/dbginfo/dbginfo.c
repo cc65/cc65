@@ -90,6 +90,7 @@ struct DbgInfo {
     Collection  FileInfoByName;         /* File infos sorted by name */
     Collection  FileInfoById;           /* File infos sorted by id */
     Collection  LineInfoByAddr;         /* Line information sorted by address */
+    Collection  SymInfoByName;          /* Symbol information sorted by name */
 };
 
 /* Input tokens */
@@ -194,6 +195,14 @@ struct LineInfo {
         unsigned        Id;             /* Id of segment */
         SegInfo*        Info;           /* Pointer to segment info */
     } Seg;
+};
+
+/* Internally used symbol info struct */
+typedef struct SymInfo SymInfo;
+struct SymInfo {
+    cc65_symbol_type    Type;           /* Type of symbol */
+    long                Value;          /* Value of symbol */
+    char                SymName[1];     /* Name of symbol */
 };
 
 
@@ -838,6 +847,47 @@ static int CompareFileInfoById (const void* L, const void* R)
 
 
 /*****************************************************************************/
+/*                                Symbol info                                */
+/*****************************************************************************/
+
+
+
+static SymInfo* NewSymInfo (const StrBuf* Name, long Val, cc65_symbol_type Type)
+/* Create a new SymInfo struct, intialize and return it */
+{
+    /* Allocate memory */
+    SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
+
+    /* Initialize it */
+    S->Value = Val;
+    S->Type  = Type;
+    memcpy (S->SymName, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
+
+    /* Return it */
+    return S;
+}
+
+
+
+static void FreeSymInfo (SymInfo* S)
+/* Free a SymInfo struct */
+{
+    xfree (S);
+}
+
+
+
+static int CompareSymInfoByName (const void* L, const void* R)
+/* Helper function to sort symbol infos in a collection by name */
+{
+    /* Sort by file name */
+    return strcmp (((const SymInfo*) L)->SymName,
+                   ((const SymInfo*) R)->SymName);
+}
+
+
+
+/*****************************************************************************/
 /*                                Debug info                                 */
 /*****************************************************************************/
 
@@ -855,6 +905,7 @@ static DbgInfo* NewDbgInfo (void)
     InitCollection (&Info->FileInfoByName);
     InitCollection (&Info->FileInfoById);
     InitCollection (&Info->LineInfoByAddr);
+    InitCollection (&Info->SymInfoByName);
 
     /* Return it */
     return Info;
@@ -883,6 +934,12 @@ static void FreeDbgInfo (DbgInfo* Info)
 
     /* Free line info */
     DoneCollection (&Info->LineInfoByAddr);
+
+    /* Free symbol info */
+    for (I = 0; I < CollCount (&Info->SymInfoByName); ++I) {
+        FreeSymInfo (CollAt (&Info->SymInfoByName, I));
+    }
+    DoneCollection (&Info->SymInfoByName);
 
     /* Free the structure itself */
     xfree (Info);
@@ -1704,6 +1761,7 @@ static void ParseSym (InputData* D)
     cc65_symbol_type    Type;
     long                Value;
     StrBuf              SymName = STRBUF_INITIALIZER;
+    SymInfo*            S;
     enum {
         ibNone          = 0x00,
         ibSymName       = 0x01,
@@ -1814,10 +1872,8 @@ static void ParseSym (InputData* D)
     }
 
     /* Create the symbol info and remember it */
-#if 0
-    S = NewSegInfo (&SegName, Id, Start, Size, &OutputName, OutputOffs);
-    CollAppend (&D->Info->SegInfoByName, S);
-#endif
+    S = NewSymInfo (&SymName, Value, Type);
+    CollAppend (&D->Info->SymInfoByName, S);
 
 ErrorExit:
     /* Entry point in case of errors */
@@ -2287,6 +2343,61 @@ static LineInfo* FindLineInfoByLine (FileInfo* F, cc65_line Line)
 
 
 
+static void ProcessSymInfo (InputData* D)
+/* Postprocess symbol infos */
+{
+    /* Get pointers to the symbol info collections */
+    Collection* SymInfoByName = &D->Info->SymInfoByName;
+
+    /* Sort the symbol infos by name */
+    CollSort (SymInfoByName, CompareSymInfoByName);
+}
+
+
+
+static int FindSymInfoByName (Collection* SymInfos, const char* SymName, int* Index)
+/* Find the SymInfo for a given file name. The function returns true if the
+ * name was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for SymName.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (SymInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        SymInfo* CurItem = CollAt (SymInfos, Cur);
+
+        /* Compare */
+        int Res = strcmp (CurItem->SymName, SymName);
+
+        /* Found? */
+        if (Res < 0) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Res == 0) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
+}
+
+
+
 /*****************************************************************************/
 /*     	      	       	      	     Code				     */
 /*****************************************************************************/
@@ -2424,6 +2535,7 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
     ProcessSegInfo (&D);
     ProcessFileInfo (&D);
     ProcessLineInfo (&D);
+    ProcessSymInfo (&D);
 
     /* Return the debug info struct that was created */
     return D.Info;
@@ -2570,7 +2682,7 @@ cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
     for (I = 0; I < CollCount (FileInfoByName); ++I) {
 
         /* Get this item */
-        FileInfo* F = CollAt (FileInfoByName, I);
+        const FileInfo* F = CollAt (FileInfoByName, I);
 
         /* Copy the data */
         D->data[I].source_name  = F->FileName;
@@ -2610,7 +2722,7 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     /* The handle is actually a pointer to a debug info struct */
     Info = (DbgInfo*) Handle;
 
-    /* Get a pointer to the file list */
+    /* Get a pointer to the segment list */
     SegInfoByName = &Info->SegInfoByName;
 
     /* Allocate memory for the data structure returned to the caller */
@@ -2622,7 +2734,7 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     for (I = 0; I < CollCount (SegInfoByName); ++I) {
 
         /* Get this item */
-        SegInfo* S = CollAt (SegInfoByName, I);
+        const SegInfo* S = CollAt (SegInfoByName, I);
 
         /* Copy the data */
         D->data[I].segment_name  = S->SegName;
@@ -2640,6 +2752,79 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 
 void cc65_free_segmentinfo (cc65_dbginfo Handle, cc65_segmentinfo* Info)
 /* Free a segment info record */
+{
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
+
+    /* Free the memory */
+    xfree (Info);
+}
+
+
+
+cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
+/* Return a list of symbols with a given name. The function returns NULL if
+ * no symbol with this name was found.
+ */
+{
+    DbgInfo*            Info;
+    Collection*         SymInfoByName;
+    cc65_symbolinfo*    D;
+    unsigned            I;
+    int                 Index;
+    unsigned            Count;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Get a pointer to the symbol list */
+    SymInfoByName = &Info->SymInfoByName;
+
+    /* Search for the symbol */
+    if (!FindSymInfoByName (SymInfoByName, Name, &Index)) {
+        /* Not found */
+        return 0;
+    }
+
+    /* Index contains the position. Count how many symbols with this name
+     * we have. Skip the first one, since we have at least one.
+     */
+    Count = 1;
+    while ((unsigned) Index + Count < CollCount (SymInfoByName)) {
+        const SymInfo* S = CollAt (SymInfoByName, (unsigned) Index + Count);
+        if (strcmp (S->SymName, Name) != 0) {
+            break;
+        }
+        ++Count;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = xmalloc (sizeof (*D) + (Count - 1) * sizeof (D->data[0]));
+
+    /* Fill in the data */
+    D->count = Count;
+    while (Count--) {
+
+        /* Get this item */
+        const SymInfo* S = CollAt (SymInfoByName, Index);
+
+        /* Copy the data */
+        D->data[I].symbol_name  = S->SymName;
+        D->data[I].symbol_type  = S->Type;
+        D->data[I].symbol_value = S->Value;
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info)
+/* Free a symbol info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);

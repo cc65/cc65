@@ -67,7 +67,8 @@ int main (int argc, char** argv)
     cc65_dbginfo        Info;
     cc65_sourceinfo*    Sources;
     cc65_segmentinfo*   Segments;
-    cc65_lineinfo*      L;
+    cc65_lineinfo*      Lines;
+    cc65_symbolinfo*    Symbols;
     unsigned            I;
     unsigned long       Addr;
 
@@ -113,14 +114,14 @@ int main (int argc, char** argv)
 
     /* Check one line */
     printf ("Requesting line info for crt0.s(59):\n");
-    L = cc65_lineinfo_byname (Info, "crt0.s", 59);
-    if (L == 0) {
+    Lines = cc65_lineinfo_byname (Info, "crt0.s", 59);
+    if (Lines == 0) {
         printf ("  Not found\n");
     } else {
         printf ("  Code range is $%04X-$%04X\n",
-                L->data[0].line_start,
-                L->data[0].line_end);
-        cc65_free_lineinfo (Info, L);
+                Lines->data[0].line_start,
+                Lines->data[0].line_end);
+        cc65_free_lineinfo (Info, Lines);
     }
 
     /* Output debug information for all addresses in the complete 6502 address
@@ -128,28 +129,44 @@ int main (int argc, char** argv)
      */
     printf ("Line info:\n");
     for (Addr = 0; Addr < 0x10000; ++Addr) {
-        L = cc65_lineinfo_byaddr (Info, Addr);
-        if (L) {
+        Lines = cc65_lineinfo_byaddr (Info, Addr);
+        if (Lines) {
             unsigned I;
             printf ("  $%04lX: ", Addr);
-            for (I = 0; I < L->count; ++I) {
+            for (I = 0; I < Lines->count; ++I) {
                 if (I > 0) {
                     printf (", ");
                 }
-                printf ("%s(%lu)", 
-                        L->data[I].source_name,
-                        (unsigned long) L->data[I].source_line);
-                if (L->data[I].output_name) {
+                printf ("%s(%lu)",
+                        Lines->data[I].source_name,
+                        (unsigned long) Lines->data[I].source_line);
+                if (Lines->data[I].output_name) {
                     printf ("  %s($%06lX)",
-                            L->data[I].output_name,
-                            L->data[I].output_offs);
+                            Lines->data[I].output_name,
+                            Lines->data[I].output_offs);
 
                 }
             }
             printf ("\n");
-            cc65_free_lineinfo (Info, L);
+            cc65_free_lineinfo (Info, Lines);
         }
     }
+
+    /* Check for address of main */
+    printf ("Requesting address of _main:\n");
+    Symbols = cc65_symbol_byname (Info, "_main");
+    if (Symbols == 0) {
+        printf ("  Not found\n");
+    } else {                             
+        unsigned I;
+        for (I = 0; I < Symbols->count; ++I) {
+            printf ("  %-20s = %04lX\n", 
+                    Symbols->data[I].symbol_name,
+                    Symbols->data[I].symbol_value);
+        }
+        cc65_free_symbolinfo (Info, Symbols);
+    }
+
 
     /* Free the debug info */
     cc65_free_dbginfo (Info);

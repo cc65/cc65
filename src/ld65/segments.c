@@ -487,16 +487,18 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 /* Write the data from the given segment to a file. For expressions, F is
  * called (see description of SegWriteFunc above).
  */
-{
-    int Sign;
+{   
+    Section*      Sec;
+    int           Sign;
     unsigned long Offs = 0;
+
 
     /* Remember the output file and offset for the segment */
     S->OutputName = TgtName;
     S->OutputOffs = (unsigned long) ftell (Tgt);
 
     /* Loop over all sections in this segment */
-    Section* Sec = S->SecRoot;
+    Sec = S->SecRoot;
     while (Sec) {
      	Fragment* Frag;
 

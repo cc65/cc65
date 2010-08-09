@@ -54,7 +54,7 @@
 
 /* Version numbers of the debug format we understand */
 #define VER_MAJOR       1U
-#define VER_MINOR       0U 
+#define VER_MINOR       0U
 
 /* Dynamic strings */
 typedef struct StrBuf StrBuf;
@@ -1663,10 +1663,21 @@ static void ParseSegment (InputData* D)
         goto ErrorExit;
     }
 
-    /* Check for required information */
+    /* Check for required and/or matched information */
     if ((InfoBits & ibRequired) != ibRequired) {
         ParseError (D, CC65_ERROR, "Required attributes missing");
         goto ErrorExit;
+    }
+    InfoBits &= (ibOutputName | ibOutputOffs);
+    if (InfoBits != ibNone && InfoBits != (ibOutputName | ibOutputOffs)) {
+        ParseError (D, CC65_ERROR,
+                    "Attributes \"outputname\" and \"outputoffs\" must be paired");
+        goto ErrorExit;
+    }
+
+    /* Fix OutputOffs if not given */
+    if (InfoBits == ibNone) {
+        OutputOffs = 0;
     }
 
     /* Create the segment info and remember it */

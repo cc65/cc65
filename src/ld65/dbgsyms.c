@@ -217,7 +217,7 @@ void PrintDbgSyms (ObjData* O, FILE* F)
 
 	    /* Emit the debug file line */
        	    fprintf (F,
-                     "sym\t\"%s\",value=0x%08lX,addrsize=%s,type=%s\n",
+                     "sym\tname=\"%s\",value=0x%08lX,addrsize=%s,type=%s\n",
                      GetString (D->Name),
                      Val,
                      AddrSizeToStr (D->AddrSize),

@@ -89,6 +89,7 @@ struct DbgInfo {
     Collection  SegInfoById;            /* Segment infos sorted by id */
     Collection  FileInfoByName;         /* File infos sorted by name */
     Collection  FileInfoById;           /* File infos sorted by id */
+    Collection  LineInfoByAddr;         /* Line information sorted by address */
 };
 
 /* Input tokens */
@@ -152,7 +153,6 @@ struct InputData {
     cc65_errorfunc      Error;          /* Function called in case of errors */
     unsigned            MajorVersion;   /* Major version number */
     unsigned            MinorVersion;   /* Minor version number */
-    Collection          LineInfos;      /* Line information */
     DbgInfo*            Info;           /* Pointer to debug info */
 };
 
@@ -673,6 +673,7 @@ static SegInfo* NewSegInfo (const StrBuf* SegName, unsigned Id,
 static void FreeSegInfo (SegInfo* S)
 /* Free a SegInfo struct */
 {
+    xfree (S->OutputName);
     xfree (S);
 }
 
@@ -853,6 +854,7 @@ static DbgInfo* NewDbgInfo (void)
     InitCollection (&Info->SegInfoById);
     InitCollection (&Info->FileInfoByName);
     InitCollection (&Info->FileInfoById);
+    InitCollection (&Info->LineInfoByAddr);
 
     /* Return it */
     return Info;
@@ -878,6 +880,9 @@ static void FreeDbgInfo (DbgInfo* Info)
     }
     DoneCollection (&Info->FileInfoByName);
     DoneCollection (&Info->FileInfoById);
+
+    /* Free line info */
+    DoneCollection (&Info->LineInfoByAddr);
 
     /* Free the structure itself */
     xfree (Info);
@@ -1511,7 +1516,7 @@ static void ParseLine (InputData* D)
 
     /* Create the line info and remember it */
     L = NewLineInfo (File, Segment, Line, Start, End);
-    CollAppend (&D->LineInfos, L);
+    CollAppend (&D->Info->LineInfoByAddr, L);
 
 ErrorExit:
     /* Entry point in case of errors */
@@ -1971,7 +1976,7 @@ static void ProcessLineInfo (InputData* D)
 /* Postprocess line infos */
 {
     /* Get pointers to the collections */
-    Collection* LineInfos = &D->LineInfos;
+    Collection* LineInfos = &D->Info->LineInfoByAddr;
     Collection* FileInfos = &D->Info->FileInfoByName;
 
     /* Walk over the line infos and replace the id numbers of file and segment
@@ -2073,8 +2078,10 @@ static void ProcessLineInfo (InputData* D)
             F->Start = ((const LineInfo*) CollFirst (&F->LineInfoByAddr))->Start;
             F->End   = ((const LineInfo*) CollLast (&F->LineInfoByAddr))->End;
         }
-
     }
+
+    /* Sort the collection with all line infos by address */
+    CollSort (LineInfos, CompareLineInfoByAddr);
 }
 
 
@@ -2193,7 +2200,6 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
         0,                      /* Function called in case of errors */
         0,                      /* Major version number */
         0,                      /* Minor version number */
-        COLLECTION_INITIALIZER, /* Line information */
         0,                      /* Pointer to debug info */
     };
     D.FileName = FileName;
@@ -2287,10 +2293,10 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
     if (D.Errors > 0) {
         /* Free allocated stuff */
         unsigned I;
-        for (I = 0; I < CollCount (&D.LineInfos); ++I) {
-            FreeLineInfo (CollAt (&D.LineInfos, I));
+        for (I = 0; I < CollCount (&D.Info->LineInfoByAddr); ++I) {
+            FreeLineInfo (CollAt (&D.Info->LineInfoByAddr, I));
         }
-        DoneCollection (&D.LineInfos);
+        DoneCollection (&D.Info->LineInfoByAddr);
         FreeDbgInfo (D.Info);
         return 0;
     }
@@ -2301,9 +2307,6 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
     ProcessSegInfo (&D);
     ProcessFileInfo (&D);
     ProcessLineInfo (&D);
-
-    /* Free the collection that contained the line info */
-    DoneCollection (&D.LineInfos);
 
     /* Return the debug info struct that was created */
     return D.Info;

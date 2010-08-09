@@ -38,6 +38,13 @@
 
 
 
+/* Allow usage from C++ */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
 /*****************************************************************************/
 /*     	      	       		     Data    				     */
 /*****************************************************************************/
@@ -183,10 +190,15 @@ void cc65_free_segmentinfo (cc65_dbginfo handle, cc65_segmentinfo* info);
 
 
 
-/* End of dbginfo.h */
-
+/* Allow usage from C++ */
+#ifdef __cplusplus
+}
 #endif
 
+
+
+/* End of dbginfo.h */
+#endif
 
 
 

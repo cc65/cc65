@@ -91,14 +91,14 @@ typedef void (*cc65_errorfunc) (const struct cc65_parseerror*);
  */
 typedef struct cc65_linedata cc65_linedata;
 struct cc65_linedata {
-    const char*     source_name;        /* Name of the file */
-    unsigned long   source_size;        /* Size of file */
-    unsigned long   source_mtime;       /* Modification time */
-    cc65_line       source_line;        /* Line number */
-    cc65_addr       line_start;         /* Start address for this line */
-    cc65_addr       line_end;           /* End address for this line */
-    const char*     output_name;        /* Output file */
-    unsigned long   output_offs;        /* Offset in output file */
+    const char*         source_name;    /* Name of the file */
+    unsigned long       source_size;    /* Size of file */
+    unsigned long       source_mtime;   /* Modification time */
+    cc65_line           source_line;    /* Line number */
+    cc65_addr           line_start;     /* Start address for this line */
+    cc65_addr           line_end;       /* End address for this line */
+    const char*         output_name;    /* Output file */
+    unsigned long       output_offs;    /* Offset in output file */
 };
 
 typedef struct cc65_lineinfo cc65_lineinfo;
@@ -110,9 +110,9 @@ struct cc65_lineinfo {
 /* Source file information */
 typedef struct cc65_sourcedata cc65_sourcedata;
 struct cc65_sourcedata {
-    const char*     source_name;        /* Name of the file */
-    unsigned long   source_size;        /* Size of file */
-    unsigned long   source_mtime;       /* Modification time */
+    const char*         source_name;    /* Name of the file */
+    unsigned long       source_size;    /* Size of file */
+    unsigned long       source_mtime;   /* Modification time */
 };
 
 typedef struct cc65_sourceinfo cc65_sourceinfo;
@@ -130,17 +130,36 @@ struct cc65_sourceinfo {
  */
 typedef struct cc65_segmentdata cc65_segmentdata;
 struct cc65_segmentdata {
-    const char*     segment_name;       /* Name of the segment */
-    cc65_addr       segment_start;      /* Start address of segment */
-    cc65_addr       segment_size;       /* Size of segment */
-    const char*     output_name;        /* Output file this seg was written to */
-    unsigned long   output_offs;        /* Offset of this seg in output file */
+    const char*         segment_name;   /* Name of the segment */
+    cc65_addr           segment_start;  /* Start address of segment */
+    cc65_addr           segment_size;   /* Size of segment */
+    const char*         output_name;    /* Output file this seg was written to */
+    unsigned long       output_offs;    /* Offset of this seg in output file */
 };
 
 typedef struct cc65_segmentinfo cc65_segmentinfo;
 struct cc65_segmentinfo {
     unsigned            count;          /* Number of data sets that follow */
     cc65_segmentdata    data[1];        /* Data sets, number is dynamic */
+};
+
+/* Symbol information */
+typedef enum {
+    CC65_SYM_EQUATE,
+    CC65_SYM_LABEL                      /* Some sort of address */
+} cc65_symbol_type;
+
+typedef struct cc65_symboldata cc65_symboldata;
+struct cc65_symboldata {
+    const char*         symbol_name;    /* Name of symbol */
+    cc65_symbol_type    symbol_type;    /* Type of symbol */
+    long                symbol_value;   /* Value of symbol */
+};
+
+typedef struct cc65_symbolinfo cc65_symbolinfo;
+struct cc65_symbolinfo {
+    unsigned            count;          /* Number of data sets that follow */
+    cc65_symboldata     data[1];        /* Data sets, number is dynamic */
 };
 
 

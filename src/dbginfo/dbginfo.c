@@ -1302,8 +1302,8 @@ static void ParseFile (InputData* D)
         }
 
         /* Something we know? */
-        if (D->Tok != TOK_ID   && D->Tok != TOK_NAME  &&
-            D->Tok != TOK_SIZE && D->Tok != TOK_MTIME) {
+        if (D->Tok != TOK_ID   && D->Tok != TOK_MTIME &&
+            D->Tok != TOK_NAME && D->Tok != TOK_SIZE) {
             /* Done */
             break;
         }
@@ -1327,6 +1327,15 @@ static void ParseFile (InputData* D)
                 NextToken (D);
                 break;
 
+            case TOK_MTIME:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                MTime = D->IVal;
+                NextToken (D);
+                InfoBits |= ibMTime;
+                break;
+
             case TOK_NAME:
                 if (!StrConstFollows (D)) {
                     goto ErrorExit;
@@ -1344,15 +1353,6 @@ static void ParseFile (InputData* D)
                 Size = D->IVal;
                 NextToken (D);
                 InfoBits |= ibSize;
-                break;
-
-            case TOK_MTIME:
-                if (!IntConstFollows (D)) {
-                    goto ErrorExit;
-                }
-                MTime = D->IVal;
-                NextToken (D);
-                InfoBits |= ibMTime;
                 break;
 
             default:
@@ -1427,8 +1427,8 @@ static void ParseLine (InputData* D)
         }
 
         /* Something we know? */
-        if (D->Tok != TOK_FILE && D->Tok != TOK_SEGMENT &&
-            D->Tok != TOK_LINE && D->Tok != TOK_RANGE) {
+        if (D->Tok != TOK_FILE  && D->Tok != TOK_LINE     &&
+            D->Tok != TOK_RANGE && D->Tok != TOK_SEGMENT) {
             /* Done */
             break;
         }
@@ -1449,15 +1449,6 @@ static void ParseLine (InputData* D)
                 }
                 File = D->IVal;
                 InfoBits |= ibFile;
-                NextToken (D);
-                break;
-
-            case TOK_SEGMENT:
-                if (!IntConstFollows (D)) {
-                    goto ErrorExit;
-                }
-                Segment = D->IVal;
-                InfoBits |= ibSegment;
                 NextToken (D);
                 break;
 
@@ -1485,6 +1476,15 @@ static void ParseLine (InputData* D)
                 End = (cc65_addr) D->IVal;
                 NextToken (D);
                 InfoBits |= ibRange;
+                break;
+
+            case TOK_SEGMENT:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Segment = D->IVal;
+                InfoBits |= ibSegment;
+                NextToken (D);
                 break;
 
             default:
@@ -1581,6 +1581,11 @@ static void ParseSegment (InputData* D)
         /* Check what the token was */
         switch (Tok) {
 
+            case TOK_ADDRSIZE:
+                NextToken (D);
+                InfoBits |= ibAddrSize;
+                break;
+
             case TOK_ID:
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
@@ -1619,15 +1624,6 @@ static void ParseSegment (InputData* D)
                 InfoBits |= ibOutputOffs;
                 break;
 
-            case TOK_START:
-                if (!IntConstFollows (D)) {
-                    goto ErrorExit;
-                }
-                Start = (cc65_addr) D->IVal;
-                NextToken (D);
-                InfoBits |= ibStart;
-                break;
-
             case TOK_SIZE:
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
@@ -1637,9 +1633,13 @@ static void ParseSegment (InputData* D)
                 InfoBits |= ibSize;
                 break;
 
-            case TOK_ADDRSIZE:
+            case TOK_START:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Start = (cc65_addr) D->IVal;
                 NextToken (D);
-                InfoBits |= ibAddrSize;
+                InfoBits |= ibStart;
                 break;
 
             case TOK_TYPE:
@@ -1701,11 +1701,128 @@ ErrorExit:
 static void ParseSym (InputData* D)
 /* Parse a SYM line */
 {
+    cc65_symbol_type    Type;
+    long                Value;
+    StrBuf              SymName = STRBUF_INITIALIZER;
+    enum {
+        ibNone          = 0x00,
+        ibSymName       = 0x01,
+        ibValue         = 0x02,
+        ibAddrSize      = 0x04,
+        ibType          = 0x08,
+        ibRequired      = ibSymName | ibValue | ibAddrSize | ibType,
+    } InfoBits = ibNone;
+
     /* Skip the SYM token */
     NextToken (D);
 
-    /* ### */
-    SkipLine (D);
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Check for an unknown keyword */
+        if (D->Tok == TOK_IDENT) {
+            UnknownKeyword (D);
+            continue;
+        }
+
+        /* Something we know? */
+        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_NAME   &&
+            D->Tok != TOK_TYPE          && D->Tok != TOK_VALUE) {
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_ADDRSIZE:
+                NextToken (D);
+                InfoBits |= ibAddrSize;
+                break;
+
+            case TOK_NAME:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&SymName, &D->SVal);
+                SB_Terminate (&SymName);
+                InfoBits |= ibSymName;
+                NextToken (D);
+                break;
+
+            case TOK_TYPE:
+                switch (D->Tok) {
+                    case TOK_EQUATE:
+                        Type = CC65_SYM_EQUATE;
+                        break;
+                    case TOK_LABEL:
+                        Type = CC65_SYM_LABEL;
+                        break;
+                    default:
+                        ParseError (D, CC65_ERROR,
+                                    "Unknown value for attribute \"type\"");
+                        SkipLine (D);
+                        goto ErrorExit;
+                }
+                NextToken (D);
+                InfoBits |= ibType;
+                break;
+
+            case TOK_VALUE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Value = D->IVal;
+                InfoBits |= ibValue;
+                NextToken (D);
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required and/or matched information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+
+    /* Create the symbol info and remember it */
+#if 0
+    S = NewSegInfo (&SegName, Id, Start, Size, &OutputName, OutputOffs);
+    CollAppend (&D->Info->SegInfoByName, S);
+#endif
+
+ErrorExit:
+    /* Entry point in case of errors */
+    SB_Done (&SymName);
+    return;
 }
 
 

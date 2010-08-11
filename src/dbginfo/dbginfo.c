@@ -89,8 +89,9 @@ struct DbgInfo {
     Collection  SegInfoById;            /* Segment infos sorted by id */
     Collection  FileInfoByName;         /* File infos sorted by name */
     Collection  FileInfoById;           /* File infos sorted by id */
-    Collection  LineInfoByAddr;         /* Line information sorted by address */
-    Collection  SymInfoByName;          /* Symbol information sorted by name */
+    Collection  LineInfoByAddr;         /* Line infos sorted by address */
+    Collection  SymInfoByName;          /* Symbol infos sorted by name */
+    Collection  SymInfoByVal;           /* Symbol infos sorted by value */
 };
 
 /* Input tokens */
@@ -880,9 +881,26 @@ static void FreeSymInfo (SymInfo* S)
 static int CompareSymInfoByName (const void* L, const void* R)
 /* Helper function to sort symbol infos in a collection by name */
 {
-    /* Sort by file name */
+    /* Sort by symbol name */
     return strcmp (((const SymInfo*) L)->SymName,
                    ((const SymInfo*) R)->SymName);
+}
+
+
+
+static int CompareSymInfoByVal (const void* L, const void* R)
+/* Helper function to sort symbol infos in a collection by value */
+{
+    /* Sort by symbol value. If both are equal, sort by symbol name so it
+     * looks nice when such a list is returned.
+     */
+    if (((const SymInfo*) L)->Value > ((const SymInfo*) R)->Value) {
+        return 1;
+    } else if (((const SymInfo*) L)->Value < ((const SymInfo*) R)->Value) {
+        return -1;
+    } else {
+        return CompareSymInfoByName (L, R);
+    }
 }
 
 
@@ -906,6 +924,7 @@ static DbgInfo* NewDbgInfo (void)
     InitCollection (&Info->FileInfoById);
     InitCollection (&Info->LineInfoByAddr);
     InitCollection (&Info->SymInfoByName);
+    InitCollection (&Info->SymInfoByVal);
 
     /* Return it */
     return Info;
@@ -940,6 +959,7 @@ static void FreeDbgInfo (DbgInfo* Info)
         FreeSymInfo (CollAt (&Info->SymInfoByName, I));
     }
     DoneCollection (&Info->SymInfoByName);
+    DoneCollection (&Info->SymInfoByVal);
 
     /* Free the structure itself */
     xfree (Info);
@@ -971,6 +991,18 @@ static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
         D->output_name  = 0;
         D->output_offs  = 0;
     }
+}
+
+
+
+static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
+/* Copy data from a SymInfo struct to the cc65_symboldata struct returned to
+ * the caller.
+ */
+{
+    D->symbol_name  = S->SymName;
+    D->symbol_type  = S->Type;
+    D->symbol_value = S->Value;
 }
 
 
@@ -1874,6 +1906,7 @@ static void ParseSym (InputData* D)
     /* Create the symbol info and remember it */
     S = NewSymInfo (&SymName, Value, Type);
     CollAppend (&D->Info->SymInfoByName, S);
+    CollAppend (&D->Info->SymInfoByVal, S);
 
 ErrorExit:
     /* Entry point in case of errors */
@@ -2348,9 +2381,11 @@ static void ProcessSymInfo (InputData* D)
 {
     /* Get pointers to the symbol info collections */
     Collection* SymInfoByName = &D->Info->SymInfoByName;
+    Collection* SymInfoByVal  = &D->Info->SymInfoByVal;
 
-    /* Sort the symbol infos by name */
+    /* Sort the symbol infos */
     CollSort (SymInfoByName, CompareSymInfoByName);
+    CollSort (SymInfoByVal,  CompareSymInfoByVal);
 }
 
 
@@ -2386,6 +2421,46 @@ static int FindSymInfoByName (Collection* SymInfos, const char* SymName, int* In
              * the first item that has a match.
              */
             if (Res == 0) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
+}
+
+
+
+static int FindSymInfoByValue (Collection* SymInfos, long Value, int* Index)
+/* Find the SymInfo for a given value. The function returns true if the
+ * value was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for the given value.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (SymInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        SymInfo* CurItem = CollAt (SymInfos, Cur);
+
+        /* Found? */
+        if (Value > CurItem->Value) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Value == CurItem->Value) {
                 Found = 1;
             }
         }
@@ -2806,16 +2881,87 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
 
     /* Fill in the data */
     D->count = Count;
-    while (Count--) {
-
-        /* Get this item */
-        const SymInfo* S = CollAt (SymInfoByName, Index);
-
+    for (I = 0; I < Count; ++I) {
         /* Copy the data */
-        D->data[I].symbol_name  = S->SymName;
-        D->data[I].symbol_type  = S->Type;
-        D->data[I].symbol_value = S->Value;
+        CopySymInfo (D->data + I, CollAt (SymInfoByName, Index++));
     }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65_addr End)
+/* Return a list of labels in the given range. End is inclusive. The function
+ * return NULL if no symbols withing the given range are found. Non label
+ * symbols are ignored and not returned.
+ */
+{
+    DbgInfo*            Info;
+    Collection*         SymInfoByVal;
+    Collection          SymInfoList = COLLECTION_INITIALIZER;
+    cc65_symbolinfo*    D;
+    unsigned            I;
+    int                 Index;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Get a pointer to the symbol list */
+    SymInfoByVal = &Info->SymInfoByVal;
+
+    /* Search for the symbol. Because we're searching for a range, we cannot
+     * make use of the function result.
+     */
+    FindSymInfoByValue (SymInfoByVal, Start, &Index);
+
+    /* Start from the given index, check all symbols until the end address is
+     * reached. Place all symbols into SymInfoList for later.
+     */
+    for (I = Index; I < CollCount (SymInfoByVal); ++I) {
+
+        /* Get the item */
+        SymInfo* Item = CollAt (SymInfoByVal, I);
+
+        /* The collection is sorted by address, so if we get a value larger
+         * than the end address, we're done.
+         */
+        if (Item->Value > (long) End) {
+            break;
+        }
+
+        /* Ignore non-labels */
+        if (Item->Type != CC65_SYM_LABEL) {
+            continue;
+        }
+
+        /* Ok, remember this one */
+        CollAppend (&SymInfoList, Item);
+    }
+
+    /* If we don't have any labels within the range, bail out. No memory has
+     * been allocated for SymInfoList.
+     */
+    if (CollCount (&SymInfoList) == 0) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = xmalloc (sizeof (*D) + (CollCount (&SymInfoList)- 1) * sizeof (D->data[0]));
+
+    /* Fill in the data */
+    D->count = CollCount (&SymInfoList);
+    for (I = 0; I < CollCount (&SymInfoList); ++I) {
+        /* Copy the data */
+        CopySymInfo (D->data + I, CollAt (&SymInfoList, I));
+    }
+
+    /* Free the collection */
+    DoneCollection (&SymInfoList);
 
     /* Return the result */
     return D;

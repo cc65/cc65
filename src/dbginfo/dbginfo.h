@@ -207,11 +207,18 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo handle);
 void cc65_free_segmentinfo (cc65_dbginfo handle, cc65_segmentinfo* info);
 /* Free a segment info record */
 
-cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name);
+cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo handle, const char* name);
 /* Return a list of symbols with a given name. The function returns NULL if
  * no symbol with this name was found.
  */
-                                                                            
+
+cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
+                                      cc65_addr start, cc65_addr end);
+/* Return a list of labels in the given range. end is inclusive. The function
+ * return NULL if no symbols withing the given range are found. Non label
+ * symbols are ignored and not returned.
+ */
+
 void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info);
 /* Free a symbol info record */
 

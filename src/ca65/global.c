@@ -82,7 +82,7 @@ unsigned char OrgPerSeg          = 0;   /* Make .org local to current seg */
 unsigned char CComments          = 0;   /* Allow C like comments */
 
 /* Misc stuff */
-const char Copyright[]           = "(C) Copyright 1998-2005 Ullrich von Bassewitz";
+const char Copyright[]           = "(C) Copyright 1998-2010 Ullrich von Bassewitz";
 
 
 

@@ -581,17 +581,14 @@ void SymCheck (void)
                               "Symbol `%m%p' is imported but never used",
                               GetSymName (S));
 	    	} else {
-	    	    /* Give the import an index, count imports */
-	    	    S->Index = ImportCount++;
-	    	    S->Flags |= SF_INDEXED;
+	    	    /* Give the import an id, count imports */
+	    	    S->ImportId = ImportCount++;
 	    	}
 	    }
 
-            /* Assign an index to all exports */
+            /* Count exports */
 	    if (S->Flags & SF_EXPORT) {
-	    	/* Give the export an index, count exports */
-	    	S->Index = ExportCount++;
-	    	S->Flags |= SF_INDEXED;
+	    	++ExportCount;
 	    }
 
             /* If the symbol is defined but has an unknown address size,

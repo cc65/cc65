@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -95,7 +95,7 @@ struct SymEntry {
                                          * addressing
                                          */
     unsigned            Flags;	        /* Symbol flags */
-    unsigned	    	Index;	        /* Index of import/export entries */
+    unsigned   	       	ImportId;       /* Id if imported symbol */
     struct ExprNode*    Expr;      	/* Symbol expression */
     Collection          ExprRefs;       /* Expressions using this symbol */
     unsigned char       ExportSize;     /* Export address size */
@@ -335,8 +335,8 @@ long GetSymVal (SymEntry* Sym);
  * in case the symbol is undefined or not constant.
  */
 
-unsigned GetSymIndex (const SymEntry* Sym);
-/* Return the symbol index for the given symbol */
+unsigned GetSymImportId (const SymEntry* Sym);
+/* Return the import id for the given symbol */
 
 #if defined(HAVE_INLINE)
 INLINE const FilePos* GetSymPos (const SymEntry* S)

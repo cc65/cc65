@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -90,6 +90,7 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
         S->GuessedUse[I] = 0;
     }
     S->Flags   	  = Flags;
+    S->ImportId   = ~0U;
     S->Expr       = 0;
     S->ExprRefs   = AUTO_COLLECTION_INITIALIZER;
     S->ExportSize = ADDR_SIZE_DEFAULT;
@@ -662,11 +663,11 @@ long GetSymVal (SymEntry* S)
 
 
 
-unsigned GetSymIndex (const SymEntry* S)
-/* Return the symbol index for the given symbol */
+unsigned GetSymImportId (const SymEntry* S)
+/* Return the import id for the given symbol */
 {
-    PRECONDITION (S != 0 && (S->Flags & SF_INDEXED) != 0);
-    return S->Index;
+    PRECONDITION (S != 0 && (S->Flags & SF_IMPORT) && S->ImportId != ~0U);
+    return S->ImportId;
 }
 
 

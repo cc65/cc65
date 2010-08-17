@@ -1769,7 +1769,7 @@ void WriteExpr (ExprNode* Expr)
         case EXPR_SYMBOL:
     	    if (SymIsImport (Expr->V.Sym)) {
                 ObjWrite8 (EXPR_SYMBOL);
-                ObjWriteVar (GetSymIndex (Expr->V.Sym));
+                ObjWriteVar (GetSymImportId (Expr->V.Sym));
             } else {
                 WriteExpr (GetSymExpr (Expr->V.Sym));
             }

@@ -67,7 +67,6 @@
 #define SF_LABEL        0x0080          /* Used as a label */
 #define SF_VAR          0x0100          /* Variable symbol */
 #define SF_FORCED       0x0400          /* Forced import, SF_IMPORT also set */
-#define SF_INDEXED	0x0800		/* Index is valid */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
 #define	SF_DEFINED  	0x4000 	       	/* Defined */
 #define SF_REFERENCED	0x8000 	       	/* Referenced */

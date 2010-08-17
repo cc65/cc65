@@ -685,6 +685,7 @@ unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
     unsigned Flags = 0;
     Flags |= SymIsConst (S, ConstVal)? SYM_CONST : SYM_EXPR;
     Flags |= (S->Flags & SF_LABEL)? SYM_LABEL : SYM_EQUATE;
+    Flags |= (S->Flags & SF_LOCAL)? SYM_CHEAP_LOCAL : SYM_STD;
 
     /* Return the result */
     return Flags;

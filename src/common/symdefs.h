@@ -71,11 +71,19 @@
 #define SYM_IS_EQUATE(x)        (((x) & SYM_MASK_LABEL) == SYM_EQUATE)
 #define SYM_IS_LABEL(x)         (((x) & SYM_MASK_LABEL) == SYM_LABEL)
 
+/* Symbol type */                                       
+#define SYM_STD                 0x00U   /* Standard symbol */
+#define SYM_CHEAP_LOCAL         0x40U   /* Cheap local symbol */
+#define SYM_MASK_TYPE           0x40U   /* Value mask */
+
+#define SYM_IS_STD(x)           (((x) & SYM_MASK_TYPE) == SYM_STD)
+#define SYM_IS_CHEAP_LOCAL      (((x) & SYM_MASK_TYPE) == SYM_CHEAP_LOCAL)
+
 
 
 /* End of symdefs.h */
 
 #endif
-                
+
 
 

@@ -37,6 +37,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "symdefs.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -606,7 +607,7 @@ void SymImportFromGlobal (SymEntry* S)
 
 
 
-int SymIsConst (SymEntry* S, long* Val)
+int SymIsConst (const SymEntry* S, long* Val)
 /* Return true if the given symbol has a constant value. If Val is not NULL
  * and the symbol has a constant value, store it's value there.
  */
@@ -669,6 +670,24 @@ unsigned GetSymImportId (const SymEntry* S)
 {
     PRECONDITION (S != 0 && (S->Flags & SF_IMPORT) && S->ImportId != ~0U);
     return S->ImportId;
+}
+
+
+
+unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
+/* Return a set of flags used when writing symbol information into a file.
+ * If the SYM_CONST bit is set, ConstVal will contain the constant value
+ * of the symbol. The result does not include the condes count.
+ * See common/symdefs.h for more information.
+ */
+{
+    /* Setup info flags */
+    unsigned Flags = 0;
+    Flags |= SymIsConst (S, ConstVal)? SYM_CONST : SYM_EXPR;
+    Flags |= (S->Flags & SF_LABEL)? SYM_LABEL : SYM_EQUATE;
+
+    /* Return the result */
+    return Flags;
 }
 
 

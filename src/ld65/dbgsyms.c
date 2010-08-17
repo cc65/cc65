@@ -142,7 +142,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 /* Read a debug symbol from a file, insert and return it */
 {
     /* Read the type and address size */
-    unsigned char Type = Read8 (F);
+    unsigned char Type = ReadVar (F);
     unsigned char AddrSize = Read8 (F);
 
     /* Create a new debug symbol */
@@ -152,7 +152,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     D->Name = MakeGlobalStringId (O, ReadVar (F));
 
     /* Read the value */
-    if (IS_EXP_EXPR (D->Type)) {
+    if (SYM_IS_EXPR (D->Type)) {
        	D->Expr = ReadExpr (F, O);
     } else {
     	D->Expr = LiteralExpr (Read32 (F), O);
@@ -221,7 +221,7 @@ void PrintDbgSyms (ObjData* O, FILE* F)
                      GetString (D->Name),
                      Val,
                      AddrSizeToStr (D->AddrSize),
-                     IS_EXP_LABEL (D->Type)? "label" : "equate");
+                     SYM_IS_LABEL (D->Type)? "label" : "equate");
 
 	    /* Insert the symbol into the table */
 	    InsertDbgSym (D, Val);
@@ -245,7 +245,7 @@ void PrintDbgSymLabels (ObjData* O, FILE* F)
  	DbgSym* D = CollAt (&O->DbgSyms, I);
 
         /* Emit this symbol only if it is a label (ignore equates) */
-        if (IS_EXP_EQUATE (D->Type)) {
+        if (SYM_IS_EQUATE (D->Type)) {
             continue;
         }
 

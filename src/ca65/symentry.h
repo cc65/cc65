@@ -246,7 +246,7 @@ INLINE int SymIsVar (const SymEntry* S)
 #  define SymIsVar(S)   (((S)->Flags & SF_VAR) != 0)
 #endif
 
-int SymIsConst (SymEntry* Sym, long* Val);
+int SymIsConst (const SymEntry* Sym, long* Val);
 /* Return true if the given symbol has a constant value. If Val is not NULL
  * and the symbol has a constant value, store it's value there.
  */
@@ -337,6 +337,13 @@ long GetSymVal (SymEntry* Sym);
 
 unsigned GetSymImportId (const SymEntry* Sym);
 /* Return the import id for the given symbol */
+
+unsigned GetSymInfoFlags (const SymEntry* Sym, long* ConstVal);
+/* Return a set of flags used when writing symbol information into a file.
+ * If the SYM_CONST bit is set, ConstVal will contain the constant value
+ * of the symbol. The result does not include the condes count.
+ * See common/symdefs.h for more information.
+ */
 
 #if defined(HAVE_INLINE)
 INLINE const FilePos* GetSymPos (const SymEntry* S)

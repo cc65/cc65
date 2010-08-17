@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -411,17 +411,17 @@ static void LibCheckExports (ObjData* O)
 	const char*     Name;
 
       	/* Get the export tag and skip the address size */
-       	unsigned char Type = *Exports++;
+       	unsigned Type = GetVar (&Exports);
         ++Exports;
 
 	/* condes decls may follow */
-	Exports += GET_EXP_CONDES_COUNT (Type);
+	Exports += SYM_GET_CONDES_COUNT (Type);
 
        	/* Next thing is index of name of symbol */
         Name = GetObjString (O, GetVar (&Exports));
 
      	/* Skip value of symbol */
-     	if (Type & EXP_EXPR) {
+     	if (SYM_IS_EXPR (Type)) {
      	    /* Expression tree */
      	    SkipExpr (&Exports);
      	} else {

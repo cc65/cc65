@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -326,7 +326,7 @@ void InsertExport (Export* E)
     E->Flags |= EXP_INLIST;
 
     /* Insert the export into any condes tables if needed */
-    if (IS_EXP_CONDES (E->Type)) {
+    if (SYM_IS_CONDES (E->Type)) {
        	ConDesAddExport (E);
     }
 
@@ -395,7 +395,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     Export* E;
 
     /* Read the type */
-    unsigned char Type = Read8 (F);
+    unsigned char Type = ReadVar (F);
 
     /* Read the address size */
     unsigned char AddrSize = Read8 (F);
@@ -404,7 +404,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     E = NewExport (Type, AddrSize, INVALID_STRING_ID, O);
 
     /* Read the constructor/destructor decls if we have any */
-    ConDesCount = GET_EXP_CONDES_COUNT (Type);
+    ConDesCount = SYM_GET_CONDES_COUNT (Type);
     if (ConDesCount > 0) {
 
 	unsigned char ConDes[CD_TYPE_COUNT];
@@ -430,7 +430,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     E->Name = MakeGlobalStringId (O, ReadVar (F));
 
     /* Read the value */
-    if (IS_EXP_EXPR (Type)) {
+    if (SYM_IS_EXPR (Type)) {
        	E->Expr = ReadExpr (F, O);
     } else {
      	E->Expr = LiteralExpr (Read32 (F), O);
@@ -449,7 +449,7 @@ Export* CreateConstExport (unsigned Name, long Value)
 /* Create an export for a literal date */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_CONST | EXP_EQUATE, ADDR_SIZE_ABS, Name, 0);
+    Export* E = NewExport (SYM_CONST | SYM_EQUATE, ADDR_SIZE_ABS, Name, 0);
 
     /* Assign the value */
     E->Expr = LiteralExpr (Value, 0);
@@ -467,7 +467,7 @@ Export* CreateMemoryExport (unsigned Name, Memory* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_EXPR | EXP_LABEL, ADDR_SIZE_ABS, Name, 0);
+    Export* E = NewExport (SYM_EXPR | SYM_LABEL, ADDR_SIZE_ABS, Name, 0);
 
     /* Assign the value */
     E->Expr = MemoryExpr (Mem, Offs, 0);
@@ -485,7 +485,7 @@ Export* CreateSegmentExport (unsigned Name, Segment* Seg, unsigned long Offs)
 /* Create a relative export to a segment */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_EXPR | EXP_LABEL, Seg->AddrSize, Name, 0);
+    Export* E = NewExport (SYM_EXPR | SYM_LABEL, Seg->AddrSize, Name, 0);
 
     /* Assign the value */
     E->Expr = SegmentExpr (Seg, Offs, 0);
@@ -503,7 +503,7 @@ Export* CreateSectionExport (unsigned Name, Section* Sec, unsigned long Offs)
 /* Create a relative export to a section */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_EXPR | EXP_LABEL, Sec->AddrSize, Name, 0);
+    Export* E = NewExport (SYM_EXPR | SYM_LABEL, Sec->AddrSize, Name, 0);
 
     /* Assign the value */
     E->Expr = SectionExpr (Sec, Offs, 0);
@@ -762,15 +762,15 @@ void PrintExportMap (FILE* F)
      	const Export* E = ExpPool [I];
 
 	/* Print unreferenced symbols only if explictly requested */
-	if (VerboseMap || E->ImpCount > 0 || IS_EXP_CONDES (E->Type)) {
+	if (VerboseMap || E->ImpCount > 0 || SYM_IS_CONDES (E->Type)) {
 	    fprintf (F,
 	       	     "%-25s %06lX %c%c%c%c   ",
 	      	     GetString (E->Name),
 	      	     GetExportVal (E),
 	      	     E->ImpCount? 'R' : ' ',
-		     IS_EXP_LABEL (E->Type)? 'L' : 'E',
+		     SYM_IS_LABEL (E->Type)? 'L' : 'E',
        	       	     GetAddrSizeCode (E->AddrSize),
-		     IS_EXP_CONDES (E->Type)? 'I' : ' ');
+		     SYM_IS_CONDES (E->Type)? 'I' : ' ');
 	    if (++Count == 2) {
 	      	Count = 0;
 	      	fprintf (F, "\n");

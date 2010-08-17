@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -49,33 +49,33 @@
 
 
 /* Number of module constructor/destructor declarations for an export */
-#define EXP_CONDES_MASK	        0x07
+#define SYM_CONDES_MASK	        0x07U
 
-#define IS_EXP_CONDES(x)	(((x) & EXP_CONDES_MASK) != 0)
-#define GET_EXP_CONDES_COUNT(x)	((x) & EXP_CONDES_MASK)
-#define INC_EXP_CONDES_COUNT(x) ((x)++)
+#define SYM_IS_CONDES(x)	(((x) & SYM_CONDES_MASK) != 0)
+#define SYM_GET_CONDES_COUNT(x) ((x) & SYM_CONDES_MASK)
+#define SYM_INC_CONDES_COUNT(x) ((x)++)
 
-/* Export value type */
-#define EXP_CONST     	        0x00   	/* Mask bit for const values */
-#define EXP_EXPR      	        0x10   	/* Mask bit for expr values */
-#define EXP_MASK_VAL  	        0x10   	/* Value mask */
+/* Symbol value type */
+#define SYM_CONST     	        0x00U   /* Mask bit for const values */
+#define SYM_EXPR      	        0x10U   /* Mask bit for expr values */
+#define SYM_MASK_VAL  	        0x10U   /* Value mask */
 
-#define IS_EXP_CONST(x)	        (((x) & EXP_MASK_VAL) == EXP_CONST)
-#define IS_EXP_EXPR(x) 	        (((x) & EXP_MASK_VAL) == EXP_EXPR)
+#define SYM_IS_CONST(x)	        (((x) & SYM_MASK_VAL) == SYM_CONST)
+#define SYM_IS_EXPR(x) 	        (((x) & SYM_MASK_VAL) == SYM_EXPR)
 
-/* Export usage */
-#define EXP_EQUATE              0x00   	/* Mask bit for an equate */
-#define EXP_LABEL               0x20    /* Mask bit for a label */
-#define EXP_MASK_LABEL          0x20    /* Value mask */
+/* Symbol usage */
+#define SYM_EQUATE              0x00U   /* Mask bit for an equate */
+#define SYM_LABEL               0x20U   /* Mask bit for a label */
+#define SYM_MASK_LABEL          0x20U   /* Value mask */
 
-#define IS_EXP_EQUATE(x)        (((x) & EXP_MASK_LABEL) == EXP_EQUATE)
-#define IS_EXP_LABEL(x)         (((x) & EXP_MASK_LABEL) == EXP_LABEL)
+#define SYM_IS_EQUATE(x)        (((x) & SYM_MASK_LABEL) == SYM_EQUATE)
+#define SYM_IS_LABEL(x)         (((x) & SYM_MASK_LABEL) == SYM_LABEL)
 
 
 
 /* End of symdefs.h */
 
 #endif
-
+                
 
 

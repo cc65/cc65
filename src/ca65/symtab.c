@@ -717,38 +717,36 @@ void WriteExports (void)
     while (S) {
        	if ((S->Flags & (SF_UNUSED | SF_EXPORT)) == SF_EXPORT) {
 
+	    /* Get the expression bits and the value */
             long ConstVal;
-
-	    /* Get the expression bits */
-            unsigned char ExprMask = SymIsConst (S, &ConstVal)? EXP_CONST : EXP_EXPR;
-            ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
+            unsigned ExprMask = GetSymInfoFlags (S, &ConstVal);
 
 	    /* Count the number of ConDes types */
 	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
-	    	if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
-	    	    INC_EXP_CONDES_COUNT (ExprMask);
-	    	}
+	     	if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
+	     	    SYM_INC_CONDES_COUNT (ExprMask);
+	     	}
 	    }
 
 	    /* Write the type and the export size */
-	    ObjWrite8 (ExprMask);
+	    ObjWriteVar (ExprMask);
             ObjWrite8 (S->ExportSize);
 
 	    /* Write any ConDes declarations */
-	    if (GET_EXP_CONDES_COUNT (ExprMask) > 0) {
-		for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
-		    unsigned char Prio = S->ConDesPrio[Type];
-		    if (Prio != CD_PRIO_NONE) {
-		    	ObjWrite8 (CD_BUILD (Type, Prio));
-		    }
-		}
+	    if (SYM_GET_CONDES_COUNT (ExprMask) > 0) {
+	     	for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
+	     	    unsigned char Prio = S->ConDesPrio[Type];
+	     	    if (Prio != CD_PRIO_NONE) {
+	     	     	ObjWrite8 (CD_BUILD (Type, Prio));
+	     	    }
+	     	}
 	    }
 
 	    /* Write the name */
        	    ObjWriteVar (S->Name);
 
 	    /* Write the value */
-	    if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
+	    if (SYM_IS_CONST (ExprMask)) {
 	     	/* Constant value */
     	     	ObjWrite32 (ConstVal);
 	    } else {
@@ -798,14 +796,12 @@ void WriteDbgSyms (void)
     	while (S) {
     	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
 
+                /* Get the expression bits and the value */
                 long ConstVal;
-
-		/* Get the expression bits */
-                unsigned char ExprMask = (SymIsConst (S, &ConstVal))? EXP_CONST : EXP_EXPR;
-                ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
+                unsigned ExprMask = GetSymInfoFlags (S, &ConstVal);
 
 		/* Write the type */
-		ObjWrite8 (ExprMask);
+		ObjWriteVar (ExprMask);
 
                 /* Write the address size */
                 ObjWrite8 (S->AddrSize);
@@ -814,7 +810,7 @@ void WriteDbgSyms (void)
        	       	ObjWriteVar (S->Name);
 
 		/* Write the value */
-		if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
+		if (SYM_IS_CONST (ExprMask)) {
 		    /* Constant value */
 		    ObjWrite32 (ConstVal);
 		} else {

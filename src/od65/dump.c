@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/* (C) 2002-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -174,16 +174,16 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
 
     /* Type of expression */
     TypeDesc[0] = '\0';
-    switch (Flags & EXP_MASK_VAL) {
-       	case EXP_CONST:	strcat (TypeDesc, "EXP_CONST");	break;
-       	case EXP_EXPR:	strcat (TypeDesc, "EXP_EXPR"); 	break;
+    switch (Flags & SYM_MASK_VAL) {
+       	case SYM_CONST: strcat (TypeDesc, "SYM_CONST"); break;
+       	case SYM_EXPR: strcat (TypeDesc, "SYM_EXPR");   break;
     }
 
     /* Constructor/destructor declarations */
     T = TypeDesc + strlen (TypeDesc);
-    Count = GET_EXP_CONDES_COUNT (Flags);
+    Count = SYM_GET_CONDES_COUNT (Flags);
     if (Count > 0 && ConDes) {
-	T += sprintf (T, ",EXP_CONDES=");
+	T += sprintf (T, ",SYM_CONDES=");
 	for (I = 0; I < Count; ++I) {
 	    unsigned Type = CD_GET_TYPE (ConDes[I]);
 	    unsigned Prio = CD_GET_PRIO (ConDes[I]);
@@ -545,10 +545,10 @@ void DumpObjExports (FILE* F, unsigned long Offset)
        	/* Read the data for one export */
        	unsigned char Type = Read8 (F);
         unsigned char AddrSize = Read8 (F);
-	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
+	ReadData (F, ConDes, SYM_GET_CONDES_COUNT (Type));
        	Name  = GetString (&StrPool, ReadVar (F));
 	Len   = strlen (Name);
-       	if (IS_EXP_EXPR (Type)) {
+       	if (SYM_IS_EXPR (Type)) {
 	    SkipExpr (F);
 	    HaveValue = 0;
 	} else {
@@ -621,7 +621,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
         unsigned char AddrSize = Read8 (F);
        	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
-	if (IS_EXP_EXPR (Type)) {
+	if (SYM_IS_EXPR (Type)) {
 	    SkipExpr (F);
 	    HaveValue = 0;
 	} else {

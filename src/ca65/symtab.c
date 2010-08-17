@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -70,12 +70,13 @@
 #define SF_DBGINFOVAL 	(SF_DEFINED)
 
 /* Symbol tables */
-SymTable*      	CurrentScope = 0;       /* Pointer to current symbol table */
-SymTable*	RootScope    = 0;       /* Root symbol table */
+SymTable*      	    CurrentScope = 0;   /* Pointer to current symbol table */
+SymTable*	    RootScope    = 0;   /* Root symbol table */
+static SymTable*    LastScope    = 0;   /* Pointer to last scope in list */
 
 /* Symbol table variables */
-static unsigned ImportCount = 0;        /* Counter for import symbols */
-static unsigned ExportCount = 0;        /* Counter for export symbols */
+static unsigned     ImportCount = 0;    /* Counter for import symbols */
+static unsigned     ExportCount = 0;    /* Counter for export symbols */
 
 
 
@@ -123,6 +124,18 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     while (Slots--) {
        	S->Table[Slots] = 0;
     }
+
+    /* Insert the symbol table into the list of all symbol tables and maintain
+     * a unqiue id for each scope.
+     */
+    S->Next = LastScope;
+    if (RootScope == 0) {
+        S->Id = 0;
+        RootScope = S;
+    } else {
+        S->Id = LastScope->Id + 1;
+    }
+    LastScope = S;
 
     /* Insert the symbol table into the child tree of the parent */
     if (Parent) {
@@ -315,6 +328,7 @@ SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, int AllocNew)
 
         /* Otherwise create a new entry, insert and return it */
         SymEntry* N = NewSymEntry (Name, SF_LOCAL);
+        N->Sym.Entry = Parent;
         if (S == 0) {
             Parent->Locals = N;
         } else if (Cmp < 0) {
@@ -354,6 +368,7 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew)
 
         /* Otherwise create a new entry, insert and return it */
         SymEntry* N = NewSymEntry (Name, SF_NONE);
+        N->Sym.Tab = Scope;
         if (S == 0) {
             Scope->Table[Hash] = N;
         } else if (Cmp < 0) {
@@ -361,7 +376,6 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew)
         } else {
             S->Right = N;
         }
-        N->SymTab = Scope;
         ++Scope->TableEntries;
         return N;
 
@@ -836,7 +850,7 @@ void WriteScopes (void)
     /* Tell the object file module that we're about to start the scopes */
     ObjStartScopes ();
 
-    /* For now ...*/
+    /* No debug info requested */
     ObjWriteVar (0);
 
     /* Done writing the scopes */

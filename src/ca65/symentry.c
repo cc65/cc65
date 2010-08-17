@@ -84,7 +84,7 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     S->Left    	  = 0;
     S->Right   	  = 0;
     S->Locals  	  = 0;
-    S->SymTab  	  = 0;
+    S->Sym.Tab    = 0;
     S->Pos     	  = CurPos;
     for (I = 0; I < sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0]); ++I) {
         S->GuessedUse[I] = 0;
@@ -620,7 +620,13 @@ SymTable* GetSymParentScope (SymEntry* S)
  * NULL if the symbol is a cheap local, or defined on global level.
  */
 {
-    return (S->SymTab && S->SymTab->Parent)? S->SymTab->Parent : 0;
+    if ((S->Flags & SF_LOCAL) != 0) {
+        /* This is a cheap local symbol */
+        return 0;
+    } else {
+        /* This is a global symbol */
+        return S->Sym.Tab->Parent;
+    }
 }
 
 

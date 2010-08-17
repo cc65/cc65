@@ -83,7 +83,10 @@ struct SymEntry {
     SymEntry*  	    	Right; 	        /* Lexically larger entry */
     SymEntry*  	    	List;	        /* List of all entries */
     SymEntry*  	       	Locals;         /* Root of subtree for local symbols */
-    struct SymTable*	SymTab;	        /* Table this symbol is in, 0 for locals */
+    union {
+        struct SymTable*    Tab;       	/* Table this symbol is in */
+        struct SymEntry*    Entry;
+    } Sym;
     FilePos    	       	Pos;  	        /* File position for this symbol */
     FilePos*            GuessedUse[1];  /* File position where symbol
                                          * address size was guessed, and the
@@ -98,7 +101,7 @@ struct SymEntry {
     unsigned char       ExportSize;     /* Export address size */
     unsigned char       AddrSize;       /* Address size of label */
     unsigned char      	ConDesPrio[CD_TYPE_COUNT]; 	/* ConDes priorities... */
-		   			/* ...actually value+1 (used as flag) */
+		    			/* ...actually value+1 (used as flag) */
     unsigned            Name;      	/* Name index in global string pool */
 };
 
@@ -353,4 +356,4 @@ INLINE const FilePos* GetSymPos (const SymEntry* S)
 
 
 
-                                    
+

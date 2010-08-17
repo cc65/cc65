@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -73,12 +73,14 @@ enum {
 
 /* A symbol table */
 typedef struct SymTable SymTable;
-struct SymTable {
+struct SymTable {                                     
+    SymTable*           Next;           /* Pointer to next table in list */
     SymTable*           Left;           /* Pointer to smaller entry */
     SymTable*           Right;          /* Pointer to greater entry */
     SymTable*          	Parent;   	/* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
     Collection          SegRanges;      /* Segment ranges for this scope */
+    unsigned            Id;             /* Scope id */
     unsigned short      Flags;          /* Symbol table flags */
     unsigned char    	AddrSize;       /* Address size */
     unsigned char       Type;           /* Type of the scope */
@@ -161,6 +163,9 @@ void WriteExports (void);
 
 void WriteDbgSyms (void);
 /* Write a list of all symbols to the object file */
+
+void WriteScopes (void);
+/* Write the scope table to the object file */
 
 
 

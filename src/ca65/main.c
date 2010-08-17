@@ -798,6 +798,9 @@ static void CreateObjFile (void)
     /* Write the export list */
     WriteExports ();
 
+    /* Write the scopes if requested */
+    WriteScopes ();
+
     /* Write debug symbols if requested */
     WriteDbgSyms ();
 

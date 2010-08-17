@@ -172,11 +172,23 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
     unsigned Count;
     unsigned I;
 
-    /* Type of expression */
+    /* Symbol type */
     TypeDesc[0] = '\0';
+    switch (Flags & SYM_MASK_TYPE) {
+       	case SYM_STD:         strcat (TypeDesc, "SYM_STD");         break;
+       	case SYM_CHEAP_LOCAL: strcat (TypeDesc, "SYM_CHEAP_LOCAL"); break;
+    }
+
+    /* Symbol usage */
+    switch (Flags & SYM_MASK_LABEL) {       
+       	case SYM_EQUATE: strcat (TypeDesc, ",SYM_EQUATE"); break;
+       	case SYM_LABEL:  strcat (TypeDesc, ",SYM_LABEL");  break;
+    }
+
+    /* Type of expression */
     switch (Flags & SYM_MASK_VAL) {
-       	case SYM_CONST: strcat (TypeDesc, "SYM_CONST"); break;
-       	case SYM_EXPR: strcat (TypeDesc, "SYM_EXPR");   break;
+       	case SYM_CONST: strcat (TypeDesc, ",SYM_CONST"); break;
+       	case SYM_EXPR:  strcat (TypeDesc, ",SYM_EXPR");   break;
     }
 
     /* Constructor/destructor declarations */
@@ -543,7 +555,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 
 
        	/* Read the data for one export */
-       	unsigned char Type = Read8 (F);
+       	unsigned Type          = ReadVar (F);
         unsigned char AddrSize = Read8 (F);
 	ReadData (F, ConDes, SYM_GET_CONDES_COUNT (Type));
        	Name  = GetString (&StrPool, ReadVar (F));
@@ -617,7 +629,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	int 	      	HaveValue;
 
        	/* Read the data for one symbol */
-       	unsigned char Type     = Read8 (F);
+       	unsigned Type          = ReadVar (F);
         unsigned char AddrSize = Read8 (F);
        	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);

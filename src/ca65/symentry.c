@@ -90,6 +90,7 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
         S->GuessedUse[I] = 0;
     }
     S->Flags   	  = Flags;
+    S->DebugSymId = ~0U;
     S->ImportId   = ~0U;
     S->Expr       = 0;
     S->ExprRefs   = AUTO_COLLECTION_INITIALIZER;

@@ -780,12 +780,12 @@ void WriteDbgSyms (void)
     /* Check if debug info is requested */
     if (DbgSyms) {
 
-    	/* Walk through the list and count the symbols */
+    	/* Walk through the list, give each symbol an id and count them */
     	Count = 0;
     	S = SymList;
     	while (S) {
     	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
-    		++Count;
+                S->DebugSymId = Count++;
     	    }
     	    S = S->List;
     	}
@@ -853,8 +853,6 @@ void WriteScopes (void)
     /* Done writing the scopes */
     ObjEndScopes ();
 }
-
-
 
 
 

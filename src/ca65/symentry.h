@@ -94,7 +94,8 @@ struct SymEntry {
                                          * addressing
                                          */
     unsigned            Flags;	        /* Symbol flags */
-    unsigned   	       	ImportId;       /* Id if imported symbol */
+    unsigned            DebugSymId;     /* Debug symbol id */
+    unsigned   	       	ImportId;       /* Id of import if this is one */
     struct ExprNode*    Expr;      	/* Symbol expression */
     Collection          ExprRefs;       /* Expressions using this symbol */
     unsigned char       ExportSize;     /* Export address size */

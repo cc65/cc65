@@ -138,8 +138,8 @@ static void Parse (void)
 	    }
 
             /* Check if we must reserve storage for the variable. We do this,
-             * 
-             *   - if it is not a typedef or function, 
+             *
+             *   - if it is not a typedef or function,
              *   - if we don't had a storage class given ("int i")
              *   - if the storage class is explicitly specified as static,
              *   - or if there is an initialization.
@@ -149,8 +149,8 @@ static void Parse (void)
 	    if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
                 (Decl.StorageClass & SC_TYPEDEF) != SC_TYPEDEF    &&
                 ((Spec.Flags & DS_DEF_STORAGE) != 0         ||
-                 (Decl.StorageClass & SC_STATIC) != 0       ||
-                 ((Decl.StorageClass & SC_EXTERN) != 0 && 
+                 (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
+                 ((Decl.StorageClass & SC_EXTERN) != 0 &&
                   CurTok.Tok == TOK_ASSIGN))) {
 
                 /* We will allocate storage */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -63,11 +63,13 @@ unsigned WarningCount	= 0;
 /* Warning and error options */
 IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
 IntStack WarningsAreErrors  = INTSTACK(0);  /* Treat warnings as errors */
-IntStack WarnStructParam    = INTSTACK(1);  /* Warn about structs passed by val */
-IntStack WarnUnusedLabel    = INTSTACK(1);  /* Warn about unused labels */
-IntStack WarnUnusedParam    = INTSTACK(1);  /* Warn about unused parameters */
-IntStack WarnUnusedVar      = INTSTACK(1);  /* Warn about unused variables */
-IntStack WarnUnknownPragma  = INTSTACK(1);  /* Warn about unknown #pragmas */
+                                            /* Warn about: */
+IntStack WarnNoEffect       = INTSTACK(1);  /* ... statements without an effect */
+IntStack WarnStructParam    = INTSTACK(1);  /* ... structs passed by val */
+IntStack WarnUnusedLabel    = INTSTACK(1);  /* ... unused labels */
+IntStack WarnUnusedParam    = INTSTACK(1);  /* ... unused parameters */
+IntStack WarnUnusedVar      = INTSTACK(1);  /* ... unused variables */
+IntStack WarnUnknownPragma  = INTSTACK(1);  /* ... unknown #pragmas */
 
 /* Map the name of a warning to the intstack that holds its state */
 typedef struct WarnMapEntry WarnMapEntry;
@@ -78,6 +80,7 @@ struct WarnMapEntry {
 static WarnMapEntry WarnMap[] = {
     /* Keep sorted, even if this isn't used for now */
     { &WarningsAreErrors,       "error"                 },
+    { &WarnNoEffect,            "no-effect"             },
     { &WarnStructParam,         "struct-param"          },
     { &WarnUnknownPragma,       "unknown-pragma"        },
     { &WarnUnusedLabel,         "unused-label"          },

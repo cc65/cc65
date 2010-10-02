@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -60,11 +60,13 @@ extern unsigned WarningCount;
 /* Warning and error options */
 extern IntStack WarnEnable;             /* Enable warnings */
 extern IntStack WarningsAreErrors;      /* Treat warnings as errors */
-extern IntStack WarnStructParam;        /* Warn about structs passed by val */
-extern IntStack WarnUnusedLabel;        /* Warn about unused labels */
-extern IntStack WarnUnusedParam;        /* Warn about unused parameters */
-extern IntStack WarnUnusedVar;          /* Warn about unused variables */
-extern IntStack WarnUnknownPragma;      /* Warn about unknown #pragmas */
+                                        /* Warn about: */
+extern IntStack WarnNoEffect;           /* ... statements without an effect */
+extern IntStack WarnStructParam;        /* ... structs passed by val */
+extern IntStack WarnUnusedLabel;        /* ... unused labels */
+extern IntStack WarnUnusedParam;        /* ... unused parameters */
+extern IntStack WarnUnusedVar;          /* ... unused variables */
+extern IntStack WarnUnknownPragma;      /* ... unknown #pragmas */
 
 
 

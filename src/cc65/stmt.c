@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -653,7 +653,9 @@ int Statement (int* PendingToken)
              * void, emit a warning.
              */
             GetCodePos (&End);
-            if (CodeRangeIsEmpty (&Start, &End) && !IsTypeVoid (Expr.Type)) {
+            if (CodeRangeIsEmpty (&Start, &End) && 
+                !IsTypeVoid (Expr.Type)         &&
+                IS_Get (&WarnNoEffect)) {
                 Warning ("Statement has no effect");
             }
             CheckSemi (PendingToken);

@@ -238,7 +238,7 @@ static IntStack* GetWarning (StrBuf* B)
 
     /* Done */
     return S;
-}
+}                
 
 
 
@@ -490,7 +490,7 @@ static void WarnPragma (StrBuf* B)
     int    Push;
 
     /* A warning name must follow */
-    IntStack* S =GetWarning (B);
+    IntStack* S = GetWarning (B);
     if (S == 0) {
         return;
     }

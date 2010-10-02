@@ -471,6 +471,8 @@ Here is a description of all the command line options:
   <descrip>
   <tag><tt/error/</tag>
         Treat all warnings as errors.
+  <tag><tt/no-effect/</tag>
+        Warn about statements that don't have an effect.
   <tag><tt/unknown-pragma/</tag>
         Warn about known #pragmas.
   <tag><tt/unused-label/</tag>

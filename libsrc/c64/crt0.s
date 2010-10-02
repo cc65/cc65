@@ -10,6 +10,7 @@
         .import         RESTOR, BSOUT, CLRCH
 	.import	       	__INTERRUPTOR_COUNT__
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
+	.import		__STACKSIZE__			; Linker generated
 
         .include        "zeropage.inc"
 	.include     	"c64.inc"
@@ -71,9 +72,9 @@ L1:	lda	sp,x
        	tsx
        	stx    	spsave 		; Save the system stack ptr
 
-	lda    	#<(__RAM_START__ + __RAM_SIZE__)
+	lda    	#<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
 	sta	sp
-	lda	#>(__RAM_START__ + __RAM_SIZE__)
+	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
        	sta	sp+1   		; Set argument stack ptr
 
 ; If we have IRQ functions, chain our stub into the IRQ vector

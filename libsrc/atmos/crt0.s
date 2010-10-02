@@ -8,7 +8,8 @@
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 	.import		initlib, donelib
 	.import	     	callmain, zerobss
-       	.import	       	__RAM_START__, __RAM_SIZE__, __BSS_LOAD__
+       	.import	       	__RAM_START__, __RAM_SIZE__
+       	.import	       	__BSS_LOAD__, __STACKSIZE__
 
         .include        "zeropage.inc"
         .include        "atmos.inc"
@@ -60,9 +61,9 @@ L1:	lda	sp,x
        	tsx
        	stx    	spsave       	; save system stk ptr
 
-	lda    	#<(__RAM_START__ + __RAM_SIZE__)
+	lda    	#<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
 	sta	sp
-	lda	#>(__RAM_START__ + __RAM_SIZE__)
+	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
        	sta	sp+1   		; Set argument stack ptr
 
 ; Call module constructors

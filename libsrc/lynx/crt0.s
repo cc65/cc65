@@ -25,7 +25,7 @@
 	.import         _main
 	.import         __BSS_LOAD__
 	.import	       	__INTERRUPTOR_COUNT__
-	.import         __RAM_START__, __RAM_SIZE__
+	.import         __RAM_START__, __RAM_SIZE__, __STACKSIZE__
 
 	.include        "zeropage.inc"
         .include        "extzp.inc"
@@ -94,9 +94,9 @@ MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$2
 
 ; setup the stack
 
-	lda     #<(__RAM_START__ + __RAM_SIZE__)
+	lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
 	sta     sp
-	lda     #>(__RAM_START__ + __RAM_SIZE__)
+	lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
 	sta     sp+1
 
 ; Init Mickey

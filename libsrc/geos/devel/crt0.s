@@ -8,6 +8,7 @@
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
+	.import		__STACKSIZE__			; Linker generated
 	.import		initlib, donelib
 	.import		callmain
 	.import		zerobss
@@ -25,9 +26,9 @@
 
 ; Setup stack
 
-	lda    	#<(__RAM_START__ + __RAM_SIZE__)
+	lda    	#<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
 	sta	sp
-	lda	#>(__RAM_START__ + __RAM_SIZE__)
+	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
        	sta	sp+1   		; Set argument stack ptr
 
 ; Call module constructors

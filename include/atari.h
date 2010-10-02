@@ -46,6 +46,7 @@
 
 /* Character codes */
 #define CH_DELCHR	0xFE   /* delete char under the cursor */
+#define CH_ENTER	0x9B
 #define CH_ESC 	    	0x1B
 #define CH_CURS_UP  	28
 #define CH_CURS_DOWN 	29

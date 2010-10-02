@@ -9,6 +9,7 @@
         .import         initlib, donelib, copydata
         .import         zerobss
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
+	.import		__STACKSIZE__			; Linker generated
 
 	.include "zeropage.inc"
 	.include "supervision.inc"
@@ -30,9 +31,9 @@ reset:
 	; initialize data
 	jsr	copydata
 
-	lda	#>(__RAM_START__ + __RAM_SIZE__)
+	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
        	sta	sp+1   		; Set argument stack ptr
-       	stz	sp              ; #<(__RAM_START__ + __RAM_SIZE__)
+       	stz	sp              ; #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
 	jsr	initlib
 	jsr	_main
 _exit:	jsr     donelib

@@ -9,6 +9,8 @@
 	.import		callirq_y, initlib, donelib
 	.import	     	callmain, zerobss
 	.import	       	__INTERRUPTOR_COUNT__
+	.import         __RAM_START__, __RAM_SIZE__     ; Linker generated
+	.import         __STACKSIZE__                   ; Linker generated
 
         .include        "zeropage.inc"
 	.include	"plus4.inc"
@@ -65,9 +67,9 @@ L1:	lda	sp,x
        	tsx
        	stx    	spsave         	; save system stk ptr
 
-        lda     #<$FD00
+        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp
-        lda     #>$FD00
+        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp+1
 
 ; Setup the IRQ vector in the banked RAM and switch off the ROM

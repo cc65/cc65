@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -238,7 +238,7 @@ static IntStack* GetWarning (StrBuf* B)
 
     /* Done */
     return S;
-}                
+}
 
 
 
@@ -266,6 +266,8 @@ static PushPopResult ParsePushPop (StrBuf* B)
     StrBuf Ident      = AUTO_STRBUF_INITIALIZER;
     PushPopResult Res = PP_NONE;
 
+    /* Remember the current string index, so we can go back in case of errors */
+    unsigned Index = SB_GetIndex (B);
 
     /* Try to read an identifier */
     if (SB_GetSym (B, &Ident, 0)) {
@@ -282,14 +284,14 @@ static PushPopResult ParsePushPop (StrBuf* B)
 
             /* Skip the following comma */
             if (!GetComma (B)) {
+                /* Error already flagged by GetComma */
                 Res = PP_ERROR;
             }
 
         } else {
 
-            /* Unknown keyword */
-            Error ("Invalid pragma arguments");
-            Res = PP_ERROR;
+            /* Unknown keyword, roll back */
+            SB_SetIndex (B, Index);
         }
     }
 

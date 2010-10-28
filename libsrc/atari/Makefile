@@ -99,6 +99,7 @@ OBJS = 	_scrsize.o      \
 	oserrlist.o     \
 	oserror.o       \
 	ostype.o        \
+	posixdirent.o   \
 	randomize.o     \
 	read.o 	        \
 	revers.o        \

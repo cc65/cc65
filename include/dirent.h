@@ -73,7 +73,13 @@ struct dirent {
     }             d_mtime;
 };
 
-#else  /* __APPLE2__ or __APPLE2ENH__ */
+#elif defined(__ATARI__)
+
+struct dirent {
+    char d_name[13];  /* 8.3 + trailing 0 */
+};
+
+#else
 
 struct dirent {
     char d_name[1];

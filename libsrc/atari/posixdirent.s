@@ -41,7 +41,7 @@ _opendir:	sta	ptr1
 cioerr:		sty	__oserror
 		jmp	return0
 
-		.proc	_readdir
+.proc	_readdir
 		tax
 		lda	#GETREC
 		sta	ICCOM,x
@@ -90,24 +90,27 @@ cioerr:		sty	__oserror
 		rts
 		
 copychar:	lda	(ptr1),y	; src=y dest=tmp1
-		cmp	#' '
 		ldy	tmp1
+		cmp	#' '
 		beq	@break
 		sta	(ptr1),y
 		iny
 		sty	tmp1
 @break:		rts
-		.endproc
+.endproc
 
-		.proc	_closedir
+.proc	_closedir
 		tax
 		lda	#CLOSE
 		sta	ICCOM,x
 		jsr	CIOV
 		bmi	@cioerr
+		ldx	#0
+		stx	__oserror		; clear system specific error code
+		txa
 		rts
 @cioerr:	jmp	__do_oserror
-		.endproc
+.endproc
 
 		.rodata
 defdev:		.asciiz	"D:*.*"

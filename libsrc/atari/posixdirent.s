@@ -6,6 +6,10 @@
 		.import	  findfreeiocb, clriocb
 		.import	  __oserror, return0, __do_oserror
 		.importzp ptr1, tmp1
+.ifdef  DEFAULT_DEVICE
+        	.import __defdev
+.endif
+
 
 .proc	_opendir
 		sta	ptr1
@@ -16,19 +20,36 @@
 @iocbok:	stx	diriocb
 		jsr	clriocb
 		ldx	diriocb
+		ldy	#0		; '.' -> "D:*.*"
+		lda	(ptr1),y
+		cmp	#'.'
+		bne	@use_parm
+
+; "." was given as parameter, use default device/dir
+
+.ifdef DEFAULT_DEVICE
+		; construct a "Dn:*.*" like string from the default drive
+		lda	__defdev+1
+		sta	dddefdev+1	; copy drive number (overwrite 2nd 'D')
+		lda	#<dddefdev
+		sta	ICBAL,x
+		lda	#>dddefdev
+		sta	ICBAH,x
+		bne	@cont
+.else
 		lda	#<defdev
 		sta	ICBAL,x
 		lda	#>defdev
 		sta	ICBAH,x
-		ldy	#0		; '.' -> "D:*.*"
-		lda	(ptr1),y
-		cmp	#'.'
-		beq	@default
-		lda	ptr1
+		bne	@cont
+.endif
+
+@use_parm:	lda	ptr1
 		sta	ICBAL,x
 		lda	ptr1+1
 		sta	ICBAH,x
-@default:	lda	#OPEN
+
+@cont:		lda	#OPEN
 		sta	ICCOM,x
 		lda	#OPNIN|DIRECT
 		sta	ICAX1,x
@@ -127,7 +148,10 @@ copychar:	lda	(ptr1),y	; src=y dest=tmp1
 @cioerr:	jmp	__do_oserror
 .endproc
 
-		.rodata
+		.data
+.ifdef DEFAULT_DEVICE
+dddefdev:	.byte	"D"
+.endif
 defdev:		.asciiz	"D:*.*"
 
 		.bss

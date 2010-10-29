@@ -7,7 +7,8 @@
 		.import	  __oserror, return0, __do_oserror
 		.importzp ptr1, tmp1
 
-_opendir:	sta	ptr1
+.proc	_opendir
+		sta	ptr1
 		stx	ptr1+1
 		jsr	findfreeiocb
 		beq	@iocbok
@@ -38,6 +39,8 @@ _opendir:	sta	ptr1
 		tax
 		lda	diriocb
 		rts
+.endproc
+
 cioerr:		sty	__oserror
 		jmp	return0
 
@@ -73,24 +76,36 @@ cioerr:		sty	__oserror
 		bcs	@break
 		cmp	#' '
 		bne	@next
+
 @break:		lda	#'.'		; extension dot
 		sta	(ptr1),y
 		iny			; copy extension
 		sty	tmp1
 		ldy	#10
-		jsr	copychar
+		lda	(ptr1),y
+		cmp	#' '
+		bne	@hasext
+
+; no extension present: remove the trailing dot and be done
+		ldy	tmp1
+		dey
+		bne	@done
+
+@hasext:	jsr	copychar
 		ldy	#11
 		jsr	copychar
 		ldy	#12
 		jsr	copychar
-		lda	#0		; end of string
+
+@done:		lda	#0		; end of string
 		sta	(ptr1),y
 		lda	ptr1
 		ldx	ptr1+1
 		rts
-		
+
+
 copychar:	lda	(ptr1),y	; src=y dest=tmp1
-		ldy	tmp1
+ 		ldy	tmp1
 		cmp	#' '
 		beq	@break
 		sta	(ptr1),y
@@ -117,4 +132,4 @@ defdev:		.asciiz	"D:*.*"
 
 		.bss
 diriocb:	.res	1
-entry:		.res	128
+entry:		.res	DSCTSZ

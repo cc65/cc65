@@ -16,9 +16,9 @@
 
 	.include	"atari.inc"
 	.import		__dos_type
-	.export		__getdefdev		; get default device (e.g. "D1:")
+	.export		__getdefdev		; get default device
+	.export		__defdev		; this is the default device string (e.g. "D1:")
 .ifdef	DYNAMIC_DD
-	.export		__defdev
 	.constructor	__getdefdev,24
 .endif
 

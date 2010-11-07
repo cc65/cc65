@@ -53,7 +53,7 @@ all:	depend
 endif
 
 $(EXE):	$(OBJS) $(LIBS)
-	$(CC) $^ $(LDFLAGS) -o $@
+	$(CC) $(LDFLAGS) $^ -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 .PHONY:	chips

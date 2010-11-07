@@ -93,7 +93,7 @@ all:	depend
 endif
 
 $(EXE):	$(INCS) $(OBJS) $(LIBS)
-	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 inc:	$(INCS)

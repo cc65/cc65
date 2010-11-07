@@ -127,7 +127,7 @@ all:	depend
 endif
 
 $(EXE):	$(OBJS) $(LIBS)
-	$(CC) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -lm -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 .PHONY:	svnversion

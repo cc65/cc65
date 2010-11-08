@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2005,      Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2005-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -38,16 +38,24 @@
 
 
 
+/* common */
+#include "exprdefs.h"
+
+
+
 /*****************************************************************************/
 /*     	       	       	       	     Code     				     */
 /*****************************************************************************/
 
 
 
-long CfgIntExpr (void);
-/* Read an expression, make sure it's an int, and return its value */
+ExprNode* CfgExpr (void);
+/* Read an integer expression and return its value */
 
-long CfgCheckedIntExpr (long Min, long Max);
+long CfgConstExpr (void);
+/* Read an integer expression, make sure its constant and return its value */
+
+long CfgCheckedConstExpr (long Min, long Max);
 /* Read an expression, make sure it's an int and in range, then return its
  * value.
  */

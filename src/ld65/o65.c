@@ -53,6 +53,7 @@
 #include "fileio.h"
 #include "global.h"
 #include "lineinfo.h"
+#include "memarea.h"
 #include "o65.h"
 #include "spool.h"
 
@@ -175,7 +176,7 @@ struct ExprDesc {
     O65Desc*   	    D;			/* File format descriptor */
     long       	    Val;		/* The offset value */
     int	       	    TooComplex;	       	/* Expression too complex */
-    Memory*         MemRef;             /* Memory reference if any */
+    MemoryArea*     MemRef;             /* Memory reference if any */
     Segment*        SegRef;             /* Segment reference if any */
     Section*   	    SecRef;		/* Section reference if any */
     ExtSym*    	    ExtRef;		/* External reference if any */
@@ -244,7 +245,7 @@ static void CvtMemoryToSegment (ExprDesc* ED)
  */
 {
     /* Get the memory area from the expression */
-    Memory* M = ED->MemRef;
+    MemoryArea* M = ED->MemRef;
 
     /* Remember the "nearest" segment and its offset */
     Segment* Nearest   = 0;
@@ -1227,9 +1228,9 @@ static void O65SetupSegments (O65Desc* D, File* F)
     D->ZPCount   = 0;
 
     /* Walk over the memory list */
-    for (I = 0; I < CollCount (&F->MemList); ++I) {
+    for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
-        Memory* M = CollAtUnchecked (&F->MemList, I);
+        MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
 
         /* Walk through the segment list and count the segment types */
         unsigned J;
@@ -1257,9 +1258,9 @@ static void O65SetupSegments (O65Desc* D, File* F)
 
     /* Walk again through the list and setup the segment arrays */
     TextIdx = DataIdx = BssIdx = ZPIdx = 0;
-    for (I = 0; I < CollCount (&F->MemList); ++I) {
+    for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
-        Memory* M = CollAtUnchecked (&F->MemList, I);
+        MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
 
         /* Walk over the segment list and check the segment types */
         unsigned J;

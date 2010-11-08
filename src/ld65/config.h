@@ -52,28 +52,16 @@
 
 
 
+/* Forward for struct MemoryArea */
+struct MemoryArea;
+
 /* File list entry */
 typedef struct File File;
 struct File {
     unsigned            Name;           /* Name index of the file */
-    unsigned	 	Flags;
-    unsigned	 	Format;		/* Output format */
-    Collection          MemList;        /* List of memory areas in this file */
-};
-
-/* Memory list entry */
-typedef struct Memory Memory;
-struct Memory {
-    unsigned            Name;           /* Name index of the memory section */
-    unsigned   	       	Attr;	  	/* Which values are valid? */
-    unsigned 		Flags;	  	/* Set of bitmapped flags */
-    unsigned long   	Start;	  	/* Start address */
-    unsigned long      	Size; 	  	/* Length of memory section */
-    unsigned long      	FillLevel;	/* Actual fill level of segment */
-    unsigned char   	FillVal;  	/* Value used to fill rest of seg */
-    unsigned char       Relocatable;    /* Memory area is relocatable */
-    Collection          SegList;  	/* List of segments for this section */
-    File*    	    	F;    	  	/* File that contains the entry */
+    unsigned	    	Flags;
+    unsigned  	    	Format;		/* Output format */
+    Collection          MemoryAreas;    /* List of memory areas in this file */
 };
 
 /* Segment descriptor entry */
@@ -83,18 +71,12 @@ struct SegDesc {
     Segment*   	      	Seg; 	  	/* Pointer to segment structure */
     unsigned   	      	Attr;	  	/* Attributes for segment */
     unsigned   	      	Flags;	  	/* Set of bitmapped flags */
-    Memory*           	Load;  	       	/* Load memory section */
-    Memory*    	      	Run;	  	/* Run memory section */
+    struct MemoryArea*  Load;           /* Load memory section */
+    struct MemoryArea*  Run;            /* Run memory section */
     unsigned long      	Addr; 		/* Start address or offset into segment */
     unsigned char     	Align;	  	/* Run area alignment if given */
     unsigned char       AlignLoad;      /* Load area alignment if given */
 };
-
-/* Memory flags */
-#define MF_DEFINE      	0x0001	  	/* Define start and size */
-#define MF_FILL	       	0x0002	  	/* Fill segment */
-#define MF_RO	       	0x0004	  	/* Read only memory area */
-#define MF_OVERFLOW     0x0008          /* Memory area overflow */
 
 /* Segment flags */
 #define SF_RO  	      	0x0001	  	/* Read only segment */
@@ -119,6 +101,9 @@ struct SegDesc {
 
 void CfgRead (void);
 /* Read the configuration */
+
+void CfgProcess (void);
+/* Process the config file after reading in object files and libraries */
 
 unsigned CfgAssignSegments (void);
 /* Assign segments, define linker symbols where requested. The function will

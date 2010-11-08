@@ -126,15 +126,15 @@ static void ReadIndexEntry (void)
         O->Strings[I] = ReadStr (Lib);
     }
 
-    /* Exports */
-    O->ExportSize = ReadVar (Lib);
-    O->Exports    = xmalloc (O->ExportSize);
-    ReadData (Lib, O->Exports, O->ExportSize);
-
     /* Imports */
     O->ImportSize = ReadVar (Lib);
     O->Imports    = xmalloc (O->ImportSize);
     ReadData (Lib, O->Imports, O->ImportSize);
+
+    /* Exports */
+    O->ExportSize = ReadVar (Lib);
+    O->Exports    = xmalloc (O->ExportSize);
+    ReadData (Lib, O->Exports, O->ExportSize);
 }
 
 
@@ -197,13 +197,13 @@ static void WriteIndexEntry (ObjData* O)
         WriteStr (NewLib, O->Strings[I]);
     }
 
-    /* Exports */
-    WriteVar (NewLib, O->ExportSize);
-    WriteData (NewLib, O->Exports, O->ExportSize);
-
     /* Imports */
     WriteVar (NewLib, O->ImportSize);
     WriteData (NewLib, O->Imports, O->ImportSize);
+
+    /* Exports */
+    WriteVar (NewLib, O->ExportSize);
+    WriteData (NewLib, O->Exports, O->ExportSize);
 }
 
 

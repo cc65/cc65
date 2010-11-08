@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    expr.h				     */
+/*                                 memarea.h                                 */
 /*                                                                           */
-/*		   Expression evaluation for the ld65 linker		     */
+/*                Memory area definition for the ld65 linker                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2010,      Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,73 +33,68 @@
 
 
 
-#ifndef EXPR_H
-#define EXPR_H
+#ifndef MEMAREA_H
+#define MEMAREA_H
 
 
 
 /* common */
-#include "exprdefs.h"
-
-/* ld65 */
-#include "objdata.h"
-#include "exports.h"
-#include "config.h"
+#include "coll.h"
 
 
 
 /*****************************************************************************/
-/*     	      	     		     Code		     		     */
+/*     	       	    		     Data				     */
 /*****************************************************************************/
 
 
 
-ExprNode* NewExprNode (ObjData* O, unsigned char Op);
-/* Create a new expression node */
+/* Forwards for structures */
+struct ExprNode;
+struct File;
 
-void FreeExpr (ExprNode* Root);
-/* Free the expression tree, Root is pointing to. */
+/* Memory area entry */
+typedef struct MemoryArea MemoryArea;
+struct MemoryArea {
+    unsigned            Name;           /* Name index of the memory section */
+    unsigned   	       	Attr;	  	/* Which values are valid? */
+    unsigned   	 	Flags;	  	/* Set of bitmapped flags */
+    struct ExprNode*    StartExpr;      /* Expression for start address */
+    unsigned long      	Start;          /* Start address */
+    struct ExprNode*    SizeExpr;       /* Expression for size */
+    unsigned long      	Size;           /* Length of memory section */
+    unsigned long      	FillLevel;     	/* Actual fill level of segment */
+    unsigned char   	FillVal;  	/* Value used to fill rest of seg */
+    unsigned char       Relocatable;    /* Memory area is relocatable */
+    Collection          SegList;  	/* List of segments for this area */
+    struct File*       	F;    	  	/* Output file for this area */
+};
 
-int IsConstExpr (ExprNode* Root);
-/* Return true if the given expression is a constant expression, that is, one
- * with no references to external symbols.
- */
-
-Import* GetExprImport (ExprNode* Expr);
-/* Get the import data structure for a symbol expression node */
-
-Export* GetExprExport (ExprNode* Expr);
-/* Get the exported symbol for a symbol expression node */
-
-Section* GetExprSection (ExprNode* Expr);
-/* Get the segment for a section expression node */
-
-long GetExprVal (ExprNode* Expr);
-/* Get the value of a constant expression */
-
-ExprNode* LiteralExpr (long Val, ObjData* O);
-/* Return an expression tree that encodes the given literal value */
-
-ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O);
-/* Return an expression tree that encodes an offset into the memory area */
-
-ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O);
-/* Return an expression tree that encodes an offset into a segment */
-
-ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O);
-/* Return an expression tree that encodes an offset into a section */
-
-ExprNode* ReadExpr (FILE* F, ObjData* O);
-/* Read an expression from the given file */
-
-int EqualExpr (ExprNode* E1, ExprNode* E2);
-/* Check if two expressions are identical. */
+/* Memory flags */
+#define MF_DEFINE      	0x0001	  	/* Define start and size */
+#define MF_FILL	       	0x0002	  	/* Fill segment */
+#define MF_RO	       	0x0004	  	/* Read only memory area */
+#define MF_OVERFLOW     0x0008          /* Memory area overflow */
+#define MF_PLACED       0x0010          /* Memory area was placed */
 
 
 
-/* End of expr.h */
+/*****************************************************************************/
+/*     	       	       	       	     Code     				     */
+/*****************************************************************************/
+
+
+
+MemoryArea* NewMemoryArea (unsigned Name);
+/* Create a new memory area and insert it into the list */
+
+
+
+/* End of memarea.h */
 
 #endif
+
+
 
 
 

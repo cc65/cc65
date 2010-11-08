@@ -52,6 +52,7 @@
 #include "expr.h"
 #include "fileio.h"
 #include "global.h"
+#include "memarea.h"
 #include "objdata.h"
 #include "spool.h"
 
@@ -176,14 +177,14 @@ Import* ReadImport (FILE* F, ObjData* Obj)
 
 
 
-Import* GenImport (const char* Name, unsigned char AddrSize)
+Import* GenImport (unsigned Name, unsigned char AddrSize)
 /* Generate a new import with the given name and address size and return it */
 {
     /* Create a new import */
     Import* I = NewImport (AddrSize, 0);
 
     /* Read the name */
-    I->Name = GetStringId (Name);
+    I->Name = Name;
 
     /* Check the address size */
     if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
@@ -211,8 +212,8 @@ Import* GenImport (const char* Name, unsigned char AddrSize)
 
 
 
-void InsertImport (Import* I)
-/* Insert an import into the table */
+Import* InsertImport (Import* I)
+/* Insert an import into the table, return I */
 {
     Export* E;
 
@@ -261,6 +262,9 @@ void InsertImport (Import* I)
 
     /* Mark the import so we know it's in the list */
     I->Flags |= IMP_INLIST;
+
+    /* Return the import to allow shorter code */
+    return I;
 }
 
 
@@ -463,7 +467,7 @@ Export* CreateConstExport (unsigned Name, long Value)
 
 
 
-Export* CreateMemoryExport (unsigned Name, Memory* Mem, unsigned long Offs)
+Export* CreateMemoryExport (unsigned Name, MemoryArea* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
     /* Create a new export */

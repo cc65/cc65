@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -46,8 +46,9 @@
 #include "filepos.h"
 
 /* ld65 */
-#include "objdata.h"
 #include "config.h"
+#include "memarea.h"
+#include "objdata.h"
 
 
 
@@ -114,11 +115,11 @@ void FreeImport (Import* I);
 Import* ReadImport (FILE* F, ObjData* Obj);
 /* Read an import from a file and insert it into the table */
 
-Import* GenImport (const char* Name, unsigned char AddrSize);
+Import* GenImport (unsigned Name, unsigned char AddrSize);
 /* Generate a new import with the given name and address size and return it */
 
-void InsertImport (Import* I);
-/* Insert an import into the table */
+Import* InsertImport (Import* I);
+/* Insert an import into the table, return I */
 
 void FreeExport (Export* E);
 /* Free an export. NOTE: This won't remove the export from the exports table,
@@ -135,7 +136,7 @@ void InsertExport (Export* E);
 Export* CreateConstExport (unsigned Name, long Value);
 /* Create an export for a literal date */
 
-Export* CreateMemoryExport (unsigned Name, Memory* Mem, unsigned long Offs);
+Export* CreateMemoryExport (unsigned Name, MemoryArea* Mem, unsigned long Offs);
 /* Create an relative export for a memory area offset */
 
 Export* CreateSegmentExport (unsigned Name, Segment* Seg, unsigned long Offs);

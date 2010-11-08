@@ -302,6 +302,9 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
     } else {
         CfgSetName (PathName);
     }
+
+    /* Read the config */
+    CfgRead ();
 }
 
 
@@ -356,7 +359,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
         /* Use default address size (which for now is always absolute
          * addressing)
          */
-        InsertImport (GenImport (Arg, ADDR_SIZE_ABS));
+        InsertImport (GenImport (GetStringId (Arg), ADDR_SIZE_ABS));
 
     } else {
 
@@ -375,7 +378,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
         A[ColPos - Arg] = '\0';
 
         /* Generate the import */
-        InsertImport (GenImport (A, AddrSize));
+        InsertImport (GenImport (GetStringId (A), AddrSize));
 
         /* Delete the copy of the argument */
         xfree (A);
@@ -481,6 +484,9 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     /* Set the target data */
     DefaultBinFmt = D->BinFmt;
     CfgSetBuf (D->Cfg);
+
+    /* Read the target config */
+    CfgRead ();
 }
 
 
@@ -643,11 +649,11 @@ int main (int argc, char* argv [])
     /* Check if we have open library groups */
     LibCheckGroup ();
 
-    /* Read the config file */
-    CfgRead ();
-
     /* Create the condes tables if requested */
     ConDesCreate ();
+
+    /* Process data from the config file */
+    CfgProcess ();
 
     /* Assign start addresses for the segments, define linker symbols. The
      * function will return the number of memory area overflows (zero on

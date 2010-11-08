@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1999-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,6 +50,7 @@
 #include "global.h"
 #include "fileio.h"
 #include "lineinfo.h"
+#include "memarea.h"
 #include "segments.h"
 #include "spool.h"
 
@@ -129,7 +130,7 @@ static void PrintNumVal (const char* Name, unsigned long V)
 
 
 
-static void BinWriteMem (BinDesc* D, Memory* M)
+static void BinWriteMem (BinDesc* D, MemoryArea* M)
 /* Write the segments of one memory area to a file */
 {
     /* Get the start address of this memory area */
@@ -294,9 +295,9 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
     /* Dump all memory areas */
-    for (I = 0; I < CollCount (&F->MemList); ++I) {
+    for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
-        Memory* M = CollAtUnchecked (&F->MemList, I);
+        MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
 	Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));
 	BinWriteMem (D, M);
     }

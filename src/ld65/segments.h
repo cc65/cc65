@@ -70,6 +70,7 @@ struct Segment {
     unsigned char     	AddrSize;      	/* Address size of segment */
     unsigned char       ReadOnly;       /* True for readonly segments (config) */
     unsigned char       Relocatable;    /* True if the segment is relocatable */
+    unsigned char       Placed;         /* Did we place this segment already? */ 
     unsigned char      	Dumped;		/* Did we dump this segment? */
 };
 

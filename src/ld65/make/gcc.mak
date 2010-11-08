@@ -51,6 +51,7 @@ OBJS = 	asserts.o       \
 	lineinfo.o	\
 	main.o	       	\
 	mapfile.o	\
+        memarea.o       \
 	o65.o		\
 	objdata.o	\
 	objfile.o	\

@@ -82,6 +82,7 @@ OBJS =	asserts.obj     \
 	lineinfo.obj	\
 	main.obj	\
 	mapfile.obj	\
+        memarea.obj     \
 	o65.obj		\
 	objdata.obj	\
 	objfile.obj	\

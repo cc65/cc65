@@ -103,6 +103,7 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->AddrSize    = AddrSize;
     S->ReadOnly    = 0;
     S->Relocatable = 0;
+    S->Placed      = 0;
     S->Dumped      = 0;
 
     /* Insert the segment into the segment list and assign the segment id */
@@ -487,7 +488,7 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 /* Write the data from the given segment to a file. For expressions, F is
  * called (see description of SegWriteFunc above).
  */
-{   
+{
     Section*      Sec;
     int           Sign;
     unsigned long Offs = 0;

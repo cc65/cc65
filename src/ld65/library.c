@@ -211,13 +211,13 @@ static ObjData* ReadIndexEntry (Library* L)
     /* Read the string pool */
     ObjReadStrPool (L->F, FileGetPos (L->F), O);
 
-    /* Skip the export size, then read the exports */
-    (void) ReadVar (L->F);
-    ObjReadExports (L->F, FileGetPos (L->F), O);
-
     /* Skip the import size, then read the imports */
     (void) ReadVar (L->F);
     ObjReadImports (L->F, FileGetPos (L->F), O);
+
+    /* Skip the export size, then read the exports */
+    (void) ReadVar (L->F);
+    ObjReadExports (L->F, FileGetPos (L->F), O);
 
     /* Done */
     return O;

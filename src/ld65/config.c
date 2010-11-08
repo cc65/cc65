@@ -53,7 +53,9 @@
 #include "config.h"
 #include "error.h"
 #include "exports.h"
+#include "expr.h"
 #include "global.h"
+#include "memarea.h"
 #include "o65.h"
 #include "objdata.h"
 #include "scanner.h"
@@ -84,7 +86,7 @@ static enum {
 static Collection       FileList = STATIC_COLLECTION_INITIALIZER;
 
 /* Memory list */
-static Collection       MemoryList = STATIC_COLLECTION_INITIALIZER;
+static Collection       MemoryAreas = STATIC_COLLECTION_INITIALIZER;
 
 /* Memory attributes */
 #define MA_START       	0x0001
@@ -94,8 +96,6 @@ static Collection       MemoryList = STATIC_COLLECTION_INITIALIZER;
 #define MA_DEFINE      	0x0010
 #define MA_FILL	       	0x0020
 #define MA_FILLVAL     	0x0040
-
-
 
 /* Segment list */
 static Collection       SegDescList = STATIC_COLLECTION_INITIALIZER;
@@ -111,7 +111,30 @@ static Collection       SegDescList = STATIC_COLLECTION_INITIALIZER;
 #define SA_START	0x0080
 #define SA_OPTIONAL     0x0100
 
+/* Symbol structure. It is used for o65 imports and exports, but also for
+ * symbols from the SYMBOLS sections (symbols defined in the config file or
+ * forced imports).
+ */
+typedef struct Symbol Symbol;
+struct Symbol {
+    const char* CfgName;        /* Config file name */
+    unsigned    CfgLine;        /* Config file position */
+    unsigned    CfgCol;
+    unsigned    Name;           /* Symbol name */
+    unsigned    Flags;          /* Symbol flags */
+    long        Val;            /* Symbol value if any */
+};
 
+/* Collections with symbols */
+static Collection       O65Imports = STATIC_COLLECTION_INITIALIZER;
+static Collection       O65Exports = STATIC_COLLECTION_INITIALIZER;
+static Collection       Symbols    = STATIC_COLLECTION_INITIALIZER;
+
+/* Symbol flags */
+#define SYM_NONE        0x00    /* No special meaning */
+#define SYM_DEF         0x01    /* Symbol defined in the config file */
+#define SYM_WEAK        0x02    /* Defined symbol is weak */
+#define SYM_IMPORT      0x04    /* A forced import */
 
 /* Descriptor holding information about the binary formats */
 static BinDesc*	BinFmtDesc	= 0;
@@ -164,21 +187,21 @@ static File* GetFile (unsigned Name)
 
 
 
-static void FileInsert (File* F, Memory* M)
+static void FileInsert (File* F, MemoryArea* M)
 /* Insert the memory area into the files list */
 {
     M->F = F;
-    CollAppend (&F->MemList, M);
+    CollAppend (&F->MemoryAreas, M);
 }
 
 
 
-static Memory* CfgFindMemory (unsigned Name)
+static MemoryArea* CfgFindMemory (unsigned Name)
 /* Find the memory are with the given name. Return NULL if not found */
 {
     unsigned I;
-    for (I = 0; I < CollCount (&MemoryList); ++I) {
-        Memory* M = CollAtUnchecked (&MemoryList, I);
+    for (I = 0; I < CollCount (&MemoryAreas); ++I) {
+        MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
        	if (M->Name == Name) {
        	    return M;
        	}
@@ -188,10 +211,10 @@ static Memory* CfgFindMemory (unsigned Name)
 
 
 
-static Memory* CfgGetMemory (unsigned Name)
+static MemoryArea* CfgGetMemory (unsigned Name)
 /* Find the memory are with the given name. Print an error on an invalid name */
 {
-    Memory* M = CfgFindMemory (Name);
+    MemoryArea* M = CfgFindMemory (Name);
     if (M == 0) {
  	CfgError ("Invalid memory area `%s'", GetString (Name));
     }
@@ -218,16 +241,7 @@ static SegDesc* CfgFindSegDesc (unsigned Name)
 
 
 
-static void SegDescInsert (SegDesc* S)
-/* Insert a segment descriptor into the list of segment descriptors */
-{
-    /* Insert the struct into the list */
-    CollAppend (&SegDescList, S);
-}
-
-
-
-static void MemoryInsert (Memory* M, SegDesc* S)
+static void MemoryInsert (MemoryArea* M, SegDesc* S)
 /* Insert the segment descriptor into the memory area list */
 {
     /* Insert the segment into the segment list of the memory area */
@@ -242,6 +256,39 @@ static void MemoryInsert (Memory* M, SegDesc* S)
 
 
 
+static Symbol* NewSymbol (unsigned Name, unsigned Flags, long Val)
+/* Create a new Symbol structure with the given name name and flags. The
+ * current config file position is recorded in the returned struct.
+ */
+{
+    /* Allocate memory */
+    Symbol* Sym = xmalloc (sizeof (Symbol));
+
+    /* Initialize the fields */
+    Sym->CfgName = CfgGetName ();
+    Sym->CfgLine = CfgErrorLine;
+    Sym->CfgCol  = CfgErrorCol;
+    Sym->Name    = Name;
+    Sym->Flags   = Flags;
+    Sym->Val     = Val;
+
+    /* Return the initialized struct */
+    return Sym;
+}
+
+
+
+static Symbol* NewO65Symbol (void)
+/* Create a new Symbol structure with the name in the current CfgSVal variable
+ * ready for use as an o65 symbol. The current config file position is recorded
+ * in the returned struct.
+ */
+{
+    return NewSymbol (GetStrBufId (&CfgSVal), SYM_NONE, 0);
+}
+
+
+
 static File* NewFile (unsigned Name)
 /* Create a new file descriptor and insert it into the list */
 {
@@ -252,7 +299,7 @@ static File* NewFile (unsigned Name)
     F->Name    = Name;
     F->Flags   = 0;
     F->Format  = BINFMT_DEFAULT;
-    InitCollection (&F->MemList);
+    InitCollection (&F->MemoryAreas);
 
     /* Insert the struct into the list */
     CollAppend (&FileList, F);
@@ -263,32 +310,20 @@ static File* NewFile (unsigned Name)
 
 
 
-static Memory* NewMemory (unsigned Name)
-/* Create a new memory section and insert it into the list */
+static MemoryArea* CreateMemoryArea (unsigned Name)
+/* Create a new memory area and insert it into the list */
 {
     /* Check for duplicate names */
-    Memory* M =	CfgFindMemory (Name);
+    MemoryArea* M = CfgFindMemory (Name);
     if (M) {
 	CfgError ("Memory area `%s' defined twice", GetString (Name));
     }
 
-    /* Allocate memory */
-    M = xmalloc (sizeof (Memory));
+    /* Create a new memory area */
+    M = NewMemoryArea (Name);
 
-    /* Initialize the fields */
-    M->Name        = Name;
-    M->Attr        = 0;
-    M->Flags       = 0;
-    M->Start       = 0;
-    M->Size        = 0;
-    M->FillLevel   = 0;
-    M->FillVal     = 0;
-    M->Relocatable = 0;
-    InitCollection (&M->SegList);
-    M->F           = 0;
-
-    /* Insert the struct into the list */
-    CollAppend (&MemoryList, M);
+    /* Insert the struct into the list ... */
+    CollAppend (&MemoryAreas, M);
 
     /* ...and return it */
     return M;
@@ -297,9 +332,8 @@ static Memory* NewMemory (unsigned Name)
 
 
 static SegDesc* NewSegDesc (unsigned Name)
-/* Create a segment descriptor */
+/* Create a segment descriptor and insert it into the list */
 {
-    Segment* Seg;
 
     /* Check for duplicate names */
     SegDesc* S = CfgFindSegDesc (Name);
@@ -307,20 +341,18 @@ static SegDesc* NewSegDesc (unsigned Name)
 	CfgError ("Segment `%s' defined twice", GetString (Name));
     }
 
-    /* Search for the actual segment in the input files. The function may
-     * return NULL (no such segment), this is checked later.
-     */
-    Seg = SegFind (Name);
-
     /* Allocate memory */
     S = xmalloc (sizeof (SegDesc));
 
     /* Initialize the fields */
     S->Name    = Name;
-    S->Seg     = Seg;
+    S->Seg     = 0;
     S->Attr    = 0;
     S->Flags   = 0;
     S->Align   = 0;
+
+    /* Insert the struct into the list ... */
+    CollAppend (&SegDescList, S);
 
     /* ...and return it */
     return S;
@@ -337,7 +369,7 @@ static void FreeSegDesc (SegDesc* S)
 
 
 /*****************************************************************************/
-/*     	       	       	      	     Code     				     */
+/*                            Config file parsing                            */
 /*****************************************************************************/
 
 
@@ -385,7 +417,7 @@ static void ParseMemory (void)
     while (CfgTok == CFGTOK_IDENT) {
 
 	/* Create a new entry on the heap */
-       	Memory* M = NewMemory (GetStrBufId (&CfgSVal));
+       	MemoryArea* M = CreateMemoryArea (GetStrBufId (&CfgSVal));
 
 	/* Skip the name and the following colon */
 	CfgNextTok ();
@@ -408,13 +440,13 @@ static void ParseMemory (void)
 
 		case CFGTOK_START:
 		    FlagAttr (&M->Attr, MA_START, "START");
-                    M->Start = CfgIntExpr ();
+                    M->StartExpr = CfgExpr ();
 		    break;
 
 	      	case CFGTOK_SIZE:
 	     	    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
-	      	    M->Size = CfgIntExpr ();
-		    break;
+	      	    M->SizeExpr = CfgExpr ();
+	    	    break;
 
 		case CFGTOK_TYPE:
 		    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
@@ -455,7 +487,7 @@ static void ParseMemory (void)
 
 	      	case CFGTOK_FILLVAL:
 		    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
-	      	    M->FillVal = (unsigned char) CfgCheckedIntExpr (0, 0xFF);
+	      	    M->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
 		    break;
 
 	     	default:
@@ -640,7 +672,7 @@ static void ParseSegments (void)
 
 	        case CFGTOK_ALIGN:
 	    	    FlagAttr (&S->Attr, SA_ALIGN, "ALIGN");
-	    	    Val = CfgCheckedIntExpr (1, 0x10000);
+	    	    Val = CfgCheckedConstExpr (1, 0x10000);
 	    	    S->Align = BitFind (Val);
 	    	    if ((0x01L << S->Align) != Val) {
 	    	     	CfgError ("Alignment must be a power of 2");
@@ -650,7 +682,7 @@ static void ParseSegments (void)
 
                 case CFGTOK_ALIGN_LOAD:
 	    	    FlagAttr (&S->Attr, SA_ALIGN_LOAD, "ALIGN_LOAD");
-	    	    Val = CfgCheckedIntExpr (1, 0x10000);
+	    	    Val = CfgCheckedConstExpr (1, 0x10000);
        	       	    S->AlignLoad = BitFind (Val);
 	    	    if ((0x01L << S->AlignLoad) != Val) {
 	    	     	CfgError ("Alignment must be a power of 2");
@@ -676,7 +708,7 @@ static void ParseSegments (void)
 
 	        case CFGTOK_OFFSET:
 	    	    FlagAttr (&S->Attr, SA_OFFSET, "OFFSET");
-	    	    S->Addr   = CfgCheckedIntExpr (1, 0x1000000);
+	    	    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
 	    	    S->Flags |= SF_OFFSET;
 	    	    break;
 
@@ -697,7 +729,7 @@ static void ParseSegments (void)
 
 	        case CFGTOK_START:
 	    	    FlagAttr (&S->Attr, SA_START, "START");
-	    	    S->Addr   = CfgCheckedIntExpr (1, 0x1000000);
+	    	    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
 	    	    S->Flags |= SF_START;
 	    	    break;
 
@@ -730,15 +762,6 @@ static void ParseSegments (void)
 	if ((S->Attr & SA_RUN) == 0) {
 	    S->Attr |= SA_RUN;
 	    S->Run = S->Load;
-	}
-
-	/* If the segment is marked as BSS style, and if the segment exists
-         * in any of the object file, check that there's no initialized data
-         * in the segment.
-	 */
-	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
-	    Warning ("%s(%u): Segment with type `bss' contains initialized data",
-	    	     CfgGetName (), CfgErrorLine);
 	}
 
         /* An attribute of ALIGN_LOAD doesn't make sense if there are no
@@ -774,29 +797,6 @@ static void ParseSegments (void)
       	    	((S->Flags & SF_START)  != 0);
       	if (Count > 1) {
        	    CfgError ("Only one of ALIGN, START, OFFSET may be used");
-      	}
-
-      	/* If this segment does exist in any of the object files, insert the
-      	 * descriptor into the list of segment descriptors. Otherwise print a
-         * warning and discard it, because the segment pointer in the
-         * descriptor is invalid.
-      	 */
-      	if (S->Seg != 0) {
-	    /* Insert the descriptor into the list of all descriptors */
-	    SegDescInsert (S);
-      	    /* Insert the segment into the memory area list */
-      	    MemoryInsert (S->Run, S);
-      	    if (S->Load != S->Run) {
-      	    	/* We have separate RUN and LOAD areas */
-      	    	MemoryInsert (S->Load, S);
-      	    }
-      	} else {
-            /* Print a warning if the segment is not optional */
-            if ((S->Flags & SF_OPTIONAL) == 0) {
-                CfgWarning ("Segment `%s' does not exist", GetString (S->Name));
-            }
-      	    /* Discard the descriptor */
-      	    FreeSegDesc (S);
       	}
 
 	/* Skip the semicolon */
@@ -845,7 +845,6 @@ static void ParseO65 (void)
     unsigned AttrFlags = atNone;
 
     /* Remember the attributes read */
-    unsigned CfgSValId;
     unsigned OS = 0;            /* Initialize to keep gcc happy */
     unsigned Version = 0;
 
@@ -869,23 +868,8 @@ static void ParseO65 (void)
                 AttrFlags |= atExport;
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
-                /* Convert the string into a string index */
-                CfgSValId = GetStrBufId (&CfgSVal);
-	        /* Check if the export symbol is also defined as an import. */
-	       	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
-		    CfgError ("Exported symbol `%s' cannot be an import",
-                              SB_GetConstBuf (&CfgSVal));
-		}
-      		/* Check if we have this symbol defined already. The entry
-      	     	 * routine will check this also, but we get a more verbose
-      		 * error message when checking it here.
-      		 */
-      	 	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
-      	  	    CfgError ("Duplicate exported symbol: `%s'",
-                              SB_GetConstBuf (&CfgSVal));
-      	 	}
-		/* Insert the symbol into the table */
-	  	O65SetExport (O65FmtDesc, CfgSValId);
+                /* Remember it as an export for later */
+                CollAppend (&O65Exports, NewO65Symbol ());
                 /* Eat the identifier token */
                 CfgNextTok ();
 	    	break;
@@ -895,23 +879,8 @@ static void ParseO65 (void)
                 AttrFlags |= atImport;
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
-                /* Convert the string into a string index */
-                CfgSValId = GetStrBufId (&CfgSVal);
-	        /* Check if the imported symbol is also defined as an export. */
-	       	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
-		    CfgError ("Imported symbol `%s' cannot be an export",
-                              SB_GetConstBuf (&CfgSVal));
-		}
-      	    	/* Check if we have this symbol defined already. The entry
-      	    	 * routine will check this also, but we get a more verbose
-      	    	 * error message when checking it here.
-      	    	 */
-      	    	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
-      	    	    CfgError ("Duplicate imported symbol: `%s'",
-                              SB_GetConstBuf (&CfgSVal));
-      	    	}
-	    	/* Insert the symbol into the table */
-	    	O65SetImport (O65FmtDesc, CfgSValId);
+                /* Remember it as an import for later */
+                CollAppend (&O65Imports, NewO65Symbol ());
                 /* Eat the identifier token */
                 CfgNextTok ();
 	    	break;
@@ -919,7 +888,7 @@ static void ParseO65 (void)
 	    case CFGTOK_TYPE:
 		/* Cannot have this attribute twice */
 		FlagAttr (&AttrFlags, atType, "TYPE");
-		/* Get the type of the executable */
+	    	/* Get the type of the executable */
 		CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
 		switch (CfgTok) {
 
@@ -964,14 +933,14 @@ static void ParseO65 (void)
                 /* Cannot have this attribute twice */
                 FlagAttr (&AttrFlags, atID, "ID");
                 /* We're expecting a number in the 0..$FFFF range*/
-                ModuleId = (unsigned) CfgCheckedIntExpr (0, 0xFFFF);
+                ModuleId = (unsigned) CfgCheckedConstExpr (0, 0xFFFF);
                 break;
 
             case CFGTOK_VERSION:
                 /* Cannot have this attribute twice */
                 FlagAttr (&AttrFlags, atVersion, "VERSION");
                 /* We're expecting a number in byte range */
-                Version = (unsigned) CfgCheckedIntExpr (0, 0xFF);
+                Version = (unsigned) CfgCheckedConstExpr (0, 0xFF);
                 break;
 
 	    default:
@@ -1237,7 +1206,7 @@ static void ParseStartAddress (void)
 	  	/* Don't allow this twice */
 		FlagAttr (&AttrFlags, atDefault, "DEFAULT");
 	      	/* We expect a numeric expression */
-                DefStartAddr = CfgCheckedIntExpr (0, 0xFFFFFF);
+                DefStartAddr = CfgCheckedConstExpr (0, 0xFFFFFF);
 	    	break;
 
 	    default:
@@ -1322,8 +1291,7 @@ static void ParseSymbols (void)
     while (CfgTok == CFGTOK_IDENT) {
 
 	long Val = 0L;
-        int  Weak = 0;
-        Export* E;
+        unsigned Flags = SYM_NONE;
 
 	/* Remember the name */
 	unsigned Name = GetStrBufId (&CfgSVal);
@@ -1343,13 +1311,16 @@ static void ParseSymbols (void)
             /* Make sure the next token is an integer expression, read and
              * skip it.
              */
-            Val = CfgIntExpr ();
+            Val = CfgConstExpr ();
+
+            /* This is a defined symbol */
+            Flags = SYM_DEF;
 
         } else {
 
             /* Bitmask to remember the attributes we got already */
             enum {
-                atNone	     	= 0x0000,
+                atNone	      	= 0x0000,
                 atValue         = 0x0001,
                 atWeak          = 0x0002
             };
@@ -1380,14 +1351,18 @@ static void ParseSymbols (void)
                         /* Don't allow this twice */
                         FlagAttr (&AttrFlags, atValue, "VALUE");
                         /* We expect a numeric expression */
-                        Val = CfgIntExpr ();
+                        Val = CfgConstExpr ();
+                        /* Symbol is defined */
+                        Flags |= SYM_DEF;
                         break;
 
                     case CFGTOK_WEAK:
                         /* Don't allow this twice */
                         FlagAttr (&AttrFlags, atWeak, "WEAK");
                         CfgBoolToken ();
-                        Weak = (CfgTok == CFGTOK_TRUE);
+                        if (CfgTok == CFGTOK_TRUE) {
+                            Flags |= SYM_WEAK;
+                        }
                         CfgNextTok ();
                         break;
 
@@ -1406,26 +1381,10 @@ static void ParseSymbols (void)
 
             /* Check if we have all mandatory attributes */
             AttrCheck (AttrFlags, atValue, "VALUE");
-
-            /* Weak is optional, the default are non weak symbols */
-            if ((AttrFlags & atWeak) == 0) {
-                Weak = 0;
-            }
-
         }
 
-        /* Check if the symbol is already defined */
-        if ((E = FindExport (Name)) != 0 && !IsUnresolvedExport (E)) {
-            /* If the symbol is not marked as weak, this is an error.
-             * Otherwise ignore the symbol from the config.
-             */
-            if (!Weak) {
-                CfgError ("Symbol `%s' is already defined", GetString (Name));
-            }
-        } else {
-            /* The symbol is undefined, generate an export */
-            CreateConstExport (Name, Val);
-        }
+        /* Remember the symbol for later */
+        CollAppend (&Symbols, NewSymbol (Name, Flags, Val));
 
     	/* Skip the semicolon */
     	CfgConsumeSemi ();
@@ -1521,6 +1480,220 @@ void CfgRead (void)
 
 
 
+/*****************************************************************************/
+/*                          Config file processing                           */
+/*****************************************************************************/
+
+
+
+static void ProcessMemory (void)
+/* Process the MEMORY section */
+{
+    /* Walk over the list with the memory areas */
+    unsigned I;
+    for (I = 0; I < CollCount (&MemoryAreas); ++I) {
+
+        /* Get the next memory area */
+        MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
+
+        /* Remember if this is a relocatable memory area */
+        M->Relocatable = RelocatableBinFmt (M->F->Format);
+
+        /* Resolve the expressions */
+        if (!IsConstExpr (M->StartExpr)) {
+            Error ("Start address of memory area `%s' is not constant",
+                   GetString (M->Name));
+        }
+        M->Start = GetExprVal (M->StartExpr);
+
+        if (!IsConstExpr (M->SizeExpr)) {
+            Error ("Size of memory area `%s' is not constant",
+                   GetString (M->Name));
+        }
+        M->Size = GetExprVal (M->SizeExpr);
+
+        /* Mark the memory area as placed */
+        M->Flags |= MF_PLACED;
+    }
+}
+
+
+
+static void ProcessSegments (void)
+/* Process the SEGMENTS section */
+{
+    unsigned I;
+
+    /* Walk over the list of segment descriptors */
+    I = 0;
+    while (I < CollCount (&SegDescList)) {
+
+        /* Get the next segment descriptor */
+	SegDesc* S = CollAtUnchecked (&SegDescList, I);
+
+        /* Search for the actual segment in the input files. The function may
+         * return NULL (no such segment), this is checked later.
+         */
+        S->Seg = SegFind (S->Name);
+
+	/* If the segment is marked as BSS style, and if the segment exists
+         * in any of the object file, check that there's no initialized data
+         * in the segment.
+	 */
+	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
+       	    Warning ("Segment `%s' with type `bss' contains initialized data",
+	    	     GetString (S->Name));
+	}
+
+      	/* If this segment does exist in any of the object files, insert the
+       	 * segment into the load/run memory areas. Otherwise print a warning
+         * and discard it, because the segment pointer in the descriptor is
+         * invalid.
+      	 */
+      	if (S->Seg != 0) {
+
+      	    /* Insert the segment into the memory area list */
+      	    MemoryInsert (S->Run, S);
+      	    if (S->Load != S->Run) {
+      	    	/* We have separate RUN and LOAD areas */
+      	    	MemoryInsert (S->Load, S);
+      	    }
+
+            /* Process the next segment descriptor in the next run */
+            ++I;
+
+      	} else {
+
+            /* Print a warning if the segment is not optional */
+            if ((S->Flags & SF_OPTIONAL) == 0) {
+                CfgWarning ("Segment `%s' does not exist", GetString (S->Name));
+            }
+
+      	    /* Discard the descriptor and remove it from the collection */
+      	    FreeSegDesc (S);
+            CollDelete (&SegDescList, I);
+      	}
+    }
+}
+
+
+
+static void ProcessO65 (void)
+/* Process the o65 format section */
+{
+    unsigned I;
+
+    /* Walk over the imports, check and add them to the o65 data */
+    for (I = 0; I < CollCount (&O65Imports); ++I) {
+
+        /* Get the import */
+        Symbol* Sym = CollAtUnchecked (&O65Imports, I);
+
+        /* Check if we have this symbol defined already. The entry
+         * routine will check this also, but we get a more verbose
+         * error message when checking it here.
+         */
+        if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
+            Error ("%s(%u): Duplicate imported o65 symbol: `%s'",
+                   Sym->CfgName, Sym->CfgLine, GetString (Sym->Name));
+        }
+
+        /* Insert the symbol into the table */
+        O65SetImport (O65FmtDesc, Sym->Name);
+    }
+
+    /* Walk over the exports, check and add them to the o65 data */
+    for (I = 0; I < CollCount (&O65Exports); ++I) {
+
+        /* Get the export */
+        Symbol* Sym = CollAtUnchecked (&O65Exports, I);
+
+        /* Check if the export symbol is also defined as an import. */
+        if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
+            Error ("%s(%u): Exported o65 symbol `%s' cannot also be an o65 import",
+                   Sym->CfgName, Sym->CfgLine, GetString (Sym->Name));
+        }
+
+        /* Check if we have this symbol defined already. The entry
+         * routine will check this also, but we get a more verbose
+         * error message when checking it here.
+         */
+        if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
+            Error ("%s(%u): Duplicate exported o65 symbol: `%s'",
+                   Sym->CfgName, Sym->CfgLine, GetString (Sym->Name));
+        }
+
+        /* Insert the symbol into the table */
+        O65SetExport (O65FmtDesc, Sym->Name);
+    }
+}
+
+
+
+static void ProcessBin (void)
+/* Process the bin format section */
+{
+}
+
+
+
+static void ProcessFormats (void)
+/* Process the target format section */
+{
+    ProcessO65 ();
+    ProcessBin ();
+}
+
+
+
+static void ProcessSymbols (void)
+/* Process the SYMBOLS section */
+{
+    Export* E;
+
+    /* Walk over all symbols */
+    unsigned I;
+    for (I = 0; I < CollCount (&Symbols); ++I) {
+
+        /* Get the next symbol */
+        Symbol* Sym = CollAtUnchecked (&Symbols, I);
+
+        /* Do we define this symbol? */
+        if ((Sym->Flags & SYM_DEF) != 0) {
+            /* Check if the symbol is already defined somewhere else */
+            if ((E = FindExport (Sym->Name)) != 0 && !IsUnresolvedExport (E)) {
+                /* If the symbol is not marked as weak, this is an error.
+                 * Otherwise ignore the symbol from the config.
+                 */
+                if ((Sym->Flags & SYM_WEAK) == 0) {
+                    CfgError ("Symbol `%s' is already defined",
+                              GetString (Sym->Name));
+                }
+            } else {
+                /* The symbol is undefined, generate an export */
+                CreateConstExport (Sym->Name, Sym->Val);
+            }
+
+        } else {
+
+
+        }
+    }
+}
+
+
+
+void CfgProcess (void)
+/* Process the config file after reading in object files and libraries */
+{
+    ProcessSymbols (); /* ######## */
+    ProcessMemory ();
+    ProcessSegments ();
+    ProcessFormats ();
+}
+
+
+
 static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a RUN segment */
 {
@@ -1563,18 +1736,15 @@ unsigned CfgAssignSegments (void)
      * segments while doing this.
      */
     unsigned I;
-    for (I = 0; I < CollCount (&MemoryList); ++I) {
+    for (I = 0; I < CollCount (&MemoryAreas); ++I) {
 
         unsigned J;
 
         /* Get this entry */
-        Memory* M = CollAtUnchecked (&MemoryList, I);
+        MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
 
      	/* Get the start address of this memory area */
      	unsigned long Addr = M->Start;
-
-        /* Remember if this is a relocatable memory area */
-        M->Relocatable = RelocatableBinFmt (M->F->Format);
 
      	/* Walk through the segments in this memory area */
         for (J = 0; J < CollCount (&M->SegList); ++J) {
@@ -1621,6 +1791,9 @@ unsigned CfgAssignSegments (void)
                 S->Seg->PC = Addr;
                 S->Seg->ReadOnly = (S->Flags & SF_RO) != 0;
                 S->Seg->Relocatable = M->Relocatable;
+
+                /* Remember that this segment is placed */
+                S->Seg->Placed = 1;
 
             } else if (S->Load == M) {
 
@@ -1696,7 +1869,7 @@ void CfgWriteTarget (void)
         File* F = CollAtUnchecked (&FileList, I);
 
     	/* We don't need to look at files with no memory areas */
-  	if (CollCount (&F->MemList) > 0) {
+  	if (CollCount (&F->MemoryAreas) > 0) {
 
   	    /* Is there an output file? */
   	    if (SB_GetLen (GetStrBuf (F->Name)) > 0) {
@@ -1714,7 +1887,7 @@ void CfgWriteTarget (void)
   		       	break;
 
   		    case BINFMT_O65:
-  		       	O65WriteTarget (O65FmtDesc, F);
+  	    	       	O65WriteTarget (O65FmtDesc, F);
   		       	break;
 
   		    default:
@@ -1728,12 +1901,12 @@ void CfgWriteTarget (void)
        	       	 * loading into these memory areas in this file as dumped.
   		 */
                 unsigned J;
-                for (J = 0; J < CollCount (&F->MemList); ++J) {
+                for (J = 0; J < CollCount (&F->MemoryAreas); ++J) {
 
                     unsigned K;
 
                     /* Get this entry */
-  		    Memory* M = CollAtUnchecked (&F->MemList, J);
+  		    MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, J);
 
 		    /* Debugging */
        	       	    Print (stdout, 2, "Skipping `%s'...\n", GetString (M->Name));

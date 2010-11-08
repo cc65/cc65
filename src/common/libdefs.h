@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,14 +39,14 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*     	       	    	      	     Data				     */
 /*****************************************************************************/
 
 
 
 /* Defines for magic and version */
 #define LIB_MAGIC	0x7A55616E
-#define LIB_VERSION	0x000B
+#define LIB_VERSION	0x000C
 
 /* Size of an library file header */
 #define	LIB_HDR_SIZE  	12

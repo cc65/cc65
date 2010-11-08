@@ -34,76 +34,16 @@
 
 
 /* common */
+#include "addrsize.h"
 #include "strbuf.h"
 
 /* ld65 */
 #include "cfgexpr.h"
 #include "error.h"
 #include "exports.h"
+#include "expr.h"
 #include "scanner.h"
 #include "spool.h"
-
-
-
-/*****************************************************************************/
-/*     	      	    		     Data				     */
-/*****************************************************************************/
-
-
-
-/* Type of a CfgExpr */
-enum {
-    ceEmpty,
-    ceInt,
-    ceString
-};
-
-typedef struct CfgExpr CfgExpr;
-struct CfgExpr {
-    unsigned    Type;           /* Type of the expression */
-    long        IVal;           /* Integer value if it's a string */
-    StrBuf      SVal;           /* String value if it's a string */
-};
-
-#define CFGEXPR_INITIALIZER { ceEmpty, 0, STATIC_STRBUF_INITIALIZER }
-
-
-
-/*****************************************************************************/
-/*                                 Forwards                                  */
-/*****************************************************************************/
-
-
-
-static void Expr (CfgExpr* E);
-/* Full expression */
-
-
-
-/*****************************************************************************/
-/*                              struct CfgExpr                               */
-/*****************************************************************************/
-
-
-
-static void CE_Done (CfgExpr* E)
-/* Cleanup a CfgExpr struct */
-{
-    /* If the type is a string, we must delete the string buffer */
-    if (E->Type == ceString) {
-        SB_Done (&E->SVal);
-    }
-}
-
-
-
-static void CE_AssureInt (const CfgExpr* E)
-/* Make sure, E contains an integer */
-{
-    if (E->Type != ceInt) {
-        CfgError ("Integer type expected");
-    }
-}
 
 
 
@@ -113,30 +53,28 @@ static void CE_AssureInt (const CfgExpr* E)
 
 
 
-static void Factor (CfgExpr* E)
-/* Read and return a factor in E */
+static ExprNode* Factor (void)
+/* Read and return a factor */
 {
-    Export* Sym;
+    ExprNode* N = 0;            /* Initialize to avoid compiler warnings */
+    Export*   E;
+    unsigned  Name;
 
 
     switch (CfgTok) {
 
 	case CFGTOK_IDENT:
-	    /* An identifier - search an export with the given name */
-            Sym = FindExport (GetStrBufId (&CfgSVal));
-            if (Sym == 0) {
-                CfgError ("Unknown symbol in expression: `%s'",
-                          SB_GetConstBuf (&CfgSVal));
-            }
-            /* We can only handle constants */
-            if (!IsConstExport (Sym)) {
-                CfgError ("Value for symbol `%s' is not constant",
-                          SB_GetConstBuf (&CfgSVal));
-            }
+            /* Get the name as an id */
+            Name = GetStrBufId (&CfgSVal);
 
-            /* Use the symbol value */
-            E->IVal = GetExportVal (Sym);
-            E->Type = ceInt;
+            /* Check if we know the symbol already */
+            E = FindExport (Name);
+            if (E != 0 && IsConstExport (E)) {
+                N = LiteralExpr (GetExportVal (E), 0);
+            } else {
+                N = NewExprNode (0, EXPR_SYMBOL);
+                N->V.Imp = InsertImport (GenImport (Name, ADDR_SIZE_ABS));
+            }
 
             /* Skip the symbol name */
             CfgNextTok ();
@@ -144,37 +82,27 @@ static void Factor (CfgExpr* E)
 
      	case CFGTOK_INTCON:
             /* An integer constant */
-            E->IVal = CfgIVal;
-            E->Type = ceInt;
+            N = LiteralExpr (CfgIVal, 0);
 	    CfgNextTok ();
        	    break;
-
-	case CFGTOK_STRCON:
-	    /* A string constant */
-            SB_Copy (&E->SVal, &CfgSVal);
-            E->Type = ceString;
-	    CfgNextTok ();
-	    break;
 
         case CFGTOK_PLUS:
             /* Unary plus */
             CfgNextTok ();
-            Factor (E);
-            CE_AssureInt (E);
+            N = Factor ();
             break;
 
         case CFGTOK_MINUS:
             /* Unary minus */
             CfgNextTok ();
-            Factor (E);
-            CE_AssureInt (E);
-            E->IVal = -E->IVal;
+            N = NewExprNode (0, EXPR_UNARY_MINUS);
+            N->Left = Factor ();
             break;
 
        	case CFGTOK_LPAR:
             /* Left parenthesis */
        	    CfgNextTok ();
-       	    Expr (E);
+       	    N = CfgExpr ();
        	    CfgConsume (CFGTOK_RPAR, "')' expected");
        	    break;
 
@@ -182,139 +110,115 @@ static void Factor (CfgExpr* E)
        	    CfgError ("Invalid expression: %d", CfgTok);
        	    break;
     }
+
+    /* Return the new expression node */
+    return N;
 }
 
 
 
-static void Term (CfgExpr* E)
+static ExprNode* Term (void)
 /* Multiplicative operators: * and / */
 {
-    /* Left operand */
-    Factor (E);
+    /* Read left hand side */
+    ExprNode* Root = Factor ();
 
     /* Handle multiplicative operators */
     while (CfgTok == CFGTOK_MUL || CfgTok == CFGTOK_DIV) {
 
-        CfgExpr RightSide = CFGEXPR_INITIALIZER;
+        ExprNode* Left;
+        ExprNode* Right;
+        unsigned char Op;
 
         /* Remember the token, then skip it */
         cfgtok_t Tok = CfgTok;
         CfgNextTok ();
 
-        /* Left side must be an int */
-        CE_AssureInt (E);
-
-        /* Get the right operand and make sure it's an int */
-        Factor (&RightSide);
-        CE_AssureInt (&RightSide);
+        /* Move root to left side, then read right side */
+        Left = Root;
+        Right = Factor ();
 
         /* Handle the operation */
         switch (Tok) {
-
-            case CFGTOK_MUL:
-                E->IVal *= RightSide.IVal;
-                break;
-
-            case CFGTOK_DIV:
-                if (RightSide.IVal == 0) {
-                    CfgError ("Division by zero");
-                }
-                E->IVal /= RightSide.IVal;
-                break;
-
-            default:
-                Internal ("Unhandled token in Term: %d", Tok);
+            case CFGTOK_MUL:    Op = EXPR_MUL;  break;
+            case CFGTOK_DIV:    Op = EXPR_DIV;  break;
+            default:            Internal ("Unhandled token in Term: %d", Tok);
         }
-
-        /* Cleanup RightSide (this is not really needed since it may not
-         * contain strings at this point, but call it anyway for clarity.
-         */
-        CE_Done (&RightSide);
+        Root = NewExprNode (0, Op);
+        Root->Left = Left;
+        Root->Right = Right;
     }
+
+    /* Return the expression tree we've created */
+    return Root;
 }
 
 
 
-static void SimpleExpr (CfgExpr* E)
+static ExprNode* SimpleExpr (void)
 /* Additive operators: + and - */
 {
-    /* Left operand */
-    Term (E);
+    /* Read left hand side */
+    ExprNode* Root = Term ();
 
     /* Handle additive operators */
     while (CfgTok == CFGTOK_PLUS || CfgTok == CFGTOK_MINUS) {
 
-        CfgExpr RightSide = CFGEXPR_INITIALIZER;
+        ExprNode* Left;
+        ExprNode* Right;
+        unsigned char Op;
 
         /* Remember the token, then skip it */
         cfgtok_t Tok = CfgTok;
         CfgNextTok ();
 
-        /* Get the right operand */
-        Term (&RightSide);
-
-        /* Make sure, left and right side are of the same type */
-        if (E->Type != RightSide.Type) {
-            CfgError ("Incompatible types in expression");
-        }
+        /* Move root to left side, then read right side */
+        Left = Root;
+        Right = Term ();
 
         /* Handle the operation */
         switch (Tok) {
-
-            case CFGTOK_PLUS:
-                /* Plus is defined for strings and ints */
-                if (E->Type == ceInt) {
-                    E->IVal += RightSide.IVal;
-                } else if (E->Type == ceString) {
-                    SB_Append (&E->SVal, &RightSide.SVal);
-                } else {
-                    Internal ("Unhandled type in '+' operator: %u", E->Type);
-                }
-                break;
-
-            case CFGTOK_MINUS:
-                /* Operands must be ints */
-                CE_AssureInt (E);
-                E->IVal -= RightSide.IVal;
-                break;
-
-            default:
-                Internal ("Unhandled token in SimpleExpr: %d", Tok);
+            case CFGTOK_PLUS:   Op = EXPR_PLUS;         break;
+            case CFGTOK_MINUS:  Op = EXPR_MINUS;        break;
+            default:            Internal ("Unhandled token in SimpleExpr: %d", Tok);
         }
-
-        /* Cleanup RightSide */
-        CE_Done (&RightSide);
+        Root = NewExprNode (0, Op);
+        Root->Left = Left;
+        Root->Right = Right;
     }
+
+    /* Return the expression tree we've created */
+    return Root;
 }
 
 
 
-static void Expr (CfgExpr* E)
+ExprNode* CfgExpr (void)
 /* Full expression */
 {
-    SimpleExpr (E);
+    return SimpleExpr ();
 }
 
 
 
-long CfgIntExpr (void)
-/* Read an expression, make sure it's an int, and return its value */
+long CfgConstExpr (void)
+/* Read an integer expression, make sure its constant and return its value */
 {
     long Val;
 
-    CfgExpr E = CFGEXPR_INITIALIZER;
-
     /* Parse the expression */
-    Expr (&E);
+    ExprNode* Expr = CfgExpr ();
 
-    /* Make sure it's an integer */
-    CE_AssureInt (&E);
+    /* Check that it's const */
+    if (!IsConstExpr (Expr)) {
+        CfgError ("Constant expression expected");
+    }
 
     /* Get the value */
-    Val = E.IVal;
+    Val = GetExprVal (Expr);
 
-    /* Cleaup E */
-    CE_Done (&E);
+    /* Cleanup E */
+    FreeExpr (Expr);
 
     /* Return the value */
     return Val;
@@ -322,17 +226,17 @@ long CfgIntExpr (void)
 
 
 
-long CfgCheckedIntExpr (long Min, long Max)
+long CfgCheckedConstExpr (long Min, long Max)
 /* Read an expression, make sure it's an int and in range, then return its
  * value.
  */
 {
     /* Get the value */
-    long Val = CfgIntExpr ();
+    long Val = CfgConstExpr ();
 
     /* Check the range */
     if (Val < Min || Val > Max) {
-	CfgError ("Range error");
+     	CfgError ("Range error");
     }
 
     /* Return the value */

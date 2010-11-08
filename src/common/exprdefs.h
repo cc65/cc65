@@ -110,8 +110,8 @@ struct ExprNode {
        	long           	    IVal;	/* If this is a int value */
        	struct SymEntry*    Sym;	/* If this is a symbol */
 	unsigned       	    SegNum;  	/* If this is a segment */
-	unsigned    	    ImpNum;	/* If this is an import */
-        struct Memory*      Mem;        /* If this is a memory area */
+       	struct Import*      Imp;        /* If this is an import */
+        struct MemoryArea*  Mem;        /* If this is a memory area */
 	struct Segment*	    Seg;	/* If this is a segment */
 	struct Section*	    Sec;	/* If section and Obj is NULL */
     } V;

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    expr.h				     */
+/*                                 memarea.c                                 */
 /*                                                                           */
-/*		   Expression evaluation for the ld65 linker		     */
+/*                Memory area definition for the ld65 linker                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2010,      Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,73 +33,44 @@
 
 
 
-#ifndef EXPR_H
-#define EXPR_H
-
-
-
 /* common */
-#include "exprdefs.h"
+#include "xmalloc.h"
 
 /* ld65 */
-#include "objdata.h"
-#include "exports.h"
-#include "config.h"
+#include "memarea.h"
 
 
 
 /*****************************************************************************/
-/*     	      	     		     Code		     		     */
+/*     	       	       	       	     Code     				     */
 /*****************************************************************************/
 
 
 
-ExprNode* NewExprNode (ObjData* O, unsigned char Op);
-/* Create a new expression node */
+MemoryArea* NewMemoryArea (unsigned Name)
+/* Create a new memory area and insert it into the list */
+{
+    /* Allocate memory */
+    MemoryArea* M = xmalloc (sizeof (MemoryArea));
 
-void FreeExpr (ExprNode* Root);
-/* Free the expression tree, Root is pointing to. */
+    /* Initialize the fields ... */
+    M->Name        = Name;
+    M->Attr        = 0;
+    M->Flags       = 0;
+    M->StartExpr   = 0;
+    M->Start       = 0;
+    M->SizeExpr    = 0;
+    M->Size        = 0;
+    M->FillLevel   = 0;
+    M->FillVal     = 0;
+    M->Relocatable = 0;
+    InitCollection (&M->SegList);
+    M->F           = 0;
 
-int IsConstExpr (ExprNode* Root);
-/* Return true if the given expression is a constant expression, that is, one
- * with no references to external symbols.
- */
+    /* ...and return it */
+    return M;
+}
 
-Import* GetExprImport (ExprNode* Expr);
-/* Get the import data structure for a symbol expression node */
-
-Export* GetExprExport (ExprNode* Expr);
-/* Get the exported symbol for a symbol expression node */
-
-Section* GetExprSection (ExprNode* Expr);
-/* Get the segment for a section expression node */
-
-long GetExprVal (ExprNode* Expr);
-/* Get the value of a constant expression */
-
-ExprNode* LiteralExpr (long Val, ObjData* O);
-/* Return an expression tree that encodes the given literal value */
-
-ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O);
-/* Return an expression tree that encodes an offset into the memory area */
-
-ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O);
-/* Return an expression tree that encodes an offset into a segment */
-
-ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O);
-/* Return an expression tree that encodes an offset into a section */
-
-ExprNode* ReadExpr (FILE* F, ObjData* O);
-/* Read an expression from the given file */
-
-int EqualExpr (ExprNode* E1, ExprNode* E2);
-/* Check if two expressions are identical. */
-
-
-
-/* End of expr.h */
-
-#endif
 
 
 

@@ -42,23 +42,24 @@
 #include "global.h"
 #include "error.h"
 #include "fileio.h"
+#include "memarea.h"
 #include "segments.h"
 #include "expr.h"
 
 
 
 /*****************************************************************************/
-/*	    	   	 	    Helpers				     */
+/*     	      	    	       	     Code	      			     */
 /*****************************************************************************/
 
 
 
-static ExprNode* NewExprNode (ObjData* O)
+ExprNode* NewExprNode (ObjData* O, unsigned char Op)
 /* Create a new expression node */
 {
     /* Allocate fresh memory */
     ExprNode* N = xmalloc (sizeof (ExprNode));
-    N->Op 	= EXPR_NULL;
+    N->Op 	= Op;
     N->Left 	= 0;
     N->Right 	= 0;
     N->Obj	= O;
@@ -75,12 +76,6 @@ static void FreeExprNode (ExprNode* E)
     /* Free the memory */
     xfree (E);
 }
-
-
-
-/*****************************************************************************/
-/*     	      	    	       	     Code	      			     */
-/*****************************************************************************/
 
 
 
@@ -130,18 +125,19 @@ int IsConstExpr (ExprNode* Root)
 
             case EXPR_SECTION:
                 /* A section expression is const if the segment it is in is
-                 * not relocatable.
+                 * not relocatable and already placed.
                  */
                 S = GetExprSection (Root);
-                return !S->Seg->Relocatable;
+                return !S->Seg->Relocatable && S->Seg->Placed;
 
             case EXPR_SEGMENT:
-                /* A segment is const if it is not relocatable */
-                return !Root->V.Seg->Relocatable;
+                /* A segment is const if it is not relocatable and placed */
+                return !Root->V.Seg->Relocatable && Root->V.Seg->Placed;
 
             case EXPR_MEMAREA:
-                /* A memory area is const if it is not relocatable */
-                return !Root->V.Mem->Relocatable;
+                /* A memory area is const if it is not relocatable and placed */
+                return !Root->V.Mem->Relocatable && 
+                       (Root->V.Mem->Flags & MF_PLACED);
 
       	    default:
                 /* Anything else is not const */
@@ -201,7 +197,7 @@ Import* GetExprImport (ExprNode* Expr)
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
     /* Return the import */
-    return CollAt (&Expr->Obj->Imports, Expr->V.ImpNum);
+    return Expr->V.Imp;
 }
 
 
@@ -397,26 +393,23 @@ long GetExprVal (ExprNode* Expr)
 ExprNode* LiteralExpr (long Val, ObjData* O)
 /* Return an expression tree that encodes the given literal value */
 {
-    ExprNode* Expr = NewExprNode (O);
-    Expr->Op = EXPR_LITERAL;
+    ExprNode* Expr = NewExprNode (O, EXPR_LITERAL);
     Expr->V.IVal = Val;
     return Expr;
 }
 
 
 
-ExprNode* MemoryExpr (Memory* Mem, long Offs, ObjData* O)
+ExprNode* MemoryExpr (MemoryArea* Mem, long Offs, ObjData* O)
 /* Return an expression tree that encodes an offset into a memory area */
 {
     ExprNode* Root;
 
-    ExprNode* Expr = NewExprNode (O);
-    Expr->Op = EXPR_MEMAREA;
+    ExprNode* Expr = NewExprNode (O, EXPR_MEMAREA);
     Expr->V.Mem = Mem;
 
     if (Offs != 0) {
-        Root = NewExprNode (O);
-        Root->Op = EXPR_PLUS;
+        Root = NewExprNode (O, EXPR_PLUS);
         Root->Left = Expr;
         Root->Right = LiteralExpr (Offs, O);
     } else {
@@ -433,13 +426,11 @@ ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O)
 {
     ExprNode* Root;
 
-    ExprNode* Expr = NewExprNode (O);
-    Expr->Op = EXPR_SEGMENT;
+    ExprNode* Expr = NewExprNode (O, EXPR_SEGMENT);
     Expr->V.Seg = Seg;
 
     if (Offs != 0) {
-        Root = NewExprNode (O);
-        Root->Op = EXPR_PLUS;
+        Root = NewExprNode (O, EXPR_PLUS);
         Root->Left = Expr;
         Root->Right = LiteralExpr (Offs, O);
     } else {
@@ -456,13 +447,11 @@ ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O)
 {
     ExprNode* Root;
 
-    ExprNode* Expr = NewExprNode (O);
-    Expr->Op = EXPR_SECTION;
+    ExprNode* Expr = NewExprNode (O, EXPR_SECTION);
     Expr->V.Sec = Sec;
 
     if (Offs != 0) {
-        Root = NewExprNode (O);
-        Root->Op = EXPR_PLUS;
+        Root = NewExprNode (O, EXPR_PLUS);
         Root->Left = Expr;
         Root->Right = LiteralExpr (Offs, O);
     } else {
@@ -478,6 +467,7 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 /* Read an expression from the given file */
 {
     ExprNode* Expr;
+    unsigned ImpNum;
 
     /* Read the node tag and handle NULL nodes */
     unsigned char Op = Read8 (F);
@@ -486,29 +476,29 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
     }
 
     /* Create a new node */
-    Expr = NewExprNode (O);
-    Expr->Op = Op;
+    Expr = NewExprNode (O, Op);
 
     /* Check the tag and handle the different expression types */
     if (EXPR_IS_LEAF (Op)) {
 	switch (Op) {
 
 	    case EXPR_LITERAL:
-	   	Expr->V.IVal = Read32Signed (F);
-	   	break;
+	     	Expr->V.IVal = Read32Signed (F);
+	     	break;
 
 	    case EXPR_SYMBOL:
-	   	/* Read the import number */
-	   	Expr->V.ImpNum = ReadVar (F);
-	   	break;
+	     	/* Read the import number */
+	       	ImpNum = ReadVar (F);
+                Expr->V.Imp = CollAt (&O->Imports, ImpNum);
+	     	break;
 
 	    case EXPR_SECTION:
-	   	/* Read the segment number */
-	   	Expr->V.SegNum = Read8 (F);
-	   	break;
+	     	/* Read the segment number */
+	     	Expr->V.SegNum = Read8 (F);
+	     	break;
 
 	    default:
-	   	Error ("Invalid expression op: %02X", Op);
+	     	Error ("Invalid expression op: %02X", Op);
 
 	}
 
@@ -550,8 +540,8 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
 	    return (E1->V.IVal == E2->V.IVal);
 
 	case EXPR_SYMBOL:
-	    /* Import number must be identical */
-	    return (E1->V.ImpNum == E2->V.ImpNum);
+	    /* Import must be identical */
+	    return (E1->V.Imp == E2->V.Imp);
 
 	case EXPR_SECTION:
        	    /* Section must be identical */
@@ -563,7 +553,7 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
 
 	case EXPR_MEMAREA:
        	    /* Memory area must be identical */
-       	    return (E1->V.Mem == E2->V.Mem );
+       	    return (E1->V.Mem == E2->V.Mem);
 
 	default:
 	    /* Not a leaf node */

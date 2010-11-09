@@ -29,20 +29,20 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I ../apple2 -I ../../include
 extra/%.o: ../apple2/extra/%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-%.emd:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+%.emd: 	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
 
 %.joy:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 %.mou:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 %.ser:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 %.tgi:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 #--------------------------------------------------------------------------
 # Object files

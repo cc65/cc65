@@ -27,13 +27,19 @@ CFLAGS=-Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 %.emd:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 %.joy:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
+
+%.mou:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.ser:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
 
 %.tgi:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 #--------------------------------------------------------------------------
 # Object files

@@ -8,13 +8,13 @@
 	@$(AS) -o $@ $(AFLAGS) $<
 
 %.emd:	%.o ../../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 %.joy:	%.o ../../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 %.tgi:	%.o ../../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 S_OBJS	= crt0.o                \
           extzp.o               \

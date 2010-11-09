@@ -43,14 +43,14 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $(ATARIDEFS) $<
 
-%.emd:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+%.emd: 	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
 
 %.joy:	%.o ../runtime/zeropage.o
-	@$(LD) -t module -o $@ $^
+	@$(LD) -o $@ -t module $^
 
 %.tgi:	%.o ../runtime/zeropage.o atari_tgi_common.inc
-	@$(LD) -t module -o $@ $< ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $< ../runtime/zeropage.o
 
 
 #--------------------------------------------------------------------------

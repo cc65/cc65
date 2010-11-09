@@ -136,7 +136,7 @@ int IsConstExpr (ExprNode* Root)
 
             case EXPR_MEMAREA:
                 /* A memory area is const if it is not relocatable and placed */
-                return !Root->V.Mem->Relocatable && 
+                return !Root->V.Mem->Relocatable &&
                        (Root->V.Mem->Flags & MF_PLACED);
 
       	    default:
@@ -196,8 +196,16 @@ Import* GetExprImport (ExprNode* Expr)
     /* Check that this is really a symbol */
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
-    /* Return the import */
-    return Expr->V.Imp;
+    /* If we have an object file, get the import from it, otherwise
+     * (internally generated expressions), get the import from the
+     * import pointer.
+     */
+    if (Expr->Obj) {
+	/* Return the export */
+       	return CollAt (&Expr->Obj->Imports, Expr->V.ImpNum);
+    } else {
+	return Expr->V.Imp;
+    }
 }
 
 
@@ -226,7 +234,7 @@ Section* GetExprSection (ExprNode* Expr)
      */
     if (Expr->Obj) {
 	/* Return the export */
-       	return CollAt (&Expr->Obj->Sections, Expr->V.SegNum);
+       	return CollAt (&Expr->Obj->Sections, Expr->V.SecNum);
     } else {
 	return Expr->V.Sec;
     }
@@ -467,7 +475,6 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 /* Read an expression from the given file */
 {
     ExprNode* Expr;
-    unsigned ImpNum;
 
     /* Read the node tag and handle NULL nodes */
     unsigned char Op = Read8 (F);
@@ -488,13 +495,12 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 
 	    case EXPR_SYMBOL:
 	     	/* Read the import number */
-	       	ImpNum = ReadVar (F);
-                Expr->V.Imp = CollAt (&O->Imports, ImpNum);
+	       	Expr->V.ImpNum = ReadVar (F);
 	     	break;
 
 	    case EXPR_SECTION:
 	     	/* Read the segment number */
-	     	Expr->V.SegNum = Read8 (F);
+	     	Expr->V.SecNum = Read8 (F);
 	     	break;
 
 	    default:
@@ -541,7 +547,7 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
 
 	case EXPR_SYMBOL:
 	    /* Import must be identical */
-	    return (E1->V.Imp == E2->V.Imp);
+       	    return (GetExprImport (E1) == GetExprImport (E2));
 
 	case EXPR_SECTION:
        	    /* Section must be identical */

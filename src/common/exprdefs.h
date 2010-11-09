@@ -109,11 +109,12 @@ struct ExprNode {
     union {
        	long           	    IVal;	/* If this is a int value */
        	struct SymEntry*    Sym;	/* If this is a symbol */
-	unsigned       	    SegNum;  	/* If this is a segment */
-       	struct Import*      Imp;        /* If this is an import */
+	unsigned       	    SecNum;  	/* If this is a section and Obj != 0 */
+        unsigned            ImpNum;     /* If this is an import and Obj != 0 */
+       	struct Import*      Imp;        /* If this is an import and Obj == 0 */
         struct MemoryArea*  Mem;        /* If this is a memory area */
 	struct Segment*	    Seg;	/* If this is a segment */
-	struct Section*	    Sec;	/* If section and Obj is NULL */
+	struct Section*	    Sec;	/* If this is a section and Obj == 0 */
     } V;
 };
 

@@ -200,6 +200,7 @@ static void StrVal (void)
                         if (OutputName) {
                             SB_AppendStr (&CfgSVal, OutputName);
                         }
+                        OutputNameUsed = 1;
                         NextChar ();
                         break;
 
@@ -378,6 +379,7 @@ Again:
 		    	SB_Clear (&CfgSVal);
 		    }
                     SB_Terminate (&CfgSVal);
+                    OutputNameUsed = 1;
 		    CfgTok = CFGTOK_STRCON;
      		    break;
 

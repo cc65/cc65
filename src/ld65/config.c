@@ -1683,17 +1683,6 @@ static void ProcessSymbols (void)
 
 
 
-void CfgProcess (void)
-/* Process the config file after reading in object files and libraries */
-{
-    ProcessSymbols (); /* ######## */
-    ProcessMemory ();
-    ProcessSegments ();
-    ProcessFormats ();
-}
-
-
-
 static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a RUN segment */
 {
@@ -1722,20 +1711,28 @@ static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
 
 
 
-unsigned CfgAssignSegments (void)
-/* Assign segments, define linker symbols where requested. The function will
- * return the number of memory area overflows (so zero means anything went ok).
+unsigned CfgProcess (void)
+/* Process the config file after reading in object files and libraries. This
+ * includes postprocessing of the config file data but also assigning segments
+ * and defining segment/memory area related symbols. The function will return
+ * the number of memory area overflows (so zero means anything went ok).
  * In case of overflows, a short mapfile can be generated later, to ease the
  * task of rearranging segments for the user.
  */
 {
     unsigned Overflows = 0;
+    unsigned I;
+
+    /* Do postprocessing of the config file data */
+    ProcessSymbols (); /* ######## */
+    ProcessMemory ();
+    ProcessSegments ();
+    ProcessFormats ();
 
     /* Walk through each of the memory sections. Add up the sizes and check
      * for an overflow of the section. Assign the start addresses of the
      * segments while doing this.
      */
-    unsigned I;
     for (I = 0; I < CollCount (&MemoryAreas); ++I) {
 
         unsigned J;

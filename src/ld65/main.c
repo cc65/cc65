@@ -449,6 +449,21 @@ static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptOutputName (const char* Opt, const char* Arg)
+/* Give the name of the output file */
+{
+    /* If the name of the output file has been used in the config before
+     * (by using %O) we're actually changing it later, which - in most cases -
+     * gives unexpected results, so emit a warning in this case.
+     */
+    if (OutputNameUsed) {
+        Warning ("Option `%s' should preceede options `-t' or `-C'", Opt);
+    }
+    OutputName = Arg;
+}
+
+
+
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
@@ -574,7 +589,7 @@ int main (int argc, char* argv [])
 	       	    break;
 
 	       	case 'o':
-	       	    OutputName = GetArg (&I, 2);
+	       	    OptOutputName (Arg, GetArg (&I, 2));
 	       	    break;
 
 	       	case 't':
@@ -652,14 +667,11 @@ int main (int argc, char* argv [])
     /* Create the condes tables if requested */
     ConDesCreate ();
 
-    /* Process data from the config file */
-    CfgProcess ();
-
-    /* Assign start addresses for the segments, define linker symbols. The
-     * function will return the number of memory area overflows (zero on
-     * success).
+    /* Process data from the config file. Assign start addresses for the
+     * segments, define linker symbols. The function will return the number
+     * of memory area overflows (zero on success).
      */
-    MemoryAreaOverflows = CfgAssignSegments ();
+    MemoryAreaOverflows = CfgProcess ();
 
     /* Check module assertions */
     CheckAssertions ();

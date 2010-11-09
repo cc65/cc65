@@ -102,12 +102,11 @@ struct SegDesc {
 void CfgRead (void);
 /* Read the configuration */
 
-void CfgProcess (void);
-/* Process the config file after reading in object files and libraries */
-
-unsigned CfgAssignSegments (void);
-/* Assign segments, define linker symbols where requested. The function will
- * return the number of memory area overflows (so zero means anything went ok).
+unsigned CfgProcess (void);
+/* Process the config file after reading in object files and libraries. This
+ * includes postprocessing of the config file data but also assigning segments
+ * and defining segment/memory area related symbols. The function will return
+ * the number of memory area overflows (so zero means anything went ok).
  * In case of overflows, a short mapfile can be generated later, to ease the
  * task of rearranging segments for the user.
  */

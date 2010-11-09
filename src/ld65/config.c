@@ -448,47 +448,47 @@ static void ParseMemory (void)
 	      	    M->SizeExpr = CfgExpr ();
 	    	    break;
 
-		case CFGTOK_TYPE:
-		    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
-      		    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
-		    if (CfgTok == CFGTOK_RO) {
-		    	M->Flags |= MF_RO;
-		    }
+	    	case CFGTOK_TYPE:
+	    	    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
+      	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+	    	    if (CfgTok == CFGTOK_RO) {
+	    	    	M->Flags |= MF_RO;
+	    	    }
                     CfgNextTok ();
-		    break;
+	    	    break;
 
 	        case CFGTOK_FILE:
-		    FlagAttr (&M->Attr, MA_FILE, "FILE");
-		    CfgAssureStr ();
+	    	    FlagAttr (&M->Attr, MA_FILE, "FILE");
+	    	    CfgAssureStr ();
        	       	    /* Get the file entry and insert the memory area */
 	    	    FileInsert (GetFile (GetStrBufId (&CfgSVal)), M);
                     CfgNextTok ();
-		    break;
+	    	    break;
 
 	        case CFGTOK_DEFINE:
- 		    FlagAttr (&M->Attr, MA_DEFINE, "DEFINE");
-		    /* Map the token to a boolean */
-		    CfgBoolToken ();
-		    if (CfgTok == CFGTOK_TRUE) {
-	  	    	M->Flags |= MF_DEFINE;
-		    }
+ 	    	    FlagAttr (&M->Attr, MA_DEFINE, "DEFINE");
+	    	    /* Map the token to a boolean */
+	    	    CfgBoolToken ();
+	    	    if (CfgTok == CFGTOK_TRUE) {
+	    	    	M->Flags |= MF_DEFINE;
+	    	    }
                     CfgNextTok ();
-		    break;
+	    	    break;
 
 	        case CFGTOK_FILL:
- 		    FlagAttr (&M->Attr, MA_FILL, "FILL");
-		    /* Map the token to a boolean */
-		    CfgBoolToken ();
-		    if (CfgTok == CFGTOK_TRUE) {
-	  	    	M->Flags |= MF_FILL;
-		    }
+ 	    	    FlagAttr (&M->Attr, MA_FILL, "FILL");
+	    	    /* Map the token to a boolean */
+	    	    CfgBoolToken ();
+	    	    if (CfgTok == CFGTOK_TRUE) {
+	    	    	M->Flags |= MF_FILL;
+	    	    }
                     CfgNextTok ();
-		    break;
+	    	    break;
 
 	      	case CFGTOK_FILLVAL:
-		    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
+	    	    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
 	      	    M->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
-		    break;
+	    	    break;
 
 	     	default:
 	       	    FAIL ("Unexpected attribute token");
@@ -511,6 +511,7 @@ static void ParseMemory (void)
 	 */
 	if ((M->Attr & MA_FILE) == 0) {
 	    FileInsert (GetFile (GetStringId (OutputName)), M);
+	    OutputNameUsed = 1;
 	}
     }
 

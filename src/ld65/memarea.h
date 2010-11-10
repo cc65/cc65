@@ -40,6 +40,7 @@
 
 /* common */
 #include "coll.h"
+#include "filepos.h"
 
 
 
@@ -56,7 +57,8 @@ struct File;
 /* Memory area entry */
 typedef struct MemoryArea MemoryArea;
 struct MemoryArea {
-    unsigned            Name;           /* Name index of the memory section */
+    FilePos             Pos;            /* Where was the area was defined? */
+    unsigned            Name;           /* Name index of the memory area */
     unsigned   	       	Attr;	  	/* Which values are valid? */
     unsigned   	 	Flags;	  	/* Set of bitmapped flags */
     struct ExprNode*    StartExpr;      /* Expression for start address */
@@ -85,7 +87,7 @@ struct MemoryArea {
 
 
 
-MemoryArea* NewMemoryArea (unsigned Name);
+MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name);
 /* Create a new memory area and insert it into the list */
 
 

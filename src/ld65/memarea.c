@@ -47,13 +47,14 @@
 
 
 
-MemoryArea* NewMemoryArea (unsigned Name)
+MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
 /* Create a new memory area and insert it into the list */
 {
     /* Allocate memory */
     MemoryArea* M = xmalloc (sizeof (MemoryArea));
 
     /* Initialize the fields ... */
+    M->Pos         = *Pos;                     
     M->Name        = Name;
     M->Attr        = 0;
     M->Flags       = 0;

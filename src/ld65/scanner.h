@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,8 @@
 
 
 
+/* common */
+#include "filepos.h"
 #include "strbuf.h"
 
 
@@ -152,13 +154,12 @@ struct IdentTok {
 
 
 /* Current token and attributes */
-extern cfgtok_t		CfgTok;
+extern cfgtok_t	    	CfgTok;
 extern StrBuf           CfgSVal;
 extern unsigned long	CfgIVal;
 
 /* Error location */
-extern unsigned        	CfgErrorLine;
-extern unsigned        	CfgErrorCol;
+extern FilePos          CfgErrorPos;
 
 
 
@@ -168,11 +169,11 @@ extern unsigned        	CfgErrorCol;
 
 
 
-void CfgWarning (const char* Format, ...) attribute((format(printf,1,2)));
+void CfgWarning (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
 /* Print a warning message adding file name and line number of the config file */
 
-void CfgError (const char* Format, ...) attribute((format(printf,1,2)));
-/* Print an error message adding file name and line number of the config file */
+void CfgError (const FilePos* Pos, const char* Format, ...) attribute((format(printf,2,3)));
+/* Print an error message adding file name and line number of a given file */
 
 void CfgNextTok (void);
 /* Read the next token from the input stream */

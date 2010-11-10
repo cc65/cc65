@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -48,6 +48,7 @@
 #include "global.h"
 #include "error.h"
 #include "scanner.h"
+#include "spool.h"
 
 
 
@@ -63,8 +64,7 @@ StrBuf          CfgSVal = STATIC_STRBUF_INITIALIZER;
 unsigned long   CfgIVal;
 
 /* Error location */
-unsigned        	CfgErrorLine;
-unsigned        	CfgErrorCol;
+FilePos                 CfgErrorPos;
 
 /* Input sources for the configuration */
 static const char*     	CfgName		= 0;
@@ -72,8 +72,7 @@ static const char*      CfgBuf 		= 0;
 
 /* Other input stuff */
 static int     	       	C      	     	= ' ';
-static unsigned	       	InputLine    	= 1;
-static unsigned	       	InputCol     	= 0;
+static FilePos          InputPos;
 static FILE*   	       	InputFile    	= 0;
 
 
@@ -84,8 +83,8 @@ static FILE*   	       	InputFile    	= 0;
 
 
 
-void CfgWarning (const char* Format, ...)
-/* Print a warning message adding file name and line number of the config file */
+void CfgWarning (const FilePos* Pos, const char* Format, ...)
+/* Print a warning message adding file name and line number of a given file */
 {
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
     va_list ap;
@@ -94,14 +93,15 @@ void CfgWarning (const char* Format, ...)
     SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Warning ("%s(%u): %s", CfgGetName(), CfgErrorLine, SB_GetConstBuf (&Buf));
+    Warning ("%s(%lu): %s",
+             GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
 }
 
 
 
-void CfgError (const char* Format, ...)
-/* Print an error message adding file name and line number of the config file */
+void CfgError (const FilePos* Pos, const char* Format, ...)
+/* Print an error message adding file name and line number of a given file */
 {
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
     va_list ap;
@@ -110,7 +110,8 @@ void CfgError (const char* Format, ...)
     SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Error ("%s(%u): %s", CfgGetName(), CfgErrorLine, SB_GetConstBuf (&Buf));
+    Error ("%s(%lu): %s",
+           GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
 }
 
@@ -140,13 +141,13 @@ static void NextChar (void)
 
     /* Count columns */
     if (C != EOF) {
-	++InputCol;
+	++InputPos.Col;
     }
 
     /* Count lines */
     if (C == '\n') {
-     	++InputLine;
-     	InputCol = 0;
+     	++InputPos.Line;
+     	InputPos.Col = 0;
     }
 }
 
@@ -177,7 +178,7 @@ static void StrVal (void)
 
             case EOF:
             case '\n':
-                CfgError ("Unterminated string");
+                CfgError (&CfgErrorPos, "Unterminated string");
                 break;
 
             case '%':
@@ -187,7 +188,7 @@ static void StrVal (void)
                     case EOF:
                     case '\n':
                     case '\"':
-                        CfgError ("Unterminated '%%' escape sequence");
+                        CfgError (&CfgErrorPos, "Unterminated '%%' escape sequence");
                         break;
 
                     case '%':
@@ -205,7 +206,8 @@ static void StrVal (void)
                         break;
 
                     default:
-                        CfgWarning ("Unkown escape sequence `%%%c'", C);
+                        CfgWarning (&CfgErrorPos,
+                                    "Unkown escape sequence `%%%c'", C);
                         SB_AppendChar (&CfgSVal, '%');
                         SB_AppendChar (&CfgSVal, C);
                         NextChar ();
@@ -241,8 +243,7 @@ Again:
     }
 
     /* Remember the current position */
-    CfgErrorLine = InputLine;
-    CfgErrorCol  = InputCol;
+    CfgErrorPos = InputPos;
 
     /* Identifier? */
     if (C == '_' || IsAlpha (C)) {
@@ -262,7 +263,7 @@ Again:
     if (C == '$') {
 	NextChar ();
 	if (!isxdigit (C)) {
-	    CfgError ("Hex digit expected");
+	    CfgError (&CfgErrorPos, "Hex digit expected");
 	}
 	CfgIVal = 0;
 	while (isxdigit (C)) {
@@ -390,7 +391,7 @@ Again:
 		    break;
 
 	        default:
-	            CfgError ("Invalid format specification");
+	            CfgError (&CfgErrorPos, "Invalid format specification");
 	    }
 	    break;
 
@@ -399,7 +400,7 @@ Again:
 	    break;
 
 	default:
-	    CfgError ("Invalid character `%c'", C);
+	    CfgError (&CfgErrorPos, "Invalid character `%c'", C);
 
     }
 }
@@ -410,7 +411,7 @@ void CfgConsume (cfgtok_t T, const char* Msg)
 /* Skip a token, print an error message if not found */
 {
     if (CfgTok != T) {
-       	CfgError ("%s", Msg);
+       	CfgError (&CfgErrorPos, "%s", Msg);
     }
     CfgNextTok ();
 }
@@ -457,7 +458,7 @@ void CfgAssureInt (void)
 /* Make sure the next token is an integer */
 {
     if (CfgTok != CFGTOK_INTCON) {
-       	CfgError ("Integer constant expected");
+       	CfgError (&CfgErrorPos, "Integer constant expected");
     }
 }
 
@@ -467,7 +468,7 @@ void CfgAssureStr (void)
 /* Make sure the next token is a string constant */
 {
     if (CfgTok != CFGTOK_STRCON) {
-       	CfgError ("String constant expected");
+       	CfgError (&CfgErrorPos, "String constant expected");
     }
 }
 
@@ -477,7 +478,7 @@ void CfgAssureIdent (void)
 /* Make sure the next token is an identifier */
 {
     if (CfgTok != CFGTOK_IDENT) {
-       	CfgError ("Identifier expected");
+       	CfgError (&CfgErrorPos, "Identifier expected");
     }
 }
 
@@ -487,7 +488,7 @@ void CfgRangeCheck (unsigned long Lo, unsigned long Hi)
 /* Check the range of CfgIVal */
 {
     if (CfgIVal < Lo || CfgIVal > Hi) {
-	CfgError ("Range error");
+	CfgError (&CfgErrorPos, "Range error");
     }
 }
 
@@ -515,7 +516,7 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     }
 
     /* Not found or no identifier */
-    CfgError ("%s expected", Name);
+    CfgError (&CfgErrorPos, "%s expected", Name);
 }
 
 
@@ -536,7 +537,7 @@ void CfgBoolToken (void)
     } else {
 	/* We expected an integer here */
 	if (CfgTok != CFGTOK_INTCON) {
-     	    CfgError ("Boolean value expected");
+     	    CfgError (&CfgErrorPos, "Boolean value expected");
 	}
 	CfgTok = (CfgIVal == 0)? CFGTOK_FALSE : CFGTOK_TRUE;
     }
@@ -600,8 +601,9 @@ void CfgOpenInput (void)
 
     /* Initialize variables */
     C         = ' ';
-    InputLine = 1;
-    InputCol  = 0;
+    InputPos.Line = 1;
+    InputPos.Col  = 0;
+    InputPos.Name = GetStringId (CfgBuf? "[builtin config]" : CfgName);
 
     /* Start the ball rolling ... */
     CfgNextTok ();
@@ -618,7 +620,6 @@ void CfgCloseInput (void)
 	InputFile = 0;
     }
 }
-
 
 
 

@@ -62,7 +62,7 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
   How to compile cc65 and the support tools.
 
-  <tag><htmlurl url="make.html" name="make.html"></tag>
+  <tag><htmlurl url="using-make.html" name="using-make.html"></tag>
   Build programs, using the GNU Make utility.
 
   <tag><htmlurl url="customizing.html" name="customizing.html"></tag>

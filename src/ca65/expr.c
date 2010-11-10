@@ -1515,11 +1515,11 @@ ExprNode* GenSymExpr (SymEntry* Sym)
 
 
 
-static ExprNode* GenSectionExpr (unsigned SegNum)
+static ExprNode* GenSectionExpr (unsigned SecNum)
 /* Return an expression node for the given section */
 {
     ExprNode* Expr = NewExprNode (EXPR_SECTION);
-    Expr->V.SegNum = SegNum;
+    Expr->V.SecNum = SecNum;
     return Expr;
 }
 
@@ -1729,7 +1729,7 @@ ExprNode* CloneExpr (ExprNode* Expr)
 	    break;
 
 	case EXPR_SECTION:
-	    Clone = GenSectionExpr (Expr->V.SegNum);
+	    Clone = GenSectionExpr (Expr->V.SecNum);
 	    break;
 
         default:
@@ -1777,7 +1777,7 @@ void WriteExpr (ExprNode* Expr)
 
         case EXPR_SECTION:
             ObjWrite8 (EXPR_SECTION);
-	    ObjWrite8 (Expr->V.SegNum);
+	    ObjWrite8 (Expr->V.SecNum);
 	    break;
 
 	case EXPR_ULABEL:

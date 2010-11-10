@@ -481,7 +481,7 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
     ED_Done (&Right);
 }
 
-            
+
 
 static void StudyLiteral (ExprNode* Expr, ExprDesc* D)
 /* Study a literal expression node */
@@ -581,7 +581,7 @@ static void StudySection (ExprNode* Expr, ExprDesc* D)
 /* Study a section expression node */
 {
     /* Get the section reference */
-    ED_SecRef* SecRef = ED_GetSecRef (D, Expr->V.SegNum);
+    ED_SecRef* SecRef = ED_GetSecRef (D, Expr->V.SecNum);
 
     /* Update the data and the address size */
     ++SecRef->Count;
@@ -1404,7 +1404,7 @@ void StudyExpr (ExprNode* Expr, ExprDesc* D)
      */
     if (D->AddrSize == ADDR_SIZE_DEFAULT && ED_IsConst (D)) {
         D->AddrSize = GetConstAddrSize (D->Val);
-    }               
+    }
 
     /* If the expression is valid, throw away the address size and recalculate
      * it using the data we have. This is more exact than the on-the-fly

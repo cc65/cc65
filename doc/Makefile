@@ -44,7 +44,7 @@ SGML =	apple2.sgml	\
 	ld65.sgml	\
 	library.sgml	\
 	lynx.sgml	\
-	make.sgml	\
+	using-make.sgml	\
 	nes.sgml	\
         od65.sgml       \
 	pet.sgml	\

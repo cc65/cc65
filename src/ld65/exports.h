@@ -81,8 +81,8 @@ struct Export {
     ObjData* 		Obj;		/* Object file that exports the name */
     unsigned 		ImpCount;	/* How many imports for this symbol? */
     Import*  		ImpList;	/* List of imports for this symbol */
-    FilePos  		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
+    FilePos  		Pos;		/* File position of definition */
     unsigned char	Type;		/* Type of export */
     unsigned char       AddrSize;       /* Address size of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
@@ -135,6 +135,9 @@ void InsertExport (Export* E);
 
 Export* CreateConstExport (unsigned Name, long Value);
 /* Create an export for a literal date */
+
+Export* CreateExprExport (unsigned Name, ExprNode* Expr, unsigned char AddrSize);
+/* Create an export for an expression */
 
 Export* CreateMemoryExport (unsigned Name, MemoryArea* Mem, unsigned long Offs);
 /* Create an relative export for a memory area offset */

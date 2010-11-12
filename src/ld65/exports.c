@@ -105,8 +105,8 @@ static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
     Import* I = xmalloc (sizeof (Import));
 
     /* Initialize the fields */
-    I->Next	= 0;
-    I->Obj	= Obj;
+    I->Next    	= 0;
+    I->Obj     	= Obj;
     InitFilePos (&I->Pos);
     I->Exp      = 0;
     I->Name     = INVALID_STRING_ID;
@@ -290,6 +290,7 @@ static Export* NewExport (unsigned char Type, unsigned char AddrSize,
     E->ImpCount = 0;
     E->ImpList  = 0;
     E->Expr    	= 0;
+    InitFilePos (&E->Pos);
     E->Type    	= Type;
     E->AddrSize = AddrSize;
     memset (E->ConDes, 0, sizeof (E->ConDes));
@@ -467,6 +468,24 @@ Export* CreateConstExport (unsigned Name, long Value)
 
 
 
+Export* CreateExprExport (unsigned Name, ExprNode* Expr, unsigned char AddrSize)
+/* Create an export for an expression */
+{
+    /* Create a new export */
+    Export* E = NewExport (SYM_EXPR | SYM_EQUATE, AddrSize, Name, 0);
+
+    /* Assign the value expression */
+    E->Expr = Expr;
+
+    /* Insert the export */
+    InsertExport (E);
+
+    /* Return the new export */
+    return E;
+}
+
+
+
 Export* CreateMemoryExport (unsigned Name, MemoryArea* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
@@ -590,40 +609,57 @@ static void CheckSymType (const Export* E)
 /* Check the types for one export */
 {
     /* External with matching imports */
-    Import* Imp = E->ImpList;
-    while (Imp) {
-       	if (E->AddrSize != Imp->AddrSize) {
-	    /* Export is ZP, import is abs or the other way round */
+    Import* I = E->ImpList;
+    while (I) {
+       	if (E->AddrSize != I->AddrSize) {
+       	    /* Export and import address sizes do not match */
+            StrBuf ExportLoc = STATIC_STRBUF_INITIALIZER;
+            StrBuf ImportLoc = STATIC_STRBUF_INITIALIZER;
             const char* ExpAddrSize = AddrSizeToStr (E->AddrSize);
-            const char* ImpAddrSize = AddrSizeToStr (Imp->AddrSize);
-            const char* ExpObjName  = GetObjFileName (E->Obj);
-            const char* ImpObjName  = GetObjFileName (Imp->Obj);
-	    if (E->Obj) {
-	      	/* User defined export */
-       	       	Warning ("Address size mismatch for `%s': Exported from %s, "
-			 "%s(%lu) as `%s', import in %s, %s(%lu) as `%s'",
-			 GetString (E->Name),
-                         ExpObjName,
-                         GetSourceFileName (E->Obj, E->Pos.Name),
-    			 E->Pos.Line,
-                         ExpAddrSize,
-                         ImpObjName,
-                         GetSourceFileName (Imp->Obj, Imp->Pos.Name),
-		   	 Imp->Pos.Line,
-                         ImpAddrSize);
-	    } else {
-		/* Export created by the linker */
-		Warning ("Address size mismatch for `%s': Symbol is `%s'"
-                         ", but imported from %s, %s(%lu) as `%s'",
-			 GetString (E->Name),
-                         ExpAddrSize,
-                         ImpObjName,
-                         GetSourceFileName (Imp->Obj, Imp->Pos.Name),
-			 Imp->Pos.Line,
-                         ImpAddrSize);
-	    }
+            const char* ImpAddrSize = AddrSizeToStr (I->AddrSize);
+
+            /* Generate strings that describe the location of the im- and
+             * exports. This depends on the place from where they come:
+             * Object file or linker config.
+             */
+            if (E->Obj) {
+                /* The export comes from an object file */
+                SB_Printf (&ExportLoc, "%s, %s(%lu)",
+                           GetString (E->Obj->Name),
+                           GetSourceFileName (E->Obj, E->Pos.Name),
+                           E->Pos.Line);
+            } else {
+                SB_Printf (&ExportLoc, "%s(%lu)",
+                           GetSourceFileName (E->Obj, E->Pos.Name),
+                           E->Pos.Line);
+            }
+            if (I->Obj) {
+                /* The import comes from an object file */
+                SB_Printf (&ImportLoc, "%s, %s(%lu)",
+                           GetString (I->Obj->Name),
+                           GetSourceFileName (I->Obj, I->Pos.Name),
+                           I->Pos.Line);
+            } else {
+                SB_Printf (&ImportLoc, "%s(%lu)",
+                           GetSourceFileName (I->Obj, I->Pos.Name),
+                           I->Pos.Line);
+            }
+
+            /* Output the diagnostic */
+            Warning ("Address size mismatch for `%s': "
+                     "Exported from %s as `%s', "
+                     "import in %s as `%s'",
+                     GetString (E->Name),
+                     SB_GetConstBuf (&ExportLoc),
+                     ExpAddrSize,
+                     SB_GetConstBuf (&ImportLoc),
+                     ImpAddrSize);
+
+            /* Free the temporary strings */
+            SB_Done (&ExportLoc);
+            SB_Done (&ImportLoc);
 	}
-	Imp = Imp->Next;
+       	I = I->Next;
     }
 }
 

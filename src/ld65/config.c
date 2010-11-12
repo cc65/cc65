@@ -39,6 +39,7 @@
 #include <errno.h>
 
 /* common */
+#include "addrsize.h"
 #include "bitops.h"
 #include "check.h"
 #include "print.h"
@@ -111,28 +112,30 @@ static Collection       SegDescList = STATIC_COLLECTION_INITIALIZER;
 #define SA_START	0x0080
 #define SA_OPTIONAL     0x0100
 
+/* Symbol types used in the CfgSymbol structure */
+typedef enum {
+    CfgSymExport,               /* Not really used in struct CfgSymbol */
+    CfgSymImport,               /* Dito */
+    CfgSymWeak,                 /* Like export but weak */
+    CfgSymO65Export,            /* An o65 export */
+    CfgSymO65Import,            /* An o65 import */
+} CfgSymType;
+
 /* Symbol structure. It is used for o65 imports and exports, but also for
  * symbols from the SYMBOLS sections (symbols defined in the config file or
  * forced imports).
  */
-typedef struct Symbol Symbol;
-struct Symbol {
+typedef struct CfgSymbol CfgSymbol;
+struct CfgSymbol {
+    CfgSymType  Type;           /* Type of symbol */
     FilePos     Pos;            /* Config file position */
     unsigned    Name;           /* Symbol name */
-    unsigned    Flags;          /* Symbol flags */
-    long        Val;            /* Symbol value if any */
+    ExprNode*   Value;          /* Symbol value if any */
+    unsigned    AddrSize;       /* Address size of symbol */
 };
 
 /* Collections with symbols */
-static Collection       O65Imports = STATIC_COLLECTION_INITIALIZER;
-static Collection       O65Exports = STATIC_COLLECTION_INITIALIZER;
-static Collection       Symbols    = STATIC_COLLECTION_INITIALIZER;
-
-/* Symbol flags */
-#define SYM_NONE        0x00    /* No special meaning */
-#define SYM_DEF         0x01    /* Symbol defined in the config file */
-#define SYM_WEAK        0x02    /* Defined symbol is weak */
-#define SYM_IMPORT      0x04    /* A forced import */
+static Collection       CfgSymbols = STATIC_COLLECTION_INITIALIZER;
 
 /* Descriptor holding information about the binary formats */
 static BinDesc*	BinFmtDesc	= 0;
@@ -254,33 +257,27 @@ static void MemoryInsert (MemoryArea* M, SegDesc* S)
 
 
 
-static Symbol* NewSymbol (unsigned Name, unsigned Flags, long Val)
-/* Create a new Symbol structure with the given name name and flags. The
- * current config file position is recorded in the returned struct.
+static CfgSymbol* NewCfgSymbol (CfgSymType Type, unsigned Name)
+/* Create a new CfgSymbol structure with the given type and name. The
+ * current config file position is recorded in the returned struct. The
+ * created struct is inserted into the CfgSymbols collection and returned.
  */
 {
     /* Allocate memory */
-    Symbol* Sym = xmalloc (sizeof (Symbol));
+    CfgSymbol* Sym = xmalloc (sizeof (CfgSymbol));
 
     /* Initialize the fields */
-    Sym->Pos    = CfgErrorPos;
-    Sym->Name   = Name;
-    Sym->Flags  = Flags;
-    Sym->Val    = Val;
+    Sym->Type     = Type;
+    Sym->Pos      = CfgErrorPos;
+    Sym->Name     = Name;
+    Sym->Value    = 0;
+    Sym->AddrSize = ADDR_SIZE_INVALID;
+
+    /* Insert the symbol into the collection */
+    CollAppend (&CfgSymbols, Sym);
 
     /* Return the initialized struct */
     return Sym;
-}
-
-
-
-static Symbol* NewO65Symbol (void)
-/* Create a new Symbol structure with the name in the current CfgSVal variable
- * ready for use as an o65 symbol. The current config file position is recorded
- * in the returned struct.
- */
-{
-    return NewSymbol (GetStrBufId (&CfgSVal), SYM_NONE, 0);
 }
 
 
@@ -344,6 +341,7 @@ static SegDesc* NewSegDesc (unsigned Name)
 
     /* Initialize the fields */
     S->Name    = Name;
+    S->Pos     = CfgErrorPos;
     S->Seg     = 0;
     S->Attr    = 0;
     S->Flags   = 0;
@@ -872,7 +870,7 @@ static void ParseO65 (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
                 /* Remember it as an export for later */
-                CollAppend (&O65Exports, NewO65Symbol ());
+                NewCfgSymbol (CfgSymO65Export, GetStrBufId (&CfgSVal));
                 /* Eat the identifier token */
                 CfgNextTok ();
 	    	break;
@@ -883,7 +881,7 @@ static void ParseO65 (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
                 /* Remember it as an import for later */
-                CollAppend (&O65Imports, NewO65Symbol ());
+                NewCfgSymbol (CfgSymO65Import, GetStrBufId (&CfgSVal));
                 /* Eat the identifier token */
                 CfgNextTok ();
 	    	break;
@@ -1291,107 +1289,159 @@ static void ParseSymbols (void)
 /* Parse a symbols section */
 {
     static const IdentTok Attributes[] = {
+        {   "ADDRSIZE", CFGTOK_ADDRSIZE },
+        {   "TYPE",     CFGTOK_TYPE     },
        	{   "VALUE",   	CFGTOK_VALUE    },
-        {   "WEAK",     CFGTOK_WEAK     },
+    };
+
+    static const IdentTok AddrSizes [] = {
+       	{   "ABS",      CFGTOK_ABS      },
+       	{   "ABSOLUTE", CFGTOK_ABS      },
+       	{   "DIRECT",   CFGTOK_ZP       },
+       	{   "DWORD",    CFGTOK_LONG     },
+       	{   "FAR",      CFGTOK_FAR      },
+       	{   "LONG",     CFGTOK_LONG     },
+       	{   "NEAR",     CFGTOK_ABS      },
+       	{   "ZEROPAGE", CFGTOK_ZP       },
+       	{   "ZP",       CFGTOK_ZP       },
+    };
+
+    static const IdentTok Types [] = {
+       	{   "EXPORT",   CFGTOK_EXPORT   },
+       	{   "IMPORT",   CFGTOK_IMPORT   },
+       	{   "WEAK",     CFGTOK_WEAK     },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
 
-	long Val = 0L;
-        unsigned Flags = SYM_NONE;
+        /* Bitmask to remember the attributes we got already */
+        enum {
+            atNone     	= 0x0000,
+            atAddrSize  = 0x0001,
+            atType      = 0x0002,
+            atValue     = 0x0004,
+        };
+        unsigned AttrFlags = atNone;
+
+       	ExprNode* Value = 0;
+        CfgSymType Type = CfgSymExport;
+        unsigned char AddrSize = ADDR_SIZE_ABS;
+        Import* Imp;
+        Export* Exp;
+        CfgSymbol* Sym;
 
 	/* Remember the name */
 	unsigned Name = GetStrBufId (&CfgSVal);
 	CfgNextTok ();
 
-        /* Support both, old and new syntax here. New syntax is a colon
-         * followed by an attribute list, old syntax is an optional equal
-         * sign plus a value.
-         */
-        if (CfgTok != CFGTOK_COLON) {
+        /* New syntax - skip the colon */
+        CfgNextTok ();
 
-            /* Old syntax */
+        /* Parse the attributes */
+        while (1) {
 
-            /* Allow an optional assignment */
-            CfgOptionalAssign ();
+            /* Map the identifier to a token */
+            cfgtok_t AttrTok;
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            AttrTok = CfgTok;
 
-            /* Make sure the next token is an integer expression, read and
-             * skip it.
-             */
-            Val = CfgConstExpr ();
-
-            /* This is a defined symbol */
-            Flags = SYM_DEF;
-
-        } else {
-
-            /* Bitmask to remember the attributes we got already */
-            enum {
-                atNone	      	= 0x0000,
-                atValue         = 0x0001,
-                atWeak          = 0x0002
-            };
-            unsigned AttrFlags = atNone;
-
-
-            /* New syntax - skip the colon */
+            /* Skip the attribute name */
             CfgNextTok ();
 
-            /* Parse the attributes */
-            while (1) {
+            /* An optional assignment follows */
+            CfgOptionalAssign ();
 
-                /* Map the identifier to a token */
-                cfgtok_t AttrTok;
-                CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-                AttrTok = CfgTok;
+            /* Check which attribute was given */
+            switch (AttrTok) {
 
-                /* Skip the attribute name */
-                CfgNextTok ();
-
-                /* An optional assignment follows */
-                CfgOptionalAssign ();
-
-                /* Check which attribute was given */
-                switch (AttrTok) {
-
-                    case CFGTOK_VALUE:
-                        /* Don't allow this twice */
-                        FlagAttr (&AttrFlags, atValue, "VALUE");
-                        /* We expect a numeric expression */
-                        Val = CfgConstExpr ();
-                        /* Symbol is defined */
-                        Flags |= SYM_DEF;
-                        break;
-
-                    case CFGTOK_WEAK:
-                        /* Don't allow this twice */
-                        FlagAttr (&AttrFlags, atWeak, "WEAK");
-                        CfgBoolToken ();
-                        if (CfgTok == CFGTOK_TRUE) {
-                            Flags |= SYM_WEAK;
-                        }
-                        CfgNextTok ();
-                        break;
-
-                    default:
-                        FAIL ("Unexpected attribute token");
-
-                }
-
-                /* Semicolon ends the decl, otherwise accept an optional comma */
-                if (CfgTok == CFGTOK_SEMI) {
-                    break;
-                } else if (CfgTok == CFGTOK_COMMA) {
+	    	case CFGTOK_ADDRSIZE:
+                    /* Don't allow this twice */
+                    FlagAttr (&AttrFlags, atAddrSize, "ADDRSIZE");
+                    /* Map the type to a token */
+      	    	    CfgSpecialToken (AddrSizes, ENTRY_COUNT (AddrSizes), "AddrSize");
+                    switch (CfgTok) {
+                        case CFGTOK_ABS:    AddrSize = ADDR_SIZE_ABS;   break;
+                        case CFGTOK_FAR:    AddrSize = ADDR_SIZE_FAR;   break;
+                        case CFGTOK_LONG:   AddrSize = ADDR_SIZE_LONG;  break;
+                        case CFGTOK_ZP:     AddrSize = ADDR_SIZE_ZP;    break;
+       	       	       	default:
+                            Internal ("Unexpected token: %d", CfgTok);
+                    }
                     CfgNextTok ();
-                }
+	    	    break;
+
+	    	case CFGTOK_TYPE:
+                    /* Don't allow this twice */
+                    FlagAttr (&AttrFlags, atType, "TYPE");
+                    /* Map the type to a token */
+      	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                    switch (CfgTok) {
+                        case CFGTOK_EXPORT:     Type = CfgSymExport;    break;
+                        case CFGTOK_IMPORT:     Type = CfgSymImport;    break;
+                        case CFGTOK_WEAK:       Type = CfgSymWeak;      break;
+       	       	       	default:
+                            Internal ("Unexpected token: %d", CfgTok);
+                    }
+                    CfgNextTok ();
+	    	    break;
+
+                case CFGTOK_VALUE:
+                    /* Don't allow this twice */
+                    FlagAttr (&AttrFlags, atValue, "VALUE");
+                    /* Value is an expression */
+                    Value = CfgExpr ();
+                    break;
+
+                default:
+                    FAIL ("Unexpected attribute token");
+
             }
 
-            /* Check if we have all mandatory attributes */
-            AttrCheck (AttrFlags, atValue, "VALUE");
+            /* Semicolon ends the decl, otherwise accept an optional comma */
+            if (CfgTok == CFGTOK_SEMI) {
+                break;
+            } else if (CfgTok == CFGTOK_COMMA) {
+                CfgNextTok ();
+            }
         }
 
-        /* Remember the symbol for later */
-        CollAppend (&Symbols, NewSymbol (Name, Flags, Val));
+        /* We must have a type */
+        AttrCheck (AttrFlags, atType, "TYPE");
+
+        /* Further actions depend on the type */
+        switch (Type) {
+
+            case CfgSymExport:
+                /* We must have a value */
+                AttrCheck (AttrFlags, atType, "TYPE");
+                /* Create the export */
+                Exp = CreateExprExport (Name, Value, AddrSize);
+                Exp->Pos = CfgErrorPos;
+                break;
+
+            case CfgSymImport:
+                /* An import must not have a value */
+                if (AttrFlags & atValue) {
+                    CfgError (&CfgErrorPos, "Imports must not have a value");
+                }
+                /* Generate the import */
+                Imp = InsertImport (GenImport (Name, AddrSize));
+                /* Remember the file position */
+                Imp->Pos = CfgErrorPos;
+                break;
+
+            case CfgSymWeak:
+                /* We must have a value */
+                AttrCheck (AttrFlags, atType, "TYPE");
+                /* Remember the symbol for later */
+                Sym = NewCfgSymbol (CfgSymWeak, Name);
+                Sym->Value = Value;
+                Sym->AddrSize = AddrSize;
+                break;
+
+            default:
+                Internal ("Unexpected symbol type %d", Type);
+        }
 
     	/* Skip the semicolon */
     	CfgConsumeSemi ();
@@ -1493,41 +1543,6 @@ void CfgRead (void)
 
 
 
-static void ProcessMemory (void)
-/* Process the MEMORY section */
-{
-    /* Walk over the list with the memory areas */
-    unsigned I;
-    for (I = 0; I < CollCount (&MemoryAreas); ++I) {
-
-        /* Get the next memory area */
-        MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
-
-        /* Remember if this is a relocatable memory area */
-        M->Relocatable = RelocatableBinFmt (M->F->Format);
-
-        /* Resolve the expressions */
-        if (!IsConstExpr (M->StartExpr)) {
-            CfgError (&M->Pos,
-                      "Start address of memory area `%s' is not constant",
-                      GetString (M->Name));
-        }
-        M->Start = GetExprVal (M->StartExpr);
-
-        if (!IsConstExpr (M->SizeExpr)) {
-            CfgError (&M->Pos,
-                      "Size of memory area `%s' is not constant",
-                      GetString (M->Name));
-        }
-        M->Size = GetExprVal (M->SizeExpr);
-
-        /* Mark the memory area as placed */
-        M->Flags |= MF_PLACED;
-    }
-}
-
-
-
 static void ProcessSegments (void)
 /* Process the SEGMENTS section */
 {
@@ -1589,77 +1604,6 @@ static void ProcessSegments (void)
 
 
 
-static void ProcessO65 (void)
-/* Process the o65 format section */
-{
-    unsigned I;
-
-    /* Walk over the imports, check and add them to the o65 data */
-    for (I = 0; I < CollCount (&O65Imports); ++I) {
-
-        /* Get the import */
-        Symbol* Sym = CollAtUnchecked (&O65Imports, I);
-
-        /* Check if we have this symbol defined already. The entry
-         * routine will check this also, but we get a more verbose
-         * error message when checking it here.
-         */
-        if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
-            CfgError (&Sym->Pos,
-                      "Duplicate imported o65 symbol: `%s'",
-                      GetString (Sym->Name));
-        }
-
-        /* Insert the symbol into the table */
-        O65SetImport (O65FmtDesc, Sym->Name);
-    }
-
-    /* Walk over the exports, check and add them to the o65 data */
-    for (I = 0; I < CollCount (&O65Exports); ++I) {
-
-        /* Get the export */
-        Symbol* Sym = CollAtUnchecked (&O65Exports, I);
-
-        /* Check if the export symbol is also defined as an import. */
-        if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
-            CfgError (&Sym->Pos,
-                      "Exported o65 symbol `%s' cannot also be an o65 import",
-                      GetString (Sym->Name));
-        }
-
-        /* Check if we have this symbol defined already. The entry
-         * routine will check this also, but we get a more verbose
-         * error message when checking it here.
-         */
-        if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
-            CfgError (&Sym->Pos,
-                      "Duplicate exported o65 symbol: `%s'",
-                      GetString (Sym->Name));
-        }
-
-        /* Insert the symbol into the table */
-        O65SetExport (O65FmtDesc, Sym->Name);
-    }
-}
-
-
-
-static void ProcessBin (void)
-/* Process the bin format section */
-{
-}
-
-
-
-static void ProcessFormats (void)
-/* Process the target format section */
-{
-    ProcessO65 ();
-    ProcessBin ();
-}
-
-
-
 static void ProcessSymbols (void)
 /* Process the SYMBOLS section */
 {
@@ -1667,33 +1611,81 @@ static void ProcessSymbols (void)
 
     /* Walk over all symbols */
     unsigned I;
-    for (I = 0; I < CollCount (&Symbols); ++I) {
+    for (I = 0; I < CollCount (&CfgSymbols); ++I) {
 
         /* Get the next symbol */
-        Symbol* Sym = CollAtUnchecked (&Symbols, I);
+        CfgSymbol* Sym = CollAtUnchecked (&CfgSymbols, I);
 
-        /* Do we define this symbol? */
-        if ((Sym->Flags & SYM_DEF) != 0) {
-            /* Check if the symbol is already defined somewhere else */
-            if ((E = FindExport (Sym->Name)) != 0 && !IsUnresolvedExport (E)) {
-                /* If the symbol is not marked as weak, this is an error.
-                 * Otherwise ignore the symbol from the config.
-                 */
-                if ((Sym->Flags & SYM_WEAK) == 0) {
-                    CfgError (&CfgErrorPos,
-                              "Symbol `%s' is already defined",
-                              GetString (Sym->Name));
+        /* Check what it is. */
+        switch (Sym->Type) {
+
+            case CfgSymO65Export:
+                /* Check if the export symbol is also defined as an import. */
+                if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
+                    CfgError (
+                        &Sym->Pos,
+                        "Exported o65 symbol `%s' cannot also be an o65 import",
+                        GetString (Sym->Name)
+                    );
                 }
-            } else {
-                /* The symbol is undefined, generate an export */
-                CreateConstExport (Sym->Name, Sym->Val);
-            }
 
-        } else {
+                /* Check if we have this symbol defined already. The entry
+                 * routine will check this also, but we get a more verbose
+                 * error message when checking it here.
+                 */
+                if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
+                    CfgError (
+                        &Sym->Pos,
+                        "Duplicate exported o65 symbol: `%s'",
+                        GetString (Sym->Name)
+                    );
+                }
 
+                /* Insert the symbol into the table */
+                O65SetExport (O65FmtDesc, Sym->Name);
+                break;
 
+            case CfgSymO65Import:
+                /* Check if the import symbol is also defined as an export. */
+                if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
+                    CfgError (
+                        &Sym->Pos,
+                        "Imported o65 symbol `%s' cannot also be an o65 export",
+                        GetString (Sym->Name)
+                    );
+                }
+
+                /* Check if we have this symbol defined already. The entry
+                 * routine will check this also, but we get a more verbose
+                 * error message when checking it here.
+                 */
+                if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
+                    CfgError (
+                        &Sym->Pos,
+                        "Duplicate imported o65 symbol: `%s'",
+                        GetString (Sym->Name)
+                    );
+                }
+
+                /* Insert the symbol into the table */
+                O65SetImport (O65FmtDesc, Sym->Name);
+                break;
+
+            case CfgSymWeak:
+                /* If the symbol is not defined until now, define it */
+                if ((E = FindExport (Sym->Name)) == 0 || IsUnresolvedExport (E)) {
+                    /* The symbol is undefined, generate an export */
+                    E = CreateExprExport (Sym->Name, Sym->Value, Sym->AddrSize);
+                    E->Pos = Sym->Pos;
+                }
+                break;
+
+            default:
+                Internal ("Unexpected symbol type %d", Sym->Type);
+                break;
         }
     }
+
 }
 
 
@@ -1701,12 +1693,19 @@ static void ProcessSymbols (void)
 static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a RUN segment */
 {
+    Export* E;
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
+    /* Define the run address of the segment */
     SB_Printf (&Buf, "__%s_RUN__", GetString (S->Name));
-    CreateMemoryExport (GetStrBufId (&Buf), S->Run, SegAddr - S->Run->Start);
+    E = CreateMemoryExport (GetStrBufId (&Buf), S->Run, SegAddr - S->Run->Start);
+    E->Pos = S->Pos;
+
+    /* Define the size of the segment */
     SB_Printf (&Buf, "__%s_SIZE__", GetString (S->Name));
-    CreateConstExport (GetStrBufId (&Buf), S->Seg->Size);
+    E = CreateConstExport (GetStrBufId (&Buf), S->Seg->Size);
+    E->Pos = S->Pos;
+
     S->Flags |= SF_RUN_DEF;
     SB_Done (&Buf);
 }
@@ -1716,10 +1715,14 @@ static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a LOAD segment */
 {
+    Export* E;
     StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
+    /* Define the load address of the segment */
     SB_Printf (&Buf, "__%s_LOAD__", GetString (S->Name));
-    CreateMemoryExport (GetStrBufId (&Buf), S->Load, SegAddr - S->Load->Start);
+    E = CreateMemoryExport (GetStrBufId (&Buf), S->Load, SegAddr - S->Load->Start);
+    E->Pos = S->Pos;
+
     S->Flags |= SF_LOAD_DEF;
     SB_Done (&Buf);
 }
@@ -1738,11 +1741,13 @@ unsigned CfgProcess (void)
     unsigned Overflows = 0;
     unsigned I;
 
-    /* Do postprocessing of the config file data */
-    ProcessSymbols (); /* ######## */
-    ProcessMemory ();
+    /* Postprocess symbols. We must do that first, since weak symbols are
+     * defined here, which may be needed later.
+     */
+    ProcessSymbols ();
+
+    /* Postprocess segments */
     ProcessSegments ();
-    ProcessFormats ();
 
     /* Walk through each of the memory sections. Add up the sizes and check
      * for an overflow of the section. Assign the start addresses of the
@@ -1751,12 +1756,35 @@ unsigned CfgProcess (void)
     for (I = 0; I < CollCount (&MemoryAreas); ++I) {
 
         unsigned J;
+        unsigned long Addr;
 
-        /* Get this entry */
+        /* Get the next memory area */
         MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
 
+        /* Remember if this is a relocatable memory area */
+        M->Relocatable = RelocatableBinFmt (M->F->Format);
+
+        /* Resolve the start address expression */
+        if (!IsConstExpr (M->StartExpr)) {
+            CfgError (&M->Pos,
+                      "Start address of memory area `%s' is not constant",
+                      GetString (M->Name));
+        }
+        M->Start = GetExprVal (M->StartExpr);
+
+        /* Resolve the size expression */
+        if (!IsConstExpr (M->SizeExpr)) {
+            CfgError (&M->Pos,
+                      "Size of memory area `%s' is not constant",
+                      GetString (M->Name));
+        }
+        M->Size = GetExprVal (M->SizeExpr);
+
+        /* Mark the memory area as placed */
+        M->Flags |= MF_PLACED;
+
      	/* Get the start address of this memory area */
-     	unsigned long Addr = M->Start;
+     	Addr = M->Start;
 
      	/* Walk through the segments in this memory area */
         for (J = 0; J < CollCount (&M->SegList); ++J) {
@@ -1855,13 +1883,24 @@ unsigned CfgProcess (void)
 
 	/* If requested, define symbols for start and size of the memory area */
 	if (M->Flags & MF_DEFINE) {
+            Export* E;
 	    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+
+            /* Define the start of the memory area */
 	    SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
-	    CreateMemoryExport (GetStrBufId (&Buf), M, 0);
+	    E = CreateMemoryExport (GetStrBufId (&Buf), M, 0);
+            E->Pos = M->Pos;
+
+            /* Define the size of the memory area */
 	    SB_Printf (&Buf, "__%s_SIZE__", GetString (M->Name));
-	    CreateConstExport (GetStrBufId (&Buf), M->Size);
+	    E = CreateConstExport (GetStrBufId (&Buf), M->Size);
+            E->Pos = M->Pos;
+
+            /* Define the fill level of the memory area */
 	    SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
-	    CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
+	    E = CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
+            E->Pos = M->Pos;
+
             SB_Done (&Buf);
 	}
 

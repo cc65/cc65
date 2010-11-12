@@ -81,7 +81,7 @@ ObjData* NewObjData (void)
     O->FileCount        = 0;
     O->Files            = EmptyCollection;
     O->SectionCount     = 0;
-    O->Sections         = EmptyCollection;                
+    O->Sections         = EmptyCollection;
     O->ExportCount 	= 0;
     O->Exports     	= EmptyCollection;
     O->ImportCount 	= 0;
@@ -198,7 +198,11 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
     if (O == 0) {
 
      	/* No object file */
-     	return "[linker generated]";
+        if (Index == INVALID_STRING_ID) {
+            return "[linker generated]";
+        } else {
+            return GetString (Index);
+        }
 
     } else {
 

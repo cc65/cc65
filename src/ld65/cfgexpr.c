@@ -74,6 +74,7 @@ static ExprNode* Factor (void)
             } else {
                 N = NewExprNode (0, EXPR_SYMBOL);
                 N->V.Imp = InsertImport (GenImport (Name, ADDR_SIZE_ABS));
+                N->V.Imp->Pos = CfgErrorPos;
             }
 
             /* Skip the symbol name */

@@ -832,8 +832,8 @@ The necessary o65 attributes are defined in a special section labeled
 
 The <tt/FORMAT/ section is used to describe file formats. The default (binary)
 format has currently no attributes, so, while it may be listed in this
-section, the attribute list is empty. The second supported format, 
-<htmlurl url="http://www.6502.org/users/andre/o65/fileformat.html" name="o65">, 
+section, the attribute list is empty. The second supported format,
+<htmlurl url="http://www.6502.org/users/andre/o65/fileformat.html" name="o65">,
 has several attributes that may be defined here.
 
 <tscreen><verb>
@@ -942,12 +942,41 @@ mean, that the <tt/FEATURES/ section has to go to the top of the config file.
 <sect1>The SYMBOLS section<label id="SYMBOLS"><p>
 
 The configuration file may also be used to define symbols used in the link
-stage. The mandatory attribute for a symbol is its value. A second, boolean
-attribute named <tt/weak/ is available. If a symbol is marked as weak, it may
-be overridden by defining a symbol of the same name from the command line. The
-default for symbols is that they're strong, which means that an attempt to
-define a symbol with the same name from the command line will lead to an
-error.
+stage or to force symbols imports. This is done in the SYMBOLS section. The
+symbol name is followed by a colon and symbol attributes.
+
+The following symbol attributes are supported:
+
+<descrip>
+
+  <tag><tt>addrsize</tt></tag>
+
+  The <tt/addrsize/ attribute specifies the address size of the symbol and
+  may be one of
+<itemize>
+    <item><tt/zp/, <tt/zeropage/ or <tt/direct/
+    <item><tt/abs/, <tt/absolute/ or <tt/near/
+    <item><tt/far/
+    <item><tt/long/ or <tt/dword/.
+</itemize>
+
+Without this attribute, the default address size is <tt/abs/.
+
+  <tag><tt>type</tt></tag>
+
+  This attribute is mandatory. Its value is one of <tt/export/, <tt/import/ or
+  <tt/weak/. <tt/export/ means that the symbol is defined and exported from
+  the linker config. <tt/import/ means that an import is generated for this
+  symbol, eventually forcing a module that exports this symbol to be included
+  in the output. <tt/weak/ is similar as <tt/export/. However, the symbol is
+  only defined if it is not defined elsewhere.
+
+  <tag><tt>value</tt></tag>
+
+  This must only be given for symbols of type <tt/export/ or <tt/weak/. It
+  defines the value of the symbol and may be an expression.
+
+</descrip>
 
 The following example defines the stack size for an application, but allows
 the programmer to override the value by specifying <tt/--define
@@ -956,7 +985,7 @@ __STACKSIZE__=xxx/ on the command line.
 <tscreen><verb>
        	SYMBOLS {
             # Define the stack size for the application
-       	    __STACKSIZE__:      value = $800, weak = yes;
+       	    __STACKSIZE__:  type = weak, value = $800;
        	}
 </verb></tscreen>
 

@@ -1764,13 +1764,32 @@ unsigned CfgProcess (void)
         /* Remember if this is a relocatable memory area */
         M->Relocatable = RelocatableBinFmt (M->F->Format);
 
-        /* Resolve the start address expression */
+        /* Resolve the start address expression, remember the start address
+         * and mark the memory area as placed.
+         */
         if (!IsConstExpr (M->StartExpr)) {
             CfgError (&M->Pos,
                       "Start address of memory area `%s' is not constant",
                       GetString (M->Name));
         }
-        M->Start = GetExprVal (M->StartExpr);
+        Addr = M->Start = GetExprVal (M->StartExpr);
+        M->Flags |= MF_PLACED;
+
+        /* If requested, define the symbol for the start of the memory area.
+         * Doing it here means that the expression for the size of the area
+         * may reference this symbol.
+         */
+	if (M->Flags & MF_DEFINE) {
+            Export* E;
+	    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+
+            /* Define the start of the memory area */
+	    SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
+	    E = CreateMemoryExport (GetStrBufId (&Buf), M, 0);
+            E->Pos = M->Pos;
+
+            SB_Done (&Buf);
+        }
 
         /* Resolve the size expression */
         if (!IsConstExpr (M->SizeExpr)) {
@@ -1779,12 +1798,6 @@ unsigned CfgProcess (void)
                       GetString (M->Name));
         }
         M->Size = GetExprVal (M->SizeExpr);
-
-        /* Mark the memory area as placed */
-        M->Flags |= MF_PLACED;
-
-     	/* Get the start address of this memory area */
-     	Addr = M->Start;
 
      	/* Walk through the segments in this memory area */
         for (J = 0; J < CollCount (&M->SegList); ++J) {
@@ -1885,11 +1898,6 @@ unsigned CfgProcess (void)
 	if (M->Flags & MF_DEFINE) {
             Export* E;
 	    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
-
-            /* Define the start of the memory area */
-	    SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
-	    E = CreateMemoryExport (GetStrBufId (&Buf), M, 0);
-            E->Pos = M->Pos;
 
             /* Define the size of the memory area */
 	    SB_Printf (&Buf, "__%s_SIZE__", GetString (M->Name));

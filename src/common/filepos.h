@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   filepos.h				     */
+/*                                 filepos.h				     */
 /*                                                                           */
-/*			 File position data structure			     */
+/*                       File position data structure			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*             	    		     Data				     */
 /*****************************************************************************/
 
 
@@ -47,9 +47,9 @@
 /* Type of a file position */
 typedef struct FilePos FilePos;
 struct FilePos {
-    unsigned long   Line;    	       	/* Line */
-    unsigned short  Col;		/* Column */
-    unsigned short  Name;		/* File */
+    unsigned long   Line;               /* Line */
+    unsigned        Col;                /* Column */
+    unsigned        Name;               /* File */
 };
 
 /* Initializer for a FilePos */
@@ -58,7 +58,7 @@ struct FilePos {
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*             	    		     Code				     */
 /*****************************************************************************/
 
 

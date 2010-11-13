@@ -457,7 +457,7 @@ static void OptOutputName (const char* Opt, const char* Arg)
      * gives unexpected results, so emit a warning in this case.
      */
     if (OutputNameUsed) {
-        Warning ("Option `%s' should preceede options `-t' or `-C'", Opt);
+        Warning ("Option `%s' should precede options `-t' or `-C'", Opt);
     }
     OutputName = Arg;
 }

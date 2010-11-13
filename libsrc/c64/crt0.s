@@ -21,7 +21,6 @@
 
 .segment       	"EXEHDR"
 
-        .word   Head            ; Load address
 Head:   .word   @Next
         .word   .version        ; Line number
         .byte   $9E             ; SYS token

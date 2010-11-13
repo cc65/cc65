@@ -71,6 +71,7 @@ S_OBJS =	c_acptr.o	\
 		gotoxy.o 	\
 		gotoy.o 	\
                 initcwd.o       \
+                loadaddr.o      \
                 open.o          \
                 oserrlist.o     \
 		oserror.o	\

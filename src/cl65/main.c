@@ -386,23 +386,6 @@ static void Link (void)
 {
     unsigned I;
 
-    /* If we have a linker config file given, add it to the command line.
-     * Otherwise pass the target to the linker if we have one.
-     */
-    if (LinkerConfig) {
-        if (Module) {
-            Error ("Cannot use -C and --module together");
-        }
-       	CmdAddArg2 (&LD65, "-C", LinkerConfig);
-    } else if (Module) {
-        CmdSetTarget (&LD65, TGT_MODULE);
-    } else {
-	CmdSetTarget (&LD65, Target);
-    }
-
-    /* Determine which target libraries are needed */
-    SetTargetFiles ();
-
     /* Since linking is always the final step, if we have an output file name
      * given, set it here. If we don't have an explicit output name given,
      * try to build one from the name of the first input file.
@@ -419,6 +402,23 @@ static void Link (void)
     	xfree (Output);
 
     }
+
+    /* If we have a linker config file given, add it to the command line.
+     * Otherwise pass the target to the linker if we have one.
+     */
+    if (LinkerConfig) {
+        if (Module) {
+            Error ("Cannot use -C and --module together");
+        }
+       	CmdAddArg2 (&LD65, "-C", LinkerConfig);
+    } else if (Module) {
+        CmdSetTarget (&LD65, TGT_MODULE);
+    } else {
+	CmdSetTarget (&LD65, Target);
+    }
+
+    /* Determine which target libraries are needed */
+    SetTargetFiles ();
 
     /* Add all object files as parameters */
     for (I = 0; I < LD65.FileCount; ++I) {

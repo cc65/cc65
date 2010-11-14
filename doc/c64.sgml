@@ -63,6 +63,59 @@ Special locations:
 </descrip><p>
 
 
+<sect>Linker configurations<p>
+
+The ld65 linker comes with a builtin config file for the Commodore&nbsp;64,
+which is used via <tt/-t c64/ (and displayed via <tt/--dump-config c64/). The
+c64 package comes with additional secondary linker config files, which are
+used via <tt/-C &lt;configfile&gt;/.
+
+
+<sect1>builtin config file<p>
+
+The builtin configuration is tailored to C programs. It supplies the load
+address and a small BASIC stub that starts the compiled program using a SYS
+command.
+
+
+<sect1><tt/c64-asm.cfg/<p>
+
+This configuration is made for assembler programmers who don't need a special
+setup. The default start address is &dollar;801. It can be changed with the
+linker command line option <tt/--start-addr/. All standard segments with the
+exception of <tt/zeropage/ are written to the output file and a two byte load
+address is prepended.
+
+To use this config file, assemble with <tt/-t c64/ and link with <tt/-C
+c64-asm.cfg/. The former will make sure that correct character translation is
+in effect, while the latter supplies the actual config. When using <tt/cl65/,
+use both command line options.
+
+Sample command line for <tt/cl65/:
+
+<tscreen><verb>
+cl65 -o file.prg -t c64 -C c64-asm.cfg source.s
+</verb></tscreen>
+
+To generate code that loads to &dollar;C000:
+
+<tscreen><verb>
+cl65 -o file.prg --start-addr $C000 -t c64 -C c64-asm.cfg source.s
+</verb></tscreen>
+
+It is also possible to add a small BASIC header to the program, that uses SYS
+to jump to the program entry point (which is the start of the code segment).
+The advantage is that the program can be started using RUN.
+
+To generate a program with a BASIC SYS header, use
+
+<tscreen><verb>
+cl65 -o file.prg -u __EXEHDR__ -t c64 -C c64-asm.cfg source.s
+</verb></tscreen>
+
+Please note that in this case a changed start address doesn't make sense,
+since the program must be loaded to the BASIC start address.
+
 
 <sect>Platform specific header files<p>
 

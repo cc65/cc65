@@ -64,6 +64,7 @@ S_OBJS =	c_acptr.o	\
 		ctype.o 	\
 		cvline.o 	\
                 diskcmd.o       \
+                exehdr.o        \
                 filedes.o       \
                 filename.o      \
                 filevars.o      \

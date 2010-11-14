@@ -243,7 +243,7 @@ example the program <tt/MYPROG/ is loaded by <tt/MYPROG.SYSTEM/.
 
 <sect1>Heap<p>
 
-If the cc65 program can be successully linked as system program using the linker
+If the cc65 program can be successfully linked as system program using the linker
 configuration <htmlurl url="apple2enh-4.html#ss4.3" name="apple2enh-system.cfg"> but
 uses the heap either explicitly or implicitly (i.e. by loading a driver) then
 the memory from &dollar;800 to &dollar;2000 can be added to the heap by calling
@@ -352,7 +352,7 @@ you cannot do it, it just means that there's no help.
 <descrip>
 
   <tag><tt/a2e.auxmem.emd/</tag>
-  Gives access to 47,5 KB RAM (190 pages of 256 bytes each) on an Extended
+  Gives access to 47.5 KB RAM (190 pages of 256 bytes each) on an Extended
   80-Column Text Card.
   
   Note that this driver doesn't check for the actual existence of the memory

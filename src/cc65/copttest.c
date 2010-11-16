@@ -162,8 +162,6 @@ unsigned OptTest2 (CodeSeg* S)
     	    strcmp (L[0]->Arg, L[1]->Arg) == 0                  &&
             (GetRegInfo (S, I+2, L[1]->Chg) & L[1]->Chg) == 0) {
 
-            printf ("Deleting\n");
-
             /* Remove the load */
             CS_DelEntry (S, I+1);
              ++Changes;

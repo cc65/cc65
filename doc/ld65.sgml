@@ -154,6 +154,7 @@ Here is a description of all the command line options:
 
   <itemize>
   <item>none
+  <item>module
   <item>apple2
   <item>apple2enh
   <item>atari
@@ -167,7 +168,6 @@ Here is a description of all the command line options:
   <item>pet (all CBM PET systems except the 2001)
   <item>geos
   <item>lunix
-  <item>atmos
   <item>nes
   <item>supervision
   </itemize>

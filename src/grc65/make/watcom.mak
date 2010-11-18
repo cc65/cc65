@@ -25,7 +25,7 @@ LNKCFG  = ld.tmp
 CFLAGS  = -d1 -obeilr -zp4 -5 -zq -w2 -i=..\\common
 
 # Target files
-EXE	= grc.exe
+EXE	= grc65.exe
 
 # Create NT programs by default
 ifndef TARGET
@@ -60,7 +60,7 @@ endif
 # ------------------------------------------------------------------------------
 # All OBJ files
 
-OBJS = 	grc.obj
+OBJS = 	grc65.obj
 
 LIBS = ../common/common.lib
 

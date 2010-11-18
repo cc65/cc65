@@ -103,10 +103,11 @@ needs cc65.
 I want to thank Uz for his cc65 package, Alexander Boyce for his excellent GEOS Programmer's
 Reference Guide and BSW for GEOS.
 <p>
-GEOSLib is covered by the same license as cc65. You can find the whole text among documentation.
-I would really appreciate if you would like to send me your comments, suggestions, questions,
-changes, bug reports etc. I will also appreciate if you will just give me a sign that you are
-using GEOSLib - not especially something big and important, mail me even if you are just playing
+GEOSLib is covered by the same license as cc65. You can find the whole text
+among documentation. I would really appreciate if you would like to send me
+your comments, suggestions, questions, changes, bug reports etc. I will also
+appreciate if you will just give me a sign that you are using GEOSLib - not
+especially something big and important, mail me even if you are just playing
 with it.
 <p>
 You can send postcards with hellos to:
@@ -123,11 +124,12 @@ This chapter describes some rules you ought to obey, and how to use GEOSLib.
 
 <sect1>Usage
 <p>
-Apart from this file, which merely describes only standard GEOS library functions, you should read
-<tt/grc/ (GEOS resource compiler) documentation. There are informations about necessary resource
-files (each GEOS application needs at least one) and the building process - what should be done
-and in what order. Please also read cc65's documentation on how to compile C, assembler and link
-everything together.
+Apart from this file, which merely describes only standard GEOS library
+functions, you should read <tt/grc65/ (GEOS resource compiler) documentation.
+There are informations about necessary resource files (each GEOS application
+needs at least one) and the building process - what should be done and in what
+order. Please also read cc65's documentation on how to compile C, assembler
+and link everything together.
 <p>
 All in all, you just need to place
 <tscreen><verb>
@@ -135,10 +137,11 @@ All in all, you just need to place
 </verb></tscreen>
 on top of your source.
 <p>
-As a general rule read the sources of example programs and read the headers. These are the most
-reliable sources of knowledge ;). You will also find there many C macros representing various
-arguments passed to functions. Please use them. You will find your sources easier to understand,
-and it will be easier to find bugs.
+As a general rule read the sources of example programs and read the headers.
+These are the most reliable sources of knowledge ;). You will also find there
+many C macros representing various arguments passed to functions. Please use
+them. You will find your sources easier to understand, and it will be easier
+to find bugs.
 <p>
 All types used in GEOSLib are <tt/unsigned/.
 <p>

@@ -9,7 +9,7 @@ PROGS =		\
 	cl65	\
 	co65	\
 	da65	\
-	grc	\
+       	grc65   \
 	ld65	\
 	od65
 

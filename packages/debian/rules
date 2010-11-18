@@ -62,7 +62,7 @@ binary-arch: checkroot build
 	dh_testroot -a
 	dh_installdirs -a
 	dh_installmenu -a
-	for bin in ar65 ca65 cc65 cl65 da65 grc ld65 od65 ca65html; do \
+	for bin in ar65 ca65 cc65 cl65 da65 grc65 ld65 od65 ca65html; do \
 	  install -m0755 `pwd`/src/$$bin/$$bin debian/cc65/usr/bin; \
 	done
 	for info in ar65 ca65 cc65 cl65 ld65 debugging dio geos coding intro library; do \

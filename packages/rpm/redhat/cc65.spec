@@ -324,7 +324,7 @@ This package contains the header files and libraries needed to write
 GEOS programs for the C64/C128 using the cc65 crosscompiler.
 
 %files geos
-%attr(755,root,root)        /usr/bin/grc
+%attr(755,root,root)        /usr/bin/grc65
 %attr(644,root,root)        %{_libdir}/cc65/lib/geos.lib
 %attr(755,root,root) %dir   %{_libdir}/cc65/include/geos
 %attr(644,root,root)        %{_libdir}/cc65/include/geos/*.h
@@ -492,7 +492,7 @@ install -s -m 755 src/cc65/cc65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/cl65/cl65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/co65/co65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/da65/da65 $RPM_BUILD_ROOT%{_bindir}
-install -s -m 755 src/grc/grc $RPM_BUILD_ROOT%{_bindir}
+install -s -m 755 src/grc65/grc65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT%{_bindir}
 

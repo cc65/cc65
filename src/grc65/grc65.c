@@ -25,7 +25,7 @@
 #include <errno.h>
 #include <time.h>
 
-#include "grc.h"
+#include "grc65.h"
 
 /* common stuff */
 #include "fname.h"
@@ -163,7 +163,7 @@ void printVHeader (void) {
 	    "\n#\tDO NOT EDIT! Any changes will be lost!\n#"
 	    "\n#\tEdit proper resource file instead\n#"
 	    "\n#\tLook at end of this file to find commandline that must be used\n"
-	      "#\tto invoke ld65 and grc (as VLIR linker)\n#"
+	      "#\tto invoke ld65 and grc65 (as VLIR linker)\n#"
 	    "\n#\n\n");
 }
 
@@ -597,7 +597,7 @@ struct vlirentry vlirtable[127];
 
     /* now put usage info */
     fprintf(outputVFile,"\n# ld65 -o output.cvt -C %s file1.o file2.o ...",outputVName);
-    fprintf(outputVFile,"\n# grc -vlir outputname %s",headname);
+    fprintf(outputVFile,"\n# grc65 -vlir outputname %s",headname);
     for (i=1;i<=numchains;i++) {
 	fprintf(outputVFile," %s",vlirtable[i].chainname);
     }

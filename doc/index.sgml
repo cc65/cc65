@@ -34,8 +34,8 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="da65.html" name="da65.html"></tag>
   Describes the da65 6502/65C02 disassembler.
 
-  <tag><htmlurl url="grc.html" name="grc.html"></tag>
-  Describes the GEOS resource compiler (grc).
+  <tag><htmlurl url="grc65.html" name="grc65.html"></tag>
+  Describes the GEOS resource compiler (grc65).
 
   <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
   Describes the ld65 linker.

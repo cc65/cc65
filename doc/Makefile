@@ -38,7 +38,7 @@ SGML =	apple2.sgml	\
 	dio.sgml	\
 	funcref.sgml	\
 	geos.sgml	\
-	grc.sgml	\
+	grc65.sgml	\
 	index.sgml	\
 	intro.sgml	\
 	ld65.sgml	\

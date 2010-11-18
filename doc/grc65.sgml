@@ -3,7 +3,7 @@
 
 <!-- Title information -->
 
-<title>grc -- GEOS Resource Compiler
+<title>grc65 -- GEOS Resource Compiler
 <author><url name="Maciej 'YTM/Elysium' Witkowiak" url="mailto:ytm@elysium.pl">
 <and><url name="Greg King" url="mailto:gngking@erols.com">
 <date>VII 2000; VI,VII 2002; 2005-8-3
@@ -18,32 +18,32 @@ and VLIR files from, cc65-compiled programs.
 <!-- Begin the document -->
 
 <sect>Overview
-<p><bf/grc/ is a part of cc65's GEOS support.  The tool is necessary to
+<p><bf/grc65/ is a part of cc65's GEOS support.  The tool is necessary to
 generate required and optional resources.  A required resource for every GEOS
 application is the header, that is:  an icon, some strings, and some addresses.
 Optional resources might be menu definitions, other headers (e.g., for data
 files of an app.), dialog definitions, etc.  Without an application's header,
 GEOS is unable to load and start it.
 
-Currently, <bf/grc/ supports only menues and the required header definition,
+Currently, <bf/grc65/ supports only menues and the required header definition,
 along with support for building VLIR-structured files.
 
-<bf/grc/ generates output in three formats:  C header, <bf/ca65/ source (.s),
+<bf/grc65/ generates output in three formats: C header, <bf/ca65/ source (.s),
 and, for linking VLIR, <bf/ld65/ configuration script.  That is because
 application header data must be in assembly format, while menu definitions can
 be translated easily into C.  The purpose of the C file is to include it as a
 header in only one project file.  The assembly source should be processed by
-<bf/ca65/, and linked as the first object (read about <ref
-name="the building process" id="building-seq">).  The VLIR structure currently
-is supported for only projects that are written entirely in assembly code.
+<bf/ca65/, and linked as the first object (read about <ref name="the building
+process" id="building-seq">).  The VLIR structure currently is supported for
+only projects that are written entirely in assembly code.
 
-<bf/grc/ can be used also as a handy VLIR linker -- used to build
+<bf/grc65/ can be used also as a handy VLIR linker -- used to build
 VLIR-structured <tt/.cvt/ files out of prepared binary chains.
 
 
 
 <sect>Usage
-<p>grc accepts the following options:<tscreen><verb>
+<p>grc65 accepts the following options:<tscreen><verb>
 -f         force the writing of the output files
 -o name    name the .c output file
 -s name    name the .s output file
@@ -51,10 +51,10 @@ VLIR-structured <tt/.cvt/ files out of prepared binary chains.
 -h         show this help
 </verb></tscreen>
 When used as a VLIR linker, the correct syntax is:<tscreen><verb>
- grc -vlir output.cvt header.bin vlir0.bin vlir1.bin ...
+ grc65 -vlir output.cvt header.bin vlir0.bin vlir1.bin ...
 </verb></tscreen>
 Default output names are made from input names with extensions replaced by
-<tt/.h/ and <tt/.s/.  <bf/grc/ will not overwrite existing files unless forced
+<tt/.h/ and <tt/.s/.  <bf/grc65/ will not overwrite existing files unless forced
 to do so.  That is done to avoid situations where you have <tt/test.c/ and
 <tt/test.grc/ files.  Both would put their output into <tt/test.s/.  For that
 reason, you should name your resource-files differently than sources, e.g.,
@@ -65,7 +65,7 @@ reason, you should name your resource-files differently than sources, e.g.,
 <sect>Resource file format
 <p>A resource file has the name extension <tt/.grc/.  That is not required, but
 it will make for an easier recognition of the file's purpose.  Also, <bf/cl65/
-recognizes those files.  <bf/grc/'s parser is very weak, at the moment; so,
+recognizes those files.  <bf/grc65/'s parser is very weak, at the moment; so,
 read the comments carefully, and write resources exactly as they are written
 here.  Look out for CAPS. and small letters.  Everything after a '<tt/;/',
 until the end of the line, is considered as a comment, and ignored.  See the
@@ -115,7 +115,7 @@ HEADER <GEOS_TYPE> "dosname" "classname" "version" {
     structure SEQ
 }</verb></tscreen>
 The header definition describes the GEOS header sector which is unique to
-each file.  Currently, there's no way to change the default <bf/grc/ icon
+each file.  Currently, there's no way to change the default <bf/grc65/ icon
 (an empty frame).  It will be possible in the next version.  The definition
 starts with the keyword <tt/HEADER/, then goes the GEOS file-type.  You can use
 only <tt/APPLICATION/ here at the moment.  Then, there are (each one in quotes)
@@ -159,11 +159,11 @@ the names of binaries that contain code for each VLIR part.  They matter only
 for the generated <bf/ld65/ configuration file, and will be the names of the
 resulting binary files after linking.  Each one will contain one VLIR chain;
 and, they will have to be put together, in the correct order, into a VLIR
-<tt/.cvt/ file, by <bf/grc/ in its VLIR linker mode.
+<tt/.cvt/ file, by <bf/grc65/ in its VLIR linker mode.
 
 The <tt/headname/ will be the name for the binary file which will contain only
 a GEOS <tt/.cvt/ header made out of compiling the <tt/.s/ header file that also
-was generated by <bf/grc/.  At the end of the resulting <bf/ld65/ config. file
+was generated by <bf/grc65/.  At the end of the resulting <bf/ld65/ config. file
 (<tt/.cfg/), in comments, there will be information about what commands are
 required for putting the stuff together.  Read <ref name="this description"
 id="building-vlir"> for details.
@@ -202,7 +202,7 @@ file, and processed into an assembly <tt/.s/ file.  You must assemble it, with
 source), &dquot;<tt/test.h/&dquot; (a header file), and
 &dquot;<tt/resource.grc/&dquot; (with menu and header definitions).  Note the
 fact that I <em/don't recommend/ naming that file &dquot;<tt/test.grc/&dquot;,
-because you will have to be very careful with names (<bf/grc/ will make
+because you will have to be very careful with names (<bf/grc65/ will make
 &dquot;<tt/test.s/&dquot; and &dquot;<tt/test.h/&dquot; out of
 &dquot;<tt/test.grc/&dquot;, by default; and, you don't want that because
 &dquot;<tt/test.s/&dquot; is compiled from &dquot;<tt/test.c/&dquot;, and
@@ -217,7 +217,7 @@ There are no other includes.
 
 <sect2>First step -- compiling the resources
 <p><verb>
-$ grc resource.grc
+$ grc65 resource.grc
 </verb>
 will produce two output files:  &dquot;<tt/resource.h/&dquot; and
 &dquot;<tt/resource.s/&dquot;.
@@ -279,9 +279,9 @@ VLIR vlir-head.bin 0x3000 {
 }</verb></tscreen>
 (Source files are only <tt/.s/.)
 
-OK, we have &dquot;<tt/cvthead.grc/&dquot;, so let's allow <bf/grc/ to compile
+OK, we have &dquot;<tt/cvthead.grc/&dquot;, so let's allow <bf/grc65/ to compile
 it:<verb>
-$ grc cvthead.grc
+$ grc65 cvthead.grc
 </verb>
 Now, there are two new files:  &dquot;<tt/cvthead.cfg/&dquot; and
 &dquot;<tt/cvthead.s/&dquot; -- the first one is a config. file for <bf/ld65/,
@@ -310,7 +310,7 @@ VLIR file:  &dquot;<tt/vlir-head.bin/&dquot;, &dquot;<tt/vlir-0.bin/&dquot;,
 The last step is to put them together in the right order -- the order of the
 arguments <em/is important/ this time!  As suggested in the comments at the end
 of &dquot;<tt/cvthead.cfg/&dquot;, we do:<verb>
-$ grc -vlir output.cvt vlir-head.bin vlir-0.bin vlir-1.bin vlir-2.bin
+$ grc65 -vlir output.cvt vlir-head.bin vlir-0.bin vlir-1.bin vlir-2.bin
 </verb>
 That is the end.  The file &dquot;<tt/output.cvt/&dquot; can be
 deconverted under GEOS.  Note that <tt/-C cvthead.cfg/ was used on the
@@ -319,10 +319,10 @@ deconverted under GEOS.  Note that <tt/-C cvthead.cfg/ was used on the
 
 
 <sect>Bugs and feedback
-<p>This is the first release of <bf/grc/, and it contains bugs, for sure!  I am
-aware of them; I know that the parser is weak, and if you don't follow the
+<p>This is the first release of <bf/grc65/, and it contains bugs, for sure!  I
+am aware of them; I know that the parser is weak, and if you don't follow the
 grammar rules strictly, then everything will crash.  However, if you find an
-interesting bug, mail me. :-)  Mail me also for help with writing your
+interesting bug, mail me. :-) Mail me also for help with writing your
 <tt/.grc/ file correctly if you have problems with it.  I would appreciate
 comments also, and help on this file because I am sure that it can be written
 better.
@@ -330,7 +330,7 @@ better.
 
 
 <sect>Legal stuff
-<p><bf/grc/ is covered by the same license as the whole cc65 package, so you
+<p><bf/grc65/ is covered by the same license as the whole cc65 package, so you
 should see its documentation for more info.  Anyway, if you like it, and want
 to encourage me to work more on it, send me a postcard with a sight of your
 neighbourhood, city, region, etc.  Or, just e-mail me with info that you

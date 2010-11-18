@@ -5,7 +5,7 @@
 # ------------------------------------------------------------------------------
 
 # The executable to build
-EXE  	= grc
+EXE  	= grc65
 
 COMMON = ../common
 
@@ -20,7 +20,7 @@ EBIND	= emxbind
 # -----------------------------------------------------------------------------
 # List of all object files
 
-OBJS =  grc.o
+OBJS =  grc65.o
 
 LIBS = $(COMMON)/common.a
 
@@ -54,5 +54,5 @@ zap:	clean
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
 	$(CC) $(CFLAGS) -MM $^ > .depend
-
+               
 

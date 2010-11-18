@@ -96,7 +96,7 @@ clean zap:
 
 uninstall:	install-test
 	cd $(bindir) && $(RM) ar65${EXT} ca65${EXT} cc65${EXT} cl65${EXT} \
-	  co65${EXT} da65${EXT} ld65${EXT} od65${EXT} grc${EXT} ca65html
+	  co65${EXT} da65${EXT} ld65${EXT} od65${EXT} grc65${EXT} ca65html
 	$(RM) -R $(CC65_HOME) $(CC65_DOC)
 
 install:	install-test install-dirs install-bins install-libs install-docs
@@ -143,7 +143,7 @@ $(CC65_HOME)/% $(CC65_INC)/% $(CC65_DOC)/%:
 	$(MKDIR) $@
 
 install-bins:
-	for f in ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc; \
+	for f in ar65 ca65 cc65 cl65 co65 da65 ld65 od65 grc65; \
 	  do $(INSTALL_STRIP) src/$$f/$$f${EXT} $(bindir) || exit $$?; \
 	  done
 	$(INSTALL_PROG) src/ca65html/ca65html $(bindir)

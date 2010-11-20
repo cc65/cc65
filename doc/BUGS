@@ -6,4 +6,3 @@ Introduced with version 2.5:
     symbol table stuff and was not reintroduced because it was ugly anyway,
     did not work with the new symbol table code, and should be unnecessary as
     soon as local variables are allocated in one chunk on function entry.
-

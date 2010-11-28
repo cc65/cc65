@@ -261,7 +261,7 @@ static void WarnConstCompareResult (void)
  * preprocessor mode.
  */
 {
-    if (!Preprocessing) {
+    if (!Preprocessing && IS_Get (&WarnConstComparison) != 0) {
         Warning ("Result of comparison is constant");
     }
 }

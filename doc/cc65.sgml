@@ -469,10 +469,14 @@ Here is a description of all the command line options:
 
   The following warning names are currently recognized:
   <descrip>
+  <tag><tt/const-comparison/</tag>
+        Warn if the result of a comparison is constant.
   <tag><tt/error/</tag>
         Treat all warnings as errors.
   <tag><tt/no-effect/</tag>
         Warn about statements that don't have an effect.
+  <tag><tt/struct-param/</tag>
+        Warn when passing structs by value.
   <tag><tt/unknown-pragma/</tag>
         Warn about known #pragmas.
   <tag><tt/unused-label/</tag>

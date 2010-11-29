@@ -148,7 +148,7 @@ Here is a description of all the command line options:
 
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
-
+                                           
        	6502, 65SC02, 65C02, 65816, sunplus, sweet16, HuC6280
 
   The sunplus cpu is not available in the freeware version, because the
@@ -288,11 +288,14 @@ Here is a description of all the command line options:
   <label id="option-t">
   <tag><tt>-t sys, --target sys</tt></tag>
 
-  Set the target system. This will enable translation of character strings
-  and character constants into the character set of the target platform.
-  The default for the target system is "none", which means that no translation
+  Set the target system. This will enable translation of character strings and
+  character constants into the character set of the target platform. The
+  default for the target system is "none", which means that no translation
   will take place. The assembler supports the same target systems as the
   compiler, see there for a list.
+
+  Depending on the target, the default CPU type is also set. This can be 
+  overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
   <label id="option-v">
@@ -3042,7 +3045,7 @@ Here's a list of all control commands and a description, what they do:
 
   <tscreen><verb>
        	.macpack	longbranch	; Include macro package
-                         
+
        		cmp	#$20		; Set condition codes
        		jne    	Label		; Jump long on condition
   </verb></tscreen>

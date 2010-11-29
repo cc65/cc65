@@ -145,14 +145,15 @@ Here is a description of all the command line options:
   using <tt/-Oi/ (<tt/-Oi/ is the same as <tt/-O --codesize&nbsp;200/).
 
 
-  <label id="option-cpu">
+  <label id="option--cpu">
   <tag><tt>--cpu CPU</tt></tag>
 
-  A new, still experimental option. You may specify "6502" or "65C02" as the
-  CPU. 6502 is the default, so this will not change anything. Specifying 65C02
-  will use a few 65C02 instructions when generating code. Don't expect too
-  much from this option: It is still new (and may have bugs), and the
-  additional instructions for the 65C02 are not that overwhelming.
+  Set the CPU, the compiler generates code for. You may specify "6502" or
+  "65C02" as the CPU. The default depends on the selected target (see option
+  <tt/<ref id="option-t" name="-t">/). It is the 6502 CPU for most targets or
+  if no target has been set. Specifying 65C02 will use a few 65C02
+  instructions when generating code. Don't expect too much from this option:
+  In most cases the difference in size and speed is just 1-2%.
 
 
   <label id="option-create-dep">
@@ -319,12 +320,15 @@ Here is a description of all the command line options:
   will. c99 mode is actually c89 mode with a few selected C99 extensions.
 
 
-  <label id="option-standard">
+  <label id="option-t">
   <tag><tt>-t target, --target target</tt></tag>
 
-  This option is used to set the target system. The target system
-  determines things like the character set that is used for strings and
-  character constants. The following target systems are supported:
+  This option is used to set the target system. The target system determines
+  the character set that is used for strings and character constants and the
+  default CPU. The CPU setting can be overriden by use of the <tt/<ref
+  id="option--cpu" name="--cpu">/ option.
+
+  The following target systems are supported:
 
   <itemize>
   <item>none

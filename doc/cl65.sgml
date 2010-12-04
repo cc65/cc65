@@ -245,7 +245,7 @@ into an executable named morse:
 	cc65 -g -Oi -t c64 morse.c
 	ca65 -g morse.s
 	ca65 -g irq.s
-	ld65 -t c64 -o morse c64.o morse.o irq.o c64.lib
+	ld65 -o morse -t c64 c64.o morse.o irq.o c64.lib
 </verb></tscreen>
 
 When using cl65, this is simplified to

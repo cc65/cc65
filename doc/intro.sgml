@@ -185,7 +185,7 @@ linker can resolve those functions.
 Let's link our files to get the final executable:
 
 <tscreen><verb>
-        ld65 -t c64 -o hello hello.o text.o c64.lib
+        ld65 -o hello -t c64 hello.o text.o c64.lib
 </verb></tscreen>
 
 The argument after <tt/-o/ specifies the name of the output file, the argument

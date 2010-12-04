@@ -241,7 +241,7 @@ contains all of the executable code.
 
 <sect2>Fourth and last step -- linking it together
 <p><verb>
-$ ld65 -t geos -o test.cvt resource.o geos.o test.o geos.lib
+$ ld65 -o test.cvt -t geos resource.o geos.o test.o geos.lib
 </verb>
 &dquot;<tt/resource.o/&dquot; comes first because it contains the
 header.  The next one is &dquot;<tt/geos.o/&dquot;, a required starter-code

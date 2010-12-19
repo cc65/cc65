@@ -52,7 +52,8 @@ OBJS =  cgetc.o         \
         extzp.o         \
         kbhit.o         \
 	mainargs.o	\
-	sysuname.o
+	sysuname.o      \
+        toascii.o
 
 #--------------------------------------------------------------------------
 # Drivers

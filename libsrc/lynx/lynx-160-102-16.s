@@ -4,11 +4,6 @@
 ; All the drawing functions are simply done by sprites as the sprite
 ; engine is the only way to do fast graphics on a Lynx.
 ;
-; So the code is not really based on any algorithms done by somebody.
-; I have looked at other routines in the cc65 libs to see what kind of
-; entry points we need. And I have looked at the old cc65 libs by
-; Bastian Schick to see how things worked in the past.
-;
 ; This code is written by Karri Kaksonen, 2004 for the cc65 compiler.
 ;
 
@@ -39,7 +34,7 @@
         .byte   2                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .res    4, $00                  ; Reserved for future extensions
+        .word	$0100                   ; Aspect ratio
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented). A future version may
@@ -64,7 +59,6 @@
         .addr   GETPIXEL
         .addr   LINE
         .addr   BAR
-        .addr   CIRCLE
         .addr   TEXTSTYLE
         .addr   OUTTEXT
         .addr   IRQ
@@ -789,65 +783,6 @@ BAR:    lda     X1
         lda     #<bar_sprite
        	ldx     #>bar_sprite
        	jmp     draw_sprite
-
-; ------------------------------------------------------------------------
-; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the
-; radius in tmp1 and the current drawing color.
-;
-; Must set an error code: NO
-;
-; There is no sensible way of drawing a circle on a Lynx. As I would
-; have to use line elements to do the circle I rather do it in C than
-; create it here in the driver.
-
-; To do a circle please add this to your C program
-
-;int sintbl[9] = {
-;    	0,     //  0    degrees
-;	3196,  // 11.25 degrees
-;	6270,  // 22.5  degrees
-;	9102,  // 33.75 degrees
-;	11585, // 45    degrees
-;	13623, // 56.25 degrees
-;	15137, // 67.5  degrees
-;	16069, // 78.75 degrees
-;	16384  // 90    degrees
-;};
-
-;int sin(char d)
-;{
-;    char neg;
-;    d = d & 31;
-;    neg = d > 16;
-;    d = d & 15;
-;    if (d > 8)
-;        d = 16 - d;
-;    if (neg)
-;	return -sintbl[d];
-;    else
-;	return sintbl[d];
-;}
-
-;void tgi_Circle(int x0, int y0, unsigned char r)
-;{
-;	char i;
-;	int x1, y1, x2, y2;
-;
-;	x1 = ((long)sin(0) * r + 8192) / 16384 + x0;
-;	y1 = ((long)sin(8) * r + 8192) / 16384 + y0;
-;	for (i = 1; i <= 32; i++) {
-;		x2 = ((long)sin(i) * r + 8192) / 16384 + x0;
-;		y2 = ((long)sin(i+8) * r + 8192) / 16384 + y0;
-;		tgi_line(x1, y1, x2, y2);
-;		x1 = x2;
-;		y1 = y2;
-;	}
-;}
-
-;#define tgi_circle tgi_Circle
-
-CIRCLE:
-	rts
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y

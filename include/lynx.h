@@ -78,11 +78,6 @@
 
 
 
-void __fastcall__ lynx_change_framerate (unsigned char rate);
-/* Change the framerate, in Hz. Recognized values are 50, 60 and 75. */
-
-
-
 /*****************************************************************************/
 /*                           Accessing the EEPROM                            */
 /*****************************************************************************/

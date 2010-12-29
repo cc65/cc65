@@ -49,9 +49,16 @@ OBJS =  cgetc.o         \
         crt0.o          \
 	ctype.o		\
         eeprom.o        \
+	exec.o		\
         extzp.o         \
         kbhit.o         \
+	load.o		\
+	lseek.o		\
+	lynx-cart.o	\
 	mainargs.o	\
+	open.o		\
+	oserror.o	\
+	read.o		\
 	sysuname.o      \
         toascii.o
 

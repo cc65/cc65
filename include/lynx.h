@@ -73,8 +73,16 @@
 
 
 /*****************************************************************************/
-/*	       	   		     Code				     */
+/*                           Accessing the cart                              */
 /*****************************************************************************/
+
+
+
+void __fastcall__ lynx_load (int fileno);
+/* Load a file into ram. The first entry is fileno=0. */
+
+void __fastcall__ lynx_exec (int fileno);
+/* Load a file into ram and execute it. */
 
 
 
@@ -94,9 +102,12 @@ void __fastcall__ lynx_eeprom_erase (unsigned char cell);
 /* Clear the word at the given address */
 
 
+
 /*****************************************************************************/
 /*                           TGI extras                                      */
 /*****************************************************************************/
+
+
 
 #define tgi_sprite(spr) tgi_ioctl(0, spr)
 #define tgi_flip() tgi_ioctl(1, (void*)0)
@@ -105,6 +116,8 @@ void __fastcall__ lynx_eeprom_erase (unsigned char cell);
 #define tgi_busy() tgi_ioctl(4, (void*)0)
 #define tgi_updatedisplay() tgi_ioctl(4, (void*)1)
 #define tgi_setcollisiondetection(active) tgi_ioctl(5, (void*)(active))
+
+
 
 /* End of lynx.h */
 #endif

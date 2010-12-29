@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2010, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -177,8 +177,9 @@ void g_preamble (void)
     /* Tell the assembler if we want to generate debug info */
     AddTextLine ("\t.debuginfo\t%s", (DebugInfo != 0)? "on" : "off");
 
-    /* Import the stack pointer for direct auto variable access */
-    AddTextLine ("\t.importzp\tsp, sreg, regsave, regbank, tmp1, ptr1, ptr2");
+    /* Import zero page variables */
+    AddTextLine ("\t.importzp\tsp, sreg, regsave, regbank");
+    AddTextLine ("\t.importzp\ttmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4");
 
     /* Define long branch macros */
     AddTextLine ("\t.macpack\tlongbranch");

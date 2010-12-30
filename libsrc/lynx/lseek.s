@@ -41,7 +41,6 @@
 	jsr     pusheax
 	lda     #<(__BLOCKSIZE__-1)
 	ldx     #>(__BLOCKSIZE__-1)
-	jsr     decax1
 	jsr     axlong
 	jsr     tosandeax
 	eor	#$FF

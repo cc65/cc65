@@ -63,15 +63,13 @@ parmok:	jsr	popax
 	beq	flagsok
 	cmp	#(O_WRONLY | O_CREAT)
 	beq	flagsok
+	jsr	popax
 	lda	#EINVAL
-	ldx	#0
 	jmp	__directerrno
 
 flagsok:
 	jsr	popax
 	jsr     _atoi
-	jsr     pushax
-	jsr     ldax0sp
 	jsr     _openn
 	ldx     #$00
 	lda     #$01

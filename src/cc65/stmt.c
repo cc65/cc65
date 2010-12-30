@@ -71,7 +71,7 @@
 
 
 
-static void CheckLabelWithoutStatement (void)
+static int CheckLabelWithoutStatement (void)
 /* Called from Statement() after a label definition. Will check for a
  * following closing curly brace. This means that a label is not followed
  * by a statement which is required by the standard. Output an error if so.
@@ -79,6 +79,9 @@ static void CheckLabelWithoutStatement (void)
 {
     if (CurTok.Tok == TOK_RCURLY) {
         Error ("Label at end of compound statement");
+        return 1;
+    } else {
+        return 0;
     }
 }
 
@@ -569,7 +572,9 @@ int Statement (int* PendingToken)
     while (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
 	/* Handle the label */
 	DoLabel ();
-        CheckLabelWithoutStatement ();
+        if (CheckLabelWithoutStatement ()) {
+            return 0;
+        }
     }
 
     switch (CurTok.Tok) {
@@ -653,7 +658,7 @@ int Statement (int* PendingToken)
              * void, emit a warning.
              */
             GetCodePos (&End);
-            if (CodeRangeIsEmpty (&Start, &End) && 
+            if (CodeRangeIsEmpty (&Start, &End) &&
                 !IsTypeVoid (Expr.Type)         &&
                 IS_Get (&WarnNoEffect)) {
                 Warning ("Statement has no effect");

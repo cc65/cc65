@@ -79,6 +79,19 @@ struct dirent {
     char d_name[13];  /* 8.3 + trailing 0 */
 };
 
+#elif defined(__LYNX__)
+
+struct dirent {
+    unsigned char	d_blocks;
+    unsigned int	d_offset;
+    char		d_type;
+    void		*d_address;
+    unsigned int	d_size;
+};
+
+extern struct dirent FileEntry;
+#pragma zpsym ("FileEntry");
+
 #else
 
 struct dirent {

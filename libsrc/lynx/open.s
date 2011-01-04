@@ -112,8 +112,8 @@ flagsok:
 	jsr     steaxysp
 	lda     #$01
 	jsr     pusha0
-	lda     _FileEntry
-	ldx     _FileEntry+1
+	lda     #<_FileEntry
+	ldx     #>_FileEntry
 	jsr     pushax
 	ldx     #$00
 	lda     #$08

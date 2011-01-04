@@ -72,15 +72,6 @@ static TokList* CollectRepeatTokens (void)
      	    return 0;
      	}
 
-	/* If we find a token that is equal to the repeat counter name,
-	 * replace it by a REPCOUNTER token. This way we have to do strcmps
-	 * only once for each identifier, and not for each expansion.
-	 * Note: This will fail for nested repeats using the same repeat
-	 * counter name, but
-	 */
-
-
-
        	/* Collect all tokens in the list */
 	AddCurTok (List);
 
@@ -110,9 +101,9 @@ static void RepeatTokenCheck (TokList* L)
  */
 {
     if (Tok == TOK_IDENT && L->Data != 0 && SB_CompareStr (&SVal, L->Data) == 0) {
- 	/* Must replace by the repeat counter */
- 	Tok  = TOK_INTCON;
- 	IVal = L->RepCount;
+     	/* Must replace by the repeat counter */
+     	Tok  = TOK_INTCON;
+     	IVal = L->RepCount;
     }
 }
 
@@ -127,8 +118,8 @@ void ParseRepeat (void)
     /* Repeat count follows */
     long RepCount = ConstExpression ();
     if (RepCount < 0) {
-	Error ("Range error");
-	RepCount = 0;
+     	Error ("Range error");
+     	RepCount = 0;
     }
 
     /* Optional there is a comma and a counter variable */
@@ -149,7 +140,8 @@ void ParseRepeat (void)
        	}
     }
 
-    /* Separator */
+    /* Switch to raw token mode, then skip the separator */
+    EnterRawTokenMode ();
     ConsumeSep ();
 
     /* Read the token list */
@@ -157,8 +149,8 @@ void ParseRepeat (void)
 
     /* If we had an error, bail out */
     if (List == 0) {
-	xfree (Name);
-       	return;
+     	xfree (Name);
+       	goto Done;
     }
 
     /* Update the token list for replay */
@@ -171,11 +163,15 @@ void ParseRepeat (void)
      */
     if (List->Count == 0 || RepCount == 0) {
      	FreeTokList (List);
-	return;
+     	goto Done;
     }
 
     /* Read input from the repeat descriptor */
     PushTokList (List, ".REPEAT");
+
+Done:
+    /* Switch out of raw token mode */
+    LeaveRawTokenMode ();
 }
 
 

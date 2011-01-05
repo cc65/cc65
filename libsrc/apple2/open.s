@@ -8,6 +8,7 @@
 ; called before closeallfiles).
 
         .export 	_open, closedirect, freebuffer
+        .export 	__filetype, __auxtype
         .destructor	closeallfiles, 17
 
         .import		pushname, popname
@@ -221,10 +222,12 @@ closedirect:
         ldx	#CLOSE_COUNT
         jmp	callmli
 
-        .rodata
+        .data
 
 CREATE: .byte	%11000011	; ACCESS:	Standard full access
+__filetype:
         .byte	$06		; FILE_TYPE:	Standard binary file
+__auxtype:
         .word	$0000		; AUX_TYPE:	Load address N/A
         .byte	$01		; STORAGE_TYPE:	Standard seedling file
         .word	$0000		; CREATE_DATE:	Current date

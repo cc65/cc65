@@ -132,6 +132,20 @@ extern unsigned char _dos_type;
 
 
 /*****************************************************************************/
+/*                                 Variables                                 */
+/*****************************************************************************/
+
+
+
+/* The file stream implementation and the POSIX I/O functions will use the
+ * following variables to determine the file type and the aux type to use.
+ */
+extern unsigned char _filetype;         /* Default 6 */
+extern unsigned int  _auxtype;          /* Default 0 */
+
+
+
+/*****************************************************************************/
 /*                                   Code				     */
 /*****************************************************************************/
 

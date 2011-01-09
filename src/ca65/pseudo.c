@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -877,6 +877,19 @@ static void DoFarAddr (void)
 	} else {
 	    NextTok ();
 	}
+    }
+}
+
+
+
+static void DoFatal (void)
+/* Fatal user error */
+{
+    if (Tok != TOK_STRCON) {
+ 	ErrorSkip ("String constant expected");
+    } else {
+       	Fatal ("User error: %m%p", &SVal);
+	SkipUntilSep ();
     }
 }
 
@@ -1874,6 +1887,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoExport  	},
     { ccNone,       	DoExportZP	},
     { ccNone,        	DoFarAddr	},
+    { ccNone,  	       	DoFatal         },
     { ccNone,		DoFeature	},
     { ccNone,		DoFileOpt	},
     { ccNone,           DoForceImport   },

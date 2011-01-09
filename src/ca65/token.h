@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2007-2010, Ullrich von Bassewitz                                      */
+/* (C) 2007-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -164,6 +164,7 @@ typedef enum Token {
     TOK_EXPORT,
     TOK_EXPORTZP,
     TOK_FARADDR,
+    TOK_FATAL,
     TOK_FEATURE,
     TOK_FILEOPT,
     TOK_FORCEIMPORT,
@@ -220,7 +221,7 @@ typedef enum Token {
     TOK_POPCPU,
     TOK_POPSEG,
     TOK_PROC,
-    TOK_PSC02, 
+    TOK_PSC02,
     TOK_PUSHCPU,
     TOK_PUSHSEG,
     TOK_REFERENCED,

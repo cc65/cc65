@@ -148,7 +148,7 @@ Here is a description of all the command line options:
 
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
-                                           
+
        	6502, 65SC02, 65C02, 65816, sunplus, sweet16, HuC6280
 
   The sunplus cpu is not available in the freeware version, because the
@@ -294,7 +294,7 @@ Here is a description of all the command line options:
   will take place. The assembler supports the same target systems as the
   compiler, see there for a list.
 
-  Depending on the target, the default CPU type is also set. This can be 
+  Depending on the target, the default CPU type is also set. This can be
   overriden by using the <tt/<ref id="option--cpu" name="--cpu">/ option.
 
 
@@ -2290,7 +2290,8 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.ERROR</tt><label id=".ERROR"><p>
 
   Force an assembly error. The assembler will output an error message
-  preceded by "User error" and will <em/not/ produce an object file.
+  preceded by "User error". Assembly is continued but no object file will
+  generated.
 
   This command may be used to check for initial conditions that must be
   set before assembling a source file.
@@ -2307,8 +2308,9 @@ Here's a list of all control commands and a description, what they do:
 	.endif
   </verb></tscreen>
 
-  See also the <tt><ref id=".WARNING" name=".WARNING"></tt> and <tt><ref
-  id=".OUT" name=".OUT"></tt> directives.
+  See also: <tt><ref id=".FATAL" name=".FATAL"></tt>,
+            <tt><ref id=".OUT" name=".OUT"></tt>,
+            <tt><ref id=".WARNING" name=".WARNING"></tt>
 
 
 <sect1><tt>.EXITMAC, .EXITMACRO</tt><label id=".EXITMACRO"><p>
@@ -2372,6 +2374,32 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   See: <tt><ref id=".ADDR" name=".ADDR"></tt>
+
+
+<sect1><tt>.FATAL</tt><label id=".FATAL"><p>
+
+  Force an assembly error and terminate assembly. The assembler will output an
+  error message preceded by "User error" and will terminate assembly
+  immediately.
+
+  This command may be used to check for initial conditions that must be
+  set before assembling a source file.
+
+  Example:
+
+  <tscreen><verb>
+	.if    	foo = 1
+	...
+	.elseif	bar = 1
+	...
+	.else
+       	.fatal  "Must define foo or bar!"               
+	.endif
+  </verb></tscreen>
+
+  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>,
+            <tt><ref id=".OUT" name=".OUT"></tt>,
+            <tt><ref id=".WARNING" name=".WARNING"></tt>
 
 
 <sect1><tt>.FEATURE</tt><label id=".FEATURE"><p>
@@ -3097,8 +3125,9 @@ Here's a list of all control commands and a description, what they do:
   	.out	"This code was written by the codebuster(tm)"
   </verb></tscreen>
 
-  See also the <tt><ref id=".WARNING" name=".WARNING"></tt> and <tt><ref
-  id=".ERROR" name=".ERROR"></tt> directives.
+  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>,
+            <tt><ref id=".FATAL" name=".FATAL"></tt>,
+            <tt><ref id=".WARNING" name=".WARNING"></tt>
 
 
 <sect1><tt>.P02</tt><label id=".P02"><p>
@@ -3505,20 +3534,21 @@ Here's a list of all control commands and a description, what they do:
 
   <tscreen><verb>
 	.macro	jne	target
-		.local L1
-		.ifndef	target
-		.warning "Forward jump in jne, cannot optimize!"
-		beq	L1
-		jmp	target
+	   	.local L1
+	   	.ifndef	target
+	   	.warning "Forward jump in jne, cannot optimize!"
+	   	beq	L1
+	   	jmp	target
 	L1:
 	   	.else
-		...
-		.endif
+	   	...
+	   	.endif
 	.endmacro
   </verb></tscreen>
 
-  See also the <tt><ref id=".ERROR" name=".ERROR"></tt> and <tt><ref id=".OUT"
-  name=".OUT"></tt> directives.
+  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>
+            <tt><ref id=".FATAL" name=".FATAL"></tt>,
+            <tt><ref id=".OUT" name=".OUT"></tt>
 
 
 <sect1><tt>.WORD</tt><label id=".WORD"><p>

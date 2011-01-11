@@ -34,7 +34,7 @@ tosudivax:
 udiv16:	lda	#0
  	sta	ptr1+1
  	ldy	#16
-        ldx     sreg+1
+        ldx     ptr4+1
         beq     udiv16by8a
 
 L0:	asl	sreg

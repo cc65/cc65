@@ -70,12 +70,12 @@
 
 
 
-Token Tok = TOK_NONE;                   /* Current token */
+token_t Tok = TOK_NONE;                 /* Current token */
 int WS;	  				/* Flag: Whitespace before token */
 long IVal;	       	       	    	/* Integer token attribute */
 StrBuf SVal = STATIC_STRBUF_INITIALIZER;/* String token attribute */
 
-FilePos	CurPos = { 0, 0, 0 };		/* Name and position in current file */
+FilePos	CurPos = STATIC_FILEPOS_INITIALIZER;  /* Name and position in current file */
 
 
 
@@ -84,7 +84,7 @@ typedef struct InputFile InputFile;
 struct InputFile {
     FILE*      	    F;		       	/* Input file descriptor */
     FilePos	    Pos;	       	/* Position in file */
-    Token           Tok;	       	/* Last token */
+    token_t         Tok;	       	/* Last token */
     int		    C;			/* Last character */
     char       	    Line[256];		/* The current input line */
     int             IncSearchPath;      /* True if we've added a search path */
@@ -98,7 +98,7 @@ struct InputData {
     char*      	    Text;               /* Pointer to the text data */
     const char*     Pos;		/* Pointer to current position */
     int		    Malloced;		/* Memory was malloced */
-    Token           Tok;	    	/* Last token */
+    token_t         Tok;	    	/* Last token */
     int		    C;			/* Last character */
     InputData*	    Next;		/* Linked list of input data */
 };
@@ -117,7 +117,7 @@ struct CharSourceFunctions {
 /* Input source: Either file or data */
 struct CharSource {
     CharSource*                 Next;   /* Linked list of char sources */
-    Token                       Tok;	/* Last token */
+    token_t                     Tok;	/* Last token */
     int		                C;	/* Last character */
     const CharSourceFunctions*  Func;   /* Pointer to function table */
     union {
@@ -137,7 +137,7 @@ int 		  ForcedEnd     = 0;
 /* List of dot keywords with the corresponding tokens */
 struct DotKeyword {
     const char*	Key;			/* MUST be first field */
-    Token       Tok;
+    token_t     Tok;
 } DotKeywords [] = {
     { ".A16",  	    	TOK_A16		},
     { ".A8",   	    	TOK_A8		},

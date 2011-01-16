@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,7 +51,7 @@
 void NextTok (void);
 /* Get next token and handle token level functions */
 
-void Consume (Token Expected, const char* ErrMsg);
+void Consume (token_t Expected, const char* ErrMsg);
 /* Consume Token, print an error if we don't find it */
 
 void ConsumeSep (void);

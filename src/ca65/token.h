@@ -49,8 +49,8 @@
 
 
 
-/* Tokens */
-typedef enum Token {
+/* Tokens */ 
+typedef enum token_t {
     TOK_NONE,	 	/* Start value, invalid */
     TOK_EOF,           	/* End of input file */
     TOK_SEP, 	 	/* Separator (usually newline) */
@@ -254,7 +254,7 @@ typedef enum Token {
     TOK_LASTPSEUDO	= TOK_ZEROPAGE,
 
     TOK_COUNT  	  	/* Count of tokens */
-} Token;
+} token_t;
 
 
 
@@ -264,14 +264,14 @@ typedef enum Token {
 
 
 
-int TokHasSVal (Token Tok);
+int TokHasSVal (token_t Tok);
 /* Return true if the given token has an attached SVal */
 
-int TokHasIVal (Token Tok);
+int TokHasIVal (token_t Tok);
 /* Return true if the given token has an attached IVal */
 
 #if defined(HAVE_INLINE)
-INLINE int TokIsSep (enum Token T)
+INLINE int TokIsSep (enum token_t T)
 /* Return true if this is a separator token */
 {
     return (T == TOK_SEP || T == TOK_EOF);

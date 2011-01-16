@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2007      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2007-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +44,7 @@
 
 
 
-int TokHasSVal (Token Tok)
+int TokHasSVal (token_t Tok)
 /* Return true if the given token has an attached SVal */
 {
     return (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT || Tok == TOK_STRCON);
@@ -52,7 +52,7 @@ int TokHasSVal (Token Tok)
 
 
 
-int TokHasIVal (Token Tok)
+int TokHasIVal (token_t Tok)
 /* Return true if the given token has an attached IVal */
 {
     return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);

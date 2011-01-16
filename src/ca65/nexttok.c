@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -102,7 +102,7 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
     TokList* List = NewTokList ();
 
     /* Determine if the list is enclosed in curly braces. */
-    Token Term = GetTokListTerm (TOK_RPAREN);
+    token_t Term = GetTokListTerm (TOK_RPAREN);
 
     /* Read the token list */
     unsigned Current = 0;
@@ -203,7 +203,7 @@ static void FuncIdent (void)
 /* Handle the .IDENT function */
 {
     StrBuf    Buf = STATIC_STRBUF_INITIALIZER;
-    Token     Id;
+    token_t Id;
     unsigned  I;
 
     /* Skip it */
@@ -701,7 +701,7 @@ void NextTok (void)
 
 
 
-void Consume (Token Expected, const char* ErrMsg)
+void Consume (token_t Expected, const char* ErrMsg)
 /* Consume Expected, print an error if we don't find it */
 {
     if (Tok == Expected) {

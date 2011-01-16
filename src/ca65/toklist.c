@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -176,7 +176,7 @@ void FreeTokList (TokList* List)
 
 
 
-enum Token GetTokListTerm (enum Token Term)
+enum token_t GetTokListTerm (enum token_t Term)
 /* Determine if the following token list is enclosed in curly braces. This is
  * the case if the next token is the opening brace. If so, skip it and return
  * a closing brace, otherwise return Term.

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -54,7 +54,7 @@
 
 
 /* Scanner variables */
-extern Token Tok;                       /* Current token */
+extern token_t Tok;                     /* Current token */
 extern int WS; 	 			/* Flag: Whitespace before token */
 extern long IVal;      	 		/* Integer token attribute */
 extern StrBuf SVal;                     /* String token attribute */

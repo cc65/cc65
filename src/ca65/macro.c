@@ -667,7 +667,7 @@ static void StartExpClassic (Macro* M)
 /* Start expanding the classic macro M */
 {
     MacExp*     E;
-    Token       Term;
+    token_t     Term;
 
 
     /* Skip the macro name */
@@ -769,7 +769,7 @@ static void StartExpDefine (Macro* M)
        	TokNode*   Last;
 
         /* The macro may optionally be enclosed in curly braces */
-        Token Term = GetTokListTerm (TOK_COMMA);
+        token_t Term = GetTokListTerm (TOK_COMMA);
 
        	/* Check if there is really a parameter */
        	if (TokIsSep (Tok) || Tok == Term) {

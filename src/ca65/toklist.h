@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -56,7 +56,7 @@
 typedef struct TokNode TokNode;
 struct TokNode {
     TokNode*	Next;  	      		/* For single linked list */
-    Token	Tok;	      		/* Token value */
+    token_t     Tok;	      		/* Token value */
     int	       	WS;    	      		/* Whitespace before token? */
     long       	IVal;	      		/* Integer token attribute */
     StrBuf      SVal;                   /* String attribute, dyn. allocated */
@@ -113,7 +113,7 @@ TokList* NewTokList (void);
 void FreeTokList (TokList* T);
 /* Delete the token list including all token nodes */
 
-Token GetTokListTerm (Token Term);
+token_t GetTokListTerm (token_t Term);
 /* Determine if the following token list is enclosed in curly braces. This is
  * the case if the next token is the opening brace. If so, skip it and return
  * a closing brace, otherwise return Term.

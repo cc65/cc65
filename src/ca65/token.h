@@ -277,7 +277,7 @@ INLINE int TokIsSep (enum Token T)
     return (T == TOK_SEP || T == TOK_EOF);
 }
 #else
-#  define TokIsSep(T)   (T == TOK_SEP || T == TOK_EOF)
+#  define TokIsSep(T)   ((T) == TOK_SEP || (T) == TOK_EOF)
 #endif
 
 

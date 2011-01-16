@@ -54,8 +54,6 @@
 
 
 /* Scanner variables */
-#define MAX_INPUT_FILES	254		/* No more than this files total */
-#define MAX_STR_LEN    	255		/* Maximum length of any string */
 extern Token Tok;                       /* Current token */
 extern int WS; 	 			/* Flag: Whitespace before token */
 extern long IVal;      	 		/* Integer token attribute */

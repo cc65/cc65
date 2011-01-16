@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -59,7 +59,7 @@ void GetEA (EffAddr* A)
     A->Expr = 0;
 
     /* Handle an addressing size override */
-    switch (Tok) {
+    switch (CurTok.Tok) {
         case TOK_OVERRIDE_ZP:
             Restrictions = AM65_DIR | AM65_DIR_X | AM65_DIR_Y;
             NextTok ();
@@ -81,29 +81,29 @@ void GetEA (EffAddr* A)
     }
 
     /* Parse the effective address */
-    if (TokIsSep (Tok)) {
+    if (TokIsSep (CurTok.Tok)) {
 
 	A->AddrModeSet = AM65_IMPLICIT;
 
-    } else if (Tok == TOK_HASH) {
+    } else if (CurTok.Tok == TOK_HASH) {
 
 	/* #val */
 	NextTok ();
 	A->Expr  = Expression ();
 	A->AddrModeSet = AM65_IMM;
 
-    } else if (Tok == TOK_A) {
+    } else if (CurTok.Tok == TOK_A) {
 
 	NextTok ();
 	A->AddrModeSet = AM65_ACCU;
 
-    } else if (Tok == TOK_LBRACK) {
+    } else if (CurTok.Tok == TOK_LBRACK) {
 
 	/* [dir] or [dir],y */
 	NextTok ();
 	A->Expr = Expression ();
 	Consume (TOK_RBRACK, "']' expected");
-	if (Tok == TOK_COMMA) {
+	if (CurTok.Tok == TOK_COMMA) {
 	    /* [dir],y */
 	    NextTok ();
 	    Consume (TOK_Y, "`Y' expected");
@@ -113,22 +113,22 @@ void GetEA (EffAddr* A)
 	    A->AddrModeSet = AM65_DIR_IND_LONG;
 	}
 
-    } else if (Tok == TOK_LPAREN) {
+    } else if (CurTok.Tok == TOK_LPAREN) {
 
     	/* One of the indirect modes */
     	NextTok ();
     	A->Expr = Expression ();
 
-    	if (Tok == TOK_COMMA) {
+    	if (CurTok.Tok == TOK_COMMA) {
 
     	    /* (expr,X) or (rel,S),y */
     	    NextTok ();
-    	    if (Tok == TOK_X) {
+    	    if (CurTok.Tok == TOK_X) {
 	   	/* (adr,x) */
     	   	NextTok ();
        	       	A->AddrModeSet = AM65_ABS_X_IND | AM65_DIR_X_IND;
     	       	ConsumeRParen ();
-    	    } else if (Tok == TOK_S) {
+    	    } else if (CurTok.Tok == TOK_S) {
 	   	/* (rel,s),y */
     	 	NextTok ();
     	 	A->AddrModeSet = AM65_STACK_REL_IND_Y;
@@ -143,7 +143,7 @@ void GetEA (EffAddr* A)
 
 	    /* (adr) or (adr),y */
     	    ConsumeRParen ();
-    	    if (Tok == TOK_COMMA) {
+    	    if (CurTok.Tok == TOK_COMMA) {
 		/* (adr),y */
     	 	NextTok ();
     	 	Consume (TOK_Y, "`Y' expected");
@@ -165,10 +165,10 @@ void GetEA (EffAddr* A)
 	 */
        	A->Expr = Expression ();
 
-        if (Tok == TOK_COMMA) {
+        if (CurTok.Tok == TOK_COMMA) {
 
             NextTok ();
-            switch (Tok) {
+            switch (CurTok.Tok) {
 
                 case TOK_X:
                     A->AddrModeSet = AM65_ABS_LONG_X | AM65_ABS_X | AM65_DIR_X;
@@ -203,3 +203,4 @@ void GetEA (EffAddr* A)
 
 
 
+                           

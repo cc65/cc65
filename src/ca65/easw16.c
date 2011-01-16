@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2004      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2004-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -80,17 +80,17 @@ void GetSweet16EA (EffAddr* A)
     A->Reg  = 0;
 
     /* Parse the effective address */
-    if (TokIsSep (Tok)) {
+    if (TokIsSep (CurTok.Tok)) {
 
        	A->AddrModeSet = AMSW16_IMP;
 
-    } else if (Tok == TOK_AT) {
+    } else if (CurTok.Tok == TOK_AT) {
 
        	/* @reg or @regnumber */
 	A->AddrModeSet = AMSW16_IND;
 	NextTok ();
-        if (Tok == TOK_REG) {
-            A->Reg = (unsigned) IVal;
+        if (CurTok.Tok == TOK_REG) {
+            A->Reg = (unsigned) CurTok.IVal;
             NextTok ();
         } else if ((Reg = RegNum ()) >= 0) {
             /* Register number */
@@ -100,12 +100,12 @@ void GetSweet16EA (EffAddr* A)
             A->Reg = 0;
         }
 
-    } else if (Tok == TOK_REG) {
+    } else if (CurTok.Tok == TOK_REG) {
 
-        A->Reg = (unsigned) IVal;
+        A->Reg = (unsigned) CurTok.IVal;
         NextTok ();
 
-        if (Tok == TOK_COMMA) {
+        if (CurTok.Tok == TOK_COMMA) {
 
             /* Rx, constant */
             NextTok ();
@@ -133,7 +133,7 @@ void GetSweet16EA (EffAddr* A)
             A->Reg = (unsigned) Reg;
 
             /* If a comma follows, it is: OPC Rx, constant */
-            if (Tok == TOK_COMMA) {
+            if (CurTok.Tok == TOK_COMMA) {
                 NextTok ();
                 A->Expr = Expression ();
                 A->AddrModeSet = AMSW16_IMM;
@@ -147,4 +147,4 @@ void GetSweet16EA (EffAddr* A)
 }
 
 
-
+                                   

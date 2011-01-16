@@ -131,7 +131,7 @@ static unsigned char OptionalAddrSize (void)
  */
 {
     unsigned AddrSize = ADDR_SIZE_DEFAULT;
-    if (Tok == TOK_COLON) {
+    if (CurTok.Tok == TOK_COLON) {
         NextTok ();
         AddrSize = ParseAddrSize ();
         if (!ValidAddrSizeForCPU (AddrSize)) {
@@ -154,20 +154,20 @@ static void SetBoolOption (unsigned char* Flag)
     	"ON",
     };
 
-    if (Tok == TOK_PLUS) {
+    if (CurTok.Tok == TOK_PLUS) {
        	*Flag = 1;
 	NextTok ();
-    } else if (Tok == TOK_MINUS) {
+    } else if (CurTok.Tok == TOK_MINUS) {
 	*Flag = 0;
 	NextTok ();
-    } else if (Tok == TOK_IDENT) {
+    } else if (CurTok.Tok == TOK_IDENT) {
        	/* Map the keyword to a number */
        	switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
 	    case 0:    	*Flag = 0; NextTok ();		        break;
 	    case 1:	*Flag = 1; NextTok ();		        break;
 	    default:	ErrorSkip ("`on' or `off' expected");	break;
 	}
-    } else if (TokIsSep (Tok)) {
+    } else if (TokIsSep (CurTok.Tok)) {
 	/* Without anything assume switch on */
 	*Flag = 1;
     } else {
@@ -183,10 +183,10 @@ static void ExportWithAssign (SymEntry* Sym, unsigned char AddrSize, unsigned Fl
     /* The name and optional address size spec may be followed by an assignment
      * or equal token.
      */
-    if (Tok == TOK_ASSIGN || Tok == TOK_EQ) {
+    if (CurTok.Tok == TOK_ASSIGN || CurTok.Tok == TOK_EQ) {
 
         /* Assignment means the symbol is a label */
-        if (Tok == TOK_ASSIGN) {
+        if (CurTok.Tok == TOK_ASSIGN) {
             Flags |= SF_LABEL;
         }
 
@@ -214,13 +214,13 @@ static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
     while (1) {
 
         /* We need an identifier here */
-     	if (Tok != TOK_IDENT) {
+     	if (CurTok.Tok != TOK_IDENT) {
        	    ErrorSkip ("Identifier expected");
      	    return;
      	}
 
         /* Find the symbol table entry, allocate a new one if necessary */
-        Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
+        Sym = SymFind (CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
 
         /* Skip the name */
         NextTok ();
@@ -235,7 +235,7 @@ static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
         Func (Sym, AddrSize, Flags);
 
         /* More symbols? */
-     	if (Tok == TOK_COMMA) {
+     	if (CurTok.Tok == TOK_COMMA) {
      	    NextTok ();
      	} else {
      	    break;
@@ -250,7 +250,7 @@ static long IntArg (long Min, long Max)
  * and return -1 in this case.
  */
 {
-    if (Tok == TOK_IDENT && SB_CompareStr (&SVal, "unlimited") == 0) {
+    if (CurTok.Tok == TOK_IDENT && SB_CompareStr (&CurTok.SVal, "unlimited") == 0) {
 	NextTok ();
 	return -1;
     } else {
@@ -275,7 +275,7 @@ static void ConDes (const StrBuf* Name, unsigned Type)
     SymEntry* Sym = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
 
     /* Optional constructor priority */
-    if (Tok == TOK_COMMA) {
+    if (CurTok.Tok == TOK_COMMA) {
     	/* Priority value follows */
     	NextTok ();
     	Prio = ConstExpression ();
@@ -337,7 +337,7 @@ static void DoAddr (void)
 	    /* Do a range check */
 	    EmitWord (Expression ());
        	}
-	if (Tok != TOK_COMMA) {
+	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
 	    NextTok ();
@@ -362,7 +362,7 @@ static void DoAlign (void)
     }
 
     /* Optional value follows */
-    if (Tok == TOK_COMMA) {
+    if (CurTok.Tok == TOK_COMMA) {
 	NextTok ();
 	Val = ConstExpression ();
 	/* We need a byte value here */
@@ -390,16 +390,16 @@ static void DoASCIIZ (void)
 {
     while (1) {
 	/* Must have a string constant */
-	if (Tok != TOK_STRCON) {
+	if (CurTok.Tok != TOK_STRCON) {
        	    ErrorSkip ("String constant expected");
 	    return;
 	}
 
 	/* Translate into target charset and emit */
-       	TgtTranslateStrBuf (&SVal);
-       	EmitStrBuf (&SVal);
+       	TgtTranslateStrBuf (&CurTok.SVal);
+       	EmitStrBuf (&CurTok.SVal);
 	NextTok ();
-	if (Tok == TOK_COMMA) {
+	if (CurTok.Tok == TOK_COMMA) {
 	    NextTok ();
 	} else {
 	    break;
@@ -428,7 +428,7 @@ static void DoAssert (void)
     ConsumeComma ();
 
     /* Action follows */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
         ErrorSkip ("Identifier expected");
         return;
     }
@@ -468,13 +468,13 @@ static void DoAssert (void)
     /* We can have an optional message. If no message is present, use
      * "Assertion failed".
      */
-    if (Tok == TOK_COMMA) {
+    if (CurTok.Tok == TOK_COMMA) {
 
         /* Skip the comma */
         NextTok ();
 
         /* Read the message */
-        if (Tok != TOK_STRCON) {
+        if (CurTok.Tok != TOK_STRCON) {
             ErrorSkip ("String constant expected");
             return;
         }
@@ -482,7 +482,7 @@ static void DoAssert (void)
         /* Translate the message into a string id. We can then skip the input
          * string.
          */
-        Msg = GetStrBufId (&SVal);
+        Msg = GetStrBufId (&CurTok.SVal);
         NextTok ();
 
     } else {
@@ -510,7 +510,7 @@ static void DoBankBytes (void)
 {
     while (1) {
         EmitByte (FuncBankByte ());
-        if (Tok != TOK_COMMA) {
+        if (CurTok.Tok != TOK_COMMA) {
             break;
         } else {
             NextTok ();
@@ -532,20 +532,20 @@ static void DoByte (void)
 /* Define bytes */
 {
     while (1) {
-	if (Tok == TOK_STRCON) {
+	if (CurTok.Tok == TOK_STRCON) {
 	    /* A string, translate into target charset and emit */
-       	    TgtTranslateStrBuf (&SVal);
-	    EmitStrBuf (&SVal);
+       	    TgtTranslateStrBuf (&CurTok.SVal);
+	    EmitStrBuf (&CurTok.SVal);
 	    NextTok ();
 	} else {
 	    EmitByte (Expression ());
 	}
-    	if (Tok != TOK_COMMA) {
+    	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
 	    NextTok ();
 	    /* Do smart handling of dangling comma */
-	    if (Tok == TOK_SEP) {
+	    if (CurTok.Tok == TOK_SEP) {
 	     	Error ("Unexpected end of line");
 	 	break;
 	    }
@@ -615,16 +615,16 @@ static void DoConDes (void)
     long Type;
 
     /* Symbol name follows */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    SB_Copy (&Name, &SVal);
+    SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
 
     /* Type follows. May be encoded as identifier or numerical */
     ConsumeComma ();
-    if (Tok == TOK_IDENT) {
+    if (CurTok.Tok == TOK_IDENT) {
 
 	/* Map the following keyword to a number, then skip it */
 	Type = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
@@ -664,11 +664,11 @@ static void DoConstructor (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    SB_Copy (&Name, &SVal);
+    SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
 
     /* Parse the remainder of the line and export the symbol */
@@ -700,7 +700,7 @@ static void DoDbg (void)
 
 
     /* We expect a subkey */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
      	ErrorSkip ("Identifier expected");
      	return;
     }
@@ -727,7 +727,7 @@ static void DoDByt (void)
 {
     while (1) {
 	EmitWord (GenSwapExpr (Expression ()));
-	if (Tok != TOK_COMMA) {
+	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
 	    NextTok ();
@@ -759,11 +759,11 @@ static void DoDestructor (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    SB_Copy (&Name, &SVal);
+    SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
 
     /* Parse the remainder of the line and export the symbol */
@@ -780,7 +780,7 @@ static void DoDWord (void)
 {
     while (1) {
        	EmitDWord (Expression ());
-	if (Tok != TOK_COMMA) {
+	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
 	    NextTok ();
@@ -828,10 +828,10 @@ static void DoEndScope (void)
 static void DoError (void)
 /* User error */
 {
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
  	ErrorSkip ("String constant expected");
     } else {
-       	Error ("User error: %m%p", &SVal);
+       	Error ("User error: %m%p", &CurTok.SVal);
 	SkipUntilSep ();
     }
 }
@@ -872,7 +872,7 @@ static void DoFarAddr (void)
 {
     while (1) {
        	EmitFarAddr (Expression ());
-	if (Tok != TOK_COMMA) {
+	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
 	    NextTok ();
@@ -885,10 +885,10 @@ static void DoFarAddr (void)
 static void DoFatal (void)
 /* Fatal user error */
 {
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
  	ErrorSkip ("String constant expected");
     } else {
-       	Fatal ("User error: %m%p", &SVal);
+       	Fatal ("User error: %m%p", &CurTok.SVal);
 	SkipUntilSep ();
     }
 }
@@ -902,7 +902,7 @@ static void DoFeature (void)
     while (1) {
 
      	/* We expect an identifier */
-     	if (Tok != TOK_IDENT) {
+     	if (CurTok.Tok != TOK_IDENT) {
      	    ErrorSkip ("Identifier expected");
      	    return;
      	}
@@ -911,9 +911,9 @@ static void DoFeature (void)
 	LocaseSVal ();
 
      	/* Set the feature and check for errors */
-	if (SetFeature (&SVal) == FEAT_UNKNOWN) {
+	if (SetFeature (&CurTok.SVal) == FEAT_UNKNOWN) {
      	    /* Not found */
-     	    ErrorSkip ("Invalid feature: `%m%p'", &SVal);
+     	    ErrorSkip ("Invalid feature: `%m%p'", &CurTok.SVal);
      	    return;
      	} else {
 	    /* Skip the keyword */
@@ -921,7 +921,7 @@ static void DoFeature (void)
 	}
 
      	/* Allow more than one keyword */
-     	if (Tok == TOK_COMMA) {
+     	if (CurTok.Tok == TOK_COMMA) {
      	    NextTok ();
      	} else {
      	    break;
@@ -937,7 +937,7 @@ static void DoFileOpt (void)
     long OptNum;
 
     /* The option type may be given as a keyword or as a number. */
-    if (Tok == TOK_IDENT) {
+    if (CurTok.Tok == TOK_IDENT) {
 
 	/* Option given as keyword */
 	static const char* Keys [] = {
@@ -959,7 +959,7 @@ static void DoFileOpt (void)
 	ConsumeComma ();
 
 	/* We accept only string options for now */
-	if (Tok != TOK_STRCON) {
+	if (CurTok.Tok != TOK_STRCON) {
 	    ErrorSkip ("String constant expected");
 	    return;
 	}
@@ -969,17 +969,17 @@ static void DoFileOpt (void)
 
 	    case 0:
 		/* Author */
-		OptAuthor (&SVal);
+		OptAuthor (&CurTok.SVal);
 		break;
 
 	    case 1:
 		/* Comment */
-		OptComment (&SVal);
+		OptComment (&CurTok.SVal);
 		break;
 
 	    case 2:
 		/* Compiler */
-		OptCompiler (&SVal);
+		OptCompiler (&CurTok.SVal);
 		break;
 
 	    default:
@@ -1003,13 +1003,13 @@ static void DoFileOpt (void)
 	ConsumeComma ();
 
 	/* We accept only string options for now */
-	if (Tok != TOK_STRCON) {
+	if (CurTok.Tok != TOK_STRCON) {
 	    ErrorSkip ("String constant expected");
 	    return;
 	}
 
 	/* Insert the option */
-	OptStr ((unsigned char) OptNum, &SVal);
+	OptStr ((unsigned char) OptNum, &CurTok.SVal);
 
 	/* Done */
 	NextTok ();
@@ -1046,7 +1046,7 @@ static void DoHiBytes (void)
 {
     while (1) {
         EmitByte (FuncHiByte ());
-        if (Tok != TOK_COMMA) {
+        if (CurTok.Tok != TOK_COMMA) {
             break;
         } else {
             NextTok ();
@@ -1109,21 +1109,21 @@ static void DoIncBin (void)
     FILE* F;
 
     /* Name must follow */
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
     	ErrorSkip ("String constant expected");
     	return;
     }
-    SB_Copy (&Name, &SVal);
+    SB_Copy (&Name, &CurTok.SVal);
     SB_Terminate (&Name);
     NextTok ();
 
     /* A starting offset may follow */
-    if (Tok == TOK_COMMA) {
+    if (CurTok.Tok == TOK_COMMA) {
     	NextTok ();
     	Start = ConstExpression ();
 
     	/* And a length may follow */
-    	if (Tok == TOK_COMMA) {
+    	if (CurTok.Tok == TOK_COMMA) {
     	    NextTok ();
     	    Count = ConstExpression ();
     	}
@@ -1228,11 +1228,11 @@ static void DoInclude (void)
 /* Include another file */
 {
     /* Name must follow */
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
-        SB_Terminate (&SVal);
-    	if (NewInputFile (SB_GetConstBuf (&SVal)) == 0) {
+        SB_Terminate (&CurTok.SVal);
+    	if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
             /* Error opening the file, skip remainder of line */
             SkipUntilSep ();
         }
@@ -1247,11 +1247,11 @@ static void DoInterruptor (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
 
     /* Symbol name follows */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
-    SB_Copy (&Name, &SVal);
+    SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
 
     /* Parse the remainder of the line and export the symbol */
@@ -1307,7 +1307,7 @@ static void DoLoBytes (void)
 {
     while (1) {
         EmitByte (FuncLoByte ());
-        if (Tok != TOK_COMMA) {
+        if (CurTok.Tok != TOK_COMMA) {
             break;
         } else {
             NextTok ();
@@ -1327,13 +1327,13 @@ static void DoListBytes (void)
 static void DoLocalChar (void)
 /* Define the character that starts local labels */
 {
-    if (Tok != TOK_CHARCON) {
+    if (CurTok.Tok != TOK_CHARCON) {
      	ErrorSkip ("Character constant expected");
     } else {
-	if (IVal != '@' && IVal != '?') {
+	if (CurTok.IVal != '@' && CurTok.IVal != '?') {
 	    Error ("Invalid start character for locals");
 	} else {
-     	    LocalStart = (char) IVal;
+     	    LocalStart = (char) CurTok.IVal;
        	}
      	NextTok ();
     }
@@ -1347,14 +1347,14 @@ static void DoMacPack (void)
     int Package;
 
     /* We expect an identifier */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
     	return;
     }
 
     /* Search for the macro package name */
     LocaseSVal ();
-    Package = MacPackFind (&SVal);
+    Package = MacPackFind (&CurTok.SVal);
     if (Package < 0) {
     	/* Not found */
     	ErrorSkip ("Invalid macro package");
@@ -1403,13 +1403,15 @@ static void DoOrg (void)
 static void DoOut (void)
 /* Output a string */
 {
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
 	/* Output the string and be sure to flush the output to keep it in
 	 * sync with any error messages if the output is redirected to a file.
 	 */
-	printf ("%.*s\n", (int) SB_GetLen (&SVal), SB_GetConstBuf (&SVal));
+	printf ("%.*s\n",
+                (int) SB_GetLen (&CurTok.SVal),
+                SB_GetConstBuf (&CurTok.SVal));
 	fflush (stdout);
 	NextTok ();
     }
@@ -1493,12 +1495,12 @@ static void DoProc (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned char AddrSize;
 
-    if (Tok == TOK_IDENT) {
+    if (CurTok.Tok == TOK_IDENT) {
 
         SymEntry* Sym;
 
 	/* The new scope has a name. Remember it. */
-        SB_Copy (&Name, &SVal);
+        SB_Copy (&Name, &CurTok.SVal);
 
         /* Search for the symbol, generate a new one if needed */
        	Sym = SymFind (CurrentScope, &Name, SYM_ALLOC_NEW);
@@ -1595,7 +1597,7 @@ static void DoRes (void)
 	ErrorSkip ("Range error");
 	return;
     }
-    if (Tok == TOK_COMMA) {
+    if (CurTok.Tok == TOK_COMMA) {
 	NextTok ();
 	Val = ConstExpression ();
 	/* We need a byte value here */
@@ -1632,10 +1634,10 @@ static void DoScope (void)
     unsigned char AddrSize;
 
 
-    if (Tok == TOK_IDENT) {
+    if (CurTok.Tok == TOK_IDENT) {
 
     	/* The new scope has a name. Remember and skip it. */
-        SB_Copy (&Name, &SVal);
+        SB_Copy (&Name, &CurTok.SVal);
         NextTok ();
 
     } else {
@@ -1663,12 +1665,12 @@ static void DoSegment (void)
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
     SegDef Def;
 
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
 
 	/* Save the name of the segment and skip it */
-	SB_Copy (&Name, &SVal);
+	SB_Copy (&Name, &CurTok.SVal);
 	NextTok ();
 
         /* Use the name for the segment definition */
@@ -1692,14 +1694,14 @@ static void DoSetCPU (void)
 /* Switch the CPU instruction set */
 {
     /* We expect an identifier */
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
         cpu_t CPU;
 
         /* Try to find the CPU */
-        SB_Terminate (&SVal);
-        CPU = FindCPU (SB_GetConstBuf (&SVal));
+        SB_Terminate (&CurTok.SVal);
+        CPU = FindCPU (SB_GetConstBuf (&CurTok.SVal));
 
         /* Switch to the new CPU */
         SetCPU (CPU);
@@ -1758,7 +1760,7 @@ static void DoTag (void)
     }
 
     /* Optional multiplicator may follow */
-    if (Tok == TOK_COMMA) {
+    if (CurTok.Tok == TOK_COMMA) {
         long Multiplicator;
         NextTok ();
         Multiplicator = ConstExpression ();
@@ -1788,10 +1790,10 @@ static void DoUnexpected (void)
 static void DoWarning (void)
 /* User warning */
 {
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
  	ErrorSkip ("String constant expected");
     } else {
-       	Warning (0, "User warning: %m%p", &SVal);
+       	Warning (0, "User warning: %m%p", &CurTok.SVal);
 	SkipUntilSep ();
     }
 }
@@ -1803,7 +1805,7 @@ static void DoWord (void)
 {
     while (1) {
        	EmitWord (Expression ());
-	if (Tok != TOK_COMMA) {
+	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
 	    NextTok ();
@@ -1990,7 +1992,7 @@ void HandlePseudo (void)
     CtrlDesc* D;
 
     /* Calculate the index into the table */
-    unsigned Index = Tok - TOK_FIRSTPSEUDO;
+    unsigned Index = CurTok.Tok - TOK_FIRSTPSEUDO;
 
     /* Safety check */
     if (PSEUDO_COUNT != (TOK_LASTPSEUDO - TOK_FIRSTPSEUDO + 1)) {
@@ -2004,7 +2006,7 @@ void HandlePseudo (void)
 
     /* Remember the instruction, then skip it if needed */
     if ((D->Flags & ccKeepToken) == 0) {
-    	SB_Copy (&Keyword, &SVal);
+    	SB_Copy (&Keyword, &CurTok.SVal);
      	NextTok ();
     }
 

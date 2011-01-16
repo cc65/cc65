@@ -98,7 +98,7 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
 
     /* Initialize elements */
     ID->Flags = NeedTerm? ifNeedTerm : ifNone;
-    ID->Pos   = CurPos;
+    ID->Pos   = CurTok.Pos;
     ID->Name  = Directive;
 
     /* Return the result */
@@ -192,7 +192,7 @@ static void SetElse (IfDesc* ID, int E)
 
 
 /*****************************************************************************/
-/*     	       	    	   	     Code			     	     */
+/*     	       	       	   	     Code			     	     */
 /*****************************************************************************/
 
 
@@ -205,7 +205,7 @@ void DoConditionals (void)
     int IfCond = GetCurrentIfCond ();
     do {
 
-    	switch (Tok) {
+    	switch (CurTok.Tok) {
 
     	    case TOK_ELSE:
        	        D = GetCurrentIf ();
@@ -218,7 +218,7 @@ void DoConditionals (void)
 	       	    /* Allow an .ELSE */
 	  	    InvertIfCond (D);
 	  	    SetElse (D, 1);
-	  	    D->Pos = CurPos;
+	  	    D->Pos = CurTok.Pos;
 	  	    D->Name = ".ELSE";
 	  	    IfCond = GetCurrentIfCond ();
 	  	}
@@ -284,7 +284,7 @@ void DoConditionals (void)
 		D = AllocIf (".IFBLANK", 1);
 		NextTok ();
 		if (IfCond) {
-                    if (TokIsSep (Tok)) {
+                    if (TokIsSep (CurTok.Tok)) {
                         SetIfCond (D, 1);
                     } else {
 		        SetIfCond (D, 0);
@@ -320,7 +320,7 @@ void DoConditionals (void)
 	     	D = AllocIf (".IFNBLANK", 1);
 		NextTok ();
 		if (IfCond) {
-                    if (TokIsSep (Tok)) {
+                    if (TokIsSep (CurTok.Tok)) {
                         SetIfCond (D, 0);
                     } else {
 		        SetIfCond (D, 1);
@@ -421,7 +421,7 @@ void DoConditionals (void)
 
      	}
 
-    } while (IfCond == 0 && Tok != TOK_EOF);
+    } while (IfCond == 0 && CurTok.Tok != TOK_EOF);
 }
 
 
@@ -432,7 +432,7 @@ int CheckConditionals (void)
  * return false otherwise.
  */
 {
-    switch (Tok) {
+    switch (CurTok.Tok) {
         case TOK_ELSE:
         case TOK_ELSEIF:
         case TOK_ENDIF:
@@ -474,7 +474,7 @@ void CheckOpenIfs (void)
 	    break;
 	}
 
-	if (D->Pos.Name != CurPos.Name) {
+	if (D->Pos.Name != CurTok.Pos.Name) {
 	    /* The .if is from another file, bail out */
 	    break;
 	}
@@ -502,6 +502,7 @@ void CleanupIfStack (unsigned SP)
 	FreeIf ();
     }
 }
+
 
 
 

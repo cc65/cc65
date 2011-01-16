@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -69,26 +69,26 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
     SB_Clear (FullName);
 
     /* Get the starting table */
-    if (Tok == TOK_NAMESPACE) {
+    if (CurTok.Tok == TOK_NAMESPACE) {
 
         /* Start from the root scope */
         Scope = RootScope;
 
-    } else if (Tok == TOK_IDENT) {
+    } else if (CurTok.Tok == TOK_IDENT) {
 
         /* Remember the name and skip it */
-        SB_Copy (Name, &SVal);
+        SB_Copy (Name, &CurTok.SVal);
         NextTok ();
 
         /* If no namespace symbol follows, we're already done */
-        if (Tok != TOK_NAMESPACE) {
+        if (CurTok.Tok != TOK_NAMESPACE) {
             SB_Terminate (FullName);
             return CurrentScope;
         }
 
         /* Pass the scope back to the caller */
         SB_Append (FullName, Name);
-
+                               
         /* The scope must exist, so search for it starting with the current
          * scope.
          */
@@ -116,19 +116,19 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
     while (1) {
 
         /* Next token must be an identifier. */
-        if (Tok != TOK_IDENT) {
+        if (CurTok.Tok != TOK_IDENT) {
             Error ("Identifier expected");
             return 0;
         }
 
         /* Remember and skip the identifier */
-        SB_Copy (Name, &SVal);
+        SB_Copy (Name, &CurTok.SVal);
         NextTok ();
 
         /* If a namespace token follows, we search for another scope, otherwise
          * the name is a symbol and we're done.
          */
-        if (Tok != TOK_NAMESPACE) {
+        if (CurTok.Tok != TOK_NAMESPACE) {
             /* Symbol */
             return Scope;
         }
@@ -253,8 +253,8 @@ SymEntry* ParseAnySymName (int AllocNew)
     SymEntry* Sym;
 
     /* Distinguish cheap locals and other symbols */
-    if (Tok == TOK_LOCAL_IDENT) {
-        Sym = SymFindLocal (SymLast, &SVal, AllocNew);
+    if (CurTok.Tok == TOK_LOCAL_IDENT) {
+        Sym = SymFindLocal (SymLast, &CurTok.SVal, AllocNew);
         NextTok ();
     } else {
         Sym = ParseScopedSymName (AllocNew);

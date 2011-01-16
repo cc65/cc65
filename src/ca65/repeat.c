@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -63,10 +63,10 @@ static TokList* CollectRepeatTokens (void)
 
     /* Read the token list */
     unsigned Repeats = 0;
-    while (Repeats != 0 || Tok != TOK_ENDREP) {
+    while (Repeats != 0 || CurTok.Tok != TOK_ENDREP) {
 
      	/* Check for end of input */
-       	if (Tok == TOK_EOF) {
+       	if (CurTok.Tok == TOK_EOF) {
      	    Error ("Unexpected end of file");
 	    FreeTokList (List);
      	    return 0;
@@ -76,9 +76,9 @@ static TokList* CollectRepeatTokens (void)
 	AddCurTok (List);
 
      	/* Check for and count nested .REPEATs */
-     	if (Tok == TOK_REPEAT) {
+     	if (CurTok.Tok == TOK_REPEAT) {
      	    ++Repeats;
-     	} else if (Tok == TOK_ENDREP) {
+     	} else if (CurTok.Tok == TOK_ENDREP) {
      	    --Repeats;
      	}
 
@@ -100,10 +100,12 @@ static void RepeatTokenCheck (TokList* L)
  * for and replace identifiers that are the repeat counter.
  */
 {
-    if (Tok == TOK_IDENT && L->Data != 0 && SB_CompareStr (&SVal, L->Data) == 0) {
+    if (CurTok.Tok == TOK_IDENT &&
+        L->Data != 0            &&
+        SB_CompareStr (&CurTok.SVal, L->Data) == 0) {
      	/* Must replace by the repeat counter */
-     	Tok  = TOK_INTCON;
-     	IVal = L->RepCount;
+     	CurTok.Tok  = TOK_INTCON;
+     	CurTok.IVal = L->RepCount;
     }
 }
 
@@ -124,18 +126,18 @@ void ParseRepeat (void)
 
     /* Optional there is a comma and a counter variable */
     Name = 0;
-    if (Tok == TOK_COMMA) {
+    if (CurTok.Tok == TOK_COMMA) {
 
        	/* Skip the comma */
        	NextTok ();
 
        	/* Check for an identifier */
-       	if (Tok != TOK_IDENT) {
+       	if (CurTok.Tok != TOK_IDENT) {
        	    ErrorSkip ("Identifier expected");
        	} else {
        	    /* Remember the name and skip it */
-            SB_Terminate (&SVal);
-       	    Name = xstrdup (SB_GetConstBuf (&SVal));
+            SB_Terminate (&CurTok.SVal);
+       	    Name = xstrdup (SB_GetConstBuf (&CurTok.SVal));
        	    NextTok ();
        	}
     }

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2008, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -83,7 +83,7 @@ static Assertion* NewAssertion (ExprNode* Expr, AssertAction Action, unsigned Ms
     A->Expr     = Expr;
     A->Action   = Action;
     A->Msg      = Msg;
-    A->Pos      = CurPos;
+    A->Pos      = CurTok.Pos;
 
     /* Return the new struct */
     return A;
@@ -179,3 +179,4 @@ void WriteAssertions (void)
 
 
 
+                         

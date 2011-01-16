@@ -39,7 +39,9 @@
 
 
 /* common */
+#include "filepos.h"
 #include "inline.h"
+#include "strbuf.h"
 
 
 
@@ -49,7 +51,7 @@
 
 
 
-/* Tokens */ 
+/* Tokens */
 typedef enum token_t {
     TOK_NONE,	 	/* Start value, invalid */
     TOK_EOF,           	/* End of input file */
@@ -71,7 +73,7 @@ typedef enum token_t {
     TOK_ULABEL,	  	/* :++ or :-- */
 
     TOK_EQ,	  	/* = */
-    TOK_NE,	  	/* <> */
+    TOK_NE,	   	/* <> */
     TOK_LT,	  	/* < */
     TOK_GT,  	  	/* > */
     TOK_LE,	  	/* <= */
@@ -83,12 +85,12 @@ typedef enum token_t {
     TOK_BOOLNOT,	/* .not */
 
     TOK_PLUS,	  	/* + */
-    TOK_MINUS,	  	/* - */
+    TOK_MINUS,	    	/* - */
     TOK_MUL,	   	/* * */
     TOK_STAR = TOK_MUL,	/* Alias */
     TOK_DIV,	  	/* / */
     TOK_MOD,	  	/* ! */
-    TOK_OR,	  	/* | */
+    TOK_OR,	   	/* | */
     TOK_XOR,	  	/* ^ */
     TOK_BANK = TOK_XOR, /* Alias */
     TOK_AND,	  	/* & */
@@ -255,6 +257,27 @@ typedef enum token_t {
 
     TOK_COUNT  	  	/* Count of tokens */
 } token_t;
+
+
+
+/* Complete token including attributes and flags */
+typedef struct Token Token;
+struct Token {
+    token_t     Tok;            /* The actual token value */
+    int         WS;             /* Flag for "whitespace before token" */
+    long        IVal;           /* Integer attribute value */
+    StrBuf      SVal;           /* String attribute value */
+    FilePos     Pos;            /* Position from which token was read */
+};
+
+/* Initializer value for a token */
+#define STATIC_TOKEN_INITIALIZER {      \
+    TOK_NONE,                           \
+    0,                                  \
+    0,                                  \
+    STATIC_STRBUF_INITIALIZER,          \
+    STATIC_FILEPOS_INITIALIZER          \
+}
 
 
 

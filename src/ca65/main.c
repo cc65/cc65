@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -598,7 +598,7 @@ static void OneLine (void)
        	InitListingLine ();
     }
 
-    if (Tok == TOK_COLON) {
+    if (CurTok.Tok == TOK_COLON) {
        	/* An unnamed label */
        	ULabDef ();
        	NextTok ();
@@ -607,16 +607,16 @@ static void OneLine (void)
     /* If the first token on the line is an identifier, check for a macro or
      * an instruction.
      */
-    if (Tok == TOK_IDENT) {
+    if (CurTok.Tok == TOK_IDENT) {
         if (!UbiquitousIdents) {
             /* Macros and symbols cannot use instruction names */
-            Instr = FindInstruction (&SVal);
+            Instr = FindInstruction (&CurTok.SVal);
             if (Instr < 0) {
-                Macro = IsMacro (&SVal);
+                Macro = IsMacro (&CurTok.SVal);
             }
         } else {
             /* Macros and symbols may use the names of instructions */
-            Macro = IsMacro (&SVal);
+            Macro = IsMacro (&CurTok.SVal);
         }
     }
 
@@ -624,12 +624,12 @@ static void OneLine (void)
      * scoped identifier which may start with a namespace token (for global
      * namespace)
      */
-    if (Tok == TOK_LOCAL_IDENT ||
-        Tok == TOK_NAMESPACE   ||
-        (Tok == TOK_IDENT && Instr < 0 && !Macro)) {
+    if (CurTok.Tok == TOK_LOCAL_IDENT ||
+        CurTok.Tok == TOK_NAMESPACE   ||
+        (CurTok.Tok == TOK_IDENT && Instr < 0 && !Macro)) {
 
         /* Did we have whitespace before the ident? */
-        int HadWS = WS;
+        int HadWS = CurTok.WS;
 
         /* Generate the symbol table entry, then skip the name */
         Sym = ParseAnySymName (SYM_ALLOC_NEW);
@@ -637,10 +637,10 @@ static void OneLine (void)
         /* If a colon follows, this is a label definition. If there
          * is no colon, it's an assignment.
          */
-        if (Tok == TOK_EQ || Tok == TOK_ASSIGN) {
+        if (CurTok.Tok == TOK_EQ || CurTok.Tok == TOK_ASSIGN) {
 
             /* Determine the symbol flags from the assignment token */
-            unsigned Flags = (Tok == TOK_ASSIGN)? SF_LABEL : SF_NONE;
+            unsigned Flags = (CurTok.Tok == TOK_ASSIGN)? SF_LABEL : SF_NONE;
 
             /* Skip the '=' */
             NextTok ();
@@ -652,7 +652,7 @@ static void OneLine (void)
             ConsumeSep ();
             return;
 
-        } else if (Tok == TOK_SET) {
+        } else if (CurTok.Tok == TOK_SET) {
 
             ExprNode* Expr;
 
@@ -686,11 +686,11 @@ static void OneLine (void)
              * without a colon if there is no whitespace before the
              * identifier.
              */
-            if (Tok != TOK_COLON) {
+            if (CurTok.Tok != TOK_COLON) {
                 if (HadWS || !NoColonLabels) {
                     Error ("`:' expected");
                     /* Try some smart error recovery */
-                    if (Tok == TOK_NAMESPACE) {
+                    if (CurTok.Tok == TOK_NAMESPACE) {
                         NextTok ();
                     }
                 }
@@ -702,35 +702,35 @@ static void OneLine (void)
             /* If we come here, a new identifier may be waiting, which may
              * be a macro or instruction.
              */
-            if (Tok == TOK_IDENT) {
+            if (CurTok.Tok == TOK_IDENT) {
                 if (!UbiquitousIdents) {
                     /* Macros and symbols cannot use instruction names */
-                    Instr = FindInstruction (&SVal);
+                    Instr = FindInstruction (&CurTok.SVal);
                     if (Instr < 0) {
-                        Macro = IsMacro (&SVal);
+                        Macro = IsMacro (&CurTok.SVal);
                     }
                 } else {
                     /* Macros and symbols may use the names of instructions */
-                    Macro = IsMacro (&SVal);
+                    Macro = IsMacro (&CurTok.SVal);
                 }
             }
         }
     }
 
     /* We've handled a possible label, now handle the remainder of the line */
-    if (Tok >= TOK_FIRSTPSEUDO && Tok <= TOK_LASTPSEUDO) {
+    if (CurTok.Tok >= TOK_FIRSTPSEUDO && CurTok.Tok <= TOK_LASTPSEUDO) {
         /* A control command */
         HandlePseudo ();
     } else if (Macro) {
         /* A macro expansion */
         MacExpandStart ();
     } else if (Instr >= 0 ||
-               (UbiquitousIdents && ((Instr = FindInstruction (&SVal)) >= 0))) {
+               (UbiquitousIdents && ((Instr = FindInstruction (&CurTok.SVal)) >= 0))) {
         /* A mnemonic - assemble one instruction */
         HandleInstruction (Instr);
-    } else if (PCAssignment && (Tok == TOK_STAR || Tok == TOK_PC)) {
+    } else if (PCAssignment && (CurTok.Tok == TOK_STAR || CurTok.Tok == TOK_PC)) {
         NextTok ();
-        if (Tok != TOK_EQ) {
+        if (CurTok.Tok != TOK_EQ) {
             Error ("`=' expected");
             SkipUntilSep ();
         } else {
@@ -770,7 +770,7 @@ static void Assemble (void)
     NextTok ();
 
     /* Assemble lines until end of file */
-    while (Tok != TOK_EOF) {
+    while (CurTok.Tok != TOK_EOF) {
      	OneLine ();
     }
 }

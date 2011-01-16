@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -60,7 +60,7 @@ Fragment* NewFragment (unsigned char Type, unsigned short Len)
     /* Initialize it */
     F->Next 	= 0;
     F->LineList = 0;
-    F->Pos  	= CurPos;
+    F->Pos  	= CurTok.Pos;
     F->LI       = UseLineInfo (CurLineInfo);
     F->Len  	= Len;
     F->Type 	= Type;

@@ -73,7 +73,7 @@ static int LookAtStrCon (void)
  * true.
  */
 {
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
         Error ("String constant expected");
         SkipUntilSep ();
         return 0;
@@ -106,10 +106,10 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
 
     /* Read the token list */
     unsigned Current = 0;
-    while (Tok != Term) {
+    while (CurTok.Tok != Term) {
 
      	/* Check for end of line or end of input */
-     	if (TokIsSep (Tok)) {
+     	if (TokIsSep (CurTok.Tok)) {
      	    Error ("Unexpected end of line");
      	    return List;
      	}
@@ -160,13 +160,13 @@ static void FuncConcat (void)
      	}
 
         /* Append the string */
-        SB_Append (&Buf, &SVal);
+        SB_Append (&Buf, &CurTok.SVal);
 
      	/* Skip the string token */
      	NextTok ();
 
      	/* Comma means another argument */
-     	if (Tok == TOK_COMMA) {
+     	if (CurTok.Tok == TOK_COMMA) {
      	    NextTok ();
      	} else {
      	    /* Done */
@@ -177,11 +177,11 @@ static void FuncConcat (void)
     /* We expect a closing parenthesis, but will not skip it but replace it
      * by the string token just created.
      */
-    if (Tok != TOK_RPAREN) {
+    if (CurTok.Tok != TOK_RPAREN) {
      	Error ("`)' expected");
     } else {
-     	Tok = TOK_STRCON;
-     	SB_Copy (&SVal, &Buf);
+     	CurTok.Tok = TOK_STRCON;
+     	SB_Copy (&CurTok.SVal, &Buf);
     }
 
     /* Free the string buffer */
@@ -203,7 +203,7 @@ static void FuncIdent (void)
 /* Handle the .IDENT function */
 {
     StrBuf    Buf = STATIC_STRBUF_INITIALIZER;
-    token_t Id;
+    token_t   Id;
     unsigned  I;
 
     /* Skip it */
@@ -220,23 +220,23 @@ static void FuncIdent (void)
     /* Check that the string contains a valid identifier. While doing so,
      * determine if it is a cheap local, or global one.
      */
-    SB_Reset (&SVal);
+    SB_Reset (&CurTok.SVal);
 
     /* Check for a cheap local symbol */
-    if (SB_Peek (&SVal) == LocalStart) {
-        SB_Skip (&SVal);
+    if (SB_Peek (&CurTok.SVal) == LocalStart) {
+        SB_Skip (&CurTok.SVal);
         Id = TOK_LOCAL_IDENT;
     } else {
         Id = TOK_IDENT;
     }
 
     /* Next character must be a valid identifier start */
-    if (!IsIdStart (SB_Get (&SVal))) {
+    if (!IsIdStart (SB_Get (&CurTok.SVal))) {
         NoIdent ();
         return;
     }
-    for (I = SB_GetIndex (&SVal); I < SB_GetLen (&SVal); ++I) {
-        if (!IsIdChar (SB_AtUnchecked (&SVal, I))) {
+    for (I = SB_GetIndex (&CurTok.SVal); I < SB_GetLen (&CurTok.SVal); ++I) {
+        if (!IsIdChar (SB_AtUnchecked (&CurTok.SVal, I))) {
             NoIdent ();
             return;
         }
@@ -248,13 +248,13 @@ static void FuncIdent (void)
     /* If anything is ok, save and skip the string. Check that the next token
      * is a right paren, then replace the token by an identifier token.
      */
-    SB_Copy (&Buf, &SVal);
+    SB_Copy (&Buf, &CurTok.SVal);
     NextTok ();
-    if (Tok != TOK_RPAREN) {
+    if (CurTok.Tok != TOK_RPAREN) {
      	Error ("`)' expected");
     } else {
-        Tok = Id;
-        SB_Copy (&SVal, &Buf);
+        CurTok.Tok = Id;
+        SB_Copy (&CurTok.SVal, &Buf);
     }
 
     /* Free buffer memory */
@@ -442,7 +442,7 @@ static void FuncSPrintF (void)
     if (!LookAtStrCon ()) {
         return;
     }
-    SB_Copy (&Format, &SVal);
+    SB_Copy (&Format, &CurTok.SVal);
     NextTok ();
 
     /* Walk over the format string, generating the function result in R */
@@ -544,11 +544,11 @@ static void FuncSPrintF (void)
                 /* The argument must be a string constant */
                 if (!LookAtStrCon ()) {
                     /* Make it one */
-                    SB_CopyStr (&SVal, "**undefined**");
+                    SB_CopyStr (&CurTok.SVal, "**undefined**");
                 }
 
                 /* Format this argument according to the spec */
-                SB_Printf (&R1, SB_GetConstBuf (&F1), SVal);
+                SB_Printf (&R1, SB_GetConstBuf (&F1), CurTok.SVal);
 
                 /* Skip the string constant */
                 NextTok ();
@@ -596,11 +596,11 @@ static void FuncSPrintF (void)
     /* We expect a closing parenthesis, but will not skip it but replace it
      * by the string token just created.
      */
-    if (Tok != TOK_RPAREN) {
+    if (CurTok.Tok != TOK_RPAREN) {
      	Error ("`)' expected");
     } else {
-     	Tok = TOK_STRCON;
-        SB_Copy (&SVal, &R);
+     	CurTok.Tok = TOK_STRCON;
+        SB_Copy (&CurTok.SVal, &R);
     }
 
 
@@ -612,7 +612,7 @@ static void FuncSPrintF (void)
 }
 
 
-
+                
 static void FuncString (void)
 /* Handle the .STRING function */
 {
@@ -625,9 +625,9 @@ static void FuncString (void)
     ConsumeLParen ();
 
     /* Accept identifiers or numeric expressions */
-    if (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT) {
+    if (CurTok.Tok == TOK_IDENT || CurTok.Tok == TOK_LOCAL_IDENT) {
      	/* Save the identifier, then skip it */
-       	SB_Copy (&Buf, &SVal);
+       	SB_Copy (&Buf, &CurTok.SVal);
      	NextTok ();
     } else {
      	/* Numeric expression */
@@ -638,11 +638,11 @@ static void FuncString (void)
     /* We expect a closing parenthesis, but will not skip it but replace it
      * by the string token just created.
      */
-    if (Tok != TOK_RPAREN) {
+    if (CurTok.Tok != TOK_RPAREN) {
      	Error ("`)' expected");
     } else {
-     	Tok = TOK_STRCON;
-     	SB_Copy (&SVal, &Buf);
+     	CurTok.Tok = TOK_STRCON;
+     	SB_Copy (&CurTok.SVal, &Buf);
     }
 
     /* Free string memory */
@@ -661,7 +661,7 @@ void NextTok (void)
     if (RawMode == 0) {
 
 	/* Execute token handling functions */
-	switch (Tok) {
+	switch (CurTok.Tok) {
 
 	    case TOK_CONCAT:
 		FuncConcat ();
@@ -704,7 +704,7 @@ void NextTok (void)
 void Consume (token_t Expected, const char* ErrMsg)
 /* Consume Expected, print an error if we don't find it */
 {
-    if (Tok == Expected) {
+    if (CurTok.Tok == Expected) {
 	NextTok ();
     } else {
        	Error ("%s", ErrMsg);
@@ -720,7 +720,7 @@ void ConsumeSep (void)
     ExpectSep ();
 
     /* If we are at end of line, skip it */
-    if (Tok == TOK_SEP) {
+    if (CurTok.Tok == TOK_SEP) {
 	NextTok ();
     }
 }
@@ -754,7 +754,7 @@ void ConsumeComma (void)
 void SkipUntilSep (void)
 /* Skip tokens until we reach a line separator or end of file */
 {
-    while (!TokIsSep (Tok)) {
+    while (!TokIsSep (CurTok.Tok)) {
      	NextTok ();
     }
 }
@@ -766,7 +766,7 @@ void ExpectSep (void)
  * not skip the line separator.
  */
 {
-    if (!TokIsSep (Tok)) {
+    if (!TokIsSep (CurTok.Tok)) {
        	ErrorSkip ("Unexpected trailing garbage characters");
     }
 }

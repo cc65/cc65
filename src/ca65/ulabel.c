@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -82,7 +82,7 @@ static ULabel* NewULabel (ExprNode* Val)
     ULabel* L = xmalloc (sizeof (ULabel));
 
     /* Initialize the fields */
-    L->Pos = CurPos;
+    L->Pos = CurTok.Pos;
     L->Val = Val;
     L->Ref = 0;
 
@@ -160,7 +160,7 @@ void ULabDef (void)
 	ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
 	CHECK (L->Val == 0);
 	L->Val = GenCurrentPC ();
-	L->Pos = CurPos;
+	L->Pos = CurTok.Pos;
     } else {
 	/* There is no such label, create it */
        	NewULabel (GenCurrentPC ());

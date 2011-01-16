@@ -335,13 +335,13 @@ static ExprNode* FuncBlank (void)
      */
     token_t Term = GetTokListTerm (TOK_RPAREN);
     unsigned Count = 0;
-    while (Tok != Term) {
+    while (CurTok.Tok != Term) {
 
      	/* Check for end of line or end of input. Since the calling function
 	 * will check for the closing paren, we don't need to print an error
 	 * here, just bail out.
 	 */
-     	if (TokIsSep (Tok)) {
+     	if (TokIsSep (CurTok.Tok)) {
 	    break;
      	}
 
@@ -353,7 +353,7 @@ static ExprNode* FuncBlank (void)
     }
 
     /* If the list was enclosed in curly braces, skip the closing brace */
-    if (Term == TOK_RCURLY && Tok == TOK_RCURLY) {
+    if (Term == TOK_RCURLY && CurTok.Tok == TOK_RCURLY) {
         NextTok ();
     }
 
@@ -438,10 +438,10 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
      * either enclosed in curly braces, or terminated by a comma.
      */
     token_t Term = GetTokListTerm (TOK_COMMA);
-    while (Tok != Term) {
+    while (CurTok.Tok != Term) {
 
     	/* We may not end-of-line of end-of-file here */
-    	if (TokIsSep (Tok)) {
+    	if (TokIsSep (CurTok.Tok)) {
     	    Error ("Unexpected end of line");
     	    return GenLiteral0 ();
     	}
@@ -476,10 +476,10 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     Term = GetTokListTerm (TOK_RPAREN);
     Result = 1;
     Node = Root;
-    while (Tok != Term) {
+    while (CurTok.Tok != Term) {
 
     	/* We may not end-of-line of end-of-file here */
-    	if (TokIsSep (Tok)) {
+    	if (TokIsSep (CurTok.Tok)) {
     	    Error ("Unexpected end of line");
     	    return GenLiteral0 ();
     	}
@@ -621,18 +621,18 @@ static ExprNode* FuncSizeOf (void)
     SizeSym = 0;
 
     /* Check for a cheap local which needs special handling */
-    if (Tok == TOK_LOCAL_IDENT) {
+    if (CurTok.Tok == TOK_LOCAL_IDENT) {
 
         /* Cheap local symbol */
-        Sym = SymFindLocal (SymLast, &SVal, SYM_FIND_EXISTING);
+        Sym = SymFindLocal (SymLast, &CurTok.SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%m%p'", &SVal);
+            Error ("Unknown symbol or scope: `%m%p'", &CurTok.SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
 
         /* Remember and skip SVal, terminate ScopeName so it is empty */
-        SB_Copy (&Name, &SVal);
+        SB_Copy (&Name, &CurTok.SVal);
         NextTok ();
         SB_Terminate (&ScopeName);
 
@@ -708,14 +708,14 @@ static ExprNode* FuncStrAt (void)
     unsigned char C = 0;
 
     /* String constant expected */
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
       	Error ("String constant expected");
       	NextTok ();
        	goto ExitPoint;
     }
 
     /* Remember the string and skip it */
-    SB_Copy (&Str, &SVal);
+    SB_Copy (&Str, &CurTok.SVal);
     NextTok ();
 
     /* Comma must follow */
@@ -751,11 +751,11 @@ static ExprNode* FuncStrLen (void)
     int Len;
 
     /* String constant expected */
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
 
      	Error ("String constant expected");
     	/* Smart error recovery */
-     	if (Tok != TOK_RPAREN) {
+     	if (CurTok.Tok != TOK_RPAREN) {
      	    NextTok ();
      	}
        	Len = 0;
@@ -763,7 +763,7 @@ static ExprNode* FuncStrLen (void)
     } else {
 
         /* Get the length of the string */
-       	Len = SB_GetLen (&SVal);
+       	Len = SB_GetLen (&CurTok.SVal);
 
 	/* Skip the string */
 	NextTok ();
@@ -783,13 +783,13 @@ static ExprNode* FuncTCount (void)
      */
     token_t Term = GetTokListTerm (TOK_RPAREN);
     int Count = 0;
-    while (Tok != Term) {
+    while (CurTok.Tok != Term) {
 
      	/* Check for end of line or end of input. Since the calling function
 	 * will check for the closing paren, we don't need to print an error
 	 * here, just bail out.
 	 */
-     	if (TokIsSep (Tok)) {
+     	if (TokIsSep (CurTok.Tok)) {
 	    break;
      	}
 
@@ -801,7 +801,7 @@ static ExprNode* FuncTCount (void)
     }
 
     /* If the list was enclosed in curly braces, skip the closing brace */
-    if (Term == TOK_RCURLY && Tok == TOK_RCURLY) {
+    if (Term == TOK_RCURLY && CurTok.Tok == TOK_RCURLY) {
         NextTok ();
     }
 
@@ -828,7 +828,7 @@ static ExprNode* Function (ExprNode* (*F) (void))
     NextTok ();
 
     /* Expression must be enclosed in braces */
-    if (Tok != TOK_LPAREN) {
+    if (CurTok.Tok != TOK_LPAREN) {
      	Error ("'(' expected");
      	SkipUntilSep ();
 	return GenLiteral0 ();
@@ -853,15 +853,15 @@ static ExprNode* Factor (void)
     ExprNode* N;
     long      Val;
 
-    switch (Tok) {
+    switch (CurTok.Tok) {
 
 	case TOK_INTCON:
-    	    N = GenLiteralExpr (IVal);
+    	    N = GenLiteralExpr (CurTok.IVal);
        	    NextTok ();
 	    break;
 
 	case TOK_CHARCON:
-    	    N = GenLiteralExpr (TgtTranslateChar (IVal));
+    	    N = GenLiteralExpr (TgtTranslateChar (CurTok.IVal));
        	    NextTok ();
 	    break;
 
@@ -872,7 +872,7 @@ static ExprNode* Factor (void)
 	    break;
 
 	case TOK_ULABEL:
-	    N = ULabRef (IVal);
+	    N = ULabRef (CurTok.IVal);
 	    NextTok ();
 	    break;
 
@@ -1016,9 +1016,10 @@ static ExprNode* Factor (void)
 	    break;
 
 	default:
-	    if (LooseCharTerm && Tok == TOK_STRCON && SB_GetLen (&SVal) == 1) {
+	    if (LooseCharTerm && CurTok.Tok == TOK_STRCON && 
+                SB_GetLen (&CurTok.SVal) == 1) {
 		/* A character constant */
-		N = GenLiteralExpr (TgtTranslateChar (SB_At (&SVal, 0)));
+		N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
 	    } else {
 		N = GenLiteral0 ();	/* Dummy */
 		Error ("Syntax error");
@@ -1037,16 +1038,17 @@ static ExprNode* Term (void)
     ExprNode* Root = Factor ();
 
     /* Handle multiplicative operations */
-    while (Tok == TOK_MUL || Tok == TOK_DIV || Tok == TOK_MOD ||
-	   Tok == TOK_AND || Tok == TOK_XOR || Tok == TOK_SHL ||
-	   Tok == TOK_SHR) {
+    while (CurTok.Tok == TOK_MUL || CurTok.Tok == TOK_DIV ||
+           CurTok.Tok == TOK_MOD || CurTok.Tok == TOK_AND ||
+           CurTok.Tok == TOK_XOR || CurTok.Tok == TOK_SHL ||
+	   CurTok.Tok == TOK_SHR) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        token_t T = Tok;
+        token_t T = CurTok.Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1140,14 +1142,16 @@ static ExprNode* SimpleExpr (void)
     ExprNode* Root = Term ();
 
     /* Handle additive operations */
-    while (Tok == TOK_PLUS || Tok == TOK_MINUS || Tok == TOK_OR) {
+    while (CurTok.Tok == TOK_PLUS  ||
+           CurTok.Tok == TOK_MINUS ||
+           CurTok.Tok == TOK_OR) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        token_t T = Tok;
+        token_t T = CurTok.Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1201,15 +1205,16 @@ static ExprNode* BoolExpr (void)
     ExprNode* Root = SimpleExpr ();
 
     /* Handle booleans */
-    while (Tok == TOK_EQ || Tok == TOK_NE || Tok == TOK_LT ||
-	   Tok == TOK_GT || Tok == TOK_LE || Tok == TOK_GE) {
+    while (CurTok.Tok == TOK_EQ || CurTok.Tok == TOK_NE ||
+           CurTok.Tok == TOK_LT || CurTok.Tok == TOK_GT ||
+           CurTok.Tok == TOK_LE || CurTok.Tok == TOK_GE) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        token_t T = Tok;
+        token_t T = CurTok.Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1269,14 +1274,14 @@ static ExprNode* Expr2 (void)
     ExprNode* Root = BoolExpr ();
 
     /* Handle booleans */
-    while (Tok == TOK_BOOLAND || Tok == TOK_BOOLXOR) {
+    while (CurTok.Tok == TOK_BOOLAND || CurTok.Tok == TOK_BOOLXOR) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        token_t T = Tok;
+        token_t T = CurTok.Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1328,14 +1333,14 @@ static ExprNode* Expr1 (void)
     ExprNode* Root = Expr2 ();
 
     /* Handle booleans */
-    while (Tok == TOK_BOOLOR) {
+    while (CurTok.Tok == TOK_BOOLOR) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
         ExprNode* Right;
 
         /* Remember the token and skip it */
-        token_t T = Tok;
+        token_t T = CurTok.Tok;
         NextTok ();
 
         /* Move root to left side and read the right side */
@@ -1384,7 +1389,7 @@ static ExprNode* Expr0 (void)
     ExprNode* Root;
 
     /* Handle booleans */
-    if (Tok == TOK_BOOLNOT) {
+    if (CurTok.Tok == TOK_BOOLNOT) {
 
         long Val;
         ExprNode* Left;

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -86,7 +86,7 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     S->Right   	  = 0;
     S->Locals  	  = 0;
     S->Sym.Tab    = 0;
-    S->Pos     	  = CurPos;
+    S->Pos     	  = CurTok.Pos;
     for (I = 0; I < sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0]); ++I) {
         S->GuessedUse[I] = 0;
     }
@@ -578,7 +578,7 @@ void SymGuessedAddrSize (SymEntry* Sym, unsigned char AddrSize)
     }
 
     /* Ok, remember the file position */
-    Sym->GuessedUse[AddrSize-1] = xdup (&CurPos, sizeof (CurPos));
+    Sym->GuessedUse[AddrSize-1] = xdup (&CurTok.Pos, sizeof (CurTok.Pos));
 }
 
 

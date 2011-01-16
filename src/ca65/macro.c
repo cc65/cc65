@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -311,10 +311,10 @@ static void MacSkipDef (unsigned Style)
 {
     if (Style == MAC_STYLE_CLASSIC) {
 	/* Skip tokens until we reach the final .endmacro */
-	while (Tok != TOK_ENDMACRO && Tok != TOK_EOF) {
+	while (CurTok.Tok != TOK_ENDMACRO && CurTok.Tok != TOK_EOF) {
 	    NextTok ();
 	}
-	if (Tok != TOK_EOF) {
+	if (CurTok.Tok != TOK_EOF) {
 	    SkipUntilSep ();
 	} else {
 	    Error ("`.ENDMACRO' expected");
@@ -335,11 +335,11 @@ void MacDef (unsigned Style)
     int HaveParams;
 
     /* We expect a macro name here */
-    if (Tok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
 	Error ("Identifier expected");
 	MacSkipDef (Style);
     	return;
-    } else if (!UbiquitousIdents && FindInstruction (&SVal) >= 0) {
+    } else if (!UbiquitousIdents && FindInstruction (&CurTok.SVal) >= 0) {
         /* The identifier is a name of a 6502 instruction, which is not
          * allowed if not explicitly enabled.
          */
@@ -349,16 +349,16 @@ void MacDef (unsigned Style)
     }
 
     /* Did we already define that macro? */
-    if (HT_Find (&MacroTab, &SVal) != 0) {
+    if (HT_Find (&MacroTab, &CurTok.SVal) != 0) {
        	/* Macro is already defined */
-       	Error ("A macro named `%m%p' is already defined", &SVal);
+       	Error ("A macro named `%m%p' is already defined", &CurTok.SVal);
      	/* Skip tokens until we reach the final .endmacro */
      	MacSkipDef (Style);
        	return;
     }
 
     /* Define the macro */
-    M = NewMacro (&SVal, Style);
+    M = NewMacro (&CurTok.SVal, Style);
 
     /* Switch to raw token mode and skip the macro name */
     EnterRawTokenMode ();
@@ -370,7 +370,7 @@ void MacDef (unsigned Style)
     if (Style == MAC_STYLE_CLASSIC) {
      	HaveParams = 1;
     } else {
-     	if (Tok == TOK_LPAREN) {
+     	if (CurTok.Tok == TOK_LPAREN) {
      	    HaveParams = 1;
      	    NextTok ();
      	} else {
@@ -381,10 +381,10 @@ void MacDef (unsigned Style)
     /* Parse the parameter list */
     if (HaveParams) {
 
-     	while (Tok == TOK_IDENT) {
+     	while (CurTok.Tok == TOK_IDENT) {
 
      	    /* Create a struct holding the identifier */
-     	    IdDesc* I = NewIdDesc (&SVal);
+     	    IdDesc* I = NewIdDesc (&CurTok.SVal);
 
      	    /* Insert the struct into the list, checking for duplicate idents */
      	    if (M->ParamCount == 0) {
@@ -392,8 +392,8 @@ void MacDef (unsigned Style)
      	    } else {
      		IdDesc* List = M->Params;
      		while (1) {
-     		    if (SB_Compare (&List->Id, &SVal) == 0) {
-     		   	Error ("Duplicate symbol `%m%p'", &SVal);
+     		    if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
+     		   	Error ("Duplicate symbol `%m%p'", &CurTok.SVal);
      		    }
      		    if (List->Next == 0) {
      			break;
@@ -409,7 +409,7 @@ void MacDef (unsigned Style)
      	    NextTok ();
 
 	    /* Maybe there are more params... */
-	    if (Tok == TOK_COMMA) {
+	    if (CurTok.Tok == TOK_COMMA) {
 		NextTok ();
 	    } else {
 		break;
@@ -436,24 +436,24 @@ void MacDef (unsigned Style)
 	/* Check for end of macro */
 	if (Style == MAC_STYLE_CLASSIC) {
 	    /* In classic macros, only .endmacro is allowed */
-	    if (Tok == TOK_ENDMACRO) {
+	    if (CurTok.Tok == TOK_ENDMACRO) {
 		/* Done */
 		break;
 	    }
 	    /* May not have end of file in a macro definition */
-	    if (Tok == TOK_EOF) {
+	    if (CurTok.Tok == TOK_EOF) {
 		Error ("`.ENDMACRO' expected");
 		goto Done;
 	    }
 	} else {
 	    /* Accept a newline or end of file for new style macros */
-	    if (TokIsSep (Tok)) {
+	    if (TokIsSep (CurTok.Tok)) {
 		break;
 	    }
 	}
 
      	/* Check for a .LOCAL declaration */
-     	if (Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC) {
+     	if (CurTok.Tok == TOK_LOCAL && Style == MAC_STYLE_CLASSIC) {
 
      	    while (1) {
 
@@ -463,21 +463,21 @@ void MacDef (unsigned Style)
        		NextTok ();
 
      		/* Need an identifer */
-     		if (Tok != TOK_IDENT && Tok != TOK_LOCAL_IDENT) {
+     		if (CurTok.Tok != TOK_IDENT && CurTok.Tok != TOK_LOCAL_IDENT) {
      	       	    Error ("Identifier expected");
      		    SkipUntilSep ();
      		    break;
      		}
 
      		/* Put the identifier into the locals list and skip it */
-       	       	I = NewIdDesc (&SVal);
+       	       	I = NewIdDesc (&CurTok.SVal);
      		I->Next = M->Locals;
      		M->Locals = I;
      		++M->LocalCount;
      		NextTok ();
 
      	      	/* Check for end of list */
-     		if (Tok != TOK_COMMA) {
+     		if (CurTok.Tok != TOK_COMMA) {
      		    break;
      		}
 
@@ -492,11 +492,11 @@ void MacDef (unsigned Style)
      	T = NewTokNode ();
 
      	/* If the token is an ident, check if it is a local parameter */
-     	if (Tok == TOK_IDENT) {
+     	if (CurTok.Tok == TOK_IDENT) {
      	    unsigned Count = 0;
      	    IdDesc* I = M->Params;
      	    while (I) {
-     	       	if (SB_Compare (&I->Id, &SVal) == 0) {
+     	       	if (SB_Compare (&I->Id, &CurTok.SVal) == 0) {
      	       	    /* Local param name, replace it */
      	       	    T->Tok  = TOK_MACPARAM;
      	       	    T->IVal = Count;
@@ -584,29 +584,30 @@ static int MacExpand (void* Data)
        	Mac->Exp = Mac->Exp->Next;
 
        	/* Is it a request for actual parameter count? */
-       	if (Tok == TOK_PARAMCOUNT) {
-       	    Tok  = TOK_INTCON;
-       	    IVal = Mac->ParamCount;
+       	if (CurTok.Tok == TOK_PARAMCOUNT) {
+       	    CurTok.Tok  = TOK_INTCON;
+       	    CurTok.IVal = Mac->ParamCount;
        	    return 1;
        	}
 
        	/* Is it the name of a macro parameter? */
-       	if (Tok == TOK_MACPARAM) {
+       	if (CurTok.Tok == TOK_MACPARAM) {
 
        	    /* Start to expand the parameter token list */
-       	    Mac->ParamExp = Mac->Params [IVal];
+       	    Mac->ParamExp = Mac->Params [CurTok.IVal];
 
        	    /* Recursive call to expand the parameter */
        	    return MacExpand (Mac);
        	}
 
        	/* If it's an identifier, it may in fact be a local symbol */
-       	if ((Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT) && Mac->M->LocalCount) {
+       	if ((CurTok.Tok == TOK_IDENT || CurTok.Tok == TOK_LOCAL_IDENT) &&
+            Mac->M->LocalCount) {
        	    /* Search for the local symbol in the list */
        	    unsigned Index = 0;
        	    IdDesc* I = Mac->M->Locals;
        	    while (I) {
-       	       	if (SB_Compare (&SVal, &I->Id) == 0) {
+       	       	if (SB_Compare (&CurTok.SVal, &I->Id) == 0) {
        	       	    /* This is in fact a local symbol, change the name. Be sure
                      * to generate a local label name if the original name was
                      * a local label, and also generate a name that cannot be
@@ -614,11 +615,11 @@ static int MacExpand (void* Data)
                      */
                     if (SB_At (&I->Id, 0) == LocalStart) {
                         /* Must generate a local symbol */
-                        SB_Printf (&SVal, "%cLOCAL-MACRO_SYMBOL-%04X",
+                        SB_Printf (&CurTok.SVal, "%cLOCAL-MACRO_SYMBOL-%04X",
                                    LocalStart, Mac->LocalStart + Index);
                     } else {
                         /* Global symbol */
-                        SB_Printf (&SVal, "LOCAL-MACRO_SYMBOL-%04X",
+                        SB_Printf (&CurTok.SVal, "LOCAL-MACRO_SYMBOL-%04X",
                                    Mac->LocalStart + Index);
                     }
        	       	    break;
@@ -677,7 +678,7 @@ static void StartExpClassic (Macro* M)
     E = NewMacExp (M);
 
     /* Read the actual parameters */
-    while (!TokIsSep (Tok)) {
+    while (!TokIsSep (CurTok.Tok)) {
 
 	TokNode* Last;
 
@@ -692,12 +693,12 @@ static void StartExpClassic (Macro* M)
 
        	/* Read tokens for one parameter, accept empty params */
 	Last = 0;
-	while (Tok != Term && Tok != TOK_SEP) {
+	while (CurTok.Tok != Term && CurTok.Tok != TOK_SEP) {
 
 	    TokNode* T;
 
 	    /* Check for end of file */
-	    if (Tok == TOK_EOF) {
+	    if (CurTok.Tok == TOK_EOF) {
 	     	Error ("Unexpected end of file");
                 FreeMacExp (E);
 	     	return;
@@ -725,7 +726,7 @@ static void StartExpClassic (Macro* M)
          * is an error. Skip the closing curly brace.
          */
         if (Term == TOK_RCURLY) {
-            if (Tok == TOK_SEP) {
+            if (CurTok.Tok == TOK_SEP) {
                 Error ("End of line encountered within macro argument");
                 break;
             }
@@ -733,7 +734,7 @@ static void StartExpClassic (Macro* M)
         }
 
 	/* Check for a comma */
-	if (Tok == TOK_COMMA) {
+	if (CurTok.Tok == TOK_COMMA) {
  	    NextTok ();
  	} else {
  	    break;
@@ -772,7 +773,7 @@ static void StartExpDefine (Macro* M)
         token_t Term = GetTokListTerm (TOK_COMMA);
 
        	/* Check if there is really a parameter */
-       	if (TokIsSep (Tok) || Tok == Term) {
+       	if (TokIsSep (CurTok.Tok) || CurTok.Tok == Term) {
             ErrorSkip ("Macro parameter #%u is empty", E->ParamCount+1);
             FreeMacExp (E);
             return;
@@ -798,7 +799,7 @@ static void StartExpDefine (Macro* M)
 	    /* And skip it... */
 	    NextTok ();
 
-       	} while (Tok != Term && !TokIsSep (Tok));
+       	} while (CurTok.Tok != Term && !TokIsSep (CurTok.Tok));
 
 	/* One parameter more */
 	++E->ParamCount;
@@ -807,7 +808,7 @@ static void StartExpDefine (Macro* M)
          * is an error. Skip the closing curly brace.
          */
         if (Term == TOK_RCURLY) {
-            if (TokIsSep (Tok)) {
+            if (TokIsSep (CurTok.Tok)) {
                 Error ("End of line encountered within macro argument");
                 break;
             }
@@ -816,7 +817,7 @@ static void StartExpDefine (Macro* M)
 
        	/* Check for a comma */
        	if (Count > 0) {
-       	    if (Tok == TOK_COMMA) {
+       	    if (CurTok.Tok == TOK_COMMA) {
        	        NextTok ();
        	    } else {
        		Error ("`,' expected");
@@ -841,14 +842,14 @@ void MacExpandStart (void)
 /* Start expanding the macro in SVal */
 {
     /* Search for the macro */
-    Macro* M = HT_FindEntry (&MacroTab, &SVal);
+    Macro* M = HT_FindEntry (&MacroTab, &CurTok.SVal);
     CHECK (M != 0);
 
     /* Call the apropriate subroutine */
     switch (M->Style) {
     	case MAC_STYLE_CLASSIC:	StartExpClassic (M);	break;
 	case MAC_STYLE_DEFINE:	StartExpDefine (M);	break;
-	default:   	      	Internal ("Invalid macro style: %d", M->Style);
+	default:       	      	Internal ("Invalid macro style: %d", M->Style);
     }
 }
 
@@ -888,6 +889,7 @@ int InMacExpansion (void)
 {
     return (MacExpansions > 0);
 }
+
 
 
 

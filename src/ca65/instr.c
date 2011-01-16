@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -1255,7 +1255,7 @@ static void PutTST (const InsDesc* Ins)
     EffAddr   A;
 
     /* The first argument is always an immediate byte */
-    if (Tok != TOK_HASH) {
+    if (CurTok.Tok != TOK_HASH) {
         ErrorSkip ("Invalid addressing mode");
         return;
     }

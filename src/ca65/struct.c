@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -74,7 +74,7 @@ static long Member (long AllocSize)
     long Multiplicator;
 
     /* A multiplicator may follow */
-    if (Tok != TOK_SEP) {
+    if (CurTok.Tok != TOK_SEP) {
         Multiplicator = ConstExpression ();
         if (Multiplicator <= 0) {
             ErrorSkip ("Range error");
@@ -103,10 +103,10 @@ static long DoStructInternal (long Offs, unsigned Type)
      * union, the struct may be anonymous, in which case no new lexical level
      * is started.
      */
-    int Anon = (Tok != TOK_IDENT);
+    int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (&SVal, ST_STRUCT, ADDR_SIZE_ABS);
+        SymEnterLevel (&CurTok.SVal, ST_STRUCT, ADDR_SIZE_ABS);
         NextTok ();
         /* Start at zero offset in the new scope */
         Offs = 0;
@@ -116,23 +116,25 @@ static long DoStructInternal (long Offs, unsigned Type)
     ConsumeSep ();
 
     /* Read until end of struct */
-    while (Tok != TOK_ENDSTRUCT && Tok != TOK_ENDUNION && Tok != TOK_EOF) {
+    while (CurTok.Tok != TOK_ENDSTRUCT && 
+           CurTok.Tok != TOK_ENDUNION  && 
+           CurTok.Tok != TOK_EOF) {
 
         long      MemberSize;
         SymTable* Struct;
         SymEntry* Sym;
 
         /* Allow empty and comment lines */
-        if (Tok == TOK_SEP) {
+        if (CurTok.Tok == TOK_SEP) {
             NextTok ();
             continue;
         }
 
         /* The format is "[identifier] storage-allocator [, multiplicator]" */
         Sym = 0;
-        if (Tok == TOK_IDENT) {
+        if (CurTok.Tok == TOK_IDENT) {
             /* We have an identifier, generate a symbol */
-            Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
+            Sym = SymFind (CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
 
             /* Assign the symbol the offset of the current member */
             SymDef (Sym, GenLiteralExpr (Offs), ADDR_SIZE_DEFAULT, SF_NONE);
@@ -143,7 +145,7 @@ static long DoStructInternal (long Offs, unsigned Type)
 
         /* Read storage allocators */
         MemberSize = 0;                 /* In case of errors, use zero */
-        switch (Tok) {
+        switch (CurTok.Tok) {
 
             case TOK_BYTE:
                 NextTok ();
@@ -169,7 +171,7 @@ static long DoStructInternal (long Offs, unsigned Type)
 
             case TOK_RES:
 		NextTok ();
-                if (Tok == TOK_SEP) {
+                if (CurTok.Tok == TOK_SEP) {
                     ErrorSkip ("Size is missing");
                 } else {
                     MemberSize = Member (1);

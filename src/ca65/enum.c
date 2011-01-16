@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -62,10 +62,10 @@ void DoEnum (void)
     ExprNode* BaseExpr = GenLiteral0 ();
 
     /* Check for a name */
-    int Anon = (Tok != TOK_IDENT);
+    int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (&SVal, ST_ENUM, ADDR_SIZE_ABS);
+        SymEnterLevel (&CurTok.SVal, ST_ENUM, ADDR_SIZE_ABS);
         NextTok ();
     }
 
@@ -73,19 +73,19 @@ void DoEnum (void)
     ConsumeSep ();
 
     /* Read until end of struct */
-    while (Tok != TOK_ENDENUM && Tok != TOK_EOF) {
+    while (CurTok.Tok != TOK_ENDENUM && CurTok.Tok != TOK_EOF) {
 
         SymEntry* Sym;
         ExprNode* EnumExpr;
 
         /* Skip empty lines */
-        if (Tok == TOK_SEP) {
+        if (CurTok.Tok == TOK_SEP) {
             NextTok ();
             continue;
         }
 
         /* The format is "identifier [ = value ]" */
-        if (Tok != TOK_IDENT) {
+        if (CurTok.Tok != TOK_IDENT) {
             /* Maybe it's a conditional? */
             if (!CheckConditionals ()) {
                 ErrorSkip ("Identifier expected");
@@ -94,13 +94,13 @@ void DoEnum (void)
         }
 
         /* We have an identifier, generate a symbol */
-        Sym = SymFind (CurrentScope, &SVal, SYM_ALLOC_NEW);
+        Sym = SymFind (CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
 
         /* Skip the member name */
         NextTok ();
 
         /* Check for an assignment */
-        if (Tok == TOK_EQ) {
+        if (CurTok.Tok == TOK_EQ) {
 
             /* Skip the equal sign */
             NextTok ();
@@ -142,6 +142,7 @@ void DoEnum (void)
     /* Free the base expression */
     FreeExpr (BaseExpr);
 }
+
 
 
 

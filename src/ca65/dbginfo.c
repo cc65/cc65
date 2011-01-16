@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -65,11 +65,11 @@ void DbgInfoFile (void)
     ConsumeComma ();
 
     /* Name */
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
        	ErrorSkip ("String constant expected");
        	return;
     }
-    SB_Copy (&Name, &SVal);
+    SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
 
     /* Comma expected */
@@ -102,7 +102,7 @@ void DbgInfoLine (void)
     /* If a parameters follow, this is actual line info. If no parameters
      * follow, the last line info is terminated.
      */
-    if (Tok == TOK_SEP) {
+    if (CurTok.Tok == TOK_SEP) {
 	ClearLineInfo ();
 	return;
     }
@@ -111,13 +111,13 @@ void DbgInfoLine (void)
     ConsumeComma ();
 
     /* The name of the file follows */
-    if (Tok != TOK_STRCON) {
+    if (CurTok.Tok != TOK_STRCON) {
      	ErrorSkip ("String constant expected");
      	return;
     }
 
     /* Get the index in the file table for the name */
-    Index = GetFileIndex (&SVal);
+    Index = GetFileIndex (&CurTok.SVal);
 
     /* Skip the name */
     NextTok ();
@@ -146,3 +146,5 @@ void DbgInfoSym (void)
 
 
 
+
+               

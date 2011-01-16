@@ -64,11 +64,11 @@ TokNode* NewTokNode (void)
 
     /* Initialize the token contents */
     T->Next   	= 0;
-    T->Tok	= Tok;
-    T->WS 	= WS;
-    T->IVal	= IVal;
+    T->Tok	= CurTok.Tok;
+    T->WS 	= CurTok.WS;
+    T->IVal	= CurTok.IVal;
     SB_Init (&T->SVal);
-    SB_Copy (&T->SVal, &SVal);
+    SB_Copy (&T->SVal, &CurTok.SVal);
 
     /* Return the node */
     return T;
@@ -89,11 +89,11 @@ void TokSet (TokNode* T)
 /* Set the scanner token from the given token node */
 {
     /* Set the values */
-    Tok  = T->Tok;
-    WS   = T->WS;
-    IVal = T->IVal;
-    SB_Copy (&SVal, &T->SVal);
-    SB_Terminate (&SVal);
+    CurTok.Tok  = T->Tok;
+    CurTok.WS   = T->WS;
+    CurTok.IVal = T->IVal;
+    SB_Copy (&CurTok.SVal, &T->SVal);
+    SB_Terminate (&CurTok.SVal);
 }
 
 
@@ -101,18 +101,18 @@ void TokSet (TokNode* T)
 enum TC TokCmp (const TokNode* T)
 /* Compare the token given as parameter against the current token */
 {
-    if (T->Tok != Tok) {
+    if (T->Tok != CurTok.Tok) {
 	/* Different token */
 	return tcDifferent;
     }
 
     /* If the token has string attribute, check it */
     if (TokHasSVal (T->Tok)) {
-       	if (SB_Compare (&SVal, &T->SVal) != 0) {
+       	if (SB_Compare (&CurTok.SVal, &T->SVal) != 0) {
      	    return tcSameToken;
 	}
     } else if (TokHasIVal (T->Tok)) {
-	if (T->IVal != IVal) {
+	if (T->IVal != CurTok.IVal) {
      	    return tcSameToken;
 	}
     }
@@ -182,7 +182,7 @@ enum token_t GetTokListTerm (enum token_t Term)
  * a closing brace, otherwise return Term.
  */
 {
-    if (Tok == TOK_LCURLY) {
+    if (CurTok.Tok == TOK_LCURLY) {
         NextTok ();
         return TOK_RCURLY;
     } else {
@@ -275,6 +275,7 @@ void PushTokList (TokList* List, const char* Desc)
     /* Insert the list specifying our input function */
     PushInput (ReplayTokList, List, Desc);
 }
+
 
 
 

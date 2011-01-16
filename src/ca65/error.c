@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -94,7 +94,7 @@ void Warning (unsigned Level, const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    WarningMsg (&CurPos, Level, Format, ap);
+    WarningMsg (&CurTok.Pos, Level, Format, ap);
     va_end (ap);
 }
 
@@ -140,7 +140,7 @@ void Error (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    ErrorMsg (&CurPos, Format, ap);
+    ErrorMsg (&CurTok.Pos, Format, ap);
     va_end (ap);
 }
 
@@ -162,7 +162,7 @@ void ErrorSkip (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    ErrorMsg (&CurPos, Format, ap);
+    ErrorMsg (&CurTok.Pos, Format, ap);
     va_end (ap);
 
     SkipUntilSep ();

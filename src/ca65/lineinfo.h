@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                70794 Filderstadt                                          */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -93,7 +93,7 @@ LineInfo* UseLineInfo (LineInfo* LI);
  * function will gracefully accept NULL pointers and do nothing in this case.
  */
 
-void GenLineInfo (unsigned FileIndex, unsigned long LineNum);
+void GenLineInfo (unsigned FileIndex, unsigned long LineNum, unsigned ColNum);
 /* Generate a new line info */
 
 void ClearLineInfo (void);

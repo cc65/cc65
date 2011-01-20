@@ -49,17 +49,14 @@
 /*****************************************************************************/
 /*     	       	    		     Data				     */
 /*****************************************************************************/
-
+                                
 
 
 /* Struct holding a token */
 typedef struct TokNode TokNode;
 struct TokNode {
     TokNode*	Next;  	      		/* For single linked list */
-    token_t     Tok;	      		/* Token value */
-    int	       	WS;    	      		/* Whitespace before token? */
-    long       	IVal;	      		/* Integer token attribute */
-    StrBuf      SVal;                   /* String attribute, dyn. allocated */
+    Token       T;                      /* Token value */
 };
 
 /* Struct holding a token list */
@@ -95,13 +92,13 @@ enum TC {
 TokNode* NewTokNode (void);
 /* Create and return a token node with the current token value */
 
-void FreeTokNode (TokNode* T);
+void FreeTokNode (TokNode* N);
 /* Free the given token node */
 
-void TokSet (TokNode* T);
+void TokSet (TokNode* N);
 /* Set the scanner token from the given token node */
 
-enum TC TokCmp (const TokNode* T);
+enum TC TokCmp (const TokNode* N);
 /* Compare the token given as parameter against the current token */
 
 void InitTokList (TokList* T);

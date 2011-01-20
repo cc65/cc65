@@ -57,62 +57,55 @@
 TokNode* NewTokNode (void)
 /* Create and return a token node with the current token value */
 {
-    TokNode* T;
 
     /* Allocate memory */
-    T = xmalloc (sizeof (TokNode));
+    TokNode* N = xmalloc (sizeof (TokNode));
 
     /* Initialize the token contents */
-    T->Next   	= 0;
-    T->Tok	= CurTok.Tok;
-    T->WS 	= CurTok.WS;
-    T->IVal	= CurTok.IVal;
-    SB_Init (&T->SVal);
-    SB_Copy (&T->SVal, &CurTok.SVal);
+    N->Next     = 0;
+    SB_Init (&N->T.SVal);
+    CopyToken (&N->T, &CurTok);
 
     /* Return the node */
-    return T;
+    return N;
 }
 
 
 
-void FreeTokNode (TokNode* T)
+void FreeTokNode (TokNode* N)
 /* Free the given token node */
 {
-    SB_Done (&T->SVal);
-    xfree (T);
+    SB_Done (&N->T.SVal);
+    xfree (N);
 }
 
 
 
-void TokSet (TokNode* T)
+void TokSet (TokNode* N)
 /* Set the scanner token from the given token node */
 {
     /* Set the values */
-    CurTok.Tok  = T->Tok;
-    CurTok.WS   = T->WS;
-    CurTok.IVal = T->IVal;
-    SB_Copy (&CurTok.SVal, &T->SVal);
+    CopyToken (&CurTok, &N->T);
     SB_Terminate (&CurTok.SVal);
 }
 
 
 
-enum TC TokCmp (const TokNode* T)
+enum TC TokCmp (const TokNode* N)
 /* Compare the token given as parameter against the current token */
 {
-    if (T->Tok != CurTok.Tok) {
+    if (N->T.Tok != CurTok.Tok) {
 	/* Different token */
 	return tcDifferent;
     }
 
     /* If the token has string attribute, check it */
-    if (TokHasSVal (T->Tok)) {
-       	if (SB_Compare (&CurTok.SVal, &T->SVal) != 0) {
+    if (TokHasSVal (N->T.Tok)) {
+       	if (SB_Compare (&CurTok.SVal, &N->T.SVal) != 0) {
      	    return tcSameToken;
 	}
-    } else if (TokHasIVal (T->Tok)) {
-	if (T->IVal != CurTok.IVal) {
+    } else if (TokHasIVal (N->T.Tok)) {
+	if (N->T.IVal != CurTok.IVal) {
      	    return tcSameToken;
 	}
     }
@@ -275,7 +268,6 @@ void PushTokList (TokList* List, const char* Desc)
     /* Insert the list specifying our input function */
     PushInput (ReplayTokList, List, Desc);
 }
-
 
 
 

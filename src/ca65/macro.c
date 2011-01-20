@@ -331,7 +331,7 @@ void MacDef (unsigned Style)
 /* Parse a macro definition */
 {
     Macro* M;
-    TokNode* T;
+    TokNode* N;
     int HaveParams;
 
     /* We expect a macro name here */
@@ -489,7 +489,7 @@ void MacDef (unsigned Style)
      	}
 
      	/* Create a token node for the current token */
-     	T = NewTokNode ();
+     	N = NewTokNode ();
 
      	/* If the token is an ident, check if it is a local parameter */
      	if (CurTok.Tok == TOK_IDENT) {
@@ -498,8 +498,8 @@ void MacDef (unsigned Style)
      	    while (I) {
      	       	if (SB_Compare (&I->Id, &CurTok.SVal) == 0) {
      	       	    /* Local param name, replace it */
-     	       	    T->Tok  = TOK_MACPARAM;
-     	       	    T->IVal = Count;
+       	       	    N->T.Tok  = TOK_MACPARAM;
+     	       	    N->T.IVal = Count;
      	       	    break;
      	       	}
      	       	++Count;
@@ -510,11 +510,11 @@ void MacDef (unsigned Style)
      	/* Insert the new token in the list */
      	if (M->TokCount == 0) {
      	    /* First token */
-     	    M->TokRoot = M->TokLast = T;
+     	    M->TokRoot = M->TokLast = N;
      	} else {
      	    /* We have already tokens */
-     	    M->TokLast->Next = T;
-     	    M->TokLast = T;
+     	    M->TokLast->Next = N;
+     	    M->TokLast = N;
      	}
      	++M->TokCount;
 

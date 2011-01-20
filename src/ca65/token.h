@@ -303,6 +303,11 @@ INLINE int TokIsSep (enum token_t T)
 #  define TokIsSep(T)   ((T) == TOK_SEP || (T) == TOK_EOF)
 #endif
 
+void CopyToken (Token* Dst, const Token* Src);
+/* Copy a token. The current value of Dst.SVal is free'd, so Dst must be
+ * initialized.
+ */
+
 
 
 /* End of token.h */

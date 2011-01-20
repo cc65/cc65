@@ -133,7 +133,7 @@ void DbgInfoLine (void)
     }
 
     /* Remember the line info */
-    GenLineInfo (Index, LineNum);
+    GenLineInfo (Index, LineNum, 0);
 }
 
 
@@ -147,4 +147,4 @@ void DbgInfoSym (void)
 
 
 
-               
+

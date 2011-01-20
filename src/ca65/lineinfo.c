@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                70794 Filderstadt                                          */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -74,7 +74,7 @@ LineInfo* CurLineInfo   = 0;
 
 
 
-static LineInfo* NewLineInfo (unsigned FileIndex, unsigned long LineNum)
+static LineInfo* NewLineInfo (unsigned File, unsigned long Line, unsigned Col)
 /* Create and return a new line info. Usage will be zero. */
 {
     /* Allocate memory */
@@ -83,9 +83,9 @@ static LineInfo* NewLineInfo (unsigned FileIndex, unsigned long LineNum)
     /* Initialize the fields */
     LI->Usage    = 0;
     LI->Index    = 0;           /* Currently invalid */
-    LI->Pos.Line = LineNum;
-    LI->Pos.Col  = 0;
-    LI->Pos.Name = FileIndex;
+    LI->Pos.Line = Line;
+    LI->Pos.Col  = Col;
+    LI->Pos.Name = File;
 
     /* Insert this structure into the collection */
     CollAppend (&LineInfoColl, LI);
@@ -112,11 +112,11 @@ LineInfo* UseLineInfo (LineInfo* LI)
 
 
 
-void GenLineInfo (unsigned FileIndex, unsigned long LineNum)
+void GenLineInfo (unsigned FileIndex, unsigned long LineNum, unsigned ColNum)
 /* Generate a new line info */
 {
     /* Create a new line info and make it current */
-    CurLineInfo = NewLineInfo (FileIndex, LineNum);
+    CurLineInfo = NewLineInfo (FileIndex, LineNum, ColNum);
 }
 
 
@@ -129,7 +129,7 @@ void ClearLineInfo (void)
 
 
 
-static int CmpLineInfo (void* Data attribute ((unused)), 
+static int CmpLineInfo (void* Data attribute ((unused)),
 			const void* LI1_, const void* LI2_)
 /* Compare function for the sort */
 {
@@ -162,7 +162,7 @@ static int CmpLineInfo (void* Data attribute ((unused)),
     }
 }
 
-							   
+
 
 void MakeLineInfoIndex (void)
 /* Sort the line infos and drop all unreferenced ones */

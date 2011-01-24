@@ -371,24 +371,24 @@ void SegCheck (void)
      	       	   	if (Abs) {
      	       	   	    /* Absolute value */
      	       	   	    if (Val > 255) {
-     	       	       	     	PError (&F->Pos, "Range error (%ld not in [0..255])", Val);
+     	       	       	     	LIError (&F->LI, "Range error (%ld not in [0..255])", Val);
      	       	   	    }
      	       	   	} else {
      	     	   	    /* PC relative value */
      	     	   	    if (Val < -128 || Val > 127) {
-     	       	       	     	PError (&F->Pos, "Range error (%ld not in [-128..127])", Val);
+     	       	       	     	LIError (&F->LI, "Range error (%ld not in [-128..127])", Val);
      	     	   	    }
      	     	   	}
      	       	    } else if (F->Len == 2) {
      	     	    	if (Abs) {
      	     	   	    /* Absolute value */
      	     	   	    if (Val > 65535) {
-     	       	       	     	PError (&F->Pos, "Range error (%ld not in [0..65535])", Val);
+     	       	       	     	LIError (&F->LI, "Range error (%ld not in [0..65535])", Val);
      	     	   	    }
      	     	   	} else {
      	     	   	    /* PC relative value */
      	     	   	    if (Val < -32768 || Val > 32767) {
-     	       	       	     	PError (&F->Pos, "Range error (%ld not in [-32768..32767])", Val);
+     	       	       	     	LIError (&F->LI, "Range error (%ld not in [-32768..32767])", Val);
      	       		    }
      	     		}
      	     	    }
@@ -412,7 +412,7 @@ void SegCheck (void)
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
-     	       	        PError (&F->Pos, "Range error");
+     	       	        LIError (&F->LI, "Range error");
      	     	    }
      		}
 
@@ -477,7 +477,6 @@ static void WriteOneSeg (Segment* Seg)
 /* Write one segment to the object file */
 {
     Fragment* Frag;
-    unsigned LineInfoIndex;
     unsigned long DataSize;
     unsigned long EndPos;
 
@@ -541,14 +540,8 @@ static void WriteOneSeg (Segment* Seg)
 
     	}
 
-       	/* Write the file position of this fragment */
-	ObjWritePos (&Frag->Pos);
-
-	/* Write extra line info for this fragment. Zero is considered
-	 * "no line info", so add one to the value.
-	 */
-	LineInfoIndex = Frag->LI? Frag->LI->Index + 1 : 0;
-	ObjWriteVar (LineInfoIndex);
+       	/* Write the line infos for this fragment */
+       	WriteLineInfo (&Frag->LI);
 
 	/* Next fragment */
 	Frag = Frag->Next;
@@ -617,6 +610,7 @@ void WriteSegments (void)
     /* Done writing segments */
     ObjEndSegments ();
 }
+
 
 
 

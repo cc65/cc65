@@ -38,8 +38,6 @@
 
 /* ca65 */
 #include "fragment.h"
-#include "lineinfo.h"
-#include "scanner.h"
 
 
 
@@ -60,15 +58,14 @@ Fragment* NewFragment (unsigned char Type, unsigned short Len)
     /* Initialize it */
     F->Next 	= 0;
     F->LineList = 0;
-    F->Pos  	= CurTok.Pos;
-    F->LI       = UseLineInfo (CurLineInfo);
+    F->LI       = EmptyCollection;
+    GetFullLineInfo (&F->LI);
     F->Len  	= Len;
     F->Type 	= Type;
 
     /* And return it */
     return F;
 }
-
 
 
 

@@ -41,8 +41,8 @@
 #include "asserts.h"
 #include "error.h"
 #include "expr.h"
+#include "lineinfo.h"
 #include "objfile.h"
-#include "scanner.h"
 #include "spool.h"
 
 
@@ -59,7 +59,7 @@ struct Assertion {
     ExprNode*       Expr;       /* Expression to evaluate */
     AssertAction    Action;     /* Action to take */
     unsigned        Msg;        /* Message to print (if any) */
-    FilePos         Pos;        /* File position of assertion */
+    Collection      LI;         /* Line infos for the assertion */
 };
 
 /* Collection with all assertions for a module */
@@ -83,7 +83,8 @@ static Assertion* NewAssertion (ExprNode* Expr, AssertAction Action, unsigned Ms
     A->Expr     = Expr;
     A->Action   = Action;
     A->Msg      = Msg;
-    A->Pos      = CurTok.Pos;
+    A->LI       = EmptyCollection;
+    GetFullLineInfo (&A->LI);
 
     /* Return the new struct */
     return A;
@@ -128,11 +129,11 @@ void CheckAssertions (void)
             switch (A->Action) {
 
                 case ASSERT_ACT_WARN:
-                    PWarning (&A->Pos, 0, "%s", Msg);
+                    LIWarning (&A->LI, 0, "%s", Msg);
                     break;
 
                 case ASSERT_ACT_ERROR:
-                    PError (&A->Pos, "%s", Msg);
+                    LIError (&A->LI, "%s", Msg);
                     break;
 
                 default:
@@ -169,7 +170,7 @@ void WriteAssertions (void)
         WriteExpr (A->Expr);
         ObjWriteVar ((unsigned) A->Action);
         ObjWriteVar (A->Msg);
-        ObjWritePos (&A->Pos);
+        WriteLineInfo (&A->LI);
     }
 
     /* Done writing the assertions */
@@ -179,4 +180,4 @@ void WriteAssertions (void)
 
 
 
-                         
+

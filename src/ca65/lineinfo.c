@@ -43,28 +43,90 @@
 
 
 
+#include <string.h>
+#include <limits.h>
+
 /* common */
 #include "coll.h"
 #include "xmalloc.h"
 
 /* ca65 */
-#include "objfile.h"
+#include "global.h"
 #include "lineinfo.h"
+#include "objfile.h"
 
 
 
 /*****************************************************************************/
-/*  				     Data                                    */
+/*  		       		     Data                                    */
 /*****************************************************************************/
 
 
+
+/* An invalid line info index */
+#define INV_LINEINFO_INDEX      UINT_MAX
 
 /* Collection containing all line infos */
-Collection LineInfoColl = STATIC_COLLECTION_INITIALIZER;
-unsigned  LineInfoValid = 0;              /* Valid, that is, used entries */
+static Collection LineInfoColl = STATIC_COLLECTION_INITIALIZER;
 
-/* Static pointer to last line info or NULL if not active */
-LineInfo* CurLineInfo   = 0;
+/* Number of valid (=used) line infos in LineInfoColl */
+static unsigned UsedLineInfoCount;
+
+/* Entry in CurLineInfo */
+typedef struct LineInfoSlot LineInfoSlot;
+struct LineInfoSlot {
+    unsigned    Type;
+    LineInfo*   Info;
+};
+
+/* Dynamically allocated array of LineInfoSlots */
+static LineInfoSlot* CurLineInfo;
+static unsigned AllocatedSlots;
+static unsigned UsedSlots;
+
+
+
+/*****************************************************************************/
+/*                              struct LineInfo                              */
+/*****************************************************************************/
+
+
+
+static LineInfo* NewLineInfo (unsigned Type, unsigned File,
+                              unsigned long Line, unsigned Col)
+/* Create and return a new line info. Usage will be zero. */
+{
+    /* Allocate memory */
+    LineInfo* LI = xmalloc (sizeof (LineInfo));
+
+    /* Initialize the fields */
+    LI->Usage    = 0;
+    LI->Type     = Type;
+    LI->Index    = INV_LINEINFO_INDEX;
+    LI->Pos.Name = File;
+    LI->Pos.Line = Line;
+    LI->Pos.Col  = Col;
+
+    /* Return the new struct */
+    return LI;
+}
+
+
+
+static void FreeLineInfo (LineInfo* LI)
+/* "Free" line info. If the usage counter is non zero, move it to the
+ * collection that contains all line infos, otherwise delete it.
+ * The function handles a NULL pointer transparently.
+ */
+{
+    if (LI) {
+        if (LI->Usage > 0) {
+            CollAppend (&LineInfoColl, LI);
+        } else {
+            xfree (LI);
+        }
+    }
+}
 
 
 
@@ -74,24 +136,131 @@ LineInfo* CurLineInfo   = 0;
 
 
 
-static LineInfo* NewLineInfo (unsigned File, unsigned long Line, unsigned Col)
-/* Create and return a new line info. Usage will be zero. */
+void InitLineInfo (void)
+/* Initialize the line infos */
 {
-    /* Allocate memory */
-    LineInfo* LI = xmalloc (sizeof (LineInfo));
+    /* Allocate 8 slots */
+    AllocatedSlots = 8;
+    CurLineInfo = xmalloc (AllocatedSlots * sizeof (LineInfoSlot));
 
-    /* Initialize the fields */
-    LI->Usage    = 0;
-    LI->Index    = 0;           /* Currently invalid */
-    LI->Pos.Line = Line;
-    LI->Pos.Col  = Col;
-    LI->Pos.Name = File;
+    /* Initalize the predefined slots */
+    UsedSlots = 2;
+    CurLineInfo[LI_SLOT_ASM].Type = LI_TYPE_ASM;
+    CurLineInfo[LI_SLOT_ASM].Info = 0;
+    CurLineInfo[LI_SLOT_EXT].Type = LI_TYPE_EXT; 
+    CurLineInfo[LI_SLOT_EXT].Info = 0;
+}
 
-    /* Insert this structure into the collection */
-    CollAppend (&LineInfoColl, LI);
 
-    /* Return the new struct */
-    return LI;
+
+unsigned AllocLineInfoSlot (unsigned Type)
+/* Allocate a line info slot of the given type and return the slot index */
+{
+    /* Grow the array if necessary */
+    if (UsedSlots >= AllocatedSlots) {
+        LineInfoSlot* NewLineInfo;
+        AllocatedSlots *= 2;
+        NewLineInfo = xmalloc (AllocatedSlots * sizeof (LineInfoSlot));
+        memcpy (NewLineInfo, CurLineInfo, UsedSlots * sizeof (LineInfoSlot));
+        xfree (CurLineInfo);
+        CurLineInfo = NewLineInfo;
+    }
+
+    /* Array is now big enough, add the new data */
+    CurLineInfo[UsedSlots].Type = Type;
+    CurLineInfo[UsedSlots].Info = 0;
+
+    /* Increment the count and return the index of the new slot */
+    return UsedSlots++;
+}
+
+
+
+void FreeLineInfoSlot (unsigned Slot)
+/* Free the line info in the given slot. Note: Alloc/Free must be used in
+ * FIFO order.
+ */
+{
+    /* Check the parameter */
+    PRECONDITION (Slot == UsedSlots - 1);
+
+    /* Free the last entry */
+    FreeLineInfo (CurLineInfo[Slot].Info);
+    --UsedSlots;
+}
+
+
+
+void GenLineInfo (unsigned Slot, unsigned File, unsigned long Line, unsigned Col)
+/* Generate a new line info in the given slot */
+{
+    /* Get a pointer to the slot */
+    LineInfoSlot* S = CurLineInfo + Slot;
+
+    /* Check if we already have data */
+    if (S->Info) {
+        /* Generate new data only if it is different from the existing. */
+        if (S->Info->Pos.Col == Col &&
+            S->Info->Pos.Line == Line &&
+            S->Info->Pos.Name == File) {
+            /* Already there */
+            return;
+        }
+
+        /* We have data, but it's not identical. If it is in use, copy it to
+         * line info collection, otherwise delete it.
+         */
+        FreeLineInfo (S->Info);
+
+    }
+
+    /* Allocate new data */
+    S->Info = NewLineInfo (S->Type, File, Line, Col);
+}
+
+
+
+void ClearLineInfo (unsigned Slot)
+/* Clear the line info in the given slot */
+{
+    /* Get a pointer to the slot */
+    LineInfoSlot* S = CurLineInfo + Slot;
+
+    /* Free the struct and zero the pointer */
+    FreeLineInfo (S->Info);
+    S->Info = 0;
+}
+
+
+
+LineInfo* GetLineInfo (unsigned Slot)
+/* Get the line info from the given slot */
+{
+    PRECONDITION (Slot < UsedSlots);
+    return CurLineInfo[Slot].Info;
+}
+
+
+
+void GetFullLineInfo (Collection* LineInfos)
+/* Return full line infos, that is line infos for all slots in LineInfos. The
+ * function does also increase the usage counter for all line infos returned.
+ */
+{
+   unsigned I;
+
+    /* Copy all valid line infos to the collection */
+    for (I = 0; I < UsedSlots; ++I) {
+
+        /* Get the slot */
+        LineInfoSlot* S = CurLineInfo + I;
+
+        /* Ignore empty slots */
+        if (S->Info) {
+            ++S->Info->Usage;
+            CollAppend (LineInfos, S->Info);
+        }
+    }
 }
 
 
@@ -102,35 +271,30 @@ LineInfo* UseLineInfo (LineInfo* LI)
  */
 {
     if (LI) {
-	if (LI->Usage++ == 0) {
-	    /* One more valid line info */
-	    ++LineInfoValid;
-	}
+       	++LI->Usage;
     }
     return LI;
 }
 
 
 
-void GenLineInfo (unsigned FileIndex, unsigned long LineNum, unsigned ColNum)
-/* Generate a new line info */
+LineInfo* ReleaseLineInfo (LineInfo* LI)
+/* Decrease the reference count of the given line info and return it. The
+ * function will gracefully accept NULL pointers and do nothing in this case.
+ */
 {
-    /* Create a new line info and make it current */
-    CurLineInfo = NewLineInfo (FileIndex, LineNum, ColNum);
-}
-
-
-
-void ClearLineInfo (void)
-/* Clear the current line info */
-{
-    CurLineInfo = 0;
+    if (LI) {
+        /* Cannot decrease below zero */
+       	CHECK (LI->Usage != 0);
+        --LI->Usage;
+    }
+    return LI;
 }
 
 
 
 static int CmpLineInfo (void* Data attribute ((unused)),
-			const void* LI1_, const void* LI2_)
+      			const void* LI1_, const void* LI2_)
 /* Compare function for the sort */
 {
     /* Cast the pointers */
@@ -138,21 +302,11 @@ static int CmpLineInfo (void* Data attribute ((unused)),
     const LineInfo* LI2 = LI2_;
 
     /* Unreferenced line infos are always larger, otherwise sort by file,
-     * then by line.
+     * then by line, then by column.
      */
     if ((LI1->Usage == 0) == (LI2->Usage == 0)) {
 	/* Both are either referenced or unreferenced */
-       	if (LI1->Pos.Name< LI2->Pos.Name) {
-	    return -1;
-	} else if (LI1->Pos.Name > LI2->Pos.Name) {
-	    return 1;
-	} else if (LI1->Pos.Line < LI2->Pos.Line) {
-	    return -1;
-	} else if (LI1->Pos.Line > LI2->Pos.Line) {
-	    return 1;
-	} else {
-	    return 0;
-	}
+        return CompareFilePos (&LI1->Pos, &LI2->Pos);
     } else {
 	if (LI1->Usage > 0) {
 	    return -1;
@@ -164,25 +318,54 @@ static int CmpLineInfo (void* Data attribute ((unused)),
 
 
 
+void WriteLineInfo (const Collection* LineInfos)
+/* Write a list of line infos to the object file. MakeLineInfoIndex has to
+ * be called before!
+ */
+{
+    unsigned I;
+
+    /* Write the count */
+    ObjWriteVar (CollCount (LineInfos));
+
+    /* Write the line info indices */
+    for (I = 0; I < CollCount (LineInfos); ++I) {
+        ObjWriteVar (((const LineInfo*) CollConstAt (LineInfos, I))->Index);
+    }
+}
+
+
+
 void MakeLineInfoIndex (void)
-/* Sort the line infos and drop all unreferenced ones */
+/* Index the line infos */
 {
     unsigned I;
 
     /* Sort the collection */
     CollSort (&LineInfoColl, CmpLineInfo, 0);
 
-    /* Walk over the list and index the line infos. */
-    for (I = 0; I < LineInfoValid; ++I) {
+    /* Walk over the list, index the line infos and count the used ones */
+    UsedLineInfoCount = 0;
+    for (I = 0; I < CollCount (&LineInfoColl); ++I) {
 	/* Get a pointer to this line info */
 	LineInfo* LI = CollAtUnchecked (&LineInfoColl, I);
-	LI->Index = I;
+
+        /* If it is invalid, terminate the loop. All unused line infos were
+         * placed at the end of the collection by the sort.
+         */
+        if (LI->Usage == 0) {
+            break;
+        }
+
+        /* Index and count this one */
+        LI->Index = I;
+        ++UsedLineInfoCount;
     }
 }
 
 
 
-void WriteLineInfo (void)
+void WriteLineInfos (void)
 /* Write a list of all line infos to the object file. */
 {
     /* Tell the object file module that we're about to write line infos */
@@ -194,15 +377,12 @@ void WriteLineInfo (void)
 	unsigned I;
 
 	/* Write the line info count to the list */
-       	ObjWriteVar (LineInfoValid);
+       	ObjWriteVar (UsedLineInfoCount);
 
-       	/* Walk through list and write all line infos that have references.
-	 * Because of the sort, this are exactly the first LineInfoValid
-	 * ones.
-	 */
-	for (I = 0; I < LineInfoValid; ++I) {
+       	/* Walk over the list and write all line infos */
+	for (I = 0; I < UsedLineInfoCount; ++I) {
 	    /* Get a pointer to this line info */
-	    LineInfo* LI = CollAtUnchecked (&LineInfoColl, I);
+	    LineInfo* LI = CollAt (&LineInfoColl, I);
 	    /* Write the source file position */
 	    ObjWritePos (&LI->Pos);
 	}

@@ -43,6 +43,7 @@
 /* ca65 */
 #include "error.h"
 #include "filetab.h"
+#include "lineinfo.h"
 #include "nexttok.h"
 
 
@@ -59,6 +60,32 @@ unsigned WarnLevel	= 1;
 /* Statistics */
 unsigned ErrorCount	= 0;
 unsigned WarningCount	= 0;
+
+
+
+/*****************************************************************************/
+/*                             Helper functions                              */
+/*****************************************************************************/
+
+
+
+static int FindAsmEntry (const Collection* LineInfos)
+/* Return the last entry of type LI_TYPE_ASM in the given line infos. If none
+ * was found, return -1.
+ */
+{
+    unsigned I = CollCount (LineInfos);
+    while (I > 0) {
+        const LineInfo* LI = CollConstAt (LineInfos, --I);
+        if ((LI->Type & LI_MASK_TYPE) == LI_TYPE_ASM) {
+            /* Found */
+            return (int) I;
+        }
+    }
+
+    /* Not found */
+    return -1;
+}
 
 
 
@@ -111,6 +138,29 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
 
 
 
+void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format, ...)
+/* Print warning message using the given line infos */
+{
+    const LineInfo* LI;
+    va_list ap;
+
+    /* Search backwards in LI for the first entry of type LI_TYPE_ASM. */
+    int I = FindAsmEntry (LineInfos);
+
+    /* We must have such an entry */
+    CHECK (I >= 0);
+
+    /* Get the position for this entry */
+    LI = CollConstAt (LineInfos, I);
+
+    /* Output a warning for this position */
+    va_start (ap, Format);
+    WarningMsg (&LI->Pos, Level, Format, ap);
+    va_end (ap);
+}
+
+
+
 /*****************************************************************************/
 /*		     		    Errors				     */
 /*****************************************************************************/
@@ -152,6 +202,29 @@ void PError (const FilePos* Pos, const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     ErrorMsg (Pos, Format, ap);
+    va_end (ap);
+}
+
+
+
+void LIError (const Collection* LineInfos, const char* Format, ...)
+/* Print an error message using the given line infos. */
+{
+    const LineInfo* LI;
+    va_list ap;
+
+    /* Search backwards in LI for the first entry of type LI_TYPE_ASM. */
+    int I = FindAsmEntry (LineInfos);
+
+    /* We must have such an entry */
+    CHECK (I >= 0);
+
+    /* Get the position for this entry */
+    LI = CollConstAt (LineInfos, I);
+
+    /* Output an error for this position */
+    va_start (ap, Format);
+    ErrorMsg (&LI->Pos, Format, ap);
     va_end (ap);
 }
 

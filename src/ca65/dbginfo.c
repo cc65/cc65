@@ -49,6 +49,17 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* The line info slot used */
+static unsigned LineInfoSlot;
+
+
+
+/*****************************************************************************/
 /*     	       	    		     Code			   	     */
 /*****************************************************************************/
 
@@ -103,7 +114,7 @@ void DbgInfoLine (void)
      * follow, the last line info is terminated.
      */
     if (CurTok.Tok == TOK_SEP) {
-	ClearLineInfo ();
+	ClearLineInfo (LineInfoSlot);
 	return;
     }
 
@@ -133,7 +144,7 @@ void DbgInfoLine (void)
     }
 
     /* Remember the line info */
-    GenLineInfo (Index, LineNum, 0);
+    GenLineInfo (LineInfoSlot, Index, LineNum, 0);
 }
 
 
@@ -143,8 +154,6 @@ void DbgInfoSym (void)
 {
     ErrorSkip ("Not implemented");
 }
-
-
 
 
 

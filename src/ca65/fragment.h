@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,27 +40,29 @@
 
 /* common */
 #include "exprdefs.h"
-#include "filepos.h"
+#include "coll.h"
+
+/* ca65 */
+#include "lineinfo.h"
 
 
 
 /*****************************************************************************/
-/*	       			struct Fragment				     */
+/*	       	 		struct Fragment				     */
 /*****************************************************************************/
 
 
 
 typedef struct Fragment Fragment;
 struct Fragment {
-    Fragment*  	       	Next;		/* Pointer to next fragment in segment */
-    Fragment*		LineList;	/* List of fragments for one src line */
-    FilePos    	    	Pos;		/* File position for this fragment */
-    struct LineInfo*    LI;             /* Extra line info */
-    unsigned short 	Len;		/* Length for this fragment */
-    unsigned char   	Type;		/* Fragment type */
+    Fragment*  	       	Next;       /* Pointer to next fragment in segment */
+    Fragment*	       	LineList;   /* List of fragments for one src line */
+    Collection          LI;         /* Line info for this fragment */
+    unsigned short 	Len;        /* Length for this fragment */
+    unsigned char   	Type;       /* Fragment type */
     union {
-       	unsigned char  	Data[4];        /* Literal values */
-       	ExprNode*   	Expr;		/* Expression */
+       	unsigned char  	Data[4];    /* Literal values */
+       	ExprNode*   	Expr;       /* Expression */
     } V;
 };
 

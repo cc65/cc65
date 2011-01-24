@@ -805,7 +805,7 @@ static void CreateObjFile (void)
     WriteDbgSyms ();
 
     /* Write line infos if requested */
-    WriteLineInfo ();
+    WriteLineInfos ();
 
     /* Write the string pool */
     WriteStrPool ();
@@ -902,7 +902,7 @@ int main (int argc, char* argv [])
                     break;
 
        	        case 'o':
-       		    OutFile = GetArg (&I, 2);
+       	    	    OutFile = GetArg (&I, 2);
        	     	    break;
 
        		case 's':
@@ -926,7 +926,7 @@ int main (int argc, char* argv [])
     		    break;
 
        	        case 'U':
-		    OptAutoImport (Arg, 0);
+	    	    OptAutoImport (Arg, 0);
        		    break;
 
        	        case 'V':
@@ -979,6 +979,9 @@ int main (int argc, char* argv [])
 
     /* Initialize the segments */
     InitSegments ();
+
+    /* Initialize the line infos */
+    InitLineInfo ();
 
     /* Initialize the scanner, open the input file */
     InitScanner (InFile);

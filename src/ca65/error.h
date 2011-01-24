@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,12 +40,13 @@
 
 /* common */
 #include "attrib.h"
+#include "coll.h"
 #include "filepos.h"
 
 
 
 /*****************************************************************************/
-/*	  	       	   	     Data		     		     */
+/*	  	       	   	     Data 		     		     */
 /*****************************************************************************/
 
 
@@ -71,11 +72,17 @@ void Warning (unsigned Level, const char* Format, ...) attribute ((format (print
 void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...) attribute ((format (printf, 3, 4)));
 /* Print warning message giving an explicit file and position. */
 
+void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format, ...) attribute ((format (printf, 3, 4)));
+/* Print warning message using the given line infos */
+
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
 
 void PError (const FilePos* Pos, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print an error message giving an explicit file and position. */
+
+void LIError (const Collection* LineInfos, const char* Format, ...) attribute ((format (printf, 2, 3)));
+/* Print an error message using the given line infos. */
 
 void ErrorSkip (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message and skip the rest of the line */

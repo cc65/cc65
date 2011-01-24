@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,6 +50,31 @@ void InitFilePos (FilePos* P)
     P->Line = 0;
     P->Col  = 0;
     P->Name = 0;
+}
+
+
+
+int CompareFilePos (const FilePos* P1, const FilePos* P2)
+/* Compare two file positions. Return zero if both are equal, return a value
+ * > 0 if P1 is greater and P2, and a value < 0 if P1 is less than P2. The
+ * compare rates file index over line over column.
+ */
+{
+    if (P1->Name > P2->Name) {    
+        return 1;
+    } else if (P1->Name < P2->Name) {
+        return -1;
+    } else if (P1->Line > P2->Line) {
+        return 1;
+    } else if (P1->Line < P2->Line) {
+        return -1;
+    } else if (P1->Col > P2->Col) {
+        return 1;
+    } else if (P1->Col < P2->Col) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 

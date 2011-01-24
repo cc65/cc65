@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -64,23 +64,15 @@ struct ObjData {
     ObjHeader	 	Header;		/* Header of file */
     unsigned long  	Start;		/* Start offset of data in library */
     unsigned 	     	Flags;
-    unsigned 	 	FileCount;	/* Input file count */
     Collection          Files;		/* List of input files */
-    unsigned	 	SectionCount;	/* Count of sections in this object */
     Collection          Sections;  	/* List of all sections */
-    unsigned	  	ExportCount;	/* Count of exports */
     Collection          Exports;       	/* List of all exports */
-    unsigned	 	ImportCount;	/* Count of imports */
     Collection          Imports;   	/* List of all imports */
-    unsigned	 	DbgSymCount;	/* Count of debug symbols */
     Collection          DbgSyms;       	/* List of debug symbols */
-    unsigned            LineInfoCount;  /* Count of additional line infos */
-    Collection          LineInfos;      /* List of additional line infos */
+    Collection          LineInfos;      /* List of line infos */
     unsigned            StringCount;    /* Count of strings */
     unsigned*           Strings;        /* List of global string indices */
-    unsigned            AssertionCount; /* Count of module assertions */
     Collection          Assertions;     /* List of module assertions */
-    unsigned            ScopeCount;     /* Count of scopes */
     Collection          Scopes;         /* List of scopes */
 };
 

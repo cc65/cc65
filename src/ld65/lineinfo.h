@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/* (C) 2001-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -88,11 +88,13 @@ struct LineInfo {
 
 
 
-LineInfo* NewLineInfo (struct ObjData* O, const FilePos* Pos);
-/* Create and return a new LineInfo struct */
-
 LineInfo* ReadLineInfo (FILE* F, struct ObjData* O);
 /* Read a line info from a file and return it */
+
+void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
+/* Read a list of line infos stored as a list of indices in the object file,
+ * make real line infos from them and place them into the passed collection.
+ */
 
 void RelocLineInfo (struct Segment* S);
 /* Relocate the line info for a segment. */

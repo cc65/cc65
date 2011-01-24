@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -114,14 +114,15 @@ void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the files list from a file at the given position */
 {
     unsigned I;
+    unsigned FileCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->FileCount  = ReadVar (F);
-    CollGrow (&O->Files, O->FileCount);
-    for (I = 0; I < O->FileCount; ++I) {
+    FileCount  = ReadVar (F);
+    CollGrow (&O->Files, FileCount);
+    for (I = 0; I < FileCount; ++I) {
        	CollAppend (&O->Files, ReadFileInfo (F, O));
     }
 }
@@ -131,15 +132,16 @@ void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the section data from a file at the given position */
 {
-    unsigned I;
+    unsigned I;     
+    unsigned SectionCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->SectionCount = ReadVar (F);
-    CollGrow (&O->Sections, O->SectionCount);
-    for (I = 0; I < O->SectionCount; ++I) {
+    SectionCount = ReadVar (F);
+    CollGrow (&O->Sections, SectionCount);
+    for (I = 0; I < SectionCount; ++I) {
        	CollAppend (&O->Sections, ReadSection (F, O));
     }
 }
@@ -149,15 +151,16 @@ void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the imports from a file at the given position */
 {
-    unsigned I;
+    unsigned I;     
+    unsigned ImportCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->ImportCount = ReadVar (F);
-    CollGrow (&O->Imports, O->ImportCount);
-    for (I = 0; I < O->ImportCount; ++I) {
+    ImportCount = ReadVar (F);
+    CollGrow (&O->Imports, ImportCount);
+    for (I = 0; I < ImportCount; ++I) {
        	CollAppend (&O->Imports, ReadImport (F, O));
     }
 }
@@ -167,15 +170,16 @@ void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the exports from a file at the given position */
 {
-    unsigned I;
+    unsigned I;     
+    unsigned ExportCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->ExportCount = ReadVar (F);
-    CollGrow (&O->Exports, O->ExportCount);
-    for (I = 0; I < O->ExportCount; ++I) {
+    ExportCount = ReadVar (F);
+    CollGrow (&O->Exports, ExportCount);
+    for (I = 0; I < ExportCount; ++I) {
        	CollAppend (&O->Exports, ReadExport (F, O));
     }
 }
@@ -186,14 +190,15 @@ void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the debug symbols from a file at the given position */
 {
     unsigned I;
+    unsigned DbgSymCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->DbgSymCount = ReadVar (F);
-    CollGrow (&O->DbgSyms, O->DbgSymCount);
-    for (I = 0; I < O->DbgSymCount; ++I) {
+    DbgSymCount = ReadVar (F);
+    CollGrow (&O->DbgSyms, DbgSymCount);
+    for (I = 0; I < DbgSymCount; ++I) {
 	CollAppend (&O->DbgSyms, ReadDbgSym (F, O));
     }
 }
@@ -204,14 +209,15 @@ void ObjReadLineInfos (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the line infos from a file at the given position */
 {
     unsigned I;
+    unsigned LineInfoCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->LineInfoCount = ReadVar (F);
-    CollGrow (&O->LineInfos, O->LineInfoCount);
-    for (I = 0; I < O->LineInfoCount; ++I) {
+    LineInfoCount = ReadVar (F);
+    CollGrow (&O->LineInfos, LineInfoCount);
+    for (I = 0; I < LineInfoCount; ++I) {
        	CollAppend (&O->LineInfos, ReadLineInfo (F, O));
     }
 }
@@ -239,15 +245,16 @@ void ObjReadStrPool (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the assertions from a file at the given offset */
 {
-    unsigned I;
+    unsigned I;     
+    unsigned AssertionCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->AssertionCount = ReadVar (F);
-    CollGrow (&O->Assertions, O->AssertionCount);
-    for (I = 0; I < O->AssertionCount; ++I) {
+    AssertionCount = ReadVar (F);
+    CollGrow (&O->Assertions, AssertionCount);
+    for (I = 0; I < AssertionCount; ++I) {
         CollAppend (&O->Assertions, ReadAssertion (F, O));
     }
 }
@@ -257,15 +264,16 @@ void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the scope table from a file at the given offset */
 {
-    unsigned I;
+    unsigned I;     
+    unsigned ScopeCount;
 
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
     /* Read the data */
-    O->ScopeCount = ReadVar (F);
-    CollGrow (&O->Scopes, O->ScopeCount);
-    for (I = 0; I < O->ScopeCount; ++I) {
+    ScopeCount = ReadVar (F);
+    CollGrow (&O->Scopes, ScopeCount);
+    for (I = 0; I < ScopeCount; ++I) {
         CollAppend (&O->Scopes, 0);     /* ReadScope (F, O); ### not implemented */
     }
 }

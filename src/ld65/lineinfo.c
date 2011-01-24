@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/* (C) 2001-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -69,7 +69,7 @@ static CodeRange* NewCodeRange (Segment* Seg, unsigned long Offs, unsigned long 
 
 
 
-LineInfo* NewLineInfo (ObjData* O, const FilePos* Pos)
+static LineInfo* NewLineInfo (ObjData* O, const FilePos* Pos)
 /* Create and return a new LineInfo struct */
 {
     /* Allocate memory */
@@ -99,6 +99,36 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
 
     /* Allocate a new LineInfo struct, initialize and return it */
     return NewLineInfo (O, &Pos);
+}
+
+
+
+void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
+/* Read a list of line infos stored as a list of indices in the object file,
+ * make real line infos from them and place them into the passed collection.
+ */
+{
+    /* Read the number of line info indices that follow */
+    unsigned LineInfoCount = ReadVar (F);
+
+    /* Read the line infos and resolve them */
+    while (LineInfoCount--) {
+
+        /* Read an index */
+        unsigned LineInfoIndex = ReadVar (F);
+
+        /* The line info index was written by the assembler and must
+         * therefore be part of the line infos read from the object file.
+         */
+        if (LineInfoIndex >= CollCount (&O->LineInfos)) {
+            Internal ("Invalid line info index %u in module `%s'",
+                      LineInfoIndex,
+                      GetObjFileName (O));
+        }
+
+        /* Add the line info to the collection */
+        CollAppend (LineInfos, CollAt (&O->LineInfos, LineInfoIndex));
+    }
 }
 
 

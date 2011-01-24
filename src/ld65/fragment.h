@@ -86,8 +86,8 @@ struct Fragment {
 Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
 /* Create a new fragment and insert it into the section S */
 
-void AddLineInfo (Fragment* F, struct LineInfo* LI);
-/* Add the line info to the given fragment */
+void FragResolveLineInfos (Fragment* F);
+/* Resolve the back pointers for the line infos */
 
 const char* GetFragmentSourceName (const Fragment* F);
 /* Return the name of the source file for this fragment */

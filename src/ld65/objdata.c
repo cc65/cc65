@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -78,23 +78,15 @@ ObjData* NewObjData (void)
     O->MTime            = 0;
     O->Start	   	= 0;
     O->Flags   	   	= 0;
-    O->FileCount        = 0;
     O->Files            = EmptyCollection;
-    O->SectionCount     = 0;
     O->Sections         = EmptyCollection;
-    O->ExportCount 	= 0;
     O->Exports     	= EmptyCollection;
-    O->ImportCount 	= 0;
     O->Imports     	= EmptyCollection;
-    O->DbgSymCount	= 0;
     O->DbgSyms		= EmptyCollection;
-    O->LineInfoCount    = 0;
     O->LineInfos        = EmptyCollection;
     O->StringCount      = 0;
     O->Strings          = 0;
-    O->AssertionCount   = 0;
     O->Assertions       = EmptyCollection;
-    O->ScopeCount       = 0;
     O->Scopes           = EmptyCollection;
 
     /* Return the new entry */

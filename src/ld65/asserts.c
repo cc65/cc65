@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -41,8 +41,9 @@
 /* ld65 */
 #include "asserts.h"
 #include "error.h"
-#include "expr.h"
+#include "expr.h"    
 #include "fileio.h"
+#include "lineinfo.h"
 #include "objdata.h"
 #include "spool.h"
 
@@ -56,7 +57,7 @@
 
 /* Assertion struct decl */
 struct Assertion {
-    FilePos             Pos;            /* File position of assertion */
+    Collection          LineInfos;      /* File position of assertion */
     ExprNode*           Expr;           /* Expression to evaluate */
     AssertAction        Action;         /* What to do */
     unsigned            Msg;            /* Message to print */
@@ -74,6 +75,30 @@ static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
 
 
 
+static const char* GetAssertionSourceName (const Assertion* A)
+/* Return the name of the source file for this assertion */
+{
+    /* Each assertion has the basic info in line info #0 */
+    const LineInfo* LI = CollConstAt (&A->LineInfos, 0);
+
+    /* Return the source file name */
+    return GetSourceFileName (A->Obj, LI->Pos.Name);
+}
+
+
+
+static unsigned long GetAssertionSourceLine (const Assertion* A)
+/* Return the source file line for this fragment */
+{
+    /* Each assertion has the basic info in line info #0 */
+    const LineInfo* LI = CollConstAt (&A->LineInfos, 0);
+
+    /* Return the source file line */
+    return LI->Pos.Line;
+}
+
+
+
 Assertion* ReadAssertion (FILE* F, struct ObjData* O)
 /* Read an assertion from the given file */
 {
@@ -84,7 +109,7 @@ Assertion* ReadAssertion (FILE* F, struct ObjData* O)
     A->Expr = ReadExpr (F, O);
     A->Action = (AssertAction) ReadVar (F);
     A->Msg = MakeGlobalStringId (O, ReadVar (F));
-    ReadFilePos (F, &A->Pos);
+    ReadLineInfoList (F, O, &A->LineInfos);
 
     /* Set remaining fields */
     A->Obj = O;
@@ -106,6 +131,9 @@ void CheckAssertions (void)
     /* Walk over all assertions */
     for (I = 0; I < CollCount (&Assertions); ++I) {
 
+        const char* Module;
+        unsigned long Line;
+
         /* Get the assertion */
         Assertion* A = CollAtUnchecked (&Assertions, I);
 
@@ -114,32 +142,35 @@ void CheckAssertions (void)
             continue;
         }
 
+        /* Retrieve module name and line number */
+        Module  = GetAssertionSourceName (A);
+        Line    = GetAssertionSourceLine (A);
+
         /* If the expression is not constant, we're not able to handle it */
         if (!IsConstExpr (A->Expr)) {
             Warning ("Cannot evaluate assertion in module `%s', line %lu",
-                     GetSourceFileName (A->Obj, A->Pos.Name), A->Pos.Line);
+                     Module, Line);
         } else if (GetExprVal (A->Expr) == 0) {
 
             /* Assertion failed */
-            const char* Module  = GetSourceFileName (A->Obj, A->Pos.Name);
             const char* Message = GetString (A->Msg);
 
             switch (A->Action) {
 
                 case ASSERT_ACT_WARN:
                 case ASSERT_ACT_LDWARN:
-                    Warning ("%s(%lu): %s", Module, A->Pos.Line, Message);
+                    Warning ("%s(%lu): %s", Module, Line, Message);
                     break;
 
                 case ASSERT_ACT_ERROR:
                 case ASSERT_ACT_LDERROR:
-                    Error ("%s(%lu): %s", Module, A->Pos.Line, Message);
+                    Error ("%s(%lu): %s", Module, Line, Message);
                     break;
 
                 default:
                     Internal ("Invalid assertion action (%u) in module `%s', "
                               "line %lu (file corrupt?)",
-                              A->Action, Module, A->Pos.Line);
+                              A->Action, Module, Line);
                     break;
             }
         }

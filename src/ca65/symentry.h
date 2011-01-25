@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -86,7 +86,7 @@ struct SymEntry {
         struct SymTable*    Tab;       	/* Table this symbol is in */
         struct SymEntry*    Entry;
     } Sym;
-    FilePos    	       	Pos;  	        /* File position for this symbol */
+    Collection          LineInfos;      /* Line infos for this symbol */
     FilePos*            GuessedUse[1];  /* File position where symbol
                                          * address size was guessed, and the
                                          * smallest possible addressing was NOT
@@ -345,15 +345,8 @@ unsigned GetSymInfoFlags (const SymEntry* Sym, long* ConstVal);
  * See common/symdefs.h for more information.
  */
 
-#if defined(HAVE_INLINE)
-INLINE const FilePos* GetSymPos (const SymEntry* S)
+const FilePos* GetSymPos (const SymEntry* S);
 /* Return the position of first occurence in the source for the given symbol */
-{
-    return &S->Pos;
-}
-#else
-#  define GetSymPos(S)   (&(S)->Pos)
-#endif
 
 
 

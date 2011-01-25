@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -458,14 +458,16 @@ static void SymCheckUndefined (SymEntry* S)
         if (S->Flags & SF_EXPORT) {
 	    if (Sym->Flags & SF_IMPORT) {
 	       	/* The symbol is already marked as import */
-	       	PError (&S->Pos, "Symbol `%s' is already an import",
-                        GetString (Sym->Name));
+       	       	LIError (&S->LineInfos,
+                         "Symbol `%s' is already an import",
+                         GetString (Sym->Name));
 	    }
             if (Sym->Flags & SF_EXPORT) {
                 /* The symbol is already marked as an export. */
                 if (Sym->AddrSize > S->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    PWarning (&S->Pos, 1, "Symbol `%m%p' is %s but exported %s",
+                    LIWarning (&S->LineInfos, 1,
+                               "Symbol `%m%p' is %s but exported %s",
                               GetSymName (Sym),
                               AddrSizeToStr (Sym->AddrSize),
                               AddrSizeToStr (S->ExportSize));
@@ -480,10 +482,11 @@ static void SymCheckUndefined (SymEntry* S)
                 }
                 if (Sym->AddrSize > Sym->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    PWarning (&S->Pos, 1, "Symbol `%m%p' is %s but exported %s",
-                              GetSymName (Sym),
-                              AddrSizeToStr (Sym->AddrSize),
-                              AddrSizeToStr (Sym->ExportSize));
+                    LIWarning (&S->LineInfos, 1,
+                               "Symbol `%m%p' is %s but exported %s",
+                               GetSymName (Sym),
+                               AddrSizeToStr (Sym->AddrSize),
+                               AddrSizeToStr (Sym->ExportSize));
                 }
             }
         }
@@ -499,8 +502,9 @@ static void SymCheckUndefined (SymEntry* S)
 	/* The symbol is definitely undefined */
 	if (S->Flags & SF_EXPORT) {
 	    /* We will not auto-import an export */
-	    PError (&S->Pos, "Exported symbol `%m%p' was never defined",
-                    GetSymName (S));
+	    LIError (&S->LineInfos, 
+                     "Exported symbol `%m%p' was never defined",
+                     GetSymName (S));
 	} else {
 	    if (AutoImport) {
 	    	/* Mark as import, will be indexed later */
@@ -509,7 +513,9 @@ static void SymCheckUndefined (SymEntry* S)
                 S->AddrSize = CodeAddrSize;
 	    } else {
 	    	/* Error */
-	        PError (&S->Pos, "Symbol `%m%p' is undefined", GetSymName (S));
+	        LIError (&S->LineInfos, 
+                         "Symbol `%m%p' is undefined", 
+                         GetSymName (S));
 	    }
 	}
     }
@@ -567,9 +573,9 @@ void SymCheck (void)
 	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
                 const StrBuf* Name = GetStrBuf (S->Name);
                 if (SB_At (Name, 0) != '.') {           /* Ignore internals */
-                    PWarning (&S->Pos, 2,
-                              "Symbol `%m%p' is defined but never used",
-                              GetSymName (S));
+                    LIWarning (&S->LineInfos, 2,
+                               "Symbol `%m%p' is defined but never used",
+                               GetSymName (S));
                 }
 	    }
 
@@ -577,9 +583,9 @@ void SymCheck (void)
 	    if (S->Flags & SF_IMPORT) {
 	    	if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
 	    	    /* Imported symbol is not referenced */
-	    	    PWarning (&S->Pos, 2,
-                              "Symbol `%m%p' is imported but never used",
-                              GetSymName (S));
+	    	    LIWarning (&S->LineInfos, 2,
+                               "Symbol `%m%p' is imported but never used",
+                               GetSymName (S));
 	    	} else {
 	    	    /* Give the import an id, count imports */
 	    	    S->ImportId = ImportCount++;
@@ -605,11 +611,11 @@ void SymCheck (void)
                         S->ExportSize = S->AddrSize;
                     } else if (S->AddrSize > S->ExportSize) {
                         /* We're exporting a symbol smaller than it actually is */
-                        PWarning (&S->Pos, 1,
-                                  "Symbol `%m%p' is %s but exported %s",
-                                  GetSymName (S),
-                                  AddrSizeToStr (S->AddrSize),
-                                  AddrSizeToStr (S->ExportSize));
+                        LIWarning (&S->LineInfos, 1,
+                                   "Symbol `%m%p' is %s but exported %s",
+                                   GetSymName (S),
+                                   AddrSizeToStr (S->AddrSize),
+                                   AddrSizeToStr (S->ExportSize));
                     }
                 }
                 ED_Done (&ED);
@@ -689,7 +695,7 @@ void WriteImports (void)
 
             ObjWrite8 (S->AddrSize);
        	    ObjWriteVar (S->Name);
-     	    ObjWritePos (&S->Pos);
+     	    WriteLineInfo (&S->LineInfos);
      	}
      	S = S->List;
     }
@@ -754,8 +760,8 @@ void WriteExports (void)
 	        WriteExpr (S->Expr);
             }
 
-	    /* Write the source file position */
-	    ObjWritePos (&S->Pos);
+	    /* Write the line infos */
+	    WriteLineInfo (&S->LineInfos);
 	}
      	S = S->List;
     }
@@ -818,8 +824,8 @@ void WriteDbgSyms (void)
 		    WriteExpr (S->Expr);
 		}
 
-		/* Write the source file position */
-		ObjWritePos (&S->Pos);
+		/* Write the line infos */
+		WriteLineInfo (&S->LineInfos);
 	    }
 	    S = S->List;
 	}

@@ -86,7 +86,8 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     S->Right   	  = 0;
     S->Locals  	  = 0;
     S->Sym.Tab    = 0;
-    S->Pos     	  = CurTok.Pos;
+    S->LineInfos  = EmptyCollection;
+    GetFullLineInfo (&S->LineInfos);
     for (I = 0; I < sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0]); ++I) {
         S->GuessedUse[I] = 0;
     }
@@ -689,6 +690,15 @@ unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
 
     /* Return the result */
     return Flags;
+}
+
+
+
+const FilePos* GetSymPos (const SymEntry* S)
+/* Return the position of first occurence in the source for the given symbol */
+{
+    /* The actual source entry is in slot zero */
+    return &((const LineInfo*) CollConstAt (&S->LineInfos, 0))->Pos;
 }
 
 

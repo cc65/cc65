@@ -64,32 +64,6 @@ unsigned WarningCount	= 0;
 
 
 /*****************************************************************************/
-/*                             Helper functions                              */
-/*****************************************************************************/
-
-
-
-static int FindAsmEntry (const Collection* LineInfos)
-/* Return the last entry of type LI_TYPE_ASM in the given line infos. If none
- * was found, return -1.
- */
-{
-    unsigned I = CollCount (LineInfos);
-    while (I > 0) {
-        const LineInfo* LI = CollConstAt (LineInfos, --I);
-        if ((LI->Type & LI_MASK_TYPE) == LI_TYPE_ASM) {
-            /* Found */
-            return (int) I;
-        }
-    }
-
-    /* Not found */
-    return -1;
-}
-
-
-
-/*****************************************************************************/
 /*				   Warnings 				     */
 /*****************************************************************************/
 
@@ -141,17 +115,10 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
 void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format, ...)
 /* Print warning message using the given line infos */
 {
-    const LineInfo* LI;
     va_list ap;
 
-    /* Search backwards in LI for the first entry of type LI_TYPE_ASM. */
-    int I = FindAsmEntry (LineInfos);
-
-    /* We must have such an entry */
-    CHECK (I >= 0);
-
-    /* Get the position for this entry */
-    LI = CollConstAt (LineInfos, I);
+    /* The first entry in the collection is that of the actual source pos */
+    const LineInfo* LI = CollConstAt (LineInfos, 0);
 
     /* Output a warning for this position */
     va_start (ap, Format);
@@ -210,17 +177,10 @@ void PError (const FilePos* Pos, const char* Format, ...)
 void LIError (const Collection* LineInfos, const char* Format, ...)
 /* Print an error message using the given line infos. */
 {
-    const LineInfo* LI;
     va_list ap;
 
-    /* Search backwards in LI for the first entry of type LI_TYPE_ASM. */
-    int I = FindAsmEntry (LineInfos);
-
-    /* We must have such an entry */
-    CHECK (I >= 0);
-
-    /* Get the position for this entry */
-    LI = CollConstAt (LineInfos, I);
+    /* The first entry in the collection is that of the actual source pos */
+    const LineInfo* LI = CollConstAt (LineInfos, 0);
 
     /* Output an error for this position */
     va_start (ap, Format);

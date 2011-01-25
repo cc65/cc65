@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2010, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -88,6 +88,7 @@ int __fastcall__ rmdir (const char* name);
 /* Others */
 unsigned __fastcall__ sleep (unsigned seconds);
 int __fastcall__ getopt (int argc, char* const* argv, const char* optstring);
+int __fastcall__ exec (const char* progname, const char* cmdline);
 
 
 

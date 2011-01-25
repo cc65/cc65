@@ -567,6 +567,7 @@ It does not declare any functions.
 
 <itemize>
 <!-- <item><ref id="chdir" name="chdir"> -->
+<item><ref id="exec" name="exec">
 <!-- <item><ref id="getcwd" name="getcwd"> -->
 <item><ref id="getopt" name="getopt">
 <!-- <item><ref id="lseek" name="lseek"> -->
@@ -2039,6 +2040,39 @@ evaluated or is ignored.
 </quote>
 
 
+<sect1>exec<label id="exec"><p>
+
+<quote>
+<descrip>
+<tag/Function/Execute a program file.
+<tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
+<tag/Declaration/<tt/int __fastcall__ exec (const char* progname, const char* cmdline);/
+<tag/Description/<tt/exec/ replaces the currently running program by a new one.
+Calling <tt/exec()/ is identical to calling <tt/<ref id="exit" name="exit()">/,
+then loading and starting the program named in the first argument, passing
+the command line specified as second argument. On success, the function does
+not return. On failure, -1 is returned and <tt/errno/ contains an error code.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>On most platforms, the function needs to copy a small stub loader to
+some memory area outside the program space. This may collide with other
+programs. See the platform specific docs on this.
+<item>Because it is necessary to terminate the running program before the
+memory can be reused to load the new one, there is a high chance that the
+function may not be able to return on errors.
+<item>The command line is passed to the new program in the same way as cc65
+programs expect the command line. If the new program is not a cc65 generated
+program, it may not be able to read it.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="exit" name="exit">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>fast<label id="fast"><p>
 
 <quote>
@@ -2242,7 +2276,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
 <tag/Declaration/<tt/int __fastcall__ getopt (int argc, char* const* argv,
 const char* optstring);/
-<tag/Description/The function parses command line arguments, <tt/argc/ and 
+<tag/Description/The function parses command line arguments, <tt/argc/ and
 <tt/argv/ are the argument count and array passed to <tt/main/. <tt/optstring/
 is a string that contains command line option characters. If a character in
 <tt/optstring/ is followed by a colon, the option requires an argument. An

@@ -2050,8 +2050,10 @@ evaluated or is ignored.
 <tag/Description/<tt/exec/ replaces the currently running program by a new one.
 Calling <tt/exec()/ is identical to calling <tt/<ref id="exit" name="exit()">/,
 then loading and starting the program named in the first argument, passing
-the command line specified as second argument. On success, the function does
-not return. On failure, -1 is returned and <tt/errno/ contains an error code.
+the command line specified as second argument. Instead of an empty string, 
+a <tt/NULL/ pointer may be passed as second parameter.
+On success, the function does not return. On failure, -1 is returned and 
+<tt/errno/ contains an error code.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.

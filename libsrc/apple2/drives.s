@@ -15,24 +15,22 @@ _drivecount:
 
         ; Check for ProDOS 8
         lda     __dos_type
-        bne     :+
-        rts
+        beq     :+
 
         ; Number of on-line devices (minus 1)
-:       ldy     DEVCNT
+        ldy     DEVCNT
         iny
         tya
-        rts
+:       rts
 
 _drivelist:
         ldx     #$00
 
         ; Check for ProDOS 8
         lda     __dos_type
-        bne     :+
-        rts
+        beq     :+
 
         ; Up to 14 units may be active
-:       lda     #<DEVLST
+        lda     #<DEVLST
         ldx     #>DEVLST
-        rts
+:       rts

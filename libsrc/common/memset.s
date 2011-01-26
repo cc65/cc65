@@ -5,7 +5,7 @@
 ;
 ; Ullrich von Bassewitz, 29.05.1998
 ; Performance increase (about 20%) by
-; Christian Krueger, 12.09.2009
+; Christian Krueger, 12.09.2009, slightly improved 12.01.2011
 ;
 ; NOTE: bzero will return it's first argument as memset does. It is no problem
 ;       to declare the return value as void, since it may be ignored. _bzero
@@ -81,15 +81,13 @@ L1:    	.repeat 2		; Unroll this a bit to make it faster
 ; Set the remaining bytes if any
 
 L2:    	ldy	ptr3		; Get the low byte of n
-  	bne	L3		; something to set?
-  	jmp	popax		; no -> Pop ptr and return as result
+  	beq	leave		; something to set? No -> leave
 
-L3a:	sta	(ptr1),y	; set bytes in low
-	sta	(ptr2),y	; and high section
-L3:    	dey
-	bne	L3a
-	sta    	(ptr1),y       	; Set remaining byte(s)
-  	sta	(ptr2),y
+L3:	dey
+	sta	(ptr1),y		; set bytes in low
+	sta	(ptr2),y		; and high section
+	bne	L3		; flags still up to date from dey!
+leave:	
   	jmp     popax           ; Pop ptr and return as result
 
                 

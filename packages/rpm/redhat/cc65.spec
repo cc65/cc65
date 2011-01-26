@@ -353,7 +353,8 @@ programs for the Lynx Game Console using the cc65 crosscompiler.
 %attr(644,root,root)        %{_libdir}/cc65/joy/lynx-*.joy
 %attr(644,root,root)        %{_libdir}/cc65/ser/lynx-*.ser
 %attr(644,root,root)        %{_libdir}/cc65/tgi/lynx-*.tgi
-
+%attr(644,root,root)        %{_libdir}/cc65/cfg/lynx-*.cfg
+                                                             
 
 
 ###############################################################################

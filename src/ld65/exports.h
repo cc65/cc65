@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -42,11 +42,12 @@
 
 /* common */
 #include "cddefs.h"
+#include "coll.h"
 #include "exprdefs.h"
-#include "filepos.h"
 
 /* ld65 */
 #include "config.h"
+#include "lineinfo.h"
 #include "memarea.h"
 #include "objdata.h"
 
@@ -63,7 +64,7 @@ typedef struct Import Import;
 struct Import {
     Import*  		Next;		/* Single linked list */
     ObjData* 		Obj;		/* Object file that imports the name */
-    FilePos  		Pos;		/* File position of reference */
+    Collection          LineInfos;      /* Line info of reference */
     struct Export*	Exp;		/* Matching export for this import */
     unsigned            Name;		/* Name if not in table */
     unsigned char       Flags;          /* Generic flags */
@@ -82,7 +83,7 @@ struct Export {
     unsigned 		ImpCount;	/* How many imports for this symbol? */
     Import*  		ImpList;	/* List of imports for this symbol */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    FilePos  		Pos;		/* File position of definition */
+    Collection          LineInfos;      /* Line info of definition */
     unsigned char	Type;		/* Type of export */
     unsigned char       AddrSize;       /* Address size of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
@@ -121,6 +122,9 @@ Import* GenImport (unsigned Name, unsigned char AddrSize);
 Import* InsertImport (Import* I);
 /* Insert an import into the table, return I */
 
+const LineInfo* GetImportPos (const Import* I);
+/* Return the basic line info of an import */
+
 void FreeExport (Export* E);
 /* Free an export. NOTE: This won't remove the export from the exports table,
  * so it may only be called for unused exports (exports from modules that
@@ -132,6 +136,9 @@ Export* ReadExport (FILE* F, ObjData* Obj);
 
 void InsertExport (Export* E);
 /* Insert an exported identifier and check if it's already in the list */
+
+const LineInfo* GetExportPos (const Export* E);
+/* Return the basic line info of an export */
 
 Export* CreateConstExport (unsigned Name, long Value);
 /* Create an export for a literal date */

@@ -43,6 +43,7 @@
 #include "filepos.h"
 
 /* ld65 */
+#include "lineinfo.h"
 #include "segments.h"
 
 
@@ -69,7 +70,7 @@ struct File {
 typedef struct SegDesc SegDesc;
 struct SegDesc {
     unsigned            Name;           /* Index of the name */
-    FilePos             Pos;            /* Position of definition */
+    LineInfo*           LI;             /* Position of definition */
     Segment*   	      	Seg; 	  	/* Pointer to segment structure */
     unsigned   	      	Attr;	  	/* Attributes for segment */
     unsigned   	      	Flags;	  	/* Set of bitmapped flags */
@@ -115,7 +116,7 @@ unsigned CfgProcess (void);
 
 void CfgWriteTarget (void);
 /* Write the target file(s) */
-
+                             
 
 
 /* End of config.h */

@@ -128,7 +128,7 @@ typedef enum {
 typedef struct CfgSymbol CfgSymbol;
 struct CfgSymbol {
     CfgSymType  Type;           /* Type of symbol */
-    FilePos     Pos;            /* Config file position */
+    LineInfo*   LI;             /* Config file position */
     unsigned    Name;           /* Symbol name */
     ExprNode*   Value;          /* Symbol value if any */
     unsigned    AddrSize;       /* Address size of symbol */
@@ -268,7 +268,7 @@ static CfgSymbol* NewCfgSymbol (CfgSymType Type, unsigned Name)
 
     /* Initialize the fields */
     Sym->Type     = Type;
-    Sym->Pos      = CfgErrorPos;
+    Sym->LI       = GenLineInfo (&CfgErrorPos);
     Sym->Name     = Name;
     Sym->Value    = 0;
     Sym->AddrSize = ADDR_SIZE_INVALID;
@@ -341,7 +341,7 @@ static SegDesc* NewSegDesc (unsigned Name)
 
     /* Initialize the fields */
     S->Name    = Name;
-    S->Pos     = CfgErrorPos;
+    S->LI      = GenLineInfo (&CfgErrorPos);
     S->Seg     = 0;
     S->Attr    = 0;
     S->Flags   = 0;
@@ -767,9 +767,9 @@ static void ParseSegments (void)
          * separate run and load memory areas.
          */
         if ((S->Flags & SF_ALIGN_LOAD) != 0 && (S->Load == S->Run)) {
-       	    Warning ("%s(%lu): ALIGN_LOAD attribute specified, but no separate "
-                     "LOAD and RUN memory areas assigned",
-                     CfgGetName (), CfgErrorPos.Line);
+       	    CfgWarning (&CfgErrorPos,
+                        "ALIGN_LOAD attribute specified, but no separate "
+                        "LOAD and RUN memory areas assigned");
             /* Remove the flag */
             S->Flags &= ~SF_ALIGN_LOAD;
         }
@@ -778,8 +778,9 @@ static void ParseSegments (void)
          * load and run memory areas, because it's is never written to disk.
          */
         if ((S->Flags & SF_BSS) != 0 && (S->Load != S->Run)) {
-       	    Warning ("%s(%lu): Segment with type `bss' has both LOAD and RUN "
-                     "memory areas assigned", CfgGetName (), CfgErrorPos.Line);
+       	    CfgWarning (&CfgErrorPos,
+                        "Segment with type `bss' has both LOAD and RUN "
+                        "memory areas assigned");
         }
 
       	/* Don't allow read/write data to be put into a readonly area */
@@ -1416,7 +1417,7 @@ static void ParseSymbols (void)
                 AttrCheck (AttrFlags, atType, "TYPE");
                 /* Create the export */
                 Exp = CreateExprExport (Name, Value, AddrSize);
-                Exp->Pos = CfgErrorPos;
+                CollAppend (&Exp->LineInfos, GenLineInfo (&CfgErrorPos));
                 break;
 
             case CfgSymImport:
@@ -1427,7 +1428,7 @@ static void ParseSymbols (void)
                 /* Generate the import */
                 Imp = InsertImport (GenImport (Name, AddrSize));
                 /* Remember the file position */
-                Imp->Pos = CfgErrorPos;
+                CollAppend (&Imp->LineInfos, GenLineInfo (&CfgErrorPos));
                 break;
 
             case CfgSymWeak:
@@ -1565,8 +1566,9 @@ static void ProcessSegments (void)
          * in the segment.
 	 */
 	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
-       	    Warning ("Segment `%s' with type `bss' contains initialized data",
-	    	     GetString (S->Name));
+       	    CfgWarning (GetSourcePos (S->LI),
+                        "Segment `%s' with type `bss' contains initialized data",
+	    	        GetString (S->Name));
 	}
 
       	/* If this segment does exist in any of the object files, insert the
@@ -1623,7 +1625,7 @@ static void ProcessSymbols (void)
                 /* Check if the export symbol is also defined as an import. */
                 if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
                     CfgError (
-                        &Sym->Pos,
+                        GetSourcePos (Sym->LI),
                         "Exported o65 symbol `%s' cannot also be an o65 import",
                         GetString (Sym->Name)
                     );
@@ -1635,7 +1637,7 @@ static void ProcessSymbols (void)
                  */
                 if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
                     CfgError (
-                        &Sym->Pos,
+                        GetSourcePos (Sym->LI),
                         "Duplicate exported o65 symbol: `%s'",
                         GetString (Sym->Name)
                     );
@@ -1649,7 +1651,7 @@ static void ProcessSymbols (void)
                 /* Check if the import symbol is also defined as an export. */
                 if (O65GetExport (O65FmtDesc, Sym->Name) != 0) {
                     CfgError (
-                        &Sym->Pos,
+                        GetSourcePos (Sym->LI),
                         "Imported o65 symbol `%s' cannot also be an o65 export",
                         GetString (Sym->Name)
                     );
@@ -1661,7 +1663,7 @@ static void ProcessSymbols (void)
                  */
                 if (O65GetImport (O65FmtDesc, Sym->Name) != 0) {
                     CfgError (
-                        &Sym->Pos,
+                        GetSourcePos (Sym->LI),
                         "Duplicate imported o65 symbol: `%s'",
                         GetString (Sym->Name)
                     );
@@ -1676,7 +1678,7 @@ static void ProcessSymbols (void)
                 if ((E = FindExport (Sym->Name)) == 0 || IsUnresolvedExport (E)) {
                     /* The symbol is undefined, generate an export */
                     E = CreateExprExport (Sym->Name, Sym->Value, Sym->AddrSize);
-                    E->Pos = Sym->Pos;
+                    CollAppend (&E->LineInfos, Sym->LI);
                 }
                 break;
 
@@ -1699,12 +1701,12 @@ static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
     /* Define the run address of the segment */
     SB_Printf (&Buf, "__%s_RUN__", GetString (S->Name));
     E = CreateMemoryExport (GetStrBufId (&Buf), S->Run, SegAddr - S->Run->Start);
-    E->Pos = S->Pos;
+    CollAppend (&E->LineInfos, S->LI);
 
     /* Define the size of the segment */
     SB_Printf (&Buf, "__%s_SIZE__", GetString (S->Name));
     E = CreateConstExport (GetStrBufId (&Buf), S->Seg->Size);
-    E->Pos = S->Pos;
+    CollAppend (&E->LineInfos, S->LI);
 
     S->Flags |= SF_RUN_DEF;
     SB_Done (&Buf);
@@ -1721,7 +1723,7 @@ static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
     /* Define the load address of the segment */
     SB_Printf (&Buf, "__%s_LOAD__", GetString (S->Name));
     E = CreateMemoryExport (GetStrBufId (&Buf), S->Load, SegAddr - S->Load->Start);
-    E->Pos = S->Pos;
+    CollAppend (&E->LineInfos, S->LI);
 
     S->Flags |= SF_LOAD_DEF;
     SB_Done (&Buf);
@@ -1768,7 +1770,7 @@ unsigned CfgProcess (void)
          * and mark the memory area as placed.
          */
         if (!IsConstExpr (M->StartExpr)) {
-            CfgError (&M->Pos,
+            CfgError (GetSourcePos (M->LI),
                       "Start address of memory area `%s' is not constant",
                       GetString (M->Name));
         }
@@ -1786,14 +1788,14 @@ unsigned CfgProcess (void)
             /* Define the start of the memory area */
 	    SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
 	    E = CreateMemoryExport (GetStrBufId (&Buf), M, 0);
-            E->Pos = M->Pos;
+            CollAppend (&E->LineInfos, M->LI);
 
             SB_Done (&Buf);
         }
 
         /* Resolve the size expression */
         if (!IsConstExpr (M->SizeExpr)) {
-            CfgError (&M->Pos,
+            CfgError (GetSourcePos (M->LI),
                       "Size of memory area `%s' is not constant",
                       GetString (M->Name));
         }
@@ -1827,12 +1829,12 @@ unsigned CfgProcess (void)
                     if (Addr > NewAddr) {
                         /* Offset already too large */
                         if (S->Flags & SF_OFFSET) {
-                            CfgError (&M->Pos,
+                            CfgError (GetSourcePos (M->LI),
                                       "Offset too small in `%s', segment `%s'",
                                       GetString (M->Name),
                                       GetString (S->Name));
                         } else {
-                            CfgError (&M->Pos,
+                            CfgError (GetSourcePos (M->LI),
                                       "Start address too low in `%s', segment `%s'",
                                       GetString (M->Name),
                                       GetString (S->Name));
@@ -1872,9 +1874,10 @@ unsigned CfgProcess (void)
        	    if (M->FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
                 ++Overflows;
                 M->Flags |= MF_OVERFLOW;
-                Warning ("Memory area overflow in `%s', segment `%s' (%lu bytes)",
-                         GetString (M->Name), GetString (S->Name),
-                         M->FillLevel - M->Size);
+                CfgWarning (GetSourcePos (M->LI),
+                            "Memory area overflow in `%s', segment `%s' (%lu bytes)",
+                             GetString (M->Name), GetString (S->Name),
+                             M->FillLevel - M->Size);
      	    }
 
      	    /* If requested, define symbols for the start and size of the
@@ -1902,12 +1905,12 @@ unsigned CfgProcess (void)
             /* Define the size of the memory area */
 	    SB_Printf (&Buf, "__%s_SIZE__", GetString (M->Name));
 	    E = CreateConstExport (GetStrBufId (&Buf), M->Size);
-            E->Pos = M->Pos;
+            CollAppend (&E->LineInfos, M->LI);
 
             /* Define the fill level of the memory area */
 	    SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
 	    E = CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
-            E->Pos = M->Pos;
+            CollAppend (&E->LineInfos, M->LI);
 
             SB_Done (&Buf);
 	}

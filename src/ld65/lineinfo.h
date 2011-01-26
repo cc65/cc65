@@ -44,6 +44,9 @@
 #include "coll.h"
 #include "filepos.h"
 
+/* ld65 */
+#include "spool.h"
+
 
 
 /*****************************************************************************/
@@ -72,10 +75,14 @@ struct CodeRange {
 
 
 
+/* Structure holding line information. The Pos.Name field is always the
+ * global string id of the file name. If the line info was read from the
+ * object file, the File pointer is valid, otherwise it is NULL.
+ */
 typedef struct LineInfo LineInfo;
 struct LineInfo {
-    struct FileInfo*    File;	        /* File struct for this line */
-    FilePos             Pos;            /* File position */
+    struct FileInfo*    File;	        /* File struct for this line if any */
+    FilePos             Pos;            /* Position in file */
     Collection          Fragments;      /* Fragments for this line */
     Collection          CodeRanges;     /* Code ranges for this line */
 };
@@ -88,6 +95,9 @@ struct LineInfo {
 
 
 
+LineInfo* GenLineInfo (const FilePos* Pos);
+/* Generate a new (internally used) line info  with the given information */
+
 LineInfo* ReadLineInfo (FILE* F, struct ObjData* O);
 /* Read a line info from a file and return it */
 
@@ -98,6 +108,70 @@ void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
 
 void RelocLineInfo (struct Segment* S);
 /* Relocate the line info for a segment. */
+
+#if defined(HAVE_INLINE)
+INLINE const FilePos* GetSourcePos (const LineInfo* LI)
+/* Return the source file position from the given line info */
+{
+    return &LI->Pos;
+}
+#else
+#  define GetSourcePos(LI)      (&(LI)->Pos)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE const char* GetSourceName (const LineInfo* LI)
+/* Return the name of a source file from the given line info */
+{
+    return GetString (LI->Pos.Name);
+}
+#else
+#  define GetSourceName(LI)     (GetString ((LI)->Pos.Name))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned long GetSourceLine (const LineInfo* LI)
+/* Return the source file line from the given line info */
+{
+    return LI->Pos.Line;
+}
+#else
+#  define GetSourceLine(LI)     ((LI)->Pos.Line)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetSourceCol (const LineInfo* LI)
+/* Return the source file column from the given line info */
+{
+    return LI->Pos.Col;
+}
+#else
+#  define GetSourceCol(LI)      ((LI)->Pos.Col)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE const char* GetSourceNameFromList (const Collection* LineInfos)
+/* Return the name of a source file from a list of line infos */
+{
+    /* The relevant entry is in slot zero */
+    return GetSourceName (CollConstAt (LineInfos, 0));
+}
+#else
+#  define GetSourceNameFromList(LineInfos)      \
+        GetSourceName ((const LineInfo*) CollConstAt ((LineInfos), 0))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned long GetSourceLineFromList (const Collection* LineInfos)
+/* Return the source file line from a list of line infos */
+{
+    /* The relevant entry is in slot zero */
+    return GetSourceLine (CollConstAt (LineInfos, 0));
+}
+#else
+#  define GetSourceLineFromList(LineInfos)      \
+        GetSourceLine ((const LineInfo*) CollConstAt ((LineInfos), 0))
+#endif
 
 
 

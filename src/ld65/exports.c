@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -40,7 +40,6 @@
 /* common */
 #include "addrsize.h"
 #include "check.h"
-#include "coll.h"
 #include "hashstr.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -52,6 +51,7 @@
 #include "expr.h"
 #include "fileio.h"
 #include "global.h"
+#include "lineinfo.h"
 #include "memarea.h"
 #include "objdata.h"
 #include "spool.h"
@@ -102,16 +102,16 @@ static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
 /* Create a new import and initialize it */
 {
     /* Allocate memory */
-    Import* I = xmalloc (sizeof (Import));
+    Import* I    = xmalloc (sizeof (Import));
 
     /* Initialize the fields */
-    I->Next    	= 0;
-    I->Obj     	= Obj;
-    InitFilePos (&I->Pos);
-    I->Exp      = 0;
-    I->Name     = INVALID_STRING_ID;
-    I->Flags    = 0;
-    I->AddrSize = AddrSize;
+    I->Next    	 = 0;
+    I->Obj     	 = Obj;
+    I->LineInfos = EmptyCollection;
+    I->Exp       = 0;
+    I->Name      = INVALID_STRING_ID;
+    I->Flags     = 0;
+    I->AddrSize  = AddrSize;
 
     /* Return the new structure */
     return I;
@@ -127,6 +127,9 @@ void FreeImport (Import* I)
 {
     /* Safety */
     PRECONDITION ((I->Flags & IMP_INLIST) == 0);
+
+    /* Free the line info collection */
+    DoneCollection (&I->LineInfos);
 
     /* Free the struct */
     xfree (I);
@@ -148,8 +151,8 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     /* Read the name */
     I->Name = MakeGlobalStringId (Obj, ReadVar (F));
 
-    /* Read the file position */
-    ReadFilePos (F, &I->Pos);
+    /* Read the line infos */
+    ReadLineInfoList (F, Obj, &I->LineInfos);
 
     /* Check the address size */
     if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
@@ -158,10 +161,11 @@ Import* ReadImport (FILE* F, ObjData* Obj)
          * invalid. Be sure not to access it in this case.
          */
         if (ObjHasFiles (I->Obj)) {
+            const LineInfo* LI = GetImportPos (I);
             Error ("Invalid import size in for `%s', imported from %s(%lu): 0x%02X",
                    GetString (I->Name),
-                   GetSourceFileName (I->Obj, I->Pos.Name),
-                   I->Pos.Line,
+                   GetSourceName (LI),
+                   GetSourceLine (LI),
                    I->AddrSize);
         } else {
             Error ("Invalid import size in for `%s', imported from %s: 0x%02X",
@@ -193,10 +197,11 @@ Import* GenImport (unsigned Name, unsigned char AddrSize)
          * invalid. Be sure not to access it in this case.
          */
         if (ObjHasFiles (I->Obj)) {
+            const LineInfo* LI = GetImportPos (I);
             Error ("Invalid import size in for `%s', imported from %s(%lu): 0x%02X",
                    GetString (I->Name),
-                   GetSourceFileName (I->Obj, I->Pos.Name),
-                   I->Pos.Line,
+                   GetSourceName (LI),
+                   GetSourceLine (LI),
                    I->AddrSize);
         } else {
             Error ("Invalid import size in for `%s', imported from %s: 0x%02X",
@@ -269,6 +274,15 @@ Import* InsertImport (Import* I)
 
 
 
+const LineInfo* GetImportPos (const Import* I)
+/* Return the basic line info of an import */
+{
+    /* Source file position is always in slot zero */
+    return CollConstAt (&I->LineInfos, 0);
+}
+
+
+
 /*****************************************************************************/
 /*     	      	       	   	     Code  	      	  	  	     */
 /*****************************************************************************/
@@ -283,16 +297,16 @@ static Export* NewExport (unsigned char Type, unsigned char AddrSize,
     Export* E = xmalloc (sizeof (Export));
 
     /* Initialize the fields */
-    E->Name     = Name;
-    E->Next     = 0;
-    E->Flags   	= 0;
-    E->Obj      = Obj;
-    E->ImpCount = 0;
-    E->ImpList  = 0;
-    E->Expr    	= 0;
-    InitFilePos (&E->Pos);
-    E->Type    	= Type;
-    E->AddrSize = AddrSize;
+    E->Name      = Name;
+    E->Next      = 0;
+    E->Flags   	 = 0;
+    E->Obj       = Obj;
+    E->ImpCount  = 0;
+    E->ImpList   = 0;
+    E->Expr    	 = 0;
+    E->LineInfos = EmptyCollection;
+    E->Type    	 = Type;
+    E->AddrSize  = AddrSize;
     memset (E->ConDes, 0, sizeof (E->ConDes));
 
     /* Return the new entry */
@@ -310,11 +324,71 @@ void FreeExport (Export* E)
     /* Safety */
     PRECONDITION ((E->Flags & EXP_INLIST) == 0);
 
+    /* Free the line infos */
+    DoneCollection (&E->LineInfos);
+
     /* Free the export expression */
     FreeExpr (E->Expr);
 
     /* Free the struct */
     xfree (E);
+}
+
+
+
+Export* ReadExport (FILE* F, ObjData* O)
+/* Read an export from a file */
+{
+    unsigned      ConDesCount;
+    Export* E;
+
+    /* Read the type */
+    unsigned char Type = ReadVar (F);
+
+    /* Read the address size */
+    unsigned char AddrSize = Read8 (F);
+
+    /* Create a new export without a name */
+    E = NewExport (Type, AddrSize, INVALID_STRING_ID, O);
+
+    /* Read the constructor/destructor decls if we have any */
+    ConDesCount = SYM_GET_CONDES_COUNT (Type);
+    if (ConDesCount > 0) {
+
+	unsigned char ConDes[CD_TYPE_COUNT];
+	unsigned I;
+
+	/* Read the data into temp storage */
+	ReadData (F, ConDes, ConDesCount);
+
+	/* Re-order the data. In the file, each decl is encoded into a byte
+	 * which contains the type and the priority. In memory, we will use
+	 * an array of types which contain the priority. This array was
+	 * cleared by the constructor (NewExport), so we must only set the
+	 * fields that contain values.
+	 */
+	for (I = 0; I < ConDesCount; ++I) {
+	    unsigned ConDesType = CD_GET_TYPE (ConDes[I]);
+	    unsigned ConDesPrio = CD_GET_PRIO (ConDes[I]);
+	    E->ConDes[ConDesType] = ConDesPrio;
+	}
+    }
+
+    /* Read the name */
+    E->Name = MakeGlobalStringId (O, ReadVar (F));
+
+    /* Read the value */
+    if (SYM_IS_EXPR (Type)) {
+       	E->Expr = ReadExpr (F, O);
+    } else {
+     	E->Expr = LiteralExpr (Read32 (F), O);
+    }
+
+    /* Last is the file position where the definition was done */
+    ReadLineInfoList (F, O, &E->LineInfos);
+
+    /* Return the new export */
+    return E;
 }
 
 
@@ -393,59 +467,11 @@ void InsertExport (Export* E)
 
 
 
-Export* ReadExport (FILE* F, ObjData* O)
-/* Read an export from a file */
+const LineInfo* GetExportPos (const Export* E)
+/* Return the basic line info of an export */
 {
-    unsigned      ConDesCount;
-    Export* E;
-
-    /* Read the type */
-    unsigned char Type = ReadVar (F);
-
-    /* Read the address size */
-    unsigned char AddrSize = Read8 (F);
-
-    /* Create a new export without a name */
-    E = NewExport (Type, AddrSize, INVALID_STRING_ID, O);
-
-    /* Read the constructor/destructor decls if we have any */
-    ConDesCount = SYM_GET_CONDES_COUNT (Type);
-    if (ConDesCount > 0) {
-
-	unsigned char ConDes[CD_TYPE_COUNT];
-	unsigned I;
-
-	/* Read the data into temp storage */
-	ReadData (F, ConDes, ConDesCount);
-
-	/* Re-order the data. In the file, each decl is encoded into a byte
-	 * which contains the type and the priority. In memory, we will use
-	 * an array of types which contain the priority. This array was
-	 * cleared by the constructor (NewExport), so we must only set the
-	 * fields that contain values.
-	 */
-	for (I = 0; I < ConDesCount; ++I) {
-	    unsigned ConDesType = CD_GET_TYPE (ConDes[I]);
-	    unsigned ConDesPrio = CD_GET_PRIO (ConDes[I]);
-	    E->ConDes[ConDesType] = ConDesPrio;
-	}
-    }
-
-    /* Read the name */
-    E->Name = MakeGlobalStringId (O, ReadVar (F));
-
-    /* Read the value */
-    if (SYM_IS_EXPR (Type)) {
-       	E->Expr = ReadExpr (F, O);
-    } else {
-     	E->Expr = LiteralExpr (Read32 (F), O);
-    }
-
-    /* Last is the file position where the definition was done */
-    ReadFilePos (F, &E->Pos);
-
-    /* Return the new export */
-    return E;
+    /* Source file position is always in slot zero */
+    return CollConstAt (&E->LineInfos, 0);
 }
 
 
@@ -617,6 +643,8 @@ static void CheckSymType (const Export* E)
             StrBuf ImportLoc = STATIC_STRBUF_INITIALIZER;
             const char* ExpAddrSize = AddrSizeToStr (E->AddrSize);
             const char* ImpAddrSize = AddrSizeToStr (I->AddrSize);
+            const LineInfo* ExportLI = GetExportPos (E);
+            const LineInfo* ImportLI = GetImportPos (I);
 
             /* Generate strings that describe the location of the im- and
              * exports. This depends on the place from where they come:
@@ -626,23 +654,23 @@ static void CheckSymType (const Export* E)
                 /* The export comes from an object file */
                 SB_Printf (&ExportLoc, "%s, %s(%lu)",
                            GetString (E->Obj->Name),
-                           GetSourceFileName (E->Obj, E->Pos.Name),
-                           E->Pos.Line);
+                           GetSourceName (ExportLI),
+                           GetSourceLine (ExportLI));
             } else {
                 SB_Printf (&ExportLoc, "%s(%lu)",
-                           GetSourceFileName (E->Obj, E->Pos.Name),
-                           E->Pos.Line);
+                           GetSourceName (ExportLI),
+                           GetSourceLine (ExportLI));
             }
             if (I->Obj) {
                 /* The import comes from an object file */
                 SB_Printf (&ImportLoc, "%s, %s(%lu)",
                            GetString (I->Obj->Name),
-                           GetSourceFileName (I->Obj, I->Pos.Name),
-                           I->Pos.Line);
+                           GetSourceName (ImportLI),
+                           GetSourceLine (ImportLI));
             } else {
                 SB_Printf (&ImportLoc, "%s(%lu)",
-                           GetSourceFileName (I->Obj, I->Pos.Name),
-                           I->Pos.Line);
+                           GetSourceName (ImportLI),
+                           GetSourceLine (ImportLI));
             }
 
             /* Output the diagnostic */
@@ -699,8 +727,11 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 	    	     "Unresolved external `%s' referenced in:\n",
 		     GetString (E->Name));
 	    while (Imp) {
-		const char* Name = GetSourceFileName (Imp->Obj, Imp->Pos.Name);
-		fprintf (stderr, "  %s(%lu)\n", Name, Imp->Pos.Line);
+                const LineInfo* LI = GetImportPos (Imp);
+		fprintf (stderr,
+                         "  %s(%lu)\n",
+                         GetSourceName (LI),
+                         GetSourceLine (LI));
 		Imp = Imp->Next;
 	    }
 	}
@@ -850,11 +881,12 @@ void PrintImportMap (FILE* F)
 	    while (Imp) {
 
 	      	/* Print the import */
+                const LineInfo* LI = GetImportPos (Imp);
 	      	fprintf (F,
 	      		 "    %-25s %s(%lu)\n",
 	      		 GetObjFileName (Imp->Obj),
-	      		 GetSourceFileName (Imp->Obj, Imp->Pos.Name),
-	      	       	 Imp->Pos.Line);
+	      		 GetSourceName (LI),
+	      	       	 GetSourceLine (LI));
 
 	      	/* Next import */
 	      	Imp = Imp->Next;
@@ -907,10 +939,11 @@ int ExportHasMark (Export* E)
 void CircularRefError (const Export* E)
 /* Print an error about a circular reference using to define the given export */
 {
+    const LineInfo* LI = GetExportPos (E);
     Error ("Circular reference for symbol `%s', %s(%lu)",
 	   GetString (E->Name),
-           GetSourceFileName (E->Obj, E->Pos.Name),
-           E->Pos.Line);
+           GetSourceName (LI),
+           GetSourceLine (LI));
 }
 
 

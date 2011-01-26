@@ -553,20 +553,6 @@ void CfgSetName (const char* Name)
 
 
 
-const char* CfgGetName (void)
-/* Get the name of the config file */
-{
-    if (CfgName) {
-	return CfgName;
-    } else if (CfgBuf) {
-	return "[builtin config]";
-    } else {
-	return "";
-    }
-}
-
-
-
 void CfgSetBuf (const char* Buf)
 /* Set a memory buffer for the config */
 {

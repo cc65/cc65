@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/* (C) 2001-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -79,7 +79,7 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	    /* Print it */
             fprintf (F,
                      "line\tfile=%u,line=%lu,segment=%u,range=0x%06lX-0x%06lX",
-                     LI->File->Id, LI->Pos.Line, R->Seg->Id,
+                     LI->File->Id, GetSourceLine (LI), R->Seg->Id,
                      R->Offs, R->Offs + R->Size - 1);
 	}
 

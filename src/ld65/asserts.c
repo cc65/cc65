@@ -41,7 +41,7 @@
 /* ld65 */
 #include "asserts.h"
 #include "error.h"
-#include "expr.h"    
+#include "expr.h"
 #include "fileio.h"
 #include "lineinfo.h"
 #include "objdata.h"
@@ -72,30 +72,6 @@ static Collection Assertions = STATIC_COLLECTION_INITIALIZER;
 /*****************************************************************************/
 /*     	       	    	 	     Code     				     */
 /*****************************************************************************/
-
-
-
-static const char* GetAssertionSourceName (const Assertion* A)
-/* Return the name of the source file for this assertion */
-{
-    /* Each assertion has the basic info in line info #0 */
-    const LineInfo* LI = CollConstAt (&A->LineInfos, 0);
-
-    /* Return the source file name */
-    return GetSourceFileName (A->Obj, LI->Pos.Name);
-}
-
-
-
-static unsigned long GetAssertionSourceLine (const Assertion* A)
-/* Return the source file line for this fragment */
-{
-    /* Each assertion has the basic info in line info #0 */
-    const LineInfo* LI = CollConstAt (&A->LineInfos, 0);
-
-    /* Return the source file line */
-    return LI->Pos.Line;
-}
 
 
 
@@ -131,6 +107,7 @@ void CheckAssertions (void)
     /* Walk over all assertions */
     for (I = 0; I < CollCount (&Assertions); ++I) {
 
+        const LineInfo* LI;                 
         const char* Module;
         unsigned long Line;
 
@@ -142,9 +119,12 @@ void CheckAssertions (void)
             continue;
         }
 
-        /* Retrieve module name and line number */
-        Module  = GetAssertionSourceName (A);
-        Line    = GetAssertionSourceLine (A);
+        /* Retrieve the relevant line info for this assertion */
+        LI = CollConstAt (&A->LineInfos, 0);
+                           
+        /* Get file name and line number from the source */
+        Module = GetSourceName (LI);
+        Line   = GetSourceLine (LI);
 
         /* If the expression is not constant, we're not able to handle it */
         if (!IsConstExpr (A->Expr)) {
@@ -176,6 +156,6 @@ void CheckAssertions (void)
         }
     }
 }
-
+                                   
 
 

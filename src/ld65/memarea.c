@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2010,      Ullrich von Bassewitz                                      */
+/* (C) 2010-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -54,7 +54,7 @@ MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
     MemoryArea* M = xmalloc (sizeof (MemoryArea));
 
     /* Initialize the fields ... */
-    M->Pos         = *Pos;                     
+    M->LI          = GenLineInfo (Pos);
     M->Name        = Name;
     M->Attr        = 0;
     M->Flags       = 0;
@@ -65,7 +65,7 @@ MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
     M->FillLevel   = 0;
     M->FillVal     = 0;
     M->Relocatable = 0;
-    InitCollection (&M->SegList);
+    M->SegList     = EmptyCollection;
     M->F           = 0;
 
     /* ...and return it */

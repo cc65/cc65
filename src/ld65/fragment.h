@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -42,15 +42,16 @@
 #include "coll.h"
 #include "filepos.h"
 
+/* Ld65 */
+#include "lineinfo.h"
 
 
 /*****************************************************************************/
-/*				   Forwards                                  */
+/*	  			   Forwards                                  */
 /*****************************************************************************/
 
 
 
-struct LineInfo;
 struct ObjData;
 struct Section;
 
@@ -89,11 +90,25 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
 void FragResolveLineInfos (Fragment* F);
 /* Resolve the back pointers for the line infos */
 
-const char* GetFragmentSourceName (const Fragment* F);
+#if defined(HAVE_INLINE)
+INLINE const char* GetFragmentSourceName (const Fragment* F)
 /* Return the name of the source file for this fragment */
+{
+    return GetSourceNameFromList (&F->LineInfos);
+}
+#else
+#  define GetFragmentSourceName(LI)     GetSourceNameFromList (&(F)->LineInfos)
+#endif
 
-unsigned long GetFragmentSourceLine (const Fragment* F);
+#if defined(HAVE_INLINE)
+INLINE unsigned long GetFragmentSourceLine (const Fragment* F)
 /* Return the source file line for this fragment */
+{
+    return GetSourceLineFromList (&F->LineInfos);
+}
+#else
+#  define GetFragmentSourceLine(LI)     GetSourceLineFromList (&(F)->LineInfos)
+#endif
 
 
 

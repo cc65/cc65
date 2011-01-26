@@ -42,6 +42,7 @@
 #include "error.h"
 #include "exports.h"
 #include "expr.h"
+#include "lineinfo.h"
 #include "scanner.h"
 #include "spool.h"
 
@@ -74,7 +75,7 @@ static ExprNode* Factor (void)
             } else {
                 N = NewExprNode (0, EXPR_SYMBOL);
                 N->V.Imp = InsertImport (GenImport (Name, ADDR_SIZE_ABS));
-                N->V.Imp->Pos = CfgErrorPos;
+                CollAppend (&N->V.Imp->LineInfos, GenLineInfo (&CfgErrorPos));
             }
 
             /* Skip the symbol name */

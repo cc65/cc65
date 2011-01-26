@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -40,7 +40,6 @@
 /* ld65 */
 #include "error.h"
 #include "fragment.h"
-#include "lineinfo.h"
 #include "objdata.h"
 #include "segments.h"
 
@@ -111,30 +110,6 @@ void FragResolveLineInfos (Fragment* F)
         /* Add the back pointer to the line info */
         CollAppend (&LI->Fragments, F);
     }
-}
-
-
-
-const char* GetFragmentSourceName (const Fragment* F)
-/* Return the name of the source file for this fragment */
-{
-    /* Each fragment has the basic info in line info #0 */
-    const LineInfo* LI = CollConstAt (&F->LineInfos, 0);
-
-    /* Return the source file name */
-    return GetSourceFileName (F->Obj, LI->Pos.Name);
-}
-
-
-
-unsigned long GetFragmentSourceLine (const Fragment* F)
-/* Return the source file line for this fragment */
-{
-    /* Each fragment has the basic info in line info #0 */
-    const LineInfo* LI = CollConstAt (&F->LineInfos, 0);
-
-    /* Return the source file line */
-    return LI->Pos.Line;
 }
 
 

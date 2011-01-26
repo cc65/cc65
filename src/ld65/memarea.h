@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2010,      Ullrich von Bassewitz                                      */
+/* (C) 2010-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -40,7 +40,9 @@
 
 /* common */
 #include "coll.h"
-#include "filepos.h"
+
+/* ld65 */
+#include "lineinfo.h"
 
 
 
@@ -57,7 +59,7 @@ struct File;
 /* Memory area entry */
 typedef struct MemoryArea MemoryArea;
 struct MemoryArea {
-    FilePos             Pos;            /* Where was the area was defined? */
+    LineInfo*           LI;             /* Where was the area was defined? */
     unsigned            Name;           /* Name index of the memory area */
     unsigned   	       	Attr;	  	/* Which values are valid? */
     unsigned   	 	Flags;	  	/* Set of bitmapped flags */

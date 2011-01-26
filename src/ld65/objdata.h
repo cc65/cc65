@@ -129,11 +129,6 @@ INLINE int ObjHasFiles (const ObjData* O)
 #  define ObjHasFiles(O)       ((O) != 0 && CollCount (&(O)->Files) != 0)
 #endif
 
-const char* GetSourceFileName (const ObjData* O, unsigned Index);
-/* Get the name of the source file with the given index. If O is NULL, return
- * "[linker generated]" as the file name.
- */
-
 
 
 /* End of objdata.h */

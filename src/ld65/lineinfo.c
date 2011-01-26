@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  lineinfo.h                                 */
+/*			  	  lineinfo.h                                 */
 /*                                                                           */
 /*			Source file line info structure                      */
 /*                                                                           */
@@ -38,11 +38,13 @@
 #include "xmalloc.h"
 
 /* ld65 */
+#include "error.h"
+#include "fileinfo.h"
 #include "fileio.h"
 #include "fragment.h"
+#include "lineinfo.h"
 #include "objdata.h"
 #include "segments.h"
-#include "lineinfo.h"
 
 
 
@@ -69,22 +71,36 @@ static CodeRange* NewCodeRange (Segment* Seg, unsigned long Offs, unsigned long 
 
 
 
-static LineInfo* NewLineInfo (ObjData* O, const FilePos* Pos)
-/* Create and return a new LineInfo struct */
+static LineInfo* NewLineInfo (void)
+/* Create and return a new LineInfo struct with mostly empty fields */
 {
     /* Allocate memory */
     LineInfo* LI = xmalloc (sizeof (LineInfo));
 
-    /* Make sure the name index is valid */
-    CHECK (Pos->Name < CollCount (&O->Files));
-
     /* Initialize the fields */
-    LI->File = CollAt (&O->Files, Pos->Name);
-    LI->Pos = *Pos;
-    InitCollection (&LI->Fragments);
-    InitCollection (&LI->CodeRanges);
+    LI->Pos.Name   = INVALID_STRING_ID;
+    LI->Pos.Line   = 0;
+    LI->Pos.Col    = 0;
+    LI->File       = 0;
+    LI->Fragments  = EmptyCollection;
+    LI->CodeRanges = EmptyCollection;
 
     /* Return the new struct */
+    return LI;
+}
+
+
+
+LineInfo* GenLineInfo (const FilePos* Pos)
+/* Generate a new (internally used) line info  with the given information */
+{
+    /* Create a new LineInfo struct */
+    LineInfo* LI = NewLineInfo ();
+
+    /* Initialize the fields in the new LineInfo */
+    LI->Pos = *Pos;
+
+    /* Return the struct read */
     return LI;
 }
 
@@ -93,12 +109,17 @@ static LineInfo* NewLineInfo (ObjData* O, const FilePos* Pos)
 LineInfo* ReadLineInfo (FILE* F, ObjData* O)
 /* Read a line info from a file and return it */
 {
-    /* Read the file position */
-    FilePos Pos;
-    ReadFilePos (F, &Pos);
+    /* Create a new LineInfo struct */
+    LineInfo* LI = NewLineInfo ();
 
-    /* Allocate a new LineInfo struct, initialize and return it */
-    return NewLineInfo (O, &Pos);
+    /* Read/fill the fields in the new LineInfo */
+    LI->Pos.Line = ReadVar (F);
+    LI->Pos.Col  = ReadVar (F);
+    LI->File     = CollAt (&O->Files, ReadVar (F));
+    LI->Pos.Name = LI->File->Name;
+
+    /* Return the struct read */
+    return LI;
 }
 
 
@@ -217,6 +238,7 @@ void RelocLineInfo (Segment* S)
        	Sec = Sec->Next;
     }
 }
+
 
 
 

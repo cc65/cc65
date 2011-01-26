@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -47,6 +47,7 @@
 #include "expr.h"
 #include "fileio.h"
 #include "global.h"
+#include "lineinfo.h"
 #include "objdata.h"
 #include "spool.h"
 
@@ -75,16 +76,17 @@ static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O
 /* Create a new DbgSym and return it */
 {
     /* Allocate memory */
-    DbgSym* D = xmalloc (sizeof (DbgSym));
+    DbgSym* D    = xmalloc (sizeof (DbgSym));
 
     /* Initialize the fields */
-    D->Next     = 0;
-    D->Flags	= 0;
-    D->Obj      = O;
-    D->Expr    	= 0;
-    D->Name 	= 0;
-    D->Type    	= Type;
-    D->AddrSize = AddrSize;
+    D->Next      = 0;
+    D->Flags	 = 0;
+    D->Obj       = O;
+    D->LineInfos = EmptyCollection;
+    D->Expr    	 = 0;
+    D->Name 	 = 0;
+    D->Type    	 = Type;
+    D->AddrSize  = AddrSize;
 
     /* Return the new entry */
     return D;
@@ -158,8 +160,8 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     	D->Expr = LiteralExpr (Read32 (F), O);
     }
 
-    /* Last is the file position where the definition was done */
-    ReadFilePos (F, &D->Pos);
+    /* Last is the list of line infos for this symbol */
+    ReadLineInfoList (F, O, &D->LineInfos);
 
     /* Return the new DbgSym */
     return D;

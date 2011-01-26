@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,8 +41,8 @@
 #include <stdio.h>
 
 /* common */
+#include "coll.h"
 #include "exprdefs.h"
-#include "filepos.h"
 
 /* ld65 */
 #include "objdata.h"
@@ -61,7 +61,7 @@ struct DbgSym {
     DbgSym*    	       	Next;  		/* Pool linear list link */
     unsigned   		Flags;		/* Generic flags */
     ObjData*   		Obj;	    	/* Object file that exports the name */
-    FilePos    		Pos;		/* File position of definition */
+    Collection          LineInfos;      /* Line infos of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned            Name;  	       	/* Name */
     unsigned char	Type;		/* Type of symbol */

@@ -6,7 +6,7 @@
 /*					   				     */
 /*					   				     */
 /*					   				     */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -38,8 +38,8 @@
 #include <errno.h>
 
 /* common */
+#include "coll.h"
 #include "exprdefs.h"
-#include "filepos.h"
 #include "libdefs.h"
 #include "objdefs.h"
 #include "symdefs.h"
@@ -57,7 +57,7 @@
 
 
 /*****************************************************************************/
-/*	  			     Data				     */
+/*	  	 		     Data				     */
 /*****************************************************************************/
 
 
@@ -69,8 +69,7 @@ struct Library {
     unsigned    Name;           /* String id of the name */
     FILE*       F;              /* Open file stream */
     LibHeader   Header;         /* Library header */
-    unsigned    ModCount;       /* Number of modules in the library */
-    ObjData**   Modules;        /* Modules */
+    Collection  Modules;        /* Modules */
 };
 
 /* List of open libraries */
@@ -97,8 +96,7 @@ static Library* NewLibrary (FILE* F, const char* Name)
     L->Next     = 0;
     L->Name     = GetStringId (Name);
     L->F        = F;
-    L->ModCount = 0;
-    L->Modules  = 0;
+    L->Modules  = EmptyCollection;
 
     /* Return the new struct */
     return L;
@@ -115,7 +113,7 @@ static void FreeLibrary (Library* L)
     }
 
     /* Free the module index */
-    xfree (L->Modules);
+    DoneCollection (&L->Modules);
 
     /* Free the library structure */
     xfree (L);
@@ -228,18 +226,18 @@ static ObjData* ReadIndexEntry (Library* L)
 static void LibReadIndex (Library* L)
 /* Read the index of a library file */
 {
-    unsigned I;
+    unsigned ModuleCount;
 
     /* Seek to the start of the index */
     LibSeek (L, L->Header.IndexOffs);
 
     /* Read the object file count and allocate memory */
-    L->ModCount = ReadVar (L->F);
-    L->Modules  = xmalloc (L->ModCount * sizeof (L->Modules[0]));
+    ModuleCount = ReadVar (L->F);
+    CollGrow (&L->Modules, ModuleCount);
 
     /* Read all entries in the index */
-    for (I = 0; I < L->ModCount; ++I) {
-       	L->Modules[I] = ReadIndexEntry (L);
+    while (ModuleCount--) {
+       	CollAppend (&L->Modules, ReadIndexEntry (L));
     }
 }
 
@@ -313,10 +311,10 @@ static void LibResolve (void)
              * module if there are unresolved externals in existing modules
              * that may be resolved by adding the module.
              */
-            for (J = 0; J < L->ModCount; ++J) {
+            for (J = 0; J < CollCount (&L->Modules); ++J) {
 
                 /* Get the next module */
-                ObjData* O = L->Modules[J];
+                ObjData* O = CollAtUnchecked (&L->Modules, J);
 
                 /* We only need to check this module if it wasn't added before */
                 if ((O->Flags & OBJ_REF) == 0) {
@@ -343,10 +341,10 @@ static void LibResolve (void)
         /* Walk over all modules in this library and add the files list and
          * sections for all referenced modules.
          */
-        for (J = 0; J < L->ModCount; ++J) {
+        for (J = 0; J < CollCount (&L->Modules); ++J) {
 
             /* Get the object data */
-            ObjData* O = L->Modules[J];
+            ObjData* O = CollAtUnchecked (&L->Modules, J);
 
             /* Is this object file referenced? */
             if (O->Flags & OBJ_REF) {

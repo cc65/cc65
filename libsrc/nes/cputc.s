@@ -8,7 +8,7 @@
 
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
 	.export		newline
-        .constructor    conioinit
+        .constructor    initconio
 	.import		popa, _gotoxy
         .import         ppuinit, paletteinit, ppubuf_put
         .import         setcursor
@@ -18,7 +18,7 @@
 	.include	"nes.inc"
 
 ;-----------------------------------------------------------------------------
-                      
+
 .code
 
 _cputcxy:
@@ -80,7 +80,7 @@ putchar:
 
 .segment        "INIT"
 
-conioinit:
+initconio:
         jsr     ppuinit
 	jsr     paletteinit
 

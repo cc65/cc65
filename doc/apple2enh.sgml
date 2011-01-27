@@ -291,7 +291,9 @@ the <htmlurl url="funcref.html" name="function reference"> for declaration and
 usage.
 
 <itemize>
+<item>_auxtype
 <item>_dos_type
+<item>_filetype
 <item>drivecount
 <item>drivelist
 <item>get_ostype

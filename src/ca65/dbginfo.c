@@ -49,17 +49,6 @@
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* The line info slot used */
-static unsigned LineInfoSlot;
-
-
-
-/*****************************************************************************/
 /*     	       	    		     Code			   	     */
 /*****************************************************************************/
 
@@ -106,7 +95,7 @@ void DbgInfoFile (void)
 
 void DbgInfoLine (void)
 /* Parse and handle LINE subcommand of the .dbg pseudo instruction */
-{   
+{
     long Line;
     FilePos Pos = STATIC_FILEPOS_INITIALIZER;
 
@@ -114,7 +103,7 @@ void DbgInfoLine (void)
      * follow, the last line info is terminated.
      */
     if (CurTok.Tok == TOK_SEP) {
-	ClearLineInfo (LineInfoSlot);
+	ClearLineInfo (LI_SLOT_EXT);
 	return;
     }
 
@@ -141,11 +130,11 @@ void DbgInfoLine (void)
     if (Line < 0) {
 	ErrorSkip ("Line number is out of valid range");
 	return;
-    }   
+    }
     Pos.Line = Line;
 
     /* Remember the line info */
-    GenLineInfo (LineInfoSlot, &Pos);
+    GenLineInfo (LI_SLOT_EXT, &Pos);
 }
 
 

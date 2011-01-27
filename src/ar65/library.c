@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -383,12 +383,16 @@ static void SkipExpr (unsigned char** Buf)
 
 
 
-static void SkipFilePos (unsigned char** Buf)
-/* Skip a file position in Buf */
+static void SkipLineInfoList (unsigned char** Buf)
+/* Skip a list of line infos in Buf */
 {
-    (void) GetVar (Buf);	/* Line */
-    (void) GetVar (Buf);	/* Col */
-    (void) GetVar (Buf);	/* Name */
+    /* Number of indices preceeds the list */
+    unsigned long Count = GetVar (Buf);
+
+    /* Skip indices */
+    while (Count--) {
+        (void) GetVar (Buf);
+    }
 }
 
 
@@ -429,8 +433,8 @@ static void LibCheckExports (ObjData* O)
      	    Exports += 4;
      	}
 
-     	/* Skip the position */
-       	SkipFilePos (&Exports);
+     	/* Skip the line info */
+       	SkipLineInfoList (&Exports);
 
       	/* Insert the name into the hash table */
 	Print (stdout, 1, "  %s\n", Name);

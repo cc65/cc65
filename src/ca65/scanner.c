@@ -813,6 +813,9 @@ Again:
     /* Clear the string attribute */
     SB_Clear (&CurTok.SVal);
 
+    /* Generate line info for the current token */
+    GenLineInfo (LI_SLOT_ASM, &CurTok.Pos);
+
     /* Hex number or PC symbol? */
     if (C == '$') {
      	NextChar ();

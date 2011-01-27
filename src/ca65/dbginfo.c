@@ -106,9 +106,9 @@ void DbgInfoFile (void)
 
 void DbgInfoLine (void)
 /* Parse and handle LINE subcommand of the .dbg pseudo instruction */
-{
-    unsigned Index;
-    long LineNum;
+{   
+    long Line;
+    FilePos Pos = STATIC_FILEPOS_INITIALIZER;
 
     /* If a parameters follow, this is actual line info. If no parameters
      * follow, the last line info is terminated.
@@ -128,7 +128,7 @@ void DbgInfoLine (void)
     }
 
     /* Get the index in the file table for the name */
-    Index = GetFileIndex (&CurTok.SVal);
+    Pos.Name = GetFileIndex (&CurTok.SVal);
 
     /* Skip the name */
     NextTok ();
@@ -137,14 +137,15 @@ void DbgInfoLine (void)
     ConsumeComma ();
 
     /* Line number */
-    LineNum = ConstExpression ();
-    if (LineNum < 0) {
+    Line = ConstExpression ();
+    if (Line < 0) {
 	ErrorSkip ("Line number is out of valid range");
 	return;
-    }
+    }   
+    Pos.Line = Line;
 
     /* Remember the line info */
-    GenLineInfo (LineInfoSlot, Index, LineNum, 0);
+    GenLineInfo (LineInfoSlot, &Pos);
 }
 
 

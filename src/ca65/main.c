@@ -862,6 +862,11 @@ int main (int argc, char* argv [])
      */
     SymEnterLevel (&GlobalNameSpace, ST_GLOBAL, ADDR_SIZE_DEFAULT);
 
+    /* Initialize the line infos. Must be done here, since we need line infos 
+     * for symbol definitions.
+     */
+    InitLineInfo ();
+
     /* Check the parameters */
     I = 1;
     while (I < ArgCount) {
@@ -979,9 +984,6 @@ int main (int argc, char* argv [])
 
     /* Initialize the segments */
     InitSegments ();
-
-    /* Initialize the line infos */
-    InitLineInfo ();
 
     /* Initialize the scanner, open the input file */
     InitScanner (InFile);

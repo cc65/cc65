@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/* (C) 2001-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -75,7 +75,7 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
     /* Read the fields from the file */
     FI->Name  = MakeGlobalStringId (O, ReadVar (F));
     FI->MTime = Read32 (F);
-    FI->Size  = Read32 (F);
+    FI->Size  = ReadVar (F);
 
     /* Return the new struct */
     return FI;

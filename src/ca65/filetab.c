@@ -265,7 +265,7 @@ void WriteFiles (void)
 	/* Write the fields */
 	ObjWriteVar (F->Name);
 	ObjWrite32 (F->MTime);
-	ObjWrite32 (F->Size);
+       	ObjWriteVar (F->Size);
     }
 
     /* Done writing files */

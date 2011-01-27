@@ -132,7 +132,7 @@ void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the section data from a file at the given position */
 {
-    unsigned I;     
+    unsigned I;
     unsigned SectionCount;
 
     /* Seek to the correct position */
@@ -151,7 +151,7 @@ void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the imports from a file at the given position */
 {
-    unsigned I;     
+    unsigned I;
     unsigned ImportCount;
 
     /* Seek to the correct position */
@@ -170,7 +170,7 @@ void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the exports from a file at the given position */
 {
-    unsigned I;     
+    unsigned I;
     unsigned ExportCount;
 
     /* Seek to the correct position */
@@ -245,7 +245,7 @@ void ObjReadStrPool (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the assertions from a file at the given offset */
 {
-    unsigned I;     
+    unsigned I;
     unsigned AssertionCount;
 
     /* Seek to the correct position */
@@ -264,7 +264,7 @@ void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
 void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
 /* Read the scope table from a file at the given offset */
 {
-    unsigned I;     
+    unsigned I;
     unsigned ScopeCount;
 
     /* Seek to the correct position */
@@ -301,6 +301,9 @@ void ObjAdd (FILE* Obj, const char* Name)
     /* Read the files list from the object file */
     ObjReadFiles (Obj, O->Header.FileOffs, O);
 
+    /* Read the line infos from the object file */
+    ObjReadLineInfos (Obj, O->Header.LineInfoOffs, O);
+
     /* Read the imports list from the object file */
     ObjReadImports (Obj, O->Header.ImportOffs, O);
 
@@ -309,9 +312,6 @@ void ObjAdd (FILE* Obj, const char* Name)
 
     /* Read the object debug symbols from the object file */
     ObjReadDbgSyms (Obj, O->Header.DbgSymOffs, O);
-
-    /* Read the line infos from the object file */
-    ObjReadLineInfos (Obj, O->Header.LineInfoOffs, O);
 
     /* Read the assertions from the object file */
     ObjReadAssertions (Obj, O->Header.AssertOffs, O);

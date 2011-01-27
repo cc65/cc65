@@ -65,8 +65,8 @@ enum {
 enum {
     LI_MASK_COUNT       = 0x00FF,       /* Mask to extract the count */
 
-    LI_TYPE_EXT         = 0x0100,       /* Externally supplied line info */
-    LI_TYPE_ASM         = 0x0200,       /* Normal assembler source */
+    LI_TYPE_ASM         = 0x0100,       /* Normal assembler source */
+    LI_TYPE_EXT         = 0x0200,       /* Externally supplied line info */
     LI_TYPE_MACRO       = 0x0300,       /* Macro expansion */
     LI_MASK_TYPE        = 0x7F00,       /* Mask to extract the type */
 };
@@ -107,9 +107,6 @@ void GenLineInfo (unsigned Slot, const FilePos* Pos);
 void ClearLineInfo (unsigned Slot);
 /* Clear the line info in the given slot */
 
-LineInfo* GetLineInfo (unsigned Slot);
-/* Get the line info from the given slot */
-
 void GetFullLineInfo (Collection* LineInfos);
 /* Return full line infos, that is line infos for all slots in LineInfos. The
  * function does also increase the usage counter for all line infos returned.
@@ -124,6 +121,26 @@ LineInfo* ReleaseLineInfo (LineInfo* LI);
 /* Decrease the reference count of the given line info and return it. The
  * function will gracefully accept NULL pointers and do nothing in this case.
  */
+
+#if defined(HAVE_INLINE)
+INLINE const FilePos* GetSourcePos (const LineInfo* LI)
+/* Return the source file position from the given line info */
+{
+    return &LI->Pos;
+}
+#else
+#  define GetSourcePos(LI)      (&(LI)->Pos)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetLineInfoType (const LineInfo* LI)
+/* Return the type of a line info */
+{
+    return (LI->Type & LI_MASK_TYPE);
+}
+#else
+#  define GetLineInfoType(LI)     ((LI)->Type & LI_MASK_TYPE)
+#endif
 
 void WriteLineInfo (const Collection* LineInfos);
 /* Write a list of line infos to the object file. MakeLineInfoIndex has to

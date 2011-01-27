@@ -223,15 +223,6 @@ void ClearLineInfo (unsigned Slot)
 
 
 
-LineInfo* GetLineInfo (unsigned Slot)
-/* Get the line info from the given slot */
-{
-    PRECONDITION (Slot < UsedSlots);
-    return CurLineInfo[Slot].Info;
-}
-
-
-
 void GetFullLineInfo (Collection* LineInfos)
 /* Return full line infos, that is line infos for all slots in LineInfos. The
  * function does also increase the usage counter for all line infos returned.

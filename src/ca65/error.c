@@ -64,7 +64,88 @@ unsigned WarningCount	= 0;
 
 
 /*****************************************************************************/
-/*				   Warnings 				     */
+/*                             Helper functions                              */
+/*****************************************************************************/
+
+
+
+static void FormatVMsg (StrBuf* S, const FilePos* Pos, const char* Desc,
+                        const char* Format, va_list ap)
+/* Format an error/warning message into S. A trailing newline and a NUL
+ * terminator will be added to S.
+ */
+{
+    /* Format the actual message */
+    StrBuf Msg = STATIC_STRBUF_INITIALIZER;
+    SB_VPrintf (&Msg, Format, ap);
+    SB_Terminate (&Msg);
+
+    /* Format the message header */
+    SB_Printf (S, "%s(%lu): %s: ",
+               SB_GetConstBuf (GetFileName (Pos->Name)),
+               Pos->Line,
+               Desc);
+
+    /* Append the message to the message header */
+    SB_Append (S, &Msg);
+
+    /* Delete the formatted message */
+    SB_Done (&Msg);
+
+    /* Add a new line and terminate the generated message */
+    SB_AppendChar (S, '\n');
+    SB_Terminate (S);
+}
+
+
+
+static void FormatMsg (StrBuf* S, const FilePos* Pos, const char* Desc,
+                       const char* Format, ...)
+/* Format an error/warning message into S. A trailing newline and a NUL
+ * terminator will be added to S.
+ */
+{
+    va_list ap;
+    va_start (ap, Format);
+    FormatVMsg (S, Pos, Desc, Format, ap);
+    va_end (ap);
+}
+
+
+
+static void AddNotifications (const Collection* LineInfos)
+/* Output additional notifications for an error or warning */
+{
+    StrBuf Msg = STATIC_STRBUF_INITIALIZER;
+
+    /* The basic line info is always in slot zero. It has been used to
+     * output the actual error or warning. The following slots may contain
+     * more information. Check them and additional notifications if they're
+     * present.
+     */
+    unsigned I;
+    for (I = 1; I < CollCount (LineInfos); ++I) {
+        /* Get next line info */
+        const LineInfo* LI = CollConstAt (LineInfos, I);
+        /* Check the type and output an appropriate note */
+        unsigned Type = GetLineInfoType (LI);
+        if (Type == LI_TYPE_EXT) {
+            FormatMsg (&Msg, GetSourcePos (LI), "Note",
+                       "Assembler code generated from this line");
+            fputs (SB_GetConstBuf (&Msg), stderr);
+
+        } else if (Type == LI_TYPE_MACRO) {
+
+        }
+    }
+
+    SB_Done (&Msg);
+}
+
+
+
+/*****************************************************************************/
+/*   	      	     	       	   Warnings 				     */
 /*****************************************************************************/
 
 
@@ -74,17 +155,12 @@ void WarningMsg (const FilePos* Pos, unsigned Level, const char* Format, va_list
 {
     if (Level <= WarnLevel) {
 
-        StrBuf S = STATIC_STRBUF_INITIALIZER;
-        SB_VPrintf (&S, Format, ap);
-        SB_Terminate (&S);
+        StrBuf Msg = STATIC_STRBUF_INITIALIZER;
+        FormatVMsg (&Msg, Pos, "Warning", Format, ap);
+        fputs (SB_GetConstBuf (&Msg), stderr);
+        SB_Done (&Msg);
 
-       	fprintf (stderr, "%s(%lu): Warning: %s\n",
-                 SB_GetConstBuf (GetFileName (Pos->Name)),
-                 Pos->Line,
-                 SB_GetConstBuf (&S));
 	++WarningCount;
-
-        SB_Done (&S);
     }
 }
 
@@ -115,21 +191,27 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...)
 void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format, ...)
 /* Print warning message using the given line infos */
 {
-    va_list ap;
+    if (Level <= WarnLevel) {
 
-    /* The first entry in the collection is that of the actual source pos */
-    const LineInfo* LI = CollConstAt (LineInfos, 0);
+        va_list ap;
 
-    /* Output a warning for this position */
-    va_start (ap, Format);
-    WarningMsg (&LI->Pos, Level, Format, ap);
-    va_end (ap);
+        /* The first entry in the collection is that of the actual source pos */
+        const LineInfo* LI = CollConstAt (LineInfos, 0);
+
+        /* Output a warning for this position */
+        va_start (ap, Format);
+        WarningMsg (GetSourcePos (LI), Level, Format, ap);
+        va_end (ap);
+
+        /* Add additional notifications if necessary */
+        AddNotifications (LineInfos);
+    }
 }
 
 
 
 /*****************************************************************************/
-/*		     		    Errors				     */
+/*	       	     		    Errors				     */
 /*****************************************************************************/
 
 
@@ -137,17 +219,12 @@ void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format,
 void ErrorMsg (const FilePos* Pos, const char* Format, va_list ap)
 /* Print an error message */
 {
-    StrBuf S = STATIC_STRBUF_INITIALIZER;
-    SB_VPrintf (&S, Format, ap);
-    SB_Terminate (&S);
+    StrBuf Msg = STATIC_STRBUF_INITIALIZER;
+    FormatVMsg (&Msg, Pos, "Error", Format, ap);
+    fputs (SB_GetConstBuf (&Msg), stderr);
+    SB_Done (&Msg);
 
-    fprintf (stderr, "%s(%lu): Error: %s\n",
-             SB_GetConstBuf (GetFileName (Pos->Name)),
-             Pos->Line,
-             SB_GetConstBuf (&S));
     ++ErrorCount;
-
-    SB_Done (&S);
 }
 
 
@@ -184,8 +261,11 @@ void LIError (const Collection* LineInfos, const char* Format, ...)
 
     /* Output an error for this position */
     va_start (ap, Format);
-    ErrorMsg (&LI->Pos, Format, ap);
+    ErrorMsg (GetSourcePos (LI), Format, ap);
     va_end (ap);
+
+    /* Add additional notifications if necessary */
+    AddNotifications (LineInfos);
 }
 
 

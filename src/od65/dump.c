@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2010, Ullrich von Bassewitz                                      */
+/* (C) 2002-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -111,11 +111,25 @@ static char* TimeToStr (unsigned long Time)
     /* Remove the trailing newline */
     unsigned Len = strlen (S);
     if (Len > 0 && S[Len-1] == '\n') {
-	S[Len-1 ] = '\0';
+    	S[Len-1 ] = '\0';
     }
 
     /* Return the time string */
     return S;
+}
+
+
+
+static void SkipLineInfoList (FILE* F)
+/* Skip a line info list from the given file */
+{
+    /* Count preceeds the list */
+    unsigned long Count = ReadVar (F);
+
+    /* Skip indices */
+    while (Count--) {
+        (void) ReadVar (F);
+    }
 }
 
 
@@ -145,7 +159,7 @@ static void SkipExpr (FILE* F)
 	    case EXPR_SECTION:
 	   	/* Read the segment number */
 	   	(void) Read8 (F);
-	   	break;
+    	   	break;
 
 	    default:
 	   	Error ("Invalid expression op: %02X", Op);
@@ -180,7 +194,7 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
     }
 
     /* Symbol usage */
-    switch (Flags & SYM_MASK_LABEL) {       
+    switch (Flags & SYM_MASK_LABEL) {
        	case SYM_EQUATE: strcat (TypeDesc, ",SYM_EQUATE"); break;
        	case SYM_LABEL:  strcat (TypeDesc, ",SYM_LABEL");  break;
     }
@@ -388,7 +402,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
 	/* Read the data for one file */
        	const char*   Name  = GetString (&StrPool, ReadVar (F));
 	unsigned long MTime = Read32 (F);
-	unsigned long Size  = Read32 (F);
+	unsigned long Size  = ReadVar (F);
 	unsigned      Len   = strlen (Name);
 
 	/* Print the header */
@@ -473,7 +487,6 @@ void DumpObjImports (FILE* F, unsigned long Offset)
     Collection StrPool = AUTO_COLLECTION_INITIALIZER;
     unsigned   Count;
     unsigned   I;
-    FilePos    Pos;
 
     /* Seek to the header position and read the header */
     FileSetPos (F, Offset);
@@ -500,7 +513,9 @@ void DumpObjImports (FILE* F, unsigned long Offset)
        	unsigned char AddrSize = Read8 (F);
        	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
-	ReadFilePos (F, &Pos);
+
+        /* Skip the line infos */
+        SkipLineInfoList (F);
 
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
@@ -524,7 +539,6 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     Collection  StrPool = AUTO_COLLECTION_INITIALIZER;
     unsigned   	Count;
     unsigned   	I;
-    FilePos    	Pos;
 
     /* Seek to the header position and read the header */
     FileSetPos (F, Offset);
@@ -567,7 +581,9 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	    Value = Read32 (F);
 	    HaveValue = 1;
 	}
-	ReadFilePos (F, &Pos);
+
+        /* Skip the line infos */
+        SkipLineInfoList (F);
 
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
@@ -595,7 +611,6 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
     Collection  StrPool = AUTO_COLLECTION_INITIALIZER;
     unsigned    Count;
     unsigned    I;
-    FilePos     Pos;
 
     /* Seek to the header position and read the header */
     FileSetPos (F, Offset);
@@ -640,7 +655,9 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	    Value = Read32 (F);
 	    HaveValue = 1;
 	}
-	ReadFilePos (F, &Pos);
+
+        /* Skip the line infos */
+        SkipLineInfoList (F);
 
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
@@ -697,9 +714,8 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
     /* Read and print all line infos */
     for (I = 0; I < Count; ++I) {
 
-	FilePos   Pos;
-
        	/* Read one line info */
+	FilePos   Pos;
 	ReadFilePos (F, &Pos);
 
 	/* Print the header */

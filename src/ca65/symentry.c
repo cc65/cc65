@@ -288,9 +288,9 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
             /* We're exporting a symbol smaller than it actually is */
-            PWarning (GetSymPos (S), 1, "Symbol `%m%p' is %s but exported %s",
-                      GetSymName (S), AddrSizeToStr (S->AddrSize),
-                      AddrSizeToStr (S->ExportSize));
+            LIWarning (&S->LineInfos, 1, "Symbol `%m%p' is %s but exported %s",
+                       GetSymName (S), AddrSizeToStr (S->AddrSize),
+                       AddrSizeToStr (S->ExportSize));
         }
     }
 

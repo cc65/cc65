@@ -36,12 +36,12 @@
 /* common */
 #include "check.h"
 #include "coll.h"
-#include "filepos.h"
 #include "xmalloc.h"
 
 /* ca65 */
 #include "error.h"
 #include "expr.h"
+#include "lineinfo.h"
 #include "scanner.h"
 #include "ulabel.h"
 
@@ -56,9 +56,9 @@
 /* Struct that describes an unnamed label */
 typedef struct ULabel ULabel;
 struct ULabel {
-    FilePos 	Pos;   			/* Position of the label in the source */
-    ExprNode*	Val;          	       	/* The label value - may be NULL */
-    unsigned    Ref;                    /* Number of references */
+    Collection  LineInfos;      /* Position of the label in the source */
+    ExprNode*	Val;          	/* The label value - may be NULL */
+    unsigned    Ref;            /* Number of references */
 };
 
 /* List management */
@@ -82,9 +82,10 @@ static ULabel* NewULabel (ExprNode* Val)
     ULabel* L = xmalloc (sizeof (ULabel));
 
     /* Initialize the fields */
-    L->Pos = CurTok.Pos;
-    L->Val = Val;
-    L->Ref = 0;
+    L->LineInfos = EmptyCollection;
+    GetFullLineInfo (&L->LineInfos);
+    L->Val       = Val;
+    L->Ref       = 0;
 
     /* Insert the label into the collection */
     CollAppend (&ULabList, L);
@@ -160,7 +161,8 @@ void ULabDef (void)
 	ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
 	CHECK (L->Val == 0);
 	L->Val = GenCurrentPC ();
-	L->Pos = CurTok.Pos;
+        CollDeleteAll (&L->LineInfos);
+        GetFullLineInfo (&L->LineInfos);
     } else {
 	/* There is no such label, create it */
        	NewULabel (GenCurrentPC ());
@@ -204,7 +206,7 @@ void ULabCheck (void)
     unsigned I = ULabDefCount;
     while (I < CollCount (&ULabList)) {
 	ULabel* L = CollAtUnchecked (&ULabList, I);
-	PError (&L->Pos, "Undefined label");
+       	LIError (&L->LineInfos, "Undefined label");
 	++I;
     }
 
@@ -214,10 +216,11 @@ void ULabCheck (void)
     for (I = 0; I < CollCount (&ULabList); ++I) {
         ULabel* L = CollAtUnchecked (&ULabList, I);
         if (L->Ref == 0) {
-            PWarning (&L->Pos, 1, "No reference to unnamed label");
+            LIWarning (&L->LineInfos, 1, "No reference to unnamed label");
         }
     }
 }
+
 
 
 

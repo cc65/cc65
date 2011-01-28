@@ -162,13 +162,17 @@ following functions (and a few others):
 
 <sect>Other hints<p>
 
-<!--<sect1>Passing arguments to the program<p>
+<sect1>Function keys<p>
+
+These are defined to be FUNCT + number key.
+
+<sect1>Passing arguments to the program<p>
 
 Command line arguments can be passed to <tt/main()/. Since this is not
 supported by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
-    CALL#500:REM,ARG1," ARG2", ARG 3,, ARG5, ...
+    CALL#500:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5
 </verb></tscreen>
 
 <enum>
@@ -179,7 +183,7 @@ supported by BASIC, the following syntax was chosen:
 <item>The first argument passed to <tt/main/ is the program name.
 <item>A maximum number of 10 arguments (including the program name) are
       supported.
-</enum>-->
+</enum>
 
 
 <sect1>Interrupts<p>

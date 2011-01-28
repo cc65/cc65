@@ -78,13 +78,10 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 
 	    /* Print it */
             fprintf (F,
-                     "line\tfile=%u,line=%lu,segment=%u,range=0x%06lX-0x%06lX",
+                     "line\tfile=%u,line=%lu,segment=%u,range=0x%06lX-0x%06lX\n",
                      LI->File->Id, GetSourceLine (LI), R->Seg->Id,
                      R->Offs, R->Offs + R->Size - 1);
 	}
-
-	/* Terminate the line */
-	fprintf (F, "\n");
     }
 }
 

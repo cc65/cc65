@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,7 +40,8 @@
 
 #include <stdio.h>
 
-#include "../common/objdefs.h"
+/* common */
+#include "objdefs.h"
 
 
 
@@ -66,7 +67,7 @@ void ObjExtract (const char* Name);
 
 /* End of objfile.h */
 
-#endif
+#endif    
 
 
 

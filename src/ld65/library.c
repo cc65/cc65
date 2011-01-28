@@ -197,6 +197,9 @@ static ObjData* ReadIndexEntry (Library* L)
     /* Create a new entry and insert it into the list */
     ObjData* O	= NewObjData ();
 
+    /* Remember from which library this module is */
+    O->LibName = L->Name;
+
     /* Module name */
     O->Name = ReadStr (L->F);
 
@@ -206,19 +209,35 @@ static ObjData* ReadIndexEntry (Library* L)
     O->Start	= Read32 (L->F);
     Read32 (L->F);			/* Skip Size */
 
-    /* Read the string pool */
-    ObjReadStrPool (L->F, FileGetPos (L->F), O);
-
-    /* Skip the import size, then read the imports */
-    (void) ReadVar (L->F);
-    ObjReadImports (L->F, FileGetPos (L->F), O);
-
-    /* Skip the export size, then read the exports */
-    (void) ReadVar (L->F);
-    ObjReadExports (L->F, FileGetPos (L->F), O);
-
     /* Done */
     return O;
+}
+
+
+
+static void ReadBasicData (Library* L, ObjData* O)
+/* Read basic data for an object file that is necessary to resolve external
+ * references.
+ */
+{
+    /* Seek to the start of the object file and read the header */
+    LibSeek (L, O->Start);
+    LibReadObjHeader (L, O);
+
+    /* Read the string pool */
+    ObjReadStrPool (L->F, O->Start + O->Header.StrPoolOffs, O);
+
+    /* Read the files list */
+    ObjReadFiles (L->F, O->Start + O->Header.FileOffs, O);
+
+    /* Read the line infos */
+    ObjReadLineInfos (L->F, O->Start + O->Header.LineInfoOffs, O);
+
+    /* Read the imports */
+    ObjReadImports (L->F, O->Start + O->Header.ImportOffs, O);
+
+    /* Read the exports */
+    ObjReadExports (L->F, O->Start + O->Header.ExportOffs, O);
 }
 
 
@@ -226,7 +245,7 @@ static ObjData* ReadIndexEntry (Library* L)
 static void LibReadIndex (Library* L)
 /* Read the index of a library file */
 {
-    unsigned ModuleCount;
+    unsigned ModuleCount, I;
 
     /* Seek to the start of the index */
     LibSeek (L, L->Header.IndexOffs);
@@ -238,6 +257,13 @@ static void LibReadIndex (Library* L)
     /* Read all entries in the index */
     while (ModuleCount--) {
        	CollAppend (&L->Modules, ReadIndexEntry (L));
+    }
+
+    /* Walk over the index and read basic data for all object files in the
+     * library.
+     */
+    for (I = 0; I < CollCount (&L->Modules); ++I) {
+        ReadBasicData (L, CollAtUnchecked (&L->Modules, I));
     }
 }
 
@@ -349,18 +375,8 @@ static void LibResolve (void)
             /* Is this object file referenced? */
             if (O->Flags & OBJ_REF) {
 
-                /* Seek to the start of the object file and read the header */
-                LibSeek (L, O->Start);
-                LibReadObjHeader (L, O);
-
-                /* Seek to the start of the files list and read the files list */
-                ObjReadFiles (L->F, O->Start + O->Header.FileOffs, O);
-
                 /* Seek to the start of the debug info and read the debug info */
                 ObjReadDbgSyms (L->F, O->Start + O->Header.DbgSymOffs, O);
-
-                /* Seek to the start of the line infos and read them */
-                ObjReadLineInfos (L->F, O->Start + O->Header.LineInfoOffs, O);
 
                 /* Read the assertions from the object file */
                 ObjReadAssertions (L->F, O->Start + O->Header.AssertOffs, O);
@@ -373,9 +389,6 @@ static void LibResolve (void)
                  * stuff.
                  */
                 ObjReadSections (L->F, O->Start + O->Header.SegOffs, O);
-
-                /* Remember from which library this module is */
-                O->LibName = L->Name;
 
                 /* All references to strings are now resolved, so we can delete
                  * the module string pool.

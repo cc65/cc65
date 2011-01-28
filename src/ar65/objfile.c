@@ -1,15 +1,15 @@
 /*****************************************************************************/
-/*									     */
-/*				   objfile.c				     */
-/*									     */
+/*		  							     */
+/*		  		   objfile.c				     */
+/*		  							     */
 /*		  Object file handling for the ar65 archiver		     */
-/*									     */
-/*									     */
-/*									     */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/*		  							     */
+/*		  							     */
+/*		  							     */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -46,6 +46,7 @@
 #include <sys/stat.h>
 
 /* common */
+#include "fname.h"
 #include "xmalloc.h"
 
 /* ar65 */
@@ -67,17 +68,14 @@ static const char* GetModule (const char* Name)
 /* Get a module name from the file name */
 {
     /* Make a module name from the file name */
-    const char* Module = Name + strlen (Name);
-    while (Module > Name) {
-	--Module;
-	if (*Module == '/' || *Module == '\\') {
-	    ++Module;
-	    break;
-	}
-    }
+    const char* Module = FindName (Name);
+
+    /* Must not end with a path separator */
     if (*Module == 0) {
 	Error ("Cannot make module name from `%s'", Name);
     }
+
+    /* Done */
     return Module;
 }
 
@@ -164,9 +162,9 @@ void ObjAdd (const char* Name)
 	Error ("Could not open `%s': %s", Name, strerror (errno));
     }
 
-    /* Get the modification time of the object file. There a race condition 
+    /* Get the modification time of the object file. There a race condition
      * here, since we cannot use fileno() (non standard identifier in standard
-     * header file), and therefore not fstat. When using stat with the    
+     * header file), and therefore not fstat. When using stat with the
      * file name, there's a risk that the file was deleted and recreated
      * while it was open. Since mtime and size are only used to check
      * if a file has changed in the debugger, we will ignore this problem

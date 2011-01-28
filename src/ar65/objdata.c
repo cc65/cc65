@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,11 +51,8 @@
 
 
 
-/* Object data list management */
-unsigned    	ObjCount = 0;	/* Count of object files in the list */
-ObjData*    	ObjRoot  = 0;	/* List of object files */
-ObjData*    	ObjLast  = 0;	/* Last entry in list */
-ObjData**      	ObjPool  = 0;	/* Object files as array */
+/* Collection with object files */
+Collection       ObjPool        = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -72,9 +69,7 @@ ObjData* NewObjData (void)
     ObjData* O = xmalloc (sizeof (ObjData));
 
     /* Initialize the data */
-    O->Next        = 0;
     O->Name  	   = 0;
-    O->Index	   = ~0;
     O->Flags   	   = 0;
     O->MTime 	   = 0;
     O->Start	   = 0;
@@ -86,17 +81,8 @@ ObjData* NewObjData (void)
     O->ExportSize  = 0;
     O->Exports     = 0;
 
-    /* Link it into the list */
-    if (ObjLast) {
-	ObjLast->Next = O;
-	ObjLast       = O;
-    } else {
-	/* First entry */
-	ObjRoot = ObjLast = O;
-    }
-
-    /* One object file more now */
-    ++ObjCount;
+    /* Add it to the list */
+    CollAppend (&ObjPool, O);
 
     /* Return the new entry */
     return O;
@@ -126,13 +112,18 @@ ObjData* FindObjData (const char* Module)
  * module is not in the list.
  */
 {
+    unsigned I;
+
     /* Hmm. Maybe we should hash the module names? */
-    ObjData* O = ObjRoot;
-    while (O) {
+    for (I = 0; I < CollCount (&ObjPool); ++I) {
+
+        /* Get this object file */
+        ObjData* O = CollAtUnchecked (&ObjPool, I);
+
+        /* Did we find it? */
      	if (strcmp (O->Name, Module) == 0) {
      	    return O;
      	}
-	O = O->Next;
     }
     return 0;
 }
@@ -142,75 +133,26 @@ ObjData* FindObjData (const char* Module)
 void DelObjData (const char* Module)
 /* Delete the object module from the list */
 {
-    ObjData* O = ObjRoot;
-    ObjData* Last = 0;
-    while (O) {
-	if (strcmp (O->Name, Module) == 0) {
-	    /* Found the module, remove it from the list */
-	    if (Last == 0) {
-	       	/* This was the first entry in the list */
-	       	ObjRoot = O->Next;
-	    } else {
-	       	Last->Next = O->Next;
-	    }
-	    if (ObjLast == O) {
-	       	/* O was the last object in the list */
-	       	ObjLast = Last;
-	    }
-	    --ObjCount;
+    unsigned I;
+    for (I = 0; I < CollCount (&ObjPool); ++I) {
+
+        /* Get this object file */
+        ObjData* O = CollAtUnchecked (&ObjPool, I);
+
+        /* Did we find it? */
+     	if (strcmp (O->Name, Module) == 0) {
 
 	    /* Free the entry */
+            CollDelete (&ObjPool, I);
 	    FreeObjData (O);
 
 	    /* Done */
 	    return;
-	}
-	Last = O;
-	O = O->Next;
+     	}
     }
 
     /* Not found! */
     Warning ("Module `%s' not found in library", Module);
-}
-
-
-
-void MakeObjPool (void)
-/* Allocate memory, index the entries and make the ObjPool valid */
-{
-    ObjData* O;
-    unsigned Index;
-
-    /* Allocate memory for the pool */
-    ObjPool = xmalloc (ObjCount * sizeof (ObjData*));
-
-    /* Setup the pointers and index the objects */
-    Index = 0;
-    O = ObjRoot;
-    while (O) {
-
-	/* Safety */
-	CHECK (Index < ObjCount);
-
-	/* Set the Index */
-	O->Index = Index;
-
-	/* Set the pool pointer */
-	ObjPool [Index] = O;
-
-     	/* Next object */
-     	++Index;
-     	O = O->Next;
-    }
-}
-
-
-
-const char* GetObjName (unsigned Index)
-/* Get the name of a module by index */
-{
-    PRECONDITION (ObjPool != 0 && Index < ObjCount && ObjPool [Index] != 0);
-    return ObjPool [Index]->Name;
 }
 
 
@@ -220,7 +162,7 @@ const char* GetObjString (const ObjData* O, unsigned Index)
 {
     if (Index >= O->StringCount) {
         Error ("Invalid string index (%u) in module `%s'",
-               Index, GetObjName (O->Index));
+               Index, O->Name);
     }
     return O->Strings[Index];
 }

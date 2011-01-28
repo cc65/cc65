@@ -38,9 +38,7 @@
 #include <errno.h>
 
 /* common */
-#include "bitops.h"
 #include "exprdefs.h"
-#include "filepos.h"
 #include "libdefs.h"
 #include "print.h"
 #include "symdefs.h"
@@ -179,7 +177,7 @@ static void WriteHeader (void)
 
 
 
-static void WriteIndexEntry (ObjData* O)
+static void WriteIndexEntry (const ObjData* O)
 /* Write one index entry */
 {
     unsigned I;
@@ -211,7 +209,7 @@ static void WriteIndexEntry (ObjData* O)
 static void WriteIndex (void)
 /* Write the index of a library file */
 {
-    ObjData* O;
+    unsigned I;
 
     /* Sync I/O in case the last operation was a read */
     fseek (NewLib, 0, SEEK_CUR);
@@ -220,13 +218,11 @@ static void WriteIndex (void)
     Header.IndexOffs = ftell (NewLib);
 
     /* Write the object file count */
-    WriteVar (NewLib, ObjCount);
+    WriteVar (NewLib, CollCount (&ObjPool));
 
     /* Write the object files */
-    O = ObjRoot;
-    while (O) {
-	WriteIndexEntry (O);
-       	O = O->Next;
+    for (I = 0; I < CollCount (&ObjPool); ++I) {
+	WriteIndexEntry (CollConstAt (&ObjPool, I));
     }
 }
 
@@ -438,7 +434,7 @@ static void LibCheckExports (ObjData* O)
 
       	/* Insert the name into the hash table */
 	Print (stdout, 1, "  %s\n", Name);
-     	ExpInsert (Name, O->Index);
+     	ExpInsert (Name, O);
     }
 }
 
@@ -456,17 +452,14 @@ void LibClose (void)
 	unsigned char Buf [4096];
 	size_t Count;
 
-	/* Index the object files and make an array containing the objects */
-	MakeObjPool ();
-
         /* Walk through the object file list, inserting exports into the
-	 * export list checking for duplicates. Copy any data that is still
-	 * in the old library into the new one.
-	 */
-	for (I = 0; I < ObjCount; ++I) {
+     	 * export list checking for duplicates. Copy any data that is still
+     	 * in the old library into the new one.
+     	 */
+	for (I = 0; I < CollCount (&ObjPool); ++I) {
 
 	    /* Get a pointer to the object */
-	    ObjData* O = ObjPool [I];
+	    ObjData* O = CollAt (&ObjPool, I);
 
 	    /* Check exports, make global export table */
 	    LibCheckExports (O);

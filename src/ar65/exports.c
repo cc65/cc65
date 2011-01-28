@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   exports.c				     */
+/*			   	   exports.c				     */
 /*                                                                           */
 /*		Duplicate export checking for the ar65 archiver		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -47,16 +47,16 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*     	      	      		     Data				     */
 /*****************************************************************************/
 
 
 
 /* A hash table entry */
-typedef struct HashEntry HashEntry;   
+typedef struct HashEntry HashEntry;
 struct HashEntry {
-    HashEntry* 		Next;		/* Next in list */
-    unsigned		Module;	       	/* Module index */
+    HashEntry* 	      	Next;		/* Next in list */
+    const ObjData*      Module;	       	/* Pointer to object module */
     char		Name [1];	/* Name of identifier */
 };
 
@@ -67,12 +67,12 @@ static HashEntry*	HashTab [HASHTAB_SIZE];
 
 
 /*****************************************************************************/
-/*     	      	    		     Code  		  		     */
+/*     	      	    		     Code  		  	  	     */
 /*****************************************************************************/
 
 
 
-static HashEntry* NewHashEntry (const char* Name, unsigned Module)
+static HashEntry* NewHashEntry (const char* Name, const ObjData* Module)
 /* Create and return a new hash entry */
 {
     /* Get the length of the name */
@@ -91,7 +91,7 @@ static HashEntry* NewHashEntry (const char* Name, unsigned Module)
 
 
 
-void ExpInsert (const char* Name, unsigned Module)
+void ExpInsert (const char* Name, const ObjData* Module)
 /* Insert an exported identifier and check if it's already in the list */
 {
     HashEntry* L;
@@ -114,7 +114,7 @@ void ExpInsert (const char* Name, unsigned Module)
 	    /* Duplicate entry */
 	    Warning ("External symbol `%s' in module `%s' is duplicated in "
 	       	     "module `%s'",
-	  	     Name, GetObjName (L->Module), GetObjName (Module));
+	  	     Name, L->Name, Module->Name);
 	}
      	if (L->Next == 0) {
      	    break;
@@ -127,9 +127,9 @@ void ExpInsert (const char* Name, unsigned Module)
 
 
 
-int ExpFind (const char* Name)
-/* Check for an identifier in the list. Return -1 if not found, otherwise
- * return the number of the module, that exports the identifer.
+const ObjData* ExpFind (const char* Name)
+/* Check for an identifier in the list. Return NULL if not found, otherwise
+ * return a pointer to the module, that exports the identifer.
  */
 {
     /* Get a pointer to the list with the symbols hash value */
@@ -144,7 +144,7 @@ int ExpFind (const char* Name)
     }
 
     /* Not found */
-    return -1;
+    return 0;
 }
 
 

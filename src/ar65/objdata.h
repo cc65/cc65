@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "coll.h"
+
+
+
 /*****************************************************************************/
 /*     	      	    		     Data				     */
 /*****************************************************************************/
@@ -52,9 +57,7 @@
 /* Internal structure holding object file data */
 typedef struct ObjData ObjData;
 struct ObjData {
-    ObjData*  	     	Next;		/* Linked list of all objects */
     char*     	     	Name;		/* Module name */
-    unsigned  		Index;		/* Module index */
     unsigned  	     	Flags;
     unsigned long    	MTime;		/* Modifiation time of object file */
     unsigned long	Start;		/* Start offset of data in library */
@@ -69,11 +72,8 @@ struct ObjData {
 
 
 
-/* Object data list management */
-extern unsigned		ObjCount;	/* Count of files in the list */
-extern ObjData*		ObjRoot;	/* List of object files */
-extern ObjData*		ObjLast;	/* Last entry in list */
-extern ObjData**	ObjPool;	/* Object files as array */
+/* Collection with object files */
+extern Collection       ObjPool;
 
 
 
@@ -96,12 +96,6 @@ ObjData* FindObjData (const char* Module);
 
 void DelObjData (const char* Module);
 /* Delete the object module from the list */
-
-void MakeObjPool (void);
-/* Allocate memory, index the entries and make the ObjPool valid */
-
-const char* GetObjName (unsigned Index);
-/* Get the name of a module by index */
 
 const char* GetObjString (const ObjData* O, unsigned Index);
 /* Get a string from the string pool of an object file */

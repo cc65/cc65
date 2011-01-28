@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,10 +36,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* ar65 */
 #include "error.h"
-#include "objdata.h"
 #include "library.h"
 #include "list.h"
+#include "objdata.h"
 
 
 
@@ -52,7 +53,8 @@
 void ListObjFiles (int argc, char* argv [])
 /* List modules in a library */
 {
-    ObjData* O;
+    unsigned I;
+    const ObjData* O;
 
     /* Check the argument count */
     if (argc <= 0) {
@@ -66,10 +68,14 @@ void ListObjFiles (int argc, char* argv [])
     LibOpen (argv [0], 1, 0);
 
     /* List the modules */
-    O = ObjRoot;
-    while (O) {
+    for (I = 0; I < CollCount (&ObjPool); ++I) {
+
+        /* Get the entry */
+        O = CollConstAt (&ObjPool, I);
+
+        /* Print the name */
 	printf ("%s\n", O->Name);
-	O = O->Next;
+
     }
 
     /* Create a new library file and close the old one */

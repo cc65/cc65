@@ -10,7 +10,7 @@
 	.include "fd.inc"
 
 	.export	_open
-        .destructor     closeallfiles, 17
+        .destructor     closeallfiles, 5
 
 	.import _close
 	.import	clriocb

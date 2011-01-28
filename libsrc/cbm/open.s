@@ -9,7 +9,7 @@
 
 
         .export         _open
-        .destructor     closeallfiles, 17
+        .destructor     closeallfiles, 5
 
         .import         SETLFS, OPEN, CLOSE
         .import         addysp, popax
@@ -100,7 +100,7 @@ parmok: jsr     popax           ; Get flags
 
 ; Error entry. Sets _errno, clears _oserror, returns -1
 
-seterrno:                    
+seterrno:
         jmp     __directerrno
 
 ; Error entry: Close the file and exit. OS error code is in A on entry

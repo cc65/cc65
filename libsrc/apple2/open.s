@@ -9,7 +9,7 @@
 
         .export 	_open, closedirect, freebuffer
         .export 	__filetype, __auxtype
-        .destructor	closeallfiles, 17
+        .destructor	closeallfiles, 5
 
         .import		pushname, popname
         .import		iobuf_alloc, iobuf_free

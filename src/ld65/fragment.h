@@ -97,7 +97,7 @@ INLINE const char* GetFragmentSourceName (const Fragment* F)
     return GetSourceNameFromList (&F->LineInfos);
 }
 #else
-#  define GetFragmentSourceName(LI)     GetSourceNameFromList (&(F)->LineInfos)
+#  define GetFragmentSourceName(F)      GetSourceNameFromList (&(F)->LineInfos)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -107,7 +107,7 @@ INLINE unsigned long GetFragmentSourceLine (const Fragment* F)
     return GetSourceLineFromList (&F->LineInfos);
 }
 #else
-#  define GetFragmentSourceLine(LI)     GetSourceLineFromList (&(F)->LineInfos)
+#  define GetFragmentSourceLine(F)      GetSourceLineFromList (&(F)->LineInfos)
 #endif
 
 

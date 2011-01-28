@@ -46,7 +46,10 @@
 #include <sys/stat.h>
 
 /* common */
+#include "cddefs.h"
+#include "exprdefs.h"
 #include "fname.h"
+#include "symdefs.h"
 #include "xmalloc.h"
 
 /* ar65 */
@@ -81,7 +84,7 @@ static const char* GetModule (const char* Name)
 
 
 
-void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
+static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 /* Read the header of the object file checking the signature */
 {
     H->Magic	  = Read32 (Obj);
@@ -117,32 +120,106 @@ void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 
 
 
-void ObjWriteHeader (FILE* Obj, ObjHeader* H)
-/* Write the header of the object file */
+static void SkipExpr (FILE* F)
+/* Skip an expression in F */
 {
-    Write32 (Obj, H->Magic);
-    Write16 (Obj, H->Version);
-    Write16 (Obj, H->Flags);
-    Write32 (Obj, H->OptionOffs);
-    Write32 (Obj, H->OptionSize);
-    Write32 (Obj, H->FileOffs);
-    Write32 (Obj, H->FileSize);
-    Write32 (Obj, H->SegOffs);
-    Write32 (Obj, H->SegSize);
-    Write32 (Obj, H->ImportOffs);
-    Write32 (Obj, H->ImportSize);
-    Write32 (Obj, H->ExportOffs);
-    Write32 (Obj, H->ExportSize);
-    Write32 (Obj, H->DbgSymOffs);
-    Write32 (Obj, H->DbgSymSize);
-    Write32 (Obj, H->LineInfoOffs);
-    Write32 (Obj, H->LineInfoSize);
-    Write32 (Obj, H->StrPoolOffs);
-    Write32 (Obj, H->StrPoolSize);
-    Write32 (Obj, H->AssertOffs);
-    Write32 (Obj, H->AssertSize);
-    Write32 (Obj, H->ScopeOffs);
-    Write32 (Obj, H->ScopeSize);
+    /* Get the operation and skip it */
+    unsigned char Op = Read8 (F);
+
+    /* Handle then different expression nodes */
+    switch (Op) {
+
+      	case EXPR_NULL:
+      	    break;
+
+        case EXPR_LITERAL:
+      	    /* 32 bit literal value */
+      	    (void) Read32 (F);
+      	    break;
+
+        case EXPR_SYMBOL:
+      	    /* Variable seized symbol index */
+      	    (void) ReadVar (F);
+      	    break;
+
+        case EXPR_SECTION:
+      	    /* 8 bit segment number */
+      	    (void) Read8 (F);
+      	    break;
+
+        default:
+            /* What's left are unary and binary nodes */
+            SkipExpr (F);   /* Left */
+            SkipExpr (F);   /* right */
+            break;
+    }
+}
+
+
+
+static void SkipLineInfoList (FILE* F)
+/* Skip a list of line infos in F */
+{
+    /* Number of indices preceeds the list */
+    unsigned long Count = ReadVar (F);
+
+    /* Skip indices */
+    while (Count--) {
+        (void) ReadVar (F);
+    }
+}
+
+
+
+void ObjReadData (FILE* F, ObjData* O)
+/* Read object file data from the given file. The function expects the Name
+ * and Start fields to be valid. Header and basic data are read.
+ */
+{
+    unsigned long Count;
+
+    /* Seek to the start of the object file data */
+    fseek (F, O->Start, SEEK_SET);
+
+    /* Read the object file header */
+    ObjReadHeader (F, &O->Header, O->Name);
+
+    /* Read the string pool */
+    fseek (F, O->Start + O->Header.StrPoolOffs, SEEK_SET);
+    Count = ReadVar (F);
+    CollGrow (&O->Strings, Count);
+    while (Count--) {
+        CollAppend (&O->Strings, ReadStr (F));
+    }
+
+    /* Read the exports */
+    fseek (F, O->Start + O->Header.ExportOffs, SEEK_SET);
+    Count = ReadVar (F);
+    CollGrow (&O->Exports, Count);
+    while (Count--) {
+
+        unsigned char ConDes[CD_TYPE_COUNT];
+
+        /* Skip data until we get to the name */
+        unsigned Type = ReadVar (F);
+        (void) Read8 (F);       /* AddrSize */
+        ReadData (F, ConDes, SYM_GET_CONDES_COUNT (Type));
+
+        /* Now this is what we actually need: The name of the export */
+        CollAppend (&O->Exports, CollAt (&O->Strings, ReadVar (F)));
+
+        /* Skip the export value */
+        if (SYM_IS_EXPR (Type)) {
+            /* Expression tree */
+            SkipExpr (F);
+        } else {
+            /* Literal value */
+            (void) Read32 (F);
+        }
+
+        /* Line info indices */
+        SkipLineInfoList (F);
+    }
 }
 
 
@@ -154,7 +231,6 @@ void ObjAdd (const char* Name)
     const char* Module;
     ObjHeader H;
     ObjData* O;
-    unsigned I;
 
     /* Open the object file */
     FILE* Obj = fopen (Name, "rb");
@@ -192,65 +268,29 @@ void ObjAdd (const char* Name)
 	if (difftime ((time_t)O->MTime, StatBuf.st_mtime) > 0.0) {
 	    Warning ("Replacing module `%s' by older version", O->Name);
 	}
+
+        /* Free data */
+        ClearObjData (O);
     }
 
     /* Initialize the object module data structure */
-    O->Name   	  = xstrdup (Module);
-    O->Flags  	  = OBJ_HAVEDATA;
-    O->MTime  	  = StatBuf.st_mtime;
-    O->ImportSize = H.ImportSize;
-    O->Imports	  = xmalloc (O->ImportSize);
-    O->ExportSize = H.ExportSize;
-    O->Exports	  = xmalloc (O->ExportSize);
+    O->Name     = xstrdup (Module);
+    O->Flags  	= OBJ_HAVEDATA;
+    O->MTime  	= StatBuf.st_mtime;
+    O->Start    = 0;
 
-    /* Read imports and exports */
-    fseek (Obj, H.ImportOffs, SEEK_SET);
-    ReadData (Obj, O->Imports, O->ImportSize);
-    fseek (Obj, H.ExportOffs, SEEK_SET);
-    ReadData (Obj, O->Exports, O->ExportSize);
+    /* Determine the file size. Note: Race condition here */
+    fseek (Obj, 0, SEEK_END);
+    O->Size     = ftell (Obj);
 
-    /* Read the string pool */
-    fseek (Obj, H.StrPoolOffs, SEEK_SET);
-    O->StringCount = ReadVar (Obj);
-    O->Strings     = xmalloc (O->StringCount * sizeof (char*));
-    for (I = 0; I < O->StringCount; ++I) {
-        O->Strings[I] = ReadStr (Obj);
-    }
+    /* Read the basic data from the object file */
+    ObjReadData (Obj, O);
 
-    /* Skip the object file header */
-    O->Start = ftell (NewLib);
-    fseek (NewLib, OBJ_HDR_SIZE, SEEK_CUR);
-
-    /* Copy the remaining sections */
-    fseek (Obj, H.DbgSymOffs, SEEK_SET);
-    H.DbgSymOffs = LibCopyTo (Obj, H.DbgSymSize) - O->Start;
-    fseek (Obj, H.OptionOffs, SEEK_SET);
-    H.OptionOffs = LibCopyTo (Obj, H.OptionSize) - O->Start;
-    fseek (Obj, H.SegOffs, SEEK_SET);
-    H.SegOffs = LibCopyTo (Obj, H.SegSize) - O->Start;
-    fseek (Obj, H.FileOffs, SEEK_SET);
-    H.FileOffs = LibCopyTo (Obj, H.FileSize) - O->Start;
-    fseek (Obj, H.LineInfoOffs, SEEK_SET);
-    H.LineInfoOffs = LibCopyTo (Obj, H.LineInfoSize) - O->Start;
-    fseek (Obj, H.AssertOffs, SEEK_SET);
-    H.AssertOffs = LibCopyTo (Obj, H.AssertSize) - O->Start;
-    fseek (Obj, H.ScopeOffs, SEEK_SET);
-    H.ScopeOffs = LibCopyTo (Obj, H.ScopeSize) - O->Start;
-
-    /* Calculate the amount of data written */
-    O->Size = ftell (NewLib) - O->Start;
-
-    /* Clear the remaining header fields */
-    H.ImportOffs  = H.ImportSize  = 0;
-    H.ExportOffs  = H.ExportSize  = 0;
-    H.StrPoolOffs = H.StrPoolSize = 0;
-
-    /* Seek back and write the updated header */
-    fseek (NewLib, O->Start, SEEK_SET);
-    ObjWriteHeader (NewLib, &H);
-
-    /* Now seek again to end of file */
-    fseek (NewLib, 0, SEEK_END);
+    /* Copy the complete object data to the library file and update the
+     * starting offset
+     */
+    fseek (Obj, 0, SEEK_SET);
+    O->Start    = LibCopyTo (Obj, O->Size);
 
     /* Done, close the file (we read it only, so no error check) */
     fclose (Obj);
@@ -261,20 +301,14 @@ void ObjAdd (const char* Name)
 void ObjExtract (const char* Name)
 /* Extract a module from the library */
 {
-    unsigned long ImportStart;
-    unsigned long ExportStart;
-    unsigned long StrPoolStart;
-    unsigned long StrPoolSize;
     struct utimbuf U;
-    ObjHeader H;
     FILE* Obj;
-    unsigned I;
 
     /* Make a module name from the file name */
     const char* Module = GetModule (Name);
 
     /* Try to find the module in the library */
-    ObjData* O = FindObjData (Module);
+    const ObjData* O = FindObjData (Module);
 
     /* Bail out if the module does not exist */
     if (O == 0) {
@@ -287,38 +321,10 @@ void ObjExtract (const char* Name)
     	Error ("Cannot open target file `%s': %s", Name, strerror (errno));
     }
 
-    /* Copy anything to the new file that has no special handling */
+    /* Copy the complete object file data from the library to the new object
+     * file.
+     */
     LibCopyFrom (O->Start, O->Size, Obj);
-
-    /* Write imports and exports */
-    ImportStart = ftell (Obj);
-    WriteData (Obj, O->Imports, O->ImportSize);
-    ExportStart = ftell (Obj);
-    WriteData (Obj, O->Exports, O->ExportSize);
-
-    /* Write the string pool */
-    StrPoolStart = ftell (Obj);
-    WriteVar (Obj, O->StringCount);
-    for (I = 0; I < O->StringCount; ++I) {
-        WriteStr (Obj, O->Strings[I]);
-    }
-    StrPoolSize = ftell (Obj) - StrPoolStart;
-
-    /* Seek back and read the header */
-    fseek (Obj, 0, SEEK_SET);
-    ObjReadHeader (Obj, &H, Name);
-
-    /* Update the header fields */
-    H.ImportOffs  = ImportStart;
-    H.ImportSize  = O->ImportSize;
-    H.ExportOffs  = ExportStart;
-    H.ExportSize  = O->ExportSize;
-    H.StrPoolOffs = StrPoolStart;
-    H.StrPoolSize = StrPoolSize;
-
-    /* Write the changed header */
-    fseek (Obj, 0, SEEK_SET);
-    ObjWriteHeader (Obj, &H);
 
     /* Close the file */
     if (fclose (Obj) != 0) {

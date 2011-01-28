@@ -46,11 +46,12 @@
 
 /* ar65 */
 #include "error.h"
-#include "global.h"
-#include "fileio.h"
-#include "objdata.h"
 #include "exports.h"
+#include "fileio.h"
+#include "global.h"
 #include "library.h"
+#include "objdata.h"
+#include "objfile.h"
 
 
 
@@ -61,8 +62,8 @@
 
 
 /* File descriptor for the library file */
-FILE*			NewLib = 0;
-static FILE* 		Lib = 0;
+FILE*	       		NewLib = 0;
+static FILE*   		Lib = 0;
 static const char*	LibName = 0;
 
 /* The library header */
@@ -105,34 +106,15 @@ static void ReadHeader (void)
 static void ReadIndexEntry (void)
 /* Read one entry in the index */
 {
-    unsigned I;
-
     /* Create a new entry and insert it into the list */
     ObjData* O 	= NewObjData ();
 
     /* Module name/flags/MTime/Start/Size */
-    O->Name    	= ReadStr (Lib);
-    O->Flags   	= Read16 (Lib);
+    O->Name     = ReadStr (Lib);
+    O->Flags    = Read16 (Lib);
     O->MTime    = Read32 (Lib);
     O->Start    = Read32 (Lib);
     O->Size     = Read32 (Lib);
-
-    /* Strings */
-    O->StringCount = ReadVar (Lib);
-    O->Strings     = xmalloc (O->StringCount * sizeof (char*));
-    for (I = 0; I < O->StringCount; ++I) {
-        O->Strings[I] = ReadStr (Lib);
-    }
-
-    /* Imports */
-    O->ImportSize = ReadVar (Lib);
-    O->Imports    = xmalloc (O->ImportSize);
-    ReadData (Lib, O->Imports, O->ImportSize);
-
-    /* Exports */
-    O->ExportSize = ReadVar (Lib);
-    O->Exports    = xmalloc (O->ExportSize);
-    ReadData (Lib, O->Exports, O->ExportSize);
 }
 
 
@@ -140,7 +122,7 @@ static void ReadIndexEntry (void)
 static void ReadIndex (void)
 /* Read the index of a library file */
 {
-    unsigned Count;
+    unsigned Count, I;
 
     /* Seek to the start of the index */
     fseek (Lib, Header.IndexOffs, SEEK_SET);
@@ -150,14 +132,24 @@ static void ReadIndex (void)
 
     /* Read all entries in the index */
     while (Count--) {
-	ReadIndexEntry ();
+    	ReadIndexEntry ();
+    }
+
+    /* Read basic object file data from the actual entries */
+    for (I = 0; I < CollCount (&ObjPool); ++I) {
+
+        /* Get the object file entry */
+        ObjData* O = CollAtUnchecked (&ObjPool, I);
+
+        /* Read data */
+        ObjReadData (Lib, O);
     }
 }
 
 
 
 /*****************************************************************************/
-/*			 Writing file data structures			     */
+/*     	   		 Writing file data structures			     */
 /*****************************************************************************/
 
 
@@ -180,28 +172,12 @@ static void WriteHeader (void)
 static void WriteIndexEntry (const ObjData* O)
 /* Write one index entry */
 {
-    unsigned I;
-
     /* Module name/flags/MTime/start/size */
     WriteStr (NewLib, O->Name);
     Write16  (NewLib, O->Flags & ~OBJ_HAVEDATA);
     Write32  (NewLib, O->MTime);
     Write32  (NewLib, O->Start);
     Write32  (NewLib, O->Size);
-
-    /* Strings */
-    WriteVar (NewLib, O->StringCount);
-    for (I = 0; I < O->StringCount; ++I) {
-        WriteStr (NewLib, O->Strings[I]);
-    }
-
-    /* Imports */
-    WriteVar (NewLib, O->ImportSize);
-    WriteData (NewLib, O->Imports, O->ImportSize);
-
-    /* Exports */
-    WriteVar (NewLib, O->ExportSize);
-    WriteData (NewLib, O->Exports, O->ExportSize);
 }
 
 
@@ -229,7 +205,7 @@ static void WriteIndex (void)
 
 
 /*****************************************************************************/
-/*			       High level stuff				     */
+/*	   		       High level stuff				     */
 /*****************************************************************************/
 
 
@@ -321,116 +297,21 @@ void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F)
 
 
 
-static unsigned long GetVar (unsigned char** Buf)
-/* Get a variable sized value from Buf */
-{
-    unsigned char C;
-    unsigned long V = 0;
-    unsigned Shift = 0;
-    do {
-	/* Read one byte */
-       	C = **Buf;
-	++(*Buf);
-	/* Add this char to the value */
-	V |= ((unsigned long)(C & 0x7F)) << Shift;
-	/* Next value */
-	Shift += 7;
-    } while (C & 0x80);
-
-    /* Return the result */
-    return V;
-}
-
-
-
-static void SkipExpr (unsigned char** Buf)
-/* Skip an expression in Buf */
-{
-    /* Get the operation and skip it */
-    unsigned char Op = **Buf;
-    ++(*Buf);
-
-    /* Filter leaf nodes */
-    switch (Op) {
-
-      	case EXPR_NULL:
-      	    return;
-
-        case EXPR_LITERAL:
-      	    /* 32 bit literal value */
-      	    *Buf += 4;
-      	    return;
-
-        case EXPR_SYMBOL:
-      	    /* Variable seized symbol index */
-      	    (void) GetVar (Buf);
-      	    return;
-
-        case EXPR_SECTION:
-      	    /* 8 bit segment number */
-      	    *Buf += 1;
-      	    return;
-    }
-
-    /* What's left are unary and binary nodes */
-    SkipExpr (Buf);    	       	/* Skip left */
-    SkipExpr (Buf); 	       	/* Skip right */
-}
-
-
-
-static void SkipLineInfoList (unsigned char** Buf)
-/* Skip a list of line infos in Buf */
-{
-    /* Number of indices preceeds the list */
-    unsigned long Count = GetVar (Buf);
-
-    /* Skip indices */
-    while (Count--) {
-        (void) GetVar (Buf);
-    }
-}
-
-
-
 static void LibCheckExports (ObjData* O)
 /* Insert all exports from the given object file into the global list
  * checking for duplicates.
  */
 {
-    /* Get a pointer to the buffer */
-    unsigned char* Exports = O->Exports;
+    unsigned I;
 
-    /* Get the export count */
-    unsigned Count = GetVar (&Exports);
+    /* Let the user know what we do */
+    Print (stdout, 1, "Module `%s' (%u exports):\n", O->Name, CollCount (&O->Exports));
 
-    /* Read the exports */
-    Print (stdout, 1, "Module `%s' (%u exports):\n", O->Name, Count);
-    while (Count--) {
+    /* Insert the exports into the global table */
+    for (I = 0; I < CollCount (&O->Exports); ++I) {
 
-	const char*     Name;
-
-      	/* Get the export tag and skip the address size */
-       	unsigned Type = GetVar (&Exports);
-        ++Exports;
-
-	/* condes decls may follow */
-	Exports += SYM_GET_CONDES_COUNT (Type);
-
-       	/* Next thing is index of name of symbol */
-        Name = GetObjString (O, GetVar (&Exports));
-
-     	/* Skip value of symbol */
-     	if (SYM_IS_EXPR (Type)) {
-     	    /* Expression tree */
-     	    SkipExpr (&Exports);
-     	} else {
-     	    /* Constant 32 bit value */
-     	    Exports += 4;
-     	}
-
-     	/* Skip the line info */
-       	SkipLineInfoList (&Exports);
+        /* Get the name of the export */
+	const char* Name = CollConstAt (&O->Exports, I);
 
       	/* Insert the name into the hash table */
 	Print (stdout, 1, "  %s\n", Name);
@@ -458,8 +339,8 @@ void LibClose (void)
      	 */
 	for (I = 0; I < CollCount (&ObjPool); ++I) {
 
-	    /* Get a pointer to the object */
-	    ObjData* O = CollAt (&ObjPool, I);
+       	    /* Get a pointer to the object */
+	    ObjData* O = CollAtUnchecked (&ObjPool, I);
 
 	    /* Check exports, make global export table */
 	    LibCheckExports (O);
@@ -507,7 +388,7 @@ void LibClose (void)
     }
     if (NewLib && fclose (NewLib) != 0) {
      	Error ("Problem closing temporary library file: %s", strerror (errno));
-    }
+    }                                      
 }
 
 

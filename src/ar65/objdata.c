@@ -70,16 +70,14 @@ ObjData* NewObjData (void)
 
     /* Initialize the data */
     O->Name  	   = 0;
+
     O->Flags   	   = 0;
     O->MTime 	   = 0;
     O->Start	   = 0;
     O->Size 	   = 0;
-    O->StringCount = 0;
-    O->Strings     = 0;
-    O->ImportSize  = 0;
-    O->Imports     = 0;
-    O->ExportSize  = 0;
-    O->Exports     = 0;
+
+    O->Strings     = EmptyCollection;
+    O->Exports     = EmptyCollection;
 
     /* Add it to the list */
     CollAppend (&ObjPool, O);
@@ -96,13 +94,27 @@ void FreeObjData (ObjData* O)
     unsigned I;
 
     xfree (O->Name);
-    xfree (O->Imports);
-    xfree (O->Exports);
-    for (I = 0; I < O->StringCount; ++I) {
-        xfree (O->Strings[I]);
+    for (I = 0; I < CollCount (&O->Strings); ++I) {
+        xfree (CollAt (&O->Strings, I));
     }
-    xfree (O->Strings);
+    DoneCollection (&O->Strings);
+    DoneCollection (&O->Exports);
     xfree (O);
+}
+
+
+
+void ClearObjData (ObjData* O)
+/* Remove any data stored in O */
+{
+    unsigned I;                
+    xfree (O->Name);
+    O->Name = 0;
+    for (I = 0; I < CollCount (&O->Strings); ++I) {
+        xfree (CollAt (&O->Strings, I));
+    }
+    CollDeleteAll (&O->Strings);
+    CollDeleteAll (&O->Exports);
 }
 
 
@@ -153,18 +165,6 @@ void DelObjData (const char* Module)
 
     /* Not found! */
     Warning ("Module `%s' not found in library", Module);
-}
-
-
-
-const char* GetObjString (const ObjData* O, unsigned Index)
-/* Get a string from the string pool of an object file */
-{
-    if (Index >= O->StringCount) {
-        Error ("Invalid string index (%u) in module `%s'",
-               Index, O->Name);
-    }
-    return O->Strings[Index];
 }
 
 

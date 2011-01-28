@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -46,7 +46,7 @@
 
 /* Defines for magic and version */
 #define LIB_MAGIC	0x7A55616E
-#define LIB_VERSION	0x000C
+#define LIB_VERSION	0x000D
 
 /* Size of an library file header */
 #define	LIB_HDR_SIZE  	12

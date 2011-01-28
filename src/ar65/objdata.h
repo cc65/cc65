@@ -40,45 +40,48 @@
 
 /* common */
 #include "coll.h"
+#include "objdefs.h"
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*     	      	       		     Data				     */
 /*****************************************************************************/
 
 
 
 /* Values for the Flags field */
-#define	OBJ_HAVEDATA	0x0001		/* The object data is in the tmp file */
-#define OBJ_MARKED	0x0002		/* Generic marker bit */
+#define	OBJ_HAVEDATA   	0x0001		/* The object data is in the tmp file */
 
 
 /* Internal structure holding object file data */
 typedef struct ObjData ObjData;
 struct ObjData {
     char*     	     	Name;		/* Module name */
+
+    /* Index entry */
     unsigned  	     	Flags;
     unsigned long    	MTime;		/* Modifiation time of object file */
-    unsigned long	Start;		/* Start offset of data in library */
-    unsigned long	Size;		/* Size of data in library */
-    unsigned            StringCount;    /* Number of strings */
-    char**              Strings;        /* Strings from the object file */
-    unsigned long      	ImportSize;    	/* Size of imports */
-    void*     	 	Imports;       	/* Imports as raw data */
-    unsigned long	ExportSize;	/* Size of exports */
-    void*     		Exports;       	/* Exports as raw data */
+    unsigned long    	Start;		/* Start offset of data in library */
+    unsigned long    	Size;		/* Size of data in library */
+
+    /* Object file header */
+    ObjHeader           Header;
+
+    /* Basic data needed for simple checks */
+    Collection          Strings;        /* Strings from the object file */
+    Collection          Exports;       	/* Exports list from object file */
 };
 
 
 
-/* Collection with object files */
+/* Collection with all object files */
 extern Collection       ObjPool;
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code		  	   	     */
+/*     	      	    		     Code     		  	   	     */
 /*****************************************************************************/
 
 
@@ -89,6 +92,9 @@ ObjData* NewObjData (void);
 void FreeObjData (ObjData* O);
 /* Free a complete struct */
 
+void ClearObjData (ObjData* O);
+/* Remove any data stored in O */
+
 ObjData* FindObjData (const char* Module);
 /* Search for the module with the given name and return it. Return NULL if the
  * module is not in the list.
@@ -96,9 +102,6 @@ ObjData* FindObjData (const char* Module);
 
 void DelObjData (const char* Module);
 /* Delete the object module from the list */
-
-const char* GetObjString (const ObjData* O, unsigned Index);
-/* Get a string from the string pool of an object file */
 
 
 

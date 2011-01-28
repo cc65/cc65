@@ -40,8 +40,15 @@
 
 #include <stdio.h>
 
-/* common */
-#include "objdefs.h"
+
+
+/*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+struct ObjData;
 
 
 
@@ -51,11 +58,10 @@
 
 
 
-void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name);
-/* Read the header of the object file checking the signature */
-
-void ObjWriteHeader (FILE* Obj, ObjHeader* H);
-/* Write the header of the object file */
+void ObjReadData (FILE* F, struct ObjData* O);
+/* Read object file data from the given file. The function expects the Name
+ * and Start fields to be valid. Header and basic data are read.
+ */
 
 void ObjAdd (const char* Name);
 /* Add an object file to the library */
@@ -67,7 +73,7 @@ void ObjExtract (const char* Name);
 
 /* End of objfile.h */
 
-#endif    
+#endif
 
 
 

@@ -343,7 +343,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     Export* E;
 
     /* Read the type */
-    unsigned char Type = ReadVar (F);
+    unsigned Type = ReadVar (F);
 
     /* Read the address size */
     unsigned char AddrSize = Read8 (F);

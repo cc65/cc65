@@ -59,7 +59,7 @@ Fragment* NewFragment (unsigned char Type, unsigned short Len)
     F->Next 	= 0;
     F->LineList = 0;
     F->LI       = EmptyCollection;
-    GetFullLineInfo (&F->LI);
+    GetFullLineInfo (&F->LI, 1);
     F->Len  	= Len;
     F->Type 	= Type;
 

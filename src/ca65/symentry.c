@@ -87,7 +87,7 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     S->Locals  	  = 0;
     S->Sym.Tab    = 0;
     S->LineInfos  = EmptyCollection;
-    GetFullLineInfo (&S->LineInfos);
+    GetFullLineInfo (&S->LineInfos, 1);
     for (I = 0; I < sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0]); ++I) {
         S->GuessedUse[I] = 0;
     }

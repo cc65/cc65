@@ -37,6 +37,7 @@
 #include "error.h"
 #include "expr.h"
 #include "instr.h"
+#include "lineinfo.h"
 #include "nexttok.h"
 #include "symbol.h"
 #include "symtab.h"
@@ -73,7 +74,7 @@ enum {
 typedef struct IfDesc IfDesc;
 struct IfDesc {
     unsigned   	Flags; 	       	/* Bitmapped flags, see above */
-    FilePos    	Pos;		/* File position of the .IF */
+    Collection  LineInfos;      /* File position of the .IF */
     const char* Name;	      	/* Name of the directive */
 };
 
@@ -97,9 +98,10 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
     ID = &IfStack [IfCount++];
 
     /* Initialize elements */
-    ID->Flags = NeedTerm? ifNeedTerm : ifNone;
-    ID->Pos   = CurTok.Pos;
-    ID->Name  = Directive;
+    ID->Flags     = NeedTerm? ifNeedTerm : ifNone;
+    ID->LineInfos = EmptyCollection;
+    GetFullLineInfo (&ID->LineInfos, 0);
+    ID->Name      = Directive;
 
     /* Return the result */
     return ID;
@@ -218,7 +220,7 @@ void DoConditionals (void)
 	       	    /* Allow an .ELSE */
 	  	    InvertIfCond (D);
 	  	    SetElse (D, 1);
-	  	    D->Pos = CurTok.Pos;
+	  	    GetFullLineInfo (&D->LineInfos, 0);
 	  	    D->Name = ".ELSE";
 	  	    IfCond = GetCurrentIfCond ();
 	  	}
@@ -464,6 +466,8 @@ void CheckOpenIfs (void)
  * open .ifs in this file.
  */
 {
+    const LineInfo* LI;
+
     while (1) {
 	/* Get the current file number and check if the topmost entry on the
 	 * .IF stack was inserted with this file number
@@ -474,13 +478,14 @@ void CheckOpenIfs (void)
 	    break;
 	}
 
-	if (D->Pos.Name != CurTok.Pos.Name) {
+        LI = CollConstAt (&D->LineInfos, 0);
+	if (LI->Pos.Name != CurTok.Pos.Name) {
 	    /* The .if is from another file, bail out */
 	    break;
 	}
 
        	/* Start of .if is in the file we're about to leave */
-	PError (&D->Pos, "Conditional assembly branch was never closed");
+	LIError (&D->LineInfos, "Conditional assembly branch was never closed");
 	FreeIf ();
     }
 }

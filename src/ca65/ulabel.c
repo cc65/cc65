@@ -83,7 +83,7 @@ static ULabel* NewULabel (ExprNode* Val)
 
     /* Initialize the fields */
     L->LineInfos = EmptyCollection;
-    GetFullLineInfo (&L->LineInfos);
+    GetFullLineInfo (&L->LineInfos, 0);
     L->Val       = Val;
     L->Ref       = 0;
 
@@ -161,8 +161,7 @@ void ULabDef (void)
 	ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
 	CHECK (L->Val == 0);
 	L->Val = GenCurrentPC ();
-        CollDeleteAll (&L->LineInfos);
-        GetFullLineInfo (&L->LineInfos);
+        GetFullLineInfo (&L->LineInfos, 0);
     } else {
 	/* There is no such label, create it */
        	NewULabel (GenCurrentPC ());

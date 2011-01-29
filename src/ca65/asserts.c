@@ -84,7 +84,7 @@ static Assertion* NewAssertion (ExprNode* Expr, AssertAction Action, unsigned Ms
     A->Action   = Action;
     A->Msg      = Msg;
     A->LI       = EmptyCollection;
-    GetFullLineInfo (&A->LI);
+    GetFullLineInfo (&A->LI, 1);
 
     /* Return the new struct */
     return A;

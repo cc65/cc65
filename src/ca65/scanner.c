@@ -1103,12 +1103,14 @@ CharAgain:
                 CurTok.Tok = TOK_DIV;
             } else if (CComments) {
                 /* Remember the position, then skip the '*' */
-                FilePos Pos = CurTok.Pos;
+                Collection LineInfos = STATIC_COLLECTION_INITIALIZER;
+                GetFullLineInfo (&LineInfos, 0);
                 NextChar ();
                 do {
                     while (C !=  '*') {
                         if (C == EOF) {
-                            PError (&Pos, "Unterminated comment");
+                            LIError (&LineInfos, "Unterminated comment");
+                            DoneCollection (&LineInfos);
                             goto CharAgain;
                         }
                         NextChar ();
@@ -1116,6 +1118,7 @@ CharAgain:
                     NextChar ();
                 } while (C != '/');
                 NextChar ();
+                DoneCollection (&LineInfos);
                 goto Again;
             }
 	    return;

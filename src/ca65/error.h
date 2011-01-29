@@ -78,9 +78,6 @@ void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format,
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
 
-void PError (const FilePos* Pos, const char* Format, ...) attribute ((format (printf, 2, 3)));
-/* Print an error message giving an explicit file and position. */
-
 void LIError (const Collection* LineInfos, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print an error message using the given line infos. */
 

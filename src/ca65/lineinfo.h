@@ -107,9 +107,10 @@ void GenLineInfo (unsigned Slot, const FilePos* Pos);
 void ClearLineInfo (unsigned Slot);
 /* Clear the line info in the given slot */
 
-void GetFullLineInfo (Collection* LineInfos);
+void GetFullLineInfo (Collection* LineInfos, unsigned IncUsage);
 /* Return full line infos, that is line infos for all slots in LineInfos. The
- * function does also increase the usage counter for all line infos returned.
+ * function will clear LineInfos before usage and will increment the usage
+ * counter by IncUsage for all line infos returned.
  */
 
 LineInfo* UseLineInfo (LineInfo* LI);

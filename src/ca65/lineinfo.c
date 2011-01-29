@@ -94,25 +94,11 @@ static LineInfo* NewLineInfo (unsigned Type, const FilePos* Pos)
     LI->Index   = INV_LINEINFO_INDEX;
     LI->Pos     = *Pos;
 
+    /* Add the line info to the list of all line infos */
+    CollAppend (&LineInfoColl, LI);
+
     /* Return the new struct */
     return LI;
-}
-
-
-
-static void FreeLineInfo (LineInfo* LI)
-/* "Free" line info. If the usage counter is non zero, move it to the
- * collection that contains all line infos, otherwise delete it.
- * The function handles a NULL pointer transparently.
- */
-{
-    if (LI) {
-        if (LI->Usage > 0) {
-            CollAppend (&LineInfoColl, LI);
-        } else {
-            xfree (LI);
-        }
-    }
 }
 
 
@@ -127,6 +113,9 @@ void InitLineInfo (void)
 /* Initialize the line infos */
 {
     static const FilePos DefaultPos = STATIC_FILEPOS_INITIALIZER;
+
+    /* Increase the initial count of the line info collection */
+    CollGrow (&LineInfoColl, 200);
 
     /* Allocate 8 slots */
     AllocatedSlots = 8;
@@ -177,7 +166,7 @@ void FreeLineInfoSlot (unsigned Slot)
     PRECONDITION (Slot == UsedSlots - 1);
 
     /* Free the last entry */
-    FreeLineInfo (CurLineInfo[Slot].Info);
+    CurLineInfo[Slot].Info = 0;
     --UsedSlots;
 }
 
@@ -189,19 +178,10 @@ void GenLineInfo (unsigned Slot, const FilePos* Pos)
     /* Get a pointer to the slot */
     LineInfoSlot* S = CurLineInfo + Slot;
 
-    /* Check if we already have data */
-    if (S->Info) {
-        /* Generate new data only if it is different from the existing. */
-        if (CompareFilePos (&S->Info->Pos, Pos) == 0) {
-            /* Already there */
-            return;
-        }
-
-        /* We have data, but it's not identical. If it is in use, copy it to
-         * line info collection, otherwise delete it.
-         */
-        FreeLineInfo (S->Info);
-
+    /* Generate new data only if it is different from the existing. */
+    if (S->Info && CompareFilePos (&S->Info->Pos, Pos) == 0) {
+        /* Already there */
+        return;
     }
 
     /* Allocate new data */
@@ -213,33 +193,33 @@ void GenLineInfo (unsigned Slot, const FilePos* Pos)
 void ClearLineInfo (unsigned Slot)
 /* Clear the line info in the given slot */
 {
-    /* Get a pointer to the slot */
-    LineInfoSlot* S = CurLineInfo + Slot;
-
-    /* Free the struct and zero the pointer */
-    FreeLineInfo (S->Info);
-    S->Info = 0;
+    /* Zero the pointer */
+    CurLineInfo[Slot].Info = 0;
 }
 
 
 
-void GetFullLineInfo (Collection* LineInfos)
+void GetFullLineInfo (Collection* LineInfos, unsigned IncUsage)
 /* Return full line infos, that is line infos for all slots in LineInfos. The
- * function does also increase the usage counter for all line infos returned.
+ * function will clear LineInfos before usage and will increment the usage
+ * counter by IncUsage for all line infos returned.
  */
 {
-   unsigned I;
+    unsigned I;
+
+    /* Clear the collection */
+    CollDeleteAll (LineInfos);
 
     /* Copy all valid line infos to the collection */
     for (I = 0; I < UsedSlots; ++I) {
 
-        /* Get the slot */
-        LineInfoSlot* S = CurLineInfo + I;
+        /* Get the line info from the slot */
+        LineInfo* LI = CurLineInfo[I].Info;
 
         /* Ignore empty slots */
-        if (S->Info) {
-            ++S->Info->Usage;
-            CollAppend (LineInfos, S->Info);
+        if (LI) {
+            LI->Usage += IncUsage;
+            CollAppend (LineInfos, LI);
         }
     }
 }
@@ -330,12 +310,7 @@ void MakeLineInfoIndex (void)
 {
     unsigned I;
 
-    /* Be sure to move pending line infos to the global list */
-    for (I = 0; I < UsedSlots; ++I) {
-        FreeLineInfo (CurLineInfo[I].Info);
-    }
-
-    /* Sort the collection */
+    /* Sort the line info list */
     CollSort (&LineInfoColl, CmpLineInfo, 0);
 
     /* Walk over the list, index the line infos and count the used ones */

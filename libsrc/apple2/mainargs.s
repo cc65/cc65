@@ -22,7 +22,7 @@
 ; TO-DO:
 ; Add a control-character quoting mechanism.
 
-        .constructor	initmainargs, 18
+        .constructor	initmainargs, 24
         .import		__argc, __argv, __dos_type
 
         .include	"zeropage.inc"

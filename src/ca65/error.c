@@ -136,7 +136,7 @@ static void AddNotifications (const Collection* LineInfos)
                       "Assembler code generated from this line");
         } else if (Type == LI_TYPE_MACRO) {
             PrintMsg (GetSourcePos (LI), "Note",
-                      "Macro expansion was here");
+                      "Macro was defined here");
         }
     }
 }

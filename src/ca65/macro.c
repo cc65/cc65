@@ -48,6 +48,7 @@
 #include "global.h"
 #include "instr.h"
 #include "istack.h"
+#include "lineinfo.h"
 #include "nexttok.h"
 #include "pseudo.h"
 #include "toklist.h"
@@ -126,15 +127,16 @@ static Macro*  	MacroRoot = 0;	/* List of all macros */
 /* Structs that holds data for a macro expansion */
 typedef struct MacExp MacExp;
 struct MacExp {
-    MacExp*  	Next;		/* Pointer to next expansion */
-    Macro*   	M;  	  	/* Which macro do we expand? */
-    unsigned 	IfSP;		/* .IF stack pointer at start of expansion */
+    MacExp*    	Next;		/* Pointer to next expansion */
+    Macro*     	M;  	  	/* Which macro do we expand? */
+    unsigned   	IfSP;		/* .IF stack pointer at start of expansion */
     TokNode*   	Exp;		/* Pointer to current token */
-    TokNode* 	Final;		/* Pointer to final token */
+    TokNode*   	Final;		/* Pointer to final token */
     unsigned    LocalStart;	/* Start of counter for local symbol names */
-    unsigned 	ParamCount;	/* Number of actual parameters */
-    TokNode**	Params;	  	/* List of actual parameters */
-    TokNode* 	ParamExp;	/* Node for expanding parameters */
+    unsigned   	ParamCount;	/* Number of actual parameters */
+    TokNode**  	Params;	  	/* List of actual parameters */
+    TokNode*   	ParamExp;	/* Node for expanding parameters */
+    unsigned    LISlot;         /* Slot for additional line infos */
 };
 
 /* Number of active macro expansions */
@@ -254,17 +256,18 @@ static MacExp* NewMacExp (Macro* M)
 
     /* Initialize the data */
     E->M       	  = M;
-    E->IfSP	  = GetIfStack ();
+    E->IfSP    	  = GetIfStack ();
     E->Exp     	  = M->TokRoot;
-    E->Final	  = 0;
+    E->Final   	  = 0;
     E->LocalStart = LocalName;
     LocalName    += M->LocalCount;
     E->ParamCount = 0;
     E->Params     = xmalloc (M->ParamCount * sizeof (TokNode*));
     E->ParamExp	  = 0;
     for (I = 0; I < M->ParamCount; ++I) {
-	E->Params [I] = 0;
+	E->Params[I] = 0;
     }
+    E->LISlot     = AllocLineInfoSlot (LI_TYPE_MACRO | MacExpansions);
 
     /* One macro expansion more */
     ++MacExpansions;
@@ -294,6 +297,9 @@ static void FreeMacExp (MacExp* E)
         }
     }
     xfree (E->Params);
+
+    /* Free the additional line info slot */
+    FreeLineInfoSlot (E->LISlot);
 
     /* Free the final token if we have one */
     if (E->Final) {
@@ -562,7 +568,7 @@ static int MacExpand (void* Data)
     if (Mac->ParamExp) {
 
        	/* Ok, use token from parameter list */
-       	TokSet (Mac->ParamExp);
+       	TokSet (Mac->ParamExp, Mac->LISlot);
 
        	/* Set pointer to next token */
        	Mac->ParamExp = Mac->ParamExp->Next;
@@ -578,7 +584,7 @@ static int MacExpand (void* Data)
     if (Mac->Exp) {
 
        	/* Use next macro token */
-       	TokSet (Mac->Exp);
+       	TokSet (Mac->Exp, Mac->LISlot);
 
        	/* Set pointer to next token */
        	Mac->Exp = Mac->Exp->Next;
@@ -642,7 +648,7 @@ static int MacExpand (void* Data)
     if (Mac->Final) {
 
       	/* Set the final token and remove it */
-      	TokSet (Mac->Final);
+      	TokSet (Mac->Final, Mac->LISlot);
       	FreeTokNode (Mac->Final);
       	Mac->Final = 0;
 

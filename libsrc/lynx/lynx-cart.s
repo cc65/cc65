@@ -17,8 +17,7 @@
 	.include "extzp.inc"
 	.export  lynxskip0, lynxread0
 	.export  lynxblock 
-
-__BLOCKSIZE0__ = 1024
+	.import  __BLOCKSIZE__
 
 	.code
 
@@ -89,7 +88,7 @@ lynxblock:
 	lda __iodat
 	sta IODAT
 	stz _FileBlockByte
-	lda #$100-(>__BLOCKSIZE0__)
+	lda #<($100-(>__BLOCKSIZE__))
 	sta _FileBlockByte+1
 	ply
 	plx

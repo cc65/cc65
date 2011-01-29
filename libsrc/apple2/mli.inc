@@ -20,6 +20,9 @@ DESTROY_COUNT   = 1
 RENAME_CALL     = $C2
 RENAME_COUNT    = 2
 
+GET_INFO_CALL   = $C4
+GET_INFO_COUNT  = $A
+
 ON_LINE_CALL    = $C5
 ON_LINE_COUNT   = 2
 
@@ -72,6 +75,19 @@ EOF_COUNT       = 2
                                 PATHNAME        .addr
                                 NEW_PATHNAME    .addr
                         .endstruct
+                        .struct INFO
+                                PARAM_COUNT     .byte
+                                PATHNAME        .addr
+                                ACCESS          .byte
+                                FILE_TYPE       .byte
+                                AUX_TYPE        .word
+                                STORAGE_TYPE    .byte
+                                BLOCKS          .word
+                                MODE_DATE       .word
+                                MODE_TIME       .word
+                                CREATE_DATE     .word
+                                CREATE_TIME     .word
+                        .endstruct
                         .struct ON_LINE
                                 PARAM_COUNT     .byte
                                 UNIT_NUM        .byte
@@ -117,7 +133,8 @@ EOF_COUNT       = 2
 DEVNUM  :=      $BF30		; Most recent accessed device
 DEVCNT  :=      $BF31		; Number of on-line devices (minus 1)
 DEVLST  :=      $BF32		; Up to 14 units may be active
-DATELO  :=      $BF90		; Bits 15-9 = Year, 8-5 = Month, 4-0 = Day
-TIMELO  :=      $BF92		; Bits 12-8 = Hour, 5-0 = Minute
+DATELO  :=      $BF90		; Bits 15-9 = year, 8-5 = month, 4-0 = day
+TIMELO  :=      $BF92		; Bits 12-8 = hour, 5-0 = minute
+LEVEL   :=      $BF94		; File level: used in open, flush, close
 PFIXPTR :=      $BF9A		; If = 0, no prefix active
 KVERSION:=      $BFFF           ; Kernel version number

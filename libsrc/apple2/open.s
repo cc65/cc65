@@ -3,15 +3,13 @@
 ;
 ; int open (const char* name, int flags, ...);
 ;
-; Be sure to keep the value priority of closeallfiles lower than that of
-; closeallstreams (which is the high level C file I/O counterpart and must be
-; called before closeallfiles).
 
         .export 	_open, closedirect, freebuffer
         .export 	__filetype, __auxtype
+        .constructor	raisefilelevel
         .destructor	closeallfiles, 5
 
-        .import		pushname, popname
+        .import		pushname, popname, __dos_type
         .import		iobuf_alloc, iobuf_free
         .import 	addysp, incsp4, incaxy, pushax, popax
 
@@ -20,6 +18,17 @@
         .include	"fcntl.inc"
         .include	"mli.inc"
         .include	"filedes.inc"
+
+        .segment	"INIT"
+
+raisefilelevel:
+        ; Raise file level
+        lda	__dos_type
+        beq	:+
+        inc	LEVEL
+:       rts
+
+        .code
 
 _open:
         ; Throw away all parameters except name
@@ -209,10 +218,6 @@ freebuffer:
         ldx	fdtab + FD::BUFFER+1,y
         jmp	iobuf_free
 
-closeallfiles:
-        ; All open files
-        lda	#$00
-
 closedirect:
         ; Set fd
         sta	mliparam + MLI::CLOSE::REF_NUM
@@ -221,6 +226,17 @@ closedirect:
         lda	#CLOSE_CALL
         ldx	#CLOSE_COUNT
         jmp	callmli
+
+closeallfiles:
+        ; All open files with current level (or higher)
+        lda	#$00
+        jsr	closedirect
+
+        ; Restore original file level
+        lda	__dos_type
+        beq	:+
+        dec	LEVEL
+:       rts
 
         .data
 

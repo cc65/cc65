@@ -6,7 +6,7 @@
 ;
 
         .ifdef  __APPLE2ENH__
-        .constructor    initconio, 17
+        .constructor    initconio
         .endif
         .export         _cputcxy, _cputc
         .export         cputdirect, newline, putchar

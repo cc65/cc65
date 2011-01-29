@@ -267,7 +267,7 @@ static MacExp* NewMacExp (Macro* M)
     for (I = 0; I < M->ParamCount; ++I) {
 	E->Params[I] = 0;
     }
-    E->LISlot     = AllocLineInfoSlot (LI_TYPE_MACRO | MacExpansions);
+    E->LISlot     = AllocLineInfoSlot (LI_TYPE_MACRO, MacExpansions);
 
     /* One macro expansion more */
     ++MacExpansions;

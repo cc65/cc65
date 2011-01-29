@@ -35,6 +35,7 @@
 
 /* common */
 #include "check.h"
+#include "lidefs.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -78,10 +79,11 @@ static LineInfo* NewLineInfo (void)
     LineInfo* LI = xmalloc (sizeof (LineInfo));
 
     /* Initialize the fields */
+    LI->File       = 0;
+    LI->Type       = LI_TYPE_ASM;
     LI->Pos.Name   = INVALID_STRING_ID;
     LI->Pos.Line   = 0;
     LI->Pos.Col    = 0;
-    LI->File       = 0;
     LI->Fragments  = EmptyCollection;
     LI->CodeRanges = EmptyCollection;
 
@@ -92,7 +94,7 @@ static LineInfo* NewLineInfo (void)
 
 
 LineInfo* GenLineInfo (const FilePos* Pos)
-/* Generate a new (internally used) line info  with the given information */
+/* Generate a new (internally used) line info with the given information */
 {
     /* Create a new LineInfo struct */
     LineInfo* LI = NewLineInfo ();
@@ -113,6 +115,7 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
     LineInfo* LI = NewLineInfo ();
 
     /* Read/fill the fields in the new LineInfo */
+    LI->Type     = ReadVar (F);
     LI->Pos.Line = ReadVar (F);
     LI->Pos.Col  = ReadVar (F);
     LI->File     = CollAt (&O->Files, ReadVar (F));
@@ -242,5 +245,4 @@ void RelocLineInfo (Segment* S)
 
 
 
-
-
+                                

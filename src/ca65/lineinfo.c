@@ -126,15 +126,15 @@ void InitLineInfo (void)
      * generated without any input file open.
      */
     UsedSlots = 2;
-    CurLineInfo[LI_SLOT_ASM].Type = LI_TYPE_ASM;
+    CurLineInfo[LI_SLOT_ASM].Type = LI_TYPE_ASM;        /* Count = 0 */
     CurLineInfo[LI_SLOT_ASM].Info = NewLineInfo (LI_TYPE_ASM, &DefaultPos);
-    CurLineInfo[LI_SLOT_EXT].Type = LI_TYPE_EXT;
+    CurLineInfo[LI_SLOT_EXT].Type = LI_TYPE_EXT;        /* Count = 0 */
     CurLineInfo[LI_SLOT_EXT].Info = 0;
 }
 
 
 
-unsigned AllocLineInfoSlot (unsigned Type)
+unsigned AllocLineInfoSlot (unsigned Type, unsigned Count)
 /* Allocate a line info slot of the given type and return the slot index */
 {
     /* Grow the array if necessary */
@@ -148,7 +148,7 @@ unsigned AllocLineInfoSlot (unsigned Type)
     }
 
     /* Array is now big enough, add the new data */
-    CurLineInfo[UsedSlots].Type = Type;
+    CurLineInfo[UsedSlots].Type = LI_MAKE_TYPE(Type, Count);
     CurLineInfo[UsedSlots].Info = 0;
 
     /* Increment the count and return the index of the new slot */
@@ -349,6 +349,10 @@ void WriteLineInfos (void)
     for (I = 0; I < UsedLineInfoCount; ++I) {
         /* Get a pointer to this line info */
         LineInfo* LI = CollAt (&LineInfoColl, I);
+
+        /* Write the type and count of the line info */
+        ObjWriteVar (LI->Type);
+
         /* Write the source file position */
         ObjWritePos (&LI->Pos);
     }

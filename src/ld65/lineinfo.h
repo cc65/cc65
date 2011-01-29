@@ -82,6 +82,7 @@ struct CodeRange {
 typedef struct LineInfo LineInfo;
 struct LineInfo {
     struct FileInfo*    File;	        /* File struct for this line if any */
+    unsigned            Type;           /* Type of line info */
     FilePos             Pos;            /* Position in file */
     Collection          Fragments;      /* Fragments for this line */
     Collection          CodeRanges;     /* Code ranges for this line */

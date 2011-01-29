@@ -42,6 +42,7 @@
 #include "coll.h"
 #include "exprdefs.h"
 #include "filepos.h"
+#include "lidefs.h"
 #include "objdefs.h"
 #include "optdefs.h"
 #include "segdefs.h"
@@ -714,14 +715,20 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
     /* Read and print all line infos */
     for (I = 0; I < Count; ++I) {
 
-       	/* Read one line info */
 	FilePos   Pos;
+
+        /* Type of line info */
+        unsigned Type = ReadVar (F);
+
+       	/* File position of line info */
 	ReadFilePos (F, &Pos);
 
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
+        printf ("      Type:%26u\n", LI_GET_TYPE (Type));
+        printf ("      Count:%25u\n", LI_GET_COUNT (Type));
        	printf ("      Line:%26lu\n", Pos.Line);
        	printf ("      Col:%27u\n", Pos.Col);
        	printf ("      Name:%26u\n", Pos.Name);

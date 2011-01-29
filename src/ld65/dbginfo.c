@@ -33,6 +33,9 @@
 
 
 
+/* common */
+#include "lidefs.h"
+
 /* ld65 */
 #include "dbginfo.h"
 #include "fileinfo.h"
@@ -67,6 +70,10 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	/* Get this line info */
 	const LineInfo* LI = CollConstAt (&O->LineInfos, I);
 
+        /* Get the line info type and count */
+        unsigned Type  = LI_GET_TYPE (LI->Type);
+        unsigned Count = LI_GET_COUNT (LI->Type);
+
 	/* Get a pointer to the code ranges */
 	const Collection* CodeRanges = &LI->CodeRanges;
 
@@ -78,9 +85,21 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 
 	    /* Print it */
             fprintf (F,
-                     "line\tfile=%u,line=%lu,segment=%u,range=0x%06lX-0x%06lX\n",
+                     "line\tfile=%u,line=%lu,segment=%u,range=0x%06lX-0x%06lX",
                      LI->File->Id, GetSourceLine (LI), R->Seg->Id,
                      R->Offs, R->Offs + R->Size - 1);
+
+            /* Print type if not LI_TYPE_ASM and count if not zero */
+            if (Type != LI_TYPE_ASM) {
+                fprintf (F, ",type=%u", Type);
+            }
+            if (Count != 0) {
+                fprintf (F, ",count=%u", Count);
+            }
+
+            /* Terminate line */
+            fputc ('\n', F);
+
 	}
     }
 }

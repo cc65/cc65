@@ -41,6 +41,7 @@
 /* common */
 #include "coll.h"
 #include "filepos.h"
+#include "lidefs.h"
 
 
 
@@ -57,18 +58,6 @@
 enum {
     LI_SLOT_ASM         = 0,            /* Normal assembler source */
     LI_SLOT_EXT         = 1,            /* Externally supplied line info */
-};
-
-/* Types of line infos. The low byte may be used for some sort of depth
- * counter.
- */
-enum {
-    LI_MASK_COUNT       = 0x00FF,       /* Mask to extract the count */
-
-    LI_TYPE_ASM         = 0x0100,       /* Normal assembler source */
-    LI_TYPE_EXT         = 0x0200,       /* Externally supplied line info */
-    LI_TYPE_MACRO       = 0x0300,       /* Macro expansion */
-    LI_MASK_TYPE        = 0x7F00,       /* Mask to extract the type */
 };
 
 /* The LineInfo structure is shared between several fragments, so we need a
@@ -93,7 +82,7 @@ struct LineInfo {
 void InitLineInfo (void);
 /* Initialize the line infos */
 
-unsigned AllocLineInfoSlot (unsigned Type);
+unsigned AllocLineInfoSlot (unsigned Type, unsigned Count);
 /* Allocate a line info slot of the given type and return the slot index */
 
 void FreeLineInfoSlot (unsigned Slot);
@@ -137,10 +126,10 @@ INLINE const FilePos* GetSourcePos (const LineInfo* LI)
 INLINE unsigned GetLineInfoType (const LineInfo* LI)
 /* Return the type of a line info */
 {
-    return (LI->Type & LI_MASK_TYPE);
+    return LI_GET_TYPE (LI->Type);
 }
 #else
-#  define GetLineInfoType(LI)     ((LI)->Type & LI_MASK_TYPE)
+#  define GetLineInfoType(LI)     LI_GET_TYPE ((LI)->Type)
 #endif
 
 void WriteLineInfo (const Collection* LineInfos);

@@ -54,7 +54,7 @@
 
 /* Extract type and count from a type field */
 #define LI_GET_TYPE(T)          ((T) & 0x03U)
-#define LI_GET_COUNT(T)         ((unsigned)(T) >> 2);
+#define LI_GET_COUNT(T)         ((unsigned)(T) >> 2)
 
 
 

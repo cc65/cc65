@@ -93,7 +93,6 @@ OBJS = 	_scrsize.o      \
 	joy_stddrv.o    \
 	kbhit.o         \
 	lseek.o         \
-	mouse.o         \
 	mul40.o         \
 	open.o 	        \
 	oserrlist.o     \

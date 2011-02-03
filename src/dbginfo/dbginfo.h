@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2010,      Ullrich von Bassewitz                                      */
+/* (C) 2010-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -81,6 +81,13 @@ struct cc65_parseerror {
 /* Function that is called in case of parse errors */
 typedef void (*cc65_errorfunc) (const struct cc65_parseerror*);
 
+/* Type of line */
+typedef enum {
+    CC65_LINE_ASM,                      /* Assembler source */
+    CC65_LINE_EXT,                      /* Externally supplied (= C) */
+    CC65_LINE_MACRO,                    /* Macro expansion */
+} cc65_line_type;
+
 /* Line information.
  * Notes:
  *   - line_end is inclusive
@@ -99,6 +106,8 @@ struct cc65_linedata {
     cc65_addr           line_end;       /* End address for this line */
     const char*         output_name;    /* Output file */
     unsigned long       output_offs;    /* Offset in output file */
+    cc65_line_type      line_type;      /* Type of line */
+    unsigned            count;          /* Nesting counter for macros */
 };
 
 typedef struct cc65_lineinfo cc65_lineinfo;

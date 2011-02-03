@@ -91,6 +91,20 @@ static void PrintLineData (const cc65_linedata* D)
     if (D->output_name) {
         printf (" [%s($%06lX)]", D->output_name, D->output_offs);
     }
+    switch (D->line_type) {
+        case CC65_LINE_ASM:
+            printf (": Assembler source");
+            break;
+        case CC65_LINE_EXT:
+            printf (": Externally supplied");
+            break;
+        case CC65_LINE_MACRO:
+            printf (": Macro expansion (%u)", D->count);
+            break;
+        default:
+            printf (": Unknown type %u (%u)", D->line_type, D->count);
+            break;
+    }
     putchar ('\n');
 }
 
@@ -229,7 +243,7 @@ int main (int argc, char** argv)
     }
 
     /* Print symbols for the next $100 bytes starting from main (or 0x800) */
-    printf ("Requesting labels for $%04lX-$%04lX:\n",           
+    printf ("Requesting labels for $%04lX-$%04lX:\n",
             (unsigned long) Addr, (unsigned long) Addr + 0xFF);
     Symbols = cc65_symbol_inrange (Info, Addr, Addr + 0xFF);
     if (Symbols == 0) {
@@ -240,7 +254,7 @@ int main (int argc, char** argv)
     }
 
     /* Free the debug info */
-    cc65_free_dbginfo (Info);
+    cc65_free_dbginfo (Info); 
 
     return 0;
 }

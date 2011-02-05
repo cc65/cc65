@@ -133,6 +133,12 @@ Here is a description of all the command line options:
   Print the short option summary shown above.
 
 
+  <label id="option--hexoffs">
+  <tag><tt>--hexoffs</tt></tag>
+
+  Output label offsets in hexadecimal instead of decimal notation.
+
+
   <label id="option--info">
   <tag><tt>-i name, --info name</tt></tag>
 
@@ -315,6 +321,13 @@ following attributes are recognized:
   <tag><tt/CPU/</tag>
   This attribute may be used instead of the <tt><ref id="option--cpu"
   name="--cpu"></tt> option on the command line. It takes a string parameter.
+
+
+  <tag><tt/HEXOFFS/</tag>
+  The attribute is followed by a boolean value. If true, offsets to labels are
+  output in hex, otherwise they're output in decimal notation. The default is
+  false. The attribute may be changed on the command line using the <tt><ref
+  id="option--hexoffs" name="--hexoffs"></tt> option.
 
 
   <tag><tt/INPUTNAME/</tag>

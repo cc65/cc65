@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -78,6 +78,8 @@ typedef enum token_t {
     INFOTOK_INPUTSIZE,
     INFOTOK_LABELBREAK,
     INFOTOK_MNEMONIC_COLUMN,
+    INFOTOK_NL_AFTER_JMP,
+    INFOTOK_NL_AFTER_RTS,
     INFOTOK_OUTPUTNAME,
     INFOTOK_PAGELENGTH,
     INFOTOK_STARTADDR,

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2006 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,6 +57,8 @@ extern unsigned char    DebugInfo;      /* Add debug info to the object file */
 extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
 extern unsigned char    UseHexOffs;     /* Use hexadecimal label offsets */
 extern unsigned char	PassCount;	/* How many passed do we do? */
+extern signed char      NewlineAfterJMP;/* Add a newline after a JMP insn? */
+extern signed char      NewlineAfterRTS;/* Add a newline after a RTS insn? */
 extern long    		StartAddr;	/* Start/load address of the program */
 extern long             InputOffs;      /* Offset into input file */
 extern long             InputSize;      /* Number of bytes to read from input */

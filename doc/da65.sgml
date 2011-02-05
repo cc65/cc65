@@ -365,6 +365,16 @@ following attributes are recognized:
   <tt><ref id="option--mnemonic-column" name="--mnemonic-column"></tt>.
 
 
+  <tag><tt/NEWLINEAFTERJMP/</tag>
+  This attribute is followed by a boolean value. When true, a newline is
+  inserted after each <tt/JMP/ instruction. The default is false.
+
+
+  <tag><tt/NEWLINEAFTERRTS/</tag>
+  This attribute is followed by a boolean value. When true, a newline is
+  inserted after each <tt/RTS/ instruction. The default is false.       
+
+
   <label id="OUTPUTNAME">
   <tag><tt/OUTPUTNAME/</tag>
   The attribute is followed by string value, which gives the name of the

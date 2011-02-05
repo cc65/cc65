@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -85,7 +85,7 @@ static void AsmIncSection (void)
 {
     static const IdentTok LabelDefs[] = {
         {   "COMMENTSTART",     INFOTOK_COMMENTSTART    },
-       	{   "FILE",    	        INFOTOK_FILE            },                     
+       	{   "FILE",    	        INFOTOK_FILE            },
         {   "IGNOREUNKNOWN",    INFOTOK_IGNOREUNKNOWN   },
     };
 
@@ -190,6 +190,8 @@ static void GlobalSection (void)
         {   "LABELBREAK",       INFOTOK_LABELBREAK      },
         {   "MNEMONICCOL",      INFOTOK_MNEMONIC_COLUMN },
         {   "MNEMONICCOLUMN",   INFOTOK_MNEMONIC_COLUMN },
+        {   "NEWLINEAFTERJMP",  INFOTOK_NL_AFTER_JMP    },
+        {   "NEWLINEAFTERRTS",  INFOTOK_NL_AFTER_RTS    },
 	{   "OUTPUTNAME",      	INFOTOK_OUTPUTNAME	},
 	{   "PAGELENGTH",      	INFOTOK_PAGELENGTH	},
 	{   "STARTADDR",     	INFOTOK_STARTADDR	},
@@ -297,6 +299,26 @@ static void GlobalSection (void)
 	     	MCol = InfoIVal;
 		InfoNextTok ();
 		break;
+
+            case INFOTOK_NL_AFTER_JMP:
+                InfoNextTok ();
+                if (NewlineAfterJMP != -1) {
+                    InfoError ("NLAfterJMP already specified");
+                }
+                InfoBoolToken ();
+                NewlineAfterJMP = (InfoTok != INFOTOK_FALSE);
+                InfoNextTok ();
+                break;
+
+            case INFOTOK_NL_AFTER_RTS:
+                InfoNextTok ();
+                InfoBoolToken ();
+                if (NewlineAfterRTS != -1) {
+                    InfoError ("NLAfterRTS already specified");
+                }
+                NewlineAfterRTS = (InfoTok != INFOTOK_FALSE);
+                InfoNextTok ();
+                break;
 
 	    case INFOTOK_OUTPUTNAME:
 		InfoNextTok ();

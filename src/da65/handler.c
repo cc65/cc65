@@ -555,6 +555,9 @@ void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 void OH_Rts (const OpcDesc* D)
 {
     OH_Implicit (D);
+    if (NewlineAfterRTS) {
+        LineFeed ();
+    }
     SeparatorLine();
 }
 
@@ -563,6 +566,9 @@ void OH_Rts (const OpcDesc* D)
 void OH_JmpAbsolute (const OpcDesc* D)
 {
     OH_Absolute (D);
+    if (NewlineAfterJMP) {
+        LineFeed ();
+    }
     SeparatorLine ();
 }
 
@@ -571,7 +577,10 @@ void OH_JmpAbsolute (const OpcDesc* D)
 void OH_JmpAbsoluteIndirect (const OpcDesc* D)
 {
     OH_AbsoluteIndirect (D);
-    SeparatorLine ();
+    if (NewlineAfterJMP) {
+        LineFeed ();
+    }
+    SeparatorLine ();  
 }
 
 

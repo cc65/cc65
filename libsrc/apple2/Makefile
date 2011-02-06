@@ -71,6 +71,7 @@ S_OBJS=	_scrsize.o	\
 	diowrite.o	\
 	dosdetect.o	\
 	drives.o	\
+	exec.o		\
 	filedes.o	\
 	filename.o	\
         get_ostype.o    \

@@ -1141,7 +1141,7 @@ static void CreateLineInfoList (LineInfoList* L, Collection* LineInfos)
     Start = LI->Start;
     End = LI->End;
     for (J = StartIndex, Addr = LI->Start; Addr <= LI->End; ++J, ++Addr) {
-        assert (List[J].Addr = Addr);
+        assert (List[J].Addr == Addr);
         if (List[J].Count == 1 && List[J].Data == 0) {
             List[J].Data = LI;
         } else {
@@ -1172,7 +1172,7 @@ static void CreateLineInfoList (LineInfoList* L, Collection* LineInfos)
             End = LI->End;
         }
         for (J = StartIndex, Addr = LI->Start; Addr <= LI->End; ++J, ++Addr) {
-            assert (List[J].Addr = Addr);
+            assert (List[J].Addr == Addr);
             if (List[J].Count == 1 && List[J].Data == 0) {
                 List[J].Data = LI;
             } else {

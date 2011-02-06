@@ -23,6 +23,7 @@
 	.import		addysp,popax,pushax,decsp6,pusha0,pusheax,ldaxysp
 	.import		aslax3,axlong,tosaddeax,steaxysp,stax0sp,incsp8
 	.import		ldax0sp
+	.import		lynxskip0, lynxblock
 	.importzp	_FileEntry
 	.importzp	_FileStartBlock
 	.importzp	_FileCurrBlock
@@ -118,6 +119,24 @@ flagsok:
 	ldx     #$00
 	lda     #$08
 	jsr     _read
+	lda	_FileStartBlock
+	sta	_FileCurrBlock
+	jsr	lynxblock
+	lda	_FileBlockOffset
+	ldx	_FileBlockOffset+1
+	phx				; The BLL kit uses negative offsets
+	plx				; while tha basic Lynx uses positive
+	bmi	@1			; Make all offsets negative
+        eor	#$FF
+	pha
+	txa
+        eor	#$FF
+	bra	@2
+@1:	pha
+	txa
+@2:	tay
+	plx
+	jsr	lynxskip0
 	jsr     stax0sp
 	jmp     incsp8
 

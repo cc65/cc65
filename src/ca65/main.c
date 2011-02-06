@@ -97,7 +97,7 @@ static void Usage (void)
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
             "  -i\t\t\t\tIgnore case of symbols\n"
-            "  -l\t\t\t\tCreate a listing if assembly was ok\n"
+            "  -l name\t\t\tCreate a listing file if assembly was ok\n"
             "  -mm model\t\t\tSet the memory model\n"
             "  -o name\t\t\tName the output file\n"
             "  -s\t\t\t\tEnable smart mode\n"
@@ -116,7 +116,7 @@ static void Usage (void)
             "  --help\t\t\tHelp (this text)\n"
             "  --ignore-case\t\t\tIgnore case of symbols\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
-            "  --listing\t\t\tCreate a listing if assembly was ok\n"
+            "  --listing name\t\tCreate a listing file if assembly was ok\n"
             "  --list-bytes n\t\tMaximum number of bytes per listing line\n"
             "  --macpack-dir dir\t\tSet a macro package directory\n"
             "  --memory-model model\t\tSet the memory model\n"
@@ -388,7 +388,7 @@ static void OptCreateDep (const char* Opt, const char* Arg)
 
 
 static void OptCreateFullDep (const char* Opt attribute ((unused)),
-		      	      const char* Arg)
+    		      	      const char* Arg)
 /* Handle the --create-full-dep option */
 {
     FileNameOption (Opt, Arg, &FullDepName);
@@ -477,11 +477,19 @@ static void OptListBytes (const char* Opt, const char* Arg)
 
 
 
-static void OptListing (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+static void OptListing (const char* Opt, const char* Arg)
 /* Create a listing file */
-{
-    Listing = 1;
+{              
+    /* Since the meaning of -l and --listing has changed, print an error if
+     * the filename is empty or begins with the option char.
+     */
+    if (Arg == 0 || *Arg == '\0' || *Arg == '-') {
+        Fatal ("The meaning of `%s' has changed. It does now "
+               "expect a file name as argument.", Opt);
+    }
+
+    /* Get the file name */
+    FileNameOption (Opt, Arg, &ListingName);
 }
 
 
@@ -836,7 +844,7 @@ int main (int argc, char* argv [])
 	{ "--ignore-case",     	0,	OptIgnoreCase 		},
 	{ "--include-dir",     	1,	OptIncludeDir		},
         { "--list-bytes",       1,      OptListBytes            },
-	{ "--listing", 	       	0,	OptListing		},
+	{ "--listing", 	       	1,	OptListing		},
         { "--macpack-dir",      1,      OptMacPackDir           },
         { "--memory-model",     1,      OptMemoryModel          },
 	{ "--pagelength",      	1,	OptPageLength		},
@@ -862,7 +870,7 @@ int main (int argc, char* argv [])
      */
     SymEnterLevel (&GlobalNameSpace, ST_GLOBAL, ADDR_SIZE_DEFAULT);
 
-    /* Initialize the line infos. Must be done here, since we need line infos 
+    /* Initialize the line infos. Must be done here, since we need line infos
      * for symbol definitions.
      */
     InitLineInfo ();
@@ -895,7 +903,7 @@ int main (int argc, char* argv [])
        	       	    break;
 
        	       	case 'l':
-	       	    OptListing (Arg, 0);
+	       	    OptListing (Arg, GetArg (&I, 2));
        	       	    break;
 
                 case 'm':
@@ -1033,7 +1041,7 @@ int main (int argc, char* argv [])
      */
     if (ErrorCount == 0) {
      	CreateObjFile ();
-     	if (Listing) {
+     	if (SB_GetLen (&ListingName) > 0) {
      	    CreateListing ();
      	}
        CreateDependencies ();

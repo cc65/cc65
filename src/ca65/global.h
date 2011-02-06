@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -52,13 +52,12 @@
 /* File names */
 extern const char*     	InFile;	       	    /* Name of input file */
 extern const char*     	OutFile;       	    /* Name of output file */
-extern const char*     	ListFile;      	    /* Name of listing file */
+extern StrBuf           ListingName;        /* Name of listing file */
 extern StrBuf           DepName;            /* Name of dependencies file */
 extern StrBuf           FullDepName;        /* Name of full dependencies file */
 
 /* Default extensions */
 extern const char      	ObjExt[];      	    /* Default object extension */
-extern const char      	ListExt[];     	    /* Default listing extension */
 
 extern char    	       	LocalStart;    	    /* This char starts local symbols */
 
@@ -66,7 +65,6 @@ extern unsigned char   	IgnoreCase;    	    /* Ignore case on identifiers? */
 extern unsigned char   	AutoImport;    	    /* Mark unresolveds as import */
 extern unsigned char   	SmartMode;     	    /* Smart mode */
 extern unsigned char   	DbgSyms;       	    /* Add debug symbols */
-extern unsigned char   	Listing;            /* Create listing file */
 extern unsigned char   	LineCont;      	    /* Allow line continuation */
 
 /* Emulation features */

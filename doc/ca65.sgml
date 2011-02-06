@@ -95,7 +95,7 @@ Short options:
   -g                            Add debug info to object file
   -h                            Help (this text)
   -i                            Ignore case of symbols
-  -l                            Create a listing if assembly was ok
+  -l name                       Create a listing file if assembly was ok
   -mm model                     Set the memory model
   -o name                       Name the output file
   -s                            Enable smart mode
@@ -114,7 +114,7 @@ Long options:
   --help                        Help (this text)
   --ignore-case                 Ignore case of symbols
   --include-dir dir             Set an include directory search path
-  --listing                     Create a listing if assembly was ok
+  --listing name                Create a listing file if assembly was ok
   --list-bytes n                Maximum number of bytes per listing line
   --macpack-dir dir             Set a macro package directory
   --memory-model model          Set the memory model
@@ -219,11 +219,10 @@ Here is a description of all the command line options:
 
 
   <label id="option-l">
-  <tag><tt>-l, --listing</tt></tag>
+  <tag><tt>-l name, --listing name</tt></tag>
 
-  Generate an assembler listing. The listing file will always have the
-  name of the main input file with the extension replaced by ".lst". This
-  may change in future versions.
+  Generate an assembler listing with the given name. A listing file will
+  never be generated in case of assembly errors.
 
 
   <label id="option--list-bytes">
@@ -2393,7 +2392,7 @@ Here's a list of all control commands and a description, what they do:
 	.elseif	bar = 1
 	...
 	.else
-       	.fatal  "Must define foo or bar!"               
+       	.fatal  "Must define foo or bar!"
 	.endif
   </verb></tscreen>
 

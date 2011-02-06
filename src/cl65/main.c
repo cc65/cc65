@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2010, Ullrich von Bassewitz                                      */
+/* (C) 1999-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -668,7 +668,7 @@ static void Usage (void)
             "  -d\t\t\t\tDebug mode\n"
             "  -g\t\t\t\tAdd debug info\n"
             "  -h\t\t\t\tHelp (this text)\n"
-            "  -l\t\t\t\tCreate an assembler listing\n"
+            "  -l name\t\t\tCreate an assembler listing file\n"
             "  -m name\t\t\tCreate a map file\n"
             "  -mm model\t\t\tSet the memory model\n"
             "  -o name\t\t\tName the output file\n"
@@ -724,7 +724,7 @@ static void Usage (void)
             "  --lib file\t\t\tLink this library\n"
             "  --lib-path path\t\tSpecify a library search path\n"
             "  --list-targets\t\tList all available targets\n"
-            "  --listing\t\t\tCreate an assembler listing\n"
+            "  --listing name\t\tCreate an assembler listing file\n"
             "  --list-bytes n\t\tNumber of bytes per assembler listing line\n"
             "  --mapfile name\t\tCreate a map file\n"
             "  --memory-model model\t\tSet the memory model\n"
@@ -766,7 +766,7 @@ static void OptAsmArgs (const char* Opt attribute ((unused)), const char* Arg)
 }
 
 
-
+                                                            
 static void OptAsmDefine (const char* Opt attribute ((unused)), const char* Arg)
 /* Define an assembler symbol (assembler) */
 {
@@ -1009,17 +1009,16 @@ static void OptListBytes (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptListing (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+static void OptListing (const char* Opt attribute ((unused)), const char* Arg)
 /* Create an assembler listing */
 {
-    CmdAddArg (&CA65, "-l");
+    CmdAddArg2 (&CA65, "-l", Arg);
 }
 
 
 
 static void OptListTargets (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+		       	    const char* Arg attribute ((unused)))
 /* List all targets */
 {
     unsigned I;
@@ -1191,7 +1190,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print version number */
 {
     fprintf (stderr,
- 	     "cl65 V%s - (C) Copyright 1998-2009 Ullrich von Bassewitz\n",
+ 	     "cl65 V%s - (C) Copyright 1998-2011 Ullrich von Bassewitz\n",
  	     GetVersionAsString ());
 }
 
@@ -1247,7 +1246,7 @@ int main (int argc, char* argv [])
        	{ "--lib",     	       	1,     	OptLib                  },
        	{ "--lib-path",	       	1,     	OptLibPath              },
 	{ "--list-targets",	0,	OptListTargets		},
-	{ "--listing",	      	0,	OptListing		},
+	{ "--listing",	      	1,	OptListing		},
         { "--list-bytes",       1,      OptListBytes            },
 	{ "--mapfile",	      	1,	OptMapFile		},
         { "--memory-model",     1,      OptMemoryModel          },
@@ -1403,7 +1402,7 @@ int main (int argc, char* argv [])
 
 	   	case 'l':
 		    /* Create an assembler listing */
-		    OptListing (Arg, 0);
+		    OptListing (Arg, GetArg (&I, 2));
 		    break;
 
 	   	case 'm':

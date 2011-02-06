@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -50,13 +50,12 @@
 /* File names */
 const char* InFile     	         = 0;   /* Name of input file */
 const char* OutFile    	         = 0;   /* Name of output file */
-const char* ListFile   	         = 0;   /* Name of listing file */
+StrBuf ListingName = STATIC_STRBUF_INITIALIZER; /* Name of listing file */
 StrBuf DepName     = STATIC_STRBUF_INITIALIZER; /* Dependency file */
 StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Full dependency file */
 
 /* Default extensions */
 const char ObjExt[]    	         = ".o";/* Default object extension */
-const char ListExt[]   	         = ".lst"; /* Default listing extension */
 
 char LocalStart	                 = '@'; /* This char starts local symbols */
 
@@ -64,7 +63,6 @@ unsigned char IgnoreCase         = 0;   /* Ignore case on identifiers? */
 unsigned char AutoImport         = 0;   /* Mark unresolveds as import */
 unsigned char SmartMode	         = 0;   /* Smart mode */
 unsigned char DbgSyms	         = 0;   /* Add debug symbols */
-unsigned char Listing  	         = 0;   /* Create listing file */
 unsigned char LineCont	         = 0;   /* Allow line continuation */
 
 /* Emulation features */
@@ -82,7 +80,7 @@ unsigned char OrgPerSeg          = 0;   /* Make .org local to current seg */
 unsigned char CComments          = 0;   /* Allow C like comments */
 
 /* Misc stuff */
-const char Copyright[]           = "(C) Copyright 1998-2010 Ullrich von Bassewitz";
+const char Copyright[]           = "(C) Copyright 1998-2011 Ullrich von Bassewitz";
 
 
 

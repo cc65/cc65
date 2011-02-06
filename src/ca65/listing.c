@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -85,7 +85,7 @@ void NewListingLine (const char* Line, unsigned char File, unsigned char Depth)
 /* Create a new ListLine struct and insert it */
 {
     /* Store only if listing is enabled */
-    if (Listing) {
+    if (SB_GetLen (&ListingName) > 0) {
 
 	ListLine* L;
 
@@ -128,7 +128,7 @@ void NewListingLine (const char* Line, unsigned char File, unsigned char Depth)
 void EnableListing (void)
 /* Enable output of lines to the listing */
 {
-    if (Listing) {
+    if (SB_GetLen (&ListingName) > 0) {
 	/* If we're about to enable the listing, do this for the current line
 	 * also, so we will see the source line that did this.
 	 */
@@ -143,7 +143,7 @@ void EnableListing (void)
 void DisableListing (void)
 /* Disable output of lines to the listing */
 {
-    if (Listing) {
+    if (SB_GetLen (&ListingName) > 0) {
 	if (ListingEnabled == 0) {
 	    /* Cannot switch the listing off once more */
 	    Error ("Counter underflow");
@@ -169,7 +169,7 @@ void SetListBytes (int Bytes)
 void InitListingLine (void)
 /* Initialize the current listing line */
 {
-    if (Listing) {
+    if (SB_GetLen (&ListingName) > 0) {
 	/* Make the last loaded line the current line */
 	/* ###### This code is a hack! We really need to do it right
 	 * as soon as we know, how:-(
@@ -300,15 +300,12 @@ void CreateListing (void)
     ListLine* L;
     char HeaderBuf [LINE_HEADER_LEN+1];
 
-    /* Create the name of the listing file if needed */
-    if (ListFile == 0) {
-    	ListFile = MakeFilename (InFile, ListExt);
-    }
-
     /* Open the real listing file */
-    F = fopen (ListFile, "w");
+    F = fopen (SB_GetConstBuf (&ListingName), "w");
     if (F == 0) {
-    	Fatal ("Cannot open listing file: %s", strerror (errno));
+    	Fatal ("Cannot open listing file `%s': %s", 
+               SB_GetConstBuf (&ListingName), 
+               strerror (errno));
     }
 
     /* Reset variables, print the header for the first page */

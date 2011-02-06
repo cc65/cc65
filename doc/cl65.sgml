@@ -38,7 +38,7 @@ Short options:
   -d                            Debug mode
   -g                            Add debug info
   -h                            Help (this text)
-  -l                            Create an assembler listing
+  -l name                       Create an assembler listing file
   -m name                       Create a map file
   -mm model                     Set the memory model
   -o name                       Name the output file
@@ -94,7 +94,7 @@ Long options:
   --lib file                    Link this library
   --lib-path path               Specify a library search path
   --list-targets                List all available targets
-  --listing                     Create an assembler listing
+  --listing name                Create an assembler listing file
   --list-bytes n                Number of bytes per assembler listing line
   --mapfile name                Create a map file
   --memory-model model          Set the memory model

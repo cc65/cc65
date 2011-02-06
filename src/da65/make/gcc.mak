@@ -33,6 +33,7 @@ OBJS = 	asminc.o        \
 	labels.o        \
 	main.o	 	\
 	opc6502.o       \
+        opc6502x.o      \
 	opc65816.o      \
 	opc65c02.o      \
 	opc65sc02.o     \

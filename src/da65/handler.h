@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -56,7 +56,7 @@
 void OH_Illegal (const OpcDesc* D attribute ((unused)));
 void OH_Accumulator (const OpcDesc*);
 void OH_Implicit (const OpcDesc*);
-void OH_Immidiate (const OpcDesc*);
+void OH_Immediate (const OpcDesc*);
 void OH_Direct (const OpcDesc*);
 void OH_DirectX (const OpcDesc*);
 void OH_DirectY (const OpcDesc*);
@@ -74,10 +74,10 @@ void OH_AbsoluteIndirect (const OpcDesc*);
 
 void OH_BitBranch (const OpcDesc*);
 
-void OH_ImmidiateDirect (const OpcDesc*);
-void OH_ImmidiateDirectX (const OpcDesc*);
-void OH_ImmidiateAbsolute (const OpcDesc*);
-void OH_ImmidiateAbsoluteX (const OpcDesc*);
+void OH_ImmediateDirect (const OpcDesc*);
+void OH_ImmediateDirectX (const OpcDesc*);
+void OH_ImmediateAbsolute (const OpcDesc*);
+void OH_ImmediateAbsoluteX (const OpcDesc*);
 
 void OH_StackRelative (const OpcDesc*);
 void OH_DirectIndirectLongX (const OpcDesc*);

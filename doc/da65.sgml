@@ -107,9 +107,10 @@ Here is a description of all the command line options:
 
   Set the CPU type. The option takes a parameter, which may be one of
 
-       	6502, 65SC02, 65C02
+       	6502, 6502x, 65sc02, 65c02, huc6280
 
-  Support for the 65816 is currently not available.
+  6502x is the NMOS 6502 with illegal opcodes. huc6280 is the CPU of the PC
+  engine. Support for the 65816 is currently not available.
 
 
   <label id="option--formfeeds">
@@ -320,7 +321,8 @@ following attributes are recognized:
 
   <tag><tt/CPU/</tag>
   This attribute may be used instead of the <tt><ref id="option--cpu"
-  name="--cpu"></tt> option on the command line. It takes a string parameter.
+  name="--cpu"></tt> option on the command line. For possible values see
+  there. The value is a string and must be enclosed in quotes.
 
 
   <tag><tt/HEXOFFS/</tag>
@@ -372,7 +374,7 @@ following attributes are recognized:
 
   <tag><tt/NEWLINEAFTERRTS/</tag>
   This attribute is followed by a boolean value. When true, a newline is
-  inserted after each <tt/RTS/ instruction. The default is false.       
+  inserted after each <tt/RTS/ instruction. The default is false.
 
 
   <label id="OUTPUTNAME">

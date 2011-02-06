@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		  		  opctable.c				     */
+/*				   opc6502.h				     */
 /*                                                                           */
-/*		     Disassembler opcode description table		     */
+/*             6502 opcode description table with NMOS illegals              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,48 +33,29 @@
 
 
 
-/* da65 */
-#include "error.h"
-#include "opc6502.h"
-#include "opc6502x.h"
-#include "opc65816.h"
-#include "opc65c02.h"
-#include "opc65sc02.h"
-#include "opchuc6280.h"
-#include "opctable.h"
+#ifndef OPC6502X_H
+#define OPC6502X_H
+
+
+
+#include "opcdesc.h"
 
 
 
 /*****************************************************************************/
-/*			       	     Data		      		     */
+/*				     Data				     */
 /*****************************************************************************/
 
 
 
 /* Descriptions for all opcodes */
-const OpcDesc* OpcTable = OpcTable_6502;
+extern const OpcDesc OpcTable_6502X[256];
 
 
 
-/*****************************************************************************/
-/*	 	    		     Code		      		     */
-/*****************************************************************************/
+/* End of opc6502x.h */
+#endif
 
 
 
-void SetOpcTable (cpu_t CPU)
-/* Set the correct opcode table for the given CPU */
-{
-    switch (CPU) {
-        case CPU_6502:    OpcTable = OpcTable_6502;     break;
-        case CPU_6502X:   OpcTable = OpcTable_6502X;    break;
-        case CPU_65SC02:  OpcTable = OpcTable_65SC02;   break;
-        case CPU_65C02:   OpcTable = OpcTable_65C02;    break;
-        case CPU_HUC6280: OpcTable = OpcTable_HuC6280;  break;
-        default:          Error ("Unsupported CPU");
-    }
-}
-
-
-
-
+                  

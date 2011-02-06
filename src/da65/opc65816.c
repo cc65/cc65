@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   opc65816.h				     */
+/*				   opc65816.c				     */
 /*                                                                           */
 /*                       65816 opcode description table                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -56,7 +56,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "asl",  2,  flUseLabel,               OH_Direct                }, /* $06 */
     {   "ora",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $07 */
     {   "php",  1,  flNone,                   OH_Implicit              }, /* $08 */
-    {   "ora",  2,  flNone,                   OH_Immidiate             }, /* $09 */
+    {   "ora",  2,  flNone,                   OH_Immediate             }, /* $09 */
     {   "asl",  1,  flNone,                   OH_Accumulator           }, /* $0a */
     {   "phd",  1,  flNone,                   OH_Implicit              }, /* $0b */
     {   "tsb",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $0c */
@@ -88,7 +88,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "rol",  2,  flUseLabel,               OH_Direct                }, /* $26 */
     {   "and",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $27 */
     {   "plp",  1,  flNone,                   OH_Implicit              }, /* $28 */
-    {   "and",  2,  flNone,                   OH_Immidiate             }, /* $29 */
+    {   "and",  2,  flNone,                   OH_Immediate             }, /* $29 */
     {   "rol",  1,  flNone,                   OH_Accumulator           }, /* $2a */
     {   "pld",  1,  flNone,                   OH_Implicit              }, /* $2b */
     {   "bit",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $2c */
@@ -120,7 +120,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "lsr",  2,  flUseLabel,               OH_Direct                }, /* $46 */
     {   "eor",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $47 */
     {   "pha",  1,  flNone,                   OH_Implicit              }, /* $48 */
-    {   "eor",  2,  flNone,                   OH_Immidiate             }, /* $49 */
+    {   "eor",  2,  flNone,                   OH_Immediate             }, /* $49 */
     {   "lsr",  1,  flNone,                   OH_Accumulator           }, /* $4a */
     {   "phk",  1,  flNone,                   OH_Implicit              }, /* $4b */
     {   "jmp",  3,  flLabel,                  OH_JmpAbsolute           }, /* $4c */
@@ -152,7 +152,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "ror",  2,  flUseLabel,               OH_Direct                }, /* $66 */
     {   "adc",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $67 */
     {   "pla",  1,  flNone,                   OH_Implicit              }, /* $68 */
-    {   "adc",  2,  flNone,                   OH_Immidiate             }, /* $69 */
+    {   "adc",  2,  flNone,                   OH_Immediate             }, /* $69 */
     {   "ror",  1,  flNone,                   OH_Accumulator           }, /* $6a */
     {   "rtl",  1,  flNone,                   OH_Implicit              }, /* $6b */
     {   "jmp",  3,  flLabel,                  OH_JmpAbsoluteIndirect   }, /* $6c */
@@ -184,7 +184,7 @@ const OpcDesc OpcTable_65816[256] = {
     {   "stx",  2,  flUseLabel,               OH_Direct                }, /* $86 */
     {   "sta",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $87 */
     {   "dey",  1,  flNone,                   OH_Implicit              }, /* $88 */
-    {   "bit",  2,  flNone,                   OH_Immidiate             }, /* $89 */
+    {   "bit",  2,  flNone,                   OH_Immediate             }, /* $89 */
     {   "txa",  1,  flNone,                   OH_Implicit              }, /* $8a */
     {   "phb",  1,  flNone,                   OH_Implicit              }, /* $8b */
     {   "sty",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $8c */
@@ -207,16 +207,16 @@ const OpcDesc OpcTable_65816[256] = {
     {   "sta",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $9d */
     {   "stz",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $9e */
     {   "sta",  4,  flUseLabel,               OH_AbsoluteLongX         }, /* $9f */
-    {   "ldy",  2,  flNone,                   OH_Immidiate             }, /* $a0 */
+    {   "ldy",  2,  flNone,                   OH_Immediate             }, /* $a0 */
     {   "lda",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $a1 */
-    {   "ldx",  2,  flNone,                   OH_Immidiate             }, /* $a2 */
+    {   "ldx",  2,  flNone,                   OH_Immediate             }, /* $a2 */
     {   "lda",  2,  flNone,                   OH_StackRelative         }, /* $a3 */
     {   "ldy",  2,  flUseLabel,               OH_Direct                }, /* $a4 */
     {   "lda",  2,  flUseLabel,               OH_Direct                }, /* $a5 */
     {   "ldx",  2,  flUseLabel,               OH_Direct                }, /* $a6 */
     {   "lda",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $a7 */
     {   "tay",  1,  flNone,                   OH_Implicit              }, /* $a8 */
-    {   "lda",  2,  flNone,                   OH_Immidiate             }, /* $a9 */
+    {   "lda",  2,  flNone,                   OH_Immediate             }, /* $a9 */
     {   "tax",  1,  flNone,                   OH_Implicit              }, /* $aa */
     {   "plb",  1,  flNone,                   OH_Implicit              }, /* $ab */
     {   "ldy",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ac */
@@ -239,16 +239,16 @@ const OpcDesc OpcTable_65816[256] = {
     {   "lda",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $bd */
     {   "ldx",  3,  flUseLabel|flAbsOverride, OH_AbsoluteY             }, /* $be */
     {   "lda",  4,  flUseLabel,               OH_AbsoluteLongX         }, /* $bf */
-    {   "cpy",  2,  flNone,                   OH_Immidiate             }, /* $c0 */
+    {   "cpy",  2,  flNone,                   OH_Immediate             }, /* $c0 */
     {   "cmp",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $c1 */
-    {   "rep",  2,  flNone,                   OH_Immidiate             }, /* $c2 */
+    {   "rep",  2,  flNone,                   OH_Immediate             }, /* $c2 */
     {   "cmp",  2,  flNone,                   OH_StackRelative         }, /* $c3 */
     {   "cpy",  2,  flUseLabel,               OH_Direct                }, /* $c4 */
     {   "cmp",  2,  flUseLabel,               OH_Direct                }, /* $c5 */
     {   "dec",  2,  flUseLabel,               OH_Direct                }, /* $c6 */
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $c7 */
     {   "iny",  1,  flNone,                   OH_Implicit              }, /* $c8 */
-    {   "cmp",  2,  flNone,                   OH_Immidiate             }, /* $c9 */
+    {   "cmp",  2,  flNone,                   OH_Immediate             }, /* $c9 */
     {   "dex",  1,  flNone,                   OH_Implicit              }, /* $ca */
     {   "wai",  1,  flNone,                   OH_Implicit              }, /* $cb */
     {   "cpy",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $cc */
@@ -271,16 +271,16 @@ const OpcDesc OpcTable_65816[256] = {
     {   "cmp",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $dd */
     {   "dec",  3,  flUseLabel|flAbsOverride, OH_AbsoluteX             }, /* $de */
     {   "cmp",  4,  flUseLabel,               OH_AbsoluteLongX         }, /* $df */
-    {   "cpx",  2,  flNone,                   OH_Immidiate             }, /* $e0 */
+    {   "cpx",  2,  flNone,                   OH_Immediate             }, /* $e0 */
     {   "sbc",  2,  flUseLabel,               OH_DirectXIndirect       }, /* $e1 */
-    {   "sep",  2,  flNone,                   OH_Immidiate             }, /* $e2 */
+    {   "sep",  2,  flNone,                   OH_Immediate             }, /* $e2 */
     {   "sbc",  2,  flNone,                   OH_StackRelative         }, /* $e3 */
     {   "cpx",  2,  flUseLabel,               OH_Direct                }, /* $e4 */
     {   "sbc",  2,  flUseLabel,               OH_Direct                }, /* $e5 */
     {   "inc",  2,  flUseLabel,               OH_Direct                }, /* $e6 */
     {   "sbc",  2,  flUseLabel,               OH_DirectIndirectLong    }, /* $e7 */
     {   "inx",  1,  flNone,                   OH_Implicit              }, /* $e8 */
-    {   "sbc",  2,  flNone,                   OH_Immidiate             }, /* $e9 */
+    {   "sbc",  2,  flNone,                   OH_Immediate             }, /* $e9 */
     {   "nop",  1,  flNone,                   OH_Implicit              }, /* $ea */
     {   "xba",  1,  flNone,                   OH_Implicit              }, /* $eb */
     {   "cpx",  3,  flUseLabel|flAbsOverride, OH_Absolute              }, /* $ec */

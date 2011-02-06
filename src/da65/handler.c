@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -219,7 +219,7 @@ void OH_Implicit (const OpcDesc* D)
 
 
 
-void OH_Immidiate (const OpcDesc* D)
+void OH_Immediate (const OpcDesc* D)
 {
     OneLine (D, "#$%02X", GetCodeByte (PC+1));
 }
@@ -427,7 +427,7 @@ void OH_BitBranch (const OpcDesc* D)
 
 
 
-void OH_ImmidiateDirect (const OpcDesc* D)
+void OH_ImmediateDirect (const OpcDesc* D)
 {
     /* Get the operand */
     unsigned Addr = GetCodeByte (PC+2);
@@ -441,7 +441,7 @@ void OH_ImmidiateDirect (const OpcDesc* D)
 
 
 
-void OH_ImmidiateDirectX (const OpcDesc* D)
+void OH_ImmediateDirectX (const OpcDesc* D)
 {
     /* Get the operand */
     unsigned Addr = GetCodeByte (PC+2);
@@ -455,7 +455,7 @@ void OH_ImmidiateDirectX (const OpcDesc* D)
 
 
 
-void OH_ImmidiateAbsolute (const OpcDesc* D)
+void OH_ImmediateAbsolute (const OpcDesc* D)
 {
     /* Get the operand */
     unsigned Addr = GetCodeWord (PC+2);
@@ -469,7 +469,7 @@ void OH_ImmidiateAbsolute (const OpcDesc* D)
 
 
 
-void OH_ImmidiateAbsoluteX (const OpcDesc* D)
+void OH_ImmediateAbsoluteX (const OpcDesc* D)
 {
     /* Get the operand */
     unsigned Addr = GetCodeWord (PC+2);
@@ -580,7 +580,7 @@ void OH_JmpAbsoluteIndirect (const OpcDesc* D)
     if (NewlineAfterJMP) {
         LineFeed ();
     }
-    SeparatorLine ();  
+    SeparatorLine ();
 }
 
 

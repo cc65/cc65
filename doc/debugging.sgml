@@ -2,12 +2,12 @@
 
 <article>
 
-<title>Using VICE with cc65
+<title>Using emulators with cc65
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
 <date>03.12.2000
 
 <abstract>
-How to debug your code using the VICE emulator.
+How to debug your code using the VICE and Oricutron emulators.
 </abstract>
 
 <!-- Table of contents -->
@@ -92,6 +92,10 @@ a linker command line would be:
 <tscreen><verb>
     ld65 -o hello -t c64 -Ln hello.lbl -m hello.map hello.o c64.lib
 </verb></tscreen>
+or
+<tscreen><verb>
+    ld65 -o hello.tap -t atmos -Ln hello.sym -m hello.map hello.o atmos.lib
+</verb></tscreen>
 
 This will generate a file named hello.lbl that contains all symbols used in
 your program.
@@ -101,7 +105,7 @@ debug info, so you don't have to care about this.
 
 
 
-<sect>How to use the label file<p>
+<sect>How to use the label file with VICE<p>
 
 Load your program, then enter the monitor and use the "<tt/ll/" command to
 load your label file like this:
@@ -126,7 +130,25 @@ the compiler prepends an underline under most named labels).
 
 
 
+<sect>How to use the label file with Oricutron<p>
+
+Load your program, then enter the monitor and use the "<tt/sl/" command to
+load your label file like this:
+
+<tscreen><verb>
+       	sl hello.sym
+</verb></tscreen>
+
+After loading the labels, they are used by Oricutron in the disassembler listing,
+and you may use them whereever you need to specify an address. Try
+
+<tscreen><verb>
+	d ._main
+</verb></tscreen>
+
+as an example (note that VICE needs a leading dot before all labels, and that
+the compiler prepends an underline under most named labels).
+
+
+
 </article>
-
-
-

@@ -56,7 +56,7 @@ struct __antic {
 
 /* antic instruction set */
 
-/* absolute intructions (non mode lines) */
+/* absolute instructions (non mode lines) */
 #define DL_JMP  1
 #define DL_JVB  65
 
@@ -69,7 +69,7 @@ struct __antic {
 #define DL_BLK7 96
 #define DL_BLK8 112
 
-/* absoulte instructions (mode lines) */
+/* absolute instructions (mode lines) */
 #define DL_CHR40x8x1    2       /* monochrome, 40 character & 8 scanlines per mode line (GR. 0) */
 #define DL_CHR40x10x1   3       /* monochrome, 40 character & 10 scanlines per mode line */
 #define DL_CHR40x8x4    4       /* colour, 40 character & 8 scanlines per mode line (GR. 12) */

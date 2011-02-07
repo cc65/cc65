@@ -1673,9 +1673,9 @@ static void ConsumeEOL (InputData* D)
 static void ParseFile (InputData* D)
 /* Parse a FILE line */
 {
-    unsigned      Id;
-    unsigned long Size;
-    unsigned long MTime;
+    unsigned      Id = 0;  
+    unsigned long Size = 0;
+    unsigned long MTime = 0;
     StrBuf        FileName = STRBUF_INITIALIZER;
     FileInfo*     F;
     enum {
@@ -1797,11 +1797,11 @@ ErrorExit:
 static void ParseLine (InputData* D)
 /* Parse a LINE line */
 {
-    unsigned        File;
-    unsigned        Segment;
-    cc65_line       Line;
-    cc65_addr       Start;
-    cc65_addr       End;
+    unsigned        File = 0;
+    unsigned        Segment = 0;
+    cc65_line       Line = 0;
+    cc65_addr       Start = 0;
+    cc65_addr       End = 0;
     cc65_line_type  Type = CC65_LINE_ASM;
     unsigned        Count = 0;
     LineInfo*   L;
@@ -1951,12 +1951,12 @@ ErrorExit:
 static void ParseSegment (InputData* D)
 /* Parse a SEGMENT line */
 {
-    unsigned        Id;
-    cc65_addr       Start;
-    cc65_addr       Size;
+    unsigned        Id = 0;
+    cc65_addr       Start = 0;
+    cc65_addr       Size = 0;
     StrBuf          SegName = STRBUF_INITIALIZER;
     StrBuf          OutputName = STRBUF_INITIALIZER;
-    unsigned long   OutputOffs;
+    unsigned long   OutputOffs = 0;
     SegInfo*        S;
     enum {
         ibNone      = 0x00,

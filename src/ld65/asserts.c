@@ -82,9 +82,10 @@ Assertion* ReadAssertion (FILE* F, struct ObjData* O)
     Assertion* A = xmalloc (sizeof (Assertion));
 
     /* Read the fields from the file */
-    A->Expr = ReadExpr (F, O);
-    A->Action = (AssertAction) ReadVar (F);
-    A->Msg = MakeGlobalStringId (O, ReadVar (F));
+    A->LineInfos = EmptyCollection;
+    A->Expr      = ReadExpr (F, O);
+    A->Action    = (AssertAction) ReadVar (F);
+    A->Msg       = MakeGlobalStringId (O, ReadVar (F));
     ReadLineInfoList (F, O, &A->LineInfos);
 
     /* Set remaining fields */
@@ -107,7 +108,7 @@ void CheckAssertions (void)
     /* Walk over all assertions */
     for (I = 0; I < CollCount (&Assertions); ++I) {
 
-        const LineInfo* LI;                 
+        const LineInfo* LI;
         const char* Module;
         unsigned long Line;
 
@@ -121,7 +122,7 @@ void CheckAssertions (void)
 
         /* Retrieve the relevant line info for this assertion */
         LI = CollConstAt (&A->LineInfos, 0);
-                           
+
         /* Get file name and line number from the source */
         Module = GetSourceName (LI);
         Line   = GetSourceLine (LI);
@@ -156,6 +157,6 @@ void CheckAssertions (void)
         }
     }
 }
-                                   
+
 
 

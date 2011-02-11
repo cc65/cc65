@@ -136,5 +136,6 @@ DEVLST  :=      $BF32		; Up to 14 units may be active
 DATELO  :=      $BF90		; Bits 15-9 = year, 8-5 = month, 4-0 = day
 TIMELO  :=      $BF92		; Bits 12-8 = hour, 5-0 = minute
 LEVEL   :=      $BF94		; File level: used in open, flush, close
+MACHID  :=      $BF98		; Machine identification
 PFIXPTR :=      $BF9A		; If = 0, no prefix active
 KVERSION:=      $BFFF           ; Kernel version number

@@ -38,7 +38,7 @@ _exec:
         lda	#GET_INFO_CALL
         ldx	#GET_INFO_COUNT
         jsr	callmli
-oserr2: bcs	oserr
+        bcs	oserr
 
         ; If we get here the program file at least exists so we copy
         ; the loader stub right now and patch it later to set params
@@ -47,12 +47,23 @@ oserr2: bcs	oserr
         sta	target,x
         dex
         bpl	:-
-        
+
         ; Check program file type
         lda	mliparam + MLI::INFO::FILE_TYPE
         cmp	#$FF		; SYS file?
         bne	binary		; No, check for BIN file
 
+        ; ProDOS TechRefMan, chapter 5.1.5.1:
+        ; "The complete or partial pathname of the system program
+        ;  is stored at $280, starting with a length byte."
+        ldy	#$00
+        lda	(sp),y
+        tay
+:       lda	(sp),y
+        sta	$0280,y
+        dey
+        bpl	:-
+        
         ; SYS programs replace BASIC.SYSTEM so set in the ProDOS system bit map
         ; protection for pages $80 - $BF just in case BASIC.SYSTEM is there now
         ldx	#$0F		; Start with protection for pages $B8 - $BF
@@ -124,12 +135,28 @@ setbuf: lda	#$00		; Low byte
         ; Restore file level
         ldx	level
         stx	LEVEL
-        bcs	oserr2
+        bcc	:+
+        jmp	oserr
 
         ; Get and save fd
-        lda	mliparam + MLI::OPEN::REF_NUM
+:       lda	mliparam + MLI::OPEN::REF_NUM
         sta	read_ref
         sta	close_ref
+
+        .ifdef  __APPLE2ENH__
+        ; Calling the 80 column firmware needs the ROM switched
+        ; in, otherwise it copies the F8 ROM to the LC (@ $CEF4)
+        bit	$C082
+
+        ; ProDOS TechRefMan, chapter 5.3.1.3:
+        ; "80-column text cards -- and other Apple IIe features -- can
+        ;  be turned off using the following sequence of instructions:"
+        lda	#$15
+        jsr	$C300
+
+        ; Switch in LC bank 2 for R/O
+        bit	$C080
+        .endif
 
         ; Call loader stub after C libary shutdown
         lda	#<target

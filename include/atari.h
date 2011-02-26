@@ -8,7 +8,7 @@
 /*                                                                           */
 /* (C) 2000-2006 Mark Keates <markk@dendrite.co.uk>                          */
 /*               Freddy Offenga <taf_offenga@yahoo.com>                      */
-/*               Christian Groessler <cpg@aladdin.de>                        */
+/*               Christian Groessler <chris@groessler.org>                   */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */

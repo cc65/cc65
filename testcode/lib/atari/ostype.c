@@ -1,7 +1,7 @@
 /*
  * testprogram for get_ostype() and get_tv() functions
  *
- * 09-Jul-2004, cpg@aladdin.de
+ * 09-Jul-2004, chris@groessler.org
  */
 
 #include <stdio.h>

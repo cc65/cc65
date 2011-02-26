@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2005 Christian Groessler <cpg@aladdin.de>                             */
+/* (C) 2005 Christian Groessler <chris@groessler.org>                        */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */

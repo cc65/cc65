@@ -3,6 +3,8 @@
 ;
 ; This header is required for cart builds.
 ;
+	.include "lynx.inc"
+	.include "extzp.inc"
 	.import         __RAM_START__
 	.import         __CODE_SIZE__,__DATA_SIZE__,__RODATA_SIZE__
 	.import		__STARTUP_SIZE__,__INIT_SIZE__
@@ -23,99 +25,198 @@
 							; rotation 2=right
 	.byte	0,0,0,0,0				; spare
 
-.if (.match (__BLOCKSIZE__, 2048))
-__LOADER_SIZE__=0
-.elseif (.match (__BLOCKSIZE__, 512))
-__LOADER_SIZE__=0
-.else
-__LOADER_SIZE__=410
+;**********************************
+; Here is the bootloader in plaintext
+; The idea is to make the smalles possible encrypted loader as decryption
+; is very slow. The minimum size is 49 bytes plus a zero byte.
+;**********************************
+;	EXE = $f000
+;
+;	.org $0200
+;
+;	; 1. force Mikey to be in memory
+;	stz	MAPCTL
+;
+;	; 3. set ComLynx to open collector
+;	lda #4          ; a = 00000100
+;	sta SERCTL      ; set the ComLynx to open collector
+;
+;	; 4. make sure the ROM is powered on
+;	lda #8          ; a = 00001000
+;	sta IODAT       ; set the ROM power to on
+;
+;	; 5. read in secondary exe + 8 bytes from the cart and store it in $f000
+;	ldx #0          ; x = 0
+;	ldy #$AB        ; y = secondary loader
+;rloop1: lda RCART0     ; read a byte from the cart
+;	sta EXE,X       ; EXE[X] = a
+;	inx             ; x++
+;	dey             ; y--
+;	bne rloop1      ; loops until y wraps
+;
+;	; 6. jump to secondary loader
+;	jmp EXE         ; run the secondary loader
+;
+;	.reloc
+;**********************************
+; After compilation, encryption and obfuscation it turns into this.
+;**********************************
+__LOADER_SIZE__=52
+	.byte $ff, $dc, $e3, $bd, $bc, $7f, $f8, $94 
+	.byte $b7, $dd, $68, $bb, $da, $5b, $50, $5c 
+	.byte $ea, $9f, $2b, $df, $96, $80, $3f, $7e 
+	.byte $ef, $15, $81, $ae, $ad, $e4, $6e, $b3 
+	.byte $46, $d7, $72, $58, $f7, $76, $8a, $4a 
+	.byte $c7, $99, $bd, $ff, $02, $3e, $5b, $3f 
+	.byte $0c, $49, $1b, $22
 
-	; The cart starts with an encrypted loader for 1024 bytes/block
-	; images. The size of the loader is 410 bytes followed by two
-	; mandatory directory entries.
-	.byte	$FD,$C1,$0D,$8E,$E9,$EE,$09,$13,$E5,$96
-	.byte	$0C,$34,$64,$DA,$D4,$BB,$99,$EC,$CE,$4F
-	.byte	$AA,$8C,$ED,$65,$F0,$32,$70,$A3,$84,$C4
-	.byte	$FC,$A2,$6D,$3A,$F8,$77,$4B,$AC,$9B,$54
-	.byte	$7D,$82,$6F,$F8,$A5,$06,$4D,$7B,$77,$55
-	.byte	$E4,$31,$C4,$2C,$2F,$2F,$B6,$4D,$15,$A9
-	.byte	$C7,$99,$5D,$6E,$B3,$97,$92,$44,$7B,$2B
-	.byte	$85,$18,$E6,$F1,$96,$F4,$C4,$DE,$A4,$CF
-	.byte	$79,$E2,$C1,$1A,$E0,$0C,$93,$C5,$26,$BD
-	.byte	$A3,$16,$8A,$C3,$59,$A0,$39,$38,$A0,$3B
-	.byte	$EF,$BB,$1D,$5C,$0D,$1D,$CC,$48,$1D,$DD
-	.byte	$98,$9A,$7A,$F7,$96,$F9,$61,$03,$50,$DA
-	.byte	$47,$69,$94,$C3,$80,$DA,$A9,$99,$A1,$21
-	.byte	$2B,$2E,$7D,$F5,$E4,$F7,$B3,$5C,$A8,$14
-	.byte	$FA,$E9,$06,$AC,$1E,$9F,$B5,$31,$BE,$42
-	.byte	$14,$08,$0E,$05,$FB,$25,$BB,$5C,$5C,$66
-	.byte	$76,$8E,$36,$E8,$EB,$39,$F2,$26,$BD,$17
-	.byte	$29,$F4,$B8,$1D,$7E,$EE,$47,$61,$BB,$9E
-	.byte	$F5,$72,$C9,$BC,$26,$37,$D5,$78,$8F,$D0
-	.byte	$CE,$95,$21,$EB,$4A,$07,$8D,$3A,$3A,$01
-	.byte	$82,$CF,$01,$C5,$1E,$1D,$A8,$41,$4F,$BD
-	.byte	$C1,$76,$22,$A3,$88,$D9,$57,$C9,$51,$3A
-	.byte	$26,$BE,$4A,$1A,$7F,$42,$61,$CF,$FC,$FC
-	.byte	$5B,$06,$94,$D2,$2C,$78,$45,$BA,$93,$C4
-	.byte	$7D,$7C,$81,$73,$07,$4F,$E2,$6C,$E9,$81
-	.byte	$1A,$DE,$77,$74,$87,$DE,$26,$9E,$7A,$A8
-	.byte	$19,$A7,$34,$32,$70,$ED,$59,$A8,$4A,$D8
-	.byte	$FE,$CB,$DD,$02,$2F,$CE,$92,$E9,$13,$A6
-	.byte	$FF,$B4,$4B,$18,$9D,$63,$48,$E0,$3B,$3B
-	.byte	$0D,$2B,$FC,$04,$A4,$E3,$5E,$4C,$3C,$94
-	.byte	$70,$C4,$F0,$64,$15,$48,$68,$17,$DE,$14
-	.byte	$72,$F0,$59,$33,$4C,$49,$47,$8D,$B6,$F4
-	.byte	$82,$4E,$B7,$4E,$01,$C9,$C2,$82,$0B,$7A
-	.byte	$AC,$67,$9B,$0F,$04,$E1,$B6,$78,$34,$C8
-	.byte	$4F,$2A,$11,$ED,$D0,$1C,$6D,$CD,$3D,$47
-	.byte	$09,$8B,$E5,$38,$19,$7A,$31,$6E,$30,$71
-	.byte	$1C,$90,$34,$E5,$44,$CC,$00,$C7,$41,$D0
-	.byte	$27,$8A,$06,$29,$5C,$2B,$E4,$26,$63,$09
-	.byte	$52,$D3,$97,$33,$D7,$59,$1C,$36,$2F,$C9
-	.byte	$A9,$A2,$B5,$BB,$A9,$1D,$E6,$36,$7E,$56
-	.byte	$05,$A4,$9C,$E0,$45,$59,$21,$E1,$E6,$21
-.endif
+;**********************************
+; Now we have the secondary loader
+;**********************************
+__LOADER2_SIZE__=171
+	.org $f000
+	; 1. Read in the 1st File-entry (main exe) in FileEntry
+	ldx #$00
+	ldy #8
+rloop:	lda RCART0      ; read a byte from the cart
+	sta _FileEntry,X ; EXE[X] = a
+	inx
+	dey
+	bne rloop
 
-	; The directory structure required by the 410 byte bootloader
+	; 2. Set the block hardware to the main exe start
+	lda	_FileStartBlock
+	sta	_FileCurrBlock
+	jsr	seclynxblock
+
+	; 3. Skip over the block offset
+	lda	_FileBlockOffset
+	ldx	_FileBlockOffset+1
+	phx				; The BLL kit uses negative offsets
+	plx				; while the basic Lynx uses positive
+	bmi	@1			; Make all offsets negative
+        eor	#$FF
+	pha
+	txa
+        eor	#$FF
+	bra	@2
+@1:	pha
+	txa
+@2:	tay
+	plx
+	jsr	seclynxskip0
+
+	; 4. Read in the main exe to RAM
+	lda	_FileDestAddr
+	ldx	_FileDestAddr+1
+	sta     _FileDestPtr
+	stx     _FileDestPtr+1
+	lda     _FileFileLen
+	ldx     _FileFileLen+1
+	phx			; The BLL kit uses negative counts
+	plx			; while the basic Lynx uses positive
+	bmi	@3		; make all counts negative
+	eor	#$FF
+	pha
+	txa
+	eor	#$FF
+	bra	@4
+@3:	pha
+	txa
+@4:	tay
+	plx
+	jsr     seclynxread0
+
+	; 5. Jump to start of the main exe code
+	jmp	(_FileDestAddr)
+
+;**********************************
+; Skip bytes on bank 0
+; X:Y count (EOR $FFFF)
+;**********************************
+seclynxskip0:
+	inx
+	bne @0
+	iny
+	beq exit
+@0:	jsr secreadbyte0
+	bra seclynxskip0
+
+;**********************************
+; Read bytes from bank 0
+; X:Y count (EOR $ffff)
+;**********************************
+seclynxread0:
+	inx
+	bne @1
+	iny
+	beq exit
+@1:	jsr secreadbyte0
+	sta (_FileDestPtr)
+	inc _FileDestPtr
+	bne seclynxread0
+	inc _FileDestPtr+1
+	bra seclynxread0
+
+;**********************************
+; Read one byte from cartridge
+;**********************************
+secreadbyte0:
+	lda RCART0
+	inc _FileBlockByte
+	bne exit
+	inc _FileBlockByte+1
+	bne exit
+
+;**********************************
+; Select a block 
+;**********************************
+seclynxblock:
+	pha
+	phx
+	phy
+	lda __iodat
+	and #$fc
+	tay
+	ora #2
+	tax
+	lda _FileCurrBlock
+	inc _FileCurrBlock
+	sec
+	bra @2
+@0:	bcc @1
+	stx IODAT
+	clc
+@1:	inx
+	stx SYSCTL1
+	dex
+@2:	stx SYSCTL1
+	rol
+	sty IODAT
+	bne @0
+	lda __iodat
+	sta IODAT
+	stz _FileBlockByte
+	lda #<($100-(>__BLOCKSIZE__))
+	sta _FileBlockByte+1
+	ply
+	plx
+	pla
+
+exit:	rts
+	.reloc
+
 __DIRECTORY_START__:
 ; Entry 0 - title sprite (mandatory)
-off0=__LOADER_SIZE__+(__DIRECTORY_END__-__DIRECTORY_START__)
+off0=__LOADER_SIZE__+__LOADER2_SIZE__+(__DIRECTORY_END__-__DIRECTORY_START__)
 blocka=off0/__BLOCKSIZE__
-len0=(__TITLE_END__-__TITLE_START__)
-        .byte   <blocka
+; Entry 0 - first executable
+block0=off0/__BLOCKSIZE__
+len0=__STARTUP_SIZE__+__INIT_SIZE__+__CODE_SIZE__+__DATA_SIZE__+__RODATA_SIZE__
+        .byte   <block0
         .word   off0 & (__BLOCKSIZE__ - 1)
-        .byte   $00
-        .word   __TITLE_START__
-        .word   len0
-
-; Entry 1 - first executable (mandatory)
-off1=off0+len0
-block1=off1/__BLOCKSIZE__
-len1=__STARTUP_SIZE__+__INIT_SIZE__+__CODE_SIZE__+__DATA_SIZE__+__RODATA_SIZE__
-        .byte   <block1
-        .word   off1 & (__BLOCKSIZE__ - 1)
         .byte   $88
         .word   __RAM_START__
-        .word   len1
+        .word   len0
 __DIRECTORY_END__:
-	.org $2400
-__TITLE_START__:
-	; The palette for the title sprite. Complete black.
-	.byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-        .byte $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-	; The title sprite
-cls_sprite:
-        .byte   %00000001			; A pixel sprite
-       	.byte   %00010000
-       	.byte   %00100000
-       	.addr   0,pixel_bitmap
-       	.word   0
-       	.word   0
-       	.word   $a000  	                        ; 160
-       	.word   $6600	                        ; 102
-       	.byte   $00
-pixel_bitmap:
-        .byte   3,%10000100,%00000000, $0       ; A pixel bitmap
-__TITLE_END__:
-	.reloc
 

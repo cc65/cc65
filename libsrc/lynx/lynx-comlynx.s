@@ -32,15 +32,11 @@
 ;----------------------------------------------------------------------------
 ; Global variables
 ;
-; The ring buffers will be at the fixed place
-; Tx buffer $200 - $2ff. Rx buffer $300 - $3ff.
-; This memory area can usually not be used for anything as the encryption
-; stuff needs it. But for this purpose it fits perfectly.
 
 	.bss
 
-TxBuffer = $0200
-RxBuffer = $0300
+TxBuffer:	.res	256
+RxBuffer:	.res	256
 RxPtrIn:	.res	1
 RxPtrOut:	.res	1
 TxPtrIn:	.res	1

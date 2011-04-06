@@ -64,7 +64,8 @@ OBJS =  bllhdr.o	\
 	oserror.o	\
 	read.o		\
 	sysuname.o      \
-        toascii.o
+        toascii.o	\
+        uploader.o
 
 #--------------------------------------------------------------------------
 # Drivers

@@ -329,20 +329,21 @@ It does not declare any functions.
 
 <sect1><tt/serial.h/<label id="serial.h"><p>
 
-<!--
+The <tt/serial.h/ header file contains definitions for initializing serial
+communication.
+
 <itemize>
-<item><ref id="ser_load_driver" name="ser_load_driver">
-<item><ref id="ser_unload" name="ser_unload">
-<item><ref id="ser_install" name="ser_install">
-<item><ref id="ser_uninstall" name="ser_uninstall">
-<item><ref id="ser_open" name="ser_open">
 <item><ref id="ser_close" name="ser_close">
 <item><ref id="ser_get" name="ser_get">
+<item><ref id="ser_install" name="ser_install">
+<item><ref id="ser_ioctl" name="ser_ioctl">
+<item><ref id="ser_load_driver" name="ser_load_driver">
+<item><ref id="ser_open" name="ser_open">
 <item><ref id="ser_put" name="ser_put">
 <item><ref id="ser_status" name="ser_status">
-<item><ref id="ser_ioctl" name="ser_ioctl">
+<item><ref id="ser_uninstall" name="ser_uninstall">
+<item><ref id="ser_unload" name="ser_unload">
 </itemize>
--->
 
 (incomplete)
 
@@ -4160,6 +4161,256 @@ be used in presence of a prototype.
 <ref id="gotoy" name="gotoy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>ser_close<label id="ser_close"><p>
+
+<quote>
+<descrip>
+<tag/Function/Close the port and disable interrupts
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_close (const struct ser_params* params);/
+<tag/Description/Open the port by setting the port parameters and enable interrupts.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/
+<verb>
+#include <serial.h>
+ 
+extern char comlynx[];
+ 
+static void initialize(){
+  struct ser_params params = {
+    SER_BAUD_9600,
+    SER_BITS_8,
+    SER_STOP_1,
+    SER_PAR_MARK,
+    SER_HS_NONE
+  };
+  ser_install(&amp;comlynx); // This will activate the ComLynx
+  CLI();
+  ser_open(&amp;params);
+}
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>ser_get<label id="ser_get"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read a character from serial port.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_get (char* b);/
+<tag/Description/Get a character from the serial port. If no characters are
+available, the function will return SER_ERR_NO_DATA, so this is not a fatal
+error.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/
+Wait for a character to be available from a serial port.
+<verb>
+char ch;
+while (ser_get(&amp;ch) == SER_ERR_NO_DATA)
+  ;
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>ser_install<label id="ser_install"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install an already loaded driver and return an error code.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_install (void* driver);/
+<tag/Description/The function installs a driver that was already loaded into
+memory (or linked statically to the program). It returns an error code
+(<tt/SER_ERR_OK/ in case of success).
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="ser_load_driver" name="ser_load_driver">,
+<ref id="ser_uninstall" name="ser_uninstall">,
+<ref id="ser_unload" name="ser_unload">
+<tag/Example/<verb>
+extern char lynxser[]; //Include the driver statically instead of loading it.
+
+ser_install(&amp;lynxser);
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>ser_ioctl<label id="ser_ioctl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Platform dependent code extensions.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ ser_ioctl (unsigned char code, void* data);/
+<tag/Description/Some platforms have extra serial functions that are not
+supported by standard serial driver functions. You can extend the driver to support
+this extra functionality bt using ser_ioctl functions.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>These functions are not easily portable to other cc65 platforms.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/None
+</descrip>
+</quote>
+
+<sect1>ser_load_driver<label id="ser_load_driver"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load and install a serial driver.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/void __fastcall__ ser_load_driver (const char *name);/
+<tag/Description/Load and install the driver by name.
+Will just load the driver and check if loading was successul.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>ser_open<label id="ser_open"><p>
+
+<quote>
+<descrip>
+<tag/Function/Open the port by setting the port parameters and enable interrupts
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_open (const struct ser_params* params);/
+<tag/Description/Open the port by setting the port parameters and enable interrupts.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/
+<verb>
+#include <serial.h>
+ 
+extern char comlynx[];
+ 
+static void initialize(){
+  struct ser_params params = {
+    SER_BAUD_9600,
+    SER_BITS_8,
+    SER_STOP_1,
+    SER_PAR_MARK,
+    SER_HS_NONE
+  };
+  ser_install(&amp;comlynx); // This will activate the ComLynx
+  CLI();
+  ser_open(&amp;params);
+}
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>ser_put<label id="ser_put"><p>
+
+<quote>
+<descrip>
+<tag/Function/Write a character to a serial port.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_put (char b);/
+<tag/Description/Send a character via the serial port. There is a transmit
+buffer, but transmitting is not done via interrupt. The function returns
+SER_ERR_OVERFLOW if there is no space left in the transmit buffer.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/
+<verb>
+ser_put('A');
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>ser_status<label id="ser_status"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the serial port status.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_put (unsigned char* status);/
+<tag/Description/Return the serial port status.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/None
+</descrip>
+</quote>
+
+
+<sect1>ser_uninstall<label id="ser_uninstall"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall the currently loaded driver but do not unload it.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/void __fastcall__ ser_uninstall (void);/
+<tag/Description/Uninstall the currently loaded driver but do not unload it.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+<sect1>ser_unload<label id="ser_unload"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall, then unload the currently loaded driver.
+<tag/Header/<tt/<ref id="serial.h" name="serial.h">/
+<tag/Declaration/<tt/void __fastcall__ ser_unload (void);/
+<tag/Description/Uninstall, then unload the currently loaded driver.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/Other serial functions.
 <tag/Example/None.
 </descrip>
 </quote>

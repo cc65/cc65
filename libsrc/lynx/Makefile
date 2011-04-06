@@ -46,9 +46,11 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 # Object files
 
 OBJS =  bllhdr.o	\
+	bootldr.o       \
 	cgetc.o         \
         crt0.o          \
 	ctype.o		\
+	defdir.o	\
         eeprom.o        \
 	exec.o		\
 	exehdr.o	\

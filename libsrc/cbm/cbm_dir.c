@@ -13,7 +13,7 @@
 
 
 
-unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device) 
+unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device)
 {
     unsigned char status;
     if ((status = cbm_open (lfn, device, CBM_READ, "$")) == 0) {
@@ -42,7 +42,7 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
     unsigned char rv;
     unsigned char is_header;
     static const unsigned char types[] = {
-        CBM_T_OTHER, CBM_T_OTHER, CBM_T_CBM,   CBM_T_DIR,   /* a b c d */
+        CBM_T_OTHER, CBM_T_OTHER, CBM_T_CBM,   CBM_T_DEL,   /* a b c d */
         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* e f g h */
         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* i j k l */
         CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_PRG,   /* m n o p */
@@ -120,7 +120,9 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
                     l_dirent->type = CBM_T_OTHER;
                 }
 
-                cbm_k_basin();
+                if ((cbm_k_basin() == 'i') && (l_dirent->type == CBM_T_DEL)) {
+                    l_dirent->type = CBM_T_DIR;
+                }
                 cbm_k_basin();
 
                 byte = cbm_k_basin();

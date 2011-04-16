@@ -61,6 +61,7 @@ OBJS  =	_scrsize.o      \
         kbhit.o         \
         mainargs.o      \
         oserrlist.o     \
+        oserror.o       \
         revers.o        \
         systime.o       \
         sysuname.o      \

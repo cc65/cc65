@@ -1,94 +1,99 @@
-/* This is very simplified version of POSIX opendir(), readdir() and closedir() */
-/* for Commodore computers.                                                     */
-/* Created by Josef Soucek, 2003    E-mail:josef.soucek@ct.cz                   */
+/* This is a very simplified version of the POSIX opendir(),  */
+/* readdir(), and closedir() -- for Commodore computers.      */
+/* Created by Josef Soucek, 2003.  E-mail: josef.soucek@ct.cz */
 
-/* Version 0.1 - 21.1.2003 */
-/* Tested with floppy drive and IDE64 devices                                   */
-/* Not tested with messed (buggy) directory listing                             */
-/* Limits filenames to 16 chars (VICE supports more in directory listing)       */
+/* 2003-01-21 -- Version 0.1 */
+/* 2009-10-10 -- Version 0.3 */
+/* 2011-04-07 -- Version 0.4, groepaz */
+/* 2011-04-14 -- Version 0.5, Greg King */
 
+/* Tested with floppy-drive and IDE64 devices.        */
+/* Not tested with messed (buggy) directory listings. */
+/* Limits filenames to 16 chars. (VICE supports more  */
+/* in directory listings).                            */
 
 
 #include <cbm.h>
+#include <errno.h>
 
 
 
+/* Opens directory listing.
+** Returns 0 if openning directory was successful;
+** otherwise, an error-code corresponding to cbm_open().
+*/
 unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device)
 {
-    unsigned char status;
-    if ((status = cbm_open (lfn, device, CBM_READ, "$")) == 0) {
-        if (cbm_k_chkin (lfn) == 0) {
+    if (cbm_open (lfn, device, CBM_READ, "$") == 0) {
+        if ((_oserror = cbm_k_chkin (lfn)) == 0) {
             /* Ignore start address */
             cbm_k_basin();
             cbm_k_basin();
+            cbm_k_clrch();
             if (cbm_k_readst()) {
                 cbm_close(lfn);
-                status = 2;
-                cbm_k_clrch();
-            } else {
-                status = 0;
-                cbm_k_clrch();
+                _oserror = 4;           /* directory cannot be read */
             }
         }
     }
-    return status;
+    return _oserror;
 }
 
 
 
+/* Reads one directory line into cbm_dirent structure.
+** Returns 0 if reading directory-line was successful.
+** Returns non-zero if reading directory failed, or no more file-names to read.
+** Returns 2 on last line.  Then, l_dirent->size = the number of "blocks free."
+*/
 unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_dirent* l_dirent)
 {
-    unsigned char byte, i;
-    unsigned char rv;
-    unsigned char is_header;
+    unsigned char byte, i = 0;
+    unsigned char is_header = 0;
+    unsigned char rv = 1;
     static const unsigned char types[] = {
-        CBM_T_OTHER, CBM_T_OTHER, CBM_T_CBM,   CBM_T_DEL,   /* a b c d */
-        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* e f g h */
-        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* i j k l */
-        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_PRG,   /* m n o p */
-        CBM_T_OTHER, CBM_T_REL,   CBM_T_SEQ,   CBM_T_OTHER, /* q r s t */
-        CBM_T_USR,   CBM_T_VRP                              /* u v     */
+        CBM_T_CBM,   CBM_T_DEL,   CBM_T_OTHER, CBM_T_OTHER, /* c d e f */
+        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* g h i j */
+        CBM_T_OTHER, CBM_T_LNK,   CBM_T_OTHER, CBM_T_OTHER, /* k l m n */
+        CBM_T_OTHER, CBM_T_PRG,   CBM_T_OTHER, CBM_T_REL,   /* o p q r */
+        CBM_T_SEQ,   CBM_T_OTHER, CBM_T_USR,   CBM_T_VRP    /* s t u v */
     };
-
-    rv = 1;
-    is_header = 0;
 
     if (!cbm_k_chkin(lfn)) {
         if (!cbm_k_readst()) {
-            /* skip 2 bytes, next basic line pointer */
+            /* skip 2 bytes, next-BASIC-line pointer */
             cbm_k_basin();
             cbm_k_basin();
 
-            /* File-size */
-            l_dirent->size = cbm_k_basin() | ((cbm_k_basin()) << 8);
+            /* File-size or drive/partition number */
+            l_dirent->size = cbm_k_basin() | (cbm_k_basin() << 8);
 
             byte = cbm_k_basin();
+            switch (byte) {
 
-            /* "B" BLOCKS FREE. */
-            if (byte == 'b') {
-                /* Read until end, careless callers may call us again */
+                /* "B" BLOCKS FREE. */
+              case 'b':
+                /* Read until end; careless callers might call us again. */
                 while (!cbm_k_readst()) {
                     cbm_k_basin();
                 }
                 rv = 2; /* EOF */
                 goto ret_val;
-            }
 
-            /* reverse text shows that this is the directory header */
-            if (byte == 0x12) { /* RVS_ON */
+                /* Reverse-text shows when this is the directory header. */
+              case 0x12:  /* RVS_ON */
                 is_header = 1;
             }
 
             while (byte != '\"') {
-                byte = cbm_k_basin();
                 /* prevent endless loop */
                 if (cbm_k_readst()) {
                     rv = 3;
                     goto ret_val;
                 }
+                byte = cbm_k_basin();
             }
 
-            i = 0;
             while ((byte = cbm_k_basin()) != '\"') {
                 /* prevent endless loop */
                 if (cbm_k_readst()) {
@@ -103,41 +108,60 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
             }
             l_dirent->name[i] = '\0';
 
-            while ((byte = cbm_k_basin()) == ' ') {
-                /* prevent endless loop */
-                if (cbm_k_readst()) {
-                    rv = 5;
-                    goto ret_val;
-                }
-            }
-
             if (is_header) {
                 l_dirent->type = CBM_T_HEADER;
+
+		/* Get the disk-format code. */
+		i = 6;
+		do {
+		    l_dirent->access = byte = cbm_k_basin();
+		} while (--i != 0);
+
             } else {
-                if (byte >= 'a' && byte < 'a' + sizeof(types)) {
-                    l_dirent->type = types[byte - 'a'];
+                /* Go to the file-type column. */
+                while ((byte = cbm_k_basin()) == ' ') {
+                    /* prevent endless loop */
+                    if (cbm_k_readst()) {
+                        rv = 5;
+                        goto ret_val;
+                    }
+                }
+
+                l_dirent->access = CBM_A_RW;
+
+                /* "Splat" files shouldn't be read. */
+                if (byte == '*') {
+                    l_dirent->access = CBM_A_WO;
+                    byte = cbm_k_basin();
+                }
+
+                if (byte >= 'c' && byte < 'c' + sizeof types) {
+                    l_dirent->type = types[byte - 'c'];
                 } else {
                     l_dirent->type = CBM_T_OTHER;
                 }
 
-                if ((cbm_k_basin() == 'i') && (l_dirent->type == CBM_T_DEL)) {
-                    l_dirent->type = CBM_T_DIR;
-                }
+		/* Notice whether it's a directory or a deleted file. */
+		if (cbm_k_basin() == 'i' && byte == 'd') {
+		    l_dirent->type = CBM_T_DIR;
+		}
                 cbm_k_basin();
 
-                byte = cbm_k_basin();
-
-                l_dirent->access = (byte == 0x3C)? CBM_A_RO : CBM_A_RW;
+                /* Locked files shouldn't be written. */
+                if ((byte = cbm_k_basin()) == '<') {
+                    l_dirent->access = (l_dirent->access == CBM_A_WO)
+                        ? 0 : CBM_A_RO;
+                }
             }
 
-            /* read to end of line */
+            /* Read to the end of the line. */
             while (byte != 0) {
-                byte = cbm_k_basin();
                 /* prevent endless loop */
                 if (cbm_k_readst()) {
                     rv = 6;
                     goto ret_val;
                 }
+                byte = cbm_k_basin();
             }
 
             rv = 0;
@@ -151,7 +175,8 @@ ret_val:
 }
 
 
-void __fastcall__ cbm_closedir( unsigned char lfn)
+
+void __fastcall__ cbm_closedir (unsigned char lfn)
 {
     cbm_close(lfn);
 }

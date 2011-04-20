@@ -8,8 +8,8 @@
 
 
 
-#define COLOR_BACK	COLOR_BLACK
-#define COLOR_FORE	COLOR_WHITE
+#define COLOR_BACK	TGI_COLOR_BLACK
+#define COLOR_FORE	TGI_COLOR_WHITE
 
 
 /*****************************************************************************/
@@ -57,7 +57,7 @@ static void DoWarning (void)
 
 static void DoCircles (void)
 {
-    static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_ORANGE };
+    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_ORANGE };
     unsigned char I;
     unsigned char Color = COLOR_FORE;
     unsigned X = MaxX / 2;
@@ -83,7 +83,7 @@ static void DoCircles (void)
 
 static void DoCheckerboard (void)
 {
-    static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_BLACK };
+    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
     unsigned X, Y;
     unsigned char Color;
 
@@ -111,7 +111,7 @@ static void DoCheckerboard (void)
 
 static void DoDiagram (void)
 {
-    static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_BLACK };
+    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
     int XOrigin, YOrigin;
     int Amp;
     int X, Y;
@@ -155,7 +155,7 @@ static void DoDiagram (void)
 
 static void DoLines (void)
 {
-    static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_BLACK };
+    static const unsigned char Palette[2] = { TGI_COLOR_WHITE, TGI_COLOR_BLACK };
     unsigned X;
 
     tgi_setpalette (Palette);

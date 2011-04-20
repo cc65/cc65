@@ -51,7 +51,7 @@
 
 
 
-/* Color defines (default palette) */
+/* Color defines */
 #define COLOR_BLACK             0x00
 #define COLOR_RED               0x01
 #define COLOR_BLUE              0x02
@@ -69,6 +69,25 @@
 #define COLOR_LIGHTCYAN         0x0D
 #define COLOR_YELLOW            0x0E
 #define COLOR_WHITE             0x0F
+
+/* TGI color defines (default palette) */
+#define TGI_COLOR_BLACK         COLOR_BLACK      
+#define TGI_COLOR_RED           COLOR_RED        
+#define TGI_COLOR_BLUE          COLOR_BLUE       
+#define TGI_COLOR_GREEN         COLOR_GREEN      
+#define TGI_COLOR_VIOLET        COLOR_VIOLET     
+#define TGI_COLOR_PURPLE        COLOR_PURPLE     
+#define TGI_COLOR_CYAN          COLOR_CYAN       
+#define TGI_COLOR_PEAGREEN      COLOR_PEAGREEN   
+#define TGI_COLOR_GREY          COLOR_GREY       
+#define TGI_COLOR_NAVYBLUE      COLOR_NAVYBLUE   
+#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED   
+#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE  
+#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN 
+#define TGI_COLOR_LIGHTPURPLE   COLOR_LIGHTPURPLE
+#define TGI_COLOR_LIGHTCYAN     COLOR_LIGHTCYAN  
+#define TGI_COLOR_YELLOW        COLOR_YELLOW     
+#define TGI_COLOR_WHITE         COLOR_WHITE      
 
 
 

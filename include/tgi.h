@@ -53,10 +53,6 @@
 
 
 
-/* Color constants */
-#define TGI_COLOR_BLACK         0
-#define TGI_COLOR_WHITE         1
-
 /* Font constants for use with tgi_textstyle */
 #define TGI_FONT_BITMAP         0
 #define TGI_FONT_VECTOR         1

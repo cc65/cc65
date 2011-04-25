@@ -9,7 +9,7 @@
 	.import		initlib, donelib
 	.import		callmain, zerobss
 	.import		__RAM_START__, __RAM_SIZE__
-	.import		__BSS_LOAD__, __STACKSIZE__
+	.import		__ZPSAVE_LOAD__, __STACKSIZE__
 
 	.include	"zeropage.inc"
 	.include	"atmos.inc"
@@ -27,7 +27,7 @@
 	.byte	$00				; $2AF
 	.byte	$80				; $2AE Machine code flag
 	.byte	$C7				; $2AD Autoload flag
-	.dbyt	__BSS_LOAD__			; $2AB
+	.dbyt	__ZPSAVE_LOAD__			; $2AB
 	.dbyt	__RAM_START__			; $2A9
 	.byte	$00				; $2A8
 	.byte	((.VERSION >> 8) & $0F) + '0'

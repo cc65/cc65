@@ -50,7 +50,7 @@ char __fastcall__ ChangeDiskDevice(char newdev);
 #define	OFF_GS_DTYPE	189
 #define	OFF_OP_TR_SC	171
 #define	OFF_GS_ID	173
-/* disk errors reported in oserrno */
+/* disk errors reported in _oserror */
 #define	ANY_FAULT	0xf0
 #define G_EOF		0
 #define	NO_BLOCKS	1

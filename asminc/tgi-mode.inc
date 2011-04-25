@@ -42,7 +42,6 @@
         TGI_MODE_640_480_2	; 640x480,  2 colors (b/w)
         TGI_MODE_280_192_8      ; 280x192,  8 colors
         TGI_MODE_40_48_16       ; 40x48,   16 colors
-
         TGI_MODE_320_192_2
         TGI_MODE_160_192_4
         TGI_MODE_160_192_2
@@ -51,13 +50,15 @@
         TGI_MODE_80_48_4
         TGI_MODE_80_48_2
         TGI_MODE_40_24_4
-        TGI_MODE_80_192_16b     ; 80x192, 16 shades of the same color
+        TGI_MODE_80_192_16b     ; 80x192,  16 shades of the same color
         TGI_MODE_80_192_9
-        TGI_MODE_80_192_16h     ; 80x192, 16 colors with the same brightness
+        TGI_MODE_80_192_16h     ; 80x192,  16 colors with the same brightness
         TGI_MODE_320_192_2_2p
         TGI_MODE_80_192_16b_2p
         TGI_MODE_160_192_4_2p
         TGI_MODE_80_192_9_2p
+        TGI_MODE_160_102_16     ; 160x102, 16 colors
+        TGI_MODE_240_200_2      ; 240x200,  2 colors (b/w)
 .endenum
 
 

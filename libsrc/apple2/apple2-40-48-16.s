@@ -94,6 +94,12 @@ MIX:	.res	1		; 4 lines of text
 DEFPALETTE: .byte $00, $01, $02, $03, $04, $05, $06, $07
 	    .byte $08, $09, $0A, $0B, $0C, $0D, $0E, $0F
 
+TGI2COL:    .byte $00, $0C, $03, $0F, $01, $09, $06, $02
+	    .byte $04, $05, $07, $08, $0A, $0B, $0D, $0E
+
+COL2TGI:    .byte $00, $04, $07, $02, $08, $09, $06, $0A
+	    .byte $0B, $05, $0C, $0D, $01, $0E, $0F, $03
+
 MAXY:	.byte 47, 39
 
 ; ------------------------------------------------------------------------
@@ -189,7 +195,7 @@ CLEAR:
 	ldy	MAXY,x		; Max Y depends on 4 lines of text
 	jsr	CLRSC2
 	pla
-	sta	COLOR		; Save current drawing color
+	sta	COLOR		; Restore current drawing color
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
 
@@ -198,6 +204,8 @@ CLEAR:
 ; Must set an error code: NO (will only be called if color ok)
 SETCOLOR:
 	bit	$C082		; Switch in ROM
+	tax
+	lda	TGI2COL,x
 	jsr	SETCOL
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts
@@ -239,7 +247,7 @@ CONTROL:
 	cpx	#47+1		; Last line
 	bcc	:-
 	pla
-	sta	COLOR		; Save current drawing color
+	sta	COLOR		; Restore current drawing color
 	bcs	:+		; Branch always
 
 	; Clear 4 lines of text
@@ -301,6 +309,8 @@ GETPIXEL:
 	ldy	X1
 	lda	Y1
 	jsr	SCRN
+	tax
+	lda	COL2TGI,x
 	ldx	#$00
 	bit	$C080		; Switch in LC bank 2 for R/O
 	rts

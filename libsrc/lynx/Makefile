@@ -51,6 +51,9 @@ OBJS =  bllhdr.o	\
 	ctype.o		\
 	defdir.o	\
         eeprom.o        \
+        eeprom46.o      \
+        eeprom66.o      \
+        eeprom86.o      \
 	exec.o		\
 	exehdr.o	\
         extzp.o         \

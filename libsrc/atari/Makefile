@@ -113,8 +113,9 @@ OBJS = 	_scrsize.o      \
 	sysrmdir.o      \
 	systime.o       \
 	sysuname.o      \
-	toascii.o       \
+	tgi_colors.o    \
 	tgi_mode_table.o\
+	toascii.o       \
 	tvtype.o        \
 	ucase_fn.o      \
 	wherex.o        \

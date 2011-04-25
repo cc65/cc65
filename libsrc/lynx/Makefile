@@ -4,7 +4,6 @@
 
 .SUFFIXES: .o .s .c
 
-
 #--------------------------------------------------------------------------
 # Programs and flags
 
@@ -64,6 +63,7 @@ OBJS =  bllhdr.o	\
 	oserror.o	\
 	read.o		\
 	sysuname.o      \
+        tgi_colors.o	\
         toascii.o	\
         uploader.o
 

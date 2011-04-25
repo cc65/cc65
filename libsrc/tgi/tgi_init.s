@@ -55,7 +55,7 @@
 
 ; Set the drawing color to white
 
-@L1:    lda     #TGI_COLOR_WHITE
+@L1:    lda     #tgi_color_white
         jsr     _tgi_setcolor           ; tgi_setcolor (TGI_COLOR_WHITE);
 
 ; Set the text style

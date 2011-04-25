@@ -78,10 +78,7 @@
 TGI_API_VERSION         = $03
 
 ;------------------------------------------------------------------------------
-; Color and text constants
-
-TGI_COLOR_BLACK         = 0
-TGI_COLOR_WHITE         = 1
+; Text constants
 
 TGI_FONT_BITMAP         = 0
 TGI_FONT_VECTOR         = 1
@@ -99,7 +96,13 @@ TGI_CLIP_BOTTOM         = $04
 TGI_CLIP_TOP            = $08
 
 ;------------------------------------------------------------------------------
-; C accessible Variables
+; ASM accessible color constants
+
+	.global	tgi_color_black:zp	; Target-specific value for black
+	.global	tgi_color_white:zp	; Target-specific value for white
+
+;------------------------------------------------------------------------------
+; C accessible variables
 
 	.global	_tgi_drv      		; Pointer to driver
 	.global	_tgi_error    		; Last error code
@@ -125,7 +128,7 @@ TGI_CLIP_TOP            = $08
         .global _tgi_aspectratio        ; Aspect ratio, fixed point 8.8
 
 ;------------------------------------------------------------------------------
-; ASM accessible Variables
+; ASM accessible variables
 
        	.global	tgi_clip_x1             ; Coordinate for line clipper
        	.global	tgi_clip_y1             ; Coordinate for line clipper

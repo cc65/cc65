@@ -65,6 +65,7 @@ OBJS  =	_scrsize.o      \
         revers.o        \
         systime.o       \
         sysuname.o      \
+        tgi_colors.o    \
         wherex.o        \
         wherey.o        \
         write.o

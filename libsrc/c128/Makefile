@@ -67,6 +67,7 @@ OBJS =	_scrsize.o		\
 	slow.o			\
         systime.o               \
         sysuname.o              \
+        tgi_colors.o            \
 	tgi_mode_table.o	\
 	toggle_videomode.o      \
         videomode.o

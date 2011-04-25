@@ -107,6 +107,7 @@ S_OBJS=	_scrsize.o	\
         systime.o       \
         sysuname.o      \
 	textframe.o	\
+        tgi_colors.o    \
         tgi_mode_table.o\
         toascii.o       \
         videomode.o     \

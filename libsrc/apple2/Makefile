@@ -103,6 +103,7 @@ S_OBJS=	_scrsize.o	\
 	sysrmdir.o	\
         systime.o       \
         sysuname.o      \
+        tgi_colors.o    \
         tgi_mode_table.o\
         toascii.o       \
         vtabz.o         \

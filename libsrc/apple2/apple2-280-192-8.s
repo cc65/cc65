@@ -142,12 +142,11 @@ FONT:
 INSTALL:
 	.ifdef  __APPLE2ENH__
 	; No page switching if 80 column store is enabled
-	lda	#$02
 	bit	RD80COL
 	bpl	:+
 	lda	#$01
-:	sta	pages
-	.endif
+	sta	pages
+:	.endif
 
 	; Fall through
 
@@ -175,7 +174,7 @@ INIT:
 
 	; Beagle Bros Shape Mechanic fonts don't
 	; scale well so use fixed scaling factor
-	lda	#1
+	lda	#$01
 	sta	SCALE
 
 	; Done, reset the error code
@@ -402,7 +401,7 @@ OUTTEXT:
 	php			; Save Z flag
 	beq	:+		; Not horizontal
 	sec
-	sbc	#7		; Adjust X
+	sbc	#$07		; Adjust X
 	bcs	:+
 	dey
 :	tax
@@ -410,7 +409,7 @@ OUTTEXT:
 	plp			; Restore Z flag
 	bne	:+		; Not vertical
 	sec
-	sbc	#7		; Adjust Y
+	sbc	#$07		; Adjust Y
 :	jsr	HPOSN
 	clc
 	lda	FONT+2*99	; "connection char"

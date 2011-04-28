@@ -43,7 +43,7 @@ SETALTCHAR :=   $C00F   ; Norm/inv LC, no flash
 ALTCHARSET :=   $C01E   ; >127 if alt charset switched in
 
 ; Language card switches
-RDLCBNK2 :=	$C011	; >127 if LC bank 2 in use
+RDLCBNK2:=	$C011	; >127 if LC bank 2 in use
 RDLCRAM	:=	$C012	; >127 if LC is read enabled
 ROMIN	:=	$C081	; Swap in D000-FFFF ROM
 LCBANK2	:=	$C083	; Swap in LC bank 2

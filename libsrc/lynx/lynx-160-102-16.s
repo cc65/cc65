@@ -34,7 +34,7 @@
         .byte   2                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .word	$0100                   ; Aspect ratio
+        .word	$0100                   ; Aspect ratio (square pixel LCD)
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented). A future version may

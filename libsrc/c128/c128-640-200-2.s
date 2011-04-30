@@ -62,7 +62,7 @@ yres:   .word   200                     ; Y resolution
 pages:	.byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .word   $100                    ; Aspect ratio
+        .word   $006A                   ; Aspect ratio (based on 4/3 display)
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).

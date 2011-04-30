@@ -34,7 +34,7 @@
 ; Screen memory size in bytes
 	scrsize = x_res * y_res / ppb
 ; Pixel aspect ratio
-	aspect = $0100				; 1:1
+	aspect = $00CC				; based on 4/3 display
 ; Free memory needed
 	mem_needed = 185
 ; Number of screen pages

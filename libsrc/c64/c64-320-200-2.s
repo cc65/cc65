@@ -30,7 +30,7 @@
         .byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .word   $100                    ; Aspect ratio
+        .word   $00D4                   ; Aspect ratio (based on 4/3 display)
 
 ; Next comes the jump table. With the exception of IRQ, all entries must be
 ; valid and may point to an RTS for test versions (function not implemented).

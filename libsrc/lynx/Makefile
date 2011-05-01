@@ -67,7 +67,6 @@ OBJS =  bllhdr.o	\
 	read.o		\
 	sysuname.o      \
         tgi_colors.o	\
-        tgi_mode_table.o\
         toascii.o	\
         uploader.o
 

@@ -84,7 +84,7 @@ TGI_FONT_BITMAP         = 0
 TGI_FONT_VECTOR         = 1
 
 TGI_TEXT_HORIZONTAL     = 0
-TGI_TEXT_VERTICAL       = 1  
+TGI_TEXT_VERTICAL       = 1
 
 ;----------------------------------------------------------------------------
 ; Results of tgi_outcode
@@ -182,6 +182,7 @@ TGI_CLIP_TOP            = $08
         .global _tgi_clear
         .global _tgi_done
         .global _tgi_ellipse
+	.global _tgi_getaspectratio
         .global _tgi_getcolor
         .global _tgi_getcolorcount
         .global _tgi_getdefpalette
@@ -207,7 +208,8 @@ TGI_CLIP_TOP            = $08
         .global _tgi_load_driver
         .global _tgi_outtext
         .global _tgi_outtextxy
-        .global _tgi_pieslice
+        .global _tgi_pieslice	   
+	.global _tgi_getaspectratio
         .global _tgi_setcolor
         .global _tgi_setdrawpage
         .global _tgi_setpalette

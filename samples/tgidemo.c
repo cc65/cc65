@@ -71,7 +71,7 @@ static void DoCircles (void)
         tgi_line (0, MaxY, MaxX, 0);
         tgi_setcolor (Color);
         for (I = 10; I < 240; I += 10) {
-            tgi_ellipse (X, Y, I, tgi_imulround (I, tgi_aspectratio));
+            tgi_ellipse (X, Y, I, tgi_imulround (I, tgi_getaspectratio ()));
         }
 	Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }

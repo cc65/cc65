@@ -187,6 +187,16 @@ unsigned __fastcall__ tgi_getmaxy (void);
  * getmaxy() + 1
  */
 
+unsigned __fastcall__ tgi_getaspectratio (void);
+/* Returns the aspect ratio for the loaded driver. The aspect ratio is an
+ * 8.8 fixed point value.
+ */
+
+void __fastcall__ tgi_setaspectratio (unsigned aspectratio);
+/* Set a new aspect ratio for the loaded driver. The aspect ratio is an
+ * 8.8 fixed point value.
+ */
+
 unsigned char __fastcall__ tgi_getpixel (int x, int y);
 /* Get the color value of a pixel. */
 

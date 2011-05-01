@@ -44,6 +44,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_done.o              \
                 tgi_ellipse.o           \
                 tgi_free_vectorfont.o   \
+		tgi_getaspectratio.o	\
                 tgi_getcolor.o          \
                 tgi_getcolorcount.o     \
                 tgi_getdefpalette.o     \
@@ -72,6 +73,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_outtextxy.o         \
                 tgi_popxy.o             \
                 tgi_popxy2.o            \
+		tgi_setaspectratio.o	\
                 tgi_setcolor.o          \
                 tgi_setdrawpage.o       \
                 tgi_setpalette.o        \

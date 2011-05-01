@@ -1,7 +1,7 @@
 ;
-; Graphics driver for the 320x200x2 or 640x200x2 mode on GEOS 64/128
-; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
-; 28-31.12.2002
+; Graphics driver for the 320x200x2 and 640x200x2 modes on GEOS 64/128
+; 2010-08-17, Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
+; 2010-08-18, Greg King
 
 	.include 	"zeropage.inc"
 
@@ -19,8 +19,8 @@
 ; ------------------------------------------------------------------------
 ; Constants
 
-VDC_ADDR_REG	  = $D600		  ; VDC address
-VDC_DATA_REG	  = $D601		  ; VDC data
+VDC_ADDR_REG	  := $D600		  ; VDC address
+VDC_DATA_REG	  := $D601		  ; VDC data
 
 VDC_DSP_HI	  = 12			  ; registers used
 VDC_DSP_LO	  = 13
@@ -38,8 +38,8 @@ VDC_DATA	  = 31
 
 .segment        "JUMPTABLE"
 
-; First part of the header is a structure that has a magic and defines the
-; capabilities of the driver
+; First part of the header is a structure that has a magic signature,
+; and defines the capabilities of the driver.
 
         .byte   $74, $67, $69           ; "tgi"
         .byte   TGI_API_VERSION         ; TGI API version number
@@ -49,36 +49,36 @@ yres:   .word   200                     ; Y resolution
 pages:	.byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .res    4, $00                  ; Reserved for future extensions
+        .word   $100                    ; Aspect ratio: 1.0
 
-; Next comes the jump table. Currently all entries must be valid and may point
-; to an RTS for test versions (function not implemented).
+; Next comes the jump table. With the exception of IRQ, all entries must be
+; valid, and may point to an RTS for test versions (function not implemented).
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   INIT
-        .word   DONE
-	.word	GETERROR
-        .word   CONTROL
-        .word   CLEAR
-        .word   SETVIEWPAGE
-        .word   SETDRAWPAGE
-        .word   SETCOLOR
-        .word   SETPALETTE
-        .word   GETPALETTE
-        .word   GETDEFPALETTE
-        .word   SETPIXEL
-        .word   GETPIXEL
-        .word   LINE
-        .word   BAR
-        .word   TEXTSTYLE
-        .word   OUTTEXT
-        .word   0                       ; IRQ entry is unused
+	.addr	INSTALL
+	.addr	UNINSTALL
+	.addr	INIT
+	.addr	DONE
+	.addr	GETERROR
+	.addr	CONTROL
+	.addr	CLEAR
+	.addr	SETVIEWPAGE
+	.addr	SETDRAWPAGE
+	.addr	SETCOLOR
+	.addr	SETPALETTE
+	.addr	GETPALETTE
+	.addr	GETDEFPALETTE
+	.addr	SETPIXEL
+	.addr	GETPIXEL
+	.addr	LINE
+	.addr	BAR
+	.addr	TEXTSTYLE
+	.addr	OUTTEXT
+	.addr	0			; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.
 
-; Variables mapped to the zero page segment variables. Some of these are
+; Variables mapped to the zero-page segment variables. Some of these are
 ; used for passing parameters to the driver.
 
 X1              = ptr1
@@ -98,12 +98,6 @@ PALETTE:        .res    2       ; The current palette
 BITMASK:        .res    1       ; $00 = clear, $01 = set pixels
 
 OLDCOLOR:	.res	1	; colors before entering gfx mode
-
-; Line routine stuff
-
-OGora:		 .res	2
-OUkos:		 .res	2
-Y3:		 .res	2
 
 ; Text output stuff
 TEXTMAGX:       .res    1

@@ -60,7 +60,7 @@ Short options:
   -S                            Compile but don't assemble and link
   -T                            Include source as comment
   -V                            Print the version number
-  -W                            Suppress warnings
+  -W name[,...]                 Supress compiler warnings
   -Wa options                   Pass options to the assembler
   -Wl options                   Pass options to the linker
 

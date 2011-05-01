@@ -690,7 +690,7 @@ static void Usage (void)
             "  -S\t\t\t\tCompile but don't assemble and link\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the version number\n"
-            "  -W\t\t\t\tSuppress warnings\n"
+       	    "  -W name[,...]\t\t\tSupress compiler warnings\n"
             "  -Wa options\t\t\tPass options to the assembler\n"
             "  -Wl options\t\t\tPass options to the linker\n"
             "\n"
@@ -766,7 +766,7 @@ static void OptAsmArgs (const char* Opt attribute ((unused)), const char* Arg)
 }
 
 
-                                                            
+
 static void OptAsmDefine (const char* Opt attribute ((unused)), const char* Arg)
 /* Define an assembler symbol (assembler) */
 {
@@ -1351,28 +1351,18 @@ int main (int argc, char* argv [])
 	       	    OptVersion (Arg, 0);
 	   	    break;
 
-	   	case 'W':
-                    switch (Arg[2]) {
-
-                        case 'a':
-                            OptAsmArgs (Arg, GetArg (&I, 3));
-                            break;
-
-                        case 'l':
-                            OptLdArgs (Arg, GetArg (&I, 3));
-                            break;
-
-                        case '\0':
-                            /* Suppress warnings - compiler and assembler */
-                            CmdAddArg (&CC65, "-W");
-                            CmdAddArg2 (&CA65, "-W", "0");
-                            break;
-
-                        default:
-                            UnknownOption (Arg);
-                            break;
-                    }
-                    break;
+		case 'W':
+		    if (Arg[2] == 'a' && Arg[3] == '\0') {
+			/* -Wa: Pass options to assembler */
+			OptAsmArgs (Arg, GetArg (&I, 3));
+		    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
+			/* -Wl: Pass options to linker */
+			OptLdArgs (Arg, GetArg (&I, 3));
+		    } else {
+			/* Anything else: Suppress warnings (compiler) */
+			CmdAddArg2 (&CC65, "-W", GetArg (&I, 3));
+		    }
+		    break;
 
 	   	case 'c':
 	   	    /* Don't link the resulting files */

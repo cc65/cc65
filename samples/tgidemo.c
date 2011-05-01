@@ -22,6 +22,7 @@
 /* Driver stuff */
 static unsigned MaxX;
 static unsigned MaxY;
+static unsigned AspectRatio;
 
 
 
@@ -71,7 +72,7 @@ static void DoCircles (void)
         tgi_line (0, MaxY, MaxX, 0);
         tgi_setcolor (Color);
         for (I = 10; I < 240; I += 10) {
-            tgi_ellipse (X, Y, I, tgi_imulround (I, tgi_getaspectratio ()));
+            tgi_ellipse (X, Y, I, tgi_imulround (I, AspectRatio));
         }
 	Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }
@@ -192,6 +193,7 @@ int main (void)
     /* Get stuff from the driver */
     MaxX = tgi_getmaxx ();
     MaxY = tgi_getmaxy ();
+    AspectRatio = tgi_getaspectratio ();
 
     /* Set the palette, set the border color */
     Border = bordercolor (COLOR_BLACK);

@@ -1360,7 +1360,7 @@ int main (int argc, char* argv [])
 			OptLdArgs (Arg, GetArg (&I, 3));
 		    } else {
 			/* Anything else: Suppress warnings (compiler) */
-			CmdAddArg2 (&CC65, "-W", GetArg (&I, 3));
+			CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));
 		    }
 		    break;
 

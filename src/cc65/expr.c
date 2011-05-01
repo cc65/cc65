@@ -2076,7 +2076,9 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                 }
 
                 /* Comparing a char against a constant may have a constant
-                 * result.
+                 * result. Please note: It is not possible to remove the code
+		 * for the compare alltogether, because it may have side 
+		 * effects.
                  */
                 switch (Tok) {
 
@@ -2084,7 +2086,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, 0);
                             WarnConstCompareResult ();
-                            RemoveCode (&Mark0);
                             goto Done;
                         }
                         break;
@@ -2093,7 +2094,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         if (Expr2.IVal < LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, 1);
                             WarnConstCompareResult ();
-                            RemoveCode (&Mark0);
                             goto Done;
                         }
                         break;
@@ -2102,7 +2102,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal > LeftMax);
                             WarnConstCompareResult ();
-                            RemoveCode (&Mark0);
                             goto Done;
                         }
                         break;
@@ -2111,7 +2110,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal >= LeftMax);
                             WarnConstCompareResult ();
-                            RemoveCode (&Mark0);
                             goto Done;
                         }
                         break;
@@ -2120,7 +2118,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         if (Expr2.IVal <= LeftMin || Expr2.IVal > LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal <= LeftMin);
                             WarnConstCompareResult ();
-                            RemoveCode (&Mark0);
                             goto Done;
                         }
                         break;
@@ -2129,7 +2126,6 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
                         if (Expr2.IVal < LeftMin || Expr2.IVal >= LeftMax) {
                             ED_MakeConstAbsInt (Expr, Expr2.IVal < LeftMin);
                             WarnConstCompareResult ();
-                            RemoveCode (&Mark0);
                             goto Done;
                         }
                         break;

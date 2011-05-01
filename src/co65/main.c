@@ -388,7 +388,7 @@ int main (int argc, char* argv [])
        	} else {
     	    /* Filename. Check if we already had one */
     	    if (InputName) {
-    	       	Error ("Don't know what to do with `%s'\n", Arg);
+    	       	Error ("Don't know what to do with `%s'", Arg);
     	    } else {
 	       	InputName = Arg;
 	    }
@@ -400,7 +400,7 @@ int main (int argc, char* argv [])
 
     /* Do we have an input file? */
     if (InputName == 0) {
-       	Error ("No input file\n");
+       	Error ("No input file");
     }
 
     /* Generate the name of the output file if none was specified */

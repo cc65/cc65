@@ -92,7 +92,7 @@ static void Usage (void)
             "  -Os\t\t\t\tInline some known functions\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the compiler version number\n"
-            "  -W\t\t\t\tSuppress warnings\n"
+            "  -W warning[,...]\t\tSuppress warnings\n"
             "  -d\t\t\t\tDebug mode\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
@@ -123,6 +123,7 @@ static void Usage (void)
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
             "  --list-opt-steps\t\tList all optimizer steps and exit\n"
+            "  --list-warnings\t\tList available warning types for -W\n"
             "  --local-strings\t\tEmit string literals immediately\n"
             "  --memory-model model\t\tSet the memory model\n"
             "  --register-space b\t\tSet space available for register variables\n"
@@ -543,7 +544,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path */
-{                        
+{
     AddSearchPath (SysIncSearchPath, Arg);
     AddSearchPath (UsrIncSearchPath, Arg);
 }
@@ -556,6 +557,19 @@ static void OptListOptSteps (const char* Opt attribute ((unused)),
 {
     /* List the optimizer steps */
     ListOptSteps (stdout);
+
+    /* Terminate */
+    exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptListWarnings (const char* Opt attribute ((unused)),
+			     const char* Arg attribute ((unused)))
+/* List all warning types */
+{
+    /* List the warnings */
+    ListWarnings (stdout);
 
     /* Terminate */
     exit (EXIT_SUCCESS);
@@ -769,6 +783,7 @@ int main (int argc, char* argv[])
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--list-opt-steps",   0,      OptListOptSteps         },
+       	{ "--list-warnings",    0,      OptListWarnings         },
         { "--local-strings",    0,      OptLocalStrings         },
         { "--memory-model",     1,      OptMemoryModel          },
         { "--register-space",   1,      OptRegisterSpace        },

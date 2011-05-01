@@ -61,7 +61,7 @@ Short options:
   -Os                           Inline some known functions
   -T                            Include source as comment
   -V                            Print the compiler version number
-  -W                            Suppress warnings
+  -W warning[,...]              Suppress warnings
   -d                            Debug mode
   -g                            Add debug info to object file
   -h                            Help (this text)
@@ -92,6 +92,7 @@ Long options:
   --help                        Help (this text)
   --include-dir dir             Set an include directory search path
   --list-opt-steps              List all optimizer steps and exit
+  --list-warnings               List available warning types for -W
   --local-strings               Emit string literals immediately
   --memory-model model          Set the memory model
   --register-space b            Set space available for register variables
@@ -220,6 +221,13 @@ Here is a description of all the command line options:
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <label id="option-list-warnings">
+  <tag><tt>--list-warnings</tt></tag>
+
+  List the names of warning types available for use with <tt><ref
+  id="option-W" name="-W"></tt>.
 
 
   <label id="option-local-strings">
@@ -490,6 +498,9 @@ Here is a description of all the command line options:
   <tag><tt/unused-var/</tag>
         Warn about unused variables.
   </descrip>
+
+  The full list of available warning names may be retrieved by using the
+  option <tt><ref id="option-list-warnings" name="--list-warnings"></tt>.
 
   You may also use <tt><ref id="pragma-warn" name="#pragma&nbsp;warn"></tt> to
   control this setting for smaller pieces of code from within your code.

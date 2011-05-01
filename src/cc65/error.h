@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -37,6 +37,8 @@
 #define ERROR_H
 
 
+
+#include <stdio.h>
 
 /* common */
 #include "attrib.h"
@@ -105,6 +107,9 @@ IntStack* FindWarning (const char* Name);
 /* Search for a warning in the WarnMap table and return a pointer to the
  * intstack that holds its state. Return NULL if there is no such warning.
  */
+
+void ListWarnings (FILE* F);
+/* Print a list of warning types/names to the given file */
 
 void ErrorReport (void);
 /* Report errors (called at end of compile) */

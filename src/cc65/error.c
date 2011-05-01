@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -295,6 +295,17 @@ IntStack* FindWarning (const char* Name)
         }
     }
     return 0;
+}
+
+
+
+void ListWarnings (FILE* F)
+/* Print a list of warning types/names to the given file */
+{
+    unsigned I;
+    for (I = 0; I < sizeof(WarnMap) / sizeof (WarnMap[0]); ++I) {
+        fprintf (F, "%s\n", WarnMap[I].Name);
+    }
 }
 
 

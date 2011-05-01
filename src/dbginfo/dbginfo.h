@@ -224,7 +224,7 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo handle, const char* name);
 cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
                                       cc65_addr start, cc65_addr end);
 /* Return a list of labels in the given range. end is inclusive. The function
- * return NULL if no symbols withing the given range are found. Non label
+ * return NULL if no symbols within the given range are found. Non label
  * symbols are ignored and not returned.
  */
 

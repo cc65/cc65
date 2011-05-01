@@ -1673,7 +1673,7 @@ static void ConsumeEOL (InputData* D)
 static void ParseFile (InputData* D)
 /* Parse a FILE line */
 {
-    unsigned      Id = 0;  
+    unsigned      Id = 0;
     unsigned long Size = 0;
     unsigned long MTime = 0;
     StrBuf        FileName = STRBUF_INITIALIZER;
@@ -3203,7 +3203,7 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
 
 cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65_addr End)
 /* Return a list of labels in the given range. End is inclusive. The function
- * return NULL if no symbols withing the given range are found. Non label
+ * return NULL if no symbols within the given range are found. Non label
  * symbols are ignored and not returned.
  */
 {

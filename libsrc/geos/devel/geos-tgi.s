@@ -48,7 +48,7 @@ yres:   .word   200                     ; Y resolution
 pages:	.byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
-        .word   $100                    ; Aspect ratio: 1.0
+aspect: .word   $00D4                   ; Aspect ratio (based on 4/3 display)
 
 ; Next comes the jump table. With the exception of IRQ, all entries must be
 ; valid, and may point to an RTS for test versions (function not implemented).
@@ -139,10 +139,13 @@ INSTALL:
 	; check for VDC version and update register $19 value
 
 @L80:
-	lda	#<640
-	ldx	#>640
-	sta	xres
-	stx	xres+1
+	; double the x resolution and halve the aspect ratio
+
+	asl	xres
+	rol	xres+1
+
+	lsr	aspect+1
+	ror	aspect
 
 	; update number of available screens
 

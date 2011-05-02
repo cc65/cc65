@@ -33,7 +33,7 @@ S_OBJS	= crt0.o                \
           oserrlist.o           \
           randomize.o           \
 	  tgi_colors.o		\
-          tgi_mode_table.o
+          tgi_stddrv.o
 
 #--------------------------------------------------------------------------
 # Drivers

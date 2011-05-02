@@ -68,7 +68,7 @@ OBJS =	_scrsize.o		\
         systime.o               \
         sysuname.o              \
         tgi_colors.o            \
-	tgi_mode_table.o	\
+	tgi_stddrv.o            \
 	toggle_videomode.o      \
         videomode.o
 

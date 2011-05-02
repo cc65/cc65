@@ -531,7 +531,6 @@ communication.
 <item><ref id="tgi_ioctl" name="tgi_ioctl">
 <item><ref id="tgi_line" name="tgi_line">
 <item><ref id="tgi_lineto" name="tgi_lineto">
-<item><ref id="tgi_load" name="tgi_load">
 <item><ref id="tgi_load_driver" name="tgi_load_driver">
 <item><ref id="tgi_outtext" name="tgi_outtext">
 <item><ref id="tgi_outtextxy" name="tgi_outtextxy">
@@ -5750,34 +5749,11 @@ be used in presence of a prototype.
 </quote>
 
 
-<sect1>tgi_load<label id="tgi_load"><p>
-
-<quote>
-<descrip>
-<tag/Function/Load and install the matching driver for the given mode.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_load (unsigned char mode);/
-<tag/Description/Load and install the matching driver for the given mode.
-Will just load the driver and check if loading was successul.
-Will not switch to graphics mode.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
-<tag/See also/Other tgi functions.
-<tag/Example/None.
-</descrip>
-</quote>
-
-
 <sect1>tgi_load_driver<label id="tgi_load_driver"><p>
 
 <quote>
 <descrip>
-<tag/Function/Load and install the given driver. This function is identical
-to tgi_load with the only difference that the name of the driver is specified
-explicitly.
+<tag/Function/Load and install the given driver.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_load_driver (const char *name);/
 <tag/Description/Load and install the driver by name.

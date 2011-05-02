@@ -11,7 +11,6 @@
 	.include 	"extzp.inc"
 
       	.include 	"tgi-kernel.inc"
-        .include        "tgi-mode.inc"
         .include        "tgi-error.inc"
 
 	.include        "lynx.inc"

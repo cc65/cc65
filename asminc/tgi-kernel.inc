@@ -204,7 +204,6 @@ TGI_CLIP_TOP            = $08
         .global _tgi_ioctl
         .global _tgi_line
         .global _tgi_lineto
-        .global _tgi_load
         .global _tgi_load_driver
         .global _tgi_outtext
         .global _tgi_outtextxy

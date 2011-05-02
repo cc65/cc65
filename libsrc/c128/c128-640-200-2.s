@@ -23,7 +23,6 @@
 	.include     	"zeropage.inc"
 
       	.include     	"tgi-kernel.inc"
-        .include        "tgi-mode.inc"
         .include        "tgi-error.inc"
 
 

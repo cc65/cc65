@@ -38,9 +38,6 @@
 
 
 
-#ifndef _TGI_MODE_H
-#include <tgi/tgi-mode.h>
-#endif
 #ifndef _TGI_ERROR_H
 #include <tgi/tgi-error.h>
 #endif
@@ -64,9 +61,6 @@
 /* The name of the standard tgi driver for a platform */
 extern const char tgi_stddrv[];
 
-/* The default tgi mode for a platform */
-extern const unsigned char tgi_stdmode;
-
 /* A vector font definition */
 typedef struct tgi_vectorfont tgi_vectorfont;
 
@@ -78,17 +72,8 @@ typedef struct tgi_vectorfont tgi_vectorfont;
 
 
 
-void __fastcall__ tgi_load (unsigned char mode);
-/* Load and install the matching driver for the given mode. Will just load
- * the driver and check if loading was successul. Will not switch to gaphics
- * mode.
- */
-
 void __fastcall__ tgi_load_driver (const char* name);
-/* Load and install the given driver. This function is identical to tgi_load
- * with the only difference that the name of the driver is specified
- * explicitly.
- */
+/* Load and install the given driver. */
 
 void __fastcall__ tgi_unload (void);
 /* Uninstall, then unload the currently loaded driver. Will call tgi_done if

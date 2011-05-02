@@ -104,7 +104,7 @@ S_OBJS=	_scrsize.o	\
         systime.o       \
         sysuname.o      \
         tgi_colors.o    \
-        tgi_mode_table.o\
+        tgi_stddrv.o    \
         toascii.o       \
         vtabz.o         \
      	wherex.o       	\

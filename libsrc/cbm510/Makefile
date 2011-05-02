@@ -79,8 +79,7 @@ OBJS =	_scrsize.o	\
         randomize.o     \
 	revers.o	\
         systime.o       \
-        sysuname.o      \
-	tgi_mode_table.o
+        sysuname.o
 
 #--------------------------------------------------------------------------
 # Drivers

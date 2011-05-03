@@ -65,9 +65,6 @@ extern unsigned         tgi_aspectratio;/* Aspect ratio as fixed point 8.8 */
 
 
 
-const char* __fastcall__ tgi_map_mode (unsigned char mode);
-/* Map a tgi mode to a driver name. Returns NULL if no driver available. */
-
 int __fastcall__ tgi_imulround (int rhs, int lhs);
 /* Helper function for functions using sine/cosine: Multiply two values, one
  * being an 8.8 fixed point one, and return the rounded and scaled result.

@@ -66,7 +66,6 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_line.o              \
                 tgi_linepop.o           \
                 tgi_lineto.o            \
-       	       	tgi_map_mode.o          \
                 tgi_outcode.o           \
                 tgi_outtext.o           \
                 tgi_outtextxy.o         \

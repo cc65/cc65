@@ -167,7 +167,6 @@ UNINSTALL:
 INIT:
 	; Switch into graphics mode
 	bit	MIXCLR
-	bit	LOWSCR
 	bit	HIRES
 	bit	TXTCLR
 

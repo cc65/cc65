@@ -2,7 +2,7 @@
 /*									     */
 /*				    main.c				     */
 /*									     */
-/*	       Main module for the cl65 compile and link utility	     */
+/*	       Main module for the cl65 compile-and-link utility	     */
 /*									     */
 /*									     */
 /*									     */
@@ -664,7 +664,7 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] file [...]\n"
             "Short options:\n"
-            "  -c\t\t\t\tCompile and assemble but don't link\n"
+            "  -c\t\t\t\tCompile and assemble, but don't link\n"
             "  -d\t\t\t\tDebug mode\n"
             "  -g\t\t\t\tAdd debug info\n"
             "  -h\t\t\t\tHelp (this text)\n"
@@ -684,13 +684,13 @@ static void Usage (void)
             "  -L path\t\t\tSpecify a library search path\n"
             "  -Ln name\t\t\tCreate a VICE label file\n"
             "  -O\t\t\t\tOptimize code\n"
-            "  -Oi\t\t\t\tOptimize code, inline functions\n"
+            "  -Oi\t\t\t\tOptimize code, inline runtime functions\n"
             "  -Or\t\t\t\tOptimize code, honour the register keyword\n"
-            "  -Os\t\t\t\tOptimize code, inline known C funtions\n"
-            "  -S\t\t\t\tCompile but don't assemble and link\n"
+            "  -Os\t\t\t\tOptimize code, inline known C functions\n"
+            "  -S\t\t\t\tCompile, but don't assemble and link\n"
             "  -T\t\t\t\tInclude source as comment\n"
             "  -V\t\t\t\tPrint the version number\n"
-       	    "  -W name[,...]\t\t\tSupress compiler warnings\n"
+            "  -W name[,...]\t\t\tSuppress compiler warnings\n"
             "  -Wa options\t\t\tPass options to the assembler\n"
             "  -Wl options\t\t\tPass options to the linker\n"
             "\n"
@@ -699,7 +699,7 @@ static void Usage (void)
             "  --asm-args options\t\tPass options to the assembler\n"
             "  --asm-define sym[=v]\t\tDefine an assembler symbol\n"
             "  --asm-include-dir dir\t\tSet an assembler include directory\n"
-            "  --bin-include-dir dir\t\tSet an assembker binary include directory\n"
+            "  --bin-include-dir dir\t\tSet an assembler binary include directory\n"
             "  --bss-label name\t\tDefine and export a BSS segment label\n"
             "  --bss-name seg\t\tSet the name of the BSS segment\n"
             "  --cfg-path path\t\tSpecify a config file search path\n"
@@ -708,7 +708,7 @@ static void Usage (void)
             "  --code-name seg\t\tSet the name of the CODE segment\n"
             "  --codesize x\t\t\tAccept larger code by factor x\n"
             "  --config name\t\t\tUse linker config file\n"
-            "  --cpu type\t\t\tSet cpu type\n"
+            "  --cpu type\t\t\tSet CPU type\n"
             "  --create-dep name\t\tCreate a make dependency file\n"
             "  --create-full-dep name\tCreate a full make dependency file\n"
             "  --data-label name\t\tDefine and export a DATA segment label\n"
@@ -729,7 +729,7 @@ static void Usage (void)
             "  --mapfile name\t\tCreate a map file\n"
             "  --memory-model model\t\tSet the memory model\n"
             "  --module\t\t\tLink as a module\n"
-            "  --module-id id\t\tSpecify a module id for the linker\n"
+            "  --module-id id\t\tSpecify a module ID for the linker\n"
             "  --o65-model model\t\tOverride the o65 model\n"
             "  --obj file\t\t\tLink this object file\n"
             "  --obj-path path\t\tSpecify an object file search path\n"

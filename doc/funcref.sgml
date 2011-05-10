@@ -510,11 +510,12 @@ communication.
 <item><ref id="tgi_bar" name="tgi_bar">
 <item><ref id="tgi_circle" name="tgi_circle">
 <item><ref id="tgi_clear" name="tgi_clear">
+<item><ref id="tgi_done" name="tgi_done">
+<item><ref id="tgi_ellipse" name="tgi_ellipse">
+<item><ref id="tgi_getaspectratio" name="tgi_getaspectratio">
 <item><ref id="tgi_getcolor" name="tgi_getcolor">
 <item><ref id="tgi_getcolorcount" name="tgi_getcolorcount">
 <item><ref id="tgi_getdefpalette" name="tgi_getdefpalette">
-<item><ref id="tgi_done" name="tgi_done">
-<item><ref id="tgi_ellipse" name="tgi_ellipse">
 <item><ref id="tgi_geterror" name="tgi_geterror">
 <item><ref id="tgi_geterrormsg" name="tgi_geterrormsg">
 <item><ref id="tgi_getmaxcolor" name="tgi_getmaxcolor">
@@ -534,6 +535,7 @@ communication.
 <item><ref id="tgi_load_driver" name="tgi_load_driver">
 <item><ref id="tgi_outtext" name="tgi_outtext">
 <item><ref id="tgi_outtextxy" name="tgi_outtextxy">
+<item><ref id="tgi_setaspectratio" name="tgi_setaspectratio">
 <item><ref id="tgi_setcolor" name="tgi_setcolor">
 <item><ref id="tgi_setdrawpage" name="tgi_setdrawpage">
 <item><ref id="tgi_setpalette" name="tgi_setpalette">
@@ -2050,9 +2052,9 @@ evaluated or is ignored.
 <tag/Description/<tt/exec/ replaces the currently running program by a new one.
 Calling <tt/exec()/ is identical to calling <tt/<ref id="exit" name="exit()">/,
 then loading and starting the program named in the first argument, passing
-the command line specified as second argument. Instead of an empty string, 
+the command line specified as second argument. Instead of an empty string,
 a <tt/NULL/ pointer may be passed as second parameter.
-On success, the function does not return. On failure, -1 is returned and 
+On success, the function does not return. On failure, -1 is returned and
 <tt/errno/ contains an error code.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
@@ -4182,9 +4184,9 @@ be used in presence of a prototype.
 <tag/Example/
 <verb>
 #include <serial.h>
- 
+
 extern char comlynx[];
- 
+
 static void initialize(){
   struct ser_params params = {
     SER_BAUD_9600,
@@ -4315,9 +4317,9 @@ be used in presence of a prototype.
 <tag/Example/
 <verb>
 #include <serial.h>
- 
+
 extern char comlynx[];
- 
+
 static void initialize(){
   struct ser_params params = {
     SER_BAUD_9600,
@@ -5343,6 +5345,36 @@ tgi_ellipse (50, 40, 40, 20);
 </quote>
 
 
+<sect1>tgi_getaspectratio<label id="tgi_getaspectratio"><p>
+
+<quote> <descrip> <tag/Function/Return the pixel aspect ratio.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_getaspectratio (void);/
+<tag/Description/The function returns the pixel aspect ratio for the current
+driver and display as an 8.8 fixed point value. It may be used to correct
+geometric shapes so they look correct on the display. As an example, a circle
+with a radius of 100 pixels may look elliptic on some driver/display
+combinations if the aspect ratio is not 1.00.
+<tag/Limits/<itemize>
+<item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
+monitor for the given platform. The aspect ratio may be wrong if another
+monitor is used.
+<item>No TGI function will use the aspect ratio. It is up to the programmer to
+make use of it.
+<item>The <ref id="tgi_setaspectratio" name="tgi_setaspectratio"> function can
+be used to change the aspect ratio for a loaded driver. The value is not reset
+by <ref id="tgi_init" name="tgi_init">, so if a driver is linked statically to
+an application, switching into and out of graphics mode will not restore the
+original aspect ratio.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_setaspectratio" name="tgi_setaspectratio">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>tgi_getcolor<label id="tgi_getcolor"><p>
 
 <quote>
@@ -5368,6 +5400,7 @@ color = tgi_getcolor();
 </descrip>
 </quote>
 
+
 <sect1>tgi_getcolorcount<label id="tgi_getcolorcount"><p>
 
 <quote>
@@ -5391,6 +5424,7 @@ if (tgi_getcolorcount() == 2) {
 </descrip>
 </quote>
 
+
 <sect1>tgi_getdefpalette<label id="tgi_getdefpalette"><p>
 
 <quote>
@@ -5410,6 +5444,7 @@ be used in presence of a prototype.
 <tag/Example/None.
 </descrip>
 </quote>
+
 
 <sect1>tgi_geterror<label id="tgi_geterror"><p>
 
@@ -5431,6 +5466,7 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
 <sect1>tgi_geterrormsg<label id="tgi_geterrormsg"><p>
 
 <quote>
@@ -5449,6 +5485,7 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
 <sect1>tgi_getmaxcolor<label id="tgi_getmaxcolor"><p>
 
 <quote>
@@ -5466,6 +5503,7 @@ be used in presence of a prototype.
 <tag/Example/None.
 </descrip>
 </quote>
+
 
 <sect1>tgi_getmaxx<label id="tgi_getmaxx"><p>
 
@@ -5486,6 +5524,7 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
 <sect1>tgi_getmaxy<label id="tgi_getmaxy"><p>
 
 <quote>
@@ -5503,6 +5542,7 @@ be used in presence of a prototype.
 <tag/Example/None.
 </descrip>
 </quote>
+
 
 <sect1>tgi_getpagecount<label id="tgi_getpagecount"><p>
 
@@ -5524,6 +5564,7 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
 <sect1>tgi_getpalette<label id="tgi_getpalette"><p>
 
 <quote>
@@ -5542,6 +5583,7 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
 <sect1>tgi_getpixel<label id="tgi_getpixel"><p>
 
 <quote>
@@ -5559,6 +5601,7 @@ be used in presence of a prototype.
 <tag/Example/None.
 </descrip>
 </quote>
+
 
 <sect1>tgi_getxres<label id="tgi_getxres"><p>
 
@@ -5579,6 +5622,7 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
 <sect1>tgi_getyres<label id="tgi_getyres"><p>
 
 <quote>
@@ -5598,6 +5642,7 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+
 <sect1>tgi_gotoxy<label id="tgi_gotoxy"><p>
 
 <quote>
@@ -5615,6 +5660,7 @@ be used in presence of a prototype.
 <tag/Example/None.
 </descrip>
 </quote>
+
 
 <sect1>tgi_init<label id="tgi_init"><p>
 
@@ -5642,6 +5688,7 @@ tgi_init(); //Set up the default palette and clear the screen.
 </verb>
 </descrip>
 </quote>
+
 
 <sect1>tgi_install<label id="tgi_install"><p>
 
@@ -5842,6 +5889,36 @@ of range.
 tgi_setcolor(TGI_COLOR_BLUE);
 tgi_pieslice (50, 50, 40, 20, 0, 180);
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>tgi_setaspectratio<label id="tgi_setaspectratio"><p>
+
+<quote> <descrip> <tag/Function/Set the pixel aspect ratio.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_setaspectratio (unsigned ratio);/
+<tag/Description/The function sets the pixel aspect ratio for the current
+driver and display. The argument is an 8.8 fixed point value. The aspect ratio
+may be used to correct geometric shapes so they look correct on a given
+display. As an example, a circle with a radius of 100 pixels may look elliptic
+on some driver/display combinations if the aspect ratio is not 1.00.
+<tag/Limits/<itemize>
+<item>The aspect ratio is encoded in the TGI driver which assumes a "standard"
+monitor for the given platform. The aspect ratio may be wrong if another
+monitor is used.
+<item>No TGI function will use the aspect ratio. It is up to the programmer to
+make use of it.
+<item>The <tt/tgi_setaspectratio/ function can be used to change the aspect
+ratio for a loaded driver. The value is not reset by <ref id="tgi_init"
+name="tgi_init">, so if a driver is linked statically to an application,
+switching into and out of graphics mode will not restore the original aspect
+ratio.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_getaspectratio" name="tgi_getaspectratio">
+<tag/Example/None.
 </descrip>
 </quote>
 

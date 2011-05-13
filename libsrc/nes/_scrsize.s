@@ -1,6 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 2003-04-14
-; Stefan Haubenthal, 2007-01-21
+; Stefan Haubenthal, 2011-05-11
 ;
 ; Screen size function
 ;
@@ -16,9 +16,9 @@
 	jsr	_get_tv
 	ldx	#charsperline
 	ldy	#screenrows
-	cmp	#TV::NTSC
-	beq	nopal
-	dey
-nopal:	rts
+	cmp	#TV::PAL
+	beq	pal
+	dey		; NTSC rows
+pal:	rts
 
 .endproc

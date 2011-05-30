@@ -182,6 +182,7 @@ static void FuncConcat (void)
     } else {
      	CurTok.Tok = TOK_STRCON;
      	SB_Copy (&CurTok.SVal, &Buf);
+        SB_Terminate (&CurTok.SVal);
     }
 
     /* Free the string buffer */
@@ -255,6 +256,7 @@ static void FuncIdent (void)
     } else {
         CurTok.Tok = Id;
         SB_Copy (&CurTok.SVal, &Buf);
+        SB_Terminate (&CurTok.SVal);
     }
 
     /* Free buffer memory */
@@ -601,6 +603,7 @@ static void FuncSPrintF (void)
     } else {
      	CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &R);
+        SB_Terminate (&CurTok.SVal);
     }
 
 
@@ -643,6 +646,7 @@ static void FuncString (void)
     } else {
      	CurTok.Tok = TOK_STRCON;
      	SB_Copy (&CurTok.SVal, &Buf);
+        SB_Terminate (&CurTok.SVal);
     }
 
     /* Free string memory */

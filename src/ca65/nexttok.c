@@ -548,7 +548,7 @@ static void FuncSPrintF (void)
                 }
 
                 /* Format this argument according to the spec */
-                SB_Printf (&R1, SB_GetConstBuf (&F1), CurTok.SVal);
+                SB_Printf (&R1, SB_GetConstBuf (&F1), SB_GetConstBuf (&CurTok.SVal));
 
                 /* Skip the string constant */
                 NextTok ();
@@ -612,7 +612,7 @@ static void FuncSPrintF (void)
 }
 
 
-                
+
 static void FuncString (void)
 /* Handle the .STRING function */
 {

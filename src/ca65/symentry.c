@@ -627,6 +627,11 @@ SymTable* GetSymParentScope (SymEntry* S)
     if ((S->Flags & SF_LOCAL) != 0) {
         /* This is a cheap local symbol */
         return 0;
+    } else if (S->Sym.Tab == 0) {
+        /* Symbol not in a table. This may happen if there have been errors
+         * before. Return NULL in this case to avoid further errors.
+         */
+        return 0;
     } else {
         /* This is a global symbol */
         return S->Sym.Tab->Parent;

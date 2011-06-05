@@ -677,7 +677,10 @@ static void StartExpClassic (Macro* M)
     token_t     Term;
 
 
-    /* Create a structure holding expansion data */
+    /* Create a structure holding expansion data. This must be done before 
+     * skipping the macro name, because the call to NextTok may cause a new
+     * expansion if the next token is actually a .define style macro.
+     */
     E = NewMacExp (M);
 
     /* Skip the macro name */

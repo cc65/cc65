@@ -677,11 +677,11 @@ static void StartExpClassic (Macro* M)
     token_t     Term;
 
 
-    /* Skip the macro name */
-    NextTok ();
-
     /* Create a structure holding expansion data */
     E = NewMacExp (M);
+
+    /* Skip the macro name */
+    NextTok ();
 
     /* Read the actual parameters */
     while (!TokIsSep (CurTok.Tok)) {

@@ -42,6 +42,7 @@
 #include "strbuf.h"
 
 /* ca65 */
+#include "condasm.h"
 #include "error.h"
 #include "expr.h"
 #include "global.h"
@@ -661,8 +662,10 @@ void NextTok (void)
     /* Get the next raw token */
     NextRawTok ();
 
-    /* In raw mode, pass the token unchanged */
-    if (RawMode == 0) {
+    /* In raw mode, or when output is suppressed via conditional assembly,
+     * pass the token unchanged.
+     */
+    if (RawMode == 0 && IfCond) {
 
 	/* Execute token handling functions */
 	switch (CurTok.Tok) {

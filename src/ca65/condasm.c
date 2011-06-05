@@ -56,16 +56,19 @@
 
 /* Set of bitmapped flags for the if descriptor */
 enum {
-    ifNone	= 0x0000,		/* No flag */
-    ifCond	= 0x0001,		/* IF condition was true */
-    ifElse	= 0x0002,		/* We had a .ELSE branch */
-    ifNeedTerm	= 0x0004		/* Need .ENDIF termination */
+    ifNone	= 0x0000,               /* No flag */
+    ifCond	= 0x0001,               /* IF condition was true */
+    ifElse	= 0x0002,               /* We had a .ELSE branch */
+    ifNeedTerm 	= 0x0004,               /* Need .ENDIF termination */
 };
+
+/* The overall .IF condition */
+int IfCond      = 1;
 
 
 
 /*****************************************************************************/
-/*				 struct IfDesc				     */
+/*		    		 struct IfDesc				     */
 /*****************************************************************************/
 
 
@@ -95,7 +98,7 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
     }
 
     /* Alloc one element */
-    ID = &IfStack [IfCount++];
+    ID = &IfStack[IfCount++];
 
     /* Initialize elements */
     ID->Flags     = NeedTerm? ifNeedTerm : ifNone;
@@ -115,7 +118,7 @@ static IfDesc* GetCurrentIf (void)
     if (IfCount == 0) {
        	return 0;
     } else {
-        return &IfStack [IfCount-1];
+        return &IfStack[IfCount-1];
     }
 }
 
@@ -126,12 +129,12 @@ static void FreeIf (void)
 {
     int Done;
     do {
-       	IfDesc* D = GetCurrentIf();
-       	if (D == 0) {
+       	IfDesc* ID = GetCurrentIf();
+       	if (ID == 0) {
        	    Error (" Unexpected .ENDIF");
 	    Done = 1;
        	} else {
-       	    Done = (D->Flags & ifNeedTerm) != 0;
+       	    Done = (ID->Flags & ifNeedTerm) != 0;
             --IfCount;
        	}
     } while (!Done);
@@ -139,16 +142,17 @@ static void FreeIf (void)
 
 
 
-static int GetCurrentIfCond (void)
-/* Return the current condition based on all conditions on the stack */
+static void CalcOverallIfCond (void)
+/* Caclulate the overall condition based on all conditions on the stack */
 {
     unsigned Count;
+    IfCond = 1;
     for (Count = 0; Count < IfCount; ++Count) {
        	if ((IfStack[Count].Flags & ifCond) == 0) {
-       	    return 0;
+            IfCond = 0;
+       	    break;
        	}
     }
-    return 1;
 }
 
 
@@ -165,30 +169,24 @@ static void SetIfCond (IfDesc* ID, int C)
 
 
 
-static void InvertIfCond (IfDesc* ID)
-/* Invert the current condition */
+static void ElseClause (IfDesc* ID, const char* Directive)
+/* Enter an .ELSE clause */
 {
-    ID->Flags ^= ifCond;
-}
-
-
-
-static int GetElse (const IfDesc* ID)
-/* Return true if we had a .ELSE */
-{
-    return (ID->Flags & ifElse) != 0;
-}
-
-
-
-static void SetElse (IfDesc* ID, int E)
-/* Set the .ELSE flag */
-{
-    if (E) {
-	ID->Flags |= ifElse;
-    } else {
-	ID->Flags &= ~ifElse;
+    /* Check if we have an open .IF - otherwise .ELSE is not allowed */
+    if (ID == 0) {
+        Error ("Unexpected %s", Directive);
+        return;
     }
+
+    /* Check for a duplicate else, then remember that we had one */
+    if (ID->Flags & ifElse) {
+        /* We already had a .ELSE ! */
+        Error ("Duplicate .ELSE");
+    }
+    ID->Flags |= ifElse;
+
+    /* Condition is inverted now */
+    ID->Flags ^= ifCond;
 }
 
 
@@ -204,82 +202,72 @@ void DoConditionals (void)
 {
     IfDesc* D;
 
-    int IfCond = GetCurrentIfCond ();
     do {
 
     	switch (CurTok.Tok) {
 
     	    case TOK_ELSE:
        	        D = GetCurrentIf ();
-	       	if (D == 0) {
-       	       	    Error ("Unexpected .ELSE");
-       	       	} else if (GetElse(D)) {
-	       	    /* We already had a .ELSE ! */
-	       	    Error ("Duplicate .ELSE");
-       	       	} else {
-	       	    /* Allow an .ELSE */
-	  	    InvertIfCond (D);
-	  	    SetElse (D, 1);
-	  	    GetFullLineInfo (&D->LineInfos, 0);
-	  	    D->Name = ".ELSE";
-	  	    IfCond = GetCurrentIfCond ();
-	  	}
+
+                /* Allow an .ELSE */
+                ElseClause (D, ".ELSE");
+
+                /* Remember the data for the .ELSE */
+                GetFullLineInfo (&D->LineInfos, 0);
+                D->Name = ".ELSE";
+
+                /* Calculate the new overall condition */
+                CalcOverallIfCond ();
+
+                /* Skip .ELSE */
 	       	NextTok ();
-		ExpectSep ();
+	       	ExpectSep ();
        	       	break;
 
        	    case TOK_ELSEIF:
 	        D = GetCurrentIf ();
-	       	if (D == 0) {
-	       	    Error ("Unexpected .ELSEIF");
-	       	} else if (GetElse(D)) {
-	       	    /* We already had a .ELSE */
-	       	    Error ("Duplicate .ELSE");
-	       	} else {
-	       	    /* Handle as if there was an .ELSE first */
-	       	    InvertIfCond (D);
-	       	    SetElse (D, 1);
+                /* Handle as if there was an .ELSE first */
+                ElseClause (D, ".ELSEIF");
 
-		    /* Allocate and prepare a new descriptor */
-       	       	    D = AllocIf (".ELSEIF", 0);
-		    NextTok ();
+                /* Allocate and prepare a new descriptor */
+                D = AllocIf (".ELSEIF", 0);
+                NextTok ();
 
-		    /* Ignore the new condition if we are inside a false .ELSE
-		     * branch. This way we won't get any errors about undefined
-		     * symbols or similar...
-		     */
-		    if (IfCond == 0) {
-		       	SetIfCond (D, ConstExpression ());
-			ExpectSep ();
-		    }
+                /* Ignore the new condition if we are inside a false .ELSE
+                 * branch. This way we won't get any errors about undefined
+                 * symbols or similar...
+                 */
+                if (IfCond == 0) {
+                    SetIfCond (D, ConstExpression ());
+                    ExpectSep ();
+                }
 
-		    /* Get the new overall condition */
-		    IfCond = GetCurrentIfCond ();
-		}
-		break;
+                /* Get the new overall condition */
+                CalcOverallIfCond ();
+ 	       	break;
 
-	    case TOK_ENDIF:
-		/* We're done with this .IF.. - remove the descriptor(s) */
-		FreeIf ();
+ 	    case TOK_ENDIF:
+ 		/* We're done with this .IF.. - remove the descriptor(s) */
+ 		FreeIf ();
 
-	       	/* Be sure not to read the next token until the .IF stack
-		 * has been cleanup up, since we may be at end of file.
-		 */
-		NextTok ();
-		ExpectSep ();
+ 	       	/* Be sure not to read the next token until the .IF stack
+ 		 * has been cleanup up, since we may be at end of file.
+ 		 */
+ 		NextTok ();
+ 		ExpectSep ();
 
-		/* Get the new overall condition */
-	        IfCond = GetCurrentIfCond ();
-		break;
+ 		/* Get the new overall condition */
+                CalcOverallIfCond ();
+ 		break;
 
     	    case TOK_IF:
 	      	D = AllocIf (".IF", 1);
 	      	NextTok ();
 		if (IfCond) {
-		    SetIfCond (D, ConstExpression ());
-		    ExpectSep ();
+                    SetIfCond (D, ConstExpression ());
+                    ExpectSep ();
 		}
-	      	IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
 	      	break;
 
 	    case TOK_IFBLANK:
@@ -293,7 +281,7 @@ void DoConditionals (void)
                         SkipUntilSep ();
                     }
 		}
-		IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFCONST:
@@ -305,7 +293,7 @@ void DoConditionals (void)
 		    FreeExpr (Expr);
 		    ExpectSep ();
 		}
-		IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
 		break;
 
     	    case TOK_IFDEF:
@@ -315,7 +303,7 @@ void DoConditionals (void)
        	       	    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym != 0 && SymIsDef (Sym));
 		}
-	        IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFNBLANK:
@@ -329,7 +317,7 @@ void DoConditionals (void)
                         SkipUntilSep ();
                     }
 	  	}
-		IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFNCONST:
@@ -341,7 +329,7 @@ void DoConditionals (void)
 		    FreeExpr (Expr);
 		    ExpectSep ();
 		}
-		IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
 		break;
 
     	    case TOK_IFNDEF:
@@ -352,7 +340,7 @@ void DoConditionals (void)
 		    SetIfCond (D, Sym == 0 || !SymIsDef (Sym));
 		    ExpectSep ();
 		}
-	        IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
     	     	break;
 
 	    case TOK_IFNREF:
@@ -363,7 +351,7 @@ void DoConditionals (void)
 		    SetIfCond (D, Sym == 0 || !SymIsRef (Sym));
 		    ExpectSep ();
 	     	}
-	        IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFP02:
@@ -372,8 +360,8 @@ void DoConditionals (void)
 		if (IfCond) {
 		    SetIfCond (D, GetCPU() == CPU_6502);
 		}
-		IfCond = GetCurrentIfCond ();
 		ExpectSep ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFP816:
@@ -382,8 +370,8 @@ void DoConditionals (void)
 		if (IfCond) {
        	       	    SetIfCond (D, GetCPU() == CPU_65816);
 		}
-		IfCond = GetCurrentIfCond ();
 		ExpectSep ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFPC02:
@@ -392,8 +380,8 @@ void DoConditionals (void)
 		if (IfCond) {
        	       	    SetIfCond (D, GetCPU() == CPU_65C02);
 		}
-		IfCond = GetCurrentIfCond ();
 		ExpectSep ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFPSC02:
@@ -402,8 +390,8 @@ void DoConditionals (void)
 		if (IfCond) {
        	       	    SetIfCond (D, GetCPU() == CPU_65SC02);
 		}
-		IfCond = GetCurrentIfCond ();
 		ExpectSep ();
+                CalcOverallIfCond ();
 		break;
 
 	    case TOK_IFREF:
@@ -414,7 +402,7 @@ void DoConditionals (void)
 		    SetIfCond (D, Sym != 0 && SymIsRef (Sym));
 		    ExpectSep ();
      		}
-     	        IfCond = GetCurrentIfCond ();
+                CalcOverallIfCond ();
      		break;
 
      	    default:
@@ -488,6 +476,9 @@ void CheckOpenIfs (void)
 	LIError (&D->LineInfos, "Conditional assembly branch was never closed");
 	FreeIf ();
     }
+
+    /* Calculate the new overall .IF condition */
+    CalcOverallIfCond ();
 }
 
 
@@ -506,6 +497,9 @@ void CleanupIfStack (unsigned SP)
     while (IfCount > SP) {
 	FreeIf ();
     }
+
+    /* Calculate the new overall .IF condition */
+    CalcOverallIfCond ();
 }
 
 

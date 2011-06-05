@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,6 +35,17 @@
 
 #ifndef CONDASM_H
 #define CONDASM_H
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* The overall .IF condition */
+extern int IfCond;
 
 
 

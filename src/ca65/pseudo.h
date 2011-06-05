@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -35,20 +35,6 @@
 
 #ifndef PSEUDO_H
 #define PSEUDO_H
-
-
-
-/*****************************************************************************/
-/*     	      	    		     Data				     */
-/*****************************************************************************/
-
-
-
-/* Are we inside a .IF condition that has been evaluated to TRUE? */
-extern unsigned char IfCond;
-
-/* How many .IFs are currently open? */
-extern unsigned OpenIfs;
 
 
 

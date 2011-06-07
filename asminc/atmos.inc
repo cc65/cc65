@@ -12,6 +12,7 @@
 ; Low memory
 
 CAPSLOCK        := $20C
+IRQVec          := $245
 CURS_Y          := $268
 CURS_X          := $269
 STATUS          := $26A

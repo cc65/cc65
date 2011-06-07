@@ -229,6 +229,9 @@ void DoConditionals (void)
                 /* Handle as if there was an .ELSE first */
                 ElseClause (D, ".ELSEIF");
 
+                /* Calculate the new overall if condition */
+                CalcOverallIfCond ();
+
                 /* Allocate and prepare a new descriptor */
                 D = AllocIf (".ELSEIF", 0);
                 NextTok ();
@@ -237,7 +240,7 @@ void DoConditionals (void)
                  * branch. This way we won't get any errors about undefined
                  * symbols or similar...
                  */
-                if (IfCond == 0) {
+                if (IfCond) {
                     SetIfCond (D, ConstExpression ());
                     ExpectSep ();
                 }

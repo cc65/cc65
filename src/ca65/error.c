@@ -120,13 +120,20 @@ static void PrintMsg (const FilePos* Pos, const char* Desc,
 static void AddNotifications (const Collection* LineInfos)
 /* Output additional notifications for an error or warning */
 {
+    unsigned I;
+    unsigned Skipped;
+
     /* The basic line info is always in slot zero. It has been used to
      * output the actual error or warning. The following slots may contain
-     * more information. Check them and additional notifications if they're
-     * present.
+     * more information. Check them and print additional notifications if
+     * they're present, but limit the number to a reasonable value.
      */
-    unsigned I;
-    for (I = 1; I < CollCount (LineInfos); ++I) {
+    unsigned MaxCount = CollCount (LineInfos);
+    if (MaxCount > 6) {
+        MaxCount = 6;
+    }               
+    Skipped = CollCount (LineInfos) - MaxCount;
+    for (I = 1; I < MaxCount; ++I) {
         /* Get next line info */
         const LineInfo* LI = CollConstAt (LineInfos, I);
         /* Check the type and output an appropriate note */
@@ -138,6 +145,12 @@ static void AddNotifications (const Collection* LineInfos)
             PrintMsg (GetSourcePos (LI), "Note",
                       "Macro was defined here");
         }
+    }
+
+    /* Add a note if we have more stuff that we won't output */
+    if (Skipped > 0) {
+        PrintMsg (GetSourcePos (CollConstAt (LineInfos, 0)), "Note",
+                  "Dropping %u additional line infos", Skipped);
     }
 }
 

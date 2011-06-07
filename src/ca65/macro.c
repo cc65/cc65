@@ -107,6 +107,7 @@ struct Macro {
     TokNode* 	    TokRoot;	/* Root of token list */
     TokNode* 	    TokLast;	/* Pointer to last token in list */
     unsigned char   Style;	/* Macro style */
+    unsigned char   Incomplete; /* Macro is currently built */
     StrBuf          Name;	/* Macro name, dynamically allocated */
 };
 
@@ -138,6 +139,9 @@ struct MacExp {
     TokNode*   	ParamExp;	/* Node for expanding parameters */
     unsigned    LISlot;         /* Slot for additional line infos */
 };
+
+/* Maximum number of nested macro expansions */
+#define MAX_MACEXPANSIONS       256U
 
 /* Number of active macro expansions */
 static unsigned MacExpansions = 0;
@@ -230,6 +234,7 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
     M->TokRoot    = 0;
     M->TokLast    = 0;
     M->Style	  = Style;
+    M->Incomplete = 1;
     SB_Init (&M->Name);
     SB_Copy (&M->Name, Name);
 
@@ -533,6 +538,9 @@ void MacDef (unsigned Style)
 	NextTok ();
     }
 
+    /* Reset the Incomplete flag now that parsing is done */
+    M->Incomplete = 0;
+
 Done:
     /* Switch out of raw token mode */
     LeaveRawTokenMode ();
@@ -677,7 +685,7 @@ static void StartExpClassic (Macro* M)
     token_t     Term;
 
 
-    /* Create a structure holding expansion data. This must be done before 
+    /* Create a structure holding expansion data. This must be done before
      * skipping the macro name, because the call to NextTok may cause a new
      * expansion if the next token is actually a .define style macro.
      */
@@ -853,6 +861,20 @@ void MacExpandStart (void)
     /* Search for the macro */
     Macro* M = HT_FindEntry (&MacroTab, &CurTok.SVal);
     CHECK (M != 0);
+
+    /* We cannot expand an incomplete macro */
+    if (M->Incomplete) {
+        Error ("Cannot expand an incomplete macro");
+        return;
+    }
+
+    /* Don't allow too many nested macro expansions - otherwise it is possible
+     * to force an endless loop and assembler crash.
+     */
+    if (MacExpansions >= MAX_MACEXPANSIONS) {
+        Error ("Too many nested macro expansions");
+        return;
+    }
 
     /* Call the apropriate subroutine */
     switch (M->Style) {

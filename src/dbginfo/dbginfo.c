@@ -287,6 +287,58 @@ static void xfree (void* Block)
 
 
 
+static cc65_lineinfo* new_cc65_lineinfo (unsigned Count)
+/* Allocate and return a cc65_lineinfo struct that is able to hold Count
+ * entries. Initialize the count field of the returned struct.
+ */
+{
+    cc65_lineinfo* L = xmalloc (sizeof (*L) - sizeof (L->data[0]) +
+                                Count * sizeof (L->data[0]));
+    L->count = Count;
+    return L;
+}
+
+
+
+static cc65_sourceinfo* new_cc65_sourceinfo (unsigned Count)
+/* Allocate and return a cc65_sourceinfo struct that is able to hold Count
+ * entries. Initialize the count field of the returned struct.
+ */
+{
+    cc65_sourceinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
+                                  Count * sizeof (S->data[0]));
+    S->count = Count;
+    return S;
+}
+
+
+
+static cc65_segmentinfo* new_cc65_segmentinfo (unsigned Count)
+/* Allocate and return a cc65_segmentinfo struct that is able to hold Count
+ * entries. Initialize the count field of the returned struct.
+ */
+{
+    cc65_segmentinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
+                                   Count * sizeof (S->data[0]));
+    S->count = Count;
+    return S;
+}
+
+
+
+static cc65_symbolinfo* new_cc65_symbolinfo (unsigned Count)
+/* Allocate and return a cc65_symbolinfo struct that is able to hold Count
+ * entries. Initialize the count field of the returned struct.
+ */
+{
+    cc65_symbolinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
+                                  Count * sizeof (S->data[0]));
+    S->count = Count;
+    return S;
+}
+
+
+
 /*****************************************************************************/
 /*                              Dynamic strings                              */
 /*****************************************************************************/
@@ -938,9 +990,27 @@ static void FreeFileInfo (FileInfo* F)
 static int CompareFileInfoByName (const void* L, const void* R)
 /* Helper function to sort file infos in a collection by name */
 {
-    /* Sort by file name */
-    return strcmp (((const FileInfo*) L)->FileName,
-                   ((const FileInfo*) R)->FileName);
+    /* Sort by file name. If names are equal, sort by timestamp,
+     * then sort by size. Which means, identical files will go
+     * together.
+     */
+    int Res = strcmp (((const FileInfo*) L)->FileName,
+                      ((const FileInfo*) R)->FileName);
+    if (Res != 0) {
+        return Res;
+    }
+    if (((const FileInfo*) L)->MTime > ((const FileInfo*) R)->MTime) {
+        return 1;
+    } else if (((const FileInfo*) L)->MTime < ((const FileInfo*) R)->MTime) {
+        return -1;
+    }
+    if (((const FileInfo*) L)->Size > ((const FileInfo*) R)->Size) {
+        return 1;
+    } else if (((const FileInfo*) L)->Size < ((const FileInfo*) R)->Size) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 
@@ -1477,7 +1547,7 @@ static void NextToken (InputData* D)
 
 
     /* Skip whitespace */
-    while (D->C == ' ' || D->C == '\t') {
+    while (D->C == ' ' || D->C == '\t' || D->C == '\r') {
      	NextChar (D);
     }
 
@@ -2371,12 +2441,18 @@ static SegInfo* FindSegInfoById (InputData* D, unsigned Id)
 
 
 
-static FileInfo* FindFileInfoByName (Collection* FileInfos, const char* FileName)
-/* Find the FileInfo for a given file name */
+static int FindFileInfoByName (Collection* FileInfos, const char* FileName,
+                               unsigned* Index)
+/* Find the FileInfo for a given file name. The function returns true if the
+ * name was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for FileName.
+ */
 {
     /* Do a binary search */
     int Lo = 0;
     int Hi = (int) CollCount (FileInfos) - 1;
+    int Found = 0;
     while (Lo <= Hi) {
 
         /* Mid of range */
@@ -2391,16 +2467,20 @@ static FileInfo* FindFileInfoByName (Collection* FileInfos, const char* FileName
         /* Found? */
         if (Res < 0) {
             Lo = Cur + 1;
-        } else if (Res > 0) {
-            Hi = Cur - 1;
         } else {
-            /* Found! */
-            return CurItem;
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Res == 0) {
+                Found = 1;
+            }
         }
     }
 
-    /* Not found */
-    return 0;
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
 }
 
 
@@ -2462,52 +2542,22 @@ static void ProcessSegInfo (InputData* D)
 static void ProcessFileInfo (InputData* D)
 /* Postprocess file infos */
 {
+    unsigned I;
+
     /* Get pointers to the file info collections */
     Collection* FileInfoByName = &D->Info->FileInfoByName;
     Collection* FileInfoById   = &D->Info->FileInfoById;
 
-    /* First, sort the file infos, so we can check for duplicates and do
-     * binary search.
-     */
+    /* First, sort the file infos, so we can do a binary search */
     CollSort (FileInfoByName, CompareFileInfoByName);
 
-    /* Cannot work on an empty collection */
-    if (CollCount (FileInfoByName) > 0) {
-
-        /* Walk through the file infos sorted by name and check for duplicates.
-         * If we find some, warn and remove them, so the file infos are unique
-         * after that step.
-         */
-        FileInfo* F = CollAt (FileInfoByName, 0);
-        unsigned I = 1;
-        while (I < CollCount (FileInfoByName)) {
-            FileInfo* Next = CollAt (FileInfoByName, I);
-            if (strcmp (F->FileName, Next->FileName) == 0) {
-                /* Warn only if time stamp and/or size is different */
-                if (F->Size != Next->Size || F->MTime != Next->MTime) {
-                    ParseError (D,
-                                CC65_WARNING,
-                                "Duplicate file entry for \"%s\"",
-                                F->FileName);
-                }
-                /* Remove the duplicate entry */
-                FreeFileInfo (Next);
-                CollDelete (FileInfoByName, I);
-            } else {
-                /* This one is ok, check the next entry */
-                F = Next;
-                ++I;
-            }
-        }
-
-        /* Copy the file infos to another collection that will be sorted by id */
-        for (I = 0; I < CollCount (FileInfoByName); ++I) {
-            CollAppend (FileInfoById, CollAt (FileInfoByName, I));
-        }
-
-        /* Sort this collection */
-        CollSort (FileInfoById, CompareFileInfoById);
+    /* Copy the file infos to another collection that will be sorted by id */
+    for (I = 0; I < CollCount (FileInfoByName); ++I) {
+        CollAppend (FileInfoById, CollAt (FileInfoByName, I));
     }
+
+    /* Sort this collection */
+    CollSort (FileInfoById, CompareFileInfoById);
 }
 
 
@@ -2703,7 +2753,7 @@ static void ProcessSymInfo (InputData* D)
 
 
 
-static int FindSymInfoByName (Collection* SymInfos, const char* SymName, int* Index)
+static int FindSymInfoByName (Collection* SymInfos, const char* SymName, unsigned* Index)
 /* Find the SymInfo for a given file name. The function returns true if the
  * name was found. In this case, Index contains the index of the first item
  * that matches. If the item wasn't found, the function returns false and
@@ -2746,7 +2796,7 @@ static int FindSymInfoByName (Collection* SymInfos, const char* SymName, int* In
 
 
 
-static int FindSymInfoByValue (Collection* SymInfos, long Value, int* Index)
+static int FindSymInfoByValue (Collection* SymInfos, long Value, unsigned* Index)
 /* Find the SymInfo for a given value. The function returns true if the
  * value was found. In this case, Index contains the index of the first item
  * that matches. If the item wasn't found, the function returns false and
@@ -2822,7 +2872,7 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
     D.Error    = ErrFunc;
 
     /* Open the input file */
-    D.F = fopen (D.FileName, "r");
+    D.F = fopen (D.FileName, "rt");
     if (D.F == 0) {
         /* Cannot open */
         ParseError (&D, CC65_ERROR,
@@ -2966,8 +3016,7 @@ cc65_lineinfo* cc65_lineinfo_byaddr (cc65_dbginfo Handle, unsigned long Addr)
         unsigned I;
 
         /* Prepare the struct we will return to the caller */
-        D = xmalloc (sizeof (*D) + (E->Count - 1) * sizeof (D->data[0]));
-        D->count = E->Count;
+        D = new_cc65_lineinfo (E->Count);
         if (E->Count == 1) {
             CopyLineInfo (D->data, E->Data);
         } else {
@@ -2992,8 +3041,10 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
 {
     DbgInfo*        Info;
     FileInfo*       F;
-    LineInfo*       L;
     cc65_lineinfo*  D;
+    int             Found;
+    unsigned        Index;
+    Collection      LineInfoList = COLLECTION_INITIALIZER;
 
     /* Check the parameter */
     assert (Handle != 0);
@@ -3001,26 +3052,53 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
     /* The handle is actually a pointer to a debug info struct */
     Info = (DbgInfo*) Handle;
 
-    /* Get the file info */
-    F = FindFileInfoByName (&Info->FileInfoByName, FileName);
-    if (F == 0) {
-        /* File not found */
+    /* Search for the first file with this name */
+    Found = FindFileInfoByName (&Info->FileInfoByName, FileName, &Index);
+    if (!Found) {
         return 0;
     }
 
-    /* Search in the file for the given line */
-    L = FindLineInfoByLine (F, Line);
-    if (L == 0) {
-        /* Line not found */
+    /* Loop over all files with this name */
+    F = CollAt (&Info->FileInfoByName, Index);
+    while (Found) {
+
+        /* Search in the file for the given line */
+        LineInfo* L = FindLineInfoByLine (F, Line);
+        if (L) {
+            /* Remember the line info */
+            CollAppend (&LineInfoList, L);
+        }
+
+        /* Next entry */
+        ++Index;
+
+        /* If the index is valid, check if the next entry is a file with the
+         * same name.
+         */
+        if (Index < CollCount (&Info->FileInfoByName)) {
+            F = CollAt (&Info->FileInfoByName, Index);
+            Found = (strcmp (F->FileName, FileName) == 0);
+        } else {
+            Found = 0;
+        }
+    }
+
+    /* Check if we have entries */
+    if (CollCount (&LineInfoList) == 0) {
+        /* Nope */
         return 0;
     }
 
     /* Prepare the struct we will return to the caller */
-    D = xmalloc (sizeof (*D));
-    D->count = 1;
+    D = new_cc65_lineinfo (CollCount (&LineInfoList));
 
-    /* Copy data */
-    CopyLineInfo (D->data, L);
+    /* Copy the data */
+    for (Index = 0; Index < CollCount (&LineInfoList); ++Index) {
+        CopyLineInfo (D->data + Index, CollAt (&LineInfoList, Index));
+    }
+
+    /* Delete the temporary data collection */
+    DoneCollection (&LineInfoList);
 
     /* Return the allocated struct */
     return D;
@@ -3057,21 +3135,34 @@ cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
     /* Get a pointer to the file list */
     FileInfoByName = &Info->FileInfoByName;
 
-    /* Allocate memory for the data structure returned to the caller */
-    D = xmalloc (sizeof (*D) - sizeof (D->data[0]) +
-                 CollCount (FileInfoByName) * sizeof (D->data[0]));
+    /* Allocate memory for the data structure returned to the caller. 
+     * Note: To simplify things, we will allocate the maximum amount of
+     * memory, we may need later. This saves us the overhead of walking 
+     * the list twice.
+     */
+    D = new_cc65_sourceinfo (CollCount (FileInfoByName));
 
-    /* Fill in the data */
-    D->count = CollCount (FileInfoByName);
+    /* Fill in the data, skipping duplicate entries */
+    D->count = 0;
     for (I = 0; I < CollCount (FileInfoByName); ++I) {
 
         /* Get this item */
         const FileInfo* F = CollAt (FileInfoByName, I);
 
+        /* If this is not the first entry, compare it to the last one and
+         * don't add it if it is identical.
+         */
+        if (I > 0 && CompareFileInfoByName (F, CollAt (FileInfoByName, I-1)) == 0) {
+            continue;
+        }
+
         /* Copy the data */
-        D->data[I].source_name  = F->FileName;
-        D->data[I].source_size  = F->Size;
-        D->data[I].source_mtime = F->MTime;
+        D->data[D->count].source_name  = F->FileName;
+        D->data[D->count].source_size  = F->Size;
+        D->data[D->count].source_mtime = F->MTime;
+
+        /* One more valid entry */
+        ++D->count;
     }
 
     /* Return the result */
@@ -3110,8 +3201,7 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     SegInfoByName = &Info->SegInfoByName;
 
     /* Allocate memory for the data structure returned to the caller */
-    D = xmalloc (sizeof (*D) - sizeof (D->data[0]) +
-                 CollCount (SegInfoByName) * sizeof (D->data[0]));
+    D = new_cc65_segmentinfo (CollCount (SegInfoByName));
 
     /* Fill in the data */
     D->count = CollCount (SegInfoByName);
@@ -3155,7 +3245,7 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
     Collection*         SymInfoByName;
     cc65_symbolinfo*    D;
     unsigned            I;
-    int                 Index;
+    unsigned            Index;
     unsigned            Count;
 
     /* Check the parameter */
@@ -3186,7 +3276,7 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
     }
 
     /* Allocate memory for the data structure returned to the caller */
-    D = xmalloc (sizeof (*D) + (Count - 1) * sizeof (D->data[0]));
+    D = new_cc65_symbolinfo (Count);
 
     /* Fill in the data */
     D->count = Count;
@@ -3212,7 +3302,7 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65
     Collection          SymInfoList = COLLECTION_INITIALIZER;
     cc65_symbolinfo*    D;
     unsigned            I;
-    int                 Index;
+    unsigned            Index;
 
     /* Check the parameter */
     assert (Handle != 0);
@@ -3260,7 +3350,7 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65
     }
 
     /* Allocate memory for the data structure returned to the caller */
-    D = xmalloc (sizeof (*D) + (CollCount (&SymInfoList)- 1) * sizeof (D->data[0]));
+    D = new_cc65_symbolinfo (CollCount (&SymInfoList));
 
     /* Fill in the data */
     D->count = CollCount (&SymInfoList);

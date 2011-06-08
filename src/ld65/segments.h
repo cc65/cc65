@@ -70,7 +70,7 @@ struct Segment {
     unsigned char     	AddrSize;      	/* Address size of segment */
     unsigned char       ReadOnly;       /* True for readonly segments (config) */
     unsigned char       Relocatable;    /* True if the segment is relocatable */
-    unsigned char       Placed;         /* Did we place this segment already? */ 
+    unsigned char       Placed;         /* Did we place this segment already? */
     unsigned char      	Dumped;		/* Did we dump this segment? */
 };
 
@@ -81,6 +81,7 @@ typedef struct Section Section;
 struct Section {
     Section*  	   	Next;		/* List of sections in a segment */
     Segment*  	    	Seg;		/* Segment that contains the section */
+    struct ObjData*     Obj;            /* Object file this section comes from */
     struct Fragment*	FragRoot;	/* Fragment list */
     struct Fragment*	FragLast;	/* Pointer to last fragment */
     unsigned long   	Offs;		/* Offset into the segment */

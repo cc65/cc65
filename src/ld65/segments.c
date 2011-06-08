@@ -172,6 +172,7 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize)
     /* Initialize the data */
     S->Next	= 0;
     S->Seg   	= Seg;
+    S->Obj      = 0;
     S->FragRoot = 0;
     S->FragLast = 0;
     S->Size  	= 0;
@@ -230,6 +231,9 @@ Section* ReadSection (FILE* F, ObjData* O)
 
     /* Allocate the section we will return later */
     Sec = NewSection (S, Align, Type);
+
+    /* Remember the object file this section was from */
+    Sec->Obj = O;
 
     /* Set up the minimum segment alignment */
     if (Sec->Align > S->Align) {
@@ -467,7 +471,12 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
     while (Sec) {
      	Fragment* Frag;
 
+        /* Output were this section is from */
+        Print (stdout, 2, "      Section from \"%s\"\n", GetObjFileName (Sec->Obj));
+
      	/* If we have fill bytes, write them now */
+       	Print (stdout, 2, "        Filling 0x%x bytes with 0x%02x\n",
+               Sec->Fill, S->FillVal);
      	WriteMult (Tgt, S->FillVal, Sec->Fill);
      	Offs += Sec->Fill;
 
@@ -480,14 +489,14 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 
 
             /* Output fragment data */
-	    switch (Frag->Type) {
+     	    switch (Frag->Type) {
 
-		case FRAG_LITERAL:
-		    WriteData (Tgt, Frag->LitBuf, Frag->Size);
-		    break;
+     		case FRAG_LITERAL:
+     		    WriteData (Tgt, Frag->LitBuf, Frag->Size);
+     		    break;
 
-		case FRAG_EXPR:
-		case FRAG_SEXPR:
+     		case FRAG_EXPR:
+     		case FRAG_SEXPR:
 		    Sign = (Frag->Type == FRAG_SEXPR);
 		    /* Call the users function and evaluate the result */
 		    switch (F (Frag->Expr, Sign, Frag->Size, Offs, Data)) {
@@ -527,6 +536,8 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 	    }
 
      	    /* Update the offset */
+            Print (stdout, 2, "        Fragment with 0x%x bytes\n",
+                   Frag->Size);
 	    Offs += Frag->Size;
 
 	    /* Next fragment */

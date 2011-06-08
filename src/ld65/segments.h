@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -86,8 +86,8 @@ struct Section {
     struct Fragment*	FragLast;	/* Pointer to last fragment */
     unsigned long   	Offs;		/* Offset into the segment */
     unsigned long   	Size;		/* Size of the section */
+    unsigned long       Fill;           /* Fill bytes for alignment */
     unsigned char   	Align;		/* Alignment */
-    unsigned char	Fill;		/* Fill bytes for alignment */
     unsigned char	AddrSize;       /* Address size of segment */
 };
 

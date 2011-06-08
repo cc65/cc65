@@ -181,7 +181,7 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize)
 
     /* Calculate the alignment bytes needed for the section */
     V = (0x01UL << S->Align) - 1;
-    S->Fill = (unsigned char) (((Seg->Size + V) & ~V) - Seg->Size);
+    S->Fill = (((Seg->Size + V) & ~V) - Seg->Size);
 
     /* Adjust the segment size and set the section offset */
     Seg->Size  += S->Fill;
@@ -475,7 +475,7 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
         Print (stdout, 2, "      Section from \"%s\"\n", GetObjFileName (Sec->Obj));
 
      	/* If we have fill bytes, write them now */
-       	Print (stdout, 2, "        Filling 0x%x bytes with 0x%02x\n",
+       	Print (stdout, 2, "        Filling 0x%lx bytes with 0x%02x\n",
                Sec->Fill, S->FillVal);
      	WriteMult (Tgt, S->FillVal, Sec->Fill);
      	Offs += Sec->Fill;

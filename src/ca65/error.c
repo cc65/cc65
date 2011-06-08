@@ -131,7 +131,7 @@ static void AddNotifications (const Collection* LineInfos)
     unsigned MaxCount = CollCount (LineInfos);
     if (MaxCount > 6) {
         MaxCount = 6;
-    }               
+    }
     Skipped = CollCount (LineInfos) - MaxCount;
     for (I = 1; I < MaxCount; ++I) {
         /* Get next line info */
@@ -149,7 +149,8 @@ static void AddNotifications (const Collection* LineInfos)
 
     /* Add a note if we have more stuff that we won't output */
     if (Skipped > 0) {
-        PrintMsg (GetSourcePos (CollConstAt (LineInfos, 0)), "Note",
+        const LineInfo* LI = CollConstAt (LineInfos, 0);
+        PrintMsg (GetSourcePos (LI), "Note",
                   "Dropping %u additional line infos", Skipped);
     }
 }

@@ -796,7 +796,12 @@ void NextRawTok (void)
 Restart:
     /* Check if we have tokens from another input source */
     if (InputFromStack ()) {
-     	return;
+        if (CurTok.Tok == TOK_IDENT && IsDefine (&CurTok.SVal)) {
+            /* This is a define style macro - expand it */
+            MacExpandStart ();
+            goto Restart;
+        }
+        return;
     }
 
 Again:

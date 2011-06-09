@@ -227,8 +227,10 @@ void DoConditionals (void)
                 ElseClause (D, ".ELSE");
 
                 /* Remember the data for the .ELSE */
-                GetFullLineInfo (&D->LineInfos, 0);
-                D->Name = ".ELSE";
+                if (D) {
+                    GetFullLineInfo (&D->LineInfos, 0);
+                    D->Name = ".ELSE";
+                }
 
                 /* Calculate the new overall condition */
                 CalcOverallIfCond ();

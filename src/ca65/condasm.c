@@ -58,8 +58,9 @@
 enum {
     ifNone	= 0x0000,               /* No flag */
     ifCond	= 0x0001,               /* IF condition was true */
-    ifElse	= 0x0002,               /* We had a .ELSE branch */
-    ifNeedTerm 	= 0x0004,               /* Need .ENDIF termination */
+    ifParentCond= 0x0002,               /* IF condition of parent */
+    ifElse     	= 0x0004,               /* We had a .ELSE branch */
+    ifNeedTerm 	= 0x0008,               /* Need .ENDIF termination */
 };
 
 /* The overall .IF condition */
@@ -87,31 +88,6 @@ static unsigned IfCount = 0;
 
 
 
-static IfDesc* AllocIf (const char* Directive, int NeedTerm)
-/* Alloc a new element from the .IF stack */
-{
-    IfDesc* ID;
-
-    /* Check for stack overflow */
-    if (IfCount >= MAX_IFS) {
-       	Fatal ("Too many nested .IFs");
-    }
-
-    /* Alloc one element */
-    ID = &IfStack[IfCount++];
-
-    /* Initialize elements */
-    ID->Flags     = NeedTerm? ifNeedTerm : ifNone;
-    ID->LineInfos = EmptyCollection;
-    GetFullLineInfo (&ID->LineInfos, 0);
-    ID->Name      = Directive;
-
-    /* Return the result */
-    return ID;
-}
-
-
-
 static IfDesc* GetCurrentIf (void)
 /* Return the current .IF descriptor */
 {
@@ -124,35 +100,23 @@ static IfDesc* GetCurrentIf (void)
 
 
 
-static void FreeIf (void)
-/* Free all .IF descriptors until we reach one with the NeedTerm bit set */
+static int GetOverallIfCond (void)
+/* Get the overall condition based on all conditions on the stack. */
 {
-    int Done;
-    do {
-       	IfDesc* ID = GetCurrentIf();
-       	if (ID == 0) {
-       	    Error (" Unexpected .ENDIF");
-	    Done = 1;
-       	} else {
-       	    Done = (ID->Flags & ifNeedTerm) != 0;
-            --IfCount;
-       	}
-    } while (!Done);
+    /* Since the last entry contains the overall condition of the parent, we
+     * must check it in combination of the current condition. If there is no
+     * last entry, the overall condition is true.
+     */
+    return (IfCount == 0) ||
+           ((IfStack[IfCount-1].Flags & (ifCond | ifParentCond)) == (ifCond | ifParentCond));
 }
 
 
 
 static void CalcOverallIfCond (void)
-/* Caclulate the overall condition based on all conditions on the stack */
+/* Caclulate the overall condition based on all conditions on the stack. */
 {
-    unsigned Count;
-    IfCond = 1;
-    for (Count = 0; Count < IfCount; ++Count) {
-       	if ((IfStack[Count].Flags & ifCond) == 0) {
-            IfCond = 0;
-       	    break;
-       	}
-    }
+    IfCond = GetOverallIfCond ();
 }
 
 
@@ -187,6 +151,56 @@ static void ElseClause (IfDesc* ID, const char* Directive)
 
     /* Condition is inverted now */
     ID->Flags ^= ifCond;
+}
+
+
+
+static IfDesc* AllocIf (const char* Directive, int NeedTerm)
+/* Alloc a new element from the .IF stack */
+{
+    IfDesc* ID;
+
+    /* Check for stack overflow */
+    if (IfCount >= MAX_IFS) {
+       	Fatal ("Too many nested .IFs");
+    }
+
+    /* Get the next element */
+    ID = &IfStack[IfCount];
+
+    /* Initialize elements */
+    ID->Flags = NeedTerm? ifNeedTerm : ifNone;
+    if (GetOverallIfCond ()) {
+        /* The parents .IF condition is true */
+        ID->Flags |= ifParentCond;
+    }
+    ID->LineInfos = EmptyCollection;
+    GetFullLineInfo (&ID->LineInfos, 0);
+    ID->Name = Directive;
+
+    /* One more slot allocated */
+    ++IfCount;
+
+    /* Return the result */
+    return ID;
+}
+
+
+
+static void FreeIf (void)
+/* Free all .IF descriptors until we reach one with the NeedTerm bit set */
+{
+    int Done;
+    do {
+       	IfDesc* ID = GetCurrentIf();
+       	if (ID == 0) {
+       	    Error (" Unexpected .ENDIF");
+	    Done = 1;
+       	} else {
+       	    Done = (ID->Flags & ifNeedTerm) != 0;
+            --IfCount;
+       	}
+    } while (!Done);
 }
 
 

@@ -247,6 +247,7 @@ typedef enum token_t {
     TOK_TAG,
     TOK_TCOUNT,
     TOK_TIME,
+    TOK_UNDEF,
     TOK_UNION,
     TOK_VERSION,
     TOK_WARNING,

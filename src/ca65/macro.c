@@ -106,9 +106,10 @@ struct Macro {
     unsigned 	    TokCount;	/* Number of tokens for this macro */
     TokNode* 	    TokRoot;	/* Root of token list */
     TokNode* 	    TokLast;	/* Pointer to last token in list */
+    StrBuf          Name;	/* Macro name, dynamically allocated */
+    unsigned        Expansions; /* Number of active macro expansions */
     unsigned char   Style;	/* Macro style */
     unsigned char   Incomplete; /* Macro is currently built */
-    StrBuf          Name;	/* Macro name, dynamically allocated */
 };
 
 /* Hash table functions */
@@ -121,9 +122,6 @@ static const HashFunctions HashFunc = {
 
 /* Macro hash table */
 static HashTable MacroTab = STATIC_HASHTABLE_INITIALIZER (117, &HashFunc);
-
-/* Global macro data */
-static Macro*  	MacroRoot = 0;	/* List of all macros */
 
 /* Structs that holds data for a macro expansion */
 typedef struct MacExp MacExp;
@@ -151,6 +149,9 @@ static int DoMacAbort = 0;
 
 /* Counter to create local names for symbols */
 static unsigned LocalName = 0;
+
+/* Define style macros disabled if != 0 */
+static unsigned DisableDefines = 0;
 
 
 
@@ -233,14 +234,11 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
     M->TokCount	  = 0;
     M->TokRoot    = 0;
     M->TokLast    = 0;
-    M->Style	  = Style;
-    M->Incomplete = 1;
     SB_Init (&M->Name);
     SB_Copy (&M->Name, Name);
-
-    /* Insert the macro into the global macro list */
-    M->List = MacroRoot;
-    MacroRoot = M;
+    M->Expansions = 0;
+    M->Style	  = Style;
+    M->Incomplete = 1;
 
     /* Insert the macro into the hash table */
     HT_Insert (&MacroTab, &M->Node);
@@ -268,11 +266,14 @@ static MacExp* NewMacExp (Macro* M)
     LocalName    += M->LocalCount;
     E->ParamCount = 0;
     E->Params     = xmalloc (M->ParamCount * sizeof (TokNode*));
-    E->ParamExp	  = 0;
     for (I = 0; I < M->ParamCount; ++I) {
 	E->Params[I] = 0;
     }
+    E->ParamExp	  = 0;
     E->LISlot     = AllocLineInfoSlot (LI_TYPE_MACRO, MacExpansions);
+
+    /* Mark the macro as expanding */
+    ++M->Expansions;
 
     /* One macro expansion more */
     ++MacExpansions;
@@ -290,6 +291,9 @@ static void FreeMacExp (MacExp* E)
 
     /* One macro expansion less */
     --MacExpansions;
+
+    /* No longer expanding this macro */
+    --E->M->Expansions;
 
     /* Free the parameter lists */
     for (I = 0; I < E->ParamCount; ++I) {
@@ -321,18 +325,18 @@ static void MacSkipDef (unsigned Style)
 /* Skip a macro definition */
 {
     if (Style == MAC_STYLE_CLASSIC) {
-	/* Skip tokens until we reach the final .endmacro */
-	while (CurTok.Tok != TOK_ENDMACRO && CurTok.Tok != TOK_EOF) {
-	    NextTok ();
-	}
-	if (CurTok.Tok != TOK_EOF) {
-	    SkipUntilSep ();
-	} else {
-	    Error ("`.ENDMACRO' expected");
-	}
+       	/* Skip tokens until we reach the final .endmacro */
+       	while (CurTok.Tok != TOK_ENDMACRO && CurTok.Tok != TOK_EOF) {
+       	    NextTok ();
+       	}
+       	if (CurTok.Tok != TOK_EOF) {
+       	    SkipUntilSep ();
+       	} else {
+       	    Error ("`.ENDMACRO' expected");
+       	}
     } else {
-	/* Skip until end of line */
-     	SkipUntilSep ();
+       	/* Skip until end of line */
+       	SkipUntilSep ();
     }
 }
 
@@ -451,7 +455,7 @@ void MacDef (unsigned Style)
 		/* Done */
 		break;
 	    }
-	    /* May not have end of file in a macro definition */
+     	    /* May not have end of file in a macro definition */
 	    if (CurTok.Tok == TOK_EOF) {
 		Error ("`.ENDMACRO' expected");
 		goto Done;
@@ -485,7 +489,7 @@ void MacDef (unsigned Style)
      		I->Next = M->Locals;
      		M->Locals = I;
      		++M->LocalCount;
-     		NextTok ();
+       		NextTok ();
 
      	      	/* Check for end of list */
      		if (CurTok.Tok != TOK_COMMA) {
@@ -544,6 +548,28 @@ void MacDef (unsigned Style)
 Done:
     /* Switch out of raw token mode */
     LeaveRawTokenMode ();
+}
+
+
+
+void MacUndef (const StrBuf* Name)
+/* Undefine the macro with the given name. */
+{
+    /* Search for the macro */
+    Macro* M = HT_FindEntry (&MacroTab, Name);
+
+    /* Don't let the user kid with us */
+    if (M == 0) {
+        Error ("No such macro: %m%p", Name);
+        return;
+    }
+    if (M->Expansions > 0) {
+        Error ("Cannot delete a macro that is currently expanded");
+        return;
+    }
+
+    /* Remove the macro from the macro table */
+    HT_RemoveEntry (&MacroTab, M);
 }
 
 
@@ -678,18 +704,10 @@ MacEnd:
 
 
 
-static void StartExpClassic (Macro* M)
-/* Start expanding the classic macro M */
+static void StartExpClassic (MacExp* E)
+/* Start expanding a classic macro */
 {
-    MacExp*     E;
     token_t     Term;
-
-
-    /* Create a structure holding expansion data. This must be done before
-     * skipping the macro name, because the call to NextTok may cause a new
-     * expansion if the next token is actually a .define style macro.
-     */
-    E = NewMacExp (M);
 
     /* Skip the macro name */
     NextTok ();
@@ -700,10 +718,10 @@ static void StartExpClassic (Macro* M)
 	TokNode* Last;
 
        	/* Check for maximum parameter count */
-	if (E->ParamCount >= M->ParamCount) {
+	if (E->ParamCount >= E->M->ParamCount) {
        	    ErrorSkip ("Too many macro parameters");
 	    break;
-	}
+    	}
 
         /* The macro may optionally be enclosed in curly braces */
         Term = GetTokListTerm (TOK_COMMA);
@@ -730,7 +748,7 @@ static void StartExpClassic (Macro* M)
 	    } else {
 	     	Last->Next = T;
 	    }
-	    Last = T;
+       	    Last = T;
 
 	    /* And skip it... */
 	    NextTok ();
@@ -752,8 +770,8 @@ static void StartExpClassic (Macro* M)
 
 	/* Check for a comma */
 	if (CurTok.Tok == TOK_COMMA) {
- 	    NextTok ();
- 	} else {
+    	    NextTok ();
+     	} else {
  	    break;
  	}
     }
@@ -767,16 +785,13 @@ static void StartExpClassic (Macro* M)
 
 
 
-static void StartExpDefine (Macro* M)
+static void StartExpDefine (MacExp* E)
 /* Start expanding a DEFINE style macro */
 {
-    /* Create a structure holding expansion data */
-    MacExp* E = NewMacExp (M);
-
     /* A define style macro must be called with as many actual parameters
      * as there are formal ones. Get the parameter count.
      */
-    unsigned Count = M->ParamCount;
+    unsigned Count = E->M->ParamCount;
 
     /* Skip the current token */
     NextTok ();
@@ -813,13 +828,13 @@ static void StartExpDefine (Macro* M)
        	    }
        	    Last = T;
 
-	    /* And skip it... */
-	    NextTok ();
+    	    /* And skip it... */
+    	    NextTok ();
 
        	} while (CurTok.Tok != Term && !TokIsSep (CurTok.Tok));
 
-	/* One parameter more */
-	++E->ParamCount;
+    	/* One parameter more */
+    	++E->ParamCount;
 
         /* If the macro argument was enclosed in curly braces, end-of-line
          * is an error. Skip the closing curly brace.
@@ -858,9 +873,11 @@ static void StartExpDefine (Macro* M)
 void MacExpandStart (void)
 /* Start expanding the macro in SVal */
 {
+    MacExp* E;
+
     /* Search for the macro */
     Macro* M = HT_FindEntry (&MacroTab, &CurTok.SVal);
-    CHECK (M != 0);
+    CHECK (M != 0 && (M->Style != MAC_STYLE_DEFINE || DisableDefines == 0));
 
     /* We cannot expand an incomplete macro */
     if (M->Incomplete) {
@@ -876,11 +893,14 @@ void MacExpandStart (void)
         return;
     }
 
+    /* Create a structure holding expansion data */
+    E = NewMacExp (M);
+
     /* Call the apropriate subroutine */
     switch (M->Style) {
-    	case MAC_STYLE_CLASSIC:	StartExpClassic (M);	break;
-	case MAC_STYLE_DEFINE:	StartExpDefine (M);	break;
-	default:       	      	Internal ("Invalid macro style: %d", M->Style);
+    	case MAC_STYLE_CLASSIC:	StartExpClassic (E);	break;
+    	case MAC_STYLE_DEFINE:	StartExpDefine (E);	break;
+    	default:       	      	Internal ("Invalid macro style: %d", M->Style);
     }
 }
 
@@ -908,8 +928,16 @@ int IsMacro (const StrBuf* Name)
 
 int IsDefine (const StrBuf* Name)
 /* Return true if the given name is the name of a define style macro */
-{
-    Macro* M = HT_FindEntry (&MacroTab, Name);
+{   
+    Macro* M;
+
+    /* Never if disabled */
+    if (DisableDefines) {             
+        return 0;
+    }
+
+    /* Check if we have such a macro */
+    M = HT_FindEntry (&MacroTab, Name);
     return (M != 0 && M->Style == MAC_STYLE_DEFINE);
 }
 
@@ -921,6 +949,24 @@ int InMacExpansion (void)
     return (MacExpansions > 0);
 }
 
+
+
+void DisableDefineStyleMacros (void)
+/* Disable define style macros until EnableDefineStyleMacros is called */
+{
+    ++DisableDefines;
+}
+
+
+
+void EnableDefineStyleMacros (void)
+/* Re-enable define style macros previously disabled with
+ * DisableDefineStyleMacros.
+ */
+{
+    PRECONDITION (DisableDefines > 0);
+    --DisableDefines;
+}
 
 
 

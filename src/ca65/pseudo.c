@@ -1778,6 +1778,29 @@ static void DoTag (void)
 
 
 
+static void DoUnDef (void)
+/* Undefine a macro */
+{                              
+    /* The function is called with the .UNDEF token in place, because we need
+     * to disable .define macro expansions before reading the next token. 
+     * Otherwise the name of the macro would be expanded, so we would never 
+     * see it.
+     */
+    DisableDefineStyleMacros ();
+    NextTok ();
+    EnableDefineStyleMacros ();
+
+    /* We expect an identifier */
+    if (CurTok.Tok != TOK_IDENT) {
+	ErrorSkip ("Identifier expected");
+    } else {
+        MacUndef (&CurTok.SVal);
+        NextTok ();
+    }
+}
+
+
+
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
@@ -1824,7 +1847,7 @@ static void DoZeropage (void)
 
 
 /*****************************************************************************/
-/*	      		   	  Table data				     */
+/*	      		       	  Table data				     */
 /*****************************************************************************/
 
 
@@ -1914,7 +1937,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,	DoConditionals	},	/* .IFP816 */
     { ccKeepToken,	DoConditionals	},	/* .IFPC02 */
     { ccKeepToken,	DoConditionals	},	/* .IFPSC02 */
-    { ccKeepToken,	DoConditionals	},	/* .IFREF */
+    { ccKeepToken,	DoConditionals	},     	/* .IFREF */
     { ccNone,		DoImport  	},
     { ccNone,		DoImportZP	},
     { ccNone,		DoIncBin	},
@@ -1936,7 +1959,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,  	       	DoInvalid	},	/* .MID	*/
     { ccNone,  	       	DoUnexpected	},	/* .MIN */
     { ccNone,		DoNull		},
-    { ccNone,		DoOrg		},
+    { ccNone,		DoOrg  		},
     { ccNone,		DoOut		},
     { ccNone,		DoP02		},
     { ccNone,		DoP816		},
@@ -1970,10 +1993,11 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoTag           },
     { ccNone,		DoUnexpected	},   	/* .TCOUNT */
     { ccNone,  	       	DoUnexpected	},   	/* .TIME */
+    { ccKeepToken,      DoUnDef         },
     { ccNone,           DoUnion         },
     { ccNone,           DoUnexpected    },      /* .VERSION */
     { ccNone,		DoWarning	},
-    { ccNone,       	DoWord		},
+    { ccNone,       	DoWord 		},
     { ccNone,  	       	DoUnexpected	},   	/* .XMATCH */
     { ccNone,       	DoZeropage	},
 };
@@ -1981,7 +2005,7 @@ static CtrlDesc CtrlCmdTab [] = {
 
 
 /*****************************************************************************/
-/*     	       	    		     Code    				     */
+/*     	       	    	       	     Code    				     */
 /*****************************************************************************/
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,25 +39,38 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+struct StrBuf;
+
+
+
+/*****************************************************************************/
+/*			    	     Data				     */
 /*****************************************************************************/
 
 
 
 /* Macro styles */
-#define MAC_STYLE_CLASSIC	0
-#define MAC_STYLE_DEFINE	1
+#define MAC_STYLE_CLASSIC   	0
+#define MAC_STYLE_DEFINE    	1
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*     	       	    	    	     Code				     */
 /*****************************************************************************/
 
 
 
 void MacDef (unsigned Style);
 /* Parse a macro definition */
+
+void MacUndef (const struct StrBuf* Name);
+/* Undefine the macro with the given name. */
 
 void MacExpandStart (void);
 /* Start expanding the macro in SVal */
@@ -73,6 +86,14 @@ int IsDefine (const StrBuf* Name);
 
 int InMacExpansion (void);
 /* Return true if we're currently expanding a macro */
+
+void DisableDefineStyleMacros (void);
+/* Disable define style macros until EnableDefineStyleMacros is called */
+
+void EnableDefineStyleMacros (void);
+/* Re-enable define style macros previously disabled with
+ * DisableDefineStyleMacros.
+ */
 
 
 

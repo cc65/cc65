@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "check.h"
 #include "hashtab.h"
 #include "xmalloc.h"
 
@@ -164,10 +165,53 @@ void HT_Insert (HashTable* T, HashNode* N)
 
 
 
+void HT_Remove (HashNode* N)
+/* Remove a node from a hash table. */
+{
+    /* Get the table from the node */
+    HashTable* T = N->Owner;
+
+    /* Calculate the reduced hash, which is also the slot number */
+    unsigned Slot = N->Hash % T->Slots;
+
+    /* Remove the entry from the single linked list */
+    HashNode** Q = &T->Table[Slot];
+    while (1) {
+        /* If the pointer is NULL, the node is not in the table which we will
+         * consider a serious error.
+         */
+        CHECK (*Q != 0);
+        if (*Q == N) {
+            /* Found - remove it */
+            *Q = N->Next;
+            break;
+        }
+        /* Next node */
+        Q = &(*Q)->Next;
+    }
+}
+
+
+
 void HT_InsertEntry (HashTable* T, void* Entry)
 /* Insert an entry into the given hash table */
 {
     HT_Insert (T, T->Func->GetHashNode (Entry));
+}
+
+
+
+void HT_RemoveEntry (HashTable* T, void* Entry)
+/* Remove an entry from the given hash table */
+{
+    /* Get the node from the entry */
+    HashNode* N = T->Func->GetHashNode (Entry);
+
+    /* Make sure the entry is actually in the given table */
+    CHECK (N->Owner == T);
+
+    /* Remove the node */
+    HT_Remove (N);
 }
 
 

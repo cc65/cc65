@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -196,8 +196,14 @@ void* HT_FindEntry (const HashTable* T, const void* Key);
 void HT_Insert (HashTable* T, HashNode* N);
 /* Insert a node into the given hash table */
 
+void HT_Remove (HashNode* N);
+/* Remove a node from its hash table */
+
 void HT_InsertEntry (HashTable* T, void* Entry);
 /* Insert an entry into the given hash table */
+
+void HT_RemoveEntry (HashTable* T, void* Entry);
+/* Remove an entry from the given hash table */
 
 void HT_Walk (HashTable* T, void (*F) (void* Entry, void* Data), void* Data);
 /* Walk over all nodes of a hash table. For each node, the user supplied

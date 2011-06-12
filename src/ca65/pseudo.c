@@ -753,6 +753,20 @@ static void DoDefine (void)
 
 
 
+static void DoDelMac (void)
+/* Delete a classic macro */
+{
+    /* We expect an identifier */
+    if (CurTok.Tok != TOK_IDENT) {
+	ErrorSkip ("Identifier expected");
+    } else {
+        MacUndef (&CurTok.SVal, MAC_STYLE_CLASSIC);
+        NextTok ();
+    }
+}
+
+
+
 static void DoDestructor (void)
 /* Export a symbol as destructor */
 {
@@ -1779,11 +1793,11 @@ static void DoTag (void)
 
 
 static void DoUnDef (void)
-/* Undefine a macro */
-{                              
+/* Undefine a define style macro */
+{
     /* The function is called with the .UNDEF token in place, because we need
-     * to disable .define macro expansions before reading the next token. 
-     * Otherwise the name of the macro would be expanded, so we would never 
+     * to disable .define macro expansions before reading the next token.
+     * Otherwise the name of the macro would be expanded, so we would never
      * see it.
      */
     DisableDefineStyleMacros ();
@@ -1794,7 +1808,7 @@ static void DoUnDef (void)
     if (CurTok.Tok != TOK_IDENT) {
 	ErrorSkip ("Identifier expected");
     } else {
-        MacUndef (&CurTok.SVal);
+        MacUndef (&CurTok.SVal, MAC_STYLE_DEFINE);
         NextTok ();
     }
 }
@@ -1893,6 +1907,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,        	DoDebugInfo	},
     { ccNone,		DoDefine	},
     { ccNone,		DoUnexpected	},	/* .DEFINED */
+    { ccNone,           DoDelMac        },
     { ccNone,		DoDestructor	},
     { ccNone,		DoDWord		},
     { ccKeepToken,	DoConditionals	},	/* .ELSE */

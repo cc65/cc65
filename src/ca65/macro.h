@@ -69,8 +69,10 @@ struct StrBuf;
 void MacDef (unsigned Style);
 /* Parse a macro definition */
 
-void MacUndef (const struct StrBuf* Name);
-/* Undefine the macro with the given name. */
+void MacUndef (const StrBuf* Name, unsigned char Style);
+/* Undefine the macro with the given name and style. A style mismatch is
+ * treated as if the macro didn't exist.
+ */
 
 void MacExpandStart (void);
 /* Start expanding the macro in SVal */

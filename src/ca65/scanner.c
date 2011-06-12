@@ -166,6 +166,8 @@ struct DotKeyword {
     { ".DEF",   	TOK_DEFINED	},
     { ".DEFINE",	TOK_DEFINE	},
     { ".DEFINED",	TOK_DEFINED	},
+    { ".DELMAC",        TOK_DELMAC      },
+    { ".DELMACRO",      TOK_DELMAC      },
     { ".DESTRUCTOR",	TOK_DESTRUCTOR	},
     { ".DWORD", 	TOK_DWORD	},
     { ".ELSE",  	TOK_ELSE	},

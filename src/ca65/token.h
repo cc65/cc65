@@ -147,6 +147,7 @@ typedef enum token_t {
     TOK_DEBUGINFO,
     TOK_DEFINE,
     TOK_DEFINED,
+    TOK_DELMAC,
     TOK_DESTRUCTOR,
     TOK_DWORD,
     TOK_ELSE,

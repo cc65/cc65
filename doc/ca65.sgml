@@ -2113,7 +2113,22 @@ Here's a list of all control commands and a description, what they do:
   Start a define style macro definition. The command is followed by an
   identifier (the macro name) and optionally by a list of formal arguments
   in braces.
-  See section <ref id="macros" name="Macros">.
+  See also the <tt><ref id=".UNDEFINE" name=".UNDEFINE"></tt> command and
+  section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.DELMAC, .DELMACRO</tt><label id=".DELMACRO"><p>
+
+  Delete a classic macro (defined with <tt><ref id=".MACRO"
+  name=".MACRO"></tt>) . The command is followed by the name of an
+  existing macro. Its definition will be deleted together with the name.
+  If necessary, another macro with this name may be defined later.
+
+  See: <tt><ref id=".ENDMACRO" name=".ENDMACRO"></tt>,
+       <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>,
+       <tt><ref id=".MACRO" name=".MACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
 
 
 <sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
@@ -2125,7 +2140,7 @@ Here's a list of all control commands and a description, what they do:
   <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
 
   <tscreen><verb>
-	.if	.defined(a)
+  	.if	.defined(a)
   </verb></tscreen>
 
 
@@ -2201,7 +2216,13 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.ENDMAC, .ENDMACRO</tt><label id=".ENDMACRO"><p>
 
-  End of macro definition (see section <ref id="macros" name="Macros">).
+  Marks the end of a macro definition.
+
+  See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
+       <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>,
+       <tt><ref id=".MACRO" name=".MACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
 
 
 <sect1><tt>.ENDPROC</tt><label id=".ENDPROC"><p>
@@ -2315,7 +2336,13 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.EXITMAC, .EXITMACRO</tt><label id=".EXITMACRO"><p>
 
   Abort a macro expansion immediately. This command is often useful in
-  recursive macros. See separate section <ref id="macros" name="Macros">.
+  recursive macros.
+
+  See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
+       <tt><ref id=".ENDMACRO" name=".ENDMACRO"></tt>,
+       <tt><ref id=".MACRO" name=".MACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
 
 
 <sect1><tt>.EXPORT</tt><label id=".EXPORT"><p>
@@ -3081,13 +3108,26 @@ Here's a list of all control commands and a description, what they do:
   id="macropackages" name="Macro packages">.
 
 
-<sect1><tt>.MAC, .MACRO</tt><label id=".MAC"><p>
+<sect1><tt>.MAC, .MACRO</tt><label id=".MACRO"><p>
 
   Start a classic macro definition. The command is followed by an identifier
   (the macro name) and optionally by a comma separated list of identifiers
-  that are macro parameters.
+  that are macro parameters. A macro definition is terminated by <tt><ref
+  id=".ENDMACRO" name=".ENDMACRO"></tt>.
 
-  See section <ref id="macros" name="Macros">.
+  Example:
+
+  <tscreen><verb>
+       	.macro  ldax    arg             ; Define macro ldax
+                lda     arg
+                ldx     arg+1
+  </verb></tscreen>
+
+  See: <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>,
+       <tt><ref id=".ENDMACRO" name=".ENDMACRO"></tt>,
+       <tt><ref id=".EXITMACRO" name=".EXITMACRO"></tt>
+
+  See also section <ref id="macros" name="Macros">.
 
 
 <sect1><tt>.ORG</tt><label id=".ORG"><p>
@@ -3519,6 +3559,17 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<sect1><tt>.UNDEF, .UNDEFINE</tt><label id=".UNDEFINE"><p>
+
+  Delete a define style macro definition. The command is followed by an
+  identifier which specifies the name of the macro to delete. Macro
+  replacement is switched of when reading the token following the command
+  (otherwise the macro name would be replaced by it's replacement list).
+
+  See also the <tt><ref id=".DEFINE" name=".DEFINE"></tt> command and
+  section <ref id="macros" name="Macros">.
+
+
 <sect1><tt>.WARNING</tt><label id=".WARNING"><p>
 
   Force an assembly warning. The assembler will output a warning message
@@ -3599,9 +3650,9 @@ example:
 
 <tscreen><verb>
        	.macro  asr		; Arithmetic shift right
-  	       	cmp	#$80	; Put bit 7 into carry
-  		ror		; Rotate right with carry
-  	.endmacro
+      	       	cmp	#$80	; Put bit 7 into carry
+      		ror		; Rotate right with carry
+      	.endmacro
 </verb></tscreen>
 
 The macro above consists of two real instructions, that are inserted into
@@ -3609,9 +3660,9 @@ the code, whenever the macro is expanded. Macro expansion is simply done
 by using the name, like this:
 
 <tscreen><verb>
-  	lda    	$2010
-  	asr
-  	sta	$2010
+      	lda    	$2010
+      	asr
+      	sta	$2010
 </verb></tscreen>
 
 
@@ -3620,15 +3671,15 @@ by using the name, like this:
 When using macro parameters, macros can be even more useful:
 
 <tscreen><verb>
-  	.macro 	inc16	addr
-  		clc
-  		lda    	addr
-  		adc	#$01
-  		sta	addr
-  		lda	addr+1
-  	 	adc	#$00
-  		sta	addr+1
-  	.endmacro
+      	.macro 	inc16	addr
+      		clc
+      		lda    	addr
+      		adc	#$01
+      		sta	addr
+      		lda	addr+1
+      	 	adc	#$00
+      		sta	addr+1
+      	.endmacro
 </verb></tscreen>
 
 When calling the macro, you may give a parameter, and each occurrence of
@@ -3636,19 +3687,19 @@ the name "addr" in the macro definition will be replaced by the given
 parameter. So
 
 <tscreen><verb>
-  	inc16  	$1000
+      	inc16  	$1000
 </verb></tscreen>
 
 will be expanded to
 
 <tscreen><verb>
-  	       	clc
-  		lda	$1000
-  		adc	#$01
-  		sta	$1000
-  		lda	$1000+1
-  		adc	#$00
-  		sta	$1000+1
+      	       	clc
+      		lda	$1000
+      		adc	#$01
+      		sta	$1000
+      		lda	$1000+1
+      		adc	#$00
+      		sta	$1000+1
 </verb></tscreen>
 
 A macro may have more than one parameter, in this case, the parameters
@@ -3669,23 +3720,23 @@ opposite.
 Look at this example:
 
 <tscreen><verb>
-  	.macro 	ldaxy  	a, x, y
-  	.ifnblank      	a
-  	     	lda    	#a
-  	.endif
-  	.ifnblank      	x
-  		ldx    	#x
-  	.endif
-  	.ifnblank      	y
-  		ldy    	#y
-  	.endif
-  	.endmacro
+      	.macro 	ldaxy  	a, x, y
+      	.ifnblank      	a
+      	     	lda    	#a
+      	.endif
+      	.ifnblank      	x
+      		ldx    	#x
+      	.endif
+      	.ifnblank      	y
+      		ldy    	#y
+      	.endif
+      	.endmacro
 </verb></tscreen>
 
 This macro may be called as follows:
 
 <tscreen><verb>
-  	ldaxy  	1, 2, 3		; Load all three registers
+      	ldaxy  	1, 2, 3		; Load all three registers
 
   	ldaxy	1, , 3 		; Load only a and y
 
@@ -3786,24 +3837,24 @@ id=".EXITMACRO" name=".EXITMACRO"></tt> This command will stop macro expansion
 immediately:
 
 <tscreen><verb>
-  	.macro 	push   	r1, r2, r3, r4, r5, r6, r7
-  	.ifblank       	r1
-  	      	; First parameter is empty
-  	      	.exitmacro
-  	.else
-  	      	lda    	r1
-  	      	pha
-  	.endif
-  	      	push   	r2, r3, r4, r5, r6, r7
-  	.endmacro
+      	.macro 	push   	r1, r2, r3, r4, r5, r6, r7
+      	.ifblank       	r1
+      	      	; First parameter is empty
+      	      	.exitmacro
+      	.else
+      	      	lda    	r1
+      	      	pha
+      	.endif
+      	      	push   	r2, r3, r4, r5, r6, r7
+      	.endmacro
 </verb></tscreen>
 
 When expanding this macro, the expansion will push all given parameters
 until an empty one is encountered. The macro may be called like this:
 
 <tscreen><verb>
-  	push   	$20, $21, $32		; Push 3 ZP locations
-  	push  	$21    			; Push one ZP location
+      	push   	$20, $21, $32		; Push 3 ZP locations
+      	push  	$21    			; Push one ZP location
 </verb></tscreen>
 
 
@@ -3909,7 +3960,7 @@ different:
 	be omitted.
 
 <item>	Since <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may not
-	contain end-of-line tokens, there are things that cannot be done. They
+      	contain end-of-line tokens, there are things that cannot be done. They
 	may not contain several processor instructions for example. So, while
 	some things may be done with both macro types, each type has special
 	usages. The types complement each other.
@@ -3974,6 +4025,47 @@ doing more complex macros. If you compare characters against numeric values,
 be sure to take the translation into account.
 
 
+<sect1>Deleting macros<p>
+
+Macros can be deleted. This will not work if the macro that should be deleted
+is currently expanded as in the following non working example:
+
+<tscreen><verb>
+   	.macro 	notworking
+   	     	.delmacro       notworking
+   	.endmacro
+
+        notworking              ; Will not work
+</verb></tscreen>
+
+The commands to delete classic and define style macros differ. Classic macros
+can be deleted by use of <tt><ref id=".DELMACRO" name=".DELMACRO"></tt>, while
+for <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros, <tt><ref
+id=".UNDEFINE" name=".UNDEFINE"></tt> must be used. Example:
+
+<tscreen><verb>
+        .define value   1
+   	.macro 	mac
+   	       	.byte   2
+   	.endmacro
+
+                .byte   value           ; Emit one byte with value 1
+                mac                     ; Emit another byte with value 2
+
+        .undefine value
+        .delmacro mac
+
+                .byte   value           ; Error: Unknown identifier
+                mac                     ; Error: Missing ":"
+</verb></tscreen>
+
+A separate command for <tt>.DEFINE</tt> style macros was necessary, because
+the name of such a macro is replaced by its replacement list on a very low
+level. To get the actual name, macro replacement has to be switched off when
+reading the argument to <tt>.UNDEFINE</tt>. This does also mean that the
+argument to <tt>.UNDEFINE</tt> is not allowed to come from another
+<tt>.DEFINE</tt>. All this is not necessary for classic macros, so having two
+different commands increases flexibility.
 
 
 <sect>Macro packages<label id="macropackages"><p>

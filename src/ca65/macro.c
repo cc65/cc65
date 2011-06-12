@@ -206,15 +206,39 @@ static IdDesc* NewIdDesc (const StrBuf* Id)
 /* Create a new IdDesc, initialize and return it */
 {
     /* Allocate memory */
-    IdDesc* I = xmalloc (sizeof (IdDesc));
+    IdDesc* ID = xmalloc (sizeof (IdDesc));
 
     /* Initialize the struct */
-    I->Next = 0;
-    SB_Init (&I->Id);
-    SB_Copy (&I->Id, Id);
+    ID->Next = 0;
+    SB_Init (&ID->Id);
+    SB_Copy (&ID->Id, Id);
 
     /* Return the new struct */
-    return I;
+    return ID;
+}
+
+
+
+static void FreeIdDesc (IdDesc* ID)
+/* Free an IdDesc */
+{
+    /* Free the name */
+    SB_Done (&ID->Id);
+
+    /* Free the structure itself */
+    xfree (ID);
+}
+
+
+
+static void FreeIdDescList (IdDesc* ID)
+/* Free a complete list of IdDesc structures */
+{
+    while (ID) {
+        IdDesc* This = ID;      
+        ID = ID->Next;
+        FreeIdDesc (This);
+    }
 }
 
 
@@ -245,6 +269,32 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
 
     /* Return the new macro struct */
     return M;
+}
+
+
+
+static void FreeMacro (Macro* M)
+/* Free a macro entry which has already been removed from the macro table. */
+{
+    TokNode* T;
+
+    /* Free locals */
+    FreeIdDescList (M->Locals);
+
+    /* Free identifiers of parameters */
+    FreeIdDescList (M->Params);
+
+    /* Free the token list for the macro */
+    while ((T = M->TokRoot) != 0) {
+        M->TokRoot = T->Next;
+        FreeTokNode (T);
+    }
+
+    /* Free the macro name */
+    SB_Done (&M->Name);
+
+    /* Free the macro structure itself */
+    xfree (M);
 }
 
 
@@ -552,14 +602,16 @@ Done:
 
 
 
-void MacUndef (const StrBuf* Name)
-/* Undefine the macro with the given name. */
+void MacUndef (const StrBuf* Name, unsigned char Style)
+/* Undefine the macro with the given name and style. A style mismatch is
+ * treated as if the macro didn't exist.
+ */
 {
     /* Search for the macro */
     Macro* M = HT_FindEntry (&MacroTab, Name);
 
     /* Don't let the user kid with us */
-    if (M == 0) {
+    if (M == 0 || M->Style != Style) {
         Error ("No such macro: %m%p", Name);
         return;
     }
@@ -570,6 +622,9 @@ void MacUndef (const StrBuf* Name)
 
     /* Remove the macro from the macro table */
     HT_RemoveEntry (&MacroTab, M);
+
+    /* Free the macro structure */
+    FreeMacro (M);
 }
 
 
@@ -928,11 +983,11 @@ int IsMacro (const StrBuf* Name)
 
 int IsDefine (const StrBuf* Name)
 /* Return true if the given name is the name of a define style macro */
-{   
+{
     Macro* M;
 
     /* Never if disabled */
-    if (DisableDefines) {             
+    if (DisableDefines) {
         return 0;
     }
 

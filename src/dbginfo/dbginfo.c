@@ -1733,14 +1733,6 @@ static int ConsumeEqual (InputData* D)
 
 
 
-static int ConsumeMinus (InputData* D)
-/* Consume a minus sign */
-{
-    return Consume (D, TOK_MINUS, "'-'");
-}
-
-
-
 static void ConsumeEOL (InputData* D)
 /* Consume an end-of-line token, if we aren't at end-of-file */
 {
@@ -1959,14 +1951,18 @@ static void ParseLine (InputData* D)
                 }
                 Start = (cc65_addr) D->IVal;
                 NextToken (D);
-                if (!ConsumeMinus (D)) {
-                    goto ErrorExit;
+                if (D->Tok == TOK_MINUS) {
+                    /* End of range follows */
+                    NextToken (D);
+                    if (!IntConstFollows (D)) {
+                        goto ErrorExit;
+                    }
+                    End = (cc65_addr) D->IVal;
+                    NextToken (D);
+                } else {
+                    /* Start and end are identical */
+                    End = Start;
                 }
-                if (!IntConstFollows (D)) {
-                    goto ErrorExit;
-                }
-                End = (cc65_addr) D->IVal;
-                NextToken (D);
                 InfoBits |= ibRange;
                 break;
 
@@ -2237,7 +2233,7 @@ static void ParseSym (InputData* D)
 
         /* Something we know? */
         if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_NAME   &&
-            D->Tok != TOK_SEGMENT       && D->Tok != TOK_SIZE   && 
+            D->Tok != TOK_SEGMENT       && D->Tok != TOK_SIZE   &&
             D->Tok != TOK_TYPE          && D->Tok != TOK_VALUE) {
 
             /* Try smart error recovery */

@@ -654,17 +654,17 @@ static int MacExpand (void* Data)
     /* We're expanding a macro. Check if we are expanding one of the
      * macro parameters.
      */
+ExpandParam:
     if (Mac->ParamExp) {
 
        	/* Ok, use token from parameter list, but don't use its line info */
        	TokSet (Mac->ParamExp, LI_SLOT_INV);
-                                          
+
        	/* Set pointer to next token */
        	Mac->ParamExp = Mac->ParamExp->Next;
 
        	/* Done */
        	return 1;
-
     }
 
     /* We're not expanding macro parameters. Check if we have tokens left from
@@ -689,10 +689,10 @@ static int MacExpand (void* Data)
        	if (CurTok.Tok == TOK_MACPARAM) {
 
        	    /* Start to expand the parameter token list */
-       	    Mac->ParamExp = Mac->Params [CurTok.IVal];
+       	    Mac->ParamExp = Mac->Params[CurTok.IVal];
 
-       	    /* Recursive call to expand the parameter */
-       	    return MacExpand (Mac);
+       	    /* Go back and expand the parameter */
+       	    goto ExpandParam;
        	}
 
        	/* If it's an identifier, it may in fact be a local symbol */
@@ -730,7 +730,6 @@ static int MacExpand (void* Data)
 
        	/* The token was successfully set */
        	return 1;
-
     }
 
     /* No more macro tokens. Do we have a final token? */
@@ -741,9 +740,21 @@ static int MacExpand (void* Data)
       	FreeTokNode (Mac->Final);
       	Mac->Final = 0;
 
+        /* Problem: When a .define style macro is expanded within the call
+         * of a classic one, the latter may be terminated and removed while
+         * the expansion of the .define style macro is still active. Because
+         * line info slots are "stacked", this runs into a CHECK FAILED. For
+         * now, we will fix that by removing the .define style macro expansion
+         * immediately, once the final token is placed. The better solution
+         * would probably be to not require AllocLineInfoSlot/FreeLineInfoSlot
+         * to be called in FIFO order, but this is a bigger change.
+         */
+        /* End of macro expansion and pop the input function */
+        FreeMacExp (Mac);
+        PopInput ();
+
        	/* The token was successfully set */
        	return 1;
-
     }
 
 MacEnd:

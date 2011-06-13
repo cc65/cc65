@@ -5,18 +5,19 @@
 ;	Mark Keates
 ;	Freddy Offenga
 ;	Christian Groessler
+;	Stefan Haubenthal
 ;
 
 	.export		_exit
-        .export         __STARTUP__ : absolute = 1      ; Mark as startup
+	.export		__STARTUP__ : absolute = 1	; Mark as startup
 
-	.import		initlib, donelib, callmain
-       	.import	       	zerobss, pushax
-	.import		_main, __filetab, getfd
+	.import		initlib, donelib
+	.import		callmain, zerobss, callirq
+	.import		__INTERRUPTOR_COUNT__
 	.import		__STARTUP_LOAD__, __ZPSAVE_LOAD__
 	.import		__RESERVED_MEMORY__
 
-        .include        "zeropage.inc"
+	.include	"zeropage.inc"
 	.include	"atari.inc"
 
 ; ------------------------------------------------------------------------
@@ -41,7 +42,7 @@
 
 ; Save the zero page locations we need
 
-       	ldx	#zpspace-1
+	ldx	#zpspace-1
 L1:	lda	sp,x
 	sta	zpsave,x
 	dex
@@ -51,12 +52,12 @@ L1:	lda	sp,x
 
 	jsr	zerobss
 
-; setup the stack
+; Setup the stack
 
 	tsx
 	stx	spsave
 
-; report memory usage
+; Report memory usage
 
 	lda	APPMHI
 	sta	appmsav			; remember old APPMHI value
@@ -73,18 +74,31 @@ L1:	lda	sp,x
 	sta	APPMHI+1
 	sta	sp+1			; setup runtime stack part 2
 
+; If we have IRQ functions, chain our stub into the IRQ vector
+
+	lda	#<__INTERRUPTOR_COUNT__
+	beq	NoIRQ1
+	lda	VVBLKI
+	ldx	VVBLKI+1
+	sta	IRQInd+1
+	stx	IRQInd+2
+	lda	#6
+	ldy	#<IRQStub
+	ldx	#>IRQStub
+	jsr	SETVBV
+
 ; Call module constructors
 
-	jsr	initlib
+NoIRQ1:	jsr	initlib
 
-; set left margin to 0
+; Set left margin to 0
 
 	lda	LMARGN
 	sta	old_lmargin
 	ldy	#0
 	sty	LMARGN
 
-; set keyb to upper/lowercase mode
+; Set keyb to upper/lowercase mode
 
 	ldx	SHFLOK
 	stx	old_shflok
@@ -92,7 +106,7 @@ L1:	lda	sp,x
 
 ; Initialize conio stuff
 
-	dey                             ; Set X to $FF
+	dey				; Set X to $FF
 	sty	CH
 
 ; Push arguments and call main
@@ -103,22 +117,32 @@ L1:	lda	sp,x
 
 _exit:	jsr	donelib		; Run module destructors
 
+; Reset the IRQ vector if we chained it.
+
+	pha			; Save the return code on stack
+	lda	#<__INTERRUPTOR_COUNT__
+	beq	NoIRQ2
+	lda	#6
+	ldy	IRQInd+1
+	ldx	IRQInd+2
+	jsr	SETVBV
+
 ; Restore system stuff
 
-	ldx	spsave
-	txs	       		; Restore stack pointer
+NoIRQ2:	ldx	spsave
+	txs			; Restore stack pointer
 
-; restore left margin
+; Restore left margin
 
 	lda	old_lmargin
 	sta	LMARGN
 
-; restore kb mode
+; Restore kb mode
 
 	lda	old_shflok
 	sta	SHFLOK
 
-; restore APPMHI
+; Restore APPMHI
 
 	lda	appmsav
 	sta	APPMHI
@@ -133,7 +157,7 @@ L2:	lda	zpsave,x
 	dex
 	bpl	L2
 
-; turn on cursor
+; Turn on cursor
 
 	inx
 	stx	CRSINH
@@ -142,11 +166,26 @@ L2:	lda	zpsave,x
 
 	rts
 
+; ------------------------------------------------------------------------
+; The IRQ vector jumps here, if condes routines are defined with type 2.
+
+IRQStub:
+	cld				; Just to be sure
+	jsr	callirq			; Call the functions
+	jmp	IRQInd			; Jump to the saved IRQ vector
+
+; ------------------------------------------------------------------------
+; Data
+
+.data
+
+IRQInd: jmp	$0000
+
 ; *** end of main startup code
 
-.segment        "ZPSAVE"
+.segment	"ZPSAVE"
 
-zpsave:	.res	zpspace
+zpsave: .res	zpspace
 
 	.bss
 

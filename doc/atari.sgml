@@ -41,7 +41,7 @@ header (FF FF &lt;2 byte start address&gt; &lt;2 bytes end address&gt;
 &lsqb;program bytes&rsqb;). These values are calculated in the crt0.s
 file from the __STARTUP_LOAD__ and __ZPSAVE_LOAD__ values, so keep
 this in mind if you create a custom linker config file and start
-moving segments around (see section 
+moving segments around (see section
 <ref name="Reserving a memory area inside the program" id="memhole">).
 You can override this behaviour by creating your own crt0.s file and
 linking it into your program.  A run vector is added to the end of the
@@ -271,9 +271,33 @@ or f80.com software is missing. Of course you may use stdio.h functions.
 
 <sect>Other hints<p>
 
+
 <sect1>Function keys<p>
 
 Function keys are mapped to Atari + number key.
+
+
+<sect1>Passing arguments to the program<p>
+
+Command line arguments can be passed to <tt/main()/ when DOS supports it.
+
+<enum>
+<item>Arguments are separated by spaces.
+<item>Leading and trailing spaces around an argument are ignored.
+<item>The first argument passed to <tt/main/ is the program name.
+<item>A maximum number of 16 arguments (including the program name) are
+      supported.                                                       
+</enum>
+
+
+<sect1>Interrupts<p>
+
+The runtime for the Atari uses routines marked as <tt/.CONDES/ type 2 for
+interrupt handlers. Such routines must be written as simple machine language
+subroutines and will be called automatically by the VBI handler code
+when they are linked into a program. See the discussion of the <tt/.CONDES/
+feature in the <htmlurl url="ca65.html" name="assembler manual">.
+
 
 <sect1>Reserving a memory area inside a program<label id="memhole"><p>
 

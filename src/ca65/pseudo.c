@@ -1508,12 +1508,12 @@ static void DoProc (void)
 {
     StrBuf Name = STATIC_STRBUF_INITIALIZER;
     unsigned char AddrSize;
+    SymEntry* Sym = 0;
+
 
     if (CurTok.Tok == TOK_IDENT) {
 
-        SymEntry* Sym;
-
-	/* The new scope has a name. Remember it. */
+    	/* The new scope has a name. Remember it. */
         SB_Copy (&Name, &CurTok.SVal);
 
         /* Search for the symbol, generate a new one if needed */
@@ -1538,7 +1538,7 @@ static void DoProc (void)
     }
 
     /* Enter a new scope */
-    SymEnterLevel (&Name, ST_PROC, AddrSize);
+    SymEnterLevel (&Name, ST_PROC, AddrSize, Sym);
 
     /* Free memory for Name */
     SB_Done (&Name);
@@ -1665,7 +1665,7 @@ static void DoScope (void)
     AddrSize = OptionalAddrSize ();
 
     /* Enter the new scope */
-    SymEnterLevel (&Name, ST_SCOPE, AddrSize);
+    SymEnterLevel (&Name, ST_SCOPE, AddrSize, 0);
 
     /* Free memory for Name */
     SB_Done (&Name);

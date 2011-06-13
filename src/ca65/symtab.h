@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -73,12 +73,13 @@ enum {
 
 /* A symbol table */
 typedef struct SymTable SymTable;
-struct SymTable {                                     
+struct SymTable {
     SymTable*           Next;           /* Pointer to next table in list */
     SymTable*           Left;           /* Pointer to smaller entry */
     SymTable*           Right;          /* Pointer to greater entry */
     SymTable*          	Parent;   	/* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
+    SymEntry*           OwnerSym;       /* Symbol that "owns" the scope */
     Collection          SegRanges;      /* Segment ranges for this scope */
     unsigned            Id;             /* Scope id */
     unsigned short      Flags;          /* Symbol table flags */
@@ -103,7 +104,8 @@ extern SymTable*	RootScope;      /* Root symbol table */
 
 
 
-void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type, unsigned char AddrSize);
+void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
+                    unsigned char AddrSize, SymEntry* OwnerSym);
 /* Enter a new lexical level */
 
 void SymLeaveLevel (void);

@@ -83,6 +83,7 @@ struct Export {
     unsigned 		ImpCount;	/* How many imports for this symbol? */
     Import*  		ImpList;	/* List of imports for this symbol */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
+    unsigned long       Size;           /* Size of the symbol if any */
     Collection          LineInfos;      /* Line info of definition */
     unsigned char	Type;		/* Type of export */
     unsigned char       AddrSize;       /* Address size of export */

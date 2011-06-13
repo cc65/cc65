@@ -48,6 +48,7 @@
 #define LI_TYPE_ASM             0U      /* Normal assembler source */
 #define LI_TYPE_EXT             1U      /* Externally supplied line info */
 #define LI_TYPE_MACRO           2U      /* Macro expansion */
+#define LI_TYPE_MACPARAM        3U      /* Macro parameter expansion */
 
 /* Make a combined value from type and count */
 #define LI_MAKE_TYPE(T,C)       ((T) | (((unsigned)(C)) << 2U))

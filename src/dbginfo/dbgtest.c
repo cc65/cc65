@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2010,      Ullrich von Bassewitz                                      */
+/* (C) 2010-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -113,7 +113,10 @@ static void PrintLineData (const cc65_linedata* D)
 static void PrintSymbolData (const cc65_symboldata* D)
 /* Print the data for one symbol */
 {
-    printf ("  %-20s = %04lX\n", D->symbol_name, D->symbol_value);
+    printf ("  %-20s = %04lX (size %u)\n", 
+            D->symbol_name, 
+            D->symbol_value,
+            D->symbol_size);
 }
 
 
@@ -254,7 +257,7 @@ int main (int argc, char** argv)
     }
 
     /* Free the debug info */
-    cc65_free_dbginfo (Info); 
+    cc65_free_dbginfo (Info);
 
     return 0;
 }

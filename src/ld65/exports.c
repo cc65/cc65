@@ -304,6 +304,7 @@ static Export* NewExport (unsigned char Type, unsigned char AddrSize,
     E->ImpCount  = 0;
     E->ImpList   = 0;
     E->Expr    	 = 0;
+    E->Size      = 0;
     E->LineInfos = EmptyCollection;
     E->Type    	 = Type;
     E->AddrSize  = AddrSize;
@@ -384,6 +385,11 @@ Export* ReadExport (FILE* F, ObjData* O)
      	E->Expr = LiteralExpr (Read32 (F), O);
     }
 
+    /* Read the size */
+    if (SYM_HAS_SIZE (Type)) {
+        E->Size = ReadVar (F);
+    }
+
     /* Last is the file position where the definition was done */
     ReadLineInfoList (F, O, &E->LineInfos);
 
@@ -445,7 +451,7 @@ void InsertExport (Export* E)
       	      	    Imp = E->ImpList;
       	      	    while (Imp) {
       	      	   	Imp->Exp = E;
-      	      	   	Imp = Imp->Next;
+      	      	     	Imp = Imp->Next;
       	      	    }
       	      	} else {
       	      	    /* Duplicate entry, ignore it */
@@ -739,7 +745,7 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 }
 
 
-
+                     
 static int CmpExpName (const void* K1, const void* K2)
 /* Compare function for qsort */
 {

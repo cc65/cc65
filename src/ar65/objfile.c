@@ -217,6 +217,11 @@ void ObjReadData (FILE* F, ObjData* O)
             (void) Read32 (F);
         }
 
+        /* Skip the size if necessary */
+        if (SYM_HAS_SIZE (Type)) {
+            (void) ReadVar (F);
+        }
+
         /* Line info indices */
         SkipLineInfoList (F);
     }

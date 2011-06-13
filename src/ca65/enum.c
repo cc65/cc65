@@ -65,7 +65,7 @@ void DoEnum (void)
     int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (&CurTok.SVal, ST_ENUM, ADDR_SIZE_ABS);
+        SymEnterLevel (&CurTok.SVal, ST_ENUM, ADDR_SIZE_ABS, 0);
         NextTok ();
     }
 

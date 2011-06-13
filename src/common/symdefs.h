@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -55,6 +55,13 @@
 #define SYM_GET_CONDES_COUNT(x) ((x) & SYM_CONDES_MASK)
 #define SYM_INC_CONDES_COUNT(x) ((x)++)
 
+/* Size of symbol available? */      
+#define SYM_SIZELESS            0x00U   /* No symbol size available */
+#define SYM_SIZE                0x08U   /* Symbol has a size */
+#define SYM_MASK_SIZE           0x08U   /* Size mask */
+
+#define SYM_HAS_SIZE(x)         (((x) & SYM_MASK_SIZE) == SYM_SIZE)
+
 /* Symbol value type */
 #define SYM_CONST     	        0x00U   /* Mask bit for const values */
 #define SYM_EXPR      	        0x10U   /* Mask bit for expr values */
@@ -71,7 +78,7 @@
 #define SYM_IS_EQUATE(x)        (((x) & SYM_MASK_LABEL) == SYM_EQUATE)
 #define SYM_IS_LABEL(x)         (((x) & SYM_MASK_LABEL) == SYM_LABEL)
 
-/* Symbol type */                                       
+/* Symbol type */
 #define SYM_STD                 0x00U   /* Standard symbol */
 #define SYM_CHEAP_LOCAL         0x40U   /* Cheap local symbol */
 #define SYM_MASK_TYPE           0x40U   /* Value mask */

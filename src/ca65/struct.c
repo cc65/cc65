@@ -106,7 +106,7 @@ static long DoStructInternal (long Offs, unsigned Type)
     int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (&CurTok.SVal, ST_STRUCT, ADDR_SIZE_ABS);
+        SymEnterLevel (&CurTok.SVal, ST_STRUCT, ADDR_SIZE_ABS, 0);
         NextTok ();
         /* Start at zero offset in the new scope */
         Offs = 0;
@@ -116,8 +116,8 @@ static long DoStructInternal (long Offs, unsigned Type)
     ConsumeSep ();
 
     /* Read until end of struct */
-    while (CurTok.Tok != TOK_ENDSTRUCT && 
-           CurTok.Tok != TOK_ENDUNION  && 
+    while (CurTok.Tok != TOK_ENDSTRUCT &&
+           CurTok.Tok != TOK_ENDUNION  &&
            CurTok.Tok != TOK_EOF) {
 
         long      MemberSize;
@@ -263,12 +263,12 @@ static long DoStructInternal (long Offs, unsigned Type)
 long GetStructSize (SymTable* Struct)
 /* Get the size of a struct or union */
 {
-    SymEntry* Sym = SymFind (Struct, &SizeEntryName, SYM_FIND_EXISTING);
-    if (Sym == 0) {
+    SymEntry* SizeSym = FindSizeOfScope (Struct);
+    if (SizeSym == 0) {
         Error ("Size of struct/union is unknown");
         return 0;
     } else {
-        return GetSymVal (Sym);
+        return GetSymVal (SizeSym);
     }
 }
 

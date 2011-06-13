@@ -84,6 +84,7 @@ static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O
     D->Obj       = O;
     D->LineInfos = EmptyCollection;
     D->Expr    	 = 0;
+    D->Size      = 0;
     D->Name 	 = 0;
     D->Type    	 = Type;
     D->AddrSize  = AddrSize;
@@ -144,7 +145,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 /* Read a debug symbol from a file, insert and return it */
 {
     /* Read the type and address size */
-    unsigned char Type = ReadVar (F);
+    unsigned Type = ReadVar (F);
     unsigned char AddrSize = Read8 (F);
 
     /* Create a new debug symbol */
@@ -158,6 +159,11 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
        	D->Expr = ReadExpr (F, O);
     } else {
     	D->Expr = LiteralExpr (Read32 (F), O);
+    }
+
+    /* Read the size */
+    if (SYM_HAS_SIZE (D->Type)) {
+        D->Size = ReadVar (F);
     }
 
     /* Last is the list of line infos for this symbol */
@@ -219,11 +225,15 @@ void PrintDbgSyms (ObjData* O, FILE* F)
 
 	    /* Emit the debug file line */
        	    fprintf (F,
-                     "sym\tname=\"%s\",value=0x%08lX,addrsize=%s,type=%s\n",
+                     "sym\tname=\"%s\",value=0x%lX,addrsize=%s,type=%s",
                      GetString (D->Name),
                      Val,
                      AddrSizeToStr (D->AddrSize),
                      SYM_IS_LABEL (D->Type)? "label" : "equate");
+            if (D->Size != 0) {                 
+                fprintf (F, ",size=%lu", D->Size);
+            }
+            fputc ('\n', F);
 
 	    /* Insert the symbol into the table */
 	    InsertDbgSym (D, Val);

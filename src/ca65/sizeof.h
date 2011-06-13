@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2008, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -35,7 +35,7 @@
 
 #ifndef SIZEOF_H
 #define SIZEOF_H
-                                          
+
 
 
 /* common */
@@ -55,20 +55,25 @@ struct SymTable;
 
 
 /*****************************************************************************/
-/*     	       	    		     Data	   			     */
-/*****************************************************************************/
-
-
-
-extern const StrBuf SizeEntryName;      /* Contains name of symbol with size */
-
-
-
-/*****************************************************************************/
 /*     	       	    		     Code	   			     */
 /*****************************************************************************/
 
 
+
+int IsSizeOfSymbol (const struct SymEntry* Sym);
+/* Return true if the given symbol is the one that encodes the size of some
+ * entity. Sym may also be a NULL pointer in which case false is returned.
+ */
+
+struct SymEntry* FindSizeOfScope (struct SymTable* Scope);
+/* Get the size of a scope. The function returns the symbol table entry that
+ * encodes the size or NULL if there is no such entry.
+ */
+
+struct SymEntry* FindSizeOfSymbol (struct SymEntry* Sym);
+/* Get the size of a symbol table entry. The function returns the symbol table
+ * entry that encodes the size of the symbol or NULL if there is no such entry.
+ */
 
 struct SymEntry* GetSizeOfScope (struct SymTable* Scope);
 /* Get the size of a scope. The function returns the symbol table entry that

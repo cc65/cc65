@@ -46,7 +46,7 @@
 
 /* Defines for magic and version */
 #define OBJ_MAGIC	0x616E7A55
-#define OBJ_VERSION	0x000D
+#define OBJ_VERSION	0x000E
 
 /* Size of an object file header */
 #define	OBJ_HDR_SIZE	(22*4)

@@ -51,11 +51,12 @@ extern "C" {
 
 
 
-/* Data types used for addresses and line numbers. Change to "unsigned long"
- * if you ever want to run the code on a 16-bit machine.
+/* Data types used for addresses, sizes and line numbers. Change to "unsigned 
+ * long" if you ever want to run the code on a 16-bit machine.
  */
 typedef unsigned cc65_line;             /* Used to store line numbers */
-typedef unsigned cc65_addr;             /* Use to store (65xx) addresses */
+typedef unsigned cc65_addr;             /* Used to store (65xx) addresses */
+typedef unsigned cc65_size;             /* Used to store (65xx) sizes */
 
 /* Pointer to an opaque data structure containing information from the debug
  * info file. Actually a handle to the data in the file.
@@ -162,6 +163,7 @@ typedef struct cc65_symboldata cc65_symboldata;
 struct cc65_symboldata {
     const char*         symbol_name;    /* Name of symbol */
     cc65_symbol_type    symbol_type;    /* Type of symbol */
+    cc65_size           symbol_size;    /* Size of symbol, 0 if unknown */
     long                symbol_value;   /* Value of symbol */
 };
 

@@ -65,7 +65,7 @@ void CreateDbgFile (void)
     }
 
     /* Output version information */
-    fprintf (F, "version\tmajor=1,minor=1\n");
+    fprintf (F, "version\tmajor=1,minor=2\n");
 
     /* Clear the debug sym table (used to detect duplicates) */
     ClearDbgSymTable ();

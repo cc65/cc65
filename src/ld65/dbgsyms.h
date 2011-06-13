@@ -63,6 +63,7 @@ struct DbgSym {
     ObjData*   		Obj;	    	/* Object file that exports the name */
     Collection          LineInfos;      /* Line infos of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
+    unsigned long       Size;           /* Symbol size if any */
     unsigned            Name;  	       	/* Name */
     unsigned char	Type;		/* Type of symbol */
     unsigned char       AddrSize;       /* Address size of symbol */

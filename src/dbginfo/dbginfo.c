@@ -57,7 +57,7 @@
 
 /* Version numbers of the debug format we understand */
 #define VER_MAJOR       1U
-#define VER_MINOR       1U
+#define VER_MINOR       2U
 
 /* Dynamic strings */
 typedef struct StrBuf StrBuf;
@@ -127,7 +127,8 @@ typedef enum {
     TOK_PLUS,                           /* + */
     TOK_EOL,                            /* \n */
 
-    TOK_ABSOLUTE,                       /* ABSOLUTE keyword */
+    TOK_FIRST_KEYWORD,
+    TOK_ABSOLUTE = TOK_FIRST_KEYWORD,   /* ABSOLUTE keyword */
     TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
     TOK_COUNT,                          /* COUNT keyword */
     TOK_EQUATE,                         /* EQUATE keyword */
@@ -153,6 +154,7 @@ typedef enum {
     TOK_VALUE,                          /* VALUE keyword */
     TOK_VERSION,                        /* VERSION keyword */
     TOK_ZEROPAGE,                       /* ZEROPAGE keyword */
+    TOK_LAST_KEYWORD = TOK_ZEROPAGE,
 
     TOK_IDENT,                          /* To catch unknown keywords */
 } Token;
@@ -221,6 +223,7 @@ typedef struct SymInfo SymInfo;
 struct SymInfo {
     cc65_symbol_type    Type;           /* Type of symbol */
     long                Value;          /* Value of symbol */
+    cc65_size           Size;           /* Size of symbol */
     char                SymName[1];     /* Name of symbol */
 };
 
@@ -675,7 +678,7 @@ static void CollQuickSort (Collection* C, int Lo, int Hi,
    	    }
    	    if (I <= J) {
 		/* Swap I and J */
-		void* Tmp = Items[I];
+	    	void* Tmp = Items[I];
 		Items[I]  = Items[J];
 		Items[J]  = Tmp;
    	     	++I;
@@ -1035,15 +1038,17 @@ static int CompareFileInfoById (const void* L, const void* R)
 
 
 
-static SymInfo* NewSymInfo (const StrBuf* Name, long Val, cc65_symbol_type Type)
+static SymInfo* NewSymInfo (const StrBuf* Name, long Val,
+                            cc65_symbol_type Type, cc65_size Size)
 /* Create a new SymInfo struct, intialize and return it */
 {
     /* Allocate memory */
     SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
 
     /* Initialize it */
-    S->Value = Val;
     S->Type  = Type;
+    S->Value = Val;
+    S->Size  = Size;
     memcpy (S->SymName, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1382,6 +1387,7 @@ static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
 {
     D->symbol_name  = S->SymName;
     D->symbol_type  = S->Type;
+    D->symbol_size  = S->Size;
     D->symbol_value = S->Value;
 }
 
@@ -1535,6 +1541,7 @@ static void NextToken (InputData* D)
         { "range",      TOK_RANGE       },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
+        { "seg",        TOK_SEGMENT     },
         { "segment",    TOK_SEGMENT     },
         { "size",       TOK_SIZE        },
         { "start",      TOK_START       },
@@ -1665,8 +1672,16 @@ static void NextToken (InputData* D)
 
 
 
+static int TokenIsKeyword (Token Tok)
+/* Return true if the given token is a keyword */
+{
+    return (Tok >= TOK_FIRST_KEYWORD && Tok <= TOK_LAST_KEYWORD);
+}
+
+
+
 static int TokenFollows (InputData* D, Token Tok, const char* Name)
-/* Check for a comma */
+/* Check for a specific token that follows. */
 {
     if (D->Tok != Tok) {
         ParseError (D, CC65_ERROR, "%s expected", Name);
@@ -1765,15 +1780,16 @@ static void ParseFile (InputData* D)
 
         Token Tok;
 
-        /* Check for an unknown keyword */
-        if (D->Tok == TOK_IDENT) {
-            UnknownKeyword (D);
-            continue;
-        }
-
         /* Something we know? */
         if (D->Tok != TOK_ID   && D->Tok != TOK_MTIME &&
             D->Tok != TOK_NAME && D->Tok != TOK_SIZE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
             /* Done */
             break;
         }
@@ -1894,16 +1910,17 @@ static void ParseLine (InputData* D)
 
         Token Tok;
 
-        /* Check for an unknown keyword */
-        if (D->Tok == TOK_IDENT) {
-            UnknownKeyword (D);
-            continue;
-        }
-
         /* Something we know? */
         if (D->Tok != TOK_COUNT   && D->Tok != TOK_FILE  &&
             D->Tok != TOK_LINE    && D->Tok != TOK_RANGE &&
             D->Tok != TOK_SEGMENT && D->Tok != TOK_TYPE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
             /* Done */
             break;
         }
@@ -2049,17 +2066,17 @@ static void ParseSegment (InputData* D)
 
         Token Tok;
 
-        /* Check for an unknown keyword */
-        if (D->Tok == TOK_IDENT) {
-            UnknownKeyword (D);
-            continue;
-        }
-
         /* Something we know? */
         if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_ID         &&
             D->Tok != TOK_NAME          && D->Tok != TOK_OUTPUTNAME &&
             D->Tok != TOK_OUTPUTOFFS    && D->Tok != TOK_SIZE       &&
             D->Tok != TOK_START         && D->Tok != TOK_TYPE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
             /* Done */
             break;
         }
@@ -2196,6 +2213,7 @@ static void ParseSym (InputData* D)
 {
     cc65_symbol_type    Type;
     long                Value;
+    cc65_size           Size = 0;
     StrBuf              SymName = STRBUF_INITIALIZER;
     SymInfo*            S;
     enum {
@@ -2204,6 +2222,7 @@ static void ParseSym (InputData* D)
         ibValue         = 0x02,
         ibAddrSize      = 0x04,
         ibType          = 0x08,
+        ibSize          = 0x10,
         ibRequired      = ibSymName | ibValue | ibAddrSize | ibType,
     } InfoBits = ibNone;
 
@@ -2215,15 +2234,17 @@ static void ParseSym (InputData* D)
 
         Token Tok;
 
-        /* Check for an unknown keyword */
-        if (D->Tok == TOK_IDENT) {
-            UnknownKeyword (D);
-            continue;
-        }
-
         /* Something we know? */
         if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_NAME   &&
-            D->Tok != TOK_TYPE          && D->Tok != TOK_VALUE) {
+            D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE   &&
+            D->Tok != TOK_VALUE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
             /* Done */
             break;
         }
@@ -2250,6 +2271,15 @@ static void ParseSym (InputData* D)
                 SB_Copy (&SymName, &D->SVal);
                 SB_Terminate (&SymName);
                 InfoBits |= ibSymName;
+                NextToken (D);
+                break;
+
+            case TOK_SIZE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Size = (cc65_size) D->IVal;
+                InfoBits |= ibSize;
                 NextToken (D);
                 break;
 
@@ -2308,7 +2338,7 @@ static void ParseSym (InputData* D)
     }
 
     /* Create the symbol info and remember it */
-    S = NewSymInfo (&SymName, Value, Type);
+    S = NewSymInfo (&SymName, Value, Type, Size);
     CollAppend (&D->Info->SymInfoByName, S);
     CollAppend (&D->Info->SymInfoByVal, S);
 
@@ -2892,61 +2922,83 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
         ParseError (&D, CC65_ERROR,
                     "\"version\" keyword missing in first line - this is not "
                     "a valid debug info file");
-    } else {
-
-        /* Parse the version directive and check the version */
-        ParseVersion (&D);
-        if (D.MajorVersion > VER_MAJOR) {
-            ParseError (&D, CC65_WARNING,
-                        "The format of this debug info file is newer than what we "
-                        "know. Will proceed but probably fail. Version found = %u, "
-                        "version supported = %u",
-                        D.MajorVersion, VER_MAJOR);
-        }
-        ConsumeEOL (&D);
-
-        /* Parse lines */
-        while (D.Tok != TOK_EOF) {
-
-            switch (D.Tok) {
-
-                case TOK_FILE:
-                    ParseFile (&D);
-                    break;
-
-                case TOK_LINE:
-                    ParseLine (&D);
-                    break;
-
-                case TOK_SEGMENT:
-                    ParseSegment (&D);
-                    break;
-
-                case TOK_SYM:
-                    ParseSym (&D);
-                    break;
-
-                case TOK_IDENT:
-                    /* Output a warning, then skip the line with the unknown
-                     * keyword that may have been added by a later version.
-                     */
-                    ParseError (&D, CC65_WARNING,
-                                "Unknown keyword \"%s\" - skipping",
-                                SB_GetConstBuf (&D.SVal));
-
-                    SkipLine (&D);
-                    break;
-
-                default:
-                    UnexpectedToken (&D);
-
-            }
-
-            /* EOL or EOF must follow */
-            ConsumeEOL (&D);
-        }
+        goto CloseAndExit;
     }
 
+    /* Parse the version directive */
+    ParseVersion (&D);
+
+    /* Do several checks on the version number */
+    if (D.MajorVersion < VER_MAJOR) {
+        ParseError (
+            &D, CC65_ERROR,
+            "This is an old version of the debug info format that is no "
+            "longer supported. Version found = %u.%u, version supported "
+            "= %u.%u",
+             D.MajorVersion, D.MinorVersion, VER_MAJOR, VER_MINOR
+        );
+        goto CloseAndExit;
+    } else if (D.MajorVersion == VER_MAJOR && D.MinorVersion > VER_MINOR) {
+        ParseError (
+            &D, CC65_ERROR,
+            "This is a slightly newer version of the debug info format. "
+            "It might work, but you may get errors about unknown keywords "
+            "and similar. Version found = %u.%u, version supported = %u.%u",
+             D.MajorVersion, D.MinorVersion, VER_MAJOR, VER_MINOR
+        );
+    } else if (D.MajorVersion > VER_MAJOR) {
+        ParseError (
+            &D, CC65_WARNING,
+            "The format of this debug info file is newer than what we "
+            "know. Will proceed but probably fail. Version found = %u.%u, "
+            "version supported = %u.%u",
+             D.MajorVersion, D.MinorVersion, VER_MAJOR, VER_MINOR
+        );
+    }
+    ConsumeEOL (&D);
+
+    /* Parse lines */
+    while (D.Tok != TOK_EOF) {
+
+        switch (D.Tok) {
+
+            case TOK_FILE:
+                ParseFile (&D);
+                break;
+
+            case TOK_LINE:
+                ParseLine (&D);
+                break;
+
+            case TOK_SEGMENT:
+                ParseSegment (&D);
+                break;
+
+            case TOK_SYM:
+                ParseSym (&D);
+                break;
+
+            case TOK_IDENT:
+                /* Output a warning, then skip the line with the unknown
+                 * keyword that may have been added by a later version.
+                 */
+                ParseError (&D, CC65_WARNING,
+                            "Unknown keyword \"%s\" - skipping",
+                            SB_GetConstBuf (&D.SVal));
+
+                SkipLine (&D);
+                break;
+
+            default:
+                UnexpectedToken (&D);
+
+        }
+
+        /* EOL or EOF must follow */
+        ConsumeEOL (&D);
+    }
+
+CloseAndExit:
     /* Close the file */
     fclose (D.F);
 
@@ -3135,9 +3187,9 @@ cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
     /* Get a pointer to the file list */
     FileInfoByName = &Info->FileInfoByName;
 
-    /* Allocate memory for the data structure returned to the caller. 
+    /* Allocate memory for the data structure returned to the caller.
      * Note: To simplify things, we will allocate the maximum amount of
-     * memory, we may need later. This saves us the overhead of walking 
+     * memory, we may need later. This saves us the overhead of walking
      * the list twice.
      */
     D = new_cc65_sourceinfo (CollCount (FileInfoByName));

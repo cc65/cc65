@@ -206,19 +206,25 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
        	case SYM_EXPR:  strcat (TypeDesc, ",SYM_EXPR");   break;
     }
 
+    /* Size available? */
+    if (SYM_HAS_SIZE (Flags)) {
+        strcat (TypeDesc, ",SYM_SIZE");
+    }
+
+
     /* Constructor/destructor declarations */
     T = TypeDesc + strlen (TypeDesc);
     Count = SYM_GET_CONDES_COUNT (Flags);
     if (Count > 0 && ConDes) {
-	T += sprintf (T, ",SYM_CONDES=");
-	for (I = 0; I < Count; ++I) {
-	    unsigned Type = CD_GET_TYPE (ConDes[I]);
-	    unsigned Prio = CD_GET_PRIO (ConDes[I]);
-	    if (I > 0) {
-		*T++ = ',';
-	    }
+     	T += sprintf (T, ",SYM_CONDES=");
+     	for (I = 0; I < Count; ++I) {
+     	    unsigned Type = CD_GET_TYPE (ConDes[I]);
+     	    unsigned Prio = CD_GET_PRIO (ConDes[I]);
+     	    if (I > 0) {
+     		*T++ = ',';
+     	    }
        	    T += sprintf (T, "[%u,%u]", Type, Prio);
-	}
+     	}
     }
 
     /* Return the result */
@@ -563,8 +569,8 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     for (I = 0; I < Count; ++I) {
 
 	unsigned long 	Value = 0;
-	int    		HaveValue;
-	unsigned char	ConDes [CD_TYPE_COUNT];
+        unsigned long   Size = 0;
+       	unsigned char  	ConDes[CD_TYPE_COUNT];
        	const char*    	Name;
 	unsigned	Len;
 
@@ -575,13 +581,14 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	ReadData (F, ConDes, SYM_GET_CONDES_COUNT (Type));
        	Name  = GetString (&StrPool, ReadVar (F));
 	Len   = strlen (Name);
-       	if (SYM_IS_EXPR (Type)) {
-	    SkipExpr (F);
-	    HaveValue = 0;
-	} else {
+       	if (SYM_IS_CONST (Type)) {
 	    Value = Read32 (F);
-	    HaveValue = 1;
+	} else {
+       	    SkipExpr (F);
 	}
+        if (SYM_HAS_SIZE (Type)) {
+            Size = ReadVar (F);
+        }
 
         /* Skip the line infos */
         SkipLineInfoList (F);
@@ -594,8 +601,11 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
 	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
-	if (HaveValue) {
-	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
+	if (SYM_IS_CONST (Type)) {
+    	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
+    	}
+       	if (SYM_HAS_SIZE (Type)) {
+	    printf ("      Size:%16s0x%04lX  (%lu)\n", "", Size, Size);
 	}
     }
 
@@ -641,21 +651,22 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
     /* Read and print all debug symbols */
     for (I = 0; I < Count; ++I) {
 
-	unsigned long 	Value = 0;
-	int 	      	HaveValue;
+    	unsigned long 	Value = 0;
+        unsigned long   Size = 0;
 
        	/* Read the data for one symbol */
        	unsigned Type          = ReadVar (F);
         unsigned char AddrSize = Read8 (F);
        	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
-	if (SYM_IS_EXPR (Type)) {
-	    SkipExpr (F);
-	    HaveValue = 0;
-	} else {
+	if (SYM_IS_CONST (Type)) {
 	    Value = Read32 (F);
-	    HaveValue = 1;
+	} else {
+	    SkipExpr (F);
 	}
+        if (SYM_HAS_SIZE (Type)) {
+            Size = ReadVar (F);
+        }
 
         /* Skip the line infos */
         SkipLineInfoList (F);
@@ -668,8 +679,11 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
 	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
-	if (HaveValue) {
+	if (SYM_IS_CONST (Type)) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
+	}
+       	if (SYM_HAS_SIZE (Type)) {
+	    printf ("      Size:%16s0x%04lX  (%lu)\n", "", Size, Size);
 	}
     }
 

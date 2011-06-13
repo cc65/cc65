@@ -112,6 +112,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     S->Left         = 0;
     S->Right        = 0;
     S->Childs       = 0;
+    S->OwnerSym     = 0;
     S->SegRanges    = AUTO_COLLECTION_INITIALIZER;
     S->Flags        = ST_NONE;
     S->AddrSize     = ADDR_SIZE_DEFAULT;
@@ -160,7 +161,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
                     } else {
                         T->Right = S;
                         break;
-                    }
+                    }  
                 } else {
                     /* Duplicate scope name */
                     Internal ("Duplicate scope name: `%m%p'", Name);
@@ -181,7 +182,8 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
 
 
 
-void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type, unsigned char AddrSize)
+void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
+                    unsigned char AddrSize, SymEntry* OwnerSym)
 /* Enter a new lexical level */
 {
     /* Map a default address size to something real */
@@ -207,10 +209,11 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type, unsigned char A
         CurrentScope = RootScope = NewSymTable (0, ScopeName);
     }
 
-    /* Mark the scope as defined and set type and address size */
+    /* Mark the scope as defined and set type, address size and owner symbol */
     CurrentScope->Flags    |= ST_DEFINED;
     CurrentScope->AddrSize = AddrSize;
     CurrentScope->Type     = Type;
+    CurrentScope->OwnerSym = OwnerSym;
 
     /* If this is a scope that allows to emit data into segments, add segment
      * ranges for all currently existing segments. Doing this for just a few
@@ -235,11 +238,16 @@ void SymLeaveLevel (void)
 
     /* If we have segment ranges, the first one is the segment that was
      * active, when the scope was opened. Set the size of the scope to the
-     * number of data bytes emitted into this segment.
+     * number of data bytes emitted into this segment. If we have an owner
+     * symbol set the size of this symbol, too.
      */
     if (CollCount (&CurrentScope->SegRanges) > 0) {
         const SegRange* R = CollAtUnchecked (&CurrentScope->SegRanges, 0);
-        DefSizeOfScope (CurrentScope, GetSegRangeSize (R));
+        unsigned long Size = GetSegRangeSize (R);
+        DefSizeOfScope (CurrentScope, Size);
+        if (CurrentScope->OwnerSym) {              
+            DefSizeOfSymbol (CurrentScope->OwnerSym, Size);
+        }
     }
 
     /* Leave the scope */
@@ -502,7 +510,7 @@ static void SymCheckUndefined (SymEntry* S)
 	/* The symbol is definitely undefined */
 	if (S->Flags & SF_EXPORT) {
 	    /* We will not auto-import an export */
-	    LIError (&S->LineInfos, 
+	    LIError (&S->LineInfos,
                      "Exported symbol `%m%p' was never defined",
                      GetSymName (S));
 	} else {
@@ -513,8 +521,8 @@ static void SymCheckUndefined (SymEntry* S)
                 S->AddrSize = CodeAddrSize;
 	    } else {
 	    	/* Error */
-	        LIError (&S->LineInfos, 
-                         "Symbol `%m%p' is undefined", 
+	        LIError (&S->LineInfos,
+                         "Symbol `%m%p' is undefined",
                          GetSymName (S));
 	    }
 	}
@@ -727,6 +735,15 @@ void WriteExports (void)
             long ConstVal;
             unsigned ExprMask = GetSymInfoFlags (S, &ConstVal);
 
+            /* Check if this symbol has a size. If so, remember it in the
+             * flags.
+             */
+            long Size;
+            SymEntry* SizeSym = FindSizeOfSymbol (S);
+            if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
+                ExprMask |= SYM_SIZE;
+            }
+
 	    /* Count the number of ConDes types */
 	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
 	     	if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
@@ -760,6 +777,11 @@ void WriteExports (void)
 	        WriteExpr (S->Expr);
             }
 
+            /* If the symbol has a size, write it to the file */
+            if (SYM_HAS_SIZE (ExprMask)) {
+                ObjWriteVar (Size);
+            }
+
 	    /* Write the line infos */
 	    WriteLineInfo (&S->LineInfos);
 	}
@@ -788,7 +810,8 @@ void WriteDbgSyms (void)
     	Count = 0;
     	S = SymList;
     	while (S) {
-    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
+    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL &&
+                !IsSizeOfSymbol (S)) {
                 S->DebugSymId = Count++;
     	    }
     	    S = S->List;
@@ -797,14 +820,26 @@ void WriteDbgSyms (void)
     	/* Write the symbol count to the list */
        	ObjWriteVar (Count);
 
-       	/* Walk through list and write all symbols to the file */
+       	/* Walk through list and write all symbols to the file. Ignore size
+         * symbols.
+         */
     	S = SymList;
     	while (S) {
-    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
+    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL &&
+                !IsSizeOfSymbol (S)) {
 
                 /* Get the expression bits and the value */
                 long ConstVal;
                 unsigned ExprMask = GetSymInfoFlags (S, &ConstVal);
+
+                /* Check if this symbol has a size. If so, remember it in the
+                 * flags.
+                 */
+                long Size;
+                SymEntry* SizeSym = FindSizeOfSymbol (S);
+                if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
+                    ExprMask |= SYM_SIZE;
+                }
 
 		/* Write the type */
 		ObjWriteVar (ExprMask);
@@ -823,6 +858,11 @@ void WriteDbgSyms (void)
 		    /* Expression involved */
 		    WriteExpr (S->Expr);
 		}
+
+                /* If the symbol has a size, write it to the file */
+                if (SYM_HAS_SIZE (ExprMask)) {
+                    ObjWriteVar (Size);
+                }
 
 		/* Write the line infos */
 		WriteLineInfo (&S->LineInfos);

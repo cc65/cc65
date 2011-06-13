@@ -479,7 +479,7 @@ static void OptListBytes (const char* Opt, const char* Arg)
 
 static void OptListing (const char* Opt, const char* Arg)
 /* Create a listing file */
-{              
+{
     /* Since the meaning of -l and --listing has changed, print an error if
      * the filename is empty or begins with the option char.
      */
@@ -868,7 +868,7 @@ int main (int argc, char* argv [])
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
-    SymEnterLevel (&GlobalNameSpace, ST_GLOBAL, ADDR_SIZE_DEFAULT);
+    SymEnterLevel (&GlobalNameSpace, ST_GLOBAL, ADDR_SIZE_DEFAULT, 0);
 
     /* Initialize the line infos. Must be done here, since we need line infos
      * for symbol definitions.

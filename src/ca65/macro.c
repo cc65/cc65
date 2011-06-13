@@ -658,7 +658,7 @@ static int MacExpand (void* Data)
 
        	/* Ok, use token from parameter list, but don't use its line info */
        	TokSet (Mac->ParamExp, LI_SLOT_INV);
-
+                                          
        	/* Set pointer to next token */
        	Mac->ParamExp = Mac->ParamExp->Next;
 
@@ -737,7 +737,7 @@ static int MacExpand (void* Data)
     if (Mac->Final) {
 
       	/* Set the final token and remove it */
-      	TokSet (Mac->Final, Mac->LISlot);
+      	TokSet (Mac->Final, LI_SLOT_INV);
       	FreeTokNode (Mac->Final);
       	Mac->Final = 0;
 

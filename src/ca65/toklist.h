@@ -95,9 +95,10 @@ TokNode* NewTokNode (void);
 void FreeTokNode (TokNode* N);
 /* Free the given token node */
 
-void TokSet (TokNode* N, unsigned LineInfoSlot);
-/* Set the scanner token from the given token node. The given line info slot
- * is used to store the position of the token fed into the scanner.
+void TokSet (TokNode* N, int LineInfoSlot);
+/* Set the scanner token from the given token node. If the given line info
+ * slot is not LI_SLOT_INV, it is used to store the position of the token fed
+ * into the scanner.
  */
 
 enum TC TokCmp (const TokNode* N);

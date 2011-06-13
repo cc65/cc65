@@ -135,7 +135,7 @@ struct MacExp {
     unsigned   	ParamCount;	/* Number of actual parameters */
     TokNode**  	Params;	  	/* List of actual parameters */
     TokNode*   	ParamExp;	/* Node for expanding parameters */
-    unsigned    LISlot;         /* Slot for additional line infos */
+    int         LISlot;         /* Slot for additional line infos */
 };
 
 /* Maximum number of nested macro expansions */
@@ -235,7 +235,7 @@ static void FreeIdDescList (IdDesc* ID)
 /* Free a complete list of IdDesc structures */
 {
     while (ID) {
-        IdDesc* This = ID;      
+        IdDesc* This = ID;
         ID = ID->Next;
         FreeIdDesc (This);
     }
@@ -656,8 +656,8 @@ static int MacExpand (void* Data)
      */
     if (Mac->ParamExp) {
 
-       	/* Ok, use token from parameter list */
-       	TokSet (Mac->ParamExp, Mac->LISlot);
+       	/* Ok, use token from parameter list, but don't use its line info */
+       	TokSet (Mac->ParamExp, LI_SLOT_INV);
 
        	/* Set pointer to next token */
        	Mac->ParamExp = Mac->ParamExp->Next;

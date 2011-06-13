@@ -56,6 +56,7 @@
  * standard line info. It is assumed to be always there.
  */
 enum {
+    LI_SLOT_INV         = -1,           /* Use to mark invalid slots */
     LI_SLOT_ASM         = 0,            /* Normal assembler source */
     LI_SLOT_EXT         = 1,            /* Externally supplied line info */
 };
@@ -82,18 +83,18 @@ struct LineInfo {
 void InitLineInfo (void);
 /* Initialize the line infos */
 
-unsigned AllocLineInfoSlot (unsigned Type, unsigned Count);
+int AllocLineInfoSlot (unsigned Type, unsigned Count);
 /* Allocate a line info slot of the given type and return the slot index */
 
-void FreeLineInfoSlot (unsigned Slot);
+void FreeLineInfoSlot (int Slot);
 /* Free the line info in the given slot. Note: Alloc/Free must be used in
  * FIFO order.
  */
 
-void GenLineInfo (unsigned Slot, const FilePos* Pos);
+void GenLineInfo (int Slot, const FilePos* Pos);
 /* Generate a new line info in the given slot */
 
-void ClearLineInfo (unsigned Slot);
+void ClearLineInfo (int Slot);
 /* Clear the line info in the given slot */
 
 void GetFullLineInfo (Collection* LineInfos, unsigned IncUsage);
@@ -150,3 +151,4 @@ void WriteLineInfos (void);
 
 
 
+                        

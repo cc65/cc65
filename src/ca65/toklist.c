@@ -82,17 +82,20 @@ void FreeTokNode (TokNode* N)
 
 
 
-void TokSet (TokNode* N, unsigned LineInfoSlot)
-/* Set the scanner token from the given token node. The given line info slot
- * is used to store the position of the token fed into the scanner.
+void TokSet (TokNode* N, int LineInfoSlot)
+/* Set the scanner token from the given token node. If the given line info
+ * slot is not LI_SLOT_INV, it is used to store the position of the token fed
+ * into the scanner.
  */
 {
     /* Set the values */
     CopyToken (&CurTok, &N->T);
     SB_Terminate (&CurTok.SVal);
 
-    /* Set the position */
-    GenLineInfo (LineInfoSlot, &CurTok.Pos);
+    /* Set the position if the slot is not invald */
+    if (LineInfoSlot != LI_SLOT_INV) {
+        GenLineInfo (LineInfoSlot, &CurTok.Pos);
+    }
 }
 
 

@@ -134,7 +134,7 @@ void InitLineInfo (void)
 
 
 
-unsigned AllocLineInfoSlot (unsigned Type, unsigned Count)
+int AllocLineInfoSlot (unsigned Type, unsigned Count)
 /* Allocate a line info slot of the given type and return the slot index */
 {
     /* Grow the array if necessary */
@@ -152,18 +152,18 @@ unsigned AllocLineInfoSlot (unsigned Type, unsigned Count)
     CurLineInfo[UsedSlots].Info = 0;
 
     /* Increment the count and return the index of the new slot */
-    return UsedSlots++;
+    return (int) UsedSlots++;
 }
 
 
 
-void FreeLineInfoSlot (unsigned Slot)
+void FreeLineInfoSlot (int Slot)
 /* Free the line info in the given slot. Note: Alloc/Free must be used in
  * FIFO order.
  */
 {
     /* Check the parameter */
-    PRECONDITION (Slot == UsedSlots - 1);
+    PRECONDITION (Slot == (int) UsedSlots - 1);
 
     /* Free the last entry */
     CurLineInfo[Slot].Info = 0;
@@ -172,7 +172,7 @@ void FreeLineInfoSlot (unsigned Slot)
 
 
 
-void GenLineInfo (unsigned Slot, const FilePos* Pos)
+void GenLineInfo (int Slot, const FilePos* Pos)
 /* Generate a new line info in the given slot */
 {
     /* Get a pointer to the slot */
@@ -190,7 +190,7 @@ void GenLineInfo (unsigned Slot, const FilePos* Pos)
 
 
 
-void ClearLineInfo (unsigned Slot)
+void ClearLineInfo (int Slot)
 /* Clear the line info in the given slot */
 {
     /* Zero the pointer */

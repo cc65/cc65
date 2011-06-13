@@ -92,22 +92,6 @@ extern char _filetype;          /* Defaults to 'u' */
 
 
 
-#ifdef __CC65__
-/* ASCII-to-PetSCII character-map translations:
- * These lines convert characters that are not in CBM's character-set
- * into codes with shapes that resemble the ASCII shapes.
- */
-#pragma charmap(0x5c,0xbf)	/* '\\' */
-#pragma charmap(0x5f,0xa4)	/* '_'  thinner than built-in one */
-#pragma charmap(0x60,0xad)	/* '`'  */
-#pragma charmap(0x7b,0xb3)	/* '{'  */
-#pragma charmap(0x7c,0xdd)	/* '|'  "official" PetSCII code */
-#pragma charmap(0x7d,0xab)	/* '}'  */
-#pragma charmap(0x7e,0xb1)	/* '~'  */
-#endif
-
-
-
 #define CH_HLINE	192
 #define CH_VLINE	221
 #define CH_ULCORNER	176

@@ -224,6 +224,7 @@ struct SymInfo {
     cc65_symbol_type    Type;           /* Type of symbol */
     long                Value;          /* Value of symbol */
     cc65_size           Size;           /* Size of symbol */
+    unsigned            Segment;        /* Id of segment if any */
     char                SymName[1];     /* Name of symbol */
 };
 
@@ -1038,17 +1039,19 @@ static int CompareFileInfoById (const void* L, const void* R)
 
 
 
-static SymInfo* NewSymInfo (const StrBuf* Name, long Val,
-                            cc65_symbol_type Type, cc65_size Size)
+static SymInfo* NewSymInfo (const StrBuf* Name, long Val, 
+                            cc65_symbol_type Type, cc65_size Size,
+                            unsigned Segment)
 /* Create a new SymInfo struct, intialize and return it */
 {
     /* Allocate memory */
     SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
 
     /* Initialize it */
-    S->Type  = Type;
-    S->Value = Val;
-    S->Size  = Size;
+    S->Type    = Type;
+    S->Value   = Val;
+    S->Size    = Size;
+    S->Segment = Segment;
     memcpy (S->SymName, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1357,9 +1360,7 @@ static void FreeDbgInfo (DbgInfo* Info)
 
 
 static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
-/* Copy data from a LineInfo struct to the cc65_linedata struct returned to
- * the caller.
- */
+/* Copy data from a LineInfo struct to a cc65_linedata struct */
 {
     D->source_name  = L->File.Info->FileName;
     D->source_size  = L->File.Info->Size;
@@ -1380,15 +1381,38 @@ static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
 
 
 
-static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
-/* Copy data from a SymInfo struct to the cc65_symboldata struct returned to
- * the caller.
- */
+static void CopyFileInfo (cc65_sourcedata* D, const FileInfo* F)
+/* Copy data from a FileInfo struct to a cc65_sourcedata struct */
 {
-    D->symbol_name  = S->SymName;
-    D->symbol_type  = S->Type;
-    D->symbol_size  = S->Size;
-    D->symbol_value = S->Value;
+    D->id           = F->Id;
+    D->source_name  = F->FileName;
+    D->source_size  = F->Size;
+    D->source_mtime = F->MTime;
+}
+
+
+
+static void CopySegInfo (cc65_segmentdata* D, const SegInfo* S)
+/* Copy data from a SegInfo struct to a cc65_segmentdata struct */
+{
+    D->id            = S->Id;
+    D->segment_name  = S->SegName;
+    D->segment_start = S->Start;
+    D->segment_size  = S->Size;
+    D->output_name   = S->OutputName;
+    D->output_offs   = S->OutputOffs;
+}
+
+
+
+static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
+/* Copy data from a SymInfo struct to a cc65_symboldata struct */
+{
+    D->symbol_name    = S->SymName;
+    D->symbol_type    = S->Type;
+    D->symbol_size    = S->Size;
+    D->symbol_value   = S->Value;
+    D->symbol_segment = S->Segment;
 }
 
 
@@ -1459,7 +1483,7 @@ static void UnknownKeyword (InputData* D)
     /* Output a warning */
     ParseError (D, CC65_WARNING, "Unknown keyword \"%s\" - skipping",
                 SB_GetConstBuf (&D->SVal));
-
+                            
     /* Skip the identifier */
     NextToken (D);
 
@@ -2211,6 +2235,7 @@ static void ParseSym (InputData* D)
     long                Value;
     cc65_size           Size = 0;
     StrBuf              SymName = STRBUF_INITIALIZER;
+    unsigned            Segment = CC65_INV_ID;
     SymInfo*            S;
     enum {
         ibNone          = 0x00,
@@ -2234,8 +2259,8 @@ static void ParseSym (InputData* D)
 
         /* Something we know? */
         if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_FILE   &&
-            D->Tok != TOK_NAME          && D->Tok != TOK_SEGMENT&& 
-            D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE   && 
+            D->Tok != TOK_NAME          && D->Tok != TOK_SEGMENT&&
+            D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE   &&
             D->Tok != TOK_VALUE) {
 
             /* Try smart error recovery */
@@ -2286,7 +2311,7 @@ static void ParseSym (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                /* ### Drop value for now */
+                Segment = (unsigned) D->IVal;
                 InfoBits |= ibSegment;
                 NextToken (D);
                 break;
@@ -2355,7 +2380,7 @@ static void ParseSym (InputData* D)
     }
 
     /* Create the symbol info and remember it */
-    S = NewSymInfo (&SymName, Value, Type, Size);
+    S = NewSymInfo (&SymName, Value, Type, Size, Segment);
     CollAppend (&D->Info->SymInfoByName, S);
     CollAppend (&D->Info->SymInfoByVal, S);
 
@@ -2454,11 +2479,11 @@ ErrorExit:
 
 
 
-static SegInfo* FindSegInfoById (InputData* D, unsigned Id)
+static SegInfo* FindSegInfoById (DbgInfo* D, unsigned Id)
 /* Find the SegInfo with a given Id */
 {
     /* Get a pointer to the segment info collection */
-    Collection* SegInfos = &D->Info->SegInfoById;
+    Collection* SegInfos = &D->SegInfoById;
 
     /* Do a binary search */
     int Lo = 0;
@@ -2532,9 +2557,12 @@ static int FindFileInfoByName (Collection* FileInfos, const char* FileName,
 
 
 
-static FileInfo* FindFileInfoById (Collection* FileInfos, unsigned Id)
+static FileInfo* FindFileInfoById (DbgInfo* D, unsigned Id)
 /* Find the FileInfo with a given Id */
 {
+    /* Get a pointer to the collection */
+    Collection* FileInfos = &D->FileInfoById;
+
     /* Do a binary search */
     int Lo = 0;
     int Hi = (int) CollCount (FileInfos) - 1;
@@ -2637,7 +2665,7 @@ static void ProcessLineInfo (InputData* D)
         if (LastFileInfo && LastFileInfo->Id == L->File.Id) {
             F = LastFileInfo;
         } else {
-            F = FindFileInfoById (&D->Info->FileInfoById, L->File.Id);
+            F = FindFileInfoById (D->Info, L->File.Id);
 
             /* If we have no corresponding file info, print a warning and
              * remove the line info.
@@ -2665,7 +2693,7 @@ static void ProcessLineInfo (InputData* D)
         if (LastSegInfo && LastSegInfo->Id == L->Seg.Id) {
             S = LastSegInfo;
         } else {
-            S = FindSegInfoById (D, L->Seg.Id);
+            S = FindSegInfoById (D->Info, L->Seg.Id);
 
             /* If we have no corresponding segment info, print a warning and
              * remove the line info.
@@ -2884,7 +2912,7 @@ static int FindSymInfoByValue (Collection* SymInfos, long Value, unsigned* Index
 
 
 /*****************************************************************************/
-/*     	      	       	      	     Code				     */
+/*                             Debug info files                              */
 /*****************************************************************************/
 
 
@@ -3065,6 +3093,12 @@ void cc65_free_dbginfo (cc65_dbginfo Handle)
 
 
 
+/*****************************************************************************/
+/*                                 Line info                                 */
+/*****************************************************************************/
+
+
+
 cc65_lineinfo* cc65_lineinfo_byaddr (cc65_dbginfo Handle, unsigned long Addr)
 /* Return line information for the given address. The function returns 0
  * if no line information was found.
@@ -3187,6 +3221,12 @@ void cc65_free_lineinfo (cc65_dbginfo Handle, cc65_lineinfo* Info)
 
 
 
+/*****************************************************************************/
+/*                               Source files                                */
+/*****************************************************************************/
+
+
+
 cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
 /* Return a list of all source files */
 {
@@ -3226,9 +3266,7 @@ cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
         }
 
         /* Copy the data */
-        D->data[D->count].source_name  = F->FileName;
-        D->data[D->count].source_size  = F->Size;
-        D->data[D->count].source_mtime = F->MTime;
+        CopyFileInfo (D->data + D->count, F);
 
         /* One more valid entry */
         ++D->count;
@@ -3237,6 +3275,44 @@ cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
     /* Return the result */
     return D;
 }
+
+
+
+cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return information about a source file with a specific id. The function
+ * returns NULL if the id is invalid (no such source file) and otherwise a
+ * cc65_sourceinfo structure with one entry that contains the requested
+ * source file information.
+ */
+{
+    DbgInfo*            Info;
+    const FileInfo*     F;
+    cc65_sourceinfo*    D;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Search for the Id */
+    F = FindFileInfoById (Info, Id);
+
+    /* If not found return NULL */
+    if (F == 0) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_sourceinfo (1);
+
+    /* Fill in the data */
+    CopyFileInfo (D->data, F);
+
+    /* Return the result */
+    return D;
+}
+
 
 
 
@@ -3249,6 +3325,12 @@ void cc65_free_sourceinfo (cc65_dbginfo Handle, cc65_sourceinfo* Info)
     /* Free the memory */
     xfree (Info);
 }
+
+
+
+/*****************************************************************************/
+/*                                 Segments                                  */
+/*****************************************************************************/
 
 
 
@@ -3275,17 +3357,45 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     /* Fill in the data */
     D->count = CollCount (SegInfoByName);
     for (I = 0; I < CollCount (SegInfoByName); ++I) {
-
-        /* Get this item */
-        const SegInfo* S = CollAt (SegInfoByName, I);
-
         /* Copy the data */
-        D->data[I].segment_name  = S->SegName;
-        D->data[I].segment_start = S->Start;
-        D->data[I].segment_size  = S->Size;
-        D->data[I].output_name   = S->OutputName;
-        D->data[I].output_offs   = S->OutputOffs;
+        CopySegInfo (D->data + I, CollAt (SegInfoByName, I));
     }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return information about a segment with a specific id. The function returns
+ * NULL if the id is invalid (no such segment) and otherwise a segmentinfo
+ * structure with one entry that contains the requested segment information.
+ */
+{
+    DbgInfo*            Info;
+    const SegInfo*      S;
+    cc65_segmentinfo*   D;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Search for the Id */
+    S = FindSegInfoById (Info, Id);
+
+    /* If not found return NULL */
+    if (S == 0) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_segmentinfo (1);
+
+    /* Fill in the data */
+    CopySegInfo (D->data, S);
 
     /* Return the result */
     return D;
@@ -3302,6 +3412,12 @@ void cc65_free_segmentinfo (cc65_dbginfo Handle, cc65_segmentinfo* Info)
     /* Free the memory */
     xfree (Info);
 }
+
+
+
+/*****************************************************************************/
+/*                                  Symbols                                  */
+/*****************************************************************************/
 
 
 

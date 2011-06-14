@@ -46,12 +46,12 @@ extern "C" {
 
 
 /*****************************************************************************/
-/*     	      	       		     Data    				     */
+/*     	      	       		     Data    			  	     */
 /*****************************************************************************/
 
 
 
-/* Data types used for addresses, sizes and line numbers. Change to "unsigned 
+/* Data types used for addresses, sizes and line numbers. Change to "unsigned
  * long" if you ever want to run the code on a 16-bit machine.
  */
 typedef unsigned cc65_line;             /* Used to store line numbers */
@@ -62,6 +62,9 @@ typedef unsigned cc65_size;             /* Used to store (65xx) sizes */
  * info file. Actually a handle to the data in the file.
  */
 typedef void* cc65_dbginfo;
+
+/* A value that is used to mark invalid ids */
+#define CC65_INV_ID     (~0U)
 
 /* Severity for cc65_parseerror */
 typedef enum {
@@ -120,6 +123,7 @@ struct cc65_lineinfo {
 /* Source file information */
 typedef struct cc65_sourcedata cc65_sourcedata;
 struct cc65_sourcedata {
+    unsigned            id;             /* The internal file id */
     const char*         source_name;    /* Name of the file */
     unsigned long       source_size;    /* Size of file */
     unsigned long       source_mtime;   /* Modification time */
@@ -140,6 +144,7 @@ struct cc65_sourceinfo {
  */
 typedef struct cc65_segmentdata cc65_segmentdata;
 struct cc65_segmentdata {
+    unsigned            id;             /* The internal segment id */
     const char*         segment_name;   /* Name of the segment */
     cc65_addr           segment_start;  /* Start address of segment */
     cc65_addr           segment_size;   /* Size of segment */
@@ -165,6 +170,10 @@ struct cc65_symboldata {
     cc65_symbol_type    symbol_type;    /* Type of symbol */
     cc65_size           symbol_size;    /* Size of symbol, 0 if unknown */
     long                symbol_value;   /* Value of symbol */
+    unsigned            symbol_segment; /* If the symbol is segment relative,
+                                         * this contains the id of segment,
+                                         * otherwise CC65_INV_ID 
+                                         */
 };
 
 typedef struct cc65_symbolinfo cc65_symbolinfo;
@@ -176,7 +185,7 @@ struct cc65_symbolinfo {
 
 
 /*****************************************************************************/
-/*     	      	       		     Code  				     */
+/*                             Debug info files                              */
 /*****************************************************************************/
 
 
@@ -192,6 +201,14 @@ cc65_dbginfo cc65_read_dbginfo (const char* filename, cc65_errorfunc errorfunc);
 void cc65_free_dbginfo (cc65_dbginfo Handle);
 /* Free debug information read from a file */
 
+
+
+/*****************************************************************************/
+/*                                 Line info                                 */
+/*****************************************************************************/
+
+
+
 cc65_lineinfo* cc65_lineinfo_byaddr (cc65_dbginfo handle, unsigned long addr);
 /* Return line information for the given address. The function returns NULL
  * if no line information was found.
@@ -206,17 +223,54 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo handle, const char* filename,
 void cc65_free_lineinfo (cc65_dbginfo handle, cc65_lineinfo* info);
 /* Free line info returned by one of the other functions */
 
+
+
+/*****************************************************************************/
+/*                               Source files                                */
+/*****************************************************************************/
+
+
+
 cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo handle);
 /* Return a list of all source files */
+
+cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo handle, unsigned id);
+/* Return information about a source file with a specific id. The function
+ * returns NULL if the id is invalid (no such source file) and otherwise a
+ * cc65_sourceinfo structure with one entry that contains the requested
+ * source file information.
+ */
 
 void cc65_free_sourceinfo (cc65_dbginfo handle, cc65_sourceinfo* info);
 /* Free a source info record */
 
+
+
+/*****************************************************************************/
+/*                                 Segments                                  */
+/*****************************************************************************/
+
+
+
 cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo handle);
 /* Return a list of all segments referenced in the debug information */
 
+cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo handle, unsigned id);
+/* Return information about a segment with a specific id. The function returns
+ * NULL if the id is invalid (no such segment) and otherwise a cc65_segmentinfo
+ * structure with one entry that contains the requested segment information.
+ */
+
 void cc65_free_segmentinfo (cc65_dbginfo handle, cc65_segmentinfo* info);
 /* Free a segment info record */
+
+
+
+/*****************************************************************************/
+/*                                  Symbols                                  */
+/*****************************************************************************/
+
+
 
 cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo handle, const char* name);
 /* Return a list of symbols with a given name. The function returns NULL if

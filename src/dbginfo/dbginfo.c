@@ -2220,6 +2220,7 @@ static void ParseSym (InputData* D)
         ibType          = 0x08,
         ibSize          = 0x10,
         ibSegment       = 0x20,
+        ibFile          = 0x40,
         ibRequired      = ibSymName | ibValue | ibAddrSize | ibType,
     } InfoBits = ibNone;
 
@@ -2232,9 +2233,10 @@ static void ParseSym (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_NAME   &&
-            D->Tok != TOK_SEGMENT       && D->Tok != TOK_SIZE   &&
-            D->Tok != TOK_TYPE          && D->Tok != TOK_VALUE) {
+        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_FILE   &&
+            D->Tok != TOK_NAME          && D->Tok != TOK_SEGMENT&& 
+            D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE   && 
+            D->Tok != TOK_VALUE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2259,6 +2261,15 @@ static void ParseSym (InputData* D)
             case TOK_ADDRSIZE:
                 NextToken (D);
                 InfoBits |= ibAddrSize;
+                break;
+
+            case TOK_FILE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                /* ### Drop value for now */
+                InfoBits |= ibFile;
+                NextToken (D);
                 break;
 
             case TOK_NAME:

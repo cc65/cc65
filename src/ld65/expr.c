@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -394,6 +394,100 @@ long GetExprVal (ExprNode* Expr)
       	    /* NOTREACHED */
     	    return 0;
     }
+}
+
+
+
+static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
+/* Check if the given expression consists of a segment reference and only
+ * constant values, additions and subtractions. If anything else is found,
+ * set D->TooComplex to true.
+ * Internal, recursive routine.
+ */
+{
+    Export* E;
+
+    switch (Expr->Op) {
+
+	case EXPR_LITERAL:
+            D->Val += (Sign * Expr->V.IVal);
+	    break;
+
+	case EXPR_SYMBOL:
+     	    /* Get the referenced export */
+       	    E = GetExprExport (Expr);
+     	    /* If this export has a mark set, we've already encountered it.
+     	     * This means that the export is used to define it's own value,
+     	     * which in turn means, that we have a circular reference.
+     	     */
+     	    if (ExportHasMark (E)) {
+     	    	CircularRefError (E);
+       	    } else {
+     	    	MarkExport (E);
+       	       	GetSegExprValInternal (E->Expr, D, Sign);
+     	    	UnmarkExport (E);
+     	    }
+     	    break;
+
+    	case EXPR_SECTION:
+    	    if (D->Seg) {
+    	        /* We cannot handle more than one segment reference in o65 */
+    	    	D->TooComplex = 1;
+    	    } else {
+                /* Get the section from the expression */
+                Section* S = GetExprSection (Expr);
+    	    	/* Remember the segment reference */
+    	    	D->Seg = S->Seg;
+                /* Add the offset of the section to the constant value */
+                D->Val += Sign * (S->Offs + D->Seg->PC);
+    	    }
+    	    break;
+
+        case EXPR_SEGMENT:
+    	    if (D->Seg) {
+    	        /* We cannot handle more than one segment reference in o65 */
+    		D->TooComplex = 1;
+    	    } else {
+       	 	/* Remember the segment reference */
+       	       	D->Seg = Expr->V.Seg;
+                /* Add the offset of the segment to the constant value */
+                D->Val += (Sign * D->Seg->PC);
+     	    }
+     	    break;
+
+     	case EXPR_PLUS:
+     	    GetSegExprValInternal (Expr->Left, D, Sign);
+      	    GetSegExprValInternal (Expr->Right, D, Sign);
+       	    break;
+
+    	case EXPR_MINUS:
+    	    GetSegExprValInternal (Expr->Left, D, Sign);
+    	    GetSegExprValInternal (Expr->Right, D, -Sign);
+    	    break;
+
+     	default:
+    	    /* Expression contains illegal operators */
+    	    D->TooComplex = 1;
+    	    break;
+
+    }
+}
+
+
+
+void GetSegExprVal (ExprNode* Expr, SegExprDesc* D)
+/* Check if the given expression consists of a segment reference and only
+ * constant values, additions and subtractions. If anything else is found,
+ * set D->TooComplex to true. The function will initialize D.
+ */
+{
+    /* Initialize the given structure */
+    D->Val        = 0;
+    D->TooComplex = 0;
+    D->Seg        = 0;
+
+    /* Call our recursive calculation routine */
+    GetSegExprValInternal (Expr, D, 1);
 }
 
 

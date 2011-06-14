@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -49,6 +49,22 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Structure for parsing segment based expression trees */
+typedef struct SegExprDesc SegExprDesc;
+struct SegExprDesc {
+    long       	    Val;		/* The offset value */
+    int	       	    TooComplex;	       	/* Expression too complex */
+    Segment*        Seg;                /* Segment reference if any */
+};
+
+
+
+/*****************************************************************************/
 /*     	      	     		     Code		     		     */
 /*****************************************************************************/
 
@@ -76,6 +92,12 @@ Section* GetExprSection (ExprNode* Expr);
 
 long GetExprVal (ExprNode* Expr);
 /* Get the value of a constant expression */
+
+void GetSegExprVal (ExprNode* Expr, SegExprDesc* D);
+/* Check if the given expression consists of a segment reference and only
+ * constant values, additions and subtractions. If anything else is found,
+ * set D->TooComplex to true. The function will initialize D.
+ */
 
 ExprNode* LiteralExpr (long Val, ObjData* O);
 /* Return an expression tree that encodes the given literal value */

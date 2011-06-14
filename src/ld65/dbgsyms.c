@@ -130,9 +130,9 @@ static void InsertDbgSym (DbgSym* D, long Val)
 {
     /* Create the hash. We hash over the symbol value */
     unsigned Hash = ((Val >> 24) & 0xFF) ^
-		    ((Val >> 16) & 0xFF) ^
-		    ((Val >>  8) & 0xFF) ^
-		    ((Val >>  0) & 0xFF);
+	    	    ((Val >> 16) & 0xFF) ^
+	    	    ((Val >>  8) & 0xFF) ^
+	    	    ((Val >>  0) & 0xFF);
 
     /* Insert the symbol */
     D->Next = DbgSymPool [Hash];
@@ -212,31 +212,45 @@ void PrintDbgSyms (ObjData* O, FILE* F)
 	long Val;
 
 	/* Get the next debug symbol */
- 	DbgSym* D = CollAt (&O->DbgSyms, I);
+ 	DbgSym* S = CollAt (&O->DbgSyms, I);
 
 	/* Get the symbol value */
-	Val = GetDbgSymVal (D);
+	Val = GetDbgSymVal (S);
 
 	/* Lookup this symbol in the table. If it is found in the table, it was
 	 * already written to the file, so don't emit it twice. If it is not in
 	 * the table, insert and output it.
 	 */
-       	if (GetDbgSym (D, Val) == 0) {
+       	if (GetDbgSym (S, Val) == 0) {
 
-	    /* Emit the debug file line */
+            SegExprDesc D;
+
+	    /* Emit the base data for the entry */
        	    fprintf (F,
                      "sym\tname=\"%s\",value=0x%lX,addrsize=%s,type=%s",
-                     GetString (D->Name),
+                     GetString (S->Name),
                      Val,
-                     AddrSizeToStr (D->AddrSize),
-                     SYM_IS_LABEL (D->Type)? "label" : "equate");
-            if (D->Size != 0) {                 
-                fprintf (F, ",size=%lu", D->Size);
+                     AddrSizeToStr (S->AddrSize),
+                     SYM_IS_LABEL (S->Type)? "label" : "equate");
+
+            /* Emit the size only if we know it */
+            if (S->Size != 0) {
+                fprintf (F, ",size=%lu", S->Size);
             }
+
+            /* Check for a segmented expression and add the segment id to the
+             * debug info if we have one.
+             */
+            GetSegExprVal (S->Expr, &D);
+            if (!D.TooComplex && D.Seg != 0) {
+                fprintf (F, ",segment=%u", D.Seg->Id);
+            }
+
+            /* Terminate the output line */
             fputc ('\n', F);
 
 	    /* Insert the symbol into the table */
-	    InsertDbgSym (D, Val);
+	    InsertDbgSym (S, Val);
        	}
     }
 }

@@ -58,10 +58,13 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 
     /* Output the files section */
     for (I = 0; I < CollCount (&O->Files); ++I) {
-	const FileInfo* FI = CollConstAt (&O->Files, I);
-	fprintf (F,
-                 "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX\n",
-                 FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
+	FileInfo* FI = CollAt (&O->Files, I);
+        if (!FI->Dumped) {
+            fprintf (F,
+                     "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX\n",
+                     FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
+            FI->Dumped = 1;
+        }
     }
 
     /* Output the line infos */

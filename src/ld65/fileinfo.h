@@ -61,6 +61,7 @@ struct FileInfo {
     unsigned long   MTime;              /* Time of last modification */
     unsigned long   Size;               /* Size of the file */
     unsigned        Id;                 /* Id of file for debug info */
+    unsigned        Dumped;             /* Flag: Dumped to debug info file */
 };
 
 

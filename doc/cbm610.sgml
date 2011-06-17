@@ -257,7 +257,7 @@ The program return code (low byte) is passed back to BASIC by use of the
 
 <sect1>Interrupt handlers<p>
 
-The runtime for the Commodore 610 uses routines marked as <tt/.CONDES/ type 2
+The runtime for the Commodore 610 uses routines marked as <tt/.INTERRUPTOR/
 for interrupt handlers. Such routines must be written as simple machine
 language subroutines and will be called automatically by the interrupt handler
 code when they are linked into a program. See the discussion of the
@@ -296,6 +296,3 @@ freely, subject to the following restrictions:
 </enum>
 
 </article>
-
-
-

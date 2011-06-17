@@ -292,7 +292,7 @@ Command line arguments can be passed to <tt/main()/ when DOS supports it.
 
 <sect1>Interrupts<p>
 
-The runtime for the Atari uses routines marked as <tt/.CONDES/ type 2 for
+The runtime for the Atari uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the VBI handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/

@@ -30,7 +30,7 @@ more than one platform. Please see the function reference for more
 information.
 
 
-<sect>Building you first Hello World application<p>
+<sect>Building your first Hello World application<p>
 
 Here is a small traditional Hello World program for the Atari Lynx.
 
@@ -64,15 +64,23 @@ The 6502.h is needed for executing the CLI() command.
 As the Atari Lynx does not have ASCII characters available you need to use
 the Tiny Graphics Interface library for producing letters on the screen.
 
-The cc65 compiler suite has a graphics library called "Tiny Graphics Interface". This interface has some relocatable code. In order to use this in your own program you need to load it at run time.
+The cc65 compiler suite has a graphics library called "Tiny Graphics
+Interface". This interface has some relocatable code. In order to use this
+in your own program you need to load it at run time.
 
-Unfortunately the Lynx does not have a disk drive from where to load it. Therefore you must already load it at compile time. The easiest way is to link it in statically.
+Unfortunately the Lynx does not have a disk drive from where to load it.
+Therefore you must already load it at compile time. The easiest way is to
+link it in statically.
 
-This relocatable driver is found in $(CC65_HOME)/tgi/lynx-160-102-16.tgi. Copy it from here.
+This relocatable driver is found in <tt>$(CC65_HOME)/tgi/lynx-160-102-16.tgi</tt>.
+Copy it from here.
 
 The name comes from 160 by 102 pixels (The Lynx LCD size), 16 colors.
 
-In order to link in this statically we have to make it back to a source file so that we can compile it. The next command will turn the compiled driver object file into an assembler source and compile it with the ca65 assembler. 
+In order to link in this statically we have to make it back to a source
+file so that we can compile it. The next command will turn the compiled
+driver object file into an assembler source and compile it with the ca65
+assembler.
 
 <tscreen><verb>
 co65 --code-label _lynxtgi lynx-160-102-16.tgi
@@ -361,6 +369,3 @@ freely, subject to the following restrictions:
 </enum>
 
 </article>
-
-
-

@@ -224,6 +224,15 @@ The program return code (low byte) is passed back to BASIC by use of the
 <tt/ST/ variable.
 
 
+<sect1>Interrupts<p>
+
+The runtime for the C16 uses routines marked as <tt/.INTERRUPTOR/ for
+interrupt handlers. Such routines must be written as simple machine language
+subroutines and will be called automatically by the interrupt handler code
+when they are linked into a program. See the discussion of the <tt/.CONDES/
+feature in the <htmlurl url="ca65.html" name="assembler manual">.
+
+
 
 <sect>Bugs/Feedback<p>
 

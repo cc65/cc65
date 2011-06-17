@@ -345,9 +345,6 @@ unsigned GetSymInfoFlags (const SymEntry* Sym, long* ConstVal);
  * See common/symdefs.h for more information.
  */
 
-const FilePos* GetSymPos (const SymEntry* S);
-/* Return the position of first occurence in the source for the given symbol */
-
 
 
 /* End of symentry.h */

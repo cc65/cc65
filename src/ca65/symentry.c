@@ -699,12 +699,3 @@ unsigned GetSymInfoFlags (const SymEntry* S, long* ConstVal)
 
 
 
-const FilePos* GetSymPos (const SymEntry* S)
-/* Return the position of first occurence in the source for the given symbol */
-{
-    /* The actual source entry is in slot zero */
-    return &((const LineInfo*) CollConstAt (&S->LineInfos, 0))->Pos;
-}
-
-
-

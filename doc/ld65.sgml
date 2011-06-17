@@ -278,7 +278,7 @@ Here is a description of all the command line options:
   written to this file. Using the <tt/-g/ option for the compiler and assembler
   will increase the amount of information available. Please note that debug
   information generation is currently being developed, so the format of the
-  file and it's contents are subject to change without further notice.
+  file and its contents are subject to change without further notice.
 
 
   <tag><tt>--lib file</tt></tag>
@@ -399,7 +399,7 @@ for the segments and define any linker symbols (see <ref id="config-files"
 name="Configuration files">).
 
 After that, the linker is ready to produce an output file. Before doing that,
-it checks it's data for consistency. That is, it checks for unresolved
+it checks its data for consistency. That is, it checks for unresolved
 externals (if the output format is not relocatable) and for symbol type
 mismatches (for example a zero page symbol is imported by a module as absolute
 symbol).
@@ -659,7 +659,7 @@ Let's have a closer look at this <tt/SEGMENTS/ section. We specify that the
 goes into <tt/ROM2/. Read/write data will be loaded into <tt/ROM2/ but is run
 in <tt/RAM2/. That means that all references to labels in the <tt/DATA/
 segment are relocated to be in <tt/RAM2/, but the segment is written to
-<tt/ROM2/. All your startup code has to do is, to copy the data from it's
+<tt/ROM2/. All your startup code has to do is, to copy the data from its
 location in <tt/ROM2/ to the final location in <tt/RAM2/.
 
 So, how do you know, where the data is located? This is the second point,

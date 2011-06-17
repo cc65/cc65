@@ -554,7 +554,7 @@ expression:
 <item> 	If the expression contains symbols that are not defined, and these
        	symbols are local symbols, the enclosing scopes are searched for a
        	symbol with the same name. If one exists and this symbol is defined,
-       	it's attributes are used to determine the result size.
+       	its attributes are used to determine the result size.
 <item> 	In all other cases the expression is assumed to be word sized.
 </itemize>
 
@@ -3564,7 +3564,7 @@ Here's a list of all control commands and a description, what they do:
   Delete a define style macro definition. The command is followed by an
   identifier which specifies the name of the macro to delete. Macro
   replacement is switched of when reading the token following the command
-  (otherwise the macro name would be replaced by it's replacement list).
+  (otherwise the macro name would be replaced by its replacement list).
 
   See also the <tt><ref id=".DEFINE" name=".DEFINE"></tt> command and
   section <ref id="macros" name="Macros">.
@@ -3645,7 +3645,7 @@ were specified when the macro was defined.
 
 <sect1>Macros without parameters<p>
 
-In it's simplest form, a macro does not have parameters. Here's an
+In its simplest form, a macro does not have parameters. Here's an
 example:
 
 <tscreen><verb>

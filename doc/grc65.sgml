@@ -249,7 +249,7 @@ file; then, the actual application code in &dquot;<tt/test.o/&dquot;, and the
 last is the GEOS system library.
 
 The resulting file &dquot;<tt/test.cvt/&dquot; is an executable that's
-contained in the well-known GEOS <em/Convert/ format.  Note that it's name
+contained in the well-known GEOS <em/Convert/ format.  Note that its name
 (<tt/test/) isn't important; the real name, after deconverting, is the DOS name
 that was given in the header definition.
 

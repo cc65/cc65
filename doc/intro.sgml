@@ -237,7 +237,7 @@ available for execution. Here, we list sample emulators and instructions for
 running the program. Unless noted, similar instructions would also apply to a
 real machine. One word of advice: we suggest you clear the screen at the
 start, and wait for a keypress at the end of your program, as each target
-varies in it's start and exit conditions.
+varies in its start and exit conditions.
 
 
 <sect1>Apple
@@ -489,7 +489,7 @@ the emulator.
 </quote>
 
 Find the <bf/CONVERT/ program on the boot disk &lsqb;tap the 6-key; then, you
-should see it's icon in the fourth position on the <bf/deskTop/'s directory
+should see its icon in the fourth position on the <bf/deskTop/'s directory
 notePad&rsqb;.  Move GEOS's pointer over to <bf/CONVERT/'s icon; double-click
 it to run that program.  Click on the <bf/Disk/ icon; put the disk with
 "<tt/hello1/" into the drive; and, click the <bf/OK/ icon.  Use the little

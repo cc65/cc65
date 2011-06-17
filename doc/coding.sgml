@@ -101,7 +101,7 @@ constant. The compiler emits code to add a constant to the secondary register.
 Same thing again for the constant 3. So the code produced contains a fetch
 of 'i', two additions of constants, and a store (into 'i'). Unfortunately, the
 compiler does not see, that "OFFS + 3" is a constant for itself, since it does
-it's evaluation from left to right. There are some ways to help the compiler
+its evaluation from left to right. There are some ways to help the compiler
 to recognize expression like this:
 
 <enum>

@@ -309,6 +309,7 @@ neslib:
 	    $(AR) a nes.lib $$i/*.o || exit 1; \
 	done
 	cp nes/*.joy .
+	cp nes/*.tgi .
 	if [ -d nes/extra ]; then \
 	    for i in nes/extra/*.o; do \
 	       	cp $$i nes-`basename $$i` || exit 1; \

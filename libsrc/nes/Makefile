@@ -41,18 +41,6 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 %.tgi:	%.o ../runtime/zeropage.o
 	@$(LD) -o $@ -t module $^
 
-nes-64-56-2.tgi:       	nes-64-56-2.o 		\
-			../runtime/popa.o     	\
-			../runtime/zeropage.o 	\
-			clrscr.o		\
-			cputc.o			\
-			get_tv.o		\
-			gotoxy.o		\
-			ppu.o 			\
-			ppubuf.o		\
-			setcursor.o
-	@$(LD) -o $@ -t module $^
-
 #--------------------------------------------------------------------------
 # Object files
 
@@ -106,6 +94,18 @@ all: 	$(OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
+
+nes-64-56-2.tgi:       	nes-64-56-2.o 		\
+ 			../runtime/popa.o     	\
+ 			../runtime/zeropage.o 	\
+ 			clrscr.o		\
+ 			cputc.o			\
+ 			get_tv.o		\
+ 			gotoxy.o		\
+ 			ppu.o 			\
+ 			ppubuf.o		\
+ 		       	setcursor.o
+	@$(LD) -o $@ -t module $^
 
 clean:
 	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)

@@ -681,9 +681,9 @@ operator. After doing
 </verb></tscreen>
 
 may use the symbol "two" in every place where a number is expected, and it is
-evaluated to the value 2 in this context. The label assignment operator causes
-the same, but causes the symbol to be marked as a label, which may cause a
-different handling in the debugger:
+evaluated to the value 2 in this context. The label assignment operator is
+almost identical, but causes the symbol to be marked as a label, so it may be
+handled differently in a debugger:
 
 <tscreen><verb>
       io := $d000

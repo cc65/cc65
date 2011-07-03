@@ -1039,7 +1039,7 @@ static int CompareFileInfoById (const void* L, const void* R)
 
 
 
-static SymInfo* NewSymInfo (const StrBuf* Name, long Val, 
+static SymInfo* NewSymInfo (const StrBuf* Name, long Val,
                             cc65_symbol_type Type, cc65_size Size,
                             unsigned Segment)
 /* Create a new SymInfo struct, intialize and return it */
@@ -1483,7 +1483,7 @@ static void UnknownKeyword (InputData* D)
     /* Output a warning */
     ParseError (D, CC65_WARNING, "Unknown keyword \"%s\" - skipping",
                 SB_GetConstBuf (&D->SVal));
-                            
+
     /* Skip the identifier */
     NextToken (D);
 
@@ -2230,9 +2230,12 @@ ErrorExit:
 
 static void ParseSym (InputData* D)
 /* Parse a SYM line */
-{
-    cc65_symbol_type    Type;
-    long                Value;
+{                                                                 
+    /* Most of the following variables are initialized with a value that is
+     * overwritten later. This is just to avoid compiler warnings.
+     */
+    cc65_symbol_type    Type = CC65_SYM_EQUATE;
+    long                Value = 0;
     cc65_size           Size = 0;
     StrBuf              SymName = STRBUF_INITIALIZER;
     unsigned            Segment = CC65_INV_ID;

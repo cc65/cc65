@@ -28,7 +28,7 @@
 	.byte	$00				; $2AF
 	.byte	$80				; $2AE Machine code flag
 	.byte	$C7				; $2AD Autoload flag
-	.dbyt	__ZPSAVE_LOAD__			; $2AB
+	.dbyt	__ZPSAVE_LOAD__ - 1		; $2AB
 	.dbyt	__RAM_START__			; $2A9
 	.byte	$00				; $2A8
 	.byte	((.VERSION >> 8) & $0F) + '0'

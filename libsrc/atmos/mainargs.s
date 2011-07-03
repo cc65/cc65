@@ -11,8 +11,9 @@
 
 MAXARGS	 = 10			; Maximum number of arguments allowed
 REM	 = $9d			; BASIC token-code
-NAME_LEN = 0			; maximum length of command-name
+NAME_LEN = 16			; maximum length of command-name
 BASIC_BUF = $35
+FNAM	 = $293
 
 
 ;---------------------------------------------------------------------------
@@ -23,6 +24,16 @@ BASIC_BUF = $35
 
 .proc	initmainargs
 
+; Assume that the program was loaded, a moment ago, by the traditional LOAD
+; statement.  Save the "most-recent filename" as argument #0.
+; Because the buffer, that we're copying into, was zeroed out,
+; we don't need to add a NUL character.
+;
+	ldy	#NAME_LEN - 1	; limit the length
+L0:	lda	FNAM,y
+	sta	name,y
+	dey
+	bpl	L0
 	inc	__argc		; argc always is equal to, at least, 1
 
 ; Find the "rem" token.
@@ -55,15 +66,12 @@ found:	cmp	#'"'		; Is the argument quoted?
 setterm:sta	term		; Set end of argument marker
 
 ; Now store a pointer to the argument into the next slot. Since the BASIC
-; input buffer is located at the start of a RAM page, no calculations are
-; necessary.
+; input buffer is located at the zero page, no calculations are necessary.
 
 	txa			; Get low byte
 	add	#<BASIC_BUF	; Not at page boundary
 	sta	argv,y		; argv[y]= &arg
 	iny
-;;	lda	#>BASIC_BUF
-;;	sta	argv,y
 	iny
 	inc	__argc		; Found another arg
 

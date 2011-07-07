@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -130,13 +130,13 @@ struct ser_params {
 unsigned char __fastcall__ ser_load_driver (const char* driver);
 /* Load and install a serial driver. Return an error code. */
 
-unsigned char __fastcall__ ser_unload (void);
+unsigned char ser_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
 unsigned char __fastcall__ ser_install (void* driver);
 /* Install an already loaded driver. Return an error code. */
 
-unsigned char __fastcall__ ser_uninstall (void);
+unsigned char ser_uninstall (void);
 /* Uninstall the currently loaded driver and return an error code.
  * Note: This call does not free allocated memory.
  */
@@ -144,7 +144,7 @@ unsigned char __fastcall__ ser_uninstall (void);
 unsigned char __fastcall__ ser_open (const struct ser_params* params);
 /* "Open" the port by setting the port parameters and enable interrupts. */
 
-unsigned char __fastcall__ ser_close (void);
+unsigned char ser_close (void);
 /* "Close" the port. Clear buffers and and disable interrupts. */
 
 unsigned char __fastcall__ ser_get (char* b);

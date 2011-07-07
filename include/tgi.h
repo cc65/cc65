@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/* (C) 2002-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -75,7 +75,7 @@ typedef struct tgi_vectorfont tgi_vectorfont;
 void __fastcall__ tgi_load_driver (const char* name);
 /* Load and install the given driver. */
 
-void __fastcall__ tgi_unload (void);
+void tgi_unload (void);
 /* Uninstall, then unload the currently loaded driver. Will call tgi_done if
  * necessary.
  */
@@ -83,15 +83,15 @@ void __fastcall__ tgi_unload (void);
 void __fastcall__ tgi_install (void* driver);
 /* Install an already loaded driver. */
 
-void __fastcall__ tgi_uninstall (void);
+void tgi_uninstall (void);
 /* Uninstall the currently loaded driver but do not unload it. Will call
  * tgi_done if necessary.
  */
 
-void __fastcall__ tgi_init (void);
+void tgi_init (void);
 /* Initialize the already loaded graphics driver. */
 
-void __fastcall__ tgi_done (void);
+void tgi_done (void);
 /* End graphics mode, switch back to text mode. Will NOT uninstall or unload
  * the driver!
  */
@@ -111,7 +111,7 @@ void __fastcall__ tgi_install_vectorfont (const tgi_vectorfont* font);
 void tgi_free_vectorfont (const tgi_vectorfont* font);
 /* Free a vector font that was previously loaded into memory. */
 
-unsigned char __fastcall__ tgi_geterror (void);
+unsigned char tgi_geterror (void);
 /* Return the error code for the last operation. This will also clear the
  * error.
  */
@@ -119,10 +119,10 @@ unsigned char __fastcall__ tgi_geterror (void);
 const char* __fastcall__ tgi_geterrormsg (unsigned char code);
 /* Get an error message describing the error in code. */
 
-void __fastcall__ tgi_clear (void);
+void tgi_clear (void);
 /* Clear the drawpage. */
 
-unsigned __fastcall__ tgi_getpagecount (void);
+unsigned tgi_getpagecount (void);
 /* Returns the number of screen pages available. */
 
 void __fastcall__ tgi_setviewpage (unsigned char page);
@@ -131,10 +131,10 @@ void __fastcall__ tgi_setviewpage (unsigned char page);
 void __fastcall__ tgi_setdrawpage (unsigned char page);
 /* Set the drawable page. Will set an error if the page is not available. */
 
-unsigned char __fastcall__ tgi_getcolorcount (void);
+unsigned char tgi_getcolorcount (void);
 /* Get the number of available colors. */
 
-unsigned char __fastcall__ tgi_getmaxcolor (void);
+unsigned char tgi_getmaxcolor (void);
 /* Return the maximum supported color number (the number of colors would
  * then be getmaxcolor()+1).
  */
@@ -142,7 +142,7 @@ unsigned char __fastcall__ tgi_getmaxcolor (void);
 void __fastcall__ tgi_setcolor (unsigned char color);
 /* Set the current drawing color. */
 
-unsigned char __fastcall__ tgi_getcolor (void);
+unsigned char tgi_getcolor (void);
 /* Return the current drawing color. */
 
 void __fastcall__ tgi_setpalette (const unsigned char* palette);
@@ -150,29 +150,29 @@ void __fastcall__ tgi_setpalette (const unsigned char* palette);
  * a pointer to as many entries as there are colors.
  */
 
-const unsigned char* __fastcall__ tgi_getpalette (void);
+const unsigned char* tgi_getpalette (void);
 /* Return the current palette. */
 
-const unsigned char* __fastcall__ tgi_getdefpalette (void);
+const unsigned char* tgi_getdefpalette (void);
 /* Return the default palette. */
 
-unsigned __fastcall__ tgi_getxres (void);
+unsigned tgi_getxres (void);
 /* Return the resolution in X direction. */
 
-unsigned __fastcall__ tgi_getmaxx (void);
+unsigned tgi_getmaxx (void);
 /* Return the maximum x coordinate. The resolution in x direction is
  * getmaxx() + 1
  */
 
-unsigned __fastcall__ tgi_getyres (void);
+unsigned tgi_getyres (void);
 /* Return the resolution in Y direction. */
 
-unsigned __fastcall__ tgi_getmaxy (void);
+unsigned tgi_getmaxy (void);
 /* Return the maximum y coordinate. The resolution in y direction is
  * getmaxy() + 1
  */
 
-unsigned __fastcall__ tgi_getaspectratio (void);
+unsigned tgi_getaspectratio (void);
 /* Returns the aspect ratio for the loaded driver. The aspect ratio is an
  * 8.8 fixed point value.
  */

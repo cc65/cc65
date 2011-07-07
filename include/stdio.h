@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -108,7 +108,7 @@ int __fastcall__ fsetpos (FILE* f, const fpos_t* pos);
 long __fastcall__ ftell (FILE* f);
 int __fastcall__ fseek (FILE* f, long offset, int whence);
 void __fastcall__ rewind (FILE *f);
-int __fastcall__ getchar (void);
+int getchar (void);
 char* __fastcall__ gets (char* s);
 void __fastcall__ perror (const char* s);
 int printf (const char* format, ...);

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -86,10 +86,10 @@ void __fastcall__ _heapadd (void* mem, size_t size);
 size_t __fastcall__ _heapblocksize (const void* block);
 /* Return the size of an allocated block */
 
-size_t __fastcall__ _heapmemavail (void);
+size_t _heapmemavail (void);
 /* Return the total free heap space */
 
-size_t __fastcall__ _heapmaxavail (void);
+size_t _heapmaxavail (void);
 /* Return the size of the largest free block on the heap */
 
 

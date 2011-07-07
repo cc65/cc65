@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -119,26 +119,26 @@ unsigned char __fastcall__ mouse_load_driver (const struct mouse_callbacks* c,
                                               const char* driver);
 /* Load and install a mouse driver, return an error code. */
 
-unsigned char __fastcall__ mouse_unload (void);
+unsigned char mouse_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
 unsigned char __fastcall__ mouse_install (const struct mouse_callbacks* c,
                                           void* driver);
 /* Install an already loaded driver. Returns an error code. */
 
-unsigned char __fastcall__ mouse_uninstall (void);
+unsigned char mouse_uninstall (void);
 /* Uninstall the currently loaded driver. Returns an error code. */
 
 const char* __fastcall__ mouse_geterrormsg (unsigned char code);
 /* Get an error message describing the error in code. */
 
-void __fastcall__ mouse_hide (void);
+void mouse_hide (void);
 /* Hide the mouse. The function manages a counter and may be called more than
  * once. For each call to mouse_hide there must be a call to mouse_show to make
  * the mouse visible again.
  */
 
-void __fastcall__ mouse_show (void);
+void mouse_show (void);
 /* Show the mouse. See mouse_hide for more information. */
 
 void __fastcall__ mouse_setbox (const struct mouse_box* box);
@@ -167,7 +167,7 @@ void __fastcall__ mouse_move (int x, int y);
  * inside the bounding box.
  */
 
-unsigned char __fastcall__ mouse_buttons (void);
+unsigned char mouse_buttons (void);
 /* Return a bit mask encoding the states of the mouse buttons. Use the
  * MOUSE_BTN_XXX flags to decode a specific button.
  */

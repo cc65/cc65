@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -88,18 +88,18 @@ extern const char joy_stddrv[];
 unsigned char __fastcall__ joy_load_driver (const char* driver);
 /* Load and install a joystick driver. Return an error code. */
 
-unsigned char __fastcall__ joy_unload (void);
+unsigned char joy_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
 unsigned char __fastcall__ joy_install (void* driver);
 /* Install an already loaded driver. Return an error code. */
 
-unsigned char __fastcall__ joy_uninstall (void);
+unsigned char joy_uninstall (void);
 /* Uninstall the currently loaded driver and return an error code.
  * Note: This call does not free allocated memory.
  */
 
-unsigned char __fastcall__ joy_count (void);
+unsigned char joy_count (void);
 /* Return the number of joysticks supported by the driver */
 
 unsigned char __fastcall__ joy_read (unsigned char joystick);

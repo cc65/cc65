@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -78,18 +78,18 @@ struct em_copy {
 unsigned char __fastcall__ em_load_driver (const char* driver);
 /* Load and install an extended memory driver. Return an error code. */
 
-unsigned char __fastcall__ em_unload (void);
+unsigned char em_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
 unsigned char __fastcall__ em_install (void* driver);
 /* Install an already loaded driver. Return an error code. */
 
-unsigned char __fastcall__ em_uninstall (void);
+unsigned char em_uninstall (void);
 /* Uninstall the currently loaded driver and return an error code.
  * Note: This call does not free allocated memory.
  */
 
-unsigned __fastcall__ em_pagecount (void);
+unsigned em_pagecount (void);
 /* Return the total number of 256 byte pages available in extended memory. */
 
 void* __fastcall__ em_map (unsigned page);
@@ -107,7 +107,7 @@ void* __fastcall__ em_use (unsigned page);
  * use, this call may perform better than em_map.
  */
 
-void __fastcall__ em_commit (void);
+void em_commit (void);
 /* Commit changes in the memory window to extended storage. If the contents
  * of the memory window have been changed, these changes may be lost if
  * em_map, em_copyfrom or em_copyto are called without calling em_commit
@@ -127,7 +127,7 @@ void __fastcall__ em_copyto (const struct em_copy* copy_data);
 
 
 
-/* End of em.h */               
+/* End of em.h */
 #endif
 
 

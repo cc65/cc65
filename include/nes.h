@@ -90,10 +90,10 @@
 
 
 
-void __fastcall__ waitvblank (void);
+void waitvblank (void);
 /* Wait for the vertical blanking */
 
-unsigned char __fastcall__ get_tv (void);
+unsigned char get_tv (void);
 /* Return the video mode the machine is using. */
 
 

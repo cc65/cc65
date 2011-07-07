@@ -80,10 +80,10 @@ struct InputFile {
     FilePos	    Pos;	       	/* Position in file */
     token_t         Tok;	       	/* Last token */
     int		    C;			/* Last character */
-    char       	    Line[256];		/* The current input line */
+    StrBuf          Line;               /* The current input line */
     int             IncSearchPath;      /* True if we've added a search path */
     int             BinSearchPath;      /* True if we've added a search path */
-    InputFile*	    Next;      	       	/* Linked list of input files */
+    InputFile* 	    Next;      	       	/* Linked list of input files */
 };
 
 /* Struct to handle textual input data */
@@ -91,10 +91,10 @@ typedef struct InputData InputData;
 struct InputData {
     char*      	    Text;               /* Pointer to the text data */
     const char*     Pos;		/* Pointer to current position */
-    int		    Malloced;		/* Memory was malloced */
+    int	       	    Malloced;		/* Memory was malloced */
     token_t         Tok;	    	/* Last token */
-    int		    C;			/* Last character */
-    InputData*	    Next;		/* Linked list of input data */
+    int	       	    C;			/* Last character */
+    InputData* 	    Next;		/* Linked list of input data */
 };
 
 /* Input source: Either file or data */
@@ -267,7 +267,7 @@ struct DotKeyword {
     { ".SEGMENT",  	TOK_SEGMENT	},
     { ".SET",           TOK_SET         },
     { ".SETCPU",  	TOK_SETCPU    	},
-    { ".SHL",  	  	TOK_SHL		},
+    { ".SHL",  	    	TOK_SHL		},
     { ".SHR",  	  	TOK_SHR		},
     { ".SIZEOF",        TOK_SIZEOF      },
     { ".SMART",	  	TOK_SMART	},
@@ -363,47 +363,71 @@ static void IFNextChar (CharSource* S)
 /* Read the next character from the input file */
 {
     /* Check for end of line, read the next line if needed */
-    while (S->V.File.Line [S->V.File.Pos.Col] == '\0') {
+    while (SB_GetIndex (&S->V.File.Line) >= SB_GetLen (&S->V.File.Line)) {
 
-        unsigned Len, Removed;
+        unsigned Len;
 
         /* End of current line reached, read next line */
-        if (fgets (S->V.File.Line, sizeof (S->V.File.Line), S->V.File.F) == 0) {
-            /* End of file. Add an empty line to the listing. This is a
-             * small hack needed to keep the PC output in sync.
-             */
-            NewListingLine ("", S->V.File.Pos.Name, FCount);
-            C = EOF;
-            return;
+        SB_Clear (&S->V.File.Line);
+        while (1) {
+
+            int N = fgetc (S->V.File.F);
+            if (N == EOF) {
+                /* End of file. Accept files without a newline at the end */
+                if (SB_NotEmpty (&S->V.File.Line)) {
+                    break;
+                }
+
+                /* No more data - add an empty line to the listing. This
+                 * is a small hack needed to keep the PC output in sync.
+                 */
+                NewListingLine (&EmptyStrBuf, S->V.File.Pos.Name, FCount);
+                C = EOF;
+                return;
+
+            /* Check for end of line */
+            } else if (N == '\n') {
+
+                /* End of line */
+                break;
+
+            /* Collect other stuff */
+            } else {
+
+                /* Append data to line */
+                SB_AppendChar (&S->V.File.Line, N);
+
+            }
         }
 
-        /* For better handling of files with unusual line endings (DOS
-         * files that are accidently translated on Unix for example),
-         * first remove all whitespace at the end, then add a single
-         * newline.
+
+        /* If we come here, we have a new input line. To avoid problems
+         * with strange line terminators, remove all whitespace from the
+         * end of the line, the add a single newline.
          */
-        Len = strlen (S->V.File.Line);
-        Removed = 0;
-        while (Len > 0 && IsSpace (S->V.File.Line[Len-1])) {
-            ++Removed;
+        Len = SB_GetLen (&S->V.File.Line);
+        while (Len > 0 && IsSpace (SB_AtUnchecked (&S->V.File.Line, Len-1))) {
             --Len;
         }
-        if (Removed) {
-            S->V.File.Line[Len+0] = '\n';
-            S->V.File.Line[Len+1] = '\0';
-        }
+        SB_Drop (&S->V.File.Line, SB_GetLen (&S->V.File.Line) - Len);
+        SB_AppendChar (&S->V.File.Line, '\n');
+
+        /* Terminate the string buffer */
+        SB_Terminate (&S->V.File.Line);
 
         /* One more line */
         S->V.File.Pos.Line++;
-        S->V.File.Pos.Col = 0;
 
         /* Remember the new line for the listing */
-        NewListingLine (S->V.File.Line, S->V.File.Pos.Name, FCount);
+        NewListingLine (&S->V.File.Line, S->V.File.Pos.Name, FCount);
 
     }
 
-    /* Return the next character from the file */
-    C = S->V.File.Line [S->V.File.Pos.Col++];
+    /* Set the column pointer */
+    S->V.File.Pos.Col = SB_GetIndex (&S->V.File.Line);
+
+    /* Return the next character from the buffer */
+    C = SB_Get (&S->V.File.Line);
 }
 
 
@@ -426,6 +450,9 @@ void IFDone (CharSource* S)
     if (S->V.File.BinSearchPath) {
         PopSearchPath (BinSearchPath);
     }
+
+    /* Free the line buffer */
+    SB_Done (&S->V.File.Line);
 
     /* Close the input file and decrement the file count. We will ignore
      * errors here, since we were just reading from the file.
@@ -508,7 +535,7 @@ int NewInputFile (const char* Name)
     S->V.File.Pos.Line  = 0;
     S->V.File.Pos.Col   = 0;
     S->V.File.Pos.Name  = FileIdx;
-    S->V.File.Line[0]   = '\0';
+    SB_Init (&S->V.File.Line);
 
     /* Push the path for this file onto the include search lists */
     SB_CopyBuf (&Path, Name, FindName (Name) - Name);

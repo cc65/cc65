@@ -41,6 +41,7 @@
 #include "check.h"
 #include "fname.h"
 #include "fragdefs.h"
+#include "strbuf.h"
 #include "version.h"
 #include "xmalloc.h"
 
@@ -81,7 +82,7 @@ static int     	ListingEnabled = 1;	/* Enabled if > 0 */
 
 
 
-void NewListingLine (const char* Line, unsigned char File, unsigned char Depth)
+void NewListingLine (const StrBuf* Line, unsigned char File, unsigned char Depth)
 /* Create a new ListLine struct and insert it */
 {
     /* Store only if listing is enabled */
@@ -90,10 +91,10 @@ void NewListingLine (const char* Line, unsigned char File, unsigned char Depth)
 	ListLine* L;
 
 	/* Get the length of the line */
-	unsigned Len = strlen (Line);
+	unsigned Len = SB_GetLen (Line);
 
 	/* Ignore trailing newlines */
-	while (Len > 0 && Line[Len-1] == '\n') {
+	while (Len > 0 && SB_AtUnchecked (Line, Len-1) == '\n') {
 	    --Len;
 	}
 
@@ -110,8 +111,8 @@ void NewListingLine (const char* Line, unsigned char File, unsigned char Depth)
      	L->Depth	= Depth;
 	L->Output	= (ListingEnabled > 0);
 	L->ListBytes	= (unsigned char) ListBytes;
- 	memcpy (L->Line, Line, Len);
-	L->Line [Len] = '\0';
+ 	memcpy (L->Line, SB_GetConstBuf (Line), Len);
+       	L->Line[Len] = '\0';
 
 	/* Insert the line into the list of lines */
 	if (LineList == 0) {
@@ -303,8 +304,8 @@ void CreateListing (void)
     /* Open the real listing file */
     F = fopen (SB_GetConstBuf (&ListingName), "w");
     if (F == 0) {
-    	Fatal ("Cannot open listing file `%s': %s", 
-               SB_GetConstBuf (&ListingName), 
+    	Fatal ("Cannot open listing file `%s': %s",
+               SB_GetConstBuf (&ListingName),
                strerror (errno));
     }
 

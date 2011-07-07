@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +44,17 @@
 
 
 /*****************************************************************************/
-/*   				     Data		   		     */
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+struct StrBuf;
+
+
+
+/*****************************************************************************/
+/*   		     		     Data		   		     */
 /*****************************************************************************/
 
 
@@ -89,7 +99,8 @@ extern int	     	PageLength;	/* Length of a listing page */
 
 
 
-void NewListingLine (const char* Line, unsigned char File, unsigned char Depth);
+void NewListingLine (const struct StrBuf* Line, unsigned char File,
+                     unsigned char Depth);
 /* Create a new ListLine struct */
 
 void EnableListing (void);

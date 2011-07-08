@@ -14,6 +14,7 @@
         .addr   Next
         .word   .version        ; Line number
         .byte   $9E             ; SYS token
+;       .byte   <(((Start / 10000) .mod 10) + '0')
         .byte   <(((Start /  1000) .mod 10) + '0')
         .byte   <(((Start /   100) .mod 10) + '0')
         .byte   <(((Start /    10) .mod 10) + '0')
@@ -22,6 +23,11 @@
 Next:   .word   0               ; BASIC end marker
 Start:
 
+; If the start address is larger than 4 digits, the header generated above
+; will not contain the highest digit. Instead of wasting one more digit that
+; is almost never used, check it at link time and generate an error so the
+; user knows something is wrong.
 
+.assert (Start < 10000), error, "Start address too large for generated BASIC stub"
 
 

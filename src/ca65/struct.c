@@ -40,6 +40,7 @@
 #include "condasm.h"
 #include "error.h"
 #include "expr.h"
+#include "macro.h"
 #include "nexttok.h"
 #include "scanner.h"
 #include "sizeof.h"
@@ -133,6 +134,16 @@ static long DoStructInternal (long Offs, unsigned Type)
         /* The format is "[identifier] storage-allocator [, multiplicator]" */
         Sym = 0;
         if (CurTok.Tok == TOK_IDENT) {
+
+            /* Beware: An identifier may also be a macro, in which case we have
+             * to start over.
+             */
+            Macro* M = FindMacro (&CurTok.SVal);
+            if (M) {
+                MacExpandStart (M);
+                continue;
+            }
+
             /* We have an identifier, generate a symbol */
             Sym = SymFind (CurrentScope, &CurTok.SVal, SYM_ALLOC_NEW);
 

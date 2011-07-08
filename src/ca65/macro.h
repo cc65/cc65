@@ -62,7 +62,7 @@ struct StrBuf;
 struct Macro;
 typedef struct Macro Macro;
 
-
+                                
 
 /*****************************************************************************/
 /*     	       	    	    	     Code				     */
@@ -73,7 +73,7 @@ typedef struct Macro Macro;
 void MacDef (unsigned Style);
 /* Parse a macro definition */
 
-void MacUndef (const StrBuf* Name, unsigned char Style);
+void MacUndef (const struct StrBuf* Name, unsigned char Style);
 /* Undefine the macro with the given name and style. A style mismatch is
  * treated as if the macro didn't exist.
  */
@@ -84,12 +84,12 @@ void MacExpandStart (Macro* M);
 void MacAbort (void);
 /* Abort the current macro expansion */
 
-Macro* FindMacro (const StrBuf* Name);
+Macro* FindMacro (const struct StrBuf* Name);
 /* Try to find the macro with the given name and return it. If no macro with
  * this name was found, return NULL.
  */
 
-Macro* FindDefine (const StrBuf* Name);
+Macro* FindDefine (const struct StrBuf* Name);
 /* Try to find the define style macro with the given name and return it. If no
  * such macro was found, return NULL.
  */

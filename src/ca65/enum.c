@@ -41,6 +41,7 @@
 #include "enum.h"
 #include "error.h"
 #include "expr.h"
+#include "macro.h"
 #include "nexttok.h"
 #include "scanner.h"
 #include "symbol.h"
@@ -75,6 +76,7 @@ void DoEnum (void)
     /* Read until end of struct */
     while (CurTok.Tok != TOK_ENDENUM && CurTok.Tok != TOK_EOF) {
 
+        Macro*    M;
         SymEntry* Sym;
         ExprNode* EnumExpr;
 
@@ -90,6 +92,12 @@ void DoEnum (void)
             if (!CheckConditionals ()) {
                 ErrorSkip ("Identifier expected");
             }
+            continue;
+        }
+
+        /* We have an identifier. Is it a macro? */
+        if ((M = FindMacro (&CurTok.SVal)) != 0) {
+            MacExpandStart (M);
             continue;
         }
 

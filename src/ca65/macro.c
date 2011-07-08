@@ -95,7 +95,6 @@ struct IdDesc {
 
 
 /* Struct that describes a macro definition */
-typedef struct Macro Macro;
 struct Macro {
     HashNode        Node;       /* Hash list node */
     Macro*   	    List;	/* List of all macros */
@@ -641,7 +640,7 @@ static int MacExpand (void* Data)
     /* Check if we should abort this macro */
     if (DoMacAbort) {
 
-	/* Reset the flag */
+    	/* Reset the flag */
 	DoMacAbort = 0;
 
 	/* Abort any open .IF statements in this macro expansion */
@@ -936,14 +935,13 @@ static void StartExpDefine (MacExp* E)
 
 
 
-void MacExpandStart (void)
-/* Start expanding the macro in SVal */
+void MacExpandStart (Macro* M)
+/* Start expanding a macro */
 {
     MacExp* E;
 
-    /* Search for the macro */
-    Macro* M = HT_FindEntry (&MacroTab, &CurTok.SVal);
-    CHECK (M != 0 && (M->Style != MAC_STYLE_DEFINE || DisableDefines == 0));
+    /* Check the argument */
+    PRECONDITION (M && (M->Style != MAC_STYLE_DEFINE || DisableDefines == 0));
 
     /* We cannot expand an incomplete macro */
     if (M->Incomplete) {
@@ -984,16 +982,21 @@ void MacAbort (void)
 
 
 
-int IsMacro (const StrBuf* Name)
-/* Return true if the given name is the name of a macro */
+Macro* FindMacro (const StrBuf* Name)
+/* Try to find the macro with the given name and return it. If no macro with
+ * this name was found, return NULL.
+ */
 {
-    return (HT_Find (&MacroTab, Name) != 0);
+    Macro* M = HT_FindEntry (&MacroTab, Name);
+    return (M != 0 && M->Style == MAC_STYLE_CLASSIC)? M : 0;
 }
 
 
 
-int IsDefine (const StrBuf* Name)
-/* Return true if the given name is the name of a define style macro */
+Macro* FindDefine (const StrBuf* Name)
+/* Try to find the define style macro with the given name and return it. If no
+ * such macro was found, return NULL.
+ */
 {
     Macro* M;
 
@@ -1004,7 +1007,7 @@ int IsDefine (const StrBuf* Name)
 
     /* Check if we have such a macro */
     M = HT_FindEntry (&MacroTab, Name);
-    return (M != 0 && M->Style == MAC_STYLE_DEFINE);
+    return (M != 0 && M->Style == MAC_STYLE_DEFINE)? M : 0;
 }
 
 

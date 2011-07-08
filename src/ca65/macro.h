@@ -58,6 +58,10 @@ struct StrBuf;
 #define MAC_STYLE_CLASSIC   	0
 #define MAC_STYLE_DEFINE    	1
 
+/* Macro as an opaque data type */
+struct Macro;
+typedef struct Macro Macro;
+
 
 
 /*****************************************************************************/
@@ -74,17 +78,21 @@ void MacUndef (const StrBuf* Name, unsigned char Style);
  * treated as if the macro didn't exist.
  */
 
-void MacExpandStart (void);
-/* Start expanding the macro in SVal */
+void MacExpandStart (Macro* M);
+/* Start expanding a macro */
 
 void MacAbort (void);
 /* Abort the current macro expansion */
 
-int IsMacro (const StrBuf* Name);
-/* Return true if the given name is the name of a macro */
+Macro* FindMacro (const StrBuf* Name);
+/* Try to find the macro with the given name and return it. If no macro with
+ * this name was found, return NULL.
+ */
 
-int IsDefine (const StrBuf* Name);
-/* Return true if the given name is the name of a define style macro */
+Macro* FindDefine (const StrBuf* Name);
+/* Try to find the define style macro with the given name and return it. If no
+ * such macro was found, return NULL.
+ */
 
 int InMacExpansion (void);
 /* Return true if we're currently expanding a macro */

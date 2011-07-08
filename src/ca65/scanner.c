@@ -818,6 +818,8 @@ static int Sweet16Reg (const StrBuf* Id)
 void NextRawTok (void)
 /* Read the next raw token from the input stream */
 {
+    Macro* M;                
+
     /* If we've a forced end of assembly, don't read further */
     if (ForcedEnd) {
      	CurTok.Tok = TOK_EOF;
@@ -827,9 +829,9 @@ void NextRawTok (void)
 Restart:
     /* Check if we have tokens from another input source */
     if (InputFromStack ()) {
-        if (CurTok.Tok == TOK_IDENT && IsDefine (&CurTok.SVal)) {
+        if (CurTok.Tok == TOK_IDENT && (M = FindDefine (&CurTok.SVal)) != 0) {
             /* This is a define style macro - expand it */
-            MacExpandStart ();
+            MacExpandStart (M);          
             goto Restart;
         }
         return;
@@ -1001,9 +1003,9 @@ Again:
 		/* An identifier with a dot. Check if it's a define style
 		 * macro.
 		 */
-       	       	if (IsDefine (&CurTok.SVal)) {
+       	       	if ((M = FindDefine (&CurTok.SVal)) != 0) {
  		    /* This is a define style macro - expand it */
-		    MacExpandStart ();
+		    MacExpandStart (M);
 		    goto Restart;
 		}
 
@@ -1108,9 +1110,9 @@ Again:
         }
 
 	/* Check for define style macro */
-       	if (IsDefine (&CurTok.SVal)) {
+       	if ((M = FindDefine (&CurTok.SVal)) != 0) {
 	    /* Macro - expand it */
-	    MacExpandStart ();
+	    MacExpandStart (M);
 	    goto Restart;
 	} else {
 	    /* An identifier */

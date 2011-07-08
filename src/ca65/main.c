@@ -596,7 +596,7 @@ static void OneLine (void)
     Segment*      Seg   = 0;
     unsigned long PC    = 0;
     SymEntry*     Sym   = 0;
-    int           Macro = 0;
+    Macro*        Mac   = 0;
     int           Instr = -1;
 
     /* Initialize the new listing line if we are actually reading from file
@@ -606,8 +606,8 @@ static void OneLine (void)
        	InitListingLine ();
     }
 
+    /* Single colon means unnamed label */
     if (CurTok.Tok == TOK_COLON) {
-       	/* An unnamed label */
        	ULabDef ();
        	NextTok ();
     }
@@ -620,11 +620,11 @@ static void OneLine (void)
             /* Macros and symbols cannot use instruction names */
             Instr = FindInstruction (&CurTok.SVal);
             if (Instr < 0) {
-                Macro = IsMacro (&CurTok.SVal);
+                Mac = FindMacro (&CurTok.SVal);
             }
         } else {
             /* Macros and symbols may use the names of instructions */
-            Macro = IsMacro (&CurTok.SVal);
+            Mac = FindMacro (&CurTok.SVal);
         }
     }
 
@@ -634,7 +634,7 @@ static void OneLine (void)
      */
     if (CurTok.Tok == TOK_LOCAL_IDENT ||
         CurTok.Tok == TOK_NAMESPACE   ||
-        (CurTok.Tok == TOK_IDENT && Instr < 0 && !Macro)) {
+        (CurTok.Tok == TOK_IDENT && Instr < 0 && Mac == 0)) {
 
         /* Did we have whitespace before the ident? */
         int HadWS = CurTok.WS;
@@ -715,11 +715,11 @@ static void OneLine (void)
                     /* Macros and symbols cannot use instruction names */
                     Instr = FindInstruction (&CurTok.SVal);
                     if (Instr < 0) {
-                        Macro = IsMacro (&CurTok.SVal);
+                        Mac = FindMacro (&CurTok.SVal);
                     }
                 } else {
                     /* Macros and symbols may use the names of instructions */
-                    Macro = IsMacro (&CurTok.SVal);
+                    Mac = FindMacro (&CurTok.SVal);
                 }
             }
         }
@@ -729,9 +729,9 @@ static void OneLine (void)
     if (CurTok.Tok >= TOK_FIRSTPSEUDO && CurTok.Tok <= TOK_LASTPSEUDO) {
         /* A control command */
         HandlePseudo ();
-    } else if (Macro) {
+    } else if (Mac != 0) {
         /* A macro expansion */
-        MacExpandStart ();
+        MacExpandStart (Mac);
     } else if (Instr >= 0 ||
                (UbiquitousIdents && ((Instr = FindInstruction (&CurTok.SVal)) >= 0))) {
         /* A mnemonic - assemble one instruction */

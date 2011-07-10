@@ -105,6 +105,7 @@ S_OBJS = 	_cwd.o                  \
                 cc65_sincos.o           \
                 cc65_udiv32by16r16.o    \
                 cc65_umul16x16r32.o     \
+                cc65_umul16x8r32.o      \
                 chdir.o                 \
 		copydata.o	        \
                 creat.o                 \

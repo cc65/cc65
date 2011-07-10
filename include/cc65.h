@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2009,      Ullrich von Bassewitz                                      */
+/* (C) 2009-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -66,6 +66,11 @@ long __fastcall__ cc65_imul16x16r32 (int lhs, int rhs);
 
 unsigned __fastcall__ cc65_umul8x8r16 (unsigned char lhs, unsigned char rhs);
 /* Multiplicate two unsigned 8 bit to yield an unsigned 16 bit result */
+
+unsigned long __fastcall__ cc65_umul16x8r32 (unsigned lhs, unsigned char rhs);
+/* Multiplicate an unsigned 16 bit by an unsigned 8 bit number yielding a 24
+ * bit unsigned result that is extended to 32 bits for easier handling from C.
+ */
 
 unsigned long __fastcall__ cc65_umul16x16r32 (unsigned lhs, unsigned rhs);
 /* Multiplicate two unsigned 16 bit to yield an unsigned 32 bit result */

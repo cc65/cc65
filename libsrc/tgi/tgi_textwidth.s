@@ -8,7 +8,7 @@
         .include        "zeropage.inc"
 
         .import         _strlen, _toascii
-        .import         umul16x16r32
+        .import         umul8x16r16
 
 ;-----------------------------------------------------------------------------
 ; Aliases for zero page locations
@@ -36,12 +36,13 @@ Text    := ptr3
 
 ; Return the width of the string for the bitmap font
 
-        jsr     _strlen
+        ldy     _tgi_charwidth
         sta     ptr1
-        stx     ptr1+1
-        lda     _tgi_charwidth
-        ldx     #0
-        jmp     umul16x16r32
+        jsr     _strlen
+        jsr     umul8x16r16
+        ldy     _tgi_textscalew+2       ; Get rounded scale factor
+        sta     ptr1
+        jmp     umul8x16r16
 
 ; Return the width of the string for the vector font. To save some code, we
 ; will add up all the character widths and then multiply by the scale factor.
@@ -77,7 +78,7 @@ Text    := ptr3
         tay
         lda     (WTab),y                ; Get width of this char
         clc
-        adc     Width   
+        adc     Width
         sta     Width
         bcc     @L3
         inc     Width+1

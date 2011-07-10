@@ -221,6 +221,7 @@ OBJS = 	add.o		\
         udiv32by16r16.o \
        	umod.o		\
         umul16x16r32.o  \
+        umul8x16r24.o   \
         umul8x8r16.o    \
        	xor.o           \
         zeropage.o

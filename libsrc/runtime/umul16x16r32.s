@@ -5,27 +5,34 @@
 ;
 
         .export         umul16x16r32, umul16x16r32m
+        .export         umul16x16r16, umul16x16r16m
 
         .include        "zeropage.inc"
 
 
 ;---------------------------------------------------------------------------
-; 16x16 => 32 unsigned multiplication routine.
+; 16x16 => 32 unsigned multiplication routine. Because the overhead for a
+; 16x16 => 16 unsigned multiplication routine is small, we will tag it with 
+; the matching labels as well.
 ;
 ;  routine         lhs         rhs        result          result also in
 ; -----------------------------------------------------------------------
 ;  umul16x16r32    ptr1        ax         ax:sreg          ptr1:sreg
 ;  umul16x16r32m   ptr1        ptr3       ax:sreg          ptr1:sreg
+;  umul16x16r16    ptr1        ax         ax               ptr1
+;  umul16x16r16m   ptr1        ptr3       ax               ptr1
 ;
 ; ptr3 is left intact by the routine.
 ;
 
 umul16x16r32:
+umul16x16r16:
         sta     ptr3
         stx     ptr3+1
 
 umul16x16r32m:
-       	lda	#0
+umul16x16r16m:
+       	lda   	#0
        	sta    	sreg+1
        	ldy    	#16   	       	; Number of bits
 
@@ -34,22 +41,23 @@ umul16x16r32m:
 @L0:    bcc     @L1
 
       	clc
-      	adc	ptr3
+      	adc   	ptr3
       	pha
        	lda     ptr3+1
-      	adc	sreg+1
-      	sta	sreg+1
+      	adc   	sreg+1
+      	sta   	sreg+1
       	pla
 
 @L1:    ror     sreg+1
-     	ror	a
-     	ror	ptr1+1
-     	ror	ptr1
+     	ror   	a
+     	ror   	ptr1+1
+     	ror   	ptr1
         dey
         bne     @L0
 
         sta     sreg            ; Save byte 3
-      	lda	ptr1	       	; Load the result
-      	ldx	ptr1+1
-      	rts	    		; Done
+      	lda   	ptr1	       	; Load the result
+      	ldx   	ptr1+1
+      	rts   	    		; Done
+
 

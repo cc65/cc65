@@ -41,7 +41,7 @@ Text    := ptr3
         jsr     _strlen
         jsr     umul8x16r16
         ldy     _tgi_textscalew+2       ; Get rounded scale factor
-        sta     ptr1
+        sty     ptr1
         jmp     umul8x16r16
 
 ; Return the width of the string for the vector font. To save some code, we

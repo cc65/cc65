@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -63,6 +63,7 @@
 /* Tokens for the #pragmas */
 typedef enum {
     PRAGMA_ILLEGAL = -1,
+    PRAGMA_ALIGN,
     PRAGMA_BSS_NAME,
     PRAGMA_BSSSEG,                                      /* obsolete */
     PRAGMA_CHARMAP,
@@ -95,6 +96,7 @@ static const struct Pragma {
     const char*	Key;		/* Keyword */
     pragma_t   	Tok;		/* Token */
 } Pragmas[PRAGMA_COUNT] = {
+    { "align",                  PRAGMA_ALIGN            },
     { "bss-name",               PRAGMA_BSS_NAME         },
     { "bssseg",                 PRAGMA_BSSSEG           },      /* obsolete */
     { "charmap",                PRAGMA_CHARMAP          },
@@ -694,6 +696,10 @@ static void ParsePragma (void)
 
     /* Switch for the different pragmas */
     switch (Pragma) {
+
+        case PRAGMA_ALIGN:
+            IntPragma (&B, &DataAlignment, 1, 4096);
+            break;
 
      	case PRAGMA_BSSSEG:
             Warning ("#pragma bssseg is obsolete, please use #pragma bss-name instead");

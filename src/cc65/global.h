@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -68,6 +68,7 @@ extern IntStack         SignedChars;		/* Make characters signed by default */
 extern IntStack         CheckStack;		/* Generate stack overflow checks */
 extern IntStack         Optimize;		/* Optimize flag */
 extern IntStack         CodeSizeFactor;		/* Size factor for generated code */
+extern IntStack         DataAlignment;          /* Alignment for data */
 
 /* File names */
 extern StrBuf           DepName;                /* Name of dependencies file */

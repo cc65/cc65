@@ -33,6 +33,7 @@ yres:	.word	56			; Max Y resolution
 	.byte	2			; System font X size
 	.byte	2			; System font Y size
 	.word	$100			; Aspect ratio
+        .byte   0                       ; TGI driver flags
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).

@@ -55,6 +55,7 @@ _tgi_pagecount:     .res    1           ; Number of available screen pages
 _tgi_fontwidth:     .res    1           ; System font width in pixels
 _tgi_fontheight:    .res    1           ; System font height in pixels
 _tgi_aspectratio:   .res    2           ; Aspect ratio in 8.8 fixed point
+_tgi_flags:         .res    1           ; TGI driver flags
 
 
 .data

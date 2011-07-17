@@ -44,9 +44,10 @@
             YRES            .word   1   ; Y resolution
             COLORCOUNT      .byte   1   ; Number of available colors
             PAGECOUNT       .byte   1   ; Number of screens available
-            FONTWIDTH       .byte   1   ; System font width
-            FONTHEIGHT      .byte   1   ; System font height
+            FONTWIDTH       .byte   1   ; System font width in pixel
+            FONTHEIGHT      .byte   1   ; System font height in pixel
             ASPECTRATIO     .word   1   ; Fixed point 8.8 format
+            FLAGS           .byte   1   ; TGI driver flags
         .endstruct
         JUMPTAB             .struct
             INSTALL         .addr       ; INSTALL routine
@@ -75,7 +76,14 @@
 ;------------------------------------------------------------------------------
 ; The TGI API version, stored at TGI_HDR_VERSION
 
-TGI_API_VERSION         = $03
+TGI_API_VERSION         = $04
+
+;------------------------------------------------------------------------------
+; Bitmapped tgi driver flags, stored in TGI_HDR::VARS::FLAGS.
+; Beware: Some of the bits are tested using the BIT instruction, so do not
+; change the values without checking the code!
+
+TGI_BM_FONT_FINESCALE   = $80           ; Bitmap fonts are fine grained scalable
 
 ;------------------------------------------------------------------------------
 ; Text constants

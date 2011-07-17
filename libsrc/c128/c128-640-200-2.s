@@ -62,6 +62,7 @@ pages:	.byte   1                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
         .word   $006A                   ; Aspect ratio (based on 4/3 display)
+        .byte   0                       ; TGI driver flags
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).

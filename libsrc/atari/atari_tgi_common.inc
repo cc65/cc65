@@ -25,6 +25,7 @@
 	.byte   8			; System font X size
 	.byte   8			; System font Y size
 	.word	aspect			; Aspect ratio
+        .byte   0                       ; TGI driver flags
 
 ; Function table
 

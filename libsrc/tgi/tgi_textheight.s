@@ -2,7 +2,7 @@
 ; Ullrich von Bassewitz, 2009-10-30
 ;
 
-
+                                        
         .include        "tgi-kernel.inc"
         .include        "tgi-vectorfont.inc"
         .include        "zeropage.inc"
@@ -36,11 +36,8 @@
         stx     ptr1
         lda     _tgi_vectorfont+1
         sta     ptr1+1
-        ldy     #TGI_VECTORFONT::TOP
-        lda     (ptr1),y
-        ldy     #TGI_VECTORFONT::BOTTOM
-        clc
-        adc     (ptr1),y                ; Total font height is top + bottom
+        ldy     #TGI_VECTORFONT::HEIGHT
+        lda     (ptr1),y                ; Get height of font
 
         sta     ptr1
         lda     #0

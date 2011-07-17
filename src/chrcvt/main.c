@@ -129,14 +129,19 @@
  *      .byte   $54, $43, $48, $00              ; "TCH" version
  *      .word   <size of data portion>
  * Data portion:
- *      .byte   <top>                           ; Value from $88
- *      .byte   <baseline>                      ; Value from $89
- *      .byte   <bottom>                        ; Negative value from $8A
+ *      .byte   <top>                           ; Baseline to top
+ *      .byte   <bottom>                        ; Baseline to bottom
+ *      .byte   <height>                        ; Maximum char height
  *      .byte   <width>, ...                    ; $5F width bytes
  *      .word   <char definition offset>, ...   ; $5F char def offsets
  * Character definitions:
  *      .word   <converted opcode>, ...
  *      .byte   $80
+ *
+ * The baseline of the character is assume to be at position zero. top and
+ * bottom are both positive values. The former extends in positive, the other
+ * in negative direction of the baseline. height contains the sum of top and
+ * bottom and is stored here just for easier handling.
  *
  * The opcodes get converted for easier handling: END is marked by bit 7
  * set in the first byte. The second byte of this opcode is not needed.
@@ -411,8 +416,13 @@ static void ConvertFile (const char* Input, const char* Output)
     TchHeader[4] = Offs & 0xFF;
     TchHeader[5] = (Offs >> 8) & 0xFF;
     TchHeader[6] = Buf[0x88];
-    TchHeader[7] = Buf[0x89];
-    TchHeader[8] = (unsigned char) -(signed char)(Buf[0x8A]);
+    TchHeader[7] = (unsigned char) -(signed char)(Buf[0x8A]);
+    TchHeader[8] = TchHeader[6] + TchHeader[7];
+
+    /* The baseline must be zero, otherwise we cannot convert */
+    if (Buf[0x89] != 0) {
+        Error ("Baseline of font in `%s' is not zero", Input);
+    }
 
     /* If the output file is NULL, use the name of the input file with ".tch"
      * appended.

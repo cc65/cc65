@@ -27,16 +27,14 @@ _tgi_color:         .res    1           ; Current drawing color
 _tgi_font:          .res    1           ; Which font to use
 _tgi_textdir:       .res    1           ; Current text direction
 _tgi_vectorfont:    .res    2           ; Pointer to vector font
-; The following two store an 8.8 fixed point value in the first two bytes,
-; and a rounded integer value in the third byte. The latter is passed to the
-; driver to scale the bitmap font. The variables are expected to be in
-; this order and adjacent.
-_tgi_textscalew:    .res    3           ; Text scale for the width
-_tgi_textscaleh:    .res    3           ; Text scale for the height
-
-; The following two must also be in exactly this order
-_tgi_charwidth:     .res    1           ; Char width of system font
-_tgi_charheight:    .res    1           ; Char height of system font
+; The following are character scale/size variables in 8.8 fixed point
+; format. They are required to be in this order and adjacent.
+_tgi_textscalew:    .res    2           ; Vector font width scale
+                    .res    2           ; Bitmap font width scale
+_tgi_charwidth:     .res    2           ; Full width of one bitmap char
+_tgi_textscaleh:    .res    2           ; Vector font height scale
+                    .res    2           ; Bitmap font height scale
+_tgi_charheight:    .res    2           ; Full height of one bitmap char
 
 ; End of section that gets cleared when a new driver is loaded
 csize   = * - cstart
@@ -45,7 +43,7 @@ csize   = * - cstart
 _tgi_xmax:          .res    2
 _tgi_ymax:          .res    2
 
-; The following variables are copied from the driver header for faster access
+; The following variables are copied from the driver header for faster access.
 ; fontwidth and fontheight are expected to be in order and adjacent.
 tgi_driver_vars:
 _tgi_xres:          .res    2           ; X resolution of the current mode

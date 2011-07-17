@@ -3,29 +3,13 @@
 ;
 
 
+        .include        "zeropage.inc"
         .include        "tgi-kernel.inc"
 
+        .import         umul8x16r24
         .import         popa, popax
 
-
-;-----------------------------------------------------------------------------
-; Calculate either the total height or the total width of a bitmapped
-; character, depending on the value in Y. On entry, X contains the scaling
-; factor. Since it is usually small, we multiplicate by doing repeated adds.
-; The function returns zero in X and the calculated value in A.
-
-.proc   charsize_helper
-
-        lda     _tgi_fontwidth,y
-        jmp     @L2
-@L1:    clc
-        adc     _tgi_fontwidth,y
-@L2:    dex
-        bne     @L1
-        sta     _tgi_charwidth,y
-        rts
-
-.endproc
+        .macpack        cpu
 
 ;-----------------------------------------------------------------------------
 ; void __fastcall__ tgi_textstyle (unsigned width, unsigned height,
@@ -57,43 +41,65 @@
 
 .proc   _tgi_textscale
 
-; The height value is in 8.8 fixed point. Store it and calculate a rounded
-; value for scaling the bitmapped system font in the driver.
+; Setup the height
 
-        sta     _tgi_textscaleh+0
-        stx     _tgi_textscaleh+1
-        asl     a                       ; Check value behind comma
+        ldy     _tgi_fontheight         ; Get height of bitmap font in pixels
+        sty     ptr1                    ; Save for later
+        ldy     #6                      ; Address the height
+        jsr     process_onedim          ; Process height
+
+; Setup the width
+
+        jsr     popax                   ; Get width scale into a/x
+        ldy     _tgi_fontwidth          ; Get width of bitmap font in pixels
+        sty     ptr1                    ; Save for later
+        ldy     #0                      ; Address the width
+
+; Process one character dimension. That means:
+;
+;   - Store the vector font dimension in 8.8 format
+;   - If necessary, round up/down to next integer
+;   - Store the bitmap font dimension in 8.8 format
+;   - Multiply by size of bitmap char in pixels
+;   - Store the bitmap font size in 8.8 format
+;
+
+process_onedim:
+
+        jsr     store                   ; Store vector font scale factor
+        bit     _tgi_flags              ; Fine grained scaling support avail?
+        bmi     @L2                     ; Jump if yes
+
+        asl     a                       ; Round to nearest full integer
         bcc     @L1
-        inx                             ; Round
-@L1:    stx     _tgi_textscaleh+2       ; Store rounded value
+        inx
+@L1:    lda     #0
 
-; Calculate the total height of the bitmapped font and remember it.
+@L2:    jsr     store                   ; Store bitmap font scale factor
 
-        ldy     #1
-        jsr     charsize_helper
+; The size of the font in pixels in the selected dimension is already in ptr1
+; So if we call umul8x16r24 we get the size in pixels in 16.8 fixed point.
+; Disallowing characters larger than 256 pixels, we just drop the high byte
+; and remember the low 16 bit as size in 8.8 format.
 
-; The width value is in 8.8 fixed point. Store it and calculate a rounded
-; value for scaling the bitmapped system font in the driver.
+.if (.cpu .bitand ::CPU_ISET_65SC02)
+        phy                             ; Save Y
+        jsr     umul8x16r24
+        ply                             ; Restore Y
+.else
+        sty     tmp1                    ; Save Y
+        jsr     umul8x16r24
+        ldy     tmp1                    ; Restore Y
+.endif
 
-        jsr     popax                   ; height
-        sta     _tgi_textscalew+0
-        stx     _tgi_textscalew+1
-        asl     a                       ; Check value behind comma
-        bcc     @L2
-        inx                             ; Round
-@L2:    stx     _tgi_textscalew+2       ; Store rounded value
-
-; Calculate the total width of the bitmapped font and remember it.
-
-        ldy     #0
-        jsr     charsize_helper
-
-; Load values and call the driver, parameters are passed in registers
-
-        ldx     _tgi_textscalew+2
-        ldy     _tgi_textscaleh+2
-        lda     _tgi_textdir
-        jmp     tgi_textstyle
+store:  sta     _tgi_textscalew,y
+        iny
+        pha
+        txa
+        sta     _tgi_textscalew,y
+        iny
+        pla
+        rts
 
 .endproc
 

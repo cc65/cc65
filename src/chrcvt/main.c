@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -220,18 +220,23 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
-static void ConvertChar (StrBuf* Data, const unsigned char* Buf)
+static void ConvertChar (StrBuf* Data, const unsigned char* Buf, int Remaining)
 /* Convert data for one character. Original data is in Buf, converted data
  * will be placed in Data.
  */
 {
-    /* We should check here for reading past the end of the buffer in case the
-     * input data is not sane.
-     */
+    /* Convert all drawing vectors for this character */
     while (1) {
 
+        unsigned Op;
+
+        /* Check if we have enough data left */
+        if (Remaining < 2) {
+            Error ("End of file while parsing character definitions");
+        }
+
         /* Get the next op word */
-        unsigned Op = (Buf[0] + (Buf[1] << 8)) & 0x8080;
+        Op = (Buf[0] + (Buf[1] << 8)) & 0x8080;
 
         /* Check the opcode */
         switch (Op) {
@@ -267,6 +272,7 @@ static void ConvertChar (StrBuf* Data, const unsigned char* Buf)
 
         /* Next Op */
         Buf += 2;
+        Remaining -= 2;
     }
 }
 
@@ -277,7 +283,12 @@ static void ConvertFile (const char* Input, const char* Output)
 {
     /* The header of a BGI vector font file */
     static const unsigned char ChrHeader[] = {
-/*        0x50, 0x4B, 0x08, 0x08, 0x42, 0x47, 0x49, 0x20 */
+        /* According to the Borland docs, the following should work, but it
+         * doesn't. Seems like there are fonts that work, but don't have the
+         * "BGI" string in the header. So we use just the PK\b\b mark as
+         * a header.
+         *
+         * 0x50, 0x4B, 0x08, 0x08, 0x42, 0x47, 0x49, 0x20 */
         0x50, 0x4B, 0x08, 0x08
     };
 
@@ -373,6 +384,8 @@ static void ConvertFile (const char* Input, const char* Output)
     /* Convert the characters */
     for (Char = 0x20; Char <= 0x7E; ++Char, OffsetBuf += 2) {
 
+        int Remaining;
+
         /* Add the offset to the offset table */
         Offs = SB_GetLen (&VectorData);
         SB_AppendChar (&Offsets, Offs & 0xFF);
@@ -381,13 +394,16 @@ static void ConvertFile (const char* Input, const char* Output)
         /* Get the offset of the vector data in the BGI data buffer */
         Offs = OffsetBuf[0] + (OffsetBuf[1] << 8);
 
+        /* Calculate the remaining data in the buffer for this character */
+        Remaining = Size - (Offs + (VectorBuf - Buf));
+
         /* Check if the offset is valid */
-        if (Offs + (VectorBuf - Buf) > Size) {
+        if (Remaining <= 0) {
             Error ("Invalid data offset in input file `%s'", Input);
         }
 
         /* Convert the vector data and place it into the buffer */
-        ConvertChar (&VectorData, VectorBuf + Offs);
+        ConvertChar (&VectorData, VectorBuf + Offs, Remaining);
     }
 
     /* Complete the TCH header */

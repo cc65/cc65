@@ -450,8 +450,8 @@ mnemonics:
 mnemonics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
 these instructions are illegal, there are no official mnemonics for them. The
 unofficial ones are taken from <htmlurl
-url="http://oxyron.net/graham/opcodes02.html"
-name="http://oxyron.net/graham/opcodes02.html">. Please note that only the
+url="http://www.oxyron.de/html/opcodes02.html"
+name="http://www.oxyron.de/html/opcodes02.html">. Please note that only the
 ones marked as "stable" are supported. The following table uses information
 from the mentioned web page, for more information, see there.
 

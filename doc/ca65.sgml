@@ -456,7 +456,7 @@ ones marked as "stable" are supported. The following table uses information
 from the mentioned web page, for more information, see there.
 
 <itemize>
-<item><tt>ALR: A:=(A and #{imm})*2;</tt>
+<item><tt>ALR: A:=(A and #{imm})/2;</tt>
 <item><tt>ANC: A:=A and #{imm};</tt> Generates opcode &dollar;0B.
 <item><tt>ARR: A:=(A and #{imm})/2;</tt>
 <item><tt>AXS: X:=A and X-#{imm};</tt>

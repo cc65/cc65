@@ -2,20 +2,20 @@
 ; Ullrich von Bassewitz, 2009-10-30
 ;
 
-                                        
+
         .include        "tgi-kernel.inc"
         .include        "tgi-vectorfont.inc"
         .include        "zeropage.inc"
 
 
 ;-----------------------------------------------------------------------------
-; unsigned __fastcall__ tgi_textheight (const char* s);
+; unsigned __fastcall__ tgi_gettextheight (const char* s);
 ; /* Calculate the height of the text in pixels according to the current text
 ;  * style.
 ;  */
 ;
 
-.proc   _tgi_textheight
+.proc   _tgi_gettextheight        
 
         ldy     _tgi_font
         bne     @L2                     ; Jump if vector font

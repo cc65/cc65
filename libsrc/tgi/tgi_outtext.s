@@ -25,35 +25,35 @@ widths  := regbank+2
 
 .proc   _tgi_outtext
 
-        ldy     _tgi_font       ; Bit or vectorfont?
+        ldy     _tgi_font               ; Bit or vectorfont?
         bne     VectorFont
 
 ; Handle bitmapped font output
 
         sta     ptr3
-        stx     ptr3+1          ; Pass s in ptr3 to driver
+        stx     ptr3+1                  ; Pass s in ptr3 to driver
         pha
         txa
-        pha                     ; Save s on stack for later
+        pha                             ; Save s on stack for later
 
-        jsr     tgi_curtoxy     ; Copy curx/cury into ptr1/ptr2
-        jsr     tgi_outtext     ; Call the driver
+        jsr     tgi_curtoxy             ; Copy curx/cury into ptr1/ptr2
+        jsr     tgi_outtext             ; Call the driver
 
         pla
         tax
-        pla                     ; Restore s
-        jsr     _tgi_textwidth  ; Get width of text string
+        pla                             ; Restore s
+        jsr     _tgi_gettextwidth       ; Get width of text string
 
 ; Move the graphics cursor by the amount in a/x
 
 MoveCursor:
-        ldy     _tgi_textdir    ; Horizontal or vertical text?
-        beq     @L1             ; Jump if horizontal
+        ldy     _tgi_textdir            ; Horizontal or vertical text?
+        beq     @L1                     ; Jump if horizontal
 
 ; Move graphics cursor for vertical text
 
         jsr     negax
-        ldy     #2              ; Point to _tgi_cury
+        ldy     #2                      ; Point to _tgi_cury
 
 ; Move graphics cursor for horizontal text
 
@@ -125,7 +125,7 @@ VectorFont:
         jsr     MoveCursor              ; Move the graphics cursor
 
 ; Next char in string
-
+                                        
         inc     text
         bne     @L1
         inc     text+1

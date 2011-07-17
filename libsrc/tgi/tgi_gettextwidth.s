@@ -20,7 +20,7 @@ Text    := ptr3
 
 
 ;-----------------------------------------------------------------------------
-; unsigned __fastcall__ tgi_textwidth (const char* s);
+; unsigned __fastcall__ tgi_gettextwidth (const char* s);
 ; /* Calculate the width of the text in pixels according to the current text
 ;  * style.
 ;  */
@@ -29,7 +29,7 @@ Text    := ptr3
 ;
 
 .code
-.proc   _tgi_textwidth
+.proc   _tgi_gettextwidth         
 
         ldy     _tgi_font
         bne     @L1                     ; Jump if vector font

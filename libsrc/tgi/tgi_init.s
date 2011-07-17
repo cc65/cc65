@@ -65,7 +65,7 @@
         jsr     pushax                  ; Width scale = 1.0
         jsr     pushax                  ; Heigh scale = 1.0
         jsr     pusha                   ; Text direction = TGI_TEXT_HORIZONTAL
-        jmp     _tgi_textstyle          ; A = Font = TGI_FONT_BITMAP
+        jmp     _tgi_settextstyle       ; A = Font = TGI_FONT_BITMAP
 
 ; Error exit
 

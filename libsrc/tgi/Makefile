@@ -56,6 +56,8 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_getpalette.o        \
                 tgi_getpixel.o          \
                 tgi_getset.o            \
+                tgi_gettextheight.o     \
+                tgi_gettextwidth.o      \
                 tgi_getxres.o           \
                 tgi_getyres.o           \
                 tgi_gotoxy.o            \
@@ -76,10 +78,8 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_setdrawpage.o       \
                 tgi_setpalette.o        \
                 tgi_setpixel.o          \
+                tgi_settextstyle.o      \
                 tgi_setviewpage.o       \
-                tgi_textheight.o        \
-                tgi_textwidth.o         \
-                tgi_textstyle.o         \
                 tgi_unload.o            \
                 tgi_vectorchar.o
 

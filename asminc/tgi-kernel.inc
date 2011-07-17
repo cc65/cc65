@@ -134,6 +134,7 @@ TGI_CLIP_TOP            = $08
         .global _tgi_fontwidth          ; System font width
         .global _tgi_fontheight         ; System font height
         .global _tgi_aspectratio        ; Aspect ratio, fixed point 8.8
+        .global _tgi_flags              ; TGI driver flags
 
 ;------------------------------------------------------------------------------
 ; ASM accessible variables
@@ -202,6 +203,8 @@ TGI_CLIP_TOP            = $08
         .global _tgi_getpagecount
         .global _tgi_getpalette
         .global _tgi_getpixel
+        .global _tgi_gettextheight
+        .global _tgi_gettextwidth
         .global _tgi_getxres
         .global _tgi_getyres
         .global _tgi_gotoxy
@@ -221,10 +224,8 @@ TGI_CLIP_TOP            = $08
         .global _tgi_setdrawpage
         .global _tgi_setpalette
         .global _tgi_setpixel
+        .global _tgi_settextscale
+        .global _tgi_settextstyle
         .global _tgi_setviewpage
-        .global _tgi_textheight
-        .global _tgi_textscale
-        .global _tgi_textstyle
-        .global _tgi_textwidth
         .global _tgi_uninstall
         .global _tgi_unload

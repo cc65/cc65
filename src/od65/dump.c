@@ -45,6 +45,7 @@
 #include "lidefs.h"
 #include "objdefs.h"
 #include "optdefs.h"
+#include "scopedefs.h"
 #include "segdefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -229,6 +230,23 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
 
     /* Return the result */
     return TypeDesc;
+}
+
+
+
+static const char* GetScopeType (unsigned Type)
+/* Return the name of a scope type */
+{
+    switch (Type) {
+        case SCOPETYPE_GLOBAL:  return "Global scope";
+        case SCOPETYPE_FILE:    return "File scope";
+        case SCOPETYPE_PROC:    return ".PROC";
+        case SCOPETYPE_SCOPE:   return ".SCOPE";
+        case SCOPETYPE_STRUCT:  return ".STRUCT";
+        case SCOPETYPE_ENUM:    return ".ENUM";
+        case SCOPETYPE_UNDEF:   return "Undefined";
+        default:                return "Unknown scope type";
+    }
 }
 
 
@@ -806,12 +824,12 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
 
-	/* Print the data */
+       	/* Print the data */
         printf ("      Id:%28lu\n",             ReadVar (F));
         printf ("      Parent id:%21lu\n",      ReadVar (F));
         printf ("      Lexical level:%17lu\n",  ReadVar (F));
         printf ("      Flags:%25lu\n",          ReadVar (F));
-        printf ("      Type:%26lu\n",           ReadVar (F));
+        printf ("      Type:%26s\n",            GetScopeType (ReadVar (F)));
 
         /* Resolve and print the name */
        	Name = GetString (&StrPool, ReadVar (F));

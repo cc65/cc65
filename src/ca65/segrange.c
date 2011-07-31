@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,6 +37,7 @@
 #include "xmalloc.h"
 
 /* ca65 */
+#include "objfile.h"
 #include "segment.h"
 #include "segrange.h"
 
@@ -94,7 +95,7 @@ void AddSegRanges (Collection* Ranges)
 void CloseSegRanges (Collection* Ranges)
 /* Close all open segment ranges by setting PC to the current PC for the
  * segment.
- */                                     
+ */
 {
     unsigned I;
 
@@ -108,6 +109,46 @@ void CloseSegRanges (Collection* Ranges)
         R->End = R->Seg->PC;
     }
 }
+
+
+
+void WriteSegRanges (const Collection* Ranges)
+/* Write a list of segment ranges to the output file */
+{
+    unsigned I;
+    unsigned Count;
+
+    /* Determine how many of the segments contain actual data */
+    Count = 0;
+    for (I = 0; I < CollCount (Ranges); ++I) {
+
+        /* Get next range */
+        const SegRange* R = CollConstAt (Ranges, I);
+
+        /* Is this segment range empty? */
+        if (R->Start != R->End) {
+            ++Count;
+        }
+    }
+
+    /* Write the number of ranges with data */
+    ObjWriteVar (Count);
+
+    /* Write the ranges */
+    for (I = 0; I < CollCount (Ranges); ++I) {
+
+        /* Get next range */
+        const SegRange* R = CollConstAt (Ranges, I);
+
+        /* Write data for non empty ranges */
+        if (R->Start != R->End) {
+            ObjWriteVar (R->Seg->Num);
+            ObjWriteVar (R->Start);
+            ObjWriteVar (R->End);
+        }
+    }
+}
+
 
 
 

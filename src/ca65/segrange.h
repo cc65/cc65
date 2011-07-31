@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -92,6 +92,9 @@ void CloseSegRanges (Collection* Ranges);
  * segment.
  */
 
+void WriteSegRanges (const Collection* Ranges);
+/* Write a list of segment ranges to the output file */
+
 
 
 /* End of segrange.h */
@@ -100,4 +103,4 @@ void CloseSegRanges (Collection* Ranges);
 
 
 
-                         
+

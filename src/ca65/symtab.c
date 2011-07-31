@@ -73,6 +73,7 @@
 SymTable*      	    CurrentScope = 0;   /* Pointer to current symbol table */
 SymTable*	    RootScope    = 0;   /* Root symbol table */
 static SymTable*    LastScope    = 0;   /* Pointer to last scope in list */
+static unsigned     ScopeCount   = 0;   /* Number of scopes */
 
 /* Symbol table variables */
 static unsigned     ImportCount = 0;    /* Counter for import symbols */
@@ -127,7 +128,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     }
 
     /* Insert the symbol table into the list of all symbol tables and maintain
-     * a unqiue id for each scope.
+     * a unqiue id for each scope. Count the number of scopes.
      */
     S->Next = LastScope;
     if (RootScope == 0) {
@@ -137,6 +138,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
         S->Id = LastScope->Id + 1;
     }
     LastScope = S;
+    ++ScopeCount;
 
     /* Insert the symbol table into the child tree of the parent */
     if (Parent) {
@@ -161,7 +163,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
                     } else {
                         T->Right = S;
                         break;
-                    }  
+                    }
                 } else {
                     /* Duplicate scope name */
                     Internal ("Duplicate scope name: `%m%p'", Name);
@@ -245,7 +247,7 @@ void SymLeaveLevel (void)
         const SegRange* R = CollAtUnchecked (&CurrentScope->SegRanges, 0);
         unsigned long Size = GetSegRangeSize (R);
         DefSizeOfScope (CurrentScope, Size);
-        if (CurrentScope->OwnerSym) {              
+        if (CurrentScope->OwnerSym) {
             DefSizeOfSymbol (CurrentScope->OwnerSym, Size);
         }
     }
@@ -889,8 +891,56 @@ void WriteScopes (void)
     /* Tell the object file module that we're about to start the scopes */
     ObjStartScopes ();
 
-    /* No debug info requested */
-    ObjWriteVar (0);
+    /* We will write scopes only if debug symbols are requested */
+    if (DbgSyms) {
+
+        /* Get head of list */
+        const SymTable* S = LastScope;
+
+        /* Write the scope count to the file */
+        ObjWriteVar (ScopeCount);
+
+        /* Walk through all scopes and write them to the file */
+        while (S) {
+
+            /* Type must be defined */
+            CHECK (S->Type != ST_UNDEF);
+
+            /* Id of scope */
+            ObjWriteVar (S->Id);
+
+            /* Id of parent scope */
+            if (S->Parent) {
+                ObjWriteVar (S->Parent->Id);
+            } else {
+                ObjWriteVar (0);
+            }
+
+            /* Lexical level */
+            ObjWriteVar (S->Level);
+
+            /* Scope flags (currently always zero) */
+            ObjWriteVar (0);
+
+            /* Type of scope */
+            ObjWriteVar (S->Type);
+
+            /* Name of the scope */
+            ObjWriteVar (S->Name);
+
+            /* Segment ranges for this scope */
+            WriteSegRanges (&S->SegRanges);
+
+            /* Next scope */
+            S = S->Next;
+        }
+
+    } else {
+
+        /* No debug info requested */
+        ObjWriteVar (0);
+
+    }
 
     /* Done writing the scopes */
     ObjEndScopes ();

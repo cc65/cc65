@@ -869,7 +869,7 @@ int main (int argc, char* argv [])
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
-    SymEnterLevel (&GlobalNameSpace, SCOPETYPE_FILE, ADDR_SIZE_DEFAULT, 0);
+    SymEnterLevel (&GlobalNameSpace, SCOPE_FILE, ADDR_SIZE_DEFAULT, 0);
 
     /* Initialize the line infos. Must be done here, since we need line infos
      * for symbol definitions.
@@ -1018,12 +1018,17 @@ int main (int argc, char* argv [])
         SymCheck ();
     }
 
+    /* If we didn't have any errors, close the file scope lexical level */
+    if (ErrorCount == 0) {
+        SymLeaveLevel ();
+    }
+
     /* If we didn't have any errors, check and resolve the segment data */
     if (ErrorCount == 0) {
         SegCheck ();
     }
 
-    /* If we didn't have any errors, check the assertions */
+    /* If we didn't have any errors, check       the assertions */
     if (ErrorCount == 0) {
         CheckAssertions ();
     }

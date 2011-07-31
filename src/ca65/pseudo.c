@@ -817,7 +817,7 @@ static void DoEnd (void)
 static void DoEndProc (void)
 /* Leave a lexical level */
 {
-    if (GetCurrentSymTabType () != SCOPETYPE_PROC) {
+    if (GetCurrentSymTabType () != SCOPE_PROC) {
         /* No local scope */
         ErrorSkip ("No open .PROC");
     } else {
@@ -830,7 +830,7 @@ static void DoEndProc (void)
 static void DoEndScope (void)
 /* Leave a lexical level */
 {
-    if ( GetCurrentSymTabType () != SCOPETYPE_SCOPE) {
+    if ( GetCurrentSymTabType () != SCOPE_SCOPE) {
         /* No local scope */
         ErrorSkip ("No open .SCOPE");
     } else {
@@ -1539,7 +1539,7 @@ static void DoProc (void)
     }
 
     /* Enter a new scope */
-    SymEnterLevel (&Name, SCOPETYPE_PROC, AddrSize, Sym);
+    SymEnterLevel (&Name, SCOPE_PROC, AddrSize, Sym);
 
     /* Free memory for Name */
     SB_Done (&Name);
@@ -1666,7 +1666,7 @@ static void DoScope (void)
     AddrSize = OptionalAddrSize ();
 
     /* Enter the new scope */
-    SymEnterLevel (&Name, SCOPETYPE_SCOPE, AddrSize, 0);
+    SymEnterLevel (&Name, SCOPE_SCOPE, AddrSize, 0);
 
     /* Free memory for Name */
     SB_Done (&Name);
@@ -1760,7 +1760,7 @@ static void DoTag (void)
         ErrorSkip ("Unknown struct");
         return;
     }
-    if (GetSymTabType (Struct) != SCOPETYPE_STRUCT) {
+    if (GetSymTabType (Struct) != SCOPE_STRUCT) {
         ErrorSkip ("Not a struct");
         return;
     }

@@ -111,14 +111,16 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     SymTable* S = xmalloc (sizeof (SymTable) + (Slots-1) * sizeof (SymEntry*));
 
     /* Set variables and clear hash table entries */
+    S->Next         = 0;
     S->Left         = 0;
     S->Right        = 0;
     S->Childs       = 0;
     S->OwnerSym     = 0;
     S->SegRanges    = AUTO_COLLECTION_INITIALIZER;
+    S->Id           = ScopeCount++;
     S->Flags        = ST_NONE;
     S->AddrSize     = ADDR_SIZE_DEFAULT;
-    S->Type         = SCOPETYPE_UNDEF;
+    S->Type         = SCOPE_UNDEF;
     S->Level        = Level;
     S->TableSlots   = Slots;
     S->TableEntries = 0;
@@ -128,18 +130,13 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
        	S->Table[Slots] = 0;
     }
 
-    /* Insert the symbol table into the list of all symbol tables and maintain
-     * a unqiue id for each scope. Count the number of scopes.
-     */
-    S->Next = LastScope;
+    /* Insert the symbol table into the list of all symbol tables */
     if (RootScope == 0) {
-        S->Id = 0;
         RootScope = S;
     } else {
-        S->Id = LastScope->Id + 1;
+        LastScope->Next = S;
     }
     LastScope = S;
-    ++ScopeCount;
 
     /* Insert the symbol table into the child tree of the parent */
     if (Parent) {
@@ -224,7 +221,7 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
      * does not allocate memory for useless data (unhandled types here don't
      * occupy space in any segment).
      */
-    if (CurrentScope->Type <= SCOPETYPE_HAS_DATA) {
+    if (CurrentScope->Type <= SCOPE_HAS_DATA) {
         AddSegRanges (&CurrentScope->SegRanges);
     }
 }
@@ -905,7 +902,7 @@ void WriteScopes (void)
     if (DbgSyms) {
 
         /* Get head of list */
-        const SymTable* S = LastScope;
+        SymTable* S = RootScope;
 
         /* Write the scope count to the file */
         ObjWriteVar (ScopeCount);
@@ -913,11 +910,20 @@ void WriteScopes (void)
         /* Walk through all scopes and write them to the file */
         while (S) {
 
-            /* Type must be defined */
-            CHECK (S->Type != SCOPETYPE_UNDEF);
+            /* Flags for this scope */
+            unsigned Flags = 0;
 
-            /* Id of scope */
-            ObjWriteVar (S->Id);
+            /* Check if this scope has a size. If so, remember it in the
+             * flags.
+             */
+            long Size;
+            SymEntry* SizeSym = FindSizeOfScope (S);
+            if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
+                Flags |= SCOPE_SIZE;
+            }
+
+            /* Scope must be defined */
+            CHECK (S->Type != SCOPE_UNDEF);
 
             /* Id of parent scope */
             if (S->Parent) {
@@ -929,14 +935,19 @@ void WriteScopes (void)
             /* Lexical level */
             ObjWriteVar (S->Level);
 
-            /* Scope flags (currently always zero) */
-            ObjWriteVar (0);
+            /* Scope flags */
+            ObjWriteVar (Flags);
 
             /* Type of scope */
             ObjWriteVar (S->Type);
 
             /* Name of the scope */
             ObjWriteVar (S->Name);
+
+            /* If the scope has a size, write it to the file */
+            if (SCOPE_HAS_SIZE (Flags)) {
+                ObjWriteVar (Size);
+            }
 
             /* Segment ranges for this scope */
             WriteSegRanges (&S->SegRanges);

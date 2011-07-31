@@ -238,13 +238,13 @@ static const char* GetScopeType (unsigned Type)
 /* Return the name of a scope type */
 {
     switch (Type) {
-        case SCOPETYPE_GLOBAL:  return "Global scope";
-        case SCOPETYPE_FILE:    return "File scope";
-        case SCOPETYPE_PROC:    return ".PROC";
-        case SCOPETYPE_SCOPE:   return ".SCOPE";
-        case SCOPETYPE_STRUCT:  return ".STRUCT";
-        case SCOPETYPE_ENUM:    return ".ENUM";
-        case SCOPETYPE_UNDEF:   return "Undefined";
+        case SCOPE_GLOBAL:      return "Global scope";
+        case SCOPE_FILE:        return "File scope";
+        case SCOPE_PROC:        return ".PROC";
+        case SCOPE_SCOPE:       return ".SCOPE";
+        case SCOPE_STRUCT:      return ".STRUCT";
+        case SCOPE_ENUM:        return ".ENUM";
+        case SCOPE_UNDEF:       return "Undefined";
         default:                return "Unknown scope type";
     }
 }
@@ -709,7 +709,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
 	}
        	if (SYM_HAS_SIZE (Type)) {
-	    printf ("      Size:%16s0x%04lX  (%lu)\n", "", Size, Size);
+	    printf ("      Size:%20s0x%04lX  (%lu)\n", "", Size, Size);
 	}
     }
 
@@ -821,20 +821,31 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
         unsigned        SegCount;
         unsigned        J;
 
+        /* Read the data */
+        unsigned        ParentId = ReadVar (F);
+        unsigned        LexicalLevel = ReadVar (F);
+        unsigned        Flags = ReadVar (F);
+        const char*     ScopeType = GetScopeType (ReadVar (F));
+
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
 
        	/* Print the data */
-        printf ("      Id:%28lu\n",             ReadVar (F));
-        printf ("      Parent id:%21lu\n",      ReadVar (F));
-        printf ("      Lexical level:%17lu\n",  ReadVar (F));
-        printf ("      Flags:%25lu\n",          ReadVar (F));
-        printf ("      Type:%26s\n",            GetScopeType (ReadVar (F)));
+        printf ("      Parent id:%21u\n",       ParentId);
+        printf ("      Lexical level:%17u\n",   LexicalLevel);
+       	printf ("      Flags:%21s0x%02X\n",     "", Flags);
+        printf ("      Type:%26s\n",            ScopeType);
 
         /* Resolve and print the name */
        	Name = GetString (&StrPool, ReadVar (F));
 	Len  = strlen (Name);
 	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
+
+        /* Size */
+       	if (SCOPE_HAS_SIZE (Flags)) {
+            unsigned long Size = ReadVar (F);
+	    printf ("      Size:%20s0x%04lX  (%lu)\n", "", Size, Size);
+	}
 
         /* Segment ranges */
         SegCount = ReadVar (F);

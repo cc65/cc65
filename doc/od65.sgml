@@ -73,7 +73,7 @@ Here is a description of all the command line options:
 
   <tag><tt>--dump-all</tt></tag>
 
-  This will output all information, od65 is able to process. The option is a 
+  This will output all information, od65 is able to process. The option is a
   shortcut for specifying all the other <tt/--dump/ options.
 
 
@@ -102,9 +102,19 @@ Here is a description of all the command line options:
   Dump the list of imported symbols contained in the object file.
 
 
+  <tag><tt>--dump-lineinfo</tt></tag>
+
+  Dump the line info contained in the object file.
+
+
   <tag><tt>--dump-segments</tt></tag>
 
   Dump the list of segments contained in the object file.
+
+
+  <tag><tt>--dump-scopes</tt></tag>
+
+  Dump the scope (lexical level) information contained in the object file. 
 
 
   <tag><tt>-S, --dump-segsize</tt></tag>

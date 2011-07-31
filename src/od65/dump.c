@@ -240,8 +240,7 @@ static const char* GetScopeType (unsigned Type)
     switch (Type) {
         case SCOPE_GLOBAL:      return "Global scope";
         case SCOPE_FILE:        return "File scope";
-        case SCOPE_PROC:        return ".PROC";
-        case SCOPE_SCOPE:       return ".SCOPE";
+        case SCOPE_SCOPE:       return ".SCOPE or .PROC";
         case SCOPE_STRUCT:      return ".STRUCT";
         case SCOPE_ENUM:        return ".ENUM";
         case SCOPE_UNDEF:       return "Undefined";

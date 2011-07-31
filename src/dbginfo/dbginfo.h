@@ -123,7 +123,7 @@ struct cc65_lineinfo {
 /* Source file information */
 typedef struct cc65_sourcedata cc65_sourcedata;
 struct cc65_sourcedata {
-    unsigned            id;             /* The internal file id */
+    unsigned            source_id;      /* The internal file id */
     const char*         source_name;    /* Name of the file */
     unsigned long       source_size;    /* Size of file */
     unsigned long       source_mtime;   /* Modification time */
@@ -144,7 +144,7 @@ struct cc65_sourceinfo {
  */
 typedef struct cc65_segmentdata cc65_segmentdata;
 struct cc65_segmentdata {
-    unsigned            id;             /* The internal segment id */
+    unsigned            segment_id;     /* The internal segment id */
     const char*         segment_name;   /* Name of the segment */
     cc65_addr           segment_start;  /* Start address of segment */
     cc65_addr           segment_size;   /* Size of segment */
@@ -161,25 +161,51 @@ struct cc65_segmentinfo {
 /* Symbol information */
 typedef enum {
     CC65_SYM_EQUATE,
-    CC65_SYM_LABEL                      /* Some sort of address */
+    CC65_SYM_LABEL,                     /* Some sort of address */
 } cc65_symbol_type;
 
 typedef struct cc65_symboldata cc65_symboldata;
 struct cc65_symboldata {
+    unsigned            symbol_id;      /* Id of symbol */
     const char*         symbol_name;    /* Name of symbol */
     cc65_symbol_type    symbol_type;    /* Type of symbol */
     cc65_size           symbol_size;    /* Size of symbol, 0 if unknown */
     long                symbol_value;   /* Value of symbol */
     unsigned            symbol_segment; /* If the symbol is segment relative,
                                          * this contains the id of segment,
-                                         * otherwise CC65_INV_ID 
+                                         * otherwise CC65_INV_ID
                                          */
+    unsigned            scope_id;       /* The scope this symbol is in */
 };
 
 typedef struct cc65_symbolinfo cc65_symbolinfo;
 struct cc65_symbolinfo {
     unsigned            count;          /* Number of data sets that follow */
     cc65_symboldata     data[1];        /* Data sets, number is dynamic */
+};
+
+/* Scope information */
+typedef enum {
+    CC65_SCOPE_GLOBAL,                  /* Global scope */
+    CC65_SCOPE_MODULE,                  /* Module scope */
+    CC65_SCOPE_SCOPE,                   /* .PROC/.SCOPE */
+    CC65_SCOPE_STRUCT,                  /* .STRUCT */
+    CC65_SCOPE_ENUM,                    /* .ENUM */
+} cc65_scope_type;
+
+typedef struct cc65_scopedata cc65_scopedata;
+struct cc65_scopedata {
+    unsigned            scope_id;       /* Id of scope */
+    const char*         scope_name;     /* Name of scope */
+    cc65_scope_type     scope_type;     /* Type of scope */
+    cc65_size           scope_size;     /* Size of scope, 0 if unknown */
+    unsigned            scope_parent;   /* Id of parent scope */
+};
+
+typedef struct cc65_scopeinfo cc65_scopeinfo;
+struct cc65_scopeinfo {
+    unsigned            count;          /* Number of data sets that follow */
+    cc65_scopedata      data[1];        /* Data sets, number is dynamic */
 };
 
 
@@ -272,6 +298,11 @@ void cc65_free_segmentinfo (cc65_dbginfo handle, cc65_segmentinfo* info);
 
 
 
+cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo handle, unsigned id);
+/* Return the symbol with a given id. The function returns NULL if no symbol
+ * with this id was found.
+ */
+
 cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo handle, const char* name);
 /* Return a list of symbols with a given name. The function returns NULL if
  * no symbol with this name was found.
@@ -286,6 +317,22 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
 
 void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info);
 /* Free a symbol info record */
+
+
+
+/*****************************************************************************/
+/*                                  Scopes                                   */
+/*****************************************************************************/
+
+
+
+cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo handle, unsigned id);
+/* Return the scope with a given id. The function returns NULL if no scope
+ * with this id was found.
+ */
+
+void cc65_free_scopeinfo (cc65_dbginfo Handle, cc65_scopeinfo* Info);
+/* Free a scope info record */
 
 
 

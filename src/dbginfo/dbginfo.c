@@ -57,7 +57,7 @@
 
 /* Version numbers of the debug format we understand */
 #define VER_MAJOR       1U
-#define VER_MINOR       2U
+#define VER_MINOR       3U
 
 /* Dynamic strings */
 typedef struct StrBuf StrBuf;
@@ -108,8 +108,10 @@ struct DbgInfo {
     Collection          FileInfoById;   /* File infos sorted by id */
     Collection          LineInfos;      /* List of all line infos */
     LineInfoList        LineInfoByAddr; /* Line infos sorted by unique address */
+    Collection          SymInfoById;    /* Symbol infos sorted by id */
     Collection          SymInfoByName;  /* Symbol infos sorted by name */
     Collection          SymInfoByVal;   /* Symbol infos sorted by value */
+    Collection          ScopeInfoById;  /* Scope infos sorted by id */
 };
 
 /* Input tokens */
@@ -143,9 +145,11 @@ typedef enum {
     TOK_NAME,                           /* NAME keyword */
     TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
     TOK_OUTPUTOFFS,                     /* OUTPUTOFFS keyword */
+    TOK_PARENT,                         /* PARENT keyword */
     TOK_RANGE,                          /* RANGE keyword */
     TOK_RO,                             /* RO keyword */
     TOK_RW,                             /* RW keyword */
+    TOK_SCOPE,                          /* SCOPE keyword */
     TOK_SEGMENT,                        /* SEGMENT keyword */
     TOK_SIZE,                           /* SIZE keyword */
     TOK_START,                          /* START keyword */
@@ -221,11 +225,28 @@ struct LineInfo {
 /* Internally used symbol info struct */
 typedef struct SymInfo SymInfo;
 struct SymInfo {
+    unsigned            Id;             /* Id of symbol */
     cc65_symbol_type    Type;           /* Type of symbol */
     long                Value;          /* Value of symbol */
     cc65_size           Size;           /* Size of symbol */
     unsigned            Segment;        /* Id of segment if any */
+    unsigned            Scope;          /* Id of symbol scope */
+    unsigned            Parent;         /* Parent symbol if any */
     char                SymName[1];     /* Name of symbol */
+};
+
+/* Internally used scope info struct */
+typedef struct ScopeInfo ScopeInfo;
+struct ScopeInfo {
+    unsigned            Id;             /* Id of scope */
+    cc65_scope_type     Type;           /* Type of scope */
+    cc65_size           Size;           /* Size of scope */
+    unsigned            Flags;          /* Scope flags */
+    union {
+        unsigned        Id;             /* Id of parent scope */
+        ScopeInfo*      Scope;          /* Pointer to parent scope */
+    } Parent;
+    char                ScopeName[1];   /* Name of scope */
 };
 
 
@@ -337,6 +358,19 @@ static cc65_symbolinfo* new_cc65_symbolinfo (unsigned Count)
 {
     cc65_symbolinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                   Count * sizeof (S->data[0]));
+    S->count = Count;
+    return S;
+}
+
+
+
+static cc65_scopeinfo* new_cc65_scopeinfo (unsigned Count)
+/* Allocate and return a cc65_scopeinfo struct that is able to hold Count
+ * entries. Initialize the count field of the returned struct.
+ */
+{
+    cc65_scopeinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
+                                 Count * sizeof (S->data[0]));
     S->count = Count;
     return S;
 }
@@ -1039,19 +1073,13 @@ static int CompareFileInfoById (const void* L, const void* R)
 
 
 
-static SymInfo* NewSymInfo (const StrBuf* Name, long Val,
-                            cc65_symbol_type Type, cc65_size Size,
-                            unsigned Segment)
+static SymInfo* NewSymInfo (const StrBuf* Name)
 /* Create a new SymInfo struct, intialize and return it */
 {
     /* Allocate memory */
     SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
 
-    /* Initialize it */
-    S->Type    = Type;
-    S->Value   = Val;
-    S->Size    = Size;
-    S->Segment = Segment;
+    /* Initialize the name */
     memcpy (S->SymName, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1064,6 +1092,21 @@ static void FreeSymInfo (SymInfo* S)
 /* Free a SymInfo struct */
 {
     xfree (S);
+}
+
+
+
+static int CompareSymInfoById (const void* L, const void* R)
+/* Helper function to sort symbol infos in a collection by id */
+{
+    /* Sort by symbol id. */
+    if (((const SymInfo*) L)->Id > ((const SymInfo*) R)->Id) {
+        return 1;
+    } else if (((const SymInfo*) L)->Id < ((const SymInfo*) R)->Id ) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 
@@ -1287,6 +1330,60 @@ static void DoneLineInfoList (LineInfoList* L)
 
 
 /*****************************************************************************/
+/*                                Scope info                                 */
+/*****************************************************************************/
+
+
+
+static ScopeInfo* NewScopeInfo (const StrBuf* Name)
+/* Create a new ScopeInfo struct, intialize and return it */
+{
+    /* Allocate memory */
+    ScopeInfo* S = xmalloc (sizeof (ScopeInfo) + SB_GetLen (Name));
+
+    /* Initialize the name */
+    memcpy (S->ScopeName, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
+
+    /* Return it */
+    return S;
+}
+
+
+
+static void FreeScopeInfo (ScopeInfo* S)
+/* Free a ScopeInfo struct */
+{
+    xfree (S);
+}
+
+
+
+static int CompareScopeInfoById (const void* L, const void* R)
+/* Helper function to sort scope infos in a collection by id */
+{
+    /* Sort by symbol id. */
+    if (((const ScopeInfo*) L)->Id > ((const ScopeInfo*) R)->Id) {
+        return 1;
+    } else if (((const ScopeInfo*) L)->Id < ((const ScopeInfo*) R)->Id ) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+
+
+static int CompareScopeInfoByName (const void* L, const void* R)
+/* Helper function to sort scope infos in a collection by name */
+{
+    /* Sort by symbol name */
+    return strcmp (((const ScopeInfo*) L)->ScopeName,
+                   ((const ScopeInfo*) R)->ScopeName);
+}
+
+
+
+/*****************************************************************************/
 /*                                Debug info                                 */
 /*****************************************************************************/
 
@@ -1305,8 +1402,10 @@ static DbgInfo* NewDbgInfo (void)
     InitCollection (&Info->FileInfoById);
     InitCollection (&Info->LineInfos);
     InitLineInfoList (&Info->LineInfoByAddr);
+    InitCollection (&Info->SymInfoById);
     InitCollection (&Info->SymInfoByName);
     InitCollection (&Info->SymInfoByVal);
+    InitCollection (&Info->ScopeInfoById);
 
     /* Return it */
     return Info;
@@ -1344,8 +1443,15 @@ static void FreeDbgInfo (DbgInfo* Info)
     for (I = 0; I < CollCount (&Info->SymInfoByName); ++I) {
         FreeSymInfo (CollAt (&Info->SymInfoByName, I));
     }
+    DoneCollection (&Info->SymInfoById);
     DoneCollection (&Info->SymInfoByName);
     DoneCollection (&Info->SymInfoByVal);
+
+    /* Free scope info */
+    for (I = 0; I < CollCount (&Info->ScopeInfoById); ++I) {
+        FreeScopeInfo (CollAt (&Info->ScopeInfoById, I));
+    }
+    DoneCollection (&Info->ScopeInfoById);
 
     /* Free the structure itself */
     xfree (Info);
@@ -1384,7 +1490,7 @@ static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
 static void CopyFileInfo (cc65_sourcedata* D, const FileInfo* F)
 /* Copy data from a FileInfo struct to a cc65_sourcedata struct */
 {
-    D->id           = F->Id;
+    D->source_id    = F->Id;
     D->source_name  = F->FileName;
     D->source_size  = F->Size;
     D->source_mtime = F->MTime;
@@ -1395,7 +1501,7 @@ static void CopyFileInfo (cc65_sourcedata* D, const FileInfo* F)
 static void CopySegInfo (cc65_segmentdata* D, const SegInfo* S)
 /* Copy data from a SegInfo struct to a cc65_segmentdata struct */
 {
-    D->id            = S->Id;
+    D->segment_id    = S->Id;
     D->segment_name  = S->SegName;
     D->segment_start = S->Start;
     D->segment_size  = S->Size;
@@ -1408,11 +1514,25 @@ static void CopySegInfo (cc65_segmentdata* D, const SegInfo* S)
 static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
 /* Copy data from a SymInfo struct to a cc65_symboldata struct */
 {
+    D->symbol_id      = S->Id;
     D->symbol_name    = S->SymName;
     D->symbol_type    = S->Type;
     D->symbol_size    = S->Size;
     D->symbol_value   = S->Value;
     D->symbol_segment = S->Segment;
+    D->scope_id       = S->Scope;
+}
+
+
+
+static void CopyScopeInfo (cc65_scopedata* D, const ScopeInfo* S)
+/* Copy data from a ScopeInfo struct to a cc65_scopedata struct */
+{
+    D->scope_id       = S->Id;
+    D->scope_name     = S->ScopeName;
+    D->scope_type     = S->Type;
+    D->scope_size     = S->Size;
+    D->scope_parent   = S->Parent.Scope->Id;
 }
 
 
@@ -1562,9 +1682,11 @@ static void NextToken (InputData* D)
         { "name",       TOK_NAME        },
         { "outputname", TOK_OUTPUTNAME  },
         { "outputoffs", TOK_OUTPUTOFFS  },
+        { "parent",     TOK_PARENT      },
         { "range",      TOK_RANGE       },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
+        { "scope",      TOK_SCOPE       },
         { "seg",        TOK_SEGMENT     },
         { "segment",    TOK_SEGMENT     },
         { "size",       TOK_SIZE        },
@@ -2055,6 +2177,163 @@ ErrorExit:
 
 
 
+static void ParseScope (InputData* D)
+/* Parse a SCOPE line */
+{
+    /* Most of the following variables are initialized with a value that is
+     * overwritten later. This is just to avoid compiler warnings.
+     */
+    unsigned            Id = CC65_INV_ID;
+    cc65_scope_type     Type = CC65_SCOPE_MODULE;
+    cc65_size           Size = 0;
+    StrBuf              Name = STRBUF_INITIALIZER;
+    unsigned            Parent = CC65_INV_ID;
+    ScopeInfo*          S;
+    enum {
+        ibNone          = 0x000,
+
+        ibId            = 0x001,
+        ibName          = 0x002,
+        ibParent        = 0x004,
+        ibSize          = 0x008,
+        ibType          = 0x010,
+
+        ibRequired      = ibId | ibName | ibParent | ibType,
+    } InfoBits = ibNone;
+
+    /* Skip the SCOPE token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_ID            && D->Tok != TOK_NAME           &&
+            D->Tok != TOK_PARENT        && D->Tok != TOK_SIZE           &&
+            D->Tok != TOK_TYPE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                InfoBits |= ibId;
+                NextToken (D);
+                break;
+
+            case TOK_NAME:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&Name, &D->SVal);
+                SB_Terminate (&Name);
+                InfoBits |= ibName;
+                NextToken (D);
+                break;
+
+            case TOK_PARENT:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Size = D->IVal;
+                NextToken (D);
+                InfoBits |= ibParent;
+                break;
+
+            case TOK_SIZE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Size = (cc65_size) D->IVal;
+                InfoBits |= ibSize;
+                NextToken (D);
+                break;
+
+            case TOK_TYPE:
+                switch (D->Tok) {
+                    case TOK_EQUATE:
+                        Type = CC65_SYM_EQUATE;
+                        break;
+                    case TOK_LABEL:
+                        Type = CC65_SYM_LABEL;
+                        break;
+                    default:
+                        ParseError (D, CC65_ERROR,
+                                    "Unknown value for attribute \"type\"");
+                        SkipLine (D);
+                        goto ErrorExit;
+                }
+                NextToken (D);
+                InfoBits |= ibType;
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required and/or matched information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+
+    /* Create the scope info */
+    S = NewScopeInfo (&Name);
+    S->Id        = Id;
+    S->Type      = Type;
+    S->Size      = Size;
+    S->Parent.Id = Parent;
+
+    /* ... and remember it */
+    CollAppend (&D->Info->ScopeInfoById, S);
+
+ErrorExit:
+    /* Entry point in case of errors */
+    SB_Done (&Name);
+    return;
+}
+
+
+
 static void ParseSegment (InputData* D)
 /* Parse a SEGMENT line */
 {
@@ -2066,15 +2345,17 @@ static void ParseSegment (InputData* D)
     unsigned long   OutputOffs = 0;
     SegInfo*        S;
     enum {
-        ibNone      = 0x00,
-        ibId        = 0x01,
-        ibSegName   = 0x02,
-        ibStart     = 0x04,
-        ibSize      = 0x08,
-        ibAddrSize  = 0x10,
-        ibType      = 0x20,
-        ibOutputName= 0x40,
-        ibOutputOffs= 0x80,
+        ibNone      = 0x000,
+
+        ibAddrSize  = 0x001,
+        ibId        = 0x002,
+        ibOutputName= 0x004,
+        ibOutputOffs= 0x008,
+        ibSegName   = 0x010,
+        ibSize      = 0x020,
+        ibStart     = 0x040,
+        ibType      = 0x080,
+
         ibRequired  = ibId | ibSegName | ibStart | ibSize | ibAddrSize | ibType,
     } InfoBits = ibNone;
 
@@ -2230,26 +2511,37 @@ ErrorExit:
 
 static void ParseSym (InputData* D)
 /* Parse a SYM line */
-{                                                                 
+{
     /* Most of the following variables are initialized with a value that is
      * overwritten later. This is just to avoid compiler warnings.
      */
+    unsigned            File = CC65_INV_ID;
+    unsigned            Id = CC65_INV_ID;
+    StrBuf              Name = STRBUF_INITIALIZER;
+    unsigned            Parent = CC65_INV_ID;
+    unsigned            Scope = CC65_INV_ID;
+    unsigned            Segment = CC65_INV_ID;
+    cc65_size           Size = 0;
     cc65_symbol_type    Type = CC65_SYM_EQUATE;
     long                Value = 0;
-    cc65_size           Size = 0;
-    StrBuf              SymName = STRBUF_INITIALIZER;
-    unsigned            Segment = CC65_INV_ID;
+
     SymInfo*            S;
     enum {
-        ibNone          = 0x00,
-        ibSymName       = 0x01,
-        ibValue         = 0x02,
-        ibAddrSize      = 0x04,
-        ibType          = 0x08,
-        ibSize          = 0x10,
-        ibSegment       = 0x20,
-        ibFile          = 0x40,
-        ibRequired      = ibSymName | ibValue | ibAddrSize | ibType,
+        ibNone          = 0x000,
+
+        ibAddrSize      = 0x001,
+        ibFile          = 0x002,
+        ibId            = 0x004,
+        ibParent        = 0x008,
+        ibScope         = 0x010,
+        ibSegment       = 0x020,
+        ibSize          = 0x040,
+        ibName          = 0x080,
+        ibType          = 0x100,
+        ibValue         = 0x200,
+
+        ibRequired      = ibAddrSize | ibId | ibScope | ibName |
+                          ibType | ibValue,
     } InfoBits = ibNone;
 
     /* Skip the SYM token */
@@ -2262,9 +2554,10 @@ static void ParseSym (InputData* D)
 
         /* Something we know? */
         if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_FILE   &&
-            D->Tok != TOK_NAME          && D->Tok != TOK_SEGMENT&&
-            D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE   &&
-            D->Tok != TOK_VALUE) {
+            D->Tok != TOK_ID            && D->Tok != TOK_NAME   &&
+            D->Tok != TOK_PARENT        && D->Tok != TOK_SCOPE  &&
+            D->Tok != TOK_SEGMENT       && D->Tok != TOK_SIZE   &&
+            D->Tok != TOK_TYPE          && D->Tok != TOK_VALUE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2295,19 +2588,46 @@ static void ParseSym (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                /* ### Drop value for now */
+                File = D->IVal;
                 InfoBits |= ibFile;
                 NextToken (D);
+                break;
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                NextToken (D);
+                InfoBits |= ibId;
                 break;
 
             case TOK_NAME:
                 if (!StrConstFollows (D)) {
                     goto ErrorExit;
                 }
-                SB_Copy (&SymName, &D->SVal);
-                SB_Terminate (&SymName);
-                InfoBits |= ibSymName;
+                SB_Copy (&Name, &D->SVal);
+                SB_Terminate (&Name);
+                InfoBits |= ibName;
                 NextToken (D);
+                break;
+
+            case TOK_PARENT:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Parent = D->IVal;
+                NextToken (D);
+                InfoBits |= ibParent;
+                break;
+
+            case TOK_SCOPE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Scope = D->IVal;
+                NextToken (D);
+                InfoBits |= ibScope;
                 break;
 
             case TOK_SEGMENT:
@@ -2382,14 +2702,24 @@ static void ParseSym (InputData* D)
         goto ErrorExit;
     }
 
-    /* Create the symbol info and remember it */
-    S = NewSymInfo (&SymName, Value, Type, Size, Segment);
+    /* Create the symbol info */
+    S = NewSymInfo (&Name);
+    S->Id      = Id;
+    S->Type    = Type;
+    S->Value   = Value;
+    S->Size    = Size;
+    S->Segment = Segment;
+    S->Scope   = Scope;
+    S->Parent  = Parent;
+
+    /* Remember it */
+    CollAppend (&D->Info->SymInfoById, S);
     CollAppend (&D->Info->SymInfoByName, S);
     CollAppend (&D->Info->SymInfoByVal, S);
 
 ErrorExit:
     /* Entry point in case of errors */
-    SB_Done (&SymName);
+    SB_Done (&Name);
     return;
 }
 
@@ -2821,12 +3151,52 @@ static void ProcessSymInfo (InputData* D)
 /* Postprocess symbol infos */
 {
     /* Get pointers to the symbol info collections */
+    Collection* SymInfoById   = &D->Info->SymInfoById;
     Collection* SymInfoByName = &D->Info->SymInfoByName;
     Collection* SymInfoByVal  = &D->Info->SymInfoByVal;
 
     /* Sort the symbol infos */
+    CollSort (SymInfoById,   CompareSymInfoById);
     CollSort (SymInfoByName, CompareSymInfoByName);
     CollSort (SymInfoByVal,  CompareSymInfoByVal);
+}
+
+
+
+static int FindSymInfoById (Collection* SymInfos, unsigned Id, unsigned* Index)
+/* Find the SymInfo for a given id. The function returns true if the id
+ * was found. In this case, Index contains the index of the first item that
+ * matches. If the item wasn't found, the function returns false and Index
+ * contains the insert position for the given id.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (SymInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        SymInfo* CurItem = CollAt (SymInfos, Cur);
+
+        /* Found? */
+        if (Id > CurItem->Id) {
+            Lo = Cur + 1;
+        } else if (Id < CurItem->Id) {
+            Hi = Cur - 1;
+        } else {
+            Found = 1;
+            Lo = Cur;
+            break;
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
 }
 
 
@@ -2904,6 +3274,70 @@ static int FindSymInfoByValue (Collection* SymInfos, long Value, unsigned* Index
             if (Value == CurItem->Value) {
                 Found = 1;
             }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
+}
+
+
+
+static void ProcessScopeInfo (InputData* D)
+/* Postprocess scope infos */
+{
+    unsigned I;
+
+    /* Get pointers to the scope info collections */
+    Collection* ScopeInfoById = &D->Info->ScopeInfoById;
+
+    /* Sort the scope infos */
+    CollSort (ScopeInfoById, CompareScopeInfoById);
+
+    /* Walk over all scope infos and replace the parent scope id by a pointer
+     * to the parent scope.
+     */
+    for (I = 0; I < CollCount (ScopeInfoById); ++I) {
+
+        /* Get this scope info */
+        ScopeInfo* S = CollAt (ScopeInfoById, I);
+
+        /* Replace the parent id by a pointer */
+        S->Parent.Scope = CollAt (ScopeInfoById, S->Parent.Id);
+    }
+}
+
+
+
+static int FindScopeInfoById (Collection* ScopeInfos, unsigned Id, unsigned* Index)
+/* Find the ScopeInfo for a given id. The function returns true if the id
+ * was found. In this case, Index contains the index of the first item that
+ * matches. If the item wasn't found, the function returns false and Index
+ * contains the insert position for the given id.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (ScopeInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        SymInfo* CurItem = CollAt (ScopeInfos, Cur);
+
+        /* Found? */
+        if (Id > CurItem->Id) {
+            Lo = Cur + 1;
+        } else if (Id < CurItem->Id) {
+            Hi = Cur - 1;
+        } else {
+            Found = 1;
+            Lo = Cur;
+            break;
         }
     }
 
@@ -3018,6 +3452,10 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
                 ParseLine (&D);
                 break;
 
+            case TOK_SCOPE:
+                ParseScope (&D);
+                break;
+
             case TOK_SEGMENT:
                 ParseSegment (&D);
                 break;
@@ -3074,6 +3512,7 @@ CloseAndExit:
     ProcessFileInfo (&D);
     ProcessLineInfo (&D);
     ProcessSymInfo (&D);
+    ProcessScopeInfo (&D);
 
 #if DEBUG
     /* Debug output */
@@ -3424,6 +3863,43 @@ void cc65_free_segmentinfo (cc65_dbginfo Handle, cc65_segmentinfo* Info)
 
 
 
+cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return the symbol with a given id. The function returns NULL if no symbol
+ * with this id was found.
+ */
+{
+    DbgInfo*            Info;
+    Collection*         SymInfoById;
+    cc65_symbolinfo*    D;
+    unsigned            Index;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Get a pointer to the symbol list */
+    SymInfoById = &Info->SymInfoById;
+
+    /* Search for the symbol */
+    if (!FindSymInfoById (SymInfoById, Id, &Index)) {
+        /* Not found */
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_symbolinfo (1);
+
+    /* Fill in the data */
+    CopySymInfo (D->data, CollAt (SymInfoById, Index));
+
+    /* Return the result */
+    return D;
+}
+
+
+
 cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
 /* Return a list of symbols with a given name. The function returns NULL if
  * no symbol with this name was found.
@@ -3467,7 +3943,6 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
     D = new_cc65_symbolinfo (Count);
 
     /* Fill in the data */
-    D->count = Count;
     for (I = 0; I < Count; ++I) {
         /* Copy the data */
         CopySymInfo (D->data + I, CollAt (SymInfoByName, Index++));
@@ -3541,7 +4016,6 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65
     D = new_cc65_symbolinfo (CollCount (&SymInfoList));
 
     /* Fill in the data */
-    D->count = CollCount (&SymInfoList);
     for (I = 0; I < CollCount (&SymInfoList); ++I) {
         /* Copy the data */
         CopySymInfo (D->data + I, CollAt (&SymInfoList, I));
@@ -3558,6 +4032,61 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65
 
 void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info)
 /* Free a symbol info record */
+{
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
+
+    /* Free the memory */
+    xfree (Info);
+}
+
+
+
+/*****************************************************************************/
+/*                                  Scopes                                   */
+/*****************************************************************************/
+
+
+
+cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return the scope with a given id. The function returns NULL if no scope
+ * with this id was found.
+ */
+{
+    DbgInfo*            Info;
+    Collection*         ScopeInfoById;
+    cc65_scopeinfo*     D;
+    unsigned            Index;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Get a pointer to the scope list */
+    ScopeInfoById = &Info->ScopeInfoById;
+
+    /* Search for the scope */
+    if (!FindScopeInfoById (ScopeInfoById, Id, &Index)) {
+        /* Not found */
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (1);
+
+    /* Fill in the data */
+    CopyScopeInfo (D->data, CollAt (ScopeInfoById, Index));
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void cc65_free_scopeinfo (cc65_dbginfo Handle, cc65_scopeinfo* Info)
+/* Free a scope info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -71,6 +71,9 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset);
 
 void DumpObjLineInfo (FILE* F, unsigned long Offset);
 /* Dump the line infos from an object file */
+
+void DumpObjScopes (FILE* F, unsigned long Offset);
+/* Dump the scopes from an object file */
 
 void DumpObjSegSize (FILE* F, unsigned long Offset);
 /* Dump the sizes of the segment in the object file */

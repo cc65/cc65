@@ -285,6 +285,12 @@ void DumpObjHeader (FILE* F, unsigned long Offset)
 
     /* String pool */
     DumpObjHeaderSection ("String pool", H.StrPoolOffs, H.StrPoolSize);
+
+    /* Assertions */
+    DumpObjHeaderSection ("Assertions", H.AssertOffs, H.AssertSize);
+
+    /* Scopes */
+    DumpObjHeaderSection ("Scopes", H.ScopeOffs, H.ScopeSize);
 }
 
 
@@ -746,6 +752,81 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
        	printf ("      Line:%26lu\n", Pos.Line);
        	printf ("      Col:%27u\n", Pos.Col);
        	printf ("      Name:%26u\n", Pos.Name);
+    }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
+}
+
+
+
+void DumpObjScopes (FILE* F, unsigned long Offset)
+/* Dump the scopes from an object file */
+{
+    ObjHeader   H;
+    Collection  StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned    Count;
+    unsigned    I;
+
+    /* Seek to the header position and read the header */
+    FileSetPos (F, Offset);
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSetPos (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
+
+    /* Seek to the start of scopes */
+    FileSetPos (F, Offset + H.ScopeOffs);
+
+    /* Output a header */
+    printf ("  Scopes:\n");
+
+    /* Check if the object file was compiled with debug info */
+    if ((H.Flags & OBJ_FLAGS_DBGINFO) == 0) {
+	/* Print that there no scopes and bail out */
+	printf ("    Count:%27u\n", 0);
+	return;
+    }
+
+    /* Read the number of scopes and print it */
+    Count = ReadVar (F);
+    printf ("    Count:%27u\n", Count);
+
+    /* Read and print all scopes */
+    for (I = 0; I < Count; ++I) {
+
+        const char*     Name;
+        unsigned        Len;
+        unsigned        SegCount;
+        unsigned        J;
+
+	/* Print the header */
+	printf ("    Index:%27u\n", I);
+
+	/* Print the data */
+        printf ("      Id:%28lu\n",             ReadVar (F));
+        printf ("      Parent id:%21lu\n",      ReadVar (F));
+        printf ("      Lexical level:%17lu\n",  ReadVar (F));
+        printf ("      Flags:%25lu\n",          ReadVar (F));
+        printf ("      Type:%26lu\n",           ReadVar (F));
+
+        /* Resolve and print the name */
+       	Name = GetString (&StrPool, ReadVar (F));
+	Len  = strlen (Name);
+	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
+
+        /* Segment ranges */
+        SegCount = ReadVar (F);
+        printf ("      Segment ranges:\n");
+        printf ("        Count:%23u\n", SegCount);
+
+        for (J = 0; J < SegCount; ++J) {
+            printf ("        Index:%23u\n", J);
+            printf ("          Segment:%19lu\n", ReadVar (F));
+            printf ("          Start:%13s0x%06lX\n", "", ReadVar (F));
+            printf ("          End:%15s0x%06lX\n", "", ReadVar (F));
+        }
     }
 
     /* Destroy the string pool */

@@ -168,8 +168,17 @@ static void OptDumpOptions (const char* Opt attribute ((unused)),
 
 
 
+static void OptDumpScopes (const char* Opt attribute ((unused)),
+	      		   const char* Arg attribute ((unused)))
+/* Dump the scopes in the object file */
+{
+    What |= D_SCOPES;
+}
+
+
+
 static void OptDumpSegments (const char* Opt attribute ((unused)),
-			     const char* Arg attribute ((unused)))
+	    		     const char* Arg attribute ((unused)))
 /* Dump the segments in the object file */
 {
     What |= D_SEGMENTS;
@@ -262,6 +271,9 @@ static void DumpFile (const char* Name)
 	if (What & D_LINEINFO) {
 	    DumpObjLineInfo (F, 0);
 	}
+       	if (What & D_SCOPES) {
+	    DumpObjScopes (F, 0);
+	}
 	if (What & D_SEGSIZE) {
        	    DumpObjSegSize (F, 0);
 	}
@@ -286,6 +298,7 @@ int main (int argc, char* argv [])
 	{ "--dump-imports",	0,	OptDumpImports		},
         { "--dump-lineinfo",    0,      OptDumpLineInfo         },
 	{ "--dump-options",	0,	OptDumpOptions		},
+        { "--dump-scopes",      0,      OptDumpScopes           },
 	{ "--dump-segments",	0,	OptDumpSegments		},
        	{ "--dump-segsize",    	0,     	OptDumpSegSize          },
 	{ "--help",    		0,	OptHelp			},

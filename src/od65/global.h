@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*    				     Data				     */
+/*    	   			     Data				     */
 /*****************************************************************************/
 
 
@@ -52,7 +52,8 @@
 #define D_EXPORTS      	0x0020U		/* Dump exported symbols */
 #define D_DBGSYMS      	0x0040U		/* Dump debug symbols */
 #define D_LINEINFO      0x0080U         /* Dump line infos */
-#define D_SEGSIZE       0x0100U         /* Dump segment sizes */
+#define D_SCOPES        0x0100U         /* Dump scopes */
+#define D_SEGSIZE       0x0200U         /* Dump segment sizes */
 #define D_ALL  	       	0xFFFFU		/* Dump anything */
 
 
@@ -64,7 +65,6 @@ extern unsigned 	What;		/* What should get dumped? */
 /* End of global.h */
 
 #endif
-
 
 
 

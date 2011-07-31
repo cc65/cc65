@@ -228,6 +228,11 @@ void __fastcall__ tgi_pieslice (int x, int y, unsigned char rx, unsigned char ry
 void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
 /* Draw a bar (a filled rectangle) using the current color. */
 
+void __fastcall__ tgi_settextdir (unsigned char dir);
+/* Set the direction for text output. dir is one of the TGI_TEXT_XXX
+ * constants.
+ */
+
 void __fastcall__ tgi_settextscale (unsigned width, unsigned height);
 /* Set the scaling for text output. The scaling factors for width and height
  * are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.

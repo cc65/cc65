@@ -224,6 +224,7 @@ TGI_CLIP_TOP            = $08
         .global _tgi_setdrawpage
         .global _tgi_setpalette
         .global _tgi_setpixel
+        .global _tgi_settextdir
         .global _tgi_settextscale
         .global _tgi_settextstyle
         .global _tgi_setviewpage

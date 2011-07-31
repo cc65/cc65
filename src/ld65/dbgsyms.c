@@ -85,6 +85,7 @@ static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O
     D->LineInfos = EmptyCollection;
     D->Expr    	 = 0;
     D->Size      = 0;
+    D->Parent.Id = ~0UL;
     D->Name 	 = 0;
     D->Type    	 = Type;
     D->AddrSize  = AddrSize;
@@ -150,6 +151,9 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 
     /* Create a new debug symbol */
     DbgSym* D = NewDbgSym (Type, AddrSize, O);
+
+    /* Read the id of the owner scope/symbol */
+    D->Parent.Id = ReadVar (F);
 
     /* Read and assign the name */
     D->Name = MakeGlobalStringId (O, ReadVar (F));

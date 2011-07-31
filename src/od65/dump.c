@@ -663,6 +663,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
        	/* Read the data for one symbol */
        	unsigned Type          = ReadVar (F);
         unsigned char AddrSize = Read8 (F);
+        unsigned long Owner    = ReadVar (F);
        	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
 	if (SYM_IS_CONST (Type)) {
@@ -684,6 +685,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
        	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, 0));
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
+       	printf ("      Owner:%25lu\n", Owner);
 	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
 	if (SYM_IS_CONST (Type)) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);

@@ -849,6 +849,15 @@ void WriteDbgSyms (void)
                 /* Write the address size */
                 ObjWrite8 (S->AddrSize);
 
+                /* Write the id of the parent. For normal symbols, this is a
+                 * scope (symbol table), for cheap locals, it's a symbol.
+                 */
+                if (SYM_IS_STD (ExprMask)) {
+                    ObjWriteVar (S->Sym.Tab->Id);
+                } else {
+                    ObjWriteVar (S->Sym.Entry->DebugSymId);
+                }
+
 		/* Write the name */
        	       	ObjWriteVar (S->Name);
 

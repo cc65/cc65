@@ -44,6 +44,7 @@
 #include "cmdline.h"
 #include "mmodel.h"
 #include "print.h"
+#include "scopedefs.h"
 #include "strbuf.h"
 #include "target.h"
 #include "tgttrans.h"
@@ -868,7 +869,7 @@ int main (int argc, char* argv [])
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
-    SymEnterLevel (&GlobalNameSpace, ST_GLOBAL, ADDR_SIZE_DEFAULT, 0);
+    SymEnterLevel (&GlobalNameSpace, SCOPETYPE_FILE, ADDR_SIZE_DEFAULT, 0);
 
     /* Initialize the line infos. Must be done here, since we need line infos
      * for symbol definitions.

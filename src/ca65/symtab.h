@@ -60,17 +60,6 @@
 #define ST_NONE         0x00            /* No flags */
 #define ST_DEFINED      0x01            /* Scope has been defined */
 
-/* Symbol table types */
-enum {
-    ST_GLOBAL,                          /* Root level */
-    ST_PROC,                            /* .PROC */
-    ST_SCOPE,                           /* .SCOPE */
-    ST_SCOPE_HAS_DATA = ST_SCOPE,       /* Last scope that contains data */
-    ST_STRUCT,                          /* .STRUCT/.UNION */
-    ST_ENUM,                            /* .ENUM */
-    ST_UNDEF    = 0xFF
-};
-
 /* A symbol table */
 typedef struct SymTable SymTable;
 struct SymTable {

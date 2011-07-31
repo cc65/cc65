@@ -35,6 +35,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "scopedefs.h"
 
 /* ca65 */
 #include "condasm.h"
@@ -107,7 +108,7 @@ static long DoStructInternal (long Offs, unsigned Type)
     int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (&CurTok.SVal, ST_STRUCT, ADDR_SIZE_ABS, 0);
+        SymEnterLevel (&CurTok.SVal, SCOPETYPE_STRUCT, ADDR_SIZE_ABS, 0);
         NextTok ();
         /* Start at zero offset in the new scope */
         Offs = 0;
@@ -194,7 +195,7 @@ static long DoStructInternal (long Offs, unsigned Type)
                 Struct = ParseScopedSymTable ();
                 if (Struct == 0) {
                     ErrorSkip ("Unknown struct/union");
-                } else if (GetSymTabType (Struct) != ST_STRUCT) {
+                } else if (GetSymTabType (Struct) != SCOPETYPE_STRUCT) {
                     ErrorSkip ("Not a struct/union");
                 } else {
                     SymEntry* SizeSym = GetSizeOfScope (Struct);

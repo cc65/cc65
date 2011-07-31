@@ -35,6 +35,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "scopedefs.h"
 
 /* ca65 */
 #include "condasm.h"
@@ -66,7 +67,7 @@ void DoEnum (void)
     int Anon = (CurTok.Tok != TOK_IDENT);
     if (!Anon) {
         /* Enter a new scope, then skip the name */
-        SymEnterLevel (&CurTok.SVal, ST_ENUM, ADDR_SIZE_ABS, 0);
+        SymEnterLevel (&CurTok.SVal, SCOPETYPE_ENUM, ADDR_SIZE_ABS, 0);
         NextTok ();
     }
 

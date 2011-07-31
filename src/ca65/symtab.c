@@ -40,6 +40,7 @@
 #include "check.h"
 #include "hashstr.h"
 #include "mmodel.h"
+#include "scopedefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -117,7 +118,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     S->SegRanges    = AUTO_COLLECTION_INITIALIZER;
     S->Flags        = ST_NONE;
     S->AddrSize     = ADDR_SIZE_DEFAULT;
-    S->Type         = ST_UNDEF;
+    S->Type         = SCOPETYPE_UNDEF;
     S->Level        = Level;
     S->TableSlots   = Slots;
     S->TableEntries = 0;
@@ -223,7 +224,7 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
      * does not allocate memory for useless data (unhandled types here don't
      * occupy space in any segment).
      */
-    if (CurrentScope->Type <= ST_SCOPE_HAS_DATA) {
+    if (CurrentScope->Type <= SCOPETYPE_HAS_DATA) {
         AddSegRanges (&CurrentScope->SegRanges);
     }
 }
@@ -913,7 +914,7 @@ void WriteScopes (void)
         while (S) {
 
             /* Type must be defined */
-            CHECK (S->Type != ST_UNDEF);
+            CHECK (S->Type != SCOPETYPE_UNDEF);
 
             /* Id of scope */
             ObjWriteVar (S->Id);

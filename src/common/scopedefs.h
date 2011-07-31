@@ -56,8 +56,7 @@
 enum {
     SCOPE_GLOBAL,                       /* Global level */
     SCOPE_FILE,                         /* File level */
-    SCOPE_PROC,                         /* .PROC */
-    SCOPE_SCOPE,                        /* .SCOPE */
+    SCOPE_SCOPE,                        /* .SCOPE/.PROC */
     SCOPE_HAS_DATA = SCOPE_SCOPE,       /* Last scope that contains data */
     SCOPE_STRUCT,                       /* .STRUCT/.UNION */
     SCOPE_ENUM,                         /* .ENUM */

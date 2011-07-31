@@ -137,9 +137,6 @@ INLINE unsigned char GetSymTabType (const SymTable* S)
 #  define GetSymTabType(S)      ((S)->Type)
 #endif
 
-unsigned char GetCurrentSymTabType ();
-/* Return the type of the current symbol table */
-
 void SymCheck (void);
 /* Run through all symbols and check for anomalies and errors */
 

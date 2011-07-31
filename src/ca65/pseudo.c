@@ -817,7 +817,7 @@ static void DoEnd (void)
 static void DoEndProc (void)
 /* Leave a lexical level */
 {
-    if (GetCurrentSymTabType () != SCOPE_PROC) {
+    if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->OwnerSym == 0) {
         /* No local scope */
         ErrorSkip ("No open .PROC");
     } else {
@@ -830,7 +830,7 @@ static void DoEndProc (void)
 static void DoEndScope (void)
 /* Leave a lexical level */
 {
-    if ( GetCurrentSymTabType () != SCOPE_SCOPE) {
+    if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->OwnerSym != 0) {
         /* No local scope */
         ErrorSkip ("No open .SCOPE");
     } else {
@@ -1539,7 +1539,7 @@ static void DoProc (void)
     }
 
     /* Enter a new scope */
-    SymEnterLevel (&Name, SCOPE_PROC, AddrSize, Sym);
+    SymEnterLevel (&Name, SCOPE_SCOPE, AddrSize, Sym);
 
     /* Free memory for Name */
     SB_Done (&Name);

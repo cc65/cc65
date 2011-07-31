@@ -421,15 +421,6 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
 
 
 
-unsigned char GetCurrentSymTabType ()
-/* Return the type of the current symbol table */
-{
-    CHECK (CurrentScope != 0);
-    return CurrentScope->Type;
-}
-
-
-
 static void SymCheckUndefined (SymEntry* S)
 /* Handle an undefined symbol */
 {

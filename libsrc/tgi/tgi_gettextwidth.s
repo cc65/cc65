@@ -29,7 +29,7 @@ Text    := ptr3
 ;
 
 .code
-.proc   _tgi_gettextwidth         
+.proc   _tgi_gettextwidth
 
         ldy     _tgi_font
         bne     @L1                     ; Jump if vector font
@@ -37,7 +37,7 @@ Text    := ptr3
 ; Return the width of the string for the bitmap font
 
         ldy     _tgi_charwidth
-        sta     ptr1
+        sty     ptr1
         jsr     _strlen
         jsr     umul8x16r16
         ldy     _tgi_textscalew+2       ; Get rounded scale factor

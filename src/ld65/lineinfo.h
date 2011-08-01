@@ -97,10 +97,15 @@ struct LineInfo {
 
 
 LineInfo* GenLineInfo (const FilePos* Pos);
-/* Generate a new (internally used) line info  with the given information */
+/* Generate a new (internally used) line info with the given information */
 
 LineInfo* ReadLineInfo (FILE* F, struct ObjData* O);
 /* Read a line info from a file and return it */
+
+void FreeLineInfo (LineInfo* LI);
+/* Free a LineInfo structure. This function will not handle a non empty
+ * Fragments collection, it can only be used to free incomplete line infos.
+ */
 
 void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
 /* Read a list of line infos stored as a list of indices in the object file,

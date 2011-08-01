@@ -72,6 +72,15 @@ static CodeRange* NewCodeRange (Segment* Seg, unsigned long Offs, unsigned long 
 
 
 
+static void FreeCodeRange (CodeRange* R)
+/* Free a CodeRange structure */
+{
+    /* Just free the memory */
+    xfree (R);
+}
+
+
+
 static LineInfo* NewLineInfo (void)
 /* Create and return a new LineInfo struct with mostly empty fields */
 {
@@ -89,6 +98,30 @@ static LineInfo* NewLineInfo (void)
 
     /* Return the new struct */
     return LI;
+}
+
+
+
+void FreeLineInfo (LineInfo* LI)
+/* Free a LineInfo structure. This function will not handle a non empty
+ * Fragments collection, it can only be used to free incomplete line infos.
+ */
+{
+    unsigned I;
+
+    /* Check, check, ... */
+    PRECONDITION (CollCount (&LI->Fragments) == 0);
+
+    /* Free all the code ranges */
+    for (I = 0; I < CollCount (&LI->CodeRanges); ++I) {
+        FreeCodeRange (CollAtUnchecked (&LI->CodeRanges, I));
+    }
+
+    /* Free the collections */
+    DoneCollection (&LI->CodeRanges);
+
+    /* Free the structure itself */
+    xfree (LI);
 }
 
 
@@ -245,4 +278,4 @@ void RelocLineInfo (Segment* S)
 
 
 
-                                
+

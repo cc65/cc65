@@ -78,6 +78,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_setdrawpage.o       \
                 tgi_setpalette.o        \
                 tgi_setpixel.o          \
+                tgi_settextdir.o        \
                 tgi_settextstyle.o      \
                 tgi_setviewpage.o       \
                 tgi_unload.o            \

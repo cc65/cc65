@@ -53,6 +53,7 @@
 #include "lineinfo.h"
 #include "objdata.h"
 #include "objfile.h"
+#include "scopes.h"
 #include "segments.h"
 #include "spool.h"
 
@@ -274,7 +275,7 @@ void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
     ScopeCount = ReadVar (F);
     CollGrow (&O->Scopes, ScopeCount);
     for (I = 0; I < ScopeCount; ++I) {
-        CollAppend (&O->Scopes, 0);     /* ReadScope (F, O); ### not implemented */
+        CollAppend (&O->Scopes,  ReadScope (F, O, I));
     }
 }
 

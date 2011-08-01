@@ -56,6 +56,7 @@ OBJS = 	asserts.o       \
 	objdata.o	\
 	objfile.o	\
 	scanner.o	\
+        scopes.o        \
 	segments.o	\
 	spool.o         \
 	tgtcfg.o

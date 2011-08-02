@@ -94,10 +94,11 @@ static ExprNode* NewExprNode (unsigned Op)
     ExprNode* N;
 
     /* Do we have some nodes in the list already? */
-    if (FreeExprNodes) {
+    if (FreeNodeCount) {
 	/* Use first node from list */
 	N = FreeExprNodes;
 	FreeExprNodes = N->Left;
+        --FreeNodeCount;
     } else {
 	/* Allocate fresh memory */
         N = xmalloc (sizeof (ExprNode));
@@ -124,6 +125,7 @@ static void FreeExprNode (ExprNode* E)
 	    /* Remember this node for later */
 	    E->Left = FreeExprNodes;
 	    FreeExprNodes = E;
+            ++FreeNodeCount;
 	} else {
 	    /* Free the memory */
 	    xfree (E);
@@ -1016,7 +1018,7 @@ static ExprNode* Factor (void)
 	    break;
 
 	default:
-	    if (LooseCharTerm && CurTok.Tok == TOK_STRCON && 
+	    if (LooseCharTerm && CurTok.Tok == TOK_STRCON &&
                 SB_GetLen (&CurTok.SVal) == 1) {
 		/* A character constant */
 		N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
@@ -1471,8 +1473,8 @@ void FreeExpr (ExprNode* Root)
 {
     if (Root) {
      	FreeExpr (Root->Left);
-    	FreeExpr (Root->Right);
-    	FreeExprNode (Root);
+     	FreeExpr (Root->Right);
+     	FreeExprNode (Root);
     }
 }
 

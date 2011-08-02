@@ -358,7 +358,8 @@ static SegDesc* NewSegDesc (unsigned Name)
 
 static void FreeSegDesc (SegDesc* S)
 /* Free a segment descriptor */
-{
+{               
+    FreeLineInfo (S->LI);
     xfree (S);
 }
 

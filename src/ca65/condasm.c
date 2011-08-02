@@ -198,6 +198,7 @@ static void FreeIf (void)
 	    Done = 1;
        	} else {
        	    Done = (ID->Flags & ifNeedTerm) != 0;
+            DoneCollection (&ID->LineInfos);
             --IfCount;
        	}
     } while (!Done);

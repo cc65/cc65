@@ -103,7 +103,8 @@ void FreeObjData (ObjData* O)
 {
     unsigned I;
 
-    /* Unused ObjData do only have the string pool, Exports and Imports. */
+    DoneCollection (&O->Files);
+    DoneCollection (&O->Sections);
     for (I = 0; I < CollCount (&O->Exports); ++I) {
         FreeExport (CollAtUnchecked (&O->Exports, I));
     }
@@ -113,6 +114,7 @@ void FreeObjData (ObjData* O)
     }
     DoneCollection (&O->Imports);
     DoneCollection (&O->DbgSyms);
+
     for (I = 0; I < CollCount (&O->LineInfos); ++I) {
         FreeLineInfo (CollAtUnchecked (&O->LineInfos, I));
     }

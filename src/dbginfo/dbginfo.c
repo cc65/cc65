@@ -3152,7 +3152,7 @@ static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
 
 static void ProcessSymInfo (InputData* D)
 /* Postprocess symbol infos */
-{
+{          
     /* Get pointers to the symbol info collections */
     Collection* SymInfoById   = &D->Info->SymInfoById;
     Collection* SymInfoByName = &D->Info->SymInfoByName;
@@ -3626,10 +3626,10 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
             CollAppend (&LineInfoList, L);
 
             /* Check if the next one is also a match */
-            if (LineIndex >= CollCount (&F->LineInfoByLine)) {
+            if (++LineIndex >= CollCount (&F->LineInfoByLine)) {
                 break;
             }
-            L = CollAt (&F->LineInfoByLine, ++LineIndex);
+            L = CollAt (&F->LineInfoByLine, LineIndex);
             if (L->Line != Line) {
                 Found = 0;
             }

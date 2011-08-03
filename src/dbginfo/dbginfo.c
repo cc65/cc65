@@ -3109,40 +3109,43 @@ static LineInfoListEntry* FindLineInfoByAddr (const LineInfoList* L, cc65_addr A
 
 
 
-static LineInfo* FindLineInfoByLine (FileInfo* F, cc65_line Line)
-/* Find the LineInfo for a given line number */
+static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
+                               unsigned* Index)
+/* Find the LineInfo for a given line number. The function returns true if the
+ * line was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for the line.
+ */
 {
-    int         Hi;
-    int         Lo;
-
-
-    /* Get a pointer to the line info collection for this file */
-    Collection* LineInfoByLine = &F->LineInfoByLine;
-
     /* Do a binary search */
-    Lo = 0;
-    Hi = (int) CollCount (LineInfoByLine) - 1;
+    int Lo = 0;
+    int Hi = (int) CollCount (LineInfos) - 1;
+    int Found = 0;
     while (Lo <= Hi) {
 
         /* Mid of range */
         int Cur = (Lo + Hi) / 2;
 
         /* Get item */
-        LineInfo* CurItem = CollAt (LineInfoByLine, Cur);
+        const LineInfo* CurItem = CollAt (LineInfos, Cur);
 
         /* Found? */
-        if (Line < CurItem->Line) {
-            Hi = Cur - 1;
-        } else if (Line > CurItem->Line) {
+        if (Line > CurItem->Line) {
             Lo = Cur + 1;
         } else {
-            /* Found! */
-            return CurItem;
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Line == CurItem->Line) {
+                Found = 1;
+            }
         }
     }
 
-    /* Not found */
-    return 0;
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
 }
 
 
@@ -3588,7 +3591,8 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
     FileInfo*       F;
     cc65_lineinfo*  D;
     int             Found;
-    unsigned        Index;
+    unsigned        FileIndex;
+    unsigned        I;
     Collection      LineInfoList = COLLECTION_INITIALIZER;
 
     /* Check the parameter */
@@ -3598,30 +3602,47 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
     Info = (DbgInfo*) Handle;
 
     /* Search for the first file with this name */
-    Found = FindFileInfoByName (&Info->FileInfoByName, FileName, &Index);
+    Found = FindFileInfoByName (&Info->FileInfoByName, FileName, &FileIndex);
     if (!Found) {
         return 0;
     }
 
     /* Loop over all files with this name */
-    F = CollAt (&Info->FileInfoByName, Index);
+    F = CollAt (&Info->FileInfoByName, FileIndex);
     while (Found) {
 
+        unsigned LineIndex;
+        LineInfo* L = 0;
+
         /* Search in the file for the given line */
-        LineInfo* L = FindLineInfoByLine (F, Line);
-        if (L) {
-            /* Remember the line info */
+        Found = FindLineInfoByLine (&F->LineInfoByLine, Line, &LineIndex);
+        if (Found) {
+            L = CollAt (&F->LineInfoByLine, LineIndex);
+        }
+
+        /* Add all line infos for this line */
+        while (Found) {
+            /* Add next */
             CollAppend (&LineInfoList, L);
+
+            /* Check if the next one is also a match */
+            if (LineIndex >= CollCount (&F->LineInfoByLine)) {
+                break;
+            }
+            L = CollAt (&F->LineInfoByLine, ++LineIndex);
+            if (L->Line != Line) {
+                Found = 0;
+            }
         }
 
         /* Next entry */
-        ++Index;
+        ++FileIndex;
 
         /* If the index is valid, check if the next entry is a file with the
          * same name.
          */
-        if (Index < CollCount (&Info->FileInfoByName)) {
-            F = CollAt (&Info->FileInfoByName, Index);
+        if (FileIndex < CollCount (&Info->FileInfoByName)) {
+            F = CollAt (&Info->FileInfoByName, FileIndex);
             Found = (strcmp (F->FileName, FileName) == 0);
         } else {
             Found = 0;
@@ -3638,8 +3659,8 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
     D = new_cc65_lineinfo (CollCount (&LineInfoList));
 
     /* Copy the data */
-    for (Index = 0; Index < CollCount (&LineInfoList); ++Index) {
-        CopyLineInfo (D->data + Index, CollAt (&LineInfoList, Index));
+    for (I = 0; I < CollCount (&LineInfoList); ++I) {
+        CopyLineInfo (D->data + I, CollAt (&LineInfoList, I));
     }
 
     /* Delete the temporary data collection */

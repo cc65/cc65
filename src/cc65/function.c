@@ -359,7 +359,7 @@ static void F_RestoreRegVars (Function* F)
 }
 
 
-    
+
 /*****************************************************************************/
 /*     	      	  	    	     code	      		 	     */
 /*****************************************************************************/
@@ -369,7 +369,8 @@ static void F_RestoreRegVars (Function* F)
 void NewFunc (SymEntry* Func)
 /* Parse argument declarations and function body. */
 {
-    SymEntry* Param;
+    int         C99MainFunc = 0;/* Flag for C99 main function returning int */
+    SymEntry*   Param;
 
     /* Get the function descriptor from the function entry */
     FuncDesc* D = Func->V.F.Func;
@@ -433,6 +434,14 @@ void NewFunc (SymEntry* Func)
          */
         if (D->ParamCount > 0 || (D->Flags & FD_VARIADIC) != 0) {
             g_importmainargs ();
+        }
+
+        /* Determine if this is a main function in a C99 environment that
+         * returns an int.
+         */
+        if (IsTypeInt (F_GetReturnType (CurrentFunc)) &&
+            IS_Get (&Standard) == STD_C99) {
+            C99MainFunc = 1;
         }
     }
 
@@ -517,11 +526,21 @@ void NewFunc (SymEntry* Func)
         Statement (0);
     }
 
-    /* If this is not a void function, output a warning if we didn't see a
-     * return statement.
+    /* If this is not a void function, and not the main function in a C99
+     * environment returning int, output a warning if we didn't see a return
+     * statement.
      */
-    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc)) {
+    if (!F_HasVoidReturn (CurrentFunc) && !F_HasReturn (CurrentFunc) && !C99MainFunc) {
         Warning ("Control reaches end of non-void function");
+    }
+
+    /* If this is the main function in a C99 environment returning an int, let
+     * it always return zero. Note: Actual return statements jump to the return
+     * label defined below.
+     * The code is removed by the optimizer if unused.
+     */
+    if (C99MainFunc) {
+        g_getimmed (CF_INT | CF_CONST, 0, 0);
     }
 
     /* Output the function exit code label */

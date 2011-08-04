@@ -79,6 +79,9 @@ void F_ReturnFound (Function* F);
 int F_HasReturn (const Function* F);
 /* Return true if the function contains a return statement*/
 
+int F_IsMainFunc (const Function* F);
+/* Return true if this is the main function */
+
 int F_IsVariadic (const Function* F);
 /* Return true if this is a variadic function */
 

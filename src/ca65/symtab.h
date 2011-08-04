@@ -45,7 +45,6 @@
 #include "inline.h"
 
 /* ca65 */
-#include "segrange.h"
 #include "symentry.h"
 
 
@@ -69,7 +68,7 @@ struct SymTable {
     SymTable*          	Parent;   	/* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
     SymEntry*           OwnerSym;       /* Symbol that "owns" the scope */
-    Collection          SegRanges;      /* Segment ranges for this scope */
+    Collection          Spans;          /* Spans for this scope */
     unsigned            Id;             /* Scope id */
     unsigned short      Flags;          /* Symbol table flags */
     unsigned char    	AddrSize;       /* Address size */

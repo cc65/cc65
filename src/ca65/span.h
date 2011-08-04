@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                segrange.h                                 */
+/*                                  span.h                                   */
 /*                                                                           */
-/*                              A segment range                              */
+/*                      A span of data within a segment                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef SEGRANGE_H
-#define SEGRANGE_H
+#ifndef SPAN_H
+#define SPAN_H
 
 
 
@@ -50,9 +50,9 @@
 
 
 
-/* Segment range definition */
-typedef struct SegRange SegRange;
-struct SegRange{
+/* Span definition */
+typedef struct Span Span;
+struct Span{
     struct Segment* Seg;       	       	/* Pointer to segment */
     unsigned long   Start;              /* Start of range */
     unsigned long   End;                /* End of range */
@@ -66,41 +66,37 @@ struct SegRange{
 
 
 
-SegRange* NewSegRange (struct Segment* Seg);
-/* Create a new segment range. The segment is set to Seg, Start and End are
- * set to the current PC of the segment.
+Span* NewSpan (struct Segment* Seg);
+/* Create a new span. The segment is set to Seg, Start and End are set to the
+ * current PC of the segment.
  */
 
 #if defined(HAVE_INLINE)
-INLINE unsigned long GetSegRangeSize (const SegRange* R)
-/* Return the segment range size in bytes */
+INLINE unsigned long GetSpanSize (const Span* R)
+/* Return the span size in bytes */
 {
     return (R->End - R->Start);
 }
 #else
-#  define GetSegRangeSize(R)   ((R)->End - (R)->Start)
+#  define GetSpanSize(R)   ((R)->End - (R)->Start)
 #endif
 
-void AddSegRanges (Collection* Ranges);
-/* Add a segment range for all existing segments to the given collection of
- * ranges. The currently active segment will be inserted first with all others
- * following.
+void AddSpans (Collection* Spans);
+/* Add a span for all existing segments to the given collection of spans. The
+ * currently active segment will be inserted first with all others following.
  */
 
-void CloseSegRanges (Collection* Ranges);
-/* Close all open segment ranges by setting PC to the current PC for the
- * segment.
- */
+void CloseSpans (Collection* Spans);
+/* Close all open spans by setting PC to the current PC for the segment. */
 
-void WriteSegRanges (const Collection* Ranges);
-/* Write a list of segment ranges to the output file */
+void WriteSpans (const Collection* Spans);
+/* Write a list of spans to the output file */
 
 
 
-/* End of segrange.h */
+/* End of span.h */
 
 #endif
-
 
 
 

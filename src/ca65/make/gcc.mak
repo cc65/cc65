@@ -56,8 +56,8 @@ OBJS =  anonname.o      \
 	repeat.o	\
 	scanner.o	\
 	segment.o       \
-	segrange.o      \
 	sizeof.o        \
+	span.o          \
 	spool.o         \
 	struct.o        \
 	studyexpr.o     \

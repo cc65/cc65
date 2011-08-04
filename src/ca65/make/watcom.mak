@@ -89,8 +89,8 @@ OBJS = 	anonname.obj    \
 	repeat.obj	\
 	scanner.obj	\
         segment.obj     \
-        segrange.obj    \
         sizeof.obj      \
+        span.obj        \
         spool.obj       \
         struct.obj      \
         studyexpr.obj   \
@@ -119,7 +119,7 @@ $(EXE): 	$(OBJS) $(LIBS)
 	@echo "OPTION QUIET" >> $(LNKCFG)
 	@echo "OPTION MAP" >> $(LNKCFG)
 	@echo "OPTION STACK=65536" >> $(LNKCFG)
-	@echo "NAME $@" >> $(LNKCFG)          
+	@echo "NAME $@" >> $(LNKCFG)
 	@for i in $(OBJS); do echo "FILE $${i}"; done >> $(LNKCFG)
 	@for i in $(LIBS); do echo "LIBRARY $${i}"; done >> $(LNKCFG)
 	@$(LD) system $(SYSTEM) @$(LNKCFG)

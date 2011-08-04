@@ -41,6 +41,7 @@
 #include "fileio.h"
 #include "scopes.h"
 #include "span.h"
+#include "spool.h"
 
 
 
@@ -111,6 +112,48 @@ void ResolveScopes (ObjData* Obj)
         } else {
             S->Parent.Scope = GetObjScope (Obj, S->Parent.Id);
         }
+    }
+}
+
+
+
+void PrintDbgScopes (FILE* F)
+/* Output the scopes to a debug info file */
+{
+    unsigned I, J;
+
+    /* Print scopes from all modules we have linked into the output file */
+    unsigned BaseId = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Output the scopes for this object file */
+        for (J = 0; J < CollCount (&O->Scopes); ++J) {
+            const Scope* S = CollConstAt (&O->Scopes, J);
+
+            fprintf (F,
+                     "scope\tid=%u,name=\"%s\",type=%u",
+                     BaseId + S->Id,
+                     GetString (S->Name),
+                     S->Type);
+
+            /* Print the size if available */
+            if (S->Size != 0) {
+                fprintf (F, ",size=%lu", S->Size);
+            }
+            /* Print parent if available */
+            if (S->Parent.Scope) {
+                fprintf (F, ",parent=%u", BaseId + S->Parent.Scope->Id);
+            }
+
+            /* Terminate the output line */
+            fputc ('\n', F);
+        }
+
+        /* Increment scope base id */
+        BaseId += CollCount (&O->Scopes);
     }
 }
 

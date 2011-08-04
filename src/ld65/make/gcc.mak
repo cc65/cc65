@@ -36,7 +36,6 @@ OBJS = 	asserts.o       \
 	condes.o	\
 	config.o	\
 	dbgfile.o       \
-	dbginfo.o	\
 	dbgsyms.o	\
 	error.o		\
 	exports.o	\

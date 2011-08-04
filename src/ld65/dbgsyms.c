@@ -67,7 +67,7 @@ static DbgSym*	DbgSymPool[256];
 
 
 /*****************************************************************************/
-/*     	      	    		     Code			       	     */
+/*     	      	    		     Code 			       	     */
 /*****************************************************************************/
 
 
@@ -205,32 +205,30 @@ long GetDbgSymVal (const DbgSym* D)
 
 
 
-void PrintDbgSyms (ObjData* O, FILE* F)
+void PrintDbgSyms (FILE* F)
 /* Print the debug symbols in a debug file */
 {
-    unsigned I;
+    unsigned I, J;
 
-    /* Walk through all debug symbols in this module */
-    for (I = 0; I < CollCount (&O->DbgSyms); ++I) {
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
-	long Val;
+        /* Get the object file */
+        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
 
-	/* Get the next debug symbol */
- 	DbgSym* S = CollAt (&O->DbgSyms, I);
+        /* Walk through all debug symbols in this module */
+        for (J = 0; J < CollCount (&O->DbgSyms); ++J) {
 
-	/* Get the symbol value */
-	Val = GetDbgSymVal (S);
-
-	/* Lookup this symbol in the table. If it is found in the table, it was
-	 * already written to the file, so don't emit it twice. If it is not in
-	 * the table, insert and output it.
-	 */
-       	if (GetDbgSym (S, Val) == 0) {
-
+            long Val;
             SegExprDesc D;
 
-	    /* Emit the base data for the entry */
-       	    fprintf (F,
+            /* Get the next debug symbol */
+            const DbgSym* S = CollConstAt (&O->DbgSyms, J);
+
+            /* Get the symbol value */
+            Val = GetDbgSymVal (S);
+
+            /* Emit the base data for the entry */
+            fprintf (F,
                      "sym\tname=\"%s\",value=0x%lX,addrsize=%s,type=%s",
                      GetString (S->Name),
                      Val,
@@ -252,10 +250,7 @@ void PrintDbgSyms (ObjData* O, FILE* F)
 
             /* Terminate the output line */
             fputc ('\n', F);
-
-	    /* Insert the symbol into the table */
-	    InsertDbgSym (S, Val);
-       	}
+        }
     }
 }
 

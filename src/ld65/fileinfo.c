@@ -2,7 +2,7 @@
 /*                                                                           */
 /*				  fileinfo.c                                 */
 /*                                                                           */
-/*			  sOURCE FILE INFO STRUCTURE                         */
+/*			  Source file info structure                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -40,6 +40,8 @@
 /* ld65 */
 #include "fileio.h"
 #include "fileinfo.h"
+#include "objdata.h"
+#include "spool.h"
 
 
 
@@ -110,7 +112,7 @@ static FileInfo* NewFileInfo (void)
     FileInfo* FI = xmalloc (sizeof (FileInfo));
 
     /* Initialize stuff */
-    FI->Id     = Id++; 
+    FI->Id     = Id++;
     FI->Dumped = 0;
 
     /* Return the new struct */
@@ -176,6 +178,32 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
 
     /* Return the new struct */
     return FI;
+}
+
+
+
+void PrintDbgFileInfo (FILE* F)
+/* Output the file info to a debug info file */
+{
+    unsigned I, J;
+
+    /* Print file infos from all modules we have linked into the output file */
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Output the files section */
+        for (J = 0; J < CollCount (&O->Files); ++J) {
+            FileInfo* FI = CollAt (&O->Files, J);
+            if (!FI->Dumped) {
+                fprintf (F,
+                         "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX\n",
+                         FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
+                FI->Dumped = 1;
+            }
+        }
+    }
 }
 
 

@@ -39,10 +39,12 @@
 
 /* ld65 */
 #include "dbgfile.h"
-#include "dbginfo.h"
 #include "dbgsyms.h"
 #include "error.h"
+#include "fileinfo.h"
 #include "global.h"
+#include "lineinfo.h"
+#include "scopes.h"
 #include "segments.h"
 
 
@@ -56,8 +58,6 @@
 void CreateDbgFile (void)
 /* Create a debug info file */
 {
-    unsigned I;
-
     /* Open the debug info file */
     FILE* F = fopen (DbgFileName, "w");
     if (F == 0) {
@@ -67,22 +67,20 @@ void CreateDbgFile (void)
     /* Output version information */
     fprintf (F, "version\tmajor=1,minor=2\n");
 
-    /* Clear the debug sym table (used to detect duplicates) */
-    ClearDbgSymTable ();
-
     /* Output the segment info */
     PrintDbgSegments (F);
 
-    /* Print line infos from all modules we have linked into the output file */
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+    /* Output files */
+    PrintDbgFileInfo (F);
 
-        /* Get the object file */
-        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+    /* Output line info */
+    PrintDbgLineInfo (F);
 
-        /* Output debug info */
-	PrintDbgInfo (O, F);
-        PrintDbgSyms (O, F);
-    }
+    /* Output symbols */
+    PrintDbgSyms (F);
+
+    /* Output scopes */
+    PrintDbgScopes (F);
 
     /* Close the file */
     if (fclose (F) != 0) {

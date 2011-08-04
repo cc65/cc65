@@ -67,7 +67,6 @@ OBJS =	asserts.obj     \
 	condes.obj	\
 	config.obj	\
         dbgfile.obj     \
-	dbginfo.obj	\
 	dbgsyms.obj	\
 	error.obj	\
 	exports.obj	\

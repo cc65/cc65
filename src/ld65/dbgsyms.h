@@ -96,7 +96,7 @@ void ClearDbgSymTable (void);
  * or debug labels the first time.
  */
 
-void PrintDbgSyms (ObjData* O, FILE* F);
+void PrintDbgSyms (FILE* F);
 /* Print the debug symbols in a debug file */
 
 void PrintDbgSymLabels (ObjData* O, FILE* F);

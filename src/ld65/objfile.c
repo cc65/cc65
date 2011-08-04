@@ -276,7 +276,7 @@ void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
     CollGrow (&O->Scopes, ScopeCount);
     for (I = 0; I < ScopeCount; ++I) {
         CollAppend (&O->Scopes,  ReadScope (F, O, I));
-    }
+    }   
 }
 
 

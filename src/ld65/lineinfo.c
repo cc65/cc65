@@ -204,4 +204,57 @@ void RelocLineInfo (Segment* S)
 
 
 
+void PrintDbgLineInfo (FILE* F)
+/* Output the line infos to a debug info file */
+{
+    unsigned I, J, K;
+
+    /* Print line infos from all modules we have linked into the output file */
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Output the line infos */
+        for (J = 0; J < CollCount (&O->LineInfos); ++J) {
+
+            /* Get this line info */
+            const LineInfo* LI = CollConstAt (&O->LineInfos, J);
+
+            /* Get the line info type and count */
+            unsigned Type  = LI_GET_TYPE (LI->Type);
+            unsigned Count = LI_GET_COUNT (LI->Type);
+
+            /* Get a pointer to the spans */
+            const Collection* Spans = &LI->Spans;
+
+            /* Spans */
+            for (K = 0; K < CollCount (Spans); ++K) {
+
+                /* Get this code range */
+                const Span* S = CollConstAt (Spans, K);
+
+                /* Print it */
+                fprintf (F,
+                         "line\tfile=%u,line=%lu,segment=%u,range=0x%lX-0x%lX",
+                         LI->File->Id, GetSourceLine (LI), S->Seg->Id,
+                         S->Offs, S->Offs + S->Size - 1);
+
+                /* Print type if not LI_TYPE_ASM and count if not zero */
+                if (Type != LI_TYPE_ASM) {
+                    fprintf (F, ",type=%u", Type);
+                }
+                if (Count != 0) {
+                    fprintf (F, ",count=%u", Count);
+                }
+
+                /* Terminate line */
+                fputc ('\n', F);
+
+            }
+        }
+    }
+}
+
+
 

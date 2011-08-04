@@ -171,6 +171,9 @@ INLINE unsigned long GetSourceLineFromList (const Collection* LineInfos)
         GetSourceLine ((const LineInfo*) CollConstAt ((LineInfos), 0))
 #endif
 
+void PrintDbgLineInfo (FILE* F);
+/* Output the line infos to a debug info file */
+
 
 
 /* End of lineinfo.h */

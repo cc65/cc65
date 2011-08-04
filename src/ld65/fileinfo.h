@@ -75,6 +75,9 @@ struct FileInfo {
 FileInfo* ReadFileInfo (FILE* F, ObjData* O);
 /* Read a file info from a file and return it */
 
+void PrintDbgFileInfo (FILE* F);
+/* Output the file info to a debug info file */
+
 
 
 /* End of fileinfo.h */

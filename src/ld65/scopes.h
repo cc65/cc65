@@ -69,7 +69,7 @@ struct Scope {
     unsigned            Type;           /* Type of scope */
     unsigned            Name;           /* Name of scope */
     unsigned long       Size;           /* Size of scope */
-    Collection          SegRanges;      /* Segment ranges for this scope */
+    Collection          Spans;          /* Spans for this scope */
 };
 
 
@@ -93,4 +93,4 @@ void ResolveScopes (ObjData* Obj);
 #endif
 
 
-
+                                                 

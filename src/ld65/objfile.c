@@ -317,14 +317,16 @@ void ObjAdd (FILE* Obj, const char* Name)
     /* Read the assertions from the object file */
     ObjReadAssertions (Obj, O->Header.AssertOffs, O);
 
-    /* Read the scope table from the object file */
-    ObjReadScopes (Obj, O->Header.ScopeOffs, O);
-
-    /* Read the segment list from the object file. This must be last, since
+    /* Read the segment list from the object file. This must be late, since
      * the expressions stored in the code may reference segments or imported
      * symbols.
      */
     ObjReadSections (Obj, O->Header.SegOffs, O);
+
+    /* Read the scope table from the object file. Scopes reference segments, so
+     * we must read them after the sections.
+     */
+    ObjReadScopes (Obj, O->Header.ScopeOffs, O);
 
     /* Mark this object file as needed */
     O->Flags |= OBJ_REF;

@@ -38,6 +38,8 @@
 
 
 
+#include <stdio.h>
+
 /* common */
 #include "coll.h"
 
@@ -49,6 +51,7 @@
 
 
 
+struct ObjData;
 struct Segment;
 
 
@@ -76,6 +79,12 @@ struct Span {
 
 Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size);
 /* Create and return a new span */
+
+Span* ReadSpan (FILE* F, struct ObjData* O);
+/* Read a Span from a file and return it */
+
+void ReadSpans (Collection* Spans, FILE* F, struct ObjData* O);
+/* Read a list of Spans from a file and return it */
 
 void FreeSpan (Span* S);
 /* Free a span structure */

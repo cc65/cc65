@@ -51,6 +51,10 @@
 
 
 
+/* Forwards */
+struct Scope;
+struct Section;
+
 /* Values for the Flags field */
 #define	OBJ_REF		0x0001 	       	/* We have a reference to this file */
 
@@ -128,6 +132,12 @@ INLINE int ObjHasFiles (const ObjData* O)
 #else
 #  define ObjHasFiles(O)       ((O) != 0 && CollCount (&(O)->Files) != 0)
 #endif
+
+struct Section* GetObjSection (ObjData* Obj, unsigned Id);
+/* Get a section from an object file checking for a valid index */
+
+struct Scope* GetObjScope (ObjData* Obj, unsigned Id);   
+/* Get a scope from an object file checking for a valid index */
 
 
 

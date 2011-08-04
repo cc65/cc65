@@ -35,8 +35,11 @@
 
 /* common */
 #include "xmalloc.h"
-                   
-/* ld65 */       
+
+/* ld65 */           
+#include "fileio.h"
+#include "objdata.h"
+#include "segments.h"
 #include "span.h"
 
 
@@ -48,7 +51,7 @@
 
 
 Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size)
-/* Create and return a new span */                                         
+/* Create and return a new span */
 {
     /* Allocate memory */
     Span* S = xmalloc (sizeof (*S));
@@ -60,6 +63,38 @@ Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size)
 
     /* Return the result */
    return S;
+}
+
+
+
+Span* ReadSpan (FILE* F, ObjData* O)
+/* Read a Span from a file and return it */
+{
+    /* Read the section id and translate it to a section pointer */
+    Section* Sec = GetObjSection (O, ReadVar (F));
+
+    /* Read the offset and relocate it */
+    unsigned long Offs = ReadVar (F) + Sec->Offs;
+
+    /* Create and return a new Span */
+    return NewSpan (Sec->Seg, Offs, ReadVar (F));
+}
+
+
+
+void ReadSpans (Collection* Spans, FILE* F, ObjData* O)
+/* Read a list of Spans from a file and return it */
+{
+    /* First is number of Spans */
+    unsigned Count = ReadVar (F);
+
+    /* Preallocate enough entries in the collection */
+    CollGrow (Spans, Count);
+
+    /* Read the spans and add them */
+    while (Count--) {
+        CollAppend (Spans, ReadSpan (F, O));
+    }
 }
 
 
@@ -77,7 +112,7 @@ void AddSpan (Collection* Spans, struct Segment* Seg, unsigned long Offs,
               unsigned long Size)
 /* Either add a new span to the ones already in the given collection, or - if
  * possible - merge it with adjacent ones that already exist.
- */                              
+ */
 {
     unsigned I;
 

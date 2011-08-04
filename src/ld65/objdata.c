@@ -186,3 +186,27 @@ const char* GetObjFileName (const ObjData* O)
 
 
 
+struct Section* GetObjSection (ObjData* O, unsigned Id)
+/* Get a section from an object file checking for a valid index */
+{
+    if (Id >= CollCount (&O->Sections)) {
+        Error ("Invalid section index (%u) in module `%s'",
+               Id, GetObjFileName (O));
+    }
+    return CollAtUnchecked (&O->Sections, Id);
+}
+
+
+
+struct Scope* GetObjScope (ObjData* O, unsigned Id)
+/* Get a scope from an object file checking for a valid index */
+{
+    if (Id >= CollCount (&O->Scopes)) {
+        Error ("Invalid scope index (%u) in module `%s'",
+               Id, GetObjFileName (O));
+    }
+    return CollAtUnchecked (&O->Scopes, Id);
+}
+
+
+

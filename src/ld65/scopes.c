@@ -40,21 +40,7 @@
 #include "error.h"
 #include "fileio.h"
 #include "scopes.h"
-
-
-
-/*****************************************************************************/
-/*     	       	    	      	     Data				     */
-/*****************************************************************************/
-
-
-
-typedef struct SegRange SegRange;
-struct SegRange {
-    unsigned        SegId;              /* Id of segment */
-    unsigned long   Start;              /* Start of range */
-    unsigned long   End;                /* End of range */
-};
+#include "span.h"
 
 
 
@@ -71,38 +57,12 @@ static Scope* NewScope (ObjData* Obj, unsigned Id)
     Scope* S     = xmalloc (sizeof (Scope));
 
     /* Initialize the fields where necessary */
-    S->Id        = Id;
-    S->Obj       = Obj;
-    S->Size      = 0;
-    S->SegRanges = EmptyCollection;
+    S->Id       = Id;
+    S->Obj      = Obj;
+    S->Size     = 0;
+    S->Spans    = EmptyCollection;
 
     /* Return the new entry */
-    return S;
-}
-
-
-
-static SegRange* NewSegRange (void)
-/* Create a new SegRange and return it */
-{
-    /* Allocate memory and return it */
-    return xmalloc (sizeof (SegRange));
-}
-
-
-
-static SegRange* ReadSegRange (FILE* F)
-/* Read a SegRange from a file and return it */
-{
-    /* Create a new SegRange */
-    SegRange* S = NewSegRange ();
-
-    /* Read data */
-    S->SegId    = ReadVar (F);
-    S->Start    = ReadVar (F);
-    S->End      = ReadVar (F);
-
-    /* Return the SegRange read */
     return S;
 }
 
@@ -111,8 +71,6 @@ static SegRange* ReadSegRange (FILE* F)
 Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
 /* Read a scope from a file and return it */
 {
-    unsigned Count;
-
     /* Create a new scope */
     Scope* S = NewScope (Obj, Id);
 
@@ -127,10 +85,7 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
     }
 
     /* Read the segment ranges for this scope */
-    Count = ReadVar (F);
-    while (Count--) {
-        CollAppend (&S->SegRanges, ReadSegRange (F));
-    }
+    ReadSpans (&S->Spans, F, Obj);
 
     /* Return the new Scope */
     return S;
@@ -154,13 +109,7 @@ void ResolveScopes (ObjData* Obj)
             /* Root scope */
             S->Parent.Scope = 0;
         } else {
-            /* Check the data */
-            unsigned ParentId = S->Parent.Id;
-            if (ParentId >= CollCount (&Obj->Scopes)) {
-                Error ("Invalid scope index (%u) in module `%s'",
-                       ParentId, GetObjFileName (Obj));
-            }
-            S->Parent.Scope = CollAtUnchecked (&Obj->Scopes, S->Parent.Id);
+            S->Parent.Scope = GetObjScope (Obj, S->Parent.Id);
         }
     }
 }

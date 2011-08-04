@@ -45,12 +45,13 @@
 #include "filepos.h"
 
 /* ld65 */
+#include "span.h"
 #include "spool.h"
 
 
 
 /*****************************************************************************/
-/*	       			   Forwards                                  */
+/*	       	 		   Forwards                                  */
 /*****************************************************************************/
 
 
@@ -66,15 +67,6 @@ struct Segment;
 
 
 
-typedef struct CodeRange CodeRange;
-struct CodeRange {
-    struct Segment*     Seg;            /* Segment of this code range */
-    unsigned long       Offs;           /* Offset of code range */
-    unsigned long       Size;           /* Size of code range */
-};
-
-
-
 /* Structure holding line information. The Pos.Name field is always the
  * global string id of the file name. If the line info was read from the
  * object file, the File pointer is valid, otherwise it is NULL.
@@ -85,7 +77,7 @@ struct LineInfo {
     unsigned            Type;           /* Type of line info */
     FilePos             Pos;            /* Position in file */
     Collection          Fragments;      /* Fragments for this line */
-    Collection          CodeRanges;     /* Code ranges for this line */
+    Collection          Spans;          /* Spans for this line */
 };
 
 

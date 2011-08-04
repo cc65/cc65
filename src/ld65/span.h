@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   dbginfo.c				     */
+/*                                  span.h                                   */
 /*                                                                           */
-/*		    Debug info handling for the ld65 linker                  */
+/*                      A span of data within a segment                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2011, Ullrich von Bassewitz                                      */
+/* (C) 2011,      Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,79 +33,63 @@
 
 
 
+#ifndef SPAN_H
+#define SPAN_H
+
+
+
 /* common */
-#include "lidefs.h"
-
-/* ld65 */
-#include "dbginfo.h"
-#include "fileinfo.h"
-#include "lineinfo.h"
-#include "segments.h"
-#include "spool.h"
+#include "coll.h"
 
 
 
 /*****************************************************************************/
-/*     	      	     		     Code			       	     */
+/*	       			   Forwards                                  */
 /*****************************************************************************/
 
 
 
-void PrintDbgInfo (ObjData* O, FILE* F)
-/* Print the debug info into a file */
-{
-    unsigned I, J;
+struct Segment;
 
-    /* Output the files section */
-    for (I = 0; I < CollCount (&O->Files); ++I) {
-	FileInfo* FI = CollAt (&O->Files, I);
-        if (!FI->Dumped) {
-            fprintf (F,
-                     "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX\n",
-                     FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
-            FI->Dumped = 1;
-        }
-    }
 
-    /* Output the line infos */
-    for (I = 0; I < CollCount (&O->LineInfos); ++I) {
 
-	/* Get this line info */
-	const LineInfo* LI = CollConstAt (&O->LineInfos, I);
+/*****************************************************************************/
+/*  	       	 		     Data                                    */
+/*****************************************************************************/
 
-        /* Get the line info type and count */
-        unsigned Type  = LI_GET_TYPE (LI->Type);
-        unsigned Count = LI_GET_COUNT (LI->Type);
 
-	/* Get a pointer to the spans */
-	const Collection* Spans = &LI->Spans;
 
-	/* Spans */
-	for (J = 0; J < CollCount (Spans); ++J) {
+typedef struct Span Span;
+struct Span {
+    struct Segment*     Seg;            /* Segment of this span */
+    unsigned long       Offs;           /* Offset of span within segment */
+    unsigned long       Size;           /* Size of span */
+};
 
-	    /* Get this code range */
-	    const Span* S = CollConstAt (Spans, J);
 
-	    /* Print it */
-            fprintf (F,
-                     "line\tfile=%u,line=%lu,segment=%u,range=0x%lX-0x%lX",
-                     LI->File->Id, GetSourceLine (LI), S->Seg->Id,
-                     S->Offs, S->Offs + S->Size - 1);
 
-            /* Print type if not LI_TYPE_ASM and count if not zero */
-            if (Type != LI_TYPE_ASM) {
-                fprintf (F, ",type=%u", Type);
-            }
-            if (Count != 0) {
-                fprintf (F, ",count=%u", Count);
-            }
+/*****************************************************************************/
+/*     	       	      	      	     Code			     	     */
+/*****************************************************************************/
 
-            /* Terminate line */
-            fputc ('\n', F);
 
-	}
-    }
-}
+
+Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size);
+/* Create and return a new span */
+
+void FreeSpan (Span* S);
+/* Free a span structure */
+
+void AddSpan (Collection* Spans, struct Segment* Seg, unsigned long Offs,
+              unsigned long Size);
+/* Either add a new span to the ones already in the given collection, or - if
+ * possible - merge it with adjacent ones that already exist.
+ */
+
+
+
+/* End of span.h */
+#endif
 
 
 

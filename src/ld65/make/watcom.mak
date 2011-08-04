@@ -89,6 +89,7 @@ OBJS =	asserts.obj     \
 	scanner.obj	\
         scopes.obj      \
 	segments.obj	\
+        span.obj        \
         spool.obj       \
 	tgtcfg.obj
 

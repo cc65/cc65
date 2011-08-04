@@ -58,6 +58,7 @@ OBJS = 	asserts.o       \
 	scanner.o	\
         scopes.o        \
 	segments.o	\
+        span.o          \
 	spool.o         \
 	tgtcfg.o
 

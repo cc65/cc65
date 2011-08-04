@@ -55,32 +55,6 @@
 
 
 
-static CodeRange* NewCodeRange (Segment* Seg, unsigned long Offs, unsigned long Size)
-/* Create and return a new CodeRange struct */
-{
-    /* Allocate memory */
-    CodeRange* R = xmalloc (sizeof (CodeRange));
-
-    /* Initialize the fields */
-    R->Seg  = Seg;
-    R->Offs = Offs;
-    R->Size = Size;
-
-    /* Return the new struct */
-    return R;
-}
-
-
-
-static void FreeCodeRange (CodeRange* R)
-/* Free a CodeRange structure */
-{
-    /* Just free the memory */
-    xfree (R);
-}
-
-
-
 static LineInfo* NewLineInfo (void)
 /* Create and return a new LineInfo struct with mostly empty fields */
 {
@@ -94,7 +68,7 @@ static LineInfo* NewLineInfo (void)
     LI->Pos.Line   = 0;
     LI->Pos.Col    = 0;
     LI->Fragments  = EmptyCollection;
-    LI->CodeRanges = EmptyCollection;
+    LI->Spans      = EmptyCollection;
 
     /* Return the new struct */
     return LI;
@@ -113,12 +87,12 @@ void FreeLineInfo (LineInfo* LI)
     PRECONDITION (CollCount (&LI->Fragments) == 0);
 
     /* Free all the code ranges */
-    for (I = 0; I < CollCount (&LI->CodeRanges); ++I) {
-        FreeCodeRange (CollAtUnchecked (&LI->CodeRanges, I));
+    for (I = 0; I < CollCount (&LI->Spans); ++I) {
+        FreeSpan (CollAtUnchecked (&LI->Spans, I));
     }
 
     /* Free the collections */
-    DoneCollection (&LI->CodeRanges);
+    DoneCollection (&LI->Spans);
 
     /* Free the structure itself */
     xfree (LI);
@@ -191,55 +165,6 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
 
 
 
-static void AddCodeRange (LineInfo* LI, Segment* Seg, unsigned long Offs,
-                          unsigned long Size)
-/* Add a range of code to this line */
-{
-    unsigned I;
-
-    /* Get a pointer to the collection */
-    Collection* CodeRanges = &LI->CodeRanges;
-
-    /* We will keep the CodeRanges collection sorted by starting offset,
-     * so we have to search for the correct insert position. Since in most
-     * cases, the fragments have increasing order, and there is usually not
-     * more than one or two ranges, we do a linear search.
-     */
-    for (I = 0; I < CollCount (CodeRanges); ++I) {
-	CodeRange* R = CollAtUnchecked (CodeRanges, I);
-        /* Must be same segment */
-        if (R->Seg == Seg) {
-            if (Offs < R->Offs) {
-
-                /* Got the insert position */
-                if (Offs + Size == R->Offs) {
-                    /* Merge the two */
-                    R->Offs = Offs;
-                    R->Size += Size;
-                } else {
-                    /* Insert a new entry */
-                    CollInsert (CodeRanges, NewCodeRange (Seg, Offs, Size), I);
-                }
-
-                /* Done */
-                return;
-
-            } else if (R->Offs + R->Size == Offs) {
-                /* This is the regular case. Merge the two. */
-                R->Size += Size;
-
-                /* Done */
-                return;
-            }
-        }
-    }
-
-    /* We must append an entry */
-    CollAppend (CodeRanges, NewCodeRange (Seg, Offs, Size));
-}
-
-
-
 void RelocLineInfo (Segment* S)
 /* Relocate the line info for a segment. */
 {
@@ -261,7 +186,8 @@ void RelocLineInfo (Segment* S)
 
        	    /* Add the range for this fragment to all line infos */
             for (I = 0; I < CollCount (&Frag->LineInfos); ++I) {
-       	       	AddCodeRange (CollAt (&Frag->LineInfos, I), S, Offs, Frag->Size);
+                LineInfo* LI = CollAtUnchecked (&Frag->LineInfos, I);
+       	       	AddSpan (&LI->Spans, S, Offs, Frag->Size);
        	    }
 
        	    /* Update the offset */

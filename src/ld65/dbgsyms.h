@@ -67,11 +67,7 @@ struct DbgSym {
     Collection          LineInfos;      /* Line infos of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned long       Size;           /* Symbol size if any */
-    union {
-        unsigned long   Id;             /* Id of parent while not resolved */
-        struct Scope*   Scope;          /* Parent scope */
-        struct DbgSym*  Sym;            /* Parent symbol  for cheap locals */
-    } Parent;
+    unsigned            OwnerId;        /* Id of parent/owner */
     unsigned            Name;  	       	/* Name */
     unsigned char	Type;		/* Type of symbol */
     unsigned char       AddrSize;       /* Address size of symbol */

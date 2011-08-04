@@ -60,10 +60,7 @@ typedef struct Scope Scope;
 struct Scope {
     unsigned            Id;             /* Id of scope */
     ObjData*   	    	Obj;	    	/* Object file that exports the name */
-    union {
-        unsigned        Id;             /* Id of parent scope */
-        Scope*          Scope;          /* Pointer to parent scope */
-    } Parent;
+    unsigned            ParentId;       /* Id of parent scope */
     unsigned            LexicalLevel;   /* Lexical level */
     unsigned            Flags;
     unsigned            Type;           /* Type of scope */
@@ -83,8 +80,8 @@ struct Scope {
 Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id);
 /* Read a scope from a file, insert and return it */
 
-void ResolveScopes (ObjData* Obj);
-/* Resolve a scope list. */
+void PrintDbgScopes (FILE* F);
+/* Output the scopes to a debug info file */
 
 
 
@@ -93,4 +90,4 @@ void ResolveScopes (ObjData* Obj);
 #endif
 
 
-                                                 
+

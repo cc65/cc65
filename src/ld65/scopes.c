@@ -76,7 +76,7 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
     Scope* S = NewScope (Obj, Id);
 
     /* Read the data from file */
-    S->Parent.Id    = ReadVar (F);
+    S->ParentId     = ReadVar (F);
     S->LexicalLevel = ReadVar (F);
     S->Flags        = ReadVar (F);
     S->Type         = ReadVar (F);
@@ -90,29 +90,6 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
 
     /* Return the new Scope */
     return S;
-}
-
-
-
-void ResolveScopes (ObjData* Obj)
-/* Resolve a scope list. */
-{
-    unsigned I;
-
-    /* Walk over the list and resolve the parent ids. */
-    for (I = 0; I < CollCount (&Obj->Scopes); ++I) {
-
-        /* Get the scope */
-        Scope* S = CollAtUnchecked (&Obj->Scopes, I);
-
-        /* Resolve the parent id. The root scope doesn't have a parent */
-        if (S->Id == 0) {
-            /* Root scope */
-            S->Parent.Scope = 0;
-        } else {
-            S->Parent.Scope = GetObjScope (Obj, S->Parent.Id);
-        }
-    }
 }
 
 
@@ -144,8 +121,8 @@ void PrintDbgScopes (FILE* F)
                 fprintf (F, ",size=%lu", S->Size);
             }
             /* Print parent if available */
-            if (S->Parent.Scope) {
-                fprintf (F, ",parent=%u", BaseId + S->Parent.Scope->Id);
+            if (S->Id != S->ParentId) {
+                fprintf (F, ",parent=%u", BaseId + S->ParentId);
             }
 
             /* Terminate the output line */

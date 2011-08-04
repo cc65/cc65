@@ -85,7 +85,7 @@ static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O
     D->LineInfos = EmptyCollection;
     D->Expr    	 = 0;
     D->Size      = 0;
-    D->Parent.Id = ~0UL;
+    D->OwnerId   = ~0U;
     D->Name 	 = 0;
     D->Type    	 = Type;
     D->AddrSize  = AddrSize;
@@ -153,7 +153,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     DbgSym* D = NewDbgSym (Type, AddrSize, O);
 
     /* Read the id of the owner scope/symbol */
-    D->Parent.Id = ReadVar (F);
+    D->OwnerId = ReadVar (F);
 
     /* Read and assign the name */
     D->Name = MakeGlobalStringId (O, ReadVar (F));
@@ -210,6 +210,7 @@ void PrintDbgSyms (FILE* F)
 {
     unsigned I, J;
 
+    unsigned BaseId = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get the object file */
@@ -229,7 +230,8 @@ void PrintDbgSyms (FILE* F)
 
             /* Emit the base data for the entry */
             fprintf (F,
-                     "sym\tname=\"%s\",value=0x%lX,addrsize=%s,type=%s",
+                     "sym\tid=%u,name=\"%s\",value=0x%lX,addrsize=%s,type=%s",
+                     BaseId + J,
                      GetString (S->Name),
                      Val,
                      AddrSizeToStr (S->AddrSize),
@@ -248,9 +250,21 @@ void PrintDbgSyms (FILE* F)
                 fprintf (F, ",segment=%u", D.Seg->Id);
             }
 
+            /* For cheap local symbols, add the owner symbol, for others,
+             * add the owner scope.
+             */
+            if (SYM_IS_STD (S->Type)) {
+                fprintf (F, ",scope=%u", S->OwnerId);
+            } else {
+                fprintf (F, ",parent=%u", S->OwnerId);
+            }
+
             /* Terminate the output line */
             fputc ('\n', F);
         }
+
+        /* Increment base id */
+        BaseId += CollCount (&O->DbgSyms);
     }
 }
 

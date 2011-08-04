@@ -381,14 +381,16 @@ static void LibResolve (void)
                 /* Read the assertions from the object file */
                 ObjReadAssertions (L->F, O->Start + O->Header.AssertOffs, O);
 
-                /* Read the scope table from the object file */
-                ObjReadScopes (L->F, O->Start + O->Header.ScopeOffs, O);
-
                 /* Seek to the start of the segment list and read the segments.
-                 * This must be last, since the data here may reference other
+                 * This must be late, since the data here may reference other
                  * stuff.
                  */
                 ObjReadSections (L->F, O->Start + O->Header.SegOffs, O);
+
+                /* Read the scope table from the object file. Scopes reference 
+                 * segments, so we must read them after the sections.
+                 */
+                ObjReadScopes (L->F, O->Start + O->Header.ScopeOffs, O);
 
                 /* All references to strings are now resolved, so we can delete
                  * the module string pool.

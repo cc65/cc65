@@ -817,7 +817,7 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
 
         const char*     Name;
         unsigned        Len;
-        unsigned        SegCount;
+        unsigned        SpanCount;
         unsigned        J;
 
         /* Read the data */
@@ -846,16 +846,16 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
 	    printf ("      Size:%20s0x%04lX  (%lu)\n", "", Size, Size);
 	}
 
-        /* Segment ranges */
-        SegCount = ReadVar (F);
-        printf ("      Segment ranges:\n");
-        printf ("        Count:%23u\n", SegCount);
+        /* Spans */
+        SpanCount = ReadVar (F);
+        printf ("      Segment spans:\n");
+        printf ("        Count:%23u\n", SpanCount);
 
-        for (J = 0; J < SegCount; ++J) {
+        for (J = 0; J < SpanCount; ++J) {
             printf ("        Index:%23u\n", J);
             printf ("          Segment:%19lu\n", ReadVar (F));
             printf ("          Start:%13s0x%06lX\n", "", ReadVar (F));
-            printf ("          End:%15s0x%06lX\n", "", ReadVar (F));
+            printf ("          Size:%15s0x%06lX\n", "", ReadVar (F));
         }
     }
 

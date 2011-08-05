@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,6 +39,7 @@
 
 
 /* common */
+#include "coll.h"
 #include "fragdefs.h"
 #include "inline.h"
 #include "segdefs.h"
@@ -49,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*	   			     Data				     */
+/*	   	 		     Data				     */
 /*****************************************************************************/
 
 
@@ -57,7 +58,6 @@
 /* Segment definition */
 typedef struct Segment Segment;
 struct Segment {
-    Segment*   	    List;      	       	/* List of all segments */
     Fragment*  	    Root;      	  	/* Root of fragment list */
     Fragment*  	    Last;      	  	/* Pointer to last fragment */
     unsigned long   FragCount;          /* Number of fragments */
@@ -78,8 +78,8 @@ extern SegDef BssSegDef;
 extern SegDef RODataSegDef;
 extern SegDef CodeSegDef;
 
-/* List of all segments */
-extern Segment* SegmentList;
+/* Collection containing all segments */
+extern Collection SegmentList;
 
 /* Currently active segment */
 extern Segment* ActiveSeg;
@@ -161,6 +161,9 @@ void SegDump (void);
 
 void InitSegments (void);
 /* Initialize segments */
+
+void SetSegmentSizes (void);
+/* Set the default segment sizes according to the memory model */
 
 void WriteSegments (void);
 /* Write the segment data to the object file */

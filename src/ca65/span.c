@@ -50,7 +50,7 @@
 
 
 Span* NewSpan (struct Segment* Seg)
-/* Create a new span. The segment is set to Seg, Start and End are set to the 
+/* Create a new span. The segment is set to Seg, Start and End are set to the
  * current PC of the segment.
  */
 {
@@ -73,19 +73,19 @@ void AddSpans (Collection* Spans)
  * currently active segment will be inserted first with all others following.
  */
 {
-    Segment* Seg;
+    unsigned I;
 
     /* Add the currently active segment */
     CollAppend (Spans, NewSpan (ActiveSeg));
 
     /* Walk through the segment list and add all other segments */
-    Seg = SegmentList;
-    while (Seg) {
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        Segment* Seg = CollAtUnchecked (&SegmentList, I);
+
         /* Be sure to skip the active segment, since it was already added */
         if (Seg != ActiveSeg) {
             CollAppend (Spans, NewSpan (Seg));
         }
-        Seg = Seg->List;
     }
 }
 

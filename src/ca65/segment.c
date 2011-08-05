@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "coll.h"
 #include "mmodel.h"
 #include "segnames.h"
 #include "xmalloc.h"
@@ -69,10 +70,6 @@
 static int              RelocMode = 1;
 static unsigned long    AbsPC	  = 0;		/* PC if in absolute mode */
 
-/* Segment initializer macro */
-#define SEG(segdef, num, prev)      \
-    { prev, 0, 0, 0, num, 0, 1, 0, 0, segdef }
-
 /* Definitions for predefined segments */
 SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_NULL,     ADDR_SIZE_ABS);
 SegDef ZeropageSegDef = STATIC_SEGDEF_INITIALIZER (SEGNAME_ZEROPAGE, ADDR_SIZE_ZP);
@@ -81,23 +78,11 @@ SegDef BssSegDef      = STATIC_SEGDEF_INITIALIZER (SEGNAME_BSS,      ADDR_SIZE_A
 SegDef RODataSegDef   = STATIC_SEGDEF_INITIALIZER (SEGNAME_RODATA,   ADDR_SIZE_ABS);
 SegDef CodeSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_CODE,     ADDR_SIZE_ABS);
 
-/* Predefined segments */
-static Segment NullSeg     = SEG (&NullSegDef,     5, NULL);
-static Segment ZeropageSeg = SEG (&ZeropageSegDef, 4, &NullSeg);
-static Segment DataSeg     = SEG (&DataSegDef,     3, &ZeropageSeg);
-static Segment BssSeg      = SEG (&BssSegDef,      2, &DataSeg);
-static Segment RODataSeg   = SEG (&RODataSegDef,   1, &BssSeg);
-static Segment CodeSeg     = SEG (&CodeSegDef,     0, &RODataSeg);
-
-/* Number of segments */
-static unsigned SegmentCount = 6;
-
-/* List of all segments */
-Segment* SegmentList = &CodeSeg;
-static Segment* SegmentLast = &NullSeg;
+/* Collection containing all segments */
+Collection SegmentList = STATIC_COLLECTION_INITIALIZER;
 
 /* Currently active segment */
-Segment* ActiveSeg = &CodeSeg;
+Segment* ActiveSeg;
 
 
 
@@ -107,13 +92,39 @@ Segment* ActiveSeg = &CodeSeg;
 
 
 
+static Segment* NewSegFromDef (SegDef* Def)
+/* Create a new segment from a segment definition. Used only internally, no
+ * checks.
+ */
+{
+    /* Create a new segment */
+    Segment* S = xmalloc (sizeof (*S));
+
+    /* Initialize it */
+    S->Root      = 0;
+    S->Last      = 0;
+    S->FragCount = 0;
+    S->Num       = CollCount (&SegmentList);
+    S->Align     = 0;
+    S->RelocMode = 1;
+    S->PC        = 0;
+    S->AbsPC     = 0;
+    S->Def       = Def;
+
+    /* Insert it into the segment list */
+    CollAppend (&SegmentList, S);
+
+    /* And return it... */
+    return S;
+}
+
+
+
 static Segment* NewSegment (const char* Name, unsigned char AddrSize)
 /* Create a new segment, insert it into the global list and return it */
 {
-    Segment* S;
-
     /* Check for too many segments */
-    if (SegmentCount >= 256) {
+    if (CollCount (&SegmentList) >= 256) {
      	Fatal ("Too many segments");
     }
 
@@ -122,27 +133,8 @@ static Segment* NewSegment (const char* Name, unsigned char AddrSize)
      	Error ("Illegal segment name: `%s'", Name);
     }
 
-    /* Create a new segment */
-    S = xmalloc (sizeof (*S));
-
-    /* Initialize it */
-    S->List      = 0;
-    S->Root      = 0;
-    S->Last      = 0;
-    S->FragCount = 0;
-    S->Num       = SegmentCount++;
-    S->Align     = 0;
-    S->RelocMode = 1;
-    S->PC        = 0;
-    S->AbsPC     = 0;
-    S->Def       = NewSegDef (Name, AddrSize);
-
-    /* Insert it into the segment list */
-    SegmentLast->List = S;
-    SegmentLast = S;
-
-    /* And return it... */
-    return S;
+    /* Create a new segment and return it */
+    return NewSegFromDef (NewSegDef (Name, AddrSize));
 }
 
 
@@ -195,30 +187,28 @@ Fragment* GenFragment (unsigned char Type, unsigned short Len)
 void UseSeg (const SegDef* D)
 /* Use the segment with the given name */
 {
-    Segment* Seg = SegmentList;
-    while (Seg) {
+    unsigned I;
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        Segment* Seg = CollAtUnchecked (&SegmentList, I);
        	if (strcmp (Seg->Def->Name, D->Name) == 0) {
      	    /* We found this segment. Check if the type is identical */
 	    if (D->AddrSize != ADDR_SIZE_DEFAULT &&
                 Seg->Def->AddrSize != D->AddrSize) {
-		Error ("Segment attribute mismatch");
-		/* Use the new attribute to avoid errors */
+	 	Error ("Segment attribute mismatch");
+	 	/* Use the new attribute to avoid errors */
 	        Seg->Def->AddrSize = D->AddrSize;
        	    }
        	    ActiveSeg = Seg;
      	    return;
      	}
-     	/* Check next segment */
-     	Seg = Seg->List;
     }
 
     /* Segment is not in list, create a new one */
     if (D->AddrSize == ADDR_SIZE_DEFAULT) {
-        Seg = NewSegment (D->Name, ADDR_SIZE_ABS);
+        ActiveSeg = NewSegment (D->Name, ADDR_SIZE_ABS);
     } else {
-        Seg = NewSegment (D->Name, D->AddrSize);
+        ActiveSeg = NewSegment (D->Name, D->AddrSize);
     }
-    ActiveSeg = Seg;
 }
 
 
@@ -324,20 +314,13 @@ void SegAlign (unsigned Power, int Val)
 unsigned char GetSegAddrSize (unsigned SegNum)
 /* Return the address size of the segment with the given number */
 {
-    /* Search for the segment */
-    Segment* S = SegmentList;
-    while (S && SegNum) {
-    	--SegNum;
-    	S = S->List;
-    }
-
-    /* Did we find it? */
-    if (S == 0) {
+    /* Is there such a segment? */
+    if (SegNum >= CollCount (&SegmentList)) {
     	FAIL ("Invalid segment number");
     }
 
     /* Return the address size */
-    return S->Def->AddrSize;
+    return ((Segment*) CollAtUnchecked (&SegmentList, SegNum))->Def->AddrSize;
 }
 
 
@@ -345,8 +328,9 @@ unsigned char GetSegAddrSize (unsigned SegNum)
 void SegCheck (void)
 /* Check the segments for range and other errors */
 {
-    Segment* S = SegmentList;
-    while (S) {
+    unsigned I;
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        Segment* S = CollAtUnchecked (&SegmentList, I);
      	Fragment* F = S->Root;
      	while (F) {
        	    if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
@@ -421,7 +405,6 @@ void SegCheck (void)
      	    }
      	    F = F->Next;
      	}
-     	S = S->List;
     }
 }
 
@@ -430,10 +413,12 @@ void SegCheck (void)
 void SegDump (void)
 /* Dump the contents of all segments */
 {
+    unsigned I;
     unsigned X = 0;
-    Segment* S = SegmentList;
+
     printf ("\n");
-    while (S) {
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        Segment* S = CollAtUnchecked (&SegmentList, I);
 	unsigned I;
 	Fragment* F;
 	int State = -1;
@@ -466,7 +451,6 @@ void SegDump (void)
 	    F = F->Next;
 	}
 	printf ("\n  End PC = $%04X\n", (unsigned)(S->PC & 0xFFFF));
-	S = S->List;
     }
     printf ("\n");
 }
@@ -560,6 +544,20 @@ static void WriteOneSeg (Segment* Seg)
 void InitSegments (void)
 /* Initialize segments */
 {
+    /* Create the predefined segments. Code segment is active */
+    ActiveSeg = NewSegFromDef (&CodeSegDef);
+    NewSegFromDef (&RODataSegDef);
+    NewSegFromDef (&BssSegDef);
+    NewSegFromDef (&DataSegDef);
+    NewSegFromDef (&ZeropageSegDef);
+    NewSegFromDef (&NullSegDef);
+}
+
+
+
+void SetSegmentSizes (void)
+/* Set the default segment sizes according to the memory model */
+{
     /* Initialize segment sizes. The segment definitions do already contain
      * the correct values for the default case (near), so we must only change
      * things that should be different.
@@ -590,21 +588,18 @@ void InitSegments (void)
 void WriteSegments (void)
 /* Write the segment data to the object file */
 {
-    Segment* Seg;
+    unsigned I;
 
     /* Tell the object file module that we're about to start the seg list */
     ObjStartSegments ();
 
     /* First thing is segment count */
-    ObjWriteVar (SegmentCount);
+    ObjWriteVar (CollCount (&SegmentList));
 
     /* Now walk through all segments and write them to the object file */
-    Seg = SegmentList;
-    while (Seg) {
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
 	/* Write one segment */
-	WriteOneSeg (Seg);
-	/* Next segment */
-      	Seg = Seg->List;
+	WriteOneSeg (CollAtUnchecked (&SegmentList, I));
     }
 
     /* Done writing segments */

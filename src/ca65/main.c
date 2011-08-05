@@ -866,6 +866,9 @@ int main (int argc, char* argv [])
     /* Initialize the include search paths */
     InitIncludePaths ();
 
+    /* Create the predefined segments */
+    InitSegments ();
+
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
@@ -991,8 +994,8 @@ int main (int argc, char* argv [])
         SetMemoryModel (MMODEL_NEAR);
     }
 
-    /* Initialize the segments */
-    InitSegments ();
+    /* Set the default segment sizes according to the memory model */
+    SetSegmentSizes ();
 
     /* Initialize the scanner, open the input file */
     InitScanner (InFile);

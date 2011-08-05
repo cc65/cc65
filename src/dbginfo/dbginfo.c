@@ -1698,7 +1698,8 @@ static void NextToken (InputData* D)
         { "start",      TOK_START       },
         { "sym",        TOK_SYM         },
         { "type",       TOK_TYPE        },
-        { "value",      TOK_VALUE       },
+        { "val",        TOK_VALUE       },
+        { "value",      TOK_VALUE       },      /* obsolete */
         { "version",    TOK_VERSION     },
         { "zeropage",   TOK_ZEROPAGE    },      /* obsolete */
         { "zp",         TOK_ZEROPAGE    },

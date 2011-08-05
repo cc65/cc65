@@ -57,7 +57,6 @@ struct Segment {
     unsigned            Name;           /* Name index of the segment */
     unsigned            Id;             /* Segment id for debug info */
     Segment*	      	Next;		/* Hash list */
-    Segment*  	      	List;		/* List of all segments */
     struct Section*	SecRoot;	/* Section list */
     struct Section*  	SecLast;	/* Pointer to last section */
     unsigned long     	PC;    		/* PC were this segment is located */

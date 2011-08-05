@@ -38,6 +38,7 @@
 
 /* common */
 #include "check.h"
+#include "coll.h"
 #include "exprdefs.h"
 #include "fragdefs.h"
 #include "hashstr.h"
@@ -67,10 +68,10 @@
 /* Hash table */
 #define HASHTAB_MASK    0x3FU
 #define HASHTAB_SIZE 	(HASHTAB_MASK + 1)
-static Segment*        	HashTab [HASHTAB_SIZE];
+static Segment*        	HashTab[HASHTAB_SIZE];
 
-static unsigned	       	SegCount = 0; 	/* Segment count */
-static Segment*	     	SegRoot = 0;  	/* List of all segments */
+/* List of all segments */
+static Collection       SegmentList = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -107,14 +108,8 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->Dumped      = 0;
 
     /* Insert the segment into the segment list and assign the segment id */
-    if (SegRoot == 0) {
-        S->Id = 0;
-    } else {
-        S->Id = SegRoot->Id + 1;
-    }
-    S->List = SegRoot;
-    SegRoot = S;
-    ++SegCount;
+    S->Id = CollCount (&SegmentList);
+    CollAppend (&SegmentList, S);
 
     /* Insert the segment into the segment hash list */
     Hash = (S->Name & HASHTAB_MASK);
@@ -352,29 +347,30 @@ void SegDump (void)
     unsigned I;
     unsigned long Count;
     unsigned char* Data;
-
-    Segment* Seg = SegRoot;
-    while (Seg) {
+                             
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        const Segment* Seg = CollConstAt (&SegmentList, I);
 	Section* S = Seg->SecRoot;
        	printf ("Segment: %s (%lu)\n", GetString (Seg->Name), Seg->Size);
 	while (S) {
+            unsigned J;
 	    Fragment* F = S->FragRoot;
 	    printf ("  Section:\n");
 	    while (F) {
 		switch (F->Type) {
 
 		    case FRAG_LITERAL:
-			printf ("    Literal (%u bytes):", F->Size);
-			Count = F->Size;
-			Data  = F->LitBuf;
-			I = 100;
-			while (Count--) {
-			    if (I > 75) {
-				printf ("\n   ");
-		     		I = 3;
+		       	printf ("    Literal (%u bytes):", F->Size);
+		       	Count = F->Size;
+		       	Data  = F->LitBuf;
+		       	J = 100;
+		       	while (Count--) {
+		       	    if (J > 75) {
+			     	printf ("\n   ");
+		     	     	J = 3;
 			    }
 			    printf (" %02X", *Data++);
-			    I += 3;
+			    J += 3;
 			}
 			printf ("\n");
 			break;
@@ -402,7 +398,6 @@ void SegDump (void)
 	    }
 	    S = S->Next;
     	}
-	Seg = Seg->List;
     }
 }
 
@@ -574,44 +569,28 @@ static int CmpSegStart (const void* K1, const void* K2)
 void PrintSegmentMap (FILE* F)
 /* Print a segment map to the given file */
 {
-    unsigned I;
-    Segment* S;
-    Segment** SegPool;
 
     /* Allocate memory for the segment pool */
-    SegPool = xmalloc (SegCount * sizeof (Segment*));
+    Segment** SegPool = xmalloc (CollCount (&SegmentList) * sizeof (Segment*));
 
-    /* Collect pointers to the segments */
-    I = 0;
-    S = SegRoot;
-    while (S) {
-
-     	/* Check the count for safety */
-     	CHECK (I < SegCount);
-
-     	/* Remember the pointer */
-     	SegPool [I] = S;
-
-     	/* Follow the linked list */
-     	S = S->List;
-
-     	/* Next array index */
-     	++I;
+    /* Copy the segment pointers */
+    unsigned I;
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+        SegPool[I] = CollAtUnchecked (&SegmentList, I);
     }
-    CHECK (I == SegCount);
 
     /* Sort the array by increasing start addresses */
-    qsort (SegPool, SegCount, sizeof (Segment*), CmpSegStart);
+    qsort (SegPool, CollCount (&SegmentList), sizeof (Segment*), CmpSegStart);
 
     /* Print a header */
     fprintf (F, "Name                  Start   End     Size\n"
      	       	"--------------------------------------------\n");
 
     /* Print the segments */
-    for (I = 0; I < SegCount; ++I) {
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
 
      	/* Get a pointer to the segment */
-     	S = SegPool [I];
+       	Segment* S = SegPool[I];
 
      	/* Print empty segments only if explicitly requested */
      	if (VerboseMap || S->Size > 0) {
@@ -634,10 +613,13 @@ void PrintSegmentMap (FILE* F)
 
 void PrintDbgSegments (FILE* F)
 /* Output the segments to the debug file */
-{
+{                                           
     /* Walk over all segments */
-    Segment* S = SegRoot;
-    while (S) {
+    unsigned I;
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+
+        /* Get the next segment */
+        const Segment* S = CollAtUnchecked (&SegmentList, I);
 
         /* Print the segment data */
         fprintf (F,
@@ -650,10 +632,7 @@ void PrintDbgSegments (FILE* F)
                      S->OutputName, S->OutputOffs);
         }
         fputc ('\n', F);
-
-     	/* Follow the linked list */
-     	S = S->List;
-    }                                   
+    }
 }
 
 
@@ -663,13 +642,17 @@ void CheckSegments (void)
  * not written to the output file. Output an error if this is the case.
  */
 {
-    Segment* S = SegRoot;
-    while (S) {
+    unsigned I;
+    for (I = 0; I < CollCount (&SegmentList); ++I) {
+
+        /* Get the next segment */
+        const Segment* S = CollAtUnchecked (&SegmentList, I);
+
+        /* Check it */
      	if (S->Size > 0 && S->Dumped == 0) {
        	    Error ("Missing memory area assignment for segment `%s'",
                    GetString (S->Name));
 	}
-	S = S->List;
     }
 }
 

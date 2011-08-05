@@ -1667,35 +1667,41 @@ static void NextToken (InputData* D)
         const char      Keyword[16];
         Token           Tok;
     } KeywordTable[] = {
-        { "absolute",   TOK_ABSOLUTE    },
+        { "abs",        TOK_ABSOLUTE    },
+        { "absolute",   TOK_ABSOLUTE    },      /* obsolete */
         { "addrsize",   TOK_ADDRSIZE    },
         { "count",      TOK_COUNT       },
-        { "equate",     TOK_EQUATE      },
+        { "equ",        TOK_EQUATE      },
+        { "equate",     TOK_EQUATE      },      /* obsolete */
         { "file",       TOK_FILE        },
         { "id",         TOK_ID          },
-        { "label",      TOK_LABEL       },
+        { "lab",        TOK_LABEL       },
+        { "label",      TOK_LABEL       },      /* obsolete */
         { "line",       TOK_LINE        },
         { "long",       TOK_LONG        },
         { "major",      TOK_MAJOR       },
         { "minor",      TOK_MINOR       },
         { "mtime",      TOK_MTIME       },
         { "name",       TOK_NAME        },
-        { "outputname", TOK_OUTPUTNAME  },
-        { "outputoffs", TOK_OUTPUTOFFS  },
+        { "oname",      TOK_OUTPUTNAME  },
+        { "ooffs",      TOK_OUTPUTOFFS  },
+        { "outputname", TOK_OUTPUTNAME  },      /* obsolete */
+        { "outputoffs", TOK_OUTPUTOFFS  },      /* obsolete */
         { "parent",     TOK_PARENT      },
         { "range",      TOK_RANGE       },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
         { "scope",      TOK_SCOPE       },
         { "seg",        TOK_SEGMENT     },
-        { "segment",    TOK_SEGMENT     },
+        { "segment",    TOK_SEGMENT     },      /* obsolete */
         { "size",       TOK_SIZE        },
         { "start",      TOK_START       },
         { "sym",        TOK_SYM         },
         { "type",       TOK_TYPE        },
         { "value",      TOK_VALUE       },
         { "version",    TOK_VERSION     },
-        { "zeropage",   TOK_ZEROPAGE    },
+        { "zeropage",   TOK_ZEROPAGE    },      /* obsolete */
+        { "zp",         TOK_ZEROPAGE    },
     };
 
 
@@ -3152,7 +3158,7 @@ static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
 
 static void ProcessSymInfo (InputData* D)
 /* Postprocess symbol infos */
-{          
+{
     /* Get pointers to the symbol info collections */
     Collection* SymInfoById   = &D->Info->SymInfoById;
     Collection* SymInfoByName = &D->Info->SymInfoByName;

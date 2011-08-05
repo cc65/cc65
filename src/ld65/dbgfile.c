@@ -58,6 +58,8 @@
 void CreateDbgFile (void)
 /* Create a debug info file */
 {
+    unsigned I;
+
     /* Open the debug info file */
     FILE* F = fopen (DbgFileName, "w");
     if (F == 0) {
@@ -66,6 +68,34 @@ void CreateDbgFile (void)
 
     /* Output version information */
     fprintf (F, "version\tmajor=1,minor=2\n");
+
+    /* Output modules */
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get this object file */
+        const ObjData* O = CollConstAt (&ObjDataList, I);
+
+        /* The main source file is the one at index zero */
+        const FileInfo* Source = CollConstAt (&O->Files, 0);
+
+        /* Output the module line */
+        fprintf (F,
+                 "module\tid=%u,name=\"%s\",file=%u",
+                 I,
+                 GetObjFileName (O),
+                 Source->Id);
+
+        /* Add library if any */
+        if (O->LibName != INVALID_STRING_ID) {
+            fprintf (F,
+                     ",lib=\"%s\",mtime=0x%08lX",
+                     GetString (O->LibName),
+                     O->MTime);
+        }
+
+        /* Terminate the output line */
+        fputc ('\n', F);
+    }
 
     /* Output the segment info */
     PrintDbgSegments (F);

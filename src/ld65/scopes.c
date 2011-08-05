@@ -111,9 +111,10 @@ void PrintDbgScopes (FILE* F)
             const Scope* S = CollConstAt (&O->Scopes, J);
 
             fprintf (F,
-                     "scope\tid=%u,name=\"%s\",type=%u",
+                     "scope\tid=%u,name=\"%s\",module=%u,type=%u",
                      BaseId + S->Id,
                      GetString (S->Name),
+                     I,
                      S->Type);
 
             /* Print the size if available */

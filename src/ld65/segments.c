@@ -641,19 +641,19 @@ void PrintDbgSegments (FILE* F)
 
         /* Print the segment data */
         fprintf (F,
-                 "segment\tid=%u,name=\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s",
+                 "seg\tid=%u,name=\"%s\",start=0x%06lX,size=0x%04lX,addrsize=%s,type=%s",
                  S->Id, GetString (S->Name), S->PC, S->Size,
                  AddrSizeToStr (S->AddrSize),
                  S->ReadOnly? "ro" : "rw");
         if (S->OutputName) {
-            fprintf (F, ",outputname=\"%s\",outputoffs=%lu",
+            fprintf (F, ",oname=\"%s\",ooffs=%lu",
                      S->OutputName, S->OutputOffs);
         }
         fputc ('\n', F);
 
      	/* Follow the linked list */
      	S = S->List;
-    }
+    }                                   
 }
 
 

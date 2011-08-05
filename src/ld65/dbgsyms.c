@@ -207,10 +207,9 @@ long GetDbgSymVal (const DbgSym* D)
 
 void PrintDbgSyms (FILE* F)
 /* Print the debug symbols in a debug file */
-{
+{                   
     unsigned I, J;
 
-    unsigned BaseId = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get the object file */
@@ -230,12 +229,12 @@ void PrintDbgSyms (FILE* F)
 
             /* Emit the base data for the entry */
             fprintf (F,
-                     "sym\tid=%u,name=\"%s\",value=0x%lX,addrsize=%s,type=%s",
-                     BaseId + J,
+                     "sym\tid=%u,name=\"%s\",val=0x%lX,addrsize=%s,type=%s",
+                     O->SymBaseId + J,
                      GetString (S->Name),
                      Val,
                      AddrSizeToStr (S->AddrSize),
-                     SYM_IS_LABEL (S->Type)? "label" : "equate");
+                     SYM_IS_LABEL (S->Type)? "lab" : "equ");
 
             /* Emit the size only if we know it */
             if (S->Size != 0) {
@@ -247,24 +246,21 @@ void PrintDbgSyms (FILE* F)
              */
             GetSegExprVal (S->Expr, &D);
             if (!D.TooComplex && D.Seg != 0) {
-                fprintf (F, ",segment=%u", D.Seg->Id);
+                fprintf (F, ",seg=%u", D.Seg->Id);
             }
 
             /* For cheap local symbols, add the owner symbol, for others,
              * add the owner scope.
              */
             if (SYM_IS_STD (S->Type)) {
-                fprintf (F, ",scope=%u", S->OwnerId);
+                fprintf (F, ",scope=%u", O->ScopeBaseId + S->OwnerId);
             } else {
-                fprintf (F, ",parent=%u", S->OwnerId);
+                fprintf (F, ",parent=%u", O->SymBaseId + S->OwnerId);
             }
 
             /* Terminate the output line */
             fputc ('\n', F);
         }
-
-        /* Increment base id */
-        BaseId += CollCount (&O->DbgSyms);
     }
 }
 

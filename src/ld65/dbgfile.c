@@ -50,8 +50,40 @@
 
 
 /*****************************************************************************/
-/*  	     	 		     Code				     */
+/*  	     	 		     Code   				     */
 /*****************************************************************************/
+
+
+
+static void AssignBaseIds (void)
+/* Assign the base ids for debug info output. Within each module, many of the
+ * items are addressed by ids which are actually the indices of the items in
+ * the collections. To make them unique, we must assign a unique base to each
+ * range.
+ */
+{
+    unsigned I;
+
+    /* Walk over all modules */
+    unsigned FileBaseId  = 0;
+    unsigned SymBaseId   = 0;
+    unsigned ScopeBaseId = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get this module */
+        ObjData* O = CollAt (&ObjDataList, I);
+
+        /* Assign ids */
+        O->FileBaseId  = FileBaseId;
+        O->SymBaseId   = SymBaseId;
+        O->ScopeBaseId = ScopeBaseId;
+
+        /* Bump the base ids */
+        FileBaseId    += CollCount (&O->Files);
+        SymBaseId     += CollCount (&O->DbgSyms);
+        ScopeBaseId   += CollCount (&O->Scopes);
+    }
+}
 
 
 
@@ -69,7 +101,10 @@ void CreateDbgFile (void)
     /* Output version information */
     fprintf (F, "version\tmajor=1,minor=2\n");
 
-    /* Output modules */
+    /* Assign the base ids to the modules */
+    AssignBaseIds ();
+
+    /* Output modules */             
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get this object file */
@@ -80,7 +115,7 @@ void CreateDbgFile (void)
 
         /* Output the module line */
         fprintf (F,
-                 "module\tid=%u,name=\"%s\",file=%u",
+                 "mod\tid=%u,name=\"%s\",file=%u",
                  I,
                  GetObjFileName (O),
                  Source->Id);

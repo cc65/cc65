@@ -68,6 +68,11 @@ struct ObjData {
     ObjHeader	 	Header;		/* Header of file */
     unsigned long  	Start;		/* Start offset of data in library */
     unsigned 	     	Flags;
+
+    unsigned            FileBaseId;     /* Debug info base id for files */
+    unsigned            SymBaseId;      /* Debug info base id for symbols */
+    unsigned            ScopeBaseId;    /* Debug info base if for scopes */
+
     Collection          Files;		/* List of input files */
     Collection          Sections;  	/* List of all sections */
     Collection          Exports;       	/* List of all exports */
@@ -136,7 +141,7 @@ INLINE int ObjHasFiles (const ObjData* O)
 struct Section* GetObjSection (ObjData* Obj, unsigned Id);
 /* Get a section from an object file checking for a valid index */
 
-struct Scope* GetObjScope (ObjData* Obj, unsigned Id);   
+struct Scope* GetObjScope (ObjData* Obj, unsigned Id);
 /* Get a scope from an object file checking for a valid index */
 
 

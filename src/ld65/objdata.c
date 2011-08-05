@@ -78,6 +78,9 @@ ObjData* NewObjData (void)
     O->MTime            = 0;
     O->Start	   	= 0;
     O->Flags   	   	= 0;
+    O->FileBaseId       = 0;
+    O->SymBaseId        = 0;
+    O->ScopeBaseId      = 0;
     O->Files            = EmptyCollection;
     O->Sections         = EmptyCollection;
     O->Exports     	= EmptyCollection;

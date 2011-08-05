@@ -100,7 +100,6 @@ void PrintDbgScopes (FILE* F)
     unsigned I, J;
 
     /* Print scopes from all modules we have linked into the output file */
-    unsigned BaseId = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get the object file */
@@ -111,8 +110,8 @@ void PrintDbgScopes (FILE* F)
             const Scope* S = CollConstAt (&O->Scopes, J);
 
             fprintf (F,
-                     "scope\tid=%u,name=\"%s\",module=%u,type=%u",
-                     BaseId + S->Id,
+                     "scope\tid=%u,name=\"%s\",mod=%u,type=%u",
+                     O->ScopeBaseId + S->Id,
                      GetString (S->Name),
                      I,
                      S->Type);
@@ -123,15 +122,12 @@ void PrintDbgScopes (FILE* F)
             }
             /* Print parent if available */
             if (S->Id != S->ParentId) {
-                fprintf (F, ",parent=%u", BaseId + S->ParentId);
+                fprintf (F, ",parent=%u", O->ScopeBaseId + S->ParentId);
             }
 
             /* Terminate the output line */
             fputc ('\n', F);
         }
-
-        /* Increment scope base id */
-        BaseId += CollCount (&O->Scopes);
     }
 }
 

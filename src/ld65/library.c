@@ -65,7 +65,6 @@
 /* Library data structure */
 typedef struct Library Library;
 struct Library {
-    Library*    Next;
     unsigned    Name;           /* String id of the name */
     FILE*       F;              /* Open file stream */
     LibHeader   Header;         /* Library header */
@@ -93,7 +92,6 @@ static Library* NewLibrary (FILE* F, const char* Name)
     Library* L = xmalloc (sizeof (*L));
 
     /* Initialize the fields */
-    L->Next     = 0;
     L->Name     = GetStringId (Name);
     L->F        = F;
     L->Modules  = EmptyCollection;
@@ -387,7 +385,7 @@ static void LibResolve (void)
                  */
                 ObjReadSections (L->F, O->Start + O->Header.SegOffs, O);
 
-                /* Read the scope table from the object file. Scopes reference 
+                /* Read the scope table from the object file. Scopes reference
                  * segments, so we must read them after the sections.
                  */
                 ObjReadScopes (L->F, O->Start + O->Header.ScopeOffs, O);

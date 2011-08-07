@@ -56,17 +56,15 @@
 
 
 
-static void AssignBaseIds (void)
+static void AssignIds (void)
 /* Assign the base ids for debug info output. Within each module, many of the
  * items are addressed by ids which are actually the indices of the items in
  * the collections. To make them unique, we must assign a unique base to each
  * range.
  */
 {
-    unsigned I;
-
     /* Walk over all modules */
-    unsigned FileBaseId  = 0;
+    unsigned I;
     unsigned SymBaseId   = 0;
     unsigned ScopeBaseId = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
@@ -74,16 +72,20 @@ static void AssignBaseIds (void)
         /* Get this module */
         ObjData* O = CollAt (&ObjDataList, I);
 
-        /* Assign ids */
-        O->FileBaseId  = FileBaseId;
+        /* Assign the module id */
+        O->Id = I;
+
+        /* Assign base ids */
         O->SymBaseId   = SymBaseId;
         O->ScopeBaseId = ScopeBaseId;
 
         /* Bump the base ids */
-        FileBaseId    += CollCount (&O->Files);
         SymBaseId     += CollCount (&O->DbgSyms);
         ScopeBaseId   += CollCount (&O->Scopes);
-    }
+    }         
+
+    /* Assign the ids to the file infos */
+    AssignFileInfoIds ();
 }
 
 
@@ -91,8 +93,6 @@ static void AssignBaseIds (void)
 void CreateDbgFile (void)
 /* Create a debug info file */
 {
-    unsigned I;
-
     /* Open the debug info file */
     FILE* F = fopen (DbgFileName, "w");
     if (F == 0) {
@@ -102,36 +102,14 @@ void CreateDbgFile (void)
     /* Output version information */
     fprintf (F, "version\tmajor=1,minor=2\n");
 
-    /* Assign the base ids to the modules */
-    AssignBaseIds ();
+    /* Assign the ids to the items */
+    AssignIds ();
 
     /* Output libraries */
     PrintDbgLibraries (F);
 
     /* Output modules */
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
-
-        /* Get this object file */
-        const ObjData* O = CollConstAt (&ObjDataList, I);
-
-        /* The main source file is the one at index zero */
-        const FileInfo* Source = CollConstAt (&O->Files, 0);
-
-        /* Output the module line */
-        fprintf (F,
-                 "mod\tid=%u,name=\"%s\",file=%u",
-                 I,
-                 GetObjFileName (O),
-                 Source->Id);
-
-        /* Add library if any */
-        if (O->Lib != 0) {
-            fprintf (F, ",lib=%u", GetLibId (O->Lib));
-        }
-
-        /* Terminate the output line */
-        fputc ('\n', F);
-    }
+    PrintDbgModules (F);
 
     /* Output the segment info */
     PrintDbgSegments (F);

@@ -236,7 +236,7 @@ void PrintDbgLineInfo (FILE* F)
 
                 /* Print it */
                 fprintf (F,
-                         "line\tfile=%u,line=%lu,segment=%u,range=0x%lX-0x%lX",
+                         "line\tfile=%u,line=%lu,seg=%u,range=0x%lX-0x%lX",
                          LI->File->Id, GetSourceLine (LI), S->Seg->Id,
                          S->Offs, S->Offs + S->Size - 1);
 

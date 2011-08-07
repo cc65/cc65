@@ -43,6 +43,7 @@
 #include "error.h"
 #include "exports.h"
 #include "fileinfo.h"
+#include "library.h"
 #include "objdata.h"
 #include "spool.h"
 
@@ -78,7 +79,6 @@ ObjData* NewObjData (void)
     O->MTime            = 0;
     O->Start	   	= 0;
     O->Flags   	   	= 0;
-    O->FileBaseId       = 0;
     O->SymBaseId        = 0;
     O->ScopeBaseId      = 0;
     O->Files            = EmptyCollection;
@@ -106,6 +106,9 @@ void FreeObjData (ObjData* O)
 {
     unsigned I;
 
+    for (I = 0; I < CollCount (&O->Files); ++I) {
+        CollDeleteItem (&((FileInfo*) CollAtUnchecked (&O->Files, I))->Modules, O);
+    }
     DoneCollection (&O->Files);
     DoneCollection (&O->Sections);
     for (I = 0; I < CollCount (&O->Exports); ++I) {
@@ -209,6 +212,40 @@ struct Scope* GetObjScope (ObjData* O, unsigned Id)
                Id, GetObjFileName (O));
     }
     return CollAtUnchecked (&O->Scopes, Id);
+}
+
+
+
+void PrintDbgModules (FILE* F)
+/* Output the modules to a debug info file */
+{
+    unsigned I;
+
+    /* Output modules */
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get this object file */
+        const ObjData* O = CollConstAt (&ObjDataList, I);
+
+        /* The main source file is the one at index zero */
+        const FileInfo* Source = CollConstAt (&O->Files, 0);
+
+        /* Output the module line */
+        fprintf (F,
+                 "mod\tid=%u,name=\"%s\",file=%u",
+                 I,
+                 GetObjFileName (O),
+                 Source->Id);
+
+        /* Add library if any */
+        if (O->Lib != 0) {
+            fprintf (F, ",lib=%u", GetLibId (O->Lib));
+        }
+
+        /* Terminate the output line */
+        fputc ('\n', F);
+    }
+
 }
 
 

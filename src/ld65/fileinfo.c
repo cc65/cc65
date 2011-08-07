@@ -102,21 +102,33 @@ static int FindFileInfo (unsigned Name, unsigned* Index)
 
 
 
-static FileInfo* NewFileInfo (void)
+static FileInfo* NewFileInfo (unsigned Name, unsigned long MTime, unsigned long Size)
 /* Allocate and initialize a new FileInfo struct and return it */
 {
-    /* We will assign file info ids in increasing order of creation */
-    static unsigned Id = 0;
-
     /* Allocate memory */
     FileInfo* FI = xmalloc (sizeof (FileInfo));
 
     /* Initialize stuff */
-    FI->Id     = Id++;
-    FI->Dumped = 0;
+    FI->Id      = ~0U;
+    FI->Name    = Name;
+    FI->MTime   = MTime;
+    FI->Size    = Size;
+    FI->Modules = EmptyCollection;
 
     /* Return the new struct */
     return FI;
+}
+
+
+
+static void FreeFileInfo (FileInfo* FI)
+/* Free a file info structure */
+{
+    /* Free the collection */
+    DoneCollection (&FI->Modules);
+
+    /* Free memory for the structure */
+    xfree (FI);
 }
 
 
@@ -145,7 +157,8 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
 
             /* Check size and modification time stamp */
             if (FI->Size == Size && FI->MTime == MTime) {
-                /* Return this one */
+                /* Remember that the modules uses this file info, then return it */
+                CollAppend (&FI->Modules, O);
                 return FI;
             }
 
@@ -164,12 +177,10 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
     }
 
     /* Not found. Allocate a new FileInfo structure */
-    FI = NewFileInfo ();
+    FI = NewFileInfo (Name, MTime, Size);
 
-    /* Set the fields */
-    FI->Name  = Name;
-    FI->MTime = MTime;
-    FI->Size  = Size;
+    /* Remember that this module uses the file info */
+    CollAppend (&FI->Modules, O);
 
     /* Insert the file info in our global list. Index points to the insert
      * position.
@@ -182,27 +193,64 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
 
 
 
+void AssignFileInfoIds (void)
+/* Remove unused file infos and assign the ids to the remaining ones */
+{
+    unsigned I, J;
+
+    /* Print all file infos */
+    for (I = 0, J = 0; I < CollCount (&FileInfos); ++I) {
+
+        /* Get the next file info */
+        FileInfo* FI = CollAtUnchecked (&FileInfos, I);
+
+        /* If it's unused, free it, otherwise assign the id and keep it */
+        if (CollCount (&FI->Modules) == 0) {
+            FreeFileInfo (FI);
+        } else {
+            FI->Id = J;
+            CollReplace (&FileInfos, FI, J++);
+        }
+    }
+
+    /* The new count is now in J */
+    FileInfos.Count = J;
+}
+
+
+
 void PrintDbgFileInfo (FILE* F)
 /* Output the file info to a debug info file */
 {
     unsigned I, J;
 
-    /* Print file infos from all modules we have linked into the output file */
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+    /* Print all file infos */
+    for (I = 0; I < CollCount (&FileInfos); ++I) {
 
-        /* Get the object file */
-        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+        /* Get the file info */
+        const FileInfo* FI = CollAtUnchecked (&FileInfos, I);
 
-        /* Output the files section */
-        for (J = 0; J < CollCount (&O->Files); ++J) {
-            FileInfo* FI = CollAt (&O->Files, J);
-            if (!FI->Dumped) {
-                fprintf (F,
-                         "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX\n",
-                         FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
-                FI->Dumped = 1;
+        /* Base info */
+        fprintf (F,
+                 "file\tid=%u,name=\"%s\",size=%lu,mtime=0x%08lX,mod=",
+                 FI->Id, GetString (FI->Name), FI->Size, FI->MTime);
+
+        /* Modules that use the file */
+        for (J = 0; J < CollCount (&FI->Modules); ++J) {
+
+            /* Get the module */
+            const ObjData* O = CollConstAt (&FI->Modules, J);
+
+            /* Output its id */
+            if (J > 0) {
+                fprintf (F, "+%u", O->Id);
+            } else {
+                fprintf (F, "%u", O->Id);
             }
         }
+
+        /* Terminate the output line */
+        fputc ('\n', F);
     }
 }
 

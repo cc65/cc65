@@ -63,6 +63,7 @@ struct Section;
 typedef struct ObjData ObjData;
 struct ObjData {
     ObjData*	     	Next;  		/* Linked list of all objects */
+    unsigned            Id;             /* Id of this module */
     unsigned            Name;  		/* Module name */
     struct Library*     Lib;            /* Library where module comes from */
     unsigned long       MTime;          /* Time of last modification */
@@ -70,7 +71,6 @@ struct ObjData {
     unsigned long  	Start;		/* Start offset of data in library */
     unsigned   	     	Flags;
 
-    unsigned            FileBaseId;     /* Debug info base id for files */
     unsigned            SymBaseId;      /* Debug info base id for symbols */
     unsigned            ScopeBaseId;    /* Debug info base if for scopes */
 
@@ -144,6 +144,9 @@ struct Section* GetObjSection (ObjData* Obj, unsigned Id);
 
 struct Scope* GetObjScope (ObjData* Obj, unsigned Id);
 /* Get a scope from an object file checking for a valid index */
+
+void PrintDbgModules (FILE* F);
+/* Output the modules to a debug info file */
 
 
 

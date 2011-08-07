@@ -51,6 +51,14 @@
 
 #define SCOPE_HAS_SIZE(x)       (((x) & SCOPE_MASK_SIZE) == SCOPE_SIZE)
 
+/* Does the scope has a label? */
+#define SCOPE_UNLABELED         0x00U   /* Scope has no label */
+#define SCOPE_LABELED           0x02U   /* Scope has a label */
+#define SCOPE_MASK_LABEL        0x02U   /* Label size */
+
+#define SCOPE_HAS_LABEL(x)      (((x) & SCOPE_MASK_LABEL) == SCOPE_LABELED)
+
+
 
 /* Scope types */
 enum {

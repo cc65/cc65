@@ -82,7 +82,7 @@ static void AssignIds (void)
         /* Bump the base ids */
         SymBaseId     += CollCount (&O->DbgSyms);
         ScopeBaseId   += CollCount (&O->Scopes);
-    }         
+    }
 
     /* Assign the ids to the file infos */
     AssignFileInfoIds ();
@@ -100,7 +100,7 @@ void CreateDbgFile (void)
     }
 
     /* Output version information */
-    fprintf (F, "version\tmajor=1,minor=2\n");
+    fprintf (F, "version\tmajor=2,minor=0\n");
 
     /* Assign the ids to the items */
     AssignIds ();

@@ -59,9 +59,10 @@
 typedef struct Scope Scope;
 struct Scope {
     unsigned            Id;             /* Id of scope */
-    ObjData*   	    	Obj;	    	/* Object file that exports the name */
+    ObjData*   	    	Obj;	    	/* Object file that contains the scope */
     unsigned            ParentId;       /* Id of parent scope */
-    unsigned            LexicalLevel;   /* Lexical level */
+    unsigned            LabelId;        /* Id of the scope label if any */
+    unsigned            LexicalLevel;   /* Lexical level */               
     unsigned            Flags;
     unsigned            Type;           /* Type of scope */
     unsigned            Name;           /* Name of scope */

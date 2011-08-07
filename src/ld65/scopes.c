@@ -61,6 +61,7 @@ static Scope* NewScope (ObjData* Obj, unsigned Id)
     S->Id       = Id;
     S->Obj      = Obj;
     S->Size     = 0;
+    S->LabelId  = ~0U;
     S->Spans    = EmptyCollection;
 
     /* Return the new entry */
@@ -83,6 +84,9 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
     S->Name         = MakeGlobalStringId (Obj, ReadVar (F));
     if (SCOPE_HAS_SIZE (S->Flags)) {
         S->Size     = ReadVar (F);
+    }
+    if (SCOPE_HAS_LABEL (S->Flags)) {
+        S->LabelId  = ReadVar (F);
     }
 
     /* Read the segment ranges for this scope */
@@ -124,7 +128,11 @@ void PrintDbgScopes (FILE* F)
             if (S->Id != S->ParentId) {
                 fprintf (F, ",parent=%u", O->ScopeBaseId + S->ParentId);
             }
-
+            /* Print the label id if the scope is labeled */
+            if (SCOPE_HAS_LABEL (S->Flags)) {
+                fprintf (F, ",sym=%u", O->SymBaseId + S->LabelId);
+            }
+       
             /* Terminate the output line */
             fputc ('\n', F);
         }

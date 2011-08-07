@@ -102,16 +102,28 @@ struct LineInfoList {
  */
 typedef struct DbgInfo DbgInfo;
 struct DbgInfo {
-    Collection          SegInfoByName;  /* Segment infos sorted by name */
-    Collection          SegInfoById;    /* Segment infos sorted by id */
-    Collection          FileInfoByName; /* File infos sorted by name */
+
+    /* First we have all items in collections sorted by id. The ids are
+     * continous, so an access by id is almost as cheap as an array access.
+     * The collections are also used when the objects are deleted, so they're
+     * actually the ones that "own" the items.
+     */
     Collection          FileInfoById;   /* File infos sorted by id */
-    Collection          LineInfos;      /* List of all line infos */
-    LineInfoList        LineInfoByAddr; /* Line infos sorted by unique address */
+    Collection          LibInfoById;    /* Library infos sorted by id */
+    Collection          ModInfoById;    /* Module infos sorted by id */
+    Collection          ScopeInfoById;  /* Scope infos sorted by id */
+    Collection          SegInfoById;    /* Segment infos sorted by id */
     Collection          SymInfoById;    /* Symbol infos sorted by id */
+
+    /* Collections with other sort criteria */
+    Collection          FileInfoByName; /* File infos sorted by name */
+    Collection          LineInfos;      /* List of all line infos */
+    Collection          SegInfoByName;  /* Segment infos sorted by name */
     Collection          SymInfoByName;  /* Symbol infos sorted by name */
     Collection          SymInfoByVal;   /* Symbol infos sorted by value */
-    Collection          ScopeInfoById;  /* Scope infos sorted by id */
+
+    /* Other stuff */
+    LineInfoList        LineInfoByAddr; /* Line infos sorted by unique address */
 };
 
 /* Input tokens */
@@ -137,10 +149,12 @@ typedef enum {
     TOK_FILE,                           /* FILE keyword */
     TOK_ID,                             /* ID keyword */
     TOK_LABEL,                          /* LABEL keyword */
+    TOK_LIBRARY,                        /* LIBRARY keyword */
     TOK_LINE,                           /* LINE keyword */
     TOK_LONG,                           /* LONG_keyword */
     TOK_MAJOR,                          /* MAJOR keyword */
     TOK_MINOR,                          /* MINOR keyword */
+    TOK_MODULE,                         /* MODULE keyword */
     TOK_MTIME,                          /* MTIME keyword */
     TOK_NAME,                           /* NAME keyword */
     TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
@@ -183,19 +197,26 @@ struct InputData {
     DbgInfo*            Info;           /* Pointer to debug info */
 };
 
-/* Internally used segment info struct */
+/* Typedefs for the item structures. Do also serve as forwards */
+typedef struct IdStruct IdStruct;
+typedef struct FileInfo FileInfo;
+typedef struct LibInfo LibInfo;
+typedef struct LineInfo LineInfo;
+typedef struct ModInfo ModInfo;
+typedef struct ScopeInfo ScopeInfo;
 typedef struct SegInfo SegInfo;
-struct SegInfo {
-    unsigned            Id;             /* Id of segment */
-    cc65_addr           Start;          /* Start address of segment */
-    cc65_addr           Size;           /* Size of segment */
-    char*               OutputName;     /* Name of output file */
-    unsigned long       OutputOffs;     /* Offset in output file */
-    char                SegName[1];     /* Name of segment */
+typedef struct SymInfo SymInfo;
+
+/* The C standard guarantees that layout of structures with identical members
+ * is identical. To save some code, all structures below have an unsigned
+ * named Id as first member. We will use the following struct in the functions
+ * for sorting to save some code.
+ */
+struct IdStruct {
+    unsigned            Id;             /* Id of structure */
 };
 
 /* Internally used file info struct */
-typedef struct FileInfo FileInfo;
 struct FileInfo {
     unsigned            Id;             /* Id of file */
     unsigned long       Size;           /* Size of file */
@@ -204,8 +225,13 @@ struct FileInfo {
     char                FileName[1];    /* Name of file with full path */
 };
 
+/* Internally used library info struct */
+struct LibInfo {
+    unsigned            Id;             /* Id of library */
+    char                Name[1];        /* Name of library with path */
+};
+
 /* Internally used line info struct */
-typedef struct LineInfo LineInfo;
 struct LineInfo {
     cc65_addr           Start;          /* Start of data range */
     cc65_addr           End;            /* End of data range */
@@ -222,21 +248,21 @@ struct LineInfo {
     unsigned            Count;          /* Nesting counter for macros */
 };
 
-/* Internally used symbol info struct */
-typedef struct SymInfo SymInfo;
-struct SymInfo {
-    unsigned            Id;             /* Id of symbol */
-    cc65_symbol_type    Type;           /* Type of symbol */
-    long                Value;          /* Value of symbol */
-    cc65_size           Size;           /* Size of symbol */
-    unsigned            Segment;        /* Id of segment if any */
-    unsigned            Scope;          /* Id of symbol scope */
-    unsigned            Parent;         /* Parent symbol if any */
-    char                SymName[1];     /* Name of symbol */
+/* Internally used module info struct */
+struct ModInfo {
+    unsigned            Id;             /* Id of library */
+    union {
+        unsigned        Id;             /* Id of main source file */
+        FileInfo*       Info;           /* Pointer to file info */
+    } File;
+    union {
+        unsigned        Id;             /* Id of library if any */
+        LibInfo*        Info;           /* Pointer to library info or NULL */
+    } Lib;
+    char                Name[1];        /* Name of module with path */
 };
 
 /* Internally used scope info struct */
-typedef struct ScopeInfo ScopeInfo;
 struct ScopeInfo {
     unsigned            Id;             /* Id of scope */
     cc65_scope_type     Type;           /* Type of scope */
@@ -247,6 +273,28 @@ struct ScopeInfo {
         ScopeInfo*      Scope;          /* Pointer to parent scope */
     } Parent;
     char                ScopeName[1];   /* Name of scope */
+};
+
+/* Internally used segment info struct */
+struct SegInfo {
+    unsigned            Id;             /* Id of segment */
+    cc65_addr           Start;          /* Start address of segment */
+    cc65_addr           Size;           /* Size of segment */
+    char*               OutputName;     /* Name of output file */
+    unsigned long       OutputOffs;     /* Offset in output file */
+    char                SegName[1];     /* Name of segment */
+};
+
+/* Internally used symbol info struct */
+struct SymInfo {
+    unsigned            Id;             /* Id of symbol */
+    cc65_symbol_type    Type;           /* Type of symbol */
+    long                Value;          /* Value of symbol */
+    cc65_size           Size;           /* Size of symbol */
+    unsigned            Segment;        /* Id of segment if any */
+    unsigned            Scope;          /* Id of symbol scope */
+    unsigned            Parent;         /* Parent symbol if any */
+    char                SymName[1];     /* Name of symbol */
 };
 
 
@@ -842,69 +890,110 @@ static void DumpData (InputData* D)
 
 
 /*****************************************************************************/
-/*                               Segment info                                */
+/*                              struct IdStruct                              */
 /*****************************************************************************/
 
 
 
-static SegInfo* NewSegInfo (const StrBuf* SegName, unsigned Id,
-                            cc65_addr Start, cc65_addr Size,
-                            const StrBuf* OutputName, unsigned long OutputOffs)
-/* Create a new SegInfo struct and return it */
+static int CompareById (const void* L, const void* R)
+/* Helper function to sort structures in a collection by id */
+{
+    return ((int)((const IdStruct*) L)->Id) - ((int)((const IdStruct*) R)->Id);
+}
+
+
+
+/*****************************************************************************/
+/*                                 File info                                 */
+/*****************************************************************************/
+
+
+
+static FileInfo* NewFileInfo (const StrBuf* FileName, unsigned Id,
+                              unsigned long Size, unsigned long MTime)
+/* Create a new FileInfo struct and return it */
 {
     /* Allocate memory */
-    SegInfo* S = xmalloc (sizeof (SegInfo) + SB_GetLen (SegName));
+    FileInfo* F = xmalloc (sizeof (FileInfo) + SB_GetLen (FileName));
 
     /* Initialize it */
-    S->Id         = Id;
-    S->Start      = Start;
-    S->Size       = Size;
-    if (SB_GetLen (OutputName) > 0) {
-        /* Output file given */
-        S->OutputName = SB_StrDup (OutputName);
-        S->OutputOffs = OutputOffs;
-    } else {
-        /* No output file given */
-        S->OutputName = 0;
-        S->OutputOffs = 0;
-    }
-    memcpy (S->SegName, SB_GetConstBuf (SegName), SB_GetLen (SegName) + 1);
+    F->Id    = Id;
+    F->Size  = Size;
+    F->MTime = MTime;
+    InitCollection (&F->LineInfoByLine);
+    memcpy (F->FileName, SB_GetConstBuf (FileName), SB_GetLen (FileName) + 1);
 
     /* Return it */
-    return S;
+    return F;
 }
 
 
 
-static void FreeSegInfo (SegInfo* S)
-/* Free a SegInfo struct */
+static void FreeFileInfo (FileInfo* F)
+/* Free a FileInfo struct */
 {
-    xfree (S->OutputName);
-    xfree (S);
+    /* Delete the collection with the line infos */
+    DoneCollection (&F->LineInfoByLine);
+
+    /* Free the file info structure itself */
+    xfree (F);
 }
 
 
 
-static int CompareSegInfoByName (const void* L, const void* R)
-/* Helper function to sort segment infos in a collection by name */
+static int CompareFileInfoByName (const void* L, const void* R)
+/* Helper function to sort file infos in a collection by name */
 {
-    /* Sort by file name */
-    return strcmp (((const SegInfo*) L)->SegName,
-                   ((const SegInfo*) R)->SegName);
-}
-
-
-
-static int CompareSegInfoById (const void* L, const void* R)
-/* Helper function to sort segment infos in a collection by id */
-{
-    if (((const SegInfo*) L)->Id > ((const SegInfo*) R)->Id) {
+    /* Sort by file name. If names are equal, sort by timestamp,
+     * then sort by size. Which means, identical files will go
+     * together.
+     */
+    int Res = strcmp (((const FileInfo*) L)->FileName,
+                      ((const FileInfo*) R)->FileName);
+    if (Res != 0) {
+        return Res;
+    }
+    if (((const FileInfo*) L)->MTime > ((const FileInfo*) R)->MTime) {
         return 1;
-    } else if (((const SegInfo*) L)->Id < ((const SegInfo*) R)->Id) {
+    } else if (((const FileInfo*) L)->MTime < ((const FileInfo*) R)->MTime) {
+        return -1;
+    }
+    if (((const FileInfo*) L)->Size > ((const FileInfo*) R)->Size) {
+        return 1;
+    } else if (((const FileInfo*) L)->Size < ((const FileInfo*) R)->Size) {
         return -1;
     } else {
         return 0;
     }
+}
+
+
+
+/*****************************************************************************/
+/*                               Library info                                */
+/*****************************************************************************/
+
+
+
+static LibInfo* NewLibInfo (const StrBuf* Name)
+/* Create a new LibInfo struct, intialize and return it */
+{
+    /* Allocate memory */
+    LibInfo* L = xmalloc (sizeof (LibInfo) + SB_GetLen (Name));
+
+    /* Initialize the name */
+    memcpy (L->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
+
+    /* Return it */
+    return L;
+}
+
+
+
+static void FreeLibInfo (LibInfo* L)
+/* Free a LibInfo struct */
+{
+    xfree (L);
 }
 
 
@@ -982,157 +1071,6 @@ static int CompareLineInfoByLine (const void* L, const void* R)
         return -1;
     } else {
         return CompareLineInfoByAddr (L, R);
-    }
-}
-
-
-
-/*****************************************************************************/
-/*                                 File info                                 */
-/*****************************************************************************/
-
-
-
-static FileInfo* NewFileInfo (const StrBuf* FileName, unsigned Id,
-                              unsigned long Size, unsigned long MTime)
-/* Create a new FileInfo struct and return it */
-{
-    /* Allocate memory */
-    FileInfo* F = xmalloc (sizeof (FileInfo) + SB_GetLen (FileName));
-
-    /* Initialize it */
-    F->Id    = Id;
-    F->Size  = Size;
-    F->MTime = MTime;
-    InitCollection (&F->LineInfoByLine);
-    memcpy (F->FileName, SB_GetConstBuf (FileName), SB_GetLen (FileName) + 1);
-
-    /* Return it */
-    return F;
-}
-
-
-
-static void FreeFileInfo (FileInfo* F)
-/* Free a FileInfo struct */
-{
-    /* Delete the collection with the line infos */
-    DoneCollection (&F->LineInfoByLine);
-
-    /* Free the file info structure itself */
-    xfree (F);
-}
-
-
-
-static int CompareFileInfoByName (const void* L, const void* R)
-/* Helper function to sort file infos in a collection by name */
-{
-    /* Sort by file name. If names are equal, sort by timestamp,
-     * then sort by size. Which means, identical files will go
-     * together.
-     */
-    int Res = strcmp (((const FileInfo*) L)->FileName,
-                      ((const FileInfo*) R)->FileName);
-    if (Res != 0) {
-        return Res;
-    }
-    if (((const FileInfo*) L)->MTime > ((const FileInfo*) R)->MTime) {
-        return 1;
-    } else if (((const FileInfo*) L)->MTime < ((const FileInfo*) R)->MTime) {
-        return -1;
-    }
-    if (((const FileInfo*) L)->Size > ((const FileInfo*) R)->Size) {
-        return 1;
-    } else if (((const FileInfo*) L)->Size < ((const FileInfo*) R)->Size) {
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-
-
-static int CompareFileInfoById (const void* L, const void* R)
-/* Helper function to sort file infos in a collection by id */
-{
-    if (((const FileInfo*) L)->Id > ((const FileInfo*) R)->Id) {
-        return 1;
-    } else if (((const FileInfo*) L)->Id < ((const FileInfo*) R)->Id) {
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-
-
-/*****************************************************************************/
-/*                                Symbol info                                */
-/*****************************************************************************/
-
-
-
-static SymInfo* NewSymInfo (const StrBuf* Name)
-/* Create a new SymInfo struct, intialize and return it */
-{
-    /* Allocate memory */
-    SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
-
-    /* Initialize the name */
-    memcpy (S->SymName, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
-
-    /* Return it */
-    return S;
-}
-
-
-
-static void FreeSymInfo (SymInfo* S)
-/* Free a SymInfo struct */
-{
-    xfree (S);
-}
-
-
-
-static int CompareSymInfoById (const void* L, const void* R)
-/* Helper function to sort symbol infos in a collection by id */
-{
-    /* Sort by symbol id. */
-    if (((const SymInfo*) L)->Id > ((const SymInfo*) R)->Id) {
-        return 1;
-    } else if (((const SymInfo*) L)->Id < ((const SymInfo*) R)->Id ) {
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-
-
-static int CompareSymInfoByName (const void* L, const void* R)
-/* Helper function to sort symbol infos in a collection by name */
-{
-    /* Sort by symbol name */
-    return strcmp (((const SymInfo*) L)->SymName,
-                   ((const SymInfo*) R)->SymName);
-}
-
-
-
-static int CompareSymInfoByVal (const void* L, const void* R)
-/* Helper function to sort symbol infos in a collection by value */
-{
-    /* Sort by symbol value. If both are equal, sort by symbol name so it
-     * looks nice when such a list is returned.
-     */
-    if (((const SymInfo*) L)->Value > ((const SymInfo*) R)->Value) {
-        return 1;
-    } else if (((const SymInfo*) L)->Value < ((const SymInfo*) R)->Value) {
-        return -1;
-    } else {
-        return CompareSymInfoByName (L, R);
     }
 }
 
@@ -1330,6 +1268,35 @@ static void DoneLineInfoList (LineInfoList* L)
 
 
 /*****************************************************************************/
+/*                                Module info                                */
+/*****************************************************************************/
+
+
+
+static ModInfo* NewModInfo (const StrBuf* Name)
+/* Create a new ModInfo struct, intialize and return it */
+{
+    /* Allocate memory */
+    ModInfo* M = xmalloc (sizeof (ModInfo) + SB_GetLen (Name));
+
+    /* Initialize the name */
+    memcpy (M->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
+
+    /* Return it */
+    return M;
+}
+
+
+
+static void FreeModInfo (ModInfo* M)
+/* Free a ModInfo struct */
+{
+    xfree (M);
+}
+
+
+
+/*****************************************************************************/
 /*                                Scope info                                 */
 /*****************************************************************************/
 
@@ -1358,27 +1325,122 @@ static void FreeScopeInfo (ScopeInfo* S)
 
 
 
-static int CompareScopeInfoById (const void* L, const void* R)
-/* Helper function to sort scope infos in a collection by id */
-{
-    /* Sort by symbol id. */
-    if (((const ScopeInfo*) L)->Id > ((const ScopeInfo*) R)->Id) {
-        return 1;
-    } else if (((const ScopeInfo*) L)->Id < ((const ScopeInfo*) R)->Id ) {
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-
-
 static int CompareScopeInfoByName (const void* L, const void* R)
 /* Helper function to sort scope infos in a collection by name */
 {
     /* Sort by symbol name */
     return strcmp (((const ScopeInfo*) L)->ScopeName,
                    ((const ScopeInfo*) R)->ScopeName);
+}
+
+
+
+/*****************************************************************************/
+/*                               Segment info                                */
+/*****************************************************************************/
+
+
+
+static SegInfo* NewSegInfo (const StrBuf* SegName, unsigned Id,
+                            cc65_addr Start, cc65_addr Size,
+                            const StrBuf* OutputName, unsigned long OutputOffs)
+/* Create a new SegInfo struct and return it */
+{
+    /* Allocate memory */
+    SegInfo* S = xmalloc (sizeof (SegInfo) + SB_GetLen (SegName));
+
+    /* Initialize it */
+    S->Id         = Id;
+    S->Start      = Start;
+    S->Size       = Size;
+    if (SB_GetLen (OutputName) > 0) {
+        /* Output file given */
+        S->OutputName = SB_StrDup (OutputName);
+        S->OutputOffs = OutputOffs;
+    } else {
+        /* No output file given */
+        S->OutputName = 0;
+        S->OutputOffs = 0;
+    }
+    memcpy (S->SegName, SB_GetConstBuf (SegName), SB_GetLen (SegName) + 1);
+
+    /* Return it */
+    return S;
+}
+
+
+
+static void FreeSegInfo (SegInfo* S)
+/* Free a SegInfo struct */
+{
+    xfree (S->OutputName);
+    xfree (S);
+}
+
+
+
+static int CompareSegInfoByName (const void* L, const void* R)
+/* Helper function to sort segment infos in a collection by name */
+{
+    /* Sort by file name */
+    return strcmp (((const SegInfo*) L)->SegName,
+                   ((const SegInfo*) R)->SegName);
+}
+
+
+
+/*****************************************************************************/
+/*                                Symbol info                                */
+/*****************************************************************************/
+
+
+
+static SymInfo* NewSymInfo (const StrBuf* Name)
+/* Create a new SymInfo struct, intialize and return it */
+{
+    /* Allocate memory */
+    SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
+
+    /* Initialize the name */
+    memcpy (S->SymName, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
+
+    /* Return it */
+    return S;
+}
+
+
+
+static void FreeSymInfo (SymInfo* S)
+/* Free a SymInfo struct */
+{
+    xfree (S);
+}
+
+
+
+static int CompareSymInfoByName (const void* L, const void* R)
+/* Helper function to sort symbol infos in a collection by name */
+{
+    /* Sort by symbol name */
+    return strcmp (((const SymInfo*) L)->SymName,
+                   ((const SymInfo*) R)->SymName);
+}
+
+
+
+static int CompareSymInfoByVal (const void* L, const void* R)
+/* Helper function to sort symbol infos in a collection by value */
+{
+    /* Sort by symbol value. If both are equal, sort by symbol name so it
+     * looks nice when such a list is returned.
+     */
+    if (((const SymInfo*) L)->Value > ((const SymInfo*) R)->Value) {
+        return 1;
+    } else if (((const SymInfo*) L)->Value < ((const SymInfo*) R)->Value) {
+        return -1;
+    } else {
+        return CompareSymInfoByName (L, R);
+    }
 }
 
 
@@ -1396,16 +1458,20 @@ static DbgInfo* NewDbgInfo (void)
     DbgInfo* Info = xmalloc (sizeof (DbgInfo));
 
     /* Initialize it */
-    InitCollection (&Info->SegInfoByName);
-    InitCollection (&Info->SegInfoById);
-    InitCollection (&Info->FileInfoByName);
     InitCollection (&Info->FileInfoById);
-    InitCollection (&Info->LineInfos);
-    InitLineInfoList (&Info->LineInfoByAddr);
+    InitCollection (&Info->LibInfoById);
+    InitCollection (&Info->ModInfoById);
+    InitCollection (&Info->ScopeInfoById);
+    InitCollection (&Info->SegInfoById);
     InitCollection (&Info->SymInfoById);
+
+    InitCollection (&Info->FileInfoByName);
+    InitCollection (&Info->LineInfos);
+    InitCollection (&Info->SegInfoByName);
     InitCollection (&Info->SymInfoByName);
     InitCollection (&Info->SymInfoByVal);
-    InitCollection (&Info->ScopeInfoById);
+
+    InitLineInfoList (&Info->LineInfoByAddr);
 
     /* Return it */
     return Info;
@@ -1418,40 +1484,45 @@ static void FreeDbgInfo (DbgInfo* Info)
 {
     unsigned I;
 
-    /* Free segment info */
-    for (I = 0; I < CollCount (&Info->SegInfoByName); ++I) {
-        FreeSegInfo (CollAt (&Info->SegInfoByName, I));
+    /* First, free the items in the collections */
+    for (I = 0; I < CollCount (&Info->FileInfoById); ++I) {
+        FreeFileInfo (CollAt (&Info->FileInfoById, I));
     }
-    DoneCollection (&Info->SegInfoByName);
-    DoneCollection (&Info->SegInfoById);
+    for (I = 0; I < CollCount (&Info->LibInfoById); ++I) {
+        FreeLibInfo (CollAt (&Info->LibInfoById, I));
+    }
+    for (I = 0; I < CollCount (&Info->ModInfoById); ++I) {
+        FreeModInfo (CollAt (&Info->ModInfoById, I));
+    }
+    for (I = 0; I < CollCount (&Info->ScopeInfoById); ++I) {
+        FreeScopeInfo (CollAt (&Info->ScopeInfoById, I));
+    }
+    for (I = 0; I < CollCount (&Info->SegInfoById); ++I) {
+        FreeSegInfo (CollAt (&Info->SegInfoById, I));
+    }
+    for (I = 0; I < CollCount (&Info->SymInfoById); ++I) {
+        FreeSymInfo (CollAt (&Info->SymInfoById, I));
+    }
 
-    /* Free file info */
-    for (I = 0; I < CollCount (&Info->FileInfoByName); ++I) {
-        FreeFileInfo (CollAt (&Info->FileInfoByName, I));
-    }
-    DoneCollection (&Info->FileInfoByName);
+    /* Free the memory used by the collections themselves */
     DoneCollection (&Info->FileInfoById);
+    DoneCollection (&Info->LibInfoById);
+    DoneCollection (&Info->ModInfoById);
+    DoneCollection (&Info->ScopeInfoById);
+    DoneCollection (&Info->SegInfoById);
+    DoneCollection (&Info->SymInfoById);
+
+    DoneCollection (&Info->FileInfoByName);
+    DoneCollection (&Info->LineInfos);
+    DoneCollection (&Info->SegInfoByName);
+    DoneCollection (&Info->SymInfoByName);
+    DoneCollection (&Info->SymInfoByVal);
 
     /* Free line info */
     for (I = 0; I < CollCount (&Info->LineInfos); ++I) {
         FreeLineInfo (CollAt (&Info->LineInfos, I));
     }
-    DoneCollection (&Info->LineInfos);
     DoneLineInfoList (&Info->LineInfoByAddr);
-
-    /* Free symbol info */
-    for (I = 0; I < CollCount (&Info->SymInfoByName); ++I) {
-        FreeSymInfo (CollAt (&Info->SymInfoByName, I));
-    }
-    DoneCollection (&Info->SymInfoById);
-    DoneCollection (&Info->SymInfoByName);
-    DoneCollection (&Info->SymInfoByVal);
-
-    /* Free scope info */
-    for (I = 0; I < CollCount (&Info->ScopeInfoById); ++I) {
-        FreeScopeInfo (CollAt (&Info->ScopeInfoById, I));
-    }
-    DoneCollection (&Info->ScopeInfoById);
 
     /* Free the structure itself */
     xfree (Info);
@@ -1668,40 +1739,34 @@ static void NextToken (InputData* D)
         Token           Tok;
     } KeywordTable[] = {
         { "abs",        TOK_ABSOLUTE    },
-        { "absolute",   TOK_ABSOLUTE    },      /* obsolete */
         { "addrsize",   TOK_ADDRSIZE    },
         { "count",      TOK_COUNT       },
         { "equ",        TOK_EQUATE      },
-        { "equate",     TOK_EQUATE      },      /* obsolete */
         { "file",       TOK_FILE        },
         { "id",         TOK_ID          },
         { "lab",        TOK_LABEL       },
-        { "label",      TOK_LABEL       },      /* obsolete */
+        { "lib",        TOK_LIBRARY     },
         { "line",       TOK_LINE        },
         { "long",       TOK_LONG        },
         { "major",      TOK_MAJOR       },
         { "minor",      TOK_MINOR       },
+        { "module",     TOK_MODULE      },
         { "mtime",      TOK_MTIME       },
         { "name",       TOK_NAME        },
         { "oname",      TOK_OUTPUTNAME  },
         { "ooffs",      TOK_OUTPUTOFFS  },
-        { "outputname", TOK_OUTPUTNAME  },      /* obsolete */
-        { "outputoffs", TOK_OUTPUTOFFS  },      /* obsolete */
         { "parent",     TOK_PARENT      },
         { "range",      TOK_RANGE       },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
         { "scope",      TOK_SCOPE       },
         { "seg",        TOK_SEGMENT     },
-        { "segment",    TOK_SEGMENT     },      /* obsolete */
         { "size",       TOK_SIZE        },
         { "start",      TOK_START       },
         { "sym",        TOK_SYM         },
         { "type",       TOK_TYPE        },
         { "val",        TOK_VALUE       },
-        { "value",      TOK_VALUE       },      /* obsolete */
         { "version",    TOK_VERSION     },
-        { "zeropage",   TOK_ZEROPAGE    },      /* obsolete */
         { "zp",         TOK_ZEROPAGE    },
     };
 
@@ -2949,7 +3014,7 @@ static void ProcessSegInfo (InputData* D)
     }
 
     /* Sort this collection */
-    CollSort (SegInfoById, CompareSegInfoById);
+    CollSort (SegInfoById, CompareById);
 }
 
 
@@ -2972,7 +3037,7 @@ static void ProcessFileInfo (InputData* D)
     }
 
     /* Sort this collection */
-    CollSort (FileInfoById, CompareFileInfoById);
+    CollSort (FileInfoById, CompareById);
 }
 
 
@@ -3166,7 +3231,7 @@ static void ProcessSymInfo (InputData* D)
     Collection* SymInfoByVal  = &D->Info->SymInfoByVal;
 
     /* Sort the symbol infos */
-    CollSort (SymInfoById,   CompareSymInfoById);
+    CollSort (SymInfoById,   CompareById);
     CollSort (SymInfoByName, CompareSymInfoByName);
     CollSort (SymInfoByVal,  CompareSymInfoByVal);
 }
@@ -3303,7 +3368,7 @@ static void ProcessScopeInfo (InputData* D)
     Collection* ScopeInfoById = &D->Info->ScopeInfoById;
 
     /* Sort the scope infos */
-    CollSort (ScopeInfoById, CompareScopeInfoById);
+    CollSort (ScopeInfoById, CompareById);
 
     /* Walk over all scope infos and replace the parent scope id by a pointer
      * to the parent scope.

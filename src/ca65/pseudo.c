@@ -817,7 +817,7 @@ static void DoEnd (void)
 static void DoEndProc (void)
 /* Leave a lexical level */
 {
-    if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->OwnerSym == 0) {
+    if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->Label == 0) {
         /* No local scope */
         ErrorSkip ("No open .PROC");
     } else {
@@ -830,7 +830,7 @@ static void DoEndProc (void)
 static void DoEndScope (void)
 /* Leave a lexical level */
 {
-    if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->OwnerSym != 0) {
+    if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->Label != 0) {
         /* No local scope */
         ErrorSkip ("No open .SCOPE");
     } else {

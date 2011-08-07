@@ -116,7 +116,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     S->Left         = 0;
     S->Right        = 0;
     S->Childs       = 0;
-    S->OwnerSym     = 0;
+    S->Label        = 0;
     S->Spans        = AUTO_COLLECTION_INITIALIZER;
     S->Id           = ScopeCount++;
     S->Flags        = ST_NONE;
@@ -184,7 +184,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
 
 
 void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
-                    unsigned char AddrSize, SymEntry* OwnerSym)
+                    unsigned char AddrSize, SymEntry* ScopeLabel)
 /* Enter a new lexical level */
 {
     /* Map a default address size to something real */
@@ -214,12 +214,12 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
     CurrentScope->Flags    |= ST_DEFINED;
     CurrentScope->AddrSize = AddrSize;
     CurrentScope->Type     = Type;
-    CurrentScope->OwnerSym = OwnerSym;
+    CurrentScope->Label    = ScopeLabel;
 
     /* If this is a scope that allows to emit data into segments, add spans
-     * for all currently existing segments. Doing this for just a few scope 
-     * types is not really necessary but an optimization, because it does not 
-     * allocate memory for useless data (unhandled types here don't occupy 
+     * for all currently existing segments. Doing this for just a few scope
+     * types is not really necessary but an optimization, because it does not
+     * allocate memory for useless data (unhandled types here don't occupy
      * space in any segment).
      */
     if (CurrentScope->Type <= SCOPE_HAS_DATA) {
@@ -232,23 +232,23 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
 void SymLeaveLevel (void)
 /* Leave the current lexical level */
 {
-    /* Close the spans. We don't care about the scope type here, since types 
+    /* Close the spans. We don't care about the scope type here, since types
      * without spans will just have an empty list.
      */
     CloseSpans (&CurrentScope->Spans);
 
-    /* If we have spans, the first one is the segment that was active, when the 
-     * scope was opened. Set the size of the scope to the number of data bytes 
-     * emitted into this segment. If we have an owner symbol set the size of 
+    /* If we have spans, the first one is the segment that was active, when the
+     * scope was opened. Set the size of the scope to the number of data bytes
+     * emitted into this segment. If we have an owner symbol set the size of
      * this symbol, too.
      */
     if (CollCount (&CurrentScope->Spans) > 0) {
         const Span* S = CollAtUnchecked (&CurrentScope->Spans, 0);
         unsigned long Size = GetSpanSize (S);
         DefSizeOfScope (CurrentScope, Size);
-        if (CurrentScope->OwnerSym) {
-            DefSizeOfSymbol (CurrentScope->OwnerSym, Size);
-        }                                  
+        if (CurrentScope->Label) {
+            DefSizeOfSymbol (CurrentScope->Label, Size);
+        }
     }
 
     /* Leave the scope */
@@ -914,6 +914,11 @@ void WriteScopes (void)
                 Flags |= SCOPE_SIZE;
             }
 
+            /* Check if the scope has a label */
+            if (S->Label) {
+                Flags |= SCOPE_LABELED;
+            }
+
             /* Scope must be defined */
             CHECK (S->Type != SCOPE_UNDEF);
 
@@ -939,6 +944,11 @@ void WriteScopes (void)
             /* If the scope has a size, write it to the file */
             if (SCOPE_HAS_SIZE (Flags)) {
                 ObjWriteVar (Size);
+            }
+
+            /* If the scope has a label, write its id to the file */
+            if (SCOPE_HAS_LABEL (Flags)) {
+                ObjWriteVar (S->Label->DebugSymId);
             }
 
             /* Spans for this scope */

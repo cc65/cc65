@@ -67,7 +67,7 @@ struct SymTable {
     SymTable*           Right;          /* Pointer to greater entry */
     SymTable*          	Parent;   	/* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
-    SymEntry*           OwnerSym;       /* Symbol that "owns" the scope */
+    SymEntry*           Label;          /* Scope label */
     Collection          Spans;          /* Spans for this scope */
     unsigned            Id;             /* Scope id */
     unsigned short      Flags;          /* Symbol table flags */

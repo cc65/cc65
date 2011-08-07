@@ -44,12 +44,18 @@
 
 
 /*****************************************************************************/
-/*     	      	      	   	     Code				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-Span* NewSpan (struct Segment* Seg)
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+static Span* NewSpan (Segment* Seg, unsigned long Start, unsigned long End)
 /* Create a new span. The segment is set to Seg, Start and End are set to the
  * current PC of the segment.
  */
@@ -59,8 +65,8 @@ Span* NewSpan (struct Segment* Seg)
 
     /* Initialize the struct */
     S->Seg      = Seg;
-    S->Start    = Seg->PC;
-    S->End      = Seg->PC;
+    S->Start    = Start;
+    S->End      = End;
 
     /* Return the new struct */
     return S;
@@ -68,15 +74,24 @@ Span* NewSpan (struct Segment* Seg)
 
 
 
-void AddSpans (Collection* Spans)
-/* Add a span for all existing segments to the given collection of spans. The
- * currently active segment will be inserted first with all others following.
+static void FreeSpan (Span* S)
+/* Free a span */
+{
+    xfree (S);
+}
+
+
+
+void OpenSpans (Collection* Spans)
+/* Open a list of spans for all existing segments to the given collection of
+ * spans. The currently active segment will be inserted first with all others
+ * following.
  */
 {
     unsigned I;
 
     /* Add the currently active segment */
-    CollAppend (Spans, NewSpan (ActiveSeg));
+    CollAppend (Spans, NewSpan (ActiveSeg, ActiveSeg->PC, ActiveSeg->PC));
 
     /* Walk through the segment list and add all other segments */
     for (I = 0; I < CollCount (&SegmentList); ++I) {
@@ -84,7 +99,7 @@ void AddSpans (Collection* Spans)
 
         /* Be sure to skip the active segment, since it was already added */
         if (Seg != ActiveSeg) {
-            CollAppend (Spans, NewSpan (Seg));
+            CollAppend (Spans, NewSpan (Seg, Seg->PC, Seg->PC));
         }
     }
 }
@@ -92,19 +107,43 @@ void AddSpans (Collection* Spans)
 
 
 void CloseSpans (Collection* Spans)
-/* Close all open spans by setting PC to the current PC for the segment. */
+/* Close a list of spans. This will add new segments to the list, mark the end
+ * of existing ones, and remove empty spans from the list.
+ */
 {
-    unsigned I;
+    unsigned I, J;
 
-    /* Walk over the segment list */
-    for (I = 0; I < CollCount (Spans); ++I) {
+    /* Have new segments been added while the span list was open? */
+    for (I = CollCount (Spans); I < CollCount (&SegmentList); ++I) {
 
-        /* Get the next segment range */
+        /* Add new spans if not empty */
+        Segment* S = CollAtUnchecked (&SegmentList, I);
+        if (S->PC == 0) {
+            /* Segment is empty */
+            continue;
+        }
+        CollAppend (Spans, NewSpan (S, 0, S->PC));
+    }
+
+    /* Walk over the spans, close open, remove empty ones */
+    for (I = 0, J = 0; I < CollCount (Spans); ++I) {
+
+        /* Get the next span */
         Span* S = CollAtUnchecked (Spans, I);
 
         /* Set the end offset */
-        S->End = S->Seg->PC;
+        if (S->Start == S->Seg->PC) {
+            /* Span is empty */
+            FreeSpan (S);
+        } else {
+            /* Span is not empty */
+            S->End = S->Seg->PC;
+            CollReplace (Spans, S, J++);
+        }
     }
+
+    /* New Count is now in J */
+    Spans->Count = J;
 }
 
 
@@ -113,23 +152,9 @@ void WriteSpans (const Collection* Spans)
 /* Write a list of spans to the output file */
 {
     unsigned I;
-    unsigned Count;
 
-    /* Determine how many of the segments contain actual data */
-    Count = 0;
-    for (I = 0; I < CollCount (Spans); ++I) {
-
-        /* Get next range */
-        const Span* S = CollConstAt (Spans, I);
-
-        /* Is this segment range empty? */
-        if (S->Start != S->End) {
-            ++Count;
-        }
-    }
-
-    /* Write the number of spans with data */
-    ObjWriteVar (Count);
+    /* Write the number of spans */
+    ObjWriteVar (CollCount (Spans));
 
     /* Write the spans */
     for (I = 0; I < CollCount (Spans); ++I) {
@@ -137,15 +162,13 @@ void WriteSpans (const Collection* Spans)
         /* Get next range */
         const Span* S = CollConstAt (Spans, I);
 
-        /* Write data for non empty spans. We will write the size instead of
-         * the end offset to save some bytes, since most spans are expected
-         * to be rather small.
+        /* Write data for th span We will write the size instead of the end
+         * offset to save some bytes, since most spans are expected to be
+         * rather small.
          */
-        if (S->Start != S->End) {
-            ObjWriteVar (S->Seg->Num);
-            ObjWriteVar (S->Start);
-            ObjWriteVar (S->End - S->Start);
-        }
+        ObjWriteVar (S->Seg->Num);
+        ObjWriteVar (S->Start);
+        ObjWriteVar (S->End - S->Start);
     }
 }
 

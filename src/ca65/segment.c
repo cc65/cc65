@@ -457,6 +457,50 @@ void SegDump (void)
 
 
 
+void InitSegments (void)
+/* Initialize segments */
+{
+    /* Create the predefined segments. Code segment is active */
+    ActiveSeg = NewSegFromDef (&CodeSegDef);
+    NewSegFromDef (&RODataSegDef);
+    NewSegFromDef (&BssSegDef);
+    NewSegFromDef (&DataSegDef);
+    NewSegFromDef (&ZeropageSegDef);
+    NewSegFromDef (&NullSegDef);
+}
+
+
+
+void SetSegmentSizes (void)
+/* Set the default segment sizes according to the memory model */
+{
+    /* Initialize segment sizes. The segment definitions do already contain
+     * the correct values for the default case (near), so we must only change
+     * things that should be different.
+     */
+    switch (MemoryModel) {
+
+        case MMODEL_NEAR:
+            break;
+
+        case MMODEL_FAR:
+            CodeSegDef.AddrSize = ADDR_SIZE_FAR;
+            break;
+
+        case MMODEL_HUGE:
+            CodeSegDef.AddrSize   = ADDR_SIZE_FAR;
+            DataSegDef.AddrSize   = ADDR_SIZE_FAR;
+            BssSegDef.AddrSize    = ADDR_SIZE_FAR;
+            RODataSegDef.AddrSize = ADDR_SIZE_FAR;
+            break;
+
+        default:
+            Internal ("Invalid memory model: %d", MemoryModel);
+    }
+}
+
+
+
 static void WriteOneSeg (Segment* Seg)
 /* Write one segment to the object file */
 {
@@ -537,50 +581,6 @@ static void WriteOneSeg (Segment* Seg)
     ObjSetFilePos (SizePos);            /* Seek back to the size */
     ObjWrite32 (DataSize);              /* Write the size */
     ObjSetFilePos (EndPos);             /* Seek back to the end */
-}
-
-
-
-void InitSegments (void)
-/* Initialize segments */
-{
-    /* Create the predefined segments. Code segment is active */
-    ActiveSeg = NewSegFromDef (&CodeSegDef);
-    NewSegFromDef (&RODataSegDef);
-    NewSegFromDef (&BssSegDef);
-    NewSegFromDef (&DataSegDef);
-    NewSegFromDef (&ZeropageSegDef);
-    NewSegFromDef (&NullSegDef);
-}
-
-
-
-void SetSegmentSizes (void)
-/* Set the default segment sizes according to the memory model */
-{
-    /* Initialize segment sizes. The segment definitions do already contain
-     * the correct values for the default case (near), so we must only change
-     * things that should be different.
-     */
-    switch (MemoryModel) {
-
-        case MMODEL_NEAR:
-            break;
-
-        case MMODEL_FAR:
-            CodeSegDef.AddrSize = ADDR_SIZE_FAR;
-            break;
-
-        case MMODEL_HUGE:
-            CodeSegDef.AddrSize   = ADDR_SIZE_FAR;
-            DataSegDef.AddrSize   = ADDR_SIZE_FAR;
-            BssSegDef.AddrSize    = ADDR_SIZE_FAR;
-            RODataSegDef.AddrSize = ADDR_SIZE_FAR;
-            break;
-
-        default:
-            Internal ("Invalid memory model: %d", MemoryModel);
-    }
 }
 
 

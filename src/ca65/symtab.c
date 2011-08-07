@@ -223,7 +223,7 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
      * space in any segment).
      */
     if (CurrentScope->Type <= SCOPE_HAS_DATA) {
-        AddSpans (&CurrentScope->Spans);
+        OpenSpans (&CurrentScope->Spans);
     }
 }
 

@@ -53,6 +53,7 @@
 /* Span definition */
 typedef struct Span Span;
 struct Span{
+    unsigned        Id;                 /* Span id */
     struct Segment* Seg;       	       	/* Pointer to segment */
     unsigned long   Start;              /* Start of range */
     unsigned long   End;                /* End of range */
@@ -66,11 +67,6 @@ struct Span{
 
 
 
-Span* NewSpan (struct Segment* Seg);
-/* Create a new span. The segment is set to Seg, Start and End are set to the
- * current PC of the segment.
- */
-
 #if defined(HAVE_INLINE)
 INLINE unsigned long GetSpanSize (const Span* R)
 /* Return the span size in bytes */
@@ -81,9 +77,10 @@ INLINE unsigned long GetSpanSize (const Span* R)
 #  define GetSpanSize(R)   ((R)->End - (R)->Start)
 #endif
 
-void AddSpans (Collection* Spans);
-/* Add a span for all existing segments to the given collection of spans. The
- * currently active segment will be inserted first with all others following.
+void OpenSpans (Collection* Spans);
+/* Open a list of spans for all existing segments to the given collection of
+ * spans. The currently active segment will be inserted first with all others
+ * following.
  */
 
 void CloseSpans (Collection* Spans);

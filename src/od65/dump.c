@@ -846,6 +846,12 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
 	    printf ("      Size:%20s0x%04lX  (%lu)\n", "", Size, Size);
 	}
 
+        /* Label */
+        if (SCOPE_HAS_LABEL (Flags)) {
+            unsigned LabelId = ReadVar (F);
+            printf ("      Label id:%22u\n", LabelId);
+        }
+
         /* Spans */
         SpanCount = ReadVar (F);
         printf ("      Segment spans:\n");
@@ -855,7 +861,7 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
             printf ("        Index:%23u\n", J);
             printf ("          Segment:%19lu\n", ReadVar (F));
             printf ("          Start:%13s0x%06lX\n", "", ReadVar (F));
-            printf ("          Size:%15s0x%06lX\n", "", ReadVar (F));
+            printf ("          Size:%14s0x%06lX\n", "", ReadVar (F));
         }
     }
 

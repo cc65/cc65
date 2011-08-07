@@ -43,6 +43,7 @@
 #include "exports.h"
 #include "global.h"
 #include "error.h"
+#include "library.h"
 #include "mapfile.h"
 #include "objdata.h"
 #include "segments.h"
@@ -80,9 +81,9 @@ void CreateMapFile (int ShortMap)
         const ObjData* O = CollConstAt (&ObjDataList, I);
 
         /* Output the data */
-        if (O->LibName != INVALID_STRING_ID) {
+        if (O->Lib) {
             /* The file is from a library */
-            fprintf (F, "%s(%s):\n", GetString (O->LibName), GetObjFileName (O));
+            fprintf (F, "%s(%s):\n", GetLibFileName (O->Lib), GetObjFileName (O));
         } else {
             fprintf (F, "%s:\n", GetObjFileName (O));
         }

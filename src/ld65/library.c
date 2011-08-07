@@ -65,6 +65,7 @@
 /* Library data structure */
 typedef struct Library Library;
 struct Library {
+    unsigned    Id;             /* Id of library */
     unsigned    Name;           /* String id of the name */
     FILE*       F;              /* Open file stream */
     LibHeader   Header;         /* Library header */
@@ -73,6 +74,9 @@ struct Library {
 
 /* List of open libraries */
 static Collection OpenLibs = STATIC_COLLECTION_INITIALIZER;
+
+/* List of used libraries */
+static Collection Libraries = STATIC_COLLECTION_INITIALIZER;
 
 /* Flag for library grouping */
 static int Grouping = 0;
@@ -92,6 +96,7 @@ static Library* NewLibrary (FILE* F, const char* Name)
     Library* L = xmalloc (sizeof (*L));
 
     /* Initialize the fields */
+    L->Id       = ~0U;
     L->Name     = GetStringId (Name);
     L->F        = F;
     L->Modules  = EmptyCollection;
@@ -102,13 +107,23 @@ static Library* NewLibrary (FILE* F, const char* Name)
 
 
 
-static void FreeLibrary (Library* L)
-/* Free a library structure */
+static void CloseLibrary (Library* L)
+/* Close a library file and remove the list of modules */
 {
     /* Close the library file */
     if (fclose (L->F) != 0) {
         Error ("Error closing `%s': %s", GetString (L->Name), strerror (errno));
     }
+    L->F = 0;
+}
+
+
+
+static void FreeLibrary (Library* L)
+/* Free a library structure */
+{
+    /* Close the library */
+    CloseLibrary (L);
 
     /* Free the module index */
     DoneCollection (&L->Modules);
@@ -196,7 +211,7 @@ static ObjData* ReadIndexEntry (Library* L)
     ObjData* O	= NewObjData ();
 
     /* Remember from which library this module is */
-    O->LibName = L->Name;
+    O->Lib = L;
 
     /* Module name */
     O->Name = ReadStr (L->F);
@@ -365,7 +380,8 @@ static void LibResolve (void)
         /* Walk over all modules in this library and add the files list and
          * sections for all referenced modules.
          */
-        for (J = 0; J < CollCount (&L->Modules); ++J) {
+        J = 0;
+        while (J < CollCount (&L->Modules)) {
 
             /* Get the object data */
             ObjData* O = CollAtUnchecked (&L->Modules, J);
@@ -398,16 +414,30 @@ static void LibResolve (void)
                 /* Insert the object into the list of all used object files */
                 InsertObjData (O);
 
+                /* Process next object file in library */
+                ++J;
+
             } else {
 
                 /* Unreferenced object file, remove it */
                 FreeObjData (O);
+                CollDelete (&L->Modules, J);
 
             }
         }
 
-        /* Close the file and delete the library data */
-        FreeLibrary (L);
+        /* If we have referenced modules in this library, assign it an id
+         * (which is the index in the library collection) and keep it.
+         */
+        if (CollCount (&L->Modules) > 0) {
+            CloseLibrary (L);
+            L->Id = CollCount (&Libraries);
+            CollAppend (&Libraries, L);
+        } else {
+            /* Delete the library */
+            FreeLibrary (L);
+            CollDelete (&OpenLibs, I);
+        }
     }
 
     /* We're done with all open libraries, clear the OpenLibs collection */
@@ -477,6 +507,40 @@ void LibCheckGroup (void)
         Error ("Library group was never closed");
     }
 }
+
+
+
+const char* GetLibFileName (const Library* L)
+/* Get the name of a library */
+{
+    return GetString (L->Name);
+}
+
+
+
+unsigned GetLibId (const Library* L)
+/* Get the id of a library file. */
+{
+    return L->Id;
+}
+
+
+
+void PrintDbgLibraries (FILE* F)
+/* Output the libraries to a debug info file */
+{
+    unsigned I;
+
+    /* Output information about all libraries */
+    for (I = 0; I < CollCount (&Libraries); ++I) {
+        /* Get the library */
+        const Library* L = CollAtUnchecked (&Libraries, I);
+
+        /* Output the info */
+        fprintf (F, "library\tid=%u,name=\"%s\"\n", L->Id, GetString (L->Name));
+    }
+}
+
 
 
 

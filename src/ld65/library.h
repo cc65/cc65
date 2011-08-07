@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,18 @@
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Opaque structure */
+struct Library;
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -63,6 +74,15 @@ void LibEndGroup (void);
 
 void LibCheckGroup (void);
 /* Check if there are open library groups */
+
+const char* GetLibFileName (const struct Library* L);
+/* Get the name of a library */
+
+unsigned GetLibId (const struct Library* L);
+/* Get the id of a library file. */
+
+void PrintDbgLibraries (FILE* F);
+/* Output the libraries to a debug info file */
 
 
 

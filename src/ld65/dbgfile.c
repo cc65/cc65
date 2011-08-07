@@ -43,6 +43,7 @@
 #include "error.h"
 #include "fileinfo.h"
 #include "global.h"
+#include "library.h"
 #include "lineinfo.h"
 #include "scopes.h"
 #include "segments.h"
@@ -104,7 +105,10 @@ void CreateDbgFile (void)
     /* Assign the base ids to the modules */
     AssignBaseIds ();
 
-    /* Output modules */             
+    /* Output libraries */
+    PrintDbgLibraries (F);
+
+    /* Output modules */
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get this object file */
@@ -121,11 +125,8 @@ void CreateDbgFile (void)
                  Source->Id);
 
         /* Add library if any */
-        if (O->LibName != INVALID_STRING_ID) {
-            fprintf (F,
-                     ",lib=\"%s\",mtime=0x%08lX",
-                     GetString (O->LibName),
-                     O->MTime);
+        if (O->Lib != 0) {
+            fprintf (F, ",lib=%u", GetLibId (O->Lib));
         }
 
         /* Terminate the output line */

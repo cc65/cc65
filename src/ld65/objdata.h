@@ -52,6 +52,7 @@
 
 
 /* Forwards */
+struct Library;
 struct Scope;
 struct Section;
 
@@ -63,11 +64,11 @@ typedef struct ObjData ObjData;
 struct ObjData {
     ObjData*	     	Next;  		/* Linked list of all objects */
     unsigned            Name;  		/* Module name */
-    unsigned            LibName;	/* Name of library */
+    struct Library*     Lib;            /* Library where module comes from */
     unsigned long       MTime;          /* Time of last modification */
-    ObjHeader	 	Header;		/* Header of file */
+    ObjHeader  	 	Header;		/* Header of file */
     unsigned long  	Start;		/* Start offset of data in library */
-    unsigned 	     	Flags;
+    unsigned   	     	Flags;
 
     unsigned            FileBaseId;     /* Debug info base id for files */
     unsigned            SymBaseId;      /* Debug info base id for symbols */

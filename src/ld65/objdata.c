@@ -74,7 +74,7 @@ ObjData* NewObjData (void)
     /* Initialize the data */
     O->Next        	= 0;
     O->Name  	   	= INVALID_STRING_ID;
-    O->LibName    	= INVALID_STRING_ID;
+    O->Lib              = 0;
     O->MTime            = 0;
     O->Start	   	= 0;
     O->Flags   	   	= 0;

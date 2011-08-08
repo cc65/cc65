@@ -75,6 +75,9 @@ struct FileInfo {
 FileInfo* ReadFileInfo (FILE* F, ObjData* O);
 /* Read a file info from a file and return it */
 
+unsigned FileInfoCount (void);
+/* Return the total number of file infos */
+
 void AssignFileInfoIds (void);
 /* Assign the ids to the file infos */
 

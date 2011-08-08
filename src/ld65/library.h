@@ -81,6 +81,9 @@ const char* GetLibFileName (const struct Library* L);
 unsigned GetLibId (const struct Library* L);
 /* Get the id of a library file. */
 
+unsigned LibraryCount (void);
+/* Return the total number of libraries */
+
 void PrintDbgLibraries (FILE* F);
 /* Output the libraries to a debug info file */
 

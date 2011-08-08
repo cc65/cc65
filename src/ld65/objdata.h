@@ -145,6 +145,9 @@ struct Section* GetObjSection (ObjData* Obj, unsigned Id);
 struct Scope* GetObjScope (ObjData* Obj, unsigned Id);
 /* Get a scope from an object file checking for a valid index */
 
+unsigned ObjDataCount (void);
+/* Return the total number of modules */
+
 void PrintDbgModules (FILE* F);
 /* Output the modules to a debug info file */
 

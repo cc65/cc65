@@ -102,6 +102,19 @@ void CreateDbgFile (void)
     /* Output version information */
     fprintf (F, "version\tmajor=2,minor=0\n");
 
+    /* Output a line with the item numbers so the debug info module is able 
+     * to preallocate the required memory.
+     */
+    fprintf (
+        F,
+        "info\tlib=%u,mod=%u,seg=%u,file=%u,scope=%u\n",
+        LibraryCount (),
+        ObjDataCount (),
+        SegmentCount (),
+        FileInfoCount (),
+        ScopeCount ()
+    );
+
     /* Assign the ids to the items */
     AssignIds ();
 

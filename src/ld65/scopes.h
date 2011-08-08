@@ -62,7 +62,7 @@ struct Scope {
     ObjData*   	    	Obj;	    	/* Object file that contains the scope */
     unsigned            ParentId;       /* Id of parent scope */
     unsigned            LabelId;        /* Id of the scope label if any */
-    unsigned            LexicalLevel;   /* Lexical level */               
+    unsigned            LexicalLevel;   /* Lexical level */
     unsigned            Flags;
     unsigned            Type;           /* Type of scope */
     unsigned            Name;           /* Name of scope */
@@ -80,6 +80,9 @@ struct Scope {
 
 Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id);
 /* Read a scope from a file, insert and return it */
+
+unsigned ScopeCount (void);
+/* Return the total number of scopes */
 
 void PrintDbgScopes (FILE* F);
 /* Output the scopes to a debug info file */

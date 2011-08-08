@@ -76,7 +76,7 @@ struct Library {
 static Collection OpenLibs = STATIC_COLLECTION_INITIALIZER;
 
 /* List of used libraries */
-static Collection Libraries = STATIC_COLLECTION_INITIALIZER;
+static Collection LibraryList = STATIC_COLLECTION_INITIALIZER;
 
 /* Flag for library grouping */
 static int Grouping = 0;
@@ -431,8 +431,8 @@ static void LibResolve (void)
          */
         if (CollCount (&L->Modules) > 0) {
             CloseLibrary (L);
-            L->Id = CollCount (&Libraries);
-            CollAppend (&Libraries, L);
+            L->Id = CollCount (&LibraryList);
+            CollAppend (&LibraryList, L);  
         } else {
             /* Delete the library */
             FreeLibrary (L);
@@ -526,15 +526,23 @@ unsigned GetLibId (const Library* L)
 
 
 
+unsigned LibraryCount (void)
+/* Return the total number of libraries */
+{
+    return CollCount (&LibraryList);
+}
+
+
+
 void PrintDbgLibraries (FILE* F)
 /* Output the libraries to a debug info file */
 {
     unsigned I;
 
     /* Output information about all libraries */
-    for (I = 0; I < CollCount (&Libraries); ++I) {
+    for (I = 0; I < CollCount (&LibraryList); ++I) {
         /* Get the library */
-        const Library* L = CollAtUnchecked (&Libraries, I);
+        const Library* L = CollAtUnchecked (&LibraryList, I);
 
         /* Output the info */
         fprintf (F, "library\tid=%u,name=\"%s\"\n", L->Id, GetString (L->Name));

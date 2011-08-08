@@ -193,6 +193,14 @@ FileInfo* ReadFileInfo (FILE* F, ObjData* O)
 
 
 
+unsigned FileInfoCount (void)
+/* Return the total number of file infos */
+{
+    return CollCount (&FileInfos);
+}
+
+
+
 void AssignFileInfoIds (void)
 /* Remove unused file infos and assign the ids to the remaining ones */
 {

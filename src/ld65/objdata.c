@@ -216,6 +216,14 @@ struct Scope* GetObjScope (ObjData* O, unsigned Id)
 
 
 
+unsigned ObjDataCount (void)
+/* Return the total number of modules */
+{
+    return CollCount (&ObjDataList);
+}
+
+
+
 void PrintDbgModules (FILE* F)
 /* Output the modules to a debug info file */
 {

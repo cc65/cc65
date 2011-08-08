@@ -98,6 +98,25 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
 
 
 
+unsigned ScopeCount (void)
+/* Return the total number of scopes */
+{              
+
+    /* Count scopes from all modules we have linked into the output file */
+    unsigned I;
+    unsigned Count = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+        /* Get the object file */
+        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Account for the scopes in this file */
+        Count += CollCount (&O->Scopes);
+    }
+    return Count;
+}
+
+
+
 void PrintDbgScopes (FILE* F)
 /* Output the scopes to a debug info file */
 {
@@ -132,7 +151,7 @@ void PrintDbgScopes (FILE* F)
             if (SCOPE_HAS_LABEL (S->Flags)) {
                 fprintf (F, ",sym=%u", O->SymBaseId + S->LabelId);
             }
-       
+
             /* Terminate the output line */
             fputc ('\n', F);
         }

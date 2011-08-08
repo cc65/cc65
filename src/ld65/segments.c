@@ -347,7 +347,7 @@ void SegDump (void)
     unsigned I;
     unsigned long Count;
     unsigned char* Data;
-                             
+
     for (I = 0; I < CollCount (&SegmentList); ++I) {
         const Segment* Seg = CollConstAt (&SegmentList, I);
 	Section* S = Seg->SecRoot;
@@ -546,6 +546,14 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 
 
 
+unsigned SegmentCount (void)
+/* Return the total number of segments */
+{
+    return CollCount (&SegmentList);
+}
+
+
+
 static int CmpSegStart (const void* K1, const void* K2)
 /* Compare function for qsort */
 {
@@ -613,7 +621,7 @@ void PrintSegmentMap (FILE* F)
 
 void PrintDbgSegments (FILE* F)
 /* Output the segments to the debug file */
-{                                           
+{
     /* Walk over all segments */
     unsigned I;
     for (I = 0; I < CollCount (&SegmentList); ++I) {

@@ -147,6 +147,9 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
  * called (see description of SegWriteFunc above).
  */
 
+unsigned SegmentCount (void);
+/* Return the total number of segments */
+
 void PrintSegmentMap (FILE* F);
 /* Print a segment map to the given file */
 

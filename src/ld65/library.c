@@ -432,7 +432,7 @@ static void LibResolve (void)
         if (CollCount (&L->Modules) > 0) {
             CloseLibrary (L);
             L->Id = CollCount (&LibraryList);
-            CollAppend (&LibraryList, L);  
+            CollAppend (&LibraryList, L);
         } else {
             /* Delete the library */
             FreeLibrary (L);
@@ -545,7 +545,7 @@ void PrintDbgLibraries (FILE* F)
         const Library* L = CollAtUnchecked (&LibraryList, I);
 
         /* Output the info */
-        fprintf (F, "library\tid=%u,name=\"%s\"\n", L->Id, GetString (L->Name));
+        fprintf (F, "lib\tid=%u,name=\"%s\"\n", L->Id, GetString (L->Name));
     }
 }
 

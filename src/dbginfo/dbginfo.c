@@ -95,6 +95,61 @@ struct LineInfoList {
     LineInfoListEntry*  List;           /* Dynamic array with entries */
 };
 
+/* Input tokens */
+typedef enum {
+
+    TOK_INVALID,                        /* Invalid token */
+    TOK_EOF,                            /* End of file reached */
+
+    TOK_INTCON,                         /* Integer constant */
+    TOK_STRCON,                         /* String constant */
+
+    TOK_EQUAL,                          /* = */
+    TOK_COMMA,                          /* , */
+    TOK_MINUS,                          /* - */
+    TOK_PLUS,                           /* + */
+    TOK_EOL,                            /* \n */
+
+    TOK_FIRST_KEYWORD,
+    TOK_ABSOLUTE = TOK_FIRST_KEYWORD,   /* ABSOLUTE keyword */
+    TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
+    TOK_COUNT,                          /* COUNT keyword */
+    TOK_ENUM,                           /* ENUM keyword */
+    TOK_EQUATE,                         /* EQUATE keyword */
+    TOK_FILE,                           /* FILE keyword */
+    TOK_GLOBAL,                         /* GLOBAL keyword */
+    TOK_ID,                             /* ID keyword */
+    TOK_INFO,                           /* INFO keyword */
+    TOK_LABEL,                          /* LABEL keyword */
+    TOK_LIBRARY,                        /* LIBRARY keyword */
+    TOK_LINE,                           /* LINE keyword */
+    TOK_LONG,                           /* LONG_keyword */
+    TOK_MAJOR,                          /* MAJOR keyword */
+    TOK_MINOR,                          /* MINOR keyword */
+    TOK_MODULE,                         /* MODULE keyword */
+    TOK_MTIME,                          /* MTIME keyword */
+    TOK_NAME,                           /* NAME keyword */
+    TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
+    TOK_OUTPUTOFFS,                     /* OUTPUTOFFS keyword */
+    TOK_PARENT,                         /* PARENT keyword */
+    TOK_RANGE,                          /* RANGE keyword */
+    TOK_RO,                             /* RO keyword */
+    TOK_RW,                             /* RW keyword */
+    TOK_SCOPE,                          /* SCOPE keyword */
+    TOK_SEGMENT,                        /* SEGMENT keyword */
+    TOK_SIZE,                           /* SIZE keyword */
+    TOK_START,                          /* START keyword */
+    TOK_STRUCT,                         /* STRUCT keyword */
+    TOK_SYM,                            /* SYM keyword */
+    TOK_TYPE,                           /* TYPE keyword */
+    TOK_VALUE,                          /* VALUE keyword */
+    TOK_VERSION,                        /* VERSION keyword */
+    TOK_ZEROPAGE,                       /* ZEROPAGE keyword */
+    TOK_LAST_KEYWORD = TOK_ZEROPAGE,
+
+    TOK_IDENT,                          /* To catch unknown keywords */
+} Token;
+
 
 
 /* Data structure containing information from the debug info file. A pointer
@@ -126,57 +181,6 @@ struct DbgInfo {
     LineInfoList        LineInfoByAddr; /* Line infos sorted by unique address */
 };
 
-/* Input tokens */
-typedef enum {
-
-    TOK_INVALID,                        /* Invalid token */
-    TOK_EOF,                            /* End of file reached */
-
-    TOK_INTCON,                         /* Integer constant */
-    TOK_STRCON,                         /* String constant */
-
-    TOK_EQUAL,                          /* = */
-    TOK_COMMA,                          /* , */
-    TOK_MINUS,                          /* - */
-    TOK_PLUS,                           /* + */
-    TOK_EOL,                            /* \n */
-
-    TOK_FIRST_KEYWORD,
-    TOK_ABSOLUTE = TOK_FIRST_KEYWORD,   /* ABSOLUTE keyword */
-    TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
-    TOK_COUNT,                          /* COUNT keyword */
-    TOK_EQUATE,                         /* EQUATE keyword */
-    TOK_FILE,                           /* FILE keyword */
-    TOK_ID,                             /* ID keyword */
-    TOK_LABEL,                          /* LABEL keyword */
-    TOK_LIBRARY,                        /* LIBRARY keyword */
-    TOK_LINE,                           /* LINE keyword */
-    TOK_LONG,                           /* LONG_keyword */
-    TOK_MAJOR,                          /* MAJOR keyword */
-    TOK_MINOR,                          /* MINOR keyword */
-    TOK_MODULE,                         /* MODULE keyword */
-    TOK_MTIME,                          /* MTIME keyword */
-    TOK_NAME,                           /* NAME keyword */
-    TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
-    TOK_OUTPUTOFFS,                     /* OUTPUTOFFS keyword */
-    TOK_PARENT,                         /* PARENT keyword */
-    TOK_RANGE,                          /* RANGE keyword */
-    TOK_RO,                             /* RO keyword */
-    TOK_RW,                             /* RW keyword */
-    TOK_SCOPE,                          /* SCOPE keyword */
-    TOK_SEGMENT,                        /* SEGMENT keyword */
-    TOK_SIZE,                           /* SIZE keyword */
-    TOK_START,                          /* START keyword */
-    TOK_SYM,                            /* SYM keyword */
-    TOK_TYPE,                           /* TYPE keyword */
-    TOK_VALUE,                          /* VALUE keyword */
-    TOK_VERSION,                        /* VERSION keyword */
-    TOK_ZEROPAGE,                       /* ZEROPAGE keyword */
-    TOK_LAST_KEYWORD = TOK_ZEROPAGE,
-
-    TOK_IDENT,                          /* To catch unknown keywords */
-} Token;
-
 /* Data used when parsing the debug info file */
 typedef struct InputData InputData;
 struct InputData {
@@ -198,7 +202,6 @@ struct InputData {
 };
 
 /* Typedefs for the item structures. Do also serve as forwards */
-typedef struct IdStruct IdStruct;
 typedef struct FileInfo FileInfo;
 typedef struct LibInfo LibInfo;
 typedef struct LineInfo LineInfo;
@@ -207,20 +210,15 @@ typedef struct ScopeInfo ScopeInfo;
 typedef struct SegInfo SegInfo;
 typedef struct SymInfo SymInfo;
 
-/* The C standard guarantees that layout of structures with identical members
- * is identical. To save some code, all structures below have an unsigned
- * named Id as first member. We will use the following struct in the functions
- * for sorting to save some code.
- */
-struct IdStruct {
-    unsigned            Id;             /* Id of structure */
-};
-
 /* Internally used file info struct */
 struct FileInfo {
     unsigned            Id;             /* Id of file */
     unsigned long       Size;           /* Size of file */
     unsigned long       MTime;          /* Modification time */
+    union {
+        unsigned        Id;             /* Id of module */
+        ModInfo*        Info;           /* Pointer to module info */
+    } Mod;
     Collection          LineInfoByLine; /* Line infos sorted by line */
     char                FileName[1];    /* Name of file with full path */
 };
@@ -269,9 +267,17 @@ struct ScopeInfo {
     cc65_size           Size;           /* Size of scope */
     unsigned            Flags;          /* Scope flags */
     union {
+        unsigned        Id;             /* Id of module */
+        ModInfo*        Info;           /* Pointer to module info */
+    } Mod;
+    union {
         unsigned        Id;             /* Id of parent scope */
         ScopeInfo*      Scope;          /* Pointer to parent scope */
     } Parent;
+    union {
+        unsigned        Id;             /* Id of label symbol */
+        SymInfo*        Info;           /* Pointer to label symbol */
+    } Sym;
     char                ScopeName[1];   /* Name of scope */
 };
 
@@ -692,6 +698,39 @@ static void CollInsert (Collection* C, void* Item, unsigned Index)
 
 
 
+static void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
+/* If Index is a valid index for the collection, replace the item at this
+ * position by the one passed. If the collection is too small, expand it,
+ * filling unused pointers with NULL, then add the new item at the given
+ * position.
+ */
+{
+    if (Index < C->Count) {
+        /* Collection is already large enough */
+        C->Items[Index] = Item;
+    } else {
+        /* Must expand the collection */
+        unsigned Size = C->Size;
+        if (Size == 0) {
+            Size = 8;
+        }
+        while (Index >= Size) {
+            Size *= 2;
+        }
+        CollGrow (C, Size);
+
+        /* Fill up unused slots with NULL */
+        while (C->Count < Index) {
+            C->Items[C->Count++] = 0;
+        }
+
+        /* Fill in the item */
+        C->Items[C->Count++] = Item;
+    }
+}
+
+
+
 static void CollAppend (Collection* C, void* Item)
 /* Append an item to the end of the collection */
 {
@@ -890,36 +929,18 @@ static void DumpData (InputData* D)
 
 
 /*****************************************************************************/
-/*                              struct IdStruct                              */
-/*****************************************************************************/
-
-
-
-static int CompareById (const void* L, const void* R)
-/* Helper function to sort structures in a collection by id */
-{
-    return ((int)((const IdStruct*) L)->Id) - ((int)((const IdStruct*) R)->Id);
-}
-
-
-
-/*****************************************************************************/
 /*                                 File info                                 */
 /*****************************************************************************/
 
 
 
-static FileInfo* NewFileInfo (const StrBuf* FileName, unsigned Id,
-                              unsigned long Size, unsigned long MTime)
+static FileInfo* NewFileInfo (const StrBuf* FileName)
 /* Create a new FileInfo struct and return it */
 {
     /* Allocate memory */
     FileInfo* F = xmalloc (sizeof (FileInfo) + SB_GetLen (FileName));
 
     /* Initialize it */
-    F->Id    = Id;
-    F->Size  = Size;
-    F->MTime = MTime;
     InitCollection (&F->LineInfoByLine);
     memcpy (F->FileName, SB_GetConstBuf (FileName), SB_GetLen (FileName) + 1);
 
@@ -1735,22 +1756,25 @@ static void NextToken (InputData* D)
 /* Read the next token from the input stream */
 {
     static const struct KeywordEntry  {
-        const char      Keyword[16];
+        const char      Keyword[12];
         Token           Tok;
     } KeywordTable[] = {
         { "abs",        TOK_ABSOLUTE    },
         { "addrsize",   TOK_ADDRSIZE    },
         { "count",      TOK_COUNT       },
+        { "enum",       TOK_ENUM        },
         { "equ",        TOK_EQUATE      },
         { "file",       TOK_FILE        },
+        { "global",     TOK_GLOBAL      },
         { "id",         TOK_ID          },
+        { "info",       TOK_INFO        },
         { "lab",        TOK_LABEL       },
         { "lib",        TOK_LIBRARY     },
         { "line",       TOK_LINE        },
         { "long",       TOK_LONG        },
         { "major",      TOK_MAJOR       },
         { "minor",      TOK_MINOR       },
-        { "module",     TOK_MODULE      },
+        { "mod",        TOK_MODULE      },
         { "mtime",      TOK_MTIME       },
         { "name",       TOK_NAME        },
         { "oname",      TOK_OUTPUTNAME  },
@@ -1763,6 +1787,7 @@ static void NextToken (InputData* D)
         { "seg",        TOK_SEGMENT     },
         { "size",       TOK_SIZE        },
         { "start",      TOK_START       },
+        { "struct",     TOK_STRUCT      },
         { "sym",        TOK_SYM         },
         { "type",       TOK_TYPE        },
         { "val",        TOK_VALUE       },
@@ -1971,6 +1996,7 @@ static void ParseFile (InputData* D)
     unsigned      Id = 0;
     unsigned long Size = 0;
     unsigned long MTime = 0;
+    unsigned      ModId = CC65_INV_ID;
     StrBuf        FileName = STRBUF_INITIALIZER;
     FileInfo*     F;
     enum {
@@ -1979,7 +2005,8 @@ static void ParseFile (InputData* D)
         ibFileName  = 0x02,
         ibSize      = 0x04,
         ibMTime     = 0x08,
-        ibRequired  = ibId | ibFileName | ibSize | ibMTime,
+        ibModId     = 0x10,
+        ibRequired  = ibId | ibFileName | ibSize | ibMTime | ibModId,
     } InfoBits = ibNone;
 
     /* Skip the FILE token */
@@ -1991,8 +2018,9 @@ static void ParseFile (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ID   && D->Tok != TOK_MTIME &&
-            D->Tok != TOK_NAME && D->Tok != TOK_SIZE) {
+        if (D->Tok != TOK_ID            && D->Tok != TOK_MODULE         &&
+            D->Tok != TOK_MTIME         && D->Tok != TOK_NAME           &&
+            D->Tok != TOK_SIZE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2030,6 +2058,21 @@ static void ParseFile (InputData* D)
                 MTime = D->IVal;
                 NextToken (D);
                 InfoBits |= ibMTime;
+                break;
+
+            case TOK_MODULE:
+                while (1) {
+                    if (!IntConstFollows (D)) {
+                        goto ErrorExit;
+                    }
+                    ModId = D->IVal;
+                    InfoBits |= ibModId;
+                    NextToken (D);
+                    if (D->Tok != TOK_PLUS) {
+                        break;
+                    }
+                    NextToken (D);
+                }
                 break;
 
             case TOK_NAME:
@@ -2079,12 +2122,221 @@ static void ParseFile (InputData* D)
     }
 
     /* Create the file info and remember it */
-    F = NewFileInfo (&FileName, Id, Size, MTime);
+    F = NewFileInfo (&FileName);
+    F->Id       = Id;
+    F->Size     = Size;
+    F->MTime    = MTime;
+    F->Mod.Id   = ModId;
+    CollReplaceExpand (&D->Info->FileInfoById, F, Id);
     CollAppend (&D->Info->FileInfoByName, F);
 
 ErrorExit:
     /* Entry point in case of errors */
     SB_Done (&FileName);
+    return;
+}
+
+
+
+static void ParseInfo (InputData* D)
+/* Parse an INFO line */
+{
+    /* Skip the INFO token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_FILE  && D->Tok != TOK_LIBRARY        &&
+            D->Tok != TOK_LINE  && D->Tok != TOK_MODULE         &&
+            D->Tok != TOK_SCOPE && D->Tok != TOK_SEGMENT        &&
+            D->Tok != TOK_SYM) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal, check for an integer
+         * constant.
+         */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+        if (!IntConstFollows (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_FILE:
+                CollGrow (&D->Info->FileInfoById, D->IVal);
+                break;
+
+            case TOK_LIBRARY:
+                CollGrow (&D->Info->LibInfoById, D->IVal);
+                break;
+
+            case TOK_LINE:
+                /*CollGrow (&D->Info->LineInfoById, D->IVal);*/
+                break;
+
+            case TOK_MODULE:
+                CollGrow (&D->Info->ModInfoById, D->IVal);
+                break;
+
+            case TOK_SCOPE:
+                CollGrow (&D->Info->ScopeInfoById, D->IVal);
+                break;
+
+            case TOK_SEGMENT:
+                CollGrow (&D->Info->SegInfoById, D->IVal);
+                break;
+
+            case TOK_SYM:
+                CollGrow (&D->Info->SymInfoById, D->IVal);
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Skip the number */
+        NextToken (D);
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+ErrorExit:
+    /* Entry point in case of errors */
+    return;
+}
+
+
+
+static void ParseLibrary (InputData* D)
+/* Parse a LIBRARY line */
+{
+    unsigned      Id = 0;
+    StrBuf        Name = STRBUF_INITIALIZER;
+    LibInfo*      L;
+    enum {
+        ibNone      = 0x00,
+        ibId        = 0x01,
+        ibName      = 0x02,
+        ibRequired  = ibId | ibName,
+    } InfoBits = ibNone;
+
+    /* Skip the LIBRARY token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_ID            && D->Tok != TOK_NAME) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                InfoBits |= ibId;
+                NextToken (D);
+                break;
+
+            case TOK_NAME:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&Name, &D->SVal);
+                SB_Terminate (&Name);
+                InfoBits |= ibName;
+                NextToken (D);
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+
+    /* Create the library info and remember it */
+    L = NewLibInfo (&Name);
+    L->Id = Id;
+    CollReplaceExpand (&D->Info->LibInfoById, L, Id);
+
+ErrorExit:
+    /* Entry point in case of errors */
+    SB_Done (&Name);
     return;
 }
 
@@ -2249,6 +2501,144 @@ ErrorExit:
 
 
 
+static void ParseModule (InputData* D)
+/* Parse a MODULE line */
+{
+    /* Most of the following variables are initialized with a value that is
+     * overwritten later. This is just to avoid compiler warnings.
+     */
+    unsigned            Id = CC65_INV_ID;
+    StrBuf              Name = STRBUF_INITIALIZER;
+    unsigned            FileId = CC65_INV_ID;
+    unsigned            LibId = CC65_INV_ID;
+    ModInfo*            M;
+    enum {
+        ibNone          = 0x000,
+
+        ibFileId        = 0x001,
+        ibId            = 0x002,
+        ibName          = 0x004,
+        ibLibId         = 0x008,
+
+        ibRequired      = ibId | ibName | ibFileId,
+    } InfoBits = ibNone;
+
+    /* Skip the MODULE token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_FILE          && D->Tok != TOK_ID             &&
+            D->Tok != TOK_NAME          && D->Tok != TOK_LIBRARY) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_FILE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                FileId = D->IVal;
+                InfoBits |= ibFileId;
+                NextToken (D);
+                break;
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                InfoBits |= ibId;
+                NextToken (D);
+                break;
+
+            case TOK_NAME:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&Name, &D->SVal);
+                SB_Terminate (&Name);
+                InfoBits |= ibName;
+                NextToken (D);
+                break;
+
+            case TOK_LIBRARY:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                LibId = D->IVal;
+                InfoBits |= ibLibId;
+                NextToken (D);
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required and/or matched information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+
+    /* Create the scope info */
+    M = NewModInfo (&Name);
+    M->File.Id  = FileId;
+    M->Id       = Id;
+    M->Lib.Id   = LibId;
+
+    /* ... and remember it */
+    CollReplaceExpand (&D->Info->ModInfoById, M, Id);
+
+ErrorExit:
+    /* Entry point in case of errors */
+    SB_Done (&Name);
+    return;
+}
+
+
+
+
+
+
 static void ParseScope (InputData* D)
 /* Parse a SCOPE line */
 {
@@ -2259,18 +2649,22 @@ static void ParseScope (InputData* D)
     cc65_scope_type     Type = CC65_SCOPE_MODULE;
     cc65_size           Size = 0;
     StrBuf              Name = STRBUF_INITIALIZER;
-    unsigned            Parent = CC65_INV_ID;
+    unsigned            ModId = CC65_INV_ID;
+    unsigned            ParentId = CC65_INV_ID;
+    unsigned            SymId = CC65_INV_ID;
     ScopeInfo*          S;
     enum {
         ibNone          = 0x000,
 
         ibId            = 0x001,
-        ibName          = 0x002,
-        ibParent        = 0x004,
-        ibSize          = 0x008,
-        ibType          = 0x010,
+        ibModId         = 0x002,
+        ibName          = 0x004,
+        ibParentId      = 0x008,
+        ibSize          = 0x010,
+        ibSymId         = 0x020,
+        ibType          = 0x040,
 
-        ibRequired      = ibId | ibName | ibParent | ibType,
+        ibRequired      = ibId | ibModId | ibName,
     } InfoBits = ibNone;
 
     /* Skip the SCOPE token */
@@ -2282,8 +2676,9 @@ static void ParseScope (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ID            && D->Tok != TOK_NAME           &&
-            D->Tok != TOK_PARENT        && D->Tok != TOK_SIZE           &&
+        if (D->Tok != TOK_ID            && D->Tok != TOK_MODULE         &&
+            D->Tok != TOK_NAME          && D->Tok != TOK_PARENT         &&
+            D->Tok != TOK_SIZE          && D->Tok != TOK_SYM            &&
             D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
@@ -2315,6 +2710,15 @@ static void ParseScope (InputData* D)
                 NextToken (D);
                 break;
 
+            case TOK_MODULE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                ModId = D->IVal;
+                InfoBits |= ibModId;
+                NextToken (D);
+                break;
+
             case TOK_NAME:
                 if (!StrConstFollows (D)) {
                     goto ErrorExit;
@@ -2329,9 +2733,9 @@ static void ParseScope (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                Size = D->IVal;
+                ParentId = D->IVal;
                 NextToken (D);
-                InfoBits |= ibParent;
+                InfoBits |= ibParentId;
                 break;
 
             case TOK_SIZE:
@@ -2343,14 +2747,22 @@ static void ParseScope (InputData* D)
                 NextToken (D);
                 break;
 
+            case TOK_SYM:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SymId = D->IVal;
+                NextToken (D);
+                InfoBits |= ibSymId;
+                break;
+
             case TOK_TYPE:
                 switch (D->Tok) {
-                    case TOK_EQUATE:
-                        Type = CC65_SYM_EQUATE;
-                        break;
-                    case TOK_LABEL:
-                        Type = CC65_SYM_LABEL;
-                        break;
+                    case TOK_GLOBAL:    Type = CC65_SCOPE_GLOBAL;       break;
+                    case TOK_FILE:      Type = CC65_SCOPE_MODULE;       break;
+                    case TOK_SCOPE:     Type = CC65_SCOPE_SCOPE;        break;
+                    case TOK_STRUCT:    Type = CC65_SCOPE_STRUCT;       break;
+                    case TOK_ENUM:      Type = CC65_SCOPE_ENUM;         break;
                     default:
                         ParseError (D, CC65_ERROR,
                                     "Unknown value for attribute \"type\"");
@@ -2393,10 +2805,12 @@ static void ParseScope (InputData* D)
     S->Id        = Id;
     S->Type      = Type;
     S->Size      = Size;
-    S->Parent.Id = Parent;
+    S->Mod.Id    = ModId;
+    S->Parent.Id = ParentId;
+    S->Sym.Id    = SymId;
 
     /* ... and remember it */
-    CollAppend (&D->Info->ScopeInfoById, S);
+    CollReplaceExpand (&D->Info->ScopeInfoById, S, Id);
 
 ErrorExit:
     /* Entry point in case of errors */
@@ -2570,6 +2984,7 @@ static void ParseSegment (InputData* D)
 
     /* Create the segment info and remember it */
     S = NewSegInfo (&SegName, Id, Start, Size, &OutputName, OutputOffs);
+    CollReplaceExpand (&D->Info->SegInfoById, S, Id);
     CollAppend (&D->Info->SegInfoByName, S);
 
 ErrorExit:
@@ -2587,12 +3002,12 @@ static void ParseSym (InputData* D)
     /* Most of the following variables are initialized with a value that is
      * overwritten later. This is just to avoid compiler warnings.
      */
-    unsigned            File = CC65_INV_ID;
+    unsigned            FileId = CC65_INV_ID;
     unsigned            Id = CC65_INV_ID;
     StrBuf              Name = STRBUF_INITIALIZER;
-    unsigned            Parent = CC65_INV_ID;
-    unsigned            Scope = CC65_INV_ID;
-    unsigned            Segment = CC65_INV_ID;
+    unsigned            ParentId = CC65_INV_ID;
+    unsigned            ScopeId = CC65_INV_ID;
+    unsigned            SegId = CC65_INV_ID;
     cc65_size           Size = 0;
     cc65_symbol_type    Type = CC65_SYM_EQUATE;
     long                Value = 0;
@@ -2602,18 +3017,17 @@ static void ParseSym (InputData* D)
         ibNone          = 0x000,
 
         ibAddrSize      = 0x001,
-        ibFile          = 0x002,
+        ibFileId        = 0x002,
         ibId            = 0x004,
-        ibParent        = 0x008,
-        ibScope         = 0x010,
-        ibSegment       = 0x020,
+        ibParentId      = 0x008,
+        ibScopeId       = 0x010,
+        ibSegId         = 0x020,
         ibSize          = 0x040,
         ibName          = 0x080,
         ibType          = 0x100,
         ibValue         = 0x200,
 
-        ibRequired      = ibAddrSize | ibId | ibScope | ibName |
-                          ibType | ibValue,
+        ibRequired      = ibAddrSize | ibId | ibName | ibType | ibValue,
     } InfoBits = ibNone;
 
     /* Skip the SYM token */
@@ -2660,8 +3074,8 @@ static void ParseSym (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                File = D->IVal;
-                InfoBits |= ibFile;
+                FileId = D->IVal;
+                InfoBits |= ibFileId;
                 NextToken (D);
                 break;
 
@@ -2688,26 +3102,26 @@ static void ParseSym (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                Parent = D->IVal;
+                ParentId = D->IVal;
                 NextToken (D);
-                InfoBits |= ibParent;
+                InfoBits |= ibParentId;
                 break;
 
             case TOK_SCOPE:
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                Scope = D->IVal;
+                ScopeId = D->IVal;
                 NextToken (D);
-                InfoBits |= ibScope;
+                InfoBits |= ibScopeId;
                 break;
 
             case TOK_SEGMENT:
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                Segment = (unsigned) D->IVal;
-                InfoBits |= ibSegment;
+                SegId = (unsigned) D->IVal;
+                InfoBits |= ibSegId;
                 NextToken (D);
                 break;
 
@@ -2722,12 +3136,9 @@ static void ParseSym (InputData* D)
 
             case TOK_TYPE:
                 switch (D->Tok) {
-                    case TOK_EQUATE:
-                        Type = CC65_SYM_EQUATE;
-                        break;
-                    case TOK_LABEL:
-                        Type = CC65_SYM_LABEL;
-                        break;
+                    case TOK_EQUATE:    Type = CC65_SYM_EQUATE;         break;
+                    case TOK_LABEL:     Type = CC65_SYM_LABEL;          break;
+
                     default:
                         ParseError (D, CC65_ERROR,
                                     "Unknown value for attribute \"type\"");
@@ -2773,6 +3184,11 @@ static void ParseSym (InputData* D)
         ParseError (D, CC65_ERROR, "Required attributes missing");
         goto ErrorExit;
     }
+    if ((InfoBits & (ibScopeId | ibParentId)) == 0 ||
+        (InfoBits & (ibScopeId | ibParentId)) == (ibScopeId | ibParentId)) {
+        ParseError (D, CC65_ERROR, "Only one of \"parent\", \"scope\" must be specified");
+        goto ErrorExit;
+    }
 
     /* Create the symbol info */
     S = NewSymInfo (&Name);
@@ -2780,12 +3196,12 @@ static void ParseSym (InputData* D)
     S->Type    = Type;
     S->Value   = Value;
     S->Size    = Size;
-    S->Segment = Segment;
-    S->Scope   = Scope;
-    S->Parent  = Parent;
+    S->Segment = SegId;
+    S->Scope   = ScopeId;
+    S->Parent  = ParentId;
 
     /* Remember it */
-    CollAppend (&D->Info->SymInfoById, S);
+    CollReplaceExpand (&D->Info->SymInfoById, S, Id);
     CollAppend (&D->Info->SymInfoByName, S);
     CollAppend (&D->Info->SymInfoByVal, S);
 
@@ -2999,22 +3415,8 @@ static FileInfo* FindFileInfoById (DbgInfo* D, unsigned Id)
 static void ProcessSegInfo (InputData* D)
 /* Postprocess segment infos */
 {
-    unsigned I;
-
-    /* Get pointers to the segment info collections */
-    Collection* SegInfoByName = &D->Info->SegInfoByName;
-    Collection* SegInfoById   = &D->Info->SegInfoById;
-
     /* Sort the segment infos by name */
-    CollSort (SegInfoByName, CompareSegInfoByName);
-
-    /* Copy all items over to the collection that will get sorted by id */
-    for (I = 0; I < CollCount (SegInfoByName); ++I) {
-        CollAppend (SegInfoById, CollAt (SegInfoByName, I));
-    }
-
-    /* Sort this collection */
-    CollSort (SegInfoById, CompareById);
+    CollSort (&D->Info->SegInfoByName, CompareSegInfoByName);
 }
 
 
@@ -3022,22 +3424,8 @@ static void ProcessSegInfo (InputData* D)
 static void ProcessFileInfo (InputData* D)
 /* Postprocess file infos */
 {
-    unsigned I;
-
-    /* Get pointers to the file info collections */
-    Collection* FileInfoByName = &D->Info->FileInfoByName;
-    Collection* FileInfoById   = &D->Info->FileInfoById;
-
-    /* First, sort the file infos, so we can do a binary search */
-    CollSort (FileInfoByName, CompareFileInfoByName);
-
-    /* Copy the file infos to another collection that will be sorted by id */
-    for (I = 0; I < CollCount (FileInfoByName); ++I) {
-        CollAppend (FileInfoById, CollAt (FileInfoByName, I));
-    }
-
-    /* Sort this collection */
-    CollSort (FileInfoById, CompareById);
+    /* Sort the file infos by name, so we can do a binary search */
+    CollSort (&D->Info->FileInfoByName, CompareFileInfoByName);
 }
 
 
@@ -3225,15 +3613,9 @@ static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
 static void ProcessSymInfo (InputData* D)
 /* Postprocess symbol infos */
 {
-    /* Get pointers to the symbol info collections */
-    Collection* SymInfoById   = &D->Info->SymInfoById;
-    Collection* SymInfoByName = &D->Info->SymInfoByName;
-    Collection* SymInfoByVal  = &D->Info->SymInfoByVal;
-
     /* Sort the symbol infos */
-    CollSort (SymInfoById,   CompareById);
-    CollSort (SymInfoByName, CompareSymInfoByName);
-    CollSort (SymInfoByVal,  CompareSymInfoByVal);
+    CollSort (&D->Info->SymInfoByName, CompareSymInfoByName);
+    CollSort (&D->Info->SymInfoByVal,  CompareSymInfoByVal);
 }
 
 
@@ -3367,9 +3749,6 @@ static void ProcessScopeInfo (InputData* D)
     /* Get pointers to the scope info collections */
     Collection* ScopeInfoById = &D->Info->ScopeInfoById;
 
-    /* Sort the scope infos */
-    CollSort (ScopeInfoById, CompareById);
-
     /* Walk over all scope infos and replace the parent scope id by a pointer
      * to the parent scope.
      */
@@ -3379,7 +3758,12 @@ static void ProcessScopeInfo (InputData* D)
         ScopeInfo* S = CollAt (ScopeInfoById, I);
 
         /* Replace the parent id by a pointer */
-        S->Parent.Scope = CollAt (ScopeInfoById, S->Parent.Id);
+        if (S->Parent.Id != CC65_INV_ID) {
+            S->Parent.Scope = CollAt (ScopeInfoById, S->Parent.Id);
+        } else {
+            /* No parent */
+            S->Parent.Scope = 0;
+        }
     }
 }
 
@@ -3523,8 +3907,20 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
                 ParseFile (&D);
                 break;
 
+            case TOK_INFO:
+                ParseInfo (&D);
+                break;
+
+            case TOK_LIBRARY:
+                ParseLibrary (&D);
+                break;
+
             case TOK_LINE:
                 ParseLine (&D);
+                break;
+
+            case TOK_MODULE:
+                ParseModule (&D);
                 break;
 
             case TOK_SCOPE:

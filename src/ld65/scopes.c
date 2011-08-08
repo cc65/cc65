@@ -100,7 +100,7 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
 
 unsigned ScopeCount (void)
 /* Return the total number of scopes */
-{              
+{
 
     /* Count scopes from all modules we have linked into the output file */
     unsigned I;
@@ -133,13 +133,26 @@ void PrintDbgScopes (FILE* F)
             const Scope* S = CollConstAt (&O->Scopes, J);
 
             fprintf (F,
-                     "scope\tid=%u,name=\"%s\",mod=%u,type=%u",
+                     "scope\tid=%u,name=\"%s\",mod=%u",
                      O->ScopeBaseId + S->Id,
                      GetString (S->Name),
-                     I,
-                     S->Type);
+                     I);
 
-            /* Print the size if available */
+            /* Print the type if not module */
+            switch (S->Type) {
+
+                case SCOPE_GLOBAL:      fputs (",type=global", F);      break;
+                case SCOPE_FILE:        /* default */                   break;
+                case SCOPE_SCOPE:       fputs (",type=scope", F);       break;
+                case SCOPE_STRUCT:      fputs (",type=struct", F);      break;
+                case SCOPE_ENUM:        fputs (",type=enum", F);        break;
+
+                default:
+                    Error ("Module `%s': Unknown scope type %u",
+                           GetObjFileName (O), S->Type);
+            }
+
+            /* Print the size if available */                 
             if (S->Size != 0) {
                 fprintf (F, ",size=%lu", S->Size);
             }

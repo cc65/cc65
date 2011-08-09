@@ -210,6 +210,7 @@ void PrintDbgLineInfo (FILE* F)
     unsigned I, J, K;
 
     /* Print line infos from all modules we have linked into the output file */
+    unsigned Id = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get the object file */
@@ -236,8 +237,8 @@ void PrintDbgLineInfo (FILE* F)
 
                 /* Print it */
                 fprintf (F,
-                         "line\tfile=%u,line=%lu,seg=%u,range=0x%lX-0x%lX",
-                         LI->File->Id, GetSourceLine (LI), S->Seg->Id,
+                         "line\tid=%u,file=%u,line=%lu,seg=%u,range=0x%lX-0x%lX",
+                         Id++, LI->File->Id, GetSourceLine (LI), S->Seg->Id,
                          S->Offs, S->Offs + S->Size - 1);
 
                 /* Print type if not LI_TYPE_ASM and count if not zero */

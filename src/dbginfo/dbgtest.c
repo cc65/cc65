@@ -118,8 +118,8 @@ static void PrintSymbolData (const cc65_symboldata* D)
 /* Print the data for one symbol */
 {
     char Segment[256] = { 0 };  /* Needs dynamic alloc ### */
-    if (D->symbol_segment != CC65_INV_ID) {
-        cc65_segmentinfo* I = cc65_segmentinfo_byid (Info, D->symbol_segment);
+    if (D->segment_id != CC65_INV_ID) {
+        cc65_segmentinfo* I = cc65_segmentinfo_byid (Info, D->segment_id);
         if (I && I->count == 1) {
             sprintf (Segment, "segment=%s,", I->data[0].segment_name);
             cc65_free_segmentinfo (Info, I);

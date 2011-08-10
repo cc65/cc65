@@ -167,12 +167,13 @@ typedef enum {
  */
 typedef struct cc65_linedata cc65_linedata;
 struct cc65_linedata {
+    unsigned            line_id;        /* Internal id of this record */
+    cc65_addr           line_start;     /* Start address for this line */
+    cc65_addr           line_end;       /* End address for this line */
     const char*         source_name;    /* Name of the file */
     unsigned long       source_size;    /* Size of file */
     unsigned long       source_mtime;   /* Modification time */
     cc65_line           source_line;    /* Line number */
-    cc65_addr           line_start;     /* Start address for this line */
-    cc65_addr           line_end;       /* End address for this line */
     const char*         output_name;    /* Output file */
     unsigned long       output_offs;    /* Offset in output file */
     cc65_line_type      line_type;      /* Type of line */

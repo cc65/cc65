@@ -56,8 +56,8 @@
 #define DEBUG           0
 
 /* Version numbers of the debug format we understand */
-#define VER_MAJOR       1U
-#define VER_MINOR       3U
+#define VER_MAJOR       2U
+#define VER_MINOR       0U
 
 /* Dynamic strings */
 typedef struct StrBuf StrBuf;
@@ -413,10 +413,10 @@ static void SB_Realloc (StrBuf* B, unsigned NewSize)
      */
     if (B->Allocated) {
         /* Just reallocate the block */
-        B->Buf   = xrealloc (B->Buf, NewAllocated);
+        B->Buf = xrealloc (B->Buf, NewAllocated);
     } else {
         /* Allocate a new block and copy */
-        B->Buf   = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
+        B->Buf = memcpy (xmalloc (NewAllocated), B->Buf, B->Len);
     }
 
     /* Remember the new block size */
@@ -1032,12 +1032,13 @@ static cc65_lineinfo* new_cc65_lineinfo (unsigned Count)
 static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
 /* Copy data from a LineInfo struct to a cc65_linedata struct */
 {
+    D->line_id      = L->Id;
+    D->line_start   = L->Start;
+    D->line_end     = L->End;
     D->source_name  = L->File.Info->Name;
     D->source_size  = L->File.Info->Size;
     D->source_mtime = L->File.Info->MTime;
     D->source_line  = L->Line;
-    D->line_start   = L->Start;
-    D->line_end     = L->End;
     if (L->Seg.Info->OutputName) {
         D->output_name  = L->Seg.Info->OutputName;
         D->output_offs  = L->Seg.Info->OutputOffs + L->Start - L->Seg.Info->Start;
@@ -1331,7 +1332,11 @@ static void CopyModInfo (cc65_moduledata* D, const ModInfo* M)
     D->module_id      = M->Id;
     D->module_name    = M->Name;
     D->source_id      = M->File.Info->Id;
-    D->library_id     = M->Lib.Info->Id;
+    if (M->Lib.Info) {
+        D->library_id = M->Lib.Info->Id;
+    } else {
+        D->library_id = CC65_INV_ID;
+    }
 }
 
 
@@ -1381,13 +1386,21 @@ static cc65_scopeinfo* new_cc65_scopeinfo (unsigned Count)
 static void CopyScopeInfo (cc65_scopedata* D, const ScopeInfo* S)
 /* Copy data from a ScopeInfo struct to a cc65_scopedata struct */
 {
-    D->scope_id       = S->Id;
-    D->scope_name     = S->Name;
-    D->scope_type     = S->Type;
-    D->scope_size     = S->Size;
-    D->scope_parent   = S->Parent.Info->Id;
-    D->symbol_id      = S->Label.Info->Id;
-    D->module_id      = S->Mod.Info->Id;
+    D->scope_id         = S->Id;
+    D->scope_name       = S->Name;
+    D->scope_type       = S->Type;
+    D->scope_size       = S->Size;
+    if (S->Parent.Info) {
+        D->scope_parent = S->Parent.Info->Id;
+    } else {
+        D->scope_parent = CC65_INV_ID;
+    }
+    if (S->Label.Info) {
+        D->symbol_id    = S->Label.Info->Id;
+    } else {
+        D->symbol_id    = CC65_INV_ID;
+    }
+    D->module_id        = S->Mod.Info->Id;
 }
 
 
@@ -1527,14 +1540,22 @@ static cc65_symbolinfo* new_cc65_symbolinfo (unsigned Count)
 static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
 /* Copy data from a SymInfo struct to a cc65_symboldata struct */
 {
-    D->symbol_id      = S->Id;
-    D->symbol_name    = S->Name;
-    D->symbol_type    = S->Type;
-    D->symbol_size    = S->Size;
-    D->symbol_value   = S->Value;
-    D->segment_id     = S->Seg.Info->Id;
-    D->scope_id       = S->Scope.Info->Id;
-    D->parent_id      = S->Parent.Info->Id;
+    D->symbol_id        = S->Id;
+    D->symbol_name      = S->Name;
+    D->symbol_type      = S->Type;
+    D->symbol_size      = S->Size;
+    D->symbol_value     = S->Value;
+    if (S->Seg.Info) {
+        D->segment_id   = S->Seg.Info->Id;
+    } else {
+        D->segment_id   = CC65_INV_ID;
+    }
+    D->scope_id         = S->Scope.Info->Id;
+    if (S->Parent.Info) {
+        D->parent_id    = S->Parent.Info->Id;
+    } else {
+        D->parent_id    = CC65_INV_ID;
+    }
 }
 
 
@@ -1768,13 +1789,12 @@ static void NextChar (InputData* D)
 {
     /* Check if we've encountered EOF before */
     if (D->C >= 0) {
-        D->C = fgetc (D->F);
         if (D->C == '\n') {
             ++D->Line;
             D->Col = 0;
-        } else {
-            ++D->Col;
         }
+        D->C = fgetc (D->F);
+        ++D->Col;
     }
 }
 
@@ -1879,7 +1899,7 @@ static void NextToken (InputData* D)
         while ((Val = DigitVal (D->C)) >= 0 && Val < Base) {
        	    D->IVal = D->IVal * Base + Val;
 	    NextChar (D);
-	}
+       	}
 	D->Tok = TOK_INTCON;
 	return;
     }
@@ -3572,6 +3592,78 @@ static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
 static void ProcessSymInfo (InputData* D)
 /* Postprocess symbol infos */
 {
+    /* Walk over the symbols and resolve the references */
+    unsigned I;
+    for (I = 0; I < CollCount (&D->Info->SymInfoById); ++I) {
+
+        /* Get the symbol info */
+        SymInfo* S = CollAt (&D->Info->SymInfoById, I);
+
+        /* Resolve segment */
+        if (S->Seg.Id == CC65_INV_ID) {
+            S->Seg.Info = 0;
+        } else if (S->Seg.Id >= CollCount (&D->Info->SegInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid segment id %u for symbol with id %u",
+                        S->Seg.Id, S->Id);
+            S->Seg.Info = 0;
+        } else {
+            S->Seg.Info = CollAt (&D->Info->SegInfoById, S->Seg.Id);
+        }
+
+        /* Resolve the scope */
+        if (S->Scope.Id == CC65_INV_ID) {
+            S->Scope.Info = 0;
+        } else if (S->Scope.Id >= CollCount (&D->Info->ScopeInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid scope id %u for symbol with id %u",
+                        S->Scope.Id, S->Id);
+            S->Scope.Info = 0;
+        } else {
+            S->Scope.Info = CollAt (&D->Info->ScopeInfoById, S->Scope.Id);
+        }
+
+        /* Resolve the parent */
+        if (S->Parent.Id == CC65_INV_ID) {
+            S->Parent.Info = 0;
+        } else if (S->Parent.Id >= CollCount (&D->Info->SymInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid parent id %u for symbol with id %u",
+                        S->Parent.Id, S->Id);
+            S->Parent.Info = 0;
+        } else {
+            S->Parent.Info = CollAt (&D->Info->SymInfoById, S->Parent.Id);
+        }
+    }
+
+    /* Second run. Resolve scopes for cheap locals */
+    for (I = 0; I < CollCount (&D->Info->SymInfoById); ++I) {
+
+        /* Get the symbol info */
+        SymInfo* S = CollAt (&D->Info->SymInfoById, I);
+
+        /* Resolve the scope */
+        if (S->Scope.Info == 0) {
+            /* No scope - must have a parent */
+            if (S->Parent.Info == 0) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Symbol with id %u has no parent and no scope",
+                            S->Id);
+            } else if (S->Parent.Info->Scope.Info == 0) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Symbol with id %u has parent %u without a scope",
+                            S->Id, S->Parent.Info->Id);
+            } else {
+                S->Scope.Info = S->Parent.Info->Scope.Info;
+            }
+        }
+    }
+
     /* Sort the symbol infos */
     CollSort (&D->Info->SymInfoByName, CompareSymInfoByName);
     CollSort (&D->Info->SymInfoByVal,  CompareSymInfoByVal);

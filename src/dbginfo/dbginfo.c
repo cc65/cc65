@@ -149,6 +149,7 @@ typedef enum {
     TOK_SCOPE,                          /* SCOPE keyword */
     TOK_SEGMENT,                        /* SEGMENT keyword */
     TOK_SIZE,                           /* SIZE keyword */
+    TOK_SPAN,				/* SPAN keyword */
     TOK_START,                          /* START keyword */
     TOK_STRUCT,                         /* STRUCT keyword */
     TOK_SYM,                            /* SYM keyword */
@@ -180,6 +181,7 @@ struct DbgInfo {
     Collection          ModInfoById;    /* Module infos sorted by id */
     Collection          ScopeInfoById;  /* Scope infos sorted by id */
     Collection          SegInfoById;    /* Segment infos sorted by id */
+    Collection		SpanInfoById;	/* Span infos sorted by id */
     Collection          SymInfoById;    /* Symbol infos sorted by id */
 
     /* Collections with other sort criteria */
@@ -220,6 +222,7 @@ typedef struct LineInfo LineInfo;
 typedef struct ModInfo ModInfo;
 typedef struct ScopeInfo ScopeInfo;
 typedef struct SegInfo SegInfo;
+typedef struct SpanInfo SpanInfo;
 typedef struct SymInfo SymInfo;
 
 /* Internally used file info struct */
@@ -296,10 +299,21 @@ struct ScopeInfo {
 struct SegInfo {
     unsigned            Id;             /* Id of segment */
     cc65_addr           Start;          /* Start address of segment */
-    cc65_addr           Size;           /* Size of segment */
+    cc65_size           Size;           /* Size of segment */
     char*               OutputName;     /* Name of output file */
     unsigned long       OutputOffs;     /* Offset in output file */
     char                Name[1];        /* Name of segment */
+};
+
+/* Internally used span info struct */
+struct SpanInfo {
+    unsigned            Id;             /* Id of span */
+    cc65_addr           Offs;           /* Start offset of span */
+    cc65_size           Size;           /* Size of span */
+    union {
+	unsigned	Id;		/* Id of segment */
+	SegInfo*	Info;		/* Pointer to segment */
+    } Seg;
 };
 
 /* Internally used symbol info struct */
@@ -1599,6 +1613,53 @@ static int CompareSegInfoByName (const void* L, const void* R)
 
 
 /*****************************************************************************/
+/*                                 Span info                                 */
+/*****************************************************************************/
+
+
+
+static SpanInfo* NewSpanInfo (void)
+/* Create a new SpanInfo struct, intialize and return it */
+{
+    /* Allocate memory and return it */
+    return xmalloc (sizeof (SpanInfo));
+}
+
+
+
+static void FreeSpanInfo (SpanInfo* S)
+/* Free a SpanInfo struct */
+{
+    xfree (S);
+}
+
+
+
+static cc65_spaninfo* new_cc65_spaninfo (unsigned Count)
+/* Allocate and return a cc65_spaninfo struct that is able to hold Count
+ * entries. Initialize the count field of the returned struct.
+ */
+{
+    cc65_spaninfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
+                                Count * sizeof (S->data[0]));
+    S->count = Count;
+    return S;
+}
+
+
+
+static void CopySpanInfo (cc65_spandata* D, const SpanInfo* S)
+/* Copy data from a SpanInfo struct to a cc65_spandata struct */
+{
+    D->span_id          = S->Id;
+    D->span_offs        = S->Offs;
+    D->span_size        = S->Size;
+    D->segment_id       = S->Seg.Info->Id;
+}
+
+
+
+/*****************************************************************************/
 /*                                Symbol info                                */
 /*****************************************************************************/
 
@@ -1709,6 +1770,7 @@ static DbgInfo* NewDbgInfo (void)
     CollInit (&Info->ModInfoById);
     CollInit (&Info->ScopeInfoById);
     CollInit (&Info->SegInfoById);
+    CollInit (&Info->SpanInfoById);
     CollInit (&Info->SymInfoById);
 
     CollInit (&Info->FileInfoByName);
@@ -1749,6 +1811,9 @@ static void FreeDbgInfo (DbgInfo* Info)
     for (I = 0; I < CollCount (&Info->SegInfoById); ++I) {
         FreeSegInfo (CollAt (&Info->SegInfoById, I));
     }
+    for (I = 0; I < CollCount (&Info->SpanInfoById); ++I) {
+        FreeSpanInfo (CollAt (&Info->SpanInfoById, I));
+    }
     for (I = 0; I < CollCount (&Info->SymInfoById); ++I) {
         FreeSymInfo (CollAt (&Info->SymInfoById, I));
     }
@@ -1760,6 +1825,7 @@ static void FreeDbgInfo (DbgInfo* Info)
     CollDone (&Info->ModInfoById);
     CollDone (&Info->ScopeInfoById);
     CollDone (&Info->SegInfoById);
+    CollDone (&Info->SpanInfoById);
     CollDone (&Info->SymInfoById);
 
     /* Free the memory used by the other collections */
@@ -1783,7 +1849,7 @@ static void FreeDbgInfo (DbgInfo* Info)
 /*****************************************************************************/
 
 
-
+				   
 static void ParseError (InputData* D, cc65_error_severity Type, const char* Msg, ...)
 /* Call the user supplied parse error function */
 {
@@ -1940,6 +2006,7 @@ static void NextToken (InputData* D)
         { "scope",      TOK_SCOPE       },
         { "seg",        TOK_SEGMENT     },
         { "size",       TOK_SIZE        },
+       	{ "span",	TOK_SPAN	},
         { "start",      TOK_START       },
         { "struct",     TOK_STRUCT      },
         { "sym",        TOK_SYM         },

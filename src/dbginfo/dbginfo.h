@@ -243,6 +243,44 @@ void cc65_free_moduleinfo (cc65_dbginfo handle, cc65_moduleinfo* info);
 
 
 /*****************************************************************************/
+/*                                   Spans                                   */
+/*****************************************************************************/
+
+
+
+/* Span information */
+typedef struct cc65_spandata cc65_spandata;
+struct cc65_spandata {
+    unsigned            span_id;        /* The internal span id */
+    cc65_addr           span_offs;      /* Offset of the span in the segment */
+    cc65_size           span_size;      /* Size of the span */
+    unsigned            segment_id;     /* Id of the segment */
+};
+                                          
+typedef struct cc65_spaninfo cc65_spaninfo;
+struct cc65_spaninfo {
+    unsigned            count;          /* Number of data sets that follow */
+    cc65_spandata       data[1];        /* Data sets, number is dynamic */
+};
+
+                        
+
+cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo handle);
+/* Return a list of all spans */
+
+cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo handle, unsigned id);
+/* Return information about a span with a specific id. The function
+ * returns NULL if the id is invalid (no such span) and otherwise a
+ * cc65_spaninfo structure with one entry that contains the requested
+ * span information.
+ */
+       
+void cc65_free_spaninfo (cc65_dbginfo handle, cc65_spaninfo* info);
+/* Free a span info record */
+
+
+
+/*****************************************************************************/
 /*                               Source files                                */
 /*****************************************************************************/
 
@@ -305,7 +343,7 @@ struct cc65_segmentdata {
     unsigned            segment_id;     /* The internal segment id */
     const char*         segment_name;   /* Name of the segment */
     cc65_addr           segment_start;  /* Start address of segment */
-    cc65_addr           segment_size;   /* Size of segment */
+    cc65_size           segment_size;   /* Size of segment */
     const char*         output_name;    /* Output file this seg was written to */
     unsigned long       output_offs;    /* Offset of this seg in output file */
 };

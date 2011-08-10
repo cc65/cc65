@@ -565,7 +565,7 @@ static char* SB_StrDup (const StrBuf* B)
 
 
 
-static Collection* InitCollection (Collection* C)
+static Collection* CollInit (Collection* C)
 /* Initialize a collection and return it. */
 {
     /* Intialize the fields. */
@@ -579,7 +579,7 @@ static Collection* InitCollection (Collection* C)
 
 
 
-static void DoneCollection (Collection* C)
+static void CollDone (Collection* C)
 /* Free the data for a collection. This will not free the data contained in
  * the collection.
  */
@@ -587,8 +587,8 @@ static void DoneCollection (Collection* C)
     /* Free the pointer array */
     xfree (C->Items);
 
-    /* Clear the fields, so the collection may be reused (or DoneCollection
-     * called) again
+    /* Clear the fields, so the collection may be reused (or CollDone called)
+     * again
      */
     C->Count = 0;
     C->Size  = 0;
@@ -953,8 +953,8 @@ static FileInfo* NewFileInfo (const StrBuf* Name)
     FileInfo* F = xmalloc (sizeof (FileInfo) + SB_GetLen (Name));
 
     /* Initialize it */
-    InitCollection (&F->ModInfoByName);
-    InitCollection (&F->LineInfoByLine);
+    CollInit (&F->ModInfoByName);
+    CollInit (&F->LineInfoByLine);
     memcpy (F->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -966,8 +966,9 @@ static FileInfo* NewFileInfo (const StrBuf* Name)
 static void FreeFileInfo (FileInfo* F)
 /* Free a FileInfo struct */
 {
-    /* Delete the collection with the line infos */
-    DoneCollection (&F->LineInfoByLine);
+    /* Delete the collections */
+    CollDone (&F->ModInfoByName);
+    CollDone (&F->LineInfoByLine);
 
     /* Free the file info structure itself */
     xfree (F);
@@ -1382,8 +1383,8 @@ static ModInfo* NewModInfo (const StrBuf* Name)
     ModInfo* M = xmalloc (sizeof (ModInfo) + SB_GetLen (Name));
 
     /* Initialize it */
-    InitCollection (&M->FileInfoByName);
-    InitCollection (&M->ScopeInfoByName);
+    CollInit (&M->FileInfoByName);
+    CollInit (&M->ScopeInfoByName);
     memcpy (M->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1396,8 +1397,8 @@ static void FreeModInfo (ModInfo* M)
 /* Free a ModInfo struct */
 {
     /* Free the collections */
-    DoneCollection (&M->FileInfoByName);
-    DoneCollection (&M->ScopeInfoByName);
+    CollDone (&M->FileInfoByName);
+    CollDone (&M->ScopeInfoByName);
 
     /* Free the structure itself */
     xfree (M);
@@ -1701,18 +1702,18 @@ static DbgInfo* NewDbgInfo (void)
     DbgInfo* Info = xmalloc (sizeof (DbgInfo));
 
     /* Initialize it */
-    InitCollection (&Info->FileInfoById);
-    InitCollection (&Info->LibInfoById);
-    InitCollection (&Info->LineInfoById);
-    InitCollection (&Info->ModInfoById);
-    InitCollection (&Info->ScopeInfoById);
-    InitCollection (&Info->SegInfoById);
-    InitCollection (&Info->SymInfoById);
+    CollInit (&Info->FileInfoById);
+    CollInit (&Info->LibInfoById);
+    CollInit (&Info->LineInfoById);
+    CollInit (&Info->ModInfoById);
+    CollInit (&Info->ScopeInfoById);
+    CollInit (&Info->SegInfoById);
+    CollInit (&Info->SymInfoById);
 
-    InitCollection (&Info->FileInfoByName);
-    InitCollection (&Info->SegInfoByName);
-    InitCollection (&Info->SymInfoByName);
-    InitCollection (&Info->SymInfoByVal);
+    CollInit (&Info->FileInfoByName);
+    CollInit (&Info->SegInfoByName);
+    CollInit (&Info->SymInfoByName);
+    CollInit (&Info->SymInfoByVal);
 
     InitLineInfoList (&Info->LineInfoByAddr);
 
@@ -1751,18 +1752,18 @@ static void FreeDbgInfo (DbgInfo* Info)
     }
 
     /* Free the memory used by the collections themselves */
-    DoneCollection (&Info->FileInfoById);
-    DoneCollection (&Info->LibInfoById);
-    DoneCollection (&Info->LineInfoById);
-    DoneCollection (&Info->ModInfoById);
-    DoneCollection (&Info->ScopeInfoById);
-    DoneCollection (&Info->SegInfoById);
-    DoneCollection (&Info->SymInfoById);
+    CollDone (&Info->FileInfoById);
+    CollDone (&Info->LibInfoById);
+    CollDone (&Info->LineInfoById);
+    CollDone (&Info->ModInfoById);
+    CollDone (&Info->ScopeInfoById);
+    CollDone (&Info->SegInfoById);
+    CollDone (&Info->SymInfoById);
 
-    DoneCollection (&Info->FileInfoByName);
-    DoneCollection (&Info->SegInfoByName);
-    DoneCollection (&Info->SymInfoByName);
-    DoneCollection (&Info->SymInfoByVal);
+    CollDone (&Info->FileInfoByName);
+    CollDone (&Info->SegInfoByName);
+    CollDone (&Info->SymInfoByName);
+    CollDone (&Info->SymInfoByVal);
 
     /* Free line info */
     DoneLineInfoList (&Info->LineInfoByAddr);
@@ -2281,7 +2282,7 @@ static void ParseFile (InputData* D)
 
 ErrorExit:
     /* Entry point in case of errors */
-    DoneCollection (&ModIds);
+    CollDone (&ModIds);
     SB_Done (&Name);
     return;
 }
@@ -3660,7 +3661,7 @@ static void ProcessLineInfo (InputData* D)
     CreateLineInfoList (&D->Info->LineInfoByAddr, &LineInfoByAddr);
 
     /* Remove the temporary collection */
-    DoneCollection (&LineInfoByAddr);
+    CollDone (&LineInfoByAddr);
 }
 
 
@@ -4374,7 +4375,7 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
     }
 
     /* Delete the temporary data collection */
-    DoneCollection (&LineInfoList);
+    CollDone (&LineInfoList);
 
     /* Return the allocated struct */
     return D;
@@ -4841,7 +4842,7 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65
     }
 
     /* Free the collection */
-    DoneCollection (&SymInfoList);
+    CollDone (&SymInfoList);
 
     /* Return the result */
     return D;

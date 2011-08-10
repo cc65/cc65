@@ -947,9 +947,11 @@ static void DumpData (InputData* D)
 #else
 
 /* No output */
+#ifdef __WATCOMC__
+static void DBGPRINT(const char* format, ...) {}
+#else
 #define DBGPRINT(format, ...)
-
-
+#endif
 
 #endif
 
@@ -1849,7 +1851,7 @@ static void FreeDbgInfo (DbgInfo* Info)
 /*****************************************************************************/
 
 
-				   
+
 static void ParseError (InputData* D, cc65_error_severity Type, const char* Msg, ...)
 /* Call the user supplied parse error function */
 {
@@ -4522,7 +4524,6 @@ cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
 /* Return a list of all modules */
 {
     DbgInfo*            Info;
-    Collection*         ModInfoById;
     cc65_moduleinfo*    D;
     unsigned            I;
 
@@ -4532,16 +4533,13 @@ cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
     /* The handle is actually a pointer to a debug info struct */
     Info = (DbgInfo*) Handle;
 
-    /* Get a pointer to the module list */
-    ModInfoById = &Info->ModInfoById;
-
     /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_moduleinfo (CollCount (ModInfoById));
+    D = new_cc65_moduleinfo (CollCount (&Info->ModInfoById));
 
     /* Fill in the data */
-    for (I = 0; I < CollCount (ModInfoById); ++I) {
+    for (I = 0; I < CollCount (&Info->ModInfoById); ++I) {
         /* Copy the data */
-        CopyModInfo (D->data + I, CollAt (ModInfoById, I));
+        CopyModInfo (D->data + I, CollAt (&Info->ModInfoById, I));
     }
 
     /* Return the result */
@@ -4585,6 +4583,83 @@ cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 void cc65_free_moduleinfo (cc65_dbginfo Handle, cc65_moduleinfo* Info)
 /* Free a module info record */
+{
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
+
+    /* Just free the memory */
+    xfree (Info);
+}
+
+
+
+/*****************************************************************************/
+/*                                   Spans                                   */
+/*****************************************************************************/
+
+
+
+cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
+/* Return a list of all spans */
+{
+    DbgInfo*            Info;
+    cc65_spaninfo*      D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_spaninfo (CollCount (&Info->SpanInfoById));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&Info->SpanInfoById); ++I) {
+        /* Copy the data */
+        CopySpanInfo (D->data + I, CollAt (&Info->SpanInfoById, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return information about a span with a specific id. The function
+ * returns NULL if the id is invalid (no such span) and otherwise a
+ * cc65_spaninfo structure with one entry that contains the requested
+ * span information.
+ */
+{
+    DbgInfo*            Info;
+    cc65_spaninfo*      D;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the id is valid */
+    if (Id >= CollCount (&Info->SpanInfoById)) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_spaninfo (1);
+
+    /* Fill in the data */
+    CopySpanInfo (D->data, CollAt (&Info->SpanInfoById, Id));
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void cc65_free_spaninfo (cc65_dbginfo Handle, cc65_spaninfo* Info)
+/* Free a span info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);

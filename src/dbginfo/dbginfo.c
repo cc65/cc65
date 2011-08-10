@@ -184,6 +184,7 @@ struct DbgInfo {
 
     /* Collections with other sort criteria */
     Collection          FileInfoByName; /* File infos sorted by name */
+    Collection		ModInfoByName;	/* Module info sorted by name */
     Collection          SegInfoByName;  /* Segment infos sorted by name */
     Collection          SymInfoByName;  /* Symbol infos sorted by name */
     Collection          SymInfoByVal;   /* Symbol infos sorted by value */
@@ -1711,6 +1712,7 @@ static DbgInfo* NewDbgInfo (void)
     CollInit (&Info->SymInfoById);
 
     CollInit (&Info->FileInfoByName);
+    CollInit (&Info->ModInfoByName);
     CollInit (&Info->SegInfoByName);
     CollInit (&Info->SymInfoByName);
     CollInit (&Info->SymInfoByVal);
@@ -1751,7 +1753,7 @@ static void FreeDbgInfo (DbgInfo* Info)
         FreeSymInfo (CollAt (&Info->SymInfoById, I));
     }
 
-    /* Free the memory used by the collections themselves */
+    /* Free the memory used by the id collections */
     CollDone (&Info->FileInfoById);
     CollDone (&Info->LibInfoById);
     CollDone (&Info->LineInfoById);
@@ -1760,7 +1762,9 @@ static void FreeDbgInfo (DbgInfo* Info)
     CollDone (&Info->SegInfoById);
     CollDone (&Info->SymInfoById);
 
+    /* Free the memory used by the other collections */
     CollDone (&Info->FileInfoByName);
+    CollDone (&Info->ModInfoByName);
     CollDone (&Info->SegInfoByName);
     CollDone (&Info->SymInfoByName);
     CollDone (&Info->SymInfoByVal);
@@ -2332,7 +2336,8 @@ static void ParseInfo (InputData* D)
         switch (Tok) {
 
             case TOK_FILE:
-                CollGrow (&D->Info->FileInfoById, D->IVal);
+                CollGrow (&D->Info->FileInfoById,   D->IVal);
+		CollGrow (&D->Info->FileInfoByName, D->IVal);
                 break;
 
             case TOK_LIBRARY:
@@ -2340,11 +2345,12 @@ static void ParseInfo (InputData* D)
                 break;
 
             case TOK_LINE:
-                /*CollGrow (&D->Info->LineInfoById, D->IVal);*/
+                CollGrow (&D->Info->LineInfoById, D->IVal);
                 break;
 
             case TOK_MODULE:
-                CollGrow (&D->Info->ModInfoById, D->IVal);
+                CollGrow (&D->Info->ModInfoById,   D->IVal);
+		CollGrow (&D->Info->ModInfoByName, D->IVal);
                 break;
 
             case TOK_SCOPE:
@@ -2352,11 +2358,14 @@ static void ParseInfo (InputData* D)
                 break;
 
             case TOK_SEGMENT:
-                CollGrow (&D->Info->SegInfoById, D->IVal);
+                CollGrow (&D->Info->SegInfoById,   D->IVal);
+		CollGrow (&D->Info->SegInfoByName, D->IVal);
                 break;
 
             case TOK_SYM:
-                CollGrow (&D->Info->SymInfoById, D->IVal);
+                CollGrow (&D->Info->SymInfoById,   D->IVal);
+                CollGrow (&D->Info->SymInfoByName, D->IVal);
+		CollGrow (&D->Info->SymInfoByVal,  D->IVal);
                 break;
 
             default:
@@ -2800,15 +2809,13 @@ static void ParseModule (InputData* D)
 
     /* ... and remember it */
     CollReplaceExpand (&D->Info->ModInfoById, M, Id);
+    CollAppend (&D->Info->ModInfoByName, M);
 
 ErrorExit:
     /* Entry point in case of errors */
     SB_Done (&Name);
     return;
 }
-
-
-
 
 
 
@@ -3517,11 +3524,159 @@ static int FindFileInfoByName (Collection* FileInfos, const char* Name,
 
 
 
-static void ProcessSegInfo (InputData* D)
-/* Postprocess segment infos */
+static LineInfoListEntry* FindLineInfoByAddr (const LineInfoList* L, cc65_addr Addr)
+/* Find the index of a LineInfo for a given address. Returns 0 if no such
+ * lineinfo was found.
+ */
 {
-    /* Sort the segment infos by name */
-    CollSort (&D->Info->SegInfoByName, CompareSegInfoByName);
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) L->Count - 1;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        LineInfoListEntry* CurItem = &L->List[Cur];
+
+        /* Found? */
+        if (CurItem->Addr > Addr) {
+            Hi = Cur - 1;
+        } else if (CurItem->Addr < Addr) {
+            Lo = Cur + 1;
+        } else {
+            /* Found */
+            return CurItem;
+        }
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
+static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
+                               unsigned* Index)
+/* Find the LineInfo for a given line number. The function returns true if the
+ * line was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for the line.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (LineInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        const LineInfo* CurItem = CollAt (LineInfos, Cur);
+
+        /* Found? */
+        if (Line > CurItem->Line) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Line == CurItem->Line) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
+}
+
+
+
+static int FindSymInfoByName (Collection* SymInfos, const char* Name, unsigned* Index)
+/* Find the SymInfo for a given file name. The function returns true if the
+ * name was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for Name.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (SymInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        SymInfo* CurItem = CollAt (SymInfos, Cur);
+
+        /* Compare */
+        int Res = strcmp (CurItem->Name, Name);
+
+        /* Found? */
+        if (Res < 0) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Res == 0) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
+}
+
+
+
+static int FindSymInfoByValue (Collection* SymInfos, long Value, unsigned* Index)
+/* Find the SymInfo for a given value. The function returns true if the
+ * value was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for the given value.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (SymInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        SymInfo* CurItem = CollAt (SymInfos, Cur);
+
+        /* Found? */
+        if (Value > CurItem->Value) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Value == CurItem->Value) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
 }
 
 
@@ -3666,76 +3821,120 @@ static void ProcessLineInfo (InputData* D)
 
 
 
-static LineInfoListEntry* FindLineInfoByAddr (const LineInfoList* L, cc65_addr Addr)
-/* Find the index of a LineInfo for a given address. Returns 0 if no such
- * lineinfo was found.
- */
+static void ProcessModInfo (InputData* D)
+/* Postprocess module infos */
 {
-    /* Do a binary search */
-    int Lo = 0;
-    int Hi = (int) L->Count - 1;
-    while (Lo <= Hi) {
+    unsigned I;
 
-        /* Mid of range */
-        int Cur = (Lo + Hi) / 2;
+    /* Walk over all scopes and resolve the ids */
+    for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
 
-        /* Get item */
-        LineInfoListEntry* CurItem = &L->List[Cur];
+        /* Get this module info */
+        ModInfo* M = CollAt (&D->Info->ModInfoById, I);
 
-        /* Found? */
-        if (CurItem->Addr > Addr) {
-            Hi = Cur - 1;
-        } else if (CurItem->Addr < Addr) {
-            Lo = Cur + 1;
+        /* Resolve the main file */
+        if (M->File.Id >= CollCount (&D->Info->FileInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid file id %u for module with id %u",
+                        M->File.Id, M->Id);
+            M->File.Info = 0;
         } else {
-            /* Found */
-            return CurItem;
+            M->File.Info = CollAt (&D->Info->FileInfoById, M->File.Id);
+        }
+
+        /* Resolve the library */
+	if (M->Lib.Id == CC65_INV_ID) {
+            M->Lib.Info = 0;
+        } else if (M->Lib.Id >= CollCount (&D->Info->LibInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid library id %u for module with id %u",
+                        M->Lib.Id, M->Id);
+            M->Lib.Info = 0;
+        } else {
+            M->Lib.Info = CollAt (&D->Info->LibInfoById, M->Lib.Id);
         }
     }
 
-    /* Not found */
-    return 0;
+    /* Sort the collection that contains the module info by name */
+    CollSort (&D->Info->ModInfoByName, CompareModInfoByName);
 }
 
 
 
-static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
-                               unsigned* Index)
-/* Find the LineInfo for a given line number. The function returns true if the
- * line was found. In this case, Index contains the index of the first item
- * that matches. If the item wasn't found, the function returns false and
- * Index contains the insert position for the line.
- */
+static void ProcessScopeInfo (InputData* D)
+/* Postprocess scope infos */
 {
-    /* Do a binary search */
-    int Lo = 0;
-    int Hi = (int) CollCount (LineInfos) - 1;
-    int Found = 0;
-    while (Lo <= Hi) {
+    unsigned I;
 
-        /* Mid of range */
-        int Cur = (Lo + Hi) / 2;
+    /* Walk over all scopes. Resolve the ids and add the scopes to the list
+     * of scopes for a module.
+     */
+    for (I = 0; I < CollCount (&D->Info->ScopeInfoById); ++I) {
 
-        /* Get item */
-        const LineInfo* CurItem = CollAt (LineInfos, Cur);
+        /* Get this scope info */
+        ScopeInfo* S = CollAt (&D->Info->ScopeInfoById, I);
 
-        /* Found? */
-        if (Line > CurItem->Line) {
-            Lo = Cur + 1;
+        /* Resolve the module */
+        if (S->Mod.Id >= CollCount (&D->Info->ModInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid module id %u for scope with id %u",
+                        S->Mod.Id, S->Id);
+            S->Mod.Info = 0;
         } else {
-            Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-             * the first item that has a match.
-             */
-            if (Line == CurItem->Line) {
-                Found = 1;
-            }
+            S->Mod.Info = CollAt (&D->Info->ModInfoById, S->Mod.Id);
+
+            /* Add the scope to the list of scopes for this module */
+            CollAppend (&S->Mod.Info->ScopeInfoByName, S);
+        }
+
+        /* Resolve the parent scope */
+        if (S->Parent.Id == CC65_INV_ID) {
+            S->Parent.Info = 0;
+        } else if (S->Parent.Id >= CollCount (&D->Info->ScopeInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid parent scope id %u for scope with id %u",
+                        S->Parent.Id, S->Id);
+            S->Parent.Info = 0;
+        } else {
+            S->Parent.Info = CollAt (&D->Info->ScopeInfoById, S->Parent.Id);
+        }
+
+        /* Resolve the label */
+        if (S->Label.Id == CC65_INV_ID) {
+            S->Label.Info = 0;
+        } else if (S->Label.Id >= CollCount (&D->Info->SymInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid label id %u for scope with id %u",
+                        S->Label.Id, S->Id);
+            S->Label.Info = 0;
+        } else {
+            S->Label.Info = CollAt (&D->Info->SymInfoById, S->Label.Id);
         }
     }
 
-    /* Pass back the index. This is also the insert position */
-    *Index = Lo;
-    return Found;
+    /* Walk over all modules and sort the scopes by name */
+    for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
+
+        /* Get this module */
+        ModInfo* M = CollAt (&D->Info->ModInfoById, I);
+
+        /* Sort the scopes for this module by name */
+        CollSort (&M->ScopeInfoByName, CompareScopeInfoByName);
+    }
+}
+
+
+
+static void ProcessSegInfo (InputData* D)
+/* Postprocess segment infos */
+{
+    /* Sort the segment infos by name */
+    CollSort (&D->Info->SegInfoByName, CompareSegInfoByName);
 }
 
 
@@ -3818,156 +4017,6 @@ static void ProcessSymInfo (InputData* D)
     /* Sort the symbol infos */
     CollSort (&D->Info->SymInfoByName, CompareSymInfoByName);
     CollSort (&D->Info->SymInfoByVal,  CompareSymInfoByVal);
-}
-
-
-
-static int FindSymInfoByName (Collection* SymInfos, const char* Name, unsigned* Index)
-/* Find the SymInfo for a given file name. The function returns true if the
- * name was found. In this case, Index contains the index of the first item
- * that matches. If the item wasn't found, the function returns false and
- * Index contains the insert position for Name.
- */
-{
-    /* Do a binary search */
-    int Lo = 0;
-    int Hi = (int) CollCount (SymInfos) - 1;
-    int Found = 0;
-    while (Lo <= Hi) {
-
-        /* Mid of range */
-        int Cur = (Lo + Hi) / 2;
-
-        /* Get item */
-        SymInfo* CurItem = CollAt (SymInfos, Cur);
-
-        /* Compare */
-        int Res = strcmp (CurItem->Name, Name);
-
-        /* Found? */
-        if (Res < 0) {
-            Lo = Cur + 1;
-        } else {
-            Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-             * the first item that has a match.
-             */
-            if (Res == 0) {
-                Found = 1;
-            }
-        }
-    }
-
-    /* Pass back the index. This is also the insert position */
-    *Index = Lo;
-    return Found;
-}
-
-
-
-static int FindSymInfoByValue (Collection* SymInfos, long Value, unsigned* Index)
-/* Find the SymInfo for a given value. The function returns true if the
- * value was found. In this case, Index contains the index of the first item
- * that matches. If the item wasn't found, the function returns false and
- * Index contains the insert position for the given value.
- */
-{
-    /* Do a binary search */
-    int Lo = 0;
-    int Hi = (int) CollCount (SymInfos) - 1;
-    int Found = 0;
-    while (Lo <= Hi) {
-
-        /* Mid of range */
-        int Cur = (Lo + Hi) / 2;
-
-        /* Get item */
-        SymInfo* CurItem = CollAt (SymInfos, Cur);
-
-        /* Found? */
-        if (Value > CurItem->Value) {
-            Lo = Cur + 1;
-        } else {
-            Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-             * the first item that has a match.
-             */
-            if (Value == CurItem->Value) {
-                Found = 1;
-            }
-        }
-    }
-
-    /* Pass back the index. This is also the insert position */
-    *Index = Lo;
-    return Found;
-}
-
-
-
-static void ProcessScopeInfo (InputData* D)
-/* Postprocess scope infos */
-{
-    unsigned I;
-
-    /* Walk over all scopes. Resolve the ids and add the scopes to the list
-     * of scopes for a module.
-     */
-    for (I = 0; I < CollCount (&D->Info->ScopeInfoById); ++I) {
-
-        /* Get this scope info */
-        ScopeInfo* S = CollAt (&D->Info->ScopeInfoById, I);
-
-        /* Resolve the module */
-        if (S->Mod.Id >= CollCount (&D->Info->ModInfoById)) {
-            ParseError (D,
-                        CC65_ERROR,
-                        "Invalid module id %u for scope with id %u",
-                        S->Mod.Id, S->Id);
-            S->Mod.Info = 0;
-        } else {
-            S->Mod.Info = CollAt (&D->Info->ModInfoById, S->Mod.Id);
-
-            /* Add the scope to the list of scopes for this module */
-            CollAppend (&S->Mod.Info->ScopeInfoByName, S);
-        }
-
-        /* Resolve the parent scope */
-        if (S->Parent.Id == CC65_INV_ID) {
-            S->Parent.Info = 0;
-        } else if (S->Parent.Id >= CollCount (&D->Info->ScopeInfoById)) {
-            ParseError (D,
-                        CC65_ERROR,
-                        "Invalid parent scope id %u for scope with id %u",
-                        S->Parent.Id, S->Id);
-            S->Parent.Info = 0;
-        } else {
-            S->Parent.Info = CollAt (&D->Info->ScopeInfoById, S->Parent.Id);
-        }
-
-        /* Resolve the label */
-        if (S->Label.Id == CC65_INV_ID) {
-            S->Label.Info = 0;
-        } else if (S->Label.Id >= CollCount (&D->Info->SymInfoById)) {
-            ParseError (D,
-                        CC65_ERROR,
-                        "Invalid label id %u for scope with id %u",
-                        S->Label.Id, S->Id);
-            S->Label.Info = 0;
-        } else {
-            S->Label.Info = CollAt (&D->Info->SymInfoById, S->Label.Id);
-        }
-    }
-
-    /* Walk over all modules and sort the scopes by name */
-    for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
-
-        /* Get this module */
-        ModInfo* M = CollAt (&D->Info->ModInfoById, I);
-
-        /* Sort the scopes for this module by name */
-        CollSort (&M->ScopeInfoByName, CompareScopeInfoByName);
-    }
 }
 
 
@@ -4139,11 +4188,12 @@ CloseAndExit:
     /* We do now have all the information from the input file. Do
      * postprocessing.
      */
-    ProcessSegInfo (&D);
     ProcessFileInfo (&D);
     ProcessLineInfo (&D);
-    ProcessSymInfo (&D);
+    ProcessModInfo (&D);
     ProcessScopeInfo (&D);
+    ProcessSegInfo (&D);
+    ProcessSymInfo (&D);
 
 #if DEBUG
     /* Debug output */

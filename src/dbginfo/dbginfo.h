@@ -275,6 +275,13 @@ cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo handle, unsigned id);
  * source file information.
  */
 
+cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo handle,
+                                           unsigned module_id);
+/* Return information about the source files used to build a module. The
+ * function returns NULL if the module id is invalid (no such module) and
+ * otherwise a cc65_sourceinfo structure with one entry per source file.
+ */
+
 void cc65_free_sourceinfo (cc65_dbginfo handle, cc65_sourceinfo* info);
 /* Free a source info record */
 

@@ -226,10 +226,7 @@ struct FileInfo {
     unsigned            Id;             /* Id of file */
     unsigned long       Size;           /* Size of file */
     unsigned long       MTime;          /* Modification time */
-    union {
-        unsigned        Id;             /* Id of module */
-        ModInfo*        Info;           /* Pointer to module info */
-    } Mod;
+    Collection          ModInfoByName;  /* Modules in which this file is used */
     Collection          LineInfoByLine; /* Line infos sorted by line */
     char                Name[1];        /* Name of file with full path */
 };
@@ -608,13 +605,33 @@ static unsigned CollCount (const Collection* C)
 
 
 
+static void CollMove (Collection* Source, Collection* Target)
+/* Move all data from one collection to another. This function will first free
+ * the data in the target collection, and - after the move - clear the data
+ * from the source collection.
+ */
+{
+    /* Free the target collection data */
+    xfree (Target->Items);
+
+    /* Now copy the whole bunch over */
+    *Target = *Source;
+
+    /* Empty Source */
+    Source->Count = 0;
+    Source->Size  = 0;
+    Source->Items = 0;
+}
+
+
+
 static void CollGrow (Collection* C, unsigned Size)
 /* Grow the collection C so it is able to hold Size items without a resize
  * being necessary. This can be called for performance reasons if the number
  * of items to be placed in the collection is known in advance.
  */
 {
-    CollEntry* NewItems;    
+    CollEntry* NewItems;
 
     /* Ignore the call if the collection is already large enough */
     if (Size <= C->Size) {
@@ -631,8 +648,8 @@ static void CollGrow (Collection* C, unsigned Size)
 
 
 
-static void CollInsert (Collection* C, void* Item, unsigned Index)
-/* Insert the data at the given position in the collection */
+static void CollPrepareInsert (Collection* C, unsigned Index)
+/* Prepare for insertion of the data at a given position in the collection */
 {
     /* Check for invalid indices */
     assert (Index <= C->Count);
@@ -648,8 +665,41 @@ static void CollInsert (Collection* C, void* Item, unsigned Index)
        	memmove (C->Items+Index+1, C->Items+Index, (C->Count-Index) * sizeof (void*));
     }
     ++C->Count;
+}
+
+
+
+static void CollInsert (Collection* C, void* Item, unsigned Index)
+/* Insert the data at the given position in the collection */
+{
+    /* Prepare for insertion (free the given slot) */
+    CollPrepareInsert (C, Index);
 
     /* Store the new item */
+    C->Items[Index].Ptr = Item;
+}
+
+
+
+static void CollInsertId (Collection* C, unsigned Id, unsigned Index)
+/* Insert the data at the given position in the collection */
+{
+    /* Prepare for insertion (free the given slot) */
+    CollPrepareInsert (C, Index);
+
+    /* Store the new item */
+    C->Items[Index].Id = Id;
+}
+
+
+
+static void CollReplace (Collection* C, void* Item, unsigned Index)
+/* Replace the item at the given position by a new one */
+{
+    /* Check the index */
+    assert (Index < C->Count);
+
+    /* Replace the element */
     C->Items[Index].Ptr = Item;
 }
 
@@ -697,6 +747,15 @@ static void CollAppend (Collection* C, void* Item)
 
 
 
+static void CollAppendId (Collection* C, unsigned Id)
+/* Append an id to the end of the collection */
+{
+    /* Insert the id at the end of the current list */
+    CollInsertId (C, Id, C->Count);
+}
+
+
+
 static void* CollAt (Collection* C, unsigned Index)
 /* Return the item at the given index */
 {
@@ -705,6 +764,18 @@ static void* CollAt (Collection* C, unsigned Index)
 
     /* Return the element */
     return C->Items[Index].Ptr;
+}
+
+
+
+static unsigned CollIdAt (Collection* C, unsigned Index)
+/* Return the id at the given index */
+{
+    /* Check the index */
+    assert (Index < C->Count);
+
+    /* Return the element */
+    return C->Items[Index].Id;
 }
 
 
@@ -882,6 +953,7 @@ static FileInfo* NewFileInfo (const StrBuf* Name)
     FileInfo* F = xmalloc (sizeof (FileInfo) + SB_GetLen (Name));
 
     /* Initialize it */
+    InitCollection (&F->ModInfoByName);
     InitCollection (&F->LineInfoByLine);
     memcpy (F->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
@@ -1361,6 +1433,15 @@ static void CopyModInfo (cc65_moduledata* D, const ModInfo* M)
 
 
 
+static int CompareModInfoByName (const void* L, const void* R)
+/* Helper function to sort module infos in a collection by name */
+{
+    /* Compare module name */
+    return strcmp (((const ModInfo*) L)->Name, ((const ModInfo*) R)->Name);
+}
+
+
+
 /*****************************************************************************/
 /*                                Scope info                                 */
 /*****************************************************************************/
@@ -1428,7 +1509,7 @@ static void CopyScopeInfo (cc65_scopedata* D, const ScopeInfo* S)
 static int CompareScopeInfoByName (const void* L, const void* R)
 /* Helper function to sort scope infos in a collection by name */
 {
-    /* Compare symbol name */
+    /* Compare scope name */
     return strcmp (((const ScopeInfo*) L)->Name,
                    ((const ScopeInfo*) R)->Name);
 }
@@ -2064,7 +2145,7 @@ static void ParseFile (InputData* D)
     unsigned      Id = 0;
     unsigned long Size = 0;
     unsigned long MTime = 0;
-    unsigned      ModId = CC65_INV_ID;
+    Collection    ModIds = COLLECTION_INITIALIZER;
     StrBuf        Name = STRBUF_INITIALIZER;
     FileInfo*     F;
     enum {
@@ -2133,14 +2214,14 @@ static void ParseFile (InputData* D)
                     if (!IntConstFollows (D)) {
                         goto ErrorExit;
                     }
-                    ModId = D->IVal;
-                    InfoBits |= ibModId;
+                    CollAppendId (&ModIds, (unsigned) D->IVal);
                     NextToken (D);
                     if (D->Tok != TOK_PLUS) {
                         break;
                     }
                     NextToken (D);
                 }
+                InfoBits |= ibModId;
                 break;
 
             case TOK_NAME:
@@ -2194,12 +2275,13 @@ static void ParseFile (InputData* D)
     F->Id       = Id;
     F->Size     = Size;
     F->MTime    = MTime;
-    F->Mod.Id   = ModId;
+    CollMove (&F->ModInfoByName, &ModIds);
     CollReplaceExpand (&D->Info->FileInfoById, F, Id);
     CollAppend (&D->Info->FileInfoByName, F);
 
 ErrorExit:
     /* Entry point in case of errors */
+    DoneCollection (&ModIds);
     SB_Done (&Name);
     return;
 }
@@ -3446,6 +3528,54 @@ static void ProcessSegInfo (InputData* D)
 static void ProcessFileInfo (InputData* D)
 /* Postprocess file infos */
 {
+    /* Walk over all file infos and resolve the module ids */
+    unsigned I;
+    for (I = 0; I < CollCount (&D->Info->FileInfoById); ++I) {
+
+        /* Get this file info */
+        FileInfo* F = CollAt (&D->Info->FileInfoById, I);
+
+        /* Resolve the module ids */
+        unsigned J;
+        for (J = 0; I < CollCount (&F->ModInfoByName); ++J) {
+
+            /* Get the id of this module */
+            unsigned ModId = CollIdAt (&F->ModInfoByName, J);
+            if (ModId >= CollCount (&D->Info->ModInfoById)) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Invalid module id %u for file with id %u",
+                            ModId, F->Id);
+                CollReplace (&F->ModInfoByName, 0, J);
+            } else {
+
+                /* Get a pointer to the module */
+                ModInfo* M = CollAt (&D->Info->ModInfoById, ModId);
+
+                /* Replace the id by the pointer */
+                CollReplace (&F->ModInfoByName, M, J);
+
+                /* Insert a backpointer into the module */
+                CollAppend (&M->FileInfoByName, F);
+            }
+        }
+
+        /* If we didn't have any errors, sort the modules by name */
+        if (D->Errors == 0) {
+            CollSort (&F->ModInfoByName, CompareModInfoByName);
+        }
+    }
+
+    /* Now walk over all modules and sort the file infos by name */
+    for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
+
+        /* Get this module info */
+        ModInfo* M = CollAt (&D->Info->ModInfoById, I);
+
+        /* Sort the files by name */
+        CollSort (&M->FileInfoByName, CompareFileInfoByName);
+    }
+
     /* Sort the file infos by name, so we can do a binary search */
     CollSort (&D->Info->FileInfoByName, CompareFileInfoByName);
 }
@@ -4416,6 +4546,45 @@ cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
     return D;
 }
 
+
+
+
+cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo Handle, unsigned ModId)
+/* Return information about the source files used to build a module. The
+ * function returns NULL if the module id is invalid (no such module) and
+ * otherwise a cc65_sourceinfo structure with one entry per source file.
+ */
+{
+    DbgInfo*            Info;
+    ModInfo*            M;
+    cc65_sourceinfo*    D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the module id is valid */
+    if (ModId >= CollCount (&Info->ModInfoById)) {
+        return 0;
+    }
+
+    /* Get a pointer to the module info */
+    M = CollAt (&Info->ModInfoById, ModId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_sourceinfo (CollCount (&M->FileInfoByName));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&M->FileInfoByName); ++I) {
+        CopyFileInfo (D->data + I, CollAt (&M->FileInfoByName, I));
+    }
+
+    /* Return the result */
+    return D;
+}
 
 
 

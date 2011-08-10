@@ -421,6 +421,11 @@ cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo handle, unsigned id);
  * with this id was found.
  */
 
+cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo handle, unsigned module_id);
+/* Return the list of scopes for one module. The function returns NULL if no
+ * scope with the given id was found.
+ */
+
 void cc65_free_scopeinfo (cc65_dbginfo Handle, cc65_scopeinfo* Info);
 /* Free a scope info record */
 

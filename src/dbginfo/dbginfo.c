@@ -258,6 +258,8 @@ struct ModInfo {
         unsigned        Id;             /* Id of library if any */
         LibInfo*        Info;           /* Pointer to library info */
     } Lib;
+    Collection          FileInfoByName; /* Files for this module */
+    Collection          ScopeInfoByName;/* Scopes for this module */
     char                Name[1];        /* Name of module with path */
 };
 
@@ -1296,7 +1298,9 @@ static ModInfo* NewModInfo (const StrBuf* Name)
     /* Allocate memory */
     ModInfo* M = xmalloc (sizeof (ModInfo) + SB_GetLen (Name));
 
-    /* Initialize the name */
+    /* Initialize it */
+    InitCollection (&M->FileInfoByName);
+    InitCollection (&M->ScopeInfoByName);
     memcpy (M->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1308,6 +1312,11 @@ static ModInfo* NewModInfo (const StrBuf* Name)
 static void FreeModInfo (ModInfo* M)
 /* Free a ModInfo struct */
 {
+    /* Free the collections */
+    DoneCollection (&M->FileInfoByName);
+    DoneCollection (&M->ScopeInfoByName);
+
+    /* Free the structure itself */
     xfree (M);
 }
 
@@ -3757,8 +3766,66 @@ static int FindSymInfoByValue (Collection* SymInfos, long Value, unsigned* Index
 static void ProcessScopeInfo (InputData* D)
 /* Postprocess scope infos */
 {
-    /* Get pointers to the scope info collections */
-    Collection* ScopeInfoById = &D->Info->ScopeInfoById;
+    unsigned I;
+
+    /* Walk over all scopes. Resolve the ids and add the scopes to the list
+     * of scopes for a module.
+     */
+    for (I = 0; I < CollCount (&D->Info->ScopeInfoById); ++I) {
+
+        /* Get this scope info */
+        ScopeInfo* S = CollAt (&D->Info->ScopeInfoById, I);
+
+        /* Resolve the module */
+        if (S->Mod.Id >= CollCount (&D->Info->ModInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid module id %u for scope with id %u",
+                        S->Mod.Id, S->Id);
+            S->Mod.Info = 0;
+        } else {
+            S->Mod.Info = CollAt (&D->Info->ModInfoById, S->Mod.Id);
+
+            /* Add the scope to the list of scopes for this module */
+            CollAppend (&S->Mod.Info->ScopeInfoByName, S);
+        }
+
+        /* Resolve the parent scope */
+        if (S->Parent.Id == CC65_INV_ID) {
+            S->Parent.Info = 0;
+        } else if (S->Parent.Id >= CollCount (&D->Info->ScopeInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid parent scope id %u for scope with id %u",
+                        S->Parent.Id, S->Id);
+            S->Parent.Info = 0;
+        } else {
+            S->Parent.Info = CollAt (&D->Info->ScopeInfoById, S->Parent.Id);
+        }
+
+        /* Resolve the label */
+        if (S->Label.Id == CC65_INV_ID) {
+            S->Label.Info = 0;
+        } else if (S->Label.Id >= CollCount (&D->Info->SymInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid label id %u for scope with id %u",
+                        S->Label.Id, S->Id);
+            S->Label.Info = 0;
+        } else {
+            S->Label.Info = CollAt (&D->Info->SymInfoById, S->Label.Id);
+        }
+    }
+
+    /* Walk over all modules and sort the scopes by name */
+    for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
+
+        /* Get this module */
+        ModInfo* M = CollAt (&D->Info->ModInfoById, I);
+
+        /* Sort the scopes for this module by name */
+        CollSort (&M->ScopeInfoByName, CompareScopeInfoByName);
+    }
 }
 
 
@@ -4644,6 +4711,45 @@ cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
 
     /* Fill in the data */
     CopyScopeInfo (D->data, CollAt (&Info->ScopeInfoById, Id));
+
+    /* Return the result */
+    return D;
+}
+
+
+
+cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
+/* Return the list of scopes for one module. The function returns NULL if no
+ * scope with the given id was found.
+ */
+{
+    DbgInfo*            Info;
+    ModInfo*            M;
+    cc65_scopeinfo*     D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the module id is valid */
+    if (ModId >= CollCount (&Info->ModInfoById)) {
+        return 0;
+    }
+
+    /* Get a pointer to the module info */
+    M = CollAt (&Info->ModInfoById, ModId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (CollCount (&M->ScopeInfoByName));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&M->ScopeInfoByName); ++I) {
+        CopyScopeInfo (D->data + I, CollAt (&M->ScopeInfoByName, I));
+    }
+
 
     /* Return the result */
     return D;

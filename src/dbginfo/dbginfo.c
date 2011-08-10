@@ -70,12 +70,23 @@ struct StrBuf {
 /* Initializer for a string buffer */
 #define STRBUF_INITIALIZER      { 0, 0, 0 }
 
-/* An array of pointers that grows if needed */
+/* An array of unsigneds/pointers that grows if needed. C guarantees that a
+ * pointer to a union correctly converted points to each of its members.
+ * So what we do here is using union entries that contain an unsigned
+ * (used to store ids until they're resolved) and pointers to actual items
+ * in storage.
+ */
+typedef union CollEntry CollEntry;
+union CollEntry {
+    void*               Ptr;
+    unsigned            Id;
+};
+
 typedef struct Collection Collection;
 struct Collection {
     unsigned   	       	Count;		/* Number of items in the list */
     unsigned   	       	Size;		/* Size of allocated array */
-    void**	    	Items;		/* Array with dynamic size */
+    CollEntry*          Items;          /* Array with dynamic size */
 };
 
 /* Initializer for static collections */
@@ -436,12 +447,12 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
     if (NewAllocated == 0) {
-     	NewAllocated = 8;
+       	NewAllocated = 8;
     }
 
     /* Round up to the next power of two */
     while (NewAllocated < NewSize) {
-     	NewAllocated *= 2;
+       	NewAllocated *= 2;
     }
 
     /* Free the old buffer if there is one */
@@ -603,7 +614,7 @@ static void CollGrow (Collection* C, unsigned Size)
  * of items to be placed in the collection is known in advance.
  */
 {
-    void** NewItems;
+    CollEntry* NewItems;    
 
     /* Ignore the call if the collection is already large enough */
     if (Size <= C->Size) {
@@ -612,8 +623,8 @@ static void CollGrow (Collection* C, unsigned Size)
 
     /* Grow the collection */
     C->Size = Size;
-    NewItems = xmalloc (C->Size * sizeof (void*));
-    memcpy (NewItems, C->Items, C->Count * sizeof (void*));
+    NewItems = xmalloc (C->Size * sizeof (CollEntry));
+    memcpy (NewItems, C->Items, C->Count * sizeof (CollEntry));
     xfree (C->Items);
     C->Items = NewItems;
 }
@@ -639,7 +650,7 @@ static void CollInsert (Collection* C, void* Item, unsigned Index)
     ++C->Count;
 
     /* Store the new item */
-    C->Items[Index] = Item;
+    C->Items[Index].Ptr = Item;
 }
 
 
@@ -653,7 +664,7 @@ static void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
 {
     if (Index < C->Count) {
         /* Collection is already large enough */
-        C->Items[Index] = Item;
+        C->Items[Index].Ptr = Item;
     } else {
         /* Must expand the collection */
         unsigned Size = C->Size;
@@ -667,11 +678,11 @@ static void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
 
         /* Fill up unused slots with NULL */
         while (C->Count < Index) {
-            C->Items[C->Count++] = 0;
+            C->Items[C->Count++].Ptr = 0;
         }
 
         /* Fill in the item */
-        C->Items[C->Count++] = Item;
+        C->Items[C->Count++].Ptr = Item;
     }
 }
 
@@ -693,7 +704,7 @@ static void* CollAt (Collection* C, unsigned Index)
     assert (Index < C->Count);
 
     /* Return the element */
-    return C->Items[Index];
+    return C->Items[Index].Ptr;
 }
 
 
@@ -705,51 +716,51 @@ static void* CollFirst (Collection* C)
     assert (C->Count > 0);
 
     /* Return the element */
-    return C->Items[0];
+    return C->Items[0].Ptr;
 }
 
 
 
 static void CollQuickSort (Collection* C, int Lo, int Hi,
-   	                   int (*Compare) (const void*, const void*))
+       	                   int (*Compare) (const void*, const void*))
 /* Internal recursive sort function. */
 {
     /* Get a pointer to the items */
-    void** Items = C->Items;
+    CollEntry* Items = C->Items;
 
     /* Quicksort */
     while (Hi > Lo) {
-   	int I = Lo + 1;
-   	int J = Hi;
-   	while (I <= J) {
-   	    while (I <= J && Compare (Items[Lo], Items[I]) >= 0) {
-   	     	++I;
-   	    }
-   	    while (I <= J && Compare (Items[Lo], Items[J]) < 0) {
-   	     	--J;
-   	    }
-   	    if (I <= J) {
-		/* Swap I and J */
-	    	void* Tmp = Items[I];
-		Items[I]  = Items[J];
-		Items[J]  = Tmp;
-   	     	++I;
-   	     	--J;
-   	    }
-      	}
-   	if (J != Lo) {
-	    /* Swap J and Lo */
-	    void* Tmp = Items[J];
-	    Items[J]  = Items[Lo];
-	    Items[Lo] = Tmp;
-   	}
-	if (J > (Hi + Lo) / 2) {
-	    CollQuickSort (C, J + 1, Hi, Compare);
-	    Hi = J - 1;
-	} else {
-	    CollQuickSort (C, Lo, J - 1, Compare);
-	    Lo = J + 1;
-	}
+       	int I = Lo + 1;
+       	int J = Hi;
+       	while (I <= J) {
+       	    while (I <= J && Compare (Items[Lo].Ptr, Items[I].Ptr) >= 0) {
+       	     	++I;
+       	    }
+       	    while (I <= J && Compare (Items[Lo].Ptr, Items[J].Ptr) < 0) {
+       	     	--J;
+       	    }
+       	    if (I <= J) {
+       	     	/* Swap I and J */
+       	       	CollEntry Tmp = Items[I];
+       		Items[I]  = Items[J];
+       		Items[J]  = Tmp;
+       	     	++I;
+       	     	--J;
+       	    }
+       	}
+       	if (J != Lo) {
+       	    /* Swap J and Lo */
+       	    CollEntry Tmp = Items[J];
+       	    Items[J]  = Items[Lo];
+       	    Items[Lo] = Tmp;
+       	}
+       	if (J > (Hi + Lo) / 2) {
+       	    CollQuickSort (C, J + 1, Hi, Compare);
+       	    Hi = J - 1;
+       	} else {
+       	    CollQuickSort (C, Lo, J - 1, Compare);
+       	    Lo = J + 1;
+       	}
     }
 }
 

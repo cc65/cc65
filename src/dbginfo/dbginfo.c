@@ -2406,7 +2406,7 @@ static void ParseInfo (InputData* D)
         if (D->Tok != TOK_FILE  && D->Tok != TOK_LIBRARY        &&
             D->Tok != TOK_LINE  && D->Tok != TOK_MODULE         &&
             D->Tok != TOK_SCOPE && D->Tok != TOK_SEGMENT        &&
-            D->Tok != TOK_SYM) {
+            D->Tok != TOK_SPAN  && D->Tok != TOK_SYM) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2460,7 +2460,11 @@ static void ParseInfo (InputData* D)
 		CollGrow (&D->Info->SegInfoByName, D->IVal);
                 break;
 
-            case TOK_SYM:
+            case TOK_SPAN:
+                CollGrow (&D->Info->SpanInfoById,  D->IVal);
+                break;
+
+            case TOK_SYM:          
                 CollGrow (&D->Info->SymInfoById,   D->IVal);
                 CollGrow (&D->Info->SymInfoByName, D->IVal);
 		CollGrow (&D->Info->SymInfoByVal,  D->IVal);

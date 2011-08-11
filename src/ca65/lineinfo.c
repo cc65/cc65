@@ -121,7 +121,7 @@ void InitLineInfo (void)
     AllocatedSlots = 8;
     CurLineInfo = xmalloc (AllocatedSlots * sizeof (LineInfoSlot));
 
-    /* Initalize the predefined slots. Be sure to ccreate a new LineInfo for
+    /* Initalize the predefined slots. Be sure to create a new LineInfo for
      * the default source. This is necessary to allow error message to be
      * generated without any input file open.
      */
@@ -222,19 +222,6 @@ void GetFullLineInfo (Collection* LineInfos, unsigned IncUsage)
             CollAppend (LineInfos, LI);
         }
     }
-}
-
-
-
-LineInfo* UseLineInfo (LineInfo* LI)
-/* Increase the reference count of the given line info and return it. The
- * function will gracefully accept NULL pointers and do nothing in this case.
- */
-{
-    if (LI) {
-       	++LI->Usage;
-    }
-    return LI;
 }
 
 

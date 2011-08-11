@@ -103,11 +103,6 @@ void GetFullLineInfo (Collection* LineInfos, unsigned IncUsage);
  * counter by IncUsage for all line infos returned.
  */
 
-LineInfo* UseLineInfo (LineInfo* LI);
-/* Increase the reference count of the given line info and return it. The
- * function will gracefully accept NULL pointers and do nothing in this case.
- */
-
 LineInfo* ReleaseLineInfo (LineInfo* LI);
 /* Decrease the reference count of the given line info and return it. The
  * function will gracefully accept NULL pointers and do nothing in this case.
@@ -151,4 +146,4 @@ void WriteLineInfos (void);
 
 
 
-                        
+

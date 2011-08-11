@@ -292,6 +292,7 @@ struct ScopeInfo {
         unsigned        Id;             /* Id of label symbol */
         SymInfo*        Info;           /* Pointer to label symbol */
     } Label;
+    Collection		SpanInfoList;	/* List of spans for this scope */
     char                Name[1];        /* Name of scope */
 };
 
@@ -314,6 +315,7 @@ struct SpanInfo {
 	unsigned	Id;		/* Id of segment */
 	SegInfo*	Info;		/* Pointer to segment */
     } Seg;
+    Collection*		ScopeInfoList;	/* Scopes for this span */
 };
 
 /* Internally used symbol info struct */
@@ -594,6 +596,14 @@ static Collection* CollInit (Collection* C)
 
 
 
+static Collection* CollNew (void)
+/* Allocate a new collection, initialize and return it */
+{
+    return CollInit (xmalloc (sizeof (Collection)));
+}
+
+
+
 static void CollDone (Collection* C)
 /* Free the data for a collection. This will not free the data contained in
  * the collection.
@@ -608,6 +618,18 @@ static void CollDone (Collection* C)
     C->Count = 0;
     C->Size  = 0;
     C->Items = 0;
+}
+
+
+
+static void CollFree (Collection* C)
+/* Free a dynamically allocated collection */
+{
+    /* Accept NULL pointers */
+    if (C) {
+       	xfree (C->Items);
+	xfree (C);
+    }
 }
 
 
@@ -852,7 +874,7 @@ static void CollQuickSort (Collection* C, int Lo, int Hi,
 
 
 
-void CollSort (Collection* C, int (*Compare) (const void*, const void*))
+static void CollSort (Collection* C, int (*Compare) (const void*, const void*))
 /* Sort the collection using the given compare function. */
 {
     if (C->Count > 1) {
@@ -1472,7 +1494,8 @@ static ScopeInfo* NewScopeInfo (const StrBuf* Name)
     /* Allocate memory */
     ScopeInfo* S = xmalloc (sizeof (ScopeInfo) + SB_GetLen (Name));
 
-    /* Initialize the name */
+    /* Initialize the fields as necessary */
+    CollInit (&S->SpanInfoList);
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1484,6 +1507,7 @@ static ScopeInfo* NewScopeInfo (const StrBuf* Name)
 static void FreeScopeInfo (ScopeInfo* S)
 /* Free a ScopeInfo struct */
 {
+    CollDone (&S->SpanInfoList);
     xfree (S);
 }
 
@@ -1623,8 +1647,12 @@ static int CompareSegInfoByName (const void* L, const void* R)
 static SpanInfo* NewSpanInfo (void)
 /* Create a new SpanInfo struct, intialize and return it */
 {
-    /* Allocate memory and return it */
-    return xmalloc (sizeof (SpanInfo));
+    /* Allocate memory */
+    SpanInfo* S = xmalloc (sizeof (SpanInfo));
+
+    /* Initialize and return it */
+    S->ScopeInfoList = 0;
+    return S;
 }
 
 
@@ -1632,6 +1660,7 @@ static SpanInfo* NewSpanInfo (void)
 static void FreeSpanInfo (SpanInfo* S)
 /* Free a SpanInfo struct */
 {
+    CollFree (S->ScopeInfoList);
     xfree (S);
 }
 
@@ -2900,6 +2929,7 @@ static void ParseScope (InputData* D)
     StrBuf              Name = STRBUF_INITIALIZER;
     unsigned            ModId = CC65_INV_ID;
     unsigned            ParentId = CC65_INV_ID;
+    Collection    	SpanIds = COLLECTION_INITIALIZER;
     unsigned            SymId = CC65_INV_ID;
     ScopeInfo*          S;
     enum {
@@ -2910,8 +2940,9 @@ static void ParseScope (InputData* D)
         ibName          = 0x004,
         ibParentId      = 0x008,
         ibSize          = 0x010,
-        ibSymId         = 0x020,
-        ibType          = 0x040,
+	ibSpanId       	= 0x020,
+        ibSymId         = 0x040,
+        ibType          = 0x080,
 
         ibRequired      = ibId | ibModId | ibName,
     } InfoBits = ibNone;
@@ -2927,8 +2958,8 @@ static void ParseScope (InputData* D)
         /* Something we know? */
         if (D->Tok != TOK_ID            && D->Tok != TOK_MODULE         &&
             D->Tok != TOK_NAME          && D->Tok != TOK_PARENT         &&
-            D->Tok != TOK_SIZE          && D->Tok != TOK_SYM            &&
-            D->Tok != TOK_TYPE) {
+            D->Tok != TOK_SIZE          && D->Tok != TOK_SPAN		&&
+	    D->Tok != TOK_SYM           && D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2996,6 +3027,21 @@ static void ParseScope (InputData* D)
                 NextToken (D);
                 break;
 
+	    case TOK_SPAN:
+                while (1) {
+                    if (!IntConstFollows (D)) {
+                        goto ErrorExit;
+                    }
+                    CollAppendId (&SpanIds, (unsigned) D->IVal);
+                    NextToken (D);
+                    if (D->Tok != TOK_PLUS) {
+                        break;
+                    }
+                    NextToken (D);
+                }
+                InfoBits |= ibSpanId;
+                break;
+
             case TOK_SYM:
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
@@ -3049,7 +3095,7 @@ static void ParseScope (InputData* D)
         goto ErrorExit;
     }
 
-    /* Create the scope info */
+    /* Create the scope info ... */
     S = NewScopeInfo (&Name);
     S->Id        = Id;
     S->Type      = Type;
@@ -3059,10 +3105,12 @@ static void ParseScope (InputData* D)
     S->Label.Id  = SymId;
 
     /* ... and remember it */
+    CollMove (&S->SpanInfoList, &SpanIds);
     CollReplaceExpand (&D->Info->ScopeInfoById, S, Id);
 
 ErrorExit:
     /* Entry point in case of errors */
+    CollDone (&SpanIds);
     SB_Done (&Name);
     return;
 }
@@ -3240,6 +3288,134 @@ ErrorExit:
     /* Entry point in case of errors */
     SB_Done (&Name);
     SB_Done (&OutputName);
+    return;
+}
+
+
+
+static void ParseSpan (InputData* D)
+/* Parse a SPAN line */
+{
+    unsigned        Id = 0;
+    cc65_addr       Start = 0;
+    cc65_addr       Size = 0;
+    unsigned	    SegId = CC65_INV_ID;
+    SpanInfo*       S;
+    enum {
+        ibNone      = 0x000,
+
+        ibId        = 0x01,
+	ibSegId	    = 0x02,
+        ibSize      = 0x04,
+        ibStart     = 0x08,
+
+        ibRequired  = ibId | ibSegId | ibSize | ibStart,
+    } InfoBits = ibNone;
+
+    /* Skip the SEGMENT token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_ID    && D->Tok != TOK_SEGMENT	&&
+            D->Tok != TOK_SIZE 	&& D->Tok != TOK_START) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                InfoBits |= ibId;
+                NextToken (D);
+                break;
+
+            case TOK_SEGMENT:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SegId = D->IVal;
+                InfoBits |= ibSegId;
+                NextToken (D);
+                break;
+
+            case TOK_SIZE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Size = D->IVal;
+                NextToken (D);
+                InfoBits |= ibSize;
+                break;
+
+            case TOK_START:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Start = (cc65_addr) D->IVal;
+                NextToken (D);
+                InfoBits |= ibStart;
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required and/or matched information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+
+    /* Create the span info and remember it */
+    S = NewSpanInfo ();
+    S->Id     = Id;
+    S->Seg.Id = SegId;
+    S->Offs   = Start;
+    S->Size   = Size;
+    CollReplaceExpand (&D->Info->SpanInfoById, S, Id);
+
+ErrorExit:
+    /* Entry point in case of errors */
     return;
 }
 
@@ -3935,7 +4111,7 @@ static void ProcessModInfo (InputData* D)
 static void ProcessScopeInfo (InputData* D)
 /* Postprocess scope infos */
 {
-    unsigned I;
+    unsigned I, J;
 
     /* Walk over all scopes. Resolve the ids and add the scopes to the list
      * of scopes for a module.
@@ -3984,6 +4160,33 @@ static void ProcessScopeInfo (InputData* D)
         } else {
             S->Label.Info = CollAt (&D->Info->SymInfoById, S->Label.Id);
         }
+
+	/* Resolve the spans ids */
+        for (J = 0; I < CollCount (&S->SpanInfoList); ++J) {
+
+            /* Get the id of this span */
+            unsigned SpanId = CollIdAt (&S->SpanInfoList, J);
+            if (SpanId >= CollCount (&D->Info->SpanInfoById)) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Invalid span id %u for scope with id %u",
+                            SpanId, S->Id);
+                CollReplace (&S->SpanInfoList, 0, J);
+            } else {
+
+                /* Get a pointer to the span */
+                SpanInfo* SP = CollAt (&D->Info->SpanInfoById, SpanId);
+
+                /* Replace the id by the pointer */
+                CollReplace (&S->SpanInfoList, SP, J);
+
+                /* Insert a backpointer into the span */
+		if (SP->ScopeInfoList == 0) {
+		    SP->ScopeInfoList = CollNew ();
+		}
+                CollAppend (SP->ScopeInfoList, S);
+            }
+        }
     }
 
     /* Walk over all modules and sort the scopes by name */
@@ -4004,6 +4207,32 @@ static void ProcessSegInfo (InputData* D)
 {
     /* Sort the segment infos by name */
     CollSort (&D->Info->SegInfoByName, CompareSegInfoByName);
+}
+
+
+
+static void ProcessSpanInfo (InputData* D)
+/* Postprocess span infos */
+{
+    unsigned I;
+
+    /* Walk over all spans and resolve the ids */
+    for (I = 0; I < CollCount (&D->Info->SpanInfoById); ++I) {
+
+        /* Get this span info */
+        SpanInfo* S = CollAt (&D->Info->SpanInfoById, I);
+
+        /* Resolve the segment */
+        if (S->Seg.Id >= CollCount (&D->Info->SegInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid segment id %u for span with id %u",
+                        S->Seg.Id, S->Id);
+            S->Seg.Info = 0;
+        } else {
+            S->Seg.Info = CollAt (&D->Info->SegInfoById, S->Seg.Id);
+        }
+    }
 }
 
 
@@ -4214,6 +4443,10 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
                 ParseSegment (&D);
                 break;
 
+	    case TOK_SPAN:
+		ParseSpan (&D);
+		break;
+
             case TOK_SYM:
                 ParseSym (&D);
                 break;
@@ -4262,6 +4495,7 @@ CloseAndExit:
     ProcessModInfo (&D);
     ProcessScopeInfo (&D);
     ProcessSegInfo (&D);
+    ProcessSpanInfo (&D);
     ProcessSymInfo (&D);
 
 #if DEBUG

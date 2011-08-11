@@ -47,6 +47,7 @@
 #include "lineinfo.h"
 #include "scopes.h"
 #include "segments.h"
+#include "span.h"
 
 
 
@@ -102,17 +103,18 @@ void CreateDbgFile (void)
     /* Output version information */
     fprintf (F, "version\tmajor=2,minor=0\n");
 
-    /* Output a line with the item numbers so the debug info module is able 
+    /* Output a line with the item numbers so the debug info module is able
      * to preallocate the required memory.
      */
     fprintf (
         F,
-        "info\tlib=%u,mod=%u,seg=%u,file=%u,scope=%u\n",
+        "info\tlib=%u,file=%u,mod=%u,scope=%u,seg=%u,span=%u\n",
+        FileInfoCount (),
         LibraryCount (),
         ObjDataCount (),
+        ScopeCount (),
         SegmentCount (),
-        FileInfoCount (),
-        ScopeCount ()
+        SpanCount ()
     );
 
     /* Assign the ids to the items */
@@ -132,6 +134,9 @@ void CreateDbgFile (void)
 
     /* Output line info */
     PrintDbgLineInfo (F);
+
+    /* Output spans */
+    PrintDbgSpans (F);
 
     /* Output symbols */
     PrintDbgSyms (F);

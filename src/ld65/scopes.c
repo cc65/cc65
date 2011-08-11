@@ -89,7 +89,7 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
         S->LabelId  = ReadVar (F);
     }
 
-    /* Read the segment ranges for this scope */
+    /* Read the spans for this scope */
     ReadSpans (&S->Spans, F, Obj);
 
     /* Return the new Scope */
@@ -120,7 +120,7 @@ unsigned ScopeCount (void)
 void PrintDbgScopes (FILE* F)
 /* Output the scopes to a debug info file */
 {
-    unsigned I, J;
+    unsigned I, J, K;
 
     /* Print scopes from all modules we have linked into the output file */
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
@@ -152,7 +152,7 @@ void PrintDbgScopes (FILE* F)
                            GetObjFileName (O), S->Type);
             }
 
-            /* Print the size if available */                 
+            /* Print the size if available */
             if (S->Size != 0) {
                 fprintf (F, ",size=%lu", S->Size);
             }
@@ -163,6 +163,15 @@ void PrintDbgScopes (FILE* F)
             /* Print the label id if the scope is labeled */
             if (SCOPE_HAS_LABEL (S->Flags)) {
                 fprintf (F, ",sym=%u", O->SymBaseId + S->LabelId);
+            }
+            /* Print the list of spans for this scope */
+            if (CollCount (&S->Spans) > 0) {
+                const Span* SP = CollConstAt (&S->Spans, 0);
+                fprintf (F, ",span=%u", SP->Id);
+                for (K = 1; K < CollCount (&S->Spans); ++K) {
+                    SP = CollConstAt (&S->Spans, K);
+                    fprintf (F, "+%u", SP->Id);
+                }
             }
 
             /* Terminate the output line */

@@ -36,7 +36,7 @@
 /* common */
 #include "xmalloc.h"
 
-/* ld65 */           
+/* ld65 */
 #include "fileio.h"
 #include "objdata.h"
 #include "segments.h"
@@ -45,7 +45,18 @@
 
 
 /*****************************************************************************/
-/*     	       	      	      	     Code			     	     */
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* List of all spans */
+static Collection SpanList = STATIC_COLLECTION_INITIALIZER;
+
+
+
+/*****************************************************************************/
+/*     	       	       	      	     Code			     	     */
 /*****************************************************************************/
 
 
@@ -57,12 +68,16 @@ Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size)
     Span* S = xmalloc (sizeof (*S));
 
     /* Initialize the fields */
+    S->Id       = CollCount (&SpanList);
     S->Seg      = Seg;
     S->Offs     = Offs;
     S->Size     = Size;
 
+    /* Remember this span in the global list */
+    CollAppend (&SpanList, S);
+
     /* Return the result */
-   return S;
+    return S;
 }
 
 
@@ -157,6 +172,32 @@ void AddSpan (Collection* Spans, struct Segment* Seg, unsigned long Offs,
 
     /* We must append an entry */
     CollAppend (Spans, NewSpan (Seg, Offs, Size));
+}
+
+
+
+unsigned SpanCount (void)
+/* Return the total number of spans */
+{
+    return CollCount (&SpanList);
+}
+
+
+
+void PrintDbgSpans (FILE* F)
+/* Output the spans to a debug info file */
+{
+    /* Walk over all spans */                    
+    unsigned I;
+    for (I = 0; I < CollCount (&SpanList); ++I) {
+
+        /* Get this span */
+        const Span* S = CollAtUnchecked (&SpanList, I);
+
+        /* Output the data */
+        fprintf (F, "span\tid=%u,seg=%u,start=%lu,size=%lu\n",
+                 S->Id, S->Seg->Id, S->Offs, S->Size);
+    }
 }
 
 

@@ -64,6 +64,7 @@ struct Segment;
 
 typedef struct Span Span;
 struct Span {
+    unsigned		Id;		/* Id of the span */
     struct Segment*     Seg;            /* Segment of this span */
     unsigned long       Offs;           /* Offset of span within segment */
     unsigned long       Size;           /* Size of span */
@@ -94,6 +95,12 @@ void AddSpan (Collection* Spans, struct Segment* Seg, unsigned long Offs,
 /* Either add a new span to the ones already in the given collection, or - if
  * possible - merge it with adjacent ones that already exist.
  */
+
+unsigned SpanCount (void);
+/* Return the total number of spans */
+
+void PrintDbgSpans (FILE* F);
+/* Output the spans to a debug info file */
 
 
 

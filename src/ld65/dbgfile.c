@@ -108,7 +108,7 @@ void CreateDbgFile (void)
      */
     fprintf (
         F,
-        "info\tlib=%u,file=%u,mod=%u,scope=%u,seg=%u,span=%u\n",
+        "info\tfile=%u,lib=%u,mod=%u,scope=%u,seg=%u,span=%u\n",
         FileInfoCount (),
         LibraryCount (),
         ObjDataCount (),

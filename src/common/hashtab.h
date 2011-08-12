@@ -50,16 +50,19 @@
 
 
 
-/* Hash table node */
+/* Hash table node. NOTE: This structure must be the first member of a struct 
+ * that is hashed by the module. Having it first allows to omit a pointer to 
+ * the entry itself, because the C standard guarantees that a pointer to a 
+ * struct can be converted to its first member.
+ */
 typedef struct HashNode HashNode;
 struct HashNode {
     HashNode*           Next;           /* Next entry in hash list */
     struct HashTable*   Owner;          /* Owner table */
     unsigned            Hash;           /* The full hash value */
-    void*               Entry;          /* Pointer to user entry data */
 };
 
-#define STATIC_HASHNODE_INITIALIZER(Entry) { 0, 0, 0, Entry }
+#define STATIC_HASHNODE_INITIALIZER     { 0, 0, 0 }
 
 /* Hash table functions */
 typedef struct HashFunctions HashFunctions;
@@ -70,9 +73,6 @@ struct HashFunctions {
 
     const void* (*GetKey) (void* Entry);
     /* Given a pointer to the user entry data, return a pointer to the key */
-
-    HashNode* (*GetHashNode) (void* Entry);
-    /* Given a pointer to the user entry data, return a pointer to the hash node */
 
     int (*Compare) (const void* Key1, const void* Key2);
     /* Compare two keys. The function must return a value less than zero if
@@ -101,28 +101,16 @@ struct HashTable {
 
 
 #if defined(HAVE_INLINE)
-INLINE void InitHashNode (HashNode* N, void* Entry)
+INLINE void InitHashNode (HashNode* N)
 /* Initialize a hash node. */
 {
     N->Next     = 0;
     N->Owner    = 0;
-    N->Entry    = Entry;
 }
 #else
-#define InitHashNode(N, E)  	\
+#define InitHashNode(N)         \
     (N)->Next   = 0,            \
-    (N)->Owner  = 0,            \
-    (N)->Entry  = (E)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE void* HN_GetEntry (HashNode* N)
-/* Get the entry from a hash node */
-{
-    return N->Entry;
-}
-#else
-#define HN_GetEntry(N)          (N)->Entry
+    (N)->Owner  = 0
 #endif
 
 

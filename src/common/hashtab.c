@@ -109,7 +109,7 @@ HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
          * if it is not really necessary.
          */
         if (N->Hash == Hash &&
-            T->Func->Compare (Key, T->Func->GetKey (HN_GetEntry (N))) == 0) {
+            T->Func->Compare (Key, T->Func->GetKey (N)) == 0) {
             /* Found */
             break;
         }
@@ -127,11 +127,8 @@ HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
 void* HT_FindEntry (const HashTable* T, const void* Key)
 /* Find the node with the given index and return the corresponding entry */
 {
-    /* First, search for the hash node */
-    HashNode* N = HT_Find (T, Key);
-
-    /* Convert the node into an entry if necessary */
-    return N? HN_GetEntry (N) : 0;
+    /* Since the HashEntry must be first member, we can use HT_Find here */
+    return HT_Find (T, Key);
 }
 
 
@@ -147,8 +144,8 @@ void HT_Insert (HashTable* T, HashNode* N)
     }
 
     /* Generate the hash over the node key. */
-    N->Hash = T->Func->GenHash (T->Func->GetKey (HN_GetEntry (N)));
-
+    N->Hash = T->Func->GenHash (T->Func->GetKey (N));
+                                                  
     /* Calculate the reduced hash */
     RHash = N->Hash % T->Slots;
 
@@ -196,7 +193,10 @@ void HT_Remove (HashNode* N)
 void HT_InsertEntry (HashTable* T, void* Entry)
 /* Insert an entry into the given hash table */
 {
-    HT_Insert (T, T->Func->GetHashNode (Entry));
+    /* Since the hash node must be first member, Entry is also the pointer to
+     * the hash node.
+     */
+    HT_Insert (T, Entry);
 }
 
 
@@ -204,8 +204,8 @@ void HT_InsertEntry (HashTable* T, void* Entry)
 void HT_RemoveEntry (HashTable* T, void* Entry)
 /* Remove an entry from the given hash table */
 {
-    /* Get the node from the entry */
-    HashNode* N = T->Func->GetHashNode (Entry);
+    /* The entry is the first member, so we can just convert the pointer */
+    HashNode* N = Entry;
 
     /* Make sure the entry is actually in the given table */
     CHECK (N->Owner == T);
@@ -237,8 +237,8 @@ void HT_Walk (HashTable* T, void (*F) (void* Entry, void* Data), void* Data)
 
         /* Walk over all entries in this chain */
         while (N) {
-            /* Call the user function */
-            F (HN_GetEntry (N), Data);
+            /* Call the user function. N is also the pointer to the entry */
+            F (N, Data);
             /* Next node in chain */
             N = N->Next;
         }

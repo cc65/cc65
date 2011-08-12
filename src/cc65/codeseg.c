@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/* (C) 2001-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -41,7 +41,7 @@
 #include "check.h"
 #include "debugflag.h"
 #include "global.h"
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "strbuf.h"
 #include "strutil.h"
 #include "xmalloc.h"

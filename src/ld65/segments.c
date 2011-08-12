@@ -41,7 +41,7 @@
 #include "coll.h"
 #include "exprdefs.h"
 #include "fragdefs.h"
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "print.h"
 #include "segdefs.h"
 #include "symdefs.h"

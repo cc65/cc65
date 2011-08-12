@@ -40,7 +40,7 @@
 /* common */
 #include "addrsize.h"
 #include "check.h"
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -745,7 +745,7 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 }
 
 
-                     
+
 static int CmpExpName (const void* K1, const void* K2)
 /* Compare function for qsort */
 {

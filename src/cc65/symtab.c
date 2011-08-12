@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -41,7 +41,7 @@
 /* common */
 #include "check.h"
 #include "debugflag.h"
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -162,7 +162,7 @@ static void CheckSymTable (SymTable* Tab)
 	     * defined but not used.
 	     */
 	    if (((Flags & SC_AUTO) || (Flags & SC_STATIC)) && (Flags & SC_EXTERN) == 0) {
-		if (SymIsDef (Entry) && !SymIsRef (Entry) && 
+		if (SymIsDef (Entry) && !SymIsRef (Entry) &&
                     !SymHasAttr (Entry, atUnused)) {
 		    if (Flags & SC_PARAM) {
                         if (IS_Get (&WarnUnusedParam)) {

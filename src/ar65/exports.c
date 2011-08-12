@@ -36,7 +36,7 @@
 #include <string.h>
 
 /* common */
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "xmalloc.h"
 
 /* ar65 */

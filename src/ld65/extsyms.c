@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   extsyms.c				     */
+/*		  		   extsyms.c				     */
 /*                                                                           */
 /*	Handle program external symbols for relocatable output formats	     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1999-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,7 +36,7 @@
 #include <string.h>
 
 /* common */
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "xmalloc.h"
 
 /* ld65 */

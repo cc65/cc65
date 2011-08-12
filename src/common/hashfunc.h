@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   hashstr.c				     */
+/*                                hashfunc.h                                 */
 /*                                                                           */
-/*			   Hash function for strings			     */
+/*                              Hash functions                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008  Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,44 +33,37 @@
 
 
 
+#ifndef HASHFUNC_H
+#define HASHFUNC_H
+
+
+
 /* common */
-#include "hashstr.h"
+#include "attrib.h"
+#include "strbuf.h"
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*     	       	       	       	     Code	    			     */
 /*****************************************************************************/
 
 
 
-unsigned HashStr (const char* S)
+unsigned HashInt (unsigned V) attribute ((const));
+/* Return a hash value for the given integer. */
+
+unsigned HashStr (const char* S) attribute ((const));
 /* Return a hash value for the given string */
-{
-    unsigned L, H;
 
-    /* Do the hash */
-    H = L = 0;
-    while (*S) {
-    	H = ((H << 3) ^ ((unsigned char) *S++)) + L++;
-    }
-    return H;
-}
-
-
-
-unsigned HashBuf (const StrBuf* S)
+unsigned HashBuf (const StrBuf* S) attribute ((const));
 /* Return a hash value for the given string buffer */
-{
-    unsigned I, L, H;
 
-    /* Do the hash */
-    H = L = 0;
-    for (I = 0; I < SB_GetLen (S); ++I) {
-    	H = ((H << 3) ^ ((unsigned char) SB_AtUnchecked (S, I))) + L++;
-    }
-    return H;
-}
+
+
+/* End of hashfunc.h */
+
+#endif
 
 
 

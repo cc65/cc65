@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -46,7 +46,7 @@
 
 /* common */
 #include "coll.h"
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "strbuf.h"
 #include "strpool.h"
 #include "xmalloc.h"
@@ -84,7 +84,7 @@ static StringPoolEntry* NewStringPoolEntry (const StrBuf* S, unsigned Hash, unsi
     /* Initialize the fields */
     E->Next = 0;
     E->Hash = Hash;
-    E->Id   = Id;                                                       
+    E->Id   = Id;
     SB_Init (&E->Buf);
     SB_Copy (&E->Buf, S);
 

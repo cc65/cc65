@@ -70,7 +70,7 @@ OBJS =	abend.obj	\
         filetype.obj    \
 	fname.obj	\
         fp.obj          \
-	hashstr.obj	\
+	hashfunc.obj	\
         hashtab.obj     \
         intstack.obj    \
         matchpat.obj    \

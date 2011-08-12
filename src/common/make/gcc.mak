@@ -28,7 +28,7 @@ OBJS =	abend.o		\
 	filetype.o      \
 	fname.o		\
 	fp.o            \
-	hashstr.o	\
+	hashfunc.o	\
 	hashtab.o       \
 	intstack.o      \
 	matchpat.o      \

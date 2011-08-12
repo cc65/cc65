@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	    			   hashstr.h				     */
+/*                                hashfunc.c                                 */
 /*                                                                           */
-/*	    		   Hash function for strings			     */
+/*                              Hash functions                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008  Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,34 +33,62 @@
 
 
 
-#ifndef HASHSTR_H
-#define HASHSTR_H
-
-
-
 /* common */
-#include "attrib.h"
-#include "strbuf.h"
+#include "hashfunc.h"
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code	    			     */
+/*     	       	       	       	     Code				     */
 /*****************************************************************************/
 
 
 
-unsigned HashStr (const char* S) attribute ((const));
+unsigned HashInt (unsigned V)
+/* Return a hash value for the given integer. The function uses Robert
+ * Jenkins' 32 bit integer hash function taken from
+ *     http://www.concentric.net/~ttwang/tech/inthash.htm
+ * For 16 bit integers, the function may be suboptimal.
+ */
+{
+   V = (V + 0x7ed55d16) + (V << 12);
+   V = (V ^ 0xc761c23c) ^ (V >> 19);
+   V = (V + 0x165667b1) + (V << 5);
+   V = (V + 0xd3a2646c) ^ (V << 9);
+   V = (V + 0xfd7046c5) + (V << 3);
+   V = (V ^ 0xb55a4f09) ^ (V >> 16);
+   return V;
+}
+
+
+
+unsigned HashStr (const char* S)
 /* Return a hash value for the given string */
+{
+    unsigned L, H;
 
-unsigned HashBuf (const StrBuf* S) attribute ((const));
+    /* Do the hash */
+    H = L = 0;
+    while (*S) {
+    	H = ((H << 3) ^ ((unsigned char) *S++)) + L++;
+    }
+    return H;
+}
+
+
+
+unsigned HashBuf (const StrBuf* S)
 /* Return a hash value for the given string buffer */
+{
+    unsigned I, L, H;
 
-
-
-/* End of hashstr.h */
-
-#endif
+    /* Do the hash */
+    H = L = 0;
+    for (I = 0; I < SB_GetLen (S); ++I) {
+    	H = ((H << 3) ^ ((unsigned char) SB_AtUnchecked (S, I))) + L++;
+    }
+    return H;
+}
 
 
 

@@ -46,6 +46,32 @@
 
 
 
+HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Func)
+/* Initialize a hash table and return it */
+{
+    /* Initialize the fields */
+    T->Slots    = Slots;
+    T->Count    = 0;
+    T->Table    = 0;
+    T->Func     = Func;
+
+    /* Return the initialized table */
+    return T;
+}
+
+
+
+void DoneHashTable (HashTable* T)
+/* Destroy the contents of a hash table. Note: This will not free the entries
+ * in the table!
+ */
+{
+    /* Just free the array with the table pointers */
+    xfree (T->Table);
+}
+
+
+
 void FreeHashTable (HashTable* T)
 /* Free a hash table. Note: This will not free the entries in the table! */
 {
@@ -145,7 +171,7 @@ void HT_Insert (HashTable* T, HashNode* N)
 
     /* Generate the hash over the node key. */
     N->Hash = T->Func->GenHash (T->Func->GetKey (N));
-                                                  
+
     /* Calculate the reduced hash */
     RHash = N->Hash % T->Slots;
 
@@ -153,21 +179,15 @@ void HT_Insert (HashTable* T, HashNode* N)
     N->Next = T->Table[RHash];
     T->Table[RHash] = N;
 
-    /* Set the owner */
-    N->Owner = T;
-
     /* One more entry */
     ++T->Count;
 }
 
 
 
-void HT_Remove (HashNode* N)
+void HT_Remove (HashTable* T, HashNode* N)
 /* Remove a node from a hash table. */
 {
-    /* Get the table from the node */
-    HashTable* T = N->Owner;
-
     /* Calculate the reduced hash, which is also the slot number */
     unsigned Slot = N->Hash % T->Slots;
 
@@ -205,13 +225,7 @@ void HT_RemoveEntry (HashTable* T, void* Entry)
 /* Remove an entry from the given hash table */
 {
     /* The entry is the first member, so we can just convert the pointer */
-    HashNode* N = Entry;
-
-    /* Make sure the entry is actually in the given table */
-    CHECK (N->Owner == T);
-
-    /* Remove the node */
-    HT_Remove (N);
+    HT_Remove (T, Entry);
 }
 
 

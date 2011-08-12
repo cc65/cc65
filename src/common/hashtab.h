@@ -50,15 +50,14 @@
 
 
 
-/* Hash table node. NOTE: This structure must be the first member of a struct 
- * that is hashed by the module. Having it first allows to omit a pointer to 
- * the entry itself, because the C standard guarantees that a pointer to a 
+/* Hash table node. NOTE: This structure must be the first member of a struct
+ * that is hashed by the module. Having it first allows to omit a pointer to
+ * the entry itself, because the C standard guarantees that a pointer to a
  * struct can be converted to its first member.
  */
 typedef struct HashNode HashNode;
 struct HashNode {
     HashNode*           Next;           /* Next entry in hash list */
-    struct HashTable*   Owner;          /* Owner table */
     unsigned            Hash;           /* The full hash value */
 };
 
@@ -105,12 +104,9 @@ INLINE void InitHashNode (HashNode* N)
 /* Initialize a hash node. */
 {
     N->Next     = 0;
-    N->Owner    = 0;
 }
 #else
-#define InitHashNode(N)         \
-    (N)->Next   = 0,            \
-    (N)->Owner  = 0
+#define InitHashNode(N)         do { (N)->Next   = 0; } while (0)
 #endif
 
 
@@ -121,40 +117,13 @@ INLINE void InitHashNode (HashNode* N)
 
 
 
-#if defined(HAVE_INLINE)
-INLINE HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Func)
+HashTable* InitHashTable (HashTable* T, unsigned Slots, const HashFunctions* Func);
 /* Initialize a hash table and return it */
-{
-    /* Initialize the fields */
-    T->Slots    = Slots;
-    T->Count    = 0;
-    T->Table    = 0;
-    T->Func     = Func;
 
-    /* Return the initialized table */
-    return T;
-}
-#else
-#define InitHashTable(T, Slots, Func)   \
-    (T)->Slots  = (Slots),              \
-    (T)->Count  = 0,                    \
-    (T)->Table  = 0,                    \
-    (T)->Func   = (Func),               \
-    (T)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE void DoneHashTable (HashTable* T)
+void DoneHashTable (HashTable* T);
 /* Destroy the contents of a hash table. Note: This will not free the entries
  * in the table!
  */
-{
-    /* Just free the array with the table pointers */
-    xfree (T->Table);
-}
-#else
-#define DoneHashTable(T)        xfree ((T)->Table)
-#endif
 
 #if defined(HAVE_INLINE)
 INLINE HashTable* NewHashTable (unsigned Slots, const HashFunctions* Func)
@@ -184,7 +153,7 @@ void* HT_FindEntry (const HashTable* T, const void* Key);
 void HT_Insert (HashTable* T, HashNode* N);
 /* Insert a node into the given hash table */
 
-void HT_Remove (HashNode* N);
+void HT_Remove (HashTable* T, HashNode* N);
 /* Remove a node from its hash table */
 
 void HT_InsertEntry (HashTable* T, void* Entry);

@@ -38,7 +38,7 @@
 /* common */
 #include "addrsize.h"
 #include "check.h"
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "mmodel.h"
 #include "scopedefs.h"
 #include "symdefs.h"

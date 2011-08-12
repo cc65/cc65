@@ -64,9 +64,6 @@ static unsigned HT_GenHash (const void* Key);
 static const void* HT_GetKey (void* Entry);
 /* Given a pointer to the user entry data, return a pointer to the key. */
 
-static HashNode* HT_GetHashNode (void* Entry);
-/* Given a pointer to the user entry data, return a pointer to the hash node */
-
 static int HT_Compare (const void* Key1, const void* Key2);
 /* Compare two keys. The function must return a value less than zero if
  * Key1 is smaller than Key2, zero if both are equal, and a value greater
@@ -103,7 +100,6 @@ static Collection FileTab = STATIC_COLLECTION_INITIALIZER;
 static const HashFunctions HashFunc = {
     HT_GenHash,
     HT_GetKey,
-    HT_GetHashNode,
     HT_Compare
 };
 
@@ -134,14 +130,6 @@ static const void* HT_GetKey (void* Entry)
 
 
 
-static HashNode* HT_GetHashNode (void* Entry)
-/* Given a pointer to the user entry data, return a pointer to the hash node */
-{
-    return &((FileEntry*) Entry)->Node;
-}
-
-
-
 static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
  * Key1 is smaller than Key2, zero if both are equal, and a value greater
@@ -167,7 +155,7 @@ static FileEntry* NewFileEntry (unsigned Name, FileType Type,
     FileEntry* F = xmalloc (sizeof (FileEntry));
 
     /* Initialize the fields */
-    InitHashNode (&F->Node, F);
+    InitHashNode (&F->Node);
     F->Name     = Name;
     F->Index  	= CollCount (&FileTab) + 1;     /* First file has index #1 */
     F->Type     = Type;

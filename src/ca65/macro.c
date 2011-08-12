@@ -38,7 +38,7 @@
 
 /* common */
 #include "check.h"
-#include "hashstr.h"
+#include "hashfunc.h"
 #include "hashtab.h"
 #include "xmalloc.h"
 
@@ -67,9 +67,6 @@ static unsigned HT_GenHash (const void* Key);
 
 static const void* HT_GetKey (void* Entry);
 /* Given a pointer to the user entry data, return a pointer to the key */
-
-static HashNode* HT_GetHashNode (void* Entry);
-/* Given a pointer to the user entry data, return a pointer to the hash node */
 
 static int HT_Compare (const void* Key1, const void* Key2);
 /* Compare two keys. The function must return a value less than zero if
@@ -115,7 +112,6 @@ struct Macro {
 static const HashFunctions HashFunc = {
     HT_GenHash,
     HT_GetKey,
-    HT_GetHashNode,
     HT_Compare
 };
 
@@ -172,14 +168,6 @@ static const void* HT_GetKey (void* Entry)
 /* Given a pointer to the user entry data, return a pointer to the index */
 {
     return &((Macro*) Entry)->Name;
-}
-
-
-
-static HashNode* HT_GetHashNode (void* Entry)
-/* Given a pointer to the user entry data, return a pointer to the hash node */
-{
-    return &((Macro*) Entry)->Node;
 }
 
 
@@ -249,7 +237,7 @@ static Macro* NewMacro (const StrBuf* Name, unsigned char Style)
     Macro* M = xmalloc (sizeof (Macro));
 
     /* Initialize the macro struct */
-    InitHashNode (&M->Node, M);
+    InitHashNode (&M->Node);
     M->LocalCount = 0;
     M->Locals     = 0;
     M->ParamCount = 0;

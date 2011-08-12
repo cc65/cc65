@@ -90,6 +90,9 @@ void OpenSpans (Collection* Spans)
 {
     unsigned I;
 
+    /* Grow the Spans collection as necessary */
+    CollGrow (Spans, CollCount (&SegmentList));
+
     /* Add the currently active segment */
     CollAppend (Spans, NewSpan (ActiveSeg, ActiveSeg->PC, ActiveSeg->PC));
 

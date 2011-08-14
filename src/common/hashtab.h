@@ -70,7 +70,7 @@ struct HashFunctions {
     unsigned (*GenHash) (const void* Key);
     /* Generate the hash over a key. */
 
-    const void* (*GetKey) (void* Entry);
+    const void* (*GetKey) (const void* Entry);
     /* Given a pointer to the user entry data, return a pointer to the key */
 
     int (*Compare) (const void* Key1, const void* Key2);

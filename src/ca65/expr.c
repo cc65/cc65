@@ -169,7 +169,7 @@ int IsFarRange (long Val)
 
 
 
-static int IsEasyConst (const ExprNode* E, long* Val)
+int IsEasyConst (const ExprNode* E, long* Val)
 /* Do some light checking if the given node is a constant. Don't care if E is
  * a complex expression. If E is a constant, return true and place its value
  * into Val, provided that Val is not NULL.

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2006 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -128,6 +128,12 @@ int IsWordRange (long Val);
 
 int IsFarRange (long Val);
 /* Return true if this is a far (24 bit) value */
+
+int IsEasyConst (const ExprNode* E, long* Val);
+/* Do some light checking if the given node is a constant. Don't care if E is
+ * a complex expression. If E is a constant, return true and place its value
+ * into Val, provided that Val is not NULL.
+ */
 
 ExprNode* CloneExpr (ExprNode* Expr);
 /* Clone the given expression tree. The function will simply clone symbol

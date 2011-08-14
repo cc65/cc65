@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -54,7 +54,7 @@ void Emit0 (unsigned char OPC)
 /* Emit an instruction with a zero sized operand */
 {
     Fragment* F = GenFragment (FRAG_LITERAL, 1);
-    F->V.Data [0] = OPC;
+    F->V.Data[0] = OPC;
 }
 
 
@@ -62,8 +62,31 @@ void Emit0 (unsigned char OPC)
 void Emit1 (unsigned char OPC, ExprNode* Value)
 /* Emit an instruction with an one byte argument */
 {
-    Emit0 (OPC);
-    EmitByte (Value);
+    long V;
+    Fragment* F;
+
+    if (IsEasyConst (Value, &V)) {
+
+        /* Must be in byte range */
+        if (!IsByteRange (V)) {
+            Error ("Range error (%ld not in [0..255])", V);
+        }
+
+        /* Create a literal fragment */
+        F = GenFragment (FRAG_LITERAL, 2);
+        F->V.Data[0] = OPC;
+        F->V.Data[1] = (unsigned char) V;
+        FreeExpr (Value);
+
+    } else {
+
+        /* Emit the opcode */
+        Emit0 (OPC);
+
+        /* Emit the argument as an expression */
+        F = GenFragment (FRAG_EXPR, 1);
+        F->V.Expr = Value;
+    }
 }
 
 
@@ -71,8 +94,32 @@ void Emit1 (unsigned char OPC, ExprNode* Value)
 void Emit2 (unsigned char OPC, ExprNode* Value)
 /* Emit an instruction with a two byte argument */
 {
-    Emit0 (OPC);
-    EmitWord (Value);
+    long V;
+    Fragment* F;
+
+    if (IsEasyConst (Value, &V)) {
+
+        /* Must be in byte range */
+        if (!IsWordRange (V)) {
+            Error ("Range error (%ld not in [0..65535])", V);
+        }
+
+        /* Create a literal fragment */
+        F = GenFragment (FRAG_LITERAL, 3);
+        F->V.Data[0] = OPC;
+        F->V.Data[1] = (unsigned char) V;
+        F->V.Data[2] = (unsigned char) (V >> 8);
+        FreeExpr (Value);
+
+    } else {
+
+        /* Emit the opcode */
+        Emit0 (OPC);
+
+        /* Emit the argument as an expression */
+        F = GenFragment (FRAG_EXPR, 2);
+        F->V.Expr = Value;
+    }
 }
 
 
@@ -147,11 +194,24 @@ void EmitStrBuf (const StrBuf* Data)
 void EmitByte (ExprNode* Expr)
 /* Emit one byte */
 {
-    /* Create a new fragment */
-    Fragment* F = GenFragment (FRAG_EXPR, 1);
+    long V;
+    Fragment* F;
 
-    /* Set the data */
-    F->V.Expr = Expr;
+    if (IsEasyConst (Expr, &V)) {
+        /* Must be in byte range */
+        if (!IsByteRange (V)) {
+            Error ("Range error (%ld not in [0..255])", V);
+        }
+
+        /* Create a literal fragment */
+        F = GenFragment (FRAG_LITERAL, 1);
+        F->V.Data[0] = (unsigned char) V;
+        FreeExpr (Expr);
+    } else {
+        /* Emit the argument as an expression */
+        F = GenFragment (FRAG_EXPR, 1);
+        F->V.Expr = Expr;
+    }
 }
 
 
@@ -159,11 +219,25 @@ void EmitByte (ExprNode* Expr)
 void EmitWord (ExprNode* Expr)
 /* Emit one word */
 {
-    /* Create a new fragment */
-    Fragment* F = GenFragment (FRAG_EXPR, 2);
+    long V;
+    Fragment* F;
 
-    /* Set the data */
-    F->V.Expr = Expr;
+    if (IsEasyConst (Expr, &V)) {
+        /* Must be in byte range */
+        if (!IsWordRange (V)) {
+            Error ("Range error (%ld not in [0..65535])", V);
+        }
+
+        /* Create a literal fragment */
+        F = GenFragment (FRAG_LITERAL, 2);
+        F->V.Data[0] = (unsigned char) V;
+        F->V.Data[1] = (unsigned char) (V >> 8);
+        FreeExpr (Expr);
+    } else {
+        /* Emit the argument as an expression */
+        Fragment* F = GenFragment (FRAG_EXPR, 2);
+        F->V.Expr = Expr;
+    }
 }
 
 

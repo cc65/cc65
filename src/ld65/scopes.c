@@ -166,11 +166,9 @@ void PrintDbgScopes (FILE* F)
             }
             /* Print the list of spans for this scope */
             if (CollCount (&S->Spans) > 0) {
-                const Span* SP = CollConstAt (&S->Spans, 0);
-                fprintf (F, ",span=%u", SP->Id);
+                fprintf (F, ",span=%u", SpanId (O, CollConstAt (&S->Spans, 0)));
                 for (K = 1; K < CollCount (&S->Spans); ++K) {
-                    SP = CollConstAt (&S->Spans, K);
-                    fprintf (F, "+%u", SP->Id);
+                    fprintf (F, "+%u", SpanId (O, CollConstAt (&S->Spans, K)));
                 }
             }
 

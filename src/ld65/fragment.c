@@ -97,20 +97,3 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
 
 
 
-void FragResolveLineInfos (Fragment* F)
-/* Resolve the back pointers for the line infos */
-{
-    unsigned I;
-
-    /* Walk over all line infos for this fragment */
-    for (I = 0; I < CollCount (&F->LineInfos); ++I) {
-        /* Get a pointer to this line info */
-        LineInfo* LI = CollAtUnchecked (&F->LineInfos, I);
-
-        /* Add the back pointer to the line info */
-        CollAppend (&LI->Fragments, F);
-    }
-}
-
-
-

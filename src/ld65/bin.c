@@ -201,9 +201,6 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
                 Addr = NewAddr;
             }
 
-            /* Relocate line information for this segment */
-	    RelocLineInfo (S->Seg);
-
         } else if (S->Load == M) {
 
             /* Handle ALIGN_LOAD */

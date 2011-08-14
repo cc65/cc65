@@ -278,9 +278,6 @@ Section* ReadSection (FILE* F, ObjData* O)
         /* Read the line infos into the list of the fragment */
         ReadLineInfoList (F, O, &Frag->LineInfos);
 
-        /* Resolve the back pointers */
-        FragResolveLineInfos (Frag);
-
 	/* Remember the module we had this fragment from */
 	Frag->Obj = O;
     }

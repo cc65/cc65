@@ -62,13 +62,8 @@ struct Segment;
 
 
 
+/* Span is an opaque type */
 typedef struct Span Span;
-struct Span {
-    unsigned		Id;		/* Id of the span */
-    struct Segment*     Seg;            /* Segment of this span */
-    unsigned long       Offs;           /* Offset of span within segment */
-    unsigned long       Size;           /* Size of span */
-};
 
 
 
@@ -77,9 +72,6 @@ struct Span {
 /*****************************************************************************/
 
 
-
-Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size);
-/* Create and return a new span */
 
 Span* ReadSpan (FILE* F, struct ObjData* O);
 /* Read a Span from a file and return it */
@@ -90,11 +82,8 @@ void ReadSpans (Collection* Spans, FILE* F, struct ObjData* O);
 void FreeSpan (Span* S);
 /* Free a span structure */
 
-void AddSpan (Collection* Spans, struct Segment* Seg, unsigned long Offs,
-              unsigned long Size);
-/* Either add a new span to the ones already in the given collection, or - if
- * possible - merge it with adjacent ones that already exist.
- */
+unsigned SpanId (const struct ObjData* O, const Span* S);
+/* Return the global id of a span */
 
 unsigned SpanCount (void);
 /* Return the total number of spans */

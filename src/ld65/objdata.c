@@ -81,6 +81,7 @@ ObjData* NewObjData (void)
     O->Flags   	   	= 0;
     O->SymBaseId        = 0;
     O->ScopeBaseId      = 0;
+    O->SpanBaseId       = 0;
     O->Files            = EmptyCollection;
     O->Sections         = EmptyCollection;
     O->Exports     	= EmptyCollection;
@@ -91,6 +92,7 @@ ObjData* NewObjData (void)
     O->Strings          = 0;
     O->Assertions       = EmptyCollection;
     O->Scopes           = EmptyCollection;
+    O->Spans            = EmptyCollection;
 
     /* Return the new entry */
     return O;
@@ -128,6 +130,11 @@ void FreeObjData (ObjData* O)
     xfree (O->Strings);
     DoneCollection (&O->Assertions);
     DoneCollection (&O->Scopes);
+    for (I = 0; I < CollCount (&O->Spans); ++I) {
+        FreeSpan (CollAtUnchecked (&O->Spans, I));
+    }
+    DoneCollection (&O->Spans);
+
     xfree (O);
 }
 

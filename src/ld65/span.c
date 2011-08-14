@@ -50,8 +50,13 @@
 
 
 
-/* List of all spans */
-static Collection SpanList = STATIC_COLLECTION_INITIALIZER;
+/* Definition of a span */
+struct Span {
+    unsigned		Id;		/* Id of the span */
+    unsigned            Sec;            /* Section id of this span */
+    unsigned long       Offs;           /* Offset of span within segment */
+    unsigned long       Size;           /* Size of span */
+};
 
 
 
@@ -61,20 +66,17 @@ static Collection SpanList = STATIC_COLLECTION_INITIALIZER;
 
 
 
-Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size)
+static Span* NewSpan (unsigned Id, unsigned SecId, unsigned long Offs, unsigned long Size)
 /* Create and return a new span */
 {
     /* Allocate memory */
     Span* S = xmalloc (sizeof (*S));
 
     /* Initialize the fields */
-    S->Id       = CollCount (&SpanList);
-    S->Seg      = Seg;
+    S->Id       = Id;
+    S->Sec      = SecId;
     S->Offs     = Offs;
     S->Size     = Size;
-
-    /* Remember this span in the global list */
-    CollAppend (&SpanList, S);
 
     /* Return the result */
     return S;
@@ -85,14 +87,17 @@ Span* NewSpan (struct Segment* Seg, unsigned long Offs, unsigned long Size)
 Span* ReadSpan (FILE* F, ObjData* O)
 /* Read a Span from a file and return it */
 {
-    /* Read the section id and translate it to a section pointer */
-    Section* Sec = GetObjSection (O, ReadVar (F));
+    /* Create a new Span */
+    unsigned SecId     = ReadVar (F);
+    unsigned long Offs = ReadVar (F);
+    unsigned Size      = ReadVar (F);
+    Span* S = NewSpan (CollCount (&O->Spans), SecId, Offs, Size);
 
-    /* Read the offset and relocate it */
-    unsigned long Offs = ReadVar (F) + Sec->Offs;
+    /* Insert it into the collection of all spans of this object file */
+    CollAppend (&O->Spans, S);
 
-    /* Create and return a new Span */
-    return NewSpan (Sec->Seg, Offs, ReadVar (F));
+    /* And return it */
+    return S;
 }
 
 
@@ -123,55 +128,10 @@ void FreeSpan (Span* S)
 
 
 
-void AddSpan (Collection* Spans, struct Segment* Seg, unsigned long Offs,
-              unsigned long Size)
-/* Either add a new span to the ones already in the given collection, or - if
- * possible - merge it with adjacent ones that already exist.
- */
+unsigned SpanId (const struct ObjData* O, const Span* S)
+/* Return the global id of a span */
 {
-    unsigned I;
-
-    /* We don't have many spans in a collection, so we do a linear search here.
-     * The collection is kept sorted which eases our work here.
-     */
-    for (I = 0; I < CollCount (Spans); ++I) {
-
-        /* Get the next span */
-    	Span* S = CollAtUnchecked (Spans, I);
-
-        /* Must be same segment, otherwise we cannot merge */
-        if (S->Seg != Seg) {
-            continue;
-        }
-
-        /* Check if we can merge it */
-        if (Offs < S->Offs) {
-
-            /* Got the insert position */
-            if (Offs + Size == S->Offs) {
-                /* Merge the two */
-                S->Offs = Offs;
-                S->Size += Size;
-            } else {
-                /* Insert a new entry */
-                CollInsert (Spans, NewSpan (Seg, Offs, Size), I);
-            }
-
-            /* Done */
-            return;
-
-        } else if (S->Offs + S->Size == Offs) {
-
-            /* This is the regular case. Merge the two. */
-            S->Size += Size;
-
-            /* Done */
-            return;
-        }
-    }
-
-    /* We must append an entry */
-    CollAppend (Spans, NewSpan (Seg, Offs, Size));
+    return O->SpanBaseId + S->Id;
 }
 
 
@@ -179,7 +139,19 @@ void AddSpan (Collection* Spans, struct Segment* Seg, unsigned long Offs,
 unsigned SpanCount (void)
 /* Return the total number of spans */
 {
-    return CollCount (&SpanList);
+    /* Walk over all object files */
+    unsigned I;
+    unsigned Count = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get this object file */
+        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Count spans */
+        Count += CollCount (&O->Spans);
+    }
+
+    return Count;
 }
 
 
@@ -187,16 +159,30 @@ unsigned SpanCount (void)
 void PrintDbgSpans (FILE* F)
 /* Output the spans to a debug info file */
 {
-    /* Walk over all spans */                    
-    unsigned I;
-    for (I = 0; I < CollCount (&SpanList); ++I) {
+    unsigned I, J;
 
-        /* Get this span */
-        const Span* S = CollAtUnchecked (&SpanList, I);
+    /* Walk over all object files */
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
-        /* Output the data */
-        fprintf (F, "span\tid=%u,seg=%u,start=%lu,size=%lu\n",
-                 S->Id, S->Seg->Id, S->Offs, S->Size);
+        /* Get this object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Walk over all spans in this object file */
+        for (J = 0; J < CollCount (&O->Spans); ++J) {
+
+            /* Get this span */
+            Span* S = CollAtUnchecked (&O->Spans, J);
+
+            /* Get the section for this span */
+            const Section* Sec = GetObjSection (O, S->Sec);
+
+            /* Output the data */
+            fprintf (F, "span\tid=%u,seg=%u,start=%lu,size=%lu\n",
+                     O->SpanBaseId + S->Id, 
+                     Sec->Seg->Id, 
+                     Sec->Offs + S->Offs, 
+                     S->Size);
+        }
     }
 }
 

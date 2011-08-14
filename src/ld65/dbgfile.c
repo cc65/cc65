@@ -68,6 +68,7 @@ static void AssignIds (void)
     unsigned I;
     unsigned SymBaseId   = 0;
     unsigned ScopeBaseId = 0;
+    unsigned SpanBaseId  = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get this module */
@@ -79,10 +80,12 @@ static void AssignIds (void)
         /* Assign base ids */
         O->SymBaseId   = SymBaseId;
         O->ScopeBaseId = ScopeBaseId;
+        O->SpanBaseId  = SpanBaseId;
 
         /* Bump the base ids */
         SymBaseId     += CollCount (&O->DbgSyms);
         ScopeBaseId   += CollCount (&O->Scopes);
+        SpanBaseId    += CollCount (&O->Spans);
     }
 
     /* Assign the ids to the file infos */
@@ -102,7 +105,7 @@ void CreateDbgFile (void)
 
     /* Output version information */
     fprintf (F, "version\tmajor=2,minor=0\n");
-
+                                               
     /* Output a line with the item numbers so the debug info module is able
      * to preallocate the required memory.
      */

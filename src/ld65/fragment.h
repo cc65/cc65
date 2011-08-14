@@ -87,9 +87,6 @@ struct Fragment {
 Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
 /* Create a new fragment and insert it into the section S */
 
-void FragResolveLineInfos (Fragment* F);
-/* Resolve the back pointers for the line infos */
-
 #if defined(HAVE_INLINE)
 INLINE const char* GetFragmentSourceName (const Fragment* F)
 /* Return the name of the source file for this fragment */

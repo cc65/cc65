@@ -76,7 +76,6 @@ struct LineInfo {
     struct FileInfo*    File;	        /* File struct for this line if any */
     unsigned            Type;           /* Type of line info */
     FilePos             Pos;            /* Position in file */
-    Collection          Fragments;      /* Fragments for this line */
     Collection          Spans;          /* Spans for this line */
 };
 
@@ -95,17 +94,12 @@ LineInfo* ReadLineInfo (FILE* F, struct ObjData* O);
 /* Read a line info from a file and return it */
 
 void FreeLineInfo (LineInfo* LI);
-/* Free a LineInfo structure. This function will not handle a non empty
- * Fragments collection, it can only be used to free incomplete line infos.
- */
+/* Free a LineInfo structure. */
 
 void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
 /* Read a list of line infos stored as a list of indices in the object file,
  * make real line infos from them and place them into the passed collection.
  */
-
-void RelocLineInfo (struct Segment* S);
-/* Relocate the line info for a segment. */
 
 #if defined(HAVE_INLINE)
 INLINE const FilePos* GetSourcePos (const LineInfo* LI)

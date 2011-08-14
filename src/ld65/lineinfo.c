@@ -42,7 +42,6 @@
 #include "error.h"
 #include "fileinfo.h"
 #include "fileio.h"
-#include "fragment.h"
 #include "lineinfo.h"
 #include "objdata.h"
 #include "segments.h"
@@ -67,7 +66,6 @@ static LineInfo* NewLineInfo (void)
     LI->Pos.Name   = INVALID_STRING_ID;
     LI->Pos.Line   = 0;
     LI->Pos.Col    = 0;
-    LI->Fragments  = EmptyCollection;
     LI->Spans      = EmptyCollection;
 
     /* Return the new struct */
@@ -77,20 +75,8 @@ static LineInfo* NewLineInfo (void)
 
 
 void FreeLineInfo (LineInfo* LI)
-/* Free a LineInfo structure. This function will not handle a non empty
- * Fragments collection, it can only be used to free incomplete line infos.
- */
+/* Free a LineInfo structure. */
 {
-    unsigned I;
-
-    /* Check, check, ... */
-    PRECONDITION (CollCount (&LI->Fragments) == 0);
-
-    /* Free all the code ranges */
-    for (I = 0; I < CollCount (&LI->Spans); ++I) {
-        FreeSpan (CollAtUnchecked (&LI->Spans, I));
-    }
-
     /* Free the collections */
     DoneCollection (&LI->Spans);
 
@@ -122,11 +108,12 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
     LineInfo* LI = NewLineInfo ();
 
     /* Read/fill the fields in the new LineInfo */
-    LI->Type     = ReadVar (F);
     LI->Pos.Line = ReadVar (F);
     LI->Pos.Col  = ReadVar (F);
     LI->File     = CollAt (&O->Files, ReadVar (F));
     LI->Pos.Name = LI->File->Name;
+    LI->Type     = ReadVar (F);
+    ReadSpans (&LI->Spans, F, O);
 
     /* Return the struct read */
     return LI;
@@ -165,45 +152,6 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
 
 
 
-void RelocLineInfo (Segment* S)
-/* Relocate the line info for a segment. */
-{
-    unsigned long Offs = S->PC;
-
-    /* Loop over all sections in this segment */
-    Section* Sec = S->SecRoot;
-    while (Sec) {
-       	Fragment* Frag;
-
-       	/* Adjust for fill bytes */
-       	Offs += Sec->Fill;
-
-       	/* Loop over all fragments in this section */
-       	Frag = Sec->FragRoot;
-       	while (Frag) {
-
-            unsigned I;
-
-       	    /* Add the range for this fragment to all line infos */
-            for (I = 0; I < CollCount (&Frag->LineInfos); ++I) {
-                LineInfo* LI = CollAtUnchecked (&Frag->LineInfos, I);
-       	       	AddSpan (&LI->Spans, S, Offs, Frag->Size);
-       	    }
-
-       	    /* Update the offset */
-       	    Offs += Frag->Size;
-
-       	    /* Next fragment */
-       	    Frag = Frag->Next;
-       	}
-
-       	/* Next section */
-       	Sec = Sec->Next;
-    }
-}
-
-
-
 void PrintDbgLineInfo (FILE* F)
 /* Output the line infos to a debug info file */
 {
@@ -229,30 +177,33 @@ void PrintDbgLineInfo (FILE* F)
             /* Get a pointer to the spans */
             const Collection* Spans = &LI->Spans;
 
-            /* Spans */
-            for (K = 0; K < CollCount (Spans); ++K) {
+            /* Print the start of the line */
+            fprintf (F,
+                     "line\tid=%u,file=%u,line=%lu",
+                     Id++, LI->File->Id, GetSourceLine (LI));
 
-                /* Get this code range */
-                const Span* S = CollConstAt (Spans, K);
-
-                /* Print it */
-                fprintf (F,
-                         "line\tid=%u,file=%u,line=%lu,seg=%u,range=0x%lX-0x%lX",
-                         Id++, LI->File->Id, GetSourceLine (LI), S->Seg->Id,
-                         S->Offs, S->Offs + S->Size - 1);
-
-                /* Print type if not LI_TYPE_ASM and count if not zero */
-                if (Type != LI_TYPE_ASM) {
-                    fprintf (F, ",type=%u", Type);
-                }
-                if (Count != 0) {
-                    fprintf (F, ",count=%u", Count);
-                }
-
-                /* Terminate line */
-                fputc ('\n', F);
-
+            /* Print type if not LI_TYPE_ASM and count if not zero */
+            if (Type != LI_TYPE_ASM) {
+                fprintf (F, ",type=%u", Type);
             }
+            if (Count != 0) {
+                fprintf (F, ",count=%u", Count);
+            }
+
+            /* Add spans if the line info has it */
+            if (CollCount (Spans) > 0) {
+
+                /* Output the first span */
+                fprintf (F, ",span=%u", SpanId (O, CollConstAt (Spans, 0)));
+
+                /* Output the other spans */
+                for (K = 1; K < CollCount (Spans); ++K) {
+                    fprintf (F, "+%u", SpanId (O, CollConstAt (Spans, K)));
+                }
+            }
+
+            /* Terminate line */
+            fputc ('\n', F);
         }
     }
 }

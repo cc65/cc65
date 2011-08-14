@@ -61,7 +61,7 @@
 static unsigned HT_GenHash (const void* Key);
 /* Generate the hash over a key. */
 
-static const void* HT_GetKey (void* Entry);
+static const void* HT_GetKey (const void* Entry);
 /* Given a pointer to the user entry data, return a pointer to the key. */
 
 static int HT_Compare (const void* Key1, const void* Key2);
@@ -122,7 +122,7 @@ static unsigned HT_GenHash (const void* Key)
 
 
 
-static const void* HT_GetKey (void* Entry)
+static const void* HT_GetKey (const void* Entry)
 /* Given a pointer to the user entry data, return a pointer to the index */
 {
     return &((FileEntry*) Entry)->Name;
@@ -134,7 +134,7 @@ static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
  * Key1 is smaller than Key2, zero if both are equal, and a value greater
  * than zero if Key1 is greater then Key2.
- */
+ */                                 
 {
     return (int)*(const unsigned*)Key1 - (int)*(const unsigned*)Key2;
 }

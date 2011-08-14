@@ -165,7 +165,9 @@ void WriteSpans (const Collection* Spans)
         /* Get next range */
         const Span* S = CollConstAt (Spans, I);
 
-        /* Write data for th span We will write the size instead of the end
+        CHECK (S->End > S->Start);
+
+        /* Write data for the span We will write the size instead of the end
          * offset to save some bytes, since most spans are expected to be
          * rather small.
          */

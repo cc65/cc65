@@ -49,7 +49,18 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*     	       	    		     Data                                    */
+/*****************************************************************************/
+
+
+
+/* The current line info */
+static LineInfo* CurLineInfo = 0;
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -99,11 +110,16 @@ void DbgInfoLine (void)
     long Line;
     FilePos Pos = STATIC_FILEPOS_INITIALIZER;
 
+    /* Any new line info terminates the last one */
+    if (CurLineInfo) {
+        EndLine (CurLineInfo);
+        CurLineInfo = 0;
+    }
+
     /* If a parameters follow, this is actual line info. If no parameters
      * follow, the last line info is terminated.
      */
     if (CurTok.Tok == TOK_SEP) {
-	ClearLineInfo (LI_SLOT_EXT);
 	return;
     }
 
@@ -133,8 +149,8 @@ void DbgInfoLine (void)
     }
     Pos.Line = Line;
 
-    /* Remember the line info */
-    GenLineInfo (LI_SLOT_EXT, &Pos);
+    /* Generate a new external line info */
+    CurLineInfo = StartLine (&Pos, LI_TYPE_EXT, 0);
 }
 
 

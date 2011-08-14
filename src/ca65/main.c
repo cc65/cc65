@@ -1036,14 +1036,14 @@ int main (int argc, char* argv [])
         CheckAssertions ();
     }
 
-    /* If we didn't have an errors, index the line infos */
-    MakeLineInfoIndex ();
-
     /* Dump the data */
     if (Verbosity >= 2) {
         SymDump (stdout);
         SegDump ();
     }
+
+    /* If we didn't have an errors, finish off the line infos */
+    DoneLineInfo ();
 
     /* If we didn't have any errors, create the object, listing and
      * dependency files

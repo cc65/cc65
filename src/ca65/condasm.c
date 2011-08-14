@@ -487,7 +487,7 @@ void CheckOpenIfs (void)
 	}
 
         LI = CollConstAt (&D->LineInfos, 0);
-	if (LI->Pos.Name != CurTok.Pos.Name) {
+       	if (GetSourcePos (LI)->Name != CurTok.Pos.Name) {
 	    /* The .if is from another file, bail out */
 	    break;
 	}

@@ -122,8 +122,8 @@ struct CharSource {
 
 /* Current input variables */
 static CharSource* Source       = 0;    /* Current char source */
-static unsigned	    FCount      = 0;  	/* Count of input files */
-static int	    C           = 0;	/* Current input character */
+static unsigned	   FCount       = 0;  	/* Count of input files */
+static int	   C            = 0;	/* Current input character */
 
 /* Force end of assembly */
 int 		  ForcedEnd     = 0;
@@ -818,7 +818,7 @@ static int Sweet16Reg (const StrBuf* Id)
 void NextRawTok (void)
 /* Read the next raw token from the input stream */
 {
-    Macro* M;                
+    Macro* M;
 
     /* If we've a forced end of assembly, don't read further */
     if (ForcedEnd) {
@@ -831,7 +831,7 @@ Restart:
     if (InputFromStack ()) {
         if (CurTok.Tok == TOK_IDENT && (M = FindDefine (&CurTok.SVal)) != 0) {
             /* This is a define style macro - expand it */
-            MacExpandStart (M);          
+            MacExpandStart (M);
             goto Restart;
         }
         return;
@@ -852,7 +852,7 @@ Again:
     SB_Clear (&CurTok.SVal);
 
     /* Generate line info for the current token */
-    GenLineInfo (LI_SLOT_ASM, &CurTok.Pos);
+    NewAsmLine ();
 
     /* Hex number or PC symbol? */
     if (C == '$') {
@@ -901,7 +901,7 @@ Again:
 	       	CurTok.IVal = 0;
 	    }
 	    CurTok.IVal = (CurTok.IVal << 1) + DigitVal (C);
-	    NextChar ();
+    	    NextChar ();
  	}
 
 	/* This is an integer constant */
@@ -1097,7 +1097,7 @@ Again:
                     break;
 
       	      	default:
-	     	    break;
+    	     	    break;
    	    }
 
 	} else if (CPU == CPU_SWEET16 &&
@@ -1195,7 +1195,7 @@ CharAgain:
 	    NextChar ();
       	    switch (C) {
 
-		case ':':
+    		case ':':
 		    NextChar ();
 		    CurTok.Tok = TOK_NAMESPACE;
 		    break;
@@ -1244,7 +1244,7 @@ CharAgain:
 	case '#':
 	    NextChar ();
       	    CurTok.Tok = TOK_HASH;
-	    return;
+    	    return;
 
 	case '(':
 	    NextChar ();
@@ -1342,7 +1342,7 @@ CharAgain:
 	     	}
 	     	CurTok.IVal = C;
 	     	CurTok.Tok = TOK_CHARCON;
-	     	NextChar ();
+    	     	NextChar ();
 	     	if (C != '\'') {
                     if (!MissingCharTerm) {
                         Error ("Illegal character constant");

@@ -41,6 +41,7 @@
 /* common */
 #include "coll.h"
 #include "filepos.h"
+#include "hashtab.h"
 #include "lidefs.h"
 
 
@@ -51,26 +52,8 @@
 
 
 
-/* Predefined line info slots. These are allocated when initializing the
- * module. Beware: Some code relies on the fact that slot zero is the basic
- * standard line info. It is assumed to be always there.
- */
-enum {
-    LI_SLOT_INV         = -1,           /* Use to mark invalid slots */
-    LI_SLOT_ASM         = 0,            /* Normal assembler source */
-    LI_SLOT_EXT         = 1,            /* Externally supplied line info */
-};
-
-/* The LineInfo structure is shared between several fragments, so we need a
- * reference counter.
- */
+/* Opaque structure used to handle line information */
 typedef struct LineInfo LineInfo;
-struct LineInfo {
-    unsigned    Usage;                  /* Usage counter */
-    unsigned    Type;                   /* Type of line info */
-    unsigned    Index;                  /* Index */
-    FilePos     Pos;                    /* File position */
-};
 
 
 
@@ -83,58 +66,37 @@ struct LineInfo {
 void InitLineInfo (void);
 /* Initialize the line infos */
 
-int AllocLineInfoSlot (unsigned Type, unsigned Count);
-/* Allocate a line info slot of the given type and return the slot index */
+void DoneLineInfo (void);
+/* Close down line infos */
 
-void FreeLineInfoSlot (int Slot);
-/* Free the line info in the given slot. Note: Alloc/Free must be used in
- * FIFO order.
+void EndLine (LineInfo* LI);
+/* End a line that is tracked by the given LineInfo structure */
+
+LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count);
+/* Start line info for a new line */
+
+void NewAsmLine (void);
+/* Start a new assembler input line. Use this function when generating new
+ * line of LI_TYPE_ASM. It will check if line and/or file have actually
+ * changed, end the old and start the new line as necessary.
  */
 
-void GenLineInfo (int Slot, const FilePos* Pos);
-/* Generate a new line info in the given slot */
-
-void ClearLineInfo (int Slot);
-/* Clear the line info in the given slot */
-
-void GetFullLineInfo (Collection* LineInfos, unsigned IncUsage);
-/* Return full line infos, that is line infos for all slots in LineInfos. The
- * function will clear LineInfos before usage and will increment the usage
- * counter by IncUsage for all line infos returned.
+void GetFullLineInfo (Collection* LineInfos, int ForceRef);
+/* Return full line infos, that is line infos for currently active Slots. The
+ * function will clear LineInfos before usage. If ForceRef is not zero, a
+ * forced reference will be added to all line infos, with the consequence that
+ * they won't get deleted, even if there is no code or data generated for these
+ * lines.
  */
 
-LineInfo* ReleaseLineInfo (LineInfo* LI);
-/* Decrease the reference count of the given line info and return it. The
- * function will gracefully accept NULL pointers and do nothing in this case.
- */
-
-#if defined(HAVE_INLINE)
-INLINE const FilePos* GetSourcePos (const LineInfo* LI)
+const FilePos* GetSourcePos (const LineInfo* LI);
 /* Return the source file position from the given line info */
-{
-    return &LI->Pos;
-}
-#else
-#  define GetSourcePos(LI)      (&(LI)->Pos)
-#endif
 
-#if defined(HAVE_INLINE)
-INLINE unsigned GetLineInfoType (const LineInfo* LI)
+unsigned GetLineInfoType (const LineInfo* LI);
 /* Return the type of a line info */
-{
-    return LI_GET_TYPE (LI->Type);
-}
-#else
-#  define GetLineInfoType(LI)     LI_GET_TYPE ((LI)->Type)
-#endif
 
 void WriteLineInfo (const Collection* LineInfos);
-/* Write a list of line infos to the object file. MakeLineInfoIndex has to
- * be called before!
- */
-
-void MakeLineInfoIndex (void);
-/* Index the line infos */
+/* Write a list of line infos to the object file. */
 
 void WriteLineInfos (void);
 /* Write a list of all line infos to the object file. */

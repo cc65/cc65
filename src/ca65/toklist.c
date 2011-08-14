@@ -82,20 +82,12 @@ void FreeTokNode (TokNode* N)
 
 
 
-void TokSet (TokNode* N, int LineInfoSlot)
-/* Set the scanner token from the given token node. If the given line info
- * slot is not LI_SLOT_INV, it is used to store the position of the token fed
- * into the scanner.
- */
+void TokSet (TokNode* N)
+/* Set the scanner token from the given token node. */
 {
     /* Set the values */
     CopyToken (&CurTok, &N->T);
     SB_Terminate (&CurTok.SVal);
-
-    /* Set the position if the slot is not invald */
-    if (LineInfoSlot != LI_SLOT_INV) {
-        GenLineInfo (LineInfoSlot, &CurTok.Pos);
-    }
 }
 
 
@@ -227,7 +219,10 @@ static int ReplayTokList (void* List)
     CHECK (L->Last != 0);
 
     /* Set the next token from the list */
-    TokSet (L->Last, LI_SLOT_ASM);
+    TokSet (L->Last);
+
+    /* Set the line info for the new token */
+    NewAsmLine ();
 
     /* If a check function is defined, call it, so it may look at the token
      * just set and changed it as apropriate.

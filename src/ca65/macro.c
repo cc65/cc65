@@ -65,7 +65,7 @@
 static unsigned HT_GenHash (const void* Key);
 /* Generate the hash over a key. */
 
-static const void* HT_GetKey (void* Entry);
+static const void* HT_GetKey (const void* Entry);
 /* Given a pointer to the user entry data, return a pointer to the key */
 
 static int HT_Compare (const void* Key1, const void* Key2);
@@ -130,7 +130,7 @@ struct MacExp {
     unsigned   	ParamCount;	/* Number of actual parameters */
     TokNode**  	Params;	  	/* List of actual parameters */
     TokNode*   	ParamExp;	/* Node for expanding parameters */
-    int         LISlot;         /* Slot for additional line infos */
+    LineInfo*   LI;             /* Line info for the expansion */
 };
 
 /* Maximum number of nested macro expansions */
@@ -164,7 +164,7 @@ static unsigned HT_GenHash (const void* Key)
 
 
 
-static const void* HT_GetKey (void* Entry)
+static const void* HT_GetKey (const void* Entry)
 /* Given a pointer to the user entry data, return a pointer to the index */
 {
     return &((Macro*) Entry)->Name;
@@ -307,7 +307,7 @@ static MacExp* NewMacExp (Macro* M)
 	E->Params[I] = 0;
     }
     E->ParamExp	  = 0;
-    E->LISlot     = AllocLineInfoSlot (LI_TYPE_MACRO, MacExpansions);
+    E->LI         = 0;
 
     /* Mark the macro as expanding */
     ++M->Expansions;
@@ -344,8 +344,10 @@ static void FreeMacExp (MacExp* E)
     }
     xfree (E->Params);
 
-    /* Free the additional line info slot */
-    FreeLineInfoSlot (E->LISlot);
+    /* Free the additional line info */
+    if (E->LI) {
+        EndLine (E->LI);
+    }
 
     /* Free the final token if we have one */
     if (E->Final) {
@@ -644,8 +646,8 @@ static int MacExpand (void* Data)
 ExpandParam:
     if (Mac->ParamExp) {
 
-       	/* Ok, use token from parameter list, but don't use its line info */
-       	TokSet (Mac->ParamExp, LI_SLOT_INV);
+       	/* Ok, use token from parameter list */
+       	TokSet (Mac->ParamExp);
 
        	/* Set pointer to next token */
        	Mac->ParamExp = Mac->ParamExp->Next;
@@ -660,7 +662,13 @@ ExpandParam:
     if (Mac->Exp) {
 
        	/* Use next macro token */
-       	TokSet (Mac->Exp, Mac->LISlot);
+       	TokSet (Mac->Exp);
+
+        /* Create new line info for this token */
+        if (Mac->LI) {
+            EndLine (Mac->LI);
+        }
+        Mac->LI = StartLine (&CurTok.Pos, LI_TYPE_MACRO, MacExpansions);
 
        	/* Set pointer to next token */
        	Mac->Exp = Mac->Exp->Next;
@@ -723,7 +731,7 @@ ExpandParam:
     if (Mac->Final) {
 
       	/* Set the final token and remove it */
-      	TokSet (Mac->Final, LI_SLOT_INV);
+      	TokSet (Mac->Final);
       	FreeTokNode (Mac->Final);
       	Mac->Final = 0;
 

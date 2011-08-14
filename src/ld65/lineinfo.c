@@ -129,6 +129,9 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
     /* Read the number of line info indices that follow */
     unsigned LineInfoCount = ReadVar (F);
 
+    /* Grow the collection as needed */
+    CollGrow (LineInfos, LineInfoCount);
+
     /* Read the line infos and resolve them */
     while (LineInfoCount--) {
 

@@ -217,6 +217,7 @@ struct cc65_moduledata {
     const char*         module_name;    /* Name of the module */
     unsigned            source_id;      /* Id of the module main file */
     unsigned            library_id;     /* Id of the library if any */
+    unsigned            scope_id;       /* Id of the main scope */
 };
 
 typedef struct cc65_moduleinfo cc65_moduleinfo;
@@ -256,14 +257,14 @@ struct cc65_spandata {
     cc65_size           span_size;      /* Size of the span */
     unsigned            segment_id;     /* Id of the segment */
 };
-                                          
+
 typedef struct cc65_spaninfo cc65_spaninfo;
 struct cc65_spaninfo {
     unsigned            count;          /* Number of data sets that follow */
     cc65_spandata       data[1];        /* Data sets, number is dynamic */
 };
 
-                        
+
 
 cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo handle);
 /* Return a list of all spans */
@@ -274,7 +275,7 @@ cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo handle, unsigned id);
  * cc65_spaninfo structure with one entry that contains the requested
  * span information.
  */
-       
+
 void cc65_free_spaninfo (cc65_dbginfo handle, cc65_spaninfo* info);
 /* Free a span info record */
 

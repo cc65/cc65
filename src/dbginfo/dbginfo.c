@@ -270,6 +270,7 @@ struct ModInfo {
         unsigned        Id;             /* Id of library if any */
         LibInfo*        Info;           /* Pointer to library info */
     } Lib;
+    ScopeInfo*          MainScope;      /* Pointer to main scope */
     Collection          FileInfoByName; /* Files for this module */
     Collection          ScopeInfoByName;/* Scopes for this module */
     char                Name[1];        /* Name of module with path */
@@ -1422,6 +1423,7 @@ static ModInfo* NewModInfo (const StrBuf* Name)
     ModInfo* M = xmalloc (sizeof (ModInfo) + SB_GetLen (Name));
 
     /* Initialize it */
+    M->MainScope = 0;
     CollInit (&M->FileInfoByName);
     CollInit (&M->ScopeInfoByName);
     memcpy (M->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
@@ -1469,6 +1471,7 @@ static void CopyModInfo (cc65_moduledata* D, const ModInfo* M)
     } else {
         D->library_id = CC65_INV_ID;
     }
+    D->scope_id       = M->MainScope->Id;
 }
 
 
@@ -2464,7 +2467,7 @@ static void ParseInfo (InputData* D)
                 CollGrow (&D->Info->SpanInfoById,  D->IVal);
                 break;
 
-            case TOK_SYM:          
+            case TOK_SYM:
                 CollGrow (&D->Info->SymInfoById,   D->IVal);
                 CollGrow (&D->Info->SymInfoByName, D->IVal);
 		CollGrow (&D->Info->SymInfoByVal,  D->IVal);
@@ -4137,6 +4140,14 @@ static void ProcessScopeInfo (InputData* D)
 
             /* Add the scope to the list of scopes for this module */
             CollAppend (&S->Mod.Info->ScopeInfoByName, S);
+
+            /* If this is a main scope, add a pointer to the corresponding
+             * module.
+             */
+            if (S->Parent.Id == CC65_INV_ID) {
+                /* No parent means main scope */
+                S->Mod.Info->MainScope = S;
+            }
         }
 
         /* Resolve the parent scope */
@@ -4185,19 +4196,29 @@ static void ProcessScopeInfo (InputData* D)
                 CollReplace (&S->SpanInfoList, SP, J);
 
                 /* Insert a backpointer into the span */
-		if (SP->ScopeInfoList == 0) {
-		    SP->ScopeInfoList = CollNew ();
-		}
+	    	if (SP->ScopeInfoList == 0) {
+	    	    SP->ScopeInfoList = CollNew ();
+	    	}
                 CollAppend (SP->ScopeInfoList, S);
             }
         }
     }
 
-    /* Walk over all modules and sort the scopes by name */
+    /* Walk over all modules, check that eacxh one has a main scope assigned,
+     * then sort the scopes by name
+     */
     for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
 
         /* Get this module */
         ModInfo* M = CollAt (&D->Info->ModInfoById, I);
+
+        /* Must have a main scope */
+        if (M->MainScope == 0) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Module with id %u has no main scope",
+                        M->Id);
+        }
 
         /* Sort the scopes for this module by name */
         CollSort (&M->ScopeInfoByName, CompareScopeInfoByName);

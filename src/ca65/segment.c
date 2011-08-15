@@ -328,6 +328,13 @@ unsigned char GetSegAddrSize (unsigned SegNum)
 void SegCheck (void)
 /* Check the segments for range and other errors */
 {
+    static const unsigned long U_Hi[4] = {
+       	0x000000FFL, 0x0000FFFFL, 0x00FFFFFFL, 0xFFFFFFFFL
+    };
+    static const long S_Hi[4] = {
+       	0x0000007FL, 0x00007FFFL, 0x007FFFFFL, 0x7FFFFFFFL
+    };
+
     unsigned I;
     for (I = 0; I < CollCount (&SegmentList); ++I) {
         Segment* S = CollAtUnchecked (&SegmentList, I);
@@ -346,44 +353,31 @@ void SegCheck (void)
                 /* Check if the expression is constant */
                 if (ED_IsConst (&ED)) {
 
-       	       	    /* The expression is constant. Check for range errors. */
-     	       	    int Abs = (F->Type != FRAG_SEXPR);
-                    long Val = ED.Val;
-     	       	    unsigned I;
+                    long Hi, Lo;
+     	       	    unsigned J;
 
-     	       	    if (F->Len == 1) {
-     	       	   	if (Abs) {
-     	       	   	    /* Absolute value */
-     	       	   	    if (Val > 255) {
-     	       	       	     	LIError (&F->LI, "Range error (%ld not in [0..255])", Val);
-     	       	   	    }
-     	       	   	} else {
-     	     	   	    /* PC relative value */
-     	     	   	    if (Val < -128 || Val > 127) {
-     	       	       	     	LIError (&F->LI, "Range error (%ld not in [-128..127])", Val);
-     	     	   	    }
-     	     	   	}
-     	       	    } else if (F->Len == 2) {
-     	     	    	if (Abs) {
-     	     	   	    /* Absolute value */
-     	     	   	    if (Val > 65535) {
-     	       	       	     	LIError (&F->LI, "Range error (%ld not in [0..65535])", Val);
-     	     	   	    }
-     	     	   	} else {
-     	     	   	    /* PC relative value */
-     	     	   	    if (Val < -32768 || Val > 32767) {
-     	       	       	     	LIError (&F->LI, "Range error (%ld not in [-32768..32767])", Val);
-     	       		    }
-     	     		}
-     	     	    }
+       	       	    /* The expression is constant. Check for range errors. */
+                    CHECK (F->Len <= 4);
+                    if (F->Type == FRAG_SEXPR) {
+                        Hi = S_Hi[F->Len-1];
+                        Lo = ~Hi;
+                    } else {
+                        Hi = U_Hi[F->Len-1];
+                        Lo = 0;
+                    }
+                    if (ED.Val > Hi || ED.Val < Lo) {
+                        LIError (&F->LI,
+                                 "Range error (%ld not in [%ld..%ld])",
+                                 ED.Val, Lo, Hi);
+                    }
 
                     /* We don't need the expression tree any longer */
                     FreeExpr (F->V.Expr);
 
      	     	    /* Convert the fragment into a literal fragment */
-     	     	    for (I = 0; I < F->Len; ++I) {
-     	     	       	F->V.Data [I] = Val & 0xFF;
-     	     	       	Val >>= 8;
+     	     	    for (J = 0; J < F->Len; ++J) {
+     	     	       	F->V.Data[J] = ED.Val & 0xFF;
+     	     	       	ED.Val >>= 8;
      	     	    }
      	     	    F->Type = FRAG_LITERAL;
 
@@ -392,13 +386,13 @@ void SegCheck (void)
      	     	    /* We cannot evaluate the expression now, leave the job for
      	     	     * the linker. However, we can check if the address size
                      * matches the fragment size, and we will do so.
-     		     */
+     	    	     */
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
      	       	        LIError (&F->LI, "Range error");
      	     	    }
-     		}
+     	    	}
 
                 /* Release memory allocated for the expression decriptor */
                 ED_Done (&ED);

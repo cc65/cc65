@@ -405,14 +405,14 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
  * check and return one of the SEG_EXPR_xxx codes.
  */
 {
-    static const unsigned long U_HighRange [4] = {
-       	0x000000FF, 0x0000FFFF, 0x00FFFFFF, 0xFFFFFFFF
+    static const unsigned long U_Hi[4] = {
+       	0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
     };
-    static const long S_HighRange [4] = {
-       	0x0000007F, 0x00007FFF, 0x007FFFFF, 0x7FFFFFFF
+    static const long S_Hi[4] = {
+       	0x0000007FL, 0x00007FFFL, 0x007FFFFFL, 0x7FFFFFFFL
     };
-    static const long S_LowRange [4] = {
-       	0xFFFFFF80, 0xFFFF8000, 0xFF800000, 0x80000000
+    static const long S_Lo[4] = {
+       	~0x0000007FL, ~0x00007FFFL, ~0x007FFFFFL, ~0x7FFFFFFFL
     };
 
 
@@ -424,12 +424,12 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
 
     /* Check for a range error */
     if (Signed) {
-	if (Val > S_HighRange [Size-1] || Val < S_LowRange [Size-1]) {
+	if (Val > S_Hi[Size-1] || Val < S_Lo[Size-1]) {
 	    /* Range error */
 	    return SEG_EXPR_RANGE_ERROR;
 	}
     } else {
-	if (((unsigned long)Val) > U_HighRange [Size-1]) {
+	if (((unsigned long)Val) > U_Hi[Size-1]) {
 	    /* Range error */
 	    return SEG_EXPR_RANGE_ERROR;
 	}

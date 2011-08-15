@@ -329,7 +329,7 @@ void SegCheck (void)
 /* Check the segments for range and other errors */
 {
     static const unsigned long U_Hi[4] = {
-       	0x000000FFL, 0x0000FFFFL, 0x00FFFFFFL, 0xFFFFFFFFL
+       	0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
     };
     static const long S_Hi[4] = {
        	0x0000007FL, 0x00007FFFL, 0x007FFFFFL, 0x7FFFFFFFL
@@ -353,22 +353,24 @@ void SegCheck (void)
                 /* Check if the expression is constant */
                 if (ED_IsConst (&ED)) {
 
-                    long Hi, Lo;
      	       	    unsigned J;
 
        	       	    /* The expression is constant. Check for range errors. */
                     CHECK (F->Len <= 4);
                     if (F->Type == FRAG_SEXPR) {
-                        Hi = S_Hi[F->Len-1];
-                        Lo = ~Hi;
+                        long Hi = S_Hi[F->Len-1];
+                        long Lo = ~Hi;
+                        if (ED.Val > Hi || ED.Val < Lo) {
+                            LIError (&F->LI,
+                                     "Range error (%ld not in [%ld..%ld])",
+                                     ED.Val, Lo, Hi);
+                        }
                     } else {
-                        Hi = U_Hi[F->Len-1];
-                        Lo = 0;
-                    }
-                    if (ED.Val > Hi || ED.Val < Lo) {
-                        LIError (&F->LI,
-                                 "Range error (%ld not in [%ld..%ld])",
-                                 ED.Val, Lo, Hi);
+                        if (((unsigned long)ED.Val) > U_Hi[F->Len-1]) {
+                            LIError (&F->LI,
+                                     "Range error (%lu not in [0..%lu])",
+                                     (unsigned long)ED.Val, U_Hi[F->Len-1]);
+                        }
                     }
 
                     /* We don't need the expression tree any longer */

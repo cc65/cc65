@@ -12,7 +12,7 @@ EXE  	= dbgtest
 
 #
 CC      = gcc
-CFLAGS  = -g -O2 -Wall -W
+CFLAGS  = -g -Wall -W
 EBIND   = emxbind
 LDFLAGS =
 

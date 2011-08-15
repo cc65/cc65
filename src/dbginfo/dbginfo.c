@@ -92,18 +92,20 @@ struct Collection {
 /* Initializer for static collections */
 #define COLLECTION_INITIALIZER  { 0, 0, 0 }
 
-/* Line info management */
-typedef struct LineInfoListEntry LineInfoListEntry;
-struct LineInfoListEntry {
+/* Span info management. The following table has as many entries as there
+ * are addresses active in spans. Each entry lists the spans for this address.
+ */
+typedef struct SpanInfoListEntry SpanInfoListEntry;
+struct SpanInfoListEntry {
     cc65_addr           Addr;           /* Unique address */
-    unsigned            Count;          /* Number of LineInfos for this address */
-    void*               Data;           /* Either LineInfo* or LineInfo** */
+    unsigned            Count;          /* Number of SpanInfos for this address */
+    void*               Data;           /* Either SpanInfo* or SpanInfo** */
 };
 
-typedef struct LineInfoList LineInfoList;
-struct LineInfoList {
+typedef struct SpanInfoList SpanInfoList;
+struct SpanInfoList {
     unsigned            Count;          /* Number of entries */
-    LineInfoListEntry*  List;           /* Dynamic array with entries */
+    SpanInfoListEntry*  List;           /* Dynamic array with entries */
 };
 
 /* Input tokens */
@@ -143,7 +145,6 @@ typedef enum {
     TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
     TOK_OUTPUTOFFS,                     /* OUTPUTOFFS keyword */
     TOK_PARENT,                         /* PARENT keyword */
-    TOK_RANGE,                          /* RANGE keyword */
     TOK_RO,                             /* RO keyword */
     TOK_RW,                             /* RW keyword */
     TOK_SCOPE,                          /* SCOPE keyword */
@@ -192,7 +193,7 @@ struct DbgInfo {
     Collection          SymInfoByVal;   /* Symbol infos sorted by value */
 
     /* Other stuff */
-    LineInfoList        LineInfoByAddr; /* Line infos sorted by unique address */
+    SpanInfoList        SpanInfoByAddr; /* Span infos sorted by unique address */
 };
 
 /* Data used when parsing the debug info file */
@@ -244,19 +245,14 @@ struct LibInfo {
 /* Internally used line info struct */
 struct LineInfo {
     unsigned            Id;             /* Id of line info */
-    cc65_addr           Start;          /* Start of data range */
-    cc65_addr           End;            /* End of data range */
     cc65_line           Line;           /* Line number */
     union {
         unsigned        Id;             /* Id of file */
         FileInfo*       Info;           /* Pointer to file info */
     } File;
-    union {
-        unsigned        Id;             /* Id of segment */
-        SegInfo*        Info;           /* Pointer to segment info */
-    } Seg;
     cc65_line_type      Type;           /* Type of line */
     unsigned            Count;          /* Nesting counter for macros */
+    Collection          SpanInfoList;   /* List of spans for this line */
 };
 
 /* Internally used module info struct */
@@ -310,13 +306,14 @@ struct SegInfo {
 /* Internally used span info struct */
 struct SpanInfo {
     unsigned            Id;             /* Id of span */
-    cc65_addr           Offs;           /* Start offset of span */
-    cc65_size           Size;           /* Size of span */
+    cc65_addr           Start;          /* Start of span */
+    cc65_addr           End;            /* End of span */
     union {
 	unsigned	Id;		/* Id of segment */
 	SegInfo*	Info;		/* Pointer to segment */
     } Seg;
     Collection*		ScopeInfoList;	/* Scopes for this span */
+    Collection*         LineInfoList;   /* Lines for this span */
 };
 
 /* Internally used symbol info struct */
@@ -806,6 +803,18 @@ static void* CollAt (Collection* C, unsigned Index)
 
 
 
+static const void* CollConstAt (const Collection* C, unsigned Index)
+/* Return the item at the given index */
+{
+    /* Check the index */
+    assert (Index < C->Count);
+
+    /* Return the element */
+    return C->Items[Index].Ptr;
+}
+
+
+
 static unsigned CollIdAt (Collection* C, unsigned Index)
 /* Return the id at the given index */
 {
@@ -893,7 +902,7 @@ static void DumpFileInfo (Collection* FileInfos)
 
     /* File info */
     for (I = 0; I < CollCount (FileInfos); ++I) {
-        const FileInfo* FI = CollAt (FileInfos, I);
+        const FileInfo* FI = CollConstAt (FileInfos, I);
         printf ("File info %u:\n"
                 "  Name:   %s\n"
                 "  Size:   %lu\n"
@@ -927,14 +936,14 @@ static void DumpOneLineInfo (unsigned Num, LineInfo* LI)
 
 
 
-static void DumpLineInfo (LineInfoList* L)
-/* Dump a list of line infos */
+static void DumpSpanInfo (SpanInfoList* L)
+/* Dump a list of span infos */
 {
     unsigned I, J;
 
     /* Line info */
     for (I = 0; I < L->Count; ++I) {
-        const LineInfoListEntry* E = &L->List[I];
+        const SpanInfoListEntry* E = &L->List[I];
         printf ("Addr:   %lu\n", (unsigned long) E->Addr);
         if (E->Count == 1) {
             DumpOneLineInfo (0, E->Data);
@@ -974,16 +983,17 @@ static void DBGPRINT(const char* format, ...) {}
 
 
 
-static cc65_idlist* new_cc65_idlist (unsigned Count)
-/* Allocate and return a new idlist with the given count. The count field in
- * the list will already be set on return.
+static void init_cc65_idlist (cc65_idlist* L, unsigned Count)
+/* Initialize an idlist with the given count. The count field in the list
+ * will be set on return and memory for the list is allocated.
  */
 {
-    /* Allocate memory */
-    cc65_idlist* L = xmalloc (sizeof (*L) - sizeof (L->ids[0]) +
-                              Count * sizeof (L->ids[0]));
     L->count = Count;
-    return L;
+    if (Count == 0) {
+        L->ids = 0;
+    } else {
+        L->ids = xmalloc (Count * sizeof (L->ids[0]));
+    }
 }
 
 
@@ -1136,15 +1146,20 @@ static void CopyLibInfo (cc65_librarydata* D, const LibInfo* L)
 static LineInfo* NewLineInfo (void)
 /* Create a new LineInfo struct and return it */
 {
-    /* Allocate memory and return it */
-    return xmalloc (sizeof (LineInfo));
+    /* Allocate memory */
+    LineInfo* L = xmalloc (sizeof (LineInfo));
+
+    /* Initialize and return it */
+    CollInit (&L->SpanInfoList);
+    return L;
 }
 
 
 
 static void FreeLineInfo (LineInfo* L)
 /* Free a LineInfo struct */
-{
+{           
+    CollDone (&L->SpanInfoList);
     xfree (L);
 }
 
@@ -1166,254 +1181,28 @@ static cc65_lineinfo* new_cc65_lineinfo (unsigned Count)
 static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
 /* Copy data from a LineInfo struct to a cc65_linedata struct */
 {
-    D->line_id      = L->Id;
-    D->line_start   = L->Start;
-    D->line_end     = L->End;
-    D->source_name  = L->File.Info->Name;
-    D->source_size  = L->File.Info->Size;
-    D->source_mtime = L->File.Info->MTime;
-    D->source_line  = L->Line;
-    if (L->Seg.Info->OutputName) {
-        D->output_name  = L->Seg.Info->OutputName;
-        D->output_offs  = L->Seg.Info->OutputOffs + L->Start - L->Seg.Info->Start;
-    } else {
-        D->output_name  = 0;
-        D->output_offs  = 0;
-    }
-    D->line_type    = L->Type;
-    D->count        = L->Count;
-}
+    unsigned I;
 
-
-
-static int CompareLineInfoByAddr (const void* L, const void* R)
-/* Helper function to sort line infos in a collection by address. Line infos
- * with smaller start address are considered smaller. If start addresses are
- * equal, line infos with smaller end address are considered smaller. This
- * means, that when CompareLineInfoByAddr is used for sorting, a range with
- * identical start addresses will have smaller ranges first, followed by
- * larger ranges.
- */
-{
-    /* Sort by start of range */
-    if (((const LineInfo*) L)->Start > ((const LineInfo*) R)->Start) {
-        return 1;
-    } else if (((const LineInfo*) L)->Start < ((const LineInfo*) R)->Start) {
-        return -1;
-    } else if (((const LineInfo*) L)->End > ((const LineInfo*) R)->End) {
-        return 1;
-    } else if (((const LineInfo*) L)->End < ((const LineInfo*) R)->End) {
-        return -1;
-    } else {
-        return 0;
+    D->line_id          = L->Id;
+    D->source_id        = L->File.Info->Id;
+    D->source_line      = L->Line;
+    D->line_type        = L->Type;
+    D->count            = L->Count;
+    init_cc65_idlist (&D->span_list, CollCount (&L->SpanInfoList));
+    for (I = 0; I < CollCount (&L->SpanInfoList); ++I) {
+        const SpanInfo* S = CollConstAt (&L->SpanInfoList, I);
+        D->span_list.ids[I] = S->Id;
     }
 }
 
 
 
 static int CompareLineInfoByLine (const void* L, const void* R)
-/* Helper function to sort line infos in a collection by line. If the line
- * is identical, sort by the address of the range.
- */
+/* Helper function to sort line infos in a collection by line. */
 {
-    if (((const LineInfo*) L)->Line > ((const LineInfo*) R)->Line) {
-        return 1;
-    } else if (((const LineInfo*) L)->Line < ((const LineInfo*) R)->Line) {
-        return -1;
-    } else {
-        return CompareLineInfoByAddr (L, R);
-    }
-}
-
-
-
-/*****************************************************************************/
-/*                               LineInfoList                                */
-/*****************************************************************************/
-
-
-
-static void InitLineInfoList (LineInfoList* L)
-/* Initialize a line info list */
-{
-    L->Count = 0;
-    L->List  = 0;
-}
-
-
-
-static void CreateLineInfoList (LineInfoList* L, Collection* LineInfos)
-/* Create a LineInfoList from a Collection with line infos. The collection
- * must be sorted by ascending start addresses.
- */
-{
-    unsigned I, J;
-    LineInfo* LI;
-    LineInfoListEntry* List;
-    unsigned StartIndex;
-    cc65_addr Start;
-    cc65_addr Addr;
-    cc65_addr End;
-
-    /* Initialize and check if there's something to do */
-    L->Count = 0;
-    L->List  = 0;
-    if (CollCount (LineInfos) == 0) {
-        /* No entries */
-        return;
-    }
-
-    /* Step 1: Determine the number of unique address entries needed */
-    LI = CollAt (LineInfos, 0);
-    L->Count += (LI->End - LI->Start) + 1;
-    End = LI->End;
-    for (I = 1; I < CollCount (LineInfos); ++I) {
-
-        /* Get next entry */
-        LI = CollAt (LineInfos, I);
-
-        /* Check for additional unique addresses in this line info */
-        if (LI->Start > End) {
-            L->Count += (LI->End - LI->Start) + 1;
-            End = LI->End;
-        } else if (LI->End > End) {
-            L->Count += (LI->End - End);
-            End = LI->End;
-        }
-
-    }
-
-    /* Step 2: Allocate memory and initialize it */
-    L->List = List = xmalloc (L->Count * sizeof (*List));
-    for (I = 0; I < L->Count; ++I) {
-        List[I].Count = 0;
-        List[I].Data  = 0;
-    }
-
-    /* Step 3: Determine the number of entries per unique address */
-    List = L->List;
-    LI = CollAt (LineInfos, 0);
-    StartIndex = 0;
-    Start = LI->Start;
-    End = LI->End;
-    for (J = StartIndex, Addr = LI->Start; Addr <= LI->End; ++J, ++Addr) {
-        List[J].Addr = Addr;
-        ++List[J].Count;
-    }
-    for (I = 1; I < CollCount (LineInfos); ++I) {
-
-        /* Get next entry */
-        LI = CollAt (LineInfos, I);
-
-        /* Determine the start index of the next range. Line infos are sorted
-         * by ascending start address, so the start address of the next entry
-         * is always larger than the previous one - we don't need to check
-         * that.
-         */
-        if (LI->Start <= End) {
-            /* Range starts within out already known linear range */
-            StartIndex += (unsigned) (LI->Start - Start);
-            Start = LI->Start;
-            if (LI->End > End) {
-                End = LI->End;
-            }
-        } else {
-            /* Range starts after the already known */
-            StartIndex += (unsigned) (End - Start) + 1;
-            Start = LI->Start;
-            End = LI->End;
-        }
-        for (J = StartIndex, Addr = LI->Start; Addr <= LI->End; ++J, ++Addr) {
-            List[J].Addr = Addr;
-            ++List[J].Count;
-        }
-    }
-
-    /* Step 4: Allocate memory for the indirect tables */
-    for (I = 0, List = L->List; I < L->Count; ++I, ++List) {
-
-        /* For a count of 1, we store the pointer to the lineinfo for this
-         * address in the Data pointer directly. For counts > 1, we allocate
-         * an array of pointers and reset the counter, so we can use it as
-         * an index later. This is dangerous programming since it disables
-         * all possible checks!
-         */
-        if (List->Count > 1) {
-            List->Data = xmalloc (List->Count * sizeof (LineInfo*));
-            List->Count = 0;
-        }
-    }
-
-    /* Step 5: Enter the data into the table */
-    List = L->List;
-    LI = CollAt (LineInfos, 0);
-    StartIndex = 0;
-    Start = LI->Start;
-    End = LI->End;
-    for (J = StartIndex, Addr = LI->Start; Addr <= LI->End; ++J, ++Addr) {
-        assert (List[J].Addr == Addr);
-        if (List[J].Count == 1 && List[J].Data == 0) {
-            List[J].Data = LI;
-        } else {
-            ((LineInfo**) List[J].Data)[List[J].Count++] = LI;
-        }
-    }
-    for (I = 1; I < CollCount (LineInfos); ++I) {
-
-        /* Get next entry */
-        LI = CollAt (LineInfos, I);
-
-        /* Determine the start index of the next range. Line infos are sorted
-         * by ascending start address, so the start address of the next entry
-         * is always larger than the previous one - we don't need to check
-         * that.
-         */
-        if (LI->Start <= End) {
-            /* Range starts within out already known linear range */
-            StartIndex += (unsigned) (LI->Start - Start);
-            Start = LI->Start;
-            if (LI->End > End) {
-                End = LI->End;
-            }
-        } else {
-            /* Range starts after the already known */
-            StartIndex += (unsigned) (End - Start) + 1;
-            Start = LI->Start;
-            End = LI->End;
-        }
-        for (J = StartIndex, Addr = LI->Start; Addr <= LI->End; ++J, ++Addr) {
-            assert (List[J].Addr == Addr);
-            if (List[J].Count == 1 && List[J].Data == 0) {
-                List[J].Data = LI;
-            } else {
-                ((LineInfo**) List[J].Data)[List[J].Count++] = LI;
-            }
-        }
-    }
-}
-
-
-
-static void DoneLineInfoList (LineInfoList* L)
-/* Delete the contents of a line info list */
-{
-    unsigned I;
-
-    /* Delete the line info and the indirect data */
-    for (I = 0; I < L->Count; ++I) {
-
-        /* Get a pointer to the entry */
-        LineInfoListEntry* E = &L->List[I];
-
-        /* Check for indirect memory */
-        if (E->Count > 1) {
-            /* LineInfo addressed indirectly */
-            xfree (E->Data);
-        }
-    }
-
-    /* Delete the list */
-    xfree (L->List);
+    int Left  = ((const LineInfo*) L)->Line;
+    int Right = ((const LineInfo*) R)->Line;
+    return Left - Right;
 }
 
 
@@ -1663,6 +1452,7 @@ static SpanInfo* NewSpanInfo (void)
 
     /* Initialize and return it */
     S->ScopeInfoList = 0;
+    S->LineInfoList = 0;
     return S;
 }
 
@@ -1672,6 +1462,7 @@ static void FreeSpanInfo (SpanInfo* S)
 /* Free a SpanInfo struct */
 {
     CollFree (S->ScopeInfoList);
+    CollFree (S->LineInfoList);
     xfree (S);
 }
 
@@ -1694,9 +1485,34 @@ static void CopySpanInfo (cc65_spandata* D, const SpanInfo* S)
 /* Copy data from a SpanInfo struct to a cc65_spandata struct */
 {
     D->span_id          = S->Id;
-    D->span_offs        = S->Offs;
-    D->span_size        = S->Size;
+    D->span_start       = S->Start;
+    D->span_end         = S->End;
     D->segment_id       = S->Seg.Info->Id;
+}
+
+
+
+static int CompareSpanInfoByAddr (const void* L, const void* R)
+/* Helper function to sort span infos in a collection by address. Span infos
+ * with smaller start address are considered smaller. If start addresses are
+ * equal, line spans with smaller end address are considered smaller. This
+ * means, that when CompareSpanInfoByAddr is used for sorting, a range with
+ * identical start addresses will have smaller spans first, followed by
+ * larger spans.
+ */
+{
+    /* Sort by start of span */
+    if (((const SpanInfo*) L)->Start > ((const SpanInfo*) R)->Start) {
+        return 1;
+    } else if (((const SpanInfo*) L)->Start < ((const SpanInfo*) R)->Start) {
+        return -1;
+    } else if (((const SpanInfo*) L)->End > ((const SpanInfo*) R)->End) {
+        return 1;
+    } else if (((const SpanInfo*) L)->End < ((const SpanInfo*) R)->End) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 
@@ -1794,6 +1610,197 @@ static int CompareSymInfoByVal (const void* L, const void* R)
 
 
 /*****************************************************************************/
+/*                               SpanInfoList                                */
+/*****************************************************************************/
+
+
+
+static void InitSpanInfoList (SpanInfoList* L)
+/* Initialize a span info list */
+{
+    L->Count = 0;
+    L->List  = 0;
+}
+
+
+
+static void CreateSpanInfoList (SpanInfoList* L, Collection* SpanInfos)
+/* Create a SpanInfoList from a Collection with span infos. The collection
+ * must be sorted by ascending start addresses.
+ */
+{
+    unsigned I, J;
+    SpanInfo* S;
+    SpanInfoListEntry* List;
+    unsigned StartIndex;
+    cc65_addr Start;
+    cc65_addr Addr;
+    cc65_addr End;
+
+    /* Initialize and check if there's something to do */
+    L->Count = 0;
+    L->List  = 0;
+    if (CollCount (SpanInfos) == 0) {
+        /* No entries */
+        return;
+    }
+
+    /* Step 1: Determine the number of unique address entries needed */
+    S = CollAt (SpanInfos, 0);
+    L->Count += (S->End - S->Start) + 1;
+    End = S->End;
+    for (I = 1; I < CollCount (SpanInfos); ++I) {
+
+        /* Get next entry */
+        S = CollAt (SpanInfos, I);
+
+        /* Check for additional unique addresses in this span info */
+        if (S->Start > End) {
+            L->Count += (S->End - S->Start) + 1;
+            End = S->End;
+        } else if (S->End > End) {
+            L->Count += (S->End - End);
+            End = S->End;
+        }
+
+    }
+
+    /* Step 2: Allocate memory and initialize it */
+    L->List = List = xmalloc (L->Count * sizeof (*List));
+    for (I = 0; I < L->Count; ++I) {
+        List[I].Count = 0;
+        List[I].Data  = 0;
+    }
+
+    /* Step 3: Determine the number of entries per unique address */
+    List = L->List;
+    S = CollAt (SpanInfos, 0);
+    StartIndex = 0;
+    Start = S->Start;
+    End = S->End;
+    for (J = StartIndex, Addr = S->Start; Addr <= S->End; ++J, ++Addr) {
+        List[J].Addr = Addr;
+        ++List[J].Count;
+    }
+    for (I = 1; I < CollCount (SpanInfos); ++I) {
+
+        /* Get next entry */
+        S = CollAt (SpanInfos, I);
+
+        /* Determine the start index of the next range. Line infos are sorted
+         * by ascending start address, so the start address of the next entry
+         * is always larger than the previous one - we don't need to check
+         * that.
+         */
+        if (S->Start <= End) {
+            /* Range starts within out already known linear range */
+            StartIndex += (unsigned) (S->Start - Start);
+            Start = S->Start;
+            if (S->End > End) {
+                End = S->End;
+            }
+        } else {
+            /* Range starts after the already known */
+            StartIndex += (unsigned) (End - Start) + 1;
+            Start = S->Start;
+            End = S->End;
+        }
+        for (J = StartIndex, Addr = S->Start; Addr <= S->End; ++J, ++Addr) {
+            List[J].Addr = Addr;
+            ++List[J].Count;
+        }
+    }
+
+    /* Step 4: Allocate memory for the indirect tables */
+    for (I = 0, List = L->List; I < L->Count; ++I, ++List) {
+
+        /* For a count of 1, we store the pointer to the lineinfo for this
+         * address in the Data pointer directly. For counts > 1, we allocate
+         * an array of pointers and reset the counter, so we can use it as
+         * an index later. This is dangerous programming since it disables
+         * all possible checks!
+         */
+        if (List->Count > 1) {
+            List->Data = xmalloc (List->Count * sizeof (SpanInfo*));
+            List->Count = 0;
+        }
+    }
+
+    /* Step 5: Enter the data into the table */
+    List = L->List;
+    S = CollAt (SpanInfos, 0);
+    StartIndex = 0;
+    Start = S->Start;
+    End = S->End;
+    for (J = StartIndex, Addr = S->Start; Addr <= S->End; ++J, ++Addr) {
+        assert (List[J].Addr == Addr);
+        if (List[J].Count == 1 && List[J].Data == 0) {
+            List[J].Data = S;
+        } else {
+            ((SpanInfo**) List[J].Data)[List[J].Count++] = S;
+        }
+    }
+    for (I = 1; I < CollCount (SpanInfos); ++I) {
+
+        /* Get next entry */
+        S = CollAt (SpanInfos, I);
+
+        /* Determine the start index of the next range. Line infos are sorted
+         * by ascending start address, so the start address of the next entry
+         * is always larger than the previous one - we don't need to check
+         * that.
+         */
+        if (S->Start <= End) {
+            /* Range starts within out already known linear range */
+            StartIndex += (unsigned) (S->Start - Start);
+            Start = S->Start;
+            if (S->End > End) {
+                End = S->End;
+            }
+        } else {
+            /* Range starts after the already known */
+            StartIndex += (unsigned) (End - Start) + 1;
+            Start = S->Start;
+            End = S->End;
+        }
+        for (J = StartIndex, Addr = S->Start; Addr <= S->End; ++J, ++Addr) {
+            assert (List[J].Addr == Addr);
+            if (List[J].Count == 1 && List[J].Data == 0) {
+                List[J].Data = S;
+            } else {
+                ((SpanInfo**) List[J].Data)[List[J].Count++] = S;
+            }
+        }
+    }
+}
+
+
+
+static void DoneSpanInfoList (SpanInfoList* L)
+/* Delete the contents of a span info list */
+{
+    unsigned I;
+
+    /* Delete the span info and the indirect data */
+    for (I = 0; I < L->Count; ++I) {
+
+        /* Get a pointer to the entry */
+        SpanInfoListEntry* E = &L->List[I];
+
+        /* Check for indirect memory */
+        if (E->Count > 1) {
+            /* SpanInfo addressed indirectly */
+            xfree (E->Data);
+        }
+    }
+
+    /* Delete the list */
+    xfree (L->List);
+}
+
+
+
+/*****************************************************************************/
 /*                                Debug info                                 */
 /*****************************************************************************/
 
@@ -1821,7 +1828,7 @@ static DbgInfo* NewDbgInfo (void)
     CollInit (&Info->SymInfoByName);
     CollInit (&Info->SymInfoByVal);
 
-    InitLineInfoList (&Info->LineInfoByAddr);
+    InitSpanInfoList (&Info->SpanInfoByAddr);
 
     /* Return it */
     return Info;
@@ -1877,8 +1884,8 @@ static void FreeDbgInfo (DbgInfo* Info)
     CollDone (&Info->SymInfoByName);
     CollDone (&Info->SymInfoByVal);
 
-    /* Free line info */
-    DoneLineInfoList (&Info->LineInfoByAddr);
+    /* Free span info */
+    DoneSpanInfoList (&Info->SpanInfoByAddr);
 
     /* Free the structure itself */
     xfree (Info);
@@ -2042,7 +2049,6 @@ static void NextToken (InputData* D)
         { "oname",      TOK_OUTPUTNAME  },
         { "ooffs",      TOK_OUTPUTOFFS  },
         { "parent",     TOK_PARENT      },
-        { "range",      TOK_RANGE       },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
         { "scope",      TOK_SCOPE       },
@@ -2389,7 +2395,7 @@ static void ParseFile (InputData* D)
     F->Id       = Id;
     F->Size     = Size;
     F->MTime    = MTime;
-    CollMove (&F->ModInfoByName, &ModIds);
+    CollMove (&ModIds, &F->ModInfoByName);
     CollReplaceExpand (&D->Info->FileInfoById, F, Id);
     CollAppend (&D->Info->FileInfoByName, F);
 
@@ -2620,13 +2626,11 @@ static void ParseLine (InputData* D)
 {
     unsigned        Id = CC65_INV_ID;
     unsigned        FileId = CC65_INV_ID;
-    unsigned        SegId = CC65_INV_ID;
+    Collection      SpanIds = COLLECTION_INITIALIZER;
     cc65_line       Line = 0;
-    cc65_addr       Start = 0;
-    cc65_addr       End = 0;
     cc65_line_type  Type = CC65_LINE_ASM;
     unsigned        Count = 0;
-    LineInfo*   L;
+    LineInfo*       L;
     enum {
         ibNone      = 0x00,
 
@@ -2634,11 +2638,10 @@ static void ParseLine (InputData* D)
         ibFileId    = 0x02,
         ibId        = 0x04,
         ibLine      = 0x08,
-        ibRange     = 0x10,
-        ibSegId     = 0x20,
+        ibSpanId    = 0x20,
         ibType      = 0x40,
 
-        ibRequired  = ibFileId | ibId | ibLine | ibSegId | ibRange,
+        ibRequired  = ibFileId | ibId | ibLine,
     } InfoBits = ibNone;
 
     /* Skip the LINE token */
@@ -2652,8 +2655,7 @@ static void ParseLine (InputData* D)
         /* Something we know? */
         if (D->Tok != TOK_COUNT   && D->Tok != TOK_FILE         &&
             D->Tok != TOK_ID      && D->Tok != TOK_LINE         &&
-            D->Tok != TOK_RANGE   && D->Tok != TOK_SEGMENT      &&
-            D->Tok != TOK_TYPE) {
+            D->Tok != TOK_SPAN    && D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2702,34 +2704,19 @@ static void ParseLine (InputData* D)
                 InfoBits |= ibLine;
                 break;
 
-            case TOK_RANGE:
-                if (!IntConstFollows (D)) {
-                    goto ErrorExit;
-                }
-                Start = (cc65_addr) D->IVal;
-                NextToken (D);
-                if (D->Tok == TOK_MINUS) {
-                    /* End of range follows */
-                    NextToken (D);
+	    case TOK_SPAN:
+                while (1) {
                     if (!IntConstFollows (D)) {
                         goto ErrorExit;
                     }
-                    End = (cc65_addr) D->IVal;
+                    CollAppendId (&SpanIds, (unsigned) D->IVal);
                     NextToken (D);
-                } else {
-                    /* Start and end are identical */
-                    End = Start;
+                    if (D->Tok != TOK_PLUS) {
+                        break;
+                    }
+                    NextToken (D);
                 }
-                InfoBits |= ibRange;
-                break;
-
-            case TOK_SEGMENT:
-                if (!IntConstFollows (D)) {
-                    goto ErrorExit;
-                }
-                SegId = D->IVal;
-                InfoBits |= ibSegId;
-                NextToken (D);
+                InfoBits |= ibSpanId;
                 break;
 
             case TOK_TYPE:
@@ -2780,17 +2767,16 @@ static void ParseLine (InputData* D)
     /* Create the line info and remember it */
     L = NewLineInfo ();
     L->Id       = Id;
-    L->Start    = Start;
-    L->End      = End;
     L->Line     = Line;
     L->File.Id  = FileId;
-    L->Seg.Id   = SegId;
     L->Type     = Type;
     L->Count    = Count;
+    CollMove (&SpanIds, &L->SpanInfoList);
     CollReplaceExpand (&D->Info->LineInfoById, L, Id);
 
 ErrorExit:
     /* Entry point in case of errors */
+    CollDone (&SpanIds);
     return;
 }
 
@@ -3118,9 +3104,9 @@ static void ParseScope (InputData* D)
     S->Mod.Id    = ModId;
     S->Parent.Id = ParentId;
     S->Label.Id  = SymId;
+    CollMove (&SpanIds, &S->SpanInfoList);
 
     /* ... and remember it */
-    CollMove (&S->SpanInfoList, &SpanIds);
     CollReplaceExpand (&D->Info->ScopeInfoById, S, Id);
 
 ErrorExit:
@@ -3425,8 +3411,8 @@ static void ParseSpan (InputData* D)
     S = NewSpanInfo ();
     S->Id     = Id;
     S->Seg.Id = SegId;
-    S->Offs   = Start;
-    S->Size   = Size;
+    S->Start  = Start;
+    S->End    = Start + Size - 1;
     CollReplaceExpand (&D->Info->SpanInfoById, S, Id);
 
 ErrorExit:
@@ -3784,9 +3770,9 @@ static int FindFileInfoByName (Collection* FileInfos, const char* Name,
 
 
 
-static LineInfoListEntry* FindLineInfoByAddr (const LineInfoList* L, cc65_addr Addr)
-/* Find the index of a LineInfo for a given address. Returns 0 if no such
- * lineinfo was found.
+static SpanInfoListEntry* FindSpanInfoByAddr (const SpanInfoList* L, cc65_addr Addr)
+/* Find the index of a SpanInfo for a given address. Returns 0 if no such
+ * SpanInfo was found.
  */
 {
     /* Do a binary search */
@@ -3798,7 +3784,7 @@ static LineInfoListEntry* FindLineInfoByAddr (const LineInfoList* L, cc65_addr A
         int Cur = (Lo + Hi) / 2;
 
         /* Get item */
-        LineInfoListEntry* CurItem = &L->List[Cur];
+        SpanInfoListEntry* CurItem = &L->List[Cur];
 
         /* Found? */
         if (CurItem->Addr > Addr) {
@@ -3817,48 +3803,41 @@ static LineInfoListEntry* FindLineInfoByAddr (const LineInfoList* L, cc65_addr A
 
 
 
-static int FindLineInfoByLine (Collection* LineInfos, cc65_line Line,
-                               unsigned* Index)
-/* Find the LineInfo for a given line number. The function returns true if the
- * line was found. In this case, Index contains the index of the first item
- * that matches. If the item wasn't found, the function returns false and
- * Index contains the insert position for the line.
+static LineInfo* FindLineInfoByLine (Collection* LineInfos, cc65_line Line)
+/* Find the LineInfo for a given line number. The function returns the line
+ * info or NULL if none was found.
  */
 {
     /* Do a binary search */
     int Lo = 0;
     int Hi = (int) CollCount (LineInfos) - 1;
-    int Found = 0;
     while (Lo <= Hi) {
 
         /* Mid of range */
         int Cur = (Lo + Hi) / 2;
 
         /* Get item */
-        const LineInfo* CurItem = CollAt (LineInfos, Cur);
+        LineInfo* CurItem = CollAt (LineInfos, Cur);
 
         /* Found? */
         if (Line > CurItem->Line) {
             Lo = Cur + 1;
-        } else {
+        } else if (Line < CurItem->Line) {
             Hi = Cur - 1;
-            /* Since we may have duplicates, repeat the search until we've
-             * the first item that has a match.
-             */
-            if (Line == CurItem->Line) {
-                Found = 1;
-            }
+        } else {
+            /* Found */
+            return CurItem;
         }
     }
 
-    /* Pass back the index. This is also the insert position */
-    *Index = Lo;
-    return Found;
+    /* Not found */
+    return 0;
 }
 
 
 
-static int FindSymInfoByName (Collection* SymInfos, const char* Name, unsigned* Index)
+static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
+                              unsigned* Index)
 /* Find the SymInfo for a given file name. The function returns true if the
  * name was found. In this case, Index contains the index of the first item
  * that matches. If the item wasn't found, the function returns false and
@@ -3875,7 +3854,7 @@ static int FindSymInfoByName (Collection* SymInfos, const char* Name, unsigned* 
         int Cur = (Lo + Hi) / 2;
 
         /* Get item */
-        SymInfo* CurItem = CollAt (SymInfos, Cur);
+        const SymInfo* CurItem = CollConstAt (SymInfos, Cur);
 
         /* Compare */
         int Res = strcmp (CurItem->Name, Name);
@@ -3953,7 +3932,7 @@ static void ProcessFileInfo (InputData* D)
 
         /* Resolve the module ids */
         unsigned J;
-        for (J = 0; I < CollCount (&F->ModInfoByName); ++J) {
+        for (J = 0; J < CollCount (&F->ModInfoByName); ++J) {
 
             /* Get the id of this module */
             unsigned ModId = CollIdAt (&F->ModInfoByName, J);
@@ -4003,16 +3982,9 @@ static void ProcessLineInfo (InputData* D)
 {
     unsigned I;
 
-    /* Temporary collection with line infos sorted by address */
-    Collection LineInfoByAddr = COLLECTION_INITIALIZER;
-
     /* Get pointers to the collections */
     Collection* LineInfos = &D->Info->LineInfoById;
     Collection* FileInfos = &D->Info->FileInfoById;
-    Collection* SegInfos  = &D->Info->SegInfoById;
-
-    /* Resize the temporary collection */
-    CollGrow (&LineInfoByAddr, CollCount (LineInfos));
 
     /* Walk over the line infos and replace the id numbers of file and segment
      * with pointers to the actual structs. Add the line info to each file
@@ -4037,22 +4009,6 @@ static void ProcessLineInfo (InputData* D)
             CollAppend (&L->File.Info->LineInfoByLine, L);
         }
 
-        /* Replace the segment id by a pointer to the SegInfo */
-        if (L->Seg.Id >= CollCount (SegInfos)) {
-            ParseError (D,
-                        CC65_ERROR,
-                        "Invalid segment id %u for line with id %u",
-                        L->Seg.Id, L->Id);
-            L->Seg.Info = 0;
-        } else {
-            L->Seg.Info = CollAt (SegInfos, L->Seg.Id);
-        }
-
-        /* Append this line info to the temporary collection that is later
-         * sorted by address.
-         */
-        CollAppend (&LineInfoByAddr, L);
-
         /* Next one */
         ++I;
     }
@@ -4068,15 +4024,6 @@ static void ProcessLineInfo (InputData* D)
         /* Sort the line infos for this file */
         CollSort (&F->LineInfoByLine, CompareLineInfoByLine);
     }
-
-    /* Sort the collection with all line infos by address */
-    CollSort (&LineInfoByAddr, CompareLineInfoByAddr);
-
-    /* Create the line info list from the line info collection */
-    CreateLineInfoList (&D->Info->LineInfoByAddr, &LineInfoByAddr);
-
-    /* Remove the temporary collection */
-    CollDone (&LineInfoByAddr);
 }
 
 
@@ -4185,7 +4132,7 @@ static void ProcessScopeInfo (InputData* D)
         }
 
 	/* Resolve the spans ids */
-        for (J = 0; I < CollCount (&S->SpanInfoList); ++J) {
+        for (J = 0; J < CollCount (&S->SpanInfoList); ++J) {
 
             /* Get the id of this span */
             unsigned SpanId = CollIdAt (&S->SpanInfoList, J);
@@ -4249,13 +4196,19 @@ static void ProcessSpanInfo (InputData* D)
 {
     unsigned I;
 
+    /* Temporary collection with span infos sorted by address */
+    Collection SpanInfoByAddr = COLLECTION_INITIALIZER;
+
+    /* Resize the temporary collection */
+    CollGrow (&SpanInfoByAddr, CollCount (&D->Info->SpanInfoById));
+
     /* Walk over all spans and resolve the ids */
     for (I = 0; I < CollCount (&D->Info->SpanInfoById); ++I) {
 
         /* Get this span info */
         SpanInfo* S = CollAt (&D->Info->SpanInfoById, I);
 
-        /* Resolve the segment */
+        /* Resolve the segment and relocate the span */
         if (S->Seg.Id >= CollCount (&D->Info->SegInfoById)) {
             ParseError (D,
                         CC65_ERROR,
@@ -4264,8 +4217,24 @@ static void ProcessSpanInfo (InputData* D)
             S->Seg.Info = 0;
         } else {
             S->Seg.Info = CollAt (&D->Info->SegInfoById, S->Seg.Id);
+            S->Start += S->Seg.Info->Start;
+            S->End   += S->Seg.Info->Start;
         }
+
+        /* Append this span info to the temporary collection that is later
+         * sorted by address.
+         */
+        CollAppend (&SpanInfoByAddr, S);
     }
+
+    /* Sort the collection with all span infos by address */
+    CollSort (&SpanInfoByAddr, CompareSpanInfoByAddr);
+
+    /* Create the span info list from the span info collection */
+    CreateSpanInfoList (&D->Info->SpanInfoByAddr, &SpanInfoByAddr);
+
+    /* Remove the temporary collection */
+    CollDone (&SpanInfoByAddr);
 }
 
 
@@ -4546,7 +4515,7 @@ void cc65_free_dbginfo (cc65_dbginfo Handle)
 /* Free debug information read from a file */
 {
     if (Handle) {
-        FreeDbgInfo (Handle);
+        FreeDbgInfo ((DbgInfo*) Handle);
     }
 }
 
@@ -4558,7 +4527,7 @@ void cc65_free_dbginfo (cc65_dbginfo Handle)
 
 
 
-cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
+const cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
 /* Return a list of all libraries */
 {
     DbgInfo*            Info;
@@ -4581,7 +4550,7 @@ cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (LibInfoById); ++I) {
         /* Copy the data */
-        CopyLibInfo (D->data + I, CollAt (LibInfoById, I));
+        CopyLibInfo (D->data + I, CollConstAt (LibInfoById, I));
     }
 
     /* Return the result */
@@ -4590,7 +4559,7 @@ cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
 
 
 
-cc65_libraryinfo* cc65_libraryinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_libraryinfo* cc65_libraryinfo_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a library with a specific id. The function
  * returns NULL if the id is invalid (no such library) and otherwise a
  * cc65_libraryinfo structure with one entry that contains the requested
@@ -4615,7 +4584,7 @@ cc65_libraryinfo* cc65_libraryinfo_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_libraryinfo (1);
 
     /* Fill in the data */
-    CopyLibInfo (D->data, CollAt (&Info->LibInfoById, Id));
+    CopyLibInfo (D->data, CollConstAt (&Info->LibInfoById, Id));
 
     /* Return the result */
     return D;
@@ -4623,14 +4592,14 @@ cc65_libraryinfo* cc65_libraryinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-void cc65_free_libraryinfo (cc65_dbginfo Handle, cc65_libraryinfo* Info)
+void cc65_free_libraryinfo (cc65_dbginfo Handle, const cc65_libraryinfo* Info)
 /* Free a library info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Just free the memory */
-    xfree (Info);
+    xfree ((cc65_libraryinfo*) Info);
 }
 
 
@@ -4641,56 +4610,16 @@ void cc65_free_libraryinfo (cc65_dbginfo Handle, cc65_libraryinfo* Info)
 
 
 
-cc65_lineinfo* cc65_lineinfo_byaddr (cc65_dbginfo Handle, unsigned long Addr)
-/* Return line information for the given address. The function returns 0
- * if no line information was found.
- */
-{
-    LineInfoListEntry* E;
-    cc65_lineinfo*  D = 0;
-
-    /* Check the parameter */
-    assert (Handle != 0);
-
-    /* Search in the line infos for address */
-    E = FindLineInfoByAddr (&((DbgInfo*) Handle)->LineInfoByAddr, Addr);
-
-    /* Do we have line infos? */
-    if (E != 0) {
-
-        unsigned I;
-
-        /* Prepare the struct we will return to the caller */
-        D = new_cc65_lineinfo (E->Count);
-        if (E->Count == 1) {
-            CopyLineInfo (D->data, E->Data);
-        } else {
-            for (I = 0; I < D->count; ++I) {
-                /* Copy data */
-                CopyLineInfo (D->data + I, ((LineInfo**) E->Data)[I]);
-            }
-        }
-    }
-
-    /* Return the struct we've created */
-    return D;
-}
-
-
-
-cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
-                                     cc65_line Line)
-/* Return line information for a file/line number combination. The function
- * returns NULL if no line information was found.
+const cc65_lineinfo* cc65_lineinfo_byline (cc65_dbginfo Handle, unsigned FileId,
+                                           cc65_line Line)
+/* Return line information for a source file/line number combination. The
+ * function returns NULL if no line information was found.
  */
 {
     DbgInfo*        Info;
     FileInfo*       F;
     cc65_lineinfo*  D;
-    int             Found;
-    unsigned        FileIndex;
-    unsigned        I;
-    Collection      LineInfoList = COLLECTION_INITIALIZER;
+    LineInfo*       L = 0;
 
     /* Check the parameter */
     assert (Handle != 0);
@@ -4698,70 +4627,27 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
     /* The handle is actually a pointer to a debug info struct */
     Info = (DbgInfo*) Handle;
 
-    /* Search for the first file with this name */
-    Found = FindFileInfoByName (&Info->FileInfoByName, FileName, &FileIndex);
-    if (!Found) {
+    /* Check if the source file id is valid */
+    if (FileId >= CollCount (&Info->FileInfoById)) {
         return 0;
     }
 
-    /* Loop over all files with this name */
-    F = CollAt (&Info->FileInfoByName, FileIndex);
-    while (Found) {
+    /* Get the file */
+    F = CollAt (&Info->FileInfoById, FileId);
 
-        unsigned LineIndex;
-        LineInfo* L = 0;
+    /* Search in the file for the given line */
+    L = FindLineInfoByLine (&F->LineInfoByLine, Line);
 
-        /* Search in the file for the given line */
-        Found = FindLineInfoByLine (&F->LineInfoByLine, Line, &LineIndex);
-        if (Found) {
-            L = CollAt (&F->LineInfoByLine, LineIndex);
-        }
-
-        /* Add all line infos for this line */
-        while (Found) {
-            /* Add next */
-            CollAppend (&LineInfoList, L);
-
-            /* Check if the next one is also a match */
-            if (++LineIndex >= CollCount (&F->LineInfoByLine)) {
-                break;
-            }
-            L = CollAt (&F->LineInfoByLine, LineIndex);
-            if (L->Line != Line) {
-                Found = 0;
-            }
-        }
-
-        /* Next entry */
-        ++FileIndex;
-
-        /* If the index is valid, check if the next entry is a file with the
-         * same name.
-         */
-        if (FileIndex < CollCount (&Info->FileInfoByName)) {
-            F = CollAt (&Info->FileInfoByName, FileIndex);
-            Found = (strcmp (F->Name, FileName) == 0);
-        } else {
-            Found = 0;
-        }
-    }
-
-    /* Check if we have entries */
-    if (CollCount (&LineInfoList) == 0) {
-        /* Nope */
+    /* Bail out if we didn't find the line */
+    if (L == 0) {
         return 0;
     }
 
     /* Prepare the struct we will return to the caller */
-    D = new_cc65_lineinfo (CollCount (&LineInfoList));
+    D = new_cc65_lineinfo (1);
 
     /* Copy the data */
-    for (I = 0; I < CollCount (&LineInfoList); ++I) {
-        CopyLineInfo (D->data + I, CollAt (&LineInfoList, I));
-    }
-
-    /* Delete the temporary data collection */
-    CollDone (&LineInfoList);
+    CopyLineInfo (D->data, L);
 
     /* Return the allocated struct */
     return D;
@@ -4769,14 +4655,14 @@ cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo Handle, const char* FileName,
 
 
 
-void cc65_free_lineinfo (cc65_dbginfo Handle, cc65_lineinfo* Info)
+void cc65_free_lineinfo (cc65_dbginfo Handle, const cc65_lineinfo* Info)
 /* Free line info returned by one of the other functions */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Just free the memory */
-    xfree (Info);
+    xfree ((cc65_lineinfo*) Info);
 }
 
 
@@ -4787,7 +4673,7 @@ void cc65_free_lineinfo (cc65_dbginfo Handle, cc65_lineinfo* Info)
 
 
 
-cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
+const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
 /* Return a list of all modules */
 {
     DbgInfo*            Info;
@@ -4806,7 +4692,7 @@ cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (&Info->ModInfoById); ++I) {
         /* Copy the data */
-        CopyModInfo (D->data + I, CollAt (&Info->ModInfoById, I));
+        CopyModInfo (D->data + I, CollConstAt (&Info->ModInfoById, I));
     }
 
     /* Return the result */
@@ -4815,7 +4701,7 @@ cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
 
 
 
-cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a module with a specific id. The function
  * returns NULL if the id is invalid (no such module) and otherwise a
  * cc65_moduleinfo structure with one entry that contains the requested
@@ -4840,7 +4726,7 @@ cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_moduleinfo (1);
 
     /* Fill in the data */
-    CopyModInfo (D->data, CollAt (&Info->ModInfoById, Id));
+    CopyModInfo (D->data, CollConstAt (&Info->ModInfoById, Id));
 
     /* Return the result */
     return D;
@@ -4848,14 +4734,14 @@ cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-void cc65_free_moduleinfo (cc65_dbginfo Handle, cc65_moduleinfo* Info)
+void cc65_free_moduleinfo (cc65_dbginfo Handle, const cc65_moduleinfo* Info)
 /* Free a module info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Just free the memory */
-    xfree (Info);
+    xfree ((cc65_moduleinfo*) Info);
 }
 
 
@@ -4866,7 +4752,7 @@ void cc65_free_moduleinfo (cc65_dbginfo Handle, cc65_moduleinfo* Info)
 
 
 
-cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
+const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
 /* Return a list of all spans */
 {
     DbgInfo*            Info;
@@ -4885,14 +4771,16 @@ cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (&Info->SpanInfoById); ++I) {
         /* Copy the data */
-        CopySpanInfo (D->data + I, CollAt (&Info->SpanInfoById, I));
+        CopySpanInfo (D->data + I, CollConstAt (&Info->SpanInfoById, I));
     }
 
     /* Return the result */
     return D;
 }
 
-cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo Handle, unsigned Id)
+
+
+const cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a span with a specific id. The function
  * returns NULL if the id is invalid (no such span) and otherwise a
  * cc65_spaninfo structure with one entry that contains the requested
@@ -4917,7 +4805,7 @@ cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_spaninfo (1);
 
     /* Fill in the data */
-    CopySpanInfo (D->data, CollAt (&Info->SpanInfoById, Id));
+    CopySpanInfo (D->data, CollConstAt (&Info->SpanInfoById, Id));
 
     /* Return the result */
     return D;
@@ -4925,14 +4813,51 @@ cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-void cc65_free_spaninfo (cc65_dbginfo Handle, cc65_spaninfo* Info)
+const cc65_spaninfo* cc65_spaninfo_byaddr (cc65_dbginfo Handle, unsigned long Addr)
+/* Return span information for the given address. The function returns NULL
+ * if no spans were found for this address.
+ */
+{
+    SpanInfoListEntry* E;
+    cc65_spaninfo*  D = 0;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* Search for spans that cover this address */
+    E = FindSpanInfoByAddr (&((DbgInfo*) Handle)->SpanInfoByAddr, Addr);
+
+    /* Do we have spans? */
+    if (E != 0) {
+
+        unsigned I;
+
+        /* Prepare the struct we will return to the caller */
+        D = new_cc65_spaninfo (E->Count);
+        if (E->Count == 1) {
+            CopySpanInfo (D->data, E->Data);
+        } else {
+            for (I = 0; I < D->count; ++I) {
+                /* Copy data */
+                CopySpanInfo (D->data + I, ((SpanInfo**) E->Data)[I]);
+            }
+        }
+    }
+
+    /* Return the struct we've created */
+    return D;
+}
+
+
+
+void cc65_free_spaninfo (cc65_dbginfo Handle, const cc65_spaninfo* Info)
 /* Free a span info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Just free the memory */
-    xfree (Info);
+    xfree ((cc65_spaninfo*) Info);
 }
 
 
@@ -4943,7 +4868,7 @@ void cc65_free_spaninfo (cc65_dbginfo Handle, cc65_spaninfo* Info)
 
 
 
-cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
+const cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
 /* Return a list of all source files */
 {
     DbgInfo*            Info;
@@ -4966,7 +4891,7 @@ cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (FileInfoById); ++I) {
         /* Copy the data */
-        CopyFileInfo (D->data + I, CollAt (FileInfoById, I));
+        CopyFileInfo (D->data + I, CollConstAt (FileInfoById, I));
     }
 
     /* Return the result */
@@ -4975,7 +4900,7 @@ cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
 
 
 
-cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a source file with a specific id. The function
  * returns NULL if the id is invalid (no such source file) and otherwise a
  * cc65_sourceinfo structure with one entry that contains the requested
@@ -5000,7 +4925,7 @@ cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_sourceinfo (1);
 
     /* Fill in the data */
-    CopyFileInfo (D->data, CollAt (&Info->FileInfoById, Id));
+    CopyFileInfo (D->data, CollConstAt (&Info->FileInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5009,14 +4934,14 @@ cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo Handle, unsigned ModId)
+const cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo Handle, unsigned Id)
 /* Return information about the source files used to build a module. The
  * function returns NULL if the module id is invalid (no such module) and
  * otherwise a cc65_sourceinfo structure with one entry per source file.
  */
 {
     DbgInfo*            Info;
-    ModInfo*            M;
+    const ModInfo*      M;
     cc65_sourceinfo*    D;
     unsigned            I;
 
@@ -5027,19 +4952,19 @@ cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo Handle, unsigned ModId)
     Info = (DbgInfo*) Handle;
 
     /* Check if the module id is valid */
-    if (ModId >= CollCount (&Info->ModInfoById)) {
+    if (Id >= CollCount (&Info->ModInfoById)) {
         return 0;
     }
 
     /* Get a pointer to the module info */
-    M = CollAt (&Info->ModInfoById, ModId);
+    M = CollConstAt (&Info->ModInfoById, Id);
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_sourceinfo (CollCount (&M->FileInfoByName));
 
     /* Fill in the data */
     for (I = 0; I < CollCount (&M->FileInfoByName); ++I) {
-        CopyFileInfo (D->data + I, CollAt (&M->FileInfoByName, I));
+        CopyFileInfo (D->data + I, CollConstAt (&M->FileInfoByName, I));
     }
 
     /* Return the result */
@@ -5048,14 +4973,14 @@ cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo Handle, unsigned ModId)
 
 
 
-void cc65_free_sourceinfo (cc65_dbginfo Handle, cc65_sourceinfo* Info)
+void cc65_free_sourceinfo (cc65_dbginfo Handle, const cc65_sourceinfo* Info)
 /* Free a source info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Free the memory */
-    xfree (Info);
+    xfree ((cc65_sourceinfo*) Info);
 }
 
 
@@ -5066,11 +4991,11 @@ void cc65_free_sourceinfo (cc65_dbginfo Handle, cc65_sourceinfo* Info)
 
 
 
-cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
+const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 /* Return a list of all segments referenced in the debug information */
 {
     DbgInfo*            Info;
-    Collection*         SegInfoByName;
+    const Collection*   SegInfoByName;
     cc65_segmentinfo*   D;
     unsigned            I;
 
@@ -5089,7 +5014,7 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (SegInfoByName); ++I) {
         /* Copy the data */
-        CopySegInfo (D->data + I, CollAt (SegInfoByName, I));
+        CopySegInfo (D->data + I, CollConstAt (SegInfoByName, I));
     }
 
     /* Return the result */
@@ -5098,7 +5023,7 @@ cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 
 
 
-cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a segment with a specific id. The function returns
  * NULL if the id is invalid (no such segment) and otherwise a segmentinfo
  * structure with one entry that contains the requested segment information.
@@ -5122,7 +5047,7 @@ cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_segmentinfo (1);
 
     /* Fill in the data */
-    CopySegInfo (D->data, CollAt (&Info->SegInfoById, Id));
+    CopySegInfo (D->data, CollConstAt (&Info->SegInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5130,14 +5055,14 @@ cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-void cc65_free_segmentinfo (cc65_dbginfo Handle, cc65_segmentinfo* Info)
+void cc65_free_segmentinfo (cc65_dbginfo Handle, const cc65_segmentinfo* Info)
 /* Free a segment info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Free the memory */
-    xfree (Info);
+    xfree ((cc65_segmentinfo*) Info);
 }
 
 
@@ -5148,7 +5073,7 @@ void cc65_free_segmentinfo (cc65_dbginfo Handle, cc65_segmentinfo* Info)
 
 
 
-cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return the symbol with a given id. The function returns NULL if no symbol
  * with this id was found.
  */
@@ -5171,7 +5096,7 @@ cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_symbolinfo (1);
 
     /* Fill in the data */
-    CopySymInfo (D->data, CollAt (&Info->SymInfoById, Id));
+    CopySymInfo (D->data, CollConstAt (&Info->SymInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5179,7 +5104,7 @@ cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
+const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
 /* Return a list of symbols with a given name. The function returns NULL if
  * no symbol with this name was found.
  */
@@ -5211,7 +5136,7 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
      */
     Count = 1;
     while ((unsigned) Index + Count < CollCount (SymInfoByName)) {
-        const SymInfo* S = CollAt (SymInfoByName, (unsigned) Index + Count);
+        const SymInfo* S = CollConstAt (SymInfoByName, (unsigned) Index + Count);
         if (strcmp (S->Name, Name) != 0) {
             break;
         }
@@ -5224,7 +5149,7 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
     /* Fill in the data */
     for (I = 0; I < Count; ++I) {
         /* Copy the data */
-        CopySymInfo (D->data + I, CollAt (SymInfoByName, Index++));
+        CopySymInfo (D->data + I, CollConstAt (SymInfoByName, Index++));
     }
 
     /* Return the result */
@@ -5233,7 +5158,8 @@ cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name)
 
 
 
-cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65_addr End)
+const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start,
+                                            cc65_addr End)
 /* Return a list of labels in the given range. End is inclusive. The function
  * return NULL if no symbols within the given range are found. Non label
  * symbols are ignored and not returned.
@@ -5297,7 +5223,7 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65
     /* Fill in the data */
     for (I = 0; I < CollCount (&SymInfoList); ++I) {
         /* Copy the data */
-        CopySymInfo (D->data + I, CollAt (&SymInfoList, I));
+        CopySymInfo (D->data + I, CollConstAt (&SymInfoList, I));
     }
 
     /* Free the collection */
@@ -5309,14 +5235,14 @@ cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start, cc65
 
 
 
-void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info)
+void cc65_free_symbolinfo (cc65_dbginfo Handle, const cc65_symbolinfo* Info)
 /* Free a symbol info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Free the memory */
-    xfree (Info);
+    xfree ((cc65_symbolinfo*) Info);
 }
 
 
@@ -5327,7 +5253,7 @@ void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info)
 
 
 
-cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return the scope with a given id. The function returns NULL if no scope
  * with this id was found.
  */
@@ -5350,7 +5276,7 @@ cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_scopeinfo (1);
 
     /* Fill in the data */
-    CopyScopeInfo (D->data, CollAt (&Info->ScopeInfoById, Id));
+    CopyScopeInfo (D->data, CollConstAt (&Info->ScopeInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5358,13 +5284,13 @@ cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
+const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
 /* Return the list of scopes for one module. The function returns NULL if no
  * scope with the given id was found.
  */
 {
     DbgInfo*            Info;
-    ModInfo*            M;
+    const ModInfo*      M;
     cc65_scopeinfo*     D;
     unsigned            I;
 
@@ -5380,14 +5306,14 @@ cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
     }
 
     /* Get a pointer to the module info */
-    M = CollAt (&Info->ModInfoById, ModId);
+    M = CollConstAt (&Info->ModInfoById, ModId);
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_scopeinfo (CollCount (&M->ScopeInfoByName));
 
     /* Fill in the data */
     for (I = 0; I < CollCount (&M->ScopeInfoByName); ++I) {
-        CopyScopeInfo (D->data + I, CollAt (&M->ScopeInfoByName, I));
+        CopyScopeInfo (D->data + I, CollConstAt (&M->ScopeInfoByName, I));
     }
 
 
@@ -5397,14 +5323,14 @@ cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
 
 
 
-void cc65_free_scopeinfo (cc65_dbginfo Handle, cc65_scopeinfo* Info)
+void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info)
 /* Free a scope info record */
 {
     /* Just for completeness, check the handle */
     assert (Handle != 0);
 
     /* Free the memory */
-    xfree (Info);
+    xfree ((cc65_scopeinfo*) Info);
 }
 
 

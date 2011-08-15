@@ -64,8 +64,8 @@ typedef unsigned cc65_size;             /* Used to store (65xx) sizes */
 /* A structure that is used to store a list of ids */
 typedef struct cc65_idlist cc65_idlist;
 struct cc65_idlist {
-    unsigned    count;                  /* Number of elements */
-    unsigned    ids[1];                 /* List of ids, number is dynamic */
+    unsigned            count;          /* Number of elements */
+    unsigned*           ids;            /* List of ids, number is dynamic */
 };
 
 
@@ -98,7 +98,7 @@ typedef void (*cc65_errorfunc) (const struct cc65_parseerror*);
 /* Pointer to an opaque data structure containing information from the debug
  * info file. Actually a handle to the data in the file.
  */
-typedef void* cc65_dbginfo;
+typedef const void* cc65_dbginfo;
 
 
 
@@ -136,17 +136,17 @@ struct cc65_libraryinfo {
 
 
 
-cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo handle);
+const cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo handle);
 /* Return a list of all libraries */
 
-cc65_libraryinfo* cc65_libraryinfo_byid (cc65_dbginfo handle, unsigned id);
+const cc65_libraryinfo* cc65_libraryinfo_byid (cc65_dbginfo handle, unsigned id);
 /* Return information about a library with a specific id. The function
  * returns NULL if the id is invalid (no such library) and otherwise a
  * cc65_libraryinfo structure with one entry that contains the requested
  * library information.
  */
 
-void cc65_free_libraryinfo (cc65_dbginfo handle, cc65_libraryinfo* info);
+void cc65_free_libraryinfo (cc65_dbginfo handle, const cc65_libraryinfo* info);
 /* Free a library info record */
 
 
@@ -164,27 +164,15 @@ typedef enum {
     CC65_LINE_MACRO,                    /* Macro expansion */
 } cc65_line_type;
 
-/* Line information.
- * Notes:
- *   - line_end is inclusive
- *   - output_name may be NULL if the data wasn't written to the output file
- *     (example: bss segment)
- *   - output_offs is invalid if there is no output_name, and may not be of
- *     much use in case of a relocatable output file
- */
+/* Line information */
 typedef struct cc65_linedata cc65_linedata;
 struct cc65_linedata {
     unsigned            line_id;        /* Internal id of this record */
-    cc65_addr           line_start;     /* Start address for this line */
-    cc65_addr           line_end;       /* End address for this line */
-    const char*         source_name;    /* Name of the file */
-    unsigned long       source_size;    /* Size of file */
-    unsigned long       source_mtime;   /* Modification time */
+    unsigned            source_id;      /* Id of the source file */
     cc65_line           source_line;    /* Line number */
-    const char*         output_name;    /* Output file */
-    unsigned long       output_offs;    /* Offset in output file */
     cc65_line_type      line_type;      /* Type of line */
     unsigned            count;          /* Nesting counter for macros */
+    cc65_idlist         span_list;      /* List of spans for this line */
 };
 
 typedef struct cc65_lineinfo cc65_lineinfo;
@@ -195,18 +183,14 @@ struct cc65_lineinfo {
 
 
 
-cc65_lineinfo* cc65_lineinfo_byaddr (cc65_dbginfo handle, unsigned long addr);
-/* Return line information for the given address. The function returns NULL
- * if no line information was found.
+const cc65_lineinfo* cc65_lineinfo_byline (cc65_dbginfo handle,
+                                           unsigned source_id,
+                                           cc65_line line);
+/* Return line information for a source file/line number combination. The
+ * function returns NULL if no line information was found.
  */
 
-cc65_lineinfo* cc65_lineinfo_byname (cc65_dbginfo handle, const char* filename,
-                                     cc65_line line);
-/* Return line information for a file/line number combination. The function
- * returns NULL if no line information was found.
- */
-
-void cc65_free_lineinfo (cc65_dbginfo handle, cc65_lineinfo* info);
+void cc65_free_lineinfo (cc65_dbginfo handle, const cc65_lineinfo* info);
 /* Free line info returned by one of the other functions */
 
 
@@ -235,17 +219,17 @@ struct cc65_moduleinfo {
 
 
 
-cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo handle);
+const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo handle);
 /* Return a list of all modules */
 
-cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo handle, unsigned id);
+const cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo handle, unsigned id);
 /* Return information about a module with a specific id. The function
  * returns NULL if the id is invalid (no such module) and otherwise a
  * cc65_moduleinfo structure with one entry that contains the requested
  * module information.
  */
 
-void cc65_free_moduleinfo (cc65_dbginfo handle, cc65_moduleinfo* info);
+void cc65_free_moduleinfo (cc65_dbginfo handle, const cc65_moduleinfo* info);
 /* Free a module info record */
 
 
@@ -260,8 +244,8 @@ void cc65_free_moduleinfo (cc65_dbginfo handle, cc65_moduleinfo* info);
 typedef struct cc65_spandata cc65_spandata;
 struct cc65_spandata {
     unsigned            span_id;        /* The internal span id */
-    cc65_addr           span_offs;      /* Offset of the span in the segment */
-    cc65_size           span_size;      /* Size of the span */
+    cc65_addr           span_start;     /* Start of the span */
+    cc65_addr           span_end;       /* End of the span (inclusive!) */
     unsigned            segment_id;     /* Id of the segment */
 };
 
@@ -273,17 +257,23 @@ struct cc65_spaninfo {
 
 
 
-cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo handle);
-/* Return a list of all spans */
+const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo handle);
+/* Return a list of all spans. BEWARE: Large! */
 
-cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo handle, unsigned id);
+const cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo handle, unsigned id);
 /* Return information about a span with a specific id. The function
  * returns NULL if the id is invalid (no such span) and otherwise a
  * cc65_spaninfo structure with one entry that contains the requested
  * span information.
  */
 
-void cc65_free_spaninfo (cc65_dbginfo handle, cc65_spaninfo* info);
+const cc65_spaninfo* cc65_spaninfo_byaddr (cc65_dbginfo handle,
+                                           unsigned long addr);
+/* Return span information for the given address. The function returns NULL
+ * if no spans were found for this address.
+ */
+
+void cc65_free_spaninfo (cc65_dbginfo handle, const cc65_spaninfo* info);
 /* Free a span info record */
 
 
@@ -311,24 +301,24 @@ struct cc65_sourceinfo {
 
 
 
-cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo handle);
+const cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo handle);
 /* Return a list of all source files */
 
-cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo handle, unsigned id);
+const cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo handle, unsigned id);
 /* Return information about a source file with a specific id. The function
  * returns NULL if the id is invalid (no such source file) and otherwise a
  * cc65_sourceinfo structure with one entry that contains the requested
  * source file information.
  */
 
-cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo handle,
-                                           unsigned module_id);
+const cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo handle,
+                                                 unsigned module_id);
 /* Return information about the source files used to build a module. The
  * function returns NULL if the module id is invalid (no such module) and
  * otherwise a cc65_sourceinfo structure with one entry per source file.
  */
 
-void cc65_free_sourceinfo (cc65_dbginfo handle, cc65_sourceinfo* info);
+void cc65_free_sourceinfo (cc65_dbginfo handle, const cc65_sourceinfo* info);
 /* Free a source info record */
 
 
@@ -364,16 +354,16 @@ struct cc65_segmentinfo {
 
 
 
-cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo handle);
+const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo handle);
 /* Return a list of all segments referenced in the debug information */
 
-cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo handle, unsigned id);
+const cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo handle, unsigned id);
 /* Return information about a segment with a specific id. The function returns
  * NULL if the id is invalid (no such segment) and otherwise a cc65_segmentinfo
  * structure with one entry that contains the requested segment information.
  */
 
-void cc65_free_segmentinfo (cc65_dbginfo handle, cc65_segmentinfo* info);
+void cc65_free_segmentinfo (cc65_dbginfo handle, const cc65_segmentinfo* info);
 /* Free a segment info record */
 
 
@@ -413,24 +403,24 @@ struct cc65_symbolinfo {
 
 
 
-cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo handle, unsigned id);
+const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo handle, unsigned id);
 /* Return the symbol with a given id. The function returns NULL if no symbol
  * with this id was found.
  */
 
-cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo handle, const char* name);
+const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo handle, const char* name);
 /* Return a list of symbols with a given name. The function returns NULL if
  * no symbol with this name was found.
  */
 
-cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
-                                      cc65_addr start, cc65_addr end);
+const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
+                                            cc65_addr start, cc65_addr end);
 /* Return a list of labels in the given range. end is inclusive. The function
  * return NULL if no symbols within the given range are found. Non label
  * symbols are ignored and not returned.
  */
 
-void cc65_free_symbolinfo (cc65_dbginfo Handle, cc65_symbolinfo* Info);
+void cc65_free_symbolinfo (cc65_dbginfo Handle, const cc65_symbolinfo* Info);
 /* Free a symbol info record */
 
 
@@ -469,17 +459,17 @@ struct cc65_scopeinfo {
 
 
 
-cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo handle, unsigned id);
+const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo handle, unsigned id);
 /* Return the scope with a given id. The function returns NULL if no scope
  * with this id was found.
  */
 
-cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo handle, unsigned module_id);
+const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo handle, unsigned module_id);
 /* Return the list of scopes for one module. The function returns NULL if no
  * scope with the given id was found.
  */
 
-void cc65_free_scopeinfo (cc65_dbginfo Handle, cc65_scopeinfo* Info);
+void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info);
 /* Free a scope info record */
 
 

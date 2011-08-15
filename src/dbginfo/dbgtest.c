@@ -91,10 +91,7 @@ static void PrintSegmentData (const cc65_segmentdata* D)
 static void PrintLineData (const cc65_linedata* D)
 /* Print the data for one source line */
 {
-    printf ("  %s(%lu)", D->source_name, (unsigned long) D->source_line);
-    if (D->output_name) {
-        printf (" [%s($%06lX)]", D->output_name, D->output_offs);
-    }
+    printf ("  file %u", D->source_id);
     switch (D->line_type) {
         case CC65_LINE_ASM:
             printf (": Assembler source");
@@ -119,7 +116,7 @@ static void PrintSymbolData (const cc65_symboldata* D)
 {
     char Segment[256] = { 0 };  /* Needs dynamic alloc ### */
     if (D->segment_id != CC65_INV_ID) {
-        cc65_segmentinfo* I = cc65_segmentinfo_byid (Info, D->segment_id);
+        const cc65_segmentinfo* I = cc65_segmentinfo_byid (Info, D->segment_id);
         if (I && I->count == 1) {
             sprintf (Segment, "segment=%s,", I->data[0].segment_name);
             cc65_free_segmentinfo (Info, I);
@@ -136,7 +133,7 @@ static void PrintSymbolData (const cc65_symboldata* D)
 
 
 
-static void PrintSourceInfo (cc65_sourceinfo* Sources)
+static void PrintSourceInfo (const cc65_sourceinfo* Sources)
 /* Output the list of source files */
 {
     unsigned I;
@@ -149,7 +146,7 @@ static void PrintSourceInfo (cc65_sourceinfo* Sources)
 
 
 
-static void PrintSegmentInfo (cc65_segmentinfo* Segments)
+static void PrintSegmentInfo (const cc65_segmentinfo* Segments)
 /* Output the list of segments */
 {
     unsigned I;
@@ -190,12 +187,12 @@ static void PrintSymbolInfo (const cc65_symbolinfo* Symbols)
 
 int main (int argc, char** argv)
 {
-    const char*         Input;
-    cc65_sourceinfo*    Sources;
-    cc65_segmentinfo*   Segments;
-    cc65_lineinfo*      Lines;
-    cc65_symbolinfo*    Symbols;
-    cc65_addr           Addr;
+    const char*                 Input;
+    const cc65_sourceinfo*      Sources;
+    const cc65_segmentinfo*     Segments;
+    const cc65_lineinfo*        Lines;
+    const cc65_symbolinfo*      Symbols;
+    cc65_addr                   Addr;
 
 
     /* Input file is argument */
@@ -224,6 +221,7 @@ int main (int argc, char** argv)
     PrintSegmentInfo (Segments);
     cc65_free_segmentinfo (Info, Segments);
 
+#if 0
     /* Check one line */
     printf ("Requesting line info for crt0.s(59):\n");
     Lines = cc65_lineinfo_byname (Info, "crt0.s", 59);
@@ -246,7 +244,7 @@ int main (int argc, char** argv)
             cc65_free_lineinfo (Info, Lines);
         }
     }
-
+#endif
     /* Check for address of main */
     printf ("Requesting address of _main:\n");
     Symbols = cc65_symbol_byname (Info, "_main");

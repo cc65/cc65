@@ -47,9 +47,9 @@
 /* Type of a file position */
 typedef struct FilePos FilePos;
 struct FilePos {
-    unsigned long   Line;               /* Line */
-    unsigned        Col;                /* Column */
-    unsigned        Name;               /* File */
+    unsigned    Line;               /* Line */
+    unsigned    Col;                /* Column */
+    unsigned    Name;               /* File */
 };
 
 /* Initializer for a FilePos */

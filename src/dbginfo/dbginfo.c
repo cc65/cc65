@@ -981,6 +981,26 @@ static void DBGPRINT(const char* format, ...) {}
 
 
 /*****************************************************************************/
+/*                                 Id lists                                  */
+/*****************************************************************************/
+
+
+
+static cc65_idlist* new_cc65_idlist (unsigned Count)
+/* Allocate and return a new idlist with the given count. The count field in
+ * the list will already be set on return.
+ */
+{
+    /* Allocate memory */
+    cc65_idlist* L = xmalloc (sizeof (*L) - sizeof (L->ids[0]) +
+                              Count * sizeof (L->ids[0]));
+    L->count = Count;
+    return L;
+}
+
+
+
+/*****************************************************************************/
 /*                                 File info                                 */
 /*****************************************************************************/
 
@@ -1023,7 +1043,7 @@ static cc65_sourceinfo* new_cc65_sourceinfo (unsigned Count)
 {
     cc65_sourceinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                   Count * sizeof (S->data[0]));
-    S->count = Count;
+    S->count = Count;        
     return S;
 }
 

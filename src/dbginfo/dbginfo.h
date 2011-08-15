@@ -61,6 +61,13 @@ typedef unsigned cc65_size;             /* Used to store (65xx) sizes */
 /* A value that is used to mark invalid ids */
 #define CC65_INV_ID     (~0U)
 
+/* A structure that is used to store a list of ids */
+typedef struct cc65_idlist cc65_idlist;
+struct cc65_idlist {
+    unsigned    count;                  /* Number of elements */
+    unsigned    ids[1];                 /* List of ids, number is dynamic */
+};
+
 
 
 /*****************************************************************************/

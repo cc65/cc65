@@ -818,18 +818,6 @@ static unsigned CollIdAt (Collection* C, unsigned Index)
 
 
 
-static void* CollFirst (Collection* C)
-/* Return the first item in a collection */
-{
-    /* We must have at least one entry */
-    assert (C->Count > 0);
-
-    /* Return the element */
-    return C->Items[0].Ptr;
-}
-
-
-
 static void CollQuickSort (Collection* C, int Lo, int Hi,
        	                   int (*Compare) (const void*, const void*))
 /* Internal recursive sort function. */
@@ -1043,7 +1031,7 @@ static cc65_sourceinfo* new_cc65_sourceinfo (unsigned Count)
 {
     cc65_sourceinfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
                                   Count * sizeof (S->data[0]));
-    S->count = Count;        
+    S->count = Count;
     return S;
 }
 
@@ -1276,7 +1264,7 @@ static void CreateLineInfoList (LineInfoList* L, Collection* LineInfos)
     }
 
     /* Step 1: Determine the number of unique address entries needed */
-    LI = CollFirst (LineInfos);
+    LI = CollAt (LineInfos, 0);
     L->Count += (LI->End - LI->Start) + 1;
     End = LI->End;
     for (I = 1; I < CollCount (LineInfos); ++I) {
@@ -1304,7 +1292,7 @@ static void CreateLineInfoList (LineInfoList* L, Collection* LineInfos)
 
     /* Step 3: Determine the number of entries per unique address */
     List = L->List;
-    LI = CollFirst (LineInfos);
+    LI = CollAt (LineInfos, 0);
     StartIndex = 0;
     Start = LI->Start;
     End = LI->End;
@@ -1358,7 +1346,7 @@ static void CreateLineInfoList (LineInfoList* L, Collection* LineInfos)
 
     /* Step 5: Enter the data into the table */
     List = L->List;
-    LI = CollFirst (LineInfos);
+    LI = CollAt (LineInfos, 0);
     StartIndex = 0;
     Start = LI->Start;
     End = LI->End;

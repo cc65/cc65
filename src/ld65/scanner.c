@@ -93,7 +93,7 @@ void CfgWarning (const FilePos* Pos, const char* Format, ...)
     SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Warning ("%s(%lu): %s",
+    Warning ("%s(%u): %s",
              GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
 }
@@ -110,7 +110,7 @@ void CfgError (const FilePos* Pos, const char* Format, ...)
     SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Error ("%s(%lu): %s",
+    Error ("%s(%u): %s",
            GetString (Pos->Name), Pos->Line, SB_GetConstBuf (&Buf));
     SB_Done (&Buf);
 }

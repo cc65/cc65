@@ -768,7 +768,7 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
 	/* Print the data */
         printf ("      Type:%26u\n", LI_GET_TYPE (Type));
         printf ("      Count:%25u\n", LI_GET_COUNT (Type));
-       	printf ("      Line:%26lu\n", Pos.Line);
+       	printf ("      Line:%26u\n", Pos.Line);
        	printf ("      Col:%27u\n", Pos.Col);
        	printf ("      Name:%26u\n", Pos.Name);
     }

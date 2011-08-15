@@ -87,17 +87,17 @@ next:   plx			; Restore index
 ; x offset for the line starting point
 ; - a positive value means relative to the frame left edge
 ; - a negative value menas relative to the frame right edge
-XOFFS:  .byte	0, 0, 0, -2, 1, 0, 1, -2
+XOFFS:  .byte  	0, 0, 0, <-2, 1, 0, 1, <-2
 
 ; y offset for the line starting point
 ; - a positive value means relative to the frame top
 ; - a negative value menas relative to the frame bottom
-YOFFS:  .byte	0, 1, -2, 1, 0, 0, -2, 0
+YOFFS:  .byte	0, 1, <-2, 1, 0, 0, <-2, 0
 
 ; length of the line relative to the frame size
 ; - a negative value for hlines means shorter than the width
 ; - a negative value for vlines menas shorter than the height
-LENGTH: .byte	0, -2, 0, -2, -2, 0, -2, 0
+LENGTH: .byte	0, <-2, 0, <-2, <-2, 0, <-2, 0
 
 ; character to use for drawing the line
 ; - hibit set means normal printable character

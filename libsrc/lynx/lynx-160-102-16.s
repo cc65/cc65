@@ -834,7 +834,7 @@ OUTTEXT:
 	lda	Y1+1
 	sta	text_y+1
 
-     	ldy	#-1		; Calculate string length
+       	ldy    	#<-1		; Calculate string length
 @L2:
 	iny
 	lda	(STRPTR),y

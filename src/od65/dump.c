@@ -676,6 +676,8 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 
     	unsigned long 	Value = 0;
         unsigned long   Size = 0;
+        unsigned        ImportId = 0;
+        unsigned        ExportId = 0;
 
        	/* Read the data for one symbol */
        	unsigned Type          = ReadVar (F);
@@ -690,6 +692,12 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	}
         if (SYM_HAS_SIZE (Type)) {
             Size = ReadVar (F);
+        }
+        if (SYM_IS_IMPORT (Type)) {
+            ImportId = ReadVar (F);
+        }
+        if (SYM_IS_EXPORT (Type)) {
+            ExportId = ReadVar (F);
         }
 
         /* Skip the line infos */
@@ -709,6 +717,12 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	}
        	if (SYM_HAS_SIZE (Type)) {
 	    printf ("      Size:%20s0x%04lX  (%lu)\n", "", Size, Size);
+	}
+       	if (SYM_IS_IMPORT (Type)) {
+	    printf ("      Import:%24u\n", ImportId);
+	}
+       	if (SYM_IS_EXPORT (Type)) {
+	    printf ("      Export:%24u\n", ExportId);
 	}
     }
 

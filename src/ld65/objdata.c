@@ -211,6 +211,30 @@ struct Section* GetObjSection (ObjData* O, unsigned Id)
 
 
 
+struct Import* GetObjImport (ObjData* O, unsigned Id)
+/* Get an import from an object file checking for a valid index */
+{
+    if (Id >= CollCount (&O->Imports)) {
+        Error ("Invalid import index (%u) in module `%s'",
+               Id, GetObjFileName (O));
+    }
+    return CollAtUnchecked (&O->Imports, Id);
+}
+
+
+
+struct Export* GetObjExport (ObjData* O, unsigned Id)
+/* Get an export from an object file checking for a valid index */
+{
+    if (Id >= CollCount (&O->Exports)) {
+        Error ("Invalid export index (%u) in module `%s'",
+               Id, GetObjFileName (O));
+    }
+    return CollAtUnchecked (&O->Exports, Id);
+}
+
+
+
 struct Scope* GetObjScope (ObjData* O, unsigned Id)
 /* Get a scope from an object file checking for a valid index */
 {

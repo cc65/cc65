@@ -200,7 +200,7 @@ void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
     DbgSymCount = ReadVar (F);
     CollGrow (&O->DbgSyms, DbgSymCount);
     for (I = 0; I < DbgSymCount; ++I) {
-	CollAppend (&O->DbgSyms, ReadDbgSym (F, O));
+	CollAppend (&O->DbgSyms, ReadDbgSym (F, O, I));
     }
 }
 
@@ -276,7 +276,7 @@ void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
     CollGrow (&O->Scopes, ScopeCount);
     for (I = 0; I < ScopeCount; ++I) {
         CollAppend (&O->Scopes,  ReadScope (F, O, I));
-    }   
+    }
 }
 
 

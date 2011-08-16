@@ -85,6 +85,7 @@ struct Export {
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned            Size;           /* Size of the symbol if any */
     Collection          LineInfos;      /* Line info of definition */
+    unsigned            DbgSymId;       /* Id of debug symbol for this export */
     unsigned short      Type;		/* Type of export */
     unsigned short      AddrSize;       /* Address size of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */

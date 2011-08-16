@@ -44,6 +44,7 @@
 /* ld65 */
 #include "dbgsyms.h"
 #include "error.h"
+#include "exports.h"
 #include "expr.h"
 #include "fileio.h"
 #include "global.h"
@@ -59,6 +60,21 @@
 
 
 
+/* Definition of the debug symbol structure */
+struct DbgSym {
+    unsigned            Id;             /* Id of debug symbol */
+    DbgSym*    	       	Next;  		/* Pool linear list link */
+    ObjData*   		Obj;	    	/* Object file that exports the name */
+    Collection          LineInfos;      /* Line infos of definition */
+    ExprNode*  		Expr;		/* Expression (0 if not def'd) */
+    unsigned            Size;           /* Symbol size if any */
+    unsigned            OwnerId;        /* Id of parent/owner */
+    unsigned            ImportId;       /* Id of import if this is one */
+    unsigned            Name;  	       	/* Name */
+    unsigned short      Type;		/* Type of symbol */
+    unsigned short      AddrSize;       /* Address size of symbol */
+};
+
 /* We will collect all debug symbols in the following array and remove
  * duplicates before outputing them.
  */
@@ -72,22 +88,25 @@ static DbgSym*	DbgSymPool[256];
 
 
 
-static DbgSym* NewDbgSym (unsigned Type, unsigned char AddrSize, ObjData* O)
+static DbgSym* NewDbgSym (unsigned Id, unsigned Type, unsigned char AddrSize,
+                          ObjData* O)
 /* Create a new DbgSym and return it */
 {
     /* Allocate memory */
-    DbgSym* D    = xmalloc (sizeof (DbgSym));
+    DbgSym* D     = xmalloc (sizeof (DbgSym));
 
     /* Initialize the fields */
-    D->Next      = 0;
-    D->Obj       = O;
-    D->LineInfos = EmptyCollection;
-    D->Expr    	 = 0;
-    D->Size      = 0;
-    D->OwnerId   = ~0U;
-    D->Name 	 = 0;
-    D->Type    	 = Type;
-    D->AddrSize  = AddrSize;
+    D->Id         = Id;
+    D->Next       = 0;
+    D->Obj        = O;
+    D->LineInfos  = EmptyCollection;
+    D->Expr    	  = 0;
+    D->Size       = 0;
+    D->OwnerId    = ~0U;
+    D->ImportId   = ~0U;
+    D->Name 	  = 0;
+    D->Type    	  = Type;
+    D->AddrSize   = AddrSize;
 
     /* Return the new entry */
     return D;
@@ -141,7 +160,7 @@ static void InsertDbgSym (DbgSym* D, long Val)
 
 
 
-DbgSym* ReadDbgSym (FILE* F, ObjData* O)
+DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
 /* Read a debug symbol from a file, insert and return it */
 {
     /* Read the type and address size */
@@ -149,7 +168,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     unsigned char AddrSize = Read8 (F);
 
     /* Create a new debug symbol */
-    DbgSym* D = NewDbgSym (Type, AddrSize, O);
+    DbgSym* D = NewDbgSym (Id, Type, AddrSize, O);
 
     /* Read the id of the owner scope/symbol */
     D->OwnerId = ReadVar (F);
@@ -167,6 +186,19 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     /* Read the size */
     if (SYM_HAS_SIZE (D->Type)) {
         D->Size = ReadVar (F);
+    }
+
+    /* If this is an import, the file contains its id */
+    if (SYM_IS_IMPORT (D->Type)) {
+        D->ImportId = ReadVar (F);
+    }
+
+    /* If its an exports, there's also the export id, but we don't remember
+     * it but use it to let the export point back to us.
+     */
+    if (SYM_IS_EXPORT (D->Type)) {
+        /* Get the export from the export id, then set the our id */
+        GetObjExport (O, ReadVar (F))->DbgSymId = Id;
     }
 
     /* Last is the list of line infos for this symbol */
@@ -195,7 +227,7 @@ void ClearDbgSymTable (void)
 
 
 
-long GetDbgSymVal (const DbgSym* D)
+static long GetDbgSymVal (const DbgSym* D)
 /* Get the value of this symbol */
 {
     CHECK (D->Expr != 0);
@@ -203,7 +235,7 @@ long GetDbgSymVal (const DbgSym* D)
 }
 
 
-             
+
 void PrintDbgSyms (FILE* F)
 /* Print the debug symbols in a debug file */
 {
@@ -212,40 +244,56 @@ void PrintDbgSyms (FILE* F)
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get the object file */
-        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
 
         /* Walk through all debug symbols in this module */
         for (J = 0; J < CollCount (&O->DbgSyms); ++J) {
 
-            long Val;
-            SegExprDesc D;
-
             /* Get the next debug symbol */
             const DbgSym* S = CollConstAt (&O->DbgSyms, J);
 
-            /* Get the symbol value */
-            Val = GetDbgSymVal (S);
-
             /* Emit the base data for the entry */
             fprintf (F,
-                     "sym\tid=%u,name=\"%s\",val=0x%lX,addrsize=%s,type=%s",
+                     "sym\tid=%u,name=\"%s\",addrsize=%s,type=%s",
                      O->SymBaseId + J,
                      GetString (S->Name),
-                     Val,
                      AddrSizeToStr (S->AddrSize),
                      SYM_IS_LABEL (S->Type)? "lab" : "equ");
 
-            /* Emit the size only if we know it */
-            if (S->Size != 0) {
-                fprintf (F, ",size=%lu", S->Size);
+            /* If this is not an import, output its value and - if we have
+             * it - the segment.
+             */
+            if (!SYM_IS_IMPORT (S->Type)) {
+
+                SegExprDesc D;
+
+                /* Get the symbol value */
+                long Val = GetDbgSymVal (S);
+
+                /* Output it */
+                fprintf (F, ",val=0x%lX", Val);
+
+                /* Check for a segmented expression and add the segment id to
+                 * the debug info if we have one.
+                 */
+                GetSegExprVal (S->Expr, &D);
+                if (!D.TooComplex && D.Seg != 0) {
+                    fprintf (F, ",seg=%u", D.Seg->Id);
+                }
+
+                /* Output the type */
+                fprintf (F, ",type=%s", SYM_IS_LABEL (S->Type)? "lab" : "equ");
+
+            } else {
+
+                /* Output the type */
+                fputs (",type=imp", F);
+
             }
 
-            /* Check for a segmented expression and add the segment id to the
-             * debug info if we have one.
-             */
-            GetSegExprVal (S->Expr, &D);
-            if (!D.TooComplex && D.Seg != 0) {
-                fprintf (F, ",seg=%u", D.Seg->Id);
+            /* Emit the size only if we know it */
+            if (S->Size != 0) {
+                fprintf (F, ",size=%u", S->Size);
             }
 
             /* For cheap local symbols, add the owner symbol, for others,
@@ -255,6 +303,23 @@ void PrintDbgSyms (FILE* F)
                 fprintf (F, ",scope=%u", O->ScopeBaseId + S->OwnerId);
             } else {
                 fprintf (F, ",parent=%u", O->SymBaseId + S->OwnerId);
+            }
+
+            /* If this is an import, output the id of the matching export */
+            if (SYM_IS_IMPORT (S->Type)) {
+
+                /* Get the import */
+                const Import* Imp = GetObjImport (O, S->ImportId);
+
+                /* Get the export from the import */
+                const Export* Exp = Imp->Exp;
+
+                /* If this is not a linker generated symbol, output the debug
+                 * symbol id for the export
+                 */
+                if (Exp->Obj) {
+                    fprintf (F, ",exp=%u", Exp->Obj->SymBaseId + Exp->DbgSymId);
+                }
             }
 
             /* Terminate the output line */
@@ -278,25 +343,25 @@ void PrintDbgSymLabels (ObjData* O, FILE* F)
 	/* Get the next debug symbol */
  	DbgSym* D = CollAt (&O->DbgSyms, I);
 
-        /* Emit this symbol only if it is a label (ignore equates) */
-        if (SYM_IS_EQUATE (D->Type)) {
+        /* Emit this symbol only if it is a label (ignore equates and imports) */
+        if (SYM_IS_EQUATE (D->Type) || SYM_IS_IMPORT (D->Type)) {
             continue;
         }
 
-	/* Get the symbol value */
-	Val = GetDbgSymVal (D);
+       	/* Get the symbol value */
+       	Val = GetDbgSymVal (D);
 
-	/* Lookup this symbol in the table. If it is found in the table, it was
-	 * already written to the file, so don't emit it twice. If it is not in
-	 * the table, insert and output it.
-	 */
+       	/* Lookup this symbol in the table. If it is found in the table, it was
+       	 * already written to the file, so don't emit it twice. If it is not in
+       	 * the table, insert and output it.
+       	 */
        	if (GetDbgSym (D, Val) == 0) {
 
-	    /* Emit the VICE label line */
+       	    /* Emit the VICE label line */
        	    fprintf (F, "al %06lX .%s\n", Val, GetString (D->Name));
 
-	    /* Insert the symbol into the table */
-	    InsertDbgSym (D, Val);
+       	    /* Insert the symbol into the table */
+       	    InsertDbgSym (D, Val);
        	}
     }
 }

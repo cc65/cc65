@@ -52,6 +52,8 @@
 
 
 /* Forwards */
+struct Export;
+struct Import;
 struct Library;
 struct Scope;
 struct Section;
@@ -143,6 +145,12 @@ INLINE int ObjHasFiles (const ObjData* O)
 
 struct Section* GetObjSection (ObjData* Obj, unsigned Id);
 /* Get a section from an object file checking for a valid index */
+
+struct Import* GetObjImport (ObjData* Obj, unsigned Id);
+/* Get an import from an object file checking for a valid index */
+
+struct Export* GetObjExport (ObjData* Obj, unsigned Id);
+/* Get an export from an object file checking for a valid index */
 
 struct Scope* GetObjScope (ObjData* Obj, unsigned Id);
 /* Get a scope from an object file checking for a valid index */

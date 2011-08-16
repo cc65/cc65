@@ -58,33 +58,19 @@
 /* Forwards */
 struct Scope;
 
-/* Debug symbol structure */
+/* Opaque debug symbol structure */
 typedef struct DbgSym DbgSym;
-struct DbgSym {
-    DbgSym*    	       	Next;  		/* Pool linear list link */
-    ObjData*   		Obj;	    	/* Object file that exports the name */
-    Collection          LineInfos;      /* Line infos of definition */
-    ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    unsigned            Size;           /* Symbol size if any */
-    unsigned            OwnerId;        /* Id of parent/owner */
-    unsigned            Name;  	       	/* Name */
-    unsigned short      Type;		/* Type of symbol */
-    unsigned short      AddrSize;       /* Address size of symbol */
-};
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code			       	     */
+/*     	      	    		     Code	      		       	     */
 /*****************************************************************************/
 
 
 
-DbgSym* ReadDbgSym (FILE* F, ObjData* Obj);
+DbgSym* ReadDbgSym (FILE* F, ObjData* Obj, unsigned Id);
 /* Read a debug symbol from a file, insert and return it */
-
-long GetDbgSymVal (const DbgSym* D);
-/* Get the value of this symbol */
 
 void ClearDbgSymTable (void);
 /* Clear the debug symbol table. Must be called before outputting debug syms

@@ -201,8 +201,8 @@ Import* GetExprImport (ExprNode* Expr)
      * import pointer.
      */
     if (Expr->Obj) {
-	/* Return the export */
-       	return CollAt (&Expr->Obj->Imports, Expr->V.ImpNum);
+	/* Return the Import */
+       	return GetObjImport (Expr->Obj, Expr->V.ImpNum);
     } else {
 	return Expr->V.Imp;
     }

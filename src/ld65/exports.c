@@ -41,6 +41,7 @@
 #include "addrsize.h"
 #include "check.h"
 #include "hashfunc.h"
+#include "lidefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -232,7 +233,7 @@ Import* InsertImport (Import* I)
     if (HashTab[Hash] == 0) {
     	/* The slot is empty, we need to insert a dummy export */
        	E = HashTab[Hash] = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
-	++ExpCount;
+       	++ExpCount;
     } else {
     	E = HashTab [Hash];
     	while (1) {
@@ -274,11 +275,21 @@ Import* InsertImport (Import* I)
 
 
 
-const LineInfo* GetImportPos (const Import* I)
+const LineInfo* GetImportPos (const Import* Imp)
 /* Return the basic line info of an import */
 {
-    /* Source file position is always in slot zero */
-    return CollConstAt (&I->LineInfos, 0);
+    unsigned I;
+
+    /* Search for a line info of LI_TYPE_ASM */
+    for (I = 0; I < CollCount (&Imp->LineInfos); ++I) {
+        const LineInfo* LI = CollConstAt (&Imp->LineInfos, I);
+        if (LI_GET_TYPE (LI->Type) == LI_TYPE_ASM) {
+            return LI;
+        }
+    }
+
+    /* Not found - return the one in slot zero */
+    return CollConstAt (&Imp->LineInfos, 0);
 }
 
 
@@ -306,6 +317,7 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
     E->Expr    	 = 0;
     E->Size      = 0;
     E->LineInfos = EmptyCollection;
+    E->DbgSymId  = ~0U;
     E->Type    	 = Type | SYM_EXPORT;
     E->AddrSize  = AddrSize;
     memset (E->ConDes, 0, sizeof (E->ConDes));

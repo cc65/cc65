@@ -675,7 +675,7 @@ void SymDump (FILE* F)
 void WriteImports (void)
 /* Write the imports list to the object file */
 {
-    SymEntry* S;
+    SymEntry* S;         
 
     /* Tell the object file module that we're about to start the imports */
     ObjStartImports ();
@@ -725,7 +725,7 @@ void WriteExports (void)
 
 	    /* Get the expression bits and the value */
             long ConstVal;
-            unsigned ExprMask = GetSymInfoFlags (S, &ConstVal);
+            unsigned SymFlags = GetSymInfoFlags (S, &ConstVal);
 
             /* Check if this symbol has a size. If so, remember it in the
              * flags.
@@ -733,22 +733,22 @@ void WriteExports (void)
             long Size;
             SymEntry* SizeSym = FindSizeOfSymbol (S);
             if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
-                ExprMask |= SYM_SIZE;
+                SymFlags |= SYM_SIZE;
             }
 
 	    /* Count the number of ConDes types */
 	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
 	     	if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
-	     	    SYM_INC_CONDES_COUNT (ExprMask);
+	     	    SYM_INC_CONDES_COUNT (SymFlags);
 	     	}
 	    }
 
 	    /* Write the type and the export size */
-	    ObjWriteVar (ExprMask);
+	    ObjWriteVar (SymFlags);
             ObjWrite8 (S->ExportSize);
 
 	    /* Write any ConDes declarations */
-	    if (SYM_GET_CONDES_COUNT (ExprMask) > 0) {
+	    if (SYM_GET_CONDES_COUNT (SymFlags) > 0) {
 	     	for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
 	     	    unsigned char Prio = S->ConDesPrio[Type];
 	     	    if (Prio != CD_PRIO_NONE) {
@@ -761,7 +761,7 @@ void WriteExports (void)
        	    ObjWriteVar (S->Name);
 
 	    /* Write the value */
-	    if (SYM_IS_CONST (ExprMask)) {
+	    if (SYM_IS_CONST (SymFlags)) {
 	     	/* Constant value */
     	     	ObjWrite32 (ConstVal);
 	    } else {
@@ -770,7 +770,7 @@ void WriteExports (void)
             }
 
             /* If the symbol has a size, write it to the file */
-            if (SYM_HAS_SIZE (ExprMask)) {
+            if (SYM_HAS_SIZE (SymFlags)) {
                 ObjWriteVar (Size);
             }
 
@@ -822,7 +822,7 @@ void WriteDbgSyms (void)
 
                 /* Get the expression bits and the value */
                 long ConstVal;
-                unsigned ExprMask = GetSymInfoFlags (S, &ConstVal);
+                unsigned SymFlags = GetSymInfoFlags (S, &ConstVal);
 
                 /* Check if this symbol has a size. If so, remember it in the
                  * flags.
@@ -830,11 +830,11 @@ void WriteDbgSyms (void)
                 long Size;
                 SymEntry* SizeSym = FindSizeOfSymbol (S);
                 if (SizeSym != 0 && SymIsConst (SizeSym, &Size)) {
-                    ExprMask |= SYM_SIZE;
+                    SymFlags |= SYM_SIZE;
                 }
 
 		/* Write the type */
-		ObjWriteVar (ExprMask);
+		ObjWriteVar (SymFlags);
 
                 /* Write the address size */
                 ObjWrite8 (S->AddrSize);
@@ -842,7 +842,7 @@ void WriteDbgSyms (void)
                 /* Write the id of the parent. For normal symbols, this is a
                  * scope (symbol table), for cheap locals, it's a symbol.
                  */
-                if (SYM_IS_STD (ExprMask)) {
+                if (SYM_IS_STD (SymFlags)) {
                     ObjWriteVar (S->Sym.Tab->Id);
                 } else {
                     ObjWriteVar (S->Sym.Entry->DebugSymId);
@@ -852,7 +852,7 @@ void WriteDbgSyms (void)
        	       	ObjWriteVar (S->Name);
 
 		/* Write the value */
-		if (SYM_IS_CONST (ExprMask)) {
+		if (SYM_IS_CONST (SymFlags)) {
 		    /* Constant value */
 		    ObjWrite32 (ConstVal);
 		} else {
@@ -861,7 +861,7 @@ void WriteDbgSyms (void)
 		}
 
                 /* If the symbol has a size, write it to the file */
-                if (SYM_HAS_SIZE (ExprMask)) {
+                if (SYM_HAS_SIZE (SymFlags)) {
                     ObjWriteVar (Size);
                 }
 

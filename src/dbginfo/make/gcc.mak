@@ -8,11 +8,14 @@
 # ------------------------------------------------------------------------------
 
 # The executable to build
-EXE  	= dbgtest
+EXE  	= dbgsh
+
+# Library dir
+COMMON	= ../common
 
 #
 CC      = gcc
-CFLAGS  = -g -Wall -W
+CFLAGS  = -g -Wall -W -I$(COMMON)
 EBIND   = emxbind
 LDFLAGS =
 
@@ -20,8 +23,9 @@ LDFLAGS =
 # Object files to link
 
 OBJS = 	dbginfo.o     	\
-	dbgtest.o
+       	dbgsh.o
 
+LIBS = $(COMMON)/common.a
 
 # ------------------------------------------------------------------------------
 # Makefile targets
@@ -36,8 +40,8 @@ all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-$(EXE):	$(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -o $@
+$(EXE):	$(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:

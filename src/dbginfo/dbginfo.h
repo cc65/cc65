@@ -61,13 +61,6 @@ typedef unsigned cc65_size;             /* Used to store (65xx) sizes */
 /* A value that is used to mark invalid ids */
 #define CC65_INV_ID     (~0U)
 
-/* A structure that is used to store a list of ids */
-typedef struct cc65_idlist cc65_idlist;
-struct cc65_idlist {
-    unsigned            count;          /* Number of elements */
-    unsigned*           ids;            /* List of ids, number is dynamic */
-};
-
 
 
 /*****************************************************************************/
@@ -93,7 +86,7 @@ struct cc65_parseerror {
 };
 
 /* Function that is called in case of parse errors */
-typedef void (*cc65_errorfunc) (const struct cc65_parseerror*);
+typedef void (*cc65_errorfunc) (const cc65_parseerror*);
 
 /* Pointer to an opaque data structure containing information from the debug
  * info file. Actually a handle to the data in the file.
@@ -172,7 +165,6 @@ struct cc65_linedata {
     cc65_line           source_line;    /* Line number */
     cc65_line_type      line_type;      /* Type of line */
     unsigned            count;          /* Nesting counter for macros */
-    cc65_idlist         span_list;      /* List of spans for this line */
 };
 
 typedef struct cc65_lineinfo cc65_lineinfo;
@@ -271,6 +263,18 @@ const cc65_spaninfo* cc65_spaninfo_byaddr (cc65_dbginfo handle,
                                            unsigned long addr);
 /* Return span information for the given address. The function returns NULL
  * if no spans were found for this address.
+ */
+
+const cc65_spaninfo* cc65_spaninfo_byline (cc65_dbginfo handle,
+                                           unsigned line_id);
+/* Return span information for the given source line. The function returns NULL
+ * if the line id is invalid, otherwise the spans for this line (possibly zero).
+ */
+
+const cc65_spaninfo* cc65_spaninfo_byscope (cc65_dbginfo handle,
+                                            unsigned scope_id);
+/* Return span information for the given scope. The function returns NULL if
+ * the scope id is invalid, otherwise the spans for this scope (possibly zero).
  */
 
 void cc65_free_spaninfo (cc65_dbginfo handle, const cc65_spaninfo* info);
@@ -381,7 +385,7 @@ typedef enum {
 } cc65_symbol_type;
 
 /* Notes:
- *  - If the symbol is segment relative, the segment id gives segment 
+ *  - If the symbol is segment relative, the segment id gives segment
  *    information, otherwise it contains CC65_INV_ID.
  *  - If export_id is valid (not CC65_INV_ID), the symbol is an import and
  *    export_id allows to retrieve the corresponding export. The fields

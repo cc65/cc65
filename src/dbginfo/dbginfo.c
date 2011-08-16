@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 dbginfo.h                                 */
+/*                                 dbginfo.c                                 */
 /*                                                                           */
 /*                         cc65 debug info handling                          */
 /*                                                                           */
@@ -340,6 +340,7 @@ struct SymInfo {
         unsigned        Id;             /* Parent symbol if any */
         SymInfo*        Info;           /* Pointer to parent symbol if any */
     } Parent;
+    Collection*         ImportList;     /* List of imports if this is an export */
     char                Name[1];        /* Name of symbol */
 };
 
@@ -984,27 +985,6 @@ static void DBGPRINT(const char* format, ...) {}
 
 
 /*****************************************************************************/
-/*                                 Id lists                                  */
-/*****************************************************************************/
-
-
-
-static void init_cc65_idlist (cc65_idlist* L, unsigned Count)
-/* Initialize an idlist with the given count. The count field in the list
- * will be set on return and memory for the list is allocated.
- */
-{
-    L->count = Count;
-    if (Count == 0) {
-        L->ids = 0;
-    } else {
-        L->ids = xmalloc (Count * sizeof (L->ids[0]));
-    }
-}
-
-
-
-/*****************************************************************************/
 /*                                 File info                                 */
 /*****************************************************************************/
 
@@ -1187,18 +1167,11 @@ static cc65_lineinfo* new_cc65_lineinfo (unsigned Count)
 static void CopyLineInfo (cc65_linedata* D, const LineInfo* L)
 /* Copy data from a LineInfo struct to a cc65_linedata struct */
 {
-    unsigned I;
-
     D->line_id          = L->Id;
     D->source_id        = L->File.Info->Id;
     D->source_line      = L->Line;
     D->line_type        = L->Type;
     D->count            = L->Count;
-    init_cc65_idlist (&D->span_list, CollCount (&L->SpanInfoList));
-    for (I = 0; I < CollCount (&L->SpanInfoList); ++I) {
-        const SpanInfo* S = CollConstAt (&L->SpanInfoList, I);
-        D->span_list.ids[I] = S->Id;
-    }
 }
 
 
@@ -1535,7 +1508,8 @@ static SymInfo* NewSymInfo (const StrBuf* Name)
     /* Allocate memory */
     SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
 
-    /* Initialize the name */
+    /* Initialize it as necessary */
+    S->ImportList = 0;
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1547,6 +1521,7 @@ static SymInfo* NewSymInfo (const StrBuf* Name)
 static void FreeSymInfo (SymInfo* S)
 /* Free a SymInfo struct */
 {
+    CollFree (S->ImportList);
     xfree (S);
 }
 
@@ -3459,7 +3434,7 @@ static void ParseSym (InputData* D)
     unsigned            ScopeId = CC65_INV_ID;
     unsigned            SegId = CC65_INV_ID;
     cc65_size           Size = 0;
-    cc65_symbol_type    Type = CC65_SYM_EQUATE;     
+    cc65_symbol_type    Type = CC65_SYM_EQUATE;
     long                Value = 0;
 
     SymInfo*            S;
@@ -4015,7 +3990,7 @@ static void ProcessFileInfo (InputData* D)
 static void ProcessLineInfo (InputData* D)
 /* Postprocess line infos */
 {
-    unsigned I;
+    unsigned I, J;
 
     /* Get pointers to the collections */
     Collection* LineInfos = &D->Info->LineInfoById;
@@ -4023,7 +3998,8 @@ static void ProcessLineInfo (InputData* D)
 
     /* Walk over the line infos and replace the id numbers of file and segment
      * with pointers to the actual structs. Add the line info to each file
-     * where it is defined.
+     * where it is defined. Resolve the spans and add backpointers to the
+     * spans.
      */
     for (I = 0; I < CollCount (LineInfos); ++I) {
 
@@ -4044,8 +4020,32 @@ static void ProcessLineInfo (InputData* D)
             CollAppend (&L->File.Info->LineInfoByLine, L);
         }
 
-        /* Next one */
-        ++I;
+	/* Resolve the spans ids */
+        for (J = 0; J < CollCount (&L->SpanInfoList); ++J) {
+
+            /* Get the id of this span */
+            unsigned SpanId = CollIdAt (&L->SpanInfoList, J);
+            if (SpanId >= CollCount (&D->Info->SpanInfoById)) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Invalid span id %u for line with id %u",
+                            SpanId, L->Id);
+                CollReplace (&L->SpanInfoList, 0, J);
+            } else {
+
+                /* Get a pointer to the span */
+                SpanInfo* SP = CollAt (&D->Info->SpanInfoById, SpanId);
+
+                /* Replace the id by the pointer */
+                CollReplace (&L->SpanInfoList, SP, J);
+
+                /* Insert a backpointer into the span */
+	    	if (SP->LineInfoList == 0) {
+	    	    SP->LineInfoList = CollNew ();
+	    	}
+                CollAppend (SP->LineInfoList, L);
+            }
+        }
     }
 
     /* Walk over all files and sort the line infos for each file so we can
@@ -4295,6 +4295,12 @@ static void ProcessSymInfo (InputData* D)
             S->Exp.Info = 0;
         } else {
             S->Exp.Info = CollAt (&D->Info->SymInfoById, S->Exp.Id);
+
+            /* Add a backpointer, so the export knows its imports */
+            if (S->Exp.Info->ImportList == 0) {
+                S->Exp.Info->ImportList = CollNew ();
+            }
+            CollAppend (S->Exp.Info->ImportList, S);
         }
 
         /* Resolve segment */
@@ -4898,6 +4904,84 @@ const cc65_spaninfo* cc65_spaninfo_byaddr (cc65_dbginfo Handle, unsigned long Ad
 
 
 
+const cc65_spaninfo* cc65_spaninfo_byline (cc65_dbginfo Handle, unsigned LineId)
+/* Return span information for the given source line. The function returns NULL
+ * if the line id is invalid, otherwise the spans for this line (possibly zero).
+ */
+{
+    DbgInfo*            Info;
+    LineInfo*           L;
+    cc65_spaninfo*      D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the line id is valid */
+    if (LineId >= CollCount (&Info->LineInfoById)) {
+        return 0;
+    }
+
+    /* Get the line with this id */
+    L = CollAt (&Info->LineInfoById, LineId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_spaninfo (CollCount (&L->SpanInfoList));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&L->SpanInfoList); ++I) {
+        /* Copy the data */
+        CopySpanInfo (D->data + I, CollConstAt (&L->SpanInfoList, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_spaninfo* cc65_spaninfo_byscope (cc65_dbginfo Handle, unsigned ScopeId)
+/* Return span information for the given scope. The function returns NULL if
+ * the scope id is invalid, otherwise the spans for this scope (possibly zero).
+ */
+{
+    DbgInfo*            Info;
+    ScopeInfo*          S;
+    cc65_spaninfo*      D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the scope id is valid */
+    if (ScopeId >= CollCount (&Info->ScopeInfoById)) {
+        return 0;
+    }
+
+    /* Get the scope with this id */
+    S = CollAt (&Info->ScopeInfoById, ScopeId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_spaninfo (CollCount (&S->SpanInfoList));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&S->SpanInfoList); ++I) {
+        /* Copy the data */
+        CopySpanInfo (D->data + I, CollConstAt (&S->SpanInfoList, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
 void cc65_free_spaninfo (cc65_dbginfo Handle, const cc65_spaninfo* Info)
 /* Free a span info record */
 {
@@ -5249,8 +5333,8 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start
             break;
         }
 
-        /* Ignore non-labels */
-        if (Item->Type != CC65_SYM_LABEL) {
+        /* Ignore non-labels and imports */
+        if (Item->Type != CC65_SYM_LABEL || Item->Exp.Info != 0) {
             continue;
         }
 

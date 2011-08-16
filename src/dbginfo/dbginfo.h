@@ -380,6 +380,16 @@ typedef enum {
     CC65_SYM_LABEL,                     /* Some sort of address */
 } cc65_symbol_type;
 
+/* Notes:
+ *  - If the symbol is segment relative, the segment id gives segment 
+ *    information, otherwise it contains CC65_INV_ID.
+ *  - If export_id is valid (not CC65_INV_ID), the symbol is an import and
+ *    export_id allows to retrieve the corresponding export. The fields
+ *    symbol_value and segment_id are taken from the export, since imports
+ *    have no value or segments by itself. symbol_type and symbol_size are
+ *    more or less unusable because they don't have a meaning for imports.
+ *  - For normal symbols (not cheap locals) parent_id contains CC65_INV_ID.
+ */
 typedef struct cc65_symboldata cc65_symboldata;
 struct cc65_symboldata {
     unsigned            symbol_id;      /* Id of symbol */
@@ -387,10 +397,8 @@ struct cc65_symboldata {
     cc65_symbol_type    symbol_type;    /* Type of symbol */
     cc65_size           symbol_size;    /* Size of symbol, 0 if unknown */
     long                symbol_value;   /* Value of symbol */
-    unsigned            segment_id;     /* If the symbol is segment relative,
-                                         * this contains the id of segment,
-                                         * otherwise CC65_INV_ID
-                                         */
+    unsigned            export_id;      /* For imports: Matching export */
+    unsigned            segment_id;     /* Id of segment if any */
     unsigned            scope_id;       /* The scope this symbol is in */
     unsigned            parent_id;      /* Parent symbol for cheap locals */
 };

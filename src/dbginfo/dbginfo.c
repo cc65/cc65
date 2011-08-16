@@ -129,9 +129,11 @@ typedef enum {
     TOK_COUNT,                          /* COUNT keyword */
     TOK_ENUM,                           /* ENUM keyword */
     TOK_EQUATE,                         /* EQUATE keyword */
+    TOK_EXPORT,                         /* EXPORT keyword */
     TOK_FILE,                           /* FILE keyword */
     TOK_GLOBAL,                         /* GLOBAL keyword */
     TOK_ID,                             /* ID keyword */
+    TOK_IMPORT,                         /* IMPORT keyword */
     TOK_INFO,                           /* INFO keyword */
     TOK_LABEL,                          /* LABEL keyword */
     TOK_LIBRARY,                        /* LIBRARY keyword */
@@ -322,6 +324,10 @@ struct SymInfo {
     cc65_symbol_type    Type;           /* Type of symbol */
     long                Value;          /* Value of symbol */
     cc65_size           Size;           /* Size of symbol */
+    union {
+        unsigned        Id;             /* Id of export if any */
+        SymInfo*        Info;           /* Pointer to export if any */
+    } Exp;
     union {
         unsigned        Id;             /* Id of segment if any */
         SegInfo*        Info;           /* Pointer to segment if any */
@@ -1158,7 +1164,7 @@ static LineInfo* NewLineInfo (void)
 
 static void FreeLineInfo (LineInfo* L)
 /* Free a LineInfo struct */
-{           
+{
     CollDone (&L->SpanInfoList);
     xfree (L);
 }
@@ -1562,13 +1568,28 @@ static cc65_symbolinfo* new_cc65_symbolinfo (unsigned Count)
 static void CopySymInfo (cc65_symboldata* D, const SymInfo* S)
 /* Copy data from a SymInfo struct to a cc65_symboldata struct */
 {
+    SegInfo* Seg;
+
     D->symbol_id        = S->Id;
     D->symbol_name      = S->Name;
     D->symbol_type      = S->Type;
     D->symbol_size      = S->Size;
-    D->symbol_value     = S->Value;
-    if (S->Seg.Info) {
-        D->segment_id   = S->Seg.Info->Id;
+
+    /* If this is an import, it doesn't have a value or segment. Use the data
+     * from the matching export instead.
+     */
+    if (S->Exp.Info) {
+        /* This is an import, because it has a matching export */
+        D->export_id    = S->Exp.Info->Id;
+        D->symbol_value = S->Exp.Info->Value;
+        Seg             = S->Exp.Info->Seg.Info;
+    } else {
+        D->export_id    = CC65_INV_ID;
+        D->symbol_value = S->Value;
+        Seg             = S->Seg.Info;
+    }
+    if (Seg) {
+        D->segment_id   = Seg->Id;
     } else {
         D->segment_id   = CC65_INV_ID;
     }
@@ -2033,9 +2054,11 @@ static void NextToken (InputData* D)
         { "count",      TOK_COUNT       },
         { "enum",       TOK_ENUM        },
         { "equ",        TOK_EQUATE      },
+        { "exp",        TOK_EXPORT      },
         { "file",       TOK_FILE        },
         { "global",     TOK_GLOBAL      },
         { "id",         TOK_ID          },
+        { "imp",        TOK_IMPORT      },
         { "info",       TOK_INFO        },
         { "lab",        TOK_LABEL       },
         { "lib",        TOK_LIBRARY     },
@@ -3428,6 +3451,7 @@ static void ParseSym (InputData* D)
     /* Most of the following variables are initialized with a value that is
      * overwritten later. This is just to avoid compiler warnings.
      */
+    unsigned            ExportId = CC65_INV_ID;
     unsigned            FileId = CC65_INV_ID;
     unsigned            Id = CC65_INV_ID;
     StrBuf              Name = STRBUF_INITIALIZER;
@@ -3435,7 +3459,7 @@ static void ParseSym (InputData* D)
     unsigned            ScopeId = CC65_INV_ID;
     unsigned            SegId = CC65_INV_ID;
     cc65_size           Size = 0;
-    cc65_symbol_type    Type = CC65_SYM_EQUATE;
+    cc65_symbol_type    Type = CC65_SYM_EQUATE;     
     long                Value = 0;
 
     SymInfo*            S;
@@ -3443,17 +3467,18 @@ static void ParseSym (InputData* D)
         ibNone          = 0x000,
 
         ibAddrSize      = 0x001,
-        ibFileId        = 0x002,
-        ibId            = 0x004,
-        ibParentId      = 0x008,
-        ibScopeId       = 0x010,
-        ibSegId         = 0x020,
-        ibSize          = 0x040,
-        ibName          = 0x080,
-        ibType          = 0x100,
-        ibValue         = 0x200,
+        ibExportId      = 0x002,
+        ibFileId        = 0x004,
+        ibId            = 0x008,
+        ibParentId      = 0x010,
+        ibScopeId       = 0x020,
+        ibSegId         = 0x040,
+        ibSize          = 0x080,
+        ibName          = 0x100,
+        ibType          = 0x200,
+        ibValue         = 0x400,
 
-        ibRequired      = ibAddrSize | ibId | ibName | ibType | ibValue,
+        ibRequired      = ibAddrSize | ibId | ibName,
     } InfoBits = ibNone;
 
     /* Skip the SYM token */
@@ -3465,11 +3490,12 @@ static void ParseSym (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_FILE   &&
-            D->Tok != TOK_ID            && D->Tok != TOK_NAME   &&
-            D->Tok != TOK_PARENT        && D->Tok != TOK_SCOPE  &&
-            D->Tok != TOK_SEGMENT       && D->Tok != TOK_SIZE   &&
-            D->Tok != TOK_TYPE          && D->Tok != TOK_VALUE) {
+        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_EXPORT         &&
+            D->Tok != TOK_FILE          && D->Tok != TOK_ID             &&
+            D->Tok != TOK_NAME          && D->Tok != TOK_PARENT         &&
+            D->Tok != TOK_SCOPE         && D->Tok != TOK_SEGMENT        &&
+            D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE           &&
+            D->Tok != TOK_VALUE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -3494,6 +3520,15 @@ static void ParseSym (InputData* D)
             case TOK_ADDRSIZE:
                 NextToken (D);
                 InfoBits |= ibAddrSize;
+                break;
+
+            case TOK_EXPORT:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                ExportId = D->IVal;
+                InfoBits |= ibExportId;
+                NextToken (D);
                 break;
 
             case TOK_FILE:
@@ -3564,7 +3599,6 @@ static void ParseSym (InputData* D)
                 switch (D->Tok) {
                     case TOK_EQUATE:    Type = CC65_SYM_EQUATE;         break;
                     case TOK_LABEL:     Type = CC65_SYM_LABEL;          break;
-
                     default:
                         ParseError (D, CC65_ERROR,
                                     "Unknown value for attribute \"type\"");
@@ -3622,6 +3656,7 @@ static void ParseSym (InputData* D)
     S->Type       = Type;
     S->Value      = Value;
     S->Size       = Size;
+    S->Exp.Id     = ExportId;
     S->Seg.Id     = SegId;
     S->Scope.Id   = ScopeId;
     S->Parent.Id  = ParentId;
@@ -4248,6 +4283,19 @@ static void ProcessSymInfo (InputData* D)
 
         /* Get the symbol info */
         SymInfo* S = CollAt (&D->Info->SymInfoById, I);
+
+        /* Resolve export */
+        if (S->Exp.Id == CC65_INV_ID) {
+            S->Exp.Info = 0;
+        } else if (S->Exp.Id >= CollCount (&D->Info->SymInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid export id %u for symbol with id %u",
+                        S->Exp.Id, S->Id);
+            S->Exp.Info = 0;
+        } else {
+            S->Exp.Info = CollAt (&D->Info->SymInfoById, S->Exp.Id);
+        }
 
         /* Resolve segment */
         if (S->Seg.Id == CC65_INV_ID) {

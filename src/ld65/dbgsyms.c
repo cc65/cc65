@@ -72,7 +72,7 @@ static DbgSym*	DbgSymPool[256];
 
 
 
-static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O)
+static DbgSym* NewDbgSym (unsigned Type, unsigned char AddrSize, ObjData* O)
 /* Create a new DbgSym and return it */
 {
     /* Allocate memory */
@@ -80,7 +80,6 @@ static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O
 
     /* Initialize the fields */
     D->Next      = 0;
-    D->Flags	 = 0;
     D->Obj       = O;
     D->LineInfos = EmptyCollection;
     D->Expr    	 = 0;
@@ -204,10 +203,10 @@ long GetDbgSymVal (const DbgSym* D)
 }
 
 
-
+             
 void PrintDbgSyms (FILE* F)
 /* Print the debug symbols in a debug file */
-{                   
+{
     unsigned I, J;
 
     for (I = 0; I < CollCount (&ObjDataList); ++I) {

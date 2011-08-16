@@ -62,15 +62,14 @@ struct Scope;
 typedef struct DbgSym DbgSym;
 struct DbgSym {
     DbgSym*    	       	Next;  		/* Pool linear list link */
-    unsigned   		Flags;		/* Generic flags */
     ObjData*   		Obj;	    	/* Object file that exports the name */
     Collection          LineInfos;      /* Line infos of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    unsigned long       Size;           /* Symbol size if any */
+    unsigned            Size;           /* Symbol size if any */
     unsigned            OwnerId;        /* Id of parent/owner */
     unsigned            Name;  	       	/* Name */
-    unsigned char	Type;		/* Type of symbol */
-    unsigned char       AddrSize;       /* Address size of symbol */
+    unsigned short      Type;		/* Type of symbol */
+    unsigned short      AddrSize;       /* Address size of symbol */
 };
 
 

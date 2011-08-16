@@ -67,8 +67,8 @@ struct Import {
     Collection          LineInfos;      /* Line info of reference */
     struct Export*	Exp;		/* Matching export for this import */
     unsigned            Name;		/* Name if not in table */
-    unsigned char       Flags;          /* Generic flags */
-    unsigned char    	AddrSize;       /* Address size of import */
+    unsigned short      Flags;          /* Generic flags */
+    unsigned short      AddrSize;       /* Address size of import */
 };
 
 
@@ -83,10 +83,10 @@ struct Export {
     unsigned 		ImpCount;	/* How many imports for this symbol? */
     Import*  		ImpList;	/* List of imports for this symbol */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    unsigned long       Size;           /* Size of the symbol if any */
+    unsigned            Size;           /* Size of the symbol if any */
     Collection          LineInfos;      /* Line info of definition */
-    unsigned char	Type;		/* Type of export */
-    unsigned char       AddrSize;       /* Address size of export */
+    unsigned short      Type;		/* Type of export */
+    unsigned short      AddrSize;       /* Address size of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
 };
 

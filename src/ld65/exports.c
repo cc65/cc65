@@ -92,7 +92,7 @@ static Export**	       	ExpPool  = 0;	  	/* Exports array */
 
 
 
-static Export* NewExport (unsigned char Type, unsigned char AddrSize,
+static Export* NewExport (unsigned Type, unsigned char AddrSize,
                           unsigned Name, ObjData* Obj);
 /* Create a new export and initialize it */
 
@@ -289,7 +289,7 @@ const LineInfo* GetImportPos (const Import* I)
 
 
 
-static Export* NewExport (unsigned char Type, unsigned char AddrSize,
+static Export* NewExport (unsigned Type, unsigned char AddrSize,
                           unsigned Name, ObjData* Obj)
 /* Create a new export and initialize it */
 {
@@ -306,7 +306,7 @@ static Export* NewExport (unsigned char Type, unsigned char AddrSize,
     E->Expr    	 = 0;
     E->Size      = 0;
     E->LineInfos = EmptyCollection;
-    E->Type    	 = Type;
+    E->Type    	 = Type | SYM_EXPORT;
     E->AddrSize  = AddrSize;
     memset (E->ConDes, 0, sizeof (E->ConDes));
 
@@ -486,7 +486,7 @@ Export* CreateConstExport (unsigned Name, long Value)
 /* Create an export for a literal date */
 {
     /* Create a new export */
-    Export* E = NewExport (SYM_CONST | SYM_EQUATE, ADDR_SIZE_ABS, Name, 0);
+    Export* E = NewExport (SYM_CONST|SYM_EQUATE, ADDR_SIZE_ABS, Name, 0);
 
     /* Assign the value */
     E->Expr = LiteralExpr (Value, 0);
@@ -504,7 +504,7 @@ Export* CreateExprExport (unsigned Name, ExprNode* Expr, unsigned char AddrSize)
 /* Create an export for an expression */
 {
     /* Create a new export */
-    Export* E = NewExport (SYM_EXPR | SYM_EQUATE, AddrSize, Name, 0);
+    Export* E = NewExport (SYM_EXPR|SYM_EQUATE, AddrSize, Name, 0);
 
     /* Assign the value expression */
     E->Expr = Expr;

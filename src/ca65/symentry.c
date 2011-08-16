@@ -94,6 +94,7 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     S->Flags   	  = Flags;
     S->DebugSymId = ~0U;
     S->ImportId   = ~0U;
+    S->ExportId   = ~0U;
     S->Expr       = 0;
     S->ExprRefs   = AUTO_COLLECTION_INITIALIZER;
     S->ExportSize = ADDR_SIZE_DEFAULT;
@@ -676,6 +677,15 @@ unsigned GetSymImportId (const SymEntry* S)
 {
     PRECONDITION (S != 0 && (S->Flags & SF_IMPORT) && S->ImportId != ~0U);
     return S->ImportId;
+}
+
+
+
+unsigned GetSymExportId (const SymEntry* S)
+/* Return the export id for the given symbol */
+{
+    PRECONDITION (S != 0 && (S->Flags & SF_IMPORT) && S->ExportId != ~0U);
+    return S->ExportId;
 }
 
 

@@ -592,9 +592,9 @@ void SymCheck (void)
 	    	}
 	    }
 
-            /* Count exports */
+            /* Count exports, assign the export ID */
 	    if (S->Flags & SF_EXPORT) {
-	    	++ExportCount;
+                S->ExportId = ExportCount++;
 	    }
 
             /* If the symbol is defined but has an unknown address size,
@@ -865,9 +865,12 @@ void WriteDbgSyms (void)
                     ObjWriteVar (Size);
                 }
 
-                /* If the symbol is an import, write out its import id */
+                /* If the symbol is an im- or export, write out the ids */
                 if (SYM_IS_IMPORT (SymFlags)) {
                     ObjWriteVar (GetSymImportId (S));
+                }
+                if (SYM_IS_EXPORT (SymFlags)) {
+                    ObjWriteVar (GetSymExportId (S));
                 }
 
 		/* Write the line infos */

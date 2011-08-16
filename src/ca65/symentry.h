@@ -95,7 +95,8 @@ struct SymEntry {
                                          */
     unsigned            Flags;	        /* Symbol flags */
     unsigned            DebugSymId;     /* Debug symbol id */
-    unsigned   	       	ImportId;       /* Id of import if this is one */
+    unsigned            ImportId;       /* Id of import if this is one */
+    unsigned            ExportId;       /* Id of export if this is one */
     struct ExprNode*    Expr;      	/* Symbol expression */
     Collection          ExprRefs;       /* Expressions using this symbol */
     unsigned char       ExportSize;     /* Export address size */
@@ -337,6 +338,9 @@ long GetSymVal (SymEntry* Sym);
 
 unsigned GetSymImportId (const SymEntry* Sym);
 /* Return the import id for the given symbol */
+
+unsigned GetSymExportId (const SymEntry* Sym);
+/* Return the export id for the given symbol */
 
 unsigned GetSymInfoFlags (const SymEntry* Sym, long* ConstVal);
 /* Return a set of flags used when writing symbol information into a file.

@@ -60,16 +60,14 @@
 
 
 /*****************************************************************************/
-/*	     	    	   	     Data				     */
+/*     	     	    	   	     Data				     */
 /*****************************************************************************/
 
 
 
 /* Combined symbol entry flags used within this module */
 #define SF_UNDEFMASK	(SF_REFERENCED | SF_DEFINED | SF_IMPORT)
-#define SF_UNDEFVAL	(SF_REFERENCED)
-#define SF_DBGINFOMASK 	(SF_UNUSED | SF_DEFINED | SF_IMPORT)
-#define SF_DBGINFOVAL 	(SF_DEFINED)
+#define SF_UNDEFVAL 	(SF_REFERENCED)
 
 /* Symbol tables */
 SymTable*      	    CurrentScope = 0;   /* Pointer to current symbol table */
@@ -86,6 +84,20 @@ static unsigned     ExportCount = 0;    /* Counter for export symbols */
 /*****************************************************************************/
 /*     	       	       	   Internally used functions		 	     */
 /*****************************************************************************/
+
+
+
+static int IsDbgSym (const SymEntry* S)
+/* Return true if this is a debug symbol */
+{
+    if ((S->Flags & (SF_DEFINED | SF_UNUSED)) == SF_DEFINED) {
+        /* Defined symbols are debug symbols if they aren't sizes */
+        return !IsSizeOfSymbol (S);
+    } else {
+        /* Others are debug symbols if they're referenced imports */
+        return ((S->Flags & SF_REFIMP) == SF_REFIMP);
+    }
+}
 
 
 
@@ -802,8 +814,7 @@ void WriteDbgSyms (void)
     	Count = 0;
     	S = SymList;
     	while (S) {
-    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL &&
-                !IsSizeOfSymbol (S)) {
+    	    if (IsDbgSym (S)) {
                 S->DebugSymId = Count++;
     	    }
     	    S = S->List;
@@ -817,8 +828,7 @@ void WriteDbgSyms (void)
          */
     	S = SymList;
     	while (S) {
-    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL &&
-                !IsSizeOfSymbol (S)) {
+    	    if (IsDbgSym (S)) {
 
                 /* Get the expression bits and the value */
                 long ConstVal;

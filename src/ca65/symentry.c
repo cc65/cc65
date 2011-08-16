@@ -684,7 +684,7 @@ unsigned GetSymImportId (const SymEntry* S)
 unsigned GetSymExportId (const SymEntry* S)
 /* Return the export id for the given symbol */
 {
-    PRECONDITION (S != 0 && (S->Flags & SF_IMPORT) && S->ExportId != ~0U);
+    PRECONDITION (S != 0 && (S->Flags & SF_EXPORT) && S->ExportId != ~0U);
     return S->ExportId;
 }
 

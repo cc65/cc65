@@ -675,7 +675,7 @@ void SymDump (FILE* F)
 void WriteImports (void)
 /* Write the imports list to the object file */
 {
-    SymEntry* S;         
+    SymEntry* S;
 
     /* Tell the object file module that we're about to start the imports */
     ObjStartImports ();
@@ -863,6 +863,11 @@ void WriteDbgSyms (void)
                 /* If the symbol has a size, write it to the file */
                 if (SYM_HAS_SIZE (SymFlags)) {
                     ObjWriteVar (Size);
+                }
+
+                /* If the symbol is an import, write out its import id */
+                if (SYM_IS_IMPORT (SymFlags)) {
+                    ObjWriteVar (GetSymImportId (S));
                 }
 
 		/* Write the line infos */

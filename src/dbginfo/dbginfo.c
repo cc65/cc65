@@ -4792,6 +4792,45 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
 
 
 
+const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned FileId)
+/* Return line information for a source file. The function returns NULL if the
+ * file id is invalid.
+ */
+{
+    DbgInfo*        Info;
+    FileInfo*       F;
+    cc65_lineinfo*  D;
+    unsigned        I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the source file id is valid */
+    if (FileId >= CollCount (&Info->FileInfoById)) {
+        return 0;
+    }
+
+    /* Get the file */
+    F = CollAt (&Info->FileInfoById, FileId);
+
+    /* Prepare the struct we will return to the caller */
+    D = new_cc65_lineinfo (CollCount (&F->LineInfoByLine));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&F->LineInfoByLine); ++I) {
+        /* Copy the data */
+        CopyLineInfo (D->data + I, CollConstAt (&F->LineInfoByLine, I));
+    }
+
+    /* Return the allocated struct */
+    return D;
+}
+
+
+
 void cc65_free_lineinfo (cc65_dbginfo Handle, const cc65_lineinfo* Info)
 /* Free line info returned by one of the other functions */
 {

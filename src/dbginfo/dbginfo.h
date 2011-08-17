@@ -189,6 +189,11 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo handle,
  * function returns NULL if no line information was found.
  */
 
+const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned source_id);
+/* Return line information for a source file. The function returns NULL if the
+ * file id is invalid.
+ */
+
 void cc65_free_lineinfo (cc65_dbginfo handle, const cc65_lineinfo* info);
 /* Free line info returned by one of the other functions */
 

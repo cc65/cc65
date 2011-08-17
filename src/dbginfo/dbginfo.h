@@ -175,6 +175,13 @@ struct cc65_lineinfo {
 
 
 
+const cc65_lineinfo* cc65_line_byid (cc65_dbginfo handle, unsigned id);
+/* Return information about a line with a specific id. The function
+ * returns NULL if the id is invalid (no such line) and otherwise a
+ * cc65_lineinfo structure with one entry that contains the requested
+ * module information.
+ */
+
 const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo handle,
                                          unsigned source_id,
                                          cc65_line line);

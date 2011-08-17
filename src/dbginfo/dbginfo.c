@@ -4714,6 +4714,39 @@ void cc65_free_libraryinfo (cc65_dbginfo Handle, const cc65_libraryinfo* Info)
 
 
 
+const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return information about a line with a specific id. The function
+ * returns NULL if the id is invalid (no such line) and otherwise a
+ * cc65_lineinfo structure with one entry that contains the requested
+ * module information.
+ */
+{
+    DbgInfo*            Info;
+    cc65_lineinfo*      D;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the id is valid */
+    if (Id >= CollCount (&Info->LineInfoById)) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_lineinfo (1);
+
+    /* Fill in the data */
+    CopyLineInfo (D->data, CollConstAt (&Info->LineInfoById, Id));
+
+    /* Return the result */
+    return D;
+}
+
+
+
 const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
                                          cc65_line Line)
 /* Return line information for a source file/line number combination. The
@@ -5577,4 +5610,4 @@ void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info)
 
 
 
-                                    
+

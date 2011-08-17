@@ -296,6 +296,7 @@ struct ScopeInfo {
         SymInfo*        Info;           /* Pointer to label symbol */
     } Label;
     Collection		SpanInfoList;	/* List of spans for this scope */
+    Collection*         ChildScopes;    /* Child scopes of this scope */
     char                Name[1];        /* Name of scope */
 };
 
@@ -1279,6 +1280,7 @@ static ScopeInfo* NewScopeInfo (const StrBuf* Name)
 
     /* Initialize the fields as necessary */
     CollInit (&S->SpanInfoList);
+    S->ChildScopes = 0;
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1291,6 +1293,7 @@ static void FreeScopeInfo (ScopeInfo* S)
 /* Free a ScopeInfo struct */
 {
     CollDone (&S->SpanInfoList);
+    CollFree (S->ChildScopes);
     xfree (S);
 }
 
@@ -4199,6 +4202,12 @@ static void ProcessScopeInfo (InputData* D)
             S->Parent.Info = 0;
         } else {
             S->Parent.Info = CollAt (&D->Info->ScopeInfoById, S->Parent.Id);
+
+            /* Set a backpointer in the parent */
+            if (S->Parent.Info->ChildScopes == 0) {
+                S->Parent.Info->ChildScopes = CollNew ();
+            }
+            CollAppend (S->Parent.Info->ChildScopes, S);
         }
 
         /* Resolve the label */
@@ -5630,6 +5639,44 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
         CopyScopeInfo (D->data + I, CollConstAt (&M->ScopeInfoByName, I));
     }
 
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return the direct child scopes of a scope with a given id. The function
+ * returns NULL if no scope with this id was found, otherwise a list of the
+ * direct childs.
+ */
+{
+    DbgInfo*            Info;
+    cc65_scopeinfo*     D;
+    ScopeInfo*          S;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the id is valid */
+    if (Id >= CollCount (&Info->ScopeInfoById)) {
+        return 0;
+    }
+
+    /* Get the scope */
+    S = CollAt (&Info->ScopeInfoById, Id);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (S->ChildScopes? CollCount (S->ChildScopes) : 0);
+
+    /* Fill in the data */
+    for (I = 0; I < D->count; ++I) {
+        CopyScopeInfo (D->data + I, CollConstAt (S->ChildScopes, I));
+    }
 
     /* Return the result */
     return D;

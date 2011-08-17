@@ -502,6 +502,12 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo handle, unsigned module_
  * scope with the given id was found.
  */
 
+const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo handle, unsigned id);
+/* Return the direct child scopes of a scope with a given id. The function
+ * returns NULL if no scope with this id was found, otherwise a list of the
+ * direct childs.
+ */
+
 void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info);
 /* Free a scope info record */
 

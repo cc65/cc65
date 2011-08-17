@@ -296,7 +296,8 @@ struct ScopeInfo {
         SymInfo*        Info;           /* Pointer to label symbol */
     } Label;
     Collection		SpanInfoList;	/* List of spans for this scope */
-    Collection*         ChildScopes;    /* Child scopes of this scope */
+    Collection          SymInfoByName;  /* Symbols in this scope */
+    Collection*         ChildScopeList; /* Child scopes of this scope */
     char                Name[1];        /* Name of scope */
 };
 
@@ -1280,7 +1281,8 @@ static ScopeInfo* NewScopeInfo (const StrBuf* Name)
 
     /* Initialize the fields as necessary */
     CollInit (&S->SpanInfoList);
-    S->ChildScopes = 0;
+    CollInit (&S->SymInfoByName);
+    S->ChildScopeList = 0;
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1293,7 +1295,8 @@ static void FreeScopeInfo (ScopeInfo* S)
 /* Free a ScopeInfo struct */
 {
     CollDone (&S->SpanInfoList);
-    CollFree (S->ChildScopes);
+    CollDone (&S->SymInfoByName);
+    CollFree (S->ChildScopeList);
     xfree (S);
 }
 
@@ -4204,10 +4207,10 @@ static void ProcessScopeInfo (InputData* D)
             S->Parent.Info = CollAt (&D->Info->ScopeInfoById, S->Parent.Id);
 
             /* Set a backpointer in the parent */
-            if (S->Parent.Info->ChildScopes == 0) {
-                S->Parent.Info->ChildScopes = CollNew ();
+            if (S->Parent.Info->ChildScopeList == 0) {
+                S->Parent.Info->ChildScopeList = CollNew ();
             }
-            CollAppend (S->Parent.Info->ChildScopes, S);
+            CollAppend (S->Parent.Info->ChildScopeList, S);
         }
 
         /* Resolve the label */
@@ -4384,6 +4387,9 @@ static void ProcessSymInfo (InputData* D)
             S->Scope.Info = 0;
         } else {
             S->Scope.Info = CollAt (&D->Info->ScopeInfoById, S->Scope.Id);
+
+            /* Place a backpointer to the symbol in the scope */
+            CollAppend (&S->Scope.Info->SymInfoByName, S);
         }
 
         /* Resolve the parent */
@@ -4423,6 +4429,16 @@ static void ProcessSymInfo (InputData* D)
                 S->Scope.Info = S->Parent.Info->Scope.Info;
             }
         }
+    }
+
+    /* Walk over the scopes and sort the symbols in the scope by name */
+    for (I = 0; I < CollCount (&D->Info->ScopeInfoById); ++I) {
+
+        /* Get the scope info */
+        ScopeInfo* S = CollAt (&D->Info->ScopeInfoById, I);
+
+        /* Sort the symbols in this scope by name */
+        CollSort (&S->SymInfoByName, CompareSymInfoByName);
     }
 
     /* Sort the symbol infos */
@@ -5453,6 +5469,48 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name
 
 
 
+const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo Handle, unsigned ScopeId)
+/* Return a list of symbols in the given scope. This includes cheap local
+ * symbols, but not symbols in subscopes. The function returns NULL if the
+ * scope id is invalid (no such scope) and otherwise a - possibly empty -
+ * symbol list.
+ */
+{
+    DbgInfo*            Info;
+    cc65_symbolinfo*    D;
+    ScopeInfo*          S;                 
+    unsigned            I;
+
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the id is valid */
+    if (ScopeId >= CollCount (&Info->ScopeInfoById)) {
+        return 0;
+    }
+
+    /* Get the scope */
+    S = CollAt (&Info->ScopeInfoById, ScopeId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_symbolinfo (CollCount (&S->SymInfoByName));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&S->SymInfoByName); ++I) {
+        /* Copy the data */
+        CopySymInfo (D->data + I, CollConstAt (&S->SymInfoByName, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
 const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start,
                                             cc65_addr End)
 /* Return a list of labels in the given range. End is inclusive. The function
@@ -5671,11 +5729,11 @@ const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
     S = CollAt (&Info->ScopeInfoById, Id);
 
     /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_scopeinfo (S->ChildScopes? CollCount (S->ChildScopes) : 0);
+    D = new_cc65_scopeinfo (S->ChildScopeList? CollCount (S->ChildScopeList) : 0);
 
     /* Fill in the data */
     for (I = 0; I < D->count; ++I) {
-        CopyScopeInfo (D->data + I, CollConstAt (S->ChildScopes, I));
+        CopyScopeInfo (D->data + I, CollConstAt (S->ChildScopeList, I));
     }
 
     /* Return the result */

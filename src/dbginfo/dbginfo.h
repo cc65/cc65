@@ -443,6 +443,14 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo handle, const char* name
  * no symbol with this name was found.
  */
 
+const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo handle,
+                                            unsigned scope_id);
+/* Return a list of symbols in the given scope. This includes cheap local
+ * symbols, but not symbols in subscopes. The function returns NULL if the
+ * scope id is invalid (no such scope) and otherwise a - possibly empty -
+ * symbol list.
+ */
+
 const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
                                             cc65_addr start, cc65_addr end);
 /* Return a list of labels in the given range. end is inclusive. The function

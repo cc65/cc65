@@ -4663,7 +4663,7 @@ const cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
 
 
 
-const cc65_libraryinfo* cc65_libraryinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_libraryinfo* cc65_library_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a library with a specific id. The function
  * returns NULL if the id is invalid (no such library) and otherwise a
  * cc65_libraryinfo structure with one entry that contains the requested
@@ -4714,8 +4714,8 @@ void cc65_free_libraryinfo (cc65_dbginfo Handle, const cc65_libraryinfo* Info)
 
 
 
-const cc65_lineinfo* cc65_lineinfo_byline (cc65_dbginfo Handle, unsigned FileId,
-                                           cc65_line Line)
+const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
+                                         cc65_line Line)
 /* Return line information for a source file/line number combination. The
  * function returns NULL if no line information was found.
  */
@@ -4805,7 +4805,7 @@ const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
 
 
 
-const cc65_moduleinfo* cc65_moduleinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_moduleinfo* cc65_module_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a module with a specific id. The function
  * returns NULL if the id is invalid (no such module) and otherwise a
  * cc65_moduleinfo structure with one entry that contains the requested
@@ -4884,7 +4884,7 @@ const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
 
 
 
-const cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_spaninfo* cc65_span_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a span with a specific id. The function
  * returns NULL if the id is invalid (no such span) and otherwise a
  * cc65_spaninfo structure with one entry that contains the requested
@@ -4917,7 +4917,7 @@ const cc65_spaninfo* cc65_spaninfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-const cc65_spaninfo* cc65_spaninfo_byaddr (cc65_dbginfo Handle, unsigned long Addr)
+const cc65_spaninfo* cc65_span_byaddr (cc65_dbginfo Handle, unsigned long Addr)
 /* Return span information for the given address. The function returns NULL
  * if no spans were found for this address.
  */
@@ -4954,7 +4954,7 @@ const cc65_spaninfo* cc65_spaninfo_byaddr (cc65_dbginfo Handle, unsigned long Ad
 
 
 
-const cc65_spaninfo* cc65_spaninfo_byline (cc65_dbginfo Handle, unsigned LineId)
+const cc65_spaninfo* cc65_span_byline (cc65_dbginfo Handle, unsigned LineId)
 /* Return span information for the given source line. The function returns NULL
  * if the line id is invalid, otherwise the spans for this line (possibly zero).
  */
@@ -4993,7 +4993,7 @@ const cc65_spaninfo* cc65_spaninfo_byline (cc65_dbginfo Handle, unsigned LineId)
 
 
 
-const cc65_spaninfo* cc65_spaninfo_byscope (cc65_dbginfo Handle, unsigned ScopeId)
+const cc65_spaninfo* cc65_span_byscope (cc65_dbginfo Handle, unsigned ScopeId)
 /* Return span information for the given scope. The function returns NULL if
  * the scope id is invalid, otherwise the spans for this scope (possibly zero).
  */
@@ -5082,7 +5082,7 @@ const cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
 
 
 
-const cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_sourceinfo* cc65_source_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a source file with a specific id. The function
  * returns NULL if the id is invalid (no such source file) and otherwise a
  * cc65_sourceinfo structure with one entry that contains the requested
@@ -5116,7 +5116,7 @@ const cc65_sourceinfo* cc65_sourceinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-const cc65_sourceinfo* cc65_sourceinfo_bymodule (cc65_dbginfo Handle, unsigned Id)
+const cc65_sourceinfo* cc65_source_bymodule (cc65_dbginfo Handle, unsigned Id)
 /* Return information about the source files used to build a module. The
  * function returns NULL if the module id is invalid (no such module) and
  * otherwise a cc65_sourceinfo structure with one entry per source file.
@@ -5201,7 +5201,7 @@ const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 
 
 
-const cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
+const cc65_segmentinfo* cc65_segment_byid (cc65_dbginfo Handle, unsigned Id)
 /* Return information about a segment with a specific id. The function returns
  * NULL if the id is invalid (no such segment) and otherwise a segmentinfo
  * structure with one entry that contains the requested segment information.
@@ -5233,8 +5233,8 @@ const cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
 
 
-const cc65_segmentinfo* cc65_segmentinfo_byname (cc65_dbginfo Handle,
-                                                 const char* Name)
+const cc65_segmentinfo* cc65_segment_byname (cc65_dbginfo Handle,
+                                             const char* Name)
 /* Return information about a segment with a specific name. The function
  * returns NULL if no segment with this name exists and otherwise a
  * cc65_segmentinfo structure with one entry that contains the requested
@@ -5577,3 +5577,4 @@ void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info)
 
 
 
+                                    

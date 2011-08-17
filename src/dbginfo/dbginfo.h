@@ -471,6 +471,9 @@ struct cc65_scopeinfo {
 
 
 
+const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo handle);
+/* Return a list of all scopes in the debug information */
+
 const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo handle, unsigned id);
 /* Return the scope with a given id. The function returns NULL if no scope
  * with this id was found.

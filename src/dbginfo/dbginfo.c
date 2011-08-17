@@ -196,6 +196,12 @@ struct DbgInfo {
 
     /* Other stuff */
     SpanInfoList        SpanInfoByAddr; /* Span infos sorted by unique address */
+
+    /* Info data */
+    unsigned long       MemUsage;       /* Memory usage for the data */
+    unsigned            MajorVersion;   /* Major version number of loaded file */
+    unsigned            MinorVersion;   /* Minor version number of loaded file */
+    char                FileName[1];    /* Name of input file */
 };
 
 /* Data used when parsing the debug info file */
@@ -213,8 +219,6 @@ struct InputData {
     unsigned long       IVal;           /* Integer constant */
     StrBuf              SVal;           /* String constant */
     cc65_errorfunc      Error;          /* Function called in case of errors */
-    unsigned            MajorVersion;   /* Major version number */
-    unsigned            MinorVersion;   /* Minor version number */
     DbgInfo*            Info;           /* Pointer to debug info */
 };
 
@@ -1802,11 +1806,14 @@ static void DoneSpanInfoList (SpanInfoList* L)
 
 
 
-static DbgInfo* NewDbgInfo (void)
+static DbgInfo* NewDbgInfo (const char* FileName)
 /* Create a new DbgInfo struct and return it */
 {
+    /* Get the length of the name */
+    unsigned Len = strlen (FileName);
+
     /* Allocate memory */
-    DbgInfo* Info = xmalloc (sizeof (DbgInfo));
+    DbgInfo* Info = xmalloc (sizeof (DbgInfo) + Len);
 
     /* Initialize it */
     CollInit (&Info->FileInfoById);
@@ -1825,6 +1832,11 @@ static DbgInfo* NewDbgInfo (void)
     CollInit (&Info->SymInfoByVal);
 
     InitSpanInfoList (&Info->SpanInfoByAddr);
+
+    Info->MemUsage     = 0;
+    Info->MajorVersion = 0;
+    Info->MinorVersion = 0;
+    memcpy (&Info->FileName, FileName, Len+1);
 
     /* Return it */
     return Info;
@@ -3675,7 +3687,7 @@ static void ParseVersion (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                D->MajorVersion = D->IVal;
+                D->Info->MajorVersion = D->IVal;
                 NextToken (D);
                 InfoBits |= ibMajor;
                 break;
@@ -3688,7 +3700,7 @@ static void ParseVersion (InputData* D)
                 if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                D->MinorVersion = D->IVal;
+                D->Info->MinorVersion = D->IVal;
                 NextToken (D);
                 InfoBits |= ibMinor;
                 break;
@@ -4403,25 +4415,23 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
         0,                      /* Integer constant */
         STRBUF_INITIALIZER,     /* String constant */
         0,                      /* Function called in case of errors */
-        0,                      /* Major version number */
-        0,                      /* Minor version number */
         0,                      /* Pointer to debug info */
     };
     D.FileName = FileName;
     D.Error    = ErrFunc;
 
     /* Open the input file */
-    D.F = fopen (D.FileName, "rt");
+    D.F = fopen (FileName, "rt");
     if (D.F == 0) {
         /* Cannot open */
         ParseError (&D, CC65_ERROR,
                     "Cannot open input file \"%s\": %s",
-                     D.FileName, strerror (errno));
+                     FileName, strerror (errno));
         return 0;
     }
 
     /* Create a new debug info struct */
-    D.Info = NewDbgInfo ();
+    D.Info = NewDbgInfo (FileName);
 
     /* Prime the pump */
     NextToken (&D);
@@ -4438,30 +4448,34 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
     ParseVersion (&D);
 
     /* Do several checks on the version number */
-    if (D.MajorVersion < VER_MAJOR) {
+    if (D.Info->MajorVersion < VER_MAJOR) {
         ParseError (
             &D, CC65_ERROR,
             "This is an old version of the debug info format that is no "
             "longer supported. Version found = %u.%u, version supported "
             "= %u.%u",
-             D.MajorVersion, D.MinorVersion, VER_MAJOR, VER_MINOR
+            D.Info->MajorVersion, D.Info->MinorVersion,
+            VER_MAJOR, VER_MINOR
         );
         goto CloseAndExit;
-    } else if (D.MajorVersion == VER_MAJOR && D.MinorVersion > VER_MINOR) {
+    } else if (D.Info->MajorVersion == VER_MAJOR &&
+               D.Info->MinorVersion > VER_MINOR) {
         ParseError (
             &D, CC65_ERROR,
             "This is a slightly newer version of the debug info format. "
             "It might work, but you may get errors about unknown keywords "
             "and similar. Version found = %u.%u, version supported = %u.%u",
-             D.MajorVersion, D.MinorVersion, VER_MAJOR, VER_MINOR
+            D.Info->MajorVersion, D.Info->MinorVersion,
+            VER_MAJOR, VER_MINOR
         );
-    } else if (D.MajorVersion > VER_MAJOR) {
+    } else if (D.Info->MajorVersion > VER_MAJOR) {
         ParseError (
             &D, CC65_WARNING,
             "The format of this debug info file is newer than what we "
             "know. Will proceed but probably fail. Version found = %u.%u, "
             "version supported = %u.%u",
-             D.MajorVersion, D.MinorVersion, VER_MAJOR, VER_MINOR
+            D.Info->MajorVersion, D.Info->MinorVersion,
+            VER_MAJOR, VER_MINOR
         );
     }
     ConsumeEOL (&D);
@@ -5127,7 +5141,6 @@ const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 /* Return a list of all segments referenced in the debug information */
 {
     DbgInfo*            Info;
-    const Collection*   SegInfoByName;
     cc65_segmentinfo*   D;
     unsigned            I;
 
@@ -5137,16 +5150,13 @@ const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     /* The handle is actually a pointer to a debug info struct */
     Info = (DbgInfo*) Handle;
 
-    /* Get a pointer to the segment list */
-    SegInfoByName = &Info->SegInfoByName;
-
     /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_segmentinfo (CollCount (SegInfoByName));
+    D = new_cc65_segmentinfo (CollCount (&Info->SegInfoById));
 
     /* Fill in the data */
-    for (I = 0; I < CollCount (SegInfoByName); ++I) {
+    for (I = 0; I < CollCount (&Info->SegInfoById); ++I) {
         /* Copy the data */
-        CopySegInfo (D->data + I, CollConstAt (SegInfoByName, I));
+        CopySegInfo (D->data + I, CollConstAt (&Info->SegInfoById, I));
     }
 
     /* Return the result */
@@ -5382,6 +5392,34 @@ void cc65_free_symbolinfo (cc65_dbginfo Handle, const cc65_symbolinfo* Info)
 /*****************************************************************************/
 /*                                  Scopes                                   */
 /*****************************************************************************/
+
+
+
+const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo Handle)
+/* Return a list of all scopes in the debug information */
+{
+    DbgInfo*            Info;
+    cc65_scopeinfo*     D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (CollCount (&Info->ScopeInfoById));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&Info->ScopeInfoById); ++I) {
+        /* Copy the data */
+        CopyScopeInfo (D->data + I, CollConstAt (&Info->ScopeInfoById, I));
+    }
+
+    /* Return the result */
+    return D;
+}
 
 
 

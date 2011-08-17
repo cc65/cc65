@@ -190,6 +190,7 @@ struct DbgInfo {
     /* Collections with other sort criteria */
     Collection          FileInfoByName; /* File infos sorted by name */
     Collection		ModInfoByName;	/* Module info sorted by name */
+    Collection          ScopeInfoByName;/* Scope infos sorted by name */
     Collection          SegInfoByName;  /* Segment infos sorted by name */
     Collection          SymInfoByName;  /* Symbol infos sorted by name */
     Collection          SymInfoByVal;   /* Symbol infos sorted by value */
@@ -1340,9 +1341,15 @@ static void CopyScopeInfo (cc65_scopedata* D, const ScopeInfo* S)
 static int CompareScopeInfoByName (const void* L, const void* R)
 /* Helper function to sort scope infos in a collection by name */
 {
-    /* Compare scope name */
-    return strcmp (((const ScopeInfo*) L)->Name,
-                   ((const ScopeInfo*) R)->Name);
+    const ScopeInfo* Left  = L;
+    const ScopeInfo* Right = R;
+
+    /* Compare scope name, then id */
+    int Res = strcmp (Left->Name, Right->Name);
+    if (Res == 0) {
+        Res = (int)Left->Id - (int)Right->Id;
+    }         
+    return Res;
 }
 
 
@@ -1833,6 +1840,7 @@ static DbgInfo* NewDbgInfo (const char* FileName)
 
     CollInit (&Info->FileInfoByName);
     CollInit (&Info->ModInfoByName);
+    CollInit (&Info->ScopeInfoByName);
     CollInit (&Info->SegInfoByName);
     CollInit (&Info->SymInfoByName);
     CollInit (&Info->SymInfoByVal);
@@ -1894,6 +1902,7 @@ static void FreeDbgInfo (DbgInfo* Info)
     /* Free the memory used by the other collections */
     CollDone (&Info->FileInfoByName);
     CollDone (&Info->ModInfoByName);
+    CollDone (&Info->ScopeInfoByName);
     CollDone (&Info->SegInfoByName);
     CollDone (&Info->SymInfoByName);
     CollDone (&Info->SymInfoByVal);
@@ -2481,16 +2490,17 @@ static void ParseInfo (InputData* D)
 
             case TOK_MODULE:
                 CollGrow (&D->Info->ModInfoById,   D->IVal);
-		CollGrow (&D->Info->ModInfoByName, D->IVal);
+	    	CollGrow (&D->Info->ModInfoByName, D->IVal);
                 break;
 
             case TOK_SCOPE:
                 CollGrow (&D->Info->ScopeInfoById, D->IVal);
+                CollGrow (&D->Info->ScopeInfoByName, D->IVal);
                 break;
 
             case TOK_SEGMENT:
                 CollGrow (&D->Info->SegInfoById,   D->IVal);
-		CollGrow (&D->Info->SegInfoByName, D->IVal);
+	    	CollGrow (&D->Info->SegInfoByName, D->IVal);
                 break;
 
             case TOK_SPAN:
@@ -3124,6 +3134,7 @@ static void ParseScope (InputData* D)
 
     /* ... and remember it */
     CollReplaceExpand (&D->Info->ScopeInfoById, S, Id);
+    CollAppend (&D->Info->ScopeInfoByName, S);
 
 ErrorExit:
     /* Entry point in case of errors */
@@ -3900,6 +3911,50 @@ static SegInfo* FindSegInfoByName (Collection* SegInfos, const char* Name)
 
 
 
+static int FindScopeInfoByName (const Collection* ScopeInfos, const char* Name,
+                                unsigned* Index)
+/* Find the ScopeInfo for a given scope name. The function returns true if the
+ * name was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for Name.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (ScopeInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        const ScopeInfo* CurItem = CollConstAt (ScopeInfos, Cur);
+
+        /* Compare */
+        int Res = strcmp (CurItem->Name, Name);
+
+        /* Found? */
+        if (Res < 0) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Res == 0) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
+}
+
+
+
 static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
                               unsigned* Index)
 /* Find the SymInfo for a given file name. The function returns true if the
@@ -4273,6 +4328,9 @@ static void ProcessScopeInfo (InputData* D)
         /* Sort the scopes for this module by name */
         CollSort (&M->ScopeInfoByName, CompareScopeInfoByName);
     }
+
+    /* Sort the scope infos */
+    CollSort (&D->Info->ScopeInfoByName, CompareScopeInfoByName);
 }
 
 
@@ -5478,7 +5536,7 @@ const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo Handle, unsigned ScopeI
 {
     DbgInfo*            Info;
     cc65_symbolinfo*    D;
-    ScopeInfo*          S;                 
+    ScopeInfo*          S;
     unsigned            I;
 
 
@@ -5695,6 +5753,60 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
     /* Fill in the data */
     for (I = 0; I < CollCount (&M->ScopeInfoByName); ++I) {
         CopyScopeInfo (D->data + I, CollConstAt (&M->ScopeInfoByName, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
+/* Return the list of scopes with a given name. Returns NULL if no scope with
+ * the given name was found, otherwise a non empty scope list.
+ */
+{
+    DbgInfo*            Info;
+    unsigned            Index;
+    ScopeInfo*          S;
+    cc65_scopeinfo*     D;
+    unsigned            Count;
+    unsigned            I;
+
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Search for the first item with the given name */
+    if (!FindScopeInfoByName (&Info->ScopeInfoByName, Name, &Index)) {
+        /* Not found */
+        return 0;
+    }
+
+    /* Count scopes with this name */
+    Count = 1;
+    I = Index;
+    while (1) {
+        if (++I >= CollCount (&Info->ScopeInfoByName)) {
+            break;
+        }
+        S = CollAt (&Info->ScopeInfoByName, I);
+        if (strcmp (S->Name, Name) != 0) {
+            /* Next symbol has another name */
+            break;
+        }
+        ++Count;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (Count);
+
+    /* Fill in the data */
+    for (I = 0; I < Count; ++I, ++Index) {
+        CopyScopeInfo (D->data + I, CollConstAt (&Info->ScopeInfoByName, Index));
     }
 
     /* Return the result */

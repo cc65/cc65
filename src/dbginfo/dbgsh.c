@@ -72,6 +72,9 @@ static void CmdShow (Collection* Args);
 static void CmdShowHelp (Collection* Args);
 /* Print help for the show command */
 
+static void CmdShowChildScopes (Collection* Args);
+/* Show child scopes from the debug info file */
+
 static void CmdShowLibrary (Collection* Args);
 /* Show libraries from the debug info file */
 
@@ -165,6 +168,11 @@ static const CmdEntry MainCmds[] = {
 /* Table with show commands */
 static const CmdEntry ShowCmds[] = {
     {
+        "childscopes",
+        "Show child scopes of other scopes.",
+        -2,
+        CmdShowChildScopes
+    }, {
         "help",
         "Show available subcommands",
         1,
@@ -763,6 +771,52 @@ static void CmdShowHelp (Collection* Args attribute ((unused)))
 
 
 
+static void CmdShowChildScopes (Collection* Args)
+/* Show child scopes from the debug info file */
+{
+    const cc65_scopeinfo* S;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintScopeHeader ();
+
+    /* Output child scopes for all arguments */
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = ScopeId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+                case ScopeId:
+                    S = cc65_childscopes_byid (Info, Id);
+                    break;
+                default:
+                    S = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* Invalid id */
+            S = 0;
+        }
+
+        /* Output the list */
+        if (S) {
+            PrintScopes (S);
+            cc65_free_scopeinfo (Info, S);
+        }
+    }
+}
+
+
+
 static void CmdShowLine (Collection* Args)
 /* Show lines from the debug info file */
 {
@@ -982,8 +1036,7 @@ static void CmdShowScope (Collection* Args)
                 }
             } else {
                 /* An invalid id may be a scope name */
-                //S = cc65_scope_byname (Info, CollConstAt (Args, I));
-                S = 0;
+                S = cc65_scope_byname (Info, CollConstAt (Args, I));
             }
 
             /* Output the list */

@@ -348,6 +348,7 @@ struct SymInfo {
         SymInfo*        Info;           /* Pointer to parent symbol if any */
     } Parent;
     Collection*         ImportList;     /* List of imports if this is an export */
+    Collection*         CheapLocals;    /* List of cheap local symbols */
     char                Name[1];        /* Name of symbol */
 };
 
@@ -706,7 +707,7 @@ static void CollPrepareInsert (Collection* C, unsigned Index)
     /* Grow the array if necessary */
     if (C->Count >= C->Size) {
        	/* Must grow */
-        CollGrow (C, (C->Size == 0)? 8 : C->Size * 2);
+        CollGrow (C, (C->Size == 0)? 1 : C->Size * 2);
     }
 
     /* Move the existing elements if needed */
@@ -768,7 +769,7 @@ static void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
         /* Must expand the collection */
         unsigned Size = C->Size;
         if (Size == 0) {
-            Size = 8;
+            Size = 2;
         }
         while (Index >= Size) {
             Size *= 2;
@@ -1348,7 +1349,7 @@ static int CompareScopeInfoByName (const void* L, const void* R)
     int Res = strcmp (Left->Name, Right->Name);
     if (Res == 0) {
         Res = (int)Left->Id - (int)Right->Id;
-    }         
+    }
     return Res;
 }
 
@@ -1527,6 +1528,7 @@ static SymInfo* NewSymInfo (const StrBuf* Name)
 
     /* Initialize it as necessary */
     S->ImportList = 0;
+    S->CheapLocals = 0;
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1539,6 +1541,7 @@ static void FreeSymInfo (SymInfo* S)
 /* Free a SymInfo struct */
 {
     CollFree (S->ImportList);
+    CollFree (S->CheapLocals);
     xfree (S);
 }
 
@@ -4450,7 +4453,7 @@ static void ProcessSymInfo (InputData* D)
             CollAppend (&S->Scope.Info->SymInfoByName, S);
         }
 
-        /* Resolve the parent */
+        /* Resolve the parent for cheap locals */
         if (S->Parent.Id == CC65_INV_ID) {
             S->Parent.Info = 0;
         } else if (S->Parent.Id >= CollCount (&D->Info->SymInfoById)) {
@@ -4461,6 +4464,12 @@ static void ProcessSymInfo (InputData* D)
             S->Parent.Info = 0;
         } else {
             S->Parent.Info = CollAt (&D->Info->SymInfoById, S->Parent.Id);
+
+            /* Place a backpointer to the cheap local into the parent */
+            if (S->Parent.Info->CheapLocals == 0) {
+                S->Parent.Info->CheapLocals = CollNew ();
+            }
+            CollAppend (S->Parent.Info->CheapLocals, S);
         }
     }
 

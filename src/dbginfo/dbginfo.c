@@ -1264,7 +1264,7 @@ static int CompareModInfoByName (const void* L, const void* R)
 }
 
 
-                  
+
 /*****************************************************************************/
 /*                                Scope info                                 */
 /*****************************************************************************/
@@ -1317,9 +1317,9 @@ static void CopyScopeInfo (cc65_scopedata* D, const ScopeInfo* S)
     D->scope_type       = S->Type;
     D->scope_size       = S->Size;
     if (S->Parent.Info) {
-        D->scope_parent = S->Parent.Info->Id;
+        D->parent_id    = S->Parent.Info->Id;
     } else {
-        D->scope_parent = CC65_INV_ID;
+        D->parent_id    = CC65_INV_ID;
     }
     if (S->Label.Info) {
         D->symbol_id    = S->Label.Info->Id;

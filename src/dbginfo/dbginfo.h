@@ -466,7 +466,7 @@ struct cc65_scopedata {
     const char*         scope_name;     /* Name of scope */
     cc65_scope_type     scope_type;     /* Type of scope */
     cc65_size           scope_size;     /* Size of scope, 0 if unknown */
-    unsigned            scope_parent;   /* Id of parent scope */
+    unsigned            parent_id;      /* Id of parent scope */
     unsigned            symbol_id;      /* Id of scope symbol if any */
     unsigned            module_id;      /* Id of the module */
 };

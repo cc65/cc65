@@ -37,18 +37,61 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <ctype.h>
-#include <limits.h>
-#include <assert.h>
+#include <time.h>
 #include <errno.h>
 
 /* common */
 #include "attrib.h"
 #include "chartype.h"
+#include "cmdline.h"
 #include "coll.h"
 
 /* dbginfo */
 #include "dbginfo.h"
+
+
+
+/*****************************************************************************/
+/*                         Command handler forwards                          */
+/*****************************************************************************/
+
+
+
+static void CmdHelp (Collection* Args attribute ((unused)));
+/* Output a help text */
+
+static void CmdLoad (Collection* Args);
+/* Load a debug info file */
+
+static void CmdQuit (Collection* Args attribute ((unused)));
+/* Terminate the application */
+
+static void CmdShow (Collection* Args);
+/* Show items from the debug info file */
+
+static void CmdShowHelp (Collection* Args);
+/* Print help for the show command */
+
+static void CmdShowLibrary (Collection* Args);
+/* Show libraries from the debug info file */
+
+static void CmdShowLine (Collection* Args);
+/* Show lines from the debug info file */
+
+static void CmdShowModule (Collection* Args);
+/* Show modules from the debug info file */
+
+static void CmdShowScope (Collection* Args);
+/* Show scopes from the debug info file */
+
+static void CmdShowSegment (Collection* Args);
+/* Show segments from the debug info file */
+
+static void CmdShowSource (Collection* Args);
+/* Show source files from the debug info file */
+
+static void CmdUnload (Collection* Args attribute ((unused)));
+/* Unload a debug info file */
 
 
 
@@ -68,58 +111,96 @@ static cc65_dbginfo     Info = 0;
 static unsigned FileErrors   = 0;
 static unsigned FileWarnings = 0;
 
+/* Type of an id */
+enum {
+    InvalidId,
+    LibraryId,
+    LineId,
+    ModuleId,
+    ScopeId,
+    SegmentId,
+    SourceId,
+    SpanId,
+};
+
 /* Structure that contains a command description */
 typedef struct CmdEntry CmdEntry;
 struct CmdEntry {
-    char    Cmd[12];
-    int     ArgCount;
-    void    (*Func) (Collection*);
+    char        Cmd[12];
+    const char* Help;
+    int         ArgCount;
+    void        (*Func) (Collection*);
 };
 
+/* Table with main commands */
+static const CmdEntry MainCmds[] = {
+    {
+        "help",
+        "Show available commands",
+        1,
+        CmdHelp
+    }, {
+        "load",
+        "Load a debug info file",
+        2,
+        CmdLoad
+    }, {
+        "quit",
+        "Terminate the shell",
+        1,
+        CmdQuit
+    }, {
+        "show",
+        "Show items from the info file",
+        -2,
+        CmdShow
+    }, {
+        "unload",
+        "Unload a debug info file",
+        1,
+        CmdUnload
+    },
+};
 
-
-/*****************************************************************************/
-/*                            Debug file handling                            */
-/*****************************************************************************/
-
-
-
-static void CloseFile (void)
-/* Close the debug info file */
-{
-    if (Info) {
-        cc65_free_dbginfo (Info);
-        Info = 0;
-    }
-}
-
-
-
-static int FileIsOpen (void)
-/* Return true if the file is open and has loaded without errors: If not,
- * print an error message and return false.
- */
-{
-    /* File open? */
-    if (Info == 0) {
-        printf ("No debug info file\n");
-        return 0;
-    }
-
-    /* Errors on load? */
-    if (FileErrors > 0) {
-        printf ("File had load errors!\n");
-        return 0;
-    }
-
-    /* Warnings on load? */
-    if (FileWarnings > 0) {
-        printf ("Beware - file had load warnings!\n");
-    }
-
-    /* Ok */
-    return 1;
-}
+/* Table with show commands */
+static const CmdEntry ShowCmds[] = {
+    {
+        "help",
+        "Show available subcommands",
+        1,
+        CmdShowHelp
+    }, {
+        "line",
+        "Show line info. May be followed by one or more line ids.",
+        -2,
+        CmdShowLine
+    }, {
+        "library",
+        "Show libraries. May be followed by one or more library ids.",
+        -1,
+        CmdShowLibrary
+    }, {
+        "module",
+        "Show modules. May be followed by one or more module ids.",
+        -1,
+        CmdShowModule
+    }, {
+        "scope",
+        "Show scopes. May be followed by one or more segment ids.",
+        -1,
+        CmdShowScope
+    }, {
+        "segment",
+        "Show segments. May be followed by one or more segment ids.",
+        -1,
+        CmdShowSegment
+    }, {
+        "source",
+        "Show sources. May be followed by one or more source file ids.",
+        -1,
+        CmdShowSource
+    },
+};
 
 
 
@@ -129,15 +210,56 @@ static int FileIsOpen (void)
 
 
 
+static void NewLine (void)
+/* Output a newline */
+{
+    putchar ('\n');
+}
+
+
+
+static void Print (const char* Format, ...) attribute((format(printf,1,2)));
+static void Print (const char* Format, ...)
+/* Print a piece of output (no linefeed added) */
+{
+    va_list ap;
+    va_start (ap, Format);
+    vprintf (Format, ap);
+    va_end (ap);
+}
+
+
+
+static void PrintLine (const char* Format, ...) attribute((format(printf,1,2)));
+static void PrintLine (const char* Format, ...)
+/* Print one line of output. The linefeed is supplied by the function */
+{
+    va_list ap;
+    va_start (ap, Format);
+    vprintf (Format, ap);
+    NewLine ();
+    va_end (ap);
+}
+
+
+
+static void PrintSeparator (void)
+/* Print a separator line */
+{
+    PrintLine ("-----------------------------------------------------------------------");
+}
+
+
+
 static void FileError (const cc65_parseerror* Info)
 /* Callback function - is called in case of errors */
 {
     /* Output a message */
-    printf ("%s:%s(%lu): %s\n",
-            Info->type? "Error" : "Warning",
-            Info->name,
-            (unsigned long) Info->line,
-            Info->errormsg);
+    PrintLine ("%s:%s(%lu): %s",
+               Info->type? "Error" : "Warning",
+               Info->name,
+               (unsigned long) Info->line,
+               Info->errormsg);
 
     /* Bump the counters */
     switch (Info->type) {
@@ -148,38 +270,469 @@ static void FileError (const cc65_parseerror* Info)
 
 
 
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
-
-static void CmdOpen (Collection* Args)
-/* Open a debug info file */
+static const CmdEntry* FindCmd (const char* Cmd, const CmdEntry* Tab, unsigned Count)
+/* Search for a command in the given table */
 {
-    /* Argument is file name */
-    if (CollCount (Args) != 2) {
-        printf ("Command requires exactly one argument\n");
+    unsigned I;
+    for (I = 0; I < Count; ++I, ++Tab) {
+        if (strcmp (Cmd, Tab->Cmd) == 0) {
+            return Tab;
+        }
+    }
+    return 0;
+}
+
+
+
+static void ExecCmd (Collection* Args, const CmdEntry* Tab, unsigned Count)
+/* Search for the command in slot 0 of the given collection. If found, check
+ * the argument count, then execute it. If there are problems, output a
+ * diagnostic.
+ */
+{
+    /* Search for the command, check number of args, then execute it */
+    const char* Cmd = CollAt (Args, 0);
+    const CmdEntry* E = FindCmd (Cmd, Tab, Count);
+    if (E == 0) {
+        PrintLine ("No such command: %s", Cmd);
         return;
     }
 
-    /* Close an open file */
-    CloseFile ();
+    /* Check the number of arguments. Zero means that the function will check
+     * itself. A negative count means that the function needs at least
+     * abs(count) arguments. A positive count means that the function needs
+     * exactly this number of arguments.
+     * Note: The number includes the command itself.
+     */
+    if (E->ArgCount > 0 && (int)CollCount (Args) != E->ArgCount) {
+        /* Argument number mismatch */
+        switch (E->ArgCount) {
+
+            case 1:
+                PrintLine ("Command doesn't accept an argument");
+                return;
+
+            case 2:
+                PrintLine ("Command requires an argument");
+                return;
+
+            default:
+                PrintLine ("Command requires %d arguments", E->ArgCount-1);
+                return;
+        }
+    } else if (E->ArgCount < 0 && (int)CollCount (Args) < -E->ArgCount) {
+        /* Argument number mismatch */
+        switch (E->ArgCount) {
+
+            case -2:
+                PrintLine ("Command requires at least one argument");
+                return;
+
+            default:
+                PrintLine ("Command requires at least %d arguments", E->ArgCount-1);
+                return;
+        }
+    } else {
+        /* Remove the command from the argument list, then execute it */
+        CollDelete (Args, 0);
+        E->Func (Args);
+    }
+}
+
+
+
+static void PrintHelp (const CmdEntry* Tab, unsigned Count)
+/* Output help for one command table */
+{
+    while (Count--) {
+        PrintLine ("%-*s%s", (int) sizeof (Tab->Cmd) + 2, Tab->Cmd, Tab->Help);
+        ++Tab;
+    }
+}
+
+
+
+static unsigned FindIdType (const char* TypeName)
+/* Find an id type by its name. Returns the type or InvalidId. */
+{
+    static const struct {
+        char            Name[8];
+        unsigned        Type;
+    } TypeTab[] = {
+        {   "l",        LineId          },
+        {   "lib",      LibraryId       },
+        {   "library",  LibraryId       },
+        {   "line",     LineId          },
+        {   "m",        ModuleId        },
+        {   "mod",      ModuleId        },
+        {   "module",   ModuleId        },
+        {   "sc",       ScopeId         },
+        {   "scope",    ScopeId         },
+        {   "seg",      SegmentId       },
+        {   "segment",  SegmentId       },
+        {   "source",   SourceId        },
+        {   "src",      SourceId        },
+        {   "sp",       SpanId          },
+        {   "span",     SpanId          },
+    };
+
+    unsigned I;
+    for (I = 0; I < sizeof(TypeTab) / sizeof(TypeTab[0]); ++I) {
+        if (strcmp (TypeName, TypeTab[I].Name) == 0) {
+            return TypeTab[I].Type;
+        }
+    }
+    return InvalidId;
+}
+
+
+
+static int GetId (const char* S, unsigned* Id, unsigned* IdType)
+/* Parse a string for an id. If a valid id is found, it is placed in Id and
+ * the function returns true. If an optional type is found, it is placed in
+ * IdType, otherwise IdType is left unchanged. If no id is found, the
+ * function returns false.
+ */
+{
+    char TypeBuf[20];
+    char C;
+    if (sscanf (S, "%u%c", Id, &C) == 1) {
+        /* Just an id found, return it */
+        return 1;
+    }
+    if (sscanf (S, "%19[a-z]:%u%c", TypeBuf, Id, &C) == 2) {
+        *IdType = FindIdType (TypeBuf);
+        return (*IdType != InvalidId);
+    }
+
+    /* Not a valid id */
+    return 0;
+}
+
+
+
+/*****************************************************************************/
+/*                      Output functions for item lists                      */
+/*****************************************************************************/
+
+
+
+static void PrintAddr (cc65_addr Addr, unsigned FieldWidth)
+/* Output an address */
+{
+    Print ("$%06lX", (unsigned long) Addr);
+    if (FieldWidth > 7) {
+        Print ("%*s", FieldWidth - 7, "");
+    }
+}
+
+
+
+static void PrintNumber (unsigned long Num, unsigned Width, unsigned FieldWidth)
+/* Output a number */
+{
+    Print ("%*lu", Width, Num);
+    if (FieldWidth > Width) {
+        Print ("%*s", FieldWidth - Width, "");
+    }
+}
+
+
+
+static void PrintId (unsigned Id, unsigned FieldWidth)
+/* Output an id field */
+{
+    if (Id == CC65_INV_ID) {
+        Print ("   -");
+    } else {
+        Print ("%4u", Id);
+    }
+    if (FieldWidth > 4) {
+        Print ("%*s", FieldWidth - 4, "");
+    }
+}
+
+
+
+static void PrintSize (cc65_size Size, unsigned FieldWidth)
+/* Output a size */
+{
+    Print ("$%04lX", (unsigned long) Size);
+    if (FieldWidth > 5) {
+        Print ("%*s", FieldWidth - 5, "");
+    }
+}
+
+
+
+static void PrintTime (time_t T, unsigned FieldWidth)
+/* Output a time stamp of some sort */
+{
+    /* Convert to string */
+    char Buf[100];
+    unsigned Len = strftime (Buf, sizeof (Buf), "%Y-%m-%d %H:%M:%S", localtime (&T));
+
+    /* Output */
+    Print ("%s", Buf);
+    if (FieldWidth > Len) {
+        Print ("%*s", FieldWidth - Len, "");
+    }
+}
+
+
+
+static void PrintLibraryHeader (void)
+/* Output the header for a library list */
+{
+    PrintLine ("  id    name");
+    PrintSeparator ();
+}
+
+
+
+static void PrintLibraries (const cc65_libraryinfo* L)
+/* Output a list of libraries */
+{
+    unsigned I;
+    const cc65_librarydata* D;
+
+    /* Libraries */
+    for (I = 0, D = L->data; I < L->count; ++I, ++D) {
+        PrintId (D->library_id, 8);
+        Print ("%-24s", D->library_name);
+        NewLine ();
+    }
+}
+
+
+
+static void PrintLineHeader (void)
+/* Output a header for a line list */
+{
+    /* Header */
+    PrintLine ("  id    source  line    type  count");
+    PrintSeparator ();
+}
+
+
+
+static void PrintLines (const cc65_lineinfo* L)
+/* Output a list of lines */
+{
+    unsigned I;
+    const cc65_linedata* D;
+
+    /* Lines */
+    for (I = 0, D = L->data; I < L->count; ++I, ++D) {
+        PrintId (D->line_id, 8);
+        PrintId (D->source_id, 8);
+        PrintNumber (D->source_line, 6, 9);
+        PrintNumber (D->line_type, 4, 6);
+        PrintNumber (D->count, 3, 0);
+        NewLine ();
+    }
+}
+
+
+
+static void PrintModuleHeader (void)
+/* Output a header for a module list */
+{
+    /* Header */
+    PrintLine ("  id    name                    source  library  scope");
+    PrintSeparator ();
+}
+
+
+
+static void PrintModules (const cc65_moduleinfo* M)
+/* Output a list of modules */
+{
+    unsigned I;
+    const cc65_moduledata* D;
+
+    /* Modules */
+    for (I = 0, D = M->data; I < M->count; ++I, ++D) {
+        PrintId (D->module_id, 8);
+        Print ("%-24s", D->module_name);
+        PrintId (D->source_id, 8);
+        PrintId (D->library_id, 9);
+        PrintId (D->scope_id, 6);
+        NewLine ();
+    }
+}
+
+
+
+static void PrintScopeHeader (void)
+/* Output a header for a list of scopes */
+{
+    /* Header */
+    PrintLine ("  id    name                    type    size   parent  symbol  module");
+    PrintSeparator ();
+}
+
+
+
+static void PrintScopes (const cc65_scopeinfo* S)
+/* Output a list of scopes */
+{
+    unsigned I;
+    const cc65_scopedata* D;
+
+    /* Segments */
+    for (I = 0, D = S->data; I < S->count; ++I, ++D) {
+        PrintId (D->scope_id, 8);
+        Print ("%-24s", D->scope_name);
+        PrintNumber (D->scope_type, 4, 8);     /* ## */
+        PrintSize (D->scope_size, 8);
+        PrintId (D->parent_id, 8);
+        PrintId (D->symbol_id, 8);
+        PrintId (D->module_id, 0);
+        NewLine ();
+    }
+}
+
+
+
+static void PrintSegmentHeader (void)
+/* Output a header for a list of segments */
+{
+    /* Header */
+    PrintLine ("  id    name            address  size   output file     offs");
+    PrintSeparator ();
+}
+
+
+
+static void PrintSegments (const cc65_segmentinfo* S)
+/* Output a list of segments */
+{
+    unsigned I;
+    const cc65_segmentdata* D;
+
+    /* Segments */
+    for (I = 0, D = S->data; I < S->count; ++I, ++D) {
+        PrintId (D->segment_id, 8);
+        Print ("%-16s", D->segment_name);
+        PrintAddr (D->segment_start, 9);
+        PrintSize (D->segment_size, 7);
+        Print ("%-16s", D->output_name? D->output_name : "");
+        PrintSize (D->output_offs, 6);
+        NewLine ();
+    }
+}
+
+
+
+static void PrintSourceHeader (void)
+/* Output a header for a list of source files */
+{
+    /* Header */
+    PrintLine ("  id    name                            size   modification time");
+    PrintSeparator ();
+}
+
+
+
+static void PrintSources (const cc65_sourceinfo* S)
+/* Output a list of sources */
+{
+    unsigned I;
+    const cc65_sourcedata* D;
+
+    /* Segments */
+    for (I = 0, D = S->data; I < S->count; ++I, ++D) {
+        PrintId (D->source_id, 8);
+        Print ("%-30s", D->source_name);
+        Print ("%7lu  ", D->source_size);
+        PrintTime (D->source_mtime, 0);
+        NewLine ();
+    }
+}
+
+
+
+/*****************************************************************************/
+/*                            Debug file handling                            */
+/*****************************************************************************/
+
+
+
+static void UnloadFile (void)
+/* Unload the debug info file */
+{
+    if (Info) {
+        cc65_free_dbginfo (Info);
+        Info = 0;
+    }
+}
+
+
+
+static int FileIsLoaded (void)
+/* Return true if the file is open and has loaded without errors: If not,
+ * print an error message and return false.
+ */
+{
+    /* File open? */
+    if (Info == 0) {
+        PrintLine ("No debug info file");
+        return 0;
+    }
+
+    /* Errors on load? */
+    if (FileErrors > 0) {
+        PrintLine ("File had load errors!");
+        return 0;
+    }
+
+    /* Warnings on load? */
+    if (FileWarnings > 0) {
+        PrintLine ("Beware - file had load warnings!");
+    }
+
+    /* Ok */
+    return 1;
+}
+
+
+
+/*****************************************************************************/
+/*                             Command handlers                              */
+/*****************************************************************************/
+
+
+
+static void CmdHelp (Collection* Args attribute ((unused)))
+/* Output a help text */
+{
+    PrintHelp (MainCmds, sizeof (MainCmds) / sizeof (MainCmds[0]));
+}
+
+
+
+static void CmdLoad (Collection* Args)
+/* Load a debug info file */
+{
+    /* Unload a loaded file */
+    UnloadFile ();
 
     /* Clear the counters */
     FileErrors   = 0;
     FileWarnings = 0;
 
     /* Open the debug info file */
-    Info = cc65_read_dbginfo (CollAt (Args, 1), FileError);
-}
+    Info = cc65_read_dbginfo (CollAt (Args, 0), FileError);
 
-
-
-static void CmdClose (Collection* Args attribute ((unused)))
-/* Close a debug info file */
-{
-    CloseFile ();
+    /* Print a status */
+    if (FileErrors > 0) {
+        PrintLine ("File loaded with %u errors", FileErrors);
+    } else if (FileWarnings > 0) {
+        PrintLine ("File loaded with %u warnings", FileWarnings);
+    } else {
+        PrintLine ("File loaded successfully");
+    }
 }
 
 
@@ -187,8 +740,398 @@ static void CmdClose (Collection* Args attribute ((unused)))
 static void CmdQuit (Collection* Args attribute ((unused)))
 /* Terminate the application */
 {
+    UnloadFile ();
     Terminate = 1;
 }
+
+
+
+static void CmdShow (Collection* Args)
+/* Show items from the debug info file */
+{
+    /* Search for the subcommand, check number of args, then execute it */
+    ExecCmd (Args, ShowCmds, sizeof (ShowCmds) / sizeof (ShowCmds[0]));
+}
+
+
+
+static void CmdShowHelp (Collection* Args attribute ((unused)))
+/* Print help for the show command */
+{
+    PrintHelp (ShowCmds, sizeof (ShowCmds) / sizeof (ShowCmds[0]));
+}
+
+
+
+static void CmdShowLine (Collection* Args)
+/* Show lines from the debug info file */
+{
+    const cc65_lineinfo* L;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintLineHeader ();
+
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = LineId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+                case LineId:
+                    L = cc65_line_byid (Info, Id);
+                    break;
+                case SourceId:
+                    L = cc65_line_bysource (Info, Id);
+                    break;
+                default:
+                    L = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* Ignore the invalid id */
+            L = 0;
+        }
+
+        /* Output the list */
+        if (L) {
+            PrintLines (L);
+            cc65_free_lineinfo (Info, L);
+        }
+
+    }
+}
+
+
+
+static void CmdShowLibrary (Collection* Args)
+/* Show libraries from the debug info file */
+{
+    const cc65_libraryinfo* L;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintLibraryHeader ();
+
+    /* No arguments means show all libraries */
+    if (CollCount (Args) == 0) {
+
+        /* Fetch the list of libraries */
+        L = cc65_get_librarylist (Info);
+
+        /* Output the libraries */
+        PrintLibraries (L);
+
+        /* Free the list */
+        cc65_free_libraryinfo (Info, L);
+
+    } else {
+
+        unsigned I;
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = LibraryId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+                    case LibraryId:
+                        L = cc65_library_byid (Info, Id);
+                        break;
+                    default:
+                        L = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* Ignore the invalid id */
+                L = 0;
+            }
+
+            /* Output the list */
+            if (L) {
+                PrintLibraries (L);
+                cc65_free_libraryinfo (Info, L);
+            }
+        }
+    }
+}
+
+
+
+static void CmdShowModule (Collection* Args)
+/* Show modules from the debug info file */
+{
+    const cc65_moduleinfo* M;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintModuleHeader ();
+
+    /* No arguments means show all modules */
+    if (CollCount (Args) == 0) {
+
+        /* Fetch the list of modules */
+        M = cc65_get_modulelist (Info);
+
+        /* Output the modules */
+        PrintModules (M);
+
+        /* Free the list */
+        cc65_free_moduleinfo (Info, M);
+
+    } else {
+
+        unsigned I;
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = ModuleId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+                    case ModuleId:
+                        M = cc65_module_byid (Info, Id);
+                        break;
+                    default:
+                        M = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* Ignore the invalid id */
+                M = 0;
+            }
+
+            /* Output the list */
+            if (M) {
+                PrintModules (M);
+                cc65_free_moduleinfo (Info, M);
+            }
+
+        }
+    }
+}
+
+
+
+static void CmdShowScope (Collection* Args)
+/* Show scopes from the debug info file */
+{
+    const cc65_scopeinfo* S;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintScopeHeader ();
+
+    /* No arguments means show all modules */
+    if (CollCount (Args) == 0) {
+
+        /* Fetch the list of segments */
+        S = cc65_get_scopelist (Info);
+
+        /* Output the segments */
+        PrintScopes (S);
+
+        /* Free the list */
+        cc65_free_scopeinfo (Info, S);
+
+    } else {
+
+        unsigned I;
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = ScopeId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+                    case ModuleId:
+                        S = cc65_scope_bymodule (Info, Id);
+                        break;
+                    case ScopeId:
+                        S = cc65_scope_byid (Info, Id);
+                        break;
+                    default:
+                        S = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* An invalid id may be a scope name */
+                //S = cc65_scope_byname (Info, CollConstAt (Args, I));
+                S = 0;
+            }
+
+            /* Output the list */
+            if (S) {
+                PrintScopes (S);
+                cc65_free_scopeinfo (Info, S);
+            }
+        }
+    }
+}
+
+
+
+static void CmdShowSegment (Collection* Args)
+/* Show segments from the debug info file */
+{
+    const cc65_segmentinfo* S;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintSegmentHeader ();
+
+    /* No arguments means show all modules */
+    if (CollCount (Args) == 0) {
+
+        /* Fetch the list of segments */
+        S = cc65_get_segmentlist (Info);
+
+        /* Output the segments */
+        PrintSegments (S);
+
+        /* Free the list */
+        cc65_free_segmentinfo (Info, S);
+
+    } else {
+
+        unsigned I;
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = SegmentId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+                    case SegmentId:
+                        S = cc65_segment_byid (Info, Id);
+                        break;
+                    default:
+                        S = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* An invalid id may be a segment name */
+                S = cc65_segment_byname (Info, CollConstAt (Args, I));
+            }
+
+            /* Output the list */
+            if (S) {
+                PrintSegments (S);
+                cc65_free_segmentinfo (Info, S);
+            }
+        }
+    }
+}
+
+
+
+static void CmdShowSource (Collection* Args)
+/* Show source files from the debug info file */
+{
+    const cc65_sourceinfo* S;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintSourceHeader ();
+
+    /* No arguments means show all modules */
+    if (CollCount (Args) == 0) {
+
+        /* Fetch the list of source files */
+        S = cc65_get_sourcelist (Info);
+
+        /* Output the source files */
+        PrintSources (S);
+
+        /* Free the list */
+        cc65_free_sourceinfo (Info, S);
+
+    } else {
+
+        unsigned I;
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = SourceId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+                    case ModuleId:
+                        S = cc65_source_bymodule (Info, Id);
+                        break;
+                    case SourceId:
+                        S = cc65_source_byid (Info, Id);
+                        break;
+                    default:
+                        S = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* Ignore the invalid id */
+                S = 0;
+            }
+
+            /* Output the list */
+            if (S) {
+                PrintSources (S);
+                cc65_free_sourceinfo (Info, S);
+            }
+        }
+    }
+
+}
+
+
+
+static void CmdUnload (Collection* Args attribute ((unused)))
+/* Unload a debug info file */
+{
+    UnloadFile ();
+}
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
 
 
 
@@ -222,7 +1165,7 @@ static int Parse (char* CmdLine, Collection* Args)
             End = CmdLine;
             while (*End != Term) {
                 if (*End == '\0') {
-                    fputs ("Unterminated argument\n", stdout);
+                    PrintLine ("Unterminated argument");
                     return 0;
                 }
                 ++End;
@@ -232,7 +1175,7 @@ static int Parse (char* CmdLine, Collection* Args)
             End = CmdLine;
             while (!IsSpace (*End)) {
                 if (*End == '\0') {
-                    fputs ("Unterminated argument\n", stdout);
+                    PrintLine ("Unterminated argument");
                     return 0;
                 }
                 ++End;
@@ -249,41 +1192,34 @@ static int Parse (char* CmdLine, Collection* Args)
 
 
 
-static const CmdEntry* FindCmd (const char* Cmd)
-/* Search for a command */
-{
-    static const CmdEntry CmdTab[] = {
-        { "close",      0,      CmdClose        },
-        { "open",       1,      CmdOpen         },
-        { "quit",       0,      CmdQuit         },
-    };
-
-    unsigned I;
-    for (I = 0; I < sizeof (CmdTab) / sizeof (CmdTab[0]); ++I) {
-        if (strcmp (Cmd, CmdTab[I].Cmd) == 0) {
-            return CmdTab + I;
-        }
-    }
-    return 0;
-}
-
-
-
-int main (void)
+int main (int argc, char* argv[])
 /* Main program */
 {
     char Input[256];
     Collection Args = STATIC_COLLECTION_INITIALIZER;
 
-    const char* Cmd;
-    const CmdEntry* E;
+    /* Initialize the command line */
+    InitCmdLine (&argc, &argv, "dbgsh");
+
+    /* If we have commands on the command line, execute them */
+    if (ArgCount > 1) {
+        unsigned I;
+        for (I = 1; I < ArgCount; ++I) {
+            CollAppend (&Args, ArgVec[I]);
+        }
+
+        /* Search for the command, check number of args, then execute it */
+        ExecCmd (&Args, MainCmds, sizeof (MainCmds) / sizeof (MainCmds[0]));
+    }
+
+    /* Loop til program end */
     while (!Terminate) {
 
         /* Output a prompt, then read the input */
-        fputs ("dbgsh> ", stdout);
+        Print ("dbgsh> ");
         fflush (stdout);
         if (fgets (Input, sizeof (Input), stdin) == 0) {
-            fputs ("(EOF)\n", stdout);
+            PrintLine ("(EOF)");
             break;
         }
 
@@ -292,14 +1228,8 @@ int main (void)
             continue;
         }
 
-        /* Search for the command, then execute it */
-        Cmd = CollAt (&Args, 0);
-        E = FindCmd (Cmd);
-        if (E == 0) {
-            printf ("No such command: %s\n", Cmd);
-        } else {
-            E->Func (&Args);
-        }
+        /* Search for the command, check number of args, then execute it */
+        ExecCmd (&Args, MainCmds, sizeof (MainCmds) / sizeof (MainCmds[0]));
     }
 
     /* Free arguments */

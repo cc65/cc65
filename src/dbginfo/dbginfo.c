@@ -1264,7 +1264,7 @@ static int CompareModInfoByName (const void* L, const void* R)
 }
 
 
-
+                  
 /*****************************************************************************/
 /*                                Scope info                                 */
 /*****************************************************************************/
@@ -3858,6 +3858,42 @@ static LineInfo* FindLineInfoByLine (Collection* LineInfos, cc65_line Line)
 
 
 
+static SegInfo* FindSegInfoByName (Collection* SegInfos, const char* Name)
+/* Find the SegInfo for a given segment name. The function returns the segment
+ * info or NULL if none was found.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (SegInfos) - 1;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        SegInfo* CurItem = CollAt (SegInfos, Cur);
+
+        /* Compare */
+        int Res = strcmp (CurItem->Name, Name);
+
+        /* Found? */
+        if (Res < 0) {
+            Lo = Cur + 1;
+        } else if (Res > 0) {
+            Hi = Cur - 1;
+        } else {
+            /* Found */
+            return CurItem;
+        }
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
 static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
                               unsigned* Index)
 /* Find the SymInfo for a given file name. The function returns true if the
@@ -5190,6 +5226,42 @@ const cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo Handle, unsigned Id)
 
     /* Fill in the data */
     CopySegInfo (D->data, CollConstAt (&Info->SegInfoById, Id));
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_segmentinfo* cc65_segmentinfo_byname (cc65_dbginfo Handle,
+                                                 const char* Name)
+/* Return information about a segment with a specific name. The function
+ * returns NULL if no segment with this name exists and otherwise a
+ * cc65_segmentinfo structure with one entry that contains the requested
+ * information.
+ */
+{
+    DbgInfo*            Info;
+    SegInfo*            S;
+    cc65_segmentinfo*   D;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Search for the segment */
+    S = FindSegInfoByName (&Info->SegInfoByName, Name);
+    if (S == 0) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_segmentinfo (1);
+
+    /* Fill in the data */
+    CopySegInfo (D->data, S);
 
     /* Return the result */
     return D;

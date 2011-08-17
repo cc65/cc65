@@ -367,6 +367,14 @@ const cc65_segmentinfo* cc65_segmentinfo_byid (cc65_dbginfo handle, unsigned id)
  * structure with one entry that contains the requested segment information.
  */
 
+const cc65_segmentinfo* cc65_segmentinfo_byname (cc65_dbginfo handle,
+                                                 const char* name);
+/* Return information about a segment with a specific name. The function
+ * returns NULL if no segment with this name exists and otherwise a
+ * cc65_segmentinfo structure with one entry that contains the requested
+ * information.
+ */
+
 void cc65_free_segmentinfo (cc65_dbginfo handle, const cc65_segmentinfo* info);
 /* Free a segment info record */
 

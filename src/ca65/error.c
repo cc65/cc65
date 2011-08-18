@@ -190,7 +190,7 @@ void Warning (unsigned Level, const char* Format, ...)
         Collection LineInfos = STATIC_COLLECTION_INITIALIZER;
 
         /* Get line infos for the current position */
-        GetFullLineInfo (&LineInfos, 0);
+        GetFullLineInfo (&LineInfos);
 
         /* Output the message */
         va_start (ap, Format);
@@ -198,6 +198,7 @@ void Warning (unsigned Level, const char* Format, ...)
         va_end (ap);
 
         /* Free the line info list */
+        ReleaseFullLineInfo (&LineInfos);
         DoneCollection (&LineInfos);
     }
 }
@@ -265,7 +266,7 @@ void Error (const char* Format, ...)
     Collection LineInfos = STATIC_COLLECTION_INITIALIZER;
 
     /* Get line infos for the current position */
-    GetFullLineInfo (&LineInfos, 0);
+    GetFullLineInfo (&LineInfos);
 
     /* Output the message */
     va_start (ap, Format);
@@ -273,6 +274,7 @@ void Error (const char* Format, ...)
     va_end (ap);
 
     /* Free the line info list */
+    ReleaseFullLineInfo (&LineInfos);
     DoneCollection (&LineInfos);
 }
 
@@ -297,7 +299,7 @@ void ErrorSkip (const char* Format, ...)
     Collection LineInfos = STATIC_COLLECTION_INITIALIZER;
 
     /* Get line infos for the current position */
-    GetFullLineInfo (&LineInfos, 0);
+    GetFullLineInfo (&LineInfos);
 
     /* Output the message */
     va_start (ap, Format);
@@ -305,6 +307,7 @@ void ErrorSkip (const char* Format, ...)
     va_end (ap);
 
     /* Free the line info list */
+    ReleaseFullLineInfo (&LineInfos);
     DoneCollection (&LineInfos);
 
     /* Skip tokens until we reach the end of the line */

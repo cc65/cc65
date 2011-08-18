@@ -87,8 +87,7 @@ struct LineInfo {
     HashNode        Node;               /* Hash table node */
     unsigned        Id;                 /* Index */
     LineInfoKey     Key;                /* Key for this line info */
-    unsigned char   Hashed;             /* True if in hash list */
-    unsigned char   Referenced;         /* Force reference even if no spans */
+    unsigned        RefCount;           /* Reference counter */
     Collection      Spans;              /* Segment spans for this line info */
     Collection      OpenSpans;          /* List of currently open spans */
 };
@@ -183,10 +182,12 @@ static LineInfo* NewLineInfo (const LineInfoKey* Key)
     InitHashNode (&LI->Node);
     LI->Id        = ~0U;
     LI->Key       = *Key;
-    LI->Hashed    = 0;
-    LI->Referenced= 0;
+    LI->RefCount  = 0;
     InitCollection (&LI->Spans);
     InitCollection (&LI->OpenSpans);
+
+    /* Add it to the hash table, so we will find it if necessary */
+    HT_InsertEntry (&LineInfoTab, LI);
 
     /* Return the new struct */
     return LI;
@@ -208,22 +209,21 @@ static void FreeLineInfo (LineInfo* LI)
 
 
 
-static void RememberLineInfo (LineInfo* LI)
-/* Remember a LineInfo by adding it to the hash table and the global list.
- * This will also assign the id which is actually the list position.
- */
+static int CheckLineInfo (void* Entry, void* Data attribute ((unused)))
+/* Called from HT_Walk. Remembers used line infos and assigns them an id */
 {
-    /* Assign the id */
-    LI->Id = CollCount (&LineInfoList);
+    /* Entry is actually a line info */
+    LineInfo* LI = Entry;
 
-    /* Remember it in the global list */
-    CollAppend (&LineInfoList, LI);
-
-    /* Add it to the hash table, so we will find it if necessary */
-    HT_InsertEntry (&LineInfoTab, LI);
-
-    /* Remember that we have it */
-    LI->Hashed = 1;
+    /* The entry is used if there are spans or the ref counter is non zero */
+    if (LI->RefCount > 0 || CollCount (&LI->Spans) > 0) {
+        LI->Id = CollCount (&LineInfoList);
+        CollAppend (&LineInfoList, LI);
+        return 0;       /* Keep the entry */
+    } else {
+        FreeLineInfo (LI);
+        return 1;       /* Remove entry from table */
+    }
 }
 
 
@@ -258,6 +258,12 @@ void DoneLineInfo (void)
     while (Count) {
         EndLine (CollAt (&CurLineInfo, --Count));
     }
+
+    /* Walk over the entries in the hash table and sort them into used and
+     * unused ones. Add the used ones to the line info list and assign them
+     * an id.
+     */
+    HT_Walk (&LineInfoTab, CheckLineInfo, 0);
 }
 
 
@@ -282,18 +288,6 @@ void EndLine (LineInfo* LI)
      * line infos.
      */
     CollDeleteItem (&CurLineInfo, LI);
-
-    /* If this line info is already hashed, we're done. Otherwise, if it is
-     * marked as referenced or has non empty spans, remember it. It it is not
-     * referenced or doesn't have open spans, delete it.
-     */
-    if (!LI->Hashed) {
-        if (LI->Referenced || CollCount (&LI->Spans) > 0) {
-            RememberLineInfo (LI);
-        } else {
-            FreeLineInfo (LI);
-        }
-    }
 }
 
 
@@ -353,21 +347,39 @@ void NewAsmLine (void)
 
 
 
-void GetFullLineInfo (Collection* LineInfos, int ForceRef)
+LineInfo* GetAsmLineInfo (void)
+/* Return the line info for the current assembler file. The function will
+ * bump the reference counter before returning the line info.
+ */
+{
+    ++AsmLineInfo->RefCount;
+    return AsmLineInfo;
+}
+
+
+
+void ReleaseLineInfo (LineInfo* LI)
+/* Decrease the reference count for a line info */
+{
+    /* Decrease the reference counter */
+    CHECK (LI->RefCount > 0);
+    ++LI->RefCount;
+}
+
+
+
+void GetFullLineInfo (Collection* LineInfos)
 /* Return full line infos, that is line infos for currently active Slots. The
- * function will clear LineInfos before usage. If ForceRef is not zero, a
- * forced reference will be added to all line infos, with the consequence that
- * they won't get deleted, even if there is no code or data generated for these
- * lines.
+ * infos will be added to the given collection, existing entries will be left
+ * intact. The reference count of all added entries will be increased.
  */
 {
     unsigned I;
 
-    /* Clear the collection */
-    CollDeleteAll (LineInfos);
-
-    /* Grow the collection as necessary */
-    CollGrow (LineInfos, CollCount (&CurLineInfo));
+    /* If the collection is currently empty, grow it as necessary */
+    if (CollCount (LineInfos) == 0) {
+        CollGrow (LineInfos, CollCount (&CurLineInfo));
+    }
 
     /* Copy all valid line infos to the collection */
     for (I = 0; I < CollCount (&CurLineInfo); ++I) {
@@ -375,14 +387,31 @@ void GetFullLineInfo (Collection* LineInfos, int ForceRef)
         /* Get the line info from the slot */
         LineInfo* LI = CollAt (&CurLineInfo, I);
 
-        /* Mark it as referenced */
-        if (ForceRef) {
-            LI->Referenced = 1;
-        }
+        /* Bump the reference counter */
+        ++LI->RefCount;
 
         /* Return it to the caller */
         CollAppend (LineInfos, LI);
     }
+}
+
+
+
+void ReleaseFullLineInfo (Collection* LineInfos)
+/* Decrease the reference count for a collection full of LineInfos, then clear
+ * the collection.
+ */
+{
+    unsigned I;
+
+    /* Walk over all entries */
+    for (I = 0; I < CollCount (LineInfos); ++I) {
+        /* Release the the line info */
+        ReleaseLineInfo (CollAt (LineInfos, I));
+    }
+
+    /* Delete all entries */
+    CollDeleteAll (LineInfos);
 }
 
 
@@ -417,6 +446,7 @@ void WriteLineInfo (const Collection* LineInfos)
         /* Get a pointer to the line info */
         const LineInfo* LI = CollConstAt (LineInfos, I);
 
+        /* Safety */
         CHECK (LI->Id != ~0U);
 
         /* Write the index to the file */

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -64,8 +64,10 @@ ExprNode* ULabResolve (unsigned Index);
  * if a label is still undefined in this phase.
  */
 
-void ULabCheck (void);
-/* Run through all unnamed labels and check for anomalies and errors */
+void ULabDone (void);
+/* Run through all unnamed labels, check for anomalies and errors and do
+ * necessary cleanups.
+ */
 
 
 

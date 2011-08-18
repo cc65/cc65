@@ -175,7 +175,7 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
         ID->Flags |= ifParentCond;
     }
     ID->LineInfos = EmptyCollection;
-    GetFullLineInfo (&ID->LineInfos, 0);
+    GetFullLineInfo (&ID->LineInfos);
     ID->Name = Directive;
 
     /* One more slot allocated */
@@ -198,6 +198,7 @@ static void FreeIf (void)
 	    Done = 1;
        	} else {
        	    Done = (ID->Flags & ifNeedTerm) != 0;
+            ReleaseFullLineInfo (&ID->LineInfos);
             DoneCollection (&ID->LineInfos);
             --IfCount;
        	}
@@ -229,7 +230,8 @@ void DoConditionals (void)
 
                 /* Remember the data for the .ELSE */
                 if (D) {
-                    GetFullLineInfo (&D->LineInfos, 0);
+                    ReleaseFullLineInfo (&D->LineInfos);
+                    GetFullLineInfo (&D->LineInfos);
                     D->Name = ".ELSE";
                 }
 

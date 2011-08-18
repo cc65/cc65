@@ -83,7 +83,7 @@ static ULabel* NewULabel (ExprNode* Val)
 
     /* Initialize the fields */
     L->LineInfos = EmptyCollection;
-    GetFullLineInfo (&L->LineInfos, 0);
+    GetFullLineInfo (&L->LineInfos);
     L->Val       = Val;
     L->Ref       = 0;
 
@@ -160,8 +160,9 @@ void ULabDef (void)
 	 */
 	ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
 	CHECK (L->Val == 0);
-	L->Val = GenCurrentPC ();
-        GetFullLineInfo (&L->LineInfos, 0);
+	L->Val = GenCurrentPC ();     
+        ReleaseFullLineInfo (&L->LineInfos);
+        GetFullLineInfo (&L->LineInfos);
     } else {
 	/* There is no such label, create it */
        	NewULabel (GenCurrentPC ());
@@ -198,8 +199,10 @@ ExprNode* ULabResolve (unsigned Index)
 
 
 
-void ULabCheck (void)
-/* Run through all unnamed labels and check for anomalies and errors */
+void ULabDone (void)
+/* Run through all unnamed labels, check for anomalies and errors and do 
+ * necessary cleanups.
+ */
 {
     /* Check if there are undefined labels */
     unsigned I = ULabDefCount;
@@ -210,13 +213,14 @@ void ULabCheck (void)
     }
 
     /* Walk over all labels and emit a warning if any unreferenced ones
-     * are found.
+     * are found. Remove line infos because they're no longer needed.
      */
     for (I = 0; I < CollCount (&ULabList); ++I) {
         ULabel* L = CollAtUnchecked (&ULabList, I);
         if (L->Ref == 0) {
             LIWarning (&L->LineInfos, 1, "No reference to unnamed label");
         }
+        ReleaseFullLineInfo (&L->LineInfos);
     }
 }
 

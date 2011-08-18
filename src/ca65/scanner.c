@@ -1142,12 +1142,13 @@ CharAgain:
             } else if (CComments) {
                 /* Remember the position, then skip the '*' */
                 Collection LineInfos = STATIC_COLLECTION_INITIALIZER;
-                GetFullLineInfo (&LineInfos, 0);
+                GetFullLineInfo (&LineInfos);
                 NextChar ();
                 do {
                     while (C !=  '*') {
                         if (C == EOF) {
                             LIError (&LineInfos, "Unterminated comment");
+                            ReleaseFullLineInfo (&LineInfos);
                             DoneCollection (&LineInfos);
                             goto CharAgain;
                         }
@@ -1156,6 +1157,7 @@ CharAgain:
                     NextChar ();
                 } while (C != '/');
                 NextChar ();
+                ReleaseFullLineInfo (&LineInfos);
                 DoneCollection (&LineInfos);
                 goto Again;
             }

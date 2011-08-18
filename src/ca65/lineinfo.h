@@ -81,12 +81,23 @@ void NewAsmLine (void);
  * changed, end the old and start the new line as necessary.
  */
 
-void GetFullLineInfo (Collection* LineInfos, int ForceRef);
+LineInfo* GetAsmLineInfo (void);
+/* Return the line info for the current assembler file. The function will
+ * bump the reference counter before returning the line info.
+ */
+
+void ReleaseLineInfo (LineInfo* LI);
+/* Decrease the reference count for a line info */
+
+void GetFullLineInfo (Collection* LineInfos);
 /* Return full line infos, that is line infos for currently active Slots. The
- * function will clear LineInfos before usage. If ForceRef is not zero, a
- * forced reference will be added to all line infos, with the consequence that
- * they won't get deleted, even if there is no code or data generated for these
- * lines.
+ * infos will be added to the given collection, existing entries will be left
+ * intact. The reference count of all added entries will be increased.
+ */
+
+void ReleaseFullLineInfo (Collection* LineInfos);
+/* Decrease the reference count for a collection full of LineInfos, then clear
+ * the collection.
  */
 
 const FilePos* GetSourcePos (const LineInfo* LI);

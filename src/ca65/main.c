@@ -1011,9 +1011,9 @@ int main (int argc, char* argv [])
         CheckPseudo ();
     }
 
-    /* If we didn't have any errors, check the unnamed labels */
+    /* If we didn't have any errors, check and cleanup the unnamed labels */
     if (ErrorCount == 0) {
-        ULabCheck ();
+        ULabDone ();                                  
     }
 
     /* If we didn't have any errors, check the symbol table */

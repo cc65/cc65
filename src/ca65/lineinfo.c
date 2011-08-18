@@ -79,8 +79,7 @@ static int HT_Compare (const void* Key1, const void* Key2);
 typedef struct LineInfoKey LineInfoKey;
 struct LineInfoKey {
     FilePos         Pos;                /* File position */
-    unsigned short  Type;               /* Type of line info */
-    unsigned short  Count;              /* Recursion counter */
+    unsigned        Type;               /* Type/count of line info */
 };
 
 /* Structure that holds line info */
@@ -153,15 +152,12 @@ static int HT_Compare (const void* Key1, const void* Key2)
     const LineInfoKey* K1 = Key1;
     const LineInfoKey* K2 = Key2;
 
-    /* Compare line number, then file and type, then count */
+    /* Compare line number, then file and type */
     int Res = (int)K2->Pos.Line - (int)K1->Pos.Line;
     if (Res == 0) {
         Res = (int)K2->Pos.Name - (int)K1->Pos.Name;
         if (Res == 0) {
             Res = (int)K2->Type - (int)K1->Type;
-            if (Res == 0) {
-                Res = (int)K2->Count - (int)K1->Count;
-            }
         }
     }
 
@@ -310,8 +306,7 @@ LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count)
 
     /* Prepare the key struct */
     Key.Pos   = *Pos;
-    Key.Type  = Type;
-    Key.Count = Count;
+    Key.Type  = LI_MAKE_TYPE (Type, Count);
 
     /* Try to find a line info with this position and type in the hash table.
      * If so, reuse it. Otherwise create a new one.
@@ -320,8 +315,6 @@ LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count)
     if (LI == 0) {
         /* Allocate a new LineInfo */
         LI = NewLineInfo (&Key);
-    } else {
-        Key.Count = 2;
     }
 
     /* Open the spans for this line info */
@@ -456,9 +449,9 @@ void WriteLineInfos (void)
         ObjWritePos (&LI->Key.Pos);
 
         /* Write the type and count of the line info */
-        ObjWriteVar (LI_MAKE_TYPE (LI->Key.Type, LI->Key.Count));
+        ObjWriteVar (LI->Key.Type);
 
-        /* Spans are only added to the debug file if debug information is 
+        /* Spans are only added to the debug file if debug information is
          * requested. Otherwise we write an empty list.
          */
         if (DbgSyms) {

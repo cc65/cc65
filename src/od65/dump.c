@@ -378,7 +378,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 
     	    case OPT_ARGNUM:
     	     	printf ("      Data:%26lu", Val);
-    		if (Type == OPT_DATETIME) {
+    	    	if (Type == OPT_DATETIME) {
     		    /* Print the time as a string */
     		    printf ("  (%s)", TimeToStr (Val));
     		}
@@ -544,7 +544,8 @@ void DumpObjImports (FILE* F, unsigned long Offset)
        	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
 
-        /* Skip the line infos */
+        /* Skip both line info lists */
+        SkipLineInfoList (F);       
         SkipLineInfoList (F);
 
 	/* Print the header */
@@ -613,7 +614,8 @@ void DumpObjExports (FILE* F, unsigned long Offset)
             Size = ReadVar (F);
         }
 
-        /* Skip the line infos */
+        /* Skip both line infos lists */
+        SkipLineInfoList (F);         
         SkipLineInfoList (F);
 
 	/* Print the header */
@@ -700,7 +702,8 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
             ExportId = ReadVar (F);
         }
 
-        /* Skip the line infos */
+        /* Skip both line info lists */
+        SkipLineInfoList (F);      
         SkipLineInfoList (F);
 
 	/* Print the header */
@@ -937,3 +940,4 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
 
 
 
+                             

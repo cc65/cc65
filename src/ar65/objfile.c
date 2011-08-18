@@ -224,6 +224,7 @@ void ObjReadData (FILE* F, ObjData* O)
 
         /* Line info indices */
         SkipLineInfoList (F);
+        SkipLineInfoList (F);
     }
 }
 

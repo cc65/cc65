@@ -127,6 +127,7 @@ typedef enum {
     TOK_ABSOLUTE = TOK_FIRST_KEYWORD,   /* ABSOLUTE keyword */
     TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
     TOK_COUNT,                          /* COUNT keyword */
+    TOK_DEF,                            /* DEF keyword */
     TOK_ENUM,                           /* ENUM keyword */
     TOK_EQUATE,                         /* EQUATE keyword */
     TOK_EXPORT,                         /* EXPORT keyword */
@@ -147,6 +148,7 @@ typedef enum {
     TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
     TOK_OUTPUTOFFS,                     /* OUTPUTOFFS keyword */
     TOK_PARENT,                         /* PARENT keyword */
+    TOK_REF,                            /* REF keyword */
     TOK_RO,                             /* RO keyword */
     TOK_RW,                             /* RW keyword */
     TOK_SCOPE,                          /* SCOPE keyword */
@@ -349,6 +351,8 @@ struct SymInfo {
     } Parent;
     Collection*         ImportList;     /* List of imports if this is an export */
     Collection*         CheapLocals;    /* List of cheap local symbols */
+    Collection          DefLineInfoList;/* Line info of symbol definition */
+    Collection          RefLineInfoList;/* Line info of symbol references */
     char                Name[1];        /* Name of symbol */
 };
 
@@ -1254,7 +1258,7 @@ static void CopyModInfo (cc65_moduledata* D, const ModInfo* M)
         D->library_id = M->Lib.Info->Id;
     } else {
         D->library_id = CC65_INV_ID;
-    }                      
+    }
     if (M->MainScope) {
         D->scope_id   = M->MainScope->Id;
     } else {
@@ -1533,6 +1537,8 @@ static SymInfo* NewSymInfo (const StrBuf* Name)
     /* Initialize it as necessary */
     S->ImportList = 0;
     S->CheapLocals = 0;
+    CollInit (&S->DefLineInfoList);
+    CollInit (&S->RefLineInfoList);
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1546,6 +1552,8 @@ static void FreeSymInfo (SymInfo* S)
 {
     CollFree (S->ImportList);
     CollFree (S->CheapLocals);
+    CollDone (&S->DefLineInfoList);
+    CollDone (&S->RefLineInfoList);
     xfree (S);
 }
 
@@ -2061,6 +2069,7 @@ static void NextToken (InputData* D)
         { "abs",        TOK_ABSOLUTE    },
         { "addrsize",   TOK_ADDRSIZE    },
         { "count",      TOK_COUNT       },
+        { "def",        TOK_DEF         },
         { "enum",       TOK_ENUM        },
         { "equ",        TOK_EQUATE      },
         { "exp",        TOK_EXPORT      },
@@ -2081,6 +2090,7 @@ static void NextToken (InputData* D)
         { "oname",      TOK_OUTPUTNAME  },
         { "ooffs",      TOK_OUTPUTOFFS  },
         { "parent",     TOK_PARENT      },
+        { "ref",        TOK_REF         },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
         { "scope",      TOK_SCOPE       },
@@ -3462,11 +3472,13 @@ static void ParseSym (InputData* D)
     /* Most of the following variables are initialized with a value that is
      * overwritten later. This is just to avoid compiler warnings.
      */
+    Collection          DefLineIds = COLLECTION_INITIALIZER;
     unsigned            ExportId = CC65_INV_ID;
     unsigned            FileId = CC65_INV_ID;
     unsigned            Id = CC65_INV_ID;
     StrBuf              Name = STRBUF_INITIALIZER;
     unsigned            ParentId = CC65_INV_ID;
+    Collection          RefLineIds = COLLECTION_INITIALIZER;
     unsigned            ScopeId = CC65_INV_ID;
     unsigned            SegId = CC65_INV_ID;
     cc65_size           Size = 0;
@@ -3475,19 +3487,21 @@ static void ParseSym (InputData* D)
 
     SymInfo*            S;
     enum {
-        ibNone          = 0x000,
+        ibNone          = 0x0000,
 
-        ibAddrSize      = 0x001,
-        ibExportId      = 0x002,
-        ibFileId        = 0x004,
-        ibId            = 0x008,
-        ibParentId      = 0x010,
-        ibScopeId       = 0x020,
-        ibSegId         = 0x040,
-        ibSize          = 0x080,
-        ibName          = 0x100,
-        ibType          = 0x200,
-        ibValue         = 0x400,
+        ibAddrSize      = 0x0001,
+        ibDefLineId     = 0x0002,
+        ibExportId      = 0x0004,
+        ibFileId        = 0x0008,
+        ibId            = 0x0010,
+        ibParentId      = 0x0020,
+        ibRefLineId     = 0x0040,
+        ibScopeId       = 0x0080,
+        ibSegId         = 0x0100,
+        ibSize          = 0x0200,
+        ibName          = 0x0400,
+        ibType          = 0x0800,
+        ibValue         = 0x1000,
 
         ibRequired      = ibAddrSize | ibId | ibName,
     } InfoBits = ibNone;
@@ -3501,9 +3515,10 @@ static void ParseSym (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_EXPORT         &&
-            D->Tok != TOK_FILE          && D->Tok != TOK_ID             &&
-            D->Tok != TOK_NAME          && D->Tok != TOK_PARENT         &&
+        if (D->Tok != TOK_ADDRSIZE      && D->Tok != TOK_DEF            &&
+            D->Tok != TOK_EXPORT        && D->Tok != TOK_FILE           &&
+            D->Tok != TOK_ID            && D->Tok != TOK_NAME           &&
+            D->Tok != TOK_PARENT        && D->Tok != TOK_REF            &&
             D->Tok != TOK_SCOPE         && D->Tok != TOK_SEGMENT        &&
             D->Tok != TOK_SIZE          && D->Tok != TOK_TYPE           &&
             D->Tok != TOK_VALUE) {
@@ -3531,6 +3546,21 @@ static void ParseSym (InputData* D)
             case TOK_ADDRSIZE:
                 NextToken (D);
                 InfoBits |= ibAddrSize;
+                break;
+
+            case TOK_DEF:
+                while (1) {
+                    if (!IntConstFollows (D)) {
+                        goto ErrorExit;
+                    }
+                    CollAppendId (&DefLineIds, (unsigned) D->IVal);
+                    NextToken (D);
+                    if (D->Tok != TOK_PLUS) {
+                        break;
+                    }
+                    NextToken (D);
+                }
+                InfoBits |= ibDefLineId;
                 break;
 
             case TOK_EXPORT:
@@ -3577,6 +3607,21 @@ static void ParseSym (InputData* D)
                 ParentId = D->IVal;
                 NextToken (D);
                 InfoBits |= ibParentId;
+                break;
+
+            case TOK_REF:
+                while (1) {
+                    if (!IntConstFollows (D)) {
+                        goto ErrorExit;
+                    }
+                    CollAppendId (&RefLineIds, (unsigned) D->IVal);
+                    NextToken (D);
+                    if (D->Tok != TOK_PLUS) {
+                        break;
+                    }
+                    NextToken (D);
+                }
+                InfoBits |= ibRefLineId;
                 break;
 
             case TOK_SCOPE:
@@ -3672,6 +3717,8 @@ static void ParseSym (InputData* D)
     S->Seg.Id     = SegId;
     S->Scope.Id   = ScopeId;
     S->Parent.Id  = ParentId;
+    CollMove (&DefLineIds, &S->DefLineInfoList);
+    CollMove (&RefLineIds, &S->RefLineInfoList);
 
     /* Remember it */
     CollReplaceExpand (&D->Info->SymInfoById, S, Id);
@@ -3680,6 +3727,8 @@ static void ParseSym (InputData* D)
 
 ErrorExit:
     /* Entry point in case of errors */
+    CollDone (&DefLineIds);
+    CollDone (&RefLineIds);
     SB_Done (&Name);
     return;
 }
@@ -4317,7 +4366,7 @@ static void ProcessScopeInfo (InputData* D)
         }
     }
 
-    /* Walk over all modules. If a module doesn't have scopes, it wasn't 
+    /* Walk over all modules. If a module doesn't have scopes, it wasn't
      * compiled with debug info which is ok. If it has debug info, it must
      * also have a main scope. If there are scopes, sort them by name.
      */

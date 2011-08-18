@@ -510,7 +510,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
             if (Verbosity > 0) {
                 DumpExpr (Expr, SymResolve);
             }
-            LIError (&Sym->LineInfos,
+            LIError (&Sym->DefLines,
                      "Circular reference in definition of symbol `%m%p'",
                      GetSymName (Sym));
             ED_Invalidate (D);

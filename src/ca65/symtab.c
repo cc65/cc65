@@ -470,7 +470,7 @@ static void SymCheckUndefined (SymEntry* S)
         if (S->Flags & SF_EXPORT) {
 	    if (Sym->Flags & SF_IMPORT) {
 	       	/* The symbol is already marked as import */
-       	       	LIError (&S->LineInfos,
+       	       	LIError (&S->RefLines,
                          "Symbol `%s' is already an import",
                          GetString (Sym->Name));
 	    }
@@ -478,7 +478,7 @@ static void SymCheckUndefined (SymEntry* S)
                 /* The symbol is already marked as an export. */
                 if (Sym->AddrSize > S->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    LIWarning (&S->LineInfos, 1,
+                    LIWarning (&S->DefLines, 1,
                                "Symbol `%m%p' is %s but exported %s",
                               GetSymName (Sym),
                               AddrSizeToStr (Sym->AddrSize),
@@ -494,7 +494,7 @@ static void SymCheckUndefined (SymEntry* S)
                 }
                 if (Sym->AddrSize > Sym->ExportSize) {
                     /* We're exporting a symbol smaller than it actually is */
-                    LIWarning (&S->LineInfos, 1,
+                    LIWarning (&S->DefLines, 1,
                                "Symbol `%m%p' is %s but exported %s",
                                GetSymName (Sym),
                                AddrSizeToStr (Sym->AddrSize),
@@ -502,7 +502,14 @@ static void SymCheckUndefined (SymEntry* S)
                 }
             }
         }
-        Sym->Flags |= (S->Flags & SF_REFERENCED);
+        if (S->Flags & SF_REFERENCED) {
+            unsigned I;
+            Sym->Flags |= SF_REFERENCED;
+            for (I = 0; I < CollCount (&S->RefLines); ++I) {
+                CollAppend (&Sym->RefLines, CollAtUnchecked (&S->RefLines, I));
+            }
+            CollDeleteAll (&S->RefLines);
+        }
 
         /* Transfer all expression references */
         SymTransferExprRefs (S, Sym);
@@ -514,7 +521,7 @@ static void SymCheckUndefined (SymEntry* S)
 	/* The symbol is definitely undefined */
 	if (S->Flags & SF_EXPORT) {
 	    /* We will not auto-import an export */
-	    LIError (&S->LineInfos,
+	    LIError (&S->RefLines,
                      "Exported symbol `%m%p' was never defined",
                      GetSymName (S));
 	} else {
@@ -523,9 +530,11 @@ static void SymCheckUndefined (SymEntry* S)
 	    	S->Flags |= SF_IMPORT;
                 /* Use the address size for code */
                 S->AddrSize = CodeAddrSize;
+                /* Mark point of import */
+                GetFullLineInfo (&S->DefLines);
 	    } else {
 	    	/* Error */
-	        LIError (&S->LineInfos,
+	        LIError (&S->RefLines,
                          "Symbol `%m%p' is undefined",
                          GetSymName (S));
 	    }
@@ -564,6 +573,7 @@ void SymCheck (void)
 	/* Handle undefined symbols */
        	if ((S->Flags & SF_UNDEFMASK) == SF_UNDEFVAL) {
 	    /* This is an undefined symbol. Handle it. */
+            printf ("Undefined: %s\n", SB_GetConstBuf (GetSymName (S)));
 	    SymCheckUndefined (S);
 	}
 
@@ -582,20 +592,21 @@ void SymCheck (void)
 	    (S->Flags & SF_UNDEFMASK) != SF_UNDEFVAL) {
 
             /* Check for defined symbols that were never referenced */
-	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
-                const StrBuf* Name = GetStrBuf (S->Name);
-                if (SB_At (Name, 0) != '.') {           /* Ignore internals */
-                    LIWarning (&S->LineInfos, 2,
-                               "Symbol `%m%p' is defined but never used",
-                               GetSymName (S));
-                }
-	    }
+            if (IsSizeOfSymbol (S)) {
+                /* Remove line infos, we don't need them any longer */
+                ReleaseFullLineInfo (&S->DefLines);
+                ReleaseFullLineInfo (&S->RefLines);
+            } else if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
+                LIWarning (&S->DefLines, 2,
+                           "Symbol `%m%p' is defined but never used",
+                           GetSymName (S));
+            }
 
             /* Assign an index to all imports */
 	    if (S->Flags & SF_IMPORT) {
 	    	if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
 	    	    /* Imported symbol is not referenced */
-	    	    LIWarning (&S->LineInfos, 2,
+	    	    LIWarning (&S->DefLines, 2,
                                "Symbol `%m%p' is imported but never used",
                                GetSymName (S));
 	    	} else {
@@ -623,7 +634,7 @@ void SymCheck (void)
                         S->ExportSize = S->AddrSize;
                     } else if (S->AddrSize > S->ExportSize) {
                         /* We're exporting a symbol smaller than it actually is */
-                        LIWarning (&S->LineInfos, 1,
+                        LIWarning (&S->DefLines, 1,
                                    "Symbol `%m%p' is %s but exported %s",
                                    GetSymName (S),
                                    AddrSizeToStr (S->AddrSize),
@@ -707,7 +718,8 @@ void WriteImports (void)
 
             ObjWrite8 (S->AddrSize);
        	    ObjWriteVar (S->Name);
-     	    WriteLineInfo (&S->LineInfos);
+     	    WriteLineInfo (&S->DefLines);
+            WriteLineInfo (&S->RefLines);
      	}
      	S = S->List;
     }
@@ -787,7 +799,8 @@ void WriteExports (void)
             }
 
 	    /* Write the line infos */
-	    WriteLineInfo (&S->LineInfos);
+            WriteLineInfo (&S->DefLines);
+	    WriteLineInfo (&S->RefLines);
 	}
      	S = S->List;
     }
@@ -884,7 +897,8 @@ void WriteDbgSyms (void)
                 }
 
 		/* Write the line infos */
-		WriteLineInfo (&S->LineInfos);
+                WriteLineInfo (&S->DefLines);
+		WriteLineInfo (&S->RefLines);
 	    }
 	    S = S->List;
 	}

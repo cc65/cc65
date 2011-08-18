@@ -86,8 +86,8 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     S->Right   	  = 0;
     S->Locals  	  = 0;
     S->Sym.Tab    = 0;
-    S->LineInfos  = EmptyCollection;
-    GetFullLineInfo (&S->LineInfos);
+    S->DefLines   = EmptyCollection;
+    S->RefLines   = EmptyCollection;
     for (I = 0; I < sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0]); ++I) {
         S->GuessedUse[I] = 0;
     }
@@ -145,15 +145,6 @@ int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E)
             return Cmp;
        	}
     }
-}
-
-
-
-void SymRef (SymEntry* S)
-/* Mark the given symbol as referenced */
-{
-    /* Mark the symbol as referenced */
-    S->Flags |= SF_REFERENCED;
 }
 
 
@@ -276,11 +267,15 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
      */
     if (S->Flags & SF_GLOBAL) {
         S->Flags = (S->Flags & ~SF_GLOBAL) | SF_EXPORT;
+        ReleaseFullLineInfo (&S->DefLines);
     }
 
     /* Mark the symbol as defined and use the given address size */
     S->Flags |= (SF_DEFINED | Flags);
     S->AddrSize = AddrSize;
+
+    /* Remember the line info of the symbol definition */
+    GetFullLineInfo (&S->DefLines);
 
     /* If the symbol is exported, check the address sizes */
     if (S->Flags & SF_EXPORT) {
@@ -289,9 +284,9 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
             /* We're exporting a symbol smaller than it actually is */
-            LIWarning (&S->LineInfos, 1, "Symbol `%m%p' is %s but exported %s",
-                       GetSymName (S), AddrSizeToStr (S->AddrSize),
-                       AddrSizeToStr (S->ExportSize));
+            Warning (1, "Symbol `%m%p' is %s but exported %s",
+                     GetSymName (S), AddrSizeToStr (S->AddrSize),
+                     AddrSizeToStr (S->ExportSize));
         }
     }
 
@@ -299,6 +294,18 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     if ((S->Flags & SF_LOCAL) == 0) {
        	SymLast = S;
     }
+}
+
+
+
+void SymRef (SymEntry* S)
+/* Mark the given symbol as referenced */
+{
+    /* Mark the symbol as referenced */
+    S->Flags |= SF_REFERENCED;
+
+    /* Remember the current location */
+    CollAppend (&S->RefLines, GetAsmLineInfo ());
 }
 
 
@@ -345,6 +352,12 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
     /* Set the symbol data */
     S->Flags |= (SF_IMPORT | Flags);
     S->AddrSize = AddrSize;
+
+    /* Mark the position of the import as the position of the definition.
+     * Please note: In case of multiple .global or .import statements, the line
+     * infos add up.
+     */
+    GetFullLineInfo (&S->DefLines);
 }
 
 
@@ -372,6 +385,11 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
             Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
         S->Flags &= ~SF_GLOBAL;
+
+        /* .GLOBAL remembers line infos in case an .IMPORT follows. We have
+         * to remove these here.
+         */
+        ReleaseFullLineInfo (&S->DefLines);
     }
 
     /* If the symbol was already marked as an export, but wasn't defined
@@ -489,6 +507,11 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         }
         S->ExportSize = AddrSize;
         S->Flags |= (SF_GLOBAL | Flags);
+
+        /* Remember the current location as location of definition in case
+         * an .IMPORT follows later.
+         */
+        GetFullLineInfo (&S->DefLines);
     }
 }
 
@@ -555,6 +578,11 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
 
     /* Set the symbol data */
     S->Flags |= (SF_EXPORT | SF_REFERENCED);
+
+    /* In case we have no line info for the definition, record it now */
+    if (CollCount (&S->DefLines) == 0) {
+        GetFullLineInfo (&S->DefLines);
+    }
 }
 
 

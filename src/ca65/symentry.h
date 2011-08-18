@@ -89,7 +89,8 @@ struct SymEntry {
         struct SymTable*    Tab;       	/* Table this symbol is in */
         struct SymEntry*    Entry;
     } Sym;
-    Collection          LineInfos;      /* Line infos for this symbol */
+    Collection          DefLines;       /* Line infos for definition */
+    Collection          RefLines;       /* Line infos for references */
     FilePos*            GuessedUse[1];  /* File position where symbol
                                          * address size was guessed, and the
                                          * smallest possible addressing was NOT

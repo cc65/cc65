@@ -162,10 +162,13 @@ void HT_InsertEntry (HashTable* T, void* Entry);
 void HT_RemoveEntry (HashTable* T, void* Entry);
 /* Remove an entry from the given hash table */
 
-void HT_Walk (HashTable* T, void (*F) (void* Entry, void* Data), void* Data);
-/* Walk over all nodes of a hash table. For each node, the user supplied
- * function F is called, passing a pointer to the entry, and the data pointer
- * passed to HT_Walk by the caller.
+void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data);
+/* Walk over all nodes of a hash table, optionally deleting entries from the
+ * table. For each node, the user supplied function F is called, passing a
+ * pointer to the entry, and the data pointer passed to HT_Walk by the caller.
+ * If F returns true, the node is deleted from the hash table otherwise it's
+ * left in place. While deleting the node, the node is not accessed, so it is
+ * safe for F to free the memory associcated with the entry.
  */
 
 

@@ -230,10 +230,13 @@ void HT_RemoveEntry (HashTable* T, void* Entry)
 
 
 
-void HT_Walk (HashTable* T, void (*F) (void* Entry, void* Data), void* Data)
-/* Walk over all nodes of a hash table. For each node, the user supplied
- * function F is called, passing a pointer to the entry, and the data pointer
- * passed to HT_Walk by the caller.
+void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data)
+/* Walk over all nodes of a hash table, optionally deleting entries from the
+ * table. For each node, the user supplied function F is called, passing a
+ * pointer to the entry, and the data pointer passed to HT_Walk by the caller.
+ * If F returns true, the node is deleted from the hash table otherwise it's
+ * left in place. While deleting the node, the node is not accessed, so it is
+ * safe for F to free the memory associcated with the entry.
  */
 {
     unsigned I;
@@ -247,16 +250,23 @@ void HT_Walk (HashTable* T, void (*F) (void* Entry, void* Data), void* Data)
     for (I = 0; I < T->Slots; ++I) {
 
         /* Get the pointer to the first entry of the hash chain */
-        HashNode* N = T->Table[I];
+        HashNode** Cur = &T->Table[I];
 
         /* Walk over all entries in this chain */
-        while (N) {
-            /* Call the user function. N is also the pointer to the entry */
-            F (N, Data);
-            /* Next node in chain */
-            N = N->Next;
+        while (*Cur) {
+            /* Fetch the next node in chain now, because F() may delete it */
+            HashNode* Next = (*Cur)->Next;
+            /* Call the user function. N is also the pointer to the entry. If
+             * the function returns true, the entry is to be deleted.
+             */
+            if (F (*Cur, Data)) {
+                /* Delete the node from the chain */
+                *Cur = Next;
+            } else {
+                /* Next node in chain */
+                Cur = &(*Cur)->Next;
+            }
         }
-
     }
 }
 

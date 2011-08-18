@@ -254,11 +254,10 @@ void PrintDbgSyms (FILE* F)
 
             /* Emit the base data for the entry */
             fprintf (F,
-                     "sym\tid=%u,name=\"%s\",addrsize=%s,type=%s",
+                     "sym\tid=%u,name=\"%s\",addrsize=%s",
                      O->SymBaseId + J,
                      GetString (S->Name),
-                     AddrSizeToStr (S->AddrSize),
-                     SYM_IS_LABEL (S->Type)? "lab" : "equ");
+                     AddrSizeToStr (S->AddrSize));
 
             /* If this is not an import, output its value and - if we have
              * it - the segment.
@@ -285,10 +284,8 @@ void PrintDbgSyms (FILE* F)
                 fprintf (F, ",type=%s", SYM_IS_LABEL (S->Type)? "lab" : "equ");
 
             } else {
-
                 /* Output the type */
                 fputs (",type=imp", F);
-
             }
 
             /* Emit the size only if we know it */

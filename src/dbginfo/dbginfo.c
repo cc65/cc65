@@ -3605,6 +3605,7 @@ static void ParseSym (InputData* D)
             case TOK_TYPE:
                 switch (D->Tok) {
                     case TOK_EQUATE:    Type = CC65_SYM_EQUATE;         break;
+                    case TOK_IMPORT:    Type = CC65_SYM_IMPORT;         break;
                     case TOK_LABEL:     Type = CC65_SYM_LABEL;          break;
                     default:
                         ParseError (D, CC65_ERROR,
@@ -5621,8 +5622,8 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start
             break;
         }
 
-        /* Ignore non-labels and imports */
-        if (Item->Type != CC65_SYM_LABEL || Item->Exp.Info != 0) {
+        /* Ignore non-labels (this will also ignore imports) */
+        if (Item->Type != CC65_SYM_LABEL) {
             continue;
         }
 

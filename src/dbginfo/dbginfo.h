@@ -400,17 +400,22 @@ void cc65_free_segmentinfo (cc65_dbginfo handle, const cc65_segmentinfo* info);
 typedef enum {
     CC65_SYM_EQUATE,
     CC65_SYM_LABEL,                     /* Some sort of address */
+    CC65_SYM_IMPORT,                    /* An import */
 } cc65_symbol_type;
 
 /* Notes:
  *  - If the symbol is segment relative, the segment id gives segment
  *    information, otherwise it contains CC65_INV_ID.
- *  - If export_id is valid (not CC65_INV_ID), the symbol is an import and
- *    export_id allows to retrieve the corresponding export. The fields
- *    symbol_value and segment_id are taken from the export, since imports
- *    have no value or segments by itself. symbol_type and symbol_size are
- *    more or less unusable because they don't have a meaning for imports.
- *  - For normal symbols (not cheap locals) parent_id contains CC65_INV_ID.
+ *  - If the type is CC65_SYM_IMPORT, export_id may contain the id of the 
+ *    export. This is not the case if the module contaiing the export doesn't
+ *    have debug information.
+ *  - For an import, the fields symbol_value and segment_id are taken from
+ *    the export, if it is available, since imports have no value or segments
+ *    by itself.
+ *  - For an import symbol_type and symbol_size are more or less unusable 
+ *    because they don't have a meaning for imports.
+ *  - For normal symbols (not cheap locals) parent_id contains CC65_INV_ID, 
+ *    for cheap locals it contains the symbol id of the parent symbol.
  */
 typedef struct cc65_symboldata cc65_symboldata;
 struct cc65_symboldata {

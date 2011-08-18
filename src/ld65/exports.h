@@ -64,7 +64,8 @@ typedef struct Import Import;
 struct Import {
     Import*  		Next;		/* Single linked list */
     ObjData* 		Obj;		/* Object file that imports the name */
-    Collection          LineInfos;      /* Line info of reference */
+    Collection          DefLines;       /* Line infos of definition */
+    Collection          RefLines;       /* Line infos of reference */
     struct Export*	Exp;		/* Matching export for this import */
     unsigned            Name;		/* Name if not in table */
     unsigned short      Flags;          /* Generic flags */
@@ -84,7 +85,8 @@ struct Export {
     Import*  		ImpList;	/* List of imports for this symbol */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned            Size;           /* Size of the symbol if any */
-    Collection          LineInfos;      /* Line info of definition */
+    Collection          DefLines;       /* Line infos of definition */
+    Collection          RefLines;       /* Line infos of reference */
     unsigned            DbgSymId;       /* Id of debug symbol for this export */
     unsigned short      Type;		/* Type of export */
     unsigned short      AddrSize;       /* Address size of export */

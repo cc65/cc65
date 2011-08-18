@@ -108,7 +108,8 @@ static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
     /* Initialize the fields */
     I->Next    	 = 0;
     I->Obj     	 = Obj;
-    I->LineInfos = EmptyCollection;
+    I->DefLines  = EmptyCollection;
+    I->RefLines  = EmptyCollection;
     I->Exp       = 0;
     I->Name      = INVALID_STRING_ID;
     I->Flags     = 0;
@@ -129,8 +130,9 @@ void FreeImport (Import* I)
     /* Safety */
     PRECONDITION ((I->Flags & IMP_INLIST) == 0);
 
-    /* Free the line info collection */
-    DoneCollection (&I->LineInfos);
+    /* Free the line info collections */
+    DoneCollection (&I->DefLines);
+    DoneCollection (&I->RefLines);
 
     /* Free the struct */
     xfree (I);
@@ -153,7 +155,8 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     I->Name = MakeGlobalStringId (Obj, ReadVar (F));
 
     /* Read the line infos */
-    ReadLineInfoList (F, Obj, &I->LineInfos);
+    ReadLineInfoList (F, Obj, &I->DefLines);
+    ReadLineInfoList (F, Obj, &I->RefLines);
 
     /* Check the address size */
     if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
@@ -278,18 +281,12 @@ Import* InsertImport (Import* I)
 const LineInfo* GetImportPos (const Import* Imp)
 /* Return the basic line info of an import */
 {
-    unsigned I;
-
-    /* Search for a line info of LI_TYPE_ASM */
-    for (I = 0; I < CollCount (&Imp->LineInfos); ++I) {
-        const LineInfo* LI = CollConstAt (&Imp->LineInfos, I);
-        if (LI_GET_TYPE (LI->Type) == LI_TYPE_ASM) {
-            return LI;
-        }
+    /* Search in DefLines, then in RefLines */
+    const LineInfo* LI = GetAsmLineInfo (&Imp->DefLines);
+    if (LI == 0) {
+        LI = GetAsmLineInfo (&Imp->RefLines);
     }
-
-    /* Not found - return the one in slot zero */
-    return CollConstAt (&Imp->LineInfos, 0);
+    return LI;
 }
 
 
@@ -316,7 +313,8 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
     E->ImpList   = 0;
     E->Expr    	 = 0;
     E->Size      = 0;
-    E->LineInfos = EmptyCollection;
+    E->DefLines  = EmptyCollection;
+    E->RefLines  = EmptyCollection;
     E->DbgSymId  = ~0U;
     E->Type    	 = Type | SYM_EXPORT;
     E->AddrSize  = AddrSize;
@@ -338,7 +336,8 @@ void FreeExport (Export* E)
     PRECONDITION ((E->Flags & EXP_INLIST) == 0);
 
     /* Free the line infos */
-    DoneCollection (&E->LineInfos);
+    DoneCollection (&E->DefLines);
+    DoneCollection (&E->RefLines);
 
     /* Free the export expression */
     FreeExpr (E->Expr);
@@ -402,8 +401,9 @@ Export* ReadExport (FILE* F, ObjData* O)
         E->Size = ReadVar (F);
     }
 
-    /* Last is the file position where the definition was done */
-    ReadLineInfoList (F, O, &E->LineInfos);
+    /* Last are the locations */
+    ReadLineInfoList (F, O, &E->DefLines);
+    ReadLineInfoList (F, O, &E->RefLines);
 
     /* Return the new export */
     return E;
@@ -488,8 +488,12 @@ void InsertExport (Export* E)
 const LineInfo* GetExportPos (const Export* E)
 /* Return the basic line info of an export */
 {
-    /* Source file position is always in slot zero */
-    return CollConstAt (&E->LineInfos, 0);
+    /* Search in DefLines, then in RefLines */
+    const LineInfo* LI = GetAsmLineInfo (&E->DefLines);
+    if (LI == 0) {
+        LI = GetAsmLineInfo (&E->RefLines);
+    }
+    return LI;
 }
 
 

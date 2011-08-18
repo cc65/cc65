@@ -358,7 +358,7 @@ static SegDesc* NewSegDesc (unsigned Name)
 
 static void FreeSegDesc (SegDesc* S)
 /* Free a segment descriptor */
-{               
+{
     FreeLineInfo (S->LI);
     xfree (S);
 }
@@ -1418,7 +1418,7 @@ static void ParseSymbols (void)
                 AttrCheck (AttrFlags, atType, "TYPE");
                 /* Create the export */
                 Exp = CreateExprExport (Name, Value, AddrSize);
-                CollAppend (&Exp->LineInfos, GenLineInfo (&CfgErrorPos));
+                CollAppend (&Exp->DefLines, GenLineInfo (&CfgErrorPos));
                 break;
 
             case CfgSymImport:
@@ -1429,7 +1429,7 @@ static void ParseSymbols (void)
                 /* Generate the import */
                 Imp = InsertImport (GenImport (Name, AddrSize));
                 /* Remember the file position */
-                CollAppend (&Imp->LineInfos, GenLineInfo (&CfgErrorPos));
+                CollAppend (&Imp->DefLines, GenLineInfo (&CfgErrorPos));
                 break;
 
             case CfgSymWeak:
@@ -1679,7 +1679,7 @@ static void ProcessSymbols (void)
                 if ((E = FindExport (Sym->Name)) == 0 || IsUnresolvedExport (E)) {
                     /* The symbol is undefined, generate an export */
                     E = CreateExprExport (Sym->Name, Sym->Value, Sym->AddrSize);
-                    CollAppend (&E->LineInfos, Sym->LI);
+                    CollAppend (&E->DefLines, Sym->LI);
                 }
                 break;
 
@@ -1702,12 +1702,12 @@ static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
     /* Define the run address of the segment */
     SB_Printf (&Buf, "__%s_RUN__", GetString (S->Name));
     E = CreateMemoryExport (GetStrBufId (&Buf), S->Run, SegAddr - S->Run->Start);
-    CollAppend (&E->LineInfos, S->LI);
+    CollAppend (&E->DefLines, S->LI);
 
     /* Define the size of the segment */
     SB_Printf (&Buf, "__%s_SIZE__", GetString (S->Name));
     E = CreateConstExport (GetStrBufId (&Buf), S->Seg->Size);
-    CollAppend (&E->LineInfos, S->LI);
+    CollAppend (&E->DefLines, S->LI);
 
     S->Flags |= SF_RUN_DEF;
     SB_Done (&Buf);
@@ -1724,7 +1724,7 @@ static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
     /* Define the load address of the segment */
     SB_Printf (&Buf, "__%s_LOAD__", GetString (S->Name));
     E = CreateMemoryExport (GetStrBufId (&Buf), S->Load, SegAddr - S->Load->Start);
-    CollAppend (&E->LineInfos, S->LI);
+    CollAppend (&E->DefLines, S->LI);
 
     S->Flags |= SF_LOAD_DEF;
     SB_Done (&Buf);
@@ -1789,7 +1789,7 @@ unsigned CfgProcess (void)
             /* Define the start of the memory area */
 	    SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
 	    E = CreateMemoryExport (GetStrBufId (&Buf), M, 0);
-            CollAppend (&E->LineInfos, M->LI);
+            CollAppend (&E->DefLines, M->LI);
 
             SB_Done (&Buf);
         }
@@ -1906,12 +1906,12 @@ unsigned CfgProcess (void)
             /* Define the size of the memory area */
 	    SB_Printf (&Buf, "__%s_SIZE__", GetString (M->Name));
 	    E = CreateConstExport (GetStrBufId (&Buf), M->Size);
-            CollAppend (&E->LineInfos, M->LI);
+            CollAppend (&E->DefLines, M->LI);
 
             /* Define the fill level of the memory area */
 	    SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
 	    E = CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
-            CollAppend (&E->LineInfos, M->LI);
+            CollAppend (&E->DefLines, M->LI);
 
             SB_Done (&Buf);
 	}

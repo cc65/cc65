@@ -65,7 +65,8 @@ struct DbgSym {
     unsigned            Id;             /* Id of debug symbol */
     DbgSym*    	       	Next;  		/* Pool linear list link */
     ObjData*   		Obj;	    	/* Object file that exports the name */
-    Collection          LineInfos;      /* Line infos of definition */
+    Collection          DefLines;       /* Line infos for definition */
+    Collection          RefLines;       /* Line infos for references */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned            Size;           /* Symbol size if any */
     unsigned            OwnerId;        /* Id of parent/owner */
@@ -99,7 +100,8 @@ static DbgSym* NewDbgSym (unsigned Id, unsigned Type, unsigned char AddrSize,
     D->Id         = Id;
     D->Next       = 0;
     D->Obj        = O;
-    D->LineInfos  = EmptyCollection;
+    D->DefLines   = EmptyCollection;
+    D->RefLines   = EmptyCollection;
     D->Expr    	  = 0;
     D->Size       = 0;
     D->OwnerId    = ~0U;
@@ -202,7 +204,8 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
     }
 
     /* Last is the list of line infos for this symbol */
-    ReadLineInfoList (F, O, &D->LineInfos);
+    ReadLineInfoList (F, O, &D->DefLines);
+    ReadLineInfoList (F, O, &D->RefLines);
 
     /* Return the new DbgSym */
     return D;
@@ -271,6 +274,17 @@ void PrintDbgSyms (FILE* F)
                 fprintf (F, ",scope=%u", O->ScopeBaseId + S->OwnerId);
             } else {
                 fprintf (F, ",parent=%u", O->SymBaseId + S->OwnerId);
+            }
+
+            /* Output line infos */
+            if (CollCount (&S->DefLines) > 0) {
+                unsigned K;
+                const LineInfo* LI = CollConstAt (&S->DefLines, 0);
+                fprintf (F, ",line=%u", LI->Id);
+                for (K = 1; K < CollCount (&S->DefLines); ++K) {
+                    LI = CollConstAt (&S->DefLines, K);
+                    fprintf (F, "+%u", LI->Id);
+                }
             }
 
             /* If this is an import, output the id of the matching export.

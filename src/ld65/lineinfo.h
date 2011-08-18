@@ -73,6 +73,7 @@ struct Segment;
  */
 typedef struct LineInfo LineInfo;
 struct LineInfo {
+    unsigned            Id;             /* Line info id */
     struct FileInfo*    File;	        /* File struct for this line if any */
     unsigned            Type;           /* Type of line info */
     FilePos             Pos;            /* Position in file */
@@ -99,6 +100,11 @@ void FreeLineInfo (LineInfo* LI);
 void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
 /* Read a list of line infos stored as a list of indices in the object file,
  * make real line infos from them and place them into the passed collection.
+ */
+
+const LineInfo* GetAsmLineInfo (const Collection* LineInfos);
+/* Find a line info of type LI_TYPE_ASM in the given collection and return it.
+ * Return NULL if no such line info was found.
  */
 
 #if defined(HAVE_INLINE)
@@ -164,6 +170,9 @@ INLINE unsigned long GetSourceLineFromList (const Collection* LineInfos)
 #  define GetSourceLineFromList(LineInfos)      \
         GetSourceLine ((const LineInfo*) CollConstAt ((LineInfos), 0))
 #endif
+
+void AssignLineInfoIds (void);
+/* Assign the ids to the line infos */
 
 void PrintDbgLineInfo (FILE* F);
 /* Output the line infos to a debug info file */

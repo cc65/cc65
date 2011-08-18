@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2005-2010, Ullrich von Bassewitz                                      */
+/* (C) 2005-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -75,7 +75,7 @@ static ExprNode* Factor (void)
             } else {
                 N = NewExprNode (0, EXPR_SYMBOL);
                 N->V.Imp = InsertImport (GenImport (Name, ADDR_SIZE_ABS));
-                CollAppend (&N->V.Imp->LineInfos, GenLineInfo (&CfgErrorPos));
+                CollAppend (&N->V.Imp->RefLines, GenLineInfo (&CfgErrorPos));
             }
 
             /* Skip the symbol name */

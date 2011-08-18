@@ -61,6 +61,7 @@ static LineInfo* NewLineInfo (void)
     LineInfo* LI = xmalloc (sizeof (LineInfo));
 
     /* Initialize the fields */
+    LI->Id         = ~0U;
     LI->File       = 0;
     LI->Type       = LI_MAKE_TYPE (LI_TYPE_ASM, 0);
     LI->Pos.Name   = INVALID_STRING_ID;
@@ -155,13 +156,59 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
 
 
 
+const LineInfo* GetAsmLineInfo (const Collection* LineInfos)
+/* Find a line info of type LI_TYPE_ASM in the given collection and return it.
+ * Return NULL if no such line info was found.
+ */
+{
+    unsigned I;
+
+    /* Search for a line info of LI_TYPE_ASM */
+    for (I = 0; I < CollCount (LineInfos); ++I) {
+        const LineInfo* LI = CollConstAt (LineInfos, I);
+        if (LI_GET_TYPE (LI->Type) == LI_TYPE_ASM) {
+            return LI;
+        }
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
+void AssignLineInfoIds (void)
+/* Assign the ids to the line infos */
+{
+    unsigned I, J;
+
+    /* Walk over all line infos */
+    unsigned Id = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Output the line infos */
+        for (J = 0; J < CollCount (&O->LineInfos); ++J) {
+
+            /* Get this line info */
+            LineInfo* LI = CollAtUnchecked (&O->LineInfos, J);
+
+            /* Assign the id */
+            LI->Id = Id++;
+        }
+    }
+}
+
+
+
 void PrintDbgLineInfo (FILE* F)
 /* Output the line infos to a debug info file */
 {
     unsigned I, J, K;
 
     /* Print line infos from all modules we have linked into the output file */
-    unsigned Id = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get the object file */
@@ -183,7 +230,7 @@ void PrintDbgLineInfo (FILE* F)
             /* Print the start of the line */
             fprintf (F,
                      "line\tid=%u,file=%u,line=%lu",
-                     Id++, LI->File->Id, GetSourceLine (LI));
+                     LI->Id, LI->File->Id, GetSourceLine (LI));
 
             /* Print type if not LI_TYPE_ASM and count if not zero */
             if (Type != LI_TYPE_ASM) {

@@ -73,6 +73,10 @@ typedef struct Span Span;
 
 
 
+Span* NewSpan (struct ObjData* Obj, unsigned SecId, unsigned long Offs, 
+               unsigned long Size);
+/* Create and return a new span */
+
 Span* ReadSpan (FILE* F, struct ObjData* O);
 /* Read a Span from a file and return it */
 

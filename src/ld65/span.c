@@ -66,17 +66,20 @@ struct Span {
 
 
 
-static Span* NewSpan (unsigned Id, unsigned SecId, unsigned long Offs, unsigned long Size)
+Span* NewSpan (ObjData* Obj, unsigned SecId, unsigned long Offs, unsigned long Size)
 /* Create and return a new span */
 {
     /* Allocate memory */
     Span* S = xmalloc (sizeof (*S));
 
     /* Initialize the fields */
-    S->Id       = Id;
+    S->Id       = CollCount (&Obj->Spans);
     S->Sec      = SecId;
     S->Offs     = Offs;
     S->Size     = Size;
+
+    /* Insert it into the collection of all spans of this object file */
+    CollAppend (&Obj->Spans, S);
 
     /* Return the result */
     return S;
@@ -87,17 +90,11 @@ static Span* NewSpan (unsigned Id, unsigned SecId, unsigned long Offs, unsigned 
 Span* ReadSpan (FILE* F, ObjData* O)
 /* Read a Span from a file and return it */
 {
-    /* Create a new Span */
+    /* Create a new Span and return it */
     unsigned SecId     = ReadVar (F);
     unsigned long Offs = ReadVar (F);
     unsigned Size      = ReadVar (F);
-    Span* S = NewSpan (CollCount (&O->Spans), SecId, Offs, Size);
-
-    /* Insert it into the collection of all spans of this object file */
-    CollAppend (&O->Spans, S);
-
-    /* And return it */
-    return S;
+    return NewSpan (O, SecId, Offs, Size);
 }
 
 
@@ -178,9 +175,9 @@ void PrintDbgSpans (FILE* F)
 
             /* Output the data */
             fprintf (F, "span\tid=%u,seg=%u,start=%lu,size=%lu\n",
-                     O->SpanBaseId + S->Id, 
-                     Sec->Seg->Id, 
-                     Sec->Offs + S->Offs, 
+                     O->SpanBaseId + S->Id,
+                     Sec->Seg->Id,
+                     Sec->Offs + S->Offs,
                      S->Size);
         }
     }

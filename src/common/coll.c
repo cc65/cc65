@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -140,7 +140,7 @@ void CollInsert (Collection* C, void* Item, unsigned Index)
     /* Grow the array if necessary */
     if (C->Count >= C->Size) {
      	/* Must grow */
-        CollGrow (C, (C->Size == 0)? 8 : C->Size * 2);
+        CollGrow (C, (C->Size == 0)? 4 : C->Size * 2);
     }
 
     /* Move the existing elements if needed */

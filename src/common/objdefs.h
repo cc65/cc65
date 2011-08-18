@@ -53,6 +53,7 @@
 
 /* Flag bits */
 #define OBJ_FLAGS_DBGINFO	0x0001	/* File has debug info */
+#define OBJ_HAS_DBGINFO(x)      (((x) & OBJ_FLAGS_DBGINFO) != 0)
 
 
 

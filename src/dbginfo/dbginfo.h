@@ -205,7 +205,11 @@ void cc65_free_lineinfo (cc65_dbginfo handle, const cc65_lineinfo* info);
 
 
 
-/* Module information */
+/* Module information 
+ * Notes:
+ *   - scope_id contains CC65_INV_ID if the module was compiled without
+ *     debug information.
+ */
 typedef struct cc65_moduledata cc65_moduledata;
 struct cc65_moduledata {
     unsigned            module_id;      /* The internal module id */
@@ -406,15 +410,15 @@ typedef enum {
 /* Notes:
  *  - If the symbol is segment relative, the segment id gives segment
  *    information, otherwise it contains CC65_INV_ID.
- *  - If the type is CC65_SYM_IMPORT, export_id may contain the id of the 
+ *  - If the type is CC65_SYM_IMPORT, export_id may contain the id of the
  *    export. This is not the case if the module contaiing the export doesn't
  *    have debug information.
  *  - For an import, the fields symbol_value and segment_id are taken from
  *    the export, if it is available, since imports have no value or segments
  *    by itself.
- *  - For an import symbol_type and symbol_size are more or less unusable 
+ *  - For an import symbol_type and symbol_size are more or less unusable
  *    because they don't have a meaning for imports.
- *  - For normal symbols (not cheap locals) parent_id contains CC65_INV_ID, 
+ *  - For normal symbols (not cheap locals) parent_id contains CC65_INV_ID,
  *    for cheap locals it contains the symbol id of the parent symbol.
  */
 typedef struct cc65_symboldata cc65_symboldata;

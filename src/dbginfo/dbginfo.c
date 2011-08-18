@@ -1254,8 +1254,12 @@ static void CopyModInfo (cc65_moduledata* D, const ModInfo* M)
         D->library_id = M->Lib.Info->Id;
     } else {
         D->library_id = CC65_INV_ID;
+    }                      
+    if (M->MainScope) {
+        D->scope_id   = M->MainScope->Id;
+    } else {
+        D->scope_id   = CC65_INV_ID;
     }
-    D->scope_id       = M->MainScope->Id;
 }
 
 
@@ -4313,13 +4317,19 @@ static void ProcessScopeInfo (InputData* D)
         }
     }
 
-    /* Walk over all modules, check that eacxh one has a main scope assigned,
-     * then sort the scopes by name
+    /* Walk over all modules. If a module doesn't have scopes, it wasn't 
+     * compiled with debug info which is ok. If it has debug info, it must
+     * also have a main scope. If there are scopes, sort them by name.
      */
     for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
 
         /* Get this module */
         ModInfo* M = CollAt (&D->Info->ModInfoById, I);
+
+        /* Ignore modules without any scopes (no debug info) */
+        if (CollCount (&M->ScopeInfoByName) == 0) {
+            continue;
+        }
 
         /* Must have a main scope */
         if (M->MainScope == 0) {

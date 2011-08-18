@@ -40,7 +40,8 @@
 
 #include <stdio.h>
 
-/* common */
+/* common */  
+#include "coll.h"
 #include "exprdefs.h"
 
 
@@ -56,9 +57,8 @@ typedef struct Segment Segment;
 struct Segment {
     unsigned            Name;           /* Name index of the segment */
     unsigned            Id;             /* Segment id for debug info */
-    Segment*	      	Next;		/* Hash list */
-    struct Section*	SecRoot;	/* Section list */
-    struct Section*  	SecLast;	/* Pointer to last section */
+    Segment*  	      	Next;		/* Hash list */
+    Collection          Sections;       /* Sections in this segment */
     unsigned long     	PC;    		/* PC were this segment is located */
     unsigned long     	Size;		/* Size of data so far */
     struct ObjData*	AlignObj;	/* Module that requested the alignment */

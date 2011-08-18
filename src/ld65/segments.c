@@ -92,8 +92,7 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     /* Initialize the fields */
     S->Name        = Name;
     S->Next	   = 0;
-    S->SecRoot	   = 0;
-    S->SecLast	   = 0;
+    S->Sections    = EmptyCollection;
     S->PC   	   = 0;
     S->Size    	   = 0;
     S->AlignObj	   = 0;
@@ -183,13 +182,7 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize)
     S->Offs  	= Seg->Size;  	/* Current size is offset */
 
     /* Insert the section into the segment */
-    if (Seg->SecRoot == 0) {
-	/* First section in this segment */
-       	Seg->SecRoot = S;
-    } else {
-	Seg->SecLast->Next = S;
-    }
-    Seg->SecLast = S;
+    CollAppend (&Seg->Sections, S);
 
     /* Return the struct */
     return S;
@@ -311,8 +304,12 @@ int IsBSSType (Segment* S)
  */
 {
     /* Loop over all sections */
-    Section* Sec = S->SecRoot;
-    while (Sec) {
+    unsigned I;
+    for (I = 0; I < CollCount (&S->Sections); ++I) {
+
+        /* Get the next section */
+        Section* Sec = CollAtUnchecked (&S->Sections, I);
+
 	/* Loop over all fragments */
 	Fragment* F = Sec->FragRoot;
 	while (F) {
@@ -331,7 +328,6 @@ int IsBSSType (Segment* S)
 	    }
 	    F = F->Next;
 	}
-	Sec = Sec->Next;
     }
     return 1;
 }
@@ -341,15 +337,15 @@ int IsBSSType (Segment* S)
 void SegDump (void)
 /* Dump the segments and it's contents */
 {
-    unsigned I;
+    unsigned I, J;
     unsigned long Count;
     unsigned char* Data;
 
     for (I = 0; I < CollCount (&SegmentList); ++I) {
-        const Segment* Seg = CollConstAt (&SegmentList, I);
-	Section* S = Seg->SecRoot;
+        Segment* Seg = CollAtUnchecked (&SegmentList, I);
        	printf ("Segment: %s (%lu)\n", GetString (Seg->Name), Seg->Size);
-	while (S) {
+        for (J = 0; J < CollCount (&Seg->Sections); ++J) {
+            Section* S = CollAtUnchecked (&Seg->Sections, J);
             unsigned J;
 	    Fragment* F = S->FragRoot;
 	    printf ("  Section:\n");
@@ -393,7 +389,6 @@ void SegDump (void)
 		}
 		F = F->Next;
 	    }
-	    S = S->Next;
     	}
     }
 }
@@ -449,7 +444,7 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
  * called (see description of SegWriteFunc above).
  */
 {
-    Section*      Sec;
+    unsigned      I;
     int           Sign;
     unsigned long Offs = 0;
 
@@ -459,8 +454,8 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
     S->OutputOffs = (unsigned long) ftell (Tgt);
 
     /* Loop over all sections in this segment */
-    Sec = S->SecRoot;
-    while (Sec) {
+    for (I = 0; I < CollCount (&S->Sections); ++I) {
+        Section* Sec = CollAtUnchecked (&S->Sections, I);
      	Fragment* Frag;
 
         /* Output were this section is from */
@@ -535,9 +530,6 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 	    /* Next fragment */
 	    Frag = Frag->Next;
      	}
-
-	/* Next section */
-	Sec = Sec->Next;
     }
 }
 

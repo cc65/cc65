@@ -4458,8 +4458,9 @@ static void ProcessSpanInfo (InputData* D)
 static void ProcessSymInfo (InputData* D)
 /* Postprocess symbol infos */
 {
+    unsigned I, J;
+
     /* Walk over the symbols and resolve the references */
-    unsigned I;
     for (I = 0; I < CollCount (&D->Info->SymInfoById); ++I) {
 
         /* Get the symbol info */
@@ -4531,6 +4532,47 @@ static void ProcessSymInfo (InputData* D)
             }
             CollAppend (S->Parent.Info->CheapLocals, S);
         }
+
+        /* Resolve the line infos for the symbol definition */
+        for (J = 0; I < CollCount (&S->DefLineInfoList); ++J) {
+
+            /* Get the id of this line info */
+            unsigned LineId = CollIdAt (&S->DefLineInfoList, J);
+            if (LineId >= CollCount (&D->Info->LineInfoById)) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Invalid line id %u for symbol with id %u",
+                            LineId, S->Id);
+                CollReplace (&S->DefLineInfoList, 0, J);
+            } else {
+                /* Get a pointer to the line info */
+                LineInfo* LI = CollAt (&D->Info->LineInfoById, LineId);
+
+                /* Replace the id by the pointer */
+                CollReplace (&S->DefLineInfoList, LI, J);
+            }
+        }
+
+        /* Resolve the line infos for symbol references */
+        for (J = 0; I < CollCount (&S->RefLineInfoList); ++J) {
+
+            /* Get the id of this line info */
+            unsigned LineId = CollIdAt (&S->RefLineInfoList, J);
+            if (LineId >= CollCount (&D->Info->LineInfoById)) {
+                ParseError (D,
+                            CC65_ERROR,
+                            "Invalid line id %u for symbol with id %u",
+                            LineId, S->Id);
+                CollReplace (&S->RefLineInfoList, 0, J);
+            } else {
+                /* Get a pointer to the line info */
+                LineInfo* LI = CollAt (&D->Info->LineInfoById, LineId);
+
+                /* Replace the id by the pointer */
+                CollReplace (&S->RefLineInfoList, LI, J);
+            }
+        }
+
     }
 
     /* Second run. Resolve scopes for cheap locals */
@@ -4975,6 +5017,84 @@ const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned FileId)
     for (I = 0; I < CollCount (&F->LineInfoByLine); ++I) {
         /* Copy the data */
         CopyLineInfo (D->data + I, CollConstAt (&F->LineInfoByLine, I));
+    }
+
+    /* Return the allocated struct */
+    return D;
+}
+
+
+
+const cc65_lineinfo* cc65_line_bysymdef (cc65_dbginfo Handle, unsigned SymId)
+/* Return line information for the definition of a symbol. The function
+ * returns NULL if the symbol id is invalid, otherwise a list of line infos.
+ */
+{
+    DbgInfo*        Info;
+    SymInfo*        S;
+    cc65_lineinfo*  D;
+    unsigned        I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the symbol id is valid */
+    if (SymId >= CollCount (&Info->SymInfoById)) {
+        return 0;
+    }
+
+    /* Get the symbol */
+    S = CollAt (&Info->SymInfoById, SymId);
+
+    /* Prepare the struct we will return to the caller */
+    D = new_cc65_lineinfo (CollCount (&S->DefLineInfoList));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&S->DefLineInfoList); ++I) {
+        /* Copy the data */
+        CopyLineInfo (D->data + I, CollConstAt (&S->DefLineInfoList, I));
+    }
+
+    /* Return the allocated struct */
+    return D;
+}
+
+
+
+const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo Handle, unsigned SymId)
+/* Return line information for all references of a symbol. The function
+ * returns NULL if the symbol id is invalid, otherwise a list of line infos.
+ */
+{
+    DbgInfo*        Info;
+    SymInfo*        S;
+    cc65_lineinfo*  D;
+    unsigned        I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = (DbgInfo*) Handle;
+
+    /* Check if the symbol id is valid */
+    if (SymId >= CollCount (&Info->SymInfoById)) {
+        return 0;
+    }
+
+    /* Get the symbol */
+    S = CollAt (&Info->SymInfoById, SymId);
+
+    /* Prepare the struct we will return to the caller */
+    D = new_cc65_lineinfo (CollCount (&S->RefLineInfoList));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&S->RefLineInfoList); ++I) {
+        /* Copy the data */
+        CopyLineInfo (D->data + I, CollConstAt (&S->RefLineInfoList, I));
     }
 
     /* Return the allocated struct */

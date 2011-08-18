@@ -194,6 +194,16 @@ const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned source_id
  * file id is invalid.
  */
 
+const cc65_lineinfo* cc65_line_bysymdef (cc65_dbginfo handle, unsigned symbol_id);
+/* Return line information for the definition of a symbol. The function
+ * returns NULL if the symbol id is invalid, otherwise a list of line infos.
+ */
+
+const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo handle, unsigned symbol_id);
+/* Return line information for all references of a symbol. The function
+ * returns NULL if the symbol id is invalid, otherwise a list of line infos.
+ */
+
 void cc65_free_lineinfo (cc65_dbginfo handle, const cc65_lineinfo* info);
 /* Free line info returned by one of the other functions */
 
@@ -205,7 +215,7 @@ void cc65_free_lineinfo (cc65_dbginfo handle, const cc65_lineinfo* info);
 
 
 
-/* Module information 
+/* Module information
  * Notes:
  *   - scope_id contains CC65_INV_ID if the module was compiled without
  *     debug information.

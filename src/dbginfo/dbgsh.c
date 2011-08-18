@@ -93,6 +93,15 @@ static void CmdShowSegment (Collection* Args);
 static void CmdShowSource (Collection* Args);
 /* Show source files from the debug info file */
 
+static void CmdShowSymbol (Collection* Args);
+/* Show symbols */
+
+static void CmdShowSymDef (Collection* Args);
+/* Show lines from for a symbol definition */
+
+static void CmdShowSymRef (Collection* Args);
+/* Show lines from for symbol references */
+
 static void CmdUnload (Collection* Args attribute ((unused)));
 /* Unload a debug info file */
 
@@ -124,6 +133,7 @@ enum {
     SegmentId,
     SourceId,
     SpanId,
+    SymbolId
 };
 
 /* Structure that contains a command description */
@@ -207,6 +217,21 @@ static const CmdEntry ShowCmds[] = {
         "Show sources. May be followed by one or more source file ids.",
         -1,
         CmdShowSource
+    }, {
+        "symbol",
+        "Show symbols. May be followed by one or more symbol or scope ids.",
+        -2,
+        CmdShowSymbol
+    }, {
+        "symdef",
+        "Show where a symbol was defined. May be followed by one or more symbol ids.",
+        -2,
+        CmdShowSymDef
+    }, {
+        "symref",
+        "Show where a symbol was referenced. May be followed by one or more symbol ids.",
+        -2,
+        CmdShowSymRef
     },
 };
 
@@ -374,6 +399,7 @@ static unsigned FindIdType (const char* TypeName)
         {   "m",        ModuleId        },
         {   "mod",      ModuleId        },
         {   "module",   ModuleId        },
+        {   "s",        SymbolId        },
         {   "sc",       ScopeId         },
         {   "scope",    ScopeId         },
         {   "seg",      SegmentId       },
@@ -382,6 +408,8 @@ static unsigned FindIdType (const char* TypeName)
         {   "src",      SourceId        },
         {   "sp",       SpanId          },
         {   "span",     SpanId          },
+        {   "sym",      SymbolId        },
+        {   "symbol",   SymbolId        },
     };
 
     unsigned I;
@@ -653,8 +681,41 @@ static void PrintSources (const cc65_sourceinfo* S)
     for (I = 0, D = S->data; I < S->count; ++I, ++D) {
         PrintId (D->source_id, 8);
         Print ("%-30s", D->source_name);
-        Print ("%7lu  ", D->source_size);
+        PrintNumber (D->source_size, 7, 9);
         PrintTime (D->source_mtime, 0);
+        NewLine ();
+    }
+}
+
+
+
+static void PrintSymbolHeader (void)
+/* Output a header for a list of symbols */
+{
+    /* Header */
+    PrintLine ("  id  name                type  size  value  export  seg  scope parent");
+    PrintSeparator ();
+}
+
+
+
+static void PrintSymbols (const cc65_symbolinfo* S)
+/* Output a list of symbols */
+{
+    unsigned I;
+    const cc65_symboldata* D;
+
+    /* Segments */
+    for (I = 0, D = S->data; I < S->count; ++I, ++D) {
+        PrintId (D->symbol_id, 6);
+        Print ("%-20s", D->symbol_name);
+        PrintNumber (D->symbol_type, 4, 6);
+        PrintNumber (D->symbol_size, 4, 6);
+        PrintNumber (D->symbol_value, 5, 7);
+        PrintId (D->export_id, 7);
+        PrintId (D->segment_id, 6);
+        PrintId (D->scope_id, 6);
+        PrintId (D->parent_id, 0);
         NewLine ();
     }
 }
@@ -839,12 +900,25 @@ static void CmdShowLine (Collection* Args)
         if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
             /* Fetch list depending on type */
             switch (IdType) {
+
                 case LineId:
                     L = cc65_line_byid (Info, Id);
                     break;
+
                 case SourceId:
                     L = cc65_line_bysource (Info, Id);
                     break;
+
+                case SymbolId:
+                    /* ### not very clean */
+                    L = cc65_line_bysymdef (Info, Id);
+                    if (L) {
+                        PrintLines (L);
+                        cc65_free_lineinfo (Info, L);
+                    }
+                    L = cc65_line_bysymref (Info, Id);
+                    break;
+
                 default:
                     L = 0;
                     PrintLine ("Invalid id type");
@@ -1169,7 +1243,151 @@ static void CmdShowSource (Collection* Args)
             }
         }
     }
+}
 
+
+
+static void CmdShowSymbol (Collection* Args)
+/* Show symbols */
+{
+    const cc65_symbolinfo* S;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintSymbolHeader ();
+
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = SymbolId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+
+                case ScopeId:
+                    S = cc65_symbol_byscope (Info, Id);
+                    break;
+
+                case SymbolId:
+                    S = cc65_symbol_byid (Info, Id);
+                    break;
+
+                default:
+                    S = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* Ignore the invalid id */
+            S = 0;
+        }
+
+        /* Output the list */
+        if (S) {
+            PrintSymbols (S);
+            cc65_free_symbolinfo (Info, S);
+        }
+    }
+}
+
+
+
+static void CmdShowSymDef (Collection* Args)
+/* Show lines from for a symbol definition */
+{
+    const cc65_lineinfo* L;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintLineHeader ();
+
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = SymbolId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+
+                case SymbolId:
+                    L = cc65_line_bysymdef (Info, Id);
+                    break;
+
+                default:
+                    L = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* Ignore the invalid id */
+            L = 0;
+        }
+
+        /* Output the list */
+        if (L) {
+            PrintLines (L);
+            cc65_free_lineinfo (Info, L);
+        }
+    }
+}
+
+
+
+static void CmdShowSymRef (Collection* Args)
+/* Show lines from for symbol references */
+{
+    const cc65_lineinfo* L;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintLineHeader ();
+
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = SymbolId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+
+                case SymbolId:
+                    L = cc65_line_bysymref (Info, Id);
+                    break;
+
+                default:
+                    L = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* Ignore the invalid id */
+            L = 0;
+        }
+
+        /* Output the list */
+        if (L) {
+            PrintLines (L);
+            cc65_free_lineinfo (Info, L);
+        }
+    }
 }
 
 

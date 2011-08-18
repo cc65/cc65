@@ -4534,7 +4534,7 @@ static void ProcessSymInfo (InputData* D)
         }
 
         /* Resolve the line infos for the symbol definition */
-        for (J = 0; I < CollCount (&S->DefLineInfoList); ++J) {
+        for (J = 0; J < CollCount (&S->DefLineInfoList); ++J) {
 
             /* Get the id of this line info */
             unsigned LineId = CollIdAt (&S->DefLineInfoList, J);
@@ -4554,7 +4554,7 @@ static void ProcessSymInfo (InputData* D)
         }
 
         /* Resolve the line infos for symbol references */
-        for (J = 0; I < CollCount (&S->RefLineInfoList); ++J) {
+        for (J = 0; J < CollCount (&S->RefLineInfoList); ++J) {
 
             /* Get the id of this line info */
             unsigned LineId = CollIdAt (&S->RefLineInfoList, J);

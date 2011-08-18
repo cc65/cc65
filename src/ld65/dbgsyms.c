@@ -259,10 +259,44 @@ void PrintDbgSyms (FILE* F)
                      GetString (S->Name),
                      AddrSizeToStr (S->AddrSize));
 
-            /* If this is not an import, output its value and - if we have
+            /* Emit the size only if we know it */
+            if (S->Size != 0) {
+                fprintf (F, ",size=%u", S->Size);
+            }
+
+            /* For cheap local symbols, add the owner symbol, for others,
+             * add the owner scope.
+             */
+            if (SYM_IS_STD (S->Type)) {
+                fprintf (F, ",scope=%u", O->ScopeBaseId + S->OwnerId);
+            } else {
+                fprintf (F, ",parent=%u", O->SymBaseId + S->OwnerId);
+            }
+
+            /* If this is an import, output the id of the matching export.
+             * If this is not an import, output its value and - if we have
              * it - the segment.
              */
-            if (!SYM_IS_IMPORT (S->Type)) {
+            if (SYM_IS_IMPORT (S->Type)) {
+
+                /* Get the import */
+                const Import* Imp = GetObjImport (O, S->ImportId);
+
+                /* Get the export from the import */
+                const Export* Exp = Imp->Exp;
+
+                /* Output the type */
+                fputs (",type=imp", F);
+
+                /* If this is not a linker generated symbol, and the module
+                 * that contains the export has debug info, output the debug
+                 * symbol id for the export
+                 */
+                if (Exp->Obj && OBJ_HAS_DBGINFO (Exp->Obj->Header.Flags)) {
+                    fprintf (F, ",exp=%u", Exp->Obj->SymBaseId + Exp->DbgSymId);
+                }
+
+            } else {
 
                 SegExprDesc D;
 
@@ -282,41 +316,6 @@ void PrintDbgSyms (FILE* F)
 
                 /* Output the type */
                 fprintf (F, ",type=%s", SYM_IS_LABEL (S->Type)? "lab" : "equ");
-
-            } else {
-                /* Output the type */
-                fputs (",type=imp", F);
-            }
-
-            /* Emit the size only if we know it */
-            if (S->Size != 0) {
-                fprintf (F, ",size=%u", S->Size);
-            }
-
-            /* For cheap local symbols, add the owner symbol, for others,
-             * add the owner scope.
-             */
-            if (SYM_IS_STD (S->Type)) {
-                fprintf (F, ",scope=%u", O->ScopeBaseId + S->OwnerId);
-            } else {
-                fprintf (F, ",parent=%u", O->SymBaseId + S->OwnerId);
-            }
-
-            /* If this is an import, output the id of the matching export */
-            if (SYM_IS_IMPORT (S->Type)) {
-
-                /* Get the import */
-                const Import* Imp = GetObjImport (O, S->ImportId);
-
-                /* Get the export from the import */
-                const Export* Exp = Imp->Exp;
-
-                /* If this is not a linker generated symbol, output the debug
-                 * symbol id for the export
-                 */
-                if (Exp->Obj) {
-                    fprintf (F, ",exp=%u", Exp->Obj->SymBaseId + Exp->DbgSymId);
-                }
             }
 
             /* Terminate the output line */

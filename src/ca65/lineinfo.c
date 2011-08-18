@@ -438,6 +438,8 @@ void WriteLineInfos (void)
 {
     unsigned I;
 
+    Collection EmptySpans = STATIC_COLLECTION_INITIALIZER;
+
     /* Tell the object file module that we're about to write line infos */
     ObjStartLineInfos ();
 
@@ -456,12 +458,22 @@ void WriteLineInfos (void)
         /* Write the type and count of the line info */
         ObjWriteVar (LI_MAKE_TYPE (LI->Key.Type, LI->Key.Count));
 
-        /* Write the spans for this line */
-        WriteSpans (&LI->Spans);
+        /* Spans are only added to the debug file if debug information is 
+         * requested. Otherwise we write an empty list.
+         */
+        if (DbgSyms) {
+            WriteSpans (&LI->Spans);
+        } else {
+            /* Write out an empty list */
+            WriteSpans (&EmptySpans);
+        }
     }
 
     /* End of line infos */
     ObjEndLineInfos ();
+
+    /* For the sake of completeness, but not really necessary */
+    DoneCollection (&EmptySpans);
 }
 
 

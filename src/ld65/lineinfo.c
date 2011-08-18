@@ -62,7 +62,7 @@ static LineInfo* NewLineInfo (void)
 
     /* Initialize the fields */
     LI->File       = 0;
-    LI->Type       = LI_TYPE_ASM;
+    LI->Type       = LI_MAKE_TYPE (LI_TYPE_ASM, 0);
     LI->Pos.Name   = INVALID_STRING_ID;
     LI->Pos.Line   = 0;
     LI->Pos.Col    = 0;

@@ -239,6 +239,22 @@ static long GetDbgSymVal (const DbgSym* D)
 
 
 
+static void PrintLineInfo (FILE* F, const Collection* LineInfos, const char* Format)
+/* Output an attribute with line infos */
+{
+    if (CollCount (LineInfos) > 0) {
+        unsigned I;
+        const LineInfo* LI = CollConstAt (LineInfos, 0);
+        fprintf (F, Format, LI->Id);
+        for (I = 1; I < CollCount (LineInfos); ++I) {
+            LI = CollConstAt (LineInfos, I);
+            fprintf (F, "+%u", LI->Id);
+        }
+    }
+}
+
+
+
 void PrintDbgSyms (FILE* F)
 /* Print the debug symbols in a debug file */
 {
@@ -277,15 +293,8 @@ void PrintDbgSyms (FILE* F)
             }
 
             /* Output line infos */
-            if (CollCount (&S->DefLines) > 0) {
-                unsigned K;
-                const LineInfo* LI = CollConstAt (&S->DefLines, 0);
-                fprintf (F, ",line=%u", LI->Id);
-                for (K = 1; K < CollCount (&S->DefLines); ++K) {
-                    LI = CollConstAt (&S->DefLines, K);
-                    fprintf (F, "+%u", LI->Id);
-                }
-            }
+            PrintLineInfo (F, &S->DefLines, ",def=%u");
+            PrintLineInfo (F, &S->RefLines, ",ref=%u");
 
             /* If this is an import, output the id of the matching export.
              * If this is not an import, output its value and - if we have

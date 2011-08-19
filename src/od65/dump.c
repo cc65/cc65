@@ -484,7 +484,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
         unsigned long NextSeg   = ftell (F) + DataSize;
        	const char*   Name      = GetString (&StrPool, ReadVar (F));
 	unsigned      Len       = strlen (Name);
-	unsigned long Size      = Read32 (F);
+	unsigned long Size      = ReadVar (F);
 	unsigned      Align     = (1U << Read8 (F));
        	unsigned char AddrSize  = Read8 (F);
         unsigned long FragCount = ReadVar (F);
@@ -545,7 +545,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 	unsigned      Len      = strlen (Name);
 
         /* Skip both line info lists */
-        SkipLineInfoList (F);       
+        SkipLineInfoList (F);
         SkipLineInfoList (F);
 
 	/* Print the header */
@@ -615,7 +615,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
         }
 
         /* Skip both line infos lists */
-        SkipLineInfoList (F);         
+        SkipLineInfoList (F);
         SkipLineInfoList (F);
 
 	/* Print the header */
@@ -703,7 +703,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
         }
 
         /* Skip both line info lists */
-        SkipLineInfoList (F);      
+        SkipLineInfoList (F);
         SkipLineInfoList (F);
 
 	/* Print the header */
@@ -920,7 +920,7 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
         unsigned long NextSeg  = ftell (F) + DataSize;
 	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
-	unsigned long Size     = Read32 (F);
+	unsigned long Size     = ReadVar (F);
 
         /* Skip alignment, type and fragment count */
         (void) Read8 (F);
@@ -940,4 +940,4 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
 
 
 
-                             
+

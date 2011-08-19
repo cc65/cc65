@@ -128,7 +128,7 @@ INLINE const char* GetSourceName (const LineInfo* LI)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned long GetSourceLine (const LineInfo* LI)
+INLINE unsigned GetSourceLine (const LineInfo* LI)
 /* Return the source file line from the given line info */
 {
     return LI->Pos.Line;
@@ -160,7 +160,7 @@ INLINE const char* GetSourceNameFromList (const Collection* LineInfos)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned long GetSourceLineFromList (const Collection* LineInfos)
+INLINE unsigned GetSourceLineFromList (const Collection* LineInfos)
 /* Return the source file line from a list of line infos */
 {
     /* The relevant entry is in slot zero */

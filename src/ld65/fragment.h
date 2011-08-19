@@ -98,9 +98,9 @@ INLINE const char* GetFragmentSourceName (const Fragment* F)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned long GetFragmentSourceLine (const Fragment* F)
+INLINE unsigned GetFragmentSourceLine (const Fragment* F)
 /* Return the source file line for this fragment */
-{
+{               
     return GetSourceLineFromList (&F->LineInfos);
 }
 #else

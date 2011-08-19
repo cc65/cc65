@@ -492,19 +492,19 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 		   	    break;
 
 		   	case SEG_EXPR_RANGE_ERROR:
-     		   	    Error ("Range error in module `%s', line %lu",
+     		   	    Error ("Range error in module `%s', line %u",
 		   	    	   GetFragmentSourceName (Frag),
 		   	 	   GetFragmentSourceLine (Frag));
 		   	    break;
 
 		   	case SEG_EXPR_TOO_COMPLEX:
-     		   	    Error ("Expression too complex in module `%s', line %lu",
+     		   	    Error ("Expression too complex in module `%s', line %u",
 		   	    	   GetFragmentSourceName (Frag),
 		   	 	   GetFragmentSourceLine (Frag));
 			    break;
 
 			case SEG_EXPR_INVALID:
-			    Error ("Invalid expression in module `%s', line %lu",
+			    Error ("Invalid expression in module `%s', line %u",
 		   	    	   GetFragmentSourceName (Frag),
 		   	 	   GetFragmentSourceLine (Frag));
 			    break;

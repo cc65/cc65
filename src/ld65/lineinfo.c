@@ -229,7 +229,7 @@ void PrintDbgLineInfo (FILE* F)
 
             /* Print the start of the line */
             fprintf (F,
-                     "line\tid=%u,file=%u,line=%lu",
+                     "line\tid=%u,file=%u,line=%u",
                      LI->Id, LI->File->Id, GetSourceLine (LI));
 
             /* Print type if not LI_TYPE_ASM and count if not zero */

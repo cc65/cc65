@@ -244,10 +244,17 @@ static long DoStructInternal (long Offs, unsigned Type)
         ConsumeSep ();
     }
 
-    /* If this is not a anon struct, leave the struct scope level. This will
-     * also record the size of the scope.
+    /* If this is not a anon struct, enter a special symbol named ".size"
+     * into the symbol table of the struct that holds the size of the
+     * struct. Since the symbol starts with a dot, it cannot be accessed
+     * by user code.
+     * Leave the struct scope level.
      */
     if (!Anon) {
+        /* Add a symbol */
+        SymEntry* SizeSym = GetSizeOfScope (CurrentScope);
+        SymDef (SizeSym, GenLiteralExpr (Size), ADDR_SIZE_DEFAULT, SF_NONE);
+
         /* Close the struct scope */
         SymLeaveLevel ();
     }

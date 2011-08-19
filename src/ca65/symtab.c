@@ -244,10 +244,12 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
 void SymLeaveLevel (void)
 /* Leave the current lexical level */
 {
-    /* Close the spans. We don't care about the scope type here, since types
-     * without spans will just have an empty list.
+    /* If this is a scope that allows to emit data into segments, close the
+     * open the spans.
      */
-    CloseSpans (&CurrentScope->Spans);
+    if (CurrentScope->Type <= SCOPE_HAS_DATA) {
+        CloseSpans (&CurrentScope->Spans);
+    }
 
     /* If we have spans, the first one is the segment that was active, when the
      * scope was opened. Set the size of the scope to the number of data bytes

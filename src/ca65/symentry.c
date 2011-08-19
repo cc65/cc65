@@ -419,6 +419,9 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 
     /* Set the symbol data */
     S->Flags |= (SF_EXPORT | SF_REFERENCED | Flags);
+
+    /* Remember line info for this reference */
+    CollAppend (&S->RefLines, GetAsmLineInfo ());
 }
 
 

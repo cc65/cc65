@@ -271,17 +271,13 @@ void DoneLineInfo (void)
 void EndLine (LineInfo* LI)
 /* End a line that is tracked by the given LineInfo structure */
 {
-    unsigned I;
-
     /* Close the spans for the line */
     CloseSpans (&LI->OpenSpans);
 
     /* Move the spans to the list of all spans for this line, then clear the
      * list of open spans.
      */
-    for (I = 0; I < CollCount (&LI->OpenSpans); ++I) {
-        CollAppend (&LI->Spans, CollAtUnchecked (&LI->OpenSpans, I));
-    }
+    CollTransfer (&LI->Spans, &LI->OpenSpans);
     CollDeleteAll (&LI->OpenSpans);
 
     /* Line info is no longer active - remove it from the list of current
@@ -376,23 +372,13 @@ void GetFullLineInfo (Collection* LineInfos)
 {
     unsigned I;
 
-    /* If the collection is currently empty, grow it as necessary */
-    if (CollCount (LineInfos) == 0) {
-        CollGrow (LineInfos, CollCount (&CurLineInfo));
-    }
-
-    /* Copy all valid line infos to the collection */
+    /* Bum the reference counter for all active line infos */
     for (I = 0; I < CollCount (&CurLineInfo); ++I) {
-
-        /* Get the line info from the slot */
-        LineInfo* LI = CollAt (&CurLineInfo, I);
-
-        /* Bump the reference counter */
-        ++LI->RefCount;
-
-        /* Return it to the caller */
-        CollAppend (LineInfos, LI);
+        ++((LineInfo*)CollAt (&CurLineInfo, I))->RefCount;
     }
+
+    /* Copy all line infos over */
+    CollTransfer (LineInfos, &CurLineInfo);
 }
 
 

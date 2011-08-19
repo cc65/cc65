@@ -503,11 +503,9 @@ static void SymCheckUndefined (SymEntry* S)
             }
         }
         if (S->Flags & SF_REFERENCED) {
-            unsigned I;
+            /* Mark as referenced and move the line info */
             Sym->Flags |= SF_REFERENCED;
-            for (I = 0; I < CollCount (&S->RefLines); ++I) {
-                CollAppend (&Sym->RefLines, CollAtUnchecked (&S->RefLines, I));
-            }
+            CollTransfer (&Sym->RefLines, &S->RefLines);
             CollDeleteAll (&S->RefLines);
         }
 
@@ -564,9 +562,11 @@ void SymCheck (void)
 	 */
 	if (S->Flags & SF_GLOBAL) {
 	    if (S->Flags & SF_DEFINED) {
-	     	SymExportFromGlobal (S);
-	    } else {
-	     	SymImportFromGlobal (S);
+                printf ("ExportFromGlobal: %s\n", SB_GetConstBuf (GetSymName (S)));
+    	     	SymExportFromGlobal (S);
+    	    } else {
+                printf ("ImportFromGlobal: %s\n", SB_GetConstBuf (GetSymName (S)));
+    	     	SymImportFromGlobal (S);
 	    }
 	}
 

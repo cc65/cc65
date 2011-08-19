@@ -204,7 +204,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     /* Read the segment data */
     (void) Read32 (F);            /* File size of data */
     Name      = MakeGlobalStringId (O, ReadVar (F));    /* Segment name */
-    Size      = Read32 (F);       /* Size of data */
+    Size      = ReadVar (F);      /* Size of data */
     Align     = Read8 (F);        /* Alignment */
     Type      = Read8 (F);        /* Segment type */
     FragCount = ReadVar (F);      /* Number of fragments */
@@ -258,7 +258,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 
 	    case FRAG_FILL:
 	  	/* Will allocate memory, but we don't care... */
-	  	Frag = NewFragment (Type, ReadVar (F), Sec);
+     	  	Frag = NewFragment (Type, ReadVar (F), Sec);
 	  	break;
 
 	    default:
@@ -356,7 +356,7 @@ void SegDump (void)
 		       	printf ("    Literal (%u bytes):", F->Size);
 		       	Count = F->Size;
 		       	Data  = F->LitBuf;
-		       	J = 100;
+     		       	J = 100;
 		       	while (Count--) {
 		       	    if (J > 75) {
 			     	printf ("\n   ");
@@ -503,7 +503,7 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 		   	 	   GetFragmentSourceLine (Frag));
 			    break;
 
-			case SEG_EXPR_INVALID:
+     			case SEG_EXPR_INVALID:
 			    Error ("Invalid expression in module `%s', line %u",
 		   	    	   GetFragmentSourceName (Frag),
 		   	 	   GetFragmentSourceLine (Frag));
@@ -552,7 +552,7 @@ static int CmpSegStart (const void* K1, const void* K2)
 
     /* Compare the start addresses */
     if (S1->PC > S2->PC) {
-	return 1;
+     	return 1;
     } else if (S1->PC < S2->PC) {
 	return -1;
     } else {

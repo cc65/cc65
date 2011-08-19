@@ -52,6 +52,7 @@
 #include "objcode.h"
 #include "objfile.h"
 #include "segment.h"
+#include "span.h"
 #include "spool.h"
 #include "studyexpr.h"
 #include "symtab.h"
@@ -325,8 +326,8 @@ unsigned char GetSegAddrSize (unsigned SegNum)
 
 
 
-void SegCheck (void)
-/* Check the segments for range and other errors */
+void SegDone (void)
+/* Check the segments for range and other errors. Do cleanup. */
 {
     static const unsigned long U_Hi[4] = {
        	0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
@@ -453,7 +454,7 @@ void SegDump (void)
 
 
 
-void InitSegments (void)
+void SegInit (void)
 /* Initialize segments */
 {
     /* Create the predefined segments. Code segment is active */
@@ -512,7 +513,7 @@ static void WriteOneSeg (Segment* Seg)
 
     /* Write the segment data */
     ObjWriteVar (GetStringId (Seg->Def->Name)); /* Name of the segment */
-    ObjWrite32 (Seg->PC);                       /* Size */
+    ObjWriteVar (Seg->PC);                       /* Size */
     ObjWrite8 (Seg->Align);                     /* Segment alignment */
     ObjWrite8 (Seg->Def->AddrSize);             /* Address size of the segment */
     ObjWriteVar (Seg->FragCount);               /* Number of fragments */

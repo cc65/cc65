@@ -50,10 +50,12 @@
 
 
 
+/* Forwards */
+struct Segment;
+
 /* Span definition */
 typedef struct Span Span;
 struct Span{
-    unsigned        Id;                 /* Span id */
     struct Segment* Seg;       	       	/* Pointer to segment */
     unsigned long   Start;              /* Start of range */
     unsigned long   End;                /* End of range */
@@ -62,7 +64,7 @@ struct Span{
 
 
 /*****************************************************************************/
-/*     	      	      	   	     Code   				     */
+/*     	       	      	   	     Code   				     */
 /*****************************************************************************/
 
 

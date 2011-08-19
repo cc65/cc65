@@ -153,13 +153,13 @@ void EnterRelocMode (void);
  * switch the mode globally or for the current segment.
  */
 
-void SegCheck (void);
-/* Check the segments for range and other errors */
+void SegDone (void);
+/* Check the segments for range and other errors. Do cleanup. */
 
 void SegDump (void);
 /* Dump the contents of all segments */
 
-void InitSegments (void);
+void SegInit (void);
 /* Initialize segments */
 
 void SetSegmentSizes (void);

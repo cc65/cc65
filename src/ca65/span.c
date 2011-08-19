@@ -151,6 +151,23 @@ void CloseSpans (Collection* Spans)
 
 
 
+static void WriteSpan (const Span* S)
+/* Write one span to the output file */
+{
+    /* Done accept empty spans */
+    CHECK (S->End > S->Start);
+
+    /* Write data for the span We will write the size instead of the end
+     * offset to save some bytes, since most spans are expected to be
+     * rather small.
+     */
+    ObjWriteVar (S->Seg->Num);
+    ObjWriteVar (S->Start);
+    ObjWriteVar (S->End - S->Start);
+}
+
+
+
 void WriteSpans (const Collection* Spans)
 /* Write a list of spans to the output file */
 {
@@ -161,22 +178,10 @@ void WriteSpans (const Collection* Spans)
 
     /* Write the spans */
     for (I = 0; I < CollCount (Spans); ++I) {
-
-        /* Get next range */
-        const Span* S = CollConstAt (Spans, I);
-
-        CHECK (S->End > S->Start);
-
-        /* Write data for the span We will write the size instead of the end
-         * offset to save some bytes, since most spans are expected to be
-         * rather small.
-         */
-        ObjWriteVar (S->Seg->Num);
-        ObjWriteVar (S->Start);
-        ObjWriteVar (S->End - S->Start);
+        /* Write the next span */
+        WriteSpan (CollConstAt (Spans, I));
     }
 }
-
 
 
 

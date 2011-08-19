@@ -867,7 +867,7 @@ int main (int argc, char* argv [])
     InitIncludePaths ();
 
     /* Create the predefined segments */
-    InitSegments ();
+    SegInit ();
 
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
@@ -1013,7 +1013,7 @@ int main (int argc, char* argv [])
 
     /* If we didn't have any errors, check and cleanup the unnamed labels */
     if (ErrorCount == 0) {
-        ULabDone ();                                  
+        ULabDone ();
     }
 
     /* If we didn't have any errors, check the symbol table */
@@ -1028,7 +1028,7 @@ int main (int argc, char* argv [])
 
     /* If we didn't have any errors, check and resolve the segment data */
     if (ErrorCount == 0) {
-        SegCheck ();
+        SegDone ();
     }
 
     /* If we didn't have any errors, check       the assertions */

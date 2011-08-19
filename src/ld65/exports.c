@@ -749,12 +749,15 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 	    	     "Unresolved external `%s' referenced in:\n",
 		     GetString (E->Name));
 	    while (Imp) {
-                const LineInfo* LI = GetImportPos (Imp);
-		fprintf (stderr,
+                unsigned J;
+                for (J = 0; J < CollCount (&Imp->RefLines); ++J) {
+                    const LineInfo* LI = CollConstAt (&Imp->RefLines, J);
+                    fprintf (stderr,
                          "  %s(%lu)\n",
                          GetSourceName (LI),
                          GetSourceLine (LI));
-		Imp = Imp->Next;
+                }
+    		Imp = Imp->Next;
 	    }
 	}
     }

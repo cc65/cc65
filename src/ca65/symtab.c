@@ -562,10 +562,8 @@ void SymCheck (void)
 	 */
 	if (S->Flags & SF_GLOBAL) {
 	    if (S->Flags & SF_DEFINED) {
-                printf ("ExportFromGlobal: %s\n", SB_GetConstBuf (GetSymName (S)));
     	     	SymExportFromGlobal (S);
     	    } else {
-                printf ("ImportFromGlobal: %s\n", SB_GetConstBuf (GetSymName (S)));
     	     	SymImportFromGlobal (S);
 	    }
 	}
@@ -573,7 +571,6 @@ void SymCheck (void)
 	/* Handle undefined symbols */
        	if ((S->Flags & SF_UNDEFMASK) == SF_UNDEFVAL) {
 	    /* This is an undefined symbol. Handle it. */
-            printf ("Undefined: %s\n", SB_GetConstBuf (GetSymName (S)));
 	    SymCheckUndefined (S);
 	}
 

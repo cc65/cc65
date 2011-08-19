@@ -15,7 +15,7 @@ COMMON	= ../common
 
 #
 CC      = gcc
-CFLAGS  = -g -Wall -W -I$(COMMON)
+CFLAGS  = -g -O2 -Wall -W -I$(COMMON)
 EBIND   = emxbind
 LDFLAGS =
 

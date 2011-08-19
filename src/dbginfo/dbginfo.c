@@ -1481,6 +1481,16 @@ static void CopySpanInfo (cc65_spandata* D, const SpanInfo* S)
     D->span_start       = S->Start;
     D->span_end         = S->End;
     D->segment_id       = S->Seg.Info->Id;
+    if (S->ScopeInfoList) {
+        D->scope_count  = CollCount (S->ScopeInfoList);
+    } else {
+        D->scope_count  = 0;
+    }
+    if (S->LineInfoList) {            
+        D->line_count   = CollCount (S->LineInfoList);
+    } else {
+        D->line_count   = 0;
+    }
 }
 
 

@@ -265,6 +265,8 @@ struct cc65_spandata {
     cc65_addr           span_start;     /* Start of the span */
     cc65_addr           span_end;       /* End of the span (inclusive!) */
     unsigned            segment_id;     /* Id of the segment */
+    unsigned            line_count;     /* Number of lines attached */
+    unsigned            scope_count;    /* Number of scopes attached */
 };
 
 typedef struct cc65_spaninfo cc65_spaninfo;
@@ -426,8 +428,7 @@ typedef enum {
  *  - For an import, the fields symbol_value and segment_id are taken from
  *    the export, if it is available, since imports have no value or segments
  *    by itself.
- *  - For an import symbol_type and symbol_size are more or less unusable
- *    because they don't have a meaning for imports.
+ *  - For an import symbol_size doesn't have a meaning.
  *  - For normal symbols (not cheap locals) parent_id contains CC65_INV_ID,
  *    for cheap locals it contains the symbol id of the parent symbol.
  */

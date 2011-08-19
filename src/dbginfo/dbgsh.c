@@ -279,7 +279,7 @@ static void PrintLine (const char* Format, ...)
 static void PrintSeparator (void)
 /* Print a separator line */
 {
-    PrintLine ("-----------------------------------------------------------------------");
+    PrintLine ("---------------------------------------------------------------------------");
 }
 
 
@@ -693,7 +693,7 @@ static void PrintSymbolHeader (void)
 /* Output a header for a list of symbols */
 {
     /* Header */
-    PrintLine ("  id  name                type  size  value  export  seg  scope parent");
+    PrintLine ("  id  name                    type  size  value  export  seg  scope parent");
     PrintSeparator ();
 }
 
@@ -708,7 +708,7 @@ static void PrintSymbols (const cc65_symbolinfo* S)
     /* Segments */
     for (I = 0, D = S->data; I < S->count; ++I, ++D) {
         PrintId (D->symbol_id, 6);
-        Print ("%-20s", D->symbol_name);
+        Print ("%-24s", D->symbol_name);      
         PrintNumber (D->symbol_type, 4, 6);
         PrintNumber (D->symbol_size, 4, 6);
         PrintNumber (D->symbol_value, 5, 7);

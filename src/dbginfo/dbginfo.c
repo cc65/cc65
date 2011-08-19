@@ -1486,7 +1486,7 @@ static void CopySpanInfo (cc65_spandata* D, const SpanInfo* S)
     } else {
         D->scope_count  = 0;
     }
-    if (S->LineInfoList) {            
+    if (S->LineInfoList) {
         D->line_count   = CollCount (S->LineInfoList);
     } else {
         D->line_count   = 0;
@@ -5098,6 +5098,47 @@ const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo Handle, unsigned SymId)
 
 
 
+const cc65_lineinfo* cc65_line_byspan (cc65_dbginfo Handle, unsigned SpanId)
+/* Return line information for a a span. The function returns NULL if the
+ * span id is invalid, otherwise a list of line infos.
+ */
+{
+    const DbgInfo*  Info;
+    const SpanInfo* S;
+    cc65_lineinfo*  D;
+    unsigned        I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the span id is valid */
+    if (SpanId >= CollCount (&Info->SpanInfoById)) {
+        return 0;
+    }
+
+    /* Get the span */
+    S = CollAt (&Info->SpanInfoById, SpanId);
+
+    /* Prepare the struct we will return to the caller */
+    D = new_cc65_lineinfo (S->LineInfoList? CollCount (S->LineInfoList) : 0);
+
+    /* Fill in the data. Since D->LineInfoList may be NULL, we will use the
+     * count field of the returned data struct instead.
+     */
+    for (I = 0; I < D->count; ++I) {
+        /* Copy the data */
+        CopyLineInfo (D->data + I, CollAt (S->LineInfoList, I));
+    }
+
+    /* Return the allocated struct */
+    return D;
+}
+
+
+
 void cc65_free_lineinfo (cc65_dbginfo Handle, const cc65_lineinfo* Info)
 /* Free line info returned by one of the other functions */
 {
@@ -5986,6 +6027,47 @@ const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
     }
 
     /* Return the result */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
+/* Return scope information for a a span. The function returns NULL if the
+ * span id is invalid, otherwise a list of line scopes.
+ */
+{
+    const DbgInfo*      Info;
+    const SpanInfo*     S;
+    cc65_scopeinfo*     D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the span id is valid */
+    if (SpanId >= CollCount (&Info->SpanInfoById)) {
+        return 0;
+    }
+
+    /* Get the span */
+    S = CollAt (&Info->SpanInfoById, SpanId);
+
+    /* Prepare the struct we will return to the caller */
+    D = new_cc65_scopeinfo (S->ScopeInfoList? CollCount (S->ScopeInfoList) : 0);
+
+    /* Fill in the data. Since D->ScopeInfoList may be NULL, we will use the
+     * count field of the returned data struct instead.
+     */
+    for (I = 0; I < D->count; ++I) {
+        /* Copy the data */
+        CopyScopeInfo (D->data + I, CollAt (S->ScopeInfoList, I));
+    }
+
+    /* Return the allocated struct */
     return D;
 }
 

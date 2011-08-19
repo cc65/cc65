@@ -204,6 +204,11 @@ const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo handle, unsigned symbol_id
  * returns NULL if the symbol id is invalid, otherwise a list of line infos.
  */
 
+const cc65_lineinfo* cc65_line_byspan (cc65_dbginfo handle, unsigned span_id);
+/* Return line information for a a span. The function returns NULL if the
+ * span id is invalid, otherwise a list of line infos.
+ */
+
 void cc65_free_lineinfo (cc65_dbginfo handle, const cc65_lineinfo* info);
 /* Free line info returned by one of the other functions */
 
@@ -533,6 +538,11 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo handle, unsigned module_
 const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo handle, const char* name);
 /* Return the list of scopes with a given name. Returns NULL if no scope with
  * the given name was found, otherwise a non empty scope list.
+ */
+
+const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo handle, unsigned span_id);
+/* Return scope information for a a span. The function returns NULL if the
+ * span id is invalid, otherwise a list of line scopes.
  */
 
 const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo handle, unsigned id);

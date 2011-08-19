@@ -810,7 +810,7 @@ static void CollAppendId (Collection* C, unsigned Id)
 
 
 
-static void* CollAt (Collection* C, unsigned Index)
+static void* CollAt (const Collection* C, unsigned Index)
 /* Return the item at the given index */
 {
     /* Check the index */
@@ -822,19 +822,7 @@ static void* CollAt (Collection* C, unsigned Index)
 
 
 
-static const void* CollConstAt (const Collection* C, unsigned Index)
-/* Return the item at the given index */
-{
-    /* Check the index */
-    assert (Index < C->Count);
-
-    /* Return the element */
-    return C->Items[Index].Ptr;
-}
-
-
-
-static unsigned CollIdAt (Collection* C, unsigned Index)
+static unsigned CollIdAt (const Collection* C, unsigned Index)
 /* Return the id at the given index */
 {
     /* Check the index */
@@ -921,7 +909,7 @@ static void DumpFileInfo (Collection* FileInfos)
 
     /* File info */
     for (I = 0; I < CollCount (FileInfos); ++I) {
-        const FileInfo* FI = CollConstAt (FileInfos, I);
+        const FileInfo* FI = CollAt (FileInfos, I);
         printf ("File info %u:\n"
                 "  Name:   %s\n"
                 "  Size:   %lu\n"
@@ -3899,7 +3887,7 @@ static SpanInfoListEntry* FindSpanInfoByAddr (const SpanInfoList* L, cc65_addr A
 
 
 
-static LineInfo* FindLineInfoByLine (Collection* LineInfos, cc65_line Line)
+static LineInfo* FindLineInfoByLine (const Collection* LineInfos, cc65_line Line)
 /* Find the LineInfo for a given line number. The function returns the line
  * info or NULL if none was found.
  */
@@ -3932,7 +3920,7 @@ static LineInfo* FindLineInfoByLine (Collection* LineInfos, cc65_line Line)
 
 
 
-static SegInfo* FindSegInfoByName (Collection* SegInfos, const char* Name)
+static SegInfo* FindSegInfoByName (const Collection* SegInfos, const char* Name)
 /* Find the SegInfo for a given segment name. The function returns the segment
  * info or NULL if none was found.
  */
@@ -3986,7 +3974,7 @@ static int FindScopeInfoByName (const Collection* ScopeInfos, const char* Name,
         int Cur = (Lo + Hi) / 2;
 
         /* Get item */
-        const ScopeInfo* CurItem = CollConstAt (ScopeInfos, Cur);
+        const ScopeInfo* CurItem = CollAt (ScopeInfos, Cur);
 
         /* Compare */
         int Res = strcmp (CurItem->Name, Name);
@@ -4030,7 +4018,7 @@ static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
         int Cur = (Lo + Hi) / 2;
 
         /* Get item */
-        const SymInfo* CurItem = CollConstAt (SymInfos, Cur);
+        const SymInfo* CurItem = CollAt (SymInfos, Cur);
 
         /* Compare */
         int Res = strcmp (CurItem->Name, Name);
@@ -4056,7 +4044,8 @@ static int FindSymInfoByName (const Collection* SymInfos, const char* Name,
 
 
 
-static int FindSymInfoByValue (Collection* SymInfos, long Value, unsigned* Index)
+static int FindSymInfoByValue (const Collection* SymInfos, long Value,
+                               unsigned* Index)
 /* Find the SymInfo for a given value. The function returns true if the
  * value was found. In this case, Index contains the index of the first item
  * that matches. If the item wasn't found, the function returns false and
@@ -4828,8 +4817,7 @@ void cc65_free_dbginfo (cc65_dbginfo Handle)
 const cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
 /* Return a list of all libraries */
 {
-    DbgInfo*            Info;
-    Collection*         LibInfoById;
+    const DbgInfo*      Info;
     cc65_libraryinfo*   D;
     unsigned            I;
 
@@ -4837,18 +4825,15 @@ const cc65_libraryinfo* cc65_get_librarylist (cc65_dbginfo Handle)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
-
-    /* Get a pointer to the library list */
-    LibInfoById = &Info->LibInfoById;
+    Info = Handle;
 
     /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_libraryinfo (CollCount (LibInfoById));
+    D = new_cc65_libraryinfo (CollCount (&Info->LibInfoById));
 
     /* Fill in the data */
-    for (I = 0; I < CollCount (LibInfoById); ++I) {
+    for (I = 0; I < CollCount (&Info->LibInfoById); ++I) {
         /* Copy the data */
-        CopyLibInfo (D->data + I, CollConstAt (LibInfoById, I));
+        CopyLibInfo (D->data + I, CollAt (&Info->LibInfoById, I));
     }
 
     /* Return the result */
@@ -4864,14 +4849,14 @@ const cc65_libraryinfo* cc65_library_byid (cc65_dbginfo Handle, unsigned Id)
  * library information.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_libraryinfo*   D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->LibInfoById)) {
@@ -4882,7 +4867,7 @@ const cc65_libraryinfo* cc65_library_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_libraryinfo (1);
 
     /* Fill in the data */
-    CopyLibInfo (D->data, CollConstAt (&Info->LibInfoById, Id));
+    CopyLibInfo (D->data, CollAt (&Info->LibInfoById, Id));
 
     /* Return the result */
     return D;
@@ -4915,14 +4900,14 @@ const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
  * module information.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_lineinfo*      D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->LineInfoById)) {
@@ -4933,7 +4918,7 @@ const cc65_lineinfo* cc65_line_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_lineinfo (1);
 
     /* Fill in the data */
-    CopyLineInfo (D->data, CollConstAt (&Info->LineInfoById, Id));
+    CopyLineInfo (D->data, CollAt (&Info->LineInfoById, Id));
 
     /* Return the result */
     return D;
@@ -4947,8 +4932,8 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
  * function returns NULL if no line information was found.
  */
 {
-    DbgInfo*        Info;
-    FileInfo*       F;
+    const DbgInfo*  Info;
+    const FileInfo* F;
     cc65_lineinfo*  D;
     LineInfo*       L = 0;
 
@@ -4956,7 +4941,7 @@ const cc65_lineinfo* cc65_line_bynumber (cc65_dbginfo Handle, unsigned FileId,
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the source file id is valid */
     if (FileId >= CollCount (&Info->FileInfoById)) {
@@ -4991,8 +4976,8 @@ const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned FileId)
  * file id is invalid.
  */
 {
-    DbgInfo*        Info;
-    FileInfo*       F;
+    const DbgInfo*  Info;
+    const FileInfo* F;
     cc65_lineinfo*  D;
     unsigned        I;
 
@@ -5000,7 +4985,7 @@ const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned FileId)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the source file id is valid */
     if (FileId >= CollCount (&Info->FileInfoById)) {
@@ -5016,7 +5001,7 @@ const cc65_lineinfo* cc65_line_bysource (cc65_dbginfo Handle, unsigned FileId)
     /* Fill in the data */
     for (I = 0; I < CollCount (&F->LineInfoByLine); ++I) {
         /* Copy the data */
-        CopyLineInfo (D->data + I, CollConstAt (&F->LineInfoByLine, I));
+        CopyLineInfo (D->data + I, CollAt (&F->LineInfoByLine, I));
     }
 
     /* Return the allocated struct */
@@ -5030,8 +5015,8 @@ const cc65_lineinfo* cc65_line_bysymdef (cc65_dbginfo Handle, unsigned SymId)
  * returns NULL if the symbol id is invalid, otherwise a list of line infos.
  */
 {
-    DbgInfo*        Info;
-    SymInfo*        S;
+    const DbgInfo*  Info;
+    const SymInfo*  S;
     cc65_lineinfo*  D;
     unsigned        I;
 
@@ -5039,7 +5024,7 @@ const cc65_lineinfo* cc65_line_bysymdef (cc65_dbginfo Handle, unsigned SymId)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the symbol id is valid */
     if (SymId >= CollCount (&Info->SymInfoById)) {
@@ -5055,7 +5040,7 @@ const cc65_lineinfo* cc65_line_bysymdef (cc65_dbginfo Handle, unsigned SymId)
     /* Fill in the data */
     for (I = 0; I < CollCount (&S->DefLineInfoList); ++I) {
         /* Copy the data */
-        CopyLineInfo (D->data + I, CollConstAt (&S->DefLineInfoList, I));
+        CopyLineInfo (D->data + I, CollAt (&S->DefLineInfoList, I));
     }
 
     /* Return the allocated struct */
@@ -5069,8 +5054,8 @@ const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo Handle, unsigned SymId)
  * returns NULL if the symbol id is invalid, otherwise a list of line infos.
  */
 {
-    DbgInfo*        Info;
-    SymInfo*        S;
+    const DbgInfo*  Info;
+    const SymInfo*  S;
     cc65_lineinfo*  D;
     unsigned        I;
 
@@ -5078,7 +5063,7 @@ const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo Handle, unsigned SymId)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the symbol id is valid */
     if (SymId >= CollCount (&Info->SymInfoById)) {
@@ -5094,7 +5079,7 @@ const cc65_lineinfo* cc65_line_bysymref (cc65_dbginfo Handle, unsigned SymId)
     /* Fill in the data */
     for (I = 0; I < CollCount (&S->RefLineInfoList); ++I) {
         /* Copy the data */
-        CopyLineInfo (D->data + I, CollConstAt (&S->RefLineInfoList, I));
+        CopyLineInfo (D->data + I, CollAt (&S->RefLineInfoList, I));
     }
 
     /* Return the allocated struct */
@@ -5124,7 +5109,7 @@ void cc65_free_lineinfo (cc65_dbginfo Handle, const cc65_lineinfo* Info)
 const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
 /* Return a list of all modules */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_moduleinfo*    D;
     unsigned            I;
 
@@ -5132,7 +5117,7 @@ const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_moduleinfo (CollCount (&Info->ModInfoById));
@@ -5140,7 +5125,7 @@ const cc65_moduleinfo* cc65_get_modulelist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (&Info->ModInfoById); ++I) {
         /* Copy the data */
-        CopyModInfo (D->data + I, CollConstAt (&Info->ModInfoById, I));
+        CopyModInfo (D->data + I, CollAt (&Info->ModInfoById, I));
     }
 
     /* Return the result */
@@ -5156,14 +5141,14 @@ const cc65_moduleinfo* cc65_module_byid (cc65_dbginfo Handle, unsigned Id)
  * module information.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_moduleinfo*    D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->ModInfoById)) {
@@ -5174,7 +5159,7 @@ const cc65_moduleinfo* cc65_module_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_moduleinfo (1);
 
     /* Fill in the data */
-    CopyModInfo (D->data, CollConstAt (&Info->ModInfoById, Id));
+    CopyModInfo (D->data, CollAt (&Info->ModInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5203,7 +5188,7 @@ void cc65_free_moduleinfo (cc65_dbginfo Handle, const cc65_moduleinfo* Info)
 const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
 /* Return a list of all spans */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_spaninfo*      D;
     unsigned            I;
 
@@ -5211,7 +5196,7 @@ const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_spaninfo (CollCount (&Info->SpanInfoById));
@@ -5219,7 +5204,7 @@ const cc65_spaninfo* cc65_get_spanlist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (&Info->SpanInfoById); ++I) {
         /* Copy the data */
-        CopySpanInfo (D->data + I, CollConstAt (&Info->SpanInfoById, I));
+        CopySpanInfo (D->data + I, CollAt (&Info->SpanInfoById, I));
     }
 
     /* Return the result */
@@ -5235,14 +5220,14 @@ const cc65_spaninfo* cc65_span_byid (cc65_dbginfo Handle, unsigned Id)
  * span information.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_spaninfo*      D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->SpanInfoById)) {
@@ -5253,7 +5238,7 @@ const cc65_spaninfo* cc65_span_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_spaninfo (1);
 
     /* Fill in the data */
-    CopySpanInfo (D->data, CollConstAt (&Info->SpanInfoById, Id));
+    CopySpanInfo (D->data, CollAt (&Info->SpanInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5266,14 +5251,18 @@ const cc65_spaninfo* cc65_span_byaddr (cc65_dbginfo Handle, unsigned long Addr)
  * if no spans were found for this address.
  */
 {
+    const DbgInfo*      Info;
     SpanInfoListEntry* E;
     cc65_spaninfo*  D = 0;
 
     /* Check the parameter */
     assert (Handle != 0);
 
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
     /* Search for spans that cover this address */
-    E = FindSpanInfoByAddr (&((DbgInfo*) Handle)->SpanInfoByAddr, Addr);
+    E = FindSpanInfoByAddr (&Info->SpanInfoByAddr, Addr);
 
     /* Do we have spans? */
     if (E != 0) {
@@ -5303,8 +5292,8 @@ const cc65_spaninfo* cc65_span_byline (cc65_dbginfo Handle, unsigned LineId)
  * if the line id is invalid, otherwise the spans for this line (possibly zero).
  */
 {
-    DbgInfo*            Info;
-    LineInfo*           L;
+    const DbgInfo*      Info;
+    const LineInfo*     L;
     cc65_spaninfo*      D;
     unsigned            I;
 
@@ -5312,7 +5301,7 @@ const cc65_spaninfo* cc65_span_byline (cc65_dbginfo Handle, unsigned LineId)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the line id is valid */
     if (LineId >= CollCount (&Info->LineInfoById)) {
@@ -5328,7 +5317,7 @@ const cc65_spaninfo* cc65_span_byline (cc65_dbginfo Handle, unsigned LineId)
     /* Fill in the data */
     for (I = 0; I < CollCount (&L->SpanInfoList); ++I) {
         /* Copy the data */
-        CopySpanInfo (D->data + I, CollConstAt (&L->SpanInfoList, I));
+        CopySpanInfo (D->data + I, CollAt (&L->SpanInfoList, I));
     }
 
     /* Return the result */
@@ -5342,8 +5331,8 @@ const cc65_spaninfo* cc65_span_byscope (cc65_dbginfo Handle, unsigned ScopeId)
  * the scope id is invalid, otherwise the spans for this scope (possibly zero).
  */
 {
-    DbgInfo*            Info;
-    ScopeInfo*          S;
+    const DbgInfo*      Info;
+    const ScopeInfo*    S;
     cc65_spaninfo*      D;
     unsigned            I;
 
@@ -5351,7 +5340,7 @@ const cc65_spaninfo* cc65_span_byscope (cc65_dbginfo Handle, unsigned ScopeId)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the scope id is valid */
     if (ScopeId >= CollCount (&Info->ScopeInfoById)) {
@@ -5367,7 +5356,7 @@ const cc65_spaninfo* cc65_span_byscope (cc65_dbginfo Handle, unsigned ScopeId)
     /* Fill in the data */
     for (I = 0; I < CollCount (&S->SpanInfoList); ++I) {
         /* Copy the data */
-        CopySpanInfo (D->data + I, CollConstAt (&S->SpanInfoList, I));
+        CopySpanInfo (D->data + I, CollAt (&S->SpanInfoList, I));
     }
 
     /* Return the result */
@@ -5397,8 +5386,7 @@ void cc65_free_spaninfo (cc65_dbginfo Handle, const cc65_spaninfo* Info)
 const cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
 /* Return a list of all source files */
 {
-    DbgInfo*            Info;
-    Collection*         FileInfoById;
+    const DbgInfo*      Info;
     cc65_sourceinfo*    D;
     unsigned            I;
 
@@ -5406,18 +5394,15 @@ const cc65_sourceinfo* cc65_get_sourcelist (cc65_dbginfo Handle)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
-
-    /* Get a pointer to the file list */
-    FileInfoById = &Info->FileInfoById;
+    Info = Handle;
 
     /* Allocate memory for the data structure returned to the caller. */
-    D = new_cc65_sourceinfo (CollCount (FileInfoById));
+    D = new_cc65_sourceinfo (CollCount (&Info->FileInfoById));
 
     /* Fill in the data */
-    for (I = 0; I < CollCount (FileInfoById); ++I) {
+    for (I = 0; I < CollCount (&Info->FileInfoById); ++I) {
         /* Copy the data */
-        CopyFileInfo (D->data + I, CollConstAt (FileInfoById, I));
+        CopyFileInfo (D->data + I, CollAt (&Info->FileInfoById, I));
     }
 
     /* Return the result */
@@ -5433,14 +5418,14 @@ const cc65_sourceinfo* cc65_source_byid (cc65_dbginfo Handle, unsigned Id)
  * source file information.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_sourceinfo*    D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->FileInfoById)) {
@@ -5451,7 +5436,7 @@ const cc65_sourceinfo* cc65_source_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_sourceinfo (1);
 
     /* Fill in the data */
-    CopyFileInfo (D->data, CollConstAt (&Info->FileInfoById, Id));
+    CopyFileInfo (D->data, CollAt (&Info->FileInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5466,7 +5451,7 @@ const cc65_sourceinfo* cc65_source_bymodule (cc65_dbginfo Handle, unsigned Id)
  * otherwise a cc65_sourceinfo structure with one entry per source file.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     const ModInfo*      M;
     cc65_sourceinfo*    D;
     unsigned            I;
@@ -5475,7 +5460,7 @@ const cc65_sourceinfo* cc65_source_bymodule (cc65_dbginfo Handle, unsigned Id)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the module id is valid */
     if (Id >= CollCount (&Info->ModInfoById)) {
@@ -5483,14 +5468,14 @@ const cc65_sourceinfo* cc65_source_bymodule (cc65_dbginfo Handle, unsigned Id)
     }
 
     /* Get a pointer to the module info */
-    M = CollConstAt (&Info->ModInfoById, Id);
+    M = CollAt (&Info->ModInfoById, Id);
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_sourceinfo (CollCount (&M->FileInfoByName));
 
     /* Fill in the data */
     for (I = 0; I < CollCount (&M->FileInfoByName); ++I) {
-        CopyFileInfo (D->data + I, CollConstAt (&M->FileInfoByName, I));
+        CopyFileInfo (D->data + I, CollAt (&M->FileInfoByName, I));
     }
 
     /* Return the result */
@@ -5520,7 +5505,7 @@ void cc65_free_sourceinfo (cc65_dbginfo Handle, const cc65_sourceinfo* Info)
 const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
 /* Return a list of all segments referenced in the debug information */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_segmentinfo*   D;
     unsigned            I;
 
@@ -5528,7 +5513,7 @@ const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_segmentinfo (CollCount (&Info->SegInfoById));
@@ -5536,7 +5521,7 @@ const cc65_segmentinfo* cc65_get_segmentlist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (&Info->SegInfoById); ++I) {
         /* Copy the data */
-        CopySegInfo (D->data + I, CollConstAt (&Info->SegInfoById, I));
+        CopySegInfo (D->data + I, CollAt (&Info->SegInfoById, I));
     }
 
     /* Return the result */
@@ -5551,14 +5536,14 @@ const cc65_segmentinfo* cc65_segment_byid (cc65_dbginfo Handle, unsigned Id)
  * structure with one entry that contains the requested segment information.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_segmentinfo*   D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->SegInfoById)) {
@@ -5569,7 +5554,7 @@ const cc65_segmentinfo* cc65_segment_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_segmentinfo (1);
 
     /* Fill in the data */
-    CopySegInfo (D->data, CollConstAt (&Info->SegInfoById, Id));
+    CopySegInfo (D->data, CollAt (&Info->SegInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5585,15 +5570,15 @@ const cc65_segmentinfo* cc65_segment_byname (cc65_dbginfo Handle,
  * information.
  */
 {
-    DbgInfo*            Info;
-    SegInfo*            S;
+    const DbgInfo*      Info;
+    const SegInfo*      S;
     cc65_segmentinfo*   D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Search for the segment */
     S = FindSegInfoByName (&Info->SegInfoByName, Name);
@@ -5636,14 +5621,14 @@ const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
  * with this id was found.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_symbolinfo*    D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->SymInfoById)) {
@@ -5654,7 +5639,7 @@ const cc65_symbolinfo* cc65_symbol_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_symbolinfo (1);
 
     /* Fill in the data */
-    CopySymInfo (D->data, CollConstAt (&Info->SymInfoById, Id));
+    CopySymInfo (D->data, CollAt (&Info->SymInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5667,8 +5652,7 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name
  * no symbol with this name was found.
  */
 {
-    DbgInfo*            Info;
-    Collection*         SymInfoByName;
+    const DbgInfo*      Info;
     cc65_symbolinfo*    D;
     unsigned            I;
     unsigned            Index;
@@ -5678,13 +5662,10 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
-
-    /* Get a pointer to the symbol list */
-    SymInfoByName = &Info->SymInfoByName;
+    Info = Handle;
 
     /* Search for the symbol */
-    if (!FindSymInfoByName (SymInfoByName, Name, &Index)) {
+    if (!FindSymInfoByName (&Info->SymInfoByName, Name, &Index)) {
         /* Not found */
         return 0;
     }
@@ -5693,8 +5674,8 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name
      * we have. Skip the first one, since we have at least one.
      */
     Count = 1;
-    while ((unsigned) Index + Count < CollCount (SymInfoByName)) {
-        const SymInfo* S = CollConstAt (SymInfoByName, (unsigned) Index + Count);
+    while ((unsigned) Index + Count < CollCount (&Info->SymInfoByName)) {
+        const SymInfo* S = CollAt (&Info->SymInfoByName, (unsigned) Index + Count);
         if (strcmp (S->Name, Name) != 0) {
             break;
         }
@@ -5707,7 +5688,7 @@ const cc65_symbolinfo* cc65_symbol_byname (cc65_dbginfo Handle, const char* Name
     /* Fill in the data */
     for (I = 0; I < Count; ++I) {
         /* Copy the data */
-        CopySymInfo (D->data + I, CollConstAt (SymInfoByName, Index++));
+        CopySymInfo (D->data + I, CollAt (&Info->SymInfoByName, Index++));
     }
 
     /* Return the result */
@@ -5723,9 +5704,9 @@ const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo Handle, unsigned ScopeI
  * symbol list.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_symbolinfo*    D;
-    ScopeInfo*          S;
+    const ScopeInfo*    S;
     unsigned            I;
 
 
@@ -5733,7 +5714,7 @@ const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo Handle, unsigned ScopeI
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (ScopeId >= CollCount (&Info->ScopeInfoById)) {
@@ -5749,7 +5730,7 @@ const cc65_symbolinfo* cc65_symbol_byscope (cc65_dbginfo Handle, unsigned ScopeI
     /* Fill in the data */
     for (I = 0; I < CollCount (&S->SymInfoByName); ++I) {
         /* Copy the data */
-        CopySymInfo (D->data + I, CollConstAt (&S->SymInfoByName, I));
+        CopySymInfo (D->data + I, CollAt (&S->SymInfoByName, I));
     }
 
     /* Return the result */
@@ -5765,8 +5746,7 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start
  * symbols are ignored and not returned.
  */
 {
-    DbgInfo*            Info;
-    Collection*         SymInfoByVal;
+    const DbgInfo*      Info;
     Collection          SymInfoList = COLLECTION_INITIALIZER;
     cc65_symbolinfo*    D;
     unsigned            I;
@@ -5776,23 +5756,20 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
-
-    /* Get a pointer to the symbol list */
-    SymInfoByVal = &Info->SymInfoByVal;
+    Info = Handle;
 
     /* Search for the symbol. Because we're searching for a range, we cannot
      * make use of the function result.
      */
-    FindSymInfoByValue (SymInfoByVal, Start, &Index);
+    FindSymInfoByValue (&Info->SymInfoByVal, Start, &Index);
 
     /* Start from the given index, check all symbols until the end address is
      * reached. Place all symbols into SymInfoList for later.
      */
-    for (I = Index; I < CollCount (SymInfoByVal); ++I) {
+    for (I = Index; I < CollCount (&Info->SymInfoByVal); ++I) {
 
         /* Get the item */
-        SymInfo* Item = CollAt (SymInfoByVal, I);
+        SymInfo* Item = CollAt (&Info->SymInfoByVal, I);
 
         /* The collection is sorted by address, so if we get a value larger
          * than the end address, we're done.
@@ -5823,7 +5800,7 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo Handle, cc65_addr Start
     /* Fill in the data */
     for (I = 0; I < CollCount (&SymInfoList); ++I) {
         /* Copy the data */
-        CopySymInfo (D->data + I, CollConstAt (&SymInfoList, I));
+        CopySymInfo (D->data + I, CollAt (&SymInfoList, I));
     }
 
     /* Free the collection */
@@ -5856,7 +5833,7 @@ void cc65_free_symbolinfo (cc65_dbginfo Handle, const cc65_symbolinfo* Info)
 const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo Handle)
 /* Return a list of all scopes in the debug information */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_scopeinfo*     D;
     unsigned            I;
 
@@ -5864,7 +5841,7 @@ const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo Handle)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_scopeinfo (CollCount (&Info->ScopeInfoById));
@@ -5872,7 +5849,7 @@ const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo Handle)
     /* Fill in the data */
     for (I = 0; I < CollCount (&Info->ScopeInfoById); ++I) {
         /* Copy the data */
-        CopyScopeInfo (D->data + I, CollConstAt (&Info->ScopeInfoById, I));
+        CopyScopeInfo (D->data + I, CollAt (&Info->ScopeInfoById, I));
     }
 
     /* Return the result */
@@ -5886,14 +5863,14 @@ const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
  * with this id was found.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_scopeinfo*     D;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->ScopeInfoById)) {
@@ -5904,7 +5881,7 @@ const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
     D = new_cc65_scopeinfo (1);
 
     /* Fill in the data */
-    CopyScopeInfo (D->data, CollConstAt (&Info->ScopeInfoById, Id));
+    CopyScopeInfo (D->data, CollAt (&Info->ScopeInfoById, Id));
 
     /* Return the result */
     return D;
@@ -5917,7 +5894,7 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
  * scope with the given id was found.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     const ModInfo*      M;
     cc65_scopeinfo*     D;
     unsigned            I;
@@ -5926,7 +5903,7 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the module id is valid */
     if (ModId >= CollCount (&Info->ModInfoById)) {
@@ -5934,14 +5911,14 @@ const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
     }
 
     /* Get a pointer to the module info */
-    M = CollConstAt (&Info->ModInfoById, ModId);
+    M = CollAt (&Info->ModInfoById, ModId);
 
     /* Allocate memory for the data structure returned to the caller */
     D = new_cc65_scopeinfo (CollCount (&M->ScopeInfoByName));
 
     /* Fill in the data */
     for (I = 0; I < CollCount (&M->ScopeInfoByName); ++I) {
-        CopyScopeInfo (D->data + I, CollConstAt (&M->ScopeInfoByName, I));
+        CopyScopeInfo (D->data + I, CollAt (&M->ScopeInfoByName, I));
     }
 
     /* Return the result */
@@ -5955,9 +5932,9 @@ const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
  * the given name was found, otherwise a non empty scope list.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     unsigned            Index;
-    ScopeInfo*          S;
+    const ScopeInfo*    S;
     cc65_scopeinfo*     D;
     unsigned            Count;
     unsigned            I;
@@ -5967,7 +5944,7 @@ const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Search for the first item with the given name */
     if (!FindScopeInfoByName (&Info->ScopeInfoByName, Name, &Index)) {
@@ -5995,7 +5972,7 @@ const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
 
     /* Fill in the data */
     for (I = 0; I < Count; ++I, ++Index) {
-        CopyScopeInfo (D->data + I, CollConstAt (&Info->ScopeInfoByName, Index));
+        CopyScopeInfo (D->data + I, CollAt (&Info->ScopeInfoByName, Index));
     }
 
     /* Return the result */
@@ -6010,16 +5987,16 @@ const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
  * direct childs.
  */
 {
-    DbgInfo*            Info;
+    const DbgInfo*      Info;
     cc65_scopeinfo*     D;
-    ScopeInfo*          S;
+    const ScopeInfo*    S;
     unsigned            I;
 
     /* Check the parameter */
     assert (Handle != 0);
 
     /* The handle is actually a pointer to a debug info struct */
-    Info = (DbgInfo*) Handle;
+    Info = Handle;
 
     /* Check if the id is valid */
     if (Id >= CollCount (&Info->ScopeInfoById)) {
@@ -6034,7 +6011,7 @@ const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
 
     /* Fill in the data */
     for (I = 0; I < D->count; ++I) {
-        CopyScopeInfo (D->data + I, CollConstAt (S->ChildScopeList, I));
+        CopyScopeInfo (D->data + I, CollAt (S->ChildScopeList, I));
     }
 
     /* Return the result */

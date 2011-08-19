@@ -122,7 +122,7 @@ void CollAppend (Collection* C, void* Item);
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE void* CollAt (Collection* C, unsigned Index)
+INLINE void* CollAt (const Collection* C, unsigned Index)
 /* Return the item at the given index */
 {
     /* Check the index */
@@ -132,19 +132,19 @@ INLINE void* CollAt (Collection* C, unsigned Index)
     return C->Items[Index];
 }
 #else
-void* CollAt (Collection* C, unsigned Index);
+void* CollAt (const Collection* C, unsigned Index);
 /* Return the item at the given index */
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE void* CollAtUnchecked (Collection* C, unsigned Index)
+INLINE void* CollAtUnchecked (const Collection* C, unsigned Index)
 /* Return the item at the given index */
 {
     /* Return the element */
     return C->Items[Index];
 }
 #else
-#  define CollAtUnchecked(C, Index)	((C)->Items[(Index)])
+#  define CollAtUnchecked(C, Index) 	((C)->Items[(Index)])
 #endif
 
 #if defined(HAVE_INLINE)
@@ -272,6 +272,12 @@ void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned T
  * the index of the target item. The item with the index Start will later
  * have the index Target. All items with indices Target and above are moved
  * to higher indices.
+ */
+
+void CollTransfer (Collection* Dest, const Collection* Source);
+/* Transfer all items from Source to Dest. Anything already in Dest is left
+ * untouched. The items in Source are not changed and are therefore in both
+ * Collections on return.
  */
 
 void CollSort (Collection* C,

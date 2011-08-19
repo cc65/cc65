@@ -167,7 +167,7 @@ void CollAppend (Collection* C, void* Item)
 
 
 #if !defined(HAVE_INLINE)
-void* CollAt (Collection* C, unsigned Index)
+void* CollAt (const Collection* C, unsigned Index)
 /* Return the item at the given index */
 {
     /* Check the index */
@@ -434,6 +434,26 @@ static void QuickSort (Collection* C, int Lo, int Hi,
 	    Lo = J + 1;
 	}
     }
+}
+
+
+
+void CollTransfer (Collection* Dest, const Collection* Source)
+/* Transfer all items from Source to Dest. Anything already in Dest is left
+ * untouched. The items in Source are not changed and are therefore in both
+ * Collections on return.
+ */                                                           
+{
+    /* Be sure there's enough room in Dest */
+    CollGrow (Dest, Dest->Count + Source->Count);
+
+    /* Copy the items */
+    memcpy (Dest->Items + Dest->Count, 
+            Source->Items, 
+            Source->Count * sizeof (Source->Items[0]));
+
+    /* Bump the counter */
+    Dest->Count += Source->Count;
 }
 
 

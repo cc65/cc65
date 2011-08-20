@@ -28,6 +28,7 @@ OBJS =	abend.o		\
 	filetype.o      \
 	fname.o		\
 	fp.o            \
+        gentype.o       \
 	hashfunc.o	\
 	hashtab.o       \
 	intstack.o      \

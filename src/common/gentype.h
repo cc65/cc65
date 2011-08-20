@@ -39,8 +39,23 @@
 
 
 /*****************************************************************************/
-/*     	      	       		     Data				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
+
+
+
+struct StrBuf;
+
+
+
+/*****************************************************************************/
+/*     	      	       		     Data		   		     */
+/*****************************************************************************/
+
+
+
+/* The data type used to encode a generic type */
+typedef unsigned char* gt_string;
 
 
 
@@ -88,7 +103,7 @@
 #define GT_IS_FUNCTION(x)       (GT_GET_TYPE(x) == GT_FUNCTION)
 #define GT_IS_STRUCT(x)         (GT_GET_TYPE(x) == GT_STRUCT)
 #define GT_IS_UNION(x)          (GT_GET_TYPE(x) == GT_UNION)
-                                                            
+
 /* Combined values for the 6502 family */
 #define GT_BYTE         (GT_INTEGER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_1)
 #define GT_WORD         (GT_INTEGER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
@@ -96,6 +111,17 @@
 #define GT_DBYTE        (GT_POINTER | GT_BIG_ENDIAN    | GT_UNSIGNED | GT_SIZE_2)
 #define GT_PTR          (GT_POINTER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
 #define GT_FAR_PTR      (GT_POINTER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_3)
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+gt_string GT_FromStrBuf (const struct StrBuf* S);
+/* Create a dynamically allocated type string from a string buffer */
 
 
 

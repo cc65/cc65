@@ -70,6 +70,7 @@ OBJS =	abend.obj	\
         filetype.obj    \
 	fname.obj	\
         fp.obj          \
+        gentype.obj     \
 	hashfunc.obj	\
         hashtab.obj     \
         intstack.obj    \

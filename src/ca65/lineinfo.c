@@ -128,7 +128,7 @@ static unsigned HT_GenHash (const void* Key)
     const LineInfoKey* K = Key;
 
     /* Hash over a combination of type, file and line */
-    return HashInt ((K->Type << 18) ^ (K->Pos.Name << 14) ^ K->Pos.Line);
+    return HashInt ((K->Type << 21) ^ (K->Pos.Name << 14) ^ K->Pos.Line);
 }
 
 

@@ -863,6 +863,9 @@ int main (int argc, char* argv [])
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ca65");
 
+    /* Initialize the string pool */
+    InitStrPool ();
+
     /* Initialize the include search paths */
     InitIncludePaths ();
 

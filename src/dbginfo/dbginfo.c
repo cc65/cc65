@@ -126,12 +126,14 @@ typedef enum {
     TOK_FIRST_KEYWORD,
     TOK_ABSOLUTE = TOK_FIRST_KEYWORD,   /* ABSOLUTE keyword */
     TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
+    TOK_AUTO,                           /* AUTO keyword */
     TOK_COUNT,                          /* COUNT keyword */
     TOK_DEF,                            /* DEF keyword */
     TOK_ENUM,                           /* ENUM keyword */
     TOK_EQUATE,                         /* EQUATE keyword */
     TOK_EXPORT,                         /* EXPORT keyword */
     TOK_FILE,                           /* FILE keyword */
+    TOK_FUNC,                           /* FUNC keyword */
     TOK_GLOBAL,                         /* GLOBAL keyword */
     TOK_ID,                             /* ID keyword */
     TOK_IMPORT,                         /* IMPORT keyword */
@@ -156,10 +158,12 @@ typedef enum {
     TOK_SIZE,                           /* SIZE keyword */
     TOK_SPAN,				/* SPAN keyword */
     TOK_START,                          /* START keyword */
+    TOK_STATIC,                         /* STATIC keyword */
     TOK_STRUCT,                         /* STRUCT keyword */
     TOK_SYM,                            /* SYM keyword */
     TOK_TYPE,                           /* TYPE keyword */
     TOK_VALUE,                          /* VALUE keyword */
+    TOK_VAR,                            /* VAR keyword */
     TOK_VERSION,                        /* VERSION keyword */
     TOK_ZEROPAGE,                       /* ZEROPAGE keyword */
     TOK_LAST_KEYWORD = TOK_ZEROPAGE,
@@ -2066,12 +2070,14 @@ static void NextToken (InputData* D)
     } KeywordTable[] = {
         { "abs",        TOK_ABSOLUTE    },
         { "addrsize",   TOK_ADDRSIZE    },
+        { "auto",       TOK_AUTO        },
         { "count",      TOK_COUNT       },
         { "def",        TOK_DEF         },
         { "enum",       TOK_ENUM        },
         { "equ",        TOK_EQUATE      },
         { "exp",        TOK_EXPORT      },
         { "file",       TOK_FILE        },
+        { "func",       TOK_FUNC        },
         { "global",     TOK_GLOBAL      },
         { "id",         TOK_ID          },
         { "imp",        TOK_IMPORT      },
@@ -2096,10 +2102,12 @@ static void NextToken (InputData* D)
         { "size",       TOK_SIZE        },
        	{ "span",	TOK_SPAN	},
         { "start",      TOK_START       },
+        { "static",     TOK_STATIC      },
         { "struct",     TOK_STRUCT      },
         { "sym",        TOK_SYM         },
         { "type",       TOK_TYPE        },
         { "val",        TOK_VALUE       },
+        { "var",        TOK_VAR         },
         { "version",    TOK_VERSION     },
         { "zp",         TOK_ZEROPAGE    },
     };
@@ -3343,6 +3351,7 @@ static void ParseSpan (InputData* D)
     cc65_addr       Start = 0;
     cc65_addr       Size = 0;
     unsigned	    SegId = CC65_INV_ID;
+    StrBuf          Type = STRBUF_INITIALIZER;
     SpanInfo*       S;
     enum {
         ibNone      = 0x000,
@@ -3351,6 +3360,7 @@ static void ParseSpan (InputData* D)
 	ibSegId	    = 0x02,
         ibSize      = 0x04,
         ibStart     = 0x08,
+        ibType      = 0x10,
 
         ibRequired  = ibId | ibSegId | ibSize | ibStart,
     } InfoBits = ibNone;
@@ -3365,7 +3375,8 @@ static void ParseSpan (InputData* D)
 
         /* Something we know? */
         if (D->Tok != TOK_ID    && D->Tok != TOK_SEGMENT	&&
-            D->Tok != TOK_SIZE 	&& D->Tok != TOK_START) {
+            D->Tok != TOK_SIZE 	&& D->Tok != TOK_START          &&
+            D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -3422,6 +3433,16 @@ static void ParseSpan (InputData* D)
                 InfoBits |= ibStart;
                 break;
 
+            case TOK_TYPE:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&Type, &D->SVal);
+                SB_Terminate (&Type);
+                InfoBits |= ibType;
+                NextToken (D);
+                break;
+
             default:
                 /* NOTREACHED */
                 UnexpectedToken (D);
@@ -3459,6 +3480,7 @@ static void ParseSpan (InputData* D)
 
 ErrorExit:
     /* Entry point in case of errors */
+    SB_Done (&Type);
     return;
 }
 

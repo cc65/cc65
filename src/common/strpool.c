@@ -276,3 +276,11 @@ unsigned SP_AddStr (StringPool* P, const char* S)
 
 
 
+unsigned SP_GetCount (const StringPool* P)
+/* Return the number of strings in the pool */
+{
+    return CollCount (&P->Entries);
+}
+
+
+

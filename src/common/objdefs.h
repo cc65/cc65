@@ -46,10 +46,10 @@
 
 /* Defines for magic and version */
 #define OBJ_MAGIC	0x616E7A55
-#define OBJ_VERSION	0x000E
+#define OBJ_VERSION	0x000F
 
 /* Size of an object file header */
-#define	OBJ_HDR_SIZE	(22*4)
+#define	OBJ_HDR_SIZE	(24*4)
 
 /* Flag bits */
 #define OBJ_FLAGS_DBGINFO	0x0001	/* File has debug info */
@@ -83,6 +83,8 @@ struct ObjHeader {
     unsigned long       AssertSize;     /* 32: Size of assertion table */
     unsigned long       ScopeOffs;      /* 32: Offset into scope table */
     unsigned long       ScopeSize;      /* 32: Size of scope table */
+    unsigned long       SpanOffs;       /* 32: Offset into span table */
+    unsigned long       SpanSize;       /* 32: Size of span table */
 };
 
 

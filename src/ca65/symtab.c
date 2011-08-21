@@ -235,7 +235,7 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
      * space in any segment).
      */
     if (CurrentScope->Type <= SCOPE_HAS_DATA) {
-        OpenSpans (&CurrentScope->Spans);
+        OpenSpanList (&CurrentScope->Spans);
     }
 }
 
@@ -248,7 +248,7 @@ void SymLeaveLevel (void)
      * open the spans.
      */
     if (CurrentScope->Type <= SCOPE_HAS_DATA) {
-        CloseSpans (&CurrentScope->Spans);
+        CloseSpanList (&CurrentScope->Spans);
     }
 
     /* If we have spans, the first one is the segment that was active, when the
@@ -983,7 +983,7 @@ void WriteScopes (void)
             }
 
             /* Spans for this scope */
-            WriteSpans (&S->Spans);
+            WriteSpanList (&S->Spans);
 
             /* Next scope */
             S = S->Next;

@@ -116,6 +116,8 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->AssertSize   = Read32 (Obj);
     H->ScopeOffs    = Read32 (Obj);
     H->ScopeSize    = Read32 (Obj);
+    H->SpanOffs     = Read32 (Obj);
+    H->SpanSize     = Read32 (Obj);
 }
 
 

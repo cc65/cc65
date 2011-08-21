@@ -272,7 +272,7 @@ void EndLine (LineInfo* LI)
 /* End a line that is tracked by the given LineInfo structure */
 {
     /* Close the spans for the line */
-    CloseSpans (&LI->OpenSpans);
+    CloseSpanList (&LI->OpenSpans);
 
     /* Move the spans to the list of all spans for this line, then clear the
      * list of open spans.
@@ -308,7 +308,7 @@ LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count)
     }
 
     /* Open the spans for this line info */
-    OpenSpans (&LI->OpenSpans);
+    OpenSpanList (&LI->OpenSpans);
 
     /* Add the line info to the list of current line infos */
     CollAppend (&CurLineInfo, LI);
@@ -447,8 +447,6 @@ void WriteLineInfos (void)
 {
     unsigned I;
 
-    Collection EmptySpans = STATIC_COLLECTION_INITIALIZER;
-
     /* Tell the object file module that we're about to write line infos */
     ObjStartLineInfos ();
 
@@ -467,22 +465,12 @@ void WriteLineInfos (void)
         /* Write the type and count of the line info */
         ObjWriteVar (LI->Key.Type);
 
-        /* Spans are only added to the debug file if debug information is
-         * requested. Otherwise we write an empty list.
-         */
-        if (DbgSyms) {
-            WriteSpans (&LI->Spans);
-        } else {
-            /* Write out an empty list */
-            WriteSpans (&EmptySpans);
-        }
+        /* Write the ids of the spans for this line */
+        WriteSpanList (&LI->Spans);
     }
 
     /* End of line infos */
     ObjEndLineInfos ();
-
-    /* For the sake of completeness, but not really necessary */
-    DoneCollection (&EmptySpans);
 }
 
 

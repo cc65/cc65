@@ -90,7 +90,7 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
     }
 
     /* Read the spans for this scope */
-    ReadSpans (&S->Spans, F, Obj);
+    ReadSpanList (&S->Spans, F, Obj);
 
     /* Return the new Scope */
     return S;

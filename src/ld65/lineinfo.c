@@ -114,7 +114,7 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
     LI->File     = CollAt (&O->Files, ReadVar (F));
     LI->Pos.Name = LI->File->Name;
     LI->Type     = ReadVar (F);
-    ReadSpans (&LI->Spans, F, O);
+    ReadSpanList (&LI->Spans, F, O);
 
     /* Return the struct read */
     return LI;

@@ -72,6 +72,7 @@
 #include "scanner.h"
 #include "segment.h"
 #include "sizeof.h"
+#include "span.h"
 #include "spool.h"
 #include "symbol.h"
 #include "symtab.h"
@@ -561,7 +562,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptVerbose (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+	     		const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -822,6 +823,9 @@ static void CreateObjFile (void)
     /* Write the assertions */
     WriteAssertions ();
 
+    /* Write the spans */
+    WriteSpans ();
+
     /* Write an updated header and close the file */
     ObjClose ();
 }
@@ -950,7 +954,7 @@ int main (int argc, char* argv [])
        		    break;
 
        	        case 'V':
-    	    	    OptVersion (Arg, 0);
+    	     	    OptVersion (Arg, 0);
        		    break;
 
        	        case 'W':

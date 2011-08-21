@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "attrib.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -66,20 +67,17 @@ struct Span {
 
 
 
-Span* NewSpan (ObjData* Obj, unsigned SecId, unsigned long Offs, unsigned long Size)
+static Span* NewSpan (unsigned Id, unsigned Sec, unsigned long Offs, unsigned long Size)
 /* Create and return a new span */
 {
     /* Allocate memory */
     Span* S = xmalloc (sizeof (*S));
 
     /* Initialize the fields */
-    S->Id       = CollCount (&Obj->Spans);
-    S->Sec      = SecId;
+    S->Id       = Id;
+    S->Sec      = Sec;
     S->Offs     = Offs;
     S->Size     = Size;
-
-    /* Insert it into the collection of all spans of this object file */
-    CollAppend (&Obj->Spans, S);
 
     /* Return the result */
     return S;
@@ -87,20 +85,20 @@ Span* NewSpan (ObjData* Obj, unsigned SecId, unsigned long Offs, unsigned long S
 
 
 
-Span* ReadSpan (FILE* F, ObjData* O)
+Span* ReadSpan (FILE* F, ObjData* O attribute ((unused)), unsigned Id)
 /* Read a Span from a file and return it */
 {
     /* Create a new Span and return it */
     unsigned SecId     = ReadVar (F);
     unsigned long Offs = ReadVar (F);
     unsigned Size      = ReadVar (F);
-    return NewSpan (O, SecId, Offs, Size);
+    return NewSpan (Id, SecId, Offs, Size);
 }
 
 
 
-void ReadSpans (Collection* Spans, FILE* F, ObjData* O)
-/* Read a list of Spans from a file and return it */
+void ReadSpanList (Collection* Spans, FILE* F, ObjData* O)
+/* Read a list of span ids from a file and return the spans for the ids */
 {
     /* First is number of Spans */
     unsigned Count = ReadVar (F);
@@ -110,7 +108,7 @@ void ReadSpans (Collection* Spans, FILE* F, ObjData* O)
 
     /* Read the spans and add them */
     while (Count--) {
-        CollAppend (Spans, ReadSpan (F, O));
+        CollAppend (Spans, CollAt (&O->Spans, ReadVar (F)));
     }
 }
 

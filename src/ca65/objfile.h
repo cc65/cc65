@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -148,6 +148,12 @@ void ObjStartScopes (void);
 
 void ObjEndScopes (void);
 /* Mark the end of the scope table */
+
+void ObjStartSpans (void);
+/* Mark the start of the span table */
+
+void ObjEndSpans (void);
+/* Mark the end of the span table */
 
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -86,6 +86,8 @@ static ObjHeader Header = {
     0,                  /* 32: Size of assertion table */
     0,                  /* 32: Offset into scope table */
     0,                  /* 32: Size of scope table */
+    0,                  /* 32: Offset into span table */
+    0,                  /* 32: Size of span table */
 };
 
 
@@ -142,6 +144,8 @@ static void ObjWriteHeader (void)
     ObjWrite32 (Header.AssertSize);
     ObjWrite32 (Header.ScopeOffs);
     ObjWrite32 (Header.ScopeSize);
+    ObjWrite32 (Header.SpanOffs);
+    ObjWrite32 (Header.SpanSize);
 }
 
 
@@ -304,7 +308,7 @@ void ObjWriteBuf (const StrBuf* S)
      * advance).
      */
     ObjWriteVar (SB_GetLen (S));
-    ObjWriteData (SB_GetConstBuf (S), SB_GetLen (S));    
+    ObjWriteData (SB_GetConstBuf (S), SB_GetLen (S));
 }
 
 
@@ -491,6 +495,22 @@ void ObjEndScopes (void)
 /* Mark the end of the scope table */
 {
     Header.ScopeSize = ftell (F) - Header.ScopeOffs;
+}
+
+
+
+void ObjStartSpans (void)
+/* Mark the start of the span table */
+{
+    Header.SpanOffs = ftell (F);
+}
+
+
+
+void ObjEndSpans (void)
+/* Mark the end of the span table */
+{
+    Header.SpanSize = ftell (F) - Header.SpanOffs;
 }
 
 

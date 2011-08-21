@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -80,6 +80,9 @@ void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O);
 
 void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O);
 /* Read the scope table from a file at the given offset */
+
+void ObjReadSpans (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the span table from a file at the given offset */
 
 void ObjAdd (FILE* F, const char* Name);
 /* Add an object file to the module list */

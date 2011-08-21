@@ -40,12 +40,14 @@
 
 /* common */
 #include "coll.h"
+#include "gentype.h"
+#include "hashtab.h"
 #include "inline.h"
 
 
 
 /*****************************************************************************/
-/*	   			     Data   				     */
+/*	   	    		     Data   				     */
 /*****************************************************************************/
 
 
@@ -56,9 +58,12 @@ struct Segment;
 /* Span definition */
 typedef struct Span Span;
 struct Span{
+    HashNode        Node;               /* Node for hash table */
+    unsigned        Id;                 /* Id of span */
     struct Segment* Seg;       	       	/* Pointer to segment */
-    unsigned long   Start;              /* Start of range */
-    unsigned long   End;                /* End of range */
+    unsigned        Start;              /* Start of range */
+    unsigned        End;                /* End of range */
+    unsigned        Type;               /* Type of data in span */
 };
 
 
@@ -79,17 +84,29 @@ INLINE unsigned long GetSpanSize (const Span* R)
 #  define GetSpanSize(R)   ((R)->End - (R)->Start)
 #endif
 
-void OpenSpans (Collection* Spans);
+Span* OpenSpan (void);
+/* Open a span for the active segment and return it. */
+
+Span* CloseSpan (Span* S);
+/* Close the given span. Be sure to replace the passed span by the one
+ * returned, since the span will get deleted if it is empty or may be
+ * replaced if a duplicate exists.
+ */
+
+void OpenSpanList (Collection* Spans);
 /* Open a list of spans for all existing segments to the given collection of
  * spans. The currently active segment will be inserted first with all others
  * following.
  */
 
-void CloseSpans (Collection* Spans);
+void CloseSpanList (Collection* Spans);
 /* Close all open spans by setting PC to the current PC for the segment. */
 
-void WriteSpans (const Collection* Spans);
+void WriteSpanList (const Collection* Spans);
 /* Write a list of spans to the output file */
+
+void WriteSpans (void);
+/* Write all spans to the object file */
 
 
 

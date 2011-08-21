@@ -107,6 +107,8 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->AssertSize   = Read32 (Obj);
     H->ScopeOffs    = Read32 (Obj);
     H->ScopeSize    = Read32 (Obj);
+    H->SpanOffs     = Read32 (Obj);
+    H->SpanSize     = Read32 (Obj);
 }
 
 
@@ -281,6 +283,25 @@ void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
 
 
 
+void ObjReadSpans (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the span table from a file at the given offset */
+{
+    unsigned I;
+    unsigned SpanCount;
+
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
+    SpanCount = ReadVar (F);
+    CollGrow (&O->Spans, SpanCount);
+    for (I = 0; I < SpanCount; ++I) {
+        CollAppend (&O->Spans,  ReadSpan (F, O, I));
+    }
+}
+
+
+
 void ObjAdd (FILE* Obj, const char* Name)
 /* Add an object file to the module list */
 {
@@ -301,6 +322,9 @@ void ObjAdd (FILE* Obj, const char* Name)
 
     /* Read the files list from the object file */
     ObjReadFiles (Obj, O->Header.FileOffs, O);
+
+    /* Read the spans from the object file */
+    ObjReadSpans (Obj, O->Header.SpanOffs, O);
 
     /* Read the line infos from the object file */
     ObjReadLineInfos (Obj, O->Header.LineInfoOffs, O);

@@ -136,6 +136,20 @@ static void SkipLineInfoList (FILE* F)
 
 
 
+static void SkipSpanList (FILE* F)
+/* Skip a span list from the given file */
+{
+    /* Count preceeds the list */
+    unsigned long Count = ReadVar (F);
+
+    /* Skip indices */
+    while (Count--) {
+        (void) ReadVar (F);
+    }
+}
+
+
+
 static void SkipExpr (FILE* F)
 /* Skip an expression from the given file */
 {
@@ -772,12 +786,16 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
     for (I = 0; I < Count; ++I) {
 
 	FilePos   Pos;
-
-        /* Type of line info */
-        unsigned Type = ReadVar (F);
+        unsigned  Type;
 
        	/* File position of line info */
 	ReadFilePos (F, &Pos);
+
+        /* Type of line info */
+        Type = ReadVar (F);
+
+        /* Skip the spans */
+        SkipSpanList (F);
 
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
@@ -834,8 +852,6 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
 
         const char*     Name;
         unsigned        Len;
-        unsigned        SpanCount;
-        unsigned        J;
 
         /* Read the data */
         unsigned        ParentId = ReadVar (F);
@@ -869,17 +885,8 @@ void DumpObjScopes (FILE* F, unsigned long Offset)
             printf ("      Label id:%22u\n", LabelId);
         }
 
-        /* Spans */
-        SpanCount = ReadVar (F);
-        printf ("      Segment spans:\n");
-        printf ("        Count:%23u\n", SpanCount);
-
-        for (J = 0; J < SpanCount; ++J) {
-            printf ("        Index:%23u\n", J);
-            printf ("          Segment:%19lu\n", ReadVar (F));
-            printf ("          Start:%13s0x%06lX\n", "", ReadVar (F));
-            printf ("          Size:%14s0x%06lX\n", "", ReadVar (F));
-        }
+        /* Skip the spans */
+        SkipSpanList (F);
     }
 
     /* Destroy the string pool */

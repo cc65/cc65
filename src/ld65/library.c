@@ -200,6 +200,8 @@ static void LibReadObjHeader (Library* L, ObjData* O)
     O->Header.AssertSize   = Read32 (L->F);
     O->Header.ScopeOffs    = Read32 (L->F);
     O->Header.ScopeSize    = Read32 (L->F);
+    O->Header.SpanOffs     = Read32 (L->F);
+    O->Header.SpanSize     = Read32 (L->F);
 }
 
 
@@ -220,7 +222,7 @@ static ObjData* ReadIndexEntry (Library* L)
     O->Flags	= Read16 (L->F);
     O->MTime    = Read32 (L->F);
     O->Start	= Read32 (L->F);
-    Read32 (L->F);			/* Skip Size */
+    Read32 (L->F);    			/* Skip Size */
 
     /* Done */
     return O;
@@ -242,6 +244,9 @@ static void ReadBasicData (Library* L, ObjData* O)
 
     /* Read the files list */
     ObjReadFiles (L->F, O->Start + O->Header.FileOffs, O);
+
+    /* Read the spans */
+    ObjReadSpans (L->F, O->Start + O->Header.SpanOffs, O);
 
     /* Read the line infos */
     ObjReadLineInfos (L->F, O->Start + O->Header.LineInfoOffs, O);

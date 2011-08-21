@@ -139,6 +139,16 @@ INLINE HashTable* NewHashTable (unsigned Slots, const HashFunctions* Func)
 void FreeHashTable (HashTable* T);
 /* Free a hash table. Note: This will not free the entries in the table! */
 
+#if defined(HAVE_INLINE)
+INLINE unsigned HT_GetCount (const HashTable* T)
+/* Return the number of items in the table. */
+{
+    return T->Count;
+}
+#else
+#define HT_GetCount(T)  ((T)->Count)
+#endif
+
 HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash);
 /* Find the node with the given key. Differs from HT_Find in that the hash
  * for the key is precalculated and passed to the function.

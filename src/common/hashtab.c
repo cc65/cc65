@@ -194,6 +194,7 @@ void HT_Remove (HashTable* T, void* Entry)
         if (*Q == N) {
             /* Found - remove it */
             *Q = N->Next;
+            --T->Count;
             break;
         }
         /* Next node */
@@ -235,6 +236,7 @@ void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data)
             if (F (*Cur, Data)) {
                 /* Delete the node from the chain */
                 *Cur = Next;
+                --T->Count;
             } else {
                 /* Next node in chain */
                 Cur = &(*Cur)->Next;

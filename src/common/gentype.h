@@ -33,18 +33,32 @@
 
 
 
+/* This module implements a specification for a "generic data type". It is
+ * called generic, because it doesn't mimic a high level language. Instead it
+ * tries to desrcibe the type as representation on the machine.
+ * The reasoning behing this type is to allow a debugger to represent the
+ * data to the user, independent of the actual source.
+ * C data types may be mapped to generic ones, but attributes like const or
+ * volatile are (of course) lost.
+ *
+ * The data type is stored in a char array and can be terminate by a zero
+ * (see definition of GT_END below). The later is not really necessary but
+ * allows handling of types using the usual string functions. This is in fact
+ * one of the advantages of the choosen implementation:
+ * String buffers may be used to dynamically build types. Types may be stored
+ * as strings in the string pool of an object file. And a string pool may be
+ * used to remove duplicates and reference types using unique ids.
+ */
+
+
+
 #ifndef GENTYPE_H
 #define GENTYPE_H
 
 
 
-/*****************************************************************************/
-/*                                 Forwards                                  */
-/*****************************************************************************/
-
-
-
-struct StrBuf;
+/* common */
+#include "strbuf.h"
 
 
 
@@ -53,14 +67,6 @@ struct StrBuf;
 /*****************************************************************************/
 
 
-
-/* The data type used to encode a generic type */
-typedef unsigned char* gt_string;
-
-
-
-/* Termination, so we can use string functions to handle type strings */
-#define GT_END                  0x00U
 
 /* Size of a data type */
 #define GT_SIZE_1               0x00U
@@ -87,30 +93,30 @@ typedef unsigned char* gt_string;
  * introduce one thing that cannot be zero for normal data. This is the
  * type.
  */
-#define GT_INTEGER              0x20U
-#define GT_POINTER              0x40U
-#define GT_FLOAT                0x60U
-#define GT_ARRAY                0x80U
-#define GT_FUNCTION             0xA0U
-#define GT_STRUCT               0xC0U
-#define GT_UNION                0xE0U
-#define GT_MASK                 0xE0U
+#define GT_TYPE_INT             0x20U
+#define GT_TYPE_PTR             0x40U
+#define GT_TYPE_FLOAT           0x60U
+#define GT_TYPE_ARRAY           0x80U
+#define GT_TYPE_FUNC            0xA0U
+#define GT_TYPE_STRUCT          0xC0U
+#define GT_TYPE_UNION           0xE0U
+#define GT_TYPE_MASK            0xE0U
 #define GT_GET_TYPE(x)          ((x) & GT_TYPE_MASK)
-#define GT_IS_INTEGER(x)        (GT_GET_TYPE(x) == GT_INTEGER)
-#define GT_IS_POINTER(x)        (GT_GET_TYPE(x) == GT_POINTER)
-#define GT_IS_FLOAT(x)          (GT_GET_TYPE(x) == GT_FLOAT)
-#define GT_IS_ARRAY(x)          (GT_GET_TYPE(x) == GT_ARRAY)
-#define GT_IS_FUNCTION(x)       (GT_GET_TYPE(x) == GT_FUNCTION)
-#define GT_IS_STRUCT(x)         (GT_GET_TYPE(x) == GT_STRUCT)
-#define GT_IS_UNION(x)          (GT_GET_TYPE(x) == GT_UNION)
+#define GT_IS_INTEGER(x)        (GT_GET_TYPE(x) == GT_TYPE_INTEGER)
+#define GT_IS_POINTER(x)        (GT_GET_TYPE(x) == GT_TYPE_POINTER)
+#define GT_IS_FLOAT(x)          (GT_GET_TYPE(x) == GT_TYPE_FLOAT)
+#define GT_IS_ARRAY(x)          (GT_GET_TYPE(x) == GT_TYPE_ARRAY)
+#define GT_IS_FUNCTION(x)       (GT_GET_TYPE(x) == GT_TYPE_FUNCTION)
+#define GT_IS_STRUCT(x)         (GT_GET_TYPE(x) == GT_TYPE_STRUCT)
+#define GT_IS_UNION(x)          (GT_GET_TYPE(x) == GT_TYPE_UNION)
 
 /* Combined values for the 6502 family */
-#define GT_BYTE         (GT_INTEGER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_1)
-#define GT_WORD         (GT_INTEGER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
-#define GT_DWORD        (GT_INTEGER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_4)
-#define GT_DBYTE        (GT_POINTER | GT_BIG_ENDIAN    | GT_UNSIGNED | GT_SIZE_2)
-#define GT_PTR          (GT_POINTER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
-#define GT_FAR_PTR      (GT_POINTER | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_3)
+#define GT_BYTE         (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_1)
+#define GT_WORD         (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
+#define GT_DWORD        (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_4)
+#define GT_DBYTE        (GT_TYPE_PTR | GT_BIG_ENDIAN    | GT_UNSIGNED | GT_SIZE_2)
+#define GT_PTR          (GT_TYPE_PTR | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
+#define GT_FAR_PTR      (GT_TYPE_PTR | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_3)
 
 
 
@@ -120,8 +126,15 @@ typedef unsigned char* gt_string;
 
 
 
-gt_string GT_FromStrBuf (const struct StrBuf* S);
-/* Create a dynamically allocated type string from a string buffer */
+void GT_AddArray (StrBuf* Type, unsigned ArraySize);
+/* Add an array with the given size to the type string in Type. This will
+ * NOT add the element type!
+ */
+
+unsigned GT_GetArraySize (StrBuf* Type);
+/* Retrieve the size of an array stored in Type at the current index position.
+ * The index position will get moved past the array size.
+ */
 
 
 

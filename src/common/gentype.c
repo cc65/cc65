@@ -36,7 +36,6 @@
 /* common */
 #include "gentype.h"
 #include "strbuf.h"
-#include "xmalloc.h"
 
 
 
@@ -46,29 +45,40 @@
 
 
 
-gt_string GT_FromStrBuf (const struct StrBuf* S)
-/* Create a dynamically allocated type string from a string buffer. */
+void GT_AddArray (StrBuf* Type, unsigned ArraySize)
+/* Add an array with the given size to the type string in Type. This will
+ * NOT add the element type!
+ */
 {
-    /* To avoid silly mistakes, check if the last character in S is a
-     * terminator. If not, don't rely on S being terminated.
-     */
-    unsigned Len = SB_GetLen (S);
-    if (Len > 0 && SB_LookAtLast (S) == '\0') {
-        /* String is terminated - allocate memory */
-        gt_string Type = xmalloc (Len);
-        /* Copy the data and return the result */
-        return memcpy (Type, SB_GetConstBuf (S), Len);
-    } else {
-        /* String not terminated - allocate memory */
-        gt_string Type = xmalloc (Len + 1);
-        /* Copy the data */
-        memcpy (Type, SB_GetConstBuf (S), Len);
-        /* Terminate the string */
-        Type[Len] = GT_END;
-        /* Return the copy */
-        return Type;
+    unsigned I;
+
+    /* Add the array token */
+    SB_AppendChar (Type, GT_TYPE_ARRAY);
+
+    /* Add the size. */
+    for (I = 0; I < 4; ++I) {
+        SB_AppendChar (Type, ArraySize & 0xFF);
+        ArraySize >>= 8;
     }
 }
+
+
+
+unsigned GT_GetArraySize (StrBuf* Type)
+/* Retrieve the size of an array stored in Type at the current index position.
+ * The index position will get moved past the array size.
+ */
+{
+    unsigned Size;
+    Size  = (unsigned)SB_Get (Type);
+    Size |= (unsigned)SB_Get (Type) << 8;
+    Size |= (unsigned)SB_Get (Type) << 16;
+    Size |= (unsigned)SB_Get (Type) << 24;
+    return Size;
+}
+
+
+
 
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +44,7 @@
 
 
 
-StringPool StrPool = STATIC_STRINGPOOL_INITIALIZER;
+StringPool* StrPool = 0;
 
 
 
@@ -57,10 +57,13 @@ StringPool StrPool = STATIC_STRINGPOOL_INITIALIZER;
 void InitStrPool (void)
 /* Initialize the string pool */
 {
+    /* Allocate a string pool */
+    StrPool = NewStringPool (1103);
+
     /* We insert a first string here, which will have id zero. This means
      * that we can treat index zero later as invalid.
-     */               
-    SP_AddStr (&StrPool, "<invalid message #0>");
+     */
+    SP_AddStr (StrPool, "<invalid message #0>");
 }
 
 

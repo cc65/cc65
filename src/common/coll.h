@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -258,6 +258,13 @@ void CollReplace (Collection* C, void* Item, unsigned Index);
  * just the pointer will get replaced.
  */
 #endif
+
+void CollReplaceExpand (Collection* C, void* Item, unsigned Index);
+/* If Index is a valid index for the collection, replace the item at this
+ * position by the one passed. If the collection is too small, expand it,
+ * filling unused pointers with NULL, then add the new item at the given
+ * position.
+ */
 
 void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex);
 /* Move an item from one position in the collection to another. OldIndex

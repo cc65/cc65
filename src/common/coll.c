@@ -161,7 +161,7 @@ void CollAppend (Collection* C, void* Item)
 {
     /* Insert the item at the end of the current list */
     CollInsert (C, Item, C->Count);
-}
+}                      
 #endif
 
 
@@ -306,6 +306,39 @@ void CollReplace (Collection* C, void* Item, unsigned Index)
 
 
 
+void CollReplaceExpand (Collection* C, void* Item, unsigned Index)
+/* If Index is a valid index for the collection, replace the item at this
+ * position by the one passed. If the collection is too small, expand it,
+ * filling unused pointers with NULL, then add the new item at the given
+ * position.
+ */
+{
+    if (Index < C->Count) {
+        /* Collection is already large enough */
+        C->Items[Index] = Item;
+    } else {
+        /* Must expand the collection */
+        unsigned Size = C->Size;
+        if (Size == 0) {
+            Size = 4;
+        }
+        while (Index >= Size) {
+            Size *= 2;
+        }
+        CollGrow (C, Size);
+
+        /* Fill up unused slots with NULL */
+        while (C->Count < Index) {
+            C->Items[C->Count++] = 0;
+        }
+
+        /* Fill in the item */
+        C->Items[C->Count++] = Item;
+    }
+}
+
+
+
 void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
 /* Move an item from one position in the collection to another. OldIndex
  * is the current position of the item, NewIndex is the new index after
@@ -442,14 +475,14 @@ void CollTransfer (Collection* Dest, const Collection* Source)
 /* Transfer all items from Source to Dest. Anything already in Dest is left
  * untouched. The items in Source are not changed and are therefore in both
  * Collections on return.
- */                                                           
+ */
 {
     /* Be sure there's enough room in Dest */
     CollGrow (Dest, Dest->Count + Source->Count);
 
     /* Copy the items */
-    memcpy (Dest->Items + Dest->Count, 
-            Source->Items, 
+    memcpy (Dest->Items + Dest->Count,
+            Source->Items,
             Source->Count * sizeof (Source->Items[0]));
 
     /* Bump the counter */

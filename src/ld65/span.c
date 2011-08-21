@@ -42,6 +42,7 @@
 #include "objdata.h"
 #include "segments.h"
 #include "span.h"
+#include "spool.h"
 
 
 
@@ -57,6 +58,7 @@ struct Span {
     unsigned            Sec;            /* Section id of this span */
     unsigned long       Offs;           /* Offset of span within segment */
     unsigned long       Size;           /* Size of span */
+    unsigned            Type;           /* Generic type of the data */
 };
 
 
@@ -67,17 +69,14 @@ struct Span {
 
 
 
-static Span* NewSpan (unsigned Id, unsigned Sec, unsigned long Offs, unsigned long Size)
+static Span* NewSpan (unsigned Id)
 /* Create and return a new span */
 {
     /* Allocate memory */
-    Span* S = xmalloc (sizeof (*S));
+    Span* S = xmalloc (sizeof (Span));
 
-    /* Initialize the fields */
+    /* Initialize the fields as necessary */
     S->Id       = Id;
-    S->Sec      = Sec;
-    S->Offs     = Offs;
-    S->Size     = Size;
 
     /* Return the result */
     return S;
@@ -85,14 +84,18 @@ static Span* NewSpan (unsigned Id, unsigned Sec, unsigned long Offs, unsigned lo
 
 
 
-Span* ReadSpan (FILE* F, ObjData* O attribute ((unused)), unsigned Id)
+Span* ReadSpan (FILE* F, ObjData* O, unsigned Id)
 /* Read a Span from a file and return it */
 {
-    /* Create a new Span and return it */
-    unsigned SecId     = ReadVar (F);
-    unsigned long Offs = ReadVar (F);
-    unsigned Size      = ReadVar (F);
-    return NewSpan (Id, SecId, Offs, Size);
+    /* Create a new Span and initialize it */
+    Span* S = NewSpan (Id);
+    S->Sec  = ReadVar (F);
+    S->Offs = ReadVar (F);
+    S->Size = ReadVar (F);
+    S->Type = MakeGlobalStringId (O, ReadVar (F));
+
+    /* Return the new span */
+    return S;
 }
 
 

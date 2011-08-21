@@ -43,6 +43,7 @@
 #include "gentype.h"
 #include "hashtab.h"
 #include "inline.h"
+#include "strbuf.h"
 
 
 
@@ -83,6 +84,9 @@ INLINE unsigned long GetSpanSize (const Span* R)
 #else
 #  define GetSpanSize(R)   ((R)->End - (R)->Start)
 #endif
+
+void SetSpanType (Span* S, const StrBuf* Type);
+/* Set the generic type of the span to Type */
 
 Span* OpenSpan (void);
 /* Open a span for the active segment and return it. */

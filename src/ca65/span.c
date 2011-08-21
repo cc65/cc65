@@ -43,6 +43,7 @@
 #include "objfile.h"
 #include "segment.h"
 #include "span.h"
+#include "spool.h"
 
 
 
@@ -155,7 +156,7 @@ static Span* NewSpan (Segment* Seg, unsigned long Start, unsigned long End)
     S->Seg      = Seg;
     S->Start    = Start;
     S->End      = End;
-    S->Type     = 0;
+    S->Type     = EMPTY_STRING_ID;
 
     /* Return the new struct */
     return S;
@@ -183,9 +184,11 @@ static Span* MergeSpan (Span* S)
     Span* E = HT_Find (&SpanTab, S);
     if (E) {
         /* If S has a type and E not, move the type */
-        CHECK (E->Type == 0);
-        E->Type = S->Type;
-        S->Type = 0;
+        if (S->Type != EMPTY_STRING_ID) {
+            CHECK (E->Type == EMPTY_STRING_ID);
+            E->Type = S->Type;
+        }
+
         /* Free S and return E */
         FreeSpan (S);
         return E;
@@ -195,6 +198,14 @@ static Span* MergeSpan (Span* S)
         HT_Insert (&SpanTab, S);
         return S;
     }
+}
+
+
+
+void SetSpanType (Span* S, const StrBuf* Type)
+/* Set the generic type of the span to Type */
+{
+    S->Type = GetStrBufId (Type);
 }
 
 
@@ -377,6 +388,7 @@ void WriteSpans (void)
             ObjWriteVar (S->Seg->Num);
             ObjWriteVar (S->Start);
             ObjWriteVar (S->End - S->Start);
+            ObjWriteVar (S->Type);
         }
 
         /* Free the collection with the spans */

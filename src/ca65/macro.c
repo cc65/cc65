@@ -126,6 +126,7 @@ struct MacExp {
     unsigned   	IfSP;		/* .IF stack pointer at start of expansion */
     TokNode*   	Exp;		/* Pointer to current token */
     TokNode*   	Final;		/* Pointer to final token */
+    unsigned    MacExpansions;  /* Number of active macro expansions */
     unsigned    LocalStart;	/* Start of counter for local symbol names */
     unsigned   	ParamCount;	/* Number of actual parameters */
     TokNode**  	Params;	  	/* List of actual parameters */
@@ -295,25 +296,23 @@ static MacExp* NewMacExp (Macro* M)
     MacExp* E = xmalloc (sizeof (MacExp));
 
     /* Initialize the data */
-    E->M       	  = M;
-    E->IfSP    	  = GetIfStack ();
-    E->Exp     	  = M->TokRoot;
-    E->Final   	  = 0;
-    E->LocalStart = LocalName;
-    LocalName    += M->LocalCount;
-    E->ParamCount = 0;
-    E->Params     = xmalloc (M->ParamCount * sizeof (TokNode*));
+    E->M       	        = M;
+    E->IfSP    	        = GetIfStack ();
+    E->Exp     	        = M->TokRoot;
+    E->Final   	        = 0;
+    E->MacExpansions    = ++MacExpansions;      /* One macro expansion more */
+    E->LocalStart       = LocalName;
+    LocalName          += M->LocalCount;
+    E->ParamCount       = 0;
+    E->Params           = xmalloc (M->ParamCount * sizeof (TokNode*));
     for (I = 0; I < M->ParamCount; ++I) {
 	E->Params[I] = 0;
     }
-    E->ParamExp	  = 0;
-    E->LI         = 0;
+    E->ParamExp	        = 0;
+    E->LI               = 0;
 
     /* Mark the macro as expanding */
     ++M->Expansions;
-
-    /* One macro expansion more */
-    ++MacExpansions;
 
     /* Return the new macro expansion */
     return E;
@@ -668,7 +667,7 @@ ExpandParam:
         if (Mac->LI) {
             EndLine (Mac->LI);
         }
-        Mac->LI = StartLine (&CurTok.Pos, LI_TYPE_MACRO, MacExpansions);
+        Mac->LI = StartLine (&CurTok.Pos, LI_TYPE_MACRO, Mac->MacExpansions);
 
        	/* Set pointer to next token */
        	Mac->Exp = Mac->Exp->Next;

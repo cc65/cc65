@@ -47,9 +47,30 @@
 /* common */
 #include "coll.h"
 #include "hashfunc.h"
+#include "hashtab.h"
 #include "strbuf.h"
 #include "strpool.h"
 #include "xmalloc.h"
+
+
+
+/*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+static unsigned HT_GenHash (const void* Key);
+/* Generate the hash over a key. */
+
+static const void* HT_GetKey (const void* Entry);
+/* Given a pointer to the user entry data, return a pointer to the key */
+
+static int HT_Compare (const void* Key1, const void* Key2);
+/* Compare two keys. The function must return a value less than zero if
+ * Key1 is smaller than Key2, zero if both are equal, and a value greater
+ * than zero if Key1 is greater then Key2.
+ */
 
 
 
@@ -61,10 +82,23 @@
 
 /* A string pool entry */
 struct StringPoolEntry {
-    StringPoolEntry*    Next;   /* Pointer to next entry in hash chain */
-    unsigned            Hash;   /* Full hash value */
+    HashNode            Node;   /* Node for the hash table */
     unsigned            Id;     /* The numeric string id */
     StrBuf              Buf;    /* The string itself */
+};
+
+/* A string pool */
+struct StringPool {
+    Collection          Entries;        /* Entries sorted by number */
+    unsigned            TotalSize;      /* Total size of all string data */
+    HashTable           Tab;            /* Hash table */
+};
+
+/* Hash table functions */
+static const HashFunctions HashFunc = {
+    HT_GenHash,
+    HT_GetKey,
+    HT_Compare
 };
 
 
@@ -75,15 +109,14 @@ struct StringPoolEntry {
 
 
 
-static StringPoolEntry* NewStringPoolEntry (const StrBuf* S, unsigned Hash, unsigned Id)
+static StringPoolEntry* NewStringPoolEntry (const StrBuf* S, unsigned Id)
 /* Create a new string pool entry and return it. */
 {
     /* Allocate memory */
     StringPoolEntry* E = xmalloc (sizeof (StringPoolEntry));
 
     /* Initialize the fields */
-    E->Next = 0;
-    E->Hash = Hash;
+    InitHashNode (&E->Node);
     E->Id   = Id;
     SB_Init (&E->Buf);
     SB_Copy (&E->Buf, S);
@@ -98,31 +131,63 @@ static StringPoolEntry* NewStringPoolEntry (const StrBuf* S, unsigned Hash, unsi
 
 
 /*****************************************************************************/
+/*                           Hash table functions                            */
+/*****************************************************************************/
+
+
+
+static unsigned HT_GenHash (const void* Key)
+/* Generate the hash over a key. */
+{
+    return HashBuf (Key);
+}
+
+
+
+static const void* HT_GetKey (const void* Entry)
+/* Given a pointer to the user entry data, return a pointer to the index */
+{
+    return &((const StringPoolEntry*) Entry)->Buf;
+}
+
+
+
+static int HT_Compare (const void* Key1, const void* Key2)
+/* Compare two keys. The function must return a value less than zero if
+ * Key1 is smaller than Key2, zero if both are equal, and a value greater
+ * than zero if Key1 is greater then Key2.
+ */
+{
+    return SB_Compare (Key1, Key2);
+}
+
+
+
+/*****************************************************************************/
 /*                                     Code                                  */
 /*****************************************************************************/
 
 
 
-StringPool* InitStringPool (StringPool* P)
-/* Initialize a string pool */
+StringPool* NewStringPool (unsigned HashSlots)
+/* Allocate, initialize and return a new string pool */
 {
-    unsigned I;
+    /* Allocate memory */
+    StringPool* P = xmalloc (sizeof (*P));
 
     /* Initialize the fields */
-    for (I = 0; I < sizeof (P->Tab) / sizeof (P->Tab[0]); ++I) {
-        P->Tab[I] = 0;
-    }
-    P->Entries = EmptyCollection;
+    P->Entries   = EmptyCollection;
     P->TotalSize = 0;
+    InitHashTable (&P->Tab, HashSlots, &HashFunc);
 
-    /* Return a pointer to the initialized pool */
+    /* Return a pointer to the new pool */
     return P;
 }
 
 
 
-void DoneStringPool (StringPool* P)
-/* Free the data of a string pool (but not the data itself) */
+void FreeStringPool (StringPool* P)
+/* Free a string pool */
 {
     unsigned I;
 
@@ -140,31 +205,8 @@ void DoneStringPool (StringPool* P)
     }
     CollDeleteAll (&P->Entries);
 
-    /* Clear the hash table */
-    for (I = 0; I < sizeof (P->Tab) / sizeof (P->Tab[0]); ++I) {
-        P->Tab[I] = 0;
-    }
-
-    /* Reset the size */
-    P->TotalSize = 0;
-}
-
-
-
-StringPool* NewStringPool (void)
-/* Allocate, initialize and return a new string pool */
-{
-    /* Allocate memory, initialize and return it */
-    return InitStringPool (xmalloc (sizeof (StringPool)));
-}
-
-
-
-void FreeStringPool (StringPool* P)
-/* Free a string pool */
-{
-    /* Free all entries */
-    DoneStringPool (P);
+    /* Free the hash table */
+    DoneHashTable (&P->Tab);
 
     /* Free the string pool itself */
     xfree (P);
@@ -190,34 +232,24 @@ unsigned SP_Add (StringPool* P, const StrBuf* S)
  * existing string.
  */
 {
-    /* Calculate the string hash */
-    unsigned Hash = HashBuf (S);
+    /* Search for a matching entry in the hash table */
+    StringPoolEntry* E = HT_FindEntry (&P->Tab, S);
 
-    /* Calculate the reduced string hash */
-    unsigned RHash = Hash % (sizeof (P->Tab)/sizeof (P->Tab[0]));
+    /* Did we find it? */
+    if (E != 0) {
 
-    /* Search for an existing entry */
-    StringPoolEntry* E = P->Tab[RHash];
-    while (E) {
-        if (E->Hash == Hash && SB_Compare (&E->Buf, S) == 0) {
-            /* Found, return the id of the existing string */
-            return E->Id;
-        }
-        E = E->Next;
+        /* We didn't find the entry, so create a new one */
+        E = NewStringPoolEntry (S, CollCount (&P->Entries));
+
+        /* Insert the new entry into the entries collection */
+        CollAppend (&P->Entries, E);
+
+        /* Insert the new entry into the hash table */
+        HT_InsertEntry (&P->Tab, E);
+
+        /* Add up the string size */
+        P->TotalSize += SB_GetLen (&E->Buf);
     }
-
-    /* We didn't find the entry, so create a new one */
-    E = NewStringPoolEntry (S, Hash, CollCount (&P->Entries));
-
-    /* Insert the new entry into the entry collection */
-    CollAppend (&P->Entries, E);
-
-    /* Insert the new entry into the hash table */
-    E->Next = P->Tab[RHash];
-    P->Tab[RHash] = E;
-
-    /* Add up the string size */
-    P->TotalSize += SB_GetLen (&E->Buf);
 
     /* Return the id of the entry */
     return E->Id;

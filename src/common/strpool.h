@@ -48,9 +48,7 @@
 
 
 /* common */
-#include "attrib.h"
-#include "coll.h"
-#include "inline.h"
+#include "hashtab.h"
 #include "strbuf.h"
 
 
@@ -66,20 +64,6 @@ typedef struct StringPoolEntry StringPoolEntry;
 
 /* A string pool */
 typedef struct StringPool StringPool;
-struct StringPool {
-    Collection        Entries;    /* Entries sorted by number */
-    unsigned          TotalSize;  /* Total size of all string data */
-    StringPoolEntry*  Tab[4177];  /* Entry hash table */
-};
-
-/* A string pool initializer. We do only initialize the first field, all
- * others will get zeroed out by the compiler.
- */
-#define STATIC_STRINGPOOL_INITIALIZER {         \
-    STATIC_COLLECTION_INITIALIZER,              \
-    0,                                          \
-    { 0 }                                       \
-}
 
 
 
@@ -89,13 +73,7 @@ struct StringPool {
 
 
 
-StringPool* InitStringPool (StringPool* P);
-/* Initialize a string pool */
-
-void DoneStringPool (StringPool* P);
-/* Free the data of a string pool (but not the data itself) */
-
-StringPool* NewStringPool (void);
+StringPool* NewStringPool (unsigned HashSlots);
 /* Allocate, initialize and return a new string pool */
 
 void FreeStringPool (StringPool* P);
@@ -115,15 +93,8 @@ unsigned SP_AddStr (StringPool* P, const char* S);
  * exist in the pool, SP_Add will just return the index of the existing string.
  */
 
-#if defined(HAVE_INLINE)
-INLINE unsigned SP_GetCount (const StringPool* P)
+unsigned SP_GetCount (const StringPool* P);
 /* Return the number of strings in the pool */
-{
-    return CollCount (&P->Entries);
-}
-#else
-#  define SP_GetCount(P)        CollCount (&(P)->Entries)
-#endif
 
 
 

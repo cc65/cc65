@@ -204,8 +204,11 @@ static Span* MergeSpan (Span* S)
 
 void SetSpanType (Span* S, const StrBuf* Type)
 /* Set the generic type of the span to Type */
-{
-    S->Type = GetStrBufId (Type);
+{                                 
+    /* Ignore the call if we won't generate debug infos */
+    if (DbgSyms) {
+        S->Type = GetStrBufId (Type);
+    }
 }
 
 
@@ -351,7 +354,7 @@ static int CollectSpans (void* Entry, void* Data)
     return 0;
 }
 
-
+                
 
 void WriteSpans (void)
 /* Write all spans to the object file */

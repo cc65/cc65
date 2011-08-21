@@ -298,8 +298,41 @@ static void ConDes (const StrBuf* Name, unsigned Type)
 
 
 
+static StrBuf* GenArrayType (StrBuf* Type, unsigned SpanSize,
+                             unsigned char ElementType)
+/* Create an array (or single data) of the given type. SpanSize is the size
+ * of the span, Type is the element data type. The function returns Type.
+ */
+{
+    /* Get the size of the element type */
+    unsigned ElementSize = GT_GET_SIZE (ElementType);
+
+    /* Get the number of array elements */
+    unsigned ElementCount = SpanSize / ElementSize;
+
+    /* The span size must be divideable by the element size */
+    CHECK ((SpanSize % ElementSize) == 0);
+
+    /* Encoding an array needs 6 bytes. So if the array count is less, it
+     * is cheaper to build the array with single items.
+     */
+    if (ElementCount >= 6) {
+        GT_AddArray (Type, ElementCount);
+        SB_AppendChar (Type, ElementType);
+    } else {
+        while (ElementCount--) {
+            SB_AppendChar (Type, ElementType);
+        }
+    }          
+
+    /* Return the pointer to the created array type */
+    return Type;
+}
+
+
+
 /*****************************************************************************/
-/*	      	    	       Handler functions			     */
+/*	       	    	       Handler functions			     */
 /*****************************************************************************/
 
 
@@ -354,9 +387,7 @@ static void DoAddr (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    GT_AddArray (&Type, GetSpanSize (S));
-    SB_AppendChar (&Type, GT_PTR);
-    SetSpanType (S, &Type);
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_PTR));
 
     /* Free the type string */
     SB_Done (&Type);
@@ -576,9 +607,7 @@ static void DoByte (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    GT_AddArray (&Type, GetSpanSize (S));
-    SB_AppendChar (&Type, GT_BYTE);
-    SetSpanType (S, &Type);
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_BYTE));
 
     /* Free the type string */
     SB_Done (&Type);
@@ -772,9 +801,7 @@ static void DoDByt (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    GT_AddArray (&Type, GetSpanSize (S));
-    SB_AppendChar (&Type, GT_DBYTE);
-    SetSpanType (S, &Type);
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_DBYTE));
 
     /* Free the type string */
     SB_Done (&Type);
@@ -945,9 +972,7 @@ static void DoFarAddr (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    GT_AddArray (&Type, GetSpanSize (S));
-    SB_AppendChar (&Type, GT_FAR_PTR);
-    SetSpanType (S, &Type);
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_FAR_PTR));
 
     /* Free the type string */
     SB_Done (&Type);
@@ -1915,9 +1940,7 @@ static void DoWord (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    GT_AddArray (&Type, GetSpanSize (S));
-    SB_AppendChar (&Type, GT_WORD);
-    SetSpanType (S, &Type);
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_WORD));
 
     /* Free the type string */
     SB_Done (&Type);

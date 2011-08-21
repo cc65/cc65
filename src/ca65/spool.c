@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -83,7 +83,11 @@ void WriteStrPool (void)
 void InitStrPool (void)
 /* Initialize the string pool */
 {
+    /* Create a string pool */
     StrPool = NewStringPool (1103);
+
+    /* Insert an empty string. It will have string id 0 */
+    SP_AddStr (StrPool, "");
 }
 
 

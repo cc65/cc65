@@ -233,7 +233,7 @@ unsigned SP_Add (StringPool* P, const StrBuf* S)
  */
 {
     /* Search for a matching entry in the hash table */
-    StringPoolEntry* E = HT_FindEntry (&P->Tab, S);
+    StringPoolEntry* E = HT_Find (&P->Tab, S);
 
     /* Did we find it? */
     if (E != 0) {
@@ -245,7 +245,7 @@ unsigned SP_Add (StringPool* P, const StrBuf* S)
         CollAppend (&P->Entries, E);
 
         /* Insert the new entry into the hash table */
-        HT_InsertEntry (&P->Tab, E);
+        HT_Insert (&P->Tab, E);
 
         /* Add up the string size */
         P->TotalSize += SB_GetLen (&E->Buf);
@@ -280,7 +280,7 @@ unsigned SP_GetCount (const StringPool* P)
 /* Return the number of strings in the pool */
 {
     return CollCount (&P->Entries);
-}
+}                 
 
 
 

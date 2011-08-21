@@ -136,8 +136,10 @@ unsigned GT_GetArraySize (StrBuf* Type);
  * The index position will get moved past the array size.
  */
 
-void GT_AsString (const StrBuf* Type, StrBuf* String);
-/* Convert the type into a readable representation */
+const char* GT_AsString (const StrBuf* Type, StrBuf* String);
+/* Convert the type into a readable representation. The target string buffer
+ * will be zero terminated and a pointer to the contents are returned.
+ */
 
 
 

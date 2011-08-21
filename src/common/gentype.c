@@ -79,8 +79,10 @@ unsigned GT_GetArraySize (StrBuf* Type)
 
 
 
-void GT_AsString (const StrBuf* Type, StrBuf* String)
-/* Convert the type into a readable representation */
+const char* GT_AsString (const StrBuf* Type, StrBuf* String)
+/* Convert the type into a readable representation. The target string buffer
+ * will be zero terminated and a pointer to the contents are returned.
+ */
 {
     static const char HexTab[16] = "0123456789ABCDEF";
     unsigned I;
@@ -98,7 +100,10 @@ void GT_AsString (const StrBuf* Type, StrBuf* String)
     }
 
     /* Terminate the string so it can be used with string functions */
-    SB_Terminate (String);
+    SB_Terminate (String);                                  
+
+    /* Return the contents of String */
+    return SB_GetConstBuf (String);
 }
 
 

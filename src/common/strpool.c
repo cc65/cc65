@@ -236,7 +236,7 @@ unsigned SP_Add (StringPool* P, const StrBuf* S)
     StringPoolEntry* E = HT_Find (&P->Tab, S);
 
     /* Did we find it? */
-    if (E != 0) {
+    if (E == 0) {
 
         /* We didn't find the entry, so create a new one */
         E = NewStringPoolEntry (S, CollCount (&P->Entries));
@@ -280,7 +280,7 @@ unsigned SP_GetCount (const StringPool* P)
 /* Return the number of strings in the pool */
 {
     return CollCount (&P->Entries);
-}                 
+}
 
 
 

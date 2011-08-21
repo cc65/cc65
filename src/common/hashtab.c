@@ -101,20 +101,6 @@ static void HT_Alloc (HashTable* T)
 
 
 
-HashNode* HT_Find (const HashTable* T, const void* Key)
-/* Find the node with the given index */
-{
-    /* If we don't have a table, there's nothing to find */
-    if (T->Table == 0) {
-        return 0;
-    }
-
-    /* Search for the entry */
-    return HT_FindHash (T, Key, T->Func->GenHash (Key));
-}
-
-
-
 HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
 /* Find the node with the given key. Differs from HT_Find in that the hash
  * for the key is precalculated and passed to the function.
@@ -150,24 +136,28 @@ HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
 
 
 
-void* HT_FindEntry (const HashTable* T, const void* Key)
-/* Find the node with the given index and return the corresponding entry */
+void* HT_Find (const HashTable* T, const void* Key)
+/* Find the entry with the given key and return it */
 {
-    /* Since the HashEntry must be first member, we can use HT_Find here */
-    return HT_Find (T, Key);
+    /* Search for the entry */
+    return HT_FindHash (T, Key, T->Func->GenHash (Key));
 }
 
 
 
-void HT_Insert (HashTable* T, HashNode* N)
-/* Insert a node into the given hash table */
+void HT_Insert (HashTable* T, void* Entry)
+/* Insert an entry into the given hash table */
 {
+    HashNode* N;
     unsigned RHash;
 
     /* If we don't have a table, we need to allocate it now */
     if (T->Table == 0) {
         HT_Alloc (T);
     }
+
+    /* The first member of Entry is also the hash node */
+    N = Entry;
 
     /* Generate the hash over the node key. */
     N->Hash = T->Func->GenHash (T->Func->GetKey (N));
@@ -185,9 +175,12 @@ void HT_Insert (HashTable* T, HashNode* N)
 
 
 
-void HT_Remove (HashTable* T, HashNode* N)
-/* Remove a node from a hash table. */
+void HT_Remove (HashTable* T, void* Entry)
+/* Remove an entry from the given hash table */
 {
+    /* The first member of Entry is also the hash node */
+    HashNode* N = Entry;
+
     /* Calculate the reduced hash, which is also the slot number */
     unsigned Slot = N->Hash % T->Slots;
 
@@ -206,26 +199,6 @@ void HT_Remove (HashTable* T, HashNode* N)
         /* Next node */
         Q = &(*Q)->Next;
     }
-}
-
-
-
-void HT_InsertEntry (HashTable* T, void* Entry)
-/* Insert an entry into the given hash table */
-{
-    /* Since the hash node must be first member, Entry is also the pointer to
-     * the hash node.
-     */
-    HT_Insert (T, Entry);
-}
-
-
-
-void HT_RemoveEntry (HashTable* T, void* Entry)
-/* Remove an entry from the given hash table */
-{
-    /* The entry is the first member, so we can just convert the pointer */
-    HT_Remove (T, Entry);
 }
 
 

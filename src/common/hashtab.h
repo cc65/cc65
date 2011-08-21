@@ -139,27 +139,18 @@ INLINE HashTable* NewHashTable (unsigned Slots, const HashFunctions* Func)
 void FreeHashTable (HashTable* T);
 /* Free a hash table. Note: This will not free the entries in the table! */
 
-HashNode* HT_Find (const HashTable* T, const void* Key);
-/* Find the node with the given key*/
-
 HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash);
 /* Find the node with the given key. Differs from HT_Find in that the hash
  * for the key is precalculated and passed to the function.
  */
 
-void* HT_FindEntry (const HashTable* T, const void* Key);
-/* Find the node with the given key and return the corresponding entry */
+void* HT_Find (const HashTable* T, const void* Key);
+/* Find the entry with the given key and return it */
 
-void HT_Insert (HashTable* T, HashNode* N);
-/* Insert a node into the given hash table */
-
-void HT_Remove (HashTable* T, HashNode* N);
-/* Remove a node from its hash table */
-
-void HT_InsertEntry (HashTable* T, void* Entry);
+void HT_Insert (HashTable* T, void* Entry);
 /* Insert an entry into the given hash table */
 
-void HT_RemoveEntry (HashTable* T, void* Entry);
+void HT_Remove (HashTable* T, void* Entry);
 /* Remove an entry from the given hash table */
 
 void HT_Walk (HashTable* T, int (*F) (void* Entry, void* Data), void* Data);

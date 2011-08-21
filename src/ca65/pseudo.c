@@ -46,6 +46,7 @@
 #include "bitops.h"
 #include "cddefs.h"
 #include "coll.h"
+#include "gentype.h"
 #include "intstack.h"
 #include "scopedefs.h"
 #include "symdefs.h"
@@ -75,6 +76,7 @@
 #include "repeat.h"
 #include "segment.h"
 #include "sizeof.h"
+#include "span.h"
 #include "spool.h"
 #include "struct.h"
 #include "symbol.h"
@@ -331,6 +333,11 @@ static void DoA8 (void)
 static void DoAddr (void)
 /* Define addresses */
 {
+    /* Record type information */
+    Span* S = OpenSpan ();
+    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+
+    /* Parse arguments */
     while (1) {
 	if (GetCPU() == CPU_65816) {
        	    EmitWord (GenWordExpr (Expression ()));
@@ -344,6 +351,15 @@ static void DoAddr (void)
 	    NextTok ();
 	}
     }
+
+    /* Close the span, then add type information to it */
+    S = CloseSpan (S);
+    GT_AddArray (&Type, GetSpanSize (S));
+    SB_AppendChar (&Type, GT_PTR);
+    SetSpanType (S, &Type);
+
+    /* Free the type string */
+    SB_Done (&Type);
 }
 
 
@@ -532,6 +548,11 @@ static void DoBss (void)
 static void DoByte (void)
 /* Define bytes */
 {
+    /* Record type information */
+    Span* S = OpenSpan ();
+    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+
+    /* Parse arguments */
     while (1) {
 	if (CurTok.Tok == TOK_STRCON) {
 	    /* A string, translate into target charset and emit */
@@ -552,6 +573,15 @@ static void DoByte (void)
 	    }
 	}
     }
+
+    /* Close the span, then add type information to it */
+    S = CloseSpan (S);
+    GT_AddArray (&Type, GetSpanSize (S));
+    SB_AppendChar (&Type, GT_BYTE);
+    SetSpanType (S, &Type);
+
+    /* Free the type string */
+    SB_Done (&Type);
 }
 
 
@@ -726,6 +756,11 @@ static void DoDbg (void)
 static void DoDByt (void)
 /* Output double bytes */
 {
+    /* Record type information */
+    Span* S = OpenSpan ();
+    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+
+    /* Parse arguments */
     while (1) {
 	EmitWord (GenSwapExpr (Expression ()));
 	if (CurTok.Tok != TOK_COMMA) {
@@ -734,6 +769,15 @@ static void DoDByt (void)
 	    NextTok ();
 	}
     }
+
+    /* Close the span, then add type information to it */
+    S = CloseSpan (S);
+    GT_AddArray (&Type, GetSpanSize (S));
+    SB_AppendChar (&Type, GT_DBYTE);
+    SetSpanType (S, &Type);
+
+    /* Free the type string */
+    SB_Done (&Type);
 }
 
 
@@ -885,6 +929,11 @@ static void DoExportZP (void)
 static void DoFarAddr (void)
 /* Define far addresses (24 bit) */
 {
+    /* Record type information */
+    Span* S = OpenSpan ();
+    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+
+    /* Parse arguments */
     while (1) {
        	EmitFarAddr (Expression ());
 	if (CurTok.Tok != TOK_COMMA) {
@@ -893,6 +942,15 @@ static void DoFarAddr (void)
 	    NextTok ();
 	}
     }
+
+    /* Close the span, then add type information to it */
+    S = CloseSpan (S);
+    GT_AddArray (&Type, GetSpanSize (S));
+    SB_AppendChar (&Type, GT_FAR_PTR);
+    SetSpanType (S, &Type);
+
+    /* Free the type string */
+    SB_Done (&Type);
 }
 
 
@@ -1841,6 +1899,11 @@ static void DoWarning (void)
 static void DoWord (void)
 /* Define words */
 {
+    /* Record type information */
+    Span* S = OpenSpan ();
+    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+
+    /* Parse arguments */
     while (1) {
        	EmitWord (Expression ());
 	if (CurTok.Tok != TOK_COMMA) {
@@ -1849,6 +1912,15 @@ static void DoWord (void)
 	    NextTok ();
 	}
     }
+
+    /* Close the span, then add type information to it */
+    S = CloseSpan (S);
+    GT_AddArray (&Type, GetSpanSize (S));
+    SB_AppendChar (&Type, GT_WORD);
+    SetSpanType (S, &Type);
+
+    /* Free the type string */
+    SB_Done (&Type);
 }
 
 

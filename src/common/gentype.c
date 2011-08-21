@@ -79,6 +79,30 @@ unsigned GT_GetArraySize (StrBuf* Type)
 
 
 
+void GT_AsString (const StrBuf* Type, StrBuf* String)
+/* Convert the type into a readable representation */
+{
+    static const char HexTab[16] = "0123456789ABCDEF";
+    unsigned I;
+
+    /* Convert Type into readable hex. String will have twice then length
+     * plus a terminator.
+     */
+    SB_Realloc (String, 2 * SB_GetLen (Type) + 1);
+    SB_Clear (String);
+
+    for (I = 0; I < SB_GetLen (Type); ++I) {
+        unsigned char C = SB_AtUnchecked (Type, I);
+        SB_AppendChar (String, HexTab[(C & 0xF0) >> 4]);
+        SB_AppendChar (String, HexTab[(C & 0x0F) >> 0]);
+    }
+
+    /* Terminate the string so it can be used with string functions */
+    SB_Terminate (String);
+}
+
+
+
 
 
 

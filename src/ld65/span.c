@@ -34,7 +34,7 @@
 
 
 /* common */
-#include "attrib.h"
+#include "gentype.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -158,6 +158,8 @@ void PrintDbgSpans (FILE* F)
 /* Output the spans to a debug info file */
 {
     unsigned I, J;
+    StrBuf SpanType = STATIC_STRBUF_INITIALIZER;
+
 
     /* Walk over all object files */
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
@@ -168,20 +170,34 @@ void PrintDbgSpans (FILE* F)
         /* Walk over all spans in this object file */
         for (J = 0; J < CollCount (&O->Spans); ++J) {
 
+            const StrBuf* Type;
+
             /* Get this span */
-            Span* S = CollAtUnchecked (&O->Spans, J);
+            const Span* S = CollAtUnchecked (&O->Spans, J);
 
             /* Get the section for this span */
             const Section* Sec = GetObjSection (O, S->Sec);
 
             /* Output the data */
-            fprintf (F, "span\tid=%u,seg=%u,start=%lu,size=%lu\n",
+            fprintf (F, "span\tid=%u,seg=%u,start=%lu,size=%lu",
                      O->SpanBaseId + S->Id,
                      Sec->Seg->Id,
                      Sec->Offs + S->Offs,
                      S->Size);
+
+            /* If we have a type, add it */
+            Type = GetStrBuf (S->Type);
+            if (SB_GetLen (Type) > 0) {
+                fprintf (F, ",type=\"%s\"", GT_AsString (Type, &SpanType));
+            }
+
+            /* Terminate the output line */
+            fputc ('\n', F);
         }
     }
+
+    /* Free the string buffer */
+    SB_Done (&SpanType);
 }
 
 

@@ -597,7 +597,7 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
  */
 {
     /* Search for the macro */
-    Macro* M = HT_FindEntry (&MacroTab, Name);
+    Macro* M = HT_Find (&MacroTab, Name);
 
     /* Don't let the user kid with us */
     if (M == 0 || M->Style != Style) {
@@ -610,7 +610,7 @@ void MacUndef (const StrBuf* Name, unsigned char Style)
     }
 
     /* Remove the macro from the macro table */
-    HT_RemoveEntry (&MacroTab, M);
+    HT_Remove (&MacroTab, M);
 
     /* Free the macro structure */
     FreeMacro (M);
@@ -983,7 +983,7 @@ Macro* FindMacro (const StrBuf* Name)
  * this name was found, return NULL.
  */
 {
-    Macro* M = HT_FindEntry (&MacroTab, Name);
+    Macro* M = HT_Find (&MacroTab, Name);
     return (M != 0 && M->Style == MAC_STYLE_CLASSIC)? M : 0;
 }
 
@@ -1002,7 +1002,7 @@ Macro* FindDefine (const StrBuf* Name)
     }
 
     /* Check if we have such a macro */
-    M = HT_FindEntry (&MacroTab, Name);
+    M = HT_Find (&MacroTab, Name);
     return (M != 0 && M->Style == MAC_STYLE_DEFINE)? M : 0;
 }
 

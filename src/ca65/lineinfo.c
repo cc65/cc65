@@ -187,7 +187,7 @@ static LineInfo* NewLineInfo (const LineInfoKey* Key)
     InitCollection (&LI->OpenSpans);
 
     /* Add it to the hash table, so we will find it if necessary */
-    HT_InsertEntry (&LineInfoTab, LI);
+    HT_Insert (&LineInfoTab, LI);
 
     /* Return the new struct */
     return LI;
@@ -301,7 +301,7 @@ LineInfo* StartLine (const FilePos* Pos, unsigned Type, unsigned Count)
     /* Try to find a line info with this position and type in the hash table.
      * If so, reuse it. Otherwise create a new one.
      */
-    LI = HT_FindEntry (&LineInfoTab, &Key);
+    LI = HT_Find (&LineInfoTab, &Key);
     if (LI == 0) {
         /* Allocate a new LineInfo */
         LI = NewLineInfo (&Key);

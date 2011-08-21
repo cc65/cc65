@@ -134,7 +134,7 @@ static int HT_Compare (const void* Key1, const void* Key2)
 /* Compare two keys. The function must return a value less than zero if
  * Key1 is smaller than Key2, zero if both are equal, and a value greater
  * than zero if Key1 is greater then Key2.
- */                                 
+ */
 {
     return (int)*(const unsigned*)Key1 - (int)*(const unsigned*)Key2;
 }
@@ -166,7 +166,7 @@ static FileEntry* NewFileEntry (unsigned Name, FileType Type,
     CollAppend (&FileTab, F);
 
     /* Insert the entry into the hash table */
-    HT_Insert (&HashTab, &F->Node);
+    HT_Insert (&HashTab, F);
 
     /* Return the new entry */
     return F;
@@ -207,7 +207,7 @@ unsigned GetFileIndex (const StrBuf* Name)
     unsigned NameIdx = GetStrBufId (Name);
 
     /* Search in the hash table for the name */
-    FileEntry* F = HT_FindEntry (&HashTab, &NameIdx);
+    const FileEntry* F = HT_Find (&HashTab, &NameIdx);
 
     /* If we don't have this index, print a diagnostic and use the main file */
     if (F == 0) {

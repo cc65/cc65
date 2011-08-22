@@ -90,7 +90,8 @@ OBJS =	asserts.obj     \
 	segments.obj	\
         span.obj        \
         spool.obj       \
-	tgtcfg.obj
+	tgtcfg.obj      \
+        tpool.obj
 
 LIBS = ../common/common.lib
 

@@ -59,7 +59,8 @@ OBJS = 	asserts.o       \
 	segments.o	\
         span.o          \
 	spool.o         \
-	tgtcfg.o
+	tgtcfg.o        \
+        tpool.o
 
 # -----------------------------------------------------------------------------
 # List of all config includes

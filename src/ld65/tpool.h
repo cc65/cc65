@@ -38,6 +38,8 @@
 
 
 
+#include <stdio.h>
+
 /* common */
 #include "strpool.h"
 
@@ -49,8 +51,8 @@
 
 
 
-/* An empty type */
-#define EMPTY_TYPE_ID   0U
+/* An invalid type */
+#define INVALID_TYPE_ID   (~0U)
 
 /* The string pool we're using */
 extern StringPool* TypePool;
@@ -82,6 +84,19 @@ INLINE const StrBuf* GetType (unsigned Index)
 #else
 #  define GetType(Index)        SP_Get (TypePool, (Index))
 #endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned TypeCount (void)
+/* Return the number of types in the pool */
+{
+    return SP_GetCount (TypePool);
+}
+#else
+#  define TypeCount()   SP_GetCount (TypePool)
+#endif
+
+void PrintDbgTypes (FILE* F);
+/* Output the types to a debug info file */
 
 void InitTypePool (void);
 /* Initialize the type pool */

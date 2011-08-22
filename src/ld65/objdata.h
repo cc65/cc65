@@ -57,6 +57,7 @@ struct Import;
 struct Library;
 struct Scope;
 struct Section;
+struct StrBuf;
 
 /* Values for the Flags field */
 #define	OBJ_REF		0x0001 	       	/* We have a reference to this file */
@@ -143,16 +144,19 @@ INLINE int ObjHasFiles (const ObjData* O)
 #  define ObjHasFiles(O)       ((O) != 0 && CollCount (&(O)->Files) != 0)
 #endif
 
-struct Section* GetObjSection (ObjData* Obj, unsigned Id);
+const struct StrBuf* GetObjString (const ObjData* Obj, unsigned Id);
+/* Get a string from an object file checking for an invalid index */
+
+struct Section* GetObjSection (const ObjData* Obj, unsigned Id);
 /* Get a section from an object file checking for a valid index */
 
-struct Import* GetObjImport (ObjData* Obj, unsigned Id);
+struct Import* GetObjImport (const ObjData* Obj, unsigned Id);
 /* Get an import from an object file checking for a valid index */
 
-struct Export* GetObjExport (ObjData* Obj, unsigned Id);
+struct Export* GetObjExport (const ObjData* Obj, unsigned Id);
 /* Get an export from an object file checking for a valid index */
 
-struct Scope* GetObjScope (ObjData* Obj, unsigned Id);
+struct Scope* GetObjScope (const ObjData* Obj, unsigned Id);
 /* Get a scope from an object file checking for a valid index */
 
 unsigned ObjDataCount (void);

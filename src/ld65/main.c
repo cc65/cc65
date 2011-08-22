@@ -68,6 +68,7 @@
 #include "segments.h"
 #include "spool.h"
 #include "tgtcfg.h"
+#include "tpool.h"
 
 
 
@@ -553,6 +554,9 @@ int main (int argc, char* argv [])
 
     /* Initialize the string pool */
     InitStrPool ();
+
+    /* Initialize the type pool */
+    InitTypePool ();
 
     /* Check the parameters */
     I = 1;

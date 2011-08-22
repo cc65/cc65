@@ -42,7 +42,7 @@
 #include "objdata.h"
 #include "segments.h"
 #include "span.h"
-#include "spool.h"
+#include "tpool.h"
 
 
 
@@ -87,12 +87,21 @@ static Span* NewSpan (unsigned Id)
 Span* ReadSpan (FILE* F, ObjData* O, unsigned Id)
 /* Read a Span from a file and return it */
 {
+    unsigned Type;
+
     /* Create a new Span and initialize it */
     Span* S = NewSpan (Id);
     S->Sec  = ReadVar (F);
     S->Offs = ReadVar (F);
     S->Size = ReadVar (F);
-    S->Type = MakeGlobalStringId (O, ReadVar (F));
+
+    /* Read the type. An id of zero means an empty string (no need to check) */
+    Type    = ReadVar (F);
+    if (Type == 0) {
+        S->Type = INVALID_TYPE_ID;
+    } else {
+        S->Type = GetTypeId (GetObjString (O, Type));
+    }
 
     /* Return the new span */
     return S;
@@ -193,8 +202,6 @@ void PrintDbgSpans (FILE* F)
         /* Walk over all spans in this object file */
         for (J = 0; J < CollCount (&O->Spans); ++J) {
 
-            const StrBuf* Type;
-
             /* Get this span */
             const Span* S = CollAtUnchecked (&O->Spans, J);
 
@@ -209,9 +216,8 @@ void PrintDbgSpans (FILE* F)
                      S->Size);
 
             /* If we have a type, add it */
-            Type = GetStrBuf (S->Type);
-            if (SB_GetLen (Type) > 0) {
-                fprintf (F, ",type=\"%s\"", GT_AsString (Type, &SpanType));
+            if (S->Type != INVALID_TYPE_ID) {
+                fprintf (F, ",type=%u", S->Type);
             }
 
             /* Terminate the output line */

@@ -199,7 +199,15 @@ const char* GetObjFileName (const ObjData* O)
 
 
 
-struct Section* GetObjSection (ObjData* O, unsigned Id)
+const struct StrBuf* GetObjString (const ObjData* Obj, unsigned Id)
+/* Get a string from an object file checking for an invalid index */
+{
+    return GetStrBuf (MakeGlobalStringId (Obj, Id));
+}
+
+
+
+struct Section* GetObjSection (const ObjData* O, unsigned Id)
 /* Get a section from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Sections)) {
@@ -211,7 +219,7 @@ struct Section* GetObjSection (ObjData* O, unsigned Id)
 
 
 
-struct Import* GetObjImport (ObjData* O, unsigned Id)
+struct Import* GetObjImport (const ObjData* O, unsigned Id)
 /* Get an import from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Imports)) {
@@ -223,7 +231,7 @@ struct Import* GetObjImport (ObjData* O, unsigned Id)
 
 
 
-struct Export* GetObjExport (ObjData* O, unsigned Id)
+struct Export* GetObjExport (const ObjData* O, unsigned Id)
 /* Get an export from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Exports)) {
@@ -235,7 +243,7 @@ struct Export* GetObjExport (ObjData* O, unsigned Id)
 
 
 
-struct Scope* GetObjScope (ObjData* O, unsigned Id)
+struct Scope* GetObjScope (const ObjData* O, unsigned Id)
 /* Get a scope from an object file checking for a valid index */
 {
     if (Id >= CollCount (&O->Scopes)) {

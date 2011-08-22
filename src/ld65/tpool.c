@@ -33,6 +33,9 @@
 
 
 
+/* common */
+#include "gentype.h"
+
 /* ld65 */
 #include "tpool.h"
 
@@ -55,16 +58,35 @@ StringPool* TypePool = 0;
 
 
 
+void PrintDbgTypes (FILE* F)
+/* Output the types to a debug info file */
+{
+    StrBuf Type = STATIC_STRBUF_INITIALIZER;
+
+    /* Get the number of strings in the type pool */
+    unsigned Count = SP_GetCount (TypePool);
+
+    /* Output all of them */
+    unsigned Id;
+    for (Id = 0; Id < Count; ++Id) {
+
+        /* Output it */
+        fprintf (F, "type\tid=%u,val=\"%s\"\n", Id,
+                 GT_AsString (SP_Get (TypePool, Id), &Type));
+
+    }
+
+    /* Free the memory for the temporary string */
+    SB_Done (&Type);
+}
+
+
+
 void InitTypePool (void)
 /* Initialize the type pool */
 {
     /* Allocate a type pool */
     TypePool = NewStringPool (137);
-
-    /* We insert the empty string as first entry here, so it will have id
-     * zero.
-     */
-    SP_AddStr (TypePool, "");
 }
 
 

@@ -77,7 +77,7 @@ struct LineInfo {
     struct FileInfo*    File;	        /* File struct for this line if any */
     unsigned            Type;           /* Type of line info */
     FilePos             Pos;            /* Position in file */
-    Collection          Spans;          /* Spans for this line */
+    unsigned*           Spans;          /* Spans for this line */
 };
 
 

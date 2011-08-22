@@ -245,9 +245,6 @@ static void ReadBasicData (Library* L, ObjData* O)
     /* Read the files list */
     ObjReadFiles (L->F, O->Start + O->Header.FileOffs, O);
 
-    /* Read the spans */
-    ObjReadSpans (L->F, O->Start + O->Header.SpanOffs, O);
-
     /* Read the line infos */
     ObjReadLineInfos (L->F, O->Start + O->Header.LineInfoOffs, O);
 
@@ -410,6 +407,9 @@ static void LibResolve (void)
                  * segments, so we must read them after the sections.
                  */
                 ObjReadScopes (L->F, O->Start + O->Header.ScopeOffs, O);
+
+                /* Read the spans */
+                ObjReadSpans (L->F, O->Start + O->Header.SpanOffs, O);
 
                 /* All references to strings are now resolved, so we can delete
                  * the module string pool.

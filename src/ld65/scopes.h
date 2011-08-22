@@ -67,7 +67,7 @@ struct Scope {
     unsigned            Type;           /* Type of scope */
     unsigned            Name;           /* Name of scope */
     unsigned long       Size;           /* Size of scope */
-    Collection          Spans;          /* Spans for this scope */
+    unsigned*           Spans;          /* Spans for this scope */
 };
 
 

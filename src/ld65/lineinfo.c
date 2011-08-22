@@ -67,7 +67,7 @@ static LineInfo* NewLineInfo (void)
     LI->Pos.Name   = INVALID_STRING_ID;
     LI->Pos.Line   = 0;
     LI->Pos.Col    = 0;
-    LI->Spans      = EmptyCollection;
+    LI->Spans      = 0;
 
     /* Return the new struct */
     return LI;
@@ -78,8 +78,8 @@ static LineInfo* NewLineInfo (void)
 void FreeLineInfo (LineInfo* LI)
 /* Free a LineInfo structure. */
 {
-    /* Free the collections */
-    DoneCollection (&LI->Spans);
+    /* Free the span list */
+    xfree (LI->Spans);
 
     /* Free the structure itself */
     xfree (LI);
@@ -114,7 +114,7 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
     LI->File     = CollAt (&O->Files, ReadVar (F));
     LI->Pos.Name = LI->File->Name;
     LI->Type     = ReadVar (F);
-    ReadSpanList (&LI->Spans, F, O);
+    LI->Spans    = ReadSpanList (F);
 
     /* Return the struct read */
     return LI;
@@ -206,7 +206,7 @@ void AssignLineInfoIds (void)
 void PrintDbgLineInfo (FILE* F)
 /* Output the line infos to a debug info file */
 {
-    unsigned I, J, K;
+    unsigned I, J;
 
     /* Print line infos from all modules we have linked into the output file */
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
@@ -224,9 +224,6 @@ void PrintDbgLineInfo (FILE* F)
             unsigned Type  = LI_GET_TYPE (LI->Type);
             unsigned Count = LI_GET_COUNT (LI->Type);
 
-            /* Get a pointer to the spans */
-            const Collection* Spans = &LI->Spans;
-
             /* Print the start of the line */
             fprintf (F,
                      "line\tid=%u,file=%u,line=%u",
@@ -241,16 +238,7 @@ void PrintDbgLineInfo (FILE* F)
             }
 
             /* Add spans if the line info has it */
-            if (CollCount (Spans) > 0) {
-
-                /* Output the first span */
-                fprintf (F, ",span=%u", SpanId (O, CollConstAt (Spans, 0)));
-
-                /* Output the other spans */
-                for (K = 1; K < CollCount (Spans); ++K) {
-                    fprintf (F, "+%u", SpanId (O, CollConstAt (Spans, K)));
-                }
-            }
+            PrintDbgSpanList (F, O, LI->Spans);
 
             /* Terminate line */
             fputc ('\n', F);

@@ -62,7 +62,7 @@ static Scope* NewScope (ObjData* Obj, unsigned Id)
     S->Obj      = Obj;
     S->Size     = 0;
     S->LabelId  = ~0U;
-    S->Spans    = EmptyCollection;
+    S->Spans    = 0;
 
     /* Return the new entry */
     return S;
@@ -88,9 +88,7 @@ Scope* ReadScope (FILE* F, ObjData* Obj, unsigned Id)
     if (SCOPE_HAS_LABEL (S->Flags)) {
         S->LabelId  = ReadVar (F);
     }
-
-    /* Read the spans for this scope */
-    ReadSpanList (&S->Spans, F, Obj);
+    S->Spans        = ReadSpanList (F);
 
     /* Return the new Scope */
     return S;
@@ -120,7 +118,7 @@ unsigned ScopeCount (void)
 void PrintDbgScopes (FILE* F)
 /* Output the scopes to a debug info file */
 {
-    unsigned I, J, K;
+    unsigned I, J;
 
     /* Print scopes from all modules we have linked into the output file */
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
@@ -132,6 +130,7 @@ void PrintDbgScopes (FILE* F)
         for (J = 0; J < CollCount (&O->Scopes); ++J) {
             const Scope* S = CollConstAt (&O->Scopes, J);
 
+            /* Output the first chunk of data */
             fprintf (F,
                      "scope\tid=%u,name=\"%s\",mod=%u",
                      O->ScopeBaseId + S->Id,
@@ -165,12 +164,7 @@ void PrintDbgScopes (FILE* F)
                 fprintf (F, ",sym=%u", O->SymBaseId + S->LabelId);
             }
             /* Print the list of spans for this scope */
-            if (CollCount (&S->Spans) > 0) {
-                fprintf (F, ",span=%u", SpanId (O, CollConstAt (&S->Spans, 0)));
-                for (K = 1; K < CollCount (&S->Spans); ++K) {
-                    fprintf (F, "+%u", SpanId (O, CollConstAt (&S->Spans, K)));
-                }
-            }
+            PrintDbgSpanList (F, O, S->Spans);
 
             /* Terminate the output line */
             fputc ('\n', F);

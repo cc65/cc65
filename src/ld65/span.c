@@ -100,19 +100,32 @@ Span* ReadSpan (FILE* F, ObjData* O, unsigned Id)
 
 
 
-void ReadSpanList (Collection* Spans, FILE* F, ObjData* O)
-/* Read a list of span ids from a file and return the spans for the ids */
+unsigned* ReadSpanList (FILE* F)
+/* Read a list of span ids from a file. The list is returned as an array of
+ * unsigneds, the first being the number of spans (never zero) followed by
+ * the span ids. If the number of spans is zero, NULL is returned.
+ */
 {
+    unsigned* Spans;
+
     /* First is number of Spans */
     unsigned Count = ReadVar (F);
+    if (Count == 0) {
+        return 0;
+    }
 
-    /* Preallocate enough entries in the collection */
-    CollGrow (Spans, Count);
+    /* Allocate memory for the list and set the count */
+    Spans  = xmalloc ((Count + 1) * sizeof (*Spans));
+    *Spans = Count;
 
     /* Read the spans and add them */
-    while (Count--) {
-        CollAppend (Spans, CollAt (&O->Spans, ReadVar (F)));
+    while (Count) {
+        Spans[Count] = ReadVar (F);
+        --Count;
     }
+
+    /* Return the list */
+    return Spans;
 }
 
 
@@ -122,14 +135,6 @@ void FreeSpan (Span* S)
 {
     /* Just free the structure */
     xfree (S);
-}
-
-
-
-unsigned SpanId (const struct ObjData* O, const Span* S)
-/* Return the global id of a span */
-{
-    return O->SpanBaseId + S->Id;
 }
 
 
@@ -150,6 +155,24 @@ unsigned SpanCount (void)
     }
 
     return Count;
+}
+
+
+
+void PrintDbgSpanList (FILE* F, const ObjData* O, const unsigned* List)
+/* Output a string ",span=x[+y...]" for the given list. If the list is empty
+ * or NULL, output nothing. This is a helper function for other modules to
+ * print a list of spans read by ReadSpanList to the debug info file.
+ */
+{
+    if (List && *List) {
+        unsigned I;
+        const char* Format = ",span=%u";
+        for (I = 0; I < *List; ++I) {
+            fprintf (F, Format, O->SpanBaseId + List[I+1]);
+            Format = "+%u";
+        }
+    }
 }
 
 

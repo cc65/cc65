@@ -323,9 +323,6 @@ void ObjAdd (FILE* Obj, const char* Name)
     /* Read the files list from the object file */
     ObjReadFiles (Obj, O->Header.FileOffs, O);
 
-    /* Read the spans from the object file */
-    ObjReadSpans (Obj, O->Header.SpanOffs, O);
-
     /* Read the line infos from the object file */
     ObjReadLineInfos (Obj, O->Header.LineInfoOffs, O);
 
@@ -351,6 +348,9 @@ void ObjAdd (FILE* Obj, const char* Name)
      * we must read them after the sections.
      */
     ObjReadScopes (Obj, O->Header.ScopeOffs, O);
+
+    /* Read the spans from the object file */
+    ObjReadSpans (Obj, O->Header.SpanOffs, O);
 
     /* Mark this object file as needed */
     O->Flags |= OBJ_REF;

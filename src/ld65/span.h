@@ -76,17 +76,23 @@ typedef struct Span Span;
 Span* ReadSpan (FILE* F, struct ObjData* O, unsigned Id);
 /* Read a Span from a file and return it */
 
-void ReadSpanList (Collection* Spans, FILE* F, struct ObjData* O);
-/* Read a list of span ids from a file and return the spans for the ids */
+unsigned* ReadSpanList (FILE* F);
+/* Read a list of span ids from a file. The list is returned as an array of
+ * unsigneds, the first being the number of spans (never zero) followed by
+ * the span ids. If the number of spans is zero, NULL is returned.
+ */
 
 void FreeSpan (Span* S);
 /* Free a span structure */
 
-unsigned SpanId (const struct ObjData* O, const Span* S);
-/* Return the global id of a span */
-
 unsigned SpanCount (void);
 /* Return the total number of spans */
+
+void PrintDbgSpanList (FILE* F, const struct ObjData* O, const unsigned* List);
+/* Output a string ",span=x[+y...]" for the given list. If the list is empty
+ * or NULL, output nothing. This is a helper function for other modules to
+ * print a list of spans read by ReadSpanList to the debug info file.
+ */
 
 void PrintDbgSpans (FILE* F);
 /* Output the spans to a debug info file */

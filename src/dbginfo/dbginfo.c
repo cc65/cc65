@@ -192,6 +192,7 @@ struct DbgInfo {
     Collection          SegInfoById;    /* Segment infos sorted by id */
     Collection		SpanInfoById;	/* Span infos sorted by id */
     Collection          SymInfoById;    /* Symbol infos sorted by id */
+    Collection          TypeInfoById;   /* Type infos sorted by id */
 
     /* Collections with other sort criteria */
     Collection          FileInfoByName; /* File infos sorted by name */
@@ -238,6 +239,7 @@ typedef struct ScopeInfo ScopeInfo;
 typedef struct SegInfo SegInfo;
 typedef struct SpanInfo SpanInfo;
 typedef struct SymInfo SymInfo;
+typedef struct TypeInfo TypeInfo;
 
 /* Internally used file info struct */
 struct FileInfo {
@@ -327,6 +329,10 @@ struct SpanInfo {
 	unsigned	Id;		/* Id of segment */
 	SegInfo*	Info;		/* Pointer to segment */
     } Seg;
+    union {
+        unsigned        Id;             /* Id of type */
+        TypeInfo*       Info;           /* Pointer to type */
+    } Type;
     Collection*		ScopeInfoList;	/* Scopes for this span */
     Collection*         LineInfoList;   /* Lines for this span */
 };
@@ -358,6 +364,13 @@ struct SymInfo {
     Collection          DefLineInfoList;/* Line info of symbol definition */
     Collection          RefLineInfoList;/* Line info of symbol references */
     char                Name[1];        /* Name of symbol */
+};
+
+/* Internally used type info struct */
+struct TypeInfo {
+    unsigned            Id;             /* Id of type */
+    unsigned            Length;         /* Length of following data */
+    unsigned char       Data[1];        /* Data, dynamically allocated */
 };
 
 
@@ -1485,6 +1498,11 @@ static void CopySpanInfo (cc65_spandata* D, const SpanInfo* S)
     D->span_start       = S->Start;
     D->span_end         = S->End;
     D->segment_id       = S->Seg.Info->Id;
+    if (S->Type.Info) {
+        D->type_id      = S->Type.Info->Id;
+    } else {
+        D->type_id      = CC65_INV_ID;
+    }
     if (S->ScopeInfoList) {
         D->scope_count  = CollCount (S->ScopeInfoList);
     } else {
@@ -1635,6 +1653,62 @@ static int CompareSymInfoByVal (const void* L, const void* R)
     } else {
         return CompareSymInfoByName (L, R);
     }
+}
+
+
+
+/*****************************************************************************/
+/*                                 Type info                                 */
+/*****************************************************************************/
+
+
+
+static unsigned HexValue (char C)
+/* Convert the ascii representation of a hex nibble into the hex nibble */
+{
+    if (isdigit (C)) {
+        return C - '0';
+    } else if (islower (C)) {
+        return C - 'a' + 10;
+    } else {
+        return C - 'A' + 10;
+    }
+}
+
+
+
+static TypeInfo* NewTypeInfo (const StrBuf* ReadableValue)
+/* Create a new TypeInfo struct, intialize and return it */
+{
+    unsigned I;
+    const char* P;
+
+    /* Calculate the length of the final data. Since we have hex encoding, it
+     * is half of the length of ReadableValue.
+     */
+    unsigned Length = SB_GetLen (ReadableValue) / 2;
+
+    /* Allocate memory */
+    TypeInfo* T = xmalloc (sizeof (TypeInfo) + Length - 1);
+
+    /* Initialize it as necessary */
+    T->Length = Length;
+    P = SB_GetConstBuf (ReadableValue);
+    for (I = 0; I < Length; ++I) {
+        unsigned char V = (HexValue (*P++) << 4);
+        T->Data[I] = (V | HexValue (*P++));
+    }
+
+    /* Return it */
+    return T;
+}
+
+
+
+static void FreeTypeInfo (TypeInfo* T)
+/* Free a TypeInfo struct */
+{
+    xfree (T);
 }
 
 
@@ -1854,6 +1928,7 @@ static DbgInfo* NewDbgInfo (const char* FileName)
     CollInit (&Info->SegInfoById);
     CollInit (&Info->SpanInfoById);
     CollInit (&Info->SymInfoById);
+    CollInit (&Info->TypeInfoById);
 
     CollInit (&Info->FileInfoByName);
     CollInit (&Info->ModInfoByName);
@@ -1905,6 +1980,9 @@ static void FreeDbgInfo (DbgInfo* Info)
     for (I = 0; I < CollCount (&Info->SymInfoById); ++I) {
         FreeSymInfo (CollAt (&Info->SymInfoById, I));
     }
+    for (I = 0; I < CollCount (&Info->TypeInfoById); ++I) {
+        FreeTypeInfo (CollAt (&Info->TypeInfoById, I));
+    }
 
     /* Free the memory used by the id collections */
     CollDone (&Info->FileInfoById);
@@ -1915,6 +1993,7 @@ static void FreeDbgInfo (DbgInfo* Info)
     CollDone (&Info->SegInfoById);
     CollDone (&Info->SpanInfoById);
     CollDone (&Info->SymInfoById);
+    CollDone (&Info->TypeInfoById);
 
     /* Free the memory used by the other collections */
     CollDone (&Info->FileInfoByName);
@@ -2471,7 +2550,8 @@ static void ParseInfo (InputData* D)
         if (D->Tok != TOK_FILE  && D->Tok != TOK_LIBRARY        &&
             D->Tok != TOK_LINE  && D->Tok != TOK_MODULE         &&
             D->Tok != TOK_SCOPE && D->Tok != TOK_SEGMENT        &&
-            D->Tok != TOK_SPAN  && D->Tok != TOK_SYM) {
+            D->Tok != TOK_SPAN  && D->Tok != TOK_SYM            &&
+            D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2534,6 +2614,10 @@ static void ParseInfo (InputData* D)
                 CollGrow (&D->Info->SymInfoById,   D->IVal);
                 CollGrow (&D->Info->SymInfoByName, D->IVal);
 		CollGrow (&D->Info->SymInfoByVal,  D->IVal);
+                break;
+
+            case TOK_TYPE:
+                CollGrow (&D->Info->TypeInfoById,  D->IVal);
                 break;
 
             default:
@@ -3351,7 +3435,7 @@ static void ParseSpan (InputData* D)
     cc65_addr       Start = 0;
     cc65_addr       Size = 0;
     unsigned	    SegId = CC65_INV_ID;
-    StrBuf          Type = STRBUF_INITIALIZER;
+    unsigned        TypeId = CC65_INV_ID;
     SpanInfo*       S;
     enum {
         ibNone      = 0x000,
@@ -3434,13 +3518,12 @@ static void ParseSpan (InputData* D)
                 break;
 
             case TOK_TYPE:
-                if (!StrConstFollows (D)) {
+                if (!IntConstFollows (D)) {
                     goto ErrorExit;
                 }
-                SB_Copy (&Type, &D->SVal);
-                SB_Terminate (&Type);
-                InfoBits |= ibType;
+                TypeId = D->IVal;
                 NextToken (D);
+                InfoBits |= ibType;
                 break;
 
             default:
@@ -3472,15 +3555,15 @@ static void ParseSpan (InputData* D)
 
     /* Create the span info and remember it */
     S = NewSpanInfo ();
-    S->Id     = Id;
-    S->Seg.Id = SegId;
-    S->Start  = Start;
-    S->End    = Start + Size - 1;
+    S->Id       = Id;
+    S->Start    = Start;
+    S->End      = Start + Size - 1;
+    S->Seg.Id   = SegId;
+    S->Type.Id  = TypeId;
     CollReplaceExpand (&D->Info->SpanInfoById, S, Id);
 
 ErrorExit:
     /* Entry point in case of errors */
-    SB_Done (&Type);
     return;
 }
 
@@ -3750,6 +3833,122 @@ ErrorExit:
     CollDone (&DefLineIds);
     CollDone (&RefLineIds);
     SB_Done (&Name);
+    return;
+}
+
+
+
+static void ParseType (InputData* D)
+/* Parse a TYPE line */
+{
+    /* Most of the following variables are initialized with a value that is
+     * overwritten later. This is just to avoid compiler warnings.
+     */
+    unsigned            Id = CC65_INV_ID;
+    StrBuf              Value = STRBUF_INITIALIZER;
+
+    TypeInfo*           T;
+    enum {
+        ibNone          = 0x0000,
+
+        ibId            = 0x01,
+        ibValue         = 0x02,
+
+        ibRequired      = ibId | ibValue,
+    } InfoBits = ibNone;
+
+    /* Skip the SYM token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_ID    && D->Tok != TOK_VALUE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                NextToken (D);
+                InfoBits |= ibId;
+                break;
+
+            case TOK_VALUE:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&Value, &D->SVal);
+                InfoBits |= ibValue;
+                NextToken (D);
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required and/or matched information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+
+    /* Check Value */
+    if (SB_GetLen (&Value) < 2 || (SB_GetLen (&Value) & 0x01) != 0) {
+        ParseError (D, CC65_ERROR, "Invalid type value");
+        goto ErrorExit;
+    }
+
+    /* Create the type info */
+    T = NewTypeInfo (&Value);
+    T->Id       = Id;
+
+    /* Remember it */
+    CollReplaceExpand (&D->Info->TypeInfoById, T, Id);
+
+ErrorExit:
+    /* Entry point in case of errors */
+    SB_Done (&Value);
     return;
 }
 
@@ -4458,6 +4657,19 @@ static void ProcessSpanInfo (InputData* D)
             S->End   += S->Seg.Info->Start;
         }
 
+        /* Resolve the type if we have it */
+        if (S->Type.Id == CC65_INV_ID) {
+            S->Type.Info = 0;
+        } else if (S->Type.Id >= CollCount (&D->Info->TypeInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid type id %u for span with id %u",
+                        S->Type.Id, S->Id);
+            S->Type.Info = 0;
+        } else {
+            S->Type.Info = CollAt (&D->Info->TypeInfoById, S->Type.Id);
+        }
+
         /* Append this span info to the temporary collection that is later
          * sorted by address.
          */
@@ -4770,6 +4982,10 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
 
             case TOK_SYM:
                 ParseSym (&D);
+                break;
+
+            case TOK_TYPE:
+                ParseType (&D);
                 break;
 
             case TOK_IDENT:

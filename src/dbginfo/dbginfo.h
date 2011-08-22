@@ -270,6 +270,7 @@ struct cc65_spandata {
     cc65_addr           span_start;     /* Start of the span */
     cc65_addr           span_end;       /* End of the span (inclusive!) */
     unsigned            segment_id;     /* Id of the segment */
+    unsigned            type_id;        /* Id of the type of this span */
     unsigned            line_count;     /* Number of lines attached */
     unsigned            scope_count;    /* Number of scopes attached */
 };

@@ -177,6 +177,26 @@ const LineInfo* GetAsmLineInfo (const Collection* LineInfos)
 
 
 
+unsigned LineInfoCount (void)
+/* Return the total number of line infos */
+{
+    /* Walk over all object files */
+    unsigned I;
+    unsigned Count = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get this object file */
+        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Count spans */
+        Count += CollCount (&O->LineInfos);
+    }
+
+    return Count;
+}
+
+
+
 void AssignLineInfoIds (void)
 /* Assign the ids to the line infos */
 {

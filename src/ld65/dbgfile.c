@@ -47,7 +47,7 @@
 #include "lineinfo.h"
 #include "scopes.h"
 #include "segments.h"
-#include "span.h"     
+#include "span.h"
 #include "tpool.h"
 
 
@@ -115,9 +115,10 @@ void CreateDbgFile (void)
      */
     fprintf (
         F,
-        "info\tfile=%u,lib=%u,mod=%u,scope=%u,seg=%u,span=%u,type=%u\n",
+        "info\tfile=%u,lib=%u,line=%u,mod=%u,scope=%u,seg=%u,span=%u,type=%u\n",
         FileInfoCount (),
         LibraryCount (),
+        LineInfoCount (),
         ObjDataCount (),
         ScopeCount (),
         SegmentCount (),
@@ -128,8 +129,14 @@ void CreateDbgFile (void)
     /* Assign the ids to the items */
     AssignIds ();
 
+    /* Output files */
+    PrintDbgFileInfo (F);
+
     /* Output libraries */
     PrintDbgLibraries (F);
+
+    /* Output line info */
+    PrintDbgLineInfo (F);
 
     /* Output modules */
     PrintDbgModules (F);
@@ -137,23 +144,17 @@ void CreateDbgFile (void)
     /* Output the segment info */
     PrintDbgSegments (F);
 
-    /* Output files */
-    PrintDbgFileInfo (F);
-
-    /* Output line info */
-    PrintDbgLineInfo (F);
-
     /* Output spans */
     PrintDbgSpans (F);
-                    
-    /* Output types */
-    PrintDbgTypes (F);
+
+    /* Output scopes */
+    PrintDbgScopes (F);
 
     /* Output symbols */
     PrintDbgSyms (F);
 
-    /* Output scopes */
-    PrintDbgScopes (F);
+    /* Output types */
+    PrintDbgTypes (F);
 
     /* Close the file */
     if (fclose (F) != 0) {

@@ -171,6 +171,9 @@ INLINE unsigned GetSourceLineFromList (const Collection* LineInfos)
         GetSourceLine ((const LineInfo*) CollConstAt ((LineInfos), 0))
 #endif
 
+unsigned LineInfoCount (void);
+/* Return the total number of line infos */
+
 void AssignLineInfoIds (void);
 /* Assign the ids to the line infos */
 

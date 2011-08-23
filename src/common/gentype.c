@@ -54,7 +54,7 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize)
     unsigned SizeBytes;
 
     /* Remember the current position */
-    char* A = SB_GetBuf (Type) + SB_GetLen (Type);
+    unsigned Pos = SB_GetLen (Type);
 
     /* Add a dummy array token */
     SB_AppendChar (Type, GT_TYPE_ARRAY);
@@ -68,7 +68,7 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize)
     } while (ArraySize);
 
     /* Write the correct array token */
-    *A = GT_ARRAY (SizeBytes);
+    SB_GetBuf (Type)[Pos] = GT_ARRAY (SizeBytes);
 }
 
 

@@ -50,16 +50,24 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize)
  * NOT add the element type!
  */
 {
-    unsigned I;
+    unsigned SizeBytes;
 
-    /* Add the array token */
+    /* Remember the current position */
+    char* A = SB_GetBuf (Type) + SB_GetLen (Type);
+
+    /* Add a dummy array token */
     SB_AppendChar (Type, GT_TYPE_ARRAY);
 
     /* Add the size. */
-    for (I = 0; I < 4; ++I) {
+    SizeBytes = 0;
+    do {
         SB_AppendChar (Type, ArraySize & 0xFF);
         ArraySize >>= 8;
-    }
+        ++SizeBytes;
+    } while (ArraySize);
+
+    /* Write the correct array token */
+    *A = GT_ARRAY (SizeBytes);
 }
 
 
@@ -69,11 +77,18 @@ unsigned GT_GetArraySize (StrBuf* Type)
  * The index position will get moved past the array size.
  */
 {
-    unsigned Size;
-    Size  = (unsigned)SB_Get (Type);
-    Size |= (unsigned)SB_Get (Type) << 8;
-    Size |= (unsigned)SB_Get (Type) << 16;
-    Size |= (unsigned)SB_Get (Type) << 24;
+    /* Get the number of bytes for the element count */
+    unsigned SizeBytes = GT_GET_SIZE (SB_Get (Type));
+
+    /* Read the size */
+    unsigned Size = 0;
+    const char* Buf = SB_GetConstBuf (Type) + SB_GetLen (Type);
+    while (SizeBytes--) {
+        Size <<= 8;
+        Size |= Buf[SizeBytes];
+    }
+
+    /* Return it */
     return Size;
 }
 
@@ -100,7 +115,7 @@ const char* GT_AsString (const StrBuf* Type, StrBuf* String)
     }
 
     /* Terminate the string so it can be used with string functions */
-    SB_Terminate (String);                                  
+    SB_Terminate (String);
 
     /* Return the contents of String */
     return SB_GetConstBuf (String);

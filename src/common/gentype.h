@@ -89,10 +89,7 @@
 #define GT_IS_LITTLE_ENDIAN(x)  (((x) & GT_BYTEORDER_MASK) == GT_LITTLE_ENDIAN)
 #define GT_IS_BIG_ENDIAN(x)     (((x) & GT_BYTEORDER_MASK) == GT_BIG_ENDIAN)
 
-/* Type of the data. Since we want to have zero as a terminator, we must
- * introduce one thing that cannot be zero for normal data. This is the
- * type.
- */
+/* Type of the data. */
 #define GT_TYPE_INT             0x20U
 #define GT_TYPE_PTR             0x40U
 #define GT_TYPE_FLOAT           0x60U
@@ -117,6 +114,7 @@
 #define GT_DBYTE        (GT_TYPE_PTR | GT_BIG_ENDIAN    | GT_UNSIGNED | GT_SIZE_2)
 #define GT_PTR          (GT_TYPE_PTR | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
 #define GT_FAR_PTR      (GT_TYPE_PTR | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_3)
+#define GT_ARRAY(size)  (GT_TYPE_ARRAY | ((size) - 1))
 
 
 
@@ -133,7 +131,9 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize);
 
 unsigned GT_GetArraySize (StrBuf* Type);
 /* Retrieve the size of an array stored in Type at the current index position.
- * The index position will get moved past the array size.
+ * Note: Index must point to the array token itself, since the size of the
+ * element count is encoded there. The index position will get moved past the
+ * array.
  */
 
 const char* GT_AsString (const StrBuf* Type, StrBuf* String);

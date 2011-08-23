@@ -299,13 +299,15 @@ static void ConDes (const StrBuf* Name, unsigned Type)
 
 
 static StrBuf* GenArrayType (StrBuf* Type, unsigned SpanSize,
-                             unsigned char ElementType)
+                             const char* ElementType,
+                             unsigned ElementTypeLen)
 /* Create an array (or single data) of the given type. SpanSize is the size
- * of the span, Type is the element data type. The function returns Type.
+ * of the span, ElementType is a string that encodes the element data type.
+ * The function returns Type.
  */
 {
     /* Get the size of the element type */
-    unsigned ElementSize = GT_GET_SIZE (ElementType);
+    unsigned ElementSize = GT_GET_SIZE (ElementType[0]);
 
     /* Get the number of array elements */
     unsigned ElementCount = SpanSize / ElementSize;
@@ -313,17 +315,9 @@ static StrBuf* GenArrayType (StrBuf* Type, unsigned SpanSize,
     /* The span size must be divideable by the element size */
     CHECK ((SpanSize % ElementSize) == 0);
 
-    /* Encoding an array needs 6 bytes. So if the array count is less, it
-     * is cheaper to build the array with single items.
-     */
-    if (ElementCount >= 6) {
-        GT_AddArray (Type, ElementCount);
-        SB_AppendChar (Type, ElementType);
-    } else {
-        while (ElementCount--) {
-            SB_AppendChar (Type, ElementType);
-        }
-    }          
+    /* Encode the array */
+    GT_AddArray (Type, ElementCount);
+    SB_AppendBuf (Type, ElementType, ElementTypeLen);
 
     /* Return the pointer to the created array type */
     return Type;
@@ -366,6 +360,9 @@ static void DoA8 (void)
 static void DoAddr (void)
 /* Define addresses */
 {
+    /* Element type for the generated array */
+    static const char EType[2] = { GT_PTR, GT_VOID };
+
     /* Record type information */
     Span* S = OpenSpan ();
     StrBuf Type = STATIC_STRBUF_INITIALIZER;
@@ -387,9 +384,9 @@ static void DoAddr (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_PTR));
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
 
-    /* Free the type string */
+    /* Free the strings */
     SB_Done (&Type);
 }
 
@@ -579,6 +576,9 @@ static void DoBss (void)
 static void DoByte (void)
 /* Define bytes */
 {
+    /* Element type for the generated array */
+    static const char EType[1] = { GT_BYTE };
+
     /* Record type information */
     Span* S = OpenSpan ();
     StrBuf Type = STATIC_STRBUF_INITIALIZER;
@@ -607,7 +607,7 @@ static void DoByte (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_BYTE));
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
 
     /* Free the type string */
     SB_Done (&Type);
@@ -785,6 +785,9 @@ static void DoDbg (void)
 static void DoDByt (void)
 /* Output double bytes */
 {
+    /* Element type for the generated array */
+    static const char EType[1] = { GT_DBYTE };
+
     /* Record type information */
     Span* S = OpenSpan ();
     StrBuf Type = STATIC_STRBUF_INITIALIZER;
@@ -801,7 +804,7 @@ static void DoDByt (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_DBYTE));
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
 
     /* Free the type string */
     SB_Done (&Type);
@@ -956,6 +959,9 @@ static void DoExportZP (void)
 static void DoFarAddr (void)
 /* Define far addresses (24 bit) */
 {
+    /* Element type for the generated array */
+    static const char EType[2] = { GT_FAR_PTR, GT_VOID };
+
     /* Record type information */
     Span* S = OpenSpan ();
     StrBuf Type = STATIC_STRBUF_INITIALIZER;
@@ -972,7 +978,7 @@ static void DoFarAddr (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_FAR_PTR));
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
 
     /* Free the type string */
     SB_Done (&Type);
@@ -1924,6 +1930,9 @@ static void DoWarning (void)
 static void DoWord (void)
 /* Define words */
 {
+    /* Element type for the generated array */
+    static const char EType[1] = { GT_WORD };
+
     /* Record type information */
     Span* S = OpenSpan ();
     StrBuf Type = STATIC_STRBUF_INITIALIZER;
@@ -1940,7 +1949,7 @@ static void DoWord (void)
 
     /* Close the span, then add type information to it */
     S = CloseSpan (S);
-    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), GT_WORD));
+    SetSpanType (S, GenArrayType (&Type, GetSpanSize (S), EType, sizeof (EType)));
 
     /* Free the type string */
     SB_Done (&Type);

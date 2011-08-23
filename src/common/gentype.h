@@ -74,22 +74,26 @@
 #define GT_SIZE_3               0x02U
 #define GT_SIZE_4               0x03U
 #define GT_SIZE_MASK            0x07U
+
 #define GT_GET_SIZE(x)          (((x) & GT_SIZE_MASK) + 1U)
 
 /* Sign of the data type */
 #define GT_UNSIGNED             0x00U
 #define GT_SIGNED               0x08U
 #define GT_SIGN_MASK            0x08U
+
 #define GT_HAS_SIGN(x)          (((x) & GT_SIZE_MASK) == GT_SIGNED)
 
 /* Byte order */
 #define GT_LITTLE_ENDIAN        0x00U
 #define GT_BIG_ENDIAN           0x10U
 #define GT_BYTEORDER_MASK       0x10U
+
 #define GT_IS_LITTLE_ENDIAN(x)  (((x) & GT_BYTEORDER_MASK) == GT_LITTLE_ENDIAN)
 #define GT_IS_BIG_ENDIAN(x)     (((x) & GT_BYTEORDER_MASK) == GT_BIG_ENDIAN)
 
 /* Type of the data. */
+#define GT_TYPE_VOID            0x00U
 #define GT_TYPE_INT             0x20U
 #define GT_TYPE_PTR             0x40U
 #define GT_TYPE_FLOAT           0x60U
@@ -98,6 +102,7 @@
 #define GT_TYPE_STRUCT          0xC0U
 #define GT_TYPE_UNION           0xE0U
 #define GT_TYPE_MASK            0xE0U
+
 #define GT_GET_TYPE(x)          ((x) & GT_TYPE_MASK)
 #define GT_IS_INTEGER(x)        (GT_GET_TYPE(x) == GT_TYPE_INTEGER)
 #define GT_IS_POINTER(x)        (GT_GET_TYPE(x) == GT_TYPE_POINTER)
@@ -108,6 +113,7 @@
 #define GT_IS_UNION(x)          (GT_GET_TYPE(x) == GT_TYPE_UNION)
 
 /* Combined values for the 6502 family */
+#define GT_VOID         (GT_TYPE_VOID)
 #define GT_BYTE         (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_1)
 #define GT_WORD         (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
 #define GT_DWORD        (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_4)
@@ -129,11 +135,11 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize);
  * NOT add the element type!
  */
 
-unsigned GT_GetArraySize (StrBuf* Type);
-/* Retrieve the size of an array stored in Type at the current index position.
- * Note: Index must point to the array token itself, since the size of the
- * element count is encoded there. The index position will get moved past the
- * array.
+unsigned GT_GetElementCount (StrBuf* Type);
+/* Retrieve the element count of an array stored in Type at the current index
+ * position. Note: Index must point to the array token itself, since the size
+ * of the element count is encoded there. The index position will get moved
+ * past the array.
  */
 
 const char* GT_AsString (const StrBuf* Type, StrBuf* String);

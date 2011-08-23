@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "check.h"
 #include "gentype.h"
 #include "strbuf.h"
 
@@ -72,9 +73,11 @@ void GT_AddArray (StrBuf* Type, unsigned ArraySize)
 
 
 
-unsigned GT_GetArraySize (StrBuf* Type)
-/* Retrieve the size of an array stored in Type at the current index position.
- * The index position will get moved past the array size.
+unsigned GT_GetElementCount (StrBuf* Type)
+/* Retrieve the element count of an array stored in Type at the current index
+ * position. Note: Index must point to the array token itself, since the size
+ * of the element count is encoded there. The index position will get moved
+ * past the array.
  */
 {
     /* Get the number of bytes for the element count */
@@ -120,9 +123,6 @@ const char* GT_AsString (const StrBuf* Type, StrBuf* String)
     /* Return the contents of String */
     return SB_GetConstBuf (String);
 }
-
-
-
 
 
 

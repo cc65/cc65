@@ -360,6 +360,74 @@ void cc65_free_sourceinfo (cc65_dbginfo handle, const cc65_sourceinfo* info);
 
 
 /*****************************************************************************/
+/*                                  Scopes                                   */
+/*****************************************************************************/
+
+
+
+/* Scope information */
+typedef enum {
+    CC65_SCOPE_GLOBAL,                  /* Global scope */
+    CC65_SCOPE_MODULE,                  /* Module scope */
+    CC65_SCOPE_SCOPE,                   /* .PROC/.SCOPE */
+    CC65_SCOPE_STRUCT,                  /* .STRUCT */
+    CC65_SCOPE_ENUM,                    /* .ENUM */
+} cc65_scope_type;
+
+typedef struct cc65_scopedata cc65_scopedata;
+struct cc65_scopedata {
+    unsigned            scope_id;       /* Id of scope */
+    const char*         scope_name;     /* Name of scope */
+    cc65_scope_type     scope_type;     /* Type of scope */
+    cc65_size           scope_size;     /* Size of scope, 0 if unknown */
+    unsigned            parent_id;      /* Id of parent scope */
+    unsigned            symbol_id;      /* Id of scope symbol if any */
+    unsigned            module_id;      /* Id of the module */
+};
+
+typedef struct cc65_scopeinfo cc65_scopeinfo;
+struct cc65_scopeinfo {
+    unsigned            count;          /* Number of data sets that follow */
+    cc65_scopedata      data[1];        /* Data sets, number is dynamic */
+};
+
+
+
+const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo handle);
+/* Return a list of all scopes in the debug information */
+
+const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo handle, unsigned id);
+/* Return the scope with a given id. The function returns NULL if no scope
+ * with this id was found.
+ */
+
+const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo handle, unsigned module_id);
+/* Return the list of scopes for one module. The function returns NULL if no
+ * scope with the given id was found.
+ */
+
+const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo handle, const char* name);
+/* Return the list of scopes with a given name. Returns NULL if no scope with
+ * the given name was found, otherwise a non empty scope list.
+ */
+
+const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo handle, unsigned span_id);
+/* Return scope information for a a span. The function returns NULL if the
+ * span id is invalid, otherwise a list of line scopes.
+ */
+
+const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo handle, unsigned id);
+/* Return the direct child scopes of a scope with a given id. The function
+ * returns NULL if no scope with this id was found, otherwise a list of the
+ * direct childs.
+ */
+
+void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info);
+/* Free a scope info record */
+
+
+
+/*****************************************************************************/
 /*                                 Segments                                  */
 /*****************************************************************************/
 
@@ -484,76 +552,74 @@ const cc65_symbolinfo* cc65_symbol_inrange (cc65_dbginfo handle,
  * symbols are ignored and not returned.
  */
 
-void cc65_free_symbolinfo (cc65_dbginfo Handle, const cc65_symbolinfo* Info);
+void cc65_free_symbolinfo (cc65_dbginfo handle, const cc65_symbolinfo* info);
 /* Free a symbol info record */
 
 
 
 /*****************************************************************************/
-/*                                  Scopes                                   */
+/*                                   Types                                   */
 /*****************************************************************************/
 
 
 
-/* Scope information */
+/* Type information */
 typedef enum {
-    CC65_SCOPE_GLOBAL,                  /* Global scope */
-    CC65_SCOPE_MODULE,                  /* Module scope */
-    CC65_SCOPE_SCOPE,                   /* .PROC/.SCOPE */
-    CC65_SCOPE_STRUCT,                  /* .STRUCT */
-    CC65_SCOPE_ENUM,                    /* .ENUM */
-} cc65_scope_type;
+    CC65_TYPE_VOID,
+    CC65_TYPE_BYTE,
+    CC65_TYPE_WORD,
+    CC65_TYPE_DBYTE,
+    CC65_TYPE_DWORD,
+    CC65_TYPE_PTR,
+    CC65_TYPE_FARPTR,
+    CC65_TYPE_ARRAY,
 
-typedef struct cc65_scopedata cc65_scopedata;
-struct cc65_scopedata {
-    unsigned            scope_id;       /* Id of scope */
-    const char*         scope_name;     /* Name of scope */
-    cc65_scope_type     scope_type;     /* Type of scope */
-    cc65_size           scope_size;     /* Size of scope, 0 if unknown */
-    unsigned            parent_id;      /* Id of parent scope */
-    unsigned            symbol_id;      /* Id of scope symbol if any */
-    unsigned            module_id;      /* Id of the module */
+    /* The following ones are currently unavailable: */
+    CC65_TYPE_UNION,
+    CC65_TYPE_STRUCT,
+    CC65_TYPE_FUNC,
+} cc65_typetoken;
+
+
+/* A type is a linked list of typedata structures. In case of arrays, the
+ * structure will contain an element count and the element type. In case of
+ * pointers, the structure will contain the type of the data, the pointer
+ * points to (currently, there are only VOID pointers).
+ * The next pointer points to the next entry in the list. It is NULL if the
+ * end of the list is reached.
+ */
+typedef struct cc65_typedata cc65_typedata;
+struct cc65_typedata {
+    cc65_typedata*                next;         /* Pointer to next entry */
+    cc65_typetoken                what;         /* What kind of type is it? */
+    cc65_size                     size;         /* The size of the data */
+
+    /* Depending on "what", one of the members of this union follows */
+    union {
+
+        /* In case of CC65_TYPE_PTR or CC65_TYPE_FARPTR */
+        struct {
+            cc65_typedata*        ind_type;     /* Type the pointer points to */
+        } ptr;
+
+        /* In case of CC65_TYPE_ARRAY */
+        struct {
+            cc65_size             ele_count;    /* Element count */
+            const cc65_typedata*  ele_type;     /* Element type */
+        } array;
+
+    } data;
 };
 
-typedef struct cc65_scopeinfo cc65_scopeinfo;
-struct cc65_scopeinfo {
-    unsigned            count;          /* Number of data sets that follow */
-    cc65_scopedata      data[1];        /* Data sets, number is dynamic */
-};
 
 
-
-const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo handle);
-/* Return a list of all scopes in the debug information */
-
-const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo handle, unsigned id);
-/* Return the scope with a given id. The function returns NULL if no scope
- * with this id was found.
+const cc65_typedata* cc65_type_byid (cc65_dbginfo handle, unsigned id);
+/* Return the data for the type with the given id. The function returns NULL
+ * if no type with this id was found.
  */
 
-const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo handle, unsigned module_id);
-/* Return the list of scopes for one module. The function returns NULL if no
- * scope with the given id was found.
- */
-
-const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo handle, const char* name);
-/* Return the list of scopes with a given name. Returns NULL if no scope with
- * the given name was found, otherwise a non empty scope list.
- */
-
-const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo handle, unsigned span_id);
-/* Return scope information for a a span. The function returns NULL if the
- * span id is invalid, otherwise a list of line scopes.
- */
-
-const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo handle, unsigned id);
-/* Return the direct child scopes of a scope with a given id. The function
- * returns NULL if no scope with this id was found, otherwise a list of the
- * direct childs.
- */
-
-void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info);
-/* Free a scope info record */
+void cc65_free_typedata (cc65_dbginfo Handle, const cc65_typedata* data);
+/* Free a symbol info record */
 
 
 

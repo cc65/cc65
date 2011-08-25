@@ -171,8 +171,6 @@ typedef enum {
     TOK_IDENT,                          /* To catch unknown keywords */
 } Token;
 
-
-
 /* Data structure containing information from the debug info file. A pointer
  * to this structure is passed as handle to callers from the outside.
  */
@@ -369,8 +367,21 @@ struct SymInfo {
 /* Internally used type info struct */
 struct TypeInfo {
     unsigned            Id;             /* Id of type */
-    unsigned            Length;         /* Length of following data */
-    unsigned char       Data[1];        /* Data, dynamically allocated */
+    cc65_typedata       Data[1];        /* Data, dynamically allocated */
+};
+
+/* A structure used when parsing a type string into a set of cc65_typedata
+ * structures.
+ */
+typedef struct TypeParseData TypeParseData;
+struct TypeParseData {
+    TypeInfo*           Info;
+    unsigned            ItemCount;
+    unsigned            ItemIndex;
+    cc65_typedata*      ItemData;
+    const StrBuf*       Type;
+    unsigned            Pos;
+    unsigned            Error;
 };
 
 
@@ -525,10 +536,27 @@ static unsigned SB_GetLen (const StrBuf* B)
 
 
 
+static char* SB_GetBuf (StrBuf* B)
+/* Return a buffer pointer */
+{
+    return B->Buf;
+}
+
+
+
 static const char* SB_GetConstBuf (const StrBuf* B)
 /* Return a buffer pointer */
 {
     return B->Buf;
+}
+
+
+
+static char SB_At (const StrBuf* B, unsigned Pos)
+/* Return the character from a specific position */
+{
+    assert (Pos <= B->Len);
+    return B->Buf[Pos];
 }
 
 
@@ -998,6 +1026,112 @@ static void DBGPRINT(const char* format, ...) {}
 #endif
 
 #endif
+
+
+
+/*****************************************************************************/
+/*                             Helper functions                              */
+/*****************************************************************************/
+
+
+
+static unsigned HexValue (char C)
+/* Convert the ascii representation of a hex nibble into the hex nibble */
+{
+    if (isdigit (C)) {
+        return C - '0';
+    } else if (islower (C)) {
+        return C - 'a' + 10;
+    } else {
+        return C - 'A' + 10;
+    }
+}
+
+
+
+static void ParseError (InputData* D, cc65_error_severity Type, const char* Msg, ...)
+/* Call the user supplied parse error function */
+{
+    va_list             ap;
+    int                 MsgSize;
+    cc65_parseerror*    E;
+
+    /* Test-format the error message so we know how much space to allocate */
+    va_start (ap, Msg);
+    MsgSize = vsnprintf (0, 0, Msg, ap);
+    va_end (ap);
+
+    /* Allocate memory */
+    E = xmalloc (sizeof (*E) + MsgSize);
+
+    /* Write data to E */
+    E->type   = Type;
+    E->name   = D->FileName;
+    E->line   = D->SLine;
+    E->column = D->SCol;
+    va_start (ap, Msg);
+    vsnprintf (E->errormsg, MsgSize+1, Msg, ap);
+    va_end (ap);
+
+    /* Call the caller:-) */
+    D->Error (E);
+
+    /* Free the data structure */
+    xfree (E);
+
+    /* Count errors */
+    if (Type == CC65_ERROR) {
+        ++D->Errors;
+    }
+}
+
+
+
+static void SkipLine (InputData* D)
+/* Error recovery routine. Skip tokens until EOL or EOF is reached */
+{
+    while (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        NextToken (D);
+    }
+}
+
+
+
+static void UnexpectedToken (InputData* D)
+/* Call ParseError with a message about an unexpected input token */
+{
+    ParseError (D, CC65_ERROR, "Unexpected input token %d", D->Tok);
+    SkipLine (D);
+}
+
+
+
+static void UnknownKeyword (InputData* D)
+/* Print a warning about an unknown keyword in the file. Try to do smart
+ * recovery, so if later versions of the debug information add additional
+ * keywords, this code may be able to at least ignore them.
+ */
+{
+    /* Output a warning */
+    ParseError (D, CC65_WARNING, "Unknown keyword \"%s\" - skipping",
+                SB_GetConstBuf (&D->SVal));
+
+    /* Skip the identifier */
+    NextToken (D);
+
+    /* If an equal sign follows, ignore anything up to the next line end
+     * or comma. If a comma or line end follows, we're already done. If
+     * we have none of both, we ignore the remainder of the line.
+     */
+    if (D->Tok == TOK_EQUAL) {
+        NextToken (D);
+        while (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+            NextToken (D);
+        }
+    } else if (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        SkipLine (D);
+    }
+}
 
 
 
@@ -1663,45 +1797,61 @@ static int CompareSymInfoByVal (const void* L, const void* R)
 
 
 
-static unsigned HexValue (char C)
-/* Convert the ascii representation of a hex nibble into the hex nibble */
-{
-    if (isdigit (C)) {
-        return C - '0';
-    } else if (islower (C)) {
-        return C - 'a' + 10;
-    } else {
-        return C - 'A' + 10;
-    }
-}
+/* The following definitions are actually just taken from gentype.h */
 
+/* Size of a data type */
+#define GT_SIZE_1               0x00U
+#define GT_SIZE_2               0x01U
+#define GT_SIZE_3               0x02U
+#define GT_SIZE_4               0x03U
+#define GT_SIZE_MASK            0x07U
 
+#define GT_GET_SIZE(x)          (((x) & GT_SIZE_MASK) + 1U)
 
-static TypeInfo* NewTypeInfo (const StrBuf* ReadableValue)
-/* Create a new TypeInfo struct, intialize and return it */
-{
-    unsigned I;
-    const char* P;
+/* Sign of the data type */
+#define GT_UNSIGNED             0x00U
+#define GT_SIGNED               0x08U
+#define GT_SIGN_MASK            0x08U
 
-    /* Calculate the length of the final data. Since we have hex encoding, it
-     * is half of the length of ReadableValue.
-     */
-    unsigned Length = SB_GetLen (ReadableValue) / 2;
+#define GT_HAS_SIGN(x)          (((x) & GT_SIZE_MASK) == GT_SIGNED)
 
-    /* Allocate memory */
-    TypeInfo* T = xmalloc (sizeof (TypeInfo) + Length - 1);
+/* Byte order */
+#define GT_LITTLE_ENDIAN        0x00U
+#define GT_BIG_ENDIAN           0x10U
+#define GT_BYTEORDER_MASK       0x10U
 
-    /* Initialize it as necessary */
-    T->Length = Length;
-    P = SB_GetConstBuf (ReadableValue);
-    for (I = 0; I < Length; ++I) {
-        unsigned char V = (HexValue (*P++) << 4);
-        T->Data[I] = (V | HexValue (*P++));
-    }
+#define GT_IS_LITTLE_ENDIAN(x)  (((x) & GT_BYTEORDER_MASK) == GT_LITTLE_ENDIAN)
+#define GT_IS_BIG_ENDIAN(x)     (((x) & GT_BYTEORDER_MASK) == GT_BIG_ENDIAN)
 
-    /* Return it */
-    return T;
-}
+/* Type of the data. */
+#define GT_TYPE_VOID            0x00U
+#define GT_TYPE_INT             0x20U
+#define GT_TYPE_PTR             0x40U
+#define GT_TYPE_FLOAT           0x60U
+#define GT_TYPE_ARRAY           0x80U
+#define GT_TYPE_FUNC            0xA0U
+#define GT_TYPE_STRUCT          0xC0U
+#define GT_TYPE_UNION           0xE0U
+#define GT_TYPE_MASK            0xE0U
+
+#define GT_GET_TYPE(x)          ((x) & GT_TYPE_MASK)
+#define GT_IS_INTEGER(x)        (GT_GET_TYPE(x) == GT_TYPE_INTEGER)
+#define GT_IS_POINTER(x)        (GT_GET_TYPE(x) == GT_TYPE_POINTER)
+#define GT_IS_FLOAT(x)          (GT_GET_TYPE(x) == GT_TYPE_FLOAT)
+#define GT_IS_ARRAY(x)          (GT_GET_TYPE(x) == GT_TYPE_ARRAY)
+#define GT_IS_FUNCTION(x)       (GT_GET_TYPE(x) == GT_TYPE_FUNCTION)
+#define GT_IS_STRUCT(x)         (GT_GET_TYPE(x) == GT_TYPE_STRUCT)
+#define GT_IS_UNION(x)          (GT_GET_TYPE(x) == GT_TYPE_UNION)
+
+/* Combined values for the 6502 family */
+#define GT_VOID         (GT_TYPE_VOID)
+#define GT_BYTE         (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_1)
+#define GT_WORD         (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
+#define GT_DWORD        (GT_TYPE_INT | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_4)
+#define GT_DBYTE        (GT_TYPE_PTR | GT_BIG_ENDIAN    | GT_UNSIGNED | GT_SIZE_2)
+#define GT_PTR          (GT_TYPE_PTR | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_2)
+#define GT_FAR_PTR      (GT_TYPE_PTR | GT_LITTLE_ENDIAN | GT_UNSIGNED | GT_SIZE_3)
+#define GT_ARRAY(size)  (GT_TYPE_ARRAY | ((size) - 1))
 
 
 
@@ -1709,6 +1859,221 @@ static void FreeTypeInfo (TypeInfo* T)
 /* Free a TypeInfo struct */
 {
     xfree (T);
+}
+
+
+
+static void InitTypeParseData (TypeParseData* P, const StrBuf* Type,
+                               unsigned ItemCount)
+/* Initialize a TypeParseData structure */
+{
+    P->Info      = xmalloc (sizeof (*P->Info) - sizeof (P->Info->Data[0]) +
+                            ItemCount * sizeof (P->Info->Data[0]));
+    P->ItemCount = ItemCount;
+    P->ItemIndex = 0;
+    P->ItemData  = P->Info->Data;
+    P->Type      = Type;
+    P->Pos       = 0;
+    P->Error     = 0;
+}
+
+
+
+static cc65_typedata* TypeFromString (TypeParseData* P)
+/* Parse a type string and return a set of typedata structures. Will be called
+ * recursively. Will set P->Error and return NULL in case of problems.
+ */
+{
+    unsigned char B;
+    unsigned      I;
+    unsigned      Count;
+
+    /* Allocate a new entry */
+    if (P->ItemIndex >= P->ItemCount) {
+        P->Error = 1;
+        return 0;
+    }
+    cc65_typedata* Data = &P->ItemData[P->ItemIndex++];
+
+    /* Assume no following node */
+    Data->next = 0;
+
+    /* Get the next char, then skip it */
+    if (P->Pos >= SB_GetLen (P->Type)) {
+        P->Error = 1;
+        return 0;
+    }
+    B = SB_At (P->Type, P->Pos++);
+
+    switch (B) {
+
+        /* We only handle those that are currently in use */
+        case GT_VOID:
+            Data->what = CC65_TYPE_VOID;
+            Data->size = 0;
+            break;
+
+        case GT_BYTE:
+            Data->what = CC65_TYPE_BYTE;
+            Data->size = GT_GET_SIZE (B);
+            break;
+
+        case GT_WORD:
+            Data->what = CC65_TYPE_WORD;
+            Data->size = GT_GET_SIZE (B);
+            break;
+
+        case GT_DWORD:
+            Data->what = CC65_TYPE_DWORD;
+            Data->size = GT_GET_SIZE (B);
+            break;
+
+        case GT_DBYTE:
+            Data->what = CC65_TYPE_DBYTE;
+            Data->size = GT_GET_SIZE (B);
+            break;
+
+        case GT_PTR:
+            Data->what = CC65_TYPE_PTR;
+            Data->data.ptr.ind_type = TypeFromString (P);
+            Data->size = GT_GET_SIZE (B);
+            break;
+
+        case GT_FAR_PTR:
+            Data->what = CC65_TYPE_FARPTR;
+            Data->data.ptr.ind_type = TypeFromString (P);
+            Data->size = GT_GET_SIZE (B);
+            break;
+
+        default:
+            if (GT_GET_TYPE (B) == GT_TYPE_ARRAY) {
+                Count = 0;
+                I = GT_GET_SIZE (B);
+                if (I == 0 || I > 4) {
+                    P->Error = 1;
+                    break;
+                }
+                P->Pos += I;
+                if (P->Pos > SB_GetLen (P->Type)) {
+                    P->Error = 1;
+                    break;
+                }
+                while (I) {
+                    Count <<= 8;
+                    Count |= (unsigned char)  SB_At (P->Type, P->Pos - I);
+                    --I;
+                }
+                Data->what = CC65_TYPE_ARRAY;
+                Data->data.array.ele_count = Count;
+                Data->data.array.ele_type = TypeFromString (P);
+                if (!P->Error) {
+                    Data->size = Data->data.array.ele_count *
+                                 Data->data.array.ele_type->size;
+                }
+            } else {
+                /* OOPS! */
+                P->Error = 1;
+            }
+            break;
+    }
+
+    /* Return our structure or NULL in case of errors */
+    return P->Error? 0 : Data;
+}
+
+
+
+
+static TypeInfo* ParseTypeString (InputData* D, StrBuf* Type)
+/* Check if the string T contains a valid type string. Convert it from readable
+ * to binary. Calculate how many cc65_typedata structures are necessary when it
+ * is converted. Convert the string into a set of cc65_typedata structures and
+ * return them.
+ */
+{
+    unsigned        I;
+    unsigned        Count;
+    const char*     A;
+    char*           B;
+    TypeParseData   P;
+
+
+    /* The length must not be zero and divideable by two */
+    unsigned Length = SB_GetLen (Type);
+    if (Length < 2 || (Length & 0x01) != 0) {
+        ParseError (D, CC65_ERROR, "Type value has invalid length");
+        return 0;
+    }
+
+    /* The string must consist completely of hex digit chars */
+    A = SB_GetConstBuf (Type);
+    for (I = 0; I < Length; ++I) {
+        if (!isxdigit (A[I])) {
+            ParseError (D, CC65_ERROR, "Type value contains invalid characters");
+            return 0;
+        }
+    }
+
+    /* Convert the type to binary */
+    B = SB_GetBuf (Type);
+    while (A < SB_GetConstBuf (Type) + Length) {
+        /* Since we know, there are only hex digits, there can't be any errors */
+        *B++ = (HexValue (A[0]) << 4) | HexValue (A[1]);
+        A += 2;
+    }
+    Type->Len = (Length /= 2);
+
+    /* Get a pointer to the type data, then count the number of cc65_typedata
+     * items needed.
+     */
+    A = SB_GetConstBuf (Type);
+    Count = 0;
+    I = 0;
+    while (I < Length) {
+        switch (A[I]) {
+            /* We only handle those that are currently in use */
+            case GT_VOID:
+            case GT_BYTE:
+            case GT_WORD:
+            case GT_DWORD:
+            case GT_DBYTE:
+            case GT_PTR:
+            case GT_FAR_PTR:
+                ++Count;
+                ++I;
+                break;
+
+            default:
+                if (GT_GET_TYPE (A[I]) == GT_TYPE_ARRAY) {
+                    ++Count;
+                    I += GT_GET_SIZE (A[I]) + 1;
+                } else {
+                    /* Unknown type in type string */
+                    ParseError (D, CC65_ERROR, "Unkown type in type value");
+                    return 0;
+                }
+                break;
+        }
+    }
+
+    /* Check that we're even */
+    if (I != Length) {
+        ParseError (D, CC65_ERROR, "Syntax error in type in type value");
+        return 0;
+    }
+
+    /* Initialize the data structure for parsing the type string */
+    InitTypeParseData (&P, Type, Count);
+
+    /* Parse the type string and check for errors */
+    if (TypeFromString (&P) == 0 || P.ItemCount != P.ItemIndex) {
+        ParseError (D, CC65_ERROR, "Error parsing the type value");
+        FreeTypeInfo (P.Info);
+        return 0;
+    }
+
+    /* Return the result of the parse operation */
+    return P.Info;
 }
 
 
@@ -2008,98 +2373,6 @@ static void FreeDbgInfo (DbgInfo* Info)
 
     /* Free the structure itself */
     xfree (Info);
-}
-
-
-
-/*****************************************************************************/
-/*                             Helper functions                              */
-/*****************************************************************************/
-
-
-
-static void ParseError (InputData* D, cc65_error_severity Type, const char* Msg, ...)
-/* Call the user supplied parse error function */
-{
-    va_list             ap;
-    int                 MsgSize;
-    cc65_parseerror*    E;
-
-    /* Test-format the error message so we know how much space to allocate */
-    va_start (ap, Msg);
-    MsgSize = vsnprintf (0, 0, Msg, ap);
-    va_end (ap);
-
-    /* Allocate memory */
-    E = xmalloc (sizeof (*E) + MsgSize);
-
-    /* Write data to E */
-    E->type   = Type;
-    E->name   = D->FileName;
-    E->line   = D->SLine;
-    E->column = D->SCol;
-    va_start (ap, Msg);
-    vsnprintf (E->errormsg, MsgSize+1, Msg, ap);
-    va_end (ap);
-
-    /* Call the caller:-) */
-    D->Error (E);
-
-    /* Free the data structure */
-    xfree (E);
-
-    /* Count errors */
-    if (Type == CC65_ERROR) {
-        ++D->Errors;
-    }
-}
-
-
-
-static void SkipLine (InputData* D)
-/* Error recovery routine. Skip tokens until EOL or EOF is reached */
-{
-    while (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
-        NextToken (D);
-    }
-}
-
-
-
-static void UnexpectedToken (InputData* D)
-/* Call ParseError with a message about an unexpected input token */
-{
-    ParseError (D, CC65_ERROR, "Unexpected input token %d", D->Tok);
-    SkipLine (D);
-}
-
-
-
-static void UnknownKeyword (InputData* D)
-/* Print a warning about an unknown keyword in the file. Try to do smart
- * recovery, so if later versions of the debug information add additional
- * keywords, this code may be able to at least ignore them.
- */
-{
-    /* Output a warning */
-    ParseError (D, CC65_WARNING, "Unknown keyword \"%s\" - skipping",
-                SB_GetConstBuf (&D->SVal));
-
-    /* Skip the identifier */
-    NextToken (D);
-
-    /* If an equal sign follows, ignore anything up to the next line end
-     * or comma. If a comma or line end follows, we're already done. If
-     * we have none of both, we ignore the remainder of the line.
-     */
-    if (D->Tok == TOK_EQUAL) {
-        NextToken (D);
-        while (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
-            NextToken (D);
-        }
-    } else if (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
-        SkipLine (D);
-    }
 }
 
 
@@ -3933,14 +4206,11 @@ static void ParseType (InputData* D)
         goto ErrorExit;
     }
 
-    /* Check Value */
-    if (SB_GetLen (&Value) < 2 || (SB_GetLen (&Value) & 0x01) != 0) {
-        ParseError (D, CC65_ERROR, "Invalid type value");
+    /* Parse the type string to create the type info */
+    T = ParseTypeString (D, &Value);
+    if (T == 0) {
         goto ErrorExit;
     }
-
-    /* Create the type info */
-    T = NewTypeInfo (&Value);
     T->Id       = Id;
 
     /* Remember it */
@@ -5786,6 +6056,255 @@ void cc65_free_sourceinfo (cc65_dbginfo Handle, const cc65_sourceinfo* Info)
 
 
 /*****************************************************************************/
+/*                                  Scopes                                   */
+/*****************************************************************************/
+
+
+
+const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo Handle)
+/* Return a list of all scopes in the debug information */
+{
+    const DbgInfo*      Info;
+    cc65_scopeinfo*     D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (CollCount (&Info->ScopeInfoById));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&Info->ScopeInfoById); ++I) {
+        /* Copy the data */
+        CopyScopeInfo (D->data + I, CollAt (&Info->ScopeInfoById, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return the scope with a given id. The function returns NULL if no scope
+ * with this id was found.
+ */
+{
+    const DbgInfo*      Info;
+    cc65_scopeinfo*     D;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the id is valid */
+    if (Id >= CollCount (&Info->ScopeInfoById)) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (1);
+
+    /* Fill in the data */
+    CopyScopeInfo (D->data, CollAt (&Info->ScopeInfoById, Id));
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
+/* Return the list of scopes for one module. The function returns NULL if no
+ * scope with the given id was found.
+ */
+{
+    const DbgInfo*      Info;
+    const ModInfo*      M;
+    cc65_scopeinfo*     D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the module id is valid */
+    if (ModId >= CollCount (&Info->ModInfoById)) {
+        return 0;
+    }
+
+    /* Get a pointer to the module info */
+    M = CollAt (&Info->ModInfoById, ModId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (CollCount (&M->ScopeInfoByName));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&M->ScopeInfoByName); ++I) {
+        CopyScopeInfo (D->data + I, CollAt (&M->ScopeInfoByName, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
+/* Return the list of scopes with a given name. Returns NULL if no scope with
+ * the given name was found, otherwise a non empty scope list.
+ */
+{
+    const DbgInfo*      Info;
+    unsigned            Index;
+    const ScopeInfo*    S;
+    cc65_scopeinfo*     D;
+    unsigned            Count;
+    unsigned            I;
+
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Search for the first item with the given name */
+    if (!FindScopeInfoByName (&Info->ScopeInfoByName, Name, &Index)) {
+        /* Not found */
+        return 0;
+    }
+
+    /* Count scopes with this name */
+    Count = 1;
+    I = Index;
+    while (1) {
+        if (++I >= CollCount (&Info->ScopeInfoByName)) {
+            break;
+        }
+        S = CollAt (&Info->ScopeInfoByName, I);
+        if (strcmp (S->Name, Name) != 0) {
+            /* Next symbol has another name */
+            break;
+        }
+        ++Count;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (Count);
+
+    /* Fill in the data */
+    for (I = 0; I < Count; ++I, ++Index) {
+        CopyScopeInfo (D->data + I, CollAt (&Info->ScopeInfoByName, Index));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
+/* Return scope information for a a span. The function returns NULL if the
+ * span id is invalid, otherwise a list of line scopes.
+ */
+{
+    const DbgInfo*      Info;
+    const SpanInfo*     S;
+    cc65_scopeinfo*     D;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the span id is valid */
+    if (SpanId >= CollCount (&Info->SpanInfoById)) {
+        return 0;
+    }
+
+    /* Get the span */
+    S = CollAt (&Info->SpanInfoById, SpanId);
+
+    /* Prepare the struct we will return to the caller */
+    D = new_cc65_scopeinfo (S->ScopeInfoList? CollCount (S->ScopeInfoList) : 0);
+
+    /* Fill in the data. Since D->ScopeInfoList may be NULL, we will use the
+     * count field of the returned data struct instead.
+     */
+    for (I = 0; I < D->count; ++I) {
+        /* Copy the data */
+        CopyScopeInfo (D->data + I, CollAt (S->ScopeInfoList, I));
+    }
+
+    /* Return the allocated struct */
+    return D;
+}
+
+
+
+const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return the direct child scopes of a scope with a given id. The function
+ * returns NULL if no scope with this id was found, otherwise a list of the
+ * direct childs.
+ */
+{
+    const DbgInfo*      Info;
+    cc65_scopeinfo*     D;
+    const ScopeInfo*    S;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the id is valid */
+    if (Id >= CollCount (&Info->ScopeInfoById)) {
+        return 0;
+    }
+
+    /* Get the scope */
+    S = CollAt (&Info->ScopeInfoById, Id);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_scopeinfo (S->ChildScopeList? CollCount (S->ChildScopeList) : 0);
+
+    /* Fill in the data */
+    for (I = 0; I < D->count; ++I) {
+        CopyScopeInfo (D->data + I, CollAt (S->ChildScopeList, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info)
+/* Free a scope info record */
+{
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
+
+    /* Free the memory */
+    xfree ((cc65_scopeinfo*) Info);
+}
+
+
+
+/*****************************************************************************/
 /*                                 Segments                                  */
 /*****************************************************************************/
 
@@ -6114,46 +6633,18 @@ void cc65_free_symbolinfo (cc65_dbginfo Handle, const cc65_symbolinfo* Info)
 
 
 /*****************************************************************************/
-/*                                  Scopes                                   */
+/*                                   Types                                   */
 /*****************************************************************************/
 
 
 
-const cc65_scopeinfo* cc65_get_scopelist (cc65_dbginfo Handle)
-/* Return a list of all scopes in the debug information */
-{
-    const DbgInfo*      Info;
-    cc65_scopeinfo*     D;
-    unsigned            I;
-
-    /* Check the parameter */
-    assert (Handle != 0);
-
-    /* The handle is actually a pointer to a debug info struct */
-    Info = Handle;
-
-    /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_scopeinfo (CollCount (&Info->ScopeInfoById));
-
-    /* Fill in the data */
-    for (I = 0; I < CollCount (&Info->ScopeInfoById); ++I) {
-        /* Copy the data */
-        CopyScopeInfo (D->data + I, CollAt (&Info->ScopeInfoById, I));
-    }
-
-    /* Return the result */
-    return D;
-}
-
-
-
-const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return the scope with a given id. The function returns NULL if no scope
- * with this id was found.
+const cc65_typedata* cc65_type_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return the data for the type with the given id. The function returns NULL
+ * if no type with this id was found.
  */
 {
-    const DbgInfo*      Info;
-    cc65_scopeinfo*     D;
+    const DbgInfo*        Info;
+    const TypeInfo*       T;
 
     /* Check the parameter */
     assert (Handle != 0);
@@ -6162,204 +6653,27 @@ const cc65_scopeinfo* cc65_scope_byid (cc65_dbginfo Handle, unsigned Id)
     Info = Handle;
 
     /* Check if the id is valid */
-    if (Id >= CollCount (&Info->ScopeInfoById)) {
+    if (Id >= CollCount (&Info->TypeInfoById)) {
         return 0;
     }
 
-    /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_scopeinfo (1);
+    /* Get the type info with the given id */
+    T = CollAt (&Info->TypeInfoById, Id);
 
-    /* Fill in the data */
-    CopyScopeInfo (D->data, CollAt (&Info->ScopeInfoById, Id));
-
-    /* Return the result */
-    return D;
+    /* We do already have the type data. Return it. */
+    return T->Data;
 }
 
 
 
-const cc65_scopeinfo* cc65_scope_bymodule (cc65_dbginfo Handle, unsigned ModId)
-/* Return the list of scopes for one module. The function returns NULL if no
- * scope with the given id was found.
- */
+void cc65_free_typedata (cc65_dbginfo Handle, const cc65_typedata* data)
+/* Free a symbol info record */
 {
-    const DbgInfo*      Info;
-    const ModInfo*      M;
-    cc65_scopeinfo*     D;
-    unsigned            I;
+    /* Just for completeness, check the handle and the data*/
+    assert (Handle != 0 && data != 0);
 
-    /* Check the parameter */
-    assert (Handle != 0);
-
-    /* The handle is actually a pointer to a debug info struct */
-    Info = Handle;
-
-    /* Check if the module id is valid */
-    if (ModId >= CollCount (&Info->ModInfoById)) {
-        return 0;
-    }
-
-    /* Get a pointer to the module info */
-    M = CollAt (&Info->ModInfoById, ModId);
-
-    /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_scopeinfo (CollCount (&M->ScopeInfoByName));
-
-    /* Fill in the data */
-    for (I = 0; I < CollCount (&M->ScopeInfoByName); ++I) {
-        CopyScopeInfo (D->data + I, CollAt (&M->ScopeInfoByName, I));
-    }
-
-    /* Return the result */
-    return D;
+    /* Nothing to do */
 }
-
-
-
-const cc65_scopeinfo* cc65_scope_byname (cc65_dbginfo Handle, const char* Name)
-/* Return the list of scopes with a given name. Returns NULL if no scope with
- * the given name was found, otherwise a non empty scope list.
- */
-{
-    const DbgInfo*      Info;
-    unsigned            Index;
-    const ScopeInfo*    S;
-    cc65_scopeinfo*     D;
-    unsigned            Count;
-    unsigned            I;
-
-
-    /* Check the parameter */
-    assert (Handle != 0);
-
-    /* The handle is actually a pointer to a debug info struct */
-    Info = Handle;
-
-    /* Search for the first item with the given name */
-    if (!FindScopeInfoByName (&Info->ScopeInfoByName, Name, &Index)) {
-        /* Not found */
-        return 0;
-    }
-
-    /* Count scopes with this name */
-    Count = 1;
-    I = Index;
-    while (1) {
-        if (++I >= CollCount (&Info->ScopeInfoByName)) {
-            break;
-        }
-        S = CollAt (&Info->ScopeInfoByName, I);
-        if (strcmp (S->Name, Name) != 0) {
-            /* Next symbol has another name */
-            break;
-        }
-        ++Count;
-    }
-
-    /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_scopeinfo (Count);
-
-    /* Fill in the data */
-    for (I = 0; I < Count; ++I, ++Index) {
-        CopyScopeInfo (D->data + I, CollAt (&Info->ScopeInfoByName, Index));
-    }
-
-    /* Return the result */
-    return D;
-}
-
-
-
-const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
-/* Return scope information for a a span. The function returns NULL if the
- * span id is invalid, otherwise a list of line scopes.
- */
-{
-    const DbgInfo*      Info;
-    const SpanInfo*     S;
-    cc65_scopeinfo*     D;
-    unsigned            I;
-
-    /* Check the parameter */
-    assert (Handle != 0);
-
-    /* The handle is actually a pointer to a debug info struct */
-    Info = Handle;
-
-    /* Check if the span id is valid */
-    if (SpanId >= CollCount (&Info->SpanInfoById)) {
-        return 0;
-    }
-
-    /* Get the span */
-    S = CollAt (&Info->SpanInfoById, SpanId);
-
-    /* Prepare the struct we will return to the caller */
-    D = new_cc65_scopeinfo (S->ScopeInfoList? CollCount (S->ScopeInfoList) : 0);
-
-    /* Fill in the data. Since D->ScopeInfoList may be NULL, we will use the
-     * count field of the returned data struct instead.
-     */
-    for (I = 0; I < D->count; ++I) {
-        /* Copy the data */
-        CopyScopeInfo (D->data + I, CollAt (S->ScopeInfoList, I));
-    }
-
-    /* Return the allocated struct */
-    return D;
-}
-
-
-
-const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
-/* Return the direct child scopes of a scope with a given id. The function
- * returns NULL if no scope with this id was found, otherwise a list of the
- * direct childs.
- */
-{
-    const DbgInfo*      Info;
-    cc65_scopeinfo*     D;
-    const ScopeInfo*    S;
-    unsigned            I;
-
-    /* Check the parameter */
-    assert (Handle != 0);
-
-    /* The handle is actually a pointer to a debug info struct */
-    Info = Handle;
-
-    /* Check if the id is valid */
-    if (Id >= CollCount (&Info->ScopeInfoById)) {
-        return 0;
-    }
-
-    /* Get the scope */
-    S = CollAt (&Info->ScopeInfoById, Id);
-
-    /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_scopeinfo (S->ChildScopeList? CollCount (S->ChildScopeList) : 0);
-
-    /* Fill in the data */
-    for (I = 0; I < D->count; ++I) {
-        CopyScopeInfo (D->data + I, CollAt (S->ChildScopeList, I));
-    }
-
-    /* Return the result */
-    return D;
-}
-
-
-
-void cc65_free_scopeinfo (cc65_dbginfo Handle, const cc65_scopeinfo* Info)
-/* Free a scope info record */
-{
-    /* Just for completeness, check the handle */
-    assert (Handle != 0);
-
-    /* Free the memory */
-    xfree ((cc65_scopeinfo*) Info);
-}
-
 
 
 

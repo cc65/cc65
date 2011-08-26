@@ -599,7 +599,7 @@ struct cc65_typedata {
 
         /* In case of CC65_TYPE_PTR or CC65_TYPE_FARPTR */
         struct {
-            cc65_typedata*        ind_type;     /* Type the pointer points to */
+            const cc65_typedata*  ind_type;     /* Type the pointer points to */
         } ptr;
 
         /* In case of CC65_TYPE_ARRAY */
@@ -624,7 +624,7 @@ void cc65_free_typedata (cc65_dbginfo Handle, const cc65_typedata* data);
 
 
 /* Allow usage from C++ */
-#ifdef __cplusplus
+#ifdef __cplusplus     
 }
 #endif
 

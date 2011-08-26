@@ -93,6 +93,9 @@ static void CmdShowSegment (Collection* Args);
 static void CmdShowSource (Collection* Args);
 /* Show source files from the debug info file */
 
+static void CmdShowSpan (Collection* Args);
+/* Show spans from the debug info file */
+
 static void CmdShowSymbol (Collection* Args);
 /* Show symbols */
 
@@ -217,6 +220,11 @@ static const CmdEntry ShowCmds[] = {
         "Show sources. May be followed by one or more source file ids.",
         -1,
         CmdShowSource
+    }, {
+        "span",
+        "Show spans. May be followed by one or more span ids.",
+        -1,
+        CmdShowSpan
     }, {
         "symbol",
         "Show symbols. May be followed by one or more symbol or scope ids.",
@@ -689,6 +697,37 @@ static void PrintSources (const cc65_sourceinfo* S)
 
 
 
+static void PrintSpanHeader (void)
+/* Output a header for a list of spans */
+{
+    /* Header */
+    PrintLine ("  id    start     end      seg  type  lines  scopes");
+    PrintSeparator ();
+}
+
+
+
+static void PrintSpans (const cc65_spaninfo* S)
+/* Output a list of spans */
+{
+    unsigned I;
+    const cc65_spandata* D;
+
+    /* Segments */
+    for (I = 0, D = S->data; I < S->count; ++I, ++D) {
+        PrintId (D->span_id, 7);
+        PrintAddr (D->span_start, 8);
+        PrintAddr (D->span_end, 8);
+        PrintId (D->segment_id, 7);
+        PrintId (D->type_id, 7);
+        PrintNumber (D->line_count, 7, 9);
+        PrintNumber (D->scope_count, 7, 9);
+        NewLine ();
+    }
+}
+
+
+
 static void PrintSymbolHeader (void)
 /* Output a header for a list of symbols */
 {
@@ -708,7 +747,7 @@ static void PrintSymbols (const cc65_symbolinfo* S)
     /* Segments */
     for (I = 0, D = S->data; I < S->count; ++I, ++D) {
         PrintId (D->symbol_id, 6);
-        Print ("%-24s", D->symbol_name);      
+        Print ("%-24s", D->symbol_name);
         PrintNumber (D->symbol_type, 4, 6);
         PrintNumber (D->symbol_size, 4, 6);
         PrintNumber (D->symbol_value, 5, 7);
@@ -1241,6 +1280,58 @@ static void CmdShowSource (Collection* Args)
                 PrintSources (S);
                 cc65_free_sourceinfo (Info, S);
             }
+        }
+    }
+}
+
+
+
+static void CmdShowSpan (Collection* Args)
+/* Show spans from the debug info file */
+{
+    const cc65_spaninfo* S;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintSpanHeader ();
+
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = SpanId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+                case LineId:
+                    S = cc65_span_byline (Info, Id);
+                    break;
+
+                case ScopeId:
+                    S = cc65_span_byscope (Info, Id);
+                    break;
+                case SpanId:
+                    S = cc65_span_byid (Info, Id);
+                    break;
+                default:
+                    S = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* Ignore the invalid id */
+            S = 0;
+        }
+
+        /* Output the list */
+        if (S) {
+            PrintSpans (S);
+            cc65_free_spaninfo (Info, S);
         }
     }
 }

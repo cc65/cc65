@@ -368,7 +368,7 @@ static void EmitDebugInfo (void)
     const SymTable* Tab = Desc->SymTab;
 
     /* Output info for the function itself */
-    AddTextLine ("\t.dbg\tfunc, \"%s\", %s, \"%s\"", 
+    AddTextLine ("\t.dbg\tfunc, \"%s\", \"\", %s, \"%s\"",
                  Sym->Name,
                  (Sym->Flags & SC_EXTERN)? "extern" : "static",
                  Sym->AsmName);
@@ -378,14 +378,14 @@ static void EmitDebugInfo (void)
     while (Sym) {
         if ((Sym->Flags & (SC_CONST|SC_TYPE)) == 0) {
             if (Sym->Flags & SC_AUTO) {
-                AddTextLine ("\t.dbg\tsym, \"%s\", auto, %d",
+                AddTextLine ("\t.dbg\tsym, \"%s\", \"\", auto, %d",
                              Sym->Name, Sym->V.Offs);
             } else if (Sym->Flags & SC_REGISTER) {
-                AddTextLine ("\t.dbg\tsym, \"%s\", register, %d",
+                AddTextLine ("\t.dbg\tsym, \"%s\", \"\", register, %d",
                              Sym->Name, Sym->V.R.RegOffs);
 
             } else {
-                AddTextLine ("\t.dbg\tsym, \"%s\", %s, \"%s\"",
+                AddTextLine ("\t.dbg\tsym, \"%s\", \"\", %s, \"%s\"",
                              Sym->Name,
                              (Sym->Flags & SC_EXTERN)? "extern" : "static",
                              Sym->AsmName);

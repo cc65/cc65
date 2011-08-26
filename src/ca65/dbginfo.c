@@ -112,9 +112,10 @@ void DbgInfoFunc (void)
      	"STATIC",
     };
 
-    StrBuf        Name = STATIC_STRBUF_INITIALIZER;
-    StrBuf        AsmName = STATIC_STRBUF_INITIALIZER;
-    int           StorageClass;
+    StrBuf      Name = STATIC_STRBUF_INITIALIZER;
+    StrBuf      Type = STATIC_STRBUF_INITIALIZER;
+    StrBuf      AsmName = STATIC_STRBUF_INITIALIZER;
+    int         StorageClass;
 
 
     /* Parameters are separated by a comma */
@@ -126,6 +127,17 @@ void DbgInfoFunc (void)
        	return;
     }
     SB_Copy (&Name, &CurTok.SVal);
+    NextTok ();
+
+    /* Comma expected */
+    ConsumeComma ();
+
+    /* Type */
+    if (CurTok.Tok != TOK_STRCON) {
+       	ErrorSkip ("String constant expected");
+       	return;
+    }
+    SB_Copy (&Type, &CurTok.SVal);
     NextTok ();
 
     /* Comma expected */
@@ -156,6 +168,7 @@ void DbgInfoFunc (void)
 
     /* Free memory used for the strings */
     SB_Done (&AsmName);
+    SB_Done (&Type);
     SB_Done (&Name);
 }
 
@@ -222,10 +235,11 @@ void DbgInfoSym (void)
      	"STATIC",
     };
 
-    StrBuf        Name = STATIC_STRBUF_INITIALIZER;
-    StrBuf        AsmName = STATIC_STRBUF_INITIALIZER;
-    int           StorageClass;
-    int           Offs;
+    StrBuf      Name = STATIC_STRBUF_INITIALIZER;
+    StrBuf      Type = STATIC_STRBUF_INITIALIZER;
+    StrBuf      AsmName = STATIC_STRBUF_INITIALIZER;
+    int         StorageClass;
+    int         Offs;
 
 
     /* Parameters are separated by a comma */
@@ -237,6 +251,17 @@ void DbgInfoSym (void)
        	return;
     }
     SB_Copy (&Name, &CurTok.SVal);
+    NextTok ();
+
+    /* Comma expected */
+    ConsumeComma ();
+
+    /* Type */
+    if (CurTok.Tok != TOK_STRCON) {
+       	ErrorSkip ("String constant expected");
+       	return;
+    }
+    SB_Copy (&Type, &CurTok.SVal);
     NextTok ();
 
     /* Comma expected */
@@ -276,6 +301,7 @@ void DbgInfoSym (void)
 
     /* Free memory used for the strings */
     SB_Done (&AsmName);
+    SB_Done (&Type);
     SB_Done (&Name);
 }
 

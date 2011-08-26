@@ -1884,16 +1884,17 @@ static cc65_typedata* TypeFromString (TypeParseData* P)
  * recursively. Will set P->Error and return NULL in case of problems.
  */
 {
-    unsigned char B;
-    unsigned      I;
-    unsigned      Count;
+    cc65_typedata*  Data;
+    unsigned char   B;
+    unsigned        I;
+    unsigned        Count;
 
     /* Allocate a new entry */
     if (P->ItemIndex >= P->ItemCount) {
         P->Error = 1;
         return 0;
     }
-    cc65_typedata* Data = &P->ItemData[P->ItemIndex++];
+    Data = &P->ItemData[P->ItemIndex++];
 
     /* Assume no following node */
     Data->next = 0;

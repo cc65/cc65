@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -47,7 +47,6 @@
 #include "litpool.h"
 #include "locals.h"
 #include "scanner.h"
-#include "segments.h"
 #include "stackptr.h"
 #include "standard.h"
 #include "stmt.h"
@@ -74,7 +73,7 @@ typedef enum {
 struct Function {
     struct SymEntry*   	FuncEntry;  	/* Symbol table entry */
     Type*     		ReturnType; 	/* Function return type */
-    struct FuncDesc*	Desc;	    	/* Function descriptor */
+    FuncDesc*  	        Desc;	    	/* Function descriptor */
     int	      		Reserved;   	/* Reserved local space */
     unsigned  	  	RetLab;	    	/* Return code label */
     int	      		TopLevelSP;	/* SP at function top level */
@@ -360,8 +359,46 @@ static void F_RestoreRegVars (Function* F)
 
 
 
+static void EmitDebugInfo (void)
+/* Emit debug infos for the current function */
+{
+    /* Fetch stuff for the current fuction */
+    const SymEntry* Sym = CurrentFunc->FuncEntry;
+    const FuncDesc* Desc = CurrentFunc->Desc;
+    const SymTable* Tab = Desc->SymTab;
+
+    /* Output info for the function itself */
+    AddTextLine ("\t.dbg\tfunc, \"%s\", %s, \"%s\"", 
+                 Sym->Name,
+                 (Sym->Flags & SC_EXTERN)? "extern" : "static",
+                 Sym->AsmName);
+
+    /* Output info for locals */
+    Sym = Tab->SymHead;
+    while (Sym) {
+        if ((Sym->Flags & (SC_CONST|SC_TYPE)) == 0) {
+            if (Sym->Flags & SC_AUTO) {
+                AddTextLine ("\t.dbg\tsym, \"%s\", auto, %d",
+                             Sym->Name, Sym->V.Offs);
+            } else if (Sym->Flags & SC_REGISTER) {
+                AddTextLine ("\t.dbg\tsym, \"%s\", register, %d",
+                             Sym->Name, Sym->V.R.RegOffs);
+
+            } else {
+                AddTextLine ("\t.dbg\tsym, \"%s\", %s, \"%s\"",
+                             Sym->Name,
+                             (Sym->Flags & SC_EXTERN)? "extern" : "static",
+                             Sym->AsmName);
+            }
+        }
+        Sym = Sym->NextSym;
+    }
+}
+
+
+
 /*****************************************************************************/
-/*     	      	  	    	     code	      		 	     */
+/*     	      	   	    	     code	      		 	     */
 /*****************************************************************************/
 
 
@@ -554,6 +591,9 @@ void NewFunc (SymEntry* Func)
 
     /* Emit references to imports/exports */
     EmitExternals ();
+
+    /* Emit function debug info */
+    EmitDebugInfo ();
 
     /* Leave the lexical level */
     LeaveFunctionLevel ();

@@ -753,6 +753,7 @@ static void DoDbg (void)
 {
     static const char* Keys[] = {
        	"FILE",
+        "FUNC",
 	"LINE",
     	"SYM",
     };
@@ -774,8 +775,9 @@ static void DoDbg (void)
     /* Check the key and dispatch to a handler */
     switch (Key) {
 	case 0:     DbgInfoFile ();		break;
-	case 1:	    DbgInfoLine ();		break;
-	case 2:	    DbgInfoSym ();		break;
+        case 1:     DbgInfoFunc ();             break;
+	case 2:     DbgInfoLine ();             break;
+	case 3:	    DbgInfoSym ();		break;
 	default:    ErrorSkip ("Syntax error"); break;
     }
 }

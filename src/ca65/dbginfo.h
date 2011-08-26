@@ -47,6 +47,9 @@
 void DbgInfoFile (void);
 /* Parse and handle FILE subcommand of the .dbg pseudo instruction */
 
+void DbgInfoFunc (void);
+/* Parse and handle FUNC subcommand of the .dbg pseudo instruction */
+
 void DbgInfoLine (void);
 /* Parse and handle LINE subcommand of the .dbg pseudo instruction */
 

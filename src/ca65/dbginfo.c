@@ -104,6 +104,63 @@ void DbgInfoFile (void)
 
 
 
+void DbgInfoFunc (void)
+/* Parse and handle func subcommand of the .dbg pseudo instruction */
+{
+    static const char* StorageKeys[] = {
+       	"EXTERN",
+     	"STATIC",
+    };
+
+    StrBuf        Name = STATIC_STRBUF_INITIALIZER;
+    StrBuf        AsmName = STATIC_STRBUF_INITIALIZER;
+    int           StorageClass;
+
+
+    /* Parameters are separated by a comma */
+    ConsumeComma ();
+
+    /* Name */
+    if (CurTok.Tok != TOK_STRCON) {
+       	ErrorSkip ("String constant expected");
+       	return;
+    }
+    SB_Copy (&Name, &CurTok.SVal);
+    NextTok ();
+
+    /* Comma expected */
+    ConsumeComma ();
+
+    /* The storage class follows */
+    if (CurTok.Tok != TOK_IDENT) {
+       	ErrorSkip ("Storage class specifier expected");
+       	return;
+    }
+    StorageClass = GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]));
+    if (StorageClass < 0) {
+        ErrorSkip ("Storage class specifier expected");
+        return;
+    }
+    NextTok ();
+
+    /* Comma expected */
+    ConsumeComma ();
+
+    /* Assembler name follows */
+    if (CurTok.Tok != TOK_STRCON) {
+        ErrorSkip ("String constant expected");
+        return;
+    }
+    SB_Copy (&AsmName, &CurTok.SVal);
+    NextTok ();
+
+    /* Free memory used for the strings */
+    SB_Done (&AsmName);
+    SB_Done (&Name);
+}
+
+
+
 void DbgInfoLine (void)
 /* Parse and handle LINE subcommand of the .dbg pseudo instruction */
 {
@@ -158,7 +215,68 @@ void DbgInfoLine (void)
 void DbgInfoSym (void)
 /* Parse and handle SYM subcommand of the .dbg pseudo instruction */
 {
-    ErrorSkip ("Not implemented");
+    static const char* StorageKeys[] = {
+        "AUTO",
+       	"EXTERN",
+        "REGISTER",
+     	"STATIC",
+    };
+
+    StrBuf        Name = STATIC_STRBUF_INITIALIZER;
+    StrBuf        AsmName = STATIC_STRBUF_INITIALIZER;
+    int           StorageClass;
+    int           Offs;
+
+
+    /* Parameters are separated by a comma */
+    ConsumeComma ();
+
+    /* Name */
+    if (CurTok.Tok != TOK_STRCON) {
+       	ErrorSkip ("String constant expected");
+       	return;
+    }
+    SB_Copy (&Name, &CurTok.SVal);
+    NextTok ();
+
+    /* Comma expected */
+    ConsumeComma ();
+
+    /* The storage class follows */
+    if (CurTok.Tok != TOK_IDENT) {
+       	ErrorSkip ("Storage class specifier expected");
+       	return;
+    }
+    StorageClass = GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]));
+    if (StorageClass < 0) {
+        ErrorSkip ("Storage class specifier expected");
+        return;
+    }
+
+    /* Skip the storage class token and the following comma */
+    NextTok ();
+    ConsumeComma ();
+
+    /* The next tokens depend on the storage class */
+    if (StorageClass == 0) {
+        /* Auto: Stack offset follows */
+        Offs = ConstExpression ();
+    } else if (StorageClass == 2) {
+        /* Register: Register bank offset follows */
+        Offs = ConstExpression ();
+    } else {
+        /* Extern or static: Assembler name follows */
+        if (CurTok.Tok != TOK_STRCON) {
+            ErrorSkip ("String constant expected");
+            return;
+        }
+        SB_Copy (&AsmName, &CurTok.SVal);
+        NextTok ();
+    }
+
+    /* Free memory used for the strings */
+    SB_Done (&AsmName);
+    SB_Done (&Name);
 }
 
 

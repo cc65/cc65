@@ -701,7 +701,7 @@ static void PrintSpanHeader (void)
 /* Output a header for a list of spans */
 {
     /* Header */
-    PrintLine ("  id    start     end      seg  type  lines  scopes");
+    PrintLine ("  id    start    end     seg   type   lines  scopes");
     PrintSeparator ();
 }
 
@@ -717,11 +717,11 @@ static void PrintSpans (const cc65_spaninfo* S)
     for (I = 0, D = S->data; I < S->count; ++I, ++D) {
         PrintId (D->span_id, 7);
         PrintAddr (D->span_start, 8);
-        PrintAddr (D->span_end, 8);
+        PrintAddr (D->span_end, 9);
         PrintId (D->segment_id, 7);
-        PrintId (D->type_id, 7);
-        PrintNumber (D->line_count, 7, 9);
-        PrintNumber (D->scope_count, 7, 9);
+        PrintId (D->type_id, 6);
+        PrintNumber (D->line_count, 6, 7);
+        PrintNumber (D->scope_count, 7, 0);
         NewLine ();
     }
 }

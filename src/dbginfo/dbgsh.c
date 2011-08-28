@@ -100,10 +100,13 @@ static void CmdShowSymbol (Collection* Args);
 /* Show symbols */
 
 static void CmdShowSymDef (Collection* Args);
-/* Show lines from for a symbol definition */
+/* Show lines from the debug info file */
 
 static void CmdShowSymRef (Collection* Args);
-/* Show lines from for symbol references */
+/* Show lines from the debug info file */
+
+static void CmdShowType (Collection* Args);
+/* Show types from the debug info file */
 
 static void CmdUnload (Collection* Args attribute ((unused)));
 /* Unload a debug info file */
@@ -136,7 +139,8 @@ enum {
     SegmentId,
     SourceId,
     SpanId,
-    SymbolId
+    SymbolId,
+    TypeId
 };
 
 /* Structure that contains a command description */
@@ -151,6 +155,11 @@ struct CmdEntry {
 /* Table with main commands */
 static const CmdEntry MainCmds[] = {
     {
+        "exit",
+        0,
+        1,
+        CmdQuit
+    }, {
         "help",
         "Show available commands",
         1,
@@ -240,6 +249,11 @@ static const CmdEntry ShowCmds[] = {
         "Show where a symbol was referenced. May be followed by one or more symbol ids.",
         -2,
         CmdShowSymRef
+    }, {
+        "type",
+        "Show type information. May be followed by one or more type ids.",
+        -2,
+        CmdShowType
     },
 };
 
@@ -386,7 +400,10 @@ static void PrintHelp (const CmdEntry* Tab, unsigned Count)
 /* Output help for one command table */
 {
     while (Count--) {
-        PrintLine ("%-*s%s", (int) sizeof (Tab->Cmd) + 2, Tab->Cmd, Tab->Help);
+        /* Ignore the commands without help text */
+        if (Tab->Help) {
+            PrintLine ("%-*s%s", (int) sizeof (Tab->Cmd) + 2, Tab->Cmd, Tab->Help);
+        }
         ++Tab;
     }
 }
@@ -418,6 +435,8 @@ static unsigned FindIdType (const char* TypeName)
         {   "span",     SpanId          },
         {   "sym",      SymbolId        },
         {   "symbol",   SymbolId        },
+        {   "t",        TypeId          },
+        {   "type",     TypeId          },
     };
 
     unsigned I;
@@ -757,6 +776,72 @@ static void PrintSymbols (const cc65_symbolinfo* S)
         PrintId (D->parent_id, 0);
         NewLine ();
     }
+}
+
+
+
+static void PrintTypeHeader (void)
+/* Output a header for a list of types */
+{
+    /* Header */
+    PrintLine ("  id  description");
+    PrintSeparator ();
+}
+
+
+
+static void PrintType (unsigned Id, const cc65_typedata* T)
+/* Output one type */
+{
+    /* Output the id */
+    PrintId (Id, 6);
+
+    while (1) {
+        switch (T->what) {
+
+            case CC65_TYPE_VOID:
+                Print ("VOID");
+                goto ExitPoint;
+
+            case CC65_TYPE_BYTE:
+                Print ("BYTE");
+                goto ExitPoint;
+
+            case CC65_TYPE_WORD:
+                Print ("WORD");
+                goto ExitPoint;
+
+            case CC65_TYPE_DBYTE:
+                Print ("DBYTE");
+                goto ExitPoint;
+
+            case CC65_TYPE_DWORD:
+                Print ("DWORD");
+                goto ExitPoint;
+
+            case CC65_TYPE_FARPTR:
+                Print ("FAR ");
+                /* FALLTHROUGH */
+
+            case CC65_TYPE_PTR:
+                Print ("POINTER TO ");
+                T = T->data.ptr.ind_type;
+                break;
+
+            case CC65_TYPE_ARRAY:
+                Print ("ARRAY[%u] OF ", T->data.array.ele_count);
+                T = T->data.array.ele_type;
+                break;
+
+            default:
+                /* Anything else is currently not implemented */
+                Print ("***NOT IMPLEMENTED***");
+                goto ExitPoint;
+        }
+    }
+
+ExitPoint:
+    NewLine ();
 }
 
 
@@ -1339,7 +1424,7 @@ static void CmdShowSpan (Collection* Args)
 
 
 static void CmdShowSymbol (Collection* Args)
-/* Show symbols */
+/* Show symbols from the debug info file */
 {
     const cc65_symbolinfo* S;
     unsigned I;
@@ -1390,7 +1475,7 @@ static void CmdShowSymbol (Collection* Args)
 
 
 static void CmdShowSymDef (Collection* Args)
-/* Show lines from for a symbol definition */
+/* Show symbol definitions from the debug info file */
 {
     const cc65_lineinfo* L;
     unsigned I;
@@ -1437,7 +1522,7 @@ static void CmdShowSymDef (Collection* Args)
 
 
 static void CmdShowSymRef (Collection* Args)
-/* Show lines from for symbol references */
+/* Show symbol references from the debug info file */
 {
     const cc65_lineinfo* L;
     unsigned I;
@@ -1477,6 +1562,63 @@ static void CmdShowSymRef (Collection* Args)
         if (L) {
             PrintLines (L);
             cc65_free_lineinfo (Info, L);
+        }
+    }
+}
+
+
+
+static void CmdShowType (Collection* Args)
+/* Show types from the debug info file */
+{
+    const cc65_typedata* T;
+    const cc65_spaninfo* S;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintTypeHeader ();
+
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = TypeId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+
+                case SpanId:
+                    S = cc65_span_byid (Info, Id);
+                    if (S == 0 || S->count == 0) {
+                        T = 0;
+                        break;
+                    }
+                    Id = S->data[0].type_id;
+                    /* FALLTHROUGH */
+
+                case TypeId:
+                    T = cc65_type_byid (Info, Id);
+                    break;
+
+                default:
+                    T = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* Ignore the invalid id */
+            T = 0;
+        }
+
+        /* Output the list */
+        if (T) {
+            PrintType (Id, T);
+            cc65_free_typedata (Info, T);
         }
     }
 }

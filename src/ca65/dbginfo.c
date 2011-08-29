@@ -36,15 +36,18 @@
 #include <string.h>
 
 /* common */
+#include "coll.h"
+#include "hldbgsym.h"
 #include "strbuf.h"
 
 /* ca65 */
+#include "dbginfo.h"
 #include "error.h"
 #include "expr.h"
 #include "filetab.h"
 #include "lineinfo.h"
 #include "nexttok.h"
-#include "dbginfo.h"
+#include "symtab.h"
 
 
 
@@ -57,11 +60,34 @@
 /* The current line info */
 static LineInfo* CurLineInfo = 0;
 
+/* List of high level language debug symbols */
+static Collection HLDbgSyms = STATIC_COLLECTION_INITIALIZER;
+
 
 
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+static HLDbgSym* NewHLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
+/* Allocate and return a new HLDbgSym structure */
+{
+    /* Allocate memory */
+    HLDbgSym* S = xmalloc (sizeof (*S));
+
+    /* Initialize the fields as necessary */
+    S->Flags    = Flags;
+    S->Name     = Name;
+    S->AsmName  = EMPTY_STRING_ID;
+    S->Offs     = 0;
+    S->Type     = Type;
+    S->ScopeId  = CurrentScope->Id;
+
+    /* Return the result */
+    return S;
+}
 
 
 
@@ -112,10 +138,11 @@ void DbgInfoFunc (void)
      	"STATIC",
     };
 
-    StrBuf      Name = STATIC_STRBUF_INITIALIZER;
-    StrBuf      Type = STATIC_STRBUF_INITIALIZER;
-    StrBuf      AsmName = STATIC_STRBUF_INITIALIZER;
-    int         StorageClass;
+    unsigned    Name;
+    unsigned    Type;
+    unsigned    AsmName;
+    unsigned    Flags;
+    HLDbgSym*   S;
 
 
     /* Parameters are separated by a comma */
@@ -126,7 +153,7 @@ void DbgInfoFunc (void)
        	ErrorSkip ("String constant expected");
        	return;
     }
-    SB_Copy (&Name, &CurTok.SVal);
+    Name = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
     /* Comma expected */
@@ -137,7 +164,7 @@ void DbgInfoFunc (void)
        	ErrorSkip ("String constant expected");
        	return;
     }
-    SB_Copy (&Type, &CurTok.SVal);
+    Type = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
     /* Comma expected */
@@ -148,10 +175,10 @@ void DbgInfoFunc (void)
        	ErrorSkip ("Storage class specifier expected");
        	return;
     }
-    StorageClass = GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]));
-    if (StorageClass < 0) {
-        ErrorSkip ("Storage class specifier expected");
-        return;
+    switch (GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]))) {
+        case 0:   Flags = HL_TYPE_FUNC | HL_SC_EXTERN;              break;
+        case 1:   Flags = HL_TYPE_FUNC | HL_SC_STATIC;              break;
+        default:  ErrorSkip ("Storage class specifier expected");   return;
     }
     NextTok ();
 
@@ -163,13 +190,23 @@ void DbgInfoFunc (void)
         ErrorSkip ("String constant expected");
         return;
     }
-    SB_Copy (&AsmName, &CurTok.SVal);
+    AsmName = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
-    /* Free memory used for the strings */
-    SB_Done (&AsmName);
-    SB_Done (&Type);
-    SB_Done (&Name);
+    /* There may only be one function per scope */
+    if (CurrentScope == RootScope) {
+        ErrorSkip ("Functions may not be used in the root scope");
+        return;
+    } else if (CurrentScope->Flags & ST_EXTFUNC) {
+        ErrorSkip ("Only one function per scope allowed");
+        return;
+    }
+    CurrentScope->Flags |= ST_EXTFUNC;
+
+    /* Add the function */
+    S = NewHLDbgSym (Flags, Name, Type);
+    S->AsmName = AsmName;
+    CollAppend (&HLDbgSyms, S);
 }
 
 
@@ -235,11 +272,12 @@ void DbgInfoSym (void)
      	"STATIC",
     };
 
-    StrBuf      Name = STATIC_STRBUF_INITIALIZER;
-    StrBuf      Type = STATIC_STRBUF_INITIALIZER;
-    StrBuf      AsmName = STATIC_STRBUF_INITIALIZER;
-    int         StorageClass;
+    unsigned    Name;
+    unsigned    Type;
+    unsigned    AsmName = EMPTY_STRING_ID;
+    unsigned    Flags;
     int         Offs;
+    HLDbgSym*   S;                           
 
 
     /* Parameters are separated by a comma */
@@ -250,7 +288,7 @@ void DbgInfoSym (void)
        	ErrorSkip ("String constant expected");
        	return;
     }
-    SB_Copy (&Name, &CurTok.SVal);
+    Name = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
     /* Comma expected */
@@ -261,7 +299,7 @@ void DbgInfoSym (void)
        	ErrorSkip ("String constant expected");
        	return;
     }
-    SB_Copy (&Type, &CurTok.SVal);
+    Type = GetStrBufId (&CurTok.SVal);
     NextTok ();
 
     /* Comma expected */
@@ -272,10 +310,12 @@ void DbgInfoSym (void)
        	ErrorSkip ("Storage class specifier expected");
        	return;
     }
-    StorageClass = GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]));
-    if (StorageClass < 0) {
-        ErrorSkip ("Storage class specifier expected");
-        return;
+    switch (GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]))) {
+        case 0:   Flags = HL_SC_AUTO;                               break;
+        case 1:   Flags = HL_SC_EXTERN;                             break;
+        case 2:   Flags = HL_SC_REG;                                break;
+        case 3:   Flags = HL_SC_STATIC;                             break;
+        default:  ErrorSkip ("Storage class specifier expected");   return;
     }
 
     /* Skip the storage class token and the following comma */
@@ -283,26 +323,30 @@ void DbgInfoSym (void)
     ConsumeComma ();
 
     /* The next tokens depend on the storage class */
-    if (StorageClass == 0) {
+    if (Flags == HL_SC_AUTO) {
         /* Auto: Stack offset follows */
         Offs = ConstExpression ();
-    } else if (StorageClass == 2) {
-        /* Register: Register bank offset follows */
-        Offs = ConstExpression ();
     } else {
-        /* Extern or static: Assembler name follows */
+        /* Register, extern or static: Assembler name follows */
         if (CurTok.Tok != TOK_STRCON) {
             ErrorSkip ("String constant expected");
             return;
         }
-        SB_Copy (&AsmName, &CurTok.SVal);
+        AsmName = GetStrBufId (&CurTok.SVal);
         NextTok ();
+
+        /* For register, an offset follows */
+        if (Flags == HL_SC_REG) {
+            ConsumeComma ();
+            Offs = ConstExpression ();
+        }
     }
 
-    /* Free memory used for the strings */
-    SB_Done (&AsmName);
-    SB_Done (&Type);
-    SB_Done (&Name);
+    /* Add the function */
+    S = NewHLDbgSym (Flags | HL_TYPE_SYM, Name, Type);
+    S->AsmName = AsmName;
+    S->Offs    = Offs;
+    CollAppend (&HLDbgSyms, S);
 }
 
 

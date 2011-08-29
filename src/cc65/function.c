@@ -355,7 +355,7 @@ static void F_RestoreRegVars (Function* F)
     if (!F_HasVoidReturn (F)) {
      	g_restore (CF_CHAR | CF_FORCECHAR);
     }
-}
+}                                                           
 
 
 
@@ -381,7 +381,7 @@ static void EmitDebugInfo (void)
                 AddTextLine ("\t.dbg\tsym, \"%s\", \"\", auto, %d",
                              Sym->Name, Sym->V.Offs);
             } else if (Sym->Flags & SC_REGISTER) {
-                AddTextLine ("\t.dbg\tsym, \"%s\", \"\", register, %d",
+                AddTextLine ("\t.dbg\tsym, \"%s\", \"\", register, \"regbank\", %d",
                              Sym->Name, Sym->V.R.RegOffs);
 
             } else {

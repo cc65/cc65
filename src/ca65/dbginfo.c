@@ -37,7 +37,7 @@
 
 /* common */
 #include "coll.h"
-#include "hldbgsym.h"
+#include "hlldbgsym.h"
 #include "strbuf.h"
 
 /* ca65 */
@@ -63,7 +63,7 @@
 static LineInfo* CurLineInfo = 0;
 
 /* List of high level language debug symbols */
-static Collection HLDbgSyms = STATIC_COLLECTION_INITIALIZER;
+static Collection HLLDbgSyms = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -73,11 +73,11 @@ static Collection HLDbgSyms = STATIC_COLLECTION_INITIALIZER;
 
 
 
-static HLDbgSym* NewHLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
-/* Allocate and return a new HLDbgSym structure */
+static HLLDbgSym* NewHLLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
+/* Allocate and return a new HLLDbgSym structure */
 {
     /* Allocate memory */
-    HLDbgSym* S = xmalloc (sizeof (*S));
+    HLLDbgSym* S = xmalloc (sizeof (*S));
 
     /* Initialize the fields as necessary */
     S->Flags    = Flags;
@@ -144,7 +144,7 @@ void DbgInfoFunc (void)
     unsigned    Type;
     unsigned    AsmName;
     unsigned    Flags;
-    HLDbgSym*   S;
+    HLLDbgSym*  S;
 
 
     /* Parameters are separated by a comma */
@@ -178,8 +178,8 @@ void DbgInfoFunc (void)
        	return;
     }
     switch (GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]))) {
-        case 0:   Flags = HL_TYPE_FUNC | HL_SC_EXTERN;              break;
-        case 1:   Flags = HL_TYPE_FUNC | HL_SC_STATIC;              break;
+        case 0:   Flags = HLL_TYPE_FUNC | HLL_SC_EXTERN;            break;
+        case 1:   Flags = HLL_TYPE_FUNC | HLL_SC_STATIC;            break;
         default:  ErrorSkip ("Storage class specifier expected");   return;
     }
     NextTok ();
@@ -206,9 +206,9 @@ void DbgInfoFunc (void)
     CurrentScope->Flags |= ST_EXTFUNC;
 
     /* Add the function */
-    S = NewHLDbgSym (Flags, Name, Type);
+    S = NewHLLDbgSym (Flags, Name, Type);
     S->AsmName = AsmName;
-    CollAppend (&HLDbgSyms, S);
+    CollAppend (&HLLDbgSyms, S);
 }
 
 
@@ -279,7 +279,7 @@ void DbgInfoSym (void)
     unsigned    AsmName = EMPTY_STRING_ID;
     unsigned    Flags;
     int         Offs;
-    HLDbgSym*   S;
+    HLLDbgSym*  S;
 
 
     /* Parameters are separated by a comma */
@@ -313,10 +313,10 @@ void DbgInfoSym (void)
        	return;
     }
     switch (GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]))) {
-        case 0:   Flags = HL_SC_AUTO;                               break;
-        case 1:   Flags = HL_SC_EXTERN;                             break;
-        case 2:   Flags = HL_SC_REG;                                break;
-        case 3:   Flags = HL_SC_STATIC;                             break;
+        case 0:   Flags = HLL_SC_AUTO;                              break;
+        case 1:   Flags = HLL_SC_EXTERN;                            break;
+        case 2:   Flags = HLL_SC_REG;                               break;
+        case 3:   Flags = HLL_SC_STATIC;                            break;
         default:  ErrorSkip ("Storage class specifier expected");   return;
     }
 
@@ -325,7 +325,7 @@ void DbgInfoSym (void)
     ConsumeComma ();
 
     /* The next tokens depend on the storage class */
-    if (Flags == HL_SC_AUTO) {
+    if (Flags == HLL_SC_AUTO) {
         /* Auto: Stack offset follows */
         Offs = ConstExpression ();
     } else {
@@ -338,22 +338,22 @@ void DbgInfoSym (void)
         NextTok ();
 
         /* For register, an offset follows */
-        if (Flags == HL_SC_REG) {
+        if (Flags == HLL_SC_REG) {
             ConsumeComma ();
             Offs = ConstExpression ();
         }
     }
 
     /* Add the function */
-    S = NewHLDbgSym (Flags | HL_TYPE_SYM, Name, Type);
+    S = NewHLLDbgSym (Flags | HLL_TYPE_SYM, Name, Type);
     S->AsmName = AsmName;
     S->Offs    = Offs;
-    CollAppend (&HLDbgSyms, S);
+    CollAppend (&HLLDbgSyms, S);
 }
 
 
 
-void WriteHLDbgSyms (void)
+void WriteHLLDbgSyms (void)
 /* Write a list of all high level language symbols to the object file. */
 {
     unsigned I;
@@ -362,13 +362,13 @@ void WriteHLDbgSyms (void)
     if (DbgSyms) {
 
         /* Write the symbol count to the list */
-        ObjWriteVar (CollCount (&HLDbgSyms));
+        ObjWriteVar (CollCount (&HLLDbgSyms));
 
         /* Walk through list and write all symbols to the file. */
-        for (I = 0; I < CollCount (&HLDbgSyms); ++I) {
+        for (I = 0; I < CollCount (&HLLDbgSyms); ++I) {
 
             /* Get the next symbol */
-            const HLDbgSym* S = CollAtUnchecked (&HLDbgSyms, I);
+            const HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
 
             /* Write the symbol data */
             ObjWriteVar (S->Flags);

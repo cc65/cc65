@@ -911,7 +911,7 @@ void WriteDbgSyms (void)
     }
 
     /* Write the high level symbols */
-    WriteHLDbgSyms ();
+    WriteHLLDbgSyms ();
 
     /* Done writing debug symbols */
     ObjEndDbgSyms ();

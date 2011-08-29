@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 hldbgsym.h                                */
+/*                                 hlldbgsym.h                               */
 /*                                                                           */
 /*              Definitions for high level language debug symbols            */
 /*                                                                           */
@@ -41,8 +41,8 @@
 
 
 
-#ifndef HLDBGSYM_H
-#define HLDBGSYM_H
+#ifndef HLLDBGSYM_H
+#define HLLDBGSYM_H
 
 
 
@@ -53,24 +53,24 @@
 
 
 /* Flag bits that tell something about the symbol */
-#define HL_TYPE_FUNC    0x0000U                 /* Function */
-#define HL_TYPE_SYM     0x0001U                 /* Symbol */
-#define HL_TYPE_MASK    0x0007U
-#define HL_GET_TYPE(x)  ((x) & HL_TYPE_MASK)
-#define HL_IS_FUNC(x)   (HL_GET_TYPE(x) == HL_TYPE_FUNC)
-#define HL_IS_SYM(x)    (HL_GET_TYPE(x) == HL_TYPE_SYM)
+#define HLL_TYPE_FUNC   0x0000U                 /* Function */
+#define HLL_TYPE_SYM    0x0001U                 /* Symbol */
+#define HLL_TYPE_MASK   0x0007U
+#define HLL_GET_TYPE(x) ((x) & HL_TYPE_MASK)
+#define HLL_IS_FUNC(x)  (HL_GET_TYPE(x) == HL_TYPE_FUNC)
+#define HLL_IS_SYM(x)   (HL_GET_TYPE(x) == HL_TYPE_SYM)
 
 /* Storage class */
-#define HL_SC_AUTO      0x0000U                 /* On stack */
-#define HL_SC_REG       0x0008U                 /* Register */
-#define HL_SC_STATIC    0x0010U                 /* Static linkage */
-#define HL_SC_EXTERN    0x0018U                 /* External linkage */
-#define HL_SC_MASK      0x0078U
-#define HL_GET_SC(x)    ((x) & HL_SC_MASK)
+#define HLL_SC_AUTO     0x0000U                 /* On stack */
+#define HLL_SC_REG      0x0008U                 /* Register */
+#define HLL_SC_STATIC   0x0010U                 /* Static linkage */
+#define HLL_SC_EXTERN   0x0018U                 /* External linkage */
+#define HLL_SC_MASK     0x0078U
+#define HLL_GET_SC(x)   ((x) & HL_SC_MASK)
 
-/* Structure used for a high level function or symbol */
-typedef struct HLDbgSym HLDbgSym;
-struct HLDbgSym {
+/* Structure used for a high level language function or symbol */
+typedef struct HLLDbgSym HLLDbgSym;
+struct HLLDbgSym {
     unsigned    Flags;                  /* See above */
     unsigned    Name;                   /* String id of name */
     unsigned    AsmName;                /* String id of assembler name */
@@ -81,7 +81,7 @@ struct HLDbgSym {
 
 
 
-/* End of hldbgsyms.h */
+/* End of hlldbgsyms.h */
 
 #endif
 

@@ -72,15 +72,10 @@ typedef struct DbgSym DbgSym;
 DbgSym* ReadDbgSym (FILE* F, ObjData* Obj, unsigned Id);
 /* Read a debug symbol from a file, insert and return it */
 
-void ClearDbgSymTable (void);
-/* Clear the debug symbol table. Must be called before outputting debug syms
- * or debug labels the first time.
- */
-
 void PrintDbgSyms (FILE* F);
 /* Print the debug symbols in a debug file */
 
-void PrintDbgSymLabels (ObjData* O, FILE* F);
+void PrintDbgSymLabels (FILE* F);
 /* Print the debug symbols in a VICE label file */
 
 

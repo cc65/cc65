@@ -213,7 +213,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
 
 
 
-void ClearDbgSymTable (void)
+static void ClearDbgSymTable (void)
 /* Clear the debug symbol table */
 {
     unsigned I;
@@ -349,39 +349,49 @@ void PrintDbgSyms (FILE* F)
 
 
 
-void PrintDbgSymLabels (ObjData* O, FILE* F)
+void PrintDbgSymLabels (FILE* F)
 /* Print the debug symbols in a VICE label file */
 {
-    unsigned I;
+    unsigned I, J;
 
-    /* Walk through all debug symbols in this module */
-    for (I = 0; I < CollCount (&O->DbgSyms); ++I) {
+    /* Clear the symbol table */
+    ClearDbgSymTable ();
 
-	long Val;
+    /* Create labels from all modules we have linked into the output file */
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
-	/* Get the next debug symbol */
- 	DbgSym* D = CollAt (&O->DbgSyms, I);
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
 
-        /* Emit this symbol only if it is a label (ignore equates and imports) */
-        if (SYM_IS_EQUATE (D->Type) || SYM_IS_IMPORT (D->Type)) {
-            continue;
+        /* Walk through all debug symbols in this module */
+        for (J = 0; J < CollCount (&O->DbgSyms); ++J) {
+
+            long Val;
+
+            /* Get the next debug symbol */
+            DbgSym* D = CollAt (&O->DbgSyms, J);
+
+            /* Emit this symbol only if it is a label (ignore equates and imports) */
+            if (SYM_IS_EQUATE (D->Type) || SYM_IS_IMPORT (D->Type)) {
+                continue;
+            }
+
+            /* Get the symbol value */
+            Val = GetDbgSymVal (D);
+
+            /* Lookup this symbol in the table. If it is found in the table, it was
+             * already written to the file, so don't emit it twice. If it is not in
+             * the table, insert and output it.
+             */
+            if (GetDbgSym (D, Val) == 0) {
+
+                /* Emit the VICE label line */
+                fprintf (F, "al %06lX .%s\n", Val, GetString (D->Name));
+
+                /* Insert the symbol into the table */
+                InsertDbgSym (D, Val);
+            }
         }
-
-       	/* Get the symbol value */
-       	Val = GetDbgSymVal (D);
-
-       	/* Lookup this symbol in the table. If it is found in the table, it was
-       	 * already written to the file, so don't emit it twice. If it is not in
-       	 * the table, insert and output it.
-       	 */
-       	if (GetDbgSym (D, Val) == 0) {
-
-       	    /* Emit the VICE label line */
-       	    fprintf (F, "al %06lX .%s\n", Val, GetString (D->Name));
-
-       	    /* Insert the symbol into the table */
-       	    InsertDbgSym (D, Val);
-       	}
     }
 }
 

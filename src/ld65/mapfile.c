@@ -132,29 +132,17 @@ void CreateMapFile (int ShortMap)
 void CreateLabelFile (void)
 /* Create a label file */
 {
-    unsigned I;
-
     /* Open the label file */
     FILE* F = fopen (LabelFileName, "w");
     if (F == 0) {
     	Error ("Cannot create label file `%s': %s", LabelFileName, strerror (errno));
     }
 
-    /* Clear the debug sym table (used to detect duplicates) */
-    ClearDbgSymTable ();
-
     /* Print the labels for the export symbols */
     PrintExportLabels (F);
 
-    /* Create labels from all modules we have linked into the output file */
-    for (I = 0; I < CollCount (&ObjDataList); ++I) {
-
-        /* Get the object file */
-        ObjData* O = CollAtUnchecked (&ObjDataList, I);
-
-        /* Output the labels */
-	PrintDbgSymLabels (O, F);
-    }
+    /* Output the labels */
+    PrintDbgSymLabels (F);
 
     /* Close the file */
     if (fclose (F) != 0) {

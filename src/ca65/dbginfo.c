@@ -45,7 +45,9 @@
 #include "error.h"
 #include "expr.h"
 #include "filetab.h"
+#include "global.h"
 #include "lineinfo.h"
+#include "objfile.h"
 #include "nexttok.h"
 #include "symtab.h"
 
@@ -277,7 +279,7 @@ void DbgInfoSym (void)
     unsigned    AsmName = EMPTY_STRING_ID;
     unsigned    Flags;
     int         Offs;
-    HLDbgSym*   S;                           
+    HLDbgSym*   S;
 
 
     /* Parameters are separated by a comma */
@@ -347,6 +349,42 @@ void DbgInfoSym (void)
     S->AsmName = AsmName;
     S->Offs    = Offs;
     CollAppend (&HLDbgSyms, S);
+}
+
+
+
+void WriteHLDbgSyms (void)
+/* Write a list of all high level language symbols to the object file. */
+{
+    unsigned I;
+
+    /* Only if debug info is enabled */
+    if (DbgSyms) {
+
+        /* Write the symbol count to the list */
+        ObjWriteVar (CollCount (&HLDbgSyms));
+
+        /* Walk through list and write all symbols to the file. */
+        for (I = 0; I < CollCount (&HLDbgSyms); ++I) {
+
+            /* Get the next symbol */
+            const HLDbgSym* S = CollAtUnchecked (&HLDbgSyms, I);
+
+            /* Write the symbol data */
+            ObjWriteVar (S->Flags);
+            ObjWriteVar (S->Name);
+            ObjWriteVar (S->AsmName);
+            ObjWriteVar (S->Offs);
+            ObjWriteVar (S->Type);
+            ObjWriteVar (S->ScopeId);
+        }
+
+    } else {
+
+        /* Write a count of zero */
+        ObjWriteVar (0);
+
+    }
 }
 
 

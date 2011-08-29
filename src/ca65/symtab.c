@@ -45,9 +45,10 @@
 #include "xmalloc.h"
 
 /* ca65 */
-#include "global.h"
+#include "dbginfo.h"
 #include "error.h"
 #include "expr.h"
+#include "global.h"
 #include "objfile.h"
 #include "scanner.h"
 #include "segment.h"
@@ -908,6 +909,9 @@ void WriteDbgSyms (void)
 	ObjWriteVar (0);
 
     }
+
+    /* Write the high level symbols */
+    WriteHLDbgSyms ();
 
     /* Done writing debug symbols */
     ObjEndDbgSyms ();

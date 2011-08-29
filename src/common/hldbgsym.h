@@ -51,7 +51,7 @@
 /*****************************************************************************/
 
 
- 
+
 /* Flag bits that tell something about the symbol */
 #define HL_TYPE_FUNC    0x0000U                 /* Function */
 #define HL_TYPE_SYM     0x0001U                 /* Symbol */
@@ -74,6 +74,7 @@ struct HLDbgSym {
     unsigned    Flags;                  /* See above */
     unsigned    Name;                   /* String id of name */
     unsigned    AsmName;                /* String id of assembler name */
+    int         Offs;                   /* Offset if any */
     unsigned    Type;                   /* String id of type */
     unsigned    ScopeId;                /* Id of parent scope */
 };

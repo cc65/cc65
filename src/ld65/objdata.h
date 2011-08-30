@@ -74,6 +74,7 @@ struct ObjData {
     unsigned long  	Start;		/* Start offset of data in library */
     unsigned   	     	Flags;
 
+    unsigned            HLLSymBaseId;   /* Debug info base id for hll symbols */
     unsigned            SymBaseId;      /* Debug info base id for symbols */
     unsigned            ScopeBaseId;    /* Debug info base id for scopes */
     unsigned            SpanBaseId;     /* Debug info base id for spans */
@@ -83,6 +84,7 @@ struct ObjData {
     Collection          Exports;       	/* List of all exports */
     Collection          Imports;   	/* List of all imports */
     Collection          DbgSyms;       	/* List of debug symbols */
+    Collection          HLLDbgSyms;     /* List of hll debug symbols */
     Collection          LineInfos;      /* List of line infos */
     unsigned            StringCount;    /* Count of strings */
     unsigned*           Strings;        /* List of global string indices */
@@ -155,6 +157,9 @@ struct Import* GetObjImport (const ObjData* Obj, unsigned Id);
 
 struct Export* GetObjExport (const ObjData* Obj, unsigned Id);
 /* Get an export from an object file checking for a valid index */
+
+struct DbgSym* GetObjDbgSym (const ObjData* Obj, unsigned Id);
+/* Get a debug symbol from an object file checking for a valid index */
 
 struct Scope* GetObjScope (const ObjData* Obj, unsigned Id);
 /* Get a scope from an object file checking for a valid index */

@@ -53,6 +53,7 @@
 /* ca65 */
 #include "abend.h"
 #include "asserts.h"
+#include "dbginfo.h"
 #include "error.h"
 #include "expr.h"
 #include "feature.h"
@@ -1026,6 +1027,11 @@ int main (int argc, char* argv [])
     /* If we didn't have any errors, check the symbol table */
     if (ErrorCount == 0) {
         SymCheck ();
+    }
+
+    /* If we didn't have any errors, check the hll debug symbols */
+    if (ErrorCount == 0) {
+        DbgInfoCheck ();
     }
 
     /* If we didn't have any errors, close the file scope lexical level */

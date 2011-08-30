@@ -56,9 +56,12 @@
 
 
 
+/* Forwards */
+struct HLLDbgSym;
+
 /* Bits for the Flags value in SymEntry */
 #define SF_NONE         0x0000          /* Empty flag set */
-#define SF_USER		0x0001	    	/* User bit */
+#define SF_USER	 	0x0001	    	/* User bit */
 #define SF_UNUSED       0x0002	    	/* Unused entry */
 #define SF_EXPORT      	0x0004	    	/* Export this symbol */
 #define SF_IMPORT   	0x0008	    	/* Import this symbol */
@@ -87,7 +90,7 @@ struct SymEntry {
     SymEntry*  	       	Locals;         /* Root of subtree for local symbols */
     union {
         struct SymTable*    Tab;       	/* Table this symbol is in */
-        struct SymEntry*    Entry;
+        struct SymEntry*    Entry;      /* Parent for cheap locals */
     } Sym;
     Collection          DefLines;       /* Line infos for definition */
     Collection          RefLines;       /* Line infos for references */
@@ -97,6 +100,7 @@ struct SymEntry {
                                          * used. Currently only for zero page
                                          * addressing
                                          */
+    struct HLLDbgSym*   HLLSym;         /* Symbol from high level language */
     unsigned            Flags;	        /* Symbol flags */
     unsigned            DebugSymId;     /* Debug symbol id */
     unsigned            ImportId;       /* Id of import if this is one */

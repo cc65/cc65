@@ -56,6 +56,9 @@ void DbgInfoLine (void);
 void DbgInfoSym (void);
 /* Parse and handle SYM subcommand of the .dbg pseudo instruction */
 
+void DbgInfoCheck (void);
+/* Do checks on all hll debug info symbols when assembly is complete */
+
 void WriteHLLDbgSyms (void);
 /* Write a list of all high level language symbols to the object file. */
 

@@ -419,15 +419,22 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
 {
     SymEntry* Sym;
     do {
-	/* Search in the current table */
-	Sym = SymFind (Scope, Name, SYM_FIND_EXISTING);
-       	if (Sym) {
-	    /* Found, return it */
-	    break;
-	}
+        /* Search in the current table. Ignore entries flagged with SF_UNUSED,
+         * because for such symbols there is a real entry in one of the parent
+         * scopes.
+         */
+        Sym = SymFind (Scope, Name, SYM_FIND_EXISTING);
+        if (Sym) {
+            if (Sym->Flags & SF_UNUSED) {
+                Sym = 0;
+            } else {
+                /* Found, return it */
+                break;
+            }
+        }
 
         /* Not found, search in the parent scope, if we have one */
-	Scope = Scope->Parent;
+        Scope = Scope->Parent;
 
     } while (Sym == 0 && Scope != 0);
 

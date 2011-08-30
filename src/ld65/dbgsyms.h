@@ -57,6 +57,7 @@
 
 /* Forwards */
 struct Scope;
+struct HLLDbgSym;
 
 /* Opaque debug symbol structure */
 typedef struct DbgSym DbgSym;
@@ -72,8 +73,20 @@ typedef struct DbgSym DbgSym;
 DbgSym* ReadDbgSym (FILE* F, ObjData* Obj, unsigned Id);
 /* Read a debug symbol from a file, insert and return it */
 
+struct HLLDbgSym* ReadHLLDbgSym (FILE* F, ObjData* Obj, unsigned Id);
+/* Read a hll debug symbol from a file, insert and return it */
+
 void PrintDbgSyms (FILE* F);
 /* Print the debug symbols in a debug file */
+
+unsigned DbgSymCount (void);
+/* Return the total number of debug symbols */
+
+unsigned HLLDbgSymCount (void);
+/* Return the total number of high level language debug symbols */
+
+void PrintHLLDbgSyms (FILE* F);
+/* Print the high level language debug symbols in a debug file */
 
 void PrintDbgSymLabels (FILE* F);
 /* Print the debug symbols in a VICE label file */

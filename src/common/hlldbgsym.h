@@ -56,9 +56,9 @@
 #define HLL_TYPE_FUNC   0x0000U                 /* Function */
 #define HLL_TYPE_SYM    0x0001U                 /* Symbol */
 #define HLL_TYPE_MASK   0x0007U
-#define HLL_GET_TYPE(x) ((x) & HL_TYPE_MASK)
-#define HLL_IS_FUNC(x)  (HL_GET_TYPE(x) == HL_TYPE_FUNC)
-#define HLL_IS_SYM(x)   (HL_GET_TYPE(x) == HL_TYPE_SYM)
+#define HLL_GET_TYPE(x) ((x) & HLL_TYPE_MASK)
+#define HLL_IS_FUNC(x)  (HLL_GET_TYPE(x) == HLL_TYPE_FUNC)
+#define HLL_IS_SYM(x)   (HLL_GET_TYPE(x) == HLL_TYPE_SYM)
 
 /* Storage class */
 #define HLL_SC_AUTO     0x0000U                 /* On stack */
@@ -66,18 +66,7 @@
 #define HLL_SC_STATIC   0x0010U                 /* Static linkage */
 #define HLL_SC_EXTERN   0x0018U                 /* External linkage */
 #define HLL_SC_MASK     0x0078U
-#define HLL_GET_SC(x)   ((x) & HL_SC_MASK)
-
-/* Structure used for a high level language function or symbol */
-typedef struct HLLDbgSym HLLDbgSym;
-struct HLLDbgSym {
-    unsigned    Flags;                  /* See above */
-    unsigned    Name;                   /* String id of name */
-    unsigned    AsmName;                /* String id of assembler name */
-    int         Offs;                   /* Offset if any */
-    unsigned    Type;                   /* String id of type */
-    unsigned    ScopeId;                /* Id of parent scope */
-};
+#define HLL_GET_SC(x)   ((x) & HLL_SC_MASK)
 
 
 

@@ -280,6 +280,20 @@ void Error (const char* Format, ...)
 
 
 
+void PError (const FilePos* Pos, const char* Format, ...)
+/* Print an error message giving an explicit file and position. */
+{
+    va_list ap;
+    va_start (ap, Format);
+    VPrintMsg (Pos, "Error", Format, ap);
+    va_end (ap);
+
+    /* Count errors */
+    ++ErrorCount;
+}
+
+
+
 void LIError (const Collection* LineInfos, const char* Format, ...)
 /* Print an error message using the given line infos. */
 {

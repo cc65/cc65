@@ -79,6 +79,7 @@ ObjData* NewObjData (void)
     O->MTime            = 0;
     O->Start	   	= 0;
     O->Flags   	   	= 0;
+    O->HLLSymBaseId     = 0;
     O->SymBaseId        = 0;
     O->ScopeBaseId      = 0;
     O->SpanBaseId       = 0;
@@ -87,6 +88,7 @@ ObjData* NewObjData (void)
     O->Exports     	= EmptyCollection;
     O->Imports     	= EmptyCollection;
     O->DbgSyms		= EmptyCollection;
+    O->HLLDbgSyms       = EmptyCollection;
     O->LineInfos        = EmptyCollection;
     O->StringCount      = 0;
     O->Strings          = 0;
@@ -122,6 +124,7 @@ void FreeObjData (ObjData* O)
     }
     DoneCollection (&O->Imports);
     DoneCollection (&O->DbgSyms);
+    DoneCollection (&O->HLLDbgSyms);
 
     for (I = 0; I < CollCount (&O->LineInfos); ++I) {
         FreeLineInfo (CollAtUnchecked (&O->LineInfos, I));
@@ -243,6 +246,18 @@ struct Export* GetObjExport (const ObjData* O, unsigned Id)
 
 
 
+struct DbgSym* GetObjDbgSym (const ObjData* O, unsigned Id)
+/* Get a debug symbol from an object file checking for a valid index */
+{
+    if (Id >= CollCount (&O->DbgSyms)) {
+        Error ("Invalid debug symbol index (%u) in module `%s'",
+               Id, GetObjFileName (O));
+    }
+    return CollAtUnchecked (&O->DbgSyms, Id);
+}
+
+
+
 struct Scope* GetObjScope (const ObjData* O, unsigned Id)
 /* Get a scope from an object file checking for a valid index */
 {
@@ -294,6 +309,7 @@ void PrintDbgModules (FILE* F)
     }
 
 }
+
 
 
 

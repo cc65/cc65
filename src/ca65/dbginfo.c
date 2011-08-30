@@ -37,7 +37,9 @@
 
 /* common */
 #include "coll.h"
+#include "filepos.h"
 #include "hlldbgsym.h"
+#include "scopedefs.h"
 #include "strbuf.h"
 
 /* ca65 */
@@ -49,15 +51,30 @@
 #include "lineinfo.h"
 #include "objfile.h"
 #include "nexttok.h"
+#include "symentry.h"
 #include "symtab.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Data                                    */
+/*     	       	     	       	     Data                                    */
 /*****************************************************************************/
 
 
+
+/* Structure used for a high level language function or symbol */
+typedef struct HLLDbgSym HLLDbgSym;
+struct HLLDbgSym {
+    unsigned            Flags;          /* See above */
+    unsigned            Name;           /* String id of name */
+    unsigned            AsmName;        /* String id of asm symbol name */
+    SymEntry*           Sym;            /* The assembler symbol */
+    int                 Offs;           /* Offset if any */
+    unsigned            Type;           /* String id of type */
+    SymTable*           Scope;          /* Parent scope */
+    unsigned            FuncId;         /* Id of hll function if any */
+    FilePos             Pos;            /* Position of statement */
+};
 
 /* The current line info */
 static LineInfo* CurLineInfo = 0;
@@ -83,9 +100,12 @@ static HLLDbgSym* NewHLLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
     S->Flags    = Flags;
     S->Name     = Name;
     S->AsmName  = EMPTY_STRING_ID;
+    S->Sym      = 0;
     S->Offs     = 0;
     S->Type     = Type;
-    S->ScopeId  = CurrentScope->Id;
+    S->Scope    = CurrentScope;
+    S->FuncId   = ~0U;
+    S->Pos      = CurTok.Pos;
 
     /* Return the result */
     return S;
@@ -199,15 +219,21 @@ void DbgInfoFunc (void)
     if (CurrentScope == RootScope) {
         ErrorSkip ("Functions may not be used in the root scope");
         return;
-    } else if (CurrentScope->Flags & ST_EXTFUNC) {
-        ErrorSkip ("Only one function per scope allowed");
+    } else if (CurrentScope->Type != SCOPE_SCOPE || CurrentScope->Label == 0) {
+        ErrorSkip ("Functions can only be tagged to .PROC scopes");
+        return;
+    } else if (CurrentScope->Label->HLLSym != 0) {
+        ErrorSkip ("Only one HLL symbol per asm symbol is allowed");
+        return;
+    } else if (CurrentScope->Label->Name != AsmName) {
+        ErrorSkip ("Scope label and asm name for function must match");
         return;
     }
-    CurrentScope->Flags |= ST_EXTFUNC;
 
     /* Add the function */
     S = NewHLLDbgSym (Flags, Name, Type);
-    S->AsmName = AsmName;
+    S->Sym = CurrentScope->Label;
+    CurrentScope->Label->HLLSym = S;
     CollAppend (&HLLDbgSyms, S);
 }
 
@@ -353,6 +379,45 @@ void DbgInfoSym (void)
 
 
 
+void DbgInfoCheck (void)
+/* Do checks on all hll debug info symbols when assembly is complete */
+{
+    /* When parsing the debug statements for HLL symbols, we have already
+     * tagged the functions to their asm counterparts. This wasn't done for
+     * C symbols, since we will allow forward declarations. So we have to
+     * resolve the normal C symbols now.
+     */
+    unsigned I;
+    for (I = 0; I < CollCount (&HLLDbgSyms); ++I) {
+
+        /* Get the next symbol */
+        HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
+
+        /* Ignore functions and auto symbols, because the later live on the
+         * stack and don't have corresponding asm symbols.
+         */
+        if (HLL_IS_FUNC (S->Flags) || HLL_GET_SC (S->Flags) == HLL_SC_AUTO) {
+            continue;
+        }
+
+        /* Safety */
+        CHECK (S->Sym == 0 && S->Scope != 0);
+
+        /* Search for the symbol name */
+        S->Sym = SymFindAny (S->Scope, GetStrBuf (S->AsmName));
+        if (S->Sym == 0) {
+            PError (&S->Pos, "Assembler symbol `%s' not found",
+                    GetString (S->AsmName));
+        } else {
+            /* Set the backlink */
+            S->Sym->HLLSym = S;
+        }
+
+    }
+}
+
+
+
 void WriteHLLDbgSyms (void)
 /* Write a list of all high level language symbols to the object file. */
 {
@@ -370,13 +435,21 @@ void WriteHLLDbgSyms (void)
             /* Get the next symbol */
             const HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
 
+            /* Get the type of the symbol */
+            unsigned SC = HLL_GET_SC (S->Flags);
+
             /* Write the symbol data */
             ObjWriteVar (S->Flags);
             ObjWriteVar (S->Name);
-            ObjWriteVar (S->AsmName);
-            ObjWriteVar (S->Offs);
+            if (SC != HLL_SC_AUTO) {
+                CHECK (S->Sym->DebugSymId != ~0U);
+                ObjWriteVar (S->Sym->DebugSymId);
+            }
+            if (SC == HLL_SC_AUTO || SC == HLL_SC_REG) {
+                ObjWriteVar (S->Offs);
+            }
             ObjWriteVar (S->Type);
-            ObjWriteVar (S->ScopeId);
+            ObjWriteVar (S->Scope->Id);
         }
 
     } else {

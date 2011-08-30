@@ -58,7 +58,6 @@
 /* Symbol table flags */
 #define ST_NONE         0x00            /* No flags */
 #define ST_DEFINED      0x01            /* Scope has been defined */
-#define ST_EXTFUNC      0x02            /* External debug function assigned */
 
 /* A symbol table */
 typedef struct SymTable SymTable;

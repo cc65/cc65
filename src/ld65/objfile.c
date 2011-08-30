@@ -198,11 +198,18 @@ void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
     /* Seek to the correct position */
     FileSetPos (F, Pos);
 
-    /* Read the data */
+    /* Read the asm debug symbols */
     DbgSymCount = ReadVar (F);
     CollGrow (&O->DbgSyms, DbgSymCount);
     for (I = 0; I < DbgSymCount; ++I) {
-	CollAppend (&O->DbgSyms, ReadDbgSym (F, O, I));
+    	CollAppend (&O->DbgSyms, ReadDbgSym (F, O, I));
+    }
+
+    /* Read the hll debug symbols */
+    DbgSymCount = ReadVar (F);
+    CollGrow (&O->HLLDbgSyms, DbgSymCount);
+    for (I = 0; I < DbgSymCount; ++I) {    
+       	CollAppend (&O->HLLDbgSyms, ReadHLLDbgSym (F, O, I));
     }
 }
 

@@ -90,7 +90,8 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     S->RefLines   = EmptyCollection;
     for (I = 0; I < sizeof (S->GuessedUse) / sizeof (S->GuessedUse[0]); ++I) {
         S->GuessedUse[I] = 0;
-    }
+    }                 
+    S->HLLSym     = 0;
     S->Flags   	  = Flags;
     S->DebugSymId = ~0U;
     S->ImportId   = ~0U;

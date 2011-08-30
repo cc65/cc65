@@ -37,7 +37,9 @@
 
 /* common */
 #include "addrsize.h"
+#include "attrib.h"
 #include "check.h"
+#include "hlldbgsym.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -51,6 +53,7 @@
 #include "lineinfo.h"
 #include "objdata.h"
 #include "spool.h"
+#include "tpool.h"
 
 
 
@@ -76,8 +79,19 @@ struct DbgSym {
     unsigned short      AddrSize;       /* Address size of symbol */
 };
 
+/* Structure used for a high level language function or symbol */
+typedef struct HLLDbgSym HLLDbgSym;
+struct HLLDbgSym {
+    unsigned            Flags;          /* See above */
+    unsigned            Name;           /* String id of name */
+    DbgSym*             Sym;            /* Assembler symbol */
+    int                 Offs;           /* Offset if any */
+    unsigned            Type;           /* String id of type */
+    unsigned            ScopeId;        /* Parent scope */
+};
+
 /* We will collect all debug symbols in the following array and remove
- * duplicates before outputing them.
+ * duplicates before outputing them into a label file.
  */
 static DbgSym*	DbgSymPool[256];
 
@@ -112,6 +126,15 @@ static DbgSym* NewDbgSym (unsigned Id, unsigned Type, unsigned char AddrSize,
 
     /* Return the new entry */
     return D;
+}
+
+
+
+static HLLDbgSym* NewHLLDbgSym (void)
+/* Create a new HLLDbgSym and return it */
+{
+    /* Allocate memory and return it */
+    return xmalloc (sizeof (HLLDbgSym));
 }
 
 
@@ -213,6 +236,38 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
 
 
 
+HLLDbgSym* ReadHLLDbgSym (FILE* F, ObjData* O, unsigned Id attribute ((unused)))
+/* Read a hll debug symbol from a file, insert and return it */
+{
+    unsigned SC;
+
+    /* Create a new HLLDbgSym */
+    HLLDbgSym* S = NewHLLDbgSym ();
+
+    /* Read the data */
+    S->Flags    = ReadVar (F);
+    SC          = HLL_GET_SC (S->Flags);
+    S->Name     = MakeGlobalStringId (O, ReadVar (F));
+    if (SC != HLL_SC_AUTO) {
+        S->Sym = GetObjDbgSym (O, ReadVar (F));
+    } else {
+        /* Auto variables aren't attached to asm symbols */
+        S->Sym = 0;
+    }
+    if (SC == HLL_SC_AUTO || SC == HLL_SC_REG) {
+        S->Offs = ReadVar (F);
+    } else {
+        S->Offs = 0;
+    }
+    S->Type     = GetTypeId (GetObjString (O, ReadVar (F)));
+    S->ScopeId  = ReadVar (F);
+
+    /* Return the (now initialized) hll debug symbol */
+    return S;
+}
+
+
+
 static void ClearDbgSymTable (void)
 /* Clear the debug symbol table */
 {
@@ -251,6 +306,44 @@ static void PrintLineInfo (FILE* F, const Collection* LineInfos, const char* For
             fprintf (F, "+%u", LI->Id);
         }
     }
+}
+
+
+
+unsigned DbgSymCount (void)
+/* Return the total number of debug symbols */
+{
+    /* Walk over all object files */
+    unsigned I;
+    unsigned Count = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get this object file */
+        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Count debug symbols */
+        Count += CollCount (&O->DbgSyms);
+    }
+    return Count;
+}
+
+
+
+unsigned HLLDbgSymCount (void)
+/* Return the total number of high level language debug symbols */
+{
+    /* Walk over all object files */
+    unsigned I;
+    unsigned Count = 0;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get this object file */
+        const ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Count debug symbols */
+        Count += CollCount (&O->HLLDbgSyms);
+    }
+    return Count;
 }
 
 
@@ -339,6 +432,59 @@ void PrintDbgSyms (FILE* F)
 
                 /* Output the type */
                 fprintf (F, ",type=%s", SYM_IS_LABEL (S->Type)? "lab" : "equ");
+            }
+
+            /* Terminate the output line */
+            fputc ('\n', F);
+        }
+    }
+}
+
+
+
+void PrintHLLDbgSyms (FILE* F)
+/* Print the high level language debug symbols in a debug file */
+{
+    unsigned I, J;
+
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Walk through all hll debug symbols in this module */
+        for (J = 0; J < CollCount (&O->HLLDbgSyms); ++J) {
+
+            /* Get the next debug symbol */
+            const HLLDbgSym* S = CollConstAt (&O->HLLDbgSyms, J);
+
+            /* Get the storage class */
+            unsigned SC = HLL_GET_SC (S->Flags);
+
+            /* Output the base info */
+            fprintf (F, "csym\tid=%u,name=\"%s\",scope=%u,type=%u,sc=",
+                     O->HLLSymBaseId + J,
+                     GetString (S->Name),
+                     O->ScopeBaseId + S->ScopeId,
+                     S->Type);
+            switch (SC) {
+                case HLL_SC_AUTO:       fputs ("auto", F);      break;
+                case HLL_SC_REG:        fputs ("reg", F);       break;
+                case HLL_SC_STATIC:     fputs ("static", F);    break;
+                case HLL_SC_EXTERN:     fputs ("extern", F);    break;
+                default:
+                    Error ("Invalid storage class %u for hll symbol", SC);
+                    break;
+            }
+
+            /* Output the offset if it is not zero */
+            if (S->Offs) {
+                fprintf (F, ",offs=%d", S->Offs);
+            }
+
+            /* For non auto symbols output the debug symbol id of the asm sym */
+            if (SC != HLL_SC_AUTO) {
+                fprintf (F, ",sym=%u", S->Sym->Id);
             }
 
             /* Terminate the output line */

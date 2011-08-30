@@ -67,9 +67,10 @@ static void AssignIds (void)
 {
     /* Walk over all modules */
     unsigned I;
-    unsigned ScopeBaseId = 0;
-    unsigned SpanBaseId  = 0;
-    unsigned SymBaseId   = 0;
+    unsigned HLLSymBaseId = 0;
+    unsigned ScopeBaseId  = 0;
+    unsigned SpanBaseId   = 0;
+    unsigned SymBaseId    = 0;
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         /* Get this module */
@@ -79,11 +80,13 @@ static void AssignIds (void)
         O->Id = I;
 
         /* Assign base ids */
-        O->ScopeBaseId = ScopeBaseId;
-        O->SpanBaseId  = SpanBaseId;
-        O->SymBaseId   = SymBaseId;
+        O->HLLSymBaseId = HLLSymBaseId;
+        O->ScopeBaseId  = ScopeBaseId;
+        O->SpanBaseId   = SpanBaseId;
+        O->SymBaseId    = SymBaseId;
 
         /* Bump the base ids */
+        HLLSymBaseId  += CollCount (&O->HLLDbgSyms);
         ScopeBaseId   += CollCount (&O->Scopes);
         SpanBaseId    += CollCount (&O->Spans);
         SymBaseId     += CollCount (&O->DbgSyms);
@@ -115,7 +118,8 @@ void CreateDbgFile (void)
      */
     fprintf (
         F,
-        "info\tfile=%u,lib=%u,line=%u,mod=%u,scope=%u,seg=%u,span=%u,type=%u\n",
+        "info\tcsym=%u,file=%u,lib=%u,line=%u,mod=%u,scope=%u,seg=%u,span=%u,sym=%u,type=%u\n",
+        HLLDbgSymCount (),
         FileInfoCount (),
         LibraryCount (),
         LineInfoCount (),
@@ -123,11 +127,15 @@ void CreateDbgFile (void)
         ScopeCount (),
         SegmentCount (),
         SpanCount (),
+        DbgSymCount (),
         TypeCount ()
     );
 
     /* Assign the ids to the items */
     AssignIds ();
+
+    /* Output high level language symbols */
+    PrintHLLDbgSyms (F);
 
     /* Output files */
     PrintDbgFileInfo (F);

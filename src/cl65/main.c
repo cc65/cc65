@@ -1279,7 +1279,7 @@ int main (int argc, char* argv [])
     CmdInit (&CA65, "ca65");
     CmdInit (&CO65, "co65");
     CmdInit (&LD65, "ld65");
-    CmdInit (&GRC,  "grc");
+    CmdInit (&GRC,  "grc65");
 
     /* Our default target is the C64 instead of "none" */
     Target = TGT_C64;

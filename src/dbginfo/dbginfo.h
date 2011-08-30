@@ -109,6 +109,61 @@ void cc65_free_dbginfo (cc65_dbginfo Handle);
 
 
 /*****************************************************************************/
+/*                                 C Symbols                                 */
+/*****************************************************************************/
+
+
+
+/* C symbol kinds */
+typedef enum {
+    CC65_CSYM_FUNC,
+    CC65_CSYM_VAR
+} cc65_csym_kind;
+
+/* C object storage classes */
+typedef enum {
+    CC65_CSYM_AUTO,             /* Auto = on stack */
+    CC65_CSYM_REG,              /* Register = in register bank */
+    CC65_CSYM_STATIC,           /* Static = static storage */
+    CC65_CSYM_EXTERN            /* Extern = static storage + external visibility */
+} cc65_csym_sc;
+
+/* C symbol information */
+typedef struct cc65_csymdata cc65_csymdata;
+struct cc65_csymdata {
+    unsigned            csym_id;        /* The internal c symbol id */
+    unsigned char       csym_kind;      /* Kind of c symbol */
+    unsigned char       csym_sc;        /* Storage class of c symbol */
+    int                 csym_offs;      /* Offset for auto and register */
+    unsigned            symbol_id;      /* Attached asm symbol if any */
+    unsigned            scope_id;       /* Scope of c symbol */
+    const char*         csym_name;      /* Name of the symbol */
+};
+
+typedef struct cc65_csyminfo cc65_csyminfo;
+struct cc65_csyminfo {
+    unsigned            count;          /* Number of data sets that follow */
+    cc65_csymdata       data[1];        /* Data sets, number is dynamic */
+};
+
+
+
+const cc65_csyminfo* cc65_get_csymlist (cc65_dbginfo handle);
+/* Return a list of all c symbols */
+
+const cc65_csyminfo* cc65_csym_byid (cc65_dbginfo handle, unsigned id);
+/* Return information about a c symbol with a specific id. The function
+ * returns NULL if the id is invalid (no such c symbol) and otherwise a
+ * cc65_csyminfo structure with one entry that contains the requested
+ * symbol information.
+ */
+
+void cc65_free_csyminfo (cc65_dbginfo handle, const cc65_csyminfo* info);
+/* Free a c symbol info record */
+
+
+
+/*****************************************************************************/
 /*                                 Libraries                                 */
 /*****************************************************************************/
 
@@ -624,7 +679,7 @@ void cc65_free_typedata (cc65_dbginfo Handle, const cc65_typedata* data);
 
 
 /* Allow usage from C++ */
-#ifdef __cplusplus     
+#ifdef __cplusplus
 }
 #endif
 

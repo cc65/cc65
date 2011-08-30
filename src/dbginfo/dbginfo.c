@@ -128,10 +128,12 @@ typedef enum {
     TOK_ADDRSIZE,                       /* ADDRSIZE keyword */
     TOK_AUTO,                           /* AUTO keyword */
     TOK_COUNT,                          /* COUNT keyword */
+    TOK_CSYM,                           /* CSYM keyword */
     TOK_DEF,                            /* DEF keyword */
     TOK_ENUM,                           /* ENUM keyword */
     TOK_EQUATE,                         /* EQUATE keyword */
     TOK_EXPORT,                         /* EXPORT keyword */
+    TOK_EXTERN,                         /* EXTERN keyword */
     TOK_FILE,                           /* FILE keyword */
     TOK_FUNC,                           /* FUNC keyword */
     TOK_GLOBAL,                         /* GLOBAL keyword */
@@ -147,12 +149,15 @@ typedef enum {
     TOK_MODULE,                         /* MODULE keyword */
     TOK_MTIME,                          /* MTIME keyword */
     TOK_NAME,                           /* NAME keyword */
+    TOK_OFFS,                           /* OFFS keyword */
     TOK_OUTPUTNAME,                     /* OUTPUTNAME keyword */
     TOK_OUTPUTOFFS,                     /* OUTPUTOFFS keyword */
     TOK_PARENT,                         /* PARENT keyword */
     TOK_REF,                            /* REF keyword */
+    TOK_REGISTER,                       /* REGISTER keyword */
     TOK_RO,                             /* RO keyword */
     TOK_RW,                             /* RW keyword */
+    TOK_SC,                             /* SC keyword */
     TOK_SCOPE,                          /* SCOPE keyword */
     TOK_SEGMENT,                        /* SEGMENT keyword */
     TOK_SIZE,                           /* SIZE keyword */
@@ -182,6 +187,7 @@ struct DbgInfo {
      * The collections are also used when the objects are deleted, so they're
      * actually the ones that "own" the items.
      */
+    Collection          CSymInfoById;   /* C symbol infos sorted by id */
     Collection          FileInfoById;   /* File infos sorted by id */
     Collection          LibInfoById;    /* Library infos sorted by id */
     Collection          LineInfoById;   /* Line infos sorted by id */
@@ -229,6 +235,7 @@ struct InputData {
 };
 
 /* Typedefs for the item structures. Do also serve as forwards */
+typedef struct CSymInfo CSymInfo;
 typedef struct FileInfo FileInfo;
 typedef struct LibInfo LibInfo;
 typedef struct LineInfo LineInfo;
@@ -238,6 +245,27 @@ typedef struct SegInfo SegInfo;
 typedef struct SpanInfo SpanInfo;
 typedef struct SymInfo SymInfo;
 typedef struct TypeInfo TypeInfo;
+
+/* Internally used c symbol info struct */
+struct CSymInfo {
+    unsigned            Id;             /* Id of file */
+    unsigned short      Kind;           /* Kind of C symbol */
+    unsigned short      SC;             /* Storage class of C symbol */
+    int                 Offs;           /* Offset */
+    union {
+        unsigned        Id;             /* Id of attached asm symbol */
+        SymInfo*        Info;           /* Pointer to attached asm symbol */
+    } Sym;
+    union {
+        unsigned        Id;             /* Id of type */
+        TypeInfo*       Info;           /* Pointer to type */
+    } Type;
+    union {
+        unsigned        Id;             /* Id of scope */
+        ScopeInfo*      Info;           /* Pointer to scope */
+    } Scope;
+    char                Name[1];        /* Name of file with full path */
+};
 
 /* Internally used file info struct */
 struct FileInfo {
@@ -1131,6 +1159,46 @@ static void UnknownKeyword (InputData* D)
     } else if (D->Tok != TOK_COMMA && D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
         SkipLine (D);
     }
+}
+
+
+
+/*****************************************************************************/
+/*                               C symbol info                               */
+/*****************************************************************************/
+
+
+
+static CSymInfo* NewCSymInfo (const StrBuf* Name)
+/* Create a new CSymInfo struct and return it */
+{
+    /* Allocate memory */
+    CSymInfo* S = xmalloc (sizeof (CSymInfo) + SB_GetLen (Name));
+
+    /* Initialize it */
+    memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
+
+    /* Return it */
+    return S;
+}
+
+
+
+static void FreeCSymInfo (CSymInfo* S)
+/* Free a CSymInfo struct */
+{
+    /* Free the structure itself */
+    xfree (S);
+}
+
+
+
+static int CompareCSymInfoByName (const void* L, const void* R)
+/* Helper function to sort c symbol infos in a collection by name */
+{
+    /* Sort by symbol name */
+    return strcmp (((const CSymInfo*) L)->Name,
+                   ((const CSymInfo*) R)->Name);
 }
 
 
@@ -2286,6 +2354,7 @@ static DbgInfo* NewDbgInfo (const char* FileName)
     DbgInfo* Info = xmalloc (sizeof (DbgInfo) + Len);
 
     /* Initialize it */
+    CollInit (&Info->CSymInfoById);
     CollInit (&Info->FileInfoById);
     CollInit (&Info->LibInfoById);
     CollInit (&Info->LineInfoById);
@@ -2322,6 +2391,9 @@ static void FreeDbgInfo (DbgInfo* Info)
     unsigned I;
 
     /* First, free the items in the collections */
+    for (I = 0; I < CollCount (&Info->CSymInfoById); ++I) {
+        FreeCSymInfo (CollAt (&Info->CSymInfoById, I));
+    }
     for (I = 0; I < CollCount (&Info->FileInfoById); ++I) {
         FreeFileInfo (CollAt (&Info->FileInfoById, I));
     }
@@ -2351,6 +2423,7 @@ static void FreeDbgInfo (DbgInfo* Info)
     }
 
     /* Free the memory used by the id collections */
+    CollDone (&Info->CSymInfoById);
     CollDone (&Info->FileInfoById);
     CollDone (&Info->LibInfoById);
     CollDone (&Info->LineInfoById);
@@ -2425,10 +2498,12 @@ static void NextToken (InputData* D)
         { "addrsize",   TOK_ADDRSIZE    },
         { "auto",       TOK_AUTO        },
         { "count",      TOK_COUNT       },
+        { "csym",       TOK_CSYM        },
         { "def",        TOK_DEF         },
         { "enum",       TOK_ENUM        },
         { "equ",        TOK_EQUATE      },
         { "exp",        TOK_EXPORT      },
+        { "ext",        TOK_EXTERN      },
         { "file",       TOK_FILE        },
         { "func",       TOK_FUNC        },
         { "global",     TOK_GLOBAL      },
@@ -2444,12 +2519,15 @@ static void NextToken (InputData* D)
         { "mod",        TOK_MODULE      },
         { "mtime",      TOK_MTIME       },
         { "name",       TOK_NAME        },
+        { "offs",       TOK_OFFS        },
         { "oname",      TOK_OUTPUTNAME  },
         { "ooffs",      TOK_OUTPUTOFFS  },
         { "parent",     TOK_PARENT      },
         { "ref",        TOK_REF         },
+        { "reg",        TOK_REGISTER    },
         { "ro",         TOK_RO          },
         { "rw",         TOK_RW          },
+        { "sc",         TOK_SC          },
         { "scope",      TOK_SCOPE       },
         { "seg",        TOK_SEGMENT     },
         { "size",       TOK_SIZE        },
@@ -2660,6 +2738,196 @@ static void ConsumeEOL (InputData* D)
 
 
 
+static void ParseCSym (InputData* D)
+/* Parse a CSYM line */
+{
+    /* Most of the following variables are initialized with a value that is
+     * overwritten later. This is just to avoid compiler warnings.
+     */
+    unsigned            Id = 0;
+    StrBuf              Name = STRBUF_INITIALIZER;
+    int                 Offs = 0;
+    cc65_csym_sc        SC = CC65_CSYM_AUTO;
+    unsigned            ScopeId = 0;
+    unsigned            SymId = CC65_INV_ID;
+    unsigned            TypeId = CC65_INV_ID;
+    CSymInfo*           S;
+    enum {
+        ibNone          = 0x0000,
+
+        ibId            = 0x0001,
+        ibOffs          = 0x0002,
+        ibName          = 0x0004,
+        ibSC            = 0x0008,
+        ibScopeId       = 0x0010,
+        ibSymId         = 0x0020,
+        ibType          = 0x0040,
+
+        ibRequired      = ibId | ibName | ibSC | ibScopeId | ibType,
+    } InfoBits = ibNone;
+
+    /* Skip the CSYM token */
+    NextToken (D);
+
+    /* More stuff follows */
+    while (1) {
+
+        Token Tok;
+
+        /* Something we know? */
+        if (D->Tok != TOK_ID            && D->Tok != TOK_NAME           &&
+            D->Tok != TOK_OFFS          && D->Tok != TOK_SC             &&
+            D->Tok != TOK_SCOPE         && D->Tok != TOK_SYM            &&
+            D->Tok != TOK_TYPE) {
+
+            /* Try smart error recovery */
+            if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
+                UnknownKeyword (D);
+                continue;
+            }
+
+            /* Done */
+            break;
+        }
+
+        /* Remember the token, skip it, check for equal */
+        Tok = D->Tok;
+        NextToken (D);
+        if (!ConsumeEqual (D)) {
+            goto ErrorExit;
+        }
+
+        /* Check what the token was */
+        switch (Tok) {
+
+            case TOK_ID:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Id = D->IVal;
+                NextToken (D);
+                InfoBits |= ibId;
+                break;
+
+            case TOK_NAME:
+                if (!StrConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SB_Copy (&Name, &D->SVal);
+                SB_Terminate (&Name);
+                InfoBits |= ibName;
+                NextToken (D);
+                break;
+
+            case TOK_OFFS:
+                Offs = 1;
+                if (D->Tok == TOK_MINUS) {
+                    Offs = -1;
+                    NextToken (D);
+                }
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                Offs *= (int) D->IVal;
+                InfoBits |= ibOffs;
+                NextToken (D);
+                break;
+
+            case TOK_SC:
+                switch (D->Tok) {
+                    case TOK_AUTO:      SC = CC65_CSYM_AUTO;    break;
+                    case TOK_EXTERN:    SC = CC65_CSYM_EXTERN;  break;
+                    case TOK_REGISTER:  SC = CC65_CSYM_REG;     break;
+                    case TOK_STATIC:    SC = CC65_CSYM_STATIC;  break;
+                    default:
+                        ParseError (D, CC65_ERROR, "Invalid storage class token");
+                        break;
+                }
+                InfoBits |= ibSC;
+                NextToken (D);
+                break;
+
+            case TOK_SCOPE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                ScopeId = D->IVal;
+                NextToken (D);
+                InfoBits |= ibScopeId;
+                break;
+
+            case TOK_SYM:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                SymId = D->IVal;
+                NextToken (D);
+                InfoBits |= ibSymId;
+                break;
+
+            case TOK_TYPE:
+                if (!IntConstFollows (D)) {
+                    goto ErrorExit;
+                }
+                TypeId = D->IVal;
+                NextToken (D);
+                InfoBits |= ibType;
+                break;
+
+            default:
+                /* NOTREACHED */
+                UnexpectedToken (D);
+                goto ErrorExit;
+
+        }
+
+        /* Comma or done */
+        if (D->Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken (D);
+    }
+
+    /* Check for end of line */
+    if (D->Tok != TOK_EOL && D->Tok != TOK_EOF) {
+        UnexpectedToken (D);
+        SkipLine (D);
+        goto ErrorExit;
+    }
+
+    /* Check for required and/or matched information */
+    if ((InfoBits & ibRequired) != ibRequired) {
+        ParseError (D, CC65_ERROR, "Required attributes missing");
+        goto ErrorExit;
+    }
+
+    /* Symbol only valid if storage class not auto */
+    if (((InfoBits & ibSymId) != 0) != (SC != CC65_CSYM_AUTO)) {
+        ParseError (D, CC65_ERROR, "Only non auto symbols can have a symbol attached");
+        goto ErrorExit;
+    }
+
+    /* Create the symbol info */
+    S = NewCSymInfo (&Name);
+    S->Id         = Id;
+    S->Kind       = CC65_CSYM_VAR;
+    S->SC         = SC;
+    S->Offs       = Offs;
+    S->Sym.Id     = SymId;
+    S->Type.Id    = TypeId;
+    S->Scope.Id   = ScopeId;
+
+    /* Remember it */
+    CollReplaceExpand (&D->Info->CSymInfoById, S, Id);
+
+ErrorExit:
+    /* Entry point in case of errors */
+    SB_Done (&Name);
+    return;
+}
+
+
+
 static void ParseFile (InputData* D)
 /* Parse a FILE line */
 {
@@ -2821,11 +3089,11 @@ static void ParseInfo (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_FILE  && D->Tok != TOK_LIBRARY        &&
-            D->Tok != TOK_LINE  && D->Tok != TOK_MODULE         &&
-            D->Tok != TOK_SCOPE && D->Tok != TOK_SEGMENT        &&
-            D->Tok != TOK_SPAN  && D->Tok != TOK_SYM            &&
-            D->Tok != TOK_TYPE) {
+        if (D->Tok != TOK_CSYM          && D->Tok != TOK_FILE           &&
+            D->Tok != TOK_LIBRARY       && D->Tok != TOK_LINE           &&
+            D->Tok != TOK_MODULE        && D->Tok != TOK_SCOPE          &&
+            D->Tok != TOK_SEGMENT       && D->Tok != TOK_SPAN           &&
+            D->Tok != TOK_SYM           && D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -2852,9 +3120,13 @@ static void ParseInfo (InputData* D)
         /* Check what the token was */
         switch (Tok) {
 
+            case TOK_CSYM:
+                CollGrow (&D->Info->CSymInfoById,  D->IVal);
+                break;
+
             case TOK_FILE:
                 CollGrow (&D->Info->FileInfoById,   D->IVal);
-		CollGrow (&D->Info->FileInfoByName, D->IVal);
+	    	CollGrow (&D->Info->FileInfoByName, D->IVal);
                 break;
 
             case TOK_LIBRARY:
@@ -5218,6 +5490,10 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
     while (D.Tok != TOK_EOF) {
 
         switch (D.Tok) {
+
+            case TOK_CSYM:
+                ParseCSym (&D);
+                break;
 
             case TOK_FILE:
                 ParseFile (&D);

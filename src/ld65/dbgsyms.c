@@ -471,7 +471,7 @@ void PrintHLLDbgSyms (FILE* F)
                 case HLL_SC_AUTO:       fputs ("auto", F);      break;
                 case HLL_SC_REG:        fputs ("reg", F);       break;
                 case HLL_SC_STATIC:     fputs ("static", F);    break;
-                case HLL_SC_EXTERN:     fputs ("extern", F);    break;
+                case HLL_SC_EXTERN:     fputs ("ext", F);       break;
                 default:
                     Error ("Invalid storage class %u for hll symbol", SC);
                     break;

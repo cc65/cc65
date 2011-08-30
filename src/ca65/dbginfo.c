@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "coll.h"
 #include "filepos.h"
 #include "hlldbgsym.h"
@@ -113,6 +114,61 @@ static HLLDbgSym* NewHLLDbgSym (unsigned Flags, unsigned Name, unsigned Type)
 
 
 
+static unsigned HexValue (char C)
+/* Convert the ascii representation of a hex nibble into the hex nibble */
+{
+    if (isdigit (C)) {
+        return C - '0';
+    } else if (islower (C)) {
+        return C - 'a' + 10;
+    } else {
+        return C - 'A' + 10;
+    }
+}
+
+
+
+static int ValidateType (StrBuf* Type)
+/* Check if the given type is valid and if so, return a string id for it. If
+ * the type isn't valid, return -1. Type is overwritten when checking.
+ */
+{
+    unsigned        I;
+    const char*     A;
+    char*           B;
+
+
+    /* The length must not be zero and divideable by two */
+    unsigned Length = SB_GetLen (Type);
+    if (Length < 2 || (Length & 0x01) != 0) {
+        ErrorSkip ("Type value has invalid length");
+        return -1;
+    }
+
+    /* The string must consist completely of hex digit chars */
+    A = SB_GetConstBuf (Type);
+    for (I = 0; I < Length; ++I) {
+        if (!IsXDigit (A[I])) {
+            ErrorSkip ("Type value contains invalid characters");
+            return -1;
+        }
+    }
+
+    /* Convert the type to binary */
+    B = SB_GetBuf (Type);
+    while (A < SB_GetConstBuf (Type) + Length) {
+        /* Since we know, there are only hex digits, there can't be any errors */
+        *B++ = (HexValue (A[0]) << 4) | HexValue (A[1]);
+        A += 2;
+    }
+    Type->Len = (Length /= 2);
+
+    /* Allocate the type and return it */
+    return GetStrBufId (Type);
+}
+
+
+
 void DbgInfoFile (void)
 /* Parse and handle FILE subcommand of the .dbg pseudo instruction */
 {
@@ -161,7 +217,7 @@ void DbgInfoFunc (void)
     };
 
     unsigned    Name;
-    unsigned    Type;
+    int         Type;
     unsigned    AsmName;
     unsigned    Flags;
     HLLDbgSym*  S;
@@ -186,7 +242,10 @@ void DbgInfoFunc (void)
        	ErrorSkip ("String constant expected");
        	return;
     }
-    Type = GetStrBufId (&CurTok.SVal);
+    Type = ValidateType (&CurTok.SVal);
+    if (Type < 0) {
+        return;
+    }
     NextTok ();
 
     /* Comma expected */
@@ -301,7 +360,7 @@ void DbgInfoSym (void)
     };
 
     unsigned    Name;
-    unsigned    Type;
+    int         Type;
     unsigned    AsmName = EMPTY_STRING_ID;
     unsigned    Flags;
     int         Offs;
@@ -327,7 +386,10 @@ void DbgInfoSym (void)
        	ErrorSkip ("String constant expected");
        	return;
     }
-    Type = GetStrBufId (&CurTok.SVal);
+    Type = ValidateType (&CurTok.SVal);
+    if (Type < 0) {
+        return;
+    }
     NextTok ();
 
     /* Comma expected */

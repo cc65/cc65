@@ -68,6 +68,10 @@
 #define HLL_SC_MASK     0x0078U
 #define HLL_GET_SC(x)   ((x) & HLL_SC_MASK)
 
+/* Other information */
+#define HLL_DATA_SYM    0x0080U                 /* Attached asm symbol */
+#define HLL_HAS_SYM(x)  (((x) & HLL_DATA_SYM) != 0)
+
 
 
 /* End of hlldbgsyms.h */

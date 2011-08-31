@@ -359,39 +359,18 @@ static void F_RestoreRegVars (Function* F)
 
 
 
-static void EmitDebugInfo (void)
+static void F_EmitDebugInfo (void)
 /* Emit debug infos for the current function */
-{
-    /* Fetch stuff for the current fuction */
-    const SymEntry* Sym = CurrentFunc->FuncEntry;
-    const FuncDesc* Desc = CurrentFunc->Desc;
-    const SymTable* Tab = Desc->SymTab;
+{                   
+    if (DebugInfo) {
+        /* Get the current fuction */
+        const SymEntry* Sym = CurrentFunc->FuncEntry;
 
-    /* Output info for the function itself */
-    AddTextLine ("\t.dbg\tfunc, \"%s\", \"00\", %s, \"%s\"",
-                 Sym->Name,
-                 (Sym->Flags & SC_EXTERN)? "extern" : "static",
-                 Sym->AsmName);
-
-    /* Output info for locals */
-    Sym = Tab->SymHead;
-    while (Sym) {
-        if ((Sym->Flags & (SC_CONST|SC_TYPE)) == 0) {
-            if (Sym->Flags & SC_AUTO) {
-                AddTextLine ("\t.dbg\tsym, \"%s\", \"00\", auto, %d",
-                             Sym->Name, Sym->V.Offs);
-            } else if (Sym->Flags & SC_REGISTER) {
-                AddTextLine ("\t.dbg\tsym, \"%s\", \"00\", register, \"regbank\", %d",
-                             Sym->Name, Sym->V.R.RegOffs);
-
-            } else {
-                AddTextLine ("\t.dbg\tsym, \"%s\", \"00\", %s, \"%s\"",
-                             Sym->Name,
-                             (Sym->Flags & SC_EXTERN)? "extern" : "static",
-                             Sym->AsmName);
-            }
-        }
-        Sym = Sym->NextSym;
+        /* Output info for the function itself */
+        AddTextLine ("\t.dbg\tfunc, \"%s\", \"00\", %s, \"%s\"",
+                     Sym->Name,
+                     (Sym->Flags & SC_EXTERN)? "extern" : "static",
+                     Sym->AsmName);
     }
 }
 
@@ -593,6 +572,7 @@ void NewFunc (SymEntry* Func)
     EmitExternals ();
 
     /* Emit function debug info */
+    F_EmitDebugInfo ();
     EmitDebugInfo ();
 
     /* Leave the lexical level */

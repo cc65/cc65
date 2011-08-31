@@ -397,7 +397,7 @@ void Compile (const char* FileName)
 
 
 void FinishCompile (void)
-/* Emit literals, externals, do cleanup and optimizations */
+/* Emit literals, externals, debug info, do cleanup and optimizations */
 {
     SymTable* SymTab;
     SymEntry* Func;
@@ -417,6 +417,9 @@ void FinishCompile (void)
 
     /* Output the literal pool */
     OutputLiteralPool ();
+
+    /* Emit debug infos if enabled */
+    EmitDebugInfo ();
 
     /* Write imported/exported symbols */
     EmitExternals ();

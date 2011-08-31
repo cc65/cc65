@@ -188,6 +188,9 @@ void PrintSymTable (const SymTable* Tab, FILE* F, const char* Header, ...);
 void EmitExternals (void);
 /* Write import/export statements for external symbols */
 
+void EmitDebugInfo (void);
+/* Emit debug infos for the locals of the current scope */
+
 
 
 /* End of symtab.h */

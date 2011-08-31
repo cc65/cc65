@@ -495,16 +495,22 @@ void WriteHLLDbgSyms (void)
         for (I = 0; I < CollCount (&HLLDbgSyms); ++I) {
 
             /* Get the next symbol */
-            const HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
+            HLLDbgSym* S = CollAtUnchecked (&HLLDbgSyms, I);
 
             /* Get the type of the symbol */
             unsigned SC = HLL_GET_SC (S->Flags);
 
+            /* Remember if the symbol has debug info attached
+             * ### This should go into DbgInfoCheck
+             */
+            if (S->Sym && S->Sym->DebugSymId) {
+                S->Flags |= HLL_DATA_SYM;
+            }
+
             /* Write the symbol data */
             ObjWriteVar (S->Flags);
             ObjWriteVar (S->Name);
-            if (SC != HLL_SC_AUTO) {
-                CHECK (S->Sym->DebugSymId != ~0U);
+            if (HLL_HAS_SYM (S->Flags)) {
                 ObjWriteVar (S->Sym->DebugSymId);
             }
             if (SC == HLL_SC_AUTO || SC == HLL_SC_REG) {

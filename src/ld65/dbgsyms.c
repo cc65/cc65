@@ -248,7 +248,7 @@ HLLDbgSym* ReadHLLDbgSym (FILE* F, ObjData* O, unsigned Id attribute ((unused)))
     S->Flags    = ReadVar (F);
     SC          = HLL_GET_SC (S->Flags);
     S->Name     = MakeGlobalStringId (O, ReadVar (F));
-    if (SC != HLL_SC_AUTO) {
+    if (HLL_HAS_SYM (S->Flags)) {
         S->Sym = GetObjDbgSym (O, ReadVar (F));
     } else {
         /* Auto variables aren't attached to asm symbols */
@@ -483,7 +483,7 @@ void PrintHLLDbgSyms (FILE* F)
             }
 
             /* For non auto symbols output the debug symbol id of the asm sym */
-            if (SC != HLL_SC_AUTO) {
+            if (HLL_HAS_SYM (S->Flags)) {
                 fprintf (F, ",sym=%u", S->Sym->Id);
             }
 

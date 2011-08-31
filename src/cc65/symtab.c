@@ -946,3 +946,43 @@ void EmitExternals (void)
 
 
 
+void EmitDebugInfo (void)
+/* Emit debug infos for the locals of the current scope */
+{
+    const char* Head;
+    const SymEntry* Sym;
+
+    /* Output info for locals if enabled */
+    if (DebugInfo) {
+        /* For cosmetic reasons in the output file, we will insert two tabs
+         * on global level and just one on local level.
+         */
+        if (LexicalLevel == LEX_LEVEL_GLOBAL) {
+            Head = "\t.dbg\t\tsym";
+        } else {
+            Head = "\t.dbg\tsym";
+        }
+        Sym = SymTab->SymHead;
+        while (Sym) {
+            if ((Sym->Flags & (SC_CONST|SC_TYPE)) == 0) {
+                if (Sym->Flags & SC_AUTO) {
+                    AddTextLine ("%s, \"%s\", \"00\", auto, %d",
+                                 Head, Sym->Name, Sym->V.Offs);
+                } else if (Sym->Flags & SC_REGISTER) {
+                    AddTextLine ("%s, \"%s\", \"00\", register, \"regbank\", %d",
+                                 Head, Sym->Name, Sym->V.R.RegOffs);
+
+                } else if (SymIsRef (Sym) && !SymIsDef (Sym)) {
+                    AddTextLine ("%s, \"%s\", \"00\", %s, \"%s\"",
+                                 Head, Sym->Name,
+                                 (Sym->Flags & SC_EXTERN)? "extern" : "static",
+                                 Sym->AsmName);
+                }
+            }
+            Sym = Sym->NextSym;
+        }
+    }
+}
+
+
+

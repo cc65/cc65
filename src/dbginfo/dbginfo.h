@@ -158,6 +158,22 @@ const cc65_csyminfo* cc65_csym_byid (cc65_dbginfo handle, unsigned id);
  * symbol information.
  */
 
+const cc65_csyminfo* cc65_cfunc_bymodule (cc65_dbginfo handle, unsigned module_id);
+/* Return the list of C functions (not symbols!) for a specific module. If
+ * the module id is invalid, the function will return NULL, otherwise a
+ * (possibly empty) c symbol list.
+ */
+
+const cc65_csyminfo* cc65_cfunc_byname (cc65_dbginfo handle, const char* name);
+/* Return a list of all C functions with the given name that have a
+ * definition.
+ */
+
+const cc65_csyminfo* cc65_csym_byscope (cc65_dbginfo handle, unsigned scope_id);
+/* Return all C symbols for a scope. The function will return NULL if the
+ * given id is invalid.
+ */
+
 void cc65_free_csyminfo (cc65_dbginfo handle, const cc65_csyminfo* info);
 /* Free a c symbol info record */
 

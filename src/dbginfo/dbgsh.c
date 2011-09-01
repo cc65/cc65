@@ -75,6 +75,12 @@ static void CmdShowHelp (Collection* Args);
 static void CmdShowChildScopes (Collection* Args);
 /* Show child scopes from the debug info file */
 
+static void CmdShowCSymbol (Collection* Args);
+/* Show c symbols from the debug info file */
+
+static void CmdShowFunction (Collection* Args);
+/* Show C functions from the debug info file */
+
 static void CmdShowLibrary (Collection* Args);
 /* Show libraries from the debug info file */
 
@@ -132,6 +138,7 @@ static unsigned FileWarnings = 0;
 /* Type of an id */
 enum {
     InvalidId,
+    CSymbolId,
     LibraryId,
     LineId,
     ModuleId,
@@ -195,8 +202,28 @@ static const CmdEntry ShowCmds[] = {
         -2,
         CmdShowChildScopes
     }, {
+        "csym",
+        0,
+        -1,
+        CmdShowCSymbol
+    }, {
+        "csymbol",
+        "Show c symbols.",
+        -1,
+        CmdShowCSymbol
+    }, {
+        "func",
+        0,
+        -2,
+        CmdShowFunction
+    }, {
+        "function",
+        "Show c functions.",
+        -2,
+        CmdShowFunction
+    }, {
         "help",
-        "Show available subcommands",
+        "Show available subcommands.",
         1,
         CmdShowHelp
     }, {
@@ -491,10 +518,10 @@ static void PrintAddr (cc65_addr Addr, unsigned FieldWidth)
 
 
 
-static void PrintNumber (unsigned long Num, unsigned Width, unsigned FieldWidth)
+static void PrintNumber (long Num, unsigned Width, unsigned FieldWidth)
 /* Output a number */
 {
-    Print ("%*lu", Width, Num);
+    Print ("%*ld", Width, Num);
     if (FieldWidth > Width) {
         Print ("%*s", FieldWidth - Width, "");
     }
@@ -539,6 +566,38 @@ static void PrintTime (time_t T, unsigned FieldWidth)
     Print ("%s", Buf);
     if (FieldWidth > Len) {
         Print ("%*s", FieldWidth - Len, "");
+    }
+}
+
+
+
+static void PrintCSymbolHeader (void)
+/* Output a header for a list of C symbols */
+{
+    /* Header */
+    PrintLine ("  id  name                        type  kind   sc   offs  symbol scope");
+    PrintSeparator ();
+}
+
+
+
+static void PrintCSymbols (const cc65_csyminfo* S)
+/* Output a list of C symbols */
+{
+    unsigned I;
+    const cc65_csymdata* D;
+
+    /* Segments */
+    for (I = 0, D = S->data; I < S->count; ++I, ++D) {
+        PrintId (D->csym_id, 6);
+        Print ("%-28s", D->csym_name);
+        PrintId (0, 6);
+        PrintNumber (D->csym_kind, 4, 6);
+        PrintNumber (D->csym_sc, 4, 6);
+        PrintNumber (D->csym_offs, 4, 8);
+        PrintId (D->symbol_id, 6);
+        PrintId (D->scope_id, 0);
+        NewLine ();
     }
 }
 
@@ -996,6 +1055,116 @@ static void CmdShowChildScopes (Collection* Args)
         if (S) {
             PrintScopes (S);
             cc65_free_scopeinfo (Info, S);
+        }
+    }
+}
+
+
+
+static void CmdShowCSymbol (Collection* Args)
+/* Show C symbols from the debug info file */
+{
+    const cc65_csyminfo* S;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintCSymbolHeader ();
+
+    /* No arguments means show all libraries */
+    if (CollCount (Args) == 0) {
+
+        /* Fetch the list of c symbols */
+        S = cc65_get_csymlist (Info);
+
+        /* Output the c symbols */
+        PrintCSymbols (S);
+
+        /* Free the list */
+        cc65_free_csyminfo (Info, S);
+
+    } else {
+
+        /* Output c symbols for all arguments */
+        unsigned I;
+        for (I = 0; I < CollCount (Args); ++I) {
+
+            /* Parse the argument */
+            unsigned Id;
+            unsigned IdType = CSymbolId;
+            if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+                /* Fetch list depending on type */
+                switch (IdType) {
+                    case CSymbolId:
+                        S = cc65_csym_byid (Info, Id);
+                        break;   
+                    case ScopeId:
+                        S = cc65_csym_byscope (Info, Id);
+                        break;
+                    default:
+                        S = 0;
+                        PrintLine ("Invalid id type");
+                        break;
+                }
+            } else {
+                /* Invalid id */
+                S = 0;
+            }
+
+            /* Output the list */
+            if (S) {
+                PrintCSymbols (S);
+                cc65_free_csyminfo (Info, S);
+            }
+        }
+    }
+}
+
+
+
+static void CmdShowFunction (Collection* Args)
+/* Show C functions from the debug info file */
+{
+    const cc65_csyminfo* S;
+    unsigned I;
+
+    /* Be sure a file is loaded */
+    if (!FileIsLoaded ()) {
+        return;
+    }
+
+    /* Output the header */
+    PrintCSymbolHeader ();
+
+    /* Output c symbols for all arguments */
+    for (I = 0; I < CollCount (Args); ++I) {
+
+        /* Parse the argument */
+        unsigned Id;
+        unsigned IdType = ModuleId;
+        if (GetId (CollConstAt (Args, I), &Id, &IdType)) {
+            /* Fetch list depending on type */
+            switch (IdType) {
+                case ModuleId:
+                    S = cc65_cfunc_bymodule (Info, Id);
+                    break;
+                default:
+                    S = 0;
+                    PrintLine ("Invalid id type");
+                    break;
+            }
+        } else {
+            /* An invalid id may be a function name */
+            S = cc65_cfunc_byname (Info, CollConstAt (Args, I));
+        }
+
+        /* Output the list */
+        if (S) {
+            PrintCSymbols (S);
+            cc65_free_csyminfo (Info, S);
         }
     }
 }

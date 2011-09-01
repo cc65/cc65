@@ -265,7 +265,6 @@ struct CSymInfo {
         unsigned        Id;             /* Id of scope */
         ScopeInfo*      Info;           /* Pointer to scope */
     } Scope;
-    Collection*         LocalsByName;   /* Locals if this is a function */
     char                Name[1];        /* Name of file with full path */
 };
 
@@ -731,9 +730,9 @@ static void CollFree (Collection* C)
 
 
 static unsigned CollCount (const Collection* C)
-/* Return the number of items in the collection */
+/* Return the number of items in the collection. Return 0 if C is NULL. */
 {
-    return C->Count;
+    return C? C->Count : 0;
 }
 
 
@@ -1069,6 +1068,21 @@ static void DBGPRINT(const char* format, ...) {}
 
 
 
+static unsigned GetId (const void* Data)
+/* Return the id of one of the info structures. All structures have the Id
+ * field as first member, and the C standard allows converting a union pointer
+ * to the data type of the first member, so this is safe and portable.
+ */
+{
+    if (Data) {
+        return *(const unsigned*)Data;
+    } else {
+        return CC65_INV_ID;
+    }
+}
+
+
+
 static unsigned HexValue (char C)
 /* Convert the ascii representation of a hex nibble into the hex nibble */
 {
@@ -1182,7 +1196,6 @@ static CSymInfo* NewCSymInfo (const StrBuf* Name)
     CSymInfo* S = xmalloc (sizeof (CSymInfo) + SB_GetLen (Name));
 
     /* Initialize it */
-    S->LocalsByName = 0;
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1194,11 +1207,35 @@ static CSymInfo* NewCSymInfo (const StrBuf* Name)
 static void FreeCSymInfo (CSymInfo* S)
 /* Free a CSymInfo struct */
 {
-    /* Free collections */
-    CollFree (S->LocalsByName);
-
     /* Free the structure itself */
     xfree (S);
+}
+
+
+
+static cc65_csyminfo* new_cc65_csyminfo (unsigned Count)
+/* Allocate and return a cc65_csyminfo struct that is able to hold Count
+ * entries. Initialize the count field of the returned struct.
+ */
+{
+    cc65_csyminfo* S = xmalloc (sizeof (*S) - sizeof (S->data[0]) +
+                                Count * sizeof (S->data[0]));
+    S->count = Count;
+    return S;
+}
+
+
+
+static void CopyCSymInfo (cc65_csymdata* D, const CSymInfo* S)
+/* Copy data from a CSymInfo struct to a cc65_csymdata struct */
+{
+    D->csym_id      = S->Id;
+    D->csym_kind    = S->Kind;
+    D->csym_sc      = S->SC;
+    D->csym_offs    = S->Offs;
+    D->symbol_id    = GetId (S->Sym.Info);
+    D->scope_id     = GetId (S->Scope.Info);
+    D->csym_name    = S->Name;
 }
 
 
@@ -1473,19 +1510,11 @@ static cc65_moduleinfo* new_cc65_moduleinfo (unsigned Count)
 static void CopyModInfo (cc65_moduledata* D, const ModInfo* M)
 /* Copy data from a ModInfo struct to a cc65_moduledata struct */
 {
-    D->module_id      = M->Id;
-    D->module_name    = M->Name;
-    D->source_id      = M->File.Info->Id;
-    if (M->Lib.Info) {
-        D->library_id = M->Lib.Info->Id;
-    } else {
-        D->library_id = CC65_INV_ID;
-    }
-    if (M->MainScope) {
-        D->scope_id   = M->MainScope->Id;
-    } else {
-        D->scope_id   = CC65_INV_ID;
-    }
+    D->module_id    = M->Id;
+    D->module_name  = M->Name;
+    D->source_id    = M->File.Info->Id;
+    D->library_id   = GetId (M->Lib.Info);
+    D->scope_id     = GetId (M->MainScope);
 }
 
 
@@ -1553,21 +1582,13 @@ static cc65_scopeinfo* new_cc65_scopeinfo (unsigned Count)
 static void CopyScopeInfo (cc65_scopedata* D, const ScopeInfo* S)
 /* Copy data from a ScopeInfo struct to a cc65_scopedata struct */
 {
-    D->scope_id         = S->Id;
-    D->scope_name       = S->Name;
-    D->scope_type       = S->Type;
-    D->scope_size       = S->Size;
-    if (S->Parent.Info) {
-        D->parent_id    = S->Parent.Info->Id;
-    } else {
-        D->parent_id    = CC65_INV_ID;
-    }
-    if (S->Label.Info) {
-        D->symbol_id    = S->Label.Info->Id;
-    } else {
-        D->symbol_id    = CC65_INV_ID;
-    }
-    D->module_id        = S->Mod.Info->Id;
+    D->scope_id     = S->Id;
+    D->scope_name   = S->Name;
+    D->scope_type   = S->Type;
+    D->scope_size   = S->Size;
+    D->parent_id    = GetId (S->Parent.Info);
+    D->symbol_id    = GetId (S->Label.Info);
+    D->module_id    = S->Mod.Info->Id;
 }
 
 
@@ -1714,25 +1735,13 @@ static cc65_spaninfo* new_cc65_spaninfo (unsigned Count)
 static void CopySpanInfo (cc65_spandata* D, const SpanInfo* S)
 /* Copy data from a SpanInfo struct to a cc65_spandata struct */
 {
-    D->span_id          = S->Id;
-    D->span_start       = S->Start;
-    D->span_end         = S->End;
-    D->segment_id       = S->Seg.Info->Id;
-    if (S->Type.Info) {
-        D->type_id      = S->Type.Info->Id;
-    } else {
-        D->type_id      = CC65_INV_ID;
-    }
-    if (S->ScopeInfoList) {
-        D->scope_count  = CollCount (S->ScopeInfoList);
-    } else {
-        D->scope_count  = 0;
-    }
-    if (S->LineInfoList) {
-        D->line_count   = CollCount (S->LineInfoList);
-    } else {
-        D->line_count   = 0;
-    }
+    D->span_id      = S->Id;
+    D->span_start   = S->Start;
+    D->span_end     = S->End;
+    D->segment_id   = S->Seg.Info->Id;
+    D->type_id      = GetId (S->Type.Info);
+    D->scope_count  = CollCount (S->ScopeInfoList);
+    D->line_count   = CollCount (S->LineInfoList);
 }
 
 
@@ -4605,7 +4614,51 @@ ErrorExit:
 
 
 
-static int FindFileInfoByName (Collection* FileInfos, const char* Name,
+static int FindCSymInfoByName (const Collection* CSymInfos, const char* Name,
+                               unsigned* Index)
+/* Find the C symbol info with a given file name. The function returns true if
+ * the name was found. In this case, Index contains the index of the first item
+ * that matches. If the item wasn't found, the function returns false and
+ * Index contains the insert position for Name.
+ */
+{
+    /* Do a binary search */
+    int Lo = 0;
+    int Hi = (int) CollCount (CSymInfos) - 1;
+    int Found = 0;
+    while (Lo <= Hi) {
+
+        /* Mid of range */
+        int Cur = (Lo + Hi) / 2;
+
+        /* Get item */
+        const CSymInfo* CurItem = CollAt (CSymInfos, Cur);
+
+        /* Compare */
+        int Res = strcmp (CurItem->Name, Name);
+
+        /* Found? */
+        if (Res < 0) {
+            Lo = Cur + 1;
+        } else {
+            Hi = Cur - 1;
+            /* Since we may have duplicates, repeat the search until we've
+             * the first item that has a match.
+             */
+            if (Res == 0) {
+                Found = 1;
+            }
+        }
+    }
+
+    /* Pass back the index. This is also the insert position */
+    *Index = Lo;
+    return Found;
+}
+
+
+
+static int FindFileInfoByName (const Collection* FileInfos, const char* Name,
                                unsigned* Index)
 /* Find the FileInfo for a given file name. The function returns true if the
  * name was found. In this case, Index contains the index of the first item
@@ -4623,7 +4676,7 @@ static int FindFileInfoByName (Collection* FileInfos, const char* Name,
         int Cur = (Lo + Hi) / 2;
 
         /* Get item */
-        FileInfo* CurItem = CollAt (FileInfos, Cur);
+        const FileInfo* CurItem = CollAt (FileInfos, Cur);
 
         /* Compare */
         int Res = strcmp (CurItem->Name, Name);
@@ -4965,14 +5018,14 @@ static void ProcessCSymInfo (InputData* D)
         }
     }
 
-    /* Walk over all scopes and sort the c symbols by name */
+    /* Walk over all scopes and sort the c symbols by name. */
     for (I = 0; I < CollCount (&D->Info->ScopeInfoById); ++I) {
 
         /* Get this scope */
         ScopeInfo* S = CollAt (&D->Info->ScopeInfoById, I);
 
         /* Ignore scopes without C symbols */
-        if (S->CSymInfoByName && CollCount (S->CSymInfoByName) > 1) {
+        if (CollCount (S->CSymInfoByName) > 1) {
             /* Sort the c symbols for this scope by name */
             CollSort (S->CSymInfoByName, CompareCSymInfoByName);
         }
@@ -5742,6 +5795,217 @@ void cc65_free_dbginfo (cc65_dbginfo Handle)
 
 
 /*****************************************************************************/
+/*                                 C symbols                                 */
+/*****************************************************************************/
+
+
+
+const cc65_csyminfo* cc65_get_csymlist (cc65_dbginfo Handle)
+/* Return a list of all c symbols */
+{
+    const DbgInfo*      Info;
+    cc65_csyminfo*      S;
+    unsigned            I;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Allocate memory for the data structure returned to the caller */
+    S = new_cc65_csyminfo (CollCount (&Info->CSymInfoById));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&Info->CSymInfoById); ++I) {
+        /* Copy the data */
+        CopyCSymInfo (S->data + I, CollAt (&Info->CSymInfoById, I));
+    }
+
+    /* Return the result */
+    return S;
+}
+
+
+
+const cc65_csyminfo* cc65_csym_byid (cc65_dbginfo Handle, unsigned Id)
+/* Return information about a c symbol with a specific id. The function
+ * returns NULL if the id is invalid (no such c symbol) and otherwise a
+ * cc65_csyminfo structure with one entry that contains the requested
+ * symbol information.
+ */
+{
+    const DbgInfo*      Info;
+    cc65_csyminfo*      S;
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the id is valid */
+    if (Id >= CollCount (&Info->CSymInfoById)) {
+        return 0;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    S = new_cc65_csyminfo (1);
+
+    /* Fill in the data */
+    CopyCSymInfo (S->data, CollAt (&Info->CSymInfoById, Id));
+
+    /* Return the result */
+    return S;
+}
+
+
+
+const cc65_csyminfo* cc65_cfunc_bymodule (cc65_dbginfo Handle, unsigned ModId)
+/* Return the list of C functions (not symbols!) for a specific module. If
+ * the module id is invalid, the function will return NULL, otherwise a
+ * (possibly empty) c symbol list.
+ */
+{
+    const DbgInfo*      Info;
+    const ModInfo*      M;
+    cc65_csyminfo*      D;
+    unsigned            I;
+
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the module id is valid */
+    if (ModId >= CollCount (&Info->ModInfoById)) {
+        return 0;
+    }
+
+    /* Get a pointer to the module info */
+    M = CollAt (&Info->ModInfoById, ModId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_csyminfo (CollCount (&M->CSymFuncByName));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (&M->CSymFuncByName); ++I) {
+        CopyCSymInfo (D->data + I, CollAt (&M->CSymFuncByName, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_csyminfo* cc65_cfunc_byname (cc65_dbginfo Handle, const char* Name)
+/* Return a list of all C functions with the given name that have a
+ * definition.
+ */
+{
+    const DbgInfo*      Info;
+    unsigned            Index;
+    unsigned            Count;
+    const CSymInfo*     S;
+    cc65_csyminfo*      D;
+    unsigned            I;
+
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Search for a function with the given name */
+    if (!FindCSymInfoByName (&Info->CSymFuncByName, Name, &Index)) {
+        return 0;
+    }
+
+    /* Count functions with this name */
+    Count = 1;
+    I = Index;
+    while (1) {
+        if (++I >= CollCount (&Info->CSymFuncByName)) {
+            break;
+        }
+        S = CollAt (&Info->CSymFuncByName, I);
+        if (strcmp (S->Name, Name) != 0) {
+            /* Next symbol has another name */
+            break;
+        }
+        ++Count;
+    }
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_csyminfo (Count);
+
+    /* Fill in the data */
+    for (I = 0; I < Count; ++I, ++Index) {
+        CopyCSymInfo (D->data + I, CollAt (&Info->CSymFuncByName, Index));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+const cc65_csyminfo* cc65_csym_byscope (cc65_dbginfo Handle, unsigned ScopeId)
+/* Return all C symbols for a scope. The function will return NULL if the
+ * given id is invalid.
+ */
+{
+    const DbgInfo*      Info;
+    const ScopeInfo*    S;
+    cc65_csyminfo*      D;
+    unsigned            I;
+
+
+    /* Check the parameter */
+    assert (Handle != 0);
+
+    /* The handle is actually a pointer to a debug info struct */
+    Info = Handle;
+
+    /* Check if the scope id is valid */
+    if (ScopeId >= CollCount (&Info->ScopeInfoById)) {
+        return 0;
+    }
+
+    /* Get a pointer to the scope */
+    S = CollAt (&Info->ScopeInfoById, ScopeId);
+
+    /* Allocate memory for the data structure returned to the caller */
+    D = new_cc65_csyminfo (CollCount (S->CSymInfoByName));
+
+    /* Fill in the data */
+    for (I = 0; I < CollCount (S->CSymInfoByName); ++I) {
+        CopyCSymInfo (D->data + I, CollAt (S->CSymInfoByName, I));
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void cc65_free_csyminfo (cc65_dbginfo Handle, const cc65_csyminfo* Info)
+/* Free a c symbol info record */
+{
+    /* Just for completeness, check the handle */
+    assert (Handle != 0);
+
+    /* Just free the memory */
+    xfree ((cc65_csyminfo*) Info);
+}
+
+
+
+/*****************************************************************************/
 /*                                 Libraries                                 */
 /*****************************************************************************/
 
@@ -6046,9 +6310,9 @@ const cc65_lineinfo* cc65_line_byspan (cc65_dbginfo Handle, unsigned SpanId)
     S = CollAt (&Info->SpanInfoById, SpanId);
 
     /* Prepare the struct we will return to the caller */
-    D = new_cc65_lineinfo (S->LineInfoList? CollCount (S->LineInfoList) : 0);
+    D = new_cc65_lineinfo (CollCount (S->LineInfoList));
 
-    /* Fill in the data. Since D->LineInfoList may be NULL, we will use the
+    /* Fill in the data. Since S->LineInfoList may be NULL, we will use the
      * count field of the returned data struct instead.
      */
     for (I = 0; I < D->count; ++I) {
@@ -6652,7 +6916,7 @@ const cc65_scopeinfo* cc65_scope_byspan (cc65_dbginfo Handle, unsigned SpanId)
     S = CollAt (&Info->SpanInfoById, SpanId);
 
     /* Prepare the struct we will return to the caller */
-    D = new_cc65_scopeinfo (S->ScopeInfoList? CollCount (S->ScopeInfoList) : 0);
+    D = new_cc65_scopeinfo (CollCount (S->ScopeInfoList));
 
     /* Fill in the data. Since D->ScopeInfoList may be NULL, we will use the
      * count field of the returned data struct instead.
@@ -6694,7 +6958,7 @@ const cc65_scopeinfo* cc65_childscopes_byid (cc65_dbginfo Handle, unsigned Id)
     S = CollAt (&Info->ScopeInfoById, Id);
 
     /* Allocate memory for the data structure returned to the caller */
-    D = new_cc65_scopeinfo (S->ChildScopeList? CollCount (S->ChildScopeList) : 0);
+    D = new_cc65_scopeinfo (CollCount (S->ChildScopeList));
 
     /* Fill in the data */
     for (I = 0; I < D->count; ++I) {

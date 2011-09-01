@@ -1233,6 +1233,7 @@ static void CopyCSymInfo (cc65_csymdata* D, const CSymInfo* S)
     D->csym_kind    = S->Kind;
     D->csym_sc      = S->SC;
     D->csym_offs    = S->Offs;
+    D->type_id      = GetId (S->Type.Info);
     D->symbol_id    = GetId (S->Sym.Info);
     D->scope_id     = GetId (S->Scope.Info);
     D->csym_name    = S->Name;

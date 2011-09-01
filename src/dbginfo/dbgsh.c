@@ -591,7 +591,7 @@ static void PrintCSymbols (const cc65_csyminfo* S)
     for (I = 0, D = S->data; I < S->count; ++I, ++D) {
         PrintId (D->csym_id, 6);
         Print ("%-28s", D->csym_name);
-        PrintId (0, 6);
+        PrintId (D->type_id, 6);
         PrintNumber (D->csym_kind, 4, 6);
         PrintNumber (D->csym_sc, 4, 6);
         PrintNumber (D->csym_offs, 4, 8);
@@ -1100,7 +1100,7 @@ static void CmdShowCSymbol (Collection* Args)
                 switch (IdType) {
                     case CSymbolId:
                         S = cc65_csym_byid (Info, Id);
-                        break;   
+                        break;
                     case ScopeId:
                         S = cc65_csym_byscope (Info, Id);
                         break;

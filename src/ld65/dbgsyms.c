@@ -484,7 +484,7 @@ void PrintHLLDbgSyms (FILE* F)
 
             /* For non auto symbols output the debug symbol id of the asm sym */
             if (HLL_HAS_SYM (S->Flags)) {
-                fprintf (F, ",sym=%u", S->Sym->Id);
+                fprintf (F, ",sym=%u", O->SymBaseId + S->Sym->Id);
             }
 
             /* Terminate the output line */

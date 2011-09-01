@@ -199,6 +199,7 @@ struct DbgInfo {
     Collection          TypeInfoById;   /* Type infos sorted by id */
 
     /* Collections with other sort criteria */
+    Collection          CSymFuncByName; /* C functions sorted by name */
     Collection          FileInfoByName; /* File infos sorted by name */
     Collection		ModInfoByName;	/* Module info sorted by name */
     Collection          ScopeInfoByName;/* Scope infos sorted by name */
@@ -264,6 +265,7 @@ struct CSymInfo {
         unsigned        Id;             /* Id of scope */
         ScopeInfo*      Info;           /* Pointer to scope */
     } Scope;
+    Collection*         LocalsByName;   /* Locals if this is a function */
     char                Name[1];        /* Name of file with full path */
 };
 
@@ -308,6 +310,7 @@ struct ModInfo {
         LibInfo*        Info;           /* Pointer to library info */
     } Lib;
     ScopeInfo*          MainScope;      /* Pointer to main scope */
+    Collection          CSymFuncByName; /* C functions by name */
     Collection          FileInfoByName; /* Files for this module */
     Collection          ScopeInfoByName;/* Scopes for this module */
     char                Name[1];        /* Name of module with path */
@@ -330,8 +333,10 @@ struct ScopeInfo {
         unsigned        Id;             /* Id of label symbol */
         SymInfo*        Info;           /* Pointer to label symbol */
     } Label;
+    CSymInfo*           CSymFunc;       /* C function for this scope */
     Collection		SpanInfoList;	/* List of spans for this scope */
     Collection          SymInfoByName;  /* Symbols in this scope */
+    Collection*         CSymInfoByName; /* C symbols for this scope */
     Collection*         ChildScopeList; /* Child scopes of this scope */
     char                Name[1];        /* Name of scope */
 };
@@ -385,6 +390,7 @@ struct SymInfo {
         unsigned        Id;             /* Parent symbol if any */
         SymInfo*        Info;           /* Pointer to parent symbol if any */
     } Parent;
+    CSymInfo*           CSym;           /* Corresponding C symbol */
     Collection*         ImportList;     /* List of imports if this is an export */
     Collection*         CheapLocals;    /* List of cheap local symbols */
     Collection          DefLineInfoList;/* Line info of symbol definition */
@@ -1176,6 +1182,7 @@ static CSymInfo* NewCSymInfo (const StrBuf* Name)
     CSymInfo* S = xmalloc (sizeof (CSymInfo) + SB_GetLen (Name));
 
     /* Initialize it */
+    S->LocalsByName = 0;
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
     /* Return it */
@@ -1187,6 +1194,9 @@ static CSymInfo* NewCSymInfo (const StrBuf* Name)
 static void FreeCSymInfo (CSymInfo* S)
 /* Free a CSymInfo struct */
 {
+    /* Free collections */
+    CollFree (S->LocalsByName);
+
     /* Free the structure itself */
     xfree (S);
 }
@@ -1196,9 +1206,12 @@ static void FreeCSymInfo (CSymInfo* S)
 static int CompareCSymInfoByName (const void* L, const void* R)
 /* Helper function to sort c symbol infos in a collection by name */
 {
-    /* Sort by symbol name */
-    return strcmp (((const CSymInfo*) L)->Name,
-                   ((const CSymInfo*) R)->Name);
+    /* Sort by symbol name, then by id */
+    int Res = strcmp (((const CSymInfo*) L)->Name, ((const CSymInfo*) R)->Name);
+    if (Res == 0) {
+        Res = (int)((const CSymInfo*) L)->Id - (int)((const CSymInfo*) R)->Id;
+    }
+    return Res;
 }
 
 
@@ -1419,6 +1432,7 @@ static ModInfo* NewModInfo (const StrBuf* Name)
 
     /* Initialize it */
     M->MainScope = 0;
+    CollInit (&M->CSymFuncByName);
     CollInit (&M->FileInfoByName);
     CollInit (&M->ScopeInfoByName);
     memcpy (M->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
@@ -1433,6 +1447,7 @@ static void FreeModInfo (ModInfo* M)
 /* Free a ModInfo struct */
 {
     /* Free the collections */
+    CollDone (&M->CSymFuncByName);
     CollDone (&M->FileInfoByName);
     CollDone (&M->ScopeInfoByName);
 
@@ -1497,8 +1512,10 @@ static ScopeInfo* NewScopeInfo (const StrBuf* Name)
     ScopeInfo* S = xmalloc (sizeof (ScopeInfo) + SB_GetLen (Name));
 
     /* Initialize the fields as necessary */
+    S->CSymFunc = 0;
     CollInit (&S->SpanInfoList);
     CollInit (&S->SymInfoByName);
+    S->CSymInfoByName = 0;
     S->ChildScopeList = 0;
     memcpy (S->Name, SB_GetConstBuf (Name), SB_GetLen (Name) + 1);
 
@@ -1513,6 +1530,7 @@ static void FreeScopeInfo (ScopeInfo* S)
 {
     CollDone (&S->SpanInfoList);
     CollDone (&S->SymInfoByName);
+    CollFree (S->CSymInfoByName);
     CollFree (S->ChildScopeList);
     xfree (S);
 }
@@ -1757,7 +1775,8 @@ static SymInfo* NewSymInfo (const StrBuf* Name)
     SymInfo* S = xmalloc (sizeof (SymInfo) + SB_GetLen (Name));
 
     /* Initialize it as necessary */
-    S->ImportList = 0;
+    S->CSym        = 0;
+    S->ImportList  = 0;
     S->CheapLocals = 0;
     CollInit (&S->DefLineInfoList);
     CollInit (&S->RefLineInfoList);
@@ -2365,6 +2384,7 @@ static DbgInfo* NewDbgInfo (const char* FileName)
     CollInit (&Info->SymInfoById);
     CollInit (&Info->TypeInfoById);
 
+    CollInit (&Info->CSymFuncByName);
     CollInit (&Info->FileInfoByName);
     CollInit (&Info->ModInfoByName);
     CollInit (&Info->ScopeInfoByName);
@@ -2435,6 +2455,7 @@ static void FreeDbgInfo (DbgInfo* Info)
     CollDone (&Info->TypeInfoById);
 
     /* Free the memory used by the other collections */
+    CollDone (&Info->CSymFuncByName);
     CollDone (&Info->FileInfoByName);
     CollDone (&Info->ModInfoByName);
     CollDone (&Info->ScopeInfoByName);
@@ -4859,6 +4880,110 @@ static int FindSymInfoByValue (const Collection* SymInfos, long Value,
 
 
 
+static void ProcessCSymInfo (InputData* D)
+/* Postprocess c symbol infos */
+{
+    unsigned I;
+
+    /* Walk over all c symbols. Resolve the ids and add the c symbols to the
+     * corresponding asm symbols.
+     */
+    for (I = 0; I < CollCount (&D->Info->CSymInfoById); ++I) {
+
+        /* Get this c symbol info */
+        CSymInfo* S = CollAt (&D->Info->CSymInfoById, I);
+
+        /* Resolve the asm symbol */
+        if (S->Sym.Id == CC65_INV_ID) {
+            S->Sym.Info = 0;
+        } else if (S->Sym.Id >= CollCount (&D->Info->SymInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid symbol id %u for c symbol with id %u",
+                        S->Sym.Id, S->Id);
+            S->Sym.Info = 0;
+        } else {
+            S->Sym.Info = CollAt (&D->Info->SymInfoById, S->Sym.Id);
+
+            /* For normal (=static) symbols, add a backlink to the symbol but
+             * check that there is not more than one.
+             */
+            if (S->SC != CC65_CSYM_AUTO && S->SC != CC65_CSYM_REG) {
+                if (S->Sym.Info->CSym) {
+                    ParseError (D,
+                                CC65_ERROR,
+                                "Asm symbol id %u has more than one C symbol attached",
+                                S->Sym.Info->Id);
+                    S->Sym.Info = 0;
+                } else {
+                    S->Sym.Info->CSym = S;
+                }
+            }
+        }
+
+        /* Resolve the type */
+        if (S->Type.Id >= CollCount (&D->Info->TypeInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid type id %u for c symbol with id %u",
+                        S->Type.Id, S->Id);
+            S->Type.Info = 0;
+        } else {
+            S->Type.Info = CollAt (&D->Info->TypeInfoById, S->Type.Id);
+        }
+
+        /* Resolve the scope */
+        if (S->Scope.Id >= CollCount (&D->Info->ScopeInfoById)) {
+            ParseError (D,
+                        CC65_ERROR,
+                        "Invalid scope id %u for c symbol with id %u",
+                        S->Scope.Id, S->Id);
+            S->Scope.Info = 0;
+        } else {
+            S->Scope.Info = CollAt (&D->Info->ScopeInfoById, S->Scope.Id);
+
+            /* Add the c symbol to the list of all c symbols for this scope */
+            if (S->Scope.Info->CSymInfoByName == 0) {
+                S->Scope.Info->CSymInfoByName = CollNew ();
+            }
+            CollAppend (S->Scope.Info->CSymInfoByName, S);
+
+            /* If the scope has an owner symbol, it's a .PROC scope. If this
+             * symbol is identical to the one attached to the C symbol, this
+             * is actuallay a C function and the scope is the matching scope.
+             * Remember the C symbol in the scope in this case.
+             * Beware: Scopes haven't been postprocessed, so we don't have a
+             * pointer but just an id.
+             */
+            if (S->Sym.Info && S->Scope.Info->Label.Id == S->Sym.Info->Id) {
+                /* This scope is our function scope */
+                S->Scope.Info->CSymFunc = S;
+                /* Add it to the list of all c functions */
+                CollAppend (&D->Info->CSymFuncByName, S);
+            }
+
+        }
+    }
+
+    /* Walk over all scopes and sort the c symbols by name */
+    for (I = 0; I < CollCount (&D->Info->ScopeInfoById); ++I) {
+
+        /* Get this scope */
+        ScopeInfo* S = CollAt (&D->Info->ScopeInfoById, I);
+
+        /* Ignore scopes without C symbols */
+        if (S->CSymInfoByName && CollCount (S->CSymInfoByName) > 1) {
+            /* Sort the c symbols for this scope by name */
+            CollSort (S->CSymInfoByName, CompareCSymInfoByName);
+        }
+    }
+
+    /* Sort the main list of all C functions by name */
+    CollSort (&D->Info->CSymFuncByName, CompareCSymInfoByName);
+}
+
+
+
 static void ProcessFileInfo (InputData* D)
 /* Postprocess file infos */
 {
@@ -5067,6 +5192,13 @@ static void ProcessScopeInfo (InputData* D)
                 /* No parent means main scope */
                 S->Mod.Info->MainScope = S;
             }
+
+            /* If this is the scope that implements a C function, add the
+             * function to the list of all functions in this module.
+             */
+            if (S->CSymFunc) {
+                CollAppend (&S->Mod.Info->CSymFuncByName, S->CSymFunc);
+            }
         }
 
         /* Resolve the parent scope */
@@ -5131,7 +5263,8 @@ static void ProcessScopeInfo (InputData* D)
 
     /* Walk over all modules. If a module doesn't have scopes, it wasn't
      * compiled with debug info which is ok. If it has debug info, it must
-     * also have a main scope. If there are scopes, sort them by name.
+     * also have a main scope. If there are scopes, sort them by name. Do
+     * also sort C functions in this module by name.
      */
     for (I = 0; I < CollCount (&D->Info->ModInfoById); ++I) {
 
@@ -5153,6 +5286,9 @@ static void ProcessScopeInfo (InputData* D)
 
         /* Sort the scopes for this module by name */
         CollSort (&M->ScopeInfoByName, CompareScopeInfoByName);
+
+        /* Sort the C functions in this module by name */
+        CollSort (&M->CSymFuncByName, CompareCSymInfoByName);
     }
 
     /* Sort the scope infos */
@@ -5572,8 +5708,10 @@ CloseAndExit:
     }
 
     /* We do now have all the information from the input file. Do
-     * postprocessing.
+     * postprocessing. Beware: Some of the following postprocessing
+     * depends on the order of the calls.
      */
+    ProcessCSymInfo (&D);
     ProcessFileInfo (&D);
     ProcessLineInfo (&D);
     ProcessModInfo (&D);

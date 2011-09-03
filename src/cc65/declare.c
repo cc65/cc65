@@ -1367,7 +1367,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
             /* We cannot specify fastcall for variadic functions */
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
-                Error ("Variadic functions cannot be `__fastcall'");
+                Error ("Variadic functions cannot be `__fastcall__'");
                 Qualifiers &= ~T_QUAL_FASTCALL;
             }
 

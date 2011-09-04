@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -448,7 +448,7 @@ void Convert (const O65Data* D)
     }
 
     /* Open the output file */
-    F = fopen (OutputName, "wb");
+    F = fopen (OutputName, "w");
     if (F == 0) {
         Error ("Cannot open `%s': %s", OutputName, strerror (errno));
     }

@@ -66,6 +66,7 @@ X1              := ptr1
 Y1              := ptr2
 X2              := ptr3
 Y2              := ptr4
+TEXT            := ptr3
 
 ROW             := tmp2         ; Bitmap row...
 COL             := tmp3         ; ...and column, both set by PLOT
@@ -114,8 +115,9 @@ PALETTESIZE     = * - DEFPALETTE
 BITTAB:         .byte   $80,$40,$20,$10,$08,$04,$02,$01
 BITCHUNK:       .byte   $FF,$7F,$3F,$1F,$0F,$07,$03,$01
 
-VBASE  	       	= $E000         ; Video memory base address
-CBASE           = $D000         ; Color memory base address
+CHARROM         := $D000                ; Character rom base address
+CBASE           := $D000                ; Color memory base address
+VBASE  	       	:= $E000                ; Video memory base address
 
 
 .code
@@ -577,7 +579,7 @@ YCONT2: lda     (POINT),y    ;Plot endpoint
         and     CHUNK
         eor     (POINT),y
         sta     (POINT),y
-YDONE:  lda     #$37
+YDONE:  lda     #$36
         sta     $01
         cli
         rts
@@ -645,7 +647,7 @@ XCONT2: dex
 
 XDONE:  lsr     CHUNK        ;Advance to last point
         jsr     LINEPLOT     ;Plot the last chunk
-EXIT:   lda     #$37
+EXIT:   lda     #$36
         sta     $01
         cli
         rts
@@ -867,6 +869,28 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
+
+; Calculate a pointer to the representation of the character in the
+; character ROM 
+
+        ldx     #((>(CHARROM + $0800)) >> 3)
+        ldy     #0
+        lda     (TEXT),y
+        bmi     @L1
+        ldx     #((>(CHARROM + $0000)) >> 3)
+@L1:    stx     ptr4+1
+        asl     a
+        rol     ptr4+1
+        asl     a
+        rol     ptr4+1
+        asl     a
+        rol     ptr4+1
+        sta     ptr4
+
+
+
+
+
         rts
 
 ; ------------------------------------------------------------------------

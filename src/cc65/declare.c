@@ -1050,22 +1050,31 @@ static Type* ParamTypeCvt (Type* T)
 static void ParseOldStyleParamList (FuncDesc* F)
 /* Parse an old style (K&R) parameter list */
 {
+    /* Some fix point tokens that are used for error recovery */
+    static const token_t TokenList[] = { TOK_COMMA, TOK_RPAREN, TOK_SEMI };
+
     /* Parse params */
     while (CurTok.Tok != TOK_RPAREN) {
 
 	/* List of identifiers expected */
-	if (CurTok.Tok != TOK_IDENT) {
+	if (CurTok.Tok == TOK_IDENT) {
+
+            /* Create a symbol table entry with type int */
+            AddLocalSym (CurTok.Ident, type_int, SC_AUTO | SC_PARAM | SC_DEF | SC_DEFTYPE, 0);
+
+            /* Count arguments */
+            ++F->ParamCount;
+
+            /* Skip the identifier */
+            NextToken ();
+
+	} else {
+            /* Not a parameter name */
 	    Error ("Identifier expected");
-	}
 
-	/* Create a symbol table entry with type int */
-	AddLocalSym (CurTok.Ident, type_int, SC_AUTO | SC_PARAM | SC_DEF | SC_DEFTYPE, 0);
-
-	/* Count arguments */
-       	++F->ParamCount;
-
-	/* Skip the identifier */
-	NextToken ();
+            /* Try some smart error recovery */
+            SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
+        }
 
 	/* Check for more parameters */
 	if (CurTok.Tok == TOK_COMMA) {

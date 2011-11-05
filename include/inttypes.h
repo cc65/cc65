@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/* (C) 2002-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -50,13 +50,6 @@
 #include <stdint.h>
 #endif
 
-
-
-/* Return type of the imaxdiv function (which currently doesn't exist) */
-typedef struct {
-    intmax_t rem;
-    intmax_t quot;
-} ldiv_t;
 
 
 /* Standard functions */

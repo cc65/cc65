@@ -91,10 +91,13 @@ static void Parse (void)
 	    continue;
 	}
 
-	/* Check for an ASM statement (which is allowed also on global level) */
+       	/* Disallow ASM statements on global level */
 	if (CurTok.Tok == TOK_ASM) {
+            Error ("__asm__ is not allowed here");                 
+            /* Parse and remove the statement for error recovery */
 	    AsmStatement ();
 	    ConsumeSemi ();
+            RemoveGlobalCode ();
 	    continue;
 	}
 

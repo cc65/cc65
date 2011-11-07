@@ -4288,7 +4288,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
 <tag/Declaration/<tt/void __fastcall__ ser_load_driver (const char *name);/
 <tag/Description/Load and install the driver by name.
-Will just load the driver and check if loading was successul.
+Will just load the driver and check if loading was successful.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
@@ -5283,12 +5283,8 @@ tgi_circle(50, 40, 40);
 <descrip>
 <tag/Function/Clear the drawpage
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_clear (void);/
+<tag/Declaration/<tt/void tgi_clear (void);/
 <tag/Description/Clear the drawpage
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5303,13 +5299,9 @@ be used in presence of a prototype.
 <tag/Function/End graphics mode, switch back to text mode.
 Will NOT uninstall or unload the driver!
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_done (void);/
+<tag/Declaration/<tt/void tgi_done (void);/
 <tag/Description/End graphics mode, switch back to text mode.
 Will NOT uninstall or unload the driver!
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5349,7 +5341,7 @@ tgi_ellipse (50, 40, 40, 20);
 
 <quote> <descrip> <tag/Function/Return the pixel aspect ratio.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_getaspectratio (void);/
+<tag/Declaration/<tt/unsigned tgi_getaspectratio (void);/
 <tag/Description/The function returns the pixel aspect ratio for the current
 driver and display as an 8.8 fixed point value. It may be used to correct
 geometric shapes so they look correct on the display. As an example, a circle
@@ -5381,17 +5373,13 @@ original aspect ratio.
 <descrip>
 <tag/Function/Return the current drawing color.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ tgi_getcolor (void);/
+<tag/Declaration/<tt/unsigned char tgi_getcolor (void);/
 <tag/Description/The actual color is an index to a palette. During tgi_init
 you will get a default palette. The number of colors depend on the platform.
 All platforms recognize at least TGI_COLOR_BLACK and TGI_COLOR_WHITE. But some
 platforms have many more predefined colors. If you paint using TGI_COLOR_GREEN
 and then you change the green of the palette to blue using tgi_setpalette then
 after this painting in TGI_COLOR_GREEN will actually be blue.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/<verb>
@@ -5407,13 +5395,9 @@ color = tgi_getcolor();
 <descrip>
 <tag/Function/Get the number of available colors.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ tgi_getcolorcount (void);/
+<tag/Declaration/<tt/unsigned char tgi_getcolorcount (void);/
 <tag/Description/Tgi platforms use indexed color palettes. This function
 returns the number of entries we can use in the palette.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/<verb>
@@ -5431,14 +5415,10 @@ if (tgi_getcolorcount() == 2) {
 <descrip>
 <tag/Function/Get the palette installed by default.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/const unsigned char* __fastcall__ tgi_getdefpalette (void);/
+<tag/Declaration/<tt/const unsigned char* tgi_getdefpalette (void);/
 <tag/Description/The tgi driver has a default palette that is active at startup.
 The named colors TGI_COLOR_BLACK, TGI_COLOR_WHITE, TGI_COLOR_RED... need this
 palette to work correctly.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5453,13 +5433,9 @@ be used in presence of a prototype.
 <tag/Function/Return the error code for the last operation.
 This will also clear the error.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ tgi_geterror (void);/
+<tag/Declaration/<tt/unsigned char tgi_geterror (void);/
 <tag/Description/Return the error code for the last operation.
 This will also clear the error.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5492,12 +5468,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Get the highest index of the palette.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ tgi_getmaxcolor (void);/
+<tag/Declaration/<tt/unsigned char tgi_getmaxcolor (void);/
 <tag/Description/Get the highest index of the palette.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5511,13 +5483,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Get the maximum x coordinate that can be used on this screen.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_getmaxx (void);/
+<tag/Declaration/<tt/unsigned tgi_getmaxx (void);/
 <tag/Description/Get the maximum x coordinate that can be used on this screen.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
-<tag/Availability/cc65
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5531,12 +5498,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Get the maximum y coordinate that can be used on this screen.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_getmaxy (void);/
+<tag/Declaration/<tt/unsigned tgi_getmaxy (void);/
 <tag/Description/Get the maximum y coordinate that can be used on this screen.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5550,12 +5513,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Return the number of screen pages available.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_getpagecount (void);/
+<tag/Declaration/<tt/unsigned tgi_getpagecount (void);/
 <tag/Description/Return the number of screen pages available.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="tgi_setdrawpage" name="tgi_setdrawpage">,
@@ -5571,12 +5530,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Get the palette installed.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/const unsigned char* __fastcall__ tgi_getpalette (void);/
+<tag/Declaration/<tt/const unsigned char* tgi_getpalette (void);/
 <tag/Description/Get the palette installed.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions
 <tag/Example/None.
@@ -5609,13 +5564,9 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Get number of horisontal pixels on the screen.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_getxres (void);/
+<tag/Declaration/<tt/unsigned tgi_getxres (void);/
 <tag/Description/Get number of horisontal pixels on the screen.
 This is same as tgi_maxx()+1.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
 <tag/Example/None.
@@ -5629,13 +5580,9 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Get number of vertical pixels on the screen.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_getyres (void);/
+<tag/Declaration/<tt/unsigned tgi_getyres (void);/
 <tag/Description/Get number of vertical pixels on the screen.
 This is same as tgi_maxy()+1.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
 <tag/Example/None.
@@ -5668,12 +5615,10 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Initialize the already loaded graphics driver.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_init (void);/
+<tag/Declaration/<tt/void tgi_init (void);/
 <tag/Description/The tgi_init function will set the default palette to the
 hardware.
 <tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
 <item><tt/tgi_init/ will not clear the screen. This allows switching between
 text and graphics mode on platforms that have separate memory areas for the
 screens. If you want the screen cleared, call <tt/<ref id="tgi_clear"
@@ -5804,7 +5749,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/void __fastcall__ tgi_load_driver (const char *name);/
 <tag/Description/Load and install the driver by name.
-Will just load the driver and check if loading was successul.
+Will just load the driver and check if loading was successful.
 Will not switch to graphics mode.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
@@ -6108,13 +6053,9 @@ be used in presence of a prototype.
 <tag/Function/Uninstall the currently loaded driver but do not unload it.
 Will call tgi_done if necessary.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_uninstall (void);/
+<tag/Declaration/<tt/void tgi_uninstall (void);/
 <tag/Description/Uninstall the currently loaded driver but do not unload it.
 Will call tgi_done if necessary.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
 <tag/Example/None.
@@ -6128,13 +6069,9 @@ be used in presence of a prototype.
 <tag/Function/Uninstall, then unload the currently loaded driver.
 Will call tgi_done if necessary.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_unload (void);/
+<tag/Declaration/<tt/void tgi_unload (void);/
 <tag/Description/Uninstall, then unload the currently loaded driver.
 Will call tgi_done if necessary.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
 <tag/Example/None.

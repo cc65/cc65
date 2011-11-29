@@ -50,11 +50,11 @@
 
 
 
-/* Font constants for use with tgi_textstyle */
+/* Font constants for use with tgi_settextstyle */
 #define TGI_FONT_BITMAP         0
 #define TGI_FONT_VECTOR         1
 
-/* Direction constants for use with tgi_textstyle */
+/* Direction constants for use with tgi_settextstyle */
 #define TGI_TEXT_HORIZONTAL     0
 #define TGI_TEXT_VERTICAL       1
 

@@ -541,9 +541,9 @@ communication.
 <item><ref id="tgi_setpalette" name="tgi_setpalette">
 <item><ref id="tgi_setpixel" name="tgi_setpixel">
 <item><ref id="tgi_setviewpage" name="tgi_setviewpage">
-<item><ref id="tgi_textheight" name="tgi_textheight">
-<item><ref id="tgi_textstyle" name="tgi_textstyle">
-<item><ref id="tgi_textwidth" name="tgi_textwidth">
+<item><ref id="tgi_gettextheight" name="tgi_gettextheight">
+<item><ref id="tgi_settextstyle" name="tgi_settextstyle">
+<item><ref id="tgi_gettextwidth" name="tgi_gettextwidth">
 <item><ref id="tgi_uninstall" name="tgi_uninstall">
 <item><ref id="tgi_unload" name="tgi_unload">
 </itemize>
@@ -5987,14 +5987,14 @@ tgi_setviewpage(0); // Show page 0
 </descrip>
 </quote>
 
-<sect1>tgi_textheight<label id="tgi_textheight"><p>
+<sect1>tgi_gettextheight<label id="tgi_gettextheight"><p>
 
 <quote>
 <descrip>
 <tag/Function/Calculate the height of the text in pixels according to
 the current text style.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_textheight (const char* s);/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextheight (const char* s);/
 <tag/Description/Calculate the height of the text in pixels according to
 the current text style.
 <tag/Limits/<itemize>
@@ -6007,13 +6007,13 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
-<sect1>tgi_textstyle<label id="tgi_textstyle"><p>
+<sect1>tgi_settextstyle<label id="tgi_settextstyle"><p>
 
 <quote>
 <descrip>
 <tag/Function/Set the style for text output.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_textstyle (unsigned char magx, unsigned char magy, unsigned char dir);/
+<tag/Declaration/<tt/void __fastcall__ tgi_settextstyle (unsigned char magx, unsigned char magy, unsigned char dir);/
 <tag/Description/Set the style for text output.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
@@ -6025,13 +6025,13 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
-<sect1>tgi_textwidth<label id="tgi_textwidth"><p>
+<sect1>tgi_gettextwidth<label id="tgi_gettextwidth"><p>
 
 <quote>
 <descrip>
 <tag/Function/Calculate the width of the text in pixels according to the current text style.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ tgi_textwidth (const char* s);/
+<tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextwidth (const char* s);/
 <tag/Function/Calculate the width of the text in pixels according to the current text style.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Description/Calculate the width of the text in pixels according to the current text style.

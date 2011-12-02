@@ -3079,7 +3079,7 @@ Here's a list of all control commands and a description, what they do:
 
 
 <sect1><tt>.MACPACK</tt><label id=".MACPACK"><p>
-
+           
   Insert a predefined macro package. The command is followed by an
   identifier specifying the macro package to insert. Available macro
   packages are:
@@ -3100,8 +3100,8 @@ Here's a list of all control commands and a description, what they do:
   <tscreen><verb>
        	.macpack	longbranch	; Include macro package
 
-       		cmp	#$20		; Set condition codes
-       		jne    	Label		; Jump long on condition
+       	   	cmp	#$20		; Set condition codes
+       	   	jne    	Label		; Jump long on condition
   </verb></tscreen>
 
   Macro packages are explained in more detail in section <ref
@@ -4121,12 +4121,12 @@ definition for the "<tt/jeq/" macro, the other macros are built using the same
 scheme:
 
 <tscreen><verb>
-       	.macro	jeq	Target
+       	.macro	jeq    	Target
        	    	.if	.def(Target) .and ((*+2)-(Target) <= 127)
        	    	beq	Target
        	    	.else
-       	    	bne	*+5
-       	    	jmp	Target
+       	    	bne    	*+5
+       	    	jmp    	Target
        	    	.endif
        	.endmacro
 </verb></tscreen>
@@ -4142,6 +4142,13 @@ The package defines the following macros:
        	jeq, jne, jmi, jpl, jcs, jcc, jvs, jvc
 </verb></tscreen>
 
+
+
+<sect1><tt>.MACPACK atari</tt><p>
+
+The atari macro package will define a macro named <tt/scrcode/. It takes a
+string as argument and places this string into memory translated into screen
+codes.
 
 
 <sect1><tt>.MACPACK cbm</tt><p>

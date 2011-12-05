@@ -568,6 +568,21 @@ unsigned GetCurrentLine (void)
 
 
 
+static void WriteEscaped (FILE* F, const char* Name)
+/* Write a file name to a dependency file escaping spaces */
+{
+    while (*Name) {
+        if (*Name == ' ') {
+            /* Escape spaces */
+            fputc ('\\', F);
+        }
+        fputc (*Name, F);
+        ++Name;
+    }
+}
+
+
+
 static void WriteDep (FILE* F, InputType Types)
 /* Helper function. Writes all file names that match Types to the output */
 {
@@ -590,8 +605,8 @@ static void WriteDep (FILE* F, InputType Types)
             fputc (' ', F);
         }
 
-    	/* Print the dependency */
-        fputs (IF->Name, F);
+    	/* Print the dependency escaping spaces */
+        WriteEscaped (F, IF->Name);
     }
 }
 
@@ -602,8 +617,6 @@ static void CreateDepFile (const char* Name, InputType Types)
  * all files with the given types there.
  */
 {
-    const char* Target;
-
     /* Open the file */
     FILE* F = fopen (Name, "w");
     if (F == 0) {
@@ -614,11 +627,11 @@ static void CreateDepFile (const char* Name, InputType Types)
      * file name as target, followed by a tab character.
      */
     if (SB_IsEmpty (&DepTarget)) {
-        Target = OutputFilename;
+        WriteEscaped (F, OutputFilename);
     } else {
-        Target = SB_GetConstBuf (&DepTarget);
+        WriteEscaped (F, SB_GetConstBuf (&DepTarget));
     }
-    fprintf (F, "%s:\t", Target);
+    fputs (":\t", F);
 
     /* Write out the dependencies for the output file */
     WriteDep (F, Types);

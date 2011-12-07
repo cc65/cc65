@@ -1200,8 +1200,8 @@ the format specifier before passing the assembly code line to the backend.
   <item><tt/%b/ - Numerical 8-bit value
   <item><tt/%w/ - Numerical 16-bit value
   <item><tt/%l/ - Numerical 32-bit value
-  <item><tt/%v/ - Assembler name of a (global) variable or function
-  <item><tt/%o/ - Stack offset of a (local) variable
+  <item><tt/%v/ - Assembler name of a global variable or function
+  <item><tt/%o/ - Stack offset of a local variable
   <item><tt/%g/ - Assembler name of a C label
   <item><tt/%s/ - The argument is converted to a string
   <item><tt/%%/ - The % sign itself
@@ -1227,6 +1227,52 @@ Or, to access a struct member of a static variable:
       	static pixel_t pixel;
        	__asm__ ("ldy #%b", offsetof(pixel_t, color));
       	__asm__ ("lda %v,y", pixel);
+</verb></tscreen>
+<p>
+The next example shows how to use global variables to exchange data between C
+an assembler and how to handle assembler jumps:
+
+<tscreen><verb>
+        unsigned char globalSubA, globalSubB, globalSubResult;
+
+        /* return a-b, return 255 if b>a */
+        unsigned char sub (unsigned char a, unsigned char b)
+        {
+            globalSubA = a;
+            globalSubB = b;
+            __asm__ ("sec");
+            __asm__ ("lda %v", globalSubA);
+            __asm__ ("sbc %v", globalSubB);
+            __asm__ ("bcs %g", jumpSubNoError);
+            __asm__ ("lda #$FF");
+        jumpSubNoError:
+            __asm__ ("sta %v", globalSubResult);
+            return globalSubResult;
+        }
+</verb></tscreen>
+<p>
+
+Arrays can also be accessed:
+
+<tscreen><verb>
+        unsigned char globalSquareTable[] = {
+            0, 1, 4, 9, 16, 25, 36, 49, 64, 81,
+            100, 121, 144, 169, 196, 225
+        };
+        unsigned char globalSquareA, globalSquareResult;
+
+        /* return a*a for a<16, else 255 */
+        unsigned char square (unsigned char a)
+        {
+            if (a>15){
+                return 255;
+            }
+            globalSquareA = a;
+            __asm__ ("ldx %v", globalSquareA);
+            __asm__ ("lda %v,x", globalSquareTable);
+            __asm__ ("sta %v", globalSquareResult);
+            return globalSquareResult;
+        }
 </verb></tscreen>
 <p>
 

@@ -677,7 +677,7 @@ Numeric constants are defined using the equal sign or the label assignment
 operator. After doing
 
 <tscreen><verb>
-      two = 2
+        two = 2
 </verb></tscreen>
 
 may use the symbol "two" in every place where a number is expected, and it is
@@ -686,13 +686,46 @@ almost identical, but causes the symbol to be marked as a label, so it may be
 handled differently in a debugger:
 
 <tscreen><verb>
-      io := $d000
+        io := $d000
 </verb></tscreen>
 
 The right side can of course be an expression:
 
 <tscreen><verb>
-      four = two * two
+        four = two * two
+</verb></tscreen>
+
+
+<label id=".SET">
+<sect1>Numeric variables<p>
+
+Within macros and other control structures (<tt><ref id=".REPEAT"
+name=".REPEAT"></tt>, ...) it is sometimes useful to have some sort of
+variable. This can be achieved by the <tt>.SET</tt> operator. It creates a
+symbol that may get assigned a different value later:
+
+<tscreen><verb>
+        four .set 4
+        lda     #four           ; Loads 4 into A
+        four .set 3
+        lda     #four           ; Loads 3 into A
+</verb></tscreen>
+
+Since the value of the symbol can change later, it must be possible to
+evaluate it when used (no delayed evaluation as with normal symbols). So the
+expression used as the value must be constant.
+
+Following is an example for a macro that generates a different label each time
+it is used. It uses the <tt><ref id=".SPRINTF" name=".SPRINTF"></tt> function
+and a numeric variable named <tt>lcount</tt>.
+
+<tscreen><verb>
+        .lcount .set 0          ; Initialize the counter
+
+        .macro  genlab
+                .ident (.sprintf ("L%04X", lcount)):
+                lcount .set lcount + 1
+        .endmacro
 </verb></tscreen>
 
 
@@ -731,14 +764,14 @@ You may use cheap local labels as an easy way to reuse common label
 names like "Loop". Here is an example:
 
 <tscreen><verb>
-	Clear:  lda    #$00   	     	; Global label
-		ldy    #$20
-	@Loop:  sta    Mem,y  	     	; Local label
-		dey
-		bne    @Loop  	     	; Ok
-		rts
+      	Clear:  lda    #$00   	     	; Global label
+      		ldy    #$20
+      	@Loop:  sta    Mem,y  	     	; Local label
+      		dey
+      		bne    @Loop  	     	; Ok
+      		rts
        	Sub:    ... 	       	     	; New global label
-	 	bne    @Loop  	     	; ERROR: Unknown identifier!
+      	 	bne    @Loop  	     	; ERROR: Unknown identifier!
 </verb></tscreen>
 
 <sect1>Unnamed labels<p>
@@ -754,23 +787,23 @@ reference (use the n'th label in forward direction). An example will help to
 understand this:
 
 <tscreen><verb>
-	:	lda	(ptr1),y	; #1
-		cmp	(ptr2),y
-		bne    	:+     		; -> #2
-		tax
-		beq	:+++   		; -> #4
-		iny
-		bne	:-     		; -> #1
-		inc	ptr1+1
-		inc	ptr2+1
-		bne	:-     		; -> #1
+      	:	lda	(ptr1),y	; #1
+      		cmp	(ptr2),y
+      		bne    	:+     		; -> #2
+      		tax
+      		beq	:+++   		; -> #4
+      		iny
+      		bne	:-     		; -> #1
+      		inc	ptr1+1
+      		inc	ptr2+1
+      		bne	:-     		; -> #1
 
-	:	bcs	:+     	       	; #2 -> #3
-		ldx	#$FF
-		rts
+      	:	bcs	:+     	       	; #2 -> #3
+      		ldx	#$FF
+      		rts
 
-	:	ldx	#$01   		; #3
-	:	rts	       		; #4
+      	:	ldx	#$01   		; #3
+      	:	rts	       		; #4
 </verb></tscreen>
 
 As you can see from the example, unnamed labels will make even short
@@ -792,15 +825,15 @@ possible with the other symbol types).
 Example:
 
 <tscreen><verb>
-	.DEFINE	two	2
-	.DEFINE version	"SOS V2.3"
+      	.DEFINE	two	2
+      	.DEFINE version	"SOS V2.3"
 
-	four = two * two       	; Ok
-	.byte	version	       	; Ok
+      	four = two * two       	; Ok
+      	.byte	version	       	; Ok
 
-	.PROC		       	; Start local scope
-	two = 3		       	; Will give "2 = 3" - invalid!
-	.ENDPROC
+      	.PROC		       	; Start local scope
+      	two = 3		       	; Will give "2 = 3" - invalid!
+      	.ENDPROC
 </verb></tscreen>
 
 
@@ -3079,7 +3112,7 @@ Here's a list of all control commands and a description, what they do:
 
 
 <sect1><tt>.MACPACK</tt><label id=".MACPACK"><p>
-           
+
   Insert a predefined macro package. The command is followed by an
   identifier specifying the macro package to insert. Available macro
   packages are:

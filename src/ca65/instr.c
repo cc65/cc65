@@ -479,7 +479,7 @@ static const struct {
 /* Instruction table for the 65816 */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[101];
+    InsDesc  Ins[99];
 } InsTab65816 = {
     sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {

@@ -85,7 +85,7 @@ and/or different sector counts.
 The following function returns the sector size of the currently inserted disk:
 
 <tscreen><verb>
-    sectsize_t __fastcall__ dio_query_sectsize(dhandle_t handle);
+    sectsize_t __fastcall__ dio_query_sectsize (dhandle_t handle);
 </verb></tscreen>
 
 On the Atari platform, the sector size is handled specially. Please refer
@@ -96,7 +96,7 @@ specific platform documentation.
 The following function returns the sector count of the currently inserted disk:
 
 <tscreen><verb>
-    sectnum_t __fastcall__ dio_query_sectcount(dhandle_t handle);
+    sectnum_t __fastcall__ dio_query_sectcount (dhandle_t handle);
 </verb></tscreen>
 
 <sect>Converting sector numbers<p>

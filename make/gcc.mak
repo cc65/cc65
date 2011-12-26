@@ -101,7 +101,7 @@ uninstall:	install-test
 
 install:	install-test install-dirs install-bins install-libs install-docs
 	@echo
-	@echo 'If you put the files into non-standard directories, then'
+	@echo 'If you install files into non-default directories, then'
 	@echo 'you might need to export some shell environment variables:'
 	@echo
 	@echo 'CC65_HOME=$(CC65_HOME)'

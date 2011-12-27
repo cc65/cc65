@@ -178,3 +178,11 @@ unsigned long AlignAddr (unsigned long Addr, unsigned long Alignment)
 
 
 
+unsigned long AlignCount (unsigned long Addr, unsigned long Alignment)
+/* Calculate how many bytes must be inserted to align Addr to Alignment */
+{
+    return AlignAddr (Addr, Alignment) - Addr;
+}
+
+
+

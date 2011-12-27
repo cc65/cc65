@@ -1,0 +1,8 @@
+
+; this is the resource file for hello2.c, a GEOS application example
+
+HEADER APPLICATION "hello2" "Hello 2" "V1.0" {
+dostype USR
+author "Maciej Witkowiak"
+info "This is a C prog compiled with cc65 and GEOSLib."
+}

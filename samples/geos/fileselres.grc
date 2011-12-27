@@ -1,0 +1,8 @@
+
+; this is the resource file for filesel.c, a GEOS application example
+
+HEADER APPLICATION "filesel" "FileSel" "V1.0" {
+dostype USR
+author "Maciej Witkowiak"
+info "This is a C prog compiled with cc65 and GEOSLib."
+}

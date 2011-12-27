@@ -1,0 +1,8 @@
+
+; this is the resource file for rmvprot.c, a GEOS application example
+
+HEADER APPLICATION "rmvprot" "RmvProt" "V1.0" {
+dostype USR
+author "Maciej Witkowiak"
+info "This will remove the write protection from your bootdisk."
+}

@@ -25,6 +25,7 @@
 #include "fname.h"
 #include "abend.h"
 #include "chartype.h"
+#include "target.h"
 #include "xmalloc.h"
 
 /* I hope that no one will be able to create a .grc bigger than this... */
@@ -100,6 +101,7 @@ char *ProgName;	/* for AbEnd, later remove and use common/cmdline.h */
 char *outputCName = NULL, *outputSName = NULL;
 FILE *outputCFile, *outputSFile;
 int CFnum = 0, SFnum = 0;
+int apple = 0;
 char outputCMode[2] = "w";
 char outputSMode[2] = "w";
 
@@ -110,7 +112,8 @@ void printUsage(void) {
            "Options:\n"
            "\t-h, -?\t\tthis help\n"
            "\t-o name\t\tname C output file\n"
-           "\t-s name\t\tname asm output file\n",
+           "\t-s name\t\tname asm output file\n"
+           "\t-t sys\t\tset target system\n",
            ProgName);
 }
 
@@ -739,6 +742,18 @@ int main(int argc, char *argv[]) {
                     break;
                 case 's':
                     outputSName = argv[++i];
+                    break;
+                case 't':
+                    switch (FindTarget(argv[++i])) {
+                        case TGT_GEOS: // todo: TGT_GEOS-CBM
+                            apple = 0;
+                            break;
+                        case TGT_COUNT: //todo: TGT_GEOS-APPLE
+                            apple = 1;
+                            break;
+                        default:
+                            AbEnd("unknown target system type %s\n", argv[i]);
+                    }
                     break;
                 case 'h':
                 case '?':

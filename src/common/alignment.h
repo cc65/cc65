@@ -54,6 +54,11 @@
  */
 #define MAX_ALIGNMENT   0x10000UL
 
+/* The following value marks what is considered a "large alignment" and worth
+ * a warning if not suppressed.
+ */
+#define LARGE_ALIGNMENT 0x101UL
+
 
 
 /*****************************************************************************/

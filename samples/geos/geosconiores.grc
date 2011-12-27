@@ -1,5 +1,4 @@
-
-; this is resource file for hello1.c, a GEOS application example
+; this is the resource file for geosconio.c, a GEOS application example
 
 HEADER APPLICATION "conio" "ConIO" "V0.1" {
 dostype USR

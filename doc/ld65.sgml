@@ -157,19 +157,22 @@ Here is a description of all the command line options:
   <item>module
   <item>apple2
   <item>apple2enh
+  <item>apple-geos
   <item>atari
   <item>atmos
   <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
   <item>c128
-  <item>plus4
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
-  <item>pet (all CBM PET systems except the 2001)
-  <item>geos
+  <item>cbm-geos
   <item>lunix
+  <item>lynx
   <item>nes
+  <item>pet (all CBM PET systems except the 2001)
+  <item>plus4
   <item>supervision
+  <item>vic20
   </itemize>
 
   There are a few more targets defined but neither of them is actually

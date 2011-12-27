@@ -342,6 +342,7 @@ Here is a description of all the command line options:
   <item>none
   <item>apple2
   <item>apple2enh
+  <item>apple-geos
   <item>atari
   <item>atmos
   <item>c16 (works also for the c116 with memory up to 32K)
@@ -349,7 +350,7 @@ Here is a description of all the command line options:
   <item>c128
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM-II II computers with 80 column video)
-  <item>geos
+  <item>cbm-geos
   <item>lunix
   <item>lynx
   <item>nes

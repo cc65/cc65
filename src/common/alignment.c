@@ -59,7 +59,6 @@ static const unsigned char Primes[] = {
 };
 #define PRIME_COUNT     (sizeof (Primes) / sizeof (Primes[0]))
 #define LAST_PRIME      ((unsigned long)Primes[PRIME_COUNT-1])
-#define FAC_MAX         0x10000UL
 
 
 
@@ -107,7 +106,7 @@ static void Factorize (unsigned long Value, FactorizedNumber* F)
     }
 
     /* Be sure we can factorize */
-    CHECK (Value <= FAC_MAX && Value != 0);
+    CHECK (Value <= MAX_ALIGNMENT && Value != 0);
 
     /* Handle factor 2 separately for speed */
     while ((Value & 0x01UL) == 0UL) {

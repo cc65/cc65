@@ -44,43 +44,13 @@
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* The C file contains a list of primes up to 256, so we can factorize numbers
- * up to 0x10000 or somewhat more. The FactorizedNumber structure below
- * contains the powers of the primes from the prime table. The size of the
- * table (= the number of primes contained therein) is the constant below.
- */
-#define PRIME_COUNT     54
-
-
-
-
-/* A number together with its prime factors */
-typedef struct FactorizedNumber FactorizedNumber;
-struct FactorizedNumber {
-    unsigned long       Value;                  /* The actual number */
-    unsigned char       Powers[PRIME_COUNT];    /* Powers of the factors */
-};
-
-
-
-/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-void Factorize (unsigned long Value, FactorizedNumber* F);
-/* Factorize a value between 1 and 0x10000. */
-
-FactorizedNumber* LCM (const FactorizedNumber* Left,
-                       const FactorizedNumber* Right,
-                       FactorizedNumber* Res);
-/* Calculate the least common multiple of two factorized numbers and return
+unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right);
+/* Calculate the least common multiple of two numbers and return
  * the result.
  */
 

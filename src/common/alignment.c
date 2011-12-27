@@ -49,7 +49,7 @@
  * all primes up to 256, which means we're able to factorize alignments up to
  * 0x10000. This is checked in the code.
  */
-static const unsigned char Primes[PRIME_COUNT] = {
+static const unsigned char Primes[] = {
       2,   3,   5,   7,  11,  13,  17,  19,  23,  29,
      31,  37,  41,  43,  47,  53,  59,  61,  67,  71,
      73,  79,  83,  89,  97, 101, 103, 107, 109, 113,
@@ -57,9 +57,19 @@ static const unsigned char Primes[PRIME_COUNT] = {
     179, 181, 191, 193, 197, 199, 211, 223, 227, 229,
     233, 239, 241, 251
 };
+#define PRIME_COUNT     (sizeof (Primes) / sizeof (Primes[0]))
 #define LAST_PRIME      ((unsigned long)Primes[PRIME_COUNT-1])
+#define FAC_MAX         0x10000UL
 
-#define FAC_MAX         (LAST_PRIME * LAST_PRIME - 1)
+
+
+/* A number together with its prime factors */
+typedef struct FactorizedNumber FactorizedNumber;
+struct FactorizedNumber {
+    unsigned long       Value;                  /* The actual number */
+    unsigned long       Remainder;              /* Remaining prime */
+    unsigned char       Powers[PRIME_COUNT];    /* Powers of the factors */
+};
 
 
 
@@ -75,6 +85,7 @@ static void Initialize (FactorizedNumber* F, unsigned long Value)
     unsigned I;
 
     F->Value = Value;
+    F->Remainder = 1;
     for (I = 0; I < PRIME_COUNT; ++I) {
         F->Powers[I] = 0;
     }
@@ -82,35 +93,8 @@ static void Initialize (FactorizedNumber* F, unsigned long Value)
 
 
 
-static unsigned char MaxPower (unsigned char A, unsigned char B)
-/* Return the larger of A and B. This will get hopefully inlined by the
- * compiler.
- */
-{
-    return (A > B)? A : B;
-}
-
-
-
-static FactorizedNumber* Produce (FactorizedNumber* F)
-/* Generate a value from a list of powers of primes and return F */
-{
-    unsigned I;
-
-    F->Value = 1;
-    for (I = 0; I < PRIME_COUNT; ++I) {
-        unsigned Count = F->Powers[I];
-        while (Count--) {
-            F->Value *= Primes[I];
-        }
-    }
-    return F;
-}
-
-
-
-void Factorize (unsigned long Value, FactorizedNumber* F)
-/* Factorize a value between 1 and 0x10000. */
+static void Factorize (unsigned long Value, FactorizedNumber* F)
+/* Factorize a value between 1 and 0x10000 that is in F */
 {
     unsigned I;
 
@@ -131,9 +115,7 @@ void Factorize (unsigned long Value, FactorizedNumber* F)
         Value >>= 1;
     }
 
-    /* Factorize. We don't need to check for array bounds since we checked the
-     * maximum value above.
-     */
+    /* Factorize. */
     I = 1;      /* Skip 2 because it was handled above */
     while (Value > 1) {
         unsigned long Tmp = Value / Primes[I];
@@ -143,29 +125,47 @@ void Factorize (unsigned long Value, FactorizedNumber* F)
             Value = Tmp;
         } else {
             /* This is not a factor, try next one */
-            ++I;
+            if (++I >= PRIME_COUNT) {
+                break;
+            }
         }
     }
+
+    /* If something is left, it must be a remaining prime */
+    F->Remainder = Value;
 }
 
 
 
-FactorizedNumber* LCM (const FactorizedNumber* Left,
-                       const FactorizedNumber* Right,
-                       FactorizedNumber* Res)
-/* Calculate the least common multiple of two factorized numbers and return
+unsigned long LeastCommonMultiple (unsigned long Left, unsigned long Right)
+/* Calculate the least common multiple of two numbers and return
  * the result.
  */
 {
     unsigned I;
+    FactorizedNumber L, R;
+    unsigned long Res;
 
-    /* Generate the powers for the lcm */
+    /* Factorize the two numbers */
+    Factorize (Left, &L);
+    Factorize (Right, &R);
+
+    /* Generate the result from the factors.
+     * Some thoughts on range problems: Since the largest numbers we can
+     * factorize are 2^16 (0x10000), the only numbers that could produce an
+     * overflow when using 32 bits are exactly these. But the LCM for 2^16
+     * and 2^16 is 2^16 so this will never happen and we're safe.
+     */
+    Res = L.Remainder * R.Remainder;
     for (I = 0; I < PRIME_COUNT; ++I) {
-        Res->Powers[I] = MaxPower (Left->Powers[I], Right->Powers[I]);
+        unsigned P = (L.Powers[I] > R.Powers[I])? L.Powers[I] : R.Powers[I];
+        while (P--) {
+            Res *= Primes[I];
+        }
     }
 
-    /* Generate the actual lcm value from the powers and return the result */
-    return Produce (Res);
+    /* Return the calculated lcm */
+    return Res;
 }
 
 

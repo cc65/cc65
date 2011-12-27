@@ -64,6 +64,7 @@ unsigned char AutoImport         = 0;   /* Mark unresolveds as import */
 unsigned char SmartMode	         = 0;   /* Smart mode */
 unsigned char DbgSyms	         = 0;   /* Add debug symbols */
 unsigned char LineCont	         = 0;   /* Allow line continuation */
+unsigned char LargeAlignment     = 0;   /* Don't warn about large alignments */
 
 /* Emulation features */
 unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */

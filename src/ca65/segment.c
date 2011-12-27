@@ -38,6 +38,7 @@
 
 /* common */
 #include "addrsize.h"
+#include "alignment.h"
 #include "coll.h"
 #include "mmodel.h"
 #include "segnames.h"
@@ -106,7 +107,7 @@ static Segment* NewSegFromDef (SegDef* Def)
     S->Last      = 0;
     S->FragCount = 0;
     S->Num       = CollCount (&SegmentList);
-    S->Align     = 0;
+    S->Align     = 1;
     S->RelocMode = 1;
     S->PC        = 0;
     S->AbsPC     = 0;
@@ -276,37 +277,53 @@ void EnterRelocMode (void)
 
 
 
-void SegAlign (unsigned Power, int Val)
-/* Align the PC segment to 2^Power. If Val is -1, emit fill fragments (the
- * actual fill value will be determined by the linker), otherwise use the
- * given value.
+void SegAlign (unsigned long Alignment, int FillVal)
+/* Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
+ * (the actual fill value will be determined by the linker), otherwise use
+ * the given value.
  */
 {
     unsigned char Data [4];
-    unsigned long Align = (1UL << Power) - 1;
-    unsigned long NewPC = (ActiveSeg->PC + Align) & ~Align;
-    unsigned long Count = NewPC - ActiveSeg->PC;
+    unsigned long CombinedAlignment;
+    unsigned long Count;
 
-    if (Val != -1) {
-	/* User defined fill value */
-	memset (Data, Val, sizeof (Data));
-	while (Count) {
-	    if (Count > sizeof (Data)) {
-	    	EmitData (Data, sizeof (Data));
-	    	Count -= sizeof (Data);
-	    } else {
-	    	EmitData (Data, Count);
-	    	Count = 0;
-	    }
-	}
+    /* The segment must have the combined alignment of all separate alignments
+     * in the source. Calculate this alignment and check it for sanity.
+     */
+    CombinedAlignment = LeastCommonMultiple (ActiveSeg->Align, Alignment);
+    if (CombinedAlignment > MAX_ALIGNMENT) {
+        Error ("Combined alignment for active segment exceeds 0x10000");
     } else {
-	/* Linker defined fill value */
-	EmitFill (Count);
+        ActiveSeg->Align = CombinedAlignment;
+
+        /* Output a warning for larger alignments if not suppressed */
+        if (CombinedAlignment > LARGE_ALIGNMENT && !LargeAlignment) {
+            Warning (0, "Combined alignment is suspiciously large (%lu)",
+                     CombinedAlignment);
+        }
     }
 
-    /* Remember the alignment in the header */
-    if (ActiveSeg->Align < Power) {
-     	ActiveSeg->Align = Power;
+
+
+    /* Calculate the number of fill bytes */
+    Count = AlignCount (ActiveSeg->PC, Alignment) - ActiveSeg->PC;
+
+    /* Emit the data or a fill fragment */
+    if (FillVal != -1) {
+       	/* User defined fill value */
+       	memset (Data, FillVal, sizeof (Data));
+       	while (Count) {
+       	    if (Count > sizeof (Data)) {
+       	    	EmitData (Data, sizeof (Data));
+       	    	Count -= sizeof (Data);
+       	    } else {
+       	    	EmitData (Data, Count);
+       	    	Count = 0;
+       	    }
+       	}
+    } else {
+       	/* Linker defined fill value */
+       	EmitFill (Count);
     }
 }
 
@@ -513,8 +530,8 @@ static void WriteOneSeg (Segment* Seg)
 
     /* Write the segment data */
     ObjWriteVar (GetStringId (Seg->Def->Name)); /* Name of the segment */
-    ObjWriteVar (Seg->PC);                       /* Size */
-    ObjWrite8 (Seg->Align);                     /* Segment alignment */
+    ObjWriteVar (Seg->PC);                      /* Size */
+    ObjWriteVar (Seg->Align);                   /* Segment alignment */
     ObjWrite8 (Seg->Def->AddrSize);             /* Address size of the segment */
     ObjWriteVar (Seg->FragCount);               /* Number of fragments */
 

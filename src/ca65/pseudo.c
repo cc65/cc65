@@ -42,6 +42,7 @@
 #include <sys/stat.h>
 
 /* common */
+#include "alignment.h"
 #include "assertion.h"
 #include "bitops.h"
 #include "cddefs.h"
@@ -395,37 +396,31 @@ static void DoAddr (void)
 static void DoAlign (void)
 /* Align the PC to some boundary */
 {
-    long Val;
-    long Align;
-    unsigned Bit;
+    long FillVal;
+    long Alignment;
 
     /* Read the alignment value */
-    Align = ConstExpression ();
-    if (Align <= 0 || Align > 0x10000) {
-       	ErrorSkip ("Range error");
-      	return;
+    Alignment = ConstExpression ();
+    if (Alignment <= 0 || (unsigned long) Alignment > MAX_ALIGNMENT) {
+        ErrorSkip ("Range error");
+        return;
     }
 
     /* Optional value follows */
     if (CurTok.Tok == TOK_COMMA) {
-	NextTok ();
-	Val = ConstExpression ();
-	/* We need a byte value here */
-	if (!IsByteRange (Val)) {
-       	    ErrorSkip ("Range error");
-	    return;
-	}
+        NextTok ();
+        FillVal = ConstExpression ();
+        /* We need a byte value here */
+        if (!IsByteRange (FillVal)) {
+            ErrorSkip ("Range error");
+            return;
+        }
     } else {
-	Val = -1;
+        FillVal = -1;
     }
 
-    /* Check if the alignment is a power of two */
-    Bit = BitFind (Align);
-    if (Align != (0x01L << Bit)) {
-	Error ("Alignment value must be a power of 2");
-    } else {
-	SegAlign (Bit, (int) Val);
-    }
+    /* Generate the alignment */
+    SegAlign (Alignment, (int) FillVal);
 }
 
 

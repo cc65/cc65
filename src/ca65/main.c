@@ -119,6 +119,7 @@ static void Usage (void)
             "  --help\t\t\tHelp (this text)\n"
             "  --ignore-case\t\t\tIgnore case of symbols\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
+            "  --large-alignment\t\tDon't warn about large alignments\n"
             "  --listing name\t\tCreate a listing file if assembly was ok\n"
             "  --list-bytes n\t\tMaximum number of bytes per listing line\n"
             "  --macpack-dir dir\t\tSet a macro package directory\n"
@@ -454,6 +455,15 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 /* Add an include search path */
 {
     AddSearchPath (IncSearchPath, Arg);
+}
+
+
+
+static void OptLargeAlignment (const char* Opt attribute ((unused)),
+			       const char* Arg attribute ((unused)))
+/* Don't warn about large alignments */
+{
+    LargeAlignment = 1;
 }
 
 
@@ -849,6 +859,7 @@ int main (int argc, char* argv [])
 	{ "--help",    		0,	OptHelp			},
 	{ "--ignore-case",     	0,	OptIgnoreCase 		},
 	{ "--include-dir",     	1,	OptIncludeDir		},
+        { "--large-alignment",  0,      OptLargeAlignment       },
         { "--list-bytes",       1,      OptListBytes            },
 	{ "--listing", 	       	1,	OptListing		},
         { "--macpack-dir",      1,      OptMacPackDir           },

@@ -62,7 +62,7 @@ struct Segment {
     Fragment*  	    Last;      	  	/* Pointer to last fragment */
     unsigned long   FragCount;          /* Number of fragments */
     unsigned        Num;       		/* Segment number */
-    unsigned        Align;     		/* Segment alignment */
+    unsigned long   Align;     		/* Segment alignment */
     int             RelocMode;          /* Relocatable mode if OrgPerSeg */
     unsigned long   PC;                 /* PC if in relocatable mode */
     unsigned long   AbsPC;              /* PC if in local absolute mode */
@@ -128,10 +128,10 @@ INLINE unsigned char GetCurrentSegAddrSize (void)
 #  define GetCurrentSegAddrSize()    (ActiveSeg->Def->AddrSize)
 #endif
 
-void SegAlign (unsigned Power, int Val);
-/* Align the PC segment to 2^Power. If Val is -1, emit fill fragments (the
- * actual fill value will be determined by the linker), otherwise use the
- * given value.
+void SegAlign (unsigned long Alignment, int FillVal);
+/* Align the PC segment to Alignment. If FillVal is -1, emit fill fragments
+ * (the actual fill value will be determined by the linker), otherwise use
+ * the given value.
  */
 
 unsigned char GetSegAddrSize (unsigned SegNum);

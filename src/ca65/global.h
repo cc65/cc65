@@ -66,6 +66,7 @@ extern unsigned char   	AutoImport;    	    /* Mark unresolveds as import */
 extern unsigned char   	SmartMode;     	    /* Smart mode */
 extern unsigned char   	DbgSyms;       	    /* Add debug symbols */
 extern unsigned char   	LineCont;      	    /* Allow line continuation */
+extern unsigned char    LargeAlignment;     /* Don't warn about large alignments */
 
 /* Emulation features */
 extern unsigned char   	DollarIsPC;    	    /* Allow the $ symbol as current PC */

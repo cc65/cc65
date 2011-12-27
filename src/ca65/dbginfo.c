@@ -363,7 +363,7 @@ void DbgInfoSym (void)
     int         Type;
     unsigned    AsmName = EMPTY_STRING_ID;
     unsigned    Flags;
-    int         Offs;
+    int         Offs = 0;
     HLLDbgSym*  S;
 
 

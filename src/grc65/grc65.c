@@ -110,7 +110,7 @@ void printUsage(void) {
     printf("Usage: %s [options] file\n"
            "Options:\n"
            "\t-h, -?\t\tthis help\n"
-           "\t-f\t\tforce writting files\n"
+           "\t-f\t\tforce writing files\n"
            "\t-o name\t\tname C output file\n"
            "\t-s name\t\tname asm output file\n",
            ProgName);

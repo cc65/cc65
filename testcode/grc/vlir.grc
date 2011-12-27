@@ -1,0 +1,13 @@
+HEADER APPLICATION "test" "TestApp" "V1.0" {
+structure VLIR
+dostype USR
+author "Maciej Witkowiak"
+info "This is just an example."
+}
+
+; maximum size for chains >=1 will be $1000
+VLIR 0x1000 {
+0
+1
+2
+}

@@ -1,32 +1,31 @@
-
 ; Maciej 'YTM/Elysium' Witkowiak
 ; 06.06.2002
 
-; This is source for main VLIR-structured program part
+; This is the source for the main VLIR-structured program part
 
     ; include some GEOS defines
 
-	    .include "../../../libsrc/geos/inc/const.inc"
-	    .include "../../../libsrc/geos/inc/jumptab.inc"
-	    .include "../../../libsrc/geos/inc/geossym.inc"
-	    .include "../../../libsrc/geos/inc/geosmac.ca65.inc"
+	    .include "../../libsrc/geos/inc/const.inc"
+	    .include "../../libsrc/geos/inc/jumptab.inc"
+	    .include "../../libsrc/geos/inc/geossym.inc"
+	    .include "../../libsrc/geos/inc/geosmac.ca65.inc"
 
     ; import load addresses for all VLIR chains
-    ; by default they are all the same, but this is not required
-    ; these labels are defined upon linking with ld65 - each segment has it
-	    .import __VLIR1_LOAD__
-	    .import __VLIR2_LOAD__
+    ; these labels are defined upon linking with ld65
+
+	    .import __OVERLAYADDR__
+	    .import __OVERLAYSIZE__
 
     ; import names of functions defined (and exported) in each VLIR part
     ; of your application
-    ; here I used VLIRx_ prefix to prevent name clash
+    ; here I used an OVERLAYx_ prefix to prevent name clashes
 
-	    .import VLIR1_Function1
-	    .import VLIR2_Function2
+	    .import OVERLAY1_Function1
+	    .import OVERLAY2_Function1
 
-    ; segments "CODE", "DATA", "RODATA" and "BSS" all go to VLIR0 chain
+    ; segments "STARTUP", "CODE", "DATA", "RODATA" and "BSS" all go to VLIR0 chain
 
-	    .segment "CODE"
+	    .segment "STARTUP"
 	    ; code segment for VLIR 0 chain
 ProgExec:
 		LoadW r0, paramString		; show something
@@ -39,19 +38,19 @@ ProgExec:
 
 		lda #1
 		jsr PointRecord			; we want next module (#1)
-		LoadW r2, $ffff			; length - as many bytes as there are
-		LoadW r7, __VLIR1_LOAD__	; all VLIR segments have the same load address
+		LoadW r2, __OVERLAYSIZE__	; length - as many bytes as we have room for
+		LoadW r7, __OVERLAYADDR__	; all VLIR segments have the same load address
 		jsr ReadRecord			; load it
 		bnex error
-		jsr VLIR1_Function1		; execute something
+		jsr OVERLAY1_Function1		; execute something
 
 		lda #2
 		jsr PointRecord			; next module
-		LoadW r2, $ffff
-		LoadW r7, __VLIR2_LOAD__
+		LoadW r2, __OVERLAYSIZE__
+		LoadW r7, __OVERLAYADDR__
 		jsr ReadRecord			; load it
 		bnex error
-		jsr VLIR2_Function2		; execute something
+		jsr OVERLAY2_Function1		; execute something
 
 error:		jmp EnterDeskTop		; end of application
 

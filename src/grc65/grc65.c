@@ -100,7 +100,6 @@ char *ProgName;	/* for AbEnd, later remove and use common/cmdline.h */
 char *outputCName = NULL, *outputSName = NULL;
 FILE *outputCFile, *outputSFile;
 int CFnum = 0, SFnum = 0;
-int forceFlag = 0;
 char outputCMode[2] = "w";
 char outputSMode[2] = "w";
 
@@ -110,7 +109,6 @@ void printUsage(void) {
     printf("Usage: %s [options] file\n"
            "Options:\n"
            "\t-h, -?\t\tthis help\n"
-           "\t-f\t\tforce writing files\n"
            "\t-o name\t\tname C output file\n"
            "\t-s name\t\tname asm output file\n",
            ProgName);
@@ -145,12 +143,6 @@ void printSHeader(void) {
 
 void openCFile(void) {
 
-    if ((CFnum == 0) && (forceFlag == 0)) {
-        /* test if file exists already and no forcing*/
-        if ((outputCFile = fopen(outputCName,"r")) != 0)
-            AbEnd("file %s already exists, aborting\n", outputCName);
-    }
-
     if ((outputCFile = fopen(outputCName,outputCMode)) == 0) {
         AbEnd("can't open file %s for writing: %s\n", outputCName, strerror(errno));
     }
@@ -164,12 +156,6 @@ void openCFile(void) {
 
 
 void openSFile(void) {
-
-    if ((SFnum == 0) && (forceFlag == 0)) {
-        /* test if file exists already and no forcing*/
-        if ((outputSFile = fopen(outputSName,"r")) != 0)
-            AbEnd("file %s already exists, aborting\n", outputSName);
-    }
 
     if ((outputSFile = fopen(outputSName, outputSMode)) == 0) {
         AbEnd("can't open file %s for writing: %s\n", outputSName, strerror(errno));
@@ -748,9 +734,6 @@ int main(int argc, char *argv[]) {
 
         if (arg[0] == '-') {
             switch (arg[1]) {
-                case 'f':
-                    forceFlag = 1;
-                    break;
                 case 'o':
                     outputCName = argv[++i];
                     break;

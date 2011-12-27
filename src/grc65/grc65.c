@@ -369,15 +369,25 @@ void DoHeader(void) {
 
     a = findToken(hdrFTypes, token);
 
-    switch (a) {
-        case 0:
-            myHead.geostype = 6;
-            break;
-        case 1:
-            myHead.geostype = 14;
-            break;
-        default:
-            AbEnd("filetype '%s' is not supported yet\n", token);
+    if (apple == 1) {
+        switch (a) {
+            case 0:
+                myHead.geostype = 0x82;
+                break;
+            default:
+                AbEnd("filetype '%s' is not supported yet\n", token);
+        }
+    } else {
+        switch (a) {
+            case 0:
+                myHead.geostype = 6;
+                break;
+            case 1:
+                myHead.geostype = 14;
+                break;
+            default:
+                AbEnd("filetype '%s' is not supported yet\n", token);
+        }
     }
 
     myHead.dosname = nextPhrase();
@@ -389,7 +399,8 @@ void DoHeader(void) {
     /* put default values into myHead here */
     myHead.author = "cc65";
     myHead.info = "Program compiled with cc65 and GEOSLib.";
-    myHead.dostype = 128 + 3;
+    myHead.dostype = 128;
+    if (apple == 0) myHead.dostype += 3;
     myHead.structure = 0;
     myHead.mode = 0;
     myHead.icon = NULL;
@@ -433,7 +444,7 @@ void DoHeader(void) {
                         AbEnd("unknown dostype in header '%s'\n", myHead.dosname);
                         break;
                     default:
-                        myHead.dostype = b / 2 + 128 + 1;
+                        if (apple == 0) myHead.dostype = b / 2 + 128 + 1;
                         break;
                 }
                 break;
@@ -442,16 +453,16 @@ void DoHeader(void) {
                     case -1:
                         AbEnd("unknown mode in header '%s'\n", myHead.dosname);
                     case 0:
-                        myHead.mode = 0x40;
+                        if (apple == 0) myHead.mode = 0x40;
                         break;
                     case 1:
-                        myHead.mode = 0x00;
+                        if (apple == 0) myHead.mode = 0x00;
                         break;
                     case 2:
-                        myHead.mode = 0xc0;
+                        if (apple == 0) myHead.mode = 0xc0;
                         break;
                     case 3:
-                        myHead.mode = 0x80;
+                        if (apple == 0) myHead.mode = 0x80;
                         break;
                 }
                 break;
@@ -480,21 +491,51 @@ void DoHeader(void) {
 
     fprintf(outputSFile,
         "\n"
-        "\t\t.segment \"DIRENTRY\"\n\n"
-        "\t.byte %i\n"
-        "\t.word 0\n", myHead.dostype);
+        "\t\t.segment \"DIRENTRY\"\n\n");
 
-    fillOut(myHead.dosname, 16, "$a0");
+    if (apple == 1) {
 
-    fprintf(outputSFile,
-        "\t.word 0\n"
-        "\t.byte %i\n"
-        "\t.byte %i\n"
-        "\t.byte %i, %i, %i, %i, %i\n\n"
-        "\t.word 0\n"
-        "\t.byte \"PRG formatted GEOS file V1.0\"\n\n",
-        myHead.structure, myHead.geostype,
-        myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);
+        fprintf(outputSFile,
+            "\t.byte %i << 4 | %i\n",
+            myHead.structure + 2, strlen(myHead.dosname));
+
+        fillOut(myHead.dosname, 15, "0");
+
+        fprintf(outputSFile,
+            "\t.byte $%02x\n"
+            "\t.word 0\n"
+            "\t.word 0\n"
+            "\t.byte 0, 0, 0\n"
+            "\t.word %i << 9 | %i << 5 | %i, %i << 8 | %i\n"
+            "\t.byte 0\n"
+            "\t.byte 0\n"
+            "\t.byte 0\n"
+            "\t.word 0\n"
+            "\t.word %i << 9 | %i << 5 | %i, %i << 8 | %i\n"
+            "\t.word 0\n",
+            myHead.geostype,
+            myHead.year % 100, myHead.month, myHead.day, myHead.hour, myHead.min,
+            myHead.year % 100, myHead.month, myHead.day, myHead.hour, myHead.min);
+
+    } else {
+
+        fprintf(outputSFile,
+            "\t.byte %i\n"
+            "\t.word 0\n",
+            myHead.dostype);
+
+        fillOut(myHead.dosname, 16, "$a0");
+
+        fprintf(outputSFile,
+            "\t.word 0\n"
+            "\t.byte %i\n"
+            "\t.byte %i\n"
+            "\t.byte %i, %i, %i, %i, %i\n\n"
+            "\t.word 0\n"
+            "\t.byte \"PRG formatted GEOS file V1.0\"\n\n",
+            myHead.structure, myHead.geostype,
+            myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);
+    }
 
     fprintf(outputSFile,
         "\n"
@@ -525,7 +566,8 @@ void DoHeader(void) {
 
     fprintf(outputSFile,
         "\t.byte 0, 0, 0\n"
-        "\t.byte %i\n\n", myHead.mode);
+        "\t.byte %i\n\n",
+        myHead.mode);
 
     setLen(myHead.author, 62);
     fprintf(outputSFile,
@@ -537,7 +579,8 @@ void DoHeader(void) {
     setLen(myHead.info, 95);
     fprintf(outputSFile,
         "\t.byte \"%s\"\n"
-        "\t.byte 0\n\n", myHead.info);
+        "\t.byte 0\n\n",
+        myHead.info);
 
     if (fclose (outputSFile) != 0)
         AbEnd("error closing %s: %s\n", outputSName, strerror(errno));
@@ -745,10 +788,10 @@ int main(int argc, char *argv[]) {
                     break;
                 case 't':
                     switch (FindTarget(argv[++i])) {
-                        case TGT_GEOS: // todo: TGT_GEOS-CBM
+                        case TGT_GEOS: /* todo: TGT_GEOS-CBM */
                             apple = 0;
                             break;
-                        case TGT_COUNT: //todo: TGT_GEOS-APPLE
+                        case TGT_COUNT: /* todo: TGT_GEOS-APPLE */
                             apple = 1;
                             break;
                         default:

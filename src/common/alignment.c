@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                alignment.h                                */
+/*                                alignment.c                                */
 /*                                                                           */
 /*                             Address aligment                              */
 /*                                                                           */
@@ -33,13 +33,9 @@
 
 
 
-#ifndef ALIGNMENT_H
-#define ALIGNMENT_H
-
-
-
 /* common */
-#include "inline.h"
+#include "alignment.h"
+#include "check.h"
 
 
 
@@ -49,22 +45,21 @@
 
 
 
-/* The C file contains a list of primes up to 256, so we can factorize numbers
- * up to 0x10000 or somewhat more. The FactorizedNumber structure below
- * contains the powers of the primes from the prime table. The size of the
- * table (= the number of primes contained therein) is the constant below.
+/* To factorize an alignment, we will use the following prime table. It lists
+ * all primes up to 256, which means we're able to factorize alignments up to
+ * 0x10000. This is checked in the code.
  */
-#define PRIME_COUNT     54
-
-
-
-
-/* A number together with its prime factors */
-typedef struct FactorizedNumber FactorizedNumber;
-struct FactorizedNumber {
-    unsigned long       Value;                  /* The actual number */
-    unsigned char       Powers[PRIME_COUNT];    /* Powers of the factors */
+static const unsigned char Primes[PRIME_COUNT] = {
+      2,   3,   5,   7,  11,  13,  17,  19,  23,  29,
+     31,  37,  41,  43,  47,  53,  59,  61,  67,  71,
+     73,  79,  83,  89,  97, 101, 103, 107, 109, 113,
+    127, 131, 137, 139, 149, 151, 157, 163, 167, 173,
+    179, 181, 191, 193, 197, 199, 211, 223, 227, 229,
+    233, 239, 241, 251
 };
+#define LAST_PRIME      ((unsigned long)Primes[PRIME_COUNT-1])
+
+#define FAC_MAX         (LAST_PRIME * LAST_PRIME - 1)
 
 
 
@@ -74,24 +69,112 @@ struct FactorizedNumber {
 
 
 
-void Factorize (unsigned long Value, FactorizedNumber* F);
+static void Initialize (FactorizedNumber* F, unsigned long Value)
+/* Initialize a FactorizedNumber structure */
+{
+    unsigned I;
+
+    F->Value = Value;
+    for (I = 0; I < PRIME_COUNT; ++I) {
+        F->Powers[I] = 0;
+    }
+}
+
+
+
+static unsigned char MaxPower (unsigned char A, unsigned char B)
+/* Return the larger of A and B. This will get hopefully inlined by the
+ * compiler.
+ */
+{
+    return (A > B)? A : B;
+}
+
+
+
+static FactorizedNumber* Produce (FactorizedNumber* F)
+/* Generate a value from a list of powers of primes and return F */
+{
+    unsigned I;
+
+    F->Value = 1;
+    for (I = 0; I < PRIME_COUNT; ++I) {
+        unsigned Count = F->Powers[I];
+        while (Count--) {
+            F->Value *= Primes[I];
+        }
+    }
+    return F;
+}
+
+
+
+void Factorize (unsigned long Value, FactorizedNumber* F)
 /* Factorize a value between 1 and 0x10000. */
+{
+    unsigned I;
+
+    /* Initialize F */
+    Initialize (F, Value);
+
+    /* If the value is 1 we're already done */
+    if (Value == 1) {
+        return;
+    }
+
+    /* Be sure we can factorize */
+    CHECK (Value <= FAC_MAX && Value != 0);
+
+    /* Handle factor 2 separately for speed */
+    while ((Value & 0x01UL) == 0UL) {
+        ++F->Powers[0];
+        Value >>= 1;
+    }
+
+    /* Factorize. We don't need to check for array bounds since we checked the
+     * maximum value above.
+     */
+    I = 1;      /* Skip 2 because it was handled above */
+    while (Value > 1) {
+        unsigned long Tmp = Value / Primes[I];
+        if (Tmp * Primes[I] == Value) {
+            /* This is a factor */
+            ++F->Powers[I];
+            Value = Tmp;
+        } else {
+            /* This is not a factor, try next one */
+            ++I;
+        }
+    }
+}
+
+
 
 FactorizedNumber* LCM (const FactorizedNumber* Left,
                        const FactorizedNumber* Right,
-                       FactorizedNumber* Res);
+                       FactorizedNumber* Res)
 /* Calculate the least common multiple of two factorized numbers and return
  * the result.
  */
+{
+    unsigned I;
 
-unsigned long AlignAddr (unsigned long Addr, unsigned long Alignment);
+    /* Generate the powers for the lcm */
+    for (I = 0; I < PRIME_COUNT; ++I) {
+        Res->Powers[I] = MaxPower (Left->Powers[I], Right->Powers[I]);
+    }
+
+    /* Generate the actual lcm value from the powers and return the result */
+    return Produce (Res);
+}
+
+
+
+unsigned long AlignAddr (unsigned long Addr, unsigned long Alignment)
 /* Align an address to the given alignment */
-
-
-
-/* End of alignment.h */
-
-#endif
+{
+    return ((Addr + Alignment - 1) / Alignment) * Alignment;
+}
 
 
 

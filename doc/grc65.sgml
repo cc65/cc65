@@ -8,8 +8,8 @@
 <and><url name="Greg King" url="mailto:gngking@erols.com">
 <date>VII 2000; VI,VII 2002; 2005-8-3
 <abstract>
-This document describes a compiler that can create GEOS headers and menues for,
-and VLIR files from, cc65-compiled programs.
+This document describes a compiler that can create GEOS headers and menues for
+cc65-compiled programs.
 </abstract>
 
 <!-- Table of contents -->
@@ -28,30 +28,21 @@ GEOS is unable to load and start it.
 Currently, <bf/grc65/ supports only menues and the required header definition,
 along with support for building VLIR-structured files.
 
-<bf/grc65/ generates output in three formats: C header, <bf/ca65/ source (.s),
-and, for linking VLIR, <bf/ld65/ configuration script.  That is because
-application header data must be in assembly format, while menu definitions can
-be translated easily into C.  The purpose of the C file is to include it as a
-header in only one project file.  The assembly source should be processed by
-<bf/ca65/, and linked as the first object (read about <ref name="the building
-process" id="building-seq">).  The VLIR structure currently is supported for
-only projects that are written entirely in assembly code.
-
-<bf/grc65/ can be used also as a handy VLIR linker -- used to build
-VLIR-structured <tt/.cvt/ files out of prepared binary chains.
+<bf/grc65/ generates output in two formats: C header and <bf/ca65/ source (.s).
+That is because the application header data must be in assembly format, while
+the menu definitions can be translated easily into C.  The purpose of the C
+file is to include it as a header in only one project file.  The assembly source
+should be processed by <bf/ca65/ and linked to the application (read about
+<ref name="the building process" id="building-seq">).
 
 
 
 <sect>Usage
 <p>grc65 accepts the following options:<tscreen><verb>
--f         force the writing of the output files
--o name    name the .c output file
--s name    name the .s output file
--l name    name the ld65 output file
--h         show this help
-</verb></tscreen>
-When used as a VLIR linker, the correct syntax is:<tscreen><verb>
- grc65 -vlir output.cvt header.bin vlir0.bin vlir1.bin ...
+-h, -?     this help
+-f         force writing files
+-o name    name the C output file
+-s name    name the asm output file
 </verb></tscreen>
 Default output names are made from input names with extensions replaced by
 <tt/.h/ and <tt/.s/.  <bf/grc65/ will not overwrite existing files unless forced
@@ -113,19 +104,18 @@ HEADER <GEOS_TYPE> "dosname" "classname" "version" {
     dostype   SEQ
     mode      any
     structure SEQ
+    icon      "sprite.raw"
 }</verb></tscreen>
 The header definition describes the GEOS header sector which is unique to
-each file.  Currently, there's no way to change the default <bf/grc65/ icon
-(an empty frame).  It will be possible in the next version.  The definition
-starts with the keyword <tt/HEADER/, then goes the GEOS file-type.  You can use
-only <tt/APPLICATION/ here at the moment.  Then, there are (each one in quotes)
-the DOS file-name (up to 16 characters), the GEOS Class name (up to 12
-characters), and the version info (up to 4 characters).  The version should be
-written as &dquot;<tt/V/x.y&dquot;, where <em/x/ is the major, and <em/y/ is
-the minor, version number.  Those fields, along with both braces, are required.
-The lines between braces are optional, and will be replaced by default and
-current values.  The keyword <tt/author/ and its value in quotes name the
-programmer, and can be up to 63 bytes long.  <tt/info/ (in the same format) can
+each file.  The definition starts with the keyword <tt/HEADER/, then goes the
+GEOS file-type.  You can use only <tt/APPLICATION/ here at the moment.  Then,
+there are (each one in quotes) the DOS file-name (up to 16 characters), the GEOS
+Class name (up to 12 characters), and the version info (up to 4 characters).
+The version should be written as &dquot;<tt/V/x.y&dquot;, where <em/x/ is the
+major, and <em/y/ is the minor, version number.  Those fields, along with both
+braces, are required.  The lines between braces are optional, and will be replaced
+by default and current values.  The keyword <tt/author/ and its value in quotes name
+the programmer, and can be up to 63 bytes long.  <tt/info/ (in the same format) can
 have up to 95 characters.  If the <tt/date/ field is omitted, then the time of
 that compilation will be placed into the header.  Note that, if you do specify
 the date, you have to write all 5 numbers.  The <tt/dostype/ can be <tt/SEQ/,
@@ -137,36 +127,26 @@ it describes system requirements.  <tt/any/ will work on both 64-GEOS and
 and <tt/c64only/ will work on only 64-GEOS.  The default value for
 <tt/structure/ is <tt/SEQ/ (sequential).  You can put <tt/VLIR/ there, too; but
 then, you also have to put in a third type of resource -- a VLIR-table
-description.
+description.  The value of <tt/icon/ is a quoted file-name.  The first 63 bytes of
+this file are expected to represent a standard monochrome VIC sprite.  The file gets
+accessed when the generated assembly source is be processed by <bf/ca65/.  Examples
+for programs generating such files are <em/Sprite Painter/ and <em/SpritePad/.
 
 
 <sect1>VLIR table description
 <p><tscreen><verb>
-VLIR headname address {
-    vlir0
-    blank
-    vlir2
-    blank
-    vlir4
+VLIR size {
+    0
+    1
+    2
+    4
+    5
 }</verb></tscreen>
-The first element is the keyword <tt/VLIR/, then goes the name for the header
-binary file (read below), and the base address for all VLIR chains that are
-different from 0.  It can be either decimal (e.g., <tt/4096/) or hexadecimal
-with a <tt/0x/ prefix (e.g., <tt/0x1000/).  Then, between braces are the names
-of VLIR chain binaries or the keyword <tt/blank/ which denotes empty chains.
-In the example, chains #1 and #3 are missing.  The names between braces are
-the names of binaries that contain code for each VLIR part.  They matter only
-for the generated <bf/ld65/ configuration file, and will be the names of the
-resulting binary files after linking.  Each one will contain one VLIR chain;
-and, they will have to be put together, in the correct order, into a VLIR
-<tt/.cvt/ file, by <bf/grc65/ in its VLIR linker mode.
-
-The <tt/headname/ will be the name for the binary file which will contain only
-a GEOS <tt/.cvt/ header made out of compiling the <tt/.s/ header file that also
-was generated by <bf/grc65/.  At the end of the resulting <bf/ld65/ config. file
-(<tt/.cfg/), in comments, there will be information about what commands are
-required for putting the stuff together.  Read <ref name="this description"
-id="building-vlir"> for details.
+The first element is the keyword <tt/VLIR/, then goes the size for all VLIR chains
+that are different from 0.  It can be either decimal (e.g., <tt/4096/) or hexadecimal
+with a <tt/0x/ prefix (e.g., <tt/0x1000/).  Then, between braces are the VLIR chain
+numbers used by the application.  Skipped numbers denote empty chains.  In the example,
+chains #3 is missing.  Read <ref name="this description" id="building-vlir"> for details.
 
 
 

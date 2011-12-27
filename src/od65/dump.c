@@ -499,7 +499,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
        	const char*   Name      = GetString (&StrPool, ReadVar (F));
 	unsigned      Len       = strlen (Name);
 	unsigned long Size      = ReadVar (F);
-	unsigned      Align     = (1U << Read8 (F));
+       	unsigned long Align     = ReadVar (F);
        	unsigned char AddrSize  = Read8 (F);
         unsigned long FragCount = ReadVar (F);
 
@@ -509,7 +509,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	/* Print the data */
 	printf ("      Name:%*s\"%s\"\n", (int)(24-Len), "", Name);
        	printf ("      Size:%26lu\n", Size);
-	printf ("      Alignment:%21u\n", Align);
+	printf ("      Alignment:%21lu\n", Align);
 	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
                 AddrSizeToStr (AddrSize));
        	printf ("      Fragment count:%16lu\n", FragCount);
@@ -930,7 +930,7 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
 	unsigned long Size     = ReadVar (F);
 
         /* Skip alignment, type and fragment count */
-        (void) Read8 (F);
+        (void) ReadVar (F);
         (void) Read8 (F);
         (void) ReadVar (F);
 

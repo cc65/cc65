@@ -36,7 +36,7 @@ ALLTARGETS =	apple2		\
 		c64		\
 		cbm510		\
 		cbm610		\
-		geos		\
+                geos-cbm        \
 		lynx		\
 		nes		\
 		pet		\
@@ -248,36 +248,36 @@ cbm610lib:
 #-----------------------------------------------------------------------------
 # GEOS on the C64/128
 
-.PHONY:	geoslib
-geoslib:
+.PHONY:	geos-cbmlib
+geos-cbmlib:
 	CC=../$(CC) \
 	AS=../$(AS) \
 	AR=../$(AR) \
 	LD=../$(LD) \
-	AFLAGS="-t geos --forget-inc-paths -I../../../asminc" \
-	CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../../include" \
-	$(MAKE) -C geos
+	AFLAGS="-t geos-cbm --forget-inc-paths -I../../../asminc" \
+	CFLAGS="-Osir -g -T -t geos-cbm --forget-inc-paths -I. -I../../../include" \
+	$(MAKE) -C geos-cbm
 	for i in em joystick tgi conio common runtime zlib; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
-	    AFLAGS="-t geos --forget-inc-paths -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) SYS=geos -C $$i || exit 1; \
+	    AFLAGS="-t geos-cbm --forget-inc-paths -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t geos-cbm --forget-inc-paths -I. -I../../include" \
+	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
 	    for objfile in $$i/*.o; do \
-	        if [ -f geos/$$objfile ]; then \
-	      	    $(AR) a geos.lib geos/$$objfile || exit 1; \
+	        if [ -f geos-cbm/$$objfile ]; then \
+	      	    $(AR) a geos-cbm.lib geos-cbm/$$objfile || exit 1; \
 	      	else \
-	      	    $(AR) a geos.lib $$objfile || exit 1; \
+	      	    $(AR) a geos-cbm.lib $$objfile || exit 1; \
 	      	fi; \
 	    done \
 	done
-	cp geos/devel/*.emd .
-	cp geos/devel/*.joy .
-	cp geos/devel/*.tgi .
-	if [ -d geos/extra ]; then \
-	    for i in geos/extra/*.o; do \
-	       	cp $$i geos-`basename $$i` || exit 1; \
+	cp geos-cbm/devel/*.emd .
+	cp geos-cbm/devel/*.joy .
+	cp geos-cbm/devel/*.tgi .
+	if [ -d geos-cbm/extra ]; then \
+	    for i in geos-cbm/extra/*.o; do \
+	       	cp $$i geos-cbm-`basename $$i` || exit 1; \
 	    done \
 	fi
 

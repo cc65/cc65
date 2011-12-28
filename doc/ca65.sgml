@@ -114,6 +114,7 @@ Long options:
   --help                        Help (this text)
   --ignore-case                 Ignore case of symbols
   --include-dir dir             Set an include directory search path
+  --large-alignment             Don't warn about large alignments
   --listing name                Create a listing file if assembly was ok
   --list-bytes n                Maximum number of bytes per listing line
   --macpack-dir dir             Set a macro package directory
@@ -223,6 +224,13 @@ Here is a description of all the command line options:
 
   Generate an assembler listing with the given name. A listing file will
   never be generated in case of assembly errors.
+
+
+  <label id="option--large-alignment">
+  <tag><tt>--large-alignment</tt></tag>
+
+  Disable warnings about a large combined alignment. See the discussion of the
+  <tt><ref id=".ALIGN" name=".ALIGN"></tt> directive for futher information.
 
 
   <label id="option--list-bytes">
@@ -1844,20 +1852,70 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.ALIGN</tt><label id=".ALIGN"><p>
 
   Align data to a given boundary. The command expects a constant integer
-  argument that must be a power of two, plus an optional second argument
+  argument in the range 1 ... 65536, plus an optional second argument
   in byte range. If there is a second argument, it is used as fill value,
   otherwise the value defined in the linker configuration file is used
   (the default for this value is zero).
 
-  Since alignment depends on the base address of the module, you must
-  give the same (or a greater) alignment for the segment when linking.
-  The linker will give you a warning, if you don't do that.
+  <tt/.ALIGN/ will insert fill bytes, and the number of fill bytes depend of
+  the final address of the segment. <tt/.ALIGN/ cannot insert a variable
+  number of bytes, since that would break address calculations within the
+  module. So each <tt/.ALIGN/ expects the segment to be aligned to a multiple
+  of the alignment, because that allows the number of fill bytes to be
+  calculated in advance by the assembler. You are therefore required to
+  specify a matching alignment for the segment in the linker config. The
+  linker will output a warning if the alignment of the segment is less than
+  what is necessary to have a correct alignment in the object file.
 
   Example:
 
   <tscreen><verb>
       	.align	256
   </verb></tscreen>
+
+  Some unexpected behaviour might occur if there are multiple <tt/.ALIGN/
+  commands with different arguments. To allow the assembler to calculate the
+  number of fill bytes in advance, the alignment of the segment must be a
+  multiple of each of the alignment factors. This may result in unexpectedly
+  large alignments for the segment within the module.
+
+  Example:
+
+  <tscreen><verb>
+        .align  15
+        .byte   15
+        .align  18
+        .byte   18
+  </verb></tscreen>
+
+  For the assembler to be able to align correctly, the segment must be aligned
+  to the least common multiple of 15 and 18 which is 90. The assembler will
+  calculate this automatically and will mark the segment with this value.
+
+  Unfortunately, the combined alignment may get rather large without the user
+  knowing about it, wasting space in the final executable. If we add another
+  alignment to the example above
+
+  <tscreen><verb>
+        .align  15
+        .byte   15
+        .align  18
+        .byte   18
+        .align  251
+        .byte   0
+  </verb></tscreen>
+
+  the assembler will force a segment alignment to the least common multiple of
+  15, 18 and 251 - which is 22590. To protect the user against errors, the
+  assembler will issue a warning when the combined alignment exceeds 256. The
+  command line option <tt><ref id="option--large-alignment"
+  name="--large-alignment"></tt> will disable this warning.
+
+  Please note that with alignments that are a power of two (which were the
+  only alignments possible in older versions of the assembler), the problem is
+  less severe, because the least common multiple of powers to the same base is
+  always the larger one.
+
 
 
 <sect1><tt>.ASCIIZ</tt><label id=".ASCIIZ"><p>
@@ -2171,7 +2229,7 @@ Here's a list of all control commands and a description, what they do:
   is a symbol that is already defined somewhere in the source file up to the
   current position. Otherwise the function yields false. As an example, the
   <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
-
+           
   <tscreen><verb>
   	.if	.defined(a)
   </verb></tscreen>

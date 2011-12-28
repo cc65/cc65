@@ -292,7 +292,14 @@ void SegAlign (unsigned long Alignment, int FillVal)
      */
     CombinedAlignment = LeastCommonMultiple (ActiveSeg->Align, Alignment);
     if (CombinedAlignment > MAX_ALIGNMENT) {
-        Error ("Combined alignment for active segment exceeds 0x10000");
+        Error ("Combined alignment for active segment is %lu which exceeds %lu",
+               CombinedAlignment, MAX_ALIGNMENT);
+
+        /* Avoid creating large fills for an object file that is thrown away 
+         * later.
+         */
+        Count = 1;
+
     } else {
         ActiveSeg->Align = CombinedAlignment;
 
@@ -301,12 +308,12 @@ void SegAlign (unsigned long Alignment, int FillVal)
             Warning (0, "Combined alignment is suspiciously large (%lu)",
                      CombinedAlignment);
         }
+
+        /* Calculate the number of fill bytes */
+        Count = AlignCount (ActiveSeg->PC, Alignment) - ActiveSeg->PC;
+
     }
 
-
-
-    /* Calculate the number of fill bytes */
-    Count = AlignCount (ActiveSeg->PC, Alignment) - ActiveSeg->PC;
 
     /* Emit the data or a fill fragment */
     if (FillVal != -1) {

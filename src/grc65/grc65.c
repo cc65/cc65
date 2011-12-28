@@ -209,7 +209,7 @@ void fillOut(char *name, int len, char *filler) {
 
     setLen(name, len);
     fprintf(outputSFile, "\t.byte \"%s\"\n", name);
-    
+
     a = strlen(name);
     if (a < len) {
         fprintf(outputSFile, "\t.res  (%i - %i), %s\n", len, a, filler);
@@ -496,8 +496,8 @@ void DoHeader(void) {
     if (apple == 1) {
 
         fprintf(outputSFile,
-            "\t.byte %i << 4 | %i\n",
-            myHead.structure + 2, strlen(myHead.dosname));
+            "\t.byte %i << 4 | %u\n",
+            myHead.structure + 2, (unsigned) strlen(myHead.dosname));
 
         fillOut(myHead.dosname, 15, "0");
 
@@ -623,7 +623,7 @@ void DoVLIR(void) {
     if (lastrecord == -1) {
         AbEnd("There must be at least one VLIR record.\n");
     }
-    
+
     /* always include record 0 */
     vlirtable[0] = 1;
 

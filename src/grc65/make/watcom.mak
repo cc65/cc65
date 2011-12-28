@@ -60,7 +60,7 @@ endif
 # ------------------------------------------------------------------------------
 # All OBJ files
 
-OBJS = 	grc65.obj
+OBJS = 	main.obj
 
 LIBS = ../common/common.lib
 

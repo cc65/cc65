@@ -20,7 +20,7 @@ EBIND	= emxbind
 # -----------------------------------------------------------------------------
 # List of all object files
 
-OBJS =  grc65.o
+OBJS =  main.o
 
 LIBS = $(COMMON)/common.a
 
@@ -54,5 +54,5 @@ zap:	clean
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
 	$(CC) $(CFLAGS) -MM $^ > .depend
-               
+
 

@@ -306,7 +306,7 @@ static void CmdSetOutput (CmdDesc* Cmd, const char* File)
 static void CmdSetTarget (CmdDesc* Cmd, target_t Target)
 /* Set the output file in a command desc */
 {
-    CmdAddArg2 (Cmd, "-t", TargetNames[Target]);
+    CmdAddArg2 (Cmd, "-t", GetTargetName (Target));
 }
 
 
@@ -335,7 +335,7 @@ static void SetTargetFiles (void)
     if (Target != TGT_NONE) {
 
  	/* Get a pointer to the system name and its length */
- 	const char* TargetName = TargetNames [Target];
+ 	const char* TargetName = GetTargetName (Target);
  	unsigned    TargetNameLen = strlen (TargetName);
 
  	/* Set the library file */
@@ -1021,11 +1021,11 @@ static void OptListTargets (const char* Opt attribute ((unused)),
 		       	    const char* Arg attribute ((unused)))
 /* List all targets */
 {
-    unsigned I;
+    target_t T;
 
     /* List the targets */
-    for (I = TGT_NONE; I < TGT_COUNT; ++I) {
-	printf ("%s\n", TargetNames[I]);
+    for (T = TGT_NONE; T < TGT_COUNT; ++T) {
+	printf ("%s\n", GetTargetName (T));
     }
 
     /* Terminate */

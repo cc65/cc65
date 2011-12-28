@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -210,9 +210,15 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__APPLE2ENH__", 1);
      	    break;
 
-     	case TGT_GEOS:
+     	case TGT_GEOS_CBM:
      	    /* Do not handle as a CBM system */
      	    DefineNumericMacro ("__GEOS__", 1);
+     	    DefineNumericMacro ("__GEOS_CBM__", 1);
+     	    break;
+
+     	case TGT_GEOS_APPLE:
+     	    DefineNumericMacro ("__GEOS__", 1);
+     	    DefineNumericMacro ("__GEOS_APPLE__", 1);
      	    break;
 
 	case TGT_LUNIX:
@@ -950,7 +956,7 @@ int main (int argc, char* argv[])
     /* If no CPU given, use the default CPU for the target */
     if (CPU == CPU_UNKNOWN) {
         if (Target != TGT_UNKNOWN) {
-            CPU = DefaultCPU[Target];
+            CPU = GetTargetProperties (Target)->DefaultCPU;
         } else {
             CPU = CPU_6502;
         }

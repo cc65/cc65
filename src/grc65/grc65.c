@@ -788,10 +788,10 @@ int main(int argc, char *argv[]) {
                     break;
                 case 't':
                     switch (FindTarget(argv[++i])) {
-                        case TGT_GEOS: /* todo: TGT_GEOS-CBM */
+                        case TGT_GEOS_CBM:
                             apple = 0;
                             break;
-                        case TGT_COUNT: /* todo: TGT_GEOS-APPLE */
+                        case TGT_GEOS_APPLE:
                             apple = 1;
                             break;
                         default:

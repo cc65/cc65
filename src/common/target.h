@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -66,7 +66,8 @@ typedef enum {
     TGT_BBC,
     TGT_APPLE2,
     TGT_APPLE2ENH,
-    TGT_GEOS,
+    TGT_GEOS_CBM,
+    TGT_GEOS_APPLE,
     TGT_LUNIX,
     TGT_ATMOS,
     TGT_NES,
@@ -75,11 +76,16 @@ typedef enum {
     TGT_COUNT			/* Number of target systems */
 } target_t;
 
+/* Collection of target properties */
+typedef struct TargetProperties TargetProperties;
+struct TargetProperties {
+    const char              Name[12];   /* Name of the target */
+    cpu_t                   DefaultCPU; /* Default CPU for this target */
+    const unsigned char*    CharMap;    /* Character translation table */
+};
+
 /* Target system */
 extern target_t		Target;
-
-/* Table with target names */
-extern const char* TargetNames[TGT_COUNT];
 
 /* Table with default CPUs per target */
 extern const cpu_t DefaultCPU[TGT_COUNT];
@@ -97,12 +103,16 @@ target_t FindTarget (const char* Name);
  * the given name is no valid target.
  */
 
+const TargetProperties* GetTargetProperties (target_t Target);
+/* Return the properties for a target */
+
+const char* GetTargetName (target_t Target);
+/* Return the name of a target */
+
 
 
 /* End of target.h */
-
 #endif
-
 
 
 

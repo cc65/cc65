@@ -38,10 +38,23 @@ should be processed by <bf/ca65/ and linked to the application (read about
 
 
 <sect>Usage
-<p>grc65 accepts the following options:<tscreen><verb>
--h, -?     this help
--o name    name the C output file
--s name    name the asm output file
+<p>grc65 accepts the following options:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: grc65 [options] file
+Short options:
+  -V                    Print the version number
+  -h                    Help (this text)
+  -o name               Name the C output file
+  -s name               Name the asm output file
+  -t sys                Set the target system
+
+Long options:
+  --help                Help (this text)
+  --target sys          Set the target system
+  --version             Print the version number
+---------------------------------------------------------------------------
 </verb></tscreen>
 Default output names are made from input names with extensions replaced by
 <tt/.h/ and <tt/.s/.

@@ -22,10 +22,12 @@
 #include <time.h>
 
 /* common stuff */
-#include "fname.h"
 #include "abend.h"
+#include "cmdline.h"
+#include "fname.h"
 #include "chartype.h"
 #include "target.h"
+#include "version.h"
 #include "xmalloc.h"
 
 /* I hope that no one will be able to create a .grc bigger than this... */
@@ -94,9 +96,8 @@ const unsigned char icon1[] = {255, 255, 255, 128,   0,   1, 128,   0,   1,
                                128,   0,   1, 128,   0,   1, 128,   0,   1,
                                128,   0,   1, 128,   0,   1, 255, 255, 255};
 
-char *ProgName;	/* for AbEnd, later remove and use common/cmdline.h */
-
-char *outputCName = NULL, *outputSName = NULL;
+const char *outputCName = NULL;
+const char *outputSName = NULL;
 FILE *outputCFile, *outputSFile;
 int CFnum = 0, SFnum = 0;
 int apple = 0;
@@ -104,16 +105,70 @@ char outputCMode[2] = "w";
 char outputSMode[2] = "w";
 
 
-void printUsage(void) {
+static void Usage (void) {
 
-    printf("Usage: %s [options] file\n"
-           "Options:\n"
-           "\t-h, -?\t\tthis help\n"
-           "\t-o name\t\tname C output file\n"
-           "\t-s name\t\tname asm output file\n"
-           "\t-t sys\t\tset target system\n",
-           ProgName);
+    printf ("Usage: %s [options] file\n"
+            "Short options:\n"
+            "  -V\t\t\tPrint the version number\n"
+            "  -h\t\t\tHelp (this text)\n"
+            "  -o name\t\tName the C output file\n"
+            "  -s name\t\tName the asm output file\n"
+            "  -t sys\t\tSet the target system\n"
+            "\n"
+            "Long options:\n"
+            "  --help\t\tHelp (this text)\n"
+            "  --target sys\t\tSet the target system\n"
+            "  --version\t\tPrint the version number\n",
+            ProgName);
 }
+
+
+static void OptHelp (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
+/* Print usage information and exit */
+{
+    Usage ();
+    exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
+/* Set the target system */
+{
+    switch (FindTarget(Arg)) {
+
+        case TGT_GEOS_CBM:
+            apple = 0;
+            break;
+
+        case TGT_GEOS_APPLE:
+            apple = 1;
+            break;
+
+        case TGT_UNKNOWN:
+            AbEnd ("Unknown target system `%s'", Arg);
+            break;
+
+        default:
+            /* Target is known but unsupported */
+            AbEnd ("Unsupported target system `%s'", Arg);
+            break;
+
+    }
+}
+
+
+
+static void OptVersion (const char* Opt attribute ((unused)),
+	    		const char* Arg attribute ((unused)))
+/* Print the assembler version */
+{
+    fprintf (stderr,
+             "grc65 V%s - (C) Copyright, Maciej 'YTM/Elysium' Witkowiak\n",
+             GetVersionAsString ());
+}
+
 
 
 void printCHeader(void) {
@@ -145,7 +200,7 @@ void printSHeader(void) {
 void openCFile(void) {
 
     if ((outputCFile = fopen(outputCName,outputCMode)) == 0) {
-        AbEnd("can't open file %s for writing: %s\n", outputCName, strerror(errno));
+        AbEnd ("Can't open file %s for writing: %s", outputCName, strerror(errno));
     }
 
     if (CFnum == 0) {
@@ -159,7 +214,7 @@ void openCFile(void) {
 void openSFile(void) {
 
     if ((outputSFile = fopen(outputSName, outputSMode)) == 0) {
-        AbEnd("can't open file %s for writing: %s\n", outputSName, strerror(errno));
+        AbEnd ("Can't open file %s for writing: %s", outputSName, strerror(errno));
     }
 
     if (SFnum == 0) {
@@ -259,7 +314,7 @@ void DoMenu(void) {
     myMenu.type = nextWord();
 
     if (strcmp(nextWord(), "{") != 0) {
-        AbEnd("menu '%s' description has no opening bracket!\n", myMenu.name);
+        AbEnd ("Menu '%s' description has no opening bracket!", myMenu.name);
     }
     curItem = xmalloc(sizeof(struct menuitem));
     myMenu.item = curItem;
@@ -284,8 +339,8 @@ void DoMenu(void) {
         curItem = newItem;
         item++;
         } while (strcmp(token, "}") != 0);
-    if (item == 0) AbEnd("menu '%s' has 0 items!\n", myMenu.name);
-    if (item > 31) AbEnd("menu '%s' has too many items!\n", myMenu.name);
+    if (item == 0) AbEnd ("Menu '%s' has 0 items!", myMenu.name);
+    if (item > 31) AbEnd ("Menu '%s' has too many items!", myMenu.name);
 
     curItem->next = NULL;
 
@@ -347,7 +402,7 @@ void DoMenu(void) {
         "};\n\n");
 
     if (fclose(outputCFile) != 0)
-        AbEnd("error closing %s: %s\n", outputCName, strerror(errno));
+        AbEnd ("Error closing %s: %s", outputCName, strerror(errno));
 }
 
 
@@ -373,7 +428,7 @@ void DoHeader(void) {
                 myHead.geostype = 0x82;
                 break;
             default:
-                AbEnd("filetype '%s' is not supported yet\n", token);
+                AbEnd ("Filetype '%s' is not supported yet", token);
         }
     } else {
         switch (a) {
@@ -384,7 +439,7 @@ void DoHeader(void) {
                 myHead.geostype = 14;
                 break;
             default:
-                AbEnd("filetype '%s' is not supported yet\n", token);
+                AbEnd ("Filetype '%s' is not supported yet", token);
         }
     }
 
@@ -413,7 +468,7 @@ void DoHeader(void) {
     myHead.min = my_tm->tm_min;
 
     if (strcmp(nextWord(), "{") != 0) {
-        AbEnd("header '%s' has no opening bracket!\n", myHead.dosname);
+        AbEnd ("Header '%s' has no opening bracket!", myHead.dosname);
     }
 
     do {
@@ -421,7 +476,7 @@ void DoHeader(void) {
         if (strcmp(token, "}") == 0) break;
         switch (a = findToken(hdrFields, token)) {
             case -1:
-                AbEnd("unknown field '%s' in header '%s'\n", token, myHead.dosname);
+                AbEnd ("Unknown field '%s' in header '%s'", token, myHead.dosname);
                 break;
             case 0: /* author */
                 myHead.author = nextPhrase();
@@ -439,7 +494,7 @@ void DoHeader(void) {
             case 3: /* dostype */
                 switch (b = findToken(hdrDOSTp, nextWord())) {
                     case -1:
-                        AbEnd("unknown dostype in header '%s'\n", myHead.dosname);
+                        AbEnd ("Unknown dostype in header '%s'", myHead.dosname);
                         break;
                     default:
                         if (apple == 0) myHead.dostype = b / 2 + 128 + 1;
@@ -449,7 +504,7 @@ void DoHeader(void) {
             case 4: /* mode */
                 switch (b = findToken(hdrModes, nextWord())) {
                     case -1:
-                        AbEnd("unknown mode in header '%s'\n", myHead.dosname);
+                        AbEnd ("Unknown mode in header '%s'", myHead.dosname);
                     case 0:
                         if (apple == 0) myHead.mode = 0x40;
                         break;
@@ -467,7 +522,7 @@ void DoHeader(void) {
             case 5: /* structure */
                 switch (b = findToken(hdrStructTp, nextWord())) {
                     case -1:
-                        AbEnd("unknown structure type in header '%s'\n", myHead.dosname);
+                        AbEnd ("unknown structure type in header '%s'", myHead.dosname);
                     case 0:
                     case 1:
                         myHead.structure = 0;
@@ -581,7 +636,7 @@ void DoHeader(void) {
         myHead.info);
 
     if (fclose (outputSFile) != 0)
-        AbEnd("error closing %s: %s\n", outputSName, strerror(errno));
+        AbEnd ("Error closing %s: %s", outputSName, strerror(errno));
 }
 
 
@@ -596,7 +651,7 @@ void DoVLIR(void) {
     vlirsize = strtol(nextWord(), NULL, 0);
 
     if (strcmp(nextWord(), "{") != 0) {
-        AbEnd ("VLIR description has no opening bracket!\n");
+        AbEnd ("VLIR description has no opening bracket!");
     }
 
     lastrecord = -1;
@@ -608,10 +663,10 @@ void DoVLIR(void) {
 
         record = atoi(token);
         if (record < 0 || record > 126) {
-            AbEnd("VLIR record %i is out of range 0-126.\n", record);
+            AbEnd ("VLIR record %i is out of range 0-126.", record);
         }
         if (vlirtable[record] == 1) {
-            AbEnd("VLIR record %i is defined twice.\n", record);
+            AbEnd ("VLIR record %i is defined twice.", record);
         }
 
         vlirtable[record] = 1;
@@ -619,7 +674,7 @@ void DoVLIR(void) {
     } while (strcmp(token, "}") != 0);
 
     if (lastrecord == -1) {
-        AbEnd("There must be at least one VLIR record.\n");
+        AbEnd ("There must be at least one VLIR record.");
     }
 
     /* always include record 0 */
@@ -659,7 +714,7 @@ void DoVLIR(void) {
         "\n");
 
     if (fclose(outputSFile) != 0)
-        AbEnd("error closing %s: %s\n", outputSName, strerror(errno));
+        AbEnd ("Error closing %s: %s", outputSName, strerror(errno));
 
     openCFile();
 
@@ -670,7 +725,7 @@ void DoVLIR(void) {
         "#define OVERLAY_SIZE (unsigned)&_OVERLAYSIZE__\n\n");
 
     if (fclose(outputCFile) != 0)
-        AbEnd("error closing %s: %s\n", outputCName, strerror(errno));
+        AbEnd ("Error closing %s: %s", outputCName, strerror(errno));
 }
 
 
@@ -711,7 +766,7 @@ char *filterInput(FILE *F, char *tbl) {
         }
     }
 
-    if (bracket != 0) AbEnd("there are unclosed brackets!\n");
+    if (bracket != 0) AbEnd ("There are unclosed brackets!");
 
     return tbl;
 }
@@ -728,7 +783,7 @@ void processFile(const char *filename) {
     int vlir = 0; /* number of processed VLIR sections */
 
     if ((F = fopen(filename, "r")) == 0) {
-        AbEnd("can't open file %s for reading: %s\n", filename, strerror(errno));
+        AbEnd ("Can't open file %s for reading: %s", filename, strerror(errno));
     }
 
     str = filterInput(F, xmalloc(BLOODY_BIG_BUFFER));
@@ -743,7 +798,7 @@ void processFile(const char *filename) {
                     break;
                 case 1:
                     if (++head != 1) {
-                        AbEnd("more than one HEADER section, aborting.\n");
+                        AbEnd ("More than one HEADER section, aborting.");
                     } else {
                         DoHeader();
                     }
@@ -752,13 +807,13 @@ void processFile(const char *filename) {
                 case 3: break; /* dialog not implemented yet */
                 case 4:
                     if (++vlir != 1) {
-                        AbEnd("more than one VLIR section, aborting.\n");
+                        AbEnd ("More than one VLIR section, aborting.");
                     } else {
                         DoVLIR();
                     }
                     break;
                 default:
-                    AbEnd("unknown section %s.\n",token);
+                    AbEnd ("Unknown section %s.",token);
                     break;
             }
         }
@@ -769,54 +824,74 @@ void processFile(const char *filename) {
 
 int main(int argc, char *argv[]) {
 
-    int ffile = 0, i = 1;
+    /* Program long options */
+    static const LongOpt OptTab[] = {
+	{ "--help",    		0,	OptHelp			},
+	{ "--target",  		1,	OptTarget		},
+	{ "--version", 	       	0,	OptVersion		},
+    };
 
-    ProgName = argv[0];
+    unsigned ffile = 0;
+    unsigned I;
 
-    while (i < argc) {
-        const char *arg = argv[i];
 
-        if (arg[0] == '-') {
-            switch (arg[1]) {
+    /* Initialize the cmdline module */
+    InitCmdLine (&argc, &argv, "grc65");
+
+    /* Check the parameters */
+    I = 1;
+    while (I < ArgCount) {
+
+       	/* Get the argument */
+       	const char* Arg = ArgVec [I];
+
+       	/* Check for an option */
+       	if (Arg[0] == '-') {
+            switch (Arg[1]) {
+
+	       	case '-':
+	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+	       	    break;
+
                 case 'o':
-                    outputCName = argv[++i];
+                    outputCName = GetArg (&I, 2);
                     break;
+
                 case 's':
-                    outputSName = argv[++i];
+                    outputSName = GetArg (&I, 2);
                     break;
+
                 case 't':
-                    switch (FindTarget(argv[++i])) {
-                        case TGT_GEOS_CBM:
-                            apple = 0;
-                            break;
-                        case TGT_GEOS_APPLE:
-                            apple = 1;
-                            break;
-                        default:
-                            AbEnd("unknown target system type %s\n", argv[i]);
-                    }
+                    OptTarget (Arg, GetArg (&I, 2));
                     break;
+
                 case 'h':
                 case '?':
-                    printUsage();
-                    exit(EXIT_SUCCESS);
+                    OptHelp (Arg, 0);
                     break;
+
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
+
                 default:
-                    AbEnd("unknown option %s\n", arg);
+                    UnknownOption (Arg);
             }
+
         } else {
             ffile++;
 
-            if (outputCName == NULL) outputCName = MakeFilename(arg, ".h");
-            if (outputSName == NULL) outputSName = MakeFilename(arg, ".s");
+            if (outputCName == NULL) outputCName = MakeFilename (Arg, ".h");
+            if (outputSName == NULL) outputSName = MakeFilename (Arg, ".s");
 
-            processFile(arg);
+            processFile(Arg);
         }
 
-        i++;
+	/* Next argument */
+	++I;
     }
 
-    if (ffile == 0) AbEnd("no input file\n");
+    if (ffile == 0) AbEnd ("No input file");
 
     return EXIT_SUCCESS;
 }

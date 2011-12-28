@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2010, Ullrich von Bassewitz                                      */
+/* (C) 1999-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -1109,19 +1109,19 @@ void O65SetLargeModel (O65Desc* D)
 
 
 
-void O65SetAlignment (O65Desc* D, unsigned Align)
+void O65SetAlignment (O65Desc* D, unsigned Alignment)
 /* Set the executable alignment */
 {
     /* Remove all alignment bits from the mode word */
     D->Header.Mode &= ~MF_ALIGN_MASK;
 
     /* Set the alignment bits */
-    switch (Align) {
+    switch (Alignment) {
 	case 1:	  D->Header.Mode |= MF_ALIGN_1;   break;
     	case 2:   D->Header.Mode |= MF_ALIGN_2;   break;
 	case 4:   D->Header.Mode |= MF_ALIGN_4;   break;
         case 256: D->Header.Mode |= MF_ALIGN_256; break;
-        default:  Error ("Invalid alignment for O65 format: %u", Align);
+        default:  Error ("Invalid alignment for O65 format: %u", Alignment);
     }
 }
 

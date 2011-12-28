@@ -95,6 +95,7 @@ const TargetDesc Targets[TGT_COUNT] = {
     {   BINFMT_BINARY,	CfgApple2       },
     {   BINFMT_BINARY,  CfgApple2Enh    },
     {   BINFMT_BINARY,  CfgGeos         },
+    {   BINFMT_BINARY,  CfgGeos         },
     {   BINFMT_O65,     CfgLunix        },
     {  	BINFMT_BINARY,	CfgAtmos        },
     {  	BINFMT_BINARY, 	CfgNES          },

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2010, Ullrich von Bassewitz                                      */
+/* (C) 1999-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -38,6 +38,7 @@
 #include <errno.h>
 
 /* common */
+#include "alignment.h"
 #include "print.h"
 #include "xmalloc.h"
 
@@ -161,13 +162,16 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         PrintNumVal  ("Address", Addr);
         PrintNumVal  ("FileOffs", (unsigned long) ftell (D->F));
 
-	/* Check if we would need an alignment */
-	if (S->Seg->Align > S->Align) {
-	    /* Segment itself requires larger alignment than configured
+       	/* Check if the alignment for the segment from the linker config is
+         * a multiple for that of the segment.
+         */
+        if ((S->RunAlignment % S->Seg->Alignment) != 0) {
+       	    /* Segment requires another alignment than configured
 	     * in the linker.
 	     */
-	    Warning ("Segment `%s' in module `%s' requires larger alignment",
-	       	     GetString (S->Name), GetObjFileName (S->Seg->AlignObj));
+	    Warning ("Segment `%s' is not aligned properly. Resulting "
+                     "executable may not be functional.",
+	       	     GetString (S->Name));              
 	}
 
         /* If this is the run memory area, we must apply run alignment. If
@@ -181,8 +185,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
             /* Handle ALIGN and OFFSET/START */
             if (S->Flags & SF_ALIGN) {
                 /* Align the address */
-                unsigned long Val = (0x01UL << S->Align) - 1;
-                unsigned long NewAddr = (Addr + Val) & ~Val;
+                unsigned long NewAddr = AlignAddr (Addr, S->RunAlignment);
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
                     WriteMult (D->F, M->FillVal, NewAddr - Addr);
                     PrintNumVal ("SF_ALIGN", NewAddr - Addr);
@@ -206,10 +209,9 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
             /* Handle ALIGN_LOAD */
             if (S->Flags & SF_ALIGN_LOAD) {
                 /* Align the address */
-                unsigned long Val = (0x01UL << S->AlignLoad) - 1;
-                unsigned long NewAddr = (Addr + Val) & ~Val;
+                unsigned long NewAddr = AlignAddr (Addr, S->LoadAlignment);
                 if (DoWrite || (M->Flags & MF_FILL) != 0) {
-                    WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                    WriteMult (D->F, M->FillVal, NewAddr - Addr);
                     PrintNumVal ("SF_ALIGN_LOAD", NewAddr - Addr);
                 }
                 Addr = NewAddr;

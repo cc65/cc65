@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -47,6 +47,7 @@
 #include "xsprintf.h"
 
 /* ld65 */
+#include "alignment.h"
 #include "bin.h"
 #include "binfmt.h"
 #include "cfgexpr.h"
@@ -340,12 +341,13 @@ static SegDesc* NewSegDesc (unsigned Name)
     S = xmalloc (sizeof (SegDesc));
 
     /* Initialize the fields */
-    S->Name    = Name;
-    S->LI      = GenLineInfo (&CfgErrorPos);
-    S->Seg     = 0;
-    S->Attr    = 0;
-    S->Flags   = 0;
-    S->Align   = 0;
+    S->Name          = Name;
+    S->LI            = GenLineInfo (&CfgErrorPos);
+    S->Seg           = 0;
+    S->Attr          = 0;
+    S->Flags         = 0;
+    S->RunAlignment  = 1;
+    S->LoadAlignment = 1;
 
     /* Insert the struct into the list ... */
     CollAppend (&SegDescList, S);
@@ -637,7 +639,6 @@ static void ParseSegments (void)
     };
 
     unsigned Count;
-    long     Val;
 
     /* The MEMORY section must preceed the SEGMENTS section */
     if ((SectionsEncountered & SE_MEMORY) == 0) {
@@ -672,21 +673,13 @@ static void ParseSegments (void)
 
 	        case CFGTOK_ALIGN:
 	    	    FlagAttr (&S->Attr, SA_ALIGN, "ALIGN");
-	    	    Val = CfgCheckedConstExpr (1, 0x10000);
-	    	    S->Align = BitFind (Val);
-	    	    if ((0x01L << S->Align) != Val) {
-	    	     	CfgError (&CfgErrorPos, "Alignment must be a power of 2");
-	    	    }
+	    	    S->RunAlignment = (unsigned) CfgCheckedConstExpr (1, MAX_ALIGNMENT);
 	    	    S->Flags |= SF_ALIGN;
 	    	    break;
 
                 case CFGTOK_ALIGN_LOAD:
 	    	    FlagAttr (&S->Attr, SA_ALIGN_LOAD, "ALIGN_LOAD");
-	    	    Val = CfgCheckedConstExpr (1, 0x10000);
-       	       	    S->AlignLoad = BitFind (Val);
-	    	    if ((0x01L << S->AlignLoad) != Val) {
-	    	     	CfgError (&CfgErrorPos, "Alignment must be a power of 2");
-	    	    }
+	    	    S->LoadAlignment = (unsigned) CfgCheckedConstExpr (1, MAX_ALIGNMENT);
 	    	    S->Flags |= SF_ALIGN_LOAD;
 	    	    break;
 
@@ -1818,8 +1811,22 @@ unsigned CfgProcess (void)
                  */
                 if (S->Flags & SF_ALIGN) {
                     /* Align the address */
-                    unsigned long Val = (0x01UL << S->Align) - 1;
-                    Addr = (Addr + Val) & ~Val;
+                    unsigned long NewAddr = AlignAddr (Addr, S->RunAlignment);
+
+                    /* If the first segment placed in the memory area needs
+                     * fill bytes for the alignment, emit a warning, since
+                     * this is somewhat suspicious.
+                     */
+                    if (M->FillLevel == 0 && NewAddr > Addr) {
+                        CfgWarning (GetSourcePos (S->LI),
+                                    "First segment in memory area `%s' does "
+                                    "already need fill bytes for alignment",
+                                    GetString (M->Name));
+                    }
+
+                    /* Use the aligned address */
+                    Addr = NewAddr;
+
                 } else if (S->Flags & (SF_OFFSET | SF_START)) {
                     /* Give the segment a fixed starting address */
                     unsigned long NewAddr = S->Addr;
@@ -1862,8 +1869,7 @@ unsigned CfgProcess (void)
                  */
                 if (S->Flags & SF_ALIGN_LOAD) {
                     /* Align the address */
-                    unsigned long Val = (0x01UL << S->AlignLoad) - 1;
-                    Addr = (Addr + Val) & ~Val;
+                    Addr = AlignAddr (Addr, S->LoadAlignment);
                 }
 
             }

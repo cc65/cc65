@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -77,8 +77,8 @@ struct SegDesc {
     struct MemoryArea*  Load;           /* Load memory section */
     struct MemoryArea*  Run;            /* Run memory section */
     unsigned long      	Addr; 		/* Start address or offset into segment */
-    unsigned char     	Align;	  	/* Run area alignment if given */
-    unsigned char       AlignLoad;      /* Load area alignment if given */
+    unsigned long       RunAlignment;   /* Run area alignment if given */
+    unsigned long       LoadAlignment;  /* Load area alignment if given */
 };
 
 /* Segment flags */
@@ -116,7 +116,7 @@ unsigned CfgProcess (void);
 
 void CfgWriteTarget (void);
 /* Write the target file(s) */
-                             
+
 
 
 /* End of config.h */

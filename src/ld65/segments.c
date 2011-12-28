@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "alignment.h"
 #include "check.h"
 #include "coll.h"
 #include "exprdefs.h"
@@ -95,10 +96,9 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->Sections    = EmptyCollection;
     S->PC   	   = 0;
     S->Size    	   = 0;
-    S->AlignObj	   = 0;
     S->OutputName  = 0;
     S->OutputOffs  = 0;
-    S->Align       = 0;
+    S->Alignment   = 1;
     S->FillVal	   = 0;
     S->AddrSize    = AddrSize;
     S->ReadOnly    = 0;
@@ -154,12 +154,9 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
 
 
 
-Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize)
+Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSize)
 /* Create a new section for the given segment */
 {
-    unsigned long V;
-
-
     /* Allocate memory */
     Section* S = xmalloc (sizeof (Section));
 
@@ -170,12 +167,11 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize)
     S->FragRoot = 0;
     S->FragLast = 0;
     S->Size  	= 0;
-    S->Align    = Align;
+    S->Alignment= Alignment;
     S->AddrSize = AddrSize;
 
     /* Calculate the alignment bytes needed for the section */
-    V = (0x01UL << S->Align) - 1;
-    S->Fill = (((Seg->Size + V) & ~V) - Seg->Size);
+    S->Fill = AlignCount (Seg->Size, S->Alignment);
 
     /* Adjust the segment size and set the section offset */
     Seg->Size  += S->Fill;
@@ -195,7 +191,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 {
     unsigned      Name;
     unsigned      Size;
-    unsigned char Align;
+    unsigned long Alignment;
     unsigned char Type;
     unsigned      FragCount;
     Segment*      S;
@@ -205,29 +201,39 @@ Section* ReadSection (FILE* F, ObjData* O)
     (void) Read32 (F);            /* File size of data */
     Name      = MakeGlobalStringId (O, ReadVar (F));    /* Segment name */
     Size      = ReadVar (F);      /* Size of data */
-    Align     = Read8 (F);        /* Alignment */
+    Alignment = ReadVar (F);      /* Alignment */
     Type      = Read8 (F);        /* Segment type */
     FragCount = ReadVar (F);      /* Number of fragments */
 
 
     /* Print some data */
-    Print (stdout, 2, "Module `%s': Found segment `%s', size = %u, align = %u, type = %u\n",
-	   GetObjFileName (O), GetString (Name), Size, Align, Type);
+    Print (stdout, 2,
+           "Module `%s': Found segment `%s', size = %u, alignment = %lu, type = %u\n",
+    	   GetObjFileName (O), GetString (Name), Size, Alignment, Type);
 
     /* Get the segment for this section */
     S = GetSegment (Name, Type, GetObjFileName (O));
 
     /* Allocate the section we will return later */
-    Sec = NewSection (S, Align, Type);
+    Sec = NewSection (S, Alignment, Type);
 
     /* Remember the object file this section was from */
     Sec->Obj = O;
 
-    /* Set up the minimum segment alignment */
-    if (Sec->Align > S->Align) {
-	/* Section needs larger alignment, use this one */
-	S->Align    = Sec->Align;
-	S->AlignObj = O;
+    /* Set up the combined segment alignment */
+    if (Sec->Alignment > 1) {
+        Alignment = LeastCommonMultiple (S->Alignment, Sec->Alignment);
+        if (Alignment > MAX_ALIGNMENT) {
+            Error ("Combined alignment for segment `%s' is %lu which exceeds "
+                   "%lu. Last module requiring alignment was `%s'.",
+                   GetString (Name), Alignment, MAX_ALIGNMENT,
+                   GetObjFileName (O));
+        } else if (Alignment >= LARGE_ALIGNMENT) {
+            Warning ("Combined alignment for segment `%s' is suspiciously "
+                     "large (%lu). Last module requiring alignment was `%s'.",
+                     GetString (Name), Alignment, GetObjFileName (O));
+        }
+        S->Alignment = Alignment;
     }
 
     /* Start reading fragments from the file and insert them into the section . */
@@ -471,10 +477,6 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
      	Frag = Sec->FragRoot;
      	while (Frag) {
 
-            /* Do fragment alignment checks */
-
-
-
             /* Output fragment data */
      	    switch (Frag->Type) {
 
@@ -580,8 +582,8 @@ void PrintSegmentMap (FILE* F)
     qsort (SegPool, CollCount (&SegmentList), sizeof (Segment*), CmpSegStart);
 
     /* Print a header */
-    fprintf (F, "Name                  Start   End     Size\n"
-     	       	"--------------------------------------------\n");
+    fprintf (F, "Name                   Start     End    Size  Align\n"
+     	       	"----------------------------------------------------\n");
 
     /* Print the segments */
     for (I = 0; I < CollCount (&SegmentList); ++I) {
@@ -597,8 +599,8 @@ void PrintSegmentMap (FILE* F)
      		/* Point to last element addressed */
      	     	--End;
      	    }
-     	    fprintf (F, "%-20s  %06lX  %06lX  %06lX\n",
-       	       	     GetString (S->Name), S->PC, End, S->Size);
+     	    fprintf (F, "%-20s  %06lX  %06lX  %06lX  %05lX\n",
+       	       	     GetString (S->Name), S->PC, End, S->Size, S->Alignment);
      	}
     }
 

@@ -40,7 +40,7 @@
 
 #include <stdio.h>
 
-/* common */  
+/* common */
 #include "coll.h"
 #include "exprdefs.h"
 
@@ -61,10 +61,9 @@ struct Segment {
     Collection          Sections;       /* Sections in this segment */
     unsigned long     	PC;    		/* PC were this segment is located */
     unsigned long     	Size;		/* Size of data so far */
-    struct ObjData*	AlignObj;	/* Module that requested the alignment */
     const char*         OutputName;     /* Name of output file or NULL */
     unsigned long       OutputOffs;     /* Offset in output file */
-    unsigned char     	Align;		/* Alignment needed */
+    unsigned long       Alignment;      /* Alignment needed */
     unsigned char     	FillVal;	/* Value to use for fill bytes */
     unsigned char     	AddrSize;      	/* Address size of segment */
     unsigned char       ReadOnly;       /* True for readonly segments (config) */
@@ -86,7 +85,7 @@ struct Section {
     unsigned long   	Offs;		/* Offset into the segment */
     unsigned long   	Size;		/* Size of the section */
     unsigned long       Fill;           /* Fill bytes for alignment */
-    unsigned char   	Align;		/* Alignment */
+    unsigned long       Alignment;      /* Alignment */
     unsigned char	AddrSize;       /* Address size of segment */
 };
 
@@ -120,7 +119,7 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
  * message and may be NULL if the segment is linker generated.
  */
 
-Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize);
+Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSize);
 /* Create a new section for the given segment */
 
 Section* ReadSection (FILE* F, struct ObjData* O);

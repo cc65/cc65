@@ -122,8 +122,8 @@ struct TargetEntry {
  * Allows mupltiple entries for one target id (target name aliases).
  */
 static const TargetEntry TargetMap[] = {
-    {   "apple2enh",    TGT_APPLE2ENH   },
     {   "apple2",       TGT_APPLE2      },
+    {   "apple2enh",    TGT_APPLE2ENH   },
     {   "atari",        TGT_ATARI       },
     {   "atmos",        TGT_ATMOS       },
     {   "bbc",          TGT_BBC         },

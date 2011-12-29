@@ -27,11 +27,7 @@ LDFLAGS = -lm
 
 # Determine the svn version number if possible
 ifneq "$(shell which svnversion 2>/dev/null)" ""
-ifneq "$(wildcard .svn)" ""
 SVNVERSION=$(shell svnversion)
-else
-SVNVERSION=unknown
-endif
 else
 SVNVERSION=unknown
 endif

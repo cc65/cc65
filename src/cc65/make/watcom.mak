@@ -29,9 +29,11 @@ EXE	= cc65.exe
 
 # Determine the svn version number if possible
 ifneq "$(shell which svnversion 2>/dev/null)" ""
-ifneq "$(wildcard .svn)" ""
 SVNVERSION=$(shell svnversion)
-else
+ifeq "$(SVNVERSION)" "exported"
+SVNVERSION=unknown
+endif
+ifeq "$(SVNVERSION)" "Unversioned directory"
 SVNVERSION=unknown
 endif
 else

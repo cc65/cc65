@@ -28,6 +28,12 @@ LDFLAGS = -lm
 # Determine the svn version number if possible
 ifneq "$(shell which svnversion 2>/dev/null)" ""
 SVNVERSION=$(shell svnversion)
+ifeq "$(SVNVERSION)" "exported"
+SVNVERSION=unknown
+endif
+ifeq "$(SVNVERSION)" "Unversioned directory"
+SVNVERSION=unknown
+endif
 else
 SVNVERSION=unknown
 endif

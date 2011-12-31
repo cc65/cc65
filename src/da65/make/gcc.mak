@@ -38,6 +38,7 @@ OBJS = 	asminc.o        \
 	opc65c02.o      \
 	opc65sc02.o     \
         opchuc6280.o    \
+        opcm740.o       \
 	opctable.o	\
 	output.o 	\
 	scanner.o       \

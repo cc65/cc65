@@ -87,6 +87,14 @@ void OH_DirectIndirectLongY (const OpcDesc*);
 void OH_BlockMove (const OpcDesc*);
 void OH_AbsoluteXIndirect (const OpcDesc*);
 
+/* Mitsubishi 740 */
+void OH_DirectImmediate (const OpcDesc*);
+void OH_ZeroPageBit (const OpcDesc*);
+void OH_AccumulatorBit (const OpcDesc*);
+void OH_AccumulatorBitBranch (const OpcDesc*);
+void OH_JmpDirectIndirect (const OpcDesc* D);
+void OH_SpecialPage (const OpcDesc*);
+                    
 /* Handlers for special instructions */
 void OH_Rts (const OpcDesc*);
 void OH_JmpAbsolute (const OpcDesc*);

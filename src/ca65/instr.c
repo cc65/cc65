@@ -784,10 +784,11 @@ static const InsTable* InsTabs[CPU_COUNT] = {
 #ifdef SUNPLUS
     (const InsTable*) &InsTabSunPlus,
 #else
-    NULL,
+    0,
 #endif
     (const InsTable*) &InsTabSweet16,
     (const InsTable*) &InsTabHuC6280,
+    0,                                  /* Mitsubishi 740 */
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 

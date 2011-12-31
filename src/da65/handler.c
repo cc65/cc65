@@ -552,6 +552,86 @@ void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 
 
 
+void OH_DirectImmediate (const OpcDesc* D)
+{
+    /* Get the operand */
+    unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%s, #$%02X", GetAddrArg (D->Flags, Addr), GetCodeByte (PC+2));
+}
+
+
+
+void OH_ZeroPageBit (const OpcDesc* D)
+{
+    unsigned Bit = GetCodeByte (PC) >> 5;
+    unsigned Addr = GetCodeByte (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "%01X,%s", Bit, GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_AccumulatorBit (const OpcDesc* D)
+{
+    unsigned Bit = GetCodeByte (PC) >> 5;
+
+    /* Output the line */
+    OneLine (D, "%01X,a", Bit);
+}
+
+
+
+void OH_AccumulatorBitBranch (const OpcDesc* D)
+{
+    unsigned Bit = GetCodeByte (PC) >> 5;
+    signed char BranchOffs = GetCodeByte (PC+1);
+
+    /* Calculate the target address for the branch */
+    unsigned BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
+
+    /* Generate labels in pass 1 */
+    GenerateLabel (flLabel, BranchAddr);
+
+    /* Output the line */
+    OneLine (D, "%01X,a,%s", Bit, GetAddrArg (flLabel, BranchAddr));
+}
+
+
+
+void OH_JmpDirectIndirect (const OpcDesc* D)
+{
+    OH_DirectIndirect (D);
+    if (NewlineAfterJMP) {
+        LineFeed ();
+    }
+    SeparatorLine ();
+}
+
+
+
+void OH_SpecialPage (const OpcDesc* D)
+{
+  /* Get the operand */
+  unsigned Addr = 0xFF00 + GetCodeByte (PC+1);
+
+  /* Generate a label in pass 1 */
+  GenerateLabel (D->Flags, Addr);
+
+  /* OneLine (D, "$FF%02X", (CodeByte (PC+1)); */
+  OneLine (D, "\%s", GetAddrArg (D->Flags, Addr));
+}
+
+
+
 void OH_Rts (const OpcDesc* D)
 {
     OH_Implicit (D);

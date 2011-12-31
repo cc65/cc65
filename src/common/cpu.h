@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2009, Ullrich von Bassewitz                                      */
+/* (C) 2003-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -56,6 +56,7 @@ typedef enum {
     CPU_SUNPLUS,	        /* Not in the freeware version - sorry */
     CPU_SWEET16,
     CPU_HUC6280,                /* Used in PC engine */
+    CPU_M740,                   /* Mitsubishi 740 series MCUs */
     CPU_COUNT  	    	        /* Number of different CPUs */
 } cpu_t;
 
@@ -70,6 +71,7 @@ enum {
     CPU_ISET_SUNPLUS    = 1 << CPU_SUNPLUS,
     CPU_ISET_SWEET16    = 1 << CPU_SWEET16,
     CPU_ISET_HUC6280    = 1 << CPU_HUC6280,
+    CPU_ISET_M740       = 1 << CPU_M740,
 };
 
 /* CPU used */

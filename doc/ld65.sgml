@@ -699,18 +699,21 @@ useful for things like a software stack, or an i/o area.
      	}
 </verb></tscreen>
 
-This will define three external symbols that may be used in your code:
+This will define some external symbols that may be used in your code:
 
 <tscreen><verb>
        	__STACK_START__	  	This is set to the start of the memory
-     	     		  	area, $C000 in this example.
+     	     	      	  	area, $C000 in this example.
      	__STACK_SIZE__	  	The size of the area, here $1000.
         __STACK_LAST__		This is NOT the same as START+SIZE.
-     	     	    		Instead, it it defined as the first
-     	     			address that is not used by data. If we
-     	     			don't define any segments for this area,
-     	     			the value will be the same as START.
-</verb></tscreen>
+     	     	      		Instead, it it defined as the first
+     	     	      		address that is not used by data. If we
+     	     	      		don't define any segments for this area,
+     	     	      		the value will be the same as START.
+        __STACK_FILEOFFS__      The binary offset in the output file. This
+                                is not defined for relocatable output file
+                                formats (o65).
+</verb></tscreen>                             
 
 A memory section may also have a type. Valid types are
 

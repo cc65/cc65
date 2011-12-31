@@ -63,6 +63,7 @@ struct File {
     unsigned            Name;           /* Name index of the file */
     unsigned	    	Flags;
     unsigned  	    	Format;		/* Output format */
+    unsigned long       Size;           /* Size of the generated file */
     Collection          MemoryAreas;    /* List of memory areas in this file */
 };
 

@@ -11,6 +11,10 @@
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
+/* With contributions from:                                                  */
+/*                                                                           */
+/*      - "David M. Lloyd" <david.lloyd@redhat.com>                          */
+/*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
@@ -293,6 +297,7 @@ static File* NewFile (unsigned Name)
     F->Name    = Name;
     F->Flags   = 0;
     F->Format  = BINFMT_DEFAULT;
+    F->Size    = 0;
     InitCollection (&F->MemoryAreas);
 
     /* Insert the struct into the list */
@@ -1757,6 +1762,9 @@ unsigned CfgProcess (void)
         /* Get the next memory area */
         MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
 
+        /* Remember the offset in the output file */
+        M->FileOffs = M->F->Size;
+
         /* Remember if this is a relocatable memory area */
         M->Relocatable = RelocatableBinFmt (M->F->Format);
 
@@ -1904,7 +1912,9 @@ unsigned CfgProcess (void)
 
 	}
 
-	/* If requested, define symbols for start and size of the memory area */
+	/* If requested, define symbols for start, size and offset of the
+         * memory area
+         */
 	if (M->Flags & MF_DEFINE) {
             Export* E;
 	    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
@@ -1918,10 +1928,26 @@ unsigned CfgProcess (void)
 	    SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
 	    E = CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
             CollAppend (&E->DefLines, M->LI);
+                                           
+            /* Define the file offset of the memory area. This isn't of much
+             * use for relocatable output files.
+             */
+            if (!M->Relocatable) {
+                SB_Printf (&Buf, "__%s_FILEOFFS__", GetString (M->Name));
+                E = CreateConstExport (GetStrBufId (&Buf), M->FileOffs);
+                CollAppend (&E->DefLines, M->LI);
+            }
 
+            /* Throw away the string buffer */
             SB_Done (&Buf);
 	}
 
+        /* Grow the file by the size of the memory area */
+        if (M->Flags & MF_FILL) {
+            M->F->Size += M->Size;
+        } else {
+            M->F->Size += M->FillLevel;
+        }
     }
 
     /* Return the number of memory area overflows */

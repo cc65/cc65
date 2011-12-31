@@ -134,11 +134,18 @@ static void PrintNumVal (const char* Name, unsigned long V)
 static void BinWriteMem (BinDesc* D, MemoryArea* M)
 /* Write the segments of one memory area to a file */
 {
+    unsigned I;
+
     /* Get the start address of this memory area */
     unsigned long Addr = M->Start;
 
+    /* Debugging: Check that the file offset is correct */
+    if (ftell (D->F) != (long)M->FileOffs) {
+        Internal ("Invalid file offset for memory area %s: %ld/%lu",
+                  GetString (M->Name), ftell (D->F), M->FileOffs);            
+    }
+
     /* Walk over all segments in this memory area */
-    unsigned I;
     for (I = 0; I < CollCount (&M->SegList); ++I) {
 
 	int DoWrite;
@@ -171,7 +178,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
 	     */
 	    Warning ("Segment `%s' is not aligned properly. Resulting "
                      "executable may not be functional.",
-	       	     GetString (S->Name));              
+	       	     GetString (S->Name));
 	}
 
         /* If this is the run memory area, we must apply run alignment. If

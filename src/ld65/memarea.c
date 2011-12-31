@@ -58,6 +58,7 @@ MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
     M->Name        = Name;
     M->Attr        = 0;
     M->Flags       = 0;
+    M->FileOffs    = ~0UL;
     M->StartExpr   = 0;
     M->Start       = 0;
     M->SizeExpr    = 0;

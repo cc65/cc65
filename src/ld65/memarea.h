@@ -63,6 +63,7 @@ struct MemoryArea {
     unsigned            Name;           /* Name index of the memory area */
     unsigned   	       	Attr;	  	/* Which values are valid? */
     unsigned   	 	Flags;	  	/* Set of bitmapped flags */
+    unsigned long       FileOffs;       /* Offset in output file */
     struct ExprNode*    StartExpr;      /* Expression for start address */
     unsigned long      	Start;          /* Start address */
     struct ExprNode*    SizeExpr;       /* Expression for size */

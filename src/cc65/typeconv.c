@@ -128,7 +128,7 @@ static void DoConversion (ExprDesc* Expr, const Type* NewType)
             Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
 
             /* If the new type is signed, sign extend the value */
-            if (!IsSignUnsigned (NewType)) {
+            if (IsSignSigned (NewType)) {
                 if (Expr->IVal & (0x01UL << (NewBits-1))) {
                     /* Beware: Use the safe shift routine here. */
                     Expr->IVal |= shl_l (~0UL, NewBits);

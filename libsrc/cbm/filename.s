@@ -144,23 +144,19 @@ drivedone:
 
 fncomplete:
 	pha	   		; Save mode
-        jsr     fnaddcomma      ; Add a comma
         lda     __filetype
-        jsr     fnadd           ; Add the type
+        jsr     fnaddmode       ; Add the type
         pla
 fnaddmode:
         pha
-        jsr     fnaddcomma
+        lda     #','
+        jsr     fnadd
         pla
 
 fnadd:  ldx     fnlen
         inc     fnlen
         sta     fnbuf,x
         rts
-
-fnaddcomma:
-        lda     #','
-        bne     fnadd
 
 ;--------------------------------------------------------------------------
 ; Data

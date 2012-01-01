@@ -33,7 +33,7 @@ yres:	.word	56			; Max Y resolution
 	.byte	2			; System font X size
 	.byte	2			; System font Y size
 	.word	$100			; Aspect ratio
-        .byte   0                       ; TGI driver flags
+	.byte	0			; TGI driver flags
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).
@@ -110,11 +110,11 @@ AY:		.res	1
 
 DEFPALETTE:	.byte	$0, $1
 OFFSET:		.byte	8, 4, 2, 1
-;			00  00  00  00  01  01  01  01
-;			00  01  10  11  00  01  10  11
+;			00  00	00  00	01  01	01  01
+;			00  01	10  11	00  01	10  11
 CODE:		.byte	32, 29, 26, 25, 28, 24+128, 31+128, 30+128
-;			10  10  10  10  11  11  11  11
-;			00  01  10  11  00  01  10  11
+;			10  10	10  10	11  11	11  11
+;			00  01	10  11	00  01	10  11
 		.byte	30, 31, 24, 28+128, 25+128, 26+128, 29+128, 32+128
 
 .code
@@ -376,197 +376,6 @@ GETPIXEL:
 	rts
 
 ; ------------------------------------------------------------------------
-; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
-; X2/Y2 = ptr3/ptr4 using the current drawing color.
-;
-; Must set an error code: NO
-;
-
-LINE:
-	; nx = abs(x2 - x1)
-	lda	X2
-	sub	X1
-	sta	NX
-	lda	X2+1
-	sbc	X1+1
-	tay
-	lda	NX
-	jsr	abs
-	sta	NX
-	sty	NX+1
-	; ny = abs(y2 - y1)
-	lda	Y2
-	sub	Y1
-	sta	NY
-	lda	Y2+1
-	sbc	Y1+1
-	tay
-	lda	NY
-	jsr	abs
-	sta	NY
-	sty	NY+1
-	; if (x2>=x1)
-	ldx	#X2
-	lda	X1
-	ldy	#0
-	jsr	icmp
-	bcc	@L0243
-	beq	@L0243
-	; dx = 1;
-	lda	#1
-	bne	@L0244
-	; else
-	; dx = -1;
-@L0243: lda	#$ff
-@L0244: sta	DX
-	; if (y2>=y1)
-	ldx	#Y2
-	lda	Y1
-	ldy	#0
-	jsr	icmp
-	bcc	@L024A
-	beq	@L024A
-	; dy = 1;
-	lda	#1
-	bne	@L024B
-	; else
-	; dy = -1;
-@L024A: lda	#$ff
-@L024B: sta	DY
-	; err = ay = 0;
-	lda	#0
-	sta	ERR
-	sta	ERR+1
-	sta	AY
-
-	; if (nx<ny) {
-	ldx	#NX
-	lda	NY
-	ldy	#0
-	jsr	icmp
-	bcs	@L0255
-	;  nx <-> ny
-	lda	NX
-	ldx	NY
-	sta	NY
-	stx	NX
-	lda	NX+1
-	ldx	NY+1
-	sta	NY+1
-	stx	NX+1
-	; ay = dx
-	lda	DX
-	sta	AY
-	; dx = dy = 0;
-	lda	#0
-	sta	DX
-	sta	DY
-	; ny = - ny;
-@L0255: lda	NY
-	ldy	#0
-	jsr	neg
-	sta	NY
-	sty	NY+1
-	; for (count=nx;count>0;--count) {
-	lda	NX
-	ldx	#0
-	sta	COUNT
-	stx	COUNT+1
-@L0166: lda	COUNT		; count>0
-	ora	COUNT+1
-	bne	@L0167
-	rts
-	;    setpixel(X1,Y1)
-@L0167: jsr	SETPIXEL
-	;    pb = err + ny
-	lda	ERR
-	add	NY
-	sta	PB
-	lda	ERR+1
-	adc	NY+1
-	sta	PB+1
-	tax
-	;    ub = pb + nx
-	lda	PB
-	add	NX
-	sta	UB
-	txa
-	adc	NX+1
-	sta	UB+1
-	;    x1 = x1 + dx
-	ldx	#0
-	lda	DX
-	bpl	@L027B
-	dex
-@L027B: add	X1
-	sta	X1
-	txa
-	adc	X1+1
-	sta	X1+1
-	;   y1 = y1 + ay
-	ldx	#0
-	lda	AY
-	bpl	@L027E
-	dex
-@L027E: add	Y1
-	sta	Y1
-	txa
-	adc	Y1+1
-	sta	Y1+1
-	; if (abs(pb)<abs(ub)) {
-	lda	PB
-	ldy	PB+1
-	jsr	abs
-	sta	TEMP3
-	sty	TEMP4
-	lda	UB
-	ldy	UB+1
-	jsr	abs
-	ldx	#TEMP3
-	jsr	icmp
-	bpl	@L027F
-	;   err = pb
-	lda	PB
-	ldx	PB+1
-	jmp	@L0312
-	; } else { x1 = x1 + ay
-@L027F:
-	ldx	#0
-	lda	AY
-	bpl	@L0288
-	dex
-@L0288: add	X1
-	sta	X1
-	txa
-	adc	X1+1
-	sta	X1+1
-	;	y1 = y1 + dy
-	ldx	#0
-	lda	DY
-	bpl	@L028B
-	dex
-@L028B: add	Y1
-	sta	Y1
-	txa
-	adc	Y1+1
-	sta	Y1+1
-	;	err = ub }
-	lda	UB
-	ldx	UB+1
-@L0312:
-	sta	ERR
-	stx	ERR+1
-	; } (--count)
-	sec
-	lda	COUNT
-	sbc	#1
-	sta	COUNT
-	bcc	@L0260
-	jmp	@L0166
-@L0260: dec	COUNT+1
-	jmp	@L0166
-
-; ------------------------------------------------------------------------
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
 ; X1/Y1 = ptr1/ptr2 and X2/Y2 = ptr3/ptr4 using the current drawing color.
 ; Contrary to most other functions, the graphics kernel will sort and clip
@@ -634,49 +443,6 @@ OUTTEXT:
 	bne	@L1
 	rts
 
-;-------------
-; copies of some runtime routines
-
-abs:
-	; a/y := abs(a/y)
-	cpy	#0
-	bpl	absend
-	; negay
-neg:	eor	#$ff
-	add	#1
-	pha
-	tya
-	eor	#$ff
-	adc	#0
-	tay
-	pla
-absend: rts
-
-icmp:
-	; compare a/y to zp,x
-	sta	TEMP		; TEMP/TEMP2 - arg2
-	sty	TEMP2
-	lda	$0,x
-	pha
-	lda	$1,x
-	tay
-	pla
-	tax
-	tya			; x/a - arg1 (a=high)
-
-	sub	TEMP2
-	bne	@L4
-	cpx	TEMP
-	beq	@L3
-	adc	#$ff
-	ora	#$01
-@L3:	rts
-@L4:	bvc	@L3
-	eor	#$ff
-	ora	#$01
-	rts
-
-
 ; ------------------------------------------------------------------------
 ; Calculate all variables to plot the pixel at X1/Y1. If the point is out
 ; of range, a carry is returned and INRANGE is set to a value !0 zero. If
@@ -722,3 +488,7 @@ CALC:	lda	xres
 	tax
 	lda	OFFSET,x
 	rts
+
+; ------------------------------------------------------------------------
+
+.include	"../tgi/tgidrv_line.inc"

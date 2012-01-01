@@ -93,9 +93,19 @@ allow access to hardware located in the address space.
 
 <sect>Loadable drivers<p>
 
+All drivers must be statically linked because no file I/O is available.
+See the documentation for the <htmlurl url="co65.html" name="co65 utility">
+for information on how to do that.
+
 <sect1>Graphics drivers<p>
 
-No graphics drivers are currently available for the NES.
+<descrip>
+
+  <tag><tt/nes-64-56-2.tgi/</tag>
+  This driver features a resolution of 64&times;56 with 2 colors using the
+  CHR bank.
+
+</descrip><p>
 
 <sect1>Extended memory drivers<p>
 
@@ -104,10 +114,7 @@ No extended memory drivers are currently available for the NES.
 
 <sect1>Joystick drivers<p>
 
-A joystick driver for the standard buttons is available, but must be
-statically linked, because no file I/O is available. See the documentation for
-the <htmlurl url="co65.html" name="co65 utility"> for information on how to do
-that.
+A joystick driver for the standard four buttons joypad is available.
 
 <sect1>Mouse drivers<p>
 

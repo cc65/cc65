@@ -65,6 +65,7 @@ OBJS =  _scrsize.o      \
         revers.o        \
         setcursor.o     \
         sysuname.o      \
+        tgi_colors.o    \
         waitvblank.o    \
         wherex.o        \
         wherey.o

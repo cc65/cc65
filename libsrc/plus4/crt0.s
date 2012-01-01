@@ -112,11 +112,10 @@ L2:	lda	zpsave,x
        	ldx	spsave
        	txs
 
-; Enable the ROM, reset changed vectors and return to BASIC
+; Enable the ROM and return to BASIC
 
         sta     ENABLE_ROM
-  	jmp	$FF8A           ; RESTOR
-
+       	rts
 
 ; ------------------------------------------------------------------------
 ; IRQ handler. The handler in the ROM enables the kernal and jumps to

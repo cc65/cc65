@@ -132,9 +132,9 @@ L2:	lda	zpsave,x
        	ldx    	mmusave
 	stx	MMU_CR
 
-; Done, restore kernal vectors in an attempt to cleanup
+; Done, return to BASIC
 
-     	jmp	RESTOR
+     	rts
 
 ; ------------------------------------------------------------------------
 ; The C128 has ROM parallel to the RAM starting from $4000. The startup code

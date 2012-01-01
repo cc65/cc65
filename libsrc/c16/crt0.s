@@ -112,9 +112,9 @@ L2:	lda	zpsave,x
 	ldx	spsave
 	txs
 
-; Reset changed vectors
+; Back to BASIC
 
-	jmp	RESTOR
+	rts
 
 ; ------------------------------------------------------------------------
 ; The IRQ vector jumps here, if condes routines are defined with type 2.

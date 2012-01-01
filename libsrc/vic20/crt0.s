@@ -106,9 +106,9 @@ L2:	lda	zpsave,x
   	ldx	spsave
 	txs
 
-; Reset changed vectors, back to basic
+; Back to basic
 
-	jmp	RESTOR
+        rts
 
 
 ; ------------------------------------------------------------------------

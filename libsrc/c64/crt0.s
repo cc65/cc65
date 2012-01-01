@@ -121,9 +121,9 @@ L2:   	lda	zpsave,x
        	ldx    	mmusave
 	stx	$01    	  	; Restore memory configuration
 
-; Reset changed vectors, back to basic
+; Back to basic
 
-	jmp	RESTOR
+        rts
 
 ; ------------------------------------------------------------------------
 ; The IRQ vector jumps here, if condes routines are defined with type 2.

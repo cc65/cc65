@@ -1413,7 +1413,7 @@ static void ParseSymbols (void)
 
             case CfgSymExport:
                 /* We must have a value */
-                AttrCheck (AttrFlags, atType, "TYPE");
+                AttrCheck (AttrFlags, atValue, "VALUE");
                 /* Create the export */
                 Exp = CreateExprExport (Name, Value, AddrSize);
                 CollAppend (&Exp->DefLines, GenLineInfo (&CfgErrorPos));
@@ -1432,7 +1432,7 @@ static void ParseSymbols (void)
 
             case CfgSymWeak:
                 /* We must have a value */
-                AttrCheck (AttrFlags, atType, "TYPE");
+                AttrCheck (AttrFlags, atValue, "VALUE");
                 /* Remember the symbol for later */
                 Sym = NewCfgSymbol (CfgSymWeak, Name);
                 Sym->Value = Value;
@@ -1928,7 +1928,7 @@ unsigned CfgProcess (void)
 	    SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
 	    E = CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
             CollAppend (&E->DefLines, M->LI);
-                                           
+
             /* Define the file offset of the memory area. This isn't of much
              * use for relocatable output files.
              */

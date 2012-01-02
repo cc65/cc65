@@ -1427,7 +1427,7 @@ static void ParseSymbols (void)
                 /* Generate the import */
                 Imp = InsertImport (GenImport (Name, AddrSize));
                 /* Remember the file position */
-                CollAppend (&Imp->DefLines, GenLineInfo (&CfgErrorPos));
+                CollAppend (&Imp->RefLines, GenLineInfo (&CfgErrorPos));
                 break;
 
             case CfgSymWeak:

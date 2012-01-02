@@ -22,5 +22,6 @@ int main (void)
 {
 
     GraphicsString(&myString);
+
 }
 

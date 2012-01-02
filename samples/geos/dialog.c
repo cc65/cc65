@@ -28,5 +28,7 @@ static const dlgBoxStr myDialog = {
 
 void main (void)
 {
+
     DoDlgBox (&myDialog);
-    }
+    
+}

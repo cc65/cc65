@@ -18,5 +18,7 @@ static const void myTab = {
 int main (void)
 {
 
+    InitRam(&myTab);
+
 }
 

@@ -215,21 +215,21 @@ Note that &dquot;<tt/resource.h/&dquot; is included at the top of
 
 <sect2>Second step -- assembling the application header
 <p><verb>
-$ ca65 -t cbm-geos resource.s
+$ ca65 -t geos-cbm resource.s
 </verb>
 And, voil&aacute; -- &dquot;<tt/resource.o/&dquot; is ready.
 
 <sect2>Third step -- compiling the code
 <p><verb>
-$ cc65 -t cbm-geos -O test.c
-$ ca65 -t cbm-geos test.s
+$ cc65 -t geos-cbm -O test.c
+$ ca65 -t geos-cbm test.s
 </verb>
 That way, you have a &dquot;<tt/test.o/&dquot; object file which
 contains all of the executable code.
 
 <sect2>Fourth and last step -- linking it together
 <p><verb>
-$ ld65 -o test.cvt -t cbm-geos resource.o geos.o test.o geos.lib
+$ ld65 -o test.cvt -t geos-cbm resource.o geos.o test.o geos.lib
 </verb>
 &dquot;<tt/resource.o/&dquot; comes first because it contains the
 header.  The next one is &dquot;<tt/geos.o/&dquot;, a required starter-code
@@ -241,7 +241,7 @@ contained in the well-known GEOS <em/Convert/ format.  Note that its name
 (<tt/test/) isn't important; the real name, after deconverting, is the DOS name
 that was given in the header definition.
 
-At each step, a <tt/-t cbm-geos/ was present on the command-line.  That switch is
+At each step, a <tt/-t geos-cbm/ was present on the command-line.  That switch is
 required for the correct process of GEOS sequential app. building.
 
 
@@ -275,13 +275,13 @@ Now, there are two new files:  &dquot;<tt/cvthead.cfg/&dquot; and
 &dquot;<tt/cvthead.s/&dquot; -- the first one is a config. file for <bf/ld65/,
 and the second one contains the GEOS <tt/.cvt/ header.  It can be assembled:
 <verb>
-$ ca65 -t cbm-geos cvthead.s
+$ ca65 -t geos-cbm cvthead.s
 </verb>
 Now, we have &dquot;<tt/cvthead.o/&dquot;.  The rest of the assembly
 sources can be assembled:<verb>
-$ ca65 -t cbm-geos vlir0.s
-$ ca65 -t cbm-geos vlir1.s
-$ ca65 -t cbm-geos vlir2.s
+$ ca65 -t geos-cbm vlir0.s
+$ ca65 -t geos-cbm vlir1.s
+$ ca65 -t geos-cbm vlir2.s
 </verb>
 Note that the file-names here, although similar to those from the
 <tt/VLIR/ section of the <tt/.grc/ file, are not significant.  The only thing

@@ -163,7 +163,6 @@ portable. conio implementations exist for the following targets:
   <itemize>
   <item>apple2
   <item>apple2enh
-  <item>apple-geos
   <item>atari
   <item>atmos
   <item>c16 (works also for the c116 with up to 32K memory)
@@ -172,7 +171,8 @@ portable. conio implementations exist for the following targets:
   <item>plus4 (or expanded c16/c116)
   <item>cbm510 (40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
-  <item>cbm-geos
+  <item>geos-apple
+  <item>geos-cbm
   <item>nes
   <item>pet (all CBM PET systems except the 2001)
   <item>vic20

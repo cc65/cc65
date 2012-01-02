@@ -462,7 +462,7 @@ The tutorial files are different for GEOS.  You will find them "next door," in
 
 Compile the tutorial with
 <tscreen><verb>
-cl65 -O -t cbm-geos hello1.c hello1res.grc
+cl65 -O -t geos-cbm hello1.c hello1res.grc
 </verb></tscreen>
 Copy the resulting file "<tt/hello1/" onto a (GEOS-format) disk.
 

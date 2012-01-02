@@ -550,6 +550,7 @@ static void DoHeader (void)
     if (apple == 1) {
 
         fprintf (outputSFile,
+            "\t.import __VLIR0_START__, __VLIR0_LAST__, __BSS_SIZE__\n\n"
             "\t.byte %i << 4 | %u\n",
             myHead.structure + 2, (unsigned)strlen (myHead.dosname));
 
@@ -559,7 +560,8 @@ static void DoHeader (void)
             "\t.byte $%02x\n"
             "\t.word 0\n"
             "\t.word 0\n"
-            "\t.byte 0, 0, 0\n"
+            "\t.word __VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__\n"
+            "\t.byte 0\n"
             "\t.word %i << 9 | %i << 5 | %i, %i << 8 | %i\n"
             "\t.byte 0\n"
             "\t.byte 0\n"

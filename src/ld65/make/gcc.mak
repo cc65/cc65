@@ -75,7 +75,7 @@ INCS =	apple2.inc	\
 	c64.inc		\
 	cbm510.inc	\
 	cbm610.inc	\
-	geos.inc	\
+	geos-cbm.inc	\
 	lunix.inc	\
 	lynx.inc	\
 	module.inc      \
@@ -155,8 +155,8 @@ cbm510.inc:	cfg/cbm510.cfg
 cbm610.inc:	cfg/cbm610.cfg
 	@$(CVT) $< $@ CfgCBM610
 
-geos.inc:	cfg/geos.cfg
-	@$(CVT) $< $@ CfgGeos
+geos-cbm.inc:	cfg/geos-cbm.cfg
+	@$(CVT) $< $@ CfgGeosCBM
 
 lunix.inc:	cfg/lunix.cfg
 	@$(CVT) $< $@ CfgLunix

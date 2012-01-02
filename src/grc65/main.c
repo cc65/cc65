@@ -462,7 +462,7 @@ static void DoHeader (void)
     t = time (NULL);
     my_tm = localtime (&t);
 
-    myHead.year = my_tm->tm_year;
+    myHead.year = my_tm->tm_year % 100;
     myHead.month = my_tm->tm_mon + 1;
     myHead.day = my_tm->tm_mday;
     myHead.hour = my_tm->tm_hour;
@@ -568,8 +568,8 @@ static void DoHeader (void)
             "\t.word %i << 9 | %i << 5 | %i, %i << 8 | %i\n"
             "\t.word 0\n",
             myHead.geostype,
-            myHead.year % 100, myHead.month, myHead.day, myHead.hour, myHead.min,
-            myHead.year % 100, myHead.month, myHead.day, myHead.hour, myHead.min);
+            myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min,
+            myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);
 
     } else {
 

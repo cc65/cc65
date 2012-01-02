@@ -166,7 +166,7 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
     { "apple2",         CPU_6502,       CTNone  },
     { "apple2enh",      CPU_65C02,      CTNone  },
     { "geos-cbm",       CPU_6502,       CTNone  },
-    { "geos-apple2",    CPU_6502,       CTNone  },
+    { "geos-apple",     CPU_65C02,      CTNone  },
     { "lunix",          CPU_6502,       CTNone  },
     { "atmos",          CPU_6502,       CTNone  },
     { "nes",            CPU_6502,       CTNone  },

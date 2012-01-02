@@ -188,12 +188,6 @@ source: jsr	$BF00
         ; Go for it ...
         jmp	(data_buffer)
 
-        ; Quit to ProDOS dispatcher
-quit            = * - source + target
-:       jsr	$BF00
-        .byte	$65		; QUIT
-        .word	quit_param
-
 read_param      = * - source + target
         .byte	$04		; PARAM_COUNT
 read_ref        = * - source + target
@@ -208,6 +202,12 @@ close_param     = * - source + target
 close_ref       = * - source + target
         .byte	$00		; REF_NUM
 
+        ; Quit to ProDOS dispatcher
+quit            = * - source + target
+:       jsr	$BF00
+        .byte	$65		; QUIT
+        .word	quit_param
+
 quit_param      = * - source + target
         .byte	$04		; PARAM_COUNT
         .byte	$00		; QUIT_TYPE
@@ -215,8 +215,8 @@ quit_param      = * - source + target
         .byte	$00		; RESERVED
         .word	$0000		; RESERVED
 
-size    = * - source
+size            = * - source
 
-target  = DOSWARM - size
+target          = DOSWARM - size
 
 dosvec: jmp	quit

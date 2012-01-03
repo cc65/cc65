@@ -64,7 +64,9 @@ struct appheader {
     char *icon;
 };
 
-const char *mainToken[] = {"MENU", "HEADER", "ICON", "DIALOG", "VLIR", ""};
+const char *mainToken[] = {"MENU", "HEADER", "ICON", "DIALOG", "MEMORY", ""};
+
+const char *toggle[] = {"off", "no", "0", "on", "yes", "1", ""};
 
 const char *hdrFTypes[] = {"APPLICATION", "AUTO_EXEC", "DESK_ACC", "ASSEMBLY",
                            "DISK_DEVICE", "PRINTER", "SYSTEM", ""};
@@ -76,6 +78,8 @@ const char *hdrDOSTp[] = {"seq", "SEQ", "prg", "PRG", "usr", "USR", ""};
 const char *hdrStructTp[] = {"seq", "SEQ", "vlir", "VLIR", ""};
 
 const char *hdrModes[] = {"any", "40only", "80only", "c64only", ""};
+
+const char *memFields[] = {"stacksize", "overlaysize", "overlaynums", "backbuffer", ""};
 
 const int BSWTab[] = {0, 0x005, 0x007, 0x00b, 0x011, 0x017, 0x01d, 0x023,
     0x025, 0x029, 0x02d, 0x033, 0x039, 0x03c, 0x041, 0x043, 0x04a, 0x04f,
@@ -107,19 +111,20 @@ char outputSMode[2] = "w";
 
 static void Usage (void)
 {
-    printf ("Usage: %s [options] file\n"
-            "Short options:\n"
-            "  -V\t\t\tPrint the version number\n"
-            "  -h\t\t\tHelp (this text)\n"
-            "  -o name\t\tName the C output file\n"
-            "  -s name\t\tName the asm output file\n"
-            "  -t sys\t\tSet the target system\n"
-            "\n"
-            "Long options:\n"
-            "  --help\t\tHelp (this text)\n"
-            "  --target sys\t\tSet the target system\n"
-            "  --version\t\tPrint the version number\n",
-            ProgName);
+    printf (
+        "Usage: %s [options] file\n"
+        "Short options:\n"
+        "  -V\t\t\tPrint the version number\n"
+        "  -h\t\t\tHelp (this text)\n"
+        "  -o name\t\tName the C output file\n"
+        "  -s name\t\tName the asm output file\n"
+        "  -t sys\t\tSet the target system\n"
+        "\n"
+        "Long options:\n"
+        "  --help\t\tHelp (this text)\n"
+        "  --target sys\t\tSet the target system\n"
+        "  --version\t\tPrint the version number\n",
+        ProgName);
 }
 
 
@@ -153,7 +158,6 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
             /* Target is known but unsupported */
             AbEnd ("Unsupported target system `%s'", Arg);
             break;
-
     }
 }
 
@@ -163,8 +167,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr,
-             "grc65 V%s - (C) Copyright, Maciej 'YTM/Elysium' Witkowiak\n",
-             GetVersionAsString ());
+        "grc65 V%s - (C) Copyright, Maciej 'YTM/Elysium' Witkowiak\n",
+        GetVersionAsString ());
 }
 
 
@@ -252,8 +256,9 @@ static char *nextWord (void)
 
 static void setLen (char *name, unsigned len)
 {
-    if (strlen (name) > len)
+    if (strlen (name) > len) {
         name[len] = '\0';
+    }
 }
 
 
@@ -319,7 +324,8 @@ static void DoMenu (void)
     }
     curItem = xmalloc (sizeof(struct menuitem));
     myMenu.item = curItem;
-    do {
+
+    for (;;) {
         token = nextWord ();
         if (strcmp (token, "}") == 0) break;
         if (token[strlen(token) - 1] != '"') {
@@ -339,7 +345,8 @@ static void DoMenu (void)
         curItem->next = newItem;
         curItem = newItem;
         item++;
-        } while (strcmp (token, "}") != 0);
+    }
+
     if (item == 0) AbEnd ("Menu '%s' has 0 items!", myMenu.name);
     if (item > 31) AbEnd ("Menu '%s' has too many items!", myMenu.name);
 
@@ -390,9 +397,10 @@ static void DoMenu (void)
         fprintf (outputCFile,
             "\t%s, (char)%s, (int)",
             curItem->name, curItem->type);
-        if ((strstr (curItem->type, "SUB_MENU") != NULL) && (strstr (curItem->type, "DYN_SUB_MENU") == NULL))
+        if ((strstr (curItem->type, "SUB_MENU") != NULL) && (strstr (curItem->type, "DYN_SUB_MENU") == NULL)) {
             fprintf (outputCFile,
                 "&");
+        }
         fprintf (outputCFile,
             "%s,\n",
             curItem->target);
@@ -402,8 +410,9 @@ static void DoMenu (void)
     fprintf (outputCFile,
         "};\n\n");
 
-    if (fclose (outputCFile) != 0)
+    if (fclose (outputCFile) != 0) {
         AbEnd ("Error closing %s: %s", outputCName, strerror (errno));
+    }
 }
 
 
@@ -415,16 +424,16 @@ static void DoHeader (void)
     struct appheader myHead;
     char *token;
     char i1[9], i2[9], i3[9];
-    int a, b;
+    int i;
 
     openSFile ();
 
     token = nextWord ();
 
-    a = findToken(hdrFTypes, token);
+    i = findToken(hdrFTypes, token);
 
     if (apple == 1) {
-        switch (a) {
+        switch (i) {
             case 0:
                 myHead.geostype = 0x82;
                 break;
@@ -432,7 +441,7 @@ static void DoHeader (void)
                 AbEnd ("Filetype '%s' is not supported yet", token);
         }
     } else {
-        switch (a) {
+        switch (i) {
             case 0:
                 myHead.geostype = 6;
                 break;
@@ -472,19 +481,22 @@ static void DoHeader (void)
         AbEnd ("Header '%s' has no opening bracket!", myHead.dosname);
     }
 
-    do {
+    for (;;) {
         token = nextWord ();
         if (strcmp (token, "}") == 0) break;
-        switch (a = findToken (hdrFields, token)) {
+        switch (findToken (hdrFields, token)) {
             case -1:
                 AbEnd ("Unknown field '%s' in header '%s'", token, myHead.dosname);
                 break;
+
             case 0: /* author */
                 myHead.author = nextPhrase ();
                 break;
+
             case 1: /* info */
                 myHead.info = nextPhrase ();
                 break;
+
             case 2: /* date */
                 myHead.year = atoi (nextWord ());
                 myHead.month = atoi (nextWord ());
@@ -492,18 +504,20 @@ static void DoHeader (void)
                 myHead.hour = atoi (nextWord ());
                 myHead.min = atoi (nextWord ());
                 break;
+
             case 3: /* dostype */
-                switch (b = findToken (hdrDOSTp, nextWord ())) {
+                switch (i = findToken (hdrDOSTp, nextWord ())) {
                     case -1:
                         AbEnd ("Unknown dostype in header '%s'", myHead.dosname);
                         break;
                     default:
-                        if (apple == 0) myHead.dostype = b / 2 + 128 + 1;
+                        if (apple == 0) myHead.dostype = i / 2 + 128 + 1;
                         break;
                 }
                 break;
+
             case 4: /* mode */
-                switch (b = findToken (hdrModes, nextWord ())) {
+                switch (findToken (hdrModes, nextWord ())) {
                     case -1:
                         AbEnd ("Unknown mode in header '%s'", myHead.dosname);
                     case 0:
@@ -520,8 +534,9 @@ static void DoHeader (void)
                         break;
                 }
                 break;
+
             case 5: /* structure */
-                switch (b = findToken (hdrStructTp, nextWord ())) {
+                switch (findToken (hdrStructTp, nextWord ())) {
                     case -1:
                         AbEnd ("unknown structure type in header '%s'", myHead.dosname);
                     case 0:
@@ -534,17 +549,16 @@ static void DoHeader (void)
                         break;
                 }
                 break;
+
             case 6: /* icon */
                 myHead.icon = nextPhrase ();
                 break;
         }
-
-    } while (strcmp (token, "}") != 0);
+    }
 
     /* OK, all information is gathered, do flushout */
 
     fprintf (outputSFile,
-        "\n"
         "\t\t.segment \"DIRENTRY\"\n\n");
 
     if (apple == 1) {
@@ -594,7 +608,6 @@ static void DoHeader (void)
     }
 
     fprintf (outputSFile,
-        "\n"
         "\t\t.segment \"FILEINFO\"\n\n"
         "\t.import __VLIR0_START__, __STARTUP_RUN__\n\n"
         "\t.byte 3, 21, 63 | $80\n");
@@ -604,10 +617,10 @@ static void DoHeader (void)
             "\t.incbin \"%s\", 0, 63\n",
             myHead.icon);
     } else {
-        for (a = 0; a != 63; a = a + 3) {
+        for (i = 0; i != 63; i = i + 3) {
             fprintf (outputSFile,
                 "\t.byte %%%s, %%%s, %%%s\n",
-                bintos (icon1[a], i1), bintos (icon1[a+1], i2), bintos (icon1[a+2], i3));
+                bintos (icon1[i], i1), bintos (icon1[i+1], i2), bintos (icon1[i+2], i3));
         }
     }
 
@@ -638,97 +651,161 @@ static void DoHeader (void)
         "\t.byte 0\n\n",
         myHead.info);
 
-    if (fclose (outputSFile) != 0)
+    if (fclose (outputSFile) != 0) {
         AbEnd ("Error closing %s: %s", outputSName, strerror (errno));
+    }
 }
 
 
-static void DoVLIR (void)
+static void DoMemory (void)
 {
     char *token;
-    int record, lastrecord;
-    int vlirsize, vlirtable[127];
+    int stacksize, overlaysize;
+    int overlaytable[127];
+    int number, lastnumber;
+    int backbuffer;
 
     openSFile ();
 
-    vlirsize = strtol (nextWord (), NULL, 0);
+    stacksize = -1;
+    overlaysize = -1;
+    memset (overlaytable, 0, sizeof(overlaytable));
+    lastnumber = -1;
+    backbuffer = -1;
 
     if (strcmp(nextWord (), "{") != 0) {
-        AbEnd ("VLIR description has no opening bracket!");
+        AbEnd ("MEMORY description has no opening bracket!");
     }
 
-    lastrecord = -1;
-    memset (vlirtable, 0, sizeof(vlirtable));
-
-    do {
-        token = nextWord ();
+    token = NULL;
+    for (;;) {
+        if (token == NULL) token = nextWord ();
         if (strcmp (token, "}") == 0) break;
+        switch (findToken (memFields, token)) {
+            case -1:
+                AbEnd ("Unknown field '%s' in MEMORY description", token);
+                break;
 
-        record = atoi (token);
-        if (record < 0 || record > 126) {
-            AbEnd ("VLIR record %i is out of range 0-126.", record);
+            case 0: /* stacksize */
+                stacksize = strtol (nextWord (), NULL, 0);
+                token = NULL;
+                break;
+
+            case 1: /* overlaysize */
+                overlaysize = strtol (nextWord (), NULL, 0);
+                token = NULL;
+                break;
+
+            case 2: /* overlaynums */
+                do {
+                    token = nextWord ();
+                    if (IsDigit (token[0]) == 0) break;
+
+                    number = atoi (token);
+                    if (number < 0 || number > 126) {
+                        AbEnd ("Overlay number %i is out of range 0-126", number);
+                    }
+                    if (overlaytable[number] == 1) {
+                        AbEnd ("Overlay number %i is defined twice", number);
+                    }
+
+                    overlaytable[number] = 1;
+                    if (number > lastnumber) lastnumber = number;
+
+                } while (IsDigit (token[0]) != 0);
+
+                if (lastnumber == -1) {
+                    AbEnd ("There must be at least one overlay number");
+                }
+
+                /* always include number 0 */
+                overlaytable[0] = 1;
+                break;
+
+            case 3: /* backbuffer */
+                switch (findToken (toggle, nextWord ())) {
+                    case -1:
+                        AbEnd ("Unknown value for 'backbuffer'");
+                        break;
+                    case 0:
+                    case 1:
+                    case 2:
+                        backbuffer = 0;
+                        break;
+                    default:
+                        backbuffer = 1;
+                        break;
+                }
+                token = NULL;
+                break;
         }
-        if (vlirtable[record] == 1) {
-            AbEnd ("VLIR record %i is defined twice.", record);
-        }
-
-        vlirtable[record] = 1;
-        if (record > lastrecord) lastrecord = record;
-    } while (strcmp (token, "}") != 0);
-
-    if (lastrecord == -1) {
-        AbEnd ("There must be at least one VLIR record.");
     }
-
-    /* always include record 0 */
-    vlirtable[0] = 1;
 
     /* OK, all information is gathered, do flushout */
 
-    fprintf (outputSFile,
-        "\n"
-        "\t\t.segment \"RECORDS\"\n\n"
-        "\t.export __OVERLAYSIZE__ : absolute = $%04x\n\n",
-        vlirsize);
+    if (lastnumber != -1) {
+        fprintf (outputSFile,
+            "\t\t.segment \"RECORDS\"\n\n");
 
-    for (record = 0; record <= lastrecord; record++) {
-        if (vlirtable[record] == 1) {
-            fprintf (outputSFile,
-                "\t.import __VLIR%i_START__, __VLIR%i_LAST__\n",
-                record, record);
+        for (number = 0; number <= lastnumber; number++) {
+            if (overlaytable[number] == 1) {
+                fprintf (outputSFile,
+                    "\t.import __VLIR%i_START__, __VLIR%i_LAST__\n",
+                    number, number);
+            }
+        }
+        fprintf (outputSFile,
+            "\n");
+
+        for (number = 0; number <= lastnumber; number++) {
+            if (overlaytable[number] == 1) {
+                fprintf (outputSFile,
+                    "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) /    254) + 1\n"
+                    "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) .MOD 254) + 2\n",
+                    number, number, number, number);
+            } else {
+                fprintf (outputSFile,
+                    "\t.byte $00\n"
+                    "\t.byte $FF\n");
+            }
+        }
+        fprintf (outputSFile,
+            "\n");
+
+        openCFile ();
+
+        fprintf (outputCFile,
+            "extern void _OVERLAYADDR__;\n"
+            "extern void _OVERLAYSIZE__;\n\n"
+            "#define OVERLAY_ADDR (char*)   &_OVERLAYADDR__\n"
+            "#define OVERLAY_SIZE (unsigned)&_OVERLAYSIZE__\n\n");
+
+        if (fclose (outputCFile) != 0) {
+            AbEnd ("Error closing %s: %s", outputCName, strerror (errno));
         }
     }
-    fprintf (outputSFile,
-        "\n");
 
-    for (record = 0; record <= lastrecord; record++) {
-        if (vlirtable[record] == 1) {
-            fprintf (outputSFile,
-                "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) /    254) + 1\n"
-                "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) .MOD 254) + 2\n",
-                record, record, record, record);
-        } else {
-            fprintf (outputSFile,
-                "\t.byte $00\n"
-                "\t.byte $FF\n");
-        }
+    if (stacksize != -1) {
+        fprintf (outputSFile,
+            "\t.export __STACKSIZE__ : absolute = $%04x\n\n",
+            stacksize);
     }
-    fprintf (outputSFile,
-        "\n");
 
-    if (fclose (outputSFile) != 0)
+    if (overlaysize != -1 && apple == 0) {
+        fprintf (outputSFile,
+            "\t.export __OVERLAYSIZE__ : absolute = $%04x\n\n",
+            overlaysize);
+    }
+
+    if (backbuffer != -1) {
+        fprintf (outputSFile,
+            "\t.export __BACKBUFSIZE__ : absolute = $%04x\n\n",
+            backbuffer ? 0x2000 : 0x0000);
+    }
+
+    if (fclose (outputSFile) != 0) {
         AbEnd ("Error closing %s: %s", outputSName, strerror (errno));
-
-    openCFile ();
-
-    fprintf (outputCFile,
-        "extern void _OVERLAYADDR__;\n"
-        "extern void _OVERLAYSIZE__;\n\n"
-        "#define OVERLAY_ADDR (char*)   &_OVERLAYADDR__\n"
-        "#define OVERLAY_SIZE (unsigned)&_OVERLAYSIZE__\n\n");
-
-    if (fclose (outputCFile) != 0)
-        AbEnd ("Error closing %s: %s", outputCName, strerror (errno));
+    }
 }
 
 
@@ -737,7 +814,7 @@ static char *filterInput (FILE *F, char *tbl)
     /* loads file into buffer filtering it out */
     int a, prevchar = -1, i = 0, bracket = 0, quote = 1;
 
-    while (1) {
+    for (;;) {
         a = getc(F);
         if ((a == '\n') || (a == '\015')) a = ' ';
         if (a == ',' && quote) a = ' ';
@@ -782,8 +859,8 @@ static void processFile (const char *filename)
     char *str;
     char *token;
 
-    int head = 0; /* number of processed HEADER sections */
-    int vlir = 0; /* number of processed VLIR sections */
+    int head = 0;   /* number of processed HEADER sections */
+    int memory = 0; /* number of processed MEMORY sections */
 
     if ((F = fopen (filename, "r")) == 0) {
         AbEnd ("Can't open file %s for reading: %s", filename, strerror (errno));
@@ -801,7 +878,7 @@ static void processFile (const char *filename)
                     break;
                 case 1:
                     if (++head != 1) {
-                        AbEnd ("More than one HEADER section, aborting.");
+                        AbEnd ("More than one HEADER section, aborting");
                     } else {
                         DoHeader ();
                     }
@@ -809,14 +886,14 @@ static void processFile (const char *filename)
                 case 2: break; /* icon not implemented yet */
                 case 3: break; /* dialog not implemented yet */
                 case 4:
-                    if (++vlir != 1) {
-                        AbEnd ("More than one VLIR section, aborting.");
+                    if (++memory != 1) {
+                        AbEnd ("More than one MEMORY section, aborting");
                     } else {
-                        DoVLIR ();
+                        DoMemory ();
                     }
                     break;
                 default:
-                    AbEnd ("Unknown section %s.", token);
+                    AbEnd ("Unknown section '%s'", token);
                     break;
             }
         }

@@ -295,7 +295,7 @@ void SegAlign (unsigned long Alignment, int FillVal)
         Error ("Combined alignment for active segment is %lu which exceeds %lu",
                CombinedAlignment, MAX_ALIGNMENT);
 
-        /* Avoid creating large fills for an object file that is thrown away 
+        /* Avoid creating large fills for an object file that is thrown away
          * later.
          */
         Count = 1;
@@ -372,9 +372,6 @@ void SegDone (void)
                 ED_Init (&ED);
                 StudyExpr (F->V.Expr, &ED);
 
-                /* Try to simplify it before looking further */
-                F->V.Expr = SimplifyExpr (F->V.Expr, &ED);
-
                 /* Check if the expression is constant */
                 if (ED_IsConst (&ED)) {
 
@@ -408,7 +405,10 @@ void SegDone (void)
      	     	    }
      	     	    F->Type = FRAG_LITERAL;
 
-     	     	} else if (ED.AddrSize != ADDR_SIZE_DEFAULT) {
+     	     	} else {
+
+                    /* Simplify the expression */
+                    F->V.Expr = SimplifyExpr (F->V.Expr, &ED);
 
      	     	    /* We cannot evaluate the expression now, leave the job for
      	     	     * the linker. However, we can check if the address size

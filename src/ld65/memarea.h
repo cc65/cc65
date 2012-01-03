@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2010-2011, Ullrich von Bassewitz                                      */
+/* (C) 2010-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -68,6 +68,7 @@ struct MemoryArea {
     unsigned long      	Start;          /* Start address */
     struct ExprNode*    SizeExpr;       /* Expression for size */
     unsigned long      	Size;           /* Length of memory section */
+    struct ExprNode*    BankExpr;       /* Expression for bank */
     unsigned long      	FillLevel;     	/* Actual fill level of segment */
     unsigned char   	FillVal;  	/* Value used to fill rest of seg */
     unsigned char       Relocatable;    /* Memory area is relocatable */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -141,6 +141,7 @@ struct DotKeyword {
     { ".ASCIIZ",       	TOK_ASCIIZ	},
     { ".ASSERT",        TOK_ASSERT      },
     { ".AUTOIMPORT", 	TOK_AUTOIMPORT	},
+    { ".BANK",          TOK_BANK        },
     { ".BANKBYTE",      TOK_BANKBYTE    },
     { ".BANKBYTES",     TOK_BANKBYTES   },
     { ".BITAND",	TOK_AND		},

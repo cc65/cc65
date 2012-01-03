@@ -1061,7 +1061,7 @@ int main (int argc, char* argv [])
         SegDone ();
     }
 
-    /* If we didn't have any errors, check       the assertions */
+    /* If we didn't have any errors, check the assertions */
     if (ErrorCount == 0) {
         CheckAssertions ();
     }

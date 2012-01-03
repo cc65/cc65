@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -77,6 +77,10 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 	case EXPR_SEGMENT:
 	    printf (" SEG");
 	    break;
+
+        case EXPR_MEMAREA:
+            printf (" MEM");
+            break;
 
        	case EXPR_PLUS:
 	    printf (" +");
@@ -177,6 +181,10 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 	case EXPR_BOOLNOT:
     	    printf (" BOOL_NOT");
 	    break;
+
+        case EXPR_BANK:
+            printf (" BANK");
+            break;
 
        	case EXPR_BYTE0:
 	    printf (" BYTE0");

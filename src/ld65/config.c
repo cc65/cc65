@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -102,6 +102,7 @@ static Collection       MemoryAreas = STATIC_COLLECTION_INITIALIZER;
 #define MA_DEFINE      	0x0010
 #define MA_FILL	       	0x0020
 #define MA_FILLVAL     	0x0040
+#define MA_BANK         0x0080
 
 /* Segment list */
 static Collection       SegDescList = STATIC_COLLECTION_INITIALIZER;
@@ -405,13 +406,14 @@ static void ParseMemory (void)
 /* Parse a MEMORY section */
 {
     static const IdentTok Attributes [] = {
-       	{   "START",  	CFGTOK_START    },
-	{   "SIZE", 	CFGTOK_SIZE     },
-        {   "TYPE",     CFGTOK_TYPE     },
-        {   "FILE",     CFGTOK_FILE     },
+        {   "BANK",     CFGTOK_BANK     },
         {   "DEFINE",   CFGTOK_DEFINE   },
+        {   "FILE",     CFGTOK_FILE     },
   	{   "FILL", 	CFGTOK_FILL     },
        	{   "FILLVAL", 	CFGTOK_FILLVAL  },
+	{   "SIZE", 	CFGTOK_SIZE     },
+       	{   "START",  	CFGTOK_START    },
+        {   "TYPE",     CFGTOK_TYPE     },
     };
     static const IdentTok Types [] = {
        	{   "RO",    	CFGTOK_RO       },
@@ -442,31 +444,9 @@ static void ParseMemory (void)
 	    /* Check which attribute was given */
 	    switch (AttrTok) {
 
-		case CFGTOK_START:
-		    FlagAttr (&M->Attr, MA_START, "START");
-                    M->StartExpr = CfgExpr ();
-		    break;
-
-	      	case CFGTOK_SIZE:
-	     	    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
-	      	    M->SizeExpr = CfgExpr ();
-	    	    break;
-
-	    	case CFGTOK_TYPE:
-	    	    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
-      	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
-	    	    if (CfgTok == CFGTOK_RO) {
-	    	    	M->Flags |= MF_RO;
-	    	    }
-                    CfgNextTok ();
-	    	    break;
-
-	        case CFGTOK_FILE:
-	    	    FlagAttr (&M->Attr, MA_FILE, "FILE");
-	    	    CfgAssureStr ();
-       	       	    /* Get the file entry and insert the memory area */
-	    	    FileInsert (GetFile (GetStrBufId (&CfgSVal)), M);
-                    CfgNextTok ();
+	      	case CFGTOK_BANK:
+	     	    FlagAttr (&M->Attr, MA_BANK, "BANK");
+	      	    M->BankExpr = CfgExpr ();
 	    	    break;
 
 	        case CFGTOK_DEFINE:
@@ -476,6 +456,14 @@ static void ParseMemory (void)
 	    	    if (CfgTok == CFGTOK_TRUE) {
 	    	    	M->Flags |= MF_DEFINE;
 	    	    }
+                    CfgNextTok ();
+	    	    break;
+
+	        case CFGTOK_FILE:
+	    	    FlagAttr (&M->Attr, MA_FILE, "FILE");
+	    	    CfgAssureStr ();
+       	       	    /* Get the file entry and insert the memory area */
+	    	    FileInsert (GetFile (GetStrBufId (&CfgSVal)), M);
                     CfgNextTok ();
 	    	    break;
 
@@ -492,6 +480,25 @@ static void ParseMemory (void)
 	      	case CFGTOK_FILLVAL:
 	    	    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
 	      	    M->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
+	    	    break;
+
+	      	case CFGTOK_SIZE:
+	     	    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
+	      	    M->SizeExpr = CfgExpr ();
+	    	    break;
+
+		case CFGTOK_START:
+		    FlagAttr (&M->Attr, MA_START, "START");
+                    M->StartExpr = CfgExpr ();
+		    break;
+
+	    	case CFGTOK_TYPE:
+	    	    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
+      	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "TYPE");
+	    	    if (CfgTok == CFGTOK_RO) {
+	    	    	M->Flags |= MF_RO;
+	    	    }
+                    CfgNextTok ();
 	    	    break;
 
 	     	default:
@@ -1859,16 +1866,30 @@ unsigned CfgProcess (void)
                     Addr = NewAddr;
                 }
 
+                /* If the segment has .BANK expressions referring to it, it 
+                 * must be placed into a memory area that has the bank 
+                 * attribute.
+                 */
+                if (S->Seg->BankRef && M->BankExpr == 0) {
+                    CfgError (GetSourcePos (S->LI),
+                              "Segment `%s' is refered to by .BANK, but the "
+                              "memory area `%s' it is placed into has no BANK "
+                              "attribute",
+                              GetString (S->Name),
+                              GetString (M->Name));
+                }
+
                 /* Set the start address of this segment, set the readonly flag
                  * in the segment and and remember if the segment is in a
                  * relocatable file or not.
                  */
                 S->Seg->PC = Addr;
                 S->Seg->ReadOnly = (S->Flags & SF_RO) != 0;
-                S->Seg->Relocatable = M->Relocatable;
 
-                /* Remember that this segment is placed */
-                S->Seg->Placed = 1;
+                /* Remember the run memory for this segment, which is also a
+                 * flag that the segment has been placed.
+                 */
+                S->Seg->MemArea = M;
 
             } else if (S->Load == M) {
 

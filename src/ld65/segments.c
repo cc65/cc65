@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -94,6 +94,7 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->Name        = Name;
     S->Next	   = 0;
     S->Sections    = EmptyCollection;
+    S->MemArea     = 0;
     S->PC   	   = 0;
     S->Size    	   = 0;
     S->OutputName  = 0;
@@ -102,10 +103,9 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->FillVal	   = 0;
     S->AddrSize    = AddrSize;
     S->ReadOnly    = 0;
-    S->Relocatable = 0;
-    S->Placed      = 0;
     S->Dumped      = 0;
-
+    S->BankRef     = 0;
+                
     /* Insert the segment into the segment list and assign the segment id */
     S->Id = CollCount (&SegmentList);
     CollAppend (&SegmentList, S);

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -39,6 +39,7 @@
 
 
 /* common */
+#include "coll.h"
 #include "exprdefs.h"
 
 
@@ -138,6 +139,14 @@ int IsEasyConst (const ExprNode* E, long* Val);
 ExprNode* CloneExpr (ExprNode* Expr);
 /* Clone the given expression tree. The function will simply clone symbol
  * nodes, it will not resolve them.
+ */
+
+ExprNode* FinalizeExpr (ExprNode* Expr, const Collection* LineInfos);
+/* Finalize an expression tree before it is written to the file. This will
+ * replace EXPR_BANKRAW nodes by EXPR_BANK nodes, and replace constant
+ * expressions by their result. The LineInfos are used when diagnosing errors.
+ * Beware: The expression tree may get replaced in future versions, so don't
+ * use Expr after calling this function.
  */
 
 void WriteExpr (ExprNode* Expr);

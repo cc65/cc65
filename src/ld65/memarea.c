@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2010-2011, Ullrich von Bassewitz                                      */
+/* (C) 2010-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -63,6 +63,7 @@ MemoryArea* NewMemoryArea (const FilePos* Pos, unsigned Name)
     M->Start       = 0;
     M->SizeExpr    = 0;
     M->Size        = 0;
+    M->BankExpr    = 0;
     M->FillLevel   = 0;
     M->FillVal     = 0;
     M->Relocatable = 0;

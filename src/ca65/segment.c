@@ -407,8 +407,11 @@ void SegDone (void)
 
      	     	} else {
 
+                    /* Finalize the expression */
+                    F->V.Expr = FinalizeExpr (F->V.Expr, &F->LI);        
+
                     /* Simplify the expression */
-                    F->V.Expr = SimplifyExpr (F->V.Expr, &ED);
+                    /* ### F->V.Expr = SimplifyExpr (F->V.Expr, &ED); */
 
      	     	    /* We cannot evaluate the expression now, leave the job for
      	     	     * the linker. However, we can check if the address size

@@ -1095,6 +1095,33 @@ static void StudyBoolNot (ExprNode* Expr, ExprDesc* D)
 
 
 
+static void StudyBank (ExprNode* Expr, ExprDesc* D)
+/* Study an EXPR_BANK expression node */
+{
+    /* Get the section reference */
+    ED_SecRef* SecRef = ED_GetSecRef (D, Expr->V.SecNum);
+
+    /* Update the data and the address size */
+    ++SecRef->Count;
+
+    /* The expression is always linker evaluated, so invalidate it */
+    ED_Invalidate (D);
+}
+
+
+
+static void StudyBankRaw (ExprNode* Expr, ExprDesc* D)
+/* Study an EXPR_BANKRAW expression node */
+{
+    /* Study the expression extracting section references */
+    StudyExprInternal (Expr->Left, D);
+
+    /* The expression is always linker evaluated, so invalidate it */
+    ED_Invalidate (D);
+}
+
+
+
 static void StudyByte0 (ExprNode* Expr, ExprDesc* D)
 /* Study an EXPR_BYTE0 expression node */
 {
@@ -1231,6 +1258,10 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
             StudyULabel (Expr, D);
             break;
 
+        case EXPR_BANK:
+            StudyBank (Expr, D);
+            break;
+
     	case EXPR_PLUS:
             StudyPlus (Expr, D);
     	    break;
@@ -1329,6 +1360,10 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
 
         case EXPR_BOOLNOT:
             StudyBoolNot (Expr, D);
+            break;
+
+        case EXPR_BANKRAW:
+            StudyBankRaw (Expr, D);
             break;
 
         case EXPR_BYTE0:

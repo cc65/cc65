@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2007-2011, Ullrich von Bassewitz                                      */
+/* (C) 2007-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -90,9 +90,8 @@ typedef enum token_t {
     TOK_STAR = TOK_MUL,	/* Alias */
     TOK_DIV,	  	/* / */
     TOK_MOD,	  	/* ! */
-    TOK_OR,	   	/* | */
+    TOK_OR, 	   	/* | */
     TOK_XOR,	  	/* ^ */
-    TOK_BANK = TOK_XOR, /* Alias */
     TOK_AND,	  	/* & */
     TOK_SHL,	  	/* << */
     TOK_SHR,	  	/* >> */
@@ -128,6 +127,7 @@ typedef enum token_t {
     TOK_ASCIIZ,
     TOK_ASSERT,
     TOK_AUTOIMPORT,
+    TOK_BANK,
     TOK_BANKBYTE,
     TOK_BANKBYTES,
     TOK_BLANK,

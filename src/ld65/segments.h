@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -52,6 +52,9 @@
 
 
 
+/* Forwards */
+struct MemoryArea;
+
 /* Segment structure */
 typedef struct Segment Segment;
 struct Segment {
@@ -59,6 +62,7 @@ struct Segment {
     unsigned            Id;             /* Segment id for debug info */
     Segment*  	      	Next;		/* Hash list */
     Collection          Sections;       /* Sections in this segment */
+    struct MemoryArea*  MemArea;        /* Run memory area once placed */
     unsigned long     	PC;    		/* PC were this segment is located */
     unsigned long     	Size;		/* Size of data so far */
     const char*         OutputName;     /* Name of output file or NULL */
@@ -67,9 +71,8 @@ struct Segment {
     unsigned char     	FillVal;	/* Value to use for fill bytes */
     unsigned char     	AddrSize;      	/* Address size of segment */
     unsigned char       ReadOnly;       /* True for readonly segments (config) */
-    unsigned char       Relocatable;    /* True if the segment is relocatable */
-    unsigned char       Placed;         /* Did we place this segment already? */
     unsigned char      	Dumped;		/* Did we dump this segment? */
+    unsigned char       BankRef;        /* We need the bank of this segment */
 };
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -60,6 +60,7 @@
 #define EXPR_SEGMENT   	       	(EXPR_LEAFNODE | 0x04)	/* Linker only */
 #define EXPR_MEMAREA   	       	(EXPR_LEAFNODE | 0x05) 	/* Linker only */
 #define EXPR_ULABEL		(EXPR_LEAFNODE | 0x06) 	/* Assembler only */
+#define EXPR_BANK               (EXPR_LEAFNODE | 0x07)
 
 /* Binary operations, left and right hand sides are valid */
 #define EXPR_PLUS      	       	(EXPR_BINARYNODE | 0x01)
@@ -89,13 +90,14 @@
 #define EXPR_NOT       	       	(EXPR_UNARYNODE | 0x02)
 #define EXPR_SWAP      	       	(EXPR_UNARYNODE | 0x03)
 #define EXPR_BOOLNOT		(EXPR_UNARYNODE | 0x04)
+#define EXPR_BANKRAW            (EXPR_UNARYNODE | 0x05) /* Assembler only */
 
 #define EXPR_BYTE0            	(EXPR_UNARYNODE | 0x08)
 #define EXPR_BYTE1            	(EXPR_UNARYNODE | 0x09)
-#define EXPR_BYTE2		(EXPR_UNARYNODE | 0x0A)
-#define EXPR_BYTE3		(EXPR_UNARYNODE | 0x0B)
-#define EXPR_WORD0		(EXPR_UNARYNODE | 0x0C)
-#define EXPR_WORD1		(EXPR_UNARYNODE | 0x0D)
+#define EXPR_BYTE2  		(EXPR_UNARYNODE | 0x0A)
+#define EXPR_BYTE3  		(EXPR_UNARYNODE | 0x0B)
+#define EXPR_WORD0  		(EXPR_UNARYNODE | 0x0C)
+#define EXPR_WORD1  		(EXPR_UNARYNODE | 0x0D)
 
 
 
@@ -121,9 +123,10 @@ struct ExprNode {
 
 
 /* Macros to determine the expression type */
-#define EXPR_IS_LEAF(Op)       	(((Op) & EXPR_TYPEMASK) == EXPR_LEAFNODE)
-#define EXPR_IS_UNARY(Op)  	(((Op) & EXPR_TYPEMASK) == EXPR_UNARYNODE)
-#define EXPR_IS_BINARY(OP)	(((Op) & EXPR_TYPEMASK) == EXPR_BINARYNODE)
+#define EXPR_NODETYPE(Op)       ((Op) & EXPR_TYPEMASK)
+#define EXPR_IS_LEAF(Op)       	(EXPR_NODETYPE (Op) == EXPR_LEAFNODE)
+#define EXPR_IS_UNARY(Op)  	(EXPR_NODETYPE (Op) == EXPR_UNARYNODE)
+#define EXPR_IS_BINARY(OP)	(EXPR_NODETYPE (Op) == EXPR_BINARYNODE)
 
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2011, Ullrich von Bassewitz                                      */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -173,8 +173,9 @@ static void SkipExpr (FILE* F)
 	   	break;
 
 	    case EXPR_SECTION:
+            case EXPR_BANK:
 	   	/* Read the segment number */
-	   	(void) Read8 (F);
+	       	(void) ReadVar (F);
     	   	break;
 
 	    default:

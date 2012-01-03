@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -72,7 +72,7 @@ ExprNode* NewExprNode (ObjData* O, unsigned char Op)
 
 static void FreeExprNode (ExprNode* E)
 /* Free a node */
-{
+{         
     /* Free the memory */
     xfree (E);
 }
@@ -99,6 +99,7 @@ int IsConstExpr (ExprNode* Root)
     int         Const;
     Export*     E;
     Section*    S;
+    MemoryArea* M;
 
     if (EXPR_IS_LEAF (Root->Op)) {
       	switch (Root->Op) {
@@ -111,7 +112,7 @@ int IsConstExpr (ExprNode* Root)
        	       	E = GetExprExport (Root);
     		/* If this export has a mark set, we've already encountered it.
     		 * This means that the export is used to define it's own value,
-    		 * which in turn means, that we have a circular reference.
+    	   	 * which in turn means, that we have a circular reference.
     		 */
     		if (ExportHasMark (E)) {
                     CircularRefError (E);
@@ -119,8 +120,8 @@ int IsConstExpr (ExprNode* Root)
     		} else {
     		    MarkExport (E);
     		    Const = IsConstExport (E);
-    		    UnmarkExport (E);
-    		}
+    	   	    UnmarkExport (E);
+    	   	}
     		return Const;
 
             case EXPR_SECTION:
@@ -128,22 +129,35 @@ int IsConstExpr (ExprNode* Root)
                  * not relocatable and already placed.
                  */
                 S = GetExprSection (Root);
-                return !S->Seg->Relocatable && S->Seg->Placed;
+                M = S->Seg->MemArea;
+                return M != 0 && (M->Flags & MF_PLACED) != 0 && !M->Relocatable;
 
             case EXPR_SEGMENT:
                 /* A segment is const if it is not relocatable and placed */
-                return !Root->V.Seg->Relocatable && Root->V.Seg->Placed;
+                M = Root->V.Seg->MemArea;
+                return M != 0 && (M->Flags & MF_PLACED) != 0 && !M->Relocatable;
 
             case EXPR_MEMAREA:
                 /* A memory area is const if it is not relocatable and placed */
                 return !Root->V.Mem->Relocatable &&
                        (Root->V.Mem->Flags & MF_PLACED);
 
+            case EXPR_BANK:
+                /* A bank expression is const if the section, the segment is
+                 * part of, is already placed, and the memory area has a
+                 * constant bank expression.
+                 */
+                S = GetExprSection (Root);
+                M = S->Seg->MemArea;
+                return M != 0 && (M->Flags & MF_PLACED) != 0 &&
+                       M->BankExpr != 0 && IsConstExpr (M->BankExpr);
+
       	    default:
                 /* Anything else is not const */
       	 	return 0;
 
       	}
+
     } else if (EXPR_IS_UNARY (Root->Op)) {
 
       	return IsConstExpr (Root->Left);
@@ -201,7 +215,7 @@ Import* GetExprImport (ExprNode* Expr)
      * import pointer.
      */
     if (Expr->Obj) {
-	/* Return the Import */
+    	/* Return the Import */
        	return GetObjImport (Expr->Obj, Expr->V.ImpNum);
     } else {
 	return Expr->V.Imp;
@@ -226,7 +240,7 @@ Section* GetExprSection (ExprNode* Expr)
 /* Get the segment for a section expression node */
 {
     /* Check that this is really a section node */
-    PRECONDITION (Expr->Op == EXPR_SECTION);
+    PRECONDITION (Expr->Op == EXPR_SECTION || Expr->Op == EXPR_BANK);
 
     /* If we have an object file, get the section from it, otherwise
      * (internally generated expressions), get the section from the
@@ -245,9 +259,11 @@ Section* GetExprSection (ExprNode* Expr)
 long GetExprVal (ExprNode* Expr)
 /* Get the value of a constant expression */
 {
-    long Right, Left, Val;
-    Section* S;
-    Export* E;
+    long        Right;
+    long        Left;
+    long        Val;
+    Section*    S;
+    Export*     E;
 
     switch (Expr->Op) {
 
@@ -280,6 +296,10 @@ long GetExprVal (ExprNode* Expr)
 
         case EXPR_MEMAREA:
             return Expr->V.Mem->Start;
+
+        case EXPR_BANK:
+       	    S = GetExprSection (Expr);
+            return GetExprVal (S->Seg->MemArea->BankExpr);
 
        	case EXPR_PLUS:
      	    return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
@@ -345,8 +365,8 @@ long GetExprVal (ExprNode* Expr)
 	case EXPR_BOOLOR:
 	    return GetExprVal (Expr->Left) || GetExprVal (Expr->Right);
 
-	case EXPR_BOOLXOR:
-	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
+    	case EXPR_BOOLXOR:
+    	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
 
         case EXPR_MAX:
             Left = GetExprVal (Expr->Left);
@@ -359,16 +379,16 @@ long GetExprVal (ExprNode* Expr)
             return (Left < Right)? Left : Right;
 
        	case EXPR_UNARY_MINUS:
-	    return -GetExprVal (Expr->Left);
+    	    return -GetExprVal (Expr->Left);
 
        	case EXPR_NOT:
-	    return ~GetExprVal (Expr->Left);
+    	    return ~GetExprVal (Expr->Left);
 
         case EXPR_SWAP:
-	    Left = GetExprVal (Expr->Left);
-	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
+    	    Left = GetExprVal (Expr->Left);
+    	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
 
-	case EXPR_BOOLNOT:
+    	case EXPR_BOOLNOT:
        	    return !GetExprVal (Expr->Left);
 
        	case EXPR_BYTE0:
@@ -569,11 +589,12 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 /* Read an expression from the given file */
 {
     ExprNode* Expr;
+    Section*  S;
 
     /* Read the node tag and handle NULL nodes */
     unsigned char Op = Read8 (F);
     if (Op == EXPR_NULL) {
-  	return 0;
+    	return 0;
     }
 
     /* Create a new node */
@@ -581,20 +602,30 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 
     /* Check the tag and handle the different expression types */
     if (EXPR_IS_LEAF (Op)) {
-	switch (Op) {
+    	switch (Op) {
 
-	    case EXPR_LITERAL:
-	     	Expr->V.IVal = Read32Signed (F);
-	     	break;
+    	    case EXPR_LITERAL:
+    	     	Expr->V.IVal = Read32Signed (F);
+    	     	break;
 
-	    case EXPR_SYMBOL:
-	     	/* Read the import number */
+    	    case EXPR_SYMBOL:
+    	     	/* Read the import number */
 	       	Expr->V.ImpNum = ReadVar (F);
 	     	break;
 
 	    case EXPR_SECTION:
-	     	/* Read the segment number */
-	     	Expr->V.SecNum = Read8 (F);
+	     	/* Read the section number */
+	     	Expr->V.SecNum = ReadVar (F);
+	     	break;
+
+            case EXPR_BANK:
+	     	/* Read the section number */
+	     	Expr->V.SecNum = ReadVar (F);
+                /* Mark the section so we know it must be placed into a memory
+                 * area with the "bank" attribute.
+                 */
+                S = GetExprSection (Expr);
+                S->Seg->BankRef = 1;
 	     	break;
 
 	    default:
@@ -624,12 +655,12 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
     	return 0;
     }
     if (E1 == 0) {
-	return 1;
+    	return 1;
     }
 
     /* Both pointers not NULL, check OP */
     if (E1->Op != E2->Op) {
-	return 0;
+    	return 0;
     }
 
     /* OPs are identical, check data for leafs, or subtrees */

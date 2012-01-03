@@ -1990,6 +1990,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,       	DoASCIIZ	},
     { ccNone,           DoAssert        },
     { ccNone,       	DoAutoImport	},
+    { ccNone,           DoUnexpected    },      /* .BANK */
     { ccNone,        	DoUnexpected	},	/* .BANKBYTE */
     { ccNone,           DoBankBytes     },
     { ccNone,        	DoUnexpected	},	/* .BLANK */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -65,7 +65,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	    	     Data				     */
+/*     	      	    	    	     Data      				     */
 /*****************************************************************************/
 
 
@@ -238,6 +238,19 @@ static ExprNode* HiByte (ExprNode* Operand)
 
 
 
+static ExprNode* Bank (ExprNode* Operand)
+/* Return the bank of the given segmented expression */
+{
+    /* Generate the bank expression */
+    ExprNode* Expr = NewExprNode (EXPR_BANKRAW);
+    Expr->Left = Operand;
+
+    /* Return the result */
+    return Expr;
+}
+
+
+
 static ExprNode* BankByte (ExprNode* Operand)
 /* Return the bank byte of the given expression */
 {
@@ -317,6 +330,14 @@ static ExprNode* Symbol (SymEntry* S)
             return GenSymExpr (S);
         }
     }
+}
+
+
+
+ExprNode* FuncBank (void)
+/* Handle the .BANK builtin function */
+{
+    return Bank (Expression ());
 }
 
 
@@ -446,7 +467,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     	if (TokIsSep (CurTok.Tok)) {
     	    Error ("Unexpected end of line");
     	    return GenLiteral0 ();
-    	}
+     	}
 
 	/* Get a node with this token */
 	Node = NewTokNode ();
@@ -923,7 +944,8 @@ static ExprNode* Factor (void)
             N = HiByte (Factor ());
 	    break;
 
-        case TOK_BANK:
+        case TOK_XOR:
+            /* ^ means the bank byte of an expression */
             NextTok ();
             N = BankByte (Factor ());
             break;
@@ -933,6 +955,10 @@ static ExprNode* Factor (void)
 	    N = Expr0 ();
        	    ConsumeRParen ();
 	    break;
+
+        case TOK_BANK:
+            N = Function (FuncBank);
+            break;
 
         case TOK_BANKBYTE:
             N = Function (FuncBankByte);
@@ -1532,6 +1558,16 @@ static ExprNode* GenSectionExpr (unsigned SecNum)
 
 
 
+static ExprNode* GenBankExpr (unsigned SecNum)
+/* Return an expression node for the given bank */
+{
+    ExprNode* Expr = NewExprNode (EXPR_BANK);
+    Expr->V.SecNum = SecNum;
+    return Expr;
+}
+
+
+
 ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right)
 /* Generate an addition from the two operands */
 {
@@ -1739,6 +1775,10 @@ ExprNode* CloneExpr (ExprNode* Expr)
 	    Clone = GenSectionExpr (Expr->V.SecNum);
 	    break;
 
+        case EXPR_BANK:
+            Clone = GenBankExpr (Expr->V.SecNum);
+            break;
+
         default:
             /* Generate a new node */
             Clone = NewExprNode (Expr->Op);
@@ -1750,6 +1790,70 @@ ExprNode* CloneExpr (ExprNode* Expr)
 
     /* Done */
     return Clone;
+}
+
+
+
+ExprNode* FinalizeExpr (ExprNode* Expr, const Collection* LineInfos)
+/* Finalize an expression tree before it is written to the file. This will
+ * replace EXPR_BANKRAW nodes by EXPR_BANK nodes, and replace constant
+ * expressions by their result. The LineInfos are used when diagnosing errors.
+ * Beware: The expression tree may get replaced in future versions, so don't
+ * use Expr after calling this function.
+ */
+{
+    ExprDesc ED;
+
+    /* Check the type code */
+    switch (EXPR_NODETYPE (Expr->Op)) {
+
+        case EXPR_LEAFNODE:
+            /* Nothing to do for leaf nodes */
+            break;
+
+        case EXPR_BINARYNODE:
+            Expr->Left  = FinalizeExpr (Expr->Left, LineInfos);
+            Expr->Right = FinalizeExpr (Expr->Right, LineInfos);
+            /* FALLTHROUGH */
+
+        case EXPR_UNARYNODE:
+            Expr->Left = FinalizeExpr (Expr->Left, LineInfos);
+
+            /* Special handling for BANKRAW */
+            if (Expr->Op == EXPR_BANKRAW) {
+
+                /* Study the expression */
+                ED_Init (&ED);
+                StudyExpr (Expr->Left, &ED);
+
+                /* The expression must be ok and must have exactly one segment
+                 * reference.
+                 */
+                if (ED.Flags & ED_TOO_COMPLEX) {
+                    LIError (LineInfos,
+                             "Cannot evaluate expression");
+                } else if (ED.SecCount == 0) {
+                    LIError (LineInfos,
+                             ".BANK expects a segment reference");
+                } else if (ED.SecCount > 1 || ED.SecRef[0].Count > 1) {
+                    LIError (LineInfos,
+                             "Too many segment references in argument to .BANK");
+                } else {
+                    FreeExpr (Expr->Left);
+                    Expr->Op = EXPR_BANK;
+                    Expr->Left = 0;
+                    Expr->V.SecNum = ED.SecRef[0].Ref;
+                }
+
+                /* Cleanup */
+                ED_Done (&ED);
+
+            }
+            break;
+    }
+
+    /* Return the (partial) tree */
+    return Expr;
 }
 
 
@@ -1784,12 +1888,17 @@ void WriteExpr (ExprNode* Expr)
 
         case EXPR_SECTION:
             ObjWrite8 (EXPR_SECTION);
-	    ObjWrite8 (Expr->V.SecNum);
+	    ObjWriteVar (Expr->V.SecNum);
 	    break;
 
 	case EXPR_ULABEL:
             WriteExpr (ULabResolve (Expr->V.IVal));
 	    break;
+
+        case EXPR_BANK:
+            ObjWrite8 (EXPR_BANK);
+            ObjWriteVar (Expr->V.SecNum);
+            break;
 
         default:
 	    /* Not a leaf node */
@@ -1818,7 +1927,7 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
     }
 
     /* Check the type code */
-    switch (Expr->Op & EXPR_TYPEMASK) {
+    switch (EXPR_NODETYPE (Expr->Op)) {
 
         case EXPR_LEAFNODE:
             if (Expr->Op == EXPR_SYMBOL) {

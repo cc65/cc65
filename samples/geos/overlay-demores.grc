@@ -1,0 +1,11 @@
+HEADER APPLICATION "Overlay Demo" "Overlay Demo" "V1.0" {
+    author    "Oliver Schmidt"
+    info      "This is a minimalistic cc65 GEOSLib overlay demo program written in C."
+    date      12 01 01 12 00
+    structure VLIR
+}
+
+MEMORY {
+    overlaysize 0x1000
+    overlaynums 0 1 2 3
+}

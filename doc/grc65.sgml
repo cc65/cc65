@@ -134,27 +134,37 @@ it describes system requirements.  <tt/any/ will work on both 64-GEOS and
 40-column mode only.  <tt/80only/ will work on only 128-GEOS in 80-column mode,
 and <tt/c64only/ will work on only 64-GEOS.  The default value for
 <tt/structure/ is <tt/SEQ/ (sequential).  You can put <tt/VLIR/ there, too; but
-then, you also have to put in a third type of resource -- a VLIR-table
-description.  The value of <tt/icon/ is a quoted file-name.  The first 63 bytes of
-this file are expected to represent a standard monochrome VIC sprite.  The file gets
-accessed when the generated assembly source is be processed by <bf/ca65/.  Examples
-for programs generating such files are <em/Sprite Painter/ and <em/SpritePad/.
+then, you also have to put in a third type of resource -- a memory definition.
+The value of <tt/icon/ is a quoted file-name.  The first 63 bytes of this file
+are expected to represent a standard monochrome VIC sprite.  The file gets accessed
+when the generated assembly source is be processed by <bf/ca65/.  Examples for
+programs generating such files are <em/Sprite Painter/ and <em/SpritePad/.  The
+default <tt/icon/ is an empty frame internally represented in the generated assembly
+file.
 
 
-<sect1>VLIR table description
+<sect1>Memory definition
 <p><tscreen><verb>
-VLIR size {
-    0
-    1
-    2
-    4
-    5
+MEMORY {
+    stacksize   0x0800
+    overlaysize 0x2000
+    overlaynums 0 1 2 4 5
 }</verb></tscreen>
-The first element is the keyword <tt/VLIR/, then goes the size for all VLIR chains
-that are different from 0.  It can be either decimal (e.g., <tt/4096/) or hexadecimal
-with a <tt/0x/ prefix (e.g., <tt/0x1000/).  Then, between braces are the VLIR chain
-numbers used by the application.  Skipped numbers denote empty chains.  In the example,
-chains #3 is missing.  Read <ref name="this description" id="building-vlir"> for details.
+The memory definition is unique to each file and describes several attributes related
+to the memory layout.  It consists of the keyword <tt/MEMORY/ followed by braces which
+contain optional lines.  The value of <tt/stacksize/ can be either decimal (e.g.
+<tt/4096/) or hexadecimal with a <tt/0x/ prefix (e.g. <tt/0x1000/).  The default value
+of 0x400 comes from the linker configuration file. The value of <tt/backbuffer/ can be
+either <tt/yes/ or <tt/no/. The further means that the application uses the system-supplied
+background screen buffer while the latter means that the program uses the memory of the
+background screen buffer for own purposes.  The default value of <tt/yes/ comes from the
+linker configuration file.  If the <tt/structure/ in the header definition is set to the
+value <tt/VLIR/ then it is possible and necessary to provide here the attributes of the 
+VLIR overlays. <tt/overlaysize/ defines the maximal size for all VLIR records but number
+0.  It can be either decimal (e.g. <tt/4096/) or hexadecimal with a <tt/0x/ prefix (e.g.
+<tt/0x1000/).  <tt/overlaynums/ defines the VLIR record numbers used by the application.
+Skipped numbers denote empty records.  In the example, record number 3 is missing.  Read
+<ref name="this description" id="building-vlir"> for details.
 
 
 

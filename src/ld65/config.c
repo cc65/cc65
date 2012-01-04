@@ -1816,6 +1816,9 @@ unsigned CfgProcess (void)
      	    /* Get the segment */
      	    SegDesc* S = CollAtUnchecked (&M->SegList, J);
 
+            /* Remember the start address before handling this segment */
+            unsigned long StartAddr = Addr;
+
             /* Some actions depend on wether this is the load or run memory
              * area.
              */
@@ -1866,8 +1869,8 @@ unsigned CfgProcess (void)
                     Addr = NewAddr;
                 }
 
-                /* If the segment has .BANK expressions referring to it, it 
-                 * must be placed into a memory area that has the bank 
+                /* If the segment has .BANK expressions referring to it, it
+                 * must be placed into a memory area that has the bank
                  * attribute.
                  */
                 if (S->Seg->BankRef && M->BankExpr == 0) {
@@ -1931,6 +1934,11 @@ unsigned CfgProcess (void)
      	    /* Calculate the new address */
      	    Addr += S->Seg->Size;
 
+            /* If this segment goes out to the file, increase the file size */
+            if ((S->Flags & SF_BSS) == 0 && S->Load == M) {
+                M->F->Size += Addr - StartAddr;
+            }
+
 	}
 
 	/* If requested, define symbols for start, size and offset of the
@@ -1963,11 +1971,11 @@ unsigned CfgProcess (void)
             SB_Done (&Buf);
 	}
 
-        /* Grow the file by the size of the memory area */
-        if (M->Flags & MF_FILL) {
-            M->F->Size += M->Size;
-        } else {
-            M->F->Size += M->FillLevel;
+        /* If we didn't have an overflow and are requested to fill the memory
+         * area, acount for that in the file size.
+         */
+        if ((M->Flags & MF_OVERFLOW) == 0 && (M->Flags & MF_FILL) != 0) {
+            M->F->Size += (M->Size - M->FillLevel);
         }
     }
 

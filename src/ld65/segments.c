@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "alignment.h"
 #include "check.h"
 #include "coll.h"
@@ -44,7 +45,6 @@
 #include "fragdefs.h"
 #include "hashfunc.h"
 #include "print.h"
-#include "segdefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -105,7 +105,7 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->ReadOnly    = 0;
     S->Dumped      = 0;
     S->BankRef     = 0;
-                
+
     /* Insert the segment into the segment list and assign the segment id */
     S->Id = CollCount (&SegmentList);
     CollAppend (&SegmentList, S);

@@ -37,7 +37,6 @@ OBJS =	abend.o		\
 	mmodel.o        \
 	print.o		\
 	searchpath.o    \
-	segdefs.o       \
 	segnames.o      \
 	shift.o         \
 	strbuf.o	\

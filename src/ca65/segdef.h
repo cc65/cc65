@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   segdefs.h   	       	       	       	     */
+/*				   segdef.h                                  */
 /*                                                                           */
-/*		Segment definitions for the bin65 binary utils		     */
+/*		Segment definitions for the ca65 assembler                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef SEGDEFS_H
-#define SEGDEFS_H
+#ifndef SEGDEF_H
+#define SEGDEF_H
 
 
 
@@ -77,7 +77,7 @@ SegDef* DupSegDef (const SegDef* D);
 /* Duplicate a segment definition and return it */
 
 
-                                                   
+
 /* End of segdefs.h */
 
 #endif

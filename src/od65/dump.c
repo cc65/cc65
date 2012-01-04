@@ -46,7 +46,6 @@
 #include "objdefs.h"
 #include "optdefs.h"
 #include "scopedefs.h"
-#include "segdefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 

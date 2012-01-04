@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   segdefs.c   	       	       	       	     */
+/*				   segdef.c                                  */
 /*                                                                           */
-/*		Segment definitions for the bin65 binary utils		     */
+/*		Segment definitions for the ca65 assembler                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,7 +35,9 @@
 
 /* common */
 #include "xmalloc.h"
-#include "segdefs.h"
+
+/* ca65 */
+#include "segdef.h"
 
 
 
@@ -78,4 +80,4 @@ SegDef* DupSegDef (const SegDef* Def)
 
 
 
-                                                   
+

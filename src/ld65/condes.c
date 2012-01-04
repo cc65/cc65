@@ -40,7 +40,6 @@
 #include "check.h"
 #include "coll.h"
 #include "fragdefs.h"
-#include "segdefs.h"
 #include "xmalloc.h"
 
 /* ld65 */

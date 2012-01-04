@@ -42,10 +42,10 @@
 #include "coll.h"
 #include "fragdefs.h"
 #include "inline.h"
-#include "segdefs.h"
 
 /* ca65 */
 #include "fragment.h"
+#include "segdef.h"
 
 
 

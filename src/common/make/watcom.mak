@@ -79,7 +79,6 @@ OBJS =	abend.obj	\
         mmodel.obj      \
 	print.obj	\
         searchpath.obj  \
-        segdefs.obj     \
         segnames.obj    \
         shift.obj       \
 	strbuf.obj	\

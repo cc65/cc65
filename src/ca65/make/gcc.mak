@@ -55,6 +55,7 @@ OBJS =  anonname.o      \
 	pseudo.o       	\
 	repeat.o	\
 	scanner.o	\
+        segdef.o        \
 	segment.o       \
 	sizeof.o        \
 	span.o          \

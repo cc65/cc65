@@ -88,6 +88,7 @@ OBJS = 	anonname.obj    \
 	pseudo.obj	\
 	repeat.obj	\
 	scanner.obj	\
+        segdef.obj      \
         segment.obj     \
         sizeof.obj      \
         span.obj        \

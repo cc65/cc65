@@ -846,7 +846,7 @@ static void O65WriteBssSeg (O65Desc* D)
     /* Initialize variables */
     D->CurReloc	= 0;
 
-    /* Dump all data segments */
+    /* Dump all bss segments */               
     O65WriteSeg (D, D->BssSeg, D->BssCount, 0);
 
     /* Set the size of the segment */
@@ -863,7 +863,7 @@ static void O65WriteZPSeg (O65Desc* D)
     /* Initialize variables */
     D->CurReloc	= 0;
 
-    /* Dump all data segments */
+    /* Dump all zp segments */
     O65WriteSeg (D, D->ZPSeg, D->ZPCount, 0);
 
     /* Set the size of the segment */

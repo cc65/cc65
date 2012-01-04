@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -62,6 +62,7 @@ struct Segment {
     Fragment*  	    Last;      	  	/* Pointer to last fragment */
     unsigned long   FragCount;          /* Number of fragments */
     unsigned        Num;       		/* Segment number */
+    unsigned        Flags;              /* Segment flags */
     unsigned long   Align;     		/* Segment alignment */
     int             RelocMode;          /* Relocatable mode if OrgPerSeg */
     unsigned long   PC;                 /* PC if in relocatable mode */

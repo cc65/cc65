@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   segdef.h                                  */
+/*				   segdefs.h                                 */
 /*                                                                           */
-/*		Segment definitions for the ca65 assembler                   */
+/*                     Constants and flags for segments                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 2012,      Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,13 +33,8 @@
 
 
 
-#ifndef SEGDEF_H
-#define SEGDEF_H
-
-
-
-/* common */
-#include "addrsize.h"
+#ifndef SEGDEFS_H
+#define SEGDEFS_H
 
 
 
@@ -49,36 +44,13 @@
 
 
 
-/* Segment definition */
-typedef struct SegDef SegDef;
-struct SegDef {
-    char*         Name;         /* Segment name */
-    unsigned char AddrSize;     /* Default address size */
-};
-
-/* Initializer for static SegDefs */
-#define STATIC_SEGDEF_INITIALIZER(name, addrsize) { name, addrsize }
+/* Segment flags */
+#define SEG_FLAG_NONE           0x00
+#define SEG_FLAG_BANKREF        0x01    /* Segment is referenced by .BANK */
 
 
 
-/*****************************************************************************/
-/*     	       	    	    	     Code				     */
-/*****************************************************************************/
-
-
-
-SegDef* NewSegDef (const char* Name, unsigned char AddrSize);
-/* Create a new segment definition and return it */
-
-void FreeSegDef (SegDef* D);
-/* Free a segment definition */
-
-SegDef* DupSegDef (const SegDef* D);
-/* Duplicate a segment definition and return it */
-
-
-
-/* End of segdef.h */
+/* End of segdefs.h */
 
 #endif
 

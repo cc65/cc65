@@ -41,6 +41,7 @@
 #include "alignment.h"
 #include "coll.h"
 #include "mmodel.h"
+#include "segdefs.h"
 #include "segnames.h"
 #include "xmalloc.h"
 
@@ -107,6 +108,7 @@ static Segment* NewSegFromDef (SegDef* Def)
     S->Last      = 0;
     S->FragCount = 0;
     S->Num       = CollCount (&SegmentList);
+    S->Flags     = SEG_FLAG_NONE;
     S->Align     = 1;
     S->RelocMode = 1;
     S->PC        = 0;
@@ -408,7 +410,7 @@ void SegDone (void)
      	     	} else {
 
                     /* Finalize the expression */
-                    F->V.Expr = FinalizeExpr (F->V.Expr, &F->LI);        
+                    F->V.Expr = FinalizeExpr (F->V.Expr, &F->LI);
 
                     /* Simplify the expression */
                     /* ### F->V.Expr = SimplifyExpr (F->V.Expr, &ED); */

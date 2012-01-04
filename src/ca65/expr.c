@@ -42,6 +42,7 @@
 #include "exprdefs.h"
 #include "print.h"
 #include "shift.h"
+#include "segdefs.h"
 #include "strbuf.h"
 #include "tgttrans.h"
 #include "version.h"
@@ -1839,10 +1840,16 @@ ExprNode* FinalizeExpr (ExprNode* Expr, const Collection* LineInfos)
                     LIError (LineInfos,
                              "Too many segment references in argument to .BANK");
                 } else {
+                    Segment* S;
+
                     FreeExpr (Expr->Left);
                     Expr->Op = EXPR_BANK;
                     Expr->Left = 0;
                     Expr->V.SecNum = ED.SecRef[0].Ref;
+
+                    /* Mark the segment */
+                    S = CollAt (&SegmentList, Expr->V.SecNum);
+                    S->Flags |= SEG_FLAG_BANKREF;
                 }
 
                 /* Cleanup */

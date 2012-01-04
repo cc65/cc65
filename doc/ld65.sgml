@@ -713,7 +713,7 @@ This will define some external symbols that may be used in your code:
         __STACK_FILEOFFS__      The binary offset in the output file. This
                                 is not defined for relocatable output file
                                 formats (o65).
-</verb></tscreen>                             
+</verb></tscreen>
 
 A memory section may also have a type. Valid types are
 
@@ -735,6 +735,13 @@ The symbol <tt/%S/ may be used to access the default start address (that is,
 the one defined in the <ref id="FEATURES" name="FEATURES"> section, or the
 value given on the command line with the <tt><ref id="option-S" name="-S"></tt>
 option).
+
+To support systems with banked memory, a special attribute named <tt/bank/ is
+available. The attribute value is an arbitrary 32 bit integer. The assembler
+has a builtin function named <tt/.BANK/ which may be used with an argument
+that has a segment reference (for example a symbol). The result of this
+function is the value of the bank attribute for the run memory area of the
+segment.
 
 
 <sect1>Other SEGMENT attributes<p>

@@ -72,7 +72,7 @@ ExprNode* NewExprNode (ObjData* O, unsigned char Op)
 
 static void FreeExprNode (ExprNode* E)
 /* Free a node */
-{         
+{
     /* Free the memory */
     xfree (E);
 }
@@ -589,7 +589,6 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 /* Read an expression from the given file */
 {
     ExprNode* Expr;
-    Section*  S;
 
     /* Read the node tag and handle NULL nodes */
     unsigned char Op = Read8 (F);
@@ -614,18 +613,9 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 	     	break;
 
 	    case EXPR_SECTION:
-	     	/* Read the section number */
-	     	Expr->V.SecNum = ReadVar (F);
-	     	break;
-
             case EXPR_BANK:
 	     	/* Read the section number */
 	     	Expr->V.SecNum = ReadVar (F);
-                /* Mark the section so we know it must be placed into a memory
-                 * area with the "bank" attribute.
-                 */
-                S = GetExprSection (Expr);
-                S->Seg->BankRef = 1;
 	     	break;
 
 	    default:

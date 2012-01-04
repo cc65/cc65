@@ -61,6 +61,7 @@ struct Segment {
     unsigned            Name;           /* Name index of the segment */
     unsigned            Id;             /* Segment id for debug info */
     Segment*  	      	Next;		/* Hash list */
+    unsigned            Flags;          /* Segment flags */
     Collection          Sections;       /* Sections in this segment */
     struct MemoryArea*  MemArea;        /* Run memory area once placed */
     unsigned long     	PC;    		/* PC were this segment is located */
@@ -72,7 +73,6 @@ struct Segment {
     unsigned char     	AddrSize;      	/* Address size of segment */
     unsigned char       ReadOnly;       /* True for readonly segments (config) */
     unsigned char      	Dumped;		/* Did we dump this segment? */
-    unsigned char       BankRef;        /* We need the bank of this segment */
 };
 
 

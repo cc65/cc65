@@ -45,6 +45,7 @@
 #include "fragdefs.h"
 #include "hashfunc.h"
 #include "print.h"
+#include "segdefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -93,6 +94,7 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     /* Initialize the fields */
     S->Name        = Name;
     S->Next	   = 0;
+    S->Flags       = SEG_FLAG_NONE;
     S->Sections    = EmptyCollection;
     S->MemArea     = 0;
     S->PC   	   = 0;
@@ -104,7 +106,6 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
     S->AddrSize    = AddrSize;
     S->ReadOnly    = 0;
     S->Dumped      = 0;
-    S->BankRef     = 0;
 
     /* Insert the segment into the segment list and assign the segment id */
     S->Id = CollCount (&SegmentList);
@@ -190,6 +191,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 /* Read a section from a file */
 {
     unsigned      Name;
+    unsigned      Flags;
     unsigned      Size;
     unsigned long Alignment;
     unsigned char Type;
@@ -198,12 +200,13 @@ Section* ReadSection (FILE* F, ObjData* O)
     Section*      Sec;
 
     /* Read the segment data */
-    (void) Read32 (F);            /* File size of data */
+    (void) Read32 (F);          /* File size of data */
     Name      = MakeGlobalStringId (O, ReadVar (F));    /* Segment name */
-    Size      = ReadVar (F);      /* Size of data */
-    Alignment = ReadVar (F);      /* Alignment */
-    Type      = Read8 (F);        /* Segment type */
-    FragCount = ReadVar (F);      /* Number of fragments */
+    Flags     = ReadVar (F);    /* Segment flags */
+    Size      = ReadVar (F);    /* Size of data */
+    Alignment = ReadVar (F);    /* Alignment */
+    Type      = Read8 (F);      /* Segment type */
+    FragCount = ReadVar (F);    /* Number of fragments */
 
 
     /* Print some data */
@@ -213,6 +216,11 @@ Section* ReadSection (FILE* F, ObjData* O)
 
     /* Get the segment for this section */
     S = GetSegment (Name, Type, GetObjFileName (O));
+                                        
+    /* The only possible flag is currently SEG_FLAG_BANKREF, and it must be
+     * applied to the segment, not the section.
+     */
+    S->Flags |= Flags;
 
     /* Allocate the section we will return later */
     Sec = NewSection (S, Alignment, Type);

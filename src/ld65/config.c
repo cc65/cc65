@@ -47,6 +47,7 @@
 #include "bitops.h"
 #include "check.h"
 #include "print.h"
+#include "segdefs.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 
@@ -1873,7 +1874,7 @@ unsigned CfgProcess (void)
                  * must be placed into a memory area that has the bank
                  * attribute.
                  */
-                if (S->Seg->BankRef && M->BankExpr == 0) {
+                if ((S->Seg->Flags & SEG_FLAG_BANKREF) != 0 && M->BankExpr == 0) {
                     CfgError (GetSourcePos (S->LI),
                               "Segment `%s' is refered to by .BANK, but the "
                               "memory area `%s' it is placed into has no BANK "

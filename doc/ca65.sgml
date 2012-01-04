@@ -1275,6 +1275,49 @@ Pseudo functions expect their arguments in parenthesis, and they have a result,
 either a string or an expression.
 
 
+<sect1><tt>.BANK</tt><label id=".BANK"><p>
+
+  The <tt/.BANK/ function is used to support systems with banked memory. The
+  argument is an expression with exactly one segment reference - usually a
+  label. The function result is the value of the <tt/bank/ attribute assigned
+  to the run memory area of the segment. Please see the linker documentation
+  for more information about memory areas and their attributes.
+
+  The value of <tt/.BANK/ can be used to switch memory so that a memory bank
+  containing specific data is available.
+
+  The <tt/bank/ attribute is a 32 bit integer and so is the result of the
+  <tt/.BANK/ function. You will have to use <tt><ref id=".LOBYTE"
+  name=".LOBYTE"></tt> or similar functions to address just part of it.
+
+  Please note that <tt/.BANK/ will always get evaluated in the link stage, so
+  an expression containing <tt/.BANK/ can never be used where a constant known
+  result is expected (for example with <tt/.RES/).
+
+  Example:
+
+  <tscreen><verb>
+        .segment "BANK1"
+        .proc   banked_func_1
+                ...
+        .endproc
+
+        .segment "BANK2"
+        .proc   banked_func_2
+                ...
+        .endproc
+
+        .proc   bank_table
+  	        .addr   banked_func_1
+                .byte   <.BANK (banked_func_1)
+
+                .addr   banked_func_2
+                .byte   <.BANK (banked_func_2)
+        .endproc
+  </verb></tscreen>
+
+
+
 <sect1><tt>.BANKBYTE</tt><label id=".BANKBYTE"><p>
 
   The function returns the bank byte (that is, bits 16-23) of its argument.
@@ -2229,7 +2272,7 @@ Here's a list of all control commands and a description, what they do:
   is a symbol that is already defined somewhere in the source file up to the
   current position. Otherwise the function yields false. As an example, the
   <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
-           
+
   <tscreen><verb>
   	.if	.defined(a)
   </verb></tscreen>

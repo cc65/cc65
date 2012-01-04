@@ -542,6 +542,7 @@ static void WriteOneSeg (Segment* Seg)
 
     /* Write the segment data */
     ObjWriteVar (GetStringId (Seg->Def->Name)); /* Name of the segment */
+    ObjWriteVar (Seg->Flags);                   /* Segment flags */
     ObjWriteVar (Seg->PC);                      /* Size */
     ObjWriteVar (Seg->Align);                   /* Segment alignment */
     ObjWrite8 (Seg->Def->AddrSize);             /* Address size of the segment */

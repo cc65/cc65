@@ -159,7 +159,7 @@ either <tt/yes/ or <tt/no/. The further means that the application uses the syst
 background screen buffer while the latter means that the program uses the memory of the
 background screen buffer for own purposes.  The default value of <tt/yes/ comes from the
 linker configuration file.  If the <tt/structure/ in the header definition is set to the
-value <tt/VLIR/ then it is possible and necessary to provide here the attributes of the 
+value <tt/VLIR/ then it is possible and necessary to provide here the attributes of the
 VLIR overlays. <tt/overlaysize/ defines the maximal size for all VLIR records but number
 0.  It can be either decimal (e.g. <tt/4096/) or hexadecimal with a <tt/0x/ prefix (e.g.
 <tt/0x1000/).  <tt/overlaynums/ defines the VLIR record numbers used by the application.
@@ -265,7 +265,7 @@ required for the correct process of GEOS sequential application building.
 
 <sect>Building a GEOS VLIR overlay application<label id="building-vlir">
 <p>Large GEOS applications typically don't fit in one piece in their designated
-memeory area.  They are therefore split into overlays which are loaded into memory 
+memeory area.  They are therefore split into overlays which are loaded into memory
 on demand.  The individual overlays are stored as records of a VLIR (Variable
 Length Index Record) file.  When GEOS starts a VLIR overlay appliation it loads
 record number 0 which is supposed to contain the main program.  The record numbers
@@ -284,7 +284,7 @@ Always place the <tt/.grc/ file as first input file on the command-line in order
 to make sure that the generated <tt/.h/ file is available when it is needed for
 inclusion by a <tt/.c/ file.
 
-You will almost certianly want to generate a map file that shows (beside a lot of
+You will almost certainly want to generate a map file that shows (beside a lot of
 other infos) how large your individual overlays are. This info is necessary to tune
 the distribution of code into the overlays and optimizes the memory area reserved
 for the overlays.

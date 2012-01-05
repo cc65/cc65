@@ -26,7 +26,7 @@ files of an app.), dialog definitions, etc.  Without an application's header,
 GEOS is unable to load and start it.
 
 Currently, <bf/grc65/ supports only menues and the required header definition,
-along with support for building VLIR-structured files.
+along with support for building applications with VLIR-structured overlays.
 
 <bf/grc65/ generates output in two formats: C header and <bf/ca65/ source (.s).
 That is because the application header data must be in assembly format, while
@@ -64,12 +64,12 @@ Default output names are made from input names with extensions replaced by
 <sect>Resource file format
 <p>A resource file has the name extension <tt/.grc/.  That is not required, but
 it will make for an easier recognition of the file's purpose.  Also, <bf/cl65/
-recognizes those files.  <bf/grc65/'s parser is very weak, at the moment; so,
+recognizes those files.  <bf/grc65/'s parser is very weak at the moment; so,
 read the comments carefully, and write resources exactly as they are written
-here.  Look out for CAPS. and small letters.  Everything after a '<tt/;/',
-until the end of the line, is considered as a comment, and ignored.  See the
+here.  Look out for CAPS and small letters.  Everything after a '<tt/;/'
+until the end of the line is considered as a comment and ignored.  See the
 included <ref name="commented example .grc file" id="example-grc"> for a
-better view of the problem.
+better view of the situation.
 
 
 <sect1>Menu definition
@@ -79,7 +79,7 @@ MENU menuName leftx,topy <ORIENTATION> {
     ...
     "item name x" <MENU_TYPE> pointer
 }</verb></tscreen>
-The definition starts with the keyword <tt/MENU/, then goes the menu's name,
+The definition starts with the keyword <tt/MENU/, then comes the menu's name,
 which will be represented in C as <tt/const void/.  Then are the co-ordinates
 of the top left corner of the menu box.  The position of the bottom right
 corner is estimated, based on the length of item names and the menu's
@@ -91,7 +91,7 @@ be in quotes.  Next is a menu-type bit.  It can be <tt/MENU_ACTION/ or
 <tt/SUB_MENU/; either of them can be combined with the <tt/DYN_SUB_MENU/ bit
 (see <url name="the GEOSLib documentation" url="geos.html"> for descriptions of
 them).  You can use C logical operators in expressions, but you have to do it
-without spaces.  So, a dynamically created submenu will be something like:
+without spaces.  So a dynamically created submenu will be something like:
 <tscreen><verb>
 "dynamic" SUB_MENU|DYN_SUB_MENU create_dynamic</verb></tscreen>
 The last part of the item definition is a pointer which can be any name that is
@@ -99,7 +99,7 @@ present in the C source code that includes the generated header.  It can point
 to a function or to another menu definition.
 
 If you are doing sub(sub)menu definitions, remember to place the lowest level
-definition first, and the top-level menu as the last one.  That way, the C
+definition first, and the top-level menu as the last one.  That way the C
 compiler won't complain about unknown names.
 
 
@@ -176,9 +176,9 @@ general.
 
 GEOS support in cc65 is based on the <em/Convert v2.5/ format, well-known in
 the GEOS world.  It means that each file built with the cc65 package has to be
-deconverted, in GEOS, before it can be run.  You can read a step-by-step
-description of that in the GEOS section of the <url name="cc65 Compiler Intro"
-url="intro.html">.
+deconverted in GEOS, before it can be run.  You can read a step-by-step
+description of that in the <url name="GEOS section of the cc65 Compiler Intro"
+url="intro-6.html#ss6.5">.
 
 Each project consists of four parts, two are provided by cc65.  Those parts
 are:<enum>
@@ -187,132 +187,130 @@ are:<enum>
 <item>application objects
 <item>system library
 </enum>
-<bf/2./ and <bf/4./ are with cc65; you have to write the application,
-yourself. ;-)
+<bf/2./ and <bf/4./ come with cc65; however you have to write the application
+yourself ;-)
 
 The application header is defined in the <tt/HEADER/ section of the <tt/.grc/
-file, and processed into an assembly <tt/.s/ file.  You must assemble it, with
+file and is processed into an assembly <tt/.s/ file.  You must assemble it, with
 <bf/ca65/, into the object <tt/.o/ format.
 
-
-<sect1>Building a GEOS application without cl65
-<p>Assume that there are three input files:  &dquot;<tt/test.c/&dquot; (a C
+Assume that there are three input files:  &dquot;<tt/test.c/&dquot; (a C
 source), &dquot;<tt/test.h/&dquot; (a header file), and
-&dquot;<tt/resource.grc/&dquot; (with menu and header definitions).  Note the
-fact that I <em/don't recommend/ naming that file &dquot;<tt/test.grc/&dquot;,
+&dquot;<tt/testres.grc/&dquot; (with menu and header definitions).  Note the
+fact that I <em/don't recommend/ naming that file &dquot;<tt/test.grc/&dquot;
 because you will have to be very careful with names (<bf/grc65/ will make
 &dquot;<tt/test.s/&dquot; and &dquot;<tt/test.h/&dquot; out of
-&dquot;<tt/test.grc/&dquot;, by default; and, you don't want that because
+&dquot;<tt/test.grc/&dquot; by default; and you don't want that because
 &dquot;<tt/test.s/&dquot; is compiled from &dquot;<tt/test.c/&dquot;, and
 &dquot;<tt/test.h/&dquot; is something completely different)!
 
 <bf/One important thing/ -- the top of &dquot;<tt/test.c/&dquot; looks like:
 <tscreen><verb>
 #include <geos.h>
-#include "resource.h"
+#include "testres.h"
 </verb></tscreen>
 There are no other includes.
 
-<sect2>First step -- compiling the resources
-<p><verb>
-$ grc65 resource.grc
-</verb>
-will produce two output files:  &dquot;<tt/resource.h/&dquot; and
-&dquot;<tt/resource.s/&dquot;.
 
-Note that &dquot;<tt/resource.h/&dquot; is included at the top of
+<sect1>Building the GEOS application using cl65
+<p>This is a simple one step process:
+<tscreen><verb>
+cl65 -t geos-cbm -O -o test.cvt testres.grc test.c
+</verb></tscreen>
+Always place the <tt/.grc/ file as first input file on the command-line in order
+to make sure that the generated <tt/.h/ file is available when it is needed for
+inclusion by a <tt/.c/ file.
+
+
+<sect1>Building the GEOS application without cl65
+<sect2>First step -- compiling the resources
+<tscreen><verb>
+grc65 -t geos-cbm testres.grc
+</verb></tscreen>
+will produce two output files:  &dquot;<tt/testres.h/&dquot; and
+&dquot;<tt/testres.s/&dquot;.
+
+Note that &dquot;<tt/testres.h/&dquot; is included at the top of
 &dquot;<tt/test.c/&dquot;.  So, resource compiling <em/must be/ the first step.
 
 <sect2>Second step -- assembling the application header
-<p><verb>
-$ ca65 -t geos-cbm resource.s
-</verb>
-And, voil&aacute; -- &dquot;<tt/resource.o/&dquot; is ready.
+<tscreen><verb>
+ca65 -t geos-cbm testres.s
+</verb></tscreen>
+And, voil&aacute; -- &dquot;<tt/testres.o/&dquot; is ready.
 
 <sect2>Third step -- compiling the code
-<p><verb>
-$ cc65 -t geos-cbm -O test.c
-$ ca65 -t geos-cbm test.s
-</verb>
+<tscreen><verb>
+cc65 -t geos-cbm -O test.c
+ca65 -t geos-cbm test.s
+</verb></tscreen>
 That way, you have a &dquot;<tt/test.o/&dquot; object file which
 contains all of the executable code.
 
 <sect2>Fourth and last step -- linking it together
-<p><verb>
-$ ld65 -o test.cvt -t geos-cbm resource.o geos.o test.o geos.lib
-</verb>
-&dquot;<tt/resource.o/&dquot; comes first because it contains the
-header.  The next one is &dquot;<tt/geos.o/&dquot;, a required starter-code
-file; then, the actual application code in &dquot;<tt/test.o/&dquot;, and the
-last is the GEOS system library.
+<tscreen><verb>
+ld65 -t geos-cbm -o test.cvt testres.o test.o geos.lib
+</verb></tscreen>
+The last file is the GEOS system library.
 
 The resulting file &dquot;<tt/test.cvt/&dquot; is an executable that's
 contained in the well-known GEOS <em/Convert/ format.  Note that its name
-(<tt/test/) isn't important; the real name, after deconverting, is the DOS name
+(<tt/test.cvt/) isn't important; the real name, after deconverting, is the DOS name
 that was given in the header definition.
 
 At each step, a <tt/-t geos-cbm/ was present on the command-line.  That switch is
-required for the correct process of GEOS sequential app. building.
+required for the correct process of GEOS sequential application building.
 
 
 
-<sect>Building a GEOS VLIR application<label id="building-vlir">
-<p>Currently, you can build VLIR applications only if your code is written in
-assembly -- no C code allowed.
+<sect>Building a GEOS VLIR overlay application<label id="building-vlir">
+<p>Large GEOS applications typically don't fit in one piece in their designated
+memeory area.  They are therefore split into overlays which are loaded into memory 
+on demand.  The individual overlays are stored as records of a VLIR (Variable
+Length Index Record) file.  When GEOS starts a VLIR overlay appliation it loads
+record number 0 which is supposed to contain the main program.  The record numbers
+starting with 1 are to be used for the actual overlays.
 
-In your sources, only the command <tt/.segment &dquot;/<em/NAME/<tt/&dquot;/
-will decide which code/data goes where.  File-names don't matter.  Segments
-<tt/CODE/, <tt/RODATA/, <tt/DATA/, and <tt/BSS/ go into VLIR part #0.  Segment
-<tt/VLIR1/ goes into VLIR part #1, <tt/VLIR2/ goes into VLIR part #2, and so
-on.
+In "<tt>cc65/samples/geos</tt>" there's a VLIR overlay demo application consisting
+of the files "<tt/overlay-demo.c/" and "<tt/overlay-demores.grc/".
 
-The GEOS resource file's contents are similar to <ref
-name="the sequential-file example" id="building-seq">, but there also is a
-<tt/VLIR/ section and a <tt/structure VLIR/ tag.  Here is that part:<tscreen>
-<verb>
-VLIR vlir-head.bin 0x3000 {
-  vlir-0.bin    ; CODE, RODATA, DATA, BSS
-  vlir-1.bin    ; VLIR1
-  vlir-2.bin    ; VLIR2
-}</verb></tscreen>
-(Source files are only <tt/.s/.)
 
-OK, we have &dquot;<tt/cvthead.grc/&dquot;, so let's allow <bf/grc65/ to compile
-it:<verb>
-$ grc65 cvthead.grc
-</verb>
-Now, there are two new files:  &dquot;<tt/cvthead.cfg/&dquot; and
-&dquot;<tt/cvthead.s/&dquot; -- the first one is a config. file for <bf/ld65/,
-and the second one contains the GEOS <tt/.cvt/ header.  It can be assembled:
-<verb>
-$ ca65 -t geos-cbm cvthead.s
-</verb>
-Now, we have &dquot;<tt/cvthead.o/&dquot;.  The rest of the assembly
-sources can be assembled:<verb>
-$ ca65 -t geos-cbm vlir0.s
-$ ca65 -t geos-cbm vlir1.s
-$ ca65 -t geos-cbm vlir2.s
-</verb>
-Note that the file-names here, although similar to those from the
-<tt/VLIR/ section of the <tt/.grc/ file, are not significant.  The only thing
-that matters is which code will go into which segment.
+<sect1>Building the GEOS application using cl65
+<p>This is a simple one step process:
+<tscreen><verb>
+cl65 -t geos-cbm -O -o overlay-demo.cvt -m overlay-demo.map overlay-demores.grc overlay-demo.c
+</verb></tscreen>
+Always place the <tt/.grc/ file as first input file on the command-line in order
+to make sure that the generated <tt/.h/ file is available when it is needed for
+inclusion by a <tt/.c/ file.
 
-Now, we can generate binaries.  This time, the order of the arguments on the
-command-line is not important.<verb>
-$ ld65 -C cvthead.cfg vlir1.o cvthead.o vlir0.o vlir2.o
-</verb>
-As defined in the <tt/.grc/ file, we now have the binary parts of the
-VLIR file:  &dquot;<tt/vlir-head.bin/&dquot;, &dquot;<tt/vlir-0.bin/&dquot;,
-&dquot;<tt/vlir-1.bin/&dquot;, and &dquot;<tt/vlir-2.bin/&dquot;.
+You will almost certianly want to generate a map file that shows (beside a lot of
+other infos) how large your individual overlays are. This info is necessary to tune
+the distribution of code into the overlays and optimizes the memory area reserved
+for the overlays.
 
-The last step is to put them together in the right order -- the order of the
-arguments <em/is important/ this time!  As suggested in the comments at the end
-of &dquot;<tt/cvthead.cfg/&dquot;, we do:<verb>
-$ grc65 -vlir output.cvt vlir-head.bin vlir-0.bin vlir-1.bin vlir-2.bin
-</verb>
-That is the end.  The file &dquot;<tt/output.cvt/&dquot; can be
-deconverted under GEOS.  Note that <tt/-C cvthead.cfg/ was used on the
-<bf/ld65/ command-line instead of the switch <tt/-t cbm-geos/.
+
+<sect1>Building the GEOS application without cl65
+<sect2>First step -- compiling the resources
+<tscreen><verb>
+grc65 -t geos-cbm overlay-demores.grc
+</verb></tscreen>
+
+<sect2>Second step -- assembling the application header
+<tscreen><verb>
+ca65 -t geos-cbm overlay-demores.s
+</verb></tscreen>
+
+<sect2>Third step -- compiling the code
+<tscreen><verb>
+cc65 -t geos-cbm -O overlay-demo.c
+ca65 -t geos-cbm overlay-demo.s
+</verb></tscreen>
+
+<sect2>Fourth and last step -- linking it together
+<tscreen><verb>
+ld65 -t geos-cbm -o overlay-demo.cvt -m overlay-demo.map overlay-demores.o overlay-demo.o geos.lib
+</verb></tscreen>
 
 
 

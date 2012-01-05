@@ -325,7 +325,7 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 
 %files geos
 %attr(755,root,root)        /usr/bin/grc65
-%attr(644,root,root)        %{_libdir}/cc65/lib/geos.lib
+%attr(644,root,root)        %{_libdir}/cc65/lib/geos-cbm.lib
 %attr(755,root,root) %dir   %{_libdir}/cc65/include/geos
 %attr(644,root,root)        %{_libdir}/cc65/include/geos/*.h
 %attr(644,root,root)        %{_libdir}/cc65/emd/geos-*.emd

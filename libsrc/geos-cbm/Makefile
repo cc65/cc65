@@ -23,5 +23,5 @@ clean:
 
 .PHONY: zap
 zap:	clean
-	@$(RM) ../geos.lib
+	@$(RM) ../geos-cbm.lib
 

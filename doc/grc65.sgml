@@ -249,7 +249,7 @@ contains all of the executable code.
 
 <sect2>Fourth and last step -- linking it together
 <tscreen><verb>
-ld65 -t geos-cbm -o test.cvt testres.o test.o geos.lib
+ld65 -t geos-cbm -o test.cvt testres.o test.o geos-cbm.lib
 </verb></tscreen>
 The last file is the GEOS system library.
 
@@ -309,7 +309,7 @@ ca65 -t geos-cbm overlay-demo.s
 
 <sect2>Fourth and last step -- linking it together
 <tscreen><verb>
-ld65 -t geos-cbm -o overlay-demo.cvt -m overlay-demo.map overlay-demores.o overlay-demo.o geos.lib
+ld65 -t geos-cbm -o overlay-demo.cvt -m overlay-demo.map overlay-demores.o overlay-demo.o geos-cbm.lib
 </verb></tscreen>
 
 

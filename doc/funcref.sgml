@@ -4102,7 +4102,7 @@ if (rename (OLDNAME, NEWNAME) == 0) {
 <descrip>
 <tag/Function/Resets the break vector to its original value.
 <tag/Header/<tt/<ref id="6502.h" name="6502.h">/
-<tag/Declaration/<tt/void __fastcall__ reset_brk (void);/
+<tag/Declaration/<tt/void reset_brk (void);/
 <tag/Description/<tt/reset_brk/ resets the break vector to the value it had
 before a call to <tt/set_brk/.
 <tag/Limits/

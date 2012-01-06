@@ -101,7 +101,7 @@ uninstall:	install-test
 
 install:	install-test install-dirs install-bins install-libs install-docs
 	@echo
-	@echo 'If you install files into non-default directories, then'
+	@echo 'If you installed the files into non-default directories, then'
 	@echo 'you might need to export some shell environment variables:'
 	@echo
 	@echo 'CC65_HOME=$(CC65_HOME)'
@@ -112,6 +112,11 @@ install:	install-test install-dirs install-bins install-libs install-docs
 	@echo 'LD65_LIB=$(LD65_LIB)'
 	@echo 'LD65_OBJ=$(LD65_OBJ)'
 	@echo
+	@if [ -x $(bindir)/grc${EXT} ]; then \
+	  echo 'grc was renamed to grc65; but, a grc command is in your binaries directory.' \
+	  echo "If that command is an old copy of CC65's program," \
+	  echo 'then you should use a "${MAKE} erase-grc" command to remove it.' \
+	  fi
 
 .PHONY:	install-test
 install-test:
@@ -137,7 +142,7 @@ $(bindir) $(datadir) $(docdir) $(libdir) \
 $(CC65_DOC) $(CC65_HOME) \
 $(CA65_INC) $(CC65_INC) \
 $(LD65_CFG) $(LD65_LIB) $(LD65_OBJ):
-	$(MKDIR) $@
+	$(MKDIR) -p $@ || $(MKDIR) $@
 
 $(CC65_HOME)/% $(CC65_INC)/% $(CC65_DOC)/%:
 	$(MKDIR) $@
@@ -166,13 +171,13 @@ install-libs:
 	for f in libsrc/*-*.o; \
 	  do $(INSTALL_DATA) $$f $(LD65_OBJ) || exit $$?; \
 	  done
+	for f in src/ld65/cfg/[!g]*-*.cfg; \
+	  do $(INSTALL_DATA) $$f $(LD65_CFG) || exit $$?; \
+	  done
 	for d in emd joy mou ser tgi; \
 	  do for f in libsrc/*.$$d; \
 	    do $(INSTALL_DATA) $$f $(CC65_HOME)/$$d || exit $$?; \
 	    done || exit $$?; \
-	  done
-	for f in src/ld65/cfg/*-*.cfg; \
-	  do $(INSTALL_DATA) $$f $(LD65_CFG) || exit $$?; \
 	  done
 
 install-docs:
@@ -197,3 +202,6 @@ install-samps:	${addprefix $(CC65_DOC)/, $(shell find samples -type d)}
 	      fi; \
 	    done || exit $$?; \
 	  done
+
+erase-grc:
+	$(RM) $(bindir)/grc${EXT}

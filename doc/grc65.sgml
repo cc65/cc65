@@ -224,6 +224,7 @@ inclusion by a <tt/.c/ file.
 
 <sect1>Building the GEOS application without cl65
 <sect2>First step -- compiling the resources
+<p>
 <tscreen><verb>
 grc65 -t geos-cbm testres.grc
 </verb></tscreen>
@@ -234,12 +235,14 @@ Note that &dquot;<tt/testres.h/&dquot; is included at the top of
 &dquot;<tt/test.c/&dquot;.  So, resource compiling <em/must be/ the first step.
 
 <sect2>Second step -- assembling the application header
+<p>
 <tscreen><verb>
 ca65 -t geos-cbm testres.s
 </verb></tscreen>
 And, voil&aacute; -- &dquot;<tt/testres.o/&dquot; is ready.
 
 <sect2>Third step -- compiling the code
+<p>
 <tscreen><verb>
 cc65 -t geos-cbm -O test.c
 ca65 -t geos-cbm test.s
@@ -248,6 +251,7 @@ That way, you have a &dquot;<tt/test.o/&dquot; object file which
 contains all of the executable code.
 
 <sect2>Fourth and last step -- linking it together
+<p>
 <tscreen><verb>
 ld65 -t geos-cbm -o test.cvt testres.o test.o geos-cbm.lib
 </verb></tscreen>
@@ -292,22 +296,26 @@ for the overlays.
 
 <sect1>Building the GEOS application without cl65
 <sect2>First step -- compiling the resources
+<p>
 <tscreen><verb>
 grc65 -t geos-cbm overlay-demores.grc
 </verb></tscreen>
 
 <sect2>Second step -- assembling the application header
+<p>
 <tscreen><verb>
 ca65 -t geos-cbm overlay-demores.s
 </verb></tscreen>
 
 <sect2>Third step -- compiling the code
+<p>
 <tscreen><verb>
 cc65 -t geos-cbm -O overlay-demo.c
 ca65 -t geos-cbm overlay-demo.s
 </verb></tscreen>
 
 <sect2>Fourth and last step -- linking it together
+<p>
 <tscreen><verb>
 ld65 -t geos-cbm -o overlay-demo.cvt -m overlay-demo.map overlay-demores.o overlay-demo.o geos-cbm.lib
 </verb></tscreen>

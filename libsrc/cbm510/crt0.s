@@ -2,7 +2,7 @@
 ; Startup code for cc65 (CBM 500 version)
 ;
 
-   	.export	     	_exit
+   	.export	     	_exit, BRKVec
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
      	.import	   	_clrscr, initlib, donelib, callirq_y

@@ -250,7 +250,7 @@ ca65 -t geos-cbm test.s
 That way, you have a &dquot;<tt/test.o/&dquot; object file which
 contains all of the executable code.
 
-<sect2>Fourth and last step -- linking it together
+<sect2>Fourth and last step -- linking the application
 <p>
 <tscreen><verb>
 ld65 -t geos-cbm -o test.cvt testres.o test.o geos-cbm.lib
@@ -279,7 +279,7 @@ In "<tt>cc65/samples/geos</tt>" there's a VLIR overlay demo application consisti
 of the files "<tt/overlay-demo.c/" and "<tt/overlay-demores.grc/".
 
 
-<sect1>Building the GEOS application using cl65
+<sect1>Building the GEOS overlay application using cl65
 <p>This is a simple one step process:
 <tscreen><verb>
 cl65 -t geos-cbm -O -o overlay-demo.cvt -m overlay-demo.map overlay-demores.grc overlay-demo.c
@@ -294,27 +294,27 @@ the distribution of code into the overlays and to optimize the memory area reser
 for the overlays.
 
 
-<sect1>Building the GEOS application without cl65
-<sect2>First step -- compiling the resources
+<sect1>Building the GEOS overlay application without cl65
+<sect2>First step -- compiling the overlay resources
 <p>
 <tscreen><verb>
 grc65 -t geos-cbm overlay-demores.grc
 </verb></tscreen>
 
-<sect2>Second step -- assembling the application header
+<sect2>Second step -- assembling the overlay application header
 <p>
 <tscreen><verb>
 ca65 -t geos-cbm overlay-demores.s
 </verb></tscreen>
 
-<sect2>Third step -- compiling the code
+<sect2>Third step -- compiling the overlay code
 <p>
 <tscreen><verb>
 cc65 -t geos-cbm -O overlay-demo.c
 ca65 -t geos-cbm overlay-demo.s
 </verb></tscreen>
 
-<sect2>Fourth and last step -- linking it together
+<sect2>Fourth and last step -- linking the overlay application
 <p>
 <tscreen><verb>
 ld65 -t geos-cbm -o overlay-demo.cvt -m overlay-demo.map overlay-demores.o overlay-demo.o geos-cbm.lib

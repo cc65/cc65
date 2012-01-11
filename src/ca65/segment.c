@@ -312,7 +312,7 @@ void SegAlign (unsigned long Alignment, int FillVal)
         }
 
         /* Calculate the number of fill bytes */
-        Count = AlignCount (ActiveSeg->PC, Alignment) - ActiveSeg->PC;
+        Count = AlignCount (ActiveSeg->PC, Alignment);
 
     }
 

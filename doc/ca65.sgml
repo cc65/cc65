@@ -823,12 +823,18 @@ convenient in some situations, so it's your decision.
 
 <sect1>Using macros to define labels and constants<p>
 
-While there are drawbacks with this approach, it may be handy in some
-situations. Using <tt><ref id=".DEFINE" name=".DEFINE"></tt>, it is
-possible to define symbols or constants that may be used elsewhere. Since
-the macro facility works on a very low level, there is no scoping. On the
-other side, you may also define string constants this way (this is not
+While there are drawbacks with this approach, it may be handy in a few rare
+situations. Using <tt><ref id=".DEFINE" name=".DEFINE"></tt>, it is possible
+to define symbols or constants that may be used elsewhere. One of the
+advantages is that you can use it to define string constants (this is not
 possible with the other symbol types).
+
+Please note: <tt/.DEFINE/ style macros do token replacements on a low level,
+so the names do not adhere to scoping, diagnostics may be misleading, there
+are no symbols to look up in the map file, and there is no debug info.
+Especially the first problem in the list can lead to very nasty programming
+errors. Because of these problems, the general advice is, <bf/NOT/ do use
+<tt/.DEFINE/ if you don't have to.
 
 Example:
 
@@ -2247,6 +2253,11 @@ Here's a list of all control commands and a description, what they do:
   Start a define style macro definition. The command is followed by an
   identifier (the macro name) and optionally by a list of formal arguments
   in braces.
+
+  Please note that <tt/.DEFINE/ shares most disadvantages with its C
+  counterpart, so the general advice is, <bf/NOT/ do use <tt/.DEFINE/ if you
+  don't have to.
+
   See also the <tt><ref id=".UNDEFINE" name=".UNDEFINE"></tt> command and
   section <ref id="macros" name="Macros">.
 

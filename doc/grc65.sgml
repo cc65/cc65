@@ -137,7 +137,7 @@ and <tt/c64only/ will work on only 64-GEOS.  The default value for
 then, you also have to put in a third type of resource -- a memory definition.
 The value of <tt/icon/ is a quoted file-name.  The first 63 bytes of this file
 are expected to represent a standard monochrome VIC sprite.  The file gets accessed
-when the generated assembly source is be processed by <bf/ca65/.  Examples for
+when the generated assembly source is being processed by <bf/ca65/.  Examples for
 programs generating such files are <em/Sprite Painter/ and <em/SpritePad/.  The
 default <tt/icon/ is an empty frame internally represented in the generated assembly
 file.

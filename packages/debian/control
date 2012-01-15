@@ -18,7 +18,7 @@ Description: Crosscompiler/Crossassembler for 6502 systems
 
 Package: cc65-doc
 Architecture: all
-Depends: cc65 (>= 2.13.2-1)
+Depends: cc65 (= ${Source-Version})
 Description: Documentation for the cc65 C compiler
  This package contains the documentation for the cc65 C compiler, in HTML
  and info format.

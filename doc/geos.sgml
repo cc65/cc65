@@ -19,36 +19,36 @@ useful for writing GEOS applications in general.
 
 <sect>Introduction
 <p>
-As we all know that the best computers in the world are c64 and c128. They have their GUI too -
-excellent GEOS. GEOS seems very difficult and cryptic for many people, from programmer's point
-of view. That's not true. The designers of GEOS created flexible and powerful system, which
+As we all know that the best computers in the world are the C64 and C128. They have their GUI too -
+the excellent GEOS. GEOS seems very difficult and cryptic for many people, from programmer's point
+of view. That's not true. The designers of GEOS created a flexible and powerful system, which
 is easy to use and program.
 <p>
 Coding GEOS in C? That's something new. It is possible now - with Ulrich von Bassewitz's cc65
-package and my GEOSLib you are able to create GEOS applications in no-time.
+package and my GEOSLib you are able to create GEOS applications in no time.
 <p>
-GEOSLib supports a subset of standard cc65 libraries. Whenever possible native Kernal functions
+GEOSLib supports a subset of the standard cc65 libraries. Whenever possible native Kernal functions
 are used (e.g. <tt/memset/ is an alias for <tt/FillRam/), however not all are supported. E.g.
 string functions like <tt/strcmp/, <tt/strcpy/ are doubled with native <tt/CmpString/,
 <tt/CopyString/ because the latter can handle only 256 byte strings. Keep this in mind when
-you will write your program. If you don't need long strings simply use functions from Kernal,
-resulting code will be smaller.
+you write your program. If you don't need long strings simply use functions from the Kernal,
+the resulting code will be smaller.
 <p>
 <tt/dio/ - direct disk access is available, but you might have problems with devices other
 than 1541, 1571 or 1581. RAM drives emulating these should work.
 <p>
 <tt/conio/ - simple console input-output is available for command line applications.
-This implementation assumes that one character will fit in 8x8 cell, so output with
+This implementation assumes that one character does fit in 8x8 cell, so output with
 default BSW font, which is has 9 points, might be a bit messy.
-<tt/cputs/ will output characters with fixed width, for proportional spacing use
+<tt/cputs/ does output characters with fixed width, for proportional spacing use
 <tt/cpputs/ but this function does not update cursor. There is no color support in
-GEOS 2.0 so color functions are disabled. Both 40 and 80 columns modes are supported
+GEOS 2.0 so color functions are disabled. Both 40 and 80 column modes are supported
 and automatically detected.
 <p>
-<tt/tgi/ - TGI driver for GEOS that supports both 40 and 80 columns modes but mode can not be
+<tt/tgi/ - TGI driver for GEOS that supports both 40 and 80 column modes but mode can not be
 changed between <tt/tgi_init/ and <tt/tgi_done/.
 <p>
-<tt/joy/ - JOY driver for GEOS supports only joystick, not current pointing device.
+<tt/joy/ - JOY driver for GEOS that supports only joystick, not current pointing device.
 <p>
 It is safe to use these standard includes and their contents:
 <tt/assert.h, conio.h, dio.h, errno.h, em.h, geos.h, joystick.h, modload.h, mouse.h, stdlib.h, string.h, tgi.h, time.h/
@@ -62,33 +62,33 @@ Functions from the headers above are either standard C library functions or cc65
 either case they are not GEOS specific and so they are not described here.
 <p>
 I am an assembler programmer and GEOSLib was designed in such way that cc65 could emit the best
-available code (well, the best as for machine :). Many of the <tt/void foo (void)/ functions are
-just raw calls to Kernal (assembled just as <tt/jsr _foo/), look in <tt/gsym.h/, where you
-will find many definitions of standard GEOS locations. Access to these addresses is optimized by
+available code (well, the best as for machine :-). Many of the <tt/void foo (void)/ functions are
+just raw calls to the Kernal (assembled just as <tt/jsr _foo/), look in <tt/gsym.h/, where you
+can find many definitions of standard GEOS locations. Access to these addresses is optimized by
 cc65 to simple <tt/lda/ and <tt/sta/. Don't be afraid to use C syntax.
 
 <sect1>Requirements
 <p>
-You will not need c64 or c128 for development. The only hardware requirement is a PC capable of
-running cc65. You will however need c64 or c128 emulator and GEOS image disks (.d64) to test your
+You don't need a C64 or C128 for development. The only hardware requirement is a PC capable of
+running cc65. You do however need C64 or C128 emulator and GEOS disk images (.d64) to test your
 programs.
 
 The software needed:
 <itemize>
-    <item><em/cc65/ Excellent package containing C crosscompiler, crossassembler and linker, you
-		can get it from: <htmlurl url="http://www.von-bassewitz.de/uz/cc65/"
-		name="http://www.von-bassewitz.de/uz/cc65/">
-    <item><em/VICE/ This is portable C64, C128 and few other Commodore computers emulator, you
-		can obtain it from: <htmlurl url="http://www.cs.cmu.edu/~dsladic/vice/vice.html"
-		name="http://www.cs.cmu.edu/~dsladic/vice/vice.html">. VICE package contains
+    <item><em/cc65/ Excellent package containing a C crosscompiler, a crossassembler and a linker, you
+		can get it from: <htmlurl url="http://www.cc65.org/"
+		name="http://www.cc65.org/">
+    <item><em/VICE/ This is a portable C64, C128 and few other Commodore computers emulator, you
+		can obtain it from: <htmlurl url="http://www.viceteam.org/"
+		name="http://www.viceteam.org/">. The VICE package contains the
 		c1541 program that is able to convert/unconvert GEOS files to disk images.
     <item><em/Star Commander/ This tool is only for DOS. You will need it for transferring
-		object files from PC to 1541. There's also one important ability of this
+		object files from a PC to a 1541. There's also one important ability of this
 		tool - it automatically un-converts .cvt files into GEOS native format on
 		disk image files.
-    <item><em/cbm4linux/ A Linux kernel module that allows for communication with 1541 and
-		other Commodore IEC bus drives. It can be replacement for Star Commander if
-		you want only to transfer files to a disk and unconvert using GEOS program for
+    <item><em/cbm4linux/ A Linux kernel module that allows for communication with a 1541 and
+		other Commodore IEC bus drives. It can be a replacement for Star Commander if
+		you only want to transfer files to a disk and unconvert using GEOS program for
 		this purpose. Check out: <htmlurl url="http://www.lb.shuttle.de/puffin/cbm4linux/"
 		name="http://www.lb.shuttle.de/puffin/cbm4linux">
 </itemize>
@@ -96,7 +96,7 @@ The software needed:
 VICE and cc65 are portable - they run on variety of platforms - DOS, Win32 and UNIX. GEOSLib only
 needs cc65.
 <p>
-<em/Update:/ starting from v2.5.0 GEOSLib is a part of cc65 package as its GEOS support library.
+<em/Update:/ starting from v2.5.0 GEOSLib is a part of the cc65 package as its GEOS support library.
 
 <sect1>Legal
 <p>
@@ -118,28 +118,28 @@ POLAND
 <p>
 e-mail: <tt/ytm@elysium.pl/
 
-<sect>What have you got and what to do with it?
+<sect>What do you have and what to do with it?
 <p>
 This chapter describes some rules you ought to obey, and how to use GEOSLib.
 
 <sect1>Usage
 <p>
 Apart from this file, which merely describes only standard GEOS library
-functions, you should read <tt/grc65/ (GEOS resource compiler) documentation.
-There are informations about necessary resource files (each GEOS application
-needs at least one) and the building process - what should be done and in what
-order. Please also read cc65's documentation on how to compile C, assembler
+functions, you should read the <tt/grc65/ (GEOS resource compiler) documentation.
+There is information about necessary resource files (each GEOS application
+needs at least one) and the build process - what should be done and in what
+order. Please also read the cc65 documentation on how to compile C, assembler
 and link everything together.
 <p>
 All in all, you just need to place
 <tscreen><verb>
 &num;include &lt;geos.h&gt;
 </verb></tscreen>
-on top of your source.
+at the top of your source.
 <p>
-As a general rule read the sources of example programs and read the headers.
-These are the most reliable sources of knowledge ;). You will also find there
-many C macros representing various arguments passed to functions. Please use
+As a general rule read the sources of the example programs and read the headers.
+These are the most reliable sources of knowledge ;-). You will also find there
+many C macros representing various arguments passed to the functions. Please use
 them. You will find your sources easier to understand, and it will be easier
 to find bugs.
 <p>
@@ -149,14 +149,14 @@ Screen coordinates are given in pixels unless stated differently.
 
 <sect1>Notes on style
 <p>
-Contrary to typical GEOS assembly program which has a main function called after loading that
-setups the screen, menus, icons etc. exiting from <tt/main/ function in C is equivalent to
+Contrary to a typical GEOS assembly program which has a main function called after loading that
+setups the screen, menus, icons etc. exiting from the <tt/main/ function in C is equivalent to
 calling <tt/exit()/. These two are the only safe methods of terminating applications. DO NOT
 USE <tt/EnterDeskTop/! Your data may be lost as library destructors and functions registered
-with <tt/atexit/ will not be called.
+with <tt/atexit/ are not called.
 <p>
 For GEOS GUI applications the recommended program structure is to have everything initialized
-in <tt/main/ function and at the end of it a call to <tt/MainLoop()/ function. WARNING! This
+in the <tt/main/ function and at the end of it a call to the <tt/MainLoop()/ function. WARNING! This
 function never returns, any code between <tt/MainLoop();/ and the end of <tt/main/ will not
 be executed. You have to call <tt/exit()/ explicitly somewhere in your code (e.g. in a menu
 handler or via DialogBox action).
@@ -165,44 +165,44 @@ Whenever possible use definitions from <tt/gsym.h/. The resulting code is transl
 series of <tt/lda/ and <tt/sta/, so you can't do it better :-).
 <p>
 Don't hesitate to use library functions. Everything was written with size and speed in mind. In
-fact many calls are just redirections to GEOS kernal which results in simple <tt/jsr/.
+fact many calls are just redirections to the GEOS Kernal which results in a simple <tt/jsr/.
 <p>
 The <tt/main/ function receives the standard <tt/argc/ and <tt/argv/ parameters. There are
-always either 1 or 3 parameters. DOS application name is always set as <tt/argv[0]/.
-If present, <tt/argv[1]/ and <tt/argv[2]/ will be set to data filename and data diskname (it only
-works if user double-clicks on data file associated with your application). Note that it is up
+always either 1 or 3 parameters. The DOS application name is always set as <tt/argv[0]/.
+If present, <tt/argv[1]/ and <tt/argv[2]/ will be set to the data filename and data diskname (it only
+works if the user double-clicks on a data file associated with your application). Note that it is up
 to your application to determine which of the available (up to four) disk drives has the disk
 with given diskname inside. If this fails your program should ask to insert the proper disk into
 one of available drives.
 <p>
-You might wonder why I have chosen sometimes weird order of arguments in functions. I just
-wanted to avoid unnecessary pushing and popping arguments from stack because cc65 can pass single
+You might wonder why I have chosen a sometimes weird order of arguments in functions. I just
+wanted to avoid unnecessary pushing and popping of arguments from the stack because cc65 can pass a single
 <tt/unsigned int/ through CPU registers.
 <p>
-Do not try to compile in strict ANSI mode. Library uses cc65 extensions which are not available in
+Do not try to compile in strict ANSI mode. The library uses cc65 extensions which are not available in
 ANSI.
 <p>
 It is possible to use dynamically loaded modules, three such modules are provided:
-GEOS TGI driver, GEOS EMD driver (for VDC extended memory) and GEOS JOY driver.
+A GEOS TGI driver, a GEOS EMD driver (for VDC extended memory) and a GEOS JOY driver.
 Just make sure that their filenames appear UPPERCASE in DeskTop. There are no more special
-recommendations, read cc65 documentation about modules and demo programs source code.
+recommendations, read the cc65 documentation about modules and the demo programs source code.
 
 <sect>Library Functions
 <p>
-Functions here are sorted more or less in the way they appear in header files. This way I am able
-to keep functions covering similar task near each other. All function names are identical to those
-from <tt/geosSym/ file provided with GeoProgrammer package. Only my extensions to <tt/geosSym/
+Functions here are sorted more or less in the way they appear in the header files. This way I am able
+to keep functions covering similar tasks near each other. All function names are identical to those
+from the <tt/geosSym/ file provided with the GeoProgrammer package. Only my extensions to <tt/geosSym/
 are covered by new names, but I tried to keep them in the naming convention.
 
 <sect1>Graphics
 <p>
-This section covers drawing package of GEOS along with text output routines.
+This section covers the drawing package of GEOS along with text output routines.
 
 <sect2>SetPattern
 <p>
 <tt/void SetPattern (char pattern)/
 <p>
-This function sets current pattern to given. There are 32 different patterns in GEOS. You can
+This function sets the current pattern to the given. There are 32 different patterns in GEOS. You can
 see them together in the filling box in GeoPaint.
 
 <sect2>GraphicsString
@@ -210,35 +210,35 @@ see them together in the filling box in GeoPaint.
 <tt/void GraphicsString (char *myGString)/
 <p>
 One of the more powerfull routines of GEOS. This function calls other graphic functions depending
-on given command string. See structures chapter for more detailed description of the structure of it.
+on the given command string. See the structures chapter for a more detailed description.
 
 <sect2>Rectangle functions
 <p>
-Parameters to those functions are grouped in <tt/struct window drawWindow/. To speed up things and
-reduce overhead this structure is glued to zero page locations, where all rectangle functions
-expect their parameters. You can modify data directly (e.g. <tt/drawWindow.top=10/) or via
-<tt/InitDrawWindow/ function. Contents of <tt/drawWindow/ are guaranteed not to change only when
-using graphics functions. In other case you should keep your data in separate <tt/struct window/
-and use <tt/InitDrawWindow/ before first call to rectangle functions.
+Parameters to those functions are grouped in the <tt/struct window drawWindow/. To speed up things and
+reduce overhead this structure is bound to zero page locations, where all rectangle functions
+expect their parameters. You can modify the data directly (e.g. <tt/drawWindow.top=10/) or via the
+<tt/InitDrawWindow/ function. Contents of <tt/drawWindow/ are guaranteed not to change when only
+using graphics functions. In other cases you should keep your data in separate <tt/struct window/
+and use <tt/InitDrawWindow/ before the first call to one of the rectangle functions.
 
 <sect3>InitDrawWindow
 <p>
 <tt/void InitDrawWindow (struct window *myWindow)/
 <p>
-This function only copies contents of <tt/myWindow/ into system area of <tt/drawWindow/. Use it
-if for some reason you have to keep window data out of zero page space.
+This function only copies the contents of <tt/myWindow/ into the system area of <tt/drawWindow/. Use it
+if for some reason you have to keep your window data out of the zero page space.
 
 <sect3>Rectangle
 <p>
 <tt/void Rectangle (void)/
 <p>
-This draws on screen rectangle filled with current pattern.
+This draws on screen a rectangle filled with the current pattern.
 
 <sect3>FrameRectangle
 <p>
 <tt/void FrameRectangle (char pattern)/
 <p>
-This one draws frame with given bit pattern (not a pattern from GEOS palette).
+This one draws a frame with the given bit pattern (not a pattern from the GEOS palette).
 
 <sect3>InvertRectangle
 <p>
@@ -252,56 +252,56 @@ Just as the name says...
 <p>
 <tt/void RecoverRectangle (void)/
 <p>
-These two functions are for copying parts of the screen to (<tt/Imprint/) and from (<tt/Recover/)
-backbuffer of the screen. For example when drawing new menu box GEOS first uses
+These two functions are for copying parts of the screen to (<tt/Imprint/) and from (<tt/Recover/) the
+backbuffer of the screen. For example when drawing a new menu box GEOS first uses
 <tt/ImprintRectangle/ to save the area under the box, and restores it by <tt/RecoverRectangle/ upon
 destroying the menu.
 
 <sect2>Line Functions
 <p>
-GEOS drawing package is optimized so there are different functions for drawing vertical and
+The GEOS drawing package is optimized so there are different functions for drawing vertical and
 horizontal lines.
 
 <sect3>HorizontalLine
 <p>
 <tt/void HorizontalLine (char pattern, char y, unsigned xStart, unsigned xEnd)/
 <p>
-This function draws horizontal line using given pattern - here it is a true bit pattern, not
-pattern set by <tt/SetPattern/.
+This function draws a horizontal line using the given pattern. Note that <tt/pattern/ is not a pattern
+number as set in <tt/SetPattern/ but a true bit pattern.
 
 <sect3>InvertLine
 <p>
 <tt/void InvertLine (char y, unsigned xStart, unsigned xEnd)/
 <p>
-There is only horizontal version.
+There is only a horizontal version.
 
 <sect3>RecoverLine
 <p>
 <tt/void RecoverLine (char y, unsigned xStart, unsigned xEnd)/
 <p>
-This function recovers only one line. It is utilized by <tt/RecoverRectangle/. See its description
+This function recovers a single line. It is utilized by <tt/RecoverRectangle/. See its description
 for more details.
 
 <sect3>VerticalLine
 <p>
 <tt/void VerticalLine (char pattern, char yStart, char yEnd, unsigned x)/
 <p>
-This function draws vertical line using given pattern. Note that <tt/pattern/ is not a pattern
+This function draws a vertical line using the given pattern. Note that <tt/pattern/ is not a pattern
 number as set in <tt/SetPattern/ but a true bit pattern.
 
 <sect3>DrawLine
 <p>
 <tt/void DrawLine (char mode, struct window *myWindow)/
 <p>
-<tt/top/ parameters of <tt/struct window/ describe the starting point of the line, while
-<tt/bottom/ are for the ending point. If <tt/mode/ is <tt/DRAW_DRAW/ then current pattern from
-<tt/SetPattern/ is used for drawing. If <tt/mode/ is <tt/DRAW_ERASE/ then line is erased from the
-screen. If <tt/mode/ is <tt/DRAW_COPY/ then line is copied from/to back/frontbuffer, according to
-<tt/dispBufferOn/ setting.
+The <tt/top/ parameters of <tt/struct window/ describe the starting point of the line, while
+<tt/bottom/ ones are for the ending point. If <tt/mode/ is <tt/DRAW_DRAW/ then the current pattern from
+<tt/SetPattern/ is used for drawing. If <tt/mode/ is <tt/DRAW_ERASE/ then the line is erased from the
+screen. If <tt/mode/ is <tt/DRAW_COPY/ then the line is copied from/to back/frontbuffer, according to
+the <tt/dispBufferOn/ setting.
 
 <sect2>Point Functions
 <p>
-Parameters to these two functions are passed by a pointer to own <tt/struct pixel/ filled with
+The parameters to these two functions are passed by a pointer to an own <tt/struct pixel/ filled with
 proper values.
 
 <sect3>DrawPoint
@@ -315,7 +315,7 @@ on the screen.
 <p>
 <tt/char TestPoint (struct pixel *myPixel)/
 <p>
-This function tests if given pixel is set and returns <tt/true/ (non-zero) or <tt/false/ (zero).
+This function tests if the given pixel is set and returns <tt/true/ (non-zero) or <tt/false/ (zero).
 
 <sect2>Character and string output
 
@@ -326,21 +326,21 @@ This function tests if given pixel is set and returns <tt/true/ (non-zero) or <t
 <tt/cpputs (char *myString)/
 <p>
 Actually this is a part of <tt/conio/, but this function is non-standard. It is
-a variety of <tt/cputs/ that will output string with proportional spacing, not
+a variation of <tt/cputs/ that outputs the string with proportional spacing, not
 fixed like <tt/cputs/.
 
 <sect3>PutChar
 <p>
 <tt/void PutChar (char character, char y, unsigned x)/
 <p>
-This function outputs single character using current style and font to screen.
+This function outputs a single character using the current style and font to the screen.
 
 <sect3>PutString
 <p>
 <tt/void PutString (char *myString, char y, unsigned x)/
 <p>
-Same as <tt/PutChar/ except the fact that you can output whole <tt/NULL/-terminated string.
-See <tt/ggraph.h/ for list of tokens that you can also place in the string - like <tt/CBOLDON/ or
+Same as <tt/PutChar/ except the fact that you can output a whole <tt/NULL/-terminated string.
+See <tt/ggraph.h/ for the list of tokens that you can also place in the string - like <tt/CBOLDON/ or
 <tt/COUTLINEON/.
 
 <sect3>PutDecimal
@@ -348,9 +348,9 @@ See <tt/ggraph.h/ for list of tokens that you can also place in the string - lik
 <tt/void PutDecimal (char parameter, unsigned value, char y, unsigned x)/
 <p>
 This function converts <tt/value/ to its decimal representation and outputs it to the screen.
-The <tt/parameter/ is the field width in pixels (range 1-31) and mode bits. Depending on them
-the string can be filled with zeroes (string always 5 characters long) or not and left or right
-justified to given pixel. See <tt/ggraph.h/ for predefined values for <tt/parameter/.
+The <tt/parameter/ is the field width in pixels (range 1-31) and the mode bits. Depending on them
+the string can be filled with zeroes (the string is always 5 characters long) or not and left or right
+justified to the given pixel. See <tt/ggraph.h/ for predefined values for <tt/parameter/.
 
 <sect2>Font Handling
 
@@ -358,26 +358,26 @@ justified to given pixel. See <tt/ggraph.h/ for predefined values for <tt/parame
 <p>
 <tt/char GetCharWidth (char character)/
 <p>
-This function returns real width (in pixels) of given character with current font. It can be used
-for counting the length of string on screen, allowing for indentation or justification.
+This function returns the real width (in pixels) of the given character with the current font. It can be used
+for counting the length of a string on the screen, allowing for indentation or justification.
 
 <sect3>LoadCharSet
 <p>
 <tt/void LoadCharSet (struct fontdesc *myFont)/
 <p>
-This function forces GEOS to use given font instead of own. <tt/myFont/ should be casted from
-pointer to the start of area where was loaded record from font file (VLIR structure).
+This function forces GEOS to use the given font. <tt/myFont/ should be casted from a
+pointer to the start of the area where a record from a font file (VLIR structure) was loaded.
 
 <sect3>UseSystemFont
 <p>
 <tt/void UseSystemFont (void)/
 <p>
-This function forces GEOS to use built-in BSW font.
+This function forces GEOS to use the built-in BSW font.
 
 <sect2>Bitmap handling
 <p>
-I'm not quite sure how are these functions working (except <tt/BitmapUp/) so you should
-probably look into library sources and compare it with your knowledge. Please let me know
+I'm not quite sure how these functions are working (except <tt/BitmapUp/) so you should
+probably look into the library sources and compare it with your knowledge. Please let me know
 if something is wrong or broken.
 
 <sect3>BitmapUp
@@ -385,8 +385,8 @@ if something is wrong or broken.
 <tt/void BitmapUp (struct iconpic *myPic)/
 <p>
 This function unpacks the bitmap and places it on the screen - just as you set it in the
-<tt/struct iconpic/ pointer to which you pass. See <tt/gstruct.h/ for description of this
-structure. Note that you can only use packed GEOS bitmaps - simple Photo Scrap is in this format.
+<tt/struct iconpic/ pointer which you pass. See <tt/gstruct.h/ for a description of this
+structure. Note that you can only use packed GEOS bitmaps - a simple Photo Scrap is in this format.
 
 <sect3>BitmapClip
 <p>
@@ -402,8 +402,8 @@ and the number of rows to skip from the top if it.
 	struct iconpic *myPic)/
 <p>
 Similar to the previous one with some extension. <tt/proc1/ is called before reading a byte (it
-returns in .A next value), and <tt/proc2/ is called every time the parser reads a byte which is
-not a piece of pattern (byte of code greater than 219). Both procedures should be written
+returns in .A the next value), and <tt/proc2/ is called every time the parser reads a byte which is
+not a piece of a pattern (byte of code greater than 219). Both procedures should be written
 separately in assembler and declared as <tt/__fastcall__/ returning char.
 
 <sect1>Menus and Icons
@@ -412,34 +412,34 @@ Here you will find information about functions related with menus and icons.
 
 <sect2>Menus
 <p>
-Menus are essential for GUI. GEOS can handle only one menu at a time, but each menu can call
-another one, which results in submenu tree. There can be up to 8 menu levels, each one with up
+Menus are essential for a GUI. GEOS can handle only one menu at a time, but each menu can call
+another one, which results in a submenu tree. There can be up to 8 menu levels, each one with up
 to 32 items.
 <p>
-Menus are initialized with <tt/DoMenu/ and then Kernal takes care for everything. Your code
-(called from event handler) should be a function without parameters, returning void. You should
+Menus are initialized with <tt/DoMenu/ and then the Kernal takes care of everything. Your code
+(called from an event handler) should be a function without parameters, returning void. You should
 use <tt/DoPreviousMenu/ or <tt/GotoFirstMenu/ at least once in its code to have the screen clean.
 
 <sect3>DoMenu
 <p>
 <tt/void DoMenu (struct menu *myMenu)/
 <p>
-This function initializes GEOS menu processor and exits. See <tt/DoMenu structure/ for more
-information about it. Know that many GEOS application just initializes the screen, menu and
-exits to main Kernal loop, this proves the power of <tt/DoMenu/.
+This function initializes the GEOS menu processor and exits. See <tt/DoMenu structure/ for more
+information about it. Know that many GEOS applications just initialize the screen, menu and
+exit to the main Kernal loop, this proves the power of <tt/DoMenu/.
 
 <sect3>ReDoMenu
 <p>
 <tt/void ReDoMenu (void)/
 <p>
-This simply redraws the menu at lowest level. It works like calling <tt/DoMenu/ again with
+This simply redraws the menu at the lowest level. It works like calling <tt/DoMenu/ again with
 the same parameters.
 
 <sect3>RecoverMenu
 <p>
 <tt/void RecoverMenu (void)/
 <p>
-This function erases current menu from the screen. It doesn't change the menu level.
+This function erases the current menu from the screen. It doesn't change the menu level.
 
 <sect3>RecoverAllMenus
 <p>
@@ -452,23 +452,23 @@ set to 0 (topmost).
 <p>
 <tt/void DoPreviousMenu (void)/
 <p>
-This functions causes menu processor to go back one menu level. You should use it in menu
+This functions causes the menu processor to go back one menu level. You should use it in menu
 handler code to have the screen clean.
 
 <sect3>GotoFirstMenu
 <p>
 <tt/void GotoFirstMenu (void)/
 <p>
-This one jumps back to the topmost menu. If there is only menu and submenu it works the
+This one jumps back to the topmost menu. If there is only a menu and one submenu it works the
 same as <tt/DoPreviousMenu/.
 
 <sect2>Icon Functions
 <p>
 Icons are working similar to menus except the fact that there is only one level. Icons are
 defined as a screen area filled with a bitmap, but if you would setup icons and erase the
-screen they are still active and clicking in the place where formerly an icon was will cause
+screen they would still be active and clicking in the place where formerly an icon was would cause
 an effect. Similarly if you would setup icons and then turn them off with <tt/ClearMouseMode/
-the bitmap will be still on the screen but clicking on it would not cause any action.
+the bitmap would still be on the screen but clicking on it would not cause any action.
 There is only one, but powerful icon function.
 
 <sect3>DoIcons
@@ -476,7 +476,7 @@ There is only one, but powerful icon function.
 <tt/void DoIcons (struct icontab *myIconTab)/
 <p>
 This function initializes all icons that are present on the screen at once. For more information
-look at <tt/Icons/ chapter in this manual.
+look at the <tt/Icons/ chapter in this manual.
 
 <sect1>DialogBoxes
 <p>
@@ -488,21 +488,21 @@ This chapter covers the most powerful GEOS user interface function - <tt/DoDlgBo
 <p>
 <tt/char DoDlgBox (char *dialogString)/
 <p>
-DialogBox returns one byte. It can be the value of one of six standard icons (see <tt/gdlgbox.h/)
-or whatever closing routine passes. Register <tt/r0L/ also contains this value.
+This function returns one byte. It can be the value of one of six standard icons (see <tt/gdlgbox.h/)
+or whatever the closing routine passes. Register <tt/r0L/ also contains this value.
 <p>
-Read structures chapter for the specs of the <tt/dialogString/.
+Read the structures chapter for the specs of the <tt/dialogString/.
 
 <sect3>RstrFrmDialogue
 <p>
 <tt/char RstrFrmDialogue/
 <p>
-This function called from within DialogBox event immediately closes the DialogBox and returns
+This function is called from within DoDlgBox event. It immediately closes the DialogBox and returns
 the owner ID (or whatever caller has in the .A register).
 
 <sect2>GEOSLib extensions
 <p>
-To simplify usage of DoDlgBox from C I've wrote some help functions - wrappers for DoDlgBox,
+To simplify the usage of DoDlgBox from C I wrote some helper functions - wrappers for DoDlgBox,
 with predefined data. In one word - these are standard DialogBoxes you can see in almost every
 GEOS application.
 
@@ -514,18 +514,18 @@ GEOS application.
 <p>
 <tt/void DlgBoxOk (char *line1, char *line2)/
 <p>
-These function show two lines of text in standard-sized DialogBox. You can read the code of
-pressed icon from return value. E.g. for <tt/DlgBoxYesNo/ it can only be <tt/YES/ or <tt/NO/.
+These function show two lines of text in a standard-sized DialogBox. You can read the code of the
+pressed icon from the return value. E.g. for <tt/DlgBoxYesNo/ it can only be <tt/YES/ or <tt/NO/.
 You can pass an empty string or NULL to get a blank line.
 
 <sect3>DlgBoxGetString
 <p>
 <tt/char DlgBoxGetString (char *string, char strlen, char *line1, char *line2)/
 <p>
-This function prompts user for entering a string of at most <tt/strlen/ characters. It is returned
+This function prompts the user to enter a string of at most <tt/strlen/ characters. It is returned
 in <tt/string/. The two given lines of text are shown above the input line. Please remember
-that there is also <tt/CANCEL/ icon in the DialogBox and you should test if user confirmed his
-input or gave up. The <tt/string/ is also shown so you can place default input there or remember
+that there is also a <tt/CANCEL/ icon in the DialogBox and you should test if user confirmed his
+input or gave up. The <tt/string/ is also shown so you can place a default input there or remember
 to place <tt/NULL/ at start.
 
 <sect3>DlgBoxFileSelect
@@ -534,8 +534,8 @@ to place <tt/NULL/ at start.
 <p>
 This routine is the standard file selector. It can return <tt/OPEN/, <tt/CANCEL/ or disk error
 on reading the directory or opening the disk.
-There is also <tt/DISK/ icon shown, but it is handled internally. You pass as input parameters
-<tt/filetype/ and pointer to string containing the first part of file's class. If this string is
+There is also a <tt/DISK/ icon shown, but it is handled internally. You pass as input parameters
+<tt/filetype/ and a pointer to a string containing the first part of a file's class. If this string is
 empty (<tt/NULL/ at the start), then all files with given filetype will be shown.
 <p>
 At present this file selector handles only first 16 files of given type and supports only one
@@ -546,13 +546,13 @@ At present this file selector handles only first 16 files of given type and supp
 <tt/char MessageBox (char mode, const char *format, ...)/
 <p>
 This function is a more general one. It works very much like <tt/printf/ in a
-box. The only difference is <tt/mode/ parameter which allows for placing
+box. The only difference is the <tt/mode/ parameter which allows for placing
 default icons (see <tt/gdlgbox.h/ for list of possible <tt/MB_/ values).
-Any too wide text will be clipped to the size of the default window. If mode
-parameter is invalid or equal to <tt/MB_EMPTY/ then the window will be closed
+Any too wide text will be clipped to the size of the default window. If <tt/mode/
+is invalid or equal to <tt/MB_EMPTY/ then the window will be closed
 after a click. Otherwise the user must choose an icon.
 <p>
-Note: use it if you really need (or if you will use it in many places) as
+Note: Use it if you really need (or if you use it in many places) as
 it adds quite amount of code to your program.
 <p>
 Note: the formatted text <em/cannot exceed/ 255 bytes in length, there is no check
@@ -564,14 +564,14 @@ You will find here functions related to sprite and mouse drawing and handling.
 
 <sect2>Mouse related functions
 <p>
-These cover mouse - as a general pointing device, but expect user to utilize as different devices
-as digital or analog joystick, mouse, lightpen or koalapad (whatever it is).
+These cover the mouse - as a general pointing device, but expect users to utilize as different devices
+as a digital or analog joystick, a mouse, a lightpen or a koalapad (whatever it is).
 
 <sect3>StartMouseMode
 <p>
 <tt/void StartMouseMode (void)/
 <p>
-This function initializes mouse vectors - <tt/mouseVector/ and <tt/mouseFaultVec/, and then
+This function initializes the mouse vectors - <tt/mouseVector/ and <tt/mouseFaultVec/, and then
 calls <tt/MouseUp/.
 
 <sect3>ClearMouseMode
@@ -587,35 +587,35 @@ but they are not cleared from the screen.
 <p>
 <tt/void MouseOff (void)/
 <p>
-The first function turns the mouse pointer on. It will appear on next IRQ. The second one does
-the opposite - it turns off the pointer, but its position is still updated by input driver.
+The first function turns the mouse pointer on. It appears on the next IRQ. The second one does
+the opposite - it turns off the pointer, but its position is still updated by the input driver.
 
 <sect3>IsMseInRegion
 <p>
 <tt/char IsMseInRegion (struct window *myWindow)/
 <p>
-This function tests if mouse pointer is actually in given range of screen. See <tt/gsprite.h/ for
-description of bits in return values - they describe the position in detail.
+This function tests if the mouse pointer is actually in the given range of the screen. See <tt/gsprite.h/ for
+a description of the bits in the return values - they describe the position in detail.
 
 <sect2>Sprites
 <p>
 You are free to use any of the eight sprites, but keep in mind that sprite 0 is actually the mouse
-pointer and sprite 1 can be overwritten when using text prompt. You don't have to worry about
-40/80 column issues because GEOS128 has pretty good sprite emulator for VDC.
+pointer and sprite 1 can be overwritten when using a text prompt. You don't have to worry about
+40/80 column issues because GEOS128 has a pretty good sprite emulator for the VDC.
 
 <sect3>DrawSprite
 <p>
 <tt/void DrawSprite (char sprite, char *mySprite)/
 <p>
 This function initializes the sprite data. <tt/mySprite/ is a 63-byte table with bitmap data, which
-is copied to system sprite area (at <tt/sprpic/ - see <tt/gsym.h/). Hardware sprite registers are
-not initialized and sprite is not yet visible.
+is copied to the system sprite area (at <tt/sprpic/ - see <tt/gsym.h/). Hardware sprite registers are
+not initialized and the sprite is not yet visible.
 
 <sect3>PosSprite
 <p>
 <tt/void PosSprite (char sprite, struct pixel *myPixel)/
 <p>
-This function positions the sprite on the screen. Given coordinates are screen ones - they are
+This function positions the sprite on the screen. The given coordinates are screen ones - they are
 converted to sprite coordinates by GEOS. Due to this you cannot use this function to position your
 sprite off the left or top to the screen.
 
@@ -633,7 +633,7 @@ These two functions are responsible for making the sprite visible or not.
 <p>
 <tt/void InitTextPrompt (char height)/
 <p>
-This function initializes sprite 1 for text prompt with given <tt/height/. This parameter can be in
+This function initializes sprite 1 for a text prompt with given <tt/height/. This parameter can be in
 range 1-48.
 
 <sect3>PromptOn and PromptOff
@@ -642,38 +642,38 @@ range 1-48.
 <p>
 <tt/void PromptOff (void)/
 <p>
-The first function places text prompt in given place and enables blinking.
+The first function places a text prompt in given place and enables blinking.
 The second one is pretty self-explanatory.
 
 <sect3>GetNextChar
 <p>
 <tt/char GetNextChar (void)/
 <p>
-This function gets next character from the keyboard queue. If the queue is empty it returns
-<tt/NULL/, otherwise you receive true ASCII code of a character or value of special (function)
-key. See <tt/gsprite.h/ for list of them.
+This function gets the next character from the keyboard queue. If the queue is empty it returns
+<tt/NULL/, otherwise you receive the true ASCII code of a character or the value of a special (function)
+key. See <tt/gsprite.h/ for the list of them.
 
 <sect1>Disk
 <p>
-This chapter covers slightly low-level disk routines. You should use them with care, because
+This chapter covers rather low-level disk routines. You should use them with care, because
 you may easily corrupt data on disks. Also remember that contemporary GEOS supports many various
 devices and sticking to 1541 track layout (e.g. expecting the directory on track 18) might be
 dangerous.
 <p>
-For some purposes you might consider using <tt/dio.h/ interface to disk access. It is native.
+For some purposes you might consider using the <tt/dio.h/ interface to disk access. It is native.
 <p>
-All GEOS disk functions return error code in X register. In some cases this is returned by
-GEOSLib function (if its type is <tt/char/), but in all cases last error is saved in <tt/__oserror/
+All GEOS disk functions return an error code in the X register. In some cases this is returned by the
+GEOSLib function (if its type is <tt/char/), but in all cases the last error is saved in the <tt/__oserror/
 location. If it is nonzero - an error occured. See <tt/gdisk.h/ for the list of possible errorcodes.
-You need to include <tt/errno.h/ to get <tt/__oserror/, together with standard <tt/errno/. The
+You need to include <tt/errno.h/ to get <tt/__oserror/, together with the standard <tt/errno/. The
 latter gives less verbose, but still usable information and can be used with <tt/strerror/.
-Probably you will get more information using <tt/_stroserror/ in similar way.
+Probably you will get more information using <tt/_stroserror/ in a similar way.
 <p>
-For passing parameters use almost always pointer to your data e.g. <tt/ReadBuff (&amp;myTrSe)/.
+For passing parameters use almost always a pointer to your data e.g. <tt/ReadBuff (&amp;myTrSe)/.
 
 <sect2>Buffer functions
 <p>
-These functions are taking single data sector (256 bytes) to read or write on a disk.
+These functions take a single data sector (256 bytes) to read or write on the disk.
 
 <sect3>ReadBuff and Writebuff
 <p>
@@ -681,7 +681,7 @@ These functions are taking single data sector (256 bytes) to read or write on a 
 <p>
 <tt/char WriteBuff (struct tr_se *myTrSe)/
 <p>
-These functions read and write sector placed at <tt/diskBlkBuf/.
+These functions read and write a sector placed at <tt/diskBlkBuf/.
 
 <sect3>GetBlock and ReadBlock
 <p>
@@ -689,8 +689,8 @@ These functions read and write sector placed at <tt/diskBlkBuf/.
 <p>
 <tt/char ReadBlock (struct tr_se *myTrSe, char *buffer)/
 <p>
-These two functions are reading a single block directly at 256 byte array placed at <tt/buffer/.
-The difference between them is that <tt/GetBlock/ will initialize TurboDos in drive if it was not
+These two functions read a single block directly to the 256 byte array placed at <tt/buffer/.
+The difference between them is that <tt/GetBlock/ initializes TurboDos in the drive if it was not
 enabled. <tt/ReadBlock/ assumes that it is already enabled thus being slightly faster.
 
 <sect3>PutBlock, WriteBlock, VerWriteBlock
@@ -702,20 +702,20 @@ enabled. <tt/ReadBlock/ assumes that it is already enabled thus being slightly f
 <tt/char VerWriteBlock (struct tr_se *myTrSe, char *buffer)/
 <p>
 Similar to previous but needed for writing the disk. <tt/VerWriteBlock/ verifies the data after
-writing. In case of error five tries are attempted before error code is returned.
+writing. In case of an error five tries are attempted before an error code is returned.
 
 <sect2>Directory header
 <p>
-Functions described here are operating on <tt/curDirHeader/ where current disk header is stored.
-On larger capacity drives (than 1541) the second part of directory header in <tt/dir2Head/.
+The functions described here operate on <tt/curDirHeader/ where the current disk header is stored.
+On larger (than 1541) capacity drives the second part of the directory header is in <tt/dir2Head/.
 
 <sect3>GetPtrCurDkNm
 <p>
 <tt/void GetPtrCurDkNm (char *diskName)/
 <p>
-This function fills given character string with the name of current disk. It is converted to C
-standard - string is terminated with <tt/NULL/ character instead of code 160 as in Commodore DOS.
-Note that passed pointer must point to an array of at least 17 bytes.
+This function fills the given character string with the name of current disk. It is converted to C
+standard - the string is terminated with <tt/NULL/ character instead of code 160 as in Commodore DOS.
+Note that the passed pointer must point to an array of at least 17 bytes.
 
 <sect3>GetDirHead and PutDirHead
 <p>
@@ -723,7 +723,7 @@ Note that passed pointer must point to an array of at least 17 bytes.
 <p>
 <tt/char PutDirHead (void)/
 <p>
-These functions are reading and writing the directory header. You should use <tt/GetDirHead/ before
+These functions read and write the directory header. You should use <tt/GetDirHead/ before
 using any functions described below, and you should use <tt/PutDirHead/ to save the changes on the
 disk. Otherwise they will be lost. Operating area is the <tt/curDirHead/.
 
@@ -731,21 +731,21 @@ disk. Otherwise they will be lost. Operating area is the <tt/curDirHead/.
 <p>
 <tt/unsigned CalcBlksFree (void)/
 <p>
-This function returns the number of free blocks on current disk. It is counted using data in
+This function returns the number of free blocks on the current disk. It is counted using data in
 <tt/curDirHead/ so you must initialize the disk before calling it.
 
 <sect3>ChkDskGEOS
 <p>
 <tt/char ChkDskGEOS (void)/
 <p>
-This functions checks <tt/curDirHead/ for GEOS Format identifier. It returns either true or false,
+This functions checks <tt/curDirHead/ for the GEOS Format identifier. It returns either true or false,
 and also sets <tt/isGEOS/ properly. You must initialize the disk before using this.
 
 <sect3>SetGEOSDisk
 <p>
 <tt/char SetGEOSDisk (void)/
 <p>
-This function initializes disk for use with GEOS. It sets indicator in directory header and
+This function initializes disk for use with GEOS. It sets the indicator in directory header and
 allocates a sector for the directory of border files. You don't need to initialize the disk before
 using.
 
@@ -753,8 +753,8 @@ using.
 <p>
 <tt/char FindBAMBit (struct tr_se *myTrSe)/
 <p>
-This function returns the bit value from BAM (Block Allocation Map) for given sector. The bit is
-set if the sector is free to use. Returned value is always zero if the sector is already allocated.
+This function returns the bit value from the BAM (Block Allocation Map) for the given sector. The bit is
+set if the sector is free to use. The returned value is always zero if the sector is already allocated.
 In fact, this function could be used in a following way:
 <tscreen><verb>
 &num;define BlockInUse FindBAMBit
@@ -772,12 +772,12 @@ Anyway, I feel that this function is too low-level.
 <p>
 <tt/char NxtBlkAlloc (struct tr_se *myTrSe, struct tr_se output&lsqb;&rsqb, unsigned length)/
 <p>
-Both functions are allocating enough disk sectors to fit the number of <tt/length/ in them. You
-will find output in <tt/output/ which is table of <tt/struct tr_se/. The last entry will have the
-number of track equal to 0 and sector equal to 255. The simplest way of using them is to use
-predefined space in GEOS data space and pass <tt/fileTrScTab/, which is a predefined table.
+Both functions allocate enough disk sectors to fit <tt/length/ bytes in them. You
+find the output in <tt/output/ which is a table of <tt/struct tr_se/. The last entry will have the
+track equal to 0 and sector equal to 255. The simplest way of using them is to use
+predefined space in the GEOS data space and pass <tt/fileTrScTab/, which is a predefined table.
 <p>
-The difference between those two is that <tt/NextBlkAlloc/ will start allocating from given sector,
+The difference between those two is that <tt/NextBlkAlloc/ starts allocating from the given sector,
 and <tt/BlkAlloc/ starts from the first nonused sector.
 <p>
 You need to use <tt/PutDirHead/ later to save any changes in BAM.
@@ -786,7 +786,7 @@ You need to use <tt/PutDirHead/ later to save any changes in BAM.
 <p>
 <tt/char FreeBlock (struct tr_se *myTrSe)/
 <p>
-Simply deallocates a block in BAM. You need to update BAM with <tt/PutDirHead/.
+Simply deallocates a block in the BAM. You need to update the BAM with <tt/PutDirHead/.
 
 <sect3>SetNextFree
 <p>
@@ -794,7 +794,7 @@ Simply deallocates a block in BAM. You need to update BAM with <tt/PutDirHead/.
 <p>
 This function finds the first free sector starting from given track and sector and allocates it.
 It might return the same argument if the given block is not allocated. I wanted it to be type
-clean, but it made usage a bit tricky. To assign a value to own <tt/struct tr_se/ you have to
+clean, but this made the usage a bit tricky. To assign a value to your own <tt/struct tr_se/ you have to
 cast both variables to <tt/unsigned/. E.g.
 <tscreen><verb>
 struct tr_se myTrSe;
@@ -804,11 +804,11 @@ struct tr_se myTrSe;
 <p>
 In this example <tt/otherTrSe/ can be replaced by <tt/myTrSe/.
 <p>
-Note: you <em/must/ use casting to have correct values.
+Note: you <em/must/ use casting to have the correct values.
 
 <sect2>Low-level disk IO
 <p>
-Functions described here are more usable in kernal or drivers code, less common in applications,
+Functions described here are more usable in Kernal or drivers code, less common in applications,
 but who knows, maybe someone will need them.
 
 <sect3>EnterTurbo, ExitTurbo, PurgeTurbo
@@ -819,13 +819,13 @@ but who knows, maybe someone will need them.
 <p>
 <tt/void PurgeTurbo (void)/
 <p>
-These functions are interface to GEOS TurboDos feature which makes slow Commodore drives a bit
+These functions are the interface to the GEOS TurboDos feature which makes slow Commodore drives a bit
 more usable. <tt/EnterTurbo/ enables TurboDos unless it is already enabled. If not, then you will
-have to wait a bit to transfer TurboDos code into disk drive RAM. <tt/ExitTurbo/ disables TurboDos.
-This is useful for sending some DOS commands for drive e.g. for formatting. Note that before any
-interaction with Kernal in ROM you have to call <tt/InitForIO/. You don't have to worry about speed.
+have to wait a bit to transfer the TurboDos code into disk drive RAM. <tt/ExitTurbo/ disables TurboDos.
+This is useful for sending some DOS commands to a drive e.g. for formatting. Note that before any
+interaction with the Kernal in ROM you have to call <tt/InitForIO/. You don't have to worry about speed.
 <tt/EnterTurbo/ will only enable TurboDos (no code transfer) if TurboDos was disabled with
-<tt/ExitTurbo/. <tt/PurgeTurbo/ acts different from <tt/ExitTurbo/ - it not only disables TurboDos,
+<tt/ExitTurbo/. <tt/PurgeTurbo/ acts differently from <tt/ExitTurbo/ - it not only disables TurboDos,
 but also removes it from drive RAM (not quite true, but it works like that). After using
 <tt/PurgeTurbo/ the next call to <tt/EnterTurbo/ will reload drive RAM.
 
@@ -833,36 +833,36 @@ but also removes it from drive RAM (not quite true, but it works like that). Aft
 <p>
 <tt/char ChangeDiskDevice (char newDevice)/
 <p>
-This function changes logical number of current device (in fact drives only) with given one. It is
-usable for swapping drives. There's no check if given <tt/newDevice/ already exist, so if you want
+This function changes the logical number of the current device (in fact drives only) to given one. It is
+usable for swapping drives. There's no check if the given <tt/newDevice/ already exist, so if you want
 to change the logical number of drive 8 to 9 and you have drive number 9 then GEOS will probably
-hang on disk access. Use safe, large numbers. Note that safe IEC range is 8-31.
+hang on disk access. Use safe, large numbers. Note that the safe IEC range is 8-31.
 
 <sect2>Disk Initialization
 <p>
-GEOS has two functions for initialization ('logging in' as they say on CP&bsol;M) the disk.
+GEOS has two functions for initialization ('logging in' as they say on CP&bsol;M) of a disk.
 <sect3>OpenDisk
 <p>
 <tt/char OpenDisk (void)/
 <p>
 This function initializes everything for a new disk. It loads and enables TurboDos if needed.
 Then the disk is initialized with <tt/NewDisk/. Next, <tt/GetDirHead/ initializes <tt/curDirHead/.
-Disk names are compared and if they differ then disk cache on REU is cleared. Finally format is
-checked with <tt/ChkDkGEOS/ and disk name is updated in internal tables.
+Disk names are compared and if they differ then the disk cache on REU is cleared. Finally the format is
+checked with <tt/ChkDkGEOS/ and the disk name is updated in the internal tables.
 
 <sect3>NewDisk
 <p>
 <tt/char NewDisk (void)/
 <p>
-This function is similar to DOS command I. It clears REU cache and enables TurboDos if needed.
+This function is similar to the DOS command I. It clears the REU cache and enables TurboDos if needed.
 
 <sect1>Files
 <p>
-This section cover GEOS file interface.
+This section cover the GEOS file interface.
 
 <sect2>Directory handling
 <p>
-Functions described here are common for SEQ and VLIR structures.
+The functions described here are common for SEQ and VLIR structures.
 
 <sect3>Get1stDirEntry and GetNxtDirEntry
 <p>
@@ -870,34 +870,33 @@ Functions described here are common for SEQ and VLIR structures.
 <p>
 <tt/struct filehandle *GetNxtDirEntry (void)/
 <p>
-These two functions are best suited for scanning whole directory for particular files. Note that
-returned filehandles describes all file slots in the directory - even those with deleted files.
-The return value can be obtained by casting both sides to <tt/unsigned/ - as in <tt/SetNextFree/
-function or read directly after call to those two functions from <tt/r5/. Current sector number
-is in <tt/r1/ and sector data itself is in <tt/diskBlkBuf/.
+These two functions are best suited for scanning the whole directory for particular files. Note that
+the returned filehandles describe all file slots in the directory - even those with deleted files.
+The return value can be obtained by casting both sides to <tt/unsigned/ - as in the <tt/SetNextFree/
+function or read directly after a call to those two functions from <tt/r5/. The current sector number
+is in <tt/r1/ and the sector data itself is in <tt/diskBlkBuf/.
 
 <sect3>FindFile
 <p>
 <tt/char FindFile (char *fName)/
 <p>
-This function scans whole directory for the given filename. It returns either 0 (success) or 5
-(FILE_NOT_FOUND, defined in <tt/gdisk.h/) or any other fatal disk read error. After successful
-<tt/FindFile/ you will have <tt/struct filehandle/ at <tt/dirEntryBuf/ filled with file's data and
+This function scans the whole directory for the given filename. It returns either 0 (success) or 5
+(FILE_NOT_FOUND, defined in <tt/gdisk.h/) or any other fatal disk read error. After a successful
+<tt/FindFile/ you will have <tt/struct filehandle/ at <tt/dirEntryBuf/ filled with the file's data and
 other registers set as described in <tt/GetNxtDirEntry/.
 
 <sect3>FindFTypes
 <p>
 <tt/char FindFTypes (char *buffer, char fType, char fMaxNum, char *classTxt)/
 <p>
-This function scans directory and fills a table at <tt/buffer/ with <tt/char &lsqb;17&rsqb;/ entries.
-<tt/fType/ is GEOS type of searched files and <tt/classTxt/ is a string for Class field in file
-header. Class will match if given will be equal or shorter than that found in file's header block.
-If you want just to find all files with given GEOS type you should pass empty string or <tt/NULL/ as
-<tt/classTxt/. Be warned that for searching <tt/NON_GEOS/ files must pass <tt/NULL/ as <tt/classTxt/.
-<tt/fMaxNum/ is the maximal number of found files, thus the <tt/buffer/ must
-provide area of size equal to <tt/17 * fMaxNum/.
-This function returns the number of found files, ranging from 0 to number passed as <tt/fMaxNum/.
-Return value can be also restored from <tt/r7H/.
+This function scans the directory and fills a table at <tt/buffer/ with <tt/char &lsqb;17&rsqb;/ entries.
+<tt/fType/ is the GEOS type of the searched files and <tt/classTxt/ is a string for the Class field in the file
+header. Class matches if the given string is equal or shorter than that found in the file's header block.
+If you want just to find all files with the given GEOS type you should pass an empty string or <tt/NULL/ as
+<tt/classTxt/. Be warned that for searching <tt/NON_GEOS/ files you must pass <tt/NULL/ as <tt/classTxt/.
+<tt/fMaxNum/ is the maximal number of files to find, thus the <tt/buffer/ must provide an area of size
+equal to <tt/17 * fMaxNum/. This function returns the number of found files, ranging from 0 to number
+passed as <tt/fMaxNum/. The return value can be also restored from <tt/r7H/.
 
 <sect3>DeleteFile
 <p>
@@ -915,13 +914,13 @@ I think it is obvious...
 <p>
 <tt/char GetFHdrInfo (struct filehandle *myFile)/
 <p>
-This function loads the file header into <tt/fileHeader/ buffer. Using after e.g. <tt/FindFile/
-you can pass address of <tt/dirEntryBuf/.
+This function loads the file header into the <tt/fileHeader/ buffer. Using after e.g. <tt/FindFile/
+you can pass the address of <tt/dirEntryBuf/.
 
 <sect2>Common and SEQ structure
 <p>
-Functions described here are common for SEQ and VLIR structures because arguments passed are
-starting track and sector which may point either to start of a chain for VLIR or data for SEQ.
+Functions described here are common for SEQ and VLIR structures because the arguments passed are the
+starting track and sector which may point either to the start of a chain for VLIR or the data for SEQ.
 
 <sect3>GetFile
 <p>
@@ -929,12 +928,12 @@ starting track and sector which may point either to start of a chain for VLIR or
 <p>
 This routine loads and runs a given file <tt/fname/. The file must be one of following types:
 <tt/SYSTEM, DESK_ACC, APPLICATION, APPL_DATA, PRINTER,/ or <tt/INPUT_DEVICE/. The execution
-address is taken from file header. If it is zero, then file is only loaded. Only the first chain
-from VLIR files is loaded. If <tt/flag/ has bit 0 set then load address is taken from <tt/loadaddr/
-and not from file header. In this case <tt/APPLICATION/ files will be only loaded, not executed.
+address is taken from the file header. If it is zero, then the file is only loaded. Only the first chain
+from VLIR files is loaded. If <tt/flag/ has bit 0 set then the load address is taken from <tt/loadaddr/
+and not from the file header. In this case <tt/APPLICATION/ files will be only loaded, not executed.
 This does not apply to <tt/DESK_ACC/. If either bit 6 or 7 of <tt/flag/ are set, then 16 bytes from
-<tt/datadname/ is copied to <tt/dataDiskName/ and 16 bytes from <tt/datafname/ goes to <tt/dataFileName/
-thus becoming parameters for the new application. Pass <tt/NULL/ as any unused parameter.
+<tt/datadname/ are copied to <tt/dataDiskName/ and 16 bytes from <tt/datafname/ go to <tt/dataFileName/
+thus becoming parameters for the new application. Pass <tt/NULL/ for any unused parameter.
 
 <sect3>ReadFile
 <p>
@@ -947,70 +946,70 @@ This function reads at most <tt/fLength/ bytes into <tt/buffer/ from chained sec
 <p>
 <tt/char ReadByte (void)/
 <p>
-This function returns next byte from a file. Before the first call to it you must load <tt/r5/
-with <tt/NULL/, <tt/r4/ with sector buffer address and <tt/r1/ with track and sector of the
+This function returns the next byte from a file. Before the first call to it you must load <tt/r5/
+with <tt/NULL/, <tt/r4/ with the sector buffer address and <tt/r1/ with the track and sector of the
 first block of a file.
 Remember to not modify <tt/r1/, <tt/r4/ and <tt/r5/. These registers must be preserved between
 calls to <tt/ReadByte/.
 <p>
-Returned value is valid only if there was no error. End of file is marked as <tt/BFR_OVERFLOW/
-in <tt/__oserror/, this is set when trying to read one byte after the end of file, in this case
+The returned value is valid only if there was no error. The end of file is marked as <tt/BFR_OVERFLOW/
+in <tt/__oserror/, this is set when trying to read one byte after the end of file, in this case the
 returned value is invalid.
 
 <sect3>SaveFile
 <p>
 <tt/char SaveFile (char skip, struct fileheader *myHeader)/
 <p>
-<tt/SaveFile/ will take care of everything needed to create a GEOS file, no matter VLIR of SEQ
-structure. All you need to do is to place data in proper place and prepare a header which will
+<tt/SaveFile/ will take care of everything needed to create a GEOS file, no matter if VLIR of SEQ
+structure. All you need to do is to place the data in the proper place and prepare a header which will
 contain all information about a file. The <tt/skip/ parameter says how many directory pages you
-want to skip before searching for a free slot for directory entry. In most cases you will put
+want to skip before searching for a free slot for the directory entry. In most cases you will put
 <tt/0/ there.
 <p>
 You have to declare a <tt/struct fileheader/ and fill it with proper values. There is only one
-difference - the first two bytes which are link to nonexistent next sector are replaced by a
+difference - the first two bytes which are a link to a nonexistent next sector are replaced by a
 pointer to the DOS filename of the file.
 <p>
-When saving sequential files two most important fields in <tt/struct fileheader/ are <tt/fileheader.load_address/
+When saving sequential files the two most important fields in <tt/struct fileheader/ are <tt/fileheader.load_address/
 and <tt/fileheader.end_address/.
 
 <sect3>FreeFile
 <p>
 <tt/char FreeFile (struct tr_se myTable&lsqb;&rsqb;)/
 <p>
-This function deallocates all sectors contained in passed table.
+This function deallocates all sectors contained in the passed table.
 
 <sect3>FollowChain
 <p>
 <tt/char FollowChain(struct tr_se *myTrSe, char *buffer)/
 <p>
-This function fills a <tt/struct tr_se/ table at <tt/buffer/ with sector numbers for chain of
+This function fills a <tt/struct tr_se/ table at <tt/buffer/ with the sector numbers for a chain of
 sectors starting with <tt/myTrSe/. You can pass such data (<tt/buffer/) to e.g. <tt/FreeFile/.
 
 <sect2>VLIR structure
 <p>
-Here are informations about VLIR files (called later as RecordFile) and functions.
+Here is information about VLIR files (later called RecordFiles) and functions.
 <p>
-VLIR is a file which consists of up to 127 SEQ-like files called records. Each record is like one
-SEQ structure file. Records are grouped together, described by common name - VLIR file name and
-own number. Each record pointed by its number is described by starting track and sector numbers.
+A VLIR structure file consists of up to 127 SEQ-like files called records. Each record is like one
+SEQ structure file. Records are grouped together, described by a common name - the VLIR file name and
+an own number. Each record pointed to by its number is described by the starting track and sector numbers.
 VLIR structures allow records to be empty (<tt/tr_se/ of such record is equal to <tt/&lcub;NULL,$ff&rcub;/),
-or even non-exist (<tt/&lcub;NULL,NULL&rcub;/). Any other numbers represent starting track and sector of
-particular file.
+or even non-exist (<tt/&lcub;NULL,NULL&rcub;/). Any other numbers represent the starting track and sector of
+a particular file.
 <p>
-In GEOS there can be only one file opened at a time. Upon opening VLIR file some information
-about it are copied into memory. You can retrieve records table at <tt/fileTrScTab/ (table of
+In GEOS there can be only one file opened at a time. Upon opening a VLIR file some information
+about it is copied into memory. You can retrieve the records table at <tt/fileTrScTab/ (table of
 128 <tt/struct tr_se/) and from <tt/VLIRInfo/ (<tt/struct VLIR_info/.
-E.g. size of whole VLIR file can be retrieved by reading <tt/VLIRInfo.fileSize/.
+E.g. the size of whole VLIR file can be retrieved by reading <tt/VLIRInfo.fileSize/.
 
 <sect3>OpenRecordFile
 <p>
 <tt/char OpenRecordFile (char *fName)/
 <p>
-This function finds and opens given file. An error is returned if file is not found or if it is not
+This function finds and opens a given file. An error is returned if the file is not found or if it is not
 in VLIR format. Information in <tt/VLIRInfo/ is initialized. VLIR track and sector table is
-loaded at <tt/fileTrScTab/ and will be valid until call to <tt/CloseRecordFile/ so don't modify it.
-You should <tt/PointRecord/ before trying to do something with file.
+loaded at <tt/fileTrScTab/ and will be valid until a call to <tt/CloseRecordFile/ so don't modify it.
+You should call <tt/PointRecord/ before trying to do something with the file.
 
 <sect3>CloseRecordFile
 <p>
@@ -1022,16 +1021,16 @@ This function calls <tt/UpdateRecordFile/ and clears internal GEOS variables.
 <p>
 <tt/char UpdateRecordFile (void)/
 <p>
-This function will check <tt/VLIRInfo.fileWritten/ flag and if it is set, then <tt/curDirHead/ is
-updated along with size and date stamps in directory entry.
+This function will check the <tt/VLIRInfo.fileWritten/ flag and if it is set, then <tt/curDirHead/ is
+updated along with size and date stamps in the directory entry.
 
 <sect3>PointRecord
 <p>
 <tt/char PointRecord (char recordNumber)/
 <p>
 This function will setup internal variables (and <tt/VLIRInfo.curRecord/) and return the track and
-sector of given record in <tt/r1/. Note that the data may not be valid (if record is non-existing
-you will get 0,0 and if it is empty - 255, 0).
+sector of the given record in <tt/r1/. Note that the data may not be valid (if the record is non-existing
+you will get 0,0 and if it is empty - 255,0).
 
 <sect3>NextRecord and PreviousRecord
 <p>
@@ -1045,14 +1044,14 @@ These two work like <tt/PointRecord/. Names are self-explanatory.
 <p>
 <tt/char AppendRecord (void)/
 <p>
-This function will append an empty record ( pair of 255,0 ) to current VLIR track and sector
+This function will append an empty record (pair of 255,0) to the current VLIR track and sector
 table. It will also set <tt/VLIRInfo.curRecord/ to its number.
 
 <sect3>DeleteRecord
 <p>
 <tt/char DeleteRecord (void)/
 <p>
-This function will remove current record from the table, and move all current+1 records one place
+This function will remove the current record from the table, and move all current+1 records one place
 back (in the table). Note that there's no BAM update and you must call <tt/UpdateRecordFile/ to
 commit changes.
 
@@ -1061,7 +1060,7 @@ commit changes.
 <tt/char InsertRecord (void)/
 <p>
 This function will insert an empty record in place of <tt/VLIRInfo.curRecord/ and move all following
-records in table one place forward (contents of <tt/VLIRInfo.curRecord/ after call to <tt/InsertRecord/
+records in the table one place forward (contents of <tt/VLIRInfo.curRecord/ after a call to <tt/InsertRecord/
 can be found in <tt/VLIRInfo.curRecord + 1/).
 
 <sect3>ReadRecord and WriteRecord
@@ -1070,35 +1069,35 @@ can be found in <tt/VLIRInfo.curRecord + 1/).
 <p>
 <tt/char WriteRecord (char *buffer, unsigned fLength)/
 <p>
-This function will load or save at most <tt/fLength/ bytes from currently pointed record into or from
+This function will load or save at most <tt/fLength/ bytes from the currently pointed record into or from
 <tt/buffer/.
 
 <sect1>Memory and Strings
 <p>
-Functions covered in this section are common for whole C world - copying memory parts and
-strings is one of the main computer tasks. GEOS also has interface to do this. These functions
-are replacement for those like <tt/memset, memcpy, strcpy/ etc. from standard libraries.
+The functions covered in this section are common for the whole C world - copying memory parts and
+strings is one of the main computer tasks. GEOS also has an interface to do this. These functions
+are replacements for those like <tt/memset, memcpy, strcpy/ etc. from standard libraries.
 If you are dealing with short strings (up to 255 characters) you should use these functions
-instead of standard ones. E.g. <tt/CopyString/ instead of <tt/strcpy/. It will work faster.
+instead of standard ones, e.g. <tt/CopyString/ instead of <tt/strcpy/. It will work faster.
 <p>
-However some of them have slightly different calling convention (order of arguments to be specific),
-so please check their syntax here before direct replacing.
+However some of them have slightly different calling conventions (order of arguments to be specific),
+so please check their syntax here before a direct replacement.
 <p>
 Please note that the memory areas described here as <em/strings/ are up to 255 characters (without
-counting the terminating <tt/NULL/), and <em/regions/ can cover whole 64K of memory.
+counting the terminating <tt/NULL/), and <em/regions/ can cover the whole 64K of memory.
 
 <sect2>CopyString
 <p>
 <tt/void CopyString (char *dest, char *src)/
 <p>
-This function copies string from <tt/src/ to <tt/dest/, until it reaches <tt/NULL/. <tt/NULL/
+This function copies the string from <tt/src/ to <tt/dest/, until it reaches <tt/NULL/. The <tt/NULL/
 is also copied.
 
 <sect2>CmpString
 <p>
 <tt/char CmpString (char *s1, char *s2)/
 <p>
-This function compares string <tt/s1/ to <tt/s2/ for equality - this is case sensitive, and both
+This function compares the strings <tt/s1/ to <tt/s2/ for equality - this is case sensitive, and both
 strings have to have the same length. It returns either <tt/true/ (non-zero) or <tt/false/ (zero).
 
 <sect2>CopyFString and CmpFString
@@ -1108,14 +1107,14 @@ strings have to have the same length. It returns either <tt/true/ (non-zero) or 
 <tt/char CmpFString (char length, char *s1, char *s2)/
 <p>
 These two are similar to <tt/CopyString/ and <tt/CmpString/ except the fact, that you provide
-the length of copied or compared strings. The strings can also contain several <tt/NULL/
+the length of the copied or compared strings. The strings can also contain several <tt/NULL/
 characters - they are not treated as delimiters.
 
 <sect2>CRC
 <p>
 <tt/unsigned CRC (char *src, unsigned length)/
 <p>
-This function calculates the CRC checksum for given memory range. I don't know if it is
+This function calculates the CRC checksum for the given memory range. I don't know if it is
 compatible with standard CRC routines.
 
 <sect2>FillRam and ClearRam
@@ -1124,27 +1123,27 @@ compatible with standard CRC routines.
 <p>
 <tt/void *ClearRam (char *dest, unsigned length)/
 <p>
-Both functions are filling given memory range. <tt/ClearRam/ fills with <tt/0s/, while
-<tt/FillRam/ uses given <tt/value/. Be warned that these functions destroy <tt/r0, r1 and
-r2L/ registers. These are aliases for <tt/memset/ and <tt/bzero/, respectively.
+Both functions are filling the given memory range. <tt/ClearRam/ fills with <tt/0s/, while
+<tt/FillRam/ uses the given <tt/value/. Be warned that these functions destroy <tt/r0, r1 and
+r2L/ registers. The functions are aliases for <tt/memset/ and <tt/bzero/, respectively.
 
 <sect2>MoveData
 <p>
 <tt/void *MoveData (char *dest, char *src, unsigned length)/
 <p>
-This functions copies one memory region to another. There are checks for overlap and the
-non-destructive method is chosen. Be warned that this function destroys contents of
-<tt/r0, r1 and r2/ registers. This is also alias for <tt/memcpy/
+This functions copies one memory region to another. There are checks for an overlap and the
+non-destructive method is chosen. Be warned that this function destroys contents of the
+<tt/r0, r1 and r2/ registers. This function is an alias for <tt/memcpy/.
 
 <sect2>InitRam
 <p>
 <tt/void InitRam (char *table)/
 <p>
 This function allows to initialize multiple memory locations with single bytes or strings.
-This is done with <tt/table/ where everything is defined. See structures chapter for description of
+This is done with a <tt/table/ where everything is defined. See the structures chapter for a description of
 <tt/InitRam's/ command string.
 
-<sect2>Stash, Fetch, Swap, and VerifyRAM
+<sect2>StashRAM, FetchRAM, SwapRAM, and VerifyRAM
 <p>
 <tt/void StashRAM (char bank, unsigned length, char *reuAddress, char *cpuAddress)/
 <p>
@@ -1154,15 +1153,15 @@ This is done with <tt/table/ where everything is defined. See structures chapter
 <p>
 <tt/ char VerifyRAM (char bank, unsigned length, char *reuAddress, char *cpuAddress)/
 <p>
-These functions are interface to REU - Ram Expansion Unit. I think that they are self-explanatory.
-You can check for REU presence by taking value of <tt/ramExpSize/. You have to do it before
+These functions are the interface to a REU - Ram Expansion Unit. I think that they are self-explanatory.
+You can check for REU presence by taking the value of <tt/ramExpSize/. You have to do it before
 using any of these functions.
 
 <sect1>Processes and Multitasking
 <p>
-Weird? Not at all. GEOS has limited multitasking ability. You can set up a chain of functions
+Weird? Not at all. GEOS has some limited multitasking ability. You can set up a chain of functions
 called in specified intervals and you can put the main program to sleep without disturbing other
-tasks and making user interface unresponsive.
+tasks and making the user interface unresponsive.
 
 <sect2>InitProcesses
 <p>
@@ -1172,11 +1171,11 @@ This is the main initialization routine. After calling it processes are set up, 
 enabled. The parameters for <tt/InitProcesses/ are:
 <itemize>
     <item><tt/number/ - number of processes
-    <item><tt/processTab/ - table of <tt/struct process/, with size equal to <tt/number/
+    <item><tt/processTab/ - a table of <tt/struct process/, with size equal to <tt/number/
 </itemize>
 <p>
-Single task is described by entry in <tt/processTab/, it contains two values - <tt/pointer/ to
-task function and number of <tt/jiffies/ which describe the delay between calls to task. On PAL
+A single task is described by an entry in <tt/processTab/, it contains two values - a <tt/pointer/ to
+the task function and a number of <tt/jiffies/ which describe the delay between calls to task. On PAL
 systems there are 50 jiffies per second, while on NTSC there are 60.
 <p>
 The maximum number of tasks is 20. Be warned that GEOS doesn't check if parameters are valid and
@@ -1185,7 +1184,7 @@ if <tt/processTab/ would be too large it would overwrite existing data in GEOS s
 There's one important thing - the last entry in <tt/processTab/ has to be <tt/NULL,NULL/, so the
 maximum size of <tt/processTab/ is equal to 21.
 <p>
-See description of <tt/process/ structure for more detailed discussion on this.
+See the description of <tt/process/ structure for a more detailed discussion on this.
 
 <sect2>RestartProcess and EnableProcess
 <p>
@@ -1193,12 +1192,12 @@ See description of <tt/process/ structure for more detailed discussion on this.
 <p>
 <tt/void EnableProcess (char processNumber)/
 <p>
-These two functions start the task counter. <tt/RestartProcess/ for each process should be called
+These two functions start the task counter. <tt/RestartProcess/ should be called for each process
 after <tt/InitProcesses/, because it resets all flags and counters and it starts the counters.
 <p>
-<tt/RestartProcess/ enables counters and sets their initial value to that given in <tt/processTab/.
+<tt/RestartProcess/ enables the counters and sets their initial value to that given in <tt/processTab/.
 <p>
-<tt/EnableProcess/ forces given process to execute by simulating the timer running out of time.
+<tt/EnableProcess/ forces the given process to execute by simulating the timer expiring.
 
 <sect2>BlockProcess and UnBlockProcess
 <p>
@@ -1206,8 +1205,8 @@ after <tt/InitProcesses/, because it resets all flags and counters and it starts
 <p>
 <tt/void UnBlockProcess (char processNumber)/
 <p>
-<tt/BlockProcess/ disables the execution of given process, but this does not disable the timers.
-It means that if you call <tt/UnBlockProcess/ before timer runs out, the process will be executed.
+<tt/BlockProcess/ disables the execution of the given process, but this does not disable the timers.
+It means that if you call <tt/UnBlockProcess/ before the timer runs out, the process will be executed.
 <p>
 <tt/UnBlockProcess/ does the opposite.
 
@@ -1224,11 +1223,11 @@ This is not equal to <tt/RestartProcess/ as timers are not reloaded with initial
 <p>
 <tt/void Sleep (unsigned jiffies)/
 <p>
-This function is multitasking sleep - the program is halted, but it doesn't block other functions
+This function is a multitasking sleep - the program is halted, but it doesn't block other functions
 e.g. callbacks from menus and icons.
-The only argument here is the number of jiffies to wait until app will wake up. It depends on
+The only argument here is the number of jiffies to wait until the app will wake up. It depends on the
 video mode (PAL or NTSC) how many jiffies there are per second (50 or 60, respectively).
-If you don't want to worry about it and need only full second resolution, call standard
+If you don't want to worry about it and need only full second resolution, call the standard
 <tt/sleep/ function from <tt/unistd.h/.
 
 <sect1>System Functions
@@ -1247,7 +1246,7 @@ up. You shouldn't use this unless you know what you are doing.
 <tt/void DoneWithIO (void)/
 <p>
 These functions are called by some disk routines. You should call them only if you want to
-do something with IO registers or call one of Kernal ROM routines. Note that this is rather an
+do something with IO registers or call one of the Kernal ROM routines. Note that this is rather an
 expensive way of turning off IRQs and enabling IO.
 
 <sect2>MainLoop
@@ -1255,8 +1254,8 @@ expensive way of turning off IRQs and enabling IO.
 <tt/void MainLoop (void)/
 <p>
 Returns control to the system. Any code between call to <tt/MainLoop/ and the end of current
-function will never be executed. When in <tt/MainLoop/ systems waits for your action - using
-icons, keyboard or menus to force some specific action from program. You have to define
+function will never be executed. When in <tt/MainLoop/ the system waits for your action - using
+icons, keyboard or menus to force some specific action from the program. You have to define
 proper handlers before that.
 
 <sect2>EnterDeskTop
@@ -1271,32 +1270,32 @@ use it. Always use <tt/exit()/ instead. Library destructors and functions regist
 <p>
 <tt/void ToBASIC (void)/
 <p>
-This one is another way of finishing application - forcing GEOS to shutdown and exit to BASIC.
-I was considering whether to include it or not, but maybe someone will need it. Which is I doubt.
+This one is another way of terminating an application - forcing GEOS to shutdown and exit to BASIC.
+I was considering whether to include it or not, but maybe someone will need it - which I doubt.
 <p>
 <em/WARNING:/ library destructors and functions registered with <tt/atexit()/ will not be called
-so it is quite unsafe way to finish your program.
+so it is quite unsafe way to terminate your program.
 
 <sect2>Panic
 <p>
 <tt/void Panic (void)/
 <p>
-This calls system's <tt/Panic/ handler - it shows dialog box with message
+This calls system's <tt/Panic/ handler - it shows a dialog box with the message
 <tscreen><verb>
 System error at:xxxx
 </verb></tscreen>
-where <tt/xxxx/ is last known execution address (caller). By default this is bound to <tt/BRK/
+where <tt/xxxx/ is last known execution address (caller). By default this is bound to the <tt/BRK/
 instruction, but it might be usable in debugging as kind of <tt/assert/. (Note that <tt/assert/
 is available as a separate function and will give you more information than that).
 <p>
-System is halted after call to <tt/Panic/ which means that library destructors will not be
+The system is halted after a call to <tt/Panic/ which means that library destructors will not be
 called and some data may be lost (no wonder you're panicking).
 
 <sect2>CallRoutine
 <p>
 <tt/void CallRoutine (void &ast;myFunct)/
 <p>
-This is system caller routine. You need to provide pointer to a function and it will be immediately
+This is a system caller routine. You need to provide a pointer to a function and it will be immediately
 called, unless the pointer is equal to <tt/NULL/. This is the main functionality of this function -
 you don't need to check if the pointer is valid.
 
@@ -1304,9 +1303,8 @@ you don't need to check if the pointer is valid.
 <p>
 <tt/unsigned GetSerialNumber (void)/
 <p>
-This function returns the serial number of system. It might be used for copy-protection.
-However, please remember that the Free Software is a true power and you are using it
-right now.
+This function returns the serial number of the system. It might be used for copy-protection.
+However, please remember that Free Software is a true power and you are using it right now.
 
 <sect2>GetRandom
 <p>
@@ -1319,38 +1317,38 @@ a=random;
 but by calling this function you are sure that the results will be always different.
 <tt/random/ is updated once a frame (50Hz PAL) and on every call to <tt/GetRandom/.
 <p>
-Note that it is not the same as <tt/rand/ function from the standard library. <tt/GetRandom/
-will give you unpredictable results (if IRQs would occur between calls to it) while
-<tt/rand/ conforms to the standard and for given seed (<tt/srand/) it always returns with the
+Note that this is not the same as the <tt/rand/ function from the standard library. <tt/GetRandom/
+will give you unpredictable results (if IRQs occur between calls to it) while
+<tt/rand/ conforms to the standard and for a given seed (<tt/srand/) always returns with the
 same sequence of values.
 
 <sect2>SetDevice
 <p>
 <tt/void SetDevice (char device)/
 <p>
-This function sets current device to given. It might be used together with <tt/InitForIO/,
-<tt/DoneWithIO/ and some Kernal routines. Unless new device is a disk drive this only sets
-new value in <tt/curDevice/, in other case new disk driver is loaded from REU or internal RAM.
+This function sets the current device to the given. It might be used together with <tt/InitForIO/,
+<tt/DoneWithIO/ and some Kernal routines. Unless the new device is a disk drive this only sets
+new value in <tt/curDevice/, in the other case new disk driver is loaded from REU or internal RAM.
 
 <sect2>get_ostype
 <p>
 <tt/char get_ostype (void)/
 <p>
-This function returns GEOS Kernal version combined (by logical OR) with machine type. Read
-<tt/gsys.h/ for definitions of returned values.
+This function returns the GEOS Kernal version combined (by logical OR) with the machine type. Read
+<tt/gsys.h/ for definitions of the returned values.
 
 <sect2>get_tv
 <p>
 <tt/char get_tv (void)/
 <p>
-This function returns PAL/NTSC flag combined (by logical OR) with 40/80 columns flag. This is
-not the best way to check if screen has 40 or 80 columns since PAL/NTSC check is always
-performed and it can take as long as full raster frame. If you just want to know if
-screen has 40 or 80 columns use expression <tt/graphMode & 0x80/ which returns <tt/0/ for
-40 columns and <tt/0x80/ for 80 columns. Remember that this parameter can be changed during
+This function returns the PAL/NTSC flag combined (by logical OR) with the 40/80 columns flag. This is
+not the best way to check if the screen has 40 or 80 columns since a PAL/NTSC check is always
+performed and it can take as long as a full raster frame. If you just want to know if the 
+screen has 40 or 80 columns use the expression <tt/graphMode & 0x80/ which returns <tt/0/ for
+40 columns and <tt/0x80/ for 80 columns. Remember that this value can be changed during
 runtime. It is unclear if this will work for GEOS 64 so you probably do not want to test
 anything if not running under GEOS128. Use <tt/get_ostype/ to check it. Read <tt/gsys.h/ for
-definitions of returned values.
+definitions of the returned values.
 
 <sect>Library Structures
 <p>

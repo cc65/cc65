@@ -59,7 +59,7 @@ Special locations:
   The text screen is located at &dollar;400 (as in the standard setup).
 
   <tag/Stack/
-  The C runtime stack is located at &dollar;CFFF and growing downwards.
+  The C runtime stack is located at &dollar;BFFF and growing downwards.
 
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C
@@ -151,7 +151,7 @@ structures, accessing the struct fields will access the chip registers.
   is explained in <tt/_6526.h/.
 
   <tag><tt/COLOR_RAM/</tag>
-  A character array that mirrors the color RAM of the C64 at &dollar;D800.
+  A character array that mirrors the color RAM of the C128 at &dollar;D800.
 
 </descrip><p>
 

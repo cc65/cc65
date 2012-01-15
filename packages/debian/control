@@ -2,18 +2,26 @@ Source: cc65
 Section: non-free/devel
 Priority: optional
 Maintainer: Michael Klein <michael.klein@puffin.lb.shuttle.de>
-Build-Depends: debhelper, linuxdoc-tools, perl
+Build-Depends: debhelper, linuxdoc-tools, groff, dpatch
 Standards-Version: 3.2.1
 
 Package: cc65
-Suggests: cc65-apple2, cc65-atari, cc65-c128, cc65-c64, cc65-cbm510, cc65-cbm610, cc65-geos, cc65-pet, cc65-plus4, cc65-c16, cc65-vic20
+Suggests: cc65-apple2, cc65-apple2enh, cc65-atari, cc65-c128, cc65-c64, cc65-cbm510, cc65-cbm610, cc65-geos, cc65-pet, cc65-plus4, cc65-c16, cc65-vic20
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: Crosscompiler/Crossassembler for 6502 systems
  A C crosscompiler for 6502 systems, including a macroassembler that
  supports 6502, 65SC02 and 65816 CPUs, a linker, an archiver and some
  other tools. To create programs for one of the supported target
- machines, you have to install at least one of the library packages.
+ machines, you have to install at least one of the target platform
+ packages in addition to the main package.
+
+Package: cc65-doc
+Architecture: all
+Depends: cc65 (>= 2.13.2-1)
+Description: Documentation for the cc65 C compiler
+ This package contains the documentation for the cc65 C compiler, in HTML
+ and info format.
 
 Package: cc65-apple2
 Architecture: all
@@ -22,12 +30,26 @@ Description: Apple ][ specific libraries and headers for the cc65 compiler
  This package contains the header files and libraries needed to write
  programs for the Apple ][ using the cc65 crosscompiler.
 
+Package: cc65-apple2enh
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description:  Apple //e specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Apple //e using the cc65 crosscompiler.
+
 Package: cc65-atari
 Architecture: all
 Depends: cc65 (= ${Source-Version})
 Description: Atari specific libraries and headers for the cc65 compiler
  This package contains the header files and libraries needed to write
  programs for the 8 bit Atari machines using the cc65 crosscompiler.
+
+Package: cc65-atmos
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: Oric Atmos specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Oric Atmos using the cc65 crosscompiler.
 
 Package: cc65-c128
 Architecture: all
@@ -66,6 +88,21 @@ Description: GEOS specific libraries and headers for the cc65 compiler
  This package contains the header files and libraries needed to write
  GEOS programs for the C64/C128 using the cc65 crosscompiler.
 
+Package: cc65-lynx
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: Lynx specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Lynx Game Console using the cc65 crosscompiler.
+
+Package: cc65-nes
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: NES specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Nintendo Entertainment System using the cc65
+ crosscompiler.
+
 Package: cc65-pet
 Architecture: all
 Depends: cc65 (= ${Source-Version})
@@ -81,6 +118,13 @@ Description: Plus/4 specific libraries and headers for the cc65 compiler
  This package contains the header files and libraries needed to write
  programs for the Commodore Plus/4 and C16/116 using the cc65
  crosscompiler.
+
+Package: cc65-supervision
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: Supervision specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Supervision Game console using the cc65 crosscompiler.
 
 Package: cc65-c16
 Architecture: all

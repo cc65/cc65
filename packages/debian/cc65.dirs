@@ -1,8 +1,13 @@
 usr/bin
 usr/lib/cc65/lib
-usr/lib/cc65/include/geos
+usr/lib/cc65/obj
+usr/lib/cc65/ser
+usr/lib/cc65/cfg
+usr/lib/cc65/include
 usr/lib/cc65/include/tgi
 usr/lib/cc65/asminc
 usr/lib/cc65/emd
+usr/lib/cc65/joy
+usr/lib/cc65/mou
 usr/lib/cc65/tgi
 usr/share/info

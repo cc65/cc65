@@ -1,2 +1,6 @@
-usr/lib/cc65/lib/geos.lib
-usr/lib/cc65/lib/geos.o
+usr/bin/grc65
+usr/lib/cc65/lib/geos-cbm.lib
+usr/lib/cc65/include/geos/*.h
+usr/lib/cc65/emd/geos-*.emd
+usr/lib/cc65/joy/geos-*.joy
+usr/lib/cc65/tgi/geos-*.tgi

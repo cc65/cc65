@@ -1,3 +1,104 @@
+cc65 (2.13.9-svn5395-1) stable; urgency=low
+
+  * New upstream SVN version
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Sun, 08 Jan 2012 12:05:17 +0100
+
+cc65 (2.13.9-svn5353-1) stable; urgency=low
+
+  * New upstream SVN version
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Sun, 01 Jan 2012 20:09:11 +0100
+
+cc65 (2.13.2-3) stable; urgency=low
+
+  * Change cc65-doc so we do not need new binary packages.
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Tue, 03 Aug 2010 21:17:00 +0200
+
+cc65 (2.13.2-2) stable; urgency=low
+
+  * Fix for cc65-doc package
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Tue, 03 Aug 2010 20:35:00 +0200
+
+cc65 (2.13.2-1) stable; urgency=low
+
+  * New upstream version
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Wed, 17 Mar 2010 10:44:00 +0100
+
+cc65 (2.13.0svn4529-3) stable; urgency=low
+
+  * Add patch so the other libsrc/*/ directories compile even with installed
+    cc65 headers.
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Fri, 18 Dec 2009 19:37:00 +0100
+
+cc65 (2.13.0svn4529-2) stable; urgency=low
+
+  * Add patch so libsrc/tgi compiles even with installed cc65 headers.
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Thu, 17 Dec 2009 21:12:00 +0100
+
+cc65 (2.13.0svn4529-1) stable; urgency=low
+
+  * New upstream SVN version
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Wed, 16 Dec 2009 19:44:00 +0100
+
+cc65 (2.13.0svn4389-2) stable; urgency=low
+
+  * New rules, using newer debhelper
+  * Split documentation in it's own package
+  * Add packages for apple2enh, lynks, atmos, nes and supervision
+  * Add missing build-dependencies
+  * Don't build info files, some names conflict with already used names from other packages
+
+ -- Daniel Serpell <daniel.serpell@gmail.com>  Mon, 26 Oct 2009 08:57:54 -0300
+
+cc65 (2.13.0svn4389-1) stable; urgency=low
+
+  * Added bugfixes from upstream SVN
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Sun, 25 Oct 2009 11:47:00 +0100
+
+cc65 (2.13.0-1) stable; urgency=low
+
+  * New upstream version
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Fri, 23 Oct 2009 13:46:00 +0200
+
+cc65 (2.12.0-1) stable; urgency=low
+
+  * New upstream version
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Tue, 22 Apr 2008 19:11:00 +0200
+
+cc65 (2.11.9-cvs20070211-1) stable; urgency=low
+
+  * New upstream version (cvs)
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Fri, 22 Feb 2007 21:30:00 +0100
+
+cc65 (2.11.9-cvs20060823-1) stable; urgency=low
+
+  * New upstream version (cvs)
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Thu, 14 Sep 2006 17:44:03 +0100
+
+cc65 (2.11.9-cvs20060606-2) stable; urgency=low
+
+  * compile for sarge
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Mon, 17 Jul 2006 20:54:27 +0100
+
+cc65 (2.11.9-cvs20060606-1) stable; urgency=low
+
+  * New upstream version (cvs)
+
+ -- Spiro Trikaliotis <ml-cc65@trikaliotis.net>  Mon, 17 Jul 2006 19:52:13 +0100
+
 cc65 (2.11.0-1) stable; urgency=low
 
   * New upstream version

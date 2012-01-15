@@ -1,2 +1,4 @@
 usr/lib/cc65/lib/atari.lib
-usr/lib/cc65/lib/atari.o
+usr/lib/cc65/tgi/atari*.tgi
+usr/lib/cc65/tgi/atr*.tgi
+usr/lib/cc65/joy/atari*.joy

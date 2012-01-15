@@ -1,1 +1,2 @@
-src/ld65/cfg/geos.cfg
+src/ld65/cfg/geos-apple.cfg
+src/ld65/cfg/geos-cbm.cfg

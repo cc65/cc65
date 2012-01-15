@@ -1,2 +1,8 @@
 usr/lib/cc65/lib/apple2.lib
-usr/lib/cc65/lib/apple2.o
+usr/lib/cc65/obj/apple2-*.o
+usr/lib/cc65/emd/a2.*.emd
+usr/lib/cc65/joy/a2.*.joy
+usr/lib/cc65/mou/a2.*.mou
+usr/lib/cc65/ser/a2.*.ser
+usr/lib/cc65/tgi/a2.*.tgi
+usr/lib/cc65/cfg/apple2-*.cfg

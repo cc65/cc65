@@ -1,0 +1,63 @@
+#! /bin/bash
+
+#exit 1
+
+FILE=debian/cc65-doc.postinst.debhelper
+
+oldpatch() {
+	# $1 = file
+	# $2 = description
+
+	sed -ie "s/\(install-info --quiet\) \(\/usr\/share\/info\/$1.info\)/\1 --section CC65.* \"CC65 cross-compiler for 6502 systems\" --description=\"$2\" \2/" $FILE
+}
+
+patch() {
+	# $1 = file (i.e., cc65 for cc65.info)
+	# $2 = description
+
+	sed -ie "1iINFO-DIR-SECTION CC65 \"CC65 cross-compiler for 6502 systems\"\nSTART-INFO-DIR-ENTRY\n* $1: ($1).   \"$2\"\nEND-INFO-DIR-ENTRY\n\n" doc/$1.info
+}
+
+patch index         "cc65 documentation overview"
+
+# Program documentation
+patch ar65          "Describes the ar65 archiver."
+patch ca65          "Describes the ca65 macro assembler."
+patch ca65html      "Describes the ca65html assembler-source-to-HTML converter."
+patch cc65          "Describes the cc65 C compiler."
+patch cl65          "Describes the cl65 compile & link utility."
+patch co65          "Describes the co65 object-file converter."
+patch da65          "Describes the da65 6502\/65C02 disassembler."
+patch grc65         "Describes the GEOS resource compiler (grc)."
+patch ld65          "Describes the ld65 linker."
+patch od65          "Describes the od65 object file dump utility."
+
+# Usage
+patch intro         "Describes the use of the tools, by building a short 'hello world' example"
+patch coding        "Contains hints on creating the most effective code with cc65."
+patch using-make    "Build programs, using the GNU Make utility."
+patch customizing   "How to use the cc65 toolset for a custom hardware platform (a target system not currently supported by the cc65 library set)."
+patch debugging     "Debug programs, using the VICE emulator."
+
+# Library information and other references
+patch funcref       "A (currently incomplete) function reference."
+patch dio           "Low-level disk I\/O API."
+patch geos          "The GEOSLib manual."
+patch library       "An overview over the cc65 runtime and C libraries."
+
+# Platform-specific information
+patch apple2        "Topics specific to the Apple ][."
+patch apple2enh     "Topics specific to the enhanced Apple \/\/e."
+patch atari         "Topics specific to the Atari 8-bit machines."
+patch atmos         "Topics specific to the Oric Atmos."
+patch c128          "Topics specific to the Commodore 128."
+patch c16           "Topics specific to the Commodore 16\/116."
+patch c64           "Topics specific to the Commodore 64."
+patch cbm510        "Topics specific to the Commodore 510."
+patch cbm610        "Topics specific to the Commodore 610."
+patch lynx          "Topics specific to the Atari Lynx Game Console."
+patch nes           "Topics specific to the Nintendo Entertainment System."
+patch pet           "Topics specific to the Commodore PET machines."
+patch plus4         "Topics specific to the Commodore Plus\/4."
+patch supervision   "Topics specific to the Supervision Console."
+patch vic20         "Topics specific to the Commodore VIC20."

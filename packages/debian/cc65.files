@@ -1,0 +1,16 @@
+usr/bin/ar65
+usr/bin/ca65
+usr/bin/ca65html
+usr/bin/cc65
+usr/bin/cl65
+usr/bin/co65
+usr/bin/da65
+usr/bin/ld65
+usr/bin/od65
+usr/lib/cc65/include/*.h
+usr/lib/cc65/include/em/*.h
+usr/lib/cc65/include/joystick/*.h
+usr/lib/cc65/include/mouse/*.h
+usr/lib/cc65/include/sys/*.h
+usr/lib/cc65/include/tgi/*.h
+usr/lib/cc65/asminc/*.inc

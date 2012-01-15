@@ -1,2 +1,8 @@
+usr/lib/cc65/cfg/c64-*.cfg
 usr/lib/cc65/lib/c64.lib
-usr/lib/cc65/lib/c64.o
+usr/lib/cc65/emd/dtv-*.emd
+usr/lib/cc65/emd/c64-*.emd
+usr/lib/cc65/joy/c64-*.joy
+usr/lib/cc65/mou/c64-*.mou
+usr/lib/cc65/ser/c64-*.ser
+usr/lib/cc65/tgi/c64-*.tgi

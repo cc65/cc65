@@ -1,0 +1,3 @@
+usr/lib/cc65/lib/vic20.lib
+usr/lib/cc65/joy/vic20-*.joy
+usr/lib/cc65/cfg/vic20-*.cfg

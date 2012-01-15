@@ -1,2 +1,3 @@
 usr/lib/cc65/lib/plus4.lib
-usr/lib/cc65/lib/plus4.o
+usr/lib/cc65/joy/plus4-*.joy
+usr/lib/cc65/ser/plus4-*.ser

@@ -1,2 +1,4 @@
 usr/lib/cc65/lib/cbm510.lib
-usr/lib/cc65/lib/cbm510.o
+usr/lib/cc65/emd/cbm510-*.emd
+usr/lib/cc65/joy/cbm510-*.joy
+usr/lib/cc65/ser/cbm510-*.ser

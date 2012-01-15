@@ -1,0 +1,5 @@
+usr/lib/cc65/lib/lynx.lib
+usr/lib/cc65/joy/lynx-*.joy
+usr/lib/cc65/ser/lynx-*.ser
+usr/lib/cc65/tgi/lynx-*.tgi
+usr/lib/cc65/cfg/lynx-*.cfg

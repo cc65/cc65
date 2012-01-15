@@ -2,89 +2,156 @@
 # Made with the aid of debmake, by Christoph Lameter,
 # based on the sample debian/rules file for GNU hello by Ian Jackson.
 
-export DH_COMPAT=3
+#export DH_COMPAT=5
+
+include /usr/share/dpatch/dpatch.make
 
 build: build-stamp
 
-build-stamp:
+build-stamp: patch
 	dh_testdir
+
+	install -d libsrc/apple2enh/extra
 
 	# Add here commands to compile the package.
 	$(MAKE) -C src -f make/gcc.mak
 	$(MAKE) -C libsrc
-	$(MAKE) -C doc all
+	$(MAKE) -C doc txt html info
+
+
+	chmod 755 debian/fixinfo
+	debian/fixinfo
 
 	touch build-stamp
 
-clean:
+	[ -e announce.txt ] || touch announce.txt
+
+clean: unpatch
 	dh_testdir
 	dh_testroot
-	dh_clean
-	-rm -f build-stamp
+	rm -f build-stamp
+
 	-$(MAKE) -C src -f make/gcc.mak zap
 	-$(MAKE) -C libsrc zap
 	-$(MAKE) -C doc zap
-	-rm -f `find . -name "*~"`
 
-binary-indep: build
-	dh_testdir -i
-	dh_testroot -i
-	dh_installdirs -i
-	for arch in apple2 atari c128 c64 cbm510 cbm610 geos pet plus4 c16 vic20; do \
-	  install -m0755 -d debian/cc65-$$arch/usr/lib/cc65/lib; \
-	  install -m0644 `pwd`/libsrc/$$arch.lib debian/cc65-$$arch/usr/lib/cc65/lib/; \
-	  install -m0644 `pwd`/libsrc/$$arch.o debian/cc65-$$arch/usr/lib/cc65/lib/; \
-	  for f in `pwd`/libsrc/$$arch-*.emd; do \
-	    if [ -f $$f ]; then \
-	      install -m0755 -d debian/cc65-$$arch/usr/lib/cc65/emd; \
-	      install -m0644 $$f debian/cc65-$$arch/usr/lib/cc65/emd/;  \
-	    fi; \
-	  done; \
-	  for f in `pwd`/libsrc/$$arch-*.tgi; do \
-	    if [ -f $$f ]; then \
-	      install -m0755 -d debian/cc65-$$arch/usr/lib/cc65/tgi; \
-	      install -m0644 $$f debian/cc65-$$arch/usr/lib/cc65/tgi/;  \
-	    fi; \
-	  done; \
-	  dh_installdocs -p cc65-$$arch src/ld65/cfg/$$arch.cfg; \
-	done
-	dh_installchangelogs -i
-	dh_compress -i
-	dh_fixperms -i
-	dh_installdeb -i
-	dh_shlibdeps -i
-	dh_gencontrol -i
-	dh_md5sums -i
-	dh_builddeb -i
+	# remove files that the upstream system erroneously left behind
+	[ ! -e libsrc/geos-cbm/devel/geos-tgi.tgi ] || rm libsrc/geos-cbm/devel/geos-tgi.tgi
+	[ ! -e libsrc/geos-cbm/devel/geos-vdc.emd ] || rm libsrc/geos-cbm/devel/geos-vdc.emd
+	[ ! -e libsrc/geos-cbm/devel/geos-stdjoy.joy ] || rm libsrc/geos-cbm/devel/geos-stdjoy.joy
 
-binary-arch: checkroot build
-	dh_testdir -a
-	dh_testroot -a
-	dh_installdirs -a
-	dh_installmenu -a
-	for bin in ar65 ca65 cc65 cl65 da65 grc65 ld65 od65 ca65html; do \
-	  install -m0755 `pwd`/src/$$bin/$$bin debian/cc65/usr/bin; \
+	dh_clean
+
+install: DH_OPTIONS=
+install: build
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	
+	# Add here commands to install the package into debian/tmp.
+	# (copied from RPM spec file)
+	mkdir -p debian/tmp/usr/bin
+	mkdir -p debian/tmp/usr/lib/cc65/asminc
+	mkdir -p debian/tmp/usr/lib/cc65/cfg
+	mkdir -p debian/tmp/usr/lib/cc65/emd
+	mkdir -p debian/tmp/usr/lib/cc65/include/em
+	mkdir -p debian/tmp/usr/lib/cc65/include/geos
+	mkdir -p debian/tmp/usr/lib/cc65/include/joystick
+	mkdir -p debian/tmp/usr/lib/cc65/include/mouse
+	mkdir -p debian/tmp/usr/lib/cc65/include/sys
+	mkdir -p debian/tmp/usr/lib/cc65/include/tgi
+	mkdir -p debian/tmp/usr/lib/cc65/joy
+	mkdir -p debian/tmp/usr/lib/cc65/lib
+	mkdir -p debian/tmp/usr/lib/cc65/mou
+	mkdir -p debian/tmp/usr/lib/cc65/obj
+	mkdir -p debian/tmp/usr/lib/cc65/ser
+	mkdir -p debian/tmp/usr/lib/cc65/tgi
+	
+	# Binaries
+	install -s -m 755 src/ar65/ar65 debian/tmp/usr/bin
+	install -s -m 755 src/ca65/ca65 debian/tmp/usr/bin
+	install    -m 755 src/ca65html/ca65html debian/tmp/usr/bin
+	install -s -m 755 src/cc65/cc65 debian/tmp/usr/bin
+	install -s -m 755 src/cl65/cl65 debian/tmp/usr/bin
+	install -s -m 755 src/co65/co65 debian/tmp/usr/bin
+	install -s -m 755 src/da65/da65 debian/tmp/usr/bin
+	install -s -m 755 src/grc65/grc65 debian/tmp/usr/bin
+	install -s -m 755 src/ld65/ld65 debian/tmp/usr/bin
+	install -s -m 755 src/od65/od65 debian/tmp/usr/bin
+	
+	# Libraries and includes
+	install -m 644 libsrc/*.lib debian/tmp/usr/lib/cc65/lib
+	install -m 644 include/*.h debian/tmp/usr/lib/cc65/include
+	install -m 644 include/geos/*.h debian/tmp/usr/lib/cc65/include/geos
+	install -m 644 include/em/*.h debian/tmp/usr/lib/cc65/include/em
+	install -m 644 include/joystick/*.h debian/tmp/usr/lib/cc65/include/joystick
+	install -m 644 include/mouse/*.h debian/tmp/usr/lib/cc65/include/mouse
+	install -m 644 include/sys/*.h debian/tmp/usr/lib/cc65/include/sys
+	install -m 644 include/tgi/*.h debian/tmp/usr/lib/cc65/include/tgi
+	install -m 644 asminc/*.inc debian/tmp/usr/lib/cc65/asminc
+	
+	# Extra object files
+	for extra in libsrc/*-*.o; do \
+	    install -m 644 $${extra} debian/tmp/usr/lib/cc65/obj; \
 	done
-	for info in ar65 ca65 cc65 cl65 ld65 debugging dio geos coding intro library; do \
-	  install -m0755 `pwd`/doc/$$info.info* debian/cc65/usr/share/info; \
+	
+	# Additional linker configurations
+	for config in src/ld65/cfg/*-*.cfg; do \
+	    install -m 644 $${config} debian/tmp/usr/lib/cc65/cfg; \
 	done
-	install -m0644 `pwd`/include/*.h           debian/cc65/usr/lib/cc65/include
-	install -m0644 `pwd`/include/geos/*.h      debian/cc65/usr/lib/cc65/include/geos
-	install -m0644 `pwd`/include/tgi/*.h       debian/cc65/usr/lib/cc65/include/tgi
-	install -m0644 `pwd`/asminc/*.inc          debian/cc65/usr/lib/cc65/asminc
-	dh_installman -a
-	dh_installdocs -a
-	dh_installexamples -a
-	dh_installchangelogs -a
-	dh_compress -a
-	dh_fixperms -a
+	
+	# Drivers
+	install -m 644 libsrc/*.emd debian/tmp/usr/lib/cc65/emd
+	install -m 644 libsrc/*.joy debian/tmp/usr/lib/cc65/joy
+	install -m 644 libsrc/*.mou debian/tmp/usr/lib/cc65/mou
+	install -m 644 libsrc/*.ser debian/tmp/usr/lib/cc65/ser
+	install -m 644 libsrc/*.tgi debian/tmp/usr/lib/cc65/tgi
+	
+	dh_install
+	dh_movefiles
+
+# This single target is used to build all the packages, all at once, or
+# one at a time. So keep in mind: any options passed to commands here will
+# affect _all_ packages. Anything you want to only affect one package
+# should be put in another target, such as the install target.
+binary-common:
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_installexamples
+	dh_installmenu
+#	dh_installcatalogs
+#	dh_installmime
+#	dh_installinit
+	dh_installman
+	dh_installinfo
+#	dh_installwm
+#	dh_lintian
+#	dh_bugfiles
+#	dh_undocumented
 	dh_strip
-	dh_installdeb -a
-	dh_shlibdeps -a
-	dh_gencontrol -a
-	dh_md5sums -a
-	dh_builddeb -a
+	dh_link
+	dh_compress
+	dh_fixperms
+#	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+# Build architecture independant packages using the common target.
+binary-indep: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-i binary-common
+
+# Build architecture dependant packages using the common target.
+binary-arch: build install
+	$(MAKE) -f debian/rules DH_OPTIONS=-a binary-common
+# Any other binary targets build just one binary package at a time.
+binary-%: build install
+	make -f debian/rules binary-common DH_OPTIONS=-p$*
 
 binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary-common binary install
 
-.PHONY: binary binary-arch binary-indep clean checkroot

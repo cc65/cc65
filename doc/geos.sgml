@@ -1353,20 +1353,20 @@ definitions of the returned values.
 <sect>Library Structures
 <p>
 To simplify usage and optimize passing parameters to functions I have declared several structures
-which describe most common objects. Some of these structures are bound to static addresses in
-GEOS data space (<tt/$8000-$8fff/), so you can use their fields directly in optimized way.
-Please see <tt/gsym.h/ and find them. All structures are defined in <tt/gstruct.h/ and you may
+which describe the most common objects. Some of these structures are bound to static addresses in
+the GEOS data space (<tt/$8000-$8fff/), so you can use their fields directly in an optimized way.
+Please see <tt/gsym.h/ to find them. All structures are defined in <tt/gstruct.h/ and you may
 find also some comments there.
 
 <sect1>Graphics Structures
 
 <sect2>pixel
 <p>
-One simple structure describing a point on the screen.
+A simple structure describing a point on the screen.
 
 <sect2>fontdesc
 <p>
-This structure describes a font in one pointsize. There is current font - <tt/struct fontdesc/
+This structure describes a font in one pointsize. There is the current font - <tt/struct fontdesc/
 bound to <tt/curFontDesc/. You can also force GEOS to use your own fonts by calling
 <tt/LoadCharSet/. You just need to open a VLIR font file and load one record - one pointsize -
 somewhere. At the start of this area you already have all data for <tt/fontdesc/ so you can
@@ -1376,14 +1376,14 @@ from disk).
 
 <sect2>window
 <p>
-This widely used structure holds description of a region of the screen. It describes top-left and
+This widely used structure holds the description of a region of the screen. It describes the top-left and
 bottom-right corners of a window.
 
 <sect2>iconpic
 <p>
 Maybe the name isn't the best - it has nothing with <tt/DoIcons/ but with bitmap functions -
-<tt/BitmapUp/ for example. This structure holds parameters needed to properly decode and show
-a bitmap on the screen. Bitmap has to be encoded - if you have some non-GEOS bitmaps simply
+<tt/BitmapUp/ for example. This structure holds the parameters needed to properly decode and show
+a bitmap on the screen. The bitmap has to be encoded - if you have some non-GEOS bitmaps simply
 convert them to Photo Scraps - this is the format used by all GEOS bitmap functions - <tt/DoIcons/
 too.
 
@@ -1393,16 +1393,16 @@ These structures describe click boxes (icons) that can be placed on screen or in
 
 <sect2>icondef
 <p>
-This is the definition of a single click box. Please see <tt/gstruct.h/ for description of its fields.
+This is the definition of a single click box. Please see <tt/gstruct.h/ for a description of its fields.
 
 <sect2>icontab
 <p>
-This is toplevel description of icons to be placed and enabled on the screen. This structure
-has following fields:
+This is the toplevel description of icons to be placed and enabled on the screen. This structure
+has the following fields:
 <itemize>
     <item><tt/char number/ - total number of icons declared here
-    <item><tt/struct pixel mousepos/ - after finishing <tt/DoIcons/ mouse pointer will be placed in
-	this point allowing you to have hint for user what is default action
+    <item><tt/struct pixel mousepos/ - after finishing <tt/DoIcons/ the mouse pointer will be placed in
+	this point allowing you to have a hint for the user what the default action is
     <item><tt/struct icondef tab&lsqb;&rsqb/ - this table of size equal to <tt/icontab.number/ contains
 	descriptions for all icons
 </itemize>
@@ -1411,36 +1411,36 @@ has following fields:
 
 <sect2>tr_se
 <p>
-This simple structure holds track and sector number of something. Do not expect the track to be
+This simple structure holds the track and sector number of something. Do not expect the track to be
 in range 1-35, as GEOS can support many various and weird devices. For example my C128 256K
-expansion is utilized as RAMDisk with layout of 4 tracks 128 sectors each. However assuming that
-track number equal to 0 is illegal might be wise.
+expansion is utilized as RAMDisk with a layout of 4 tracks of 128 sectors each. However assuming that
+a track number equal to 0 is illegal might be wise.
 
 <sect2>f_date
 <p>
-This is placeholder for file datestamp. This structure is also present in <tt/struct filehandle/.
-GEOS is not Y2K compliant, so if current file has in <tt/filehandle.date.year/ value less than 86
+This is a placeholder for a file datestamp. This structure is also present in <tt/struct filehandle/.
+GEOS is not Y2K compliant, so if the current file has in <tt/filehandle.date.year/ a value less than 86
 you can safely assume that it is e.g. 2004 and not 1904.
 
 <sect2>filehandle
 <p>
-This is main file descriptor. It is either entry in the directory (returned from file functions)
+This is the main file descriptor. It is either an entry in the directory (returned from file functions)
 or its copy in <tt/dirEntryBuf/. This is optimized so you can safely get to the file's year e.g.
 by testing <tt/dirEntryBuf.date.year/ - it will be compiled to simple <tt/LDA, STA/.
 
 <sect2>fileheader
 <p>
-This structure holds fileheader description. You can load file's header into <tt/fileHeader/
+This structure holds the fileheader description. You can load a file's header into the <tt/fileHeader/
 fixed area using <tt/GetFHdrInfo/. (note that <tt/fileHeader/ is a place in memory while
 <tt/fileheader/ is a structure).
-You will also need own fileheader for <tt/SaveFile/.
+You will also need your own fileheader for <tt/SaveFile/.
 
 <sect1>System Structures
 
 <sect2>s_date
 <p>
 This structure is defined only for <tt/system_date/. It is slightly different from <tt/f_date/
-so I prepared this one. You can e.g. get or set current time using <tt/system_date.s_hour/ and
+so I prepared this one. You can e.g. get or set the current time using <tt/system_date.s_hour/ and
 <tt/system_date.s_minute/. Accesses to these will be optimized to simple <tt/LDA/ and <tt/STA/
 pair.
 
@@ -1448,15 +1448,15 @@ pair.
 <p>
 You should declare a table of that type to prepare data for <tt/InitProcesses/. The maximum number
 of processes is 20, and the last entry has to be equal to <tt/&lcub;NULL,NULL&rcub;/, so this table may hold
-only 21 entries. The first member of this structure (<tt/pointer/) holds the pointer to called
+only 21 entries. The first member of this structure (<tt/pointer/) holds the pointer to the called
 function (void returning void), you will probably have to cast that pointer into <tt/unsigned int/.
 The second field <tt/jiffies/ holds the amount of time between calls to that function.
 On PAL systems there are 50 jiffies per second, while NTSC have 60 of them.
 
-<sect1>Few thing in detail...
+<sect1>A few things in detail...
 <p>
 GEOSLib uses cc65 non-ANSI extensions to easily initialize data in memory. This is done with a
-kind of array of unspecified length and unspecified type. Here is how it goes:
+kind of array of unspecified length and unspecified type. Here is how it works:
 <tscreen><verb>
 void example = &lcub;
     (char)3, (unsigned)3, (char)0 &rcub;;
@@ -1474,20 +1474,20 @@ cast each member to proper type.
 <sect2>DoMenu structure
 <p>
 <tt/DoMenu/ is responsible for everything concerned with menu processing. Many, many GEOS programs
-are just initializing screen and menu and exit to <tt/MainLoop/. In GEOSLib it is the same as
+are just initializing the screen and menu and returning to <tt/MainLoop/. In GEOSLib it is the same as
 returning from <tt/main/ function without using <tt/exit(0)/.
 <p>
-Menu is described by two types of data - menu descriptors and menu items. Descriptor contains
-information about following menu items, and items are containing names of entries and either
+A menu is described by two types of data - menu descriptors and menu items. A descriptor contains
+information about the following menu items, and items contain names of entries and either
 pointers to functions to execute or, in case of nested menus, pointers to submenu descriptors.
 Note that submenu descriptor can be top-level descriptor, there's no difference in structure,
 just in the content.
 <p>
-Here is how single descriptor looks like:
+Here is how a single descriptor looks like:
 <tscreen><verb>
 void myMenu = &lcub;
 	(char)top, (char)bottom,                // this is the size of the menubox
-	(unsigned)left, (unsigned)right,        // counting all items in current descriptor
+	(unsigned)left, (unsigned)right,        // counting all items in the current descriptor
 	(char)number_of_items | type_of_menu,   // number of following items ORed with
 	                                        // type of this menu, it can be either
 	// HORIZONTAL or VERTICAL if you will have also bit 6 set then menu won't be closed
@@ -1505,32 +1505,32 @@ This is followed by <tt/number_of_items/ of following item description.
 <tt/pointer/ is a pointer to something, what it points for depends from <tt/item_type/. This one
 can have following values:
 <p>
-<tt/MENU_ACTION/ - a function pointed by <tt/pointer/ will be called after clicking on menu item
+<tt/MENU_ACTION/ - a function pointed by <tt/pointer/ will be called after clicking on the menu item
 <p>
 <tt/SUB_MENU/ - <tt/pointer/ points to next menu descriptor - a submenu
 <p>
 Both of them can be ORed with <tt/DYN_SUB_MENU/ and then the <tt/pointer/ points to a function
-which will return in <tt/r0/ needed pointer (to function to execute or a submenu).
+which will return in <tt/r0/ the needed pointer (to function to execute or a submenu).
 <p>
 For creating nested menus (you can have at most 8 levels of submenus) you need to declare such
-structure for each submenu and top level menu.
+a structure for each submenu and top level menu.
 
 <sect2>DoDlgBox command string
 <p>
 <tt/DoDlgBox/ is together with <tt/DoMenu/ one of the most powerful routines in GEOS. It is
-responsible for creating dialog boxes, that is windows which task is to interact with user.
-Format of the command string is following:
+responsible for creating dialog boxes, that is windows which task is to interact with the user.
+The format of the command string is following:
 <tscreen><verb>
     (window size and position)
     (commands and parameters)
     NULL
 </verb></tscreen>
-There is custom type defined for the command string: <tt/dlgBoxStr/.
+There is a custom type defined for the command string: <tt/dlgBoxStr/.
 
 <sect3>Size and position
 <p>
-The first element can be specified in two ways - by using default size and position or specifying
-own. The first case results in
+The first element can be specified in two ways - by using the default size and position or specifying
+your own. The first case results in
 <tscreen><verb>
 const dlgBoxStr example = &lcub;
 	DB_DEFPOS (pattern_of_shadow),
@@ -1547,23 +1547,23 @@ const dlgBoxStr example = &lcub;
 
 <sect3>Commands
 <p>
-The next element of <tt/DoDlgBox/ command string are commands themselves. First six commands are
-default icons and the number of selected icon will be returned from window processor. The icons are
-<tt/OK, CANCEL, YES, NO, OPEN/, and <tt/DISK/. You can use predefined macros for use them, e.g.:
+The next element of the <tt/DoDlgBox/ command string are the commands themselves. The first six commands are
+default icons and the number of the selected icon will be returned from window processor. The icons are
+<tt/OK, CANCEL, YES, NO, OPEN/, and <tt/DISK/. You can use predefined macros for using them, e.g.:
 <tscreen><verb>
 	...
 	DB_ICON(OK, DBI_X_0, DBI_Y_0),
 	...
 </verb></tscreen>
 Note that the position is counted from top left corner of window, not entire screen and that the 'x'
-position is counted in cards (8-pixel) and not in pixels. This is true also for all following commands.
-<tt/DBI_X_0/ and <tt/DBI_Y_0/ are predefined (see <tt/gdlgbox.h/ for more), default positions
-which will make icons to appear on default window exactly where you would expect them.
+position is counted in cards (8-pixel) and not in pixels. This is also true for all following commands.
+<tt/DBI_X_0/ and <tt/DBI_Y_0/ are predefined (see <tt/gdlgbox.h/ for more), the default positions
+which will cause icons to appear on a default window exactly where you would expect them.
 <p>
-<tt/DB_TXTSTR (x, y, text)/ will cause to show given text in the window.
+<tt/DB_TXTSTR (x, y, text)/ will cause to show the given text in the window.
 <p>
 <tt/DB_VARSTR (x, y, ptr)/ works as above, but here you are passing a pointer to a zero page location
-where the address of text is stored. This is useful for information windows where only text content
+where the address of the text is stored. This is useful for information windows where only the text content
 is variable. Consider following:
 <tscreen><verb>
 char text = "foo";
@@ -1573,37 +1573,37 @@ char text = "foo";
 	DB_VARSTR (TXT_LN_X, TXT_LN_1_Y, &amp;r15),
 	...
 </verb></tscreen>
-will cause to appear the word ``foo'' in the window, but you may store the pointer to any text in
-<tt/r15/ (in this case) before call to DoDlgBox.
+will cause the word ``foo'' to appear in the window, but you may store the pointer to any text in
+<tt/r15/ (in this case) before the call to DoDlgBox.
 <p>
-<tt/DB_GETSTR(x, y, ptr, length)/ - will add input from keyboard feature. <tt/ptr/ works as in
-previous example and points to place where text is to be stored. Note that the contents of this
-place will be shown upon creating window. <tt/length/ is the maximum number of characters to input.
+<tt/DB_GETSTR(x, y, ptr, length)/ - will add a input-from-keyboard feature. <tt/ptr/ works as in the
+previous example and points to the location where the text is to be stored. Note that the contents of this
+location will be shown upon creating the window. <tt/length/ is the maximum number of characters to input.
 <p>
-<tt/DB_SYSOPV(ptr)/ - this sets <tt/otherPressVec/ to given pointer. It is called on every keypress.
+<tt/DB_SYSOPV(ptr)/ - this sets <tt/otherPressVec/ to the given pointer. It is called on every keypress.
 <p>
-<tt/DB_GRPHSTR(ptr)/ - data for this command is the pointer for <tt/GraphicsString/ commands.
+<tt/DB_GRPHSTR(ptr)/ - the data for this command is a pointer for <tt/GraphicsString/ commands.
 <p>
-<tt/DB_GETFILES(x, y)/ - for standard window you should pass 4 for both x and y. This function
-draws file selection box and searches current drive for files. Before call to <tt/DoDlgBox/ you
-must load <tt/r7L/ with GEOS filetype of searched files and <tt/r10/ with class text. In <tt/r5/
-you have to load pointer to a <tt/char&lsqb;17&rsqb;/ where selected filename will be copied. It works
+<tt/DB_GETFILES(x, y)/ - for a standard window you should pass 4 for both x and y. This function
+draws a file selection box and searches the current drive for files. Before the call to <tt/DoDlgBox/ you
+must load <tt/r7L/ with the GEOS filetype of searched files and <tt/r10/ with the class text. In <tt/r5/
+you have to load a pointer to a <tt/char&lsqb;17&rsqb;/ where the selected filename will be copied. It works
 like <tt/FindFTypes/ but is limited to first 16 files.
 <p>
-<tt/DB_OPVEC(ptr)/ - this sets the new pointer for button press function, if you pass
+<tt/DB_OPVEC(ptr)/ - this sets a new pointer for the button press function, if you pass
 <tt/RstrFrmDialogue/ here you will cause the window to close after pressing mouse button.
 <p>
-<tt/DB_USRICON(x, y, ptr)/ - places single user icon (click box) on window, <tt/ptr/ points at a
+<tt/DB_USRICON(x, y, ptr)/ - places a single user icon (click box) on the window, <tt/ptr/ points at a
 <tt/struct icondef/ but fields <tt/x/ and <tt/y/ are not used here. You can have at most 8 click
-boxes in a window, this is internal limit of GEOS Kernal.
+boxes in a window, this is an internal limit of the GEOS Kernal.
 <p>
-<tt/DB_USRROUT(ptr)/ - this command causes to immediately call user routine pointed by <tt/ptr/.
+<tt/DB_USRROUT(ptr)/ - this command causes to immediately call the user routine pointed by <tt/ptr/.
 
 <sect2>GraphicsString command string
 <p>
-<tt/GraphicsString/ is a very powerful routine to initialize whole screen at once. There are
-predefined macros for all commands, names are self-explanatory, see them in <tt/ggraph.h/. Last
-command have to be <tt/GSTR_END/. There is custom type defined for the command string: <tt/graphicStr/.
+<tt/GraphicsString/ is a very powerful routine to initialize the whole screen at once. There are
+predefined macros for all commands, names are self-explanatory, see them in <tt/ggraph.h/. The last
+command has to be <tt/GSTR_END/. There is a custom type defined for the command string: <tt/graphicStr/.
 <p>
 Here is an example for clearing the screen:
 <tscreen><verb>
@@ -1616,8 +1616,8 @@ const graphicStr example = &lcub;
 
 <sect2>InitRam table
 <p>
-This type of data is used to initialize one or more bytes in many places at once. The format is
-as following:
+This type of data is used to initialize one or more bytes in different locations at once. The format is
+the following:
 <tscreen><verb>
 void example = &lcub;
     (unsigned)address_to_store_values_at,
@@ -1630,7 +1630,7 @@ void example = &lcub;
 
 <sect2>Intercepting system vectors
 <p>
-It is possible to intercept and hook in the GEOS Kernal using vectors. Here is a little example:
+It is possible to intercept events and hook into the GEOS Kernal using vectors. Here is a little example:
 <tscreen><verb>
 void_func oldVector;
 
@@ -1649,12 +1649,12 @@ void remove_hook(void) &lcub;
 &rcub;
 </verb></tscreen>
 <p>
-In your <tt/main/ function you should call <tt/hook_into_system()/ but <em/after/ all calls to GEOS
-kernal (like <tt/DoMenu/, <tt/DoIcons/, etc.) - right before passing control to the <tt/MainLoop()/.
-Be warned that vectors are most likely to be changed by GEOS kernal also by other functions (like
-<tt/GotoFirstMenu/, <tt/DoDlgBox/ and its derivatives etc.). It depends on what kernal functions
+In your <tt/main/ function you should call <tt/hook_into_system()/ but <em/after/ all calls to the GEOS
+Kernal (like <tt/DoMenu/, <tt/DoIcons/, etc.) - right before passing control to the <tt/MainLoop()/.
+Be warned that vectors are most likely to be changed by the GEOS Kernal also via other functions (like
+<tt/GotoFirstMenu/, <tt/DoDlgBox/ and its derivatives etc.). It depends on what Kernal functions
 you use and which vectors you altered. Unfortunately there is no exact list for GEOS 2.0, a complete
-list for GEOS 1.x can be found in A. Boyce's Programmers' Reference Guide mentioned before. Most of
+list for GEOS 1.x can be found in A. Boyce's Programmers' Reference Guide mentioned before. Most of the
 information contained there should be still valid for GEOS 2.0. When calling a function that restores
 the vector you should add a <tt/hook_into_system()/ call right after it.
 <p>
@@ -1667,10 +1667,10 @@ That little example above intercepts <tt/mouseVector/. The <tt/NewVectorHandler/
 called every time the mouse button changes status. Other important vectors you should know about
 are:
 <itemize>
-	<item><tt/appMain/ - this is called from within <tt/MainLoop/ system loop
+	<item><tt/appMain/ - this is called from within the <tt/MainLoop/ system loop
 	<item><tt/keyVector/ - called whenever a keypress occurs
-	<item><tt/intTopVector/ - called at the start of IRQ routine
-	<item><tt/intBotVector/ - called at the end of IRQ routine
+	<item><tt/intTopVector/ - called at the start of the IRQ routine
+	<item><tt/intBotVector/ - called at the end of the IRQ routine
 </itemize>
 
 </article>

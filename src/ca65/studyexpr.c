@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2007 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -1206,7 +1206,7 @@ static void StudyWord0 (ExprNode* Expr, ExprDesc* D)
 
     /* We can handle only const expressions */
     if (ED_IsConst (D)) {
-        D->Val = (D->Val & 0xFFFFL);
+        D->Val &= 0xFFFFL;
     } else {
         ED_Invalidate (D);
     }
@@ -1232,6 +1232,44 @@ static void StudyWord1 (ExprNode* Expr, ExprDesc* D)
 
     /* In any case, the result is an absolute expression */
     D->AddrSize = ADDR_SIZE_ABS;
+}
+
+
+
+static void StudyFarAddr (ExprNode* Expr, ExprDesc* D)
+/* Study an EXPR_FARADDR expression node */
+{
+    /* Study the expression */
+    StudyExprInternal (Expr->Left, D);
+
+    /* We can handle only const expressions */
+    if (ED_IsConst (D)) {
+        D->Val &= 0xFFFFFFL;
+    } else {
+        ED_Invalidate (D);
+    }
+
+    /* In any case, the result is a far address */
+    D->AddrSize = ADDR_SIZE_FAR;
+}
+
+
+
+static void StudyDWord (ExprNode* Expr, ExprDesc* D)
+/* Study an EXPR_DWORD expression node */
+{
+    /* Study the expression */
+    StudyExprInternal (Expr->Left, D);
+
+    /* We can handle only const expressions */
+    if (ED_IsConst (D)) {
+        D->Val &= 0xFFFFFFFFL;
+    } else {
+        ED_Invalidate (D);
+    }
+
+    /* In any case, the result is a long expression */
+    D->AddrSize = ADDR_SIZE_LONG;
 }
 
 
@@ -1388,6 +1426,14 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
 
         case EXPR_WORD1:
             StudyWord1 (Expr, D);
+            break;
+
+        case EXPR_FARADDR:
+            StudyFarAddr (Expr, D);
+            break;
+
+        case EXPR_DWORD:
+            StudyDWord (Expr, D);
             break;
 
         default:

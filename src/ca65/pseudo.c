@@ -370,12 +370,12 @@ static void DoAddr (void)
 
     /* Parse arguments */
     while (1) {
-	if (GetCPU() == CPU_65816) {
-       	    EmitWord (GenWordExpr (Expression ()));
-	} else {
+        ExprNode* Expr = Expression ();
+	if (GetCPU () == CPU_65816 || ForceRange) {
 	    /* Do a range check */
-	    EmitWord (Expression ());
-       	}
+            Expr = GenWordExpr (Expr);
+	}
+        EmitWord (Expr);
 	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
@@ -586,7 +586,7 @@ static void DoByte (void)
 	    EmitStrBuf (&CurTok.SVal);
 	    NextTok ();
 	} else {
-	    EmitByte (Expression ());
+            EmitByte (BoundedExpr (Expression, 1));
 	}
     	if (CurTok.Tok != TOK_COMMA) {
 	    break;
@@ -595,7 +595,7 @@ static void DoByte (void)
 	    /* Do smart handling of dangling comma */
 	    if (CurTok.Tok == TOK_SEP) {
 	     	Error ("Unexpected end of line");
-	 	break;
+	    	break;
 	    }
 	}
     }
@@ -791,7 +791,7 @@ static void DoDByt (void)
 
     /* Parse arguments */
     while (1) {
-	EmitWord (GenSwapExpr (Expression ()));
+	EmitWord (GenSwapExpr (BoundedExpr (Expression, 2)));
 	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
@@ -865,7 +865,7 @@ static void DoDWord (void)
 /* Define dwords */
 {
     while (1) {
-       	EmitDWord (Expression ());
+       	EmitDWord (BoundedExpr (Expression, 4));
 	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
@@ -965,7 +965,7 @@ static void DoFarAddr (void)
 
     /* Parse arguments */
     while (1) {
-       	EmitFarAddr (Expression ());
+       	EmitFarAddr (BoundedExpr (Expression, 3));
 	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
@@ -1936,7 +1936,7 @@ static void DoWord (void)
 
     /* Parse arguments */
     while (1) {
-       	EmitWord (Expression ());
+       	EmitWord (BoundedExpr (Expression, 2));
 	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	} else {
@@ -1970,14 +1970,14 @@ static void DoZeropage (void)
 
 /* Control commands flags */
 enum {
-    ccNone	= 0x0000,		/* No special flags */
-    ccKeepToken	= 0x0001		/* Do not skip the current token */
+    ccNone	= 0x0000,  		/* No special flags */
+    ccKeepToken	= 0x0001   		/* Do not skip the current token */
 };
 
 /* Control command table */
 typedef struct CtrlDesc CtrlDesc;
 struct CtrlDesc {
-    unsigned   	Flags; 			/* Flags for this directive */
+    unsigned   	Flags; 	   		/* Flags for this directive */
     void       	(*Handler) (void);	/* Command handler */
 };
 

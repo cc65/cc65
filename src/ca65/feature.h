@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -63,6 +63,7 @@ typedef enum {
     FEAT_MISSING_CHAR_TERM,
     FEAT_UBIQUITOUS_IDENTS,
     FEAT_C_COMMENTS,
+    FEAT_FORCE_RANGE,
 
     /* Special value: Number of features available */
     FEAT_COUNT

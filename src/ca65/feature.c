@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,6 +61,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "missing_char_term",
     "ubiquitous_idents",
     "c_comments",
+    "force_range",
 };
 
 
@@ -115,6 +116,7 @@ feature_t SetFeature (const StrBuf* Key)
         case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = 1;    break;
         case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = 1;    break;
         case FEAT_C_COMMENTS:                 CComments         = 1;    break;
+        case FEAT_FORCE_RANGE:                ForceRange        = 1;    break;
 	default:      			 /* Keep gcc silent */	        break;
     }
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -79,7 +79,8 @@ unsigned char MissingCharTerm    = 0;   /* Allow lda #'a (no closing term) */
 unsigned char UbiquitousIdents   = 0;   /* Allow ubiquitous identifiers */
 unsigned char OrgPerSeg          = 0;   /* Make .org local to current seg */
 unsigned char CComments          = 0;   /* Allow C like comments */
-
+unsigned char ForceRange         = 0;   /* Force values into expected range */
+                
 /* Misc stuff */
 const char Copyright[]           = "(C) Copyright 1998-2011 Ullrich von Bassewitz";
 

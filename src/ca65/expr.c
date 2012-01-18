@@ -1705,6 +1705,44 @@ ExprNode* GenWordExpr (ExprNode* Expr)
 
 
 
+ExprNode* GenFarAddrExpr (ExprNode* Expr)
+/* Force the given expression into a far address and return the result. */
+{
+    long      Val;
+
+    /* Special handling for const expressions */
+    if (IsEasyConst (Expr, &Val)) {
+        FreeExpr (Expr);
+        Expr = GenLiteralExpr (Val & 0xFFFFFF);
+    } else {
+        ExprNode* Operand = Expr;
+        Expr = NewExprNode (EXPR_FARADDR);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
+ExprNode* GenDWordExpr (ExprNode* Expr)
+/* Force the given expression into a dword and return the result. */
+{
+    long      Val;
+
+    /* Special handling for const expressions */
+    if (IsEasyConst (Expr, &Val)) {
+        FreeExpr (Expr);
+        Expr = GenLiteralExpr (Val & 0xFFFFFFFF);
+    } else {
+        ExprNode* Operand = Expr;
+        Expr = NewExprNode (EXPR_DWORD);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
 ExprNode* GenNE (ExprNode* Expr, long Val)
 /* Generate an expression that compares Expr and Val for inequality */
 {
@@ -1953,6 +1991,31 @@ void ExprGuessedAddrSize (const ExprNode* Expr, unsigned char AddrSize)
             ExprGuessedAddrSize (Expr->Left, AddrSize);
             break;
     }
+}
+
+
+
+ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size)
+/* Force the given expression into a specific size of ForceRange is true */
+{
+    if (ForceRange) {
+        switch (Size) {
+            case 1:     Expr = GenByteExpr (Expr);      break;
+            case 2:     Expr = GenWordExpr (Expr);      break;
+            case 3:     Expr = GenFarAddrExpr (Expr);   break;
+            case 4:     Expr = GenDWordExpr (Expr);     break;
+            default:    Internal ("Invalid size in BoundedExpr: %u", Size);
+        }
+    }
+    return Expr;
+}
+
+
+
+ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size)
+/* Parse an expression and force it within a given size if ForceRange is true */
+{
+    return MakeBoundedExpr (ExprFunc (), Size);
 }
 
 

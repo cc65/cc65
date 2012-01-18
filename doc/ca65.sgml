@@ -2597,7 +2597,7 @@ Here's a list of all control commands and a description, what they do:
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
-  <tag><tt>c_comments</tt></tag>
+  <tag><tt>c_comments</tt><label id="c_comments"></tag>
 
     Allow C like comments using <tt>/*</tt> and <tt>*/</tt> as left and right
     comment terminators. Note that C comments may not be nested. There's also a
@@ -2616,13 +2616,20 @@ Here's a list of all control commands and a description, what they do:
     dollar character is not allowed to start an identifier, even with this
     feature enabled.
 
-  <tag><tt>dollar_is_pc</tt></tag>
+  <tag><tt>dollar_is_pc</tt><label id="dollar_is_pc"></tag>
 
     The dollar sign may be used as an alias for the star (`*'), which
     gives the value of the current PC in expressions.
     Note: Assignment to the pseudo variable is not allowed.
 
-  <tag><tt>labels_without_colons</tt></tag>
+  <tag><tt>force_range</tt><label id="force_range"></tag>
+
+    Force expressions into their valid range for immediate addressing and
+    storage operators like <tt><ref id=".BYTE" name=".BYTE"></tt> and
+    <tt><ref id=".WORD" name=".WORD"></tt>. Be very careful with this one,
+    since it will completely disable error checks.
+
+  <tag><tt>labels_without_colons</tt><label id="labels_without_colons"></tag>
 
     Allow labels without a trailing colon. These labels are only accepted,
     if they start at the beginning of a line (no leading white space).
@@ -2636,17 +2643,17 @@ Here's a list of all control commands and a description, what they do:
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
 
-  <tag><tt>loose_char_term</tt></tag>
+  <tag><tt>loose_char_term</tt><label id="loose_char_term"></tag>
 
     Accept single quotes as well as double quotes as terminators for char
     constants.
 
-  <tag><tt>loose_string_term</tt></tag>
+  <tag><tt>loose_string_term</tt><label id="loose_string_term"></tag>
 
     Accept single quotes as well as double quotes as terminators for string
     constants.
 
-  <tag><tt>missing_char_term</tt></tag>
+  <tag><tt>missing_char_term</tt><label id="missing_char_term"></tag>
 
     Accept single quoted character constants where the terminating quote is
     missing.
@@ -2663,7 +2670,7 @@ Here's a list of all control commands and a description, what they do:
     effect will only enable absolute mode for the current segment. Dito for
     <tt><ref id=".RELOC" name=".RELOC"></tt>.
 
-  <tag><tt>pc_assignment</tt></tag>
+  <tag><tt>pc_assignment</tt><label id="pc_assignment"></tag>
 
     Allow assignments to the PC symbol (`*' or `&dollar;' if <tt/dollar_is_pc/
     is enabled). Such an assignment is handled identical to the <tt><ref
@@ -2671,7 +2678,7 @@ Here's a list of all control commands and a description, what they do:
     removing the lines with the assignments may also be an option when porting
     code written for older assemblers).
 
-  <tag><tt>ubiquitous_idents</tt></tag>
+  <tag><tt>ubiquitous_idents</tt><label id="ubiquitous_idents"></tag>
 
     Allow the use of instructions names as names for macros and symbols. This
     makes it possible to "overload" instructions by defining a macro with the

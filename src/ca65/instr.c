@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -1006,6 +1006,16 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
     /* Build the opcode */
     A->Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A->AddrMode];
+
+    /* If feature force_range is active, and we have immediate addressing mode,
+     * limit the expression to the maximum possible value.
+     */
+    if (A->AddrMode == AM65I_IMM_ACCU || A->AddrMode == AM65I_IMM_INDEX ||
+        A->AddrMode == AM65I_IMM_IMPLICIT) {
+        if (ForceRange && A->Expr) {
+            A->Expr = MakeBoundedExpr (A->Expr, ExtBytes[A->AddrMode]);
+        }
+    }
 
     /* Success */
     return 1;

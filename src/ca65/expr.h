@@ -109,6 +109,12 @@ ExprNode* GenByteExpr (ExprNode* Expr);
 ExprNode* GenWordExpr (ExprNode* Expr);
 /* Force the given expression into a word and return the result. */
 
+ExprNode* GenFarAddrExpr (ExprNode* Expr);
+/* Force the given expression into a far address and return the result. */
+
+ExprNode* GenDWordExpr (ExprNode* Expr);
+/* Force the given expression into a dword and return the result. */
+
 ExprNode* GenNE (ExprNode* Expr, long Val);
 /* Generate an expression that compares Expr and Val for inequality */
 
@@ -169,6 +175,13 @@ ExprNode* FuncLoByte (void);
 
 ExprNode* FuncHiByte (void);
 /* Handle the .HIBYTE builtin function */
+
+ExprNode* MakeBoundedExpr (ExprNode* Expr, unsigned Size);
+/* Force the given expression into a specific size of ForceRange is true */
+
+ExprNode* BoundedExpr (ExprNode* (*ExprFunc) (void), unsigned Size);
+/* Parse an expression and force it within a given size if ForceRange is true */
+
 
 
 /* End of expr.h */

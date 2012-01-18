@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -63,17 +63,6 @@ struct regs {
     unsigned char flags;	/* Flags value */
     unsigned      pc;		/* Program counter */
 };
-
-/* Defines for the flags in the regs structure */
-#ifdef __OBSOLETE_FLAGS__
-#define F_NEG		0x80	/* N flag */
-#define F_OVF		0x40	/* V flag */
-#define F_BRK		0x10	/* B flag */
-#define F_DEC		0x08	/* D flag */
-#define F_IEN  	   	0x04	/* I flag */
-#define F_ZERO	   	0x02	/* Z flag */
-#define F_CARRY	   	0x01	/* C flag */
-#endif
 
 /* Defines for the flags in the regs structure */
 #define F6502_N		0x80	/* N flag */

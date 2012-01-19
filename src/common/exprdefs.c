@@ -210,6 +210,14 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 	    printf (" WORD1");
 	    break;
 
+       	case EXPR_FARADDR:
+	    printf (" FARADDR");
+	    break;
+
+       	case EXPR_DWORD:
+	    printf (" DWORD");
+	    break;
+
         default:
        	    AbEnd ("Unknown Op type: %u", Expr->Op);
 

@@ -1,4 +1,4 @@
-;
+;                       
 ; Oliver Schmidt, 2012-01-18
 ;
 ; void __fastcall__ set_irq (irq_handler f, void *stack_addr, size_t stack_size);
@@ -44,7 +44,7 @@
 .proc	_reset_irq
 
 	lda  	#$00
-	sta	irqvec+3	; High byte is enough
+	sta	irqvec+2	; High byte is enough
 	rts
 
 .endproc
@@ -53,7 +53,7 @@
 .proc	clevel_irq
 
 	; Is C level interrupt request vector set?
-	lda	irqvec+3	; High byte is enough
+       	lda    	irqvec+2	; High byte is enough
 	bne	@L1
 	clc			; Interrupt not handled
 	rts
@@ -73,7 +73,7 @@
 
 	; Call C level interrupt request handler
 	jsr	irqvec
-	
+
 	; Copy back our zero page content
 	ldx     #zpspace-1
 @L3:    ldy     zpsave,x

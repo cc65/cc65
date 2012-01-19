@@ -408,6 +408,12 @@ long GetExprVal (ExprNode* Expr)
 
        	case EXPR_WORD1:
 	    return (GetExprVal (Expr->Left) >> 16) & 0xFFFF;
+             
+        case EXPR_FARADDR:
+            return GetExprVal (Expr->Left) & 0xFFFFFF;
+
+        case EXPR_DWORD:
+            return GetExprVal (Expr->Left) & 0xFFFFFFFF;
 
         default:
        	    Internal ("Unknown expression Op type: %u", Expr->Op);

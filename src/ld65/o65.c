@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2011, Ullrich von Bassewitz                                      */
+/* (C) 1999-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -629,9 +629,10 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
     /* Determine the expression to relocate */
     Expr = E;
-    if (E->Op == EXPR_BYTE0 || E->Op == EXPR_BYTE1 ||
-       	E->Op == EXPR_BYTE2 || E->Op == EXPR_BYTE3 ||
-       	E->Op == EXPR_WORD0 || E->Op == EXPR_WORD1) {
+    if (E->Op == EXPR_BYTE0   || E->Op == EXPR_BYTE1 ||
+       	E->Op == EXPR_BYTE2   || E->Op == EXPR_BYTE3 ||
+       	E->Op == EXPR_WORD0   || E->Op == EXPR_WORD1 ||
+        E->Op == EXPR_FARADDR || E->Op == EXPR_DWORD) {
        	/* Use the real expression */
        	Expr = E->Left;
     }
@@ -674,6 +675,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
        	case EXPR_BYTE3:    BinVal = (BinVal >> 24) & 0xFF;	break;
        	case EXPR_WORD0:    BinVal &= 0xFFFF;			break;
        	case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;	break;
+        case EXPR_FARADDR:  BinVal &= 0xFFFFFFUL;               break;
+        case EXPR_DWORD:    BinVal &= 0xFFFFFFFFUL;             break;
     }
     WriteVal (D->F, BinVal, Size);
 
@@ -846,7 +849,7 @@ static void O65WriteBssSeg (O65Desc* D)
     /* Initialize variables */
     D->CurReloc	= 0;
 
-    /* Dump all bss segments */               
+    /* Dump all bss segments */
     O65WriteSeg (D, D->BssSeg, D->BssCount, 0);
 
     /* Set the size of the segment */

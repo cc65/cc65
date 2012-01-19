@@ -123,6 +123,7 @@ S_OBJS = 	_cwd.o                  \
 		getcpu.o	        \
                 getcwd.o                \
 		getenv.o	        \
+		interrupt.o	        \
 		isalnum.o	        \
 		isalpha.o	        \
 		isblank.o	        \

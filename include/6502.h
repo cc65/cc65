@@ -100,15 +100,27 @@ typedef void (*brk_handler) (void);
 /* Type of the break handler */
 
 void __fastcall__ set_brk (brk_handler f);
-/* Set the break vector to the given address, return the old address */
+/* Set the break vector to the given address */
 
 void reset_brk (void);
 /* Reset the break vector to the original value */
 
 
 
+/* Possible returns for irq_handler() */
+#define IRQ_NOT_HANDLED	0
+#define IRQ_HANDLED	1
+
+typedef unsigned (*irq_handler) (void);
+/* Type of the C level interrupt request handler */
+
+void __fastcall__ set_irq (irq_handler f, void *stack_addr, size_t stack_size);
+/* Set the C level interrupt request vector to the given address */
+
+void reset_irq (void);
+/* Reset the C level interrupt request vector */
+
+
+
 /* End of 6502.h */
 #endif
-
-
-

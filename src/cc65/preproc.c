@@ -688,7 +688,7 @@ static void MacroCall (StrBuf* Target, Macro* M)
 static void ExpandMacro (StrBuf* Target, Macro* M)
 /* Expand a macro into Target */
 {
-#if 0
+#if 1
     static unsigned V = 0;
     printf ("Expanding %s(%u)\n", M->Name, ++V);
 #endif
@@ -727,7 +727,7 @@ static void ExpandMacro (StrBuf* Target, Macro* M)
         DoneMacroExp (&E);
 
     }
-#if 0
+#if 1
     printf ("Done with %s(%u)\n", M->Name, V--);
 #endif
 }
@@ -845,7 +845,7 @@ static void DefineMacro (void)
     while (IsSpace (SB_LookAtLast (&M->Replacement))) {
         SB_Drop (&M->Replacement, 1);
     }
-#if 0
+#if 1
     printf ("%s: <%.*s>\n", M->Name, SB_GetLen (&M->Replacement), SB_GetConstBuf (&M->Replacement));
 #endif
 

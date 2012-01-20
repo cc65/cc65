@@ -1105,6 +1105,7 @@ static void StructRef (ExprDesc* Expr)
 {
     ident Ident;
     SymEntry* Field;
+    Type* FinalType;
     TypeCode Q;
 
     /* Skip the token and check for an identifier */
@@ -1139,9 +1140,6 @@ static void StructRef (ExprDesc* Expr)
         ED_MakeLValExpr (Expr);
     }
 
-    /* Set the struct field offset */
-    Expr->IVal += Field->V.Offs;
-
     /* The type is the type of the field plus any qualifiers from the struct */
     if (IsClassStruct (Expr->Type)) {
         Q = GetQualifier (Expr->Type);
@@ -1149,27 +1147,81 @@ static void StructRef (ExprDesc* Expr)
         Q = GetQualifier (Indirect (Expr->Type));
     }
     if (GetQualifier (Field->Type) == (GetQualifier (Field->Type) | Q)) {
-        Expr->Type = Field->Type;
+        FinalType = Field->Type;
     } else {
-        Expr->Type = TypeDup (Field->Type);
-        Expr->Type->C |= Q;
+        FinalType = TypeDup (Field->Type);
+        FinalType->C |= Q;
     }
 
-    /* An struct member is actually a variable. So the rules for variables
-     * with respect to the reference type apply: If it's an array, it is
-     * a rvalue, otherwise it's an lvalue. (A function would also be a rvalue,
-     * but a struct field cannot be a function).
+    /* A struct is usually an lvalue. If not, it is a struct in the primary
+     * register.
      */
-    if (IsTypeArray (Expr->Type)) {
-        ED_MakeRVal (Expr);
+    if (ED_IsRVal (Expr) && ED_IsLocExpr (Expr) && !IsTypePtr (Expr->Type)) {
+
+        unsigned Flags = 0;
+        unsigned BitOffs;
+
+        /* Get the size of the type */
+        unsigned Size = SizeOf (Expr->Type);
+
+        /* Safety check */
+        CHECK (Field->V.Offs + Size <= SIZEOF_LONG);
+
+        /* The type of the operation depends on the type of the struct */
+        switch (Size) {
+            case 1:     Flags = CF_CHAR | CF_UNSIGNED | CF_CONST;       break;
+            case 2:     Flags = CF_INT  | CF_UNSIGNED | CF_CONST;       break;
+            case 3:     /* FALLTHROUGH */
+            case 4:     Flags = CF_LONG | CF_UNSIGNED | CF_CONST;       break;
+            default:    Internal ("Invalid struct size: %u", Size);     break;
+        }
+
+        /* Generate a shift to get the field in the proper position in the
+         * primary. For bit fields, mask the value.
+         */
+        BitOffs = Field->V.Offs * CHAR_BITS;
+        if (SymIsBitField (Field)) {
+            BitOffs += Field->V.B.BitOffs;
+            g_asr (Flags, BitOffs);
+            /* Mask the value. This is unnecessary if the shift executed above
+             * moved only zeroes into the value.
+             */
+            if (BitOffs + Field->V.B.BitWidth != Size * CHAR_BITS) {
+                g_and (CF_INT | CF_UNSIGNED | CF_CONST,
+                       (0x0001U << Field->V.B.BitWidth) - 1U);
+            }
+        } else {
+            g_asr (Flags, BitOffs);
+        }
+
+        /* Use the new type */
+        Expr->Type = FinalType;
+
     } else {
-        ED_MakeLVal (Expr);
+
+        /* Set the struct field offset */
+        Expr->IVal += Field->V.Offs;
+
+        /* Use the new type */
+        Expr->Type = FinalType;
+
+        /* An struct member is actually a variable. So the rules for variables
+         * with respect to the reference type apply: If it's an array, it is
+         * a rvalue, otherwise it's an lvalue. (A function would also be a rvalue,
+         * but a struct field cannot be a function).
+         */
+        if (IsTypeArray (Expr->Type)) {
+            ED_MakeRVal (Expr);
+        } else {
+            ED_MakeLVal (Expr);
+        }
+
+        /* Make the expression a bit field if necessary */
+        if (SymIsBitField (Field)) {
+            ED_MakeBitField (Expr, Field->V.B.BitOffs, Field->V.B.BitWidth);
+        }
     }
 
-    /* Make the expression a bit field if necessary */
-    if (SymIsBitField (Field)) {
-        ED_MakeBitField (Expr, Field->V.B.BitOffs, Field->V.B.BitWidth);
-    }
 }
 
 
@@ -2077,7 +2129,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
                 /* Comparing a char against a constant may have a constant
                  * result. Please note: It is not possible to remove the code
-		 * for the compare alltogether, because it may have side 
+		 * for the compare alltogether, because it may have side
 		 * effects.
                  */
                 switch (Tok) {

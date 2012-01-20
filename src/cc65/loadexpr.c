@@ -162,8 +162,11 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
             unsigned F = CF_INT | CF_UNSIGNED | CF_CONST | (Flags & CF_TEST);
             /* Shift right by the bit offset */
             g_asr (F, Expr->BitOffs);
-            /* And by the width */
-            g_and (F, (0x0001U << Expr->BitWidth) - 1U);
+            /* And by the width if the field doesn't end on an int boundary */
+            if (Expr->BitOffs + Expr->BitWidth != CHAR_BITS &&
+                Expr->BitOffs + Expr->BitWidth != INT_BITS) {
+                g_and (F, (0x0001U << Expr->BitWidth) - 1U);
+            }
         }
 
         /* Expression was tested */

@@ -58,7 +58,9 @@ function.
 <item><ref id="_sys" name="_sys">
 <item><ref id="getcpu" name="getcpu">
 <item><ref id="reset_brk" name="reset_brk">
+<item><ref id="reset_irq" name="reset_irq">
 <item><ref id="set_brk" name="set_brk">
+<item><ref id="set_irq" name="set_irq">
 </itemize>
 
 
@@ -4119,6 +4121,22 @@ the program ends.
 </quote>
 
 
+<sect1>reset_irq<label id="reset_irq"><p>
+
+<quote>
+<descrip>
+<tag/Function/Resets the C level interrupt request vector.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void reset_irq (void);/
+<tag/Description/<tt/reset_irq/ resets the C level interrupt request vector.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="set_irq" name="set_irq">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>revers<label id="revers"><p>
 
 <quote>
@@ -4447,6 +4465,41 @@ the program terminates.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="reset_brk" name="reset_brk">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_irq<label id="set_irq"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the C level interrupt request vector to the given address.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void __fastcall__ set_irq (irq_handler f, void *stack_addr, size_t stack_size);/
+<tag/Description/<tt/set_irq/ allows a user program to handle interrupt requests
+(IRQs) within the program code by letting the vector point to a user written C
+function. The runtime library installs a small stub that saves the zero page
+registers used by the C runtime before calling the handler function and restores
+them after the handler function returns. Additionally the stub temporarily switches
+the C runtime stack to the stack area provided as parameter. If the handler function
+was set up to handle a "private", "exclusive" interrupt request source it must
+return the value <tt/IRQ_HANDLED/ if and only if it has verified that the current
+interrupt request actually stems from that source. In all other cases it must return
+the value <tt/IRQ_NOT_HANDLED/.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The stub saves the zero page registers used by the C runtime and switches
+to the provided stack area. This means that it is safe to execute C code,
+even if C code was interrupted. Be careful however not to call into the C library,
+and do not enable stack checks for the handler function or any other function called
+from it.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="reset_irq" name="reset_irq">
 <tag/Example/None.
 </descrip>
 </quote>

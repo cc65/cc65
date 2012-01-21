@@ -1,4 +1,4 @@
-;                       
+;
 ; Oliver Schmidt, 2012-01-18
 ;
 ; void __fastcall__ set_irq (irq_handler f, void *stack_addr, size_t stack_size);
@@ -53,7 +53,7 @@
 .proc	clevel_irq
 
 	; Is C level interrupt request vector set?
-       	lda    	irqvec+2	; High byte is enough
+	lda    	irqvec+2	; High byte is enough
 	bne	@L1
 	clc			; Interrupt not handled
 	rts

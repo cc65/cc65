@@ -1,22 +1,15 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;                                                                              ;
-; Apple][ ProDOS 8 system program for loading binary programs (Oliver Schmidt) ;
-;                                                                              ;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;                                                                               ;
+; LOADER.SYSTEM - an Apple][ ProDOS 8 loader for cc65 programs (Oliver Schmidt) ;
+;                                                                               ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 A1L		:= $3C
 A1H		:= $3D
-HIMEM		:= $73
 STACK		:= $0100
 BUF		:= $0200
 PATHNAME	:= $0280
-DOSWARM		:= $03D0
-DOSCOLD		:= $03D3
-SOFTEV		:= $03F2
-PWREDUP		:= $03F4
 MLI		:= $BF00
-MEMTABL		:= $BF58
-RESET		:= $FA62
 VERSION		:= $FBB3
 RDKEY		:= $FD0C
 PRBYTE		:= $FDDA
@@ -29,12 +22,12 @@ READ_CALL	   = $CA
 CLOSE_CALL	   = $CC
 FILE_NOT_FOUND_ERR = $46
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	.import	__CODE_0300_SIZE__, __DATA_0300_SIZE__
 	.import	__CODE_0300_LOAD__, __CODE_0300_RUN__
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .segment	"DATA_2000"
 
@@ -64,7 +57,7 @@ LOADING:
 ELLIPSES:
 		.byte	" ...", $0D, $0D, $00
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .segment	"DATA_0300"
 
@@ -79,17 +72,12 @@ CLOSE_PARAM:
 		.byte	$01		;PARAM_COUNT
 CLOSE_REF:	.byte	$00		;REF_NUM
 
-
-.ifndef		REBOOT
-
 QUIT_PARAM:
 		.byte	$04		;PARAM_COUNT
 		.byte	$00		;QUIT_TYPE
 		.word	$0000		;RESERVED
 		.byte	$00		;RESERVED
 		.word	$0000		;RESERVED
-
-.endif
 
 FILE_NOT_FOUND:
 		.asciiz	"... File Not Found"
@@ -100,7 +88,7 @@ ERROR_NUMBER:
 PRESS_ANY_KEY:
 		.asciiz	" - Press Any Key "
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .segment	"CODE_2000"
 
@@ -120,68 +108,6 @@ STARTUP:.res	65
 	sta	__CODE_0300_RUN__ - 1,x
 	dex
 	bne	:-
-
-.ifndef		REBOOT
-
-	; Jump to dispatcher on program exit
-	ldy	#$4C		; jmp
-	lda	#<EXIT
-	ldx	#>EXIT
-	sty	DOSWARM
-	sta	DOSWARM + 1
-	stx	DOSWARM + 2
-	sty	DOSCOLD
-	sta	DOSCOLD + 1
-	stx	DOSCOLD + 2
-
-	; Jump to dispatcher on RESET
-	sta	SOFTEV
-	stx	SOFTEV + 1
-	txa
-	eor	#$A5
-	sta	PWREDUP
-
-.else
-
-	; Jump to RESET on program exit
-	ldy	#$4C		; jmp
-	lda	#<RESET
-	ldx	#>RESET
-	sty	DOSWARM
-	sta	DOSWARM + 1
-	stx	DOSWARM + 2
-	sty	DOSCOLD
-	sta	DOSCOLD + 1
-	stx	DOSCOLD + 2
-	
-	; Reboot on RESET
-	inc	PWREDUP
-
-.endif
-
-	; That's what it's all about !
-	lda	#<MLI
-	ldx	#>MLI
-	sta	HIMEM
-	stx	HIMEM + 1
-
-	; Overwrite the whole system bit map
-	ldx	#($C0 / 8) - 1
-
-	; Set protection for pages $B8 - $BF
-	lda	#%00000001
-	sta	MEMTABL,x
-	dex
-
-	; Set protection for pages $08 - $B7
-	lda	#%00000000
-:	sta	MEMTABL,x
-	dex
-	bne	:-
-
-	; Set protection for pages $00 - $07
-	lda	#%11011111	; include page $03
-	sta	MEMTABL,x
 
 	; Remove ".SYSTEM" from pathname
 	lda	PATHNAME
@@ -240,7 +166,7 @@ STARTUP:.res	65
 	; It's high time to leave this place
 	jmp	__CODE_0300_RUN__
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .segment	"CODE_0300"
 
@@ -301,18 +227,8 @@ ERROR:
 	ldx	#>PRESS_ANY_KEY
 	jsr	PRINT
 	jsr	RDKEY
-
-.ifndef		REBOOT
-
-EXIT:
-	; Reset stack
-	ldx	#$FF
-	txs
-
 	jsr	MLI
 	.byte	QUIT_CALL
 	.word	QUIT_PARAM
-	
-.endif
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

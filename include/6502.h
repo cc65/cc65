@@ -111,7 +111,7 @@ void reset_brk (void);
 #define IRQ_NOT_HANDLED	0
 #define IRQ_HANDLED	1
 
-typedef unsigned (*irq_handler) (void);
+typedef unsigned char (*irq_handler) (void);
 /* Type of the C level interrupt request handler */
 
 void __fastcall__ set_irq (irq_handler f, void *stack_addr, size_t stack_size);

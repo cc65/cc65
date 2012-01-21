@@ -655,6 +655,11 @@ void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos
  * current code end)
  */
 {
+    /* Transparently handle an empty range */
+    if (Count == 0) {
+        return;
+    }
+
     /* If NewPos is at the end of the code segment, move any labels from the
      * label pool to the first instruction of the moved range.
      */

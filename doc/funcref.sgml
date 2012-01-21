@@ -95,7 +95,16 @@ function.
 <sect1><tt/atari.h/<label id="atari.h"><p>
 
 <itemize>
+<!-- <item><ref id="_getcolor" name="_getcolor"> -->
+<!-- <item><ref id="_getdefdev" name="_getdefdev"> -->
+<!-- <item><ref id="_graphics" name="_graphics"> -->
+<!-- <item><ref id="_rest_vecs" name="_rest_vecs"> -->
+<!-- <item><ref id="_save_vecs" name="_save_vecs"> -->
+<!-- <item><ref id="_scroll" name="_scroll"> -->
+<!-- <item><ref id="_setcolor" name="_setcolor"> -->
+<!-- <item><ref id="_setcolor_low" name="_setcolor_low"> -->
 <item><ref id="get_ostype" name="get_ostype">
+<!-- <item><ref id="get_tv" name="get_tv"> -->
 </itemize>
 
 (incomplete)
@@ -147,6 +156,23 @@ function.
 <item><ref id="pokebsys" name="pokebsys">
 <item><ref id="pokewsys" name="pokewsys">
 </itemize>
+
+
+<sect1><tt/cc65.h/<label id="cc65.h"><p>
+
+<itemize>
+<!-- <item><ref id="cc65_cos" name="cc65_cos"> -->
+<!-- <item><ref id="cc65_idiv32by16r16" name="cc65_idiv32by16r16"> -->
+<!-- <item><ref id="cc65_imul16x16r32" name="cc65_imul16x16r32"> -->
+<!-- <item><ref id="cc65_imul8x8r16" name="cc65_imul8x8r16"> -->
+<!-- <item><ref id="cc65_sin" name="cc65_sin"> -->
+<!-- <item><ref id="cc65_udiv32by16r16" name="cc65_udiv32by16r16"> -->
+<!-- <item><ref id="cc65_umul16x16r32" name="cc65_umul16x16r32"> -->
+<!-- <item><ref id="cc65_umul16x8r32" name="cc65_umul16x8r32"> -->
+<!-- <item><ref id="cc65_umul8x8r16" name="cc65_umul8x8r16"> -->
+</itemize>
+
+(incomplete)
 
 
 <sect1><tt/conio.h/<label id="conio.h"><p>
@@ -204,12 +230,17 @@ function.
 
 <sect1><tt/dbg.h/<label id="dbg.h"><p>
 
+<itemize>
+<!-- <item><ref id="DbgInit" name="DbgInit"> -->
+</itemize>
+
 (incomplete)
 
 
 <sect1><tt/dio.h/<label id="dio.h"><p>
 
-(incomplete)
+<htmlurl url="dio.html" name="dio.html">
+Low-level disk I/O API.
 
 
 <sect1><tt/em.h/<label id="em.h"><p>
@@ -229,6 +260,13 @@ function.
 
 
 <sect1><tt/errno.h/<label id="errno.h"><p>
+
+<itemize>
+<!-- <item><ref id="_directerrno" name="_directerrno"> -->
+<!-- <item><ref id="_mappederrno" name="_mappederrno"> -->
+<!-- <item><ref id="_osmaperrno" name="_osmaperrno"> -->
+<!-- <item><ref id="_seterrno" name="_seterrno"> -->
+</itemize>
 
 (incomplete)
 
@@ -267,6 +305,21 @@ function.
 </itemize>
 
 
+<sect1><tt/lynx.h/<label id="lynx.h"><p>
+
+<itemize>
+<!-- <item><ref id="lynx_eeprom_erase" name="lynx_eeprom_erase"> -->
+<!-- <item><ref id="lynx_eeprom_read" name="lynx_eeprom_read"> -->
+<!-- <item><ref id="lynx_eeprom_write" name="lynx_eeprom_write"> -->
+<!-- <item><ref id="lynx_eeread" name="lynx_eeread"> -->
+<!-- <item><ref id="lynx_eewrite" name="lynx_eewrite"> -->
+<!-- <item><ref id="lynx_exec" name="lynx_exec"> -->
+<!-- <item><ref id="lynx_load" name="lynx_load"> -->
+</itemize>
+
+(incomplete)
+
+
 <sect1><tt/modload.h/<label id="modload.h"><p>
 
 <itemize>
@@ -278,25 +331,29 @@ function.
 <sect1><tt/mouse.h/<label id="mouse.h"><p>
 
 <itemize>
-<item><ref id="mouse_load_driver" name="mouse_load_driver">
-<item><ref id="mouse_unload" name="mouse_unload">
-<item><ref id="mouse_install" name="mouse_install">
-<item><ref id="mouse_uninstall" name="mouse_uninstall">
-<item><ref id="mouse_hide" name="mouse_hide">
-<item><ref id="mouse_show" name="mouse_show">
-<item><ref id="mouse_setbox" name="mouse_setbox">
-<item><ref id="mouse_getbox" name="mouse_getbox">
-<item><ref id="mouse_move" name="mouse_move">
 <item><ref id="mouse_buttons" name="mouse_buttons">
-<item><ref id="mouse_pos" name="mouse_pos">
+<item><ref id="mouse_getbox" name="mouse_getbox">
+<item><ref id="mouse_geterrormsg" name="mouse_geterrormsg">
+<item><ref id="mouse_hide" name="mouse_hide">
 <item><ref id="mouse_info" name="mouse_info">
+<item><ref id="mouse_install" name="mouse_install">
 <item><ref id="mouse_ioctl" name="mouse_ioctl">
+<item><ref id="mouse_load_driver" name="mouse_load_driver">
+<item><ref id="mouse_move" name="mouse_move">
+<item><ref id="mouse_pos" name="mouse_pos">
+<item><ref id="mouse_setbox" name="mouse_setbox">
+<item><ref id="mouse_show" name="mouse_show">
+<item><ref id="mouse_uninstall" name="mouse_uninstall">
+<item><ref id="mouse_unload" name="mouse_unload">
 </itemize>
-
-(incomplete)
 
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
+
+<itemize>
+<!-- <item><ref id="get_tv" name="get_tv"> -->
+<!-- <item><ref id="waitvblank" name="waitvblank"> -->
+</itemize>
 
 (incomplete)
 
@@ -346,8 +403,6 @@ communication.
 <item><ref id="ser_uninstall" name="ser_uninstall">
 <item><ref id="ser_unload" name="ser_unload">
 </itemize>
-
-(incomplete)
 
 
 <sect1><tt/setjmp.h/<label id="setjmp.h"><p>
@@ -459,13 +514,18 @@ communication.
 <item><ref id="ltoa" name="ltoa">
 <item><ref id="malloc" name="malloc">
 <item><ref id="perror" name="perror">
+<!-- <item><ref id="posix_memalign" name="posix_memalign"> -->
+<!-- <item><ref id="putenv" name="putenv"> -->
 <item><ref id="qsort" name="qsort">
 <item><ref id="rand" name="rand">
 <item><ref id="realloc" name="realloc">
 <item><ref id="srand" name="srand">
+<!-- <item><ref id="system" name="system"> -->
 <item><ref id="ultoa" name="ultoa">
 <item><ref id="utoa" name="utoa">
 </itemize>
+
+(incomplete)
 
 
 <sect1><tt/string.h/<label id="string.h"><p>
@@ -474,6 +534,7 @@ communication.
 <item><ref id="_stroserror" name="_stroserror">
 <item><ref id="bzero" name="bzero">
 <item><ref id="memchr" name="memchr">
+<item><ref id="memcmp" name="memcmp">
 <item><ref id="memcpy" name="memcpy">
 <item><ref id="memmove" name="memmove">
 <item><ref id="memset" name="memset">
@@ -592,6 +653,13 @@ communication.
 
 
 <sect1><tt/zlib.h/<label id="zlib.h"><p>
+
+<itemize>
+<!-- <item><ref id="adler32" name="adler32"> -->
+<!-- <item><ref id="crc32" name="crc32"> -->
+<!-- <item><ref id="inflatemem" name="inflatemem"> -->
+<!-- <item><ref id="uncompress" name="uncompress"> -->
+</itemize>
 
 (incomplete)
 
@@ -3235,6 +3303,32 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>memcmp<label id="memcmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two memory areas.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ memcmp (const void* p1, const void* p2, size_t count);/
+<tag/Description/<tt/memcmp/ compares <tt/count/ bytes from the memory area
+pointed to by <tt/p1/ into the memory area pointed to by <tt/p2/. It returns a value that is less than
+zero if <tt/p1/ is less than <tt/p2/, zero if <tt/p1/ is the same as <tt/p2/,
+and a value greater than zero if <tt/p1/ is greater than <tt/p2/.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcmp" name="strcmp">,
+<ref id="memmove" name="memmove">,
+<ref id="memset" name="memset">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>memcpy<label id="memcpy"><p>
 
 <quote>
@@ -4665,7 +4759,7 @@ be used in presence of a prototype.
 <ref id="strcmp" name="strcmp">,
 <ref id="strcoll" name="strcoll">,
 <ref id="stricmp" name="stricmp">,
-<ref id="strncmp" name="strncmp">
+<ref id="strncmp" name="strncmp">,
 <ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
@@ -4772,7 +4866,7 @@ be used in presence of a prototype.
 <ref id="strcasecmp" name="strcasecmp">,
 <ref id="strcmp" name="strcmp">,
 <ref id="stricmp" name="stricmp">,
-<ref id="strncmp" name="strncmp">
+<ref id="strncmp" name="strncmp">,
 <ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
@@ -4907,7 +5001,7 @@ be used in presence of a prototype.
 <ref id="strcasecmp" name="strcasecmp">,
 <ref id="strcmp" name="strcmp">,
 <ref id="strcoll" name="strcoll">,
-<ref id="strncmp" name="strncmp">
+<ref id="strncmp" name="strncmp">,
 <ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
@@ -5016,7 +5110,7 @@ be used in presence of a prototype.
 <ref id="strcasecmp" name="strcasecmp">,
 <ref id="strcmp" name="strcmp">,
 <ref id="strcoll" name="strcoll">,
-<ref id="stricmp" name="stricmp">
+<ref id="stricmp" name="stricmp">,
 <ref id="strxfrm" name="strxfrm">
 <tag/Example/None.
 </descrip>
@@ -5183,7 +5277,7 @@ just copy s2 to s1 using <tt><ref id="strncpy" name="strncpy"></tt>.
 <tag/See also/
 <ref id="strcmp" name="strcmp">,
 <ref id="strcoll" name="strcoll">,
-<ref id="strncpy" name="strncpy">,
+<ref id="strncpy" name="strncpy">
 <tag/Example/None.
 </descrip>
 </quote>

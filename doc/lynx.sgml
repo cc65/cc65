@@ -182,6 +182,10 @@ Programs containing Lynx specific code may use the <tt/lynx.h/ header file.
 <item>lynx_eeprom_erase
 <item>lynx_eeprom_read
 <item>lynx_eeprom_write
+<item>lynx_eeread
+<item>lynx_eewrite
+<item>lynx_exec
+<item>lynx_load
 </itemize>
 
 

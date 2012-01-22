@@ -160,7 +160,7 @@ function.
 
 <sect1><tt/cc65.h/<label id="cc65.h"><p>
 
-<itemize>
+<!-- <itemize> -->
 <!-- <item><ref id="cc65_cos" name="cc65_cos"> -->
 <!-- <item><ref id="cc65_idiv32by16r16" name="cc65_idiv32by16r16"> -->
 <!-- <item><ref id="cc65_imul16x16r32" name="cc65_imul16x16r32"> -->
@@ -170,7 +170,7 @@ function.
 <!-- <item><ref id="cc65_umul16x16r32" name="cc65_umul16x16r32"> -->
 <!-- <item><ref id="cc65_umul16x8r32" name="cc65_umul16x8r32"> -->
 <!-- <item><ref id="cc65_umul8x8r16" name="cc65_umul8x8r16"> -->
-</itemize>
+<!-- </itemize> -->
 
 (incomplete)
 
@@ -230,9 +230,9 @@ function.
 
 <sect1><tt/dbg.h/<label id="dbg.h"><p>
 
-<itemize>
+<!-- <itemize> -->
 <!-- <item><ref id="DbgInit" name="DbgInit"> -->
-</itemize>
+<!-- </itemize> -->
 
 (incomplete)
 
@@ -261,12 +261,12 @@ Low-level disk I/O API.
 
 <sect1><tt/errno.h/<label id="errno.h"><p>
 
-<itemize>
+<!-- <itemize> -->
 <!-- <item><ref id="_directerrno" name="_directerrno"> -->
 <!-- <item><ref id="_mappederrno" name="_mappederrno"> -->
 <!-- <item><ref id="_osmaperrno" name="_osmaperrno"> -->
 <!-- <item><ref id="_seterrno" name="_seterrno"> -->
-</itemize>
+<!-- </itemize> -->
 
 (incomplete)
 
@@ -307,7 +307,7 @@ Low-level disk I/O API.
 
 <sect1><tt/lynx.h/<label id="lynx.h"><p>
 
-<itemize>
+<!-- <itemize> -->
 <!-- <item><ref id="lynx_eeprom_erase" name="lynx_eeprom_erase"> -->
 <!-- <item><ref id="lynx_eeprom_read" name="lynx_eeprom_read"> -->
 <!-- <item><ref id="lynx_eeprom_write" name="lynx_eeprom_write"> -->
@@ -315,7 +315,7 @@ Low-level disk I/O API.
 <!-- <item><ref id="lynx_eewrite" name="lynx_eewrite"> -->
 <!-- <item><ref id="lynx_exec" name="lynx_exec"> -->
 <!-- <item><ref id="lynx_load" name="lynx_load"> -->
-</itemize>
+<!-- </itemize> -->
 
 (incomplete)
 
@@ -350,10 +350,10 @@ Low-level disk I/O API.
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
-<itemize>
+<!-- <itemize> -->
 <!-- <item><ref id="get_tv" name="get_tv"> -->
 <!-- <item><ref id="waitvblank" name="waitvblank"> -->
-</itemize>
+<!-- </itemize> -->
 
 (incomplete)
 
@@ -654,12 +654,12 @@ communication.
 
 <sect1><tt/zlib.h/<label id="zlib.h"><p>
 
-<itemize>
+<!-- <itemize> -->
 <!-- <item><ref id="adler32" name="adler32"> -->
 <!-- <item><ref id="crc32" name="crc32"> -->
 <!-- <item><ref id="inflatemem" name="inflatemem"> -->
 <!-- <item><ref id="uncompress" name="uncompress"> -->
-</itemize>
+<!-- </itemize> -->
 
 (incomplete)
 
@@ -4209,7 +4209,9 @@ the program ends.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="set_brk" name="set_brk">
+<ref id="reset_irq" name="reset_irq">,
+<ref id="set_brk" name="set_brk">,
+<ref id="set_irq" name="set_irq">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -4223,8 +4225,15 @@ the program ends.
 <tag/Header/<tt/<ref id="6502.h" name="6502.h">/
 <tag/Declaration/<tt/void reset_irq (void);/
 <tag/Description/<tt/reset_irq/ resets the C level interrupt request vector.
+<tag/Limits/
+<itemize>
+<item>The original IRQ vector is restored on program termination even without
+calling this function.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="reset_brk" name="reset_brk">,
+<ref id="set_brk" name="set_brk">,
 <ref id="set_irq" name="set_irq">
 <tag/Example/None.
 </descrip>
@@ -4585,15 +4594,21 @@ the value <tt/IRQ_NOT_HANDLED/.
 <itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
-<item>The stub saves the zero page registers used by the C runtime and switches
-to the provided stack area. This means that it is safe to execute C code,
-even if C code was interrupted. Be careful however not to call into the C library,
-and do not enable stack checks for the handler function or any other function called
-from it.
+<item>The stub saves the registers and zero page locations used by the C runtime
+and switches to the provided stack area. As a consequence, there is some
+runtime overhead, but it it is safe to execute C code, even if other C code
+was interrupted. Be careful however not to call C library functions, and do not
+enable stack checks for the handler function or any other function called from
+it.
+<item>The interrupt vector is reset on function termination, so it's not
+strictly necessary to call <tt/<ref id="reset_irq" name="reset_irq">/ as part
+of the cleanup when the program terminates.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="reset_irq" name="reset_irq">
+<ref id="reset_brk" name="reset_brk">,
+<ref id="reset_irq" name="reset_irq">,
+<ref id="set_brk" name="set_brk">
 <tag/Example/None.
 </descrip>
 </quote>

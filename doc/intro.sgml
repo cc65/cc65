@@ -92,24 +92,24 @@ is the C64.
          |
         cc65
          \/
-    +---------+       +---------+
-    | hello.s |       | text.s  |
-    +---------+       +---------+
-         |                 |
-        ca65              ca65
-         \/                \/
-    +---------+       +---------+       +----------+       +---------+
-    | hello.o |       | text.o  |       |  c64.o   |       | c64.lib |
-    +---------+       +---------+       +----------+       +---------+
-         |                    \          /                      |
-         |                     \        /                       |
-         |                      \      /                        |
-         +----------------------->ld65<-------------------------+
+    +---------+       +---------+       +---------+
+    | hello.s |       | text.s  |       | crt0.o  |
+    +---------+       +---------+       +---------+
+         |                 |                 |
+        ca65              ca65              ar65
+         \/                \/                \/
+    +---------+       +---------+       +---------+
+    | hello.o |       | text.o  |       | c64.lib |
+    +---------+       +---------+       +---------+
+         |                    \          /
+         |                     \        /
+         |                      \      /
+         +----------------------->ld65<
                                    \/
                                  hello
 </verb></tscreen>
 
-<tt/c64.o/ (the startup code) and <tt/c64.lib/ (the C64 version of the runtime
+<tt/crt0.o/ (the startup code) and <tt/c64.lib/ (the C64 version of the runtime
 and C library) are provided in binary form in the cc65 package. Actually, the
 startup code is contained in the library, so you won't need to care about it.
 

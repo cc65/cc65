@@ -40,7 +40,7 @@ iocbok:	stx	tmp4		; remember IOCB index
 	jsr	ucase_fn
 	bcc	ucok1
 
-	lda	#182		; see oserror.s
+	lda	#183		; see oserror.s
 	rts
 ucok1:
 

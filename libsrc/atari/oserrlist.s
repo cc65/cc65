@@ -90,4 +90,5 @@ __sys_oserrlist:
         sys_oserr_entry        176, "invalid disk format"
         sys_oserr_entry        180, "not a binary file"
         sys_oserr_entry        181, "invalid address range"
+        sys_oserr_entry        182, "invalid parameter"
         sys_oserr_sentinel     "unknown error"

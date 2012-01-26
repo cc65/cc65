@@ -16,9 +16,9 @@ _write:
 	jmp	__do_oserror	; update errno
 
 write9:
-	lda	ICBLL,x		; get buf len lo
+	lda	ICBLL,x		; get buf len low
 	pha
-	lda	ICBLH,x		; buf len hi
+	lda	ICBLH,x		; buf len high
 	tax
 	lda	#0
 	sta	__oserror	; clear system dependend error code

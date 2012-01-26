@@ -113,9 +113,9 @@ install:	install-test install-dirs install-bins install-libs install-docs
 	@echo 'LD65_OBJ=$(LD65_OBJ)'
 	@echo
 	@if [ -x $(bindir)/grc${EXT} ]; then \
-	  echo 'grc was renamed to grc65; but, a grc command is in your binaries directory.' \
-	  echo "If that command is an old copy of CC65's program," \
-	  echo 'then you should use a "${MAKE} erase-grc" command to remove it.' \
+	  echo 'grc was renamed to grc65; but, a grc command is in your binaries directory.'; \
+	  echo "If that command is an old copy of CC65's program,"; \
+	  echo 'then you should use a "${MAKE} erase-grc" command to remove it.'; \
 	  fi
 
 .PHONY:	install-test

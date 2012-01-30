@@ -1,33 +1,22 @@
 #
-# Makefile for GEOS lib
-# for cc65
-#
+# makefile for CC65 runtime library
 #
 
-%.o:	%.s
-	@$(AS) -o $@ $(AFLAGS) $<
+#--------------------------------------------------------------------------
+# Object files
 
-%.o:   	%.c
-	@$(CC) $(CFLAGS) $<
-	@$(AS) -g -o $@ $(AFLAGS) $(*).s
+C_OBJS	+=	systime.o
 
-S_OBJS  =       ctype.o                 \
-                callroutine.o           \
-                enterdesktop.o          \
-                firstinit.o             \
-                get_ostype.o            \
-                getrandom.o             \
-                getserialnumber.o       \
-	        initdoneio.o            \
-                mainloop.o              \
-                panic.o                 \
-                tobasic.o               \
-                setdevice.o             \
-                sysuname.o
-
-C_OBJS	=	systime.o
-
-all: $(C_OBJS) $(S_OBJS)
-
-clean:
-	@$(RM) *.~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) core
+S_OBJS  +=      ctype.o			\
+		callroutine.o		\
+		enterdesktop.o		\
+		firstinit.o		\
+		get_ostype.o		\
+		getrandom.o		\
+		getserialnumber.o	\
+		initdoneio.o		\
+		mainloop.o		\
+		panic.o			\
+		tobasic.o		\
+		setdevice.o		\
+		sysuname.o

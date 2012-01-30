@@ -1,27 +1,95 @@
 #
-# Makefile for GEOS lib
-# for cc65
+# makefile for CC65 runtime library
 #
-# Maciej 'YTM/Elysium' Witkowiak
 
-OBJ_DIRS=common conio devel disk dlgbox file graph menuicon memory mousesprite process runtime system
+.SUFFIXES: .o .s .c
 
-all:
-	@for i in $(OBJ_DIRS); do $(MAKE) -C $$i; done
-	@for i in $(OBJ_DIRS); do $(AR) a ../geos-cbm.lib $$i/*.o; done
+#--------------------------------------------------------------------------
+# Programs and flags
 
-rebuild: zap all clean
+SYS	= geos-cbm
 
+AS	= ../../src/ca65/ca65
+CC	= ../../src/cc65/cc65
+LD	= ../../src/ld65/ld65
 
-.PHONY: clean
+AFLAGS	= -t $(SYS) --forget-inc-paths -I../../asminc
+CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
+
+#--------------------------------------------------------------------------
+# Rules
+
+%.o:   	%.c
+	@$(CC) -o $(notdir $(*).s) $(CFLAGS) $<
+	@$(AS) -o $@ $(AFLAGS) $(*).s
+
+%.o:	%.s
+	@$(AS) -g -o $@ $(AFLAGS) $<
+
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.joy:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.mou:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.ser:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+#--------------------------------------------------------------------------
+# Directories
+
+DIRS =	common		\
+	conio		\
+	devel		\
+	disk		\
+	dlgbox		\
+	file		\
+	graph		\
+	menuicon	\
+	memory		\
+	mousesprite	\
+	process		\
+	runtime		\
+	system
+
+#--------------------------------------------------------------------------
+# Drivers
+
+EMDS = geos-vdc.emd
+
+JOYS = geos-stdjoy.joy
+
+MOUS = #geos-stdmou.mou
+
+SERS =
+
+TGIS = geos-tgi.tgi
+
+#--------------------------------------------------------------------------
+# Directives
+
+include $(addsuffix /Makefile, $(DIRS))
+vpath %.c $(DIRS)
+vpath %.s $(DIRS)
+
+#--------------------------------------------------------------------------
+# Targets
+
+.PHONY:	all clean zap
+
+all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
+
 clean:
-	@for i in $(OBJ_DIRS); do \
-	    cd $$i;				\
-	    $(MAKE) clean;			\
-	    cd ..;				\
-	done
+	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
-.PHONY: zap
 zap:	clean
-	@$(RM) ../geos-cbm.lib
-
+	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)

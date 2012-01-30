@@ -1,17 +1,14 @@
 #
-# Makefile for GEOS lib
-# for cc65
-#
+# makefile for CC65 runtime library
 #
 
-%.o:	%.s
-	@$(AS) -o $@ $(AFLAGS) $<
+#--------------------------------------------------------------------------
+# Object files
 
-
-S_OBJS	= domenu.o dopreviousmenu.o redomenu.o recovermenu.o recoverallmenus.o\
-          gotofirstmenu.o doicons.o
-
-all: $(S_OBJS)
-
-clean:
-	@$(RM) *.~ $(S_OBJS) core
+S_OBJS +=	domenu.o		\
+		dopreviousmenu.o	\
+		redomenu.o		\
+		recovermenu.o		\
+		recoverallmenus.o	\
+		gotofirstmenu.o		\
+		doicons.o

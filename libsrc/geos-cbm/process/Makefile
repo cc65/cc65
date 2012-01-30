@@ -1,16 +1,11 @@
 #
-# Makefile for GEOS lib
-# for cc65
-#
+# makefile for CC65 runtime library
 #
 
-%.o:	%.s
-	@$(AS) -o $@ $(AFLAGS) $<
+#--------------------------------------------------------------------------
+# Object files
 
-
-S_OBJS	= processinitrestartenable.o processblock.o processfreeze.o processsleep.o
-
-all: $(S_OBJS)
-
-clean:
-	@$(RM) *.~ $(S_OBJS) core
+S_OBJS +=	processinitrestartenable.o	\
+		processblock.o			\
+		processfreeze.o			\
+		processsleep.o

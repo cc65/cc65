@@ -1,17 +1,21 @@
 #
-# Makefile for GEOS lib
-# for cc65
+# makefile for CC65 runtime library
 #
 
-%.o:	%.s
-	@$(AS) -o $@ $(AFLAGS) $<
+#--------------------------------------------------------------------------
+# Object files
 
-
-S_OBJS	= cclear.o chline.o cvline.o cgetc.o clrscr.o color.o\
-	cputc.o cpputs.o cursor.o gotoxy.o kbhit.o revers.o\
-	where.o _scrsize.o
-
-all: $(S_OBJS)
-
-clean:
-	@$(RM) *.~ $(S_OBJS) core
+S_OBJS +=	_scrsize.o	\
+		cclear.o	\
+		chline.o	\
+		cvline.o	\
+		cgetc.o		\
+		clrscr.o	\
+		color.o		\
+		cputc.o		\
+		cpputs.o	\
+		cursor.o	\
+		gotoxy.o	\
+		kbhit.o		\
+		revers.o	\
+		where.o

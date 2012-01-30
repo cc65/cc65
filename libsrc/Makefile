@@ -250,31 +250,13 @@ cbm610lib:
 
 .PHONY:	geos-cbmlib
 geos-cbmlib:
-	CC=../$(CC) \
-	AS=../$(AS) \
-	AR=../$(AR) \
-	LD=../$(LD) \
-	AFLAGS="-t geos-cbm --forget-inc-paths -I../../../asminc" \
-	CFLAGS="-Osir -g -T -t geos-cbm --forget-inc-paths -I. -I../../../include" \
-	$(MAKE) -C geos-cbm
-	for i in em joystick tgi conio common runtime zlib; do \
-	    CC=$(CC) \
-	    AS=$(AS) \
-	    LD=$(LD) \
-	    AFLAGS="-t geos-cbm --forget-inc-paths -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t geos-cbm --forget-inc-paths -I. -I../../include" \
+	for i in runtime geos-cbm common conio em joystick tgi zlib; do \
 	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
-	    for objfile in $$i/*.o; do \
-	        if [ -f geos-cbm/$$objfile ]; then \
-	      	    $(AR) a geos-cbm.lib geos-cbm/$$objfile || exit 1; \
-	      	else \
-	      	    $(AR) a geos-cbm.lib $$objfile || exit 1; \
-	      	fi; \
-	    done \
+	    $(AR) a geos-cbm.lib $$i/*.o || exit 1; \
 	done
-	cp geos-cbm/devel/*.emd .
-	cp geos-cbm/devel/*.joy .
-	cp geos-cbm/devel/*.tgi .
+	cp geos-cbm/*.emd .
+	cp geos-cbm/*.joy .
+	cp geos-cbm/*.tgi .
 	if [ -d geos-cbm/extra ]; then \
 	    for i in geos-cbm/extra/*.o; do \
 	       	cp $$i geos-cbm-`basename $$i` || exit 1; \

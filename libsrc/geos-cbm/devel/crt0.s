@@ -13,7 +13,7 @@
 	.import		callmain
 	.import		zerobss
 	.importzp	sp
-	.include	"../inc/jumptab.inc"
+	.include	"jumptab.inc"
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.

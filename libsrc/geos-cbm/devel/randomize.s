@@ -8,7 +8,7 @@
     	.export	       	__randomize
 	.import		_srand
 
-	.include	"../inc/geossym.inc"
+	.include	"geossym.inc"
 
 __randomize:
 	lda	random		; get random value from internal generator

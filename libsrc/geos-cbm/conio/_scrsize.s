@@ -7,7 +7,7 @@
 ; 6.3.2001, 17.4.2003
 
 
-	.include 	"../inc/geossym.inc"
+	.include 	"geossym.inc"
 
 	.export		xsize, ysize
 	.export		screensize

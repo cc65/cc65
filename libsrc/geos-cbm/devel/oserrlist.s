@@ -14,7 +14,7 @@
 ; error code could not be found.
 ;
 
-	.include	"../inc/const.inc"
+	.include	"const.inc"
 
         .export         __sys_oserrlist
 

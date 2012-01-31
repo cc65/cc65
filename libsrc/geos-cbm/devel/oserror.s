@@ -9,7 +9,7 @@
 
 	.export		__osmaperrno
 	.include	"errno.inc"
-	.include	"../inc/const.inc"
+	.include	"const.inc"
 
 .code
 

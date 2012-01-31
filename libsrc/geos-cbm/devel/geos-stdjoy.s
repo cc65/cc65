@@ -9,7 +9,7 @@
 
       	.include 	"joy-kernel.inc"
         .include        "joy-error.inc"
-	.include	"../inc/geossym.inc"
+	.include	"geossym.inc"
 
         .macpack        generic
 

@@ -8,9 +8,9 @@
 	.import		popax,pushax,_dio_log_to_phys
 	.importzp	ptr1
  	.export		dio_params,dio_secnum
-	.include 	"../inc/geossym.inc"
-	.include	"../inc/jumptab.inc"
-	.include	"../inc/dio.inc"
+	.include 	"geossym.inc"
+	.include	"jumptab.inc"
+	.include	"dio.inc"
 
 .bss
 dio_secnum:	.res 2

@@ -15,8 +15,8 @@
 	.constructor    initmainargs, 24
        	.import         __argc, __argv
 
-	.include	"../inc/const.inc"
-	.include	"../inc/geossym.inc"
+	.include	"const.inc"
+	.include	"geossym.inc"
 
 ;---------------------------------------------------------------------------
 ; Setup arguments for main

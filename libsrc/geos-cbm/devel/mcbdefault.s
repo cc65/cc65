@@ -13,9 +13,9 @@
         .export         _mouse_def_callbacks
 
 ;       .include        "mouse-kernel.inc"
-;	.include	"../inc/const.inc"
-;	.include	"../inc/geossym.inc"
-	.include	"../inc/jumptab.inc"
+;	.include	"const.inc"
+;	.include	"geossym.inc"
+	.include	"jumptab.inc"
 
 ;       .macpack        generic
 

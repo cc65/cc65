@@ -12,8 +12,8 @@
 
 FILEDES	= 3	; first free to use file descriptor
 
-	.include	"../inc/geossym.inc"
-	.include	"../inc/const.inc"
+	.include	"geossym.inc"
+	.include	"const.inc"
        	.include        "errno.inc"
 	.include	"fcntl.inc"
 

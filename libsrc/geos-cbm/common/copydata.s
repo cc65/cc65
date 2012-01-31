@@ -6,8 +6,8 @@
 
 	.export		copydata
 	.import		__DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
-	.include	"../inc/geossym.inc"
-	.include 	"../inc/jumptab.inc"
+	.include	"geossym.inc"
+	.include 	"jumptab.inc"
 
 copydata:
 	lda #<__DATA_SIZE__	; no need to check if it is == 0

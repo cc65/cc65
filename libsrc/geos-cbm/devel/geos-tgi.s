@@ -8,10 +8,10 @@
       	.include 	"tgi-kernel.inc"
         .include        "tgi-error.inc"
 
-	.include	"../inc/const.inc"
-	.include	"../inc/jumptab.inc"
-	.include	"../inc/geossym.inc"
-	.include	"../inc/geossym2.inc"
+	.include	"const.inc"
+	.include	"jumptab.inc"
+	.include	"geossym.inc"
+	.include	"geossym2.inc"
 
         .macpack        generic
 

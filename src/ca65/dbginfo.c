@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -503,7 +503,7 @@ void WriteHLLDbgSyms (void)
             /* Remember if the symbol has debug info attached
              * ### This should go into DbgInfoCheck
              */
-            if (S->Sym && S->Sym->DebugSymId) {
+            if (S->Sym && S->Sym->DebugSymId != ~0U) {
                 S->Flags |= HLL_DATA_SYM;
             }
 

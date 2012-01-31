@@ -8,6 +8,6 @@
 
 	    .export _UseSystemFont
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _UseSystemFont = UseSystemFont

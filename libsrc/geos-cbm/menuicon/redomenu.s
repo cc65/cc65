@@ -8,6 +8,6 @@
 
 	    .export _ReDoMenu
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _ReDoMenu = ReDoMenu

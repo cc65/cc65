@@ -10,8 +10,8 @@
 	    .import popax, setoserror
 	    .import gettrse
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _FollowChain:
 	sta r3L

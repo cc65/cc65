@@ -9,8 +9,8 @@
 	    .export _revers
 	    .importzp tmp1
 
-	    .include "../inc/geossym.inc"
-	    .include "../inc/const.inc"
+	    .include "geossym.inc"
+	    .include "const.inc"
 
 _revers:
 	    tax

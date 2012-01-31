@@ -10,7 +10,7 @@
 
 	    .export _IsMseInRegion
 	    
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _IsMseInRegion:
 	    jsr _InitDrawWindow

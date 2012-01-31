@@ -10,7 +10,7 @@
 	    .import BitmapRegs
 	    .export _BitmapUp
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _BitmapUp:
 	    jsr BitmapRegs

@@ -11,8 +11,8 @@
 	    .importzp ptr2, ptr3, ptr4
 	    .import popa, popax
 
-	    .include "../inc/geossym.inc"
-	    .include "../inc/const.inc"
+	    .include "geossym.inc"
+	    .include "const.inc"
 
 .code
 

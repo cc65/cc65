@@ -9,7 +9,7 @@
 	    .import setoserror
 	    .export _ChangeDiskDevice
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	
 _ChangeDiskDevice:
 	jsr ChangeDiskDevice

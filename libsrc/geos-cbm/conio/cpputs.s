@@ -17,9 +17,9 @@
 	    .import popa
 	    .importzp cursor_x, cursor_y
 
-	    .include "../inc/const.inc"
-	    .include "../inc/geossym.inc"
-	    .include "../inc/jumptab.inc"
+	    .include "const.inc"
+	    .include "geossym.inc"
+	    .include "jumptab.inc"
 
 _cpputsxy:
 	sta	r0L		; Save s for later

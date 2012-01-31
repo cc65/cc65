@@ -10,7 +10,7 @@
 	    .import getintcharint
 	    .export _PutDecimal
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _PutDecimal:
 	    jsr getintcharint

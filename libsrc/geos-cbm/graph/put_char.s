@@ -9,8 +9,8 @@
 	    .import popa
 	    .export _PutChar
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _PutChar:
 	    sta r11L

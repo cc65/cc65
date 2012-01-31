@@ -7,7 +7,7 @@
 	    .import popa, popax
 	    .export getintcharint
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 getintcharint:
 	    sta r11L

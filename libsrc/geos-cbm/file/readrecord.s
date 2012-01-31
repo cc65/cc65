@@ -9,8 +9,8 @@
 	    .export _ReadRecord
 	    .import popax, setoserror
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _ReadRecord:
 	sta r2L

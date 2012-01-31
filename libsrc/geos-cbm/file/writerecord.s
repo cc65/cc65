@@ -9,8 +9,8 @@
 	    .export _WriteRecord
 	    .import popax, setoserror
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _WriteRecord:
 	sta r2L

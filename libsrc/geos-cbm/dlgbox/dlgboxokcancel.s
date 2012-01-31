@@ -10,8 +10,8 @@
 	    .import DB_get2lines, _DoDlgBox
 	    .importzp ptr3, ptr4
 
-	    .include "../inc/geossym.inc"
-	    .include "../inc/const.inc"
+	    .include "geossym.inc"
+	    .include "const.inc"
 
 .code
 

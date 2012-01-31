@@ -8,6 +8,6 @@
 
 	    .export _MouseUp
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _MouseUp = MouseUp

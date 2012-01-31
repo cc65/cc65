@@ -8,6 +8,6 @@
 
 	    .export _Panic
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _Panic = Panic

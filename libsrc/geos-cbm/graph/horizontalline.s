@@ -11,7 +11,7 @@
 	    
 	    .export _HorizontalLine
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _HorizontalLine:
 	    jsr HLineRegs

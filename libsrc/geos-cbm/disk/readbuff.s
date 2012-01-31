@@ -10,8 +10,8 @@
 	    .import gettrse
 	    .export _ReadBuff
 
-	    .include "../inc/diskdrv.inc"
-	    .include "../inc/geossym.inc"
+	    .include "diskdrv.inc"
+	    .include "geossym.inc"
 	
 _ReadBuff:
 	jsr gettrse

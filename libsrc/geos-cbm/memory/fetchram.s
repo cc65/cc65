@@ -9,8 +9,8 @@
 	    .import REURegs
 	    .export _FetchRAM
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _FetchRAM:
 	    jsr REURegs

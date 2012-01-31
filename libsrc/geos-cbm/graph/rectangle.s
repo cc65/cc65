@@ -8,6 +8,6 @@
 
 	    .export _Rectangle
 	    
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _Rectangle = Rectangle

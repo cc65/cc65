@@ -10,8 +10,8 @@
 	    .import popa
 	    .export _SaveFile
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _SaveFile:
 	sta r9L

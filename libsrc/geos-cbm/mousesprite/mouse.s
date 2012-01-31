@@ -15,9 +15,9 @@
        	.import	       	popsreg, addysp1
    	.importzp   	sp, sreg, ptr1
 
-	.include "../inc/const.inc"
-	.include "../inc/jumptab.inc"
-	.include "../inc/geossym.inc"
+	.include "const.inc"
+	.include "jumptab.inc"
+	.include "geossym.inc"
 
 
 .code

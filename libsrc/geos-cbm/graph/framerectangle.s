@@ -8,6 +8,6 @@
 
 	    .export _FrameRectangle
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	    
 _FrameRectangle = FrameRectangle

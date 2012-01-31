@@ -15,9 +15,9 @@
 	    .export _get_tv
 	    .importzp tmp1
 
-	    .include "../inc/const.inc"
-	    .include "../inc/geossym.inc"
-	    .include "../inc/geossym2.inc"
+	    .include "const.inc"
+	    .include "geossym.inc"
+	    .include "geossym2.inc"
 
 _get_ostype:
 	    ldx #0

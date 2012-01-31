@@ -10,7 +10,7 @@
 
 	    .export _RecoverLine
 	    
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _RecoverLine:
 	    jsr HLineRegs

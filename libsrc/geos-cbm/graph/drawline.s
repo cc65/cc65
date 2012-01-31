@@ -11,9 +11,9 @@
 	    .importzp tmp1
 	    .export _DrawLine
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
-	    .include "../inc/geosmac.ca65.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
+	    .include "geosmac.ca65.inc"
 
 _DrawLine:
 	    tay

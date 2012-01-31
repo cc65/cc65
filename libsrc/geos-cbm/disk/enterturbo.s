@@ -8,6 +8,6 @@
 
 	    .export _EnterTurbo
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	
 _EnterTurbo	= EnterTurbo

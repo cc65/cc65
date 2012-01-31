@@ -8,7 +8,7 @@
 
 	    .export _kbhit
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 .proc   _kbhit
 

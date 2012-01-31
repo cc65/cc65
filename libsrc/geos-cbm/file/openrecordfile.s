@@ -9,8 +9,8 @@
 	    .import setoserror
 	    .export _OpenRecordFile
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _OpenRecordFile:
 	sta r0L

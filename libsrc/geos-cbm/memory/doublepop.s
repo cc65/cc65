@@ -7,7 +7,7 @@
 	    .import popax
 	    .export DoublePop
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 DoublePop:
 	    sta r0L

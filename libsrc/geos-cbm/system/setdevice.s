@@ -8,6 +8,6 @@
 
 	    .export _SetDevice
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	
 _SetDevice	= SetDevice

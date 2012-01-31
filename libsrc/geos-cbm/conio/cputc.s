@@ -30,9 +30,9 @@
 	    .import xsize,ysize
 	    .importzp cursor_x, cursor_y, cursor_c, cursor_r
 
-	    .include "../inc/const.inc"
-	    .include "../inc/geossym.inc"
-	    .include "../inc/jumptab.inc"
+	    .include "const.inc"
+	    .include "geossym.inc"
+	    .include "jumptab.inc"
 
 _cputcxy:
 	pha	    		; Save C

@@ -9,8 +9,8 @@
 	    .import setoserror
 	    .export _ChkDkGEOS
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _ChkDkGEOS:
 	jsr ChkDkGEOS

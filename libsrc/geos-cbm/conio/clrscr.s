@@ -8,9 +8,9 @@
 
 	    .export _clrscr
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
-	    .include "../inc/const.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
+	    .include "const.inc"
 
 	    .import fixcursor
 	    .importzp cursor_c, cursor_r

@@ -14,7 +14,7 @@
 	    .export _BlockProcess
 	    .export _UnBlockProcess
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	    
 _BlockProcess:
 	    tax

@@ -8,6 +8,6 @@
 
 	    .export _PromptOff
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _PromptOff = PromptOff

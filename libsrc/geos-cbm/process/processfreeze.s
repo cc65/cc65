@@ -12,7 +12,7 @@
 	    .export _FreezeProcess
 	    .export _UnFreezeProcess
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	    
 _FreezeProcess:
 	    tax

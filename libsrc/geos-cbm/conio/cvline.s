@@ -6,8 +6,8 @@
 ; void cvlinexy (unsigned char x, unsigned char y, unsigned char length);
 ; void cvline (unsigned char length);
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
     	    .export		_cvlinexy, _cvline
 	    .import		popa, _gotoxy, fixcursor

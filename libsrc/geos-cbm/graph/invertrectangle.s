@@ -8,7 +8,7 @@
 
 	    .export _InvertRectangle
 	    
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _InvertRectangle = InvertRectangle
 

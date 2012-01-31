@@ -8,6 +8,6 @@
 
 	    .export _ToBASIC
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _ToBASIC = ToBASIC

@@ -8,7 +8,7 @@
 
 	    .export _GetCharWidth
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _GetCharWidth:
 	    jsr GetCharWidth

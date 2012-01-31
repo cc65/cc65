@@ -8,6 +8,6 @@
 
 	    .export _FirstInit
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _FirstInit = FirstInit

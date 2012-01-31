@@ -10,8 +10,8 @@
 	    .import gettrse
 	    .export _PutBlock
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _PutBlock:
 	sta r4L

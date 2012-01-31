@@ -9,7 +9,7 @@
 
 	    .export _InitForIO, _DoneWithIO
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _InitForIO = InitForIO
 	    

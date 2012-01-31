@@ -8,6 +8,6 @@
 
 	    .export _InitTextPrompt
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _InitTextPrompt	= InitTextPrompt

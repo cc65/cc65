@@ -8,8 +8,8 @@
 
 	    .export  __sysremove
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 __sysremove:
 	sta r0L

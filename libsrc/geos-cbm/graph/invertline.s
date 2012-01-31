@@ -9,7 +9,7 @@
 	    .import HLineRegs
 	    .export _InvertLine
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	    
 _InvertLine:
 	    jsr HLineRegs

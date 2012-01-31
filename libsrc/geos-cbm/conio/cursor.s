@@ -9,8 +9,8 @@
 	    .export _cursor
 	    .import update_cursor
 	    .importzp cursor_flag
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _cursor:
 

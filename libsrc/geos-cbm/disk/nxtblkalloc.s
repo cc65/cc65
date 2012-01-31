@@ -11,8 +11,8 @@
 	    .importzp ptr4
 	    .export _NxtBlkAlloc
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _NxtBlkAlloc:
 	sta r2L

@@ -9,8 +9,8 @@
 	    .import DoublePop
 	    .export _ClearRam
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _ClearRam:
 	    jsr DoublePop

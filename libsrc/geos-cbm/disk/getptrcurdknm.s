@@ -11,8 +11,8 @@
 	    .import __oserror
 	    .export _GetPtrCurDkNm
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _GetPtrCurDkNm: 
 	sta ptr3

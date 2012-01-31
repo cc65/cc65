@@ -8,6 +8,6 @@
 
 	    .export _CallRoutine
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _CallRoutine = CallRoutine

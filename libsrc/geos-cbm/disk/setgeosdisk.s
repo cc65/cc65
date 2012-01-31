@@ -9,7 +9,7 @@
 	    .import setoserror
 	    .export _SetGEOSDisk
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _SetGEOSDisk:
 	jsr SetGEOSDisk

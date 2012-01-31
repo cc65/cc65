@@ -12,8 +12,8 @@
 	    .import popa
 	    .export _PosSprite
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _PosSprite:
 	    sta ptr4

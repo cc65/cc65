@@ -8,8 +8,8 @@
 
 	    .export _DoDlgBox
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _DoDlgBox:
 	    sta r0L

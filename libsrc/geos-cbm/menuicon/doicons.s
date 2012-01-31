@@ -8,8 +8,8 @@
 
 	    .export _DoIcons
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _DoIcons:
 	    sta r0L

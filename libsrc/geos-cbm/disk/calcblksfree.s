@@ -9,8 +9,8 @@
 	    .import __oserror
 	    .export _CalcBlksFree
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _CalcBlksFree:
 	jsr CalcBlksFree

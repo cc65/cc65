@@ -11,8 +11,8 @@
 
 	.import		dio_params, setoserror
  	.export		_dio_write
-	.include "../inc/geossym.inc"
-	.include "../inc/jumptab.inc"
+	.include "geossym.inc"
+	.include "jumptab.inc"
 
 .proc	_dio_write
 

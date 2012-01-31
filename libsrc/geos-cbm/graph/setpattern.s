@@ -8,6 +8,6 @@
 
 	    .export _SetPattern
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _SetPattern = SetPattern

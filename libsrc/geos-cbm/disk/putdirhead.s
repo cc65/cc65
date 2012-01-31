@@ -9,7 +9,7 @@
 	    .import setoserror
 	    .export _PutDirHead
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	
 _PutDirHead:
 	jsr PutDirHead

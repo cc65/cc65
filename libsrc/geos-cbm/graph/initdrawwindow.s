@@ -11,7 +11,7 @@
 	    
 	    .export _InitDrawWindow
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 _InitDrawWindow:			;a/x is a struct window*
 	    sta ptr4

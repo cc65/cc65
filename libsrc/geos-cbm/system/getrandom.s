@@ -8,7 +8,7 @@
 
 	    .export _GetRandom
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _GetRandom:
 	    jsr GetRandom

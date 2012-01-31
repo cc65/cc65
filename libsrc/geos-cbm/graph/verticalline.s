@@ -10,8 +10,8 @@
 	    	    	    
 	    .export _VerticalLine
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	    
 _VerticalLine:
 	    stx r4H

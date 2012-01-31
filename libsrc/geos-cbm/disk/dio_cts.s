@@ -15,9 +15,9 @@
 	.export		sectab_1541_l, sectab_1541_h	; for log_to_phys
 	.import		popax,__oserror
 	.importzp	ptr1,ptr2,ptr3,tmp1,tmp2,tmp3,tmp4
-	.include "../inc/dio.inc"
-        .include "../inc/geossym.inc"
-	.include "../inc/const.inc"
+	.include "dio.inc"
+        .include "geossym.inc"
+	.include "const.inc"
 
 .proc	_dio_phys_to_log
 	sta	ptr1

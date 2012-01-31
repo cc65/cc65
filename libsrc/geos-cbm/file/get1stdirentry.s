@@ -9,8 +9,8 @@
 	    .import __oserror
 	    .export _Get1stDirEntry
 
-	    .include "../inc/diskdrv.inc"
-	    .include "../inc/geossym.inc"
+	    .include "diskdrv.inc"
+	    .include "geossym.inc"
 
 _Get1stDirEntry:
 	jsr Get1stDirEntry

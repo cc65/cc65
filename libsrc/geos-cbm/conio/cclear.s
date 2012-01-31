@@ -6,8 +6,8 @@
 ; void cclearxy (unsigned char x, unsigned char y, unsigned char length);
 ; void cclear (unsigned char length);
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
     	    .export		_cclearxy, _cclear
 	    .import		popa, _gotoxy, fixcursor

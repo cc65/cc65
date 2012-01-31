@@ -12,7 +12,7 @@
 	    .importzp tmp1
 	    .export _DrawPoint
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _DrawPoint:
 	    jsr PointRegs

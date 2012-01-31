@@ -10,8 +10,8 @@
 	    .import gettrse
 	    .export _VerWriteBlock
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _VerWriteBlock:
 	sta r4L

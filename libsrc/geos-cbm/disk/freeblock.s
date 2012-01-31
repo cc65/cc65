@@ -9,8 +9,8 @@
 	    .import gettrse, setoserror
 	    .export _FreeBlock
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _FreeBlock:
 	jsr gettrse

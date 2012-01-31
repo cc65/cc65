@@ -15,8 +15,8 @@
 	    .export _RestartProcess
 	    .export _EnableProcess
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _InitProcesses:
 	    

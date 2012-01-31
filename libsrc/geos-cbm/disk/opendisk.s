@@ -9,7 +9,7 @@
 	    .import setoserror
 	    .export _OpenDisk
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	
 _OpenDisk:
 	jsr OpenDisk

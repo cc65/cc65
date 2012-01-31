@@ -8,6 +8,6 @@
 
 	    .export _ClearMouseMode
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _ClearMouseMode = ClearMouseMode

@@ -10,7 +10,7 @@
 	    .import popa
 	    .export _CopyFString
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _CopyFString:
 	    jsr DoubleSPop

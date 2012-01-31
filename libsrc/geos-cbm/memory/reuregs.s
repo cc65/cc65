@@ -8,7 +8,7 @@
 	    .import DoublePop
 	    .export REURegs
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 REURegs:
 	    jsr DoublePop

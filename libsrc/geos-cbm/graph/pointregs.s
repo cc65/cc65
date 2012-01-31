@@ -8,7 +8,7 @@
 	    
 	    .export PointRegs
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 PointRegs:			;a/x is a struct pixel*
 	    sta ptr4

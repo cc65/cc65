@@ -9,8 +9,8 @@
 	    .import setoserror
 	    .export _FreeFile
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _FreeFile:
 	sta r9L

@@ -13,10 +13,10 @@
 	.export _dio_open, _dio_close
 	.import __oserror, _OpenDisk
 	.importzp ptr1, tmp1
-	.include "../inc/dio.inc"
-        .include "../inc/jumptab.inc"
-        .include "../inc/geossym.inc"
-	.include "../inc/const.inc"
+	.include "dio.inc"
+        .include "jumptab.inc"
+        .include "geossym.inc"
+	.include "const.inc"
 
 .bss
 

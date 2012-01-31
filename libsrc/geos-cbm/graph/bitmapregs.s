@@ -8,7 +8,7 @@
 	    
 	    .export BitmapRegs
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 BitmapRegs:			;a/x is a struct iconpic*
 	    sta ptr4

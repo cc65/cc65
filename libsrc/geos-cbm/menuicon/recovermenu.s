@@ -8,6 +8,6 @@
 
 	    .export _RecoverMenu
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _RecoverMenu = RecoverMenu

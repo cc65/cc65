@@ -13,7 +13,7 @@
 	    .import popa
 	    .importzp cursor_x, cursor_y, cursor_c, cursor_r
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _gotox:	    sta cursor_c
 	    jmp fixcursor

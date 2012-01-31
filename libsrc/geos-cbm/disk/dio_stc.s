@@ -14,9 +14,9 @@
 	.importzp	ptr1,ptr2,ptr3,tmp1,tmp2
 	.import		popax,__oserror
 	.import		sectab_1541_l, sectab_1541_h
-	.include "../inc/dio.inc"
-        .include "../inc/geossym.inc"
-	.include "../inc/const.inc"
+	.include "dio.inc"
+        .include "geossym.inc"
+	.include "const.inc"
 
 .proc	_dio_log_to_phys
 

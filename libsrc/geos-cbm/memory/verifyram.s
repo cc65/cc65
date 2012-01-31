@@ -9,8 +9,8 @@
 	    .import REURegs
 	    .export _VerifyRAM
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _VerifyRAM:
 	    jsr REURegs

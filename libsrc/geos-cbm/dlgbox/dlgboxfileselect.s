@@ -10,10 +10,10 @@
 		.import popa, popax
 		.import _DoDlgBox
 
-		.include "../inc/jumptab.inc"
-		.include "../inc/geossym.inc"
-		.include "../inc/const.inc"
-		.include "../inc/geosmac.ca65.inc"
+		.include "jumptab.inc"
+		.include "geossym.inc"
+		.include "const.inc"
+		.include "geosmac.ca65.inc"
 
 .code
 

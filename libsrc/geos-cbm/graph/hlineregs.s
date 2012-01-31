@@ -9,7 +9,7 @@
 
 	    .export HLineRegs
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 HLineRegs:
 	    stx r4H

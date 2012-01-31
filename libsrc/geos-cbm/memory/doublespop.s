@@ -9,7 +9,7 @@
 	    .export DoubleSPop
 	    .export SetPtrXY
 
-	    .include "../inc/geossym.inc"
+	    .include "geossym.inc"
 
 DoubleSPop:
 	    sta ptr4

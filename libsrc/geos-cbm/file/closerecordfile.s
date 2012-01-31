@@ -9,7 +9,7 @@
 	    .import setoserror
 	    .export _CloseRecordFile
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	
 _CloseRecordFile:
 	jsr CloseRecordFile

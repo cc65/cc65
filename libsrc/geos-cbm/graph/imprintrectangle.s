@@ -8,7 +8,7 @@
 	    
 	    .export _ImprintRectangle
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	    
 _ImprintRectangle = ImprintRectangle
 

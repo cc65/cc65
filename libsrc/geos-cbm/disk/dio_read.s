@@ -11,8 +11,8 @@
 
 	.import		dio_params, __oserror
  	.export		_dio_read
-	.include "../inc/geossym.inc"
-	.include "../inc/jumptab.inc"
+	.include "geossym.inc"
+	.include "jumptab.inc"
 
 .proc	_dio_read
 

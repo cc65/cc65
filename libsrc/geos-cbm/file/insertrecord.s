@@ -9,7 +9,7 @@
 	    .import setoserror
 	    .export _InsertRecord
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _InsertRecord:
 	jsr InsertRecord

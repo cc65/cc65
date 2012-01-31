@@ -9,7 +9,7 @@
 
 	    .export _GetNextChar
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _GetNextChar:
 	    jsr GetNextChar

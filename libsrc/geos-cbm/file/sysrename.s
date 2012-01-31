@@ -9,8 +9,8 @@
 	    .export __sysrename
 	    .import popax
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 __sysrename:
 	sta r0L

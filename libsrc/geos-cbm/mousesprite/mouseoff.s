@@ -8,6 +8,6 @@
 
 	    .export _MouseOff
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _MouseOff = MouseOff

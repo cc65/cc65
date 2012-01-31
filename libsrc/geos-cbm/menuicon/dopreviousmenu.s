@@ -8,6 +8,6 @@
 
 	    .export _DoPreviousMenu
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _DoPreviousMenu = DoPreviousMenu

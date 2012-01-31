@@ -8,6 +8,6 @@
 
 	    .export _GotoFirstMenu
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _GotoFirstMenu = GotoFirstMenu

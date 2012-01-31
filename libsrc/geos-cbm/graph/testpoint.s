@@ -10,7 +10,7 @@
 	    .import return0, return1
 	    .export _TestPoint
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	    
 _TestPoint:
 	    jsr PointRegs

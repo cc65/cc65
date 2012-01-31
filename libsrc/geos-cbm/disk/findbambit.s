@@ -11,8 +11,8 @@
 	    .import return0, return1
 	    .export _FindBAMBit
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _FindBAMBit:
 	jsr gettrse

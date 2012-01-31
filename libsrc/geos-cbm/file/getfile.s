@@ -9,8 +9,8 @@
 	    .export _GetFile
 	    .import popa, popax, setoserror
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _GetFile:
 	sta r3L

@@ -8,6 +8,6 @@
 
 	    .export _RstrFrmDialogue
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	
 _RstrFrmDialogue	= RstrFrmDialogue

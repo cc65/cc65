@@ -9,8 +9,8 @@
 	    .import __oserror
 	    .export _GetNxtDirEntry
 
-	    .include "../inc/diskdrv.inc"
-	    .include "../inc/geossym.inc"
+	    .include "diskdrv.inc"
+	    .include "geossym.inc"
 
 _GetNxtDirEntry:
 	jsr GetNxtDirEntry

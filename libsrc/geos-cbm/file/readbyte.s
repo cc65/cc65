@@ -9,7 +9,7 @@
 	    .import __oserror
 	    .export _ReadByte
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _ReadByte:
 	jsr ReadByte

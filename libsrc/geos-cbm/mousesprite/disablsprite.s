@@ -8,8 +8,8 @@
 
 	    .export _DisablSprite
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _DisablSprite:
 	    sta r3L

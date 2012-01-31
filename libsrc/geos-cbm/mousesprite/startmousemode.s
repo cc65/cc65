@@ -8,7 +8,7 @@
 
 	    .export _StartMouseMode
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _StartMouseMode:
 	    clc

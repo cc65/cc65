@@ -8,8 +8,8 @@
 
 	    .export _LoadCharSet
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 _LoadCharSet:
 	    sta r0L

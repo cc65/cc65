@@ -9,8 +9,8 @@
 	    .export _FindFTypes
 	    .import popax, popa, setoserror
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 .code
 	

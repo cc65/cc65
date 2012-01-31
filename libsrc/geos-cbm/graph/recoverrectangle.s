@@ -8,7 +8,7 @@
 	    
 	    .export _RecoverRectangle
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 	    
 _RecoverRectangle = RecoverRectangle
 

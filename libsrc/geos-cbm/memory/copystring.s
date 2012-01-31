@@ -9,7 +9,7 @@
 	    .import DoubleSPop
 	    .export _CopyString
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _CopyString:
 	    jsr DoubleSPop

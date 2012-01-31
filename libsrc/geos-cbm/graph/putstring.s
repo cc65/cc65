@@ -10,7 +10,7 @@
 	    .import getintcharint
 	    .export _PutString
 
-	    .include "../inc/jumptab.inc"
+	    .include "jumptab.inc"
 
 _PutString:
 	    jsr getintcharint

@@ -9,8 +9,8 @@
 	    .import popax, setoserror
 	    .export _BlkAlloc
 
-	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 	
 _BlkAlloc:
 	sta r2L

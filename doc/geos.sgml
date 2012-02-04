@@ -858,7 +858,7 @@ This function is similar to the DOS command I. It clears the REU cache and enabl
 
 <sect1>Files
 <p>
-This section cover the GEOS file interface.
+This section covers the GEOS file interface.
 
 <sect2>Directory handling
 <p>

@@ -50,7 +50,6 @@ DIRS =	common		\
 	disk		\
 	file		\
 	memory		\
-	process		\
 	runtime		\
 	system
 

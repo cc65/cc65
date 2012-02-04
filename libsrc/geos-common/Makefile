@@ -34,7 +34,8 @@ DIRS =	dlgbox		\
 	graph		\
 	memory		\
 	menuicon	\
-	mousesprite
+	mousesprite	\
+	process
 
 #--------------------------------------------------------------------------
 # Directives

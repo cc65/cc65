@@ -49,7 +49,6 @@ DIRS =	common		\
 	devel		\
 	disk		\
 	file		\
-	menuicon	\
 	memory		\
 	mousesprite	\
 	process		\

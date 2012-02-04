@@ -29,7 +29,8 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Directories
 
-DIRS =	dlgbox		\
+DIRS =	common		\
+	dlgbox		\
 	disk		\
 	file		\
 	graph		\

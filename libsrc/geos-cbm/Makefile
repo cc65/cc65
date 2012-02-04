@@ -44,8 +44,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Directories
 
-DIRS =	common		\
-	conio		\
+DIRS =	conio		\
 	devel		\
 	disk		\
 	file		\

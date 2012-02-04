@@ -23,7 +23,11 @@ _GetPtrCurDkNm:
 	txa
 	bne fin
 namelp:	lda (ptr4),y
+.ifdef  __GEOS_CBM__
 	cmp #$a0
+.else
+	cmp #0
+.endif
 	beq fin
 	sta (ptr3),y
 	iny

@@ -35,6 +35,7 @@ _mouse_init:
 	sta	mouseTop
 	sta	mouseLeft
 	sta	mouseLeft+1
+.ifdef  __GEOS_CBM__
 	lda	#199
 	sta	mouseBottom
 	lda	graphMode
@@ -47,6 +48,12 @@ _mse_screen320:
 	lda	#<319			; 40 columns on C64/C128
 	ldx	#>319
 _mse_storex:
+.else
+	lda	#191
+	sta	mouseBottom
+	lda	#<559
+	ldx	#>559
+.endif
 	sta	mouseRight
 	stx	mouseRight+1
 _mse_initend:

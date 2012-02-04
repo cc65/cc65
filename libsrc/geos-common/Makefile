@@ -30,7 +30,8 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 # Directories
 
 DIRS =	dlgbox		\
-	file
+	file		\
+	memory
 
 #--------------------------------------------------------------------------
 # Directives

@@ -35,7 +35,8 @@ DIRS =	dlgbox		\
 	memory		\
 	menuicon	\
 	mousesprite	\
-	process
+	process		\
+	runtime
 
 #--------------------------------------------------------------------------
 # Directives

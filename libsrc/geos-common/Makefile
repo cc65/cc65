@@ -31,6 +31,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 
 DIRS =	dlgbox		\
 	file		\
+	graph		\
 	memory
 
 #--------------------------------------------------------------------------

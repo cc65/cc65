@@ -49,7 +49,6 @@ DIRS =	common		\
 	devel		\
 	disk		\
 	file		\
-	graph		\
 	menuicon	\
 	memory		\
 	mousesprite	\

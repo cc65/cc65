@@ -48,7 +48,6 @@ DIRS =	common		\
 	conio		\
 	devel		\
 	disk		\
-	dlgbox		\
 	file		\
 	graph		\
 	menuicon	\

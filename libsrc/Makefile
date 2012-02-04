@@ -16,6 +16,7 @@ LD = ../../src/ld65/ld65
 # List of shared directories
 SHAREDDIRS =	cbm		\
 		common		\
+		geos-common	\
 		conio		\
 		dbg		\
 		em		\
@@ -250,7 +251,7 @@ cbm610lib:
 
 .PHONY:	geos-cbmlib
 geos-cbmlib:
-	for i in runtime geos-cbm common conio em joystick tgi zlib; do \
+	for i in runtime geos-cbm geos-common common conio em joystick tgi zlib; do \
 	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
 	    $(AR) a geos-cbm.lib $$i/*.o || exit 1; \
 	done

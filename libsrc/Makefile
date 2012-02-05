@@ -251,16 +251,26 @@ cbm610lib:
 
 .PHONY:	geos-cbmlib
 geos-cbmlib:
-	for i in runtime geos-cbm geos-common common conio em joystick tgi zlib; do \
+	for i in geos-cbm geos-common; do \
 	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
 	    $(AR) a geos-cbm.lib $$i/*.o || exit 1; \
+	done
+	for i in runtime common conio em joystick tgi zlib; do \
+	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
+	    for objfile in $$i/*.o; do \
+		if [ -f geos-common/`basename $$objfile` ]; then \
+		    $(AR) a geos-cbm.lib geos-common/`basename $$objfile`; \
+		else \
+		    $(AR) a geos-cbm-lib $$objfile; \
+		fi; \
+	    done \
 	done
 	cp geos-cbm/*.emd .
 	cp geos-cbm/*.joy .
 	cp geos-cbm/*.tgi .
 	if [ -d geos-cbm/extra ]; then \
 	    for i in geos-cbm/extra/*.o; do \
-	       	cp $$i geos-cbm-`basename $$i` || exit 1; \
+	    	cp $$i geos-cbm-`basename $$i` || exit 1; \
 	    done \
 	fi
 

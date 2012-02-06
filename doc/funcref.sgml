@@ -616,7 +616,7 @@ communication.
 <itemize>
 <!-- <item><ref id="_systime" name="_systime"> -->
 <!-- <item><ref id="asctime" name="asctime"> -->
-<!-- <item><ref id="clock" name="clock"> -->
+<item><ref id="clock" name="clock">
 <!-- <item><ref id="ctime" name="ctime"> -->
 <!-- <item><ref id="gmtime" name="gmtime"> -->
 <!-- <item><ref id="localtime" name="localtime"> -->
@@ -1508,6 +1508,30 @@ used in presence of a prototype.
 <tag/See also/
 <ref id="feof" name="feof">,
 <ref id="ferror" name="ferror">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>clock<label id="clock"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine the processor time used.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/clock_t clock (void);/
+<tag/Description/The <tt/clock/ function returns an approximaton of processor
+time used by the program. The time is returned in implementation defined
+units. It can be converted to seconds by dividing by the value if the macro
+<tt/CLOCKS_PER_SEC/.
+<tag/Limits/<itemize>
+<item>Since the machines, cc65 generated programs run on, cannot run multiple
+processes, the function will actually return the time since some
+implementation defined point in the past.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="time" name="time">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6258,6 +6282,8 @@ only be used in presence of a prototype.
 returned value may not be valid.
 </itemize>
 <tag/Availability/ISO 9899
+<tag/See also/
+<ref id="clock" name="clock">
 <tag/Example/None.
 </descrip>
 </quote>

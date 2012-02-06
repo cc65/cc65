@@ -1522,7 +1522,7 @@ used in presence of a prototype.
 <tag/Declaration/<tt/clock_t clock (void);/
 <tag/Description/The <tt/clock/ function returns an approximaton of processor
 time used by the program. The time is returned in implementation defined
-units. It can be converted to seconds by dividing by the value if the macro
+units. It can be converted to seconds by dividing by the value of the macro
 <tt/CLOCKS_PER_SEC/.
 <tag/Limits/<itemize>
 <item>Since the machines, cc65 generated programs run on, cannot run multiple

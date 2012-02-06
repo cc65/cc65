@@ -261,7 +261,7 @@ geos-cbmlib:
 		if [ -f geos-common/`basename $$objfile` ]; then \
 		    $(AR) a geos-cbm.lib geos-common/`basename $$objfile`; \
 		else \
-		    $(AR) a geos-cbm-lib $$objfile; \
+		    $(AR) a geos-cbm.lib $$objfile; \
 		fi; \
 	    done \
 	done

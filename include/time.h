@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2005 Ullrich von Bassewitz                                       */
+/* (C) 1998-2012 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -99,6 +99,12 @@ unsigned _clocks_per_sec (void);
 #elif  defined(__GEOS__)
 #  define CLK_TCK		1	/* POSIX */
 #  define CLOCKS_PER_SEC	1	/* ANSI */
+#elif defined(__LYNX__)
+/* The clock-rate depends on the video scan-rate;
+** so, read it at run-time. */
+extern clock_t _clk_tck (void);
+#  define CLK_TCK		_clk_tck()
+#  define CLOCKS_PER_SEC	_clk_tck()
 #endif
 
 

@@ -20,4 +20,5 @@ S_OBJS  +=      callroutine.o		\
 		oserrlist.o		\
 		panic.o			\
 		randomize.o		\
+		setoserror.o		\
 		sysuname.o

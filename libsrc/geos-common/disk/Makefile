@@ -16,5 +16,4 @@ S_OBJS +=	blkalloc.o		\
 		opendisk.o		\
 		putblock.o		\
 		putdirhead.o		\
-		setnextfree.o		\
-		setoserror.o
+		setnextfree.o

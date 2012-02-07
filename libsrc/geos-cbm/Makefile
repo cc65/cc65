@@ -44,8 +44,8 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Directories
 
-DIRS =	devel		\
-	disk		\
+DIRS =	disk		\
+	drivers		\
 	file		\
 	memory		\
 	system

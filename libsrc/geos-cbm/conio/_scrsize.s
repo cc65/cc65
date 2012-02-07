@@ -18,6 +18,7 @@
 .segment        "INIT"
 
 initscrsize:
+.ifdef  __GEOS_CBM__
 	lda	graphMode
 	bpl	L1
 	lda	#80		; 80 columns (more or less)
@@ -25,6 +26,11 @@ initscrsize:
 L1:	lda	#40		; 40 columns (more or less)
 	sta	xsize
 	lda	#24		; something like that for Y size
+.else
+	lda	#70		; 70 columns (more or less)
+	sta	xsize
+	lda	#23		; something like that for Y size
+.endif
 	sta	ysize
 	ldx	#1
 	stx	cursor_r

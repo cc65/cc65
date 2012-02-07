@@ -258,8 +258,9 @@ geos-cbmlib:
 	for i in runtime common conio em joystick tgi zlib; do \
 	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
 	    for objfile in $$i/*.o; do \
-		if [ -f geos-common/`basename $$objfile` ]; then \
-		    $(AR) a geos-cbm.lib geos-common/`basename $$objfile`; \
+		BASENAME=`basename $$objfile`; \
+		if [ -f geos-common/$$BASENAME ]; then \
+		    $(AR) a geos-cbm.lib geos-common/$$BASENAME; \
 		else \
 		    $(AR) a geos-cbm.lib $$objfile; \
 		fi; \

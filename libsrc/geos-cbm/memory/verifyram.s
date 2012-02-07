@@ -13,8 +13,8 @@
 	    .include "geossym.inc"
 
 _VerifyRAM:
-	    jsr REURegs
-	    jsr VerifyRAM
-	    txa
-	    ldx #0
-	    rts
+	jsr REURegs
+	jsr VerifyRAM
+	txa
+	ldx #0
+	rts

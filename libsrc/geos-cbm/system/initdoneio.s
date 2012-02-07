@@ -11,6 +11,6 @@
 
 	    .include "jumptab.inc"
 
-_InitForIO = InitForIO
+_InitForIO	= InitForIO
 	    
-_DoneWithIO = DoneWithIO
+_DoneWithIO	= DoneWithIO

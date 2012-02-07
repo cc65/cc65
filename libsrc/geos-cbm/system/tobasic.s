@@ -10,4 +10,4 @@
 
 	    .include "jumptab.inc"
 
-_ToBASIC = ToBASIC
+_ToBASIC	= ToBASIC

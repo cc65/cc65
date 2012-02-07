@@ -13,7 +13,7 @@
 ; char (example: for ASCII, this must be $E0).
 
 
-     	.export		__cdiff
+	    .export __cdiff
 
 __cdiff:
 	.byte	$e0
@@ -47,19 +47,19 @@ __cdiff:
 
 ; The table is taken from Craig S. Bruce technical docs for the ACE os
 
-	.export		__ctype
+	    .export __ctype
 
 __ctype:
-   	.byte	$10	;   0/00 ___rvs_@___
+	.byte	$10	;   0/00 ___rvs_@___
 	.byte	$10	;   1/01 ___rvs_a___
-       	.byte	$10	;   2/02 ___rvs_b___
+	.byte	$10	;   2/02 ___rvs_b___
 	.byte	$10	;   3/03 ___rvs_c___
 	.byte	$10	;   4/04 ___rvs_d___
 	.byte	$10	;   5/05 ___rvs_e___
 	.byte	$10	;   6/06 ___rvs_f___
 	.byte	$10	;   7/07 _BEL/rvs_g_
 	.byte	$10	;   8/08 ___rvs_h___
-       	.byte  	$D0	;   9/09 _TAB/rvs_i_
+	.byte  	$D0	;   9/09 _TAB/rvs_i_
 	.byte	$50	;  10/0a _BOL/rvs_j_
 	.byte	$10	;  11/0b ___rvs_k___
 	.byte	$10	;  12/0c ___rvs_l___
@@ -82,10 +82,10 @@ __ctype:
 	.byte	$10	;  29/1d ___rvs_]___
 	.byte	$10	;  30/1e ___rvs_^___
 	.byte	$10	;  31/1f _rvs_under_
-       	.byte  	$A0	;  32/20 ___SPACE___
+	.byte  	$A0	;  32/20 ___SPACE___
 	.byte	$00	;  33/21 _____!_____
 	.byte	$00	;  34/22 _____"_____
-       	.byte	$00	;  35/23 _____#_____
+	.byte	$00	;  35/23 _____#_____
 	.byte	$00	;  36/24 _____$_____
 	.byte	$00	;  37/25 _____%_____
 	.byte	$00	;  38/26 _____&_____
@@ -95,9 +95,9 @@ __ctype:
 	.byte	$00	;  42/2a _____*_____
 	.byte	$00	;  43/2b _____+_____
 	.byte	$00	;  44/2c _____,_____
-   	.byte	$00	;  45/2d _____-_____
+	.byte	$00	;  45/2d _____-_____
 	.byte	$00	;  46/2e _____._____
-       	.byte	$00	;  47/2f _____/_____
+	.byte	$00	;  47/2f _____/_____
 	.byte	$0C	;  48/30 _____0_____
 	.byte	$0C	;  49/31 _____1_____
 	.byte	$0C	;  50/32 _____2_____
@@ -116,33 +116,33 @@ __ctype:
 	.byte	$00	;  63/3f _____?_____
 
 	.byte	$00	;  64/40 _____@_____
-       	.byte  	$09	;  65/41 _____a_____
-   	.byte	$09	;  66/42 _____b_____
-   	.byte	$09	;  67/43 _____c_____
-   	.byte	$09	;  68/44 _____d_____
-   	.byte	$09	;  69/45 _____e_____
-   	.byte	$09	;  70/46 _____f_____
-   	.byte	$01	;  71/47 _____g_____
-   	.byte	$01	;  72/48 _____h_____
-   	.byte	$01	;  73/49 _____i_____
-   	.byte	$01	;  74/4a _____j_____
-   	.byte	$01	;  75/4b _____k_____
-   	.byte	$01	;  76/4c _____l_____
-   	.byte	$01    	;  77/4d _____m_____
-   	.byte	$01	;  78/4e _____n_____
-       	.byte	$01	;  79/4f _____o_____
-   	.byte	$01	;  80/50 _____p_____
-   	.byte	$01	;  81/51 _____q_____
-   	.byte	$01	;  82/52 _____r_____
-   	.byte	$01	;  83/53 _____s_____
-   	.byte	$01	;  84/54 _____t_____
-   	.byte	$01	;  85/55 _____u_____
-   	.byte	$01	;  86/56 _____v_____
-   	.byte	$01	;  87/57 _____w_____
-   	.byte	$01	;  88/58 _____x_____
-   	.byte	$01	;  89/59 _____y_____
+	.byte  	$09	;  65/41 _____a_____
+	.byte	$09	;  66/42 _____b_____
+	.byte	$09	;  67/43 _____c_____
+	.byte	$09	;  68/44 _____d_____
+	.byte	$09	;  69/45 _____e_____
+	.byte	$09	;  70/46 _____f_____
+	.byte	$01	;  71/47 _____g_____
+	.byte	$01	;  72/48 _____h_____
+	.byte	$01	;  73/49 _____i_____
+	.byte	$01	;  74/4a _____j_____
+	.byte	$01	;  75/4b _____k_____
+	.byte	$01	;  76/4c _____l_____
+	.byte	$01    	;  77/4d _____m_____
+	.byte	$01	;  78/4e _____n_____
+	.byte	$01	;  79/4f _____o_____
+	.byte	$01	;  80/50 _____p_____
+	.byte	$01	;  81/51 _____q_____
+	.byte	$01	;  82/52 _____r_____
+	.byte	$01	;  83/53 _____s_____
+	.byte	$01	;  84/54 _____t_____
+	.byte	$01	;  85/55 _____u_____
+	.byte	$01	;  86/56 _____v_____
+	.byte	$01	;  87/57 _____w_____
+	.byte	$01	;  88/58 _____x_____
+	.byte	$01	;  89/59 _____y_____
 	.byte	$01	;  90/5a _____z_____
-       	.byte	$00	;  91/5b _____[_____
+	.byte	$00	;  91/5b _____[_____
 	.byte	$00	;  92/5c _____\_____
 	.byte	$00	;  93/5d _____]_____
 	.byte	$00	;  94/5e _____^_____
@@ -176,7 +176,7 @@ __ctype:
 	.byte	$02	; 121/79 _U`_grave__
 	.byte	$02	; 122/7a _U'_acute__
 	.byte	$00	; 123/7b _U^_circum_
-       	.byte	$00	; 124/7c _U"_dieres_
+	.byte	$00	; 124/7c _U"_dieres_
 	.byte	$00	; 125/7d _Y'_acute__
 	.byte	$00	; 126/7e _cap_thorn_
 	.byte	$00	; 127/7f _Es-sed_B__
@@ -188,7 +188,7 @@ __ctype:
 	.byte	$00	; 132/84 _tl_corner_
 	.byte	$00	; 133/85 _tr_corner_
 	.byte	$00	; 134/86 _bl_corner_
-       	.byte	$00	; 135/87 _br_corner_
+	.byte	$00	; 135/87 _br_corner_
 	.byte	$00	; 136/88 ___l_tee___
 	.byte	$00	; 137/89 ___r_tee___
 	.byte	$00	; 138/8a ___t_tee___
@@ -221,7 +221,7 @@ __ctype:
 	.byte	$00	; 165/a5 ____yen____
 	.byte	$00	; 166/a6 _|_broken__
 	.byte	$00	; 167/a7 __section__
-       	.byte	$00	; 168/a8 __umulaut__
+	.byte	$00	; 168/a8 __umulaut__
 	.byte	$00	; 169/a9 _copyright_
 	.byte	$00	; 170/aa __fem_ord__
 	.byte	$00	; 171/ab _l_ang_quo_
@@ -233,7 +233,7 @@ __ctype:
 	.byte	$00	; 177/b1 ____+/-____
 	.byte	$00	; 178/b2 _2_supersc_
 	.byte	$00	; 179/b3 _3_supersc_
-       	.byte	$00	; 180/b4 ___acute___
+	.byte	$00	; 180/b4 ___acute___
 	.byte	$00	; 181/b5 ____mu_____
 	.byte	$00	; 182/b6 _paragraph_
 	.byte	$00	; 183/b7 __mid_dot__
@@ -266,7 +266,7 @@ __ctype:
 	.byte	$00	; 209/d1 _____Q_____
 	.byte	$00	; 210/d2 _____R_____
 	.byte	$00	; 211/d3 _____S_____
-       	.byte	$00	; 212/d4 _____T_____
+	.byte	$00	; 212/d4 _____T_____
 	.byte	$00	; 213/d5 _____U_____
 	.byte	$00	; 214/d6 _____V_____
 	.byte	$00	; 215/d7 _____W_____
@@ -278,7 +278,7 @@ __ctype:
 	.byte	$00	; 221/dd _____}_____
 	.byte	$00	; 222/de _____~_____
 	.byte	$00	; 223/df ___HOUSE___
-       	.byte	$00	; 224/e0 _a`_grave__
+	.byte	$00	; 224/e0 _a`_grave__
 	.byte	$00	; 225/e1 _a'_acute__
 	.byte	$00	; 226/e2 _a^_circum_
 	.byte	$00	; 227/e3 _a~_tilde__
@@ -310,4 +310,3 @@ __ctype:
 	.byte	$00	; 253/fd _y'_acute__
 	.byte	$00	; 254/fe _sm_thorn__
 	.byte	$00	; 255/ff _y"_dieres_
-

@@ -14,5 +14,5 @@
 	    .include "geossym.inc"
 
 _SwapRAM:
-	    jsr REURegs
-	    jmp SwapRAM
+	jsr REURegs
+	jmp SwapRAM

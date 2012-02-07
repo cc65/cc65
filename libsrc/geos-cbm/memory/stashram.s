@@ -13,5 +13,5 @@
 	    .include "geossym.inc"
 
 _StashRAM:
-	    jsr REURegs
-	    jmp StashRAM
+	jsr REURegs
+	jmp StashRAM

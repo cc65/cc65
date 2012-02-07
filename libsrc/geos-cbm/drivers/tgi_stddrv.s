@@ -6,8 +6,9 @@
 ; const char tgi_stddrv[];
 ;
 
-        .export	_tgi_stddrv
+	    .export _tgi_stddrv
 
 .rodata
 
-_tgi_stddrv:	.asciiz	"geos-tgi.tgi"
+_tgi_stddrv:
+	.asciiz "geos-tgi.tgi"

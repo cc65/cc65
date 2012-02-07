@@ -9,17 +9,15 @@
 ; sectnum_t - 16bit
 ;
 
-	.import		dio_params, __oserror
- 	.export		_dio_read
-	.include "geossym.inc"
-	.include "jumptab.inc"
+	    .import dio_params, __oserror
+ 	    .export _dio_read
 
-.proc	_dio_read
+	    .include "geossym.inc"
+	    .include "jumptab.inc"
 
+_dio_read:
 	jsr dio_params
 	jsr ReadBlock
 	stx __oserror
 	txa
 	rts
-
-.endproc

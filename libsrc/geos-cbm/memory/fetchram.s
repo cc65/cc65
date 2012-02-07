@@ -13,5 +13,5 @@
 	    .include "geossym.inc"
 
 _FetchRAM:
-	    jsr REURegs
-	    jmp FetchRAM
+	jsr REURegs
+	jmp FetchRAM

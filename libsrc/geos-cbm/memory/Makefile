@@ -5,8 +5,8 @@
 #--------------------------------------------------------------------------
 # Object files
 
-S_OBJS +=	reuregs.o	\
+S_OBJS +=	fetchram.o	\
+		reuregs.o	\
 		stashram.o	\
-		fetchram.o	\
 		swapram.o	\
 		verifyram.o

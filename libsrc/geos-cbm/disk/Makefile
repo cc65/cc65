@@ -7,11 +7,11 @@
 
 S_OBJS +=	changediskdevice.o	\
 		chkdkgeos.o		\
-		dio_openclose.o		\
 		dio_cts.o		\
+		dio_openclose.o		\
 		dio_params.o		\
-		dio_stc.o		\
 		dio_read.o		\
+		dio_stc.o		\
 		dio_write.o		\
 		dio_writev.o		\
 		enterturbo.o		\

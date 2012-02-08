@@ -26,6 +26,21 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.joy:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.mou:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.ser:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -o $@ -t module $^
+
 #--------------------------------------------------------------------------
 # Directories
 
@@ -43,6 +58,19 @@ DIRS =	common		\
 	system
 
 #--------------------------------------------------------------------------
+# Drivers
+
+EMDS =
+
+JOYS =
+
+MOUS = #geos-stdmou.mou
+
+SERS =
+
+TGIS =
+
+#--------------------------------------------------------------------------
 # Directives
 
 include $(addsuffix /Makefile, $(DIRS))
@@ -54,9 +82,13 @@ vpath %.s $(DIRS)
 
 .PHONY:	all clean zap
 
-all: 	$(C_OBJS) $(S_OBJS)
+all: 	$(C_OBJS) $(S_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
+	
 clean:
-	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)
+	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
+	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)

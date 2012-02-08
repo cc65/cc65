@@ -17,5 +17,4 @@ S_OBJS +=	startmousemode.o	\
 		inittextprompt.o	\
 		promptoff.o		\
 		prompton.o		\
-		getnextchar.o		\
-		mouse.o
+		getnextchar.o

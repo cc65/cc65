@@ -5,6 +5,6 @@
 #--------------------------------------------------------------------------
 # Object files
 
-S_OBJS +=	joy_stddrv.o	\
-		tgi_colors.o	\
-		tgi_stddrv.o
+S_OBJS +=	fio_module.o	\
+		mcbdefault.o	\
+		mouse_stddrv.o

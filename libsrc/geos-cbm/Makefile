@@ -57,7 +57,7 @@ EMDS = geos-vdc.emd
 
 JOYS = geos-stdjoy.joy
 
-MOUS = #geos-stdmou.mou
+MOUS =
 
 SERS =
 

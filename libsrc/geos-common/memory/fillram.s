@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -13,18 +12,18 @@
 	    .include "geossym.inc"
 
 _FillRam:
-	    sta r0L
-	    stx r0H
-	    jsr popa
-	    sta r2L
-	    jsr popax
-	    sta r1L
-	    stx r1H
-	    pha
-	    txa
-	    pha
-	    jsr FillRam
-	    pla
-	    tax
-	    pla
-	    rts
+	sta r0L
+	stx r0H
+	jsr popa
+	sta r2L
+	jsr popax
+	sta r1L
+	stx r1H
+	pha
+	txa
+	pha
+	jsr FillRam
+	pla
+	tax
+	pla
+	rts

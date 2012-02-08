@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -13,9 +12,9 @@
 	    .include "geossym.inc"
 
 _CRC:
-	    jsr DoublePop
-	    jsr CRC
-	    lda r2L
-	    ldx r2H
-	    rts
+	jsr DoublePop
+	jsr CRC
+	lda r2L
+	ldx r2H
+	rts
 	    

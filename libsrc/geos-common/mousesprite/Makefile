@@ -5,16 +5,16 @@
 #--------------------------------------------------------------------------
 # Object files
 
-S_OBJS +=	startmousemode.o	\
-		clearmousemode.o	\
-		mouseup.o		\
-		mouseoff.o		\
-		drawsprite.o		\
-		possprite.o		\
-		enablsprite.o		\
+S_OBJS +=	clearmousemode.o	\
 		disablsprite.o		\
-		ismseinregion.o		\
+		drawsprite.o		\
+		enablsprite.o		\
+		getnextchar.o		\
 		inittextprompt.o	\
+		ismseinregion.o		\
+		mouseoff.o		\
+		mouseup.o		\
+		possprite.o		\
 		promptoff.o		\
 		prompton.o		\
-		getnextchar.o
+		startmousemode.o

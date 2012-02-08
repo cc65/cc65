@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -13,7 +12,7 @@
 	    .include "jumptab.inc"
 
 _CopyFString:
-	    jsr DoubleSPop
-	    jsr popa
-	    jsr SetPtrXY
-	    jmp CopyFString
+	jsr DoubleSPop
+	jsr popa
+	jsr SetPtrXY
+	jmp CopyFString

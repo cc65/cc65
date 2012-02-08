@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -12,7 +11,7 @@
 	    .include "jumptab.inc"
 
 _GetNextChar:
-	    jsr GetNextChar
-	    ldx #0
-	    tay			; preserve Z flag
-	    rts
+	jsr GetNextChar
+	ldx #0
+	tay			; preserve Z flag
+	rts

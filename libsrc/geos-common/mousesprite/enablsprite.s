@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -12,5 +11,5 @@
 	    .include "geossym.inc"
 
 _EnablSprite:
-	    sta r3L
-	    jmp EnablSprite
+	sta r3L
+	jmp EnablSprite

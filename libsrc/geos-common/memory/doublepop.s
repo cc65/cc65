@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -10,9 +9,9 @@
 	    .include "geossym.inc"
 
 DoublePop:
-	    sta r0L
-	    stx r0H
-	    jsr popax
-	    sta r1L
-	    stx r1H
-	    rts
+	sta r0L
+	stx r0H
+	jsr popax
+	sta r1L
+	stx r1H
+	rts

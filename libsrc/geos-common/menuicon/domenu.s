@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -12,7 +11,7 @@
 	    .include "geossym.inc"
 
 _DoMenu:
-	    sta r0L
-	    stx r0H
-	    lda #0
-	    jmp DoMenu
+	sta r0L
+	stx r0H
+	lda #0
+	jmp DoMenu

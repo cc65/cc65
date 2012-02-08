@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -13,8 +12,8 @@
 	    .include "jumptab.inc"
 
 _CmpString:
-	    jsr DoubleSPop
-	    jsr CmpString
-	    bne L1
-	    jmp return0
-L1:	    jmp return1
+	jsr DoubleSPop
+	jsr CmpString
+	bne L1
+	jmp return0
+L1:	jmp return1

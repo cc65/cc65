@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -13,13 +12,13 @@
 	    .include "geossym.inc"
 
 _ClearRam:
-	    jsr DoublePop
-	    pha
-	    txa
-	    pha
-	    jsr ClearRam
-	    pla
-	    tax
-	    pla
-	    rts
+	jsr DoublePop
+	pha
+	txa
+	pha
+	jsr ClearRam
+	pla
+	tax
+	pla
+	rts
 

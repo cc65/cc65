@@ -5,14 +5,14 @@
 #--------------------------------------------------------------------------
 # Object files
 
-S_OBJS +=	crc.o		\
-		doublepop.o	\
-		clearram.o	\
-		fillram.o	\
-		initram.o	\
-		movedata.o	\
-		doublespop.o	\
-		copystring.o	\
+S_OBJS +=	clearram.o	\
+		cmpfstring.o	\
 		cmpstring.o	\
 		copyfstring.o	\
-		cmpfstring.o
+		copystring.o	\
+		crc.o		\
+		doublepop.o	\
+		doublespop.o	\
+		fillram.o	\
+		initram.o	\
+		movedata.o

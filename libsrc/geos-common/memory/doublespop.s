@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -12,17 +11,17 @@
 	    .include "geossym.inc"
 
 DoubleSPop:
-	    sta ptr4
-	    stx ptr4+1
-	    jsr popax
-	    sta ptr3
-	    stx ptr3+1
-;	    rts
+	sta ptr4
+	stx ptr4+1
+	jsr popax
+	sta ptr3
+	stx ptr3+1
+;	rts
 ;
 ; SetPtrXY can be sometimes executed twice, but even this way it is few cycles
 ; faster...
 
 SetPtrXY:
-	    ldx #ptr4
-	    ldy #ptr3
-	    rts
+	ldx #ptr4
+	ldy #ptr3
+	rts

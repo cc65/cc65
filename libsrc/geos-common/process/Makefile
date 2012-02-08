@@ -5,7 +5,7 @@
 #--------------------------------------------------------------------------
 # Object files
 
-S_OBJS +=	processinitrestartenable.o	\
-		processblock.o			\
+S_OBJS +=	processblock.o			\
 		processfreeze.o			\
+		processinitrestartenable.o	\
 		processsleep.o

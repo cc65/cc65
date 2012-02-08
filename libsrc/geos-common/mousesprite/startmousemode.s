@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -11,5 +10,5 @@
 	    .include "jumptab.inc"
 
 _StartMouseMode:
-	    clc
-	    jmp StartMouseMode
+	clc
+	jmp StartMouseMode

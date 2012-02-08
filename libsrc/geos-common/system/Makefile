@@ -16,8 +16,8 @@ S_OBJS  +=      callroutine.o		\
 		getserialnumber.o	\
 		mainargs.o		\
 		mainloop.o		\
-		oserror.o		\
 		oserrlist.o		\
+		oserror.o		\
 		panic.o			\
 		randomize.o		\
 		setoserror.o		\

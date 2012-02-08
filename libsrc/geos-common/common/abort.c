@@ -4,8 +4,6 @@
  * Maciej 'YTM/Elysium' Witkowiak 15.7.2001
  */
 
-
-
 #include <stdlib.h>
 #include <geos.h>
 

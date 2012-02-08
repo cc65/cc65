@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -11,6 +10,6 @@
 	    .include "jumptab.inc"
 
 _GetRandom:
-	    jsr GetRandom
-	    ldx #0
-	    rts
+	jsr GetRandom
+	ldx #0
+	rts

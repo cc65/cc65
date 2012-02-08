@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -12,8 +11,7 @@
 	    .include "geossym.inc"
 
 _GetSerialNumber:
-
-	    jsr GetSerialNumber
-	    lda r0L
-	    ldx r0H
-	    rts
+	jsr GetSerialNumber
+	lda r0L
+	ldx r0H
+	rts

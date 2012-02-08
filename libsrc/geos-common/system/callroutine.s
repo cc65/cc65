@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -10,4 +9,4 @@
 
 	    .include "jumptab.inc"
 
-_CallRoutine = CallRoutine
+_CallRoutine	= CallRoutine

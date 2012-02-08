@@ -1,4 +1,3 @@
-
 /*
  * systime.c
  *
@@ -8,9 +7,9 @@
 #include <time.h>
 #include <geos.h>
 
-time_t _systime(void) {
-
-struct tm currentTime;
+time_t _systime(void)
+{
+    struct tm currentTime;
 
     currentTime.tm_sec = system_date.s_seconds;
     currentTime.tm_min = system_date.s_minutes;
@@ -24,11 +23,9 @@ struct tm currentTime;
     currentTime.tm_isdst = -1;
 
     return mktime(&currentTime);
-
 }
 
-clock_t clock(void) {
-
+clock_t clock(void)
+{
     return _systime();
-
 }

@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -10,6 +9,6 @@
 	    .export _EnterDeskTop
 
 _EnterDeskTop:
-	    lda #0
-	    tax
-	    jmp _exit
+	lda #0
+	tax
+	jmp _exit

@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -10,4 +9,4 @@
 
 	    .include "jumptab.inc"
 
-_MainLoop = MainLoop
+_MainLoop	= MainLoop

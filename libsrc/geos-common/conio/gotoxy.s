@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -15,30 +14,33 @@
 
 	    .include "jumptab.inc"
 
-_gotox:	    sta cursor_c
-	    jmp fixcursor
+_gotox:
+	sta cursor_c
+	jmp fixcursor
 
-_gotoy:	    sta cursor_r
-	    inc cursor_r
-	    jmp fixcursor
+_gotoy:
+	sta cursor_r
+	inc cursor_r
+	jmp fixcursor
 
-_gotoxy:    sta cursor_r
-	    inc cursor_r
-	    jsr popa
-	    sta cursor_c
+_gotoxy:
+	sta cursor_r
+	inc cursor_r
+	jsr popa
+	sta cursor_c
 
 ; convert 8x8 x/y coordinates to GEOS hires
 fixcursor:
-	    lda cursor_c
-	    sta cursor_x
-	    lda #0
-	    sta cursor_x+1
-	    lda cursor_r
-	    sta cursor_y
-	    ldx #cursor_x
-	    ldy #3
-	    jsr DShiftLeft
-	    asl cursor_y
-	    asl cursor_y
-	    asl cursor_y
-	    rts
+	lda cursor_c
+	sta cursor_x
+	lda #0
+	sta cursor_x+1
+	lda cursor_r
+	sta cursor_y
+	ldx #cursor_x
+	ldy #3
+	jsr DShiftLeft
+	asl cursor_y
+	asl cursor_y
+	asl cursor_y
+	rts

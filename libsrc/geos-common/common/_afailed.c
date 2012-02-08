@@ -10,7 +10,6 @@
 
 void _afailed (char* file, unsigned line)
 {
-
     ExitTurbo();
 
     drawWindow.top = 0;

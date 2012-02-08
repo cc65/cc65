@@ -7,14 +7,14 @@
 
 S_OBJS +=	_scrsize.o	\
 		cclear.o	\
-		chline.o	\
-		cvline.o	\
 		cgetc.o		\
+		chline.o	\
 		clrscr.o	\
 		color.o		\
-		cputc.o		\
 		cpputs.o	\
+		cputc.o		\
 		cursor.o	\
+		cvline.o	\
 		gotoxy.o	\
 		kbhit.o		\
 		revers.o	\

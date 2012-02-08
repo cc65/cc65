@@ -4,10 +4,11 @@
 ; Copy the data segment from the LOAD to the RUN location
 ;
 
-	.export		copydata
-	.import		__DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
-	.include	"geossym.inc"
-	.include 	"jumptab.inc"
+	    .export copydata
+	    .import __DATA_LOAD__, __DATA_RUN__, __DATA_SIZE__
+
+	    .include "geossym.inc"
+	    .include "jumptab.inc"
 
 copydata:
 	lda #<__DATA_SIZE__	; no need to check if it is == 0

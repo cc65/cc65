@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -10,11 +9,11 @@
 ;
 
 
- 	.export		_textcolor, _bgcolor, _bordercolor
+ 	    .export _textcolor, _bgcolor, _bordercolor
 
 ; for GEOS 2.0 there is no color support, perhaps Wheels has it
 
 _textcolor:
 _bgcolor:
 _bordercolor:
-		rts
+	rts

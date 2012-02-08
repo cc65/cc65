@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -10,13 +9,10 @@
 
 	    .include "geossym.inc"
 
-.proc   _kbhit
-
-        ldx     #0              ; High byte of result
-        lda     pressFlag
-        rol                     ; Bit 7 is new key flag
-        txa                     ; A = 0
-        rol
-        rts
-
-.endproc
+_kbhit:
+	ldx #0			; High byte of result
+	lda pressFlag
+	rol                     ; Bit 7 is new key flag
+	txa                     ; A = 0
+	rol
+	rts

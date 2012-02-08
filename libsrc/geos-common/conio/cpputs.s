@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -12,7 +11,6 @@
 ; does not update cursor position
 
 	    .export _cpputsxy, _cpputs
-
 	    .import _gotoxy
 	    .import popa
 	    .importzp cursor_x, cursor_y
@@ -22,24 +20,24 @@
 	    .include "jumptab.inc"
 
 _cpputsxy:
-	sta	r0L		; Save s for later
-	stx	r0H
-	jsr	popa		; Get Y
-	jsr	_gotoxy		; Set cursor, pop x
-   	jmp	L0		; Same as cputs...
+	sta r0L			; Save s for later
+	stx r0H
+	jsr popa		; Get Y
+	jsr _gotoxy		; Set cursor, pop x
+	jmp L0			; Same as cputs...
 
 _cpputs:
-	sta	r0L		; Save s
-   	stx	r0H
-L0:	ldy	#0
-	lda	(r0),y
-   	bne	L1		; Jump if there's something
+	sta r0L			; Save s
+	stx r0H
+L0:	ldy #0
+	lda (r0),y
+	bne L1			; Jump if there's something
 	rts
 
-L1:	lda	cursor_x
-	sta 	r11L
-	lda	cursor_x+1
-	sta	r11H
-	lda	cursor_y
-	sta	r1H
-	jmp	PutString
+L1:	lda cursor_x
+	sta r11L
+	lda cursor_x+1
+	sta r11H
+	lda cursor_y
+	sta r1H
+	jmp PutString

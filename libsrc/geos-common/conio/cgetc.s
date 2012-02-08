@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -16,25 +15,25 @@
 
 _cgetc:
 ; show cursor if needed
-	    lda cursor_flag
-	    beq L0
+	lda cursor_flag
+	beq L0
 
-	    jsr update_cursor
-	    lda cursor_x
-	    ldx cursor_x+1
-	    sta stringX
-	    stx stringX+1
-	    lda	cursor_y
-	    sec
-	    sbc	curHeight
-	    sta stringY
-	    jsr PromptOn
+	jsr update_cursor
+	lda cursor_x
+	ldx cursor_x+1
+	sta stringX
+	stx stringX+1
+	lda cursor_y
+	sec
+	sbc curHeight
+	sta stringY
+	jsr PromptOn
 
-L0:	    jsr GetNextChar
-	    tax
-	    beq L0
-	    pha
-	    jsr PromptOff
-	    pla
-	    ldx #0
-	    rts
+L0:	jsr GetNextChar
+	tax
+	beq L0
+	pha
+	jsr PromptOff
+	pla
+	ldx #0
+	rts

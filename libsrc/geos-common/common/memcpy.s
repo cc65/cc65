@@ -4,7 +4,7 @@
 ; Maciej 'YTM/Elysium' Witkowiak, 15.07.2001
 ;
 
-  	.export		_memcpy
-	.import		_MoveData
+	    .export _memcpy
+	    .import _MoveData
 
-_memcpy	= _MoveData
+_memcpy		= _MoveData

@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -12,10 +11,12 @@
 	    .export _wherex, _wherey
 	    .importzp cursor_c, cursor_r
 
-_wherex:    lda cursor_c
-	    ldx #0
-	    rts
+_wherex:
+	lda cursor_c
+	ldx #0
+	rts
 
-_wherey:    lda cursor_r
-	    ldx #0
-	    rts
+_wherey:
+	lda cursor_r
+	ldx #0
+	rts

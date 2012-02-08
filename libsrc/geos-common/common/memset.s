@@ -6,9 +6,9 @@
 ; Maciej 'YTM/Elysium' Witkowiak, 20.08.2003
 ;
 
- 	.export	_memset, _bzero, __bzero
-	.import _ClearRam, _FillRam
+ 	    .export _memset, _bzero, __bzero
+	    .import _ClearRam, _FillRam
 
-_bzero = _ClearRam
-__bzero = _ClearRam
-_memset = _FillRam
+_bzero		= _ClearRam
+__bzero		= _ClearRam
+_memset		= _FillRam

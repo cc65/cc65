@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -24,7 +23,6 @@
 ; UPLINE = ?, KEY_UPARROW = GOTOY, ...
 
 	    .export _cputcxy, _cputc, update_cursor
-
 	    .import _gotoxy, fixcursor
 	    .import popa
 	    .import xsize,ysize
@@ -35,9 +33,9 @@
 	    .include "jumptab.inc"
 
 _cputcxy:
-	pha	    		; Save C
-	jsr	popa		; Get Y
-	jsr	_gotoxy		; Set cursor, drop x
+	pha    			; Save C
+	jsr popa		; Get Y
+	jsr _gotoxy		; Set cursor, drop x
 	pla			; Restore C
 
 ; Plot a character - also used as internal function
@@ -45,58 +43,58 @@ _cputcxy:
 _cputc:
 	tax			; save character
 ; some characters 0-31 are not safe for PutChar
-	cmp	#$20
-	bcs	L1
-	cmp	#CR
-	beq	do_cr
-	cmp	#LF
-	beq	do_lf
-	cmp	#KEY_DELETE
-	bne	L0
-	ldx	#BACKSPACE
+	cmp #$20
+	bcs L1
+	cmp #CR
+	beq do_cr
+	cmp #LF
+	beq do_lf
+	cmp #KEY_DELETE
+	bne L0
+	ldx #BACKSPACE
 	sec
-	bcs	L2
+	bcs L2
 L0:	rts
 
 L1:	clc
 L2:	php
-	lda	cursor_x
-	sta 	r11L
-	lda	cursor_x+1
-	sta	r11H
-	lda	cursor_y
-	sta	r1H
+	lda cursor_x
+	sta r11L
+	lda cursor_x+1
+	sta r11H
+	lda cursor_y
+	sta r1H
 	txa
-	jsr	PutChar
+	jsr PutChar
 	plp
-	bcs	update_cursor
+	bcs update_cursor
 
-	inc	cursor_c
-	lda	cursor_c
-	cmp	xsize			; hit right margin?
-	bne	update_cursor
-	lda	#0			; yes - do cr+lf
-	sta	cursor_c
-do_lf:	inc	cursor_r
-	lda	cursor_r
-	cmp	ysize			; hit bottom margin?
-	bne	update_cursor
-	dec	cursor_r		; yes - stay in the last line
+	inc cursor_c
+	lda cursor_c
+	cmp xsize		; hit right margin?
+	bne update_cursor
+	lda #0			; yes - do cr+lf
+	sta cursor_c
+do_lf:	inc cursor_r
+	lda cursor_r
+	cmp ysize		; hit bottom margin?
+	bne update_cursor
+	dec cursor_r		; yes - stay in the last line
 
 update_cursor:
-	jsr 	fixcursor
-	lda	cursor_x
-	sta	r4L
-	lda	cursor_x+1
-	sta	r4H
-	lda	cursor_y
+	jsr fixcursor
+	lda cursor_x
+	sta r4L
+	lda cursor_x+1
+	sta r4H
+	lda cursor_y
 	sec
-	sbc	curHeight
-	sta	r5L
-	lda	#1		; update cursor prompt position
-	sta	r3L
-	jmp	PosSprite
+	sbc curHeight
+	sta r5L
+	lda #1			; update cursor prompt position
+	sta r3L
+	jmp PosSprite
 
-do_cr:	lda	#0
-	sta	cursor_c
-	beq	update_cursor
+do_cr:	lda #0
+	sta cursor_c
+	beq update_cursor

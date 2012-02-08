@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -16,17 +15,17 @@
 .code
 
 _DlgBoxYesNo:
-	    jsr DB_get2lines
-	    lda #<paramStrYesNo
-	    ldx #>paramStrYesNo
-	    jmp _DoDlgBox
+	jsr DB_get2lines
+	lda #<paramStrYesNo
+	ldx #>paramStrYesNo
+	jmp _DoDlgBox
 
 .rodata
 
 paramStrYesNo:
-	    .byte DEF_DB_POS | 1
-	    .byte DBVARSTR, TXT_LN_X, TXT_LN_2_Y, ptr3
-	    .byte DBVARSTR, TXT_LN_X, TXT_LN_3_Y, ptr4
-	    .byte YES, DBI_X_0, DBI_Y_2
-	    .byte NO, DBI_X_2, DBI_Y_2
-	    .byte NULL
+	.byte DEF_DB_POS | 1
+	.byte DBVARSTR, TXT_LN_X, TXT_LN_2_Y, ptr3
+	.byte DBVARSTR, TXT_LN_X, TXT_LN_3_Y, ptr4
+	.byte YES, DBI_X_0, DBI_Y_2
+	.byte NO, DBI_X_2, DBI_Y_2
+	.byte NULL

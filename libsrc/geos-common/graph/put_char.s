@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -13,9 +12,9 @@
 	    .include "geossym.inc"
 
 _PutChar:
-	    sta r11L
-	    stx r11H
-	    jsr popa
-	    sta r1H
-	    jsr popa
-	    jmp PutChar
+	sta r11L
+	stx r11H
+	jsr popa
+	sta r1H
+	jsr popa
+	jmp PutChar

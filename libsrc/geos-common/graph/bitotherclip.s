@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -20,18 +19,18 @@
 	    .include "geossym.inc"
 
 _BitOtherClip:
-	    jsr BitOtherRegs
-	    jsr popax
-	    sta r12L
-	    stx r12H
-	    jsr popa
-	    sta r11H
-	    jsr popa
-	    sta r11L
-	    jsr popax
-	    sta r14L
-	    stx r14H
-	    jsr popax
-	    sta r13L
-	    stx r13H
-	    jmp BitOtherClip
+	jsr BitOtherRegs
+	jsr popax
+	sta r12L
+	stx r12H
+	jsr popa
+	sta r11H
+	jsr popa
+	sta r11L
+	jsr popax
+	sta r14L
+	stx r14H
+	jsr popax
+	sta r13L
+	stx r13H
+	jmp BitOtherClip

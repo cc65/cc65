@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -12,6 +11,6 @@
 	    .include "geossym.inc"
 
 _LoadCharSet:
-	    sta r0L
-	    stx r0H
-	    jmp LoadCharSet
+	sta r0L
+	stx r0H
+	jmp LoadCharSet

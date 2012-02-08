@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -13,8 +12,8 @@
 	    .include "jumptab.inc"
 	    
 _TestPoint:
-	    jsr PointRegs
-	    jsr TestPoint
-	    bcc goFalse
-	    jmp return1
-goFalse:    jmp return0
+	jsr PointRegs
+	jsr TestPoint
+	bcc goFalse
+	jmp return1
+goFalse:jmp return0

@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -13,5 +12,5 @@
 	    .include "jumptab.inc"
 
 _PutString:
-	    jsr getintcharint
-	    jmp PutString
+	jsr getintcharint
+	jmp PutString

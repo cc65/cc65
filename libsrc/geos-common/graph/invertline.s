@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -12,5 +11,5 @@
 	    .include "jumptab.inc"
 	    
 _InvertLine:
-	    jsr HLineRegs
-	    jmp InvertLine
+	jsr HLineRegs
+	jmp InvertLine

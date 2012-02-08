@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -10,12 +9,12 @@
 	    .include "geossym.inc"
 
 getintcharint:
-	    sta r11L
-	    stx r11H
-	    jsr popa
-	    sta r1H
-	    jsr popax
-	    sta r0L
-	    stx r0H
-	    rts
+	sta r11L
+	stx r11H
+	jsr popa
+	sta r1H
+	jsr popax
+	sta r0L
+	stx r0H
+	rts
 

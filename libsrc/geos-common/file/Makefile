@@ -5,28 +5,28 @@
 #--------------------------------------------------------------------------
 # Object files
 
-S_OBJS +=	get1stdirentry.o	\
-		getnxtdirentry.o	\
-		openrecordfile.o	\
+S_OBJS +=	appendrecord.o		\
 		closerecordfile.o	\
+		deletefile.o		\
+		deleterecord.o		\
+		findfile.o		\
+		findftypes.o		\
+		freefile.o		\
+		get1stdirentry.o	\
+		getfhdrinfo.o		\
+		getfile.o		\
+		getnxtdirentry.o	\
+		insertrecord.o		\
 		nextrecord.o		\
+		openrecordfile.o	\
 		previousrecord.o	\
 		pointrecord.o		\
-		deleterecord.o		\
-		insertrecord.o		\
-		appendrecord.o		\
-		readrecord.o		\
-		writerecord.o		\
-		updaterecordfile.o	\
-		findfile.o		\
-		getfhdrinfo.o		\
-		readfile.o		\
-		savefile.o		\
-		freefile.o		\
-		deletefile.o		\
-		renamefile.o		\
-		findftypes.o		\
 		readbyte.o		\
-		getfile.o		\
+		readfile.o		\
+		readrecord.o		\
+		renamefile.o		\
+		savefile.o		\
 		sysremove.o		\
-		sysrename.o
+		sysrename.o		\
+		writerecord.o		\
+		updaterecordfile.o

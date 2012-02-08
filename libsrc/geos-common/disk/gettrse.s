@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -6,12 +5,13 @@
 
 	    .export gettrse
 	    .importzp ptr4
+
 gettrse:
-	    sta ptr4
-	    stx ptr4+1
-	    ldy #1
-	    lda (ptr4),y
-	    tax
-	    dey
-	    lda (ptr4),y
-	    rts
+	sta ptr4
+	stx ptr4+1
+	ldy #1
+	lda (ptr4),y
+	tax
+	dey
+	lda (ptr4),y
+	rts

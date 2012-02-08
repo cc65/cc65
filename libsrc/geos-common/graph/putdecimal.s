@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -13,6 +12,6 @@
 	    .include "jumptab.inc"
 
 _PutDecimal:
-	    jsr getintcharint
-	    jsr popa
-	    jmp PutDecimal
+	jsr getintcharint
+	jsr popa
+	jmp PutDecimal

@@ -7,11 +7,11 @@
 
 C_OBJS +=	messagebox.o
 
-S_OBJS +=	dodlgbox.o		\
-		rstrfrmdialogue.o	\
-		dbget2lines.o		\
-		dlgboxyesno.o		\
-		dlgboxokcancel.o	\
-		dlgboxok.o		\
+S_OBJS +=	dbget2lines.o		\
 		dlgboxgetstring.o	\
-		dlgboxfileselect.o
+		dlgboxfileselect.o	\
+		dlgboxok.o		\
+		dlgboxokcancel.o	\
+		dlgboxyesno.o		\
+		dodlgbox.o		\
+		rstrfrmdialogue.o

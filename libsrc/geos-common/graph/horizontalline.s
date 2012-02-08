@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -8,12 +7,11 @@
 
 	    .import popa
 	    .import HLineRegs
-	    
 	    .export _HorizontalLine
 
 	    .include "jumptab.inc"
 
 _HorizontalLine:
-	    jsr HLineRegs
-	    jsr popa
-	    jmp HorizontalLine
+	jsr HLineRegs
+	jsr popa
+	jmp HorizontalLine

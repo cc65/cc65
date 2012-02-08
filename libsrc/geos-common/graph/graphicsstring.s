@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -12,6 +11,6 @@
 	    .include "geossym.inc"
 
 _GraphicsString:
-	    sta r0L
-	    stx r0H
-	    jmp GraphicsString
+	sta r0L
+	stx r0H
+	jmp GraphicsString

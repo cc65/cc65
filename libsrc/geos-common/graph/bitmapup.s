@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Alliance' Witkowiak
 ;
@@ -6,12 +5,11 @@
 
 ; void BitmapUp	(struct iconpic *myGfx);
 
-
 	    .import BitmapRegs
 	    .export _BitmapUp
 
 	    .include "jumptab.inc"
 
 _BitmapUp:
-	    jsr BitmapRegs
-	    jmp BitmapUp
+	jsr BitmapRegs
+	jmp BitmapUp

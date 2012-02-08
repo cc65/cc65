@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
@@ -35,4 +34,5 @@ _FindFTypes:
 
 .bss
 
-tmpFileMax:	.res 1
+tmpFileMax:
+	.res 1

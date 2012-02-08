@@ -1,4 +1,4 @@
-
+;
 ;GeosConst - various system constans sorted by function
 ;reassembled by Maciej 'YTM/Elysium' Witkowiak
 ;4-2-99, 18-3-99

@@ -1,4 +1,4 @@
-
+;
 ;GEOS macros
 ;reassembled for 6502TASM/MMS by Maciej 'YTM/Elysium' Witkowiak
 ;4-2-99
@@ -6,53 +6,70 @@
 ;28-6-99 - ca65 port
 ;macro 'sub' renamed to 'ssub' due to 65816 mnemonics
 
+;-------------------------------------------------------------------------
 
-	.macro 		LoadB dest, value
+.macro 	LoadB dest, value
 	lda #value
 	sta dest
-	.endmacro
+.endmacro
 
-	.macro		LoadW dest, value
+;-------------------------------------------------------------------------
+
+.macro	LoadW dest, value
 	LoadB dest+1, >(value)
 	LoadB dest+0, <(value)
-	.endmacro
+.endmacro
 
-	.macro		MoveB source, dest
+;-------------------------------------------------------------------------
+
+.macro	MoveB source, dest
 	lda source
 	sta dest
-	.endmacro
+.endmacro
 
-	.macro		MoveW source, dest
+;-------------------------------------------------------------------------
+
+.macro	MoveW source, dest
 	MoveB source+1, dest+1
 	MoveB source+0, dest+0
-	.endmacro
+.endmacro
 
-	.macro		add source
+;-------------------------------------------------------------------------
+
+.macro	add source
 	clc
 	adc source
-	.endmacro
+.endmacro
 
-	.macro		AddB source, dest
+;-------------------------------------------------------------------------
+
+.macro	AddB source, dest
 	lda source
 	add dest
 	sta dest
-	.endmacro
+.endmacro
 
-	.macro		AddW source, dest
+;-------------------------------------------------------------------------
+
+.macro	AddW source, dest
 	AddB source+0, dest+0
 	lda source+1
 	adc dest+1
 	sta dest+1
-	.endmacro
+.endmacro
 
-	.macro		AddVB value, dest
+;-------------------------------------------------------------------------
+
+.macro	AddVB value, dest
 	lda dest
 	clc
 	adc #(value)
 	sta dest
 	.endmacro
 
-	.macro		AddVW value, dest
+;-------------------------------------------------------------------------
+
+.macro	AddVW value, dest
 .local Skip
 	AddVB <(value), dest+0
 	.if (>(value))=0
@@ -64,27 +81,35 @@
 	    sta dest+1
 	.endif
 Skip:
-	.endmacro
+.endmacro
 
-	.macro		ssub source
+;-------------------------------------------------------------------------
+
+.macro	ssub source
 	sec
 	sbc source
-	.endmacro
+.endmacro
 
-	.macro		SubB source, dest
+;-------------------------------------------------------------------------
+
+.macro	SubB source, dest
 	lda dest
 	ssub source
 	sta dest
-	.endmacro
+.endmacro
 
-	.macro		SubW source, dest
+;-------------------------------------------------------------------------
+
+.macro	SubW source, dest
 	SubB source+0, dest+0
 	lda dest+1
 	sbc source+1
 	sta dest+1
-	.endmacro
+.endmacro
 
-	.macro		SubVW value, dest
+;-------------------------------------------------------------------------
+
+.macro	SubVW value, dest
 	sec
 	lda dest+0
 	sbc #<(value)
@@ -92,88 +117,116 @@ Skip:
 	lda dest+1
 	sbc #>(value)
 	sta dest+1
-	.endmacro
+.endmacro
 
-	.macro		CmpB source, dest
+;-------------------------------------------------------------------------
+
+.macro	CmpB source, dest
 	lda source
 	cmp dest
-	.endmacro
+.endmacro
 
-	.macro		CmpBI source, immed
+;-------------------------------------------------------------------------
+
+.macro	CmpBI source, immed
 	lda source
 	cmp #(immed)
-	.endmacro
+.endmacro
 
-	.macro		CmpW source, dest
+;-------------------------------------------------------------------------
+
+.macro	CmpW source, dest
 .local Skip	
 	CmpB source+1, dest+1
 	bne Skip
 	CmpB source+0, dest+0
 Skip:
-	.endmacro
+.endmacro
 
-	.macro		CmpWI source, immed
+;-------------------------------------------------------------------------
+
+.macro	CmpWI source, immed
 .local Skip
 	CmpBI source+1, >(immed)
 	bne Skip
 	CmpBI source+0, <(immed)
 Skip:
-	.endmacro
+.endmacro
 
-	.macro		PushB source
+;-------------------------------------------------------------------------
+
+.macro	PushB source
 	lda source
 	pha
-	.endmacro
+.endmacro
 
-	.macro		PushW source
+;-------------------------------------------------------------------------
+
+.macro	PushW source
 	PushB source+1
 	PushB source+0
-	.endmacro
+.endmacro
 
-	.macro		PopB dest
+;-------------------------------------------------------------------------
+
+.macro	PopB dest
 	pla
 	sta dest
-	.endmacro
+.endmacro
 
-	.macro		PopW dest
+;-------------------------------------------------------------------------
+
+.macro	PopW dest
 	PopB dest+0
 	PopB dest+1
-	.endmacro
+.endmacro
 
-	.macro		bra addr
+;-------------------------------------------------------------------------
+
+.macro	bra addr
 	clv
 	bvc addr
-	.endmacro
+.endmacro
 
-	.macro		smb bitNumber, dest
+;-------------------------------------------------------------------------
+
+.macro	smb bitNumber, dest
 	pha
 	lda #(1 << bitNumber)
 	ora dest
 	sta dest
 	pla
-	.endmacro
+.endmacro
 
-	.macro		smbf bitNumber, dest
+;-------------------------------------------------------------------------
+
+.macro	smbf bitNumber, dest
 	lda #(1 << bitNumber)
 	ora dest
 	sta dest
-	.endmacro
+.endmacro
 
-	.macro		rmb bitNumber, dest
+;-------------------------------------------------------------------------
+
+.macro	rmb bitNumber, dest
 	pha
 	lda #(1 << bitNumber) ^ $ff 
 	and dest
 	sta dest
 	pla
-	.endmacro
+.endmacro
 
-	.macro		rmbf bitNumber, dest
+;-------------------------------------------------------------------------
+
+.macro	rmbf bitNumber, dest
 	lda #(1 << bitNumber) ^ $ff
 	and dest
 	sta dest
-	.endmacro
+.endmacro
 
-	.macro		bbs bitNumber, source, addr
+;-------------------------------------------------------------------------
+
+.macro	bbs bitNumber, source, addr
 .local Skip
 	php
 	pha
@@ -185,9 +238,11 @@ Skip:
 	bra addr
 Skip:	pla
 	plp
-	.endmacro
+.endmacro
 
-	.macro		bbsf bitNumber, source, addr
+;-------------------------------------------------------------------------
+
+.macro	bbsf bitNumber, source, addr
 	.if     bitNumber=7
 		bit source
 		bmi addr
@@ -201,9 +256,11 @@ Skip:	pla
 		    bne addr
 		.endif
 	.endif
-	.endmacro
+.endmacro
 
-	.macro		bbr bitNumber, source, addr
+;-------------------------------------------------------------------------
+
+.macro	bbr bitNumber, source, addr
 .local Skip
 	php
 	pha
@@ -215,9 +272,11 @@ Skip:	pla
 	bra addr
 Skip:	pla
 	plp
-	.endmacro
+.endmacro
 
-	.macro		bbrf bitNumber, source, addr
+;-------------------------------------------------------------------------
+
+.macro	bbrf bitNumber, source, addr
 	.if bitNumber=7
 	    bit source
 	    bpl addr
@@ -231,26 +290,38 @@ Skip:	pla
 		    beq addr
 		.endif
 	.endif
-	.endmacro
+.endmacro
+
+;-------------------------------------------------------------------------
 
 ;03.03.99 by Maciej Witkowiak
 
-	.macro		addv value
+;-------------------------------------------------------------------------
+
+.macro	addv value
 	clc
 	adc #(value)
-	.endmacro
+.endmacro
 
-	.macro		subv value
+;-------------------------------------------------------------------------
+
+.macro	subv value
 	sec
 	sbc #(value)
-	.endmacro
+.endmacro
 
-	.macro		bnex addr
+;-------------------------------------------------------------------------
+
+.macro	bnex addr
 	txa
 	bne addr
-	.endmacro
+.endmacro
 
-	.macro		beqx addr
+;-------------------------------------------------------------------------
+
+.macro	beqx addr
 	txa
 	beq addr
-	.endmacro
+.endmacro
+
+;-------------------------------------------------------------------------

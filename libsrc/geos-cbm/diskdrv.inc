@@ -1,4 +1,4 @@
-
+;
 ;GEOS Disk Driver JumpTab
 ;reassembled by Maciej 'YTM/Alliance' Witkowiak
 ;4-2-99

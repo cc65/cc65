@@ -8,7 +8,7 @@
 
 	.export	xsize, ysize
 	.export	screensize
-	.importz cursor_r, cursor_c
+	.importzp cursor_r, cursor_c
 	.import _cursor
 	.constructor initscrsize
 		      

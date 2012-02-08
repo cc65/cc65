@@ -13,7 +13,6 @@ S_OBJS  +=      callroutine.o		\
 		extzp.o			\
 		firstinit.o		\
 		getrandom.o		\
-		getserialnumber.o	\
 		mainargs.o		\
 		mainloop.o		\
 		oserrlist.o		\

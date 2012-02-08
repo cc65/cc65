@@ -7,6 +7,7 @@
 
 S_OBJS  +=      ctype.o			\
 		get_ostype.o		\
+		getserialnumber.o	\
 		initdoneio.o		\
 		setdevice.o		\
 		tobasic.o

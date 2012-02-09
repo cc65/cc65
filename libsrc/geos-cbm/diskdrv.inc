@@ -4,30 +4,30 @@
 ;4-2-99
 
 ;pointers
-_InitForIO		=	$9000
-_DoneWithIO		=	$9002
-_ExitTurbo		=	$9004
-_PurgeTurbo		=	$9006
-_EnterTurbo		=	$9008
-_ChangeDiskDevice	=	$900a
-_NewDisk		=	$900c
-_ReadBlock		=	$900e
-_WriteBlock		=	$9010
-_VerWriteBlock		=	$9012
-_OpenDisk		=	$9014
-_GetBlock		=	$9016
-_PutBlock		=	$9018
-_GetDirHead		=	$901a
-_PutDirHead		=	$901c
-_GetFreeDirBlk		=	$901e
-_CalcBlksFree		=	$9020
-_FreeBlock		=	$9022
-_SetNextFree		=	$9024
-_FindBAMBit		=	$9026
-_NxtBlkAlloc		=	$9028
-_BlkAlloc		=	$902a
-_ChkDkGEOS		=	$902c
-_SetGEOSDisk		=	$902e
+InitForIO_		=	$9000
+DoneWithIO_		=	$9002
+ExitTurbo_		=	$9004
+PurgeTurbo_		=	$9006
+EnterTurbo_		=	$9008
+ChangeDiskDevice_	=	$900a
+NewDisk_		=	$900c
+ReadBlock_		=	$900e
+WriteBlock_		=	$9010
+VerWriteBlock_		=	$9012
+OpenDisk_		=	$9014
+GetBlock_		=	$9016
+PutBlock_		=	$9018
+GetDirHead_		=	$901a
+PutDirHead_		=	$901c
+GetFreeDirBlk_		=	$901e
+CalcBlksFree_		=	$9020
+FreeBlock_		=	$9022
+SetNextFree_		=	$9024
+FindBAMBit_		=	$9026
+NxtBlkAlloc_		=	$9028
+BlkAlloc_		=	$902a
+ChkDkGEOS_		=	$902c
+SetGEOSDisk_		=	$902e
 
 ;jump table
 Get1stDirEntry		=	$9030

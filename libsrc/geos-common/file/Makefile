@@ -19,8 +19,8 @@ S_OBJS +=	appendrecord.o		\
 		insertrecord.o		\
 		nextrecord.o		\
 		openrecordfile.o	\
-		previousrecord.o	\
 		pointrecord.o		\
+		previousrecord.o	\
 		readbyte.o		\
 		readfile.o		\
 		readrecord.o		\
@@ -28,5 +28,5 @@ S_OBJS +=	appendrecord.o		\
 		savefile.o		\
 		sysremove.o		\
 		sysrename.o		\
-		writerecord.o		\
-		updaterecordfile.o
+		updaterecordfile.o	\
+		writerecord.o

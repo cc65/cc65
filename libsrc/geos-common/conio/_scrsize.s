@@ -38,6 +38,8 @@ L1:	lda #40			; 40 columns (more or less)
 	txa 
 	jmp _cursor		; home and update cursor
 
+.code
+
 screensize: 
 	ldx xsize
 	ldy ysize

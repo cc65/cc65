@@ -12,8 +12,6 @@
 	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 
-.code
-	
 _FindFTypes:
 	sta r10L
 	stx r10H

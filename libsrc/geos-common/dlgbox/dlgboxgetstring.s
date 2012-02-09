@@ -13,8 +13,6 @@
 	    .include "geossym.inc"
 	    .include "const.inc"
 
-.code
-
 _DlgBoxGetString:
 	jsr DB_get2lines
 	jsr popa

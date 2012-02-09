@@ -12,8 +12,6 @@
 	    .include "errno.inc"
 	    .include "const.inc"
 
-.code
-
 __osmaperrno:
 	ldx #ErrTabSize
 @L1:	cmp ErrTab-2,x		; Search for the error code

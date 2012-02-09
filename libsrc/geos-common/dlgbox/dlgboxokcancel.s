@@ -12,8 +12,6 @@
 	    .include "geossym.inc"
 	    .include "const.inc"
 
-.code
-
 _DlgBoxOkCancel:
 	jsr DB_get2lines
 	lda #<paramStrOkCancel

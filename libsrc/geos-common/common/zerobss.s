@@ -8,10 +8,8 @@
 	    .export zerobss
 	    .import __BSS_RUN__, __BSS_SIZE__
 	    
-            .include "jumptab.inc"
-            .include "geossym.inc"
-
-.code
+	    .include "jumptab.inc"
+	    .include "geossym.inc"
 
 zerobss:
 	lda #<__BSS_SIZE__

@@ -8,7 +8,6 @@
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
-
  	    .export _textcolor, _bgcolor, _bordercolor
 
 ; for GEOS 2.0 there is no color support, perhaps Wheels has it

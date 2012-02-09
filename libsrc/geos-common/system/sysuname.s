@@ -4,8 +4,8 @@
 ; unsigned char __fastcall__ _sysuname (struct utsname* buf);
 ;
 
-	.import utscopy
-	.export __sysuname, utsdata
+	    .import utscopy
+	    .export __sysuname, utsdata
 
 __sysuname	= utscopy
 

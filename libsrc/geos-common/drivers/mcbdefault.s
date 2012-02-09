@@ -22,8 +22,6 @@
 ; The functions below must be interrupt-safe,
 ; because they might be called from an interrupt-handler.
 
-.code
-
 ; --------------------------------------------------------------------------
 ; Hide the mouse pointer. Always called with interrupts disabled.
 

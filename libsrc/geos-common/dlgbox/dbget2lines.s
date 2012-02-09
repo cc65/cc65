@@ -7,8 +7,6 @@
 	    .importzp ptr3,ptr4
 	    .import popax
 
-.code
-
 DB_get2lines:
 	sta ptr4		; fetch line 2
 	stx ptr4+1

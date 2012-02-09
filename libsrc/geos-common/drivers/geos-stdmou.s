@@ -19,8 +19,6 @@
 	    .include "jumptab.inc"
 	    .include "geossym.inc"
 
-.code
-
 ; --------------------------------------------------------------------------
 ;
 ; unsigned char __fastcall__ mouse_init (unsigned char type);

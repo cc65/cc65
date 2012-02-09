@@ -5,17 +5,15 @@
 
 ; char DlgBoxFileSelect       (char *class, char ftype, char *fname);
 
-		.export _DlgBoxFileSelect
-		.import popa, popax
-		.import _DoDlgBox
+	    .export _DlgBoxFileSelect
+	    .import popa, popax
+	    .import _DoDlgBox
 
-		.include "jumptab.inc"
-		.include "diskdrv.inc"
-		.include "geossym.inc"
-		.include "geosmac.inc"
-		.include "const.inc"
-
-.code
+	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
+	    .include "geossym.inc"
+	    .include "geosmac.inc"
+	    .include "const.inc"
 
 _DlgBoxFileSelect:
 	sta tmp_r5

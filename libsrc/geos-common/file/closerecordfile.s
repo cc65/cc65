@@ -9,6 +9,7 @@
 	    .export _CloseRecordFile
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	
 _CloseRecordFile:
 	jsr CloseRecordFile

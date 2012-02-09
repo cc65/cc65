@@ -10,6 +10,7 @@
 	    .export _SetNextFree
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 	
 _SetNextFree:

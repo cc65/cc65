@@ -9,6 +9,7 @@
 	    .export _PointRecord
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	
 _PointRecord:
 	jsr PointRecord

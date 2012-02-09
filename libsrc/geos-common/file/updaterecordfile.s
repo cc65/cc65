@@ -9,6 +9,7 @@
 	    .export _UpdateRecordFile
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 
 _UpdateRecordFile:
 	jsr UpdateRecordFile

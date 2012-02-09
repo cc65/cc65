@@ -9,6 +9,7 @@
 	    .import popax
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 
 __sysrename:

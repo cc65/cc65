@@ -9,6 +9,7 @@
 	    .export _PutDirHead
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	
 _PutDirHead:
 	jsr PutDirHead

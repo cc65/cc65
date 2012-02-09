@@ -9,6 +9,7 @@
 	    .export _FindFile
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 	
 _FindFile:

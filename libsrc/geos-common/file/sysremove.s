@@ -8,6 +8,7 @@
 	    .export  __sysremove
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 
 __sysremove:

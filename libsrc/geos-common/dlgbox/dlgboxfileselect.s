@@ -10,6 +10,7 @@
 		.import _DoDlgBox
 
 		.include "jumptab.inc"
+		.include "diskdrv.inc"
 		.include "geossym.inc"
 		.include "geosmac.inc"
 		.include "const.inc"

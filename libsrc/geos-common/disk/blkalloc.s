@@ -9,6 +9,7 @@
 	    .export _BlkAlloc
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 	
 _BlkAlloc:

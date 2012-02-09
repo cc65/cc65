@@ -10,6 +10,7 @@
 	    .export _GetBlock
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 	
 _GetBlock:

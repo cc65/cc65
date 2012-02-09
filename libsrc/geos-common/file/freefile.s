@@ -9,6 +9,7 @@
 	    .export _FreeFile
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	    .include "geossym.inc"
 	
 _FreeFile:

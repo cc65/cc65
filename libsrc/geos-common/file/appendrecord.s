@@ -9,6 +9,7 @@
 	    .export _AppendRecord
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	
 _AppendRecord:
 

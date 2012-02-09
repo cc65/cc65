@@ -9,6 +9,7 @@
 	    .export _InsertRecord
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 
 _InsertRecord:
 	jsr InsertRecord

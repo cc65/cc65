@@ -9,6 +9,7 @@
 	    .export _OpenDisk
 
 	    .include "jumptab.inc"
+	    .include "diskdrv.inc"
 	
 _OpenDisk:
 	jsr OpenDisk

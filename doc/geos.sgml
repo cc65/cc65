@@ -1199,24 +1199,24 @@ after <tt/InitProcesses/, because it resets all flags and counters and it starts
 <p>
 <tt/EnableProcess/ forces the given process to execute by simulating the timer expiring.
 
-<sect2>BlockProcess and UnBlockProcess
+<sect2>BlockProcess and UnblockProcess
 <p>
 <tt/void BlockProcess (char processNumber)/
 <p>
-<tt/void UnBlockProcess (char processNumber)/
+<tt/void UnblockProcess (char processNumber)/
 <p>
 <tt/BlockProcess/ disables the execution of the given process, but this does not disable the timers.
-It means that if you call <tt/UnBlockProcess/ before the timer runs out, the process will be executed.
+It means that if you call <tt/UnblockProcess/ before the timer runs out, the process will be executed.
 <p>
-<tt/UnBlockProcess/ does the opposite.
+<tt/UnblockProcess/ does the opposite.
 
-<sect2>FreezeProcess and UnFreezeProcess
+<sect2>FreezeProcess and UnfreezeProcess
 <p>
 <tt/void FreezeProcess (char processNumber)/
 <p>
-<tt/void UnFreezeProcess (char processNumber)/
+<tt/void UnfreezeProcess (char processNumber)/
 <p>
-<tt/FreezeProcess/ disables timer for given process. <tt/UnFreezeProcess/ does the opposite.
+<tt/FreezeProcess/ disables timer for given process. <tt/UnfreezeProcess/ does the opposite.
 This is not equal to <tt/RestartProcess/ as timers are not reloaded with initial value.
 
 <sect2>Sleep

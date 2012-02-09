@@ -6,10 +6,10 @@
 ; void	InitProcesses	(char number, struct process* proctab);
 ; (rest)
 ; void	BlockProcess	(char number);
-; void	UnBlockProcess	(char number);
+; void	UnblockProcess	(char number);
 
 	    .export _BlockProcess
-	    .export _UnBlockProcess
+	    .export _UnblockProcess
 
 	    .include "jumptab.inc"
 	    
@@ -17,6 +17,6 @@ _BlockProcess:
 	tax
 	jmp BlockProcess
 	    
-_UnBlockProcess:
+_UnblockProcess:
 	tax
-	jmp UnBlockProcess
+	jmp UnblockProcess

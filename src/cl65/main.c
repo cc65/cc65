@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2011, Ullrich von Bassewitz                                      */
+/* (C) 1999-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -593,6 +593,12 @@ static void CompileRes (const char* File)
 {
     /* Remember the current assembler argument count */
     unsigned ArgCount = GRC.ArgCount;
+
+    /* Resource files need an geos-apple or geos-cbm target */
+    if (Target != TGT_GEOS_APPLE && Target != TGT_GEOS_CBM) {
+       	Error ("Resource files need a geos-apple or geos-cbm, target");
+    }
+    CmdSetTarget (&GRC, Target);
 
     /* Add the file as argument for the resource compiler */
     CmdAddArg (&GRC, File);

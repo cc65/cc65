@@ -55,7 +55,8 @@ curpage:
 
 .bss
 
-window:	.res 256		; memory window
+window:
+	.res 256		; memory window
 
 .code
 

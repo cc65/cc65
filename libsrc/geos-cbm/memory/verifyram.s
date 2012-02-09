@@ -1,4 +1,3 @@
-
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;

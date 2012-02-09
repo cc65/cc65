@@ -70,7 +70,6 @@ INSTALL:
 UNINSTALL:
 	rts
 
-
 ; ------------------------------------------------------------------------
 ; COUNT: Return the total number of available joysticks in a/x.
 ;

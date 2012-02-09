@@ -37,7 +37,8 @@ ALLTARGETS =	apple2		\
 		c64		\
 		cbm510		\
 		cbm610		\
-                geos-cbm        \
+		geos-apple      \
+		geos-cbm        \
 		lynx		\
 		nes		\
 		pet		\
@@ -243,6 +244,32 @@ cbm610lib:
 	if [ -d cbm610/extra ]; then \
 	    for i in cbm610/extra/*.o; do \
 	       	cp $$i cbm610-`basename $$i` || exit 1; \
+	    done \
+	fi
+
+#-----------------------------------------------------------------------------
+# GEOS on the Apple
+
+.PHONY:	geos-applelib
+geos-applelib:
+	for i in geos-apple geos-common; do \
+	    $(MAKE) SYS=geos-apple -C $$i || exit 1; \
+	    $(AR) a geos-apple.lib $$i/*.o || exit 1; \
+	done
+	for i in runtime common conio em joystick tgi zlib; do \
+	    $(MAKE) SYS=geos-apple -C $$i || exit 1; \
+	    for objfile in $$i/*.o; do \
+		BASENAME=`basename $$objfile`; \
+		if [ -f geos-common/$$BASENAME ]; then \
+		    $(AR) a geos-apple.lib geos-common/$$BASENAME; \
+		else \
+		    $(AR) a geos-apple.lib $$objfile; \
+		fi; \
+	    done \
+	done
+	if [ -d geos-apple/extra ]; then \
+	    for i in geos-apple/extra/*.o; do \
+	    	cp $$i geos-apple-`basename $$i` || exit 1; \
 	    done \
 	fi
 

@@ -11,8 +11,8 @@
 
 		.include "jumptab.inc"
 		.include "geossym.inc"
+		.include "geosmac.inc"
 		.include "const.inc"
-		.include "geosmac.ca65.inc"
 
 .code
 

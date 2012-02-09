@@ -8,7 +8,7 @@
 	    .include "../../libsrc/geos/inc/const.inc"
 	    .include "../../libsrc/geos/inc/jumptab.inc"
 	    .include "../../libsrc/geos/inc/geossym.inc"
-	    .include "../../libsrc/geos/inc/geosmac.ca65.inc"
+	    .include "../../libsrc/geos/inc/geosmac.inc"
 
 	    .export OVERLAY2_Function1
 	    .export OVERLAY2_Function2

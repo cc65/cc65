@@ -12,7 +12,7 @@
 
 	    .include "jumptab.inc"
 	    .include "geossym.inc"
-	    .include "geosmac.ca65.inc"
+	    .include "geosmac.inc"
 
 _DrawLine:
 	tay

@@ -594,10 +594,9 @@ static void CompileRes (const char* File)
     /* Remember the current assembler argument count */
     unsigned ArgCount = GRC.ArgCount;
 
-    /* Resource files need an geos-apple or geos-cbm target */
-    if (Target != TGT_GEOS_APPLE && Target != TGT_GEOS_CBM) {
-       	Error ("Resource files need a geos-apple or geos-cbm, target");
-    }
+    /* Resource files need an geos-apple or geos-cbm target but this
+     * is checked within grc65.
+     */
     CmdSetTarget (&GRC, Target);
 
     /* Add the file as argument for the resource compiler */

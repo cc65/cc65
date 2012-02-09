@@ -1,4 +1,3 @@
-
 #include <geos.h>
 #include <conio.h>
 #include <stdlib.h>
@@ -7,25 +6,30 @@ unsigned char x,y;
 
 void_func oldMouseVector, oldKeyVector;
 
-void foo1 (void) {
+void foo1 (void)
+{
     // do something on mouse press/release
     gotoxy(x,y);
     ++x;
     cputc('A');
+
     // call previous routine
     oldMouseVector();
 }
 
-void foo2 (void) {
+void foo2 (void)
+{
     // do something on key press/release
     gotoxy(x,y);
     ++y;
     cputc('B');
+
     // call previous routine
     oldKeyVector();
 }
 
-void hook_into_system(void) {
+void hook_into_system(void)
+{
     // hook into system vectors - preserve old value
     oldMouseVector = mouseVector;
     mouseVector = foo1;
@@ -33,21 +37,20 @@ void hook_into_system(void) {
     keyVector = foo2;
 }
 
-void remove_hooks(void) {
+void remove_hooks(void)
+{
     mouseVector = oldMouseVector;
     keyVector = oldKeyVector;
 }
 
-int main(void) {
-
+int main(void)
+{
     x = 0;
     y = 0;
 
-/*
-    To make cc65 do something for you before exiting you might register
-    a function to be called using atexit call. #include <stdlib.h> then and
-    write:
-*/
+    // To make cc65 do something for you before exiting you might register
+    // a function to be called using atexit call. #include <stdlib.h> then and
+    // write:
     atexit(&remove_hooks);
 
     clrscr();
@@ -55,16 +58,13 @@ int main(void) {
 
     hook_into_system();
 
-/* This program will loop forever though */
-
+    // This program will loop forever though
     MainLoop();
 
-/*
-    If not using atexit() you have to remember about restoring system vectors
-    right before exiting your application. Otherwise the system will most
-    likely crash.
+    // If not using atexit() you have to remember about restoring system vectors
+    // right before exiting your application. Otherwise the system will most
+    // likely crash.
+    // remove_hooks();
 
-    remove_hooks();
-*/
     return 0;
 }

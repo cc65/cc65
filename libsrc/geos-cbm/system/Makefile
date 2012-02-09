@@ -5,8 +5,7 @@
 #--------------------------------------------------------------------------
 # Object files
 
-S_OBJS  +=      ctype.o			\
-		get_ostype.o		\
+S_OBJS  +=      get_ostype.o		\
 		getserialnumber.o	\
 		initdoneio.o		\
 		setdevice.o		\

@@ -563,8 +563,11 @@ static void DoHeader (void)
 
     if (apple == 1) {
 
+        if (myHead.structure == 0) {
+            fprintf (outputSFile,
+                "\t.import __VLIR0_START__, __VLIR0_LAST__, __BSS_SIZE__\n\n");
+        }
         fprintf (outputSFile,
-            "\t.import __VLIR0_START__, __VLIR0_LAST__, __BSS_SIZE__\n\n"
             "\t.byte %i << 4 | %u\n",
             myHead.structure + 2, (unsigned)strlen (myHead.dosname));
 
@@ -574,7 +577,7 @@ static void DoHeader (void)
             "\t.byte $%02x\n"
             "\t.word 0\n"
             "\t.word 0\n"
-            "\t.word __VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__\n"
+            "\t.word %s\n"
             "\t.byte 0\n"
             "\t.word %i << 9 | %i << 5 | %i, %i << 8 | %i\n"
             "\t.byte 0\n"
@@ -582,8 +585,10 @@ static void DoHeader (void)
             "\t.byte 0\n"
             "\t.word 0\n"
             "\t.word %i << 9 | %i << 5 | %i, %i << 8 | %i\n"
-            "\t.word 0\n",
+            "\t.word 0\n\n",
             myHead.geostype,
+            myHead.structure == 0 ?
+                "__VLIR0_LAST__ - __VLIR0_START__ - __BSS_SIZE__" : "0",
             myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min,
             myHead.year, myHead.month, myHead.day, myHead.hour, myHead.min);
 
@@ -747,30 +752,61 @@ static void DoMemory (void)
         fprintf (outputSFile,
             "\t\t.segment \"RECORDS\"\n\n");
 
-        for (number = 0; number <= lastnumber; number++) {
-            if (overlaytable[number] == 1) {
-                fprintf (outputSFile,
-                    "\t.import __VLIR%i_START__, __VLIR%i_LAST__\n",
-                    number, number);
-            }
-        }
-        fprintf (outputSFile,
-            "\n");
+        if (apple == 1) {
 
-        for (number = 0; number <= lastnumber; number++) {
-            if (overlaytable[number] == 1) {
+            for (number = 0; number <= lastnumber; number++) {
                 fprintf (outputSFile,
-                    "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) /    254) + 1\n"
-                    "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) .MOD 254) + 2\n",
-                    number, number, number, number);
-            } else {
-                fprintf (outputSFile,
-                    "\t.byte $00\n"
-                    "\t.byte $FF\n");
+                    "\t.byte %s\n",
+                    overlaytable[number] == 1 ? "$00" : "$FF");
             }
+            fprintf (outputSFile,
+                "\n");
+
+            for (number = 0; number <= lastnumber; number++) {
+                if (overlaytable[number] == 1) {
+                    fprintf (outputSFile,
+                        "\t\t.segment \"VLIRIDX%i\"\n\n"
+                        "\t.import __VLIR%i_START__, __VLIR%i_LAST__%s\n\n"
+                        "\t.res  255\n"
+                        "\t.byte .lobyte (__VLIR%i_LAST__ - __VLIR%i_START__%s)\n"
+                        "\t.res  255\n"
+                        "\t.byte .hibyte (__VLIR%i_LAST__ - __VLIR%i_START__%s)\n\n",
+                        number, number, number,
+                        number == 0 ? ", __BSS_SIZE__" : "",
+                        number, number,
+                        number == 0 ? " - __BSS_SIZE__" : "",
+                        number, number,
+                        number == 0 ? " - __BSS_SIZE__" : "");
+                }
+            }
+
+        } else {
+
+            for (number = 0; number <= lastnumber; number++) {
+                if (overlaytable[number] == 1) {
+                    fprintf (outputSFile,
+                        "\t.import __VLIR%i_START__, __VLIR%i_LAST__\n",
+                        number, number);
+                }
+            }
+            fprintf (outputSFile,
+                "\n");
+
+            for (number = 0; number <= lastnumber; number++) {
+                if (overlaytable[number] == 1) {
+                    fprintf (outputSFile,
+                        "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) /    254) + 1\n"
+                        "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) .MOD 254) + 2\n",
+                        number, number, number, number);
+                } else {
+                    fprintf (outputSFile,
+                        "\t.byte $00\n"
+                        "\t.byte $FF\n");
+                }
+            }
+            fprintf (outputSFile,
+                "\n");
         }
-        fprintf (outputSFile,
-            "\n");
 
         openCFile ();
 

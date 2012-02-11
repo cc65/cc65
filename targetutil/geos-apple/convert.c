@@ -5,6 +5,8 @@
 #include <dirent.h>
 #include <dio.h>
 
+unsigned char info_signature[3] = {3, 21, 63 | 0x80};
+
 dhandle_t dhandle;
 
 struct dir_entry_t {
@@ -43,22 +45,28 @@ union {
         unsigned char addr_hi[254];
         unsigned char size_hi[2];
     } content;
-} index_block;
+} index_block, master_block, vlir_block;
 
 union {
     unsigned char bytes[512];
     struct {
-        unsigned char      info_block[256];
+        unsigned           reserved;
+        unsigned char      info_block[254];
         unsigned char      vlir_records[128];
         struct dir_entry_t dir_entry;
     } content;
 } header_block;
 
 
-static void err_exit(char *operation)
+static void err_exit(char *operation, unsigned char oserr)
 {
-    fprintf(stderr, "%s - err:%02x - %s",
-            operation, (int)_oserror, _stroserror(_oserror));
+    if (oserr) {
+        fprintf(stderr, "%s - err:%02x - %s",
+                operation, (int)_oserror, _stroserror(_oserror));
+    } else {
+        fprintf(stderr, "%s",
+                operation);
+    }
     getchar();
     exit(EXIT_FAILURE);
 }
@@ -91,11 +99,11 @@ static unsigned get_dir_entry(char* p_name)
        of relative path and current drive for free */
     dir = opendir(d_name);
     if (!dir) {
-        err_exit("opendir");
+        err_exit("opendir", 1);
     }
     dirent = readdir(dir);
     if (!dirent) {
-        err_exit("readdir");
+        err_exit("readdir", 1);
     }
 
     /* Field header_pointer directly follows field last_mod */
@@ -104,11 +112,11 @@ static unsigned get_dir_entry(char* p_name)
     /* DEV_NUM is set to the drive accessed above */
     dhandle = dio_open(*(driveid_t*)0xBF30);
     if (!dhandle) {
-        err_exit("dio_open");
+        err_exit("dio_open", 1);
     }
 
     if (dio_read(dhandle, cur_addr, &dir_block)) {
-        err_exit("dio_read.1");
+        err_exit("dio_read.1", 1);
     }
 
     /* Get directory entry infos from directory header */
@@ -130,12 +138,12 @@ static unsigned get_dir_entry(char* p_name)
                 cur_addr = dir_block.content.next_block;
                 if (!cur_addr) {
                     _mappederrno(0x46);
-                    err_exit("dio_read.2");
+                    err_exit("dio_read.2", 1);
                 }
 
                 /* Read next directory block */
                 if (dio_read(dhandle, cur_addr, &dir_block)) {
-                    err_exit("dio_read.3");
+                    err_exit("dio_read.3", 1);
                 }
 
                 /* Start with first entry in next block */
@@ -159,10 +167,12 @@ static unsigned get_dir_entry(char* p_name)
 
 int main(int argc, char* argv[])
 {
-    char     input[80];
-    char*    p_name;
-    unsigned dir_addr;
-    unsigned header_addr;
+    char          input[80];
+    char*         p_name;
+    unsigned      dir_addr;
+    unsigned      header_addr;
+    unsigned char index;
+    unsigned long size;
 
     if (argc > 1) {
         p_name = argv[1];
@@ -174,47 +184,126 @@ int main(int argc, char* argv[])
     dir_addr = get_dir_entry(p_name);
 
     if (dio_read(dhandle, dir_entry->key_pointer, &index_block)) {
-        err_exit("dio_read.4");
+        err_exit("dio_read.4", 1);
     }
 
     header_addr = index_block.content.addr_lo[0] |
                   index_block.content.addr_hi[0] << 8;
 
     if (dio_read(dhandle, header_addr, &header_block)) {
-        err_exit("dio_read.5");
+        err_exit("dio_read.5", 1);
+    }
+
+    for (index = 0; index < sizeof(info_signature); ++index) {
+        if (header_block.content.info_block[index] != info_signature[index]) {
+            err_exit("file signature mismatch", 0);
+        }   
+    }
+
+    if (header_block.content.dir_entry.storage_length.storage_type == 2)
+    {
+        printf("Sequential file\n");
+
+        memmove(&index_block.content.addr_lo[0],
+                &index_block.content.addr_lo[1], sizeof(index_block.content.addr_lo) - 1);
+        memmove(&index_block.content.addr_hi[0],
+                &index_block.content.addr_hi[1], sizeof(index_block.content.addr_hi) - 1);
+
+        size = (unsigned long)(header_block.content.dir_entry.size[0])       |
+               (unsigned long)(header_block.content.dir_entry.size[1]) <<  8 |
+               (unsigned long)(header_block.content.dir_entry.size[2]) << 16;
+
+    } else {
+        unsigned      vlir_addr;
+        unsigned long vlir_size;
+        unsigned char vlir_blocks;
+        unsigned char record = 0;
+
+        printf("VLIR file\n");
+
+        index = 1;
+        size  = 0;
+
+        while (1) {
+            vlir_addr = index_block.content.addr_lo[index] |
+                        index_block.content.addr_hi[index] << 8;
+            ++index;
+
+            if (vlir_addr == 0) {
+                break;
+            }
+
+            while (header_block.content.vlir_records[record] == 0xFF) {
+                master_block.content.addr_lo[record] = 0xFF;
+                master_block.content.addr_hi[record] = 0xFF;
+                ++record;
+            }
+
+            master_block.content.addr_lo[record] = (unsigned char)(vlir_addr     );
+            master_block.content.addr_hi[record] = (unsigned char)(vlir_addr >> 8);
+            ++record;
+
+            if (dio_read(dhandle, vlir_addr, &vlir_block)) {
+                err_exit("dio_read.6", 1);
+            }
+
+            vlir_size = (unsigned long)(vlir_block.content.size_lo[1])       |
+                        (unsigned long)(vlir_block.content.size_hi[1]) <<  8 |
+                        (unsigned long)(vlir_block.content.size_lo[0]) << 16 |
+                        (unsigned long)(vlir_block.content.size_hi[0]) << 24;
+
+            printf("VLIR %u size %lu bytes\n", record, vlir_size);
+
+            vlir_blocks = (unsigned char)((vlir_size + 511) / 512);
+
+            memcpy(&vlir_block.content.addr_lo[0],
+                   &index_block.content.addr_lo[index], vlir_blocks);
+            memcpy(&vlir_block.content.addr_hi[0],
+                   &index_block.content.addr_hi[index], vlir_blocks);
+
+            if (dio_write(dhandle, vlir_addr, &vlir_block)) {
+                err_exit("dio_write.1", 1);
+            }
+
+            index += vlir_blocks;
+            size  += vlir_size;
+        }
+
+        index_block = master_block;
+    }
+
+    printf("File size %lu bytes\n", size);
+
+    index_block.content.size_lo[1] = (unsigned char)(size      );
+    index_block.content.size_hi[1] = (unsigned char)(size >>  8);
+    index_block.content.size_lo[0] = (unsigned char)(size >> 16);
+    index_block.content.size_hi[0] = (unsigned char)(size >> 24);
+
+    if (dio_write(dhandle, dir_entry->key_pointer, &index_block)) {
+        err_exit("dio_write.2", 1);
     }
 
     dir_entry->storage_length  = header_block.content.dir_entry.storage_length;
     memcpy(dir_entry->file_name, header_block.content.dir_entry.file_name, 15);
     dir_entry->file_type       = header_block.content.dir_entry.file_type;
-    memcpy(dir_entry->size,      header_block.content.dir_entry.size, 3);
+    dir_entry->size[0]         = (unsigned char)(size      );
+    dir_entry->size[1]         = (unsigned char)(size >>  8);
+    dir_entry->size[2]         = (unsigned char)(size >> 16);
     dir_entry->creation        = header_block.content.dir_entry.creation;
     dir_entry->version         = header_block.content.dir_entry.version;
     dir_entry->min_version     = header_block.content.dir_entry.min_version;
     dir_entry->aux_type        = header_addr;
     dir_entry->last_mod        = header_block.content.dir_entry.last_mod;
 
-    memmove(&index_block.content.addr_lo[0],
-            &index_block.content.addr_lo[1], sizeof(index_block.content.addr_lo) - 1);
-    memmove(&index_block.content.addr_hi[0],
-            &index_block.content.addr_hi[1], sizeof(index_block.content.addr_hi) - 1);
-
-    index_block.content.size_lo[1] = dir_entry->size[0];
-    index_block.content.size_hi[1] = dir_entry->size[1];
-    index_block.content.size_lo[0] = dir_entry->size[2];
-    index_block.content.size_hi[0] = 0;
-
     if (dio_write(dhandle, dir_addr, &dir_block)) {
-        err_exit("dio_write.1");
-    }
-
-    if (dio_write(dhandle, dir_entry->key_pointer, &index_block)) {
-        err_exit("dio_write.2");
+        err_exit("dio_write.3", 1);
     }
 
     if (dio_close(dhandle)) {
-        err_exit("dio_close");
+        err_exit("dio_close", 1);
     }
 
+    printf("Conversion successful");
+    getchar();
     return EXIT_SUCCESS;
 }

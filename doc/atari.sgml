@@ -96,12 +96,13 @@ header file.
 
 <sect1>Atari specific functions<p>
 
-The functions listed below are special for the Atari. See the <htmlurl
-url="funcref.html" name="function reference"> for declaration and usage.
+The functions and global variable listed below are special for the Atari.
+See the <htmlurl url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
 <item>get_ostype
 <item>get_tv
+<item>_dos_type
 <item>_gtia_mkcolor
 <item>_getcolor
 <item>_getdefdev

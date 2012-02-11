@@ -196,6 +196,7 @@ extern unsigned char _dos_type;        /* the DOS flavour */
 #define SPARTADOS   1
 #define OSADOS      2
 #define MYDOS       3
+#define XDOS        4
 #define NODOS       255
 
 /* Define hardware */

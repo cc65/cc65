@@ -177,7 +177,11 @@ int main(int argc, char* argv[])
     if (argc > 1) {
         p_name = argv[1];
     } else {
-        printf("Apple GEOS Convert\nPathname:");
+        printf("\n"
+               "Apple GEOS Convert 1.0\n"
+               "----------------------\n"
+               "\n"
+               "Pathname:");
         p_name = gets(input);
     }
 
@@ -202,7 +206,7 @@ int main(int argc, char* argv[])
 
     if (header_block.content.dir_entry.storage_length.storage_type == 2)
     {
-        printf("Sequential file\n");
+        printf("\nSequential file\n");
 
         memmove(&index_block.content.addr_lo[0],
                 &index_block.content.addr_lo[1], sizeof(index_block.content.addr_lo) - 1);
@@ -219,7 +223,7 @@ int main(int argc, char* argv[])
         unsigned char vlir_blocks;
         unsigned char record = 0;
 
-        printf("VLIR file\n");
+        printf("\nVLIR file\n");
 
         index = 1;
         size  = 0;
@@ -252,7 +256,7 @@ int main(int argc, char* argv[])
                         (unsigned long)(vlir_block.content.size_lo[0]) << 16 |
                         (unsigned long)(vlir_block.content.size_hi[0]) << 24;
 
-            printf("VLIR %u size %lu bytes\n", record, vlir_size);
+            printf("VLIR %u size %lu bytes\n", record - 1, vlir_size);
 
             vlir_blocks = (unsigned char)((vlir_size + 511) / 512);
 
@@ -272,7 +276,7 @@ int main(int argc, char* argv[])
         index_block = master_block;
     }
 
-    printf("File size %lu bytes\n", size);
+    printf("File size %lu bytes\n\n", size);
 
     index_block.content.size_lo[1] = (unsigned char)(size      );
     index_block.content.size_hi[1] = (unsigned char)(size >>  8);
@@ -303,7 +307,8 @@ int main(int argc, char* argv[])
         err_exit("dio_close", 1);
     }
 
-    printf("Conversion successful");
+    printf("Convert to '%.*s' successful", dir_entry->storage_length.name_length,
+                                           dir_entry->file_name);
     getchar();
     return EXIT_SUCCESS;
 }

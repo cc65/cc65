@@ -42,11 +42,6 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 	@$(LD) -o $@ -t module $^
 
 #--------------------------------------------------------------------------
-# Object files
-
-S_OBJS=	ctype.o
-
-#--------------------------------------------------------------------------
 # Directories
 
 DIRS =	disk
@@ -68,8 +63,8 @@ TGIS =
 # Directives
 
 include $(addsuffix /Makefile, $(DIRS))
-vpath %.c $(DIRS) ../apple2
-vpath %.s $(DIRS) ../apple2
+vpath %.c $(DIRS)
+vpath %.s $(DIRS)
 
 #--------------------------------------------------------------------------
 # Targets

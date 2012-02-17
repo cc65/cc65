@@ -9,6 +9,7 @@ C_OBJS	+=	systime.o
 
 S_OBJS  +=      callroutine.o		\
 		crt0.o			\
+		ctype.o			\
 		enterdesktop.o		\
 		extzp.o			\
 		firstinit.o		\

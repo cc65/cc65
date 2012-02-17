@@ -42,11 +42,6 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 	@$(LD) -o $@ -t module $^
 
 #--------------------------------------------------------------------------
-# Object files
-
-S_OBJS=	ctype.o
-
-#--------------------------------------------------------------------------
 # Directories
 
 DIRS =	disk		\
@@ -72,8 +67,8 @@ TGIS = geos-tgi.tgi
 # Directives
 
 include $(addsuffix /Makefile, $(DIRS))
-vpath %.c $(DIRS) ../cbm
-vpath %.s $(DIRS) ../cbm
+vpath %.c $(DIRS)
+vpath %.s $(DIRS)
 
 #--------------------------------------------------------------------------
 # Targets

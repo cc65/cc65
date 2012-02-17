@@ -98,7 +98,7 @@ struct dirent {
     char d_name[1];
 };
 
-#endif  /* __APPLE2__ or __APPLE2ENH__ */
+#endif
 
 
 

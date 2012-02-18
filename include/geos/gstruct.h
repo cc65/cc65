@@ -18,14 +18,6 @@
 
 typedef void (*void_func) (void);
 
-struct f_date {			/* date in filedesctiptor */
-	char f_year;
-	char f_month;
-	char f_day;
-	char f_hour;
-	char f_minute;
-};
-
 struct s_date {			/* system date & time */
 	char s_year;
 	char s_month;
@@ -56,6 +48,43 @@ struct fileheader {		/* header block (like fileHeader) */
 	char note[96];
 };
 
+#ifdef __GEOS_APPLE__
+
+struct f_date {			/* date in filedesctiptor */
+	unsigned f_day:5;
+	unsigned f_month:4;
+	unsigned f_year:7;
+	char f_minute;
+	char f_hour;
+};
+
+struct filehandle {		/* filehandle in directory sectors */
+	unsigned name_len:4;	/* or in dirEntryBuf               */
+	unsigned structure:4;
+	char name[15];
+	char type;
+	struct tr_se n_block;
+	unsigned size;
+	char byte_size[3];
+	struct f_date date;
+	char version;
+	char min_version;
+	char access;
+	struct tr_se header;
+	struct f_date mod_date;
+	struct tr_se dir_head;
+};
+
+#else /* #ifdef __GEOS_APPLE__ */
+
+struct f_date {			/* date in filedesctiptor */
+	char f_year;
+	char f_month;
+	char f_day;
+	char f_hour;
+	char f_minute;
+};
+
 struct filehandle {		/* filehandle in directory sectors */
 	char dostype;		/* or in dirEntryBuf               */
 	struct tr_se n_block;
@@ -66,6 +95,8 @@ struct filehandle {		/* filehandle in directory sectors */
 	struct f_date date;
 	unsigned size;
 };
+
+#endif /* #ifdef __GEOS_APPLE__ */
 
 struct pixel {			/* describes point              */
 	unsigned x;
@@ -99,7 +130,6 @@ struct process {		/* process info, declare table of that type */
 	unsigned jiffies;	/* last entry HAVE TO BE {0,0}              */
 };
 
-
 struct iconpic {		/* icon/encoded bitmap description          */
 	char *pic_ptr;		/* ptr to a photo scrap (or encoded bitmap) */
 	char x;			/* position in cards (*8 pixels)            */
@@ -122,7 +152,6 @@ struct icontab {
 	struct pixel mousepos;	/* position of mouse after DoIcons          */
 	struct icondef tab[];	/* table of size declared by icontab.number */
 };
-
 
 struct menuitem {
 	char *name;

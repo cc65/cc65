@@ -180,6 +180,10 @@ No VIC1011 drivers are currently available for the VIC20.
 
 <sect>Other hints<p>
 
+<sect1>Escape code<p>
+
+For an Esc press CTRL and [ key.
+
 <sect1>Passing arguments to the program<p>
 
 Command line arguments can be passed to <tt/main()/. Since this is not

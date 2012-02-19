@@ -133,7 +133,7 @@ atarilib:
 
 .PHONY:	atmoslib
 atmoslib:
-	for i in runtime atmos common conio em joystick tgi zlib; do \
+	for i in runtime atmos common conio dbg em joystick tgi zlib; do \
 	    $(MAKE) SYS=atmos -C $$i || exit 1; \
 	    $(AR) a atmos.lib $$i/*.o || exit 1; \
 	done

@@ -88,6 +88,15 @@
 #define CH_LTEE     	'+'
 #define CH_RTEE     	'+'
 #define CH_CROSS    	'+'
+#define CH_CURS_UP	 11
+#define CH_CURS_DOWN	 10
+#define CH_CURS_LEFT	  8
+#define CH_CURS_RIGHT	  9
+#define CH_DEL		127
+#define CH_ENTER	 13
+#define CH_STOP		  3
+#define CH_LIRA		 95
+#define CH_ESC		 27
 
 
 

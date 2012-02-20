@@ -151,7 +151,7 @@ __ctype:
 	.byte CT_NONE		;			125/7d _____}_____
 	.byte CT_NONE		;			126/7e _____~_____
 	.byte CT_CTRL		;			127/7f __USELAST__
-	.byte CT_CTRL		;			128/80 __SHORTCUT_
+	.byte CT_NONE		;			128/80 __SHORTCUT_
 	.byte CT_NONE		;			129/81 ____N/A____
 	.byte CT_NONE		;			130/82 ____N/A____
 	.byte CT_NONE		;			131/83 ____N/A____

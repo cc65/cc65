@@ -49,6 +49,7 @@ SGML =	apple2.sgml	\
         od65.sgml       \
 	pet.sgml	\
 	plus4.sgml	\
+        smc.sgml        \
         supervision.sgml\
 	vic20.sgml
 

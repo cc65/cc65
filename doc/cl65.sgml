@@ -72,6 +72,7 @@ Long options:
   --bin-include-dir dir         Set an assembker binary include directory
   --bss-label name              Define and export a BSS segment label
   --bss-name seg                Set the name of the BSS segment
+  --cc-args options             Pass options to the compiler
   --cfg-path path               Specify a config file search path
   --check-stack                 Generate stack overflow checks
   --code-label name             Define and export a CODE segment label
@@ -172,6 +173,16 @@ There are a few remaining options that control the behaviour of cl65:
   if cl65 supports an option by itself, do not pass this option to the
   assembler by means of the <tt/-Wa/ switch.
 
+  <tag><tt>-Wc options, --cc-args options</tt></tag>
+
+  Pass options directly to the compiler. This may be used to pass options
+  that aren't directly supported by cl65. Several options may be separated by
+  commas, the commas are replaced by spaces when passing them to the
+  compiler. Beware: Passing arguments directly to the compiler may interfere
+  with some of the defaults, because cl65 doesn't parse the options passed. So
+  if cl65 supports an option by itself, do not pass this option to the
+  compiler by means of the <tt/-Wc/ switch.
+
   <tag><tt>-Wl options, --ld-args options</tt></tag>
 
   Pass options directly to the linker. This may be used to pass options that
@@ -182,7 +193,7 @@ There are a few remaining options that control the behaviour of cl65:
   supports an option by itself, do not pass this option to the linker by means
   of the <tt/-Wl/ switch.
 
-</descrip>
+</descrip>                        
 
 
 

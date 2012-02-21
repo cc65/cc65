@@ -697,6 +697,7 @@ static void Usage (void)
             "  -V\t\t\t\tPrint the version number\n"
             "  -W name[,...]\t\t\tSuppress compiler warnings\n"
             "  -Wa options\t\t\tPass options to the assembler\n"
+            "  -Wc options\t\t\tPass options to the compiler\n"
             "  -Wl options\t\t\tPass options to the linker\n"
             "\n"
             "Long options:\n"
@@ -707,6 +708,7 @@ static void Usage (void)
             "  --bin-include-dir dir\t\tSet an assembler binary include directory\n"
             "  --bss-label name\t\tDefine and export a BSS segment label\n"
             "  --bss-name seg\t\tSet the name of the BSS segment\n"
+            "  --cc-args options\t\tPass options to the compiler\n"
             "  --cfg-path path\t\tSpecify a config file search path\n"
             "  --check-stack\t\t\tGenerate stack overflow checks\n"
             "  --code-label name\t\tDefine and export a CODE segment label\n"
@@ -809,6 +811,14 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 {
     CmdAddArg2 (&CC65, "--bss-name", Arg);
     CmdAddArg2 (&CO65, "--bss-name", Arg);
+}
+
+
+
+static void OptCCArgs (const char* Opt attribute ((unused)), const char* Arg)
+/* Pass arguments to the compiler */
+{
+    CmdAddArgList (&CC65, Arg);
 }
 
 
@@ -1229,6 +1239,7 @@ int main (int argc, char* argv [])
         { "--bin-include-dir",  1,      OptBinIncludeDir        },
        	{ "--bss-label",       	1,     	OptBssLabel             },
 	{ "--bss-name",	 	1, 	OptBssName   		},
+        { "--cc-args",          1,      OptCCArgs               },
        	{ "--cfg-path",	       	1,     	OptCfgPath              },
        	{ "--check-stack",	0,     	OptCheckStack		},
        	{ "--code-label",      	1,     	OptCodeLabel            },
@@ -1360,6 +1371,9 @@ int main (int argc, char* argv [])
 		    if (Arg[2] == 'a' && Arg[3] == '\0') {
 			/* -Wa: Pass options to assembler */
 			OptAsmArgs (Arg, GetArg (&I, 3));
+		    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
+			/* -Wc: Pass options to compiler */
+			OptCCArgs (Arg, GetArg (&I, 3));
 		    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
 			/* -Wl: Pass options to linker */
 			OptLdArgs (Arg, GetArg (&I, 3));

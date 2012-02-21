@@ -6,7 +6,7 @@
 <date>2012-02-19
 
 <abstract>
-The 'smc.mac' macro package for ca65 eases the use, increases the safeness and
+The 'smc.inc' macro package for ca65 eases the use, increases the safeness and
 self-explanation of 'self-modifying-code' (SMC).
 </abstract>
 
@@ -38,7 +38,7 @@ general purpose library with SMC excludes ROM targets!
 The ca65 SMC macro package consists of two files:
 
 <itemize>
-<item><tt>smc.mac</tt>
+<item><tt>smc.inc</tt>
 <item><tt>opcodes.inc</tt>
 </itemize>
 

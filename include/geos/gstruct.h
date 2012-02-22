@@ -48,7 +48,28 @@ struct fileheader {		/* header block (like fileHeader) */
 	char note[96];
 };
 
-#ifdef __GEOS_APPLE__
+#ifdef __GEOS_CBM__
+
+struct f_date {			/* date in filedesctiptor */
+	char f_year;
+	char f_month;
+	char f_day;
+	char f_hour;
+	char f_minute;
+};
+
+struct filehandle {		/* filehandle in directory sectors */
+	char dostype;		/* or in dirEntryBuf               */
+	struct tr_se n_block;
+	char name[16];
+	struct tr_se header;
+	char structure;
+	char type;
+	struct f_date date;
+	unsigned size;
+};
+
+#else /* #ifdef __GEOS_CBM__ */
 
 struct f_date {			/* date in filedesctiptor */
 	unsigned f_day:5;
@@ -75,28 +96,7 @@ struct filehandle {		/* filehandle in directory sectors */
 	struct tr_se dir_head;
 };
 
-#else /* #ifdef __GEOS_APPLE__ */
-
-struct f_date {			/* date in filedesctiptor */
-	char f_year;
-	char f_month;
-	char f_day;
-	char f_hour;
-	char f_minute;
-};
-
-struct filehandle {		/* filehandle in directory sectors */
-	char dostype;		/* or in dirEntryBuf               */
-	struct tr_se n_block;
-	char name[16];
-	struct tr_se header;
-	char structure;
-	char type;
-	struct f_date date;
-	unsigned size;
-};
-
-#endif /* #ifdef __GEOS_APPLE__ */
+#endif /* #ifdef __GEOS_CBM__ */
 
 struct pixel {			/* describes point              */
 	unsigned x;

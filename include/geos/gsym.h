@@ -61,88 +61,7 @@
 #define	r15L		(*(char*)(R_BASE + 0x1e))
 #define	r15H		(*(char*)(R_BASE + 0x1f))
 
-#ifdef __GEOS_APPLE__
-
-#define nameBuf		char[16]
-#define blockBuf	char[512]
-
-#define R_BASE		0x00
-
-#define	curPattern	(*(unsigned*)0x022c)
-#define	string		(*(unsigned*)0x53)
-#define curFontDesc	(*(struct fontdesc*)0x0218)
-#define	currentMode	(*(char*)0x021c)
-#define	dispBufferOn	(*(char*)0x021d)
-#define	mouseOn		(*(char*)0x5d)
-#define curWindow	(*(struct window*)0x021e)
-#define	pressFlag	(*(char*)0x08fe)
-#define mousePos	(*(struct pixel*)0x0241)
-#define	returnAddress	(*(unsigned*)0x64)
-
-#define	diskBlkBuf	((blockBuf)0xf659)
-#define fileHeader	(*(struct fileheader*)0xf859)
-#define curDirHead	((char[39])0xfa80)
-#define dirEntryBuf	(*(struct filehandle*)0xfa59)
-
-#define DrACurDkNm	((nameBuf)0xfaa7)
-#define DrBCurDkNm	((nameBuf)0xfab7)
-#define dataFileName	((nameBuf)0x02a4)
-#define dataDiskName	((nameBuf)0x02b4)
-#define PrntFileName	((nameBuf)0x08ac)
-
-#define	curDrive	(*(char*)0xf60d)
-#define	diskOpenFlg	(*(char*)0xf617)
-#define	NUMDRV		(*(char*)0xf60e)
-
-#define driveType	((char[4])0xfaf3)
-
-#define	VLIRInfo	(*(struct VLIR_info*)0xf618)
-
-#define appMain		(*(void_func*)0x0200)
-#define intTopVector	(*(void_func*)0x0202)
-#define intBotVector	(*(void_func*)0x0204)
-#define mouseVector	(*(void_func*)0x0206)
-#define keyVector	(*(void_func*)0x0208)
-#define	inputVector	(*(void_func*)0x020a)
-#define	mouseFaultVec	(*(void_func*)0x020c)
-#define	otherPressVec	(*(void_func*)0x020e)
-#define	StringFaultVec	(*(void_func*)0x0210)
-#define	alarmTmtVector	(*(void_func*)0x0212)
-#define	BRKVector	(*(void_func*)0x0214)
-#define	RecoverVector	(*(void_func*)0x0216)
-
-#define	selectionFlash	(*(char*)0x0224)
-#define	alphaFlag	(*(char*)0x0225)
-#define	iconSelFlg	(*(char*)0x0226)
-#define	faultData	(*(char*)0x0227)
-#define	menuNumber	(*(char*)0x0228)
-#define mouseWindow	(*(struct window*)0x57)
-#define stringXY	(*(struct pixel*)0x022e)
-
-#define	maxMouseSpeed	(*(char*)0x027d)
-#define	minMouseSpeed	(*(char*)0x027e)
-#define	mouseAccel	(*(char*)0x027f)
-#define	keyData		(*(char*)0x0245)
-#define	mouseData	(*(char*)0x0246)
-#define	inputData	(*(char*)0x0247)
-#define	random		(*(char*)0x024c)
-#define	saveFontTab	(*(struct fontdesc*)0x024e)
-
-#define	dblClickCount	(*(char*)0x0258)
-#define system_date	(*(struct s_date*)0xf200)
-#define	sysDBData	(*(char*)0x0259)
-#define	dlgBoxRamBuf	(*(char*)0xf381)
-
-#define	firstBoot	(*(char*)0x0281)
-#define inputDevName	((nameBuf)0x08cc)
-#define	DrCCurDkNm	((nameBuf)0xfac7)
-#define	DrDCurDkNm	((nameBuf)0xfad7)
-
-#define	mobenble	(*(char*)0x0818)
-#define	moby2		(*(char*)0x081a)
-#define	mobx2		(*(char*)0x0819)
-
-#else /* #ifdef __GEOS_APPLE__ */
+#ifdef __GEOS_CBM__
 
 #define nameBuf		char[17]
 #define blockBuf	char[256]
@@ -337,6 +256,87 @@
 #define	vdcreg		(*(char*)0xd600)
 #define	vdcdata		(*(char*)0xd601)
 
-#endif /* #ifdef __GEOS_APPLE__ */
+#else /* #ifdef __GEOS_CBM__ */
+
+#define nameBuf		char[16]
+#define blockBuf	char[512]
+
+#define R_BASE		0x00
+
+#define	curPattern	(*(unsigned*)0x022c)
+#define	string		(*(unsigned*)0x53)
+#define curFontDesc	(*(struct fontdesc*)0x0218)
+#define	currentMode	(*(char*)0x021c)
+#define	dispBufferOn	(*(char*)0x021d)
+#define	mouseOn		(*(char*)0x5d)
+#define curWindow	(*(struct window*)0x021e)
+#define	pressFlag	(*(char*)0x08fe)
+#define mousePos	(*(struct pixel*)0x0241)
+#define	returnAddress	(*(unsigned*)0x64)
+
+#define	diskBlkBuf	((blockBuf)0xf659)
+#define fileHeader	(*(struct fileheader*)0xf859)
+#define curDirHead	((char[39])0xfa80)
+#define dirEntryBuf	(*(struct filehandle*)0xfa59)
+
+#define DrACurDkNm	((nameBuf)0xfaa7)
+#define DrBCurDkNm	((nameBuf)0xfab7)
+#define dataFileName	((nameBuf)0x02a4)
+#define dataDiskName	((nameBuf)0x02b4)
+#define PrntFileName	((nameBuf)0x08ac)
+
+#define	curDrive	(*(char*)0xf60d)
+#define	diskOpenFlg	(*(char*)0xf617)
+#define	NUMDRV		(*(char*)0xf60e)
+
+#define driveType	((char[4])0xfaf3)
+
+#define	VLIRInfo	(*(struct VLIR_info*)0xf618)
+
+#define appMain		(*(void_func*)0x0200)
+#define intTopVector	(*(void_func*)0x0202)
+#define intBotVector	(*(void_func*)0x0204)
+#define mouseVector	(*(void_func*)0x0206)
+#define keyVector	(*(void_func*)0x0208)
+#define	inputVector	(*(void_func*)0x020a)
+#define	mouseFaultVec	(*(void_func*)0x020c)
+#define	otherPressVec	(*(void_func*)0x020e)
+#define	StringFaultVec	(*(void_func*)0x0210)
+#define	alarmTmtVector	(*(void_func*)0x0212)
+#define	BRKVector	(*(void_func*)0x0214)
+#define	RecoverVector	(*(void_func*)0x0216)
+
+#define	selectionFlash	(*(char*)0x0224)
+#define	alphaFlag	(*(char*)0x0225)
+#define	iconSelFlg	(*(char*)0x0226)
+#define	faultData	(*(char*)0x0227)
+#define	menuNumber	(*(char*)0x0228)
+#define mouseWindow	(*(struct window*)0x57)
+#define stringXY	(*(struct pixel*)0x022e)
+
+#define	maxMouseSpeed	(*(char*)0x027d)
+#define	minMouseSpeed	(*(char*)0x027e)
+#define	mouseAccel	(*(char*)0x027f)
+#define	keyData		(*(char*)0x0245)
+#define	mouseData	(*(char*)0x0246)
+#define	inputData	(*(char*)0x0247)
+#define	random		(*(char*)0x024c)
+#define	saveFontTab	(*(struct fontdesc*)0x024e)
+
+#define	dblClickCount	(*(char*)0x0258)
+#define system_date	(*(struct s_date*)0xf200)
+#define	sysDBData	(*(char*)0x0259)
+#define	dlgBoxRamBuf	(*(char*)0xf381)
+
+#define	firstBoot	(*(char*)0x0281)
+#define inputDevName	((nameBuf)0x08cc)
+#define	DrCCurDkNm	((nameBuf)0xfac7)
+#define	DrDCurDkNm	((nameBuf)0xfad7)
+
+#define	mobenble	(*(char*)0x0818)
+#define	moby2		(*(char*)0x081a)
+#define	mobx2		(*(char*)0x0819)
+
+#endif /* #ifdef __GEOS_CBM__ */
 
 #endif

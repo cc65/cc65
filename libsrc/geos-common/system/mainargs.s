@@ -34,7 +34,7 @@ initmainargs:
 	ldy #0
 @fn_loop:
 	lda dirEntryBuf+OFF_FNAME,y
-.ifdef  __GEOS_CBM__
+.ifdef __GEOS_CBM__
 	cmp #$a0
 .else
 	cmp #0

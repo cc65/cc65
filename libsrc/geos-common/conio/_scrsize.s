@@ -17,7 +17,7 @@
 .segment	"INIT"
 
 initscrsize:
-.ifdef  __GEOS_CBM__
+.ifdef __GEOS_CBM__
 	lda graphMode
 	bpl L1
 	lda #80			; 80 columns (more or less)

@@ -32,7 +32,7 @@ _mouse_init:
 	sta mouseTop
 	sta mouseLeft
 	sta mouseLeft+1
-.ifdef  __GEOS_CBM__
+.ifdef __GEOS_CBM__
 	lda #199
 	sta mouseBottom
 	lda graphMode

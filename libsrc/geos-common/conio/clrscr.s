@@ -28,7 +28,7 @@ _clrscr:
 	inx
 	stx cursor_r
 	jsr fixcursor		; home cursor
-.ifdef  __GEOS_CBM__
+.ifdef __GEOS_CBM__
 	lda #199
 	sta r2H
 	lda graphMode

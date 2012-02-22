@@ -32,4 +32,4 @@ S_OBJS +=	bitmapclip.o		\
 		setpattern.o		\
 		testpoint.o		\
 		usesystemfont.o		\
-		verticalline.o		\
+		verticalline.o

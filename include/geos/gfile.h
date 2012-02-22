@@ -70,33 +70,5 @@ char UpdateRecordFile(void);
 #define	USR		3
 #define	REL		4
 #define	CBM		5
-/* directory offsets */
-/* offsets in dir entry i.e. index dirEntryBuf with these */
-#define	FRST_FILE_ENTRY	2
-#define	OFF_CFILE_TYPE	0
-#define	OFF_DE_TR_SC	1
-#define	OFF_FNAME	3
-#define	OFF_GHDR_PTR	19
-#define	OFF_GSTRUC_TYPE	21
-#define	OFF_GFILE_TYPE	22
-#define	OFF_YEAR	23
-#define	OFF_SIZE	28
-#define	OFF_NXT_FILE	32
-/* offsets in file header i.e. index fileHeader with these */
-#define	O_GHIC_WIDTH	2
-#define	O_GHIC_HEIGHT	3
-#define	O_GHIC_PIC	4
-#define	O_GHCMDR_TYPE	68
-#define	O_GHGEOS_TYPE	69
-#define	O_GHSTR_TYPE	70
-#define	O_GHST_ADDR	71
-#define	O_GHEND_ADDR	73
-#define	O_GHST_VEC	75
-#define	O_GHFNAME	77
-#define	O_128_FLAGS	96
-#define	O_GH_AUTHOR	97
-#define	O_GHP_DISK	97
-#define	O_GHP_FNAME	117
-#define	O_GHINFO_TXT	160
 
 #endif

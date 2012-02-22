@@ -6,6 +6,7 @@
 # Object files
 
 C_OBJS +=	_afailed.o	\
+		_poserror.o	\
 		abort.o		\
 		perror.o	\
 		sleep.o

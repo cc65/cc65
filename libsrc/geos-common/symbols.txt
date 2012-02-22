@@ -220,7 +220,7 @@ totNumBlks	n/a	n/a	$f60b	Word		Total number of blocks in current volume.
 turboFlags	$8492	$8492	n/a	4 Bytes		The turbo state flags for drives 8 through 11 on Commodore.
 usedRecords	$8497	$8497	$f619	Byte		Holds the nunber of records in an open VLIR file.
 vdcClrMode	n/a	$88be	n/a	Byte		Holds the current color mode for C128 color routines.
-version		$c00f	$c00f	$e00c	Byte		Holds byte indicating uhat version of GEOS is running.
+version		$c00f	$c00f	$e00c	Byte		Holds byte indicating what version of GEOS is running.
 windowTop	$33	$33	$021e	Byte		Top line of window for text clipping.
 year		$8516	$8516	$f200	Byte		Holds the year for the time of day clock.
 

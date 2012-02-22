@@ -65,18 +65,27 @@ void foobar (void)
 
 void main(int /*argc*/, char *argv[])
 {
-    OpenRecordFile(argv[0]);
+    if (OpenRecordFile(argv[0])) {
+        _poserror("OpenRecordFile");
+        return;
+    }
 
     DlgBoxOk(CBOLDON "Overlay Demo - Main" CPLAINTEXT,
              "Click OK to call Overlay One.");
 
-    PointRecord(1);
+    if (PointRecord(1)) {
+        _poserror("PointRecord.1");
+        return;
+    }
 
     /* The macro definitions OVERLAY_ADDR and OVERLAY_SIZE were generated in
      * overlay-demores.h by grc65. They contain the overlay area address and
      * size specific to a certain program.
      */
-    ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE);
+    if (ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE)) {
+        _poserror("ReadRecord.1");
+        return;
+    }
 
     /* The linker makes sure that the call to foo() ends up at the right mem
      * addr. However it's up to user to make sure that the - right - overlay
@@ -87,23 +96,38 @@ void main(int /*argc*/, char *argv[])
     DlgBoxOk(CBOLDON "Overlay Demo - Main" CPLAINTEXT,
              "Click OK to call Overlay Two.");
 
-    PointRecord(2);
+    if (PointRecord(2)) {
+        _poserror("PointRecord.2");
+        return;
+    }
 
     /* Replacing one overlay with another one can only happen from the main
      * program. This implies that an overlay can never load another overlay.
      */
-    ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE);
+    if (ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE)) {
+        _poserror("ReadRecord.2");
+        return;
+    }
 
     bar();
 
     DlgBoxOk(CBOLDON "Overlay Demo - Main" CPLAINTEXT,
              "Click OK to call Overlay Three.");
 
-    PointRecord(3);
+    if (PointRecord(3)) {
+        _poserror("PointRecord.3");
+        return;
+    }
 
-    ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE);
+    if (ReadRecord(OVERLAY_ADDR, OVERLAY_SIZE)) {
+        _poserror("ReadRecord.3");
+        return;
+    }
 
     foobar();
 
-    CloseRecordFile();
+    if (CloseRecordFile()) {
+        _poserror("CloseRecordFile");
+        return;
+    }
 }

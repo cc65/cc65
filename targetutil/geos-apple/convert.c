@@ -187,37 +187,48 @@ int main(int argc, char* argv[])
 
     dir_addr = get_dir_entry(p_name);
 
+    /* Read index block */
     if (dio_read(dhandle, dir_entry->key_pointer, &index_block)) {
         err_exit("dio_read.4", 1);
     }
 
+    /* First pointer is header block */
     header_addr = index_block.content.addr_lo[0] |
                   index_block.content.addr_hi[0] << 8;
 
+    /* Read header block */
     if (dio_read(dhandle, header_addr, &header_block)) {
         err_exit("dio_read.5", 1);
     }
 
+    /* Do some sanity check */
     for (index = 0; index < sizeof(info_signature); ++index) {
         if (header_block.content.info_block[index] != info_signature[index]) {
             err_exit("file signature mismatch", 0);
         }   
     }
 
+    /* Check ProDOS storage type in directory entry template */
     if (header_block.content.dir_entry.storage_length.storage_type == 2)
     {
+
+        /* ProDOS sapling file means GEOS Sequential file*/
         printf("\nSequential file\n");
 
+        /* Remove header block pointer from pointer list */
         memmove(&index_block.content.addr_lo[0],
                 &index_block.content.addr_lo[1], sizeof(index_block.content.addr_lo) - 1);
         memmove(&index_block.content.addr_hi[0],
                 &index_block.content.addr_hi[1], sizeof(index_block.content.addr_hi) - 1);
 
+        /* Get file size from ProDOS directory entry template */
         size = (unsigned long)(header_block.content.dir_entry.size[0])       |
                (unsigned long)(header_block.content.dir_entry.size[1]) <<  8 |
                (unsigned long)(header_block.content.dir_entry.size[2]) << 16;
 
     } else {
+
+        /* ProDOS tree file means GEOS VLIR file */
         unsigned      vlir_addr;
         unsigned long vlir_size;
         unsigned char vlir_blocks;
@@ -225,32 +236,42 @@ int main(int argc, char* argv[])
 
         printf("\nVLIR file\n");
 
+        /* Skip header block pointer */
         index = 1;
         size  = 0;
 
         while (1) {
+
+            /* Get next VLIR index pointer from index block */
             vlir_addr = index_block.content.addr_lo[index] |
                         index_block.content.addr_hi[index] << 8;
             ++index;
 
+            /* Check for end of pointer list */
             if (vlir_addr == 0) {
                 break;
             }
 
+            /* Check for empty VLIRs */
             while (header_block.content.vlir_records[record] == 0xFF) {
+
+                /* Add empty VLIR index pointer to to master index block */
                 master_block.content.addr_lo[record] = 0xFF;
                 master_block.content.addr_hi[record] = 0xFF;
                 ++record;
             }
 
+            /* Add VLIR index pointer to master index block */
             master_block.content.addr_lo[record] = (unsigned char)(vlir_addr     );
             master_block.content.addr_hi[record] = (unsigned char)(vlir_addr >> 8);
             ++record;
 
+            /* Read VLIR index block */
             if (dio_read(dhandle, vlir_addr, &vlir_block)) {
                 err_exit("dio_read.6", 1);
             }
 
+            /* Get VLIR size from VLIR index block */
             vlir_size = (unsigned long)(vlir_block.content.size_lo[1])       |
                         (unsigned long)(vlir_block.content.size_hi[1]) <<  8 |
                         (unsigned long)(vlir_block.content.size_lo[0]) << 16 |
@@ -258,35 +279,44 @@ int main(int argc, char* argv[])
 
             printf("VLIR %u size %lu bytes\n", record - 1, vlir_size);
 
+            /* Compute VLIR block size */
             vlir_blocks = (unsigned char)((vlir_size + 511) / 512);
 
+            /* Copy VLIR block pointers from index block to VLIR index block */
             memcpy(&vlir_block.content.addr_lo[0],
                    &index_block.content.addr_lo[index], vlir_blocks);
             memcpy(&vlir_block.content.addr_hi[0],
                    &index_block.content.addr_hi[index], vlir_blocks);
+            index += vlir_blocks;
 
+            /* Write back VLIR index block */
             if (dio_write(dhandle, vlir_addr, &vlir_block)) {
                 err_exit("dio_write.1", 1);
             }
 
-            index += vlir_blocks;
-            size  += vlir_size;
+            /* Add VLIR size to file size */
+            size += vlir_size;
         }
 
+        /* Replace (by now completely read) index block with
+           (by now completely created) master index block */
         index_block = master_block;
     }
 
     printf("File size %lu bytes\n\n", size);
 
+    /* Set file size in index block */
     index_block.content.size_lo[1] = (unsigned char)(size      );
     index_block.content.size_hi[1] = (unsigned char)(size >>  8);
     index_block.content.size_lo[0] = (unsigned char)(size >> 16);
     index_block.content.size_hi[0] = (unsigned char)(size >> 24);
 
+    /* Write index block */
     if (dio_write(dhandle, dir_entry->key_pointer, &index_block)) {
         err_exit("dio_write.2", 1);
     }
 
+    /* Copy selected fields from directory entry template to directory block */
     dir_entry->storage_length  = header_block.content.dir_entry.storage_length;
     memcpy(dir_entry->file_name, header_block.content.dir_entry.file_name, 15);
     dir_entry->file_type       = header_block.content.dir_entry.file_type;
@@ -299,10 +329,12 @@ int main(int argc, char* argv[])
     dir_entry->aux_type        = header_addr;
     dir_entry->last_mod        = header_block.content.dir_entry.last_mod;
 
+    /* Write directory block */
     if (dio_write(dhandle, dir_addr, &dir_block)) {
         err_exit("dio_write.3", 1);
     }
 
+    /* We're done */
     if (dio_close(dhandle)) {
         err_exit("dio_close", 1);
     }

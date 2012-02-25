@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 bitmap.h                                  */
+/*                                   pcx.c                                   */
 /*                                                                           */
-/*         Bitmap definition for the sp65 sprite and bitmap utility          */
+/*                              Read PCX files                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,63 +33,47 @@
 
 
 
-#ifndef BITMAP_H
-#define BITMAP_H
-
-
-
-/* common */
-#include "strbuf.h"
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 /* sp65 */
-#include "palette.h"
-#include "pixel.h"
+#include "error.h"
+#include "fileio.h"
+#include "pcx.h"
 
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
+/*                                  Macros                                   */
 /*****************************************************************************/
 
 
 
-/* Safety limit for the size of the bitmap in pixels */
-#define BM_MAX_SIZE     4194304UL
+/* Size of the PCX header and other constants */
+#define PCX_HEADER_SIZE         128
+#define PCX_MAGIC_ID            0x0A
 
-/* Bitmap type */
-typedef enum BitmapType BitmapType;
-enum BitmapType {
-    bmUnknown,
-    bmMonochrome,
-    bmIndexed,
-    bmRGB,
-    bmRGBA
-};
+/* Type of a PCX header */
+typedef unsigned char           PCXHeader[PCX_HEADER_SIZE];
 
-/* Bitmap structure */
-typedef struct Bitmap Bitmap;
-struct Bitmap {
-
-    /* Type of the bitmap */
-    BitmapType  Type;
-
-    /* Name of the bitmap. This is used for error messages and should be
-     * something that allows the user to identify which bitmap the message
-     * refers to. For bitmaps loaded from a file, using the file name is
-     * a good idea.
-     */
-    StrBuf      Name;
-
-    /* Size of the bitmap */
-    unsigned    Width;
-    unsigned    Height;
-
-    /* Palette for monochrome and indexed bitmap types, otherwise NULL */
-    Palette*    Pal;
-
-    /* Pixel data, dynamically allocated */
-    Pixel       Data[1];
-};
+/* The following macros are used to access the PCX header, which is a 128 byte
+ * block of raw data.
+ */
+#define WORD(H, O)              ((H)[O] | ((H)[O+1] << 8))
+#define PCX_ID(H)               ((H)[0])
+#define PCX_FILE_VERSION(H)     ((H)[1])
+#define PCX_COMPRESSION(H)      ((H)[2])
+#define PCX_BPP(H)              ((H)[3])
+#define PCX_XMIN(H)             WORD(H, 4)
+#define PCX_YMIN(H)             WORD(H, 6)
+#define PCX_XMAX(H)             WORD(H, 8)
+#define PCX_YMAX(H)             WORD(H, 10)
+#define PCX_PLANES(H)           ((H)[65])
+#define PCX_BYTES_PER_LINE(H)   WORD(H, 66)
+#define PCX_PAL_INFO(H)         WORD(H, 68)
+#define PCX_WIDTH(H)            WORD(H, 70)
+#define PCX_HEIGHT(H)           WORD(H, 72)
 
 
 
@@ -99,30 +83,58 @@ struct Bitmap {
 
 
 
-Bitmap* NewBitmap (unsigned Width, unsigned Height);
-/* Create a new bitmap. The type is set to unknown and the palette to NULL */
+Bitmap* ReadPCXFile (const char* Name)
+/* Read a bitmap from a PCX file */
+{
+    PCXHeader H;
+    unsigned Version, Compression;
+    unsigned BPP, Planes, BytesPerLine;
+    unsigned Width, Height;
+    Bitmap* B;
 
-void FreeBitmap (Bitmap* B);
-/* Free a dynamically allocated bitmap */
+    /* Open the file */
+    FILE* F = fopen (Name, "rb");
+    if (F == 0) {
+        Error ("Cannot open PCX file `%s': %s", Name, strerror (errno));
+    }
 
-int ValidBitmapSize (unsigned Width, unsigned Height);
-/* Return true if this is a valid size for a bitmap */
+    /* Read the PCX header */
+    ReadData (F, H, sizeof (H));
 
-Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y);
-/* Get the color for a given pixel. For indexed bitmaps, the palette entry
- * is returned.
- */
+    /* Check the magic id byte */
+    if (PCX_ID (H) != PCX_MAGIC_ID) {
+        Error ("`%s' is not a PCX file", Name);
+    }
 
-Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y);
-/* Return a pixel from the bitmap. The returned value may either be a color
- * or a palette index, depending on the type of the bitmap.
- */
+    /* Read more data */
+    Version      = PCX_FILE_VERSION (H);
+    Compression  = PCX_COMPRESSION (H);
+    BPP          = PCX_BPP (H);
+    Planes       = PCX_PLANES (H);
+    BytesPerLine = PCX_BYTES_PER_LINE (H);
+    Width        = PCX_XMAX (H) - PCX_XMIN (H) + 1;
+    Height       = PCX_YMAX (H) - PCX_YMIN (H) + 1;
 
+    /* Check the data */
+    if (Compression != 0 && Compression != 1) {
+        Error ("Unsupported compression (%d) in PCX file `%s'",
+               Compression, Name);
+    }
+    if (BPP != 1 && BPP != 4 && BPP != 8) {
+        Error ("Unsupported bit depth (%d) in PCX file `%s'",
+               BPP, Name);
+    }
+    if (!ValidBitmapSize (Width, Height)) {
+        Error ("PCX file `%s' has an unsupported size (w=%u, h=%d)",
+               Name, Width, Height);
+    }
 
+    /* Close the file */
+    fclose (F);
 
-/* End of bitmap.h */
-
-#endif
+    /* Return the bitmap */
+    return B;
+}
 
 
 

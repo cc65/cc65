@@ -85,6 +85,18 @@ void FreeBitmap (Bitmap* B)
 
 
 
+int ValidBitmapSize (unsigned Width, unsigned Height)
+/* Return true if this is a valid size for a bitmap */
+{
+    /* Calculate the size of the bitmap in pixels */
+    unsigned long Size = (unsigned long) Width * Height;
+
+    /* Check the size */
+    return (Size > 0 && Size <= BM_MAX_SIZE);
+}
+
+
+
 Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y)
 /* Get the color for a given pixel. For indexed bitmaps, the palette entry
  * is returned.

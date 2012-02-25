@@ -26,7 +26,8 @@ OBJS = 	bitmap.o        \
         error.o		\
         fileio.o        \
 	main.o          \
-        palette.o
+        palette.o       \
+        pcx.o
 
 LIBS = $(COMMON)/common.a
 

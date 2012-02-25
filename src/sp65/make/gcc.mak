@@ -24,6 +24,7 @@ LDFLAGS =
 
 OBJS = 	bitmap.o        \
         error.o		\
+        fileio.o        \
 	main.o          \
         palette.o
 

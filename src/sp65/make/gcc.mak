@@ -22,8 +22,10 @@ LDFLAGS =
 # -----------------------------------------------------------------------------
 # List of all object files
 
-OBJS = 	error.o		\
-	main.o
+OBJS = 	bitmap.o        \
+        error.o		\
+	main.o          \
+        palette.o
 
 LIBS = $(COMMON)/common.a
 

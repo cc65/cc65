@@ -242,6 +242,7 @@ Bitmap* ReadPCXFile (const char* Name)
     Bitmap* B;
     unsigned char* L;
     Pixel* Px;
+    unsigned MaxIdx = 0;
     unsigned X, Y;
 
 
@@ -313,6 +314,9 @@ Bitmap* ReadPCXFile (const char* Name)
 
                 /* Create pixels */
                 for (X = 0; X < P->Width; ++X, ++Px) {
+                    if (L[X] > MaxIdx) {
+                        MaxIdx = L[X];
+                    }
                     Px->Index = L[X];
                 }
             }
@@ -388,21 +392,25 @@ Bitmap* ReadPCXFile (const char* Name)
                 Error ("Invalid palette marker in PCX file `%s'", Name);
             }
 
-            /* Read the palette */
-            ReadData (F, Palette, sizeof (Palette));
-            Count = 256;
-
         } else if (EndPos == CurPos) {
 
             /* The palette is in the header */
             FileSetPos (F, 16);
-            ReadData (F, Palette, 48);
-            Count = 16;
+
+            /* Check the maximum index for safety */
+            if (MaxIdx > 15) {
+                Error ("PCX file `%s' contains more than 16 indexed colors "
+                       "but no extra palette", Name);
+            }
 
         } else {
             Error ("Error in PCX file `%s': %lu bytes at end of pixel data",
                    Name, EndPos - CurPos);
         }
+
+        /* Read the palette. We will just read what we need. */
+        Count = MaxIdx + 1;
+        ReadData (F, Palette, Count * sizeof (Palette[0]));
 
         /* Create the palette from the data */
         B->Pal = NewPalette (Count);
@@ -412,6 +420,7 @@ Bitmap* ReadPCXFile (const char* Name)
             B->Pal->Entries[I].B = Palette[I][2];
             B->Pal->Entries[I].A = 0;
         }
+
     }
 
     /* Close the file */

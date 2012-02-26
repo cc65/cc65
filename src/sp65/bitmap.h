@@ -113,6 +113,14 @@ void FreeBitmap (Bitmap* B);
 int ValidBitmapSize (unsigned Width, unsigned Height);
 /* Return true if this is a valid size for a bitmap */
 
+Bitmap* SliceBitmap (const Bitmap* Original,
+                     unsigned X, unsigned Y,
+                     unsigned Width, unsigned Height);
+/* Create a slice of the given bitmap. The slice starts at position X/Y of
+ * the original and has the given width and height. Location 0/0 is at the
+ * upper left corner.
+ */
+
 Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y);
 /* Get the color for a given pixel. For indexed bitmaps, the palette entry
  * is returned.

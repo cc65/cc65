@@ -100,6 +100,46 @@ int ValidBitmapSize (unsigned Width, unsigned Height)
 
 
 
+Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
+                     unsigned Width, unsigned Height)
+/* Create a slice of the given bitmap. The slice starts at position X/Y of
+ * the original and has the given width and height. Location 0/0 is at the
+ * upper left corner.
+ */
+{
+    Bitmap*  B;
+    unsigned Y;
+
+
+    /* Check the coordinates and size */
+    PRECONDITION (OrigX != 0 && OrigY != 0 &&
+                  OrigX + Width <= O->Width &&
+                  OrigY + Height <= O->Height);
+
+    /* Create a new bitmap with the given size */
+    B = NewBitmap (Width, Height);
+
+    /* Copy fields from the original */
+    B->Type = O->Type;
+    if (SB_GetLen (&O->Name) > 0) {
+        SB_CopyStr (&B->Name, "Slice of ");
+        SB_Append (&B->Name, &O->Name);
+    }
+    B->Pal = DupPalette (O->Pal);
+
+    /* Copy the pixel data */
+    for (Y = 0; Y < Height; ++Y) {
+        memcpy (B->Data + Y * B->Width,
+                O->Data + (OrigY + Y) * O->Width + OrigX,
+                Width * sizeof (O->Data[0]));
+    }
+
+    /* Return the slice */
+    return B;
+}
+
+
+
 Color GetPixelColor (const Bitmap* B, unsigned X, unsigned Y)
 /* Get the color for a given pixel. For indexed bitmaps, the palette entry
  * is returned.

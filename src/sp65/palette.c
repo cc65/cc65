@@ -33,6 +33,8 @@
 
 
 
+#include <string.h>
+
 /* common */
 #include "check.h"
 #include "xmalloc.h"
@@ -68,7 +70,7 @@ Palette* NewPalette (unsigned Entries)
 
 Palette* NewMonochromePalette (void)
 /* Create and return a palette with two entries (black and white) */
-{                               
+{
     /* Create a new palette */
     Palette* P = NewPalette (2);
 
@@ -78,6 +80,21 @@ Palette* NewMonochromePalette (void)
 
     /* Return the new palette */
     return P;
+}
+
+
+
+Palette* DupPalette (const Palette* P)
+/* Create a copy of a palette */
+{                                      
+    /* Create a new palette */
+    Palette* N = NewPalette (P->Count);
+
+    /* Copy the palette data */
+    memcpy (N->Entries, P->Entries, P->Count * sizeof (P->Entries[0]));
+
+    /* Return the copy */
+    return N;
 }
 
 

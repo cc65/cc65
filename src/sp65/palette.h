@@ -69,6 +69,9 @@ Palette* NewPalette (unsigned Entries);
 Palette* NewMonochromePalette (void);
 /* Create and return a palette with two entries (black and white) */
 
+Palette* DupPalette (const Palette* P);
+/* Create a copy of a palette */
+
 void FreePalette (Palette* P);
 /* Free a dynamically allocated palette */
 

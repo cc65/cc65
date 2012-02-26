@@ -56,6 +56,7 @@
 
 /* Some PCX constants */
 #define PCX_MAGIC_ID            0x0A
+#define PCX_MAX_PLANES          4
 
 /* A raw PCX header is just a block of bytes */
 typedef unsigned char           RawPCXHeader[128];
@@ -63,25 +64,25 @@ typedef unsigned char           RawPCXHeader[128];
 /* Structured PCX header */
 typedef struct PCXHeader PCXHeader;
 struct PCXHeader {
-    unsigned    Id;
-    unsigned    FileVersion;
-    unsigned    Compressed;
-    unsigned    BPP;
-    unsigned    XMin;
-    unsigned    YMin;
-    unsigned    XMax;
-    unsigned    YMax;
-    unsigned    XDPI;
-    unsigned    YDPI;
-    unsigned    Planes;
-    unsigned    BytesPerPlane;
-    unsigned    PalInfo;
-    unsigned    ScreenWidth;
-    unsigned    ScreenHeight;
+    unsigned        Id;
+    unsigned        FileVersion;
+    unsigned        Compressed;
+    unsigned        BPP;
+    unsigned        XMin;
+    unsigned        YMin;
+    unsigned        XMax;
+    unsigned        YMax;
+    unsigned        XDPI;
+    unsigned        YDPI;
+    unsigned        Planes;
+    unsigned        BytesPerPlane;
+    unsigned        PalInfo;
+    unsigned        ScreenWidth;
+    unsigned        ScreenHeight;
 
     /* Calculated data */
-    unsigned    Width;
-    unsigned    Height;
+    unsigned        Width;
+    unsigned        Height;
 };
 
 /* Read a little endian word from a byte array at offset O */
@@ -142,9 +143,16 @@ static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
         Error ("Unsupported compression (%d) in PCX file `%s'",
                P->Compressed, Name);
     }
-    if (P->BPP != 1 && P->BPP != 4 && P->BPP != 8) {
-        Error ("Unsupported bit depth (%u) in PCX file `%s'",
-               P->BPP, Name);
+    /* We support:
+     *   - one plane with either 1 or 8 bits per pixel
+     *   - three planes with 8 bits per pixel
+     *   - four planes with 8 bits per pixel (does this exist?)
+     */
+    if (!((P->BPP == 1 && P->Planes == 1) ||
+          (P->BPP == 8 && (P->Planes == 1 || P->Planes == 3 || P->Planes == 4)))) {
+        /* We could support others, but currently we don't */
+        Error ("Unsupported PCX format: %u planes, %u bpp in PCX file `%s'",
+               P->Planes, P->BPP, Name);
     }
     if (P->PalInfo != 1 && P->PalInfo != 2) {
         Error ("Unsupported palette info (%u) in PCX file `%s'",
@@ -164,8 +172,8 @@ static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
 static void DumpPCXHeader (const PCXHeader* P, const char* Name)
 /* Dump the header of the PCX file in readable form to stdout */
 {
-    printf ("File name:      %s\n", Name);
-    printf ("PCX Version:    ");
+    printf ("File name:       %s\n", Name);
+    printf ("PCX Version:     ");
     switch (P->FileVersion) {
         case 0: puts ("2.5");                             break;
         case 2: puts ("2.8 with palette");                break;
@@ -173,12 +181,56 @@ static void DumpPCXHeader (const PCXHeader* P, const char* Name)
         case 4: puts ("PCX for Windows without palette"); break;
         case 5: puts ("3.0");                             break;
     }
-    printf ("Image type:     %s\n", P->PalInfo? "color" : "grayscale");
-    printf ("Compression:    %s\n", P->Compressed? "RLE" : "None");
-    printf ("Structure:      %u planes of %u bits\n", P->Planes, P->BPP);
-    printf ("Bounding box:   [%u/%u - %u/%u]\n", P->XMin, P->YMin, P->XMax, P->YMax);
-    printf ("Resolution:     %u/%u DPI\n", P->XDPI, P->YDPI);
-    printf ("Screen size:    %u/%u\n", P->ScreenWidth, P->ScreenHeight);
+    printf ("Image type:      %s\n", P->PalInfo? "color" : "grayscale");
+    printf ("Compression:     %s\n", P->Compressed? "RLE" : "None");
+    printf ("Structure:       %u planes of %u bits\n", P->Planes, P->BPP);
+    printf ("Bounding box:    [%u/%u - %u/%u]\n", P->XMin, P->YMin, P->XMax, P->YMax);
+    printf ("Resolution:      %u/%u DPI\n", P->XDPI, P->YDPI);
+    printf ("Screen size:     %u/%u\n", P->ScreenWidth, P->ScreenHeight);
+    printf ("Bytes per plane: %u\n", P->BytesPerPlane);
+}
+
+
+
+static void ReadPlane (FILE* F, PCXHeader* P, unsigned char* L)
+/* Read one (possibly compressed) plane from the file */
+{
+    if (P->Compressed) {
+
+        /* Uncompress RLE data */
+        unsigned Remaining = P->Width;
+        while (Remaining) {
+
+            unsigned char C;
+
+            /* Read the next byte */
+            unsigned char B = Read8 (F);
+
+            /* Check for a run length */
+            if ((B & 0xC0) == 0xC0) {
+                C = (B & 0x3F);         /* Count */
+                B = Read8 (F);          /* Value */
+            } else {
+                C = 1;
+            }
+
+            /* Write the data to the buffer */
+            if (C > Remaining) {
+                C = Remaining;
+            }
+            memset (L, B, C);
+
+            /* Bump counters */
+            L += C;
+            Remaining -= C;
+
+        }
+    } else {
+
+        /* Just read one line */
+        ReadData (F, L, P->Width);
+
+    }
 }
 
 
@@ -188,6 +240,11 @@ Bitmap* ReadPCXFile (const char* Name)
 {
     PCXHeader* P;
     Bitmap* B;
+    unsigned char* L;
+    Pixel* Px;
+    unsigned X, Y;
+
+
 
     /* Open the file */
     FILE* F = fopen (Name, "rb");
@@ -201,6 +258,160 @@ Bitmap* ReadPCXFile (const char* Name)
     /* Dump the header if requested */
     if (Verbosity > 0) {
         DumpPCXHeader (P, Name);
+    }
+
+    /* Create the bitmap */
+    B = NewBitmap (P->Width, P->Height);
+
+    /* Determine the type of the bitmap */
+    switch (P->Planes) {
+        case 1: B->Type = (P->PalInfo? bmIndexed : bmMonochrome);       break;
+        case 3: B->Type = bmRGB;                                        break;
+        case 4: B->Type = bmRGBA;                                       break;
+        default:Internal ("Unexpected number of planes");
+    }
+
+    /* Remember the PCX header in the tag */
+    B->Tag = P;
+
+    /* Allocate memory for the scan line */
+    L = xmalloc (P->Width);
+
+    /* Read the pixel data */
+    Px = B->Data;
+    if (P->Planes == 1) {
+
+        /* This is either monochrome or indexed */
+        if (P->BPP == 1) {
+            /* Monochrome */
+            for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
+
+                unsigned I;
+                unsigned char Mask;
+
+                /* Read the plane */
+                ReadPlane (F, P, L);
+
+                /* Create pixels */
+                for (X = 0, I = 0, Mask = 0x01; X < P->Width; ++Px) {
+                    Px->Index = (L[I] & Mask) != 0;
+                    if (Mask == 0x80) {
+                        Mask = 0x01;
+                        ++I;
+                    } else {
+                        Mask <<= 1;
+                    }
+                }
+
+            }
+        } else {
+            /* One plane with 8bpp is indexed */
+            for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
+
+                /* Read the plane */
+                ReadPlane (F, P, L);
+
+                /* Create pixels */
+                for (X = 0; X < P->Width; ++X, ++Px) {
+                    Px->Index = L[X];
+                }
+            }
+        }
+    } else {
+        /* 3 or 4 planes are RGB or RGBA (don't know if this exists) */
+        for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
+
+            /* Read the R plane and move the data */
+            ReadPlane (F, P, L);
+            for (X = 0; X < P->Width; ++X, ++Px) {
+                Px->C.R = L[X];
+            }
+
+            /* Read the G plane and move the data */
+            ReadPlane (F, P, L);
+            for (X = 0; X < P->Width; ++X, ++Px) {
+                Px->C.G = L[X];
+            }
+
+            /* Read the B plane and move the data */
+            ReadPlane (F, P, L);
+            for (X = 0; X < P->Width; ++X, ++Px) {
+                Px->C.B = L[X];
+            }
+
+            /* Either read the A plane or clear it */
+            if (P->Planes == 4) {
+                ReadPlane (F, P, L);
+                for (X = 0; X < P->Width; ++X, ++Px) {
+                    Px->C.A = L[X];
+                }
+            } else {
+                for (X = 0; X < P->Width; ++X, ++Px) {
+                    Px->C.A = 0;
+                }
+            }
+        }
+    }
+
+    /* One plane means we have a palette which is either part of the header
+     * or follows.
+     */
+    if (B->Type == bmMonochrome) {
+
+        /* Create the monochrome palette */
+        B->Pal = NewMonochromePalette ();
+
+    } else if (B->Type == bmIndexed) {
+
+        unsigned      Count;
+        unsigned      I;
+        unsigned char Palette[256][3];
+        unsigned long EndPos;
+
+        /* Determine the current file position */
+        unsigned long CurPos = FileGetPos (F);
+
+        /* Seek to the end of the file */
+        (void) fseek (F, 0, SEEK_END);
+
+        /* Get this position */
+        EndPos = FileGetPos (F);
+
+        /* There's a palette if the old location is 769 bytes from the end */
+        if (EndPos - CurPos == sizeof (Palette) + 1) {
+
+            /* Seek back */
+            FileSetPos (F, CurPos);
+
+            /* Check for palette marker */
+            if (Read8 (F) != 0x0C) {
+                Error ("Invalid palette marker in PCX file `%s'", Name);
+            }
+
+            /* Read the palette */
+            ReadData (F, Palette, sizeof (Palette));
+            Count = 256;
+
+        } else if (EndPos == CurPos) {
+
+            /* The palette is in the header */
+            FileSetPos (F, 16);
+            ReadData (F, Palette, 48);
+            Count = 16;
+
+        } else {
+            Error ("Error in PCX file `%s': %lu bytes at end of pixel data",
+                   Name, EndPos - CurPos);
+        }
+
+        /* Create the palette from the data */
+        B->Pal = NewPalette (Count);
+        for (I = 0; I < Count; ++I) {
+            B->Pal->Entries[I].R = Palette[I][0];
+            B->Pal->Entries[I].G = Palette[I][1];
+            B->Pal->Entries[I].B = Palette[I][2];
+            B->Pal->Entries[I].A = 0;
+        }
     }
 
     /* Close the file */

@@ -23,6 +23,7 @@ LDFLAGS =
 # List of all object files
 
 OBJS = 	bitmap.o        \
+        color.o         \
         error.o		\
         fileio.o        \
 	main.o          \

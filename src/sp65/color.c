@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 palette.h                                 */
+/*                                  color.c                                  */
 /*                                                                           */
-/*      Color palette definition for the sp65 sprite and bitmap utility      */
+/*          Color definition for the sp65 sprite and bitmap utility          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,27 +33,7 @@
 
 
 
-#ifndef PALETTE_H
-#define PALETTE_H
-
-
-
-/* sp65 */
 #include "color.h"
-
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-typedef struct Palette Palette;
-struct Palette {
-    unsigned            Count;          /* Number of entries */
-    Color               Entries[1];     /* Palette entries - dynamic */
-};
 
 
 
@@ -63,18 +43,25 @@ struct Palette {
 
 
 
-Palette* NewPalette (unsigned Entries);
-/* Create a new palette with the given number of entries */
+#if !defined(HAVE_INLINE)
 
-Palette* NewMonochromePalette (void);
-/* Create and return a palette with two entries (black and white) */
+Color RGB (unsigned char R, unsigned char G, unsigned char B)
+/* Generate a color value */
+{
+    Color C;
+    C.R = R; C.G = G; C.B = B; C.A = 0;
+    return C;
+}
 
-void FreePalette (Palette* P);
-/* Free a dynamically allocated palette */
 
 
-
-/* End of palette.h */
+Color RGBA (unsigned char R, unsigned char G, unsigned char B, unsigned char A)
+/* Generate a color value */
+{
+    Color C;
+    C.R = R; C.G = G; C.B = B; C.A = A;
+    return C;
+}
 
 #endif
 

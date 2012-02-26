@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -70,28 +70,27 @@ static unsigned FilesProcessed = 0;
 static void Usage (void)
 /* Print usage information and exit */
 {
-    fprintf (stderr,
-    	     "Usage: %s [options] file [options] [file]\n"
-    	     "Short options:\n"
-       	     "  -h\t\t\tHelp (this text)\n"
-       	     "  -H\t\t\tDump the object file header\n"
-       	     "  -S\t\t\tDump segments sizes\n"
-       	     "  -V\t\t\tPrint the version number and exit\n"
-	     "\n"
-	     "Long options:\n"
-	     "  --dump-all\t\tDump all object file information\n"
-	     "  --dump-dbgsyms\tDump debug symbols\n"
-       	     "  --dump-exports\tDump exported symbols\n"
-	     "  --dump-files\t\tDump the source files\n"
-	     "  --dump-header\t\tDump the object file header\n"
-	     "  --dump-imports\tDump imported symbols\n"
-	     "  --dump-lineinfo\tDump line information\n"
-	     "  --dump-options\tDump object file options\n"
-	     "  --dump-segments\tDump the segments in the file\n"
-       	     "  --dump-segsize\tDump segments sizes\n"
-	     "  --help\t\tHelp (this text)\n"
-       	     "  --version\t\tPrint the version number and exit\n",
-    	     ProgName);
+    printf ("Usage: %s [options] file [options] [file]\n"
+    	    "Short options:\n"
+       	    "  -h\t\t\tHelp (this text)\n"
+       	    "  -H\t\t\tDump the object file header\n"
+       	    "  -S\t\t\tDump segments sizes\n"
+       	    "  -V\t\t\tPrint the version number and exit\n"
+	    "\n"
+	    "Long options:\n"
+	    "  --dump-all\t\tDump all object file information\n"
+	    "  --dump-dbgsyms\tDump debug symbols\n"
+       	    "  --dump-exports\tDump exported symbols\n"
+	    "  --dump-files\t\tDump the source files\n"
+	    "  --dump-header\t\tDump the object file header\n"
+	    "  --dump-imports\tDump imported symbols\n"
+	    "  --dump-lineinfo\tDump line information\n"
+	    "  --dump-options\tDump object file options\n"
+	    "  --dump-segments\tDump the segments in the file\n"
+       	    "  --dump-segsize\tDump segments sizes\n"
+	    "  --help\t\tHelp (this text)\n"
+       	    "  --version\t\tPrint the version number and exit\n",
+    	    ProgName);
 }
 
 

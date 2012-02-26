@@ -65,7 +65,8 @@ Bitmap* NewBitmap (unsigned Width, unsigned Height)
 
     /* Initialize the data */
     B->Type     = bmUnknown;
-    SB_Init (&B->Name);
+    B->Name     = EmptyStrBuf;
+    B->Tag      = 0;
     B->Width    = Width;
     B->Height   = Height;
     B->Pal      = 0;
@@ -79,8 +80,10 @@ Bitmap* NewBitmap (unsigned Width, unsigned Height)
 void FreeBitmap (Bitmap* B)
 /* Free a dynamically allocated bitmap */
 {
-    /* Free the palette */
+    /* Free the format specific data, the palette and then the bitmap */
+    xfree (B->Tag);
     xfree (B->Pal);
+    xfree(B);
 }
 
 

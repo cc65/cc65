@@ -80,6 +80,11 @@ struct Bitmap {
      */
     StrBuf      Name;
 
+    /* Pointer to some format specific data. May be used by the frontend.
+     * The data is free'd as a block when calling FreeBitmap.
+     */
+    void*       Tag;
+
     /* Size of the bitmap */
     unsigned    Width;
     unsigned    Height;

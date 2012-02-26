@@ -37,6 +37,10 @@
 #include <stdio.h>
 #include <string.h>
 
+/* common */
+#include "print.h"
+#include "xmalloc.h"
+
 /* sp65 */
 #include "error.h"
 #include "fileio.h"
@@ -50,30 +54,38 @@
 
 
 
-/* Size of the PCX header and other constants */
-#define PCX_HEADER_SIZE         128
+/* Some PCX constants */
 #define PCX_MAGIC_ID            0x0A
 
-/* Type of a PCX header */
-typedef unsigned char           PCXHeader[PCX_HEADER_SIZE];
+/* A raw PCX header is just a block of bytes */
+typedef unsigned char           RawPCXHeader[128];
 
-/* The following macros are used to access the PCX header, which is a 128 byte
- * block of raw data.
- */
+/* Structured PCX header */
+typedef struct PCXHeader PCXHeader;
+struct PCXHeader {
+    unsigned    Id;
+    unsigned    FileVersion;
+    unsigned    Compressed;
+    unsigned    BPP;
+    unsigned    XMin;
+    unsigned    YMin;
+    unsigned    XMax;
+    unsigned    YMax;
+    unsigned    XDPI;
+    unsigned    YDPI;
+    unsigned    Planes;
+    unsigned    BytesPerPlane;
+    unsigned    PalInfo;
+    unsigned    ScreenWidth;
+    unsigned    ScreenHeight;
+
+    /* Calculated data */
+    unsigned    Width;
+    unsigned    Height;
+};
+
+/* Read a little endian word from a byte array at offset O */
 #define WORD(H, O)              ((H)[O] | ((H)[O+1] << 8))
-#define PCX_ID(H)               ((H)[0])
-#define PCX_FILE_VERSION(H)     ((H)[1])
-#define PCX_COMPRESSION(H)      ((H)[2])
-#define PCX_BPP(H)              ((H)[3])
-#define PCX_XMIN(H)             WORD(H, 4)
-#define PCX_YMIN(H)             WORD(H, 6)
-#define PCX_XMAX(H)             WORD(H, 8)
-#define PCX_YMAX(H)             WORD(H, 10)
-#define PCX_PLANES(H)           ((H)[65])
-#define PCX_BYTES_PER_LINE(H)   WORD(H, 66)
-#define PCX_PAL_INFO(H)         WORD(H, 68)
-#define PCX_WIDTH(H)            WORD(H, 70)
-#define PCX_HEIGHT(H)           WORD(H, 72)
 
 
 
@@ -83,13 +95,98 @@ typedef unsigned char           PCXHeader[PCX_HEADER_SIZE];
 
 
 
+static PCXHeader* NewPCXHeader (void)
+/* Allocate a new PCX header and return it */
+{
+    /* No initialization here */
+    return xmalloc (sizeof (PCXHeader));
+}
+
+
+
+static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
+/* Read a structured PCX header from the given file and return it */
+{
+    RawPCXHeader H;
+
+    /* Allocate a new PCXHeader structure */
+    PCXHeader* P = NewPCXHeader ();
+
+    /* Read the raw header */
+    ReadData (F, H, sizeof (H));
+
+    /* Convert the data into structured form */
+    P->Id               = H[0];
+    P->FileVersion      = H[1];
+    P->Compressed       = H[2];
+    P->BPP              = H[3];
+    P->XMin             = WORD (H, 4);
+    P->YMin             = WORD (H, 6);
+    P->XMax             = WORD (H, 8);
+    P->YMax             = WORD (H, 10);
+    P->XDPI             = WORD (H, 12);
+    P->YDPI             = WORD (H, 14);
+    P->Planes           = H[65];
+    P->BytesPerPlane    = WORD (H, 66);
+    P->PalInfo          = WORD (H, 68);
+    P->ScreenWidth      = WORD (H, 70);
+    P->ScreenHeight     = WORD (H, 72);
+    P->Width            = P->XMax - P->XMin + 1;
+    P->Height           = P->YMax - P->YMin + 1;
+
+    /* Check the header data */
+    if (P->Id != PCX_MAGIC_ID || P->FileVersion == 1 || P->FileVersion > 5) {
+        Error ("`%s' is not a PCX file", Name);
+    }
+    if (P->Compressed > 1) {
+        Error ("Unsupported compression (%d) in PCX file `%s'",
+               P->Compressed, Name);
+    }
+    if (P->BPP != 1 && P->BPP != 4 && P->BPP != 8) {
+        Error ("Unsupported bit depth (%u) in PCX file `%s'",
+               P->BPP, Name);
+    }
+    if (P->PalInfo != 1 && P->PalInfo != 2) {
+        Error ("Unsupported palette info (%u) in PCX file `%s'",
+               P->PalInfo, Name);
+    }
+    if (!ValidBitmapSize (P->Width, P->Height)) {
+        Error ("PCX file `%s' has an unsupported size (w=%u, h=%d)",
+               Name, P->Width, P->Height);
+    }
+
+    /* Return the structured header */
+    return P;
+}
+
+
+
+static void DumpPCXHeader (const PCXHeader* P, const char* Name)
+/* Dump the header of the PCX file in readable form to stdout */
+{
+    printf ("File name:      %s\n", Name);
+    printf ("PCX Version:    ");
+    switch (P->FileVersion) {
+        case 0: puts ("2.5");                             break;
+        case 2: puts ("2.8 with palette");                break;
+        case 3: puts ("2.8 without palette");             break;
+        case 4: puts ("PCX for Windows without palette"); break;
+        case 5: puts ("3.0");                             break;
+    }
+    printf ("Image type:     %s\n", P->PalInfo? "color" : "grayscale");
+    printf ("Compression:    %s\n", P->Compressed? "RLE" : "None");
+    printf ("Structure:      %u planes of %u bits\n", P->Planes, P->BPP);
+    printf ("Bounding box:   [%u/%u - %u/%u]\n", P->XMin, P->YMin, P->XMax, P->YMax);
+    printf ("Resolution:     %u/%u DPI\n", P->XDPI, P->YDPI);
+    printf ("Screen size:    %u/%u\n", P->ScreenWidth, P->ScreenHeight);
+}
+
+
+
 Bitmap* ReadPCXFile (const char* Name)
 /* Read a bitmap from a PCX file */
 {
-    PCXHeader H;
-    unsigned Version, Compression;
-    unsigned BPP, Planes, BytesPerLine;
-    unsigned Width, Height;
+    PCXHeader* P;
     Bitmap* B;
 
     /* Open the file */
@@ -99,34 +196,11 @@ Bitmap* ReadPCXFile (const char* Name)
     }
 
     /* Read the PCX header */
-    ReadData (F, H, sizeof (H));
+    P = ReadPCXHeader (F, Name);
 
-    /* Check the magic id byte */
-    if (PCX_ID (H) != PCX_MAGIC_ID) {
-        Error ("`%s' is not a PCX file", Name);
-    }
-
-    /* Read more data */
-    Version      = PCX_FILE_VERSION (H);
-    Compression  = PCX_COMPRESSION (H);
-    BPP          = PCX_BPP (H);
-    Planes       = PCX_PLANES (H);
-    BytesPerLine = PCX_BYTES_PER_LINE (H);
-    Width        = PCX_XMAX (H) - PCX_XMIN (H) + 1;
-    Height       = PCX_YMAX (H) - PCX_YMIN (H) + 1;
-
-    /* Check the data */
-    if (Compression != 0 && Compression != 1) {
-        Error ("Unsupported compression (%d) in PCX file `%s'",
-               Compression, Name);
-    }
-    if (BPP != 1 && BPP != 4 && BPP != 8) {
-        Error ("Unsupported bit depth (%d) in PCX file `%s'",
-               BPP, Name);
-    }
-    if (!ValidBitmapSize (Width, Height)) {
-        Error ("PCX file `%s' has an unsupported size (w=%u, h=%d)",
-               Name, Width, Height);
+    /* Dump the header if requested */
+    if (Verbosity > 0) {
+        DumpPCXHeader (P, Name);
     }
 
     /* Close the file */

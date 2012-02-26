@@ -40,6 +40,7 @@
 
 /* common */
 #include "cmdline.h"
+#include "print.h"
 #include "version.h"
 
 /* sp65 */
@@ -57,16 +58,18 @@
 static void Usage (void)
 /* Print usage information and exit */
 {
-    fprintf (stderr,
-    	     "Usage: %s [options] file [options] [file]\n"
-    	     "Short options:\n"
-       	     "  -h\t\t\tHelp (this text)\n"
-       	     "  -V\t\t\tPrint the version number and exit\n"
-	     "\n"
-	     "Long options:\n"
-	     "  --help\t\tHelp (this text)\n"
-       	     "  --version\t\tPrint the version number and exit\n",
-    	     ProgName);
+    printf (
+    	    "Usage: %s [options] file [options] [file]\n"
+    	    "Short options:\n"
+       	    "  -V\t\t\tPrint the version number and exit\n"
+       	    "  -h\t\t\tHelp (this text)\n"
+            "  -v\t\t\tIncrease verbosity\n"
+	    "\n"
+	    "Long options:\n"
+	    "  --help\t\tHelp (this text)\n"
+            "  --verbose\t\tIncrease verbosity\n"
+       	    "  --version\t\tPrint the version number and exit\n",
+    	    ProgName);
 }
 
 
@@ -77,6 +80,15 @@ static void OptHelp (const char* Opt attribute ((unused)),
 {
     Usage ();
     exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptVerbose (const char* Opt attribute ((unused)),
+		       	const char* Arg attribute ((unused)))
+/* Increase versbosity */
+{
+    ++Verbosity;
 }
 
 
@@ -98,6 +110,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--help",    		0,	OptHelp			},
+       	{ "--verbose",          0,      OptVerbose              },
 	{ "--version", 	       	0,	OptVersion		},
     };
 
@@ -121,13 +134,17 @@ int main (int argc, char* argv [])
 	 	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 	 	    break;
 
+       	        case 'V':
+    		    OptVersion (Arg, 0);
+       		    break;
+
 	 	case 'h':
 	 	    OptHelp (Arg, 0);
 	 	    break;
 
-       	        case 'V':
-    		    OptVersion (Arg, 0);
-       		    break;
+	 	case 'v':
+	 	    OptVerbose (Arg, 0);
+	 	    break;
 
        	       	default:
        	       	    UnknownOption (Arg);

@@ -22,7 +22,8 @@ LDFLAGS =
 # -----------------------------------------------------------------------------
 # List of all object files
 
-OBJS = 	bin.o           \
+OBJS = 	asm.o           \
+        bin.o           \
         bitmap.o        \
         color.o         \
         error.o		\

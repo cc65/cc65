@@ -57,7 +57,6 @@
 #define BM_MAX_SIZE     4194304UL
 
 /* Bitmap type */
-typedef enum BitmapType BitmapType;
 enum BitmapType {
     bmUnknown,
     bmMonochrome,
@@ -65,6 +64,7 @@ enum BitmapType {
     bmRGB,
     bmRGBA
 };
+typedef enum BitmapType BitmapType;
 
 /* Bitmap structure */
 typedef struct Bitmap Bitmap;

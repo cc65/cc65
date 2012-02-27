@@ -49,13 +49,13 @@
 
 
 
-typedef enum InputFormat InputFormat;
 enum InputFormat {
     ifAuto      = -1,           /* Auto detect */
     ifPCX,                      /* PCX */
 
     ifCount                     /* Number of actual input formats w/o ifAuto*/
 };
+typedef enum InputFormat InputFormat;                
 
 
 

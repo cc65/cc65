@@ -60,8 +60,16 @@ endif
 # ------------------------------------------------------------------------------
 # All OBJ files
 
-OBJS =  error.obj	\
-	main.obj
+OBJS =  asm.obj         \
+        bin.obj         \
+        bitmap.obj      \
+        color.obj       \
+        error.obj	\
+        fileio.obj      \
+        input.obj       \
+	main.obj        \
+        palette.obj     \
+        pcx.obj
 
 LIBS = ../common/common.lib
 

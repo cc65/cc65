@@ -91,8 +91,13 @@ GRBANK3 		=	%00
 VIC_X_POS_OFF		=	24
 VIC_Y_POS_OFF		=	50
 SC_BYTE_WIDTH		=	40
+.ifdef __GEOS_CBM__
 SC_PIX_HEIGHT		=	200
 SC_PIX_WIDTH		=	320
+.else
+SC_PIX_HEIGHT		=	192
+SC_PIX_WIDTH		=	560
+.endif
 SC_SIZE 		=	8000
 ;128 screen size constants
 SCREENBYTEWIDTH 	=	80

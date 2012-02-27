@@ -105,6 +105,14 @@ static PCXHeader* NewPCXHeader (void)
 
 
 
+static void FreePCXHeader (PCXHeader* H)
+/* Free a PCX header structure */
+{
+    xfree (H);
+}
+
+
+
 static PCXHeader* ReadPCXHeader (FILE* F, const char* Name)
 /* Read a structured PCX header from the given file and return it */
 {
@@ -275,9 +283,6 @@ Bitmap* ReadPCXFile (const char* Name)
     /* Copy the name */
     SB_CopyStr (&B->Name, Name);
 
-    /* Remember the PCX header in the tag */
-    B->Tag = P;
-
     /* Allocate memory for the scan line */
     L = xmalloc (P->Width);
 
@@ -428,6 +433,9 @@ Bitmap* ReadPCXFile (const char* Name)
 
     /* Close the file */
     fclose (F);
+
+    /* Free the PCX header */
+    FreePCXHeader (P);
 
     /* Return the bitmap */
     return B;

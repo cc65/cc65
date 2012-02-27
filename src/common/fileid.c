@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                filetype.c                                 */
+/*                                 fileid.c                                  */
 /*                                                                           */
-/*                       Determine the type of a file                        */
+/*               Determine the id of a file type by extension                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -38,71 +38,41 @@
 
 /* common */
 #include "fileid.h"
-#include "filetype.h"
+#include "fname.h"
 
 
 
 /*****************************************************************************/
-/*	      	     	      	     Data		     		     */
+/*	       	     	       	     Code		     		     */
 /*****************************************************************************/
 
 
 
-static const FileId TypeTable[] = {
-    /* Upper case stuff for obsolete operating systems */
-    {   "A",	FILETYPE_LIB	},
-    {   "A65",	FILETYPE_ASM	},
-    {   "ASM",	FILETYPE_ASM	},
-    {   "C",	FILETYPE_C	},
-    {   "EMD",  FILETYPE_O65    },
-    {   "GRC",	FILETYPE_GR	},
-    {   "JOY",  FILETYPE_O65    },
-    {   "LIB",	FILETYPE_LIB	},
-    {   "MOU",  FILETYPE_O65    },
-    {   "O",	FILETYPE_OBJ	},
-    {   "O65",  FILETYPE_O65    },
-    {   "OBJ",	FILETYPE_OBJ	},
-    {   "S",	FILETYPE_ASM	},
-    {   "SER",  FILETYPE_O65    },
-    {   "TGI",  FILETYPE_O65    },
-
-    {   "a",	FILETYPE_LIB	},
-    {   "a65",	FILETYPE_ASM	},
-    {   "asm",	FILETYPE_ASM	},
-    {   "c",	FILETYPE_C	},
-    {   "emd",  FILETYPE_O65    },
-    {   "grc",	FILETYPE_GR	},
-    {   "joy",  FILETYPE_O65    },
-    {   "lib",	FILETYPE_LIB	},
-    {   "mou",  FILETYPE_O65    },
-    {   "o",	FILETYPE_OBJ	},
-    {   "o65",  FILETYPE_O65    },
-    {   "obj",	FILETYPE_OBJ	},
-    {   "s",	FILETYPE_ASM	},
-    {   "ser",  FILETYPE_O65    },
-    {   "tgi",  FILETYPE_O65    },
-};
-
-#define FILETYPE_COUNT (sizeof (TypeTable) / sizeof (TypeTable[0]))
+static int Compare (const void* Key, const void* Id)
+/* Compare function for bsearch */
+{
+    return strcmp (Key, ((const FileId*) Id)->Ext);
+}
 
 
 
-/*****************************************************************************/
-/*	       	     	     	     Code		     		     */
-/*****************************************************************************/
-
-
-
-FILETYPE GetFileType (const char* Name)
-/* Determine the type of the given file by looking at the name. If the file
- * type could not be determined, the function returns FILETYPE_UNKOWN.
+const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
+/* Determine the id of the given file by looking at file extension of the name.
+ * The table passed to the function must be sorted alphabetically. If the
+ * extension is found, a pointer to the matching table entry is returned. If
+ * no matching table entry was found, the function returns NULL.
  */
 {
-    /* Search for a table entry */
-    const FileId* F = GetFileId (Name, TypeTable, FILETYPE_COUNT);
+    /* Determine the file type by the extension */
+    const char* Ext = FindExt (Name);
 
-    /* Return the result */
-    return F? F->Id : FILETYPE_UNKNOWN;
+    /* Do we have an extension? */
+    if (Ext == 0) {
+    	return 0;
+    }
+
+    /* Search for a table entry and return it */
+    return bsearch (Ext+1, Table, Count, sizeof (FileId), Compare);
 }
 
 

@@ -67,6 +67,7 @@ OBJS =	abend.obj	\
         cpu.obj         \
         debugflag.obj   \
 	exprdefs.obj	\
+        fileid.obj      \
 	filepos.obj	\
         filetype.obj    \
 	fname.obj	\

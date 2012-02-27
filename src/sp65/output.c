@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   bin.h                                   */
+/*                                 output.c                                  */
 /*                                                                           */
-/*         Binary file output for the sp65 sprite and bitmap utility         */
+/*   Output format/file definitions for the sp65 sprite and bitmap utility   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,13 +33,52 @@
 
 
 
-#ifndef BIN_H
-#define BIN_H
-
-
-
 /* common */
-#include "strbuf.h"
+#include "fileid.h"
+
+/* sp65 */
+#include "asm.h"
+#include "bin.h"
+#include "error.h"
+#include "output.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+typedef struct OutputFormatDesc OutputFormatDesc;
+struct OutputFormatDesc {
+
+    /* Write routine */
+    void (*Write) (const char* Name, const StrBuf* Data);
+
+};
+
+/* Table with Output formats */
+static OutputFormatDesc OutputFormatTable[ofCount] = {
+    {   WriteAsmFile    },
+    {   WriteBinFile    },
+};
+
+/* Table that maps extensions to Output formats. Must be sorted alphabetically */
+static const FileId FormatTable[] = {
+    /* Upper case stuff for obsolete operating systems */
+    {   "A",    ofAsm           },
+    {   "ASM",  ofAsm           },
+    {   "BIN",  ofBin           },
+    {   "INC",  ofAsm           },
+    {   "S",    ofAsm           },
+
+    {   "a",    ofAsm           },
+    {   "asm",  ofAsm           },
+    {   "bin",  ofBin           },
+    {   "inc",  ofAsm           },
+    {   "s",    ofAsm           },
+};
 
 
 
@@ -49,14 +88,29 @@
 
 
 
-void WriteBinFile (const char* Name, const StrBuf* Data);
-/* Write the contents of Data to the given file in binary format */
+void WriteOutputFile (const char* Name, const StrBuf* Data, OutputFormat Format)
+/* Write the contents of Data to the given file in the format specified. If
+ * the format is ofAuto, it is determined by the file extension.
+ */
+{
+    /* If the format is Auto, try to determine it from the file name */
+    if (Format == ofAuto) {
+        /* Search for the entry in the table */
+        const FileId* F = GetFileId (Name, FormatTable,
+                                     sizeof (FormatTable) / sizeof (FormatTable[0]));
+        /* Found? */
+        if (F == 0) {
+            Error ("Cannot determine file format of output file `%s'", Name);
+        }
+        Format = F->Id;
+    }
 
+    /* Check the format just for safety */
+    CHECK (Format >= 0 && Format < ofCount);
 
-
-/* End of bin.h */
-
-#endif
+    /* Call the format specific write */
+    OutputFormatTable[Format].Write (Name, Data);
+}
 
 
 

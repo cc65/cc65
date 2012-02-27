@@ -68,6 +68,7 @@ OBJS =  asm.obj         \
         fileio.obj      \
         input.obj       \
 	main.obj        \
+        output.obj      \
         palette.obj     \
         pcx.obj
 

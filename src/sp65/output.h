@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   bin.h                                   */
+/*                                 output.h                                  */
 /*                                                                           */
-/*         Binary file output for the sp65 sprite and bitmap utility         */
+/*   Output format/file definitions for the sp65 sprite and bitmap utility   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef BIN_H
-#define BIN_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
 
 
@@ -44,17 +44,37 @@
 
 
 /*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+enum OutputFormat {
+    ofAuto      = -1,           /* Auto detect */
+    ofAsm,                      /* Output assembler source */
+    ofBin,                      /* Output raw binary format */
+
+    ofCount                     /* Number of output formats without ofAuto */
+};
+typedef enum OutputFormat OutputFormat;
+
+
+
+
+/*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
 
 
 
-void WriteBinFile (const char* Name, const StrBuf* Data);
-/* Write the contents of Data to the given file in binary format */
+void WriteOutputFile (const char* Name, const StrBuf* Data, OutputFormat Format);
+/* Write the contents of Data to the given file in the format specified. If
+ * the format is ofAuto, it is determined by the file extension.
+ */
 
 
 
-/* End of bin.h */
+/* End of output.h */
 
 #endif
 

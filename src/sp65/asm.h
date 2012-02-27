@@ -49,7 +49,7 @@
 
 
 
-void WiteAsmFile (const char* Name, const StrBuf* Data);
+void WriteAsmFile (const char* Name, const StrBuf* Data);
 /* Write the contents of Data to the given file in assembler (ca65) format */
 
 

@@ -49,7 +49,7 @@
 
 
 
-void WiteBinFile (const char* Name, const StrBuf* Data)
+void WriteBinFile (const char* Name, const StrBuf* Data)
 /* Write the contents of Data to the given file in binary format */
 {
     unsigned Size;

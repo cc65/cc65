@@ -30,6 +30,7 @@ OBJS = 	asm.o           \
         fileio.o        \
         input.o         \
 	main.o          \
+        output.o        \
         palette.o       \
         pcx.o
 

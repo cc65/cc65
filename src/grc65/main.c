@@ -164,7 +164,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
-/* Print the assembler version */
+/* Print the program version */
 {
     fprintf (stderr,
         "grc65 V%s - (C) Copyright, Maciej 'YTM/Elysium' Witkowiak\n",
@@ -266,7 +266,7 @@ static void fillOut (char *name, int len, char *filler)
 {
     int a;
 
-    setLen(name, len);
+    setLen (name, len);
     fprintf (outputSFile, "\t.byte \"%s\"\n", name);
 
     a = strlen (name);
@@ -319,7 +319,7 @@ static void DoMenu (void)
     myMenu.top = atoi (nextWord ());
     myMenu.type = nextWord ();
 
-    if (strcmp(nextWord (), "{") != 0) {
+    if (strcmp (nextWord (), "{") != 0) {
         AbEnd ("Menu '%s' description has no opening bracket!", myMenu.name);
     }
     curItem = xmalloc (sizeof(struct menuitem));
@@ -328,13 +328,13 @@ static void DoMenu (void)
     for (;;) {
         token = nextWord ();
         if (strcmp (token, "}") == 0) break;
-        if (token[strlen(token) - 1] != '"') {
+        if (token[strlen (token) - 1] != '"') {
             strcpy (namebuff, token);
             do {
                 token = nextWord ();
                 strcat (namebuff, " ");
                 strcat (namebuff, token);
-            } while (token[strlen(token) - 1] != '"');
+            } while (token[strlen (token) - 1] != '"');
             token = xmalloc (strlen (namebuff));
             strcpy (token, namebuff);
         }
@@ -430,7 +430,7 @@ static void DoHeader (void)
 
     token = nextWord ();
 
-    i = findToken(hdrFTypes, token);
+    i = findToken (hdrFTypes, token);
 
     if (apple == 1) {
         switch (i) {
@@ -674,11 +674,11 @@ static void DoMemory (void)
 
     stacksize = -1;
     overlaysize = -1;
-    memset (overlaytable, 0, sizeof(overlaytable));
+    memset (overlaytable, 0, sizeof (overlaytable));
     lastnumber = -1;
     backbuffer = -1;
 
-    if (strcmp(nextWord (), "{") != 0) {
+    if (strcmp (nextWord (), "{") != 0) {
         AbEnd ("MEMORY description has no opening bracket!");
     }
 
@@ -785,8 +785,8 @@ static void DoMemory (void)
             for (number = 0; number <= lastnumber; number++) {
                 if (overlaytable[number] == 1) {
                     fprintf (outputSFile,
-                        "\t.import __VLIR%i_START__, __VLIR%i_LAST__\n",
-                        number, number);
+                        "\t.import __VLIR%i_START__, __VLIR%i_LAST__%s\n",
+                        number, number, number == 0 ? ", __BSS_SIZE__" : "");
                 }
             }
             fprintf (outputSFile,
@@ -795,9 +795,10 @@ static void DoMemory (void)
             for (number = 0; number <= lastnumber; number++) {
                 if (overlaytable[number] == 1) {
                     fprintf (outputSFile,
-                        "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) /    254) + 1\n"
-                        "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__ - 1) .MOD 254) + 2\n",
-                        number, number, number, number);
+                        "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__%s - 1) /    254) + 1\n"
+                        "\t.byte .lobyte ((__VLIR%i_LAST__ - __VLIR%i_START__%s - 1) .MOD 254) + 2\n",
+                        number, number, number == 0 ? " - __BSS_SIZE__" : "",
+                        number, number, number == 0 ? " - __BSS_SIZE__" : "");
                 } else {
                     fprintf (outputSFile,
                         "\t.byte $00\n"

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    main.c				     */
+/*                                  input.c                                  */
 /*                                                                           */
-/*            Main program of the sp65 sprite and bitmap utility             */
+/*   Input format/file definitions for the sp65 sprite and bitmap utility    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,135 +33,73 @@
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-
 /* common */
-#include "cmdline.h"
-#include "print.h"
-#include "version.h"
+#include "fileid.h"
 
-/* sp65 */
+/* sp65 */        
 #include "error.h"
 #include "input.h"
+#include "pcx.h"
 
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Code			  	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-static void Usage (void)
-/* Print usage information and exit */
+typedef struct InputFormatDesc InputFormatDesc;
+struct InputFormatDesc {
+
+    /* Read routine */
+    Bitmap* (*Read) (const char* Name);
+
+};
+
+/* Table with input formats */
+static InputFormatDesc InputFormatTable[ifCount] = {
+    {   ReadPCXFile     },
+};
+
+/* Table that maps extensions to input formats. Must be sorted alphabetically */
+static const FileId FormatTable[] = {
+    /* Upper case stuff for obsolete operating systems */
+    {   "PCX",  ifPCX           },
+
+    {   "pcx",  ifPCX           },
+};
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+Bitmap* ReadInputFile (const char* Name, InputFormat Format)
+/* Read a bitmap from a file and return it. If Format is ifAuto, the routine
+ * tries to determine the format from the file name extension.
+ */
 {
-    printf (
-    	    "Usage: %s [options] file [options] [file]\n"
-    	    "Short options:\n"
-       	    "  -V\t\t\tPrint the version number and exit\n"
-       	    "  -h\t\t\tHelp (this text)\n"
-            "  -v\t\t\tIncrease verbosity\n"
-	    "\n"
-	    "Long options:\n"
-	    "  --help\t\tHelp (this text)\n"
-            "  --verbose\t\tIncrease verbosity\n"
-       	    "  --version\t\tPrint the version number and exit\n",
-    	    ProgName);
-}
-
-
-
-static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
-/* Print usage information and exit */
-{
-    Usage ();
-    exit (EXIT_SUCCESS);
-}
-
-
-
-static void OptVerbose (const char* Opt attribute ((unused)),
-		       	const char* Arg attribute ((unused)))
-/* Increase versbosity */
-{
-    ++Verbosity;
-}
-
-
-
-static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
-/* Print the assembler version */
-{
-    fprintf (stderr,
-       	     "%s V%s - (C) Copyright 2012, Ullrich von Bassewitz\n",
-       	     ProgName, GetVersionAsString ());
-}
-
-
-
-int main (int argc, char* argv [])
-/* sp65 main program */
-{
-    /* Program long options */
-    static const LongOpt OptTab[] = {
-	{ "--help",    		0,	OptHelp			},
-       	{ "--verbose",          0,      OptVerbose              },
-	{ "--version", 	       	0,	OptVersion		},
-    };
-
-    unsigned I;
-
-    /* Initialize the cmdline module */
-    InitCmdLine (&argc, &argv, "sp65");
-
-    /* Check the parameters */
-    I = 1;
-    while (I < ArgCount) {
-
-       	/* Get the argument */
-       	const char* Arg = ArgVec[I];
-
-       	/* Check for an option */
-       	if (Arg [0] == '-') {
-       	    switch (Arg [1]) {
-
-	 	case '-':
-	 	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-	 	    break;
-
-       	        case 'V':
-    		    OptVersion (Arg, 0);
-       		    break;
-
-	 	case 'h':
-	 	    OptHelp (Arg, 0);
-	 	    break;
-
-	 	case 'v':
-	 	    OptVerbose (Arg, 0);
-	 	    break;
-
-       	       	default:
-       	       	    UnknownOption (Arg);
-		    break;
-
-     	    }
-       	} else {
-    	    /* #### Testing */
-       	    ReadInputFile (Arg, ifAuto);
-     	}
-
-	/* Next argument */
-	++I;
+    /* If the format is Auto, try to determine it from the file name */
+    if (Format == ifAuto) {
+        /* Search for the entry in the table */
+        const FileId* F = GetFileId (Name, FormatTable,
+                                     sizeof (FormatTable) / sizeof (FormatTable[0]));
+        /* Found? */
+        if (F == 0) {
+            Error ("Cannot determine file format of input file `%s'", Name);
+        }
+        Format = F->Id;
     }
 
-    /* Success */
-    return EXIT_SUCCESS;
+    /* Check the format just for safety */
+    CHECK (Format >= 0 && Format < ifCount);
+
+    /* Call the format specific read */
+    return InputFormatTable[Format].Read (Name);
 }
 
 

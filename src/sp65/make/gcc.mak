@@ -26,6 +26,7 @@ OBJS = 	bitmap.o        \
         color.o         \
         error.o		\
         fileio.o        \
+        input.o         \
 	main.o          \
         palette.o       \
         pcx.o

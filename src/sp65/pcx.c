@@ -272,6 +272,9 @@ Bitmap* ReadPCXFile (const char* Name)
         default:Internal ("Unexpected number of planes");
     }
 
+    /* Copy the name */
+    SB_CopyStr (&B->Name, Name);
+
     /* Remember the PCX header in the tag */
     B->Tag = P;
 

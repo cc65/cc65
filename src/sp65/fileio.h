@@ -64,9 +64,6 @@ unsigned long Read24 (FILE* F);
 unsigned long Read32 (FILE* F);
 /* Read a 32 bit value from the file */
 
-char* ReadStr (FILE* F);
-/* Read a string from the file into a malloced area */
-
 void* ReadData (FILE* F, void* Data, unsigned Size);
 /* Read data from the file */
 

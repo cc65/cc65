@@ -18,7 +18,7 @@ char diskName[17] = "";
 static const graphicStr clearScreen = {
         MOVEPENTO(0, 0),
         NEWPATTERN(2),
-        RECTANGLETO(319, 199),
+        RECTANGLETO(SC_PIX_WIDTH-1, SC_PIX_HEIGHT-1),
         GSTR_END
 };
 

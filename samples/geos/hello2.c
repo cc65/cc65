@@ -13,7 +13,7 @@
 #include <geos.h>
 
 // Let's define the window we're operating
-struct window wholeScreen = {0, 199, 0, 319};
+struct window wholeScreen = {0, SC_PIX_HEIGHT-1, 0, SC_PIX_WIDTH-1};
 
 
 void main (void)

@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void __fastcall__ cbm_untlk (void);
+; void cbm_untlk (void);
 ;
 
        	.export	       	_cbm_untlk
@@ -9,5 +9,3 @@
 
 
 _cbm_untlk = UNTLK
-
-

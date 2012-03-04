@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; unsigned __fastcall__ tgi_getyres (void);
+; unsigned tgi_getyres (void);
 ; /* Return the resolution in Y direction */
 
 
@@ -14,4 +14,3 @@
         rts
 
 .endproc
-

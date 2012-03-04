@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2003-12-30
 ;
-; void __fastcall__ mouse_show (void);
+; void mouse_show (void);
 ; /* Show the mouse. See mouse_hide for more information. */
 ;
 
@@ -17,5 +17,3 @@
 @L1:	rts
 
 .endproc
-
-

@@ -728,7 +728,7 @@ allocation functions, or that has been free'd will give unpredicable results.
 <descrip>
 <tag/Function/Return the largest block that is available on the heap.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
-<tag/Declaration/<tt/size_t __fastcall__ _heapmaxavail (void);/
+<tag/Declaration/<tt/size_t _heapmaxavail (void);/
 <tag/Description/The function returns the size of the largest block that may
 be allocated from the heap using <tt/<ref id="malloc" name="malloc">/.
 <tag/Availability/cc65
@@ -1841,7 +1841,7 @@ ldiv
 <descrip>
 <tag/Function/Commit changes into extended memory.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/void __fastcall__ em_commit (void);/
+<tag/Declaration/<tt/void em_commit (void);/
 <tag/Description/Commit changes in the memory window to extended storage. If
 the contents of the memory window have been changed, these changes may be lost
 if <tt/<ref id="em_map" name="em_map">/, <tt/<ref id="em_use" name="em_use">/,
@@ -2015,7 +2015,7 @@ loaded.
 <descrip>
 <tag/Function/Return the number of available extended memory pages.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/unsigned __fastcall__ em_pagecount (void);/
+<tag/Declaration/<tt/unsigned em_pagecount (void);/
 <tag/Description/The function returns the size of the extended memory supported
 by the driver in 256 byte pages.
 <tag/Limits/<itemize>
@@ -2036,7 +2036,7 @@ by the driver in 256 byte pages.
 <descrip>
 <tag/Function/Uninstall an already loaded extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ em_install (void);/
+<tag/Declaration/<tt/unsigned char em_uninstall (void);/
 <tag/Description/The function uninstalls an already loaded extended memory
 driver but doesn't remove it from memory.
 <tag/Limits/<itemize>
@@ -2044,8 +2044,6 @@ driver but doesn't remove it from memory.
 name="em_load_driver">/, <tt/<ref id="em_unload" name="em_unload">/
 should be used instead of <tt/em_uninstall/ so the driver is also removed
 from memory.
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -2063,7 +2061,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Unload an extended memory driver.
 <tag/Header/<tt/<ref id="em.h" name="em.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ em_unload (void);/
+<tag/Declaration/<tt/unsigned char em_unload (void);/
 <tag/Description/The function unloads a loaded extended memory driver and
 frees all memory allocated for the driver.
 <tag/Limits/<itemize>
@@ -3008,7 +3006,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Return the number of joysticks supported by the current driver.
 <tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ joy_count (void);/
+<tag/Declaration/<tt/unsigned char joy_count (void);/
 <tag/Description/The function returns a the number of joysticks supported
 by the current joystick driver.
 <tag/Limits/<itemize>
@@ -3016,8 +3014,6 @@ by the current joystick driver.
 name="joy_load_driver"> before calling this function.
 <item>The function returns the number of joysticks supported by the driver.
 There's no way to check for the number of actually connected joysticks.
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -3108,15 +3104,13 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Uninstall the current joystick driver.
 <tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ joy_uninstall (void);/
+<tag/Declaration/<tt/unsigned char joy_uninstall (void);/
 <tag/Description/The function uninstalls the currently installed joystick
 driver. It does not remove the driver from memory. The function returns an
 error code, which is <tt/JOY_ERR_OK/ if the driver was successfully uninstalled.
 <tag/Limits/<itemize>
 <item>A joystick driver must be installed using <ref id="joy_install"
 name="joy_install"> before calling this function.
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -3134,15 +3128,13 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Uninstall, then unload the current joystick driver.
 <tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ joy_unload (void);/
+<tag/Declaration/<tt/unsigned char joy_unload (void);/
 <tag/Description/The function uninstalls the currently installed joystick
 driver and removes it from memory. An error code is returned, which is
 <tt/JOY_ERR_OK/ if the driver was successfully uninstalled.
 <tag/Limits/<itemize>
 <item>A joystick driver must be loaded using <ref id="joy_load_driver"
 name="joy_load_driver"> before calling this function.
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -3540,14 +3532,10 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Return a bit mask encoding the state of the mouse buttons.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ mouse_buttons (void);/
+<tag/Declaration/<tt/unsigned char mouse_buttons (void);/
 <tag/Description/The function returns a bit mask that encodes the state of the
 mouse buttons. You may use the <tt/MOUSE_BTN_XXX/ flags to decode the function
 return value.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="mouse_info" name="mouse_info">,
@@ -3588,16 +3576,12 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Hide the mouse pointer.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
-<tag/Declaration/<tt/void __fastcall__ mouse_hide (void);/
+<tag/Declaration/<tt/void mouse_hide (void);/
 <tag/Description/The function hides the mouse pointer. It manages a counter
 that is shared between <tt/<ref id="mouse_show" name="mouse_show">/ and
 <tt/mouse_hide/ so that every call call to <tt/mouse_hide/ must be followed by
 a call to <tt/<ref id="mouse_show" name="mouse_show">/ to make the mouse cursor
 visible.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="mouse_show" name="mouse_show">
@@ -3777,15 +3761,11 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Show the mouse pointer.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
-<tag/Declaration/<tt/void __fastcall__ mouse_show (void);/
+<tag/Declaration/<tt/void mouse_show (void);/
 <tag/Description/The function shows the mouse pointer. It manages a counter
 that is shared between <tt/<ref id="mouse_hide" name="mouse_hide">/ and
 <tt/mouse_show/. The mouse cursor is visible if there was one more call to
 <tt/mouse_show/ than to <tt/<ref id="mouse_hide" name="mouse_hide">/.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="mouse_hide" name="mouse_hide">
@@ -3800,7 +3780,7 @@ used in presence of a prototype.
 <descrip>
 <tag/Function/Uninstall an already loaded mouse driver.
 <tag/Header/<tt/<ref id="mouse.h" name="mouse.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ mouse_install (void);/
+<tag/Declaration/<tt/unsigned char mouse_uninstall (void);/
 <tag/Description/The function uninstalls an already loaded mouse driver but
 don't removes it from memory.
 <tag/Limits/<itemize>
@@ -3808,8 +3788,6 @@ don't removes it from memory.
 name="mouse_load_driver">/, <tt/<ref id="mouse_unload" name="mouse_unload">/
 should be used instead of <tt/mouse_uninstall/ so the driver is also removed
 from memory.
-<item>The function is only available as fastcall function, so it may only be
-used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
@@ -4531,12 +4509,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Uninstall the currently loaded driver but do not unload it.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/void __fastcall__ ser_uninstall (void);/
+<tag/Declaration/<tt/void ser_uninstall (void);/
 <tag/Description/Uninstall the currently loaded driver but do not unload it.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other serial functions.
 <tag/Example/None.

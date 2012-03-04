@@ -9,7 +9,7 @@
         .include        "extzp.inc"
 
 ; ------------------------------------------------------------------------
-; void __fastcall__ clrscr (void);
+; void clrscr (void);
 
 .proc	_clrscr
 

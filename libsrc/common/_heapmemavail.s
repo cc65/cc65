@@ -3,7 +3,7 @@
 ;
 ; Return the amount of free memory on the heap.
 ;
-; size_t __fastcall__ _heapmemavail (void);
+; size_t _heapmemavail (void);
 ;
 ;
 
@@ -76,6 +76,3 @@ __heapmemavail:
         lda     ptr2
 
         rts
-
-
-

@@ -186,7 +186,7 @@ tgi_set_ptr:
         rts
 
 ;----------------------------------------------------------------------------
-; void __fastcall__ tgi_uninstall (void);
+; void tgi_uninstall (void);
 ; /* Uninstall the currently loaded driver but do not unload it. Will call
 ;  * tgi_done if necessary.
 ;  */
@@ -207,6 +207,3 @@ _tgi_uninstall:
         sta     _tgi_error
 
         rts
-
-
-

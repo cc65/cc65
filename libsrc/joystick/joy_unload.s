@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2002-11-29
 ;
-; unsigned char __fastcall__ joy_unload (void);
+; unsigned char joy_unload (void);
 ; /* Unload the currently loaded driver. */
 
 
@@ -35,5 +35,3 @@ no_driver:
         pla                             ; Remove pushed junk
 	lda	#JOY_ERR_NO_DRIVER
 	rts
-
-

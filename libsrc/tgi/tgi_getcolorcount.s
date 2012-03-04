@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 22.06.2002
 ;
-; unsigned char __fastcall__ tgi_getcolorcount (void);
+; unsigned char tgi_getcolorcount (void);
 ; /* Get the number of available colors */
 
         .include        "tgi-kernel.inc"
@@ -13,4 +13,3 @@
         rts
 
 .endproc
-

@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2004-03-21
 ;
-; unsigned char __fastcall__ mouse_unload (void);
+; unsigned char mouse_unload (void);
 ; /* Uninstall, then unload the currently loaded driver. */
 
 
@@ -33,4 +33,3 @@ no_driver:
         pla                             ; Remove pushed junk
 	lda	#<MOUSE_ERR_NO_DRIVER
 	rts
-

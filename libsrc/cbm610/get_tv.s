@@ -1,7 +1,7 @@
 ;
 ; Stefan Haubenthal, 2009-08-02
 ;
-; unsigned char __fastcall__ get_tv (void);
+; unsigned char get_tv (void);
 ; /* Return the video mode the machine is using */
 ;
 

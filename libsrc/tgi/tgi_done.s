@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; void __fastcall__ tgi_done (void);
+; void tgi_done (void);
 ; /* End graphics mode, switch back to text mode. Will NOT unload the driver! */
 
         .include        "tgi-kernel.inc"
@@ -17,4 +17,3 @@
 @L1:    rts
 
 .endproc
-

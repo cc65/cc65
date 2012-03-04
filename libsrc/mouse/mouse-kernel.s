@@ -156,7 +156,7 @@ copycb: lda     (sreg),y
         rts
 
 ;----------------------------------------------------------------------------
-; unsigned char __fastcall__ mouse_uninstall (void);
+; unsigned char mouse_uninstall (void);
 ; /* Uninstall the currently loaded driver. Returns an error code. */
 
 _mouse_uninstall:
@@ -182,5 +182,3 @@ _mouse_clear_ptr:                       ; External entry point
 
         tax
         rts                             ; Return zero
-
-

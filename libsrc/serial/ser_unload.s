@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2003-04-15
 ;
-; unsigned char __fastcall__ ser_unload (void);
+; unsigned char ser_unload (void);
 ; /* Unload the currently loaded driver. */
 
 
@@ -35,4 +35,3 @@ no_driver:
         pla                             ; Remove pushed junk
 	lda	#<SER_ERR_NO_DRIVER
 	rts
-

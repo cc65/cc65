@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2011-05-01
 ;
-; unsigned __fastcall__ tgi_getaspectratio (void);
+; unsigned tgi_getaspectratio (void);
 ; /* Returns the aspect ratio for the loaded driver. The aspect ratio is an
 ;  * 8.8 fixed point value.
 ;  */
@@ -16,4 +16,3 @@
         rts
 
 .endproc
-

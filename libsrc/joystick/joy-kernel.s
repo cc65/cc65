@@ -104,7 +104,7 @@ set:    sta     joy_vectors,x
         rts
 
 ;----------------------------------------------------------------------------
-; unsigned char __fastcall__ joy_uninstall (void);
+; unsigned char joy_uninstall (void);
 ; /* Uninstall the currently loaded driver. Note: This call does not free
 ;  * allocated memory.
 ;  */
@@ -122,4 +122,3 @@ _joy_clear_ptr:                         ; External entry point
 
         tax                             ; Return zero
         rts
-

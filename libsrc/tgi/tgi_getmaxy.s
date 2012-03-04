@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; unsigned __fastcall__ tgi_getmaxy (void);
+; unsigned tgi_getmaxy (void);
 ; /* Return the maximum y coordinate. The resolution in y direction is
 ;  * getmaxy() + 1
 ;  */
@@ -15,4 +15,3 @@
         rts
 
 .endproc
-

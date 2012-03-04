@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; void __fastcall__ tgi_init (void);
+; void tgi_init (void);
 ; /* Initialize the already loaded graphics driver */
 
 
@@ -72,5 +72,3 @@
 @L9:    rts
 
 .endproc
-
-

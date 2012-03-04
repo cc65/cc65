@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2003-12-30
 ;
-; void __fastcall__ mouse_hide (void);
+; void mouse_hide (void);
 ; /* Hide the mouse. The function manages a counter and may be called more than
 ;  * once. For each call to mouse_hide there must be a call to mouse_show to make
 ;  * the mouse visible again.
@@ -19,5 +19,3 @@
 	rts
 
 .endproc
-
-

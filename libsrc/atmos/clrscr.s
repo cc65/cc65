@@ -8,7 +8,7 @@
 	.include  	"atmos.inc"
 
 ; ------------------------------------------------------------------------
-; void __fastcall__ clrscr (void);
+; void clrscr (void);
 
 .proc	_clrscr
 

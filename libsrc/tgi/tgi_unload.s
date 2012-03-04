@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; void __fastcall__ tgi_unload (void);
+; void tgi_unload (void);
 ; /* Unload the currently loaded driver. */
 
 
@@ -32,5 +32,3 @@ no_driver:
         lda     #<TGI_ERR_NO_DRIVER
         sta     _tgi_error
         rts
-
-

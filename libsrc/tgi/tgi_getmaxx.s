@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; unsigned __fastcall__ tgi_getmaxx (void);
+; unsigned tgi_getmaxx (void);
 ; /* Return the maximum x coordinate. The resolution in x direction is
 ;  * getmaxx() + 1
 ;  */
@@ -16,5 +16,3 @@
         rts
 
 .endproc
-
-

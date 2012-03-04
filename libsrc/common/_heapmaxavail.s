@@ -3,7 +3,7 @@
 ;
 ; Return the size of the largest free block on the heap.
 ;
-; size_t __fastcall__ _heapmaxavail (void);
+; size_t _heapmaxavail (void);
 ;
 ;
                             
@@ -74,4 +74,3 @@ __heapmaxavail:
 @L3:    lda     ptr2
         ldx     ptr2+1
         rts
-

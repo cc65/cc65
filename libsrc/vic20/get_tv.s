@@ -2,7 +2,7 @@
 ; Stefan Haubenthal, 2004-10-07
 ; Based on code from Pu-239
 ;
-; unsigned char __fastcall__ get_tv (void);
+; unsigned char get_tv (void);
 ; /* Return the video mode the machine is using */
 ;
 

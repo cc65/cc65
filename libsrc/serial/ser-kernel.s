@@ -92,7 +92,7 @@ copy:   lda     (ptr1),y
         rts
 
 ;----------------------------------------------------------------------------
-; unsigned char __fastcall__ ser_uninstall (void);
+; unsigned char ser_uninstall (void);
 ; /* Uninstall the currently loaded driver and return an error code.
 ;  * Note: This call does not free allocated memory.
 ;  */
@@ -110,4 +110,3 @@ _ser_clear_ptr:                         ; External entry point
 
         tax
         rts                             ; Return zero
-

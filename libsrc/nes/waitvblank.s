@@ -2,7 +2,7 @@
 ; Written by Groepaz/Hitmen <groepaz@gmx.net>
 ; Cleanup by Ullrich von Bassewitz <uz@cc65.org>
 ;
-; void __fastcall__ waitvblank(void);
+; void waitvblank(void);
 ;
 
 	.export _waitvblank
@@ -16,5 +16,3 @@ wait:   lda     PPU_STATUS
         rts
 
 .endproc
-
-

@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; unsigned __fastcall__ tgi_getxres (void);
+; unsigned tgi_getxres (void);
 ; /* Return the resolution in X direction */
 
 
@@ -14,4 +14,3 @@
         rts
 
 .endproc
-

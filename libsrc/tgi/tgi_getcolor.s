@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 22.06.2002
 ;
-; unsigned char __fastcall__ tgi_getcolor (void);
+; unsigned char tgi_getcolor (void);
 ; /* Return the current drawing color */
 
 

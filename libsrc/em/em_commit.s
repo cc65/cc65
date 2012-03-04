@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2002-12-01
 ;
-; void __fastcall__ em_commit (void);
+; void em_commit (void);
 ; /* Commit changes in the memory window to extended storage. If the contents
 ;  * of the memory window have been changed, these changes may be lost if
 ;  * em_map, em_copyfrom or em_copyto are called without calling em_commit
@@ -12,5 +12,3 @@
         .include        "em-kernel.inc"
 
        	_em_commit      = emd_commit            ; Use driver entry
-
-                                   

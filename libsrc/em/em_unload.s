@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 2002-11-29
 ;
-; unsigned char __fastcall__ em_unload (void);
+; unsigned char em_unload (void);
 ; /* Unload the currently loaded driver. */
 
 
@@ -28,4 +28,3 @@ no_driver:
 	tax				; X = 0
 	lda	#EM_ERR_NO_DRIVER
 	rts
-

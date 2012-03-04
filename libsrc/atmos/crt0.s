@@ -133,7 +133,17 @@ L2:	lda	zpsave,x
 
 IRQStub:
 	cld				; Just to be sure
+	pha
+	txa
+	pha
+	tya
+	pha
 	jsr	callirq			; Call the functions
+	pla
+	tay
+	pla
+	tax
+	pla
 	jmp	IRQInd			; Jump to the saved IRQ vector
 
 ; ------------------------------------------------------------------------

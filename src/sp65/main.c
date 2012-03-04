@@ -84,6 +84,13 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
+/* Read an input file */
+{
+}
+
+
+
 static void OptVerbose (const char* Opt attribute ((unused)),
 		       	const char* Arg attribute ((unused)))
 /* Increase versbosity */
@@ -110,6 +117,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--help",    		0,	OptHelp			},
+        { "--read",             1,      OptRead                 },
        	{ "--verbose",          0,      OptVerbose              },
 	{ "--version", 	       	0,	OptVersion		},
     };
@@ -141,6 +149,10 @@ int main (int argc, char* argv [])
 	 	case 'h':
 	 	    OptHelp (Arg, 0);
 	 	    break;
+
+                case 'r':
+                    OptRead (Arg, GetArg (&I, 2));
+                    break;
 
 	 	case 'v':
 	 	    OptVerbose (Arg, 0);

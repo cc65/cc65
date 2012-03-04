@@ -61,6 +61,7 @@ endif
 # All OBJ files
 
 OBJS =  asm.obj         \
+        attr.obj        \
         bin.obj         \
         bitmap.obj      \
         color.obj       \

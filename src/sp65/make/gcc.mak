@@ -23,6 +23,7 @@ LDFLAGS =
 # List of all object files
 
 OBJS = 	asm.o           \
+        attr.o          \
         bin.o           \
         bitmap.o        \
         color.o         \

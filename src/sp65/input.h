@@ -55,7 +55,7 @@ enum InputFormat {
 
     ifCount                     /* Number of actual input formats w/o ifAuto*/
 };
-typedef enum InputFormat InputFormat;                
+typedef enum InputFormat InputFormat;
 
 
 
@@ -65,6 +65,11 @@ typedef enum InputFormat InputFormat;
 /*****************************************************************************/
 
 
+
+int FindInputFormat (const char* Name);
+/* Find an input format by name. The function returns a value less than zero
+ * if Name is not a known input format.
+ */
 
 Bitmap* ReadInputFile (const char* Name, InputFormat Format);
 /* Read a bitmap from a file and return it. If Format is ifAuto, the routine

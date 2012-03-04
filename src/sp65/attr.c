@@ -32,7 +32,7 @@
 /*****************************************************************************/
 
 
-                  
+
 #include <stdio.h>
 #include <string.h>
 
@@ -139,6 +139,62 @@ int FindAttr (const Collection* C, const char* Name, unsigned* Index)
 
 
 
+const Attr* GetAttr (const Collection* C, const char* Name)
+/* Search for an attribute with the given name and return it. The function
+ * returns NULL if the attribute wasn't found.
+ */
+{
+    /* Search for the attribute and return it */
+    unsigned Index;
+    if (FindAttr (C, Name, &Index)) {
+        return CollConstAt (C, Index);
+    } else {
+        /* Not found */
+        return 0;
+    }
+}
+
+
+
+const Attr* NeedAttr (const Collection* C, const char* Name, const char* Context)
+/* Search for an attribute with the given name and return it. If the attribute
+ * is not found, the function terminates with an error using Context as
+ * additional context in the error message.
+ */
+{
+    /* Search for the attribute and return it */
+    unsigned Index;
+    if (!FindAttr (C, Name, &Index)) {
+        Error ("Found no attribute named `%s' in %s", Name, Context);
+    }
+    return CollConstAt (C, Index);
+}
+
+
+
+const char* GetAttrVal (const Collection* C, const char* Name)
+/* Search for an attribute with the given name and return its value. The
+ * function returns NULL if the attribute wasn't found.
+ */
+{
+    const Attr* A = GetAttr (C, Name);
+    return (A == 0)? 0 : A->Value;
+}
+
+
+
+const char* NeedAttrVal (const Collection* C, const char* Name, const char* Context)
+/* Search for an attribute with the given name and return its value. If the
+ * attribute wasn't not found, the function terminates with an error using
+ * Context as additional context in the error message.
+ */
+{
+    const Attr* A = NeedAttr (C, Name, Context);
+    return (A == 0)? 0 : A->Value;
+}
+
+
+
 void AddAttr (Collection* C, const char* Name, const char* Value)
 /* Add an attribute to an alphabetically sorted attribute collection */
 {
@@ -170,7 +226,7 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
     if (Pos == 0) {
         /* Combined is actually a value */
         if (Name == 0) {
-            Error ("Command line attribute `%s' doesn't contain a name", Name);
+            Error ("Command line attribute `%s' doesn't contain a name", Combined);
         }
         AddAttr (C, Name, Combined);
     } else {
@@ -185,6 +241,57 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
         /* Release memory */
         SB_Done (&N);
     }
+}
+
+
+
+Collection* ParseAttrList (const char* List, const char** NameList, unsigned NameCount)
+/* Parse a list containing name/value pairs into a sorted collection. Some
+ * attributes may not need a name, so NameList contains these names. If there
+ * were no errors, the function returns a alphabetically sorted collection
+ * containing Attr entries.
+ */
+{
+    const char* Name;
+
+    /* Create a new collection */
+    Collection* C = NewCollection ();
+
+    /* Name/value pairs are separated by commas */
+    const char* L = List;
+    StrBuf B = AUTO_STRBUF_INITIALIZER;
+    while (1) {
+        if (*L == ',' || *L == '\0') {
+
+            /* Terminate the string */
+            SB_Terminate (&B);
+
+            /* Determine the default name */
+            if (CollCount (C) >= NameCount) {
+                Name = 0;
+            } else {
+                Name = NameList[CollCount (C)];
+            }
+
+            /* Split and add this attribute/value pair */
+            SplitAddAttr (C, SB_GetConstBuf (&B), Name);
+
+            /* Done, clear the buffer. */
+            SB_Clear (&B);
+            if (*L == '\0') {
+                break;
+            }
+        } else {
+            SB_AppendChar (&B, *L);
+        }
+        ++L;
+    }
+
+    /* Free memory */
+    SB_Done (&B);
+
+    /* Return the collection with the attributes */
+    return C;
 }
 
 

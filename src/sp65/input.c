@@ -36,7 +36,7 @@
 /* common */
 #include "fileid.h"
 
-/* sp65 */        
+/* sp65 */
 #include "error.h"
 #include "input.h"
 #include "pcx.h"
@@ -75,6 +75,19 @@ static const FileId FormatTable[] = {
 /*****************************************************************************/
 /*                                   Code                                    */
 /*****************************************************************************/
+
+
+
+int FindInputFormat (const char* Name)
+/* Find an input format by name. The function returns a value less than zero
+ * if Name is not a known input format.
+ */
+{
+    /* Search for the entry in the table */
+    const FileId* F = GetFileId (Name, FormatTable,
+                                 sizeof (FormatTable) / sizeof (FormatTable[0]));
+    return (F == 0)? -1 : F->Id;
+}
 
 
 

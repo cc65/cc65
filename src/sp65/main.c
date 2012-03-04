@@ -44,8 +44,23 @@
 #include "version.h"
 
 /* sp65 */
+#include "attr.h"
 #include "error.h"
 #include "input.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Bitmap first read */
+static Bitmap* B;
+
+/* Bitmap last processed */
+static Bitmap* C;
 
 
 
@@ -66,7 +81,7 @@ static void Usage (void)
             "  -v\t\t\tIncrease verbosity\n"
 	    "\n"
 	    "Long options:\n"
-	    "  --help\t\tHelp (this text)\n"
+    	    "  --help\t\tHelp (this text)\n"
             "  --verbose\t\tIncrease verbosity\n"
        	    "  --version\t\tPrint the version number and exit\n",
     	    ProgName);
@@ -84,9 +99,32 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
-static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
+static void OptRead (const char* Opt, const char* Arg)
 /* Read an input file */
 {
+    static const char* NameList[] = {
+        "name", "format"
+    };
+
+
+    /* Parse the argument */
+    Collection* C = ParseAttrList (Arg, NameList, 2);
+
+    /* Must have a file name given */
+    const char* FileName = NeedAttrVal (C, "name", Opt);
+
+    /* Determine the format of the input file */
+    int IF = ifAuto;
+    const char* Format = GetAttrVal (C, "format");
+    if (Format != 0) {
+        IF = FindInputFormat (Format);
+        if (IF <= 0) {
+            Error ("Unknown input format `%s'", Format);
+        }
+    }
+
+    /* Read the file */
+    B = ReadInputFile (FileName, IF);
 }
 
 

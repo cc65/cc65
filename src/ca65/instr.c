@@ -593,7 +593,7 @@ static const struct {
 /* Instruction table for the SWEET16 pseudo CPU */
 static const struct {
     unsigned Count;
-    InsDesc  Ins[27];
+    InsDesc  Ins[26];
 } InsTabSweet16 = {
     sizeof (InsTabSweet16.Ins) / sizeof (InsTabSweet16.Ins[0]),
     {

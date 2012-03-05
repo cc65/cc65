@@ -126,6 +126,41 @@ Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y);
  * or a palette index, depending on the type of the bitmap.
  */
 
+#if defined(HAVE_INLINE)
+INLINE BitmapType GetBitmapType (const Bitmap* B)
+/* Get the type of a bitmap */
+{
+    return B->Type;
+}
+#else
+#  define GetBitmapType(B)      ((B)->Type)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetBitmapWidth (const Bitmap* B)
+/* Get the width of a bitmap */
+{
+    return B->Width;
+}
+#else
+#  define GetBitmapWidth(B)     ((B)->Width)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetBitmapHeight (const Bitmap* B)
+/* Get the height of a bitmap */
+{
+    return B->Height;
+}
+#else
+#  define GetBitmapHeight(B)    ((B)->Height)
+#endif
+
+unsigned GetBitmapColors (const Bitmap* B);
+/* Get the number of colors in an image. The function will return the number
+ * of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.
+ */
+
 
 
 /* End of bitmap.h */

@@ -30,6 +30,7 @@ OBJS = 	asm.o           \
         error.o		\
         fileio.o        \
         input.o         \
+        koala.o         \
 	main.o          \
         output.o        \
         palette.o       \

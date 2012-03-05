@@ -68,6 +68,7 @@ OBJS =  asm.obj         \
         error.obj	\
         fileio.obj      \
         input.obj       \
+        koala.obj       \
 	main.obj        \
         output.obj      \
         palette.obj     \

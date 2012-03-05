@@ -33,6 +33,8 @@
 
 
 
+#include <stdlib.h>
+
 /* common */
 #include "fileid.h"
 
@@ -78,14 +80,27 @@ static const FileId FormatTable[] = {
 
 
 
+static int Compare (const void* Key, const void* Id)
+/* Compare function for bsearch */
+{
+    return strcmp (Key, ((const FileId*) Id)->Ext);
+}
+
+
+
 int FindInputFormat (const char* Name)
 /* Find an input format by name. The function returns a value less than zero
  * if Name is not a known input format.
  */
 {
-    /* Search for the entry in the table */
-    const FileId* F = GetFileId (Name, FormatTable,
-                                 sizeof (FormatTable) / sizeof (FormatTable[0]));
+    /* Search for the entry in the table. */
+    const FileId* F = bsearch (Name,
+                               FormatTable,
+                               sizeof (FormatTable) / sizeof (FormatTable[0]),
+                               sizeof (FormatTable[0]),
+                               Compare);
+
+    /* Return the id or an error code */
     return (F == 0)? -1 : F->Id;
 }
 

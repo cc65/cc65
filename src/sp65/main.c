@@ -118,7 +118,7 @@ static void OptRead (const char* Opt, const char* Arg)
     const char* Format = GetAttrVal (C, "format");
     if (Format != 0) {
         IF = FindInputFormat (Format);
-        if (IF <= 0) {
+        if (IF < 0) {
             Error ("Unknown input format `%s'", Format);
         }
     }

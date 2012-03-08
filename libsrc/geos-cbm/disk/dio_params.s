@@ -26,7 +26,7 @@ dio_params:
 
 	jsr popax
 	sta dio_secnum
-	stx dio_secnum
+	stx dio_secnum+1
 
 	jsr popax		; get 3rd parameter
 	pha			; save it

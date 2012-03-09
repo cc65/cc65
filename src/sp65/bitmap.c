@@ -190,7 +190,9 @@ unsigned GetBitmapColors (const Bitmap* B)
         case bmRGB:
         case bmRGBA:            return (1U << 24);
         default:                Internal ("Unknown bitmap type %u", B->Type);
-    }
+    }   
+    /* NOTREACHED */
+    return 0;
 }
 
 

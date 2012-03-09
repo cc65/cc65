@@ -80,14 +80,6 @@ static const FileId FormatTable[] = {
 
 
 
-static int Compare (const void* Key, const void* Id)
-/* Compare function for bsearch */
-{
-    return strcmp (Key, ((const FileId*) Id)->Ext);
-}
-
-
-
 int FindInputFormat (const char* Name)
 /* Find an input format by name. The function returns a value less than zero
  * if Name is not a known input format.
@@ -98,7 +90,7 @@ int FindInputFormat (const char* Name)
                                FormatTable,
                                sizeof (FormatTable) / sizeof (FormatTable[0]),
                                sizeof (FormatTable[0]),
-                               Compare);
+                               CompareFileId);
 
     /* Return the id or an error code */
     return (F == 0)? -1 : F->Id;

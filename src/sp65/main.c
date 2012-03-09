@@ -48,6 +48,7 @@
 #include "attr.h"
 #include "error.h"
 #include "input.h"
+#include "output.h"
 
 
 
@@ -77,16 +78,18 @@ static void Usage (void)
     printf (
     	    "Usage: %s [options] file [options] [file]\n"
     	    "Short options:\n"
-       	    "  -V\t\t\tPrint the version number and exit\n"
-       	    "  -h\t\t\tHelp (this text)\n"
-            "  -v\t\t\tIncrease verbosity\n"
+       	    "  -V\t\t\t\tPrint the version number and exit\n"
+       	    "  -h\t\t\t\tHelp (this text)\n"
+            "  -v\t\t\t\tIncrease verbosity\n"
 	    "\n"
 	    "Long options:\n"
-    	    "  --help\t\tHelp (this text)\n"
-            "  --pop\t\t\tRestore the original loaded image\n"
-            "  --slice x,y,w,h\tGenerate a slice from the loaded bitmap\n"
-            "  --verbose\t\tIncrease verbosity\n"
-       	    "  --version\t\tPrint the version number and exit\n",
+    	    "  --help\t\t\tHelp (this text)\n"
+            "  --pop\t\t\t\tRestore the original loaded image\n"
+            "  --read file[,attrlist]\tRead an input file\n"
+            "  --slice x,y,w,h\t\tGenerate a slice from the loaded bitmap\n"
+            "  --verbose\t\t\tIncrease verbosity\n"
+       	    "  --version\t\t\tPrint the version number and exit\n"
+            "  --write file[,attrlist]\tWrite an output file\n",
     	    ProgName);
 }
 
@@ -221,6 +224,36 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptWrite (const char* Opt, const char* Arg)
+/* Write an output file */
+{
+    static const char* NameList[] = {
+        "name", "format"
+    };
+
+
+    /* Parse the argument */
+    Collection* A = ParseAttrList (Arg, NameList, 2);
+
+    /* Must have a file name given */
+    const char* FileName = NeedAttrVal (A, "name", Opt);
+
+    /* Determine the format of the input file */
+    int OF = ofAuto;
+    const char* Format = GetAttrVal (A, "format");
+    if (Format != 0) {
+        OF = FindOutputFormat (Format);
+        if (OF < 0) {
+            Error ("Unknown output format `%s'", Format);
+        }
+    }
+
+    /* Write the file */
+    WriteOutputFile (FileName, 0, OF);
+}
+
+
+
 int main (int argc, char* argv [])
 /* sp65 main program */
 {
@@ -232,6 +265,7 @@ int main (int argc, char* argv [])
         { "--slice",            1,      OptSlice                },
        	{ "--verbose",          0,      OptVerbose              },
 	{ "--version", 	       	0,	OptVersion		},
+       	{ "--write",   	       	1,     	OptWrite                },
     };
 
     unsigned I;

@@ -48,8 +48,8 @@
 
 
 
-static int Compare (const void* Key, const void* Id)
-/* Compare function for bsearch */
+int CompareFileId (const void* Key, const void* Id)
+/* Compare function used when calling bsearch with a table of FileIds */
 {
     return strcmp (Key, ((const FileId*) Id)->Ext);
 }
@@ -72,7 +72,7 @@ const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
     }
 
     /* Search for a table entry and return it */
-    return bsearch (Ext+1, Table, Count, sizeof (FileId), Compare);
+    return bsearch (Ext+1, Table, Count, sizeof (FileId), CompareFileId);
 }
 
 

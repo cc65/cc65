@@ -61,6 +61,9 @@ struct FileId {
 
 
 
+int CompareFileId (const void* Key, const void* Id);
+/* Compare function used when calling bsearch with a table of FileIds */
+
 const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count);
 /* Determine the id of the given file by looking at file extension of the name.
  * The table passed to the function must be sorted alphabetically. If the

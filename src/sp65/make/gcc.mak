@@ -27,7 +27,8 @@ OBJS = 	asm.o           \
         bin.o           \
         bitmap.o        \
         color.o         \
-        error.o		\
+        convert.o       \
+        error.o	    	\
         fileio.o        \
         input.o         \
         koala.o         \

@@ -46,6 +46,7 @@
 
 /* sp65 */
 #include "attr.h"
+#include "convert.h"
 #include "error.h"
 #include "input.h"
 #include "output.h"
@@ -61,8 +62,11 @@
 /* Bitmap first read */
 static Bitmap* B;
 
-/* Bitmap last processed */
+/* Bitmap working copy */
 static Bitmap* C;
+
+/* Output data from convertion */
+static StrBuf* D;
 
 
 
@@ -79,17 +83,21 @@ static void Usage (void)
     	    "Usage: %s [options] file [options] [file]\n"
     	    "Short options:\n"
        	    "  -V\t\t\t\tPrint the version number and exit\n"
+            "  -c fmt[,attrlist]\t\tConvert into target format\n"
        	    "  -h\t\t\t\tHelp (this text)\n"
+            "  -r file[,attrlist]\t\tRead an input file\n"
             "  -v\t\t\t\tIncrease verbosity\n"
+            "  -w file[,attrlist]\t\tWrite the output to a file\n"
 	    "\n"
 	    "Long options:\n"
+            "  --convert-to fmt[,attrlist]\tConvert into target format\n"
     	    "  --help\t\t\tHelp (this text)\n"
             "  --pop\t\t\t\tRestore the original loaded image\n"
             "  --read file[,attrlist]\tRead an input file\n"
             "  --slice x,y,w,h\t\tGenerate a slice from the loaded bitmap\n"
             "  --verbose\t\t\tIncrease verbosity\n"
        	    "  --version\t\t\tPrint the version number and exit\n"
-            "  --write file[,attrlist]\tWrite an output file\n",
+            "  --write file[,attrlist]\tWrite the output to a file\n",
     	    ProgName);
 }
 
@@ -107,6 +115,46 @@ static void SetWorkBitmap (Bitmap* N)
 
     /* Set the new one */
     C = N;
+}
+
+
+
+static void SetOutputData (StrBuf* N)
+/* Delete the old output data and replace it by the given one. The new one
+ * may be NULL to clear it.
+ */
+{
+    /* Delete the old output data */
+    if (D != 0) {
+        FreeStrBuf (D);
+    }
+
+    /* Set the new one */
+    D = N;
+}
+
+
+
+static void OptConvertTo (const char* Opt attribute ((unused)), const char* Arg)
+/* Convert the bitmap into a target format */
+{
+    static const char* NameList[] = {
+        "format"
+    };
+
+    /* Parse the argument */
+    Collection* A = ParseAttrList (Arg, NameList, 2);
+
+    /* We must have a bitmap */
+    if (C == 0) {
+        Error ("No bitmap to convert");
+    }
+
+    /* Convert the bitmap */
+    SetOutputData (ConvertTo (C, A));
+
+    /* Delete the attribute list */
+    FreeCollection (A);
 }
 
 
@@ -250,6 +298,9 @@ static void OptWrite (const char* Opt, const char* Arg)
 
     /* Write the file */
     WriteOutputFile (FileName, 0, OF);
+
+    /* Delete the attribute list */
+    FreeCollection (A);
 }
 
 
@@ -259,6 +310,7 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+        { "--convert-to",       1,      OptConvertTo            },
 	{ "--help",    		0,	OptHelp			},
         { "--pop",              0,      OptPop                  },
         { "--read",             1,      OptRead                 },
@@ -292,6 +344,10 @@ int main (int argc, char* argv [])
     		    OptVersion (Arg, 0);
        		    break;
 
+                case 'c':
+                    OptConvertTo (Arg, GetArg (&I, 2));
+                    break;
+
 	 	case 'h':
 	 	    OptHelp (Arg, 0);
 	 	    break;
@@ -303,6 +359,10 @@ int main (int argc, char* argv [])
 	 	case 'v':
 	 	    OptVerbose (Arg, 0);
 	 	    break;
+
+                case 'w':
+                    OptWrite (Arg, GetArg (&I, 2));
+                    break;
 
        	       	default:
        	       	    UnknownOption (Arg);

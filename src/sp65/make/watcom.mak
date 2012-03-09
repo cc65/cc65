@@ -65,7 +65,8 @@ OBJS =  asm.obj         \
         bin.obj         \
         bitmap.obj      \
         color.obj       \
-        error.obj	\
+        convert.obj     \
+        error.obj     	\
         fileio.obj      \
         input.obj       \
         koala.obj       \

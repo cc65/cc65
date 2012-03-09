@@ -53,6 +53,10 @@
 
 
 
+/* Safety limit for the bitmap sizes */
+#define BM_MAX_WIDTH    4096U
+#define BM_MAX_HEIGHT   4096U
+
 /* Safety limit for the size of the bitmap in pixels */
 #define BM_MAX_SIZE     4194304UL
 

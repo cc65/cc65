@@ -72,7 +72,8 @@ OBJS =  asm.obj         \
 	main.obj        \
         output.obj      \
         palette.obj     \
-        pcx.obj
+        pcx.obj         \
+        vic2sprite.obj
 
 LIBS = ../common/common.lib
 

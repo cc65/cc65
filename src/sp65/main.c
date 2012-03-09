@@ -39,6 +39,7 @@
 #include <errno.h>
 
 /* common */
+#include "abend.h"
 #include "cmdline.h"
 #include "print.h"
 #include "version.h"
@@ -82,9 +83,27 @@ static void Usage (void)
 	    "\n"
 	    "Long options:\n"
     	    "  --help\t\tHelp (this text)\n"
+            "  --pop\t\t\tRestore the original loaded image\n"
+            "  --slice x,y,w,h\tGenerate a slice from the loaded bitmap\n"
             "  --verbose\t\tIncrease verbosity\n"
        	    "  --version\t\tPrint the version number and exit\n",
     	    ProgName);
+}
+
+
+
+static void SetWorkBitmap (Bitmap* N)
+/* Delete an old working bitmap and set a new one. The new one may be NULL
+ * to clear it.
+ */
+{
+    /* If we have a distinct work bitmap, delete it */
+    if (C != 0 && C != B) {
+        FreeBitmap (C);
+    }
+
+    /* Set the new one */
+    C = N;
 }
 
 
@@ -99,6 +118,21 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptPop (const char* Opt attribute ((unused)),
+		    const char* Arg attribute ((unused)))
+/* Restore the original image */
+{
+    /* C and B must differ and we must have an original */
+    if (B == 0 || C == 0 || C == B) {
+        Error ("Nothing to pop");
+    }
+
+    /* Delete the changed image and restore the original one */
+    SetWorkBitmap (B);
+}
+
+
+
 static void OptRead (const char* Opt, const char* Arg)
 /* Read an input file */
 {
@@ -108,14 +142,14 @@ static void OptRead (const char* Opt, const char* Arg)
 
 
     /* Parse the argument */
-    Collection* C = ParseAttrList (Arg, NameList, 2);
+    Collection* A = ParseAttrList (Arg, NameList, 2);
 
     /* Must have a file name given */
-    const char* FileName = NeedAttrVal (C, "name", Opt);
+    const char* FileName = NeedAttrVal (A, "name", Opt);
 
     /* Determine the format of the input file */
     int IF = ifAuto;
-    const char* Format = GetAttrVal (C, "format");
+    const char* Format = GetAttrVal (A, "format");
     if (Format != 0) {
         IF = FindInputFormat (Format);
         if (IF < 0) {
@@ -123,8 +157,46 @@ static void OptRead (const char* Opt, const char* Arg)
         }
     }
 
-    /* Read the file */
-    B = ReadInputFile (FileName, IF);
+    /* Clear the working copy */
+    SetWorkBitmap (0);
+
+    /* Delete the original */
+    FreeBitmap (B);
+
+    /* Read the file and use it as original and as working copy */
+    B = C = ReadInputFile (FileName, IF);
+
+    /* Delete the attribute list */
+    FreeCollection (A);
+}
+
+
+
+static void OptSlice (const char* Opt attribute ((unused)), const char* Arg)
+/* Generate a slice of a bitmap */
+{
+    unsigned X, Y, W, H;
+    unsigned char T;
+
+    /* We must have a bitmap otherwise we cannot slice */
+    if (C == 0) {
+        Error ("Nothing to slice");
+    }
+
+    /* The argument is X,Y,W,H */
+    if (sscanf (Arg, "%u,%u,%u,%u,%c", &X, &Y, &W, &H, &T) != 4) {
+        Error ("Invalid argument. Slice must be given as X,Y,W,H");
+    }
+
+    /* Check the coordinates to be within the original bitmap */
+    if (W > BM_MAX_WIDTH || H > BM_MAX_HEIGHT ||
+        X + W > GetBitmapWidth (C) ||
+        Y + H > GetBitmapHeight (C)) {
+        Error ("Invalid slice coordinates and/or size");
+    }
+
+    /* Create the slice */
+    SetWorkBitmap (SliceBitmap (C, X, Y, W, H));
 }
 
 
@@ -139,7 +211,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+		  	const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr,
@@ -155,7 +227,9 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--help",    		0,	OptHelp			},
+        { "--pop",              0,      OptPop                  },
         { "--read",             1,      OptRead                 },
+        { "--slice",            1,      OptSlice                },
        	{ "--verbose",          0,      OptVerbose              },
 	{ "--version", 	       	0,	OptVersion		},
     };
@@ -202,8 +276,8 @@ int main (int argc, char* argv [])
 
      	    }
        	} else {
-    	    /* #### Testing */
-       	    ReadInputFile (Arg, ifAuto);
+    	    /* We don't accept anything else */
+            AbEnd ("Don't know what to do with `%s'", Arg);
      	}
 
 	/* Next argument */

@@ -79,9 +79,12 @@ Bitmap* NewBitmap (unsigned Width, unsigned Height)
 void FreeBitmap (Bitmap* B)
 /* Free a dynamically allocated bitmap */
 {
-    /* Free the palette and then the bitmap */
-    xfree (B->Pal);
-    xfree(B);
+    /* Alloc NULL pointers */
+    if (B != 0) {
+        /* Free the palette and then the bitmap */
+        xfree (B->Pal);
+        xfree(B);
+    }
 }
 
 
@@ -110,9 +113,7 @@ Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
 
 
     /* Check the coordinates and size */
-    PRECONDITION (OrigX != 0 && OrigY != 0 &&
-                  OrigX + Width <= O->Width &&
-                  OrigY + Height <= O->Height);
+    PRECONDITION (OrigX + Width <= O->Width && OrigY + Height <= O->Height);
 
     /* Create a new bitmap with the given size */
     B = NewBitmap (Width, Height);
@@ -181,8 +182,8 @@ Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y)
 unsigned GetBitmapColors (const Bitmap* B)
 /* Get the number of colors in an image. The function will return the number
  * of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.
- */                                       
-{                                   
+ */
+{
     switch (B->Type) {
         case bmMonochrome:      return 2;
         case bmIndexed:         return B->Pal->Count;

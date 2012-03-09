@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  koala.c                                  */
+/*                               vic2sprite.c                                */
 /*                                                                           */
-/*        Koala format backend for the sp65 sprite and bitmap utility        */
+/*    VICII sprite format backend for the sp65 sprite and bitmap utility     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -38,7 +38,7 @@
 
 /* sp65 */
 #include "error.h"
-#include "koala.h"
+#include "vic2sprite.h"
 
 
 
@@ -49,8 +49,8 @@
 
 
 /* Screen size of a koala picture */
-#define WIDTH   160U
-#define HEIGHT  200U
+#define WIDTH   24U
+#define HEIGHT  21U
 
 
 
@@ -60,40 +60,44 @@
 
 
 
-StrBuf* GenKoala (const Bitmap* B, const Collection* A attribute ((unused)))
-/* Generate binary output in koala format for the bitmap B. The output is
- * stored in a string buffer (which is actually a dynamic char array) and
+StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A attribute ((unused)))
+/* Generate binary output in VICII sprite format for the bitmap B. The output
+ * is stored in a string buffer (which is actually a dynamic char array) and
  * returned.
  */
 {
     StrBuf* D;
-    unsigned char Screen[160][200];
-    unsigned char X, Y;
+    unsigned X, Y;
 
-    /* Koala pictures are always 160x200 in size with 16 colors */
+    /* Sprites pictures are always 24x21 in size with 2 colors */
     if (GetBitmapType (B)   != bmIndexed ||
-        GetBitmapColors (B) > 16         ||
+        GetBitmapColors (B) != 2         ||
         GetBitmapHeight (B) != HEIGHT    ||
         GetBitmapWidth (B)  != WIDTH) {
 
-        Error ("Bitmaps converted to koala format must be in indexed mode "
-               "with 16 colors max and a size of %ux%u", WIDTH, HEIGHT);
-    }
-
-    /* Read the image into Screen */
-    for (Y = 0; Y < HEIGHT; ++Y) {
-        for (X = 0; X < WIDTH; ++X) {
-            Screen[X][Y] = (unsigned char) GetPixel (B, X, Y).Index;
-        }
+        Error ("Bitmaps converted to vic2 sprite format must be in indexed "
+               "mode with 2 colors max and a size of %ux%u", WIDTH, HEIGHT);
     }
 
     /* Create the output buffer and resize it to the required size. */
     D = NewStrBuf ();
-    SB_Realloc (D, 10003);
+    SB_Realloc (D, 63);
 
-    /* Add $4400 as load address */
-    SB_AppendChar (D, 0x00);
-    SB_AppendChar (D, 0x44);
+    /* Convert the image */
+    for (Y = 0; Y < HEIGHT; ++Y) {
+        unsigned char V = 0;
+        for (X = 0; X < WIDTH; ++X) {
+
+            /* Fetch next bit into byte buffer */
+            V = (V << 1) | (GetPixel (B, X, Y).Index != 0);
+
+            /* Store full bytes into the output buffer */
+            if ((X & 0x07) == 0x07) {
+                SB_AppendChar (D, V);
+                V = 0;
+            }
+        }
+    }
 
     /* Return the converted bitmap */
     return D;

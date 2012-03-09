@@ -34,7 +34,8 @@ OBJS = 	asm.o           \
 	main.o          \
         output.o        \
         palette.o       \
-        pcx.o
+        pcx.o           \
+        vic2sprite.o
 
 LIBS = $(COMMON)/common.a
 

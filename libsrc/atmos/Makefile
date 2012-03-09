@@ -79,7 +79,7 @@ JOYS = atmos-pase.joy
 
 MOUS =
 
-SERS =
+SERS = atmos-acia.ser
 
 TGIS = atmos-240-200-2.tgi
 

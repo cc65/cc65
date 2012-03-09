@@ -138,6 +138,7 @@ atmoslib:
 	    $(AR) a atmos.lib $$i/*.o || exit 1; \
 	done
 	cp atmos/*.joy .
+	cp atmos/*.ser .
 	cp atmos/*.tgi .
 	if [ -d atmos/extra ]; then \
 	    for i in atmos/extra/*.o; do \

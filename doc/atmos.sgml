@@ -130,7 +130,16 @@ No mouse drivers are currently available for the Atmos.
 
 <sect1>RS232 device drivers<p>
 
-No serial drivers are currently available for the Atmos.
+<descrip>
+
+  <tag><tt/atmos-acia.ser/</tag>
+  Driver for the Telestrat integrated serial controller and the Atmos with a
+  serial add-on.
+  Note that because of the peculiarities of the 6551 chip together with the
+  use of the NMI, transmits are not interrupt driven, and the transceiver
+  blocks if the receiver asserts flow control because of a full buffer.
+  
+</descrip><p>
 
 
 

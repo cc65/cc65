@@ -40,6 +40,7 @@
 
 /* sp65 */
 #include "asm.h"
+#include "attr.h"
 #include "bin.h"
 #include "error.h"
 #include "output.h"
@@ -56,7 +57,7 @@ typedef struct OutputFormatDesc OutputFormatDesc;
 struct OutputFormatDesc {
 
     /* Write routine */
-    void (*Write) (const char* Name, const StrBuf* Data);
+    void (*Write) (const StrBuf*, const Collection*);
 
 };
 
@@ -90,46 +91,39 @@ static const FileId FormatTable[] = {
 
 
 
-int FindOutputFormat (const char* Name)
-/* Find an output format by name. The function returns a value less than zero
- * if Name is not a known output format.
+void WriteOutputFile (const StrBuf* Data, const Collection* A)
+/* Write the contents of Data to a file. Format, file name etc. must be given
+ * as attributes in A. If no format is given, the function tries to autodetect
+ * it by using the extension of the file name.
  */
 {
-    /* Search for the entry in the table. */
-    const FileId* F = bsearch (Name,
-                               FormatTable,
-                               sizeof (FormatTable) / sizeof (FormatTable[0]),
-                               sizeof (FormatTable[0]),
-                               CompareFileId);
+    const FileId* F;
 
-    /* Return the id or an error code */
-    return (F == 0)? -1 : F->Id;
-}
-
-
-
-void WriteOutputFile (const char* Name, const StrBuf* Data, OutputFormat Format)
-/* Write the contents of Data to the given file in the format specified. If
- * the format is ofAuto, it is determined by the file extension.
- */
-{
-    /* If the format is Auto, try to determine it from the file name */
-    if (Format == ofAuto) {
-        /* Search for the entry in the table */
-        const FileId* F = GetFileId (Name, FormatTable,
-                                     sizeof (FormatTable) / sizeof (FormatTable[0]));
+    /* Get the file format from the command line */
+    const char* Format = GetAttrVal (A, "format");
+    if (Format != 0) {
+        /* Format is given, search for it in the table. */
+        F = bsearch (Format,
+                     FormatTable,
+                     sizeof (FormatTable) / sizeof (FormatTable[0]),
+                     sizeof (FormatTable[0]),
+                     CompareFileId);
+        if (F == 0) {
+            Error ("Unknown output format `%s'", Format);
+        }
+    } else {
+        /* No format given, use file name extension */
+        const char* Name = NeedAttrVal (A, "name", "write");
+        F = GetFileId (Name, FormatTable,
+                       sizeof (FormatTable) / sizeof (FormatTable[0]));
         /* Found? */
         if (F == 0) {
             Error ("Cannot determine file format of output file `%s'", Name);
         }
-        Format = F->Id;
     }
 
-    /* Check the format just for safety */
-    CHECK (Format >= 0 && Format < ofCount);
-
     /* Call the format specific write */
-    OutputFormatTable[Format].Write (Name, Data);
+    OutputFormatTable[F->Id].Write (Data, A);
 }
 
 

@@ -67,14 +67,10 @@ typedef enum OutputFormat OutputFormat;
 
 
 
-int FindOutputFormat (const char* Name);
-/* Find an output format by name. The function returns a value less than zero
- * if Name is not a known output format.
- */
-
-void WriteOutputFile (const char* Name, const StrBuf* Data, OutputFormat Format);
-/* Write the contents of Data to the given file in the format specified. If
- * the format is ofAuto, it is determined by the file extension.
+void WriteOutputFile (const StrBuf* Data, const Collection* A);
+/* Write the contents of Data to a file. Format, file name etc. must be given
+ * as attributes in A. If no format is given, the function tries to autodetect
+ * it by using the extension of the file name.
  */
 
 

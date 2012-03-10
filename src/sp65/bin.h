@@ -39,6 +39,7 @@
 
 
 /* common */
+#include "coll.h"
 #include "strbuf.h"
 
 
@@ -49,8 +50,8 @@
 
 
 
-void WriteBinFile (const char* Name, const StrBuf* Data);
-/* Write the contents of Data to the given file in binary format */
+void WriteBinFile (const StrBuf* Data, const Collection* A);
+/* Write the contents of Data to a file in binary format */
 
 
 

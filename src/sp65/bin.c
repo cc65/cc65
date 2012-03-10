@@ -38,6 +38,7 @@
 #include <string.h>
 
 /* sp65 */
+#include "attr.h"
 #include "bin.h"
 #include "error.h"
 
@@ -49,10 +50,13 @@
 
 
 
-void WriteBinFile (const char* Name, const StrBuf* Data)
+void WriteBinFile (const StrBuf* Data, const Collection* A)
 /* Write the contents of Data to the given file in binary format */
 {
     unsigned Size;
+
+    /* Get the file name */
+    const char* Name = NeedAttrVal (A, "name", "write");
 
     /* Open the output file */
     FILE* F = fopen (Name, "wb");

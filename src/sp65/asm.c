@@ -42,6 +42,7 @@
 #include "version.h"
 
 /* sp65 */
+#include "attr.h"
 #include "bin.h"
 #include "error.h"
 
@@ -53,14 +54,28 @@
 
 
 
-void WriteAsmFile (const char* Name, const StrBuf* Data)
+void WriteAsmFile (const StrBuf* Data, const Collection* A)
 /* Write the contents of Data to the given file in assembler (ca65) format */
 {
+    FILE*       F;
     const char* D;
     unsigned    Size;
+    unsigned    BytesPerLine = 16;
+    char        C;
+
+
+    /* Get the file name */
+    const char* Name = NeedAttrVal (A, "name", "write");
+
+    /* Check for a bytesperline attribute */
+    const char* V = GetAttrVal (A, "bytesperline");
+    if ((V && sscanf (V, "%u%c", &BytesPerLine, &C) != 1) || 
+        (BytesPerLine < 1 || BytesPerLine > 64)) {
+        Error ("Invalid value for attribute `bytesperline'");
+    }
 
     /* Open the output file */
-    FILE* F = fopen (Name, "w");
+    F = fopen (Name, "w");
     if (F == 0) {
         Error ("Cannot open output file `%s': %s", Name, strerror (errno));
     }
@@ -83,8 +98,8 @@ void WriteAsmFile (const char* Name, const StrBuf* Data)
 
         /* Output one line */
         unsigned Chunk = Size;
-        if (Chunk > 16) {
-            Chunk = 16;
+        if (Chunk > BytesPerLine) {
+            Chunk = BytesPerLine;         
         }
         fprintf (F, "        .byte   $%02X", (*D++ & 0xFF));
         for (I = 1; I < Chunk; ++I) {

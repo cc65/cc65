@@ -39,6 +39,7 @@
 
 
 /* common */
+#include "coll.h"
 #include "strbuf.h"
 
 
@@ -49,8 +50,8 @@
 
 
 
-void WriteAsmFile (const char* Name, const StrBuf* Data);
-/* Write the contents of Data to the given file in assembler (ca65) format */
+void WriteAsmFile (const StrBuf* Data, const Collection* A);
+/* Write the contents of Data to a file in assembler (ca65) format */
 
 
 

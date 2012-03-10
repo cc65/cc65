@@ -272,7 +272,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
-static void OptWrite (const char* Opt, const char* Arg)
+static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
 /* Write an output file */
 {
     static const char* NameList[] = {
@@ -283,21 +283,8 @@ static void OptWrite (const char* Opt, const char* Arg)
     /* Parse the argument */
     Collection* A = ParseAttrList (Arg, NameList, 2);
 
-    /* Must have a file name given */
-    const char* FileName = NeedAttrVal (A, "name", Opt);
-
-    /* Determine the format of the input file */
-    int OF = ofAuto;
-    const char* Format = GetAttrVal (A, "format");
-    if (Format != 0) {
-        OF = FindOutputFormat (Format);
-        if (OF < 0) {
-            Error ("Unknown output format `%s'", Format);
-        }
-    }
-
     /* Write the file */
-    WriteOutputFile (FileName, D, OF);
+    WriteOutputFile (D, A);
 
     /* Delete the attribute list */
     FreeCollection (A);

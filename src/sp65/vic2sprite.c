@@ -35,6 +35,7 @@
 
 /* common */
 #include "attrib.h"
+#include "print.h"
 
 /* sp65 */
 #include "error.h"
@@ -69,13 +70,18 @@ StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A attribute ((unused))
     StrBuf* D;
     unsigned X, Y;
 
+
+    /* Output the image properties */
+    Print (stdout, 1, "Image is %ux%u with %u colors%s\n",
+           GetBitmapWidth (B), GetBitmapHeight (B), GetBitmapColors (B),
+           (GetBitmapType (B) == bmIndexed)? " (indexed)" : "");
+
     /* Sprites pictures are always 24x21 in size with 2 colors */
     if (GetBitmapType (B)   != bmIndexed ||
         GetBitmapColors (B) != 2         ||
         GetBitmapHeight (B) != HEIGHT    ||
         GetBitmapWidth (B)  != WIDTH) {
-                                                        
-        printf ("w = %u, h = %u\n", GetBitmapWidth (B), GetBitmapHeight (B));
+
         Error ("Bitmaps converted to vic2 sprite format must be in indexed "
                "mode with a size of %ux%u and two colors", WIDTH, HEIGHT);
     }

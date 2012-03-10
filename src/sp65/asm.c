@@ -38,6 +38,7 @@
 #include <string.h>
 
 /* common */
+#include "check.h"
 #include "cmdline.h"
 #include "version.h"
 
@@ -60,6 +61,7 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A)
     FILE*       F;
     const char* D;
     unsigned    Size;
+    unsigned    Base = 16;
     unsigned    BytesPerLine = 16;
     char        C;
 
@@ -69,9 +71,16 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A)
 
     /* Check for a bytesperline attribute */
     const char* V = GetAttrVal (A, "bytesperline");
-    if ((V && sscanf (V, "%u%c", &BytesPerLine, &C) != 1) || 
+    if ((V && sscanf (V, "%u%c", &BytesPerLine, &C) != 1) ||
         (BytesPerLine < 1 || BytesPerLine > 64)) {
         Error ("Invalid value for attribute `bytesperline'");
+    }
+
+    /* Check for a base attribute */
+    V = GetAttrVal (A, "base");
+    if ((V && sscanf (V, "%u%c", &Base, &C) != 1) ||
+        (Base != 2 && Base != 10 && Base != 16)) {
+        Error ("Invalid value for attribute `base'");
     }
 
     /* Open the output file */
@@ -99,11 +108,32 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A)
         /* Output one line */
         unsigned Chunk = Size;
         if (Chunk > BytesPerLine) {
-            Chunk = BytesPerLine;         
+            Chunk = BytesPerLine;
         }
-        fprintf (F, "        .byte   $%02X", (*D++ & 0xFF));
-        for (I = 1; I < Chunk; ++I) {
-            fprintf (F, ",%02X", (*D++ & 0xFF));
+        fputs ("        .byte   ", F);
+        for (I = 0; I < Chunk; ++I) {
+            unsigned char V = *D++;
+            if (I > 0) {
+                fputc (',', F);
+            }
+            switch (Base) {
+                case 2:
+                    fprintf (F, "%%%u%u%u%u%u%u%u%u",
+                             (V >> 7) & 0x01, (V >> 6) & 0x01,
+                             (V >> 5) & 0x01, (V >> 4) & 0x01,
+                             (V >> 3) & 0x01, (V >> 2) & 0x01,
+                             (V >> 1) & 0x01, (V >> 0) & 0x01);
+                    break;
+
+                case 10:
+                    fprintf (F, "%u", V);
+                    break;
+
+                case 16:
+                    fprintf (F, "$%02X", V);
+                    break;
+
+            }
         }
         fputc ('\n', F);
 

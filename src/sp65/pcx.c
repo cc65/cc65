@@ -42,6 +42,7 @@
 #include "xmalloc.h"
 
 /* sp65 */
+#include "attr.h"
 #include "error.h"
 #include "fileio.h"
 #include "pcx.h"

@@ -196,7 +196,7 @@ static void OptPop (const char* Opt attribute ((unused)),
 
 
 
-static void OptRead (const char* Opt, const char* Arg)
+static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
 /* Read an input file */
 {
     static const char* NameList[] = {

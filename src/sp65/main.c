@@ -373,6 +373,11 @@ int main (int argc, char* argv [])
 	++I;
     }
 
+    /* Cleanup data */
+    FreeBitmap (B);
+    FreeBitmap (C);
+    FreeStrBuf (D);
+
     /* Success */
     return EXIT_SUCCESS;
 }

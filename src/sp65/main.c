@@ -85,6 +85,7 @@ static void Usage (void)
        	    "  -V\t\t\t\tPrint the version number and exit\n"
             "  -c fmt[,attrlist]\t\tConvert into target format\n"
        	    "  -h\t\t\t\tHelp (this text)\n"
+            "  -lc\t\t\t\tList all possible conversions\n"
             "  -r file[,attrlist]\t\tRead an input file\n"
             "  -v\t\t\t\tIncrease verbosity\n"
             "  -w file[,attrlist]\t\tWrite the output to a file\n"
@@ -92,6 +93,7 @@ static void Usage (void)
 	    "Long options:\n"
             "  --convert-to fmt[,attrlist]\tConvert into target format\n"
     	    "  --help\t\t\tHelp (this text)\n"
+            "  --list-conversions\t\tList all possible conversions\n"
             "  --pop\t\t\t\tRestore the original loaded image\n"
             "  --read file[,attrlist]\tRead an input file\n"
             "  --slice x,y,w,h\t\tGenerate a slice from the loaded bitmap\n"
@@ -164,6 +166,16 @@ static void OptHelp (const char* Opt attribute ((unused)),
 /* Print usage information and exit */
 {
     Usage ();
+    exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptListConversions (const char* Opt attribute ((unused)),
+		                const char* Arg attribute ((unused)))
+/* Print a list of all conversions */
+{
+    ListConversionTargets (stdout);
     exit (EXIT_SUCCESS);
 }
 
@@ -299,6 +311,7 @@ int main (int argc, char* argv [])
     static const LongOpt OptTab[] = {
         { "--convert-to",       1,      OptConvertTo            },
 	{ "--help",    		0,	OptHelp			},
+        { "--list-conversions", 0,      OptListConversions      },
         { "--pop",              0,      OptPop                  },
         { "--read",             1,      OptRead                 },
         { "--slice",            1,      OptSlice                },
@@ -320,24 +333,32 @@ int main (int argc, char* argv [])
        	const char* Arg = ArgVec[I];
 
        	/* Check for an option */
-       	if (Arg [0] == '-') {
-       	    switch (Arg [1]) {
+       	if (Arg[0] == '-') {
+       	    switch (Arg[1]) {
 
-	 	case '-':
-	 	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-	 	    break;
+	       	case '-':
+	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+	       	    break;
 
        	        case 'V':
-    		    OptVersion (Arg, 0);
-       		    break;
+    	       	    OptVersion (Arg, 0);
+       	       	    break;
 
                 case 'c':
                     OptConvertTo (Arg, GetArg (&I, 2));
                     break;
 
-	 	case 'h':
-	 	    OptHelp (Arg, 0);
-	 	    break;
+	       	case 'h':
+	       	    OptHelp (Arg, 0);
+	       	    break;
+
+                case 'l':
+                    if (Arg[2] == 'c') {                       
+                        OptListConversions (Arg, 0);
+                    } else {
+                        UnknownOption (Arg);
+                    }
+                    break;
 
                 case 'r':
                     OptRead (Arg, GetArg (&I, 2));

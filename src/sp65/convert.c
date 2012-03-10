@@ -107,3 +107,12 @@ StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
 
 
 
+void ListConversionTargets (FILE* F)
+/* Output a list of conversion targets */
+{
+    unsigned I;
+    for (I = 0; I < sizeof (ConverterMap) / sizeof (ConverterMap[0]); ++I) {
+        fprintf (F, "  %s\n", ConverterMap[I].Format);
+    }
+}
+                

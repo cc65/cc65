@@ -38,6 +38,8 @@
 
 
 
+#include <stdio.h>
+
 /* common */
 #include "coll.h"
 #include "strbuf.h"
@@ -59,6 +61,9 @@ StrBuf* ConvertTo (const Bitmap* B, const Collection* A);
  * returned. The actual output format is taken from the "format" attribute
  * in the attribute collection A.
  */
+
+void ListConversionTargets (FILE* F);
+/* Output a list of conversion targets */
 
 
 

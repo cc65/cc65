@@ -38,6 +38,7 @@
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
 #include "cmdline.h"
 #include "version.h"
@@ -55,19 +56,34 @@
 
 
 
-void WriteAsmFile (const StrBuf* Data, const Collection* A)
-/* Write the contents of Data to the given file in assembler (ca65) format */
+static int ValidAsmLabel (const char* L)
+/* Check an assembler label for validity */
 {
-    FILE*       F;
-    const char* D;
-    unsigned    Size;
-    unsigned    Base = 16;
-    unsigned    BytesPerLine = 16;
+    /* Must begin with underscore or alphabetic character */
+    if (*L != '_' && !IsAlpha (*L)) {
+        return 0;
+    }
+    ++L;
+
+    /* Remainder must be as above plus digits */
+    while (*L) {
+        if (*L != '_' && !IsAlNum (*L)) {
+            return 0;
+        }
+        ++L;
+    }
+
+    /* Ok */
+    return 1;
+}
+
+
+
+static unsigned GetBytesPerLine (const Collection* A)
+/* Return the number of bytes per line from the attribute collection A */
+{
     char        C;
-
-
-    /* Get the file name */
-    const char* Name = NeedAttrVal (A, "name", "write");
+    unsigned    BytesPerLine = 16;
 
     /* Check for a bytesperline attribute */
     const char* V = GetAttrVal (A, "bytesperline");
@@ -75,13 +91,76 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A)
         (BytesPerLine < 1 || BytesPerLine > 64)) {
         Error ("Invalid value for attribute `bytesperline'");
     }
+    return BytesPerLine;
+}
+
+
+
+static unsigned GetBase (const Collection* A)
+/* Return the number base from the attribute collection A */
+{
+    char        C;
+    unsigned    Base = 16;
 
     /* Check for a base attribute */
-    V = GetAttrVal (A, "base");
+    const char* V = GetAttrVal (A, "base");
     if ((V && sscanf (V, "%u%c", &Base, &C) != 1) ||
         (Base != 2 && Base != 10 && Base != 16)) {
         Error ("Invalid value for attribute `base'");
     }
+    return Base;
+}
+
+
+
+static const char* GetLabel (const Collection* A)
+/* Return the assembler label from the attribute collection A */
+{
+    /* Check for a label attribute */
+    const char* Label = GetAttrVal (A, "label");
+    if (Label && !ValidAsmLabel (Label)) {
+        Error ("Invalid value for attribute `label'");
+    }
+    return Label;
+}
+
+
+
+static const char* GetSegment (const Collection* A)
+/* Return the segment name from the attribute collection A */
+{
+    /* Check for a label attribute */
+    const char* Seg = GetAttrVal (A, "segment");
+    if (Seg && !ValidAsmLabel (Seg)) {
+        Error ("Invalid value for attribute `segment'");
+    }
+    return Seg;
+}
+
+
+
+void WriteAsmFile (const StrBuf* Data, const Collection* A)
+/* Write the contents of Data to the given file in assembler (ca65) format */
+{
+    FILE*       F;
+    const char* D;
+    unsigned    Size;
+
+
+    /* Get the file name */
+    const char* Name = NeedAttrVal (A, "name", "write");
+
+    /* Check the number of bytes per line */
+    unsigned BytesPerLine = GetBytesPerLine (A);
+
+    /* Get the number base */
+    unsigned Base = GetBase (A);
+
+    /* Get the assembler label */
+    const char* Label = GetLabel (A);
+
+    /* Get the segment */
+    const char* Segment = GetSegment (A);
 
     /* Open the output file */
     F = fopen (Name, "w");
@@ -97,6 +176,17 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A)
              "\n",
              ProgName,
              GetVersionAsString ());
+
+
+    /* If we have a segment defined, output a segment directive */
+    if (Segment) {
+        fprintf (F, ".segment        \"%s\"\n\n", Segment);
+    }
+
+    /* If we have an assembler label, output that */
+    if (Label) {
+        fprintf (F, "%s:\n", Label);
+    }
 
     /* Write the data */
     D    = SB_GetConstBuf (Data);

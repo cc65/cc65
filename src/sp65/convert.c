@@ -33,10 +33,35 @@
 
 
 
+#include <stdlib.h>
+
 /* sp65 */
+#include "attr.h"
 #include "convert.h"
+#include "error.h"
 #include "koala.h"
 #include "vic2sprite.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Type of the entry in the converter table */
+typedef struct ConverterMapEntry ConverterMapEntry;
+struct ConverterMapEntry {
+    const char*         Format;
+    StrBuf*             (*ConvertFunc) (const Bitmap*, const Collection*);
+};
+
+/* Converter table, alphabetically sorted */
+static const ConverterMapEntry ConverterMap[] = {
+    {   "koala",                GenKoala        },
+    {   "vic2-sprite",          GenVic2Sprite   },
+};
 
 
 
@@ -46,13 +71,38 @@
 
 
 
+static int Compare (const void* Key, const void* MapEntry)
+/* Compare function for bsearch */
+{
+    return strcmp (Key, ((const ConverterMapEntry*) MapEntry)->Format);
+}
+
+
+
 StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
 /* Convert the bitmap B into some sort of other binary format. The output is
  * stored in a string buffer (which is actually a dynamic char array) and
  * returned. The actual output format is taken from the "format" attribute
  * in the attribute collection A.
- */                                                     
+ */
 {
+    const ConverterMapEntry* E;
+
+    /* Get the format to convert to */
+    const char* Format = NeedAttrVal (A, "format", "convert");
+
+    /* Search for the matching converter */
+    E = bsearch (Format,
+                 ConverterMap,
+                 sizeof (ConverterMap) / sizeof (ConverterMap[0]),
+                 sizeof (ConverterMap[0]),
+                 Compare);
+    if (E == 0) {
+        Error ("No such target format: `%s'", Format);
+    }
+
+    /* Do the conversion */
+    return E->ConvertFunc (B, A);
 }
 
 

@@ -156,16 +156,16 @@ const Attr* GetAttr (const Collection* C, const char* Name)
 
 
 
-const Attr* NeedAttr (const Collection* C, const char* Name, const char* Context)
+const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op)
 /* Search for an attribute with the given name and return it. If the attribute
- * is not found, the function terminates with an error using Context as
- * additional context in the error message.
+ * is not found, the function terminates with an error using Op as additional 
+ * context in the error message.
  */
 {
     /* Search for the attribute and return it */
     unsigned Index;
     if (!FindAttr (C, Name, &Index)) {
-        Error ("Found no attribute named `%s' in %s", Name, Context);
+        Error ("Found no attribute named `%s' for operation %s", Name, Op);
     }
     return CollConstAt (C, Index);
 }
@@ -183,13 +183,13 @@ const char* GetAttrVal (const Collection* C, const char* Name)
 
 
 
-const char* NeedAttrVal (const Collection* C, const char* Name, const char* Context)
+const char* NeedAttrVal (const Collection* C, const char* Name, const char* Op)
 /* Search for an attribute with the given name and return its value. If the
  * attribute wasn't not found, the function terminates with an error using
- * Context as additional context in the error message.
+ * Op as additional context in the error message.
  */
 {
-    const Attr* A = NeedAttr (C, Name, Context);
+    const Attr* A = NeedAttr (C, Name, Op);
     return (A == 0)? 0 : A->Value;
 }
 

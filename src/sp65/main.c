@@ -297,7 +297,7 @@ static void OptWrite (const char* Opt, const char* Arg)
     }
 
     /* Write the file */
-    WriteOutputFile (FileName, 0, OF);
+    WriteOutputFile (FileName, D, OF);
 
     /* Delete the attribute list */
     FreeCollection (A);

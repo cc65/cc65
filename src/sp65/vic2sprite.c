@@ -74,9 +74,10 @@ StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A attribute ((unused))
         GetBitmapColors (B) != 2         ||
         GetBitmapHeight (B) != HEIGHT    ||
         GetBitmapWidth (B)  != WIDTH) {
-
+                                                        
+        printf ("w = %u, h = %u\n", GetBitmapWidth (B), GetBitmapHeight (B));
         Error ("Bitmaps converted to vic2 sprite format must be in indexed "
-               "mode with 2 colors max and a size of %ux%u", WIDTH, HEIGHT);
+               "mode with a size of %ux%u and two colors", WIDTH, HEIGHT);
     }
 
     /* Create the output buffer and resize it to the required size. */

@@ -49,19 +49,11 @@
 
 
 
-/* Attribute flags */
-enum AttrFlags {
-    afNone,
-    afInt,                              /* Integer number */
-};
-typedef enum AttrFlags AttrFlags;
-
-/* */
+/* Attribute structure */
 typedef struct Attr Attr;
 struct Attr {
-    AttrFlags   Flags;                  /* Attribute flags */
-    char*       Name;                   /* Attribute name */
-    char        Value[1];               /* Attribute value */
+    char*       Name;           /* Attribute name - points into Value */
+    char        Value[1];       /* Attribute value followed by Name */
 };
 
 

@@ -53,33 +53,20 @@
 
 
 
-static int IsNumber (const char* Value)
-/* Check if Value is an integer number */
-{
-    if (*Value == '-' || *Value == '+') {
-        ++Value;
-    }
-    while (IsDigit (*Value)) {
-        ++Value;
-    }
-    return (*Value == '\0');
-}
-
-
-
 Attr* NewAttr (const char* Name, const char* Value)
 /* Create a new attribute */
 {
-    /* Determine the length of Value */
-    unsigned Len = strlen (Value);
+    /* Determine the string lengths */
+    unsigned NameLen  = strlen (Name);
+    unsigned ValueLen = strlen (Value);
 
     /* Allocate memory */
-    Attr* A = xmalloc (sizeof (Attr) + Len);
+    Attr* A = xmalloc (sizeof (Attr) + ValueLen + NameLen + 1);
 
     /* Initialize the fields */
-    A->Flags = IsNumber (Value)? afInt : afNone;
-    A->Name  = xstrdup (Name);
-    memcpy (A->Value, Value, Len + 1);
+    A->Name = A->Value + ValueLen + 1;
+    memcpy (A->Value, Value, ValueLen + 1);
+    memcpy (A->Name, Name, NameLen + 1);
 
     /* Return the new struct */
     return A;
@@ -90,11 +77,7 @@ Attr* NewAttr (const char* Name, const char* Value)
 void FreeAttr (Attr* A)
 /* Free an attribute structure */
 {
-    /* Allow NULL pointers */
-    if (A) {
-        xfree (A->Name);
-        xfree (A);
-    }
+    xfree (A);
 }
 
 
@@ -309,7 +292,7 @@ Collection* ParseAttrList (const char* List, const char** NameList, unsigned Nam
 
 
 void FreeAttrList (Collection* C)
-/* Free a list of attributes */  
+/* Free a list of attributes */
 {
     unsigned I;
 

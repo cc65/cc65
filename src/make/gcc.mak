@@ -11,7 +11,8 @@ PROGS =		\
 	da65	\
        	grc65   \
 	ld65	\
-	od65
+	od65    \
+        sp65
 
 SUBDIRS	= common $(PROGS)
 

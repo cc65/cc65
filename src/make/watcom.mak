@@ -12,7 +12,8 @@ SUBDIRS =	  	\
         da65            \
 	grc65    	\
 	ld65		\
-	od65
+	od65            \
+        sp65
 
 all:	win32
 

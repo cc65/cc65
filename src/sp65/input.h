@@ -38,25 +38,11 @@
 
 
 
+/* common */
+#include "coll.h"
+
 /* sp65 */
 #include "bitmap.h"
-
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-enum InputFormat {
-    ifAuto      = -1,           /* Auto detect */
-    ifPCX,                      /* PCX */
-
-    ifCount                     /* Number of actual input formats w/o ifAuto*/
-};
-typedef enum InputFormat InputFormat;
-
 
 
 
@@ -66,14 +52,10 @@ typedef enum InputFormat InputFormat;
 
 
 
-int FindInputFormat (const char* Name);
-/* Find an input format by name. The function returns a value less than zero
- * if Name is not a known input format.
- */
-
-Bitmap* ReadInputFile (const char* Name, InputFormat Format);
-/* Read a bitmap from a file and return it. If Format is ifAuto, the routine
- * tries to determine the format from the file name extension.
+Bitmap* ReadInputFile (const Collection* A);
+/* Read a bitmap from a file and return it. Format, file name etc. must be
+ * given as attributes in A. If no format is given, the function tries to
+ * autodetect it by using the extension of the file name.
  */
 
 

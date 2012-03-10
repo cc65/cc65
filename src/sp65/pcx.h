@@ -38,6 +38,9 @@
 
 
 
+/* common */
+#include "coll.h"
+
 /* sp65 */
 #include "bitmap.h"
 
@@ -49,7 +52,7 @@
 
 
 
-Bitmap* ReadPCXFile (const char* Name);
+Bitmap* ReadPCXFile (const Collection* A);
 /* Read a bitmap from a PCX file */
 
 

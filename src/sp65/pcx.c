@@ -243,7 +243,7 @@ static void ReadPlane (FILE* F, PCXHeader* P, unsigned char* L)
 
 
 
-Bitmap* ReadPCXFile (const char* Name)
+Bitmap* ReadPCXFile (const Collection* A)
 /* Read a bitmap from a PCX file */
 {
     PCXHeader* P;
@@ -254,6 +254,8 @@ Bitmap* ReadPCXFile (const char* Name)
     unsigned X, Y;
 
 
+    /* Get the file name */
+    const char* Name = NeedAttrVal (A, "name", "read pcx file");
 
     /* Open the file */
     FILE* F = fopen (Name, "rb");

@@ -207,19 +207,6 @@ static void OptRead (const char* Opt, const char* Arg)
     /* Parse the argument */
     Collection* A = ParseAttrList (Arg, NameList, 2);
 
-    /* Must have a file name given */
-    const char* FileName = NeedAttrVal (A, "name", Opt);
-
-    /* Determine the format of the input file */
-    int IF = ifAuto;
-    const char* Format = GetAttrVal (A, "format");
-    if (Format != 0) {
-        IF = FindInputFormat (Format);
-        if (IF < 0) {
-            Error ("Unknown input format `%s'", Format);
-        }
-    }
-
     /* Clear the working copy */
     SetWorkBitmap (0);
 
@@ -227,7 +214,7 @@ static void OptRead (const char* Opt, const char* Arg)
     FreeBitmap (B);
 
     /* Read the file and use it as original and as working copy */
-    B = C = ReadInputFile (FileName, IF);
+    B = C = ReadInputFile (A);
 
     /* Delete the attribute list */
     FreeCollection (A);
@@ -353,7 +340,7 @@ int main (int argc, char* argv [])
 	       	    break;
 
                 case 'l':
-                    if (Arg[2] == 'c') {                       
+                    if (Arg[2] == 'c') {
                         OptListConversions (Arg, 0);
                     } else {
                         UnknownOption (Arg);

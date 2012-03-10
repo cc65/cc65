@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -115,8 +115,11 @@ StrBuf* NewStrBuf (void)
 void FreeStrBuf (StrBuf* B)
 /* Free a string buffer */
 {
-    SB_Done (B);
-    xfree (B);
+    /* Allow NULL pointers */
+    if (B) {
+        SB_Done (B);
+        xfree (B);
+    }
 }
 
 
@@ -179,7 +182,7 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
 
     /* Allocate a fresh block */
     B->Buf = xmalloc (NewAllocated);
-               
+
     /* Remember the new block size */
     B->Allocated = NewAllocated;
 }
@@ -225,7 +228,7 @@ void SB_Terminate (StrBuf* B)
 
 void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
 /* Copy Buf to Target, discarding the old contents of Target */
-{    
+{
     if (Size) {
         if (Target->Allocated < Size) {
             SB_CheapRealloc (Target, Size);

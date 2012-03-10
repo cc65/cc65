@@ -87,6 +87,18 @@ Attr* NewAttr (const char* Name, const char* Value)
 
 
 
+void FreeAttr (Attr* A)
+/* Free an attribute structure */
+{
+    /* Allow NULL pointers */
+    if (A) {
+        xfree (A->Name);
+        xfree (A);
+    }
+}
+
+
+
 void DumpAttrColl (const Collection* C)
 /* Dump a collection of attribute/value pairs for debugging */
 {
@@ -240,7 +252,7 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
 
         /* Release memory */
         SB_Done (&N);
-    }                                 
+    }
 }
 
 
@@ -292,6 +304,22 @@ Collection* ParseAttrList (const char* List, const char** NameList, unsigned Nam
 
     /* Return the collection with the attributes */
     return C;
+}
+
+
+
+void FreeAttrList (Collection* C)
+/* Free a list of attributes */  
+{
+    unsigned I;
+
+    /* Walk over the collection and free all attributes */
+    for (I = 0; I < CollCount (C); ++I) {
+        FreeAttr (CollAtUnchecked (C, I));
+    }
+
+    /* Free the collection itself */
+    FreeCollection (C);
 }
 
 

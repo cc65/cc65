@@ -437,6 +437,9 @@ Bitmap* ReadPCXFile (const Collection* A)
     /* Close the file */
     fclose (F);
 
+    /* Free memory for the scan line */
+    xfree (L);
+
     /* Free the PCX header */
     FreePCXHeader (P);
 

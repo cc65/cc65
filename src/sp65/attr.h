@@ -75,6 +75,9 @@ struct Attr {
 Attr* NewAttr (const char* Name, const char* Value);
 /* Create a new attribute */
 
+void FreeAttr (Attr* A);
+/* Free an attribute structure */
+
 void DumpAttrColl (const Collection* C);
 /* Dump a collection of attribute/value pairs for debugging */
 
@@ -92,7 +95,7 @@ const Attr* GetAttr (const Collection* C, const char* Name);
 
 const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op);
 /* Search for an attribute with the given name and return it. If the attribute
- * is not found, the function terminates with an error using Op as additional 
+ * is not found, the function terminates with an error using Op as additional
  * context in the error message.
  */
 
@@ -122,6 +125,9 @@ Collection* ParseAttrList (const char* List, const char** NameList, unsigned Nam
  * were no errors, the function returns a alphabetically sorted collection
  * containing Attr entries.
  */
+
+void FreeAttrList (Collection* C);
+/* Free a list of attributes */
 
 
 

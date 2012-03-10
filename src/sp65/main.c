@@ -156,7 +156,7 @@ static void OptConvertTo (const char* Opt attribute ((unused)), const char* Arg)
     SetOutputData (ConvertTo (C, A));
 
     /* Delete the attribute list */
-    FreeCollection (A);
+    FreeAttrList (A);
 }
 
 
@@ -217,7 +217,7 @@ static void OptRead (const char* Opt attribute ((unused)), const char* Arg)
     B = C = ReadInputFile (A);
 
     /* Delete the attribute list */
-    FreeCollection (A);
+    FreeAttrList (A);
 }
 
 
@@ -286,7 +286,7 @@ static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
     WriteOutputFile (D, A);
 
     /* Delete the attribute list */
-    FreeCollection (A);
+    FreeAttrList (A);
 }
 
 

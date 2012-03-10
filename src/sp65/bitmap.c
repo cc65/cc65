@@ -81,7 +81,8 @@ void FreeBitmap (Bitmap* B)
 {
     /* Alloc NULL pointers */
     if (B != 0) {
-        /* Free the palette and then the bitmap */
+        /* Free name, palette and then the bitmap */
+        SB_Done (&B->Name);
         xfree (B->Pal);
         xfree(B);
     }
@@ -190,7 +191,7 @@ unsigned GetBitmapColors (const Bitmap* B)
         case bmRGB:
         case bmRGBA:            return (1U << 24);
         default:                Internal ("Unknown bitmap type %u", B->Type);
-    }   
+    }
     /* NOTREACHED */
     return 0;
 }

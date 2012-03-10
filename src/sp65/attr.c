@@ -158,7 +158,7 @@ const Attr* GetAttr (const Collection* C, const char* Name)
 
 const Attr* NeedAttr (const Collection* C, const char* Name, const char* Op)
 /* Search for an attribute with the given name and return it. If the attribute
- * is not found, the function terminates with an error using Op as additional 
+ * is not found, the function terminates with an error using Op as additional
  * context in the error message.
  */
 {
@@ -240,7 +240,7 @@ void SplitAddAttr (Collection* C, const char* Combined, const char* Name)
 
         /* Release memory */
         SB_Done (&N);
-    }
+    }                                 
 }
 
 
@@ -261,7 +261,7 @@ Collection* ParseAttrList (const char* List, const char** NameList, unsigned Nam
     const char* L = List;
     StrBuf B = AUTO_STRBUF_INITIALIZER;
     while (1) {
-        if (*L == ',' || *L == '\0') {
+        if (*L == ',' || *L == ':' || *L == '\0') {
 
             /* Terminate the string */
             SB_Terminate (&B);

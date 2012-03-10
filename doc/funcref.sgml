@@ -4296,12 +4296,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Close the port and disable interrupts
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ ser_close (const struct ser_params* params);/
-<tag/Description/Open the port by setting the port parameters and enable interrupts.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
+<tag/Declaration/<tt/unsigned char ser_close (void);/
+<tag/Description/Close the port by clearing buffers and disable interrupts.
 <tag/Availability/cc65
 <tag/See also/Other serial functions.
 <tag/Example/
@@ -4409,7 +4405,7 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Load and install a serial driver.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/void __fastcall__ ser_load_driver (const char *name);/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_load_driver (const char *name);/
 <tag/Description/Load and install the driver by name.
 Will just load the driver and check if loading was successful.
 <tag/Limits/<itemize>
@@ -4490,7 +4486,7 @@ ser_put('A');
 <descrip>
 <tag/Function/Return the serial port status.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/unsigned char __fastcall__ ser_put (unsigned char* status);/
+<tag/Declaration/<tt/unsigned char __fastcall__ ser_status (unsigned char* status);/
 <tag/Description/Return the serial port status.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
@@ -4509,7 +4505,7 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Uninstall the currently loaded driver but do not unload it.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/void ser_uninstall (void);/
+<tag/Declaration/<tt/unsigned char ser_uninstall (void);/
 <tag/Description/Uninstall the currently loaded driver but do not unload it.
 <tag/Availability/cc65
 <tag/See also/Other serial functions.
@@ -4523,12 +4519,8 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Uninstall, then unload the currently loaded driver.
 <tag/Header/<tt/<ref id="serial.h" name="serial.h">/
-<tag/Declaration/<tt/void __fastcall__ ser_unload (void);/
+<tag/Declaration/<tt/unsigned char ser_unload (void);/
 <tag/Description/Uninstall, then unload the currently loaded driver.
-<tag/Limits/<itemize>
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
-</itemize>
 <tag/Availability/cc65
 <tag/See also/Other serial functions.
 <tag/Example/None.

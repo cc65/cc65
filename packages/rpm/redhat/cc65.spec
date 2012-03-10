@@ -49,6 +49,7 @@ packages in addition to the main package.
 %attr(755,root,root)        /usr/bin/da65
 %attr(755,root,root)        /usr/bin/ld65
 %attr(755,root,root)        /usr/bin/od65
+%attr(755,root,root)        /usr/bin/sp65
 %attr(755,root,root) %dir   %{_libdir}/cc65
 %attr(755,root,root) %dir   %{_libdir}/cc65/cfg
 %attr(755,root,root) %dir   %{_libdir}/cc65/emd
@@ -498,6 +499,7 @@ install -s -m 755 src/da65/da65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/grc65/grc65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT%{_bindir}
+install -s -m 755 src/od65/sp65 $RPM_BUILD_ROOT%{_bindir}
 
 # Libraries and includes
 install -m 644 libsrc/*.lib $RPM_BUILD_ROOT%{_libdir}/cc65/lib

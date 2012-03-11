@@ -38,6 +38,14 @@
 
 
 
+/* We need size_t */
+#ifndef _HAVE_size_t
+#define _HAVE_size_t
+typedef unsigned size_t;
+#endif
+
+
+
 /* Possible returns of getcpu() */
 #define CPU_6502	0
 #define CPU_65C02	1

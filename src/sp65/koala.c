@@ -71,7 +71,7 @@ StrBuf* GenKoala (const Bitmap* B, const Collection* A attribute ((unused)))
     unsigned char X, Y;
 
     /* Koala pictures are always 160x200 in size with 16 colors */
-    if (GetBitmapType (B)   != bmIndexed ||
+    if (!BitmapIsIndexed (B)             ||
         GetBitmapColors (B) > 16         ||
         GetBitmapHeight (B) != HEIGHT    ||
         GetBitmapWidth (B)  != WIDTH) {

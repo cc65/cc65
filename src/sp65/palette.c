@@ -86,7 +86,12 @@ Palette* NewMonochromePalette (void)
 
 Palette* DupPalette (const Palette* P)
 /* Create a copy of a palette */
-{                                      
+{
+    /* Allow to pass a NULL palette */
+    if (P == 0) {
+        return 0;
+    }
+
     /* Create a new palette */
     Palette* N = NewPalette (P->Count);
 

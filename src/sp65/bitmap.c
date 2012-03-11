@@ -64,7 +64,6 @@ Bitmap* NewBitmap (unsigned Width, unsigned Height)
     B = xmalloc (sizeof (*B) + (Size - 1) * sizeof (B->Data[0]));
 
     /* Initialize the data */
-    B->Type     = bmUnknown;
     B->Name     = EmptyStrBuf;
     B->Width    = Width;
     B->Height   = Height;
@@ -120,7 +119,6 @@ Bitmap* SliceBitmap (const Bitmap* O, unsigned OrigX, unsigned OrigY,
     B = NewBitmap (Width, Height);
 
     /* Copy fields from the original */
-    B->Type = O->Type;
     if (SB_GetLen (&O->Name) > 0) {
         SB_CopyStr (&B->Name, "Slice of ");
         SB_Append (&B->Name, &O->Name);
@@ -185,15 +183,11 @@ unsigned GetBitmapColors (const Bitmap* B)
  * of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.
  */
 {
-    switch (B->Type) {
-        case bmMonochrome:      return 2;
-        case bmIndexed:         return B->Pal->Count;
-        case bmRGB:
-        case bmRGBA:            return (1U << 24);
-        default:                Internal ("Unknown bitmap type %u", B->Type);
+    if (B->Pal) {
+        return B->Pal->Count;
+    } else {
+        return (1U << 24);
     }
-    /* NOTREACHED */
-    return 0;
 }
 
 

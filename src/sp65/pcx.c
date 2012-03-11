@@ -275,14 +275,6 @@ Bitmap* ReadPCXFile (const Collection* A)
     /* Create the bitmap */
     B = NewBitmap (P->Width, P->Height);
 
-    /* Determine the type of the bitmap */
-    switch (P->Planes) {
-        case 1: B->Type = (P->PalInfo? bmIndexed : bmMonochrome);       break;
-        case 3: B->Type = bmRGB;                                        break;
-        case 4: B->Type = bmRGBA;                                       break;
-        default:Internal ("Unexpected number of planes");
-    }
-
     /* Copy the name */
     SB_CopyStr (&B->Name, Name);
 
@@ -332,7 +324,75 @@ Bitmap* ReadPCXFile (const Collection* A)
                 }
             }
         }
+
+        /* One plane means we have a palette which is either part of the header
+         * or follows.
+         */
+        if (P->PalInfo == 0) {
+
+            /* Create the monochrome palette */
+            B->Pal = NewMonochromePalette ();
+
+        } else {
+
+            unsigned      Count;
+            unsigned      I;
+            unsigned char Palette[256][3];
+            unsigned long EndPos;
+
+            /* Determine the current file position */
+            unsigned long CurPos = FileGetPos (F);
+
+            /* Seek to the end of the file */
+            (void) fseek (F, 0, SEEK_END);
+
+            /* Get this position */
+            EndPos = FileGetPos (F);
+
+            /* There's a palette if the old location is 769 bytes from the end */
+            if (EndPos - CurPos == sizeof (Palette) + 1) {
+
+                /* Seek back */
+                FileSetPos (F, CurPos);
+
+                /* Check for palette marker */
+                if (Read8 (F) != 0x0C) {
+                    Error ("Invalid palette marker in PCX file `%s'", Name);
+                }
+
+            } else if (EndPos == CurPos) {
+
+                /* The palette is in the header */
+                FileSetPos (F, 16);
+
+                /* Check the maximum index for safety */
+                if (MaxIdx > 15) {
+                    Error ("PCX file `%s' contains more than 16 indexed colors "
+                           "but no extra palette", Name);
+                }
+
+            } else {
+                Error ("Error in PCX file `%s': %lu bytes at end of pixel data",
+                       Name, EndPos - CurPos);
+            }
+
+            /* Read the palette. We will just read what we need. */
+            Count = MaxIdx + 1;
+            ReadData (F, Palette, Count * sizeof (Palette[0]));
+
+            /* Create the palette from the data */
+            B->Pal = NewPalette (Count);
+            for (I = 0; I < Count; ++I) {
+                B->Pal->Entries[I].R = Palette[I][0];
+                B->Pal->Entries[I].G = Palette[I][1];
+                B->Pal->Entries[I].B = Palette[I][2];
+                B->Pal->Entries[I].A = 0;
+            }
+
+        }
+
     } else {
+
         /* 3 or 4 planes are RGB or RGBA (don't know if this exists) */
         for (Y = 0, Px = B->Data; Y < P->Height; ++Y) {
 
@@ -366,72 +426,6 @@ Bitmap* ReadPCXFile (const Collection* A)
                 }
             }
         }
-    }
-
-    /* One plane means we have a palette which is either part of the header
-     * or follows.
-     */
-    if (B->Type == bmMonochrome) {
-
-        /* Create the monochrome palette */
-        B->Pal = NewMonochromePalette ();
-
-    } else if (B->Type == bmIndexed) {
-
-        unsigned      Count;
-        unsigned      I;
-        unsigned char Palette[256][3];
-        unsigned long EndPos;
-
-        /* Determine the current file position */
-        unsigned long CurPos = FileGetPos (F);
-
-        /* Seek to the end of the file */
-        (void) fseek (F, 0, SEEK_END);
-
-        /* Get this position */
-        EndPos = FileGetPos (F);
-
-        /* There's a palette if the old location is 769 bytes from the end */
-        if (EndPos - CurPos == sizeof (Palette) + 1) {
-
-            /* Seek back */
-            FileSetPos (F, CurPos);
-
-            /* Check for palette marker */
-            if (Read8 (F) != 0x0C) {
-                Error ("Invalid palette marker in PCX file `%s'", Name);
-            }
-
-        } else if (EndPos == CurPos) {
-
-            /* The palette is in the header */
-            FileSetPos (F, 16);
-
-            /* Check the maximum index for safety */
-            if (MaxIdx > 15) {
-                Error ("PCX file `%s' contains more than 16 indexed colors "
-                       "but no extra palette", Name);
-            }
-
-        } else {
-            Error ("Error in PCX file `%s': %lu bytes at end of pixel data",
-                   Name, EndPos - CurPos);
-        }
-
-        /* Read the palette. We will just read what we need. */
-        Count = MaxIdx + 1;
-        ReadData (F, Palette, Count * sizeof (Palette[0]));
-
-        /* Create the palette from the data */
-        B->Pal = NewPalette (Count);
-        for (I = 0; I < Count; ++I) {
-            B->Pal->Entries[I].R = Palette[I][0];
-            B->Pal->Entries[I].G = Palette[I][1];
-            B->Pal->Entries[I].B = Palette[I][2];
-            B->Pal->Entries[I].A = 0;
-        }
-
     }
 
     /* Close the file */

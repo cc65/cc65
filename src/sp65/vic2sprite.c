@@ -74,10 +74,10 @@ StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A attribute ((unused))
     /* Output the image properties */
     Print (stdout, 1, "Image is %ux%u with %u colors%s\n",
            GetBitmapWidth (B), GetBitmapHeight (B), GetBitmapColors (B),
-           (GetBitmapType (B) == bmIndexed)? " (indexed)" : "");
+           BitmapIsIndexed (B)? " (indexed)" : "");
 
     /* Sprites pictures are always 24x21 in size with 2 colors */
-    if (GetBitmapType (B)   != bmIndexed ||
+    if (!BitmapIsIndexed (B)             ||
         GetBitmapColors (B) != 2         ||
         GetBitmapHeight (B) != HEIGHT    ||
         GetBitmapWidth (B)  != WIDTH) {

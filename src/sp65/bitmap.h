@@ -60,22 +60,9 @@
 /* Safety limit for the size of the bitmap in pixels */
 #define BM_MAX_SIZE     4194304UL
 
-/* Bitmap type */
-enum BitmapType {
-    bmUnknown,
-    bmMonochrome,
-    bmIndexed,
-    bmRGB,
-    bmRGBA
-};
-typedef enum BitmapType BitmapType;
-
 /* Bitmap structure */
 typedef struct Bitmap Bitmap;
 struct Bitmap {
-
-    /* Type of the bitmap */
-    BitmapType  Type;
 
     /* Name of the bitmap. This is used for error messages and should be
      * something that allows the user to identify which bitmap the message
@@ -88,7 +75,7 @@ struct Bitmap {
     unsigned    Width;
     unsigned    Height;
 
-    /* Palette for monochrome and indexed bitmap types, otherwise NULL */
+    /* Palette for indexed bitmap types, otherwise NULL */
     Palette*    Pal;
 
     /* Pixel data, dynamically allocated */
@@ -131,13 +118,13 @@ Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y);
  */
 
 #if defined(HAVE_INLINE)
-INLINE BitmapType GetBitmapType (const Bitmap* B)
-/* Get the type of a bitmap */
+INLINE int BitmapIsIndexed (const Bitmap* B)
+/* Return true if this is an indexed bitmap */
 {
-    return B->Type;
+    return (B->Pal != 0);
 }
 #else
-#  define GetBitmapType(B)      ((B)->Type)
+#  define BitmapIsIndexed(B)    ((B)->Pal != 0)
 #endif
 
 #if defined(HAVE_INLINE)

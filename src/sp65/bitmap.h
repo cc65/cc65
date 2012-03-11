@@ -157,10 +157,27 @@ INLINE const Palette* GetBitmapPalette (const Bitmap* B)
 #  define GetBitmapPalette(B)   ((B)->Pal)
 #endif
 
-unsigned GetBitmapColors (const Bitmap* B);
+#if defined(HAVE_INLINE)
+INLINE const StrBuf* GetBitmapName (const Bitmap* B)
+/* Get the name of a bitmap */
+{
+    return &B->Name;
+}
+#else
+#  define GetBitmapName(B)      (&(B)->Name)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetBitmapColors (const Bitmap* B)
 /* Get the number of colors in an image. The function will return the number
  * of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.
  */
+{
+    return B->Pal? B->Pal->Count : (1U << 24);
+}
+#else
+# define GetBitmapColors(B)     ((B)->Pal? (B)->Pal->Count : (1U << 24))
+#endif
 
 
 

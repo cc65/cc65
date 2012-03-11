@@ -178,17 +178,3 @@ Pixel GetPixel (const Bitmap* B, unsigned X, unsigned Y)
 
 
 
-unsigned GetBitmapColors (const Bitmap* B)
-/* Get the number of colors in an image. The function will return the number
- * of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.
- */
-{
-    if (B->Pal) {
-        return B->Pal->Count;
-    } else {
-        return (1U << 24);
-    }
-}
-
-
-

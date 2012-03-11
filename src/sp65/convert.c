@@ -40,6 +40,7 @@
 #include "convert.h"
 #include "error.h"
 #include "koala.h"
+#include "lynxsprite.h"
 #include "vic2sprite.h"
 
 
@@ -60,6 +61,7 @@ struct ConverterMapEntry {
 /* Converter table, alphabetically sorted */
 static const ConverterMapEntry ConverterMap[] = {
     {   "koala",                GenKoala        },
+    {   "lynx-sprite",          GenLynxSprite   },
     {   "vic2-sprite",          GenVic2Sprite   },
 };
 

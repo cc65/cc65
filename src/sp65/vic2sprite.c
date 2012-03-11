@@ -38,6 +38,7 @@
 #include "print.h"
 
 /* sp65 */
+#include "attr.h"
 #include "error.h"
 #include "vic2sprite.h"
 
@@ -49,9 +50,17 @@
 
 
 
+/* Sprite mode */
+enum Mode {
+    smAuto,
+    smHighRes,
+    smMultiColor
+};
+
 /* Screen size of a koala picture */
-#define WIDTH   24U
-#define HEIGHT  21U
+#define WIDTH_HR        24U
+#define WIDTH_MC        12U
+#define HEIGHT          21U
 
 
 
@@ -61,12 +70,33 @@
 
 
 
-StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A attribute ((unused)))
+static enum Mode GetMode (const Collection* A)
+/* Return the sprite mode from the attribute collection A */
+{
+    /* Check for a mode attribute */
+    const char* Mode = GetAttrVal (A, "mode");
+    if (Mode) {
+        if (strcmp (Mode, "highres") == 0) {
+            return smHighRes;
+        } else if (strcmp (Mode, "multicolor") == 0) {
+            return smMultiColor;
+        } else {
+            Error ("Invalid value for attribute `mode'");
+        }
+    } else {
+        return smAuto;
+    }
+}
+
+
+
+StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A)
 /* Generate binary output in VICII sprite format for the bitmap B. The output
  * is stored in a string buffer (which is actually a dynamic char array) and
  * returned.
  */
 {
+    enum Mode M;
     StrBuf* D;
     unsigned X, Y;
 
@@ -76,14 +106,38 @@ StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A attribute ((unused))
            GetBitmapWidth (B), GetBitmapHeight (B), GetBitmapColors (B),
            BitmapIsIndexed (B)? " (indexed)" : "");
 
-    /* Sprites pictures are always 24x21 in size with 2 colors */
-    if (!BitmapIsIndexed (B)             ||
-        GetBitmapColors (B) != 2         ||
-        GetBitmapHeight (B) != HEIGHT    ||
-        GetBitmapWidth (B)  != WIDTH) {
+    /* Get the sprite mode */
+    M = GetMode (A);
 
-        Error ("Bitmaps converted to vic2 sprite format must be in indexed "
-               "mode with a size of %ux%u and two colors", WIDTH, HEIGHT);
+    /* Check the height of the bitmap */
+    if (GetBitmapHeight (B) != HEIGHT) {
+        Error ("Invalid bitmap height (%u) for conversion to vic2 sprite",
+               GetBitmapHeight (B));
+    }
+
+    /* If the mode wasn't given, determine it from the image properties */
+    if (M == smAuto) {
+        switch (GetBitmapWidth (B)) {
+            case WIDTH_HR:
+                M = smHighRes;
+                break;
+            case WIDTH_MC:
+                M = smMultiColor;
+                break;
+            default:
+                Error ("Cannot determine mode from image properties");
+        }
+    }
+
+    /* Now check if mode and the image properties match */
+    if (M == smMultiColor) {
+        if (GetBitmapWidth (B) != WIDTH_MC || GetBitmapColors (B) > 4) {
+            Error ("Invalid image properties for multicolor sprite");
+        }
+    } else {
+        if (GetBitmapWidth (B) != WIDTH_HR || GetBitmapColors (B) > 2) {
+            Error ("Invalid image properties for highres sprite");
+        }
     }
 
     /* Create the output buffer and resize it to the required size. */
@@ -93,15 +147,29 @@ StrBuf* GenVic2Sprite (const Bitmap* B, const Collection* A attribute ((unused))
     /* Convert the image */
     for (Y = 0; Y < HEIGHT; ++Y) {
         unsigned char V = 0;
-        for (X = 0; X < WIDTH; ++X) {
+        if (M == smHighRes) {
+            for (X = 0; X < WIDTH_HR; ++X) {
 
-            /* Fetch next bit into byte buffer */
-            V = (V << 1) | (GetPixel (B, X, Y).Index != 0);
+                /* Fetch next bit into byte buffer */
+                V = (V << 1) | (GetPixel (B, X, Y).Index & 0x01);
 
-            /* Store full bytes into the output buffer */
-            if ((X & 0x07) == 0x07) {
-                SB_AppendChar (D, V);
-                V = 0;
+                /* Store full bytes into the output buffer */
+                if ((X & 0x07) == 0x07) {
+                    SB_AppendChar (D, V);
+                    V = 0;
+                }
+            }
+        } else {
+            for (X = 0; X < WIDTH_MC; ++X) {
+
+                /* Fetch next bit into byte buffer */
+                V = (V << 2) | (GetPixel (B, X, Y).Index & 0x03);
+
+                /* Store full bytes into the output buffer */
+                if ((X & 0x03) == 0x03) {
+                    SB_AppendChar (D, V);
+                    V = 0;
+                }
             }
         }
     }

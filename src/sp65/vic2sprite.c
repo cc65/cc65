@@ -57,7 +57,7 @@ enum Mode {
     smMultiColor
 };
 
-/* Screen size of a koala picture */
+/* Size of a sprite */
 #define WIDTH_HR        24U
 #define WIDTH_MC        12U
 #define HEIGHT          21U

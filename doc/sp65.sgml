@@ -1,0 +1,155 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>sp65 Users Guide
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<date>2012-03-11
+
+<abstract>
+sp65 is a sprite and bitmap utility that is part of the cc65 development suite.
+It is used to convert graphics and bitmaps into the target formats of the
+supported machines.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+sp65 is a tool that converts images from common formats into formats used 
+on the 6502 platforms that are the targets of the cc65 compiler suite. In
+addition, it allows some very simple operation with loaded graphics data, like
+using part of an image for further processing.
+                                                          
+The utility has been designed in a way that adding additional source or target
+formats is easy. The final output is either binary, or C/assembler source.
+
+
+
+<sect>Usage<p>
+
+
+<sect1>Command line option overview<p>
+
+The sp65 utility accepts the following options:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: sp65 [options] file [options] [file]
+Short options:
+  -V                            Print the version number and exit
+  -c fmt[,attrlist]             Convert into target format
+  -h                            Help (this text)
+  -lc                           List all possible conversions
+  -r file[,attrlist]            Read an input file
+  -v                            Increase verbosity
+  -w file[,attrlist]            Write the output to a file
+
+Long options:
+  --convert-to fmt[,attrlist]   Convert into target format
+  --help                        Help (this text)
+  --list-conversions            List all possible conversions
+  --pop                         Restore the original loaded image
+  --read file[,attrlist]        Read an input file
+  --slice x,y,w,h               Generate a slice from the loaded bitmap
+  --verbose                     Increase verbosity
+  --version                     Print the version number and exit
+  --write file[,attrlist]       Write the output to a file
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <label id="option--convert-to">
+  <tag><tt>-c, --convert-to format[,attrlist]</tt></tag>
+
+  Convert a bitmap into one of the supported target formats.
+
+
+  <label id="option--help">
+  <tag><tt>-h, --help</tt></tag>
+
+  Print the short option summary shown above.
+
+</descrip>
+<p>
+
+
+
+<sect>Attribute lists<label id="attr-lists"><p>
+
+
+
+<sect>Input formats<p>
+
+<sect1>PCX<p>
+
+
+
+<sect>Conversions<p>
+
+
+<sect1>VIC2 sprites<p>
+
+
+<sect1>Koala images<p>
+
+
+
+
+<sect>Output formats<p>
+
+
+<sect1>Binary<p>
+
+<sect1>Assembler code<p>
+
+<sect1>C code<p>
+
+<sect>Bugs/Feedback<p>
+
+If you have problems using the assembler, if you find any bugs, or if
+you're doing something interesting with the assembler, I would be glad to
+hear from you. Feel free to contact me by email
+(<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">).
+
+
+
+<sect>Copyright<p>
+
+sp65 (and all cc65 binutils) are (C) Copyright 1998-2012 Ullrich von Bassewitz
+and others. For usage of the binaries and/or sources the following conditions
+do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item> 	The origin of this software must not be misrepresented; you must not
+       	claim that you wrote the original software. If you use this software
+       	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+
+
+</article>
+
+
+

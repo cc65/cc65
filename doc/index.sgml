@@ -40,10 +40,11 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
   Describes the ld65 linker.
 
-<!--
   <tag><htmlurl url="od65.html" name="od65.html"></tag>
   Describes the od65 object-file analyzer.
--->
+
+  <tag><htmlurl url="sp65.html" name="sp65.html"></tag>
+  Describes the sprite and bitmap utility.
 
 </descrip>
 

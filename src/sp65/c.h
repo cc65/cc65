@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 output.h                                  */
+/*                                    c.h                                    */
 /*                                                                           */
-/*   Output format/file definitions for the sp65 sprite and bitmap utility   */
+/*              C output for the sp65 sprite and bitmap utility              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,12 +33,13 @@
 
 
 
-#ifndef OUTPUT_H
-#define OUTPUT_H
+#ifndef C_H
+#define C_H
 
 
 
 /* common */
+#include "coll.h"
 #include "strbuf.h"
 
 
@@ -49,15 +50,12 @@
 
 
 
-void WriteOutputFile (const StrBuf* Data, const Collection* A);
-/* Write the contents of Data to a file. Format, file name etc. must be given
- * as attributes in A. If no format is given, the function tries to autodetect
- * it by using the extension of the file name.
- */
+void WriteCFile (const StrBuf* Data, const Collection* A);
+/* Write the contents of Data to a file in C format */
 
 
 
-/* End of output.h */
+/* End of c.h */
 
 #endif
 

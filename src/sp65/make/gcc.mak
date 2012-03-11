@@ -26,6 +26,7 @@ OBJS = 	asm.o           \
         attr.o          \
         bin.o           \
         bitmap.o        \
+        c.o             \
         color.o         \
         convert.o       \
         error.o	    	\

@@ -64,6 +64,7 @@ OBJS =  asm.obj         \
         attr.obj        \
         bin.obj         \
         bitmap.obj      \
+        c.obj           \
         color.obj       \
         convert.obj     \
         error.obj     	\

@@ -42,6 +42,7 @@
 #include "asm.h"
 #include "attr.h"
 #include "bin.h"
+#include "c.h"
 #include "error.h"
 #include "output.h"
 
@@ -52,6 +53,15 @@
 /*****************************************************************************/
 
 
+
+/* Different types of output formats */
+enum OutputFormat {
+    ofAsm,                      /* Output assembler source */
+    ofBin,                      /* Output raw binary format */
+    ofC,                        /* Output C code */
+
+    ofCount                     /* Number of output formats without ofAuto */
+};
 
 typedef struct OutputFormatDesc OutputFormatDesc;
 struct OutputFormatDesc {
@@ -65,6 +75,7 @@ struct OutputFormatDesc {
 static OutputFormatDesc OutputFormatTable[ofCount] = {
     {   WriteAsmFile    },
     {   WriteBinFile    },
+    {   WriteCFile      },
 };
 
 /* Table that maps extensions to Output formats. Must be sorted alphabetically */
@@ -73,12 +84,14 @@ static const FileId FormatTable[] = {
     {   "A",    ofAsm           },
     {   "ASM",  ofAsm           },
     {   "BIN",  ofBin           },
+    {   "C",    ofC             },
     {   "INC",  ofAsm           },
     {   "S",    ofAsm           },
 
     {   "a",    ofAsm           },
     {   "asm",  ofAsm           },
     {   "bin",  ofBin           },
+    {   "c",    ofC             },
     {   "inc",  ofAsm           },
     {   "s",    ofAsm           },
 };

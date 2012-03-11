@@ -31,6 +31,7 @@ OBJS = 	asm.o           \
         convert.o       \
         error.o	    	\
         fileio.o        \
+        geosicon.o      \
         input.o         \
         koala.o         \
 	lynxsprite.o    \

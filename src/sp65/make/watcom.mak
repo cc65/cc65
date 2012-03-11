@@ -69,6 +69,7 @@ OBJS =  asm.obj         \
         convert.obj     \
         error.obj     	\
         fileio.obj      \
+        geosicon.obj    \
         input.obj       \
         koala.obj       \
         lynxsprite.obj  \

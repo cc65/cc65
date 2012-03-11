@@ -71,6 +71,7 @@ OBJS =  asm.obj         \
         fileio.obj      \
         input.obj       \
         koala.obj       \
+        lynxsprite.obj  \
 	main.obj        \
         output.obj      \
         palette.obj     \

@@ -33,6 +33,7 @@ OBJS = 	asm.o           \
         fileio.o        \
         input.o         \
         koala.o         \
+	lynxsprite.o    \
 	main.o          \
         output.o        \
         palette.o       \

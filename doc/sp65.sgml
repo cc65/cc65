@@ -1,4 +1,4 @@
-<!doctype linuxdoc system>
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
 
 <article>
 <title>sp65 Users Guide
@@ -18,11 +18,11 @@ supported machines.
 
 <sect>Overview<p>
 
-sp65 is a tool that converts images from common formats into formats used 
+sp65 is a tool that converts images from common formats into formats used
 on the 6502 platforms that are the targets of the cc65 compiler suite. In
 addition, it allows some very simple operation with loaded graphics data, like
 using part of an image for further processing.
-                                                          
+
 The utility has been designed in a way that adding additional source or target
 formats is easy. The final output is either binary, or C/assembler source.
 
@@ -63,20 +63,67 @@ Long options:
 
 <sect1>Command line options in detail<p>
 
-Here is a description of all the command line options:
+Below is a description of all the command line options. For the concept of
+attribute lists see <ref id="attr-lists" name="below">.
 
 <descrip>
 
   <label id="option--convert-to">
   <tag><tt>-c, --convert-to format[,attrlist]</tt></tag>
 
-  Convert a bitmap into one of the supported target formats.
+  Convert a bitmap into one of the supported target formats. The option
+  argument must at least contain the "format" attribute. For more attributes,
+  see section <ref id="conversions" name="Conversions">.
 
 
   <label id="option--help">
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <label id="option--list-conversions">
+  <tag><tt>-lc, --list-conversions</tt></tag>
+
+  Print a list of possible conversions.
+
+
+  <label id="option--pop">
+  <tag><tt>--pop</tt></tag>
+
+  Restore the working copy of the bitmap from the one originally loaded from
+  the file. This may for example be used when creating several output files
+  from one input file.
+
+
+  <label id="option--read">
+  <tag><tt>-r, --read filename[,attrlist]</tt></tag>
+
+  Read an input file. The option argument must at least contain the "name"
+  attribute. See <ref id="input-formats" name="input formats"> for more
+  information.
+
+
+  <label id="option-v">
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase verbosity. Usually only needed for debugging purposes. You may use
+  this option more than one time for even more verbose output.
+
+
+  <label id="option-V">
+  <tag><tt>-V, --version</tt></tag>
+
+  Print the version number of the assembler. If you send any suggestions or
+  bugfixes, please include the version number.
+
+
+  <label id="option--write">
+  <tag><tt>-w, --write filename[,attrlist]</tt></tag>
+
+  Write an output file. The option argument must at least contain the "name"
+  attribute. See <ref id="output-formats" name="output formats"> for more
+  information.
 
 </descrip>
 <p>
@@ -87,13 +134,13 @@ Here is a description of all the command line options:
 
 
 
-<sect>Input formats<p>
+<sect>Input formats<label id="input-formats"><p>
 
 <sect1>PCX<p>
 
 
 
-<sect>Conversions<p>
+<sect>Conversions<label id="conversions"><p>
 
 
 <sect1>VIC2 sprites<p>
@@ -104,14 +151,53 @@ Here is a description of all the command line options:
 
 
 
-<sect>Output formats<p>
+<sect>Output formats<label id="output-formats"><p>
+
+Using <tt/<ref id="option--write" name="--write">/ it is possible to write
+processed data to an output file. An attribute "name" is mandatory, it is used
+as the file name for the output. The output format can be specified using an
+attribute named "format". If this attribute doesn't exist, the output format
+is determined by looking at the file name extension.
 
 
 <sect1>Binary<p>
 
+For this format, the processed data is written to the output file in raw
+binary format. There are not attributes for this output format.
+
+
 <sect1>Assembler code<p>
 
+For this format, the processed data is written to the output file in ca65
+assembler format. There are several attributes for this output format:
+
+<descrip>
+
+  <tag/base/
+  The value for this attribute specifies the numeric base for the data
+  values. It may be either 2, 10 or 16. The default is 16. If the base is
+  2, the numbers are prefixed by '%', if the base is 16, the numbers are
+  prefixed by '&dollar;'. For base 10, there is no prefix.
+
+  <tag/bytesperline/
+  The value for this attribute specifies the number of bytes output in
+  one line of the assembler file. The default is 16.
+
+  <tag/label/
+  If specified, an assembler label is added in front of the data.
+
+  <tag/segment/
+  If specified, a <tt/.SEGMENT/ directive is used to place the data into
+  the given segment.
+
+</descrip>
+
+
+
+
 <sect1>C code<p>
+
+
 
 <sect>Bugs/Feedback<p>
 

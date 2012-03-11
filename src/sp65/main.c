@@ -161,6 +161,26 @@ static void OptConvertTo (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptDumpPalette (const char* Opt attribute ((unused)),
+                            const char* Arg attribute ((unused)))
+/* Dump the palette of the current work bitmap */
+{
+    /* We must have a bitmap ... */
+    if (C == 0) {
+        Error ("No bitmap");
+    }
+
+    /* ... which must be indexed */
+    if (!BitmapIsIndexed (C)) {
+        Error ("Current bitmap is not indexed");
+    }
+
+    /* Dump the palette */
+    DumpPalette (stdout, GetBitmapPalette (C));
+}
+
+
+
 static void OptHelp (const char* Opt attribute ((unused)),
 		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
@@ -297,6 +317,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--convert-to",       1,      OptConvertTo            },
+        { "--dump-palette",     0,      OptDumpPalette          },
 	{ "--help",    		0,	OptHelp			},
         { "--list-conversions", 0,      OptListConversions      },
         { "--pop",              0,      OptPop                  },
@@ -374,8 +395,8 @@ int main (int argc, char* argv [])
     }
 
     /* Cleanup data */
+    SetWorkBitmap (C);
     FreeBitmap (B);
-    FreeBitmap (C);
     FreeStrBuf (D);
 
     /* Success */

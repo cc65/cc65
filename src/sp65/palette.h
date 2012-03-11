@@ -38,6 +38,8 @@
 
 
 
+#include <stdio.h>
+
 /* sp65 */
 #include "color.h"
 
@@ -74,6 +76,9 @@ Palette* DupPalette (const Palette* P);
 
 void FreePalette (Palette* P);
 /* Free a dynamically allocated palette */
+
+void DumpPalette (FILE* F, const Palette* P);
+/* Dump the palette in readable form to the given file */
 
 
 

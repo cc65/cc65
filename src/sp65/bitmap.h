@@ -147,6 +147,16 @@ INLINE unsigned GetBitmapHeight (const Bitmap* B)
 #  define GetBitmapHeight(B)    ((B)->Height)
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE const Palette* GetBitmapPalette (const Bitmap* B)
+/* Get the palette of a bitmap */
+{
+    return B->Pal;
+}
+#else
+#  define GetBitmapPalette(B)   ((B)->Pal)
+#endif
+
 unsigned GetBitmapColors (const Bitmap* B);
 /* Get the number of colors in an image. The function will return the number
  * of palette entries for indexed bitmaps and 2^24 for non indexed bitmaps.

@@ -112,3 +112,29 @@ void FreePalette (Palette* P)
 
 
 
+void DumpPalette (FILE* F, const Palette* P)
+/* Dump the palette in readable form to the given file */
+{
+    unsigned I;
+
+    fputs ("Entry     R      G      B      A     Combined\n", F);
+    fputs ("----------------------------------------------\n", F);
+    for (I = 0; I < P->Count; ++I) {
+
+        /* Get the color entry */
+        const Color* C = P->Entries + I;
+
+        /* Output it */
+        fprintf (F,
+                 " %3u    %3u    %3u    %3u    %3u    #%08lX\n",
+                 I,
+                 C->R, C->G, C->B, C->A,
+                 (((unsigned long) C->A) << 24) |
+                 (((unsigned long) C->B) << 16) |
+                 (((unsigned long) C->G) <<  8) |
+                 (((unsigned long) C->R) <<  0));
+    }
+}
+
+
+

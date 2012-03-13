@@ -31,6 +31,7 @@ OBJS = 	asm.o           \
         convert.o       \
         error.o	    	\
         fileio.o        \
+        geosbitmap.o    \
         geosicon.o      \
         input.o         \
         koala.o         \
@@ -39,6 +40,7 @@ OBJS = 	asm.o           \
         output.o        \
         palette.o       \
         pcx.o           \
+        raw.o           \
         vic2sprite.o
 
 LIBS = $(COMMON)/common.a

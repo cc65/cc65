@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 convert.c                                 */
+/*                                   raw.h                                   */
 /*                                                                           */
-/*    Main target conversion module for the sp65 file and bitmap utility     */
+/*        Raw image converter for the sp65 sprite and bitmap utility         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,43 +33,17 @@
 
 
 
-#include <stdlib.h>
+#ifndef RAW_H
+#define RAW_H
+
+
+
+/* common */
+#include "coll.h"
+#include "strbuf.h"
 
 /* sp65 */
-#include "attr.h"
-#include "convert.h"
-#include "error.h"
-#include "geosbitmap.h"
-#include "geosicon.h"
-#include "koala.h"
-#include "lynxsprite.h"
-#include "raw.h"
-#include "vic2sprite.h"
-
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Type of the entry in the converter table */
-typedef struct ConverterMapEntry ConverterMapEntry;
-struct ConverterMapEntry {
-    const char*         Format;
-    StrBuf*             (*ConvertFunc) (const Bitmap*, const Collection*);
-};
-
-/* Converter table, alphabetically sorted */
-static const ConverterMapEntry ConverterMap[] = {
-    {   "geos-bitmap",          GenGeosBitmap   },
-    {   "geos-icon",            GenGeosIcon     },
-    {   "koala",                GenKoala        },
-    {   "lynx-sprite",          GenLynxSprite   },
-    {   "raw",                  GenRaw          },
-    {   "vic2-sprite",          GenVic2Sprite   },
-};
+#include "bitmap.h"
 
 
 
@@ -79,48 +53,15 @@ static const ConverterMapEntry ConverterMap[] = {
 
 
 
-static int Compare (const void* Key, const void* MapEntry)
-/* Compare function for bsearch */
-{
-    return strcmp (Key, ((const ConverterMapEntry*) MapEntry)->Format);
-}
-
-
-
-StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
-/* Convert the bitmap B into some sort of other binary format. The output is
- * stored in a string buffer (which is actually a dynamic char array) and
- * returned. The actual output format is taken from the "format" attribute
- * in the attribute collection A.
+StrBuf* GenRaw (const Bitmap* B, const Collection* A);
+/* Generate binary output in raw format. The output is stored in a string
+ * buffer (which is actually a dynamic char array) and returned.
  */
-{
-    const ConverterMapEntry* E;
-
-    /* Get the format to convert to */
-    const char* Format = NeedAttrVal (A, "format", "convert");
-
-    /* Search for the matching converter */
-    E = bsearch (Format,
-                 ConverterMap,
-                 sizeof (ConverterMap) / sizeof (ConverterMap[0]),
-                 sizeof (ConverterMap[0]),
-                 Compare);
-    if (E == 0) {
-        Error ("No such target format: `%s'", Format);
-    }
-
-    /* Do the conversion */
-    return E->ConvertFunc (B, A);
-}
 
 
 
-void ListConversionTargets (FILE* F)
-/* Output a list of conversion targets */
-{
-    unsigned I;
-    for (I = 0; I < sizeof (ConverterMap) / sizeof (ConverterMap[0]); ++I) {
-        fprintf (F, "  %s\n", ConverterMap[I].Format);
-    }
-}
+/* End of raw.h */
+#endif
+
+
 

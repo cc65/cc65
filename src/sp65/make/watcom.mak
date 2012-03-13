@@ -69,6 +69,7 @@ OBJS =  asm.obj         \
         convert.obj     \
         error.obj     	\
         fileio.obj      \
+        geosbitmap.obj  \
         geosicon.obj    \
         input.obj       \
         koala.obj       \
@@ -77,6 +78,7 @@ OBJS =  asm.obj         \
         output.obj      \
         palette.obj     \
         pcx.obj         \
+        raw.obj         \
         vic2sprite.obj
 
 LIBS = ../common/common.lib

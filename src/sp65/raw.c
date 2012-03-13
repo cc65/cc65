@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 convert.c                                 */
+/*                                   raw.c                                   */
 /*                                                                           */
-/*    Main target conversion module for the sp65 file and bitmap utility     */
+/*        Raw image converter for the sp65 sprite and bitmap utility         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,43 +33,14 @@
 
 
 
-#include <stdlib.h>
+/* common */
+#include "attrib.h"
+#include "print.h"
 
 /* sp65 */
 #include "attr.h"
-#include "convert.h"
 #include "error.h"
-#include "geosbitmap.h"
-#include "geosicon.h"
-#include "koala.h"
-#include "lynxsprite.h"
 #include "raw.h"
-#include "vic2sprite.h"
-
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* Type of the entry in the converter table */
-typedef struct ConverterMapEntry ConverterMapEntry;
-struct ConverterMapEntry {
-    const char*         Format;
-    StrBuf*             (*ConvertFunc) (const Bitmap*, const Collection*);
-};
-
-/* Converter table, alphabetically sorted */
-static const ConverterMapEntry ConverterMap[] = {
-    {   "geos-bitmap",          GenGeosBitmap   },
-    {   "geos-icon",            GenGeosIcon     },
-    {   "koala",                GenKoala        },
-    {   "lynx-sprite",          GenLynxSprite   },
-    {   "raw",                  GenRaw          },
-    {   "vic2-sprite",          GenVic2Sprite   },
-};
 
 
 
@@ -79,48 +50,40 @@ static const ConverterMapEntry ConverterMap[] = {
 
 
 
-static int Compare (const void* Key, const void* MapEntry)
-/* Compare function for bsearch */
-{
-    return strcmp (Key, ((const ConverterMapEntry*) MapEntry)->Format);
-}
-
-
-
-StrBuf* ConvertTo (const Bitmap* B, const Collection* A)
-/* Convert the bitmap B into some sort of other binary format. The output is
- * stored in a string buffer (which is actually a dynamic char array) and
- * returned. The actual output format is taken from the "format" attribute
- * in the attribute collection A.
+StrBuf* GenRaw (const Bitmap* B, const Collection* A attribute ((unused)))
+/* Generate binary output in raw format. The output is stored in a string
+ * buffer (which is actually a dynamic char array) and returned.
  */
 {
-    const ConverterMapEntry* E;
+    StrBuf* D;
+    unsigned X, Y;
 
-    /* Get the format to convert to */
-    const char* Format = NeedAttrVal (A, "format", "convert");
 
-    /* Search for the matching converter */
-    E = bsearch (Format,
-                 ConverterMap,
-                 sizeof (ConverterMap) / sizeof (ConverterMap[0]),
-                 sizeof (ConverterMap[0]),
-                 Compare);
-    if (E == 0) {
-        Error ("No such target format: `%s'", Format);
+    /* Output the image properties */
+    Print (stdout, 1, "Image is %ux%u with %u colors%s\n",
+           GetBitmapWidth (B), GetBitmapHeight (B), GetBitmapColors (B),
+           BitmapIsIndexed (B)? " (indexed)" : "");
+
+    /* Check the bitmap properties */
+    if (!BitmapIsIndexed (B)) {
+        Error ("The raw format needs an input bitmap in indexed format");
     }
 
-    /* Do the conversion */
-    return E->ConvertFunc (B, A);
+    /* Create the output buffer and resize it to the required size. */
+    D = NewStrBuf ();
+    SB_Realloc (D, GetBitmapWidth (B) * GetBitmapHeight (B));
+
+    /* Convert the image */
+    for (Y = 0; Y < GetBitmapHeight (B); ++Y) {
+        for (X = 0; X < GetBitmapWidth (B); ++X) {
+            /* Place one pixel into the buffer */
+            SB_AppendChar (D, (unsigned char) GetPixel (B, X, Y).Index);
+        }
+    }
+
+    /* Return the converted bitmap */
+    return D;
 }
 
 
-
-void ListConversionTargets (FILE* F)
-/* Output a list of conversion targets */
-{
-    unsigned I;
-    for (I = 0; I < sizeof (ConverterMap) / sizeof (ConverterMap[0]); ++I) {
-        fprintf (F, "  %s\n", ConverterMap[I].Format);
-    }
-}
 

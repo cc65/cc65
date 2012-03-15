@@ -303,7 +303,7 @@ static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
     Collection* A = ParseAttrList (Arg, NameList, 2);
 
     /* Write the file */
-    WriteOutputFile (D, A);
+    WriteOutputFile (D, A, C);
 
     /* Delete the attribute list */
     FreeAttrList (A);

@@ -42,6 +42,9 @@
 #include "coll.h"
 #include "strbuf.h"
 
+/* sp65 */
+#include "bitmap.h"
+
 
 
 /*****************************************************************************/
@@ -50,7 +53,7 @@
 
 
 
-void WriteAsmFile (const StrBuf* Data, const Collection* A);
+void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 /* Write the contents of Data to a file in assembler (ca65) format */
 
 

@@ -41,6 +41,9 @@
 /* common */
 #include "strbuf.h"
 
+/* sp65 */
+#include "bitmap.h"
+
 
 
 /*****************************************************************************/
@@ -49,10 +52,12 @@
 
 
 
-void WriteOutputFile (const StrBuf* Data, const Collection* A);
+void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B);
 /* Write the contents of Data to a file. Format, file name etc. must be given
  * as attributes in A. If no format is given, the function tries to autodetect
- * it by using the extension of the file name.
+ * it by using the extension of the file name. The bitmap passed to the
+ * function is the bitmap used as source of the conversion. It may be used to
+ * determine the bitmap properties for documentation purposes.
  */
 
 

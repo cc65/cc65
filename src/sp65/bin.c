@@ -37,6 +37,9 @@
 #include <stdio.h>
 #include <string.h>
 
+/* common */
+#include "attrib.h"
+
 /* sp65 */
 #include "attr.h"
 #include "bin.h"
@@ -50,7 +53,8 @@
 
 
 
-void WriteBinFile (const StrBuf* Data, const Collection* A)
+void WriteBinFile (const StrBuf* Data, const Collection* A, 
+                   const Bitmap* B attribute ((unused)))
 /* Write the contents of Data to the given file in binary format */
 {
     unsigned Size;

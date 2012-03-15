@@ -67,7 +67,7 @@ typedef struct OutputFormatDesc OutputFormatDesc;
 struct OutputFormatDesc {
 
     /* Write routine */
-    void (*Write) (const StrBuf*, const Collection*);
+    void (*Write) (const StrBuf*, const Collection*, const Bitmap*);
 
 };
 
@@ -104,10 +104,12 @@ static const FileId FormatTable[] = {
 
 
 
-void WriteOutputFile (const StrBuf* Data, const Collection* A)
+void WriteOutputFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
 /* Write the contents of Data to a file. Format, file name etc. must be given
  * as attributes in A. If no format is given, the function tries to autodetect
- * it by using the extension of the file name.
+ * it by using the extension of the file name. The bitmap passed to the
+ * function is the bitmap used as source of the conversion. It may be used to
+ * determine the bitmap properties for documentation purposes.
  */
 {
     const FileId* F;
@@ -136,7 +138,7 @@ void WriteOutputFile (const StrBuf* Data, const Collection* A)
     }
 
     /* Call the format specific write */
-    OutputFormatTable[F->Id].Write (Data, A);
+    OutputFormatTable[F->Id].Write (Data, A, B);
 }
 
 

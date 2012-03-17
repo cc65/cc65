@@ -545,6 +545,52 @@ static SymEntry* StructOrUnionForwardDecl (const char* Name)
 
 
 
+static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
+/* Copy fields from an anon union/struct into the current lexical level. The
+ * function returns the size of the embedded struct/union.
+ */
+{
+    /* Get the pointer to the symbol table entry of the anon struct */
+    SymEntry* Entry = GetSymEntry (Decl->Type);
+
+    /* Get the size of the anon struct */
+    unsigned Size = Entry->V.S.Size;
+
+    /* Get the symbol table containing the fields. If it is empty, there has
+     * been an error before, so bail out.
+     */
+    SymTable* Tab = Entry->V.S.SymTab;
+    if (Tab == 0) {
+        /* Incomplete definition - has been flagged before */
+        return Size;
+    }
+
+    /* Get a pointer to the list of symbols. Then walk the list adding copies
+     * of the embedded struct to the current level.
+     */
+    Entry = Tab->SymHead;
+    while (Entry) {
+
+        /* Enter a copy of this symbol adjusting the offset. We will just
+         * reuse the type string here.
+         */
+        AddLocalSym (Entry->Name, Entry->Type,SC_STRUCTFIELD, Offs + Entry->V.Offs);
+
+        /* Currently, there can not be any attributes, but if there will be
+         * some in the future, we want to know this.
+         */
+        CHECK (Entry->Attr == 0);
+
+        /* Next entry */
+        Entry = Entry->NextSym;
+    }
+
+    /* Return the size of the embedded struct */
+    return Size;
+}
+
+
+
 static SymEntry* ParseUnionDecl (const char* Name)
 /* Parse a union declaration. */
 {
@@ -597,8 +643,19 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
             /* Check for fields without a name */
             if (Decl.Ident[0] == '\0') {
-                /* Any field without a name is legal but useless in a union */
-                Warning ("Declaration does not declare anything");
+                /* In cc65 mode, we allow anonymous structs/unions within
+                 * a struct.
+                 */
+                if (IS_Get (&Standard) >= STD_CC65 && IsClassStruct (Decl.Type)) {
+                    /* This is an anonymous struct or union. Copy the fields
+                     * into the current level.
+                     */
+                    CopyAnonStructFields (&Decl, 0);
+
+                } else {
+                    /* A non bit-field without a name is legal but useless */
+                    Warning ("Declaration does not declare anything");
+                }
                 goto NextMember;
             }
 
@@ -722,18 +779,6 @@ static SymEntry* ParseStructDecl (const char* Name)
                 goto NextMember;
             }
 
-            /* Check for fields without names */
-            if (Decl.Ident[0] == '\0') {
-                if (FieldWidth < 0) {
-                    /* A non bit-field without a name is legal but useless */
-                    Warning ("Declaration does not declare anything");
-                    goto NextMember;
-                } else {
-                    /* A bit-field without a name will get an anonymous one */
-                    AnonName (Decl.Ident, "bit-field");
-                }
-            }
-
             /* Check if this field is a flexible array member, and
              * calculate the size of the field.
              */
@@ -745,6 +790,30 @@ static SymEntry* ParseStructDecl (const char* Name)
                 FlexibleMember = 1;
                 /* Assume zero for size calculations */
                 SetElementCount (Decl.Type, FLEXIBLE);
+            }
+
+            /* Check for fields without names */
+            if (Decl.Ident[0] == '\0') {
+                if (FieldWidth < 0) {
+                    /* In cc65 mode, we allow anonymous structs/unions within
+                     * a struct.
+                     */
+                    if (IS_Get (&Standard) >= STD_CC65 && IsClassStruct (Decl.Type)) {
+
+                        /* This is an anonymous struct or union. Copy the
+                         * fields into the current level.
+                         */
+                        StructSize += CopyAnonStructFields (&Decl, StructSize);
+
+                    } else {
+                        /* A non bit-field without a name is legal but useless */
+                        Warning ("Declaration does not declare anything");
+                    }
+                    goto NextMember;
+                } else {
+                    /* A bit-field without a name will get an anonymous one */
+                    AnonName (Decl.Ident, "bit-field");
+                }
             }
 
             /* Add a field entry to the table */

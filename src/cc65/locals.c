@@ -356,11 +356,10 @@ static unsigned ParseStaticDecl (Declaration* Decl, unsigned* SC)
     if (CurTok.Tok == TOK_ASSIGN) {
 
         /* Initialization ahead, switch to data segment and define a label.
-         * For arrays, we need to check the elements of the array for 
+         * For arrays, we need to check the elements of the array for
          * constness, not the array itself.
          */
-        if (IsQualConst (Decl->Type) ||
-            (IsTypeArray (Decl->Type) && IsQualConst (GetElementType (Decl->Type)))) {
+        if (IsQualConst (GetBaseElementType (Decl->Type))) {
             SymData = AllocLabel (g_userodata);
         } else {
             SymData = AllocLabel (g_usedata);

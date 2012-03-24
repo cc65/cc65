@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -93,7 +93,7 @@ static void Parse (void)
 
        	/* Disallow ASM statements on global level */
 	if (CurTok.Tok == TOK_ASM) {
-            Error ("__asm__ is not allowed here");                 
+            Error ("__asm__ is not allowed here");
             /* Parse and remove the statement for error recovery */
 	    AsmStatement ();
 	    ConsumeSemi ();
@@ -209,9 +209,7 @@ static void Parse (void)
                       * the element qualifiers, since not the array but its
                       * elements are const.
                       */
-		    if (IsQualConst (Decl.Type) ||
-                        (IsTypeArray (Decl.Type) &&
-                         IsQualConst (GetElementType (Decl.Type)))) {
+		    if (IsQualConst (GetBaseElementType (Decl.Type))) {
 		      	g_userodata ();
 		    } else {
 			g_usedata ();

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -650,6 +650,20 @@ Type* GetElementType (Type* T)
 {
     CHECK (IsTypeArray (T));
     return T + 1;
+}
+
+
+
+Type* GetBaseElementType (Type* T)
+/* Return the base element type of a given type. If T is not an array, this
+ * will return. Otherwise it will return the base element type, which means
+ * the element type that is not an array.
+ */
+{     
+    while (IsTypeArray (T)) {
+        ++T;
+    }
+    return T;
 }
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -639,6 +639,12 @@ void SetElementCount (Type* T, long Count);
 
 Type* GetElementType (Type* T);
 /* Return the element type of the given array type. */
+
+Type* GetBaseElementType (Type* T);
+/* Return the base element type of a given type. If T is not an array, this
+ * will return. Otherwise it will return the base element type, which means
+ * the element type that is not an array.
+ */
 
 struct SymEntry* GetSymEntry (const Type* T) attribute ((const));
 /* Return a SymEntry pointer from a type */

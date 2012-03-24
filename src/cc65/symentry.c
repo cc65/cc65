@@ -162,7 +162,7 @@ int SymIsOutputFunc (const SymEntry* Sym)
     return IsTypeFunc (Sym->Type)               &&
            SymIsDef (Sym)                       &&
            (Sym->Flags & (SC_REF | SC_EXTERN));
-}                                               
+}
 
 
 
@@ -205,6 +205,23 @@ void SymUseAttr (SymEntry* Sym, struct Declaration* D)
     Sym->Attr = D->Attributes;
     D->Attributes = 0;
     Sym->Flags |= SC_HAVEATTR;
+}
+
+
+
+void SymSetAsmName (SymEntry* Sym)
+/* Set the assembler name for an external symbol from the name of the symbol */
+{
+    unsigned Len;
+
+    /* Cannot be used to change the name */
+    PRECONDITION (Sym->AsmName == 0);
+                 
+    /* The assembler name starts with an underline */
+    Len = strlen (Sym->Name);
+    Sym->AsmName = xmalloc (Len + 2);
+    Sym->AsmName[0] = '_';
+    memcpy (Sym->AsmName+1, Sym->Name, Len+1);
 }
 
 

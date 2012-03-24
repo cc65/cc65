@@ -710,6 +710,7 @@ SymEntry* AddLocalSym (const char* Name, const Type* T, unsigned Flags, int Offs
             Entry->V.R.SaveOffs = StackPtr;
         } else if ((Flags & SC_EXTERN) == SC_EXTERN) {
             Entry->V.Label = Offs;
+            SymSetAsmName (Entry);
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
             /* Generate the assembler name from the label number */
             Entry->V.Label = Offs;
@@ -809,8 +810,6 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 
     } else {
 
-        unsigned Len;
-
 	/* Create a new entry */
      	Entry = NewSymEntry (Name, Flags);
 
@@ -826,10 +825,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags)
 	}
 
         /* Add the assembler name of the symbol */
-        Len = strlen (Name);
-        Entry->AsmName = xmalloc (Len + 2);
-        Entry->AsmName[0] = '_';
-        memcpy (Entry->AsmName+1, Name, Len+1);
+        SymSetAsmName (Entry);
 
      	/* Add the entry to the symbol table */
      	AddSymEntry (Tab, Entry);

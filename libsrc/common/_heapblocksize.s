@@ -32,7 +32,7 @@ __heapblocksize:
         sta     ptr2            ; Place the raw block pointer into ptr2
         iny
         lda     (ptr1),y
-        sta     ptr2+2
+        sta     ptr2+1
 
 ; Load the size from the raw block
 

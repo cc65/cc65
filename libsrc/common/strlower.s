@@ -19,7 +19,7 @@ _strlwr:
 	sta	ptr1	       	; Save s (working copy)
 	stx	ptr1+1
 	sta	ptr2
-	sta	ptr2+2	       	; save function result
+       	sta    	ptr2+1	       	; save function result
 	ldy	#0
 
 loop:	lda    	(ptr1),y       	; get character

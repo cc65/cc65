@@ -1,4 +1,4 @@
-<!doctype linuxdoc system>
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
 
 <article>
 <title>ca65 Users Guide
@@ -2392,6 +2392,13 @@ Here's a list of all control commands and a description, what they do:
   and unions&quot;">.
 
 
+<sect1><tt>.ENDUNION</tt><label id=".ENDUNION"><p>
+
+  Ends a union definition. See the <tt/<ref id=".UNION" name=".UNION">/
+  command and the separate section named <ref id="structs" name="&quot;Structs
+  and unions&quot;">.
+
+
 <sect1><tt>.ENUM</tt><label id=".ENUM"><p>
 
   Start an enumeration. This directive is very similar to the C <tt/enum/
@@ -3680,7 +3687,9 @@ Here's a list of all control commands and a description, what they do:
   Starts a struct definition. Structs are covered in a separate section named
   <ref id="structs" name="&quot;Structs and unions&quot;">.
 
-  See: <tt><ref id=".ENDSTRUCT" name=".ENDSTRUCT"></tt>
+  See also: <tt><ref id=".ENDSTRUCT" name=".ENDSTRUCT"></tt>,
+            <tt><ref id=".ENDUNION" name=".ENDUNION"></tt>,
+            <tt><ref id=".UNION" name=".UNION"></tt>
 
 
 <sect1><tt>.SUNPLUS</tt><label id=".SUNPLUS"><p>
@@ -3722,6 +3731,16 @@ Here's a list of all control commands and a description, what they do:
   section <ref id="macros" name="Macros">.
 
 
+<sect1><tt>.UNION</tt><label id=".UNION"><p>
+
+  Starts a union definition. Unions are covered in a separate section named
+  <ref id="structs" name="&quot;Structs and unions&quot;">.
+
+  See also: <tt><ref id=".ENDSTRUCT" name=".ENDSTRUCT"></tt>,
+            <tt><ref id=".ENDUNION" name=".ENDUNION"></tt>,
+            <tt><ref id=".STRUCT" name=".STRUCT"></tt>
+
+
 <sect1><tt>.WARNING</tt><label id=".WARNING"><p>
 
   Force an assembly warning. The assembler will output a warning message
@@ -3748,7 +3767,7 @@ Here's a list of all control commands and a description, what they do:
 	.endmacro
   </verb></tscreen>
 
-  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>
+  See also: <tt><ref id=".ERROR" name=".ERROR"></tt>,
             <tt><ref id=".FATAL" name=".FATAL"></tt>,
             <tt><ref id=".OUT" name=".OUT"></tt>
 
@@ -4418,7 +4437,15 @@ of 4 bytes:
 </verb></tscreen>
 
 A union shares the total space between all its members, its size is the same
-as that of the largest member.
+as that of the largest member. The offset of all members relative to the union
+is zero.
+
+<tscreen><verb>
+      .union  Entry
+              index   .word
+              ptr     .addr
+      .endunion
+</verb></tscreen>
 
 A struct or union must not necessarily have a name. If it is anonymous, no
 local scope is opened, the identifiers used to name the members are placed

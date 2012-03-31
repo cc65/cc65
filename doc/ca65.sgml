@@ -704,7 +704,7 @@ The right side can of course be an expression:
 </verb></tscreen>
 
 
-<label id=".SET">
+<label id="variables">
 <sect1>Numeric variables<p>
 
 Within macros and other control structures (<tt><ref id=".REPEAT"
@@ -3623,6 +3623,12 @@ Here's a list of all control commands and a description, what they do:
   See: <tt><ref id=".BSS" name=".BSS"></tt>, <tt><ref id=".CODE"
   name=".CODE"></tt>, <tt><ref id=".DATA" name=".DATA"></tt> and <tt><ref
   id=".RODATA" name=".RODATA"></tt>
+
+
+<sect1><tt>.SET</tt><label id=".SET"><p>
+
+  <tt/.SET/ is used to assign a value to a variable. See <ref id="variables"
+  name="Numeric variables"> for a full description.
 
 
 <sect1><tt>.SETCPU</tt><label id=".SETCPU"><p>

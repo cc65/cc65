@@ -77,7 +77,7 @@ static time_t FileTimeToUnixTime (const FILETIME* T)
      * way to express a number > 32 bit (known to me) but is able to do
      * calculations with 64 bit integers, so we need to do it this way.
      */
-    static const ULARGE_INTEGER Offs = { 0xB6109100UL, 0x20000000UL };
+    static const ULARGE_INTEGER Offs = { 0xB6109100UL, 0x00000020UL };
     ULARGE_INTEGER V;
     V.LowPart  = T->dwLowDateTime;
     V.HighPart = T->dwHighDateTime;

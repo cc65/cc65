@@ -69,6 +69,7 @@ OBJS =	abend.obj	\
 	exprdefs.obj	\
         fileid.obj      \
 	filepos.obj	\
+        filestat.obj    \
         filetype.obj    \
 	fname.obj	\
         fp.obj          \

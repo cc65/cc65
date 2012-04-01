@@ -27,6 +27,7 @@ OBJS =	abend.o		\
 	exprdefs.o	\
         fileid.o        \
 	filepos.o	\
+        filestat.o      \
 	filetype.o      \
 	fname.o		\
 	fp.o            \

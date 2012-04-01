@@ -6,7 +6,7 @@
 /*		  							     */
 /*		  							     */
 /*		  							     */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -43,11 +43,11 @@
 #  include <utime.h>
 #endif
 #include <time.h>
-#include <sys/stat.h>
 
 /* common */
 #include "cddefs.h"
 #include "exprdefs.h"
+#include "filestat.h"
 #include "fname.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -254,7 +254,7 @@ void ObjAdd (const char* Name)
      * if a file has changed in the debugger, we will ignore this problem
      * here.
      */
-    if (stat (Name, &StatBuf) != 0) {
+    if (FileStat (Name, &StatBuf) != 0) {
 	Error ("Cannot stat object file `%s': %s", Name, strerror (errno));
     }
 

@@ -38,14 +38,13 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include <sys/types.h>		/* EMX needs this */
-#include <sys/stat.h>
 
 /* common */
 #include "addrsize.h"
 #include "attrib.h"
 #include "chartype.h"
 #include "check.h"
+#include "filestat.h"
 #include "fname.h"
 #include "xmalloc.h"
 
@@ -520,7 +519,7 @@ int NewInputFile (const char* Name)
      * if a file has changed in the debugger, we will ignore this problem
      * here.
      */
-    if (stat (Name, &Buf) != 0) {
+    if (FileStat (Name, &Buf) != 0) {
         Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
     }
 

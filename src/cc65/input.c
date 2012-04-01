@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -36,12 +36,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 /* common */
 #include "check.h"
 #include "coll.h"
+#include "filestat.h"
 #include "fname.h"
 #include "print.h"
 #include "strbuf.h"
@@ -173,7 +172,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
          * here.
          */
      	struct stat Buf;
- 	if (stat (IF->Name, &Buf) != 0) {
+ 	if (FileStat (IF->Name, &Buf) != 0) {
  	    /* Error */
  	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
  	}

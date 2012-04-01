@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -38,8 +38,6 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#include <sys/types.h>		/* EMX needs this */
-#include <sys/stat.h>
 
 /* common */
 #include "alignment.h"
@@ -47,6 +45,7 @@
 #include "bitops.h"
 #include "cddefs.h"
 #include "coll.h"
+#include "filestat.h"
 #include "gentype.h"
 #include "intstack.h"
 #include "scopedefs.h"
@@ -1264,7 +1263,7 @@ static void DoIncBin (void)
      * here.
      */
     SB_Terminate (&Name);
-    if (stat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
+    if (FileStat (SB_GetConstBuf (&Name), &StatBuf) != 0) {
         Fatal ("Cannot stat input file `%m%p': %s", &Name, strerror (errno));
     }
 

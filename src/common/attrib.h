@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  typeattr.h				     */
+/*                                 attrib.h                                  */
 /*                                                                           */
 /*			     Handle gcc attributes			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */

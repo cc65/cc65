@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -34,10 +34,6 @@
 
 
 #include <string.h>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>		/* EMX needs this */
-#include <sys/stat.h>
 
 /* common */
 #include "fname.h"
@@ -208,7 +204,7 @@ void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
     /* Read the hll debug symbols */
     DbgSymCount = ReadVar (F);
     CollGrow (&O->HLLDbgSyms, DbgSymCount);
-    for (I = 0; I < DbgSymCount; ++I) {    
+    for (I = 0; I < DbgSymCount; ++I) {
        	CollAppend (&O->HLLDbgSyms, ReadHLLDbgSym (F, O, I));
     }
 }

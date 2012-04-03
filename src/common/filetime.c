@@ -84,7 +84,7 @@ static FILETIME* UnixTimeToFileTime (time_t T, FILETIME* FT)
      */
     static const ULARGE_INTEGER Offs = { 0xB6109100UL, 0x00000020UL };
     ULARGE_INTEGER V;
-    V.QuadPart = (unsigned __int64) T * 10000000U + Offs.QuadPart;
+    V.QuadPart = ((unsigned __int64) T + Offs.QuadPart) * 10000000U;
     FT->dwLowDateTime  = V.LowPart;
     FT->dwHighDateTime = V.HighPart;
     return FT;

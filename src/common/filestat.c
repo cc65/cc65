@@ -119,7 +119,7 @@ int FileStat (const char* Path, struct stat* Buf)
         } else {
             Error = EACCES;
         }
-        CloseHandle (H);
+        (void) CloseHandle (H);
     } else {
         Error = EACCES;
     }

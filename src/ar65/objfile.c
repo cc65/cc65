@@ -35,19 +35,12 @@
 
 #include <string.h>
 #include <errno.h>
-#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__)
-/* The Windows compilers have the file in the wrong directory */
-#  include <sys/utime.h>
-#else
-#  include <sys/types.h>     		/* FreeBSD needs this */
-#  include <utime.h>
-#endif
-#include <time.h>
 
 /* common */
 #include "cddefs.h"
 #include "exprdefs.h"
 #include "filestat.h"
+#include "filetime.h"
 #include "fname.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -309,7 +302,6 @@ void ObjAdd (const char* Name)
 void ObjExtract (const char* Name)
 /* Extract a module from the library */
 {
-    struct utimbuf U;
     FILE* Obj;
 
     /* Make a module name from the file name */
@@ -340,9 +332,7 @@ void ObjExtract (const char* Name)
     }
 
     /* Set access and modification time */
-    U.actime = O->MTime;
-    U.modtime = O->MTime;
-    if (utime (Name, &U) != 0) {
+    if (SetFileTimes (Name, O->MTime) != 0) {
 	Error ("Cannot set mod time on `%s': %s", Name, strerror (errno));
     }
 }

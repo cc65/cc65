@@ -115,8 +115,14 @@ static const struct ChipData CData[] = {
 };
 
 /* Defines for console screen */
-static const XColor FgColor = {
-    0,  32*256, 141*256, 32*256, 0, 0          /* green */
+static const XColor GreenColor = {
+    0,  32*256, 141*256, 32*256, 0, 0           /* green */
+};
+static const XColor AmberColor = {
+    0,  255*256, 204*256, 51*256, 0, 0          /* amber */
+};
+static const XColor WhiteColor = {
+    0,  224*256, 224*256, 224*256, 0, 0         /* white */
 };
 static const XColor BgColor = {
     0,  0*256, 0*256, 0*256, 0, 0               /* black */
@@ -147,7 +153,7 @@ struct ScreenInstance {
     unsigned            Rows;
     unsigned            Cols;
 
-    /* Window dimensions, 384*288 (PAL) */
+    /* Window dimensions, determined by char resolution and char set */
     unsigned            XTotal;
     unsigned            YTotal;
 
@@ -263,6 +269,8 @@ static void* ScreenCreateInstance (unsigned Addr, unsigned Range, void* CfgInfo)
     XSizeHints  SizeHints;
     XWMHints    WMHints;
     Cursor      C;
+    unsigned    CharColor;
+
 
     /* Allocate the instance data */
     ScreenInstance* V = VScreen = Sim->Malloc (sizeof (ScreenInstance));
@@ -354,8 +362,15 @@ static void* ScreenCreateInstance (unsigned Addr, unsigned Range, void* CfgInfo)
         Sim->Error ("Screen: Need color display");
     }
 
+    /* Determine the character color */
+    CharColor = (unsigned) CfgGetNum (CfgInfo, "charcolor", 0, 2, 0);
+
     /* Get all needed colors */
-    V->FgColor = FgColor;
+    switch (CharColor) {
+        case 1:         V->FgColor = AmberColor;        break;
+        case 2:         V->FgColor = WhiteColor;        break;
+        default:        V->FgColor = GreenColor;        break;
+    }
     V->BgColor = BgColor;
     CM = DefaultColormap (V->ScreenDisplay, V->Screen);
     if (XAllocColor (V->ScreenDisplay, CM, &V->FgColor) == 0) {
@@ -634,7 +649,7 @@ static void ScreenEventLoop (void)
                 break;
 
         }
-    }                 
+    }
 
     /* Flush the outgoing event queue */
     XFlush (VScreen->ScreenDisplay);

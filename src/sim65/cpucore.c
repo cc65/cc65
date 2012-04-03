@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,7 +41,7 @@
 #include "abend.h"
 #include "attrib.h"
 #include "print.h"
-#include "xsprintf.h"
+#include "strbuf.h"
 
 /* sim65 */
 #include "cpuregs.h"
@@ -75,7 +75,7 @@ int HaveIRQRequest = 0;
 int CPUHalted      = 0;
 
 /* Break message */
-static char BreakMsg[1024];
+static StrBuf BreakMsg = STATIC_STRBUF_INITIALIZER;
 
 
 
@@ -2518,12 +2518,10 @@ void RESET (void)
 void Break (const char* Format, ...)
 /* Stop running and display the given message */
 {
-#if 0
     va_list ap;
     va_start (ap, Format);
-    xvsprintf (BreakMsg, sizeof (BreakMsg), Format, ap);
+    SB_VPrintf (&BreakMsg, Format, ap);
     va_end (ap);
-#endif
 }
 
 
@@ -2570,9 +2568,9 @@ void CPURun (void)
     /* Count cycles */
     TotalCycles += Cycles;
 
-    if (BreakMsg[0]) {
-        printf ("%s\n", BreakMsg);
-        BreakMsg[0] = '\0';
+    if (SB_GetLen (&BreakMsg) > 0) {
+        printf ("%.*s\n", SB_GetLen (&BreakMsg), SB_GetConstBuf (&BreakMsg));
+        SB_Clear (&BreakMsg);
     }
 }
 

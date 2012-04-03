@@ -26,8 +26,9 @@ OBJS =	abend.o		\
 	debugflag.o     \
 	exprdefs.o	\
         fileid.o        \
-	filepos.o	\
+ 	filepos.o	\
         filestat.o      \
+        filetime.o      \
 	filetype.o      \
 	fname.o		\
 	fp.o            \

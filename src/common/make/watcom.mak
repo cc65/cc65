@@ -70,6 +70,7 @@ OBJS =	abend.obj	\
         fileid.obj      \
 	filepos.obj	\
         filestat.obj    \
+        filetime.obj    \
         filetype.obj    \
 	fname.obj	\
         fp.obj          \

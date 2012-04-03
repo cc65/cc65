@@ -37,14 +37,13 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <dirent.h>
 #include <unistd.h>
 
 /* common */
 #include "abend.h"
 #include "cmdline.h"
+#include "filestat.h"
 #include "print.h"
 #include "version.h"
 #include "xmalloc.h"
@@ -128,7 +127,7 @@ static void OptChipDir (const char* Opt attribute ((unused)), const char* Arg)
         strcpy (Name + DirLen + 1, E->d_name);
 
         /* Stat the file */
-        if (stat (Name, &S) != 0) {
+        if (FileStat (Name, &S) != 0) {
             Warning ("Cannot stat `%s': %s", Name, strerror (errno));
             xfree (Name);
             continue;

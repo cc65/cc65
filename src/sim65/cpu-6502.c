@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   cpucore.c                               */
+/*                                cpu-6502.c                                 */
 /*                                                                           */
 /*                        CPU core for the 6502 simulator                    */
 /*                                                                           */
@@ -44,17 +44,17 @@
 #include "strbuf.h"
 
 /* sim65 */
+#include "cpu-6502.h"
 #include "cpuregs.h"
 #include "cputype.h"
 #include "error.h"
 #include "global.h"
 #include "memory.h"
-#include "cpucore.h"
 
 
 
 /*****************************************************************************/
-/*  		    		     Data				     */
+/*  		     		     Data				     */
 /*****************************************************************************/
 
 

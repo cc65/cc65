@@ -111,7 +111,7 @@ static void OptChipDir (const char* Opt attribute ((unused)), const char* Arg)
 	char*  Name;
         struct stat S;
 
-	/* ### Ignore anything buy *.so files */
+	/* ### Ignore anything but *.so files */
 	unsigned NameLen = strlen (E->d_name);
 	if (NameLen <= 3) {
 	    continue;
@@ -168,7 +168,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 {
     if (CfgAvail ()) {
 	Error ("Cannot use -C twice");
-    }
+    }                             
     CfgSetName (Arg);
 }
 

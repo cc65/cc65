@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,6 +41,10 @@
 /* common.h */
 #include "coll.h"
 
+/* sim65 */
+#include "addrspace.h"
+#include "cpucore.h"
+
 
 
 /*****************************************************************************/
@@ -50,29 +54,30 @@
 
 
 /* Forwards */
-struct CPUData;
+struct CPUCore;
 
 /* */
 typedef struct System System;
 struct System {
-
-    struct CPUData*       CPU;          /* The CPU in the system */
-    struct AddressSpace*  AS;           /* The CPU address space */
-    Collection            ChipInstances;/* Instances of all the chips */
-
+    CPUCore*            CPU;            /* The CPU in the system */
+    AddressSpace*       AS;             /* The CPU address space */
+    Collection          ChipInstances;  /* Instances of all the chips */
 };
 
+/* Global pointer to simulated system */
+extern System*  System;
+
 
 
 /*****************************************************************************/
-/*     	      	    		     Code		  		     */
+/*     	      	    	  	     Code		  		     */
 /*****************************************************************************/
 
 
 
-System* NewSystem (struct CPUData* CPU);
-/* Create and initialize a new System struct. The function will read the size 
- * of the address space from the CPU, and also create a new AddressSpace 
+System* NewSystem (CPUCore* CPU);
+/* Create and initialize a new System struct. The function will read the size
+ * of the address space from the CPU, and also create a new AddressSpace
  * object. No chips are assigned, however.
  */
 

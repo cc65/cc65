@@ -45,17 +45,6 @@
 
 
 /*****************************************************************************/
-/*     	   	    		     Data				     */
-/*****************************************************************************/
-
-
-
-/* The actual CPU instance */
-CPUCore*        CPU = 0;
-
-
-
-/*****************************************************************************/
 /*     	       	    	   	     Code				     */
 /*****************************************************************************/
 
@@ -76,7 +65,7 @@ CPUCore* NewCPUCore (const char* Name, unsigned AddrSpaceSize)
 
     /* Initialize the data */
     C->Handle = 0;              /* ### */
-    C->AS     = NewAddressSpace (AddrSpaceSize);
+    C->AddressSize = AddrSpaceSize;
 
     /* Return the new CPU core */
     return C;

@@ -143,8 +143,8 @@ static void ParseCPU (void)
     AttrCheck (Attr, atType, "TYPE");
     AttrCheck (Attr, atAddrSpace, "ADDRSPACE");
 
-    /* Create the CPU */
-    CPUInstance = NewCPU ("6502", Size);
+    /* Create the system using the specified CPU */
+    System = NewSystem (NewCPU ("6502", Size));
 
     /* Skip the semicolon */
     CfgConsumeSemi ();
@@ -158,7 +158,7 @@ static void ParseAddrSpace (void)
     unsigned I;
 
     /* CPU must be defined before the address space */
-    if (CPUInstance == 0) {
+    if (System == 0) {
         CfgError ("CPU must be defined before address space definitions");
     }
 

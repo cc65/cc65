@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                cpu-6502.h                                 */
+/*		  		   cpudata.h				     */
 /*                                                                           */
-/*                        CPU core for the 6502 simulator                    */
+/*                   CPU data passed from the CPU plugins                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2012, Ullrich von Bassewitz                                      */
+/* (C) 2012,      Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -33,54 +33,54 @@
 
 
 
-#ifndef CPU_6502_H
-#define CPU_6502_H
-
-
-
-/* sim65 */
-#include "cpuregs.h"
+#ifndef CPUDATA_H
+#define CPUDATA_H
 
 
 
 /*****************************************************************************/
-/*  	   			     Data				     */
+/*                                     Data                                  */
 /*****************************************************************************/
 
 
 
-/* Registers */
-extern CPURegs Regs;
+/* Forwards */
+struct SimData;
+
+/* CPUData structure */
+typedef struct CPUData CPUData;
+struct CPUData {
+    const char* CPUName;                /* Name of the chip */
+    unsigned    MajorVersion;           /* Version information */
+    unsigned    MinorVersion;
+
+    /* -- Exported functions -- */
+
+    void Init (const struct SimData* Data);
+    /* Initialize the CPU module */
+
+    void* (*CreateInstance) (void* CfgInfo);
+    /* Create an instance of the CPU. Return the instance data pointer */
+
+    void (*DestroyInstance) (void* Data);
+    /* Destroy an instance of the CPU */
+
+    void Reset (void* Data);
+    /* Generate a CPU RESET */
+
+    void IRQRequest (void* Data);
+    /* Generate an IRQ */
+
+    void NMIRequest (void* Data);
+    /* Generate an NMI */
+
+    void Run (void* Data);
+    /* Run one CPU instruction */
+};
 
 
 
-/*****************************************************************************/
-/*  			   	     Code				     */
-/*****************************************************************************/
-
-
-
-void CPUInit (void);
-/* Initialize the CPU */
-
-void RESET (void);
-/* Generate a CPU RESET */
-
-void IRQRequest (void);
-/* Generate an IRQ */
-
-void NMIRequest (void);
-/* Generate an NMI */
-
-void Break (const char* Format, ...);
-/* Stop running and display the given message */
-
-void CPURun (void);
-/* Run one CPU instruction */
-
-
-
-/* End of cpu-6502.h */
+/* End of cpudata.h */
 
 #endif
 

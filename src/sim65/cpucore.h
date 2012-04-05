@@ -52,12 +52,14 @@
 /* CPU core structure */
 typedef struct CPUCore CPUCore;
 struct CPUCore {
-    void*           Handle;             /* Pointer to shared lib handle */
-    AddressSpace*   AS;                 /* Address space */
-};
+    void*       Handle;                 /* Pointer to shared lib handle */
+    unsigned    AddressSize;            /* Size of the address space */
 
-/* The actual CPU instance */
-extern CPUCore*         CPU;
+    /* Callback functions */
+
+
+
+};
 
 
 

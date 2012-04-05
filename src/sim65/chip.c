@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,10 +44,10 @@
 
 /* sim65 */
 #include "cfgdata.h"
+#include "chip.h"
 #include "chipdata.h"
 #include "cpucore.h"
 #include "error.h"
-#include "chip.h"
 
 
 
@@ -301,6 +301,7 @@ ChipInstance* MirrorChipInstance (const ChipInstance* Orig, unsigned Addr)
 
     /* Initialize the fields */
     CI->C    = Orig->C;
+    CI->AS   = 0;
     CI->Addr = Addr;
     CI->Size = Orig->Size;
     CI->Data = Orig->Data;

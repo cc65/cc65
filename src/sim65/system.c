@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,7 +37,6 @@
 #include "xmalloc.h"
 
 /* sim65 */
-#include "addrspace.h"
 #include "system.h"
 
 
@@ -48,7 +47,7 @@
 
 
 
-System* NewSystem (struct CPUData* CPU)
+System* NewSystem (CPUCore* CPU)
 /* Create and initialize a new System struct. The function will read the size
  * of the address space from the CPU, and also create a new AddressSpace
  * object. No chips are assigned, however.
@@ -59,7 +58,7 @@ System* NewSystem (struct CPUData* CPU)
 
     /* Initialize the fields */
     Sys->CPU      = CPU;
-    Sys->AS       = 0;    /* ### */
+    Sys->AS       = NewAddressSpace (CPU->AddressSize);
     Sys->ChipInstances = AUTO_COLLECTION_INITIALIZER;
 
     /* Return the new system */

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -60,8 +60,14 @@ static void* CreateInstance (unsigned Addr, unsigned Range, void* CfgInfo);
 static void DestroyInstance (void* Data);
 /* Destroy a chip instance */
 
+static void WriteCtrl (void* Data, unsigned Offs, unsigned char Val);
+/* Write control data */
+
 static void Write (void* Data, unsigned Offs, unsigned char Val);
 /* Write user data */
+
+static unsigned char ReadCtrl (void* Data, unsigned Offs);
+/* Read control data */
 
 static unsigned char Read (void* Data, unsigned Offs);
 /* Read user data */
@@ -73,6 +79,9 @@ static unsigned char Read (void* Data, unsigned Offs);
 /*****************************************************************************/
 
 
+
+/* The SimData pointer we get when InitChip is called */
+static const SimData* Sim;
 
 /* Control data passed to the main program */
 static const struct ChipData CData[1] = {
@@ -86,15 +95,33 @@ static const struct ChipData CData[1] = {
         InitChip,
         CreateInstance,
 	DestroyInstance,
+        WriteCtrl,
         Write,
-        Write,
-        Read,
+        ReadCtrl,
         Read
     }
 };
 
-/* The SimData pointer we get when InitChip is called */
-static const SimData* Sim;
+/* Screen instance data */
+typedef struct InstanceData InstanceData;
+struct InstanceData {
+    /* The memory area used for data */
+    unsigned char*      Mem[32];
+};
+
+/* Function opcodes */
+enum {
+    F_open,
+    F_close,
+    F_write,
+    F_read,
+    F_lseek,
+    F_unlink,
+    F_chdir,
+    F_getcwd,
+    F_mkdir,
+    F_rmdir,
+};
 
 
 
@@ -137,8 +164,14 @@ static int InitChip (const struct SimData* Data)
 static void* CreateInstance (unsigned Addr, unsigned Range, void* CfgInfo)
 /* Initialize a new chip instance */
 {
-    /* We don't need any instance data */
-    return 0;
+    /* Allocate the instance data */
+    InstanceData* D = Sim->Malloc (sizeof (InstanceData));
+
+    /* Initialize the instance data */
+    memset (D->Mem, 0x00, sizeof (D->Mem));
+
+    /* Return the instance data */
+    return D;
 }
 
 
@@ -146,28 +179,111 @@ static void* CreateInstance (unsigned Addr, unsigned Range, void* CfgInfo)
 static void DestroyInstance (void* Data)
 /* Destroy a chip instance */
 {
+    /* Cast the instance data pointer */
+    InstanceData* D = Data;
+
+    /* Free the instance data */
+    Sim->Free (D);
 }
 
 
 
-static void Write (void* Data attribute ((unused)),
-		   unsigned Offs attribute ((unused)),
-		   unsigned char Val)
+static void WriteCtrl (void* Data attribute, unsigned Offs, unsigned char Val)
 /* Write user data */
 {
-    putchar (Val);
+    /* Cast the instance data pointer */
+    InstanceData* D = Data;
+
+    /* Write to the memory */
+    D->Mem[Offs] = Val;
 }
 
 
 
-static unsigned char Read (void* Data attribute ((unused)),
-			   unsigned Offs attribute ((unused)))
+static void Write (void* Data, unsigned Offs, unsigned char Val)
+/* Write user data */
+{
+    /* Cast the instance data pointer */
+    InstanceData* D = Data;
+
+    /* Write to the memory */
+    D->Mem[Offs] = Val;
+
+    /* Now check the offset. Zero is special because it will trigger the
+     * action
+     */
+    if (Offs == 0) {
+
+        /* The action is determined by the value that is written */
+        switch (Val) {
+
+            case F_open:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_close:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_write:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_read:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_lseek:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_unlink:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_chdir:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_getcwd:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_mkdir:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+            case F_rmdir:
+                Sim->Break ("Unsupported function $%02X", Val);
+                break;
+
+        }
+    }
+}
+
+
+
+static unsigned char ReadCtrl (void* Data, unsigned Offs)
 /* Read user data */
 {
-    /* Read a character and return the value */
-    return getchar ();
+    /* Cast the instance data pointer */
+    InstanceData* D = Data;
+
+    /* Read the cell and return the value */
+    return D->Mem[Offs];
 }
 
+
+
+static unsigned char Read (void* Data, unsigned Offs)
+/* Read user data */
+{
+    /* Cast the instance data pointer */
+    InstanceData* D = Data;
+
+    /* Read the cell and return the value */
+    return D->Mem[Offs];
+}
 
 
 

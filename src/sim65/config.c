@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,11 +46,11 @@
 #include "xmalloc.h"
 
 /* sim65 */
+#include "addrspace.h"
 #include "cfgdata.h"
 #include "chip.h"
 #include "error.h"
 #include "global.h"
-#include "memory.h"
 #include "location.h"
 #include "scanner.h"
 #include "config.h"
@@ -143,18 +143,26 @@ static void ParseCPU (void)
     AttrCheck (Attr, atType, "TYPE");
     AttrCheck (Attr, atAddrSpace, "ADDRSPACE");
 
+    /* Create the CPU */
+    CPUInstance = NewCPU ("6502", Size);
+
     /* Skip the semicolon */
     CfgConsumeSemi ();
 }
 
 
 
-static void ParseMemory (void)
-/* Parse a MEMORY section */
+static void ParseAddrSpace (void)
+/* Parse a ADDRSPACE section */
 {
     unsigned I;
 
+    /* CPU must be defined before the address space */
+    if (CPUInstance == 0) {
+        CfgError ("CPU must be defined before address space definitions");
+    }
 
+    /* Parse addresses */
     while (CfgTok == CFGTOK_INTCON) {
 
         Location* L;
@@ -263,8 +271,8 @@ static void ParseMemory (void)
         /* Delete the "name" attribute */
         FreeCfgData (D);
 
-        /* Assign the chip instance to memory */
-        MemAssignChip (CI, L->Start, Range);
+        /* Assign the chip instance to address space */
+        ASAssignChip (CPUInstance->AS, CI, L->Start, Range);
     }
 
     /* Create the mirrors */
@@ -295,7 +303,7 @@ static void ParseMemory (void)
         /* For simplicity, get the chip instance we're mirroring from the
          * memory, instead of searching for the range in the list.
          */
-        CI = MemGetChip (MirrorAddr);
+        CI = ASGetChip (MirrorAddr);
         if (CI == 0) {
             /* We are mirroring an unassigned address */
             Error ("%s(%u): Mirroring an unassigned address",
@@ -316,8 +324,8 @@ static void ParseMemory (void)
         /* Clone the chip instance for the new location */
         MCI = MirrorChipInstance (CI, L->Start - Offs);
 
-        /* Assign the chip instance to memory */
-        MemAssignChip (MCI, L->Start, Range);
+        /* Assign the chip instance to address space */
+        ASAssignChip (CPUInstance->AS, MCI, L->Start, Range);
     }
 }
 
@@ -327,8 +335,8 @@ static void ParseConfig (void)
 /* Parse the config file */
 {
     static const IdentTok BlockNames [] = {
-       	{   "CPU",     	CFGTOK_CPU      },
-       	{   "MEMORY",  	CFGTOK_MEMORY   },
+       	{   "ADDRSPACE",   	CFGTOK_ADDRSPACE 	},
+       	{   "CPU",     	   	CFGTOK_CPU      	},
     };
     cfgtok_t BlockTok;
 
@@ -345,12 +353,12 @@ static void ParseConfig (void)
 	/* Read the block */
 	switch (BlockTok) {
 
-            case CFGTOK_CPU:
-                ParseCPU ();
+            case CFGTOK_ADDRSPACE:
+                ParseAddrSpace ();
                 break;
 
-            case CFGTOK_MEMORY:
-                ParseMemory ();
+            case CFGTOK_CPU:
+                ParseCPU ();
                 break;
 
 	    default:

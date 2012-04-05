@@ -105,6 +105,8 @@ static const SimData Sim65Data = {
     GetCfgId,
     GetCfgStr,
     GetCfgNum,
+    0,
+    0,
     Break,
     IRQRequest,
     NMIRequest,
@@ -156,7 +158,7 @@ static int GetCfgNum (void* CfgInfo, const char* Name, long* Val)
 
 
 static int CmpChips (void* Data attribute ((unused)),
-		     const void* lhs, const void* rhs)
+    		     const void* lhs, const void* rhs)
 /* Compare function for CollSort */
 {
     /* Cast the object pointers */
@@ -404,7 +406,7 @@ void LoadChipLibrary (const char* LibName)
         /* Output chip name and version to keep the user happy */
         Print (stdout, 1,
                "  Found %s `%s', version %u.%u in library `%s'\n",
-	       (D->Type == CHIPDATA_TYPE_CHIP)? "chip" : "cpu",
+    	       (D->Type == CHIPDATA_TYPE_CHIP)? "chip" : "cpu",
                D->ChipName,
                D->MajorVersion,
                D->MinorVersion,

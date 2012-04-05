@@ -12,7 +12,7 @@ COMMON	= ../common
 
 #
 CC	= gcc
-CFLAGS 	= -g -O2 -Wall -W -std=c89
+CFLAGS 	= -g -Wall -W -std=c89
 override CFLAGS += -I$(COMMON)
 EBIND	= emxbind
 LDFLAGS	= -ldl
@@ -27,13 +27,13 @@ OBJS = 	addrspace.o     \
 	chip.o          \
 	chippath.o      \
 	config.o        \
+        cpu-6502.o      \
 	cpucore.o     	\
 	cputype.o     	\
 	error.o         \
 	global.o      	\
 	location.o      \
 	main.o          \
-	memory.o        \
 	scanner.o       \
 	system.o
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -58,7 +58,7 @@ struct CfgData {
 	CfgDataString
     }		Type;		/* Type of the value */
     union {
-	char*	SVal;		/* String or id value */
+        char*   SVal;           /* String or id value */
 	long	IVal;		/* Integer value */
     } V;
     unsigned    Line;           /* Line where the attribute was defined */

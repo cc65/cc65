@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,17 +57,14 @@ CfgData* NewCfgData (void)
  * uses the current output of the config scanner.
  */
 {
-    /* Get the length of the identifier */
-    unsigned AttrLen = strlen (CfgSVal);
-
     /* Allocate memory */
-    CfgData* D = xmalloc (sizeof (CfgData) + AttrLen);
+    CfgData* D = xmalloc (sizeof (CfgData) + SB_GetLen (&CfgSVal));
 
     /* Initialize the fields */
     D->Type = CfgDataInvalid;
     D->Line = CfgErrorLine;
     D->Col  = CfgErrorCol;
-    memcpy (D->Attr, CfgSVal, AttrLen+1);
+    memcpy (D->Attr, SB_GetConstBuf (&CfgSVal), SB_GetLen (&CfgSVal) + 1);
 
     /* Return the new struct */
     return D;
@@ -78,7 +75,7 @@ CfgData* NewCfgData (void)
 void FreeCfgData (CfgData* D)
 /* Free a config data structure */
 {
-    if (D->Type == CfgDataString) {
+    if (D->Type == CfgDataId || D->Type == CfgDataString) {
         /* Free the string value */
         xfree (D->V.SVal);
     }

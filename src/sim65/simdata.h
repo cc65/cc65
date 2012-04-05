@@ -89,6 +89,12 @@ struct SimData {
      * true. If not found, return false.
      */
 
+    unsigned char (*ReadCtrl) (unsigned Addr);
+    /* Read from the given address without triggering any additional action */
+
+    void (*WriteCtrl) (unsigned Addr, unsigned char Val);
+    /* Write to the given address without triggering additional action */
+
     void (*Break) (const char* Format, ...);
     /* Stop the CPU and display the given message */
 
@@ -98,7 +104,7 @@ struct SimData {
     void (*NMI) (void);
     /* Issue an nmi request */
 
-    
+
 
 };
 

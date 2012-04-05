@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 cpucore.h                                 */
+/*                                   cpucore.h                               */
 /*                                                                           */
-/*                     CPU definition for the simulator                      */
+/*                        CPU core for the 6502 simulator                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2012, Ullrich von Bassewitz                                      */
-/*                Roemerstrasse 52                                           */
-/*                D-70794 Filderstadt                                        */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,43 +39,50 @@
 
 
 /* sim65 */
-#include "addrspace.h"
+#include "cpuregs.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*  	   			     Data				     */
 /*****************************************************************************/
 
 
 
-/* CPU core structure */
-typedef struct CPUCore CPUCore;
-struct CPUCore {
-    void*           Handle;             /* Pointer to shared lib handle */
-    AddressSpace*   AS;                 /* Address space */
-};
-
-/* The actual CPU instance */
-extern CPUCore*         CPU;
+/* Registers */
+extern CPURegs Regs;
 
 
 
 /*****************************************************************************/
-/*     	       	    	    	     Code				     */
+/*  			   	     Code				     */
 /*****************************************************************************/
 
 
 
-CPUCore* NewCPUCore (const char* Name, unsigned AddrSpaceSize);
-/* Create and return a new CPU including it's address space */
+void CPUInit (void);
+/* Initialize the CPU */
+
+void RESET (void);
+/* Generate a CPU RESET */
+
+void IRQRequest (void);
+/* Generate an IRQ */
+
+void NMIRequest (void);
+/* Generate an NMI */
+
+void Break (const char* Format, ...);
+/* Stop running and display the given message */
+
+void CPURun (void);
+/* Run one CPU instruction */
 
 
 
 /* End of cpucore.h */
 
 #endif
-
 
 
 

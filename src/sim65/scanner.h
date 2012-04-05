@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.h				     */
+/*		   		   scanner.h				     */
 /*                                                                           */
 /*            Configuration file scanner for the sim65 6502 simulator        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,6 +40,7 @@
 
 /* common */
 #include "attrib.h"
+#include "strbuf.h"
 
 
 
@@ -67,11 +68,10 @@ typedef enum {
 
     /* Primary blocks */
     CFGTOK_CPU,
-    CFGTOK_MEMORY,
-
-    /* CPU block */
-    CFGTOK_TYPE,
     CFGTOK_ADDRSPACE,
+
+    /* Secondary stuff */
+    CFGTOK_TYPE,
 
     /* Special identifiers */
     CFGTOK_TRUE,
@@ -92,9 +92,8 @@ struct IdentTok {
 
 
 /* Current token and attributes */
-#define CFG_MAX_IDENT_LEN  255
 extern cfgtok_t		CfgTok;
-extern char    	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
+extern StrBuf		CfgSVal;
 extern unsigned long	CfgIVal;
 
 /* Error location */

@@ -6,7 +6,7 @@
 COMMON  = ../../common
 SIM65	= ..
 
-CFLAGS 	= -g -O2 -Wall -W -std=c89
+CFLAGS 	= -g -Wall -W -std=c89
 override CFLAGS += -I$(COMMON) -I$(SIM65) -fpic
 CC	= gcc
 EBIND	= emxbind

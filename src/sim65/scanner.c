@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,7 +57,7 @@
 
 /* Current token and attributes */
 cfgtok_t	        CfgTok;
-char   	       	        CfgSVal [CFG_MAX_IDENT_LEN+1];
+StrBuf			CfgSVal = STATIC_STRBUF_INITIALIZER;
 unsigned long           CfgIVal;
 
 /* Error location */
@@ -266,7 +266,7 @@ Again:
 	    I = 0;
 	    while (C != '\"') {
 		if (C == EOF || C == '\n') {
-		    Error ("%s(%u): Unterminated string", CfgName, InputLine);
+	 	    Error ("%s(%u): Unterminated string", CfgName, InputLine);
 		}
 	       	if (I < CFG_MAX_IDENT_LEN) {
 		    CfgSVal [I++] = C;

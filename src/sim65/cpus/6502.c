@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                cpu-6502.c                                 */
+/*                                  6502.c                                   */
 /*                                                                           */
-/*                        CPU core for the 6502 simulator                    */
+/*                           CPU core for the 6502                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,9 +44,7 @@
 #include "strbuf.h"
 
 /* sim65 */
-#include "cpu-6502.h"
-#include "cpuregs.h"
-#include "cputype.h"
+#include "6502regs.h"
 #include "error.h"
 #include "global.h"
 #include "memory.h"
@@ -1037,15 +1035,11 @@ static void OPC_6502_6C (void)
     unsigned Addr;
     Cycles = 5;
     Addr = MemReadWord (Regs.PC+1);
-    if (CPU == CPU_6502) {
-        /* Emulate the 6502 bug */
-        Regs.PC = MemReadByte (Addr);
-        Addr = (Addr & 0xFF00) | ((Addr + 1) & 0xFF);
-        Regs.PC |= (MemReadByte (Addr) << 8);
-    } else {
-        /* 65C02 and above have this bug fixed */
-        Regs.PC = MemReadWord (Addr);
-    }
+
+    /* Emulate the 6502 bug */
+    Regs.PC = MemReadByte (Addr);
+    Addr = (Addr & 0xFF00) | ((Addr + 1) & 0xFF);
+    Regs.PC |= (MemReadByte (Addr) << 8);
 }
 
 

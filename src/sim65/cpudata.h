@@ -44,19 +44,23 @@
 
 
 
+/* Version defines */
+#define CPUDATA_VER_MAJOR       1U
+#define CPUDATA_VER_MINOR       0U
+
 /* Forwards */
 struct SimData;
 
 /* CPUData structure */
 typedef struct CPUData CPUData;
 struct CPUData {
-    const char* CPUName;                /* Name of the chip */
-    unsigned    MajorVersion;           /* Version information */
-    unsigned    MinorVersion;
+    const char*     CPUName;            /* Name of the chip */
+    unsigned        MajorVersion;       /* Version information */
+    unsigned        MinorVersion;                             
 
     /* -- Exported functions -- */
 
-    void Init (const struct SimData* Data);
+    void (*Init) (const struct SimData* Data);
     /* Initialize the CPU module */
 
     void* (*CreateInstance) (void* CfgInfo);
@@ -65,17 +69,22 @@ struct CPUData {
     void (*DestroyInstance) (void* Data);
     /* Destroy an instance of the CPU */
 
-    void Reset (void* Data);
+    void (*Reset) (void* Data);
     /* Generate a CPU RESET */
 
-    void IRQRequest (void* Data);
+    void (*IRQRequest) (void* Data);
     /* Generate an IRQ */
 
-    void NMIRequest (void* Data);
+    void (*NMIRequest) (void* Data);
     /* Generate an NMI */
 
-    void Run (void* Data);
-    /* Run one CPU instruction */
+    unsigned (*ExecuteInsn) (void* Data);
+    /* Execute one CPU instruction. Return the number of clock cycles for the
+     * executed instruction.
+     */
+
+    unsigned long (*GetCycles) (void* Data);
+    /* Return the total number of clock cycles executed */
 };
 
 

@@ -1,5 +1,5 @@
 #
-# gcc Makefile for the sim65 chip plugins
+# gcc Makefile for the sim65 CPU plugins
 #
 
 # Include directories

@@ -113,6 +113,10 @@ struct CPURegs {
 #define OF	0x40		/* Overflow flag */
 #define SF	0x80		/* Sign flag */
 
+/* Type of an opcode handler function */
+struct CPUInstance;
+typedef void (*OPFunc) (struct CPUInstance* D);
+
 
 
 /* Control data passed to the main program */
@@ -152,7 +156,7 @@ static const struct CPUData CData[] = {
 /* CPU instance data */
 typedef struct CPUInstance CPUInstance;
 struct CPUInstance {
-    unsigned            Type;           /* CPU type */
+    const OPFunc*       Handlers;       /* Table with opcode handlers */
 
     CPURegs             Regs;           /* The CPU registers */
 
@@ -421,20 +425,57 @@ struct CPUInstance {
 
 
 
+static unsigned char MemReadByte (unsigned Addr)
+/* Read a byte from a memory location */
+{
+    return Sim->Read (Addr);
+}
+
+
+
+static unsigned MemReadWord (unsigned Addr)
+/* Read a word from a memory location */
+{
+    unsigned W = Sim->Read (Addr);
+    return (W | (Sim->Read (Addr + 1) << 8));
+}
+
+
+
+static unsigned MemReadZPWord (unsigned Addr)
+/* Read a word from the zero page. This function differs from ReadMemW in that
+ * the read will always be in the zero page, even in case of an address
+ * overflow.
+ */
+{
+    unsigned W = Sim->Read (Addr & 0xFF);
+    return (W | (Sim->Read ((Addr + 1) & 0xFF) << 8));
+}
+
+
+
+static void MemWriteByte (unsigned Addr, unsigned char Val)
+/* Write a byte to a memory location */
+{
+    Sim->Write (Addr, Val);
+}
+
+
+
 /*****************************************************************************/
 /*                                CPUInstance                                */
 /*****************************************************************************/
 
 
 
-static CPUInstance* NewCPUInstance (unsigned Type)
+static CPUInstance* NewCPUInstance (const OPFunc FuncTable[256], void* CfgInfo)
 /* Create and return a new CPU instance struct */
 {
     /* Allocate memory */
     CPUInstance* D = Sim->Malloc (sizeof (*D));
 
     /* Initialize the fields */
-    D->Type             = Type;         /* CPU type */
+    D->Handlers         = FuncTable;    /* Table with opcode handlers */
     D->StackPage        = 0x100;        /* Allows to move the stack page */
     D->HaveNMIRequest   = 0;            /* NMI request active */
     D->HaveIRQRequest   = 0;            /* IRQ request active */
@@ -446,16 +487,25 @@ static CPUInstance* NewCPUInstance (unsigned Type)
 
 
 
+static void DeleteCPUInstance (CPUInstance* Instance)
+/* Delete a CPU instance */
+{
+    /* Just free the memory */
+    Sim->Free (Instance);
+}
+
+
+
 /*****************************************************************************/
-/*                               Opcode stuff                                */
+/*                         Opcode handling functions                         */
 /*****************************************************************************/
 
 
 
 static void OPC_Illegal (CPUInstance* D)
 {
-    Warning ("Illegal opcode $%02X at address $%04X\n",
-             MemReadByte (D->Regs.PC), D->Regs.PC);
+    Sim->Warning ("Illegal opcode $%02X at address $%04X\n",
+                  MemReadByte (D->Regs.PC), D->Regs.PC);
 }
 
 
@@ -1142,14 +1192,31 @@ static void OPC_6502_6A (CPUInstance* D)
 static void OPC_6502_6C (CPUInstance* D)
 /* Opcode $6C: JMP (ind) */
 {
-    unsigned Addr;
+    unsigned PC, Lo, Hi;
     D->Cycles = 5;
-    Addr = MemReadWord (D->Regs.PC+1);
+    PC = D->Regs.PC;
+    Lo = MemReadWord (PC+1);
 
     /* Emulate the 6502 bug */
-    D->Regs.PC = MemReadByte (Addr);
-    Addr = (Addr & 0xFF00) | ((Addr + 1) & 0xFF);
-    D->Regs.PC |= (MemReadByte (Addr) << 8);
+    D->Regs.PC = MemReadByte (Lo);
+    Hi = (Lo & 0xFF00) | ((Lo + 1) & 0xFF);
+    D->Regs.PC |= (MemReadByte (Hi) << 8);
+
+    /* Output a warning if the bug is triggered */
+    if (Hi != Lo + 1) {
+        Sim->Warning ("6502 indirect jump bug triggered at $%04X, ind addr = $%04X",
+                      PC, Lo);
+    }
+}
+
+
+
+static void OPC_65C02_6C (CPUInstance* D)
+/* Opcode $6C: JMP (ind) */
+{
+    /* 6502 bug fixed here */
+    D->Cycles = 5;
+    D->Regs.PC = MemReadWord (MemReadWord (D->Regs.PC+1));
 }
 
 
@@ -2312,14 +2379,13 @@ static void OPC_6502_FE (CPUInstance* D)
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                           Opcode handler tables                           */
 /*****************************************************************************/
 
 
 
-/* Opcode handler table */
-typedef void (*OPCFunc) (CPUInstance* D);
-static const OPCFunc OPCTable[256] = {
+/* Opcode handler table for the 6502 */
+static const OPFunc OP6502Table[256] = {
     OPC_6502_00,
     OPC_6502_01,
     OPC_Illegal,
@@ -2580,6 +2646,268 @@ static const OPCFunc OPCTable[256] = {
 
 
 
+/* Opcode handler table for the 65C02 */
+static const OPFunc OP65C02Table[256] = {
+    OPC_6502_00,
+    OPC_6502_01,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_05,
+    OPC_6502_06,
+    OPC_Illegal,
+    OPC_6502_08,
+    OPC_6502_09,
+    OPC_6502_0A,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_0D,
+    OPC_6502_0E,
+    OPC_Illegal,
+    OPC_6502_10,
+    OPC_6502_11,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_15,
+    OPC_6502_16,
+    OPC_Illegal,
+    OPC_6502_18,
+    OPC_6502_19,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_1D,
+    OPC_6502_1E,
+    OPC_Illegal,
+    OPC_6502_20,
+    OPC_6502_21,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_24,
+    OPC_6502_25,
+    OPC_6502_26,
+    OPC_Illegal,
+    OPC_6502_28,
+    OPC_6502_29,
+    OPC_6502_2A,
+    OPC_Illegal,
+    OPC_6502_2C,
+    OPC_6502_2D,
+    OPC_6502_2E,
+    OPC_Illegal,
+    OPC_6502_30,
+    OPC_6502_31,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_35,
+    OPC_6502_36,
+    OPC_Illegal,
+    OPC_6502_38,
+    OPC_6502_39,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_3D,
+    OPC_6502_3E,
+    OPC_Illegal,
+    OPC_6502_40,
+    OPC_6502_41,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_45,
+    OPC_6502_46,
+    OPC_Illegal,
+    OPC_6502_48,
+    OPC_6502_49,
+    OPC_6502_4A,
+    OPC_Illegal,
+    OPC_6502_4C,
+    OPC_6502_4D,
+    OPC_6502_4E,
+    OPC_Illegal,
+    OPC_6502_50,
+    OPC_6502_51,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_55,
+    OPC_6502_56,
+    OPC_Illegal,
+    OPC_6502_58,
+    OPC_6502_59,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_5D,
+    OPC_6502_5E,
+    OPC_Illegal,
+    OPC_6502_60,
+    OPC_6502_61,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_65,
+    OPC_6502_66,
+    OPC_Illegal,
+    OPC_6502_68,
+    OPC_6502_69,
+    OPC_6502_6A,
+    OPC_Illegal,
+    OPC_65C02_6C,
+    OPC_6502_6D,
+    OPC_6502_6E,
+    OPC_Illegal,
+    OPC_6502_70,
+    OPC_6502_71,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_75,
+    OPC_6502_76,
+    OPC_Illegal,
+    OPC_6502_78,
+    OPC_6502_79,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_7D,
+    OPC_6502_7E,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_81,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_84,
+    OPC_6502_85,
+    OPC_6502_86,
+    OPC_Illegal,
+    OPC_6502_88,
+    OPC_Illegal,
+    OPC_6502_8A,
+    OPC_Illegal,
+    OPC_6502_8C,
+    OPC_6502_8D,
+    OPC_6502_8E,
+    OPC_Illegal,
+    OPC_6502_90,
+    OPC_6502_91,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_94,
+    OPC_6502_95,
+    OPC_6502_96,
+    OPC_Illegal,
+    OPC_6502_98,
+    OPC_6502_99,
+    OPC_6502_9A,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_9D,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_A0,
+    OPC_6502_A1,
+    OPC_6502_A2,
+    OPC_Illegal,
+    OPC_6502_A4,
+    OPC_6502_A5,
+    OPC_6502_A6,
+    OPC_Illegal,
+    OPC_6502_A8,
+    OPC_6502_A9,
+    OPC_6502_AA,
+    OPC_Illegal,
+    OPC_6502_AC,
+    OPC_6502_AD,
+    OPC_6502_AE,
+    OPC_Illegal,
+    OPC_6502_B0,
+    OPC_6502_B1,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_B4,
+    OPC_6502_B5,
+    OPC_6502_B6,
+    OPC_Illegal,
+    OPC_6502_B8,
+    OPC_6502_B9,
+    OPC_6502_BA,
+    OPC_Illegal,
+    OPC_6502_BC,
+    OPC_6502_BD,
+    OPC_6502_BE,
+    OPC_Illegal,
+    OPC_6502_C0,
+    OPC_6502_C1,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_C4,
+    OPC_6502_C5,
+    OPC_6502_C6,
+    OPC_Illegal,
+    OPC_6502_C8,
+    OPC_6502_C9,
+    OPC_6502_CA,
+    OPC_Illegal,
+    OPC_6502_CC,
+    OPC_6502_CD,
+    OPC_6502_CE,
+    OPC_Illegal,
+    OPC_6502_D0,
+    OPC_6502_D1,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_D5,
+    OPC_6502_D6,
+    OPC_Illegal,
+    OPC_6502_D8,
+    OPC_6502_D9,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_DD,
+    OPC_6502_DE,
+    OPC_Illegal,
+    OPC_6502_E0,
+    OPC_6502_E1,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_E4,
+    OPC_6502_E5,
+    OPC_6502_E6,
+    OPC_Illegal,
+    OPC_6502_E8,
+    OPC_6502_E9,
+    OPC_6502_EA,
+    OPC_Illegal,
+    OPC_6502_EC,
+    OPC_6502_ED,
+    OPC_6502_EE,
+    OPC_Illegal,
+    OPC_6502_F0,
+    OPC_6502_F1,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_F5,
+    OPC_6502_F6,
+    OPC_Illegal,
+    OPC_6502_F8,
+    OPC_6502_F9,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_Illegal,
+    OPC_6502_FD,
+    OPC_6502_FE,
+    OPC_Illegal,
+};
+
+
+
 /*****************************************************************************/
 /*				     Code				     */
 /*****************************************************************************/
@@ -2598,6 +2926,7 @@ static void Init (const SimData* S)
 static void* Create6502Instance (void* CfgInfo)
 /* Create an instance of a 6502 CPU */
 {
+    return NewCPUInstance (OP6502Table, CfgInfo);
 }
 
 
@@ -2605,6 +2934,7 @@ static void* Create6502Instance (void* CfgInfo)
 static void* Create65C02Instance (void* CfgInfo)
 /* Create an instance of a 65C02 CPU */
 {
+    return NewCPUInstance (OP65C02Table, CfgInfo);
 }
 
 
@@ -2612,6 +2942,8 @@ static void* Create65C02Instance (void* CfgInfo)
 static void DestroyInstance (void* Instance)
 /* Destroy an instance of a CPU */
 {
+    /* Free the instance */
+    DeleteCPUInstance (Instance);
 }
 
 
@@ -2694,7 +3026,7 @@ static unsigned ExecuteInsn (void* Data)
         unsigned char OPC = MemReadByte (D->Regs.PC);
 
         /* Execute it */
-        OPCTable[OPC] (D);
+        D->Handlers[OPC] (D);
 
     }
 

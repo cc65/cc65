@@ -302,6 +302,11 @@ static void OptWrite (const char* Opt attribute ((unused)), const char* Arg)
     /* Parse the argument */
     Collection* A = ParseAttrList (Arg, NameList, 2);
 
+    /* We must have output data */
+    if (D == 0) {
+        Error ("No conversion, so there's nothing to write");
+    }
+
     /* Write the file */
     WriteOutputFile (D, A, C);
 

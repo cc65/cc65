@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -100,6 +100,11 @@ int F_GetTopLevelSP (const Function* F);
 int F_ReserveLocalSpace (Function* F, unsigned Size);
 /* Reserve (but don't allocate) the given local space and return the stack
  * offset.
+ */
+
+int F_GetStackPtr (const Function* F);
+/* Return the current stack pointer including reserved (but not allocated)
+ * space on the stack.
  */
 
 void F_AllocLocalSpace (Function* F);

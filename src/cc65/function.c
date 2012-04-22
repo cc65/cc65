@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -237,6 +237,16 @@ int F_ReserveLocalSpace (Function* F, unsigned Size)
 
 
 
+int F_GetStackPtr (const Function* F)
+/* Return the current stack pointer including reserved (but not allocated)
+ * space on the stack.
+ */
+{
+    return StackPtr - F->Reserved;
+}
+
+
+
 void F_AllocLocalSpace (Function* F)
 /* Allocate any local space previously reserved. The function will do
  * nothing if there is no reserved local space.
@@ -361,7 +371,7 @@ static void F_RestoreRegVars (Function* F)
 
 static void F_EmitDebugInfo (void)
 /* Emit debug infos for the current function */
-{                   
+{
     if (DebugInfo) {
         /* Get the current fuction */
         const SymEntry* Sym = CurrentFunc->FuncEntry;

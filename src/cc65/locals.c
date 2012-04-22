@@ -176,7 +176,7 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
 
 
 
-static void ParseAutoDecl (Declaration* Decl)
+static void ParseAutoDecl (Declaration* Decl)    
 /* Parse the declaration of an auto variable. */
 {
     unsigned  Flags;
@@ -392,8 +392,11 @@ static void ParseStaticDecl (Declaration* Decl)
 
     } else {
 
+        /* Get the size of the variable */
+        Size = SizeOf (Decl->Type);
+
         /* Allocate a label and space for the variable in the BSS segment */
-        AllocStorage (DataLabel, g_usebss, SizeOf (Sym->Type));
+        AllocStorage (DataLabel, g_usebss, Size);
 
     }
 

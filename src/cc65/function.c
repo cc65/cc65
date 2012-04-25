@@ -373,7 +373,7 @@ static void F_EmitDebugInfo (void)
 /* Emit debug infos for the current function */
 {
     if (DebugInfo) {
-        /* Get the current fuction */
+        /* Get the current function */
         const SymEntry* Sym = CurrentFunc->FuncEntry;
 
         /* Output info for the function itself */

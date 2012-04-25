@@ -7,7 +7,7 @@
         .export         _write
         .constructor    initstdout
 
-        .import         SETLFS, OPEN, CKOUT, BSOUT, CLRCH
+        .import         SETLFS, OPEN, CKOUT, BSOUT, READST, CLRCH
         .import         rwcommon
         .importzp       sp, ptr1, ptr2, ptr3
 
@@ -72,7 +72,15 @@
         bne     @L1
         inc     ptr2+1          ; A = *buf++;
 @L1:    jsr     BSOUT
-        bcs     @error          ; Bail out on errors
+
+; Check the status
+
+        pha
+        jsr     READST
+        lsr     a               ; Bit zero is write timeout
+        bne     devnotpresent2
+        pla
+        bcs     @L3
 
 ; Count characters written
 
@@ -87,9 +95,9 @@
         inc     ptr1+1
         bne     @L0
 
-; Wrote all chars, close the output channel
+; Wrote all chars or disk full. Close the output channel
 
-        jsr     CLRCH
+@L3:    jsr     CLRCH
 
 ; Clear _oserror and return the number of chars written
 
@@ -101,6 +109,8 @@
 
 ; Error entry: Device not present
 
+devnotpresent2:
+        pla
 devnotpresent:
         lda     #ENODEV
         jmp     __directerrno   ; Sets _errno, clears _oserror, returns -1

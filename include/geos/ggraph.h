@@ -93,15 +93,17 @@ void __fastcall__ GraphicsString(char *myGfxString);
 /* VIC screen sizes */
 #define	VIC_X_POS_OFF	24
 #define	VIC_Y_POS_OFF	50
-#define	SC_BYTE_WIDTH	40
 #ifdef __GEOS_CBM__
+#define	SC_BYTE_WIDTH	40
 #define	SC_PIX_HEIGHT	200
 #define	SC_PIX_WIDTH	320
+#define	SC_SIZE		8000
 #else
+#define	SC_BYTE_WIDTH	70
 #define	SC_PIX_HEIGHT	192
 #define	SC_PIX_WIDTH	560
+#define	SC_SIZE		13440
 #endif
-#define	SC_SIZE		8000
 /* VDC screen constants	*/
 #define	SCREENBYTEWIDTH		80
 #define	SCREENPIXELWIDTH	640

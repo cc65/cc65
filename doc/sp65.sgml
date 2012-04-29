@@ -236,6 +236,11 @@ format. There are no additional attributes for this format.
 
 <sect1>GEOS bitmap<p>
 
+The current bitmap working copy is converted to a GEOS compacted bitmap. This
+format is used by several GEOS functions (i.e. 'BitmapUp') and is described
+in 'The Official GEOS Programmers Reference Guide', chapter 4, section
+'Bit-Mapped Graphics'.
+
 
 <sect1>GEOS icon<p>
 
@@ -285,8 +290,8 @@ assembler format. There are several attributes for this output format:
   prefixed by '&dollar;'. For base 10, there is no prefix.
 
   <tag/bytesperline/
-  The value for this attribute specifies the number of bytes output in
-  one line of the assembler file. The default is 16.
+  The value for this attribute specifies the number of bytes output in one
+  line of the assembler file. The default is 16.
 
   <tag/label/
   If specified, an assembler label is added in front of the data.
@@ -313,8 +318,8 @@ Possible attributes for this format are:
   are prefixed by 0x. For base 10, there is no prefix.
 
   <tag/bytesperline/
-  The value for this attribute specifies the number of bytes output in
-  one line of the assembler file. The default is 16.
+  The value for this attribute specifies the number of bytes output in one
+  line of the C source code. The default is 16.
 
   <tag/ident/
   This mandatory specifies the identifier which is used as the name of the

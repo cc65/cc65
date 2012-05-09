@@ -180,7 +180,75 @@ static unsigned OptShift1 (CodeSeg* S)
 
 
 
-static unsigned OptShift2 (CodeSeg* S)
+static unsigned OptShift2(CodeSeg* S)
+/* A call to the asrax1 routines may get replaced by something simpler, if
+ * X is not used later:
+ *
+ *      cmp     #$80
+ *      ror     a
+ *
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        unsigned Count;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+	if (E->OPC == OP65_JSR                  &&
+       	    strncmp (E->Arg, "asrax", 5) == 0   &&
+	    strlen (E->Arg) == 6                &&
+	    IsDigit (E->Arg[5])                 &&
+            (Count = (E->Arg[5] - '0')) >= 1    &&
+            Count * 100 <= S->CodeSizeFactor    &&
+            !RegXUsed (S, I+1)) {
+
+            CodeEntry* X;
+            unsigned J = I+1;
+
+            /* Generate the replacement sequence */
+            while (Count--) {
+                /* cmp #$80 */
+                X = NewCodeEntry (OP65_CMP, AM65_IMM, "$80", 0, E->LI);
+                CS_InsertEntry (S, X, J++);
+
+                /* ror a */
+                X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, E->LI);
+                CS_InsertEntry (S, X, J++);
+            }
+
+            /* Delete the call to asrax */
+            CS_DelEntry (S, I);
+
+            /* Remember, we had changes */
+            ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptShift3 (CodeSeg* S)
 /* A call to the shraxN routine may get replaced by one or more lsr insns
  * if the value of X is zero.
  */
@@ -255,7 +323,7 @@ static unsigned GetShiftType (const char* Sub)
 
 
 
-static unsigned OptShift3 (CodeSeg* S)
+static unsigned OptShift4 (CodeSeg* S)
 /* Search for the sequence
  *
  *      lda     xxx
@@ -376,7 +444,7 @@ static unsigned OptShift3 (CodeSeg* S)
 
 
 
-static unsigned OptShift4 (CodeSeg* S)
+static unsigned OptShift5 (CodeSeg* S)
 /* Inline the shift subroutines. */
 {
     unsigned Changes = 0;
@@ -1415,8 +1483,9 @@ static OptFunc DOptPush2       	= { OptPush2,        "OptPush2",         50, 0, 
 static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift3      	= { OptShift3,       "OptShift3",      	110, 0, 0, 0, 0, 0 };
-static OptFunc DOptShift4      	= { OptShift4,       "OptShift4",      	200, 0, 0, 0, 0, 0 };
+static OptFunc DOptShift3      	= { OptShift3,       "OptShift3",      	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptShift4      	= { OptShift4,       "OptShift4",      	110, 0, 0, 0, 0, 0 };
+static OptFunc DOptShift5      	= { OptShift5,       "OptShift5",      	200, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",    	100, 0, 0, 0, 0, 0 };
@@ -1510,6 +1579,7 @@ static OptFunc* OptFuncs[] = {
     &DOptShift2,
     &DOptShift3,
     &DOptShift4,
+    &DOptShift5,
     &DOptSize1,
     &DOptSize2,
     &DOptStackOps,

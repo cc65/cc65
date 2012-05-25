@@ -90,7 +90,7 @@ void GetEA (EffAddr* A)
 	/* #val */
 	NextTok ();
 	A->Expr  = Expression ();
-	A->AddrModeSet = AM65_IMM;
+	A->AddrModeSet = AM65_ALL_IMM;
 
     } else if (CurTok.Tok == TOK_A) {
 
@@ -203,4 +203,4 @@ void GetEA (EffAddr* A)
 
 
 
-                           
+

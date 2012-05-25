@@ -82,7 +82,6 @@
 #define AM65_IMM_ACCU	       	0x00200000UL
 #define AM65_IMM_INDEX	       	0x00400000UL
 #define AM65_IMM_IMPLICIT	0x00800000UL
-#define AM65_IMM                (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT)
 #define AM65_BLOCKMOVE          0x01000000UL
 #define AM65_BLOCKXFER          0x02000000UL
 
@@ -90,7 +89,19 @@
 #define AM65_SET_ZP 	(AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
 
 /* Bitmask for all ABS operations that have correspondent FAR ops */
-#define AM65_SET_ABS      (AM65_ABS | AM65_ABS_X)
+#define AM65_SET_ABS    (AM65_ABS | AM65_ABS_X)
+
+/* Bitmask for all ZP operations */
+#define AM65_ALL_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
+
+/* Bitmask for all ABS operations */
+#define AM65_ALL_ABS    (AM65_ABS | AM65_ABS_X | AM65_ABS_Y | AM65_ABS_IND | AM65_ABS_X_IND)
+
+/* Bitmask for all FAR operations */
+#define AM65_ALL_FAR    (AM65_ABS_LONG | AM65_ABS_LONG_X)
+                        
+/* Bitmask for all immediate operations */
+#define AM65_ALL_IMM    (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT)
 
 /* Bit numbers and count */
 #define AM65I_IMM_ACCU	       	21

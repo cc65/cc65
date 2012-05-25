@@ -945,17 +945,29 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         A->Expr = SimplifyExpr (A->Expr, &ED);
 
         if (ED.AddrSize == ADDR_SIZE_DEFAULT) {
-            /* If we don't know how big the expression is, assume the
-             * default address size for data. If this default address
-             * size is unequal to zero page addressing, but zero page
-             * addressing is allowed by the instruction, mark all symbols
-             * in the expression tree. This mark will be checked at end
-             * of assembly, and a warning is issued, if a zero page symbol
-             * was guessed wrong here.
+            /* We don't know how big the expression is. If the instruction
+             * allows just one addressing mode, assume this as address size
+             * for the expression. Otherwise assume the default address size
+             * for data.
              */
-            ED.AddrSize = DataAddrSize;
-            if (ED.AddrSize > ADDR_SIZE_ZP && (A->AddrModeSet & AM65_SET_ZP)) {
-                ExprGuessedAddrSize (A->Expr, ADDR_SIZE_ZP);
+            if ((A->AddrModeSet & ~AM65_ALL_ZP) == 0) {
+                ED.AddrSize = ADDR_SIZE_ZP;
+            } else if ((A->AddrModeSet & ~AM65_ALL_ABS) == 0) {
+                ED.AddrSize = ADDR_SIZE_ABS;
+            } else if ((A->AddrModeSet & ~AM65_ALL_FAR) == 0) {
+                ED.AddrSize = ADDR_SIZE_FAR;
+            } else {
+                ED.AddrSize = DataAddrSize;
+                /* If the default address size of the data segment is unequal
+                 * to zero page addressing, but zero page addressing is 
+                 * allowed by the instruction, mark all symbols in the 
+                 * expression tree. This mark will be checked at end of 
+                 * assembly, and a warning is issued, if a zero page symbol
+                 * was guessed wrong here.
+                 */
+                if (ED.AddrSize > ADDR_SIZE_ZP && (A->AddrModeSet & AM65_SET_ZP)) {
+                    ExprGuessedAddrSize (A->Expr, ADDR_SIZE_ZP);
+                }
             }
         }
 
@@ -989,7 +1001,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
      * emit a warning. This warning protects against a typo, where the '#'
      * for the immediate operand is omitted.
      */
-    if (A->Expr && (Ins->AddrMode & AM65_IMM)                    &&
+    if (A->Expr && (Ins->AddrMode & AM65_ALL_IMM)                &&
         (A->AddrModeSet & (AM65_DIR | AM65_ABS | AM65_ABS_LONG)) &&
         ExtBytes[A->AddrMode] == 1) {
 

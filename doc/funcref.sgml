@@ -143,7 +143,7 @@ function.
 
 <sect1><tt/cbm.h/<label id="cbm.h"><p>
 
-<itemize>
+<!-- <itemize> -->
 <!-- <item><ref id="cbm_clall" name="cbm_clall"> -->
 <!-- <item><ref id="cbm_close" name="cbm_close"> -->
 <!-- <item><ref id="cbm_closedir" name="cbm_closedir"> -->
@@ -167,7 +167,7 @@ function.
 <!-- <item><ref id="cbm_readdir" name="cbm_readdir"> -->
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
-</itemize>
+<!-- </itemize> -->
 
 (incomplete)
 

@@ -98,6 +98,12 @@
 #define CH_LIRA		 95
 #define CH_ESC		 27
 
+void __fastcall__ atmos_load(const char* name);
+/* Load Atmos tape. */
+
+void __fastcall__ atmos_save(const char* name, const void* start, const void* end);
+/* Save Atmos tape. */
+
 
 
 /* End of atmos.h */

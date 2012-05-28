@@ -62,6 +62,17 @@ Special locations:
 Programs containing Atmos specific code may use the <tt/atmos.h/ header file.
 
 
+<sect1>Atmos specific functions<p>
+
+The functions listed below are special for the Atmos. See the <htmlurl
+url="funcref.html" name="function reference"> for declaration and usage.
+
+<itemize>
+<item>atmos_load
+<item>atmos_save
+</itemize>
+
+
 <sect1>Hardware access<p>
 
 The following pseudo variables declared in the <tt/atmos.h/ header file do allow
@@ -197,7 +208,7 @@ supported by BASIC, the following syntax was chosen:
 
 <sect1>Interrupts<p>
 
-The runtime for the Atmos uses routines marked as <tt/.CONDES/ type 2 for
+The runtime for the Atmos uses routines marked as <tt/.INTERRUPTOR/ for
 interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/

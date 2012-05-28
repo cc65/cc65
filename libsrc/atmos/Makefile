@@ -45,6 +45,8 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 # Object files
 
 OBJS  =	_scrsize.o      \
+        atmos_load.o    \
+        atmos_save.o    \
         cclear.o        \
         cgetc.o         \
         chline.o        \
@@ -63,6 +65,7 @@ OBJS  =	_scrsize.o      \
         oserrlist.o     \
         oserror.o       \
         revers.o        \
+        store_filename.o\
         systime.o       \
         sysuname.o      \
         tgi_colors.o    \

@@ -112,7 +112,10 @@ function.
 
 <sect1><tt/atmos.h/<label id="atmos.h"><p>
 
-(incomplete)
+<itemize>
+<item><ref id="atmos_load" name="atmos_load">
+<item><ref id="atmos_save" name="atmos_save">
+</itemize>
 
 
 <sect1><tt/c128.h/<label id="c128.h"><p>
@@ -136,6 +139,37 @@ function.
 <itemize>
 <item><ref id="get_ostype" name="get_ostype">
 </itemize>
+
+
+<sect1><tt/cbm.h/<label id="cbm.h"><p>
+
+<itemize>
+<!-- <item><ref id="cbm_clall" name="cbm_clall"> -->
+<!-- <item><ref id="cbm_close" name="cbm_close"> -->
+<!-- <item><ref id="cbm_closedir" name="cbm_closedir"> -->
+<!-- <item><ref id="cbm_k_basin" name="cbm_k_basin"> -->
+<!-- <item><ref id="cbm_k_bsout" name="cbm_k_bsout"> -->
+<!-- <item><ref id="cbm_k_chkin" name="cbm_k_chkin"> -->
+<!-- <item><ref id="cbm_k_ckout" name="cbm_k_ckout"> -->
+<!-- <item><ref id="cbm_k_close" name="cbm_k_close"> -->
+<!-- <item><ref id="cbm_k_clrch" name="cbm_k_clrch"> -->
+<!-- <item><ref id="cbm_k_getin" name="cbm_k_getin"> -->
+<!-- <item><ref id="cbm_k_load" name="cbm_k_load"> -->
+<!-- <item><ref id="cbm_k_open" name="cbm_k_open"> -->
+<!-- <item><ref id="cbm_k_readst" name="cbm_k_readst"> -->
+<!-- <item><ref id="cbm_k_save" name="cbm_k_save"> -->
+<!-- <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs"> -->
+<!-- <item><ref id="cbm_k_setnam" name="cbm_k_setnam"> -->
+<!-- <item><ref id="cbm_load" name="cbm_load"> -->
+<!-- <item><ref id="cbm_open" name="cbm_open"> -->
+<!-- <item><ref id="cbm_opendir" name="cbm_opendir"> -->
+<!-- <item><ref id="cbm_read" name="cbm_read"> -->
+<!-- <item><ref id="cbm_readdir" name="cbm_readdir"> -->
+<!-- <item><ref id="cbm_save" name="cbm_save"> -->
+<!-- <item><ref id="cbm_write" name="cbm_write"> -->
+</itemize>
+
+(incomplete)
 
 
 <sect1><tt/cbm510.h/<label id="cbm510.h"><p>
@@ -1152,6 +1186,40 @@ used in presence of a prototype.
 <ref id="abort" name="abort">,
 <ref id="exit" name="exit">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_load<label id="atmos_load"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load Atmos tape.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_load(const char* name);/
+<tag/Description/<tt/atmos_load/ reads a memory block from tape.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_save" name="atmos_save">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atmos_save<label id="atmos_save"><p>
+
+<quote>
+<descrip>
+<tag/Function/Save Atmos tape.
+<tag/Header/<tt/<ref id="atmos.h" name="atmos.h">/
+<tag/Declaration/<tt/void __fastcall__ atmos_save(const char* name, const void* start, const void* end);/
+<tag/Description/<tt/atmos_save/ writes a memory block to tape.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atmos_load" name="atmos_load">
+<tag/Example/<verb>
+atmos_save("hires", 0xa000, 0xc000);
+</verb>
 </descrip>
 </quote>
 

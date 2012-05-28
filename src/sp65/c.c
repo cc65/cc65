@@ -116,8 +116,8 @@ static const char* GetIdentifier (const Collection* A)
 /* Return the variable identifier from the attribute collection A */
 {
     /* Check for a ident attribute */
-    const char* Ident = NeedAttrVal (A, "ident", "write");
-    if (!ValidIdentifier (Ident)) {
+    const char* Ident = GetAttrVal (A, "ident");
+    if (Ident && !ValidIdentifier (Ident)) {
         Error ("Invalid value for attribute `ident'");
     }
     return Ident;
@@ -168,9 +168,20 @@ void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
              GetBitmapColors (B),
              BitmapIsIndexed (B)? ", indexed" : "");
 
-
-    /* Output the declaration and identifier */
-    fprintf (F, "const unsigned char %s[] = {\n", Ident);
+    /* If an identifier was given, output #defines for width, height, the
+     * number of colors and declare a variable for the data.
+     */
+    if (Ident) {
+        fprintf (F,
+                 "#define %s_COLORS       %u\n"
+                 "#define %s_WIDTH        %u\n"
+                 "#define %s_HEIGHT       %u\n"
+                 "const unsigned char %s[] = {\n",
+                 Ident, GetBitmapColors (B),
+                 Ident, GetBitmapWidth (B),
+                 Ident, GetBitmapHeight (B),
+                 Ident);
+    }
 
     /* Write the data */
     D    = SB_GetConstBuf (Data);
@@ -188,10 +199,10 @@ void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
         for (I = 0; I < Chunk; ++I) {
             switch (Base) {
                 case 10:
-                    fprintf (F, "%u,", *D++);
+                    fprintf (F, "%u,", *D++ & 0xFF);
                     break;
                 case 16:
-                    fprintf (F, "0x%02X,", *D++);
+                    fprintf (F, "0x%02X,", *D++ & 0xFF);
                     break;
 
             }
@@ -202,8 +213,10 @@ void WriteCFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
         Size -= Chunk;
     }
 
-    /* Terminate the array */
-    fputs ("};\n", F);
+    /* Terminate the array if we had an identifier */
+    if (Ident) {
+        fputs ("};\n", F);
+    }
 
     /* Close the file */
     if (fclose (F) != 0) {

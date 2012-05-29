@@ -79,6 +79,18 @@ struct dirent {
     char d_name[13];  /* 8.3 + trailing 0 */
 };
 
+#elif defined(__CBM__)
+
+struct dirent {
+    char                d_name[16+1];
+    unsigned int        d_off;
+    unsigned int        d_reclen;
+    unsigned char       d_type;
+                
+    /* bsd extensions */
+    unsigned char       d_namlen;
+};
+
 #elif defined(__LYNX__)
 
 struct dirent {

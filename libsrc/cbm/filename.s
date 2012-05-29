@@ -6,7 +6,7 @@
 
         .export         fnparse, fnparsename, fnset
         .export         fnadd, fnaddmode, fncomplete, fndefunit
-        .export         fnunit, fnlen, fncmd, fnbuf
+        .export         fnunit, fnlen, fnisfile, fncmd, fnbuf
 
         .import         SETNAM
         .import         __curunit, __filetype
@@ -106,10 +106,30 @@ drivedone:
         lda     #2              ; Length of drive spec
         sta     fnlen
 
-; Copy the name into the file name buffer. The subroutine returns an error
-; code in A and zero flag set if the were no errors.
+; Assume this is a standard file on disk
 
-        jmp     fnparsename
+        sta     fnisfile
+
+; Special treatment for directory. If the file name is "$", things are
+; actually different: $ is directory for unit 0, $0 dito, $1 is directory
+; for unit 1. For simplicity, we won't check anything else if the first
+; character of the file name is '$'.
+
+        lda     (ptr1),y        ; Get first character
+        cmp     #'$'            ;
+        bne     fnparsename
+
+; Juggle stuff
+
+        ldx     fnbuf+0         ; unit
+        stx     fnbuf+1
+        sta     fnbuf+0
+
+; No need to check the name. Length is already 2
+
+        lda     #0              ; ok flag
+        sta     fnisfile        ; This is not a real file
+        rts
 
 .endproc
 
@@ -163,10 +183,11 @@ fnadd:  ldx     fnlen
 
 .bss
 
-fnunit: .res    1
-fnlen:  .res    1
+fnunit:         .res    1
+fnlen:          .res    1
+fnisfile:       .res    1       ; Flags standard file (as opposed to "$")
 
 .data
-fncmd:  .byte   's'     ; Use as scratch command
-fnbuf:  .res    35      ; Either 0:0123456789012345,t,m
-                        ; Or     0:0123456789012345=0123456789012345
+fncmd:          .byte   's'     ; Use as scratch command
+fnbuf:          .res    35      ; Either 0:0123456789012345,t,m
+                                ; Or     0:0123456789012345=0123456789012345

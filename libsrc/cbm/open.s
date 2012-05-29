@@ -15,7 +15,7 @@
         .import         addysp, popax
         .import         scratch, fnparse, fnaddmode, fncomplete, fnset
         .import         opencmdchannel, closecmdchannel, readdiskerror
-        .import         fnunit
+        .import         fnunit, fnisfile
         .import         _close
         .importzp       sp, tmp2, tmp3
 
@@ -158,7 +158,10 @@ common: sta     tmp3
         clc
         adc     #LFN_OFFS
         ldx     fnunit
-        tay                     ; Use the LFN also as SA
+        ldy     fnisfile        ; Is this a standard file on disk?
+        beq     nofile          ; Branch if not
+        tay                     ; Use the LFN also as SA for files
+nofile:                         ; ... else use SA=0 (read)
         jsr     SETLFS          ; Set the file params
 
         jsr     OPEN

@@ -1,3 +1,7 @@
+/*
+ * Ullrich von Bassewitz, 2012-05-30. Based on code by Groepaz.
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
@@ -10,10 +14,8 @@
 
 DIR* __fastcall__ opendir (const char*)
 {
-    unsigned char buffer[8+16+1+7];
-    int count;
-    DIR d;
     DIR* dir = 0;
+    DIR d;
 
     /* Setup file name and offset */
     d.name[0] = '$';
@@ -25,8 +27,7 @@ DIR* __fastcall__ opendir (const char*)
     if (d.fd >= 0) {
 
         /* Skip the disk header */
-        count = read (d.fd, buffer, sizeof (buffer));
-        if (count == sizeof (buffer)) {
+        if (_dirskip (32, &d)) {
 
             /* Allocate memory for the DIR structure returned */
             dir = malloc (sizeof (*dir));
@@ -38,9 +39,6 @@ DIR* __fastcall__ opendir (const char*)
                 /* Set an appropriate error code */
                 errno = ENOMEM;
             }
-        } else if (count >= 0) {
-            /* Short read - need to set an error code */
-            errno = EIO;
         }
     }
 

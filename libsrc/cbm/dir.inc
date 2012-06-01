@@ -23,5 +23,5 @@
         .global _readdir
         .global _telldir
         .global _rewinddir
-
+        .global __dirskip
 

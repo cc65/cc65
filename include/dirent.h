@@ -84,9 +84,9 @@ struct dirent {
 struct dirent {
     char                d_name[16+1];
     unsigned int        d_off;
-    unsigned int        d_reclen;
+    unsigned int        d_blocks;
     unsigned char       d_type;
-                
+
     /* bsd extensions */
     unsigned char       d_namlen;
 };

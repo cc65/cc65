@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -116,7 +116,7 @@ extern char _filetype;          /* Defaults to 'u' */
 #define CH_LIRA		 92
 #define CH_ESC		 27
 
-
+                
 
 /*****************************************************************************/
 /*                Definitions for directory reading functions                */
@@ -149,6 +149,14 @@ struct cbm_dirent {
     unsigned char access;
 };
 
+unsigned char __fastcall__ _cbm_filetype (unsigned char c);
+/* Map the start character for a file type to one of the file types above. 
+ * Note: 'd' will always mapped to CBM_T_DEL. The calling function has to 
+ * look at the following character to determine if the file type is actually 
+ * CBM_T_DIR.
+ * This is a function used by the implementation. There is usually no need
+ * to call it from user code.
+ */
 
 
 /*****************************************************************************/

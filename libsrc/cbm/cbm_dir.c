@@ -51,13 +51,6 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
     unsigned char byte, i = 0;
     unsigned char is_header = 0;
     unsigned char rv = 1;
-    static const unsigned char types[] = {
-        CBM_T_CBM,   CBM_T_DEL,   CBM_T_OTHER, CBM_T_OTHER, /* c d e f */
-        CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, CBM_T_OTHER, /* g h i j */
-        CBM_T_OTHER, CBM_T_LNK,   CBM_T_OTHER, CBM_T_OTHER, /* k l m n */
-        CBM_T_OTHER, CBM_T_PRG,   CBM_T_OTHER, CBM_T_REL,   /* o p q r */
-        CBM_T_SEQ,   CBM_T_OTHER, CBM_T_USR,   CBM_T_VRP    /* s t u v */
-    };
 
     if (!cbm_k_chkin(lfn)) {
         if (!cbm_k_readst()) {
@@ -135,11 +128,8 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
                     byte = cbm_k_basin();
                 }
 
-                if (byte >= 'c' && byte < 'c' + sizeof types) {
-                    l_dirent->type = types[byte - 'c'];
-                } else {
-                    l_dirent->type = CBM_T_OTHER;
-                }
+                /* Determine the file type */
+                l_dirent->type = _cbm_filetype (byte);
 
 		/* Notice whether it's a directory or a deleted file. */
 		if (cbm_k_basin() == 'i' && byte == 'd') {

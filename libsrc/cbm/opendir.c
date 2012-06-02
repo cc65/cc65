@@ -20,7 +20,7 @@ DIR* __fastcall__ opendir (const char*)
     /* Setup file name and offset */
     d.name[0] = '$';
     d.name[1] = '\0';
-    d.offs    = 0;
+    d.off     = 0;
 
     /* Open the directory on disk for reading */
     d.fd = open (d.name, O_RDONLY);

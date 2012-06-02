@@ -32,7 +32,8 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 C_OBJS =       	cbm_dir.o       \
                 cbm_load.o	\
 		cbm_save.o      \
-                opendir.o
+                opendir.o       \
+                readdir.o
 
 S_OBJS =	c_acptr.o	\
 	 	c_basin.o 	\
@@ -55,6 +56,7 @@ S_OBJS =	c_acptr.o	\
 		c_unlsn.o	\
 		c_untlk.o	\
 		cbm_close.o	\
+                cbm_ftype.o     \
 		cbm_open.o 	\
 		cbm_read.o 	\
 		cbm_write.o     \

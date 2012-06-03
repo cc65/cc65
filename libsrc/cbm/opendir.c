@@ -11,16 +11,28 @@
 
 
 
-DIR* __fastcall__ opendir (const char*)
+DIR* __fastcall__ opendir (register const char* name)
 {
     unsigned char buf[32];
-    DIR* dir = 0;
     DIR d;
+    DIR* dir = 0;
 
-    /* Setup file name and offset */
+    /* Setup the actual file name that is sent to the disk. We accept "0:",
+     * "1:" and "." as directory names.
+     */
     d.name[0] = '$';
-    d.name[1] = '\0';
-    d.off     = sizeof (buf);
+    if (name == 0 || name[0] == '\0' || (name[0] == '.' && name[1] == '\0')) {
+        d.name[1] = '\0';
+    } else if ((name[0] == '0' || name[0] == '1') && name[1] == ':' && name[2] == '\0') {
+        d.name[1] = name[0];
+        d.name[2] = '\0';
+    } else {
+        errno = EINVAL;
+        goto exitpoint;
+    }
+
+    /* Set the offset of the first entry */
+    d.off = sizeof (buf);
 
     /* Open the directory on disk for reading */
     d.fd = open (d.name, O_RDONLY);
@@ -42,6 +54,7 @@ DIR* __fastcall__ opendir (const char*)
         }
     }
 
+exitpoint:
     /* Done */
     return dir;
 }

@@ -38,9 +38,6 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
         goto exitpoint;
     }
 
-    /* Adjust the directory offset */
-    dir->off += 4;
-
     /* Read the next file entry into the buffer */
     for (count = 0, b = buffer; count < sizeof (buffer); ++b) {
         if (!_dirread1 (dir, b)) {
@@ -52,8 +49,8 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
         }
     }
 
-    /* Bump the directory offset */
-    dir->off += count;
+    /* Bump the directory offset and include the bytes for line-link and size */
+    dir->off += count + 4;
 
     /* End of directory is reached if the buffer contains "blocks free". It is
      * sufficient here to check for the leading 'b'. buffer will contain at

@@ -33,7 +33,8 @@ C_OBJS =       	cbm_dir.o       \
                 cbm_load.o	\
 		cbm_save.o      \
                 opendir.o       \
-                readdir.o
+                readdir.o       \
+                seekdir.o
 
 S_OBJS =	c_acptr.o	\
 	 	c_basin.o 	\
@@ -82,6 +83,7 @@ S_OBJS =	c_acptr.o	\
                 oserrlist.o     \
 		oserror.o	\
                 read.o          \
+                rewinddir.o     \
                 rwcommon.o      \
                 scratch.o       \
                 sysremove.o     \

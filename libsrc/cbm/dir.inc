@@ -10,7 +10,7 @@
 
 .struct DIR
     fd          .word
-    off         .word     
+    off         .word
     name        .byte   16+1
 .endstruct
 
@@ -21,10 +21,10 @@
         .global _opendir
         .global _closedir
         .global _readdir
-;        .global _telldir
-;        .global _rewinddir
+        .global _seekdir
+        .global _telldir
+        .global _rewinddir
         .global __dirread
         .global __dirread1
-        .global __dirskip
 
 

@@ -126,6 +126,10 @@ struct dirent* __fastcall__ readdir (DIR* dir);
 
 int __fastcall__ closedir (DIR* dir);
 
+long __fastcall__ telldir (DIR* dir);
+
+void __fastcall__ seekdir (DIR* dir, long offs);
+
 void __fastcall__ rewinddir (DIR* dir);
 
 

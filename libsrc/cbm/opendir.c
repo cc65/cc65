@@ -13,7 +13,8 @@
 
 
 DIR* __fastcall__ opendir (const char*)
-{
+{                           
+    unsigned char buf[32];
     DIR* dir = 0;
     DIR d;
 
@@ -27,7 +28,7 @@ DIR* __fastcall__ opendir (const char*)
     if (d.fd >= 0) {
 
         /* Skip the disk header */
-        if (_dirskip (32, &d)) {
+        if (_dirread (&d, buf, 32)) {
 
             /* Allocate memory for the DIR structure returned */
             dir = malloc (sizeof (*dir));

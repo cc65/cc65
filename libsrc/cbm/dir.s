@@ -1,92 +1,99 @@
 ;
 ; Ullrich von Bassewitz, 2012-06-01
 ;
-; unsigned char __fastcall__ _dirskip (unsigned char count, struct DIR* dir);
-; /* Skip bytes from the directory and make sure, errno is set if this isn't
-;  * possible. Return true if anything is ok and false otherwise. For
-;  * simplicity we assume that read will never return less than count if there
-;  * is no error and end-of-file is not reached.
-;  * Note: count must not be more than 254.
-;  */
-;
+; Helper functions for open-/read-/closedir
+
 
         .include        "dir.inc"
         .include        "errno.inc"
         .include        "zeropage.inc"
-
+                             
+        .import         pushax
         .import         _read
-        .import         pushax, pushptr1idx
-        .import         subysp, addysp1
 
 
-.proc   __dirskip
+;---------------------------------------------------------------------------
+;
+; unsigned char __fastcall__ _dirread1 (DIR* dir, void* buf);
+; /* Read one byte from the directory into the supplied buffer. Makes sure,
+;  * errno is set in case of a short read. Return true if the read was
+;  * successful and false otherwise.
+;  */
 
-        sta     ptr1
-        stx     ptr1+1          ; Save dir
+__dirread1:
 
-; Get count and allocate space on the stack
+        jsr     pushax          ; Push buf
+        lda     #1              ; Load count = 1
 
-        ldy     #0
+; Run directly into __dirread
+
+;---------------------------------------------------------------------------
+;
+; unsigned char __fastcall__ _dirread (DIR* dir, void* buf, unsigned char count);
+; /* Read characters from the directory into the supplied buffer. Makes sure,
+;  * errno is set in case of a short read. Return true if the read was
+;  * successful and false otherwise.
+;  */
+
+__dirread:
+
+; Save count
+
+        pha
+
+; Replace dir by dir->fd
+
+        ldy     #2
         lda     (sp),y
-        pha
-        tay
-        jsr     subysp
-
-; Save current value of sp
-
-        lda     sp
-        pha
-        lda     sp+1
-        pha
-
-; Push dir->fd
-
+        sta     ptr1
+        iny
+        lda     (sp),y
+        sta     ptr1+1
         ldy     #DIR::fd+1
-        jsr     pushptr1idx
-
-; Push pointer to buffer
-
+        lda     (ptr1),y
+        pha
+        dey
+        lda     (ptr1),y
+        ldy     #2
+        sta     (sp),y
         pla
-        tax
-        pla
-        jsr     pushax
+        iny
+        sta     (sp),y
 
-; Load count and call read
+; Get count, save it again, clear the high byte and call read(). By the
+; previous actions, the stack frame is as read() needs it, and read() will
+; also drop it.
 
         pla
         pha
         ldx     #0
         jsr     _read
 
-; Check for errors. In case of errors, errno is already set.
+; Check for errors.
 
         cpx     #$FF
-        bne     L2
+        bne     L3
 
-; read() returned an error
+; read() returned an error, so errno is already set
 
-        pla                     ; Count
-        tay
-        lda     #0
-        tax
-L1:     jmp     addysp1         ; Drop buffer plus count
+        pla                     ; Drop count
+        inx                     ; X = 0
+L1:     txa                     ; Return zero
+L2:     rts
 
 ; read() was successful, check number of bytes read. We assume that read will
 ; not return more than count, so X is zero if we come here.
 
-L2:     sta     tmp1
-        pla                     ; count
-        tay
+L3:     sta     tmp1            ; Save returned count
+        pla                     ; Our count
         cmp     tmp1
-        beq     L1              ; Drop variables, return count
+        beq     L2              ; Ok, return count
 
 ; Didn't read enough bytes. This is an error for us, but errno is not set
 
         lda     #<EIO
         sta     __errno
-        stx     __errno+1
-        txa                     ; A=X=0
-        beq     L1              ; Branch always
+        stx     __errno+1       ; X is zero
+        bne     L1              ; Branch always
 
-.endproc
 

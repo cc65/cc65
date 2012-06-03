@@ -18,36 +18,34 @@
 
 struct dirent* __fastcall__ readdir (register DIR* dir)
 {
-    static struct dirent entry;
     register unsigned char* b;
     register unsigned char i;
-    unsigned char count;
-    unsigned char j;
+    register unsigned char count;
     unsigned char s;
+    unsigned char j;
     unsigned char buffer[0x40];
+    static struct dirent entry;
 
 
     /* Remember the directory offset for this entry */
     entry.d_off = dir->off;
 
     /* Skip the basic line-link */
-    if (!_dirskip (2, dir)) {
+    if (!_dirread (dir, buffer, 2)) {
         /* errno already set */
-        goto exit;
+        goto exitpoint;
     }
     dir->off += 2;
-
+                                
     /* Read the number of blocks */
-    if (read (dir->fd, &entry.d_blocks, sizeof (entry.d_blocks)) !=
-        sizeof (entry.d_blocks)) {
-        goto error;
+    if (!_dirread (dir, &entry.d_blocks, sizeof (entry.d_blocks))) {
+        goto exitpoint;
     }
 
     /* Read the next file entry into the buffer */
     for (count = 0, b = buffer; count < sizeof (buffer); ++count, ++b) {
-        if (read (dir->fd, b, 1) != 1) {
-            /* ### Check for EOF */
-            goto error;
+        if (!_dirread1 (dir, b)) {
+            goto exitpoint;
         }
         if (*b == '\0') {
             break;
@@ -59,7 +57,7 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
      * called again, read until end of directory.
      */
     if (count > 0 && buffer[0] == 'b') {
-        while (read (dir->fd, buffer, 1) == 1) ;
+        while (_dirread1 (dir, buffer)) ;
         return 0;
     }
 
@@ -120,10 +118,9 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
         ++b;
     }
 
-    /* Something went wrong - terminating quote not found */
-error:
+    /* Something went wrong when parsing the directory entry */
     _errno = EIO;
-exit:
+exitpoint:
     return 0;
 }
 

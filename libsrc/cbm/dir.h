@@ -30,12 +30,16 @@ struct DIR {
 
 
 
-unsigned char __fastcall__ _dirskip (unsigned char count, struct DIR* dir);
-/* Skip bytes from the directory and make sure, errno is set if this isn't
- * possible. Return true if anything is ok and false otherwise. For
- * simplicity we assume that read will never return less than count if there
- * is no error and end-of-file is not reached.
- * Note: count must not be more than 254.
+unsigned char __fastcall__ _dirread (DIR* dir, void* buf, unsigned char count);
+/* Read characters from the directory into the supplied buffer. Makes sure,
+ * errno is set in case of a short read. Return true if the read was
+ * successful and false otherwise.
+ */
+
+unsigned char __fastcall__ _dirread1 (DIR* dir, void* buf);
+/* Read one byte from the directory into the supplied buffer. Makes sure,
+ * errno is set in case of a short read. Return true if the read was
+ * successful and false otherwise.
  */
 
 

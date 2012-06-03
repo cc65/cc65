@@ -85,7 +85,7 @@ struct dirent {
     char                d_name[16+1];
     unsigned int        d_off;
     unsigned int        d_blocks;
-    unsigned char       d_type;
+    unsigned char       d_type;         /* See CBM_T_xxx defines in cbm.h */
 
     /* bsd extensions */
     unsigned char       d_namlen;

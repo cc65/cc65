@@ -10,7 +10,7 @@
 
 .struct DIR
     fd          .word
-    offs        .word
+    off         .word     
     name        .byte   16+1
 .endstruct
 

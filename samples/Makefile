@@ -122,6 +122,9 @@ endif
 
 nachtm:		nachtm.o
 
+overlaydemo:	overlaydemo.o
+	@$(LD) -t $(SYS) -m $(basename $@).map -C $(SYS)-overlay.cfg -o $@ $^ $(CLIB)
+
 plasma:		plasma.o
 
 sieve:		sieve.o

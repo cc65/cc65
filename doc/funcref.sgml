@@ -277,6 +277,20 @@ function.
 Low-level disk I/O API.
 
 
+<sect1><tt/dirent.h/<label id="dirent.h"><p>
+
+<itemize>
+<item><ref id="closedir" name="closedir">
+<item><ref id="opendir" name="opendir">
+<item><ref id="readdir" name="readdir">
+<item><ref id="rewinddir" name="rewinddir">
+<item><ref id="seekdir" name="seekdir">
+<item><ref id="telldir" name="telldir">
+</itemize>
+
+(incomplete)
+
+
 <sect1><tt/em.h/<label id="em.h"><p>
 
 <itemize>
@@ -1641,6 +1655,29 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="creat" name="creat">,
 <ref id="open" name="open">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>closedir<label id="closedir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Close a directory.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/int __fastcall__ closedir (DIR* dir);/
+<tag/Description/The function closes the given directory descriptor. It returns
+zero on success and -1 on error. If an error occurs, the cause can be determined 
+by reading the <tt/errno/ variable.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="opendir" name="opendir">,
+<ref id="readdir" name="readdir">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3931,6 +3968,29 @@ cc65 allows to pass this argument, it is ignored.
 </quote>
 
 
+<sect1>opendir<label id="opendir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Open a directory.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/DIR* __fastcall__ opendir (const char* name);/
+<tag/Description/<tt/opendir/ opens a directory and returns the direcory
+descriptor associated with it. On error, NULL is returned and an error code is
+stored in <tt/errno/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="closedir" name="closedir">,
+<ref id="readdir" name="readdir">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>peekbsys<label id="peekbsys"><p>
 
 <quote>
@@ -4149,6 +4209,34 @@ had been used with an argument of 1.
 </quote>
 
 
+<sect1>readdir<label id="readdir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read a directory.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/struct dirent* __fastcall__ readdir (DIR* dir);/
+<tag/Description/<tt/readdir/ reads the next directory entry from the directory
+stream pointed to by <tt/dir/. It stores the data in a <tt/dirent/ structure 
+and returns a pointer to it. If the end of directory is reached, or an error
+occurs, NULL is returned. In case of errors, an error code is stored into 
+<tt/errno/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The returned pointer may point to a statically allocated instance of
+<tt/struct dirent/, so it may get overwritten by subsequent calls to
+<tt/readdir/.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="closedir" name="closedir">,
+<ref id="opendir" name="opendir">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>realloc<label id="realloc"><p>
 
 <quote>
@@ -4334,6 +4422,28 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>rewinddir<label id="rewinddir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Reset a directory stream.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/void __fastcall__ rewinddir (DIR* dir);/
+<tag/Description/<tt/rewinddir/ sets the position of the directory stream
+pointed to by <tt/dir/ to the start of the directory.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="seekdir" name="seekdir">,
+<ref id="telldir" name="telldir">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>screensize<label id="screensize"><p>
 
 <quote>
@@ -4353,6 +4463,29 @@ be used in presence of a prototype.
 <ref id="gotoy" name="gotoy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>seekdir<label id="seekdir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the position of a directory stream.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/void __fastcall__ seekdir (DIR* dir, long offset);/
+<tag/Description/<tt/seekdir/ sets the position of the directory stream
+pointed to by <tt/dir/ to the value given in <tt/offset/, which should be a
+value returned by <tt/<ref id="telldir" name="telldir">/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="rewinddir" name="rewinddir">,
+<ref id="telldir" name="telldir">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -5384,6 +5517,29 @@ be used in presence of a prototype.
 
 <quote>
 See <tt/strupper/.
+</quote>
+
+
+<sect1>telldir<label id="telldir"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the current position of a directory stream.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/long __fastcall__ telldir (DIR* dir);/
+<tag/Description/<tt/telldir/ returns the current position of a directory
+stream. The return value may be used in subsequent calls to
+<tt/<ref id="seekdir" name="seekdir">/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="seekdir" name="seekdir">,
+<ref id="telldir" name="telldir">
+<tag/Example/None.
+</descrip>
 </quote>
 
 

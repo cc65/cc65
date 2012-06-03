@@ -32,18 +32,21 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
         /* errno already set */
         goto exitpoint;
     }
-    dir->off += 2;
 
     /* Read the number of blocks */
     if (!_dirread (dir, &entry.d_blocks, sizeof (entry.d_blocks))) {
         goto exitpoint;
     }
 
+    /* Adjust the directory offset */
+    dir->off += 4;
+
     /* Read the next file entry into the buffer */
-    for (count = 0, b = buffer; count < sizeof (buffer); ++count, ++b) {
+    for (count = 0, b = buffer; count < sizeof (buffer); ++b) {
         if (!_dirread1 (dir, b)) {
             goto exitpoint;
         }
+        ++count;
         if (*b == '\0') {
             break;
         }

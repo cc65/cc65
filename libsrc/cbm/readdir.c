@@ -52,17 +52,16 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
         }
     }
 
-    /* End of directory is reached if the buffer contains "blocks free". It is
-     * sufficient here to check for the leading 'b'. To avoid problems if we're
-     * called again, read until end of directory.
-     */
-    if (count > 0 && buffer[0] == 'b') {
-        while (_dirread1 (dir, buffer)) ;
-        return 0;
-    }
-
     /* Bump the directory offset */
     dir->off += count;
+
+    /* End of directory is reached if the buffer contains "blocks free". It is
+     * sufficient here to check for the leading 'b'. buffer will contain at
+     * least one byte if we come here.
+     */
+    if (buffer[0] == 'b') {
+        goto exitpoint;
+    }
 
     /* Parse the buffer for the filename and file type */
     i = 0;

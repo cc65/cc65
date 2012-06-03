@@ -4,9 +4,6 @@
 
 
 
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -36,7 +33,7 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
         goto exitpoint;
     }
     dir->off += 2;
-                                
+
     /* Read the number of blocks */
     if (!_dirread (dir, &entry.d_blocks, sizeof (entry.d_blocks))) {
         goto exitpoint;

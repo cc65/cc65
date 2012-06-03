@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -13,7 +12,7 @@
 
 
 DIR* __fastcall__ opendir (const char*)
-{                           
+{
     unsigned char buf[32];
     DIR* dir = 0;
     DIR d;
@@ -21,7 +20,7 @@ DIR* __fastcall__ opendir (const char*)
     /* Setup file name and offset */
     d.name[0] = '$';
     d.name[1] = '\0';
-    d.off     = 0;
+    d.off     = sizeof (buf);
 
     /* Open the directory on disk for reading */
     d.fd = open (d.name, O_RDONLY);

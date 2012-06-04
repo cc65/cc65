@@ -293,12 +293,11 @@ assembler format. There are several attributes for this output format:
   The value for this attribute specifies the number of bytes output in one
   line of the assembler file. The default is 16.
 
-  <tag/label/
-  If specified, an assembler label is added in front of the data.
-
-  <tag/segment/
-  If specified, a <tt/.SEGMENT/ directive is used to place the data into
-  the given segment.
+  <tag/ident/
+  This is an optional attribute. When given, the output processor will wrap
+  the data into a <tt/.PROC/ with the given name. In addition, three constants
+  are added as local symbols within the <tt/.PROC/: <tt/COLORS/, <tt/WIDTH/
+  and <tt/HEIGHT/.
 
 </descrip>
 
@@ -322,8 +321,10 @@ Possible attributes for this format are:
   line of the C source code. The default is 16.
 
   <tag/ident/
-  This mandatory specifies the identifier which is used as the name of the
-  variable that holds the output data.
+  This is an optional attribute. When given, the output processor will wrap
+  the data into an array of unsigned char with the given name. In addition,
+  three <tt/#define/s are added for <tt/&lt;ident&gt;_COLORS/,
+  <tt/&lt;ident&gt;_WIDTH/ and <tt/&lt;ident&gt;_HEIGHT/.
 
 </descrip>
 

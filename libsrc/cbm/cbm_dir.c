@@ -13,18 +13,31 @@
 /* in directory listings).                            */
 
 
+#include <stdarg.h>
 #include <cbm.h>
 #include <errno.h>
 
 
 
-/* Opens directory listing.
-** Returns 0 if openning directory was successful;
-** otherwise, an error-code corresponding to cbm_open().
+/* Opens directory listing. Returns 0 if opening directory was successful;
+** otherwise, an error-code corresponding to cbm_open(). As an optional
+** argument, the name of the directory may be passed to the function. If
+** no explicit name is specified, "$" is used.
 */
-unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device)
+unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...)
 {
-    if (cbm_open (lfn, device, CBM_READ, "$") == 0) {
+    va_list ap;
+    const char* name = "$";
+
+    /* The name used in cbm_open may optionally be passed */
+    if (__argsize__ == 4) {
+        va_start (ap, device);
+        name = va_arg (ap, const char*);
+        va_end (ap);
+    }
+
+    /* Open the directory */
+    if (cbm_open (lfn, device, CBM_READ, name) == 0) {
         if ((_oserror = cbm_k_chkin (lfn)) == 0) {
             /* Ignore start address */
             cbm_k_basin();

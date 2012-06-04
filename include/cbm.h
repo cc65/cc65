@@ -116,7 +116,7 @@ extern char _filetype;          /* Defaults to 'u' */
 #define CH_LIRA		 92
 #define CH_ESC		 27
 
-                
+
 
 /*****************************************************************************/
 /*                Definitions for directory reading functions                */
@@ -150,9 +150,9 @@ struct cbm_dirent {
 };
 
 unsigned char __fastcall__ _cbm_filetype (unsigned char c);
-/* Map the start character for a file type to one of the file types above. 
- * Note: 'd' will always mapped to CBM_T_DEL. The calling function has to 
- * look at the following character to determine if the file type is actually 
+/* Map the start character for a file type to one of the file types above.
+ * Note: 'd' will always mapped to CBM_T_DEL. The calling function has to
+ * look at the following character to determine if the file type is actually
  * CBM_T_DIR.
  * This is a function used by the implementation. There is usually no need
  * to call it from user code.
@@ -274,10 +274,11 @@ int __fastcall__ cbm_write (unsigned char lfn, const void* buffer,
  * _oserror contains an error-code, then (see above table).
  */
 
-unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device);
-/* Opens directory listing.
- * Returns 0 if openning directory was successful;
- * otherwise, an error-code corresponding to cbm_open().
+unsigned char cbm_opendir (unsigned char lfn, unsigned char device, ...);
+/* Opens directory listing. Returns 0 if opening directory was successful;
+ * otherwise, an error-code corresponding to cbm_open(). As an optional
+ * argument, the name of the directory may be passed to the function. If
+ * no explicit name is specified, "$" is used.
  */
 
 unsigned char __fastcall__ cbm_readdir (unsigned char lfn,

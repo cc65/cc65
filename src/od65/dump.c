@@ -924,13 +924,17 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
     /* Read and print the sizes of all segments */
     while (Count--) {
 
+        unsigned long Size;
+
        	/* Read the data for one segment */
         unsigned long DataSize = Read32 (F);
         unsigned long NextSeg  = ftell (F) + DataSize;
 	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
-        (void) ReadVar (F);     /* Skip segment flags */
-	unsigned long Size     = ReadVar (F);
+
+        /* Skip segment flags, read size */
+        (void) ReadVar (F);     
+        Size = ReadVar (F);
 
         /* Skip alignment, type and fragment count */
         (void) ReadVar (F);

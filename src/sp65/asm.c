@@ -56,7 +56,7 @@
 
 
 
-static int ValidAsmLabel (const char* L)
+static int ValidIdentifier (const char* L)
 /* Check an assembler label for validity */
 {
     /* Must begin with underscore or alphabetic character */
@@ -113,28 +113,15 @@ static unsigned GetBase (const Collection* A)
 
 
 
-static const char* GetLabel (const Collection* A)
-/* Return the assembler label from the attribute collection A */
+static const char* GetIdentifier (const Collection* A)
+/* Return the label identifier from the attribute collection A */
 {
-    /* Check for a label attribute */
-    const char* Label = GetAttrVal (A, "label");
-    if (Label && !ValidAsmLabel (Label)) {
-        Error ("Invalid value for attribute `label'");
+    /* Check for a ident attribute */
+    const char* Ident = GetAttrVal (A, "ident");
+    if (Ident && !ValidIdentifier (Ident)) {
+        Error ("Invalid value for attribute `ident'");
     }
-    return Label;
-}
-
-
-
-static const char* GetSegment (const Collection* A)
-/* Return the segment name from the attribute collection A */
-{
-    /* Check for a label attribute */
-    const char* Seg = GetAttrVal (A, "segment");
-    if (Seg && !ValidAsmLabel (Seg)) {
-        Error ("Invalid value for attribute `segment'");
-    }
-    return Seg;
+    return Ident;
 }
 
 
@@ -159,11 +146,8 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
     /* Get the number base */
     unsigned Base = GetBase (A);
 
-    /* Get the assembler label */
-    const char* Label = GetLabel (A);
-
-    /* Get the segment */
-    const char* Segment = GetSegment (A);
+    /* Get the identifier */
+    const char* Ident = GetIdentifier (A);
 
     /* Open the output file */
     F = fopen (Name, "w");
@@ -185,14 +169,17 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
              GetBitmapColors (B),
              BitmapIsIndexed (B)? ", indexed" : "");
 
-    /* If we have a segment defined, output a segment directive */
-    if (Segment) {
-        fprintf (F, ".segment        \"%s\"\n\n", Segment);
-    }
-
     /* If we have an assembler label, output that */
-    if (Label) {
-        fprintf (F, "%s:\n", Label);
+    if (Ident) {
+        fprintf (F,
+                 ".proc   %s\n"
+                 "        COLORS = %u\n"
+                 "        WIDTH  = %u\n"
+                 "        HEIGHT = %u\n",
+                 Ident,
+                 GetBitmapColors (B),
+                 GetBitmapWidth (B),
+                 GetBitmapHeight (B));
     }
 
     /* Write the data */
@@ -236,6 +223,11 @@ void WriteAsmFile (const StrBuf* Data, const Collection* A, const Bitmap* B)
 
         /* Bump the counters */
         Size -= Chunk;
+    }
+
+    /* Terminate the .proc if we had an identifier */
+    if (Ident) {
+        fputs (".endproc\n", F);
     }
 
     /* Add an empty line at the end */

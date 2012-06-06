@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2010, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -40,6 +40,7 @@
 #include "abend.h"
 #include "chartype.h"
 #include "cpu.h"
+#include "debugflag.h"
 #include "print.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -1809,6 +1810,9 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 
 	/* Run the function */
     	C = F->Func (S);
+        if (Debug && C > 0) {
+            printf ("Applied %s: %u changes\n", F->Name, C);
+        }
     	Changes += C;
 
     	/* Do statistics */

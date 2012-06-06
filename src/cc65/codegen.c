@@ -1833,26 +1833,6 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
             break;
 
         case CF_INT:
-            if (IS_Get (&CodeSizeFactor) >= 200) {
-                /* Lots of code, use only if size is not important */
-               	AddCodeLine ("sta ptr1");
-                AddCodeLine ("stx ptr1+1");
-                AddCodeLine ("ldy #$%02X", offs);
-                AddCodeLine ("lda #$%02X", (int)(val & 0xFF));
-                AddCodeLine ("clc");
-                AddCodeLine ("adc (ptr1),y");
-                AddCodeLine ("sta (ptr1),y");
-                AddCodeLine ("pha");
-                AddCodeLine ("iny");
-                AddCodeLine ("lda #$%02X", (unsigned char)(val >> 8));
-                AddCodeLine ("adc (ptr1),y");
-                AddCodeLine ("sta (ptr1),y");
-                AddCodeLine ("tax");
-                AddCodeLine ("pla");
-                break;
-            }
-            /* FALL THROUGH */
-
         case CF_LONG:
             AddCodeLine ("jsr pushax");  	/* Push the address */
             push (CF_PTR);		    	/* Correct the internal sp */
@@ -2049,26 +2029,6 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
             break;
 
         case CF_INT:
-            if (IS_Get (&CodeSizeFactor) >= 200) {
-                /* Lots of code, use only if size is not important */
-                AddCodeLine ("sta ptr1");
-               	AddCodeLine ("stx ptr1+1");
-                AddCodeLine ("ldy #$%02X", offs);
-                AddCodeLine ("lda (ptr1),y");
-                AddCodeLine ("sec");
-                AddCodeLine ("sbc #$%02X", (unsigned char)val);
-                AddCodeLine ("sta (ptr1),y");
-                AddCodeLine ("pha");
-                AddCodeLine ("iny");
-                AddCodeLine ("lda (ptr1),y");
-                AddCodeLine ("sbc #$%02X", (unsigned char)(val >> 8));
-                AddCodeLine ("sta (ptr1),y");
-             	AddCodeLine ("tax");
-                AddCodeLine ("pla");
-                break;
-            }
-            /* FALL THROUGH */
-
         case CF_LONG:
             AddCodeLine ("jsr pushax");     	/* Push the address */
             push (CF_PTR);  			/* Correct the internal sp */

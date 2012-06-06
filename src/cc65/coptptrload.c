@@ -1227,11 +1227,15 @@ unsigned OptPtrLoad15 (CodeSeg* S)
  *
  *      lda     zp
  *      ldx     zp+1
+ *      jsr     pushax          <- optional
  *      ldy     xx
  *      jsr     ldaxidx
  *
  * and replace it by:
  *
+ *      lda     zp              <- only if
+ *      ldx     zp+1            <- call to
+ *      jsr     pushax          <- pushax present
  *      ldy     xx
  *      lda     (zp),y
  *      tax
@@ -1243,50 +1247,58 @@ unsigned OptPtrLoad15 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
+    while (I < CS_GetEntryCount (S) - 3) {
 
-	CodeEntry* L[4];
+	CodeEntry* L[5];
 	unsigned Len;
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+      	/* Get next 3 entries */
+       	CS_GetEntries (S, L, I, 3);
 
-     	/* Check for the sequence */
+     	/* Check for the start of the sequence */
        	if (L[0]->OPC == OP65_LDA && L[0]->AM == AM65_ZP        &&
-       	    CS_GetEntries (S, L+1, I+1, 3)     	                &&
-            !CS_RangeHasLabel (S, I+1, 3)                       &&
        	    L[1]->OPC == OP65_LDX && L[1]->AM == AM65_ZP        &&
+            !CS_RangeHasLabel (S, I+1, 2)                       &&
             (Len = strlen (L[0]->Arg)) > 0                      &&
             strncmp (L[0]->Arg, L[1]->Arg, Len) == 0            &&
-            strcmp (L[1]->Arg + Len, "+1") == 0                 &&
-	    L[2]->OPC == OP65_LDY                               &&
-       	    CE_IsCallTo (L[3], "ldaxidx")) {
+            strcmp (L[1]->Arg + Len, "+1") == 0) {
 
-	    CodeEntry* X;
+            unsigned PushAX = CE_IsCallTo (L[2], "pushax");
 
-       	    /* lda (zp),y */
-	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[0]->Arg, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+4);
+            /* Check for the remainder of the sequence */
+            if (CS_GetEntries (S, L+3, I+3, 1 + PushAX)         &&
+                !CS_RangeHasLabel (S, I+3, 1 + PushAX)          &&
+                L[2+PushAX]->OPC == OP65_LDY                    &&
+                CE_IsCallTo (L[3+PushAX], "ldaxidx")) {
 
-	    /* tax */
-            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[3]->LI);
-            CS_InsertEntry (S, X, I+5);
+                CodeEntry* X;
 
-	    /* dey */
-            X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[3]->LI);
-            CS_InsertEntry (S, X, I+6);
+                /* lda (zp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[0]->Arg, 0, L[3]->LI);
+                CS_InsertEntry (S, X, I+PushAX+4);
 
-       	    /* lda (zp),y */
-	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[0]->Arg, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+7);
+                /* tax */
+                X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[3]->LI);
+                CS_InsertEntry (S, X, I+PushAX+5);
 
-	    /* Remove the old code */
-	    CS_DelEntry (S, I+3);
-	    CS_DelEntries (S, I, 2);
+                /* dey */
+                X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[3]->LI);
+                CS_InsertEntry (S, X, I+PushAX+6);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+                /* lda (zp),y */
+                X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[0]->Arg, 0, L[3]->LI);
+                CS_InsertEntry (S, X, I+PushAX+7);
 
+                /* Remove the old code */
+                CS_DelEntry (S, I+PushAX+3);
+                if (!PushAX) {
+                    CS_DelEntries (S, I, 2);
+                }
+
+                /* Remember, we had changes */
+                ++Changes;
+
+            }
 	}
 
 	/* Next entry */

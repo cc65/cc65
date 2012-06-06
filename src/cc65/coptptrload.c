@@ -1247,16 +1247,14 @@ unsigned OptPtrLoad15 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < CS_GetEntryCount (S) - 3) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[5];
 	unsigned Len;
 
-      	/* Get next 3 entries */
-       	CS_GetEntries (S, L, I, 3);
-
      	/* Check for the start of the sequence */
-       	if (L[0]->OPC == OP65_LDA && L[0]->AM == AM65_ZP        &&
+       	if (CS_GetEntries (S, L, I, 3)                          &&
+            L[0]->OPC == OP65_LDA && L[0]->AM == AM65_ZP        &&
        	    L[1]->OPC == OP65_LDX && L[1]->AM == AM65_ZP        &&
             !CS_RangeHasLabel (S, I+1, 2)                       &&
             (Len = strlen (L[0]->Arg)) > 0                      &&

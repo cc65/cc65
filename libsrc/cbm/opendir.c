@@ -14,8 +14,8 @@
 DIR* __fastcall__ opendir (register const char* name)
 {
     unsigned char buf[32];
-    DIR d;
     DIR* dir = 0;
+    DIR d;
 
     /* Setup the actual file name that is sent to the disk. We accept "0:",
      * "1:" and "." as directory names.

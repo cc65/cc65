@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -41,6 +41,7 @@
 
 /* ar65 */
 #include "error.h"
+#include "library.h"
 #include "objdata.h"
 
 
@@ -107,7 +108,7 @@ void FreeObjData (ObjData* O)
 void ClearObjData (ObjData* O)
 /* Remove any data stored in O */
 {
-    unsigned I;                
+    unsigned I;
     xfree (O->Name);
     O->Name = 0;
     for (I = 0; I < CollCount (&O->Strings); ++I) {
@@ -164,7 +165,7 @@ void DelObjData (const char* Module)
     }
 
     /* Not found! */
-    Warning ("Module `%s' not found in library", Module);
+    Warning ("Module `%s' not found in library `%s'", Module, LibName);
 }
 
 

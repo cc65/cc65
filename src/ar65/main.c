@@ -6,12 +6,12 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
-/*	    								     */
-/*	    								     */
+/*	    						    		     */
+/*	    						    		     */
 /* This software is provided 'as-is', without any expressed or implied	     */
 /* warranty.  In no event will the authors be held liable for any damages    */
 /* arising from the use of this software.				     */
@@ -121,7 +121,7 @@ int main (int argc, char* argv [])
 
 	    case 'V':
 		fprintf (stderr,
-       	       	       	 "ar65 V%s - (C) Copyright 1998-2011 Ullrich von Bassewitz\n",
+       	       	       	 "ar65 V%s - (C) Copyright 1998-2012 Ullrich von Bassewitz\n",
 			 GetVersionAsString ());
 		break;
 

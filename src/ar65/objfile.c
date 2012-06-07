@@ -267,7 +267,8 @@ void ObjAdd (const char* Name)
 	 * and the external one.
 	 */
 	if (difftime ((time_t)O->MTime, StatBuf.st_mtime) > 0.0) {
-	    Warning ("Replacing module `%s' by older version", O->Name);
+	    Warning ("Replacing module `%s' by older version in library `%s'",
+                     O->Name, LibName);
 	}
 
         /* Free data */
@@ -312,7 +313,7 @@ void ObjExtract (const char* Name)
 
     /* Bail out if the module does not exist */
     if (O == 0) {
-    	Error ("Module `%s' not found in library", Module);
+    	Error ("Module `%s' not found in library `%s'", Module, LibName);
     }
 
     /* Open the output file */

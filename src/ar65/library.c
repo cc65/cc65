@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -60,14 +60,16 @@
 /*****************************************************************************/
 
 
+                        
+/* Name of the library file */
+const char*  	        LibName = 0;
 
 /* File descriptor for the library file */
 FILE*	       		NewLib = 0;
 static FILE*   		Lib = 0;
-static const char*	LibName = 0;
 
 /* The library header */
-static LibHeader       	Header = {
+static LibHeader    	Header = {
     LIB_MAGIC,
     LIB_VERSION,
     0,
@@ -99,7 +101,7 @@ static void ReadHeader (void)
     }
     Header.Flags   = Read16 (Lib);
     Header.IndexOffs = Read32 (Lib);
-}
+}                                                  
 
 
 
@@ -388,7 +390,7 @@ void LibClose (void)
     }
     if (NewLib && fclose (NewLib) != 0) {
      	Error ("Problem closing temporary library file: %s", strerror (errno));
-    }                                      
+    }
 }
 
 

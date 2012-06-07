@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -48,6 +48,9 @@
 
 
 
+/* Name of the library file */
+extern const char* LibName;
+
 /* File descriptor for the new library file */
 extern FILE*	NewLib;
 
@@ -73,7 +76,7 @@ unsigned long LibCopyTo (FILE* F, unsigned long Bytes);
 void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F);
 /* Copy data from the library file into another file */
 
-void LibClose (void);  
+void LibClose (void);
 /* Write remaining data, close both files and copy the temp file to the old
  * filename
  */

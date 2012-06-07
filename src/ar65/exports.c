@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -41,6 +41,7 @@
 
 /* ar65 */
 #include "error.h"
+#include "library.h"
 #include "objdata.h"
 #include "exports.h"
 
@@ -112,9 +113,9 @@ void ExpInsert (const char* Name, const ObjData* Module)
     while (1) {
 	if (strcmp (L->Name, Name) == 0) {
 	    /* Duplicate entry */
-	    Warning ("External symbol `%s' in module `%s' is duplicated in "
-	       	     "module `%s'",
-	  	     Name, L->Name, Module->Name);
+       	    Warning ("External symbol `%s' in module `%s', library `%s' "
+                     "is duplicated in module `%s'",
+	  	     Name, L->Name, LibName, Module->Name);
 	}
      	if (L->Next == 0) {
      	    break;

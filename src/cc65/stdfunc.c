@@ -202,6 +202,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     ArgDesc  Arg1, Arg2, Arg3;
     unsigned ParamSize = 0;
     unsigned Label;
+    int      Offs;
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
@@ -328,7 +329,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                             !(ED_IsLocAbs (&Arg2.Expr) && Arg2.Expr.IVal < 256);
 
         /* Calculate the real stack offset */
-        int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
+        Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
         /* Drop the generated code */
         RemoveCode (&Arg1.Expr.Start);
@@ -402,7 +403,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
                             !(ED_IsLocAbs (&Arg1.Expr) && Arg1.Expr.IVal < 256);
 
         /* Calculate the real stack offset */
-        int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
+        Offs = ED_GetStackOffs (&Arg2.Expr, 0);
 
         /* Drop the generated code */
         RemoveCode (&Arg1.Expr.Start);
@@ -459,6 +460,43 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
          * to the first argument.
          */
         *Expr = Arg1.Expr;
+
+    } else if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256   &&
+               ED_IsRVal (&Arg2.Expr) && ED_IsLocStack (&Arg2.Expr)     &&
+               (Offs = ED_GetStackOffs (&Arg2.Expr, 0)) == 0) {
+
+        /* Drop the generated code but leave the load of the first argument*/
+        RemoveCode (&Arg1.Push);
+
+        /* We need a label */
+        Label = GetLocalLabel ();
+
+        /* Generate memcpy code */
+        AddCodeLine ("sta ptr1");
+        AddCodeLine ("stx ptr1+1");
+        if (Arg3.Expr.IVal <= 127) {
+            AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
+            g_defcodelabel (Label);
+            AddCodeLine ("lda (ptr1),y");
+            AddCodeLine ("sta (sp),y");
+            AddCodeLine ("dey");
+            AddCodeLine ("bpl %s", LocalLabelName (Label));
+        } else {
+            AddCodeLine ("ldy #$00");
+            g_defcodelabel (Label);
+            AddCodeLine ("lda (ptr1),y");
+            AddCodeLine ("sta (sp),y");
+            AddCodeLine ("iny");
+            AddCodeLine ("cpy #$%02X", (unsigned char) Arg3.Expr.IVal);
+            AddCodeLine ("bne %s", LocalLabelName (Label));
+        }
+
+        /* Reload result - X hasn't changed by the code above */
+        AddCodeLine ("lda ptr1");
+
+        /* The function result is an rvalue in the primary register */
+        ED_MakeRValExpr (Expr);
+        Expr->Type = GetFuncReturn (Expr->Type);
 
     } else {
 

@@ -828,7 +828,7 @@ static void DoMemory (void)
             stacksize);
     }
 
-    if (overlaysize != -1 && apple == 0) {
+    if (overlaysize != -1) {
         fprintf (outputSFile,
             "\t.export __OVERLAYSIZE__ : absolute = $%04x\n\n",
             overlaysize);

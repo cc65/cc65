@@ -6,8 +6,8 @@
 
 	    .export _exit
 	    .export __STARTUP__ : absolute = 1		; Mark as startup
-	    .import __VLIR0_START__, __VLIR0_SIZE__	; Linker generated
-	    .import __STACKSIZE__, __BACKBUFSIZE__	; Linker generated
+	    .import __STACKADDR__, __STACKSIZE__	; Linker generated
+	    .import __BACKBUFSIZE__			; Linker generated
 	    .import initlib, donelib
 	    .import callmain
 	    .import zerobss
@@ -46,8 +46,8 @@
 
 ; Setup stack.
 
-	lda #<(__VLIR0_START__ + __VLIR0_SIZE__ + __STACKSIZE__)
-	ldx #>(__VLIR0_START__ + __VLIR0_SIZE__ + __STACKSIZE__)
+	lda #<(__STACKADDR__ + __STACKSIZE__)
+	ldx #>(__STACKADDR__ + __STACKSIZE__)
 	sta sp
 	stx sp+1
 

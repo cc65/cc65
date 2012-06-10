@@ -7,10 +7,13 @@
 ;
 ; push eax on stack
 ;
-	.export		push0ax, pusheax
-	.import		decsp4
-	.importzp	sp, sreg
+       	.export		pushl0, push0ax, pusheax
+       	.import		decsp4
+       	.importzp	sp, sreg
 
+pushl0:
+        lda     #0
+        tax
 push0ax:
 	ldy	#0
 	sty	sreg

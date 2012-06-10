@@ -18,8 +18,9 @@
 
 
 
-char* __fastcall__ fgets (char* s, unsigned size, FILE* f)
+char* __fastcall__ fgets (char* s, unsigned size, register FILE* f)
 {
+    register char* p = s;
     unsigned i;
     int c;
 
@@ -34,28 +35,30 @@ char* __fastcall__ fgets (char* s, unsigned size, FILE* f)
 
        	/* Get next character */
        	if ((c = fgetc (f)) == EOF) {
-       	    s[i] = '\0';
        	    /* Error or EOF */
        	    if ((f->f_flags & _FERROR) != 0 || i == 0) {
        	     	/* ERROR or EOF on first char */
+                *p = '\0';
        	     	return 0;
        	    } else {
        	        /* EOF with data already read */
                 break;
-    	    }
+      	    }
        	}
 
        	/* One char more */
-       	s[i++] = c;
+       	*p = c;
+        ++p;
+        ++i;
 
-     	/* Stop at end of line */
-     	if (c == '\n') {
-     	    break;
-     	}
+      	/* Stop at end of line */
+      	if ((char)c == '\n') {
+      	    break;
+      	}
     }
 
     /* Terminate the string */
-    s[i] = '\0';
+    *p = '\0';
 
     /* Done */
     return s;

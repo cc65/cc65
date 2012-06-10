@@ -18,17 +18,18 @@
 
 
 
-int __fastcall__ fputc (int c, FILE* f)
+int __fastcall__ fputc (int c, register FILE* f)
 {
     /* Check if the file is open or if there is an error condition */
     if ((f->f_flags & _FOPEN) == 0 || (f->f_flags & (_FERROR | _FEOF)) != 0) {
-    	return EOF;
+    	goto ReturnEOF;
     }
 
-    /* Write the byte (knows about byte order!) */
-    if (write (f->f_fd, &c, 1) <= 0) {
+    /* Write the byte */
+    if (write (f->f_fd, &c, 1) != 1) {
    	/* Error */
 	f->f_flags |= _FERROR;
+ReturnEOF:
 	return EOF;
     }
 

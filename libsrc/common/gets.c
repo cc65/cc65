@@ -19,35 +19,40 @@
 
 char* __fastcall__ gets (char* s)
 {
+    register char* p = s;
     int c;
-    int i = 0;
+    unsigned i = 0;
 
-    do {
+    while (1) {
 
        	/* Get next character */
        	if ((c = fgetc (stdin)) == EOF) {
        	    /* Error or EOF */
-       	    s [i] = 0;
+       	    *p = '\0';
        	    if (stdin->f_flags & _FERROR) {
-       	    	/* ERROR */
-       	    	return 0;
+       	       	/* ERROR */
+       	       	return 0;
        	    } else {
        	        /* EOF */
-		if (i) {
-		    return s;
-		} else {
-		    return 0;
-		}
+     	       	if (i) {
+     	       	    return s;
+     	       	} else {
+     	       	    return 0;
+     	       	}
      	    }
        	}
 
-       	/* One char more */
-       	s [i++] = c;
+       	/* One char more. Newline ends the input */
+        if ((char) c == '\n') {
+            *p = '\0';
+            break;
+        } else {
+            *p = c;
+            ++p;
+            ++i;
+        }
 
-    } while (c != '\n');
-
-    /* Replace newline by NUL */
-    s [i-1] = '\0';
+    }
 
     /* Done */
     return s;
@@ -55,4 +60,4 @@ char* __fastcall__ gets (char* s)
 
 
 
-		   
+

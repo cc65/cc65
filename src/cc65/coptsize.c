@@ -337,6 +337,16 @@ static const CallDesc CallTable [] = {
         "pusheax",
         {
             /*     A               X               Y             SRegLo   */
+                         0,              0, UNKNOWN_REGVAL,              0,
+            /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
+                         0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL
+        },
+        F_NONE,
+        "pushl0"
+    },{
+        "pusheax",
+        {
+            /*     A               X               Y             SRegLo   */
             UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0,
             /*   SRegHi          Ptr1Lo          Ptr1Hi           Tmp1    */
                          0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, UNKNOWN_REGVAL

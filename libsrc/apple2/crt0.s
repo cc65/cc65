@@ -1,32 +1,21 @@
 ;
-; Oliver Schmidt, 15.09.2009
+; Oliver Schmidt, 2009-09-15
 ;
 ; Startup code for cc65 (Apple2 version)
 ;
 
         .export         _exit, done, return
-        .export         __STARTUP__ : absolute = 1      ; Mark as startup
+        .export         __STARTUP__ : absolute = 1	; Mark as startup
         .import         zerobss
         .import    	initlib, donelib
         .import    	callmain, callirq
-        .import        	__RAM_START__ , __RAM_LAST__	; Linker generated
-        .import         __MOVE_START__, __MOVE_LAST__	; Linker generated
-        .import         __LC_START__  , __LC_LAST__	; Linker generated
-        .import        	__ZPSAVE_RUN__, __INIT_SIZE__	; Linker generated
+        .import        	__RAM_LAST__, __ZPSAVE_RUN__	; Linker generated
+        .import         __LC_START__, __LC_LAST__	; Linker generated
+        .import        	__INIT_SIZE__			; Linker generated
         .import        	__INTERRUPTOR_COUNT__		; Linker generated
 
         .include        "zeropage.inc"
         .include        "apple2.inc"
-
-        .linecont	+
-
-; ------------------------------------------------------------------------
-
-        .segment        "EXEHDR"
-
-        .addr           __RAM_START__			; Start address
-        .word           __ZPSAVE_RUN__ - __RAM_START__ + \
-			__MOVE_LAST__  - __MOVE_START__	; Size
 
 ; ------------------------------------------------------------------------
 

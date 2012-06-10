@@ -1,0 +1,5 @@
+HEADER APPLICATION "Bitmap Demo" "Bitmap Demo" "V1.0" {
+    author    "Oliver Schmidt"
+    info      "This is a minimalistic cc65 GEOSLib bitmap demo program written in C."
+    date      12 06 10 12 00
+}

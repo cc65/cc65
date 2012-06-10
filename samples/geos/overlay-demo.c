@@ -20,12 +20,11 @@ void show(char *name)
     char line1[40];
 
     sprintf(line1, CBOLDON "Overlay Demo - Overlay %s" CPLAINTEXT, name);
-    DlgBoxOk(line1,
-             "Click OK to return to Main.");
+    DlgBoxOk(line1, "Click OK to return to Main.");
 }
 
 /* In a real-world overlay program one would probably not use a #pragma but
- * rather place the all the code of certain souce files into the overlay by
+ * rather place the all the code of certain source files into the overlay by
  * compiling them with --code-name OVERLAY1.
  */
 #pragma code-name(push, "OVERLAY1");

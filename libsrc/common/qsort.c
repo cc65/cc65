@@ -10,7 +10,8 @@
 
 
 
-static void QuickSort (void* Base, int Lo, int Hi, size_t Size,
+static void QuickSort (register unsigned char* Base, int Lo, int Hi,
+                       register size_t Size,
 	               int (*Compare)(const void*, const void*))
 /* Internal recursive function. Works with ints, but this shouldn't be
  * a problem.
@@ -18,28 +19,25 @@ static void QuickSort (void* Base, int Lo, int Hi, size_t Size,
 {
     int I, J;
 
-    /* Get a char pointer */
-    unsigned char* B = Base;
-
     /* Quicksort */
     while (Hi > Lo) {
    	I = Lo + Size;
    	J = Hi;
    	while (I <= J) {
-   	    while (I <= J && Compare (B + Lo, B + I) >= 0) {
+   	    while (I <= J && Compare (Base + Lo, Base + I) >= 0) {
    	     	I += Size;
    	    }
-   	    while (I <= J && Compare (B + Lo, B + J) < 0) {
+   	    while (I <= J && Compare (Base + Lo, Base + J) < 0) {
    	     	J -= Size;
    	    }
    	    if (I <= J) {
-   	     	_swap (B + I, B + J, Size);
+   	     	_swap (Base + I, Base + J, Size);
    	     	I += Size;
    	     	J -= Size;
    	    }
       	}
    	if (J != Lo) {
-   	    _swap (B + J, B + Lo, Size);
+   	    _swap (Base + J, Base + Lo, Size);
    	}
        	if (((unsigned) J) * 2 > (Hi + Lo)) {
 	    QuickSort (Base, J + Size, Hi, Size, Compare);

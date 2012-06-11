@@ -261,7 +261,11 @@ static unsigned OptShift3 (CodeSeg* S)
  *
  *      ror     a
  *
- * if X is zero on entry and unused later.
+ * if X is zero on entry and unused later. For shift counts > 1, more
+ *
+ *      shr     a
+ *
+ * must be added.
  */
 {
     unsigned Changes = 0;
@@ -287,12 +291,21 @@ static unsigned OptShift3 (CodeSeg* S)
 	    L[1]->OPC == OP65_INX            	       	        &&
 	    L[0]->JumpTo->Owner == L[2]                         &&
 	    !CS_RangeHasLabel (S, I, 2)                         &&
-            CE_IsCallTo (L[2], "shrax1")                        &&
+            L[2]->OPC == OP65_JSR                               &&
+            strlen (L[2]->Arg) == 6                             &&
+            memcmp (L[2]->Arg, "shrax", 5) == 0                 &&
+            IsDigit (L[2]->Arg[5])                              &&
 	    !RegXUsed (S, I+3)) {
+
+            unsigned ShiftCount = (L[2]->Arg[5] - '0');
 
             /* Add the replacement insn instead */
             CodeEntry* X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
             CS_InsertEntry (S, X, I+3);
+            while (--ShiftCount) {
+                X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, L[2]->LI);
+                CS_InsertEntry (S, X, I+4);
+            }
 
 	    /* Remove the bcs/dex/jsr */
 	    CS_DelEntries (S, I, 3);

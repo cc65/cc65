@@ -491,6 +491,9 @@ unsigned OptPtrStore4 (CodeSeg* S)
  *      ldx     #$00
  *      lda     yyy
  *      sta     (ptr1),y
+ *
+ * In case a/x is loaded from the register bank before the clc, we can even
+ * use the register bank instead of ptr1.
  */
 {
     unsigned Changes = 0;
@@ -526,7 +529,7 @@ unsigned OptPtrStore4 (CodeSeg* S)
 
 	    CodeEntry* X;
             const char* ZPLoc;
-                                                      
+
             /* Track the insertion point */
             unsigned IP = I + 9;
 
@@ -567,7 +570,7 @@ unsigned OptPtrStore4 (CodeSeg* S)
 	}
 
 	/* Next entry */
-	++I;
+  	++I;
 
     }
 
@@ -578,6 +581,129 @@ unsigned OptPtrStore4 (CodeSeg* S)
 
 
 unsigned OptPtrStore5 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      clc
+ *      adc     xxx
+ *      bcc     L
+ *      inx
+ * L:   jsr	pushax
+ *      ldy     yyy
+ *	ldx	#$00
+ *	lda	(sp),y
+ *	ldy     #$00
+ *      jsr     staspidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      ldy     yyy-2
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      ldy     xxx
+ *      sta     (ptr1),y
+ *
+ * In case a/x is loaded from the register bank before the clc, we can even
+ * use the register bank instead of ptr1.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[10];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_CLC                               &&
+       	    CS_GetEntries (S, L+1, I+1, 9)                      &&
+  	    L[1]->OPC == OP65_ADC                               &&
+	    (L[1]->AM == AM65_ABS                       ||
+             L[1]->AM == AM65_ZP                        ||
+             L[1]->AM == AM65_IMM)                              &&
+       	    (L[2]->OPC == OP65_BCC || L[2]->OPC == OP65_JCC)    &&
+       	    L[2]->JumpTo != 0                                   &&
+       	    L[2]->JumpTo->Owner == L[4]                         &&
+       	    L[3]->OPC == OP65_INX                               &&
+            CE_IsCallTo (L[4], "pushax")                        &&
+            L[5]->OPC == OP65_LDY                               &&
+            CE_IsConstImm (L[5])                                &&
+            L[6]->OPC == OP65_LDX                               &&
+            L[7]->OPC == OP65_LDA                               &&
+            L[7]->AM == AM65_ZP_INDY                            &&
+            strcmp (L[7]->Arg, "sp") == 0                       &&
+       	    L[8]->OPC == OP65_LDY                               &&
+            (L[8]->AM == AM65_ABS                       ||
+             L[8]->AM == AM65_ZP                        ||
+             L[8]->AM == AM65_IMM)                              &&
+       	    CE_IsCallTo (L[9], "staspidx")                      &&
+       	    !CS_RangeHasLabel (S, I+1, 3)                       &&
+            !CS_RangeHasLabel (S, I+5, 5)) {
+
+	    CodeEntry* X;
+            const char* Arg;
+            const char* ZPLoc;
+
+            /* Track the insertion point */
+            unsigned IP = I + 10;
+
+            /* If the sequence is preceeded by a load of a ZP value, we can
+             * use this ZP value as a pointer.
+             */
+            if (I < 2 || (ZPLoc = ZPLoadAX (S, I-2)) == 0) {
+
+                ZPLoc = "ptr1";
+
+                /* Must use ptr1 */
+                X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[9]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[9]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+            }
+
+            Arg = MakeHexArg (L[5]->Num - 2);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[5]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            X = NewCodeEntry (OP65_LDX, L[6]->AM, L[6]->Arg, 0, L[6]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            X = NewCodeEntry (OP65_LDA, L[7]->AM, L[7]->Arg, 0, L[7]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLoc, 0, L[9]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+	    /* Remove the old code */
+	    CS_DelEntries (S, I, 10);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPtrStore6 (CodeSeg* S)
 /* Search for the sequence:
  *
  *    	jsr   	pushax
@@ -601,16 +727,6 @@ unsigned OptPtrStore5 (CodeSeg* S)
  * In case a/x is loaded from the register bank before the pushax, we can even
  * use the register bank instead of ptr1.
  *
- *
- *    	jsr    	pushax
- *      ldy     xxx
- *      jsr     ldauidx
- *      ldx     #$00
- *      lda     (zp),y
- *      subop
- *      ldy     yyy
- *      sta     (zp),y
- *  	jsr   	staspidx
  */
 {
     unsigned Changes = 0;

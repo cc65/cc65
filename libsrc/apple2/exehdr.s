@@ -6,15 +6,11 @@
 ;
 
         .export         __EXEHDR__ : absolute = 1	; Linker referenced
-        .import        	__RAM_START__, __ZPSAVE_RUN__	; Linker generated
-        .import         __MOVE_START__, __MOVE_LAST__	; Linker generated
-
-        .linecont	+
+        .import        	__LOADADDR__, __LOADSIZE__	; Linker generated
 
 ; ------------------------------------------------------------------------
 
         .segment        "EXEHDR"
 
-        .addr           __RAM_START__			; Start address
-        .word           __ZPSAVE_RUN__ - __RAM_START__ + \
-			__MOVE_LAST__  - __MOVE_START__	; Size
+        .addr           __LOADADDR__	; Load address
+        .word           __LOADSIZE__	; Load length

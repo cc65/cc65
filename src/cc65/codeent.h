@@ -183,6 +183,16 @@ INLINE void CE_ResetMark (CodeEntry* E)
 #  define CE_ResetMark(E)	((E)->Flags &= ~CEF_USERMARK)
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE int CE_HasNumArg (const CodeEntry* E)
+/* Return true if the instruction has a numeric argument */
+{
+    return (E->Flags & CEF_NUMARG) != 0;
+}
+#else
+#  define CE_HasNumArg(E)       (((E)->Flags & CEF_NUMARG) != 0)
+#endif
+
 void CE_SetArg (CodeEntry* E, const char* Arg);
 /* Replace the argument by the new one. */
 

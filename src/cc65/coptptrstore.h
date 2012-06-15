@@ -52,8 +52,6 @@
 unsigned OptPtrStore1 (CodeSeg* S);
 /* Search for the sequence:
  *
- *      lda     #<(label+0)
- *      ldx     #>(label+0)
  *      clc
  *      adc     xxx
  *      bcc     L
@@ -66,11 +64,36 @@ unsigned OptPtrStore1 (CodeSeg* S);
  *
  * and replace it by:
  *
+ *      sta     ptr1
+ *      stx     ptr1+1
  *      ldy     xxx
- *	ldx	#$00
- *	lda	yyy
- *      sta	label,y
- */
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     (ptr1),y
+ *
+ * or by
+ *
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     label,y
+ *
+ * or by
+ *
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     $xxxx,y
+ *
+ * or by
+ *
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     (zp),y
+ *
+ * depending on the two instructions preceeding the sequence above.
+ */                                
 
 unsigned OptPtrStore2 (CodeSeg* S);
 /* Search for the sequence:
@@ -129,32 +152,6 @@ unsigned OptPtrStore3 (CodeSeg* S);
 unsigned OptPtrStore4 (CodeSeg* S);
 /* Search for the sequence:
  *
- *      ldy     #offs1
- *      clc
- *      adc     (sp),y
- *      bcc     L
- *      inx
- * L:   jsr     pushax
- *  	ldy     #offs2
- *      ldx     #$00
- *      lda     (sp),y
- *      ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldx     #$00
- *      ldy     #offs2-2
- *      lda     (sp),y
- *      ldy     #offs1
- *      sta     (ptr1),y
- */
-
-unsigned OptPtrStore5 (CodeSeg* S);
-/* Search for the sequence:
- *
  *      clc
  *      adc     xxx
  *      bcc     L
@@ -179,8 +176,8 @@ unsigned OptPtrStore5 (CodeSeg* S);
  * In case a/x is loaded from the register bank before the clc, we can even
  * use the register bank instead of ptr1.
  */
-                                   
-unsigned OptPtrStore6 (CodeSeg* S);
+
+unsigned OptPtrStore5 (CodeSeg* S);
 /* Search for the sequence:
  *
  *    	jsr   	pushax

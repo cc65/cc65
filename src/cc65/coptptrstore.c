@@ -36,7 +36,9 @@
 #include <string.h>
 
 /* common */
+#include "strbuf.h"
 #include "xmalloc.h"
+#include "xsprintf.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -89,7 +91,7 @@ static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
 
 
 
-static const char* ZPLoadAX (CodeSeg* S, unsigned I)
+static const char* LoadAXZP (CodeSeg* S, unsigned I)
 /* If the two instructions at S/I are a load of A/X from a two byte zero byte
  * location, return the name of the zero page location. Otherwise return NULL.
  */
@@ -121,8 +123,74 @@ static const char* ZPLoadAX (CodeSeg* S, unsigned I)
 
 
 
+static const char* LoadAXImm (CodeSeg* S, unsigned I)
+/* If the two instructions at S/I are a load of A/X of a constant value or a
+ * wqord sized address label, return the address of the location as a string.
+ * Beware: In case of a numeric value, the result is returned in static
+ * storage which is overwritten with each call.
+ */
+{
+    static StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+    CodeEntry* L[2];
+    unsigned Len;
+
+    if (CS_GetEntries (S, L, I, 2)                              &&
+        ((L[0]->OPC == OP65_LDA && L[1]->OPC == OP65_LDX)   ||
+         (L[0]->OPC == OP65_LDX && L[1]->OPC == OP65_LDA))      &&
+        L[0]->AM == AM65_IMM                                    &&
+        L[1]->AM == AM65_IMM                                    &&
+        !CE_HasLabel (L[1])) {
+
+        /* Immediate load of A/X */
+        if (CE_HasNumArg (L[0]) && CE_HasNumArg (L[1])) {
+
+            /* Numeric argument - get low and high byte */
+            unsigned Hi, Lo;
+            if (L[0]->OPC == OP65_LDA) {
+                Lo = (L[0]->Num & 0xFF);
+                Hi = (L[1]->Num & 0xFF);
+            } else {
+                Lo = (L[1]->Num & 0xFF);
+                Hi = (L[0]->Num & 0xFF);
+            }
+
+            /* Format into buffer */
+            SB_Printf (&Buf, "$%04X", Lo | (Hi << 8));
+
+            /* Return the address as a string */
+            return SB_GetConstBuf (&Buf);
+
+        } else if ((Len = strlen (L[0]->Arg)) > 3               &&
+                   L[0]->Arg[0] == '<'                          &&
+                   L[0]->Arg[1] == '('                          &&
+                   strlen (L[1]->Arg) == Len                    &&
+                   L[1]->Arg[0] == '>'                          &&
+                   memcmp (L[0]->Arg+1, L[1]->Arg+1, Len-1) == 0) {
+
+            /* Load of an address label */
+            SB_CopyBuf (&Buf, L[0]->Arg + 2, Len - 3);
+            SB_Terminate (&Buf);
+            return SB_GetConstBuf (&Buf);
+
+        } else {
+
+            /* Not found */
+            return 0;
+
+        }
+
+    } else {
+
+        /* Not found */
+        return 0;
+
+    }
+}
+
+
+
 /*****************************************************************************/
-/*		   	 	     Code                                    */
+/* 		   	 	     Code                                    */
 /*****************************************************************************/
 
 
@@ -130,8 +198,6 @@ static const char* ZPLoadAX (CodeSeg* S, unsigned I)
 unsigned OptPtrStore1 (CodeSeg* S)
 /* Search for the sequence:
  *
- *      lda     #<(label+0)
- *      ldx     #>(label+0)
  *      clc
  *      adc     xxx
  *      bcc     L
@@ -144,10 +210,35 @@ unsigned OptPtrStore1 (CodeSeg* S)
  *
  * and replace it by:
  *
+ *      sta     ptr1
+ *      stx     ptr1+1
  *      ldy     xxx
- *	ldx	#$00
- *	lda	yyy
- *      sta	label,y
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     (ptr1),y
+ *
+ * or by
+ *
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     label,y
+ *
+ * or by
+ *
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     $xxxx,y
+ *
+ * or by
+ *
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     yyy
+ *      sta     (zp),y
+ *
+ * depending on the two instructions preceeding the sequence above.
  */
 {
     unsigned Changes = 0;
@@ -156,64 +247,95 @@ unsigned OptPtrStore1 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[11];
-	unsigned Len;
+	CodeEntry* L[9];
 
       	/* Get next entry */
        	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_LDA      	       	             &&
-	    L[0]->AM == AM65_IMM                             &&
-       	    CS_GetEntries (S, L+1, I+1, 10)                  &&
-       	    L[1]->OPC == OP65_LDX              	             &&
-	    L[1]->AM == AM65_IMM                             &&
-	    L[2]->OPC == OP65_CLC                            &&
-	    L[3]->OPC == OP65_ADC                            &&
-	    (L[3]->AM == AM65_ABS || L[3]->AM == AM65_ZP)    &&
-       	    (L[4]->OPC == OP65_BCC || L[4]->OPC == OP65_JCC) &&
-       	    L[4]->JumpTo != 0                                &&
-       	    L[4]->JumpTo->Owner == L[6]                      &&
-	    L[5]->OPC == OP65_INX                            &&
-            CE_IsCallTo (L[6], "pushax")                     &&
-            L[7]->OPC == OP65_LDX                            &&
-            L[8]->OPC == OP65_LDA                            &&
-       	    L[9]->OPC == OP65_LDY                            &&
-       	    CE_IsKnownImm (L[9], 0)                          &&
-       	    CE_IsCallTo (L[10], "staspidx")                  &&
-       	    !CS_RangeHasLabel (S, I+1, 5)                    &&
-            !CS_RangeHasLabel (S, I+7, 4)                    &&
-	    /* Check the label last because this is quite costly */
-	    (Len = strlen (L[0]->Arg)) > 3                   &&
-	    L[0]->Arg[0] == '<'                              &&
-	    L[0]->Arg[1] == '('                              &&
-	    strlen (L[1]->Arg) == Len                        &&
-	    L[1]->Arg[0] == '>'                              &&
-       	    memcmp (L[0]->Arg+1, L[1]->Arg+1, Len-1) == 0) {
+       	if (L[0]->OPC == OP65_CLC                               &&
+       	    CS_GetEntries (S, L+1, I+1, 8)                      &&
+	    L[1]->OPC == OP65_ADC                               &&
+	    (L[1]->AM == AM65_ABS                       ||
+             L[1]->AM == AM65_ZP                        ||
+             L[1]->AM == AM65_IMM)                              &&
+       	    (L[2]->OPC == OP65_BCC || L[2]->OPC == OP65_JCC)    &&
+       	    L[2]->JumpTo != 0                                   &&
+       	    L[2]->JumpTo->Owner == L[4]                         &&
+       	    L[3]->OPC == OP65_INX                               &&
+            CE_IsCallTo (L[4], "pushax")                        &&
+            L[5]->OPC == OP65_LDX                               &&
+            L[6]->OPC == OP65_LDA                               &&
+       	    L[7]->OPC == OP65_LDY                               &&
+       	    CE_IsKnownImm (L[7], 0)                             &&
+       	    CE_IsCallTo (L[8], "staspidx")                      &&
+       	    !CS_RangeHasLabel (S, I+1, 3)                       &&
+            !CS_RangeHasLabel (S, I+5, 4)) {
 
 	    CodeEntry* X;
-	    char* Label;
+            const char* Loc;
+            am_t AM;
 
-	    /* We will create all the new stuff behind the current one so
-	     * we keep the line references.
-	     */
-	    X = NewCodeEntry (OP65_LDY,	L[3]->AM, L[3]->Arg, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+11);
+            /* Track the insertion point */
+            unsigned IP = I + 9;
 
-       	    X = NewCodeEntry (OP65_LDX, L[7]->AM, L[7]->Arg, 0, L[7]->LI);
-	    CS_InsertEntry (S, X, I+12);
+            unsigned DeleteStart = I;
+            unsigned DeleteCount = 9;
+            if (I >= 2) {
+                if ((Loc = LoadAXZP (S, I-2)) != 0) {
+                    /* If the sequence is preceeded by a load of a ZP value,
+                     * we can use this ZP value as a pointer using ZP
+                     * indirect Y addressing.
+                     */
+                    AM = AM65_ZP_INDY;
+                    DeleteStart -= 2;
+                    DeleteCount += 2;
+                } else if ((Loc = LoadAXImm (S, I-2)) != 0) {
+                    /* If the sequence is preceeded by a load of an immediate
+                     * value, we can use this absolute value as an address
+                     * using absolute indexed Y addressing.
+                     */
+                    AM = AM65_ABSY;
+                    DeleteStart -= 2;
+                    DeleteCount += 2;
+                }
+            }
 
-            X = NewCodeEntry (OP65_LDA, L[8]->AM, L[8]->Arg, 0, L[8]->LI);
-            CS_InsertEntry (S, X, I+13);
+            /* If we don't have a zero page location, we use ptr1 with zp
+             * indirect Y addressing. We must store the value in A/X into
+             * ptr1 in this case.
+             */
+            if (Loc == 0) {
 
-	    Label = memcpy (xmalloc (Len-2), L[0]->Arg+2, Len-3);
-	    Label[Len-3] = '\0';
-       	    X = NewCodeEntry (OP65_STA, AM65_ABSY, Label, 0, L[10]->LI);
-	    CS_InsertEntry (S, X, I+14);
-	    xfree (Label);
+                /* Must use ptr1 */
+                Loc = "ptr1";
+                AM  = AM65_ZP_INDY;
+
+                X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[8]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[8]->LI);
+                CS_InsertEntry (S, X, IP++);
+
+            }
+
+            X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            X = NewCodeEntry (OP65_LDX, L[5]->AM, L[5]->Arg, 0, L[5]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            X = NewCodeEntry (OP65_LDA, L[6]->AM, L[6]->Arg, 0, L[6]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            X = NewCodeEntry (OP65_STA, AM, Loc, 0, L[8]->LI);
+            CS_InsertEntry (S, X, IP++);
 
 	    /* Remove the old code */
-	    CS_DelEntries (S, I, 11);
+	    CS_DelEntries (S, DeleteStart, DeleteCount);
+
+            /* Skip most of the generated replacement */
+            I += 3;
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -221,7 +343,7 @@ unsigned OptPtrStore1 (CodeSeg* S)
 	}
 
 	/* Next entry */
-	++I;
+  	++I;
 
     }
 
@@ -478,116 +600,6 @@ unsigned OptPtrStore4 (CodeSeg* S)
  *      bcc     L
  *      inx
  * L:   jsr	pushax
- *	ldx	#$00
- *	lda	yyy
- *	ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     (ptr1),y
- *
- * In case a/x is loaded from the register bank before the clc, we can even
- * use the register bank instead of ptr1.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[9];
-
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_CLC                               &&
-       	    CS_GetEntries (S, L+1, I+1, 8)                      &&
-	    L[1]->OPC == OP65_ADC                               &&
-	    (L[1]->AM == AM65_ABS                       ||
-             L[1]->AM == AM65_ZP                        ||
-             L[1]->AM == AM65_IMM)                              &&
-       	    (L[2]->OPC == OP65_BCC || L[2]->OPC == OP65_JCC)    &&
-       	    L[2]->JumpTo != 0                                   &&
-       	    L[2]->JumpTo->Owner == L[4]                         &&
-       	    L[3]->OPC == OP65_INX                               &&
-            CE_IsCallTo (L[4], "pushax")                        &&
-            L[5]->OPC == OP65_LDX                               &&
-            L[6]->OPC == OP65_LDA                               &&
-       	    L[7]->OPC == OP65_LDY                               &&
-       	    CE_IsKnownImm (L[7], 0)                             &&
-       	    CE_IsCallTo (L[8], "staspidx")                      &&
-       	    !CS_RangeHasLabel (S, I+1, 3)                       &&
-            !CS_RangeHasLabel (S, I+5, 4)) {
-
-	    CodeEntry* X;
-            const char* ZPLoc;
-
-            /* Track the insertion point */
-            unsigned IP = I + 9;
-
-            /* If the sequence is preceeded by a load of a ZP value, we can
-             * use this ZP value as a pointer.
-             */
-            if (I < 2 || (ZPLoc = ZPLoadAX (S, I-2)) == 0) {
-
-                ZPLoc = "ptr1";
-
-                /* Must use ptr1 */
-                X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[8]->LI);
-                CS_InsertEntry (S, X, IP++);
-
-                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[8]->LI);
-                CS_InsertEntry (S, X, IP++);
-
-            }
-
-            X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
-            CS_InsertEntry (S, X, IP++);
-
-            X = NewCodeEntry (OP65_LDX, L[5]->AM, L[5]->Arg, 0, L[5]->LI);
-            CS_InsertEntry (S, X, IP++);
-
-            X = NewCodeEntry (OP65_LDA, L[6]->AM, L[6]->Arg, 0, L[6]->LI);
-            CS_InsertEntry (S, X, IP++);
-
-            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLoc, 0, L[8]->LI);
-            CS_InsertEntry (S, X, IP++);
-
-	    /* Remove the old code */
-	    CS_DelEntries (S, I, 9);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-  	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-unsigned OptPtrStore5 (CodeSeg* S)
-/* Search for the sequence:
- *
- *      clc
- *      adc     xxx
- *      bcc     L
- *      inx
- * L:   jsr	pushax
  *      ldy     yyy
  *	ldx	#$00
  *	lda	(sp),y
@@ -647,23 +659,42 @@ unsigned OptPtrStore5 (CodeSeg* S)
 
 	    CodeEntry* X;
             const char* Arg;
-            const char* ZPLoc;
+            const char* Loc;
+            am_t AM;
 
             /* Track the insertion point */
             unsigned IP = I + 10;
 
-            /* If the sequence is preceeded by a load of a ZP value, we can
-             * use this ZP value as a pointer.
-             */
-            if (I < 2 || (ZPLoc = ZPLoadAX (S, I-2)) == 0) {
+            if (I >= 2) {
+                if ((Loc = LoadAXZP (S, I-2)) != 0) {
+                    /* If the sequence is preceeded by a load of a ZP value,
+                     * we can use this ZP value as a pointer using ZP
+                     * indirect Y addressing.
+                     */
+                    AM = AM65_ZP_INDY;
+                } else if ((Loc = LoadAXImm (S, I-2)) != 0) {
+                    /* If the sequence is preceeded by a load of an immediate
+                     * value, we can use this absolute value as an address
+                     * using absolute indexed Y addressing.
+                     */
+                    AM = AM65_ABSY;
+                }
+            }
 
-                ZPLoc = "ptr1";
+            /* If we don't have a zero page location, we use ptr1 with zp
+             * indirect Y addressing. We must store the value in A/X into
+             * ptr1 in this case.
+             */
+            if (Loc == 0) {
 
                 /* Must use ptr1 */
-                X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[9]->LI);
+                Loc = "ptr1";
+                AM  = AM65_ZP_INDY;
+
+                X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[8]->LI);
                 CS_InsertEntry (S, X, IP++);
 
-                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[9]->LI);
+                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[8]->LI);
                 CS_InsertEntry (S, X, IP++);
 
             }
@@ -681,7 +712,7 @@ unsigned OptPtrStore5 (CodeSeg* S)
             X = NewCodeEntry (OP65_LDY, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
             CS_InsertEntry (S, X, IP++);
 
-            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLoc, 0, L[9]->LI);
+            X = NewCodeEntry (OP65_STA, AM, Loc, 0, L[9]->LI);
             CS_InsertEntry (S, X, IP++);
 
 	    /* Remove the old code */
@@ -703,7 +734,7 @@ unsigned OptPtrStore5 (CodeSeg* S)
 
 
 
-unsigned OptPtrStore6 (CodeSeg* S)
+unsigned OptPtrStore5 (CodeSeg* S)
 /* Search for the sequence:
  *
  *    	jsr   	pushax

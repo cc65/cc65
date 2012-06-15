@@ -397,7 +397,7 @@ void CE_SetNumArg (CodeEntry* E, long Num)
 int CE_IsConstImm (const CodeEntry* E)
 /* Return true if the argument of E is a constant immediate value */
 {
-    return (E->AM == AM65_IMM && (E->Flags & CEF_NUMARG) != 0);
+    return (E->AM == AM65_IMM && CE_HasNumArg (E));
 }
 
 
@@ -407,9 +407,7 @@ int CE_IsKnownImm (const CodeEntry* E, unsigned long Num)
  * equal to Num.
  */
 {
-    return E->AM == AM65_IMM            &&
-           (E->Flags & CEF_NUMARG) != 0 &&
-           E->Num == Num;
+    return (E->AM == AM65_IMM && CE_HasNumArg (E) && E->Num == Num);
 }
 
 
@@ -1388,7 +1386,7 @@ void CE_Output (const CodeEntry* E)
 
     /* Print the mnemonic */
     Chars = WriteOutput ("\t%s", D->Mnemo);
-              
+
     /* Space to leave before the operand */
     Space = 9 - Chars;
 
@@ -1453,7 +1451,7 @@ void CE_Output (const CodeEntry* E)
     }
 
     /* Print usage info if requested by the debugging flag */
-    if (Debug) {                    
+    if (Debug) {
 	char Use [128];
 	char Chg [128];
        	WriteOutput ("%*s; USE: %-12s CHG: %-12s SIZE: %u",

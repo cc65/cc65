@@ -7,7 +7,7 @@
 
         .constructor	initiobuf
         .export		iobuf_alloc, iobuf_free
-        .import        	__RAM_START__
+        .import        	__STARTUP_RUN__
         .import		incsp2, popax
 
         .include	"zeropage.inc"
@@ -18,7 +18,7 @@
 
 initiobuf:
         ; Convert end address highbyte to table index
-        lda     #>__RAM_START__
+        lda     #>__STARTUP_RUN__
         sec
         sbc     #>$0800
         lsr

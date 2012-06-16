@@ -76,6 +76,13 @@ unsigned OptPtrStore1 (CodeSeg* S);
  *      ldy     xxx
  *      ldx     #$00
  *      lda     yyy
+ *      sta     (zp),y
+ *
+ * or by
+ *
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     yyy
  *      sta     label,y
  *
  * or by
@@ -85,71 +92,10 @@ unsigned OptPtrStore1 (CodeSeg* S);
  *      lda     yyy
  *      sta     $xxxx,y
  *
- * or by
- *
- *      ldy     xxx
- *      ldx     #$00
- *      lda     yyy
- *      sta     (zp),y
- *
  * depending on the two instructions preceeding the sequence above.
- */                                
+ */
 
 unsigned OptPtrStore2 (CodeSeg* S);
-/* Search for the sequence:
- *
- *      lda     #<(label+0)
- *      ldx     #>(label+0)
- *      ldy     aaa
- *      clc
- *      adc     (sp),y
- *      bcc     L
- *      inx
- * L:   jsr	pushax
- *	ldx	#$00
- *	lda	yyy
- *	ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      ldy     aaa
- *	ldx	#$00
- *	lda	(sp),y
- *      tay
- *      lda     yyy
- *      sta	label,y
- */
-
-unsigned OptPtrStore3 (CodeSeg* S);
-/* Search for the sequence:
- *
- *      lda     #<(label+0)
- *      ldx     #>(label+0)
- *      ldy     aaa
- *      clc
- *      adc     (sp),y
- *      bcc     L
- *      inx
- * L:   jsr	pushax
- *      ldy     #bbb
- *	ldx	#$00
- *	lda	(sp),y
- *	ldy     #$00
- *      jsr     staspidx
- *
- * and replace it by:
- *
- *      ldy     aaa
- *	lda	(sp),y
- *      tax
- *      ldy     #bbb-2
- *      lda     (sp),y
- *      sta	label,x
- *	ldx	#$00
- */
-
-unsigned OptPtrStore4 (CodeSeg* S);
 /* Search for the sequence:
  *
  *      clc
@@ -173,11 +119,34 @@ unsigned OptPtrStore4 (CodeSeg* S);
  *      ldy     xxx
  *      sta     (ptr1),y
  *
- * In case a/x is loaded from the register bank before the clc, we can even
- * use the register bank instead of ptr1.
+ * or by
+ *
+ *      ldy     yyy-2
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      ldy     xxx
+ *      sta     (zp),y
+ *
+ * or by
+ *
+ *      ldy     yyy-2
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      ldy     xxx
+ *      sta     label,y
+ *
+ * or by
+ *
+ *      ldy     yyy-2
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      ldy     xxx
+ *      sta     $xxxx,y
+ *
+ * depending on the code preceeding the sequence above.
  */
 
-unsigned OptPtrStore5 (CodeSeg* S);
+unsigned OptPtrStore3 (CodeSeg* S);
 /* Search for the sequence:
  *
  *    	jsr   	pushax

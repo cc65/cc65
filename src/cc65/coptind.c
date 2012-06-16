@@ -1950,7 +1950,8 @@ unsigned OptPushPop (CodeSeg* S)
             case FoundPop:
                 /* We're at the instruction after the PLA.
                  * Check for the following conditions:
-                 *   - If this instruction is a store of A, does not have a
+                 *   - If this instruction is a store of A that doesn't use
+                 *     another register, if the instruction does not have a
                  *     label, and A is not used later, we may replace the PHA
                  *     by the store and remove pla if several other conditions
                  *     are met.
@@ -1958,9 +1959,10 @@ unsigned OptPushPop (CodeSeg* S)
                  *     is either unused later, or not changed by the code
                  *     between push and pop, we may remove PHA and PLA.
                  */
-                if (E->OPC == OP65_STA                  &&
-                    !CE_HasLabel (E)                    &&
-                    !RegAUsed (S, I+1)                  &&
+                if (E->OPC == OP65_STA                          &&
+                    (E->AM == AM65_ABS || E->AM == AM65_ZP)     &&
+                    !CE_HasLabel (E)                            &&
+                    !RegAUsed (S, I+1)                          &&
                     !MemAccess (S, Push+1, Pop-1, E)) {
 
                     /* Insert a STA after the PHA */

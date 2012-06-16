@@ -1201,10 +1201,8 @@ static OptFunc DOptPtrLoad15   	= { OptPtrLoad15,    "OptPtrLoad15",   	 86, 0, 
 static OptFunc DOptPtrLoad16   	= { OptPtrLoad16,    "OptPtrLoad16",   	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad17   	= { OptPtrLoad17,    "OptPtrLoad17",    190, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",     65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",     50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore3   	= { OptPtrStore3,    "OptPtrStore3",     50, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore4   	= { OptPtrStore4,    "OptPtrStore4",     65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore5   	= { OptPtrStore5,    "OptPtrStore5",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",     65, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrStore3   	= { OptPtrStore3,    "OptPtrStore3",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush2       	= { OptPush2,        "OptPush2",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
@@ -1297,8 +1295,6 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPtrStore3,
-    &DOptPtrStore4,
-    &DOptPtrStore5,
     &DOptPush1,
     &DOptPush2,
     &DOptPushPop,
@@ -1569,11 +1565,10 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     unsigned Changes = 0;
 
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
+    Changes += RunOptFunc (S, &DOptPtrLoad13, 1); /* ### */
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
     Changes += RunOptFunc (S, &DOptPtrStore3, 1);
-    Changes += RunOptFunc (S, &DOptPtrStore4, 1);
-    Changes += RunOptFunc (S, &DOptPtrStore5, 1);
     Changes += RunOptFunc (S, &DOptAdd3, 1);    /* Before OptPtrLoad5! */
     Changes += RunOptFunc (S, &DOptPtrLoad1, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad2, 1);

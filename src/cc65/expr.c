@@ -48,6 +48,7 @@
 
 /* Generator attributes */
 #define GEN_NOPUSH	0x01		/* Don't push lhs */
+#define GEN_COMM        0x02            /* Operator is commutative */
 
 /* Map a generator function and its attributes to a token */
 typedef struct {
@@ -1756,7 +1757,7 @@ void hie10 (ExprDesc* Expr)
 
      	       	/* A typecast */
     	       	TypeCast (Expr);
-
+                        
      	    } else {
 
                 /* An expression */
@@ -2287,10 +2288,10 @@ static void hie9 (ExprDesc *Expr)
 /* Process * and / operators. */
 {
     static const GenDesc hie9_ops[] = {
-        { TOK_STAR,   	GEN_NOPUSH,	g_mul   },
-        { TOK_DIV,    	GEN_NOPUSH,     g_div   },
-        { TOK_MOD,    	GEN_NOPUSH,     g_mod   },
-        { TOK_INVALID,  0,              0       }
+        { TOK_STAR,     GEN_NOPUSH | GEN_COMM,  g_mul   },
+        { TOK_DIV,      GEN_NOPUSH,             g_div   },
+        { TOK_MOD,      GEN_NOPUSH,             g_mod   },
+        { TOK_INVALID,  0,                      0       }
     };
     int UsedGen;
 
@@ -2751,8 +2752,8 @@ static void hie4 (ExprDesc* Expr)
 /* Handle & (bitwise and) */
 {
     static const GenDesc hie4_ops[] = {
-        { TOK_AND,    	GEN_NOPUSH,     g_and   },
-        { TOK_INVALID,  0,              0       }
+        { TOK_AND,      GEN_NOPUSH | GEN_COMM,  g_and   },
+        { TOK_INVALID,  0,                      0       }
     };
     int UsedGen;
 
@@ -2765,8 +2766,8 @@ static void hie3 (ExprDesc* Expr)
 /* Handle ^ (bitwise exclusive or) */
 {
     static const GenDesc hie3_ops[] = {
-        { TOK_XOR,    	GEN_NOPUSH,     g_xor   },
-        { TOK_INVALID,  0,              0       }
+        { TOK_XOR,     	GEN_NOPUSH | GEN_COMM,  g_xor   },
+        { TOK_INVALID,  0,                      0       }
     };
     int UsedGen;
 
@@ -2779,8 +2780,8 @@ static void hie2 (ExprDesc* Expr)
 /* Handle | (bitwise or) */
 {
     static const GenDesc hie2_ops[] = {
-        { TOK_OR,    	GEN_NOPUSH,     g_or    },
-        { TOK_INVALID,  0,              0       }
+        { TOK_OR,    	GEN_NOPUSH | GEN_COMM,  g_or    },
+        { TOK_INVALID,  0,                      0       }
     };
     int UsedGen;
 

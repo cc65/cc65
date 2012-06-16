@@ -1565,7 +1565,6 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     unsigned Changes = 0;
 
     Changes += RunOptFunc (S, &DOptStackPtrOps, 5);
-    Changes += RunOptFunc (S, &DOptPtrLoad13, 1); /* ### */
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
     Changes += RunOptFunc (S, &DOptPtrStore3, 1);

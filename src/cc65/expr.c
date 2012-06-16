@@ -1757,7 +1757,7 @@ void hie10 (ExprDesc* Expr)
 
      	       	/* A typecast */
     	       	TypeCast (Expr);
-                        
+
      	    } else {
 
                 /* An expression */
@@ -1789,10 +1789,11 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
     const GenDesc* Gen;
     token_t Tok;       	     	 	/* The operator token */
     unsigned ltype, type;
-    int rconst;	       	       	       	/* Operand is a constant */
+    int lconst;                         /* Left operand is a constant */
+    int rconst;	       	       	       	/* Right operand is a constant */
 
 
-    hienext (Expr);
+    ExprWithCheck (hienext, Expr);
 
     *UsedGen = 0;
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
@@ -1814,10 +1815,16 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	/* Get the lhs on stack */
        	GetCodePos (&Mark1);
 	ltype = TypeOf (Expr->Type);
-       	if (ED_IsConstAbs (Expr)) {
+       	lconst = ED_IsConstAbs (Expr);
+        if (lconst) {
 	    /* Constant value */
 	    GetCodePos (&Mark2);
-       	    g_push (ltype | CF_CONST, Expr->IVal);
+            /* If the operator is commutative, don't push the left side, if
+             * it's a constant, since we will exchange both operands.
+             */
+            if ((Gen->Flags & GEN_COMM) == 0) {
+                g_push (ltype | CF_CONST, Expr->IVal);
+            }
 	} else {
 	    /* Value not constant */
 	    LoadExpr (CF_NONE, Expr);
@@ -1841,7 +1848,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	}
 
 	/* Check for const operands */
-	if (ED_IsConstAbs (Expr) && rconst) {
+        if (lconst && rconst) {
 
 	    /* Both operands are constant, remove the generated code */
     	    RemoveCode (&Mark1);
@@ -1926,6 +1933,31 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
                 }
             }
 
+        } else if (lconst && (Gen->Flags & GEN_COMM) && !rconst) {
+
+            /* The left side is constant, the right side is not, and the
+             * operator allows swapping the operands. We haven't pushed the
+             * left side onto the stack in this case, and will reverse the
+             * operation because this allows for better code.
+             */
+            unsigned rtype = ltype | CF_CONST;
+       	    ltype = TypeOf (Expr2.Type);       /* Expr2 is now left */
+	    type = CF_CONST;
+            if ((Gen->Flags & GEN_NOPUSH) == 0) {
+                g_push (ltype, 0);
+                ltype |= CF_REG;   	/* Value is in register */
+            }
+
+ 	    /* Determine the type of the operation result. */
+       	    type |= g_typeadjust (ltype, rtype);
+	    Expr->Type = promoteint (Expr->Type, Expr2.Type);
+
+	    /* Generate code */
+	    Gen->Func (type, Expr->IVal);
+
+            /* We have a rvalue in the primary now */
+	    ED_MakeRValExpr (Expr);
+
 	} else {
 
 	    /* If the right hand side is constant, and the generator function
@@ -1937,16 +1969,16 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	    if (rconst) {
 	     	/* Second value is constant - check for div */
 	     	type |= CF_CONST;
-	 	rtype |= CF_CONST;
+	    	rtype |= CF_CONST;
 	     	if (Tok == TOK_DIV && Expr2.IVal == 0) {
 	      	    Error ("Division by zero");
 	     	} else if (Tok == TOK_MOD && Expr2.IVal == 0) {
 	     	    Error ("Modulo operation with zero");
 	     	}
-	 	if ((Gen->Flags & GEN_NOPUSH) != 0) {
-	 	    RemoveCode (&Mark2);
-	 	    ltype |= CF_REG;   	/* Value is in register */
-	 	}
+	    	if ((Gen->Flags & GEN_NOPUSH) != 0) {
+	    	    RemoveCode (&Mark2);
+	    	    ltype |= CF_REG;   	/* Value is in register */
+	    	}
 	    }
 
  	    /* Determine the type of the operation result. */
@@ -1980,7 +2012,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 
 
     GetCodePos (&Mark0);
-    hienext (Expr);
+    ExprWithCheck (hienext, Expr);
 
     while ((Gen = FindGen (CurTok.Tok, Ops)) != 0) {
 
@@ -2324,7 +2356,7 @@ static void parseadd (ExprDesc* Expr)
     if (ED_IsConst (Expr)) {
 
     	/* The left hand side is a constant of some sort. Good. Get rhs */
-	hie9 (&Expr2);
+	ExprWithCheck (hie9, &Expr2);
        	if (ED_IsConstAbs (&Expr2)) {
 
        	    /* Right hand side is a constant numeric value. Get the rhs type */
@@ -2554,7 +2586,7 @@ static void parsesub (ExprDesc* Expr)
 
     /* Get the left hand side type, initialize operation flags */
     lhst = Expr->Type;
-    rscale = 1;	     	    	/* Scale by 1, that is, don't scale */
+    rscale = 1;	     	     	/* Scale by 1, that is, don't scale */
 
     /* Remember the output queue position, then bring the value onto the stack */
     GetCodePos (&Mark1);
@@ -2708,7 +2740,7 @@ static void parsesub (ExprDesc* Expr)
 void hie8 (ExprDesc* Expr)
 /* Process + and - binary operators. */
 {
-    hie9 (Expr);
+    ExprWithCheck (hie9, Expr);
     while (CurTok.Tok == TOK_PLUS || CurTok.Tok == TOK_MINUS) {
        	if (CurTok.Tok == TOK_PLUS) {
        	    parseadd (Expr);
@@ -2842,7 +2874,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
     int FalseLab;
     ExprDesc Expr2;
 
-    hie2 (Expr);
+    ExprWithCheck (hie2, Expr);
     if (CurTok.Tok == TOK_BOOL_AND) {
 
        	/* Tell our caller that we're evaluating a boolean */
@@ -2978,14 +3010,14 @@ static void hieQuest (ExprDesc* Expr)
     ExprDesc 	Expr3;          /* Expression 3 */
     int         Expr2IsNULL;    /* Expression 2 is a NULL pointer */
     int         Expr3IsNULL;    /* Expression 3 is a NULL pointer */
-    Type* 	ResultType;     /* Type of result */
+    Type*   	ResultType;     /* Type of result */
 
 
     /* Call the lower level eval routine */
     if (Preprocessing) {
-        hieOrPP (Expr);
+        ExprWithCheck (hieOrPP, Expr);
     } else {
-        hieOr (Expr);
+        ExprWithCheck (hieOr, Expr);
     }
 
     /* Check if it's a ternary expression */

@@ -9,9 +9,9 @@
         .import         zerobss
         .import    	initlib, donelib
         .import    	callmain, callirq
-        .import        	__RAM_LAST__, __ZPSAVE_RUN__	; Linker generated
         .import         __LC_START__, __LC_LAST__	; Linker generated
-        .import        	__INIT_SIZE__			; Linker generated
+        .import        	__INIT_RUN__, __INIT_SIZE__	; Linker generated
+        .import        	__ZPSAVE_RUN__			; Linker generated
         .import        	__INTERRUPTOR_COUNT__		; Linker generated
 
         .include        "zeropage.inc"
@@ -66,8 +66,8 @@
 	sty	$97
 
 	; Set destination last address
-	lda	#<__RAM_LAST__
-	ldy	#>__RAM_LAST__
+	lda	#<(__INIT_RUN__ + __INIT_SIZE__)
+	ldy	#>(__INIT_RUN__ + __INIT_SIZE__)
 	sta	$94
 	sty	$95
 

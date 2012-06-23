@@ -6,8 +6,8 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2005, Ullrich von Bassewitz                                      */
-/*                Römerstrasse 52                                            */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
 /*                                                                           */
@@ -41,12 +41,12 @@
 
 
 /*****************************************************************************/
-/*		  	      nega optimizations			     */
+/*		  	      bnega optimizations			     */
 /*****************************************************************************/
 
 
 
-unsigned OptNegA1 (CodeSeg* S)
+unsigned OptBNegA1 (CodeSeg* S)
 /* Check for
  *
  *	ldx 	#$00
@@ -98,10 +98,10 @@ unsigned OptNegA1 (CodeSeg* S)
 
 
 
-unsigned OptNegA2 (CodeSeg* S)
+unsigned OptBNegA2 (CodeSeg* S)
 /* Check for
  *
- *	lda 	..
+ *	lda  	..
  * 	jsr 	bnega
  *	jeq/jne	..
  *
@@ -160,12 +160,12 @@ unsigned OptNegA2 (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*		   	      negax optimizations			     */
+/*	     	   	      bnegax optimizations			     */
 /*****************************************************************************/
 
 
 
-unsigned OptNegAX1 (CodeSeg* S)
+unsigned OptBNegAX1 (CodeSeg* S)
 /* On a call to bnegax, if X is zero, the result depends only on the value in
  * A, so change the call to a call to bnega. This will get further optimized
  * later if possible.
@@ -209,7 +209,7 @@ unsigned OptNegAX1 (CodeSeg* S)
 
 
 
-unsigned OptNegAX2 (CodeSeg* S)
+unsigned OptBNegAX2 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      ldy     #xx
@@ -282,7 +282,7 @@ unsigned OptNegAX2 (CodeSeg* S)
 
 
 
-unsigned OptNegAX3 (CodeSeg* S)
+unsigned OptBNegAX3 (CodeSeg* S)
 /* Search for the sequence:
  *
  *  	lda	xx
@@ -343,7 +343,7 @@ unsigned OptNegAX3 (CodeSeg* S)
 
 
 
-unsigned OptNegAX4 (CodeSeg* S)
+unsigned OptBNegAX4 (CodeSeg* S)
 /* Search for the sequence:
  *
  *    	jsr   	xxx
@@ -352,7 +352,7 @@ unsigned OptNegAX4 (CodeSeg* S)
  *
  * and replace it by:
  *
- *      jsr	xxx
+ *      jsr  	xxx
  *  	<boolean test>
  *  	jne/jeq	...
  */
@@ -385,14 +385,14 @@ unsigned OptNegAX4 (CodeSeg* S)
 	    /* Insert apropriate test code */
 	    if (ByteSized) {
 	     	/* Test bytes */
-	    	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
-  	    	CS_InsertEntry (S, X, I+2);
+	     	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
+  	     	CS_InsertEntry (S, X, I+2);
 	    } else {
-	    	/* Test words */
-	    	X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
-      	    	CS_InsertEntry (S, X, I+2);
-	    	X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
-	    	CS_InsertEntry (S, X, I+3);
+	     	/* Test words */
+	     	X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
+      	     	CS_InsertEntry (S, X, I+2);
+	     	X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
+	     	CS_InsertEntry (S, X, I+3);
 	    }
 
 	    /* Delete the subroutine call */

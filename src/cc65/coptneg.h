@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,26 +44,26 @@
 
 
 /*****************************************************************************/
-/*		  	      nega optimizations			     */
+/*		  	      bnega optimizations			     */
 /*****************************************************************************/
 
 
 
-unsigned OptNegA1 (CodeSeg* S);
+unsigned OptBNegA1 (CodeSeg* S);
 /* Check for
  *
- *	ldx 	#$00
- *	lda 	..
- * 	jsr 	bnega
+ *	ldx  	#$00
+ *	lda  	..
+ * 	jsr  	bnega
  *
  * Remove the ldx if the lda does not use it.
  */
 
-unsigned OptNegA2 (CodeSeg* S);
+unsigned OptBNegA2 (CodeSeg* S);
 /* Check for
  *
- *	lda 	..
- * 	jsr 	bnega
+ *	lda  	..
+ * 	jsr  	bnega
  *	jeq/jne	..
  *
  * Adjust the conditional branch and remove the call to the subroutine.
@@ -72,25 +72,25 @@ unsigned OptNegA2 (CodeSeg* S);
 
 
 /*****************************************************************************/
-/*		   	      negax optimizations			     */
+/*	     	   	      bnegax optimizations			     */
 /*****************************************************************************/
 
 
 
-unsigned OptNegAX1 (CodeSeg* S);
+unsigned OptBNegAX1 (CodeSeg* S);
 /* On a call to bnegax, if X is zero, the result depends only on the value in
  * A, so change the call to a call to bnega. This will get further optimized
  * later if possible.
  */
 
-unsigned OptNegAX2 (CodeSeg* S);
+unsigned OptBNegAX2 (CodeSeg* S);
 /* Search for the sequence:
  *
- *  	lda	(xx),y
+ *  	lda  	(xx),y
  *  	tax
  *  	dey
- *  	lda	(xx),y
- *  	jsr	bnegax
+ *  	lda  	(xx),y
+ *  	jsr  	bnegax
  *  	jne/jeq	...
  *
  * and replace it by
@@ -101,22 +101,22 @@ unsigned OptNegAX2 (CodeSeg* S);
  *	jeq/jne	...
  */
 
-unsigned OptNegAX3 (CodeSeg* S);
+unsigned OptBNegAX3 (CodeSeg* S);
 /* Search for the sequence:
  *
- *  	lda	xx
- *  	ldx	yy
- *  	jsr	bnegax
+ *  	lda  	xx
+ *  	ldx  	yy
+ *  	jsr  	bnegax
  *    	jne/jeq	...
  *
  * and replace it by
  *
  *  	lda    	xx
- *	ora	xx+1
+ *	ora  	xx+1
  *	jeq/jne	...
  */
 
-unsigned OptNegAX4 (CodeSeg* S);
+unsigned OptBNegAX4 (CodeSeg* S);
 /* Search for the sequence:
  *
  *    	jsr   	xxx

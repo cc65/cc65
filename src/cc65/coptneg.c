@@ -417,3 +417,161 @@ unsigned OptBNegAX4 (CodeSeg* S)
 
 
 
+/*****************************************************************************/
+/*                            negax optimizations                            */
+/*****************************************************************************/
+
+
+
+unsigned OptNegAX1 (CodeSeg* S)
+/* Search for a call to negax and replace it by
+ *
+ *      eor     #$FF
+ *      clc
+ *      adc     #$01
+ *
+ * if X isn't used later.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if this is a call to negax, and if X isn't used later */
+       	if (CE_IsCallTo (E, "negax") && !RegXUsed (S, I+1)) {
+
+            CodeEntry* X;
+
+            /* Add replacement code behind */
+	    X = NewCodeEntry (OP65_EOR, AM65_IMM, "$FF", 0, E->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+            X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, I+2);
+
+            X = NewCodeEntry (OP65_ADC, AM65_IMM, "$01", 0, E->LI);
+            CS_InsertEntry (S, X, I+3);
+
+            /* Delete the call to negax */
+	    CS_DelEntry (S, I);
+
+            /* Skip the generated code */
+            I += 2;
+
+	    /* We had changes */
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptNegAX2 (CodeSeg* S)
+/* Search for a call to negax and replace it by
+ *
+ *      ldx     #$FF
+ *      eor     #$FF
+ *      clc
+ *      adc     #$01
+ *      bne     L1
+ *      inx
+ * L1:
+ *
+ * if X is known and zero on entry.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        CodeEntry* P;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if this is a call to negax, and if X is known and zero */
+	if (E->RI->In.RegX == 0                 &&
+            CE_IsCallTo (E, "negax")            &&
+            (P = CS_GetNextEntry (S, I)) != 0) {
+
+            CodeEntry* X;
+            CodeLabel* L;
+
+            /* Add replacement code behind */
+
+            /* ldx #$FF */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$FF", 0, E->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+            /* eor #$FF */
+	    X = NewCodeEntry (OP65_EOR, AM65_IMM, "$FF", 0, E->LI);
+	    CS_InsertEntry (S, X, I+2);
+
+            /* clc */
+            X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, I+3);
+
+            /* adc #$01 */
+            X = NewCodeEntry (OP65_ADC, AM65_IMM, "$01", 0, E->LI);
+            CS_InsertEntry (S, X, I+4);
+
+            /* Get the label attached to the insn following the call */
+            L = CS_GenLabel (S, P);
+
+            /* bne L */
+            X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, E->LI);
+            CS_InsertEntry (S, X, I+5);
+
+            /* inx */
+            X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, I+6);
+
+            /* Delete the call to negax */
+	    CS_DelEntry (S, I);
+
+            /* Skip the generated code */
+            I += 5;
+
+	    /* We had changes */
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+

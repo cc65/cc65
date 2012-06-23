@@ -330,8 +330,8 @@ static unsigned OptShift3 (CodeSeg* S)
 
 
 static unsigned OptShift4 (CodeSeg* S)
-/* A call to the shraxN routine may get replaced by one or more lsr insns
- * if the value of X is zero.
+/* Calls to the asraxN or shraxN routines may get replaced by one or more lsr
+ * insns if the value of X is zero.
  */
 {
     unsigned Changes = 0;
@@ -348,10 +348,11 @@ static unsigned OptShift4 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                       &&
-       	    strncmp (E->Arg, "shrax", 5) == 0        &&
-	    strlen (E->Arg) == 6                     &&
-	    IsDigit (E->Arg[5])                      &&
+	if (E->OPC == OP65_JSR                          &&
+       	    (strncmp (E->Arg, "shrax", 5) == 0  ||
+             strncmp (E->Arg, "asrax", 5) == 0)         &&
+	    strlen (E->Arg) == 6                        &&
+	    IsDigit (E->Arg[5])                         &&
        	    E->RI->In.RegX == 0) {
 
 	    /* Insert shift insns */
@@ -1151,6 +1152,12 @@ static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",        	 65, 0, 
 static OptFunc DOptAdd4	       	= { OptAdd4,   	     "OptAdd4",        	 90, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd5	       	= { OptAdd5,   	     "OptAdd5",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd6	       	= { OptAdd6,   	     "OptAdd6",        	 40, 0, 0, 0, 0, 0 };
+static OptFunc DOptBNegA1       = { OptBNegA1,       "OptBNegA1",       100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBNegA2       = { OptBNegA2,       "OptBNegA2",       100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBNegAX2      = { OptBNegAX2,      "OptBNegAX2",      100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",        	 42, 0, 0, 0, 0, 0 };
@@ -1176,15 +1183,11 @@ static OptFunc DOptJumpTarget2  = { OptJumpTarget2,  "OptJumpTarget2",  100, 0, 
 static OptFunc DOptJumpTarget3  = { OptJumpTarget3,  "OptJumpTarget3",  100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad2        = { OptLoad2,        "OptLoad2",        200, 0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX1       = { OptNegAX1,       "OptNegAX1",       165, 0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX2       = { OptNegAX2,       "OptNegAX2",       200, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",         	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps1    = { OptRTSJumps1,    "OptRTSJumps1",   	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps2    = { OptRTSJumps2,    "OptRTSJumps2",   	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegA1       = { OptBNegA1,       "OptBNegA1",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegA2       = { OptBNegA2,       "OptBNegA2",       100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX1      = { OptBNegAX1,      "OptBNegAX1",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX2      = { OptBNegAX2,      "OptBNegAX2",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX3      = { OptBNegAX3,      "OptBNegAX3",      100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBNegAX4      = { OptBNegAX4,      "OptBNegAX4",      100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPrecalc      = { OptPrecalc,      "OptPrecalc",     	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",    	100, 0, 0, 0, 0, 0 };
@@ -1246,6 +1249,12 @@ static OptFunc* OptFuncs[] = {
     &DOptAdd4,
     &DOptAdd5,
     &DOptAdd6,
+    &DOptBNegA1,
+    &DOptBNegA2,
+    &DOptBNegAX1,
+    &DOptBNegAX2,
+    &DOptBNegAX3,
+    &DOptBNegAX4,
     &DOptBoolTrans,
     &DOptBranchDist,
     &DOptCmp1,
@@ -1271,12 +1280,8 @@ static OptFunc* OptFuncs[] = {
     &DOptJumpTarget3,
     &DOptLoad1,
     &DOptLoad2,
-    &DOptBNegA1,
-    &DOptBNegA2,
-    &DOptBNegAX1,
-    &DOptBNegAX2,
-    &DOptBNegAX3,
-    &DOptBNegAX4,
+    &DOptNegAX1,
+    &DOptNegAX2,
     &DOptPrecalc,
     &DOptPtrLoad1,
     &DOptPtrLoad11,
@@ -1642,6 +1647,8 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
        	C += RunOptFunc (S, &DOptBNegA1, 1);
        	C += RunOptFunc (S, &DOptBNegA2, 1);
+        C += RunOptFunc (S, &DOptNegAX1, 1);
+        C += RunOptFunc (S, &DOptNegAX2, 1);
        	C += RunOptFunc (S, &DOptStackOps, 1);
        	C += RunOptFunc (S, &DOptSub1, 1);
        	C += RunOptFunc (S, &DOptSub2, 1);

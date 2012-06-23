@@ -1753,9 +1753,6 @@ unsigned OptStackOps (CodeSeg* S)
     } State = Initialize;
 
 
-    /* Generate register info */
-    CS_GenRegInfo (S);
-
     /* Remember the code segment in the info struct */
     Data.Code = S;
 
@@ -1941,9 +1938,6 @@ unsigned OptStackOps (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free the register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

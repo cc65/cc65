@@ -174,9 +174,6 @@ unsigned OptBNegAX1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -199,9 +196,6 @@ unsigned OptBNegAX1 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -436,9 +430,6 @@ unsigned OptNegAX1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -476,9 +467,6 @@ unsigned OptNegAX1 (CodeSeg* S)
 
     }
 
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -501,9 +489,6 @@ unsigned OptNegAX2 (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -565,9 +550,6 @@ unsigned OptNegAX2 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

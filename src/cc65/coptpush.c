@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -63,9 +63,6 @@ unsigned OptPush1 (CodeSeg* S)
     unsigned I;
     unsigned Changes = 0;
 
-    /* Generate register info */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -110,9 +107,6 @@ unsigned OptPush1 (CodeSeg* S)
 
     }
 
-    /* Free the register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -133,9 +127,6 @@ unsigned OptPush2 (CodeSeg* S)
 {
     unsigned I;
     unsigned Changes = 0;
-
-    /* Generate register info */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -171,9 +162,6 @@ unsigned OptPush2 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free the register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

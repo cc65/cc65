@@ -794,9 +794,6 @@ unsigned OptJumpTarget3 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -863,9 +860,6 @@ unsigned OptJumpTarget3 (CodeSeg* S)
         /* Next entry */
         ++I;
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -980,9 +974,6 @@ unsigned OptCondBranches2 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -1018,9 +1009,6 @@ unsigned OptCondBranches2 (CodeSeg* S)
        	/* Next entry */
        	++I;
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -1149,9 +1137,6 @@ unsigned OptDupLoads (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -1340,9 +1325,6 @@ unsigned OptDupLoads (CodeSeg* S)
     	}
 
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -2019,9 +2001,6 @@ unsigned OptPrecalc (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -2138,9 +2117,6 @@ unsigned OptPrecalc (CodeSeg* S)
 	++I;
     }
 
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -2235,9 +2211,6 @@ unsigned OptIndLoads1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -2265,9 +2238,6 @@ unsigned OptIndLoads1 (CodeSeg* S)
 
     }
 
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -2288,9 +2258,6 @@ unsigned OptIndLoads2 (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -2318,9 +2285,6 @@ unsigned OptIndLoads2 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

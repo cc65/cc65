@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -70,9 +70,6 @@ unsigned OptTest1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -125,9 +122,6 @@ unsigned OptTest1 (CodeSeg* S)
     	++I;
 
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

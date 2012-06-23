@@ -106,9 +106,6 @@ static unsigned OptShift1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -173,9 +170,6 @@ static unsigned OptShift1 (CodeSeg* S)
 
     }
 
-    /* Free the register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -193,9 +187,6 @@ static unsigned OptShift2(CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -241,9 +232,6 @@ static unsigned OptShift2(CodeSeg* S)
 
     }
 
-    /* Free the register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -270,9 +258,6 @@ static unsigned OptShift3 (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -320,9 +305,6 @@ static unsigned OptShift3 (CodeSeg* S)
 
     }
 
-    /* Free the register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -336,9 +318,6 @@ static unsigned OptShift4 (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -374,9 +353,6 @@ static unsigned OptShift4 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free the register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -627,9 +603,6 @@ static unsigned OptLoad1 (CodeSeg* S)
     unsigned I;
     unsigned Changes = 0;
 
-    /* Generate register info */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -668,9 +641,6 @@ static unsigned OptLoad1 (CodeSeg* S)
 
     }
 
-    /* Free the register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -682,9 +652,6 @@ static unsigned OptLoad2 (CodeSeg* S)
 {
     unsigned I;
     unsigned Changes = 0;
-
-    /* Generate register info */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -771,9 +738,6 @@ static unsigned OptLoad2 (CodeSeg* S)
 	++I;
     }
 
-    /* Free the register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -806,9 +770,6 @@ static unsigned OptDecouple (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info for the following step */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -1007,9 +968,6 @@ static unsigned OptDecouple (CodeSeg* S)
 
     }
 
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -1049,9 +1007,6 @@ static unsigned OptStackPtrOps (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info for the following step */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -1106,9 +1061,6 @@ static unsigned OptStackPtrOps (CodeSeg* S)
         }
 
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -1511,10 +1463,10 @@ static void WriteOptStats (const char* Name)
     	fprintf (F,
        	       	 "%-20s %10lu %10lu %10lu %10lu\n",
     		 O->Name,
-		 O->TotalRuns,
+   		 O->TotalRuns,
       	       	 O->LastRuns,
-	       	 O->TotalChanges,
-		 O->LastChanges);
+   	       	 O->TotalChanges,
+   		 O->LastChanges);
     }
 
     /* Close the file, ignore errors here. */
@@ -1539,7 +1491,7 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     Changes = 0;
     do {
 
-	/* Run the function */
+   	/* Run the function */
     	C = F->Func (S);
         if (Debug && C > 0) {
             printf ("Applied %s: %u changes\n", F->Name, C);
@@ -1551,6 +1503,11 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     	++F->LastRuns;
     	F->TotalChanges += C;
     	F->LastChanges  += C;
+
+        /* If we had changes, regenerate register info */
+        if (C) {
+            CS_GenRegInfo (S);
+        }
 
     } while (--Max && C > 0);
 
@@ -1847,6 +1804,9 @@ void RunOpt (CodeSeg* S)
      	Print (stdout, 1, "Running optimizer for global code segment\n");
     }
 
+    /* Generate register info for all instructions */
+    CS_GenRegInfo (S);
+
     /* Run groups of optimizations */
     RunOptGroup1 (S);
     RunOptGroup2 (S);
@@ -1855,6 +1815,9 @@ void RunOpt (CodeSeg* S)
     RunOptGroup5 (S);
     RunOptGroup6 (S);
     RunOptGroup7 (S);
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 
     /* Write statistics */
     if (StatFileName) {

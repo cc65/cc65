@@ -683,9 +683,6 @@ unsigned OptPtrLoad7 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -832,9 +829,6 @@ unsigned OptPtrLoad7 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free the register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -1165,9 +1159,6 @@ unsigned OptPtrLoad14 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -1212,9 +1203,6 @@ unsigned OptPtrLoad14 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free the register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

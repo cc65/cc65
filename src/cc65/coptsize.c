@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -881,9 +881,6 @@ unsigned OptSize1 (CodeSeg* S)
     /* Are we optimizing for size */
     int OptForSize = (S->CodeSizeFactor < 100);
 
-    /* Generate register info for the following step */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -942,9 +939,6 @@ unsigned OptSize1 (CodeSeg* S)
 
     }
 
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -959,9 +953,6 @@ unsigned OptSize2 (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info for the following step */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -1039,9 +1030,6 @@ unsigned OptSize2 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

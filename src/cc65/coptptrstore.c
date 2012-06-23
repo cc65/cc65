@@ -266,9 +266,6 @@ unsigned OptPtrStore1 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned I;
 
-    /* Generate register info */
-    CS_GenRegInfo (S);
-
     /* Walk over the entries */
     I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -379,9 +376,6 @@ unsigned OptPtrStore1 (CodeSeg* S)
 
     }
 
-    /* Free the register info */
-    CS_FreeRegInfo (S);
-
     /* Return the number of changes made */
     return Changes;
 }
@@ -441,9 +435,6 @@ unsigned OptPtrStore2 (CodeSeg* S)
 {
     unsigned Changes = 0;
     unsigned I;
-
-    /* Generate register info */
-    CS_GenRegInfo (S);
 
     /* Walk over the entries */
     I = 0;
@@ -626,9 +617,6 @@ unsigned OptPtrStore2 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Free the register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

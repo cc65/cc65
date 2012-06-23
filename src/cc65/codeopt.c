@@ -1760,6 +1760,7 @@ static unsigned RunOptGroup7 (CodeSeg* S)
         Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
         Changes += RunOptFunc (S, &DOptJumpTarget1, 5);
         Changes += RunOptFunc (S, &DOptStore5, 1);
+        Changes += RunOptFunc (S, &DOptTransfers1, 1); 
         Changes += RunOptFunc (S, &DOptTransfers3, 1);
     }
 

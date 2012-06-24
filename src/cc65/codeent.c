@@ -232,7 +232,7 @@ const char* MakeHexArg (unsigned Num)
 
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
-	   		 CodeLabel* JumpTo, LineInfo* LI)
+	   	      	 CodeLabel* JumpTo, LineInfo* LI)
 /* Create a new code entry, initialize and return it */
 {
     /* Get the opcode description */
@@ -533,24 +533,24 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    	    Out->RegA = In->RegA & (short) E->Num;
 	    	} else if (E->AM == AM65_ZP) {
 	    	    switch (GetKnownReg (E->Use & REG_ZP, In)) {
-	    	    	case REG_TMP1:
-	    	    	    Out->RegA = In->RegA & In->Tmp1;
-	    	    	    break;
-	    		case REG_PTR1_LO:
-	    		    Out->RegA = In->RegA & In->Ptr1Lo;
-	    		    break;
-	    		case REG_PTR1_HI:
-	    		    Out->RegA = In->RegA & In->Ptr1Hi;
-	    		    break;
-	    		case REG_SREG_LO:
-	    		    Out->RegA = In->RegA & In->SRegLo;
-	    		    break;
-	    		case REG_SREG_HI:
-	    		    Out->RegA = In->RegA & In->SRegHi;
-	    		    break;
-	    	    	default:
-	    	    	    Out->RegA = UNKNOWN_REGVAL;
-	    	     	    break;
+	    	      	case REG_TMP1:
+	    	      	    Out->RegA = In->RegA & In->Tmp1;
+	    	      	    break;
+	    	      	case REG_PTR1_LO:
+	    	      	    Out->RegA = In->RegA & In->Ptr1Lo;
+	    	      	    break;
+	    	      	case REG_PTR1_HI:
+	    	      	    Out->RegA = In->RegA & In->Ptr1Hi;
+	    	      	    break;
+	    	      	case REG_SREG_LO:
+	    	      	    Out->RegA = In->RegA & In->SRegLo;
+	    	      	    break;
+	    	      	case REG_SREG_HI:
+	    	      	    Out->RegA = In->RegA & In->SRegHi;
+	    	      	    break;
+	    	      	default:
+	    	      	    Out->RegA = UNKNOWN_REGVAL;
+	    	      	    break;
 	    	    }
                 } else {
 	    	    Out->RegA = UNKNOWN_REGVAL;
@@ -567,20 +567,20 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Chg & REG_ZP, In)) {
 		    case REG_TMP1:
-			Out->Tmp1 = (In->Tmp1 << 1) & 0xFF;
-			break;
+		      	Out->Tmp1 = (In->Tmp1 << 1) & 0xFF;
+		      	break;
 		    case REG_PTR1_LO:
-			Out->Ptr1Lo = (In->Ptr1Lo << 1) & 0xFF;
-			break;
+		      	Out->Ptr1Lo = (In->Ptr1Lo << 1) & 0xFF;
+		      	break;
 		    case REG_PTR1_HI:
-			Out->Ptr1Hi = (In->Ptr1Hi << 1) & 0xFF;
-			break;
+		      	Out->Ptr1Hi = (In->Ptr1Hi << 1) & 0xFF;
+		      	break;
 		    case REG_SREG_LO:
-			Out->SRegLo = (In->SRegLo << 1) & 0xFF;
-			break;
+		      	Out->SRegLo = (In->SRegLo << 1) & 0xFF;
+		      	break;
 		    case REG_SREG_HI:
-			Out->SRegHi = (In->SRegHi << 1) & 0xFF;
-			break;
+		      	Out->SRegHi = (In->SRegHi << 1) & 0xFF;
+		      	break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
@@ -654,20 +654,20 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Chg & REG_ZP, In)) {
 		    case REG_TMP1:
-			Out->Tmp1 = (In->Tmp1 - 1) & 0xFF;
-			break;
+		      	Out->Tmp1 = (In->Tmp1 - 1) & 0xFF;
+		      	break;
 		    case REG_PTR1_LO:
-			Out->Ptr1Lo = (In->Ptr1Lo - 1) & 0xFF;
-			break;
+		      	Out->Ptr1Lo = (In->Ptr1Lo - 1) & 0xFF;
+		      	break;
 		    case REG_PTR1_HI:
-			Out->Ptr1Hi = (In->Ptr1Hi - 1) & 0xFF;
-			break;
+		      	Out->Ptr1Hi = (In->Ptr1Hi - 1) & 0xFF;
+		      	break;
 		    case REG_SREG_LO:
-			Out->SRegLo = (In->SRegLo - 1) & 0xFF;
-	     		break;
+		      	Out->SRegLo = (In->SRegLo - 1) & 0xFF;
+	     	      	break;
 		    case REG_SREG_HI:
-			Out->SRegHi = (In->SRegHi - 1) & 0xFF;
-			break;
+		      	Out->SRegHi = (In->SRegHi - 1) & 0xFF;
+		      	break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
@@ -693,18 +693,18 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		    Out->RegA = In->RegA ^ (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
 		    switch (GetKnownReg (E->Use & REG_ZP, In)) {
-		    	case REG_TMP1:
-		    	    Out->RegA = In->RegA ^ In->Tmp1;
-		    	    break;
-			case REG_PTR1_LO:
-			    Out->RegA = In->RegA ^ In->Ptr1Lo;
-			    break;
-			case REG_PTR1_HI:
-			    Out->RegA = In->RegA ^ In->Ptr1Hi;
-			    break;
-			case REG_SREG_LO:
-			    Out->RegA = In->RegA ^ In->SRegLo;
-			    break;
+		      	case REG_TMP1:
+		      	    Out->RegA = In->RegA ^ In->Tmp1;
+		      	    break;
+		      	case REG_PTR1_LO:
+		      	    Out->RegA = In->RegA ^ In->Ptr1Lo;
+		      	    break;
+		      	case REG_PTR1_HI:
+		      	    Out->RegA = In->RegA ^ In->Ptr1Hi;
+		      	    break;
+		      	case REG_SREG_LO:
+		      	    Out->RegA = In->RegA ^ In->SRegLo;
+		      	    break;
 			case REG_SREG_HI:
 			    Out->RegA = In->RegA ^ In->SRegHi;
 			    break;
@@ -812,13 +812,24 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	     	Out->SRegHi = UNKNOWN_REGVAL;
 	    }
        	    /* ## FIXME: Quick hack for some known functions: */
-	    if (strcmp (E->Arg, "tosandax") == 0) {
+	    if (strcmp (E->Arg, "complax") == 0) {
+		if (RegValIsKnown (In->RegA)) {
+		    Out->RegA = (In->RegA ^ 0xFF);
+		}
+		if (RegValIsKnown (In->RegX)) {
+		    Out->RegX = (In->RegX ^ 0xFF);
+ 		}
+ 	    } else if (strcmp (E->Arg, "tosandax") == 0) {
 		if (In->RegA == 0) {
 		    Out->RegA = 0;
 		}
 		if (In->RegX == 0) {
 		    Out->RegX = 0;
 		}
+            } else if (strcmp (E->Arg, "tosaslax") == 0) {
+                if ((In->RegA & 0x0F) >= 8) {
+                    Out->RegA = 0;
+                }
 	    } else if (strcmp (E->Arg, "tosorax") == 0) {
 		if (In->RegA == 0xFF) {
 		    Out->RegA = 0xFF;
@@ -826,7 +837,13 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	     	if (In->RegX == 0xFF) {
                     Out->RegX = 0xFF;
                 }
-            } else if (FindBoolCmpCond (E->Arg) != CMP_INV) {
+            } else if (strcmp (E->Arg, "tosshlax") == 0) {
+                if ((In->RegA & 0x0F) >= 8) {
+                    Out->RegA = 0;
+                }
+            } else if (FindBoolCmpCond (E->Arg) != CMP_INV ||
+                       FindTosCmpCond (E->Arg) != CMP_INV) {
+                /* Result is boolean value, so X is zero on output */
                 Out->RegX = 0;
             }
 	    break;
@@ -843,21 +860,21 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Use & REG_ZP, In)) {
 		    case REG_TMP1:
-			Out->RegA = In->Tmp1;
-			break;
+		      	Out->RegA = In->Tmp1;
+		      	break;
 		    case REG_PTR1_LO:
-			Out->RegA = In->Ptr1Lo;
-			break;
+		      	Out->RegA = In->Ptr1Lo;
+		      	break;
 		    case REG_PTR1_HI:
-			Out->RegA = In->Ptr1Hi;
-			break;
+		      	Out->RegA = In->Ptr1Hi;
+		      	break;
 		    case REG_SREG_LO:
-			Out->RegA = In->SRegLo;
-			break;
+		      	Out->RegA = In->SRegLo;
+		      	break;
 		    case REG_SREG_HI:
 			Out->RegA = In->SRegHi;
 			break;
-		    default:
+	    	    default:
 			Out->RegA = UNKNOWN_REGVAL;
 			break;
 		}
@@ -912,7 +929,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			Out->RegY = In->Ptr1Hi;
 			break;
 		    case REG_SREG_LO:
-			Out->RegY = In->SRegLo;
+	    		Out->RegY = In->SRegLo;
 			break;
 		    case REG_SREG_HI:
 			Out->RegY = In->SRegHi;

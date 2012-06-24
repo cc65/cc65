@@ -57,7 +57,7 @@ S_OBJS =	c_acptr.o	\
 		c_unlsn.o	\
 		c_untlk.o	\
 		cbm_close.o	\
-                cbm_ftype.o     \
+                cbm_filetype.o  \
 		cbm_open.o 	\
 		cbm_read.o 	\
 		cbm_write.o     \

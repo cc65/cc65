@@ -5,7 +5,7 @@
 ; unsigned char __fastcall__ _cbm_filetype (unsigned char c);
 ;
 
-        .include "cbm_ftype.inc"
+        .include "cbm_filetype.inc"
 
         .macpack generic
 

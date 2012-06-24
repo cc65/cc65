@@ -70,6 +70,9 @@
 #  include <pet.h>
 #endif
 
+/* Include definitions for CBM file types */
+#include <cbm_filetype.h>
+
 
 
 /*****************************************************************************/
@@ -124,19 +127,6 @@ extern char _filetype;          /* Defaults to 'u' */
 
 
 
-/* CBM FILE TYPES */
-#define CBM_T_DEL    0
-#define CBM_T_SEQ    1
-#define CBM_T_PRG    2
-#define CBM_T_USR    3
-#define CBM_T_REL    4
-#define CBM_T_CBM    5          /* 1581 sub-partition */
-#define CBM_T_DIR    6          /* IDE64 and CMD sub-directory */
-#define CBM_T_LNK    7          /* IDE64 soft-link */
-#define CBM_T_VRP    8          /* Vorpal fast-loadable format */
-#define CBM_T_OTHER  9          /* File-type not recognized */
-#define CBM_T_HEADER 10         /* Disk header / title */
-
 /* CBM FILE ACCESS */
 #define CBM_A_RO    1           /* Read only   */
 #define CBM_A_WO    2           /* Write only  */
@@ -149,14 +139,6 @@ struct cbm_dirent {
     unsigned char access;
 };
 
-unsigned char __fastcall__ _cbm_filetype (unsigned char c);
-/* Map the start character for a file type to one of the file types above.
- * Note: 'd' will always mapped to CBM_T_DEL. The calling function has to
- * look at the following character to determine if the file type is actually
- * CBM_T_DIR.
- * This is a function used by the implementation. There is usually no need
- * to call it from user code.
- */
 
 
 /*****************************************************************************/

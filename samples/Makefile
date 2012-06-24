@@ -79,6 +79,7 @@ EXELIST	=	ascii 		\
 		mandelbrot	\
      		mousedemo 	\
      		nachtm 		\
+     		ovrldemo	\
      		plasma 		\
      		sieve 		\
      		tgidemo
@@ -122,7 +123,7 @@ endif
 
 nachtm:		nachtm.o
 
-overlaydemo:	overlaydemo.o
+ovrldemo:	overlaydemo.o
 	@$(LD) -t $(SYS) -m $(basename $@).map -C $(SYS)-overlay.cfg -o $@ $^ $(CLIB)
 
 plasma:		plasma.o
@@ -168,5 +169,3 @@ clean:
 .PHONY:	zap
 zap:	clean
 	$(RM) $(EXELIST) samples.d64
-
-

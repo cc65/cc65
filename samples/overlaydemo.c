@@ -8,6 +8,7 @@
 
 
 #include <stdio.h>
+#include <conio.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -70,17 +71,19 @@ unsigned char loadfile (char *name, void *addr, void *size)
 void main (void)
 {
     log ("Calling overlay 1 from main");
-    if (loadfile ("overlaydemo.1", &_OVERLAY1_LOAD__, &_OVERLAY1_SIZE__)) {
+    if (loadfile ("ovrldemo.1", &_OVERLAY1_LOAD__, &_OVERLAY1_SIZE__)) {
         foo ();
     }
 
     log ("Calling overlay 2 from main");
-    if (loadfile ("overlaydemo.2", &_OVERLAY2_LOAD__, &_OVERLAY2_SIZE__)) {
+    if (loadfile ("ovrldemo.2", &_OVERLAY2_LOAD__, &_OVERLAY2_SIZE__)) {
         bar ();
     }
 
     log ("Calling overlay 3 from main");
-    if (loadfile ("overlaydemo.3", &_OVERLAY3_LOAD__, &_OVERLAY3_SIZE__)) {
+    if (loadfile ("ovrldemo.3", &_OVERLAY3_LOAD__, &_OVERLAY3_SIZE__)) {
         foobar ();
     }
+
+    cgetc ();
 }

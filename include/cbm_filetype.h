@@ -53,18 +53,20 @@
 
 /* CBM FILE TYPES. The definitions are used within standard headers, so we
  * be careful with identifiers in the user name space.
+ * "Regular" files have a special bit set so it's easier to pick them out.
  */
-#define _CBM_T_DEL      0
-#define _CBM_T_SEQ      1
-#define _CBM_T_PRG      2
-#define _CBM_T_USR      3
-#define _CBM_T_REL      4
-#define _CBM_T_CBM      5       /* 1581 sub-partition */
-#define _CBM_T_DIR      6       /* IDE64 and CMD sub-directory */
-#define _CBM_T_LNK      7       /* IDE64 soft-link */
-#define _CBM_T_VRP      8       /* Vorpal fast-loadable format */
-#define _CBM_T_OTHER    9       /* File-type not recognized */
-#define _CBM_T_HEADER  10       /* Disk header / title */
+#define _CBM_T_REG      0x10U   /* Bit set for regular files */
+#define _CBM_T_SEQ      0x10U
+#define _CBM_T_PRG      0x11U
+#define _CBM_T_USR      0x12U
+#define _CBM_T_REL      0x13U
+#define _CBM_T_DEL      0x00U
+#define _CBM_T_CBM      0x01U   /* 1581 sub-partition */
+#define _CBM_T_DIR      0x02U   /* IDE64 and CMD sub-directory */
+#define _CBM_T_LNK      0x03U   /* IDE64 soft-link */
+#define _CBM_T_VRP      0x04U   /* Vorpal fast-loadable format */
+#define _CBM_T_OTHER    0x05U   /* File-type not recognized */
+#define _CBM_T_HEADER   0x06U   /* Disk header / title */
 
 #if __CC65_STD__ == __CC65_STD_CC65__
 /* Allow for names without leading underscores */

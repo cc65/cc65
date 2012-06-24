@@ -85,11 +85,19 @@ struct dirent {
     char                d_name[16+1];
     unsigned int        d_off;
     unsigned int        d_blocks;
-    unsigned char       d_type;         /* See CBM_T_xxx defines in cbm.h */
+    unsigned char       d_type;         /* See _CBM_T_xxx defines */
 
     /* bsd extensions */
     unsigned char       d_namlen;
 };
+
+/* File type specification macros. We need definitions of CBM file types. */
+#include <cbm_filetype.h>
+
+#define _DE_ISREG(t)    (((t) & _CBM_T_REG) != 0)
+#define _DE_ISDIR(t)    ((t) == _CBM_T_DIR)
+#define _DE_ISLBL(t)    ((t) == _CBM_T_HDR)
+#define _DE_ISLNK(t)    ((t) == _CBM_T_LNK)
 
 #elif defined(__LYNX__)
 

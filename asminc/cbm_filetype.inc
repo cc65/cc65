@@ -7,21 +7,22 @@
 ; Define bitmapped constants for the table entries
 
 .enum
-        CBM_T_DEL               ; Deleted file
-        CBM_T_SEQ               ; Sequential file
-        CBM_T_PRG               ; Program file
-        CBM_T_USR               ; User file
-        CBM_T_REL               ; Relative file
-        CBM_T_CBM               ; 1581 sub-partition
-        CBM_T_DIR               ; IDE64 and CMD sub-directory
-        CBM_T_LNK               ; IDE64 soft-link
-        CBM_T_VRP               ; Vorpal fast-loadable format
-        CBM_T_OTHER             ; File-type not recognized
-        CBM_T_HEADER            ; Disk header / title 
+        CBM_T_REG     = $10     ; Bit set for regular files
+        CBM_T_SEQ     = $10     ; Sequential file
+        CBM_T_PRG     = $11     ; Program file
+        CBM_T_USR     = $12     ; User file
+        CBM_T_REL     = $13     ; Relative file
+        CBM_T_DEL     = $00     ; Deleted file
+        CBM_T_CBM     = $01     ; 1581 sub-partition
+        CBM_T_DIR     = $02     ; IDE64 and CMD sub-directory
+        CBM_T_LNK     = $03     ; IDE64 soft-link
+        CBM_T_VRP     = $04     ; Vorpal fast-loadable format
+        CBM_T_OTHER   = $05     ; File-type not recognized
+        CBM_T_HEADER  = $06     ; Disk header / title
 .endenum
 
 
-; The following function maps the start character for a file type to 
+; The following function maps the start character for a file type to
 ; one of the file types above. Note: 'd' will always mapped to CBM_T_DEL.
 ; The calling function has to look at the following character to determine
 ; if the file type is actually CBM_T_DIR.

@@ -279,7 +279,11 @@ Low-level disk I/O API.
 
 <sect1><tt/dirent.h/<label id="dirent.h"><p>
 
-<itemize>
+<itemize>      
+<item><ref id="_DE_ISDIR" name="_DE_ISDIR">
+<item><ref id="_DE_ISLBL" name="_DE_ISLBL">
+<item><ref id="_DE_ISLNK" name="_DE_ISLNK">
+<item><ref id="_DE_ISREG" name="_DE_ISREG">
 <item><ref id="closedir" name="closedir">
 <item><ref id="opendir" name="opendir">
 <item><ref id="readdir" name="readdir">
@@ -713,6 +717,105 @@ communication.
 
 
 <sect>Alphabetical function reference<p>
+
+<sect1>_DE_ISDIR<label id="_DE_ISDIR"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine if a directory entry specifies a directory.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/int _DE_ISDIR(unsigned char type);/
+<tag/Description/The function is called with the type of a directory entry
+taken from a <tt/struct dirent/ and returns true if the entry designates
+a directory.
+<tag/Limits/
+<itemize>
+<item>The function is actually a macro.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_DE_ISLBL" name="_DE_ISLBL">,
+<ref id="_DE_ISLNK" name="_DE_ISLNK">,
+<ref id="_DE_ISREG" name="_DE_ISREG">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_DE_ISLBL<label id="_DE_ISLBL"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine if a directory entry specifies a disk label.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/int _DE_ISLBL(unsigned char type);/
+<tag/Description/The function is called with the type of a directory entry
+taken from a <tt/struct dirent/ and returns true if the entry designates
+a disk label.
+<tag/Limits/
+<itemize>
+<item>The function is actually a macro.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_DE_ISDIR" name="_DE_ISDIR">,
+<ref id="_DE_ISLNK" name="_DE_ISLNK">,
+<ref id="_DE_ISREG" name="_DE_ISREG">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_DE_ISLNK<label id="_DE_ISLNK"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine if a directory entry specifies a link.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/int _DE_ISLNK(unsigned char type);/
+<tag/Description/The function is called with the type of a directory entry
+taken from a <tt/struct dirent/ and returns true if the entry designates
+a link.
+<tag/Limits/
+<itemize>
+<item>The function is actually a macro.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_DE_ISDIR" name="_DE_ISDIR">,
+<ref id="_DE_ISLBL" name="_DE_ISLBL">,
+<ref id="_DE_ISREG" name="_DE_ISREG">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_DE_ISREG<label id="_DE_ISREG"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine if a directory entry specifies a regular file.
+<tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
+<tag/Declaration/<tt/int _DE_ISREG(unsigned char type);/
+<tag/Description/The function is called with the type of a directory entry
+taken from a <tt/struct dirent/ and returns true if the entry designates
+a regular file.
+<tag/Limits/
+<itemize>
+<item>The function is actually a macro.
+<item>A "regular file" means anything with data in it. This might still mean
+that special processing is needed, when accessing the file. Relative files of 
+the CBM systems are classified as being "regular" files, for example.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_DE_ISDIR" name="_DE_ISDIR">,
+<ref id="_DE_ISLBL" name="_DE_ISLBL">,
+<ref id="_DE_ISLNK" name="_DE_ISLNK">
+<tag/Example/None.
+</descrip>
+</quote>
+
 
 <sect1>_heapadd<label id="_heapadd"><p>
 
@@ -1668,7 +1771,7 @@ be used in presence of a prototype.
 <tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
 <tag/Declaration/<tt/int __fastcall__ closedir (DIR* dir);/
 <tag/Description/The function closes the given directory descriptor. It returns
-zero on success and -1 on error. If an error occurs, the cause can be determined 
+zero on success and -1 on error. If an error occurs, the cause can be determined
 by reading the <tt/errno/ variable.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
@@ -4217,9 +4320,9 @@ had been used with an argument of 1.
 <tag/Header/<tt/<ref id="dirent.h" name="dirent.h">/
 <tag/Declaration/<tt/struct dirent* __fastcall__ readdir (DIR* dir);/
 <tag/Description/<tt/readdir/ reads the next directory entry from the directory
-stream pointed to by <tt/dir/. It stores the data in a <tt/dirent/ structure 
+stream pointed to by <tt/dir/. It stores the data in a <tt/dirent/ structure
 and returns a pointer to it. If the end of directory is reached, or an error
-occurs, NULL is returned. In case of errors, an error code is stored into 
+occurs, NULL is returned. In case of errors, an error code is stored into
 <tt/errno/.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only

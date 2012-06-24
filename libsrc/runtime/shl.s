@@ -11,45 +11,70 @@
 ;
 
 
-	.export		tosaslax, tosshlax
-	.import		popax
-	.importzp	tmp1
+      	.export		tosaslax, tosshlax, aslaxy, shlaxy
+      	.import		popax
+      	.importzp	tmp1
+
+        .macpack        cpu
 
 tosshlax:
 tosaslax:
-        and     #$0F            ; Bring the shift count into a valid range
-        sta     tmp1            ; Save it
-
+        sta     tmp1            ; Save shift count it
         jsr     popax           ; Get the left hand operand
-
         ldy     tmp1            ; Get shift count
-        beq     L9              ; Bail out if shift count zero
 
-        cpy     #8              ; Shift count 8 or greater?
-        bcc     L3              ; Jump if not
+; Run into shlaxy
 
-; Shift count is greater 7. The carry is set when we enter here.
-
-        tax
+shlaxy:
+aslaxy:
+        pha
         tya
-        sbc     #8
-        tay
-        txa
-        jmp     L2
+        and     #$0F
+        beq     L2              ; Nothing to shift
+        sec
+        sbc     #8              ; Shift count 8 or greater?
+        beq     L3              ; Jump if exactly 8
+        bcc     L4              ; Jump if less than 8
+
+; Shift count is greater than 8.
+
+        tay                     ; Shift count into Y
+        pla                     ; Get low byte
+
 L1:     asl     a
-L2:     dey
-        bpl     L1
+        dey
+        bne     L1
         tax
-        lda     #$00
+        tya                     ; A = 0
         rts
 
-; Shift count is less than 8.
+; Shift count is zero
 
-L3:     stx     tmp1            ; Save high byte of lhs
-L4:    	asl	a
+L2:     pla
+        rts
+
+; Shift count is exactly 8
+
+.if (.cpu .bitand CPU_ISET_65SC02)
+L3:     plx                     ; Low byte from stack into X
+        rts                     ; A is already zero
+.else
+L3:     pla                     ; Low byte from stack ...
+        tax                     ; ... into X
+        lda     #$00            ; Clear low byte
+        rts
+.endif
+
+; Shift count is less than 8
+
+L4:     adc     #8              ; Correct counter
+        tay                     ; Shift count into Y
+        pla                     ; Restore low byte
+        stx     tmp1            ; Save high byte of lhs
+L5:    	asl	a 
   	rol	tmp1
         dey
-       	bne     L4
+       	bne     L5
 
 ; Done with shift
 

@@ -84,6 +84,11 @@ struct dirent {
     char d_name[13];  /* 8.3 + trailing 0 */
 };
 
+#define _DE_ISREG(t)  (1)
+#define _DE_ISDIR(t)  (0)
+#define _DE_ISLBL(t)  (0)
+#define _DE_ISLNK(t)  (0)
+
 #elif defined(__CBM__)
 
 struct dirent {
@@ -117,11 +122,21 @@ struct dirent {
 extern struct dirent FileEntry;
 #pragma zpsym ("FileEntry");
 
+#define _DE_ISREG(t)    (1)
+#define _DE_ISDIR(t)    (0)
+#define _DE_ISLBL(t)    (0)
+#define _DE_ISLNK(t)    (0)
+
 #else
 
 struct dirent {
     char d_name[1];
 };
+
+#define _DE_ISREG(t)  (1)
+#define _DE_ISDIR(t)  (0)
+#define _DE_ISLBL(t)  (0)
+#define _DE_ISLNK(t)  (0)
 
 #endif
 

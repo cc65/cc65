@@ -46,7 +46,6 @@
 
 /* Segment flags */
 #define SEG_FLAG_NONE           0x00
-#define SEG_FLAG_BANKREF        0x01    /* Segment is referenced by .BANK */
 
 
 

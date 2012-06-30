@@ -147,14 +147,6 @@ ExprNode* CloneExpr (ExprNode* Expr);
  * nodes, it will not resolve them.
  */
 
-ExprNode* FinalizeExpr (ExprNode* Expr, const Collection* LineInfos);
-/* Finalize an expression tree before it is written to the file. This will
- * replace EXPR_BANKRAW nodes by EXPR_BANK nodes, and replace constant
- * expressions by their result. The LineInfos are used when diagnosing errors.
- * Beware: The expression tree may get replaced in future versions, so don't
- * use Expr after calling this function.
- */
-
 void WriteExpr (ExprNode* Expr);
 /* Write the given expression to the object file */
 

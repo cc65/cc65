@@ -1870,19 +1870,6 @@ unsigned CfgProcess (void)
                     Addr = NewAddr;
                 }
 
-                /* If the segment has .BANK expressions referring to it, it
-                 * must be placed into a memory area that has the bank
-                 * attribute.
-                 */
-                if ((S->Seg->Flags & SEG_FLAG_BANKREF) != 0 && M->BankExpr == 0) {
-                    CfgError (GetSourcePos (S->LI),
-                              "Segment `%s' is refered to by .BANK, but the "
-                              "memory area `%s' it is placed into has no BANK "
-                              "attribute",
-                              GetString (S->Name),
-                              GetString (M->Name));
-                }
-
                 /* Set the start address of this segment, set the readonly flag
                  * in the segment and and remember if the segment is in a
                  * relocatable file or not.

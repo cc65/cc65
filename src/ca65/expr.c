@@ -243,7 +243,7 @@ static ExprNode* Bank (ExprNode* Operand)
 /* Return the bank of the given segmented expression */
 {
     /* Generate the bank expression */
-    ExprNode* Expr = NewExprNode (EXPR_BANKRAW);
+    ExprNode* Expr = NewExprNode (EXPR_BANK);
     Expr->Left = Operand;
 
     /* Return the result */
@@ -1833,76 +1833,6 @@ ExprNode* CloneExpr (ExprNode* Expr)
 
 
 
-ExprNode* FinalizeExpr (ExprNode* Expr, const Collection* LineInfos)
-/* Finalize an expression tree before it is written to the file. This will
- * replace EXPR_BANKRAW nodes by EXPR_BANK nodes, and replace constant
- * expressions by their result. The LineInfos are used when diagnosing errors.
- * Beware: The expression tree may get replaced in future versions, so don't
- * use Expr after calling this function.
- */
-{
-    ExprDesc ED;
-
-    /* Check the type code */
-    switch (EXPR_NODETYPE (Expr->Op)) {
-
-        case EXPR_LEAFNODE:
-            /* Nothing to do for leaf nodes */
-            break;
-
-        case EXPR_BINARYNODE:
-            Expr->Left  = FinalizeExpr (Expr->Left, LineInfos);
-            Expr->Right = FinalizeExpr (Expr->Right, LineInfos);
-            /* FALLTHROUGH */
-
-        case EXPR_UNARYNODE:
-            Expr->Left = FinalizeExpr (Expr->Left, LineInfos);
-
-            /* Special handling for BANKRAW */
-            if (Expr->Op == EXPR_BANKRAW) {
-
-                /* Study the expression */
-                ED_Init (&ED);
-                StudyExpr (Expr->Left, &ED);
-
-                /* The expression must be ok and must have exactly one segment
-                 * reference.
-                 */
-                if (ED.Flags & ED_TOO_COMPLEX) {
-                    LIError (LineInfos,
-                             "Cannot evaluate expression");
-                } else if (ED.SecCount == 0) {
-                    LIError (LineInfos,
-                             ".BANK expects a segment reference");
-                } else if (ED.SecCount > 1 || ED.SecRef[0].Count > 1) {
-                    LIError (LineInfos,
-                             "Too many segment references in argument to .BANK");
-                } else {
-                    Segment* S;
-
-                    FreeExpr (Expr->Left);
-                    Expr->Op = EXPR_BANK;
-                    Expr->Left = 0;
-                    Expr->V.SecNum = ED.SecRef[0].Ref;
-
-                    /* Mark the segment */
-                    S = CollAt (&SegmentList, Expr->V.SecNum);
-                    S->Flags |= SEG_FLAG_BANKREF;
-                }
-
-                /* Cleanup */
-                ED_Done (&ED);
-
-            }
-            break;
-    }
-
-    /* Return the (partial) tree */
-    return Expr;
-}
-
-
-
 void WriteExpr (ExprNode* Expr)
 /* Write the given expression to the object file */
 {
@@ -1939,11 +1869,6 @@ void WriteExpr (ExprNode* Expr)
 	case EXPR_ULABEL:
             WriteExpr (ULabResolve (Expr->V.IVal));
 	    break;
-
-        case EXPR_BANK:
-            ObjWrite8 (EXPR_BANK);
-            ObjWriteVar (Expr->V.SecNum);
-            break;
 
         default:
 	    /* Not a leaf node */

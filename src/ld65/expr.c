@@ -142,16 +142,6 @@ int IsConstExpr (ExprNode* Root)
                 return !Root->V.Mem->Relocatable &&
                        (Root->V.Mem->Flags & MF_PLACED);
 
-            case EXPR_BANK:
-                /* A bank expression is const if the section, the segment is
-                 * part of, is already placed, and the memory area has a
-                 * constant bank expression.
-                 */
-                S = GetExprSection (Root);
-                M = S->Seg->MemArea;
-                return M != 0 && (M->Flags & MF_PLACED) != 0 &&
-                       M->BankExpr != 0 && IsConstExpr (M->BankExpr);
-
       	    default:
                 /* Anything else is not const */
       	 	return 0;
@@ -160,7 +150,30 @@ int IsConstExpr (ExprNode* Root)
 
     } else if (EXPR_IS_UNARY (Root->Op)) {
 
-      	return IsConstExpr (Root->Left);
+        SegExprDesc D;
+
+        /* Special handling for the BANK pseudo function */
+        switch (Root->Op) {
+
+            case EXPR_BANK:
+                /* Get segment references for the expression */
+                GetSegExprVal (Root->Left, &D);
+
+                /* The expression is const if the expression contains exactly
+                 * one segment that is assigned to a memory area which has a
+                 * bank attribute that is constant.
+                 */
+                return (D.TooComplex              == 0  &&
+                        D.Seg                     != 0  &&
+                        D.Seg->MemArea            != 0  &&
+                        D.Seg->MemArea->BankExpr  != 0  &&
+                        IsConstExpr (D.Seg->MemArea->BankExpr));
+
+            default:
+                /* All others handled normal */
+                return IsConstExpr (Root->Left);
+
+        }
 
     } else {
 
@@ -171,9 +184,9 @@ int IsConstExpr (ExprNode* Root)
       	 	if (IsConstExpr (Root->Left)) {
       	 	    /* lhs is const, if it is zero, don't eval right */
       	 	    if (GetExprVal (Root->Left) == 0) {
-      	 		return 1;
+      	 	 	return 1;
       	  	    } else {
-      	 		return IsConstExpr (Root->Right);
+      	 	 	return IsConstExpr (Root->Right);
       	 	    }
       	 	} else {
       	 	    /* lhs not const --> tree not const */
@@ -240,7 +253,7 @@ Section* GetExprSection (ExprNode* Expr)
 /* Get the segment for a section expression node */
 {
     /* Check that this is really a section node */
-    PRECONDITION (Expr->Op == EXPR_SECTION || Expr->Op == EXPR_BANK);
+    PRECONDITION (Expr->Op == EXPR_SECTION);
 
     /* If we have an object file, get the section from it, otherwise
      * (internally generated expressions), get the section from the
@@ -264,6 +277,7 @@ long GetExprVal (ExprNode* Expr)
     long        Val;
     Section*    S;
     Export*     E;
+    SegExprDesc D;
 
     switch (Expr->Op) {
 
@@ -297,10 +311,6 @@ long GetExprVal (ExprNode* Expr)
         case EXPR_MEMAREA:
             return Expr->V.Mem->Start;
 
-        case EXPR_BANK:
-       	    S = GetExprSection (Expr);
-            return GetExprVal (S->Seg->MemArea->BankExpr);
-
        	case EXPR_PLUS:
      	    return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
 
@@ -314,7 +324,7 @@ long GetExprVal (ExprNode* Expr)
      	    Left  = GetExprVal (Expr->Left);
      	    Right = GetExprVal (Expr->Right);
 	    if (Right == 0) {
-	  	Error ("Division by zero");
+     	  	Error ("Division by zero");
 	    }
 	    return Left / Right;
 
@@ -379,36 +389,53 @@ long GetExprVal (ExprNode* Expr)
             return (Left < Right)? Left : Right;
 
        	case EXPR_UNARY_MINUS:
-    	    return -GetExprVal (Expr->Left);
+     	    return -GetExprVal (Expr->Left);
 
        	case EXPR_NOT:
-    	    return ~GetExprVal (Expr->Left);
+     	    return ~GetExprVal (Expr->Left);
 
         case EXPR_SWAP:
-    	    Left = GetExprVal (Expr->Left);
-    	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
+     	    Left = GetExprVal (Expr->Left);
+     	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
 
-    	case EXPR_BOOLNOT:
+     	case EXPR_BOOLNOT:
        	    return !GetExprVal (Expr->Left);
 
+        case EXPR_BANK:
+            GetSegExprVal (Expr->Left, &D);
+            if (D.TooComplex || D.Seg == 0) {
+                Error ("Argument for .BANK is not segment relative or too complex");
+            }
+            if (D.Seg->MemArea == 0) {
+                Error ("Segment `%s' is referenced by .BANK but "
+                       "not assigned to a memory area",
+                       GetString (D.Seg->Name));
+            }
+            if (D.Seg->MemArea->BankExpr == 0) {
+                Error ("Memory area `%s' is referenced by .BANK but "
+                       "has no BANK attribute",
+                       GetString (D.Seg->MemArea->Name));
+            }
+            return GetExprVal (D.Seg->MemArea->BankExpr);
+
        	case EXPR_BYTE0:
-	    return GetExprVal (Expr->Left) & 0xFF;
+     	    return GetExprVal (Expr->Left) & 0xFF;
 
        	case EXPR_BYTE1:
-	    return (GetExprVal (Expr->Left) >> 8) & 0xFF;
+     	    return (GetExprVal (Expr->Left) >> 8) & 0xFF;
 
        	case EXPR_BYTE2:
-	    return (GetExprVal (Expr->Left) >> 16) & 0xFF;
+     	    return (GetExprVal (Expr->Left) >> 16) & 0xFF;
 
        	case EXPR_BYTE3:
-	    return (GetExprVal (Expr->Left) >> 24) & 0xFF;
+     	    return (GetExprVal (Expr->Left) >> 24) & 0xFF;
 
        	case EXPR_WORD0:
-	    return GetExprVal (Expr->Left) & 0xFFFF;
+     	    return GetExprVal (Expr->Left) & 0xFFFF;
 
        	case EXPR_WORD1:
-	    return (GetExprVal (Expr->Left) >> 16) & 0xFFFF;
-             
+     	    return (GetExprVal (Expr->Left) >> 16) & 0xFFFF;
+
         case EXPR_FARADDR:
             return GetExprVal (Expr->Left) & 0xFFFFFF;
 
@@ -418,7 +445,7 @@ long GetExprVal (ExprNode* Expr)
         default:
        	    Internal ("Unknown expression Op type: %u", Expr->Op);
       	    /* NOTREACHED */
-    	    return 0;
+     	    return 0;
     }
 }
 
@@ -619,7 +646,6 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 	     	break;
 
 	    case EXPR_SECTION:
-            case EXPR_BANK:
 	     	/* Read the section number */
 	     	Expr->V.SecNum = ReadVar (F);
 	     	break;

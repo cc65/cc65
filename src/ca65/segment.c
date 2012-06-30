@@ -409,9 +409,6 @@ void SegDone (void)
 
      	     	} else {
 
-                    /* Finalize the expression */
-                    F->V.Expr = FinalizeExpr (F->V.Expr, &F->LI);
-
                     /* Simplify the expression */
                     /* ### F->V.Expr = SimplifyExpr (F->V.Expr, &ED); */
 

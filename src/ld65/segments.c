@@ -202,7 +202,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     /* Read the segment data */
     (void) Read32 (F);          /* File size of data */
     Name      = MakeGlobalStringId (O, ReadVar (F));    /* Segment name */
-    Flags     = ReadVar (F);    /* Segment flags */
+    Flags     = ReadVar (F);    /* Segment flags (currently unused) */
     Size      = ReadVar (F);    /* Size of data */
     Alignment = ReadVar (F);    /* Alignment */
     Type      = Read8 (F);      /* Segment type */
@@ -216,11 +216,6 @@ Section* ReadSection (FILE* F, ObjData* O)
 
     /* Get the segment for this section */
     S = GetSegment (Name, Type, GetObjFileName (O));
-                                        
-    /* The only possible flag is currently SEG_FLAG_BANKREF, and it must be
-     * applied to the segment, not the section.
-     */
-    S->Flags |= Flags;
 
     /* Allocate the section we will return later */
     Sec = NewSection (S, Alignment, Type);

@@ -60,7 +60,6 @@
 #define EXPR_SEGMENT   	       	(EXPR_LEAFNODE | 0x04)	/* Linker only */
 #define EXPR_MEMAREA   	       	(EXPR_LEAFNODE | 0x05) 	/* Linker only */
 #define EXPR_ULABEL		(EXPR_LEAFNODE | 0x06) 	/* Assembler only */
-#define EXPR_BANK               (EXPR_LEAFNODE | 0x07)
 
 /* Binary operations, left and right hand sides are valid */
 #define EXPR_PLUS      	       	(EXPR_BINARYNODE | 0x01)
@@ -90,7 +89,7 @@
 #define EXPR_NOT       	       	(EXPR_UNARYNODE | 0x02)
 #define EXPR_SWAP      	       	(EXPR_UNARYNODE | 0x03)
 #define EXPR_BOOLNOT		(EXPR_UNARYNODE | 0x04)
-#define EXPR_BANKRAW            (EXPR_UNARYNODE | 0x05) /* Assembler only */
+#define EXPR_BANK               (EXPR_UNARYNODE | 0x05)
 
 #define EXPR_BYTE0            	(EXPR_UNARYNODE | 0x08)
 #define EXPR_BYTE1            	(EXPR_UNARYNODE | 0x09)

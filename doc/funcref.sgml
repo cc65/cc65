@@ -144,22 +144,26 @@ function.
 <sect1><tt/cbm.h/<label id="cbm.h"><p>
 
 <!-- <itemize> -->
-<!-- <item><ref id="cbm_clall" name="cbm_clall"> -->
-<!-- <item><ref id="cbm_close" name="cbm_close"> -->
-<!-- <item><ref id="cbm_closedir" name="cbm_closedir"> -->
+<!-- <item><ref id="cbm_k_acptr" name="cbm_k_acptr"> -->
 <!-- <item><ref id="cbm_k_basin" name="cbm_k_basin"> -->
 <!-- <item><ref id="cbm_k_bsout" name="cbm_k_bsout"> -->
 <!-- <item><ref id="cbm_k_chkin" name="cbm_k_chkin"> -->
+<!-- <item><ref id="cbm_k_ciout" name="cbm_k_ciout"> -->
 <!-- <item><ref id="cbm_k_ckout" name="cbm_k_ckout"> -->
+<!-- <item><ref id="cbm_k_clall" name="cbm_k_clall"> -->
 <!-- <item><ref id="cbm_k_close" name="cbm_k_close"> -->
 <!-- <item><ref id="cbm_k_clrch" name="cbm_k_clrch"> -->
 <!-- <item><ref id="cbm_k_getin" name="cbm_k_getin"> -->
+<!-- <item><ref id="cbm_k_iobase" name="cbm_k_iobase"> -->
+<!-- <item><ref id="cbm_k_listen" name="cbm_k_listen"> -->
 <!-- <item><ref id="cbm_k_load" name="cbm_k_load"> -->
 <!-- <item><ref id="cbm_k_open" name="cbm_k_open"> -->
 <!-- <item><ref id="cbm_k_readst" name="cbm_k_readst"> -->
 <!-- <item><ref id="cbm_k_save" name="cbm_k_save"> -->
 <!-- <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs"> -->
 <!-- <item><ref id="cbm_k_setnam" name="cbm_k_setnam"> -->
+<!-- <item><ref id="cbm_k_talk" name="cbm_k_talk"> -->
+<!-- <item><ref id="cbm_k_unlsn" name="cbm_k_unlsn"> -->
 <!-- <item><ref id="cbm_load" name="cbm_load"> -->
 <!-- <item><ref id="cbm_open" name="cbm_open"> -->
 <!-- <item><ref id="cbm_opendir" name="cbm_opendir"> -->
@@ -279,7 +283,7 @@ Low-level disk I/O API.
 
 <sect1><tt/dirent.h/<label id="dirent.h"><p>
 
-<itemize>      
+<itemize>
 <item><ref id="_DE_ISDIR" name="_DE_ISDIR">
 <item><ref id="_DE_ISLBL" name="_DE_ISLBL">
 <item><ref id="_DE_ISLNK" name="_DE_ISLNK">
@@ -804,7 +808,7 @@ a regular file.
 <itemize>
 <item>The function is actually a macro.
 <item>A "regular file" means anything with data in it. This might still mean
-that special processing is needed, when accessing the file. Relative files of 
+that special processing is needed, when accessing the file. Relative files of
 the CBM systems are classified as being "regular" files, for example.
 </itemize>
 <tag/Availability/cc65

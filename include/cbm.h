@@ -172,21 +172,27 @@ unsigned char get_tv (void);
 #define CBM_SEQ		2	/* default is ",r" -- or ",s" when writing */
 
 /* Kernal-level functions */
-void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV,
+unsigned char cbm_k_acptr (void);
+unsigned char cbm_k_basin (void);
+void __fastcall__ cbm_k_bsout (unsigned char C);
+unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
+void __fastcall__ cbm_k_ciout (unsigned char C);
+unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
+void cbm_clall (void);
+void __fastcall__ cbm_k_close (unsigned char FN);
+void cbm_k_clrch (void);
+unsigned char cbm_k_getin (void);
+unsigned cbm_k_iobase (void);
+void __fastcall__ cbm_k_listen (unsigned char dev);
+unsigned int __fastcall__ cbm_k_load(unsigned char flag, unsigned addr);
+unsigned char cbm_k_open (void);
+unsigned char cbm_k_readst (void);
+unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
+void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV, 
                                 unsigned char SA);
 void __fastcall__ cbm_k_setnam (const char* Name);
-unsigned int __fastcall__ cbm_k_load(unsigned char flag, unsigned addr);
-unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
-unsigned char cbm_k_open (void);
-void __fastcall__ cbm_k_close (unsigned char FN);
-signed char cbm_k_readst (void);
-unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
-unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
-unsigned char cbm_k_basin (void);
-unsigned char cbm_k_getin (void);
-void __fastcall__ cbm_k_bsout (unsigned char C);
-void cbm_k_clrch (void);
-void cbm_clall (void);
+void __fastcall__ cbm_k_talk (unsigned char dev);
+void cbm_k_unlsn (void);
 
 
 

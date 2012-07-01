@@ -1,13 +1,13 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; unsigned cbm_iobase (void);
+; unsigned cbm_k_iobase (void);
 ;
 
-       	.export	       	_cbm_iobase
+       	.export	       	_cbm_k_iobase
         .import         IOBASE
 
-_cbm_iobase:
+_cbm_k_iobase:                   
 	jsr	IOBASE
 	txa
 	pha

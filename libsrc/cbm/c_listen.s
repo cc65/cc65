@@ -1,13 +1,11 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void __fastcall__ cbm_listen (unsigned char dev);
+; void __fastcall__ cbm_k_listen (unsigned char dev);
 ;
 
-       	.export	       	_cbm_listen
         .import         LISTEN
-
-_cbm_listen = LISTEN
+       	.export	       	_cbm_k_listen := LISTEN
 
 
 

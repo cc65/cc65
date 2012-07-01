@@ -1,11 +1,8 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void cbm_unlsn (void);
+; void cbm_k_unlsn (void);
 ;
 
-       	.export	       	_cbm_unlsn
         .import         UNLSN
-
-
-_cbm_unlsn = UNLSN
+       	.export	       	_cbm_k_unlsn := UNLSN

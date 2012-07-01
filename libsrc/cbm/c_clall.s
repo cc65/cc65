@@ -1,11 +1,8 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void cbm_clall (void);
+; void cbm_k_clall (void);
 ;
 
-       	.export	       	_cbm_clall
         .import         CLALL
-
-
-_cbm_clall = CLALL
+       	.export	       	_cbm_k_clall := CLALL

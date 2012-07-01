@@ -60,13 +60,13 @@
 #define _CBM_T_PRG      0x11U
 #define _CBM_T_USR      0x12U
 #define _CBM_T_REL      0x13U
+#define _CBM_T_VRP      0x14U   /* Vorpal fast-loadable format */
 #define _CBM_T_DEL      0x00U
 #define _CBM_T_CBM      0x01U   /* 1581 sub-partition */
 #define _CBM_T_DIR      0x02U   /* IDE64 and CMD sub-directory */
 #define _CBM_T_LNK      0x03U   /* IDE64 soft-link */
-#define _CBM_T_VRP      0x04U   /* Vorpal fast-loadable format */
-#define _CBM_T_OTHER    0x05U   /* File-type not recognized */
-#define _CBM_T_HEADER   0x06U   /* Disk header / title */
+#define _CBM_T_OTHER    0x04U   /* File-type not recognized */
+#define _CBM_T_HEADER   0x05U   /* Disk header / title */
 
 #if __CC65_STD__ == __CC65_STD_CC65__
 /* Allow for names without leading underscores */

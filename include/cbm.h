@@ -85,7 +85,7 @@
  * following variables to determine the file type and the disk unit to use.
  */
 extern unsigned char _curunit;  /* Defaults to current when program started */
-extern char _filetype;          /* Defaults to 'u' */
+extern char _filetype;          /* Defaults to 's' */
 
 
 

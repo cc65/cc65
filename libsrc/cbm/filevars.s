@@ -13,7 +13,7 @@
 .data
 
 __filetype:
-        .byte   'u'             ; Create user files by default
+        .byte   's'             ; Create sequential files by default
 
 
 .bss

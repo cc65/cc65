@@ -45,6 +45,7 @@ S_OBJS =	c_acptr.o	\
 		c_clall.o	\
 		c_close.o 	\
 		c_clrch.o 	\
+                c_getin.o       \
 		c_iobase.o	\
 		c_listen.o	\
 		c_load.o 	\

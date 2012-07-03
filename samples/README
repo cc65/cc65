@@ -75,6 +75,13 @@ Platforms:	All systems that have the Commodore SID (Sound Interface
 		C64, C128, CBM510, CBM610
 
 -----------------------------------------------------------------------------
+Name:           overlaydemo
+Description:	Shows how to load overlay files from disk. Written and
+                contributed by Oliver Schmidt, <ol.sc@web.de>.
+Platforms:     	All systems with an overlay linker config (currently the C64,
+                the Atari and the Apple ][).
+
+-----------------------------------------------------------------------------
 Name:           plasma
 Description:	A fancy graphics demo written by groepaz/hitmen.
 Platforms:     	The program needs a VIC, or a TED, so it runs on the following

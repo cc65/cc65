@@ -81,11 +81,12 @@ struct dirent {
 #elif defined(__ATARI__)
 
 struct dirent {
-    char d_name[13];  /* 8.3 + trailing 0 */
+    char          d_name[13];  /* 8.3 + trailing 0 */
+    unsigned char d_type;
 };
 
-#define _DE_ISREG(t)  (1)
-#define _DE_ISDIR(t)  (0)
+#define _DE_ISREG(t)  ((t) != 0xC4)
+#define _DE_ISDIR(t)  ((t) == 0xC4)
 #define _DE_ISLBL(t)  (0)
 #define _DE_ISLNK(t)  (0)
 

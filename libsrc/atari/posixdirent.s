@@ -93,7 +93,7 @@ cioerr:		sty	__oserror
 		dey
 		dey
 		sta	(ptr1),y
-		cpy	#9
+		cpy	#8
 		bcs	@break
 		cmp	#' '
 		bne	@next
@@ -113,6 +113,8 @@ cioerr:		sty	__oserror
 		bne	@done
 
 @hasext:	jsr	copychar
+		ldy	#13		; d_type
+		sta	(ptr1),y
 		ldy	#11
 		jsr	copychar
 		ldy	#12

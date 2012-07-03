@@ -73,8 +73,8 @@ struct dirent {
     }             d_mtime;
 };
 
-#define _DE_ISREG(t)  ((t) != $0F)
-#define _DE_ISDIR(t)  ((t) == $0F)
+#define _DE_ISREG(t)  ((t) != 0x0F)
+#define _DE_ISDIR(t)  ((t) == 0x0F)
 #define _DE_ISLBL(t)  (0)
 #define _DE_ISLNK(t)  (0)
 

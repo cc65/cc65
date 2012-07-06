@@ -11,15 +11,15 @@
 ;
 
 
-      	.export		tosaslax, tosshlax, aslaxy, shlaxy
-      	.import		popax
-      	.importzp	tmp1
+        .export          tosaslax, tosshlax, aslaxy, shlaxy
+        .import          popax
+        .importzp        tmp1
 
         .macpack        cpu
 
 tosshlax:
 tosaslax:
-        sta     tmp1            ; Save shift count it
+        sta     tmp1            ; Save shift count
         jsr     popax           ; Get the left hand operand
         ldy     tmp1            ; Get shift count
 
@@ -71,13 +71,13 @@ L4:     adc     #8              ; Correct counter
         tay                     ; Shift count into Y
         pla                     ; Restore low byte
         stx     tmp1            ; Save high byte of lhs
-L5:    	asl	a 
-  	rol	tmp1
+L5:     asl     a
+        rol     tmp1
         dey
-       	bne     L5
+        bne     L5
 
 ; Done with shift
 
-        ldx	tmp1
+        ldx     tmp1
 L9:     rts
 

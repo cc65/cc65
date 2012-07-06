@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -65,8 +66,11 @@ static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
     if (L[0]->OPC == OP65_AND                                           ||
     	L[0]->OPC == OP65_EOR                                           ||
     	L[0]->OPC == OP65_ORA                                           ||
-    	(L[0]->OPC == OP65_JSR && strncmp (L[0]->Arg, "shlax", 5) == 0) ||
-       	(L[0]->OPC == OP65_JSR && strncmp (L[0]->Arg, "shrax", 5) == 0)) {
+    	(L[0]->OPC == OP65_JSR                          &&
+         (strncmp (L[0]->Arg, "shlax", 5) == 0  ||
+          strncmp (L[0]->Arg, "shrax", 5) == 0)         &&
+         strlen (L[0]->Arg) == 6                        &&
+         IsDigit (L[0]->Arg[5]))) {
 
     	/* One insn */
     	return 1;

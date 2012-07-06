@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2009, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -94,6 +94,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "asrax2",         REG_AX,	       	      REG_AX | REG_TMP1	 	     },
     { "asrax3",         REG_AX,	       	      REG_AX | REG_TMP1	 	     },
     { "asrax4",         REG_AX,	       	      REG_AX | REG_TMP1	 	     },
+    { "asraxy",         REG_AXY,              REG_AXY | REG_TMP1             },
     { "asreax1",        REG_EAX,              REG_EAX | REG_TMP1       	     },
     { "asreax2",        REG_EAX,              REG_EAX | REG_TMP1 	     },
     { "asreax3",        REG_EAX,              REG_EAX | REG_TMP1 	     },
@@ -219,6 +220,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "shrax2",         REG_AX,               REG_AX | REG_TMP1		     },
     { "shrax3",         REG_AX,               REG_AX | REG_TMP1		     },
     { "shrax4",         REG_AX,               REG_AX | REG_TMP1		     },
+    { "shraxy",         REG_AXY,              REG_AXY | REG_TMP1             },
     { "shreax1",        REG_EAX,              REG_EAX | REG_TMP1       	     },
     { "shreax2",        REG_EAX,              REG_EAX | REG_TMP1	     },
     { "shreax3",        REG_EAX,              REG_EAX | REG_TMP1	     },

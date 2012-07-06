@@ -716,7 +716,7 @@ static int IsRegVar (StackOpData* D)
 
 
 /*****************************************************************************/
-/*   	       		 Actual optimization functions                       */
+/*   	       	       	 Actual optimization functions                       */
 /*****************************************************************************/
 
 
@@ -824,6 +824,71 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
     }
 
     /* Remove the push and the call to the tosgeax function */
+    RemoveRemainders (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
+static unsigned Opt_tosshift (StackOpData* D, const char* Name)
+/* Optimize shift sequences. */
+{
+    CodeEntry*  X;
+
+    /* Store the value into the zeropage instead of pushing it */
+    ReplacePushByStore (D);
+
+    /* Inline the compare */
+    D->IP = D->OpIndex+1;
+
+    /* tay */
+    X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* If the lhs is direct (but not stack relative), we can just reload the
+     * data later.
+     */
+    if ((D->Lhs.A.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT &&
+        (D->Lhs.X.Flags & (LI_DIRECT | LI_RELOAD_Y)) == LI_DIRECT) {
+
+        CodeEntry* LoadX = D->Lhs.X.LoadEntry;
+        CodeEntry* LoadA = D->Lhs.A.LoadEntry;
+
+        /* lda */
+        X = NewCodeEntry (OP65_LDA, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* ldx */
+        X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* Lhs load entries can be removed */
+        D->Lhs.X.Flags |= LI_REMOVE;
+        D->Lhs.A.Flags |= LI_REMOVE;
+
+    } else {
+
+        /* Save lhs into zeropage and reload later */
+        AddStoreX (D);
+        AddStoreA (D);
+
+        /* lda zp */
+        X = NewCodeEntry (OP65_LDA, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+        /* ldx zp+1 */
+        X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
+    }
+
+    /* jsr shlaxy/aslaxy/whatever */
+    X = NewCodeEntry (OP65_JSR, AM65_ABS, Name, 0, D->OpEntry->LI);
+    InsertEntry (D, X, D->IP++);
+
+    /* Remove the push and the call to the tossubax function */
     RemoveRemainders (D);
 
     /* We changed the sequence */
@@ -1169,6 +1234,22 @@ static unsigned Opt_tosandax (StackOpData* D)
 
 
 
+static unsigned Opt_tosaslax (StackOpData* D)
+/* Optimize the tosaslax sequence */
+{
+    return Opt_tosshift (D, "aslaxy");
+}
+
+
+
+static unsigned Opt_tosasrax (StackOpData* D)
+/* Optimize the tosasrax sequence */
+{
+    return Opt_tosshift (D, "asraxy");
+}
+
+
+
 static unsigned Opt_toseqax (StackOpData* D)
 /* Optimize the toseqax sequence */
 {
@@ -1237,7 +1318,7 @@ static unsigned Opt_tosltax (StackOpData* D)
     CodeLabel* L;
 
 
-    /* Inline the sbc */
+    /* Inline the compare */
     D->IP = D->OpIndex+1;
 
     /* Must be true because of OP_RHS_LOAD */
@@ -1310,6 +1391,22 @@ static unsigned Opt_tosorax (StackOpData* D)
 
     /* We changed the sequence */
     return 1;
+}
+
+
+
+static unsigned Opt_tosshlax (StackOpData* D)
+/* Optimize the tosshlax sequence */
+{
+    return Opt_tosshift (D, "shlaxy");
+}
+
+
+
+static unsigned Opt_tosshrax (StackOpData* D)
+/* Optimize the tosshrax sequence */
+{
+    return Opt_tosshift (D, "shraxy");
 }
 
 
@@ -1547,11 +1644,18 @@ static const OptFuncDesc FuncTable[] = {
     { "staxspidx",  Opt_staxspidx, REG_AX,   OP_NONE                    },
     { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                    },
     { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                    },
+    { "tosaslax",   Opt_tosaslax,  REG_NONE, OP_NONE                    },
+#if 0 
+    /* Library routine missing */
+    { "tosasrax",   Opt_tosasrax,  REG_NONE, OP_NONE                    },
+#endif
     { "toseqax",    Opt_toseqax,   REG_NONE, OP_NONE                    },
     { "tosgeax",    Opt_tosgeax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosltax",    Opt_tosltax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosneax",    Opt_tosneax,   REG_NONE, OP_NONE                    },
     { "tosorax",    Opt_tosorax,   REG_NONE, OP_NONE                    },
+    { "tosshlax",   Opt_tosshlax,  REG_NONE, OP_NONE                    },
+    { "tosshrax",   Opt_tosshrax,  REG_NONE, OP_NONE                    },
     { "tossubax",   Opt_tossubax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosugeax",   Opt_tosugeax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosugtax",   Opt_tosugtax,  REG_NONE, OP_RHS_LOAD_DIRECT         },
@@ -1599,11 +1703,13 @@ static int HarmlessCall (const char* Name)
         "aslax2",
         "aslax3",
         "aslax4",
+        "aslaxy",
         "asrax1",
         "asrax2",
         "asrax3",
         "asrax4",
         "bnegax",
+        "complax",
         "decax1",
         "decax2",
         "decax3",
@@ -1629,6 +1735,7 @@ static int HarmlessCall (const char* Name)
         "shlax2",
         "shlax3",
         "shlax4",
+        "shlaxy",
         "shrax1",
         "shrax2",
         "shrax3",
@@ -1744,6 +1851,9 @@ unsigned OptStackOps (CodeSeg* S)
     StackOpData         Data;
     int                 I;
     int                 OldEntryCount;  /* Old number of entries */
+    unsigned            UsedRegs;       /* Registers used */
+    unsigned            ChangedRegs;    /* Registers changed */
+
 
     enum {
         Initialize,
@@ -1782,6 +1892,7 @@ unsigned OptStackOps (CodeSeg* S)
 
             case Initialize:
                 ResetStackOpData (&Data);
+                UsedRegs = ChangedRegs = REG_NONE;
                 State = Search;
                 /* FALLTHROUGH */
 
@@ -1868,6 +1979,17 @@ unsigned OptStackOps (CodeSeg* S)
                     Data.UsedRegs |= (E->Use | E->Chg);
                     TrackLoads (&Data.Rhs, E, I);
                 }
+                /* If the registers from the push (A/X) are used before they're
+                 * changed, we cannot change the sequence, because this would
+                 * with a high probability change the register contents.
+                 */
+                UsedRegs |= E->Use;
+                if ((UsedRegs & ~ChangedRegs) & REG_AX) {
+                    I = Data.PushIndex;
+                    State = Initialize;
+                    break;
+                }
+                ChangedRegs |= E->Chg;
                 break;
 
             case FoundOp:

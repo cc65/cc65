@@ -1645,7 +1645,7 @@ static const OptFuncDesc FuncTable[] = {
     { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                    },
     { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                    },
     { "tosaslax",   Opt_tosaslax,  REG_NONE, OP_NONE                    },
-#if 0 
+#if 0
     /* Library routine missing */
     { "tosasrax",   Opt_tosasrax,  REG_NONE, OP_NONE                    },
 #endif
@@ -1851,8 +1851,8 @@ unsigned OptStackOps (CodeSeg* S)
     StackOpData         Data;
     int                 I;
     int                 OldEntryCount;  /* Old number of entries */
-    unsigned            UsedRegs;       /* Registers used */
-    unsigned            ChangedRegs;    /* Registers changed */
+    unsigned            UsedRegs = 0;   /* Registers used */
+    unsigned            ChangedRegs = 0;/* Registers changed */
 
 
     enum {

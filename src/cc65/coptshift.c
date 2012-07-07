@@ -444,6 +444,11 @@ unsigned OptShift4 (CodeSeg* S)
                  *     dey
                  *     bpl     L1
                  *     rol     a
+                 * 
+                 * A negative shift count or one that is greater or equal than 
+                 * the bit width of the left operand (which is promoted to 
+                 * integer before the operation) causes undefined behaviour, so
+                 * above transformation is safe.
                  */
                 CodeLabel* L;
 

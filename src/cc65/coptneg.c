@@ -557,3 +557,54 @@ unsigned OptNegAX2 (CodeSeg* S)
 
 
 
+/*****************************************************************************/
+/*                           complax optimizations                           */
+/*****************************************************************************/
+
+
+
+unsigned OptComplAX1 (CodeSeg* S)
+/* Search for a call to complax and replace it by
+ *
+ *      eor     #$FF
+ *
+ * if X isn't used later.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if this is a call to negax, and if X isn't used later */
+       	if (CE_IsCallTo (E, "complax") && !RegXUsed (S, I+1)) {
+
+            CodeEntry* X;
+
+            /* Add replacement code behind */
+	    X = NewCodeEntry (OP65_EOR, AM65_IMM, "$FF", 0, E->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+            /* Delete the call to negax */
+	    CS_DelEntry (S, I);
+
+	    /* We had changes */
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+

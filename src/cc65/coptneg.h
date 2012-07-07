@@ -164,6 +164,22 @@ unsigned OptNegAX2 (CodeSeg* S);
 
 
 
+/*****************************************************************************/
+/*                           complax optimizations                           */
+/*****************************************************************************/
+
+
+
+unsigned OptComplAX1 (CodeSeg* S);
+/* Search for a call to complax and replace it by
+ *
+ *      eor     #$FF
+ *
+ * if X isn't used later.
+ */
+
+
+
 /* End of coptneg.h */
 
 #endif

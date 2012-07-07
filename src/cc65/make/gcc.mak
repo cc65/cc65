@@ -62,6 +62,7 @@ OBJS =	anonname.o	\
 	coptptrload.o   \
         coptptrstore.o  \
 	coptpush.o	\
+        coptshift.o     \
 	coptsize.o      \
 	coptstop.o	\
 	coptstore.o     \

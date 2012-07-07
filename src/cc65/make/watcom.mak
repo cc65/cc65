@@ -94,6 +94,7 @@ OBJS =	anonname.obj	\
         coptptrload.obj \
         coptptrstore.obj\
 	coptpush.obj	\
+        coptshift.obj   \
         coptsize.obj    \
 	coptstop.obj	\
         coptstore.obj   \

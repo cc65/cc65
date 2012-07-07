@@ -412,7 +412,7 @@ unsigned OptShift3 (CodeSeg* S)
 	    !CS_RangeHasLabel (S, I, 2)                         &&
             L[2]->OPC == OP65_JSR                               &&
             (Shift = GetShift (L[2]->Arg)) != SHIFT_NONE        &&
-            SHIFT_TYPE (Shift) == SHIFT_TYPE_ASR                &&
+            SHIFT_DIR (Shift) == SHIFT_DIR_RIGHT                &&
             (Count = SHIFT_COUNT (Shift)) > 0                   &&
 	    !RegXUsed (S, I+3)) {
 

@@ -1086,6 +1086,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
         C += RunOptFunc (S, &DOptNegAX1, 1);
         C += RunOptFunc (S, &DOptNegAX2, 1);
        	C += RunOptFunc (S, &DOptStackOps, 3);
+        C += RunOptFunc (S, &DOptShift1, 1);
         C += RunOptFunc (S, &DOptShift4, 1);
        	C += RunOptFunc (S, &DOptSub1, 1);
        	C += RunOptFunc (S, &DOptSub2, 1);

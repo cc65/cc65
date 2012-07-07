@@ -128,10 +128,10 @@ enum {
 
 
 /* Macros to extract values from a shift type */
-#define SHIFT_COUNT(S)  ((S) & SHIFT_MASK_COUNT)
-#define SHIFT_DIR(S)    ((S) & SHIFT_MASK_DIR)
-#define SHIFT_MODE(S)   ((S) & SHIFT_MASK_MODE)
-#define SHIFT_TYPE(S)   ((S) & SHIFT_MASK_TYPE)
+#define SHIFT_COUNT(S)          ((S) & SHIFT_MASK_COUNT)
+#define SHIFT_DIR(S)            ((S) & SHIFT_MASK_DIR)
+#define SHIFT_MODE(S)           ((S) & SHIFT_MASK_MODE)
+#define SHIFT_TYPE(S)           ((S) & SHIFT_MASK_TYPE)
 
 
 
@@ -208,7 +208,6 @@ unsigned OptShift1 (CodeSeg* S)
     while (I < CS_GetEntryCount (S)) {
 
         unsigned   Shift;
-        unsigned   Count;
         CodeEntry* N;
         CodeEntry* X;
         CodeLabel* L;
@@ -219,22 +218,52 @@ unsigned OptShift1 (CodeSeg* S)
      	/* Check for the sequence */
 	if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
-            SHIFT_DIR (Shift) == SHIFT_DIR_LEFT         &&
-            (Count = SHIFT_COUNT (Shift)) > 0) {
+            SHIFT_DIR (Shift) == SHIFT_DIR_LEFT) {
 
+
+            unsigned Count = SHIFT_COUNT (Shift);
             if (!RegXUsed (S, I+1)) {
 
-                /* Insert shift insns */
-                while (Count--) {
+                if (Count == SHIFT_COUNT_Y) {
+
+                    CodeLabel* L;
+
+                    if (S->CodeSizeFactor < 200) {
+                        goto NextEntry;
+                    }
+
+                    /* Change into
+                     *
+                     * L1:  asl     a
+                     *      dey
+                     *      bpl     L1
+                     *      ror     a
+                     */
+
+                    /* asl a */
                     X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
                     CS_InsertEntry (S, X, I+1);
+                    L = CS_GenLabel (S, X);
+
+                    /* dey */
+                    X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
+                    CS_InsertEntry (S, X, I+2);
+
+                    /* bpl L1 */
+                    X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, E->LI);
+                    CS_InsertEntry (S, X, I+3);
+
+                    /* ror a */
+                    X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, E->LI);
+                    CS_InsertEntry (S, X, I+4);
+
+                } else {
+                    /* Insert shift insns */
+                    while (Count--) {
+                        X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
+                        CS_InsertEntry (S, X, I+1);
+                    }
                 }
-
-                /* Delete the call to shlax */
-                CS_DelEntry (S, I);
-
-                /* Remember, we had changes */
-                ++Changes;
 
             } else if (E->RI->In.RegX == 0              &&
                        Count == 1                       &&
@@ -253,15 +282,21 @@ unsigned OptShift1 (CodeSeg* S)
                 X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
                 CS_InsertEntry (S, X, I+3);
 
-                /* Delete the call to shlax */
-                CS_DelEntry (S, I);
+            } else {
 
-                /* Remember, we had changes */
-                ++Changes;
+                /* We won't handle this one */
+                goto NextEntry;
+
             }
 
+            /* Delete the call to shlax */
+            CS_DelEntry (S, I);
+
+            /* Remember, we had changes */
+            ++Changes;
 	}
 
+NextEntry:
 	/* Next entry */
 	++I;
 
@@ -438,19 +473,25 @@ unsigned OptShift4 (CodeSeg* S)
             Count = SHIFT_COUNT (Shift);
             if (Count == SHIFT_COUNT_Y) {
 
+                CodeLabel* L;
+
+                if (S->CodeSizeFactor < 200) {
+                    /* Not acceptable */
+                    goto NextEntry;
+                }
+
                 /* Generate:
                  *
                  * L1: lsr     a
                  *     dey
                  *     bpl     L1
                  *     rol     a
-                 * 
-                 * A negative shift count or one that is greater or equal than 
-                 * the bit width of the left operand (which is promoted to 
+                 *
+                 * A negative shift count or one that is greater or equal than
+                 * the bit width of the left operand (which is promoted to
                  * integer before the operation) causes undefined behaviour, so
                  * above transformation is safe.
                  */
-                CodeLabel* L;
 
                 /* lsr a */
                 X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
@@ -486,6 +527,7 @@ unsigned OptShift4 (CodeSeg* S)
 
 	}
 
+NextEntry:
 	/* Next entry */
 	++I;
 

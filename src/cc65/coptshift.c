@@ -36,7 +36,7 @@
 /* common */
 #include "chartype.h"
 
-/* cc65 */           
+/* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptshift.h"
@@ -49,19 +49,141 @@
 
 
 
-/* Shift types */
+/* Shift types. Shift type is in the first byte, shift count in the second */
 enum {
-    SHIFT_NONE,
-    SHIFT_ASR_1,
-    SHIFT_ASL_1,
-    SHIFT_LSR_1,
-    SHIFT_LSL_1
+    SHIFT_NONE          = 0x0000,
+
+    /* Masks */
+    SHIFT_MASK_COUNT    = 0x00FF,
+    SHIFT_MASK_DIR      = 0x0F00,
+    SHIFT_MASK_MODE     = 0xF000,       /* Arithmetic or logical */
+    SHIFT_MASK_TYPE     = SHIFT_MASK_DIR | SHIFT_MASK_MODE,
+
+    /* Shift counts */
+    SHIFT_COUNT_Y       = 0x0000,       /* Count is in Y register */
+    SHIFT_COUNT_1       = 0x0001,
+    SHIFT_COUNT_2       = 0x0002,
+    SHIFT_COUNT_3       = 0x0003,
+    SHIFT_COUNT_4       = 0x0004,
+    SHIFT_COUNT_5       = 0x0005,
+    SHIFT_COUNT_6       = 0x0006,
+    SHIFT_COUNT_7       = 0x0007,
+
+    /* Shift directions */
+    SHIFT_DIR_LEFT      = 0x0100,
+    SHIFT_DIR_RIGHT     = 0x0200,
+
+    /* Shift modes */
+    SHIFT_MODE_ARITH    = 0x1000,
+    SHIFT_MODE_LOGICAL  = 0x2000,
+
+    /* Shift types */
+    SHIFT_TYPE_ASL      = SHIFT_DIR_LEFT  | SHIFT_MODE_ARITH,
+    SHIFT_TYPE_ASR      = SHIFT_DIR_RIGHT | SHIFT_MODE_ARITH,
+    SHIFT_TYPE_LSL      = SHIFT_DIR_LEFT  | SHIFT_MODE_LOGICAL,
+    SHIFT_TYPE_LSR      = SHIFT_DIR_RIGHT | SHIFT_MODE_LOGICAL,
+
+    /* Complete specs */
+    SHIFT_ASL_Y         = SHIFT_TYPE_ASL | SHIFT_COUNT_Y,
+    SHIFT_ASR_Y         = SHIFT_TYPE_ASR | SHIFT_COUNT_Y,
+    SHIFT_LSL_Y         = SHIFT_TYPE_LSL | SHIFT_COUNT_Y,
+    SHIFT_LSR_Y         = SHIFT_TYPE_LSR | SHIFT_COUNT_Y,
+
+    SHIFT_ASL_1         = SHIFT_TYPE_ASL | SHIFT_COUNT_1,
+    SHIFT_ASR_1         = SHIFT_TYPE_ASR | SHIFT_COUNT_1,
+    SHIFT_LSL_1         = SHIFT_TYPE_LSL | SHIFT_COUNT_1,
+    SHIFT_LSR_1         = SHIFT_TYPE_LSR | SHIFT_COUNT_1,
+
+    SHIFT_ASL_2         = SHIFT_TYPE_ASL | SHIFT_COUNT_2,
+    SHIFT_ASR_2         = SHIFT_TYPE_ASR | SHIFT_COUNT_2,
+    SHIFT_LSL_2         = SHIFT_TYPE_LSL | SHIFT_COUNT_2,
+    SHIFT_LSR_2         = SHIFT_TYPE_LSR | SHIFT_COUNT_2,
+
+    SHIFT_ASL_3         = SHIFT_TYPE_ASL | SHIFT_COUNT_3,
+    SHIFT_ASR_3         = SHIFT_TYPE_ASR | SHIFT_COUNT_3,
+    SHIFT_LSL_3         = SHIFT_TYPE_LSL | SHIFT_COUNT_3,
+    SHIFT_LSR_3         = SHIFT_TYPE_LSR | SHIFT_COUNT_3,
+
+    SHIFT_ASL_4         = SHIFT_TYPE_ASL | SHIFT_COUNT_4,
+    SHIFT_ASR_4         = SHIFT_TYPE_ASR | SHIFT_COUNT_4,
+    SHIFT_LSL_4         = SHIFT_TYPE_LSL | SHIFT_COUNT_4,
+    SHIFT_LSR_4         = SHIFT_TYPE_LSR | SHIFT_COUNT_4,
+
+    SHIFT_ASL_5         = SHIFT_TYPE_ASL | SHIFT_COUNT_5,
+    SHIFT_ASR_5         = SHIFT_TYPE_ASR | SHIFT_COUNT_5,
+    SHIFT_LSL_5         = SHIFT_TYPE_LSL | SHIFT_COUNT_5,
+    SHIFT_LSR_5         = SHIFT_TYPE_LSR | SHIFT_COUNT_5,
+
+    SHIFT_ASL_6         = SHIFT_TYPE_ASL | SHIFT_COUNT_6,
+    SHIFT_ASR_6         = SHIFT_TYPE_ASR | SHIFT_COUNT_6,
+    SHIFT_LSL_6         = SHIFT_TYPE_LSL | SHIFT_COUNT_6,
+    SHIFT_LSR_6         = SHIFT_TYPE_LSR | SHIFT_COUNT_6,
+
+    SHIFT_ASL_7         = SHIFT_TYPE_ASL | SHIFT_COUNT_7,
+    SHIFT_ASR_7         = SHIFT_TYPE_ASR | SHIFT_COUNT_7,
+    SHIFT_LSL_7         = SHIFT_TYPE_LSL | SHIFT_COUNT_7,
+    SHIFT_LSR_7         = SHIFT_TYPE_LSR | SHIFT_COUNT_7,
 };
 
 
 
+/* Macros to extract values from a shift type */
+#define SHIFT_COUNT(S)  ((S) & SHIFT_MASK_COUNT)
+#define SHIFT_DIR(S)    ((S) & SHIFT_MASK_DIR)
+#define SHIFT_MODE(S)   ((S) & SHIFT_MASK_MODE)
+#define SHIFT_TYPE(S)   ((S) & SHIFT_MASK_TYPE)
+
+
+
 /*****************************************************************************/
-/*				Optimize shifts                              */
+/*                              Helper routines                              */
+/*****************************************************************************/
+
+
+
+static unsigned GetShift (const char* Name)
+/* Determine the shift from the name of the subroutine */
+{
+    unsigned Type;
+
+    if (strncmp (Name, "aslax", 5) == 0) {
+        Type = SHIFT_TYPE_ASL;
+    } else if (strncmp (Name, "asrax", 5) == 0) {
+        Type = SHIFT_TYPE_ASR;
+    } else if (strncmp (Name, "shlax", 5) == 0) {
+        Type = SHIFT_TYPE_LSL;
+    } else if (strncmp (Name, "shrax", 5) == 0) {
+        Type = SHIFT_TYPE_LSR;
+    } else {
+        /* Nothing we know */
+        return SHIFT_NONE;
+    }
+
+    /* Get the count */
+    switch (Name[5]) {
+        case 'y':       Type |= SHIFT_COUNT_Y;  break;
+        case '1':       Type |= SHIFT_COUNT_1;  break;
+        case '2':       Type |= SHIFT_COUNT_2;  break;
+        case '3':       Type |= SHIFT_COUNT_3;  break;
+        case '4':       Type |= SHIFT_COUNT_4;  break;
+        case '5':       Type |= SHIFT_COUNT_5;  break;
+        case '6':       Type |= SHIFT_COUNT_6;  break;
+        case '7':       Type |= SHIFT_COUNT_7;  break;
+        default:        return SHIFT_NONE;
+    }
+
+    /* Make sure nothing follows */
+    if (Name[6] == '\0') {
+        return Type;
+    } else {
+        return SHIFT_NONE;
+    }
+}
+
+
+
+/*****************************************************************************/
+/*	       			Optimize shifts                              */
 /*****************************************************************************/
 
 
@@ -85,6 +207,8 @@ unsigned OptShift1 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
+        unsigned   Shift;
+        unsigned   Count;
         CodeEntry* N;
         CodeEntry* X;
         CodeLabel* L;
@@ -93,16 +217,14 @@ unsigned OptShift1 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                       &&
-       	    (strncmp (E->Arg, "shlax", 5) == 0 ||
-	     strncmp (E->Arg, "aslax", 5) == 0)	     &&
-	    strlen (E->Arg) == 6                     &&
-	    IsDigit (E->Arg[5])) {
+	if (E->OPC == OP65_JSR                          &&
+            (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
+            SHIFT_DIR (Shift) == SHIFT_DIR_LEFT         &&
+            (Count = SHIFT_COUNT (Shift)) > 0) {
 
             if (!RegXUsed (S, I+1)) {
 
                 /* Insert shift insns */
-                unsigned Count = E->Arg[5] - '0';
                 while (Count--) {
                     X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
                     CS_InsertEntry (S, X, I+1);
@@ -115,7 +237,7 @@ unsigned OptShift1 (CodeSeg* S)
                 ++Changes;
 
             } else if (E->RI->In.RegX == 0              &&
-                       E->Arg[5] == '1'                 &&
+                       Count == 1                       &&
                        (N = CS_GetNextEntry (S, I)) != 0) {
 
                 /* asl a */
@@ -167,17 +289,17 @@ unsigned OptShift2(CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
+        unsigned Shift;
         unsigned Count;
 
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                  &&
-       	    strncmp (E->Arg, "asrax", 5) == 0   &&
-	    strlen (E->Arg) == 6                &&
-	    IsDigit (E->Arg[5])                 &&
-            (Count = (E->Arg[5] - '0')) >= 1    &&
+	if (E->OPC == OP65_JSR                          &&
+            (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
+            SHIFT_TYPE (Shift) == SHIFT_TYPE_ASR        &&
+            (Count = SHIFT_COUNT (Shift)) > 0           &&
             Count * 100 <= S->CodeSizeFactor    &&
             !RegXUsed (S, I+1)) {
 
@@ -238,6 +360,8 @@ unsigned OptShift3 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
+        unsigned   Shift;
+        unsigned   Count;
 	CodeEntry* L[3];
 
       	/* Get next entry */
@@ -252,17 +376,15 @@ unsigned OptShift3 (CodeSeg* S)
 	    L[0]->JumpTo->Owner == L[2]                         &&
 	    !CS_RangeHasLabel (S, I, 2)                         &&
             L[2]->OPC == OP65_JSR                               &&
-            strlen (L[2]->Arg) == 6                             &&
-            memcmp (L[2]->Arg, "shrax", 5) == 0                 &&
-            IsDigit (L[2]->Arg[5])                              &&
+            (Shift = GetShift (L[2]->Arg)) != SHIFT_NONE        &&
+            SHIFT_TYPE (Shift) == SHIFT_TYPE_ASR                &&
+            (Count = SHIFT_COUNT (Shift)) > 0                   &&
 	    !RegXUsed (S, I+3)) {
-
-            unsigned ShiftCount = (L[2]->Arg[5] - '0');
 
             /* Add the replacement insn instead */
             CodeEntry* X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
             CS_InsertEntry (S, X, I+3);
-            while (--ShiftCount) {
+            while (--Count) {
                 X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, L[2]->LI);
                 CS_InsertEntry (S, X, I+4);
             }
@@ -298,23 +420,58 @@ unsigned OptShift4 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
+        unsigned Shift;
+        unsigned Count;
+
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
 	if (E->OPC == OP65_JSR                          &&
-       	    (strncmp (E->Arg, "shrax", 5) == 0  ||
-             strncmp (E->Arg, "asrax", 5) == 0)         &&
-	    strlen (E->Arg) == 6                        &&
-	    IsDigit (E->Arg[5])                         &&
+            (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
+            SHIFT_DIR (Shift) == SHIFT_DIR_RIGHT        &&
        	    E->RI->In.RegX == 0) {
 
-	    /* Insert shift insns */
-	    unsigned Count = E->Arg[5] - '0';
-	    while (Count--) {
-	    	CodeEntry* X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
-    	    	CS_InsertEntry (S, X, I+1);
-	    }
+            CodeEntry* X;
+
+            /* Shift count may be in Y */
+            Count = SHIFT_COUNT (Shift);
+            if (Count == SHIFT_COUNT_Y) {
+
+                /* Generate:
+                 *
+                 * L1: lsr     a
+                 *     dey
+                 *     bpl     L1
+                 *     rol     a
+                 */
+                CodeLabel* L;
+
+                /* lsr a */
+                X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
+                CS_InsertEntry (S, X, I+1);
+                L = CS_GenLabel (S, X);
+
+                /* dey */
+                X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
+                CS_InsertEntry (S, X, I+2);
+
+                /* bpl L1 */
+                X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, E->LI);
+                CS_InsertEntry (S, X, I+3);
+
+                /* rol a */
+                X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, E->LI);
+                CS_InsertEntry (S, X, I+4);
+
+            } else {
+                /* Insert shift insns */
+                while (Count--) {
+                    X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
+                    CS_InsertEntry (S, X, I+1);
+                }
+
+            }
 
 	    /* Delete the call to shrax */
 	    CS_DelEntry (S, I);
@@ -331,27 +488,6 @@ unsigned OptShift4 (CodeSeg* S)
 
     /* Return the number of changes made */
     return Changes;
-}
-
-
-
-static unsigned GetShiftType (const char* Sub)
-/* Helper function for OptShift5 */
-{
-    if (*Sub == 'a') {
-        if (strcmp (Sub+1, "slax1") == 0) {
-            return SHIFT_ASL_1;
-        } else if (strcmp (Sub+1, "srax1") == 0) {
-            return SHIFT_ASR_1;
-        }
-    } else if (*Sub == 's') {
-        if (strcmp (Sub+1, "hlax1") == 0) {
-            return SHIFT_LSL_1;
-        } else if (strcmp (Sub+1, "hrax1") == 0) {
-            return SHIFT_LSR_1;
-        }
-    }
-    return SHIFT_NONE;
 }
 
 
@@ -397,7 +533,8 @@ unsigned OptShift5 (CodeSeg* S)
             L[1]->OPC == OP65_LDX                               &&
             (L[1]->AM == AM65_ABS || L[1]->AM == AM65_ZP)       &&
             L[2]->OPC == OP65_JSR                               &&
-            (ShiftType = GetShiftType (L[2]->Arg)) != SHIFT_NONE&&
+            (ShiftType = GetShift (L[2]->Arg)) != SHIFT_NONE    &&
+            SHIFT_COUNT(ShiftType) == 1                         &&
        	    L[3]->OPC == OP65_STA                               &&
             (L[3]->AM == AM65_ABS || L[3]->AM == AM65_ZP)       &&
             L[4]->OPC == OP65_STX                               &&
@@ -486,6 +623,8 @@ unsigned OptShift6 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
+        unsigned   Shift;
+        unsigned   Count;
         CodeEntry* X;
         unsigned   IP;
 
@@ -494,13 +633,9 @@ unsigned OptShift6 (CodeSeg* S)
 
      	/* Check for a call to one of the shift routine */
 	if (E->OPC == OP65_JSR                          &&
-       	    (strncmp (E->Arg, "shlax", 5) == 0  ||
-             strncmp (E->Arg, "aslax", 5) == 0)         &&
-	    strlen (E->Arg) == 6                        &&
-	    IsDigit (E->Arg[5])) {
-
-            /* Get number of shifts */
-            unsigned ShiftCount = (E->Arg[5] - '0');
+            (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
+            SHIFT_DIR (Shift) == SHIFT_DIR_LEFT         &&
+            (Count = SHIFT_COUNT (Shift)) > 0) {
 
             /* Code is:
              *
@@ -516,8 +651,8 @@ unsigned OptShift6 (CodeSeg* S)
              * and replaces a txa, so for a shift count of 1, we get a factor
              * of 200, which matches nicely the CodeSizeFactor enabled with -Oi
              */
-            if (ShiftCount > 1 || S->CodeSizeFactor > 200) {
-                unsigned Size = 4 + 3 * ShiftCount;
+            if (Count > 1 || S->CodeSizeFactor > 200) {
+                unsigned Size = 4 + 3 * Count;
                 if ((Size * 100 / 3) > S->CodeSizeFactor) {
                     /* Not acceptable */
                     goto NextEntry;
@@ -531,7 +666,7 @@ unsigned OptShift6 (CodeSeg* S)
             X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, E->LI);
             CS_InsertEntry (S, X, IP++);
 
-            while (ShiftCount--) {
+            while (Count--) {
                 /* asl a */
                 X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
                 CS_InsertEntry (S, X, IP++);

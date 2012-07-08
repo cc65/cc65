@@ -1108,12 +1108,12 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptRTSJumps1, 1);
        	C += RunOptFunc (S, &DOptCmp1, 1);
        	C += RunOptFunc (S, &DOptCmp2, 1);
+       	C += RunOptFunc (S, &DOptCmp8, 1);      /* Must run before OptCmp3 */
        	C += RunOptFunc (S, &DOptCmp3, 1);
        	C += RunOptFunc (S, &DOptCmp4, 1);
        	C += RunOptFunc (S, &DOptCmp5, 1);
        	C += RunOptFunc (S, &DOptCmp6, 1);
        	C += RunOptFunc (S, &DOptCmp7, 1);
-       	C += RunOptFunc (S, &DOptCmp8, 1);
        	C += RunOptFunc (S, &DOptCmp9, 1);
        	C += RunOptFunc (S, &DOptTest1, 1);
         C += RunOptFunc (S, &DOptLoad1, 1);

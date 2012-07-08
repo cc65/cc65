@@ -381,7 +381,7 @@ unsigned OptShift3 (CodeSeg* S)
  *
  *      ror     a
  *
- * if X is zero on entry and unused later. For shift counts > 1, more
+ * if X is zero on entry. For shift counts > 1, more
  *
  *      shr     a
  *
@@ -413,9 +413,8 @@ unsigned OptShift3 (CodeSeg* S)
             L[2]->OPC == OP65_JSR                               &&
             (Shift = GetShift (L[2]->Arg)) != SHIFT_NONE        &&
             SHIFT_DIR (Shift) == SHIFT_DIR_RIGHT                &&
-            (Count = SHIFT_COUNT (Shift)) > 0                   &&
-	    !RegXUsed (S, I+3)) {
-
+            (Count = SHIFT_COUNT (Shift)) > 0) {
+                                                
             /* Add the replacement insn instead */
             CodeEntry* X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
             CS_InsertEntry (S, X, I+3);

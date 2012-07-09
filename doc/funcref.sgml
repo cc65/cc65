@@ -143,27 +143,26 @@ function.
 
 <sect1><tt/cbm.h/<label id="cbm.h"><p>
 
-<!-- <itemize> -->
-<!-- <item><ref id="cbm_k_acptr" name="cbm_k_acptr"> -->
-<!-- <item><ref id="cbm_k_basin" name="cbm_k_basin"> -->
-<!-- <item><ref id="cbm_k_bsout" name="cbm_k_bsout"> -->
-<!-- <item><ref id="cbm_k_chkin" name="cbm_k_chkin"> -->
-<!-- <item><ref id="cbm_k_ciout" name="cbm_k_ciout"> -->
-<!-- <item><ref id="cbm_k_ckout" name="cbm_k_ckout"> -->
-<!-- <item><ref id="cbm_k_clall" name="cbm_k_clall"> -->
-<!-- <item><ref id="cbm_k_close" name="cbm_k_close"> -->
-<!-- <item><ref id="cbm_k_clrch" name="cbm_k_clrch"> -->
-<!-- <item><ref id="cbm_k_getin" name="cbm_k_getin"> -->
-<!-- <item><ref id="cbm_k_iobase" name="cbm_k_iobase"> -->
-<!-- <item><ref id="cbm_k_listen" name="cbm_k_listen"> -->
-<!-- <item><ref id="cbm_k_load" name="cbm_k_load"> -->
-<!-- <item><ref id="cbm_k_open" name="cbm_k_open"> -->
-<!-- <item><ref id="cbm_k_readst" name="cbm_k_readst"> -->
-<!-- <item><ref id="cbm_k_save" name="cbm_k_save"> -->
-<!-- <item><ref id="cbm_k_setlfs" name="cbm_k_setlfs"> -->
-<!-- <item><ref id="cbm_k_setnam" name="cbm_k_setnam"> -->
-<!-- <item><ref id="cbm_k_talk" name="cbm_k_talk"> -->
-<!-- <item><ref id="cbm_k_unlsn" name="cbm_k_unlsn"> -->
+<itemize>
+<item><ref id="cbm_k_acptr" name="cbm_k_acptr">
+<item><ref id="cbm_k_basin" name="cbm_k_basin">
+<item><ref id="cbm_k_bsout" name="cbm_k_bsout">
+<item><ref id="cbm_k_chkin" name="cbm_k_chkin">
+<item><ref id="cbm_k_ciout" name="cbm_k_ciout">
+<item><ref id="cbm_k_ckout" name="cbm_k_ckout">
+<item><ref id="cbm_k_clall" name="cbm_k_clall">
+<item><ref id="cbm_k_close" name="cbm_k_close">
+<item><ref id="cbm_k_clrch" name="cbm_k_clrch">
+<item><ref id="cbm_k_getin" name="cbm_k_getin">
+<item><ref id="cbm_k_iobase" name="cbm_k_iobase">
+<item><ref id="cbm_k_listen" name="cbm_k_listen">
+<item><ref id="cbm_k_load" name="cbm_k_load">
+<item><ref id="cbm_k_open" name="cbm_k_open">
+<item><ref id="cbm_k_readst" name="cbm_k_readst">
+<item><ref id="cbm_k_save" name="cbm_k_save">
+<item><ref id="cbm_k_setlfs" name="cbm_k_setlfs">
+<item><ref id="cbm_k_setnam" name="cbm_k_setnam">
+<item><ref id="cbm_k_unlsn" name="cbm_k_unlsn">
 <!-- <item><ref id="cbm_load" name="cbm_load"> -->
 <!-- <item><ref id="cbm_open" name="cbm_open"> -->
 <!-- <item><ref id="cbm_opendir" name="cbm_opendir"> -->
@@ -171,7 +170,7 @@ function.
 <!-- <item><ref id="cbm_readdir" name="cbm_readdir"> -->
 <!-- <item><ref id="cbm_save" name="cbm_save"> -->
 <!-- <item><ref id="cbm_write" name="cbm_write"> -->
-<!-- </itemize> -->
+</itemize>
 
 (incomplete)
 
@@ -1553,6 +1552,494 @@ be used in presence of a prototype.
 <ref id="free" name="free">,
 <ref id="malloc" name="malloc">,
 <ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_acptr<label id="cbm_k_acptr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Input byte from serial bus
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char cbm_k_acptr (void);/
+<tag/Description/The function returns a byte of data, which it
+gets from the current TALKer on the serial bus.
+In order to receive the data, the device must have previously been
+sent a command to TALK and a secondary address if it needs one.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_talk" name="cbm_k_talk">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_basin<label id="cbm_k_basin"><p>
+
+<quote>
+<descrip>
+<tag/Function/Input a Character from the Current Device
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char cbm_k_basin (void);/
+<tag/Description/The function returns a character from the current input device.
+Device must first have been OPENed and then designated as the input channel by the CHKIN routine.
+When this function is called, the next byte of data available from the device is returned.
+Exception is the routine for the keyboard device (which is the default input device).
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_chkin" name="cbm_k_chkin">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_bsout<label id="cbm_k_bsout"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a byte
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_bsout (unsigned char C);/
+<tag/Description/Function sends the character to the current output device.
+Unless a device has been OPENed and designated as the
+current output channel using the CHKOUT routine, the character is
+printed to the screen, which is the default output device.  If the
+cassette is the current device, outputting a byte will only add it to
+the buffer. No actual transmission of data will occur until the
+192-byte buffer is full.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_chkin" name="cbm_k_chkout">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_chkin<label id="cbm_k_chkin"><p>
+
+<quote>
+<descrip>
+<tag/Function/Designate a Logical File As the Current Input Channel
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);/
+<tag/Description/If you wish to
+get data from any device other than the keyboard, this function must be
+called after OPENing the device, before you can get a data byte with
+the cbm_k_basin or cbm_k_getin routine.  When called, the routine will designate
+the logical file whose file number was supplied as the
+current file, its device as the current device, and its secondary
+address as the current secondary address.  If the device on the
+channel is a serial device, which requires a TALK command and
+sometimes a secondary address, function will send them over the
+serial bus.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_basin" name="cbm_k_basin">,
+<ref id="cbm_k_getin" name="cbm_k_getin">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_ciout<label id="cbm_k_ciout"><p>
+
+<quote>
+<descrip>
+<tag/Function/Transmit a byte over the serial bus
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_ciout (unsigned char C);/
+<tag/Description/Purpose of this function is to send a byte of data over
+the serial bus.  In order for the data to be received, the serial
+device must have first been commanded to LISTEN and been given a
+secondary address if necessary.  This routine always buffers the
+current character, and defers sending it until the next byte is
+buffered.  When the UNLISTEN command is sent, the last byte will be
+sent with an End or Identify (EOI).
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_listen" name="cbm_k_listen">,
+<ref id="cbm_k_unlsn" name="cbm_k_unlsn">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_ckout<label id="cbm_k_ckout"><p>
+
+<quote>
+<descrip>
+<tag/Function/Designate a Logical File As the Current Output Channel
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);/
+<tag/Description/If you wish to
+output data to any device other than the screen, this routine must be
+called after OPENing the device, and before you output a data byte
+with the cbm_k_bsout() function.  When called, the function will designate the
+logical file whose file number was supplied as the current
+file, its device as the current device, and its secondary address as
+the current secondary address.  If the device on the channel uses the
+serial bus, and therefore requires a LISTEN command and possibly a
+secondary address, this information will be sent on the bus.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_bsout" name="cbm_k_bsout">,
+<ref id="cbm_k_listen" name="cbm_k_listen">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_clall<label id="cbm_k_clall"><p>
+
+<quote>
+<descrip>
+<tag/Function/Close All Logical I/O Files
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_clall (void);/
+<tag/Description/It closes all
+open files, by resetting the index into open files to
+zero and restores the default I/O devices.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_close" name="cbm_k_close">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_close<label id="cbm_k_close"><p>
+
+<quote>
+<descrip>
+<tag/Function/Close a Logical I/O File
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_close (unsigned char FN);/
+<tag/Description/It is used to
+close a logical file after all I/O operations involving that file have
+been completed.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_clall" name="cbm_k_clall">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_clrch<label id="cbm_k_clrch"><p>
+
+<quote>
+<descrip>
+<tag/Function/Restore Current Input and Output Devices to the Default Devices
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_clrch (void);/
+<tag/Description/It sets the
+current input device to the keyboard, and the current output device to
+the screen.  Also, if the current input device was formerly a serial
+device, the routine sends it an UNTALK command on the serial bus, and
+if a serial device was formerly the current output device, the routine
+sends it an UNLISTEN command.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_chkin" name="cbm_k_chkin">,
+<ref id="cbm_k_ckout" name="cbm_k_ckout">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_getin<label id="cbm_k_getin"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get One Byte from the Input Device
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char cbm_k_getin (void);/
+<tag/Description/Function gets a character from the current input device.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_basin" name="cbm_k_basin">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_iobase<label id="cbm_k_iobase"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return Base Address of Memory-Mapped I/O Devices
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned cbm_k_iobase (void);/
+<tag/Description/This function returns the address of
+the memory section where the memory mapped I/O devices are located. This
+address can then be used with an offset to access the memory mapped I/O
+devices in the Commodore 64. The offset is the number of locations from
+the beginning of the page on which the I/O register you want is located.
+This function exists to provide compatibility between the Commodore 64,
+VIC-20, and future models of the Commodore 64. If the I/O locations for
+a program are set by a call to this function, they should
+still remain compatible with future versions of the Commodore 64, the
+KERNAL and BASIC.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_listen<label id="cbm_k_listen"><p>
+
+<quote>
+<descrip>
+<tag/Function/Command a device on the serial bus to LISTEN
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_listen (unsigned char dev);/
+<tag/Description/This function will command a device on the serial bus to
+receive data. The KERNAL routine will OR the supplied device number bit by bit
+to convert it to a listen address, then transmits this data as a command on
+the serial bus. The specified device will then go into listen mode, and
+be ready to accept information.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_unlsn" name="cbm_k_unlsn">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_load<label id="cbm_k_load"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load RAM from a Device
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned int __fastcall__ cbm_k_load(unsigned char flag, unsigned addr);/
+<tag/Description/This function LOADs data bytes from any input device directly into the memory.
+It can also be used for a verify operation, comparing data from a device with the data already in
+memory, while leaving the data stored in RAM unchanged.
+The flag must be set to 0 for a LOAD operation, or 1 for a
+verify, If the input device is OPENed with a secondary address (SA) of 0
+the header information from the device is ignored. In this case, the starting address for the load must be supplied.
+If the device is addressed with a secondary address of 1, then the data is
+loaded into memory starting at the location specified by the header.
+Function returns the address of the highest RAM location loaded.
+Before this function can be called, the KERNAL SETLFS, and SETNAM
+routines must be called.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_setlfs" name="cbm_k_setlfs">,
+<ref id="cbm_k_setnam" name="cbm_k_setnam">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_open<label id="cbm_k_open"><p>
+
+<quote>
+<descrip>
+<tag/Function/Open a Logical I/O File
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char cbm_k_open (void);/
+<tag/Description/This function assigns a logical file to a device, so that it can be used for
+Input/Output operations. In order to specify the logical file number,
+the device number, and the secondary address if any, the cbm_k_setlfs() function must first be called.
+Likewise, in order to designate the filename, the cbm_k_setnam() function must be used first.  After these two
+functions are called, cbm_k_open() is then called.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_setlfs" name="cbm_k_setlfs">,
+<ref id="cbm_k_setnam" name="cbm_k_setnam">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_readst<label id="cbm_k_readst"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read status word
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char cbm_k_readst (void);/
+<tag/Description/This function returns the current status of the I/O devices. It is usually called after new communication to an I/O device and gives information about device status, or errors that have occurred during the I/O operation.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_save<label id="cbm_k_save"><p>
+
+<quote>
+<descrip>
+<tag/Function/Save RAM to a Device
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end)/
+<tag/Description/This function saves a section of memory. The cbm_k_setlfs() and cbm_k_setnam() functions must be
+used before calling this function. However, a file name is not required to
+SAVE to device 1 (the Datassette(TM) recorder). Any attempt to save to
+other devices without using a file name results in an error. NOTE: Device 0 (the keyboard), device 2 (RS-232), and device 3 (the screen) cannot be SAVEd to. If the attempt is made, an error occurs, and the SAVE is stopped.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_setlfs" name="cbm_k_setlfs">,
+<ref id="cbm_k_setnam" name="cbm_k_setnam">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_setlfs<label id="cbm_k_setlfs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set up a logical file
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV, unsigned char SA);/
+<tag/Description/This functions sets up the logical file by setting its number, device address,
+and secondary address.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_setnam" name="cbm_k_setnam">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_setnam<label id="cbm_k_setnam"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set Filename Parameters
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_setnam (const char* Name);/
+<tag/Description/This function is used to set up the file name for the OPEN,
+SAVE, or LOAD operations.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_open" name="cbm_k_open">,
+<ref id="cbm_k_load" name="cbm_k_load">,
+<ref id="cbm_k_save" name="cbm_k_save">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_talk<label id="cbm_k_talk"><p>
+
+<quote>
+<descrip>
+<tag/Function/Commands device to TALK
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void __fastcall__ cbm_k_talk (unsigned char dev);/
+<tag/Description/When called, it ORs the device number with the TALK code (64, $40) and sends it on the serial
+bus. This commands the device to TALK.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cbm_k_acptr" name="cbm_k_acptr">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cbm_k_unlsn<label id="cbm_k_unlsn"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send an UNLISTEN command
+<tag/Header/<tt/<ref id="cbm.h" name="cbm.h">/
+<tag/Declaration/<tt/void cbm_k_unlsn (void);/
+<tag/Description/This function commands all devices on the serial bus to
+stop receiving data from the host computer (i.e., UNLISTEN). Calling this
+function results in an UNLISTEN command being transmitted on the serial
+bus. Only devices previously commanded to LISTEN are affected. This
+function is normally used after the host computer is finished sending data
+to external devices. Sending the UNLISTEN commands the listening devices
+to get off the serial bus so it can be used for other purposes.
+<tag/Limits/<itemize>
+<item>
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+
 <tag/Example/None.
 </descrip>
 </quote>

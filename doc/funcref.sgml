@@ -1598,7 +1598,7 @@ Exception is the routine for the keyboard device (which is the default input dev
 <ref id="cbm_k_open" name="cbm_k_open">,
 <ref id="cbm_k_chkin" name="cbm_k_chkin">
 <tag/Example/None.
-</descrip>
+</descrip>                               
 </quote>
 
 
@@ -1799,7 +1799,7 @@ sends it an UNLISTEN command.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_basin" name="cbm_k_basin">,
+<ref id="cbm_k_basin" name="cbm_k_basin">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1880,7 +1880,8 @@ routines must be called.
 only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
-<tag/See also/
+<tag/See also/                         
+<ref id="cbm_k_save" name="cbm_k_save">,
 <ref id="cbm_k_setlfs" name="cbm_k_setlfs">,
 <ref id="cbm_k_setnam" name="cbm_k_setnam">
 <tag/Example/None.
@@ -1905,6 +1906,7 @@ functions are called, cbm_k_open() is then called.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="cbm_k_close" name="cbm_k_close">,
 <ref id="cbm_k_setlfs" name="cbm_k_setlfs">,
 <ref id="cbm_k_setnam" name="cbm_k_setnam">
 <tag/Example/None.
@@ -1948,6 +1950,7 @@ only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="cbm_k_load" name="cbm_k_load">,
 <ref id="cbm_k_setlfs" name="cbm_k_setlfs">,
 <ref id="cbm_k_setnam" name="cbm_k_setnam">
 <tag/Example/None.
@@ -2014,7 +2017,7 @@ only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="cbm_k_acptr" name="cbm_k_acptr">,
+<ref id="cbm_k_acptr" name="cbm_k_acptr">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2039,7 +2042,7 @@ to get off the serial bus so it can be used for other purposes.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-
+<ref id="cbm_k_listen" name="cbm_k_listen">
 <tag/Example/None.
 </descrip>
 </quote>

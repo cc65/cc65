@@ -224,6 +224,66 @@ static unsigned OptLoad2 (CodeSeg* S)
 
 
 
+static unsigned OptLoad3 (CodeSeg* S)
+/* Remove repeated loads from one and the same memory location */
+{
+    unsigned Changes = 0;
+    CodeEntry* Load = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Forget a preceeding load if we have a label */
+        if (Load && CE_HasLabel (E)) {
+            Load = 0;
+        }
+
+        /* Check if this insn is a load */
+        if (E->Info & OF_LOAD) {
+
+            /* If we had a preceeding load that is identical, remove this one.
+             * If it is not identical, or we didn't have one, remember it.
+             */
+            if (Load != 0                               &&
+                E->OPC == Load->OPC                     &&
+                E->AM == Load->AM                       &&
+                ((E->Arg == 0 && Load->Arg == 0) ||
+                 strcmp (E->Arg, Load->Arg) == 0)) {
+
+                /* Now remove the call to the subroutine */
+                CS_DelEntry (S, I);
+
+                /* Remember, we had changes */
+                ++Changes;
+
+                /* Next insn */
+                continue;
+
+            } else {
+
+                Load = E;
+
+            }
+
+        } else if ((E->Info & OF_CMP) == 0 && (E->Info & OF_CBRA) == 0) {
+            /* Forget the first load on occurance of any insn we don't like */
+            Load = 0;
+        }
+
+	/* Next entry */
+	++I;
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*			      Decouple operations                            */
 /*****************************************************************************/
@@ -616,6 +676,7 @@ static OptFunc DOptJumpTarget2  = { OptJumpTarget2,  "OptJumpTarget2",  100, 0, 
 static OptFunc DOptJumpTarget3  = { OptJumpTarget3,  "OptJumpTarget3",  100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptLoad2        = { OptLoad2,        "OptLoad2",        200, 0, 0, 0, 0, 0 };
+static OptFunc DOptLoad3        = { OptLoad3,        "OptLoad3",          0, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX1       = { OptNegAX1,       "OptNegAX1",       165, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX2       = { OptNegAX2,       "OptNegAX2",       200, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",         	100, 0, 0, 0, 0, 0 };
@@ -714,6 +775,7 @@ static OptFunc* OptFuncs[] = {
     &DOptJumpTarget3,
     &DOptLoad1,
     &DOptLoad2,
+    &DOptLoad3,
     &DOptNegAX1,
     &DOptNegAX2,
     &DOptPrecalc,
@@ -1155,6 +1217,7 @@ static unsigned RunOptGroup4 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptTest2, 1);
     Changes += RunOptFunc (S, &DOptTransfers2, 1);
     Changes += RunOptFunc (S, &DOptLoad2, 1);
+    Changes += RunOptFunc (S, &DOptLoad3, 1);
 
     /* Return the number of changes */
     return Changes;

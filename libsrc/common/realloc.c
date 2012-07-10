@@ -39,13 +39,12 @@
 
 
 
-void* __fastcall__ realloc (void* block, size_t size)
+void* __fastcall__ realloc (void* block, register size_t size)
 {
-    struct usedblock* b;
+    register struct usedblock* b;
     struct usedblock* newblock;
     unsigned oldsize;
     unsigned newhptr;
-    int diff;
 
     /* Check the block parameter */
     if (!block) {
@@ -74,13 +73,10 @@ void* __fastcall__ realloc (void* block, size_t size)
     b = (((struct usedblock*) block) - 1)->start;
     oldsize = b->size;
 
-    /* Get the size difference as a signed quantity */
-    diff = size - oldsize;
-
     /* Is the block at the current heap top? */
     if (((unsigned) b) + oldsize == ((unsigned) _heapptr)) {
     	/* Check if we've enough memory at the heap top */
-    	newhptr = ((unsigned) _heapptr) + diff;
+    	newhptr = ((unsigned) _heapptr) - oldsize + size;
     	if (newhptr <= ((unsigned) _heapend)) {
     	    /* Ok, there's space enough */
        	    _heapptr = (unsigned*) newhptr;

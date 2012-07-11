@@ -11,50 +11,68 @@
 ;
 
 
-      	.export		tosasrax
+      	.export		tosasrax, asraxy
       	.import		popax
       	.importzp	tmp1
 
 tosasrax:
-        and     #$0F            ; Bring the shift count into a valid range
-        sta     tmp1            ; Save it
-
+        sta     tmp1            ; Save shift count
         jsr     popax           ; Get the left hand operand
-
         ldy     tmp1            ; Get shift count
-        beq     L9              ; Bail out if shift count zero
 
-        cpy     #8              ; Shift count 8 or greater?
-        bcc     L1              ; Jump if not
+; Run into asraxy
 
-; Shift count is greater 8. The carry is set when we enter here.
-
+asraxy:
+        pha
         tya
-        sbc     #8
-        tay                     ; Adjust shift count
-        txa
-        ldx     #$00            ; Shift by 8 bits
-        cmp     #$00            ; Test sign bit
-        bpl     L1
-        dex                     ; Make X the correct sign extended value
+        and     #$0F
+        beq     L2              ; Nothing to shift
+        sec
+        sbc     #8              ; Shift count 8 or greater?
+        beq     L3              ; Jump if exactly 8
+        bcc     L6              ; Jump if less than 8
 
-; Save the high byte so we can shift it
+; Shift count is greater than 8.
 
-L1:     stx     tmp1            ; Save high byte
-        jmp     L3
+        tay                     ; Shift count into Y
+        pla                     ; Discard low byte
+        txa                     ; Get high byte
 
-; Do the actual shift
+L1:     cmp     #$80            ; Sign bit into carry
+        ror     a               ; Carry into A
+        dey
+        bne     L1
+        beq     L4              ; Sign extend and return
 
-L2:    	cpx     #$80            ; Copy bit 15 into the carry
+; Shift count is zero
+
+L2:     pla
+        rts
+
+; Shift count is exactly 8
+
+L3:     pla                     ; Drop low byte from stack ...
+        txa                     ; Move high byte to low
+L4:     ldx     #$00            ; Clear high byte
+        cmp     #$80            ; Check sign bit
+        bcc     L5
+        dex
+L5:     rts
+
+; Shift count is less than 8
+
+L6:     adc     #8              ; Correct counter
+        tay                     ; Shift count into Y
+        pla                     ; Restore low byte
+        stx     tmp1            ; Save high byte of lhs
+L7:     cpx     #$80            ; Sign bit into carry
         ror     tmp1
         ror     a
-L3:     dey
-       	bpl     L2
+        dey
+       	bne     L7
 
 ; Done with shift
 
-        ldx    	tmp1
-L9:     rts
-
-
+        ldx	tmp1
+        rts
 

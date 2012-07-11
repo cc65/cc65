@@ -840,7 +840,7 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
 
-    /* Inline the compare */
+    /* Inline the shift */
     D->IP = D->OpIndex+1;
 
     /* tay */
@@ -1645,10 +1645,7 @@ static const OptFuncDesc FuncTable[] = {
     { "tosaddax",   Opt_tosaddax,  REG_NONE, OP_NONE                    },
     { "tosandax",   Opt_tosandax,  REG_NONE, OP_NONE                    },
     { "tosaslax",   Opt_tosaslax,  REG_NONE, OP_NONE                    },
-#if 0
-    /* Library routine missing */
     { "tosasrax",   Opt_tosasrax,  REG_NONE, OP_NONE                    },
-#endif
     { "toseqax",    Opt_toseqax,   REG_NONE, OP_NONE                    },
     { "tosgeax",    Opt_tosgeax,   REG_NONE, OP_RHS_LOAD_DIRECT         },
     { "tosltax",    Opt_tosltax,   REG_NONE, OP_RHS_LOAD_DIRECT         },

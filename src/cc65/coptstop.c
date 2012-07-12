@@ -840,13 +840,6 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
     /* Store the value into the zeropage instead of pushing it */
     ReplacePushByStore (D);
 
-    /* Inline the shift */
-    D->IP = D->OpIndex+1;
-
-    /* tay */
-    X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, D->OpEntry->LI);
-    InsertEntry (D, X, D->IP++);
-
     /* If the lhs is direct (but not stack relative), we can just reload the
      * data later.
      */
@@ -855,6 +848,13 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
 
         CodeEntry* LoadX = D->Lhs.X.LoadEntry;
         CodeEntry* LoadA = D->Lhs.A.LoadEntry;
+
+        /* Inline the shift */
+        D->IP = D->OpIndex+1;
+
+        /* tay */
+        X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
 
         /* lda */
         X = NewCodeEntry (OP65_LDA, LoadA->AM, LoadA->Arg, 0, D->OpEntry->LI);
@@ -874,6 +874,15 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
         AddStoreX (D);
         AddStoreA (D);
 
+        /* Be sure to setup IP after adding the stores, otherwise it will get
+         * messed up.   
+         */
+        D->IP = D->OpIndex+1;
+
+        /* tay */
+        X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
+
         /* lda zp */
         X = NewCodeEntry (OP65_LDA, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
@@ -888,7 +897,7 @@ static unsigned Opt_tosshift (StackOpData* D, const char* Name)
     X = NewCodeEntry (OP65_JSR, AM65_ABS, Name, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->IP++);
 
-    /* Remove the push and the call to the tossubax function */
+    /* Remove the push and the call to the shift function */
     RemoveRemainders (D);
 
     /* We changed the sequence */

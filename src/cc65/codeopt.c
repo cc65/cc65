@@ -35,6 +35,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 /* common */
 #include "abend.h"
@@ -42,6 +43,7 @@
 #include "cpu.h"
 #include "debugflag.h"
 #include "print.h"
+#include "strbuf.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 
@@ -49,6 +51,7 @@
 #include "asmlabel.h"
 #include "codeent.h"
 #include "codeinfo.h"
+#include "codeopt.h"
 #include "coptadd.h"
 #include "coptc02.h"
 #include "coptcmp.h"
@@ -65,7 +68,7 @@
 #include "copttest.h"
 #include "error.h"
 #include "global.h"
-#include "codeopt.h"
+#include "output.h"
 
 
 
@@ -1019,6 +1022,48 @@ static void WriteOptStats (const char* Name)
 
 
 
+static void OpenDebugFile (const CodeSeg* S)
+/* Open the debug file for the given segment if the flag is on */
+{
+    if (DebugOptOutput) {
+        StrBuf Name = AUTO_STRBUF_INITIALIZER;
+        if (S->Func) {
+            SB_CopyStr (&Name, S->Func->Name);
+        } else {
+            SB_CopyStr (&Name, "global");
+        }
+        SB_AppendStr (&Name, ".opt");
+        SB_Terminate (&Name);
+        OpenDebugOutputFile (SB_GetConstBuf (&Name));
+        SB_Done (&Name);
+    }
+}
+
+
+
+static void WriteDebugOutput (CodeSeg* S, const char* Step)
+/* Write a separator line into the debug file if the flag is on */
+{
+    if (DebugOptOutput) {
+        /* Output a separator */
+        WriteOutput ("=========================================================================\n");
+
+        /* Output a header line */
+        if (Step == 0) {
+            /* Initial output */
+            WriteOutput ("Initial code for function `%s':\n",
+                         S->Func? S->Func->Name : "<global>");
+        } else {
+            WriteOutput ("Code after applying `%s':\n", Step);
+        }
+
+        /* Output the code segment */
+        CS_Output (S);
+    }
+}
+
+
+
 static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 /* Run one optimizer function Max times or until there are no more changes */
 {
@@ -1037,9 +1082,6 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 
    	/* Run the function */
     	C = F->Func (S);
-        if (Debug && C > 0) {
-            printf ("Applied %s: %u changes\n", F->Name, C);
-        }
     	Changes += C;
 
     	/* Do statistics */
@@ -1048,8 +1090,12 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     	F->TotalChanges += C;
     	F->LastChanges  += C;
 
-        /* If we had changes, regenerate register info */
+        /* If we had changes, output stuff and regenerate register info */
         if (C) {
+            if (Debug) {
+                printf ("Applied %s: %u changes\n", F->Name, C);
+            }
+            WriteDebugOutput (S, F->Name);
             CS_GenRegInfo (S);
         }
 
@@ -1352,6 +1398,10 @@ void RunOpt (CodeSeg* S)
      	Print (stdout, 1, "Running optimizer for global code segment\n");
     }
 
+    /* If requested, open an output file */
+    OpenDebugFile (S);
+    WriteDebugOutput (S, 0);
+
     /* Generate register info for all instructions */
     CS_GenRegInfo (S);
 
@@ -1367,9 +1417,14 @@ void RunOpt (CodeSeg* S)
     /* Free register info */
     CS_FreeRegInfo (S);
 
+    /* Close output file if necessary */
+    if (DebugOptOutput) {
+        CloseOutputFile ();
+    }
+
     /* Write statistics */
     if (StatFileName) {
-	WriteOptStats (StatFileName);
+     	WriteOptStats (StatFileName);
     }
 }
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2009,     Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2009-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	       	     	     	     Data		     		     */
+/*     	       	     	     	     Data      		     		     */
 /*****************************************************************************/
 
 
@@ -60,7 +60,7 @@ extern FILE* OutputFile;
 
 
 /*****************************************************************************/
-/*     	       	     	     	     Code		     		     */
+/*     	       	     	     	     Code      		     		     */
 /*****************************************************************************/
 
 
@@ -75,6 +75,11 @@ void MakeDefaultOutputName (const char* InputFilename);
 
 void OpenOutputFile ();
 /* Open the output file. Will call Fatal() in case of failures. */
+
+void OpenDebugOutputFile (const char* Name);
+/* Open an output file for debugging purposes. Will call Fatal() in case of 
+ * failures. 
+ */
 
 void CloseOutputFile ();
 /* Close the output file. Will call Fatal() in case of failures. */

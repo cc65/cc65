@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -505,6 +505,15 @@ static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptDebugOptOutput (const char* Opt attribute ((unused)), 
+                               const char* Arg attribute ((unused)))
+/* Output optimization steps */
+{
+    DebugOptOutput = 1;
+}
+
+
+
 static void OptDepTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --dep-target option */
 {
@@ -782,6 +791,7 @@ int main (int argc, char* argv[])
        	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
         { "--debug-opt",        1,      OptDebugOpt             },
+        { "--debug-opt-output", 0,      OptDebugOptOutput       },
         { "--dep-target",       1,      OptDepTarget            },
 	{ "--disable-opt",	1,	OptDisableOpt		},
 	{ "--enable-opt",	1,	OptEnableOpt  	       	},

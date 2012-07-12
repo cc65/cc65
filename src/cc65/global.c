@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -46,6 +46,7 @@
 unsigned char AddSource		= 0; 	/* Add source lines as comments */
 unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
 unsigned char PreprocessOnly    = 0;    /* Just preprocess the input */
+unsigned char DebugOptOutput    = 0;    /* Output debug stuff */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 
 /* Stackable options */
@@ -61,7 +62,7 @@ IntStack CheckStack         = INTSTACK(0);  /* Generate stack overflow checks */
 IntStack Optimize      	    = INTSTACK(0);  /* Optimize flag */
 IntStack CodeSizeFactor	    = INTSTACK(100);/* Size factor for generated code */
 IntStack DataAlignment      = INTSTACK(1);  /* Alignment for data */
-                
+
 /* File names */
 StrBuf DepName     = STATIC_STRBUF_INITIALIZER; /* Name of dependencies file */
 StrBuf FullDepName = STATIC_STRBUF_INITIALIZER; /* Name of full dependencies file */

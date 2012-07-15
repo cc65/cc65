@@ -4,16 +4,9 @@
 ; Variables used for CBM file I/O
 ;
 
-        .export         __filetype
         .export         __curunit
         .constructor    initcurunit, 30
         .importzp       devnum
-
-
-.data
-
-__filetype:
-        .byte   's'             ; Create sequential files by default
 
 
 .bss

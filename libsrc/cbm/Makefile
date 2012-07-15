@@ -74,6 +74,7 @@ S_OBJS =	c_acptr.o	\
                 exehdr.o        \
                 filedes.o       \
                 filename.o      \
+                filetype.o      \
                 filevars.o      \
 		gotox.o 	\
 		gotoxy.o 	\

@@ -61,9 +61,9 @@ next:   dex
        	dey                     ; Parm count < 4 shouldn't be needed to be...
        	dey                     ; ...checked (it generates a c compiler warning)
         dey
-	dey
-	beq  	parmok 	   	; Branch if parameter count ok
-	jsr  	addysp	   	; Fix stack, throw away unused parameters
+       	dey
+       	beq  	parmok 	   	; Branch if parameter count ok
+       	jsr  	addysp	   	; Fix stack, throw away unused parameters
 
 ; Parameters ok. Pop the flags and save them into tmp3
 
@@ -74,7 +74,7 @@ parmok: jsr     popax           ; Get flags
 
         jsr     popax           ; Get name
         jsr     fnparse         ; Parse it
-        cmp     #0
+        tax
         bne     oserror         ; Bail out if problem with name
 
 ; Get a free file handle and remember it in tmp2
@@ -92,7 +92,7 @@ parmok: jsr     popax           ; Get flags
         cmp     #O_RDONLY       ; Open for reading?
         beq     doread          ; Yes: Branch
         cmp     #(O_WRONLY | O_CREAT)   ; Open for writing?
-        beq     flagsok
+        beq     dowrite
 
 ; Invalid open mode
 
@@ -119,9 +119,16 @@ closeandexit:
 
 oserror:jmp     __mappederrno
 
+; Read bit is set. Add an 'r' to the name
+
+doread: lda     #'r'
+        jsr     fnaddmode       ; Add the mode to the name
+        lda     #LFN_READ
+        bne     common          ; Branch always
+
 ; If O_TRUNC is set, scratch the file, but ignore any errors
 
-flagsok:
+dowrite:
         lda     tmp3
         and     #O_TRUNC
         beq     notrunc
@@ -131,23 +138,21 @@ flagsok:
 
 notrunc:
         lda     tmp3            ; Get the mode again
-        ldx     #'a'
         and     #O_APPEND       ; Append mode?
         bne     append          ; Branch if yes
-        ldx     #'w'
-append: txa
+
+; Setup the name for create mode
+
+        lda     #'w'
         jsr     fncomplete      ; Add type and mode to the name
+        jmp     appendcreate
 
-; Setup the real open flags
+; Append bit is set. Add an 'a' to the name
 
+append: lda     #'a'
+        jsr     fnaddmode       ; Add open mode to file name
+appendcreate:
         lda     #LFN_WRITE
-        bne     common
-
-; Read bit is set. Add an 'r' to the name
-
-doread: lda     #'r'
-        jsr     fnaddmode       ; Add the mode to the name
-        lda     #LFN_READ
 
 ; Common read/write code. Flags in A, handle in tmp2
 
@@ -194,3 +199,4 @@ nofile:                         ; ... else use SA=0 (read)
 .endproc
 
 
+           

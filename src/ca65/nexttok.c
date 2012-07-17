@@ -629,10 +629,27 @@ static void FuncString (void)
     ConsumeLParen ();
 
     /* Accept identifiers or numeric expressions */
-    if (CurTok.Tok == TOK_IDENT || CurTok.Tok == TOK_LOCAL_IDENT) {
+    if (CurTok.Tok == TOK_LOCAL_IDENT) {
      	/* Save the identifier, then skip it */
        	SB_Copy (&Buf, &CurTok.SVal);
      	NextTok ();
+    } else if (CurTok.Tok == TOK_NAMESPACE || CurTok.Tok == TOK_IDENT) {
+
+        /* Parse a fully qualified symbol name. We cannot use
+         * ParseScopedSymName here since the name may be invalid.
+         */
+        int NameSpace;
+        do {
+            NameSpace = (CurTok.Tok == TOK_NAMESPACE);
+            if (NameSpace) {
+                SB_AppendStr (&Buf, "::");
+            } else {
+                SB_Append (&Buf, &CurTok.SVal);
+            }
+            NextTok ();
+        } while ((NameSpace != 0 && CurTok.Tok == TOK_IDENT) ||
+                 (NameSpace == 0 && CurTok.Tok == TOK_NAMESPACE));
+
     } else {
      	/* Numeric expression */
      	long Val = ConstExpression ();

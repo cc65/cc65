@@ -92,8 +92,8 @@ ctrl:   .addr   _read
 @L4:    rts
 
 ; Check the driver signature, install the driver. c is already on stack and
-; will get removed by ser_install().
-; Res = ser_install (ctrl.module);
+; will get removed by tgi_install().
+; tgi_install (ctrl.module);
 
 @L5:    lda     ctrl + MOD_CTRL::MODULE
         ldx     ctrl + MOD_CTRL::MODULE+1
@@ -115,4 +115,4 @@ ctrl:   .addr   _read
 .endproc
 
 
-   
+

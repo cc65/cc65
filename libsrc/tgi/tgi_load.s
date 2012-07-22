@@ -91,8 +91,7 @@ ctrl:   .addr   _read
 @L3:    sta     _tgi_error
 @L4:    rts
 
-; Check the driver signature, install the driver. c is already on stack and
-; will get removed by tgi_install().
+; Check the driver signature, install the driver.
 ; tgi_install (ctrl.module);
 
 @L5:    lda     ctrl + MOD_CTRL::MODULE

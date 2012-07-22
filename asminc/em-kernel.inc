@@ -74,7 +74,7 @@ EMD_API_VERSION         = $00
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
-
+             
         .global emd_install
         .global emd_uninstall
         .global emd_pagecount
@@ -87,6 +87,11 @@ EMD_API_VERSION         = $00
 ;------------------------------------------------------------------------------
 ; ASM functions
 
+       	.global	em_clear_ptr
+
+;------------------------------------------------------------------------------
+; C callable functions
+
 	.global	_em_unload
 	.global	_em_install
 	.global _em_uninstall
@@ -96,5 +101,4 @@ EMD_API_VERSION         = $00
 	.global	_em_commit
 	.global _em_copyfrom
 	.global	_em_copyto
-
 

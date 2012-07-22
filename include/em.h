@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2011, Ullrich von Bassewitz                                      */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -53,6 +53,7 @@
 #define EM_ERR_CANNOT_LOAD      2       /* Error loading driver */
 #define EM_ERR_INV_DRIVER       3       /* Invalid driver */
 #define EM_ERR_NO_DEVICE        4       /* Device (hardware) not found */
+#define EM_ERR_INSTALLED        5       /* A driver is already installed */
 
 /* Parameters for the em_copy_... functions. NOTE: The first seven bytes
  * have the same order and alignment as needed for the Commodore REU, so

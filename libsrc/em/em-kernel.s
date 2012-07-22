@@ -4,7 +4,6 @@
 ; Common functions of the extended memory API.
 ;
 
-        .export         em_clear_ptr
         .import         return0
         .importzp       ptr1
 

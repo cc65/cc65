@@ -6,10 +6,10 @@
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */
-;/* (C) 2002      Ullrich von Bassewitz                                       */
-;/*               Wacholderweg 14                                             */
-;/*               D-70597 Stuttgart                                           */
-;/* EMail:        uz@musoftware.de                                            */
+;/* (C) 2002-2012, Ullrich von Bassewitz                                      */
+;/*                Roemerstrasse 52                                           */
+;/*                D-70794 Filderstadt                                        */
+;/* EMail:         uz@cc65.org                                                */
 ;/*                                                                           */
 ;/*                                                                           */
 ;/* This software is provided 'as-is', without any expressed or implied       */
@@ -33,12 +33,17 @@
 
 
 
-; Error codes
-EM_ERR_OK               = 0       ; No error
-EM_ERR_NO_DRIVER        = 1       ; No driver available
-EM_ERR_CANNOT_LOAD      = 2       ; Error loading driver
-EM_ERR_INV_DRIVER       = 3       ; Invalid driver
-EM_ERR_NO_DEVICE        = 4       ; Device (hardware) not found
+; Error constants
+.enum
+        EM_ERR_OK                       ; No error
+        EM_ERR_NO_DRIVER                ; No driver available
+        EM_ERR_CANNOT_LOAD              ; Error loading driver
+        EM_ERR_INV_DRIVER               ; Invalid driver
+        EM_ERR_NO_DEVICE                ; Device (hardware) not found
+        EM_ERR_INSTALLED                ; A driver is already installed
+
+        EM_ERR_COUNT                    ; Special: Number of error messages
+.endenum
 
 
 

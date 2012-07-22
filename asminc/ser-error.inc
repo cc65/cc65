@@ -6,10 +6,10 @@
 ;*                                                                          *
 ;*                                                                          *
 ;*                                                                          *
-;*(C) 2003      Ullrich von Bassewitz                                       *
-;*              Römerstrasse 52                                             *
-;*              D-70794 Filderstadt                                         *
-;*EMail:        uz@cc65.org                                                 *
+;* (C) 2003-2012, Ullrich von Bassewitz                                     *
+;*                Roemerstrasse 52                                          *
+;*                D-70794 Filderstadt                                       *
+;* EMail:         uz@cc65.org                                               *
 ;*                                                                          *
 ;*                                                                          *
 ;*This software is provided 'as-is', without any expressed or implied       *
@@ -36,15 +36,19 @@
 ;------------------------------------------------------------------------------
 ; Error codes
 
-SER_ERR_OK     	       	=       $00    	; Not an error - relax
-SER_ERR_NO_DRIVER       =       $01     ; No driver available
-SER_ERR_CANNOT_LOAD     =       $02     ; Error loading driver
-SER_ERR_INV_DRIVER      =       $03     ; Invalid driver
-SER_ERR_NO_DEVICE       =       $04     ; Device (hardware) not found
-SER_ERR_BAUD_UNAVAIL   	=       $05    	; Baud rate not available
-SER_ERR_NO_DATA	       	=       $06   	; Nothing to read
-SER_ERR_OVERFLOW       	=       $07   	; No room in send buffer
-SER_ERR_INIT_FAILED     =       $08   	; Initialization failed
-SER_ERR_INV_IOCTL       =       $09     ; IOCTL not supported
+.enum
+        SER_ERR_OK                      ; Not an error - relax
+        SER_ERR_NO_DRIVER               ; No driver available
+        SER_ERR_CANNOT_LOAD             ; Error loading driver
+        SER_ERR_INV_DRIVER              ; Invalid driver
+        SER_ERR_NO_DEVICE               ; Device (hardware) not found
+        SER_ERR_BAUD_UNAVAIL            ; Baud rate not available
+        SER_ERR_NO_DATA                 ; Nothing to read
+        SER_ERR_OVERFLOW                ; No room in send buffer
+        SER_ERR_INIT_FAILED             ; Initialization failed
+        SER_ERR_INV_IOCTL               ; IOCTL not supported
+        SER_ERR_INSTALLED               ; A driver is already installed
 
+        SER_ERR_COUNT                   ; Special: Number of error codes
+.endenum
 

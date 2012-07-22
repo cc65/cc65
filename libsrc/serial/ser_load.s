@@ -37,22 +37,22 @@ ctrl:   .addr   _read
 
 .proc   _ser_load_driver
 
-; Save name on the C stack. We will need it later as parameter passed to open()
+; Check if we do already have a driver loaded. This is an error. Do not
+; touch A/X because they contain the file name.
 
-        jsr     pushax
-
-; Check if we do already have a driver loaded. If so, remove it.
-
-        lda     _ser_drv
-        ora     _ser_drv+1
+        ldy     _ser_drv
+        bne     @L0
+        ldy     _ser_drv+1
         beq     @L1
-        jsr     _ser_uninstall
+@L0:    lda     #SER_ERR_INSTALLED
+        bne     @L4
 
-; Open the file. The name parameter is already on stack and will get removed
-; by open().
+; Push the name onto the C stack and open the file. The parameter will get
+; removed by open().
 ; ctrl.callerdata = open (name, O_RDONLY);
 
-@L1:    lda     #<O_RDONLY
+@L1:    jsr     pushax
+        lda     #<O_RDONLY
         jsr     pusha0
         ldy     #4                      ; Argument size
         jsr     _open
@@ -113,7 +113,7 @@ ctrl:   .addr   _read
 ; Open or mod_load failed. Return an error code.
 
 @L3:    lda     #<SER_ERR_CANNOT_LOAD
-        ldx     #>SER_ERR_CANNOT_LOAD
+@L4:    ldx     #0
         rts
 
 .endproc

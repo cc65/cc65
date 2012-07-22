@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2011, Ullrich von Bassewitz                                      */
+/* (C) 2003-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -110,6 +110,7 @@
 #define SER_ERR_OVERFLOW       	0x07   	/* No room in send buffer */
 #define SER_ERR_INIT_FAILED     0x08   	/* Initialization failed */
 #define SER_ERR_INV_IOCTL       0x09    /* IOCTL not supported */
+#define SER_ERR_INSTALLED       0x0A    /* A driver is already installed */
 
 /* Struct containing parameters for the serial port */
 struct ser_params {

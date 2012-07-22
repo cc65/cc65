@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2009, Ullrich von Bassewitz                                      */
+/* (C) 2002-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -53,6 +53,7 @@
 #define TGI_ERR_INV_FUNC	6	/* Function not supported */
 #define TGI_ERR_INV_FONT        7       /* Font file is invalid */
 #define TGI_ERR_NO_RES          8       /* Out of resources */
+#define TGI_ERR_INSTALLED       9       /* A driver is already installed */
 
 
 

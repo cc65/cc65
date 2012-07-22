@@ -201,6 +201,7 @@ _tgi_uninstall:
 
 ; Clear driver pointer and error code
 
+tgi_clear_ptr:
         lda     #$00
         sta     _tgi_drv
         sta     _tgi_drv+1

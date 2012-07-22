@@ -6,7 +6,7 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002-2009, Ullrich von Bassewitz                                      */
+;* (C) 2002-2012, Ullrich von Bassewitz                                      */
 ;*                Roemerstrasse 52                                           */
 ;*                D-70794 Filderstadt                                        */
 ;* EMail:         uz@cc65.org                                                */
@@ -45,6 +45,7 @@
         TGI_ERR_INV_FONT        ; Font file is invalid
         TGI_ERR_NO_RES          ; Out of resources (memory, handles, ...)
         TGI_ERR_UNKNOWN         ; Unknown error
+        TGI_ERR_INSTALLED       ; A driver is already installed
 
         TGI_ERR_COUNT           ; Special: Number of error messages
 .endenum

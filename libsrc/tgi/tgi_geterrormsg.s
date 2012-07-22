@@ -41,6 +41,7 @@ offs:   .byte   <(msg0-msgtab)
         .byte   <(msg7-msgtab)
         .byte   <(msg8-msgtab)
         .byte   <(msg9-msgtab)
+        .byte   <(msg10-msgtab)
 
 msgtab:
 msg0:   .asciiz         "No error"
@@ -53,4 +54,6 @@ msg6:   .asciiz         "Function not supported"
 msg7:   .asciiz         "Invalid font file"
 msg8:   .asciiz         "Out of resources"
 msg9:   .asciiz         "Unknown error"
+msg10:  .asciiz         "A driver is already installed"
 
+.assert (*-msgtab) < 256, error, "Message table too large"

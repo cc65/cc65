@@ -6,7 +6,7 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002-2009, Ullrich von Bassewitz                                      */
+;* (C) 2002-2012, Ullrich von Bassewitz                                      */
 ;*                Roemerstrasse 52                                           */
 ;*                D-70794 Filderstadt                                        */
 ;* EMail:         uz@cc65.org                                                */
@@ -170,6 +170,7 @@ TGI_CLIP_TOP            = $08
 ;------------------------------------------------------------------------------
 ; ASM functions
 
+        .global tgi_clear_ptr
         .global tgi_clippedline
         .global tgi_curtoxy
         .global tgi_getset

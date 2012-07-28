@@ -477,15 +477,15 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         if (Arg3.Expr.IVal <= 127) {
             AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
             g_defcodelabel (Label);
-            AddCodeLine ("lda (ptr1),y");
-            AddCodeLine ("sta (sp),y");
+            AddCodeLine ("lda (sp),y");
+            AddCodeLine ("sta (ptr1),y");
             AddCodeLine ("dey");
             AddCodeLine ("bpl %s", LocalLabelName (Label));
         } else {
             AddCodeLine ("ldy #$00");
             g_defcodelabel (Label);
-            AddCodeLine ("lda (ptr1),y");
-            AddCodeLine ("sta (sp),y");
+            AddCodeLine ("lda (sp),y");
+            AddCodeLine ("sta (ptr1),y");
             AddCodeLine ("iny");
             AddCodeLine ("cpy #$%02X", (unsigned char) Arg3.Expr.IVal);
             AddCodeLine ("bne %s", LocalLabelName (Label));

@@ -18,8 +18,8 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
     register unsigned char* b;
     register unsigned char i;
     register unsigned char count;
-    unsigned char s;
-    unsigned char j;
+    static unsigned char s;
+    static unsigned char j;
     unsigned char buffer[0x40];
     static struct dirent entry;
 
@@ -78,9 +78,17 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
             case 1:
                 /* Within file name */
                 if (*b == '"') {
+                    /* End of file name found. */
                     entry.d_name[j] = '\0';
                     entry.d_namlen = j;
-                    s = 2;
+                    if (entry.d_off != 0) {
+                        /* Proceed with file type */
+                        s = 2;
+                    } else {
+                        /* This is a disk header, so we're done */
+                        entry.d_type = _CBM_T_HEADER;
+                        return &entry;
+                    }
                 } else if (j < sizeof (entry.d_name) - 1) {
                     entry.d_name[j] = *b;
                     ++j;
@@ -105,8 +113,8 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
                 /* Distinguish DEL or DIR file type entries */
                 switch (*b) {
                     case 'e':                                   break;
-                    case 'i': entry.d_type = CBM_T_DIR;         break;
-                    default:  entry.d_type = CBM_T_OTHER;       break;
+                    case 'i': entry.d_type = _CBM_T_DIR;        break;
+                    default:  entry.d_type = _CBM_T_OTHER;      break;
                 }
                 return &entry;
         }

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -70,9 +70,6 @@ void InitIncludePaths (void)
     /* Create the search path lists */
     SysIncSearchPath = NewSearchPath ();
     UsrIncSearchPath = NewSearchPath ();
-
-    /* Add the current path to the user search path list */
-    AddSearchPath (UsrIncSearchPath, "");
 
     /* Add some compiled in search paths if defined at compile time */
 #ifdef CC65_INC

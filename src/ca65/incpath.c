@@ -71,10 +71,6 @@ void InitIncludePaths (void)
     IncSearchPath = NewSearchPath ();
     BinSearchPath = NewSearchPath ();
 
-    /* Add the current directory to the search paths */
-    AddSearchPath (IncSearchPath, "");
-    AddSearchPath (BinSearchPath, "");
-
     /* Add some compiled in search paths if defined at compile time */
 #ifdef CA65_INC
     AddSearchPath (IncSearchPath, CA65_INC);

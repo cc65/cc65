@@ -820,6 +820,10 @@ to find branch targets (this is the reason why I for my part do
 prefer the "cheap" local labels). Nevertheless, unnamed labels are
 convenient in some situations, so it's your decision.
 
+<bf/Note:/ <ref id="scopes" name="Scopes"> organize named symbols, not
+unnamed ones, so scopes don't have an effect on unnamed labels.
+
+
 
 <sect1>Using macros to define labels and constants<p>
 

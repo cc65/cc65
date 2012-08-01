@@ -81,7 +81,7 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
                     /* End of file name found. */
                     entry.d_name[j] = '\0';
                     entry.d_namlen = j;
-                    if (entry.d_off != 0) {
+                    if (entry.d_off > 2) {
                         /* Proceed with file type */
                         s = 2;
                     } else {

@@ -96,7 +96,7 @@ parmok: jsr     popax           ; Get flags
 
 ; Invalid open mode
 
-        lda     #EINVAL
+einval: lda     #EINVAL
 
 ; Error entry. Sets _errno, clears _oserror, returns -1
 
@@ -119,11 +119,14 @@ closeandexit:
 
 oserror:jmp     __mappederrno
 
+
 ; Read bit is set. Add an 'r' to the name
 
-doread: lda     #'r'
+doread: ldy     fnisfile        ; File or directory?
+        beq     isdir           ; Don't add ,R for directory
+        lda     #'r'
         jsr     fnaddmode       ; Add the mode to the name
-        lda     #LFN_READ
+isdir:  lda     #LFN_READ
         bne     common          ; Branch always
 
 ; If O_TRUNC is set, scratch the file, but ignore any errors
@@ -199,4 +202,4 @@ nofile:                         ; ... else use SA=0 (read)
 .endproc
 
 
-           
+

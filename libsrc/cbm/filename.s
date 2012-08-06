@@ -125,6 +125,15 @@ drivedone:
         stx     fnbuf+1
         sta     fnbuf+0
 
+; Add the file mask
+
+        lda     #':'
+        sta     fnbuf+2
+        lda     #'*'
+        sta     fnbuf+3
+        lda     #4
+        sta     fnlen
+
 ; No need to check the name. Length is already 2
 
         lda     #0              ; ok flag

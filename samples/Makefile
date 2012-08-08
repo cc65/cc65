@@ -78,6 +78,7 @@ EXELIST	=	ascii 		\
      		hello 		\
 		mandelbrot	\
      		mousedemo 	\
+     		multdemo 	\
      		nachtm 		\
      		ovrldemo	\
      		plasma 		\
@@ -120,6 +121,9 @@ mousedemo:	mousedemo.o
 else
 mousedemo:	mousedemo.o
 endif
+
+multdemo:	multidemo.o
+	@$(LD) -t $(SYS) -m $(basename $@).map -C $(SYS)-overlay.cfg -o $@ $^ $(CLIB)
 
 nachtm:		nachtm.o
 

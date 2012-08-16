@@ -833,14 +833,14 @@ but also removes it from drive RAM (not quite true, but it works like that). Aft
 <p>
 <tt/char ChangeDiskDevice (char newDevice)/
 <p>
-This function changes the logical number of the current device (in fact drives only) to given one. It is
+This function changes the logical number of the current device (in fact drives only) to the given one. It is
 usable for swapping drives. There's no check if the given <tt/newDevice/ already exist, so if you want
-to change the logical number of drive 8 to 9 and you have drive number 9 then GEOS will probably
+to change the logical number of drive 8 to 9 and you don't have drive number 9 then GEOS will probably
 hang on disk access. Use safe, large numbers. Note that the safe IEC range is 8-31.
 
 <sect2>Disk Initialization
 <p>
-GEOS has two functions for initialization ('logging in' as they say on CP&bsol;M) of a disk.
+GEOS has two functions for initialization ('logging in' as they say on CP/M) of a disk.
 <sect3>OpenDisk
 <p>
 <tt/char OpenDisk (void)/

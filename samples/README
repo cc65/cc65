@@ -68,6 +68,14 @@ Platforms:     	All systems with mouse and conio support:
 		C64, C128, CBM510, Atari, Apple ][
 
 -----------------------------------------------------------------------------
+Name:           multidemo
+Description:	Shows how to combine multiple cc65 features incl. overlays
+                and extended memory drivers. Written and contributed by
+		Oliver Schmidt, <ol.sc@web.de>.
+Platforms:     	All systems with an overlay linker config, disk directory
+                access and EMD support (currently the C64 and the Apple ][).
+
+-----------------------------------------------------------------------------
 Name:           nachtm
 Description:	Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart
 Platforms:	All systems that have the Commodore SID (Sound Interface

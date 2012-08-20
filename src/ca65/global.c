@@ -65,6 +65,7 @@ unsigned char SmartMode	         = 0;   /* Smart mode */
 unsigned char DbgSyms	         = 0;   /* Add debug symbols */
 unsigned char LineCont	         = 0;   /* Allow line continuation */
 unsigned char LargeAlignment     = 0;   /* Don't warn about large alignments */
+unsigned char RelaxChecks        = 0;   /* Relax a few assembler checks */
 
 /* Emulation features */
 unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */
@@ -80,7 +81,7 @@ unsigned char UbiquitousIdents   = 0;   /* Allow ubiquitous identifiers */
 unsigned char OrgPerSeg          = 0;   /* Make .org local to current seg */
 unsigned char CComments          = 0;   /* Allow C like comments */
 unsigned char ForceRange         = 0;   /* Force values into expected range */
-                
+
 /* Misc stuff */
 const char Copyright[]           = "(C) Copyright 1998-2011 Ullrich von Bassewitz";
 

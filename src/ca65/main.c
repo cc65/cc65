@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -125,6 +125,7 @@ static void Usage (void)
             "  --macpack-dir dir\t\tSet a macro package directory\n"
             "  --memory-model model\t\tSet the memory model\n"
             "  --pagelength n\t\tSet the page length for the listing\n"
+            "  --relax-checks\t\tRelax some checks (see docs)\n"
             "  --smart\t\t\tEnable smart mode\n"
             "  --target sys\t\t\tSet the target system\n"
             "  --verbose\t\t\tIncrease verbosity\n"
@@ -561,6 +562,15 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 
 
 
+static void OptRelaxChecks (const char* Opt attribute ((unused)),
+		            const char* Arg attribute ((unused)))
+/* Handle the --relax-checks options */
+{
+    RelaxChecks = 1;
+}
+
+
+
 static void OptSmart (const char* Opt attribute ((unused)),
 		      const char* Arg attribute ((unused)))
 /* Handle the -s/--smart options */
@@ -871,6 +881,7 @@ int main (int argc, char* argv [])
         { "--macpack-dir",      1,      OptMacPackDir           },
         { "--memory-model",     1,      OptMemoryModel          },
 	{ "--pagelength",      	1,	OptPageLength		},
+        { "--relax-checks",     0,      OptRelaxChecks          },
     	{ "--smart",   	       	0,	OptSmart		},
 	{ "--target",  		1,	OptTarget		},
 	{ "--verbose", 	       	0,	OptVerbose		},

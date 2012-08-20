@@ -120,6 +120,7 @@ Long options:
   --macpack-dir dir             Set a macro package directory
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
+  --relax-checks                Relax some checks (see docs)
   --smart                       Enable smart mode
   --target sys                  Set the target system
   --verbose                     Increase verbosity
@@ -274,6 +275,20 @@ Here is a description of all the command line options:
 
   sets the length of a listing page in lines. See the <tt><ref
   id=".PAGELENGTH" name=".PAGELENGTH"></tt> directive for more information.
+
+
+  <label id="option--relax-checks">
+  <tag><tt>--relax-checks</tt></tag>
+
+  Relax some checks done by the assembler. This will allow code that is an
+  error in most cases and flagged as such by the assembler, but can be valid
+  in special situations.
+
+  Examples are:
+<itemize>
+<item>Short branches between two different segments.
+<item>Byte sized address loads where the address is not a zeropage address.
+</itemize>
 
 
   <label id="option-s">

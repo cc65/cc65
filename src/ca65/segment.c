@@ -407,20 +407,18 @@ void SegDone (void)
      	     	    }
      	     	    F->Type = FRAG_LITERAL;
 
-     	     	} else {
+      	     	} else if (RelaxChecks == 0) {
 
-                    /* Simplify the expression */
-                    /* ### F->V.Expr = SimplifyExpr (F->V.Expr, &ED); */
-
-     	     	    /* We cannot evaluate the expression now, leave the job for
-     	     	     * the linker. However, we can check if the address size
-                     * matches the fragment size, and we will do so.
-     	    	     */
+      	     	    /* We cannot evaluate the expression now, leave the job for
+      	     	     * the linker. However, we can check if the address size
+                     * matches the fragment size. Mismatches are errors in 
+                     * most situations.
+      	    	     */
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
-     	       	        LIError (&F->LI, "Range error");
-     	     	    }
+      	       	        LIError (&F->LI, "Range error");
+      	     	    }
      	    	}
 
                 /* Release memory allocated for the expression decriptor */

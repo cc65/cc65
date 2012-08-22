@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstraße 52                                              */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2012,  Ullrich von Bassewitz                                     */
+/*                 Roemerstrasse 52                                          */
+/*                 D-70794 Filderstadt                                       */
+/* EMail:          uz@cc65.org                                               */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,7 +36,7 @@
 #ifndef STUDYEXPR_H
 #define STUDYEXPR_H
 
-
+                                            
 
 /* common */
 #include "exprdefs.h"
@@ -52,6 +52,7 @@
 /* Flags */
 #define ED_OK           0x00            /* Nothing special */
 #define ED_TOO_COMPLEX  0x01            /* Expression is too complex */
+#define ED_ERROR        0x02            /* Error evaluating the expression */
 
 /* Symbol reference */
 typedef struct ED_SymRef ED_SymRef;

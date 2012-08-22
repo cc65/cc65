@@ -106,11 +106,19 @@ int ED_IsConst (const ExprDesc* D)
 
 
 static int ED_IsValid (const ExprDesc* D)
-/* Return true if the expression is valid, that is, the TOO_COMPLEX flag is
- * not set
+/* Return true if the expression is valid, that is, neither the ERROR nor the
+ * TOO_COMPLEX flags are set.
  */
 {
-    return ((D->Flags & ED_TOO_COMPLEX) == 0);
+    return ((D->Flags & (ED_ERROR | ED_TOO_COMPLEX)) == 0);
+}
+
+
+
+static int ED_HasError (const ExprDesc* D)
+/* Return true if the expression has an error. */
+{
+    return ((D->Flags & ED_ERROR) != 0);
 }
 
 
@@ -119,6 +127,14 @@ static void ED_Invalidate (ExprDesc* D)
 /* Set the TOO_COMPLEX flag for D */
 {
     D->Flags |= ED_TOO_COMPLEX;
+}
+
+
+
+static void ED_SetError (ExprDesc* D)
+/* Set the TOO_COMPLEX and ERROR flags for D */
+{
+    D->Flags |= (ED_ERROR | ED_TOO_COMPLEX);
 }
 
 
@@ -507,13 +523,10 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
     if (SymHasExpr (Sym)) {
 
         if (SymHasUserMark (Sym)) {
-            if (Verbosity > 0) {
-                DumpExpr (Expr, SymResolve);
-            }
             LIError (&Sym->DefLines,
                      "Circular reference in definition of symbol `%m%p'",
                      GetSymName (Sym));
-            ED_Invalidate (D);
+            ED_SetError (D);
         } else {
 
             unsigned char AddrSize;
@@ -522,6 +535,11 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
             SymMarkUser (Sym);
             StudyExprInternal (GetSymExpr (Sym), D);
             SymUnmarkUser (Sym);
+
+            /* If requested and if the expression is valid, dump it */
+            if (Verbosity > 0 && !ED_HasError (D)) {
+                DumpExpr (Expr, SymResolve);
+            }
 
             /* If the symbol has an explicit address size, use it. This may
              * lead to range errors later (maybe even in the linker stage), if
@@ -733,7 +751,7 @@ static void StudyDiv (ExprNode* Expr, ExprDesc* D)
     if (ED_IsValid (D)) {
         if (D->Right == 0) {
             Error ("Division by zero");
-            ED_Invalidate (D);
+            ED_SetError (D);
         } else {
             D->Val /= D->Right;
         }
@@ -752,7 +770,7 @@ static void StudyMod (ExprNode* Expr, ExprDesc* D)
     if (ED_IsValid (D)) {
         if (D->Right == 0) {
             Error ("Modulo operation with zero");
-            ED_Invalidate (D);
+            ED_SetError (D);
         } else {
             D->Val %= D->Right;
         }

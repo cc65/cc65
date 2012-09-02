@@ -2892,7 +2892,7 @@ Here's a list of all control commands and a description, what they do:
 
   This command is often used to check if a macro parameter was given. Since an
   empty macro parameter will evaluate to nothing, the condition will evaluate
-  to FALSE if an empty parameter was given.
+  to TRUE if an empty parameter was given.
 
   Example:
 
@@ -4084,41 +4084,35 @@ written more efficiently, like this:
        	.endmacro
 </verb></tscreen>
 
-But imagine what happens, if you use this macro twice? Since the label
-"Skip" has the same name both times, you get a "duplicate symbol" error.
-Without a way to circumvent this problem, macros are not as useful, as
-they could be. One solution is, to start a new lexical block inside the
-macro:
-
-<tscreen><verb>
-  	.macro 	inc16  	addr
-  	.proc
-       	       	inc	addr
-       	       	bne    	Skip
-       	   	inc    	addr+1
-  	Skip:
-  	.endproc
-  	.endmacro
-</verb></tscreen>
-
-Now the label is local to the block and not visible outside. However,
-sometimes you want a label inside the macro to be visible outside. To make
-that possible, there's a new command that's only usable inside a macro
-definition: <tt><ref id=".LOCAL" name=".LOCAL"></tt>. <tt/.LOCAL/ declares one
-or more symbols as local to the macro expansion. The names of local variables
-are replaced by a unique name in each separate macro expansion. So we could
-also solve the problem above by using <tt/.LOCAL/:
+But imagine what happens, if you use this macro twice? Since the label "Skip"
+has the same name both times, you get a "duplicate symbol" error. Without a
+way to circumvent this problem, macros are not as useful, as they could be.
+One possible solution is the command <tt><ref id=".LOCAL" name=".LOCAL"></tt>.
+It declares one or more symbols as local to the macro expansion. The names of
+local variables are replaced by a unique name in each separate macro
+expansion. So we can solve the problem above by using <tt/.LOCAL/:
 
 <tscreen><verb>
      	.macro 	inc16	addr
        	    	.local 	Skip 	    	; Make Skip a local symbol
-  	     	clc
-  	     	lda	addr
-  	     	adc	#$01
-  	     	sta	addr
-  	     	bcc	Skip
-  	     	inc	addr+1
-  	Skip:				; Not visible outside
+  	     	inc     addr
+       	       	bne     Skip
+  	     	inc     addr+1
+  	Skip:	     	     		; Not visible outside
+  	.endmacro
+</verb></tscreen>
+
+Another solution is of course to start a new lexical block inside the macro
+that hides any labels:
+
+<tscreen><verb>
+  	.macro 	inc16  	addr
+  	.proc
+       	       	inc   	addr
+       	       	bne    	Skip
+       	   	inc    	addr+1
+  	Skip:
+  	.endproc
   	.endmacro
 </verb></tscreen>
 
@@ -4199,7 +4193,7 @@ detect the end of one parameter, only the first token is used. If you
 don't like that, use classic macros instead:
 
 <tscreen><verb>
-   	.macro 	message
+   	.macro 	DEBUG   message
    	     	.out	message
    	.endmacro
 </verb></tscreen>

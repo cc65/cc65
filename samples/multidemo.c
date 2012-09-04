@@ -1,5 +1,5 @@
 /*
- * Minimalistic overlay demo program.
+ * Extended memory overlay demo program.
  *
  * 2012-17-07, Oliver Schmidt (ol.sc@web.de)
  *

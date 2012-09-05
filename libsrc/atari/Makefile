@@ -126,7 +126,7 @@ OBJS = 	_scrsize.o      \
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS =
+EMDS = atari-130xe.emd
 
 JOYS = atari-stdjoy.joy atari-multijoy.joy
 

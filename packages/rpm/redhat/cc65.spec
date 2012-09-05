@@ -168,6 +168,7 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 %files atari
 %attr(644,root,root)        %{_libdir}/cc65/lib/atari.lib
+%attr(644,root,root)        %{_libdir}/cc65/tgi/atr*.emd
 %attr(644,root,root)        %{_libdir}/cc65/joy/atari*.joy
 %attr(644,root,root)        %{_libdir}/cc65/tgi/atari*.tgi
 %attr(644,root,root)        %{_libdir}/cc65/tgi/atr*.tgi

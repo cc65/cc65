@@ -105,6 +105,7 @@ atarilib:
 	    $(MAKE) SYS=atari -C $$i || exit 1; \
 	    $(AR) a atari.lib $$i/*.o || exit 1; \
 	done
+	cp atari/atari-130xe.emd atr130xe.emd
 	cp atari/atari-stdjoy.joy ataristd.joy
 	cp atari/atari-multijoy.joy atarimj8.joy
 	cp atari/atari-10.tgi atari10.tgi

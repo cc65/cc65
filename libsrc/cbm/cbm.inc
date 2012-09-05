@@ -61,7 +61,7 @@ CBMDEV_SCREEN   = 3
 ; Disk stuff
 ;
 
-MAX_DRIVES      = 24
+MAX_DRIVES      = 23
 FIRST_DRIVE     = 8
 
 

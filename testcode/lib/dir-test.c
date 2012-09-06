@@ -27,14 +27,8 @@ int main(void)
 {
     char* name = ".";
     unsigned char go = 0;
-    register DIR *D;
-    struct dirent* E;
-
-    D = opendir (name);
-    if (D == 0) {
-        printf("error opening %s: %s\n", name, strerror (errno));
-        return 1;
-    }
+    DIR *D;
+    register struct dirent* E;
 
     /* Explain usage and wait for a key */
     printf ("Use the following keys:\n"
@@ -86,7 +80,7 @@ done:
     if (errno == 0) {
         printf ("Done\n");
     } else {
-        printf("Done: %d (s)\n", errno, strerror (errno));
+        printf("Done: %d (%s)\n", errno, strerror (errno));
     }
 
     /* Close the directory */

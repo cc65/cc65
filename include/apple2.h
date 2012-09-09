@@ -149,12 +149,6 @@ extern unsigned int  _auxtype;   /* Default 0 */
 
 
 
-unsigned char drivecount (void);
-/* Returns the number of ProDOS 8 drives. */
-
-unsigned char* drivelist (void);
-/* Returns a pointer to the list of ProDOS 8 drives. */
-
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */
 

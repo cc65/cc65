@@ -70,12 +70,12 @@ S_OBJS=	_scrsize.o	\
 	diosectsize.o	\
 	diowrite.o	\
 	dosdetect.o	\
-	drives.o	\
 	exec.o		\
 	exehdr.o	\
 	filedes.o	\
 	filename.o	\
         get_ostype.o    \
+	getdevice.o	\
 	gotoxy.o	\
 	gotoy.o		\
         home.o          \

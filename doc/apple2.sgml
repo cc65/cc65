@@ -294,8 +294,6 @@ usage.
 <item>_auxtype
 <item>_dos_type
 <item>_filetype
-<item>drivecount
-<item>drivelist
 <item>get_ostype
 <item>rebootafterexit
 <item>rootdir

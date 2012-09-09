@@ -55,6 +55,7 @@ OBJS = 	_scrsize.o     	 	\
        	devnum.o       	 	\
         get_ostype.o            \
         get_tv.o                \
+        getdevice.o             \
 	joy_stddrv.o		\
        	kbhit.o	       	 	\
         kernal.o                \

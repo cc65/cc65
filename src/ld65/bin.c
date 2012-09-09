@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2011, Ullrich von Bassewitz                                      */
+/* (C) 1999-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -142,7 +142,7 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
     /* Debugging: Check that the file offset is correct */
     if (ftell (D->F) != (long)M->FileOffs) {
         Internal ("Invalid file offset for memory area %s: %ld/%lu",
-                  GetString (M->Name), ftell (D->F), M->FileOffs);            
+                  GetString (M->Name), ftell (D->F), M->FileOffs);
     }
 
     /* Walk over all segments in this memory area */
@@ -231,11 +231,10 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
 	 */
        	if (DoWrite) {
             unsigned long P = ftell (D->F);
-            S->Seg->FillVal = M->FillVal;
 	    SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
             PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
-	} else if (M->Flags & MF_FILL) {
-	    WriteMult (D->F, M->FillVal, S->Seg->Size);
+       	} else if (M->Flags & MF_FILL) {
+	    WriteMult (D->F, S->Seg->FillVal, S->Seg->Size);
             PrintNumVal ("Filled", (unsigned long) S->Seg->Size);
 	}
 

@@ -118,6 +118,7 @@ static Collection       SegDescList = STATIC_COLLECTION_INITIALIZER;
 #define SA_OFFSET	0x0040
 #define SA_START	0x0080
 #define SA_OPTIONAL     0x0100
+#define SA_FILLVAL      0x0200
 
 /* Symbol types used in the CfgSymbol structure */
 typedef enum {
@@ -353,6 +354,7 @@ static SegDesc* NewSegDesc (unsigned Name)
     S->Seg           = 0;
     S->Attr          = 0;
     S->Flags         = 0;
+    S->FillVal       = 0;
     S->RunAlignment  = 1;
     S->LoadAlignment = 1;
 
@@ -637,6 +639,7 @@ static void ParseSegments (void)
         {   "ALIGN",            CFGTOK_ALIGN            },
         {   "ALIGN_LOAD",       CFGTOK_ALIGN_LOAD       },
         {   "DEFINE",           CFGTOK_DEFINE           },
+        {   "FILLVAL",          CFGTOK_FILLVAL          },
        	{   "LOAD",    	        CFGTOK_LOAD             },
 	{   "OFFSET",  	        CFGTOK_OFFSET           },
         {   "OPTIONAL",         CFGTOK_OPTIONAL         },
@@ -704,6 +707,12 @@ static void ParseSegments (void)
 	    	     	S->Flags |= SF_DEFINE;
 	    	    }
                     CfgNextTok ();
+	    	    break;
+
+                case CFGTOK_FILLVAL:
+	    	    FlagAttr (&S->Attr, SA_FILLVAL, "FILLVAL");
+	      	    S->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
+                    S->Flags |= SF_FILLVAL;
 	    	    break;
 
 	    	case CFGTOK_LOAD:
@@ -1561,22 +1570,22 @@ static void ProcessSegments (void)
     while (I < CollCount (&SegDescList)) {
 
         /* Get the next segment descriptor */
-	SegDesc* S = CollAtUnchecked (&SegDescList, I);
+   	SegDesc* S = CollAtUnchecked (&SegDescList, I);
 
         /* Search for the actual segment in the input files. The function may
          * return NULL (no such segment), this is checked later.
          */
         S->Seg = SegFind (S->Name);
 
-	/* If the segment is marked as BSS style, and if the segment exists
+   	/* If the segment is marked as BSS style, and if the segment exists
          * in any of the object file, check that there's no initialized data
          * in the segment.
-	 */
-	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
+   	 */
+   	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
        	    CfgWarning (GetSourcePos (S->LI),
                         "Segment `%s' with type `bss' contains initialized data",
-	    	        GetString (S->Name));
-	}
+   	    	        GetString (S->Name));
+   	}
 
       	/* If this segment does exist in any of the object files, insert the
        	 * segment into the load/run memory areas. Otherwise print a warning
@@ -1591,6 +1600,9 @@ static void ProcessSegments (void)
       	    	/* We have separate RUN and LOAD areas */
       	    	MemoryInsert (S->Load, S);
       	    }
+
+            /* Use the fill value from the config */
+            S->Seg->FillVal = S->FillVal;
 
             /* Process the next segment descriptor in the next run */
             ++I;
@@ -1892,6 +1904,13 @@ unsigned CfgProcess (void)
                     Addr = AlignAddr (Addr, S->LoadAlignment);
                 }
 
+            }
+
+            /* If this is the load memory area and the segment doesn't have a
+             * fill value defined, use the one from the memory area.
+             */
+            if (S->Load == M && (S->Flags & SF_FILLVAL) == 0) {
+                S->Seg->FillVal = M->FillVal;
             }
 
      	    /* Increment the fill level of the memory area and check for an

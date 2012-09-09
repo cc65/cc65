@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -75,6 +75,7 @@ struct SegDesc {
     Segment*   	      	Seg; 	  	/* Pointer to segment structure */
     unsigned   	      	Attr;	  	/* Attributes for segment */
     unsigned   	      	Flags;	  	/* Set of bitmapped flags */
+    unsigned char       FillVal;        /* Fill value for this segment */
     struct MemoryArea*  Load;           /* Load memory section */
     struct MemoryArea*  Run;            /* Run memory section */
     unsigned long      	Addr; 		/* Start address or offset into segment */
@@ -94,6 +95,7 @@ struct SegDesc {
 #define SF_OPTIONAL     0x0100          /* Segment is optional (must not exist) */
 #define SF_RUN_DEF     	0x0200		/* RUN symbols already defined */
 #define SF_LOAD_DEF   	0x0400		/* LOAD symbols already defined */
+#define SF_FILLVAL      0x0800          /* Segment has separate fill value */
 
 
 

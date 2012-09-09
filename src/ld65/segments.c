@@ -464,16 +464,22 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
 
     /* Loop over all sections in this segment */
     for (I = 0; I < CollCount (&S->Sections); ++I) {
-        Section* Sec = CollAtUnchecked (&S->Sections, I);
-     	Fragment* Frag;
+
+        Section*        Sec = CollAtUnchecked (&S->Sections, I);
+     	Fragment*       Frag;
+        unsigned char   FillVal;
 
         /* Output were this section is from */
         Print (stdout, 2, "      Section from \"%s\"\n", GetObjFileName (Sec->Obj));
 
-     	/* If we have fill bytes, write them now */
+     	/* If we have fill bytes, write them now. Beware: If this is the
+         * first section, the fill value is not considered part of the segment
+         * and therefore taken from the memory area.
+         */
+        FillVal = (I == 0)? S->MemArea->FillVal : S->FillVal;
        	Print (stdout, 2, "        Filling 0x%lx bytes with 0x%02x\n",
-               Sec->Fill, S->FillVal);
-     	WriteMult (Tgt, S->FillVal, Sec->Fill);
+               Sec->Fill, FillVal);
+     	WriteMult (Tgt, FillVal, Sec->Fill);
      	Offs += Sec->Fill;
 
      	/* Loop over all fragments in this section */

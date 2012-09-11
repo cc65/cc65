@@ -122,20 +122,12 @@ flagsok:
 	lda	_FileStartBlock
 	sta	_FileCurrBlock
 	jsr	lynxblock
+	lda	_FileBlockOffset+1
+        eor	#$FF
+	tay
 	lda	_FileBlockOffset
-	ldx	_FileBlockOffset+1
-	phx				; The BLL kit uses negative offsets
-	plx				; while tha basic Lynx uses positive
-	bmi	@1			; Make all offsets negative
         eor	#$FF
-	pha
-	txa
-        eor	#$FF
-	bra	@2
-@1:	pha
-	txa
-@2:	tay
-	plx
+	tax
 	jsr	lynxskip0
 	jsr     stax0sp
 	jmp     incsp8

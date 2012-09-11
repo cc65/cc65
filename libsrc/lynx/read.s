@@ -8,8 +8,7 @@
 ; reads bytes from a raw cart and does not understand the concept of files.
 ; So if you read over the end of file you get data from the next file.
 ;
-; The count-parameter can be positive (Atari style) or negative (BLL style).
-; In any case the read routine will work correctly.
+; The count-parameter is positive (Atari style).
 ;
 ; int __fastcall__ read(int fd,void *buf,int count)
 ;
@@ -30,18 +29,13 @@
 	sta     _FileDestPtr
 	stx     _FileDestPtr+1
 	jsr     ldax0sp
-	phx			; The BLL kit uses negative counts
-	plx			; while the basic Lynx uses positive
-	bmi	@1		; make all counts negative
-	eor	#$FF
 	pha
-	txa
+        txa
 	eor	#$FF
-	bra	@2
-@1:	pha
-	txa
-@2:	tay
-	plx
+	tay
+	pla
+	eor	#$FF
+	tax
 	jsr     lynxread0
 	jsr     ldax0sp
 	jmp     incsp6

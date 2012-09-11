@@ -23,7 +23,7 @@
 ;	.org $0200
 ;
 ;	; 1. force Mikey to be in memory
-;	stz	MAPCTL
+;	stz MAPCTL
 ;
 ;	; 3. set ComLynx to open collector
 ;	lda #4          ; a = 00000100
@@ -35,7 +35,7 @@
 ;
 ;	; 5. read in secondary exe + 8 bytes from the cart and store it in $f000
 ;	ldx #0          ; x = 0
-;	ldy #$AB        ; y = secondary loader size (171 bytes)
+;	ldy #$97        ; y = secondary loader size (151 bytes)
 ;rloop1: lda RCART0     ; read a byte from the cart
 ;	sta EXE,X       ; EXE[X] = a
 ;	inx             ; x++
@@ -49,13 +49,13 @@
 ;**********************************
 ; After compilation, encryption and obfuscation it turns into this.
 ;**********************************
-	.byte $ff, $dc, $e3, $bd, $bc, $7f, $f8, $94 
-	.byte $b7, $dd, $68, $bb, $da, $5b, $50, $5c 
-	.byte $ea, $9f, $2b, $df, $96, $80, $3f, $7e 
-	.byte $ef, $15, $81, $ae, $ad, $e4, $6e, $b3 
-	.byte $46, $d7, $72, $58, $f7, $76, $8a, $4a 
-	.byte $c7, $99, $bd, $ff, $02, $3e, $5b, $3f 
-	.byte $0c, $49, $1b, $22
+	.byte $ff, $30, $73, $35, $4a, $a8, $54, $ef 
+	.byte $54, $20, $f5, $38, $f4, $35, $7e, $31 
+	.byte $7a, $c3, $f6, $eb, $ee, $30, $e3, $e5 
+	.byte $81, $91, $85, $bf, $4b, $d9, $cf, $80 
+	.byte $5f, $54, $36, $b5, $8a, $b0, $50, $d6 
+	.byte $38, $22, $3e, $c1, $01, $a6, $dd, $f5 
+	.byte $4b, $5e, $6b, $21
 
 ;**********************************
 ; Now we have the secondary loader
@@ -76,20 +76,12 @@ rloop:	lda RCART0      ; read a byte from the cart
 	jsr	seclynxblock
 
 	; 3. Skip over the block offset
+	lda	_FileBlockOffset+1
+        eor	#$FF
+	tay
 	lda	_FileBlockOffset
-	ldx	_FileBlockOffset+1
-	phx				; The BLL kit uses negative offsets
-	plx				; while the basic Lynx uses positive
-	bmi	@1			; Make all offsets negative
         eor	#$FF
-	pha
-	txa
-        eor	#$FF
-	bra	@2
-@1:	pha
-	txa
-@2:	tay
-	plx
+	tax
 	jsr	seclynxskip0
 
 	; 4. Read in the main exe to RAM
@@ -97,20 +89,12 @@ rloop:	lda RCART0      ; read a byte from the cart
 	ldx	_FileDestAddr+1
 	sta     _FileDestPtr
 	stx     _FileDestPtr+1
+	lda     _FileFileLen+1
+	eor	#$FF
+	tay
 	lda     _FileFileLen
-	ldx     _FileFileLen+1
-	phx			; The BLL kit uses negative counts
-	plx			; while the basic Lynx uses positive
-	bmi	@3		; make all counts negative
 	eor	#$FF
-	pha
-	txa
-	eor	#$FF
-	bra	@4
-@3:	pha
-	txa
-@4:	tay
-	plx
+	tax
 	jsr     seclynxread0
 
 	; 5. Jump to start of the main exe code
@@ -190,5 +174,6 @@ seclynxblock:
 	pla
 
 exit:	rts
+
 	.reloc
 

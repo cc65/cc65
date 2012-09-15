@@ -18,7 +18,7 @@
 ; The idea is to make the smalles possible encrypted loader as decryption
 ; is very slow. The minimum size is 49 bytes plus a zero byte.
 ;**********************************
-;	EXE = $f000
+;	EXE = $fb68
 ;
 ;	.org $0200
 ;
@@ -49,18 +49,18 @@
 ;**********************************
 ; After compilation, encryption and obfuscation it turns into this.
 ;**********************************
-	.byte $ff, $30, $73, $35, $4a, $a8, $54, $ef 
-	.byte $54, $20, $f5, $38, $f4, $35, $7e, $31 
-	.byte $7a, $c3, $f6, $eb, $ee, $30, $e3, $e5 
-	.byte $81, $91, $85, $bf, $4b, $d9, $cf, $80 
-	.byte $5f, $54, $36, $b5, $8a, $b0, $50, $d6 
-	.byte $38, $22, $3e, $c1, $01, $a6, $dd, $f5 
-	.byte $4b, $5e, $6b, $21
+	.byte $ff, $81, $ca, $33, $be, $80, $a2, $c4 
+	.byte $6d, $98, $fe, $8d, $bc, $66, $c0, $7a 
+	.byte $09, $50, $23, $28, $18, $c8, $06, $70 
+	.byte $58, $4f, $1b, $e1, $c7, $90, $08, $cd 
+	.byte $1a, $6e, $5a, $45, $32, $d7, $6d, $c6 
+	.byte $8a, $e5, $d8, $5c, $a0, $e8, $4f, $7a 
+	.byte $5f, $73, $8d, $22
 
 ;**********************************
 ; Now we have the secondary loader
 ;**********************************
-	.org $f000
+	.org $fb68
 	; 1. Read in the 1st File-entry (main exe) in FileEntry
 	ldx #$00
 	ldy #8

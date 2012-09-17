@@ -626,7 +626,7 @@ static void DoCharMap (void)
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (Index < 0 || Index > 255) {
+    if (Index <= 0 || Index > 255) {
       	/* Value out of range */
        	ErrorSkip ("Range error");
       	return;
@@ -637,7 +637,7 @@ static void DoCharMap (void)
 
     /* Read the character code */
     Code = ConstExpression ();
-    if (Code < 0 || Code > 255) {
+    if (Code <= 0 || Code > 255) {
     	/* Value out of range */
        	ErrorSkip ("Range error");
     	return;

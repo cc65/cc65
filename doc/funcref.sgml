@@ -1,4 +1,4 @@
-<!doctype linuxdoc system>
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
 
 <article>
 <title>cc65 function reference
@@ -1598,7 +1598,7 @@ Exception is the routine for the keyboard device (which is the default input dev
 <ref id="cbm_k_open" name="cbm_k_open">,
 <ref id="cbm_k_chkin" name="cbm_k_chkin">
 <tag/Example/None.
-</descrip>                               
+</descrip>
 </quote>
 
 
@@ -1880,7 +1880,7 @@ routines must be called.
 only be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
-<tag/See also/                         
+<tag/See also/
 <ref id="cbm_k_save" name="cbm_k_save">,
 <ref id="cbm_k_setlfs" name="cbm_k_setlfs">,
 <ref id="cbm_k_setnam" name="cbm_k_setnam">
@@ -4824,6 +4824,17 @@ be used in presence of a prototype.
 <item>The returned pointer may point to a statically allocated instance of
 <tt/struct dirent/, so it may get overwritten by subsequent calls to
 <tt/readdir/.
+<item>On several platforms, namely the CBMs and the Atari, the disk drives get
+confused when opening/closing files between directory reads. So for example a
+program that reads the list of files on a disk, and after each call to
+<tt/readdir/, opens the file to process it, will fail.<newline>
+Possible solutions are reading the directory into memory before processing the
+file list, or to reset the directory by seeking to the correct position after
+opening/closing a file:
+<verb>
+        seekdir (DIR, telldir (DIR));
+</verb>
+Platforms known to work without problems are: Apple.
 </itemize>
 <tag/Availability/POSIX 1003.1
 <tag/See also/

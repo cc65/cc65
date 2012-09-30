@@ -70,6 +70,7 @@ OBJS =	_scrsize.o	\
         mainargs.o      \
         randomize.o	\
 	revers.o        \
+	status.o        \
         sysuname.o
 
 #--------------------------------------------------------------------------

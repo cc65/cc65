@@ -9,6 +9,7 @@
 	.import		callmain
         .import         CLRCH, BSOUT
 	.import		__INTERRUPTOR_COUNT__
+	.importzp       ST
 
         .include        "zeropage.inc"
 	.include	"pet.inc"

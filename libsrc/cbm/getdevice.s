@@ -11,9 +11,8 @@
         .import         isdisk
         .import         opencmdchannel
         .import         closecmdchannel
+        .importzp       ST
         .importzp       tmp2
-
-        .include        "c64.inc"
 
 ;------------------------------------------------------------------------------
 ; _getfirstdevice

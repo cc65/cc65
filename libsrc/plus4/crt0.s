@@ -11,6 +11,7 @@
 	.import	       	__INTERRUPTOR_COUNT__
 	.import         __RAM_START__, __RAM_SIZE__     ; Linker generated
 	.import         __STACKSIZE__                   ; Linker generated
+	.importzp       ST
 
         .include        "zeropage.inc"
 	.include	"plus4.inc"

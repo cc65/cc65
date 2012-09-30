@@ -6,8 +6,7 @@
 ;
 
         .export         checkst
-
-        .include        "pet.inc"
+        .importzp       ST
 
 
 .proc   checkst
@@ -22,5 +21,3 @@
         rts
 
 .endproc
-
-

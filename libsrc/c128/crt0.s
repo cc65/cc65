@@ -10,6 +10,7 @@
         .import         RESTOR, BSOUT, CLRCH
 	.import	       	__INTERRUPTOR_COUNT__
     	.import	 	__RAM_START__, __RAM_SIZE__, __STACKSIZE__
+	.importzp       ST
 
         .include        "zeropage.inc"
     	.include 	"c128.inc"

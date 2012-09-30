@@ -5,8 +5,7 @@
 ;
 
         .export         READST
-
-        .include        "pet.inc"
+        .importzp       ST
 
 
 .proc   READST

@@ -11,6 +11,7 @@
 	.import	     	callmain, zerobss
         .import         MEMTOP, RESTOR, BSOUT, CLRCH
 	.import	       	__INTERRUPTOR_COUNT__
+	.importzp       ST
 
         .include        "zeropage.inc"
 	.include	"plus4.inc"

@@ -76,6 +76,7 @@ S_OBJS =	c_acptr.o	\
                 filename.o      \
                 filetype.o      \
                 filevars.o      \
+                getdevice.o     \
 		gotox.o 	\
 		gotoxy.o 	\
 		gotoy.o 	\

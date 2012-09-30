@@ -56,7 +56,6 @@ OBJS =	_scrsize.o		\
        	devnum.o       	 	\
 	fast.o			\
         get_tv.o        	\
-        getdevice.o        	\
 	joy_stddrv.o		\
      	kbhit.o	       		\
         kernal.o        	\
@@ -66,6 +65,7 @@ OBJS =	_scrsize.o		\
         randomize.o     	\
         revers.o        	\
 	slow.o			\
+	status.o		\
         systime.o               \
         sysuname.o              \
         tgi_colors.o            \

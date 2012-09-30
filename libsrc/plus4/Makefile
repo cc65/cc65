@@ -82,6 +82,7 @@ OBJS =	_scrsize.o	\
         mainargs.o      \
         randomize.o     \
         revers.o        \
+        status.o        \
         systime.o       \
         sysuname.o
 

@@ -42,6 +42,11 @@ struct {
  */
 #define MAX_EM_OVERLAY 3
 
+/* Search for up to 10 extended memory drivers.
+ */
+#define MAX_EM_DRIVER 10
+
+
 
 /* Functions resident in an overlay can call back functions resident in the
  * main program at any time without any precautions. The function log() is
@@ -96,8 +101,11 @@ void foobar (void)
 
 unsigned char loademdriver (void)
 {
+    static char emd[MAX_EM_DRIVER][FILENAME_MAX];
     DIR* dir;
     struct dirent* ent;
+    unsigned char max = 0;
+    unsigned char num;
 
     printf ("Dbg: Searching for emdrivers\n");
     dir = opendir (".");
@@ -119,17 +127,24 @@ unsigned char loademdriver (void)
             continue;
         }
 
-        printf ("Dbg: Trying emdriver %s\n", ent->d_name);
-        if (em_load_driver (ent->d_name) == EM_ERR_OK) {
-            printf ("Dbg: Loaded emdriver %s\n", ent->d_name);
+        printf ("Dbg: Memorizing file %s\n", ent->d_name);
+        strcpy (emd[max], ent->d_name);
+        if (++max == MAX_EM_DRIVER) {
             break;
         }
- 
-        printf ("Dbg: Emdriver %s failed\n", ent->d_name);
     }
-
     closedir (dir);
-    return ent != NULL;
+
+    for (num = 0; num < max; ++num) {
+        printf ("Dbg: Trying emdriver %s\n", emd[num]);
+        if (em_load_driver (emd[num]) == EM_ERR_OK) {
+            printf ("Dbg: Loaded emdriver %s\n", emd[num]);
+            return 1;
+        }
+ 
+        printf ("Dbg: Emdriver %s failed\n", emd[num]);
+    }
+    return 0;
 }
 
 void copyoverlays (void)

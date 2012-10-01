@@ -168,10 +168,11 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 %files atari
 %attr(644,root,root)        %{_libdir}/cc65/lib/atari.lib
-%attr(644,root,root)        %{_libdir}/cc65/tgi/atr*.emd
+%attr(644,root,root)        %{_libdir}/cc65/emd/atr*.emd
 %attr(644,root,root)        %{_libdir}/cc65/joy/atari*.joy
 %attr(644,root,root)        %{_libdir}/cc65/tgi/atari*.tgi
 %attr(644,root,root)        %{_libdir}/cc65/tgi/atr*.tgi
+%attr(644,root,root)        %{_libdir}/cc65/cfg/atari-*.cfg
 
 
 
@@ -192,7 +193,7 @@ programs for the Oric Atmos using the cc65 crosscompiler.
 %files atmos
 %attr(644,root,root)        %{_libdir}/cc65/lib/atmos.lib
 %attr(644,root,root)        %{_libdir}/cc65/joy/atmos-*.joy
-%attr(644,root,root)        %{_libdir}/cc65/tgi/atmos-*.ser
+%attr(644,root,root)        %{_libdir}/cc65/ser/atmos-*.ser
 %attr(644,root,root)        %{_libdir}/cc65/tgi/atmos-*.tgi
 
 
@@ -264,6 +265,7 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 %attr(644,root,root)        %{_libdir}/cc65/mou/c64-*.mou
 %attr(644,root,root)        %{_libdir}/cc65/ser/c64-*.ser
 %attr(644,root,root)        %{_libdir}/cc65/tgi/c64-*.tgi
+%attr(644,root,root)        %{_libdir}/cc65/cfg/c64-*.cfg
 
 
 
@@ -329,12 +331,13 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 %files geos
 %attr(755,root,root)        /usr/bin/grc65
 %attr(644,root,root)        %{_libdir}/cc65/lib/geos-cbm.lib
+%attr(644,root,root)        %{_libdir}/cc65/lib/geos-apple.lib
 %attr(755,root,root) %dir   %{_libdir}/cc65/include/geos
 %attr(644,root,root)        %{_libdir}/cc65/include/geos/*.h
 %attr(644,root,root)        %{_libdir}/cc65/emd/geos-*.emd
 %attr(644,root,root)        %{_libdir}/cc65/joy/geos-*.joy
 %attr(644,root,root)        %{_libdir}/cc65/tgi/geos-*.tgi
-
+%attr(644,root,root)        %{_libdir}/cc65/cfg/geos-*.cfg
 
 
 ###############################################################################
@@ -500,7 +503,7 @@ install -s -m 755 src/da65/da65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/grc65/grc65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT%{_bindir}
 install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT%{_bindir}
-install -s -m 755 src/od65/sp65 $RPM_BUILD_ROOT%{_bindir}
+install -s -m 755 src/sp65/sp65 $RPM_BUILD_ROOT%{_bindir}
 
 # Libraries and includes
 install -m 644 libsrc/*.lib $RPM_BUILD_ROOT%{_libdir}/cc65/lib

@@ -7,6 +7,7 @@
         .export         READST
 
         .include        "plus4.inc"
+        .importzp       ST
 
 ; Read the status byte from the zero page instead of banking in the ROM
 

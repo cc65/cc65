@@ -7,7 +7,6 @@
 ; Zero page, Commodore stuff
 
 TMPPTR          := $22          ; Temporary ptr used by BASIC
-ST     	       	:= $90 	    	; IEC status byte
 TIME            := $A3          ; 60HZ clock
 FNAM_LEN       	:= $AB 	    	; Length of filename
 LFN             := $AC          ; Logical file number

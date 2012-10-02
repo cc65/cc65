@@ -8,7 +8,6 @@
 
 MEMSIZE	       	:= $34          ; Size of memory installed
 TIME            := $8D          ; 60HZ clock
-ST     	       	:= $96          ; IEC status byte
 KEY_COUNT      	:= $9E          ; Number of keys in input buffer
 RVS		:= $9F          ; Reverse flag
 CURS_FLAG	:= $A7          ; 1 = cursor off

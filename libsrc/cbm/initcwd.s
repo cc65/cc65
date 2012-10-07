@@ -5,31 +5,18 @@
 ;
 
 	.export		initcwd
-	.import		__curunit, __cwd
-	.import		pusha0, tosudiva0
-	.importzp	sreg, ptr1
-
-	.macpack	generic
+	.import		__curunit, __cwd, devicestr
+	.importzp	ptr2
 
 	.segment	"INIT"
 
 .proc	initcwd
 
+	lda	#<__cwd
+	ldx	#>__cwd
+	sta	ptr2
+	stx	ptr2+1
 	lda	__curunit
-	jsr	pusha0
-	lda	#10
-	jsr	tosudiva0
-	ldx	#0
-	lda	sreg
-	beq	:+		; >=10
-	add	#'0'
-	sta	__cwd
-	inx
-:	lda	ptr1		; rem
-	add	#'0'
-	sta	__cwd,x
-	lda	#0
-	sta	__cwd+1,x
-	rts
+	jmp	devicestr
 
 .endproc

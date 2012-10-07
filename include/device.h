@@ -55,6 +55,8 @@ unsigned char getfirstdevice (void);
 
 unsigned char __fastcall__ getnextdevice (unsigned char device);
 
+char* __fastcall__ getdevicedir (unsigned char device, char* buf, size_t size);
+
 
 
 /* End of device.h */

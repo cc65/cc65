@@ -86,7 +86,8 @@ errno:  jsr     __seterrno      ; Returns 0 in A
 ; Copy device string representation into buf
 
 okay:   lda     fnunit
-        jsr     devicestr
+        jsr     devicestr       ; Returns 0 in A
+        sta     __oserror       ; Clear _oserror
 
 ; Success, return buf
 

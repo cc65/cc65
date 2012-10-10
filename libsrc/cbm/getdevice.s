@@ -26,7 +26,7 @@ _getfirstdevice:
 
 _getnextdevice:
         tax
-next:	inx
+next:   inx
         cpx     #$FF
         beq     done
 

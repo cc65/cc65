@@ -70,7 +70,6 @@ S_OBJS =	c_acptr.o	\
 		ctype.o  	\
 		cvline.o 	\
                 devicedir.o     \
-                devicestr.o     \
                 dir.o           \
                 diskcmd.o       \
                 exehdr.o        \

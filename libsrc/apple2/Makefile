@@ -62,6 +62,7 @@ S_OBJS=	_scrsize.o	\
      	crt0.o		\
      	ctype.o		\
      	cvline.o	\
+     	devicedir.o	\
 	dioclose.o	\
 	diocommon.o	\
 	dioopen.o	\
@@ -95,7 +96,6 @@ S_OBJS=	_scrsize.o	\
      	read.o          \
      	reboot.o        \
      	revers.o	\
-     	rootdir.o	\
 	rwcommon.o	\
 	syschdir.o	\
 	sysmkdir.o	\

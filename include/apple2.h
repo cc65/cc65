@@ -155,11 +155,6 @@ unsigned char get_ostype (void);
 void rebootafterexit (void);
 /* Reboot machine after program termination has completed. */
 
-int __fastcall__ rootdir (unsigned char drive, char* buf);
-/* Fill buffer with root directory name of ProDOS 8 disk in
- * ProDOS 8 drive. Returns 0 on success and -1 on error.
- */
-
 #define ser_apple2_slot(num)  ser_ioctl (0, (void*) (num))
 /* Select a slot number from 1 to 7 prior to ser_open.
  * The default slot number is 2.

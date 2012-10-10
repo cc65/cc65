@@ -296,7 +296,6 @@ usage.
 <item>_filetype
 <item>get_ostype
 <item>rebootafterexit
-<item>rootdir
 <item>ser_apple2_slot
 <item>textframe
 <item>textframexy

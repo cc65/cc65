@@ -7,8 +7,6 @@
 	.import		__cwd
 	.include	"atari.inc"
 
-	.segment	"INIT"
-
 .proc	initcwd
 
 	jsr	findfreeiocb

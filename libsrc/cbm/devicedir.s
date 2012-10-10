@@ -75,12 +75,13 @@ close:  pha
         bcs     okay            ; Buf >= 3
 
 erange: lda     #<ERANGE
-        bne     errno           ; Branch always
+        jsr     __directerrno
+        bne     fail            ; Branch always
 
-oserr:  jsr     __osmaperrno
+oserr:  jsr     __mappederrno
 
-errno:  jsr     __seterrno      ; Returns 0 in A
-        tax                     ; Return NULL
+fail:   lda     #0              ; Return NULL
+        tax
         rts
 
 ; Copy device string representation into buf

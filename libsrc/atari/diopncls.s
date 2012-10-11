@@ -8,7 +8,7 @@
 ; _dio_write functions. To query the sector size, the _dio_open
 ; accesses the disk drive.
 ;
-; dhandle_t	__fastcall__ dio_open  (driveid_t drive_id);
+; dhandle_t	__fastcall__ dio_open  (unsigned char device);
 ; unsigned char __fastcall__ dio_close (dhandle_t handle);
 ;
 

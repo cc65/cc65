@@ -8,11 +8,10 @@
 ; cylinder and head 0 and as sector the sectnum it got
 ;
 ; unsigned char __fastcall__ dio_log_to_phys(dhandle_t handle,
-;					     sectnum_t *sectnum,	/* input */
+;					     unsigned *sectnum,		/* input */
 ;					     dio_phys_pos *physpos);	/* output */
 ;
 ; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
 ;
 
 	.export		_dio_log_to_phys

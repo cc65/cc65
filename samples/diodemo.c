@@ -54,11 +54,11 @@ static void ClearLine (void)
 }
 
 
-static driveid_t AskForDrive (const char* Name)
+static unsigned char AskForDrive (const char* Name)
 /* Ask for a drive id and return it */
 {
-    driveid_t Drive = 0;
-    char      Char;
+    unsigned char Drive = 0;
+    char          Char;
 
     cprintf ("\r\n%s Drive ID ?", Name);
 
@@ -74,7 +74,7 @@ static driveid_t AskForDrive (const char* Name)
 }
 
 
-static void AskForDisk (const char* Name, driveid_t Drive)
+static void AskForDisk (const char* Name, unsigned char Drive)
 /* Ask the user to insert a specific disk */
 {
     ClearLine ();
@@ -84,7 +84,7 @@ static void AskForDisk (const char* Name, driveid_t Drive)
 }
 
 
-static char* AllocBuffer (sectsize_t SectSize, sectnum_t SectCount, sectnum_t* ChunkCount)
+static char* AllocBuffer (unsigned int SectSize, unsigned int SectCount, unsigned int* ChunkCount)
 /* Allocate a copy buffer on the heap and return a pointer to it */
 {
     char*         Buffer = NULL;
@@ -94,7 +94,7 @@ static char* AllocBuffer (sectsize_t SectSize, sectnum_t SectCount, sectnum_t* C
     /* Increase number of chunks resp. decrease size */
     /* of one chunk until buffer allocation succeeds */
     do {
-        *ChunkCount = (sectnum_t) ((SectCount + Chunks - 1) / Chunks);
+        *ChunkCount = (unsigned int) ((SectCount + Chunks - 1) / Chunks);
         BufferSize = *ChunkCount * (unsigned long) SectSize;
         if (BufferSize < UINT_MAX) {
             Buffer = malloc ((size_t) BufferSize);
@@ -107,16 +107,16 @@ static char* AllocBuffer (sectsize_t SectSize, sectnum_t SectCount, sectnum_t* C
 
 int main (int argc, const char* argv[])
 {
-    driveid_t  SourceId;
-    driveid_t  TargetId;
-    dhandle_t  Source = NULL;
-    dhandle_t  Target = NULL;
-    sectsize_t SectSize;
-    sectnum_t  SectCount;
-    char*      Buffer;
-    sectnum_t  Sector;
-    sectnum_t  ChunkCount;
-    sectnum_t  ChunkOffset = 0;
+    unsigned char SourceId;
+    unsigned char TargetId;
+    dhandle_t     Source = NULL;
+    dhandle_t     Target = NULL;
+    unsigned int  SectSize;
+    unsigned int  SectCount;
+    char*         Buffer;
+    unsigned int  Sector;
+    unsigned int  ChunkCount;
+    unsigned int  ChunkOffset = 0;
 
     clrscr ();
     screensize (&ScreenX, &ScreenY);

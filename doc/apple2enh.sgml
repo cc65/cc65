@@ -495,15 +495,15 @@ url="ca65.html" name="assembler manual">.
 
   <tag/Drive ID/
   The function <htmlurl url="dio-1.html" name="dio_open()"> has the single
-  parameter <tt/drive_id/ to identify the drive to be opened. Therefore an
+  parameter <tt/device/ to identify the device to be opened. Therefore an
   Apple&nbsp;II slot and drive pair is mapped to that <tt/drive_id/ according
   to the formula
 
   <tscreen>
-    drive_id = slot * 16 + (drive - 1) * 128
+    device = slot * 0x10 + (drive - 1) * 0x80
   </tscreen>
 
-  so that for example slot 6 drive 2 is mapped to <tt/drive_id/ 224.
+  so that for example slot 6 drive 2 is mapped to <tt/device/ 0xE0.
 
   <tag/Sector count/
   The function <htmlurl url="dio-3.html" name="dio_query_sectcount()"> returns

@@ -17,16 +17,16 @@ Include the dio.h header file to get the necessary definitions.
 
 <sect>Opening the disk for low level I/O<p>
 
-Prior to using these functions a handle to the drive has to be obtained. This
+Prior to using these functions a handle to the device has to be obtained. This
 is done with the <tt>dio_open</tt> function. After use, the handle should be
 released with the <tt>dio_close</tt> function.
 
 <tscreen><verb>
-    dhandle_t __fastcall__ dio_open (driveid_t drive_id);
+    dhandle_t __fastcall__ dio_open (unsigned char device);
 </verb></tscreen>
 
-The <tt>drive_id</tt> specifies the drive to access, with 0 being the first
-disk drive, 1 the second, and so on.
+The <tt>device</tt> specifies the device to access, with 0 being the first
+device, 1 the second, and so on.
 
 <tscreen><verb>
     unsigned char __fastcall__ dio_close (dhandle_t handle);
@@ -41,7 +41,7 @@ The read and write functions are:
 
 <tscreen><verb>
     unsigned char __fastcall__ dio_read (dhandle_t handle,
-    					 sectnum_t sect_num,
+                                         unsigned sect_num,
                                          void *buffer);
 </verb></tscreen>
 
@@ -50,7 +50,7 @@ location at buffer.
 
 <tscreen><verb>
     unsigned char __fastcall__ dio_write (dhandle_t handle,
-    					  sectnum_t sect_num,
+                                          unsigned sect_num,
                                           const void *buffer);
 </verb></tscreen>
 
@@ -59,8 +59,8 @@ by <tt>sect_num</tt>. No verify is performed.
 
 <tscreen><verb>
     unsigned char __fastcall__ dio_write_verify (dhandle_t handle,
-    						 sectnum_t sect_num,
-                                             	 const void *buffer);
+                                                 unsigned sect_num,
+                                                 const void *buffer);
 </verb></tscreen>
 
 This function will write the memory contents at buffer to the sector specified
@@ -85,7 +85,7 @@ and/or different sector counts.
 The following function returns the sector size of the currently inserted disk:
 
 <tscreen><verb>
-    sectsize_t __fastcall__ dio_query_sectsize (dhandle_t handle);
+    unsigned __fastcall__ dio_query_sectsize (dhandle_t handle);
 </verb></tscreen>
 
 On the Atari platform, the sector size is handled specially. Please refer
@@ -96,13 +96,13 @@ specific platform documentation.
 The following function returns the sector count of the currently inserted disk:
 
 <tscreen><verb>
-    sectnum_t __fastcall__ dio_query_sectcount (dhandle_t handle);
+    unsigned __fastcall__ dio_query_sectcount (dhandle_t handle);
 </verb></tscreen>
 
 <sect>Converting sector numbers<p>
 
 Since the read and write functions expect a sector number, for systems where
-the sectors aren't addressed by a logical sector number (e.g. CBM drives),
+the sectors aren't addressed by a logical sector number (e.g. CBM devices),
 there are 2 conversion functions. One of them converts a logical sector number
 to a head/track/sector triple. The other conversion function works the other
 way round.
@@ -110,14 +110,14 @@ way round.
 <tscreen><verb>
     unsigned char __fastcall__ dio_phys_to_log (dhandle_t handle,
                                                 const dio_phys_pos *physpos,
-                                                sectnum_t *sectnum);
+                                                unsigned *sectnum);
 </verb></tscreen>
 
 This function converts track/head/sector to logical sector number.
 
 <tscreen><verb>
     unsigned char __fastcall__ dio_log_to_phys (dhandle_t handle,
-                                                const _sectnum_t *sectnum,
+                                                const unsigned *sectnum,
                                                 dio_phys_pos *physpos);
 </verb></tscreen>
 
@@ -132,6 +132,3 @@ The logical sector number is returned as physical sector and vice versa.
 
 
 </article>
-
-
-								       

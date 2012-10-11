@@ -10,10 +10,9 @@
 ;
 ; unsigned char __fastcall__ dio_phys_to_log(dhandle_t handle,
 ;					     dio_phys_pos *physpos,	/* input */
-;					     sectnum_t *sectnum);	/* output */
+;					     unsigned *sectnum);	/* output */
 ;
 ; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
 ;
 
 	.export		_dio_phys_to_log

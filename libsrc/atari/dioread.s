@@ -3,13 +3,12 @@
 ;
 ; this file provides the _dio_read function
 ;
-; unsigned char __fastcall__ dio_read(dhandle_t handle,sectnum_t sect_num,void *buffer);
+; unsigned char __fastcall__ dio_read(dhandle_t handle,unsigned sect_num,void *buffer);
 ; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
 ;
 
 	.import		__sio_call,pushax
- 	.export		_dio_read
+	.export		_dio_read
 	.include	"atari.inc"
 
 .proc	_dio_read

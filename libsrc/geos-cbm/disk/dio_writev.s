@@ -4,13 +4,11 @@
 ;
 ; this file provides the _dio_write function
 ;
-; unsigned char __fastcall__ dio_write_verify(dhandle_t handle,sectnum_t sect_num,const void *buffer);
-; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
+; unsigned char __fastcall__ dio_write_verify (dhandle_t handle, unsigned sect_num, const void *buffer);
 ;
 
 	    .import dio_params, __oserror
- 	    .export _dio_write_verify
+	    .export _dio_write_verify
 
 	    .include "geossym.inc"
 	    .include "jumptab.inc"

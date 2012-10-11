@@ -110,7 +110,7 @@ static unsigned get_dir_entry(char* p_name)
     cur_addr = *(unsigned*)(&dirent->d_mtime.hour + 1);
 
     /* DEV_NUM is set to the drive accessed above */
-    dhandle = dio_open(*(driveid_t*)0xBF30);
+    dhandle = dio_open(*(unsigned char*)0xBF30);
     if (!dhandle) {
         err_exit("dio_open", 1);
     }
@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
     for (index = 0; index < sizeof(info_signature); ++index) {
         if (header_block.content.info_block[index] != info_signature[index]) {
             err_exit("file signature mismatch", 0);
-        }   
+        }
     }
 
     /* Check ProDOS storage type in directory entry template */

@@ -1,7 +1,7 @@
 ;
 ; Oliver Schmidt, 24.03.2005
 ;
-; dhandle_t __fastcall__ dio_open (driveid_t drive_id);
+; dhandle_t __fastcall__ dio_open (unsigned char device);
 ;
 
         .export 	_dio_open

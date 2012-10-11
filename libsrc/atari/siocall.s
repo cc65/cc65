@@ -7,11 +7,10 @@
 ; to save space with _dio_read and _dio_write functions.
 ;
 ; unsigned char __fastcall__ _sio_call(dhandle_t handle,
-;				       sectnum_t sect_num,
+;				       unsigned sect_num,
 ;				       void *buffer,
-;				       unsigned int sio_val);
+;				       unsigned sio_val);
 ; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
 ; sio_val is (sio_command | sio_direction << 8)
 ;
 

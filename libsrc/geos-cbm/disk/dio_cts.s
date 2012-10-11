@@ -3,12 +3,9 @@
 ; 2.7.2001
 ;
 ;
-; unsigned char __fastcall__ dio_phys_to_log(dhandle_t handle,
-;					     dio_phys_pos *physpos,	/* input */
-;					     sectnum_t *sectnum);	/* output */
-;
-; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
+; unsigned char __fastcall__ dio_phys_to_log (dhandle_t handle,
+;					      dio_phys_pos *physpos,	/* input */
+;					      unsigned *sectnum);	/* output */
 ;
 
 	    .export _dio_phys_to_log
@@ -17,7 +14,7 @@
 	    .importzp ptr1,ptr2,ptr3,tmp1,tmp2,tmp3,tmp4
 
 	    .include "dio.inc"
-            .include "geossym.inc"
+	    .include "geossym.inc"
 	    .include "const.inc"
 
 _dio_phys_to_log:

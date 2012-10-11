@@ -2,12 +2,9 @@
 ; Maciej 'YTM/Elysium' Witkowiak
 ; 2.7.2001
 ;
-; unsigned char __fastcall__ dio_log_to_phys(dhandle_t handle,
-;					     sectnum_t *sectnum,	/* input */
-;					     dio_phys_pos *physpos);	/* output */
-;
-; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
+; unsigned char __fastcall__ dio_log_to_phys (dhandle_t handle,
+;					      unsigned *sectnum,	/* input */
+;					      dio_phys_pos *physpos);	/* output */
 ;
 
 	    .export _dio_log_to_phys
@@ -16,7 +13,7 @@
 	    .import sectab_1541_l, sectab_1541_h
 
 	    .include "dio.inc"
-            .include "geossym.inc"
+	    .include "geossym.inc"
 	    .include "const.inc"
 
 _dio_log_to_phys:

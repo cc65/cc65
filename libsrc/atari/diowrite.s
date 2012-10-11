@@ -3,9 +3,8 @@
 ;
 ; this file provides the _dio_write function
 ;
-; unsigned char __fastcall__ dio_write(dhandle_t handle,sectnum_t sect_num,const void *buffer);
+; unsigned char __fastcall__ dio_write(dhandle_t handle,unsigned sect_num,const void *buffer);
 ; dhandle_t - 16bit (ptr)
-; sectnum_t - 16bit
 ;
 
 	.import		__sio_call,pushax

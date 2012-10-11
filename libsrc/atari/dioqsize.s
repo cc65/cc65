@@ -1,7 +1,7 @@
 ;
 ; Christian Groessler, February 2005
 ;
-; sectsize_t __fastcall__ dio_query_sectsize(dhandle_t handle);
+; unsigned __fastcall__ dio_query_sectsize(dhandle_t handle);
 ;
 
 	.include	"atari.inc"

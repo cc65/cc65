@@ -4,7 +4,7 @@
 ; based on Atari version by Christian Groessler
 ; 2.7.2001
 ;
-; dhandle_t     __fastcall__ dio_open  (driveid_t drive_id);
+; dhandle_t     __fastcall__ dio_open  (unsigned char device);
 ; unsigned char __fastcall__ dio_close (dhandle_t handle);
 ;
 ; dio_open sets given device as current and initializes disk

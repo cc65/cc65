@@ -1,7 +1,7 @@
 ;
 ; Oliver Schmidt, 24.03.2005
 ;
-; unsigned char __fastcall__ dio_write (dhandle_t handle, sectnum_t sect_num, const void *buffer);
+; unsigned char __fastcall__ dio_write (dhandle_t handle, unsigned sect_num, const void *buffer);
 ;
 
         .export 	_dio_write

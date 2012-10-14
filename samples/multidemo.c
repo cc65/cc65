@@ -102,8 +102,8 @@ void foobar (void)
 unsigned char loademdriver (void)
 {
     static char emd[MAX_EM_DRIVER][FILENAME_MAX];
-    DIR* dir;
-    struct dirent* ent;
+    DIR *dir;
+    struct dirent *ent;
     unsigned char max = 0;
     unsigned char num;
 

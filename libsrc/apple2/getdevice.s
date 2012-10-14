@@ -37,9 +37,9 @@ next:   tax
         ; Number of on-line devices (minus 1)
         ldy     DEVCNT
 
-	; Does the list contain the device?
+        ; Does the list contain the device?
 :       cmp     (ptr1),y
-        beq	done
+        beq     done
         dey
         bpl     :-
         bmi     next            ; Branch always

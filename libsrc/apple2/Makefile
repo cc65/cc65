@@ -19,7 +19,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Rules
 
-%.o:   	%.c
+%.o:	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
@@ -50,19 +50,19 @@ C_OBJS=	closedir.o	\
 	rewinddir.o
 
 S_OBJS=	_scrsize.o	\
-     	break.o		\
-     	cclear.o	\
-     	cgetc.o		\
-     	chline.o	\
+	break.o		\
+	cclear.o	\
+	cgetc.o		\
+	chline.o	\
 	close.o		\
-     	clrscr.o	\
-     	color.o		\
-        cout.o          \
-     	cputc.o		\
-     	crt0.o		\
-     	ctype.o		\
-     	cvline.o	\
-     	devicedir.o	\
+	clrscr.o	\
+	color.o		\
+	cout.o		\
+	cputc.o		\
+	crt0.o		\
+	ctype.o		\
+	cvline.o	\
+	devicedir.o	\
 	dioclose.o	\
 	diocommon.o	\
 	dioopen.o	\
@@ -75,41 +75,42 @@ S_OBJS=	_scrsize.o	\
 	exehdr.o	\
 	filedes.o	\
 	filename.o	\
-        get_ostype.o    \
+	get_ostype.o	\
 	getdevice.o	\
 	gotoxy.o	\
 	gotoy.o		\
-        home.o          \
+	home.o		\
 	initcwd.o	\
-	iobuf.o         \
-        joy_stddrv.o    \
-     	kbhit.o		\
-        mainargs.o      \
+	iobuf.o		\
+	isdevice.o	\
+	joy_stddrv.o	\
+	kbhit.o		\
+	mainargs.o	\
 	mcbdefault.o	\
 	mli.o		\
-        mouse_stddrv.o  \
+	mouse_stddrv.o	\
 	open.o		\
-        oserrlist.o     \
+	oserrlist.o	\
 	oserror.o	\
-        randomize.o     \
-        rdkey.o         \
-     	read.o          \
-     	reboot.o        \
-     	revers.o	\
+	randomize.o	\
+	rdkey.o		\
+	read.o		\
+	reboot.o	\
+	revers.o	\
 	rwcommon.o	\
 	syschdir.o	\
 	sysmkdir.o	\
 	sysremove.o	\
 	sysrename.o	\
 	sysrmdir.o	\
-        systime.o       \
-        sysuname.o      \
-        tgi_colors.o    \
-        tgi_stddrv.o    \
-        toascii.o       \
-        vtabz.o         \
-     	wherex.o       	\
-       	wherey.o        \
+	systime.o	\
+	sysuname.o	\
+	tgi_colors.o	\
+	tgi_stddrv.o	\
+	toascii.o	\
+	vtabz.o		\
+	wherex.o	\
+	wherey.o	\
 	write.o
 
 S_EXTRA_OBJS=		\
@@ -141,5 +142,5 @@ all: 	$(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS
 clean:
 	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
-zap:   	clean
+zap:	clean
 	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)

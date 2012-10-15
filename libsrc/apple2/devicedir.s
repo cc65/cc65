@@ -27,13 +27,13 @@ _getdevicedir:
 
         ; Set device
         jsr	popa
+        asl
+        asl
+        asl
+        asl
         sta	mliparam + MLI::ON_LINE::UNIT_NUM
 
         ; Check for valid slot
-        tax
-        and	#$0F
-        bne	erange
-        txa
         and	#$70
         beq	erange
 

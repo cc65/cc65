@@ -500,10 +500,10 @@ url="ca65.html" name="assembler manual">.
   to the formula
 
   <tscreen>
-    device = slot * 0x10 + (drive - 1) * 0x80
+    device = slot + (drive - 1) * 8
   </tscreen>
 
-  so that for example slot 6 drive 2 is mapped to <tt/device/ 0xE0.
+  so that for example slot 6 drive 2 is mapped to <tt/device/ 14.
 
   <tag/Sector count/
   The function <htmlurl url="dio-3.html" name="dio_query_sectcount()"> returns

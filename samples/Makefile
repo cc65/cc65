@@ -48,7 +48,7 @@ MY_ASM = --forget-inc-paths -I . -I $(CA65_INC)
 endif
 
 # This one comes with VICE
-C1541  	= c1541
+C1541	= c1541
 
 
 # --------------------------------------------------------------------------
@@ -71,25 +71,26 @@ C1541  	= c1541
 # List of executables. This list could be made target dependent by checking
 # $(SYS).
 
-EXELIST	=	ascii 		\
-     		diodemo		\
-     		fire 		\
-     		gunzip65 	\
-     		hello 		\
+EXELIST	=	ascii		\
+		diodemo		\
+		enumdevdir	\
+		fire		\
+		gunzip65	\
+		hello		\
 		mandelbrot	\
-     		mousedemo 	\
-     		multdemo 	\
-     		nachtm 		\
-     		ovrldemo	\
-     		plasma 		\
-     		sieve 		\
-     		tgidemo
+		mousedemo	\
+		multdemo	\
+		nachtm		\
+		ovrldemo	\
+		plasma		\
+		sieve		\
+		tgidemo
 
 # --------------------------------------------------------------------------
 # Rules how to make each one of the binaries
 
 .PHONY:	all
-all:   	$(EXELIST)
+all:	$(EXELIST)
 
 ascii:		ascii.o
 
@@ -152,7 +153,7 @@ endif
 # with the VICE emulator.
 
 .PHONY:	disk
-disk:  	samples.d64
+disk:	samples.d64
 
 samples.d64:	all
 	@$(C1541) -format samples,AA  d64 $@ > /dev/null

@@ -71,23 +71,25 @@
 #define COLOR_WHITE             0x0F
 
 /* TGI color defines (default palette) */
-#define TGI_COLOR_BLACK         COLOR_BLACK      
-#define TGI_COLOR_RED           COLOR_RED        
-#define TGI_COLOR_BLUE          COLOR_BLUE       
-#define TGI_COLOR_GREEN         COLOR_GREEN      
-#define TGI_COLOR_VIOLET        COLOR_VIOLET     
-#define TGI_COLOR_PURPLE        COLOR_PURPLE     
-#define TGI_COLOR_CYAN          COLOR_CYAN       
-#define TGI_COLOR_PEAGREEN      COLOR_PEAGREEN   
-#define TGI_COLOR_GREY          COLOR_GREY       
-#define TGI_COLOR_NAVYBLUE      COLOR_NAVYBLUE   
-#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED   
-#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE  
-#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN 
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_RED           COLOR_RED
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_VIOLET        COLOR_VIOLET
+#define TGI_COLOR_PURPLE        COLOR_PURPLE
+#define TGI_COLOR_CYAN          COLOR_CYAN
+#define TGI_COLOR_PEAGREEN      COLOR_PEAGREEN
+#define TGI_COLOR_GREY          COLOR_GREY
+#define TGI_COLOR_NAVYBLUE      COLOR_NAVYBLUE
+#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
+#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
+#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
 #define TGI_COLOR_LIGHTPURPLE   COLOR_LIGHTPURPLE
-#define TGI_COLOR_LIGHTCYAN     COLOR_LIGHTCYAN  
-#define TGI_COLOR_YELLOW        COLOR_YELLOW     
-#define TGI_COLOR_WHITE         COLOR_WHITE      
+#define TGI_COLOR_LIGHTCYAN     COLOR_LIGHTCYAN
+#define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_WHITE         COLOR_WHITE
+
+
 
 
 
@@ -176,6 +178,21 @@ unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val);
 
 #define SPRCOLL_dont_collide 0x20
 #define SPRCOLL_number_0_3 0x00
+
+
+/* Define Hardware */
+#include <_mikey.h>
+#define MIKEY (*(struct __mikey *)0xFD00)
+
+#define _MIKEY_TIMERS (*(struct _mikey_all_timers *) 0xFD00) 	// mikey_timers[8]
+#define _HBL_TIMER (*(struct _mikey_timer *) 0xFD00)			// timer0 (HBL)
+#define _VBL_TIMER (*(struct _mikey_timer *) 0xFD08)    		// timer2 (VBL)
+#define _UART_TIMER (*(struct _mikey_timer *) 0xFD14)   		// timer4 (UART)
+#define _VIDDMA (*(unsigned int *) 0xFD92)						// dispctl/viddma
+
+#include <_suzy.h>
+#define SUZY        (*(struct __suzy*)0xFC00)
+
 
 /* End of lynx.h */
 #endif

@@ -5,7 +5,6 @@
 ;
 
         .export         _getdevicedir
-
         .import         opencmdchannel, closecmdchannel
         .import         writefndiskcmd, readdiskerror
         .import         isdisk, fnunit, fncmd, devicestr

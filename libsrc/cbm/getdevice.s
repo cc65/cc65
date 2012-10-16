@@ -7,7 +7,6 @@
 
         .export         _getfirstdevice
         .export         _getnextdevice
-
         .import         isdisk
         .import         opencmdchannel
         .import         closecmdchannel

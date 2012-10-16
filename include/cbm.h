@@ -81,10 +81,9 @@
 
 
 
-/* The file stream implementation and the POSIX I/O functions will use the
- * following variables to determine the file type and the disk unit to use.
+/* The file stream implementation and the POSIX I/O functions will
+ * use the following variable to determine the file type to use.
  */
-extern unsigned char _curunit;  /* Defaults to current when program started */
 extern char _filetype;          /* Defaults to 's' */
 
 

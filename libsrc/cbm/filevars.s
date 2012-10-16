@@ -4,14 +4,14 @@
 ; Variables used for CBM file I/O
 ;
 
-        .export         __curunit
+        .export         curunit
         .constructor    initcurunit, 30
         .importzp       devnum
 
 
 .bss
 
-__curunit:
+curunit:
         .res    1
 
 
@@ -23,7 +23,7 @@ __curunit:
         bne     @L0
         lda     #8              ; Default is disk
         sta     devnum
-@L0:    sta     __curunit
+@L0:    sta     curunit
         rts
 
 .endproc

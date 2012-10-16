@@ -5,7 +5,7 @@
 ;
 
 	.export		initcwd, devicestr
-	.import		__curunit, __cwd
+	.import		curunit, __cwd
 	.import		pusha0, tosudiva0
 	.importzp	sreg, ptr1, ptr2
 
@@ -16,7 +16,7 @@ initcwd:
 	ldx	#>__cwd
 	sta	ptr2
 	stx	ptr2+1
-	lda	__curunit
+	lda	curunit
 	; Fall through
 
 ;------------------------------------------------------------------------------
@@ -28,11 +28,11 @@ devicestr:
 	jsr	tosudiva0
 	ldy	#0
 	lda	sreg
-	beq	:+		; >=10
+	beq	@L0		; >=10
 	add	#'0'
 	sta	(ptr2),y
 	iny
-:	lda	ptr1		; rem
+@L0:	lda	ptr1		; rem
 	add	#'0'
 	sta	(ptr2),y
 	iny

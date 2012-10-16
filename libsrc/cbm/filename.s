@@ -9,7 +9,7 @@
         .export         fnunit, fnlen, fnisfile, fncmd, fnbuf
 
         .import         SETNAM
-        .import         __curunit, __filetype
+        .import         curunit, __filetype
         .importzp       ptr1, tmp1
 
         .include        "ctype.inc"
@@ -147,7 +147,7 @@ drivedone:
 
 .proc   fndefunit
 
-        lda     __curunit
+        lda     curunit
         sta     fnunit
         rts
 

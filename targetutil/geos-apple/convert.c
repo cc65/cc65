@@ -110,7 +110,7 @@ static unsigned get_dir_entry(char* p_name)
     cur_addr = *(unsigned*)(&dirent->d_mtime.hour + 1);
 
     /* DEV_NUM is set to the drive accessed above */
-    dhandle = dio_open(*(unsigned char*)0xBF30);
+    dhandle = dio_open(*(unsigned char*)0xBF30 >> 4);
     if (!dhandle) {
         err_exit("dio_open", 1);
     }

@@ -55,9 +55,6 @@ It is safe to use these standard includes and their contents:
 <p>
 For <tt/time.h/ functions <tt/systime()/ and <tt/clock()/ note that the resolution is one second.
 <p>
-It was not tested enough, but functions from these includes might work under GEOS:
-<tt/rs232.h, zlib.h/
-<p>
 Functions from the headers above are either standard C library functions or cc65-specific, in
 either case they are not GEOS specific and so they are not described here.
 <p>
@@ -82,10 +79,11 @@ The software needed:
 		can obtain it from: <htmlurl url="http://www.viceteam.org/"
 		name="http://www.viceteam.org/">. The VICE package contains the
 		c1541 program that is able to convert/unconvert GEOS files to disk images.
-    <item><em/Star Commander/ This tool is only for DOS. You will need it for transferring
+    <item><em/The Star Commander/ This tool is only for DOS. You will need it for transferring
 		object files from a PC to a 1541. There's also one important ability of this
 		tool - it automatically un-converts .cvt files into GEOS native format on
-		disk image files.
+		disk image files. Check out: <htmlurl url="http://sta.c64.org/sc.html"
+		name="http://sta.c64.org/sc.html">
     <item><em/cbm4linux/ A Linux kernel module that allows for communication with a 1541 and
 		other Commodore IEC bus drives. It can be a replacement for Star Commander if
 		you only want to transfer files to a disk and unconvert using GEOS program for

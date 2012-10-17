@@ -72,6 +72,7 @@ S_OBJS =	c_acptr.o	\
 		devicedir.o	\
 		dir.o		\
 		diskcmd.o	\
+		diskinit.o	\
 		exehdr.o	\
 		filedes.o	\
 		filename.o	\

@@ -5,7 +5,7 @@
 ;
 
         .export         __syschdir
-        .import         curunit, initcwd
+        .import         diskinit, fnunit, curunit, initcwd
         .importzp       ptr1, tmp1, tmp2
 
 ;--------------------------------------------------------------------------
@@ -31,7 +31,7 @@
 
         iny
         lda     (ptr1),y
-        beq     done
+        beq     init
         jsr     getdigit
         bcs     err
         stx     tmp1            ; First digit
@@ -60,13 +60,22 @@
         lda     (ptr1),y
         bne     err
 
+; Check device readiness
+
+init:   txa
+        jsr     diskinit
+        bne     done
+
 ; Success, update cwd
 
-done:   stx     curunit
+        lda     fnunit          ; Set by diskinit
+        sta     curunit
         jmp     initcwd         ; Returns with A = 0
 
+; Return with error in A
+
 err:    lda     #9              ; "Ilegal device"
-        rts
+done:   rts
 
 .endproc
 

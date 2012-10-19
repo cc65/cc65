@@ -6,13 +6,13 @@
 ; unsigned char __fastcall__ textcolor (unsigned char color);
 ; unsigned char __fastcall__ bgcolor (unsigned char color);
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
+; unsigned char __fastcall__ revers (unsigned char onoff);
 ;
 
- 	    .export _textcolor, _bgcolor, _bordercolor
+ 	    .export _textcolor, _bgcolor, _bordercolor, _revers
+	    .import return0
 
-; for GEOS 2.0 there is no color support, perhaps Wheels has it
-
-_textcolor:
-_bgcolor:
-_bordercolor:
-	rts
+_textcolor	= return0
+_bgcolor	= return0
+_bordercolor	= return0
+_revers		= return0

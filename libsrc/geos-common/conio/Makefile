@@ -10,11 +10,10 @@ S_OBJS +=	_scrsize.o	\
 		cgetc.o		\
 		chline.o	\
 		clrscr.o	\
-		color.o		\
 		cputc.o		\
 		cursor.o	\
 		cvline.o	\
+		dummies.o	\
 		gotoxy.o	\
 		kbhit.o		\
-		revers.o	\
 		where.o

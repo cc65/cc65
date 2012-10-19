@@ -11,9 +11,6 @@
 #include <geos/gstruct.h>
 #endif
 
-void __fastcall__ cpputs(char *s);
-void __fastcall__ cpputsxy(unsigned x, unsigned y, char *s);
-
 void __fastcall__ SetPattern(char newpattern);
 
 void __fastcall__ HorizontalLine(char pattern, char y, unsigned xstart, unsigned xend);

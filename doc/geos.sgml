@@ -39,9 +39,7 @@ than 1541, 1571 or 1581. RAM drives emulating these should work.
 <p>
 <tt/conio/ - simple console input-output is available for command line applications.
 This implementation assumes that one character does fit in 8x8 cell, so output with
-default BSW font, which is has 9 points, might be a bit messy.
-<tt/cputs/ does output characters with fixed width, for proportional spacing use
-<tt/cpputs/ but this function does not update cursor. There is no color support in
+default BSW font, which is has 9 points, might be a bit messy. There is no color support in
 GEOS 2.0 so color functions are disabled. Both 40 and 80 column modes are supported
 and automatically detected.
 <p>
@@ -316,16 +314,6 @@ on the screen.
 This function tests if the given pixel is set and returns <tt/true/ (non-zero) or <tt/false/ (zero).
 
 <sect2>Character and string output
-
-<sect3>cpputs
-<p>
-<tt/cpputsxy (char x, char y, char *myString)/
-<p>
-<tt/cpputs (char *myString)/
-<p>
-Actually this is a part of <tt/conio/, but this function is non-standard. It is
-a variation of <tt/cputs/ that outputs the string with proportional spacing, not
-fixed like <tt/cputs/.
 
 <sect3>PutChar
 <p>

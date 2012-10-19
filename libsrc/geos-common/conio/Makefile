@@ -11,7 +11,6 @@ S_OBJS +=	_scrsize.o	\
 		chline.o	\
 		clrscr.o	\
 		color.o		\
-		cpputs.o	\
 		cputc.o		\
 		cursor.o	\
 		cvline.o	\

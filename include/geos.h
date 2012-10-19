@@ -67,21 +67,15 @@
 #include <geos/gdlgbox.h>
 #endif
 
-/* Character codes $80-$8F */
-/*  1  */
-/* 2 4 */
-/*  8  */
-#define CH_HLINE		128|0|2|4|0
-#define CH_VLINE		128|1|0|0|8
-#define CH_ULCORNER		128|1|2|0|0
-#define CH_URCORNER		128|1|0|4|0
-#define CH_LLCORNER		128|0|2|0|8
-#define CH_LRCORNER		128|0|0|4|8
-#define CH_TTEE			128|1|2|4|0
-#define CH_RTEE			128|1|0|4|8
-#define CH_BTEE			128|0|2|4|8
-#define CH_LTEE			128|1|2|0|8
-#define CH_CROSS		128|1|2|4|8
+#define CH_ULCORNER		'+'
+#define CH_URCORNER		'+'
+#define CH_LLCORNER		'+'
+#define CH_LRCORNER		'+'
+#define CH_TTEE			'+'
+#define CH_RTEE			'+'
+#define CH_BTEE			'+'
+#define CH_LTEE			'+'
+#define CH_CROSS		'+'
 
 /* Additional key defines */
 #define CH_F1			133

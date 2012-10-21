@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <dirent.h>
+#include <device.h>
 #include <dio.h>
 
 unsigned char info_signature[3] = {3, 21, 63 | 0x80};
@@ -109,8 +110,7 @@ static unsigned get_dir_entry(char* p_name)
     /* Field header_pointer directly follows field last_mod */
     cur_addr = *(unsigned*)(&dirent->d_mtime.hour + 1);
 
-    /* DEV_NUM is set to the drive accessed above */
-    dhandle = dio_open(*(unsigned char*)0xBF30 >> 4);
+    dhandle = dio_open(getcurrentdevice());
     if (!dhandle) {
         err_exit("dio_open", 1);
     }

@@ -61,6 +61,7 @@ S_OBJS=	_scrsize.o	\
 	cputc.o		\
 	crt0.o		\
 	ctype.o		\
+	curdevice.o	\
 	cvline.o	\
 	devicedir.o	\
 	dioclose.o	\

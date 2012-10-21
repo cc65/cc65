@@ -68,6 +68,7 @@ S_OBJS =	c_acptr.o	\
 		close.o		\
 		closedir.o	\
 		ctype.o		\
+		curdevice.o	\
 		cvline.o	\
 		devicedir.o	\
 		dir.o		\

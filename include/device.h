@@ -55,6 +55,8 @@ unsigned char getfirstdevice (void);
 
 unsigned char __fastcall__ getnextdevice (unsigned char device);
 
+unsigned char getcurrentdevice (void);
+
 char* __fastcall__ getdevicedir (unsigned char device, char* buf, size_t size);
 
 

@@ -256,18 +256,14 @@ cbm610lib:
 geos-applelib:
 	for i in geos-apple geos-common; do \
 	    $(MAKE) SYS=geos-apple -C $$i || exit 1; \
+	    TARGET_OBJS="$$TARGET_OBJS`(cd $$i && printf '%s|' *.o)`"; \
 	    $(AR) a geos-apple.lib $$i/*.o || exit 1; \
-	done
+	done; \
+	TARGET_OBJS="$${TARGET_OBJS%?}"; \
 	for i in runtime common conio em joystick tgi zlib; do \
 	    $(MAKE) SYS=geos-apple -C $$i || exit 1; \
-	    for objfile in $$i/*.o; do \
-		BASENAME=`basename $$objfile`; \
-		if [ -f geos-common/$$BASENAME ]; then \
-		    $(AR) a geos-apple.lib geos-common/$$BASENAME; \
-		else \
-		    $(AR) a geos-apple.lib $$objfile; \
-		fi; \
-	    done \
+	    SHARED_OBJS=`ls $$i/*.o | grep -vwE "$$TARGET_OBJS"`; \
+	    $(AR) a geos-apple.lib $$SHARED_OBJS || exit 1; \
 	done
 	if [ -d geos-apple/extra ]; then \
 	    for i in geos-apple/extra/*.o; do \
@@ -282,18 +278,14 @@ geos-applelib:
 geos-cbmlib:
 	for i in geos-cbm geos-common; do \
 	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
+	    TARGET_OBJS="$$TARGET_OBJS`(cd $$i && printf '%s|' *.o)`"; \
 	    $(AR) a geos-cbm.lib $$i/*.o || exit 1; \
-	done
+	done; \
+	TARGET_OBJS="$${TARGET_OBJS%?}"; \
 	for i in runtime common conio em joystick tgi zlib; do \
 	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
-	    for objfile in $$i/*.o; do \
-		BASENAME=`basename $$objfile`; \
-		if [ -f geos-common/$$BASENAME ]; then \
-		    $(AR) a geos-cbm.lib geos-common/$$BASENAME; \
-		else \
-		    $(AR) a geos-cbm.lib $$objfile; \
-		fi; \
-	    done \
+	    SHARED_OBJS=`ls $$i/*.o | grep -vwE "$$TARGET_OBJS"`; \
+	    $(AR) a geos-cbm.lib $$SHARED_OBJS || exit 1; \
 	done
 	cp geos-cbm/*.emd .
 	cp geos-cbm/*.joy .

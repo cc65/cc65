@@ -54,39 +54,37 @@
 /* Color defines */
 #define COLOR_BLACK             0x00
 #define COLOR_RED               0x01
-#define COLOR_BLUE              0x02
-#define COLOR_GREEN             0x03
-#define COLOR_VIOLET            0x04
-#define COLOR_PURPLE            COLOR_VIOLET
-#define COLOR_CYAN              0x05
-#define COLOR_PEAGREEN          0x06
-#define COLOR_GREY              0x07
-#define COLOR_NAVYBLUE          0x08
-#define COLOR_LIGHTRED          0x09
-#define COLOR_LIGHTBLUE         0x0A
-#define COLOR_LIGHTGREEN        0x0B
-#define COLOR_LIGHTPURPLE       0x0C
-#define COLOR_LIGHTCYAN         0x0D
-#define COLOR_YELLOW            0x0E
+#define COLOR_PINK              0x02
+#define COLOR_LIGHTGREY         0x03
+#define COLOR_GREY              0x04
+#define COLOR_DARKGREY          0x05
+#define COLOR_BROWN             0x06
+#define COLOR_PEACH             0x07
+#define COLOR_YELLOW            0x08
+#define COLOR_LIGHTGREEN        0x09
+#define COLOR_GREEN             0x0A
+#define COLOR_DARKBROWN         0x0B
+#define COLOR_VIOLET            0x0C
+#define COLOR_BLUE              0x0D
+#define COLOR_LIGHBLUE          0x0E
 #define COLOR_WHITE             0x0F
 
 /* TGI color defines (default palette) */
 #define TGI_COLOR_BLACK         COLOR_BLACK
 #define TGI_COLOR_RED           COLOR_RED
-#define TGI_COLOR_BLUE          COLOR_BLUE
-#define TGI_COLOR_GREEN         COLOR_GREEN
-#define TGI_COLOR_VIOLET        COLOR_VIOLET
-#define TGI_COLOR_PURPLE        COLOR_PURPLE
-#define TGI_COLOR_CYAN          COLOR_CYAN
-#define TGI_COLOR_PEAGREEN      COLOR_PEAGREEN
+#define TGI_COLOR_PINK          COLOR_PINK
+#define TGI_COLOR_LIGHTGREY     COLOR_LIGHTGREY
 #define TGI_COLOR_GREY          COLOR_GREY
-#define TGI_COLOR_NAVYBLUE      COLOR_NAVYBLUE
-#define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
-#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
-#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
-#define TGI_COLOR_LIGHTPURPLE   COLOR_LIGHTPURPLE
-#define TGI_COLOR_LIGHTCYAN     COLOR_LIGHTCYAN
+#define TGI_COLOR_DARKGREY      COLOR_DARKGREY
+#define TGI_COLOR_BROWN         COLOR_BROWN
+#define TGI_COLOR_PEACH         COLOR_PEACH
 #define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_DARKBROWN     COLOR_DARKBROWN
+#define TGI_COLOR_VIOLET        COLOR_VIOLET
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_WHITE         COLOR_WHITE
 
 

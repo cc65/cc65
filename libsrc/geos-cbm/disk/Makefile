@@ -10,6 +10,8 @@ S_OBJS +=	changediskdevice.o	\
 		dio_cts.o		\
 		dio_openclose.o		\
 		dio_params.o		\
+		dio_qcount.o		\
+		dio_qsize.o		\
 		dio_read.o		\
 		dio_stc.o		\
 		dio_write.o		\

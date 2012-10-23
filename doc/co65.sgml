@@ -210,7 +210,7 @@ Here is a description of all the command line options:
 
   <tag><tt>--zeropage-name seg</tt></tag>
 
-  Set the name of the data segment. The default name is "ZEROPAGE" which is
+  Set the name of the zeropage segment. The default name is "ZEROPAGE" which is
   compatible with the standard ld65 linker configurations.
 
 </descrip>

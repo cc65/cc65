@@ -38,7 +38,7 @@ curRecord	$8496	$8496	$f618	Byte		Holds the current record number for an open VL
 currentMode	$2e	$2e	$021c	Byte		Holds the current text drawing node.
 curSetWidth	$27	$27	$0219	Word		Holds the card width in pixels for the current font.
 curType		$88c6	$88c6	n/a	Byte		Holds the current disk type.
-curXpos0	n/a	$1303	$d954	16 Bytes	The current  X positions of the C128 ami Apple soft sprites.
+curXpos0	n/a	$1303	$d954	16 Bytes	The current X positions of the C128 ami Apple soft sprites.
 curYpos0	n/a	$1313	$d964	8 Bytes		The current Y positions for the C128 and Apple soft sprites.
 dataDiskName	$8453	$8453	$02b4	18 | 16 Bytes	Holds the disk name that an application's data file is on.
 dataFileName	$8442	$8442	$02a4	17 | 16 Bytes	This is the name of a data file to open.

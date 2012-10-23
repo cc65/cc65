@@ -110,37 +110,37 @@ text_bitmap:    .res	8*(1+20+1)+1
 .rodata
 
 DEFPALETTE:     .byte   >$000
-		.byte	>$007
-		.byte	>$070
-		.byte	>$700
-		.byte	>$077
-		.byte	>$770
-		.byte	>$707
+		.byte	>$44d
+		.byte	>$aaf
+		.byte	>$ac9
 		.byte	>$777
-		.byte	>$333
-		.byte	>$00F
-		.byte	>$0F0
-		.byte	>$F00
-		.byte	>$0FF
-		.byte	>$FF0
-		.byte	>$F0F
-		.byte	>$FFF
+		.byte	>$445
+		.byte	>$539
+		.byte	>$94e
+		.byte	>$d3c
+		.byte	>$c24
+		.byte	>$701
+		.byte	>$223
+		.byte	>$484
+		.byte	>$8e1
+		.byte	>$cf4
+		.byte	>$fff
 		.byte   <$000
-		.byte	<$007
-		.byte	<$070
-		.byte	<$700
-		.byte	<$077
-		.byte	<$770
-		.byte	<$707
+		.byte	<$44d
+		.byte	<$aaf
+		.byte	<$ac9
 		.byte	<$777
-		.byte	<$333
-		.byte	<$00F
-		.byte	<$0F0
-		.byte	<$F00
-		.byte	<$0FF
-		.byte	<$FF0
-		.byte	<$F0F
-		.byte	<$FFF
+		.byte	<$445
+		.byte	<$539
+		.byte	<$94e
+		.byte	<$d3c
+		.byte	<$c24
+		.byte	<$701
+		.byte	<$223
+		.byte	<$484
+		.byte	<$8e1
+		.byte	<$cf4
+		.byte	<$fff
 
 PALETTESIZE     = * - DEFPALETTE
 

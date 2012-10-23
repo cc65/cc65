@@ -60,8 +60,9 @@ static unsigned char AskForDrive (const char* Name)
     unsigned char Drive = 0;
     char          Char;
 
-    cprintf ("\r\n%s Drive ID ?", Name);
+    cprintf ("\r\n%s Drive ID ? ", Name);
 
+    cursor (1);
     do {
         Char = cgetc ();
         if (isdigit (Char)) {
@@ -69,6 +70,7 @@ static unsigned char AskForDrive (const char* Name)
             Drive = Drive * 10 + Char - '0';
         }
     } while (Char != CH_ENTER);
+    cursor (0);
 
     return Drive;
 }

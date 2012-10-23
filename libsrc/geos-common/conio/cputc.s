@@ -22,7 +22,7 @@
 ; HOME = KEY_ENTER, KEY_HOME = REV_ON, 
 ; UPLINE = ?, KEY_UPARROW = GOTOY, ...
 
-	    .export _cputcxy, _cputc, update_cursor
+	    .export _cputcxy, _cputc
 	    .import _gotoxy, fixcursor
 	    .import popa
 	    .import xsize,ysize
@@ -63,38 +63,29 @@ L2:	php
 	lda cursor_x+1
 	sta r11H
 	lda cursor_y
+	clc
+	adc #6			; 6 pixels down to the baseline
 	sta r1H
 	txa
 	jsr PutChar
 	plp
-	bcs update_cursor
+	bcs fix_cursor
 
 	inc cursor_c
 	lda cursor_c
 	cmp xsize		; hit right margin?
-	bne update_cursor
+	bne fix_cursor
 	lda #0			; yes - do cr+lf
 	sta cursor_c
 do_lf:	inc cursor_r
 	lda cursor_r
 	cmp ysize		; hit bottom margin?
-	bne update_cursor
+	bne fix_cursor
 	dec cursor_r		; yes - stay in the last line
 
-update_cursor:
-	jsr fixcursor
-	lda cursor_x
-	sta r4L
-	lda cursor_x+1
-	sta r4H
-	lda cursor_y
-	sec
-	sbc curHeight
-	sta r5L
-	lda #1			; update cursor prompt position
-	sta r3L
-	jmp PosSprite
+fix_cursor:
+	jmp fixcursor
 
 do_cr:	lda #0
 	sta cursor_c
-	beq update_cursor
+	beq fix_cursor

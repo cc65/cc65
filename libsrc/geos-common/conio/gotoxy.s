@@ -20,12 +20,10 @@ _gotox:
 
 _gotoy:
 	sta cursor_r
-	inc cursor_r
 	jmp fixcursor
 
 _gotoxy:
 	sta cursor_r
-	inc cursor_r
 	jsr popa
 	sta cursor_c
 
@@ -35,12 +33,12 @@ fixcursor:
 	sta cursor_x
 	lda #0
 	sta cursor_x+1
-	lda cursor_r
-	sta cursor_y
 	ldx #cursor_x
 	ldy #3
 	jsr DShiftLeft
-	asl cursor_y
-	asl cursor_y
-	asl cursor_y
+	lda cursor_r
+	asl a
+	asl a
+	asl a
+	sta cursor_y
 	rts

@@ -14,8 +14,6 @@
 	    .include "const.inc"
 
 _clrscr:
-	lda #ST_WR_FORE | ST_WR_BACK
-	sta dispBufferOn
 	lda curPattern		; save current pattern
 	pha
 	lda #0			; set pattern to clear
@@ -25,7 +23,6 @@ _clrscr:
 	stx r3H
 	stx r2L
 	stx cursor_c
-	inx
 	stx cursor_r
 	jsr fixcursor		; home cursor
 .ifdef __GEOS_CBM__

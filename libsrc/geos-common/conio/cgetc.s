@@ -7,25 +7,25 @@
 ; unsigned char cgetc (void);
 
 	    .export _cgetc
-	    .import update_cursor
-	    .importzp cursor_x, cursor_y, cursor_flag
+	    .import cursor
+	    .importzp cursor_x, cursor_y
 
 	    .include "jumptab.inc"
 	    .include "geossym.inc"
 
 _cgetc:
 ; show cursor if needed
-	lda cursor_flag
+	lda cursor
 	beq L0
 
-	jsr update_cursor
+; prepare cursor
+	lda #7
+	jsr InitTextPrompt
 	lda cursor_x
 	ldx cursor_x+1
 	sta stringX
 	stx stringX+1
 	lda cursor_y
-	sec
-	sbc curHeight
 	sta stringY
 	jsr PromptOn
 
@@ -33,7 +33,15 @@ L0:	jsr GetNextChar
 	tax
 	beq L0
 	pha
+
+; from 'The Hitchhiker's Guide To GEOS'
+	php
+	sei
 	jsr PromptOff
+	lda #0
+	sta alphaFlag
+	plp
+
 	pla
 	ldx #0
 	rts

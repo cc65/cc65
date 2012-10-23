@@ -30,7 +30,7 @@ _cclear:
 	lda cursor_y		; level
 	sta r2L
 	clc
-	adc #8
+	adc #7
 	sta r2H
 	txa			; right end
 	clc
@@ -40,6 +40,13 @@ _cclear:
 	ldx #r4
 	ldy #3
 	jsr DShiftLeft
+	clc			; one pixel less
+	lda r4L
+	sbc #0
+	sta r4L
+	lda r4L+1
+	sbc #0
+	sta r4L+1
 	lda curPattern		; store current pattern
 	pha
 	lda #0			; set pattern to clear

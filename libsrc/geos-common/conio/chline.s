@@ -28,17 +28,26 @@ _chline:
 	lda cursor_x+1
 	sta r3L+1
 	lda cursor_y		; level
-	sec
-	sbc #4			; in the middle of a cell
+	clc
+	adc #4			; in the middle of a cell
 	sta r11L
 	txa			; right end
 	clc
 	adc cursor_c
 	sta cursor_c
 	sta r4L
+	lda #0
+	sta r4L+1
 	ldx #r4
 	ldy #3
 	jsr DShiftLeft
+	clc			; one pixel less
+	lda r4L
+	sbc #0
+	sta r4L
+	lda r4L+1
+	sbc #0
+	sta r4L+1
 	lda #%11111111		; pattern
 	jsr HorizontalLine
 	jsr fixcursor

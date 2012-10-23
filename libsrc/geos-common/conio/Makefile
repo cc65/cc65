@@ -11,7 +11,6 @@ S_OBJS +=	_scrsize.o	\
 		chline.o	\
 		clrscr.o	\
 		cputc.o		\
-		cursor.o	\
 		cvline.o	\
 		dummies.o	\
 		gotoxy.o	\

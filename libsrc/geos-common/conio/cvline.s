@@ -25,7 +25,7 @@ _cvline:
 	tax
 	lda cursor_x		; x position
 	clc
-	adc #4			; in the middle of cell
+	adc #3			; in the middle of cell
 	sta r4L
 	lda cursor_x+1
 	adc #0
@@ -36,10 +36,12 @@ _cvline:
 	clc
 	adc cursor_r
 	sta cursor_r
+	asl a
+	asl a
+	asl a
+	clc			; one pixel less
+	sbc #0
 	sta r3H
-	asl r3H
-	asl r3H
-	asl r3H
 	lda #%11111111		; pattern
 	jsr VerticalLine
 	jsr fixcursor

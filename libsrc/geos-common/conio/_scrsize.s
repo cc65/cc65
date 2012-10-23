@@ -24,18 +24,16 @@ initscrsize:
 	.byte $2c
 L1:	lda #40			; 40 columns (more or less)
 	sta xsize
-	lda #24			; something like that for Y size
+	lda #25			; something like that for Y size
 .else
 	lda #70			; 70 columns (more or less)
 	sta xsize
-	lda #23			; something like that for Y size
+	lda #24			; something like that for Y size
 .endif
 	sta ysize
-	ldx #1
-	stx cursor_r
-	dex 
-	stx cursor_c
-	txa 
+	lda #0
+	sta cursor_c
+	sta cursor_r
 	jmp _cursor		; home and update cursor
 
 .code

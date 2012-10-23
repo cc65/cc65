@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <stdlib.h>
 #include <em.h>
 #include <conio.h>
 
@@ -41,10 +42,6 @@ struct {
  * use in allocating extended memory for it.
  */
 #define MAX_EM_OVERLAY 3
-
-/* Search for up to 10 extended memory drivers.
- */
-#define MAX_EM_DRIVER 10
 
 
 
@@ -101,9 +98,9 @@ void foobar (void)
 
 unsigned char loademdriver (void)
 {
-    static char emd[MAX_EM_DRIVER][FILENAME_MAX];
     DIR *dir;
     struct dirent *ent;
+    char *emd = NULL;
     unsigned char max = 0;
     unsigned char num;
 
@@ -128,22 +125,26 @@ unsigned char loademdriver (void)
         }
 
         printf ("Dbg: Memorizing file %s\n", ent->d_name);
-        strcpy (emd[max], ent->d_name);
-        if (++max == MAX_EM_DRIVER) {
-            break;
-        }
+        emd = realloc (emd, FILENAME_MAX * (max + 1));
+        strcpy (emd + FILENAME_MAX * max++, ent->d_name);
     }
     closedir (dir);
 
     for (num = 0; num < max; ++num) {
-        printf ("Dbg: Trying emdriver %s\n", emd[num]);
-        if (em_load_driver (emd[num]) == EM_ERR_OK) {
-            printf ("Dbg: Loaded emdriver %s\n", emd[num]);
+        char *drv;
+
+        drv = emd + FILENAME_MAX * num;
+        printf ("Dbg: Trying emdriver %s\n", drv);
+        if (em_load_driver (drv) == EM_ERR_OK) {
+            printf ("Dbg: Loaded emdriver %s\n", drv);
+            free (emd);
             return 1;
         }
- 
-        printf ("Dbg: Emdriver %s failed\n", emd[num]);
+
+        printf ("Dbg: Emdriver %s failed\n", drv);
     }
+
+    free (emd);
     return 0;
 }
 

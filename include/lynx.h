@@ -66,7 +66,7 @@
 #define COLOR_DARKBROWN         0x0B
 #define COLOR_VIOLET            0x0C
 #define COLOR_BLUE              0x0D
-#define COLOR_LIGHBLUE          0x0E
+#define COLOR_LIGHTBLUE         0x0E
 #define COLOR_WHITE             0x0F
 
 /* TGI color defines (default palette) */

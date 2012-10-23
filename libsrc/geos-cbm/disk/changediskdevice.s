@@ -5,8 +5,8 @@
 
 ; char ChangeDiskDevice (char newDriveNumber);
 
-	    .import setoserror
 	    .export _ChangeDiskDevice
+	    .import setoserror
 
 	    .include "jumptab.inc"
 	

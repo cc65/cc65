@@ -6,9 +6,9 @@
 ; char FindBAMBit (struct tr_se *TS);
 ; (might be called inUSE (if (!inUSE(block))))
 
+	    .export _FindBAMBit
 	    .import gettrse
 	    .import return0, return1
-	    .export _FindBAMBit
 
 	    .include "jumptab.inc"
 	    .include "geossym.inc"

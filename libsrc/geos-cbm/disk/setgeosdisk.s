@@ -5,8 +5,8 @@
 
 ; char SetGEOSDisk (void);
 
-	    .import setoserror
 	    .export _SetGEOSDisk
+	    .import setoserror
 
 	    .include "jumptab.inc"
 

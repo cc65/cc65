@@ -7,8 +7,8 @@
 ; unsigned char __fastcall__ dio_write_verify (dhandle_t handle, unsigned sect_num, const void *buffer);
 ;
 
-	    .import dio_params, __oserror
 	    .export _dio_write_verify
+	    .import dio_params, __oserror
 
 	    .include "geossym.inc"
 	    .include "jumptab.inc"

@@ -5,9 +5,9 @@
 
 ; char ReadBlock (struct tr_se myTS, char *buffer);
 
+	    .export _ReadBlock
 	    .import popax, setoserror
 	    .import gettrse
-	    .export _ReadBlock
 
 	    .include "jumptab.inc"
 	    .include "geossym.inc"

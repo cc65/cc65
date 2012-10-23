@@ -5,8 +5,8 @@
 
 ; char ChkDkGEOS (void);
 
-	    .import setoserror
 	    .export _ChkDkGEOS
+	    .import setoserror
 
 	    .include "jumptab.inc"
 	    .include "geossym.inc"

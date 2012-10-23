@@ -5,9 +5,9 @@
 
 ; char ReadBuff  (struct tr_se);
 
+	    .export _ReadBuff
 	    .import setoserror
 	    .import gettrse
-	    .export _ReadBuff
 
 	    .include "diskdrv.inc"
 	    .include "geossym.inc"

@@ -5,8 +5,8 @@
 
 ; char NewDisk (void);
 
-	    .import setoserror
 	    .export _NewDisk
+	    .import setoserror
 
 	    .include "jumptab.inc"
 	

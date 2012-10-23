@@ -5,9 +5,9 @@
 
 ; char VerWriteBlock (struct tr_se *myTS, char *buffer);
 
+	    .export _VerWriteBlock
 	    .import popax, setoserror
 	    .import gettrse
-	    .export _VerWriteBlock
 
 	    .include "jumptab.inc"
 	    .include "geossym.inc"

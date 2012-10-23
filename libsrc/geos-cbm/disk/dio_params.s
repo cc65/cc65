@@ -5,9 +5,9 @@
 ; this function is used by dio_read and dio_write to fix parameters (secnum)
 ; this function calls SetDevice so that more than one drive can be used at once
 
+	    .export dio_params,dio_secnum
 	    .import popax,pushax,_dio_log_to_phys
 	    .importzp ptr1
- 	    .export dio_params,dio_secnum
 
 	    .include "geossym.inc"
 	    .include "jumptab.inc"

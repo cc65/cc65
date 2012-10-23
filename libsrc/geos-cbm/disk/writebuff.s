@@ -5,9 +5,9 @@
 
 ; char WriteBuff (struct tr_se*);
 
+	    .export _WriteBuff
 	    .import setoserror
 	    .import gettrse
-	    .export _WriteBuff
 
 	    .include "diskdrv.inc"
 	    .include "geossym.inc"

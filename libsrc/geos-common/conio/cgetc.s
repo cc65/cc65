@@ -7,7 +7,7 @@
 ; unsigned char cgetc (void);
 
 	    .export _cgetc
-	    .import cursor
+	    .import cursor, _PromptOff
 	    .importzp cursor_x, cursor_y
 
 	    .include "jumptab.inc"
@@ -33,15 +33,7 @@ L0:	jsr GetNextChar
 	tax
 	beq L0
 	pha
-
-; from 'The Hitchhiker's Guide To GEOS'
-	php
-	sei
-	jsr PromptOff
-	lda #0
-	sta alphaFlag
-	plp
-
+	jsr _PromptOff
 	pla
 	ldx #0
 	rts

@@ -114,14 +114,14 @@ DEFPALETTE:     .byte   >$011
 		.byte	>$9af
 		.byte	>$9b8
 		.byte	>$777
-		.byte	>$334
+		.byte	>$335
 		.byte	>$448
 		.byte	>$75e
 		.byte	>$d5f
 		.byte	>$c53
 		.byte	>$822
 		.byte	>$223
-		.byte	>$5a6
+		.byte	>$484
 		.byte	>$8e5
 		.byte	>$cf5
 		.byte	>$fff
@@ -130,14 +130,14 @@ DEFPALETTE:     .byte   >$011
 		.byte	<$9af
 		.byte	<$9b8
 		.byte	<$777
-		.byte	<$334
+		.byte	<$335
 		.byte	<$448
 		.byte	<$75e
 		.byte	<$d5f
 		.byte	<$c53
 		.byte	<$822
 		.byte	<$223
-		.byte	<$5a6
+		.byte	<$484
 		.byte	<$8e5
 		.byte	<$cf5
 		.byte	<$fff

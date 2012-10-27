@@ -55,6 +55,13 @@
 
 
 
+/* Arguments for SymFind... */
+typedef enum {
+    SYM_FIND_EXISTING 	= 0x00,
+    SYM_ALLOC_NEW	= 0x01,
+    SYM_CHECK_ONLY      = 0x02,
+} SymFindAction;
+
 /* Symbol table flags */
 #define ST_NONE         0x00            /* No flags */
 #define ST_DEFINED      0x01            /* Scope has been defined */
@@ -100,7 +107,7 @@ void SymEnterLevel (const StrBuf* ScopeName, unsigned char Type,
 void SymLeaveLevel (void);
 /* Leave the current lexical level */
 
-SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, int AllocNew);
+SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, SymFindAction Action);
 /* Find a scope in the given enclosing scope */
 
 SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name);
@@ -109,16 +116,17 @@ SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name);
  * scope.
  */
 
-SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* StrBuf, int AllocNew);
-/* Find a cheap local symbol. If AllocNew is given and the entry is not
- * found, create a new one. Return the entry found, or the new entry created,
- * or - in case AllocNew is zero - return 0.
+SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Action);
+/* Find a cheap local symbol. If Action contains SYM_ALLOC_NEW and the entry is
+ * not found, create a new one. Return the entry found, or the new entry
+ * created, or - in case Action is SYM_FIND_EXISTING - return 0.
  */
 
-SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew);
-/* Find a new symbol table entry in the given table. If AllocNew is given and
- * the entry is not found, create a new one. Return the entry found, or the
- * new entry created, or - in case AllocNew is zero - return 0.
+SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action);
+/* Find a new symbol table entry in the given table. If Action contains
+ * SYM_ALLOC_NEW and the entry is not found, create a new one. Return the
+ * entry found, or the new entry created, or - in case Action is
+ * SYM_FIND_EXISTING - return 0.
  */
 
 SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name);

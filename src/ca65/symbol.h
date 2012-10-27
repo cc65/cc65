@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -38,6 +38,11 @@
 
 
 
+/* cc65 */
+#include "symtab.h"
+
+
+
 /*****************************************************************************/
 /*                                 Forwards                                  */
 /*****************************************************************************/
@@ -45,7 +50,6 @@
 
 
 struct StrBuf;
-struct SymTable;
 
 
 
@@ -64,7 +68,7 @@ struct SymTable* ParseScopedIdent (struct StrBuf* Name, struct StrBuf* FullName)
  * by the caller for error messages or similar.
  */
 
-struct SymEntry* ParseScopedSymName (int AllowNew);
+struct SymEntry* ParseScopedSymName (SymFindAction Action);
 /* Parse a (possibly scoped) symbol name, search for it in the symbol table
  * and return the symbol table entry.
  */
@@ -74,7 +78,7 @@ struct SymTable* ParseScopedSymTable (void);
  * symbol space and return the symbol table struct.
  */
 
-struct SymEntry* ParseAnySymName (int AllocNew);
+struct SymEntry* ParseAnySymName (SymFindAction Action);
 /* Parse a cheap local symbol or a a (possibly scoped) symbol name, search
  * for it in the symbol table and return the symbol table entry.
  */

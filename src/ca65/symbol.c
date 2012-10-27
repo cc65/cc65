@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -43,7 +43,6 @@
 #include "nexttok.h"
 #include "scanner.h"
 #include "symbol.h"
-#include "symtab.h"
 
 
 
@@ -88,7 +87,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
 
         /* Pass the scope back to the caller */
         SB_Append (FullName, Name);
-                               
+
         /* The scope must exist, so search for it starting with the current
          * scope.
          */
@@ -152,7 +151,7 @@ SymTable* ParseScopedIdent (StrBuf* Name, StrBuf* FullName)
 
 
 
-SymEntry* ParseScopedSymName (int AllocNew)
+SymEntry* ParseScopedSymName (SymFindAction Action)
 /* Parse a (possibly scoped) symbol name, search for it in the symbol table
  * and return the symbol table entry.
  */
@@ -178,17 +177,17 @@ SymEntry* ParseScopedSymName (int AllocNew)
         /* Search for the symbol and return it. If no scope was specified,
          * search also in the upper levels.
          */
-        if (NoScope && !AllocNew) {
+        if (NoScope && (Action & SYM_ALLOC_NEW) == 0) {
             Sym = SymFindAny (Scope, &Ident);
         } else {
-            Sym = SymFind (Scope, &Ident, AllocNew);
+            Sym = SymFind (Scope, &Ident, Action);
         }
     } else {
         /* No scope ==> no symbol. To avoid errors in the calling routine that
-         * may not expect NULL to be returned if AllocNew is true, create a new
-         * symbol.
+         * may not expect NULL to be returned if Action contains SYM_ALLOC_NEW,
+         * create a new symbol.
          */
-        if (AllocNew) {
+        if (Action & SYM_ALLOC_NEW) { 
             Sym = NewSymEntry (&Ident, SF_NONE);
         } else {
             Sym = 0;
@@ -245,7 +244,7 @@ SymTable* ParseScopedSymTable (void)
 
 
 
-SymEntry* ParseAnySymName (int AllocNew)
+SymEntry* ParseAnySymName (SymFindAction Action)
 /* Parse a cheap local symbol or a a (possibly scoped) symbol name, search
  * for it in the symbol table and return the symbol table entry.
  */
@@ -254,10 +253,10 @@ SymEntry* ParseAnySymName (int AllocNew)
 
     /* Distinguish cheap locals and other symbols */
     if (CurTok.Tok == TOK_LOCAL_IDENT) {
-        Sym = SymFindLocal (SymLast, &CurTok.SVal, AllocNew);
+        Sym = SymFindLocal (SymLast, &CurTok.SVal, Action);
         NextTok ();
     } else {
-        Sym = ParseScopedSymName (AllocNew);
+        Sym = ParseScopedSymName (Action);
     }
 
     /* Return the symbol found */

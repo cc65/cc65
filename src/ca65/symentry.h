@@ -78,10 +78,6 @@ struct HLLDbgSym;
 /* Combined values */
 #define SF_REFIMP       (SF_REFERENCED|SF_IMPORT)       /* A ref'd import */
 
-/* Arguments for SymFind... */
-#define SYM_FIND_EXISTING 	0
-#define SYM_ALLOC_NEW		1
-
 /* Structure of a symbol table entry */
 typedef struct SymEntry SymEntry;
 struct SymEntry {

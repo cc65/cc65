@@ -275,7 +275,7 @@ void SymLeaveLevel (void)
 
 
 
-SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, int AllocNew)
+SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, SymFindAction Action)
 /* Find a scope in the given enclosing scope */
 {
     SymTable** T = &Parent->Childs;
@@ -292,7 +292,7 @@ SymTable* SymFindScope (SymTable* Parent, const StrBuf* Name, int AllocNew)
     }
 
     /* Create a new scope if requested and we didn't find one */
-    if (*T == 0 && AllocNew) {
+    if (*T == 0 && (Action & SYM_ALLOC_NEW) != 0) {
         *T = NewSymTable (Parent, Name);
     }
 
@@ -323,11 +323,12 @@ SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name)
 
 
 
-SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, int AllocNew)
-/* Find a cheap local symbol. If AllocNew is given and the entry is not
- * found, create a new one. Return the entry found, or the new entry created,
- * or - in case AllocNew is zero - return 0.
+SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, SymFindAction Action)
+/* Find a cheap local symbol. If Action contains SYM_ALLOC_NEW and the entry is
+ * not found, create a new one. Return the entry found, or the new entry
+ * created, or - in case Action is SYM_FIND_EXISTING - return 0.
  */
+
 {
     SymEntry* S;
     int Cmp;
@@ -336,7 +337,7 @@ SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, int AllocNew)
     if (!Parent) {
         /* No last global, so there's no local table */
         Error ("No preceeding global symbol");
-        if (AllocNew) {
+        if (Action & SYM_ALLOC_NEW) {
             return NewSymEntry (Name, SF_LOCAL);
         } else {
             return 0;
@@ -351,7 +352,7 @@ SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, int AllocNew)
         return S;
     }
 
-    if (AllocNew) {
+    if (Action & SYM_ALLOC_NEW) {
 
         /* Otherwise create a new entry, insert and return it */
         SymEntry* N = NewSymEntry (Name, SF_LOCAL);
@@ -372,10 +373,11 @@ SymEntry* SymFindLocal (SymEntry* Parent, const StrBuf* Name, int AllocNew)
 
 
 
-SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew)
-/* Find a new symbol table entry in the given table. If AllocNew is given and
- * the entry is not found, create a new one. Return the entry found, or the
- * new entry created, or - in case AllocNew is zero - return 0.
+SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, SymFindAction Action)
+/* Find a new symbol table entry in the given table. If Action contains
+ * SYM_ALLOC_NEW and the entry is not found, create a new one. Return the
+ * entry found, or the new entry created, or - in case Action is
+ * SYM_FIND_EXISTING - return 0.
  */
 {
     SymEntry* S;
@@ -388,13 +390,13 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew)
 
     /* If we found an entry, return it */
     if (Cmp == 0) {
-        if (SymTabIsClosed (Scope)) {
+        if ((Action & SYM_CHECK_ONLY) == 0 && SymTabIsClosed (Scope)) {
             S->Flags |= SF_FIXED;
         }
         return S;
     }
 
-    if (AllocNew) {
+    if (Action & SYM_ALLOC_NEW) {
 
         /* Otherwise create a new entry, insert and return it. If the scope is
          * already closed, mark the symbol as fixed so it won't be resolved
@@ -428,7 +430,7 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
  * never create a new symbol, since this can only be done in one specific
  * scope.
  */
-{                 
+{
     /* Generate the name hash */
     unsigned Hash = HashBuf (Name);
 
@@ -478,7 +480,7 @@ static void SymCheckUndefined (SymEntry* S)
     if ((S->Flags & SF_FIXED) == 0) {
         SymTable* Tab = GetSymParentScope (S);
         while (Tab) {
-            Sym = SymFind (Tab, GetStrBuf (S->Name), SYM_FIND_EXISTING);
+            Sym = SymFind (Tab, GetStrBuf (S->Name), SYM_FIND_EXISTING | SYM_CHECK_ONLY);
             if (Sym && (Sym->Flags & (SF_DEFINED | SF_IMPORT)) != 0) {
                 /* We've found a symbol in a higher level that is
                  * either defined in the source, or an import.

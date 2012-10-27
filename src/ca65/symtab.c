@@ -443,6 +443,8 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
                 /* Found, return it */
                 break;
             }
+        } else {
+            Sym = 0;
         }
 
         /* Not found, search in the parent scope, if we have one */

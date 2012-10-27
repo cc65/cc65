@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -67,12 +67,13 @@ struct HLLDbgSym;
 #define SF_IMPORT   	0x0008	    	/* Import this symbol */
 #define SF_GLOBAL	0x0010	    	/* Global symbol */
 #define SF_LOCAL        0x0020          /* Cheap local symbol */
-#define SF_LABEL        0x0080          /* Used as a label */
-#define SF_VAR          0x0100          /* Variable symbol */
-#define SF_FORCED       0x0400          /* Forced import, SF_IMPORT also set */
-#define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
-#define	SF_DEFINED  	0x4000 	       	/* Defined */
-#define SF_REFERENCED	0x8000 	       	/* Referenced */
+#define SF_LABEL        0x0040          /* Used as a label */
+#define SF_VAR          0x0080          /* Variable symbol */
+#define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
+#define SF_FIXED        0x0200          /* May not be trampoline */
+#define SF_MULTDEF     	0x1000		/* Multiply defined symbol */
+#define	SF_DEFINED  	0x2000 	       	/* Defined */
+#define SF_REFERENCED	0x4000 	       	/* Referenced */
 
 /* Combined values */
 #define SF_REFIMP       (SF_REFERENCED|SF_IMPORT)       /* A ref'd import */

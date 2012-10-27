@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -58,6 +58,7 @@
 /* Symbol table flags */
 #define ST_NONE         0x00            /* No flags */
 #define ST_DEFINED      0x01            /* Scope has been defined */
+#define ST_CLOSED       0x02            /* Scope is closed */
 
 /* A symbol table */
 typedef struct SymTable SymTable;
@@ -134,6 +135,16 @@ INLINE unsigned char GetSymTabType (const SymTable* S)
 }
 #else
 #  define GetSymTabType(S)      ((S)->Type)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int SymTabIsClosed (const SymTable* S)
+/* Return true if the symbol table has been closed */
+{
+    return (S->Flags & ST_CLOSED) != 0;
+}
+#else
+#  define SymTabIsClosed(S)      (((S)->Flags & ST_CLOSED) != 0)
 #endif
 
 void SymCheck (void);

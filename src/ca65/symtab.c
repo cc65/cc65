@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -266,6 +266,9 @@ void SymLeaveLevel (void)
         }
     }
 
+    /* Mark the scope as closed */
+    CurrentScope->Flags |= ST_CLOSED;
+
     /* Leave the scope */
     CurrentScope = CurrentScope->Parent;
 }
@@ -385,13 +388,22 @@ SymEntry* SymFind (SymTable* Scope, const StrBuf* Name, int AllocNew)
 
     /* If we found an entry, return it */
     if (Cmp == 0) {
+        if (SymTabIsClosed (Scope)) {
+            S->Flags |= SF_FIXED;
+        }
         return S;
     }
 
     if (AllocNew) {
 
-        /* Otherwise create a new entry, insert and return it */
+        /* Otherwise create a new entry, insert and return it. If the scope is
+         * already closed, mark the symbol as fixed so it won't be resolved
+         * by a symbol in the enclosing scopes later.
+         */
         SymEntry* N = NewSymEntry (Name, SF_NONE);
+        if (SymTabIsClosed (Scope)) {
+            N->Flags |= SF_FIXED;
+        }
         N->Sym.Tab = Scope;
         if (S == 0) {
             Scope->Table[Hash] = N;
@@ -423,8 +435,8 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
          * because for such symbols there is a real entry in one of the parent
          * scopes.
          */
-        Sym = SymFind (Scope, Name, SYM_FIND_EXISTING);
-        if (Sym) {
+        unsigned Hash = HashBuf (Name) % Scope->TableSlots;
+        if (SymSearchTree (Scope->Table[Hash], Name, &Sym) == 0) {
             if (Sym->Flags & SF_UNUSED) {
                 Sym = 0;
             } else {
@@ -449,26 +461,28 @@ static void SymCheckUndefined (SymEntry* S)
 {
     /* Undefined symbol. It may be...
      *
-     *   - An undefined symbol in a nested lexical level. In this
-     *     case, search for the symbol in the higher levels and
+     *   - An undefined symbol in a nested lexical level. If the symbol is not
+     *     fixed to this level, search for the symbol in the higher levels and
      * 	   make the entry a trampoline entry if we find one.
      *
-     *   - If the symbol is not found, it is a real undefined symbol.
-     *     If the AutoImport flag is set, make it an import. If the
-     *     AutoImport flag is not set, it's an error.
+     *   - If the symbol is not found, it is a real undefined symbol. If the
+     *     AutoImport flag is set, make it an import. If the AutoImport flag is
+     *     not set, it's an error.
      */
     SymEntry* Sym = 0;
-    SymTable* Tab = GetSymParentScope (S);
-    while (Tab) {
-        Sym = SymFind (Tab, GetStrBuf (S->Name), SYM_FIND_EXISTING);
-        if (Sym && (Sym->Flags & (SF_DEFINED | SF_IMPORT)) != 0) {
-            /* We've found a symbol in a higher level that is
-             * either defined in the source, or an import.
-             */
-             break;
+    if ((S->Flags & SF_FIXED) == 0) {
+        SymTable* Tab = GetSymParentScope (S);
+        while (Tab) {
+            Sym = SymFind (Tab, GetStrBuf (S->Name), SYM_FIND_EXISTING);
+            if (Sym && (Sym->Flags & (SF_DEFINED | SF_IMPORT)) != 0) {
+                /* We've found a symbol in a higher level that is
+                 * either defined in the source, or an import.
+                 */
+                 break;
+            }
+            /* No matching symbol found in this level. Look further */
+            Tab = Tab->Parent;
         }
-        /* No matching symbol found in this level. Look further */
-        Tab = Tab->Parent;
     }
 
     if (Sym) {

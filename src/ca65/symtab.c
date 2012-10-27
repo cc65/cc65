@@ -428,15 +428,18 @@ SymEntry* SymFindAny (SymTable* Scope, const StrBuf* Name)
  * never create a new symbol, since this can only be done in one specific
  * scope.
  */
-{
+{                 
+    /* Generate the name hash */
+    unsigned Hash = HashBuf (Name);
+
+    /* Search for the symbol */
     SymEntry* Sym;
     do {
         /* Search in the current table. Ignore entries flagged with SF_UNUSED,
          * because for such symbols there is a real entry in one of the parent
          * scopes.
          */
-        unsigned Hash = HashBuf (Name) % Scope->TableSlots;
-        if (SymSearchTree (Scope->Table[Hash], Name, &Sym) == 0) {
+        if (SymSearchTree (Scope->Table[Hash % Scope->TableSlots], Name, &Sym) == 0) {
             if (Sym->Flags & SF_UNUSED) {
                 Sym = 0;
             } else {

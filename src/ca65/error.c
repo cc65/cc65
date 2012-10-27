@@ -61,6 +61,9 @@ unsigned WarnLevel	= 1;
 unsigned ErrorCount	= 0;
 unsigned WarningCount	= 0;
 
+/* Maximum number of additional notifications */
+#define MAX_NOTES       6
+
 
 
 /*****************************************************************************/
@@ -121,6 +124,7 @@ static void AddNotifications (const Collection* LineInfos)
 /* Output additional notifications for an error or warning */
 {
     unsigned I;
+    unsigned Output;
     unsigned Skipped;
 
     /* The basic line info is always in slot zero. It has been used to
@@ -128,22 +132,36 @@ static void AddNotifications (const Collection* LineInfos)
      * more information. Check them and print additional notifications if
      * they're present, but limit the number to a reasonable value.
      */
-    unsigned MaxCount = CollCount (LineInfos);
-    if (MaxCount > 6) {
-        MaxCount = 6;
-    }
-    Skipped = CollCount (LineInfos) - MaxCount;
-    for (I = 1; I < MaxCount; ++I) {
+    for (I = 1, Output = 0, Skipped = 0; I < CollCount (LineInfos); ++I) {
         /* Get next line info */
         const LineInfo* LI = CollConstAt (LineInfos, I);
         /* Check the type and output an appropriate note */
-        unsigned Type = GetLineInfoType (LI);
-        if (Type == LI_TYPE_EXT) {
-            PrintMsg (GetSourcePos (LI), "Note",
-                      "Assembler code generated from this line");
-        } else if (Type == LI_TYPE_MACRO) {
-            PrintMsg (GetSourcePos (LI), "Note",
-                      "Macro was defined here");
+        const char* Msg;
+        switch (GetLineInfoType (LI)) {
+
+            case LI_TYPE_EXT:
+                Msg = "Assembler code generated from this line";
+                break;
+
+            case LI_TYPE_MACRO:
+                Msg = "Macro was defined here";
+                break;
+
+            default:
+                /* No output */
+                Msg = 0;
+                break;
+
+        }
+
+        /* Output until an upper limit of messages is reached */
+        if (Msg) {
+            if (Output < MAX_NOTES) {
+                PrintMsg (GetSourcePos (LI), "Note", "%s", Msg);
+                ++Output;
+            } else {
+                ++Skipped;
+            }
         }
     }
 
@@ -158,7 +176,7 @@ static void AddNotifications (const Collection* LineInfos)
 
 
 /*****************************************************************************/
-/*   	      	      	       	   Warnings 				     */
+/*     	      	      	       	   Warnings 				     */
 /*****************************************************************************/
 
 

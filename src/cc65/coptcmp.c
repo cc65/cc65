@@ -432,8 +432,8 @@ unsigned OptCmp3 (CodeSeg* S)
             int Delete = 0;
 
 	    /* Check for the call to boolxx. We only remove the compare if
-	     * the carry flag is evaluated later, because the load will not
-	     * set the carry flag.
+       	     * the carry flag is not evaluated later, because the load will
+             * not set the carry flag.
 	     */
 	    if (L[2]->OPC == OP65_JSR) {
 	    	switch (FindBoolCmpCond (L[2]->Arg)) {
@@ -458,12 +458,29 @@ unsigned OptCmp3 (CodeSeg* S)
 	    	}
 
 	    } else if ((L[2]->Info & OF_FBRA) != 0) {
-
-                /* The following insn branches on the condition of a load, so
-                 * the compare instruction can be removed.
+                /* The following insn branches on the condition of the load,
+                 * so the compare instruction might be removed. For safety,
+                 * do some more checks if the carry isn't used later, since
+                 * the compare does set the carry, but the load does not.
                  */
-                Delete = 1;
+                CodeEntry* E;
+                CodeEntry* N;
+                if ((E = CS_GetNextEntry (S, I+2)) != 0         &&
+                    L[2]->JumpTo != 0                           &&
+                    (N = L[2]->JumpTo->Owner) != 0              &&
+                    N->OPC != OP65_BCC                          &&
+                    N->OPC != OP65_BCS                          &&
+                    N->OPC != OP65_JCC                          &&
+                    N->OPC != OP65_JCS                          &&
+                    (N->OPC != OP65_JSR                 ||
+                    FindBoolCmpCond (N->Arg) == CMP_INV)) {
 
+                    /* The following insn branches on the condition of a load,
+                     * and there's no use of the carry flag in sight, so the
+                     * compare instruction can be removed.
+                     */
+                    Delete = 1;
+                }
             }
 
             /* Delete the compare if we can */

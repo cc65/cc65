@@ -42,6 +42,7 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
+#include "fname.h"
 #include "print.h"
 #include "version.h"
 #include "xmalloc.h"
@@ -1154,17 +1155,17 @@ void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
     /* Write the correct option length */
     switch (OS) {
 
-    	case O65OS_CC65:
+     	case O65OS_CC65:
             /* Set the 16 bit id */
             Opt[2] = (unsigned char) Id;
             Opt[3] = (unsigned char) (Id >> 8);
-	    O65SetOption (D, O65OPT_OS, Opt, 4);
-	    break;
+     	    O65SetOption (D, O65OPT_OS, Opt, 4);
+     	    break;
 
-	default:
+     	default:
             /* No id for OS/A65, Lunix, and unknown OSes */
        	    O65SetOption (D, O65OPT_OS, Opt, 2);
-	    break;
+     	    break;
 
     }
 }
@@ -1337,6 +1338,7 @@ void O65WriteTarget (O65Desc* D, File* F)
     char        OptBuf [256];	/* Buffer for option strings */
     unsigned    OptLen;
     time_t      T;
+    const char* Name;
 
     /* Place the filename in the control structure */
     D->Filename = GetString (F->Name);
@@ -1366,7 +1368,9 @@ void O65WriteTarget (O65Desc* D, File* F)
     /* Keep the user happy */
     Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
-    /* Define some more options: A timestamp and the linker version */
+    /* Define some more options: A timestamp, the linker version and the
+     * filename
+     */
     T = time (0);
     strcpy (OptBuf, ctime (&T));
     OptLen = strlen (OptBuf);
@@ -1377,6 +1381,8 @@ void O65WriteTarget (O65Desc* D, File* F)
     O65SetOption (D, O65OPT_TIMESTAMP, OptBuf, OptLen + 1);
     sprintf (OptBuf, "ld65 V%s", GetVersionAsString ());
     O65SetOption (D, O65OPT_ASM, OptBuf, strlen (OptBuf) + 1);
+    Name = FindName (D->Filename);
+    O65SetOption (D, O65OPT_FILENAME, Name, strlen (Name) + 1);
 
     /* Write the header */
     O65WriteHeader (D);

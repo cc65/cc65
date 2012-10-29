@@ -11,6 +11,7 @@
 AR = ../src/ar65/ar65
 AS = ../../src/ca65/ca65
 CC = ../../src/cc65/cc65
+CO = ../../src/co65/co65
 LD = ../../src/ld65/ld65
 
 # List of shared directories
@@ -37,8 +38,8 @@ ALLTARGETS =	apple2		\
 		c64		\
 		cbm510		\
 		cbm610		\
-		geos-apple      \
-		geos-cbm        \
+		geos-apple	\
+		geos-cbm	\
 		lynx		\
 		nes		\
 		pet		\
@@ -156,8 +157,8 @@ c16lib:
 	    $(MAKE) SYS=c16 -C $$i || exit 1; \
 	    $(AR) a c16.lib $$i/*.o || exit 1; \
 	done
-	cp c16/*.joy .
 	cp c16/*.emd .
+	cp c16/*.joy .
 	if [ -d c16/extra ]; then \
 	    for i in c16/extra/*.o; do \
 	       	cp $$i c16-`basename $$i` || exit 1; \

@@ -11,6 +11,7 @@ SYS	= apple2
 
 AS	= ../../src/ca65/ca65
 CC	= ../../src/cc65/cc65
+CO	= ../../src/co65/co65
 LD	= ../../src/ld65/ld65
 
 AFLAGS	= -t $(SYS) --forget-inc-paths -I../../asminc
@@ -25,6 +26,26 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
+
+%-emd.o: %.emd
+	@$(CO) -o $(*)-emd.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-emd.s
+
+%-joy.o: %.joy
+	@$(CO) -o $(*)-joy.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-joy.s
+
+%-mou.o: %.mou
+	@$(CO) -o $(*)-mou.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-mou.s
+
+%-ser.o: %.ser
+	@$(CO) -o $(*)-ser.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-ser.s
+
+%-tgi.o: %.tgi
+	@$(CO) -o $(*)-tgi.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-tgi.s
 
 %.emd:	%.o ../runtime/zeropage.o
 	@$(LD) -o $@ -t module $^
@@ -44,77 +65,82 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-C_OBJS=	closedir.o	\
-	opendir.o	\
-	readdir.o	\
+C_OBJS=	closedir.o		\
+	opendir.o		\
+	readdir.o		\
 	rewinddir.o
 
-S_OBJS=	_scrsize.o	\
-	break.o		\
-	cclear.o	\
-	cgetc.o		\
-	chline.o	\
-	close.o		\
-	clrscr.o	\
-	color.o		\
-	cout.o		\
-	cputc.o		\
-	crt0.o		\
-	ctype.o		\
-	curdevice.o	\
-	cvline.o	\
-	devicedir.o	\
-	dioclose.o	\
-	diocommon.o	\
-	dioopen.o	\
-	dioread.o	\
-	diosectcount.o	\
-	diosectsize.o	\
-	diowrite.o	\
-	dosdetect.o	\
-	exec.o		\
-	exehdr.o	\
-	filedes.o	\
-	filename.o	\
-	get_ostype.o	\
-	getdevice.o	\
-	gotoxy.o	\
-	gotoy.o		\
-	home.o		\
-	initcwd.o	\
-	iobuf.o		\
-	isdevice.o	\
-	joy_stddrv.o	\
-	kbhit.o		\
-	mainargs.o	\
-	mcbdefault.o	\
-	mli.o		\
-	mouse_stddrv.o	\
-	open.o		\
-	oserrlist.o	\
-	oserror.o	\
-	randomize.o	\
-	rdkey.o		\
-	read.o		\
-	reboot.o	\
-	revers.o	\
-	rwcommon.o	\
-	syschdir.o	\
-	sysmkdir.o	\
-	sysremove.o	\
-	sysrename.o	\
-	sysrmdir.o	\
-	systime.o	\
-	sysuname.o	\
-	tgi_colors.o	\
-	tgi_stddrv.o	\
-	toascii.o	\
-	vtabz.o		\
-	wherex.o	\
-	wherey.o	\
-	write.o
+S_OBJS=	_scrsize.o		\
+	break.o			\
+	cclear.o		\
+	cgetc.o			\
+	chline.o		\
+	close.o			\
+	clrscr.o		\
+	color.o			\
+	cout.o			\
+	cputc.o			\
+	crt0.o			\
+	ctype.o			\
+	curdevice.o		\
+	cvline.o		\
+	devicedir.o		\
+	dioclose.o		\
+	diocommon.o		\
+	dioopen.o		\
+	dioread.o		\
+	diosectcount.o		\
+	diosectsize.o		\
+	diowrite.o		\
+	dosdetect.o		\
+	exec.o			\
+	exehdr.o		\
+	filedes.o		\
+	filename.o		\
+	get_ostype.o		\
+	getdevice.o		\
+	gotoxy.o		\
+	gotoy.o			\
+	home.o			\
+	initcwd.o		\
+	iobuf.o			\
+	isdevice.o		\
+	joy_stddrv.o		\
+	kbhit.o			\
+	mainargs.o		\
+	mcbdefault.o		\
+	mli.o			\
+	mouse_stddrv.o		\
+	open.o			\
+	oserrlist.o		\
+	oserror.o		\
+	randomize.o		\
+	rdkey.o			\
+	read.o			\
+	reboot.o		\
+	revers.o		\
+	rwcommon.o		\
+	syschdir.o		\
+	sysmkdir.o		\
+	sysremove.o		\
+	sysrename.o		\
+	sysrmdir.o		\
+	systime.o		\
+	sysuname.o		\
+	tgi_colors.o		\
+	tgi_stddrv.o		\
+	toascii.o		\
+	vtabz.o			\
+	wherex.o		\
+	wherey.o		\
+	write.o			\
+	$(EMDS:.emd=-emd.o)	\
+	$(JOYS:.joy=-joy.o)	\
+	$(MOUS:.mou=-mou.o)	\
+	$(SERS:.ser=-ser.o)	\
+	$(TGIS:.tgi=-tgi.o)
 
-S_EXTRA_OBJS=		\
+S_EXTRA_OBJS=			\
 	extra/iobuf-0800.o
 
 #--------------------------------------------------------------------------
@@ -135,13 +161,18 @@ TGIS = apple2-280-192-8.tgi apple2-40-48-16.tgi
 
 .PHONY:	all clean zap
 
-all: 	$(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
+all:	$(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) $(S_EXTRA_OBJS) \
+	       $(EMDS:.emd=.o) $(EMDS:.emd=-emd.s) \
+	       $(JOYS:.joy=.o) $(JOYS:.joy=-joy.s) \
+	       $(MOUS:.mou=.o) $(MOUS:.mou=-mou.s) \
+	       $(SERS:.ser=.o) $(SERS:.ser=-ser.s) \
+	       $(TGIS:.tgi=.o) $(TGIS:.tgi=-tgi.s)
 
 zap:	clean
 	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)

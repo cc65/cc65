@@ -28,6 +28,7 @@ SYS	= atari
 
 AS	= ../../src/ca65/ca65
 CC	= ../../src/cc65/cc65
+CO	= ../../src/co65/co65
 LD	= ../../src/ld65/ld65
 
 AFLAGS	= -t $(SYS) --forget-inc-paths -I../../asminc
@@ -36,14 +37,26 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Rules
 
-%.o:   	%.c
+%.o:	%.c
 	@$(CC) $(CFLAGS) $(ATARIDEFS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $(ATARIDEFS) $<
 
-%.emd: 	%.o ../runtime/zeropage.o
+%-emd.o: %.emd
+	@$(CO) -o $(*)-emd.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-emd.s
+
+%-joy.o: %.joy
+	@$(CO) -o $(*)-joy.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-joy.s
+
+%-tgi.o: %.tgi
+	@$(CO) -o $(*)-tgi.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-tgi.s
+
+%.emd:	%.o ../runtime/zeropage.o
 	@$(LD) -o $@ -t module $^
 
 %.joy:	%.o ../runtime/zeropage.o
@@ -56,71 +69,74 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS = 	_scrsize.o      \
-	break.o         \
-	cclear.o        \
-	cgetc.o         \
-	chline.o        \
-	clock.o         \
-	close.o         \
-	clrscr.o        \
-	color.o         \
-	cputc.o         \
-	crt0.o 	        \
-	ctype.o         \
-	cvline.o        \
-	dio_cts.o       \
-	dio_stc.o       \
-	diopncls.o      \
-	dioqsize.o      \
-	dioread.o       \
-	diowrite.o      \
-	diowritev.o     \
-	do_oserr.o      \
-	dosdetect.o     \
-	fdtable.o       \
-	fdtab.o         \
-	fdtoiocb.o      \
-	getargs.o       \
-	getdefdev.o     \
-	getfd.o         \
-	gotox.o         \
-	gotoy.o         \
-	gotoxy.o        \
-	graphics.o      \
-	initcwd.o       \
-	inviocb.o       \
-	joy_stddrv.o    \
-	kbhit.o         \
-	lseek.o         \
-	mul40.o         \
-	open.o 	        \
-	oserrlist.o     \
-	oserror.o       \
-	ostype.o        \
-	posixdirent.o   \
-	randomize.o     \
-	read.o 	        \
-	revers.o        \
-	rwcommon.o      \
-	savevec.o       \
-	scroll.o        \
-	setcolor.o      \
-	siocall.o       \
-	syschdir.o      \
-	sysmkdir.o      \
-	sysremove.o     \
-	sysrmdir.o      \
-	systime.o       \
-	sysuname.o      \
-	tgi_colors.o    \
-	tgi_stddrv.o    \
-	toascii.o       \
-	tvtype.o        \
-	ucase_fn.o      \
-	wherex.o        \
-	wherey.o        \
-	write.o
+OBJS = 	_scrsize.o              \
+	break.o                 \
+	cclear.o                \
+	cgetc.o                 \
+	chline.o                \
+	clock.o                 \
+	close.o                 \
+	clrscr.o                \
+	color.o                 \
+	cputc.o                 \
+	crt0.o                  \
+	ctype.o                 \
+	cvline.o                \
+	dio_cts.o               \
+	dio_stc.o               \
+	diopncls.o              \
+	dioqsize.o              \
+	dioread.o               \
+	diowrite.o              \
+	diowritev.o             \
+	do_oserr.o              \
+	dosdetect.o             \
+	fdtable.o               \
+	fdtab.o                 \
+	fdtoiocb.o              \
+	getargs.o               \
+	getdefdev.o             \
+	getfd.o                 \
+	gotox.o                 \
+	gotoy.o                 \
+	gotoxy.o                \
+	graphics.o              \
+	initcwd.o               \
+	inviocb.o               \
+	joy_stddrv.o            \
+	kbhit.o                 \
+	lseek.o                 \
+	mul40.o                 \
+	open.o                  \
+	oserrlist.o             \
+	oserror.o               \
+	ostype.o                \
+	posixdirent.o           \
+	randomize.o             \
+	read.o                  \
+	revers.o                \
+	rwcommon.o              \
+	savevec.o               \
+	scroll.o                \
+	setcolor.o              \
+	siocall.o               \
+	syschdir.o              \
+	sysmkdir.o              \
+	sysremove.o             \
+	sysrmdir.o              \
+	systime.o               \
+	sysuname.o              \
+	tgi_colors.o            \
+	tgi_stddrv.o            \
+	toascii.o               \
+	tvtype.o                \
+	ucase_fn.o              \
+	wherex.o                \
+	wherey.o                \
+	write.o                 \
+	$(EMDS:.emd=-emd.o)     \
+	$(JOYS:.joy=-joy.o)     \
+	$(TGIS:.tgi=-tgi.o)
 
 
 #--------------------------------------------------------------------------
@@ -137,14 +153,16 @@ TGIS = atari-3.tgi atari-4.tgi atari-5.tgi atari-6.tgi atari-7.tgi atari-8.tgi \
 #--------------------------------------------------------------------------
 # Targets
 
-all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
+all:	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(OBJS) \
+	       $(EMDS:.emd=.o) $(EMDS:.emd=-emd.s) \
+	       $(JOYS:.joy=.o) $(JOYS:.joy=-joy.s) \
+	       $(TGIS:.tgi=.o) $(TGIS:.tgi=-tgi.s)
 
 zap:	clean
 	@$(RM) $(EMDS) $(JOYS) $(TGIS)
-

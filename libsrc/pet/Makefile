@@ -11,6 +11,7 @@ SYS	= pet
 
 AS	= ../../src/ca65/ca65
 CC	= ../../src/cc65/cc65
+CO	= ../../src/co65/co65
 LD	= ../../src/ld65/ld65
 
 AFLAGS	= -t $(SYS) --forget-inc-paths -I../../asminc
@@ -19,23 +20,29 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Rules
 
-%.o:   	%.c
+%.o:	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
+%-emd.o: %.emd
+	@$(CO) -o $(*)-emd.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-emd.s
+
+%-joy.o: %.joy
+	@$(CO) -o $(*)-joy.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-joy.s
+
+%-tgi.o: %.tgi
+	@$(CO) -o $(*)-tgi.s --code-name _$(subst -,_,$(*)) $<
+	@$(AS) -o $@ $(AFLAGS) $(*)-tgi.s
+
 %.emd:	%.o ../runtime/zeropage.o
 	@$(LD) -o $@ -t module $^
 
 %.joy:	%.o ../runtime/zeropage.o
-	@$(LD) -o $@ -t module $^
-
-%.mou:	%.o ../runtime/zeropage.o
-	@$(LD) -o $@ -t module $^
-
-%.ser:	%.o ../runtime/zeropage.o
 	@$(LD) -o $@ -t module $^
 
 %.tgi:	%.o ../runtime/zeropage.o
@@ -44,34 +51,37 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS =	_scrsize.o	\
-	break.o		\
-	cgetc.o		\
-        checkst.o       \
-	clrscr.o	\
-	color.o		\
-	conio.o		\
-	cputc.o		\
-	crt0.o		\
-	devnum.o	\
-	get_tv.o	\
-	kbhit.o         \
-        kbsout.o        \
-        kchkin.o        \
-        kckout.o        \
-        kclose.o        \
-        kernal.o        \
-        kopen.o         \
-        kplot.o         \
-        krdtim.o        \
-        kreadst.o       \
-        ksetlfs.o       \
-        ksetnam.o       \
-        mainargs.o      \
-        randomize.o	\
-	revers.o        \
-	status.o        \
-        sysuname.o
+OBJS =	_scrsize.o              \
+        break.o                 \
+        cgetc.o                 \
+        checkst.o               \
+        clrscr.o                \
+        color.o                 \
+        conio.o                 \
+        cputc.o                 \
+        crt0.o                  \
+        devnum.o                \
+        get_tv.o                \
+        kbhit.o                 \
+        kbsout.o                \
+        kchkin.o                \
+        kckout.o                \
+        kclose.o                \
+        kernal.o                \
+        kopen.o                 \
+        kplot.o                 \
+        krdtim.o                \
+        kreadst.o               \
+        ksetlfs.o               \
+        ksetnam.o               \
+        mainargs.o              \
+        randomize.o             \
+        revers.o                \
+        status.o                \
+        sysuname.o              \
+        $(EMDS:.emd=-emd.o)     \
+        $(JOYS:.joy=-joy.o)     \
+        $(TGIS:.tgi=-tgi.o)
 
 #--------------------------------------------------------------------------
 # Drivers
@@ -93,9 +103,10 @@ all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(OBJS) \
+	       $(EMDS:.emd=.o) $(EMDS:.emd=-emd.s) \
+	       $(JOYS:.joy=.o) $(JOYS:.joy=-joy.s) \
+	       $(TGIS:.tgi=.o) $(TGIS:.tgi=-tgi.s)
 
 zap:	clean
 	@$(RM) $(EMDS) $(JOYS) $(TGIS)
-
-

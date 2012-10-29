@@ -19,7 +19,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Rules
 
-%.o:   	%.c
+%.o:	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
@@ -29,20 +29,19 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-C_OBJS =
+C_OBJS=
 
-S_OBJS  =       crt0.o          \
-                ctype.o
+S_OBJS= crt0.o          \
+        ctype.o
 
 #--------------------------------------------------------------------------
 # Targets
 
 .PHONY:	all clean zap
 
-all:   	$(C_OBJS) $(S_OBJS)
+all:	$(C_OBJS) $(S_OBJS)
 
 clean:
 	@$(RM) $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS)
 
 zap:	clean
-

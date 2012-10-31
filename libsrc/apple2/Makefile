@@ -28,23 +28,23 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 %-emd.o: %.emd
-	@$(CO) -o $(*)-emd.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-emd.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-emd.s
 
 %-joy.o: %.joy
-	@$(CO) -o $(*)-joy.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-joy.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-joy.s
 
 %-mou.o: %.mou
-	@$(CO) -o $(*)-mou.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-mou.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-mou.s
 
 %-ser.o: %.ser
-	@$(CO) -o $(*)-ser.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-ser.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-ser.s
 
 %-tgi.o: %.tgi
-	@$(CO) -o $(*)-tgi.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-tgi.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-tgi.s
 
 %.emd:	%.o ../runtime/zeropage.o

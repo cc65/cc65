@@ -28,15 +28,15 @@ CFLAGS=-Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 %-emd.o: %.emd
-	@$(CO) -o $(*)-emd.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-emd.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-emd.s
 
 %-joy.o: %.joy
-	@$(CO) -o $(*)-joy.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-joy.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-joy.s
 
 %-tgi.o: %.tgi
-	@$(CO) -o $(*)-tgi.s --code-name _$(subst -,_,$(*)) $<
+	@$(CO) -o $(*)-tgi.s --code-label _$(subst -,_,$(*)) $<
 	@$(AS) -o $@ $(AFLAGS) $(*)-tgi.s
 
 %.emd:	%.o ../runtime/zeropage.o

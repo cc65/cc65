@@ -79,6 +79,7 @@ OBJS =  bllhdr.o                \
         exec.o                  \
         exehdr.o                \
         extzp.o                 \
+        joy_stddrv.o            \
         kbhit.o                 \
         load.o                  \
         lseek.o                 \
@@ -89,6 +90,7 @@ OBJS =  bllhdr.o                \
         read.o                  \
         sysuname.o              \
         tgi_colors.o            \
+        tgi_stddrv.o            \
         toascii.o               \
         uploader.o              \
         $(EMDS:.emd=-emd.o)     \

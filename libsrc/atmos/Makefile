@@ -81,6 +81,7 @@ OBJS  =	_scrsize.o              \
         gotox.o                 \
         gotoxy.o                \
         gotoy.o                 \
+        joy_stddrv.o            \
         kbhit.o                 \
         mainargs.o              \
         oserrlist.o             \
@@ -90,6 +91,7 @@ OBJS  =	_scrsize.o              \
         systime.o               \
         sysuname.o              \
         tgi_colors.o            \
+        tgi_stddrv.o            \
         wherex.o                \
         wherey.o                \
         write.o                 \

@@ -5113,7 +5113,7 @@ be used in presence of a prototype.
 <verb>
 #include <serial.h>
 
-extern char comlynx[];
+extern void lynx_comlynx[];
 
 static void initialize(){
   struct ser_params params = {
@@ -5123,7 +5123,7 @@ static void initialize(){
     SER_PAR_MARK,
     SER_HS_NONE
   };
-  ser_install(&amp;comlynx); // This will activate the ComLynx
+  ser_install(lynx_comlynx); // This will activate the ComLynx
   CLI();
   ser_open(&amp;params);
 }
@@ -5179,9 +5179,9 @@ used in presence of a prototype.
 <ref id="ser_uninstall" name="ser_uninstall">,
 <ref id="ser_unload" name="ser_unload">
 <tag/Example/<verb>
-extern char lynxser[]; //Include the driver statically instead of loading it.
+extern void lynx_comlynx[]; //Include the driver statically instead of loading it.
 
-ser_install(&amp;lynxser);
+ser_install(lynx_comlynx);
 </verb>
 </descrip>
 </quote>
@@ -5246,7 +5246,7 @@ be used in presence of a prototype.
 <verb>
 #include <serial.h>
 
-extern char comlynx[];
+extern void lynx_comlynx[];
 
 static void initialize(){
   struct ser_params params = {
@@ -5256,7 +5256,7 @@ static void initialize(){
     SER_PAR_MARK,
     SER_HS_NONE
   };
-  ser_install(&amp;comlynx); // This will activate the ComLynx
+  ser_install(lynx_comlynx); // This will activate the ComLynx
   CLI();
   ser_open(&amp;params);
 }
@@ -6611,8 +6611,7 @@ name="tgi_clear">/ after <tt/tgi_init/.
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
 <tag/Example/<verb>
-extern char lynxtgi[]; //Include the driver statically instead of loading it.
-tgi_install(&amp;lynxtgi);
+tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
 tgi_init(); //Set up the default palette and clear the screen.
 </verb>
 </descrip>
@@ -6639,9 +6638,7 @@ used in presence of a prototype.
 <ref id="tgi_uninstall" name="tgi_uninstall">,
 <ref id="tgi_unload" name="tgi_unload">
 <tag/Example/<verb>
-extern char lynxtgi[]; //Include the driver statically instead of loading it.
-
-tgi_install(&amp;lynxtgi);
+tgi_install(tgi_static_stddrv); //Include the driver statically instead of loading it.
 tgi_init(); //Set up the default palette and clear the screen.
 </verb>
 </descrip>

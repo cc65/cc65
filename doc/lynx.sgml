@@ -38,10 +38,9 @@ Here is a small traditional Hello World program for the Atari Lynx.
 #include <lynx.h>
 #include <tgi.h>
 #include <6502.h> 
-extern char lynxtgi[];
 
 void main(void) {
-  tgi_install(&amp;lynxtgi);
+  tgi_install(tgi_static_stddrv);
   tgi_init();
   CLI();
   while (tgi_busy())
@@ -70,36 +69,10 @@ in your own program you need to load it at run time.
 
 Unfortunately the Lynx does not have a disk drive from where to load it.
 Therefore you must already load it at compile time. The easiest way is to
-link it in statically.
-
-This relocatable driver is found in <tt>$(CC65_HOME)/tgi/lynx-160-102-16.tgi</tt>.
-Copy it from here.
-
-The name comes from 160 by 102 pixels (The Lynx LCD size), 16 colors.
-
-In order to link in this statically we have to make it back to a source
-file so that we can compile it. The next command will turn the compiled
-driver object file into an assembler source and compile it with the ca65
-assembler.
+automatically link it in statically from the Lynx C library.
 
 <tscreen><verb>
-co65 --code-label _lynxtgi lynx-160-102-16.tgi
-ca65 -t lynx lynx-160-102-16.s
-</verb></tscreen>
-
-This will create a linkable object file called lynx-160-102-16.o
-
-Then we need to compile our main file to a linkable object file. 
-
-<tscreen><verb>
-cc65 -t lynx main.c
-ca65 -t lynx main.s
-</verb></tscreen>
-
-Finally we have to link them together to produce an executable cart.
-
-<tscreen><verb>
-cl65 -t lynx -o game.lnx main.o lynx-160-102-16.o lynx.lib
+cl65 -t lynx -o game.lnx main.c
 </verb></tscreen>
 
 This will create a bootable cart image called game.lnx
@@ -218,8 +191,6 @@ structures, accessing the struct fields will access the chip registers.
 
 A TGI driver for the standard graphics mode (160&times;102 in 16 colors) is
 available, but must be statically linked, because no file I/O is available.
-See the documentation for the <htmlurl url="co65.html" name="co65 utility">
-for information on how to do that.
 
 The TGI driver is implemented as an interrupt driven dual buffering device.
 To use it as a single-buffer device set draw page and view page to the same
@@ -263,9 +234,7 @@ No extended memory drivers are currently available for the Lynx.
 <sect1>Joystick drivers<p>
 
 A joystick driver for the standard buttons is available, but must be
-statically linked, because no file I/O is available. See the documentation for
-the <htmlurl url="co65.html" name="co65 utility"> for information on how to do
-that.
+statically linked, because no file I/O is available.
 
 <sect1>Mouse drivers<p>
 

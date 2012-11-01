@@ -94,8 +94,7 @@ structures, accessing the struct fields will access the chip registers.
 <em>Note:</em> Since the Atmos doesn't have working disk I/O
 (see <ref id="limitations" name="section &quot;Limitations&quot;">), the
 available drivers cannot be loaded at runtime (so the term "loadable drivers"
-is somewhat misleading). Instead, the drivers have to be converted using the
-<htmlurl url="co65.html" name="co65 utility"> and statically linked. While
+is somewhat misleading). Instead, the drivers have to be statically linked. While
 this may seem overhead, it has two advantages:
 
 <enum>

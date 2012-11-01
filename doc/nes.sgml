@@ -94,8 +94,6 @@ allow access to hardware located in the address space.
 <sect>Loadable drivers<p>
 
 All drivers must be statically linked because no file I/O is available.
-See the documentation for the <htmlurl url="co65.html" name="co65 utility">
-for information on how to do that.
 
 <sect1>Graphics drivers<p>
 

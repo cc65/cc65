@@ -77,11 +77,13 @@ OBJS =	_scrsize.o              \
         devnum.o                \
         fast.o                  \
         get_tv.o                \
+        joy_stat_stddrv.o       \
         joy_stddrv.o            \
         kbhit.o                 \
         kernal.o                \
         mainargs.o              \
         mcbdefault.o            \
+        mouse_stat_stddrv.o     \
         mouse_stddrv.o          \
         randomize.o             \
         revers.o                \
@@ -90,6 +92,7 @@ OBJS =	_scrsize.o              \
         systime.o               \
         sysuname.o              \
         tgi_colors.o            \
+        tgi_stat_stddrv.o       \
         tgi_stddrv.o            \
         toggle_videomode.o      \
         videomode.o             \

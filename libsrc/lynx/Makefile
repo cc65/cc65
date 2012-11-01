@@ -79,6 +79,7 @@ OBJS =  bllhdr.o                \
         exec.o                  \
         exehdr.o                \
         extzp.o                 \
+        joy_stat_stddrv.o       \
         joy_stddrv.o            \
         kbhit.o                 \
         load.o                  \
@@ -90,6 +91,7 @@ OBJS =  bllhdr.o                \
         read.o                  \
         sysuname.o              \
         tgi_colors.o            \
+        tgi_stat_stddrv.o       \
         tgi_stddrv.o            \
         toascii.o               \
         uploader.o              \

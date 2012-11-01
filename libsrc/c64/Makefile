@@ -76,12 +76,14 @@ OBJS =  _scrsize.o              \
         devnum.o                \
         get_ostype.o            \
         get_tv.o                \
+        joy_stat_stddrv.o       \
         joy_stddrv.o            \
         kbhit.o                 \
         kernal.o                \
         kplot.o                 \
         mainargs.o              \
         mcbdefault.o            \
+        mouse_stat_stddrv.o     \
         mouse_stddrv.o          \
         randomize.o             \
         revers.o                \
@@ -89,6 +91,7 @@ OBJS =  _scrsize.o              \
         systime.o               \
         sysuname.o              \
         tgi_colors.o            \
+        tgi_stat_stddrv.o       \
         tgi_stddrv.o            \
         $(EMDS:.emd=-emd.o)     \
         $(JOYS:.joy=-joy.o)     \

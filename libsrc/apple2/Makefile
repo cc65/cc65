@@ -105,11 +105,13 @@ S_OBJS=	_scrsize.o		\
 	initcwd.o		\
 	iobuf.o			\
 	isdevice.o		\
+	joy_stat_stddrv.o	\
 	joy_stddrv.o		\
 	kbhit.o			\
 	mainargs.o		\
 	mcbdefault.o		\
 	mli.o			\
+	mouse_stat_stddrv.o	\
 	mouse_stddrv.o		\
 	open.o			\
 	oserrlist.o		\
@@ -128,6 +130,7 @@ S_OBJS=	_scrsize.o		\
 	systime.o		\
 	sysuname.o		\
 	tgi_colors.o		\
+	tgi_stat_stddrv.o	\
 	tgi_stddrv.o		\
 	toascii.o		\
 	vtabz.o			\

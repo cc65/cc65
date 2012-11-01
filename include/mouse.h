@@ -107,6 +107,9 @@ extern const struct mouse_callbacks mouse_def_callbacks;
 /* The name of the standard mouse driver for a platform */
 extern const char mouse_stddrv[];
 
+/* The address of the static standard mouse driver for a platform */
+extern const char mouse_static_stddrv[];
+
 
 
 /*****************************************************************************/

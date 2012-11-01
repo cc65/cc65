@@ -61,6 +61,9 @@
 /* The name of the standard tgi driver for a platform */
 extern const char tgi_stddrv[];
 
+/* The address of the static standard tgi driver for a platform */
+extern const void tgi_static_stddrv[];
+
 /* A vector font definition */
 typedef struct tgi_vectorfont tgi_vectorfont;
 

@@ -103,6 +103,7 @@ OBJS = 	_scrsize.o              \
 	graphics.o              \
 	initcwd.o               \
 	inviocb.o               \
+	joy_stat_stddrv.o       \
 	joy_stddrv.o            \
 	kbhit.o                 \
 	lseek.o                 \
@@ -127,6 +128,7 @@ OBJS = 	_scrsize.o              \
 	systime.o               \
 	sysuname.o              \
 	tgi_colors.o            \
+	tgi_stat_stddrv.o       \
 	tgi_stddrv.o            \
 	toascii.o               \
 	tvtype.o                \

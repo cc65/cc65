@@ -79,6 +79,7 @@ OBJS =  _scrsize.o              \
         gotox.o                 \
         gotoxy.o                \
         gotoy.o                 \
+        joy_stat_stddrv.o       \
         joy_stddrv.o            \
         mainargs.o              \
         ppu.o                   \
@@ -88,6 +89,7 @@ OBJS =  _scrsize.o              \
         setcursor.o             \
         sysuname.o              \
         tgi_colors.o            \
+        tgi_stat_stddrv.o       \
         tgi_stddrv.o            \
         waitvblank.o            \
         wherex.o                \

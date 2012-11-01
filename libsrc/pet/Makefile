@@ -62,6 +62,7 @@ OBJS =	_scrsize.o              \
         crt0.o                  \
         devnum.o                \
         get_tv.o                \
+        joy_stat_stddrv.o       \
         joy_stddrv.o            \
         kbhit.o                 \
         kbsout.o                \

@@ -118,7 +118,7 @@ SER_HS_NONE             =       $00    ; No handshake
 SER_HS_HW               =       $01    ; Hardware (RTS/CTS) handshake
 SER_HS_SW               =       $02    ; Software handshake
 
-; Bit masks to mask out things from the status returned by rs232_status
+; Bit masks to mask out things from the status returned by ser_status
 SER_STATUS_PE          	=       $01	; Parity error
 SER_STATUS_FE  	       	=       $02	; Framing error
 SER_STATUS_OE           =       $04	; Overrun error

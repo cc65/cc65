@@ -290,11 +290,11 @@ output.
         ca65 c64-hi.s
   </verb></tscreen>
 
-Next, change your C code to declare a variable that is actually the first byte
+Next, change your C code to declare a variable that is actually the address
 of the driver:
 
   <tscreen><verb>
-       	extern char c64_hi;
+       	extern void c64_hi[];
   </verb></tscreen>
 
 Instead of loading and unloading the driver, change the code to install and
@@ -302,7 +302,7 @@ uninstall the driver, which will be already in memory after linking:
 
   <tscreen><verb>
         /* Install the driver */
-        tgi_install (&amp;c64_hi);
+        tgi_install (c64_hi);
 
         ...
 

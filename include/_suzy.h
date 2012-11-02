@@ -29,10 +29,10 @@
 #define __SUZY_H
 
 /* Joypad $FCB0 */
-#define JOY_RIGHT       0x10
-#define JOY_LEFT        0x20
-#define JOY_DOWN        0x40
-#define JOY_UP          0x80
+#define JOYPAD_RIGHT    0x10
+#define JOYPAD_LEFT     0x20
+#define JOYPAD_DOWN     0x40
+#define JOYPAD_UP       0x80
 #define BUTTON_OPTION1  0x08
 #define BUTTON_OPTION2  0x04
 #define BUTTON_INNER    0x02

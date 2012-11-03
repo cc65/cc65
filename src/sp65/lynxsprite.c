@@ -258,6 +258,9 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     if ((OY == 0) && (OX == 0)) {
         /* Trivial case only one quadrant */
 
+        /* Mark end of sprite */
+        SB_AppendChar (D, 0);
+
         /* Return the converted bitmap */
         return D;
     }

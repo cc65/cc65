@@ -29,7 +29,8 @@
 
        	.export	callirq
         .export callirq_y       ; Same but with Y preloaded
-
+                                                            
+        .export __CALLIRQ__: absolute = 1
        	.import	__INTERRUPTOR_TABLE__, __INTERRUPTOR_COUNT__
 
 .code

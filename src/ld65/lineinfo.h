@@ -97,6 +97,9 @@ LineInfo* ReadLineInfo (FILE* F, struct ObjData* O);
 void FreeLineInfo (LineInfo* LI);
 /* Free a LineInfo structure. */
 
+LineInfo* DupLineInfo (const LineInfo* LI);
+/* Creates a duplicate of a line info structure */
+
 void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
 /* Read a list of line infos stored as a list of indices in the object file,
  * make real line infos from them and place them into the passed collection.

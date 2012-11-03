@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*     	       	      	      	     Code			     	     */
+/*     	       	      	       	     Code			     	     */
 /*****************************************************************************/
 
 
@@ -83,6 +83,25 @@ void FreeLineInfo (LineInfo* LI)
 
     /* Free the structure itself */
     xfree (LI);
+}
+
+
+
+LineInfo* DupLineInfo (const LineInfo* LI)
+/* Creates a duplicate of a line info structure */
+{                              
+    /* Allocate memory */
+    LineInfo* New = xmalloc (sizeof (LineInfo));
+
+    /* Copy the fields (leave id invalid) */
+    New->Id     = LI->Id;
+    New->File   = LI->File;
+    New->Type   = LI->Type;
+    New->Pos    = LI->Pos;
+    New->Spans  = DupSpanList (LI->Spans);
+
+    /* Return the copy */
+    return New;
 }
 
 

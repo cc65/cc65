@@ -82,6 +82,9 @@ unsigned* ReadSpanList (FILE* F);
  * the span ids. If the number of spans is zero, NULL is returned.
  */
 
+unsigned* DupSpanList (const unsigned* S);
+/* Duplicate a span list */
+
 void FreeSpan (Span* S);
 /* Free a span structure */
 

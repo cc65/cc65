@@ -1042,11 +1042,12 @@ static void ParseConDes (void)
 /* Parse the CONDES feature */
 {
     static const IdentTok Attributes [] = {
-       	{   "SEGMENT",	   	CFGTOK_SEGMENT		},
-	{   "LABEL",  	   	CFGTOK_LABEL  		},
 	{   "COUNT",	   	CFGTOK_COUNT		},
-	{   "TYPE",	   	CFGTOK_TYPE   		},
+        {   "IMPORT",           CFGTOK_IMPORT           },
+	{   "LABEL",  	   	CFGTOK_LABEL  		},
 	{   "ORDER",	   	CFGTOK_ORDER		},
+       	{   "SEGMENT",	   	CFGTOK_SEGMENT		},
+	{   "TYPE",	   	CFGTOK_TYPE   		},
     };
 
     static const IdentTok Types [] = {
@@ -1061,9 +1062,10 @@ static void ParseConDes (void)
     };
 
     /* Attribute values. */
-    unsigned SegName = INVALID_STRING_ID;
-    unsigned Label   = INVALID_STRING_ID;
     unsigned Count   = INVALID_STRING_ID;
+    unsigned Label   = INVALID_STRING_ID;
+    unsigned SegName = INVALID_STRING_ID;
+    ConDesImport Import;
     /* Initialize to avoid gcc warnings: */
     int Type = -1;
     ConDesOrder Order = cdIncreasing;
@@ -1071,11 +1073,12 @@ static void ParseConDes (void)
     /* Bitmask to remember the attributes we got already */
     enum {
 	atNone	   	= 0x0000,
-	atSegName  	= 0x0001,
-	atLabel	   	= 0x0002,
-	atCount	   	= 0x0004,
-	atType	   	= 0x0008,
-	atOrder	   	= 0x0010
+	atCount	   	= 0x0001,
+        atImport        = 0x0002,
+	atLabel	   	= 0x0004,
+	atOrder	   	= 0x0008,
+	atSegName  	= 0x0010,
+	atType	   	= 0x0020,
     };
     unsigned AttrFlags = atNone;
 
@@ -1094,50 +1097,34 @@ static void ParseConDes (void)
 	/* Check which attribute was given */
 	switch (AttrTok) {
 
-	    case CFGTOK_SEGMENT:
-	  	/* Don't allow this twice */
-		FlagAttr (&AttrFlags, atSegName, "SEGMENT");
+	    case CFGTOK_COUNT:
+	       	/* Don't allow this twice */
+	    	FlagAttr (&AttrFlags, atCount, "COUNT");
 	      	/* We expect an identifier */
-		CfgAssureIdent ();
-		/* Remember the value for later */
-		SegName = GetStrBufId (&CfgSVal);
+	    	CfgAssureIdent ();
+	    	/* Remember the value for later */
+	    	Count = GetStrBufId (&CfgSVal);
+	    	break;
+
+	    case CFGTOK_IMPORT:
+	       	/* Don't allow this twice */
+	    	FlagAttr (&AttrFlags, atImport, "IMPORT");
+	      	/* We expect an identifier */
+	    	CfgAssureIdent ();
+	    	/* Remember value and position for later */
+       	       	Import.Name = GetStrBufId (&CfgSVal);
+                Import.Pos = CfgErrorPos;
+                Import.AddrSize = ADDR_SIZE_ABS;
 	    	break;
 
 	    case CFGTOK_LABEL:
 	       	/* Don't allow this twice */
-		FlagAttr (&AttrFlags, atLabel, "LABEL");
+	    	FlagAttr (&AttrFlags, atLabel, "LABEL");
 	      	/* We expect an identifier */
-		CfgAssureIdent ();
-		/* Remember the value for later */
-		Label = GetStrBufId (&CfgSVal);
-		break;
-
-	    case CFGTOK_COUNT:
-	       	/* Don't allow this twice */
-		FlagAttr (&AttrFlags, atCount, "COUNT");
-	      	/* We expect an identifier */
-		CfgAssureIdent ();
-		/* Remember the value for later */
-		Count = GetStrBufId (&CfgSVal);
-		break;
-
-	    case CFGTOK_TYPE:
-	  	/* Don't allow this twice */
-		FlagAttr (&AttrFlags, atType, "TYPE");
-		/* The type may be given as id or numerical */
-		if (CfgTok == CFGTOK_INTCON) {
-		    CfgRangeCheck (CD_TYPE_MIN, CD_TYPE_MAX);
-		    Type = (int) CfgIVal;
-		} else {
-		    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
-		    switch (CfgTok) {
-		     	case CFGTOK_CONSTRUCTOR: Type = CD_TYPE_CON;	break;
-		     	case CFGTOK_DESTRUCTOR:	 Type = CD_TYPE_DES;	break;
-                        case CFGTOK_INTERRUPTOR: Type = CD_TYPE_INT;    break;
-	     	     	default: FAIL ("Unexpected type token");
-		    }
-		}
-		break;
+	    	CfgAssureIdent ();
+	    	/* Remember the value for later */
+	    	Label = GetStrBufId (&CfgSVal);
+	    	break;
 
 	    case CFGTOK_ORDER:
 	       	/* Don't allow this twice */
@@ -1147,6 +1134,33 @@ static void ParseConDes (void)
 		    case CFGTOK_DECREASING: Order = cdDecreasing;	break;
 		    case CFGTOK_INCREASING: Order = cdIncreasing;	break;
 		    default: FAIL ("Unexpected order token");
+		}
+		break;
+
+	    case CFGTOK_SEGMENT:
+	    	/* Don't allow this twice */
+	    	FlagAttr (&AttrFlags, atSegName, "SEGMENT");
+	      	/* We expect an identifier */
+	    	CfgAssureIdent ();
+	    	/* Remember the value for later */
+	    	SegName = GetStrBufId (&CfgSVal);
+	    	break;
+
+	    case CFGTOK_TYPE:
+	    	/* Don't allow this twice */
+	    	FlagAttr (&AttrFlags, atType, "TYPE");
+	    	/* The type may be given as id or numerical */
+	    	if (CfgTok == CFGTOK_INTCON) {
+	    	    CfgRangeCheck (CD_TYPE_MIN, CD_TYPE_MAX);
+	    	    Type = (int) CfgIVal;
+	    	} else {
+	     	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+	    	    switch (CfgTok) {
+		       	case CFGTOK_CONSTRUCTOR: Type = CD_TYPE_CON;	break;
+		       	case CFGTOK_DESTRUCTOR:	 Type = CD_TYPE_DES;	break;
+                        case CFGTOK_INTERRUPTOR: Type = CD_TYPE_INT;    break;
+	     	       	default: FAIL ("Unexpected type token");
+		    }
 		}
 		break;
 
@@ -1183,6 +1197,9 @@ static void ParseConDes (void)
     ConDesSetLabel (Type, Label);
     if (AttrFlags & atCount) {
 	ConDesSetCountSym (Type, Count);
+    }
+    if (AttrFlags & atImport) {
+	ConDesSetImport (Type, &Import);
     }
     if (AttrFlags & atOrder) {
 	ConDesSetOrder (Type, Order);

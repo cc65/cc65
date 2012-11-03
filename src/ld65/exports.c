@@ -301,6 +301,8 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
                           unsigned Name, ObjData* Obj)
 /* Create a new export and initialize it */
 {
+    unsigned I;
+
     /* Allocate memory */
     Export* E = xmalloc (sizeof (Export));
 
@@ -318,7 +320,9 @@ static Export* NewExport (unsigned Type, unsigned char AddrSize,
     E->DbgSymId  = ~0U;
     E->Type    	 = Type | SYM_EXPORT;
     E->AddrSize  = AddrSize;
-    memset (E->ConDes, 0, sizeof (E->ConDes));
+    for (I = 0; I < sizeof (E->ConDes) / sizeof (E->ConDes[0]); ++I) {
+        E->ConDes[I] = CD_PRIO_NONE;
+    }
 
     /* Return the new entry */
     return E;
@@ -351,8 +355,9 @@ void FreeExport (Export* E)
 Export* ReadExport (FILE* F, ObjData* O)
 /* Read an export from a file */
 {
-    unsigned      ConDesCount;
-    Export* E;
+    unsigned    ConDesCount;
+    unsigned    I;
+    Export*     E;
 
     /* Read the type */
     unsigned Type = ReadVar (F);
@@ -367,23 +372,18 @@ Export* ReadExport (FILE* F, ObjData* O)
     ConDesCount = SYM_GET_CONDES_COUNT (Type);
     if (ConDesCount > 0) {
 
-	unsigned char ConDes[CD_TYPE_COUNT];
-	unsigned I;
+       	unsigned char ConDes[CD_TYPE_COUNT];
 
-	/* Read the data into temp storage */
-	ReadData (F, ConDes, ConDesCount);
+       	/* Read the data into temp storage */
+       	ReadData (F, ConDes, ConDesCount);
 
-	/* Re-order the data. In the file, each decl is encoded into a byte
-	 * which contains the type and the priority. In memory, we will use
-	 * an array of types which contain the priority. This array was
-	 * cleared by the constructor (NewExport), so we must only set the
-	 * fields that contain values.
-	 */
-	for (I = 0; I < ConDesCount; ++I) {
-	    unsigned ConDesType = CD_GET_TYPE (ConDes[I]);
-	    unsigned ConDesPrio = CD_GET_PRIO (ConDes[I]);
-	    E->ConDes[ConDesType] = ConDesPrio;
-	}
+       	/* Re-order the data. In the file, each decl is encoded into a byte
+       	 * which contains the type and the priority. In memory, we will use
+       	 * an array of types which contain the priority.
+       	 */
+       	for (I = 0; I < ConDesCount; ++I) {
+       	    E->ConDes[CD_GET_TYPE (ConDes[I])] = CD_GET_PRIO (ConDes[I]);
+       	}
     }
 
     /* Read the name */
@@ -393,7 +393,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     if (SYM_IS_EXPR (Type)) {
        	E->Expr = ReadExpr (F, O);
     } else {
-     	E->Expr = LiteralExpr (Read32 (F), O);
+       	E->Expr = LiteralExpr (Read32 (F), O);
     }
 
     /* Read the size */
@@ -404,6 +404,28 @@ Export* ReadExport (FILE* F, ObjData* O)
     /* Last are the locations */
     ReadLineInfoList (F, O, &E->DefLines);
     ReadLineInfoList (F, O, &E->RefLines);
+
+    /* If this symbol is exported as a condes, and the condes type declares a
+     * forced import, add this import to the object module.
+     */
+    for (I = 0; I < CD_TYPE_COUNT; ++I) {
+        const ConDesImport* CDI;
+        if (E->ConDes[I] != CD_PRIO_NONE && (CDI = ConDesGetImport (I)) != 0) {
+
+            unsigned J;
+
+            /* Generate a new import and insert it */
+            Import* Imp = InsertImport (GenImport (CDI->Name, CDI->AddrSize));
+
+            /* Add line info for the config file and for the export that is
+             * actually the condes that forces the import.
+             */
+            CollAppend (&Imp->RefLines, GenLineInfo (&CDI->Pos));
+            for (J = 0; J < CollCount (&E->DefLines); ++J) {
+                CollAppend (&Imp->RefLines, DupLineInfo (CollAt (&E->DefLines, J)));
+            }
+        }
+    }
 
     /* Return the new export */
     return E;

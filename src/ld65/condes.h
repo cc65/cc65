@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "filepos.h"
+
+
+
 /*****************************************************************************/
 /*	      	  		   Forwards				     */
 /*****************************************************************************/
@@ -60,6 +65,14 @@ typedef enum {
     cdDecreasing		/* Decreasing priority */
 } ConDesOrder;
 
+/* Data for a forced condes import */
+typedef struct ConDesImport ConDesImport;
+struct ConDesImport {
+    unsigned    Name;           /* Name of the import */
+    FilePos     Pos;            /* Position of import in the config file */
+    unsigned    AddrSize;       /* Address size of the symbol */
+};
+
 
 
 /*****************************************************************************/
@@ -73,6 +86,14 @@ void ConDesAddExport (struct Export* E);
 
 void ConDesSetSegName (unsigned Type, unsigned SegName);
 /* Set the segment name where the table should go */
+
+const ConDesImport* ConDesGetImport (unsigned Type);
+/* Get the forced import for the given ConDes type. Returns NULL if there is
+ * no forced import for this type.
+ */
+
+void ConDesSetImport (unsigned Type, const ConDesImport* Import);
+/* Set the forced import for the given ConDes type */
 
 void ConDesSetLabel (unsigned Type, unsigned Name);
 /* Set the label for the given ConDes type */

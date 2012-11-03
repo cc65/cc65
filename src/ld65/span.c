@@ -139,6 +139,23 @@ unsigned* ReadSpanList (FILE* F)
 
 
 
+unsigned* DupSpanList (const unsigned* S)
+/* Duplicate a span list */
+{
+    unsigned Size;
+
+    /* The list may be empty */
+    if (S == 0) {
+        return 0;
+    }
+
+    /* Allocate memory, copy and return the new list */
+    Size = (*S + 1) * sizeof (*S);
+    return memcpy (xmalloc (Size), S, Size);
+}
+
+
+
 void FreeSpan (Span* S)
 /* Free a span structure */
 {

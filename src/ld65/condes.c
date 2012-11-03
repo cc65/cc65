@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   condes.h				     */
+/*				   condes.c                                  */
 /*                                                                           */
 /*		     Module constructor/destructor support		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,6 +39,7 @@
 #include "addrsize.h"
 #include "check.h"
 #include "coll.h"
+#include "filepos.h"
 #include "fragdefs.h"
 #include "xmalloc.h"
 
@@ -62,20 +63,64 @@ typedef struct ConDesDesc ConDesDesc;
 struct ConDesDesc {
     Collection	    	ExpList;	/* List of exported symbols */
     unsigned            SegName;	/* Name of segment the table is in */
-    unsigned            Label;		/* Name of table label */
+    unsigned            Label; 		/* Name of table label */
     unsigned            CountSym;	/* Name of symbol for entry count */
-    unsigned char   	Order;		/* Table order (increasing/decreasing) */
+    unsigned char   	Order; 		/* Table order (increasing/decreasing) */
+    ConDesImport        Import;         /* Forced import if any */
 };
 
 /* Array for all types */
 static ConDesDesc ConDes[CD_TYPE_COUNT] = {
-    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
+    {
+        STATIC_COLLECTION_INITIALIZER,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        cdIncreasing,
+        { INVALID_STRING_ID, STATIC_FILEPOS_INITIALIZER, ADDR_SIZE_DEFAULT },
+    },{
+        STATIC_COLLECTION_INITIALIZER,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        cdIncreasing,
+        { INVALID_STRING_ID, STATIC_FILEPOS_INITIALIZER, ADDR_SIZE_DEFAULT },
+    },{
+        STATIC_COLLECTION_INITIALIZER,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        cdIncreasing,
+        { INVALID_STRING_ID, STATIC_FILEPOS_INITIALIZER, ADDR_SIZE_DEFAULT },
+    },{
+        STATIC_COLLECTION_INITIALIZER,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        cdIncreasing,
+        { INVALID_STRING_ID, STATIC_FILEPOS_INITIALIZER, ADDR_SIZE_DEFAULT },
+    },{
+        STATIC_COLLECTION_INITIALIZER,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        cdIncreasing,
+        { INVALID_STRING_ID, STATIC_FILEPOS_INITIALIZER, ADDR_SIZE_DEFAULT },
+    },{
+        STATIC_COLLECTION_INITIALIZER,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        cdIncreasing,
+        { INVALID_STRING_ID, STATIC_FILEPOS_INITIALIZER, ADDR_SIZE_DEFAULT },
+    },{
+        STATIC_COLLECTION_INITIALIZER,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        INVALID_STRING_ID,
+        cdIncreasing,
+        { INVALID_STRING_ID, STATIC_FILEPOS_INITIALIZER, ADDR_SIZE_DEFAULT },
+    },
 };
 
 
@@ -222,6 +267,38 @@ void ConDesSetSegName (unsigned Type, unsigned SegName)
 
     /* Set the name */
     ConDes[Type].SegName = SegName;
+}
+
+
+
+const ConDesImport* ConDesGetImport (unsigned Type)
+/* Get the forced import for the given ConDes type. Returns NULL if there is
+ * no forced import for this type.
+ */
+{
+    const ConDesImport* Import;
+
+    /* Check the parameters */
+    PRECONDITION (Type <= CD_TYPE_MAX);
+
+    /* Return the import */    
+    Import = &ConDes[Type].Import;
+    return (Import->Name != INVALID_STRING_ID)? Import : 0;
+}
+
+
+
+void ConDesSetImport (unsigned Type, const ConDesImport* Import)
+/* Set the forced import for the given ConDes type */
+{
+    /* Check the parameters */
+    PRECONDITION (Type <= CD_TYPE_MAX && Import != 0);
+
+    /* Setting the import twice is bad */
+    CHECK (ConDes[Type].Import.Name == INVALID_STRING_ID);
+
+    /* Set the import and its position */
+    ConDes[Type].Import = *Import;
 }
 
 

@@ -1,4 +1,4 @@
-<!doctype linuxdoc system>
+<!doctype linuxdoc system>      <!-- -*- text-mode -*- -->
 
 <article>
 <title>ld65 Users Guide
@@ -933,6 +933,13 @@ The <tt/CONDES/ feature has several attributes:
   order of entries is reversed in this case.
 
   Please note that the order of entries with equal priority is undefined.
+
+  <tag><tt>import</tt></tag>
+
+  This attribute defines a valid symbol name, that is added as an import
+  to the modules defining a constructor/desctructor of the given type.
+  This can be used to force linkage of a module if this module exports the
+  requested symbol. 
 
 </descrip>
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -62,7 +62,7 @@ unsigned ErrorCount	= 0;
 unsigned WarningCount	= 0;
 
 /* Maximum number of additional notifications */
-#define MAX_NOTES       6
+#define MAX_NOTES       8
 
 
 
@@ -145,6 +145,10 @@ static void AddNotifications (const Collection* LineInfos)
 
             case LI_TYPE_MACRO:
                 Msg = "Macro was defined here";
+                break;
+
+            case LI_TYPE_MACPARAM:
+                Msg = "Macro parameter came from here";
                 break;
 
             default:

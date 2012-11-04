@@ -8,11 +8,11 @@
 ; by the compiler, ready for usage in asm code.
 
 
-	.importzp   	sp, sreg, regsave
-	.importzp   	ptr1, ptr2, ptr3, ptr4
-	.importzp   	tmp1, tmp2, tmp3, tmp4
-	.importzp   	regbank
-
+        .globalzp       sp, sreg, regsave
+        .globalzp       ptr1, ptr2, ptr3, ptr4
+        .globalzp       tmp1, tmp2, tmp3, tmp4
+        .globalzp       regbank
+  
 ; The size of the register bank
 regbanksize     = 6
 

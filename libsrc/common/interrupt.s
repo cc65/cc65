@@ -6,13 +6,30 @@
 ;
 
 	.export	   	_set_irq, _reset_irq
-	.interruptor    clevel_irq, 1		; Export as low priority IRQ handler
+	.interruptor    clevel_irq, 1 		; Export as low priority IRQ handler
 	.import 	popax
+        .importzp       __ZP_START__
 
 	.include        "zeropage.inc"
 
 	.macpack	generic
 
+
+; ---------------------------------------------------------------------------
+
+.data
+
+irqvec:	jmp	$00FF		; Patched at runtime
+
+; ---------------------------------------------------------------------------
+
+.bss
+
+irqsp:	.res	2
+
+zpsave: .res    zpsavespace
+
+; ---------------------------------------------------------------------------
 
 .proc	_set_irq
 
@@ -59,8 +76,8 @@
 	rts
 
 	; Save our zero page locations
-@L1:	ldx     #zpspace-1
-@L2:    lda     sp,x
+@L1:	ldx     #.sizeof(::zpsave)-1
+@L2:    lda     __ZP_START__,x
 	sta     zpsave,x
 	dex
 	bpl     @L2
@@ -75,9 +92,9 @@
 	jsr	irqvec
 
 	; Copy back our zero page content
-	ldx     #zpspace-1
+	ldx     #.sizeof(::zpsave)-1
 @L3:    ldy     zpsave,x
-	sty     sp,x
+	sty     __ZP_START__,x
 	dex
 	bpl     @L3
 
@@ -87,16 +104,3 @@
 
 .endproc
 
-; ---------------------------------------------------------------------------
-
-.data
-
-irqvec:	jmp	$00FF		; Patched at runtime
-
-; ---------------------------------------------------------------------------
-
-.bss
-
-irqsp:	.res	2
-
-zpsave: .res    zpspace

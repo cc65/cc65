@@ -35,11 +35,11 @@
 
         .include        "o65.inc"
         .include        "modload.inc"
+        .include        "zeropage.inc"
 
         .import         pushax, pusha0, push0, push1, decax1
         .import         _malloc, _free, _bzero
         .import         __ZP_START__    ; Linker generated
-        .importzp       sp, ptr1, tmp1, regbank
 
         .macpack        generic
 
@@ -58,7 +58,7 @@ TPtr            = regbank+4             ; Pointer to module data for relocation
 
 ; Save areas and error recovery data
 Stack:          .byte   0               ; Old stackpointer
-RegBankSave:    .res    6               ; Save area for register bank
+RegBankSave:    .res    regbanksize     ; Save area for register bank
 
 ; The header of the o65 file. Since we don't need the first 8 bytes any
 ; longer, once we've checked them, we will overlay them with other data to

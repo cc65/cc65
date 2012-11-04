@@ -5,7 +5,7 @@
 ;
 
  	.export	       	_DbgInit
-       	.export		_DbgSP, _DbgCS, _DbgHI
+       	.export	 	_DbgSP, _DbgCS, _DbgHI
 	.import	       	popax, return0, _DbgEntry, _set_brk, _end_brk
 	.import	       	_DbgBreaks
 	.import	       	_brk_pc
@@ -63,7 +63,8 @@ DbgStack:
 CTemp:
 _DbgCS:	.res	2	  	; sp
 _DbgHI:	.res	2 	  	; sreg
-	.res	(zpspace-4) 	; Other stuff
+       	.res   	(zpsavespace-4) ; Other stuff
+
 _DbgSP:	.res	1
 retsav:	.res	2	  	; Save buffer for return address
 
@@ -72,7 +73,7 @@ retsav:	.res	2	  	; Save buffer for return address
 ; Swap the C temporaries
 
 DbgSwapZP:
- 	ldy	#zpspace-1
+ 	ldy	#zpsavespace-1
 Swap1: 	ldx	CTemp,y
        	lda    	<__ZP_START__,y
        	sta	CTemp,y
@@ -91,7 +92,7 @@ Swap1: 	ldx	CTemp,y
 ; reset the breakpoints. See declaration of struct breakpoint in the C
 ; source
 
-MaxBreaks	= 48	      	; 4*12
+MaxBreaks	= 48   	      	; 4*12
 
 ResetDbgBreaks:
        	ldy	#0

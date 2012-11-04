@@ -1,15 +1,16 @@
 ;
 ; _printf: Basic layer for all printf type functions.
 ;
-; Ullrich von Bassewitz, 21.10.2000
+; Ullrich von Bassewitz, 2000-10-21
 ;
+                                   
+        .include        "zeropage.inc"
 
   	.export	  	__printf
 
 	.import	  	popax, pushax, pusheax, decsp6, push1, axlong, axulong
 	.import		_ltoa, _ultoa
 	.import		_strlower, _strlen
-	.importzp	sp, ptr1, ptr2, tmp1, regbank, sreg
 
 	.macpack	generic
 
@@ -750,7 +751,7 @@ HaveArg:
 .bss
 
 ; Save area for the zero page registers
-RegSave:	.res  	6
+RegSave:	.res  	regbanksize
 
 ; One character argument for OutFunc
 CharArg:	.byte 	0

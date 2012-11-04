@@ -21,10 +21,10 @@
  * linker. They contain the overlay area address and size specific to a
  * certain program.
  */
-extern void _OVERLAY1_LOAD__, _OVERLAY1_SIZE__;
-extern void _OVERLAY2_LOAD__, _OVERLAY2_SIZE__;
-extern void _OVERLAY3_LOAD__, _OVERLAY3_SIZE__;
-extern void _OVERLAY4_LOAD__, _OVERLAY4_SIZE__;
+extern void _OVERLAY1_LOAD__[], _OVERLAY1_SIZE__[];
+extern void _OVERLAY2_LOAD__[], _OVERLAY2_SIZE__[];
+extern void _OVERLAY3_LOAD__[], _OVERLAY3_SIZE__[];
+extern void _OVERLAY4_LOAD__[], _OVERLAY4_SIZE__[];
 
 struct {
     char     *name;
@@ -32,10 +32,10 @@ struct {
     void     *addr;
     unsigned size;
 } overlay[] =
-    {{"multdemo.1", -1, &_OVERLAY1_LOAD__, (unsigned)&_OVERLAY1_SIZE__},
-     {"multdemo.2", -1, &_OVERLAY2_LOAD__, (unsigned)&_OVERLAY2_SIZE__},
-     {"multdemo.3", -1, &_OVERLAY3_LOAD__, (unsigned)&_OVERLAY3_SIZE__},
-     {"multdemo.4", -1, &_OVERLAY4_LOAD__, (unsigned)&_OVERLAY4_SIZE__}};
+    {{"multdemo.1", -1, _OVERLAY1_LOAD__, (unsigned)_OVERLAY1_SIZE__},
+     {"multdemo.2", -1, _OVERLAY2_LOAD__, (unsigned)_OVERLAY2_SIZE__},
+     {"multdemo.3", -1, _OVERLAY3_LOAD__, (unsigned)_OVERLAY3_SIZE__},
+     {"multdemo.4", -1, _OVERLAY4_LOAD__, (unsigned)_OVERLAY4_SIZE__}};
 
 /* Copy overlays into extended memory up to overlay 3. Overlay 4 is known to
  * to be loaded only once for onetime initialization purposes so there's no

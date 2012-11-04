@@ -132,6 +132,7 @@ struct MacExp {
     TokNode**  	Params;	  	/* List of actual parameters */
     TokNode*   	ParamExp;	/* Node for expanding parameters */
     LineInfo*   LI;             /* Line info for the expansion */
+    LineInfo*   ParamLI;        /* Line info for parameter expansion */
 };
 
 /* Maximum number of nested macro expansions */
@@ -310,6 +311,7 @@ static MacExp* NewMacExp (Macro* M)
     }
     E->ParamExp	        = 0;
     E->LI               = 0;
+    E->ParamLI          = 0;
 
     /* Mark the macro as expanding */
     ++M->Expansions;
@@ -344,6 +346,9 @@ static void FreeMacExp (MacExp* E)
     xfree (E->Params);
 
     /* Free the additional line info */
+    if (E->ParamLI) {
+        EndLine (E->ParamLI);
+    }
     if (E->LI) {
         EndLine (E->LI);
     }
@@ -441,20 +446,20 @@ void MacDef (unsigned Style)
 
      	    /* Insert the struct into the list, checking for duplicate idents */
      	    if (M->ParamCount == 0) {
-     		M->Params = I;
+     	    	M->Params = I;
      	    } else {
-     		IdDesc* List = M->Params;
-     		while (1) {
-     		    if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
-     		   	Error ("Duplicate symbol `%m%p'", &CurTok.SVal);
-     		    }
-     		    if (List->Next == 0) {
-     			break;
-     		    } else {
-     			List = List->Next;
-     		    }
-     		}
-     		List->Next = I;
+     	    	IdDesc* List = M->Params;
+     	    	while (1) {
+     	    	    if (SB_Compare (&List->Id, &CurTok.SVal) == 0) {
+     	    	   	Error ("Duplicate symbol `%m%p'", &CurTok.SVal);
+     	    	    }
+     	    	    if (List->Next == 0) {
+     	    		break;
+     	    	    } else {
+     	    		List = List->Next;
+     	    	    }
+     	    	}
+     	    	List->Next = I;
      	    }
      	    ++M->ParamCount;
 
@@ -513,7 +518,7 @@ void MacDef (unsigned Style)
      	    	IdDesc* I;
 
      	  	/* Skip .local or comma */
-       		NextTok ();
+       	    	NextTok ();
 
      		/* Need an identifer */
      		if (CurTok.Tok != TOK_IDENT && CurTok.Tok != TOK_LOCAL_IDENT) {
@@ -544,7 +549,7 @@ void MacDef (unsigned Style)
      	/* Create a token node for the current token */
      	N = NewTokNode ();
 
-     	/* If the token is an ident, check if it is a local parameter */
+        /* If the token is an identifier, check if it is a local parameter */
      	if (CurTok.Tok == TOK_IDENT) {
      	    unsigned Count = 0;
      	    IdDesc* I = M->Params;
@@ -648,11 +653,24 @@ ExpandParam:
        	/* Ok, use token from parameter list */
        	TokSet (Mac->ParamExp);
 
+        /* Create new line info for this parameter token */
+        if (Mac->ParamLI) {
+            EndLine (Mac->ParamLI);
+        }
+        Mac->ParamLI = StartLine (&CurTok.Pos, LI_TYPE_MACPARAM, Mac->MacExpansions);
+
        	/* Set pointer to next token */
        	Mac->ParamExp = Mac->ParamExp->Next;
 
        	/* Done */
        	return 1;
+
+    } else if (Mac->ParamLI) {
+
+        /* There's still line info open from the parameter expansion - end it */
+        EndLine (Mac->ParamLI);
+        Mac->ParamLI = 0;
+
     }
 
     /* We're not expanding macro parameters. Check if we have tokens left from

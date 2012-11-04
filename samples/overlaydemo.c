@@ -13,9 +13,9 @@
 #include <unistd.h>
 
 
-extern void _OVERLAY1_LOAD__, _OVERLAY1_SIZE__;
-extern void _OVERLAY2_LOAD__, _OVERLAY2_SIZE__;
-extern void _OVERLAY3_LOAD__, _OVERLAY3_SIZE__;
+extern void _OVERLAY1_LOAD__[], _OVERLAY1_SIZE__[];
+extern void _OVERLAY2_LOAD__[], _OVERLAY2_SIZE__[];
+extern void _OVERLAY3_LOAD__[], _OVERLAY3_SIZE__[];
 
 
 /* Functions resident in an overlay can call back functions resident in the
@@ -89,7 +89,7 @@ void main (void)
      * linker. They contain the overlay area address and size specific to a
      * certain program.
      */
-    if (loadfile ("ovrldemo.1", &_OVERLAY1_LOAD__, &_OVERLAY1_SIZE__)) {
+    if (loadfile ("ovrldemo.1", _OVERLAY1_LOAD__, _OVERLAY1_SIZE__)) {
 
         /* The linker makes sure that the call to foo() ends up at the right mem
          * addr. However it's up to user to make sure that the - right - overlay
@@ -103,12 +103,12 @@ void main (void)
     /* Replacing one overlay with another one can only happen from the main
      * program. This implies that an overlay can never load another overlay.
      */
-    if (loadfile ("ovrldemo.2", &_OVERLAY2_LOAD__, &_OVERLAY2_SIZE__)) {
+    if (loadfile ("ovrldemo.2", _OVERLAY2_LOAD__, _OVERLAY2_SIZE__)) {
         bar ();
     }
 
     log ("Calling overlay 3 from main");
-    if (loadfile ("ovrldemo.3", &_OVERLAY3_LOAD__, &_OVERLAY3_SIZE__)) {
+    if (loadfile ("ovrldemo.3", _OVERLAY3_LOAD__, _OVERLAY3_SIZE__)) {
         foobar ();
     }
 

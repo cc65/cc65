@@ -7,7 +7,6 @@
 
 
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mouse.h>
@@ -65,7 +64,7 @@ static const unsigned char MouseSprite[64] = {
 static void CheckError (const char* S, unsigned char Error)
 {
     if (Error != MOUSE_ERR_OK) {
-        printf ("%s: %s(%d)\n", S, mouse_geterrormsg (Error), Error);
+        cprintf ("%s: %s(%d)\r\n", S, mouse_geterrormsg (Error), Error);
         exit (EXIT_FAILURE);
     }
 }
@@ -75,15 +74,15 @@ static void CheckError (const char* S, unsigned char Error)
 static void DoWarning (void)
 /* Warn the user that a mouse driver is needed for this program */
 {
-    printf ("Warning: This program needs the mouse\n"
-            "driver with the name\n"
-            "    %s\n"
-            "on disk! Press 'y' if you have it or\n"
-            "any other key to exit.\n", mouse_stddrv);
+    cprintf ("Warning: This program needs the mouse\r\n"
+             "driver with the name\r\n"
+             "    %s\r\n"
+             "on disk! Press 'y' if you have it or\r\n"
+             "any other key to exit.\r\n", mouse_stddrv);
     if (tolower (cgetc ()) != 'y') {
         exit (EXIT_SUCCESS);
     }
-    printf ("Ok. Please wait patiently...\n");
+    cprintf ("Ok. Please wait patiently...\r\n");
 }
 
 
@@ -111,9 +110,6 @@ int main (void)
     /* Initialize the debugger */
     DbgInit (0);
 
-    /* Output a warning about the driver that is needed */
-    DoWarning ();
-
     /* Clear the screen, set white on black */
     (void) bordercolor (COLOR_BLACK);
     (void) bgcolor (COLOR_BLACK);
@@ -137,6 +133,9 @@ int main (void)
 
 #endif
 
+    /* Output a warning about the driver that is needed */
+    DoWarning ();
+
     /* Load and install the mouse driver */
     CheckError ("mouse_load_driver",
                 mouse_load_driver (&mouse_def_callbacks, mouse_stddrv));
@@ -145,6 +144,7 @@ int main (void)
     mouse_getbox (&full_box);
 
     /* Print a help line */
+    clrscr ();
     revers (1);
     cputsxy (0, 0, "d)ebug  h)ide   q)uit   s)how   j)ail   ");
     revers (0);
@@ -156,29 +156,29 @@ int main (void)
     ShowState (Jailed, Invisible);
     while (!Done) {
 
-	/* Get the current mouse coordinates and button states and print them */
-	mouse_info (&info);
-      	gotoxy (0, 2);
-       	cprintf ("X  = %3d", info.pos.x);
-      	gotoxy (0, 3);
-      	cprintf ("Y  = %3d", info.pos.y);
-      	gotoxy (0, 4);
-      	cprintf ("LB = %c", (info.buttons & MOUSE_BTN_LEFT)? '1' : '0');
-      	gotoxy (0, 5);
-      	cprintf ("RB = %c", (info.buttons & MOUSE_BTN_RIGHT)? '1' : '0');
+        /* Get the current mouse coordinates and button states and print them */
+        mouse_info (&info);
+        gotoxy (0, 2);
+        cprintf ("X  = %3d", info.pos.x);
+        gotoxy (0, 3);
+        cprintf ("Y  = %3d", info.pos.y);
+        gotoxy (0, 4);
+        cprintf ("LB = %c", (info.buttons & MOUSE_BTN_LEFT)? '1' : '0');
+        gotoxy (0, 5);
+        cprintf ("RB = %c", (info.buttons & MOUSE_BTN_RIGHT)? '1' : '0');
 
         /* Handle user input */
-     	if (kbhit ()) {
-     	    switch (tolower (cgetc ())) {
+        if (kbhit ()) {
+            switch (tolower (cgetc ())) {
 
-		case 'd':
-		    BREAK();
-		    break;
+                case 'd':
+                    BREAK();
+                    break;
 
-		case 'h':
- 	   	    ShowState (Jailed, ++Invisible);
-	   	    mouse_hide ();
-	   	    break;
+                case 'h':
+                    ShowState (Jailed, ++Invisible);
+                    mouse_hide ();
+                    break;
 
                 case 'j':
                     if (Jailed) {
@@ -195,18 +195,18 @@ int main (void)
                     ShowState (Jailed, Invisible);
                     break;
 
-		case 's':
-     	   	    if (Invisible) {
-     	   	     	ShowState (Jailed, --Invisible);
-     	   	 	mouse_show ();
-	       	    }
-	   	    break;
+                case 's':
+                    if (Invisible) {
+                        ShowState (Jailed, --Invisible);
+                        mouse_show ();
+                    }
+                    break;
 
-	   	case 'q':
-		    Done = 1;
-		    break;
-	    }
-	}
+                case 'q':
+                    Done = 1;
+                    break;
+            }
+        }
 
     }
 
@@ -219,6 +219,3 @@ int main (void)
 
     return EXIT_SUCCESS;
 }
-
-
-

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2011, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -89,7 +89,7 @@ void FreeLineInfo (LineInfo* LI)
 
 LineInfo* DupLineInfo (const LineInfo* LI)
 /* Creates a duplicate of a line info structure */
-{                              
+{
     /* Allocate memory */
     LineInfo* New = xmalloc (sizeof (LineInfo));
 
@@ -176,8 +176,8 @@ void ReadLineInfoList (FILE* F, ObjData* O, Collection* LineInfos)
 
 
 const LineInfo* GetAsmLineInfo (const Collection* LineInfos)
-/* Find a line info of type LI_TYPE_ASM in the given collection and return it.
- * Return NULL if no such line info was found.
+/* Find a line info of type LI_TYPE_ASM and count zero in the given collection
+ * and return it. Return NULL if no such line info was found.
  */
 {
     unsigned I;
@@ -185,7 +185,7 @@ const LineInfo* GetAsmLineInfo (const Collection* LineInfos)
     /* Search for a line info of LI_TYPE_ASM */
     for (I = 0; I < CollCount (LineInfos); ++I) {
         const LineInfo* LI = CollConstAt (LineInfos, I);
-        if (LI_GET_TYPE (LI->Type) == LI_TYPE_ASM) {
+        if (LI->Type == LI_MAKE_TYPE (LI_TYPE_ASM, 0)) {
             return LI;
         }
     }

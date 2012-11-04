@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2011, Ullrich von Bassewitz                                      */
+/* (C) 2001-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -106,8 +106,8 @@ void ReadLineInfoList (FILE* F, struct ObjData* O, Collection* LineInfos);
  */
 
 const LineInfo* GetAsmLineInfo (const Collection* LineInfos);
-/* Find a line info of type LI_TYPE_ASM in the given collection and return it.
- * Return NULL if no such line info was found.
+/* Find a line info of type LI_TYPE_ASM and count zero in the given collection
+ * and return it. Return NULL if no such line info was found.
  */
 
 #if defined(HAVE_INLINE)

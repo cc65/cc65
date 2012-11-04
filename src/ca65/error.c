@@ -139,6 +139,10 @@ static void AddNotifications (const Collection* LineInfos)
         const char* Msg;
         switch (GetLineInfoType (LI)) {
 
+            case LI_TYPE_ASM:
+                Msg = "Expanded from here";
+                break;
+
             case LI_TYPE_EXT:
                 Msg = "Assembler code generated from this line";
                 break;

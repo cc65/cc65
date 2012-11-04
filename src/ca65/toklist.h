@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -42,12 +42,13 @@
 #include "strbuf.h"
 
 /* ca65 */
+#include "lineinfo.h"
 #include "scanner.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*     	       	     		     Data				     */
 /*****************************************************************************/
 
 
@@ -70,6 +71,7 @@ struct TokList {
     unsigned	Count;	      		/* Token count */
     void	(*Check)(TokList*);	/* Token check function */
     void*      	Data;			/* Additional data for check */
+    LineInfo*   LI;                     /* Line info for replay */
 };
 
 
@@ -100,9 +102,6 @@ void TokSet (TokNode* N);
 
 enum TC TokCmp (const TokNode* N);
 /* Compare the token given as parameter against the current token */
-
-void InitTokList (TokList* T);
-/* Initialize a token list structure for later use */
 
 TokList* NewTokList (void);
 /* Create a new, empty token list */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -46,6 +46,17 @@
 #include "nexttok.h"
 #include "scanner.h"
 #include "toklist.h"
+
+
+
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Number of currently pushed token lists */
+static unsigned PushCounter = 0;
 
 
 
@@ -117,9 +128,12 @@ enum TC TokCmp (const TokNode* N)
 
 
 
-void InitTokList (TokList* T)
-/* Initialize a token list structure for later use */
+TokList* NewTokList (void)
+/* Create a new, empty token list */
 {
+    /* Allocate memory for the list structure */
+    TokList* T = xmalloc (sizeof (TokList));
+
     /* Initialize the fields */
     T->Next	= 0;
     T->Root	= 0;
@@ -129,18 +143,7 @@ void InitTokList (TokList* T)
     T->Count 	= 0;
     T->Check	= 0;
     T->Data	= 0;
-}
-
-
-
-TokList* NewTokList (void)
-/* Create a new, empty token list */
-{
-    /* Allocate memory for the list structure */
-    TokList* T = xmalloc (sizeof (TokList));
-
-    /* Initialize the fields */
-    InitTokList (T);
+    T->LI       = 0;
 
     /* Return the new list */
     return T;
@@ -157,6 +160,11 @@ void FreeTokList (TokList* List)
 	TokNode* Tmp = T;
 	T = T->Next;
 	FreeTokNode (Tmp);
+    }
+
+    /* Free associated line info */
+    if (List->LI) {
+        EndLine (List->LI);
     }
 
     /* If we have associated data, free it */
@@ -215,14 +223,30 @@ static int ReplayTokList (void* List)
     /* Cast the generic pointer to an actual list */
     TokList* L = List;
 
-    /* Last may never be a NULL pointer, otherwise there's a bug in the code */
-    CHECK (L->Last != 0);
+    /* If there are no more tokens, decrement the repeat counter. If it goes
+     * zero, delete the list and remove the function from the stack.
+     */
+    if (L->Last == 0) {
+	if (++L->RepCount >= L->RepMax) {
+	    /* Done with this list */
+	    FreeTokList (L);
+            --PushCounter;
+	    PopInput ();
+            return 0;
+	} else {
+	    /* Replay one more time */
+	    L->Last = L->Root;
+	}
+    }
 
     /* Set the next token from the list */
     TokSet (L->Last);
 
     /* Set the line info for the new token */
-    NewAsmLine ();
+    if (L->LI) {
+        EndLine (L->LI);
+    }
+    L->LI = StartLine (&CurTok.Pos, LI_TYPE_ASM, PushCounter);
 
     /* If a check function is defined, call it, so it may look at the token
      * just set and changed it as apropriate.
@@ -233,20 +257,6 @@ static int ReplayTokList (void* List)
 
     /* Set the pointer to the next token */
     L->Last = L->Last->Next;
-
-    /* If this was the last token, decrement the repeat counter. If it goes
-     * zero, delete the list and remove the function from the stack.
-     */
-    if (L->Last == 0) {
-	if (++L->RepCount >= L->RepMax) {
-	    /* Done with this list */
-	    FreeTokList (L);
-	    PopInput ();
-	} else {
-	    /* Replay one more time */
-	    L->Last = L->Root;
-	}
-    }
 
     /* We have a token */
     return 1;
@@ -270,6 +280,7 @@ void PushTokList (TokList* List, const char* Desc)
     List->Last = List->Root;
 
     /* Insert the list specifying our input function */
+    ++PushCounter;
     PushInput (ReplayTokList, List, Desc);
 }
 

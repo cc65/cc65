@@ -33,6 +33,7 @@
 
 
 
+#include <stdio.h>
 #include <string.h>
 
 /* common */
@@ -41,6 +42,7 @@
 #include "xmalloc.h"
 
 /* ca65 */
+#include "filetab.h"
 #include "global.h"
 #include "lineinfo.h"
 #include "objfile.h"
@@ -231,6 +233,33 @@ static int CheckLineInfo (void* Entry, void* Data attribute ((unused)))
 /*****************************************************************************/
 /*     	       	       	      	     Code			     	     */
 /*****************************************************************************/
+
+
+
+#if 0
+static void DumpLineInfos (const char* Title, const Collection* C)
+/* Dump line infos from the given collection */
+{
+    unsigned I;
+    fprintf (stderr, "%s:\n", Title);
+    for (I = 0; I < CollCount (C); ++I) {
+        const LineInfo* LI = CollConstAt (C, I);
+        const char* Type;
+        switch (GetLineInfoType (LI)) {
+            case LI_TYPE_ASM:           Type = "ASM";           break;
+            case LI_TYPE_EXT:           Type = "EXT";           break;
+            case LI_TYPE_MACRO:         Type = "MACRO";         break;
+            case LI_TYPE_MACPARAM:      Type = "MACPARAM";      break;
+            default:                    Type = "unknown";       break;
+        }
+        fprintf (stderr,
+                 "%2u: %-8s %2u %-16s %u/%u\n",
+                 I, Type, LI->Key.Pos.Name,
+                 SB_GetConstBuf (GetFileName (LI->Key.Pos.Name)),
+                 LI->Key.Pos.Line, LI->Key.Pos.Col);
+    }
+}
+#endif
 
 
 

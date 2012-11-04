@@ -87,7 +87,8 @@
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
 #define TGI_COLOR_WHITE         COLOR_WHITE
 
-
+/* No support for dynamically loadable drivers */
+#define DYN_DRV 0
 
 
 
@@ -182,11 +183,11 @@ unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val);
 #include <_mikey.h>
 #define MIKEY (*(struct __mikey *)0xFD00)
 
-#define _MIKEY_TIMERS (*(struct _mikey_all_timers *) 0xFD00) 	// mikey_timers[8]
-#define _HBL_TIMER (*(struct _mikey_timer *) 0xFD00)			// timer0 (HBL)
-#define _VBL_TIMER (*(struct _mikey_timer *) 0xFD08)    		// timer2 (VBL)
-#define _UART_TIMER (*(struct _mikey_timer *) 0xFD14)   		// timer4 (UART)
-#define _VIDDMA (*(unsigned int *) 0xFD92)						// dispctl/viddma
+#define _MIKEY_TIMERS (*(struct _mikey_all_timers *) 0xFD00)  // mikey_timers[8]
+#define _HBL_TIMER (*(struct _mikey_timer *) 0xFD00)          // timer0 (HBL)
+#define _VBL_TIMER (*(struct _mikey_timer *) 0xFD08)          // timer2 (VBL)
+#define _UART_TIMER (*(struct _mikey_timer *) 0xFD14)         // timer4 (UART)
+#define _VIDDMA (*(unsigned int *) 0xFD92)                    // dispctl/viddma
 
 #include <_suzy.h>
 #define SUZY        (*(struct __suzy*)0xFC00)
@@ -194,6 +195,3 @@ unsigned __fastcall__ lynx_eewrite (unsigned cell, unsigned val);
 
 /* End of lynx.h */
 #endif
-
-
-

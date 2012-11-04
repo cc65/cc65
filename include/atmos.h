@@ -47,20 +47,20 @@
 
 
 /* Color defines */
-#define COLOR_BLACK 	0x00
-#define COLOR_RED 	0x01
-#define COLOR_GREEN 	0x02
-#define COLOR_YELLOW 	0x03
-#define COLOR_BLUE 	0x04
-#define COLOR_MAGENTA 	0x05
-#define COLOR_CYAN 	0x06
-#define COLOR_WHITE 	0x07
+#define COLOR_BLACK	0x00
+#define COLOR_RED	0x01
+#define COLOR_GREEN	0x02
+#define COLOR_YELLOW	0x03
+#define COLOR_BLUE	0x04
+#define COLOR_MAGENTA	0x05
+#define COLOR_CYAN	0x06
+#define COLOR_WHITE	0x07
 
 
 
 /* Define hardware */
 #include <_6522.h>
-#define VIA    	(*(struct __6522*)0x300)
+#define VIA	(*(struct __6522*)0x300)
 
 
 
@@ -79,15 +79,15 @@
 
 
 /* Character codes */
-#define CH_ULCORNER 	'+'
-#define CH_URCORNER 	'+'
-#define CH_LLCORNER 	'+'
-#define CH_LRCORNER 	'+'
-#define CH_TTEE     	'+'
-#define CH_BTEE     	'+'
-#define CH_LTEE     	'+'
-#define CH_RTEE     	'+'
-#define CH_CROSS    	'+'
+#define CH_ULCORNER	'+'
+#define CH_URCORNER	'+'
+#define CH_LLCORNER	'+'
+#define CH_LRCORNER	'+'
+#define CH_TTEE		'+'
+#define CH_BTEE		'+'
+#define CH_LTEE		'+'
+#define CH_RTEE		'+'
+#define CH_CROSS	'+'
 #define CH_CURS_UP	 11
 #define CH_CURS_DOWN	 10
 #define CH_CURS_LEFT	  8
@@ -97,6 +97,13 @@
 #define CH_STOP		  3
 #define CH_LIRA		 95
 #define CH_ESC		 27
+
+
+
+/* No support for dynamically loadable drivers */
+#define DYN_DRV		0
+
+
 
 void __fastcall__ atmos_load(const char* name);
 /* Load Atmos tape. */
@@ -108,6 +115,3 @@ void __fastcall__ atmos_save(const char* name, const void* start, const void* en
 
 /* End of atmos.h */
 #endif
-
-
-

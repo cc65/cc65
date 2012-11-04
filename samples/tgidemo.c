@@ -9,6 +9,10 @@
 
 
 
+#ifndef DYN_DRV
+#  define DYN_DRV	1
+#endif
+
 #define COLOR_BACK	TGI_COLOR_BLACK
 #define COLOR_FORE	TGI_COLOR_WHITE
 
@@ -74,7 +78,7 @@ static void DoCircles (void)
         for (I = 10; I < 240; I += 10) {
             tgi_ellipse (X, Y, I, tgi_imulround (I, AspectRatio));
         }
-	Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
+        Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }
 
     cgetc ();
@@ -96,16 +100,16 @@ static void DoCheckerboard (void)
             for (X = 0; X <= MaxX; X += 10) {
                 tgi_setcolor (Color);
                 tgi_bar (X, Y, X+9, Y+9);
-		Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
+                Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
                 if (kbhit ()) {
                     cgetc ();
                     tgi_clear ();
                     return;
                 }
             }
-	    Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
+            Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
         }
-	Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
+        Color = Color == COLOR_FORE ? COLOR_BACK : COLOR_FORE;
     }
 }
 
@@ -163,11 +167,11 @@ static void DoLines (void)
     tgi_setpalette (Palette);
     tgi_setcolor (COLOR_FORE);
 
-    for	(X = 0; X <= MaxY; X += 10) {
-	tgi_line (0, 0, MaxY, X);
-	tgi_line (0, 0, X, MaxY);
-	tgi_line (MaxY, MaxY, 0, MaxY-X);
-	tgi_line (MaxY, MaxY, MaxY-X, 0);
+    for (X = 0; X <= MaxY; X += 10) {
+        tgi_line (0, 0, MaxY, X);
+        tgi_line (0, 0, X, MaxY);
+        tgi_line (MaxY, MaxY, 0, MaxY-X);
+        tgi_line (MaxY, MaxY, MaxY-X, 0);
     }
 
     cgetc ();
@@ -180,12 +184,19 @@ int main (void)
 {
     unsigned char Border;
 
+#if DYN_DRV
     /* Warn the user that the tgi driver is needed */
     DoWarning ();
 
     /* Load and initialize the driver */
     tgi_load_driver (tgi_stddrv);
     CheckError ("tgi_load_driver");
+#else
+    /* Install the driver */
+    tgi_install (tgi_static_stddrv);
+    CheckError ("tgi_install");
+#endif
+
     tgi_init ();
     CheckError ("tgi_init");
     tgi_clear ();
@@ -204,8 +215,13 @@ int main (void)
     DoDiagram ();
     DoLines ();
 
+#if DYN_DRV
     /* Unload the driver */
     tgi_unload ();
+#else
+    /* Uninstall the driver */
+    tgi_uninstall ();
+#endif
 
     /* Reset the border */
     (void) bordercolor (Border);

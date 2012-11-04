@@ -43,15 +43,15 @@
 
 
 /* Key and character defines */
-#define CH_ENTER	        '\n'
-#define CH_CURS_UP		0x01
-#define CH_CURS_DOWN	        0x02
-#define CH_CURS_LEFT	        0x03
-#define CH_CURS_RIGHT	        0x04
-#define CH_ESC		        8
-#define CH_DEL		        20
+#define CH_ENTER                '\n'
+#define CH_CURS_UP              0x01
+#define CH_CURS_DOWN            0x02
+#define CH_CURS_LEFT            0x03
+#define CH_CURS_RIGHT           0x04
+#define CH_ESC                  8
+#define CH_DEL                  20
 
-#define CH_CROSS	        0x10
+#define CH_CROSS                0x10
 #define CH_RTEE                 0x17
 #define CH_LTEE                 0x0f
 #define CH_TTEE                 0x16
@@ -64,29 +64,31 @@
 #define CH_LRCORNER             0x08
 #define CH_PI                   0x05
 
-
 /* Color defines */
-#define COLOR_BLACK  	       	0x00
-#define COLOR_WHITE  	       	0x01
-#define COLOR_RED    	       	0x02
-#define COLOR_CYAN      	0x03
-#define COLOR_VIOLET 	       	0x04
-#define COLOR_GREEN  	       	0x05
-#define COLOR_BLUE   	       	0x06
-#define COLOR_YELLOW 	       	0x07
-#define COLOR_ORANGE 	       	0x08
-#define COLOR_BROWN  	       	0x09
-#define COLOR_LIGHTRED       	0x0A
-#define COLOR_GRAY1  	       	0x0B
-#define COLOR_GRAY2  	       	0x0C
-#define COLOR_LIGHTGREEN     	0x0D
-#define COLOR_LIGHTBLUE      	0x0E
-#define COLOR_GRAY3  	       	0x0F
+#define COLOR_BLACK             0x00
+#define COLOR_WHITE             0x01
+#define COLOR_RED               0x02
+#define COLOR_CYAN              0x03
+#define COLOR_VIOLET            0x04
+#define COLOR_GREEN             0x05
+#define COLOR_BLUE              0x06
+#define COLOR_YELLOW            0x07
+#define COLOR_ORANGE            0x08
+#define COLOR_BROWN             0x09
+#define COLOR_LIGHTRED          0x0A
+#define COLOR_GRAY1             0x0B
+#define COLOR_GRAY2             0x0C
+#define COLOR_LIGHTGREEN        0x0D
+#define COLOR_LIGHTBLUE         0x0E
+#define COLOR_GRAY3             0x0F
 
 /* Return codes of get_tv */
 #define TV_NTSC         0
 #define TV_PAL          1
 #define TV_OTHER        2
+
+/* No support for dynamically loadable drivers */
+#define DYN_DRV         0
 
 
 
@@ -100,6 +102,3 @@ unsigned char get_tv (void);
 
 /* End of nes.h */
 #endif
-
-
-

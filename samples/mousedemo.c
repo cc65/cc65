@@ -20,11 +20,11 @@
 
 /* Address of data for sprite 0 */
 #if defined(__C64__)
-#  define SPRITE0_DATA    0x0340
-#  define SPRITE0_PTR  	  0x07F8
+#  define SPRITE0_DATA	0x0340
+#  define SPRITE0_PTR	0x07F8
 #elif defined(__C128__)
-#  define SPRITE0_DATA    0x0E00
-#  define SPRITE0_PTR     0x07F8
+#  define SPRITE0_DATA	0x0E00
+#  define SPRITE0_PTR	0x07F8
 #endif
 
 /* The mouse sprite (an arrow) */
@@ -54,6 +54,12 @@ static const unsigned char MouseSprite[64] = {
 };
 
 #endif  /* __C64__ or __C128__ */
+
+
+/* Dynamically loaded driver by default */
+#ifndef DYN_DRV
+#  define DYN_DRV	1
+#endif
 
 
 #define max(a,b)  (((a) > (b)) ? (a) : (b))
@@ -133,12 +139,18 @@ int main (void)
 
 #endif
 
+#if DYN_DRV
     /* Output a warning about the driver that is needed */
     DoWarning ();
 
     /* Load and install the mouse driver */
     CheckError ("mouse_load_driver",
                 mouse_load_driver (&mouse_def_callbacks, mouse_stddrv));
+#else
+    /* Install the mouse driver */
+    CheckError ("mouse_install",
+                mouse_install (&mouse_def_callbacks, mouse_static_stddrv));
+#endif
 
     /* Get the initial mouse bounding box */
     mouse_getbox (&full_box);
@@ -210,8 +222,13 @@ int main (void)
 
     }
 
+#if DYN_DRV
     /* Uninstall and unload the mouse driver */
     CheckError ("mouse_unload", mouse_unload ());
+#else
+    /* Uninstall the mouse driver */
+    CheckError ("mouse_uninstall", mouse_uninstall ());
+#endif
 
     /* Say goodbye */
     clrscr ();

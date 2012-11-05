@@ -6994,7 +6994,7 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Set the style for text output.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void __fastcall__ tgi_settextstyle (unsigned char magx, unsigned char magy, unsigned char dir);/
+<tag/Declaration/<tt/void __fastcall__ tgi_settextstyle (unsigned char magx, unsigned char magy, unsigned char dir, unsigned char font);/
 <tag/Description/Set the style for text output.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
@@ -7013,10 +7013,7 @@ be used in presence of a prototype.
 <tag/Function/Calculate the width of the text in pixels according to the current text style.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Declaration/<tt/unsigned __fastcall__ tgi_gettextwidth (const char* s);/
-<tag/Function/Calculate the width of the text in pixels according to the current text style.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Description/Calculate the width of the text in pixels according to the current text style.
-<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.

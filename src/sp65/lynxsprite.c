@@ -33,6 +33,8 @@
 
 
 
+#include <stdlib.h>
+
 /* common */
 #include "attrib.h"
 #include "print.h"
@@ -82,6 +84,32 @@ static enum Mode GetMode (const Collection* A)
         }
     } else {
         return smAuto;
+    }
+}
+
+
+static unsigned GetActionPointX (const Collection* A)
+/* Return the sprite mode from the attribute collection A */
+{
+    /* Check for a action point x attribute */
+    const char* ActionPointX = GetAttrVal (A, "ax");
+    if (ActionPointX) {
+        return atoi(ActionPointX);
+    } else {
+        return 0;
+    }
+}
+
+
+static unsigned GetActionPointY (const Collection* A)
+/* Return the sprite mode from the attribute collection A */
+{
+    /* Check for a action point y attribute */
+    const char* ActionPointY = GetAttrVal (A, "ay");
+    if (ActionPointY) {
+        return atoi(ActionPointY);
+    } else {
+        return 0;
     }
 }
 
@@ -218,9 +246,15 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     char ColorBits;
     char ColorMask;
 
-    /* Anchor point of the sprite */
-    OX = 0;
-    OY = 0;
+    /* Action point of the sprite */
+    OX = GetActionPointX (A);
+    OY = GetActionPointY (A);
+    if (OX >= GetBitmapWidth (B)) {
+        Error ("Action point X cannot be larger than bitmap width");
+    }
+    if (OY >= GetBitmapHeight (B)) {
+        Error ("Action point Y cannot be larger than bitmap height");
+    }
 
     /* Output the image properties */
     Print (stdout, 1, "Image is %ux%u with %u colors%s\n",

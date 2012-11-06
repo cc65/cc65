@@ -82,9 +82,9 @@ static enum Mode GetMode (const Collection* A)
         } else {
             Error ("Invalid value for attribute `mode'");
         }
-    } else {
-        return smAuto;
     }
+
+    return smAuto;
 }
 
 

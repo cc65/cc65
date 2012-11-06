@@ -37,7 +37,7 @@
 
 /* common */
 #include "check.h"
-#include "print.h"
+#include "debugflag.h"
 #include "shift.h"
 #include "xmalloc.h"
 
@@ -537,7 +537,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
             SymUnmarkUser (Sym);
 
             /* If requested and if the expression is valid, dump it */
-            if (Verbosity > 0 && !ED_HasError (D)) {
+            if (Debug > 0 && !ED_HasError (D)) {
                 DumpExpr (Expr, SymResolve);
             }
 

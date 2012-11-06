@@ -1,4 +1,4 @@
-/*****************************************************************************/
+
 /*                                                                           */
 /*				    main.c				     */
 /*                                                                           */
@@ -42,6 +42,7 @@
 #include "addrsize.h"
 #include "chartype.h"
 #include "cmdline.h"
+#include "debugflag.h"
 #include "mmodel.h"
 #include "print.h"
 #include "scopedefs.h"
@@ -97,6 +98,7 @@ static void Usage (void)
             "  -U\t\t\t\tMark unresolved symbols as import\n"
             "  -V\t\t\t\tPrint the assembler version\n"
             "  -W n\t\t\t\tSet warning level n\n"
+            "  -d\t\t\t\tDebug mode\n"
             "  -g\t\t\t\tAdd debug info to object file\n"
             "  -h\t\t\t\tHelp (this text)\n"
             "  -i\t\t\t\tIgnore case of symbols\n"
@@ -113,6 +115,7 @@ static void Usage (void)
             "  --cpu type\t\t\tSet cpu type\n"
             "  --create-dep name\t\tCreate a make dependency file\n"
             "  --create-full-dep name\tCreate a full make dependency file\n"
+            "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --feature name\t\tSet an emulation feature\n"
             "  --forget-inc-paths\t\tForget include search paths\n"
@@ -403,6 +406,15 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)),
 /* Handle the --create-full-dep option */
 {
     FileNameOption (Opt, Arg, &FullDepName);
+}
+
+
+
+static void OptDebug (const char* Opt attribute ((unused)),
+	       	      const char* Arg attribute ((unused)))
+/* Compiler debug mode */
+{
+    ++Debug;
 }
 
 
@@ -869,6 +881,7 @@ int main (int argc, char* argv [])
         { "--cpu",     	       	1,	OptCPU 			},
         { "--create-dep",       1,      OptCreateDep            },
         { "--create-full-dep",  1,      OptCreateFullDep        },
+       	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0,	OptDebugInfo		},
 	{ "--feature",		1,	OptFeature		},
        	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
@@ -929,6 +942,10 @@ int main (int argc, char* argv [])
 	       	case '-':
 	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 	       	    break;
+
+		case 'd':
+		    OptDebug (Arg, 0);
+		    break;
 
        	       	case 'g':
        	       	    OptDebugInfo (Arg, 0);

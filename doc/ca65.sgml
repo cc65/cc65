@@ -92,6 +92,7 @@ Short options:
   -U                            Mark unresolved symbols as import
   -V                            Print the assembler version
   -W n                          Set warning level n
+  -d                            Debug mode
   -g                            Add debug info to object file
   -h                            Help (this text)
   -i                            Ignore case of symbols
@@ -108,6 +109,7 @@ Long options:
   --cpu type                    Set cpu type
   --create-dep name             Create a make dependency file
   --create-full-dep name        Create a full make dependency file
+  --debug                       Debug mode
   --debug-info                  Add debug info to object file
   --feature name                Set an emulation feature
   --forget-inc-paths            Forget include search paths
@@ -173,6 +175,12 @@ Here is a description of all the command line options:
   the assembled module in makefile syntax. The output is written to a file
   with the given name. The output does include files passed via debug
   information to the assembler.
+
+
+  <tag><tt>-d, --debug</tt></tag>
+
+  Enables debug mode, something that should not be needed for mere
+  mortals:-)
 
 
   <label id="option--feature">

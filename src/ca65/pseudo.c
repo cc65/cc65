@@ -637,7 +637,7 @@ static void DoCharMap (void)
 
     /* Read the character code */
     Code = ConstExpression ();
-    if (Code <= 0 || Code > 255) {
+    if (Code < 0 || Code > 255) {
     	/* Value out of range */
        	ErrorSkip ("Range error");
     	return;

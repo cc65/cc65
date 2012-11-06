@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  tgttrans.c				     */
+/*		      		  tgttrans.c				     */
 /*                                                                           */
-/*			   Character set translation			     */
+/*		      	   Character set translation			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -92,24 +92,6 @@ int TgtTranslateChar (int C)
 {
     /* Translate */
     return Tab[C & 0xFF];
-}
-
-
-
-char* TgtTranslateStr (char* S)
-/* Translate a complete string from the source character set into the target
- * system character set.
- */
-{
-    /* Translate */
-    unsigned char* T = (unsigned char*)S;
-    while (*T) {
-	*T = Tab[*T];
-	++T;
-    }
-
-    /* Return the argument string */
-    return S;
 }
 
 

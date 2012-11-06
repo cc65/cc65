@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2008 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,7 +34,7 @@
 
 
 #ifndef TGTTRANS_H
-#define TGTTRANS_H  
+#define TGTTRANS_H
 
 
 
@@ -57,18 +57,13 @@ int TgtTranslateChar (int C);
  * system character set.
  */
 
-char* TgtTranslateStr (char* S);
-/* Translate a complete string from the source character set into the target
- * system character set.
- */
-
 void TgtTranslateBuf (void* Buf, unsigned Len);
 /* Translate a buffer of the given length from the source character set into
  * the target system character set.
  */
 
 void TgtTranslateStrBuf (StrBuf* Buf);
-/* Translate a string buffer from the source character set into the target 
+/* Translate a string buffer from the source character set into the target
  * system character set.
  */
 

@@ -86,6 +86,102 @@ static enum Mode GetMode (const Collection* A)
 }
 
 
+static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask, char LineBuffer[512],
+    int i, int LastOpaquePixel) {
+/*
+ * The data starts with a byte count. It tells the number of bytes on this
+ * line + 1.
+ * Special case is a count of 1. It will change to next quadrant.
+ * Other special case is 0. It will end the sprite.
+ *
+ * Ordinary data packet. These are bits in a stream.
+ * 1=literal 0=packed
+ * 4 bit count (+1)
+ * for literal you put "count" values
+ * for packed you repeat the value "count" times
+ * Never use packed mode for one pixel
+ * If the last bit on a line is 1 you need to add a byte of zeroes
+ * A sequence 00000 ends a scan line
+ *
+ * All data is high nybble first
+ */
+    char OutBuffer[512]; /* The maximum size is 508 pixels */
+    unsigned char OutIndex = 0;
+    unsigned char V = 0;
+    unsigned W = 0;
+    signed j;
+    signed k;
+
+    switch (M) {
+    case smAuto:
+    case smLiteral:
+        OutIndex = 0;
+        k = 0;
+        for (j = 0; j < i; j++) {
+            /* Fetch next pixel index into pixel buffer */
+            W = (W << ColorBits) | (LineBuffer[j] & ColorMask);
+            k += ColorBits;
+            if (k > 7) {
+                /* The byte is ready */
+                k -= 8;
+                V = (W >> k) & 0xFF;
+                OutBuffer[OutIndex++] = V;
+                if (!OutIndex) {
+                    Error ("Sprite is too large for the Lynx");
+                }
+            }
+        }
+        /* Output last bits */
+        if (k != 0) {
+            W = (W << (8-k));
+            k = 0;
+            V = W & 0xFF;
+            OutBuffer[OutIndex++] = V;
+            if (!OutIndex) {
+                Error ("Sprite is too large for the Lynx");
+            }
+        }
+        /* Fix bug in Lynx where the last bit on a line is 1 */
+        if (V & 1) {
+            OutBuffer[OutIndex++] = 0;
+            if (!OutIndex) {
+                Error ("Sprite is too large for the Lynx");
+            }
+        }
+        /* Fix bug in Lynx where the count cannot be 1 */
+        if (OutIndex == 1) {
+            OutBuffer[OutIndex++] = 0;
+        }
+        /* Write the byte count to the end of the scanline */
+        if (OutIndex == 255) {
+            Error ("Sprite is too large for the Lynx");
+        }
+        SB_AppendChar (D, OutIndex+1);
+        /* Write scanline data */
+        for (j = 0; j < OutIndex; j++) {
+            SB_AppendChar (D, OutBuffer[j]);
+        }
+        break;
+    case smPacked:
+        /* Bug workaround: If last bit is 1 and it is in bit0 add a zero byte */
+        /* Note: These extra pixels will be painted also. There is no workaround for this */
+        if (LineBuffer[i - 1] & 0x01) {
+            LineBuffer[i++] = 0;
+        }
+        /* Logical problem workaround: The count can not be 1 so add an extra byte */
+        if (i == 1) {
+            LineBuffer[i++] = 0;
+        }
+        /* Write the byte count for this partial scanline */
+        SB_AppendChar (D, i);
+        for (i = 0; i < LineBuffer[0]; i++) {
+            SB_AppendChar (D, LineBuffer[i]);
+        }
+        break;
+    case smPackedTransparent:
+        break;
+    }
+}
 
 StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
 /* Generate binary output in Lynx sprite format for the bitmap B. The output
@@ -117,10 +213,8 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
 {
     enum Mode M;
     StrBuf* D;
-    unsigned X, Y;
+    signed X, Y;
     unsigned OX, OY;
-    char LineBuffer[512]; /* The maximum size is 508 pixels */
-    char OutBuffer[512]; /* The maximum size is 508 pixels */
     char ColorBits;
     char ColorMask;
 
@@ -135,11 +229,6 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
 
     /* Get the sprite mode */
     M = GetMode (A);
-
-    /* If the mode wasn't given, fallback to packed */
-    if (M == smAuto) {
-        M = smLiteral;
-    }
 
     /* Now check if bitmap indexes are ok */
     if (GetBitmapColors (B) > 16) {
@@ -165,17 +254,13 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     SB_Realloc (D, 63);
 
     /* Convert the image for quadrant bottom right */
-    for (Y = OY; Y < GetBitmapHeight (B); ++Y) {
-        unsigned char V = 0;
-        unsigned char OutIndex;
-        unsigned W = 0;
+    for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
         signed i = 0;
-        signed j;
-        signed k;
         signed LastOpaquePixel = -1;
+        char LineBuffer[512]; /* The maximum size is 508 pixels */
 
         /* Fill the LineBuffer for easier optimisation */
-        for (X = OX; X < GetBitmapWidth (B); ++X) {
+        for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
 
             /* Fetch next bit into byte buffer */
             LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
@@ -186,73 +271,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             ++i;
         }
 
-        switch (M) {
-        case smLiteral:
-            OutIndex = 0;
-            for (j = 0; j < i; j++) {
-                /* Fetch next pixel index into pixel buffer */
-                W = (W << ColorBits) | (LineBuffer[j] & ColorMask);
-                k += ColorBits;
-                if (k > 7) {
-                    /* The byte is ready */
-                    k -= 8;
-                    V = (W >> k) & 0xFF;
-                    OutBuffer[OutIndex++] = V;
-                    if (!OutIndex) {
-                        Error ("Sprite is too large for the Lynx");
-                    }
-                }
-            }
-            /* Output last bits */
-            if (k != 0) {
-                W = (W << (8-k));
-                k = 0;
-                V = W & 0xFF;
-                OutBuffer[OutIndex++] = V;
-                if (!OutIndex) {
-                    Error ("Sprite is too large for the Lynx");
-                }
-            }
-            /* Fix bug in Lynx where the last bit on a line is 1 */
-            if (V & 1) {
-                OutBuffer[OutIndex++] = 0;
-                if (!OutIndex) {
-                    Error ("Sprite is too large for the Lynx");
-                }
-            }
-            /* Fix bug in Lynx where the count cannot be 1 */
-            if (OutIndex == 1) {
-                OutBuffer[OutIndex++] = 0;
-            }
-            /* Write the byte count to the end of the scanline */
-            if (OutIndex == 255) {
-                Error ("Sprite is too large for the Lynx");
-            }
-            SB_AppendChar (D, OutIndex+1);
-            /* Write scanline data */
-            for (j = 0; j < OutIndex; j++) {
-                SB_AppendChar (D, OutBuffer[j]);
-            }
-            break;
-        case smPacked:
-            /* Bug workaround: If last bit is 1 and it is in bit0 add a zero byte */
-            /* Note: These extra pixels will be painted also. There is no workaround for this */
-            if (LineBuffer[i - 1] & 0x01) {
-                LineBuffer[i++] = 0;
-            }
-            /* Logical problem workaround: The count can not be 1 so add an extra byte */
-            if (i == 1) {
-                LineBuffer[i++] = 0;
-            }
-            /* Write the byte count for this partial scanline */
-            SB_AppendChar (D, i);
-            for (i = 0; i < LineBuffer[0]; i++) {
-                SB_AppendChar (D, LineBuffer[i]);
-            }
-            break;
-        case smPackedTransparent:
-            break;
-        }
+        encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
     }
 
     if ((OY == 0) && (OX == 0)) {
@@ -270,20 +289,23 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
 
     /* Convert the image for quadrant top right */
     for (Y = OY - 1; Y >= 0; --Y) {
-        unsigned char V = 0;
-        if (M == smLiteral) {
-            for (X = OX; X < GetBitmapWidth (B); ++X) {
+        signed i = 0;
+        signed LastOpaquePixel = -1;
+        char LineBuffer[512]; /* The maximum size is 508 pixels */
 
-                /* Fetch next bit into byte buffer */
-                V = (V << 4) | (GetPixel (B, X, Y).Index & 0x0f);
+        /* Fill the LineBuffer for easier optimisation */
+        for (X = OX; X < (signed)GetBitmapWidth (B); ++X) {
 
-                /* Store full bytes into the output buffer */
-                if ((X & 0x01) == 0x01) {
-                    SB_AppendChar (D, V);
-                    V = 0;
-                }
+            /* Fetch next bit into byte buffer */
+            LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
+
+            if (LineBuffer[i]) {
+                LastOpaquePixel = i;
             }
+            ++i;
         }
+
+        encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
     }
 
     /* Next quadrant */
@@ -291,41 +313,47 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
 
     /* Convert the image for quadrant top left */
     for (Y = OY - 1; Y >= 0; --Y) {
-        unsigned char V = 0;
-        if (M == smLiteral) {
-            for (X = OX - 1; X >= 0; --X) {
+        signed i = 0;
+        signed LastOpaquePixel = -1;
+        char LineBuffer[512]; /* The maximum size is 508 pixels */
 
-                /* Fetch next bit into byte buffer */
-                V = (V << 4) | (GetPixel (B, X, Y).Index & 0x0f);
+        /* Fill the LineBuffer for easier optimisation */
+        for (X = OX - 1; X >= 0; --X) {
 
-                /* Store full bytes into the output buffer */
-                if ((X & 0x01) == 0x01) {
-                    SB_AppendChar (D, V);
-                    V = 0;
-                }
+            /* Fetch next bit into byte buffer */
+            LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
+
+            if (LineBuffer[i]) {
+                LastOpaquePixel = i;
             }
+            ++i;
         }
+
+        encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
     }
 
     /* Next quadrant */
     SB_AppendChar (D, 1);
 
     /* Convert the image for quadrant bottom left */
-    for (Y = OY; Y < GetBitmapHeight (B); ++Y) {
-        unsigned char V = 0;
-        if (M == smLiteral) {
-            for (X = OX - 1; X >= 0; --X) {
+    for (Y = OY; Y < (signed)GetBitmapHeight (B); ++Y) {
+        signed i = 0;
+        signed LastOpaquePixel = -1;
+        char LineBuffer[512]; /* The maximum size is 508 pixels */
 
-                /* Fetch next bit into byte buffer */
-                V = (V << 4) | (GetPixel (B, X, Y).Index & 0x0f);
+        /* Fill the LineBuffer for easier optimisation */
+        for (X = OX - 1; X >= 0; --X) {
 
-                /* Store full bytes into the output buffer */
-                if ((X & 0x01) == 0x01) {
-                    SB_AppendChar (D, V);
-                    V = 0;
-                }
+            /* Fetch next bit into byte buffer */
+            LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
+
+            if (LineBuffer[i]) {
+                LastOpaquePixel = i;
             }
+            ++i;
         }
+
+        encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
     }
 
     /* End sprite */

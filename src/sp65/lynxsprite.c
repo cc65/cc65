@@ -222,21 +222,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
  * - Up left
  * - Down left
  *
- * The data starts with a byte count. It tells the number of bytes on this
- * line + 1.
- * Special case is a count of 1. It will change to next quadrant.
- * Other special case is 0. It will end the sprite.
- *
- * Ordinary data packet. These are bits in a stream.
- * 1=literal 0=packed
- * 4 bit count (+1)
- * for literal you put "count" values
- * for packed you repeat the value "count" times
- * Never use packed mode for one pixel
- * If the last bit on a line is 1 you need to add a byte of zeroes
- * A sequence 00000 ends a scan line
- *
- * All data is high nybble first
+ * The sprite will end with a byte 0.
  */
 {
     enum Mode M;
@@ -340,6 +326,16 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
         }
 
         encodeSprite(D, M, ColorBits, ColorMask, LineBuffer, i, LastOpaquePixel);
+    }
+
+    if (OX == 0) {
+        /* Special case only two quadrants */
+
+        /* Mark end of sprite */
+        SB_AppendChar (D, 0);
+
+        /* Return the converted bitmap */
+        return D;
     }
 
     /* Next quadrant */

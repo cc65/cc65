@@ -58,7 +58,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS =	_scrsize.o              \
+OBJS =  _scrsize.o              \
         banking.o               \
         break.o                 \
         cgetc.o                 \
@@ -97,7 +97,7 @@ OBJS =	_scrsize.o              \
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS =	cbm510-ram.emd
+EMDS = cbm510-ram.emd
 
 JOYS = cbm510-stdjoy.joy
 

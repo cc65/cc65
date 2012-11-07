@@ -120,6 +120,24 @@
 
 
 
+/* The addresses of the static drivers */
+extern void c128_georam[];
+extern void c128_ram[];
+extern void c128_ram2[];
+extern void c128_ramcart[];
+extern void c128_reu[];
+extern void c128_vdc[];
+extern void c128_ptvjoy[];
+extern void c128_stdjoy[];	/* Referred to by joy_static_stddrv[] */
+extern void c128_1351[];	/* Referred to by mouse_static_stddrv[] */
+extern void c128_joymouse[];
+extern void c128_potmouse[];
+extern void c128_swlink[];
+extern void c128_640_200_2[];	/* Referred to by tgi_static_stddrv[] */
+extern void c128_640_480_2[];
+
+
+
 unsigned __fastcall__ videomode (unsigned Mode);
 /* Set the video mode, return the old mode. Call with one of the VIDEOMODE_xx
  * constants.
@@ -145,6 +163,3 @@ void slow (void);
 
 /* End of c128.h */
 #endif
-
-
-

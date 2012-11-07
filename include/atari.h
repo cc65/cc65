@@ -151,6 +151,24 @@ extern char *_getdefdev(void);          /* get default floppy device */
 
 /* global variables */
 extern unsigned char _dos_type;        /* the DOS flavour */
+extern void atari_130xe[];
+extern void atari_stdjoy[];            /* referred to by joy_static_stddrv[] */
+extern void atari_multijoy[];
+extern void atari_10[];
+extern void atari_10p2[];
+extern void atari_11[];
+extern void atari_14[];
+extern void atari_15[];
+extern void atari_15p2[];
+extern void atari_3[];
+extern void atari_4[];
+extern void atari_5[];
+extern void atari_6[];
+extern void atari_7[];
+extern void atari_8[];                 /* referred to by tgi_static_stddrv[] */
+extern void atari_8p2[];
+extern void atari_9[];
+extern void atari_9p2[];
 
 /* provide old names for backwards compatibility */
 #ifdef ATARI_COMPAT_PRE_2_11

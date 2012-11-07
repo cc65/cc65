@@ -5113,8 +5113,6 @@ be used in presence of a prototype.
 <verb>
 #include <serial.h>
 
-extern void lynx_comlynx[];
-
 static void initialize(){
   struct ser_params params = {
     SER_BAUD_9600,
@@ -5179,9 +5177,7 @@ used in presence of a prototype.
 <ref id="ser_uninstall" name="ser_uninstall">,
 <ref id="ser_unload" name="ser_unload">
 <tag/Example/<verb>
-extern void lynx_comlynx[]; //Include the driver statically instead of loading it.
-
-ser_install(lynx_comlynx);
+ser_install(lynx_comlynx); //Include the driver statically instead of loading it.
 </verb>
 </descrip>
 </quote>
@@ -5245,8 +5241,6 @@ be used in presence of a prototype.
 <tag/Example/
 <verb>
 #include <serial.h>
-
-extern void lynx_comlynx[];
 
 static void initialize(){
   struct ser_params params = {

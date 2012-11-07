@@ -121,7 +121,35 @@
 #define C64_EU_OLD      0x00
 #define C64_DTV         0xFF            /* C64 DTV */
 
-                
+
+
+/*****************************************************************************/
+/*                                 Variables                                 */
+/*****************************************************************************/
+
+
+
+/* The addresses of the static drivers */
+extern void c64_c256k[];
+extern void c64_dqbb[];
+extern void c64_georam[];
+extern void c64_isepic[];
+extern void c64_ram[];
+extern void c64_ramcart[];
+extern void c64_reu[];
+extern void c64_vdc[];
+extern void dtv_himem[];
+extern void c64_hitjoy[];
+extern void c64_numpad[];
+extern void c64_ptvjoy[];
+extern void c64_stdjoy[];               /* Referred to by joy_static_stddrv[] */
+extern void c64_1351[];                 /* Referred to by mouse_static_stddrv[] */
+extern void c64_joymouse[];
+extern void c64_potmouse[];
+extern void c64_swlink[];
+extern void c64_320_200_2[];            /* Referred to by tgi_static_stddrv[] */
+
+
 
 /*****************************************************************************/
 /*	       	   		     Code				     */
@@ -136,6 +164,3 @@ unsigned char get_ostype (void);
 
 /* End of c64.h */
 #endif
-
-
-

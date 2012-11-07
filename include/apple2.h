@@ -141,6 +141,14 @@ extern unsigned char _dos_type;
 extern unsigned char _filetype;  /* Default 6 */
 extern unsigned int  _auxtype;   /* Default 0 */
 
+/* The addresses of the static drivers */
+extern void apple2_auxmem[];
+extern void apple2_stdjoy[];     /* Referred to by joy_static_stddrv[]   */
+extern void apple2_stdmou[];     /* Referred to by mouse_static_stddrv[] */
+extern void apple2_ssc[];
+extern void apple2_280_192_8[];  /* Referred to by tgi_static_stddrv[]   */
+extern void apple2_40_48_16[];
+
 
 
 /*****************************************************************************/

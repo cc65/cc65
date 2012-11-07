@@ -92,8 +92,11 @@
 
 
 
+/* The addresses of the static drivers */
+extern void vic20_ptvjoy[];
+extern void vic20_stdjoy[];	/* Referred to by joy_static_stddrv[] */
+
+
+
 /* End of vic20.h */
 #endif
-
-
-

@@ -105,6 +105,13 @@
 
 
 
+/* The addresses of the static drivers */
+extern void atmos_pase[];	/* Referred to by joy_static_stddrv[] */
+extern void atmos_acia[];
+extern void atmos_240_200_2[];	/* Referred to by tgi_static_stddrv[] */
+
+
+
 void __fastcall__ atmos_load(const char* name);
 /* Load Atmos tape. */
 

@@ -812,10 +812,10 @@ static void DoMemory (void)
         openCFile ();
 
         fprintf (outputCFile,
-            "extern void _OVERLAYADDR__;\n"
-            "extern void _OVERLAYSIZE__;\n\n"
-            "#define OVERLAY_ADDR (char*)   &_OVERLAYADDR__\n"
-            "#define OVERLAY_SIZE (unsigned)&_OVERLAYSIZE__\n\n");
+            "extern void _OVERLAYADDR__[];\n"
+            "extern void _OVERLAYSIZE__[];\n\n"
+            "#define OVERLAY_ADDR (char*)   _OVERLAYADDR__\n"
+            "#define OVERLAY_SIZE (unsigned)_OVERLAYSIZE__\n\n");
 
         if (fclose (outputCFile) != 0) {
             AbEnd ("Error closing %s: %s", outputCName, strerror (errno));

@@ -136,6 +136,9 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
+
 <sect1>Graphics drivers<p>
 
 No graphics drivers are currently available for the VIC20.
@@ -150,17 +153,16 @@ No extended memory drivers are currently available for the VIC20.
 
 <descrip>
 
-  <tag><tt/vic20-stdjoy.joy/</tag>
+  <tag><tt/vic20-stdjoy.joy (vic20_stdjoy)/</tag>
   Supports one standard joystick connected to the joysticks port of the VIC20.
 
-  <tag><tt/vic20-ptvjoy.joy/</tag>
+  <tag><tt/vic20-ptvjoy.joy (vic20_ptvjoy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
   <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
   name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to three joysticks are supported.
 
 </descrip><p>
-
 
 
 <sect1>Mouse drivers<p>

@@ -159,19 +159,22 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
+
 <sect1>Graphics drivers<p>
 
 Note: The graphics drivers for the VDC are incompatible with the extended
 memory drivers using the VDC memory!
 
 <descrip>
-  <tag><tt/c128-vdc.tgi/</tag>
+  <tag><tt/c128-vdc.tgi (c128_640_200_2)/</tag>
   This driver was written by Maciej Witkowiak. It uses the 80 column display
   and features a resolution of 640*200 with two colors and an adjustable
   palette (that means that the two colors can be chosen out of the 16 VDC
   colors).
 
-  <tag><tt/c128-vdc2.tgi/</tag>
+  <tag><tt/c128-vdc2.tgi (c128_640_480_2)/</tag>
   This driver was written by Maciej Witkowiak. This driver uses the 80 column
   display and features a resolution of 640*480 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of the
@@ -186,16 +189,16 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 <descrip>
 
-  <tag><tt/c128-georam.emd/</tag>
+  <tag><tt/c128-georam.emd (c128_georam)/</tag>
   A driver for the GeoRam cartridge. The driver will always assume 2048 pages
   of 256 bytes each. There are no checks, so if your program knows better,
   just go ahead.
 
-  <tag><tt/c128-ram.emd/</tag>
+  <tag><tt/c128-ram.emd (c128_ram)/</tag>
   An extended memory driver for the RAM in page 1. The common memory area is
   excluded, so this driver supports 251 pages of 256 bytes each.
 
-  <tag><tt/c128-ram2.emd/</tag>
+  <tag><tt/c128-ram2.emd (c128_ram2)/</tag>
 
   An extended memory driver for the RAM in pages 1-3. The common memory area
   is excluded, so this driver supports up to 731 pages of 256 bytes each. The
@@ -204,17 +207,17 @@ missing on VDC and are translated to the two colors missing from VIC palette.
   machines with RAM in banks 2+3, so it has been made a separate driver. The
   additional code was contributed by Marco van den Heuvel.
 
-  <tag><tt/c128-ramcart.emd/</tag>
+  <tag><tt/c128-ramcart.emd (c128_ramcart)/</tag>
   A driver for the RamCart 64/128 written and contributed by Maciej Witkowiak.
   Will test the hardware for the available RAM.
 
-  <tag><tt/c128-reu.emd/</tag>
+  <tag><tt/c128-reu.emd (c128_reu)/</tag>
   A driver for the CBM REUs. The driver will determine from the connected REU
   if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
   but since there are no range checks, the application can use more memory if
   it has better knowledge about the hardware than the driver.
 
-  <tag><tt/c128-vdc.emd/</tag>
+  <tag><tt/c128-vdc.emd (c128_vdc)/</tag>
   A driver for the VDC memory of the C128 written and contributed by Maciej
   Witkowiak. Autodetects the amount of memory available (16 or 64K) and offers
   64 or 256 pages of 256 bytes each. Note: This driver is incompatible with
@@ -227,14 +230,14 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 <descrip>
 
-  <tag><tt/c128-ptvjoy.joy/</tag>
+  <tag><tt/c128-ptvjoy.joy (c128_ptvjoy)/</tag>
   Driver for the Protovision 4-player adapter originally written by Groepaz
   for the C64 and converted for the C128 by me. See <htmlurl
   url="http://www.protovision-online.de/hardw/hardwstart.htm"
   name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to four joysticks are supported.
 
-  <tag><tt/c128-stdjoy.joy/</tag>
+  <tag><tt/c128-stdjoy.joy (c128_stdjoy)/</tag>
   Supports up to two joysticks connected to the standard joysticks port of
   the C128.
 
@@ -246,14 +249,14 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 <descrip>
 
-  <tag><tt/c128-1351.mou/</tag>
+  <tag><tt/c128-1351.mou (c128_1351)/</tag>
   Supports a standard mouse connected to port #0 of the C128.
 
-  <tag><tt/c128-joy.mou/</tag>
+  <tag><tt/c128-joy.mou (c128_joymouse)/</tag>
   Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
   #1 of the C128.
 
-  <tag><tt/c128-pot.mou/</tag>
+  <tag><tt/c128-pot.mou (c128_potmouse)/</tag>
   Supports a potentiometer device e.g. Koala Pad connected to port #1 of
   the C128.
 
@@ -264,7 +267,7 @@ missing on VDC and are translated to the two colors missing from VIC palette.
 
 <descrip>
 
-  <tag><tt/c128-swlink.ser/</tag>
+  <tag><tt/c128-swlink.ser (c128_swlink)/</tag>
   Driver for the SwiftLink cartridge. Supports up to 38400 baud, hardware flow
   control (RTS/CTS) and interrupt driven receives. Note that because of the
   peculiarities of the 6551 chip together with the use of the NMI, transmits

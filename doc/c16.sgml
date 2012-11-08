@@ -148,6 +148,9 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
+
 <sect1>Graphics drivers<p>
 
 No graphics drivers are currently available for the C16/C116.
@@ -157,7 +160,7 @@ No graphics drivers are currently available for the C16/C116.
 
 <descrip>
 
-  <tag><tt/c16-ram.emd/</tag>
+  <tag><tt/c16-ram.emd (c16_ram)/</tag>
   A driver for the hidden RAM below the BASIC and KERNAL ROMs. Supports 125
   pages with 256 bytes each if the machine is equipped with 64K of memory
   (a Plus/4 or a memory extended C16/116).
@@ -170,7 +173,7 @@ No graphics drivers are currently available for the C16/C116.
 
 <descrip>
 
-  <tag><tt/c16-stdjoy.joy/</tag>
+  <tag><tt/c16-stdjoy.joy (c16_stdjoy)/</tag>
   Supports up to two joysticks connected to the standard joysticks port of
   the Commodore 16/116.
 

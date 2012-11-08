@@ -104,13 +104,14 @@ this may seem overhead, it has two advantages:
       at runtime with almost no effort.
 </enum>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
 
 
 <sect1>Graphics drivers<p>
 
 <descrip>
 
-  <tag><tt/atmos-240-200-2.tgi/</tag>
+  <tag><tt/atmos-240-200-2.tgi (atmos_240_200_2)/</tag>
   This driver was written by Stefan Haubenthal. It features a resolution of
   240&times;200 with 2 colors.
 
@@ -126,7 +127,7 @@ No extended memory drivers are currently available for the Atmos.
 
 <descrip>
 
-  <tag><tt/atmos-pase.joy/</tag>
+  <tag><tt/atmos-pase.joy (atmos_pase)/</tag>
   Supports two standard joysticks connected to the P.A.S.E. interface of the Atmos.
 
 </descrip><p>
@@ -142,7 +143,7 @@ No mouse drivers are currently available for the Atmos.
 
 <descrip>
 
-  <tag><tt/atmos-acia.ser/</tag>
+  <tag><tt/atmos-acia.ser (atmos_acia)/</tag>
   Driver for the Telestrat integrated serial controller and the Atmos with a
   serial add-on.
   Note that because of the peculiarities of the 6551 chip together with the

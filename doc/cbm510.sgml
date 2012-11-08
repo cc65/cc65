@@ -173,6 +173,8 @@ will <em>not</em> work!
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
 
 <sect1>Graphics drivers<p>
 
@@ -182,7 +184,7 @@ No graphics drivers are currently available for the Commodore 510.
 <sect1>Extended memory drivers<p>
 
 <descrip>
-  <tag><tt/cbm510-ram.emd/</tag>
+  <tag><tt/cbm510-ram.emd (cbm510_ram)/</tag>
   A driver for the RAM in bank 1. Supports up to 255 pages with 256 bytes
   each.
 </descrip><p>
@@ -192,7 +194,7 @@ No graphics drivers are currently available for the Commodore 510.
 
 <descrip>
 
-  <tag><tt/cbm510-std.joy/</tag>
+  <tag><tt/cbm510-std.joy (cbm510_stdjoy)/</tag>
   Supports up to two standard joysticks connected to the joysticks port of
   the Commodore 510.
 
@@ -208,7 +210,7 @@ No mouse drivers are currently available for the Commodore 510.
 
 <descrip>
 
-  <tag><tt/cbm510-std.ser/</tag>
+  <tag><tt/cbm510-std.ser (cbm510_stdser)/</tag>
   Driver for the 6551 ACIA chip built into the Commodore 510. Supports up to
   19200 baud, hardware flow control (RTS/CTS) and interrupt driven receives.
   Note that because of the peculiarities of the 6551 chip transmits are not

@@ -199,6 +199,9 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
+
 <sect1>Graphics drivers<p>
 
 <em>Note:</em> All available graphics drivers for the TGI interface will use
@@ -207,7 +210,7 @@ the standard setup without any memory loss or need for a changed
 configuration.
 
 <descrip>
-  <tag><tt/c64-hi.tgi/</tag>
+  <tag><tt/c64-hi.tgi (c64_320_200_2)/</tag>
   This driver features a resolution of 320*200 with two colors and an
   adjustable palette (that means that the two colors can be chosen out of a
   palette of the 16 C64 colors).
@@ -218,45 +221,45 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-c256k.emd/</tag>
+  <tag><tt/c64-c256k.emd (c64_c256k)/</tag>
   A driver for the C64 256K memory expansion. This driver offers 768 pages of
   256 bytes each. Written and contributed by Marco van den Heuvel.
 
-  <tag><tt/c64-dqbb.emd/</tag>
+  <tag><tt/c64-dqbb.emd (c64_dqbb)/</tag>
   A driver for the Double Quick Brown Box cartridge. This driver offers
   64 pages of 256 bytes each. Written and contributed by Marco van den Heuvel.
 
-  <tag><tt/c64-georam.emd/</tag>
+  <tag><tt/c64-georam.emd (c64_georam)/</tag>
   A driver for the Berkeley Softworks GeoRam cartridge. The driver will
   determine the available RAM from the connected cartridge. It supports 64KB
   up to 2048KB of RAM.
 
-  <tag><tt/c64-isepic.emd/</tag>
+  <tag><tt/c64-isepic.emd (c64_isepic)/</tag>
   A driver for the ISEPIC cartridge. This driver offers just 8 pages of 256
   bytes each. Written and contributed by Marco van den Heuvel.
 
-  <tag><tt/c64-ram.emd/</tag>
+  <tag><tt/c64-ram.emd (c64_ram)/</tag>
   A driver for the hidden RAM below the I/O area and kernal ROM. Supports 48
   256 byte pages. Please note that this driver is incompatible with any of the
   graphics drivers!
 
-  <tag><tt/c64-ramcart.emd/</tag>
+  <tag><tt/c64-ramcart.emd (c64_ramcart)/</tag>
   A driver for the RamCart 64/128 written and contributed by Maciej Witkowiak.
   Will test the hardware for the available RAM.
 
-  <tag><tt/c64-reu.emd/</tag>
+  <tag><tt/c64-reu.emd (c64_reu)/</tag>
   A driver for the CBM REUs. The driver will determine from the connected REU
   if it supports 128KB of RAM or more. In the latter case, 256KB are assumed,
   but since there are no range checks, the application can use more memory if
   it has better knowledge about the hardware than the driver.
 
-  <tag><tt/c64-vdc.emd/</tag>
+  <tag><tt/c64-vdc.emd (c64_vdc)/</tag>
   A driver for the VDC memory of the C128. Written and contributed by Maciej
   Witkowiak. Can be used if the program is running in C64 mode of the C128.
   Autodetects the amount of memory available (16 or 64K) and offers 64 or 256
   pages of 256 bytes each.
 
-  <tag><tt/dtv-himem.emd/</tag>
+  <tag><tt/dtv-himem.emd (dtv_himem)/</tag>
   A driver for the C64 D2TV (the second or PAL version). This driver offers
   indeed 7680 pages of 256 bytes each.
 
@@ -267,23 +270,23 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-hitjoy.joy/</tag>
+  <tag><tt/c64-hitjoy.joy (c64_hitjoy)/</tag>
   Driver for the Digital Excess & Hitmen adapter contributed by Groepaz. See
   <htmlurl url="http://www.digitalexcess.de/downloads/productions.php"
   name="http://www.digitalexcess.de/downloads/productions.php"> on
   instructions how to build one. Up to four joysticks are supported.
 
-  <tag><tt/c64-ptvjoy.joy/</tag>
+  <tag><tt/c64-ptvjoy.joy (c64_ptvjoy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
   <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
   name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to four joysticks are supported.
 
-  <tag><tt/c64-stdjoy.joy/</tag>
+  <tag><tt/c64-stdjoy.joy (c64_stdjoy)/</tag>
   Supports up to two standard joysticks connected to the joysticks port of
   the C64.
 
-  <tag><tt/c64-numpad.joy/</tag>
+  <tag><tt/c64-numpad.joy (c64_numpad)/</tag>
   Supports one joystick emulated by the numberpad of the C128 in C64 mode,
   the firebutton is labeled &dquot;5&dquot; and ENTER.
 
@@ -294,14 +297,14 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-1351.mou/</tag>
+  <tag><tt/c64-1351.mou (c64_1351)/</tag>
   Supports a standard mouse connected to port #0 of the C64.
 
-  <tag><tt/c64-joy.mou/</tag>
+  <tag><tt/c64-joy.mou (c64_joymouse)/</tag>
   Supports a mouse emulated by a standard joystick e.g. 1350 mouse in port
   #1 of the C64.
 
-  <tag><tt/c64-pot.mou/</tag>
+  <tag><tt/c64-pot.mou (c64_potmouse)/</tag>
   Supports a potentiometer device e.g. Koala Pad connected to port #1 of
   the C64.
 
@@ -312,7 +315,7 @@ configuration.
 
 <descrip>
 
-  <tag><tt/c64-swlink.ser/</tag>
+  <tag><tt/c64-swlink.ser (c64_swlink)/</tag>
   Driver for the SwiftLink cartridge. Supports up to 38400 baud, hardware flow
   control (RTS/CTS) and interrupt driven receives. Note that because of the
   peculiarities of the 6551 chip together with the use of the NMI, transmits

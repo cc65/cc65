@@ -146,6 +146,9 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
+
 <sect1>Graphics drivers<p>
 
 No graphics drivers are currently available for the Plus/4.
@@ -156,17 +159,15 @@ No graphics drivers are currently available for the Plus/4.
 No extended memory drivers are currently available for the Plus/4.
 
 
-
 <sect1>Joystick drivers<p>
 
 <descrip>
 
-  <tag><tt/plus4-stdjoy.joy/</tag>
+  <tag><tt/plus4-stdjoy.joy (plus4_stdjoy)/</tag>
   Supports up to two joysticks connected to the standard joysticks port of
   the Plus/4.
 
 </descrip><p>
-
 
 
 <sect1>Mouse drivers<p>
@@ -179,7 +180,7 @@ does not exist).
 
 <descrip>
 
-  <tag><tt/plus4-stdser.ser/</tag>
+  <tag><tt/plus4-stdser.ser (plus4_stdser)/</tag>
   Driver for the 6551 ACIA chip built into the Plus/4. Supports up to 19200
   baud, hardware flow control (RTS/CTS) and interrupt driven receives. Note
   that because of the peculiarities of the 6551 chip transmits are not

@@ -173,6 +173,8 @@ will <em>not</em> work!
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
 
 <sect1>Graphics drivers<p>
 
@@ -184,7 +186,7 @@ really good:-).
 <sect1>Extended memory drivers<p>
 
 <descrip>
-  <tag><tt/cbm610-ram.emd/</tag>
+  <tag><tt/cbm610-ram.emd (cbm610_ram)/</tag>
   A driver for the RAM in bank 2. Supports up to 255 pages with 256 bytes
   each.
 </descrip><p>
@@ -207,7 +209,7 @@ does not exist).
 
 <descrip>
 
-  <tag><tt/cbm610-std.ser/</tag>
+  <tag><tt/cbm610-std.ser (cbm610_stdser)/</tag>
   Driver for the 6551 ACIA chip built into the Commodore 610. Supports up to
   19200 baud, hardware flow control (RTS/CTS) and interrupt driven receives.
   Note that because of the peculiarities of the 6551 chip transmits are not

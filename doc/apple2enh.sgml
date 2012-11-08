@@ -313,18 +313,20 @@ you cannot do it, it just means that there's no help.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
 
 <sect1>Graphics drivers<p>
 
 <descrip>
 
-  <tag><tt/a2e.lo.tgi/</tag>
+  <tag><tt/a2e.lo.tgi (apple2_40_48_16)/</tag>
   This driver features a resolution of 40&times;48 with 16 colors.
 
   The function <tt/tgi_apple2_mix()/ allows to activate 4 lines of text. The
   function clears the corresponding area at the bottom of the screen.
 
-  <tag><tt/a2e.hi.tgi/</tag>
+  <tag><tt/a2e.hi.tgi (apple2_280_192_8)/</tag>
   This driver features a resolution of 280&times;192 with 8 colors and two
   hires pages. Note that programs using this driver will have to be linked
   with <tt/--start-addr $4000/ to reserve the first hires page or with
@@ -350,7 +352,7 @@ you cannot do it, it just means that there's no help.
 
 <descrip>
 
-  <tag><tt/a2e.auxmem.emd/</tag>
+  <tag><tt/a2e.auxmem.emd (apple2_auxmem)/</tag>
   Gives access to 47.5 KB RAM (190 pages of 256 bytes each) on an Extended
   80-Column Text Card.
   
@@ -364,7 +366,7 @@ you cannot do it, it just means that there's no help.
 
 <descrip>
 
-  <tag><tt/a2e.stdjoy.joy/</tag>
+  <tag><tt/a2e.stdjoy.joy (apple2_stdjoy)/</tag>
   Supports up to two standard analog joysticks connected to the game port of
   the enhanced&nbsp;Apple&nbsp;//e.
 
@@ -375,7 +377,7 @@ you cannot do it, it just means that there's no help.
 
 <descrip>
 
-  <tag><tt/a2e.stdmou.mou/</tag>
+  <tag><tt/a2e.stdmou.mou (apple2_stdmou)/</tag>
   Driver for the AppleMouse&nbsp;II Card. Searches all Apple&nbsp;II slots
   for an AppleMouse&nbsp;II Card compatible firmware. The default bounding
   box is &lsqb;0..279,0..191&rsqb;.
@@ -390,7 +392,7 @@ you cannot do it, it just means that there's no help.
 
 <descrip>
 
-  <tag><tt/a2e.ssc.ser/</tag>
+  <tag><tt/a2e.ssc.ser (apple2_ssc)/</tag>
   Driver for the Apple&nbsp;II Super Serial Card. Supports up to 19200 baud,
   hardware flow control (RTS/CTS) and interrupt driven receives. Note
   that because of the peculiarities of the 6551 chip transmits are not

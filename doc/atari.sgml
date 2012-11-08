@@ -154,12 +154,39 @@ chip registers.
 
 <sect1>Graphics drivers<p>
 
-Currently there are no graphics drivers available for the Atari platform.
-However, the runtime library provides a function named _graphics, with
-a mode parameter just like the BASIC GRAPHICS command. This function will
-switch to the requested graphics mode.
-There are currently no functions available to access the graphics
-memory. The access must be implemented manually.
+<descrip>
+
+  <tag><tt/atari10.tgi (atari_10)/</tag>
+
+  <tag><tt/atr10p2.tgi (atari_10p2)/</tag>
+
+  <tag><tt/atari11.tgi (atari_11)/</tag>
+
+  <tag><tt/atari14.tgi (atari_14)/</tag>
+
+  <tag><tt/atari15.tgi (atari_15)/</tag>
+
+  <tag><tt/atr15p2.tgi (atari_15p2)/</tag>
+
+  <tag><tt/atari3.tgi (atari_3)/</tag>
+
+  <tag><tt/atari4.tgi (atari_4)/</tag>
+
+  <tag><tt/atari5.tgi (atari_5)/</tag>
+
+  <tag><tt/atari6.tgi (atari_6)/</tag>
+
+  <tag><tt/atari7.tgi (atari_7)/</tag>
+
+  <tag><tt/atari8.tgi (atari_8)/</tag>
+
+  <tag><tt/atr8p2.tgi (atari_8p2)/</tag>
+
+  <tag><tt/atari9.tgi (atari_9)/</tag>
+
+  <tag><tt/atr9p2.tgi (atari_9p2)/</tag>
+
+</descrip><p>
 
 Many graphics modes require more memory than the text screen which is
 in effect when the program starts up. Therefore the programmer has to
@@ -221,22 +248,25 @@ the Atari ROM code.
 
 <sect1>Extended memory drivers<p>
 
-Currently there are no extended memory drivers available for the Atari
-platform.
+<descrip>
+
+  <tag><tt/atr130xe.emd (atari_130xe)/</tag>
+
+</descrip><p>
+
 
 <sect1>Joystick drivers<p>
 
 <descrip>
 
-  <tag><tt/ataristd.joy/</tag>
+  <tag><tt/ataristd.joy (atari_stdjoy)/</tag>
   Supports up to four standard joysticks connected to the joystick ports of
   the Atari.
 
-  <tag><tt/atarim8.joy/</tag>
+  <tag><tt/atarim8.joy (atari_multijoy)/</tag>
   Supports up to eight standard joysticks connected to a MultiJoy adapter.
 
 </descrip><p>
-
 
 
 <sect1>Mouse drivers<p>

@@ -133,6 +133,9 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
+
 <sect1>Graphics drivers<p>
 
 No graphics drivers are currently available for the PET.
@@ -147,11 +150,14 @@ No extended memory drivers are currently available for the PET.
 
 <descrip>
 
-  <tag><tt/pet-ptvjoy.joy/</tag>
+  <tag><tt/pet-ptvjoy.joy (pet_ptvjoy)/</tag>
   Driver for the Protovision 4-player adapter contributed by Groepaz. See
   <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
   name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
   building instructions. Up to two joysticks are supported.
+
+  <tag><tt/pet-stdjoy.joy (pet_stdjoy)/</tag>
+  Driver for the standard PET userport joystick.
 
 </descrip><p>
 

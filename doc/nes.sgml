@@ -94,16 +94,19 @@ allow access to hardware located in the address space.
 <sect>Loadable drivers<p>
 
 All drivers must be statically linked because no file I/O is available.
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
 
 <sect1>Graphics drivers<p>
 
 <descrip>
 
-  <tag><tt/nes-64-56-2.tgi/</tag>
+  <tag><tt/nes-64-56-2.tgi (nes_64_56_2)/</tag>
   This driver features a resolution of 64&times;56 with 2 colors using the
   CHR bank.
 
 </descrip><p>
+
 
 <sect1>Extended memory drivers<p>
 
@@ -112,7 +115,13 @@ No extended memory drivers are currently available for the NES.
 
 <sect1>Joystick drivers<p>
 
-A joystick driver for the standard four buttons joypad is available.
+<descrip>
+
+  <tag><tt/nes-stdjoy.joy (nes_stdjoy)/</tag>
+  A joystick driver for the standard four buttons joypad is available.
+
+</descrip><p>
+
 
 <sect1>Mouse drivers<p>
 

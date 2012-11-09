@@ -187,44 +187,52 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect>Loadable drivers<p>
 
+The names in the parentheses denote the symbols to be used for static linking of the drivers.
+
+
 <sect1>Graphics drivers<p>
 
-A TGI driver for the standard graphics mode (160&times;102 in 16 colors) is
-available, but must be statically linked, because no file I/O is available.
+<descrip>
 
-The TGI driver is implemented as an interrupt driven dual buffering device.
-To use it as a single-buffer device set draw page and view page to the same
-value 0 or 1;
+  <tag><tt/lynx-160-102-16.tgi (lynx_160_102_16)/</tag>
+  A TGI driver for the standard graphics mode (160&times;102 in 16 colors).
 
-The TGI driver has a few Lynx-specific extensions.
+  The TGI driver is implemented as an interrupt driven dual buffering device.
+  To use it as a single-buffer device set draw page and view page to the same
+  value 0 or 1;
 
-Calling tgi_sprite(spr) or tgi_ioctl(0, spr) will display a standard Lynx
-sprite on screen.
+  The TGI driver has a few Lynx-specific extensions.
 
-Calling tgi_flip() or tgi_ioctl(1, 0) will do a flip screen.
+  Calling tgi_sprite(spr) or tgi_ioctl(0, spr) will display a standard Lynx
+  sprite on screen.
 
-Calling tgi_setbgcolor(bgcolor) or tgi_ioctl(2, bgindex) will set the text
-background color to the index defined by bgindex. If bgindex is 0 then the
-background color is transparent.
+  Calling tgi_flip() or tgi_ioctl(1, 0) will do a flip screen.
 
-To set the framerate of the display hardware call tgi_setframerate(rate) or
-tgi_ioctl(3, rate). The supported framerates are 50, 60 and 75 frames per
-second. Actually there is no real reason to use anything else than 75 frames
-per second.
+  Calling tgi_setbgcolor(bgcolor) or tgi_ioctl(2, bgindex) will set the text
+  background color to the index defined by bgindex. If bgindex is 0 then the
+  background color is transparent.
 
-To check if the drawing engine is busy with the previous swap you can
-call tgi_busy or tgi_ioctl(4, 0). It returns 0 if idle and 1 if busy
+  To set the framerate of the display hardware call tgi_setframerate(rate) or
+  tgi_ioctl(3, rate). The supported framerates are 50, 60 and 75 frames per
+  second. Actually there is no real reason to use anything else than 75 frames
+  per second.
 
-To update displays you can call tgi_updatedisplay() or tgi_ioctl(4, 1) it
-will wait for the next VBL interrupt and set the draw buffer to the
-view buffer. The draw buffer is also changed to (drawbuffer xor 1).
+  To check if the drawing engine is busy with the previous swap you can
+  call tgi_busy or tgi_ioctl(4, 0). It returns 0 if idle and 1 if busy
 
-You can also enable or disable collision detection by a call to
-tgi_setcollisiondetection(active) or tgi_ioctl(5, active). The collision
-result is located before the sprite structure by default in this driver.
+  To update displays you can call tgi_updatedisplay() or tgi_ioctl(4, 1) it
+  will wait for the next VBL interrupt and set the draw buffer to the
+  view buffer. The draw buffer is also changed to (drawbuffer xor 1).
 
-In order to reserve memory for the collision detection buffer you need to
-specify lynx-coll.cfg as the configuration file to the linker.
+  You can also enable or disable collision detection by a call to
+  tgi_setcollisiondetection(active) or tgi_ioctl(5, active). The collision
+  result is located before the sprite structure by default in this driver.
+
+  In order to reserve memory for the collision detection buffer you need to
+  specify lynx-coll.cfg as the configuration file to the linker.
+
+</descrip><p>
+
 
 <sect1>Extended memory drivers<p>
 
@@ -233,8 +241,13 @@ No extended memory drivers are currently available for the Lynx.
 
 <sect1>Joystick drivers<p>
 
-A joystick driver for the standard buttons is available, but must be
-statically linked, because no file I/O is available.
+<descrip>
+
+  <tag><tt/lynx-stdjoy.joy (lynx_stdjoy)/</tag>
+  A joystick driver for the standard buttons.
+
+</descrip><p>
+
 
 <sect1>Mouse drivers<p>
 
@@ -244,6 +257,9 @@ No mouse drivers are currently available for the Lynx.
 <sect1>RS232 device drivers<p>
 
 <descrip>
+
+  <tag><tt/lynx-comlynx.ser (lynx_comlynx)/</tag>
+  A serial driver for the ComLynx port.
 
   The ComLynx port has Tx and Rx wired together. Every byte is sent
   to all connected Lynxes. Only one Lynx can send at a time. There is no

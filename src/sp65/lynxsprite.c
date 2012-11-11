@@ -57,7 +57,7 @@ enum Mode {
     smAuto,
     smLiteral,
     smPacked,
-    smPackedTransparent
+    smShaped
 };
 
 
@@ -77,8 +77,8 @@ static enum Mode GetMode (const Collection* A)
             return smLiteral;
         } else if (strcmp (Mode, "packed") == 0) {
             return smPacked;
-        } else if (strcmp (Mode, "transparent") == 0) {
-            return smPackedTransparent;
+        } else if (strcmp (Mode, "shaped") == 0) {
+            return smShaped;
         } else {
             Error ("Invalid value for attribute `mode'");
         }
@@ -113,9 +113,90 @@ static unsigned GetActionPointY (const Collection* A)
     }
 }
 
+static char OutBuffer[512]; /* The maximum size is 508 pixels */
+static unsigned char OutIndex;
+
+static void AssembleByte(unsigned bits, char val)
+{
+    static char bit_counter = 8, byte = 0;
+
+    /* initialize */
+    if (!bits) {
+        OutIndex = 0;
+        bit_counter = 8;
+        byte = 0;
+        return;
+    }
+    /* handle end of line */
+    if (bits == 8) {
+        byte <<= bit_counter;
+        OutBuffer[OutIndex++] = byte;
+        if (!OutIndex) {
+            Error ("Sprite is too large for the Lynx");
+        }
+        if (byte & 0x1) {
+            OutBuffer[OutIndex++] = byte;
+            if (!OutIndex) {
+                Error ("Sprite is too large for the Lynx");
+            }
+        }
+        return;
+    }
+    val <<= 8 - bits;
+
+    do {
+        byte <<= 1;
+
+        if (val & 0x80)
+            ++byte;
+
+        if (!(--bit_counter)) {
+            OutBuffer[OutIndex++] = byte;
+            if (!OutIndex) {
+                Error ("Sprite is too large for the Lynx");
+            }
+            byte = 0;
+            bit_counter = 8;
+        }
+
+        val <<= 1;
+
+    } while (--bits);
+}
+
+static unsigned char ChoosePackagingMode(signed len, signed index, char LineBuffer[512])
+{
+    --len;
+    if (!len) {
+        return 0;
+    }
+    if (LineBuffer[index] != LineBuffer[index + 1]) {
+        return 0;
+    }
+    return 1;
+}
+
+static void WriteOutBuffer(StrBuf *D)
+{
+    signed i;
+
+    /* Fix bug in Lynx where the count cannot be 1 */
+    if (OutIndex == 1) {
+        OutBuffer[OutIndex++] = 0;
+    }
+    /* Write the byte count to the end of the scanline */
+    if (OutIndex == 255) {
+        Error ("Sprite is too large for the Lynx");
+    }
+    SB_AppendChar (D, OutIndex+1);
+    /* Write scanline data */
+    for (i = 0; i < OutIndex; i++) {
+        SB_AppendChar (D, OutBuffer[i]);
+    }
+}
 
 static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask, char LineBuffer[512],
-    int i, int LastOpaquePixel) {
+    int len, int LastOpaquePixel) {
 /*
  * The data starts with a byte count. It tells the number of bytes on this
  * line + 1.
@@ -133,80 +214,71 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
  *
  * All data is high nybble first
  */
-    char OutBuffer[512]; /* The maximum size is 508 pixels */
-    unsigned char OutIndex = 0;
     unsigned char V = 0;
-    unsigned W = 0;
-    signed j;
-    signed k;
+    signed i;
+    signed count;
 
+    AssembleByte(0, 0);
     switch (M) {
     case smAuto:
     case smLiteral:
-        OutIndex = 0;
-        k = 0;
-        for (j = 0; j < i; j++) {
+        for (i = 0; i < len; i++) {
             /* Fetch next pixel index into pixel buffer */
-            W = (W << ColorBits) | (LineBuffer[j] & ColorMask);
-            k += ColorBits;
-            if (k > 7) {
-                /* The byte is ready */
-                k -= 8;
-                V = (W >> k) & 0xFF;
-                OutBuffer[OutIndex++] = V;
-                if (!OutIndex) {
-                    Error ("Sprite is too large for the Lynx");
-                }
-            }
+            AssembleByte(ColorBits, LineBuffer[i] & ColorMask);
         }
-        /* Output last bits */
-        if (k != 0) {
-            W = (W << (8-k));
-            k = 0;
-            V = W & 0xFF;
-            OutBuffer[OutIndex++] = V;
-            if (!OutIndex) {
-                Error ("Sprite is too large for the Lynx");
-            }
-        }
-        /* Fix bug in Lynx where the last bit on a line is 1 */
-        if (V & 1) {
-            OutBuffer[OutIndex++] = 0;
-            if (!OutIndex) {
-                Error ("Sprite is too large for the Lynx");
-            }
-        }
-        /* Fix bug in Lynx where the count cannot be 1 */
-        if (OutIndex == 1) {
-            OutBuffer[OutIndex++] = 0;
-        }
-        /* Write the byte count to the end of the scanline */
-        if (OutIndex == 255) {
-            Error ("Sprite is too large for the Lynx");
-        }
-        SB_AppendChar (D, OutIndex+1);
-        /* Write scanline data */
-        for (j = 0; j < OutIndex; j++) {
-            SB_AppendChar (D, OutBuffer[j]);
-        }
+        /* Write the buffer to file */
+        WriteOutBuffer(D);
         break;
     case smPacked:
-        /* Bug workaround: If last bit is 1 and it is in bit0 add a zero byte */
-        /* Note: These extra pixels will be painted also. There is no workaround for this */
-        if (LineBuffer[i - 1] & 0x01) {
-            LineBuffer[i++] = 0;
+#if 0
+        i = 0;
+        while (len) {
+            V = LineBuffer[i];
+            ++i;
+            --len;
+            count = 0;
+            if (ChoosePackagingMode(len, i, LineBuffer)) {
+                /* Make runlength packet */
+                do {
+                    ++count;
+                    ++i;
+                    --len;
+                } while (V == LineBuffer[i] && len && count != 15);
+
+                AssembleByte(5, count);
+                AssembleByte(ColorBits, V);
+
+            } else {
+                /* Make packed literal packet */
+                d_ptr = differ;
+                while (V != LastBuffer[i] && len && count != 15) {
+                    *d_ptr++ = V;
+                    ++count;
+                    V = LineBuffar[i];
+                    ++i;
+                    --len;
+                }
+                if (!len || count == 15)
+                    *d_ptr = V;
+                else if (V == LineBuffer[i]) {
+                    --count;
+                    --i;
+                    ++len;
+                }
+
+                AssembleByte(5, count | 0x10);
+                d_ptr = differ;
+                do {
+                    AssembleByte(ColorBits, *d_ptr++);
+                } while (--count >= 0);
+
+            }
         }
-        /* Logical problem workaround: The count can not be 1 so add an extra byte */
-        if (i == 1) {
-            LineBuffer[i++] = 0;
-        }
-        /* Write the byte count for this partial scanline */
-        SB_AppendChar (D, i);
-        for (i = 0; i < LineBuffer[0]; i++) {
-            SB_AppendChar (D, LineBuffer[i]);
-        }
+#endif
+        AssembleByte(8, 0);
         break;
-    case smPackedTransparent:
+
+    case smShaped:
         break;
     }
 }

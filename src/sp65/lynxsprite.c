@@ -129,12 +129,58 @@ static void AssembleByte(unsigned bits, char val)
     }
     /* handle end of line */
     if (bits == 8) {
-        byte <<= bit_counter;
-        OutBuffer[OutIndex++] = byte;
-        if (!OutIndex) {
-            Error ("Sprite is too large for the Lynx");
+        if (bit_counter != 8) {
+            byte <<= bit_counter;
+            OutBuffer[OutIndex++] = byte;
+            if (!OutIndex) {
+                Error ("Sprite is too large for the Lynx");
+            }
+            if (byte & 0x1) {
+                OutBuffer[OutIndex++] = byte;
+                if (!OutIndex) {
+                    Error ("Sprite is too large for the Lynx");
+                }
+            }
         }
-        if (byte & 0x1) {
+        return;
+    }
+    val <<= 8 - bits;
+
+    do {
+        byte <<= 1;
+
+        if (val & 0x80)
+            ++byte;
+
+        if (!(--bit_counter)) {
+            OutBuffer[OutIndex++] = byte;
+            if (!OutIndex) {
+                Error ("Sprite is too large for the Lynx");
+            }
+            byte = 0;
+            bit_counter = 8;
+        }
+
+        val <<= 1;
+
+    } while (--bits);
+}
+
+static void AssembleByteLiteral(unsigned bits, char val)
+{
+    static char bit_counter = 8, byte = 0;
+
+    /* initialize */
+    if (!bits) {
+        OutIndex = 0;
+        bit_counter = 8;
+        byte = 0;
+        return;
+    }
+    /* handle end of line */
+    if (bits == 8) {
+        if (bit_counter != 8) {
+            byte <<= bit_counter;
             OutBuffer[OutIndex++] = byte;
             if (!OutIndex) {
                 Error ("Sprite is too large for the Lynx");
@@ -217,28 +263,31 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
     unsigned char V = 0;
     signed i;
     signed count;
+    unsigned char differ[16];
+    unsigned char *d_ptr;
 
-    AssembleByte(0, 0);
     switch (M) {
     case smAuto:
     case smLiteral:
+        AssembleByteLiteral(0, 0);
         for (i = 0; i < len; i++) {
             /* Fetch next pixel index into pixel buffer */
-            AssembleByte(ColorBits, LineBuffer[i] & ColorMask);
+            AssembleByteLiteral(ColorBits, LineBuffer[i] & ColorMask);
         }
+        AssembleByteLiteral(8, 0);
         /* Write the buffer to file */
         WriteOutBuffer(D);
         break;
     case smPacked:
-#if 0
+        AssembleByte(0, 0);
         i = 0;
         while (len) {
-            V = LineBuffer[i];
-            ++i;
-            --len;
-            count = 0;
             if (ChoosePackagingMode(len, i, LineBuffer)) {
                 /* Make runlength packet */
+                V = LineBuffer[i];
+                ++i;
+                --len;
+                count = 0;
                 do {
                     ++count;
                     ++i;
@@ -251,19 +300,15 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
             } else {
                 /* Make packed literal packet */
                 d_ptr = differ;
-                while (V != LastBuffer[i] && len && count != 15) {
+                V = LineBuffer[i++];
+                *d_ptr++ = V;
+                --len;
+                count = 0;
+                while (ChoosePackagingMode(len, i, LineBuffer) == 0 && len && count != 15) {
+                    V = LineBuffer[i++];
                     *d_ptr++ = V;
                     ++count;
-                    V = LineBuffar[i];
-                    ++i;
                     --len;
-                }
-                if (!len || count == 15)
-                    *d_ptr = V;
-                else if (V == LineBuffer[i]) {
-                    --count;
-                    --i;
-                    ++len;
                 }
 
                 AssembleByte(5, count | 0x10);
@@ -274,8 +319,9 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
 
             }
         }
-#endif
         AssembleByte(8, 0);
+        /* Write the buffer to file */
+        WriteOutBuffer(D);
         break;
 
     case smShaped:

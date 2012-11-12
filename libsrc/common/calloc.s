@@ -7,8 +7,8 @@
 ;
 
   	.export	_calloc
-	.import _malloc, _memset
-	.import	tosumulax, pushax, push0
+	.import _malloc, __bzero
+	.import	tosumulax, pushax
 
 
 ; -------------------------------------------------------------------------
@@ -35,21 +35,20 @@
   	cpx     #0
   	bne	ClearBlock
   	cmp	#0
-  	beq	ClearBlock
+       	bne     ClearBlock
 
 ; We have a NULL pointer, bail out
 
      	rts
 
-; No NULL pointer, clear the block. memset will return a pointer to the
+; No NULL pointer, clear the block. _bzero will return a pointer to the
 ; block which is exactly what we want.
 
 ClearBlock:
         jsr	pushax	     	      	; ptr
-  	jsr	push0		      	; #0
 	lda	Size
-	ldx	Size+1			; Size
-	jmp	_memset
+	ldx	Size+1 		 	; Size
+	jmp	__bzero
 
 .endproc
 

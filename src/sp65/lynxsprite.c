@@ -133,12 +133,12 @@ static void AssembleByte(unsigned bits, char val)
             byte <<= bit_counter;
             OutBuffer[OutIndex++] = byte;
             if (!OutIndex) {
-                Error ("Sprite is too large for the Lynx");
+                Error ("ASprite is too large for the Lynx");
             }
             if (byte & 0x1) {
                 OutBuffer[OutIndex++] = byte;
                 if (!OutIndex) {
-                    Error ("Sprite is too large for the Lynx");
+                    Error ("BSprite is too large for the Lynx");
                 }
             }
         }
@@ -325,6 +325,53 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
         break;
 
     case smShaped:
+        if (LastOpaquePixel >= 0 && LastOpaquePixel < len) {
+            len = LastOpaquePixel;
+        }
+        AssembleByte(0, 0);
+        i = 0;
+        while (len) {
+            if (ChoosePackagingMode(len, i, LineBuffer)) {
+                /* Make runlength packet */
+                V = LineBuffer[i];
+                ++i;
+                --len;
+                count = 0;
+                do {
+                    ++count;
+                    ++i;
+                    --len;
+                } while (V == LineBuffer[i] && len && count != 15);
+
+                AssembleByte(5, count);
+                AssembleByte(ColorBits, V);
+
+            } else {
+                /* Make packed literal packet */
+                d_ptr = differ;
+                V = LineBuffer[i++];
+                *d_ptr++ = V;
+                --len;
+                count = 0;
+                while (ChoosePackagingMode(len, i, LineBuffer) == 0 && len && count != 15) {
+                    V = LineBuffer[i++];
+                    *d_ptr++ = V;
+                    ++count;
+                    --len;
+                }
+
+                AssembleByte(5, count | 0x10);
+                d_ptr = differ;
+                do {
+                    AssembleByte(ColorBits, *d_ptr++);
+                } while (--count >= 0);
+
+            }
+        }
+        AssembleByte(5, 0);
+        AssembleByte(8, 0);
+        /* Write the buffer to file */
+        WriteOutBuffer(D);
         break;
     }
 }

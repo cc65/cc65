@@ -144,46 +144,13 @@ static void AssembleByte(unsigned bits, char val)
         }
         return;
     }
-    val <<= 8 - bits;
-
-    do {
-        byte <<= 1;
-
-        if (val & 0x80)
-            ++byte;
-
-        if (!(--bit_counter)) {
-            OutBuffer[OutIndex++] = byte;
-            if (!OutIndex) {
-                Error ("Sprite is too large for the Lynx");
-            }
-            byte = 0;
-            bit_counter = 8;
-        }
-
-        val <<= 1;
-
-    } while (--bits);
-}
-
-static void AssembleByteLiteral(unsigned bits, char val)
-{
-    static char bit_counter = 8, byte = 0;
-
-    /* initialize */
-    if (!bits) {
-        OutIndex = 0;
-        bit_counter = 8;
-        byte = 0;
-        return;
-    }
-    /* handle end of line */
-    if (bits == 8) {
+    /* handle end of line for literal */
+    if (bits == 7) {
         if (bit_counter != 8) {
             byte <<= bit_counter;
             OutBuffer[OutIndex++] = byte;
             if (!OutIndex) {
-                Error ("Sprite is too large for the Lynx");
+                Error ("ASprite is too large for the Lynx");
             }
         }
         return;
@@ -266,20 +233,19 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
     unsigned char differ[16];
     unsigned char *d_ptr;
 
+    AssembleByte(0, 0);
     switch (M) {
     case smAuto:
     case smLiteral:
-        AssembleByteLiteral(0, 0);
         for (i = 0; i < len; i++) {
             /* Fetch next pixel index into pixel buffer */
-            AssembleByteLiteral(ColorBits, LineBuffer[i] & ColorMask);
+            AssembleByte(ColorBits, LineBuffer[i] & ColorMask);
         }
-        AssembleByteLiteral(8, 0);
+        AssembleByte(7, 0);
         /* Write the buffer to file */
         WriteOutBuffer(D);
         break;
     case smPacked:
-        AssembleByte(0, 0);
         i = 0;
         while (len) {
             if (ChoosePackagingMode(len, i, LineBuffer)) {
@@ -325,53 +291,54 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
         break;
 
     case smShaped:
-        if (LastOpaquePixel >= 0 && LastOpaquePixel < len) {
-            len = LastOpaquePixel;
-        }
-        AssembleByte(0, 0);
-        i = 0;
-        while (len) {
-            if (ChoosePackagingMode(len, i, LineBuffer)) {
-                /* Make runlength packet */
-                V = LineBuffer[i];
-                ++i;
-                --len;
-                count = 0;
-                do {
-                    ++count;
+        if (LastOpaquePixel > -1) {
+            if (LastOpaquePixel < len - 1) {
+                len = LastOpaquePixel + 1;
+            }
+            i = 0;
+            while (len) {
+                if (ChoosePackagingMode(len, i, LineBuffer)) {
+                    /* Make runlength packet */
+                    V = LineBuffer[i];
                     ++i;
                     --len;
-                } while (V == LineBuffer[i] && len && count != 15);
+                    count = 0;
+                    do {
+                        ++count;
+                        ++i;
+                        --len;
+                    } while (V == LineBuffer[i] && len && count != 15);
 
-                AssembleByte(5, count);
-                AssembleByte(ColorBits, V);
+                    AssembleByte(5, count);
+                    AssembleByte(ColorBits, V);
 
-            } else {
-                /* Make packed literal packet */
-                d_ptr = differ;
-                V = LineBuffer[i++];
-                *d_ptr++ = V;
-                --len;
-                count = 0;
-                while (ChoosePackagingMode(len, i, LineBuffer) == 0 && len && count != 15) {
+                } else {
+                    /* Make packed literal packet */
+                    d_ptr = differ;
                     V = LineBuffer[i++];
                     *d_ptr++ = V;
-                    ++count;
                     --len;
+                    count = 0;
+                    while (ChoosePackagingMode(len, i, LineBuffer) == 0 && len && count != 15) {
+                        V = LineBuffer[i++];
+                        *d_ptr++ = V;
+                        ++count;
+                        --len;
+                    }
+
+                    AssembleByte(5, count | 0x10);
+                    d_ptr = differ;
+                    do {
+                        AssembleByte(ColorBits, *d_ptr++);
+                    } while (--count >= 0);
+
                 }
-
-                AssembleByte(5, count | 0x10);
-                d_ptr = differ;
-                do {
-                    AssembleByte(ColorBits, *d_ptr++);
-                } while (--count >= 0);
-
             }
+            AssembleByte(5, 0);
+            AssembleByte(8, 0);
+            /* Write the buffer to file */
+            WriteOutBuffer(D);
         }
-        AssembleByte(5, 0);
-        AssembleByte(8, 0);
-        /* Write the buffer to file */
-        WriteOutBuffer(D);
         break;
     }
 }

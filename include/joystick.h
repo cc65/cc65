@@ -78,7 +78,7 @@ extern const unsigned char joy_masks[8];
 extern const char joy_stddrv[];
 
 /* The address of the static standard joystick driver for a platform */
-extern const char joy_static_stddrv[];
+extern const void joy_static_stddrv[];
 
 
 

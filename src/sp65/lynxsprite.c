@@ -113,6 +113,18 @@ static unsigned GetActionPointY (const Collection* A)
     }
 }
 
+static unsigned GetEdgeIndex (const Collection* A)
+/* Return the sprite mode from the attribute collection A */
+{
+    /* Get index for edge color in shaped mode */
+    const char* EdgeIndex = GetAttrVal (A, "edge");
+    if (EdgeIndex) {
+        return atoi(EdgeIndex);
+    } else {
+        return 0;
+    }
+}
+
 static char OutBuffer[512]; /* The maximum size is 508 pixels */
 static unsigned char OutIndex;
 
@@ -133,12 +145,12 @@ static void AssembleByte(unsigned bits, char val)
             byte <<= bit_counter;
             OutBuffer[OutIndex++] = byte;
             if (!OutIndex) {
-                Error ("ASprite is too large for the Lynx");
+                Error ("Sprite is too large for the Lynx");
             }
             if (byte & 0x1) {
                 OutBuffer[OutIndex++] = byte;
                 if (!OutIndex) {
-                    Error ("BSprite is too large for the Lynx");
+                    Error ("Sprite is too large for the Lynx");
                 }
             }
         }
@@ -150,7 +162,7 @@ static void AssembleByte(unsigned bits, char val)
             byte <<= bit_counter;
             OutBuffer[OutIndex++] = byte;
             if (!OutIndex) {
-                Error ("ASprite is too large for the Lynx");
+                Error ("Sprite is too large for the Lynx");
             }
         }
         return;
@@ -363,6 +375,10 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
     unsigned OX, OY;
     char ColorBits;
     char ColorMask;
+    char EdgeIndex;
+
+    /* Get EdgeIndex */
+    EdgeIndex = GetEdgeIndex (A);
 
     /* Action point of the sprite */
     OX = GetActionPointX (A);
@@ -417,7 +433,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             /* Fetch next bit into byte buffer */
             LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
 
-            if (LineBuffer[i]) {
+            if (LineBuffer[i] != EdgeIndex) {
                 LastOpaquePixel = i;
             }
             ++i;
@@ -451,7 +467,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             /* Fetch next bit into byte buffer */
             LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
 
-            if (LineBuffer[i]) {
+            if (LineBuffer[i] != EdgeIndex) {
                 LastOpaquePixel = i;
             }
             ++i;
@@ -485,7 +501,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             /* Fetch next bit into byte buffer */
             LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
 
-            if (LineBuffer[i]) {
+            if (LineBuffer[i] != EdgeIndex) {
                 LastOpaquePixel = i;
             }
             ++i;
@@ -509,7 +525,7 @@ StrBuf* GenLynxSprite (const Bitmap* B, const Collection* A)
             /* Fetch next bit into byte buffer */
             LineBuffer[i] = GetPixel (B, X, Y).Index & ColorMask;
 
-            if (LineBuffer[i]) {
+            if (LineBuffer[i] != EdgeIndex) {
                 LastOpaquePixel = i;
             }
             ++i;

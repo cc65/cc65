@@ -4549,7 +4549,7 @@ useful for assembler programs.
 
 Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
 id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
-name=".INTERRUPTOR"></tt> keywords it it possible to export functions in a
+name=".INTERRUPTOR"></tt> keywords it is possible to export functions in a
 special way. The linker is able to generate tables with all functions of a
 specific type. Such a table will <em>only</em> include symbols from object
 files that are linked into a specific executable. This may be used to add

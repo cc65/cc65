@@ -199,7 +199,7 @@ INIT:
 	lda	#$A0
 	sta	COLLBASH
 ; Put collision index before sprite data
-	lda	#$FE
+	lda	#$FF
 	sta	COLLOFFL
 	lda	#$FF
 	sta	COLLOFFH
@@ -260,12 +260,17 @@ CONTROL:
 
 	cmp	#5
 	bne	ControlSwap
-	lda	ptr1
+	lda	ptr1		; Activate/deactivate collission detection
 	bne	@L0
+       	lda	%00100000	; tgi_clear does not erase collision buffer
+	sta	cls_sprite+2
 	lda	__sprsys
 	ora	#$20
 	bra	@L1
-@L0:	lda	__sprsys
+@L0:	
+       	lda	%00000000	; tgi_clear erases collision buffer
+	sta	cls_sprite+2
+	lda	__sprsys
 	and	#$df
 @L1:	sta	__sprsys
 	sta	SPRSYS

@@ -97,7 +97,7 @@ typedef struct SCB_REHVST_PAL {             // SCB with all attributes
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
   unsigned int hsize;
@@ -112,7 +112,7 @@ typedef struct SCB_REHVST {                  // SCB without pallette
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
   unsigned int hsize;
@@ -126,7 +126,7 @@ typedef struct SCB_REHV {                 // SCB without stretch/tilt
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
   unsigned int hsize;
@@ -138,7 +138,7 @@ typedef struct SCB_REHV_PAL {             // SCB without str/tilt, w/ penpal
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
   unsigned int hsize;
@@ -151,7 +151,7 @@ typedef struct SCB_REHVS {                // SCB w/o tilt & penpal
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
   unsigned int hsize;
@@ -164,7 +164,7 @@ typedef struct SCB_REHVS_PAL {            // SCB w/o tilt w/penpal
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
   unsigned int hsize;
@@ -178,7 +178,7 @@ typedef struct SCB_RENONE {                 // SCB w/o size/stretch/tilt/pal
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
 } SCB_RENONE;
@@ -188,12 +188,27 @@ typedef struct SCB_RENONE_PAL {             // SCB w/o size/str/tilt w/penpal
   unsigned char sprctl1;
   unsigned char sprcoll;
   char *next;
-  char *data;
+  unsigned char *data;
   unsigned int hpos;
   unsigned int vpos;
   unsigned char penpal[8];
 } SCB_RENONE_PAL;
 
+typedef struct PENPAL_4 {
+  unsigned char penpal[8];
+} PENPAL_4;
+
+typedef struct PENPAL_3 {
+  unsigned char penpal[4];
+} PENPAL_3;
+
+typedef struct PENPAL_2 {
+  unsigned char penpal[2];
+} PENPAL_2;
+
+typedef struct PENPAL_1 {
+  unsigned char penpal[1];
+} PENPAL_1;
 
 /* Misc system defines */
 

@@ -262,13 +262,17 @@ CONTROL:
 	bne	ControlSwap
 	lda	ptr1		; Activate/deactivate collission detection
 	bne	@L0
-       	lda	%00100000	; tgi_clear does not erase collision buffer
+       	lda	#%11000001	; tgi_clear does not erase collision buffer
+	sta	cls_sprite
+       	lda	#%00100000
 	sta	cls_sprite+2
 	lda	__sprsys
 	ora	#$20
 	bra	@L1
 @L0:	
-       	lda	%00000000	; tgi_clear erases collision buffer
+       	lda	#%11000000	; tgi_clear erases collision buffer
+	sta	cls_sprite
+       	lda	#%00000000
 	sta	cls_sprite+2
 	lda	__sprsys
 	and	#$df
@@ -381,10 +385,11 @@ draw_sprite:			; Draw it in render buffer
 
 .rodata
 pixel_bitmap:
-        .byte   3,%10000100,%00000000, $0       ; A pixel bitmap
+        .byte   2,%00010000, 0                  ; A pixel bitmap
+.data
 cls_sprite:
-        .byte   %00000001			; A pixel sprite
-       	.byte   %00010000
+        .byte   %11000001			; A pixel sprite
+       	.byte   %10010000
        	.byte   %00100000
        	.addr   0,pixel_bitmap
        	.word   0

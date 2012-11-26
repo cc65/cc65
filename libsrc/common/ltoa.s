@@ -7,20 +7,17 @@
 
 	.export		_ltoa, _ultoa
 	.import	     	popax
-	.import		__hextab
+	.import		__hextab, __longminstr
 	.importzp	sreg, ptr1, ptr2, ptr3, tmp1
 
 
 
-.rodata
-specval:
-       	.byte  	'-', '2', '1', '4', '7', '4', '8', '3', '6', '4', '8', 0
 .code
 
 ;
 ; Common subroutine to pop the parameters and put them into core
 ;
-			     
+
 dopop: 	sta	tmp1  		; will loose high byte
    	jsr	popax 		; get s
    	sta	ptr1
@@ -56,12 +53,12 @@ _ltoa:	jsr	dopop 		; pop the arguments
    	bne	L2
 
    	ldy	#11
-L1:	lda	specval,y   	; copy -2147483648
+L1:	lda	__longminstr,y  ; copy -2147483648
    	sta    	(ptr1),y
     	dey
     	bpl	L1
     	jmp	L10
-
+                  
 ; Check if the value is negative. If so, write a - sign and negate the
 ; number.
 

@@ -42,6 +42,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 # From C source-files
 C_OBJS =	_afailed.o	        \
 		_hextab.o	        \
+                _longminstr.o           \
                 _poserror.o             \
 		_scanf.o	        \
 		abort.o		        \

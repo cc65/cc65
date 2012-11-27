@@ -98,8 +98,8 @@ typedef struct SCB_REHVST_PAL {             // SCB with all attributes
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
   unsigned int hsize;
   unsigned int vsize;
   unsigned int stretch;
@@ -113,8 +113,8 @@ typedef struct SCB_REHVST {                  // SCB without pallette
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
   unsigned int hsize;
   unsigned int vsize;
   unsigned int stretch;
@@ -127,8 +127,8 @@ typedef struct SCB_REHV {                 // SCB without stretch/tilt
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
   unsigned int hsize;
   unsigned int vsize;
 } SCB_REHV;
@@ -139,8 +139,8 @@ typedef struct SCB_REHV_PAL {             // SCB without str/tilt, w/ penpal
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
   unsigned int hsize;
   unsigned int vsize;
   unsigned char penpal[8];
@@ -152,8 +152,8 @@ typedef struct SCB_REHVS {                // SCB w/o tilt & penpal
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
   unsigned int hsize;
   unsigned int vsize;
   unsigned int stretch;
@@ -165,8 +165,8 @@ typedef struct SCB_REHVS_PAL {            // SCB w/o tilt w/penpal
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
   unsigned int hsize;
   unsigned int vsize;
   unsigned int stretch;
@@ -179,8 +179,8 @@ typedef struct SCB_RENONE {                 // SCB w/o size/stretch/tilt/pal
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
 } SCB_RENONE;
 
 typedef struct SCB_RENONE_PAL {             // SCB w/o size/str/tilt w/penpal
@@ -189,8 +189,8 @@ typedef struct SCB_RENONE_PAL {             // SCB w/o size/str/tilt w/penpal
   unsigned char sprcoll;
   char *next;
   unsigned char *data;
-  unsigned int hpos;
-  unsigned int vpos;
+  signed int hpos;
+  signed int vpos;
   unsigned char penpal[8];
 } SCB_RENONE_PAL;
 

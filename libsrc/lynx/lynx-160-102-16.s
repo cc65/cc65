@@ -387,6 +387,8 @@ draw_sprite:			; Draw it in render buffer
 pixel_bitmap:
         .byte   2,%00010000, 0                  ; A pixel bitmap
 .data
+collindex:
+	.byte	0
 cls_sprite:
         .byte   %11000001			; A pixel sprite
        	.byte   %10010000
@@ -554,6 +556,8 @@ GETDEFPALETTE:
 ;
 
 .data
+pixel_coll:
+	.byte	0
 pixel_sprite:
         .byte   %00000001			; A pixel sprite
        	.byte   %00010000
@@ -630,6 +634,8 @@ GETPIXEL:
 ;
 
 .data
+line_coll:
+	.byte	0
 line_sprite:
 	.byte   0		; Will be replaced by the code
 	.byte	%00110000
@@ -762,6 +768,8 @@ LINE:
 ;
 
 .data
+bar_coll:
+	.byte	0
 bar_sprite:
         .byte   %00000001			; A pixel sprite
      	.byte   %00010000
@@ -928,6 +936,8 @@ OUTTEXT:
         jmp	draw_sprite
 
 .data
+text_coll:
+	.byte 0
 text_sprite:
         .byte $00,$90,$20
         .addr 0, text_bitmap

@@ -106,6 +106,25 @@ extern void lynx_160_102_16[];    /* Referred to by tgi_static_stddrv[] */
 
 
 /*****************************************************************************/
+/*                           Sound support                                   */
+/*****************************************************************************/
+
+void lynx_snd_init ();
+/* Initialize the sound driver */
+
+void lynx_snd_pause ();
+/* Pause sound */
+
+void lynx_snd_unpause ();
+/* Continue sound after pause */
+
+void __fastcall__ lynx_snd_play (unsigned char channel, unsigned char *music);
+/* Play tune on channel */
+
+void lynx_snd_stop ();
+/* Stop sound on all channels */
+
+/*****************************************************************************/
 /*                           Accessing the cart                              */
 /*****************************************************************************/
 

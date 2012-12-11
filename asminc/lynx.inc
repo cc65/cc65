@@ -116,6 +116,7 @@ TIMER6      = $FD18
 TIMER7      = $FD1C
 HTIMER      = $FD00             ; horizontal line timer (timer 0)
 VTIMER      = $FD08             ; vertical blank timer (timer 2)
+STIMER      = $FD1C             ; sound timer (timer 7)
 
 HTIMBKUP    = $FD00             ; horizontal line timer (timer 0)
 HTIMCTLA    = $FD01
@@ -126,6 +127,10 @@ VTIMCTLA    = $FD09
 VTIMCNT     = $FD0A
 VTIMCTLB    = $FD0B
 BAUDBKUP    = $FD10             ; serial timer (timer 4)
+STIMBKUP    = $FD1C             ; sound timer (timer 7)
+STIMCTLA    = $FD1D
+STIMCNT     = $FD1E
+STIMCTLB    = $FD1F
 
 TIM0BKUP    = $FD00
 TIM0CTLA    = $FD01
@@ -216,6 +221,7 @@ TIMER7_INTERRUPT = $80
 HBL_INTERRUPT = TIMER0_INTERRUPT
 VBL_INTERRUPT = TIMER2_INTERRUPT
 SERIAL_INTERRUPT = TIMER4_INTERRUPT
+SND_INTERRUPT = TIMER7_INTERRUPT
 
 INTRST      = $FD80
 INTSET      = $FD81

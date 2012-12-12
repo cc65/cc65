@@ -85,6 +85,7 @@ OBJS =  bllhdr.o                \
         load.o                  \
         lseek.o                 \
         lynx-cart.o             \
+        lynx-snd.o              \
         mainargs.o              \
         open.o                  \
         oserror.o               \

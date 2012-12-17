@@ -189,13 +189,25 @@ static void AssembleByte(unsigned bits, char val)
     } while (--bits);
 }
 
-static unsigned char ChoosePackagingMode(signed len, signed index, char LineBuffer[512])
+static unsigned char ChoosePackagingMode(signed len, signed index, char ColorBits, char LineBuffer[512])
 {
     --len;
     if (!len) {
         return 0;
     }
     if (LineBuffer[index] != LineBuffer[index + 1]) {
+        return 0;
+    }
+    if (ColorBits > 2) {
+        return 1;
+    }
+    if (LineBuffer[index] != LineBuffer[index + 2]) {
+        return 0;
+    }
+    if (ColorBits > 1) {
+        return 1;
+    }
+    if (LineBuffer[index] != LineBuffer[index + 3]) {
         return 0;
     }
     return 1;
@@ -260,7 +272,7 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
     case smPacked:
         i = 0;
         while (len) {
-            if (ChoosePackagingMode(len, i, LineBuffer)) {
+            if (ChoosePackagingMode(len, i, ColorBits, LineBuffer)) {
                 /* Make runlength packet */
                 V = LineBuffer[i];
                 ++i;
@@ -282,7 +294,7 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
                 *d_ptr++ = V;
                 --len;
                 count = 0;
-                while (ChoosePackagingMode(len, i, LineBuffer) == 0 && len && count != 15) {
+                while (ChoosePackagingMode(len, i, ColorBits, LineBuffer) == 0 && len && count != 15) {
                     V = LineBuffer[i++];
                     *d_ptr++ = V;
                     ++count;
@@ -309,7 +321,7 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
             }
             i = 0;
             while (len) {
-                if (ChoosePackagingMode(len, i, LineBuffer)) {
+                if (ChoosePackagingMode(len, i, ColorBits, LineBuffer)) {
                     /* Make runlength packet */
                     V = LineBuffer[i];
                     ++i;
@@ -331,7 +343,7 @@ static void encodeSprite(StrBuf *D, enum Mode M, char ColorBits, char ColorMask,
                     *d_ptr++ = V;
                     --len;
                     count = 0;
-                    while (ChoosePackagingMode(len, i, LineBuffer) == 0 && len && count != 15) {
+                    while (ChoosePackagingMode(len, i, ColorBits, LineBuffer) == 0 && len && count != 15) {
                         V = LineBuffer[i++];
                         *d_ptr++ = V;
                         ++count;

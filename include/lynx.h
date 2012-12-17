@@ -115,7 +115,7 @@ void lynx_snd_init ();
 void lynx_snd_pause ();
 /* Pause sound */
 
-void lynx_snd_unpause ();
+void lynx_snd_continue ();
 /* Continue sound after pause */
 
 void __fastcall__ lynx_snd_play (unsigned char channel, unsigned char *music);

@@ -11,8 +11,10 @@
         .export		_lynx_snd_play
         .export		_lynx_snd_stop
         .export		_lynx_snd_pause
-        .export		_lynx_snd_unpause
+        .export		_lynx_snd_continue
 	.interruptor	lynx_snd_handler
+      	.import         popa
+        .importzp       ptr1
 
 ;----------------------------------------------------------------------------
 ; ZP variables that go into APPZP
@@ -1101,7 +1103,12 @@ set0:                ldy SndOffsets,x
 
 
 _lynx_snd_play:
-
+	sta ptr1
+	stx ptr1+1
+	jsr popa
+	tax
+	lda ptr1
+	ldy ptr1+1
                 php
                 pha
                 lda SndActive,x
@@ -1213,7 +1220,7 @@ _lynx_snd_pause:    php
                 rts
 
 
-_lynx_snd_unpause:   php
+_lynx_snd_continue:   php
                 sei
 SndPauseOff1:    lda #0 ; Selbsmodifizierter Code!!!
                 sta STIMCTLA

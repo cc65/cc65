@@ -69,7 +69,7 @@ Long options:
   --asm-args options            Pass options to the assembler
   --asm-define sym[=v]          Define an assembler symbol
   --asm-include-dir dir         Set an assembler include directory
-  --bin-include-dir dir         Set an assembker binary include directory
+  --bin-include-dir dir         Set an assembler binary include directory
   --bss-label name              Define and export a BSS segment label
   --bss-name seg                Set the name of the BSS segment
   --cc-args options             Pass options to the compiler

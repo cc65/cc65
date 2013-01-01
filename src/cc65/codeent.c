@@ -827,7 +827,8 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		    Out->RegX = 0;
 		}
             } else if (strcmp (E->Arg, "tosaslax") == 0) {
-                if ((In->RegA & 0x0F) >= 8) {
+                if (RegValIsKnown (In->RegA) && (In->RegA & 0x0F) >= 8) {
+                    printf ("Hey!\n");
                     Out->RegA = 0;
                 }
 	    } else if (strcmp (E->Arg, "tosorax") == 0) {

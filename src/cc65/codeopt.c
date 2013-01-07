@@ -1264,6 +1264,7 @@ static unsigned RunOptGroup4 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptTransfers2, 1);
     Changes += RunOptFunc (S, &DOptLoad2, 1);
     Changes += RunOptFunc (S, &DOptLoad3, 1);
+    Changes += RunOptFunc (S, &DOptDupLoads, 1);
 
     /* Return the number of changes */
     return Changes;

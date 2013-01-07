@@ -15,7 +15,7 @@
 .proc   _write
 
 	sta	ptr3
-	sta	ptr3+1	     	; save count as result
+       	stx     ptr3+1	     	; save count as result
 
         eor     #$FF
         sta     ptr2

@@ -1,7 +1,8 @@
 ;
-; Graphics driver for the 240x200x2 mode on the Atmos
+; Graphics driver for the 240x200x2 monochrome mode on the Atmos
 ;
 ; Stefan Haubenthal <polluks@sdf.lonestar.org>
+; 2012-08-11, Greg King <greg.king5@verizon.net>
 ;
 
 	.include	"zeropage.inc"
@@ -11,6 +12,9 @@
 	.include	"atmos.inc"
 
 	.macpack	generic
+
+XSIZE	=	6			; System font width
+YSIZE	=	8			; System font height
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
@@ -26,8 +30,8 @@
 	.word	200			; Y resolution
 	.byte	2			; Number of drawing colors
 	.byte	1			; Number of screens available
-xsize:	.byte	6			; System font X size
-	.byte	8			; System font Y size
+	.byte	XSIZE			; System font X size
+	.byte	YSIZE			; System font Y size
         .word   $011C                   ; Aspect ratio (based on 4/3 display)
         .byte   0                       ; TGI driver flags
 
@@ -65,7 +69,6 @@ X1		= ptr1
 Y1		= ptr2
 X2		= ptr3
 Y2		= ptr4
-RADIUS		= tmp1
 
 ; Absolute variables used in the code
 
@@ -90,7 +93,7 @@ INK		= $F210
 
 .rodata
 
-DEFPALETTE:	.byte	$00, $07
+DEFPALETTE:	.byte	0, 1
 
 .code
 
@@ -218,15 +221,7 @@ SETCOLOR:
 ;
 
 SETPALETTE:
-	ldy	#0
-	lda	(ptr1),y
-	sta	PARAM1
-	jsr	PAPER
-	ldy	#1
-	lda	(ptr1),y
-	sta	PARAM1
-	jsr	INK
-	lda	#TGI_ERR_OK
+	lda	#TGI_ERR_INV_FUNC	; This resolution has no palette
 	sta	ERROR
 	rts
 
@@ -263,15 +258,16 @@ GETDEFPALETTE:
 ;
 
 SETPIXEL:
+	lda	Y1
+	sta	PARAM2
 	lda	MODE
 mymode:	sta	PARAM3
 	lda	X1
 	sta	PARAM1
-	lda	Y1
-	sta	PARAM2
 	lda	#0
 	sta	PARAM1+1
 	sta	PARAM2+1
+	sta	PARAM3+1
 	jmp	CURSET
 
 ; ------------------------------------------------------------------------
@@ -316,6 +312,8 @@ LINE:
 	sta	PARAM2+1
 	lda	MODE
 	sta	PARAM3
+	ldx	#>0
+	stx	PARAM3+1
 	jmp	DRAW
 
 ; ------------------------------------------------------------------------
@@ -368,13 +366,11 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-	lda	X1
-	sta	PARAM1
 	lda	Y1
+	sub	#(YSIZE - 1)
 	sta	PARAM2
-	lda	#3
-	sta	PARAM3
-	jsr	CURSET
+	lda	#3		; (Move graphics cursor; don't draw)
+	jsr	mymode
 
 	ldy	#0
 @next:	lda	(ptr3),y
@@ -382,15 +378,21 @@ OUTTEXT:
 	sta	PARAM1
 	lda	#0
 	sta	PARAM2
+	sta	PARAM1+1
+	sta	PARAM2+1
+	sta	PARAM3+1
 	lda	MODE
 	sta	PARAM3
 	tya
 	pha
 	jsr	CHAR
-	lda	xsize
+	lda	#XSIZE
 	sta	PARAM1
 	lda	#0
 	sta	PARAM2
+	sta	PARAM1+1
+	sta	PARAM2+1
+	sta	PARAM3+1
 	lda	#3
 	sta	PARAM3
 	jsr	CURMOV

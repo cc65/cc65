@@ -2,12 +2,12 @@
 /*                                                                           */
 /*				   atmos.h                                   */
 /*                                                                           */
-/*		     Oric Atmos system specific definitions                  */
+/*		     Oric Atmos system-specific definitions                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002       Debrune Jérome, <jede@oric.org>                            */
-/* (C) 2003-2004  Ullrich von Bassewitz                                      */
+/* (C) 2003-2013  Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -55,6 +55,19 @@
 #define COLOR_MAGENTA	0x05
 #define COLOR_CYAN	0x06
 #define COLOR_WHITE	0x07
+
+/* TGI color defines */
+/* White and red are swapped, so that the pallete
+** driver is compatible with black-and-white drivers.
+*/
+#define TGI_COLOR_BLACK		COLOR_BLACK
+#define TGI_COLOR_WHITE		1
+#define TGI_COLOR_GREEN		COLOR_GREEN
+#define TGI_COLOR_YELLOW	COLOR_YELLOW
+#define TGI_COLOR_BLUE		COLOR_BLUE
+#define TGI_COLOR_MAGENTA	COLOR_MAGENTA
+#define TGI_COLOR_CYAN		COLOR_CYAN
+#define TGI_COLOR_RED		7
 
 
 

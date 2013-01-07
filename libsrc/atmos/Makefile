@@ -94,6 +94,7 @@ OBJS  =	_scrsize.o              \
         tgi_colors.o            \
         tgi_stat_stddrv.o       \
         tgi_stddrv.o            \
+        toascii.o               \
         wherex.o                \
         wherey.o                \
         write.o                 \
@@ -115,7 +116,7 @@ MOUS =
 
 SERS = atmos-acia.ser
 
-TGIS = atmos-240-200-2.tgi
+TGIS = atmos-240-200-2.tgi atmos-228-200-3.tgi
 
 #--------------------------------------------------------------------------
 # Targets

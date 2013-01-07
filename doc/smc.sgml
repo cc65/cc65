@@ -437,7 +437,7 @@ SMC GetChar, { LDA  SMC_AbsAdr, x }
 
   Example:
 <tscreen><verb>
-    SMC_TransferAddress JumpTo, #CloseChannel, Y
+    SMC_TransferAddress JumpTo, #CloseChannel
     ...
 SMC JumpTo, { JMP OpenChannel }
 </verb></tscreen>

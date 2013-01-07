@@ -180,11 +180,11 @@ SMC_StoreValue label, register
 
 .macro SMC_TransferAddressSingle        label, address, register
 .if .paramcount = 2 .or .match ((register), a)
-        .if (.match (.left (1, {adress}), #))
+        .if (.match (.left (1, {address}), #))
                 ; immediate mode
-        lda     #<(.right (.tcount ({adress})-1, {adress}))
+        lda     #<(.right (.tcount ({address})-1, {address}))
                 sta _SMCDesignator+1
-        lda #>(.right (.tcount ({adress})-1, {adress}))
+        lda #>(.right (.tcount ({address})-1, {address}))
                 sta _SMCDesignator+2
     .else
         ; assume absolute or zero page
@@ -194,11 +194,11 @@ SMC_StoreValue label, register
                 sta _SMCDesignator+2
         .endif
 .elseif .match ((register), x)
-        .if (.match (.left (1, {adress}), #))
+        .if (.match (.left (1, {address}), #))
                 ; immediate mode
-        ldx     #<(.right (.tcount ({adress})-1, {adress}))
+        ldx     #<(.right (.tcount ({address})-1, {address}))
                 stx _SMCDesignator+1
-        ldx #>(.right (.tcount ({adress})-1, {adress}))
+        ldx #>(.right (.tcount ({address})-1, {address}))
                 stx _SMCDesignator+2
     .else
         ; assume absolute or zero page
@@ -208,11 +208,11 @@ SMC_StoreValue label, register
                 stx _SMCDesignator+2
         .endif
 .elseif .match ((register), y)
-        .if (.match (.left (1, {adress}), #))
+        .if (.match (.left (1, {address}), #))
                 ; immediate mode
-        ldy     #<(.right (.tcount ({adress})-1, {adress}))
+        ldy     #<(.right (.tcount ({address})-1, {address}))
                 sty _SMCDesignator+1
-        ldy #>(.right (.tcount ({adress})-1, {adress}))
+        ldy #>(.right (.tcount ({address})-1, {address}))
                 sty _SMCDesignator+2
     .else
         ; assume absolute or zero page
@@ -226,11 +226,11 @@ SMC_StoreValue label, register
 
 
 .macro SMC_TransferAddress      label, address
-.if (.match (.left (1, {adress}), #))
+.if (.match (.left (1, {address}), #))
         ; immediate mode
-        lda	#<(.right (.tcount ({adress})-1, {adress}))
+        lda	#<(.right (.tcount ({address})-1, {address}))
         sta _SMCDesignator+1
-        ldx #>(.right (.tcount ({adress})-1, {adress}))
+        ldx #>(.right (.tcount ({address})-1, {address}))
         stx _SMCDesignator+2
 .else
         ; assume absolute or zero page

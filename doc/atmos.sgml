@@ -3,9 +3,10 @@
 <article>
 
 <title>Oric Atmos specific information for cc65
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-Stefan A. Haubenthal, <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org">
-<date>2005-07-17
+<author>Ullrich von Bassewitz <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"><newline>
+Stefan A. Haubenthal <htmlurl url="mailto:polluks@sdf.lonestar.org" name="polluks@sdf.lonestar.org"><newline>
+<url url="mailto:greg.king5@verizon.net" name="Greg King">
+<date>2013-01-08
 
 <abstract>
 An overview over the Atmos runtime system as it is implemented for the cc65 C
@@ -111,9 +112,17 @@ The names in the parentheses denote the symbols to be used for static linking of
 
 <descrip>
 
+  <tag><tt/atmos-228-200-3.tgi (atmos_228_200_3)/</tag>
+  This driver was written by Greg King and Stefan Haubenthal.
+  It features a resolution of 228&times;200 with a palette of two colors that
+  can be chosen from the Atmos's eight colors.  The driver supports a third
+  palette-"color" that actually "flips" the pixel (it becomes the other color)
+  that is on the screen under the graphics cursor.
+
   <tag><tt/atmos-240-200-2.tgi (atmos_240_200_2)/</tag>
-  This driver was written by Stefan Haubenthal. It features a resolution of
-  240&times;200 with 2 colors.
+  This driver was written by Stefan Haubenthal and Greg King.
+  It features a resolution of 240&times;200 with black and white colors.
+  It is the default graphics driver for the Atmos.
 
 </descrip><p>
 
@@ -133,7 +142,6 @@ No extended memory drivers are currently available for the Atmos.
 </descrip><p>
 
 
-
 <sect1>Mouse drivers<p>
 
 No mouse drivers are currently available for the Atmos.
@@ -149,7 +157,7 @@ No mouse drivers are currently available for the Atmos.
   Note that because of the peculiarities of the 6551 chip together with the
   use of the NMI, transmits are not interrupt driven, and the transceiver
   blocks if the receiver asserts flow control because of a full buffer.
-  
+
 </descrip><p>
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -62,6 +62,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "ubiquitous_idents",
     "c_comments",
     "force_range",
+    "underline_in_numbers",
 };
 
 
@@ -117,6 +118,7 @@ feature_t SetFeature (const StrBuf* Key)
         case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = 1;    break;
         case FEAT_C_COMMENTS:                 CComments         = 1;    break;
         case FEAT_FORCE_RANGE:                ForceRange        = 1;    break;
+        case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= 1;    break;
 	default:      			 /* Keep gcc silent */	        break;
     }
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -64,6 +64,7 @@ typedef enum {
     FEAT_UBIQUITOUS_IDENTS,
     FEAT_C_COMMENTS,
     FEAT_FORCE_RANGE,
+    FEAT_UNDERLINE_IN_NUMBERS,
 
     /* Special value: Number of features available */
     FEAT_COUNT

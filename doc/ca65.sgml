@@ -2719,6 +2719,17 @@ Here's a list of all control commands and a description, what they do:
     same name. This does also make it possible to introduce hard to find errors
     in your code, so be careful!
 
+  <tag><tt>underline_in_numbers</tt><label id="underline_in_numbers"></tag>
+
+    Allow underlines within numeric constants. These may be used for grouping
+    the digits of numbers for easier reading.
+    Example:
+    <tscreen><verb>
+        .feature        underline_in_numbers
+        .word           %1100001110100101
+        .word           %1100_0011_1010_0101    ; Identical but easier to read
+    </verb></tscreen>
+
   </descrip>
 
   It is also possible to specify features on the command line using the

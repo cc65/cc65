@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -862,7 +862,7 @@ Again:
      	if (!IsXDigit (C)) {
 	    if (DollarIsPC) {
 	     	CurTok.Tok = TOK_PC;
-		return;
+	    	return;
 	    } else {
      	     	Error ("Hexadecimal digit expected");
 	    }
@@ -870,14 +870,26 @@ Again:
 
       	/* Read the number */
      	CurTok.IVal = 0;
-     	while (IsXDigit (C)) {
-     	    if (CurTok.IVal & 0xF0000000) {
-     	    	Error ("Overflow in hexadecimal number");
-     		CurTok.IVal = 0;
-     	    }
-     	    CurTok.IVal = (CurTok.IVal << 4) + DigitVal (C);
-     	    NextChar ();
-     	}
+        while (1) {
+            if (UnderlineInNumbers && C == '_') {
+                while (C == '_') {
+                    NextChar ();
+                }
+                if (!IsXDigit (C)) {
+                    Error ("Number may not end with underline");
+                }
+            }
+            if (IsXDigit (C)) {
+                if (CurTok.IVal & 0xF0000000) {
+                    Error ("Overflow in hexadecimal number");
+                    CurTok.IVal = 0;
+                }
+                CurTok.IVal = (CurTok.IVal << 4) + DigitVal (C);
+                NextChar ();
+            } else {
+                break;
+            }
+        }
 
      	/* This is an integer constant */
     	CurTok.Tok = TOK_INTCON;
@@ -895,14 +907,26 @@ Again:
 
       	/* Read the number */
         CurTok.IVal = 0;
-	while (IsBDigit (C)) {
-	    if (CurTok.IVal & 0x80000000) {
-	       	Error ("Overflow in binary number");
-	       	CurTok.IVal = 0;
-	    }
-	    CurTok.IVal = (CurTok.IVal << 1) + DigitVal (C);
-    	    NextChar ();
- 	}
+        while (1) {
+            if (UnderlineInNumbers && C == '_') {
+                while (C == '_') {
+                    NextChar ();
+                }
+                if (!IsBDigit (C)) {
+                    Error ("Number may not end with underline");
+                }
+            }
+            if (IsBDigit (C)) {
+                if (CurTok.IVal & 0x80000000) {
+                    Error ("Overflow in binary number");
+                    CurTok.IVal = 0;
+                }
+                CurTok.IVal = (CurTok.IVal << 1) + DigitVal (C);
+                NextChar ();
+            } else {
+                break;
+            }
+        }
 
 	/* This is an integer constant */
         CurTok.Tok = TOK_INTCON;
@@ -926,17 +950,27 @@ Again:
 
         /* Read the number into Buf counting the digits */
         Digits = 0;
-        while (IsXDigit (C)) {
-
-            /* Buf is big enough to allow any decimal and hex number to
-             * overflow, so ignore excess digits here, they will be detected
-             * when we convert the value.
-             */
-            if (Digits < sizeof (Buf)) {
-                Buf[Digits++] = C;
+        while (1) {
+            if (UnderlineInNumbers && C == '_') {
+                while (C == '_') {
+                    NextChar ();
+                }
+                if (!IsXDigit (C)) {
+                    Error ("Number may not end with underline");
+                }
             }
-
-            NextChar ();
+            if (IsXDigit (C)) {
+                /* Buf is big enough to allow any decimal and hex number to
+                 * overflow, so ignore excess digits here, they will be detected
+                 * when we convert the value.
+                 */
+                if (Digits < sizeof (Buf)) {
+                    Buf[Digits++] = C;
+                }
+                NextChar ();
+            } else {
+                break;
+            }
         }
 
         /* Allow zilog/intel style hex numbers with a 'h' suffix */

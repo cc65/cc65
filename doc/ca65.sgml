@@ -1694,7 +1694,7 @@ either a string or an expression.
   <tscreen><verb>
         .struct Point                   ; Struct size = 4
                 xcoord  .word
-                xcoord  .word
+                ycoord  .word
         .endstruct
 
         P:      .tag    Point           ; Declare a point

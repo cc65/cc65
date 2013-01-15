@@ -12,7 +12,7 @@ _isdigit:
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-       	and    	#CT_DIGIT	; Mask digit bit
+	and	#CT_DIGIT	; Mask digit bit
 	rts
 
 @L1:	lda	#$00		; Return false

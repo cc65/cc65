@@ -12,7 +12,7 @@ _isalpha:
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-       	and    	#CT_ALPHA	; Mask character bits
+	and	#CT_ALPHA	; Mask character bits
 	rts
 
 @L1:	lda	#$00		; Return false

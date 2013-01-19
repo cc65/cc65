@@ -639,9 +639,9 @@ segment, than storing it into one of the ROMs, we have to put it there. But
 unfortunately, ROM is not writable, so we have to copy it into RAM before
 running the actual code.
 
-The linker cannot help you copying the data from ROM into RAM (this must be
-done by the startup code of your program), but it has some features that will
-help you in this process.
+The linker won't copy the data from ROM into RAM for you (this must be done by
+the startup code of your program), but it has some features that will help you
+in this process.
 
 First, you may not only specify a "<tt/load/" attribute for a segment, but
 also a "<tt/run/" attribute. The "<tt/load/" attribute is mandatory, and, if
@@ -683,6 +683,10 @@ So, what your startup code must do, is to copy <tt/__DATA_SIZE__/ bytes from
 <tt/__DATA_LOAD__/ to <tt/__DATA_RUN__/ before any other routines are called.
 All references to labels in the <tt/DATA/ segment are relocated to <tt/RAM2/
 by the linker, so things will work properly.
+
+There's a library subroutine called <tt/copydata/ (in a module named
+<tt/copydata.s/) that might be used to do actual copying. Be sure to have a
+look at it's inner workings before using it!
 
 
 <sect1>Other MEMORY area attributes<p>
@@ -939,7 +943,7 @@ The <tt/CONDES/ feature has several attributes:
   This attribute defines a valid symbol name, that is added as an import
   to the modules defining a constructor/desctructor of the given type.
   This can be used to force linkage of a module if this module exports the
-  requested symbol. 
+  requested symbol.
 
 </descrip>
 

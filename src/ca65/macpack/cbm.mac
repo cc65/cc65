@@ -56,7 +56,7 @@
         .endif
 
         ; Call the macro recursively with the remaining args
-        scrcode arg2, arg3, arg4, arg5, arg6, arg7, arg8
+        scrcode arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 .endmacro
 
-                        
+

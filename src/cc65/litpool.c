@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -169,7 +169,7 @@ void ReleaseLiteral (Literal* L)
 /* Decrement the reference counter for the literal */
 {
     --L->RefCount;
-    CHECK (L->RefCount >= 0 && (L->RefCount > 0 || !L->Output));
+    CHECK (L->RefCount >= 0);
 }
 
 

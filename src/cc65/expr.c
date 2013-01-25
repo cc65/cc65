@@ -1744,6 +1744,13 @@ void hie10 (ExprDesc* Expr)
     	       	CodeMark Mark;
                 GetCodePos (&Mark);
      	       	hie10 (Expr);
+                /* If the expression is a literal string, release it, so it
+                 * won't be output as data if not used elsewhere.
+                 */
+                if (ED_IsLocLiteral (Expr)) {
+                    ReleaseLiteral (Expr->LVal);
+                }
+                /* Calculate the size */
      	       	Size = CheckedSizeOf (Expr->Type);
     	       	/* Remove any generated code */
     	       	RemoveCode (&Mark);

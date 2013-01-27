@@ -65,7 +65,7 @@ Long options:
 </verb></tscreen>
 
 
-<sect1>Command line options in detail<p>
+<sect1>Command line options in detail<label id="cmdline-opt-detail"><p>
 
 Here is a description of all the command line options:
 
@@ -114,7 +114,7 @@ Here is a description of all the command line options:
 
   <tag><tt>--dump-scopes</tt></tag>
 
-  Dump the scope (lexical level) information contained in the object file. 
+  Dump the scope (lexical level) information contained in the object file.
 
 
   <tag><tt>-S, --dump-segsize</tt></tag>
@@ -141,8 +141,8 @@ Here is a description of all the command line options:
 
 The converter will read one or more object files per invocation and write the
 contents in readable format to standard output. Please note that you need to
-specify and of the <tt/--dump/ options listed above, otherwise no useful
-output will be generated.
+specify any of the <tt/--dump/ options listed <ref id="cmdline-opt-detail"
+name="above">, otherwise no useful output will be generated.
 
 Example output for the command
 <tscreen><verb>

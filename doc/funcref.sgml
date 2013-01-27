@@ -6325,7 +6325,7 @@ tgi_ellipse (50, 40, 40, 20);
 <descrip>
 <tag/Function/Free a vector font that was previously loaded into memory.
 <tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
-<tag/Declaration/<tt/void tgi_free_vectorfont (const tgi_vectorfont* font);/
+<tag/Declaration/<tt/void __fastcall__ tgi_free_vectorfont (const tgi_vectorfont* font);/
 <tag/Description/Free a vector font that was previously loaded into memory.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only

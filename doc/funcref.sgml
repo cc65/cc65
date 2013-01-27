@@ -630,6 +630,7 @@ communication.
 <item><ref id="tgi_clear" name="tgi_clear">
 <item><ref id="tgi_done" name="tgi_done">
 <item><ref id="tgi_ellipse" name="tgi_ellipse">
+<item><ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
 <item><ref id="tgi_getaspectratio" name="tgi_getaspectratio">
 <item><ref id="tgi_getcolor" name="tgi_getcolor">
 <item><ref id="tgi_getcolorcount" name="tgi_getcolorcount">
@@ -642,15 +643,19 @@ communication.
 <item><ref id="tgi_getpagecount" name="tgi_getpagecount">
 <item><ref id="tgi_getpalette" name="tgi_getpalette">
 <item><ref id="tgi_getpixel" name="tgi_getpixel">
+<item><ref id="tgi_gettextheight" name="tgi_gettextheight">
+<item><ref id="tgi_gettextwidth" name="tgi_gettextwidth">
 <item><ref id="tgi_getxres" name="tgi_getxres">
 <item><ref id="tgi_getyres" name="tgi_getyres">
 <item><ref id="tgi_gotoxy" name="tgi_gotoxy">
 <item><ref id="tgi_init" name="tgi_init">
 <item><ref id="tgi_install" name="tgi_install">
+<item><ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">
 <item><ref id="tgi_ioctl" name="tgi_ioctl">
 <item><ref id="tgi_line" name="tgi_line">
 <item><ref id="tgi_lineto" name="tgi_lineto">
 <item><ref id="tgi_load_driver" name="tgi_load_driver">
+<item><ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">
 <item><ref id="tgi_outtext" name="tgi_outtext">
 <item><ref id="tgi_outtextxy" name="tgi_outtextxy">
 <item><ref id="tgi_setaspectratio" name="tgi_setaspectratio">
@@ -659,9 +664,8 @@ communication.
 <item><ref id="tgi_setpalette" name="tgi_setpalette">
 <item><ref id="tgi_setpixel" name="tgi_setpixel">
 <item><ref id="tgi_setviewpage" name="tgi_setviewpage">
-<item><ref id="tgi_gettextheight" name="tgi_gettextheight">
+<item><ref id="tgi_settextscale" name="tgi_settextscale">
 <item><ref id="tgi_settextstyle" name="tgi_settextstyle">
-<item><ref id="tgi_gettextwidth" name="tgi_gettextwidth">
 <item><ref id="tgi_uninstall" name="tgi_uninstall">
 <item><ref id="tgi_unload" name="tgi_unload">
 </itemize>
@@ -6315,6 +6319,27 @@ tgi_ellipse (50, 40, 40, 20);
 </quote>
 
 
+<sect1>tgi_free_vectorfont<label id="tgi_free_vectorfont"><p>
+
+<quote>
+<descrip>
+<tag/Function/Free a vector font that was previously loaded into memory.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void tgi_free_vectorfont (const tgi_vectorfont* font);/
+<tag/Description/Free a vector font that was previously loaded into memory.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">,
+<ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>tgi_getaspectratio<label id="tgi_getaspectratio"><p>
 
 <quote> <descrip> <tag/Function/Return the pixel aspect ratio.
@@ -6639,6 +6664,30 @@ tgi_init(); //Set up the default palette and clear the screen.
 </quote>
 
 
+<sect1>tgi_install_vectorfont<label id="tgi_install_vectorfont"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install an already loaded driver and return an error code.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_install_vectorfont (const tgi_vectorfont* font);/
+<tag/Description/
+Install a vector font for use. More than one vector font can be loaded,
+but only one can be active. This function is used to tell which one. Call
+with a NULL pointer to uninstall the currently installed font.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_load_vectorfont" name="tgi_load_vectorfont">,
+<ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>tgi_ioctl<label id="tgi_ioctl"><p>
 
 <quote>
@@ -6732,6 +6781,30 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/Other tgi functions.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>tgi_load_vectorfont<label id="tgi_load_vectorfont"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load the given vector font.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/const tgi_vectorfont* __fastcall__ tgi_load_vectorfont (const char* name);/
+<tag/Description/
+Load a vector font into memory and return it. In case of errors, NULL is
+returned and an error is set, which can be retrieved using tgi_geterror.
+To use the font, it has to be installed using tgi_install_vectorfont.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_install_vectorfont" name="tgi_install_vectorfont">,
+<ref id="tgi_free_vectorfont" name="tgi_free_vectorfont">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -6982,6 +7055,27 @@ be used in presence of a prototype.
 </descrip>
 </quote>
 
+<sect1>tgi_settextscale<label id="tgi_settextscale"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the scaling for text output.
+<tag/Header/<tt/<ref id="tgi.h" name="tgi.h">/
+<tag/Declaration/<tt/void __fastcall__ tgi_settextscale (unsigned width, unsigned height);/
+<tag/Description/
+Set the scaling for text output. The scaling factors for width and height
+are 8.8 fixed point values. This means that $100 = 1 $200 = 2 etc.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="tgi_settextstyle" name="tgi_settextstyle">
+<tag/Example/None.
+</descrip>
+</quote>
+
 <sect1>tgi_settextstyle<label id="tgi_settextstyle"><p>
 
 <quote>
@@ -6995,7 +7089,8 @@ be used in presence of a prototype.
 be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
-<tag/See also/Other tgi functions.
+<tag/See also/
+<ref id="tgi_settextscale" name="tgi_settextscale">
 <tag/Example/None.
 </descrip>
 </quote>

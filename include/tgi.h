@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2011, Ullrich von Bassewitz                                      */
+/* (C) 2002-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -111,7 +111,7 @@ void __fastcall__ tgi_install_vectorfont (const tgi_vectorfont* font);
  * with a NULL pointer to uninstall the currently installed font.
  */
 
-void tgi_free_vectorfont (const tgi_vectorfont* font);
+void __fastcall__ tgi_free_vectorfont (const tgi_vectorfont* font);
 /* Free a vector font that was previously loaded into memory. */
 
 unsigned char tgi_geterror (void);

@@ -1099,8 +1099,7 @@ set0:                ldy SndOffsets,x
         _IFPL
             jmp set0
         _ENDIF
-                rts
-
+	rts
 
 _lynx_snd_play:
 	sta ptr1
@@ -1109,136 +1108,140 @@ _lynx_snd_play:
 	tax
 	lda ptr1
 	ldy ptr1+1
-                php
-                pha
-                lda SndActive,x
-                _IFNE
-                  dec SndReqStop,x
-                  lda #1
-                  sta SndDelay,x
-start0:                lda SndActive,x
-                  bne start0
-                _ENDIF
-                bra start1
+	php
+	pha
+	lda SndActive,x
+	_IFNE
+		dec SndReqStop,x
+		lda #1
+		sta SndDelay,x
+start0:		lda SndActive,x
+		bne start0
+	_ENDIF
+	bra start1
 SndStartSoundx:
-                php
-                pha
-
-start1:              sei
-                pla
-                sta SndPtrLo,x
-                tya
-                sta SndPtrHi,x
-                lda #1
-                sta SndDelay,x
-                stz SndEnvVol,x
-                stz SndEnvFrq,x
-                stz SndEnvWave,x
-                sta SndActive,x
-                stz SndReqStop,x
-                plp
-                rts
+	php
+	pha
+start1:
+	sei
+	pla
+	sta SndPtrLo,x
+	tya
+	sta SndPtrHi,x
+	lda #1
+	sta SndDelay,x
+	stz SndEnvVol,x
+	stz SndEnvFrq,x
+	stz SndEnvWave,x
+	sta SndActive,x
+	stz SndReqStop,x
+	plp
+	rts
 SndStartSound2:
-                pha
-
-                lda SndActive,x         ; check default
-                beq start20                  ; inactive => ok
-                phx
-                ldx #3                  ; search free channel
-start21:                lda SndActive,x
-                  beq start22                ; found =>
-                  dex
-                bpl start21
-                plx                     ; not found
-                dec SndReqStop,x        ; stop default-channel
-                lda #1
-                sta SndDelay,x
-start23:                lda SndActive,x
-                bne start23
-                bra start20
-start22:              pla             ; clear stack
-
-start20:              pla
-                phx
-                jsr SndStartSoundx      ; launch new sound
-                plx
-                rts
-
+	pha
+	lda SndActive,x         ; check default
+	beq start20                  ; inactive => ok
+	phx
+	ldx #3                  ; search free channel
+start21:
+	lda SndActive,x
+	beq start22                ; found =>
+	dex
+	bpl start21
+	plx                     ; not found
+	dec SndReqStop,x        ; stop default-channel
+	lda #1
+	sta SndDelay,x
+start23:
+	lda SndActive,x
+	bne start23
+	bra start20
+start22:
+	pla             ; clear stack
+start20:
+	pla
+	phx
+	jsr SndStartSoundx      ; launch new sound
+	plx
+	rts
 
 _lynx_snd_stop:
-                ldx #3
-                  lda SndActive,x
-                  _IFNE
-stop0:                  dec SndReqStop,x
-                    lda #1
-                    sta SndDelay,x
-stop1:                  lda SndActive,x
-                    bne stop1
-                  _ENDIF
-                  dex
-                bpl stop0
-                rts
+	ldx #3
+	lda SndActive,x
+	_IFNE
+stop0:		dec SndReqStop,x
+		lda #1
+		sta SndDelay,x
+stop1:		lda SndActive,x
+		bne stop1
+	_ENDIF
+	dex
+	bpl stop0
+	rts
 
-SndStopChannel:
-                lda SndActive,x
-                _IFNE
-                  dec SndReqStop,x
-                  lda #1
-                  sta SndDelay,x
-stopc1:                lda SndActive,x
-                  bne stopc1
-                _ENDIF
-                rts
+_lynx_snd_stop_channel:
+	lda SndActive,x
+	_IFNE
+		dec SndReqStop,x
+		lda #1
+		sta SndDelay,x
+stopc1:		lda SndActive,x
+		bne stopc1
+	_ENDIF
+	rts
 
-SndChannelsActive:
-                ldx #3
-                lda #0
-act0:                ldy SndActive,x
-                  _IFNE
-                    ora SndMask,x
-                  _ENDIF
-                  dex
-                bpl act0
-                rts
+_lynx_snd_active:
+	ldx #3
+	lda #0
+act0:	ldy SndActive,x
+	_IFNE
+		ora SndMask,x
+	_ENDIF
+	dex
+	bpl act0
+	rts
 
+_lynx_snd_pause:
+	php
+	sei
+	lda STIMCTLA
+	sta SndPauseOff1+1
+	stz STIMCTLA
+	lda MSTEREO
+	sta SndPauseOff2+1
+	lda #$ff
+	sta MSTEREO
+	lda #$18
+	trb AUD0CTLA
+	trb AUD1CTLA
+	trb AUD2CTLA
+	trb AUD3CTLA
+	plp
+	rts
 
-_lynx_snd_pause:    php
-                sei
-                lda STIMCTLA
-                sta SndPauseOff1+1
-                stz STIMCTLA
-                lda MSTEREO
-                sta SndPauseOff2+1
-                lda #$ff
-                sta MSTEREO
-                lda #$18
-                trb AUD0CTLA
-                trb AUD1CTLA
-                trb AUD2CTLA
-                trb AUD3CTLA
-                plp
-                rts
+_lynx_snd_continue:
+	php
+	sei
+SndPauseOff1:
+	lda #0 ; Selbsmodifizierter Code!!!
+	sta STIMCTLA
+SndPauseOff2:
+	lda #0 ; Selbsmodifizierter Code!!!
+	sta MSTEREO
 
+	lda #$18
+	tsb AUD0CTLA
+	tsb AUD1CTLA
+	tsb AUD2CTLA
+	tsb AUD3CTLA
 
-_lynx_snd_continue:   php
-                sei
-SndPauseOff1:    lda #0 ; Selbsmodifizierter Code!!!
-                sta STIMCTLA
-SndPauseOff2:    lda #0 ; Selbsmodifizierter Code!!!
-                sta MSTEREO
+	plp
+	rts
 
-               lda #$18
-                tsb AUD0CTLA
-                tsb AUD1CTLA
-                tsb AUD2CTLA
-                tsb AUD3CTLA
+	.rodata
 
-                plp
-                rts
-
-            .rodata
-
-SndMask:       .byte 1,2,4,8
+SndMask:
+	.byte 1,2,4,8
 
 SndPrescaler:
 	.byte $00,$06,$06,$06,$06,$05,$05,$05,$05,$05,$05,$05,$04,$04,$04,$04

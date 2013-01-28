@@ -8,13 +8,14 @@
 	.include	"zeropage.inc"
 
 	.export		_lynx_snd_init
-        .export		_lynx_snd_play
-        .export		_lynx_snd_stop
-        .export		_lynx_snd_pause
-        .export		_lynx_snd_continue
+	.export		_lynx_snd_active
+	.export		_lynx_snd_play
+	.export		_lynx_snd_stop
+	.export		_lynx_snd_pause
+	.export		_lynx_snd_continue
 	.interruptor	lynx_snd_handler
-      	.import         popa
-        .importzp       ptr1
+	.import         popa
+	.importzp       ptr1
 
 ;----------------------------------------------------------------------------
 ; ZP variables that go into APPZP

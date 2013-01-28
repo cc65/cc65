@@ -124,6 +124,9 @@ void __fastcall__ lynx_snd_play (unsigned char channel, unsigned char *music);
 void lynx_snd_stop ();
 /* Stop sound on all channels */
 
+unsigned char lynx_snd_active();
+/* Show which channels are active */
+
 /*****************************************************************************/
 /*                           Accessing the cart                              */
 /*****************************************************************************/

@@ -11,6 +11,7 @@
 	.export		_lynx_snd_active
 	.export		_lynx_snd_play
 	.export		_lynx_snd_stop
+	.export		_lynx_snd_stop_channel
 	.export		_lynx_snd_pause
 	.export		_lynx_snd_continue
 	.interruptor	lynx_snd_handler
@@ -1181,6 +1182,7 @@ stop1:		lda SndActive,x
 	rts
 
 _lynx_snd_stop_channel:
+	tax
 	lda SndActive,x
 	_IFNE
 		dec SndReqStop,x

@@ -596,10 +596,10 @@ names here. Segments that go into <tt/ROM1/ will be written to a file named
 named "rom2.bin". The name given on the command line is ignored in both cases.
 
 Assigning an empty file name for a memory area will discard the data written
-to it. This is useful, if the a memory area has segments assigned that are
-empty (for example because they are of type bss). In that case, the linker
-will create an empty output file. This may be suppressed by assigning an empty
-file name to that memory area.
+to it. This is useful, if the memory area has segments assigned that are empty
+(for example because they are of type bss). In that case, the linker will
+create an empty output file. This may be suppressed by assigning an empty file
+name to that memory area.
 
 The <tt/%O/ sequence is also allowed inside a string. So using
 

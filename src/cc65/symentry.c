@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -100,6 +100,7 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
       	{ "SC_TYPEDEF",	    SC_TYPEDEF	        },
         { "SC_BITFIELD",    SC_BITFIELD         },
        	{ "SC_STRUCTFIELD", SC_STRUCTFIELD	},
+        { "SC_UNION",       SC_UNION            },
       	{ "SC_STRUCT", 	    SC_STRUCT	        },
     	{ "SC_AUTO",   	    SC_AUTO	        },
     	{ "SC_REGISTER",    SC_REGISTER	        },
@@ -125,7 +126,7 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     /* Print the assembler name if we have one */
     if (E->AsmName) {
         fprintf (F, "    AsmName: %s\n", E->AsmName);
-    }
+    }                                             
 
     /* Print the flags */
     SymFlags = E->Flags;
@@ -216,7 +217,7 @@ void SymSetAsmName (SymEntry* Sym)
 
     /* Cannot be used to change the name */
     PRECONDITION (Sym->AsmName == 0);
-                 
+
     /* The assembler name starts with an underline */
     Len = strlen (Sym->Name);
     Sym->AsmName = xmalloc (Len + 2);

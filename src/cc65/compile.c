@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -150,7 +150,7 @@ static void Parse (void)
              * This means that "extern int i;" will not get storage allocated.
              */
 	    if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
-                (Decl.StorageClass & SC_TYPEDEF) != SC_TYPEDEF    &&
+                (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF    &&
                 ((Spec.Flags & DS_DEF_STORAGE) != 0         ||
                  (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
                  ((Decl.StorageClass & SC_EXTERN) != 0 &&

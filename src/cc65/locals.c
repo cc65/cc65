@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -176,7 +176,7 @@ static void ParseRegisterDecl (Declaration* Decl, int Reg)
 
 
 
-static void ParseAutoDecl (Declaration* Decl)    
+static void ParseAutoDecl (Declaration* Decl)
 /* Parse the declaration of an auto variable. */
 {
     unsigned  Flags;
@@ -440,7 +440,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
     /* Handle anything that needs storage (no functions, no typdefs) */
     if ((Decl.StorageClass & SC_FUNC) != SC_FUNC &&
-         (Decl.StorageClass & SC_TYPEDEF) != SC_TYPEDEF) {
+         (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
 
         /* If we have a register variable, try to allocate a register and
          * convert the declaration to "auto" if this is not possible.

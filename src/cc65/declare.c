@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -527,17 +527,17 @@ static int ParseFieldWidth (Declaration* Decl)
 
 
 
-static SymEntry* StructOrUnionForwardDecl (const char* Name)
+static SymEntry* StructOrUnionForwardDecl (const char* Name, unsigned Type)
 /* Handle a struct or union forward decl */
 {
-    /* Try to find a struct with the given name. If there is none,
+    /* Try to find a struct/union with the given name. If there is none,
      * insert a forward declaration into the current lexical level.
      */
     SymEntry* Entry = FindTagSym (Name);
     if (Entry == 0) {
-        Entry = AddStructSym (Name, 0, 0);
-    } else if (SymIsLocal (Entry) && (Entry->Flags & SC_STRUCT) != SC_STRUCT) {
-        /* Already defined in the level, but no struct */
+        Entry = AddStructSym (Name, Type, 0, 0);
+    } else if ((Entry->Flags & SC_TYPEMASK) != Type) {
+        /* Already defined, but no struct */
         Error ("Symbol `%s' is already different kind", Name);
     }
     return Entry;
@@ -574,7 +574,7 @@ static unsigned CopyAnonStructFields (const Declaration* Decl, int Offs)
         /* Enter a copy of this symbol adjusting the offset. We will just
          * reuse the type string here.
          */
-        AddLocalSym (Entry->Name, Entry->Type,SC_STRUCTFIELD, Offs + Entry->V.Offs);
+        AddLocalSym (Entry->Name, Entry->Type, SC_STRUCTFIELD, Offs + Entry->V.Offs);
 
         /* Currently, there can not be any attributes, but if there will be
          * some in the future, we want to know this.
@@ -604,11 +604,11 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
     if (CurTok.Tok != TOK_LCURLY) {
     	/* Just a forward declaration. */
-    	return StructOrUnionForwardDecl (Name);
+    	return StructOrUnionForwardDecl (Name, SC_UNION);
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
-    Entry = AddStructSym (Name, 0, 0);
+    Entry = AddStructSym (Name, SC_UNION, 0, 0);
 
     /* Skip the curly brace */
     NextToken ();
@@ -688,7 +688,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     LeaveStructLevel ();
 
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, UnionSize, FieldTab);
+    return AddStructSym (Name, SC_UNION, UnionSize, FieldTab);
 }
 
 
@@ -707,11 +707,11 @@ static SymEntry* ParseStructDecl (const char* Name)
 
     if (CurTok.Tok != TOK_LCURLY) {
     	/* Just a forward declaration. */
-    	return StructOrUnionForwardDecl (Name);
+    	return StructOrUnionForwardDecl (Name, SC_STRUCT);
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
-    Entry = AddStructSym (Name, 0, 0);
+    Entry = AddStructSym (Name, SC_STRUCT, 0, 0);
 
     /* Skip the curly brace */
     NextToken ();
@@ -858,7 +858,7 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
     LeaveStructLevel ();
 
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, StructSize, FieldTab);
+    return AddStructSym (Name, SC_STRUCT, StructSize, FieldTab);
 }
 
 
@@ -1613,7 +1613,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
      * int declaration.
      */
     if ((D->StorageClass & SC_FUNC) != SC_FUNC &&
-        (D->StorageClass & SC_TYPEDEF) != SC_TYPEDEF) {
+        (D->StorageClass & SC_TYPEMASK) != SC_TYPEDEF) {
         /* If the standard was not set explicitly to C89, print a warning
          * for variables with implicit int type.
          */

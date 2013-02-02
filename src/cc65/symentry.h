@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -87,10 +87,12 @@ struct LiteralPool;
 #define SC_REF 	     	0x2000U         /* Symbol is referenced */
 
 #define SC_TYPE	       	0x4000U	        /* This is a type, struct, typedef, etc. */
-#define SC_STRUCT      	0x4001U	        /* Struct or union */
-#define SC_STRUCTFIELD  0x4002U	        /* Struct or union field */
+#define SC_STRUCT      	0x4001U	        /* Struct */
+#define SC_UNION        0x4002U         /* Union */
+#define SC_STRUCTFIELD  0x4003U	        /* Struct or union field */
 #define SC_BITFIELD     0x4004U         /* A bit-field inside a struct or union */
-#define SC_TYPEDEF     	0x4008U	        /* A typedef */
+#define SC_TYPEDEF     	0x4005U         /* A typedef */
+#define SC_TYPEMASK     0x400FU         /* Mask for above types */
 
 #define SC_ZEROPAGE  	0x8000U	        /* Symbol marked as zeropage */
 

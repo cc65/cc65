@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2011, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -543,15 +543,20 @@ static void AddSymEntry (SymTable* T, SymEntry* S)
 
 
 
-SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
+SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab)
 /* Add a struct/union entry and return it */
 {
+    SymEntry* Entry;
+
+    /* Type must be struct or union */
+    PRECONDITION (Type == SC_STRUCT || Type == SC_UNION);
+
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (TagTab, Name, HashStr (Name));
+    Entry = FindSymInTable (TagTab, Name, HashStr (Name));
     if (Entry) {
 
      	/* We do have an entry. This may be a forward, so check it. */
-     	if ((Entry->Flags & SC_STRUCT) == 0) {
+     	if ((Entry->Flags & SC_TYPEMASK) != Type) {
 	    /* Existing symbol is not a struct */
 	    Error ("Symbol `%s' is already different kind", Name);
 	} else if (Size > 0 && Entry->V.S.Size > 0) {
@@ -568,7 +573,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
     } else {
 
     	/* Create a new entry */
-    	Entry = NewSymEntry (Name, SC_STRUCT);
+    	Entry = NewSymEntry (Name, Type);
 
     	/* Set the struct data */
     	Entry->V.S.SymTab = Tab;

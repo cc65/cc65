@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2009, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -144,7 +144,7 @@ SymEntry* FindStructField (const Type* TypeArray, const char* Name);
 
 
 
-SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab);
+SymEntry* AddStructSym (const char* Name, unsigned Type, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
 
 SymEntry* AddBitField (const char* Name, unsigned Offs, unsigned BitOffs, unsigned Width);

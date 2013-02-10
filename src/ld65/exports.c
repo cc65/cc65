@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2011, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -196,23 +196,12 @@ Import* GenImport (unsigned Name, unsigned char AddrSize)
 
     /* Check the address size */
     if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
-        /* Beware: This function may be called in cases where the object file
-         * is not read completely into memory. In this case, the file list is
-         * invalid. Be sure not to access it in this case.
+        /* We have no object file information and no line info for a new
+         * import
          */
-        if (ObjHasFiles (I->Obj)) {
-            const LineInfo* LI = GetImportPos (I);
-            Error ("Invalid import size in for `%s', imported from %s(%u): 0x%02X",
-                   GetString (I->Name),
-                   GetSourceName (LI),
-                   GetSourceLine (LI),
-                   I->AddrSize);
-        } else {
-            Error ("Invalid import size in for `%s', imported from %s: 0x%02X",
-                   GetString (I->Name),
-                   GetObjFileName (I->Obj),
-                   I->AddrSize);
-        }
+        Error ("Invalid import size 0x%02X for symbol `%s'",
+               I->AddrSize,
+               GetString (I->Name));
     }
 
     /* Return the new import */
@@ -232,7 +221,7 @@ Import* InsertImport (Import* I)
     /* Create a hash value for the given name */
     unsigned Hash = (Name & HASHTAB_MASK);
 
-    /* Search through the list in that slot and print matching duplicates */
+    /* Search through the list in that slot for a symbol with that name */
     if (HashTab[Hash] == 0) {
     	/* The slot is empty, we need to insert a dummy export */
        	E = HashTab[Hash] = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
@@ -711,10 +700,18 @@ static void CheckSymType (const Export* E)
                            GetString (I->Obj->Name),
                            GetSourceName (ImportLI),
                            GetSourceLine (ImportLI));
-            } else {
+            } else if (ImportLI) {
+                /* The import is linker generated and we have line
+                 * information
+                 */
                 SB_Printf (&ImportLoc, "%s(%u)",
                            GetSourceName (ImportLI),
                            GetSourceLine (ImportLI));
+            } else {
+                /* The import is linker generated and we don't have line
+                 * information
+                 */
+                SB_Printf (&ImportLoc, "%s", GetObjFileName (I->Obj));
             }
 
             /* Output the diagnostic */
@@ -927,13 +924,22 @@ void PrintImportMap (FILE* F)
 	    Imp = Exp->ImpList;
 	    while (Imp) {
 
-	      	/* Print the import */
+	      	/* Print the import. Beware: The import might be linker
+                 * generated, in which case there is no object file and
+                 * sometimes no line information.
+                 */
                 const LineInfo* LI = GetImportPos (Imp);
-	      	fprintf (F,
-	      		 "    %-25s %s(%u)\n",
-	      		 GetObjFileName (Imp->Obj),
-	      		 GetSourceName (LI),
-	      	       	 GetSourceLine (LI));
+                if (LI) {
+                    fprintf (F,
+                             "    %-25s %s(%u)\n",
+                             GetObjFileName (Imp->Obj),
+                             GetSourceName (LI),
+                             GetSourceLine (LI));
+                } else {
+                    fprintf (F,
+                             "    %-25s\n",
+                             GetObjFileName (Imp->Obj));
+                }
 
 	      	/* Next import */
 	      	Imp = Imp->Next;

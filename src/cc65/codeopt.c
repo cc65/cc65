@@ -248,6 +248,8 @@ static unsigned OptLoad3 (CodeSeg* S)
         /* Check if this insn is a load */
         if (E->Info & OF_LOAD) {
 
+            CodeEntry* N;
+
             /* If we had a preceeding load that is identical, remove this one.
              * If it is not identical, or we didn't have one, remember it.
              */
@@ -255,7 +257,9 @@ static unsigned OptLoad3 (CodeSeg* S)
                 E->OPC == Load->OPC                     &&
                 E->AM == Load->AM                       &&
                 ((E->Arg == 0 && Load->Arg == 0) ||
-                 strcmp (E->Arg, Load->Arg) == 0)) {
+                 strcmp (E->Arg, Load->Arg) == 0)       &&
+                (N = CS_GetNextEntry (S, I)) != 0       &&
+                (N->Info & OF_CBRA) == 0) {
 
                 /* Now remove the call to the subroutine */
                 CS_DelEntry (S, I);

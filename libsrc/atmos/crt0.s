@@ -7,14 +7,12 @@
 	.export		_exit
 	.export		__STARTUP__ : absolute = 1	; Mark as startup
 	.import		initlib, donelib
-	.import		callmain, zerobss, callirq
-	.import		__INTERRUPTOR_COUNT__
+	.import		callmain, zerobss
 	.import		__RAM_START__, __RAM_SIZE__
 	.import		__ZPSAVE_LOAD__, __STACKSIZE__
 
 	.include	"zeropage.inc"
 	.include	"atmos.inc"
-
 
 ; ------------------------------------------------------------------------
 ; Oric tape header
@@ -70,24 +68,9 @@ L1:	lda	sp,x
 	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
 	sta	sp+1		; Set argument stack ptr
 
-; If we have IRQ functions, chain our stub into the IRQ vector
-
-	lda	#<__INTERRUPTOR_COUNT__
-	beq	NoIRQ1
-	lda	IRQVec
-	ldx	IRQVec+1
-	sta	IRQInd+1
-	stx	IRQInd+2
-	lda	#<IRQStub
-	ldx	#>IRQStub
-	sei
-	sta	IRQVec
-	stx	IRQVec+1
-	cli
-
 ; Call module constructors
 
-NoIRQ1: jsr	initlib
+	jsr	initlib
 
 ; Push arguments and call main()
 
@@ -97,21 +80,9 @@ NoIRQ1: jsr	initlib
 
 _exit:	jsr	donelib		; Run module destructors
 
-; Reset the IRQ vector if we chained it.
-
-	pha			; Save the return code on stack
-	lda	#<__INTERRUPTOR_COUNT__
-	beq	NoIRQ2
-	lda	IRQInd+1
-	ldx	IRQInd+2
-	sei
-	sta	IRQVec
-	stx	IRQVec+1
-	cli
-
 ; Restore system stuff
 
-NoIRQ2: ldx	spsave
+	ldx	spsave
 	txs
 	lda	stsave
 	sta	STATUS
@@ -129,33 +100,12 @@ L2:	lda	zpsave,x
 	rts
 
 ; ------------------------------------------------------------------------
-; The IRQ vector jumps here, if condes routines are defined with type 2.
-
-IRQStub:
-	cld				; Just to be sure
-	pha
-	txa
-	pha
-	tya
-	pha
-	jsr	callirq			; Call the functions
-	pla
-	tay
-	pla
-	tax
-	pla
-	jmp	IRQInd			; Jump to the saved IRQ vector
-
-; ------------------------------------------------------------------------
-; Data
-
-.data
-
-IRQInd: jmp	$0000
 
 .segment	"ZPSAVE"
 
 zpsave: .res	zpspace
+
+; ------------------------------------------------------------------------
 
 .bss
 

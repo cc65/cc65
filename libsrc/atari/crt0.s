@@ -12,8 +12,7 @@
 	.export		__STARTUP__ : absolute = 1	; Mark as startup
 
 	.import		initlib, donelib
-	.import		callmain, zerobss, callirq
-	.import		__INTERRUPTOR_COUNT__
+	.import		callmain, zerobss
 	.import		__STARTUP_LOAD__, __ZPSAVE_LOAD__
 	.import		__RESERVED_MEMORY__
 
@@ -23,7 +22,8 @@
 ; ------------------------------------------------------------------------
 ; EXE header
 
-	.segment "EXEHDR"
+.segment	"EXEHDR"
+
 	.word	$FFFF
 	.word	__STARTUP_LOAD__
 	.word	__ZPSAVE_LOAD__ - 1
@@ -31,7 +31,7 @@
 ; ------------------------------------------------------------------------
 ; Actual code
 
-	.segment	"STARTUP"
+.segment	"STARTUP"
 
 	rts	; fix for SpartaDOS / OS/A+
 		; they first call the entry point from AUTOSTRT and
@@ -74,22 +74,9 @@ L1:	lda	sp,x
 	sta	APPMHI+1
 	sta	sp+1			; setup runtime stack part 2
 
-; If we have IRQ functions, chain our stub into the IRQ vector
-
-	lda	#<__INTERRUPTOR_COUNT__
-	beq	NoIRQ1
-	lda	VVBLKI
-	ldx	VVBLKI+1
-	sta	IRQInd+1
-	stx	IRQInd+2
-	lda	#6
-	ldy	#<IRQStub
-	ldx	#>IRQStub
-	jsr	SETVBV
-
 ; Call module constructors
 
-NoIRQ1:	jsr	initlib
+	jsr	initlib
 
 ; Set left margin to 0
 
@@ -117,19 +104,9 @@ NoIRQ1:	jsr	initlib
 
 _exit:	jsr	donelib		; Run module destructors
 
-; Reset the IRQ vector if we chained it.
-
-	pha			; Save the return code on stack
-	lda	#<__INTERRUPTOR_COUNT__
-	beq	NoIRQ2
-	lda	#6
-	ldy	IRQInd+1
-	ldx	IRQInd+2
-	jsr	SETVBV
-
 ; Restore system stuff
 
-NoIRQ2:	ldx	spsave
+	ldx	spsave
 	txs			; Restore stack pointer
 
 ; Restore left margin
@@ -166,28 +143,17 @@ L2:	lda	zpsave,x
 
 	rts
 
-; ------------------------------------------------------------------------
-; The IRQ vector jumps here, if condes routines are defined with type 2.
-
-IRQStub:
-	cld				; Just to be sure
-	jsr	callirq			; Call the functions
-	jmp	IRQInd			; Jump to the saved IRQ vector
-
-; ------------------------------------------------------------------------
-; Data
-
-.data
-
-IRQInd: jmp	$0000
-
 ; *** end of main startup code
+
+; ------------------------------------------------------------------------
 
 .segment	"ZPSAVE"
 
 zpsave: .res	zpspace
 
-	.bss
+; ------------------------------------------------------------------------
+
+.bss
 
 spsave:		.res	1
 appmsav:	.res	1

@@ -27,13 +27,18 @@
 ; entries.
 ;
 
-       	.export	callirq
-        .export callirq_y       ; Same but with Y preloaded
-                                                            
-        .export __CALLIRQ__: absolute = 1
-       	.import	__INTERRUPTOR_TABLE__, __INTERRUPTOR_COUNT__
+        .export         callirq
+        .export         callirq_y       ; Same but with Y preloaded
+        .export         __CALLIRQ__ : absolute = 1
+        .constructor    irq_init, 10
+        .destructor     irq_done, 10
 
-.code
+        .import         __INTERRUPTOR_TABLE__, __INTERRUPTOR_COUNT__
+        .import         initirq
+        .import         doneirq
+
+        irq_init :=     initirq
+        irq_done :=     doneirq
 
 ; --------------------------------------------------------------------------
 ; Call all IRQ routines. The function needs to use self modifying code and
@@ -51,14 +56,12 @@ callirq_y:
 loop:   dey
         lda     __INTERRUPTOR_TABLE__,y
         sta     jmpvec+2                ; Modify code below
-     	dey
+        dey
         lda     __INTERRUPTOR_TABLE__,y
         sta     jmpvec+1                ; Modify code below
-       	sty    	index+1                 ; Modify code below
-jmpvec: jsr    	$FFFF                   ; Patched at runtime
+        sty     index+1                 ; Modify code below
+jmpvec: jsr     $FFFF                   ; Patched at runtime
         bcs     done                    ; Bail out if interrupt handled
-index: 	ldy    	#$FF                    ; Patched at runtime
-       	bne     loop
+index:  ldy     #$FF                    ; Patched at runtime
+        bne     loop
 done:   rts
-
-

@@ -79,6 +79,7 @@ OBJS =  bllhdr.o                \
         exec.o                  \
         exehdr.o                \
         extzp.o                 \
+        irq.o                   \
         joy_stat_stddrv.o       \
         joy_stddrv.o            \
         kbhit.o                 \

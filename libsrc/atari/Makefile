@@ -103,6 +103,7 @@ OBJS = 	_scrsize.o              \
 	graphics.o              \
 	initcwd.o               \
 	inviocb.o               \
+	irq.o                   \
 	joy_stat_stddrv.o       \
 	joy_stddrv.o            \
 	kbhit.o                 \

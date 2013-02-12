@@ -81,6 +81,7 @@ OBJS  =	_scrsize.o              \
         gotox.o                 \
         gotoxy.o                \
         gotoy.o                 \
+        irq.o                   \
         joy_stat_stddrv.o       \
         joy_stddrv.o            \
         kbhit.o                 \

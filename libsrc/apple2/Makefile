@@ -104,6 +104,7 @@ S_OBJS=	_scrsize.o		\
 	home.o			\
 	initcwd.o		\
 	iobuf.o			\
+	irq.o			\
 	isdevice.o		\
 	joy_stat_stddrv.o	\
 	joy_stddrv.o		\

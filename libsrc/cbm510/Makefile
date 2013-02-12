@@ -68,6 +68,7 @@ OBJS =  _scrsize.o              \
         crt0.o                  \
         devnum.o                \
         extzp.o                 \
+        irq.o                   \
         joy_stat_stddrv.o       \
         joy_stddrv.o            \
         kbhit.o                 \

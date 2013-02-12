@@ -4,8 +4,8 @@
 ; void rebootafterexit (void);
 ;
 
-        .constructor	initreboot
-        .export	        _rebootafterexit
+        .constructor    initreboot, 11
+        .export         _rebootafterexit
         .import         done, return
 
 _rebootafterexit := return

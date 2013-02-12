@@ -70,6 +70,7 @@ OBJS =  _scrsize.o              \
         devnum.o                \
         extzp.o                 \
         get_tv.o                \
+        irq.o                   \
         kbhit.o                 \
         kclose.o                \
         kernal.o                \

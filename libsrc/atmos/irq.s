@@ -29,7 +29,6 @@ initirq:
 .code
 
 doneirq:
-	beq	NoIRQ2
 	lda	IRQInd+1
 	ldx	IRQInd+2
 	sei

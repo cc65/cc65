@@ -2,7 +2,7 @@
 ; IRQ handling (C16 version)
 ;
 
-	.export		_exit
+	.export		initirq, doneirq
 	.import		callirq
 
 	.include	"plus4.inc"

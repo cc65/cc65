@@ -20,11 +20,7 @@ initirq:
 	stx	IRQInd+2
 	lda	#<IRQStub
 	ldx	#>IRQStub
-	sei
-	sta	IRQVec
-	stx	IRQVec+1
-	cli
-	rts
+	jmp	setvec
 
 ; ------------------------------------------------------------------------
 
@@ -33,7 +29,7 @@ initirq:
 doneirq:
 	lda	IRQInd+1
 	ldx	IRQInd+2
-	sei
+setvec:	sei
 	sta	IRQVec
 	stx	IRQVec+1
 	cli

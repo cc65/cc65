@@ -7,7 +7,6 @@
         .export         initirq, doneirq
         .import         callirq, __dos_type, _exit
 
-        .include        "zeropage.inc"
         .include        "apple2.inc"
 
         .segment        "INIT"

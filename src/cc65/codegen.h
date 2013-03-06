@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -55,19 +55,26 @@
 /* Code generator flags.
  * Note: The type flags are designed so that a smaller type may override a
  * larger one by or'ing it into the existing one.
+ * Note^2: The actual type including the sign flag is in the lower bits, so
+ * we can mask the information and use them as a table index.
  */
 #define CF_NONE		0x0000	/* No special flags */
 
-#define CF_TYPE	       	0x0007	/* Mask for operand type */
+/* Values for the actual type */
 #define CF_CHAR	       	0x0003  /* Operation on characters */
 #define CF_INT		0x0001	/* Operation on ints */
 #define CF_PTR		CF_INT	/* Alias for readability */
 #define CF_LONG		0x0000	/* Operation on longs */
 #define CF_FLOAT        0x0004  /* Operation on a float */
 
-#define CF_NOKEEP	0x0008	/* Value may get destroyed when storing */
+/* Signedness */
+#define CF_UNSIGNED    	0x0008  /* Value is unsigned */
 
-#define CF_UNSIGNED    	0x0010	/* Value is unsigned */
+/* Masks for retrieving type information */
+#define CF_TYPEMASK     0x0007  /* Type information */
+#define CF_STYPEMASK    0x000F  /* Includes signedness */
+
+#define CF_NOKEEP	0x0010  /* Value may get destroyed when storing */
 #define CF_CONST	0x0020 	/* Constant value available */
 #define CF_CONSTADDR	0x0040	/* Constant address value available */
 #define CF_TEST	       	0x0080 	/* Test value */

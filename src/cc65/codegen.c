@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -71,10 +71,10 @@ static void typeerror (unsigned type)
 /* Print an error message about an invalid operand type */
 {
     /* Special handling for floats here: */
-    if ((type & CF_TYPE) == CF_FLOAT) {
+    if ((type & CF_TYPEMASK) == CF_FLOAT) {
         Fatal ("Floating point type is currently unsupported");
     } else {
-        Internal ("Invalid type in CF flags: %04X, type = %u", type, type & CF_TYPE);
+        Internal ("Invalid type in CF flags: %04X, type = %u", type, type & CF_TYPEMASK);
     }
 }
 
@@ -257,7 +257,7 @@ void g_segname (segment_t Seg)
 unsigned sizeofarg (unsigned flags)
 /* Return the size of a function argument type that is encoded in flags */
 {
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             return (flags & CF_FORCECHAR)? 1 : 2;
@@ -652,7 +652,7 @@ void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
     if ((Flags & CF_CONST) != 0) {
 
         /* Numeric constant */
-        switch (Flags & CF_TYPE) {
+        switch (Flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if ((Flags & CF_FORCECHAR) != 0) {
@@ -735,7 +735,7 @@ void g_getstatic (unsigned flags, unsigned long label, long offs)
     const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and generate the correct load operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if ((flags & CF_FORCECHAR) || (flags & CF_TEST)) {
@@ -790,7 +790,7 @@ void g_getlocal (unsigned Flags, int Offs)
 /* Fetch specified local object (local var). */
 {
     Offs -= StackPtr;
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             CheckLocalOffs (Offs);
@@ -850,7 +850,7 @@ void g_getind (unsigned Flags, unsigned Offs)
     Offs = MakeByteOffs (Flags, Offs);
 
     /* Handle the indirect fetch */
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             /* Character sized */
@@ -1014,7 +1014,7 @@ void g_putstatic (unsigned flags, unsigned long label, long offs)
     const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and generate the correct store operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             AddCodeLine ("sta %s", lbuf);
@@ -1047,7 +1047,7 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 {
     Offs -= StackPtr;
     CheckLocalOffs (Offs);
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (Flags & CF_CONST) {
@@ -1149,7 +1149,7 @@ void g_putind (unsigned Flags, unsigned Offs)
 
     /* Check the size and determine operation */
     AddCodeLine ("ldy #$%02X", Offs);
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             AddCodeLine ("jsr staspidx");
@@ -1183,7 +1183,7 @@ void g_putind (unsigned Flags, unsigned Offs)
 void g_toslong (unsigned flags)
 /* Make sure, the value on TOS is a long. Convert if necessary */
 {
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
         case CF_INT:
@@ -1208,7 +1208,7 @@ void g_toslong (unsigned flags)
 void g_tosint (unsigned flags)
 /* Make sure, the value on TOS is an int. Convert if necessary */
 {
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
         case CF_INT:
@@ -1231,7 +1231,7 @@ void g_regint (unsigned Flags)
 {
     unsigned L;
 
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (Flags & CF_FORCECHAR) {
@@ -1265,7 +1265,7 @@ void g_reglong (unsigned Flags)
 {
     unsigned L;
 
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (Flags & CF_FORCECHAR) {
@@ -1329,15 +1329,15 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
     unsigned result;
 
     /* Get the type spec from the flags */
-    ltype = lhs & CF_TYPE;
-    rtype = rhs & CF_TYPE;
+    ltype = lhs & CF_TYPEMASK;
+    rtype = rhs & CF_TYPEMASK;
 
     /* Check if a conversion is needed */
     if (ltype == CF_LONG && rtype != CF_LONG && (rhs & CF_CONST) == 0) {
         /* We must promote the primary register to long */
         g_reglong (rhs);
         /* Get the new rhs type */
-        rhs = (rhs & ~CF_TYPE) | CF_LONG;
+        rhs = (rhs & ~CF_TYPEMASK) | CF_LONG;
         rtype = CF_LONG;
     } else if (ltype != CF_LONG && (lhs & CF_CONST) == 0 && rtype == CF_LONG) {
         /* We must promote the lhs to long */
@@ -1347,7 +1347,7 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
             g_toslong (lhs);
         }
         /* Get the new rhs type */
-        lhs = (lhs & ~CF_TYPE) | CF_LONG;
+        lhs = (lhs & ~CF_TYPEMASK) | CF_LONG;
         ltype = CF_LONG;
     }
 
@@ -1377,8 +1377,8 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
     unsigned ltype, rtype;
 
     /* Get the type spec from the flags */
-    ltype = lhs & CF_TYPE;
-    rtype = rhs & CF_TYPE;
+    ltype = lhs & CF_TYPEMASK;
+    rtype = rhs & CF_TYPEMASK;
 
     /* Check if a conversion is needed */
     if ((rhs & CF_CONST) == 0) {
@@ -1426,7 +1426,7 @@ void g_scale (unsigned flags, long val)
         if ((p2 = PowerOf2 (val)) > 0 && p2 <= 4) {
 
             /* Factor is 2, 4, 8 and 16, use special function */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -1472,7 +1472,7 @@ void g_scale (unsigned flags, long val)
         if ((p2 = PowerOf2 (val)) > 0 && p2 <= 4) {
 
             /* Factor is 2, 4, 8 and 16 use special function */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -1536,7 +1536,7 @@ void g_addlocal (unsigned flags, int offs)
     offs -= StackPtr;
     CheckLocalOffs (offs);
 
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             L = GetLocalLabel();
@@ -1583,7 +1583,7 @@ void g_addstatic (unsigned flags, unsigned long label, long offs)
     /* Create the correct label name */
     const char* lbuf = GetLabelName (flags, label, offs);
 
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             L = GetLocalLabel();
@@ -1633,7 +1633,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, long offs,
     const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -1744,7 +1744,7 @@ void g_addeqlocal (unsigned flags, int Offs, unsigned long val)
     CheckLocalOffs (Offs);
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -1819,7 +1819,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
     offs = MakeByteOffs (flags, offs);
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             AddCodeLine ("sta ptr1");
@@ -1856,7 +1856,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
     const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -1956,7 +1956,7 @@ void g_subeqlocal (unsigned flags, int Offs, unsigned long val)
     CheckLocalOffs (Offs);
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -2015,7 +2015,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
     offs = MakeByteOffs (flags, offs);
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             AddCodeLine ("sta ptr1");
@@ -2112,7 +2112,7 @@ void g_save (unsigned flags)
 /* Copy primary register to hold register. */
 {
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -2141,7 +2141,7 @@ void g_restore (unsigned flags)
 /* Copy hold register to primary. */
 {
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -2174,7 +2174,7 @@ void g_cmp (unsigned flags, unsigned long val)
     unsigned L;
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -2214,7 +2214,7 @@ static void oper (unsigned Flags, unsigned long Val, const char** Subs)
     if (Flags & CF_UNSIGNED) {
         ++Subs;
     }
-    if ((Flags & CF_TYPE) == CF_LONG) {
+    if ((Flags & CF_TYPEMASK) == CF_LONG) {
         Subs += 2;
     }
 
@@ -2236,7 +2236,7 @@ static void oper (unsigned Flags, unsigned long Val, const char** Subs)
 void g_test (unsigned flags)
 /* Test the value in the primary and set the condition codes */
 {
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -2269,10 +2269,10 @@ void g_test (unsigned flags)
 void g_push (unsigned flags, unsigned long val)
 /* Push the primary register or a constant value onto the stack */
 {
-    if (flags & CF_CONST && (flags & CF_TYPE) != CF_LONG) {
+    if (flags & CF_CONST && (flags & CF_TYPEMASK) != CF_LONG) {
 
         /* We have a constant 8 or 16 bit value */
-        if ((flags & CF_TYPE) == CF_CHAR && (flags & CF_FORCECHAR)) {
+        if ((flags & CF_TYPEMASK) == CF_CHAR && (flags & CF_FORCECHAR)) {
 
             /* Handle as 8 bit value */
             AddCodeLine ("lda #$%02X", (unsigned char) val);
@@ -2294,7 +2294,7 @@ void g_push (unsigned flags, unsigned long val)
         }
 
         /* Push the primary register */
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -2329,7 +2329,7 @@ void g_swap (unsigned flags)
  * of *both* values (must have same size).
  */
 {
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
         case CF_INT:
@@ -2551,7 +2551,7 @@ void g_mul (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -2699,7 +2699,7 @@ void g_or (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -2770,7 +2770,7 @@ void g_xor (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -2837,7 +2837,7 @@ void g_and (unsigned Flags, unsigned long Val)
      */
     if (Flags & CF_CONST) {
 
-        switch (Flags & CF_TYPE) {
+        switch (Flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (Flags & CF_FORCECHAR) {
@@ -2929,7 +2929,7 @@ void g_asr (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
             case CF_INT:
@@ -3061,7 +3061,7 @@ void g_asl (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
             case CF_INT:
@@ -3150,7 +3150,7 @@ void g_asl (unsigned flags, unsigned long val)
 void g_neg (unsigned Flags)
 /* Primary = -Primary */
 {
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (Flags & CF_FORCECHAR) {
@@ -3179,7 +3179,7 @@ void g_neg (unsigned Flags)
 void g_bneg (unsigned flags)
 /* Primary = !Primary */
 {
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             AddCodeLine ("jsr bnega");
@@ -3203,7 +3203,7 @@ void g_bneg (unsigned flags)
 void g_com (unsigned Flags)
 /* Primary = ~Primary */
 {
-    switch (Flags & CF_TYPE) {
+    switch (Flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (Flags & CF_FORCECHAR) {
@@ -3237,7 +3237,7 @@ void g_inc (unsigned flags, unsigned long val)
 
     /* Generate code for the supported types */
     flags &= ~CF_CONST;
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -3336,7 +3336,7 @@ void g_dec (unsigned flags, unsigned long val)
 
     /* Generate code for the supported types */
     flags &= ~CF_CONST;
-    switch (flags & CF_TYPE) {
+    switch (flags & CF_TYPEMASK) {
 
         case CF_CHAR:
             if (flags & CF_FORCECHAR) {
@@ -3440,7 +3440,7 @@ void g_eq (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -3494,7 +3494,7 @@ void g_ne (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -3562,7 +3562,7 @@ void g_lt (unsigned flags, unsigned long val)
             }
 
             /* Look at the type */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -3603,7 +3603,7 @@ void g_lt (unsigned flags, unsigned long val)
         } else if (val == 0) {
 
             /* A signed compare against zero must only look at the sign bit */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -3639,7 +3639,7 @@ void g_lt (unsigned flags, unsigned long val)
         } else {
 
             /* Signed compare against a constant != zero */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -3710,7 +3710,7 @@ void g_le (unsigned flags, unsigned long val)
     if (flags & CF_CONST) {
 
         /* Look at the type */
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -3825,7 +3825,7 @@ void g_gt (unsigned flags, unsigned long val)
     if (flags & CF_CONST) {
 
         /* Look at the type */
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
                 if (flags & CF_FORCECHAR) {
@@ -3971,7 +3971,7 @@ void g_ge (unsigned flags, unsigned long val)
             }
 
             /* Look at the type */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -4015,7 +4015,7 @@ void g_ge (unsigned flags, unsigned long val)
         } else if (val == 0) {
 
             /* A signed compare against zero must only look at the sign bit */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -4044,7 +4044,7 @@ void g_ge (unsigned flags, unsigned long val)
         } else {
 
             /* Signed compare against a constant != zero */
-            switch (flags & CF_TYPE) {
+            switch (flags & CF_TYPEMASK) {
 
                 case CF_CHAR:
                     if (flags & CF_FORCECHAR) {
@@ -4120,7 +4120,7 @@ void g_defdata (unsigned flags, unsigned long val, long offs)
     if (flags & CF_CONST) {
 
         /* Numeric constant */
-        switch (flags & CF_TYPE) {
+        switch (flags & CF_TYPEMASK) {
 
             case CF_CHAR:
              	AddDataLine ("\t.byte\t$%02lX", val & 0xFF);

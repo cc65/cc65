@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65html Users Guide: Peculiarities</TITLE>
+ <LINK HREF="ca65html-4.html" REL=next>
+ <LINK HREF="ca65html-2.html" REL=previous>
+ <LINK HREF="ca65html.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65html-4.html">Next</A>
+<A HREF="ca65html-2.html">Previous</A>
+<A HREF="ca65html.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="s3">3.</A> <A HREF="ca65html.html#toc3">Peculiarities</A></H2>
+
+
+
+<H2><A NAME="ss3.1">3.1</A> <A HREF="ca65html.html#toc3.1">Cross links</A>
+</H2>
+
+
+<P>Since ca65html is able to generate links between modules, the best way to use
+it is to supply all modules to it in one run, instead of running each file
+separately through it.</P>
+
+
+<H2><A NAME="ss3.2">3.2</A> <A HREF="ca65html.html#toc3.2">Include files</A>
+</H2>
+
+
+<P>For now, ca65html will not read files included with <CODE>.include</CODE>. Specifying
+the include files as normal input files on the command line works in many
+cases.</P>
+
+
+<H2><A NAME="ss3.3">3.3</A> <A HREF="ca65html.html#toc3.3">Conversion errors</A>
+</H2>
+
+
+<P>Since ca65html does not really parse the input, but does most of its work
+applying text patterns, it doesn't know anything about scoping and advanced
+features of the assembler. This means that it might miss a label.  And, it
+might choose the wrong color for an item, in rare cases. Because it's just a
+tool for displaying sources in a nice form, I think that's OK. Anyway, if you
+find a conversion problem, you can send me a short piece of example input code.
+If possible, I will fix it.</P>
+
+
+<H2><A NAME="ss3.4">3.4</A> <A HREF="ca65html.html#toc3.4">Colorization</A>
+</H2>
+
+
+<P>While having colors in the output looks really nice, it has one drawback:</P>
+<P>
+<OL>
+<LI>Because lots of <CODE>&lt;span&gt;</CODE> tags are created in the output,
+the size of the output file literally will explode.  It seems to be the price
+that you have to pay for color.
+</LI>
+</OL>
+</P>
+
+
+<HR>
+<A HREF="ca65html-4.html">Next</A>
+<A HREF="ca65html-2.html">Previous</A>
+<A HREF="ca65html.html#toc3">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Library Overview: Direct console I/O - conio.h</TITLE>
+ <LINK HREF="library-6.html" REL=next>
+ <LINK HREF="library-4.html" REL=previous>
+ <LINK HREF="library.html#toc5" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="library-6.html">Next</A>
+<A HREF="library-4.html">Previous</A>
+<A HREF="library.html#toc5">Contents</A>
+<HR>
+<H2><A NAME="s5">5.</A> <A HREF="library.html#toc5">Direct console I/O - <CODE>conio.h</CODE></A></H2>
+
+
+<P>The <CODE>conio.h</CODE> header file contains a large set of functions that do screen
+and keyboard I/O. The functions will write directly to the screen or poll the
+keyboard directly with no more help from the operating system than needed.
+This has some disadvantages, but on the other side it's fast and reasonably
+portable. conio implementations exist for the following targets:</P>
+<P>
+<UL>
+<LI>apple2</LI>
+<LI>apple2enh</LI>
+<LI>atari</LI>
+<LI>atmos</LI>
+<LI>c16 (works also for the c116 with up to 32K memory)</LI>
+<LI>c64</LI>
+<LI>c128</LI>
+<LI>plus4 (or expanded c16/c116)</LI>
+<LI>cbm510 (40 column video)</LI>
+<LI>cbm610 (all CBM series-II computers with 80 column video)</LI>
+<LI>geos-apple</LI>
+<LI>geos-cbm</LI>
+<LI>nes</LI>
+<LI>pet (all CBM PET systems except the 2001)</LI>
+<LI>vic20</LI>
+</UL>
+</P>
+<P>The conio.h header file does also include the system specific header files
+which define constants for special characters and keys.</P>
+
+
+
+<HR>
+<A HREF="library-6.html">Next</A>
+<A HREF="library-4.html">Previous</A>
+<A HREF="library.html#toc5">Contents</A>
+</BODY>
+</HTML>

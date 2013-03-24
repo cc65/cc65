@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Commodore PET specific information for cc65: Platform specific header files</TITLE>
+ <LINK HREF="pet-5.html" REL=next>
+ <LINK HREF="pet-3.html" REL=previous>
+ <LINK HREF="pet.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="pet-5.html">Next</A>
+<A HREF="pet-3.html">Previous</A>
+<A HREF="pet.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="pet.html#toc4">Platform specific header files</A></H2>
+
+
+<P>Programs containing PET specific code may use the <CODE>pet.h</CODE> or <CODE>cbm.h</CODE>
+header files. Using the later may be an option when writing code for more than
+one CBM platform, since it includes <CODE>pet.h</CODE> and declares several functions
+common to all CBM platforms.</P>
+
+
+<H2><A NAME="ss4.1">4.1</A> <A HREF="pet.html#toc4.1">PET specific functions</A>
+</H2>
+
+
+<P>There are currently no special PET functions.</P>
+
+
+
+<H2><A NAME="ss4.2">4.2</A> <A HREF="pet.html#toc4.2">CBM specific functions</A>
+</H2>
+
+
+<P>Some functions are available for all (or at least most) of the Commodore
+machines. See the 
+<A HREF="funcref.html">function reference</A> for
+declaration and usage.</P>
+<P>
+<UL>
+<LI>cbm_close</LI>
+<LI>cbm_closedir</LI>
+<LI>cbm_k_setlfs</LI>
+<LI>cbm_k_setnam</LI>
+<LI>cbm_k_load</LI>
+<LI>cbm_k_save</LI>
+<LI>cbm_k_open</LI>
+<LI>cbm_k_close</LI>
+<LI>cbm_k_readst</LI>
+<LI>cbm_k_chkin</LI>
+<LI>cbm_k_ckout</LI>
+<LI>cbm_k_basin</LI>
+<LI>cbm_k_bsout</LI>
+<LI>cbm_k_clrch</LI>
+<LI>cbm_load</LI>
+<LI>cbm_open</LI>
+<LI>cbm_opendir</LI>
+<LI>cbm_read</LI>
+<LI>cbm_readdir</LI>
+<LI>cbm_save</LI>
+<LI>cbm_write</LI>
+<LI>get_tv</LI>
+</UL>
+</P>
+
+
+<H2><A NAME="ss4.3">4.3</A> <A HREF="pet.html#toc4.3">Hardware access</A>
+</H2>
+
+
+<P>The following pseudo variables declared in the <CODE>pet.h</CODE> header file do allow
+access to hardware located in the address space. Some variables are
+structures, accessing the struct fields will access the chip registers.</P>
+<P>
+<DL>
+
+<DT><B><CODE>PIA1, PIA2</CODE></B><DD>
+<P>Access to the two PIA (peripheral interface adapter) chips is available via
+the <CODE>PIA1</CODE> and <CODE>PIA2</CODE> variables. The structure behind these variables
+is explained in <CODE>_pia.h</CODE>.</P>
+
+<DT><B><CODE>VIA</CODE></B><DD>
+<P>The <CODE>VIA</CODE> structure allows access to the VIA (versatile interface
+adapter). See the <CODE>_6522.h</CODE> header file located in the include
+directory for the declaration of the structure.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="pet-5.html">Next</A>
+<A HREF="pet-3.html">Previous</A>
+<A HREF="pet.html#toc4">Contents</A>
+</BODY>
+</HTML>

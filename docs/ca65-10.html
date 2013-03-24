@@ -1,0 +1,713 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Pseudo functions</TITLE>
+ <LINK HREF="ca65-11.html" REL=next>
+ <LINK HREF="ca65-9.html" REL=previous>
+ <LINK HREF="ca65.html#toc10" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-11.html">Next</A>
+<A HREF="ca65-9.html">Previous</A>
+<A HREF="ca65.html#toc10">Contents</A>
+<HR>
+<H2><A NAME="pseudo-functions"></A> <A NAME="s10">10.</A> <A HREF="ca65.html#toc10">Pseudo functions</A></H2>
+
+
+<P>Pseudo functions expect their arguments in parenthesis, and they have a result,
+either a string or an expression.</P>
+
+
+<H2><A NAME=".BANK"></A> <A NAME="ss10.1">10.1</A> <A HREF="ca65.html#toc10.1"><CODE>.BANK</CODE></A>
+</H2>
+
+
+<P>The <CODE>.BANK</CODE> function is used to support systems with banked memory. The
+argument is an expression with exactly one segment reference - usually a
+label. The function result is the value of the <CODE>bank</CODE> attribute assigned
+to the run memory area of the segment. Please see the linker documentation
+for more information about memory areas and their attributes.</P>
+<P>The value of <CODE>.BANK</CODE> can be used to switch memory so that a memory bank
+containing specific data is available.</P>
+<P>The <CODE>bank</CODE> attribute is a 32 bit integer and so is the result of the
+<CODE>.BANK</CODE> function. You will have to use <CODE>
+<A HREF="#.LOBYTE">.LOBYTE</A></CODE> or similar functions to address just part of it.</P>
+<P>Please note that <CODE>.BANK</CODE> will always get evaluated in the link stage, so
+an expression containing <CODE>.BANK</CODE> can never be used where a constant known
+result is expected (for example with <CODE>.RES</CODE>).</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .segment "BANK1"
+        .proc   banked_func_1
+                ...
+        .endproc
+
+        .segment "BANK2"
+        .proc   banked_func_2
+                ...
+        .endproc
+
+        .proc   bank_table
+                .addr   banked_func_1
+                .byte   &lt;.BANK (banked_func_1)
+
+                .addr   banked_func_2
+                .byte   &lt;.BANK (banked_func_2)
+        .endproc
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+<H2><A NAME=".BANKBYTE"></A> <A NAME="ss10.2">10.2</A> <A HREF="ca65.html#toc10.2"><CODE>.BANKBYTE</CODE></A>
+</H2>
+
+
+<P>The function returns the bank byte (that is, bits 16-23) of its argument.
+It works identical to the '^' operator.</P>
+<P>See: <CODE>
+<A HREF="#.HIBYTE">.HIBYTE</A></CODE>,
+<CODE>
+<A HREF="#.LOBYTE">.LOBYTE</A></CODE></P>
+
+
+<H2><A NAME=".BLANK"></A> <A NAME="ss10.3">10.3</A> <A HREF="ca65.html#toc10.3"><CODE>.BLANK</CODE></A>
+</H2>
+
+
+<P>Builtin function. The function evaluates its argument in braces and yields
+"false" if the argument is non blank (there is an argument), and "true" if
+there is no argument.  The token list that makes up the function argument
+may optionally be enclosed in curly braces. This allows the inclusion of
+tokens that would otherwise terminate the list (the closing right
+parenthesis). The curly braces are not considered part of the list, a list
+just consisting of curly braces is considered to be empty.</P>
+<P>As an example, the <CODE>.IFBLANK</CODE> statement may be replaced by</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .if     .blank({arg})
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+<H2><A NAME=".CONCAT"></A> <A NAME="ss10.4">10.4</A> <A HREF="ca65.html#toc10.4"><CODE>.CONCAT</CODE></A>
+</H2>
+
+
+<P>Builtin string function. The function allows to concatenate a list of string
+constants separated by commas. The result is a string constant that is the
+concatenation of all arguments. This function is most useful in macros and
+when used together with the <CODE>.STRING</CODE> builtin function. The function may
+be used in any case where a string constant is expected.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .include        .concat ("myheader", ".", "inc")
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This is the same as the command</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .include        "myheader.inc"
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".CONST"></A> <A NAME="ss10.5">10.5</A> <A HREF="ca65.html#toc10.5"><CODE>.CONST</CODE></A>
+</H2>
+
+
+<P>Builtin function. The function evaluates its argument in braces and
+yields "true" if the argument is a constant expression (that is, an
+expression that yields a constant value at assembly time) and "false"
+otherwise. As an example, the .IFCONST statement may be replaced by</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .if     .const(a + 3)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".HIBYTE"></A> <A NAME="ss10.6">10.6</A> <A HREF="ca65.html#toc10.6"><CODE>.HIBYTE</CODE></A>
+</H2>
+
+
+<P>The function returns the high byte (that is, bits 8-15) of its argument.
+It works identical to the '>' operator.</P>
+<P>See: <CODE>
+<A HREF="#.LOBYTE">.LOBYTE</A></CODE>,
+<CODE>
+<A HREF="#.BANKBYTE">.BANKBYTE</A></CODE></P>
+
+
+<H2><A NAME=".HIWORD"></A> <A NAME="ss10.7">10.7</A> <A HREF="ca65.html#toc10.7"><CODE>.HIWORD</CODE></A>
+</H2>
+
+
+<P>The function returns the high word (that is, bits 16-31) of its argument.</P>
+<P>See: <CODE>
+<A HREF="#.LOWORD">.LOWORD</A></CODE></P>
+
+
+<H2><A NAME=".IDENT"></A> <A NAME="ss10.8">10.8</A> <A HREF="ca65.html#toc10.8"><CODE>.IDENT</CODE></A>
+</H2>
+
+
+<P>The function expects a string as its argument, and converts this argument
+into an identifier. If the string starts with the current <CODE>
+<A HREF="ca65-11.html#.LOCALCHAR">.LOCALCHAR</A></CODE>, it will be converted into a cheap local
+identifier, otherwise it will be converted into a normal identifier.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  makelabel       arg1, arg2
+                .ident (.concat (arg1, arg2)):
+        .endmacro
+
+                makelabel       "foo", "bar"
+
+                .word           foobar          ; Valid label
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".LEFT"></A> <A NAME="ss10.9">10.9</A> <A HREF="ca65.html#toc10.9"><CODE>.LEFT</CODE></A>
+</H2>
+
+
+<P>Builtin function. Extracts the left part of a given token list.</P>
+<P>Syntax:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .LEFT (&lt;int expr&gt;, &lt;token list&gt;)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The first integer expression gives the number of tokens to extract from
+the token list. The second argument is the token list itself. The token
+list may optionally be enclosed into curly braces. This allows the
+inclusion of tokens that would otherwise terminate the list (the closing
+right paren in the given case).</P>
+<P>Example:</P>
+<P>To check in a macro if the given argument has a '#' as first token
+(immediate addressing mode), use something like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  ldax    arg
+                ...
+                .if (.match (.left (1, {arg}), #))
+
+                ; ldax called with immediate operand
+                ...
+
+                .endif
+                ...
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See also the <CODE>
+<A HREF="#.MID">.MID</A></CODE> and <CODE>
+<A HREF="#.RIGHT">.RIGHT</A></CODE> builtin functions.</P>
+
+
+<H2><A NAME=".LOBYTE"></A> <A NAME="ss10.10">10.10</A> <A HREF="ca65.html#toc10.10"><CODE>.LOBYTE</CODE></A>
+</H2>
+
+
+<P>The function returns the low byte (that is, bits 0-7) of its argument.
+It works identical to the '&lt;' operator.</P>
+<P>See: <CODE>
+<A HREF="#.HIBYTE">.HIBYTE</A></CODE>,
+<CODE>
+<A HREF="#.BANKBYTE">.BANKBYTE</A></CODE></P>
+
+
+<H2><A NAME=".LOWORD"></A> <A NAME="ss10.11">10.11</A> <A HREF="ca65.html#toc10.11"><CODE>.LOWORD</CODE></A>
+</H2>
+
+
+<P>The function returns the low word (that is, bits 0-15) of its argument.</P>
+<P>See: <CODE>
+<A HREF="#.HIWORD">.HIWORD</A></CODE></P>
+
+
+<H2><A NAME=".MATCH"></A> <A NAME="ss10.12">10.12</A> <A HREF="ca65.html#toc10.12"><CODE>.MATCH</CODE></A>
+</H2>
+
+
+<P>Builtin function. Matches two token lists against each other. This is
+most useful within macros, since macros are not stored as strings, but
+as lists of tokens.</P>
+<P>The syntax is</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .MATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Both token list may contain arbitrary tokens with the exception of the
+terminator token (comma resp. right parenthesis) and</P>
+<P>
+<UL>
+<LI>end-of-line</LI>
+<LI>end-of-file</LI>
+</UL>
+</P>
+<P>The token lists may optionally be enclosed into curly braces. This allows
+the inclusion of tokens that would otherwise terminate the list (the closing
+right paren in the given case). Often a macro parameter is used for any of
+the token lists.</P>
+<P>Please note that the function does only compare tokens, not token
+attributes. So any number is equal to any other number, regardless of the
+actual value. The same is true for strings. If you need to compare tokens
+<EM>and</EM> token attributes, use the <CODE>
+<A HREF="#.XMATCH">.XMATCH</A></CODE> function.</P>
+<P>Example:</P>
+<P>Assume the macro <CODE>ASR</CODE>, that will shift right the accumulator by one,
+while honoring the sign bit. The builtin processor instructions will allow
+an optional "A" for accu addressing for instructions like <CODE>ROL</CODE> and
+<CODE>ROR</CODE>. We will use the <CODE>
+<A HREF="#.MATCH">.MATCH</A></CODE> function
+to check for this and print and error for invalid calls.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  asr     arg
+
+                .if (.not .blank(arg)) .and (.not .match ({arg}, a))
+                .error "Syntax error"
+                .endif
+
+                cmp     #$80            ; Bit 7 into carry
+                lsr     a               ; Shift carry into bit 7
+
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The macro will only accept no arguments, or one argument that must be the
+reserved keyword "A".</P>
+<P>See: <CODE>
+<A HREF="#.XMATCH">.XMATCH</A></CODE></P>
+
+
+<H2><A NAME=".MAX"></A> <A NAME="ss10.13">10.13</A> <A HREF="ca65.html#toc10.13"><CODE>.MAX</CODE></A>
+</H2>
+
+
+<P>Builtin function. The result is the larger of two values.</P>
+<P>The syntax is</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .MAX (&lt;value #1&gt;, &lt;value #2&gt;)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ; Reserve space for the larger of two data blocks
+        savearea:       .max (.sizeof (foo), .sizeof (bar))
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See: <CODE>
+<A HREF="#.MIN">.MIN</A></CODE></P>
+
+
+<H2><A NAME=".MID"></A> <A NAME="ss10.14">10.14</A> <A HREF="ca65.html#toc10.14"><CODE>.MID</CODE></A>
+</H2>
+
+
+<P>Builtin function. Takes a starting index, a count and a token list as
+arguments. Will return part of the token list.</P>
+<P>Syntax:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .MID (&lt;int expr&gt;, &lt;int expr&gt;, &lt;token list&gt;)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The first integer expression gives the starting token in the list (the first
+token has index 0). The second integer expression gives the number of tokens
+to extract from the token list. The third argument is the token list itself.
+The token list may optionally be enclosed into curly braces. This allows the
+inclusion of tokens that would otherwise terminate the list (the closing
+right paren in the given case).</P>
+<P>Example:</P>
+<P>To check in a macro if the given argument has a '<CODE>#</CODE>' as first token
+(immediate addressing mode), use something like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  ldax    arg
+                ...
+                .if (.match (.mid (0, 1, {arg}), #))
+
+                ; ldax called with immediate operand
+                ...
+
+                .endif
+                ...
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See also the <CODE>
+<A HREF="#.LEFT">.LEFT</A></CODE> and <CODE>
+<A HREF="#.RIGHT">.RIGHT</A></CODE> builtin functions.</P>
+
+
+<H2><A NAME=".MIN"></A> <A NAME="ss10.15">10.15</A> <A HREF="ca65.html#toc10.15"><CODE>.MIN</CODE></A>
+</H2>
+
+
+<P>Builtin function. The result is the smaller of two values.</P>
+<P>The syntax is</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .MIN (&lt;value #1&gt;, &lt;value #2&gt;)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ; Reserve space for some data, but 256 bytes minimum
+        savearea:       .min (.sizeof (foo), 256)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See: <CODE>
+<A HREF="#.MAX">.MAX</A></CODE></P>
+
+
+<H2><A NAME=".REFERENCED"></A> <A NAME="ss10.16">10.16</A> <A HREF="ca65.html#toc10.16"><CODE>.REF, .REFERENCED</CODE></A>
+</H2>
+
+
+<P>Builtin function. The function expects an identifier as argument in braces.
+The argument is evaluated, and the function yields "true" if the identifier
+is a symbol that has already been referenced somewhere in the source file up
+to the current position. Otherwise the function yields false. As an example,
+the <CODE>
+<A HREF="ca65-11.html#.IFREF">.IFREF</A></CODE> statement may be replaced by</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .if     .referenced(a)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See: <CODE>
+<A HREF="ca65-11.html#.DEFINED">.DEFINED</A></CODE></P>
+
+
+<H2><A NAME=".RIGHT"></A> <A NAME="ss10.17">10.17</A> <A HREF="ca65.html#toc10.17"><CODE>.RIGHT</CODE></A>
+</H2>
+
+
+<P>Builtin function. Extracts the right part of a given token list.</P>
+<P>Syntax:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .RIGHT (&lt;int expr&gt;, &lt;token list&gt;)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The first integer expression gives the number of tokens to extract from the
+token list. The second argument is the token list itself.  The token list
+may optionally be enclosed into curly braces. This allows the inclusion of
+tokens that would otherwise terminate the list (the closing right paren in
+the given case).</P>
+<P>See also the <CODE>
+<A HREF="#.LEFT">.LEFT</A></CODE> and <CODE>
+<A HREF="#.MID">.MID</A></CODE> builtin functions.</P>
+
+
+<H2><A NAME=".SIZEOF"></A> <A NAME="ss10.18">10.18</A> <A HREF="ca65.html#toc10.18"><CODE>.SIZEOF</CODE></A>
+</H2>
+
+
+<P><CODE>.SIZEOF</CODE> is a pseudo function that returns the size of its argument. The
+argument can be a struct/union, a struct member, a procedure, or a label. In
+case of a procedure or label, its size is defined by the amount of data
+placed in the segment where the label is relative to. If a line of code
+switches segments (for example in a macro) data placed in other segments
+does not count for the size.</P>
+<P>Please note that a symbol or scope must exist, before it is used together with
+<CODE>.SIZEOF</CODE> (this may get relaxed later, but will always be true for scopes).
+A scope has preference over a symbol with the same name, so if the last part
+of a name represents both, a scope and a symbol, the scope is chosen over the
+symbol.</P>
+<P>After the following code:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .struct Point                   ; Struct size = 4
+                xcoord  .word
+                ycoord  .word
+        .endstruct
+
+        P:      .tag    Point           ; Declare a point
+        @P:     .tag    Point           ; Declare another point
+
+        .code
+        .proc   Code
+                nop
+                .proc   Inner
+                        nop
+                .endproc
+                nop
+        .endproc
+
+        .proc   Data
+        .data                           ; Segment switch!!!
+                .res    4
+        .endproc
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>
+<DL>
+<DT><B><CODE>.sizeof(Point)</CODE></B><DD>
+<P>will have the value 4, because this is the size of struct <CODE>Point</CODE>.</P>
+
+<DT><B><CODE>.sizeof(Point::xcoord)</CODE></B><DD>
+<P>will have the value 2, because this is the size of the member <CODE>xcoord</CODE>
+in struct <CODE>Point</CODE>.</P>
+
+<DT><B><CODE>.sizeof(P)</CODE></B><DD>
+<P>will have the value 4, this is the size of the data declared on the same
+source line as the label <CODE>P</CODE>, which is in the same segment that <CODE>P</CODE>
+is relative to.</P>
+
+<DT><B><CODE>.sizeof(@P)</CODE></B><DD>
+<P>will have the value 4, see above. The example demonstrates that <CODE>.SIZEOF</CODE>
+does also work for cheap local symbols.</P>
+
+<DT><B><CODE>.sizeof(Code)</CODE></B><DD>
+<P>will have the value 3, since this is amount of data emitted into the code
+segment, the segment that was active when <CODE>Code</CODE> was entered. Note that
+this value includes the amount of data emitted in child scopes (in this
+case <CODE>Code::Inner</CODE>).</P>
+
+<DT><B><CODE>.sizeof(Code::Inner)</CODE></B><DD>
+<P>will have the value 1 as expected.</P>
+
+<DT><B><CODE>.sizeof(Data)</CODE></B><DD>
+<P>will have the value 0. Data is emitted within the scope <CODE>Data</CODE>, but since
+the segment is switched after entry, this data is emitted into another
+segment.</P>
+</DL>
+</P>
+
+
+<H2><A NAME=".STRAT"></A> <A NAME="ss10.19">10.19</A> <A HREF="ca65.html#toc10.19"><CODE>.STRAT</CODE></A>
+</H2>
+
+
+<P>Builtin function. The function accepts a string and an index as
+arguments and returns the value of the character at the given position
+as an integer value. The index is zero based.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  M       Arg
+                ; Check if the argument string starts with '#'
+                .if (.strat (Arg, 0) = '#')
+                ...
+                .endif
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".SPRINTF"></A> <A NAME="ss10.20">10.20</A> <A HREF="ca65.html#toc10.20"><CODE>.SPRINTF</CODE></A>
+</H2>
+
+
+<P>Builtin function. It expects a format string as first argument. The number
+and type of the following arguments depend on the format string. The format
+string is similar to the one of the C <CODE>printf</CODE> function. Missing things
+are: Length modifiers, variable width.</P>
+<P>The result of the function is a string.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        num     = 3
+
+        ; Generate an identifier:
+        .ident (.sprintf ("%s%03d", "label", num)):
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".STRING"></A> <A NAME="ss10.21">10.21</A> <A HREF="ca65.html#toc10.21"><CODE>.STRING</CODE></A>
+</H2>
+
+
+<P>Builtin function. The function accepts an argument in braces and converts
+this argument into a string constant. The argument may be an identifier, or
+a constant numeric value.</P>
+<P>Since you can use a string in the first place, the use of the function may
+not be obvious. However, it is useful in macros, or more complex setups.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ; Emulate other assemblers:
+        .macro  section name
+                .segment        .string(name)
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".STRLEN"></A> <A NAME="ss10.22">10.22</A> <A HREF="ca65.html#toc10.22"><CODE>.STRLEN</CODE></A>
+</H2>
+
+
+<P>Builtin function. The function accepts a string argument in braces and
+evaluates to the length of the string.</P>
+<P>Example:</P>
+<P>The following macro encodes a string as a pascal style string with
+a leading length byte.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  PString Arg
+                .byte   .strlen(Arg), Arg
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".TCOUNT"></A> <A NAME="ss10.23">10.23</A> <A HREF="ca65.html#toc10.23"><CODE>.TCOUNT</CODE></A>
+</H2>
+
+
+<P>Builtin function. The function accepts a token list in braces. The function
+result is the number of tokens given as argument. The token list may
+optionally be enclosed into curly braces which are not considered part of
+the list and not counted. Enclosement in curly braces allows the inclusion
+of tokens that would otherwise terminate the list (the closing right paren
+in the given case).</P>
+<P>Example:</P>
+<P>The <CODE>ldax</CODE> macro accepts the '#' token to denote immediate addressing (as
+with the normal 6502 instructions). To translate it into two separate 8 bit
+load instructions, the '#' token has to get stripped from the argument:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  ldax    arg
+                .if (.match (.mid (0, 1, {arg}), #))
+                ; ldax called with immediate operand
+                lda     #&lt;(.right (.tcount ({arg})-1, {arg}))
+                ldx     #>(.right (.tcount ({arg})-1, {arg}))
+                .else
+                ...
+                .endif
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".XMATCH"></A> <A NAME="ss10.24">10.24</A> <A HREF="ca65.html#toc10.24"><CODE>.XMATCH</CODE></A>
+</H2>
+
+
+<P>Builtin function. Matches two token lists against each other. This is
+most useful within macros, since macros are not stored as strings, but
+as lists of tokens.</P>
+<P>The syntax is</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .XMATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Both token list may contain arbitrary tokens with the exception of the
+terminator token (comma resp. right parenthesis) and</P>
+<P>
+<UL>
+<LI>end-of-line</LI>
+<LI>end-of-file</LI>
+</UL>
+</P>
+<P>The token lists may optionally be enclosed into curly braces. This allows
+the inclusion of tokens that would otherwise terminate the list (the closing
+right paren in the given case). Often a macro parameter is used for any of
+the token lists.</P>
+<P>The function compares tokens <EM>and</EM> token values. If you need a function
+that just compares the type of tokens, have a look at the <CODE>
+<A HREF="#.MATCH">.MATCH</A></CODE> function.</P>
+<P>See: <CODE>
+<A HREF="#.MATCH">.MATCH</A></CODE></P>
+
+
+
+<HR>
+<A HREF="ca65-11.html">Next</A>
+<A HREF="ca65-9.html">Previous</A>
+<A HREF="ca65.html#toc10">Contents</A>
+</BODY>
+</HTML>

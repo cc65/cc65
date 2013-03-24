@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>od65 Users Guide: Usage</TITLE>
+ <LINK HREF="od65-3.html" REL=next>
+ <LINK HREF="od65-1.html" REL=previous>
+ <LINK HREF="od65.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="od65-3.html">Next</A>
+<A HREF="od65-1.html">Previous</A>
+<A HREF="od65.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="s2">2.</A> <A HREF="od65.html#toc2">Usage</A></H2>
+
+
+<P>The od65 utility dumps contents of one or more ca65 generated object file to
+standard output. It has no cross-version compatibility, so you have to use
+a version that matches the version of ca65 used to create the object files.</P>
+
+
+<H2><A NAME="ss2.1">2.1</A> <A HREF="od65.html#toc2.1">Command line option overview</A>
+</H2>
+
+
+<P>The program may be called as follows:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+---------------------------------------------------------------------------
+Usage: od65 [options] file [options] [file]
+Short options:
+  -h                    Help (this text)
+  -H                    Dump the object file header
+  -S                    Dump segments sizes
+  -V                    Print the version number and exit
+
+Long options:
+  --dump-all            Dump all object file information
+  --dump-dbgsyms        Dump debug symbols
+  --dump-exports        Dump exported symbols
+  --dump-files          Dump the source files
+  --dump-header         Dump the object file header
+  --dump-imports        Dump imported symbols
+  --dump-lineinfo       Dump line information
+  --dump-options        Dump object file options
+  --dump-segments       Dump the segments in the file
+  --dump-segsize        Dump segments sizes
+  --help                Help (this text)
+  --version             Print the version number and exit
+---------------------------------------------------------------------------
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="cmdline-opt-detail"></A> <A NAME="ss2.2">2.2</A> <A HREF="od65.html#toc2.2">Command line options in detail</A>
+</H2>
+
+
+<P>Here is a description of all the command line options:</P>
+<P>
+<DL>
+
+<DT><B><CODE>--dump-all</CODE></B><DD>
+<P>This will output all information, od65 is able to process. The option is a
+shortcut for specifying all the other <CODE>--dump</CODE> options.</P>
+
+
+<DT><B><CODE>--dump-dbgsyms</CODE></B><DD>
+<P>Dump all debug symbols contained in the object file.</P>
+
+
+<DT><B><CODE>--dump-exports</CODE></B><DD>
+<P>Dump all exported symbols contained in the object file.</P>
+
+
+<DT><B><CODE>--dump-files</CODE></B><DD>
+<P>Dump the file table contained in the object file.</P>
+
+
+<DT><B><CODE>-H, --dump-header</CODE></B><DD>
+<P>Dump the object file header.</P>
+
+
+<DT><B><CODE>--dump-imports</CODE></B><DD>
+<P>Dump the list of imported symbols contained in the object file.</P>
+
+
+<DT><B><CODE>--dump-lineinfo</CODE></B><DD>
+<P>Dump the line info contained in the object file.</P>
+
+
+<DT><B><CODE>--dump-segments</CODE></B><DD>
+<P>Dump the list of segments contained in the object file.</P>
+
+
+<DT><B><CODE>--dump-scopes</CODE></B><DD>
+<P>Dump the scope (lexical level) information contained in the object file.</P>
+
+
+<DT><B><CODE>-S, --dump-segsize</CODE></B><DD>
+<P>Dump the sizes of all segments contained in the object file. This option is
+quite useful to determine the effect of measures that increase or decrease
+code size.</P>
+
+
+<DT><B><CODE>-h, --help</CODE></B><DD>
+<P>Print the short option summary shown above.</P>
+
+
+<DT><B><CODE>-V, --version</CODE></B><DD>
+<P>Print the version number of the compiler. When submitting a bug report,
+please include the operating system you're using, and the compiler
+version.</P>
+</DL>
+</P>
+
+
+<HR>
+<A HREF="od65-3.html">Next</A>
+<A HREF="od65-1.html">Previous</A>
+<A HREF="od65.html#toc2">Contents</A>
+</BODY>
+</HTML>

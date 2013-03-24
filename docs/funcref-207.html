@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 function reference: Alphabetical function reference: realloc</TITLE>
+ <LINK HREF="funcref-208.html" REL=next>
+ <LINK HREF="funcref-206.html" REL=previous>
+ <LINK HREF="funcref.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="funcref-208.html">Next</A>
+<A HREF="funcref-206.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="realloc"></A> 3.158 <A HREF="funcref.html#toc3.158">realloc</A></H2>
+
+
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT><B>Function</B><DD>
+<P>Change the size of an allocated memory block.</P>
+<DT><B>Header</B><DD>
+<P><CODE>
+<A HREF="funcref-42.html#stdlib.h">stdlib.h</A></CODE></P>
+<DT><B>Declaration</B><DD>
+<P><CODE>void* __fastcall__ realloc (void* block, size_t size);</CODE></P>
+<DT><B>Description</B><DD>
+<P><CODE>realloc</CODE> changes the size of the memory block pointed to
+by <CODE>block</CODE> to <CODE>size</CODE> bytes. If <CODE>block</CODE> is <CODE>NULL</CODE>, <CODE>realloc</CODE>
+behaves as if <CODE>malloc</CODE> had been called. If <CODE>size</CODE> is zero, <CODE>realloc</CODE>
+behaves as if <CODE>free</CODE> had been called. On error (not enough memory
+available), <CODE>realloc</CODE> returns <CODE>NULL</CODE>.</P>
+<DT><B>Limits</B><DD>
+<P>
+<UL>
+<LI>The part of the memory block that is returned will have its contents
+unchanged.</LI>
+<LI>This function is somewhat dangerous to use. Be careful to save the
+pointer you're passing somewhere else, otherwise
+<BLOCKQUOTE><CODE>
+<PRE>
+        ptr = realloc (ptr, size);
+</PRE>
+</CODE></BLOCKQUOTE>
+
+will loose your only copy of <CODE>ptr</CODE> if <CODE>realloc</CODE> returns <CODE>NULL</CODE>.</LI>
+<LI>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.</LI>
+</UL>
+</P>
+<DT><B>Availability</B><DD>
+<P>ISO 9899</P>
+<DT><B>See also</B><DD>
+<P>
+<A HREF="funcref-54.html#_heapadd">_heapadd</A>,
+<A HREF="funcref-55.html#_heapblocksize">_heapblocksize</A>,
+<A HREF="funcref-56.html#_heapmaxavail">_heapmaxavail</A>,
+<A HREF="funcref-57.html#_heapmemavail">_heapmemavail</A>,
+<A HREF="funcref-83.html#calloc">calloc</A>,
+<A HREF="funcref-140.html#free">free</A>,
+<A HREF="#realloc">realloc</A></P>
+<DT><B>Example</B><DD>
+<P>None.</P>
+</DL>
+</BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="funcref-208.html">Next</A>
+<A HREF="funcref-206.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+</BODY>
+</HTML>

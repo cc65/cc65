@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Atari specific information for cc65: DIO implementation</TITLE>
+ <LINK HREF="atari-8.html" REL=next>
+ <LINK HREF="atari-6.html" REL=previous>
+ <LINK HREF="atari.html#toc7" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="atari-8.html">Next</A>
+<A HREF="atari-6.html">Previous</A>
+<A HREF="atari.html#toc7">Contents</A>
+<HR>
+<H2><A NAME="dio"></A> <A NAME="s7">7.</A> <A HREF="atari.html#toc7">DIO implementation</A></H2>
+
+
+<P>The Atari supports disk drives with either 128 or 256 byte sectors.
+The first three sectors of any disk are always 128 bytes long though. This is
+because the system can only boot from 128 bytes sectors.</P>
+<P>Therefore the DIO read and write functions transfer only 128 bytes
+for sectors 1 to 3, regardless of the type of diskette.</P>
+
+
+<HR>
+<A HREF="atari-8.html">Next</A>
+<A HREF="atari-6.html">Previous</A>
+<A HREF="atari.html#toc7">Contents</A>
+</BODY>
+</HTML>

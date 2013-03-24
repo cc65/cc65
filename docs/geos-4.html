@@ -1,0 +1,366 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>GEOSLib docs: Library Structures</TITLE>
+ <LINK HREF="geos-3.html" REL=previous>
+ <LINK HREF="geos.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+Next
+<A HREF="geos-3.html">Previous</A>
+<A HREF="geos.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="geos.html#toc4">Library Structures</A></H2>
+
+<P>To simplify usage and optimize passing parameters to functions I have declared several structures
+which describe the most common objects. Some of these structures are bound to static addresses in
+the GEOS data space (<CODE>$8000-$8fff</CODE>), so you can use their fields directly in an optimized way.
+Please see <CODE>gsym.h</CODE> to find them. All structures are defined in <CODE>gstruct.h</CODE> and you may
+find also some comments there.</P>
+
+<H2><A NAME="ss4.1">4.1</A> <A HREF="geos.html#toc4.1">Graphics Structures</A>
+</H2>
+
+<H3>pixel</H3>
+
+<P>A simple structure describing a point on the screen.</P>
+
+<H3>fontdesc</H3>
+
+<P>This structure describes a font in one pointsize. There is the current font - <CODE>struct fontdesc</CODE>
+bound to <CODE>curFontDesc</CODE>. You can also force GEOS to use your own fonts by calling
+<CODE>LoadCharSet</CODE>. You just need to open a VLIR font file and load one record - one pointsize -
+somewhere. At the start of this area you already have all data for <CODE>fontdesc</CODE> so you can
+pass a pointer to the load address of that pointsize to <CODE>LoadCharSet</CODE>. (Note that although
+it has 'Load' in the name, that function loads only GEOS internal data structures, not data
+from disk).</P>
+
+<H3>window</H3>
+
+<P>This widely used structure holds the description of a region of the screen. It describes the top-left and
+bottom-right corners of a window.</P>
+
+<H3>iconpic</H3>
+
+<P>Maybe the name isn't the best - it has nothing with <CODE>DoIcons</CODE> but with bitmap functions -
+<CODE>BitmapUp</CODE> for example. This structure holds the parameters needed to properly decode and show
+a bitmap on the screen. The bitmap has to be encoded - if you have some non-GEOS bitmaps simply
+convert them to Photo Scraps - this is the format used by all GEOS bitmap functions - <CODE>DoIcons</CODE>
+too.</P>
+
+<H2><A NAME="ss4.2">4.2</A> <A HREF="geos.html#toc4.2">Icons</A>
+</H2>
+
+<P>These structures describe click boxes (icons) that can be placed on screen or in a dialog box.</P>
+
+<H3>icondef</H3>
+
+<P>This is the definition of a single click box. Please see <CODE>gstruct.h</CODE> for a description of its fields.</P>
+
+<H3>icontab</H3>
+
+<P>This is the toplevel description of icons to be placed and enabled on the screen. This structure
+has the following fields:
+<UL>
+<LI><CODE>char number</CODE> - total number of icons declared here</LI>
+<LI><CODE>struct pixel mousepos</CODE> - after finishing <CODE>DoIcons</CODE> the mouse pointer will be placed in
+this point allowing you to have a hint for the user what the default action is</LI>
+<LI><CODE>struct icondef tab[]</CODE> - this table of size equal to <CODE>icontab.number</CODE> contains
+descriptions for all icons</LI>
+</UL>
+</P>
+
+<H2><A NAME="ss4.3">4.3</A> <A HREF="geos.html#toc4.3">File and Disk</A>
+</H2>
+
+<H3>tr_se</H3>
+
+<P>This simple structure holds the track and sector number of something. Do not expect the track to be
+in range 1-35, as GEOS can support many various and weird devices. For example my C128 256K
+expansion is utilized as RAMDisk with a layout of 4 tracks of 128 sectors each. However assuming that
+a track number equal to 0 is illegal might be wise.</P>
+
+<H3>f_date</H3>
+
+<P>This is a placeholder for a file datestamp. This structure is also present in <CODE>struct filehandle</CODE>.
+GEOS is not Y2K compliant, so if the current file has in <CODE>filehandle.date.year</CODE> a value less than 86
+you can safely assume that it is e.g. 2004 and not 1904.</P>
+
+<H3>filehandle</H3>
+
+<P>This is the main file descriptor. It is either an entry in the directory (returned from file functions)
+or its copy in <CODE>dirEntryBuf</CODE>. This is optimized so you can safely get to the file's year e.g.
+by testing <CODE>dirEntryBuf.date.year</CODE> - it will be compiled to simple <CODE>LDA, STA</CODE>.</P>
+
+<H3>fileheader</H3>
+
+<P>This structure holds the fileheader description. You can load a file's header into the <CODE>fileHeader</CODE>
+fixed area using <CODE>GetFHdrInfo</CODE>. (note that <CODE>fileHeader</CODE> is a place in memory while
+<CODE>fileheader</CODE> is a structure).
+You will also need your own fileheader for <CODE>SaveFile</CODE>.</P>
+
+<H2><A NAME="ss4.4">4.4</A> <A HREF="geos.html#toc4.4">System Structures</A>
+</H2>
+
+<H3>s_date</H3>
+
+<P>This structure is defined only for <CODE>system_date</CODE>. It is slightly different from <CODE>f_date</CODE>
+so I prepared this one. You can e.g. get or set the current time using <CODE>system_date.s_hour</CODE> and
+<CODE>system_date.s_minute</CODE>. Accesses to these will be optimized to simple <CODE>LDA</CODE> and <CODE>STA</CODE>
+pair.</P>
+
+<H3>process</H3>
+
+<P>You should declare a table of that type to prepare data for <CODE>InitProcesses</CODE>. The maximum number
+of processes is 20, and the last entry has to be equal to <CODE>{NULL,NULL}</CODE>, so this table may hold
+only 21 entries. The first member of this structure (<CODE>pointer</CODE>) holds the pointer to the called
+function (void returning void), you will probably have to cast that pointer into <CODE>unsigned int</CODE>.
+The second field <CODE>jiffies</CODE> holds the amount of time between calls to that function.
+On PAL systems there are 50 jiffies per second, while NTSC have 60 of them.</P>
+
+<H2><A NAME="ss4.5">4.5</A> <A HREF="geos.html#toc4.5">A few things in detail...</A>
+</H2>
+
+<P>GEOSLib uses cc65 non-ANSI extensions to easily initialize data in memory. This is done with a
+kind of array of unspecified length and unspecified type. Here is how it works:
+<BLOCKQUOTE><CODE>
+<PRE>
+void example = {
+    (char)3, (unsigned)3, (char)0 };
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Which will be compiled to following string of bytes:
+<BLOCKQUOTE><CODE>
+<PRE>
+_example:
+        .byte 3
+        .word 3
+        .byte 0
+</PRE>
+</CODE></BLOCKQUOTE>
+
+As you see this way it is possible to define data of any type in any order. You must remember to
+cast each member to proper type.</P>
+
+<H3>DoMenu structure</H3>
+
+<P><CODE>DoMenu</CODE> is responsible for everything concerned with menu processing. Many, many GEOS programs
+are just initializing the screen and menu and returning to <CODE>MainLoop</CODE>. In GEOSLib it is the same as
+returning from <CODE>main</CODE> function without using <CODE>exit(0)</CODE>.</P>
+<P>A menu is described by two types of data - menu descriptors and menu items. A descriptor contains
+information about the following menu items, and items contain names of entries and either
+pointers to functions to execute or, in case of nested menus, pointers to submenu descriptors.
+Note that submenu descriptor can be top-level descriptor, there's no difference in structure,
+just in the content.</P>
+<P>Here is how a single descriptor looks like:
+<BLOCKQUOTE><CODE>
+<PRE>
+void myMenu = {
+        (char)top, (char)bottom,                // this is the size of the menubox
+        (unsigned)left, (unsigned)right,        // counting all items in the current descriptor
+        (char)number_of_items | type_of_menu,   // number of following items ORed with
+                                                // type of this menu, it can be either
+        // HORIZONTAL or VERTICAL if you will have also bit 6 set then menu won't be closed
+        // after moving mouse pointer outside the menubox. You can have at most 31 items.
+</PRE>
+</CODE></BLOCKQUOTE>
+
+This is followed by <CODE>number_of_items</CODE> of following item description.
+<BLOCKQUOTE><CODE>
+<PRE>
+        ...
+        "menuitemname", (char)item_type, (unsigned)pointer,
+        "nextitemname", (char)item_type, (unsigned)pointer,
+        ...
+        "lastitemname", (char)item_type, (unsigned)pointer };
+        // Note that there isn't ending &lt;tt/NULL/ or something like that.
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<CODE>pointer</CODE> is a pointer to something, what it points for depends from <CODE>item_type</CODE>. This one
+can have following values:</P>
+<P><CODE>MENU_ACTION</CODE> - a function pointed by <CODE>pointer</CODE> will be called after clicking on the menu item</P>
+<P><CODE>SUB_MENU</CODE> - <CODE>pointer</CODE> points to next menu descriptor - a submenu</P>
+<P>Both of them can be ORed with <CODE>DYN_SUB_MENU</CODE> and then the <CODE>pointer</CODE> points to a function
+which will return in <CODE>r0</CODE> the needed pointer (to function to execute or a submenu).</P>
+<P>For creating nested menus (you can have at most 8 levels of submenus) you need to declare such
+a structure for each submenu and top level menu.</P>
+
+<H3>DoDlgBox command string</H3>
+
+<P><CODE>DoDlgBox</CODE> is together with <CODE>DoMenu</CODE> one of the most powerful routines in GEOS. It is
+responsible for creating dialog boxes, that is windows which task is to interact with the user.
+The format of the command string is following:
+<BLOCKQUOTE><CODE>
+<PRE>
+    (window size and position)
+    (commands and parameters)
+    NULL
+</PRE>
+</CODE></BLOCKQUOTE>
+
+There is a custom type defined for the command string: <CODE>dlgBoxStr</CODE>.</P>
+
+<H3>Size and position</H3>
+
+<P>The first element can be specified in two ways - by using the default size and position or specifying
+your own. The first case results in
+<BLOCKQUOTE><CODE>
+<PRE>
+const dlgBoxStr example = {
+        DB_DEFPOS (pattern_of_shadow),
+        ...             // commands
+        DB_END };
+</PRE>
+</CODE></BLOCKQUOTE>
+
+And the own size and position would be:
+<BLOCKQUOTE><CODE>
+<PRE>
+const dlgBoxStr example = {
+        DB_SETPOS (pattern, top, bottom, left, right)
+        ...             // commands
+        DB_END };
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Commands</H3>
+
+<P>The next element of the <CODE>DoDlgBox</CODE> command string are the commands themselves. The first six commands are
+default icons and the number of the selected icon will be returned from window processor. The icons are
+<CODE>OK, CANCEL, YES, NO, OPEN</CODE>, and <CODE>DISK</CODE>. You can use predefined macros for using them, e.g.:
+<BLOCKQUOTE><CODE>
+<PRE>
+        ...
+        DB_ICON(OK, DBI_X_0, DBI_Y_0),
+        ...
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Note that the position is counted from top left corner of window, not entire screen and that the 'x'
+position is counted in cards (8-pixel) and not in pixels. This is also true for all following commands.
+<CODE>DBI_X_0</CODE> and <CODE>DBI_Y_0</CODE> are predefined (see <CODE>gdlgbox.h</CODE> for more), the default positions
+which will cause icons to appear on a default window exactly where you would expect them.</P>
+<P><CODE>DB_TXTSTR (x, y, text)</CODE> will cause to show the given text in the window.</P>
+<P><CODE>DB_VARSTR (x, y, ptr)</CODE> works as above, but here you are passing a pointer to a zero page location
+where the address of the text is stored. This is useful for information windows where only the text content
+is variable. Consider following:
+<BLOCKQUOTE><CODE>
+<PRE>
+char text = "foo";
+        ...
+        r15=(unsigned)text;             // in code just before call to DoDlgBox
+        ...
+        DB_VARSTR (TXT_LN_X, TXT_LN_1_Y, &amp;r15),
+        ...
+</PRE>
+</CODE></BLOCKQUOTE>
+
+will cause the word ``foo'' to appear in the window, but you may store the pointer to any text in
+<CODE>r15</CODE> (in this case) before the call to DoDlgBox.</P>
+<P><CODE>DB_GETSTR(x, y, ptr, length)</CODE> - will add a input-from-keyboard feature. <CODE>ptr</CODE> works as in the
+previous example and points to the location where the text is to be stored. Note that the contents of this
+location will be shown upon creating the window. <CODE>length</CODE> is the maximum number of characters to input.</P>
+<P><CODE>DB_SYSOPV(ptr)</CODE> - this sets <CODE>otherPressVec</CODE> to the given pointer. It is called on every keypress.</P>
+<P><CODE>DB_GRPHSTR(ptr)</CODE> - the data for this command is a pointer for <CODE>GraphicsString</CODE> commands.</P>
+<P><CODE>DB_GETFILES(x, y)</CODE> - for a standard window you should pass 4 for both x and y. This function
+draws a file selection box and searches the current drive for files. Before the call to <CODE>DoDlgBox</CODE> you
+must load <CODE>r7L</CODE> with the GEOS filetype of searched files and <CODE>r10</CODE> with the class text. In <CODE>r5</CODE>
+you have to load a pointer to a <CODE>char[17]</CODE> where the selected filename will be copied. It works
+like <CODE>FindFTypes</CODE> but is limited to first 16 files.</P>
+<P><CODE>DB_OPVEC(ptr)</CODE> - this sets a new pointer for the button press function, if you pass
+<CODE>RstrFrmDialogue</CODE> here you will cause the window to close after pressing mouse button.</P>
+<P><CODE>DB_USRICON(x, y, ptr)</CODE> - places a single user icon (click box) on the window, <CODE>ptr</CODE> points at a
+<CODE>struct icondef</CODE> but fields <CODE>x</CODE> and <CODE>y</CODE> are not used here. You can have at most 8 click
+boxes in a window, this is an internal limit of the GEOS Kernal.</P>
+<P><CODE>DB_USRROUT(ptr)</CODE> - this command causes to immediately call the user routine pointed by <CODE>ptr</CODE>.</P>
+
+<H3>GraphicsString command string</H3>
+
+<P><CODE>GraphicsString</CODE> is a very powerful routine to initialize the whole screen at once. There are
+predefined macros for all commands, names are self-explanatory, see them in <CODE>ggraph.h</CODE>. The last
+command has to be <CODE>GSTR_END</CODE>. There is a custom type defined for the command string: <CODE>graphicStr</CODE>.</P>
+<P>Here is an example for clearing the screen:
+<BLOCKQUOTE><CODE>
+<PRE>
+const graphicStr example = {
+        MOVEPENTO(0,0),
+        NEWPATTERN(0),
+        RECTANGLETO(319,199)
+        GSTR_END };
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>InitRam table</H3>
+
+<P>This type of data is used to initialize one or more bytes in different locations at once. The format is
+the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+void example = {
+    (unsigned)address_to_store_values_at,
+    (char)number_of_bytes_that_follow,
+    (char)data,(char)data (...)
+    // more such definitions
+    (unsigned)NULL // address of 0 ends the table
+    };
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Intercepting system vectors</H3>
+
+<P>It is possible to intercept events and hook into the GEOS Kernal using vectors. Here is a little example:
+<BLOCKQUOTE><CODE>
+<PRE>
+void_func oldVector;
+
+void NewVectorHandler(void) {
+        // do something and at the end call the old vector routine
+        oldVector();
+}
+
+void hook_into_system(void) {
+        oldVector = mouseVector;
+        mouseVector = NewVectorHandler;
+}
+
+void remove_hook(void) {
+        mouseVector = oldVector;
+}
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In your <CODE>main</CODE> function you should call <CODE>hook_into_system()</CODE> but <EM>after</EM> all calls to the GEOS
+Kernal (like <CODE>DoMenu</CODE>, <CODE>DoIcons</CODE>, etc.) - right before passing control to the <CODE>MainLoop()</CODE>.
+Be warned that vectors are most likely to be changed by the GEOS Kernal also via other functions (like
+<CODE>GotoFirstMenu</CODE>, <CODE>DoDlgBox</CODE> and its derivatives etc.). It depends on what Kernal functions
+you use and which vectors you altered. Unfortunately there is no exact list for GEOS 2.0, a complete
+list for GEOS 1.x can be found in A. Boyce's Programmers' Reference Guide mentioned before. Most of the
+information contained there should be still valid for GEOS 2.0. When calling a function that restores
+the vector you should add a <CODE>hook_into_system()</CODE> call right after it.</P>
+<P>It is critical to restore old vector values before exiting the program. If you have more than one
+place where you call <CODE>exit()</CODE> then it might be worth to register <CODE>remove_hook</CODE> function to
+be called upon exiting with <CODE>atexit(&amp;remove_hook);</CODE> call. This way you will ensure that
+such destructor will be always called.</P>
+<P>That little example above intercepts <CODE>mouseVector</CODE>. The <CODE>NewVectorHandler</CODE> function will be
+called every time the mouse button changes status. Other important vectors you should know about
+are:
+<UL>
+<LI><CODE>appMain</CODE> - this is called from within the <CODE>MainLoop</CODE> system loop</LI>
+<LI><CODE>keyVector</CODE> - called whenever a keypress occurs</LI>
+<LI><CODE>intTopVector</CODE> - called at the start of the IRQ routine</LI>
+<LI><CODE>intBotVector</CODE> - called at the end of the IRQ routine</LI>
+</UL>
+</P>
+
+<HR>
+Next
+<A HREF="geos-3.html">Previous</A>
+<A HREF="geos.html#toc4">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>sp65 Users Guide: Attribute lists</TITLE>
+ <LINK HREF="sp65-5.html" REL=next>
+ <LINK HREF="sp65-3.html" REL=previous>
+ <LINK HREF="sp65.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="sp65-5.html">Next</A>
+<A HREF="sp65-3.html">Previous</A>
+<A HREF="sp65.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="attr-lists"></A> <A NAME="s4">4.</A> <A HREF="sp65.html#toc4">Attribute lists</A></H2>
+
+
+<P>As described in 
+<A HREF="sp65-3.html#processing-pipeline">Processing pipeline</A>,
+sp65 consists of lots of different modules that may be combined in different
+ways, to convert an input bitmap to some output.</P>
+<P>Many of the processors and converters have options to change the way, they're
+working. To avoid having lots of command line options that must be parsed on
+high level and passed down to the relevant parts of the program, sp65 features
+something called "attribute lists". Attribute lists are lists of
+attribute/value pairs. These lists are parsed by the main program module
+without any knowledge about their meaning. Lower level parts just grab the
+attributes they need.</P>
+<P>In general, attribute lists look like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        attr1=val1[,attr2=val2[,...]]
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Instead of the comma, colons may also be used (even mixed).</P>
+<P>To simplify things and to make the most common options look "normal", some
+mandatory attributes may be given without an attribute name. If the attribute
+name is missing, the default name is determined by the position. For example,
+the option <CODE>
+<A HREF="sp65-2.html#option--read">--read</A></CODE> does always need a file
+name. The attribute name for the file name is "name". To avoid having to type</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        sp65 --read name=ball.pcx ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>the first attribute gets the default name "name" assigned. So if the first
+attribute doesn't have a name, it is assumed that it is the file name. This
+means that instead of the line above, one can also use</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        sp65 --read ball.pcx ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The second attribute for <CODE>--read</CODE> is the format of the input file. So when
+using</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        sp65 --read ball.pic:pcx ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>a PCX file named "ball.pic" is read. The long form would be</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        sp65 --read name=ball.pic:format=pcx ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Changing the order of the attributes is possible only when explicitly
+specifying the names of the attributes. Using</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        sp65 --read pcx:ball.pic ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>will make sp65 complain, because it tries to read a file named "pcx" with an
+(unknown) format of "ball.pic". The following however will work:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        sp65 --read format=pcx:name=ball.pic ...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The attributes that are valid for each processor or converter are listed
+below.</P>
+
+
+
+<HR>
+<A HREF="sp65-5.html">Next</A>
+<A HREF="sp65-3.html">Previous</A>
+<A HREF="sp65.html#toc4">Contents</A>
+</BODY>
+</HTML>

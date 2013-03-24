@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Address sizes and memory models</TITLE>
+ <LINK HREF="ca65-9.html" REL=next>
+ <LINK HREF="ca65-7.html" REL=previous>
+ <LINK HREF="ca65.html#toc8" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-9.html">Next</A>
+<A HREF="ca65-7.html">Previous</A>
+<A HREF="ca65.html#toc8">Contents</A>
+<HR>
+<H2><A NAME="address-sizes"></A> <A NAME="s8">8.</A> <A HREF="ca65.html#toc8">Address sizes and memory models</A></H2>
+
+
+
+<H2><A NAME="ss8.1">8.1</A> <A HREF="ca65.html#toc8.1">Address sizes</A>
+</H2>
+
+
+<P>ca65 assigns each segment and each symbol an address size. This is true, even
+if the symbol is not used as an address. You may also think of a value range
+of the symbol instead of an address size.</P>
+<P>Possible address sizes are:</P>
+<P>
+<UL>
+<LI>Zeropage or direct (8 bits)</LI>
+<LI>Absolute (16 bits)</LI>
+<LI>Far (24 bits)</LI>
+<LI>Long (32 bits)</LI>
+</UL>
+</P>
+<P>Since the assembler uses default address sizes for the segments and symbols,
+it is usually not necessary to override the default behaviour. In cases, where
+it is necessary, the following keywords may be used to specify address sizes:</P>
+<P>
+<UL>
+<LI>DIRECT, ZEROPAGE or ZP for zeropage addressing (8 bits).</LI>
+<LI>ABSOLUTE, ABS or NEAR for absolute addressing (16 bits).</LI>
+<LI>FAR for far addressing (24 bits).</LI>
+<LI>LONG or DWORD for long addressing (32 bits).</LI>
+</UL>
+</P>
+
+
+<H2><A NAME="ss8.2">8.2</A> <A HREF="ca65.html#toc8.2">Address sizes of segments</A>
+</H2>
+
+
+<P>The assembler assigns an address size to each segment. Since the
+representation of a label within this segment is "segment start + offset",
+labels will inherit the address size of the segment they are declared in.</P>
+<P>The address size of a segment may be changed, by using an optional address
+size modifier. See the <CODE>
+<A HREF="ca65-11.html#.SEGMENT">segment directive</A></CODE> for
+an explanation on how this is done.</P>
+
+
+<H2><A NAME="ss8.3">8.3</A> <A HREF="ca65.html#toc8.3">Address sizes of symbols</A>
+</H2>
+
+
+
+
+
+
+<H2><A NAME="ss8.4">8.4</A> <A HREF="ca65.html#toc8.4">Memory models</A>
+</H2>
+
+
+<P>The default address size of a segment depends on the memory model used. Since
+labels inherit the address size from the segment they are declared in,
+changing the memory model is an easy way to change the address size of many
+symbols at once.</P>
+
+
+
+
+<HR>
+<A HREF="ca65-9.html">Next</A>
+<A HREF="ca65-7.html">Previous</A>
+<A HREF="ca65.html#toc8">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Users Guide: Differences to the ISO standard</TITLE>
+ <LINK HREF="cc65-5.html" REL=next>
+ <LINK HREF="cc65-3.html" REL=previous>
+ <LINK HREF="cc65.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="cc65-5.html">Next</A>
+<A HREF="cc65-3.html">Previous</A>
+<A HREF="cc65.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="cc65.html#toc4">Differences to the ISO standard</A></H2>
+
+
+<P>Apart from the things listed below, the compiler does support additional
+keywords, has several functions in the standard headers with names outside the
+reserved namespace and a few syntax extensions. All these can be disabled with
+the <CODE>
+<A HREF="cc65-2.html#option--standard">--standard</A></CODE> command line
+option. Its use for maximum standards compatibility is advised.</P>
+<P>Here is a list of differences between the language, the compiler accepts,
+and the one defined by the ISO standard:</P>
+<P>
+<UL>
+<LI>    The datatypes "float" and "double" are not available.
+
+</LI>
+<LI>    C Functions may not return structs (or unions), and structs may not
+be passed as parameters by value. However, struct assignment *is*
+possible.
+
+</LI>
+<LI>    Part of the C library is available only with fastcall calling
+conventions (see below).  It means that you must not mix pointers to
+those functions with pointers to user-written, not-fastcall functions.
+
+</LI>
+<LI>    The <CODE>volatile</CODE> keyword doesn't have an effect. This is not as bad
+as it sounds, since the 6502 has so few registers that it isn't
+possible to keep values in registers anyway.
+
+</LI>
+</UL>
+</P>
+<P>There may be some more minor differences I'm currently not aware of. The
+biggest problem is the missing float data type. With this limitation in
+mind, you should be able to write fairly portable code.</P>
+
+
+
+<HR>
+<A HREF="cc65-5.html">Next</A>
+<A HREF="cc65-3.html">Previous</A>
+<A HREF="cc65.html#toc4">Contents</A>
+</BODY>
+</HTML>

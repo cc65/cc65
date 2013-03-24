@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ld65 Users Guide: Search paths</TITLE>
+ <LINK HREF="ld65-4.html" REL=next>
+ <LINK HREF="ld65-2.html" REL=previous>
+ <LINK HREF="ld65.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ld65-4.html">Next</A>
+<A HREF="ld65-2.html">Previous</A>
+<A HREF="ld65.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="s3">3.</A> <A HREF="ld65.html#toc3">Search paths</A></H2>
+
+
+<P>Starting with version 2.10 there are now several search paths for files needed
+by the linker: One for libraries, one for object files and one for config
+files.</P>
+
+
+<H2><A NAME="ss3.1">3.1</A> <A HREF="ld65.html#toc3.1">Library search path</A>
+</H2>
+
+
+<P>The library search path contains in this order:</P>
+<P>
+<OL>
+<LI>The current directory.</LI>
+<LI>A compiled in library path which is often <CODE>/usr/lib/cc65/lib</CODE> on
+Linux systems.</LI>
+<LI>The value of the environment variable <CODE>LD65_LIB</CODE> if it is defined.</LI>
+<LI>A subdirectory named <CODE>lib</CODE> of the directory defined in the environment
+variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
+<LI>Any directory added with the <CODE>
+<A HREF="ld65-2.html#option--lib-path">--lib-path</A></CODE> option on the command line.</LI>
+</OL>
+</P>
+
+
+<H2><A NAME="ss3.2">3.2</A> <A HREF="ld65.html#toc3.2">Object file search path</A>
+</H2>
+
+
+<P>The object file search path contains in this order:</P>
+<P>
+<OL>
+<LI>The current directory.</LI>
+<LI>A compiled in directory which is often <CODE>/usr/lib/cc65/obj</CODE> on
+Linux systems.</LI>
+<LI>The value of the environment variable <CODE>LD65_OBJ</CODE> if it is defined.</LI>
+<LI>A subdirectory named <CODE>obj</CODE> of the directory defined in the environment
+variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
+<LI>Any directory added with the <CODE>
+<A HREF="ld65-2.html#option--obj-path">--obj-path</A></CODE> option on the command line.</LI>
+</OL>
+</P>
+
+
+<H2><A NAME="ss3.3">3.3</A> <A HREF="ld65.html#toc3.3">Config file search path</A>
+</H2>
+
+
+<P>The config file search path contains in this order:</P>
+<P>
+<OL>
+<LI>The current directory.</LI>
+<LI>A compiled in directory which is often <CODE>/usr/lib/cc65/cfg</CODE> on
+Linux systems.</LI>
+<LI>The value of the environment variable <CODE>LD65_CFG</CODE> if it is defined.</LI>
+<LI>A subdirectory named <CODE>cfg</CODE> of the directory defined in the environment
+variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
+<LI>Any directory added with the <CODE>
+<A HREF="ld65-2.html#option--cfg-path">--cfg-path</A></CODE> option on the command line.</LI>
+</OL>
+</P>
+
+
+
+<HR>
+<A HREF="ld65-4.html">Next</A>
+<A HREF="ld65-2.html">Previous</A>
+<A HREF="ld65.html#toc3">Contents</A>
+</BODY>
+</HTML>

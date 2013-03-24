@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Defining a Custom cc65 Target: System Memory Map Definition</TITLE>
+ <LINK HREF="customizing-3.html" REL=next>
+ <LINK HREF="customizing-1.html" REL=previous>
+ <LINK HREF="customizing.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="customizing-3.html">Next</A>
+<A HREF="customizing-1.html">Previous</A>
+<A HREF="customizing.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="s2">2.</A> <A HREF="customizing.html#toc2">System Memory Map Definition</A></H2>
+
+
+<P>The targeted system uses block RAM contained on the XILINX FPGA for the
+system memory (both RAM and ROM).  The block RAMs are available in
+various aspect ratios, and they will be used in this system as 2K*8
+devices.  There will be two RAMs used for data storage, starting at
+location $0000 and growing upwards.  There will be one ROM (realized as
+initialized RAM) used code storage, starting at location $FFFF and
+growing downwards.</P>
+<P>The cc65 toolset requires a memory configuration file to define the
+memory that is available to the cc65 run-time environment, which is
+defined as follows:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+MEMORY {
+    ZP:        start =    $0, size =  $100, type   = rw, define = yes;
+    RAM:       start =  $200, size = $0E00, define = yes;
+    ROM:       start = $F800, size = $0800, file   = %O;
+}
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>ZP defines the available zero page locations, which in this case starts
+at $0 and has a length of $100.  Keep in mind that certain systems may
+require access to some zero page locations, so the starting address may
+need to be adjusted accordingly to prevent cc65 from attempting to reuse
+those locations.  Also, at a minimum, the cc65 run-time environment uses
+26 zero page locations, so the smallest zero page size that can be
+specified is $1A.  The usable RAM memory area begins after the 6502
+stack storage in page 1, so it is defined as starting at location $200
+and filling the remaining 4K of space (4096 - 2 *
+256&nbsp;=&nbsp;3584&nbsp;=&nbsp;$0E00).  The 2K of ROM space begins at
+address $F800 and goes to $FFFF (size&nbsp;=&nbsp;$0800).</P>
+<P>Next, the memory segments within the memory devices need to be defined.
+A standard segment definition is used, with one notable exception.  The
+interrupt and reset vector locations need to be defined at locations
+$FFFA through $FFFF.  A special segment named VECTORS is defined that
+resides at these locations.  Later, the interrupt vector map will be
+created and placed in the VECTORS segment, and the linker will put these
+vectors at the proper memory locations.  The segment definition is:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+SEGMENTS {
+    ZEROPAGE:  load = ZP,  type = zp,  define   = yes;
+    DATA:      load = ROM, type = rw,  define   = yes, run = RAM;
+    BSS:       load = RAM, type = bss, define   = yes;
+    HEAP:      load = RAM, type = bss, optional = yes;
+    STARTUP:   load = ROM, type = ro;
+    INIT:      load = ROM, type = ro,  optional = yes;
+    CODE:      load = ROM, type = ro;
+    RODATA:    load = ROM, type = ro;
+    VECTORS:   load = ROM, type = ro,  start    = $FFFA;
+}
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The meaning of each of these segments is as follows.</P>
+
+<P><CODE>       ZEROPAGE:  </CODE>Data in page 0, defined by ZP as starting at $0 with length $100</P>
+<P><CODE>       DATA:      </CODE>Initialized data that can be modified by the program, stored in RAM</P>
+<P><CODE>       BSS:       </CODE>Uninitialized data stored in RAM (used for variable storage)</P>
+<P><CODE>       HEAP:      </CODE>Uninitialized C-level heap storage in RAM, optional</P>
+<P><CODE>       STARTUP:   </CODE>The program initialization code, stored in ROM</P>
+<P><CODE>       INIT:      </CODE>The code needed to initialize the system, stored in ROM</P>
+<P><CODE>       CODE:      </CODE>The program code, stored in ROM</P>
+<P><CODE>       RODATA:    </CODE>Initialized data that cannot be modified by the program, stored in ROM</P>
+<P><CODE>       VECTORS:   </CODE>The interrupt vector table, stored in ROM at location $FFFA</P>
+<P>A note about initialized data:  any variables that require an initial
+value, such as external (global) variables, require that the initial
+values be stored in the ROM code image.  However, variables stored in
+ROM cannot change; therefore the data must be moved into variables that
+are located in RAM.  Specifying <CODE>run&nbsp;=&nbsp;RAM</CODE> as part of
+the DATA segment definition will indicate that those variables will
+require their initialization value to be copied via a call to the
+<CODE>copydata</CODE> routine in the startup assembly code.  In addition,
+there are system level variables that will need to be initialized as
+well, especially if the heap segment is used via a C-level call to
+<CODE>malloc&nbsp;()</CODE>.</P>
+<P>The final section of the definition file contains the data constructors
+and destructors used for system startup.  In addition, if the heap is
+used, the maximum C-level stack size needs to be defined in order for
+the system to be able to reliably allocate blocks of memory.  The stack
+size selection must be greater than the maximum amount of storage
+required to run the program, keeping in mind that the C-level subroutine
+call stack and all local variables are stored in this stack.  The
+<CODE>FEATURES</CODE> section defines the required constructor/destructor
+attributes and the <CODE>SYMBOLS</CODE> section defines the stack size.  The
+constructors will be run via a call to <CODE>initlib</CODE> in the startup
+assembly code and the destructors will be run via an assembly language
+call to <CODE>donelib</CODE> during program termination.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+FEATURES {
+    CONDES:    segment = STARTUP,
+               type    = constructor,
+               label   = __CONSTRUCTOR_TABLE__,
+               count   = __CONSTRUCTOR_COUNT__;
+    CONDES:    segment = STARTUP,
+               type    = destructor,
+               label   = __DESTRUCTOR_TABLE__,
+               count   = __DESTRUCTOR_COUNT__;
+}
+
+SYMBOLS {
+    # Define the stack size for the application
+    __STACKSIZE__:  value = $0200, weak = yes;
+}
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>These definitions are placed in a file named &#34;sbc.cfg&#34;
+and are referred to during the ld65 linker stage.</P>
+
+<HR>
+<A HREF="customizing-3.html">Next</A>
+<A HREF="customizing-1.html">Previous</A>
+<A HREF="customizing.html#toc2">Contents</A>
+</BODY>
+</HTML>

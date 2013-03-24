@@ -1,0 +1,192 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Defining a Custom cc65 Target: Startup Code Definition</TITLE>
+ <LINK HREF="customizing-4.html" REL=next>
+ <LINK HREF="customizing-2.html" REL=previous>
+ <LINK HREF="customizing.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="customizing-4.html">Next</A>
+<A HREF="customizing-2.html">Previous</A>
+<A HREF="customizing.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="s3">3.</A> <A HREF="customizing.html#toc3">Startup Code Definition</A></H2>
+
+
+<P>In the cc65 toolset, a startup routine must be defined that is executed
+when the CPU is reset.  This startup code is marked with the STARTUP
+segment name, which was defined in the system configuration file as
+being in read only memory.  The standard convention used in the
+predefined libraries is that this code is resident in the crt0 module.
+For this custom system, all that needs to be done is to perform a little
+bit of 6502 housekeeping, set up the C-level stack pointer, initialize
+the memory storage, and call the C-level routine <CODE>main&nbsp;()</CODE>.
+The following code was used for the crt0 module, defined in the file
+&#34;crt0.s&#34;:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+; ---------------------------------------------------------------------------
+; crt0.s
+; ---------------------------------------------------------------------------
+;
+; Startup code for cc65 (Single Board Computer version)
+
+.export   _init, _exit
+.import   _main
+
+.export   __STARTUP__ : absolute = 1        ; Mark as startup
+.import   __RAM_START__, __RAM_SIZE__       ; Linker generated
+
+.import    copydata, zerobss, initlib, donelib
+
+.include  &#34;zeropage.inc&#34;
+
+; ---------------------------------------------------------------------------
+; Place the startup code in a special segment
+
+.segment  &#34;STARTUP&#34;
+
+; ---------------------------------------------------------------------------
+; A little light 6502 housekeeping
+
+_init:    LDX     #$FF                 ; Initialize stack pointer to $01FF
+          TXS
+          CLD                          ; Clear decimal mode
+
+; ---------------------------------------------------------------------------
+; Set cc65 argument stack pointer
+
+          LDA     #&lt;(__RAM_START__ + __RAM_SIZE__)
+          STA     sp
+          LDA     #&gt;(__RAM_START__ + __RAM_SIZE__)
+          STA     sp+1
+
+; ---------------------------------------------------------------------------
+; Initialize memory storage
+
+          JSR     zerobss              ; Clear BSS segment
+          JSR     copydata             ; Initialize DATA segment
+          JSR     initlib              ; Run constructors
+
+; ---------------------------------------------------------------------------
+; Call main()
+
+          JSR     _main
+
+; ---------------------------------------------------------------------------
+; Back from main (this is also the _exit entry):  force a software break
+
+_exit:    JSR     donelib              ; Run destructors
+          BRK
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The following discussion explains the purpose of several important
+assembler level directives in this file.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.export   _init, _exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line instructs the assembler that the symbols <CODE>_init</CODE> and
+<CODE>_exit</CODE> are to be accessible from other modules.  In this
+example, <CODE>_init</CODE> is the location that the CPU should jump to when
+reset, and <CODE>_exit</CODE> is the location that will be called when the
+program is finished.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.import   _main
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line instructs the assembler to import the symbol <CODE>_main</CODE>
+from another module.  cc65 names all C-level routines as
+{underscore}{name} in assembler, thus the <CODE>main&nbsp;()</CODE> routine
+in C is named <CODE>_main</CODE> in the assembler.  This is how the startup
+code will link to the C-level code.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.export   __STARTUP__ : absolute = 1        ; Mark as startup
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line marks this code as startup code (code that is executed when
+the processor is reset), which will then be automatically linked into
+the executable code.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.import   __RAM_START__, __RAM_SIZE__       ; Linker generated
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line imports the RAM starting address and RAM size constants, which
+are used to initialize the cc65 C-level argument stack pointer.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.segment  &#34;STARTUP&#34;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line instructs the assembler that the code is to be placed in the
+STARTUP segment of memory.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+          JSR     zerobss              ; Clear BSS segment
+          JSR     copydata             ; Initialize DATA segment
+          JSR     initlib              ; Run constructors
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>These three lines initialize the external (global) and system
+variables.  The first line sets the BSS segment -- the memory locations
+used for external variables -- to 0.  The second line copies the
+initialization value stored in ROM to the RAM locations used for
+initialized external variables.  The last line runs the constructors
+that are used to initialize the system run-time variables.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+          JSR     _main
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This is the actual call to the C-level <CODE>main&nbsp;()</CODE> routine,
+which is called after the startup code completes.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+_exit:    JSR     donelib              ; Run destructors
+          BRK
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This is the code that will be executed when <CODE>main ()</CODE>
+terminates.  The first thing that must be done is run the destructors
+via a call to <CODE>donelib</CODE>.  Then the program can terminate.  In
+this example, the program is expected to run forever.  Therefore, there
+needs to be a way of indicating when something has gone wrong and the
+system needs to be shut down, requiring a restart only by a hard reset.
+The BRK instruction will be used to indicate a software fault.  This is
+advantageous because cc65 uses the BRK instruction as the fill byte in
+the final binary code.  In addition, the hardware has been designed to
+force the data lines to $00 for all illegal memory accesses, thereby
+also forcing a BRK instruction into the CPU.</P>
+
+<HR>
+<A HREF="customizing-4.html">Next</A>
+<A HREF="customizing-2.html">Previous</A>
+<A HREF="customizing.html#toc3">Contents</A>
+</BODY>
+</HTML>

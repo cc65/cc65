@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Atari Lynx specific information for cc65: Memory layout</TITLE>
+ <LINK HREF="lynx-5.html" REL=next>
+ <LINK HREF="lynx-3.html" REL=previous>
+ <LINK HREF="lynx.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="lynx-5.html">Next</A>
+<A HREF="lynx-3.html">Previous</A>
+<A HREF="lynx.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="lynx.html#toc4">Memory layout</A></H2>
+
+
+<P>cc65 generated programs with the default setup run with the I/O area and the
+kernal enabled, which gives a usable memory range of $200 - $C037.</P>
+<P>Special locations:
+<BLOCKQUOTE><CODE>
+<PRE>
+  0000 - 00FF Zero page
+  0100 - 01FF Machine stack
+
+  A058 - C037 Collision buffer
+  C038 - E017 Screen buffer 1
+  E018 - FFF7 Screen buffer 0
+  FFF8 - FFFF Hardware vectors
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>
+<DL>
+<DT><B>Text screen</B><DD>
+<P>No conio support is currently available for the Lynx.</P>
+
+<DT><B>Keyboard</B><DD>
+<P>The Lynx "flabode" keys, Opt 1, Pause and Opt 2 are implemented using the
+conio interface. The only characters the keyboard is able to produce are
+'R' for Restart (Opt 1 + Pause), 'F' for flip (Opt 2 + Pause),
+'P' for pause, '1' for Opt 1, '2' for Opt 2, '3' for Opt 1 + Opt 2 and
+'?' for all keys down at the same time.</P>
+
+<DT><B>Stack</B><DD>
+<P>The C runtime stack is located at $C037 (or $A057 if collision
+detection is enabled) and growing downwards.</P>
+
+<DT><B>Heap</B><DD>
+<P>The C heap is located at the end of the program and grows towards the C
+runtime stack.</P>
+
+<DT><B>Screen</B><DD>
+<P>The collision detection screen is at $A058 if it is enabled. The
+double buffered screens are at $C038 and $E018.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="lynx-5.html">Next</A>
+<A HREF="lynx-3.html">Previous</A>
+<A HREF="lynx.html#toc4">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 function reference: Alphabetical function reference: tgi_install_vectorfont</TITLE>
+ <LINK HREF="funcref-284.html" REL=next>
+ <LINK HREF="funcref-282.html" REL=previous>
+ <LINK HREF="funcref.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="funcref-284.html">Next</A>
+<A HREF="funcref-282.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="tgi_install_vectorfont"></A> 3.234 <A HREF="funcref.html#toc3.234">tgi_install_vectorfont</A></H2>
+
+
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT><B>Function</B><DD>
+<P>Install an already loaded driver and return an error code.</P>
+<DT><B>Header</B><DD>
+<P><CODE>
+<A HREF="funcref-44.html#tgi.h">tgi.h</A></CODE></P>
+<DT><B>Declaration</B><DD>
+<P><CODE>void __fastcall__ tgi_install_vectorfont (const tgi_vectorfont* font);</CODE></P>
+<DT><B>Description</B><DD>
+<P>Install a vector font for use. More than one vector font can be loaded,
+but only one can be active. This function is used to tell which one. Call
+with a NULL pointer to uninstall the currently installed font.</P>
+<DT><B>Limits</B><DD>
+<P>
+<UL>
+<LI>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.</LI>
+</UL>
+</P>
+<DT><B>Availability</B><DD>
+<P>cc65</P>
+<DT><B>See also</B><DD>
+<P>
+<A HREF="funcref-288.html#tgi_load_vectorfont">tgi_load_vectorfont</A>,
+<A HREF="funcref-265.html#tgi_free_vectorfont">tgi_free_vectorfont</A></P>
+<DT><B>Example</B><DD>
+<P>None.</P>
+</DL>
+</BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="funcref-284.html">Next</A>
+<A HREF="funcref-282.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+</BODY>
+</HTML>

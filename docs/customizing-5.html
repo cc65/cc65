@@ -1,0 +1,157 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Defining a Custom cc65 Target: Interrupt Service Routine Definition</TITLE>
+ <LINK HREF="customizing-6.html" REL=next>
+ <LINK HREF="customizing-4.html" REL=previous>
+ <LINK HREF="customizing.html#toc5" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="customizing-6.html">Next</A>
+<A HREF="customizing-4.html">Previous</A>
+<A HREF="customizing.html#toc5">Contents</A>
+<HR>
+<H2><A NAME="s5">5.</A> <A HREF="customizing.html#toc5">Interrupt Service Routine Definition</A></H2>
+
+
+<P>For this system, the CPU is put into a wait condition prior to allowing
+interrupt processing.  Therefore, the interrupt service routine is very
+simple:  return from all valid interrupts.  However, as mentioned
+before, the BRK instruction is used to indicate a software fault, which
+will call the same interrupt service routine as the maskable interrupt
+signal IRQ.  The interrupt service routine must be able to tell the
+difference between the two, and act appropriately.</P>
+<P>The interrupt service routine shown below includes code to detect when a
+BRK instruction has occurred and stops the CPU from further processing.
+The interrupt service routine is in a file named
+&#34;interrupt.s&#34;.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+; ---------------------------------------------------------------------------
+; interrupt.s
+; ---------------------------------------------------------------------------
+;
+; Interrupt handler.
+;
+; Checks for a BRK instruction and returns from all valid interrupts.
+
+.import   _stop
+.export   _irq_int, _nmi_int
+
+.segment  &#34;CODE&#34;
+
+.PC02                             ; Force 65C02 assembly mode
+
+; ---------------------------------------------------------------------------
+; Non-maskable interrupt (NMI) service routine
+
+_nmi_int:  RTI                    ; Return from all NMI interrupts
+
+; ---------------------------------------------------------------------------
+; Maskable interrupt (IRQ) service routine
+
+_irq_int:  PHX                    ; Save X register contents to stack
+           TSX                    ; Transfer stack pointer to X
+           PHA                    ; Save accumulator contents to stack
+           INX                    ; Increment X so it points to the status
+           INX                    ;   register value saved on the stack
+           LDA $100,X             ; Load status register contents
+           AND #$10               ; Isolate B status bit
+           BNE break              ; If B = 1, BRK detected
+
+; ---------------------------------------------------------------------------
+; IRQ detected, return
+
+irq:       PLA                    ; Restore accumulator contents
+           PLX                    ; Restore X register contents
+           RTI                    ; Return from all IRQ interrupts
+
+; ---------------------------------------------------------------------------
+; BRK detected, stop
+
+break:     JMP _stop              ; If BRK is detected, something very bad
+                                  ;   has happened, so stop running
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The following discussion explains the purpose of several important
+assembler level directives in this file.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.import   _stop
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line instructs the assembler to import the symbol <CODE>_stop</CODE>
+from another module.  This routine will be called if a BRK instruction
+is encountered, signaling a software fault.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.export   _irq_int, _nmi_int
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line instructs the assembler that the symbols <CODE>_irq_int</CODE> and
+<CODE>_nmi_int</CODE> are to be accessible from other modules.  In this
+example, the address of these symbols will be placed in the interrupt
+vector table.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+.segment  &#34;CODE&#34;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This line instructs the assembler that the code is to be placed in the
+CODE segment of memory.  Note that because there are 65C02 mnemonics in
+the assembly code, the assembler is forced to use the 65C02 instruction
+set with the <CODE>.PC02</CODE> directive.</P>
+<P>The final step is to define the interrupt vector memory locations.
+Recall that a segment named VECTORS was defined in the memory
+configuration file, which started at location $FFFA.  The addresses of
+the interrupt service routines from &#34;interrupt.s&#34; along with
+the address for the initialization code in crt0 are defined in a file
+named &#34;vectors.s&#34;.  Note that these vectors will be placed in
+memory in their proper little-endian format as:</P>
+
+<P><CODE>       $FFFA&nbsp;-&nbsp;$FFFB:</CODE> NMI interrupt vector (low byte, high byte)</P>
+<P><CODE>       $FFFC&nbsp;-&nbsp;$FFFD:</CODE> Reset vector (low byte, high byte)</P>
+<P><CODE>       $FFFE&nbsp;-&nbsp;$FFFF:</CODE> IRQ/BRK interrupt vector (low byte, high byte)</P>
+<P>using the <CODE>.addr</CODE> assembler directive.  The contents of the file are:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+; ---------------------------------------------------------------------------
+; vectors.s
+; ---------------------------------------------------------------------------
+;
+; Defines the interrupt vector table.
+
+.import    _init
+.import    _nmi_int, _irq_int
+
+.segment  &#34;VECTORS&#34;
+
+.addr      _nmi_int    ; NMI vector
+.addr      _init       ; Reset vector
+.addr      _irq_int    ; IRQ/BRK vector
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The cc65 toolset will replace the address symbols defined here with the
+actual addresses of the routines during the link process.</P>
+
+<HR>
+<A HREF="customizing-6.html">Next</A>
+<A HREF="customizing-4.html">Previous</A>
+<A HREF="customizing.html#toc5">Contents</A>
+</BODY>
+</HTML>

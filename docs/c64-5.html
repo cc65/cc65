@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Commodore 64 specific information for cc65: Platform specific header files</TITLE>
+ <LINK HREF="c64-6.html" REL=next>
+ <LINK HREF="c64-4.html" REL=previous>
+ <LINK HREF="c64.html#toc5" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="c64-6.html">Next</A>
+<A HREF="c64-4.html">Previous</A>
+<A HREF="c64.html#toc5">Contents</A>
+<HR>
+<H2><A NAME="s5">5.</A> <A HREF="c64.html#toc5">Platform specific header files</A></H2>
+
+
+<P>Programs containing C64 specific code may use the <CODE>c64.h</CODE> or <CODE>cbm.h</CODE>
+header files. Using the later may be an option when writing code for more than
+one CBM platform, since it includes <CODE>c64.h</CODE> and declares several functions
+common to all CBM platforms.</P>
+
+
+<H2><A NAME="ss5.1">5.1</A> <A HREF="c64.html#toc5.1">C64 specific functions</A>
+</H2>
+
+
+<P>The functions listed below are special for the C64. See the 
+<A HREF="funcref.html">function reference</A> for declaration and usage.</P>
+<P>
+<UL>
+<LI>get_ostype</LI>
+</UL>
+</P>
+
+
+<H2><A NAME="ss5.2">5.2</A> <A HREF="c64.html#toc5.2">CBM specific functions</A>
+</H2>
+
+
+<P>Some functions are available for all (or at least most) of the Commodore
+machines. See the 
+<A HREF="funcref.html">function reference</A> for
+declaration and usage.</P>
+<P>
+<UL>
+<LI>cbm_close</LI>
+<LI>cbm_closedir</LI>
+<LI>cbm_k_setlfs</LI>
+<LI>cbm_k_setnam</LI>
+<LI>cbm_k_load</LI>
+<LI>cbm_k_save</LI>
+<LI>cbm_k_open</LI>
+<LI>cbm_k_close</LI>
+<LI>cbm_k_readst</LI>
+<LI>cbm_k_chkin</LI>
+<LI>cbm_k_ckout</LI>
+<LI>cbm_k_basin</LI>
+<LI>cbm_k_bsout</LI>
+<LI>cbm_k_clrch</LI>
+<LI>cbm_load</LI>
+<LI>cbm_open</LI>
+<LI>cbm_opendir</LI>
+<LI>cbm_read</LI>
+<LI>cbm_readdir</LI>
+<LI>cbm_save</LI>
+<LI>cbm_write</LI>
+<LI>get_tv</LI>
+</UL>
+</P>
+
+
+<H2><A NAME="ss5.3">5.3</A> <A HREF="c64.html#toc5.3">Hardware access</A>
+</H2>
+
+
+<P>The following pseudo variables declared in the <CODE>c64.h</CODE> header file do allow
+access to hardware located in the address space. Some variables are
+structures, accessing the struct fields will access the chip registers.</P>
+<P>
+<DL>
+
+<DT><B><CODE>VIC</CODE></B><DD>
+<P>The <CODE>VIC</CODE> structure allows access to the VIC II (the graphics
+controller). See the <CODE>_vic2.h</CODE> header file located in the include
+directory for the declaration of the structure.</P>
+
+<DT><B><CODE>SID</CODE></B><DD>
+<P>The <CODE>SID</CODE> structure allows access to the SID (the sound interface
+device). See the <CODE>_sid.h</CODE> header file located in the include directory
+for the declaration of the structure.</P>
+
+<DT><B><CODE>CIA1, CIA2</CODE></B><DD>
+<P>Access to the two CIA (complex interface adapter) chips is available via
+the <CODE>CIA1</CODE> and <CODE>CIA2</CODE> variables. The structure behind these variables
+is explained in <CODE>_6526.h</CODE>.</P>
+
+<DT><B><CODE>COLOR_RAM</CODE></B><DD>
+<P>A character array that mirrors the color RAM of the C64 at $D800.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="c64-6.html">Next</A>
+<A HREF="c64-4.html">Previous</A>
+<A HREF="c64.html#toc5">Contents</A>
+</BODY>
+</HTML>

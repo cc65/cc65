@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 function reference: Alphabetical function reference: cputcxy</TITLE>
+ <LINK HREF="funcref-118.html" REL=next>
+ <LINK HREF="funcref-116.html" REL=previous>
+ <LINK HREF="funcref.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="funcref-118.html">Next</A>
+<A HREF="funcref-116.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="cputcxy"></A> 3.68 <A HREF="funcref.html#toc3.68">cputcxy</A></H2>
+
+
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT><B>Function</B><DD>
+<P>Output a character at a specific screen position.</P>
+<DT><B>Header</B><DD>
+<P><CODE>
+<A HREF="funcref-16.html#conio.h">conio.h</A></CODE></P>
+<DT><B>Declaration</B><DD>
+<P><CODE>void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);</CODE></P>
+<DT><B>Description</B><DD>
+<P><CODE>cputcxy</CODE> moves the cursor to the given x/y position on
+the screen and outputs one character.</P>
+<DT><B>Limits</B><DD>
+<P>
+<UL>
+<LI>Like all other <CODE>conio</CODE> output functions, <CODE>cputcxy</CODE> distinguishes
+between <CODE>\r</CODE> and <CODE>\n</CODE>.</LI>
+<LI>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.</LI>
+</UL>
+</P>
+<DT><B>Availability</B><DD>
+<P>cc65</P>
+<DT><B>See also</B><DD>
+<P>
+<A HREF="funcref-115.html#cprintf">cprintf</A>,
+<A HREF="funcref-116.html#cputc">cputc</A>,
+<A HREF="funcref-118.html#cputs">cputs</A>,
+<A HREF="funcref-119.html#cputsxy">cputsxy</A>,
+<A HREF="funcref-311.html#vcprintf">vcprintf</A></P>
+<DT><B>Example</B><DD>
+<P>None.</P>
+</DL>
+</BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="funcref-118.html">Next</A>
+<A HREF="funcref-116.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+</BODY>
+</HTML>

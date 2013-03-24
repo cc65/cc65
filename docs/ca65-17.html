@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Porting sources from other assemblers</TITLE>
+ <LINK HREF="ca65-18.html" REL=next>
+ <LINK HREF="ca65-16.html" REL=previous>
+ <LINK HREF="ca65.html#toc17" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-18.html">Next</A>
+<A HREF="ca65-16.html">Previous</A>
+<A HREF="ca65.html#toc17">Contents</A>
+<HR>
+<H2><A NAME="s17">17.</A> <A HREF="ca65.html#toc17">Porting sources from other assemblers</A></H2>
+
+
+<P>Sometimes it is necessary to port code written for older assemblers to ca65.
+In some cases, this can be done without any changes to the source code by
+using the emulation features of ca65 (see <CODE>
+<A HREF="ca65-11.html#.FEATURE">.FEATURE</A></CODE>). In other cases, it is necessary to make changes to the
+source code.</P>
+<P>Probably the biggest difference is the handling of the <CODE>
+<A HREF="ca65-11.html#.ORG">.ORG</A></CODE> directive. ca65 generates relocatable code, and placement is
+done by the linker. Most other assemblers generate absolute code, placement is
+done within the assembler and there is no external linker.</P>
+<P>In general it is not a good idea to write new code using the emulation
+features of the assembler, but there may be situations where even this rule is
+not valid.</P>
+
+<H2><A NAME="ss17.1">17.1</A> <A HREF="ca65.html#toc17.1">TASS</A>
+</H2>
+
+
+<P>You need to use some of the ca65 emulation features to simulate the behaviour
+of such simple assemblers.</P>
+<P>
+<OL>
+<LI>Prepare your sourcecode like this:
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        ; if you want TASS style labels without colons
+        .feature labels_without_colons
+
+        ; if you want TASS style character constants
+        ; ("a" instead of the default 'a')
+        .feature loose_char_term
+
+                .word *+2       ; the cbm load address
+
+                [yourcode here]
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+notice that the two emulation features are mostly useful for porting
+sources originally written in/for TASS, they are not needed for the
+actual "simple assembler operation" and are not recommended if you are
+writing new code from scratch.
+</LI>
+<LI>Replace all program counter assignments (which are not possible in ca65
+by default, and the respective emulation feature works different from what
+you'd expect) by another way to skip to memory locations, for example the
+<CODE>
+<A HREF="ca65-11.html#.RES">.RES</A></CODE> directive.
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        ; *=$2000
+        .res $2000-*    ; reserve memory up to $2000
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+Please note that other than the original TASS, ca65 can never move the program
+counter backwards - think of it as if you are assembling to disk with TASS.
+</LI>
+<LI>Conditional assembly (<CODE>.ifeq</CODE>/<CODE>.endif</CODE>/<CODE>.goto</CODE> etc.) must be
+rewritten to match ca65 syntax. Most importantly notice that due to the lack
+of <CODE>.goto</CODE>, everything involving loops must be replaced by
+<CODE>
+<A HREF="ca65-11.html#.REPEAT">.REPEAT</A></CODE>.
+</LI>
+<LI>To assemble code to a different address than it is executed at, use the
+<CODE>
+<A HREF="ca65-11.html#.ORG">.ORG</A></CODE> directive instead of
+<CODE>.offs</CODE>-constructs.
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        .org $1800
+
+        [floppy code here]
+
+        .reloc  ; back to normal
+</PRE>
+</CODE></BLOCKQUOTE>
+
+</LI>
+<LI>Then assemble like this:
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        cl65 --start-addr 0x0ffe -t none myprog.s -o myprog.prg
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+Note that you need to use the actual start address minus two, since two bytes
+are used for the cbm load address.
+</LI>
+</OL>
+</P>
+
+
+<HR>
+<A HREF="ca65-18.html">Next</A>
+<A HREF="ca65-16.html">Previous</A>
+<A HREF="ca65.html#toc17">Contents</A>
+</BODY>
+</HTML>

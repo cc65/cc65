@@ -1,0 +1,330 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Users Guide: #pragmas</TITLE>
+ <LINK HREF="cc65-8.html" REL=next>
+ <LINK HREF="cc65-6.html" REL=previous>
+ <LINK HREF="cc65.html#toc7" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="cc65-8.html">Next</A>
+<A HREF="cc65-6.html">Previous</A>
+<A HREF="cc65.html#toc7">Contents</A>
+<HR>
+<H2><A NAME="pragmas"></A> <A NAME="s7">7.</A> <A HREF="cc65.html#toc7">#pragmas</A></H2>
+
+
+<P>The compiler understands some pragmas that may be used to change code
+generation and other stuff. Some of these pragmas understand a special form:
+If the first parameter is <CODE>push</CODE>, the old value is saved onto a stack
+before changing it. The value may later be restored by using the <CODE>pop</CODE>
+parameter with the <CODE>#pragma</CODE>.</P>
+
+<H2><A NAME="pragma-bss-name"></A> <A NAME="ss7.1">7.1</A> <A HREF="cc65.html#toc7.1"><CODE>#pragma bss-name ([push,] &lt;name&gt;)</CODE></A>
+</H2>
+
+
+<P>This pragma changes the name used for the BSS segment (the BSS segment
+is used to store uninitialized data). The argument is a string enclosed
+in double quotes.</P>
+<P>Note: The default linker configuration file does only map the standard
+segments. If you use other segments, you have to create a new linker
+configuration file.</P>
+<P>Beware: The startup code will zero only the default BSS segment. If you
+use another BSS segment, you have to do that yourself, otherwise
+uninitialized variables do not have the value zero.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        #pragma bss-name ("MyBSS")
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="pragma-charmap"></A> <A NAME="ss7.2">7.2</A> <A HREF="cc65.html#toc7.2"><CODE>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</CODE></A>
+</H2>
+
+
+<P>Each literal string and each literal character in the source is translated
+by use of a translation table. This translation table is preset when the
+compiler is started depending on the target system, for example to map
+ISO-8859-1 characters into PETSCII if the target is a commodore machine.</P>
+<P>This pragma allows to change entries in the translation table, so the
+translation for individual characters, or even the complete table may be
+adjusted.</P>
+<P>Both arguments are assumed to be unsigned characters with a valid range of
+1-255.</P>
+<P>Beware of two pitfalls:</P>
+<P>
+<UL>
+<LI>The character index is actually the code of the character in the
+C source, so character mappings do always depend on the source
+character set. This means that <CODE>#pragma&nbsp;charmap</CODE> is not
+portable -- it depends on the build environment.</LI>
+<LI>While it is possible to use character literals as indices, the
+result may be somewhat unexpected, since character literals are
+itself translated. For this reason I would suggest to avoid
+character literals and use numeric character codes instead.</LI>
+</UL>
+</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        /* Use a space wherever an 'a' occurs in ISO-8859-1 source */
+        #pragma charmap (0x61, 0x20);
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="pragma-check-stack"></A> <A NAME="ss7.3">7.3</A> <A HREF="cc65.html#toc7.3"><CODE>#pragma check-stack ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>Tells the compiler to insert calls to a stack checking subroutine to detect
+stack overflows. The stack checking code will lead to somewhat larger and
+slower programs, so you may want to use this pragma when debugging your
+program and switch it off for the release version. If a stack overflow is
+detected, the program is aborted.</P>
+<P>If the argument is "off", stack checks are disabled (the default), otherwise
+they're enabled.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+
+<H2><A NAME="pragma-code-name"></A> <A NAME="ss7.4">7.4</A> <A HREF="cc65.html#toc7.4"><CODE>#pragma code-name ([push,] &lt;name&gt;)</CODE></A>
+</H2>
+
+
+<P>This pragma changes the name used for the CODE segment (the CODE segment
+is used to store executable code). The argument is a string enclosed in
+double quotes.</P>
+<P>Note: The default linker configuration file does only map the standard
+segments. If you use other segments, you have to create a new linker
+configuration file.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        #pragma code-name ("MyCODE")
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="pragma-codesize"></A> <A NAME="ss7.5">7.5</A> <A HREF="cc65.html#toc7.5"><CODE>#pragma codesize ([push,] &lt;int&gt;)</CODE></A>
+</H2>
+
+
+<P>This pragma allows finer control about speed vs. size decisions in the code
+generation and optimization phase. It gives the allowed size increase factor
+(in percent). The default is can be changed by use of the <CODE>
+<A HREF="cc65-2.html#option-codesize">--codesize</A></CODE> compiler option.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+
+
+<H2><A NAME="pragma-data-name"></A> <A NAME="ss7.6">7.6</A> <A HREF="cc65.html#toc7.6"><CODE>#pragma data-name ([push,] &lt;name&gt;)</CODE></A>
+</H2>
+
+
+<P>This pragma changes the name used for the DATA segment (the DATA segment
+is used to store initialized data). The argument is a string enclosed in
+double quotes.</P>
+<P>Note: The default linker configuration file does only map the standard
+segments. If you use other segments, you have to create a new linker
+configuration file.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        #pragma data-name ("MyDATA")
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="pragma-local-strings"></A> <A NAME="ss7.7">7.7</A> <A HREF="cc65.html#toc7.7"><CODE>#pragma local-strings ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>When "on", emit string literals to the data segment when they're encountered
+in the source. The default ("off") is to keep string literals until end of
+assembly, merge read only literals if possible, and then output the literals
+into the data or rodata segment that is active at that point.</P>
+<P>Using this <CODE>#pragma</CODE> it is possible to control the behaviour from within
+the source. When <CODE>#pragma local-strings</CODE> is active, string literals are
+output immediately, which means that they go into the currently active data
+or rodata segment, but cannot be merged. When inactive, string literals are
+remembered and output as a whole when translation is finished.</P>
+
+
+<H2><A NAME="pragma-optimize"></A> <A NAME="ss7.8">7.8</A> <A HREF="cc65.html#toc7.8"><CODE>#pragma optimize ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>Switch optimization on or off. If the argument is "off", optimization is
+disabled, otherwise it is enabled. Please note that this pragma only effects
+whole functions. The setting in effect when the function is encountered will
+determine if the generated code is optimized or not.</P>
+<P>Optimization and code generation is also controlled by the 
+<A HREF="#pragma-codesize">codesize pragma</A>.</P>
+<P>The default is "off", but may be changed with the <CODE>
+<A HREF="cc65-2.html#option-O">-O</A></CODE> compiler option.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+
+
+<H2><A NAME="pragma-rodata-name"></A> <A NAME="ss7.9">7.9</A> <A HREF="cc65.html#toc7.9"><CODE>#pragma rodata-name ([push,] &lt;name&gt;)</CODE></A>
+</H2>
+
+
+<P>This pragma changes the name used for the RODATA segment (the RODATA
+segment is used to store readonly data). The argument is a string
+enclosed in double quotes.</P>
+<P>Note: The default linker configuration file does only map the standard
+segments. If you use other segments, you have to create a new linker
+configuration file.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        #pragma rodata-name ("MyRODATA")
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="pragma-regvaraddr"></A> <A NAME="ss7.10">7.10</A> <A HREF="cc65.html#toc7.10"><CODE>#pragma regvaraddr ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>The compiler does not allow to take the address of register variables.
+The regvaraddr pragma changes this. Taking the address of a register
+variable is allowed after using this pragma with "on" as argument.
+Using "off" as an argument switches back to the default behaviour.</P>
+<P>Beware: The C standard does not allow taking the address of a variable
+declared as register. So your programs become non-portable if you use
+this pragma. In addition, your program may not work. This is usually the
+case if a subroutine is called with the address of a register variable,
+and this subroutine (or a subroutine called from there) uses
+register variables. So be careful with this #pragma.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        #pragma regvaraddr(on)  /* Allow taking the address
+                                 * of register variables
+                                 */
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="pragma-register-vars"></A> <A NAME="ss7.11">7.11</A> <A HREF="cc65.html#toc7.11"><CODE>#pragma register-vars ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>Enables or disables use of register variables. If register variables are
+disabled (the default), the <CODE>register</CODE> keyword is ignored. Register
+variables are explained in more detail in 
+<A HREF="cc65-8.html#register-vars">a separate   chapter</A>.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+
+
+<H2><A NAME="pragma-signed-chars"></A> <A NAME="ss7.12">7.12</A> <A HREF="cc65.html#toc7.12"><CODE>#pragma signed-chars ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>Changes the signedness of the default character type. If the argument is
+"on", default characters are signed, otherwise characters are unsigned. The
+compiler default is to make characters unsigned since this creates a lot
+better code. This default may be overridden by the <CODE>
+<A HREF="cc65-2.html#option-signed-chars">--signed-chars</A></CODE> command line option.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+
+
+<H2><A NAME="pragma-static-locals"></A> <A NAME="ss7.13">7.13</A> <A HREF="cc65.html#toc7.13"><CODE>#pragma static-locals ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>Use variables in the bss segment instead of variables on the stack. This
+pragma changes the default set by the compiler option <CODE>
+<A HREF="cc65-2.html#option-static-locals">--static-locals</A></CODE>. If the argument is "on",
+local variables are allocated in the BSS segment, leading to shorter and in
+most cases faster, but non-reentrant code.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+
+
+<H2><A NAME="pragma-warn"></A> <A NAME="ss7.14">7.14</A> <A HREF="cc65.html#toc7.14"><CODE>#pragma warn (name, [push,] on|off)</CODE></A>
+</H2>
+
+
+<P>Switch compiler warnings on or off. "name" is the name of a warning (see the
+<CODE>
+<A HREF="cc65-2.html#option-W">-W</A></CODE> compiler option for a list). The name is
+either followed by "pop", which restores the last pushed state, or by "on" or
+"off", optionally preceeded by "push" to push the current state before
+changing it.</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        /* Don't warn about the unused parameter in function func */
+        #pragma warn (unused-param, push, off)
+        static int func (int unused)
+        {
+            return 0;
+        }
+        #pragma warn (unused-param, pop)
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="pragma-writable-strings"></A> <A NAME="ss7.15">7.15</A> <A HREF="cc65.html#toc7.15"><CODE>#pragma writable-strings ([push,] on|off)</CODE></A>
+</H2>
+
+
+<P>Changes the storage location of string literals. For historical reasons,
+the C standard defines that string literals are of type "char[]", but
+writing to such a literal causes undefined behaviour. Most compilers
+(including cc65) place string literals in the read-only data segment, which
+may cause problems with old C code that writes to string literals.</P>
+<P>Using this pragma (or the corresponding command line option <CODE>
+<A HREF="cc65-2.html#option-writable-strings">--writable-strings</A></CODE>) causes the
+literals to be placed in the data segment so they can be written to without
+worry.</P>
+<P>The <CODE>#pragma</CODE> understands the push and pop parameters as explained above.</P>
+
+
+<H2><A NAME="ss7.16">7.16</A> <A HREF="cc65.html#toc7.16"><CODE>#pragma zpsym (&lt;name&gt;)</CODE></A>
+</H2>
+
+
+<P>Tell the compiler that the -- previously as external declared -- symbol with
+the given name is a zero page symbol (usually from an assembler file).
+The compiler will create a matching import declaration for the assembler.</P>
+<P>Example:
+<BLOCKQUOTE><CODE>
+<PRE>
+        extern int foo;
+        #pragma zpsym ("foo");  /* foo is in the zeropage */
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+
+<HR>
+<A HREF="cc65-8.html">Next</A>
+<A HREF="cc65-6.html">Previous</A>
+<A HREF="cc65.html#toc7">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Oric Atmos specific information for cc65: Loadable drivers</TITLE>
+ <LINK HREF="atmos-6.html" REL=next>
+ <LINK HREF="atmos-4.html" REL=previous>
+ <LINK HREF="atmos.html#toc5" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="atmos-6.html">Next</A>
+<A HREF="atmos-4.html">Previous</A>
+<A HREF="atmos.html#toc5">Contents</A>
+<HR>
+<H2><A NAME="s5">5.</A> <A HREF="atmos.html#toc5">Loadable drivers</A></H2>
+
+
+<P><EM>Note:</EM> Since the Atmos doesn't have working disk I/O
+(see 
+<A HREF="atmos-6.html#limitations">section &#34;Limitations&#34;</A>), the
+available drivers cannot be loaded at runtime (so the term "loadable drivers"
+is somewhat misleading). Instead, the drivers have to be statically linked. While
+this may seem overhead, it has two advantages:</P>
+<P>
+<OL>
+<LI>The interface is identical to the one used for other platforms
+and to the one for the Atmos once it has disk I/O.</LI>
+<LI>Once disk I/O is available, existing code can be changed to load drivers
+at runtime with almost no effort.</LI>
+</OL>
+</P>
+<P>The names in the parentheses denote the symbols to be used for static linking of the drivers.</P>
+
+
+<H2><A NAME="ss5.1">5.1</A> <A HREF="atmos.html#toc5.1">Graphics drivers</A>
+</H2>
+
+
+<P>
+<DL>
+
+<DT><B><CODE>atmos-228-200-3.tgi (atmos_228_200_3)</CODE></B><DD>
+<P>This driver was written by Greg King and Stefan Haubenthal.
+It features a resolution of 228&times;200 with a palette of two colors that
+can be chosen from the Atmos's eight colors.  The driver supports a third
+palette-"color" that actually "flips" the pixel (it becomes the other color)
+that is on the screen under the graphics cursor.</P>
+
+<DT><B><CODE>atmos-240-200-2.tgi (atmos_240_200_2)</CODE></B><DD>
+<P>This driver was written by Stefan Haubenthal and Greg King.
+It features a resolution of 240&times;200 with black and white colors.
+It is the default graphics driver for the Atmos.</P>
+
+</DL>
+</P>
+
+
+
+<H2><A NAME="ss5.2">5.2</A> <A HREF="atmos.html#toc5.2">Extended memory drivers</A>
+</H2>
+
+
+<P>No extended memory drivers are currently available for the Atmos.</P>
+
+
+<H2><A NAME="ss5.3">5.3</A> <A HREF="atmos.html#toc5.3">Joystick drivers</A>
+</H2>
+
+
+<P>
+<DL>
+
+<DT><B><CODE>atmos-pase.joy (atmos_pase)</CODE></B><DD>
+<P>Supports two standard joysticks connected to the P.A.S.E. interface of the Atmos.</P>
+
+</DL>
+</P>
+
+
+
+<H2><A NAME="ss5.4">5.4</A> <A HREF="atmos.html#toc5.4">Mouse drivers</A>
+</H2>
+
+
+<P>No mouse drivers are currently available for the Atmos.</P>
+
+
+<H2><A NAME="ss5.5">5.5</A> <A HREF="atmos.html#toc5.5">RS232 device drivers</A>
+</H2>
+
+
+<P>
+<DL>
+
+<DT><B><CODE>atmos-acia.ser (atmos_acia)</CODE></B><DD>
+<P>Driver for the Telestrat integrated serial controller and the Atmos with a
+serial add-on.
+Note that because of the peculiarities of the 6551 chip together with the
+use of the NMI, transmits are not interrupt driven, and the transceiver
+blocks if the receiver asserts flow control because of a full buffer.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="atmos-6.html">Next</A>
+<A HREF="atmos-4.html">Previous</A>
+<A HREF="atmos.html#toc5">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Atari specific information for cc65: Memory layout</TITLE>
+ <LINK HREF="atari-4.html" REL=next>
+ <LINK HREF="atari-2.html" REL=previous>
+ <LINK HREF="atari.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="atari-4.html">Next</A>
+<A HREF="atari-2.html">Previous</A>
+<A HREF="atari.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="s3">3.</A> <A HREF="atari.html#toc3">Memory layout</A></H2>
+
+
+<P>The default linker script assumes that the BASIC ROM is disabled (or
+the BASIC cartridge unplugged). This gives a usable memory range from
+$2E00 - $BC1F. The library startup code examines the
+current memory configuration, which depends on the size of the
+installed memory and cartridges present, by inspecting the value in
+the MEMTOP ($2E5) variable. Then the initial stack pointer,
+which indicates the upper bound of memory used, is adjusted. The
+default load address of $2E00 was chosen to accommodate having
+a DOS loaded and a driver that resides in low memory such as the 850
+R: handler. You can override this behaviour by creating a custom
+linker config file or by using the "--start-addr" cl65 command line
+argument or the "--start-addr" or "-S" ld65 command line arguments.</P>
+<P>Special locations:</P>
+<P>
+<DL>
+<DT><B>Text screen</B><DD>
+<P>The text screen depends on the installed memory size and cartridges
+and can be obtained from the SAVMSC variable ($58).</P>
+
+<DT><B>Stack</B><DD>
+<P>The C runtime stack is located at MEMTOP and grows downwards,
+regardless of how your linker config file is setup.  This
+accommodates the different memory configurations of the Atari
+machines, as well as having a cartridge installed.  You can override
+this behaviour by writing your own crt0.s file and linking it to
+your program (see also 
+<A HREF="atari-9.html#memhole_final_note">Final note</A>).</P>
+
+<DT><B>Heap</B><DD>
+<P>The C heap is located at the end of the program and grows towards the C
+runtime stack.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="atari-4.html">Next</A>
+<A HREF="atari-2.html">Previous</A>
+<A HREF="atari.html#toc3">Contents</A>
+</BODY>
+</HTML>

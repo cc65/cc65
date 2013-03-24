@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Macro packages</TITLE>
+ <LINK HREF="ca65-14.html" REL=next>
+ <LINK HREF="ca65-12.html" REL=previous>
+ <LINK HREF="ca65.html#toc13" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-14.html">Next</A>
+<A HREF="ca65-12.html">Previous</A>
+<A HREF="ca65.html#toc13">Contents</A>
+<HR>
+<H2><A NAME="macropackages"></A> <A NAME="s13">13.</A> <A HREF="ca65.html#toc13">Macro packages</A></H2>
+
+
+<P>Using the <CODE>
+<A HREF="ca65-11.html#.MACPACK">.MACPACK</A></CODE> directive, predefined
+macro packages may be included with just one command. Available macro packages
+are:</P>
+
+
+<H2><A NAME="ss13.1">13.1</A> <A HREF="ca65.html#toc13.1"><CODE>.MACPACK generic</CODE></A>
+</H2>
+
+
+<P>This macro package defines macros that are useful in almost any program.
+Currently defined macros are:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  add     Arg
+                clc
+                adc     Arg
+        .endmacro
+
+        .macro  sub     Arg
+                sec
+                sbc     Arg
+        .endmacro
+
+        .macro  bge     Arg
+                bcs     Arg
+        .endmacro
+
+        .macro  blt     Arg
+                bcc     Arg
+        .endmacro
+
+        .macro  bgt     Arg
+                .local  L
+                beq     L
+                bcs     Arg
+        L:
+        .endmacro
+
+        .macro  ble     Arg
+                beq     Arg
+                bcc     Arg
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss13.2">13.2</A> <A HREF="ca65.html#toc13.2"><CODE>.MACPACK longbranch</CODE></A>
+</H2>
+
+
+<P>This macro package defines long conditional jumps. They are named like the
+short counterpart but with the 'b' replaced by a 'j'. Here is a sample
+definition for the "<CODE>jeq</CODE>" macro, the other macros are built using the same
+scheme:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  jeq     Target
+                .if     .def(Target) .and ((*+2)-(Target) &lt;= 127)
+                beq     Target
+                .else
+                bne     *+5
+                jmp     Target
+                .endif
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>All macros expand to a short branch, if the label is already defined (back
+jump) and is reachable with a short jump. Otherwise the macro expands to a
+conditional branch with the branch condition inverted, followed by an absolute
+jump to the actual branch target.</P>
+<P>The package defines the following macros:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        jeq, jne, jmi, jpl, jcs, jcc, jvs, jvc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+<H2><A NAME="ss13.3">13.3</A> <A HREF="ca65.html#toc13.3"><CODE>.MACPACK atari</CODE></A>
+</H2>
+
+
+<P>The atari macro package will define a macro named <CODE>scrcode</CODE>. It takes a
+string as argument and places this string into memory translated into screen
+codes.</P>
+
+
+<H2><A NAME="ss13.4">13.4</A> <A HREF="ca65.html#toc13.4"><CODE>.MACPACK cbm</CODE></A>
+</H2>
+
+
+<P>The cbm macro package will define a macro named <CODE>scrcode</CODE>. It takes a
+string as argument and places this string into memory translated into screen
+codes.</P>
+
+
+<H2><A NAME="ss13.5">13.5</A> <A HREF="ca65.html#toc13.5"><CODE>.MACPACK cpu</CODE></A>
+</H2>
+
+
+<P>This macro package does not define any macros but constants used to examine
+the value read from the <CODE>
+<A HREF="ca65-9.html#.CPU">.CPU</A></CODE> pseudo variable. For
+each supported CPU a constant similar to</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+    CPU_6502
+    CPU_65SC02
+    CPU_65C02
+    CPU_65816
+    CPU_SUNPLUS
+    CPU_SWEET16
+    CPU_HUC6280
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>is defined. These constants may be used to determine the exact type of the
+currently enabled CPU. In addition to that, for each CPU instruction set,
+another constant is defined:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+    CPU_ISET_6502
+    CPU_ISET_65SC02
+    CPU_ISET_65C02
+    CPU_ISET_65816
+    CPU_ISET_SUNPLUS
+    CPU_ISET_SWEET16
+    CPU_ISET_HUC6280
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The value read from the <CODE>
+<A HREF="ca65-9.html#.CPU">.CPU</A></CODE> pseudo variable may
+be checked with <CODE>
+<A HREF="ca65-5.html#operators">.BITAND</A></CODE> to determine if the
+currently enabled CPU supports a specific instruction set. For example the
+65C02 supports all instructions of the 65SC02 CPU, so it has the
+<CODE>CPU_ISET_65SC02</CODE> bit set in addition to its native <CODE>CPU_ISET_65C02</CODE>
+bit. Using</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                lda     (sp)
+        .else
+                ldy     #$00
+                lda     (sp),y
+        .endif
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>it is possible to determine if the</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+                lda     (sp)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>instruction is supported, which is the case for the 65SC02, 65C02 and 65816
+CPUs (the latter two are upwards compatible to the 65SC02).</P>
+
+
+
+<HR>
+<A HREF="ca65-14.html">Next</A>
+<A HREF="ca65-12.html">Previous</A>
+<A HREF="ca65.html#toc13">Contents</A>
+</BODY>
+</HTML>

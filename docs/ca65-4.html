@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Input format</TITLE>
+ <LINK HREF="ca65-5.html" REL=next>
+ <LINK HREF="ca65-3.html" REL=previous>
+ <LINK HREF="ca65.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-5.html">Next</A>
+<A HREF="ca65-3.html">Previous</A>
+<A HREF="ca65.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="ca65.html#toc4">Input format</A></H2>
+
+
+
+<H2><A NAME="ss4.1">4.1</A> <A HREF="ca65.html#toc4.1">Assembler syntax</A>
+</H2>
+
+
+<P>The assembler accepts the standard 6502/65816 assembler syntax. One line may
+contain a label (which is identified by a colon), and, in addition to the
+label, an assembler mnemonic, a macro, or a control command (see section 
+<A HREF="ca65-11.html#control-commands">Control Commands</A> for supported control
+commands). Alternatively, the line may contain a symbol definition using
+the '=' token. Everything after a semicolon is handled as a comment (that is,
+it is ignored).</P>
+<P>Here are some examples for valid input lines:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        Label:                          ; A label and a comment
+                lda     #$20            ; A 6502 instruction plus comment
+        L1:     ldx     #$20            ; Same with label
+        L2:     .byte   "Hello world"   ; Label plus control command
+                mymac   $20             ; Macro expansion
+                MySym = 3*L1            ; Symbol definition
+        MaSym   = Label                 ; Another symbol
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The assembler accepts</P>
+<P>
+<UL>
+<LI>all valid 6502 mnemonics when in 6502 mode (the default or after the
+<CODE>
+<A HREF="ca65-11.html#.P02">.P02</A></CODE> command was given).</LI>
+<LI>all valid 6502 mnemonics plus a set of illegal instructions when in
+<A HREF="#6502X-mode">6502X mode</A>.</LI>
+<LI>all valid 65SC02 mnemonics when in 65SC02 mode (after the
+<CODE>
+<A HREF="ca65-11.html#.PSC02">.PSC02</A></CODE> command was given).</LI>
+<LI>all valid 65C02 mnemonics when in 65C02 mode (after the
+<CODE>
+<A HREF="ca65-11.html#.PC02">.PC02</A></CODE> command was given).</LI>
+<LI>all valid 65618 mnemonics when in 65816 mode (after the
+<CODE>
+<A HREF="ca65-11.html#.P816">.P816</A></CODE> command was given).</LI>
+<LI>all valid SunPlus mnemonics when in SunPlus mode (after the
+<CODE>
+<A HREF="ca65-11.html#.SUNPLUS">.SUNPLUS</A></CODE> command was given).</LI>
+</UL>
+</P>
+
+
+<H2><A NAME="ss4.2">4.2</A> <A HREF="ca65.html#toc4.2">65816 mode</A>
+</H2>
+
+
+<P>In 65816 mode several aliases are accepted in addition to the official
+mnemonics:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        BGE is an alias for BCS
+        BLT is an alias for BCC
+        CPA is an alias for CMP
+        DEA is an alias for DEC A
+        INA is an alias for INC A
+        SWA is an alias for XBA
+        TAD is an alias for TCD
+        TAS is an alias for TCS
+        TDA is an alias for TDC
+        TSA is an alias for TSC
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+<H2><A NAME="6502X-mode"></A> <A NAME="ss4.3">4.3</A> <A HREF="ca65.html#toc4.3">6502X mode</A>
+</H2>
+
+
+<P>6502X mode is an extension to the normal 6502 mode. In this mode, several
+mnemonics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
+these instructions are illegal, there are no official mnemonics for them. The
+unofficial ones are taken from 
+<A HREF="http://www.oxyron.de/html/opcodes02.html">http://www.oxyron.de/html/opcodes02.html</A>. Please note that only the
+ones marked as "stable" are supported. The following table uses information
+from the mentioned web page, for more information, see there.</P>
+<P>
+<UL>
+<LI><CODE>ALR: A:=(A and #{imm})/2;</CODE></LI>
+<LI><CODE>ANC: A:=A and #{imm};</CODE> Generates opcode $0B.</LI>
+<LI><CODE>ARR: A:=(A and #{imm})/2;</CODE></LI>
+<LI><CODE>AXS: X:=A and X-#{imm};</CODE></LI>
+<LI><CODE>DCP: {adr}:={adr}-1; A-{adr};</CODE></LI>
+<LI><CODE>ISC: {adr}:={adr}+1; A:=A-{adr};</CODE></LI>
+<LI><CODE>LAS: A,X,S:={adr} and S;</CODE></LI>
+<LI><CODE>LAX: A,X:={adr};</CODE></LI>
+<LI><CODE>RLA: {adr}:={adr}rol; A:=A and {adr};</CODE></LI>
+<LI><CODE>RRA: {adr}:={adr}ror; A:=A adc {adr};</CODE></LI>
+<LI><CODE>SAX: {adr}:=A and X;</CODE></LI>
+<LI><CODE>SLO: {adr}:={adr}*2; A:=A or {adr};</CODE></LI>
+<LI><CODE>SRE: {adr}:={adr}/2; A:=A xor {adr};</CODE></LI>
+</UL>
+</P>
+
+
+
+<H2><A NAME="sweet16-mode"></A> <A NAME="ss4.4">4.4</A> <A HREF="ca65.html#toc4.4">sweet16 mode</A>
+</H2>
+
+
+<P>SWEET 16 is an interpreter for a pseudo 16 bit CPU written by Steve Wozniak
+for the Apple ][ machines. It is available in the Apple ][ ROM. ca65 can
+generate code for this pseudo CPU when switched into sweet16 mode. The
+following is special in sweet16 mode:</P>
+<P>
+<UL>
+<LI>The '@' character denotes indirect addressing and is no longer available
+for cheap local labels. If you need cheap local labels, you will have to
+switch to another lead character using the <CODE>
+<A HREF="ca65-11.html#.LOCALCHAR">.LOCALCHAR</A></CODE> command.
+</LI>
+<LI>Registers are specified using <CODE>R0</CODE> .. <CODE>R15</CODE>. In sweet16 mode,
+these identifiers are reserved words.
+</LI>
+</UL>
+</P>
+<P>Please note that the assembler does neither supply the interpreter needed for
+SWEET 16 code, nor the zero page locations needed for the SWEET 16 registers,
+nor does it call the interpreter. All this must be done by your program. Apple
+][ programmers do probably know how to use sweet16 mode.</P>
+<P>For more information about SWEET 16, see
+<A HREF="http://www.6502.org/source/interpreters/sweet16.htm">http://www.6502.org/source/interpreters/sweet16.htm</A>.</P>
+
+
+<H2><A NAME="ss4.5">4.5</A> <A HREF="ca65.html#toc4.5">Number format</A>
+</H2>
+
+
+<P>For literal values, the assembler accepts the widely used number formats: A
+preceding '$' or a trailing 'h' denotes a hex value, a preceding '%'
+denotes a binary value, and a bare number is interpreted as a decimal. There
+are currently no octal values and no floats.</P>
+
+
+<H2><A NAME="ss4.6">4.6</A> <A HREF="ca65.html#toc4.6">Conditional assembly</A>
+</H2>
+
+
+<P>Please note that when using the conditional directives (<CODE>.IF</CODE> and friends),
+the input must consist of valid assembler tokens, even in <CODE>.IF</CODE> branches
+that are not assembled. The reason for this behaviour is that the assembler
+must still be able to detect the ending tokens (like <CODE>.ENDIF</CODE>), so
+conversion of the input stream into tokens still takes place. As a consequence
+conditional assembly directives may <B>not</B> be used to prevent normal text
+(used as a comment or similar) from being assembled. </P>
+
+
+
+<HR>
+<A HREF="ca65-5.html">Next</A>
+<A HREF="ca65-3.html">Previous</A>
+<A HREF="ca65.html#toc4">Contents</A>
+</BODY>
+</HTML>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Compiler Intro: The easy way (using the cl65 utility)</TITLE>
+ <LINK HREF="intro-6.html" REL=next>
+ <LINK HREF="intro-4.html" REL=previous>
+ <LINK HREF="intro.html#toc5" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="intro-6.html">Next</A>
+<A HREF="intro-4.html">Previous</A>
+<A HREF="intro.html#toc5">Contents</A>
+<HR>
+<H2><A NAME="using-cl65"></A> <A NAME="s5">5.</A> <A HREF="intro.html#toc5">The easy way (using the cl65 utility)</A></H2>
+
+
+<P>The <B>cl65</B> utility is able to do all of the steps described above, in just
+one command line, and it has defaults for some options that are very
+well-suited for our example.</P>
+<P>To compile both files into one executable, enter:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        cl65 -O hello.c text.s
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The <B>cl65</B> utility knows how to translate C files into object files (it will
+call the compiler, and then the assembler). It does know also how to create
+object files from assembly files (it will call only the assembler, for that).
+It knows how to build an executable (it will pass all object files to the
+linker). And finally, it has the C64 as a default target, and will supply the
+correct startup file and runtime library names to the linker, so you don't
+have to care about that.</P>
+<P>The one-liner above should give you a C64 executable named "<CODE>hello</CODE>" in the
+current directory.</P>
+<P>For more information about the compile &amp; link utility, see 
+<A HREF="cl65.html">cl65.html</A>.</P>
+
+
+
+<HR>
+<A HREF="intro-6.html">Next</A>
+<A HREF="intro-4.html">Previous</A>
+<A HREF="intro.html#toc5">Contents</A>
+</BODY>
+</HTML>

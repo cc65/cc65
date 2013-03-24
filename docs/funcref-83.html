@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 function reference: Alphabetical function reference: calloc</TITLE>
+ <LINK HREF="funcref-84.html" REL=next>
+ <LINK HREF="funcref-82.html" REL=previous>
+ <LINK HREF="funcref.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="funcref-84.html">Next</A>
+<A HREF="funcref-82.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="calloc"></A> 3.34 <A HREF="funcref.html#toc3.34">calloc</A></H2>
+
+
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT><B>Function</B><DD>
+<P>Allocate and clear memory.</P>
+<DT><B>Header</B><DD>
+<P><CODE>
+<A HREF="funcref-42.html#stdlib.h">stdlib.h</A></CODE></P>
+<DT><B>Declaration</B><DD>
+<P><CODE>void* __fastcall__ calloc (size_t n, size_t size);</CODE></P>
+<DT><B>Description</B><DD>
+<P><CODE>calloc</CODE> allocates memory for an array of <CODE>n</CODE> elements
+of size <CODE>size</CODE>, clears the whole block with binary zeroes and returns a
+pointer to it. On error (not enough memory available), <CODE>calloc</CODE> returns
+<CODE>NULL</CODE>.</P>
+<DT><B>Limits</B><DD>
+<P>
+<UL>
+<LI>Clearing the memory may not have the expected effect on all platforms:
+pointers in the block may not be <CODE>NULL</CODE> and floating point variables may
+not be zero (0.0). In other words: The "clearing" effect of this function
+should be used with care for portable programs.</LI>
+<LI>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.</LI>
+</UL>
+</P>
+<DT><B>Availability</B><DD>
+<P>ISO 9899</P>
+<DT><B>See also</B><DD>
+<P>
+<A HREF="funcref-54.html#_heapadd">_heapadd</A>,
+<A HREF="funcref-55.html#_heapblocksize">_heapblocksize</A>,
+<A HREF="funcref-56.html#_heapmaxavail">_heapmaxavail</A>,
+<A HREF="funcref-57.html#_heapmemavail">_heapmemavail</A>,
+<A HREF="funcref-140.html#free">free</A>,
+<A HREF="funcref-173.html#malloc">malloc</A>,
+<A HREF="funcref-207.html#realloc">realloc</A></P>
+<DT><B>Example</B><DD>
+<P>None.</P>
+</DL>
+</BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="funcref-84.html">Next</A>
+<A HREF="funcref-82.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+</BODY>
+</HTML>

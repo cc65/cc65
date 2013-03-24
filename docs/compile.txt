@@ -1,0 +1,316 @@
+
+
+Instructions for compiling cc65 and the ca65 binutils:
+
+
+Linux (and probably most other Unices)
+--------------------------------------
+                           
+Preconditions:
+
+You need the GNU C Compiler, Perl and sgml-tools installed.
+
+The simple way:
+
+From the main directory, use
+
+        make -f make/gcc.mak
+
+to build all binaries, libraries and the docs. Use
+
+        make -f make/gcc.mak install
+
+to install the files. Check the makefile before doing so and adjust the PREFIX
+variable as you like it.
+
+
+Step by step:
+
+Enter the src/ directory and do a
+
+       	make -f make/gcc.mak
+
+This will build all executables. You may use
+
+	make -f make/gcc.mak strip
+
+to remove debugging information from the binaries.
+
+After that, you need to compile the libraries. Do
+
+	cd libsrc; make
+
+HTML docs can be generated with
+
+        cd doc; make html
+
+That's it! Installation directories for the RPM packages are
+
+	/usr/bin		        for the binaries
+	/usr/lib/cc65/include	        for include files
+	/usr/lib/cc65/lib	        for libraries and startup files
+        /usr/share/doc/cc65-<version>   for documentation
+
+When using these directories, you don't need to set the CC65_INC and
+CC65_LIB environment variables. You may also use the /usr/local tree
+for installation, but the compiler and linker have no predefined search
+path for this directory, so you need the environment variables or
+change the search paths in the source.
+
+
+
+DOS using the DJGPP compiler
+----------------------------
+
+Most information in this section was provided by Keith W. Gerdes
+(kwg@netzero.net). Thanks a lot!
+
+The tmpfile() function in DJGPP has a bug and will not open the scratch
+file in binary mode. If you have problems with the archiver (which uses
+the tmpfile() function), you have two choices:
+
+  1. Get a fix from http://www.cartsys.com/eldredge/djgpp-patches.html
+     and apply it. This will solve the problem once and forever.
+
+  2. For a temporary solution, in the file binutils/ar65/main.c, add the
+     following lines:
+
+     At top:
+
+   	#include <fcntl.h>
+
+     At start of main:
+
+   	_fmode = O_BINARY;
+
+     This will switch the default mode to binary and will work around the
+     bug.
+
+Keith sent me the following notes how to build the tools on a DOS system
+using DJGPP (add your system type to CFLAGS if needed):
+
+-------------------------------------------------------------------------
+
+Here's my current batch file:
+
+cd djgpp_v2\cc65
+
+if exist bin\nul goto ahead
+mkdir bin
+mkdir lib
+:ahead
+
+cd src\common
+make -f make\gcc.mak
+
+cd ..\ar65
+make -f make\gcc.mak
+del ar65
+strip ar65.exe
+move ar65.exe ..\..\bin
+
+cd ..\ca65
+make -f make\gcc.mak
+del ca65
+strip ca65.exe
+move ca65.exe ..\..\bin
+
+cd ..\cc65
+make -f make\gcc.mak
+del cc65
+strip cc65.exe
+move cc65.exe ..\..\bin
+
+cd ..\cl65
+make -f make\gcc.mak
+del cl65
+strip cl65.exe
+move cl65.exe ..\..\bin
+
+cd ..\da65
+make -f make\gcc.mak
+del da65
+strip da65.exe
+move da65.exe ..\..\bin
+
+cd ..\grc
+make -f make\gcc.mak
+del grc
+strip grc.exe
+move grc.exe ..\..\bin
+
+cd ..\ld65
+make -f make\gcc.mak
+del ld65
+strip ld65.exe
+move ld65.exe ..\..\bin
+
+cd ..\od65
+make -f make\gcc.mak
+del od65
+strip od65.exe
+move od65.exe ..\..\bin
+
+cd ..\..
+
+cd libsrc\common
+make "CC=cc65" "CFLAGS=-Osir -g -t none -I../../include" "AS=ca65"
+"AFLAGS=-t none"
+ar65 a common.lib *.o
+move common.lib ..\..\lib
+
+cd ..\runtime
+make "CC=cc65" "CFLAGS=-Osir -g -t none -I../../include" "AS=ca65"
+"AFLAGS=-t none"
+ar65 a runtime.lib *.o
+move runtime.lib ..\..\lib
+
+ --
+
+In djgpp.env I use:
+
++LFN=Y
+
+for the .depend file.
+
+ --
+
+And in autoexec.bat I have:
+
+set CC65_INC=E:\djgpp_v2\cc65\include
+set CC65_LIB=E:\djgpp_v2\cc65\lib
+PATH=E:\djgpp_v2\cc65\binutils;%PATH%
+
+-------------------------------------------------------------------------
+
+
+OS/2 using the EMX compiler
+---------------------------
+
+If you're using OS/2 and have the EMX compiler and some GNU tools
+installed, you may also be able to compile the tools and libraries
+under OS/2. Mirco Miranda (mircomir@libero.it) sent me the following
+notes:
+
+
+-------------------------------------------------------------------------
+
+CC65 make facilities V0.3 for OS/2 by Mirco Miranda
+Date: 02/01/2000
+
+OS2HOWTO.TXT... I wrote this very fast... I hope that you can
+understand...
+
+Emx is a porting of gcc under OS/2. I wrote some C code that with
+simply (and few) preprocessor line can be compiled under OS/2 and Linux.
+Now for emx there are projects like P2 that let's add to OS/2 a complete
+Posix.1/SUS-like environment... I think that in the future the porting
+from bsd unix (and I hope linux) environment can be made very easy...
+
+These are the things because I tried to compile CC65 with emx/gcc...
+
+WARNING: at time that as wrote compiling with emx/gcc give some warnings.
+
+
+1. What do you need
+-------------------
+
+- emx/gcc 0.9D for OS/2
+
+http://hobbes.nmsu.edu/cgi-bin/h-browse?sh=1&dir=/pub/os2/dev/emx/v0.9d
+
+- gnu make
+
+http://hobbes.nmsu.edu/pub/os2/dev/util/gnumake.zip
+
+- bash
+
+Use (ba)sh coming with this package.
+There are many porting of unix shell for OS/2 and some don't
+work propely.
+
+- and finally the source package of the CC65
+  http://www.cc65.org/#Download
+  http://www.acc.umu.se/~arvid/cc65_mirror/cc65-sources-2.6.0.tar.gz
+
+I hope that's all! I have the complete emx/gnu tools installed on
+my OS/2 and I haven't test if you need other package. Sorry.
+
+
+2. Setup environment in OS/2
+----------------------------
+
+Unpack source package in a Directory and
+copy the files in src directory of source code.
+
+Install emx 0.9D following the istruction comes with it.
+Emx is well documented and I don't rewrite here emx documentation.
+
+Unpack the gnu make tool and copy make-os2.exe in ...\emx\gnu directory
+then rename it in make.exe
+
+Copy xxsh.exe in ...\emx\gnu directory
+
+
+If you want use my .cmd script (makeos2emx.cmd):
+
+- copy it in src directory
+- edit it and change the emx path(s) according with your(s).
+  (set MYEMXPATH=c:\appos2\emx)
+
+else
+
+- add ...\emx\gnu directory on your libpath
+- add ...\emx\gnu directiry on your path
+- set comspec=...\emx\gnu\xxsh.exe
+- run make -f make/gcc.mak in src directory
+- run make in libsrc directory
+
+3. My make files
+----------------
+
+If you use zap command, *.exe are not deleted.
+
+
+4. Author & Disclaimer
+----------------------
+
+Mirco Miranda
+mircomir@libero.it
+ICQ#: 51640305
+
+I haven't tested the generated code of cc65 executables with emx/gcc...
+If you use the cc65 executables compiled with emx/gcc to compile the library,
+please test it before hardly or productivity using.
+
+Safety solution is compile the cc65 executables with Watcom and then
+compile the library using gnu make and gnu (ba)sh coming with this package.
+If you use this last solution you must have only installed emx runtime because
+make.exe and xxsh.exe use it!
+
+-------------------------------------------------------------------------
+
+
+
+DOS, Windows, OS/2 using the Watcom Compiler
+--------------------------------------------
+
+This is what I'm using. You need the Borland make in addition to the
+Watcom tools, or you have to change the makefile.
+
+1. Copy %WATCOM%\src\startup\wildargv.c from your Watcom directory into
+   binutils\common.
+
+2. Enter
+
+     	make -f make\watcom.mak
+
+   in the src/ directory.
+
+3. Use Linux to build the libraries:-) If you don't have Linux, get it
+   now! More serious: There is no makefile to build the libraries under
+   any of the DOS based operating systems. Use a batch file similar to
+   the one above, or rewrite the makefile.
+
+
+

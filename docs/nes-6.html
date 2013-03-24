@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Nintendo Entertainment System specific information for cc65: Limitations</TITLE>
+ <LINK HREF="nes-7.html" REL=next>
+ <LINK HREF="nes-5.html" REL=previous>
+ <LINK HREF="nes.html#toc6" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="nes-7.html">Next</A>
+<A HREF="nes-5.html">Previous</A>
+<A HREF="nes.html#toc6">Contents</A>
+<HR>
+<H2><A NAME="s6">6.</A> <A HREF="nes.html#toc6">Limitations</A></H2>
+
+
+
+<H2><A NAME="ss6.1">6.1</A> <A HREF="nes.html#toc6.1">Disk I/O</A>
+</H2>
+
+
+<P>The existing library for the NES doesn't implement C file
+I/O. There are no hacks for the <CODE>read()</CODE> and <CODE>write()</CODE> routines.</P>
+<P>To be more concrete, this limitation means that you cannot use any of the
+following functions (and a few others):</P>
+<P>
+<UL>
+<LI>fclose</LI>
+<LI>fopen</LI>
+<LI>fread</LI>
+<LI>fprintf</LI>
+<LI>fputc</LI>
+<LI>fscanf</LI>
+<LI>fwrite</LI>
+<LI>...</LI>
+</UL>
+</P>
+
+
+
+<HR>
+<A HREF="nes-7.html">Next</A>
+<A HREF="nes-5.html">Previous</A>
+<A HREF="nes.html#toc6">Contents</A>
+</BODY>
+</HTML>

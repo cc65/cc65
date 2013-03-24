@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 function reference: Alphabetical function reference: cbm_k_iobase</TITLE>
+ <LINK HREF="funcref-95.html" REL=next>
+ <LINK HREF="funcref-93.html" REL=previous>
+ <LINK HREF="funcref.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="funcref-95.html">Next</A>
+<A HREF="funcref-93.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="cbm_k_iobase"></A> 3.45 <A HREF="funcref.html#toc3.45">cbm_k_iobase</A></H2>
+
+
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT><B>Function</B><DD>
+<P>Return Base Address of Memory-Mapped I/O Devices</P>
+<DT><B>Header</B><DD>
+<P><CODE>
+<A HREF="funcref-12.html#cbm.h">cbm.h</A></CODE></P>
+<DT><B>Declaration</B><DD>
+<P><CODE>unsigned cbm_k_iobase (void);</CODE></P>
+<DT><B>Description</B><DD>
+<P>This function returns the address of
+the memory section where the memory mapped I/O devices are located. This
+address can then be used with an offset to access the memory mapped I/O
+devices in the Commodore 64. The offset is the number of locations from
+the beginning of the page on which the I/O register you want is located.
+This function exists to provide compatibility between the Commodore 64,
+VIC-20, and future models of the Commodore 64. If the I/O locations for
+a program are set by a call to this function, they should
+still remain compatible with future versions of the Commodore 64, the
+KERNAL and BASIC.</P>
+<DT><B>Limits</B><DD>
+<P>
+<UL>
+<LI></LI>
+</UL>
+</P>
+<DT><B>Availability</B><DD>
+<P>cc65</P>
+<DT><B>See also</B><DD>
+
+<DT><B>Example</B><DD>
+<P>None.</P>
+</DL>
+</BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="funcref-95.html">Next</A>
+<A HREF="funcref-93.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+</BODY>
+</HTML>

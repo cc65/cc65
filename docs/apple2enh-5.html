@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Enhanced&nbsp;Apple&nbsp;//e specific information for cc65: ProDOS 8 system programs</TITLE>
+ <LINK HREF="apple2enh-6.html" REL=next>
+ <LINK HREF="apple2enh-4.html" REL=previous>
+ <LINK HREF="apple2enh.html#toc5" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="apple2enh-6.html">Next</A>
+<A HREF="apple2enh-4.html">Previous</A>
+<A HREF="apple2enh.html#toc5">Contents</A>
+<HR>
+<H2><A NAME="s5">5.</A> <A HREF="apple2enh.html#toc5">ProDOS 8 system programs</A></H2>
+
+
+<P>ProDOS 8 system programs are always loaded to the start address $2000.
+For cc65 programs this means that the 6 KB from $800 to $2000 are
+by default unused. There are however several options to make use of that memory
+range.</P>
+
+
+<H2><A NAME="ss5.1">5.1</A> <A HREF="apple2enh.html#toc5.1">LOADER.SYSTEM</A>
+</H2>
+
+
+<P>The easiest (and for really large programs in fact the only) way to have a cc65
+program use the memory from $800 to $2000 is to link it as binary
+(as opposed to system) program using the linker configuration
+<A HREF="apple2enh-4.html#ss4.4">apple2enh-loader.cfg</A> with start address
+$800 and load it with <B>LOADER.SYSTEM - an Apple&nbsp;][
+ProDOS 8 loader for cc65 programs</B>. The program then works like a system program
+(i.e. quits to the ProDOS dispatcher).</P>
+<P>Using LOADER.SYSTEM is as simple as copying it to the ProDOS 8 directory of the
+program to load under name &lt;program&gt;.SYSTEM as a system program. For
+example the program <CODE>MYPROG</CODE> is loaded by <CODE>MYPROG.SYSTEM</CODE>.</P>
+
+
+<H2><A NAME="ss5.2">5.2</A> <A HREF="apple2enh.html#toc5.2">Heap</A>
+</H2>
+
+
+<P>If the cc65 program can be successfully linked as system program using the linker
+configuration 
+<A HREF="apple2enh-4.html#ss4.3">apple2enh-system.cfg</A> but
+uses the heap either explicitly or implicitly (i.e. by loading a driver) then
+the memory from $800 to $2000 can be added to the heap by calling
+<CODE>_heapadd ((void *) 0x0800, 0x1800);</CODE> at the beginning of <CODE>main()</CODE>.</P>
+
+
+<H2><A NAME="ss5.3">5.3</A> <A HREF="apple2enh.html#toc5.3">ProDOS 8 I/O buffers</A>
+</H2>
+
+
+<P>ProDOS 8 requires for every open file a page-aligned 1 KB I/O buffer. By default
+these buffers are allocated by the cc65 runtime system on the heap using
+<CODE>posix_memalign()</CODE>. While this is generally the best solution it means quite
+some overhead for (especially rather small) cc65 programs which do open files
+but don't make use of the heap otherwise.</P>
+<P>The apple2enh package comes with the alternative ProDOS 8 I/O buffer allocation
+module <CODE>apple2enh-iobuf-0800.o</CODE> which uses the memory between $800 and
+the program start address for the 1 KB I/O buffers. For system programs (with
+start address $2000) this results in up to 6 I/O buffers and thus up to 6
+concurrently open files.</P>
+<P>While using <CODE>_heapadd()</CODE> as described in the section above together with the
+default I/O buffer allocation basically yields the same placement of I/O buffers
+in memory the primary benefit of <CODE>apple2enh-iobuf-0800.o</CODE> is a reduction in code
+size - and thus program file size - of more than 1400 bytes.</P>
+<P>Using <CODE>apple2enh-iobuf-0800.o</CODE> is as simple as placing it on the linker command 
+line like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+cl65 -t apple2enh -C apple2enh-system.cfg myprog.c apple2enh-iobuf-0800.o
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+<HR>
+<A HREF="apple2enh-6.html">Next</A>
+<A HREF="apple2enh-4.html">Previous</A>
+<A HREF="apple2enh.html#toc5">Contents</A>
+</BODY>
+</HTML>

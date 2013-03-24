@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Atari Lynx specific information for cc65: Loadable drivers</TITLE>
+ <LINK HREF="lynx-7.html" REL=next>
+ <LINK HREF="lynx-5.html" REL=previous>
+ <LINK HREF="lynx.html#toc6" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="lynx-7.html">Next</A>
+<A HREF="lynx-5.html">Previous</A>
+<A HREF="lynx.html#toc6">Contents</A>
+<HR>
+<H2><A NAME="s6">6.</A> <A HREF="lynx.html#toc6">Loadable drivers</A></H2>
+
+
+<P>The names in the parentheses denote the symbols to be used for static linking of the drivers.</P>
+
+
+<H2><A NAME="ss6.1">6.1</A> <A HREF="lynx.html#toc6.1">Graphics drivers</A>
+</H2>
+
+
+<P>
+<DL>
+
+<DT><B><CODE>lynx-160-102-16.tgi (lynx_160_102_16)</CODE></B><DD>
+<P>A TGI driver for the standard graphics mode (160&times;102 in 16 colors).</P>
+<P>The TGI driver is implemented as an interrupt driven dual buffering device.
+To use it as a single-buffer device set draw page and view page to the same
+value 0 or 1;</P>
+<P>The TGI driver has a few Lynx-specific extensions.</P>
+<P>Calling tgi_sprite(spr) or tgi_ioctl(0, spr) will display a standard Lynx
+sprite on screen.</P>
+<P>Calling tgi_flip() or tgi_ioctl(1, 0) will do a flip screen.</P>
+<P>Calling tgi_setbgcolor(bgcolor) or tgi_ioctl(2, bgindex) will set the text
+background color to the index defined by bgindex. If bgindex is 0 then the
+background color is transparent.</P>
+<P>To set the framerate of the display hardware call tgi_setframerate(rate) or
+tgi_ioctl(3, rate). The supported framerates are 50, 60 and 75 frames per
+second. Actually there is no real reason to use anything else than 75 frames
+per second.</P>
+<P>To check if the drawing engine is busy with the previous swap you can
+call tgi_busy or tgi_ioctl(4, 0). It returns 0 if idle and 1 if busy</P>
+<P>To update displays you can call tgi_updatedisplay() or tgi_ioctl(4, 1) it
+will wait for the next VBL interrupt and set the draw buffer to the
+view buffer. The draw buffer is also changed to (drawbuffer xor 1).</P>
+<P>You can also enable or disable collision detection by a call to
+tgi_setcollisiondetection(active) or tgi_ioctl(5, active). The collision
+result is located before the sprite structure by default in this driver.</P>
+<P>In order to reserve memory for the collision detection buffer you need to
+specify lynx-coll.cfg as the configuration file to the linker.</P>
+
+</DL>
+</P>
+
+
+
+<H2><A NAME="ss6.2">6.2</A> <A HREF="lynx.html#toc6.2">Extended memory drivers</A>
+</H2>
+
+
+<P>No extended memory drivers are currently available for the Lynx.</P>
+
+
+<H2><A NAME="ss6.3">6.3</A> <A HREF="lynx.html#toc6.3">Joystick drivers</A>
+</H2>
+
+
+<P>
+<DL>
+
+<DT><B><CODE>lynx-stdjoy.joy (lynx_stdjoy)</CODE></B><DD>
+<P>A joystick driver for the standard buttons.</P>
+
+</DL>
+</P>
+
+
+
+<H2><A NAME="ss6.4">6.4</A> <A HREF="lynx.html#toc6.4">Mouse drivers</A>
+</H2>
+
+
+<P>No mouse drivers are currently available for the Lynx.</P>
+
+
+<H2><A NAME="ss6.5">6.5</A> <A HREF="lynx.html#toc6.5">RS232 device drivers</A>
+</H2>
+
+
+<P>
+<DL>
+
+<DT><B><CODE>lynx-comlynx.ser (lynx_comlynx)</CODE></B><DD>
+<P>A serial driver for the ComLynx port.</P>
+<P>The ComLynx port has Tx and Rx wired together. Every byte is sent
+to all connected Lynxes. Only one Lynx can send at a time. There is no
+protocol created for communication. You are on your own.</P>
+<P>If the Lynx returns framing error then it is likely that another Lynx is
+sending data at the same time.</P>
+<P>The Lynx can also send a break and receive a break. The Lynx break is
+recognized if the bit is down for 24 bit cycles or more.</P>
+<P>To send a break you just set the break bit. The length of the break depends
+on how long this bit is down.</P>
+<P>The driver supports the baudrates:
+<UL>
+<LI>62500</LI>
+<LI>31250</LI>
+<LI>9600</LI>
+<LI>7200</LI>
+<LI>4800</LI>
+<LI>3600</LI>
+<LI>2400</LI>
+<LI>1800</LI>
+<LI>1200</LI>
+<LI>600</LI>
+<LI>300</LI>
+<LI>150</LI>
+<LI>134.5</LI>
+<LI>110</LI>
+<LI>75</LI>
+</UL>
+
+The parity bit supports MARK and SPACE. It also supports EVEN and ODD parity
+but the parity bit is included in the calculation. Most of us don't want it
+this way. But there is nothing we can do about it.</P>
+<P>The Lynx hardware will always check parity on incoming traffic. Currently
+the driver cannot receive data from standard PC's due to this parity bug.
+For working with Lynx to Lynx communication use EVEN parity.</P>
+<P>To send data to standard PC's use MARK or SPACE as parity setting.</P>
+<P>There is always only one stop bit. And the data length is always 8 bits.</P>
+<P>We have no handshaking available. Even software handshake is impossible
+as ComLynx has only one wire for the data.</P>
+<P>Both transmit and receive are interrupt driven.</P>
+
+</DL>
+</P>
+
+
+
+<HR>
+<A HREF="lynx-7.html">Next</A>
+<A HREF="lynx-5.html">Previous</A>
+<A HREF="lynx.html#toc6">Contents</A>
+</BODY>
+</HTML>

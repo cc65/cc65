@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Commodore 610 specific information for cc65: Platform specific header files</TITLE>
+ <LINK HREF="cbm610-5.html" REL=next>
+ <LINK HREF="cbm610-3.html" REL=previous>
+ <LINK HREF="cbm610.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="cbm610-5.html">Next</A>
+<A HREF="cbm610-3.html">Previous</A>
+<A HREF="cbm610.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="cbm610.html#toc4">Platform specific header files</A></H2>
+
+
+<P>Programs containing CBM 610 specific code may use the <CODE>cbm610.h</CODE> or
+<CODE>cbm.h</CODE> header files. Using the later may be an option when writing code
+for more than one CBM platform, since it includes <CODE>cbm610.h</CODE> and declares
+several functions common to all CBM platforms.</P>
+
+<H2><A NAME="ss4.1">4.1</A> <A HREF="cbm610.html#toc4.1">CBM 610 specific functions</A>
+</H2>
+
+
+<P>The functions listed below are special for the CBM 610. See the 
+<A HREF="funcref.html">function reference</A> for declaration and usage.</P>
+<P>
+<UL>
+<LI>peekbsys</LI>
+<LI>peekwsys</LI>
+<LI>pokebsys</LI>
+<LI>pokewsys</LI>
+</UL>
+</P>
+
+
+<H2><A NAME="ss4.2">4.2</A> <A HREF="cbm610.html#toc4.2">CBM specific functions</A>
+</H2>
+
+
+<P>Some functions are available for all (or at least most) of the Commodore
+machines. See the 
+<A HREF="funcref.html">function reference</A> for
+declaration and usage.</P>
+
+<P>
+<UL>
+<LI>cbm_close</LI>
+<LI>cbm_closedir</LI>
+<LI>cbm_k_setlfs</LI>
+<LI>cbm_k_setnam</LI>
+<LI>cbm_k_load</LI>
+<LI>cbm_k_save</LI>
+<LI>cbm_k_open</LI>
+<LI>cbm_k_close</LI>
+<LI>cbm_k_readst</LI>
+<LI>cbm_k_chkin</LI>
+<LI>cbm_k_ckout</LI>
+<LI>cbm_k_basin</LI>
+<LI>cbm_k_bsout</LI>
+<LI>cbm_k_clrch</LI>
+<LI>cbm_load</LI>
+<LI>cbm_open</LI>
+<LI>cbm_opendir</LI>
+<LI>cbm_read</LI>
+<LI>cbm_readdir</LI>
+<LI>cbm_save</LI>
+<LI>cbm_write</LI>
+<LI>get_tv</LI>
+</UL>
+</P>
+
+
+
+<H2><A NAME="ss4.3">4.3</A> <A HREF="cbm610.html#toc4.3">Hardware access</A>
+</H2>
+
+
+<P>The following pseudo variables declared in the <CODE>cbm610.h</CODE> header file do
+allow access to hardware located in the address space. Some variables are
+structures, accessing the struct fields will access the chip registers.</P>
+<P><B>Note:</B> All I/O chips are located in the system bank (bank 15) and can
+therefore not be accessed like on other platforms. Please use one of the
+<CODE>peekbsys</CODE>, <CODE>peekwsys</CODE>, <CODE>pokebsys</CODE> and <CODE>pokewsys</CODE> functions to
+access the I/O chips. Direct reads and writes to the structures named below
+will <EM>not</EM> work!</P>
+<P>
+<DL>
+
+<DT><B><CODE>CRTC</CODE></B><DD>
+<P>The <CODE>CRTC</CODE> structure allows access to the CRTC (the video controller).
+See the <CODE>_6545.h</CODE> header file located in the include directory for the
+declaration of the structure.</P>
+
+<DT><B><CODE>SID</CODE></B><DD>
+<P>The <CODE>SID</CODE> structure allows access to the SID (the
+sound interface device). See the <CODE>_sid.h</CODE> header file located in the
+include directory for the declaration of the structure.</P>
+
+<DT><B><CODE>ACIA</CODE></B><DD>
+<P>Access to the ACIA (the RS232 chip) is available via the <CODE>ACIA</CODE> variable.
+See the <CODE>_6551.h</CODE> header file located in the include directory for the
+declaration of the structure.</P>
+
+<DT><B><CODE>CIA</CODE></B><DD>
+<P>Access to the CIA chip is available via the <CODE>CIA</CODE> variable. See the
+<CODE>_6526.h</CODE> header file located in the include directory for the
+declaration of the structure.</P>
+
+<DT><B><CODE>TPI1, TPI2</CODE></B><DD>
+<P>The two 6525 triport chips may be accessed by using this variable. See the
+<CODE>_6525.h</CODE> header file located in the include directory for the
+declaration of the structure.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="cbm610-5.html">Next</A>
+<A HREF="cbm610-3.html">Previous</A>
+<A HREF="cbm610.html#toc4">Contents</A>
+</BODY>
+</HTML>

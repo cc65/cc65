@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide</TITLE>
+ <LINK HREF="ca65-1.html" REL=next>
+
+
+</HEAD>
+<BODY>
+<A HREF="ca65-1.html">Next</A>
+Previous
+Contents
+<HR>
+<H1>ca65 Users Guide</H1>
+
+<H2>Ullrich von Bassewitz, 
+<A HREF="mailto:uz@cc65.org">uz@cc65.org</A></H2>2000-07-19, 2000-11-29, 2001-10-02, 2005-09-08
+<HR>
+<EM>ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
+used as a companion assembler for the cc65 crosscompiler, but it may also be
+used as a standalone product.</EM>
+<HR>
+<P>
+<H2><A NAME="toc1">1.</A> <A HREF="ca65-1.html">Overview</A></H2>
+
+<UL>
+<LI><A NAME="toc1.1">1.1</A> <A HREF="ca65-1.html#ss1.1">Design criteria</A>
+</UL>
+<P>
+<H2><A NAME="toc2">2.</A> <A HREF="ca65-2.html">Usage</A></H2>
+
+<UL>
+<LI><A NAME="toc2.1">2.1</A> <A HREF="ca65-2.html#ss2.1">Command line option overview</A>
+<LI><A NAME="toc2.2">2.2</A> <A HREF="ca65-2.html#ss2.2">Command line options in detail</A>
+</UL>
+<P>
+<H2><A NAME="toc3">3.</A> <A HREF="ca65-3.html">Search paths</A></H2>
+
+<P>
+<H2><A NAME="toc4">4.</A> <A HREF="ca65-4.html">Input format</A></H2>
+
+<UL>
+<LI><A NAME="toc4.1">4.1</A> <A HREF="ca65-4.html#ss4.1">Assembler syntax</A>
+<LI><A NAME="toc4.2">4.2</A> <A HREF="ca65-4.html#ss4.2">65816 mode</A>
+<LI><A NAME="toc4.3">4.3</A> <A HREF="ca65-4.html#ss4.3">6502X mode</A>
+<LI><A NAME="toc4.4">4.4</A> <A HREF="ca65-4.html#ss4.4">sweet16 mode</A>
+<LI><A NAME="toc4.5">4.5</A> <A HREF="ca65-4.html#ss4.5">Number format</A>
+<LI><A NAME="toc4.6">4.6</A> <A HREF="ca65-4.html#ss4.6">Conditional assembly</A>
+</UL>
+<P>
+<H2><A NAME="toc5">5.</A> <A HREF="ca65-5.html">Expressions</A></H2>
+
+<UL>
+<LI><A NAME="toc5.1">5.1</A> <A HREF="ca65-5.html#ss5.1">Expression evaluation</A>
+<LI><A NAME="toc5.2">5.2</A> <A HREF="ca65-5.html#ss5.2">Size of an expression result</A>
+<LI><A NAME="toc5.3">5.3</A> <A HREF="ca65-5.html#ss5.3">Boolean expressions</A>
+<LI><A NAME="toc5.4">5.4</A> <A HREF="ca65-5.html#ss5.4">Constant expressions</A>
+<LI><A NAME="toc5.5">5.5</A> <A HREF="ca65-5.html#ss5.5">Available operators</A>
+</UL>
+<P>
+<H2><A NAME="toc6">6.</A> <A HREF="ca65-6.html">Symbols and labels</A></H2>
+
+<UL>
+<LI><A NAME="toc6.1">6.1</A> <A HREF="ca65-6.html#ss6.1">Numeric constants</A>
+<LI><A NAME="toc6.2">6.2</A> <A HREF="ca65-6.html#ss6.2">Numeric variables</A>
+<LI><A NAME="toc6.3">6.3</A> <A HREF="ca65-6.html#ss6.3">Standard labels</A>
+<LI><A NAME="toc6.4">6.4</A> <A HREF="ca65-6.html#ss6.4">Local labels and symbols</A>
+<LI><A NAME="toc6.5">6.5</A> <A HREF="ca65-6.html#ss6.5">Cheap local labels</A>
+<LI><A NAME="toc6.6">6.6</A> <A HREF="ca65-6.html#ss6.6">Unnamed labels</A>
+<LI><A NAME="toc6.7">6.7</A> <A HREF="ca65-6.html#ss6.7">Using macros to define labels and constants</A>
+<LI><A NAME="toc6.8">6.8</A> <A HREF="ca65-6.html#ss6.8">Symbols and <CODE>.DEBUGINFO</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc7">7.</A> <A HREF="ca65-7.html">Scopes</A></H2>
+
+<UL>
+<LI><A NAME="toc7.1">7.1</A> <A HREF="ca65-7.html#ss7.1">Global scope</A>
+<LI><A NAME="toc7.2">7.2</A> <A HREF="ca65-7.html#ss7.2">Cheap locals</A>
+<LI><A NAME="toc7.3">7.3</A> <A HREF="ca65-7.html#ss7.3">Generic nested scopes</A>
+<LI><A NAME="toc7.4">7.4</A> <A HREF="ca65-7.html#ss7.4">Nested procedures</A>
+<LI><A NAME="toc7.5">7.5</A> <A HREF="ca65-7.html#ss7.5">Structs, unions and enums</A>
+<LI><A NAME="toc7.6">7.6</A> <A HREF="ca65-7.html#ss7.6">Explicit scope specification</A>
+<LI><A NAME="toc7.7">7.7</A> <A HREF="ca65-7.html#ss7.7">Scope search order</A>
+</UL>
+<P>
+<H2><A NAME="toc8">8.</A> <A HREF="ca65-8.html">Address sizes and memory models</A></H2>
+
+<UL>
+<LI><A NAME="toc8.1">8.1</A> <A HREF="ca65-8.html#ss8.1">Address sizes</A>
+<LI><A NAME="toc8.2">8.2</A> <A HREF="ca65-8.html#ss8.2">Address sizes of segments</A>
+<LI><A NAME="toc8.3">8.3</A> <A HREF="ca65-8.html#ss8.3">Address sizes of symbols</A>
+<LI><A NAME="toc8.4">8.4</A> <A HREF="ca65-8.html#ss8.4">Memory models</A>
+</UL>
+<P>
+<H2><A NAME="toc9">9.</A> <A HREF="ca65-9.html">Pseudo variables</A></H2>
+
+<UL>
+<LI><A NAME="toc9.1">9.1</A> <A HREF="ca65-9.html#ss9.1"><CODE>*</CODE></A>
+<LI><A NAME="toc9.2">9.2</A> <A HREF="ca65-9.html#ss9.2"><CODE>.CPU</CODE></A>
+<LI><A NAME="toc9.3">9.3</A> <A HREF="ca65-9.html#ss9.3"><CODE>.PARAMCOUNT</CODE></A>
+<LI><A NAME="toc9.4">9.4</A> <A HREF="ca65-9.html#ss9.4"><CODE>.TIME</CODE></A>
+<LI><A NAME="toc9.5">9.5</A> <A HREF="ca65-9.html#ss9.5"><CODE>.VERSION</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc10">10.</A> <A HREF="ca65-10.html">Pseudo functions</A></H2>
+
+<UL>
+<LI><A NAME="toc10.1">10.1</A> <A HREF="ca65-10.html#ss10.1"><CODE>.BANK</CODE></A>
+<LI><A NAME="toc10.2">10.2</A> <A HREF="ca65-10.html#ss10.2"><CODE>.BANKBYTE</CODE></A>
+<LI><A NAME="toc10.3">10.3</A> <A HREF="ca65-10.html#ss10.3"><CODE>.BLANK</CODE></A>
+<LI><A NAME="toc10.4">10.4</A> <A HREF="ca65-10.html#ss10.4"><CODE>.CONCAT</CODE></A>
+<LI><A NAME="toc10.5">10.5</A> <A HREF="ca65-10.html#ss10.5"><CODE>.CONST</CODE></A>
+<LI><A NAME="toc10.6">10.6</A> <A HREF="ca65-10.html#ss10.6"><CODE>.HIBYTE</CODE></A>
+<LI><A NAME="toc10.7">10.7</A> <A HREF="ca65-10.html#ss10.7"><CODE>.HIWORD</CODE></A>
+<LI><A NAME="toc10.8">10.8</A> <A HREF="ca65-10.html#ss10.8"><CODE>.IDENT</CODE></A>
+<LI><A NAME="toc10.9">10.9</A> <A HREF="ca65-10.html#ss10.9"><CODE>.LEFT</CODE></A>
+<LI><A NAME="toc10.10">10.10</A> <A HREF="ca65-10.html#ss10.10"><CODE>.LOBYTE</CODE></A>
+<LI><A NAME="toc10.11">10.11</A> <A HREF="ca65-10.html#ss10.11"><CODE>.LOWORD</CODE></A>
+<LI><A NAME="toc10.12">10.12</A> <A HREF="ca65-10.html#ss10.12"><CODE>.MATCH</CODE></A>
+<LI><A NAME="toc10.13">10.13</A> <A HREF="ca65-10.html#ss10.13"><CODE>.MAX</CODE></A>
+<LI><A NAME="toc10.14">10.14</A> <A HREF="ca65-10.html#ss10.14"><CODE>.MID</CODE></A>
+<LI><A NAME="toc10.15">10.15</A> <A HREF="ca65-10.html#ss10.15"><CODE>.MIN</CODE></A>
+<LI><A NAME="toc10.16">10.16</A> <A HREF="ca65-10.html#ss10.16"><CODE>.REF, .REFERENCED</CODE></A>
+<LI><A NAME="toc10.17">10.17</A> <A HREF="ca65-10.html#ss10.17"><CODE>.RIGHT</CODE></A>
+<LI><A NAME="toc10.18">10.18</A> <A HREF="ca65-10.html#ss10.18"><CODE>.SIZEOF</CODE></A>
+<LI><A NAME="toc10.19">10.19</A> <A HREF="ca65-10.html#ss10.19"><CODE>.STRAT</CODE></A>
+<LI><A NAME="toc10.20">10.20</A> <A HREF="ca65-10.html#ss10.20"><CODE>.SPRINTF</CODE></A>
+<LI><A NAME="toc10.21">10.21</A> <A HREF="ca65-10.html#ss10.21"><CODE>.STRING</CODE></A>
+<LI><A NAME="toc10.22">10.22</A> <A HREF="ca65-10.html#ss10.22"><CODE>.STRLEN</CODE></A>
+<LI><A NAME="toc10.23">10.23</A> <A HREF="ca65-10.html#ss10.23"><CODE>.TCOUNT</CODE></A>
+<LI><A NAME="toc10.24">10.24</A> <A HREF="ca65-10.html#ss10.24"><CODE>.XMATCH</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc11">11.</A> <A HREF="ca65-11.html">Control commands</A></H2>
+
+<UL>
+<LI><A NAME="toc11.1">11.1</A> <A HREF="ca65-11.html#ss11.1"><CODE>.A16</CODE></A>
+<LI><A NAME="toc11.2">11.2</A> <A HREF="ca65-11.html#ss11.2"><CODE>.A8</CODE></A>
+<LI><A NAME="toc11.3">11.3</A> <A HREF="ca65-11.html#ss11.3"><CODE>.ADDR</CODE></A>
+<LI><A NAME="toc11.4">11.4</A> <A HREF="ca65-11.html#ss11.4"><CODE>.ALIGN</CODE></A>
+<LI><A NAME="toc11.5">11.5</A> <A HREF="ca65-11.html#ss11.5"><CODE>.ASCIIZ</CODE></A>
+<LI><A NAME="toc11.6">11.6</A> <A HREF="ca65-11.html#ss11.6"><CODE>.ASSERT</CODE></A>
+<LI><A NAME="toc11.7">11.7</A> <A HREF="ca65-11.html#ss11.7"><CODE>.AUTOIMPORT</CODE></A>
+<LI><A NAME="toc11.8">11.8</A> <A HREF="ca65-11.html#ss11.8"><CODE>.BANKBYTES</CODE></A>
+<LI><A NAME="toc11.9">11.9</A> <A HREF="ca65-11.html#ss11.9"><CODE>.BSS</CODE></A>
+<LI><A NAME="toc11.10">11.10</A> <A HREF="ca65-11.html#ss11.10"><CODE>.BYT, .BYTE</CODE></A>
+<LI><A NAME="toc11.11">11.11</A> <A HREF="ca65-11.html#ss11.11"><CODE>.CASE</CODE></A>
+<LI><A NAME="toc11.12">11.12</A> <A HREF="ca65-11.html#ss11.12"><CODE>.CHARMAP</CODE></A>
+<LI><A NAME="toc11.13">11.13</A> <A HREF="ca65-11.html#ss11.13"><CODE>.CODE</CODE></A>
+<LI><A NAME="toc11.14">11.14</A> <A HREF="ca65-11.html#ss11.14"><CODE>.CONDES</CODE></A>
+<LI><A NAME="toc11.15">11.15</A> <A HREF="ca65-11.html#ss11.15"><CODE>.CONSTRUCTOR</CODE></A>
+<LI><A NAME="toc11.16">11.16</A> <A HREF="ca65-11.html#ss11.16"><CODE>.DATA</CODE></A>
+<LI><A NAME="toc11.17">11.17</A> <A HREF="ca65-11.html#ss11.17"><CODE>.DBYT</CODE></A>
+<LI><A NAME="toc11.18">11.18</A> <A HREF="ca65-11.html#ss11.18"><CODE>.DEBUGINFO</CODE></A>
+<LI><A NAME="toc11.19">11.19</A> <A HREF="ca65-11.html#ss11.19"><CODE>.DEFINE</CODE></A>
+<LI><A NAME="toc11.20">11.20</A> <A HREF="ca65-11.html#ss11.20"><CODE>.DELMAC, .DELMACRO</CODE></A>
+<LI><A NAME="toc11.21">11.21</A> <A HREF="ca65-11.html#ss11.21"><CODE>.DEF, .DEFINED</CODE></A>
+<LI><A NAME="toc11.22">11.22</A> <A HREF="ca65-11.html#ss11.22"><CODE>.DESTRUCTOR</CODE></A>
+<LI><A NAME="toc11.23">11.23</A> <A HREF="ca65-11.html#ss11.23"><CODE>.DWORD</CODE></A>
+<LI><A NAME="toc11.24">11.24</A> <A HREF="ca65-11.html#ss11.24"><CODE>.ELSE</CODE></A>
+<LI><A NAME="toc11.25">11.25</A> <A HREF="ca65-11.html#ss11.25"><CODE>.ELSEIF</CODE></A>
+<LI><A NAME="toc11.26">11.26</A> <A HREF="ca65-11.html#ss11.26"><CODE>.END</CODE></A>
+<LI><A NAME="toc11.27">11.27</A> <A HREF="ca65-11.html#ss11.27"><CODE>.ENDENUM</CODE></A>
+<LI><A NAME="toc11.28">11.28</A> <A HREF="ca65-11.html#ss11.28"><CODE>.ENDIF</CODE></A>
+<LI><A NAME="toc11.29">11.29</A> <A HREF="ca65-11.html#ss11.29"><CODE>.ENDMAC, .ENDMACRO</CODE></A>
+<LI><A NAME="toc11.30">11.30</A> <A HREF="ca65-11.html#ss11.30"><CODE>.ENDPROC</CODE></A>
+<LI><A NAME="toc11.31">11.31</A> <A HREF="ca65-11.html#ss11.31"><CODE>.ENDREP, .ENDREPEAT</CODE></A>
+<LI><A NAME="toc11.32">11.32</A> <A HREF="ca65-11.html#ss11.32"><CODE>.ENDSCOPE</CODE></A>
+<LI><A NAME="toc11.33">11.33</A> <A HREF="ca65-11.html#ss11.33"><CODE>.ENDSTRUCT</CODE></A>
+<LI><A NAME="toc11.34">11.34</A> <A HREF="ca65-11.html#ss11.34"><CODE>.ENDUNION</CODE></A>
+<LI><A NAME="toc11.35">11.35</A> <A HREF="ca65-11.html#ss11.35"><CODE>.ENUM</CODE></A>
+<LI><A NAME="toc11.36">11.36</A> <A HREF="ca65-11.html#ss11.36"><CODE>.ERROR</CODE></A>
+<LI><A NAME="toc11.37">11.37</A> <A HREF="ca65-11.html#ss11.37"><CODE>.EXITMAC, .EXITMACRO</CODE></A>
+<LI><A NAME="toc11.38">11.38</A> <A HREF="ca65-11.html#ss11.38"><CODE>.EXPORT</CODE></A>
+<LI><A NAME="toc11.39">11.39</A> <A HREF="ca65-11.html#ss11.39"><CODE>.EXPORTZP</CODE></A>
+<LI><A NAME="toc11.40">11.40</A> <A HREF="ca65-11.html#ss11.40"><CODE>.FARADDR</CODE></A>
+<LI><A NAME="toc11.41">11.41</A> <A HREF="ca65-11.html#ss11.41"><CODE>.FATAL</CODE></A>
+<LI><A NAME="toc11.42">11.42</A> <A HREF="ca65-11.html#ss11.42"><CODE>.FEATURE</CODE></A>
+<LI><A NAME="toc11.43">11.43</A> <A HREF="ca65-11.html#ss11.43"><CODE>.FILEOPT, .FOPT</CODE></A>
+<LI><A NAME="toc11.44">11.44</A> <A HREF="ca65-11.html#ss11.44"><CODE>.FORCEIMPORT</CODE></A>
+<LI><A NAME="toc11.45">11.45</A> <A HREF="ca65-11.html#ss11.45"><CODE>.GLOBAL</CODE></A>
+<LI><A NAME="toc11.46">11.46</A> <A HREF="ca65-11.html#ss11.46"><CODE>.GLOBALZP</CODE></A>
+<LI><A NAME="toc11.47">11.47</A> <A HREF="ca65-11.html#ss11.47"><CODE>.HIBYTES</CODE></A>
+<LI><A NAME="toc11.48">11.48</A> <A HREF="ca65-11.html#ss11.48"><CODE>.I16</CODE></A>
+<LI><A NAME="toc11.49">11.49</A> <A HREF="ca65-11.html#ss11.49"><CODE>.I8</CODE></A>
+<LI><A NAME="toc11.50">11.50</A> <A HREF="ca65-11.html#ss11.50"><CODE>.IF</CODE></A>
+<LI><A NAME="toc11.51">11.51</A> <A HREF="ca65-11.html#ss11.51"><CODE>.IFBLANK</CODE></A>
+<LI><A NAME="toc11.52">11.52</A> <A HREF="ca65-11.html#ss11.52"><CODE>.IFCONST</CODE></A>
+<LI><A NAME="toc11.53">11.53</A> <A HREF="ca65-11.html#ss11.53"><CODE>.IFDEF</CODE></A>
+<LI><A NAME="toc11.54">11.54</A> <A HREF="ca65-11.html#ss11.54"><CODE>.IFNBLANK</CODE></A>
+<LI><A NAME="toc11.55">11.55</A> <A HREF="ca65-11.html#ss11.55"><CODE>.IFNDEF</CODE></A>
+<LI><A NAME="toc11.56">11.56</A> <A HREF="ca65-11.html#ss11.56"><CODE>.IFNREF</CODE></A>
+<LI><A NAME="toc11.57">11.57</A> <A HREF="ca65-11.html#ss11.57"><CODE>.IFP02</CODE></A>
+<LI><A NAME="toc11.58">11.58</A> <A HREF="ca65-11.html#ss11.58"><CODE>.IFP816</CODE></A>
+<LI><A NAME="toc11.59">11.59</A> <A HREF="ca65-11.html#ss11.59"><CODE>.IFPC02</CODE></A>
+<LI><A NAME="toc11.60">11.60</A> <A HREF="ca65-11.html#ss11.60"><CODE>.IFPSC02</CODE></A>
+<LI><A NAME="toc11.61">11.61</A> <A HREF="ca65-11.html#ss11.61"><CODE>.IFREF</CODE></A>
+<LI><A NAME="toc11.62">11.62</A> <A HREF="ca65-11.html#ss11.62"><CODE>.IMPORT</CODE></A>
+<LI><A NAME="toc11.63">11.63</A> <A HREF="ca65-11.html#ss11.63"><CODE>.IMPORTZP</CODE></A>
+<LI><A NAME="toc11.64">11.64</A> <A HREF="ca65-11.html#ss11.64"><CODE>.INCBIN</CODE></A>
+<LI><A NAME="toc11.65">11.65</A> <A HREF="ca65-11.html#ss11.65"><CODE>.INCLUDE</CODE></A>
+<LI><A NAME="toc11.66">11.66</A> <A HREF="ca65-11.html#ss11.66"><CODE>.INTERRUPTOR</CODE></A>
+<LI><A NAME="toc11.67">11.67</A> <A HREF="ca65-11.html#ss11.67"><CODE>.LINECONT</CODE></A>
+<LI><A NAME="toc11.68">11.68</A> <A HREF="ca65-11.html#ss11.68"><CODE>.LIST</CODE></A>
+<LI><A NAME="toc11.69">11.69</A> <A HREF="ca65-11.html#ss11.69"><CODE>.LISTBYTES</CODE></A>
+<LI><A NAME="toc11.70">11.70</A> <A HREF="ca65-11.html#ss11.70"><CODE>.LOBYTES</CODE></A>
+<LI><A NAME="toc11.71">11.71</A> <A HREF="ca65-11.html#ss11.71"><CODE>.LOCAL</CODE></A>
+<LI><A NAME="toc11.72">11.72</A> <A HREF="ca65-11.html#ss11.72"><CODE>.LOCALCHAR</CODE></A>
+<LI><A NAME="toc11.73">11.73</A> <A HREF="ca65-11.html#ss11.73"><CODE>.MACPACK</CODE></A>
+<LI><A NAME="toc11.74">11.74</A> <A HREF="ca65-11.html#ss11.74"><CODE>.MAC, .MACRO</CODE></A>
+<LI><A NAME="toc11.75">11.75</A> <A HREF="ca65-11.html#ss11.75"><CODE>.ORG</CODE></A>
+<LI><A NAME="toc11.76">11.76</A> <A HREF="ca65-11.html#ss11.76"><CODE>.OUT</CODE></A>
+<LI><A NAME="toc11.77">11.77</A> <A HREF="ca65-11.html#ss11.77"><CODE>.P02</CODE></A>
+<LI><A NAME="toc11.78">11.78</A> <A HREF="ca65-11.html#ss11.78"><CODE>.P816</CODE></A>
+<LI><A NAME="toc11.79">11.79</A> <A HREF="ca65-11.html#ss11.79"><CODE>.PAGELEN, .PAGELENGTH</CODE></A>
+<LI><A NAME="toc11.80">11.80</A> <A HREF="ca65-11.html#ss11.80"><CODE>.PC02</CODE></A>
+<LI><A NAME="toc11.81">11.81</A> <A HREF="ca65-11.html#ss11.81"><CODE>.POPCPU</CODE></A>
+<LI><A NAME="toc11.82">11.82</A> <A HREF="ca65-11.html#ss11.82"><CODE>.POPSEG</CODE></A>
+<LI><A NAME="toc11.83">11.83</A> <A HREF="ca65-11.html#ss11.83"><CODE>.PROC</CODE></A>
+<LI><A NAME="toc11.84">11.84</A> <A HREF="ca65-11.html#ss11.84"><CODE>.PSC02</CODE></A>
+<LI><A NAME="toc11.85">11.85</A> <A HREF="ca65-11.html#ss11.85"><CODE>.PUSHCPU</CODE></A>
+<LI><A NAME="toc11.86">11.86</A> <A HREF="ca65-11.html#ss11.86"><CODE>.PUSHSEG</CODE></A>
+<LI><A NAME="toc11.87">11.87</A> <A HREF="ca65-11.html#ss11.87"><CODE>.RELOC</CODE></A>
+<LI><A NAME="toc11.88">11.88</A> <A HREF="ca65-11.html#ss11.88"><CODE>.REPEAT</CODE></A>
+<LI><A NAME="toc11.89">11.89</A> <A HREF="ca65-11.html#ss11.89"><CODE>.RES</CODE></A>
+<LI><A NAME="toc11.90">11.90</A> <A HREF="ca65-11.html#ss11.90"><CODE>.RODATA</CODE></A>
+<LI><A NAME="toc11.91">11.91</A> <A HREF="ca65-11.html#ss11.91"><CODE>.SCOPE</CODE></A>
+<LI><A NAME="toc11.92">11.92</A> <A HREF="ca65-11.html#ss11.92"><CODE>.SEGMENT</CODE></A>
+<LI><A NAME="toc11.93">11.93</A> <A HREF="ca65-11.html#ss11.93"><CODE>.SET</CODE></A>
+<LI><A NAME="toc11.94">11.94</A> <A HREF="ca65-11.html#ss11.94"><CODE>.SETCPU</CODE></A>
+<LI><A NAME="toc11.95">11.95</A> <A HREF="ca65-11.html#ss11.95"><CODE>.SMART</CODE></A>
+<LI><A NAME="toc11.96">11.96</A> <A HREF="ca65-11.html#ss11.96"><CODE>.STRUCT</CODE></A>
+<LI><A NAME="toc11.97">11.97</A> <A HREF="ca65-11.html#ss11.97"><CODE>.SUNPLUS</CODE></A>
+<LI><A NAME="toc11.98">11.98</A> <A HREF="ca65-11.html#ss11.98"><CODE>.TAG</CODE></A>
+<LI><A NAME="toc11.99">11.99</A> <A HREF="ca65-11.html#ss11.99"><CODE>.UNDEF, .UNDEFINE</CODE></A>
+<LI><A NAME="toc11.100">11.100</A> <A HREF="ca65-11.html#ss11.100"><CODE>.UNION</CODE></A>
+<LI><A NAME="toc11.101">11.101</A> <A HREF="ca65-11.html#ss11.101"><CODE>.WARNING</CODE></A>
+<LI><A NAME="toc11.102">11.102</A> <A HREF="ca65-11.html#ss11.102"><CODE>.WORD</CODE></A>
+<LI><A NAME="toc11.103">11.103</A> <A HREF="ca65-11.html#ss11.103"><CODE>.ZEROPAGE</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc12">12.</A> <A HREF="ca65-12.html">Macros</A></H2>
+
+<UL>
+<LI><A NAME="toc12.1">12.1</A> <A HREF="ca65-12.html#ss12.1">Introduction</A>
+<LI><A NAME="toc12.2">12.2</A> <A HREF="ca65-12.html#ss12.2">Macros without parameters</A>
+<LI><A NAME="toc12.3">12.3</A> <A HREF="ca65-12.html#ss12.3">Parametrized macros</A>
+<LI><A NAME="toc12.4">12.4</A> <A HREF="ca65-12.html#ss12.4">Detecting parameter types</A>
+<LI><A NAME="toc12.5">12.5</A> <A HREF="ca65-12.html#ss12.5">Recursive macros</A>
+<LI><A NAME="toc12.6">12.6</A> <A HREF="ca65-12.html#ss12.6">Local symbols inside macros</A>
+<LI><A NAME="toc12.7">12.7</A> <A HREF="ca65-12.html#ss12.7">C style macros</A>
+<LI><A NAME="toc12.8">12.8</A> <A HREF="ca65-12.html#ss12.8">Characters in macros</A>
+<LI><A NAME="toc12.9">12.9</A> <A HREF="ca65-12.html#ss12.9">Deleting macros</A>
+</UL>
+<P>
+<H2><A NAME="toc13">13.</A> <A HREF="ca65-13.html">Macro packages</A></H2>
+
+<UL>
+<LI><A NAME="toc13.1">13.1</A> <A HREF="ca65-13.html#ss13.1"><CODE>.MACPACK generic</CODE></A>
+<LI><A NAME="toc13.2">13.2</A> <A HREF="ca65-13.html#ss13.2"><CODE>.MACPACK longbranch</CODE></A>
+<LI><A NAME="toc13.3">13.3</A> <A HREF="ca65-13.html#ss13.3"><CODE>.MACPACK atari</CODE></A>
+<LI><A NAME="toc13.4">13.4</A> <A HREF="ca65-13.html#ss13.4"><CODE>.MACPACK cbm</CODE></A>
+<LI><A NAME="toc13.5">13.5</A> <A HREF="ca65-13.html#ss13.5"><CODE>.MACPACK cpu</CODE></A>
+</UL>
+<P>
+<H2><A NAME="toc14">14.</A> <A HREF="ca65-14.html">Predefined constants</A></H2>
+
+<P>
+<H2><A NAME="toc15">15.</A> <A HREF="ca65-15.html">Structs and unions</A></H2>
+
+<UL>
+<LI><A NAME="toc15.1">15.1</A> <A HREF="ca65-15.html#ss15.1">Structs and unions Overview</A>
+<LI><A NAME="toc15.2">15.2</A> <A HREF="ca65-15.html#ss15.2">Declaration</A>
+<LI><A NAME="toc15.3">15.3</A> <A HREF="ca65-15.html#ss15.3">The <CODE>.TAG</CODE> keyword</A>
+<LI><A NAME="toc15.4">15.4</A> <A HREF="ca65-15.html#ss15.4">Limitations</A>
+</UL>
+<P>
+<H2><A NAME="toc16">16.</A> <A HREF="ca65-16.html">Module constructors/destructors</A></H2>
+
+<UL>
+<LI><A NAME="toc16.1">16.1</A> <A HREF="ca65-16.html#ss16.1">Module constructors/destructors Overview</A>
+<LI><A NAME="toc16.2">16.2</A> <A HREF="ca65-16.html#ss16.2">Calling order</A>
+<LI><A NAME="toc16.3">16.3</A> <A HREF="ca65-16.html#ss16.3">Pitfalls</A>
+</UL>
+<P>
+<H2><A NAME="toc17">17.</A> <A HREF="ca65-17.html">Porting sources from other assemblers</A></H2>
+
+<UL>
+<LI><A NAME="toc17.1">17.1</A> <A HREF="ca65-17.html#ss17.1">TASS</A>
+</UL>
+<P>
+<H2><A NAME="toc18">18.</A> <A HREF="ca65-18.html">Bugs/Feedback</A></H2>
+
+<P>
+<H2><A NAME="toc19">19.</A> <A HREF="ca65-19.html">Copyright</A></H2>
+
+<HR>
+<A HREF="ca65-1.html">Next</A>
+Previous
+Contents
+</BODY>
+</HTML>

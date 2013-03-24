@@ -1,0 +1,322 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Scopes</TITLE>
+ <LINK HREF="ca65-8.html" REL=next>
+ <LINK HREF="ca65-6.html" REL=previous>
+ <LINK HREF="ca65.html#toc7" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-8.html">Next</A>
+<A HREF="ca65-6.html">Previous</A>
+<A HREF="ca65.html#toc7">Contents</A>
+<HR>
+<H2><A NAME="scopes"></A> <A NAME="s7">7.</A> <A HREF="ca65.html#toc7">Scopes</A></H2>
+
+
+<P>ca65 implements several sorts of scopes for symbols.</P>
+
+<H2><A NAME="ss7.1">7.1</A> <A HREF="ca65.html#toc7.1">Global scope</A>
+</H2>
+
+
+<P>All (non cheap local) symbols that are declared outside of any nested scopes
+are in global scope.</P>
+
+
+<H2><A NAME="ss7.2">7.2</A> <A HREF="ca65.html#toc7.2">Cheap locals</A>
+</H2>
+
+
+<P>A special scope is the scope for cheap local symbols. It lasts from one non
+local symbol to the next one, without any provisions made by the programmer.
+All other scopes differ in usage but use the same concept internally.</P>
+
+
+<H2><A NAME="ss7.3">7.3</A> <A HREF="ca65.html#toc7.3">Generic nested scopes</A>
+</H2>
+
+
+<P>A nested scoped for generic use is started with <CODE>
+<A HREF="ca65-11.html#.SCOPE">.SCOPE</A></CODE> and closed with <CODE>
+<A HREF="ca65-11.html#.ENDSCOPE">.ENDSCOPE</A></CODE>.
+The scope can have a name, in which case it is accessible from the outside by
+using 
+<A HREF="#scopesyntax">explicit scopes</A>. If the scope does not
+have a name, all symbols created within the scope are local to the scope, and
+aren't accessible from the outside.</P>
+<P>A nested scope can access symbols from the local or from enclosing scopes by
+name without using explicit scope names. In some cases there may be
+ambiguities, for example if there is a reference to a local symbol that is not
+yet defined, but a symbol with the same name exists in outer scopes:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  outer
+                foo     = 2
+                .scope  inner
+                        lda     #foo
+                        foo     = 3
+                .endscope
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In the example above, the <CODE>lda</CODE> instruction will load the value 3 into the
+accumulator, because <CODE>foo</CODE> is redefined in the scope. However:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  outer
+                foo     = $1234
+                .scope  inner
+                        lda     foo,x
+                        foo     = $12
+                .endscope
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Here, <CODE>lda</CODE> will still load from <CODE>$12,x</CODE>, but since it is unknown to the
+assembler that <CODE>foo</CODE> is a zeropage symbol when translating the instruction,
+absolute mode is used instead. In fact, the assembler will not use absolute
+mode by default, but it will search through the enclosing scopes for a symbol
+with the given name. If one is found, the address size of this symbol is used.
+This may lead to errors:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  outer
+                foo     = $12
+                .scope  inner
+                        lda     foo,x
+                        foo     = $1234
+                .endscope
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In this case, when the assembler sees the symbol <CODE>foo</CODE> in the <CODE>lda</CODE>
+instruction, it will search for an already defined symbol <CODE>foo</CODE>. It will
+find <CODE>foo</CODE> in scope <CODE>outer</CODE>, and a close look reveals that it is a
+zeropage symbol. So the assembler will use zeropage addressing mode. If
+<CODE>foo</CODE> is redefined later in scope <CODE>inner</CODE>, the assembler tries to change
+the address in the <CODE>lda</CODE> instruction already translated, but since the new
+value needs absolute addressing mode, this fails, and an error message "Range
+error" is output.</P>
+<P>Of course the most simple solution for the problem is to move the definition
+of <CODE>foo</CODE> in scope <CODE>inner</CODE> upwards, so it precedes its use. There may be
+rare cases when this cannot be done. In these cases, you can use one of the
+address size override operators:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  outer
+                foo     = $12
+                .scope  inner
+                        lda     a:foo,x
+                        foo     = $1234
+                .endscope
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will cause the <CODE>lda</CODE> instruction to be translated using absolute
+addressing mode, which means changing the symbol reference later does not
+cause any errors.</P>
+
+
+<H2><A NAME="ss7.4">7.4</A> <A HREF="ca65.html#toc7.4">Nested procedures</A>
+</H2>
+
+
+<P>A nested procedure is created by use of <CODE>
+<A HREF="ca65-11.html#.PROC">.PROC</A></CODE>. It
+differs from a <CODE>
+<A HREF="ca65-11.html#.SCOPE">.SCOPE</A></CODE> in that it must have a
+name, and a it will introduce a symbol with this name in the enclosing scope.
+So</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .proc   foo
+                ...
+        .endproc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>is actually the same as</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        foo:
+        .scope  foo
+                ...
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This is the reason why a procedure must have a name. If you want a scope
+without a name, use <CODE>
+<A HREF="ca65-11.html#.SCOPE">.SCOPE</A></CODE>.</P>
+<P><B>Note:</B> As you can see from the example above, scopes and symbols live in
+different namespaces. There can be a symbol named <CODE>foo</CODE> and a scope named
+<CODE>foo</CODE> without any conflicts (but see the section titled 
+<A HREF="#scopesearch">&#34;Scope search order&#34;</A>).</P>
+
+
+<H2><A NAME="ss7.5">7.5</A> <A HREF="ca65.html#toc7.5">Structs, unions and enums</A>
+</H2>
+
+
+<P>Structs, unions and enums are explained in a 
+<A HREF="ca65-15.html#structs">separate section</A>, I do only cover them here, because if they are declared with a
+name, they open a nested scope, similar to <CODE>
+<A HREF="ca65-11.html#.SCOPE">.SCOPE</A></CODE>. However, when no name is specified, the behaviour is
+different: In this case, no new scope will be opened, symbols declared within
+a struct, union, or enum declaration will then be added to the enclosing scope
+instead.</P>
+
+
+<H2><A NAME="scopesyntax"></A> <A NAME="ss7.6">7.6</A> <A HREF="ca65.html#toc7.6">Explicit scope specification</A>
+</H2>
+
+
+<P>Accessing symbols from other scopes is possible by using an explicit scope
+specification, provided that the scope where the symbol lives in has a name.
+The namespace token (<CODE>::</CODE>) is used to access other scopes:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  foo
+        bar:    .word   0
+        .endscope
+
+                ...
+                lda     foo::bar        ; Access foo in scope bar
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The only way to deny access to a scope from the outside is to declare a scope
+without a name (using the <CODE>
+<A HREF="ca65-11.html#.SCOPE">.SCOPE</A></CODE> command).</P>
+<P>A special syntax is used to specify the global scope: If a symbol or scope is
+preceded by the namespace token, the global scope is searched:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        bar     = 3
+
+        .scope  foo
+                bar     = 2
+                lda     #::bar  ; Access the global bar (which is 3)
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="scopesearch"></A> <A NAME="ss7.7">7.7</A> <A HREF="ca65.html#toc7.7">Scope search order</A>
+</H2>
+
+
+<P>The assembler searches for a scope in a similar way as for a symbol. First, it
+looks in the current scope, and then it walks up the enclosing scopes until
+the scope is found.</P>
+<P>However, one important thing to note when using explicit scope syntax is, that
+a symbol may be accessed before it is defined, but a scope may <B>not</B> be
+used without a preceding definition. This means that in the following
+example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  foo
+                bar     = 3
+        .endscope
+
+        .scope  outer
+                lda     #foo::bar  ; Will load 3, not 2!
+                .scope  foo
+                        bar     = 2
+                .endscope
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>the reference to the scope <CODE>foo</CODE> will use the global scope, and not the
+local one, because the local one is not visible at the point where it is
+referenced.</P>
+<P>Things get more complex if a complete chain of scopes is specified:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  foo
+                .scope  outer
+                        .scope  inner
+                                bar = 1
+                        .endscope
+                .endscope
+                .scope  another
+                        .scope  nested
+                                lda     #outer::inner::bar      ; 1
+                        .endscope
+                .endscope
+        .endscope
+
+        .scope  outer
+                .scope  inner
+                        bar = 2
+                .endscope
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>When <CODE>outer::inner::bar</CODE> is referenced in the <CODE>lda</CODE> instruction, the
+assembler will first search in the local scope for a scope named <CODE>outer</CODE>.
+Since none is found, the enclosing scope (<CODE>another</CODE>) is checked. There is
+still no scope named <CODE>outer</CODE>, so scope <CODE>foo</CODE> is checked, and finally
+scope <CODE>outer</CODE> is found. Within this scope, <CODE>inner</CODE> is searched, and in
+this scope, the assembler looks for a symbol named <CODE>bar</CODE>.</P>
+<P>Please note that once the anchor scope is found, all following scopes
+(<CODE>inner</CODE> in this case) are expected to be found exactly in this scope. The
+assembler will search the scope tree only for the first scope (if it is not
+anchored in the root scope). Starting from there on, there is no flexibility,
+so if the scope named <CODE>outer</CODE> found by the assembler does not contain a
+scope named <CODE>inner</CODE>, this would be an error, even if such a pair does exist
+(one level up in global scope).</P>
+<P>Ambiguities that may be introduced by this search algorithm may be removed by
+anchoring the scope specification in the global scope. In the example above,
+if you want to access the "other" symbol <CODE>bar</CODE>, you would have to write:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .scope  foo
+                .scope  outer
+                        .scope  inner
+                                bar = 1
+                        .endscope
+                .endscope
+                .scope  another
+                        .scope  nested
+                                lda     #::outer::inner::bar    ; 2
+                        .endscope
+                .endscope
+        .endscope
+
+        .scope  outer
+                .scope  inner
+                        bar = 2
+                .endscope
+        .endscope
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="ca65-8.html">Next</A>
+<A HREF="ca65-6.html">Previous</A>
+<A HREF="ca65.html#toc7">Contents</A>
+</BODY>
+</HTML>

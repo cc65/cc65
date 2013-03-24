@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Defining a Custom cc65 Target: Custom Run-Time Library Creation</TITLE>
+ <LINK HREF="customizing-5.html" REL=next>
+ <LINK HREF="customizing-3.html" REL=previous>
+ <LINK HREF="customizing.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="customizing-5.html">Next</A>
+<A HREF="customizing-3.html">Previous</A>
+<A HREF="customizing.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="customizing.html#toc4">Custom Run-Time Library Creation</A></H2>
+
+
+<P>The next step in customizing the cc65 toolset is creating a run-time
+library for the targeted hardware.  The easiest way to do this is to
+modify a standard library from the cc65 distribution.  In this example,
+there is no console I/O, mouse, joystick, etc. in the system, so it is
+most appropriate to use the simplest library as the base, which is for
+the Watara Supervision and is named &#34;supervision.lib&#34; in the
+lib directory of the distribution.</P>
+<P>The only modification required is to replace the <CODE>crt0</CODE> module in
+the supervision.lib library with custom startup code.  This is simply
+done by first copying the library and giving it a new name, compiling
+the startup code with ca65, and finally using the ar65 archiver to
+replace the module in the new library.  The steps are shown below:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ copy &#34;C:\Program Files\cc65\lib\supervision.lib&#34; sbc.lib
+$ ca65 crt0.s
+$ ar65 a sbc.lib crt0.o
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<HR>
+<A HREF="customizing-5.html">Next</A>
+<A HREF="customizing-3.html">Previous</A>
+<A HREF="customizing.html#toc4">Contents</A>
+</BODY>
+</HTML>

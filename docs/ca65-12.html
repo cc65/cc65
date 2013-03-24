@@ -1,0 +1,532 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Macros</TITLE>
+ <LINK HREF="ca65-13.html" REL=next>
+ <LINK HREF="ca65-11.html" REL=previous>
+ <LINK HREF="ca65.html#toc12" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-13.html">Next</A>
+<A HREF="ca65-11.html">Previous</A>
+<A HREF="ca65.html#toc12">Contents</A>
+<HR>
+<H2><A NAME="macros"></A> <A NAME="s12">12.</A> <A HREF="ca65.html#toc12">Macros</A></H2>
+
+
+
+
+<H2><A NAME="ss12.1">12.1</A> <A HREF="ca65.html#toc12.1">Introduction</A>
+</H2>
+
+
+<P>Macros may be thought of as "parametrized super instructions". Macros are
+sequences of tokens that have a name. If that name is used in the source
+file, the macro is "expanded", that is, it is replaced by the tokens that
+were specified when the macro was defined.</P>
+
+
+<H2><A NAME="ss12.2">12.2</A> <A HREF="ca65.html#toc12.2">Macros without parameters</A>
+</H2>
+
+
+<P>In its simplest form, a macro does not have parameters. Here's an
+example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  asr             ; Arithmetic shift right
+                cmp     #$80    ; Put bit 7 into carry
+                ror             ; Rotate right with carry
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The macro above consists of two real instructions, that are inserted into
+the code, whenever the macro is expanded. Macro expansion is simply done
+by using the name, like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        lda     $2010
+        asr
+        sta     $2010
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss12.3">12.3</A> <A HREF="ca65.html#toc12.3">Parametrized macros</A>
+</H2>
+
+
+<P>When using macro parameters, macros can be even more useful:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  inc16   addr
+                clc
+                lda     addr
+                adc     #$01
+                sta     addr
+                lda     addr+1
+                adc     #$00
+                sta     addr+1
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>When calling the macro, you may give a parameter, and each occurrence of
+the name "addr" in the macro definition will be replaced by the given
+parameter. So</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        inc16   $1000
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>will be expanded to</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+                clc
+                lda     $1000
+                adc     #$01
+                sta     $1000
+                lda     $1000+1
+                adc     #$00
+                sta     $1000+1
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>A macro may have more than one parameter, in this case, the parameters
+are separated by commas. You are free to give less parameters than the
+macro actually takes in the definition. You may also leave intermediate
+parameters empty. Empty parameters are replaced by empty space (that is,
+they are removed when the macro is expanded). If you have a look at our
+macro definition above, you will see, that replacing the "addr" parameter
+by nothing will lead to wrong code in most lines. To help you, writing
+macros with a variable parameter list, there are some control commands:</P>
+<P><CODE>
+<A HREF="ca65-11.html#.IFBLANK">.IFBLANK</A></CODE> tests the rest of the line and
+returns true, if there are any tokens on the remainder of the line. Since
+empty parameters are replaced by nothing, this may be used to test if a given
+parameter is empty. <CODE>
+<A HREF="ca65-11.html#.IFNBLANK">.IFNBLANK</A></CODE> tests the
+opposite.</P>
+<P>Look at this example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  ldaxy   a, x, y
+        .ifnblank       a
+                lda     #a
+        .endif
+        .ifnblank       x
+                ldx     #x
+        .endif
+        .ifnblank       y
+                ldy     #y
+        .endif
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This macro may be called as follows:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ldaxy   1, 2, 3         ; Load all three registers
+
+        ldaxy   1, , 3          ; Load only a and y
+
+        ldaxy   , , 3           ; Load y only
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>There's another helper command for determining, which macro parameters are
+valid: <CODE>
+<A HREF="ca65-9.html#.PARAMCOUNT">.PARAMCOUNT</A></CODE> This command is
+replaced by the parameter count given, <EM>including</EM> intermediate empty macro
+parameters:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ldaxy   1               ; .PARAMCOUNT = 1
+        ldaxy   1,,3            ; .PARAMCOUNT = 3
+        ldaxy   1,2             ; .PARAMCOUNT = 2
+        ldaxy   1,              ; .PARAMCOUNT = 2
+        ldaxy   1,2,3           ; .PARAMCOUNT = 3
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Macro parameters may optionally be enclosed into curly braces. This allows the
+inclusion of tokens that would otherwise terminate the parameter (the comma in
+case of a macro parameter).</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  foo     arg1, arg2
+                ...
+        .endmacro
+
+                foo     ($00,x)         ; Two parameters passed
+                foo     {($00,x)}       ; One parameter passed
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In the first case, the macro is called with two parameters: '<CODE>($00</CODE>'
+and 'x)'. The comma is not passed to the macro, since it is part of the
+calling sequence, not the parameters.</P>
+<P>In the second case, '($00,x)' is passed to the macro, this time
+including the comma.</P>
+
+
+<H2><A NAME="ss12.4">12.4</A> <A HREF="ca65.html#toc12.4">Detecting parameter types</A>
+</H2>
+
+
+<P>Sometimes it is nice to write a macro that acts differently depending on the
+type of the argument supplied. An example would be a macro that loads a 16 bit
+value from either an immediate operand, or from memory. The <CODE>
+<A HREF="ca65-10.html#.MATCH">.MATCH</A></CODE> and <CODE>
+<A HREF="ca65-10.html#.XMATCH">.XMATCH</A></CODE>
+functions will allow you to do exactly this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  ldax    arg
+                .if (.match (.left (1, {arg}), #))
+                    ; immediate mode
+                    lda     #&lt;(.right (.tcount ({arg})-1, {arg}))
+                    ldx     #>(.right (.tcount ({arg})-1, {arg}))
+                .else
+                    ; assume absolute or zero page
+                    lda     arg
+                    ldx     1+(arg)
+                .endif
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Using the <CODE>
+<A HREF="ca65-10.html#.MATCH">.MATCH</A></CODE> function, the macro is able to
+check if its argument begins with a hash mark. If so, two immediate loads are
+emitted, Otherwise a load from an absolute zero page memory location is
+assumed. Please note how the curly braces are used to enclose parameters to
+pseudo functions handling token lists. This is necessary, because the token
+lists may include commas or parens, which would be treated by the assembler
+as end-of-list.</P>
+<P>The macro can be used as</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        foo:    .word   $5678
+        ...
+                ldax    #$1234          ; X=$12, A=$34
+        ...
+                ldax    foo             ; X=$56, A=$78
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss12.5">12.5</A> <A HREF="ca65.html#toc12.5">Recursive macros</A>
+</H2>
+
+
+<P>Macros may be used recursively:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  push    r1, r2, r3
+                lda     r1
+                pha
+        .if     .paramcount > 1
+                push    r2, r3
+        .endif
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>There's also a special macro to help writing recursive macros: <CODE>
+<A HREF="ca65-11.html#.EXITMACRO">.EXITMACRO</A></CODE> This command will stop macro expansion
+immediately:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  push    r1, r2, r3, r4, r5, r6, r7
+        .ifblank        r1
+                ; First parameter is empty
+                .exitmacro
+        .else
+                lda     r1
+                pha
+        .endif
+                push    r2, r3, r4, r5, r6, r7
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>When expanding this macro, the expansion will push all given parameters
+until an empty one is encountered. The macro may be called like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        push    $20, $21, $32           ; Push 3 ZP locations
+        push    $21                     ; Push one ZP location
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss12.6">12.6</A> <A HREF="ca65.html#toc12.6">Local symbols inside macros</A>
+</H2>
+
+
+<P>Now, with recursive macros, <CODE>
+<A HREF="ca65-11.html#.IFBLANK">.IFBLANK</A></CODE> and
+<CODE>
+<A HREF="ca65-9.html#.PARAMCOUNT">.PARAMCOUNT</A></CODE>, what else do you need?
+Have a look at the inc16 macro above. Here is it again:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  inc16   addr
+                clc
+                lda     addr
+                adc     #$01
+                sta     addr
+                lda     addr+1
+                adc     #$00
+                sta     addr+1
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you have a closer look at the code, you will notice, that it could be
+written more efficiently, like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  inc16   addr
+                inc     addr
+                bne     Skip
+                inc     addr+1
+        Skip:
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>But imagine what happens, if you use this macro twice? Since the label "Skip"
+has the same name both times, you get a "duplicate symbol" error. Without a
+way to circumvent this problem, macros are not as useful, as they could be.
+One possible solution is the command <CODE>
+<A HREF="ca65-11.html#.LOCAL">.LOCAL</A></CODE>.
+It declares one or more symbols as local to the macro expansion. The names of
+local variables are replaced by a unique name in each separate macro
+expansion. So we can solve the problem above by using <CODE>.LOCAL</CODE>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  inc16   addr
+                .local  Skip            ; Make Skip a local symbol
+                inc     addr
+                bne     Skip
+                inc     addr+1
+        Skip:                           ; Not visible outside
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Another solution is of course to start a new lexical block inside the macro
+that hides any labels:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  inc16   addr
+        .proc
+                inc     addr
+                bne     Skip
+                inc     addr+1
+        Skip:
+        .endproc
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss12.7">12.7</A> <A HREF="ca65.html#toc12.7">C style macros</A>
+</H2>
+
+
+<P>Starting with version 2.5 of the assembler, there is a second macro type
+available: C style macros using the <CODE>.DEFINE</CODE> directive. These macros are
+similar to the classic macro type described above, but behaviour is sometimes
+different:</P>
+<P>
+<UL>
+<LI>    Macros defined with <CODE>
+<A HREF="ca65-11.html#.DEFINE">.DEFINE</A></CODE> may not
+span more than a line. You may use line continuation (see <CODE>
+<A HREF="ca65-11.html#.LINECONT">.LINECONT</A></CODE>) to spread the definition over
+more than one line for increased readability, but the macro itself
+may not contain an end-of-line token.
+</LI>
+<LI>    Macros defined with <CODE>
+<A HREF="ca65-11.html#.DEFINE">.DEFINE</A></CODE> share
+the name space with classic macros, but they are detected and replaced
+at the scanner level. While classic macros may be used in every place,
+where a mnemonic or other directive is allowed, <CODE>
+<A HREF="ca65-11.html#.DEFINE">.DEFINE</A></CODE> style macros are allowed anywhere in a line. So
+they are more versatile in some situations.
+</LI>
+<LI>    <CODE>
+<A HREF="ca65-11.html#.DEFINE">.DEFINE</A></CODE> style macros may take
+parameters. While classic macros may have empty parameters, this is
+not true for <CODE>
+<A HREF="ca65-11.html#.DEFINE">.DEFINE</A></CODE> style macros.
+For this macro type, the number of actual parameters must match
+exactly the number of formal parameters.
+
+To make this possible, formal parameters are enclosed in braces when
+defining the macro. If there are no parameters, the empty braces may
+be omitted.
+</LI>
+<LI>    Since <CODE>
+<A HREF="ca65-11.html#.DEFINE">.DEFINE</A></CODE> style macros may not
+contain end-of-line tokens, there are things that cannot be done. They
+may not contain several processor instructions for example. So, while
+some things may be done with both macro types, each type has special
+usages. The types complement each other.
+</LI>
+</UL>
+</P>
+<P>Let's look at a few examples to make the advantages and disadvantages
+clear.</P>
+<P>To emulate assemblers that use "<CODE>EQU</CODE>" instead of "<CODE>=</CODE>" you may use the
+following <CODE>.DEFINE</CODE>:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .define EQU     =
+
+        foo     EQU     $1234           ; This is accepted now
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You may use the directive to define string constants used elsewhere:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ; Define the version number
+        .define VERSION         "12.3a"
+
+        ; ... and use it
+        .asciiz VERSION
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Macros with parameters may also be useful:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .define DEBUG(message)  .out    message
+
+        DEBUG   "Assembling include file #3"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Note that, while formal parameters have to be placed in braces, this is
+not true for the actual parameters. Beware: Since the assembler cannot
+detect the end of one parameter, only the first token is used. If you
+don't like that, use classic macros instead:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  DEBUG   message
+                .out    message
+        .endmacro
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>(This is an example where a problem can be solved with both macro types).</P>
+
+
+<H2><A NAME="ss12.8">12.8</A> <A HREF="ca65.html#toc12.8">Characters in macros</A>
+</H2>
+
+
+<P>When using the 
+<A HREF="ca65-2.html#option-t">-t</A> option, characters are translated
+into the target character set of the specific machine. However, this happens
+as late as possible. This means that strings are translated if they are part
+of a <CODE>
+<A HREF="ca65-11.html#.BYTE">.BYTE</A></CODE> or <CODE>
+<A HREF="ca65-11.html#.ASCIIZ">.ASCIIZ</A></CODE> command. Characters are translated as soon as they are
+used as part of an expression.</P>
+<P>This behaviour is very intuitive outside of macros but may be confusing when
+doing more complex macros. If you compare characters against numeric values,
+be sure to take the translation into account.</P>
+
+
+<H2><A NAME="ss12.9">12.9</A> <A HREF="ca65.html#toc12.9">Deleting macros</A>
+</H2>
+
+
+<P>Macros can be deleted. This will not work if the macro that should be deleted
+is currently expanded as in the following non working example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  notworking
+                .delmacro       notworking
+        .endmacro
+
+        notworking              ; Will not work
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The commands to delete classic and define style macros differ. Classic macros
+can be deleted by use of <CODE>
+<A HREF="ca65-11.html#.DELMACRO">.DELMACRO</A></CODE>, while
+for <CODE>
+<A HREF="ca65-11.html#.DEFINE">.DEFINE</A></CODE> style macros, <CODE>
+<A HREF="ca65-11.html#.UNDEFINE">.UNDEFINE</A></CODE> must be used. Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .define value   1
+        .macro  mac
+                .byte   2
+        .endmacro
+
+                .byte   value           ; Emit one byte with value 1
+                mac                     ; Emit another byte with value 2
+
+        .undefine value
+        .delmacro mac
+
+                .byte   value           ; Error: Unknown identifier
+                mac                     ; Error: Missing ":"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>A separate command for <CODE>.DEFINE</CODE> style macros was necessary, because
+the name of such a macro is replaced by its replacement list on a very low
+level. To get the actual name, macro replacement has to be switched off when
+reading the argument to <CODE>.UNDEFINE</CODE>. This does also mean that the
+argument to <CODE>.UNDEFINE</CODE> is not allowed to come from another
+<CODE>.DEFINE</CODE>. All this is not necessary for classic macros, so having two
+different commands increases flexibility.</P>
+
+
+<HR>
+<A HREF="ca65-13.html">Next</A>
+<A HREF="ca65-11.html">Previous</A>
+<A HREF="ca65.html#toc12">Contents</A>
+</BODY>
+</HTML>

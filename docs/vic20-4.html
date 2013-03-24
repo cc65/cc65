@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Commodore VIC20 (aka VC20) specific information for cc65: Platform specific header files</TITLE>
+ <LINK HREF="vic20-5.html" REL=next>
+ <LINK HREF="vic20-3.html" REL=previous>
+ <LINK HREF="vic20.html#toc4" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="vic20-5.html">Next</A>
+<A HREF="vic20-3.html">Previous</A>
+<A HREF="vic20.html#toc4">Contents</A>
+<HR>
+<H2><A NAME="s4">4.</A> <A HREF="vic20.html#toc4">Platform specific header files</A></H2>
+
+
+<P>Programs containing VIC20 specific code may use the <CODE>vic20.h</CODE> or <CODE>cbm.h</CODE>
+header files. Using the later may be an option when writing code for more than
+one CBM platform, since it includes <CODE>vic20.h</CODE> and declares several functions
+common to all CBM platforms.</P>
+
+
+<H2><A NAME="ss4.1">4.1</A> <A HREF="vic20.html#toc4.1">VIC20 specific functions</A>
+</H2>
+
+
+<P>There are currently no special VIC20 functions.</P>
+
+
+
+<H2><A NAME="ss4.2">4.2</A> <A HREF="vic20.html#toc4.2">CBM specific functions</A>
+</H2>
+
+
+<P>Some functions are available for all (or at least most) of the Commodore
+machines. See the 
+<A HREF="funcref.html">function reference</A> for
+declaration and usage.</P>
+<P>
+<UL>
+<LI>cbm_close</LI>
+<LI>cbm_closedir</LI>
+<LI>cbm_k_setlfs</LI>
+<LI>cbm_k_setnam</LI>
+<LI>cbm_k_load</LI>
+<LI>cbm_k_save</LI>
+<LI>cbm_k_open</LI>
+<LI>cbm_k_close</LI>
+<LI>cbm_k_readst</LI>
+<LI>cbm_k_chkin</LI>
+<LI>cbm_k_ckout</LI>
+<LI>cbm_k_basin</LI>
+<LI>cbm_k_bsout</LI>
+<LI>cbm_k_clrch</LI>
+<LI>cbm_load</LI>
+<LI>cbm_open</LI>
+<LI>cbm_opendir</LI>
+<LI>cbm_read</LI>
+<LI>cbm_readdir</LI>
+<LI>cbm_save</LI>
+<LI>cbm_write</LI>
+<LI>get_tv</LI>
+</UL>
+</P>
+
+
+<H2><A NAME="ss4.3">4.3</A> <A HREF="vic20.html#toc4.3">Hardware access</A>
+</H2>
+
+
+<P>The following pseudo variables declared in the <CODE>vic20.h</CODE> header file do allow
+access to hardware located in the address space. Some variables are
+structures, accessing the struct fields will access the chip registers.</P>
+<P>
+<DL>
+
+<DT><B><CODE>VIC</CODE></B><DD>
+<P>The <CODE>VIC</CODE> structure allows access to the VIC (the graphics
+controller). See the <CODE>_vic.h</CODE> header file located in the include
+directory for the declaration of the structure.</P>
+
+<DT><B><CODE>VIA1, VIA2</CODE></B><DD>
+<P>Access to the two VIA (versatile interface adapter) chips is available via
+the <CODE>VIA1</CODE> and <CODE>VIA2</CODE> variables. The structure behind these variables
+is explained in <CODE>_6522.h</CODE>.</P>
+
+<DT><B><CODE>COLOR_RAM</CODE></B><DD>
+<P>A character array that mirrors the color RAM of the VIC20 at $9600.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="vic20-5.html">Next</A>
+<A HREF="vic20-3.html">Previous</A>
+<A HREF="vic20.html#toc4">Contents</A>
+</BODY>
+</HTML>

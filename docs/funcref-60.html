@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 function reference: Alphabetical function reference: _stroserror</TITLE>
+ <LINK HREF="funcref-61.html" REL=next>
+ <LINK HREF="funcref-59.html" REL=previous>
+ <LINK HREF="funcref.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="funcref-61.html">Next</A>
+<A HREF="funcref-59.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="_stroserror"></A> 3.11 <A HREF="funcref.html#toc3.11">_stroserror</A></H2>
+
+
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT><B>Function</B><DD>
+<P>Return a string describing an OS specific error code.</P>
+<DT><B>Header</B><DD>
+<P><CODE>
+<A HREF="funcref-43.html#string.h">string.h</A></CODE></P>
+<DT><B>Declaration</B><DD>
+<P><CODE>const char* __fastcall__ _stroserror (unsigned char errcode);</CODE></P>
+<DT><B>Description</B><DD>
+<P><CODE>_stroserror</CODE> will return a string describing the given
+operating system specific error code.</P>
+<DT><B>Limits</B><DD>
+<P>
+<UL>
+<LI>Since operating system specific error code are - you guessed it -
+operating system specific, the parameter and the string returned depend on the
+cc65 target.</LI>
+<LI>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.</LI>
+</UL>
+</P>
+<DT><B>Availability</B><DD>
+<P>cc65</P>
+<DT><B>See also</B><DD>
+<P>
+<A HREF="funcref-242.html#strerror">strerror</A></P>
+<DT><B>Example</B><DD>
+<P>None.</P>
+</DL>
+</BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="funcref-61.html">Next</A>
+<A HREF="funcref-59.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+</BODY>
+</HTML>

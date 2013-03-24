@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Defining a Custom cc65 Target: Adding Custom Instructions</TITLE>
+ <LINK HREF="customizing-7.html" REL=next>
+ <LINK HREF="customizing-5.html" REL=previous>
+ <LINK HREF="customizing.html#toc6" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="customizing-7.html">Next</A>
+<A HREF="customizing-5.html">Previous</A>
+<A HREF="customizing.html#toc6">Contents</A>
+<HR>
+<H2><A NAME="s6">6.</A> <A HREF="customizing.html#toc6">Adding Custom Instructions</A></H2>
+
+
+<P>The cc65 instruction set only supports the WAI (Wait for Interrupt) and
+STP (Stop) instructions when used with the 65816 CPU (accessed via the
+--cpu command line option of the ca65 macro assembler).  The 65C02 core
+used in this example supports these two instructions, and in fact the
+system benefits from the use of both the WAI and STP instructions.</P>
+<P>In order to use the WAI instruction in this case, a C routine named
+&#34;wait&#34; was created that consists of the WAI opcode followed by
+a subroutine return.  It was convenient in this example to put the IRQ
+interrupt enable in this subroutine as well, since interrupts should
+only be enabled when the code is in this wait condition.</P>
+<P>For both the WAI and STP instructions, the assembler is
+&#34;fooled&#34; into placing those opcodes into memory by inserting a
+single byte of data that just happens to be the opcode for those
+instructions.  The assembly code routines are placed in a file, named
+&#34;wait.s&#34;, which is shown below:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<HR>
+<PRE>
+; ---------------------------------------------------------------------------
+; wait.s
+; ---------------------------------------------------------------------------
+;
+; Wait for interrupt and return
+
+.export  _wait, _stop
+
+; ---------------------------------------------------------------------------
+; Wait for interrupt:  Forces the assembler to emit a WAI opcode ($CB)
+; ---------------------------------------------------------------------------
+
+.segment  &#34;CODE&#34;
+
+.proc _wait: near
+
+           CLI                    ; Enable interrupts
+.byte      $CB                    ; Inserts a WAI opcode
+           RTS                    ; Return to caller
+
+.endproc
+
+; ---------------------------------------------------------------------------
+; Stop:  Forces the assembler to emit a STP opcode ($DB)
+; ---------------------------------------------------------------------------
+
+.proc _stop: near
+
+.byte      $DB                    ; Inserts a STP opcode
+
+.endproc
+</PRE>
+<HR>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The label <CODE>_wait</CODE>, when exported, can be called by using the
+<CODE>wait&nbsp;()</CODE> subroutine call in C.  The section is marked as
+code so that it will be stored in read-only memory, and the procedure is
+tagged for 16-bit absolute addressing via the &#34;near&#34;
+modifier.  Similarly, the <CODE>_stop</CODE> routine can be called from
+within the C-level code via a call to <CODE>stop&nbsp;()</CODE>.  In
+addition, the routine can be called from assembly code by calling
+<CODE>_stop</CODE> (as was done in the interrupt service routine).</P>
+
+<HR>
+<A HREF="customizing-7.html">Next</A>
+<A HREF="customizing-5.html">Previous</A>
+<A HREF="customizing.html#toc6">Contents</A>
+</BODY>
+</HTML>

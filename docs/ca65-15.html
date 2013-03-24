@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Structs and unions</TITLE>
+ <LINK HREF="ca65-16.html" REL=next>
+ <LINK HREF="ca65-14.html" REL=previous>
+ <LINK HREF="ca65.html#toc15" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-16.html">Next</A>
+<A HREF="ca65-14.html">Previous</A>
+<A HREF="ca65.html#toc15">Contents</A>
+<HR>
+<H2><A NAME="structs"></A> <A NAME="s15">15.</A> <A HREF="ca65.html#toc15">Structs and unions</A></H2>
+
+
+
+<H2><A NAME="ss15.1">15.1</A> <A HREF="ca65.html#toc15.1">Structs and unions Overview</A>
+</H2>
+
+
+<P>Structs and unions are special forms of 
+<A HREF="ca65-7.html#scopes">scopes</A>.  They
+are to some degree comparable to their C counterparts. Both have a list of
+members. Each member allocates storage and may optionally have a name, which,
+in case of a struct, is the offset from the beginning and, in case of a union,
+is always zero.</P>
+
+
+<H2><A NAME="ss15.2">15.2</A> <A HREF="ca65.html#toc15.2">Declaration</A>
+</H2>
+
+
+<P>Here is an example for a very simple struct with two members and a total size
+of 4 bytes:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+      .struct Point
+              xcoord  .word
+              ycoord  .word
+      .endstruct
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>A union shares the total space between all its members, its size is the same
+as that of the largest member. The offset of all members relative to the union
+is zero.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+      .union  Entry
+              index   .word
+              ptr     .addr
+      .endunion
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>A struct or union must not necessarily have a name. If it is anonymous, no
+local scope is opened, the identifiers used to name the members are placed
+into the current scope instead.</P>
+<P>A struct may contain unnamed members and definitions of local structs. The
+storage allocators may contain a multiplier, as in the example below:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+      .struct Circle
+              .struct Point
+                      .word   2         ; Allocate two words
+              .endstruct
+              Radius  .word
+      .endstruct
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss15.3">15.3</A> <A HREF="ca65.html#toc15.3">The <CODE>.TAG</CODE> keyword</A>
+</H2>
+
+
+<P>Using the 
+<A HREF="ca65-11.html#.TAG">.TAG</A> keyword, it is possible to reserve space
+for an already defined struct or unions within another struct:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+      .struct Point
+              xcoord  .word
+              ycoord  .word
+      .endstruct
+
+      .struct Circle
+              Origin  .tag    Point
+              Radius  .byte
+      .endstruct
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Space for a struct or union may be allocated using the 
+<A HREF="ca65-11.html#.TAG">.TAG</A> directive.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        C:      .tag    Circle
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Currently, members are just offsets from the start of the struct or union. To
+access a field of a struct, the member offset has to be added to the address
+of the struct itself:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        lda     C+Circle::Radius        ; Load circle radius into A
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This may change in a future version of the assembler.</P>
+
+
+<H2><A NAME="ss15.4">15.4</A> <A HREF="ca65.html#toc15.4">Limitations</A>
+</H2>
+
+
+<P>Structs and unions are currently implemented as nested symbol tables (in fact,
+they were a by-product of the improved scoping rules). Currently, the
+assembler has no idea of types. This means that the 
+<A HREF="ca65-11.html#.TAG">.TAG</A> keyword will only allocate space. You won't be able to initialize
+variables declared with 
+<A HREF="ca65-11.html#.TAG">.TAG</A>, and adding an embedded
+structure to another structure with 
+<A HREF="ca65-11.html#.TAG">.TAG</A> will not make
+this structure accessible by using the '::' operator.</P>
+
+
+
+<HR>
+<A HREF="ca65-16.html">Next</A>
+<A HREF="ca65-14.html">Previous</A>
+<A HREF="ca65.html#toc15">Contents</A>
+</BODY>
+</HTML>

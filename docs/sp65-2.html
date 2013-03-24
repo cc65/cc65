@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>sp65 Users Guide: Usage</TITLE>
+ <LINK HREF="sp65-3.html" REL=next>
+ <LINK HREF="sp65-1.html" REL=previous>
+ <LINK HREF="sp65.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="sp65-3.html">Next</A>
+<A HREF="sp65-1.html">Previous</A>
+<A HREF="sp65.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="s2">2.</A> <A HREF="sp65.html#toc2">Usage</A></H2>
+
+
+
+
+<H2><A NAME="ss2.1">2.1</A> <A HREF="sp65.html#toc2.1">Command line option overview</A>
+</H2>
+
+
+<P>The sp65 utility accepts the following options:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+---------------------------------------------------------------------------
+Usage: sp65 [options] file [options] [file]
+Short options:
+  -V                            Print the version number and exit
+  -c fmt[,attrlist]             Convert into target format
+  -h                            Help (this text)
+  -lc                           List all possible conversions
+  -r file[,attrlist]            Read an input file
+  -v                            Increase verbosity
+  -w file[,attrlist]            Write the output to a file
+
+Long options:
+  --convert-to fmt[,attrlist]   Convert into target format
+  --help                        Help (this text)
+  --list-conversions            List all possible conversions
+  --pop                         Restore the original loaded image
+  --read file[,attrlist]        Read an input file
+  --slice x,y,w,h               Generate a slice from the loaded bitmap
+  --verbose                     Increase verbosity
+  --version                     Print the version number and exit
+  --write file[,attrlist]       Write the output to a file
+---------------------------------------------------------------------------
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME="ss2.2">2.2</A> <A HREF="sp65.html#toc2.2">Command line options in detail</A>
+</H2>
+
+
+<P>Below is a description of all the command line options. For the concept of
+attribute lists see 
+<A HREF="sp65-4.html#attr-lists">below</A>.</P>
+<P>
+<DL>
+<P>
+<A NAME="option--convert-to"></A> </P>
+<DT><B><CODE>-c, --convert-to format[,attrlist]</CODE></B><DD>
+<P>Convert a bitmap into one of the supported target formats. The option
+argument must at least contain the "format" attribute. For more attributes,
+see section 
+<A HREF="sp65-6.html#conversions">Conversions</A>.</P>
+
+<P>
+<A NAME="option--help"></A> </P>
+<DT><B><CODE>-h, --help</CODE></B><DD>
+<P>Print the short option summary shown above.</P>
+
+<P>
+<A NAME="option--list-conversions"></A> </P>
+<DT><B><CODE>-lc, --list-conversions</CODE></B><DD>
+<P>Print a list of possible conversions.</P>
+
+<P>
+<A NAME="option--pop"></A> </P>
+<DT><B><CODE>--pop</CODE></B><DD>
+<P>Restore the working copy of the bitmap from the one originally loaded from
+the file. This may for example be used when creating several output files
+from one input file.</P>
+
+<P>
+<A NAME="option--read"></A> </P>
+<DT><B><CODE>-r, --read filename[,attrlist]</CODE></B><DD>
+<P>Read an input file. The option argument must at least contain the "name"
+attribute. See 
+<A HREF="sp65-5.html#input-formats">input formats</A> for more
+information.</P>
+
+<P>
+<A NAME="option-v"></A> </P>
+<DT><B><CODE>-v, --verbose</CODE></B><DD>
+<P>Increase verbosity. Usually only needed for debugging purposes. You may use
+this option more than one time for even more verbose output.</P>
+
+<P>
+<A NAME="option-V"></A> </P>
+<DT><B><CODE>-V, --version</CODE></B><DD>
+<P>Print the version number of the assembler. If you send any suggestions or
+bugfixes, please include the version number.</P>
+
+<P>
+<A NAME="option--write"></A> </P>
+<DT><B><CODE>-w, --write filename[,attrlist]</CODE></B><DD>
+<P>Write an output file. The option argument must at least contain the "name"
+attribute. See 
+<A HREF="sp65-7.html#output-formats">output formats</A> for more
+information.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="sp65-3.html">Next</A>
+<A HREF="sp65-1.html">Previous</A>
+<A HREF="sp65.html#toc2">Contents</A>
+</BODY>
+</HTML>

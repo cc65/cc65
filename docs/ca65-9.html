@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Pseudo variables</TITLE>
+ <LINK HREF="ca65-10.html" REL=next>
+ <LINK HREF="ca65-8.html" REL=previous>
+ <LINK HREF="ca65.html#toc9" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-10.html">Next</A>
+<A HREF="ca65-8.html">Previous</A>
+<A HREF="ca65.html#toc9">Contents</A>
+<HR>
+<H2><A NAME="pseudo-variables"></A> <A NAME="s9">9.</A> <A HREF="ca65.html#toc9">Pseudo variables</A></H2>
+
+
+<P>Pseudo variables are readable in all cases, and in some special cases also
+writable.</P>
+
+<H2><A NAME="ss9.1">9.1</A> <A HREF="ca65.html#toc9.1"><CODE>*</CODE></A>
+</H2>
+
+
+<P>Reading this pseudo variable will return the program counter at the start
+of the current input line.</P>
+<P>Assignment to this variable is possible when <CODE>
+<A HREF="ca65-11.html#.FEATURE">.FEATURE pc_assignment</A></CODE> is used. Note: You should not use
+assignments to <CODE>*</CODE>, use <CODE>
+<A HREF="ca65-11.html#.ORG">.ORG</A></CODE> instead.</P>
+
+
+<H2><A NAME=".CPU"></A> <A NAME="ss9.2">9.2</A> <A HREF="ca65.html#toc9.2"><CODE>.CPU</CODE></A>
+</H2>
+
+
+<P>Reading this pseudo variable will give a constant integer value that
+tells which CPU is currently enabled. It can also tell which instruction
+set the CPU is able to translate. The value read from the pseudo variable
+should be further examined by using one of the constants defined by the
+"cpu" macro package (see <CODE>
+<A HREF="ca65-11.html#.MACPACK">.MACPACK</A></CODE>).</P>
+<P>It may be used to replace the .IFPxx pseudo instructions or to construct
+even more complex expressions.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macpack        cpu
+        .if     (.cpu .bitand CPU_ISET_65816)
+                phx
+                phy
+        .else
+                txa
+                pha
+                tya
+                pha
+        .endif
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".PARAMCOUNT"></A> <A NAME="ss9.3">9.3</A> <A HREF="ca65.html#toc9.3"><CODE>.PARAMCOUNT</CODE></A>
+</H2>
+
+
+<P>This builtin pseudo variable is only available in macros. It is replaced by
+the actual number of parameters that were given in the macro invocation.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .macro  foo     arg1, arg2, arg3
+        .if     .paramcount &lt;> 3
+        .error  "Too few parameters for macro foo"
+        .endif
+        ...
+        .endmacro
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>See section 
+<A HREF="ca65-12.html#macros">Macros</A>.</P>
+
+
+<H2><A NAME=".TIME"></A> <A NAME="ss9.4">9.4</A> <A HREF="ca65.html#toc9.4"><CODE>.TIME</CODE></A>
+</H2>
+
+
+<P>Reading this pseudo variable will give a constant integer value that
+represents the current time in POSIX standard (as seconds since the
+Epoch).</P>
+<P>It may be used to encode the time of translation somewhere in the created
+code.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        .dword  .time   ; Place time here
+  
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+<H2><A NAME=".VERSION"></A> <A NAME="ss9.5">9.5</A> <A HREF="ca65.html#toc9.5"><CODE>.VERSION</CODE></A>
+</H2>
+
+
+<P>Reading this pseudo variable will give the assembler version according to
+the following formula:</P>
+<P>VER_MAJOR*$100 + VER_MINOR*$10 + VER_PATCH</P>
+<P>It may be used to encode the assembler version or check the assembler for
+special features not available with older versions.</P>
+<P>Example:</P>
+<P>Version 2.11.1 of the assembler will return $2B1 as numerical constant when
+reading the pseudo variable <CODE>.VERSION</CODE>.</P>
+
+
+
+<HR>
+<A HREF="ca65-10.html">Next</A>
+<A HREF="ca65-8.html">Previous</A>
+<A HREF="ca65.html#toc9">Contents</A>
+</BODY>
+</HTML>

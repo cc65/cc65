@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Library Overview: ISO C compatible library</TITLE>
+ <LINK HREF="library-3.html" REL=next>
+ <LINK HREF="library-1.html" REL=previous>
+ <LINK HREF="library.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="library-3.html">Next</A>
+<A HREF="library-1.html">Previous</A>
+<A HREF="library.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="s2">2.</A> <A HREF="library.html#toc2">ISO C compatible library</A></H2>
+
+
+<P>The C library contains a large subset of the ISO C library. Functions are
+usually missing in areas, where there is no support on typical 6502 systems.
+Wide character sets are an example for this.</P>
+<P>I will not go into detail about the ISO functions. If a function is not
+mentioned here explicitly, expect it to be available and to behave as defined
+in the C standard.</P>
+<P>Functions that are <EM>not</EM> available:</P>
+<P>
+<UL>
+<LI><CODE>tmpfile/tmpnam</CODE>
+
+</LI>
+<LI><CODE>system</CODE>
+
+</LI>
+<LI>All functions that handle floating point numbers in some manner.
+
+</LI>
+<LI>The <CODE>ldiv</CODE> function (cc65 is currently not able to return structs
+with a size not equal to 1, 2 or 4 bytes by value).
+
+</LI>
+<LI>All functions handling wide character strings.
+
+</LI>
+<LI>Signals and all related functions (having <CODE>SIGSEGV</CODE> would be
+cool:-)
+
+</LI>
+<LI><CODE>setbuf/setvbuf</CODE></LI>
+</UL>
+</P>
+<P>Functions not available on all supported systems:</P>
+<P>
+<UL>
+<LI><CODE>fopen/fread/fwrite/fclose/fputs/fgets/fscanf</CODE>: The functions
+are built on open/read/write/close. These latter functions are not available
+on all systems.
+
+</LI>
+<LI><CODE>ftell/fseek/fgetpos/fsetpos</CODE>: Support depends on the
+capabilities of the target machine.
+
+</LI>
+<LI><CODE>rename/remove/rewind</CODE>: Support depends on the capabilities of
+the target machine.
+
+</LI>
+<LI><CODE>time</CODE>: Since many of the supported systems do not have a real
+time clock, which means that the <CODE>time</CODE> function is not available. Please
+note that the other functions from <CODE>time.h</CODE> <EM>are</EM> available.</LI>
+</UL>
+</P>
+
+<P>Functions that are limited in any way:</P>
+<P>
+<UL>
+<LI><CODE>strcspn/strpbrk/strspn</CODE>: These functions have a length
+limitation of 256 for the second string argument. Since this string gives a
+character set, and there are only 256 distinct characters, this shouldn't be
+a problem.
+
+</LI>
+<LI><CODE>getenv</CODE>: Since there is no such thing as an environment on all
+supported systems, the <CODE>getenv</CODE> function will always return a <CODE>NULL</CODE>
+pointer.
+
+</LI>
+<LI><CODE>locale</CODE>: There is no other locale than the "C" locale. The
+native locale is identical to the "C" locale.</LI>
+</UL>
+</P>
+
+<P>In addition to these limitations, some more functions are limited if inlined
+versions are requested by using -Os:</P>
+<P>
+<UL>
+<LI>The <CODE>strlen</CODE> function only works for strings with a maximum length
+of 255 characters.
+
+</LI>
+<LI>The <CODE>isxxx</CODE> character classification functions from
+<CODE>&lt;ctype.h&gt;</CODE> will give unpredictable results if the argument is not
+in character range (0..255). This limitation may be removed by #undef'ing
+the function name (when using <CODE>-Os</CODE>, the functions are actually macros
+that expand to inline assembler code, but the real functions are still
+available if the macro definition is removed).</LI>
+</UL>
+</P>
+
+
+
+<HR>
+<A HREF="library-3.html">Next</A>
+<A HREF="library-1.html">Previous</A>
+<A HREF="library.html#toc2">Contents</A>
+</BODY>
+</HTML>

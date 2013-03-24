@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ca65 Users Guide: Overview</TITLE>
+ <LINK HREF="ca65-2.html" REL=next>
+
+ <LINK HREF="ca65.html#toc1" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ca65-2.html">Next</A>
+Previous
+<A HREF="ca65.html#toc1">Contents</A>
+<HR>
+<H2><A NAME="s1">1.</A> <A HREF="ca65.html#toc1">Overview</A></H2>
+
+
+<P>ca65 is a replacement for the ra65 assembler that was part of the cc65 C
+compiler, originally developed by John R. Dunning. I had some problems with
+ra65 and the copyright does not permit some things which I wanted to be
+possible, so I decided to write a completely new assembler/linker/archiver
+suite for the cc65 compiler. ca65 is part of this suite.</P>
+<P>Some parts of the assembler (code generation and some routines for symbol
+table handling) are taken from an older crossassembler named a816 written
+by me a long time ago.</P>
+
+
+<H2><A NAME="ss1.1">1.1</A> <A HREF="ca65.html#toc1.1">Design criteria</A>
+</H2>
+
+
+<P>Here's a list of the design criteria, that I considered important for the
+development:</P>
+<P>
+<UL>
+<LI>    The assembler must support macros. Macros are not essential, but they
+make some things easier, especially when you use the assembler in the
+backend of a compiler.</LI>
+<LI>    The assembler must support the newer 65C02 and 65816 CPUs. I have been
+thinking about a 65816 backend for the C compiler, and even my old
+a816 assembler had support for these CPUs, so this wasn't really a
+problem.</LI>
+<LI>    The assembler must produce relocatable code. This is necessary for the
+compiler support, and it is more convenient.</LI>
+<LI>    Conditional assembly must be supported. This is a must for bigger
+projects written in assembler (like Elite128).</LI>
+<LI>    The assembler must support segments, and it must support more than
+three segments (this is the count, most other assemblers support).
+Having more than one code segments helps developing code for systems
+with a divided ROM area (like the C64).</LI>
+<LI>    The linker must be able to resolve arbitrary expressions. It should
+be able to get things like
+<BLOCKQUOTE><CODE>
+<PRE>
+        .import S1, S2
+        .export Special
+        Special = 2*S1 + S2/7
+</PRE>
+</CODE></BLOCKQUOTE>
+
+right.</LI>
+<LI>    True lexical nesting for symbols. This is very convenient for larger
+assembly projects.</LI>
+<LI>    "Cheap" local symbols without lexical nesting for those quick, late
+night hacks.</LI>
+<LI>    I liked the idea of "options" as Anre Fachats .o65 format has it, so I
+introduced the concept into the object file format use by the new cc65
+binutils.</LI>
+<LI>    The assembler will be a one pass assembler. There was no real need for
+this decision, but I've written several multipass assemblers, and it
+started to get boring. A one pass assembler needs much more elaborated
+data structures, and because of that it's much more fun:-)</LI>
+<LI>    Non-GPLed code that may be used in any project without restrictions or
+fear of "GPL infecting" other code.</LI>
+</UL>
+</P>
+
+
+
+<HR>
+<A HREF="ca65-2.html">Next</A>
+Previous
+<A HREF="ca65.html#toc1">Contents</A>
+</BODY>
+</HTML>

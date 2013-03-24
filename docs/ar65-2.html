@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>ar65 Users Guide: Usage</TITLE>
+ <LINK HREF="ar65-3.html" REL=next>
+ <LINK HREF="ar65-1.html" REL=previous>
+ <LINK HREF="ar65.html#toc2" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="ar65-3.html">Next</A>
+<A HREF="ar65-1.html">Previous</A>
+<A HREF="ar65.html#toc2">Contents</A>
+<HR>
+<H2><A NAME="s2">2.</A> <A HREF="ar65.html#toc2">Usage</A></H2>
+
+
+
+<P>The archiver is called as follows:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        Usage: ar65 &lt;operation> lib file|module ...
+        Operation is one of:
+                a       Add modules
+                d       Delete modules
+                l       List library contents
+                x       Extract modules
+                V       Print the archiver version
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>You may add modules to a library using the `a' command. If the library
+does not exist, it is created (and a warning message is printed which you
+may ignore if creation of the library was your intention). You may
+specify any number of modules on the command line following the library.</P>
+<P>If a module with the same name exists in the library, it is replaced by
+the new one. The archiver prints a warning, if the module in the library
+has a newer timestamp than the one to add.</P>
+<P>Here's an example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ar65 a mysubs.lib sub1.o sub2.o
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will add two modules to the library `mysubs.lib' creating the
+library if necessary. If the library contains modules named sub1.o or
+sub2.o, they are replaced by the new ones.</P>
+<P>Modules names in the library are stored without the path, so, using</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ar65 a mysubs.lib ofiles/sub1.o ofiles/sub2.o
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>will add two modules named `sub1.o' and `sub2.o' to the library.</P>
+<P>Deleting modules from a library is done with the `d' command. You may not
+give a path when naming the modules.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ar65 d mysubs.lib sub1.o
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This will delete the module named `sub1.o' from the library, printing an
+error if the library does not contain that module.</P>
+
+<P>The `l' command prints a list of all modules in the library. Any module
+names on the command line are ignored.</P>
+<P>Example:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ar65 l mysubs.lib
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>Using the `x' command, you may extract modules from the library. The
+modules named on the command line are extracted from the library and put
+into the current directory.</P>
+<P>Note: Because of the indexing done by the archiver, the modules may have
+a changed binary layout, that is, a binary compare with the old module
+(before importing it into the library) may yield differences. The
+extracted modules are accepted by the linker and archiver, however, so
+this is not a problem.</P>
+<P>Example for extracting a module from the library:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        ar65 x mysubs.lib sub1.o
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>The `V' command prints the version number of the assembler. If you send
+any suggestions or bugfixes, please include your version number.</P>
+<P>In addition to these operations, the archiver will check for, and warn
+about duplicate external symbols in the library, every time when an
+operation does update the library. This is only a warning, the linker
+will ignore one of the duplicate symbols (which one is unspecified).</P>
+
+
+<HR>
+<A HREF="ar65-3.html">Next</A>
+<A HREF="ar65-1.html">Previous</A>
+<A HREF="ar65.html#toc2">Contents</A>
+</BODY>
+</HTML>

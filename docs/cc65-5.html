@@ -1,0 +1,196 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Users Guide: Extensions</TITLE>
+ <LINK HREF="cc65-6.html" REL=next>
+ <LINK HREF="cc65-4.html" REL=previous>
+ <LINK HREF="cc65.html#toc5" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="cc65-6.html">Next</A>
+<A HREF="cc65-4.html">Previous</A>
+<A HREF="cc65.html#toc5">Contents</A>
+<HR>
+<H2><A NAME="s5">5.</A> <A HREF="cc65.html#toc5">Extensions</A></H2>
+
+
+<P>This cc65 version has some extensions to the ISO C standard.</P>
+<P>
+<UL>
+<LI>    The compiler allows to insert assembler statements into the output
+file. The syntax is
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        asm (&lt;string literal&gt;[, optional parameters]) ;
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+or
+<BLOCKQUOTE><CODE>
+<PRE>
+        __asm__ (&lt;string literal&gt;[, optional parameters]) ;
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+The first form is in the user namespace and is disabled if the <CODE>-A</CODE>
+switch is given.
+
+There is a whole section covering inline assembler statements,
+<A HREF="cc65-9.html#inline-asm">see there</A>.
+
+
+</LI>
+<LI>    There is a special calling convention named "fastcall".
+The syntax for a function declaration using fastcall is
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        &lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+or
+<BLOCKQUOTE><CODE>
+<PRE>
+        &lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+An example would be
+<BLOCKQUOTE><CODE>
+<PRE>
+        void __fastcall__ f (unsigned char c)
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The first form of the fastcall keyword is in the user namespace and can
+therefore be disabled with the <CODE>
+<A HREF="cc65-2.html#option--standard">--standard</A></CODE> command line option.
+
+For functions declared as <CODE>fastcall</CODE>, the rightmost parameter is not
+pushed on the stack but left in the primary register when the function
+is called. This will reduce the cost when calling assembler functions
+significantly, especially when the function itself is rather small.
+
+
+</LI>
+<LI>    There are two pseudo variables named <CODE>__AX__</CODE> and <CODE>__EAX__</CODE>.
+Both refer to the primary register that is used by the compiler to
+evaluate expressions or return function results. <CODE>__AX__</CODE> is of
+type <CODE>unsigned int</CODE> and <CODE>__EAX__</CODE> of type <CODE>long unsigned int</CODE>
+respectively. The pseudo variables may be used as lvalue and rvalue as
+every other variable. They are most useful together with short
+sequences of assembler code. For example, the macro
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        #define hi(x)           \
+            (__AX__ = (x),      \
+             asm ("txa"),       \
+             asm ("ldx #$00"),  \
+             __AX__)
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+will give the high byte of any unsigned value.
+
+
+</LI>
+<LI>    Inside a function, the identifier <CODE>__func__</CODE> gives the name of the
+current function as a string. Outside of functions, <CODE>__func__</CODE> is
+undefined.
+Example:
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        #define PRINT_DEBUG(s)  printf ("%s: %s\n", __func__, s);
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+The macro will print the name of the current function plus a given
+string.
+
+
+</LI>
+<LI>    cc65 allows the initialization of <CODE>void</CODE> variables. This may be
+used to create variable structures that are more compatible with
+interfaces written for assembler languages. Here is an example:
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        void GCmd = {   (char)3, (unsigned)0x2000, (unsigned)0x3000 };
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+This will be translated as follows:
+
+<BLOCKQUOTE><CODE>
+<PRE>
+        _GCmd:
+                .byte   3
+                .word   $2000
+                .word   $3000
+        
+</PRE>
+</CODE></BLOCKQUOTE>
+
+
+Since the variable is of type <CODE>void</CODE> you may not use it as is.
+However, taking the address of the variable results in a <CODE>void*</CODE>
+which may be passed to any function expecting a pointer.
+
+See the 
+<A HREF="geos.html">GEOS library document</A> for examples
+on how to use this feature.
+
+
+</LI>
+<LI>  cc65 implements flexible array struct members as defined in the C99 ISO
+standard. As an extension, these fields may be initialized. There are
+several exceptions, however (which is probably the reason why the
+standard does not define this feature, because it is highly
+unorthogonal). Flexible array members cannot be initialized ...
+
+<UL>
+<LI>... when defining an array of structs with flexible
+members.</LI>
+<LI>... if such a struct is a member field of another struct
+which is not the last field.</LI>
+<LI>... if the struct which contains a flexible array member is
+declared as <CODE>register</CODE>, and the size and compiler settings
+do allow the compiler actually to place the struct into the
+register bank in the zero page.</LI>
+</UL>
+
+
+Please note that -- as defined in the ISO C standard -- the <CODE>sizeof</CODE>
+operator returns the struct size with the flexible array member having
+size zero, even if it is initialized.
+
+
+</LI>
+</UL>
+</P>
+
+
+
+<HR>
+<A HREF="cc65-6.html">Next</A>
+<A HREF="cc65-4.html">Previous</A>
+<A HREF="cc65.html#toc5">Contents</A>
+</BODY>
+</HTML>

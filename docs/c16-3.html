@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>Commodore 16/116 specific information for cc65: Memory layout</TITLE>
+ <LINK HREF="c16-4.html" REL=next>
+ <LINK HREF="c16-2.html" REL=previous>
+ <LINK HREF="c16.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="c16-4.html">Next</A>
+<A HREF="c16-2.html">Previous</A>
+<A HREF="c16.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="s3">3.</A> <A HREF="c16.html#toc3">Memory layout</A></H2>
+
+
+<P>cc65 generated programs with the default setup run with the kernal and basic
+banked in. This gives a usable memory range of $1000 - $4000
+(or $8000 if the machine is equipped with 32K RAM or more). Having the
+kernal and basic ROMs banked in means, that ROM entry points may be called
+directly from user code.</P>
+<P>Special locations:</P>
+<P>
+<DL>
+<DT><B>Text screen</B><DD>
+<P>The text screen is located at $C00 (as in the standard setup).</P>
+
+<DT><B>Color RAM</B><DD>
+<P>The color RAM is located at $800 (standard location).</P>
+
+<DT><B>Stack</B><DD>
+<P>The C runtime stack is located at $3FFF ($7FFF in case of a
+machine with 32K of memory or more) and growing downwards.</P>
+
+<DT><B>Heap</B><DD>
+<P>The C heap is located at the end of the program and grows towards the C
+runtime stack.</P>
+
+</DL>
+</P>
+
+
+
+
+<HR>
+<A HREF="c16-4.html">Next</A>
+<A HREF="c16-2.html">Previous</A>
+<A HREF="c16.html#toc3">Contents</A>
+</BODY>
+</HTML>

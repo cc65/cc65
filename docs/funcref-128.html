@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 function reference: Alphabetical function reference: em_load_driver</TITLE>
+ <LINK HREF="funcref-129.html" REL=next>
+ <LINK HREF="funcref-127.html" REL=previous>
+ <LINK HREF="funcref.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="funcref-129.html">Next</A>
+<A HREF="funcref-127.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="em_load_driver"></A> 3.79 <A HREF="funcref.html#toc3.79">em_load_driver</A></H2>
+
+
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT><B>Function</B><DD>
+<P>Load and initialize an extended memory driver.</P>
+<DT><B>Header</B><DD>
+<P><CODE>
+<A HREF="funcref-21.html#em.h">em.h</A></CODE></P>
+<DT><B>Declaration</B><DD>
+<P><CODE>void __fastcall__ em_load_driver (const char* name);</CODE></P>
+<DT><B>Description</B><DD>
+<P>Load an extended memory driver into memory and initialize
+it. The function returns an error code that tells if all this has been
+successful.</P>
+<DT><B>Limits</B><DD>
+<P>
+<UL>
+<LI>Not all drivers are able to detect if the supported hardware is really
+present.</LI>
+<LI>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.</LI>
+<LI>The driver is loaded by name, so currently you must know the type of
+extended memory that should be supported. There is no autodetect capability.</LI>
+</UL>
+</P>
+<DT><B>Availability</B><DD>
+<P>cc65</P>
+<DT><B>See also</B><DD>
+<P>
+<A HREF="funcref-132.html#em_unload">em_unload</A></P>
+<DT><B>Example</B><DD>
+<P>None.</P>
+</DL>
+</BLOCKQUOTE>
+</P>
+
+
+<HR>
+<A HREF="funcref-129.html">Next</A>
+<A HREF="funcref-127.html">Previous</A>
+<A HREF="funcref.html#toc3">Contents</A>
+</BODY>
+</HTML>

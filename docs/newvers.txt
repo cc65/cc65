@@ -1,0 +1,511 @@
+
+This document is slightly outdated! See cc65.txt and library.txt for a more
+up-to-date discussion.
+
+
+
+Discussion of some of the features/non features of the current cc65 version
+---------------------------------------------------------------------------
+
+  1. Copyright
+
+  2. Differences to the original version
+
+  3. Known bugs and limitations
+
+  4. Library
+
+  5. Bugs
+
+
+
+
+1. Copyright
+-----------
+
+This is the original compiler copyright:
+
+--------------------------------------------------------------------------
+  -*- Mode: Text -*-
+
+     This is the copyright notice for RA65, LINK65, LIBR65, and other
+  Atari 8-bit programs.  Said programs are Copyright 1989, by John R.
+  Dunning.  All rights reserved, with the following exceptions:
+
+      Anyone may copy or redistribute these programs, provided that:
+
+  1:  You don't charge anything for the copy.  It is permissable to
+      charge a nominal fee for media, etc.
+
+  2:  All source code and documentation for the programs is made
+      available as part of the distribution.
+
+  3:  This copyright notice is preserved verbatim, and included in
+      the distribution.
+
+      You are allowed to modify these programs, and redistribute the
+  modified versions, provided that the modifications are clearly noted.
+
+      There is NO WARRANTY with this software, it comes as is, and is
+  distributed in the hope that it may be useful.
+
+      This copyright notice applies to any program which contains
+  this text, or the refers to this file.
+
+      This copyright notice is based on the one published by the Free
+  Software Foundation, sometimes known as the GNU project.  The idea
+  is the same as theirs, ie the software is free, and is intended to
+  stay that way.  Everybody has the right to copy, modify, and re-
+  distribute this software.  Nobody has the right to prevent anyone
+  else from copying, modifying or redistributing it.
+
+--------------------------------------------------------------------------
+
+In acknowledgment of this copyright, I will place my own changes to the
+compiler under the same copyright.
+
+However, since the library and all binutils (assembler, archiver, linker)
+are a complete rewrite, they are covered by another copyright:
+
+
+--------------------------------------------------------------------------
+
+		       CC65 C Library and Binutils
+
+       	        (C) Copyright 1998 Ullrich von Bassewitz
+
+                           COPYING CONDITIONS
+
+
+  This software is provided 'as-is', without any expressed or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not
+     be misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source
+     distribution
+
+
+--------------------------------------------------------------------------
+
+I will try to contact John, maybe he is also willing to place his sources
+under a less restrictive copyright, after all these years:-)
+
+
+
+
+2. Differences to the original version
+--------------------------------------
+
+This is a list of changes against the cc65 archives. I got the originals
+from:
+
+  http://www.umich.edu/~archive/atari/8bit/Languages/Cc65/
+
+
+
+  * Removed all assembler code from the compiler. It was unportable because
+    it made assumptions about the character set (ATASCII) and made the
+    sources hard to read and to debug.
+
+  * All programs do return an error code, so they may be used by make. All
+    programs try to remove the target file, if there were errors.
+
+  * The assembler now checks several error conditions (others still go
+    undetected - see "known bugs").
+
+  * Removed many bugs from the compiler. One error was invalid code
+    produced by the compiler that went through the assembler since the
+    assembler did not check for ranges itself.
+
+  * Removed many non-portable constructs from the compiler. Code cleanups,
+    rewrite of the function headers and more.
+
+  * New style function prototypes supported instead of the old K&R syntax.
+    The new syntax is a must, that is, the old style syntax is no longer
+    understood. As an extension, unnamed parameters may be used to avoid
+    warnings about unused parameters.
+
+  * New void type. May also be used as a function return type.
+
+  * Changed the memory management in the compiler. Use malloc/free instead
+    of the old homebrew (and unportable) stuff.
+
+  * Default character type is unsigned. This is much more what you want in
+    small systems environments, since a char is often used to represent a
+    small numerical value, and the integer promotion does the wrong thing
+    in those cases. Look at the follwing piece of code:
+
+       char c = read_char ();
+       switch (c) {
+           case 0x80: printf ("c is 0x80\n"); break;
+           default:   printf ("c is something else\n"); break;
+       }
+
+    With signed chars, the code above, will *always* run into the default
+    selector. c is promoted to int, and since it is signed, 0x80 will get
+    promoted to 0xFF80 - which will select the default label. With unsigned
+    chars, the code works as intended (but note: the code works for cc65
+    but it is non portable anyway, since many other compilers have signed
+    chars by default, so be careful! Having unsigned chars is just a
+    convenience thing).
+
+  * Shorter code when using the builtin operators and the lhs of an expr
+    is a constant (e.g. expressions like "c == 0x80" are encoded two
+    bytes shorter).
+
+  * Some optimizations when pushing constants.
+
+  * Character set translation by the compiler. A new -t option was added
+    to set the target system type. Use
+
+	-t0     For no spefic target system (default)
+        -t1     For the atari (does not work completely, since I did not
+                have an ATASCII translation table).
+        -t2     Target system is C64.
+        -t3     Target system is C128.
+        -t4     Target system is ACE.
+	-t5	Target system is Plus/5.
+
+  * Dito for the linker: Allow an option to set the target system and add
+    code to the linker to produce different headers and set the correct
+    start address.
+
+  * Complete rewrite of the C library. See extra chapter.
+
+  * Many changes in the runtime library. Splitted it into more than one
+    file to allow for smaller executables if not all of the code is needed.
+
+  * Allow longer names. Now the first 12 characters are sigificant at the
+    expense of some more memory used at runtime.
+
+  * String constants are now concatenated in all places. This allows
+    things like:
+
+    	fputs ("Options:\n"
+    	       "    -b  bomb computer\n"
+               "    -f  format hard disk\n"
+    	       "    -k  kill init\n",
+               stderr);
+
+    saving code for more than one call to the function.
+
+  * Several new macros are defined:
+
+      M6502       This one is old - don't use!
+      __CC65__    Use this instead. Defined when compiling with cc65.
+      __ATARI__   Defined when the target system is atari.
+      __CBM__     Defined when compiling for a CBM system as target.
+      __C64__     Defined when the C64 is the target system.
+      __C128__    Defined when compiling for the 128.
+      __ACE__     Defined when compiling for ACE.
+      __PLUS4__	  Defined when compiling for the Plus/4.
+
+    The __CC65__ macro has the compiler version as its value, version
+    1.0 of the compiler will define this macro as 0x100.
+
+  * The -a option is gone.
+
+  * The compiler will generate external references (via .globl) only if a
+    function is defined as extern in a module, or not defined but called
+    from a module. The old behaviour was to generate a reference for every
+    function prototype ever seen, which meant that using a header file like
+    stdio.h got most of the C library linked in, even if it was never used.
+
+  * Many new warnings added (about unused parameters, unused variables,
+    compares of unsigneds against zero, function call without prototype
+    and much more).
+
+  * Added a new compiler option (-W) to suppress all warnings.
+
+  * New internal variable __fixargs__ that gives the size of fixed
+    arguments, a function takes. This allows to work (somehow) around the
+    problem, that cc65 has the "wrong" (that is, pascal) calling order. See
+    below ("Known problems") for a discussion.
+
+  * The "empty" preprocessor directive ("#" on a line) is now ignored.
+
+  * Added a "#error" directive to force user errors.
+
+  * Optimization of the code generation. Constant parts of expressions are
+    now detected in many places where the old compiler evaluated the
+    constants at runtime.
+
+  * Allow local static variables (there was code in the original compiler for
+    that, but it did not work). Allow also initialization in this case (no
+    code for that in the original). Local static variables in the top level
+    function block have no penalty, for static variables in nested blocks, the
+    compiler generates a jump around the variable space. To eliminate this,
+    an assembler/linker with support for segments is needed.
+
+  * You cannot return a value from a void function, and must return a value
+    in a non-void function. Violations are flagged as an error.
+
+  * Typedefs added.
+
+  * The nonstandard evaluation of the NOARGC and FIXARGC macros has been
+    replaced by a smart algorithm that does the same thing automagically
+    and without user help (provided there are function prototypes).
+
+  * Function pointers may now be used to call a function without
+    dereferencing. Given a function
+
+  	void f1 (void (*f2) ())
+
+    the following was valid before:
+
+  	  (*f2) ();
+
+    The ANSI standard allows a second form (because there's no ambiguity)
+    which is now also allowed:
+
+  	  f2 ();
+
+  * Pointer subtraction was completely messed up and did not work (that is,
+    subtraction of a pointer from a pointer produced wrong results).
+
+  * Local struct definitions are allowed.
+
+  * Check types in assignments, parameters for function calls and more.
+
+  * A new long type (32 bit) is available. The integer promotion rules
+    are applied if needed. This includes much more type checking and a
+    better handling of chars (they are handled as chars, not as ints, in
+    all places where this is possible).
+
+  * Integer constants now have an associated type, 'U' and 'L' modifers
+    may be used.
+
+  * The old #asm statement is gone. Instead, there's now a asm ("xxx")
+    statement that has the syntax that is defined by the C++ standard
+    (the C standard does not define an ASM statement). The string literal
+    in parenthesis is inserted in the assembler output. You may also
+    use __asm__ instead of asm (see below).
+
+  * Allow // comments.
+
+  * New compiler option -A (ANSI) that disables several extensions (asm
+    directive, // comments, unnamed function parameters) and also defines
+    a macro named __STRICT_ANSI__. The header files will exclude some
+    non-ANSI functions if __STRICT_ANSI__ is defined (that is, -A is given
+    on the command line).
+    -A will not disable the __asm__ directive (identifiers starting with
+    __ are in the namespace of the implementation).
+
+  * Create optimized code if the address of a variable is a constant. This
+    may be achieved by constructs like "*(char*)0x200 = 0x01" and is used
+    to access absolute memory locations. The compiler detects this case
+    also if structs or arrays are involved and generates direct stores and
+    fetches.
+
+
+
+3. Known problems
+-----------------
+
+  * No floats.
+
+  * Only simple automatic variables may be initialized (no arrays).
+
+  * "Wrong" order of arguments on the stack. The arguments are pushed in
+    the order, the arguments are parsed. That means that the va_xxx macros
+    in stdarg.h are ok (they work as expected), but the fixed parameters of
+    a function with a variable argument list do not match and must be
+    determined with the (non-standard) va_fix macro.
+
+    Using the __fixargs__ kludge, it is possible to write standard conform
+    va_xxx macros to work with variable sized argument lists. However, the
+    fixed parameters in the function itself usually have the wrong values,
+    because the order of the arguments on the stack is reversed compared to
+    a stock C compiler. Pushing the args the other way round requires much
+    work and a more elaborated intermediate code than cc65 has.
+
+    To understand the problem, have a look at this (non working!) sprintf
+    function:
+
+       	int sprintf (char* buf, char* format, ...)
+	/* Non working version */
+    	{
+    	    int count;
+    	    va_list ap;
+    	    va_start (ap, format);
+       	    count = vsprintf (buf, format, ap);
+    	    va_end (ap);
+    	    return count;
+    	}
+
+    The problem here is in the "format" and "buf" parameters. They do (in
+    most cases) not contain, what the caller gave us as arguments. To
+    access the "real" arguments, use the va_fix macro. It is only valid
+    before the first call to va_arg, and takes the va_list and the number
+    of the fixed argument as parameters. So the right way would be
+
+    	int sprintf (char* buf, char* format, ...)
+	/* Working version */
+    	{
+    	    int count;
+    	    va_list ap;
+    	    va_start (ap, format);
+       	    count = vsprintf (va_fix (ap, 1), va_fix (ap, 2), ap);
+    	    va_end (ap);
+    	    return count;
+    	}
+
+    The fixed parameter are obtained by using the va_fix macro with the
+    number of the parameter given as second argument. Beware: Since the
+    fixed arguments declared are usually one of the additional parameters,
+    the following code, which tries to be somewhat portable, does *not*
+    work. The assignment will overwrite the other parameters instead,
+    causing unexpected results:
+
+    	int sprintf (char* buf, char* format, ...)
+	/* Non working version */
+    	{
+    	    int count;
+    	    va_list ap;
+    	    va_start (ap, format);
+        #ifdef __CC65__
+	    buf    = va_fix (ap, 1);
+	    format = va_fix (ap, 2);
+	#endif
+       	    count = vsprintf (buf, format, ap);
+    	    va_end (ap);
+    	    return count;
+    	}
+
+    To write a portable version of sprintf, use code like this instead:
+
+    	int sprintf (char* buf, char* format, ...)
+	/* Working version */
+    	{
+    	    int count;
+    	    va_list ap;
+    	    va_start (ap, format);
+	#ifdef __CC65__
+       	    count = vsprintf (va_fix (ap, 1), va_fix (ap, 2), ap);
+	#else
+	    count = vsprintf (buf, format, ap);
+	#endif
+    	    va_end (ap);
+    	    return count;
+    	}
+
+    I know, va_fix is a kludge, but at least it *is* possible to write
+    functions with variable sized argument lists in a comfortable manner.
+
+  * The assembler still accepts lots of illegal stuff without an error (and
+    creates wrong code). Be careful!
+
+  * When starting a compiled program twice on the C64 (or 128), you may get
+    other results or the program may even crash. This is because static
+    variables do not have their startup values, they were changed in the
+    first run.
+
+  * There's only *one* symbol table level. It is - via a flag - used for both,
+    locals and global symbols. However, if you have variables in nested
+    blocks, the names may collide with the ones in the upper block. I will
+    probably add real symbol tables some time to remove this problem.
+
+  * Variables in nested blocks are handled inefficiently, especially in loops.
+    The frame on the stack is allocated and deallocated for each loop
+    iteration. There's no way around this, since the compiler has not enough
+    memory to hold a complete function body in memory (it would be able to
+    backpatch the frame generating code on function entry).
+
+
+
+
+4. Library
+----------
+
+The C library is a complete rewrite and has nothing in common with the old
+Atari stuff. When rewriting the library, I was guided by the following
+rules:
+
+  * Use standard conform functions as far as possible. In addition, if
+    there's a ANSI-C compatible function, it should act as defined in the
+    ANSI standard. If if does not act as defined, this is an error.
+
+  * Do not use non-standard functions if the functionality of those
+    functions is covered by a standard function. Use exceptions only, if
+    there is a non-ANSI function that is very popular (example: itoa).
+
+  * Use new style prototpyes and header files.
+
+  * Make the library portable. For example, the complete stdio stuff is
+    based on only four system dependent functions:
+
+    	open, read, write, close
+
+    So, if you rewrite these functions for a new system, all others
+    (printf, fprintf, fgets, fputc ...) will work, too.
+
+  * Do not expect a common character set. Unfortunately, I was not able to
+    be completely consequent in this respect. C sources are no problem
+    since the compiler does character translation, but the assembler
+    sources make assumptions about the following characters:
+
+    	0 	--> code $30
+    	+ 	--> code $2B
+    	- 	--> code $2D
+
+    All other functions (especially the isxxx ones) are table driven, so
+    only the classification table is system dependent.
+
+
+The first port was for the ACE operating system. The current version has also
+support for the C64, the C128 and the Plus/4 in native mode. The ACE port has
+disk support but no conio module, all others don't have disk support but
+direct console I/O.
+
+Currently the following limitations the are known:
+
+  * getwd (ace) does not work. I get an error (carry flag) with an error
+    code of zero (aceErrStopped). Maybe my code is wrong...
+
+  * The error codes are currently system error codes. They should be
+    translated to something system independent. The ace codes are a good
+    starting point. However, I don't like the idea, that zero is a valid
+    error code, and some other codes are missing ("invalid parameter" and
+    more). As soon as this is done, it is also possible to write a
+    strerror() function to give more descriptive error messages to the
+    user.
+
+  * Many functions not very good tested.
+
+  * The printf and heap functions are way too big. Rewritting _printf
+    and malloc/free in assembler will probably squeeze 2K out of the
+    code.
+
+  * The isxxx functions do not handle EOF correctly. This is probably
+    a permanent restriction, even if it is non-standard. It would require
+    extra code in each of the isxxx functions, since EOF is defined as -1
+    and cannot be handled effectively with the table approach and 8 bit
+    index registers.
+
+  * The strcspn, strpbrk and strspn functions have a string length limitation
+    of 256 for the second argument. This is usually not a problem since the
+    second argument gives a character set, and a character set cannot be
+    larger than 256 chars for all known 6502 systems.
+
+
+
+
+5. Bugs
+-------
+
+Please note that the compiler and the libraries are beta! Send bug reports to
+uz@cc65.org.
+
+
+
+

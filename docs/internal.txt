@@ -1,0 +1,207 @@
+
+
+	  		    Internals doc for CC65
+
+
+
+Stacks:
+-------
+
+The program stack used by programs compiled with CC65 is located in high
+memory.  The stack starts there and grows down.  Arguments to functions, local
+data etc are allocated on this stack, and deallocated when functions exit.
+
+The program code and data is located in low memory. The heap is located
+between the program code and the stack. The default size for the parameter
+stack is 2K, you may change this for most platforms in the linker
+configuration.
+
+Note: The size of the stack is only needed if you use the heap, or if you
+call the stack checking routine (_stkcheck) from somewhere in your program.
+
+When calling other functions, the return address goes on the normal 6502
+stack, *not* on the parameter stack.
+
+
+
+Registers:
+----------
+
+Since CC65 is a member of the Small-C family of compilers, it uses the notion
+of a 'primary register'.  In the CC65 implementation, I used the AX register
+pair as the primary register.  Just about everything interesting that the
+library code does is done by somehow getting a value into AX, and then calling
+some routine or other.  In places where Small-C would use a secondary
+register, top-of-stack is used, so for instance two argument function like
+integer-multiply work by loading AX, pushing it on the stack, loading the
+second value, and calling the internal function.  The stack is popped, and the
+result comes back in AX.
+
+
+
+Calling sequences:
+------------------
+
+C functions are called by pushing their args on the stack, and JSR'ing to the
+entry point.  (See ex 1, below) If the function returns a value, it comes back
+in AX.  NOTE!!!  A potentially significant difference between the CC65
+environment and other C environments is that the CALLEE pops arguments, not
+the CALLER.  (This is done so as to generate more compact code) In normal use,
+this doesn't cause any problems, as the normal function entry/exit conventions
+take care of popping the right number of things off the stack, but you may
+have to worry about it when doing things like writing hand-coded assembly
+language routines that take variable numbers of arguments.  More about that
+later.
+
+Ex 1:  Function call:  Assuming 'i' declared int and 'c' declared
+       char, the following C code
+
+       	i = baz(i, c);
+
+       in absence of a prototype generates this assembler code.  I've added
+       the comments.
+
+       	lda	_i 		; get 'i', low byte
+       	ldx	_i+1		; get 'i', hi byte
+       	jsr	pushax		; push it
+       	lda	_c 		; get 'c'
+       	ldx	#0 		; fill hi byte with 0
+       	jsr	pushax		; push it
+       	ldy	#4     	       	; arg size
+       	jsr	_baz		; call the function
+       	sta	_i  		; store the result
+	stx	_i+1
+
+       In presence of a prototype, the picture changes slightly, since the
+       compiler is able to do some optimizations:
+
+       	lda	_i  	      	; get 'i', low byte
+       	ldx	_i+1	      	; get 'i', hi byte
+       	jsr	pushax	      	; push it
+       	lda 	_c  	      	; get 'c'
+       	jsr    	pusha 	      	; push it
+       	jsr	_baz	      	; call the function
+       	sta	_i  	      	; store the result
+       	stx	_i+1
+
+
+Note that the two words of arguments to baz were popped before it exitted.
+The way baz could tell how much to pop was by the argument count in Y at call
+time.  Thus, even if baz had been called with 3 args instead of the 2 it was
+expecting, that would not cause stack corruption.
+
+There's another tricky part about all this, though.  Note that the args to baz
+are pushed in FORWARD order, ie the order they appear in the C statement.
+That means that if you call a function with a different number of args than it
+was expecting, they wont end up in the right places, ie if you call baz, as
+above, with 3 args, it'll operate on the LAST two, not the first two.
+
+
+
+Symbols:
+--------
+
+CC65 does the usual trick of prepending an underbar ('_') to symbol names when
+compiling them into assembler.  Therefore if you have a C function named
+'bar', CC65 will define and refer to it as '_bar'.
+
+
+
+Systems:
+--------
+
+Supported systems at this time are: C64, C128, Plus/4, CBM 500, CBM 600/700,
+the newer PET machines (not 2001), Atari 8bit, and the Apple ][ (thanks to
+Kevin Ruland, who did the port).
+
+C16:    Works with unexpanded or memory expanded C16 and C116 machines.
+        However, a maximum of 32KB from the total memory is used. The Plus/4
+        target supports up to 64K of memory, but has a small code overhead
+        because of the banking routines involved. Apart from this additional
+        overhead, the Plus/4 target and the C16 target are the same. 16K
+        machines (unexpanded C16) have 12K of memory for C programs available,
+        machines with 32K or more have 28K available. The actual amount of
+        memory is auto detected.
+
+C64:  	The program runs in a memory configuration, where only the kernal ROM
+      	is enabled. The text screen is expected at the usual place ($400), so
+       	50K of memory are available to the program.
+
+C128: 	The startup code will reprogram the MMU, so that only the kernal ROM
+      	is enabled. This means, there are 41K of memory available to the
+      	program.
+
+Plus/4:	Works with bank switching so 59K of memory are available to the 
+        program.
+
+CBM 500:
+    	The C program runs in bank #0 and has a total of 48K memory available.
+	This is less than what is available on its bigger brothers (CBM
+	600/700) because the character data and video RAM is placed in the
+	execution bank (#0) to allow the use of sprites.
+
+CBM 600/700:
+      	The C program runs in a separate segment and has almost full 64K of
+      	memory available.
+
+PET:  	The startup code will adjust the upper memory limit to the installed
+      	memory. However, only linear memory is used, this limits the top to
+      	$8000, so on a 8032 or similar machine, 31K of memory are available to
+      	the program.
+
+Apple ][:
+        The program starts at $803, end of RAM is $95FF, so 35.5K of memory
+        (including stack) are available to the program.
+
+Atari:  The startup code will adjust the upper memory limit to the installed
+        memory detected at runtime. The programmer can adjust the upper memory
+        limit by setting the __RESERVED_MEMORY__ variable at link time. The
+        given __RESERVED_MEMORY__ value will be subtracted from the upper
+        memory limit used by the runtine. This memory could be used as graphics
+        memory, for example.
+        In the default case (no setting of __RESERVED_MEMORY__) the upper
+        memory limit is $9C1F (with Basic cartridge) and $BC1F (without
+        cartridge). The program starts at $2E00 by default.
+        These values are for a 48K or 64K machine.
+
+Note: The above numbers do not mean that the remaining memory is unusable.
+However, it is not linear memory and must be accessed by other, nonportable
+methods. I'm thinking about a library extension that allows access to the
+additional memory as a far heap, but these routines do not exist until now.
+
+
+
+Inline Assembly:
+----------------
+
+CC65 allows inline assembly by a special keyword named "asm". Inline assembly
+looks like a function call. The string in parenthesis is output in the
+assembler file.
+
+Example, insert a break instruction into the code:
+
+       	asm ("brk")
+
+Beware: Be careful when inserting inline code since this may collide with
+the work of the optimizer.
+
+
+
+Pseudo variables:
+-----------------
+
+There are two special variables available named __AX__ and __EAX__. These
+variables must never be declared (this gives an error), but may be used as any
+other variable. However, accessing these variables will access the primary
+register that is used by the compiler to evaluate expressions, return
+functions results and pass parameters.
+
+This feature is useful with inline assembly and macros. For example, a macro
+that reads a CRTC register may be written like this:
+
+#define wr(idx) (__AX__=(idx), 	       	\
+       	       	asm ("sta $2000"),      \
+                asm ("lda $2000"),      \
+                asm ("ldx #$00"),	\
+		__AX__)
+

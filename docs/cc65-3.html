@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Users Guide: Input and output</TITLE>
+ <LINK HREF="cc65-4.html" REL=next>
+ <LINK HREF="cc65-2.html" REL=previous>
+ <LINK HREF="cc65.html#toc3" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="cc65-4.html">Next</A>
+<A HREF="cc65-2.html">Previous</A>
+<A HREF="cc65.html#toc3">Contents</A>
+<HR>
+<H2><A NAME="s3">3.</A> <A HREF="cc65.html#toc3">Input and output</A></H2>
+
+
+<P>The compiler will accept one C file per invocation and create a file with
+the same base name, but with the extension replaced by ".s". The output
+file contains assembler code suitable for the use with the ca65 macro
+assembler.</P>
+<P>Include files in single quotes are searched in the following places:
+<OL>
+<LI>The current directory.</LI>
+<LI>The value of the environment variable <CODE>CC65_INC</CODE> if it is defined.</LI>
+<LI>Any directory added with the <CODE>-I</CODE> option on the command line.</LI>
+</OL>
+</P>
+<P>Include files in angle brackets are searched in the following places:
+<OL>
+<LI>A compiled in directory which is often <CODE>/usr/lib/cc65/include</CODE> on
+Linux systems.</LI>
+<LI>The value of the environment variable <CODE>CC65_INC</CODE> if it is defined.</LI>
+<LI>A subdirectory named <CODE>include</CODE> of the directory defined in the
+environment variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
+<LI>Any directory added with the <CODE>-I</CODE> option on the command line.</LI>
+</OL>
+</P>
+
+
+
+<HR>
+<A HREF="cc65-4.html">Next</A>
+<A HREF="cc65-2.html">Previous</A>
+<A HREF="cc65.html#toc3">Contents</A>
+</BODY>
+</HTML>

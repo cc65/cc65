@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.66">
+ <TITLE>cc65 Users Guide: Inline assembler</TITLE>
+ <LINK HREF="cc65-10.html" REL=next>
+ <LINK HREF="cc65-8.html" REL=previous>
+ <LINK HREF="cc65.html#toc9" REL=contents>
+</HEAD>
+<BODY>
+<A HREF="cc65-10.html">Next</A>
+<A HREF="cc65-8.html">Previous</A>
+<A HREF="cc65.html#toc9">Contents</A>
+<HR>
+<H2><A NAME="inline-asm"></A> <A NAME="s9">9.</A> <A HREF="cc65.html#toc9">Inline assembler</A></H2>
+
+
+<P>The compiler allows to insert assembler statements into the output file. The
+syntax is</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        asm (&lt;string literal&gt;[, optional parameters]) ;
+</PRE>
+</CODE></BLOCKQUOTE>
+
+or
+<BLOCKQUOTE><CODE>
+<PRE>
+        __asm__ (&lt;string literal&gt;[, optional parameters]) ;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>The first form is in the user namespace and is disabled by <CODE>
+<A HREF="cc65-2.html#option--standard">--standard</A></CODE> if the argument is not <CODE>cc65</CODE>.</P>
+<P>The asm statement may be used inside a function and on global file level. An
+inline assembler statement is a primary expression, so it may also be used as
+part of an expression. Please note however that the result of an expression
+containing just an inline assembler statement is always of type <CODE>void</CODE>.</P>
+<P>The contents of the string literal are preparsed by the compiler and inserted
+into the generated assembly output, so that the can be further processed by
+the backend and especially the optimizer. For this reason, the compiler does
+only allow regular 6502 opcodes to be used with the inline assembler. Pseudo
+instructions (like <CODE>.import</CODE>, <CODE>.byte</CODE> and so on) are <EM>not</EM> allowed,
+even if the ca65 assembler (which is used to translate the generated assembler
+code) would accept them. The builtin inline assembler is not a replacement for
+the full blown macro assembler which comes with the compiler.</P>
+<P>Note: Inline assembler statements are subject to all optimizations done by the
+compiler. There is currently no way to protect an inline assembler statement
+from being moved or removed completely by the optimizer. If in doubt, check
+the generated assembler output, or disable optimizations.</P>
+<P>The string literal may contain format specifiers from the following list. For
+each format specifier, an argument is expected which is inserted instead of
+the format specifier before passing the assembly code line to the backend.</P>
+<P>
+<UL>
+<LI><CODE>%b</CODE> - Numerical 8-bit value</LI>
+<LI><CODE>%w</CODE> - Numerical 16-bit value</LI>
+<LI><CODE>%l</CODE> - Numerical 32-bit value</LI>
+<LI><CODE>%v</CODE> - Assembler name of a global variable or function</LI>
+<LI><CODE>%o</CODE> - Stack offset of a local variable</LI>
+<LI><CODE>%g</CODE> - Assembler name of a C label</LI>
+<LI><CODE>%s</CODE> - The argument is converted to a string</LI>
+<LI><CODE>%%</CODE> - The % sign itself</LI>
+</UL>
+</P>
+
+<P>Using these format specifiers, you can access C <CODE>#defines</CODE>, variables or
+similar stuff from the inline assembler. For example, to load the value of
+a C <CODE>#define</CODE> into the Y register, one would use</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        #define OFFS  23
+        __asm__ ("ldy #%b", OFFS);
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Or, to access a struct member of a static variable:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        typedef struct {
+            unsigned char x;
+            unsigned char y;
+            unsigned char color;
+        } pixel_t;
+        static pixel_t pixel;
+        __asm__ ("ldy #%b", offsetof(pixel_t, color));
+        __asm__ ("lda %v,y", pixel);
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>The next example shows how to use global variables to exchange data between C
+an assembler and how to handle assembler jumps:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        unsigned char globalSubA, globalSubB, globalSubResult;
+
+        /* return a-b, return 255 if b>a */
+        unsigned char sub (unsigned char a, unsigned char b)
+        {
+            globalSubA = a;
+            globalSubB = b;
+            __asm__ ("sec");
+            __asm__ ("lda %v", globalSubA);
+            __asm__ ("sbc %v", globalSubB);
+            __asm__ ("bcs %g", jumpSubNoError);
+            __asm__ ("lda #$FF");
+        jumpSubNoError:
+            __asm__ ("sta %v", globalSubResult);
+            return globalSubResult;
+        }
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>Arrays can also be accessed:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        unsigned char globalSquareTable[] = {
+            0, 1, 4, 9, 16, 25, 36, 49, 64, 81,
+            100, 121, 144, 169, 196, 225
+        };
+        unsigned char globalSquareA, globalSquareResult;
+
+        /* return a*a for a&lt;16, else 255 */
+        unsigned char square (unsigned char a)
+        {
+            if (a>15){
+                return 255;
+            }
+            globalSquareA = a;
+            __asm__ ("ldx %v", globalSquareA);
+            __asm__ ("lda %v,x", globalSquareTable);
+            __asm__ ("sta %v", globalSquareResult);
+            return globalSquareResult;
+        }
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>Note: Do not embed the assembler labels that are used as names of global
+variables or functions into your asm statements. Code like this</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        int foo;
+        int bar () { return 1; }
+        __asm__ ("lda _foo");           /* DON'T DO THAT! */
+        ...
+        __asm__ ("jsr _bar");           /* DON'T DO THAT EITHER! */
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<P>may stop working if the way, the compiler generates these names is changed in
+a future version. Instead use the format specifiers from the table above:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+        __asm__ ("lda %v", foo);        /* OK */
+        ...
+        __asm__ ("jsr %v", bar);        /* OK */
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+
+
+<HR>
+<A HREF="cc65-10.html">Next</A>
+<A HREF="cc65-8.html">Previous</A>
+<A HREF="cc65.html#toc9">Contents</A>
+</BODY>
+</HTML>

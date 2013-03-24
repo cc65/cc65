@@ -1,8 +1,0 @@
-Introduced with version 2.5:
-
-  * Use of "goto" to jump into or out of blocks that declare local variables
-    will create programs that crash, since the stack is not corrected. The old
-    stack correction code was removed because of the restructuring of the
-    symbol table stuff and was not reintroduced because it was ugly anyway,
-    did not work with the new symbol table code, and should be unnecessary as
-    soon as local variables are allocated in one chunk on function entry.

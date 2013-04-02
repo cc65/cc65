@@ -38,7 +38,7 @@ curRecord	$8496	$8496	$f618	Byte		Holds the current record number for an open VL
 currentMode	$2e	$2e	$021c	Byte		Holds the current text drawing node.
 curSetWidth	$27	$27	$0219	Word		Holds the card width in pixels for the current font.
 curType		$88c6	$88c6	n/a	Byte		Holds the current disk type.
-curXpos0	n/a	$1303	$d954	16 Bytes	The current X positions of the C128 ami Apple soft sprites.
+curXpos0	n/a	$1303	$d954	16 Bytes	The current X positions of the C128 and Apple soft sprites.
 curYpos0	n/a	$1313	$d964	8 Bytes		The current Y positions for the C128 and Apple soft sprites.
 dataDiskName	$8453	$8453	$02b4	18 | 16 Bytes	Holds the disk name that an application's data file is on.
 dataFileName	$8442	$8442	$02a4	17 | 16 Bytes	This is the name of a data file to open.
@@ -62,7 +62,7 @@ DrBCurDkNm	$8430	$8430	$fab7	18 | 16 Bytes	This is the disk name of the current 
 DrCCurDkNm	$88dc	$88dc	$fac7	18 | 16 Bytes	This is the disk name of the current disk in drive C.
 DrDCurDkNm	$88ee	$88ee	$fad7	18 | 16 Bytes	This is the disk name of the current disk in drive D.
 driveData	$88bf	$88bf	n/a	4 Bytes		One byte is reserved for each disk drive, to be used by the ...
-driveType	$848e	$848e	$faf3	4 Bytes		There are 4 bytes at location driueType, one for each of four ...
+driveType	$848e	$848e	$faf3	4 Bytes		There are 4 bytes at location driveType, one for each of four ...
 drSizeHi	n/a	n/a	$fafb	4 Bytes		The high bytes of the sizes of the four possible ...
 drSizeLo	n/a	n/a	$faf7	4 Bytes		The low bytes of the sizes of the four possible ...
 extclr		$20	$20	n/a	Byte		Holds value for exterior (border) color.
@@ -86,7 +86,7 @@ inputData	$8506	$8506	$0247	4 Bytes		This is where input drivers pass device spe
 inputDevName	$88cb	$88cb	$08cc	17 | 16 Bytes	String that holds the name of the current input device.
 inputVector	$84a5	$84a5	$020a	Word		Pointer to routine to call on input device change.
 intBotVector	$849f	$849f	$0204	Word		Vector to routine to call after the operating system interrupt ...
-interleave	$848c	$848c	n/a	Byte		Variable uused by BlkAlloc routine as the desired interleave when ...
+interleave	$848c	$848c	n/a	Byte		Variable used by BlkAlloc routine as the desired interleave when ...
 intSource	n/a	n/a	$02c6	Byte		Byte to indicate where interrupts are coming from on the Apple.
 intTopVector	$849d	$849d	$0202	Word		Vector to routine to call before the operating system interrupt ...
 invertBuffer	n/a	$1ced	n/a	80 Bytes	Buffer area used to speed up the 80 colunn InvertLine routine.
@@ -97,8 +97,8 @@ keyVector	$84a3	$84a3	$0208	Word		Vector to routine to call on keypress.
 leftMargin	$35	$35	$0220	Word		Leftmost point for writing characters.
 MachineType	n/a	n/a	$02c4	Byte		Type of Apple machine.
 maxMouseSpeed	$8501	$8501	$027d	Byte		Maximum speed for mouse cursor.
-mcmclr0		$d025	$d025	n/a	Byte 		This is the variable for nuiti-color node colors 0.
-mcmclr1		$d026	$d026	n/a	Byte 		This is the variable for nuiti-color node colors 1.
+mcmclr0		$d025	$d025	n/a	Byte 		This is the variable for multi-color mode colors 0.
+mcmclr1		$d026	$d026	n/a	Byte 		This is the variable for multi-color mode colors 1.
 MenuNumber	$84b7	$84b7	$0228	Byte		Number of currently working menu.
 minMouseSpeed	$8502	$8502	$027e	Byte		Minimum speed for mouse cursor.
 minutes		$851a	$851a	$f204	Byte		Variable for minutes for time of day clock.
@@ -162,7 +162,7 @@ obj4Pointer	$8ffc	$8ffc	n/a	Byte		Pointer to the picture data for sprite 4.
 obj5Pointer	$8ffd	$8ffd	n/a	Byte		Pointer to the picture data for sprite 5.
 obj6Pointer	$8ffe	$8ffe	n/a	Byte		Pointer to the picture data for sprite 6.
 obj7Pointer	$8fff	$8fff	n/a	Byte		Pointer to the picture data for sprite 7.
-offFlag		n/a	n/a	$027c	Byte		Flag telling whether the wouse needs to be redrawn.
+offFlag		n/a	n/a	$027c	Byte		Flag telling whether the mouse needs to be redrawn.
 otherPressVec	$84a9	$84a9	$020e	Word		Vector to routine that is called when the mouse button is ...
 pressFlag	$39	$39	$08fe	Byte		Flag to indicate that a new key has been pressed.
 PrntDiskName	$8476	$8476	n/a	18 Bytes	Disk name that current printer driver is on.
@@ -210,7 +210,7 @@ sspr5back	n/a	$17d3	$5c10	294 | 336 Bytes	For the soft sprites #5, there is a bu
 sspr6back	n/a	$18f9	$5d60	294 | 336 Bytes	For the soft sprites #6, there is a buffer in the ...
 sspr7back	n/a	$1a1f	$5eb0	294 | 336 Bytes	For the soft sprites #7, there is a buffer in the ...
 string		$24	$24	$53	Word		Used by GEOS as a pointer to string destinations for routines ...
-StringFaultVec	$84ab	$84ab	$0210	Word		Vector called when an attenpt is made to write a character ...
+StringFaultVec	$84ab	$84ab	$0210	Word		Vector called when an attempt is made to write a character ...
 stringX		$84be	$84be	$022e	Word		The X position for string input.
 stringY		$84c0	$84c0	$0230	Byte		The Y position for string input.
 sysDBData	$851d	$851d	$0259	Byte		Variable that is used internally to indicate which icon caused ...
@@ -218,7 +218,7 @@ sysFlgCopy	$c012	$c012	n/a	Byte		This is a copy of the sysRAMFlg that is saved h
 sysRAMFlg	$88c4	$88c4	n/a	Byte		If RAM expansion in, Bank 0 is reserved for the Kernal's use.
 totNumBlks	n/a	n/a	$f60b	Word		Total number of blocks in current volume.
 turboFlags	$8492	$8492	n/a	4 Bytes		The turbo state flags for drives 8 through 11 on Commodore.
-usedRecords	$8497	$8497	$f619	Byte		Holds the nunber of records in an open VLIR file.
+usedRecords	$8497	$8497	$f619	Byte		Holds the number of records in an open VLIR file.
 vdcClrMode	n/a	$88be	n/a	Byte		Holds the current color mode for C128 color routines.
 version		$c00f	$c00f	$e00c	Byte		Holds byte indicating what version of GEOS is running.
 windowTop	$33	$33	$021e	Byte		Top line of window for text clipping.

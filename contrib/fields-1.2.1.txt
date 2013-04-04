@@ -1,0 +1,70 @@
+fields-1.2.1 - some optimizations and minor code fixes
+Written by Joseph Rose, packed on 09-19-2009
+Contact info in file
+Versions compiled for c64, c128, Plus/4, Apple 2, should be portable to
+	other computers
+Uses conio.
+Compiled on cc65 2.12.0.
+
+------------------------------------------------------------------
+History:
+1.0.0:
+	*	First release.
+1.0.0a:
+	*	Finished documentation.  It was incomplete.
+1.1.0:
+	*	Optimized code.  Cut about 1k from the C64 demo before other
+		modifications.  Also added optimizations recommended by
+		Greg King, a user of Fields.
+	*	Hard-coded screen size.  C128 and defaults to 80 column, other
+		computers 40.  Apple 2 gets 24 lines, others 25.
+	*	Added check box.
+	*	Made return data external to field data.
+	*	There was a bug where you couldn't type to the right of a
+		text or number field.  That bug was fixed.
+1.2.0:
+	*	More optimizing.  Decreased C64 demo size from 9.74k to 9.19k
+		before other improvements.
+	*	Added menu support.
+	*	Apple 2e support now tested.
+1.2.1:
+	*	Even more optimizing.
+	*	Bug fixed with menu support.  It didn't deselect submenus
+		properly after submenu cancel and reselection.
+	*	Text/number edit field now inserts text instead of overwriting
+		it.
+	*	Apple 2 cursor now supported.
+	*	Numbers are now signed.
+
+Known bugs:
+	*	Support for pre-C64 CBM computers and Apple 2 non-enhanced 
+		untested.
+
+To Do:
+	*	String compression
+	*	Long suppport
+	*	Limit field key entries (i.e. all caps, password,
+		letters/numbers, digits only...)
+	*	Custom-handling of field changes (Call user code on
+		field change)
+	*	Windows
+	*	Menu routine calls menu code directly
+	*	40-column C128 and 80-column Apple
+
+------------------------------------------------------------------
+To install:
+1.	Download the ZIP file.
+2.	Uncompress it, keeping directory structure intact, to a
+	convenient directory on your computer, i.e. 
+	cc65/lib/fields.
+3.	Copy the contents of the distribution's lib directory
+	to cc65's lib directory and the include directory to cc65's include
+	directory.
+
+Now the installation is complete.
+------------------------------------------------------------------
+
+	If you find this library useful, please contact me via e-mail.  My
+e-mail address is maspethrose7@aol.com.  Please start the subject with "To
+Joseph" so I can get it, as I share my address with someone else.  I am an
+egotist, and I like to hear that I did a job well done.  :)

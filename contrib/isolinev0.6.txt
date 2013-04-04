@@ -1,0 +1,19 @@
+This was meant as a trial, how to display rotating stripes on the screen. 
+The method is explained in the file isoline.c
+This program should compile for all platforms with conio library, but colors may change.
+It was last compiled with the cc65 Version 2.11.0
+
+Use "cl65 -l -Oirs isoline.c" to compile the program.
+
+This is Version 0.6 and may be the last one.
+
+To generate the sintable needed for the rotation i used
+"Wixbouncer V1.1/Style" (http://style64.org).
+
+The difference to version 0.5 is, that i used signed chars instead of 
+signed ints wherever possible and that i shortened the sintable by 24 bytes.
+To calculate the size of it i can not use sizeof(sinus)/sizeof(int)/2 anymore,
+because the sinus is only 1.25 times in memory.
+So i indroduced a constant specifying the size of the unrepeated sinus.
+
+Monte Carlos/Cascade, april 2006.

@@ -1,0 +1,12 @@
+GenCart64 - cc65 Library for C64 cartridges
+by Joseph Rose, a.k.a. Harry Potter
+-------------------------------------------
+*  Works under some c64 emulators
+*  Multiple cartridge types
+*  Simple graphics demos--other demos
+   coming soon!
+-------------------------------------------
+This software is in its preliminary stages.
+However, I think it's still useful.  :)
+-------------------------------------------
+Compiled with cc65 2.13.3

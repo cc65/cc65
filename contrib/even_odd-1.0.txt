@@ -1,0 +1,52 @@
+Diamond-Effect V1.0
+Draws a colorful caro effect on the screen.
+
+Compiled with CC65 2.11.9
+Compatible with all systems supporting conio.h
+
+by
+Monte Carlos / Cascade on 24.3.2008
+-----------------------------------
+
+This program draws a colorful diamond on the screen.
+It can only be compiled, if the target system features
+"conio.h".
+
+The size of the diamond can be given by command line
+parameters using the "run:rem par1, par2" syntax.
+The spaces before the parameters are important!
+Given too large x or y sizes or a wrong number of
+parameters will be prompted with an error message.
+
+The speciality of this routine is, that it always draws
+a symmetric diamond independent on the odd- or evenness
+of the x respectively y-size of the drawing area.
+This is not trivial.
+When the drawing area is of even size,
+it is divided in a left and a right half and the
+zero lies between the middle two chars.
+When the drawing area is of odd size,
+is is divided in three parts:
+The left third, the middle char with the coordinate zero
+and the right third.
+How can we make a routine compatible to both cases?
+
+The solution is to use virtual a double x and y-screensize.
+All even virtual coordinates belong to the screenpixels
+0,1,2,3,4....
+All odd virtual coordinates belong to the mid of the screenpixels
+0.5, 1.5, 2.5, ...
+With this convention the start and end pixels have always the
+virtual coordinates -(size-1) and (size-1).
+Try to understand this with the help of the pdf-document, it
+will get really clear.
+
+In the loop, which draws the diamond the coordinates x and y
+start with -(size-1) and run till (size-1) in steps
+of 2.
+The values given to gotoxy are therefore just the half
+of x respectively y plus an offset.
+Look into the pdf, which is included in the release.
+There you can see, how the origin of the real screen
+is moved by half an pixel and therefore the area is
+placed always centro symmetric.

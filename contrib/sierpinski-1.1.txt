@@ -1,0 +1,26 @@
+Sierpinski Triangle V1.1 TGI version compiled with cc65 V 2.13.9
+Free to use for any purpose
+
+How to compile?
+
+C64:
+Invoke "cl65 -t c64 -Ois sier.c" and assure, that the right version of
+"c64-hi.tgi" is in the same directory as the executable. Then simply drag the
+executable into vice or copy both executable and "c64-hi.tgi" onto a disk to
+run on a real machine.
+
+C128:
+Invoke "cl65 -t c128 -Ois sier.c" and assure, that the right version of
+"c128-vdc.tgi" is in the same directory as the executable. Then simply drag the
+executable into vice or copy both executable and "c128-vdc.tgi" onto a disk to
+run on a real machine.
+
+Apple //e:
+Invoke "cl65 -t apple2enh -Ois --start-addr 0x4000 sier.c" and copy both the
+executable and the right version of "a2e.hi.tgi" onto a disk.
+
+Atari 8-bit:
+Invoke "cl65 -t atari -Ois -Wl -D__RESERVED_MEMORY__=0x2000 sier.c" and copy
+both the executable and the right version of "atari8.tgi" onto a disk.
+
+Admittely some of the code was copied out of the tgi demo delivered with cc65.

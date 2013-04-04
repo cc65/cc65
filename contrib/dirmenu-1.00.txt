@@ -1,0 +1,4 @@
+dirmenu - Directory menu program for CBM computers (C64, C128, CBM264 series)
+Compiled with cc65 snapshot 2009-09-18.
+By Joseph Rose, a.k.a. Harry Potter
+Freeware--use as you wish!

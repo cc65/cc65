@@ -1,0 +1,14 @@
+rand.s is a replacement for cc65's rand() funcion.
+Created by Joseph Rose, a.k.a. Harry Potter
+--------------------------------------------------
+To replace the normal function, just include the
+rand.s file into your program at the command line.
+
+For a modified random number (i.e. a number
+facored into the random number generator) use the
+function w/ prototype:
+
+	int __fascall__ rand2 (int);
+
+Pass to the function the number to factor to
+rand2().

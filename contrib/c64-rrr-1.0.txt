@@ -1,0 +1,141 @@
+C64-RRR.EMD
+
+Version 1.0
+compiled with cl65 v2.11.9 for target c64.
+
+21.08.2006
+hannenz@freenet.de
+http://people.freenet.de/hannenz
+
+FILES INCLUDED
+--------------
+
+c64-rrr.emd		compiled driver module ready to load and use from cc65-code
+c64-rrr.s		source code of driver
+README			this file
+c64-rrr.d64		a disk image containing this and some other em-drivers alongside with some small test programs.
+em-test.c		the em-test source code written by UZ and slightly modified by me 
+			(pass driver name as command line argument, defaults to "c64-rrr.emd" if no argument is given)
+em-test2.c		another em-test, written by me. self explaining.
+
+the executables of em-test and em-test2 are provided on the disk image!
+
+WHAT IS IT?
+-----------
+
+C64-rrr.emd is a (loadable) driver for use with cc65 development. It allows access to the 32K of RAM on the Retro Replay Cartridge for use as extendede memory, just like a REU for example.
+
+Once loaded, it may be accessed through the functions definded and described in "em.h"
+These are:
+
+em_install
+em_uninstall
+em_pagecount
+em_use
+em_map
+em_commit
+em_copyfrom
+em_copyto
+
+Please refer to the file "em.h" in the include directory of your cc65-distribution for detailed information about those functions.
+
+USAGE
+-----
+
+To use the driver it must be loaded with em_load_driver at runtime. include something like
+
+	em_load_driver("c64-rrr.emd");
+
+into your code to load the driver module.
+The function em_load_driver calls em_install(void*) itself!! (Install checks the presence of a RetroReplay hardware) and returns an error code. (see em.h)
+
+Now, all functions may be called just as with any other em-driver:
+
+The function em_pagecount() returns the number of available pages (256-byte-chunks) of extended memory which will always be 128 with c64-rrr.emd.
+
+There are basically two ways how to make use of the driver. 
+
+em_uninstall is obligatory, it does nothing.
+
+1) EM_USE, EM_MAP and EM_COMMIT
+-------------------------------
+
+These functions provide a 256-byte window in regular memory which contains a mirror of a certain page in extended memory. If you call em_use(page), the driver will just remember that you want to use the specified page in extended memory - nothing more - and will return a pointer to the 256-byte-memory-window. 
+Now you can write anything to the memory-window. The contents of the window are transfered to extended memory by calling em_commit(). This means writing the window-contents into rr-ram to the current page set by em_use or em_map.
+
+Calling em_map(page) reads the contents of the desired page into the memory-window and also returns the adress of the mmeory window as a pointer. This means reading a page from rr-ram into the window.
+
+2) EM_COPYTO & EM_COPYFROM
+--------------------------
+
+These fnuctions are more flexible, since you can specify exactly how many bytes should be transfered from or to extended memory and which memory locations should be used.
+You have to setup a struct variable of type em_copy (defined in em.h) which contains the necessary data:
+
+--8<---- copied from em.h ------------------------
+
+/* Parameters for the em_copy_... functions. NOTE: The first seven bytes
+ * have the same order and alignment as needed for the Commodore REU, so
+ * don't change the order without changing the assembler file that defines
+ * the struct offsets and the code in the REU driver.
+ */
+
+struct em_copy {
+    void*           buf;        /* Memory buffer to copy from or to */
+    unsigned char   offs;       /* Offset into page */
+    unsigned        page;       /* Starting page to copy from or to */
+    unsigned        count;      /* Number of bytes to copy */
+    unsigned char   unused;     /* Make the size 8 bytes */
+};
+
+---------------------------------------------------
+
+So you just set up the values of the struct fields as desired and then call em_copyfrom or em_copyto with the adress of the struct variable passed as argument. an example: Transfering 1876 bytes from 0x8207 into extended memory adress 0x1234:
+
+em_copy x;
+x.buf = 0x8207:		/* c64 adress (linear memory) */
+x.offs = 0x1234 & 255	/* lo byte of extended memory adress */
+x.page = 0x1234 >> 8;	/* hi byte of extended memory adress */
+x.count = 1876;
+
+em_copyto(&x);		/* call function */
+
+the other way round should be quite clear...?!
+
+NOTE1:
+------
+
+This driver should work with the Action Replay as well!! But in fact i could not test this, because i don't own such a thing.
+If you have one, please test it and report me, if the driver is running as well!
+
+
+NOTE2:
+------
+
+PLease keep in mind that when running under some sort of OS on ROM (like RR-ROM, TFR or AR-ROM and the like) your usage of RR-RAM will most propably conflict with the OS. No problem as long as your program runs and doesn't rely on anything concerning the ROM, but there will be most likely problems when exiting your program and control passing back to the OS. Best will be to end your programm with a reset ($fce2 or something) or not to end it at all ;)
+
+NOTE3:
+------
+
+All driver functions will leave with $00 in $de00, which means standard memory config: $8000-$9fff c64 RAM, $a000-$bfff BASIC and $e000-$ffff KERNAL. (depending on $01 of course). The driver doesn't change anything in $01.
+
+If you want to write your own ROM and use this driver it should propably return with RR-ROM enabled, recompile it and change all occurances of 
+
+	lda #2
+	sta $de00
+
+to
+	lda #0
+	sta $de00
+
+or whatever mem-config you need...
+
+
+NOTE4:
+The driver code is compiled with cl65 and the option --module:
+
+>cl65 -o c64-rrr.emd --module c64-rrr.s
+
+
+
+Bugs, remarks and suggestions are welcome! just leave me an email at hannenz@freenet.de
+

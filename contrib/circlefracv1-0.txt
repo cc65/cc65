@@ -1,0 +1,24 @@
+*** Circle Frac V1.0 by Monte Carlos / Cascade ***
+
+Recursively drawing of circles using the "tiny graphics interface"(TGI) for CC65.
+Tested on C64(VIC, 320x200), C128 (VDC, 640x200 and 640x480).
+
+Simply compile with:
+cl65 -tC64|C128 -Oirs -o circlefrac
+
+The program uses command line args to let the user specify how to draw the circles.
+If you just type RUN, after you loaded the program with the C64/C128, you get a
+short explanation on how to use these args.
+
+The TGI Routines load the standard driver for the specified system. This is
+"c64-hi.tgi" on the C64 platform and "c128-vdc.tgi" (640x200) on the C128 platform.
+If you want to use the 640x480 resolution, just rename the TGI driver "c128-vdc.tgi" to
+"c128-vdc1.tgi" and the driver "C128-vdc2.tgi" to "c128-vdc.tgi" so that the
+program "thinks" it would still load the standard driver.
+If you want to use 640x200 resolution again, just undo renaming of the drivers.
+There is currently no way to detect, which drivers are available on which platform. So made the decision for this work around.
+
+
+Monte Carlos on 14th of october 2012
+
+Contact: montecarlos@gmx.net

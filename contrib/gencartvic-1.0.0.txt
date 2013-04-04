@@ -1,0 +1,10 @@
+GenCartVic by Joseph Rose, a.k.a. Harry Potter
+Vic-20 cartridge library for general-purpose applications.
+Files are based on Ullrich von Bassewitz's Vic-20 cc65 library.
+---------------------------------------------------------------
+Compiled under cc65 snapshot 2009-09-18.
+
+Should work on most software!
+
+To install, unzip to its own directory, perhaps to cc65\lib\gencartvic and
+follow the instructions in the manual.

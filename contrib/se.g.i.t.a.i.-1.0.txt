@@ -1,0 +1,62 @@
+Se.g.i.t.a.i/Cascade
+Sources Version 1.0
+Compiled with CC65 2.11.9
+
+
+This is the source pack to the BCC-Party 2007 Release
+"Se gitai o Ilios" (http://www.berlinc64club.de and
+http://noname.c64.org/csdb/release/?id=56368)
+
+
+To compile the sources you need a newer version of make
+(http://www.gnu.org/software/make/), because older
+versions have a bug which make "make" quit with
+"Error -1" under some unknown circumstances.
+
+The source-tree has following structure:
+
+The Intro and the Main-Part has 2 distinct folders
+with some sub-directories added.
+In the root-dir there is the main-program of the intro, 
+the linker config file, the makefile and the executable. 
+The folder "subs" contains all the subroutines, 
+which must be compiled seperately and 
+linked to the main-program.
+The folder datafiles contains all the stuff which is 
+appended with ".incbin". 
+Under "subs\headers" are all the prototypes found,
+which are included in the C-parts of the program.
+
+The Main-Part is hiding in the directory "mountains",
+which also contains the folders "datafiles", "subs"
+and headers. The main-part has a seperate makefile,
+which should be executed by changing to the directory
+"mountains" and then type make.
+The main-part also has a seperate linker-config file.
+
+Normally make only executes all the steps necessary to
+compile the parts of the program, which changed.
+If you don't want that (for example, if you only changed
+a header file), then type "make clean".
+In the makefile for the main-part there is a flag called 
+"DEBUG". This flag has nothing to do with "NDEBUG" 
+used by "assert.h".
+If "DEBUG" is 1, then you don't get the pretty part, like
+you maybe expect to see. Instead you see bars in the border
+representing how much rastertime the routines need and a
+debug sprite layer and debug rasterbars.
+The 3 pixel high area in the sprite layer reflects the 
+area covered entirely by the clowds. This is the
+switching area, where the background colors and charsets
+and softscroll registers are changed.
+Create the paralax.exo by hand (exomizer sfx basic -n -o paralax.exo paralax.run).
+
+The intro linked together with the paralax.exo is to big to fit into 
+the lower $d000 bytes of memory. You can only load it with cards (for example AR, RR)
+or you must first compress it with exomizer and then load it.
+
+
+
+If you have more questions, then mail me:
+
+montecarlos(aeeetsch)gmx.net

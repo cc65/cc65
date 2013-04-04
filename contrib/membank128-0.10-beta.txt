@@ -1,0 +1,28 @@
+MemBank128 v. 0.10 Beta
+by Joseph Rose, a.k.a. Harry Potter
+-----------------------------------
+Expands the available memory on the C128 as follows:
+
+*	Your code operates in Bank 0, giving you 56k to play with.  All
+	kernal/IO access will be delegated.
+*	Allows the use of "low RAM" (the first 7k of Bank 0/15) for data.
+	You can put code and initialized data in the 2.25k application
+	buffer.
+*	You can use Bank 1 for data.  You can load initialized data into
+	Bank 1.
+
+These give you 118k+ available RAM, as opposed to cc65's normal 41k, and I
+deem this as magic.
+
+Limits:
+-------
+*	This is a beta version.  Not all library functions are implemented.
+	Unimplemented modules are in the distribution's deflib\ directory.
+*	Some functions may not be fully debugged.
+*	Far memory allocation is not available.
+
+Feedback:
+---------
+If you try this program and like it, or you have any suggestions, please
+e-mail me at rose.joseph12@yahoo.com.  Encouragement will inspire me to
+continue to develop this software.

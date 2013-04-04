@@ -1,0 +1,29 @@
+What is this thing for???
+
+This is a little library for depacking Amica Paint and Zoomatic pictures.
+It is designed for the C64, but it probably runs on other machines with vic.
+The testprograms testamica and testzoom don't run on other machines than c64,
+because i don't know the pokes to initialize gfx modes on non-c64's.
+
+This Version is a little bit improved, as it doesn't bug when rle sequences 
+overlap with two areas, for example screen and bitmap. Even the background color
+bytes gets depacked for this reason. You can't be sure that it is the last byte of
+the data, because it could be part of a rle sequence.
+
+Planned is to put the two different depack modules into different files, so that they can
+be linked separetedly. Further i plan a lib for initializing different c64 modes. The
+procedures should return the adresses of the bitmap/screen/(colorram) area.
+Further it should initialize valid combinations of them, only. There should be the
+possibility to switch pages, if there is enough memory free. The gfx locations used
+should depand on the memory model used. 
+The problem is about the many pemutations of valid bitmap/screen/vicbank combinations
+and that the program must get some information out of the config file.
+Perhaps someone has ideas about that. Perhaps he/she would do it in a different way. 
+Succestions are welcome.
+
+The code is still very untidied. Will be fixed in unknown future.
+
+The compiler version used was cc65-2.10.0.
+
+Carlos/Cascade 13.4.2004
+

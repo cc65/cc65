@@ -1,0 +1,7 @@
+The program circle.c should compile on any platform supporting conio and command line
+arguments. Remember, c64 passes arguments to main in this form: run:rem,arg1,arg2,arg3.
+
+The compiler version used is v2.10.0.
+
+Carlos/Cascade 13.4.2004
+

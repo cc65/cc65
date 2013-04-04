@@ -1,0 +1,20 @@
+This is Version 1.1 of a non-recursive algorithm to draw a dragon curve.
+
+The way how the curve is drawn is described in paperfolding.pdf.
+
+It uses tgi.h to plot the curve, so it only runs on platforms supporting
+tgi and at least 320x200x2 resolution.
+The short assembler routine should run on any 6502 compatible processor,
+so if you want to get it run on some other platform, you have rewrite only
+the draw functions.
+
+To compile the program do not forget to link the machine code:
+
+cl65 -t c64 -Ois drachen.c testbits.s
+cl65 -t c128 -Ois drachen.c testbits.s
+cl65 -t apple2enh -Ois --start-addr 0x4000 drachen.c testbits.s
+cl65 -t atari -Ois -Wl -D__RESERVED_MEMORY__=0x2000 drachen.c testbits.s
+
+Monte Carlos 
+
+Apr 2006

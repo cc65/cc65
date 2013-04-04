@@ -1,0 +1,13 @@
+AltInput - an alternate line input routine
+for cc65
+by Joseph Rose, a.k.a. Harry Poter
+------------------------------------------
+*	Should compile for most targets
+*	Simply compile this module with your
+	program and call the GetInput()
+	routine, passing a pointer to the
+	text buffer in In and the max. len.
+	in InLen.
+
+If you like this idea or have any suggestions,
+please e-mail me at rose.joseph12@yahoo.com.

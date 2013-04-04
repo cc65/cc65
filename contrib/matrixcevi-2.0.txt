@@ -1,0 +1,5 @@
+Programme: Matrix screen saver
+Target: C64, C128
+Author: Markus Stehr aka. BastetFurry (c)2005
+Contributor: Stefan Haubenthal (optimisations, C128 port)
+Licence: GPL

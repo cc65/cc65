@@ -1,0 +1,4 @@
+VicText: Simple Vic-20 text demo for cc65.
+By Joseph Rose, a.k.a. Harry Potter
+Compiled with cc65 v. 2.13.0
+Uses the conio library.

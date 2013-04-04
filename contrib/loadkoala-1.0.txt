@@ -1,0 +1,12 @@
+cc65 koala viewer for the C64
+
+Just a small example of how to load graphics into memory.
+This program hereby put in the public domain, do whatever
+you want with this source.
+
+Compiled using cc65 version 2.8.0.
+
+The Cyberwing title screen was drawn by TMR/Cosine who
+graciously allowed me to include it as an example picture.
+
+MagerValp@cling.gu.se 2002-11-29

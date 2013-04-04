@@ -1,0 +1,38 @@
+HUFFMAN ENCODER/ DECODER     
+
+This Zip-Archive (huffman-1.0.zip) contains the following:
+
+ huffman.c
+ decoder.c
+ huffman.prg
+ decoder.prg
+ huffman.txt
+
+huffman.c is the source code for a huffman encoder. It encodes a given file
+using huffman codes and writes compressed data into the output file.
+
+decoder.c is the counterpart: it decodes files compressed with the encoder and
+writes the uncompressed data to a given output file or - if none is given - to
+stdout.
+
+huffman.prg precompiled binary for c64
+decoder.prg precompiled binary for c64
+
+huffman.txt is this file.
+
+I achieved compression ratios of about 60%-80% for text files, 70%-90% for gfx
+data files using this one. There is almost no compression for binaries
+(program files and the like).
+
+both source codes compile under CC65 V2.11.0 and for C64 target. Since there
+is rarely system specific code in it it should compile for all other targets
+too but i did't try yet. By replacing the <cbm.h> file-I/O with <stdio.h>
+file-I/O it should even compile with any C-Compiler for any platform with a
+little bit of RAM.
+
+you can do whatever you like with the sources, most likely compile it with
+CC65 and use on a C64 ;)
+
+written by johannes braun,
+contact me at hannenz@freenet.de or visit http://people.freenet.de/hannenz
+

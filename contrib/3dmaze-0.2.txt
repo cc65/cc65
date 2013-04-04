@@ -1,0 +1,34 @@
+Stefan Haubenthals port of 3dmaze to the cc65 TGI API.
+
+Build for the C64:
+cl65 -t c64 -Ois 3dmaze.c
+
+Build for the C128:
+cl65 -t c128 -Ois 3dmaze.c
+
+Build for the Apple //e:
+cl65 -t apple2enh -Ois --start-addr 0x6000 -Wl -D__STACKSIZE__=0x100 3dmaze.c
+
+Build for the Atari 8-bit:
+cl65 -t atari -Ois -Wl -D__RESERVED_MEMORY__=0x2000 3dmaze.c
+
+From http://www.frenzy.com/~jaebear/code/legal.html:
+
+-------------------------------------------------------------------------------
+All sourcecodes contained herein may be used for personal knowledge and
+educational purposes. No monies are to be earned for redistribution of the
+source within this webpage. Unless otherwise specified, all sourcecode on this
+web page is freely distributable, with the exception of the HTML markup and
+the text therein.
+
+There is no warranties or guarantees for the sourcecode supplied on this
+webpage, and although all source has been thoroughly tested before it's use on
+this page, I cannot guarantee that it all works all the time. I also do not
+take responsibility for any unforseen damage which the source code on this
+page may cause.
+
+If you have any questions about the source on my webpages, please feel free to
+email me at jcordes@cs.nmsu.edu I will try and answer all questions sent, but
+time may not allow a rapid or complete response.
+-------------------------------------------------------------------------------
+

@@ -1,0 +1,26 @@
+Pet Tetris V1.3 by Tim Howe, 15 March 2010.
+
+This is probably the last game EVER to be written for the PET!
+It is 30% assembly code and 70% C, and has been compiled with
+cc65 version 2-12-0.
+
+It requires a 40 column Commodore PET with BASIC 2 ROMS. Unfortunately
+it does not run under BASIC 4 (4000 series). This may be something
+that I (or someone else) can rectify in due course.
+
+There are 3 versions available:
+
+tetris (the source included here) - This is the standard version and will
+run in 16 or 32k (models 3016 or a 3032).
+
+8ktetris - This is a cut down version that fit into 8k (model 3008).
+
+dactetris - This 'mega' version has wave sound effects.
+To hear them, you will need an 8-bit DAC connected to the PET USER port.
+This version requires a 32k mackine (3032). Email for source.
+
+Latest binaries should be available from
+        www.zimmers.net/anonftp/pub/cbm/pet/games/english/
+
+
+

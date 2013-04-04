@@ -1,0 +1,5 @@
+quikman-2008.11.1 - A hires Pac-Man clone for the unexpanded VIC20.
+Written by Robert Hurst on 2008-11-01. For questions or suggestions
+contact me at robert@hurst-ri.us.
+Developed using ca65 version 2.12.0
+Tested on the VIC20 using VICE and MESS.

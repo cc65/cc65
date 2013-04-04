@@ -1,0 +1,32 @@
+Hidden64 Beta Version 0.21
+By Joseph Rose, a.k.a. Harry Potter
+Working magic in the computer community
+Upgraded to cc65 Snapshot 12.13.9
+------------------------------------------
+Hidden64 is a cc65 library for C64 programmers that provides near-direct
+access to the 12k of RAM behind the I/O and kernal ROM of a C64 normally
+inaccessible to cc65 programs.  It also provides access to the tape
+buffer as BSS RAM.  This version is incomplete.  In particular, the manual
+and example program are incomplete and I should eventually add more
+functions and examples to the library.  However, it works!
+------------------------------------------
+I look forward to any feedback regarding this software.  You can e-mail me
+at my new address: rose.joseph12@yahoo.com.
+------------------------------------------
+New:
+
+*	hstricmp(), hstrncpy()
+*	low memory buffer space is made available
+*	an alternate configuration for treating 61k as one
+	block
+*	get hidden strings into *printf() fields
+*	hang-man demo
+
+Planned:
+
+*	memory allocation functions for Hidden RAM
+*	alternate start-up files to reset upon exit--my memory config-
+	urations may need it at times
+*	thinking about a fake command-prompt and trying to figure out how
+	to implement one
+*	a brain storm demo

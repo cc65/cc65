@@ -1,0 +1,4 @@
+CBM Simple-I/O printf() replacement
+Joseph Rose, a.k.a. Harry Potter
+Helps write more compact code
+Try me out!

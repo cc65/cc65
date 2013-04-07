@@ -278,7 +278,7 @@ void ObjAdd (const char* Name)
     /* Initialize the object module data structure */
     O->Name     = xstrdup (Module);
     O->Flags  	= OBJ_HAVEDATA;
-    O->MTime  	= StatBuf.st_mtime;
+    O->MTime  	= (unsigned long) StatBuf.st_mtime;
     O->Start    = 0;
 
     /* Determine the file size. Note: Race condition here */

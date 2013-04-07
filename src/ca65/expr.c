@@ -1031,7 +1031,7 @@ static ExprNode* Factor (void)
 	    break;
 
 	case TOK_TIME:
-	    N = GenLiteralExpr (time (0));
+	    N = GenLiteralExpr ((long) time (0));
 	    NextTok ();
 	    break;
 

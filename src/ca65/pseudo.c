@@ -1267,7 +1267,7 @@ static void DoIncBin (void)
     }
 
     /* Add the file to the input file table */
-    AddFile (&Name, FT_BINARY, Size, StatBuf.st_mtime);
+    AddFile (&Name, FT_BINARY, Size, (unsigned long) StatBuf.st_mtime);
 
     /* If a count was not given, calculate it now */
     if (Count < 0) {

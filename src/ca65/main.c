@@ -600,7 +600,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr, "ca65 V%s - %s\n", GetVersionAsString (), Copyright);
+    fprintf (stderr, "ca65 V%s\n", GetVersionAsString ());
 }
 
 

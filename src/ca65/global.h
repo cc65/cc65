@@ -85,9 +85,6 @@ extern unsigned char    CComments;          /* Allow C like comments */
 extern unsigned char    ForceRange;         /* Force values into expected range */
 extern unsigned char    UnderlineInNumbers; /* Allow underlines in numbers */
 
-/* Misc stuff */
-extern const char       Copyright[];        /* Copyright string */
-
 
 
 /* End of global.h */

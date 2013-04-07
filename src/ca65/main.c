@@ -65,7 +65,6 @@
 #include "istack.h"
 #include "lineinfo.h"
 #include "listing.h"
-#include "macpack.h"
 #include "macro.h"
 #include "nexttok.h"
 #include "objfile.h"
@@ -526,18 +525,6 @@ static void OptListing (const char* Opt, const char* Arg)
 
 
 
-static void OptMacPackDir (const char* Opt attribute ((unused)), const char* Arg)
-/* Set a macro package directory */
-{
-    /* Make a string buffer from Arg */
-    StrBuf Dir;
-
-    /* Use the directory */
-    MacPackSetDir (SB_InitFromString (&Dir, Arg));
-}
-
-
-
 static void OptMemoryModel (const char* Opt, const char* Arg)
 /* Set the memory model */
 {
@@ -891,7 +878,6 @@ int main (int argc, char* argv [])
         { "--large-alignment",  0,      OptLargeAlignment       },
         { "--list-bytes",       1,      OptListBytes            },
 	{ "--listing", 	       	1,	OptListing		},
-        { "--macpack-dir",      1,      OptMacPackDir           },
         { "--memory-model",     1,      OptMemoryModel          },
 	{ "--pagelength",      	1,	OptPageLength		},
         { "--relax-checks",     0,      OptRelaxChecks          },

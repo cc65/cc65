@@ -21,9 +21,6 @@ override CFLAGS += -DCA65_INC=$(CA65_INC)
 EBIND	= emxbind
 LDFLAGS	=
 
-# Perl script for macro file conversion
-CVT=macpack/cvt-mac.pl
-
 # -----------------------------------------------------------------------------
 # List of all object files
 
@@ -45,7 +42,6 @@ OBJS =  anonname.o      \
 	istack.o       	\
 	lineinfo.o	\
 	listing.o      	\
-	macpack.o      	\
 	macro.o	       	\
 	main.o 	       	\
 	nexttok.o      	\
@@ -72,12 +68,6 @@ OBJS =  anonname.o      \
 # -----------------------------------------------------------------------------
 # List of all macro files
 
-INCS =	atari.inc       \
-	cbm.inc		\
-	cpu.inc		\
-	generic.inc	\
-	longbranch.inc
-
 LIBS = $(COMMON)/common.a
 
 # ------------------------------------------------------------------------------
@@ -93,17 +83,15 @@ all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-$(EXE):	$(INCS) $(OBJS) $(LIBS)
+$(EXE):	$(OBJS) $(LIBS)
 	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
-
-inc:	$(INCS)
 
 clean:
 	$(RM) *~ core.* *.map
 
 zap:	clean
-	$(RM) *.o $(EXE) $(INCS) .depend
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies
@@ -112,31 +100,3 @@ zap:	clean
 depend dep:	$(INCS) $(OBJS:.o=.c)
 	@echo "Creating dependency information"
 	$(CC) $(CFLAGS) -MM $(OBJS:.o=.c) > .depend
-
-# -----------------------------------------------------------------------------
-# Rules to make config includes
-
-atari.inc:	macpack/atari.mac
-	@$(CVT) $< $@ MacAtari
-
-cbm.inc:	macpack/cbm.mac
-	@$(CVT) $< $@ MacCBM
-
-cpu.inc:	macpack/cpu.mac
-	@$(CVT) $< $@ MacCPU
-
-generic.inc:   	macpack/generic.mac
-	@$(CVT) $< $@ MacGeneric
-
-longbranch.inc:	macpack/longbranch.mac
-	@$(CVT) $< $@ MacLongBranch
-
-
-
-
-
-
-
-
-
-

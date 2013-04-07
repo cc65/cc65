@@ -67,7 +67,6 @@
 #include "incpath.h"
 #include "instr.h"
 #include "listing.h"
-#include "macpack.h"
 #include "macro.h"
 #include "nexttok.h"
 #include "objcode.h"
@@ -1444,28 +1443,16 @@ static void DoLocalChar (void)
 static void DoMacPack (void)
 /* Insert a macro package */
 {
-    int Package;
-
     /* We expect an identifier */
     if (CurTok.Tok != TOK_IDENT) {
     	ErrorSkip ("Identifier expected");
-    	return;
-    }
-
-    /* Search for the macro package name */
-    LocaseSVal ();
-    Package = MacPackFind (&CurTok.SVal);
-    if (Package < 0) {
-    	/* Not found */
-    	ErrorSkip ("Invalid macro package");
-    	return;
-    }
-
-    /* Insert the package. If this fails, skip the remainder of the line to
-     * avoid additional error messages.
-     */
-    if (MacPackInsert (Package) == 0) {
-        SkipUntilSep ();
+    } else {
+        SB_AppendStr (&CurTok.SVal, ".mac");
+        SB_Terminate (&CurTok.SVal);
+    	if (NewInputFile (SB_GetConstBuf (&CurTok.SVal)) == 0) {
+            /* Error opening the file, skip remainder of line */
+            SkipUntilSep ();
+        }
     }
 }
 

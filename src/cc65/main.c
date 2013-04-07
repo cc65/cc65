@@ -67,7 +67,6 @@
 #include "scanner.h"
 #include "segments.h"
 #include "standard.h"
-#include "svnversion.h"
 
 
 
@@ -712,9 +711,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 	    		const char* Arg attribute ((unused)))
 /* Print the compiler version */
 {
-    fprintf (stderr,
-       	     "cc65 V%s\nSVN version: %s\n",
-       	     GetVersionAsString (), SVNVersion);
+    fprintf (stderr, "cc65 V%s\n", GetVersionAsString ());
     exit (EXIT_SUCCESS);
 }
 

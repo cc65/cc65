@@ -133,9 +133,9 @@ unsigned OptStore2 (CodeSeg* S)
             !RegAXUsed (S, I+1)) {
 
             /* Get the register values */
-            unsigned char A = RI->In.RegA;
-            unsigned char X = RI->In.RegX;
-            unsigned char Y = RI->In.RegY;
+            unsigned char A = (unsigned char) RI->In.RegA;
+            unsigned char X = (unsigned char) RI->In.RegX;
+            unsigned char Y = (unsigned char) RI->In.RegY;
 
             /* Setup other variables */
             CodeEntry*  N;
@@ -205,11 +205,11 @@ unsigned OptStore3 (CodeSeg* S)
             !RegEAXUsed (S, I+1)) {
 
             /* Get the register values */
-            unsigned char A = RI->In.RegA;
-            unsigned char X = RI->In.RegX;
-            unsigned char Y = RI->In.RegY;
-            unsigned char L = RI->In.SRegLo;
-            unsigned char H = RI->In.SRegHi;
+            unsigned char A = (unsigned char) RI->In.RegA;
+            unsigned char X = (unsigned char) RI->In.RegX;
+            unsigned char Y = (unsigned char) RI->In.RegY;
+            unsigned char L = (unsigned char) RI->In.SRegLo;
+            unsigned char H = (unsigned char) RI->In.SRegHi;
 
             /* Setup other variables */
             unsigned    Done = 0;

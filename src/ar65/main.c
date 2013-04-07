@@ -120,9 +120,7 @@ int main (int argc, char* argv [])
 		break;
 
 	    case 'V':
-		fprintf (stderr,
-       	       	       	 "ar65 V%s - (C) Copyright 1998-2012 Ullrich von Bassewitz\n",
-			 GetVersionAsString ());
+		fprintf (stderr, "ar65 V%s\n", GetVersionAsString ());
 		break;
 
 	    default:

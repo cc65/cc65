@@ -57,6 +57,11 @@
 #define va_copy(dest,src)       __va_copy(dest, src)
 #endif
 
+/* MS VC allows for assignment */
+#if defined(_MSC_VER)
+#define va_copy(dest,src)       ((dest) = (src))
+#endif
+
 /* If va_copy is not defined now, we have a problem */
 #if !defined(va_copy)
 #error "Need a working va_copy!"

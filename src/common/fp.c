@@ -99,7 +99,7 @@ Float FP_F_FromInt (long Val)
 /* Convert an integer into a floating point variable */
 {
     Float D;
-    D.V = Val;
+    D.V = (float) Val;
     return D;
 }
 
@@ -164,7 +164,7 @@ size_t FP_D_Size (void)
 unsigned char* FP_D_Data (Double Val)
 /* Return the raw data of a double in a malloc'ed buffer. Free after use. */
 {
-    float F = Val.V;
+    float F = (float) Val.V;
     return memcpy (xmalloc (F_SIZE), &F, F_SIZE);
 }
 

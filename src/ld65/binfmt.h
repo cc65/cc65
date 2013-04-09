@@ -44,11 +44,6 @@
 
 
 
-/* Types of available output formats */
-#define BINFMT_DEFAULT 		0   	/* Default (binary) */
-#define BINFMT_BINARY		1	/* Straight binary format */
-#define BINFMT_O65		2	/* Andre Fachats o65 format */
-
 /* Default format (depends on target system) */
 extern unsigned char DefaultBinFmt;
 

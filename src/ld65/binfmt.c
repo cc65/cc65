@@ -33,6 +33,10 @@
 
 
 
+/* common */
+#include "target.h"
+
+/* ld65 */
 #include "error.h"
 #include "binfmt.h"
 

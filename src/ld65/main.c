@@ -67,7 +67,6 @@
 #include "scanner.h"
 #include "segments.h"
 #include "spool.h"
-#include "tgtcfg.h"
 #include "tpool.h"
 
 
@@ -326,21 +325,6 @@ static void OptDefine (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptDumpConfig (const char* Opt attribute ((unused)), const char* Arg)
-/* Dump a builtin linker configuration */
-{
-    /* Map the given target name to its id */
-    target_t T = FindTarget (Arg);
-    if (T == TGT_UNKNOWN) {
-        Error ("Target system `%s' is unknown", Arg);
-    }
-
-    /* Dump the builtin configuration */
-    DumpBuiltinConfig (stdout, T);
-}
-
-
-
 static void OptEndGroup (const char* Opt attribute ((unused)),
 	 	         const char* Arg attribute ((unused)))
 /* End a library group */
@@ -486,7 +470,8 @@ static void OptStartGroup (const char* Opt attribute ((unused)),
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
-    const TargetDesc* D;
+    StrBuf FileName = STATIC_STRBUF_INITIALIZER;
+    char*  PathName;
 
     /* Map the target name to a target id */
     Target = FindTarget (Arg);
@@ -494,14 +479,25 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
        	Error ("Invalid target name: `%s'", Arg);
     }
 
-    /* Get the target description record */
-    D = &Targets[Target];
+    /* Set the target binary format */
+    DefaultBinFmt = GetTargetProperties (Target)->BinFmt;
 
-    /* Set the target data */
-    DefaultBinFmt = D->BinFmt;
-    CfgSetBuf (D->Cfg);
+    /* Build config file name from target name */
+    SB_CopyStr (&FileName, GetTargetName (Target));
+    SB_AppendStr (&FileName, ".cfg");
+    SB_Terminate (&FileName);
 
-    /* Read the target config */
+    /* Search for the file */
+    PathName = SearchFile (CfgSearchPath, SB_GetBuf (&FileName));
+    if (PathName == 0) {
+        Error ("Cannot find config file `%s'", SB_GetBuf (&FileName));
+    }
+
+    /* Free file name memory */
+    SB_Done (&FileName);
+
+    /* Read the file */
+    CfgSetName (PathName);
     CfgRead ();
 }
 
@@ -527,7 +523,6 @@ int main (int argc, char* argv [])
        	{ "--config",  	       	1,     	OptConfig    	    	},
      	{ "--dbgfile",          1,      OptDbgFile              },
         { "--define",           1,      OptDefine               },
-       	{ "--dump-config",     	1,     	OptDumpConfig           },
         { "--end-group",        0,      OptEndGroup             },
         { "--force-import",     1,      OptForceImport          },
      	{ "--help",	       	0,     	OptHelp	     	    	},

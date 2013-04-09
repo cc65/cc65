@@ -48,6 +48,7 @@
 #include "check.h"
 #include "print.h"
 #include "segdefs.h"
+#include "target.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 

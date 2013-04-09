@@ -81,14 +81,17 @@ typedef struct TargetProperties TargetProperties;
 struct TargetProperties {
     const char              Name[12];   /* Name of the target */
     cpu_t                   DefaultCPU; /* Default CPU for this target */
+    unsigned char           BinFmt;     /* Default binary format for this target */
     const unsigned char*    CharMap;    /* Character translation table */
 };
 
 /* Target system */
 extern target_t		Target;
 
-/* Table with default CPUs per target */
-extern const cpu_t DefaultCPU[TGT_COUNT];
+/* Types of available output formats */
+#define BINFMT_DEFAULT 		0   	/* Default (binary) */
+#define BINFMT_BINARY		1	/* Straight binary format */
+#define BINFMT_O65		2	/* Andre Fachats o65 format */
 
 
 

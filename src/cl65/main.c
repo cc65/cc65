@@ -41,7 +41,9 @@
 #else
 #  define NEED_SPAWN   1
 #endif
-
+#if defined(_MSC_VER)
+#  pragma warning(disable : 4996)
+#endif
 
 
 #include <stdio.h>

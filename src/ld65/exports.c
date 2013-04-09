@@ -674,8 +674,8 @@ static void CheckSymType (const Export* E)
        	    /* Export and import address sizes do not match */
             StrBuf ExportLoc = STATIC_STRBUF_INITIALIZER;
             StrBuf ImportLoc = STATIC_STRBUF_INITIALIZER;
-            const char* ExpAddrSize = AddrSizeToStr (E->AddrSize);
-            const char* ImpAddrSize = AddrSizeToStr (I->AddrSize);
+            const char* ExpAddrSize = AddrSizeToStr ((unsigned char) E->AddrSize);
+            const char* ImpAddrSize = AddrSizeToStr ((unsigned char) I->AddrSize);
             const LineInfo* ExportLI = GetExportPos (E);
             const LineInfo* ImportLI = GetImportPos (I);
 
@@ -884,7 +884,7 @@ void PrintExportMap (FILE* F)
 	      	     GetExportVal (E),
 	      	     E->ImpCount? 'R' : ' ',
 		     SYM_IS_LABEL (E->Type)? 'L' : 'E',
-       	       	     GetAddrSizeCode (E->AddrSize),
+       	       	     GetAddrSizeCode ((unsigned char) E->AddrSize),
 		     SYM_IS_CONDES (E->Type)? 'I' : ' ');
 	    if (++Count == 2) {
 	      	Count = 0;

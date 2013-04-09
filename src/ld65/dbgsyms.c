@@ -369,7 +369,7 @@ void PrintDbgSyms (FILE* F)
                      "sym\tid=%u,name=\"%s\",addrsize=%s",
                      O->SymBaseId + J,
                      GetString (S->Name),
-                     AddrSizeToStr (S->AddrSize));
+                     AddrSizeToStr ((unsigned char) S->AddrSize));
 
             /* Emit the size only if we know it */
             if (S->Size != 0) {

@@ -399,20 +399,25 @@ Export* ReadExport (FILE* F, ObjData* O)
      */
     for (I = 0; I < CD_TYPE_COUNT; ++I) {
         const ConDesImport* CDI;
-        if (E->ConDes[I] != CD_PRIO_NONE && (CDI = ConDesGetImport (I)) != 0) {
 
+        if (E->ConDes[I] != CD_PRIO_NONE && (CDI = ConDesGetImport (I)) != 0) {
             unsigned J;
 
-            /* Generate a new import and insert it */
-            Import* Imp = InsertImport (GenImport (CDI->Name, CDI->AddrSize));
+            /* Generate a new import, and add it to the module's import list. */
+            Import* Imp = GenImport (CDI->Name, CDI->AddrSize);
 
-            /* Add line info for the config file and for the export that is
-             * actually the condes that forces the import.
+            Imp->Obj = O;
+            CollAppend (&O->Imports, Imp);
+
+            /* Add line info for the export that is actually the condes that
+             * forces the import.  Then, add line info for the config. file.
+             * The export's info is added first because the import pretends
+             * that it came from the object module instead of the config. file.
              */
-            CollAppend (&Imp->RefLines, GenLineInfo (&CDI->Pos));
             for (J = 0; J < CollCount (&E->DefLines); ++J) {
                 CollAppend (&Imp->RefLines, DupLineInfo (CollAt (&E->DefLines, J)));
             }
+            CollAppend (&Imp->RefLines, GenLineInfo (&CDI->Pos));
         }
     }
 

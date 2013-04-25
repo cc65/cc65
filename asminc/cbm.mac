@@ -2,20 +2,8 @@
 
 ; Helper macro that converts and outputs one character
 .macro _scrcode char
-        .if (char >= '@' .and char <= 'z')
-                .byte   (char - '@')
-        .elseif (char >= 'A' .and char <= 'Z')
-                .byte   (char - 'A' + 65)
-        .elseif (char = '[')
-                .byte   27
-        .elseif (char = ']')
-                .byte   29
-        .elseif (char = '^')
-                .byte   30
-        .elseif (char = '_')
-                .byte   31
-        .elseif (char < 256)
-                .byte   char
+        .if (char < 256)
+                .byte   <(.strat ("h@dbdlhh", char >> 5) << 4) ^ char
         .else
                 .error  "scrcode: Character constant out of range"
         .endif
@@ -24,7 +12,7 @@
 .macro  scrcode arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9
 
         ; Bail out if next argument is empty
-        .if     .blank (arg1)
+        .if     .blank ({arg1})
                 .exitmacro
         .endif
 

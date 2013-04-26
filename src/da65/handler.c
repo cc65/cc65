@@ -627,7 +627,7 @@ void OH_SpecialPage (const OpcDesc* D)
   GenerateLabel (D->Flags, Addr);
 
   /* OneLine (D, "$FF%02X", (CodeByte (PC+1)); */
-  OneLine (D, "\%s", GetAddrArg (D->Flags, Addr));
+  OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
 

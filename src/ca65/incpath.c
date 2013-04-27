@@ -73,7 +73,7 @@ void InitIncludePaths (void)
 
     /* Add some compiled in search paths if defined at compile time */
 #ifdef CA65_INC
-    AddSearchPath (IncSearchPath, CA65_INC);
+    AddSearchPath (IncSearchPath, STRINGIZE (CA65_INC));
 #endif
 
     /* Add specific paths from the environment */

@@ -71,13 +71,13 @@ void InitSearchPaths (void)
 
     /* Add some compiled in search paths if defined at compile time */
 #if defined(LD65_LIB)
-    AddSearchPath (LibSearchPath, LD65_LIB);
+    AddSearchPath (LibSearchPath, STRINGIZE (LD65_LIB));
 #endif
 #if defined(LD65_OBJ)
-    AddSearchPath (ObjSearchPath, LD65_OBJ);
+    AddSearchPath (ObjSearchPath, STRINGIZE (LD65_OBJ));
 #endif
 #if defined(LD65_CFG)
-    AddSearchPath (CfgSearchPath, LD65_CFG);
+    AddSearchPath (CfgSearchPath, STRINGIZE (LD65_CFG));
 #endif
 
     /* Add specific paths from the environment */

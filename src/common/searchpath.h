@@ -48,6 +48,10 @@
 
 
 
+/* Convert argument to C string */
+#define _STRINGIZE(arg) #arg
+#define  STRINGIZE(arg) _STRINGIZE(arg)
+
 /* A search path is a pointer to the list */
 typedef struct Collection SearchPath;
 

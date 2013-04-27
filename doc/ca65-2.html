@@ -60,7 +60,6 @@ Long options:
   --large-alignment             Don't warn about large alignments
   --listing name                Create a listing file if assembly was ok
   --list-bytes n                Maximum number of bytes per listing line
-  --macpack-dir dir             Set a macro package directory
   --memory-model model          Set the memory model
   --pagelength n                Set the page length for the listing
   --relax-checks                Relax some checks (see docs)
@@ -182,16 +181,6 @@ input. See the <CODE>
 <A HREF="ca65-11.html#.LISTBYTES">.LISTBYTES</A></CODE> directive
 for more information. The value zero can be used to encode an unlimited
 number of printed bytes.</P>
-
-<P>
-<A NAME="option--macpack-dir"></A> </P>
-<DT><B><CODE>--macpack-dir dir</CODE></B><DD>
-<P>This options allows to specify a directory containing macro files that are
-used instead of the builtin images when a <CODE>
-<A HREF="ca65-11.html#.MACPACK">.MACPACK</A></CODE> directive is encountered. If <CODE>--macpack-dir</CODE>
-was specified, a <CODE>.mac</CODE> extension is added to the package name and
-the resulting file is loaded from the given directory. This is most useful
-when debugging the builtin macro packages.</P>
 
 <P>
 <A NAME="option-mm"></A> </P>

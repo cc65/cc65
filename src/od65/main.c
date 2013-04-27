@@ -208,9 +208,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr,
-       	     "%s V%s - (C) Copyright 2000-2011, Ullrich von Bassewitz\n",
-       	     ProgName, GetVersionAsString ());
+    fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
 }
 
 

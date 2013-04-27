@@ -507,9 +507,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
-    fprintf (stderr,
-       	     "ld65 V%s - (C) Copyright 1998-2009, Ullrich von Bassewitz\n",
-	     GetVersionAsString ());
+    fprintf (stderr, "ld65 V%s\n", GetVersionAsString ());
 }
 
 

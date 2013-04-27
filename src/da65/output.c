@@ -75,7 +75,7 @@ static void PageHeader (void)
 /* Print a page header */
 {
     fprintf (F,
-       	     "; da65 V%s - (C) Copyright 2000-2009,  Ullrich von Bassewitz\n"
+       	     "; da65 V%s\n"
              "; Created:    %s\n"
      	     "; Input file: %s\n"
      	     "; Page:       %u\n\n",

@@ -166,9 +166,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
                         const char* Arg attribute ((unused)))
 /* Print the program version */
 {
-    fprintf (stderr,
-        "grc65 V%s - (C) Copyright, Maciej 'YTM/Elysium' Witkowiak\n",
-        GetVersionAsString ());
+    fprintf (stderr, "grc65 V%s\n", GetVersionAsString ());
 }
 
 

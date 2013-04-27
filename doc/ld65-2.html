@@ -49,7 +49,6 @@ Long options:
   --config name         Use linker config file
   --dbgfile name        Generate debug information
   --define sym=val      Define a symbol
-  --dump-config name    Dump a builtin configuration
   --end-group           End a library group
   --force-import sym    Force an import of symbol `sym'
   --help                Help (this text)
@@ -112,14 +111,14 @@ symbols.</P>
 <DT><B><CODE>-o name</CODE></B><DD>
 <P>The -o switch is used to give the name of the default output file.
 Depending on your output configuration, this name may NOT be used as
-name for the output file. However, for the builtin configurations, this
+name for the output file. However, for the default configurations, this
 name is used for the output file name.</P>
 
 <P>
 <A NAME="option-t"></A> </P>
 <DT><B><CODE>-t sys, --target sys</CODE></B><DD>
 <P>The argument for the -t switch is the name of the target system. Since this
-switch will activate a builtin configuration, it may not be used together
+switch will activate a default configuration, it may not be used together
 with the <CODE>
 <A HREF="#option-C">-C</A></CODE> option. The following target
 systems are currently supported:</P>
@@ -215,9 +214,9 @@ version.</P>
 <A NAME="option-S"></A> </P>
 <DT><B><CODE>-S addr, --start-addr addr</CODE></B><DD>
 <P>Using -S you may define the default starting address. If and how this
-address is used depends on the config file in use. For the builtin
+address is used depends on the config file in use. For the default
 configurations, only the "none", "apple2" and "apple2enh" systems honor an
-explicit start address, all other builtin config provide their own.</P>
+explicit start address, all other default configs provide their own.</P>
 
 
 <DT><B><CODE>-V, --version</CODE></B><DD>

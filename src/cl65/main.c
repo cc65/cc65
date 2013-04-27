@@ -136,12 +136,10 @@ static char* TargetLib	= 0;
 
 
 #if defined(NEED_SPAWN)
-#  if defined(SPAWN_UNIX)
-#    include "spawn-unix.inc"
-#  elif defined(SPAWN_AMIGA)
+#  if defined(SPAWN_AMIGA)
 #    include "spawn-amiga.inc"
 #  else
-#    error "Don't know which spawn module to include!"
+#    include "spawn-unix.inc"
 #  endif
 #endif
 

@@ -28,7 +28,29 @@ mostlyclean:
 clean: mostlyclean
 	$(RM) -r ../bin
 
-.PHONY: all $(PROGS) mostlyclean clean
+install: all
+	$(foreach prog,$(PROGS),$(INSTALL_recipe))
+
+uninstall:
+	$(foreach prog,$(PROGS),$(UNINSTALL_recipe))
+
+.PHONY: all $(PROGS) mostlyclean clean install uninstall
+
+##########
+
+define INSTALL_recipe =
+
+ln -s $(abspath ../bin/$(prog)) /usr/local/bin/$(prog)
+
+endef
+
+##########
+
+define UNINSTALL_recipe =
+
+$(RM) /usr/local/bin/$(prog)
+
+endef
 
 ##########
 

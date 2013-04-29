@@ -93,7 +93,7 @@ endef
 
 $(eval $(call OBJS_template,common))
 ../wrk/common/common.a: $(common_OBJS)
-	$(AR) r $@ $^
+	$(AR) r $@ $?
 
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
 

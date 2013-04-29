@@ -38,7 +38,7 @@ uninstall:
 
 ##########
 
-define INSTALL_recipe =
+define INSTALL_recipe
 
 ln -s $(abspath ../bin/$(prog)) /usr/local/bin/$(prog)
 
@@ -46,7 +46,7 @@ endef
 
 ##########
 
-define UNINSTALL_recipe =
+define UNINSTALL_recipe
 
 $(RM) /usr/local/bin/$(prog)
 
@@ -54,7 +54,7 @@ endef
 
 ##########
 
-define OBJS_template =
+define OBJS_template
 
 $(1)_OBJS := $$(addprefix ../wrk/,$$(addsuffix .o,$$(basename $$(wildcard $(1)/*.c))))
 
@@ -69,7 +69,7 @@ endef
 
 ##########
 
-define PROG_template =
+define PROG_template
 
 $$(eval $$(call OBJS_template,$(1)))
 

@@ -20,6 +20,8 @@ CFLAGS += -MMD -MP -O -std=c89 -I common \
           -DCA65_INC=$(CA65_INC) -DCC65_INC=$(CC65_INC) \
           -DLD65_LIB=$(LD65_LIB) -DLD65_OBJ=$(LD65_OBJ) -DLD65_CFG=$(LD65_CFG)
 
+LDLIBS += -lm
+
 all: $(PROGS)
 
 mostlyclean:
@@ -74,7 +76,7 @@ define PROG_template
 $$(eval $$(call OBJS_template,$(1)))
 
 ../bin/$(1): $$($(1)_OBJS) ../wrk/common/common.a | ../bin
-	$$(CC) $$(LDFLAGS) -o $$@ $$^
+	$$(CC) $$(LDFLAGS) $$(LDLIBS) -o $$@ $$^
 
 $(1): ../bin/$(1)
 

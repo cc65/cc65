@@ -7,6 +7,7 @@
 ; void __fastcall__ textframe (unsigned char width, unsigned char height,
 ;                              unsigned char style);
 ;
+        .ifdef  __APPLE2ENH__
 
         .export 	_textframexy, _textframe
         .import 	popa, pusha, _gotoxy
@@ -103,3 +104,5 @@ LENGTH: .byte	0, <-2, 0, <-2, <-2, 0, <-2, 0
 ; - hibit set means normal printable character
 ; - hibit clear means MouseText character
 CHAR:   .byte	'_'|$80, '_', 'L', 'Z', 'L', 'Z', '_'|$80, '_'
+
+        .endif                  ; __APPLE2ENH__

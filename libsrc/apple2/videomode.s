@@ -3,6 +3,7 @@
 ;
 ; unsigned __fastcall__ videomode (unsigned mode);
 ;
+        .ifdef  __APPLE2ENH__
 
 	.export		_videomode
         .import         COUT
@@ -63,3 +64,5 @@ done:   lda     #$11            ; Ctrl-char code for 40 cols
         bpl     :+
         lda     #$12            ; Ctrl-char code for 80 cols
 :       rts                     ; X was preserved all the way
+
+        .endif                  ; __APPLE2ENH__

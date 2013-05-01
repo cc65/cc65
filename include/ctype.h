@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2009, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -40,14 +40,14 @@
 /* The array containing character classification data */
 extern unsigned char _ctype[256];
 
-/* Bits used to specify characters classes */
+/* Bits used to specify character classes */
 #define _CT_LOWER      	0x01   	/* 0 - Lower case char */
 #define _CT_UPPER   	0x02   	/* 1 - Upper case char */
 #define _CT_DIGIT   	0x04	/* 2 - Numeric digit */
-#define _CT_XDIGIT     	0x08	/* 3 - Hex digit (both, lower and upper) */
+#define _CT_XDIGIT     	0x08	/* 3 - Hex digit (both lower and upper) */
 #define _CT_CNTRL      	0x10	/* 4 - Control character */
 #define _CT_SPACE   	0x20	/* 5 - The space character itself */
-#define _CT_OTHER_WS	0x40 	/* 6 - Other whitespace ('\f', '\n', '\r', '\t' and '\v') */
+#define _CT_OTHER_WS	0x40 	/* 6 - Other whitespace ('\f', '\n', '\r', '\t', and '\v') */
 #define _CT_SPACE_TAB	0x80 	/* 7 - Space or tab character */
 
 /* Bit combinations */
@@ -79,17 +79,17 @@ int __fastcall__ tolower (int c); 	/* Always external */
 
 #if __CC65_STD__ >= __CC65_STD_CC65__
 unsigned char __fastcall__ toascii (unsigned char c);
-/* Convert a target specific character to ascii */
+/* Convert a target-specific character to ASCII. */
 #endif
 
 
 
-/* When inlining of known function is enabled, overload most of the above
- * functions by macros. The function prototypes are again available after
- * #undef'ing the macros.
- * Please note that the following macros do NOT handle EOF correctly, as
+/* When inlining-of-known-functions is enabled, overload most of the above
+ * functions by macroes. The function prototypes are available again after
+ * #undef'ing the macroes.
+ * Please note that the following macroes do NOT handle EOF correctly, as
  * stated in the manual. If you need correct behaviour for EOF, don't
- * use -Os, or #undefine the following macros.
+ * use -Os, or #undefine the following macroes.
  */
 #ifdef __OPT_s__
 
@@ -128,8 +128,10 @@ unsigned char __fastcall__ toascii (unsigned char c);
 #define isgraph(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
 	       	    __asm__ ("lda %v,y", _ctype),       \
-		    __asm__ ("eor #%b", _CT_NOT_GRAPH), \
-	       	    __asm__ ("and #%b", _CT_NOT_GRAPH), \
+		    __asm__ ("and #%b", _CT_NOT_GRAPH), \
+	       	    __asm__ ("cmp #1"),                 \
+	       	    __asm__ ("lda #1"),                 \
+	       	    __asm__ ("sbc #1"),                 \
                     __AX__)
 
 #define islower(c)  (__AX__ = (c),                      \
@@ -141,15 +143,17 @@ unsigned char __fastcall__ toascii (unsigned char c);
 #define isprint(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
 	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("eor #%b", _CT_NOT_PRINT), \
 	       	    __asm__ ("and #%b", _CT_NOT_PRINT), \
+	       	    __asm__ ("eor #%b", _CT_NOT_PRINT), \
                     __AX__)
 
 #define ispunct(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
 	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("eor #%b", _CT_NOT_PUNCT), \
 	       	    __asm__ ("and #%b", _CT_NOT_PUNCT), \
+	       	    __asm__ ("cmp #1"),                 \
+	       	    __asm__ ("lda #1"),                 \
+	       	    __asm__ ("sbc #1"),                 \
                     __AX__)
 
 #define isspace(c)  (__AX__ = (c),                      \

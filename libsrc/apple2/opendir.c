@@ -37,7 +37,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <dirent.h>
-#include <dir.h>
+#include "dir.h"
 
 
 

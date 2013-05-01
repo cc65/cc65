@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include <dir.h>
+#include "dir.h"
 
 
 

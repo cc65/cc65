@@ -34,7 +34,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <dirent.h>
-#include <dir.h>
+#include "dir.h"
 
 
 

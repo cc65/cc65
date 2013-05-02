@@ -191,7 +191,6 @@ Section* ReadSection (FILE* F, ObjData* O)
 /* Read a section from a file */
 {
     unsigned      Name;
-    unsigned      Flags;
     unsigned      Size;
     unsigned long Alignment;
     unsigned char Type;
@@ -202,7 +201,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     /* Read the segment data */
     (void) Read32 (F);          /* File size of data */
     Name      = MakeGlobalStringId (O, ReadVar (F));    /* Segment name */
-    Flags     = ReadVar (F);    /* Segment flags (currently unused) */
+                ReadVar (F);    /* Segment flags (currently unused) */
     Size      = ReadVar (F);    /* Size of data */
     Alignment = ReadVar (F);    /* Alignment */
     Type      = Read8 (F);      /* Segment type */

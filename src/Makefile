@@ -38,6 +38,8 @@ uninstall:
 
 .PHONY: all $(PROGS) mostlyclean clean install uninstall
 
+.SUFFIXES:
+
 ##########
 
 define INSTALL_recipe
@@ -58,7 +60,7 @@ endef
 
 define OBJS_template
 
-$(1)_OBJS := $$(addprefix ../wrk/,$$(addsuffix .o,$$(basename $$(wildcard $(1)/*.c))))
+$(1)_OBJS := $$(patsubst %.c,../wrk/%.o,$$(wildcard $(1)/*.c))
 
 $$($(1)_OBJS): | ../wrk/$(1)
 

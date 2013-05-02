@@ -639,7 +639,6 @@ static void NumericConst (void)
         if ((Base == 16 && toupper (CurC) == 'F') ||
             (Base == 10 && toupper (CurC) == 'E')) {
 
-            int Sign;
             unsigned Digits;
             unsigned Exp;
 
@@ -647,9 +646,7 @@ static void NumericConst (void)
             NextChar ();
 
             /* Read an optional sign */
-            Sign = 1;
             if (CurC == '-') {
-                Sign = -1;
                 NextChar ();
             } else if (CurC == '+') {
                 NextChar ();

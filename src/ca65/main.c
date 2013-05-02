@@ -1,4 +1,3 @@
-
 /*                                                                           */
 /*				    main.c				     */
 /*                                                                           */
@@ -314,7 +313,6 @@ static void DefineSymbol (const char* Def)
 /* Define a symbol from the command line */
 {
     const char* P;
-    unsigned I;
     long Val;
     StrBuf SymName = AUTO_STRBUF_INITIALIZER;
 
@@ -326,7 +324,6 @@ static void DefineSymbol (const char* Def)
     P = Def;
 
     /* Copy the symbol, checking the rest */
-    I = 0;
     while (IsIdChar (*P)) {
         SB_AppendChar (&SymName, *P++);
     }

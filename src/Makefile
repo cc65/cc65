@@ -76,7 +76,7 @@ define PROG_template
 $$(eval $$(call OBJS_template,$(1)))
 
 ../bin/$(1): $$($(1)_OBJS) ../wrk/common/common.a | ../bin
-	$$(CC) $$(LDFLAGS) $$(LDLIBS) -o $$@ $$^
+	$$(CC) $$(LDFLAGS) -o $$@ $$^ $$(LDLIBS)
 
 $(1): ../bin/$(1)
 

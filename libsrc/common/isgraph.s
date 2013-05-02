@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 02.06.1998
+; 1998-06-02, Ullrich von Bassewitz
+; 2013-05-01, Greg King
 ;
 ; int isgraph (int c);
 ;
@@ -8,15 +9,17 @@
 	.include	"ctype.inc"
 
 _isgraph:
-	cpx	#$00		; Char range ok?
+	cpx	#>0		; Char range OK?
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-       	eor    	#CT_CTRL_SPACE	; NOT control and NOT space
-	and 	#CT_CTRL_SPACE	; Mask character bits
-	rts
+	and	#CT_CTRL_SPACE	; Mask character bits
+	cmp	#1		; If false, then set "borrow" flag
+	lda	#0
+	sbc	#0		; Invert logic
+	rts			; Return NOT control and NOT space
 
-@L1:	lda	#$00		; Return false
+@L1:	lda	#<0		; Return false
 	tax
 	rts
 

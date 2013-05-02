@@ -599,7 +599,6 @@ static SymEntry* ParseUnionDecl (const char* Name)
     unsigned  FieldSize;
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
-    SymEntry* Entry;
 
 
     if (CurTok.Tok != TOK_LCURLY) {
@@ -608,7 +607,7 @@ static SymEntry* ParseUnionDecl (const char* Name)
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
-    Entry = AddStructSym (Name, SC_UNION, 0, 0);
+    AddStructSym (Name, SC_UNION, 0, 0);
 
     /* Skip the curly brace */
     NextToken ();
@@ -702,7 +701,6 @@ static SymEntry* ParseStructDecl (const char* Name)
     int       BitOffs;          /* Bit offset for bit-fields */
     int       FieldWidth;       /* Width in bits, -1 if not a bit-field */
     SymTable* FieldTab;
-    SymEntry* Entry;
 
 
     if (CurTok.Tok != TOK_LCURLY) {
@@ -711,7 +709,7 @@ static SymEntry* ParseStructDecl (const char* Name)
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
-    Entry = AddStructSym (Name, SC_STRUCT, 0, 0);
+    AddStructSym (Name, SC_STRUCT, 0, 0);
 
     /* Skip the curly brace */
     NextToken ();

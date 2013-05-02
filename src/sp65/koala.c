@@ -94,6 +94,9 @@ StrBuf* GenKoala (const Bitmap* B, const Collection* A attribute ((unused)))
     /* Add $4400 as load address */
     SB_AppendChar (D, 0x00);
     SB_AppendChar (D, 0x44);
+    
+    /* TODO: The actual work ;-) */
+    (void)Screen;
 
     /* Return the converted bitmap */
     return D;

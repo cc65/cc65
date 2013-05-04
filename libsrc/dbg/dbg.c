@@ -80,6 +80,12 @@ static char GetKeyUpdate (void);
 #    endif
 #  endif
 #endif
+#ifndef COLOR_BLACK
+#  define COLOR_BLACK   0
+#endif
+#ifndef COLOR_WHITE
+#  define COLOR_WHITE   1
+#endif
 
 /* Screen definitions */
 #if defined(__CBM610__)
@@ -98,8 +104,37 @@ static char GetKeyUpdate (void);
 #endif
 
 /* Replacement key definitions */
-#if defined(__APPLE2__)
+#if defined(__APPLE2__) || defined(__LYNX__) || defined(__SUPERVISION__)
 #  define CH_DEL        ('H' - 'A' + 1)         /* Ctrl+H */
+#endif
+
+/* Replacement char definitions */
+#ifndef CH_ULCORNER
+#  define CH_ULCORNER   '+'
+#endif
+#ifndef CH_URCORNER
+#  define CH_URCORNER   '+'
+#endif
+#ifndef CH_LLCORNER
+#  define CH_LLCORNER   '+'
+#endif
+#ifndef CH_LRCORNER
+#  define CH_LRCORNER   '+'
+#endif
+#ifndef CH_TTEE
+#  define CH_TTEE       '+'
+#endif
+#ifndef CH_LTEE
+#  define CH_LTEE       '+'
+#endif
+#ifndef CH_RTEE
+#  define CH_RTEE       '+'
+#endif
+#ifndef CH_BTEE
+#  define CH_BTEE       '+'
+#endif
+#ifndef CH_CROSS
+#  define CH_CROSS      '+'
 #endif
 
 /* Defines for opcodes */

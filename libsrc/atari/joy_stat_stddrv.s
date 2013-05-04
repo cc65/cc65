@@ -7,8 +7,8 @@
 ;
 
         .export	_joy_static_stddrv
-        .import	_atari_stdjoy
+        .import	_ataristd_joy
 
 .rodata
 
-_joy_static_stddrv := _atari_stdjoy
+_joy_static_stddrv := _ataristd_joy

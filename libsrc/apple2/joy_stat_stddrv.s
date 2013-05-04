@@ -7,8 +7,16 @@
 ;
 
         .export	_joy_static_stddrv
-        .import	_apple2_stdjoy
+        .ifdef	__APPLE2ENH__
+        .import	_a2e_stdjoy_joy
+        .else
+        .import	_a2_stdjoy_joy
+        .endif
 
 .rodata
 
-_joy_static_stddrv := _apple2_stdjoy
+        .ifdef	__APPLE2ENH__
+_joy_static_stddrv := _a2e_stdjoy_joy
+        .else
+_joy_static_stddrv := _a2_stdjoy_joy
+        .endif

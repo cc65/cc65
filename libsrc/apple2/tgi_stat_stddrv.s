@@ -7,8 +7,16 @@
 ;
 
         .export	_tgi_static_stddrv
-        .import	_apple2_280_192_8
+        .ifdef	__APPLE2ENH__
+        .import	_a2e_hi_tgi
+        .else
+        .import	_a2_hi_tgi
+        .endif
 
 .rodata
 
-_tgi_static_stddrv := _apple2_280_192_8
+        .ifdef	__APPLE2ENH__
+_tgi_static_stddrv := _a2e_hi_tgi
+        .else
+_tgi_static_stddrv := _a2_hi_tgi
+        .endif

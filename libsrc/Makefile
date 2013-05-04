@@ -1,419 +1,203 @@
-# -*- make -*-
-#
-# Makefile for CC65 Libraries
-#
+CBMS = c128   \
+       c16    \
+       c64    \
+       cbm510 \
+       cbm610 \
+       pet    \
+       plus4  \
+       vic20
 
-.SUFFIXES: .o .obj .s .c
+GEOS = geos-apple \
+       geos-cbm
 
-# Defines for executables. AR is used within this makefile, the others are
-# passed to the submakes and contain paths relative to the subdirectories
-# handled by the make subprocesses.
-AR = ../src/ar65/ar65
-AS = ../../src/ca65/ca65
-CC = ../../src/cc65/cc65
-CO = ../../src/co65/co65
-LD = ../../src/ld65/ld65
+TARGETS = $(CBMS)   \
+          $(GEOS)   \
+          apple2    \
+          apple2enh \
+          atari     \
+          atmos     \
+          lynx      \
+          nes       \
+          supervision
 
-# List of shared directories
-SHAREDDIRS =	cbm		\
-		common		\
-		geos-common	\
-		conio		\
-		dbg		\
-		em		\
-		joystick	\
-		mouse		\
-		runtime		\
-		serial		\
-		tgi		\
-		zlib
+DRVTYPES = emd \
+           joy \
+           mou \
+           ser \
+           tgi
 
-# List of all targets
-ALLTARGETS =	apple2		\
-		apple2enh	\
-		atari		\
-		atmos		\
-		c128		\
-		c16		\
-		c64		\
-		cbm510		\
-		cbm610		\
-		geos-apple	\
-		geos-cbm	\
-		lynx		\
-		nes		\
-		pet		\
-		plus4		\
-		supervision	\
-		vic20
+# Every target requires its individual vpath setting but the vpath directive
+# acts globally. Therefore each target is built in a separate make instance.
 
-#-----------------------------------------------------------------------------
+ifeq ($(words $(MAKECMDGOALS)),1)
+  ifeq ($(MAKECMDGOALS),$(filter $(MAKECMDGOALS),$(TARGETS)))
+    TARGET = $(MAKECMDGOALS)
+  endif
+endif
 
-.PHONY:	all
-all:
-	for tgt in $(ALLTARGETS); do			\
-	    $(MAKE) mostly-clean "$$tgt"lib || exit 1;	\
-	done
+.SUFFIXES:
 
-#-----------------------------------------------------------------------------
-# Apple ][
+.PHONY: all $(TARGETS) mostlyclean clean
 
-.PHONY:	apple2lib
-apple2lib:
-	for i in runtime apple2 common conio dbg em joystick mouse serial tgi zlib; do \
-	    $(MAKE) SYS=apple2 -C $$i || exit 1; \
-	    $(AR) a apple2.lib $$i/*.o || exit 1; \
-	done
-	cp apple2/apple2-auxmem.emd a2.auxmem.emd
-	cp apple2/apple2-stdjoy.joy a2.stdjoy.joy
-	cp apple2/apple2-stdmou.mou a2.stdmou.mou
-	cp apple2/apple2-ssc.ser a2.ssc.ser
-	cp apple2/apple2-280-192-8.tgi a2.hi.tgi
-	cp apple2/apple2-40-48-16.tgi a2.lo.tgi
-	if [ -d apple2/extra ]; then \
-	    for i in apple2/extra/*.o; do \
-	       	cp $$i apple2-`basename $$i` || exit 1; \
-	    done \
-	fi
+ifndef TARGET
 
-#-----------------------------------------------------------------------------
-# enhanced Apple //e
+all: $(TARGETS)
 
-.PHONY:	apple2enhlib
-apple2enhlib:
-	for i in runtime apple2enh common conio dbg em joystick mouse serial tgi zlib; do \
-	    $(MAKE) SYS=apple2enh -C $$i || exit 1; \
-	    $(AR) a apple2enh.lib $$i/*.o || exit 1; \
-	done
-	cp apple2enh/apple2-auxmem.emd a2e.auxmem.emd
-	cp apple2enh/apple2-stdjoy.joy a2e.stdjoy.joy
-	cp apple2enh/apple2-stdmou.mou a2e.stdmou.mou
-	cp apple2enh/apple2-ssc.ser a2e.ssc.ser
-	cp apple2enh/apple2-280-192-8.tgi a2e.hi.tgi
-	cp apple2enh/apple2-40-48-16.tgi a2e.lo.tgi
-	if [ -d apple2enh/extra ]; then \
-	    for i in apple2enh/extra/*.o; do \
-	       	cp $$i apple2enh-`basename $$i` || exit 1; \
-	    done \
-	fi
+$(TARGETS):
+	@$(MAKE) --no-print-directory $@
 
-#-----------------------------------------------------------------------------
-# Atari
+mostlyclean:
+	$(RM) -r ../wrk
 
-.PHONY:	atarilib
-atarilib:
-	for i in runtime atari common conio dbg em joystick tgi zlib; do \
-	    $(MAKE) SYS=atari -C $$i || exit 1; \
-	    $(AR) a atari.lib $$i/*.o || exit 1; \
-	done
-	cp atari/atari-130xe.emd atr130xe.emd
-	cp atari/atari-stdjoy.joy ataristd.joy
-	cp atari/atari-multijoy.joy atarimj8.joy
-	cp atari/atari-10.tgi atari10.tgi
-	cp atari/atari-10p2.tgi atr10p2.tgi
-	cp atari/atari-11.tgi atari11.tgi
-	cp atari/atari-14.tgi atari14.tgi
-	cp atari/atari-15.tgi atari15.tgi
-	cp atari/atari-15p2.tgi atr15p2.tgi
-	cp atari/atari-3.tgi atari3.tgi
-	cp atari/atari-4.tgi atari4.tgi
-	cp atari/atari-5.tgi atari5.tgi
-	cp atari/atari-6.tgi atari6.tgi
-	cp atari/atari-7.tgi atari7.tgi
-	cp atari/atari-8.tgi atari8.tgi
-	cp atari/atari-8p2.tgi atr8p2.tgi
-	cp atari/atari-9.tgi atari9.tgi
-	cp atari/atari-9p2.tgi atr9p2.tgi
-	if [ -d atari/extra ]; then \
-	    for i in atari/extra/*.o; do \
-	       	cp $$i atari-`basename $$i` || exit 1; \
-	    done \
-	fi
+clean: mostlyclean
+	$(RM) -r ../lib $(addprefix ../,$(DRVTYPES))
 
-#-----------------------------------------------------------------------------
-# Oric Atmos
+else # TARGET
 
-.PHONY:	atmoslib
-atmoslib:
-	for i in runtime atmos common conio dbg em joystick tgi zlib; do \
-	    $(MAKE) SYS=atmos -C $$i || exit 1; \
-	    $(AR) a atmos.lib $$i/*.o || exit 1; \
-	done
-	cp atmos/*.joy .
-	cp atmos/*.ser .
-	cp atmos/*.tgi .
-	if [ -d atmos/extra ]; then \
-	    for i in atmos/extra/*.o; do \
-	       	cp $$i atmos-`basename $$i` || exit 1; \
-	    done \
-	fi
+CFLAGS += -t $(TARGET) -Osir --create-dep $(@:.o=.d)
 
-#-----------------------------------------------------------------------------
-# C16, C116
+EXTZP = cbm510 \
+        cbm610 \
+        lynx
 
-.PHONY:	c16lib
-c16lib:
-	for i in runtime c16 cbm common conio dbg em joystick mouse tgi zlib; do \
-	    $(MAKE) SYS=c16 -C $$i || exit 1; \
-	    $(AR) a c16.lib $$i/*.o || exit 1; \
-	done
-	cp c16/*.emd .
-	cp c16/*.joy .
-	if [ -d c16/extra ]; then \
-	    for i in c16/extra/*.o; do \
-	       	cp $$i c16-`basename $$i` || exit 1; \
-	    done \
-	fi
+MKINC = $(GEOS) \
+        atari   \
+        nes
 
-#-----------------------------------------------------------------------------
-# C64
+GEOSDIRS = common      \
+           conio       \
+           disk        \
+           dlgbox      \
+           file        \
+           graph       \
+           memory      \
+           menuicon    \
+           mousesprite \
+           process     \
+           runtime     \
+           system
 
-.PHONY:	c64lib
-c64lib:
-	for i in runtime c64 cbm common conio dbg em joystick mouse serial tgi zlib; do \
-	    $(MAKE) SYS=c64 -C $$i || exit 1; \
-	    $(AR) a c64.lib $$i/*.o || exit 1; \
-	done
-	cp c64/*.emd .
-	cp c64/*.joy .
-	cp c64/c64-1351.mou .
-	cp c64/c64-joymouse.mou c64-joy.mou
-	cp c64/c64-potmouse.mou c64-pot.mou
-	cp c64/*.ser .
-	cp c64/c64-320-200-2.tgi c64-hi.tgi
-	if [ -d c64/extra ]; then \
-	    for i in c64/extra/*.o; do \
-	       	cp $$i c64-`basename $$i` || exit 1; \
-	    done \
-	fi
+ifeq ($(TARGET),apple2enh)
+  OBJPFX = a2
+  DRVPFX = a2e
+  DIRS = apple2
+else
+  DIRS = $(TARGET)
+endif
 
-#-----------------------------------------------------------------------------
-# C128
+ifeq ($(TARGET),$(filter $(TARGET),$(CBMS)))
+  DIRS += cbm
+endif
 
-.PHONY:	c128lib
-c128lib:
-	for i in runtime c128 cbm common conio dbg em joystick mouse serial tgi zlib; do \
-	    $(MAKE) SYS=c128 -C $$i || exit 1; \
-	    $(AR) a c128.lib $$i/*.o || exit 1; \
-	done
-	cp c128/*.emd .
-	cp c128/*.joy .
-	cp c128/c128-1351.mou .
-	cp c128/c128-joymouse.mou c128-joy.mou
-	cp c128/c128-potmouse.mou c128-pot.mou
-	cp c128/*.ser .
-	cp c128/c128-640-200-2.tgi c128-vdc.tgi
-	cp c128/c128-640-480-2.tgi c128-vdc2.tgi
-	if [ -d cbm/extra ]; then \
-	    for i in cbm/extra/*.o; do \
-	       	cp $$i cbm-`basename $$i` || exit 1; \
-	    done \
-	fi
-	if [ -d c128/extra ]; then \
-	    for i in c128/extra/*.o; do \
-	       	cp $$i c128-`basename $$i` || exit 1; \
-	    done \
-	fi
+ifeq ($(TARGET),$(filter $(TARGET),$(GEOS)))
+  DIRS += $(addprefix $(TARGET)/,  $(GEOSDIRS))
+  DIRS += $(addprefix geos-common/,$(GEOSDIRS))
+endif
 
-#-----------------------------------------------------------------------------
-# Commodore P500 / CBM 5x0
+DIRS += common   \
+        conio    \
+        dbg      \
+        em       \
+        joystick \
+        mouse    \
+        runtime  \
+        serial   \
+        tgi      \
+        zlib
 
-.PHONY:	cbm510lib
-cbm510lib:
-	for i in runtime cbm510 cbm common conio dbg em joystick mouse serial tgi zlib; do \
-	    $(MAKE) SYS=cbm510 -C $$i || exit 1; \
-	    $(AR) a cbm510.lib $$i/*.o || exit 1; \
-	done
-	cp cbm510/*.emd .
-	cp cbm510/cbm510-stdjoy.joy cbm510-std.joy
-	cp cbm510/cbm510-stdser.ser cbm510-std.ser
-	if [ -d cbm510/extra ]; then \
-	    for i in cbm510/extra/*.o; do \
-	       	cp $$i cbm510-`basename $$i` || exit 1; \
-	    done \
-	fi
+vpath %.s $(DIRS)
+vpath %.c $(DIRS)
 
-#-----------------------------------------------------------------------------
-# PET-II series
+OBJS := $(patsubst %.s,%.o,$(foreach dir,$(DIRS),$(wildcard $(dir)/*.s)))
+OBJS += $(patsubst %.c,%.o,$(foreach dir,$(DIRS),$(wildcard $(dir)/*.c)))
 
-.PHONY:	cbm610lib
-cbm610lib:
-	for i in runtime cbm610 cbm common conio dbg em joystick serial tgi zlib; do \
-	    $(MAKE) SYS=cbm610 -C $$i || exit 1; \
-	    $(AR) a cbm610.lib $$i/*.o || exit 1; \
-	done
-	cp cbm610/*.emd .
-	cp cbm610/cbm610-stdser.ser cbm610-std.ser
-	if [ -d cbm610/extra ]; then \
-	    for i in cbm610/extra/*.o; do \
-	       	cp $$i cbm610-`basename $$i` || exit 1; \
-	    done \
-	fi
+OBJS := $(addprefix ../wrk/$(TARGET)/,$(sort $(notdir $(OBJS))))
 
-#-----------------------------------------------------------------------------
-# GEOS on the Apple
+DEPS = $(OBJS:.o=.d)
 
-.PHONY:	geos-applelib
-geos-applelib:
-	for i in geos-apple geos-common; do \
-	    $(MAKE) SYS=geos-apple -C $$i || exit 1; \
-	    TARGET_OBJS="$$TARGET_OBJS`(cd $$i && printf '%s|' *.o)`"; \
-	    $(AR) a geos-apple.lib $$i/*.o || exit 1; \
-	done; \
-	TARGET_OBJS="$${TARGET_OBJS%?}"; \
-	for i in runtime common conio em joystick tgi zlib; do \
-	    $(MAKE) SYS=geos-apple -C $$i || exit 1; \
-	    SHARED_OBJS=`ls $$i/*.o | grep -vwE "$$TARGET_OBJS"`; \
-	    $(AR) a geos-apple.lib $$SHARED_OBJS || exit 1; \
-	done
-	if [ -d geos-apple/extra ]; then \
-	    for i in geos-apple/extra/*.o; do \
-	    	cp $$i geos-apple-`basename $$i` || exit 1; \
-	    done \
-	fi
+ZPOBJ = ../wrk/$(TARGET)/zeropage.o
+ifeq ($(TARGET),$(filter $(TARGET),$(EXTZP)))
+  ZPOBJ += ../wrk/$(TARGET)/extzp.o
+endif
 
-#-----------------------------------------------------------------------------
-# GEOS on the C64/128
+ifeq ($(TARGET),$(filter $(TARGET),$(MKINC)))
+  include $(TARGET)/Makefile.inc
+endif
 
-.PHONY:	geos-cbmlib
-geos-cbmlib:
-	for i in geos-cbm geos-common; do \
-	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
-	    TARGET_OBJS="$$TARGET_OBJS`(cd $$i && printf '%s|' *.o)`"; \
-	    $(AR) a geos-cbm.lib $$i/*.o || exit 1; \
-	done; \
-	TARGET_OBJS="$${TARGET_OBJS%?}"; \
-	for i in runtime common conio em joystick tgi zlib; do \
-	    $(MAKE) SYS=geos-cbm -C $$i || exit 1; \
-	    SHARED_OBJS=`ls $$i/*.o | grep -vwE "$$TARGET_OBJS"`; \
-	    $(AR) a geos-cbm.lib $$SHARED_OBJS || exit 1; \
-	done
-	cp geos-cbm/*.emd .
-	cp geos-cbm/*.joy .
-	cp geos-cbm/*.tgi .
-	if [ -d geos-cbm/extra ]; then \
-	    for i in geos-cbm/extra/*.o; do \
-	    	cp $$i geos-cbm-`basename $$i` || exit 1; \
-	    done \
-	fi
+##########
 
-#-----------------------------------------------------------------------------
-# Lynx
+define DRVTYPE_template
 
-.PHONY:	lynxlib
-lynxlib:
-	for i in runtime lynx common conio em joystick serial tgi zlib; do \
-	    $(MAKE) SYS=lynx -C $$i || exit 1; \
-	    $(AR) a lynx.lib $$i/*.o || exit 1; \
-	done
-	cp lynx/*.joy .
-	cp lynx/*.ser .
-	cp lynx/*.tgi .
-	if [ -d lynx/extra ]; then \
-	    for i in lynx/extra/*.o; do \
-	       	cp $$i lynx-`basename $$i` || exit 1; \
-	    done \
-	fi
+$1_SRCDIR = $$(firstword $$(DIRS))/$1
+$1_OBJDIR = ../wrk/$$(TARGET)/$1
+$1_DRVDIR = ../$1
 
-#-----------------------------------------------------------------------------
-# NES
+$1_OBJPAT = $$($1_OBJDIR)/$$(OBJPFX)%.o
+$1_DRVPAT = $$($1_DRVDIR)/$$(DRVPFX)%.$1
+$1_STCPAT = ../wrk/$$(TARGET)/$$(DRVPFX)%-$1.o
 
-.PHONY: neslib
-neslib:
-	for i in runtime nes common conio em joystick tgi zlib; do \
-	    $(MAKE) SYS=nes -C $$i || exit 1; \
-	    $(AR) a nes.lib $$i/*.o || exit 1; \
-	done
-	cp nes/*.joy .
-	cp nes/*.tgi .
-	if [ -d nes/extra ]; then \
-	    for i in nes/extra/*.o; do \
-	       	cp $$i nes-`basename $$i` || exit 1; \
-	    done \
-	fi
+$1_OBJS := $$(patsubst $$($1_SRCDIR)/%.s,$$($1_OBJDIR)/%.o,$$(wildcard $$($1_SRCDIR)/*.s))
 
-#-----------------------------------------------------------------------------
-# CBM PET machines
+$1_DRVS = $$(patsubst $$($1_OBJPAT),$$($1_DRVPAT),$$($1_OBJS))
 
-.PHONY:	petlib
-petlib:
-	for i in runtime pet cbm common conio dbg em joystick tgi zlib; do \
-	    $(MAKE) SYS=pet -C $$i || exit 1; \
-	    $(AR) a pet.lib $$i/*.o || exit 1; \
-	done
-	cp pet/*.joy .
-	if [ -d pet/extra ]; then \
-	    for i in pet/extra/*.o; do \
-	       	cp $$i pet-`basename $$i` || exit 1; \
-	    done \
-	fi
+$1_STCS = $$(patsubst $$($1_DRVPAT),$$($1_STCPAT),$$($1_DRVS))
 
-#-----------------------------------------------------------------------------
-# Commodore Plus/4
+$$($1_OBJS): | $$($1_OBJDIR)
 
-.PHONY:	plus4lib
-plus4lib:
-	for i in runtime plus4 cbm common conio dbg em joystick mouse serial tgi zlib; do \
-	    $(MAKE) SYS=plus4 -C $$i || exit 1; \
-	    $(AR) a plus4.lib $$i/*.o || exit 1; \
-	done
-	cp plus4/*.joy .
-	cp plus4/*.ser .
-	if [ -d plus4/extra ]; then \
-	    for i in plus4/extra/*.o; do \
-	       	cp $$i plus4-`basename $$i` || exit 1; \
-	    done \
-	fi
+$$($1_OBJDIR):
+	mkdir -p $$@
 
-#-----------------------------------------------------------------------------
-# Supervision
+$$($1_DRVPAT): $$($1_OBJPAT) $$(ZPOBJ) | $$($1_DRVDIR)
+	$$(LD) -o $$@ -t module $$^
 
-.PHONY: supervisionlib
-supervisionlib:
-	for i in runtime supervision common; do \
-	    $(MAKE) SYS=supervision -C $$i || exit 1; \
-	    $(AR) a supervision.lib $$i/*.o || exit 1; \
-	done
-	if [ -d supervision/extra ]; then \
-	    for i in supervision/extra/*.o; do \
-	       	cp $$i supervision-`basename $$i` || exit 1; \
-	    done \
-	fi
+$$($1_DRVDIR):
+	mkdir $$@
 
-#-----------------------------------------------------------------------------
-# Vic20
+$(TARGET): $$($1_DRVS)
 
-.PHONY:	vic20lib
-vic20lib:
-	for i in runtime vic20 cbm common conio dbg em joystick mouse tgi zlib; do \
-	    $(MAKE) SYS=vic20 -C $$i || exit 1; \
-	    $(AR) a vic20.lib $$i/*.o || exit 1; \
-	done
-	cp vic20/*.joy .
-	if [ -d vic20/extra ]; then \
-	    for i in vic20/extra/*.o; do \
-	       	cp $$i vic20-`basename $$i` || exit 1; \
-	    done \
-	fi
+$$($1_STCPAT): $$($1_DRVPAT)
+	$$(CO) -o $$(@:.o=.s) --code-label _$$(subst -,_,$$(subst .,_,$$(<F))) $$<
+	$$(CC) -c -t $$(TARGET) -o $$@ $$(@:.o=.s)
 
-#-----------------------------------------------------------------------------
-# Dummy targets
+OBJS += $$($1_STCS)
 
-.PHONY: mostly-clean
-mostly-clean:
-	@for i in $(SHAREDDIRS); do \
-	   $(MAKE) --no-print-directory -C $$i clean || exit 1; \
-	done
+DEPS += $$($1_OBJS:.o=.d)
 
-.PHONY: clean
-clean:	mostly-clean
-	@for i in $(ALLTARGETS); do \
-	   $(MAKE) -C $$i $@ || exit 1; \
-	done
+endef
 
-.PHONY: zap
-zap:
-	@for i in $(SHAREDDIRS) $(ALLTARGETS); do \
-	   $(MAKE) -C $$i $@ || exit 1; \
-	done
-	@$(RM) *.lib *.o *.emd *.joy *.mou *.ser *.tgi
+##########
+
+$(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
+
+ifdef CC65_HOME
+  AR = $(CC65_HOME)/bin/ar65
+  CC = $(CC65_HOME)/bin/cl65
+  CO = $(CC65_HOME)/bin/co65
+  LD = $(CC65_HOME)/bin/ld65
+else
+  AR = ../bin/ar65
+  CC = ../bin/cl65
+  CO = ../bin/co65
+  LD = ../bin/ld65
+endif
+
+../wrk/$(TARGET)/%.o: %.s | ../wrk/$(TARGET)
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+../wrk/$(TARGET)/%.o: %.c | ../wrk/$(TARGET)
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+../wrk/$(TARGET):
+	mkdir -p $@
+
+../lib/$(TARGET).lib: $(OBJS) | ../lib
+	$(AR) a $@ $?
+
+../lib:
+	mkdir $@
+
+$(TARGET): ../lib/$(TARGET).lib
+
+-include $(DEPS)
+
+endif # TARGET

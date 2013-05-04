@@ -7,8 +7,8 @@
 ;
 
         .export	_mouse_static_stddrv
-        .import	_c64_1351
+        .import	_c64_1351_mou
 
 .rodata
 
-_mouse_static_stddrv := _c64_1351
+_mouse_static_stddrv := _c64_1351_mou

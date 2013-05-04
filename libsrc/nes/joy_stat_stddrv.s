@@ -7,8 +7,8 @@
 ;
 
         .export	_joy_static_stddrv
-        .import	_nes_stdjoy
+        .import	_nes_stdjoy_joy
 
 .rodata
 
-_joy_static_stddrv := _nes_stdjoy
+_joy_static_stddrv := _nes_stdjoy_joy

@@ -7,8 +7,8 @@
 ;
 
         .export	_joy_static_stddrv
-        .import	_atmos_pase
+        .import	_atmos_pase_joy
 
 .rodata
 
-_joy_static_stddrv := _atmos_pase
+_joy_static_stddrv := _atmos_pase_joy

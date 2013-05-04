@@ -7,8 +7,8 @@
 ;
 
         .export	_tgi_static_stddrv
-        .import	_c128_640_200_2
+        .import	_c128_vdc_tgi
 
 .rodata
 
-_tgi_static_stddrv := _c128_640_200_2
+_tgi_static_stddrv := _c128_vdc_tgi

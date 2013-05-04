@@ -7,8 +7,8 @@
 ;
 
         .export	_tgi_static_stddrv
-        .import	_atmos_240_200_2
+        .import	_atmos_240_200_2_tgi
 
 .rodata
 
-_tgi_static_stddrv := _atmos_240_200_2
+_tgi_static_stddrv := _atmos_240_200_2_tgi

@@ -60,14 +60,14 @@ endef
 
 define OBJS_template
 
-$(1)_OBJS := $$(patsubst %.c,../wrk/%.o,$$(wildcard $(1)/*.c))
+$1_OBJS := $$(patsubst %.c,../wrk/%.o,$$(wildcard $1/*.c))
 
-$$($(1)_OBJS): | ../wrk/$(1)
+$$($1_OBJS): | ../wrk/$1
 
-../wrk/$(1):
+../wrk/$1:
 	mkdir -p $$@
 
-DEPS += $$($(1)_OBJS:.o=.d)
+DEPS += $$($1_OBJS:.o=.d)
 
 endef
 
@@ -75,12 +75,12 @@ endef
 
 define PROG_template
 
-$$(eval $$(call OBJS_template,$(1)))
+$$(eval $$(call OBJS_template,$1))
 
-../bin/$(1): $$($(1)_OBJS) ../wrk/common/common.a | ../bin
+../bin/$1: $$($1_OBJS) ../wrk/common/common.a | ../bin
 	$$(CC) $$(LDFLAGS) -o $$@ $$^ $$(LDLIBS)
 
-$(1): ../bin/$(1)
+$1: ../bin/$1
 
 endef
 

@@ -54,7 +54,7 @@ clean: mostlyclean
 
 else # TARGET
 
-CFLAGS += -t $(TARGET) -Osir --create-dep $(@:.o=.d)
+CFLAGS += -Osir
 
 EXTZP = cbm510 \
         cbm610 \
@@ -157,7 +157,7 @@ $(TARGET): $$($1_DRVS)
 
 $$($1_STCPAT): $$($1_DRVPAT)
 	$$(CO) -o $$(@:.o=.s) --code-label _$$(subst -,_,$$(subst .,_,$$(<F))) $$<
-	$$(CC) -c -t $$(TARGET) -o $$@ $$(@:.o=.s)
+	@$$(CA) -t $$(TARGET) -o $$@ $$(@:.o=.s)
 
 OBJS += $$($1_STCS)
 
@@ -171,21 +171,24 @@ $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 
 ifdef CC65_HOME
   AR = $(CC65_HOME)/bin/ar65
-  CC = $(CC65_HOME)/bin/cl65
+  CA = $(CC65_HOME)/bin/ca65
+  CC = $(CC65_HOME)/bin/cc65
   CO = $(CC65_HOME)/bin/co65
   LD = $(CC65_HOME)/bin/ld65
 else
   AR = ../bin/ar65
-  CC = ../bin/cl65
+  CA = ../bin/ca65
+  CC = ../bin/cc65
   CO = ../bin/co65
   LD = ../bin/ld65
 endif
 
 ../wrk/$(TARGET)/%.o: %.s | ../wrk/$(TARGET)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CA) -t $(TARGET) $(AFLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 ../wrk/$(TARGET)/%.o: %.c | ../wrk/$(TARGET)
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -t $(TARGET) $(CFLAGS) --create-dep $(@:.o=.d) -o $(@:.o=.s) $<
+	@$(CA) -t $(TARGET) -o $@ $(@:.o=.s)
 
 ../wrk/$(TARGET):
 	mkdir -p $@

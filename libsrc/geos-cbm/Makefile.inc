@@ -1,1 +1,1 @@
-CFLAGS += -Wa -Igeos-cbm,-Igeos-common
+AFLAGS += -I geos-cbm -I geos-common

@@ -13,4 +13,4 @@
 # DYNAMIC_DD     - determine default disk device at runtime (SpartaDOS only)
 #                  needs DEFAULT_DEVICE to be defined, otherwise no effect
 
-CFLAGS += -Wa -DNUMDRVS=4,-DLINEBUF=80,-DUCASE_FILENAME=1,-DDEFAULT_DEVICE=1,-DDYNAMIC_DD=1
+AFLAGS += -D NUMDRVS=4 -D LINEBUF=80 -D UCASE_FILENAME=1 -D DEFAULT_DEVICE=1 -D DYNAMIC_DD=1

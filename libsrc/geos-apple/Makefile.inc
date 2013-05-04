@@ -1,1 +1,1 @@
-CFLAGS += -Wa -Igeos-apple,-Igeos-common
+AFLAGS += -I geos-apple -I geos-common

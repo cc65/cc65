@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2010, Ullrich von Bassewitz                                      */
+/* (C) 2003-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -52,6 +52,10 @@
 extern SearchPath*      LibSearchPath;          /* Library path */
 extern SearchPath*      ObjSearchPath;          /* Object file path */
 extern SearchPath*      CfgSearchPath;          /* Config file path */
+
+extern SearchPath*      LibDefaultPath;         /* Default Library path */
+extern SearchPath*      ObjDefaultPath;         /* Default Object file path */
+extern SearchPath*      CfgDefaultPath;         /* Default Config file path */
 
 
 

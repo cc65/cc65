@@ -15,8 +15,8 @@
 <H2><A NAME="s3">3.</A> <A HREF="ld65.html#toc3">Search paths</A></H2>
 
 
-<P>Starting with version 2.10 there are now several search paths for files needed
-by the linker: One for libraries, one for object files and one for config
+<P>Starting with version 2.10, there are now several search-path lists for files needed
+by the linker: one for libraries, one for object files, and one for config.
 files.</P>
 
 
@@ -24,16 +24,16 @@ files.</P>
 </H2>
 
 
-<P>The library search path contains in this order:</P>
+<P>The library search-path list contains in this order:</P>
 <P>
 <OL>
 <LI>The current directory.</LI>
-<LI>An optionally compiled in library path.</LI>
+<LI>Any directory added with the <CODE>
+<A HREF="ld65-2.html#option--lib-path">--lib-path</A></CODE> option on the command line.</LI>
 <LI>The value of the environment variable <CODE>LD65_LIB</CODE> if it is defined.</LI>
 <LI>A subdirectory named <CODE>lib</CODE> of the directory defined in the environment
 variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
-<LI>Any directory added with the <CODE>
-<A HREF="ld65-2.html#option--lib-path">--lib-path</A></CODE> option on the command line.</LI>
+<LI>An optionally compiled-in library path.</LI>
 </OL>
 </P>
 
@@ -42,16 +42,16 @@ variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
 </H2>
 
 
-<P>The object file search path contains in this order:</P>
+<P>The object file search-path list contains in this order:</P>
 <P>
 <OL>
 <LI>The current directory.</LI>
-<LI>An optionally compiled in directory.</LI>
+<LI>Any directory added with the <CODE>
+<A HREF="ld65-2.html#option--obj-path">--obj-path</A></CODE> option on the command line.</LI>
 <LI>The value of the environment variable <CODE>LD65_OBJ</CODE> if it is defined.</LI>
 <LI>A subdirectory named <CODE>obj</CODE> of the directory defined in the environment
 variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
-<LI>Any directory added with the <CODE>
-<A HREF="ld65-2.html#option--obj-path">--obj-path</A></CODE> option on the command line.</LI>
+<LI>An optionally compiled-in directory.</LI>
 </OL>
 </P>
 
@@ -60,16 +60,16 @@ variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
 </H2>
 
 
-<P>The config file search path contains in this order:</P>
+<P>The config. file search-path list contains in this order:</P>
 <P>
 <OL>
 <LI>The current directory.</LI>
-<LI>An optionally compiled in directory.</LI>
+<LI>Any directory added with the <CODE>
+<A HREF="ld65-2.html#option--cfg-path">--cfg-path</A></CODE> option on the command line.</LI>
 <LI>The value of the environment variable <CODE>LD65_CFG</CODE> if it is defined.</LI>
 <LI>A subdirectory named <CODE>cfg</CODE> of the directory defined in the environment
 variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
-<LI>Any directory added with the <CODE>
-<A HREF="ld65-2.html#option--cfg-path">--cfg-path</A></CODE> option on the command line.</LI>
+<LI>An optionally compiled-in directory.</LI>
 </OL>
 </P>
 

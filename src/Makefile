@@ -1,3 +1,5 @@
+ifeq ($(shell echo),)
+
 PROGS = ar65  \
         ca65  \
         cc65  \
@@ -100,3 +102,20 @@ $(eval $(call OBJS_template,common))
 $(foreach prog,$(PROGS),$(eval $(call PROG_template,$(prog))))
 
 -include $(DEPS)
+
+else # cmd.exe
+
+.SUFFIXES:
+
+.PHONY: all mostlyclean clean
+
+all:
+	msbuild cc65.sln /p:configuration=release /consoleloggerparameters:disableconsolecolor
+
+mostlyclean:
+	$(if $(wildcard ../wrk),rmdir /s /q ..\wrk)
+
+clean:
+	msbuild cc65.sln /p:configuration=release /consoleloggerparameters:disableconsolecolor /target:$@
+
+endif # cmd.exe

@@ -35,6 +35,16 @@ ifeq ($(words $(MAKECMDGOALS)),1)
   endif
 endif
 
+DIRLIST = $(strip $(foreach dir,$1,$(wildcard $(dir))))
+
+ifeq ($(shell echo),)
+  MKDIR = mkdir -p $1
+  RMDIR = $(RM) -r $1
+else
+  MKDIR = mkdir $(subst /,\,$1)
+  RMDIR = $(if $(DIRLIST),rmdir /s /q $(subst /,\,$(DIRLIST)))
+endif
+
 .SUFFIXES:
 
 .PHONY: all $(TARGETS) mostlyclean clean
@@ -47,10 +57,10 @@ $(TARGETS):
 	@$(MAKE) --no-print-directory $@
 
 mostlyclean:
-	$(RM) -r ../wrk
+	$(call RMDIR,../wrk)
 
-clean: mostlyclean
-	$(RM) -r ../lib $(addprefix ../,$(DRVTYPES))
+clean:
+	$(call RMDIR,../wrk ../lib $(addprefix ../,$(DRVTYPES)))
 
 else # TARGET
 
@@ -145,18 +155,20 @@ $1_STCS = $$(patsubst $$($1_DRVPAT),$$($1_STCPAT),$$($1_DRVS))
 $$($1_OBJS): | $$($1_OBJDIR)
 
 $$($1_OBJDIR):
-	mkdir -p $$@
+	@$$(call MKDIR,$$@)
 
 $$($1_DRVPAT): $$($1_OBJPAT) $$(ZPOBJ) | $$($1_DRVDIR)
-	$$(LD) -o $$@ -t module $$^
+	@echo $$(TARGET) - $$(@F)
+	@$$(LD) -o $$@ -t module $$^
 
 $$($1_DRVDIR):
-	mkdir $$@
+	@$$(call MKDIR,$$@)
 
 $(TARGET): $$($1_DRVS)
 
 $$($1_STCPAT): $$($1_DRVPAT)
-	$$(CO) -o $$(@:.o=.s) --code-label _$$(subst -,_,$$(subst .,_,$$(<F))) $$<
+	@echo $$(TARGET) - $$(<F)
+	@$$(CO) -o $$(@:.o=.s) --code-label _$$(subst -,_,$$(subst .,_,$$(<F))) $$<
 	@$$(CA) -t $$(TARGET) -o $$@ $$(@:.o=.s)
 
 OBJS += $$($1_STCS)
@@ -184,20 +196,22 @@ else
 endif
 
 ../wrk/$(TARGET)/%.o: %.s | ../wrk/$(TARGET)
-	$(CA) -t $(TARGET) $(AFLAGS) --create-dep $(@:.o=.d) -o $@ $<
+	@echo $(TARGET) - $<
+	@$(CA) -t $(TARGET) $(AFLAGS) --create-dep $(@:.o=.d) -o $@ $<
 
 ../wrk/$(TARGET)/%.o: %.c | ../wrk/$(TARGET)
-	$(CC) -t $(TARGET) $(CFLAGS) --create-dep $(@:.o=.d) -o $(@:.o=.s) $<
+	@echo $(TARGET) - $<
+	@$(CC) -t $(TARGET) $(CFLAGS) --create-dep $(@:.o=.d) -o $(@:.o=.s) $<
 	@$(CA) -t $(TARGET) -o $@ $(@:.o=.s)
 
 ../wrk/$(TARGET):
-	mkdir -p $@
+	@$(call MKDIR,$@)
 
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR) a $@ $?
 
 ../lib:
-	mkdir $@
+	@$(call MKDIR,$@)
 
 $(TARGET): ../lib/$(TARGET).lib
 

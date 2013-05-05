@@ -22,23 +22,23 @@ CFLAGS += -MMD -MP -O -std=c89 -I common \
 
 LDLIBS += -lm
 
+.SUFFIXES:
+
+.PHONY: all $(PROGS) mostlyclean clean install uninstall
+
 all: $(PROGS)
 
 mostlyclean:
 	$(RM) -r ../wrk
 
-clean: mostlyclean
-	$(RM) -r ../bin
+clean:
+	$(RM) -r ../wrk ../bin
 
 install: all
 	$(foreach prog,$(PROGS),$(INSTALL_recipe))
 
 uninstall:
 	$(foreach prog,$(PROGS),$(UNINSTALL_recipe))
-
-.PHONY: all $(PROGS) mostlyclean clean install uninstall
-
-.SUFFIXES:
 
 ##########
 
@@ -65,7 +65,7 @@ $1_OBJS := $$(patsubst %.c,../wrk/%.o,$$(wildcard $1/*.c))
 $$($1_OBJS): | ../wrk/$1
 
 ../wrk/$1:
-	mkdir -p $$@
+	@mkdir -p $$@
 
 DEPS += $$($1_OBJS:.o=.d)
 
@@ -87,11 +87,11 @@ endef
 ##########
 
 ../wrk/%.o: %.c
-	@echo $(CC) $<
+	@echo $<
 	@$(CC) -c $(CFLAGS) -o $@ $<
 
 ../bin:
-	mkdir $@
+	@mkdir $@
 
 $(eval $(call OBJS_template,common))
 ../wrk/common/common.a: $(common_OBJS)

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2012, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -956,6 +956,9 @@ int main (int argc, char* argv[])
     if (InputFile == 0) {
 	AbEnd ("No input files");
     }
+
+    /* Add the default include search paths. */
+    FinishIncludePaths ();
 
     /* Create the output file name if it was not explicitly given */
     MakeDefaultOutputName (InputFile);

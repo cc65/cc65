@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -70,17 +70,23 @@ void InitIncludePaths (void)
     /* Create the search path lists */
     IncSearchPath = NewSearchPath ();
     BinSearchPath = NewSearchPath ();
+}
 
-    /* Add some compiled in search paths if defined at compile time */
-#ifdef CA65_INC
-    AddSearchPath (IncSearchPath, STRINGIZE (CA65_INC));
-#endif
 
+
+void FinishIncludePaths (void)
+/* Finish creating the include path search list. */
+{
     /* Add specific paths from the environment */
     AddSearchPathFromEnv (IncSearchPath, "CA65_INC");
 
-    /* Add paths relative to a main directory defined in an env var */
+    /* Add paths relative to a main directory defined in an env. var. */
     AddSubSearchPathFromEnv (IncSearchPath, "CC65_HOME", "asminc");
+
+    /* Add some compiled-in search paths if defined at compile time. */
+#ifdef CA65_INC
+    AddSearchPath (IncSearchPath, STRINGIZE (CA65_INC));
+#endif
 }
 
 

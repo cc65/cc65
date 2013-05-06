@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -65,6 +65,9 @@ void ForgetAllIncludePaths (void);
 
 void InitIncludePaths (void);
 /* Initialize the include path search list */
+
+void FinishIncludePaths (void);
+/* Finish creating the include path search list. */
 
 
 

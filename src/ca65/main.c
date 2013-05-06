@@ -5,7 +5,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -1015,6 +1015,9 @@ int main (int argc, char* argv [])
 	fprintf (stderr, "%s: No input files\n", ProgName);
 	exit (EXIT_FAILURE);
     }
+
+    /* Add the default include search paths. */
+    FinishIncludePaths ();
 
     /* If no CPU given, use the default CPU for the target */
     if (GetCPU () == CPU_UNKNOWN) {

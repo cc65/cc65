@@ -6,7 +6,7 @@
 /*		     							     */
 /*		     							     */
 /*		     							     */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -178,10 +178,16 @@ static void LinkFile (const char* Name, FILETYPE Type)
 
         case FILETYPE_LIB:
             PathName = SearchFile (LibSearchPath, Name);
+            if (PathName == 0) {
+                PathName = SearchFile (LibDefaultPath, Name);
+            }
             break;
 
         case FILETYPE_OBJ:
             PathName = SearchFile (ObjSearchPath, Name);
+            if (PathName == 0) {
+                PathName = SearchFile (ObjDefaultPath, Name);
+            }
             break;
 
         default:
@@ -296,12 +302,14 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
     /* Search for the file */
     PathName = SearchFile (CfgSearchPath, Arg);
     if (PathName == 0) {
+        PathName = SearchFile (CfgDefaultPath, Arg);
+    }
+    if (PathName == 0) {
         Error ("Cannot find config file `%s'", Arg);
-    } else {
-        CfgSetName (PathName);
     }
 
     /* Read the config */
+    CfgSetName (PathName);
     CfgRead ();
 }
 
@@ -487,6 +495,9 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
     /* Search for the file */
     PathName = SearchFile (CfgSearchPath, SB_GetBuf (&FileName));
+    if (PathName == 0) {
+        PathName = SearchFile (CfgDefaultPath, SB_GetBuf (&FileName));
+    }
     if (PathName == 0) {
         Error ("Cannot find config file `%s'", SB_GetBuf (&FileName));
     }
@@ -712,7 +723,6 @@ int main (int argc, char* argv [])
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;
 }
-
 
 
 

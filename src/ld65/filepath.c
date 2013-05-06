@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2010, Ullrich von Bassewitz                                      */
+/* (C) 2003-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -48,6 +48,10 @@ SearchPath*      LibSearchPath;         /* Library path */
 SearchPath*      ObjSearchPath;         /* Object file path */
 SearchPath*      CfgSearchPath;         /* Config file path */
 
+SearchPath*      LibDefaultPath;        /* Default Library path */
+SearchPath*      ObjDefaultPath;        /* Default Object file path */
+SearchPath*      CfgDefaultPath;        /* Default Config file path */
+
 
 
 /*****************************************************************************/
@@ -64,31 +68,35 @@ void InitSearchPaths (void)
     ObjSearchPath = NewSearchPath ();
     CfgSearchPath = NewSearchPath ();
 
+    LibDefaultPath = NewSearchPath ();
+    ObjDefaultPath = NewSearchPath ();
+    CfgDefaultPath = NewSearchPath ();
+
     /* Always search all stuff in the current directory */
     AddSearchPath (LibSearchPath, "");
     AddSearchPath (ObjSearchPath, "");
     AddSearchPath (CfgSearchPath, "");
 
-    /* Add some compiled in search paths if defined at compile time */
+    /* Add specific paths from the environment. */
+    AddSearchPathFromEnv (LibDefaultPath, "LD65_LIB");
+    AddSearchPathFromEnv (ObjDefaultPath, "LD65_OBJ");
+    AddSearchPathFromEnv (CfgDefaultPath, "LD65_CFG");
+
+    /* Add paths relative to a main directory defined in an env. var. */
+    AddSubSearchPathFromEnv (LibDefaultPath, "CC65_HOME", "lib");
+    AddSubSearchPathFromEnv (ObjDefaultPath, "CC65_HOME", "obj");
+    AddSubSearchPathFromEnv (CfgDefaultPath, "CC65_HOME", "cfg");
+
+    /* Add some compiled-in search paths if defined at compile time. */
 #if defined(LD65_LIB)
-    AddSearchPath (LibSearchPath, STRINGIZE (LD65_LIB));
+    AddSearchPath (LibDefaultPath, STRINGIZE (LD65_LIB));
 #endif
 #if defined(LD65_OBJ)
-    AddSearchPath (ObjSearchPath, STRINGIZE (LD65_OBJ));
+    AddSearchPath (ObjDefaultPath, STRINGIZE (LD65_OBJ));
 #endif
 #if defined(LD65_CFG)
-    AddSearchPath (CfgSearchPath, STRINGIZE (LD65_CFG));
+    AddSearchPath (CfgDefaultPath, STRINGIZE (LD65_CFG));
 #endif
-
-    /* Add specific paths from the environment */
-    AddSearchPathFromEnv (LibSearchPath, "LD65_LIB");
-    AddSearchPathFromEnv (ObjSearchPath, "LD65_OBJ");
-    AddSearchPathFromEnv (CfgSearchPath, "LD65_CFG");
-
-    /* Add paths relative to a main directory defined in an env var */
-    AddSubSearchPathFromEnv (LibSearchPath, "CC65_HOME", "lib");
-    AddSubSearchPathFromEnv (ObjSearchPath, "CC65_HOME", "obj");
-    AddSubSearchPathFromEnv (CfgSearchPath, "CC65_HOME", "cfg");
 }
 
 

@@ -96,7 +96,7 @@ StrBuf* GenKoala (const Bitmap* B, const Collection* A attribute ((unused)))
     SB_AppendChar (D, 0x44);
     
     /* TODO: The actual work ;-) */
-    (void)Screen;
+    (void) Screen;
 
     /* Return the converted bitmap */
     return D;

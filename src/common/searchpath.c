@@ -195,6 +195,11 @@ void AddSubSearchPathFromWinBin (SearchPath* P, const char* SubDir)
     /* Add the search path */
     AddSearchPath (P, Dir);
 
+#else
+
+    (void) P;
+    (void) SubDir;
+
 #endif
 }
 

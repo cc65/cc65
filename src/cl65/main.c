@@ -283,14 +283,22 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
 
 
 
-static void CmdInit (CmdDesc* Cmd, const char* Path)
-/* Initialize the command using the given path to the executable */
+static void CmdInit (CmdDesc* Cmd, const char* Path, const char* Name)
+/* Initialize the command using the given path and name of the executable */
 {
+    char* FullName;
+
+    FullName = (char*) xmalloc (strlen (Path) + strlen (Name) + 1);
+    strcpy (FullName, Path);
+    strcat (FullName, Name);
+
     /* Remember the command */
-    Cmd->Name = xstrdup (Path);
+    Cmd->Name = xstrdup (FullName);
 
     /* Use the command name as first argument */
-    CmdAddArg (Cmd, Path);
+    CmdAddArg (Cmd, FullName);
+
+    xfree (FullName);
 }
 
 
@@ -1283,17 +1291,34 @@ int main (int argc, char* argv [])
 	{ "--zeropage-name",    1, 	OptZeropageName         },
     };
 
+    char* CmdPath;
     unsigned I;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "cl65");
 
     /* Initialize the command descriptors */
-    CmdInit (&CC65, "cc65");
-    CmdInit (&CA65, "ca65");
-    CmdInit (&CO65, "co65");
-    CmdInit (&LD65, "ld65");
-    CmdInit (&GRC,  "grc65");
+    if (argc == 0) {
+        CmdPath = xstrdup ("");
+    } else {
+        char* Ptr;
+        CmdPath = xstrdup (argv[0]);
+        Ptr = strrchr (CmdPath, '/');
+        if (Ptr == 0) {
+            Ptr = strrchr (CmdPath, '\\');
+        }
+        if (Ptr == 0) {
+            *CmdPath = '\0';
+        } else {
+            *(Ptr + 1) = '\0';
+        }
+    }
+    CmdInit (&CC65, CmdPath, "cc65");
+    CmdInit (&CA65, CmdPath, "ca65");
+    CmdInit (&CO65, CmdPath, "co65");
+    CmdInit (&LD65, CmdPath, "ld65");
+    CmdInit (&GRC,  CmdPath, "grc65");
+    xfree (CmdPath);
 
     /* Our default target is the C64 instead of "none" */
     Target = TGT_C64;

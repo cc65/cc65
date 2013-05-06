@@ -87,6 +87,9 @@ void FinishIncludePaths (void)
 #ifdef CA65_INC
     AddSearchPath (IncSearchPath, STRINGIZE (CA65_INC));
 #endif
+
+    /* Add paths relative to the parent directory of the Windows binary. */
+    AddSubSearchPathFromWinBin (IncSearchPath, "asminc");
 }
 
 

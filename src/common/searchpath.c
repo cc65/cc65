@@ -157,6 +157,48 @@ void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* Sub
 
 
 
+void AddSubSearchPathFromWinBin (SearchPath* P, const char* SubDir)
+{
+/* Windows only:
+ * Add a search path from the running binary, adding a subdirectory to
+ * the parent directory of the directory containing the binary.
+ */
+#if defined(_MSC_VER)
+
+    char Dir[_MAX_PATH];
+    char* Ptr;
+
+    if (_get_pgmptr (&Ptr) != 0) {
+        return;
+    }
+    strcpy (Dir, Ptr);
+
+    /* Remove binary name */
+    Ptr = strrchr (Dir, '\\');
+    if (Ptr == 0) {
+        return;
+    }
+    *Ptr = '\0';
+
+    /* Check for 'bin' directory */
+    Ptr = strrchr (Dir, '\\');
+    if (Ptr == 0) {
+        return;
+    }
+    if (strcmp (Ptr++, "\\bin") != 0) {
+        return;
+    }
+
+    /* Append SubDir */
+    strcpy (Ptr, SubDir);
+
+    /* Add the search path */
+    AddSearchPath (P, Dir);
+
+#endif
+}
+
+
 int PushSearchPath (SearchPath* P, const char* NewPath)
 /* Add a new search path to the head of an existing search path list, provided
  * that it's not already there. If the path is already at the first position,

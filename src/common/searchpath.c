@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -233,18 +233,6 @@ void PopSearchPath (SearchPath* P)
     /* Remove the path at position 0 */
     xfree (CollAt (P, 0));
     CollDelete (P, 0);
-}
-
-
-
-void ForgetSearchPath (SearchPath* P)
-/* Forget all search paths in the given list */
-{
-    unsigned I;
-    for (I = 0; I < CollCount (P); ++I) {
-        xfree (CollAt (P, I));
-    }
-    CollDeleteAll (P);
 }
 
 

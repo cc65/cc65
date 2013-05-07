@@ -60,9 +60,6 @@ extern SearchPath*      UsrIncSearchPath;       /* User include path */
 
 
 
-void ForgetAllIncludePaths (void);
-/* Remove all include search paths. */
-
 void InitIncludePaths (void);
 /* Initialize the include path search list */
 

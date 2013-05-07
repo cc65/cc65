@@ -55,15 +55,6 @@ SearchPath*     BinSearchPath;          /* Binary include path */
 
 
 
-void ForgetAllIncludePaths (void)
-/* Remove all include search paths. */
-{
-    ForgetSearchPath (IncSearchPath);
-    ForgetSearchPath (BinSearchPath);
-}
-
-
-
 void InitIncludePaths (void)
 /* Initialize the include path search list */
 {

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2010, Ullrich von Bassewitz                                      */
+/* (C) 2000-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -93,9 +93,6 @@ int PushSearchPath (SearchPath* P, const char* NewPath);
 
 void PopSearchPath (SearchPath* P);
 /* Remove a search path from the head of an existing search path list */
-
-void ForgetSearchPath (SearchPath* P);
-/* Forget all search paths in the given list */
 
 char* SearchFile (const SearchPath* P, const char* File);
 /* Search for a file in a list of directories. Return a pointer to a malloced

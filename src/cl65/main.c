@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2012, Ullrich von Bassewitz                                      */
+/* (C) 1999-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -732,7 +732,6 @@ static void Usage (void)
             "  --debug-info\t\t\tAdd debug info\n"
             "  --feature name\t\tSet an emulation feature\n"
             "  --force-import sym\t\tForce an import of symbol `sym'\n"
-            "  --forget-inc-paths\t\tForget include search paths (compiler)\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet a compiler include directory path\n"
             "  --ld-args options\t\tPass options to the linker\n"
@@ -969,15 +968,6 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
 /* Emulation features for the assembler */
 {
     CmdAddArg2 (&LD65, "-u", Arg);
-}
-
-
-
-static void OptForgetIncPaths (const char* Opt attribute ((unused)),
-                               const char* Arg attribute ((unused)))
-/* Forget all currently defined include paths */
-{
-    CmdAddArg (&CC65, "--forget-inc-paths");
 }
 
 
@@ -1261,7 +1251,6 @@ int main (int argc, char* argv [])
 	{ "--debug-info",    	0,	OptDebugInfo		},
 	{ "--feature",	     	1,	OptFeature		},
         { "--force-import",     1,      OptForceImport          },
-       	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
 	{ "--help",	     	0,	OptHelp			},
 	{ "--include-dir",   	1,	OptIncludeDir		},
         { "--ld-args",          1,      OptLdArgs               },

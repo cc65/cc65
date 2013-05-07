@@ -26,9 +26,9 @@ LDLIBS += -lm
 
 .SUFFIXES:
 
-.PHONY: all $(PROGS) mostlyclean clean install uninstall
+.PHONY: all bin $(PROGS) mostlyclean clean install uninstall
 
-all: $(PROGS)
+all bin: $(PROGS)
 
 mostlyclean:
 	$(RM) -r ../wrk
@@ -107,9 +107,9 @@ else # cmd.exe
 
 .SUFFIXES:
 
-.PHONY: all mostlyclean clean
+.PHONY: all bin mostlyclean clean
 
-all:
+all bin:
 	msbuild cc65.sln /p:configuration=release /consoleloggerparameters:disableconsolecolor
 
 mostlyclean:

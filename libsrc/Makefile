@@ -47,11 +47,11 @@ endif
 
 .SUFFIXES:
 
-.PHONY: all $(TARGETS) mostlyclean clean
+.PHONY: all lib $(TARGETS) mostlyclean clean
 
 ifndef TARGET
 
-all: $(TARGETS)
+all lib: $(TARGETS)
 
 $(TARGETS):
 	@$(MAKE) --no-print-directory $@

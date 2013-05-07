@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2012, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -227,9 +227,6 @@ void CfgBoolToken (void);
 void CfgSetName (const char* Name);
 /* Set a name for a config file */
 
-void CfgSetBuf (const char* Buf);
-/* Set a memory buffer for the config */
-
 int CfgAvail (void);
 /* Return true if we have a configuration available */
 
@@ -243,7 +240,6 @@ void CfgCloseInput (void);
 
 /* End of scanner.h */
 #endif
-
 
 
 

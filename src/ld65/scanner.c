@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2010, Ullrich von Bassewitz                                      */
+/* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
@@ -66,9 +66,8 @@ unsigned long   CfgIVal;
 /* Error location */
 FilePos                 CfgErrorPos;
 
-/* Input sources for the configuration */
+/* Input source for the configuration */
 static const char*     	CfgName		= 0;
-static const char*      CfgBuf 		= 0;
 
 /* Other input stuff */
 static int     	       	C      	     	= ' ';
@@ -126,18 +125,8 @@ void CfgError (const FilePos* Pos, const char* Format, ...)
 static void NextChar (void)
 /* Read the next character from the input file */
 {
-    if (CfgBuf) {
-	/* Read from buffer */
-	C = (unsigned char)(*CfgBuf);
-	if (C == 0) {
-     	    C = EOF;
-	} else {
-	    ++CfgBuf;
-	}
-    } else {
-	/* Read from the file */
-	C = getc (InputFile);
-    }
+    /* Read from the file */
+    C = getc (InputFile);
 
     /* Count columns */
     if (C != EOF) {
@@ -553,18 +542,10 @@ void CfgSetName (const char* Name)
 
 
 
-void CfgSetBuf (const char* Buf)
-/* Set a memory buffer for the config */
-{
-    CfgBuf = Buf;
-}
-
-
-
 int CfgAvail (void)
 /* Return true if we have a configuration available */
 {
-    return CfgName != 0 || CfgBuf != 0;
+    return CfgName != 0;
 }
 
 
@@ -572,24 +553,17 @@ int CfgAvail (void)
 void CfgOpenInput (void)
 /* Open the input file if we have one */
 {
-    /* If we have a config name given, open the file, otherwise we will read
-     * from a buffer.
-     */
-    if (!CfgBuf) {
-
-	/* Open the file */
-	InputFile = fopen (CfgName, "r");
-	if (InputFile == 0) {
-	    Error ("Cannot open `%s': %s", CfgName, strerror (errno));
-	}
-
+    /* Open the file */
+    InputFile = fopen (CfgName, "r");
+    if (InputFile == 0) {
+        Error ("Cannot open `%s': %s", CfgName, strerror (errno));
     }
 
     /* Initialize variables */
     C         = ' ';
     InputPos.Line = 1;
     InputPos.Col  = 0;
-    InputPos.Name = GetStringId (CfgBuf? "[builtin config]" : CfgName);
+    InputPos.Name = GetStringId (CfgName);
 
     /* Start the ball rolling ... */
     CfgNextTok ();

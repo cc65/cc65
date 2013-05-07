@@ -43,3 +43,13 @@ L:
         bcc     Arg
 .endmacro
 
+; bnz - jump if not zero
+.macro  bnz     Arg
+        bne     Arg
+.endmacro
+
+; bze - jump if zero
+.macro  bze     Arg
+        beq     Arg
+.endmacro
+

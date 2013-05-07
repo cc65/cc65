@@ -118,7 +118,6 @@ static void Usage (void)
             "  --dep-target target\t\tUse this dependency target\n"
             "  --disable-opt name\t\tDisable an optimization step\n"
             "  --enable-opt name\t\tEnable an optimization step\n"
-            "  --forget-inc-paths\t\tForget include search paths\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
             "  --list-opt-steps\t\tList all optimizer steps and exit\n"
@@ -537,15 +536,6 @@ static void OptEnableOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptForgetIncPaths (const char* Opt attribute ((unused)),
-                               const char* Arg attribute ((unused)))
-/* Forget all currently defined include paths */
-{
-    ForgetAllIncludePaths ();
-}
-
-
-
 static void OptHelp (const char* Opt attribute ((unused)),
 		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
@@ -792,7 +782,6 @@ int main (int argc, char* argv[])
         { "--dep-target",       1,      OptDepTarget            },
 	{ "--disable-opt",	1,	OptDisableOpt		},
 	{ "--enable-opt",	1,	OptEnableOpt  	       	},
-       	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--list-opt-steps",   0,      OptListOptSteps         },

@@ -116,7 +116,6 @@ static void Usage (void)
             "  --debug\t\t\tDebug mode\n"
             "  --debug-info\t\t\tAdd debug info to object file\n"
             "  --feature name\t\tSet an emulation feature\n"
-            "  --forget-inc-paths\t\tForget include search paths\n"
             "  --help\t\t\tHelp (this text)\n"
             "  --ignore-case\t\t\tIgnore case of symbols\n"
             "  --include-dir dir\t\tSet an include directory search path\n"
@@ -434,15 +433,6 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
     if (SetFeature (SB_InitFromString (&Feature, Arg)) == FEAT_UNKNOWN) {
       	AbEnd ("Illegal emulation feature: `%s'", Arg);
     }
-}
-
-
-
-static void OptForgetIncPaths (const char* Opt attribute ((unused)),
-                               const char* Arg attribute ((unused)))
-/* Forget all currently defined include paths */
-{
-    ForgetAllIncludePaths ();
 }
 
 
@@ -868,7 +858,6 @@ int main (int argc, char* argv [])
        	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0,	OptDebugInfo		},
 	{ "--feature",		1,	OptFeature		},
-       	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
 	{ "--help",    		0,	OptHelp			},
 	{ "--ignore-case",     	0,	OptIgnoreCase 		},
 	{ "--include-dir",     	1,	OptIncludeDir		},

@@ -25,12 +25,12 @@
 <P>
 <DL>
 
-<DT><B><CODE>a2.lo.tgi (apple2_40_48_16)</CODE></B><DD>
+<DT><B><CODE>a2.lo.tgi (a2_lo_tgi)</CODE></B><DD>
 <P>This driver features a resolution of 40&times;48 with 16 colors.</P>
 <P>The function <CODE>tgi_apple2_mix()</CODE> allows to activate 4 lines of text. The
 function clears the corresponding area at the bottom of the screen.</P>
 
-<DT><B><CODE>a2.hi.tgi (apple2_280_192_8)</CODE></B><DD>
+<DT><B><CODE>a2.hi.tgi (a2_hi_tgi)</CODE></B><DD>
 <P>This driver features a resolution of 280&times;192 with 8 colors and two
 hires pages. Note that programs using this driver will have to be linked
 with <CODE>--start-addr $4000</CODE> to reserve the first hires page or with
@@ -55,7 +55,7 @@ already opening the driver file) uses the heap implicitly.</P>
 <P>
 <DL>
 
-<DT><B><CODE>a2.auxmem.emd (apple2_auxmem)</CODE></B><DD>
+<DT><B><CODE>a2.auxmem.emd (a2_auxmem_emd)</CODE></B><DD>
 <P>Gives access to 47.5 KB RAM (190 pages of 256 bytes each) on an Extended
 80-Column Text Card.</P>
 <P>Note that this driver doesn't check for the actual existence of the memory
@@ -73,7 +73,7 @@ and that it doesn't check for ProDOS 8 RAM disk content!</P>
 <P>
 <DL>
 
-<DT><B><CODE>a2.stdjoy.joy (apple2_stdjoy)</CODE></B><DD>
+<DT><B><CODE>a2.stdjoy.joy (a2_stdjoy_joy)</CODE></B><DD>
 <P>Supports up to two standard analog joysticks connected to the game port of
 the Apple&nbsp;][.</P>
 
@@ -89,7 +89,7 @@ the Apple&nbsp;][.</P>
 <P>
 <DL>
 
-<DT><B><CODE>a2.stdmou.mou (apple2_stdmou)</CODE></B><DD>
+<DT><B><CODE>a2.stdmou.mou (a2_stdmou_mou)</CODE></B><DD>
 <P>Driver for the AppleMouse&nbsp;II Card. Searches all Apple&nbsp;II slots
 for an AppleMouse&nbsp;II Card compatible firmware. The default bounding
 box is [0..279,0..191].</P>
@@ -113,7 +113,7 @@ mode only.</P>
 <P>
 <DL>
 
-<DT><B><CODE>a2.ssc.ser (apple2_ssc)</CODE></B><DD>
+<DT><B><CODE>a2.ssc.ser (a2_ssc_ser)</CODE></B><DD>
 <P>Driver for the Apple&nbsp;II Super Serial Card. Supports up to 19200 baud,
 hardware flow control (RTS/CTS) and interrupt driven receives. Note
 that because of the peculiarities of the 6551 chip transmits are not

@@ -181,19 +181,11 @@ endef
 
 $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 
-ifdef CC65_HOME
-  AR = $(CC65_HOME)/bin/ar65
-  CA = $(CC65_HOME)/bin/ca65
-  CC = $(CC65_HOME)/bin/cc65
-  CO = $(CC65_HOME)/bin/co65
-  LD = $(CC65_HOME)/bin/ld65
-else
-  AR = ../bin/ar65
-  CA = ../bin/ca65
-  CC = ../bin/cc65
-  CO = ../bin/co65
-  LD = ../bin/ld65
-endif
+AR = $(if $(wildcard ../bin/ar65*),../bin/ar65,ar65)
+CA = $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
+CC = $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
+CO = $(if $(wildcard ../bin/co65*),../bin/co65,co65)
+LD = $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
 ../wrk/$(TARGET)/%.o: %.s | ../wrk/$(TARGET)
 	@echo $(TARGET) - $<

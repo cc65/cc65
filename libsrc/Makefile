@@ -125,6 +125,10 @@ OBJS := $(addprefix ../wrk/$(TARGET)/,$(sort $(notdir $(OBJS))))
 
 DEPS = $(OBJS:.o=.d)
 
+EXTRA_SRCPAT = $(firstword $(DIRS))/extra/%.s
+EXTRA_OBJPAT = ../lib/$(TARGET)-%.o
+EXTRA_OBJS := $(patsubst $(EXTRA_SRCPAT),$(EXTRA_OBJPAT),$(wildcard $(firstword $(DIRS))/extra/*.s))
+
 ZPOBJ = ../wrk/$(TARGET)/zeropage.o
 ifeq ($(TARGET),$(filter $(TARGET),$(EXTZP)))
   ZPOBJ += ../wrk/$(TARGET)/extzp.o
@@ -199,13 +203,17 @@ LD = $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 ../wrk/$(TARGET):
 	@$(call MKDIR,$@)
 
+$(EXTRA_OBJPAT): $(EXTRA_SRCPAT) | ../lib
+	@echo $(TARGET) - $<
+	@$(CA) -t $(TARGET) $(AFLAGS) -o $@ $<
+
 ../lib/$(TARGET).lib: $(OBJS) | ../lib
 	$(AR) a $@ $?
 
 ../lib:
 	@$(call MKDIR,$@)
 
-$(TARGET): ../lib/$(TARGET).lib
+$(TARGET): $(EXTRA_OBJS) ../lib/$(TARGET).lib
 
 -include $(DEPS)
 

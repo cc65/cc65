@@ -191,11 +191,11 @@ endef
 
 $(foreach drvtype,$(DRVTYPES),$(eval $(call DRVTYPE_template,$(drvtype))))
 
-AR = $(if $(wildcard ../bin/ar65*),../bin/ar65,ar65)
-CA = $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
-CC = $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
-CO = $(if $(wildcard ../bin/co65*),../bin/co65,co65)
-LD = $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
+AR := $(if $(wildcard ../bin/ar65*),../bin/ar65,ar65)
+CA := $(if $(wildcard ../bin/ca65*),../bin/ca65,ca65)
+CC := $(if $(wildcard ../bin/cc65*),../bin/cc65,cc65)
+CO := $(if $(wildcard ../bin/co65*),../bin/co65,co65)
+LD := $(if $(wildcard ../bin/ld65*),../bin/ld65,ld65)
 
 ##########
 

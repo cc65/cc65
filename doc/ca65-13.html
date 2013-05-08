@@ -59,6 +59,14 @@ Currently defined macros are:</P>
                 beq     Arg
                 bcc     Arg
         .endmacro
+
+        .macro  bnz     Arg
+                bne     Arg
+        .endmacro
+
+        .macro  bze     Arg
+                beq     Arg
+        .endmacro
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>

@@ -10,12 +10,12 @@ CBMS = c128   \
 GEOS = geos-apple \
        geos-cbm
 
-TARGETS = $(CBMS)   \
-          $(GEOS)   \
-          apple2    \
+TARGETS = apple2    \
           apple2enh \
           atari     \
           atmos     \
+          $(CBMS)   \
+          $(GEOS)   \
           lynx      \
           nes       \
           supervision

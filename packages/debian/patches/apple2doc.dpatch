@@ -1,7 +1,0 @@
-#! /bin/sh /usr/share/dpatch/dpatch-run
-## apple2doc.dpatch by  <ml-cc65@trikaliotis.net>
-##
-## All lines beginning with `## DP:' are a description of the patch.
-## DP: No description.
-
-@DPATCH@

@@ -1,3 +1,5 @@
+DEPS += ../wrk/$(TARGET)/loader.d
+
 ../wrk/$(TARGET)/loader.o: $(SRCDIR)/targetutil/loader.s | ../wrk/$(TARGET)
 	$(ASSEMBLE_recipe)
 

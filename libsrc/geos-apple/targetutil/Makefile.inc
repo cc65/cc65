@@ -1,3 +1,5 @@
+DEPS += ../wrk/$(TARGET)/convert.d
+
 ../wrk/$(TARGET)/convert.o: TARGET = apple2enh
 
 ../wrk/$(TARGET)/convert.o: $(SRCDIR)/targetutil/convert.c | ../wrk/$(TARGET)

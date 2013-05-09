@@ -519,6 +519,10 @@ static char IsAbortKey (char C)
         return 1;
     }
 #endif
+#if !defined(CH_ESC) && !defined(CH_STOP)
+    /* Avoid compiler warning about unused parameter */
+    (void) C;
+#endif
     return 0;
 }
 

@@ -130,24 +130,24 @@
 
 
 /* The addresses of the static drivers */
-extern void c64_c256k[];
-extern void c64_dqbb[];
-extern void c64_georam[];
-extern void c64_isepic[];
-extern void c64_ram[];
-extern void c64_ramcart[];
-extern void c64_reu[];
-extern void c64_vdc[];
-extern void dtv_himem[];
-extern void c64_hitjoy[];
-extern void c64_numpad[];
-extern void c64_ptvjoy[];
-extern void c64_stdjoy[];               /* Referred to by joy_static_stddrv[] */
-extern void c64_1351[];                 /* Referred to by mouse_static_stddrv[] */
-extern void c64_joymouse[];
-extern void c64_potmouse[];
-extern void c64_swlink[];
-extern void c64_320_200_2[];            /* Referred to by tgi_static_stddrv[] */
+extern void c64_c256k_emd[];
+extern void c64_dqbb_emd[];
+extern void c64_georam_emd[];
+extern void c64_isepic_emd[];
+extern void c64_ram_emd[];
+extern void c64_ramcart_emd[];
+extern void c64_reu_emd[];
+extern void c64_vdc_emd[];
+extern void dtv_himem_emd[];
+extern void c64_hitjoy_joy[];
+extern void c64_numpad_joy[];
+extern void c64_ptvjoy_joy[];
+extern void c64_stdjoy_joy[];           /* Referred to by joy_static_stddrv[] */
+extern void c64_1351_mou[];             /* Referred to by mouse_static_stddrv[] */
+extern void c64_joy_mou[];
+extern void c64_pot_mou[];
+extern void c64_swlink_ser[];
+extern void c64_hi_tgi[];               /* Referred to by tgi_static_stddrv[] */
 
 
 

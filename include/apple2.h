@@ -142,12 +142,14 @@ extern unsigned char _filetype;  /* Default 6 */
 extern unsigned int  _auxtype;   /* Default 0 */
 
 /* The addresses of the static drivers */
-extern void apple2_auxmem[];
-extern void apple2_stdjoy[];     /* Referred to by joy_static_stddrv[]   */
-extern void apple2_stdmou[];     /* Referred to by mouse_static_stddrv[] */
-extern void apple2_ssc[];
-extern void apple2_280_192_8[];  /* Referred to by tgi_static_stddrv[]   */
-extern void apple2_40_48_16[];
+#ifndef __APPLE2ENH__
+extern void a2_auxmem_emd[];
+extern void a2_stdjoy_joy[];     /* Referred to by joy_static_stddrv[]   */
+extern void a2_stdmou_mou[];     /* Referred to by mouse_static_stddrv[] */
+extern void a2_ssc_ser[];
+extern void a2_hi_tgi[];         /* Referred to by tgi_static_stddrv[]   */
+extern void a2_lo_tgi[];
+#endif
 
 
 

@@ -58,8 +58,8 @@
 
 
 /* The addresses of the static drivers */
-extern void plus4_stdjoy[];   /* Referred to by joy_static_stddrv[] */
-extern void plus4_stdser[];
+extern void plus4_stdjoy_joy[];   /* Referred to by joy_static_stddrv[] */
+extern void plus4_stdser_ser[];
 
 
 

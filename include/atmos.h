@@ -119,10 +119,10 @@
 
 
 /* The addresses of the static drivers */
-extern void atmos_pase[];	/* Referred to by joy_static_stddrv[] */
-extern void atmos_acia[];
-extern void atmos_228_200_3[];
-extern void atmos_240_200_2[];	/* Referred to by tgi_static_stddrv[] */
+extern void atmos_pase_joy[];		/* Referred to by joy_static_stddrv[] */
+extern void atmos_acia_ser[];
+extern void atmos_228_200_3_tgi[];
+extern void atmos_240_200_2_tgi[];	/* Referred to by tgi_static_stddrv[] */
 
 
 

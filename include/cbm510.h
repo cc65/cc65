@@ -118,9 +118,9 @@
 
 
 /* The addresses of the static drivers */
-extern void cbm510_ram[];
-extern void cbm510_stdjoy[];	/* Referred to by joy_static_stddrv[] */
-extern void cbm510_stdser[];
+extern void cbm510_ram_emd[];
+extern void cbm510_std_joy[];	/* Referred to by joy_static_stddrv[] */
+extern void cbm510_std_ser[];
 
 
 

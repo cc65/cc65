@@ -121,20 +121,20 @@
 
 
 /* The addresses of the static drivers */
-extern void c128_georam[];
-extern void c128_ram[];
-extern void c128_ram2[];
-extern void c128_ramcart[];
-extern void c128_reu[];
-extern void c128_vdc[];
-extern void c128_ptvjoy[];
-extern void c128_stdjoy[];	/* Referred to by joy_static_stddrv[] */
-extern void c128_1351[];	/* Referred to by mouse_static_stddrv[] */
-extern void c128_joymouse[];
-extern void c128_potmouse[];
-extern void c128_swlink[];
-extern void c128_640_200_2[];	/* Referred to by tgi_static_stddrv[] */
-extern void c128_640_480_2[];
+extern void c128_georam_emd[];
+extern void c128_ram_emd[];
+extern void c128_ram2_emd[];
+extern void c128_ramcart_emd[];
+extern void c128_reu_emd[];
+extern void c128_vdc_emd[];
+extern void c128_ptvjoy_joy[];
+extern void c128_stdjoy_joy[];	/* Referred to by joy_static_stddrv[] */
+extern void c128_1351_mous[];	/* Referred to by mouse_static_stddrv[] */
+extern void c128_joy_mou[];
+extern void c128_pot_mou[];
+extern void c128_swlink_ser[];
+extern void c128_vdc_tgi[];	/* Referred to by tgi_static_stddrv[] */
+extern void c128_vdc2_tgi[];
 
 
 

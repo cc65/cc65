@@ -99,9 +99,9 @@
 
 
 /* The addresses of the static drivers */
-extern void lynx_stdjoy[];        /* Referred to by joy_static_stddrv[] */
-extern void lynx_comlynx[];
-extern void lynx_160_102_16[];    /* Referred to by tgi_static_stddrv[] */
+extern void lynx_stdjoy_joy[];        /* Referred to by joy_static_stddrv[] */
+extern void lynx_comlynx_ser[];
+extern void lynx_160_102_16_tgi[];    /* Referred to by tgi_static_stddrv[] */
 
 
 

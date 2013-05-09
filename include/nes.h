@@ -93,8 +93,8 @@
 
 
 /* The addresses of the static drivers */
-extern void nes_stdjoy[];       /* Referred to by joy_static_stddrv[] */
-extern void nes_64_56_2[];      /* Referred to by tgi_static_stddrv[] */
+extern void nes_stdjoy_joy[];       /* Referred to by joy_static_stddrv[] */
+extern void nes_64_56_2_tgi[];      /* Referred to by tgi_static_stddrv[] */
 
 
 

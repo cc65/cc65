@@ -103,8 +103,8 @@
 
 
 /* The addresses of the static drivers */
-extern void cbm610_ram[];
-extern void cbm610_stdser[];
+extern void cbm610_ram_emd[];
+extern void cbm610_std_ser[];
 
 
 

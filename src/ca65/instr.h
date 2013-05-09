@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	       		   	    instr.h				     */
+/*                                  instr.h                                  */
 /*                                                                           */
-/*	       Instruction encoding for the ca65 macroassembler		     */
+/*             Instruction encoding for the ca65 macroassembler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -58,18 +58,18 @@
  * When assembling for the 6502 or 65C02, all addressing modes that are not
  * available on these CPUs are removed before doing any checks.
  */
-#define AM65_IMPLICIT          	0x00000003UL
-#define AM65_ACCU	       	0x00000002UL
-#define AM65_DIR      	       	0x00000004UL
-#define AM65_ABS     	       	0x00000008UL
-#define AM65_ABS_LONG  		0x00000010UL
-#define AM65_DIR_X 	  	0x00000020UL
-#define AM65_ABS_X            	0x00000040UL
-#define AM65_ABS_LONG_X		0x00000080UL
+#define AM65_IMPLICIT           0x00000003UL
+#define AM65_ACCU               0x00000002UL
+#define AM65_DIR                0x00000004UL
+#define AM65_ABS                0x00000008UL
+#define AM65_ABS_LONG           0x00000010UL
+#define AM65_DIR_X              0x00000020UL
+#define AM65_ABS_X              0x00000040UL
+#define AM65_ABS_LONG_X         0x00000080UL
 #define AM65_DIR_Y              0x00000100UL
 #define AM65_ABS_Y              0x00000200UL
 #define AM65_DIR_IND            0x00000400UL
-#define AM65_ABS_IND     	0x00000800UL
+#define AM65_ABS_IND            0x00000800UL
 #define AM65_DIR_IND_LONG       0x00001000UL
 #define AM65_DIR_IND_Y          0x00002000UL
 #define AM65_DIR_IND_LONG_Y     0x00004000UL
@@ -79,14 +79,14 @@
 #define AM65_REL_LONG           0x00040000UL
 #define AM65_STACK_REL          0x00080000UL
 #define AM65_STACK_REL_IND_Y    0x00100000UL
-#define AM65_IMM_ACCU	       	0x00200000UL
-#define AM65_IMM_INDEX	       	0x00400000UL
-#define AM65_IMM_IMPLICIT	0x00800000UL
+#define AM65_IMM_ACCU           0x00200000UL
+#define AM65_IMM_INDEX          0x00400000UL
+#define AM65_IMM_IMPLICIT       0x00800000UL
 #define AM65_BLOCKMOVE          0x01000000UL
 #define AM65_BLOCKXFER          0x02000000UL
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */
-#define AM65_SET_ZP 	(AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
+#define AM65_SET_ZP     (AM65_DIR | AM65_DIR_X | AM65_DIR_Y | AM65_DIR_IND | AM65_DIR_X_IND)
 
 /* Bitmask for all ABS operations that have correspondent FAR ops */
 #define AM65_SET_ABS    (AM65_ABS | AM65_ABS_X)
@@ -104,28 +104,28 @@
 #define AM65_ALL_IMM    (AM65_IMM_ACCU | AM65_IMM_INDEX | AM65_IMM_IMPLICIT)
 
 /* Bit numbers and count */
-#define AM65I_IMM_ACCU	       	21
-#define AM65I_IMM_INDEX	       	22
+#define AM65I_IMM_ACCU          21
+#define AM65I_IMM_INDEX         22
 #define AM65I_IMM_IMPLICIT      23
-#define AM65I_COUNT	       	26
+#define AM65I_COUNT             26
 
 
 
 /* Description for one instruction */
 typedef struct InsDesc InsDesc;
 struct InsDesc {
-    char       	      	Mnemonic[5];
-    unsigned long      	AddrMode;   	    	/* Valid adressing modes */
-    unsigned char     	BaseCode;   	    	/* Base opcode */
-    unsigned char     	ExtCode;    	 	/* Number of ext code table */
-    void       	       	(*Emit) (const InsDesc*);/* Handler function */
+    char                Mnemonic[5];
+    unsigned long       AddrMode;               /* Valid adressing modes */
+    unsigned char       BaseCode;               /* Base opcode */
+    unsigned char       ExtCode;                /* Number of ext code table */
+    void                (*Emit) (const InsDesc*);/* Handler function */
 };
 
 /* An instruction table */
 typedef struct InsTable InsTable;
 struct InsTable {
-    unsigned   	       	Count;	    	      	/* Number of intstructions */
-    InsDesc    	       	Ins[1];		      	/* Varying length */
+    unsigned            Count;                  /* Number of intstructions */
+    InsDesc             Ins[1];                 /* Varying length */
 };
 
 /* The instruction table for the currently active CPU */
@@ -154,7 +154,7 @@ extern unsigned char ExtBytes[AM65I_COUNT];
 
 
 /*****************************************************************************/
-/*     	       	    	     	     Code   				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

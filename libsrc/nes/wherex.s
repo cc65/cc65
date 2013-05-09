@@ -4,7 +4,7 @@
 ; unsigned char wherex (void);
 ;
 
-  	.export		_wherex
+        .export         _wherex
 
         .include        "nes.inc"
 
@@ -12,7 +12,7 @@
 
         lda     CURS_X
         ldx     #$00
-  	rts
+        rts
 
 .endproc
 

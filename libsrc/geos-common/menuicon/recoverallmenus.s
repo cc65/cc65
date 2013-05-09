@@ -5,8 +5,8 @@
 
 ; void RecoverAllMenus (void);
 
-	    .export _RecoverAllMenus
+            .export _RecoverAllMenus
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _RecoverAllMenus = RecoverAllMenus

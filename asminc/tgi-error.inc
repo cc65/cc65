@@ -41,7 +41,7 @@
         TGI_ERR_INV_DRIVER      ; Invalid driver
         TGI_ERR_INV_MODE        ; Mode not supported by driver
         TGI_ERR_INV_ARG         ; Invalid function argument
-        TGI_ERR_INV_FUNC       	; Function not supported
+        TGI_ERR_INV_FUNC        ; Function not supported
         TGI_ERR_INV_FONT        ; Font file is invalid
         TGI_ERR_NO_RES          ; Out of resources (memory, handles, ...)
         TGI_ERR_UNKNOWN         ; Unknown error

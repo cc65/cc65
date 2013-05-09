@@ -5,10 +5,10 @@
 ; /* Operating system specific errors from the low level functions */
 
 
-       	.export		__oserror
+        .export         __oserror
 
 .bss
 
 __oserror:
-	.res	1
+        .res    1
 

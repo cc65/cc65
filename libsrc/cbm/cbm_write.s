@@ -30,10 +30,10 @@
 
         .include        "cbm.inc"
 
-       	.export	       	_cbm_write
+        .export         _cbm_write
         .import         CKOUT, READST, BSOUT, CLRCH
         .importzp       ptr1, ptr2, ptr3
-	.import	      	popax, popa
+        .import         popax, popa
         .import         __oserror
                                                    
 

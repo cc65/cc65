@@ -5,13 +5,13 @@
 
 ; char IsMseInRegion (struct window *mywindow);
 
-	    .import _InitDrawWindow
-	    .export _IsMseInRegion
-	    
-	    .include "jumptab.inc"
+            .import _InitDrawWindow
+            .export _IsMseInRegion
+            
+            .include "jumptab.inc"
 
 _IsMseInRegion:
-	jsr _InitDrawWindow
-	jsr IsMseInRegion
-	ldx #0
-	rts
+        jsr _InitDrawWindow
+        jsr IsMseInRegion
+        ldx #0
+        rts

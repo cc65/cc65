@@ -24,30 +24,30 @@
 
 ; Save file and place it into ptr1
 
-	sta	file
-	sta	ptr1
-	stx	file+1
-	stx	ptr1+1
+        sta     file
+        sta     ptr1
+        stx     file+1
+        stx     ptr1+1
 
 ; Check if the file is open
 
-	ldy	#_FILE::f_flags
-	lda	(ptr1),y
-	and	#_FOPEN		      	; Is the file open?
-       	bne    	@L2			; Branch if yes
+        ldy     #_FILE::f_flags
+        lda     (ptr1),y
+        and     #_FOPEN                 ; Is the file open?
+        bne     @L2                     ; Branch if yes
 
 ; File not open
 
-@L1:    lda	#EBADF
+@L1:    lda     #EBADF
         jsr     __seterrno              ; Returns with A = 0
         tax                             ; A = X = 0
         jmp     incsp6
 
 ; Check if the stream is in an error state
 
-@L2:	lda	(ptr1),y		; get file->f_flags again
-	and	#_FERROR
-	bne     @L1
+@L2:    lda     (ptr1),y                ; get file->f_flags again
+        and     #_FERROR
+        bne     @L1
 
 ; Build the stackframe for write()
 
@@ -122,5 +122,5 @@
 ; Data
 
 .bss
-file:	.res	2
+file:   .res    2
 

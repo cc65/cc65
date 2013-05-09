@@ -6,7 +6,7 @@
 ;             currently only called from asm code.
 ;
 
-      	.include        "errno.inc"
+        .include        "errno.inc"
 
 .code
 

@@ -5,11 +5,11 @@
 
 ; void EnablSprite (char spritenum);
 
-	    .export _EnablSprite
+            .export _EnablSprite
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _EnablSprite:
-	sta r3L
-	jmp EnablSprite
+        sta r3L
+        jmp EnablSprite

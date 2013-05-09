@@ -5,17 +5,17 @@
 
 ; void PromptOff (void);
 
-	    .export _PromptOff
+            .export _PromptOff
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _PromptOff:
 ; from 'The Hitchhiker's Guide To GEOS'
-	php
-	sei
-	jsr PromptOff
-	lda #0
-	sta alphaFlag
-	plp
-	rts
+        php
+        sei
+        jsr PromptOff
+        lda #0
+        sta alphaFlag
+        plp
+        rts

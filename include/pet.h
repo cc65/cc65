@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                   pet.h                                   */
 /*                                                                           */
-/*                      PET system specific definitions			     */
+/*                      PET system specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -52,8 +52,8 @@
 
 
 /* Color defines */
-#define COLOR_BLACK            	0x00
-#define COLOR_WHITE            	0x01
+#define COLOR_BLACK             0x00
+#define COLOR_WHITE             0x01
 
 /* Define hardware */
 #include <_pia.h>

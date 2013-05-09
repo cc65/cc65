@@ -4,50 +4,50 @@
 ; Fatih Aygun (2009)
 ;
 
-	.include	"atari.inc"
-	.include 	"zeropage.inc"
+        .include        "atari.inc"
+        .include        "zeropage.inc"
 
-	.include 	"tgi-kernel.inc"
-	.include        "tgi-error.inc"
+        .include        "tgi-kernel.inc"
+        .include        "tgi-error.inc"
 
-	.macpack        generic
+        .macpack        generic
 
 ; ******************************************************************************
 
-	; ----------------------------------------------------------------------
-	;
-	; Constants and tables
-	;
-	; ----------------------------------------------------------------------
+        ; ----------------------------------------------------------------------
+        ;
+        ; Constants and tables
+        ;
+        ; ----------------------------------------------------------------------
 
 ; Graphics mode
-	grmode = 15
+        grmode = 15
 ; X resolution
-	x_res = 160
+        x_res = 160
 ; Y resolution
-	y_res = 192
+        y_res = 192
 ; Number of colors
-	colors = 4
+        colors = 4
 ; Pixels per byte
-	ppb = 4
+        ppb = 4
 ; Screen memory size in bytes
-	scrsize = x_res * y_res / ppb
+        scrsize = x_res * y_res / ppb
 ; Pixel aspect ratio
-	aspect = $0198				; based on 4/3 display
+        aspect = $0198                          ; based on 4/3 display
 ; Free memory needed
-	mem_needed = 15339
+        mem_needed = 15339
 ; Number of screen pages
-	pages = 2
+        pages = 2
 
 .rodata
-	mask_table:				; Mask table to set pixels
-		.byte	%11000000, %00110000, %00001100, %00000011
-	masks:					; Color masks
-		.byte	%00000000, %01010101, %10101010, %11111111
-	bar_table:				; Mask table for BAR
-		.byte	%11111111, %00111111, %00001111, %00000011, %00000000
-	default_palette:
-		.byte	$00, $0E, $32, $96
+        mask_table:                             ; Mask table to set pixels
+                .byte   %11000000, %00110000, %00001100, %00000011
+        masks:                                  ; Color masks
+                .byte   %00000000, %01010101, %10101010, %11111111
+        bar_table:                              ; Mask table for BAR
+                .byte   %11111111, %00111111, %00001111, %00000011, %00000000
+        default_palette:
+                .byte   $00, $0E, $32, $96
 
 .code
 
@@ -55,31 +55,31 @@
 
 .proc SETPALETTE
 
-	; ----------------------------------------------------------------------
-	;
-	; SETPALETTE: Set the palette (in ptr1)
-	;
-	; ----------------------------------------------------------------------
+        ; ----------------------------------------------------------------------
+        ;
+        ; SETPALETTE: Set the palette (in ptr1)
+        ;
+        ; ----------------------------------------------------------------------
 
 .code
-	; Copy the palette
-	ldy     #colors - 1
-loop:	lda     (ptr1),y
-	sta     palette,y
-	dey
-	bpl     loop
+        ; Copy the palette
+        ldy     #colors - 1
+loop:   lda     (ptr1),y
+        sta     palette,y
+        dey
+        bpl     loop
 
-	; Get the color entries from the palette
-	lda	palette
-	sta	COLOR4
-	lda	palette + 1
-	sta	COLOR0
-	lda	palette + 2
-	sta	COLOR1
-	lda	palette + 3
-	sta	COLOR2
+        ; Get the color entries from the palette
+        lda     palette
+        sta     COLOR4
+        lda     palette + 1
+        sta     COLOR0
+        lda     palette + 2
+        sta     COLOR1
+        lda     palette + 3
+        sta     COLOR2
 
-	; Done, reset the error code
+        ; Done, reset the error code
         lda     #TGI_ERR_OK
         sta     error
         rts

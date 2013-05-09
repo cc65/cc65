@@ -13,11 +13,11 @@
 ;
 
         .export         __environ, __envcount, __envsize
-	.import		initenv
-	.constructor	env_init
-	
-	env_init := initenv
-			   
+        .import         initenv
+        .constructor    env_init
+        
+        env_init := initenv
+                           
 .bss
 
 __environ:

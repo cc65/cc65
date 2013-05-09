@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   binfmt.c				     */
+/*                                 binfmt.c                                  */
 /*                                                                           */
-/*		 Binary format definitions for the ld65 linker		     */
+/*               Binary format definitions for the ld65 linker               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,18 +43,18 @@
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Default format (depends on target system) */
-unsigned char DefaultBinFmt	= BINFMT_BINARY;
+unsigned char DefaultBinFmt     = BINFMT_BINARY;
 
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -66,22 +66,22 @@ int RelocatableBinFmt (unsigned Format)
 
     /* Resolve the default format */
     if (Format == BINFMT_DEFAULT) {
-	Format = DefaultBinFmt;
+        Format = DefaultBinFmt;
     }
 
     /* Check the type */
     switch (Format) {
 
-	case BINFMT_BINARY:
-	    Reloc = 0;
-	    break;
+        case BINFMT_BINARY:
+            Reloc = 0;
+            break;
 
-	case BINFMT_O65:
-	    Reloc = 1;
-	    break;
+        case BINFMT_O65:
+            Reloc = 1;
+            break;
 
-	default:
-	    Internal ("Invalid format specifier: %u", Format);
+        default:
+            Internal ("Invalid format specifier: %u", Format);
 
     }
 

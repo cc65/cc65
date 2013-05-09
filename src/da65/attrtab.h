@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*     				   attrtab.h				     */
+/*                                 attrtab.h                                 */
 /*                                                                           */
-/*     			 Disassembler attribute table			     */
+/*                       Disassembler attribute table                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*     				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -47,28 +47,28 @@
 typedef enum attr_t {
 
     /* Styles */
-    atDefault  	    = 0x0000,   /* Default style */
-    atCode     	    = 0x0001,
-    atIllegal  	    = 0x0002,
-    atByteTab  	    = 0x0003,	/* Same as illegal */
+    atDefault       = 0x0000,   /* Default style */
+    atCode          = 0x0001,
+    atIllegal       = 0x0002,
+    atByteTab       = 0x0003,   /* Same as illegal */
     atDByteTab      = 0x0004,
-    atWordTab  	    = 0x0005,
-    atDWordTab 	    = 0x0006,
-    atAddrTab  	    = 0x0007,
-    atRtsTab   	    = 0x0008,
+    atWordTab       = 0x0005,
+    atDWordTab      = 0x0006,
+    atAddrTab       = 0x0007,
+    atRtsTab        = 0x0008,
     atTextTab       = 0x0009,
     atSkip          = 0x000A,   /* Skip code completely */
 
     /* Label flags */
-    atNoLabel  	    = 0x0000,	/* No label for this address */
-    atExtLabel 	    = 0x0010,	/* External label */
-    atIntLabel      = 0x0020,	/* Internally generated label */
-    atDepLabel 	    = 0x0040,	/* Dependent label */
+    atNoLabel       = 0x0000,   /* No label for this address */
+    atExtLabel      = 0x0010,   /* External label */
+    atIntLabel      = 0x0020,   /* Internally generated label */
+    atDepLabel      = 0x0040,   /* Dependent label */
     atUnnamedLabel  = 0x0080,   /* Unnamed label */
 
     atLabelDefined  = 0x0100,   /* True if we defined the label */
 
-    atStyleMask     = 0x000F,	/* Output style */
+    atStyleMask     = 0x000F,   /* Output style */
     atLabelMask     = 0x00F0,   /* Label information */
 
     /* Segment */
@@ -79,7 +79,7 @@ typedef enum attr_t {
 
 
 /*****************************************************************************/
-/*     				     Code	   			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

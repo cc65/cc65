@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		   		   scanner.h				     */
+/*                                 scanner.h                                 */
 /*                                                                           */
 /*            Configuration file scanner for the sim65 6502 simulator        */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Data     				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -84,26 +84,26 @@ typedef enum {
 /* Mapping table entry, special identifier --> token */
 typedef struct IdentTok IdentTok;
 struct IdentTok {
-    const char*	Ident;	     	/* Identifier */
-    cfgtok_t	Tok;	     	/* Token for identifier */
+    const char* Ident;          /* Identifier */
+    cfgtok_t    Tok;            /* Token for identifier */
 };
-#define ENTRY_COUNT(s) 	(sizeof (s) / sizeof (s [0]))
+#define ENTRY_COUNT(s)  (sizeof (s) / sizeof (s [0]))
 
 
 
 /* Current token and attributes */
-extern cfgtok_t		CfgTok;
-extern StrBuf		CfgSVal;
-extern unsigned long	CfgIVal;
+extern cfgtok_t         CfgTok;
+extern StrBuf           CfgSVal;
+extern unsigned long    CfgIVal;
 
 /* Error location */
-extern unsigned        	CfgErrorLine;
-extern unsigned        	CfgErrorCol;
+extern unsigned         CfgErrorLine;
+extern unsigned         CfgErrorCol;
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

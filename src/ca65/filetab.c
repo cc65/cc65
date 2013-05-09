@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   filetab.h				     */
+/*                                 filetab.h                                 */
 /*                                                                           */
-/*			   Input file table for ca65			     */
+/*                         Input file table for ca65                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -73,7 +73,7 @@ static int HT_Compare (const void* Key1, const void* Key2);
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			   	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -87,10 +87,10 @@ typedef struct FileEntry FileEntry;
 struct FileEntry {
     HashNode            Node;
     unsigned            Name;           /* File name */
-    unsigned  	      	Index;		/* Index of entry */
+    unsigned            Index;          /* Index of entry */
     FileType            Type;           /* Type of file */
-    unsigned long     	Size;		/* Size of file */
-    unsigned long     	MTime;		/* Time of last modification */
+    unsigned long       Size;           /* Size of file */
+    unsigned long       MTime;          /* Time of last modification */
 };
 
 /* Array of all entries, listed by index */
@@ -142,7 +142,7 @@ static int HT_Compare (const void* Key1, const void* Key2)
 
 
 /*****************************************************************************/
-/*     	       	    	 	     Code			   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -157,10 +157,10 @@ static FileEntry* NewFileEntry (unsigned Name, FileType Type,
     /* Initialize the fields */
     InitHashNode (&F->Node);
     F->Name     = Name;
-    F->Index  	= CollCount (&FileTab) + 1;     /* First file has index #1 */
+    F->Index    = CollCount (&FileTab) + 1;     /* First file has index #1 */
     F->Type     = Type;
-    F->Size   	= Size;
-    F->MTime  	= MTime;
+    F->Size     = Size;
+    F->MTime    = MTime;
 
     /* Insert the file into the file table */
     CollAppend (&FileTab, F);
@@ -182,16 +182,16 @@ const StrBuf* GetFileName (unsigned Name)
     const FileEntry* F;
 
     if (Name == 0) {
-	/* Name was defined outside any file scope, use the name of the first
-	 * file instead. Errors are then reported with a file position of
-     	 * line zero in the first file.
-	 */
-	if (CollCount (&FileTab) == 0) {
-    	    /* No files defined until now */
+        /* Name was defined outside any file scope, use the name of the first
+         * file instead. Errors are then reported with a file position of
+         * line zero in the first file.
+         */
+        if (CollCount (&FileTab) == 0) {
+            /* No files defined until now */
             return &ErrorMsg;
-	} else {
+        } else {
             F = CollConstAt (&FileTab, 0);
-	}
+        }
     } else {
         F = CollConstAt (&FileTab, Name-1);
     }
@@ -248,12 +248,12 @@ void WriteFiles (void)
 
     /* Write the file data */
     for (I = 0; I < CollCount (&FileTab); ++I) {
-	/* Get a pointer to the entry */
-	const FileEntry* F = CollConstAt (&FileTab, I);
-	/* Write the fields */
-	ObjWriteVar (F->Name);
-	ObjWrite32 (F->MTime);
-       	ObjWriteVar (F->Size);
+        /* Get a pointer to the entry */
+        const FileEntry* F = CollConstAt (&FileTab, I);
+        /* Write the fields */
+        ObjWriteVar (F->Name);
+        ObjWrite32 (F->MTime);
+        ObjWriteVar (F->Size);
     }
 
     /* Done writing files */
@@ -272,20 +272,20 @@ static void WriteDep (FILE* F, FileType Types)
 
         const StrBuf* Filename;
 
-    	/* Get the next input file */
-       	const FileEntry* E = (const FileEntry*) CollAt (&FileTab, I);
+        /* Get the next input file */
+        const FileEntry* E = (const FileEntry*) CollAt (&FileTab, I);
 
         /* Ignore it if it is not of the correct type */
         if ((E->Type & Types) == 0) {
             continue;
         }
 
-    	/* If this is not the first file, add a space */
-       	if (I > 0) {
+        /* If this is not the first file, add a space */
+        if (I > 0) {
             fputc (' ', F);
         }
 
-    	/* Print the dependency */
+        /* Print the dependency */
         Filename = GetStrBuf (E->Name);
         fprintf (F, "%*s", SB_GetLen (Filename), SB_GetConstBuf (Filename));
     }
@@ -301,7 +301,7 @@ static void CreateDepFile (const char* Name, FileType Types)
     /* Open the file */
     FILE* F = fopen (Name, "w");
     if (F == 0) {
-     	Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
+        Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
     }
 
     /* Print the output file followed by a tab char */
@@ -317,8 +317,8 @@ static void CreateDepFile (const char* Name, FileType Types)
 
     /* Close the file, check for errors */
     if (fclose (F) != 0) {
-    	remove (Name);
-    	Fatal ("Cannot write to dependeny file (disk full?)");
+        remove (Name);
+        Fatal ("Cannot write to dependeny file (disk full?)");
     }
 }
 

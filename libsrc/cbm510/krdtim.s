@@ -10,12 +10,12 @@
 
 .proc   RDTIM
 
-	sei
-	lda  	time+0
-   	ldx  	time+1
-	ldy  	time+2
-	cli
-	rts
+        sei
+        lda     time+0
+        ldx     time+1
+        ldy     time+2
+        cli
+        rts
 
 .endproc
 

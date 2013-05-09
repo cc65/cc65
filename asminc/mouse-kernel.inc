@@ -2,7 +2,7 @@
 ;/*                                                                           */
 ;/*                            mouse-kernel.inc                               */
 ;/*                                                                           */
-;/*			     	   Mouse API				      */
+;/*                                Mouse API                                  */
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */
@@ -53,23 +53,23 @@
 ;------------------------------------------------------------------------------
 ; The driver header
 
-.struct	MOUSE_HDR
-	ID   	        .byte  	3       ; Contains 0x6D, 0x6F, 0x75 ("mou")
-	VERSION         .byte  	1      	; Interface version
-	JUMPTAB         .struct
-	    INSTALL  	.addr
-	    UNINSTALL	.addr
-       	    HIDE        .addr
-	    SHOW        .addr
-       	    SETBOX      .addr
-	    GETBOX	.addr
-	    MOVE        .addr
-	    BUTTONS     .addr
-	    POS         .addr
+.struct MOUSE_HDR
+        ID              .byte   3       ; Contains 0x6D, 0x6F, 0x75 ("mou")
+        VERSION         .byte   1       ; Interface version
+        JUMPTAB         .struct
+            INSTALL     .addr
+            UNINSTALL   .addr
+            HIDE        .addr
+            SHOW        .addr
+            SETBOX      .addr
+            GETBOX      .addr
+            MOVE        .addr
+            BUTTONS     .addr
+            POS         .addr
             INFO        .addr
             IOCTL       .addr
-	    IRQ	     	.addr
-	.endstruct
+            IRQ         .addr
+        .endstruct
         FLAGS           .byte           ; Mouse driver flags
         CALLBACKS .struct               ; Jump instructions
                         .byte           ; JMP opcode
@@ -86,10 +86,10 @@
 ;------------------------------------------------------------------------------
 ; The mouse callback structure
 
-.struct	MOUSE_CALLBACKS
-	HIDE	.addr			; Hide the mouse cursor
-	SHOW	.addr			; Show the mouse cursor
-       	MOVEX	.addr			; Move the mouse cursor
+.struct MOUSE_CALLBACKS
+        HIDE    .addr                   ; Hide the mouse cursor
+        SHOW    .addr                   ; Show the mouse cursor
+        MOVEX   .addr                   ; Move the mouse cursor
         MOVEY   .addr                   ; Dito for Y
 .endstruct
 
@@ -112,7 +112,7 @@ MOUSE_FLAG_LATE_IRQ     = $80           ; Enable IRQ *after* calling INSTALL
 ;------------------------------------------------------------------------------
 ; Mouse button definitions
 
-MOUSE_BTN_LEFT 	        = $10
+MOUSE_BTN_LEFT          = $10
 MOUSE_BTN_RIGHT         = $01
 
 ;------------------------------------------------------------------------------
@@ -129,16 +129,16 @@ MOUSE_BTN_RIGHT         = $01
 .endstruct
 
 .struct MOUSE_BOX
-	MINX	.word
-    	MINY	.word
-	MAXX	.word
-	MAXY	.word
+        MINX    .word
+        MINY    .word
+        MAXX    .word
+        MAXY    .word
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; Variables
 
-       	.global	_mouse_drv              ; Pointer to driver
+        .global _mouse_drv              ; Pointer to driver
         .global _mouse_hidden           ; Counter, 0 = mouse is visible
 
 ;------------------------------------------------------------------------------
@@ -152,14 +152,14 @@ MOUSE_BTN_RIGHT         = $01
         .global _mouse_hide
         .global _mouse_show
         .global _mouse_setbox
-	.global	_mouse_getbox
+        .global _mouse_getbox
         .global _mouse_move
         .global _mouse_buttons
         .global _mouse_pos
         .global _mouse_info
         .global _mouse_ioctl
 
-	.global _mouse_clear_ptr
+        .global _mouse_clear_ptr
 
 ;------------------------------------------------------------------------------
 ; Driver entry points (asm callable)
@@ -168,8 +168,8 @@ MOUSE_BTN_RIGHT         = $01
         .global mouse_uninstall
         .global mouse_hide
         .global mouse_show
-        .global mouse_setbox			 
-	.global mouse_getbox
+        .global mouse_setbox                     
+        .global mouse_getbox
         .global mouse_move
         .global mouse_buttons
         .global mouse_pos

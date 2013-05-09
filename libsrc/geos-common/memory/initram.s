@@ -5,12 +5,12 @@
 
 ; void InitRam         (struct inittab*);
 
-	    .export _InitRam
+            .export _InitRam
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _InitRam:
-	sta r0L
-	stx r0H
-	jmp InitRam
+        sta r0L
+        stx r0H
+        jmp InitRam

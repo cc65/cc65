@@ -5,19 +5,19 @@
 
 ; char ReadBlock (struct tr_se myTS, char *buffer);
 
-	    .export _ReadBlock
-	    .import popax, setoserror
-	    .import gettrse
+            .export _ReadBlock
+            .import popax, setoserror
+            .import gettrse
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "geossym.inc"
+        
 _ReadBlock:
-	sta r4L
-	stx r4H
-	jsr popax
-	jsr gettrse
-	sta r1L
-	stx r1H
-	jsr ReadBlock
-	jmp setoserror
+        sta r4L
+        stx r4H
+        jsr popax
+        jsr gettrse
+        sta r1L
+        stx r1H
+        jsr ReadBlock
+        jmp setoserror

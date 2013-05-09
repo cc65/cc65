@@ -51,7 +51,7 @@
 /* The Windows compilers have the file in the wrong directory */
 #  include <sys/utime.h>
 #else
-#  include <sys/types.h>     		/* FreeBSD needs this */
+#  include <sys/types.h>                /* FreeBSD needs this */
 #  include <utime.h>
 #endif
 #endif
@@ -63,7 +63,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

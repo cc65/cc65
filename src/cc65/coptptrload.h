@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*		   		     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -53,32 +53,32 @@ unsigned OptPtrLoad1 (CodeSeg* S);
 /* Search for the sequence:
  *
  *      clc
- *      adc    	xxx
+ *      adc     xxx
  *      tay
  *      txa
  *      adc     yyy
  *      tax
  *      tya
  *      ldy
- *  	jsr    	ldauidx
+ *      jsr     ldauidx
  *
  * and replace it by:
  *
  *      clc
- *      adc    	xxx
+ *      adc     xxx
  *      sta     ptr1
  *      txa
  *      adc     yyy
  *      sta     ptr1+1
  *      ldy
- *     	ldx     #$00
+ *      ldx     #$00
  *      lda     (ptr1),y
  */
 
 unsigned OptPtrLoad2 (CodeSeg* S);
 /* Search for the sequence:
  *
- *      adc    	xxx
+ *      adc     xxx
  *      pha
  *      txa
  *      iny
@@ -86,18 +86,18 @@ unsigned OptPtrLoad2 (CodeSeg* S);
  *      tax
  *      pla
  *      ldy
- *  	jsr    	ldauidx
+ *      jsr     ldauidx
  *
  * and replace it by:
  *
- *      adc    	xxx
+ *      adc     xxx
  *      sta     ptr1
  *      txa
  *      iny
  *      adc     yyy
  *      sta     ptr1+1
  *      ldy
- *     	ldx     #$00
+ *      ldx     #$00
  *      lda     (ptr1),y
  */
 

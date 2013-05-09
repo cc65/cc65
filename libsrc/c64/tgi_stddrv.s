@@ -6,8 +6,8 @@
 ; const char tgi_stddrv[];
 ;
 
-        .export	_tgi_stddrv
+        .export _tgi_stddrv
 
 .rodata
 
-_tgi_stddrv:	.asciiz	"c64-hi.tgi"
+_tgi_stddrv:    .asciiz "c64-hi.tgi"

@@ -34,12 +34,12 @@
 
 initdostype:
         lda     $BF00
-        cmp     #$4C		; Is MLI present? (JMP opcode)
+        cmp     #$4C            ; Is MLI present? (JMP opcode)
         bne     done
-        lda     KVERSION	; ProDOS 8 kernel version
+        lda     KVERSION        ; ProDOS 8 kernel version
         cmp     #$10
         bcs     :+
-        ora     #$10		; Make high nibble match major version
+        ora     #$10            ; Make high nibble match major version
 :       sta     __dos_type
 done:   rts
 

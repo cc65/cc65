@@ -5,7 +5,7 @@
 ;
         .ifdef  __APPLE2ENH__
 
-	.export		_videomode
+        .export         _videomode
         .import         COUT
 
         .include        "apple2.inc"

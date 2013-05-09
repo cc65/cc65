@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    _6551.h				     */
+/*                                  _6551.h                                  */
 /*                                                                           */
-/*		  Internal include file, do not use directly		     */
+/*                Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -40,10 +40,10 @@
 
 /* Define a structure with the 6551 register offsets */
 struct __6551 {
-    unsigned char      	data;  	       	/* Data register */
-    unsigned char      	status;	       	/* Status register */
-    unsigned char      	cmd;   	       	/* Command register */
-    unsigned char	ctrl;		/* Control register */
+    unsigned char       data;           /* Data register */
+    unsigned char       status;         /* Status register */
+    unsigned char       cmd;            /* Command register */
+    unsigned char       ctrl;           /* Control register */
 };
 
 

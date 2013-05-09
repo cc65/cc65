@@ -3,18 +3,18 @@
 ;
 ; 27.10.99
 
-; void	FreezeProcess	(char number);
-; void	UnfreezeProcess	(char number);
+; void  FreezeProcess   (char number);
+; void  UnfreezeProcess (char number);
 
-	    .export _FreezeProcess
-	    .export _UnfreezeProcess
+            .export _FreezeProcess
+            .export _UnfreezeProcess
 
-	    .include "jumptab.inc"
-	    
+            .include "jumptab.inc"
+            
 _FreezeProcess:
-	tax
-	jmp FreezeProcess
-	    
+        tax
+        jmp FreezeProcess
+            
 _UnfreezeProcess:
-	tax
-	jmp UnfreezeProcess
+        tax
+        jmp UnfreezeProcess

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    mouse.h				     */
+/*                                  mouse.h                                  */
 /*                                                                           */
-/*				   Mouse API				     */
+/*                                 Mouse API                                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -41,7 +41,7 @@
 
 
 /*****************************************************************************/
-/* 	      			  Definitions	     			     */
+/*                                Definitions                                */
 /*****************************************************************************/
 
 
@@ -55,13 +55,13 @@
 #define MOUSE_ERR_INV_IOCTL     5       /* Invalid ioctl code */
 
 /* Mouse button masks */
-#define MOUSE_BTN_LEFT	     0x10
+#define MOUSE_BTN_LEFT       0x10
 #define MOUSE_BTN_RIGHT      0x01
 
 /* Structure containing the mouse coordinates */
 struct mouse_pos {
-    int 		x;
-    int 		y;
+    int                 x;
+    int                 y;
 };
 
 /* Structure containing information about the mouse */
@@ -72,10 +72,10 @@ struct mouse_info {
 
 /* Structure used for getbox/setbox */
 struct mouse_box {
-    int         	minx;
-    int         	miny;
-    int         	maxx;
-    int         	maxy;
+    int                 minx;
+    int                 miny;
+    int                 maxx;
+    int                 maxy;
 };
 
 /* Structure containing mouse callback functions. These functions are declared
@@ -113,7 +113,7 @@ extern const void mouse_static_stddrv[];
 
 
 /*****************************************************************************/
-/* 	      			   Functions	     			     */
+/*                                 Functions                                 */
 /*****************************************************************************/
 
 
@@ -150,10 +150,10 @@ void __fastcall__ mouse_setbox (const struct mouse_box* box);
  * NOTE: The function does *not* check if the mouse is currently inside the
  * given margins. The proper way to use this function therefore is:
  *
- * 	- Hide the mouse
- * 	- Set the bounding box
- * 	- Place the mouse at the desired position
- * 	- Show the mouse again.
+ *      - Hide the mouse
+ *      - Set the bounding box
+ *      - Place the mouse at the desired position
+ *      - Show the mouse again.
  *
  * NOTE2: When setting the box to something that is larger than the actual
  * screen, the positioning of the mouse cursor can fail. If such margins

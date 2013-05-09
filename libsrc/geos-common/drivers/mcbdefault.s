@@ -9,13 +9,13 @@
 ; 2004-09-24, Greg King
 ;
 
-;	.constructor	init_pointer
+;       .constructor    init_pointer
         .export         _mouse_def_callbacks
 
 ;       .include        "mouse-kernel.inc"
-;	.include	"const.inc"
-;	.include	"geossym.inc"
-	.include	"jumptab.inc"
+;       .include        "const.inc"
+;       .include        "geossym.inc"
+        .include        "jumptab.inc"
 
 ;       .macpack        generic
 

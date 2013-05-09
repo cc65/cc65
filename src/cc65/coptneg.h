@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptneg.h                                 */
+/*                                 coptneg.h                                 */
 /*                                                                           */
-/*			  Optimize negation sequences                        */
+/*                        Optimize negation sequences                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*		  	      bnega optimizations			     */
+/*                            bnega optimizations                            */
 /*****************************************************************************/
 
 
@@ -52,9 +52,9 @@
 unsigned OptBNegA1 (CodeSeg* S);
 /* Check for
  *
- *	ldx  	#$00
- *	lda  	..
- * 	jsr  	bnega
+ *      ldx     #$00
+ *      lda     ..
+ *      jsr     bnega
  *
  * Remove the ldx if the lda does not use it.
  */
@@ -62,9 +62,9 @@ unsigned OptBNegA1 (CodeSeg* S);
 unsigned OptBNegA2 (CodeSeg* S);
 /* Check for
  *
- *	lda  	..
- * 	jsr  	bnega
- *	jeq/jne	..
+ *      lda     ..
+ *      jsr     bnega
+ *      jeq/jne ..
  *
  * Adjust the conditional branch and remove the call to the subroutine.
  */
@@ -72,7 +72,7 @@ unsigned OptBNegA2 (CodeSeg* S);
 
 
 /*****************************************************************************/
-/*	     	   	      bnegax optimizations			     */
+/*                            bnegax optimizations                           */
 /*****************************************************************************/
 
 
@@ -86,48 +86,48 @@ unsigned OptBNegAX1 (CodeSeg* S);
 unsigned OptBNegAX2 (CodeSeg* S);
 /* Search for the sequence:
  *
- *  	lda  	(xx),y
- *  	tax
- *  	dey
- *  	lda  	(xx),y
- *  	jsr  	bnegax
- *  	jne/jeq	...
+ *      lda     (xx),y
+ *      tax
+ *      dey
+ *      lda     (xx),y
+ *      jsr     bnegax
+ *      jne/jeq ...
  *
  * and replace it by
  *
- *  	lda    	(xx),y
- *  	dey
- *  	ora    	(xx),y
- *	jeq/jne	...
+ *      lda     (xx),y
+ *      dey
+ *      ora     (xx),y
+ *      jeq/jne ...
  */
 
 unsigned OptBNegAX3 (CodeSeg* S);
 /* Search for the sequence:
  *
- *  	lda  	xx
- *  	ldx  	yy
- *  	jsr  	bnegax
- *    	jne/jeq	...
+ *      lda     xx
+ *      ldx     yy
+ *      jsr     bnegax
+ *      jne/jeq ...
  *
  * and replace it by
  *
- *  	lda    	xx
- *	ora  	xx+1
- *	jeq/jne	...
+ *      lda     xx
+ *      ora     xx+1
+ *      jeq/jne ...
  */
 
 unsigned OptBNegAX4 (CodeSeg* S);
 /* Search for the sequence:
  *
- *    	jsr   	xxx
- *  	jsr   	bnega(x)
- *  	jeq/jne	...
+ *      jsr     xxx
+ *      jsr     bnega(x)
+ *      jeq/jne ...
  *
  * and replace it by:
  *
- *      jsr	xxx
- *  	<boolean test>
- *  	jne/jeq	...
+ *      jsr     xxx
+ *      <boolean test>
+ *      jne/jeq ...
  */
 
 

@@ -310,7 +310,7 @@ struct __suzy {
   unsigned char parstat;        // 0xFCC2  parallel port status
   unsigned char pardata;        // 0xFCC3  parallel port data
   unsigned char howie;          // 0xFCC4  howie (?)
-								// 0xFCC5 - 0xFCFF  unused
+                                // 0xFCC5 - 0xFCFF  unused
 };
 
 

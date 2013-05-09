@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  segments.h				     */
+/*                                segments.h                                 */
 /*                                                                           */
-/*			      Segment management			     */
+/*                            Segment management                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*	      	  		   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -63,7 +63,7 @@ struct SymEntry;
 
 
 /*****************************************************************************/
-/*	       	  		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -80,12 +80,12 @@ typedef enum segment_t {
 /* A list of all segments used when generating code */
 typedef struct Segments Segments;
 struct Segments {
-    struct TextSeg*	Text;		/* Text segment */
-    struct CodeSeg*	Code; 		/* Code segment */
-    struct DataSeg*	Data; 		/* Data segment */
-    struct DataSeg*	ROData;		/* Readonly data segment */
-    struct DataSeg*	BSS;		/* Segment for uninitialized data */
-    segment_t  	       	CurDSeg;	/* Current data segment */
+    struct TextSeg*     Text;           /* Text segment */
+    struct CodeSeg*     Code;           /* Code segment */
+    struct DataSeg*     Data;           /* Data segment */
+    struct DataSeg*     ROData;         /* Readonly data segment */
+    struct DataSeg*     BSS;            /* Segment for uninitialized data */
+    segment_t           CurDSeg;        /* Current data segment */
 };
 
 /* Pointer to the current segment list. Output goes here. */
@@ -97,7 +97,7 @@ extern Segments* GS;
 
 
 /*****************************************************************************/
-/*		  	    	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

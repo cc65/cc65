@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   mapfile.c				     */
+/*                                 mapfile.c                                 */
 /*                                                                           */
-/*		     Map file creation for the ld65 linker		     */
+/*                   Map file creation for the ld65 linker                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -52,7 +52,7 @@
 
 
 /*****************************************************************************/
-/*  				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -67,12 +67,12 @@ void CreateMapFile (int ShortMap)
     /* Open the map file */
     FILE* F = fopen (MapFileName, "w");
     if (F == 0) {
-     	Error ("Cannot create map file `%s': %s", MapFileName, strerror (errno));
+        Error ("Cannot create map file `%s': %s", MapFileName, strerror (errno));
     }
 
     /* Write a modules list */
     fprintf (F, "Modules list:\n"
-     	       	"-------------\n");
+                "-------------\n");
     for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
         unsigned J;
@@ -104,8 +104,8 @@ void CreateMapFile (int ShortMap)
 
     /* Write the segment list */
     fprintf (F, "\n\n"
-       	       	"Segment list:\n"
-     		"-------------\n");
+                "Segment list:\n"
+                "-------------\n");
     PrintSegmentMap (F);
 
     /* The remainder is not written for short map files */
@@ -126,7 +126,7 @@ void CreateMapFile (int ShortMap)
 
     /* Close the file */
     if (fclose (F) != 0) {
-	Error ("Error closing map file `%s': %s", MapFileName, strerror (errno));
+        Error ("Error closing map file `%s': %s", MapFileName, strerror (errno));
     }
 }
 
@@ -138,7 +138,7 @@ void CreateLabelFile (void)
     /* Open the label file */
     FILE* F = fopen (LabelFileName, "w");
     if (F == 0) {
-    	Error ("Cannot create label file `%s': %s", LabelFileName, strerror (errno));
+        Error ("Cannot create label file `%s': %s", LabelFileName, strerror (errno));
     }
 
     /* Print the labels for the export symbols */
@@ -149,7 +149,7 @@ void CreateLabelFile (void)
 
     /* Close the file */
     if (fclose (F) != 0) {
-       	Error ("Error closing label file `%s': %s", LabelFileName, strerror (errno));
+        Error ("Error closing label file `%s': %s", LabelFileName, strerror (errno));
     }
 }
 

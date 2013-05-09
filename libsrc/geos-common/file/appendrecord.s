@@ -5,13 +5,13 @@
 
 ; char AppendRecord  (void);
 
-	    .import setoserror
-	    .export _AppendRecord
+            .import setoserror
+            .export _AppendRecord
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+        
 _AppendRecord:
 
-	jsr AppendRecord
-	jmp setoserror
+        jsr AppendRecord
+        jmp setoserror

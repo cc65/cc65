@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*                                 global.h                                  */
 /*                                                                           */
-/*		  Global variables for the da65 disassembler		     */
+/*                Global variables for the da65 disassembler                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,32 +39,32 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data			    	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* File stuff */
-extern const char*	InFile;		/* Name of input file */
-extern const char*	OutFile;	/* Name of output file */
+extern const char*      InFile;         /* Name of input file */
+extern const char*      OutFile;        /* Name of output file */
 
 /* Default extensions */
-extern const char	OutExt[];	/* Output file extension */
-extern const char 	CfgExt[];	/* Config file extension */
+extern const char       OutExt[];       /* Output file extension */
+extern const char       CfgExt[];       /* Config file extension */
 
 /* Flags and other command line stuff */
 extern unsigned char    DebugInfo;      /* Add debug info to the object file */
-extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
+extern unsigned char    FormFeeds;      /* Add form feeds to the output? */
 extern unsigned char    UseHexOffs;     /* Use hexadecimal label offsets */
-extern unsigned char	PassCount;	/* How many passed do we do? */
+extern unsigned char    PassCount;      /* How many passed do we do? */
 extern signed char      NewlineAfterJMP;/* Add a newline after a JMP insn? */
 extern signed char      NewlineAfterRTS;/* Add a newline after a RTS insn? */
-extern long    		StartAddr;	/* Start/load address of the program */
+extern long             StartAddr;      /* Start/load address of the program */
 extern long             InputOffs;      /* Offset into input file */
 extern long             InputSize;      /* Number of bytes to read from input */
 
 /* Stuff needed by many routines */
-extern unsigned         Pass;	     	/* Disassembler pass */
+extern unsigned         Pass;           /* Disassembler pass */
 extern char             Now[128];       /* Current time as string */
 
 /* Comments */
@@ -73,9 +73,9 @@ extern char             Now[128];       /* Current time as string */
 extern unsigned         Comments;       /* Add which comments to the output? */
 
 /* Page formatting */
-#define MIN_PAGE_LEN	32
-#define MAX_PAGE_LEN	127
-extern unsigned         PageLength;	/* Length of a listing page */
+#define MIN_PAGE_LEN    32
+#define MAX_PAGE_LEN    127
+extern unsigned         PageLength;     /* Length of a listing page */
 
 /* Linefeed if labels exceed this limit */
 #define MIN_LABELBREAK  1
@@ -85,27 +85,27 @@ extern unsigned         LBreak;
 /* Mnemonic column */
 #define MIN_MCOL        1
 #define MAX_MCOL        127
-extern unsigned	       	MCol;
+extern unsigned         MCol;
 
 /* Argument column */
 #define MIN_ACOL        1
 #define MAX_ACOL        127
-extern unsigned		ACol;
+extern unsigned         ACol;
 
 /* Comment column */
 #define MIN_CCOL        1
 #define MAX_CCOL        127
-extern unsigned 	CCol;
+extern unsigned         CCol;
 
 /* Text bytes column */
 #define MIN_TCOL        1
 #define MAX_TCOL        127
-extern unsigned 	TCol;
+extern unsigned         TCol;
 
 /* Max. number of data bytes per line */
 #define MIN_BYTESPERLINE        1
 #define MAX_BYTESPERLINE        127
-extern unsigned		BytesPerLine;
+extern unsigned         BytesPerLine;
 
 
 

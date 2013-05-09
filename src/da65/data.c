@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    data.c				     */
+/*                                  data.c                                   */
 /*                                                                           */
-/*			     Data output routines			     */
+/*                           Data output routines                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*   	     	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -63,9 +63,9 @@ static unsigned GetSpan (attr_t Style)
     unsigned Count = 1;
     while (Count < RemainingBytes) {
         attr_t Attr;
-       	if (MustDefLabel(PC+Count)) {
-	    break;
-     	}           
+        if (MustDefLabel(PC+Count)) {
+            break;
+        }           
         Attr = GetAttr (PC+Count);
         if ((Attr & atStyleMask) != Style) {
             break;
@@ -73,7 +73,7 @@ static unsigned GetSpan (attr_t Style)
         if ((Attr & atSegmentChange)) {
             break;
         }
-	++Count;
+        ++Count;
     }
 
     /* Return the number of bytes */
@@ -95,9 +95,9 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
      * than BytesPerLine.
      */
     if (Count < MemberSize) {
-	DataByteLine (Count);
+        DataByteLine (Count);
         PC += Count;
-	return Count;
+        return Count;
     }
 
     /* Make Count an even number of multiples of MemberSize */
@@ -107,20 +107,20 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
     BytesLeft = Count;
     while (BytesLeft > 0) {
 
-     	/* Calculate the number of bytes for the next line */
-     	unsigned Chunk = (BytesLeft > BytesPerLine)? BytesPerLine : BytesLeft;
+        /* Calculate the number of bytes for the next line */
+        unsigned Chunk = (BytesLeft > BytesPerLine)? BytesPerLine : BytesLeft;
 
-     	/* Output a line with these bytes */
-     	TableFunc (Chunk);
+        /* Output a line with these bytes */
+        TableFunc (Chunk);
 
-     	/* Next line */
-     	BytesLeft -= Chunk;
-     	PC        += Chunk;
+        /* Next line */
+        BytesLeft -= Chunk;
+        PC        += Chunk;
     }
 
     /* If the next line is not the same style, add a separator */
     if (CodeLeft() && GetStyleAttr (PC) != Style) {
-	SeparatorLine ();
+        SeparatorLine ();
     }
 
     /* Return the number of bytes output */
@@ -191,28 +191,28 @@ unsigned AddrTable (void)
         /* Now get the address from the PC */
         Addr = GetCodeWord (PC);
 
-	/* In pass 1, define a label, in pass 2 output the line */
-	if (Pass == 1) {
-	    if (!HaveLabel (Addr)) {
-	    	AddIntLabel (Addr);
-	    }
-	} else {
-	    const char* Label = GetLabel (Addr, PC);
-	    if (Label == 0) {
-	    	/* OOPS! Should not happen */
-	    	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
-	    }
-	    Indent (MCol);
-	    Output (".addr");
-	    Indent (ACol);
-	    Output ("%s", Label);
-	    LineComment (PC, 2);
-	    LineFeed ();
-	}
+        /* In pass 1, define a label, in pass 2 output the line */
+        if (Pass == 1) {
+            if (!HaveLabel (Addr)) {
+                AddIntLabel (Addr);
+            }
+        } else {
+            const char* Label = GetLabel (Addr, PC);
+            if (Label == 0) {
+                /* OOPS! Should not happen */
+                Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
+            }
+            Indent (MCol);
+            Output (".addr");
+            Indent (ACol);
+            Output ("%s", Label);
+            LineComment (PC, 2);
+            LineFeed ();
+        }
 
-	/* Next table entry */
-	PC        += 2;
-       	BytesLeft -= 2;
+        /* Next table entry */
+        PC        += 2;
+        BytesLeft -= 2;
 
         /* If we must define a label here, bail out */
         if (BytesLeft && MustDefLabel (PC)) {
@@ -222,7 +222,7 @@ unsigned AddrTable (void)
 
     /* If the next line is not an address table line, add a separator */
     if (CodeLeft() && GetStyleAttr (PC) != atAddrTab) {
-	SeparatorLine ();
+        SeparatorLine ();
     }
 
     /* Return the number of bytes output */
@@ -255,30 +255,30 @@ unsigned RtsTable (void)
         ForwardLabel (1);
 
         /* Now get the address from the PC */
-	Addr = (GetCodeWord (PC) + 1) & 0xFFFF;
+        Addr = (GetCodeWord (PC) + 1) & 0xFFFF;
 
-	/* In pass 1, define a label, in pass 2 output the line */
-	if (Pass == 1) {
-	    if (!HaveLabel (Addr)) {
-	    	AddIntLabel (Addr);
-	    }
-	} else {
-	    const char* Label = GetLabel (Addr, PC);
-	    if (Label == 0) {
-	    	/* OOPS! Should not happen */
-	     	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
-	    }
-	    Indent (MCol);
-	    Output (".word");
-	    Indent (ACol);
-	    Output ("%s-1", Label);
-	    LineComment (PC, 2);
-	    LineFeed ();
-	}
+        /* In pass 1, define a label, in pass 2 output the line */
+        if (Pass == 1) {
+            if (!HaveLabel (Addr)) {
+                AddIntLabel (Addr);
+            }
+        } else {
+            const char* Label = GetLabel (Addr, PC);
+            if (Label == 0) {
+                /* OOPS! Should not happen */
+                Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
+            }
+            Indent (MCol);
+            Output (".word");
+            Indent (ACol);
+            Output ("%s-1", Label);
+            LineComment (PC, 2);
+            LineFeed ();
+        }
 
-	/* Next table entry */
-	PC        += 2;
-       	BytesLeft -= 2;
+        /* Next table entry */
+        PC        += 2;
+        BytesLeft -= 2;
 
         /* If we must define a label here, bail out */
         if (BytesLeft && MustDefLabel (PC)) {
@@ -288,7 +288,7 @@ unsigned RtsTable (void)
 
     /* If the next line is not a return address table line, add a separator */
     if (CodeLeft() && GetStyleAttr (PC) != atRtsTab) {
-	SeparatorLine ();
+        SeparatorLine ();
     }
 
     /* Return the number of bytes output */
@@ -307,67 +307,67 @@ unsigned TextTable (void)
     unsigned BytesLeft = ByteCount;
     while (BytesLeft > 0) {
 
-	unsigned I;
+        unsigned I;
 
-	/* Count the number of characters that can be output as such */
-	unsigned Count = 0;
-	while (Count < BytesLeft && Count < BytesPerLine*4-1) {
-	    unsigned char C = GetCodeByte (PC + Count);
-	    if (C >= 0x20 && C <= 0x7E && C != '\"') {
-	    	++Count;
-	    } else {
-	    	break;
-	    }
-	}
+        /* Count the number of characters that can be output as such */
+        unsigned Count = 0;
+        while (Count < BytesLeft && Count < BytesPerLine*4-1) {
+            unsigned char C = GetCodeByte (PC + Count);
+            if (C >= 0x20 && C <= 0x7E && C != '\"') {
+                ++Count;
+            } else {
+                break;
+            }
+        }
 
-	/* If we have text, output it */
-	if (Count > 0) {
-	    unsigned CBytes;
-	    Indent (MCol);
-	    Output (".byte");
-	    Indent (ACol);
-	    Output ("\"");
-	    for (I = 0; I < Count; ++I) {
-	     	Output ("%c", GetCodeByte (PC+I));
-	    }
-	    Output ("\"");
-	    CBytes = Count;
-	    while (CBytes > 0) {
-		unsigned Chunk = CBytes;
-		if (Chunk > BytesPerLine) {
-		    Chunk = BytesPerLine;
-		}
-		LineComment (PC, Chunk);
-		LineFeed ();
-	     	CBytes -= Chunk;
-		PC += Chunk;
-	    }
-	    BytesLeft -= Count;
-	}
+        /* If we have text, output it */
+        if (Count > 0) {
+            unsigned CBytes;
+            Indent (MCol);
+            Output (".byte");
+            Indent (ACol);
+            Output ("\"");
+            for (I = 0; I < Count; ++I) {
+                Output ("%c", GetCodeByte (PC+I));
+            }
+            Output ("\"");
+            CBytes = Count;
+            while (CBytes > 0) {
+                unsigned Chunk = CBytes;
+                if (Chunk > BytesPerLine) {
+                    Chunk = BytesPerLine;
+                }
+                LineComment (PC, Chunk);
+                LineFeed ();
+                CBytes -= Chunk;
+                PC += Chunk;
+            }
+            BytesLeft -= Count;
+        }
 
-	/* Count the number of bytes that must be output as bytes */
-	Count = 0;
-	while (Count < BytesLeft && Count < BytesPerLine) {
-	    unsigned char C = GetCodeByte (PC + Count);
-       	    if (C < 0x20 || C > 0x7E || C == '\"') {
-	    	++Count;
-	    } else {
-	    	break;
-	    }
-	}
+        /* Count the number of bytes that must be output as bytes */
+        Count = 0;
+        while (Count < BytesLeft && Count < BytesPerLine) {
+            unsigned char C = GetCodeByte (PC + Count);
+            if (C < 0x20 || C > 0x7E || C == '\"') {
+                ++Count;
+            } else {
+                break;
+            }
+        }
 
-	/* If we have raw output bytes, print them */
-	if (Count > 0) {
-	    DataByteLine (Count);
-	    PC += Count;
-	    BytesLeft -= Count;
-	}
+        /* If we have raw output bytes, print them */
+        if (Count > 0) {
+            DataByteLine (Count);
+            PC += Count;
+            BytesLeft -= Count;
+        }
 
     }
 
     /* If the next line is not a byte table line, add a separator */
     if (CodeLeft() && GetStyleAttr (PC) != atTextTab) {
-	SeparatorLine ();
+        SeparatorLine ();
     }
 
     /* Return the number of bytes output */

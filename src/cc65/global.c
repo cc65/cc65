@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.c				     */
+/*                                 global.c                                  */
 /*                                                                           */
-/*		   Global variables for the cc65 C compiler		     */
+/*                 Global variables for the cc65 C compiler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -38,13 +38,13 @@
 
 
 /*****************************************************************************/
-/*     	      	    	       	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-unsigned char AddSource		= 0; 	/* Add source lines as comments */
-unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
+unsigned char AddSource         = 0;    /* Add source lines as comments */
+unsigned char DebugInfo         = 0;    /* Add debug info to the obj */
 unsigned char PreprocessOnly    = 0;    /* Just preprocess the input */
 unsigned char DebugOptOutput    = 0;    /* Output debug stuff */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
@@ -59,8 +59,8 @@ IntStack RegVarsToCallStack = INTSTACK(0);  /* Save reg variables on call stack 
 IntStack StaticLocals       = INTSTACK(0);  /* Make local variables static */
 IntStack SignedChars        = INTSTACK(0);  /* Make characters signed by default */
 IntStack CheckStack         = INTSTACK(0);  /* Generate stack overflow checks */
-IntStack Optimize      	    = INTSTACK(0);  /* Optimize flag */
-IntStack CodeSizeFactor	    = INTSTACK(100);/* Size factor for generated code */
+IntStack Optimize           = INTSTACK(0);  /* Optimize flag */
+IntStack CodeSizeFactor     = INTSTACK(100);/* Size factor for generated code */
 IntStack DataAlignment      = INTSTACK(1);  /* Alignment for data */
 
 /* File names */

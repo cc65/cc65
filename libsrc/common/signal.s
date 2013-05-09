@@ -4,8 +4,8 @@
 ; __sigfunc __fastcall__ signal (int sig, __sigfunc func);
 ;
 
-	.import		popax
-	.importzp	ptr1
+        .import         popax
+        .importzp       ptr1
 
         .include        "signal.inc"
         .include        "errno.inc"

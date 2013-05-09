@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*		     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -53,38 +53,38 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
 {
     switch (ED_GetLoc (Expr)) {
 
-       	case E_LOC_ABS:
-	    /* Number constant */
-       	    g_getimmed (Flags | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
-       	    break;
+        case E_LOC_ABS:
+            /* Number constant */
+            g_getimmed (Flags | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            break;
 
         case E_LOC_GLOBAL:
-       	    /* Global symbol, load address */
-	    g_getimmed ((Flags | CF_EXTERNAL) & ~CF_CONST, Expr->Name, Expr->IVal);
-       	    break;
+            /* Global symbol, load address */
+            g_getimmed ((Flags | CF_EXTERNAL) & ~CF_CONST, Expr->Name, Expr->IVal);
+            break;
 
-       	case E_LOC_STATIC:
-       	case E_LOC_LITERAL:
-       	    /* Static symbol or literal, load address */
-       	    g_getimmed ((Flags | CF_STATIC) & ~CF_CONST, Expr->Name, Expr->IVal);
-       	    break;
+        case E_LOC_STATIC:
+        case E_LOC_LITERAL:
+            /* Static symbol or literal, load address */
+            g_getimmed ((Flags | CF_STATIC) & ~CF_CONST, Expr->Name, Expr->IVal);
+            break;
 
-       	case E_LOC_REGISTER:
-	    /* Register variable. Taking the address is usually not
-	     * allowed.
-	     */
-	    if (IS_Get (&AllowRegVarAddr) == 0) {
-	     	Error ("Cannot take the address of a register variable");
-	    }
-       	    g_getimmed ((Flags | CF_REGVAR) & ~CF_CONST, Expr->Name, Expr->IVal);
-	    break;
+        case E_LOC_REGISTER:
+            /* Register variable. Taking the address is usually not
+             * allowed.
+             */
+            if (IS_Get (&AllowRegVarAddr) == 0) {
+                Error ("Cannot take the address of a register variable");
+            }
+            g_getimmed ((Flags | CF_REGVAR) & ~CF_CONST, Expr->Name, Expr->IVal);
+            break;
 
-    	case E_LOC_STACK:
-       	    g_leasp (Expr->IVal);
-	    break;
+        case E_LOC_STACK:
+            g_leasp (Expr->IVal);
+            break;
 
-       	default:
-	    Internal ("Unknown constant type: %04X", Expr->Flags);
+        default:
+            Internal ("Unknown constant type: %04X", Expr->Flags);
     }
 }
 
@@ -95,7 +95,7 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
 {
     if (ED_IsLVal (Expr)) {
 
-       	/* Dereferenced lvalue. If this is a bit field its type is unsigned.
+        /* Dereferenced lvalue. If this is a bit field its type is unsigned.
          * But if the field is completely contained in the lower byte, we will
          * throw away the high byte anyway and may therefore load just the
          * low byte.
@@ -106,9 +106,9 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         } else {
             Flags |= TypeOf (Expr->Type);
         }
-     	if (ED_NeedsTest (Expr)) {
-     	    Flags |= CF_TEST;
-     	}
+        if (ED_NeedsTest (Expr)) {
+            Flags |= CF_TEST;
+        }
 
         switch (ED_GetLoc (Expr)) {
 
@@ -173,8 +173,8 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
         ED_TestDone (Expr);
 
     } else {
-     	/* An rvalue */
-       	if (ED_IsLocExpr (Expr)) {
+        /* An rvalue */
+        if (ED_IsLocExpr (Expr)) {
             if (Expr->IVal != 0) {
                 /* We have an expression in the primary plus a constant
                  * offset. Adjust the value in the primary accordingly.
@@ -182,10 +182,10 @@ void LoadExpr (unsigned Flags, struct ExprDesc* Expr)
                 Flags |= TypeOf (Expr->Type);
                 g_inc (Flags | CF_CONST, Expr->IVal);
             }
-     	} else {
-     	    /* Constant of some sort, load it into the primary */
-     	    LoadConstant (Flags, Expr);
-     	}
+        } else {
+            /* Constant of some sort, load it into the primary */
+            LoadConstant (Flags, Expr);
+        }
 
         /* Are we testing this value? */
         if (ED_NeedsTest (Expr)) {

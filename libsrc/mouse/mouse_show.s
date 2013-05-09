@@ -9,11 +9,11 @@
 
 .proc   _mouse_show
 
-        lda    	_mouse_hidden           ; Mouse visible?
-	beq   	@L1			; Jump if yes
-       	dec    	_mouse_hidden           ; Set the flag
-	bne 	@L1	  		; Jump if still invisible
+        lda     _mouse_hidden           ; Mouse visible?
+        beq     @L1                     ; Jump if yes
+        dec     _mouse_hidden           ; Set the flag
+        bne     @L1                     ; Jump if still invisible
         jmp     mouse_show              ; Call the driver
-@L1:	rts
+@L1:    rts
 
 .endproc

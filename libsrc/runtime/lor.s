@@ -4,9 +4,9 @@
 ; CC65 runtime: or on longs
 ;
 
-	.export		tosor0ax, tosoreax
-	.import		addysp1
-	.importzp	sp, sreg, tmp1
+        .export         tosor0ax, tosoreax
+        .import         addysp1
+        .importzp       sp, sreg, tmp1
                                   
 
 tosor0ax:
@@ -15,22 +15,22 @@ tosor0ax:
         sty     sreg+1 
 
 tosoreax:
-       	ldy	#0
-       	ora    	(sp),y	       	; byte 0
-	sta	tmp1
-	iny
-	txa
-	ora	(sp),y	       	; byte 1
-	tax
-	iny
-	lda	sreg
-	ora	(sp),y	       	; byte 2
-	sta	sreg
-	iny
-	lda	sreg+1
-	ora	(sp),y	       	; byte 3
-	sta	sreg+1
+        ldy     #0
+        ora     (sp),y          ; byte 0
+        sta     tmp1
+        iny
+        txa
+        ora     (sp),y          ; byte 1
+        tax
+        iny
+        lda     sreg
+        ora     (sp),y          ; byte 2
+        sta     sreg
+        iny
+        lda     sreg+1
+        ora     (sp),y          ; byte 3
+        sta     sreg+1
 
-	lda	tmp1
-       	jmp	addysp1
+        lda     tmp1
+        jmp     addysp1
 

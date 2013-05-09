@@ -5,15 +5,15 @@
 ; intmax_t __fastcall imaxabs (intmax_t val);
 ;
 
-  	.export		_labs, _imaxabs
-  	.import		negeax
-	.importzp	sreg
+        .export         _labs, _imaxabs
+        .import         negeax
+        .importzp       sreg
 
 
 _labs:
 _imaxabs:
-        ldy	sreg+1		; test hi byte
-  	bpl	L1
-	jmp	negeax 		; Negate if negative
-L1:    	rts
+        ldy     sreg+1          ; test hi byte
+        bpl     L1
+        jmp     negeax          ; Negate if negative
+L1:     rts
 

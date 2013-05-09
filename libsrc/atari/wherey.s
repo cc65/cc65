@@ -4,10 +4,10 @@
 ; unsigned char wherey (void);
 ;
 
-	.export	 _wherey
-	.include "atari.inc"
+        .export  _wherey
+        .include "atari.inc"
 
 _wherey:
-	lda	ROWCRS
-	ldx	#0
-	rts
+        lda     ROWCRS
+        ldx     #0
+        rts

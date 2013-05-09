@@ -4,42 +4,42 @@
 ; void __fastcall__ _swap (void* p, void* q, size_t size);
 ;
 
-      	.export	       	__swap
-      	.import		popax
-      	.importzp	ptr1, ptr2, ptr3
+        .export         __swap
+        .import         popax
+        .importzp       ptr1, ptr2, ptr3
 
 
-__swap:	eor     #$FF
-        sta	ptr3
+__swap: eor     #$FF
+        sta     ptr3
         txa
         eor     #$FF
-       	sta	ptr3+1          ; Save -(size+1) into ptr3
+        sta     ptr3+1          ; Save -(size+1) into ptr3
 
-      	jsr	popax		; Get q
-      	sta	ptr2
-      	stx	ptr2+1
+        jsr     popax           ; Get q
+        sta     ptr2
+        stx     ptr2+1
 
-      	jsr	popax		; Get p
-      	sta	ptr1
-      	stx	ptr1+1
+        jsr     popax           ; Get p
+        sta     ptr1
+        stx     ptr1+1
 
 ; Prepare for swap
 
-      	ldy	#$00
+        ldy     #$00
 
 ; Swap loop
 
 @L1:    inc     ptr3            ; Bump counter low byte
         beq     @L3             ; Branch on overflow
 
-@L2:    lda	(ptr1),y
-      	tax
-      	lda	(ptr2),y
-      	sta	(ptr1),y
-      	txa
-      	sta	(ptr2),y
-      	iny
-      	bne	@L1
+@L2:    lda     (ptr1),y
+        tax
+        lda     (ptr2),y
+        sta     (ptr1),y
+        txa
+        sta     (ptr2),y
+        iny
+        bne     @L1
         inc     ptr1+1
         inc     ptr2+1
         bne     @L1             ; Branch always (hopefully)

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	     			   stddef.h				     */
+/*                                 stddef.h                                  */
 /*                                                                           */
-/*	     		      Common definitions			     */
+/*                            Common definitions                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -54,12 +54,12 @@ typedef unsigned size_t;
 
 /* NULL pointer */
 #ifndef _HAVE_NULL
-#define NULL	0
+#define NULL    0
 #define _HAVE_NULL
 #endif
 
 /* offsetof macro */
-#define offsetof(type, member)	(size_t) (&((type*) 0)->member)
+#define offsetof(type, member)  (size_t) (&((type*) 0)->member)
 
 
 

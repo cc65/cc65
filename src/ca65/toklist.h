@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			       	   toklist.h				     */
+/*                                 toklist.h                                 */
 /*                                                                           */
-/*		    Token list for the ca65 macroassembler		     */
+/*                  Token list for the ca65 macroassembler                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*     	       	     		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -56,21 +56,21 @@
 /* Struct holding a token */
 typedef struct TokNode TokNode;
 struct TokNode {
-    TokNode*	Next;  	      		/* For single linked list */
+    TokNode*    Next;                   /* For single linked list */
     Token       T;                      /* Token value */
 };
 
 /* Struct holding a token list */
 typedef struct TokList TokList;
 struct TokList {
-    TokList*	Next;	      		/* Single linked list (for replay) */
-    TokNode*	Root;	      		/* First node in list */
-    TokNode*	Last;	      		/* Last node in list or replay */
-    unsigned   	RepCount;      		/* Repeat counter (used for replay) */
-    unsigned	RepMax;			/* Maximum repeat count for replay */
-    unsigned	Count;	      		/* Token count */
-    void	(*Check)(TokList*);	/* Token check function */
-    void*      	Data;			/* Additional data for check */
+    TokList*    Next;                   /* Single linked list (for replay) */
+    TokNode*    Root;                   /* First node in list */
+    TokNode*    Last;                   /* Last node in list or replay */
+    unsigned    RepCount;               /* Repeat counter (used for replay) */
+    unsigned    RepMax;                 /* Maximum repeat count for replay */
+    unsigned    Count;                  /* Token count */
+    void        (*Check)(TokList*);     /* Token check function */
+    void*       Data;                   /* Additional data for check */
     LineInfo*   LI;                     /* Line info for replay */
 };
 
@@ -78,15 +78,15 @@ struct TokList {
 
 /* Return codes for TokCmp - higher numeric code means better match */
 enum TC {
-    tcDifferent, 			/* Different tokents */
-    tcSameToken, 			/* Same token, different attribute */
-    tcIdentical	 			/* Identical (token + attribute) */
+    tcDifferent,                        /* Different tokents */
+    tcSameToken,                        /* Same token, different attribute */
+    tcIdentical                         /* Identical (token + attribute) */
 };
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

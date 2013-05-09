@@ -4,10 +4,10 @@
 ; int __fastcall__ vprintf (const char* format, va_list ap);
 ;
 
-  	.export		_vprintf
+        .export         _vprintf
         .import         _vfprintf, _stdout
-  	.import		decsp2
-  	.importzp	sp
+        .import         decsp2
+        .importzp       sp
 
 
 .proc   _vprintf

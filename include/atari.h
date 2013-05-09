@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   atari.h			       	     */
+/*                                 atari.h                                   */
 /*                                                                           */
-/*		        Atari system specific definitions		     */
+/*                      Atari system specific definitions                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,11 +45,11 @@
 
 
 /* Character codes */
-#define CH_DELCHR	0xFE   /* delete char under the cursor */
-#define CH_ENTER	0x9B
-#define CH_ESC 	    	0x1B
-#define CH_CURS_UP  	28
-#define CH_CURS_DOWN 	29
+#define CH_DELCHR       0xFE   /* delete char under the cursor */
+#define CH_ENTER        0x9B
+#define CH_ESC          0x1B
+#define CH_CURS_UP      28
+#define CH_CURS_DOWN    29
 #define CH_CURS_LEFT    30
 #define CH_CURS_RIGHT   31
 
@@ -63,26 +63,26 @@
 #define CH_INSLINE      0x9D   /* insert line */
 
 /* These are defined to be Atari + NumberKey */
-#define CH_F1 	    	177
-#define CH_F2 	    	178
-#define CH_F3 	    	179
-#define CH_F4 	    	180
-#define CH_F5 	    	181
-#define CH_F6 	    	182
-#define CH_F7 	    	183
-#define CH_F8 	    	184
-#define CH_F9 	    	185
-#define CH_F10 	    	176
+#define CH_F1           177
+#define CH_F2           178
+#define CH_F3           179
+#define CH_F4           180
+#define CH_F5           181
+#define CH_F6           182
+#define CH_F7           183
+#define CH_F8           184
+#define CH_F9           185
+#define CH_F10          176
 
-#define CH_ULCORNER 	0x11
-#define CH_URCORNER 	0x05
-#define CH_LLCORNER 	0x1A
-#define CH_LRCORNER 	0x03
-#define CH_TTEE     	0x17
-#define CH_BTEE     	0x18
-#define CH_LTEE     	0x01
-#define CH_RTEE     	0x04
-#define CH_CROSS    	0x13
+#define CH_ULCORNER     0x11
+#define CH_URCORNER     0x05
+#define CH_LLCORNER     0x1A
+#define CH_LRCORNER     0x03
+#define CH_TTEE         0x17
+#define CH_BTEE         0x18
+#define CH_LTEE         0x01
+#define CH_RTEE         0x04
+#define CH_CROSS        0x13
 #define CH_HLINE        0x12
 #define CH_VLINE        0x7C
 
@@ -114,22 +114,22 @@
 /* Color defines, similar to c64 colors (untested) */
 /* Note that the conio color implementation is monochrome (bgcolor and textcolor are only placeholders) */
 /* Use the defines with the setcolor() or _atari_xxxcolor() functions */
-#define COLOR_BLACK  	       	_gtia_mkcolor(HUE_GREY,0)
-#define COLOR_WHITE  	       	_gtia_mkcolor(HUE_GREY,7)
-#define COLOR_RED    	       	_gtia_mkcolor(HUE_REDORANGE,1)
-#define COLOR_CYAN      	_gtia_mkcolor(HUE_CYAN,3)
-#define COLOR_VIOLET 	       	_gtia_mkcolor(HUE_PURPLE,4)
-#define COLOR_GREEN  	        _gtia_mkcolor(HUE_GREEN,2)
-#define COLOR_BLUE   	       	_gtia_mkcolor(HUE_BLUE,2)
-#define COLOR_YELLOW 	       	_gtia_mkcolor(HUE_YELLOW,7)
-#define COLOR_ORANGE 	       	_gtia_mkcolor(HUE_ORANGE,5)
-#define COLOR_BROWN  	       	_gtia_mkcolor(HUE_YELLOW,2)
-#define COLOR_LIGHTRED       	_gtia_mkcolor(HUE_REDORANGE,6)
-#define COLOR_GRAY1  	       	_gtia_mkcolor(HUE_GREY,2)
-#define COLOR_GRAY2  	       	_gtia_mkcolor(HUE_GREY,3)
-#define COLOR_LIGHTGREEN     	_gtia_mkcolor(HUE_GREEN,6)
-#define COLOR_LIGHTBLUE      	_gtia_mkcolor(HUE_BLUE,6)
-#define COLOR_GRAY3  	       	_gtia_mkcolor(HUE_GREY,5)
+#define COLOR_BLACK             _gtia_mkcolor(HUE_GREY,0)
+#define COLOR_WHITE             _gtia_mkcolor(HUE_GREY,7)
+#define COLOR_RED               _gtia_mkcolor(HUE_REDORANGE,1)
+#define COLOR_CYAN              _gtia_mkcolor(HUE_CYAN,3)
+#define COLOR_VIOLET            _gtia_mkcolor(HUE_PURPLE,4)
+#define COLOR_GREEN             _gtia_mkcolor(HUE_GREEN,2)
+#define COLOR_BLUE              _gtia_mkcolor(HUE_BLUE,2)
+#define COLOR_YELLOW            _gtia_mkcolor(HUE_YELLOW,7)
+#define COLOR_ORANGE            _gtia_mkcolor(HUE_ORANGE,5)
+#define COLOR_BROWN             _gtia_mkcolor(HUE_YELLOW,2)
+#define COLOR_LIGHTRED          _gtia_mkcolor(HUE_REDORANGE,6)
+#define COLOR_GRAY1             _gtia_mkcolor(HUE_GREY,2)
+#define COLOR_GRAY2             _gtia_mkcolor(HUE_GREY,3)
+#define COLOR_LIGHTGREEN        _gtia_mkcolor(HUE_GREEN,6)
+#define COLOR_LIGHTBLUE         _gtia_mkcolor(HUE_BLUE,6)
+#define COLOR_GRAY3             _gtia_mkcolor(HUE_GREY,5)
 
 /* color register functions */
 extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);

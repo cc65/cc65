@@ -5,10 +5,10 @@
 ; /* Initialize the random number generator */
 ;
 
-    	.export	       	__randomize
-	.import		_srand
+        .export         __randomize
+        .import         _srand
 
-	.include	"nes.inc"
+        .include        "nes.inc"
 
 __randomize:
         ldx     tickcount       ; Use tick clock

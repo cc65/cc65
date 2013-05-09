@@ -3,13 +3,13 @@
 ; Marco van den Heuvel, 2010-01-24
 ;
 
-        .include	"zeropage.inc"
+        .include        "zeropage.inc"
 
-        .include	"em-kernel.inc"
-        .include	"em-error.inc"
+        .include        "em-kernel.inc"
+        .include        "em-error.inc"
 
 
-        .macpack	generic
+        .macpack        generic
 
 
 ; ------------------------------------------------------------------------
@@ -19,24 +19,24 @@
 
 ; Driver signature
 
-        .byte	$65, $6d, $64		; "emd"
-        .byte	EMD_API_VERSION		; EM API version number
+        .byte   $65, $6d, $64           ; "emd"
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
-        .word	INSTALL
-        .word	UNINSTALL
-        .word	PAGECOUNT
-        .word	MAP
-        .word	USE
-        .word	COMMIT
-        .word	COPYFROM
-        .word	COPYTO
+        .word   INSTALL
+        .word   UNINSTALL
+        .word   PAGECOUNT
+        .word   MAP
+        .word   USE
+        .word   COMMIT
+        .word   COPYFROM
+        .word   COPYTO
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-IP_WINDOW       = $DF00		; Address of ISEPIC window
+IP_WINDOW       = $DF00         ; Address of ISEPIC window
 IP_CTRL_BASE    = $DE00
 PAGES           = 8
 
@@ -53,32 +53,32 @@ PAGES           = 8
 ;
 
 INSTALL:
-        lda	#0
-        sta	IP_CTRL_BASE
-        ldx	IP_WINDOW
-        cpx	IP_WINDOW
-        bne	@notpresent
-        inc	IP_WINDOW
-        cpx	IP_WINDOW
-        beq	@notpresent
-        ldx	IP_WINDOW
-        sta	IP_CTRL_BASE+1
+        lda     #0
+        sta     IP_CTRL_BASE
+        ldx     IP_WINDOW
+        cpx     IP_WINDOW
+        bne     @notpresent
+        inc     IP_WINDOW
+        cpx     IP_WINDOW
+        beq     @notpresent
+        ldx     IP_WINDOW
+        sta     IP_CTRL_BASE+1
         inx
-        stx	IP_WINDOW
+        stx     IP_WINDOW
         dex
-        sta	IP_CTRL_BASE
-        cpx	IP_WINDOW
-        beq	@setok
+        sta     IP_CTRL_BASE
+        cpx     IP_WINDOW
+        beq     @setok
 
 @notpresent:
-        lda	#<EM_ERR_NO_DEVICE
-        ldx	#>EM_ERR_NO_DEVICE
+        lda     #<EM_ERR_NO_DEVICE
+        ldx     #>EM_ERR_NO_DEVICE
         rts
 
 @setok:
-        lda	#<EM_ERR_OK
-        ldx	#>EM_ERR_OK
-;       rts				; Run into UNINSTALL instead
+        lda     #<EM_ERR_OK
+        ldx     #>EM_ERR_OK
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -93,8 +93,8 @@ UNINSTALL:
 ;
 
 PAGECOUNT:
-        lda	#<PAGES
-        ldx	#>PAGES
+        lda     #<PAGES
+        ldx     #>PAGES
         rts
 
 ; ------------------------------------------------------------------------
@@ -112,9 +112,9 @@ USE     := MAP
 
 MAP:
         tax
-        sta	IP_CTRL_BASE,x
-        lda	#<IP_WINDOW
-        ldx	#>IP_WINDOW
+        sta     IP_CTRL_BASE,x
+        lda     #<IP_WINDOW
+        ldx     #>IP_WINDOW
 
 ; Use the RTS from COMMIT below to save a precious byte of storage
 
@@ -131,7 +131,7 @@ COMMIT:
 ;
 
 COPYFROM:
-        jsr	setup
+        jsr     setup
 
 ; Setup is:
 ;
@@ -142,37 +142,37 @@ COPYFROM:
 ;   - X contains the page offset
 ;   - Y contains zero
 
-        jmp	@L5
+        jmp     @L5
 
 @L1:
-        lda	IP_WINDOW,x
-        sta	(ptr2),y
+        lda     IP_WINDOW,x
+        sta     (ptr2),y
         iny
-        bne	@L2
-        inc	ptr2+1
+        bne     @L2
+        inc     ptr2+1
 @L2:
         inx
-        beq	@L4
+        beq     @L4
 
 ; Bump count and repeat
 
 @L3:
-        inc	ptr3
-        bne	@L1
-        inc	ptr3+1
-        bne	@L1
+        inc     ptr3
+        bne     @L1
+        inc     ptr3+1
+        bne     @L1
         rts
 
 ; Bump page register
 
 @L4:
-        inc	tmp1		; Bump low page register
+        inc     tmp1            ; Bump low page register
 @L5:
-        stx	tmp2
-        ldx	tmp1
-        sta	IP_CTRL_BASE,x
-        ldx	tmp2
-        jmp	@L3
+        stx     tmp2
+        ldx     tmp1
+        sta     IP_CTRL_BASE,x
+        ldx     tmp2
+        jmp     @L3
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure
@@ -181,7 +181,7 @@ COPYFROM:
 ;
 
 COPYTO:
-        jsr	setup
+        jsr     setup
 
 ; Setup is:
 ;
@@ -192,78 +192,78 @@ COPYTO:
 ;   - X contains the page offset
 ;   - Y contains zero
 
-        jmp	@L5
+        jmp     @L5
 
 @L1:
-        lda	(ptr2),y
-        sta	IP_WINDOW,x
+        lda     (ptr2),y
+        sta     IP_WINDOW,x
         iny
-        bne	@L2
-        inc	ptr2+1
+        bne     @L2
+        inc     ptr2+1
 @L2:
         inx
-        beq	@L4
+        beq     @L4
 
 ; Bump count and repeat
 
 @L3:
-        inc	ptr3
-        bne	@L1
-        inc	ptr3+1
-        bne	@L1
+        inc     ptr3
+        bne     @L1
+        inc     ptr3+1
+        bne     @L1
         rts
 
 ; Bump page register
 
 @L4:
-        inc	tmp1		; Bump page register
+        inc     tmp1            ; Bump page register
 @L5:
-        stx	tmp2
-        ldx	tmp1
-        sta	IP_CTRL_BASE,x
-        ldx	tmp2
-        jmp	@L3
+        stx     tmp2
+        ldx     tmp1
+        sta     IP_CTRL_BASE,x
+        ldx     tmp2
+        jmp     @L3
 
 ; ------------------------------------------------------------------------
 ; Helper function for COPYFROM and COPYTO: Store the pointer to the request
 ; structure and prepare data for the copy
 
 setup:
-        sta	ptr1
-        stx	ptr1+1		; Save passed pointer
+        sta     ptr1
+        stx     ptr1+1          ; Save passed pointer
 
 ; Get the page number from the struct and remember it.
 
-        ldy	#EM_COPY::PAGE
-        lda	(ptr1),y
-        sta	tmp1
+        ldy     #EM_COPY::PAGE
+        lda     (ptr1),y
+        sta     tmp1
 
 ; Get the buffer pointer into ptr2
 
-        ldy	#EM_COPY::BUF
-        lda	(ptr1),y
-        sta	ptr2
+        ldy     #EM_COPY::BUF
+        lda     (ptr1),y
+        sta     ptr2
         iny
-        lda	(ptr1),y
-        sta	ptr2+1
+        lda     (ptr1),y
+        sta     ptr2+1
 
 ; Get the count, calculate -(count-1) and store it into ptr3
 
-        ldy	#EM_COPY::COUNT
-        lda	(ptr1),y
-        eor	#$FF
-        sta	ptr3
+        ldy     #EM_COPY::COUNT
+        lda     (ptr1),y
+        eor     #$FF
+        sta     ptr3
         iny
-        lda	(ptr1),y
-        eor	#$FF
-        sta	ptr3+1
+        lda     (ptr1),y
+        eor     #$FF
+        sta     ptr3+1
 
 ; Get the page offset into X and clear Y
 
-        ldy	#EM_COPY::OFFS
-        lda	(ptr1),y
+        ldy     #EM_COPY::OFFS
+        lda     (ptr1),y
         tax
-        ldy	#0
+        ldy     #0
 
 ; Done
 

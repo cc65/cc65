@@ -18,32 +18,32 @@
 
 int main(void)
 {
-	char c;
+        char c;
         NEWLINE;
 
         cursor (1);
-	PRINTF("enter key (cursor on): ");
-	c = cgetc();
+        PRINTF("enter key (cursor on): ");
+        c = cgetc();
         NEWLINE;
 
         cursor (0);
-	PRINTF("enter key (cursor off): ");
-	c = cgetc();
+        PRINTF("enter key (cursor off): ");
+        c = cgetc();
         NEWLINE;
 
-	PRINTF("enter key (cursor on): ");
+        PRINTF("enter key (cursor on): ");
         cursor (1);
-	c = cgetc();
+        c = cgetc();
         NEWLINE;
 
-	PRINTF("enter key (cursor off): ");
+        PRINTF("enter key (cursor off): ");
         cursor (0);
-	c = cgetc();
+        c = cgetc();
         NEWLINE;
 
         PRINTF("hit any key to exit...");
         c = cgetc();
         NEWLINE;
 
-	return(0);
+        return(0);
 }

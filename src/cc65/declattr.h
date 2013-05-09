@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  declattr.h				     */
+/*                                declattr.h                                 */
 /*                                                                           */
-/*			    Declaration attributes			     */
+/*                          Declaration attributes                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*	   	    	    	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -49,7 +49,7 @@ struct Declaration;
 
 /* Supported attribute types */
 typedef enum {
-    atNoReturn,	    	    	/* Function does not return */
+    atNoReturn,                 /* Function does not return */
     atUnused,                   /* Symbol is unused - don't warn */
 } DeclAttrType;
 
@@ -62,7 +62,7 @@ struct DeclAttr {
 
 
 /*****************************************************************************/
-/* 	   	    	    	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

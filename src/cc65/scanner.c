@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.c                                 */
+/*                                 scanner.c                                 */
 /*                                                                           */
-/*			Source file line info structure                      */
+/*                      Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -62,13 +62,13 @@
 
 
 /*****************************************************************************/
-/*		  	   	     data				     */
+/*                                   data                                    */
 /*****************************************************************************/
 
 
 
-Token CurTok;		/* The current token */
-Token NextTok;		/* The next token */
+Token CurTok;           /* The current token */
+Token NextTok;          /* The next token */
 
 
 
@@ -81,77 +81,77 @@ enum {
 
 /* Token table */
 static const struct Keyword {
-    char*    	    Key;    	/* Keyword name */
-    unsigned char   Tok;    	/* The token */
+    char*           Key;        /* Keyword name */
+    unsigned char   Tok;        /* The token */
     unsigned char   Std;        /* Token supported in which standards? */
 } Keywords [] = {
     { "_Pragma",        TOK_PRAGMA,     TT_C89 | TT_C99 | TT_CC65  },   /* !! */
-    { "__AX__",	       	TOK_AX,	       	TT_C89 | TT_C99 | TT_CC65  },
-    { "__A__", 	       	TOK_A, 	       	TT_C89 | TT_C99 | TT_CC65  },
-    { "__EAX__",       	TOK_EAX,       	TT_C89 | TT_C99 | TT_CC65  },
-    { "__X__", 	       	TOK_X, 	       	TT_C89 | TT_C99 | TT_CC65  },
-    { "__Y__", 	       	TOK_Y, 	       	TT_C89 | TT_C99 | TT_CC65  },
-    { "__asm__",       	TOK_ASM,       	TT_C89 | TT_C99 | TT_CC65  },
-    { "__attribute__", 	TOK_ATTRIBUTE, 	TT_C89 | TT_C99 | TT_CC65  },
-    { "__cdecl__",     	TOK_CDECL,      TT_C89 | TT_C99 | TT_CC65  },
-    { "__far__",       	TOK_FAR,       	TT_C89 | TT_C99 | TT_CC65  },
-    { "__fastcall__",  	TOK_FASTCALL,   TT_C89 | TT_C99 | TT_CC65  },
-    { "__inline__",     TOK_INLINE,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "__near__",      	TOK_NEAR,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "asm",   	       	TOK_ASM,   	                  TT_CC65  },
-    { "auto",  	       	TOK_AUTO,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "break", 	       	TOK_BREAK,     	TT_C89 | TT_C99 | TT_CC65  },
-    { "case",  	       	TOK_CASE,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "cdecl",         	TOK_CDECL,                        TT_CC65  },
-    { "char",  	       	TOK_CHAR,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "const", 	       	TOK_CONST,     	TT_C89 | TT_C99 | TT_CC65  },
-    { "continue",      	TOK_CONTINUE,   TT_C89 | TT_C99 | TT_CC65  },
-    { "default",       	TOK_DEFAULT,    TT_C89 | TT_C99 | TT_CC65  },
-    { "do",    	       	TOK_DO,        	TT_C89 | TT_C99 | TT_CC65  },
-    { "double",        	TOK_DOUBLE,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "else",  	       	TOK_ELSE,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "enum",  	       	TOK_ENUM,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "extern",        	TOK_EXTERN,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "far",		TOK_FAR,	                  TT_CC65  },
-    { "fastcall",      	TOK_FASTCALL,	                  TT_CC65  },
-    { "float", 	       	TOK_FLOAT,     	TT_C89 | TT_C99 | TT_CC65  },
-    { "for",   	       	TOK_FOR,       	TT_C89 | TT_C99 | TT_CC65  },
-    { "goto",  	       	TOK_GOTO,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "if",    	       	TOK_IF,        	TT_C89 | TT_C99 | TT_CC65  },
+    { "__AX__",         TOK_AX,         TT_C89 | TT_C99 | TT_CC65  },
+    { "__A__",          TOK_A,          TT_C89 | TT_C99 | TT_CC65  },
+    { "__EAX__",        TOK_EAX,        TT_C89 | TT_C99 | TT_CC65  },
+    { "__X__",          TOK_X,          TT_C89 | TT_C99 | TT_CC65  },
+    { "__Y__",          TOK_Y,          TT_C89 | TT_C99 | TT_CC65  },
+    { "__asm__",        TOK_ASM,        TT_C89 | TT_C99 | TT_CC65  },
+    { "__attribute__",  TOK_ATTRIBUTE,  TT_C89 | TT_C99 | TT_CC65  },
+    { "__cdecl__",      TOK_CDECL,      TT_C89 | TT_C99 | TT_CC65  },
+    { "__far__",        TOK_FAR,        TT_C89 | TT_C99 | TT_CC65  },
+    { "__fastcall__",   TOK_FASTCALL,   TT_C89 | TT_C99 | TT_CC65  },
+    { "__inline__",     TOK_INLINE,     TT_C89 | TT_C99 | TT_CC65  },
+    { "__near__",       TOK_NEAR,       TT_C89 | TT_C99 | TT_CC65  },
+    { "asm",            TOK_ASM,                          TT_CC65  },
+    { "auto",           TOK_AUTO,       TT_C89 | TT_C99 | TT_CC65  },
+    { "break",          TOK_BREAK,      TT_C89 | TT_C99 | TT_CC65  },
+    { "case",           TOK_CASE,       TT_C89 | TT_C99 | TT_CC65  },
+    { "cdecl",          TOK_CDECL,                        TT_CC65  },
+    { "char",           TOK_CHAR,       TT_C89 | TT_C99 | TT_CC65  },
+    { "const",          TOK_CONST,      TT_C89 | TT_C99 | TT_CC65  },
+    { "continue",       TOK_CONTINUE,   TT_C89 | TT_C99 | TT_CC65  },
+    { "default",        TOK_DEFAULT,    TT_C89 | TT_C99 | TT_CC65  },
+    { "do",             TOK_DO,         TT_C89 | TT_C99 | TT_CC65  },
+    { "double",         TOK_DOUBLE,     TT_C89 | TT_C99 | TT_CC65  },
+    { "else",           TOK_ELSE,       TT_C89 | TT_C99 | TT_CC65  },
+    { "enum",           TOK_ENUM,       TT_C89 | TT_C99 | TT_CC65  },
+    { "extern",         TOK_EXTERN,     TT_C89 | TT_C99 | TT_CC65  },
+    { "far",            TOK_FAR,                          TT_CC65  },
+    { "fastcall",       TOK_FASTCALL,                     TT_CC65  },
+    { "float",          TOK_FLOAT,      TT_C89 | TT_C99 | TT_CC65  },
+    { "for",            TOK_FOR,        TT_C89 | TT_C99 | TT_CC65  },
+    { "goto",           TOK_GOTO,       TT_C89 | TT_C99 | TT_CC65  },
+    { "if",             TOK_IF,         TT_C89 | TT_C99 | TT_CC65  },
     { "inline",         TOK_INLINE,              TT_C99 | TT_CC65  },
-    { "int",   	       	TOK_INT,       	TT_C89 | TT_C99 | TT_CC65  },
-    { "long",  	       	TOK_LONG,      	TT_C89 | TT_C99 | TT_CC65  },
-    { "near",          	TOK_NEAR,                         TT_CC65  },
-    { "register",      	TOK_REGISTER,   TT_C89 | TT_C99 | TT_CC65  },
-    { "restrict",      	TOK_RESTRICT,            TT_C99 | TT_CC65  },
-    { "return",        	TOK_RETURN,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "short", 	       	TOK_SHORT,     	TT_C89 | TT_C99 | TT_CC65  },
-    { "signed",	       	TOK_SIGNED,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "sizeof",        	TOK_SIZEOF,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "static",        	TOK_STATIC,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "struct",        	TOK_STRUCT,    	TT_C89 | TT_C99 | TT_CC65  },
-    { "switch",        	TOK_SWITCH,	TT_C89 | TT_C99 | TT_CC65  },
-    { "typedef",       	TOK_TYPEDEF,    TT_C89 | TT_C99 | TT_CC65  },
-    { "union", 	       	TOK_UNION, 	TT_C89 | TT_C99 | TT_CC65  },
-    { "unsigned",      	TOK_UNSIGNED,   TT_C89 | TT_C99 | TT_CC65  },
-    { "void",  	       	TOK_VOID,  	TT_C89 | TT_C99 | TT_CC65  },
-    { "volatile",      	TOK_VOLATILE,   TT_C89 | TT_C99 | TT_CC65  },
-    { "while", 	       	TOK_WHILE, 	TT_C89 | TT_C99 | TT_CC65  },
+    { "int",            TOK_INT,        TT_C89 | TT_C99 | TT_CC65  },
+    { "long",           TOK_LONG,       TT_C89 | TT_C99 | TT_CC65  },
+    { "near",           TOK_NEAR,                         TT_CC65  },
+    { "register",       TOK_REGISTER,   TT_C89 | TT_C99 | TT_CC65  },
+    { "restrict",       TOK_RESTRICT,            TT_C99 | TT_CC65  },
+    { "return",         TOK_RETURN,     TT_C89 | TT_C99 | TT_CC65  },
+    { "short",          TOK_SHORT,      TT_C89 | TT_C99 | TT_CC65  },
+    { "signed",         TOK_SIGNED,     TT_C89 | TT_C99 | TT_CC65  },
+    { "sizeof",         TOK_SIZEOF,     TT_C89 | TT_C99 | TT_CC65  },
+    { "static",         TOK_STATIC,     TT_C89 | TT_C99 | TT_CC65  },
+    { "struct",         TOK_STRUCT,     TT_C89 | TT_C99 | TT_CC65  },
+    { "switch",         TOK_SWITCH,     TT_C89 | TT_C99 | TT_CC65  },
+    { "typedef",        TOK_TYPEDEF,    TT_C89 | TT_C99 | TT_CC65  },
+    { "union",          TOK_UNION,      TT_C89 | TT_C99 | TT_CC65  },
+    { "unsigned",       TOK_UNSIGNED,   TT_C89 | TT_C99 | TT_CC65  },
+    { "void",           TOK_VOID,       TT_C89 | TT_C99 | TT_CC65  },
+    { "volatile",       TOK_VOLATILE,   TT_C89 | TT_C99 | TT_CC65  },
+    { "while",          TOK_WHILE,      TT_C89 | TT_C99 | TT_CC65  },
 };
-#define KEY_COUNT	(sizeof (Keywords) / sizeof (Keywords [0]))
+#define KEY_COUNT       (sizeof (Keywords) / sizeof (Keywords [0]))
 
 
 
 /* Stuff for determining the type of an integer constant */
-#define IT_INT	 	0x01
-#define IT_UINT	 	0x02
-#define IT_LONG	 	0x04
-#define IT_ULONG 	0x08
+#define IT_INT          0x01
+#define IT_UINT         0x02
+#define IT_LONG         0x04
+#define IT_ULONG        0x08
 
 
 
 /*****************************************************************************/
-/*		 		     code 			   	     */
+/*                                   code                                    */
 /*****************************************************************************/
 
 
@@ -172,9 +172,9 @@ static token_t FindKey (const char* Key)
     struct Keyword* K;
     K = bsearch (Key, Keywords, KEY_COUNT, sizeof (Keywords [0]), CmpKey);
     if (K && (K->Std & (0x01 << IS_Get (&Standard))) != 0) {
-	return K->Tok;
+        return K->Tok;
     } else {
-	return TOK_IDENT;
+        return TOK_IDENT;
     }
 }
 
@@ -186,17 +186,17 @@ static int SkipWhite (void)
  */
 {
     while (1) {
-       	while (CurC == '\0') {
-	    if (NextLine () == 0) {
-	     	return 0;
-     	    }
-	    Preprocess ();
-     	}
-	if (IsSpace (CurC)) {
-    	    NextChar ();
-	} else {
-    	    return 1;
-	}
+        while (CurC == '\0') {
+            if (NextLine () == 0) {
+                return 0;
+            }
+            Preprocess ();
+        }
+        if (IsSpace (CurC)) {
+            NextChar ();
+        } else {
+            return 1;
+        }
     }
 }
 
@@ -220,11 +220,11 @@ void SymName (char* S)
 {
     unsigned Len = 0;
     do {
-       	if (Len < MAX_IDENTLEN) {
-       	    ++Len;
-       	    *S++ = CurC;
-      	}
-       	NextChar ();
+        if (Len < MAX_IDENTLEN) {
+            ++Len;
+            *S++ = CurC;
+        }
+        NextChar ();
     } while (IsIdent (CurC) || IsDigit (CurC));
     *S = '\0';
 }
@@ -235,10 +235,10 @@ int IsSym (char* S)
 /* If a symbol follows, read it and return 1, otherwise return 0 */
 {
     if (IsIdent (CurC)) {
-     	SymName (S);
-     	return 1;
+        SymName (S);
+        return 1;
     } else {
-     	return 0;
+        return 0;
     }
 }
 
@@ -248,7 +248,7 @@ static void UnknownChar (char C)
 /* Error message for unknown character */
 {
     Error ("Invalid input character with code %02X", C & 0xFF);
-    NextChar (); 			/* Skip */
+    NextChar ();                        /* Skip */
 }
 
 
@@ -270,44 +270,44 @@ static int ParseChar (void)
 
     /* Check for escape chars */
     if (CurC == '\\') {
-	NextChar ();
-	switch (CurC) {
-	    case '?':
-	       	C = '\?';
-	      	break;
-	    case 'a':
-	       	C = '\a';
-	      	break;
-	    case 'b':
-	       	C = '\b';
-	      	break;
-     	    case 'f':
-	       	C = '\f';
-	      	break;
-	    case 'r':
-	      	C = '\r';
-	      	break;
-	    case 'n':
-	      	C = '\n';
-	      	break;
-	    case 't':
-	      	C = '\t';
-	      	break;
+        NextChar ();
+        switch (CurC) {
+            case '?':
+                C = '\?';
+                break;
+            case 'a':
+                C = '\a';
+                break;
+            case 'b':
+                C = '\b';
+                break;
+            case 'f':
+                C = '\f';
+                break;
+            case 'r':
+                C = '\r';
+                break;
+            case 'n':
+                C = '\n';
+                break;
+            case 't':
+                C = '\t';
+                break;
             case 'v':
                 C = '\v';
                 break;
-	    case '\"':
-	      	C = '\"';
-	      	break;
-	    case '\'':
-	      	C = '\'';
-	      	break;
-	    case '\\':
-	      	C = '\\';
-	      	break;
-	    case 'x':
-	    case 'X':
-	      	/* Hex character constant */
+            case '\"':
+                C = '\"';
+                break;
+            case '\'':
+                C = '\'';
+                break;
+            case '\\':
+                C = '\\';
+                break;
+            case 'x':
+            case 'X':
+                /* Hex character constant */
                 if (!IsXDigit (NextC)) {
                     Error ("\\x used with no following hex digits");
                     C = ' ';
@@ -326,19 +326,19 @@ static int ParseChar (void)
                         NextChar ();
                     }
                 }
-	      	break;
-	    case '0':
-	    case '1':
-	    case '2':
-	    case '3':
-	    case '4':
-	    case '5':
-	    case '6':
-	    case '7':
-	   	/* Octal constant */
+                break;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+                /* Octal constant */
                 HadError = 0;
-       	       	C = HexVal (CurC);
-       	       	while (IsODigit (NextC)) {
+                C = HexVal (CurC);
+                while (IsODigit (NextC)) {
                     if ((C << 3) >= 256) {
                         if (!HadError) {
                             Error ("Octal character constant out of range");
@@ -347,12 +347,12 @@ static int ParseChar (void)
                     } else {
                         C = (C << 3) | HexVal (NextC);
                     }
-     	   	    NextChar ();
-     	   	}
-     	   	break;
-     	    default:
-     	       	Error ("Illegal character constant");
-	   	C = ' ';
+                    NextChar ();
+                }
+                break;
+            default:
+                Error ("Illegal character constant");
+                C = ' ';
                 /* Try to do error recovery, otherwise the compiler will spit
                  * out thousands of errors in this place and abort.
                  */
@@ -361,10 +361,10 @@ static int ParseChar (void)
                         NextChar ();
                     }
                 }
-		break;
-     	}
+                break;
+        }
     } else {
-     	C = CurC;
+        C = CurC;
     }
 
     /* Skip the character read */
@@ -389,10 +389,10 @@ static void CharConst (void)
 
     /* Check for closing quote */
     if (CurC != '\'') {
-       	Error ("`\'' expected");
+        Error ("`\'' expected");
     } else {
-	/* Skip the quote */
-	NextChar ();
+        /* Skip the quote */
+        NextChar ();
     }
 
     /* Setup values and attributes */
@@ -430,26 +430,26 @@ static void StringConst (void)
             NextChar ();
         } else if (CurC == '\"') {
             /* Skip the quote char */
-    	    NextChar ();
+            NextChar ();
         } else {
             /* No string */
             break;
         }
 
         /* Read until end of string */
-    	while (CurC != '\"') {
-    	    if (CurC == '\0') {
-    	     	Error ("Unexpected newline");
-    	     	break;
-    	    }
-       	    SB_AppendChar (&S, ParseChar ());
-    	}
+        while (CurC != '\"') {
+            if (CurC == '\0') {
+                Error ("Unexpected newline");
+                break;
+            }
+            SB_AppendChar (&S, ParseChar ());
+        }
 
-    	/* Skip closing quote char if there was one */
-     	NextChar ();
+        /* Skip closing quote char if there was one */
+        NextChar ();
 
-	/* Skip white space, read new input */
-	SkipWhite ();
+        /* Skip white space, read new input */
+        SkipWhite ();
 
     }
 
@@ -484,7 +484,7 @@ static void NumericConst (void)
         NextChar ();
         if (toupper (CurC) == 'X') {
             Base = Prefix = 16;
-            NextChar ();    	/* gobble "x" */
+            NextChar ();        /* gobble "x" */
         } else {
             Base = 10;          /* Assume 10 for now - see below */
             Prefix = 8;         /* Actual prefix says octal */
@@ -713,7 +713,7 @@ void NextToken (void)
 
     /* Current token is the lookahead token */
     if (CurTok.LI) {
-	ReleaseLineInfo (CurTok.LI);
+        ReleaseLineInfo (CurTok.LI);
     }
     CurTok = NextTok;
 
@@ -722,7 +722,7 @@ void NextToken (void)
      * the token is used for error messages, we must make it valid.
      */
     if (CurTok.LI == 0) {
-	CurTok.LI = UseLineInfo (GetCurLineInfo ());
+        CurTok.LI = UseLineInfo (GetCurLineInfo ());
     }
 
     /* Remember the starting position of the next token */
@@ -730,16 +730,16 @@ void NextToken (void)
 
     /* Now handle end of input. */
     if (GotEOF) {
-	/* End of file reached */
-	NextTok.Tok = TOK_CEOF;
-	return;
+        /* End of file reached */
+        NextTok.Tok = TOK_CEOF;
+        return;
     }
 
     /* Determine the next token from the lookahead */
     if (IsDigit (CurC) || (CurC == '.' && IsDigit (NextC))) {
-     	/* A number */
+        /* A number */
         NumericConst ();
-     	return;
+        return;
     }
 
     /* Check for wide character literals */
@@ -751,135 +751,135 @@ void NextToken (void)
     /* Check for keywords and identifiers */
     if (IsSym (token)) {
 
-     	/* Check for a keyword */
-     	if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
-     	    /* Reserved word found */
-     	    return;
-     	}
-     	/* No reserved word, check for special symbols */
-     	if (token[0] == '_' && token[1] == '_') {
-     	    /* Special symbols */
+        /* Check for a keyword */
+        if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
+            /* Reserved word found */
+            return;
+        }
+        /* No reserved word, check for special symbols */
+        if (token[0] == '_' && token[1] == '_') {
+            /* Special symbols */
             if (strcmp (token+2, "FILE__") == 0) {
-	       	NextTok.SVal = AddLiteral (GetCurrentFile());
-	       	NextTok.Tok  = TOK_SCONST;
-	       	return;
-	    } else if (strcmp (token+2, "LINE__") == 0) {
-	       	NextTok.Tok  = TOK_ICONST;
-    	       	NextTok.IVal = GetCurrentLine();
-    	       	NextTok.Type = type_int;
-    	       	return;
-       	    } else if (strcmp (token+2, "func__") == 0) {
-	       	/* __func__ is only defined in functions */
-	       	if (CurrentFunc) {
-	       	    NextTok.SVal = AddLiteral (F_GetFuncName (CurrentFunc));
-	       	    NextTok.Tok  = TOK_SCONST;
-	       	    return;
-	       	}
-	    }
-    	}
+                NextTok.SVal = AddLiteral (GetCurrentFile());
+                NextTok.Tok  = TOK_SCONST;
+                return;
+            } else if (strcmp (token+2, "LINE__") == 0) {
+                NextTok.Tok  = TOK_ICONST;
+                NextTok.IVal = GetCurrentLine();
+                NextTok.Type = type_int;
+                return;
+            } else if (strcmp (token+2, "func__") == 0) {
+                /* __func__ is only defined in functions */
+                if (CurrentFunc) {
+                    NextTok.SVal = AddLiteral (F_GetFuncName (CurrentFunc));
+                    NextTok.Tok  = TOK_SCONST;
+                    return;
+                }
+            }
+        }
 
-       	/* No reserved word but identifier */
-	strcpy (NextTok.Ident, token);
-     	NextTok.Tok = TOK_IDENT;
-    	return;
+        /* No reserved word but identifier */
+        strcpy (NextTok.Ident, token);
+        NextTok.Tok = TOK_IDENT;
+        return;
     }
 
     /* Monstrous switch statement ahead... */
     switch (CurC) {
 
-    	case '!':
-	    NextChar ();
-    	    if (CurC == '=') {
-    		SetTok (TOK_NE);
-    	    } else {
-    		NextTok.Tok = TOK_BOOL_NOT;
-    	    }
-    	    break;
+        case '!':
+            NextChar ();
+            if (CurC == '=') {
+                SetTok (TOK_NE);
+            } else {
+                NextTok.Tok = TOK_BOOL_NOT;
+            }
+            break;
 
-    	case '\"':
-       	    StringConst ();
-    	    break;
+        case '\"':
+            StringConst ();
+            break;
 
-    	case '%':
-	    NextChar ();
-    	    if (CurC == '=') {
-    		SetTok (TOK_MOD_ASSIGN);
-    	    } else {
-    		NextTok.Tok = TOK_MOD;
-    	    }
-    	    break;
+        case '%':
+            NextChar ();
+            if (CurC == '=') {
+                SetTok (TOK_MOD_ASSIGN);
+            } else {
+                NextTok.Tok = TOK_MOD;
+            }
+            break;
 
-    	case '&':
-	    NextChar ();
-    	    switch (CurC) {
-    		case '&':
-    		    SetTok (TOK_BOOL_AND);
-    		    break;
-    		case '=':
-    		    SetTok (TOK_AND_ASSIGN);
-    	      	    break;
-    		default:
-    		    NextTok.Tok = TOK_AND;
-    	    }
-    	    break;
+        case '&':
+            NextChar ();
+            switch (CurC) {
+                case '&':
+                    SetTok (TOK_BOOL_AND);
+                    break;
+                case '=':
+                    SetTok (TOK_AND_ASSIGN);
+                    break;
+                default:
+                    NextTok.Tok = TOK_AND;
+            }
+            break;
 
-    	case '\'':
-    	    CharConst ();
-    	    break;
+        case '\'':
+            CharConst ();
+            break;
 
-    	case '(':
-    	    SetTok (TOK_LPAREN);
-    	    break;
+        case '(':
+            SetTok (TOK_LPAREN);
+            break;
 
-    	case ')':
-    	    SetTok (TOK_RPAREN);
-    	    break;
+        case ')':
+            SetTok (TOK_RPAREN);
+            break;
 
-    	case '*':
-	    NextChar ();
-    	    if (CurC == '=') {
-    		SetTok (TOK_MUL_ASSIGN);
-    	    } else {
-    		NextTok.Tok = TOK_STAR;
-    	    }
-    	    break;
+        case '*':
+            NextChar ();
+            if (CurC == '=') {
+                SetTok (TOK_MUL_ASSIGN);
+            } else {
+                NextTok.Tok = TOK_STAR;
+            }
+            break;
 
-    	case '+':
-	    NextChar ();
-    	    switch (CurC) {
-    	    	case '+':
-    		    SetTok (TOK_INC);
-    		    break;
-    	     	case '=':
-    		    SetTok (TOK_PLUS_ASSIGN);
-    		    break;
-    		default:
-    		    NextTok.Tok = TOK_PLUS;
-    	    }
-    	    break;
+        case '+':
+            NextChar ();
+            switch (CurC) {
+                case '+':
+                    SetTok (TOK_INC);
+                    break;
+                case '=':
+                    SetTok (TOK_PLUS_ASSIGN);
+                    break;
+                default:
+                    NextTok.Tok = TOK_PLUS;
+            }
+            break;
 
-    	case ',':
-    	    SetTok (TOK_COMMA);
-    	    break;
+        case ',':
+            SetTok (TOK_COMMA);
+            break;
 
-    	case '-':
-	    NextChar ();
-    	    switch (CurC) {
-    	      	case '-':
-    		    SetTok (TOK_DEC);
-    		    break;
-    		case '=':
-    	    	    SetTok (TOK_MINUS_ASSIGN);
-    		    break;
-    		case '>':
-    	    	    SetTok (TOK_PTR_REF);
-    		    break;
-    		default:
-    		    NextTok.Tok = TOK_MINUS;
-    	    }
-    	    break;
+        case '-':
+            NextChar ();
+            switch (CurC) {
+                case '-':
+                    SetTok (TOK_DEC);
+                    break;
+                case '=':
+                    SetTok (TOK_MINUS_ASSIGN);
+                    break;
+                case '>':
+                    SetTok (TOK_PTR_REF);
+                    break;
+                default:
+                    NextTok.Tok = TOK_MINUS;
+            }
+            break;
 
-    	case '.':
+        case '.':
             NextChar ();
             if (CurC == '.') {
                 NextChar ();
@@ -891,121 +891,121 @@ void NextToken (void)
             } else {
                 NextTok.Tok = TOK_DOT;
             }
-    	    break;
+            break;
 
-    	case '/':
-	    NextChar ();
-    	    if (CurC == '=') {
-    		SetTok (TOK_DIV_ASSIGN);
-    	    } else {
-    	     	NextTok.Tok = TOK_DIV;
-    	    }
-    	    break;
+        case '/':
+            NextChar ();
+            if (CurC == '=') {
+                SetTok (TOK_DIV_ASSIGN);
+            } else {
+                NextTok.Tok = TOK_DIV;
+            }
+            break;
 
-    	case ':':
-    	    SetTok (TOK_COLON);
-    	    break;
+        case ':':
+            SetTok (TOK_COLON);
+            break;
 
-    	case ';':
-    	    SetTok (TOK_SEMI);
-    	    break;
+        case ';':
+            SetTok (TOK_SEMI);
+            break;
 
-    	case '<':
-	    NextChar ();
-    	    switch (CurC) {
-    		case '=':
-    	      	    SetTok (TOK_LE);
-    	    	    break;
-    		case '<':
-		    NextChar ();
-    		    if (CurC == '=') {
-    		    	SetTok (TOK_SHL_ASSIGN);
-    		    } else {
-    		    	NextTok.Tok = TOK_SHL;
-    	    	    }
-    		    break;
-    		default:
-    		    NextTok.Tok = TOK_LT;
-    	    }
-    	    break;
+        case '<':
+            NextChar ();
+            switch (CurC) {
+                case '=':
+                    SetTok (TOK_LE);
+                    break;
+                case '<':
+                    NextChar ();
+                    if (CurC == '=') {
+                        SetTok (TOK_SHL_ASSIGN);
+                    } else {
+                        NextTok.Tok = TOK_SHL;
+                    }
+                    break;
+                default:
+                    NextTok.Tok = TOK_LT;
+            }
+            break;
 
-    	case '=':
-	    NextChar ();
-       	    if (CurC == '=') {
-    		SetTok (TOK_EQ);
-    	    } else {
-    		NextTok.Tok = TOK_ASSIGN;
-    	    }
-    	    break;
+        case '=':
+            NextChar ();
+            if (CurC == '=') {
+                SetTok (TOK_EQ);
+            } else {
+                NextTok.Tok = TOK_ASSIGN;
+            }
+            break;
 
-    	case '>':
-	    NextChar ();
-    	    switch (CurC) {
-    		case '=':
-    		    SetTok (TOK_GE);
-    		    break;
-    		case '>':
-		    NextChar ();
-    		    if (CurC == '=') {
-    		    	SetTok (TOK_SHR_ASSIGN);
-    		    } else {
-    	     	    	NextTok.Tok = TOK_SHR;
-    		    }
-    		    break;
-    		default:
-    		    NextTok.Tok = TOK_GT;
-    	    }
-    	    break;
+        case '>':
+            NextChar ();
+            switch (CurC) {
+                case '=':
+                    SetTok (TOK_GE);
+                    break;
+                case '>':
+                    NextChar ();
+                    if (CurC == '=') {
+                        SetTok (TOK_SHR_ASSIGN);
+                    } else {
+                        NextTok.Tok = TOK_SHR;
+                    }
+                    break;
+                default:
+                    NextTok.Tok = TOK_GT;
+            }
+            break;
 
-    	case '?':
-    	    SetTok (TOK_QUEST);
-    	    break;
+        case '?':
+            SetTok (TOK_QUEST);
+            break;
 
-    	case '[':
-    	    SetTok (TOK_LBRACK);
-    	    break;
+        case '[':
+            SetTok (TOK_LBRACK);
+            break;
 
-    	case ']':
-    	    SetTok (TOK_RBRACK);
-    	    break;
+        case ']':
+            SetTok (TOK_RBRACK);
+            break;
 
-    	case '^':
-	    NextChar ();
-    	    if (CurC == '=') {
-    		SetTok (TOK_XOR_ASSIGN);
-    	    } else {
-    		NextTok.Tok = TOK_XOR;
-    	    }
-    	    break;
+        case '^':
+            NextChar ();
+            if (CurC == '=') {
+                SetTok (TOK_XOR_ASSIGN);
+            } else {
+                NextTok.Tok = TOK_XOR;
+            }
+            break;
 
-    	case '{':
-    	    SetTok (TOK_LCURLY);
-    	    break;
+        case '{':
+            SetTok (TOK_LCURLY);
+            break;
 
         case '|':
-	    NextChar ();
-    	    switch (CurC) {
-    		case '|':
-    		    SetTok (TOK_BOOL_OR);
-    		    break;
-    		case '=':
-    		    SetTok (TOK_OR_ASSIGN);
-    		    break;
-    		default:
-    		    NextTok.Tok = TOK_OR;
-    	    }
-    	    break;
+            NextChar ();
+            switch (CurC) {
+                case '|':
+                    SetTok (TOK_BOOL_OR);
+                    break;
+                case '=':
+                    SetTok (TOK_OR_ASSIGN);
+                    break;
+                default:
+                    NextTok.Tok = TOK_OR;
+            }
+            break;
 
-    	case '}':
-    	    SetTok (TOK_RCURLY);
-    	    break;
+        case '}':
+            SetTok (TOK_RCURLY);
+            break;
 
-    	case '~':
-    	    SetTok (TOK_COMP);
-    	    break;
+        case '~':
+            SetTok (TOK_COMP);
+            break;
 
-    	default:
-       	    UnknownChar (CurC);
+        default:
+            UnknownChar (CurC);
 
     }
 
@@ -1020,17 +1020,17 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
 {
     while (CurTok.Tok != TOK_CEOF) {
 
-    	/* Check if the current token is in the token list */
-	unsigned I;
-    	for (I = 0; I < TokenCount; ++I) {
-    	    if (CurTok.Tok == TokenList[I]) {
-    	    	/* Found a token in the list */
-    	    	return;
-    	    }
-    	}
+        /* Check if the current token is in the token list */
+        unsigned I;
+        for (I = 0; I < TokenCount; ++I) {
+            if (CurTok.Tok == TokenList[I]) {
+                /* Found a token in the list */
+                return;
+            }
+        }
 
-    	/* Not in the list: Skip it */
-    	NextToken ();
+        /* Not in the list: Skip it */
+        NextToken ();
 
     }
 }
@@ -1043,10 +1043,10 @@ int Consume (token_t Token, const char* ErrorMsg)
  */
 {
     if (CurTok.Tok == Token) {
-	NextToken ();
+        NextToken ();
         return 1;
     } else {
-       	Error ("%s", ErrorMsg);
+        Error ("%s", ErrorMsg);
         return 0;
     }
 }
@@ -1066,13 +1066,13 @@ int ConsumeSemi (void)
 {
     /* Try do be smart about typos... */
     if (CurTok.Tok == TOK_SEMI) {
-    	NextToken ();
+        NextToken ();
         return 1;
     } else {
-	Error ("`;' expected");
-	if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
-	    NextToken ();
-	}
+        Error ("`;' expected");
+        if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
+            NextToken ();
+        }
         return 0;
     }
 }
@@ -1084,13 +1084,13 @@ int ConsumeComma (void)
 {
     /* Try do be smart about typos... */
     if (CurTok.Tok == TOK_COMMA) {
-    	NextToken ();
+        NextToken ();
         return 1;
     } else {
-      	Error ("`,' expected");
-	if (CurTok.Tok == TOK_SEMI) {
-	    NextToken ();
-	}
+        Error ("`,' expected");
+        if (CurTok.Tok == TOK_SEMI) {
+            NextToken ();
+        }
         return 0;
     }
 }

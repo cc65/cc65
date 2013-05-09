@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   asmcode.c				     */
+/*                                 asmcode.c                                 */
 /*                                                                           */
-/*	    Assembler output code handling for the cc65 C compiler	     */
+/*          Assembler output code handling for the cc65 C compiler           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*  	       	    	    	     Code   				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -123,11 +123,11 @@ void WriteAsmOutput (void)
     SymTab = GetGlobalSymTab ();
     Entry  = SymTab->SymHead;
     while (Entry) {
-       	if (SymIsOutputFunc (Entry)) {
+        if (SymIsOutputFunc (Entry)) {
             /* Function which is defined and referenced or extern */
-       	    OutputSegments (Entry->V.F.Seg);
-       	}
-       	Entry = Entry->NextSym;
+            OutputSegments (Entry->V.F.Seg);
+        }
+        Entry = Entry->NextSym;
     }
 }
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  coptpush.c                                 */
+/*                                coptpush.c                                 */
 /*                                                                           */
-/*			    Optimize push sequences                          */
+/*                          Optimize push sequences                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -41,7 +41,7 @@
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -67,43 +67,43 @@ unsigned OptPush1 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-     	CodeEntry* L[2];
+        CodeEntry* L[2];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (CE_IsCallTo (L[0], "ldaxysp")               &&
+        /* Check for the sequence */
+        if (CE_IsCallTo (L[0], "ldaxysp")               &&
             RegValIsKnown (L[0]->RI->In.RegY)           &&
             L[0]->RI->In.RegY < 0xFE                    &&
             (L[1] = CS_GetNextEntry (S, I)) != 0        &&
             !CE_HasLabel (L[1])                         &&
-       	    CE_IsCallTo (L[1], "pushax")                &&
-       	    !RegAXUsed (S, I+2)) {
+            CE_IsCallTo (L[1], "pushax")                &&
+            !RegAXUsed (S, I+2)) {
 
-	    /* Insert new code behind the pushax */
-	    const char* Arg;
-	    CodeEntry* X;
+            /* Insert new code behind the pushax */
+            const char* Arg;
+            CodeEntry* X;
 
-	    /* ldy     #xx+1 */
-	    Arg = MakeHexArg (L[0]->RI->In.RegY+2);
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+2);
+            /* ldy     #xx+1 */
+            Arg = MakeHexArg (L[0]->RI->In.RegY+2);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[0]->LI);
+            CS_InsertEntry (S, X, I+2);
 
-	    /* jsr pushwysp */
-	    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwysp", 0, L[1]->LI);
-	    CS_InsertEntry (S, X, I+3);
+            /* jsr pushwysp */
+            X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwysp", 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+3);
 
-	    /* Delete the old code */
-	    CS_DelEntries (S, I, 2);
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -132,34 +132,34 @@ unsigned OptPush2 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-     	CodeEntry* L[2];
+        CodeEntry* L[2];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (CE_IsCallTo (L[0], "ldaxidx")               &&
+        /* Check for the sequence */
+        if (CE_IsCallTo (L[0], "ldaxidx")               &&
             (L[1] = CS_GetNextEntry (S, I)) != 0        &&
             !CE_HasLabel (L[1])                         &&
-       	    CE_IsCallTo (L[1], "pushax")) {
+            CE_IsCallTo (L[1], "pushax")) {
 
-	    /* Insert new code behind the pushax */
-	    CodeEntry* X;
+            /* Insert new code behind the pushax */
+            CodeEntry* X;
 
-	    /* jsr pushwidx */
-	    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwidx", 0, L[1]->LI);
-	    CS_InsertEntry (S, X, I+2);
+            /* jsr pushwidx */
+            X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwidx", 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+2);
 
-	    /* Delete the old code */
-	    CS_DelEntries (S, I, 2);
+            /* Delete the old code */
+            CS_DelEntries (S, I, 2);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 

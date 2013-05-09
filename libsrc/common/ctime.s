@@ -4,7 +4,7 @@
 ; char* __fastcall__ ctime (time_t* timep);
 ;
 
-	.export		_ctime
+        .export         _ctime
         .import         _localtime, _asctime
 
 

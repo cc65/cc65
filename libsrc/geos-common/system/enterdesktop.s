@@ -5,10 +5,10 @@
 
 ; void EnterDeskTop (void);
 
-	    .import _exit
-	    .export _EnterDeskTop
+            .import _exit
+            .export _EnterDeskTop
 
 _EnterDeskTop:
-	lda #0
-	tax
-	jmp _exit
+        lda #0
+        tax
+        jmp _exit

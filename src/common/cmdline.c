@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   cmdline.c				     */
+/*                                 cmdline.c                                 */
 /*                                                                           */
-/*		   Helper functions for command line parsing		     */
+/*                 Helper functions for command line parsing                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Data    				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -62,14 +62,14 @@ unsigned ArgCount = 0;
 /* Struct to pass the command line */
 typedef struct {
     char**      Vec;            /* The argument vector */
-    unsigned   	Count;	        /* Actual number of arguments */
-    unsigned   	Size;	        /* Number of argument allocated */
+    unsigned    Count;          /* Actual number of arguments */
+    unsigned    Size;           /* Number of argument allocated */
 } CmdLine;
 
 
 
 /*****************************************************************************/
-/*  			       Helper functions				     */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -89,13 +89,13 @@ static void AddArg (CmdLine* L, char* Arg)
 /* Add one argument to the list */
 {
     if (L->Size <= L->Count) {
-    	/* No space left, reallocate */
-    	unsigned NewSize = L->Size * 2;
-    	char**   NewVec  = xmalloc (NewSize * sizeof (L->Vec[0]));
-    	memcpy (NewVec, L->Vec, L->Count * sizeof (L->Vec[0]));
-    	xfree (L->Vec);
-    	L->Vec  = NewVec;
-    	L->Size	= NewSize;
+        /* No space left, reallocate */
+        unsigned NewSize = L->Size * 2;
+        char**   NewVec  = xmalloc (NewSize * sizeof (L->Vec[0]));
+        memcpy (NewVec, L->Vec, L->Count * sizeof (L->Vec[0]));
+        xfree (L->Vec);
+        L->Vec  = NewVec;
+        L->Size = NewSize;
     }
 
     /* We have space left, add a copy of the argument */
@@ -114,36 +114,36 @@ static void ExpandFile (CmdLine* L, const char* Name)
     /* Try to open the file for reading */
     FILE* F = fopen (Name, "r");
     if (F == 0) {
-	AbEnd ("Cannot open \"%s\": %s", Name, strerror (errno));
+        AbEnd ("Cannot open \"%s\": %s", Name, strerror (errno));
     }
 
     /* File is open, read all lines */
     while (fgets (Buf, sizeof (Buf), F) != 0) {
 
-	/* Get a pointer to the buffer */
-	const char* B = Buf;
+        /* Get a pointer to the buffer */
+        const char* B = Buf;
 
-    	/* Skip trailing whitespace (this will also kill the newline that is
-	 * appended by fgets().
-	 */
-	unsigned Len = strlen (Buf);
-	while (Len > 0 && IsSpace (Buf [Len-1])) {
-	    --Len;
-	}
-	Buf [Len] = '\0';
+        /* Skip trailing whitespace (this will also kill the newline that is
+         * appended by fgets().
+         */
+        unsigned Len = strlen (Buf);
+        while (Len > 0 && IsSpace (Buf [Len-1])) {
+            --Len;
+        }
+        Buf [Len] = '\0';
 
-	/* Skip leading spaces */
-	while (IsSpace (*B)) {
-	    ++B;
-	}
+        /* Skip leading spaces */
+        while (IsSpace (*B)) {
+            ++B;
+        }
 
-	/* Skip empty lines to work around problems with some editors */
-	if (*B == '\0') {
-	    continue;
-	}
+        /* Skip empty lines to work around problems with some editors */
+        if (*B == '\0') {
+            continue;
+        }
 
-	/* Add anything not empty to the command line */
-	AddArg (L, xstrdup (B));
+        /* Add anything not empty to the command line */
+        AddArg (L, xstrdup (B));
 
     }
 
@@ -156,7 +156,7 @@ static void ExpandFile (CmdLine* L, const char* Name)
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code    	  			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -167,20 +167,20 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
  * array. Both arguments are remembered in static storage.
  */
 {
-    CmdLine	L;
+    CmdLine     L;
     int         I;
 
     /* Get the program name from argv[0] but strip a path */
     if (*(aArgVec)[0] == 0) {
-    	/* Use the default name given */
-    	ProgName = aProgName;
+        /* Use the default name given */
+        ProgName = aProgName;
     } else {
-    	/* Strip a path */
-       	ProgName = FindName ((*aArgVec)[0]);
-    	if (ProgName[0] == '\0') {
-    	    /* Use the default */
-    	    ProgName = aProgName;
-    	}
+        /* Strip a path */
+        ProgName = FindName ((*aArgVec)[0]);
+        if (ProgName[0] == '\0') {
+            /* Use the default */
+            ProgName = aProgName;
+        }
     }
 
     /* Make a CmdLine struct */
@@ -192,21 +192,21 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
      */
     for (I = 0; I < *aArgCount; ++I) {
 
-    	/* Get the next argument */
-    	char* Arg = (*aArgVec)[I];
+        /* Get the next argument */
+        char* Arg = (*aArgVec)[I];
 
-    	/* Is this a file argument? */
-    	if (Arg && Arg[0] == '@') {
+        /* Is this a file argument? */
+        if (Arg && Arg[0] == '@') {
 
-    	    /* Expand the file */
-    	    ExpandFile (&L, Arg+1);
+            /* Expand the file */
+            ExpandFile (&L, Arg+1);
 
-    	} else {
+        } else {
 
-    	    /* No file, just add a copy */
-    	    AddArg (&L, Arg);
+            /* No file, just add a copy */
+            AddArg (&L, Arg);
 
-    	}
+        }
     }
 
     /* Store the new argument list in a safe place... */
@@ -259,17 +259,17 @@ const char* GetArg (unsigned* ArgNum, unsigned Len)
 {
     const char* Arg = ArgVec[*ArgNum];
     if (Arg[Len] != '\0') {
-	/* Argument appended */
-	return Arg + Len;
+        /* Argument appended */
+        return Arg + Len;
     } else {
-	/* Separate argument */
-	Arg = ArgVec[*ArgNum + 1];
-	if (Arg == 0) {
-	    /* End of arguments */
-	    NeedArg (ArgVec[*ArgNum]);
-	}
-	++(*ArgNum);
-	return Arg;
+        /* Separate argument */
+        Arg = ArgVec[*ArgNum + 1];
+        if (Arg == 0) {
+            /* End of arguments */
+            NeedArg (ArgVec[*ArgNum]);
+        }
+        ++(*ArgNum);
+        return Arg;
     }
 }
 
@@ -283,25 +283,25 @@ void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 
     /* Search the table for a match */
     while (OptCount) {
-	if (strcmp (Opt, OptTab->Option) == 0) {
-	    /* Found, call the function */
-	    if (OptTab->ArgCount > 0) {
-		/* We need an argument, check if we have one */
-		const char* Arg = ArgVec[++(*ArgNum)];
-		if (Arg == 0) {
-		    NeedArg (Opt);
-		}
-	   	OptTab->Func (Opt, Arg);
-	    } else {
-	   	OptTab->Func (Opt, 0);
-	    }
-	    /* Done */
-	    return;
-	}
+        if (strcmp (Opt, OptTab->Option) == 0) {
+            /* Found, call the function */
+            if (OptTab->ArgCount > 0) {
+                /* We need an argument, check if we have one */
+                const char* Arg = ArgVec[++(*ArgNum)];
+                if (Arg == 0) {
+                    NeedArg (Opt);
+                }
+                OptTab->Func (Opt, Arg);
+            } else {
+                OptTab->Func (Opt, 0);
+            }
+            /* Done */
+            return;
+        }
 
-	/* Next table entry */
-	--OptCount;
-	++OptTab;
+        /* Next table entry */
+        --OptCount;
+        ++OptTab;
     }
 
     /* Invalid option */

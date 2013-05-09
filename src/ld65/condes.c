@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   condes.c                                  */
+/*                                 condes.c                                  */
 /*                                                                           */
-/*		     Module constructor/destructor support		     */
+/*                   Module constructor/destructor support                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,7 +53,7 @@
 
 
 /*****************************************************************************/
-/*     		    		     Data    				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -61,11 +61,11 @@
 /* Struct describing one condes type */
 typedef struct ConDesDesc ConDesDesc;
 struct ConDesDesc {
-    Collection	    	ExpList;	/* List of exported symbols */
-    unsigned            SegName;	/* Name of segment the table is in */
-    unsigned            Label; 		/* Name of table label */
-    unsigned            CountSym;	/* Name of symbol for entry count */
-    unsigned char   	Order; 		/* Table order (increasing/decreasing) */
+    Collection          ExpList;        /* List of exported symbols */
+    unsigned            SegName;        /* Name of segment the table is in */
+    unsigned            Label;          /* Name of table label */
+    unsigned            CountSym;       /* Name of symbol for entry count */
+    unsigned char       Order;          /* Table order (increasing/decreasing) */
     ConDesImport        Import;         /* Forced import if any */
 };
 
@@ -126,7 +126,7 @@ static ConDesDesc ConDes[CD_TYPE_COUNT] = {
 
 
 /*****************************************************************************/
-/*	     Internally used function to create the condes tables	     */
+/*           Internally used function to create the condes tables            */
 /*****************************************************************************/
 
 
@@ -151,19 +151,19 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
 
     /* Compare the priorities for this condes type */
     if (Prio1 < Prio2) {
-       	Cmp = -1;
+        Cmp = -1;
     } else if (Prio1 > Prio2) {
-    	Cmp = 1;
+        Cmp = 1;
     } else {
-    	/* Use the name in this case */
-       	Cmp = SB_Compare (GetStrBuf (Exp1->Name), GetStrBuf (Exp2->Name));
+        /* Use the name in this case */
+        Cmp = SB_Compare (GetStrBuf (Exp1->Name), GetStrBuf (Exp2->Name));
     }
 
     /* Reverse the result for decreasing order */
     if (CD->Order == cdIncreasing) {
-     	return Cmp;
+        return Cmp;
     } else {
-     	return -Cmp;
+        return -Cmp;
     }
 }
 
@@ -172,16 +172,16 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
 static void ConDesCreateOne (ConDesDesc* CD)
 /* Create one table if requested */
 {
-    Segment*	Seg; 		/* Segment for table */
-    Section*	Sec;		/* Section for table */
-    unsigned	Count;		/* Number of exports */
-    unsigned	I;
+    Segment*    Seg;            /* Segment for table */
+    Section*    Sec;            /* Section for table */
+    unsigned    Count;          /* Number of exports */
+    unsigned    I;
 
     /* Check if this table has a segment and table label defined. If not,
      * creation was not requested in the config file - ignore it.
      */
     if (CD->SegName == INVALID_STRING_ID || CD->Label == INVALID_STRING_ID) {
-     	return;
+        return;
     }
 
     /* Check if there is an import for the table label. If not, there is no
@@ -189,7 +189,7 @@ static void ConDesCreateOne (ConDesDesc* CD)
      * table.
      */
     if (!IsUnresolved (CD->Label)) {
-     	return;
+        return;
     }
 
     /* Sort the collection of exports according to priority */
@@ -209,14 +209,14 @@ static void ConDesCreateOne (ConDesDesc* CD)
     Count = CollCount (&CD->ExpList);
     for (I = 0; I < Count; ++I) {
 
-      	/* Get the export */
-      	Export* E = CollAt (&CD->ExpList, I);
+        /* Get the export */
+        Export* E = CollAt (&CD->ExpList, I);
 
-      	/* Create the fragment */
-      	Fragment* F = NewFragment (FRAG_EXPR, 2, Sec);
+        /* Create the fragment */
+        Fragment* F = NewFragment (FRAG_EXPR, 2, Sec);
 
-      	/* Set the expression pointer */
-      	F->Expr = E->Expr;
+        /* Set the expression pointer */
+        F->Expr = E->Expr;
     }
 
     /* Define the table start as an export, offset into section is zero
@@ -228,14 +228,14 @@ static void ConDesCreateOne (ConDesDesc* CD)
      * with the number of elements in the table.
      */
     if (CD->CountSym) {
-     	CreateConstExport (CD->CountSym, Count);
+        CreateConstExport (CD->CountSym, Count);
     }
 }
 
 
 
 /*****************************************************************************/
-/*     	       	     	   	     Code  	      	  	  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -247,10 +247,10 @@ void ConDesAddExport (struct Export* E)
 
     /* Insert the export into all tables for which declarations exist */
     for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
-     	unsigned Prio = E->ConDes[Type];
-     	if (Prio != CD_PRIO_NONE) {
-       	    CollAppend (&ConDes[Type].ExpList, E);
-  	}
+        unsigned Prio = E->ConDes[Type];
+        if (Prio != CD_PRIO_NONE) {
+            CollAppend (&ConDes[Type].ExpList, E);
+        }
     }
 }
 
@@ -374,7 +374,7 @@ void ConDesCreate (void)
 
     /* Walk over the descriptor array and create a table for each entry */
     for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
-	ConDesCreateOne (ConDes + Type);
+        ConDesCreateOne (ConDes + Type);
     }
 }
 
@@ -385,8 +385,8 @@ void ConDesDump (void)
 {
     unsigned Type;
     for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
-       	Collection* ExpList = &ConDes[Type].ExpList;
-	printf ("CONDES(%u): %u symbols\n", Type, CollCount (ExpList));
+        Collection* ExpList = &ConDes[Type].ExpList;
+        printf ("CONDES(%u): %u symbols\n", Type, CollCount (ExpList));
     }
 }
 

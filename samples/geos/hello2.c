@@ -36,7 +36,7 @@ void main (void)
     // Note that this is multitasking sleep, and if there are any icons/menus onscreen,
     // they would be usable, in this case you have only pointer usable
     Sleep(5*50);
-	     
+             
     // Normal apps exit from main into system's mainloop, and app finish
     // when user selects it from icons or menu, but here we want to exit
     // immediately.

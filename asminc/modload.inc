@@ -63,7 +63,7 @@
 ; /* Free a loaded module. Note: The given pointer is the pointer to the
 ;  * module memory, not a pointer to a control structure.
 ;  */
-.global		_mod_free
+.global         _mod_free
 
 ; Errors
 .enum

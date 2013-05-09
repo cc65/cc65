@@ -209,7 +209,7 @@ int main(void) {
                                        "\tto the first argument.\r\n\n",
                                        t + 1, n1, test_data[t].v1.nvalue);
                         }
-                else {		/* test_data[t].type1 == CHAR */
+                else {          /* test_data[t].type1 == CHAR */
                         if (strcmp(test_data[t].v1.svalue, s1))
                                 PRINTF("Test #%u assigned\r\n\"%s\",\r\n"
                                        "\tinstead of\r\n\"%s\",\r\n"
@@ -223,7 +223,7 @@ int main(void) {
                                        "\tto the second argument.\r\n\n",
                                        t + 1, n2, test_data[t].v2.nvalue);
                         }
-                else {		/* test_data[t].type2 == CHAR */
+                else {          /* test_data[t].type2 == CHAR */
                         if (strcmp(test_data[t].v2.svalue, s2))
                                 PRINTF("Test #%u assigned\r\n\"%s\",\r\n"
                                        "\tinstead of\r\n\"%s\",\r\n"
@@ -249,8 +249,8 @@ int main(void) {
         */
         PRINTF("Testing \"%%p\"...\r\n");
         sprintf(s1, "%p %p %p %p", NULL, NULL,
-                Pause,			/* static (program) storage */
-                &c);			/* automatic (stack) storage */
+                Pause,                  /* static (program) storage */
+                &c);                    /* automatic (stack) storage */
         sscanf(s1, "%p%p%p %p", &p1, &p2, &p3, &p4);
         if (p1 != NULL || p2 != NULL ||
             p3 != (void *)Pause || p4 != (void *)&c)

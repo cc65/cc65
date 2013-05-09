@@ -20,8 +20,8 @@
 
 ; Driver signature
 
-        .byte   $6A, $6F, $79	; "joy"
-        .byte   JOY_API_VERSION	; Driver API version number
+        .byte   $6A, $6F, $79   ; "joy"
+        .byte   JOY_API_VERSION ; Driver API version number
 
 ; Button state masks (8 values)
 
@@ -52,8 +52,8 @@ JOY_COUNT       = 4             ; Number of joysticks we support
 
 .bss
 
-temp3: 	.byte 0
-temp4:	.byte 0
+temp3:  .byte 0
+temp4:  .byte 0
 
 .code
 
@@ -193,16 +193,16 @@ joy1:   lda #$7F
 joy2:   dex
         bne joy3
 
-        ; ldx	#0
-        lda	#$E0
-        ldy	#$FF
+        ; ldx   #0
+        lda     #$E0
+        ldy     #$FF
         sei
-        sta	CIA1_DDRA
-        lda	CIA1_PRA
-        sty	CIA1_DDRA
+        sta     CIA1_DDRA
+        lda     CIA1_PRA
+        sty     CIA1_DDRA
         cli
-        and	#$1F
-        eor	#$1F
+        and     #$1F
+        eor     #$1F
         rts
 
         ; Read joystick 3
@@ -211,13 +211,13 @@ joy3:   dex
         bne     joy4
 
         lda     temp3
-        eor	#$1F
+        eor     #$1F
         rts
 
         ; Read joystick 4
 
 joy4:   lda     temp4
-        eor	#$1F
+        eor     #$1F
         ldx     #0
         rts
 

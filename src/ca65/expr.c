@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    expr.c				     */
+/*                                  expr.c                                   */
 /*                                                                           */
-/*	       Expression evaluation for the ca65 macroassembler	     */
+/*             Expression evaluation for the ca65 macroassembler             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -66,7 +66,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	    	     Data      				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -77,14 +77,14 @@
  * number of freed nodes for later and remember them in a single linked list
  * using the Left link.
  */
-#define	MAX_FREE_NODES	64
-static ExprNode*   	FreeExprNodes = 0;
-static unsigned	      	FreeNodeCount = 0;
+#define MAX_FREE_NODES  64
+static ExprNode*        FreeExprNodes = 0;
+static unsigned         FreeNodeCount = 0;
 
 
 
 /*****************************************************************************/
-/*	    	      		    Helpers				     */
+/*                                  Helpers                                  */
 /*****************************************************************************/
 
 
@@ -96,12 +96,12 @@ static ExprNode* NewExprNode (unsigned Op)
 
     /* Do we have some nodes in the list already? */
     if (FreeNodeCount) {
-	/* Use first node from list */
-	N = FreeExprNodes;
-	FreeExprNodes = N->Left;
+        /* Use first node from list */
+        N = FreeExprNodes;
+        FreeExprNodes = N->Left;
         --FreeNodeCount;
     } else {
-	/* Allocate fresh memory */
+        /* Allocate fresh memory */
         N = xmalloc (sizeof (ExprNode));
     }
     N->Op = Op;
@@ -122,22 +122,22 @@ static void FreeExprNode (ExprNode* E)
             SymDelExprRef (E->V.Sym, E);
         }
         /* Place the symbol into the free nodes list if possible */
-	if (FreeNodeCount < MAX_FREE_NODES) {
-	    /* Remember this node for later */
-	    E->Left = FreeExprNodes;
-	    FreeExprNodes = E;
+        if (FreeNodeCount < MAX_FREE_NODES) {
+            /* Remember this node for later */
+            E->Left = FreeExprNodes;
+            FreeExprNodes = E;
             ++FreeNodeCount;
-	} else {
-	    /* Free the memory */
-	    xfree (E);
-	}
+        } else {
+            /* Free the memory */
+            xfree (E);
+        }
     }
 }
 
 
 
 /*****************************************************************************/
-/*     	      	    	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -361,19 +361,19 @@ static ExprNode* FuncBlank (void)
     unsigned Count = 0;
     while (CurTok.Tok != Term) {
 
-     	/* Check for end of line or end of input. Since the calling function
-	 * will check for the closing paren, we don't need to print an error
-	 * here, just bail out.
-	 */
-     	if (TokIsSep (CurTok.Tok)) {
-	    break;
-     	}
+        /* Check for end of line or end of input. Since the calling function
+         * will check for the closing paren, we don't need to print an error
+         * here, just bail out.
+         */
+        if (TokIsSep (CurTok.Tok)) {
+            break;
+        }
 
-	/* One more token */
-	++Count;
+        /* One more token */
+        ++Count;
 
-	/* Skip the token */
-	NextTok ();
+        /* Skip the token */
+        NextTok ();
     }
 
     /* If the list was enclosed in curly braces, skip the closing brace */
@@ -464,25 +464,25 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     token_t Term = GetTokListTerm (TOK_COMMA);
     while (CurTok.Tok != Term) {
 
-    	/* We may not end-of-line of end-of-file here */
-    	if (TokIsSep (CurTok.Tok)) {
-    	    Error ("Unexpected end of line");
-    	    return GenLiteral0 ();
-     	}
+        /* We may not end-of-line of end-of-file here */
+        if (TokIsSep (CurTok.Tok)) {
+            Error ("Unexpected end of line");
+            return GenLiteral0 ();
+        }
 
-	/* Get a node with this token */
-	Node = NewTokNode ();
+        /* Get a node with this token */
+        Node = NewTokNode ();
 
-	/* Insert the node into the list */
-	if (Last == 0) {
-       	    Root = Node;
-	} else {
-	    Last->Next = Node;
-	}
-	Last = Node;
+        /* Insert the node into the list */
+        if (Last == 0) {
+            Root = Node;
+        } else {
+            Last->Next = Node;
+        }
+        Last = Node;
 
-	/* Skip the token */
-	NextTok ();
+        /* Skip the token */
+        NextTok ();
     }
 
     /* Skip the terminator token*/
@@ -502,30 +502,30 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     Node = Root;
     while (CurTok.Tok != Term) {
 
-    	/* We may not end-of-line of end-of-file here */
-    	if (TokIsSep (CurTok.Tok)) {
-    	    Error ("Unexpected end of line");
-    	    return GenLiteral0 ();
-    	}
+        /* We may not end-of-line of end-of-file here */
+        if (TokIsSep (CurTok.Tok)) {
+            Error ("Unexpected end of line");
+            return GenLiteral0 ();
+        }
 
-       	/* Compare the tokens if the result is not already known */
-	if (Result != 0) {
-	    if (Node == 0) {
-		/* The second list is larger than the first one */
-		Result = 0;
-	    } else if (TokCmp (Node) < EqualityLevel) {
-	 	/* Tokens do not match */
-	 	Result = 0;
-	    }
-	}
+        /* Compare the tokens if the result is not already known */
+        if (Result != 0) {
+            if (Node == 0) {
+                /* The second list is larger than the first one */
+                Result = 0;
+            } else if (TokCmp (Node) < EqualityLevel) {
+                /* Tokens do not match */
+                Result = 0;
+            }
+        }
 
-	/* Next token in first list */
-	if (Node) {
-	    Node = Node->Next;
-	}
+        /* Next token in first list */
+        if (Node) {
+            Node = Node->Next;
+        }
 
-       	/* Next token in current list */
-	NextTok ();
+        /* Next token in current list */
+        NextTok ();
     }
 
     /* If the token list was enclosed in curly braces, eat the closing brace */
@@ -535,14 +535,14 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
 
     /* Check if there are remaining tokens in the first list */
     if (Node != 0) {
-	Result = 0;
+        Result = 0;
     }
 
     /* Free the token list */
     while (Root) {
-	Node = Root;
-	Root = Root->Next;
-	FreeTokNode (Node);
+        Node = Root;
+        Root = Root->Next;
+        FreeTokNode (Node);
     }
 
     /* Done, return the result */
@@ -733,9 +733,9 @@ static ExprNode* FuncStrAt (void)
 
     /* String constant expected */
     if (CurTok.Tok != TOK_STRCON) {
-      	Error ("String constant expected");
-      	NextTok ();
-       	goto ExitPoint;
+        Error ("String constant expected");
+        NextTok ();
+        goto ExitPoint;
     }
 
     /* Remember the string and skip it */
@@ -750,7 +750,7 @@ static ExprNode* FuncStrAt (void)
 
     /* Must be a valid index */
     if (Index >= (long) SB_GetLen (&Str)) {
-	Error ("Range error");
+        Error ("Range error");
         goto ExitPoint;
     }
 
@@ -777,20 +777,20 @@ static ExprNode* FuncStrLen (void)
     /* String constant expected */
     if (CurTok.Tok != TOK_STRCON) {
 
-     	Error ("String constant expected");
-    	/* Smart error recovery */
-     	if (CurTok.Tok != TOK_RPAREN) {
-     	    NextTok ();
-     	}
-       	Len = 0;
+        Error ("String constant expected");
+        /* Smart error recovery */
+        if (CurTok.Tok != TOK_RPAREN) {
+            NextTok ();
+        }
+        Len = 0;
 
     } else {
 
         /* Get the length of the string */
-       	Len = SB_GetLen (&CurTok.SVal);
+        Len = SB_GetLen (&CurTok.SVal);
 
-	/* Skip the string */
-	NextTok ();
+        /* Skip the string */
+        NextTok ();
     }
 
     /* Return the length */
@@ -809,19 +809,19 @@ static ExprNode* FuncTCount (void)
     int Count = 0;
     while (CurTok.Tok != Term) {
 
-     	/* Check for end of line or end of input. Since the calling function
-	 * will check for the closing paren, we don't need to print an error
-	 * here, just bail out.
-	 */
-     	if (TokIsSep (CurTok.Tok)) {
-	    break;
-     	}
+        /* Check for end of line or end of input. Since the calling function
+         * will check for the closing paren, we don't need to print an error
+         * here, just bail out.
+         */
+        if (TokIsSep (CurTok.Tok)) {
+            break;
+        }
 
-	/* One more token */
-	++Count;
+        /* One more token */
+        ++Count;
 
-	/* Skip the token */
-	NextTok ();
+        /* Skip the token */
+        NextTok ();
     }
 
     /* If the list was enclosed in curly braces, skip the closing brace */
@@ -853,9 +853,9 @@ static ExprNode* Function (ExprNode* (*F) (void))
 
     /* Expression must be enclosed in braces */
     if (CurTok.Tok != TOK_LPAREN) {
-     	Error ("'(' expected");
-     	SkipUntilSep ();
-	return GenLiteral0 ();
+        Error ("'(' expected");
+        SkipUntilSep ();
+        return GenLiteral0 ();
     }
     NextTok ();
 
@@ -879,46 +879,46 @@ static ExprNode* Factor (void)
 
     switch (CurTok.Tok) {
 
-	case TOK_INTCON:
-    	    N = GenLiteralExpr (CurTok.IVal);
-       	    NextTok ();
-	    break;
+        case TOK_INTCON:
+            N = GenLiteralExpr (CurTok.IVal);
+            NextTok ();
+            break;
 
-	case TOK_CHARCON:
-    	    N = GenLiteralExpr (TgtTranslateChar (CurTok.IVal));
-       	    NextTok ();
-	    break;
+        case TOK_CHARCON:
+            N = GenLiteralExpr (TgtTranslateChar (CurTok.IVal));
+            NextTok ();
+            break;
 
-	case TOK_NAMESPACE:
-	case TOK_IDENT:
+        case TOK_NAMESPACE:
+        case TOK_IDENT:
         case TOK_LOCAL_IDENT:
             N = Symbol (ParseAnySymName (SYM_ALLOC_NEW));
-	    break;
+            break;
 
-	case TOK_ULABEL:
-	    N = ULabRef (CurTok.IVal);
-	    NextTok ();
-	    break;
+        case TOK_ULABEL:
+            N = ULabRef (CurTok.IVal);
+            NextTok ();
+            break;
 
         case TOK_PLUS:
             NextTok ();
             N = Factor ();
             break;
 
-	case TOK_MINUS:
-	    NextTok ();
+        case TOK_MINUS:
+            NextTok ();
             L = Factor ();
             if (IsEasyConst (L, &Val)) {
                 FreeExpr (L);
                 N = GenLiteralExpr (-Val);
             } else {
                 N = NewExprNode (EXPR_UNARY_MINUS);
-       	        N->Left = L;
+                N->Left = L;
             }
-     	    break;
+            break;
 
-     	case TOK_NOT:
-     	    NextTok ();
+        case TOK_NOT:
+            NextTok ();
             L = Factor ();
             if (IsEasyConst (L, &Val)) {
                 FreeExpr (L);
@@ -927,23 +927,23 @@ static ExprNode* Factor (void)
                 N = NewExprNode (EXPR_NOT);
                 N->Left = L;
             }
-     	    break;
+            break;
 
-     	case TOK_STAR:
-	case TOK_PC:
-     	    NextTok ();
-       	    N = GenCurrentPC ();
-	    break;
+        case TOK_STAR:
+        case TOK_PC:
+            NextTok ();
+            N = GenCurrentPC ();
+            break;
 
-	case TOK_LT:
-	    NextTok ();
+        case TOK_LT:
+            NextTok ();
             N = LoByte (Factor ());
-	    break;
+            break;
 
-	case TOK_GT:
-	    NextTok ();
+        case TOK_GT:
+            NextTok ();
             N = HiByte (Factor ());
-	    break;
+            break;
 
         case TOK_XOR:
             /* ^ means the bank byte of an expression */
@@ -951,11 +951,11 @@ static ExprNode* Factor (void)
             N = BankByte (Factor ());
             break;
 
-	case TOK_LPAREN:
-	    NextTok ();
-	    N = Expr0 ();
-       	    ConsumeRParen ();
-	    break;
+        case TOK_LPAREN:
+            NextTok ();
+            N = Expr0 ();
+            ConsumeRParen ();
+            break;
 
         case TOK_BANK:
             N = Function (FuncBank);
@@ -966,21 +966,21 @@ static ExprNode* Factor (void)
             break;
 
         case TOK_BLANK:
-	    N = Function (FuncBlank);
-	    break;
+            N = Function (FuncBlank);
+            break;
 
-	case TOK_CONST:
-	    N = Function (FuncConst);
-	    break;
+        case TOK_CONST:
+            N = Function (FuncConst);
+            break;
 
-	case TOK_CPU:
-	    N = GenLiteralExpr (CPUIsets[CPU]);
-	    NextTok ();
-	    break;
+        case TOK_CPU:
+            N = GenLiteralExpr (CPUIsets[CPU]);
+            NextTok ();
+            break;
 
         case TOK_DEFINED:
-	    N = Function (FuncDefined);
-	    break;
+            N = Function (FuncDefined);
+            break;
 
         case TOK_HIBYTE:
             N = Function (FuncHiByte);
@@ -998,9 +998,9 @@ static ExprNode* Factor (void)
             N = Function (FuncLoWord);
             break;
 
-	case TOK_MATCH:
-	    N = Function (FuncMatch);
-	    break;
+        case TOK_MATCH:
+            N = Function (FuncMatch);
+            break;
 
         case TOK_MAX:
             N = Function (FuncMax);
@@ -1011,50 +1011,50 @@ static ExprNode* Factor (void)
             break;
 
         case TOK_REFERENCED:
-	    N = Function (FuncReferenced);
-	    break;
+            N = Function (FuncReferenced);
+            break;
 
         case TOK_SIZEOF:
             N = Function (FuncSizeOf);
             break;
 
-	case TOK_STRAT:
-	    N = Function (FuncStrAt);
-	    break;
+        case TOK_STRAT:
+            N = Function (FuncStrAt);
+            break;
 
-	case TOK_STRLEN:
-	    N = Function (FuncStrLen);
-	    break;
+        case TOK_STRLEN:
+            N = Function (FuncStrLen);
+            break;
 
-	case TOK_TCOUNT:
-	    N = Function (FuncTCount);
-	    break;
+        case TOK_TCOUNT:
+            N = Function (FuncTCount);
+            break;
 
-	case TOK_TIME:
-	    N = GenLiteralExpr ((long) time (0));
-	    NextTok ();
-	    break;
+        case TOK_TIME:
+            N = GenLiteralExpr ((long) time (0));
+            NextTok ();
+            break;
 
         case TOK_VERSION:
             N = GenLiteralExpr (GetVersionAsNumber ());
             NextTok ();
             break;
 
-	case TOK_XMATCH:
-	    N = Function (FuncXMatch);
-	    break;
+        case TOK_XMATCH:
+            N = Function (FuncXMatch);
+            break;
 
-	default:
-	    if (LooseCharTerm && CurTok.Tok == TOK_STRCON &&
+        default:
+            if (LooseCharTerm && CurTok.Tok == TOK_STRCON &&
                 SB_GetLen (&CurTok.SVal) == 1) {
-		/* A character constant */
-		N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
-	    } else {
-		N = GenLiteral0 ();	/* Dummy */
-		Error ("Syntax error");
-	    }
-	    NextTok ();
-	    break;
+                /* A character constant */
+                N = GenLiteralExpr (TgtTranslateChar (SB_At (&CurTok.SVal, 0)));
+            } else {
+                N = GenLiteral0 ();     /* Dummy */
+                Error ("Syntax error");
+            }
+            NextTok ();
+            break;
     }
     return N;
 }
@@ -1070,7 +1070,7 @@ static ExprNode* Term (void)
     while (CurTok.Tok == TOK_MUL || CurTok.Tok == TOK_DIV ||
            CurTok.Tok == TOK_MOD || CurTok.Tok == TOK_AND ||
            CurTok.Tok == TOK_XOR || CurTok.Tok == TOK_SHL ||
-	   CurTok.Tok == TOK_SHR) {
+           CurTok.Tok == TOK_SHR) {
 
         long LVal, RVal, Val;
         ExprNode* Left;
@@ -1142,14 +1142,14 @@ static ExprNode* Term (void)
             /* Generate an expression tree */
             unsigned char Op;
             switch (T) {
-                case TOK_MUL:   Op = EXPR_MUL;	break;
+                case TOK_MUL:   Op = EXPR_MUL;  break;
                 case TOK_DIV:   Op = EXPR_DIV;  break;
                 case TOK_MOD:   Op = EXPR_MOD;  break;
                 case TOK_AND:   Op = EXPR_AND;  break;
                 case TOK_XOR:   Op = EXPR_XOR;  break;
                 case TOK_SHL:   Op = EXPR_SHL;  break;
                 case TOK_SHR:   Op = EXPR_SHR;  break;
-                default:       	Internal ("Invalid token");
+                default:        Internal ("Invalid token");
             }
             Root        = NewExprNode (Op);
             Root->Left  = Left;
@@ -1212,7 +1212,7 @@ static ExprNode* SimpleExpr (void)
                 case TOK_PLUS:  Op = EXPR_PLUS;  break;
                 case TOK_MINUS: Op = EXPR_MINUS; break;
                 case TOK_OR:    Op = EXPR_OR;    break;
-                default:       	Internal ("Invalid token");
+                default:        Internal ("Invalid token");
             }
             Root        = NewExprNode (Op);
             Root->Left  = Left;
@@ -1281,7 +1281,7 @@ static ExprNode* BoolExpr (void)
                 case TOK_GT:    Op = EXPR_GT;   break;
                 case TOK_LE:    Op = EXPR_LE;   break;
                 case TOK_GE:    Op = EXPR_GE;   break;
-                default:       	Internal ("Invalid token");
+                default:        Internal ("Invalid token");
             }
             Root        = NewExprNode (Op);
             Root->Left  = Left;
@@ -1340,7 +1340,7 @@ static ExprNode* Expr2 (void)
             switch (T) {
                 case TOK_BOOLAND:   Op = EXPR_BOOLAND; break;
                 case TOK_BOOLXOR:   Op = EXPR_BOOLXOR; break;
-                default:       	    Internal ("Invalid token");
+                default:            Internal ("Invalid token");
             }
             Root        = NewExprNode (Op);
             Root->Left  = Left;
@@ -1397,7 +1397,7 @@ static ExprNode* Expr1 (void)
             unsigned char Op;
             switch (T) {
                 case TOK_BOOLOR:    Op = EXPR_BOOLOR;  break;
-                default:       	    Internal ("Invalid token");
+                default:            Internal ("Invalid token");
             }
             Root        = NewExprNode (Op);
             Root->Left  = Left;
@@ -1424,7 +1424,7 @@ static ExprNode* Expr0 (void)
         ExprNode* Left;
 
         /* Skip the operator token */
-     	NextTok ();
+        NextTok ();
 
         /* Read the argument */
         Left = Expr0 ();
@@ -1440,8 +1440,8 @@ static ExprNode* Expr0 (void)
 
     } else {
 
-     	/* Read left hand side */
-     	Root = Expr1 ();
+        /* Read left hand side */
+        Root = Expr1 ();
 
     }
 
@@ -1481,8 +1481,8 @@ long ConstExpression (void)
     if (ED_IsConst (&D)) {
         Val = D.Val;
     } else {
-     	Error ("Constant expression expected");
-     	Val = 0;
+        Error ("Constant expression expected");
+        Val = 0;
     }
 
     /* Free the expression tree and allocated memory for D */
@@ -1499,9 +1499,9 @@ void FreeExpr (ExprNode* Root)
 /* Free the expression, Root is pointing to. */
 {
     if (Root) {
-     	FreeExpr (Root->Left);
-     	FreeExpr (Root->Right);
-     	FreeExprNode (Root);
+        FreeExpr (Root->Left);
+        FreeExpr (Root->Right);
+        FreeExprNode (Root);
     }
 }
 
@@ -1595,12 +1595,12 @@ ExprNode* GenCurrentPC (void)
     ExprNode* Root;
 
     if (GetRelocMode ()) {
-	/* Create SegmentBase + Offset */
-       	Root = GenAddExpr (GenSectionExpr (GetCurrentSegNum ()),
+        /* Create SegmentBase + Offset */
+        Root = GenAddExpr (GenSectionExpr (GetCurrentSegNum ()),
                            GenLiteralExpr (GetPC ()));
     } else {
-     	/* Absolute mode, just return PC value */
-	Root = GenLiteralExpr (GetPC ());
+        /* Absolute mode, just return PC value */
+        Root = GenLiteralExpr (GetPC ());
     }
 
     return Root;
@@ -1679,7 +1679,7 @@ ExprNode* GenULabelExpr (unsigned Num)
 /* Return an expression for an unnamed label with the given index */
 {
     ExprNode* Node = NewExprNode (EXPR_ULABEL);
-    Node->V.IVal	= Num;
+    Node->V.IVal        = Num;
 
     /* Return the new node */
     return Node;
@@ -1749,7 +1749,7 @@ ExprNode* GenNE (ExprNode* Expr, long Val)
     /* Generate a compare node */
     ExprNode* Root = NewExprNode (EXPR_NE);
     Root->Left  = Expr;
-    Root->Right	= GenLiteralExpr (Val);
+    Root->Right = GenLiteralExpr (Val);
 
     /* Return the result */
     return Root;
@@ -1798,21 +1798,21 @@ ExprNode* CloneExpr (ExprNode* Expr)
     /* Clone the node */
     switch (Expr->Op) {
 
-	case EXPR_LITERAL:
+        case EXPR_LITERAL:
             Clone = GenLiteralExpr (Expr->V.IVal);
             break;
 
-	case EXPR_ULABEL:
-	    Clone = GenULabelExpr (Expr->V.IVal);
-	    break;
+        case EXPR_ULABEL:
+            Clone = GenULabelExpr (Expr->V.IVal);
+            break;
 
-	case EXPR_SYMBOL:
-	    Clone = GenSymExpr (Expr->V.Sym);
-	    break;
+        case EXPR_SYMBOL:
+            Clone = GenSymExpr (Expr->V.Sym);
+            break;
 
-	case EXPR_SECTION:
-	    Clone = GenSectionExpr (Expr->V.SecNum);
-	    break;
+        case EXPR_SECTION:
+            Clone = GenSectionExpr (Expr->V.SecNum);
+            break;
 
         case EXPR_BANK:
             Clone = GenBankExpr (Expr->V.SecNum);
@@ -1838,8 +1838,8 @@ void WriteExpr (ExprNode* Expr)
 {
     /* Null expressions are encoded by a type byte of zero */
     if (Expr == 0) {
-	ObjWrite8 (EXPR_NULL);
-      	return;
+        ObjWrite8 (EXPR_NULL);
+        return;
     }
 
     /* If the is a leafnode, write the expression attribute, otherwise
@@ -1849,33 +1849,33 @@ void WriteExpr (ExprNode* Expr)
 
         case EXPR_LITERAL:
             ObjWrite8 (EXPR_LITERAL);
-    	    ObjWrite32 (Expr->V.IVal);
-    	    break;
+            ObjWrite32 (Expr->V.IVal);
+            break;
 
         case EXPR_SYMBOL:
-    	    if (SymIsImport (Expr->V.Sym)) {
+            if (SymIsImport (Expr->V.Sym)) {
                 ObjWrite8 (EXPR_SYMBOL);
                 ObjWriteVar (GetSymImportId (Expr->V.Sym));
             } else {
                 WriteExpr (GetSymExpr (Expr->V.Sym));
             }
-	    break;
+            break;
 
         case EXPR_SECTION:
             ObjWrite8 (EXPR_SECTION);
-	    ObjWriteVar (Expr->V.SecNum);
-	    break;
+            ObjWriteVar (Expr->V.SecNum);
+            break;
 
-	case EXPR_ULABEL:
+        case EXPR_ULABEL:
             WriteExpr (ULabResolve (Expr->V.IVal));
-	    break;
+            break;
 
         default:
-	    /* Not a leaf node */
+            /* Not a leaf node */
             ObjWrite8 (Expr->Op);
-	    WriteExpr (Expr->Left);
-	    WriteExpr (Expr->Right);
-	    break;
+            WriteExpr (Expr->Left);
+            WriteExpr (Expr->Right);
+            break;
 
     }
 }

@@ -22,23 +22,23 @@ void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
     /* Binary search */
     while (first <= last) {
 
-	/* Set current to mid of range */
-	current = (last + first) / 2;
+        /* Set current to mid of range */
+        current = (last + first) / 2;
 
-	/* Do a compare */
-       	result = cmp ((void*) (((int) base) + current*size), key);
+        /* Do a compare */
+        result = cmp ((void*) (((int) base) + current*size), key);
         if (result < 0) {
-	    first = current + 1;
-	} else {
-	    last = current - 1;
- 	    if (result == 0) {
-	 	/* Found one entry that matches the search key. However there may be
-	 	 * more than one entry with the same key value and ANSI guarantees
-	 	 * that we return the first of a row of items with the same key.
-	 	 */
-	 	found = 1;
-	    }
-	}
+            first = current + 1;
+        } else {
+            last = current - 1;
+            if (result == 0) {
+                /* Found one entry that matches the search key. However there may be
+                 * more than one entry with the same key value and ANSI guarantees
+                 * that we return the first of a row of items with the same key.
+                 */
+                found = 1;
+            }
+        }
     }
 
     /* Did we find the entry? */

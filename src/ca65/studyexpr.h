@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	    	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -73,7 +73,7 @@ typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
     unsigned short      Flags;          /* See ED_xxx */
     unsigned char       AddrSize;       /* Address size of the expression */
-    long                Val;		/* The offset value */
+    long                Val;            /* The offset value */
     long                Right;          /* Right value for StudyBinaryExpr */
 
     /* Symbol reference management */
@@ -107,7 +107,7 @@ int ED_IsConst (const ExprDesc* ED);
 
 
 /*****************************************************************************/
-/*     	      	    	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

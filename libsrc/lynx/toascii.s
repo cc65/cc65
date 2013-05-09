@@ -8,9 +8,9 @@
 .proc _toascii
 
 ; X must be zero on return
-	ldx     #0
+        ldx     #0
 
 ; Done!
-	rts
+        rts
 
 .endproc

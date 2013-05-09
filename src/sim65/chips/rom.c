@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     rom.c				     */
+/*                                   rom.c                                   */
 /*                                                                           */
-/*		    ROM plugin for the sim65 6502 simulator		     */
+/*                  ROM plugin for the sim65 6502 simulator                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -89,7 +89,7 @@ static const struct ChipData CData[1] = {
         /* -- Exported functions -- */
         InitChip,
         CreateInstance,
-	DestroyInstance,
+        DestroyInstance,
         WriteCtrl,
         Write,
         ReadCtrl,
@@ -224,7 +224,7 @@ static void Write (void* Data, unsigned Offs, unsigned char Val)
 
     /* Print a warning */
     Sim->Break ("Writing to write protected memory at $%04X (value = $%02X)",
-		D->BaseAddr+Offs, Val);
+                D->BaseAddr+Offs, Val);
 }
 
 

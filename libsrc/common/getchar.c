@@ -7,12 +7,12 @@
 
 
 #include <stdio.h>
-#undef getchar		/* This is usually declared as a macro */
+#undef getchar          /* This is usually declared as a macro */
 
 
 
 /*****************************************************************************/
-/*     	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

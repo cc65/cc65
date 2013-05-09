@@ -2,19 +2,19 @@
 ; Startup code for cc65 (CBM 500 version)
 ;
 
-   	.export	     	_exit, BRKVec
+        .export         _exit, BRKVec
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-     	.import	   	_clrscr, initlib, donelib, callirq_y
-     	.import	     	push0, callmain
-	.import	   	__CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
-	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
-	.import	       	__INTERRUPTOR_COUNT__
-	.import		scnkey, UDTIM
+        .import         _clrscr, initlib, donelib, callirq_y
+        .import         push0, callmain
+        .import         __CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
+        .import         __BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
+        .import         __INTERRUPTOR_COUNT__
+        .import         scnkey, UDTIM
 
-     	.include     	"zeropage.inc"
+        .include        "zeropage.inc"
         .include        "extzp.inc"
-     	.include       	"cbm510.inc"
+        .include        "cbm510.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -37,8 +37,8 @@
 ; The machine program in the data lines is:
 ;
 ; sei
-; lda 	  #$00
-; sta     $00 	       	<-- Switch to bank 0 after this command
+; lda     #$00
+; sta     $00           <-- Switch to bank 0 after this command
 ;
 ; Initialization is not only complex because of the jumping from one bank
 ; into another. but also because we want to save memory, and because of
@@ -48,11 +48,11 @@
 
 .segment        "EXEHDR"
 
-        .byte  	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
-   	.byte	$19,$00,$14,$00,$87,$20,$4a,$00,$27,$00,$1e,$00,$97,$20,$32,$35
-   	.byte	$36,$aa,$49,$2c,$4a,$00,$2f,$00,$28,$00,$82,$20,$49,$00,$39,$00
-   	.byte	$32,$00,$9e,$20,$32,$35,$36,$00,$4f,$00,$3c,$00,$83,$20,$31,$32
-   	.byte	$30,$2c,$31,$36,$39,$2c,$30,$2c,$31,$33,$33,$2c,$30,$00,$00,$00
+        .byte   $03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
+        .byte   $19,$00,$14,$00,$87,$20,$4a,$00,$27,$00,$1e,$00,$97,$20,$32,$35
+        .byte   $36,$aa,$49,$2c,$4a,$00,$2f,$00,$28,$00,$82,$20,$49,$00,$39,$00
+        .byte   $32,$00,$9e,$20,$32,$35,$36,$00,$4f,$00,$3c,$00,$83,$20,$31,$32
+        .byte   $30,$2c,$31,$36,$39,$2c,$30,$2c,$31,$33,$33,$2c,$30,$00,$00,$00
 
 ;------------------------------------------------------------------------------
 ; A table that contains values that must be transfered from the system zero
@@ -182,15 +182,15 @@ expull: pla
 
 .segment        "STARTUP"
 
-Back:   sta	ExecReg
+Back:   sta     ExecReg
 
 ; We are at $100 now. The following snippet is a copy of the code that is poked
 ; in the system bank memory by the basic header program, it's only for
 ; documentation and not actually used here:
 
-     	sei
-     	lda	#$00
-     	sta	ExecReg
+        sei
+        lda     #$00
+        sta     ExecReg
 
 ; This is the actual starting point of our code after switching banks for
 ; startup. Beware: The following code will get overwritten as soon as we
@@ -205,9 +205,9 @@ Back:   sta	ExecReg
         sta     ExecReg
         rts
         nop
-       	.word	nmi             ; NMI vector
-       	.word	0     	      	; Reset - not used
-       	.word	irq             ; IRQ vector
+        .word   nmi             ; NMI vector
+        .word   0               ; Reset - not used
+        .word   irq             ; IRQ vector
 .endproc
 
 ; Initializers for the extended zeropage. See extzp.s
@@ -215,23 +215,23 @@ Back:   sta	ExecReg
 .proc   extzp
         .word   $0100           ; sysp1
         .word   $0300           ; sysp3
-        .word  	$d800           ; vic
-	.word  	$da00           ; sid
-	.word  	$db00           ; cia1
-  	.word  	$dc00           ; cia2
-  	.word  	$dd00           ; acia
-  	.word  	$de00           ; tpi1
-  	.word  	$df00           ; tpi2
-  	.word  	$eab1           ; ktab1
-  	.word  	$eb11           ; ktab2
-  	.word	$eb71           ; ktab3
-  	.word  	$ebd1           ; ktab4
+        .word   $d800           ; vic
+        .word   $da00           ; sid
+        .word   $db00           ; cia1
+        .word   $dc00           ; cia2
+        .word   $dd00           ; acia
+        .word   $de00           ; tpi1
+        .word   $df00           ; tpi2
+        .word   $eab1           ; ktab1
+        .word   $eb11           ; ktab2
+        .word   $eb71           ; ktab3
+        .word   $ebd1           ; ktab4
 .endproc
 
 ; Switch the indirect segment to the system bank
 
-Origin: lda	#$0F
-      	sta	IndReg
+Origin: lda     #$0F
+        sta     IndReg
 
 ; Initialize the extended zeropage
 
@@ -247,8 +247,8 @@ L1:     lda     extzp,x
         txa
         ldy     #$FF
         sta     (sysp1),y       ; Save system stack point into $F:$1FF
- 	ldx	#$FE            ; Leave $1FF untouched for cross bank calls
- 	txs	       	       	; Set up our own stack
+        ldx     #$FE            ; Leave $1FF untouched for cross bank calls
+        txs                     ; Set up our own stack
 
 ; Copy stuff from the system zeropage to ours
 
@@ -266,18 +266,18 @@ L2:     ldx     ktmp
 
 ; Set the interrupt, NMI and other vectors
 
-      	ldx    	#.sizeof(vectors)-1
-L3:    	lda    	vectors,x
-      	sta	$10000 - .sizeof(vectors),x
-      	dex
-       	bpl     L3
+        ldx     #.sizeof(vectors)-1
+L3:     lda     vectors,x
+        sta     $10000 - .sizeof(vectors),x
+        dex
+        bpl     L3
 
 ; Setup the C stack
 
-	lda    	#.lobyte(callbank15::entry)
-     	sta	sp
-	lda   	#.hibyte(callbank15::entry)
-	sta	sp+1
+        lda     #.lobyte(callbank15::entry)
+        sta     sp
+        lda     #.hibyte(callbank15::entry)
+        sta     sp+1
 
 ; Setup the subroutine and jump vector table that redirects kernal calls to
 ; the system bank.
@@ -305,39 +305,39 @@ L3:    	lda    	vectors,x
 
 ; Set the indirect segment to bank we're executing in
 
-     	lda	ExecReg
- 	sta	IndReg
+        lda     ExecReg
+        sta     IndReg
 
 ; Zero the BSS segment. We will do that here instead calling the routine
 ; in the common library, since we have the memory anyway, and this way,
 ; it's reused later.
 
-   	lda	#<__BSS_RUN__
-   	sta	ptr1
-	lda	#>__BSS_RUN__
-   	sta	ptr1+1
-	lda	#0
-	tay
+        lda     #<__BSS_RUN__
+        sta     ptr1
+        lda     #>__BSS_RUN__
+        sta     ptr1+1
+        lda     #0
+        tay
 
 ; Clear full pages
 
-   	ldx	#>__BSS_SIZE__
-   	beq	Z2
-Z1:	sta	(ptr1),y
-   	iny
-   	bne	Z1
-   	inc	ptr1+1			; Next page
-     	dex
-   	bne	Z1
+        ldx     #>__BSS_SIZE__
+        beq     Z2
+Z1:     sta     (ptr1),y
+        iny
+        bne     Z1
+        inc     ptr1+1                  ; Next page
+        dex
+        bne     Z1
 
 ; Clear the remaining page
 
-Z2:	ldx	#<__BSS_SIZE__
-   	beq	Z4
-Z3:	sta	(ptr1),y
-   	iny
-   	dex
-   	bne	Z3
+Z2:     ldx     #<__BSS_SIZE__
+        beq     Z4
+Z3:     sta     (ptr1),y
+        iny
+        dex
+        bne     Z3
 Z4:     jmp     Init
 
 ; ------------------------------------------------------------------------
@@ -349,32 +349,32 @@ Z4:     jmp     Init
 ; Copy the character rom from the system bank into the execution bank
 
 Init:   lda     #<$C000
-	sta	ptr1
-	lda	#>$C000
-	sta	ptr1+1
-        lda	#<__CHARRAM_START__
-	sta	ptr2
-	lda	#>__CHARRAM_START__
-	sta	ptr2+1
-       	lda    	#>__CHARRAM_SIZE__     	; 16 * 256 bytes to copy
-	sta	tmp1
-	ldy	#$00
-ccopy:	lda	#$0F
-     	sta	IndReg	      		; Access the system bank
-ccopy1:	lda	(ptr1),y
-       	sta	__VIDRAM_START__,y
-       	iny
-       	bne	ccopy1
-       	lda	ExecReg
-       	sta	IndReg
-ccopy2:	lda	__VIDRAM_START__,y
-       	sta	(ptr2),y
-       	iny
-       	bne	ccopy2
-       	inc	ptr1+1
-       	inc	ptr2+1	      		; Bump high pointer bytes
-       	dec	tmp1
-       	bne	ccopy
+        sta     ptr1
+        lda     #>$C000
+        sta     ptr1+1
+        lda     #<__CHARRAM_START__
+        sta     ptr2
+        lda     #>__CHARRAM_START__
+        sta     ptr2+1
+        lda     #>__CHARRAM_SIZE__      ; 16 * 256 bytes to copy
+        sta     tmp1
+        ldy     #$00
+ccopy:  lda     #$0F
+        sta     IndReg                  ; Access the system bank
+ccopy1: lda     (ptr1),y
+        sta     __VIDRAM_START__,y
+        iny
+        bne     ccopy1
+        lda     ExecReg
+        sta     IndReg
+ccopy2: lda     __VIDRAM_START__,y
+        sta     (ptr2),y
+        iny
+        bne     ccopy2
+        inc     ptr1+1
+        inc     ptr2+1                  ; Bump high pointer bytes
+        dec     tmp1
+        bne     ccopy
 
 ; Clear the video memory. We will do this before switching the video to bank 0
 ; to avoid garbage when doing so.
@@ -384,67 +384,67 @@ ccopy2:	lda	__VIDRAM_START__,y
 ; Reprogram the VIC so that the text screen and the character ROM is in the
 ; execution bank. This is done in three steps:
 
-        lda     #$0F  	      		; We need access to the system bank
-       	sta	IndReg
+        lda     #$0F                    ; We need access to the system bank
+        sta     IndReg
 
 ; Place the VIC video RAM into bank 0
 ; CA (STATVID)   = 0
 ; CB (VICDOTSEL) = 0
 
-       	ldy	#TPI::CR
-       	lda	(tpi1),y
-       	sta	vidsave+0
-       	and	#%00001111
-       	ora	#%10100000
-       	sta	(tpi1),y
+        ldy     #TPI::CR
+        lda     (tpi1),y
+        sta     vidsave+0
+        and     #%00001111
+        ora     #%10100000
+        sta     (tpi1),y
 
 ; Set bit 14/15 of the VIC address range to the high bits of __VIDRAM_START__
 ; PC6/PC7 (VICBANKSEL 0/1) = 11
 
-       	ldy    	#TPI::PRC
-       	lda	(tpi2),y
-       	sta	vidsave+1
-       	and	#$3F
-       	ora    	#<((>__VIDRAM_START__) & $C0)
-       	sta	(tpi2),y
+        ldy     #TPI::PRC
+        lda     (tpi2),y
+        sta     vidsave+1
+        and     #$3F
+        ora     #<((>__VIDRAM_START__) & $C0)
+        sta     (tpi2),y
 
 ; Set the VIC base address register to the addresses of the video and
 ; character RAM.
 
-        ldy	#VIC_VIDEO_ADR
-       	lda	(vic),y
-       	sta	vidsave+2
-	and	#$01
-       	ora    	#<(((__VIDRAM_START__ >> 6) & $F0) | ((__CHARRAM_START__ >> 10) & $0E) | $02)
-;      	and	#$0F
-;      	ora    	#<(((>__VIDRAM_START__) << 2) & $F0)
-       	sta	(vic),y
+        ldy     #VIC_VIDEO_ADR
+        lda     (vic),y
+        sta     vidsave+2
+        and     #$01
+        ora     #<(((__VIDRAM_START__ >> 6) & $F0) | ((__CHARRAM_START__ >> 10) & $0E) | $02)
+;       and     #$0F
+;       ora     #<(((>__VIDRAM_START__) << 2) & $F0)
+        sta     (vic),y
 
 ; Switch back to the execution bank
 
         lda     ExecReg
-       	sta	IndReg
+        sta     IndReg
 
 ; Activate chained interrupt handlers, then enable interrupts.
 
         lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
         sta     irqcount
-      	cli
+        cli
 
 ; Call module constructors.
 
-        jsr	initlib
+        jsr     initlib
 
 ; Push arguments and call main()
 
-       	jsr    	callmain
+        jsr     callmain
 
 ; Call module destructors. This is also the _exit entry and the default entry
 ; point for the break vector.
 
-_exit:  pha			; Save the return code on stack
-        jsr	donelib	     	; Run module destructors
-	lda     #$00
+_exit:  pha                     ; Save the return code on stack
+        jsr     donelib         ; Run module destructors
+        lda     #$00
         sta     irqcount        ; Disable custom irq handlers
 
 ; Address the system bank
@@ -454,17 +454,17 @@ _exit:  pha			; Save the return code on stack
 
 ; Switch back the video to the system bank
 
-  	ldy	#TPI::CR
-	lda	vidsave+0
-  	sta	(tpi1),y
+        ldy     #TPI::CR
+        lda     vidsave+0
+        sta     (tpi1),y
 
-	ldy    	#TPI::PRC
-   	lda	vidsave+1
-   	sta	(tpi2),y
+        ldy     #TPI::PRC
+        lda     vidsave+1
+        sta     (tpi2),y
 
-        ldy	#VIC_VIDEO_ADR
-	lda	vidsave+2
-	sta	(vic),y
+        ldy     #VIC_VIDEO_ADR
+        lda     vidsave+2
+        sta     (vic),y
 
 ; Copy stuff back from our zeropage to the systems
 
@@ -484,9 +484,9 @@ _exit:  pha			; Save the return code on stack
 
 ; Place the program return code into ST
 
-	pla
-	ldy	#$9C		; ST
-	sta	(sysp0),y
+        pla
+        ldy     #$9C            ; ST
+        sta     (sysp0),y
 
 ; Setup the welcome code at the stack bottom in the system bank.
 
@@ -499,9 +499,9 @@ _exit:  pha			; Save the return code on stack
         iny
         lda     #$60            ; RTS opcode
         sta     (sysp1),y
-   	lda    	IndReg
+        lda     IndReg
         sei
-   	txs
+        txs
         jmp     Back
 
 ; -------------------------------------------------------------------------
@@ -509,7 +509,7 @@ _exit:  pha			; Save the return code on stack
 ; easier chaining, we do handle the IRQs in the execution bank (instead of
 ; passing them to the system bank).
 
-; This is the mapping of the active irq register of the	6525 (tpi1):
+; This is the mapping of the active irq register of the 6525 (tpi1):
 ;
 ; Bit   7       6       5       4       3       2       1       0
 ;                               |       |       |       |       ^ 50 Hz
@@ -527,10 +527,10 @@ irq:    pha
         pha
         lda     ExecReg
         sta     IndReg                  ; Be sure to address our segment
-	tsx
-       	lda    	$105,x	    		; Get the flags from the stack
-	and	#$10	    		; Test break flag
-       	bne     dobrk
+        tsx
+        lda     $105,x                  ; Get the flags from the stack
+        and     #$10                    ; Test break flag
+        bne     dobrk
 
 ; It's an IRQ
 
@@ -538,46 +538,46 @@ irq:    pha
 
 ; Call chained IRQ handlers
 
-       	ldy    	irqcount
+        ldy     irqcount
         beq     irqskip
-       	jsr    	callirq_y               ; Call the functions
+        jsr     callirq_y               ; Call the functions
 
 ; Done with chained IRQ handlers, check the TPI for IRQs and handle them
 
-irqskip:lda	#$0F
-	sta	IndReg
-	ldy	#TPI::AIR
-	lda	(tpi1),y		; Interrupt Register 6525
-	beq	noirq
+irqskip:lda     #$0F
+        sta     IndReg
+        ldy     #TPI::AIR
+        lda     (tpi1),y                ; Interrupt Register 6525
+        beq     noirq
 
 ; 50/60Hz interrupt
 
-	cmp	#%00000001		; ticker irq?
-	bne	irqend
-       	jsr     scnkey                  ; Poll the keyboard
-        jsr	UDTIM                   ; Bump the time
+        cmp     #%00000001              ; ticker irq?
+        bne     irqend
+        jsr     scnkey                  ; Poll the keyboard
+        jsr     UDTIM                   ; Bump the time
 
 ; Done
 
-irqend:	ldy	#TPI::AIR
-       	sta	(tpi1),y    		; Clear interrupt
+irqend: ldy     #TPI::AIR
+        sta     (tpi1),y                ; Clear interrupt
 
-noirq:	pla
+noirq:  pla
         sta     IndReg
         pla
         tay
         pla
         tax
         pla
-nmi:	rti
+nmi:    rti
 
-dobrk:  jmp	(BRKVec)
+dobrk:  jmp     (BRKVec)
 
 ; -------------------------------------------------------------------------
 ; Data area
 
 .data
-vidsave:.res	3
+vidsave:.res    3
 
 .bss
 irqcount:       .byte   0

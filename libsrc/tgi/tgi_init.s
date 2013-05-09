@@ -40,10 +40,10 @@
 
 ; Do driver initialization. Set draw and view pages.
 
-	lda	#0
-	jsr	tgi_setviewpage
-	lda	#0
-	jsr	tgi_setdrawpage
+        lda     #0
+        jsr     tgi_setviewpage
+        lda     #0
+        jsr     tgi_setdrawpage
 
 ; Set the default palette.
 

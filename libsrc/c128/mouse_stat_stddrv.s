@@ -6,8 +6,8 @@
 ; const void mouse_static_stddrv[];
 ;
 
-        .export	_mouse_static_stddrv
-        .import	_c128_1351_mou
+        .export _mouse_static_stddrv
+        .import _c128_1351_mou
 
 .rodata
 

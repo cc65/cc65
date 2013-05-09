@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    6502.h                                   */
+/*                                  6502.h                                   */
 /*                                                                           */
-/*			  6502 specific declarations                         */
+/*                        6502 specific declarations                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,9 +47,9 @@ typedef unsigned size_t;
 
 
 /* Possible returns of getcpu() */
-#define CPU_6502	0
-#define CPU_65C02	1
-#define CPU_65816	2
+#define CPU_6502        0
+#define CPU_65C02       1
+#define CPU_65816       2
 
 unsigned char getcpu (void);
 /* Detect the CPU the program is running on */
@@ -57,29 +57,29 @@ unsigned char getcpu (void);
 
 
 /* Macros for CPU instructions */
-#define	BRK()	__asm__ ("brk")
-#define CLI()	__asm__ ("cli")
-#define SEI()	__asm__ ("sei")
+#define BRK()   __asm__ ("brk")
+#define CLI()   __asm__ ("cli")
+#define SEI()   __asm__ ("sei")
 
 
 
 /* Struct that holds the registers for the sys function */
 struct regs {
-    unsigned char a;		/* A register value */
-    unsigned char x;		/* X register value */
-    unsigned char y;		/* Y register value */
-    unsigned char flags;	/* Flags value */
-    unsigned      pc;		/* Program counter */
+    unsigned char a;            /* A register value */
+    unsigned char x;            /* X register value */
+    unsigned char y;            /* Y register value */
+    unsigned char flags;        /* Flags value */
+    unsigned      pc;           /* Program counter */
 };
 
 /* Defines for the flags in the regs structure */
-#define F6502_N		0x80	/* N flag */
-#define F6502_V		0x40	/* V flag */
-#define F6502_B  	0x10	/* B flag */
-#define F6502_D  	0x08	/* D flag */
-#define F6502_I  	0x04	/* I flag */
-#define F6502_Z 	0x02	/* Z flag */
-#define F6502_C         0x01	/* C flag */
+#define F6502_N         0x80    /* N flag */
+#define F6502_V         0x40    /* V flag */
+#define F6502_B         0x10    /* B flag */
+#define F6502_D         0x08    /* D flag */
+#define F6502_I         0x04    /* I flag */
+#define F6502_Z         0x02    /* Z flag */
+#define F6502_C         0x01    /* C flag */
 
 /* Function to call any machine language subroutine. All registers in the
  * regs structure are passed into the routine and the results are passed
@@ -98,11 +98,11 @@ void __fastcall__ _sys (struct regs* r);
  * vector if the program ends.
  */
 
-extern unsigned char brk_a;	/* A register value */
-extern unsigned char brk_x;	/* X register value */
-extern unsigned char brk_y;	/* Y register value */
-extern unsigned char brk_sr;	/* Status register */
-extern unsigned brk_pc;		/* PC value */
+extern unsigned char brk_a;     /* A register value */
+extern unsigned char brk_x;     /* X register value */
+extern unsigned char brk_y;     /* Y register value */
+extern unsigned char brk_sr;    /* Status register */
+extern unsigned brk_pc;         /* PC value */
 
 typedef void (*brk_handler) (void);
 /* Type of the break handler */
@@ -116,8 +116,8 @@ void reset_brk (void);
 
 
 /* Possible returns for irq_handler() */
-#define IRQ_NOT_HANDLED	0
-#define IRQ_HANDLED	1
+#define IRQ_NOT_HANDLED 0
+#define IRQ_HANDLED     1
 
 typedef unsigned char (*irq_handler) (void);
 /* Type of the C level interrupt request handler */

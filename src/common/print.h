@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    print.h				     */
+/*                                  print.h                                  */
 /*                                                                           */
-/*				Program output				     */
+/*                              Program output                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001	 Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -46,23 +46,23 @@
 
 
 /*****************************************************************************/
-/*     	      	       	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-extern unsigned char Verbosity;    	/* Verbose operation flag */
+extern unsigned char Verbosity;         /* Verbose operation flag */
 
 
 
 /*****************************************************************************/
-/*     	      	       		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
 
 void Print (FILE* F, unsigned V, const char* Format, ...)
-	attribute ((format (printf, 3, 4)));
+        attribute ((format (printf, 3, 4)));
 /* Output according to Verbosity */
 
 

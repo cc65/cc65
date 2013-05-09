@@ -4,7 +4,7 @@
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
-#ifndef	_GPROCESS_H
+#ifndef _GPROCESS_H
 #define _GPROCESS_H
 
 #ifndef _GSTRUCT_H

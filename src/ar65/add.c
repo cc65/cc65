@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     add.c 				     */
+/*                                   add.c                                   */
 /*                                                                           */
-/*		   Object file adding for the ar65 archiver		     */
+/*                 Object file adding for the ar65 archiver                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -55,10 +55,10 @@ void AddObjFiles (int argc, char* argv [])
 
     /* Check the argument count */
     if (argc <= 0) {
-    	Error ("No library name given");
+        Error ("No library name given");
     }
     if (argc <= 1) {
-    	Error ("No object files to add");
+        Error ("No object files to add");
     }
 
     /* Open the library, read the index */
@@ -67,8 +67,8 @@ void AddObjFiles (int argc, char* argv [])
     /* Add the object files */
     I = 1;
     while (I < argc) {
-    	ObjAdd (argv [I]);
-    	++I;
+        ObjAdd (argv [I]);
+        ++I;
     }
 
     /* Create a new library file and close the old one */

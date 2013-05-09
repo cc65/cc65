@@ -5,15 +5,15 @@
 
 ; char DeleteFile  (char *myName);
 
-	    .import setoserror
-	    .export _DeleteFile
+            .import setoserror
+            .export _DeleteFile
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _DeleteFile:
-	sta r0L
-	stx r0H
-	jsr DeleteFile
-	jmp setoserror
+        sta r0L
+        stx r0H
+        jsr DeleteFile
+        jmp setoserror

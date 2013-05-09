@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   feature.c				     */
+/*                                 feature.c                                 */
 /*                                                                           */
-/*		    Subroutines for the emulation features		     */
+/*                  Subroutines for the emulation features                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			   	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -68,7 +68,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -82,10 +82,10 @@ feature_t FindFeature (const StrBuf* Key)
 
     /* This is not time critical, so do a linear search */
     for (F = (feature_t) 0; F < FEAT_COUNT; ++F) {
-       	if (SB_CompareStr (Key, FeatureKeys[F]) == 0) {
-	    /* Found, index is enum value */
-	    return F;
-	}
+        if (SB_CompareStr (Key, FeatureKeys[F]) == 0) {
+            /* Found, index is enum value */
+            return F;
+        }
     }
 
     /* Not found */
@@ -105,21 +105,21 @@ feature_t SetFeature (const StrBuf* Key)
 
     /* Set the flags */
     switch (Feature) {
-     	case FEAT_DOLLAR_IS_PC:		      DollarIsPC	= 1;	break;
-     	case FEAT_LABELS_WITHOUT_COLONS:      NoColonLabels	= 1;	break;
-     	case FEAT_LOOSE_STRING_TERM:	      LooseStringTerm   = 1;	break;
-	case FEAT_LOOSE_CHAR_TERM:	      LooseCharTerm	= 1;	break;
-     	case FEAT_AT_IN_IDENTIFIERS:	      AtInIdents	= 1;	break;
-     	case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents	= 1;	break;
-       	case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= 1;    break;
+        case FEAT_DOLLAR_IS_PC:               DollarIsPC        = 1;    break;
+        case FEAT_LABELS_WITHOUT_COLONS:      NoColonLabels     = 1;    break;
+        case FEAT_LOOSE_STRING_TERM:          LooseStringTerm   = 1;    break;
+        case FEAT_LOOSE_CHAR_TERM:            LooseCharTerm     = 1;    break;
+        case FEAT_AT_IN_IDENTIFIERS:          AtInIdents        = 1;    break;
+        case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents    = 1;    break;
+        case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= 1;    break;
         case FEAT_ORG_PER_SEG:                OrgPerSeg         = 1;    break;
-     	case FEAT_PC_ASSIGNMENT:	      PCAssignment	= 1;	break;
+        case FEAT_PC_ASSIGNMENT:              PCAssignment      = 1;    break;
         case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = 1;    break;
         case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = 1;    break;
         case FEAT_C_COMMENTS:                 CComments         = 1;    break;
         case FEAT_FORCE_RANGE:                ForceRange        = 1;    break;
         case FEAT_UNDERLINE_IN_NUMBERS:       UnderlineInNumbers= 1;    break;
-	default:      			 /* Keep gcc silent */	        break;
+        default:                         /* Keep gcc silent */          break;
     }
 
     /* Return the value found */

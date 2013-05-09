@@ -11,17 +11,17 @@
 #elif defined(__C128__)
 #define DRIVERNAME      "c128-ram.emd"
 #elif defined(__C16__)
-#define DRIVERNAME	"c16-ram.emd"
+#define DRIVERNAME      "c16-ram.emd"
 #elif defined(__CBM510__)
-#define DRIVERNAME	"cbm510-ram.emd"
+#define DRIVERNAME      "cbm510-ram.emd"
 #elif defined(__CBM610__)
-#define DRIVERNAME	"cbm610-ram.emd"
+#define DRIVERNAME      "cbm610-ram.emd"
 #elif defined(__APPLE2__)
-#define DRIVERNAME	"a2.auxmem.emd"
+#define DRIVERNAME      "a2.auxmem.emd"
 #elif defined(__APPLE2ENH__)
-#define DRIVERNAME	"a2e.auxmem.emd"
+#define DRIVERNAME      "a2e.auxmem.emd"
 #else
-#define DRIVERNAME	"unknown"
+#define DRIVERNAME      "unknown"
 #error "Unknown target system"
 #endif
 
@@ -82,9 +82,9 @@ int main (void)
     clrscr ();
     Res = em_load_driver (DRIVERNAME);
     if (Res != EM_ERR_OK) {
-       	cprintf ("Error in em_load_driver: %u\r\n", Res);
+        cprintf ("Error in em_load_driver: %u\r\n", Res);
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));
-       	exit (EXIT_FAILURE);
+        exit (EXIT_FAILURE);
     }
     atexit (cleanup);
 

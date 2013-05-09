@@ -2,38 +2,38 @@
 ; IRQ handling (C128 version)
 ;
 
-	.export		initirq, doneirq
-	.import		callirq
+        .export         initirq, doneirq
+        .import         callirq
 
-	.include	"c128.inc"
+        .include        "c128.inc"
 
-IRQInd	= $2FD		; JMP $0000 - used as indirect IRQ vector
+IRQInd  = $2FD          ; JMP $0000 - used as indirect IRQ vector
 
 ; ------------------------------------------------------------------------
 
-.segment	"INIT"
+.segment        "INIT"
 
 initirq:
-	lda	IRQVec
-	ldx	IRQVec+1
-	sta	IRQInd+1
-	stx	IRQInd+2
-	lda	#<IRQStub
-	ldx	#>IRQStub
-	jmp	setvec
+        lda     IRQVec
+        ldx     IRQVec+1
+        sta     IRQInd+1
+        stx     IRQInd+2
+        lda     #<IRQStub
+        ldx     #>IRQStub
+        jmp     setvec
 
 ; ------------------------------------------------------------------------
 
 .code
 
 doneirq:
-	lda	IRQInd+1
-	ldx	IRQInd+2
-setvec:	sei
-	sta	IRQVec
-	stx	IRQVec+1
-	cli
-	rts
+        lda     IRQInd+1
+        ldx     IRQInd+2
+setvec: sei
+        sta     IRQVec
+        stx     IRQVec+1
+        cli
+        rts
 
 ; ------------------------------------------------------------------------
 ; The C128 has ROM parallel to the RAM starting from $4000. The startup code
@@ -45,15 +45,15 @@ setvec:	sei
 ; placed just above the startup code, so it goes into a RAM area that is
 ; not banked.
 
-.segment	"LOWCODE"
+.segment        "LOWCODE"
 
 IRQStub:
-	cld				; Just to be sure
-	lda	MMU_CR 			; Get old register value
-	pha				; And save on stack
-	lda	#MMU_CFG_CC65		; Bank 0 with kernal ROM
-	sta	MMU_CR
-	jsr	callirq			; Call the functions
-	pla				; Get old register value
-	sta	MMU_CR
-	jmp	IRQInd			; Jump to the saved IRQ vector
+        cld                             ; Just to be sure
+        lda     MMU_CR                  ; Get old register value
+        pha                             ; And save on stack
+        lda     #MMU_CFG_CC65           ; Bank 0 with kernal ROM
+        sta     MMU_CR
+        jsr     callirq                 ; Call the functions
+        pla                             ; Get old register value
+        sta     MMU_CR
+        jmp     IRQInd                  ; Jump to the saved IRQ vector

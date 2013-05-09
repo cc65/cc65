@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   options.c				     */
+/*                                 options.c                                 */
 /*                                                                           */
-/*		Object file options for the ca65 macroassembler		     */
+/*              Object file options for the ca65 macroassembler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,20 +48,20 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Option list */
-static Option*	     	OptRoot = 0;
-static Option*	     	OptLast = 0;
-static unsigned		OptCount = 0;
+static Option*          OptRoot = 0;
+static Option*          OptLast = 0;
+static unsigned         OptCount = 0;
 
 
 
 /*****************************************************************************/
-/*     	      	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -81,9 +81,9 @@ static Option* NewOption (unsigned char Type, unsigned long Val)
 
     /* Insert it into the list */
     if (OptRoot == 0) {
-	OptRoot = Opt;
+        OptRoot = Opt;
     } else {
-       	OptLast->Next = Opt;
+        OptLast->Next = Opt;
     }
     OptLast = Opt;
 
@@ -167,12 +167,12 @@ void WriteOptions (void)
     O = OptRoot;
     while (O) {
 
-	/* Write the type of the option, then the value */
-	ObjWrite8 (O->Type);
+        /* Write the type of the option, then the value */
+        ObjWrite8 (O->Type);
         ObjWriteVar (O->Val);
 
-	/* Next option */
-	O = O->Next;
+        /* Next option */
+        O = O->Next;
 
     }
 

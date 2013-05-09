@@ -5,102 +5,102 @@
 ; void reset_irq (void);
 ;
 
-	.export	   	_set_irq, _reset_irq
-	.interruptor    clevel_irq, 1 		; Export as low priority IRQ handler
-	.import 	popax
+        .export         _set_irq, _reset_irq
+        .interruptor    clevel_irq, 1           ; Export as low priority IRQ handler
+        .import         popax
         .importzp       __ZP_START__
 
-	.include        "zeropage.inc"
+        .include        "zeropage.inc"
 
-	.macpack	generic
+        .macpack        generic
 
 
 ; ---------------------------------------------------------------------------
 
 .data
 
-irqvec:	jmp	$00FF		; Patched at runtime
+irqvec: jmp     $00FF           ; Patched at runtime
 
 ; ---------------------------------------------------------------------------
 
 .bss
 
-irqsp:	.res	2
+irqsp:  .res    2
 
 zpsave: .res    zpsavespace
 
 ; ---------------------------------------------------------------------------
 
-.proc	_set_irq
+.proc   _set_irq
 
-	; Keep clevel_irq from being called right now
-	sei
+        ; Keep clevel_irq from being called right now
+        sei
 
-	; Set irq stack pointer to stack_addr + stack_size
-	sta	irqsp
-	stx	irqsp+1
-	jsr	popax
-	add	irqsp
-	sta	irqsp
-	txa
-	adc	irqsp+1
-	sta	irqsp+1
+        ; Set irq stack pointer to stack_addr + stack_size
+        sta     irqsp
+        stx     irqsp+1
+        jsr     popax
+        add     irqsp
+        sta     irqsp
+        txa
+        adc     irqsp+1
+        sta     irqsp+1
 
-	; Set irq vector to irq_handler
-	jsr	popax
-	sta	irqvec+1
-	stx	irqvec+2 	; Set the user vector
+        ; Set irq vector to irq_handler
+        jsr     popax
+        sta     irqvec+1
+        stx     irqvec+2        ; Set the user vector
 
-	; Restore interrupt requests and return
-	cli
-	rts
-
-.endproc
-
-
-.proc	_reset_irq
-
-	lda  	#$00
-	sta	irqvec+2	; High byte is enough
-	rts
+        ; Restore interrupt requests and return
+        cli
+        rts
 
 .endproc
 
 
-.proc	clevel_irq
+.proc   _reset_irq
 
-	; Is C level interrupt request vector set?
-	lda    	irqvec+2	; High byte is enough
-	bne	@L1
-	clc			; Interrupt not handled
-	rts
+        lda     #$00
+        sta     irqvec+2        ; High byte is enough
+        rts
 
-	; Save our zero page locations
-@L1:	ldx     #.sizeof(::zpsave)-1
+.endproc
+
+
+.proc   clevel_irq
+
+        ; Is C level interrupt request vector set?
+        lda     irqvec+2        ; High byte is enough
+        bne     @L1
+        clc                     ; Interrupt not handled
+        rts
+
+        ; Save our zero page locations
+@L1:    ldx     #.sizeof(::zpsave)-1
 @L2:    lda     __ZP_START__,x
-	sta     zpsave,x
-	dex
-	bpl     @L2
+        sta     zpsave,x
+        dex
+        bpl     @L2
 
-	; Set C level interrupt stack
-	lda	irqsp
-	ldx	irqsp+1
-	sta	sp
-	stx	sp+1
+        ; Set C level interrupt stack
+        lda     irqsp
+        ldx     irqsp+1
+        sta     sp
+        stx     sp+1
 
-	; Call C level interrupt request handler
-	jsr	irqvec
+        ; Call C level interrupt request handler
+        jsr     irqvec
 
-	; Copy back our zero page content
-	ldx     #.sizeof(::zpsave)-1
+        ; Copy back our zero page content
+        ldx     #.sizeof(::zpsave)-1
 @L3:    ldy     zpsave,x
-	sty     __ZP_START__,x
-	dex
-	bpl     @L3
+        sty     __ZP_START__,x
+        dex
+        bpl     @L3
 
-	; Mark interrupt handled / not handled and return
-	lsr
-	rts
+        ; Mark interrupt handled / not handled and return
+        lsr
+        rts
 
 .endproc
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  segments.h				     */
+/*                                segments.h                                 */
 /*                                                                           */
-/*		     Segment handling for the ld65 linker		     */
+/*                   Segment handling for the ld65 linker                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*     	      	     		     Data  				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -60,19 +60,19 @@ typedef struct Segment Segment;
 struct Segment {
     unsigned            Name;           /* Name index of the segment */
     unsigned            Id;             /* Segment id for debug info */
-    Segment*  	      	Next;		/* Hash list */
+    Segment*            Next;           /* Hash list */
     unsigned            Flags;          /* Segment flags */
     Collection          Sections;       /* Sections in this segment */
     struct MemoryArea*  MemArea;        /* Run memory area once placed */
-    unsigned long     	PC;    		/* PC were this segment is located */
-    unsigned long     	Size;		/* Size of data so far */
+    unsigned long       PC;             /* PC were this segment is located */
+    unsigned long       Size;           /* Size of data so far */
     const char*         OutputName;     /* Name of output file or NULL */
     unsigned long       OutputOffs;     /* Offset in output file */
     unsigned long       Alignment;      /* Alignment needed */
-    unsigned char     	FillVal;	/* Value to use for fill bytes */
-    unsigned char     	AddrSize;      	/* Address size of segment */
+    unsigned char       FillVal;        /* Value to use for fill bytes */
+    unsigned char       AddrSize;       /* Address size of segment */
     unsigned char       ReadOnly;       /* True for readonly segments (config) */
-    unsigned char      	Dumped;		/* Did we dump this segment? */
+    unsigned char       Dumped;         /* Did we dump this segment? */
 };
 
 
@@ -80,16 +80,16 @@ struct Segment {
 /* Section structure (a section is a part of a segment) */
 typedef struct Section Section;
 struct Section {
-    Section*  	   	Next;		/* List of sections in a segment */
-    Segment*  	    	Seg;		/* Segment that contains the section */
+    Section*            Next;           /* List of sections in a segment */
+    Segment*            Seg;            /* Segment that contains the section */
     struct ObjData*     Obj;            /* Object file this section comes from */
-    struct Fragment*	FragRoot;	/* Fragment list */
-    struct Fragment*	FragLast;	/* Pointer to last fragment */
-    unsigned long   	Offs;		/* Offset into the segment */
-    unsigned long   	Size;		/* Size of the section */
+    struct Fragment*    FragRoot;       /* Fragment list */
+    struct Fragment*    FragLast;       /* Pointer to last fragment */
+    unsigned long       Offs;           /* Offset into the segment */
+    unsigned long       Size;           /* Size of the section */
     unsigned long       Fill;           /* Fill bytes for alignment */
     unsigned long       Alignment;      /* Alignment */
-    unsigned char	AddrSize;       /* Address size of segment */
+    unsigned char       AddrSize;       /* Address size of segment */
 };
 
 
@@ -97,21 +97,21 @@ struct Section {
 /* Prototype for a function that is used to write expressions to the target
  * file (used in SegWrite). It returns one of the following values:
  */
-#define SEG_EXPR_OK		0U	/* Ok */
-#define SEG_EXPR_RANGE_ERROR	1U 	/* Range error */
-#define SEG_EXPR_TOO_COMPLEX	2U 	/* Expression too complex */
+#define SEG_EXPR_OK             0U      /* Ok */
+#define SEG_EXPR_RANGE_ERROR    1U      /* Range error */
+#define SEG_EXPR_TOO_COMPLEX    2U      /* Expression too complex */
 #define SEG_EXPR_INVALID        3U      /* Expression is invalid (e.g. unmapped segment) */
 
-typedef unsigned (*SegWriteFunc) (ExprNode* E, 	      /* The expression to write */
-	  			  int Signed,  	      /* Signed expression? */
-	  			  unsigned Size,      /* Size (=range) */
-	  			  unsigned long Offs, /* File offset */
-	  			  void* Data);	      /* Callers data */
+typedef unsigned (*SegWriteFunc) (ExprNode* E,        /* The expression to write */
+                                  int Signed,         /* Signed expression? */
+                                  unsigned Size,      /* Size (=range) */
+                                  unsigned long Offs, /* File offset */
+                                  void* Data);        /* Callers data */
 
 
 
 /*****************************************************************************/
-/*     	      	     	   	     Code  	      	  	  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

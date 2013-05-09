@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   setjmp.h				     */
+/*                                 setjmp.h                                  */
 /*                                                                           */
-/*				Nonlocal jumps				     */
+/*                              Nonlocal jumps                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,7 +43,7 @@ typedef char jmp_buf [5];
 
 
 int __fastcall__ _setjmp (jmp_buf buf);
-#define setjmp	_setjmp		/* ISO insists on a macro */
+#define setjmp  _setjmp         /* ISO insists on a macro */
 void __fastcall__ longjmp (jmp_buf buf, int retval) __attribute__((noreturn));
 
 

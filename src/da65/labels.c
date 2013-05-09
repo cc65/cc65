@@ -52,7 +52,7 @@
 
 
 /*****************************************************************************/
-/*			      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -63,7 +63,7 @@ static const char* SymTab[0x10000];
 
 
 /*****************************************************************************/
-/*   	      	   	      	     Code	    			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -88,14 +88,14 @@ static void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
 
     /* Must not have two symbols for one address */
     if (ExistingAttr != atNoLabel) {
-       	/* Allow redefinition if identical. Beware: Unnamed labels don't
+        /* Allow redefinition if identical. Beware: Unnamed labels don't
          * have a name (you guessed that, didn't you?).
          */
-       	if (ExistingAttr == Attr &&
+        if (ExistingAttr == Attr &&
             ((Name == 0 && SymTab[Addr] == 0) || strcmp (SymTab[Addr], Name) == 0)) {
-       	    return;
-       	}
-       	Error ("Duplicate label for address $%04X: %s/%s", Addr, SymTab[Addr], Name);
+            return;
+        }
+        Error ("Duplicate label for address $%04X: %s/%s", Addr, SymTab[Addr], Name);
     }
 
     /* Create a new label (xstrdup will return NULL if input NULL) */
@@ -138,13 +138,13 @@ void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Off
 {
     /* Allocate memory for the dependent label name */
     unsigned NameLen = strlen (BaseName);
-    char*    DepName = xmalloc (NameLen + 7);	/* "+$ABCD\0" */
+    char*    DepName = xmalloc (NameLen + 7);   /* "+$ABCD\0" */
 
     /* Create the new name in the buffer */
     if (UseHexOffs) {
-	sprintf (DepName, "%s+$%02X", BaseName, Offs);
+        sprintf (DepName, "%s+$%02X", BaseName, Offs);
     } else {
-	sprintf (DepName, "%s+%u", BaseName, Offs);
+        sprintf (DepName, "%s+%u", BaseName, Offs);
     }
 
     /* Define the labels */
@@ -167,28 +167,28 @@ static void AddLabelRange (unsigned Addr, attr_t Attr,
 
     /* Define dependent labels if necessary */
     if (Count > 1) {
-    	unsigned Offs;
+        unsigned Offs;
 
         /* Setup the format string */
         const char* Format = UseHexOffs? "$%02X" : "%u";
 
-    	/* Allocate memory for the dependent label names */
-    	unsigned NameLen = strlen (Name);
-    	char* 	 DepName = xmalloc (NameLen + 7);	/* "+$ABCD" */
-    	char* 	 DepOffs = DepName + NameLen + 1;
+        /* Allocate memory for the dependent label names */
+        unsigned NameLen = strlen (Name);
+        char*    DepName = xmalloc (NameLen + 7);       /* "+$ABCD" */
+        char*    DepOffs = DepName + NameLen + 1;
 
-    	/* Copy the original name into the buffer */
-    	memcpy (DepName, Name, NameLen);
-    	DepName[NameLen] = '+';
+        /* Copy the original name into the buffer */
+        memcpy (DepName, Name, NameLen);
+        DepName[NameLen] = '+';
 
-    	/* Define the labels */
-       	for (Offs = 1; Offs < Count; ++Offs) {
-    	    sprintf (DepOffs, Format, Offs);
-    	    AddLabel (Addr + Offs, Attr | atDepLabel, DepName);
-    	}
+        /* Define the labels */
+        for (Offs = 1; Offs < Count; ++Offs) {
+            sprintf (DepOffs, Format, Offs);
+            AddLabel (Addr + Offs, Attr | atDepLabel, DepName);
+        }
 
-    	/* Free the name buffer */
-    	xfree (DepName);
+        /* Free the name buffer */
+        xfree (DepName);
     }
 }
 

@@ -4,23 +4,23 @@
 ; void* __fastcall__ memchr (const void* p, int c, size_t n);
 ;
 
-  	.export		_memchr
-  	.import		popax, return0
-  	.importzp	ptr1, ptr2
+        .export         _memchr
+        .import         popax, return0
+        .importzp       ptr1, ptr2
 
 
 .proc   _memchr
 
         eor     #$FF
-       	sta	ptr2
+        sta     ptr2
         txa
         eor     #$FF
-  	sta    	ptr2+1          ; Save ones complement of n
-  	jsr	popax		; get c
-  	pha
-       	jsr	popax 	     	; get p
-       	sta	ptr1
-       	stx	ptr1+1
+        sta     ptr2+1          ; Save ones complement of n
+        jsr     popax           ; get c
+        pha
+        jsr     popax           ; get p
+        sta     ptr1
+        stx     ptr1+1
 
         ldy     #$00
         pla                     ; Get c
@@ -45,13 +45,13 @@ notfound:
 
 ; Found, return pointer to char
 
-found:  ldx 	ptr1+1		; get high byte of pointer
-       	tya 			; low byte offset
-       	clc
-       	adc 	ptr1
-       	bcc 	L9
-       	inx
-L9:  	rts
+found:  ldx     ptr1+1          ; get high byte of pointer
+        tya                     ; low byte offset
+        clc
+        adc     ptr1
+        bcc     L9
+        inx
+L9:     rts
 
 .endproc
 

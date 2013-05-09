@@ -5,16 +5,16 @@
 
 ; void PutChar         (char character, char y, int x);
 
-	    .import popa
-	    .export _PutChar
+            .import popa
+            .export _PutChar
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _PutChar:
-	sta r11L
-	stx r11H
-	jsr popa
-	sta r1H
-	jsr popa
-	jmp PutChar
+        sta r11L
+        stx r11H
+        jsr popa
+        sta r1H
+        jsr popa
+        jmp PutChar

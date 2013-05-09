@@ -4,13 +4,13 @@
 ; unsigned char wherey (void);
 ;
 
-        .export	       	_wherey
+        .export         _wherey
 
-        .include	"apple2.inc"
+        .include        "apple2.inc"
 
 _wherey:
-        lda	CV
+        lda     CV
         sec
-        sbc	WNDTOP
+        sbc     WNDTOP
         ldx     #$00
         rts

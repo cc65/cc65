@@ -5,8 +5,8 @@
 ; CC65 runtime: call function via pointer in ax
 ;
 
-	.export callax
+        .export callax
 
         .include "jumptab.inc"
 
-callax		= CallRoutine
+callax          = CallRoutine

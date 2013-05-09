@@ -43,42 +43,42 @@
 
 
 /*****************************************************************************/
-/*	      	     	      	     Data		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 static const FileId TypeTable[] = {
     /* Upper case stuff for obsolete operating systems */
-    {   "A",	FILETYPE_LIB	},
-    {   "A65",	FILETYPE_ASM	},
-    {   "ASM",	FILETYPE_ASM	},
-    {   "C",	FILETYPE_C	},
+    {   "A",    FILETYPE_LIB    },
+    {   "A65",  FILETYPE_ASM    },
+    {   "ASM",  FILETYPE_ASM    },
+    {   "C",    FILETYPE_C      },
     {   "EMD",  FILETYPE_O65    },
-    {   "GRC",	FILETYPE_GR	},
+    {   "GRC",  FILETYPE_GR     },
     {   "JOY",  FILETYPE_O65    },
-    {   "LIB",	FILETYPE_LIB	},
+    {   "LIB",  FILETYPE_LIB    },
     {   "MOU",  FILETYPE_O65    },
-    {   "O",	FILETYPE_OBJ	},
+    {   "O",    FILETYPE_OBJ    },
     {   "O65",  FILETYPE_O65    },
-    {   "OBJ",	FILETYPE_OBJ	},
-    {   "S",	FILETYPE_ASM	},
+    {   "OBJ",  FILETYPE_OBJ    },
+    {   "S",    FILETYPE_ASM    },
     {   "SER",  FILETYPE_O65    },
     {   "TGI",  FILETYPE_O65    },
 
-    {   "a",	FILETYPE_LIB	},
-    {   "a65",	FILETYPE_ASM	},
-    {   "asm",	FILETYPE_ASM	},
-    {   "c",	FILETYPE_C	},
+    {   "a",    FILETYPE_LIB    },
+    {   "a65",  FILETYPE_ASM    },
+    {   "asm",  FILETYPE_ASM    },
+    {   "c",    FILETYPE_C      },
     {   "emd",  FILETYPE_O65    },
-    {   "grc",	FILETYPE_GR	},
+    {   "grc",  FILETYPE_GR     },
     {   "joy",  FILETYPE_O65    },
-    {   "lib",	FILETYPE_LIB	},
+    {   "lib",  FILETYPE_LIB    },
     {   "mou",  FILETYPE_O65    },
-    {   "o",	FILETYPE_OBJ	},
+    {   "o",    FILETYPE_OBJ    },
     {   "o65",  FILETYPE_O65    },
-    {   "obj",	FILETYPE_OBJ	},
-    {   "s",	FILETYPE_ASM	},
+    {   "obj",  FILETYPE_OBJ    },
+    {   "s",    FILETYPE_ASM    },
     {   "ser",  FILETYPE_O65    },
     {   "tgi",  FILETYPE_O65    },
 };
@@ -88,7 +88,7 @@ static const FileId TypeTable[] = {
 
 
 /*****************************************************************************/
-/*	       	     	     	     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

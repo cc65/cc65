@@ -5,6 +5,6 @@
 ;
 
         .import         CIOUT
-       	.export	       	_cbm_k_ciout := CIOUT
+        .export         _cbm_k_ciout := CIOUT
 
 

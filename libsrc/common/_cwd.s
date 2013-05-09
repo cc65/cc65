@@ -7,7 +7,7 @@
 ; by the constructor defined in this module.
 ;
 
-       	.export		__cwd
+        .export         __cwd
         .export         __cwd_buf_size
         .constructor    cwd_init
 
@@ -21,7 +21,7 @@
 
 .bss
 
-__cwd:  .res	__cwd_buf_size
+__cwd:  .res    __cwd_buf_size
 
 
 ; NOTE: Some of the code working with directories is not able to handle

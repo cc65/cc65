@@ -2,15 +2,15 @@
 ; Ullrich von Bassewitz, 2003-04-13
 ;
 
-	.export	  	_clrscr
+        .export         _clrscr
         .importzp       ptr2
 
-	.include  	"atmos.inc"
+        .include        "atmos.inc"
 
 ; ------------------------------------------------------------------------
 ; void clrscr (void);
 
-.proc	_clrscr
+.proc   _clrscr
 
 ; Set the cursor to top left cursor position
 

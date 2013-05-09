@@ -6,8 +6,8 @@
 ; const char tgi_stddrv[];
 ;
 
-        .export	_tgi_stddrv
+        .export _tgi_stddrv
 
 .rodata
 
-_tgi_stddrv:	.asciiz	"atmos-240-200-2.tgi"
+_tgi_stddrv:    .asciiz "atmos-240-200-2.tgi"

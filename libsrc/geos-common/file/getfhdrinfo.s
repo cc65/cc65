@@ -5,15 +5,15 @@
 
 ; char GetFHdrInfo  (struct filehandle *myFile);
 
-	    .import setoserror
-	    .export _GetFHdrInfo
+            .import setoserror
+            .export _GetFHdrInfo
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _GetFHdrInfo:
-	sta r9L
-	stx r9H
-	jsr GetFHdrInfo
-	jmp setoserror
+        sta r9L
+        stx r9H
+        jsr GetFHdrInfo
+        jmp setoserror

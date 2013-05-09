@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  symentry.c				     */
+/*                                symentry.c                                 */
 /*                                                                           */
-/*		 Symbol table entries for the cc65 C compiler		     */
+/*               Symbol table entries for the cc65 C compiler                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*	       	  	  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -62,13 +62,13 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     SymEntry* E = xmalloc (sizeof (SymEntry) + Len);
 
     /* Initialize the entry */
-    E->NextHash	= 0;
-    E->PrevSym	= 0;
-    E->NextSym	= 0;
-    E->Link	= 0;
-    E->Owner	= 0;
-    E->Flags	= Flags;
-    E->Type	= 0;
+    E->NextHash = 0;
+    E->PrevSym  = 0;
+    E->NextSym  = 0;
+    E->Link     = 0;
+    E->Owner    = 0;
+    E->Flags    = Flags;
+    E->Type     = 0;
     E->Attr     = 0;
     E->AsmName  = 0;
     memcpy (E->Name, Name, Len+1);
@@ -93,28 +93,28 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
 /* Dump the given symbol table entry to the file in readable form */
 {
     static const struct {
-    	const char*    	    Name;
-    	unsigned       	    Val;
+        const char*         Name;
+        unsigned            Val;
     } Flags [] = {
-	/* Beware: Order is important! */
-      	{ "SC_TYPEDEF",	    SC_TYPEDEF	        },
+        /* Beware: Order is important! */
+        { "SC_TYPEDEF",     SC_TYPEDEF          },
         { "SC_BITFIELD",    SC_BITFIELD         },
-       	{ "SC_STRUCTFIELD", SC_STRUCTFIELD	},
+        { "SC_STRUCTFIELD", SC_STRUCTFIELD      },
         { "SC_UNION",       SC_UNION            },
-      	{ "SC_STRUCT", 	    SC_STRUCT	        },
-    	{ "SC_AUTO",   	    SC_AUTO	        },
-    	{ "SC_REGISTER",    SC_REGISTER	        },
-    	{ "SC_STATIC",      SC_STATIC	        },
-    	{ "SC_EXTERN", 	    SC_EXTERN	        },
-    	{ "SC_ENUM",   	    SC_ENUM	        },
-	{ "SC_CONST",  	    SC_CONST	        },
-    	{ "SC_LABEL",	    SC_LABEL	        },
-    	{ "SC_PARAM",	    SC_PARAM	        },
-	{ "SC_FUNC",	    SC_FUNC	        },
-    	{ "SC_STORAGE",	    SC_STORAGE 	        },
-    	{ "SC_DEF",	    SC_DEF	        },
-    	{ "SC_REF",	    SC_REF	        },
-      	{ "SC_ZEROPAGE",    SC_ZEROPAGE	        },
+        { "SC_STRUCT",      SC_STRUCT           },
+        { "SC_AUTO",        SC_AUTO             },
+        { "SC_REGISTER",    SC_REGISTER         },
+        { "SC_STATIC",      SC_STATIC           },
+        { "SC_EXTERN",      SC_EXTERN           },
+        { "SC_ENUM",        SC_ENUM             },
+        { "SC_CONST",       SC_CONST            },
+        { "SC_LABEL",       SC_LABEL            },
+        { "SC_PARAM",       SC_PARAM            },
+        { "SC_FUNC",        SC_FUNC             },
+        { "SC_STORAGE",     SC_STORAGE          },
+        { "SC_DEF",         SC_DEF              },
+        { "SC_REF",         SC_REF              },
+        { "SC_ZEROPAGE",    SC_ZEROPAGE         },
     };
 
     unsigned I;
@@ -132,22 +132,22 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     SymFlags = E->Flags;
     fprintf (F, "    Flags: ");
     for (I = 0; I < sizeof (Flags) / sizeof (Flags[0]) && SymFlags != 0; ++I) {
-     	if ((SymFlags & Flags[I].Val) == Flags[I].Val) {
-     	    SymFlags &= ~Flags[I].Val;
-     	    fprintf (F, "%s ", Flags[I].Name);
-     	}
+        if ((SymFlags & Flags[I].Val) == Flags[I].Val) {
+            SymFlags &= ~Flags[I].Val;
+            fprintf (F, "%s ", Flags[I].Name);
+        }
     }
     if (SymFlags != 0) {
-	fprintf (F, "%04X", SymFlags);
+        fprintf (F, "%04X", SymFlags);
     }
     fprintf (F, "\n");
 
     /* Print the type */
     fprintf (F, "    Type:  ");
     if (E->Type) {
-     	PrintType (F, E->Type);
+        PrintType (F, E->Type);
     } else {
-     	fprintf (F, "(none)");
+        fprintf (F, "(none)");
     }
     fprintf (F, "\n");
 }

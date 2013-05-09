@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*  				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -101,17 +101,17 @@ static void RemoveCallback (Callback* C)
     Callback* N;
     Callback** L = &List;
     while ((N = *L) != 0) {
-       	if (N == C) {
-       	    /* Found, remove it */
-       	    if (C->Next) {
-	       	/* Adjust the counter of the following callback */
-       	       	C->Next->Ticks += C->Ticks;
-	    }
-     	    *L = C->Next;
-	    return;
-     	} else {
-     	    L = &N->Next;
-     	}
+        if (N == C) {
+            /* Found, remove it */
+            if (C->Next) {
+                /* Adjust the counter of the following callback */
+                C->Next->Ticks += C->Ticks;
+            }
+            *L = C->Next;
+            return;
+        } else {
+            L = &N->Next;
+        }
     }
 
     /* Callback was not found */
@@ -121,7 +121,7 @@ static void RemoveCallback (Callback* C)
 
 
 /*****************************************************************************/
-/*  	     	    	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

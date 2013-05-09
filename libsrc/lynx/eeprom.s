@@ -42,10 +42,10 @@
 ;****************
 
 
-      	.export         _lynx_eeprom_read
+        .export         _lynx_eeprom_read
         .export         _lynx_eeprom_write
         .export         _lynx_eeprom_erase
-      	.import         popa
+        .import         popa
         .importzp       ptr1
 
         .include        "lynx.inc"

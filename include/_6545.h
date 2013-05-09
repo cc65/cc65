@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    _6545.h				     */
+/*                                  _6545.h                                  */
 /*                                                                           */
-/*		  Internal include file, do not use directly		     */
+/*                Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -40,8 +40,8 @@
 
 /* Define a structure with the 6545 register offsets */
 struct __6545 {
-    unsigned char      	ctrl;	   	/* Control register */
-    unsigned char	data;	   	/* Data register */
+    unsigned char       ctrl;           /* Control register */
+    unsigned char       data;           /* Data register */
 };
 
 

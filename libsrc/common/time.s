@@ -4,7 +4,7 @@
 ; time_t __fastcall__ time (time_t* timep);
 ;
 
-	.export		_time
+        .export         _time
 
         .import         __systime
         .importzp       ptr1, sreg, tmp1

@@ -5,18 +5,18 @@
 
 ; char RenameFile  (char *old, char *new);
 
-	    .export _RenameFile
-	    .import popax, setoserror
+            .export _RenameFile
+            .import popax, setoserror
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+            .include "geossym.inc"
 
 _RenameFile:
-	sta r0L
-	stx r0H
-	jsr popax
-	sta r6L
-	stx r6H
-	jsr RenameFile
-	jmp setoserror
+        sta r0L
+        stx r0H
+        jsr popax
+        sta r6L
+        stx r6H
+        jsr RenameFile
+        jmp setoserror

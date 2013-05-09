@@ -6,8 +6,8 @@
 ; const void joy_static_stddrv[];
 ;
 
-        .export	_joy_static_stddrv
-        .import	_c64_stdjoy_joy
+        .export _joy_static_stddrv
+        .import _c64_stdjoy_joy
 
 .rodata
 

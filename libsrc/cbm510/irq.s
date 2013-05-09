@@ -2,8 +2,8 @@
 ; IRQ handling (CBM 500 version)
 ;
 
-	.export		initirq, doneirq
+        .export         initirq, doneirq
 
 initirq:
 doneirq:
-	rts
+        rts

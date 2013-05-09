@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    stmt.c                                   */
+/*                                  stmt.c                                   */
 /*                                                                           */
-/*			       Parse a statement                             */
+/*                             Parse a statement                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -66,7 +66,7 @@
 
 
 /*****************************************************************************/
-/*			       Helper functions                              */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -94,11 +94,11 @@ static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
  */
 {
     if (CurTok.Tok != Tok) {
-   	Error ("%s", Msg);
+        Error ("%s", Msg);
     } else if (PendingToken) {
-   	*PendingToken = 1;
+        *PendingToken = 1;
     } else {
-   	NextToken ();
+        NextToken ();
     }
 }
 
@@ -115,7 +115,7 @@ static void CheckSemi (int* PendingToken)
 {
     int HaveToken = (CurTok.Tok == TOK_SEMI);
     if (!HaveToken) {
-   	Error ("`;' expected");
+        Error ("`;' expected");
         /* Try to be smart about errors */
         if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
             HaveToken = 1;
@@ -136,14 +136,14 @@ static void SkipPending (int PendingToken)
 /* Skip the pending token if we have one */
 {
     if (PendingToken) {
-	NextToken ();
+        NextToken ();
     }
 }
 
 
 
 /*****************************************************************************/
-/*	  	  		     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -168,21 +168,21 @@ static int IfStatement (void)
     /* Else clause present? */
     if (CurTok.Tok != TOK_ELSE) {
 
-      	g_defcodelabel (Label1);
+        g_defcodelabel (Label1);
 
-     	/* Since there's no else clause, we're not sure, if the a break
-     	 * statement is really executed.
-     	 */
-      	return 0;
+        /* Since there's no else clause, we're not sure, if the a break
+         * statement is really executed.
+         */
+        return 0;
 
     } else {
 
-    	/* Generate a jump around the else branch */
-     	unsigned Label2 = GetLocalLabel ();
-    	g_jump (Label2);
+        /* Generate a jump around the else branch */
+        unsigned Label2 = GetLocalLabel ();
+        g_jump (Label2);
 
-    	/* Skip the else */
-     	NextToken ();
+        /* Skip the else */
+        NextToken ();
 
         /* If the if expression was always true, the code in the else branch
          * is never executed. Output a warning if this is the case.
@@ -191,17 +191,17 @@ static int IfStatement (void)
             Warning ("Unreachable code");
         }
 
-    	/* Define the target for the first test */
-    	g_defcodelabel (Label1);
+        /* Define the target for the first test */
+        g_defcodelabel (Label1);
 
-    	/* Total break only if both branches had a break. */
-     	GotBreak &= Statement (0);
+        /* Total break only if both branches had a break. */
+        GotBreak &= Statement (0);
 
-     	/* Generate the label for the else clause */
-    	g_defcodelabel (Label2);
+        /* Generate the label for the else clause */
+        g_defcodelabel (Label2);
 
-     	/* Done */
-     	return GotBreak;
+        /* Done */
+        return GotBreak;
     }
 }
 
@@ -314,25 +314,25 @@ static void ReturnStatement (void)
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
 
-	/* Evaluate the return expression */
-	hie0 (&Expr);
+        /* Evaluate the return expression */
+        hie0 (&Expr);
 
         /* If we return something in a void function, print an error and
          * ignore the value. Otherwise convert the value to the type of the
          * return.
          */
-       	if (F_HasVoidReturn (CurrentFunc)) {
-       	    Error ("Returning a value in function with return type void");
-       	} else {
-	    /* Convert the return value to the type of the function result */
-	    TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
+        if (F_HasVoidReturn (CurrentFunc)) {
+            Error ("Returning a value in function with return type void");
+        } else {
+            /* Convert the return value to the type of the function result */
+            TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
-	    /* Load the value into the primary */
-	    LoadExpr (CF_NONE, &Expr);
-    	}
+            /* Load the value into the primary */
+            LoadExpr (CF_NONE, &Expr);
+        }
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
-    	Error ("Function `%s' must return a value", F_GetFuncName (CurrentFunc));
+        Error ("Function `%s' must return a value", F_GetFuncName (CurrentFunc));
     }
 
     /* Mark the function as having a return statement */
@@ -360,9 +360,9 @@ static void BreakStatement (void)
 
     /* Check if we are inside a loop */
     if (L == 0) {
-     	/* Error: No current loop */
-     	Error ("`break' statement not within loop or switch");
-     	return;
+        /* Error: No current loop */
+        Error ("`break' statement not within loop or switch");
+        return;
     }
 
     /* Correct the stack pointer if needed */
@@ -385,19 +385,19 @@ static void ContinueStatement (void)
     /* Get the current loop descriptor */
     L = CurrentLoop ();
     if (L) {
-     	/* Search for a loop that has a continue label. */
-     	do {
-     	    if (L->ContinueLabel) {
-     	    	break;
-     	    }
-     	    L = L->Next;
-     	} while (L);
+        /* Search for a loop that has a continue label. */
+        do {
+            if (L->ContinueLabel) {
+                break;
+            }
+            L = L->Next;
+        } while (L);
     }
 
     /* Did we find it? */
     if (L == 0) {
-     	Error ("`continue' statement not within a loop");
-     	return;
+        Error ("`continue' statement not within a loop");
+        return;
     }
 
     /* Correct the stackpointer if needed */
@@ -438,7 +438,7 @@ static void ForStatement (void)
 
     /* Parse the initializer expression */
     if (CurTok.Tok != TOK_SEMI) {
-    	Expression0 (&lval1);
+        Expression0 (&lval1);
     }
     ConsumeSemi ();
 
@@ -448,9 +448,9 @@ static void ForStatement (void)
     /* Parse the test expression */
     if (CurTok.Tok != TOK_SEMI) {
         Test (BodyLabel, 1);
-    	g_jump (BreakLabel);
+        g_jump (BreakLabel);
     } else {
-    	g_jump (BodyLabel);
+        g_jump (BodyLabel);
     }
     ConsumeSemi ();
 
@@ -463,7 +463,7 @@ static void ForStatement (void)
     /* Parse the increment expression */
     HaveIncExpr = (CurTok.Tok != TOK_RPAREN);
     if (HaveIncExpr) {
-    	Expression0 (&lval3);
+        Expression0 (&lval3);
     }
 
     /* Jump to the test */
@@ -486,10 +486,10 @@ static void ForStatement (void)
     if (HaveIncExpr) {
         CodeMark Here;
         GetCodePos (&Here);
-       	MoveCode (&IncExprStart, &IncExprEnd, &Here);
+        MoveCode (&IncExprStart, &IncExprEnd, &Here);
     } else {
-    	/* Jump back to the increment expression */
-    	g_jump (IncLabel);
+        /* Jump back to the increment expression */
+        g_jump (IncLabel);
     }
 
     /* Skip a pending token if we have one */
@@ -523,16 +523,16 @@ static int CompoundStatement (void)
     /* Now process statements in this block */
     GotBreak = 0;
     while (CurTok.Tok != TOK_RCURLY) {
-     	if (CurTok.Tok != TOK_CEOF) {
-     	    GotBreak = Statement (0);
-     	} else {
-     	    break;
-     	}
+        if (CurTok.Tok != TOK_CEOF) {
+            GotBreak = Statement (0);
+        } else {
+            break;
+        }
     }
 
     /* Clean up the stack. */
     if (!GotBreak) {
-	g_space (StackPtr - OldStack);
+        g_space (StackPtr - OldStack);
     }
     StackPtr = OldStack;
 
@@ -563,15 +563,15 @@ int Statement (int* PendingToken)
 
     /* Assume no pending token */
     if (PendingToken) {
-	*PendingToken = 0;
+        *PendingToken = 0;
     }
 
     /* Check for a label. A label is always part of a statement, it does not
      * replace one.
      */
     while (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
-	/* Handle the label */
-	DoLabel ();
+        /* Handle the label */
+        DoLabel ();
         if (CheckLabelWithoutStatement ()) {
             return 0;
         }

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   condasm.c				     */
+/*                                 condasm.c                                 */
 /*                                                                           */
-/*		     Conditional assembly support for ca65		     */
+/*                   Conditional assembly support for ca65                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,21 +46,21 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Maximum count of nested .ifs */
-#define MAX_IFS		256
+#define MAX_IFS         256
 
 /* Set of bitmapped flags for the if descriptor */
 enum {
-    ifNone	= 0x0000,               /* No flag */
-    ifCond	= 0x0001,               /* IF condition was true */
+    ifNone      = 0x0000,               /* No flag */
+    ifCond      = 0x0001,               /* IF condition was true */
     ifParentCond= 0x0002,               /* IF condition of parent */
-    ifElse     	= 0x0004,               /* We had a .ELSE branch */
-    ifNeedTerm 	= 0x0008,               /* Need .ENDIF termination */
+    ifElse      = 0x0004,               /* We had a .ELSE branch */
+    ifNeedTerm  = 0x0008,               /* Need .ENDIF termination */
 };
 
 /* The overall .IF condition */
@@ -69,7 +69,7 @@ int IfCond      = 1;
 
 
 /*****************************************************************************/
-/*		    		 struct IfDesc				     */
+/*                               struct IfDesc                               */
 /*****************************************************************************/
 
 
@@ -77,9 +77,9 @@ int IfCond      = 1;
 /* One .IF descriptor */
 typedef struct IfDesc IfDesc;
 struct IfDesc {
-    unsigned   	Flags; 	       	/* Bitmapped flags, see above */
+    unsigned    Flags;          /* Bitmapped flags, see above */
     Collection  LineInfos;      /* File position of the .IF */
-    const char* Name;	      	/* Name of the directive */
+    const char* Name;           /* Name of the directive */
 };
 
 /* The .IF stack */
@@ -92,7 +92,7 @@ static IfDesc* GetCurrentIf (void)
 /* Return the current .IF descriptor */
 {
     if (IfCount == 0) {
-       	return 0;
+        return 0;
     } else {
         return &IfStack[IfCount-1];
     }
@@ -125,9 +125,9 @@ static void SetIfCond (IfDesc* ID, int C)
 /* Set the .IF condition */
 {
     if (C) {
-       	ID->Flags |= ifCond;
+        ID->Flags |= ifCond;
     } else {
-       	ID->Flags &= ~ifCond;
+        ID->Flags &= ~ifCond;
     }
 }
 
@@ -162,7 +162,7 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
 
     /* Check for stack overflow */
     if (IfCount >= MAX_IFS) {
-       	Fatal ("Too many nested .IFs");
+        Fatal ("Too many nested .IFs");
     }
 
     /* Get the next element */
@@ -192,23 +192,23 @@ static void FreeIf (void)
 {
     int Done;
     do {
-       	IfDesc* ID = GetCurrentIf();
-       	if (ID == 0) {
-       	    Error (" Unexpected .ENDIF");
-	    Done = 1;
-       	} else {
-       	    Done = (ID->Flags & ifNeedTerm) != 0;
+        IfDesc* ID = GetCurrentIf();
+        if (ID == 0) {
+            Error (" Unexpected .ENDIF");
+            Done = 1;
+        } else {
+            Done = (ID->Flags & ifNeedTerm) != 0;
             ReleaseFullLineInfo (&ID->LineInfos);
             DoneCollection (&ID->LineInfos);
             --IfCount;
-       	}
+        }
     } while (!Done);
 }
 
 
 
 /*****************************************************************************/
-/*     	       	       	   	     Code			     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -220,10 +220,10 @@ void DoConditionals (void)
 
     do {
 
-    	switch (CurTok.Tok) {
+        switch (CurTok.Tok) {
 
-    	    case TOK_ELSE:
-       	        D = GetCurrentIf ();
+            case TOK_ELSE:
+                D = GetCurrentIf ();
 
                 /* Allow an .ELSE */
                 ElseClause (D, ".ELSE");
@@ -239,12 +239,12 @@ void DoConditionals (void)
                 CalcOverallIfCond ();
 
                 /* Skip .ELSE */
-	       	NextTok ();
-	       	ExpectSep ();
-       	       	break;
+                NextTok ();
+                ExpectSep ();
+                break;
 
-       	    case TOK_ELSEIF:
-	        D = GetCurrentIf ();
+            case TOK_ELSEIF:
+                D = GetCurrentIf ();
                 /* Handle as if there was an .ELSE first */
                 ElseClause (D, ".ELSEIF");
 
@@ -266,172 +266,172 @@ void DoConditionals (void)
 
                 /* Get the new overall condition */
                 CalcOverallIfCond ();
- 	       	break;
+                break;
 
- 	    case TOK_ENDIF:
- 		/* We're done with this .IF.. - remove the descriptor(s) */
- 		FreeIf ();
+            case TOK_ENDIF:
+                /* We're done with this .IF.. - remove the descriptor(s) */
+                FreeIf ();
 
- 	       	/* Be sure not to read the next token until the .IF stack
- 		 * has been cleanup up, since we may be at end of file.
- 		 */
- 		NextTok ();
- 		ExpectSep ();
+                /* Be sure not to read the next token until the .IF stack
+                 * has been cleanup up, since we may be at end of file.
+                 */
+                NextTok ();
+                ExpectSep ();
 
- 		/* Get the new overall condition */
+                /* Get the new overall condition */
                 CalcOverallIfCond ();
- 		break;
+                break;
 
-    	    case TOK_IF:
-	      	D = AllocIf (".IF", 1);
-	      	NextTok ();
-		if (IfCond) {
+            case TOK_IF:
+                D = AllocIf (".IF", 1);
+                NextTok ();
+                if (IfCond) {
                     SetIfCond (D, ConstExpression ());
                     ExpectSep ();
-		}
+                }
                 CalcOverallIfCond ();
-	      	break;
+                break;
 
-	    case TOK_IFBLANK:
-		D = AllocIf (".IFBLANK", 1);
-		NextTok ();
-		if (IfCond) {
+            case TOK_IFBLANK:
+                D = AllocIf (".IFBLANK", 1);
+                NextTok ();
+                if (IfCond) {
                     if (TokIsSep (CurTok.Tok)) {
                         SetIfCond (D, 1);
                     } else {
-		        SetIfCond (D, 0);
+                        SetIfCond (D, 0);
                         SkipUntilSep ();
                     }
-		}
+                }
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFCONST:
-		D = AllocIf (".IFCONST", 1);
-		NextTok ();
-		if (IfCond) {
-		    ExprNode* Expr = Expression();
-		    SetIfCond (D, IsConstExpr (Expr, 0));
-		    FreeExpr (Expr);
-		    ExpectSep ();
-		}
+            case TOK_IFCONST:
+                D = AllocIf (".IFCONST", 1);
+                NextTok ();
+                if (IfCond) {
+                    ExprNode* Expr = Expression();
+                    SetIfCond (D, IsConstExpr (Expr, 0));
+                    FreeExpr (Expr);
+                    ExpectSep ();
+                }
                 CalcOverallIfCond ();
-		break;
+                break;
 
-    	    case TOK_IFDEF:
-	        D = AllocIf (".IFDEF", 1);
-		NextTok ();
-		if (IfCond) {
-       	       	    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
-		    SetIfCond (D, Sym != 0 && SymIsDef (Sym));
-		}
+            case TOK_IFDEF:
+                D = AllocIf (".IFDEF", 1);
+                NextTok ();
+                if (IfCond) {
+                    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
+                    SetIfCond (D, Sym != 0 && SymIsDef (Sym));
+                }
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFNBLANK:
-	     	D = AllocIf (".IFNBLANK", 1);
-		NextTok ();
-		if (IfCond) {
+            case TOK_IFNBLANK:
+                D = AllocIf (".IFNBLANK", 1);
+                NextTok ();
+                if (IfCond) {
                     if (TokIsSep (CurTok.Tok)) {
                         SetIfCond (D, 0);
                     } else {
-		        SetIfCond (D, 1);
+                        SetIfCond (D, 1);
                         SkipUntilSep ();
                     }
-	  	}
+                }
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFNCONST:
-		D = AllocIf (".IFNCONST", 1);
-		NextTok ();
-		if (IfCond) {
-		    ExprNode* Expr = Expression();
-		    SetIfCond (D, !IsConstExpr (Expr, 0));
-		    FreeExpr (Expr);
-		    ExpectSep ();
-		}
+            case TOK_IFNCONST:
+                D = AllocIf (".IFNCONST", 1);
+                NextTok ();
+                if (IfCond) {
+                    ExprNode* Expr = Expression();
+                    SetIfCond (D, !IsConstExpr (Expr, 0));
+                    FreeExpr (Expr);
+                    ExpectSep ();
+                }
                 CalcOverallIfCond ();
-		break;
+                break;
 
-    	    case TOK_IFNDEF:
-	        D = AllocIf (".IFNDEF", 1);
-		NextTok ();
-		if (IfCond) {
-		    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
-		    SetIfCond (D, Sym == 0 || !SymIsDef (Sym));
-		    ExpectSep ();
-		}
+            case TOK_IFNDEF:
+                D = AllocIf (".IFNDEF", 1);
+                NextTok ();
+                if (IfCond) {
+                    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
+                    SetIfCond (D, Sym == 0 || !SymIsDef (Sym));
+                    ExpectSep ();
+                }
                 CalcOverallIfCond ();
-    	     	break;
+                break;
 
-	    case TOK_IFNREF:
-	        D = AllocIf (".IFNREF", 1);
-		NextTok ();
-		if (IfCond) {
-		    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
-		    SetIfCond (D, Sym == 0 || !SymIsRef (Sym));
-		    ExpectSep ();
-	     	}
+            case TOK_IFNREF:
+                D = AllocIf (".IFNREF", 1);
+                NextTok ();
+                if (IfCond) {
+                    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
+                    SetIfCond (D, Sym == 0 || !SymIsRef (Sym));
+                    ExpectSep ();
+                }
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFP02:
-       	       	D = AllocIf (".IFP02", 1);
-		NextTok ();
-		if (IfCond) {
-		    SetIfCond (D, GetCPU() == CPU_6502);
-		}
-		ExpectSep ();
+            case TOK_IFP02:
+                D = AllocIf (".IFP02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_6502);
+                }
+                ExpectSep ();
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFP816:
-		D = AllocIf (".IFP816", 1);
-	  	NextTok ();
-		if (IfCond) {
-       	       	    SetIfCond (D, GetCPU() == CPU_65816);
-		}
-		ExpectSep ();
+            case TOK_IFP816:
+                D = AllocIf (".IFP816", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_65816);
+                }
+                ExpectSep ();
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFPC02:
-		D = AllocIf (".IFPC02", 1);
-		NextTok ();
-		if (IfCond) {
-       	       	    SetIfCond (D, GetCPU() == CPU_65C02);
-		}
-		ExpectSep ();
+            case TOK_IFPC02:
+                D = AllocIf (".IFPC02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_65C02);
+                }
+                ExpectSep ();
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFPSC02:
-		D = AllocIf (".IFPSC02", 1);
-		NextTok ();
-		if (IfCond) {
-       	       	    SetIfCond (D, GetCPU() == CPU_65SC02);
-		}
-		ExpectSep ();
+            case TOK_IFPSC02:
+                D = AllocIf (".IFPSC02", 1);
+                NextTok ();
+                if (IfCond) {
+                    SetIfCond (D, GetCPU() == CPU_65SC02);
+                }
+                ExpectSep ();
                 CalcOverallIfCond ();
-		break;
+                break;
 
-	    case TOK_IFREF:
-	        D = AllocIf (".IFREF", 1);
-     		NextTok ();
-     		if (IfCond) {
-		    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
-		    SetIfCond (D, Sym != 0 && SymIsRef (Sym));
-		    ExpectSep ();
-     		}
+            case TOK_IFREF:
+                D = AllocIf (".IFREF", 1);
+                NextTok ();
+                if (IfCond) {
+                    SymEntry* Sym = ParseAnySymName (SYM_FIND_EXISTING);
+                    SetIfCond (D, Sym != 0 && SymIsRef (Sym));
+                    ExpectSep ();
+                }
                 CalcOverallIfCond ();
-     		break;
+                break;
 
-     	    default:
-     		/* Skip tokens */
-     		NextTok ();
+            default:
+                /* Skip tokens */
+                NextTok ();
 
-     	}
+        }
 
     } while (IfCond == 0 && CurTok.Tok != TOK_EOF);
 }
@@ -479,24 +479,24 @@ void CheckOpenIfs (void)
     const LineInfo* LI;
 
     while (1) {
-	/* Get the current file number and check if the topmost entry on the
-	 * .IF stack was inserted with this file number
-	 */
-	IfDesc* D = GetCurrentIf ();
-	if (D == 0) {
-	    /* There are no open .IFs */
-	    break;
-	}
+        /* Get the current file number and check if the topmost entry on the
+         * .IF stack was inserted with this file number
+         */
+        IfDesc* D = GetCurrentIf ();
+        if (D == 0) {
+            /* There are no open .IFs */
+            break;
+        }
 
         LI = CollConstAt (&D->LineInfos, 0);
-       	if (GetSourcePos (LI)->Name != CurTok.Pos.Name) {
-	    /* The .if is from another file, bail out */
-	    break;
-	}
+        if (GetSourcePos (LI)->Name != CurTok.Pos.Name) {
+            /* The .if is from another file, bail out */
+            break;
+        }
 
-       	/* Start of .if is in the file we're about to leave */
-	LIError (&D->LineInfos, "Conditional assembly branch was never closed");
-	FreeIf ();
+        /* Start of .if is in the file we're about to leave */
+        LIError (&D->LineInfos, "Conditional assembly branch was never closed");
+        FreeIf ();
     }
 
     /* Calculate the new overall .IF condition */
@@ -517,7 +517,7 @@ void CleanupIfStack (unsigned SP)
 /* Cleanup the .IF stack, remove anything above the given stack pointer */
 {
     while (IfCount > SP) {
-	FreeIf ();
+        FreeIf ();
     }
 
     /* Calculate the new overall .IF condition */

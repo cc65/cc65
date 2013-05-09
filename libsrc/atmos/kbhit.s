@@ -4,9 +4,9 @@
 ; int kbhit (void);
 ;
 
-	.export		_kbhit
+        .export         _kbhit
 
-	.include	"atmos.inc"
+        .include        "atmos.inc"
 
 _kbhit:
         ldx     #$00            ; Load high byte

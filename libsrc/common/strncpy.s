@@ -4,9 +4,9 @@
 ; char* __fastcall__ strncpy (char* dest, const char* src, unsigned size);
 ;
 
-	.export	   	_strncpy
-	.import	   	popax
-	.importzp  	ptr1, ptr2, tmp1, tmp2, tmp3
+        .export         _strncpy
+        .import         popax
+        .importzp       ptr1, ptr2, tmp1, tmp2, tmp3
 
 .proc   _strncpy
 
@@ -16,18 +16,18 @@
         eor     #$FF
         sta     tmp2            ; Store -size - 1
 
-       	jsr    	popax 	  	; get src
-	sta	ptr1
-	stx	ptr1+1
-	jsr	popax 		; get dest
-	sta	ptr2
-	stx	ptr2+1
-       	stx    	tmp3            ; remember for function return
+        jsr     popax           ; get src
+        sta     ptr1
+        stx     ptr1+1
+        jsr     popax           ; get dest
+        sta     ptr2
+        stx     ptr2+1
+        stx     tmp3            ; remember for function return
 
 ; Copy src -> dest up to size bytes
 
         ldx     tmp1            ; Load low byte of ones complement of size
-	ldy	#$00
+        ldy     #$00
 L1:     inx
         bne     L2
         inc     tmp2

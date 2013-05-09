@@ -5,17 +5,17 @@
 
 ; char CmpFString (char length, char *dest, char* source);
 
-	    .import DoubleSPop, SetPtrXY
-	    .import popa, return0, return1
-	    .export _CmpFString
+            .import DoubleSPop, SetPtrXY
+            .import popa, return0, return1
+            .export _CmpFString
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _CmpFString:
-	jsr DoubleSPop
-	jsr popa
-	jsr SetPtrXY
-	jsr CmpFString
-	bne L1
-	jmp return0
-L1:	jmp return1
+        jsr DoubleSPop
+        jsr popa
+        jsr SetPtrXY
+        jsr CmpFString
+        bne L1
+        jmp return0
+L1:     jmp return1

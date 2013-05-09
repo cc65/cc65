@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -59,7 +59,7 @@
 typedef struct Scope Scope;
 struct Scope {
     unsigned            Id;             /* Id of scope */
-    ObjData*   	    	Obj;	    	/* Object file that contains the scope */
+    ObjData*            Obj;            /* Object file that contains the scope */
     unsigned            ParentId;       /* Id of parent scope */
     unsigned            LabelId;        /* Id of the scope label if any */
     unsigned            LexicalLevel;   /* Lexical level */
@@ -73,7 +73,7 @@ struct Scope {
 
 
 /*****************************************************************************/
-/*     	      	    	 	     Code			       	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

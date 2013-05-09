@@ -5,8 +5,8 @@
 
 ; void DoPreviousMenu (void);
 
-	    .export _DoPreviousMenu
+            .export _DoPreviousMenu
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_DoPreviousMenu	= DoPreviousMenu
+_DoPreviousMenu = DoPreviousMenu

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    goto.c				     */
+/*                                  goto.c                                   */
 /*                                                                           */
-/*		Goto and label handling for the cc65 C compiler		     */
+/*              Goto and label handling for the cc65 C compiler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*   				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -56,15 +56,15 @@ void GotoStatement (void)
     /* Label name must follow */
     if (CurTok.Tok != TOK_IDENT) {
 
-       	Error ("Label name expected");
+        Error ("Label name expected");
 
     } else {
 
-     	/* Add a new label symbol if we don't have one until now */
-     	SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF);
+        /* Add a new label symbol if we don't have one until now */
+        SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF);
 
-     	/* Jump to the label */
-     	g_jump (Entry->V.Label);
+        /* Jump to the label */
+        g_jump (Entry->V.Label);
     }
 
     /* Eat the label name */

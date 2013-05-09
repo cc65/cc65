@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.h				     */
+/*                                 scanner.h                                 */
 /*                                                                           */
-/*		Configuration file scanner for the ld65 linker		     */
+/*              Configuration file scanner for the ld65 linker               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Data     				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -153,17 +153,17 @@ typedef enum {
 /* Mapping table entry, special identifier --> token */
 typedef struct IdentTok IdentTok;
 struct IdentTok {
-    const char*	Ident;	     	/* Identifier */
-    cfgtok_t	Tok;	     	/* Token for identifier */
+    const char* Ident;          /* Identifier */
+    cfgtok_t    Tok;            /* Token for identifier */
 };
-#define ENTRY_COUNT(s) 	(sizeof (s) / sizeof (s [0]))
+#define ENTRY_COUNT(s)  (sizeof (s) / sizeof (s [0]))
 
 
 
 /* Current token and attributes */
-extern cfgtok_t	    	CfgTok;
+extern cfgtok_t         CfgTok;
 extern StrBuf           CfgSVal;
-extern unsigned long	CfgIVal;
+extern unsigned long    CfgIVal;
 
 /* Error location. PLEASE NOTE: I'm abusing the FilePos structure to some
  * degree. It is used mostly to hold a file position, where the Name member
@@ -177,7 +177,7 @@ extern FilePos          CfgErrorPos;
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

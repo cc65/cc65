@@ -6,8 +6,8 @@
 ; const void tgi_static_stddrv[];
 ;
 
-        .export	_tgi_static_stddrv
-        .import	_lynx_160_102_16_tgi
+        .export _tgi_static_stddrv
+        .import _lynx_160_102_16_tgi
 
 .rodata
 

@@ -4,9 +4,9 @@
 ; void clrscr (void);
 ;
 
-	.export		_clrscr
+        .export         _clrscr
 
-	.include	"vic20.inc"
+        .include        "vic20.inc"
 
 _clrscr = CLRSCR
 

@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*		     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -54,12 +54,12 @@ unsigned HexVal (int C)
  */
 {
     if (!IsXDigit (C)) {
-	Error ("Invalid hexadecimal digit: `%c'", C);
+        Error ("Invalid hexadecimal digit: `%c'", C);
     }
     if (IsDigit (C)) {
-	return C - '0';
+        return C - '0';
     } else {
-       	return toupper (C) - 'A' + 10;
+        return toupper (C) - 'A' + 10;
     }
 }
 

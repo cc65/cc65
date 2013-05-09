@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	       			   asmstmt.h                                 */
+/*                                 asmstmt.h                                 */
 /*                                                                           */
-/*	      Inline assembler statements for the cc65 C compiler            */
+/*            Inline assembler statements for the cc65 C compiler            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001    	 Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*	      			     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

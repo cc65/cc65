@@ -5,18 +5,18 @@
 
 ; void VerticalLine   (char pattern, char ystart, char yend, int x);
 
-	    .import popa 
-	    .export _VerticalLine
+            .import popa 
+            .export _VerticalLine
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
-	    
+            .include "jumptab.inc"
+            .include "geossym.inc"
+            
 _VerticalLine:
-	stx r4H
-	sta r4L
-	jsr popa
-	sta r3H
-	jsr popa
-	sta r3L
-	jsr popa
-	jmp VerticalLine
+        stx r4H
+        sta r4L
+        jsr popa
+        sta r3H
+        jsr popa
+        sta r3L
+        jsr popa
+        jmp VerticalLine

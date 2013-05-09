@@ -36,7 +36,7 @@
 
 
 /*****************************************************************************/
-/*	       	   	  	     Data	   			     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -113,11 +113,11 @@ struct dirent {
 #elif defined(__LYNX__)
 
 struct dirent {
-    unsigned char	d_blocks;
-    unsigned int	d_offset;
-    char		d_type;
-    void		*d_address;
-    unsigned int	d_size;
+    unsigned char       d_blocks;
+    unsigned int        d_offset;
+    char                d_type;
+    void                *d_address;
+    unsigned int        d_size;
 };
 
 extern struct dirent FileEntry;
@@ -144,7 +144,7 @@ struct dirent {
 
 
 /*****************************************************************************/
-/*		   		     Code	   			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

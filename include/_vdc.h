@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    _vdc.h				     */
+/*                                  _vdc.h                                   */
 /*                                                                           */
-/*		  Internal include file, do not use directly		     */
+/*                Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -40,8 +40,8 @@
 
 /* Define a structure with the vdc register offsets */
 struct __vdc {
-    unsigned char      	ctrl;		/* Control register */
-    unsigned char	data;	  	/* Data register */
+    unsigned char       ctrl;           /* Control register */
+    unsigned char       data;           /* Data register */
 };
 
 

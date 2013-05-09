@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   stdlib.h				     */
+/*                                 stdlib.h                                  */
 /*                                                                           */
-/*			       General utilities			     */
+/*                             General utilities                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,8 +45,8 @@ typedef unsigned size_t;
 #endif
 
 /* Standard exit codes */
-#define EXIT_SUCCESS	0
-#define EXIT_FAILURE	1
+#define EXIT_SUCCESS    0
+#define EXIT_FAILURE    1
 
 /* Return type of the div function */
 typedef struct {
@@ -94,7 +94,7 @@ size_t _heapmaxavail (void);
 
 
 /* Random numbers */
-#define	RAND_MAX   	0x7FFF
+#define RAND_MAX        0x7FFF
 int rand (void);
 void __fastcall__ srand (unsigned seed);
 void _randomize (void);         /* Non-standard */
@@ -107,12 +107,12 @@ int __fastcall__ atoi (const char* s);
 long __fastcall__ atol (const char* s);
 int __fastcall__ atexit (void (*exitfunc) (void));
 void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
-	                    size_t size, int (*cmp) (const void*, const void*));
+                            size_t size, int (*cmp) (const void*, const void*));
 div_t __fastcall__ div (int numer, int denom);
 void __fastcall__ exit (int ret) __attribute__ ((noreturn));
 char* __fastcall__ getenv (const char* name);
 void __fastcall__ qsort (void* base, size_t count, size_t size,
-	                 int (*compare) (const void*, const void*));
+                         int (*compare) (const void*, const void*));
 long __fastcall__ strtol (const char* nptr, char** endptr, int base);
 unsigned long __fastcall__ strtoul (const char* nptr, char** endptr, int base);
 int __fastcall__ system (const char* s);

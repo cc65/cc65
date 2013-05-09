@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   istack.c				     */
+/*                                 istack.c                                  */
 /*                                                                           */
-/*			  Input stack for the scanner			     */
+/*                        Input stack for the scanner                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,31 +44,31 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			   	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Size of the stack (== maximum nested macro or repeat count) */
-#define ISTACK_MAX  	256
+#define ISTACK_MAX      256
 
 /* Structure holding a stack element */
 typedef struct IElement IElement;
 struct IElement {
-    IElement*  	Next;		/* Next stack element */
-    int	       	(*Func)(void*);	/* Function called for input */
-    void*      	Data;	  	/* User data given as argument */
-    const char* Desc;		/* Description */
+    IElement*   Next;           /* Next stack element */
+    int         (*Func)(void*); /* Function called for input */
+    void*       Data;           /* User data given as argument */
+    const char* Desc;           /* Description */
 };
 
 /* The stack */
-static IElement* IStack = 0;	/* Input stack pointer */
-static unsigned  ICount	= 0;	/* Number of items on the stack */
+static IElement* IStack = 0;    /* Input stack pointer */
+static unsigned  ICount = 0;    /* Number of items on the stack */
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code	 		   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -80,7 +80,7 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
 
     /* Check for a stack overflow */
     if (ICount > ISTACK_MAX) {
-    	Fatal ("Maximum input stack nesting exceeded");
+        Fatal ("Maximum input stack nesting exceeded");
     }                                                
 
     /* Create a new stack element */
@@ -127,10 +127,10 @@ int InputFromStack (void)
      * routines.
      */
     while (IStack) {
-	if (IStack->Func (IStack->Data) != 0) {
-	    /* We have a token */
-	    return 1;
-	}
+        if (IStack->Func (IStack->Data) != 0) {
+            /* We have a token */
+            return 1;
+        }
     }
 
     /* Nothing is on the stack */
@@ -153,7 +153,7 @@ void CheckInputStack (void)
  */
 {
     if (IStack) {
-	Error ("Open %s", IStack->Desc);
+        Error ("Open %s", IStack->Desc);
     }
 }
 

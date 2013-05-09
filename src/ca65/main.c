@@ -1,7 +1,7 @@
 /*                                                                           */
-/*				    main.c				     */
+/*                                  main.c                                   */
 /*                                                                           */
-/*		   Main program for the ca65 macroassembler		     */
+/*                 Main program for the ca65 macroassembler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -81,7 +81,7 @@
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -168,7 +168,7 @@ static void NewSymbol (const char* SymName, long Val)
 
     /* Check if have already a symbol with this name */
     if (SymIsDef (Sym)) {
-    	AbEnd ("`%s' is already defined", SymName);
+        AbEnd ("`%s' is already defined", SymName);
     }
 
     /* Generate an expression for the symbol */
@@ -197,75 +197,75 @@ static void SetSys (const char* Sys)
 {
     switch (Target = FindTarget (Sys)) {
 
-	case TGT_NONE:
-	    break;
+        case TGT_NONE:
+            break;
 
         case TGT_MODULE:
             AbEnd ("Cannot use `module' as a target for the assembler");
             break;
 
-	case TGT_ATARI:
-    	    NewSymbol ("__ATARI__", 1);
-	    break;
+        case TGT_ATARI:
+            NewSymbol ("__ATARI__", 1);
+            break;
 
-	case TGT_C16:
-	    CBMSystem ("__C16__");
-	    break;
+        case TGT_C16:
+            CBMSystem ("__C16__");
+            break;
 
-	case TGT_C64:
-	    CBMSystem ("__C64__");
-	    break;
+        case TGT_C64:
+            CBMSystem ("__C64__");
+            break;
 
-	case TGT_VIC20:
-	    CBMSystem ("__VIC20__");
-	    break;
+        case TGT_VIC20:
+            CBMSystem ("__VIC20__");
+            break;
 
-	case TGT_C128:
-	    CBMSystem ("__C128__");
-	    break;
+        case TGT_C128:
+            CBMSystem ("__C128__");
+            break;
 
-	case TGT_PLUS4:
-	    CBMSystem ("__PLUS4__");
-	    break;
+        case TGT_PLUS4:
+            CBMSystem ("__PLUS4__");
+            break;
 
-	case TGT_CBM510:
-	    CBMSystem ("__CBM510__");
-	    break;
+        case TGT_CBM510:
+            CBMSystem ("__CBM510__");
+            break;
 
-	case TGT_CBM610:
-	    CBMSystem ("__CBM610__");
-	    break;
+        case TGT_CBM610:
+            CBMSystem ("__CBM610__");
+            break;
 
-	case TGT_PET:
-     	    CBMSystem ("__PET__");
-     	    break;
+        case TGT_PET:
+            CBMSystem ("__PET__");
+            break;
 
-     	case TGT_BBC:
-     	    NewSymbol ("__BBC__", 1);
-     	    break;
+        case TGT_BBC:
+            NewSymbol ("__BBC__", 1);
+            break;
 
-     	case TGT_APPLE2:
-     	    NewSymbol ("__APPLE2__", 1);
-     	    break;
+        case TGT_APPLE2:
+            NewSymbol ("__APPLE2__", 1);
+            break;
 
-     	case TGT_APPLE2ENH:
+        case TGT_APPLE2ENH:
             NewSymbol ("__APPLE2ENH__", 1);
-     	    break;
+            break;
 
-     	case TGT_GEOS_CBM:
-     	    /* Do not handle as a CBM system */
-     	    NewSymbol ("__GEOS__", 1);
-     	    NewSymbol ("__GEOS_CBM__", 1);
-     	    break;
+        case TGT_GEOS_CBM:
+            /* Do not handle as a CBM system */
+            NewSymbol ("__GEOS__", 1);
+            NewSymbol ("__GEOS_CBM__", 1);
+            break;
 
-     	case TGT_GEOS_APPLE:
-     	    NewSymbol ("__GEOS__", 1);
-     	    NewSymbol ("__GEOS_APPLE__", 1);
-     	    break;
+        case TGT_GEOS_APPLE:
+            NewSymbol ("__GEOS__", 1);
+            NewSymbol ("__GEOS_APPLE__", 1);
+            break;
 
-	case TGT_LUNIX:
-	    NewSymbol ("__LUNIX__", 1);
-	    break;
+        case TGT_LUNIX:
+            NewSymbol ("__LUNIX__", 1);
+            break;
 
         case TGT_ATMOS:
             NewSymbol ("__ATMOS__", 1);
@@ -283,7 +283,7 @@ static void SetSys (const char* Sys)
             NewSymbol ("__LYNX__", 1);
             break;
 
-     	default:
+        default:
             AbEnd ("Invalid target name: `%s'", Sys);
 
     }
@@ -318,7 +318,7 @@ static void DefineSymbol (const char* Def)
 
     /* The symbol must start with a character or underline */
     if (!IsIdStart (Def [0])) {
-	InvDef (Def);
+        InvDef (Def);
     }
     P = Def;
 
@@ -330,23 +330,23 @@ static void DefineSymbol (const char* Def)
 
     /* Do we have a value given? */
     if (*P != '=') {
-	if (*P != '\0') {
-	    InvDef (Def);
-	}
-	Val = 0;
+        if (*P != '\0') {
+            InvDef (Def);
+        }
+        Val = 0;
     } else {
-    	/* We have a value */
-    	++P;
-    	if (*P == '$') {
-    	    ++P;
-    	    if (sscanf (P, "%lx", &Val) != 1) {
-    	       	InvDef (Def);
-    	    }
-    	} else {
-    	    if (sscanf (P, "%li", &Val) != 1) {
-     	       	InvDef (Def);
-    	    }
-       	}
+        /* We have a value */
+        ++P;
+        if (*P == '$') {
+            ++P;
+            if (sscanf (P, "%lx", &Val) != 1) {
+                InvDef (Def);
+            }
+        } else {
+            if (sscanf (P, "%li", &Val) != 1) {
+                InvDef (Def);
+            }
+        }
     }
 
     /* Define the new symbol */
@@ -359,7 +359,7 @@ static void DefineSymbol (const char* Def)
 
 
 static void OptAutoImport (const char* Opt attribute ((unused)),
-    	    	     	   const char* Arg attribute ((unused)))
+                           const char* Arg attribute ((unused)))
 /* Mark unresolved symbols as imported */
 {
     AutoImport = 1;
@@ -380,9 +380,9 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 {
     cpu_t CPU = FindCPU (Arg);
     if (CPU == CPU_UNKNOWN) {
-	AbEnd ("Invalid CPU: `%s'", Arg);
+        AbEnd ("Invalid CPU: `%s'", Arg);
     } else {
-	SetCPU (CPU);
+        SetCPU (CPU);
     }
 }
 
@@ -397,7 +397,7 @@ static void OptCreateDep (const char* Opt, const char* Arg)
 
 
 static void OptCreateFullDep (const char* Opt attribute ((unused)),
-    		      	      const char* Arg)
+                              const char* Arg)
 /* Handle the --create-full-dep option */
 {
     FileNameOption (Opt, Arg, &FullDepName);
@@ -406,7 +406,7 @@ static void OptCreateFullDep (const char* Opt attribute ((unused)),
 
 
 static void OptDebug (const char* Opt attribute ((unused)),
-	       	      const char* Arg attribute ((unused)))
+                      const char* Arg attribute ((unused)))
 /* Compiler debug mode */
 {
     ++Debug;
@@ -415,7 +415,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
-		     	  const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DbgSyms = 1;
@@ -431,14 +431,14 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 
     /* Set the feature, check for errors */
     if (SetFeature (SB_InitFromString (&Feature, Arg)) == FEAT_UNKNOWN) {
-      	AbEnd ("Illegal emulation feature: `%s'", Arg);
+        AbEnd ("Illegal emulation feature: `%s'", Arg);
     }
 }
 
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -448,7 +448,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 static void OptIgnoreCase (const char* Opt attribute ((unused)),
-			   const char* Arg attribute ((unused)))
+                           const char* Arg attribute ((unused)))
 /* Ignore case on symbols */
 {
     IgnoreCase = 1;
@@ -465,7 +465,7 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 
 
 static void OptLargeAlignment (const char* Opt attribute ((unused)),
-			       const char* Arg attribute ((unused)))
+                               const char* Arg attribute ((unused)))
 /* Don't warn about large alignments */
 {
     LargeAlignment = 1;
@@ -541,7 +541,7 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 {
     int Len = atoi (Arg);
     if (Len != -1 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
-	AbEnd ("Invalid page length: %d", Len);
+        AbEnd ("Invalid page length: %d", Len);
     }
     PageLength = Len;
 }
@@ -549,7 +549,7 @@ static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg
 
 
 static void OptRelaxChecks (const char* Opt attribute ((unused)),
-		            const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* Handle the --relax-checks options */
 {
     RelaxChecks = 1;
@@ -558,7 +558,7 @@ static void OptRelaxChecks (const char* Opt attribute ((unused)),
 
 
 static void OptSmart (const char* Opt attribute ((unused)),
-		      const char* Arg attribute ((unused)))
+                      const char* Arg attribute ((unused)))
 /* Handle the -s/--smart options */
 {
     SmartMode = 1;
@@ -575,7 +575,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptVerbose (const char* Opt attribute ((unused)),
-	     		const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -584,7 +584,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr, "ca65 V%s\n", GetVersionAsString ());
@@ -597,9 +597,9 @@ static void DoPCAssign (void)
 {
     long PC = ConstExpression ();
     if (PC < 0 || PC > 0xFFFFFF) {
-	Error ("Range error");
+        Error ("Range error");
     } else {
-	EnterAbsoluteMode (PC);
+        EnterAbsoluteMode (PC);
     }
 }
 
@@ -618,13 +618,13 @@ static void OneLine (void)
      * and not from internally pushed input.
      */
     if (!HavePushedInput ()) {
-       	InitListingLine ();
+        InitListingLine ();
     }
 
     /* Single colon means unnamed label */
     if (CurTok.Tok == TOK_COLON) {
-       	ULabDef ();
-       	NextTok ();
+        ULabDef ();
+        NextTok ();
     }
 
     /* If the first token on the line is an identifier, check for a macro or
@@ -794,7 +794,7 @@ static void Assemble (void)
 
     /* Assemble lines until end of file */
     while (CurTok.Tok != TOK_EOF) {
-     	OneLine ();
+        OneLine ();
     }
 }
 
@@ -850,27 +850,27 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-        { "--auto-import",     	0,	OptAutoImport		},
+        { "--auto-import",      0,      OptAutoImport           },
         { "--bin-include-dir",  1,      OptBinIncludeDir        },
-        { "--cpu",     	       	1,	OptCPU 			},
+        { "--cpu",              1,      OptCPU                  },
         { "--create-dep",       1,      OptCreateDep            },
         { "--create-full-dep",  1,      OptCreateFullDep        },
-       	{ "--debug",           	0,     	OptDebug     		},
-	{ "--debug-info",      	0,	OptDebugInfo		},
-	{ "--feature",		1,	OptFeature		},
-	{ "--help",    		0,	OptHelp			},
-	{ "--ignore-case",     	0,	OptIgnoreCase 		},
-	{ "--include-dir",     	1,	OptIncludeDir		},
+        { "--debug",            0,      OptDebug                },
+        { "--debug-info",       0,      OptDebugInfo            },
+        { "--feature",          1,      OptFeature              },
+        { "--help",             0,      OptHelp                 },
+        { "--ignore-case",      0,      OptIgnoreCase           },
+        { "--include-dir",      1,      OptIncludeDir           },
         { "--large-alignment",  0,      OptLargeAlignment       },
         { "--list-bytes",       1,      OptListBytes            },
-	{ "--listing", 	       	1,	OptListing		},
+        { "--listing",          1,      OptListing              },
         { "--memory-model",     1,      OptMemoryModel          },
-	{ "--pagelength",      	1,	OptPageLength		},
+        { "--pagelength",       1,      OptPageLength           },
         { "--relax-checks",     0,      OptRelaxChecks          },
-    	{ "--smart",   	       	0,	OptSmart		},
-	{ "--target",  		1,	OptTarget		},
-	{ "--verbose", 	       	0,	OptVerbose		},
-	{ "--version", 	       	0,	OptVersion		},
+        { "--smart",            0,      OptSmart                },
+        { "--target",           1,      OptTarget               },
+        { "--verbose",          0,      OptVerbose              },
+        { "--version",          0,      OptVersion              },
     };
 
     /* Name of the global name space */
@@ -904,36 +904,36 @@ int main (int argc, char* argv [])
     I = 1;
     while (I < ArgCount) {
 
-       	/* Get the argument */
-       	const char* Arg = ArgVec [I];
+        /* Get the argument */
+        const char* Arg = ArgVec [I];
 
-       	/* Check for an option */
-       	if (Arg[0] == '-') {
-       	    switch (Arg[1]) {
+        /* Check for an option */
+        if (Arg[0] == '-') {
+            switch (Arg[1]) {
 
-	       	case '-':
-	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-	       	    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
-		case 'd':
-		    OptDebug (Arg, 0);
-		    break;
+                case 'd':
+                    OptDebug (Arg, 0);
+                    break;
 
-       	       	case 'g':
-       	       	    OptDebugInfo (Arg, 0);
-       	       	    break;
+                case 'g':
+                    OptDebugInfo (Arg, 0);
+                    break;
 
-	       	case 'h':
-	       	    OptHelp (Arg, 0);
-	       	    break;
+                case 'h':
+                    OptHelp (Arg, 0);
+                    break;
 
-       	        case 'i':
-       	       	    OptIgnoreCase (Arg, 0);
-       	       	    break;
+                case 'i':
+                    OptIgnoreCase (Arg, 0);
+                    break;
 
-       	       	case 'l':
-	       	    OptListing (Arg, GetArg (&I, 2));
-       	       	    break;
+                case 'l':
+                    OptListing (Arg, GetArg (&I, 2));
+                    break;
 
                 case 'm':
                     if (Arg[2] == 'm') {
@@ -943,66 +943,66 @@ int main (int argc, char* argv [])
                     }
                     break;
 
-       	        case 'o':
-       	    	    OutFile = GetArg (&I, 2);
-       	     	    break;
+                case 'o':
+                    OutFile = GetArg (&I, 2);
+                    break;
 
-       		case 's':
-       		    OptSmart (Arg, 0);
-       		    break;
+                case 's':
+                    OptSmart (Arg, 0);
+                    break;
 
-		case 't':
-		    OptTarget (Arg, GetArg (&I, 2));
-		    break;
+                case 't':
+                    OptTarget (Arg, GetArg (&I, 2));
+                    break;
 
-       	       	case 'v':
-		    OptVerbose (Arg, 0);
-       	       	    break;
+                case 'v':
+                    OptVerbose (Arg, 0);
+                    break;
 
-    	        case 'D':
-    		    DefineSymbol (GetArg (&I, 2));
-    		    break;
+                case 'D':
+                    DefineSymbol (GetArg (&I, 2));
+                    break;
 
-    		case 'I':
-    		    OptIncludeDir (Arg, GetArg (&I, 2));
-    		    break;
+                case 'I':
+                    OptIncludeDir (Arg, GetArg (&I, 2));
+                    break;
 
-       	        case 'U':
-	    	    OptAutoImport (Arg, 0);
-       		    break;
+                case 'U':
+                    OptAutoImport (Arg, 0);
+                    break;
 
-       	        case 'V':
-    	     	    OptVersion (Arg, 0);
-       		    break;
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
 
-       	        case 'W':
-       		    WarnLevel = atoi (GetArg (&I, 2));
-       		    break;
+                case 'W':
+                    WarnLevel = atoi (GetArg (&I, 2));
+                    break;
 
-       	       	default:
-       	       	    UnknownOption (Arg);
-		    break;
+                default:
+                    UnknownOption (Arg);
+                    break;
 
-     	    }
-       	} else {
-    	    /* Filename. Check if we already had one */
-    	    if (InFile) {
-    	       	fprintf (stderr, "%s: Don't know what to do with `%s'\n",
-	     		 ProgName, Arg);
-	     	exit (EXIT_FAILURE);
-    	    } else {
-	     	InFile = Arg;
-	    }
-     	}
+            }
+        } else {
+            /* Filename. Check if we already had one */
+            if (InFile) {
+                fprintf (stderr, "%s: Don't know what to do with `%s'\n",
+                         ProgName, Arg);
+                exit (EXIT_FAILURE);
+            } else {
+                InFile = Arg;
+            }
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Do we have an input file? */
     if (InFile == 0) {
-	fprintf (stderr, "%s: No input files\n", ProgName);
-	exit (EXIT_FAILURE);
+        fprintf (stderr, "%s: No input files\n", ProgName);
+        exit (EXIT_FAILURE);
     }
 
     /* Add the default include search paths. */
@@ -1082,10 +1082,10 @@ int main (int argc, char* argv [])
      * dependency files
      */
     if (ErrorCount == 0) {
-     	CreateObjFile ();
-     	if (SB_GetLen (&ListingName) > 0) {
-     	    CreateListing ();
-     	}
+        CreateObjFile ();
+        if (SB_GetLen (&ListingName) > 0) {
+            CreateListing ();
+        }
        CreateDependencies ();
     }
 

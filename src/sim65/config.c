@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   config.c				     */
+/*                                 config.c                                  */
 /*                                                                           */
 /*            Configuration file parsing for the sim65 6502 simulator        */
 /*                                                                           */
@@ -58,7 +58,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code		  		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -69,7 +69,7 @@ static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
  */
 {
     if (*Flags & Mask) {
-    	CfgError ("%s is already defined", Name);
+        CfgError ("%s is already defined", Name);
     }
     *Flags |= Mask;
 }
@@ -80,7 +80,7 @@ static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
 /* Check that a mandatory attribute was given */
 {
     if ((Attr & Mask) == 0) {
-	CfgError ("%s attribute is missing", Name);
+        CfgError ("%s attribute is missing", Name);
     }
 }
 
@@ -195,8 +195,8 @@ static void ParseAddrSpace (void)
             CfgData* D = NewCfgData ();
             CfgNextTok ();
 
-	    /* An optional assignment follows */
-	    CfgOptionalAssign ();
+            /* An optional assignment follows */
+            CfgOptionalAssign ();
 
             /* Check and assign the attribute value */
             switch (CfgTok) {
@@ -223,13 +223,13 @@ static void ParseAddrSpace (void)
             /* Add the attribute to the location */
             CollAppend (&L->Attributes, D);
 
-	    /* Skip the attribute value and an optional comma */
-	    CfgNextTok ();
-	    CfgOptionalComma ();
-	}
+            /* Skip the attribute value and an optional comma */
+            CfgNextTok ();
+            CfgOptionalComma ();
+        }
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
+        /* Skip the semicolon */
+        CfgConsumeSemi ();
     }
 
     /* Sort all memory locations */
@@ -335,23 +335,23 @@ static void ParseConfig (void)
 /* Parse the config file */
 {
     static const IdentTok BlockNames [] = {
-       	{   "ADDRSPACE",   	CFGTOK_ADDRSPACE 	},
-       	{   "CPU",     	   	CFGTOK_CPU      	},
+        {   "ADDRSPACE",        CFGTOK_ADDRSPACE        },
+        {   "CPU",              CFGTOK_CPU              },
     };
     cfgtok_t BlockTok;
 
     do {
 
-	/* Read the block ident */
-       	CfgSpecialToken (BlockNames, ENTRY_COUNT (BlockNames), "Block identifier");
-	BlockTok = CfgTok;
-	CfgNextTok ();
+        /* Read the block ident */
+        CfgSpecialToken (BlockNames, ENTRY_COUNT (BlockNames), "Block identifier");
+        BlockTok = CfgTok;
+        CfgNextTok ();
 
-	/* Expected a curly brace */
-	CfgConsume (CFGTOK_LCURLY, "`{' expected");
+        /* Expected a curly brace */
+        CfgConsume (CFGTOK_LCURLY, "`{' expected");
 
-	/* Read the block */
-	switch (BlockTok) {
+        /* Read the block */
+        switch (BlockTok) {
 
             case CFGTOK_ADDRSPACE:
                 ParseAddrSpace ();
@@ -361,13 +361,13 @@ static void ParseConfig (void)
                 ParseCPU ();
                 break;
 
-	    default:
-	     	FAIL ("Unexpected block token");
+            default:
+                FAIL ("Unexpected block token");
 
-	}
+        }
 
-	/* Skip closing brace */
-       	CfgConsumeRCurly ();
+        /* Skip closing brace */
+        CfgConsumeRCurly ();
 
     } while (CfgTok != CFGTOK_EOF);
 }

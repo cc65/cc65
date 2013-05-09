@@ -5,13 +5,13 @@
 ; /* Map a system specific error into a system independent code */
 ;
 
-	.include	"errno.inc"
-	.export		__osmaperrno
+        .include        "errno.inc"
+        .export         __osmaperrno
 
-.proc	__osmaperrno
+.proc   __osmaperrno
 
-	lda	#<EUNKNOWN
-	ldx	#>EUNKNOWN
-	rts
+        lda     #<EUNKNOWN
+        ldx     #>EUNKNOWN
+        rts
 
 .endproc

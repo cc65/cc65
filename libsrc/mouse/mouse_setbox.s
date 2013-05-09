@@ -7,10 +7,10 @@
 ;  * NOTE: The function does *not* check if the mouse is currently inside the
 ;  * given margins. The proper way to use this function therefore is:
 ;  *
-;  * 	- Hide the mouse
-;  * 	- Set the bounding box
-;  * 	- Place the mouse at the desired position
-;  * 	- Show the mouse again.
+;  *    - Hide the mouse
+;  *    - Set the bounding box
+;  *    - Place the mouse at the desired position
+;  *    - Show the mouse again.
 ;  *
 ;  * NOTE2: When setting the box to something that is larger than the actual
 ;  * screen, the positioning of the mouse cursor can fail. If such margins

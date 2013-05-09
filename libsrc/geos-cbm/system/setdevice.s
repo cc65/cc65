@@ -5,8 +5,8 @@
 
 ; void SetDevice (char newDeviceNumber);
 
-	    .export _SetDevice
+            .export _SetDevice
 
-	    .include "jumptab.inc"
-	
-_SetDevice	= SetDevice
+            .include "jumptab.inc"
+        
+_SetDevice      = SetDevice

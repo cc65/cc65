@@ -3,15 +3,15 @@
 ;
 
         .export         initcwd
-        .import		__cwd
+        .import         __cwd
 
-        .include	"zeropage.inc"
+        .include        "zeropage.inc"
         .include        "mli.inc"
 
 initcwd:
         ; Set static prefix buffer
-        lda	#<__cwd
-        ldx	#>__cwd
+        lda     #<__cwd
+        ldx     #>__cwd
         sta     mliparam + MLI::PREFIX::PATHNAME
         stx     mliparam + MLI::PREFIX::PATHNAME+1
 
@@ -21,20 +21,20 @@ initcwd:
         jsr     callmli
 
         ; Check for null prefix
-	lda	__cwd
-	beq	done
+        lda     __cwd
+        beq     done
 
-	; Remove length byte and trailing slash
-	sta	tmp1
-	ldx	#$01
-:	lda	__cwd,x
-	sta	__cwd - 1,x
-	inx
-	cpx	tmp1
-	bcc	:-
+        ; Remove length byte and trailing slash
+        sta     tmp1
+        ldx     #$01
+:       lda     __cwd,x
+        sta     __cwd - 1,x
+        inx
+        cpx     tmp1
+        bcc     :-
 
-	; Add terminating zero
-	lda	#$00
-	sta	__cwd - 1,x
-	
-done:	rts
+        ; Add terminating zero
+        lda     #$00
+        sta     __cwd - 1,x
+        
+done:   rts

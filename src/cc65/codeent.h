@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   codeent.h				     */
+/*                                 codeent.h                                 */
 /*                                                                           */
-/*			      Code segment entry			     */
+/*                            Code segment entry                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,29 +53,29 @@
 
 
 /*****************************************************************************/
-/*  	       	     	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Flags used */
-#define CEF_USERMARK 	0x0001U		/* Generic mark by user functions */
-#define CEF_NUMARG   	0x0002U		/* Insn has numerical argument */
+#define CEF_USERMARK    0x0001U         /* Generic mark by user functions */
+#define CEF_NUMARG      0x0002U         /* Insn has numerical argument */
 
 /* Code entry structure */
 typedef struct CodeEntry CodeEntry;
 struct CodeEntry {
-    unsigned char       OPC;		/* Opcode */
-    unsigned char       AM;		/* Adressing mode */
-    unsigned char    	Size;		/* Estimated size */
-    unsigned char       Flags;		/* Flags */
-    char*      	       	Arg;   	       	/* Argument as string */
-    unsigned long    	Num;		/* Numeric argument */
-    unsigned short      Info;		/* Additional code info */
-    unsigned short      Use;		/* Registers used */
-    unsigned short      Chg;		/* Registers changed/destroyed */
-    CodeLabel*	     	JumpTo;		/* Jump label */
-    Collection	     	Labels;		/* Labels for this instruction */
+    unsigned char       OPC;            /* Opcode */
+    unsigned char       AM;             /* Adressing mode */
+    unsigned char       Size;           /* Estimated size */
+    unsigned char       Flags;          /* Flags */
+    char*               Arg;            /* Argument as string */
+    unsigned long       Num;            /* Numeric argument */
+    unsigned short      Info;           /* Additional code info */
+    unsigned short      Use;            /* Registers used */
+    unsigned short      Chg;            /* Registers changed/destroyed */
+    CodeLabel*          JumpTo;         /* Jump label */
+    Collection          Labels;         /* Labels for this instruction */
     LineInfo*           LI;             /* Source line info for this insn */
     RegInfo*            RI;             /* Register info for this insn */
 };
@@ -83,7 +83,7 @@ struct CodeEntry {
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -97,7 +97,7 @@ const char* MakeHexArg (unsigned Num);
  */
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
-   	       	    	 CodeLabel* JumpTo, LineInfo* LI);
+                         CodeLabel* JumpTo, LineInfo* LI);
 /* Create a new code entry, initialize and return it */
 
 void FreeCodeEntry (CodeEntry* E);
@@ -127,7 +127,7 @@ INLINE int CE_HasLabel (const CodeEntry* E)
     return (CollCount (&E->Labels) > 0);
 }
 #else
-#  define CE_HasLabel(E)	(CollCount (&(E)->Labels) > 0)
+#  define CE_HasLabel(E)        (CollCount (&(E)->Labels) > 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -137,7 +137,7 @@ INLINE unsigned CE_GetLabelCount (const CodeEntry* E)
     return CollCount (&E->Labels);
 }
 #else
-#  define CE_GetLabelCount(E)	CollCount (&(E)->Labels)
+#  define CE_GetLabelCount(E)   CollCount (&(E)->Labels)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -147,7 +147,7 @@ INLINE CodeLabel* CE_GetLabel (CodeEntry* E, unsigned Index)
     return CollAt (&E->Labels, Index);
 }
 #else
-#  define CE_GetLabel(E, Index)	CollAt (&(E)->Labels, (Index))
+#  define CE_GetLabel(E, Index) CollAt (&(E)->Labels, (Index))
 #endif
 
 void CE_MoveLabel (CodeLabel* L, CodeEntry* E);
@@ -160,7 +160,7 @@ INLINE int CE_HasMark (const CodeEntry* E)
     return (E->Flags & CEF_USERMARK) != 0;
 }
 #else
-#  define CE_HasMark(E)	(((E)->Flags & CEF_USERMARK) != 0)
+#  define CE_HasMark(E) (((E)->Flags & CEF_USERMARK) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -170,7 +170,7 @@ INLINE void CE_SetMark (CodeEntry* E)
     E->Flags |= CEF_USERMARK;
 }
 #else
-#  define CE_SetMark(E)	((E)->Flags |= CEF_USERMARK)
+#  define CE_SetMark(E) ((E)->Flags |= CEF_USERMARK)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -180,7 +180,7 @@ INLINE void CE_ResetMark (CodeEntry* E)
     E->Flags &= ~CEF_USERMARK;
 }
 #else
-#  define CE_ResetMark(E)	((E)->Flags &= ~CEF_USERMARK)
+#  define CE_ResetMark(E)       ((E)->Flags &= ~CEF_USERMARK)
 #endif
 
 #if defined(HAVE_INLINE)

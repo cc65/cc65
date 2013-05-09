@@ -5,7 +5,7 @@
 ;
 
         .import         TALK
-       	.export	       	_cbm_k_talk := TALK
+        .export         _cbm_k_talk := TALK
 
 
 

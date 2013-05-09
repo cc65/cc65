@@ -4,7 +4,7 @@
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
-#ifndef	_GFILE_H
+#ifndef _GFILE_H
 #define _GFILE_H
 
 #ifndef _GSTRUCT_H
@@ -43,32 +43,32 @@ char __fastcall__ WriteRecord(const char *buffer, unsigned flength);
 char UpdateRecordFile(void);
 
 /* GEOS filetypes */
-#define	NOT_GEOS	0
-#define	BASIC		1
-#define	ASSEMBLY	2
-#define	DATA		3
-#define	SYSTEM		4
-#define	DESK_ACC	5
-#define	APPLICATION	6
-#define	APPL_DATA	7
-#define	FONT		8
-#define	PRINTER		9
-#define	INPUT_DEVICE	10
-#define	DISK_DEVICE	11
-#define	SYSTEM_BOOT	12
-#define	TEMPORARY	13
-#define	AUTO_EXEC	14
-#define	INPUT_128	15
-#define	NUMFILETYPES	16
+#define NOT_GEOS        0
+#define BASIC           1
+#define ASSEMBLY        2
+#define DATA            3
+#define SYSTEM          4
+#define DESK_ACC        5
+#define APPLICATION     6
+#define APPL_DATA       7
+#define FONT            8
+#define PRINTER         9
+#define INPUT_DEVICE    10
+#define DISK_DEVICE     11
+#define SYSTEM_BOOT     12
+#define TEMPORARY       13
+#define AUTO_EXEC       14
+#define INPUT_128       15
+#define NUMFILETYPES    16
 /* supported structures */
-#define	SEQUENTIAL	0
-#define	VLIR		1
+#define SEQUENTIAL      0
+#define VLIR            1
 /* DOS filetypes */
-#define	DEL		0
-#define	SEQ		1
-#define	PRG		2
-#define	USR		3
-#define	REL		4
-#define	CBM		5
+#define DEL             0
+#define SEQ             1
+#define PRG             2
+#define USR             3
+#define REL             4
+#define CBM             5
 
 #endif

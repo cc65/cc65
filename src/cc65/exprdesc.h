@@ -51,7 +51,7 @@
 
 
 /*****************************************************************************/
-/*  				     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -95,11 +95,11 @@ struct Literal;
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-    struct SymEntry*	Sym;   	        /* Symbol table entry if known */
-    Type*    	       	Type;           /* Type array of expression */
+    struct SymEntry*    Sym;            /* Symbol table entry if known */
+    Type*               Type;           /* Type array of expression */
     unsigned            Flags;
-    unsigned long   	Name;	        /* Name or label number */
-    long       	       	IVal;           /* Integer value if expression constant */
+    unsigned long       Name;           /* Name or label number */
+    long                IVal;           /* Integer value if expression constant */
     Double              FVal;           /* Floating point value */
     struct Literal*     LVal;           /* Literal value */
 
@@ -115,7 +115,7 @@ struct ExprDesc {
 
 
 /*****************************************************************************/
-/*    	     	   		     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

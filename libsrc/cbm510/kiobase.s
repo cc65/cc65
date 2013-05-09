@@ -11,9 +11,9 @@
 
 .proc   IOBASE
 
-	ldx   	cia
-	ldy   	cia+1
-	rts
+        ldx     cia
+        ldy     cia+1
+        rts
 
 .endproc
 

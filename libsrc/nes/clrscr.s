@@ -5,8 +5,8 @@
 ; void clrscr (void);
 ;
 
-	.export         _clrscr
-	.import         ppubuf_waitempty
+        .export         _clrscr
+        .import         ppubuf_waitempty
 
         .include        "nes.inc"
 
@@ -19,7 +19,7 @@
 
 ; wait for vblank
 
-	lda     #0
+        lda     #0
         sta     VBLANK_FLAG
 @w2:    lda     VBLANK_FLAG
         beq     @w2
@@ -27,7 +27,7 @@
 ; switch screen off
 
         lda     #%00000000
-	sta     PPU_CTRL2
+        sta     PPU_CTRL2
 
 ; Set start address to Name Table #1
 
@@ -64,8 +64,8 @@ lll:    lda     #$00            ; Write attribute table value and auto increment
 ; switch screen on again
 
         lda     #%00011110
-	sta     PPU_CTRL2
-	rts
+        sta     PPU_CTRL2
+        rts
 
 .endproc
 

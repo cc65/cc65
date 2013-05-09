@@ -13,7 +13,7 @@
 
 
 /*****************************************************************************/
-/*     	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -33,28 +33,28 @@ char* __fastcall__ fgets (char* s, unsigned size, register FILE* f)
     i = 0;
     while (--size) {
 
-       	/* Get next character */
-       	if ((c = fgetc (f)) == EOF) {
-       	    /* Error or EOF */
-       	    if ((f->f_flags & _FERROR) != 0 || i == 0) {
-       	     	/* ERROR or EOF on first char */
+        /* Get next character */
+        if ((c = fgetc (f)) == EOF) {
+            /* Error or EOF */
+            if ((f->f_flags & _FERROR) != 0 || i == 0) {
+                /* ERROR or EOF on first char */
                 *p = '\0';
-       	     	return 0;
-       	    } else {
-       	        /* EOF with data already read */
+                return 0;
+            } else {
+                /* EOF with data already read */
                 break;
-      	    }
-       	}
+            }
+        }
 
-       	/* One char more */
-       	*p = c;
+        /* One char more */
+        *p = c;
         ++p;
         ++i;
 
-      	/* Stop at end of line */
-      	if ((char)c == '\n') {
-      	    break;
-      	}
+        /* Stop at end of line */
+        if ((char)c == '\n') {
+            break;
+        }
     }
 
     /* Terminate the string */

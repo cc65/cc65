@@ -5,10 +5,10 @@
 ; may be patched at runtime.
 ;
 
-       	.export	jmpvec
+        .export jmpvec
 
 .data
 
-jmpvec:	jmp	$FFFF
+jmpvec: jmp     $FFFF
 
 

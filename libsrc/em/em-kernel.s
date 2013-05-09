@@ -16,23 +16,23 @@
 
 
 .bss
-_em_drv:        .res    2      		; Pointer to driver
+_em_drv:        .res    2               ; Pointer to driver
 
 ; Jump table for the driver functions.
 .data
 emd_vectors:
-emd_install:   	jmp     return0
-emd_uninstall: 	jmp     return0
+emd_install:    jmp     return0
+emd_uninstall:  jmp     return0
 emd_pagecount:  jmp     return0
 emd_map:        jmp     return0
 emd_use:        jmp     return0
 emd_commit:     jmp     return0
-emd_copyfrom:  	jmp     return0
+emd_copyfrom:   jmp     return0
 emd_copyto:     jmp     return0
 
 ; Driver header signature
 .rodata
-emd_sig:        .byte   $65, $6d, $64, EMD_API_VERSION	; "emd", version
+emd_sig:        .byte   $65, $6d, $64, EMD_API_VERSION  ; "emd", version
 
 
 ;----------------------------------------------------------------------------
@@ -41,10 +41,10 @@ emd_sig:        .byte   $65, $6d, $64, EMD_API_VERSION	; "emd", version
 
 
 _em_install:
-       	sta     _em_drv
-  	sta	ptr1
-  	stx     _em_drv+1
-  	stx    	ptr1+1
+        sta     _em_drv
+        sta     ptr1
+        stx     _em_drv+1
+        stx     ptr1+1
 
 ; Check the driver signature
 

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   opcdesc.h				     */
+/*                                 opcdesc.h                                 */
 /*                                                                           */
 /*                  Disassembler description for one opcode                  */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -47,10 +47,10 @@
 /* Constants for Flags */
 enum {
     flNone          = 0x00,                     /* No flags given */
-    flNoLabel	    = 0x00,			/* Don't use a label */
-    flGenLabel 	    = 0x01,			/* Generate a label */
-    flUseLabel	    = 0x02,			/* Use a label if there is one */
-    flLabel    	    = flUseLabel|flGenLabel,    /* Generate and use a label */
+    flNoLabel       = 0x00,                     /* Don't use a label */
+    flGenLabel      = 0x01,                     /* Generate a label */
+    flUseLabel      = 0x02,                     /* Use a label if there is one */
+    flLabel         = flUseLabel|flGenLabel,    /* Generate and use a label */
     flIllegal       = 0x10,                     /* Illegal instruction */
     flAbsOverride   = 0x20,                     /* Need a: override */
     flFarOverride   = 0x40                      /* Need f: override */
@@ -64,10 +64,10 @@ typedef void (*OpcHandler) (const OpcDesc*);
 
 /* Description for one opcode */
 struct OpcDesc {
-    char       	       	Mnemo [6]; 	/* Mnemonic */
-    unsigned char     	Size;		/* Size of this command */
-    unsigned char      	Flags; 	        /* Flags */
-    OpcHandler		Handler;	/* Handler routine */
+    char                Mnemo [6];      /* Mnemonic */
+    unsigned char       Size;           /* Size of this command */
+    unsigned char       Flags;          /* Flags */
+    OpcHandler          Handler;        /* Handler routine */
 };
 
 

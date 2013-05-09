@@ -4,14 +4,14 @@
 ; CC65 runtime: integer complement
 ;
 
-       	.export		complax
+        .export         complax
 
 complax:
-	eor	#$FF		; Not A
-	pha
-	txa
-	eor 	#$FF		; Not X
-	tax
-	pla
-	rts
+        eor     #$FF            ; Not A
+        pha
+        txa
+        eor     #$FF            ; Not X
+        tax
+        pla
+        rts
 

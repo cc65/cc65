@@ -5,8 +5,8 @@
 
 ; void ToBASIC (void);
 
-	    .export _ToBASIC
+            .export _ToBASIC
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_ToBASIC	= ToBASIC
+_ToBASIC        = ToBASIC

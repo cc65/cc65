@@ -3,7 +3,7 @@
  *                                                                           *
  * (w)2001 by groepaz/hitmen                                                 *
  *                                                                           *
- * Cleanup and porting by Ullrich von Bassewitz.			     *
+ * Cleanup and porting by Ullrich von Bassewitz.                             *
  *                                                                           *
  *****************************************************************************/
 
@@ -19,19 +19,19 @@
 #  define SCREEN1               0xE000
 #  define SCREEN2               0xE400
 #  define CHARSET               0xE800
-#  define outb(addr,val)       	(*(addr)) = (val)
+#  define outb(addr,val)        (*(addr)) = (val)
 #  define inb(addr)             (*(addr))
 #elif defined(__CBM510__)
 #  define SCREEN1               0xF000
 #  define SCREEN2               0xF400
 #  define CHARSET               0xE000
-#  define outb(addr,val)	pokebsys ((unsigned)(addr), val)
+#  define outb(addr,val)        pokebsys ((unsigned)(addr), val)
 #  define inb(addr)             peekbsys ((unsigned)(addr))
 #elif defined(__PLUS4__)
 #  define SCREEN1               0x6400
 #  define SCREEN2               0x6C00
 #  define CHARSET               0x7000
-#  define outb(addr,val)       	(*(addr)) = (val)
+#  define outb(addr,val)        (*(addr)) = (val)
 #  define inb(addr)             (*(addr))
 #endif
 
@@ -41,7 +41,7 @@
 #if defined(__PLUS4__)
 #define PAGE1                   ((SCREEN1 >> 8) & 0xF8)
 #define PAGE2                   ((SCREEN2 >> 8) & 0xF8)
-#define CHARADR			((CHARSET >> 8) & 0xFC)
+#define CHARADR                 ((CHARSET >> 8) & 0xFC)
 #else
 #define PAGE1                   ((SCREEN1 >> 6) & 0xF0) | ((CHARSET >> 10) & 0x0E)
 #define PAGE2                   ((SCREEN2 >> 6) & 0xF0) | ((CHARSET >> 10) & 0x0E)
@@ -106,7 +106,7 @@ static void doplasma (register unsigned char* scrn)
     for (ii = 0; ii < 25; ++ii) {
         ybuf[ii] = (sinustable[c1a] + sinustable[c1b]);
         c1a += 4;
-	c1b += 9;
+        c1b += 9;
     }
     c1A += 3;
     c1B -= 5;
@@ -115,15 +115,15 @@ static void doplasma (register unsigned char* scrn)
     for (i = 0; i < 40; ++i) {
         xbuf[i] = (sinustable[c2a] + sinustable[c2b]);
         c2a += 3;
-	c2b += 7;
+        c2b += 7;
     }
     c2A += 2;
     c2B -= 3;
     for (ii = 0; ii < 25; ++ii) {
-	/* Unrolling the following loop will give a speed increase of
-	 * nearly 100% (~24fps), but it will also increase the code
-	 * size a lot.
-	 */
+        /* Unrolling the following loop will give a speed increase of
+         * nearly 100% (~24fps), but it will also increase the code
+         * size a lot.
+         */
         for (i = 0; i < 40; ++i, ++scrn) {
             *scrn = (xbuf[i] + ybuf[ii]);
         }
@@ -135,26 +135,26 @@ static void doplasma (register unsigned char* scrn)
 static void makechar (void)
 {
     static const unsigned char bittab[8] = {
-	0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
+        0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
     };
     unsigned char i, ii, b, s;
     unsigned c;
 
     gotoxy (0, 1);
     for (c = 0; c < 0x100; ++c) {
-    	s = sinustable[c];
+        s = sinustable[c];
         for (i = 0; i < 8; ++i){
             b = 0;
             for (ii = 0; ii < 8; ++ii) {
                 if ((rand() & 0xFF) > s) {
-      	     	    b |= bittab[ii];
-    	     	}
+                    b |= bittab[ii];
+                }
             }
             ((unsigned char*)CHARSET) [(c*8) + i] = b;
         }
-    	if ((c & 0x07) == 0) {
-    	    cputc ('.');
-    	}
+        if ((c & 0x07) == 0) {
+            cputc ('.');
+        }
     }
 }
 
@@ -222,8 +222,8 @@ int main (void)
 
 #if defined(__PLUS4__)
     for (i=0;i<1000;i++) {
-    	((unsigned char *) (SCREEN1-0x0400))[i] = 0;
-    	((unsigned char *) (SCREEN2-0x0400))[i] = 0;
+        ((unsigned char *) (SCREEN1-0x0400))[i] = 0;
+        ((unsigned char *) (SCREEN2-0x0400))[i] = 0;
     }
     outb (&TED.char_addr, CHARADR);
 #endif
@@ -231,23 +231,23 @@ int main (void)
     /* Run the demo until a key was hit */
     t = clock ();
     while (!kbhit()) {
-      	/* Build page 1, then make it visible */
+        /* Build page 1, then make it visible */
         doplasma ((unsigned char*)SCREEN1);
 #if defined(__PLUS4__)
-      	outb (&TED.video_addr, PAGE1);
+        outb (&TED.video_addr, PAGE1);
 #else
-      	outb (&VIC.addr, PAGE1);
+        outb (&VIC.addr, PAGE1);
 #endif
 
-      	/* Build page 2, then make it visible */
+        /* Build page 2, then make it visible */
         doplasma ((unsigned char*)SCREEN2);
 #if defined(__PLUS4__)
-      	outb (&TED.video_addr, PAGE2);
+        outb (&TED.video_addr, PAGE2);
 #else
-      	outb (&VIC.addr, PAGE2);
+        outb (&VIC.addr, PAGE2);
 #endif
 
-      	/* Count frames */
+        /* Count frames */
         f += 2;
     }
     t = clock() - t;

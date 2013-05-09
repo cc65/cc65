@@ -20,11 +20,11 @@
 
 /* Address of data for sprite 0 */
 #if defined(__C64__)
-#  define SPRITE0_DATA	0x0340
-#  define SPRITE0_PTR	0x07F8
+#  define SPRITE0_DATA  0x0340
+#  define SPRITE0_PTR   0x07F8
 #elif defined(__C128__)
-#  define SPRITE0_DATA	0x0E00
-#  define SPRITE0_PTR	0x07F8
+#  define SPRITE0_DATA  0x0E00
+#  define SPRITE0_PTR   0x07F8
 #endif
 
 /* The mouse sprite (an arrow) */
@@ -58,7 +58,7 @@ static const unsigned char MouseSprite[64] = {
 
 /* Dynamically loaded driver by default */
 #ifndef DYN_DRV
-#  define DYN_DRV	1
+#  define DYN_DRV       1
 #endif
 
 

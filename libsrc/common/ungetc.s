@@ -36,10 +36,10 @@
 
 ; Check if the file is open
 
-	ldy  	#_FILE::f_flags
-	lda  	(ptr1),y
-	and  	#_FOPEN		      	; Is the file open?
-       	beq    	error                   ; Branch if no
+        ldy     #_FILE::f_flags
+        lda     (ptr1),y
+        and     #_FOPEN                 ; Is the file open?
+        beq     error                   ; Branch if no
 
 ; Set the pushback flag and reset the end-of-file indicator
 

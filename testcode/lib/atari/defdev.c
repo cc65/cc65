@@ -12,7 +12,7 @@ extern char _defdev[];
 
 int main(void)
 {
-	printf("default device: %s\n", _defdev);
-	if (_dos_type != SPARTADOS && _dos_type != OSADOS) cgetc();
-	return 0;
+        printf("default device: %s\n", _defdev);
+        if (_dos_type != SPARTADOS && _dos_type != OSADOS) cgetc();
+        return 0;
 }

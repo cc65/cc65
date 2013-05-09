@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/* 		    		     Data 				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -51,13 +51,13 @@
  * provided for DOS/Windows compatibility.
  */
 #ifndef P_WAIT
-#define P_WAIT	0
+#define P_WAIT  0
 #endif
 
 
 
 /*****************************************************************************/
-/* 		    		     Code 				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -75,27 +75,27 @@ int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [
     int pid = fork ();
     if (pid < 0) {
 
-	/* Error forking */
-	Error ("Cannot fork: %s", strerror (errno));
+        /* Error forking */
+        Error ("Cannot fork: %s", strerror (errno));
 
     } else if (pid == 0) {
 
-       	/* The son - exec the program */
-	if (execvp (File, argv) < 0) {
-	    Error ("Cannot exec `%s': %s", File, strerror (errno));
-	}
+        /* The son - exec the program */
+        if (execvp (File, argv) < 0) {
+            Error ("Cannot exec `%s': %s", File, strerror (errno));
+        }
 
     } else {
 
-	/* The father: Wait for the subprocess to terminate */
-	if (waitpid (pid, &Status, 0) < 0) {
-	    Error ("Failure waiting for subprocess: %s", strerror (errno));
-	}
+        /* The father: Wait for the subprocess to terminate */
+        if (waitpid (pid, &Status, 0) < 0) {
+            Error ("Failure waiting for subprocess: %s", strerror (errno));
+        }
 
-	/* Examine the child status */
-	if (!WIFEXITED (Status)) {
-	    Error ("Subprocess `%s' aborted by signal %d", File, WTERMSIG (Status));
-      	}
+        /* Examine the child status */
+        if (!WIFEXITED (Status)) {
+            Error ("Subprocess `%s' aborted by signal %d", File, WTERMSIG (Status));
+        }
     }
 
     /* Only the father goes here, we place a return here regardless of that

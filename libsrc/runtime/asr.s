@@ -11,9 +11,9 @@
 ;
 
 
-      	.export		tosasrax, asraxy
-      	.import		popax
-      	.importzp	tmp1
+        .export         tosasrax, asraxy
+        .import         popax
+        .importzp       tmp1
 
 tosasrax:
         sta     tmp1            ; Save shift count
@@ -69,10 +69,10 @@ L7:     cpx     #$80            ; Sign bit into carry
         ror     tmp1
         ror     a
         dey
-       	bne     L7
+        bne     L7
 
 ; Done with shift
 
-        ldx	tmp1
+        ldx     tmp1
         rts
 

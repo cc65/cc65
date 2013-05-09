@@ -23,10 +23,10 @@ static char* Alloc (void)
      * also allow us to retrieve it later.
      */
     if (P) {
-    	memset (P, Size, Size);
+        memset (P, Size, Size);
     } else {
-    	printf ("Could not allocate %u bytes\n", Size);
-    	exit (EXIT_FAILURE);
+        printf ("Could not allocate %u bytes\n", Size);
+        exit (EXIT_FAILURE);
     }
     return P;
 }
@@ -43,11 +43,11 @@ static void Free (unsigned char* P)
 
     /* Scan the block */
     for (I = 1; I < Size; ++I) {
-    	if (P[I] != Size) {
-    	    printf ("Scan failed - expected %02X, got %02X\n",
-    	    	    Size, P[I]);
-    	    exit (EXIT_FAILURE);
-       	}
+        if (P[I] != Size) {
+            printf ("Scan failed - expected %02X, got %02X\n",
+                    Size, P[I]);
+            exit (EXIT_FAILURE);
+        }
     }
 
     /* Free the block */
@@ -61,8 +61,8 @@ static void FillArray (void)
 {
     unsigned char I = 0;
     do {
-    	V[I] = Alloc ();
-    	++I;
+        V[I] = Alloc ();
+        ++I;
     } while (I != 0);
 }
 
@@ -75,20 +75,20 @@ static void ShowInfo (void)
     unsigned Count = 0;
     register struct freeblock* P = _heapfirst;
     while (P) {
-	++Count;
-       	P = P->next;
+        ++Count;
+        P = P->next;
     }
     printf ("%04X  %04X  %04X  %04X  %04X %u\n",
-      	    _heaporg, _heapptr, _heapend, _heapfirst, _heaplast, Count);
+            _heaporg, _heapptr, _heapend, _heapfirst, _heaplast, Count);
 
     if (Count) {
-	P = _heapfirst;
-	while (P) {
-	    printf ("%04X  %04X  %04X %04X(%u)\n",
-		    (unsigned) P, P[2], P[1], P[0], P[0]);
-	    P = P->next;
-	}
-	getchar ();
+        P = _heapfirst;
+        while (P) {
+            printf ("%04X  %04X  %04X %04X(%u)\n",
+                    (unsigned) P, P[2], P[1], P[0], P[0]);
+            P = P->next;
+        }
+        getchar ();
     }
 }
 
@@ -99,8 +99,8 @@ static void Test1 (void)
     unsigned char I;
     FillArray ();
     for (I = 0; I < 0x80; ++I) {
-	Free (V[0x7F-I]);
-	Free (V[0x80+I]);
+        Free (V[0x7F-I]);
+        Free (V[0x80+I]);
     }
     ShowInfo ();
 }
@@ -113,8 +113,8 @@ static void Test2 (void)
     FillArray ();
     I = 0;
     do {
-       	Free (V[I]);
-	++I;
+        Free (V[I]);
+        ++I;
     } while (I != 0);
     ShowInfo ();
 }
@@ -127,8 +127,8 @@ static void Test3 (void)
     FillArray ();
     I = 0;
     do {
-     	--I;
-     	Free (V[I]);
+        --I;
+        Free (V[I]);
     } while (I != 0);
     ShowInfo ();
 }
@@ -141,13 +141,13 @@ static void Test4 (void)
     FillArray ();
     I = 0;
     do {
-	Free (V[I]);
-	I += 2;
+        Free (V[I]);
+        I += 2;
     } while (I != 0);
     I = 1;
     do {
-	Free (V[I]);
-	I += 2;
+        Free (V[I]);
+        I += 2;
     } while (I != 1);
     ShowInfo ();
 }
@@ -160,26 +160,26 @@ static void Test5 (void)
     FillArray ();
     I = 0;
     do {
-	Free (V[I]);
-	I += 2;
+        Free (V[I]);
+        I += 2;
     } while (I != 0);
     do {
-       	V[I] = Alloc ();
-	I += 2;
+        V[I] = Alloc ();
+        I += 2;
     } while (I != 0);
     I = 1;
     do {
-	Free (V[I]);
-	I += 2;
+        Free (V[I]);
+        I += 2;
     } while (I != 1);
     do {
-       	V[I] = Alloc ();
-	I += 2;
+        V[I] = Alloc ();
+        I += 2;
     } while (I != 1);
     I = 0;
     do {
-      	Free (V[I]);
-	++I;
+        Free (V[I]);
+        ++I;
     } while (I != 0);
     ShowInfo ();
 }
@@ -192,16 +192,16 @@ static void Test6 (void)
     FillArray ();
     I = J = 0;
     do {
-	do {
-	    Free (V[I]);
-	    V[I] = Alloc ();
-	    ++I;
-	} while (I != 0);
-	++J;
+        do {
+            Free (V[I]);
+            V[I] = Alloc ();
+            ++I;
+        } while (I != 0);
+        ++J;
     } while (J < 5);
     do {
-	Free (V[I]);
-	++I;
+        Free (V[I]);
+        ++I;
     } while (I != 0);
     ShowInfo ();
 }

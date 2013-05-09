@@ -4,10 +4,10 @@
 ; CC65 runtime: multiplication for ints
 ;
 
-       	.export		tosumulax, tosmulax
+        .export         tosumulax, tosmulax
         .import         mul8x16, mul8x16a       ; in mul8.s
-    	.import		popsreg
-    	.importzp	sreg, tmp1, ptr4
+        .import         popsreg
+        .importzp       sreg, tmp1, ptr4
 
 
 ;---------------------------------------------------------------------------
@@ -15,42 +15,42 @@
 
 tosmulax:
 tosumulax:
-        sta	ptr4
+        sta     ptr4
         txa                     ; High byte zero
         beq     @L3             ; Do 8x16 multiplication if high byte zero
-       	stx	ptr4+1 	       	; Save right operand
-       	jsr	popsreg	       	; Get left operand
+        stx     ptr4+1          ; Save right operand
+        jsr     popsreg         ; Get left operand
 
 ; Do ptr4:ptr4+1 * sreg:sreg+1 --> AX
 
-       	lda	#0
-       	ldx	sreg+1	       	; Get high byte into register for speed
+        lda     #0
+        ldx     sreg+1          ; Get high byte into register for speed
         beq     @L4             ; -> we can do 8x16 after swap
-       	sta	tmp1
-       	ldy    	#16 	       	; Number of bits
+        sta     tmp1
+        ldy     #16             ; Number of bits
 
         lsr     ptr4+1
         ror     ptr4            ; Get first bit into carry
 @L0:    bcc     @L1
 
-      	clc
-      	adc	sreg
-      	pha
-       	txa	    	       	; hi byte of left op
-      	adc	tmp1
-      	sta	tmp1
-      	pla
+        clc
+        adc     sreg
+        pha
+        txa                     ; hi byte of left op
+        adc     tmp1
+        sta     tmp1
+        pla
 
 @L1:    ror     tmp1
-     	ror	a
-     	ror	ptr4+1
-     	ror	ptr4
+        ror     a
+        ror     ptr4+1
+        ror     ptr4
         dey
         bne     @L0
 
-      	lda	ptr4	       	; Load the result
-      	ldx	ptr4+1
-      	rts	    		; Done
+        lda     ptr4            ; Load the result
+        ldx     ptr4+1
+        rts                     ; Done
 
 ; High byte of rhs is zero, jump to the 8x16 routine instead
 

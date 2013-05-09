@@ -101,7 +101,7 @@ int main(void)
 ** (And, run emulators at their maximun speed.)
 */
 #if 0
-	continue;
+        continue;
 #endif
 
         /* Do one row of tests */
@@ -130,9 +130,9 @@ int main(void)
                 }
             }
 
-	    if (kbhit () && toupper (cgetc ()) == 'Q') {
-		goto Done;
-	    }
+            if (kbhit () && toupper (cgetc ()) == 'Q') {
+                goto Done;
+            }
 
             res += lhs;
         } while (++rhs != 0);
@@ -164,8 +164,8 @@ Done:
 
 #ifdef __ATARI__
     if (_dos_type != SPARTADOS && _dos_type != OSADOS) {
-	cprintf ("\rTap a key, to exit. ");
-	cgetc();
+        cprintf ("\rTap a key, to exit. ");
+        cgetc();
     }
 #endif
     return 0;

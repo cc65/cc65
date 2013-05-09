@@ -6,12 +6,12 @@
 ; 2004-12-21, Greg King
 ;
 
-	.export	      	_vsscanf
+        .export         _vsscanf
 
-	.import		popax, __scanf
-	.importzp	sp, ptr1, ptr2
+        .import         popax, __scanf
+        .importzp       sp, ptr1, ptr2
 
-	.macpack     	generic
+        .macpack        generic
 
 
 ; ----------------------------------------------------------------------------

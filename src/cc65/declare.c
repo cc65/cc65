@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   declare.c				     */
+/*                                 declare.c                                 */
 /*                                                                           */
-/*		   Parse variable and function declarations		     */
+/*                 Parse variable and function declarations                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -79,7 +79,7 @@ struct StructInitData {
 
 
 /*****************************************************************************/
-/*			       	   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -93,7 +93,7 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers);
 
 
 /*****************************************************************************/
-/*		 	      Internal functions			     */
+/*                            Internal functions                             */
 /*****************************************************************************/
 
 
@@ -117,9 +117,9 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
     /* Check for more qualifiers */
     while (1) {
 
- 	switch (CurTok.Tok) {
+        switch (CurTok.Tok) {
 
- 	    case TOK_CONST:
+            case TOK_CONST:
                 if (Allowed & T_QUAL_CONST) {
                     if (Q & T_QUAL_CONST) {
                         DuplicateQualifier ("const");
@@ -130,7 +130,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
                 }
                 break;
 
-	    case TOK_VOLATILE:
+            case TOK_VOLATILE:
                 if (Allowed & T_QUAL_VOLATILE) {
                     if (Q & T_QUAL_VOLATILE) {
                         DuplicateQualifier ("volatile");
@@ -139,7 +139,7 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
                 } else {
                     goto Done;
                 }
-	       	break;
+                break;
 
             case TOK_RESTRICT:
                 if (Allowed & T_QUAL_RESTRICT) {
@@ -196,13 +196,13 @@ static TypeCode OptionalQualifiers (TypeCode Allowed)
                 }
                 break;
 
-	    default:
-	       	goto Done;
+            default:
+                goto Done;
 
-	}
+        }
 
-	/* Skip the token */
-	NextToken ();
+        /* Skip the token */
+        NextToken ();
     }
 
 Done:
@@ -242,8 +242,8 @@ static void OptionalInt (void)
 /* Eat an optional "int" token */
 {
     if (CurTok.Tok == TOK_INT) {
-	/* Skip it */
- 	NextToken ();
+        /* Skip it */
+        NextToken ();
     }
 }
 
@@ -253,8 +253,8 @@ static void OptionalSigned (void)
 /* Eat an optional "signed" token */
 {
     if (CurTok.Tok == TOK_SIGNED) {
-	/* Skip it */
- 	NextToken ();
+        /* Skip it */
+        NextToken ();
     }
 }
 
@@ -285,11 +285,11 @@ static void NeedTypeSpace (Declaration* D, unsigned Count)
 /* Check if there is enough space for Count type specifiers within D */
 {
     if (D->Index + Count >= MAXTYPELEN) {
-   	/* We must call Fatal() here, since calling Error() will try to
-   	 * continue, and the declaration type is not correctly terminated
-   	 * in case we come here.
-   	 */
-   	Fatal ("Too many type specifiers");
+        /* We must call Fatal() here, since calling Error() will try to
+         * continue, and the declaration type is not correctly terminated
+         * in case we come here.
+         */
+        Fatal ("Too many type specifiers");
     }
 }
 
@@ -404,36 +404,36 @@ static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
     /* Check the storage class given */
     switch (CurTok.Tok) {
 
-     	case TOK_EXTERN:
-	    D->StorageClass = SC_EXTERN | SC_STATIC;
-     	    NextToken ();
-    	    break;
+        case TOK_EXTERN:
+            D->StorageClass = SC_EXTERN | SC_STATIC;
+            NextToken ();
+            break;
 
-    	case TOK_STATIC:
-	    D->StorageClass = SC_STATIC;
-    	    NextToken ();
-    	    break;
+        case TOK_STATIC:
+            D->StorageClass = SC_STATIC;
+            NextToken ();
+            break;
 
-    	case TOK_REGISTER:
-    	    D->StorageClass = SC_REGISTER | SC_STATIC;
-    	    NextToken ();
-	    break;
+        case TOK_REGISTER:
+            D->StorageClass = SC_REGISTER | SC_STATIC;
+            NextToken ();
+            break;
 
-    	case TOK_AUTO:
-	    D->StorageClass = SC_AUTO;
-    	    NextToken ();
-	    break;
+        case TOK_AUTO:
+            D->StorageClass = SC_AUTO;
+            NextToken ();
+            break;
 
-	case TOK_TYPEDEF:
-	    D->StorageClass = SC_TYPEDEF;
-	    NextToken ();
-	    break;
+        case TOK_TYPEDEF:
+            D->StorageClass = SC_TYPEDEF;
+            NextToken ();
+            break;
 
-    	default:
-	    /* No storage class given, use default */
-       	    D->Flags |= DS_DEF_STORAGE;
-    	    D->StorageClass = DefStorage;
-	    break;
+        default:
+            /* No storage class given, use default */
+            D->Flags |= DS_DEF_STORAGE;
+            D->StorageClass = DefStorage;
+            break;
     }
 }
 
@@ -447,7 +447,7 @@ static void ParseEnumDecl (void)
 
     /* Accept forward definitions */
     if (CurTok.Tok != TOK_LCURLY) {
-   	return;
+        return;
     }
 
     /* Skip the opening curly brace */
@@ -457,31 +457,31 @@ static void ParseEnumDecl (void)
     EnumVal = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
-	/* We expect an identifier */
-   	if (CurTok.Tok != TOK_IDENT) {
-   	    Error ("Identifier expected");
-    	    continue;
-   	}
+        /* We expect an identifier */
+        if (CurTok.Tok != TOK_IDENT) {
+            Error ("Identifier expected");
+            continue;
+        }
 
-	/* Remember the identifier and skip it */
-	strcpy (Ident, CurTok.Ident);
-   	NextToken ();
+        /* Remember the identifier and skip it */
+        strcpy (Ident, CurTok.Ident);
+        NextToken ();
 
-	/* Check for an assigned value */
-   	if (CurTok.Tok == TOK_ASSIGN) {
-    	    ExprDesc Expr;
-   	    NextToken ();
-   	    ConstAbsIntExpr (hie1, &Expr);
-   	    EnumVal = Expr.IVal;
-    	}
+        /* Check for an assigned value */
+        if (CurTok.Tok == TOK_ASSIGN) {
+            ExprDesc Expr;
+            NextToken ();
+            ConstAbsIntExpr (hie1, &Expr);
+            EnumVal = Expr.IVal;
+        }
 
-	/* Add an entry to the symbol table */
-	AddConstSym (Ident, type_int, SC_ENUM, EnumVal++);
+        /* Add an entry to the symbol table */
+        AddConstSym (Ident, type_int, SC_ENUM, EnumVal++);
 
-    	/* Check for end of definition */
-    	if (CurTok.Tok != TOK_COMMA)
-    	    break;
-    	NextToken ();
+        /* Check for end of definition */
+        if (CurTok.Tok != TOK_COMMA)
+            break;
+        NextToken ();
     }
     ConsumeRCurly ();
 }
@@ -602,8 +602,8 @@ static SymEntry* ParseUnionDecl (const char* Name)
 
 
     if (CurTok.Tok != TOK_LCURLY) {
-    	/* Just a forward declaration. */
-    	return StructOrUnionForwardDecl (Name, SC_UNION);
+        /* Just a forward declaration. */
+        return StructOrUnionForwardDecl (Name, SC_UNION);
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
@@ -619,18 +619,18 @@ static SymEntry* ParseUnionDecl (const char* Name)
     UnionSize      = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
-	/* Get the type of the entry */
-	DeclSpec Spec;
-	InitDeclSpec (&Spec);
-	ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
+        /* Get the type of the entry */
+        DeclSpec Spec;
+        InitDeclSpec (&Spec);
+        ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
 
-	/* Read fields with this type */
-	while (1) {
+        /* Read fields with this type */
+        while (1) {
 
-	    Declaration Decl;
+            Declaration Decl;
 
-	    /* Get type and name of the struct field */
-	    ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+            /* Get type and name of the struct field */
+            ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
 
             /* Check for a bit-field declaration */
             FieldWidth = ParseFieldWidth (&Decl);
@@ -672,11 +672,11 @@ static SymEntry* ParseUnionDecl (const char* Name)
             }
 
 NextMember: if (CurTok.Tok != TOK_COMMA) {
-     	       	break;
+                break;
             }
-     	    NextToken ();
-     	}
-     	ConsumeSemi ();
+            NextToken ();
+        }
+        ConsumeSemi ();
     }
 
     /* Skip the closing brace */
@@ -704,8 +704,8 @@ static SymEntry* ParseStructDecl (const char* Name)
 
 
     if (CurTok.Tok != TOK_LCURLY) {
-    	/* Just a forward declaration. */
-    	return StructOrUnionForwardDecl (Name, SC_STRUCT);
+        /* Just a forward declaration. */
+        return StructOrUnionForwardDecl (Name, SC_STRUCT);
     }
 
     /* Add a forward declaration for the struct in the current lexical level */
@@ -723,15 +723,15 @@ static SymEntry* ParseStructDecl (const char* Name)
     BitOffs        = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
-	/* Get the type of the entry */
-	DeclSpec Spec;
-	InitDeclSpec (&Spec);
-	ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
+        /* Get the type of the entry */
+        DeclSpec Spec;
+        InitDeclSpec (&Spec);
+        ParseTypeSpec (&Spec, -1, T_QUAL_NONE);
 
-	/* Read fields with this type */
-	while (1) {
+        /* Read fields with this type */
+        while (1) {
 
-	    Declaration Decl;
+            Declaration Decl;
             ident       Ident;
 
             /* If we had a flexible array member before, no other fields can
@@ -742,8 +742,8 @@ static SymEntry* ParseStructDecl (const char* Name)
                 FlexibleMember = 0;     /* Avoid further errors */
             }
 
-	    /* Get type and name of the struct field */
-	    ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+            /* Get type and name of the struct field */
+            ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
 
             /* Check for a bit-field declaration */
             FieldWidth = ParseFieldWidth (&Decl);
@@ -836,11 +836,11 @@ static SymEntry* ParseStructDecl (const char* Name)
             }
 
 NextMember: if (CurTok.Tok != TOK_COMMA) {
-     	       	break;
+                break;
             }
-     	    NextToken ();
-     	}
-     	ConsumeSemi ();
+            NextToken ();
+        }
+        ConsumeSemi ();
     }
 
     /* If we have bits from bit-fields left, add them to the size. */
@@ -864,8 +864,8 @@ NextMember: if (CurTok.Tok != TOK_COMMA) {
 static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
 /* Parse a type specificier */
 {
-    ident     	Ident;
-    SymEntry* 	Entry;
+    ident       Ident;
+    SymEntry*   Entry;
 
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
@@ -876,223 +876,223 @@ static void ParseTypeSpec (DeclSpec* D, long Default, TypeCode Qualifiers)
     /* Look at the data type */
     switch (CurTok.Tok) {
 
-    	case TOK_VOID:
-    	    NextToken ();
-	    D->Type[0].C = T_VOID;
-    	    D->Type[1].C = T_END;
-    	    break;
+        case TOK_VOID:
+            NextToken ();
+            D->Type[0].C = T_VOID;
+            D->Type[1].C = T_END;
+            break;
 
-    	case TOK_CHAR:
-    	    NextToken ();
-	    D->Type[0].C = GetDefaultChar();
-	    D->Type[1].C = T_END;
-	    break;
+        case TOK_CHAR:
+            NextToken ();
+            D->Type[0].C = GetDefaultChar();
+            D->Type[1].C = T_END;
+            break;
 
-    	case TOK_LONG:
-    	    NextToken ();
-    	    if (CurTok.Tok == TOK_UNSIGNED) {
-    	      	NextToken ();
-    	      	OptionalInt ();
-    	      	D->Type[0].C = T_ULONG;
-	      	D->Type[1].C = T_END;
-    	    } else {
-    	      	OptionalSigned ();
-    	      	OptionalInt ();
-	      	D->Type[0].C = T_LONG;
-	      	D->Type[1].C = T_END;
-    	    }
-	    break;
+        case TOK_LONG:
+            NextToken ();
+            if (CurTok.Tok == TOK_UNSIGNED) {
+                NextToken ();
+                OptionalInt ();
+                D->Type[0].C = T_ULONG;
+                D->Type[1].C = T_END;
+            } else {
+                OptionalSigned ();
+                OptionalInt ();
+                D->Type[0].C = T_LONG;
+                D->Type[1].C = T_END;
+            }
+            break;
 
-    	case TOK_SHORT:
-    	    NextToken ();
-    	    if (CurTok.Tok == TOK_UNSIGNED) {
-    	      	NextToken ();
-    	      	OptionalInt ();
-	      	D->Type[0].C = T_USHORT;
-	      	D->Type[1].C = T_END;
-    	    } else {
-    	      	OptionalSigned ();
-    	      	OptionalInt ();
-	      	D->Type[0].C = T_SHORT;
-	    	D->Type[1].C = T_END;
-    	    }
-    	    break;
+        case TOK_SHORT:
+            NextToken ();
+            if (CurTok.Tok == TOK_UNSIGNED) {
+                NextToken ();
+                OptionalInt ();
+                D->Type[0].C = T_USHORT;
+                D->Type[1].C = T_END;
+            } else {
+                OptionalSigned ();
+                OptionalInt ();
+                D->Type[0].C = T_SHORT;
+                D->Type[1].C = T_END;
+            }
+            break;
 
-    	case TOK_INT:
-    	    NextToken ();
-	    D->Type[0].C = T_INT;
-	    D->Type[1].C = T_END;
-    	    break;
+        case TOK_INT:
+            NextToken ();
+            D->Type[0].C = T_INT;
+            D->Type[1].C = T_END;
+            break;
 
        case TOK_SIGNED:
-    	    NextToken ();
-    	    switch (CurTok.Tok) {
+            NextToken ();
+            switch (CurTok.Tok) {
 
-       		case TOK_CHAR:
-    		    NextToken ();
-		    D->Type[0].C = T_SCHAR;
-	     	    D->Type[1].C = T_END;
-    		    break;
+                case TOK_CHAR:
+                    NextToken ();
+                    D->Type[0].C = T_SCHAR;
+                    D->Type[1].C = T_END;
+                    break;
 
-    		case TOK_SHORT:
-    		    NextToken ();
-    		    OptionalInt ();
-		    D->Type[0].C = T_SHORT;
-		    D->Type[1].C = T_END;
-    		    break;
+                case TOK_SHORT:
+                    NextToken ();
+                    OptionalInt ();
+                    D->Type[0].C = T_SHORT;
+                    D->Type[1].C = T_END;
+                    break;
 
-    		case TOK_LONG:
-    		    NextToken ();
-    	    	    OptionalInt ();
-		    D->Type[0].C = T_LONG;
-		    D->Type[1].C = T_END;
-    	     	    break;
+                case TOK_LONG:
+                    NextToken ();
+                    OptionalInt ();
+                    D->Type[0].C = T_LONG;
+                    D->Type[1].C = T_END;
+                    break;
 
-    		case TOK_INT:
-    		    NextToken ();
-    		    /* FALL THROUGH */
+                case TOK_INT:
+                    NextToken ();
+                    /* FALL THROUGH */
 
-    	    	default:
-	    	    D->Type[0].C = T_INT;
-		    D->Type[1].C = T_END;
-	  	    break;
-    	    }
-	    break;
+                default:
+                    D->Type[0].C = T_INT;
+                    D->Type[1].C = T_END;
+                    break;
+            }
+            break;
 
-    	case TOK_UNSIGNED:
-    	    NextToken ();
-    	    switch (CurTok.Tok) {
+        case TOK_UNSIGNED:
+            NextToken ();
+            switch (CurTok.Tok) {
 
-       	 	case TOK_CHAR:
-    		    NextToken ();
-		    D->Type[0].C = T_UCHAR;
-		    D->Type[1].C = T_END;
-    	     	    break;
+                case TOK_CHAR:
+                    NextToken ();
+                    D->Type[0].C = T_UCHAR;
+                    D->Type[1].C = T_END;
+                    break;
 
-    	    	case TOK_SHORT:
-    		    NextToken ();
-    		    OptionalInt ();
-		    D->Type[0].C = T_USHORT;
-		    D->Type[1].C = T_END;
-    		    break;
+                case TOK_SHORT:
+                    NextToken ();
+                    OptionalInt ();
+                    D->Type[0].C = T_USHORT;
+                    D->Type[1].C = T_END;
+                    break;
 
-    		case TOK_LONG:
-    		    NextToken ();
-    		    OptionalInt ();
-    		    D->Type[0].C = T_ULONG;
-		    D->Type[1].C = T_END;
-    		    break;
+                case TOK_LONG:
+                    NextToken ();
+                    OptionalInt ();
+                    D->Type[0].C = T_ULONG;
+                    D->Type[1].C = T_END;
+                    break;
 
-    	     	case TOK_INT:
-    		    NextToken ();
-    		    /* FALL THROUGH */
+                case TOK_INT:
+                    NextToken ();
+                    /* FALL THROUGH */
 
-    		default:
-		    D->Type[0].C = T_UINT;
-	     	    D->Type[1].C = T_END;
-		    break;
-    	    }
-	    break;
+                default:
+                    D->Type[0].C = T_UINT;
+                    D->Type[1].C = T_END;
+                    break;
+            }
+            break;
 
         case TOK_FLOAT:
-    	    NextToken ();
-	    D->Type[0].C = T_FLOAT;
-	    D->Type[1].C = T_END;
-    	    break;
+            NextToken ();
+            D->Type[0].C = T_FLOAT;
+            D->Type[1].C = T_END;
+            break;
 
         case TOK_DOUBLE:
-    	    NextToken ();
-	    D->Type[0].C = T_DOUBLE;
-	    D->Type[1].C = T_END;
-    	    break;
+            NextToken ();
+            D->Type[0].C = T_DOUBLE;
+            D->Type[1].C = T_END;
+            break;
 
-    	case TOK_UNION:
-    	    NextToken ();
-	    /* */
-    	    if (CurTok.Tok == TOK_IDENT) {
-	 	strcpy (Ident, CurTok.Ident);
-    	 	NextToken ();
-    	    } else {
-       	       	AnonName (Ident, "union");
-    	    }
-	    /* Remember we have an extra type decl */
-	    D->Flags |= DS_EXTRA_TYPE;
-	    /* Declare the union in the current scope */
-    	    Entry = ParseUnionDecl (Ident);
-       	    /* Encode the union entry into the type */
-    	    D->Type[0].C = T_UNION;
-	    SetSymEntry (D->Type, Entry);
-	    D->Type[1].C = T_END;
-	    break;
+        case TOK_UNION:
+            NextToken ();
+            /* */
+            if (CurTok.Tok == TOK_IDENT) {
+                strcpy (Ident, CurTok.Ident);
+                NextToken ();
+            } else {
+                AnonName (Ident, "union");
+            }
+            /* Remember we have an extra type decl */
+            D->Flags |= DS_EXTRA_TYPE;
+            /* Declare the union in the current scope */
+            Entry = ParseUnionDecl (Ident);
+            /* Encode the union entry into the type */
+            D->Type[0].C = T_UNION;
+            SetSymEntry (D->Type, Entry);
+            D->Type[1].C = T_END;
+            break;
 
-    	case TOK_STRUCT:
-    	    NextToken ();
-	    /* */
-    	    if (CurTok.Tok == TOK_IDENT) {
-	 	strcpy (Ident, CurTok.Ident);
-    	 	NextToken ();
-    	    } else {
-       	       	AnonName (Ident, "struct");
-    	    }
-	    /* Remember we have an extra type decl */
-	    D->Flags |= DS_EXTRA_TYPE;
-	    /* Declare the struct in the current scope */
-    	    Entry = ParseStructDecl (Ident);
-       	    /* Encode the struct entry into the type */
-    	    D->Type[0].C = T_STRUCT;
-	    SetSymEntry (D->Type, Entry);
-	    D->Type[1].C = T_END;
-	    break;
+        case TOK_STRUCT:
+            NextToken ();
+            /* */
+            if (CurTok.Tok == TOK_IDENT) {
+                strcpy (Ident, CurTok.Ident);
+                NextToken ();
+            } else {
+                AnonName (Ident, "struct");
+            }
+            /* Remember we have an extra type decl */
+            D->Flags |= DS_EXTRA_TYPE;
+            /* Declare the struct in the current scope */
+            Entry = ParseStructDecl (Ident);
+            /* Encode the struct entry into the type */
+            D->Type[0].C = T_STRUCT;
+            SetSymEntry (D->Type, Entry);
+            D->Type[1].C = T_END;
+            break;
 
-    	case TOK_ENUM:
-    	    NextToken ();
-    	    if (CurTok.Tok != TOK_LCURLY) {
-	     	/* Named enum */
-		if (CurTok.Tok == TOK_IDENT) {
-		    /* Find an entry with this name */
-    		    Entry = FindTagSym (CurTok.Ident);
-		    if (Entry) {
-			if (SymIsLocal (Entry) && (Entry->Flags & SC_ENUM) == 0) {
-		    	    Error ("Symbol `%s' is already different kind", Entry->Name);
-			}
-	     	    } else {
-			/* Insert entry into table ### */
-		    }
-		    /* Skip the identifier */
-		    NextToken ();
-    		} else {
-    	            Error ("Identifier expected");
-    		}
-    	    }
-    	    /* Remember we have an extra type decl */
-    	    D->Flags |= DS_EXTRA_TYPE;
-    	    /* Parse the enum decl */
-    	    ParseEnumDecl ();
-    	    D->Type[0].C = T_INT;
-    	    D->Type[1].C = T_END;
-    	    break;
+        case TOK_ENUM:
+            NextToken ();
+            if (CurTok.Tok != TOK_LCURLY) {
+                /* Named enum */
+                if (CurTok.Tok == TOK_IDENT) {
+                    /* Find an entry with this name */
+                    Entry = FindTagSym (CurTok.Ident);
+                    if (Entry) {
+                        if (SymIsLocal (Entry) && (Entry->Flags & SC_ENUM) == 0) {
+                            Error ("Symbol `%s' is already different kind", Entry->Name);
+                        }
+                    } else {
+                        /* Insert entry into table ### */
+                    }
+                    /* Skip the identifier */
+                    NextToken ();
+                } else {
+                    Error ("Identifier expected");
+                }
+            }
+            /* Remember we have an extra type decl */
+            D->Flags |= DS_EXTRA_TYPE;
+            /* Parse the enum decl */
+            ParseEnumDecl ();
+            D->Type[0].C = T_INT;
+            D->Type[1].C = T_END;
+            break;
 
         case TOK_IDENT:
-    	    Entry = FindSym (CurTok.Ident);
-    	    if (Entry && SymIsTypeDef (Entry)) {
-       	       	/* It's a typedef */
-    	      	NextToken ();
-    		TypeCopy (D->Type, Entry->Type);
-    	      	break;
-    	    }
-    	    /* FALL THROUGH */
+            Entry = FindSym (CurTok.Ident);
+            if (Entry && SymIsTypeDef (Entry)) {
+                /* It's a typedef */
+                NextToken ();
+                TypeCopy (D->Type, Entry->Type);
+                break;
+            }
+            /* FALL THROUGH */
 
-    	default:
-    	    if (Default < 0) {
-    		Error ("Type expected");
-    		D->Type[0].C = T_INT;
-    		D->Type[1].C = T_END;
-    	    } else {
-    		D->Flags |= DS_DEF_TYPE;
-    		D->Type[0].C = (TypeCode) Default;
-    		D->Type[1].C = T_END;
-    	    }
-    	    break;
+        default:
+            if (Default < 0) {
+                Error ("Type expected");
+                D->Type[0].C = T_INT;
+                D->Type[1].C = T_END;
+            } else {
+                D->Flags |= DS_DEF_TYPE;
+                D->Type[0].C = (TypeCode) Default;
+                D->Type[1].C = T_END;
+            }
+            break;
     }
 
     /* There may also be qualifiers *after* the initial type */
@@ -1107,7 +1107,7 @@ static Type* ParamTypeCvt (Type* T)
  */
 {
     if (IsTypeArray (T)) {
-       	T->C = T_PTR;
+        T->C = T_PTR;
     }
     return T;
 }
@@ -1123,8 +1123,8 @@ static void ParseOldStyleParamList (FuncDesc* F)
     /* Parse params */
     while (CurTok.Tok != TOK_RPAREN) {
 
-	/* List of identifiers expected */
-	if (CurTok.Tok == TOK_IDENT) {
+        /* List of identifiers expected */
+        if (CurTok.Tok == TOK_IDENT) {
 
             /* Create a symbol table entry with type int */
             AddLocalSym (CurTok.Ident, type_int, SC_AUTO | SC_PARAM | SC_DEF | SC_DEFTYPE, 0);
@@ -1135,20 +1135,20 @@ static void ParseOldStyleParamList (FuncDesc* F)
             /* Skip the identifier */
             NextToken ();
 
-	} else {
+        } else {
             /* Not a parameter name */
-	    Error ("Identifier expected");
+            Error ("Identifier expected");
 
             /* Try some smart error recovery */
             SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
         }
 
-	/* Check for more parameters */
-	if (CurTok.Tok == TOK_COMMA) {
-	    NextToken ();
-	} else {
-	    break;
-	}
+        /* Check for more parameters */
+        if (CurTok.Tok == TOK_COMMA) {
+            NextToken ();
+        } else {
+            break;
+        }
     }
 
     /* Skip right paren. We must explicitly check for one here, since some of
@@ -1159,31 +1159,31 @@ static void ParseOldStyleParamList (FuncDesc* F)
     /* An optional list of type specifications follows */
     while (CurTok.Tok != TOK_LCURLY) {
 
-	DeclSpec    	Spec;
+        DeclSpec        Spec;
 
-	/* Read the declaration specifier */
-	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        /* Read the declaration specifier */
+        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
 
-       	/* We accept only auto and register as storage class specifiers, but
-	 * we ignore all this, since we use auto anyway.
-	 */
-	if ((Spec.StorageClass & SC_AUTO) == 0 &&
-    	    (Spec.StorageClass & SC_REGISTER) == 0) {
-	    Error ("Illegal storage class");
-	}
+        /* We accept only auto and register as storage class specifiers, but
+         * we ignore all this, since we use auto anyway.
+         */
+        if ((Spec.StorageClass & SC_AUTO) == 0 &&
+            (Spec.StorageClass & SC_REGISTER) == 0) {
+            Error ("Illegal storage class");
+        }
 
-	/* Parse a comma separated variable list */
-	while (1) {
+        /* Parse a comma separated variable list */
+        while (1) {
 
-	    Declaration       	Decl;
+            Declaration         Decl;
 
-	    /* Read the parameter */
-	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
-	    if (Decl.Ident[0] != '\0') {
+            /* Read the parameter */
+            ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
+            if (Decl.Ident[0] != '\0') {
 
-	    	/* We have a name given. Search for the symbol */
-		SymEntry* Sym = FindLocalSym (Decl.Ident);
-		if (Sym) {
+                /* We have a name given. Search for the symbol */
+                SymEntry* Sym = FindLocalSym (Decl.Ident);
+                if (Sym) {
                     /* Check if we already changed the type for this
                      * parameter
                      */
@@ -1196,21 +1196,21 @@ static void ParseOldStyleParamList (FuncDesc* F)
                         /* Type has already been changed */
                         Error ("Redefinition for parameter `%s'", Sym->Name);
                     }
-		} else {
-		    Error ("Unknown identifier: `%s'", Decl.Ident);
-		}
-	    }
+                } else {
+                    Error ("Unknown identifier: `%s'", Decl.Ident);
+                }
+            }
 
-     	    if (CurTok.Tok == TOK_COMMA) {
-	     	NextToken ();
-	    } else {
-     	      	break;
-	    }
+            if (CurTok.Tok == TOK_COMMA) {
+                NextToken ();
+            } else {
+                break;
+            }
 
-	}
+        }
 
-	/* Variable list must be semicolon terminated */
-	ConsumeSemi ();
+        /* Variable list must be semicolon terminated */
+        ConsumeSemi ();
     }
 }
 
@@ -1222,50 +1222,50 @@ static void ParseAnsiParamList (FuncDesc* F)
     /* Parse params */
     while (CurTok.Tok != TOK_RPAREN) {
 
-	DeclSpec 	Spec;
-	Declaration 	Decl;
+        DeclSpec        Spec;
+        Declaration     Decl;
         SymEntry*       Sym;
 
-      	/* Allow an ellipsis as last parameter */
-	if (CurTok.Tok == TOK_ELLIPSIS) {
-    	    NextToken ();
-	    F->Flags |= FD_VARIADIC;
-	    break;
-	}
+        /* Allow an ellipsis as last parameter */
+        if (CurTok.Tok == TOK_ELLIPSIS) {
+            NextToken ();
+            F->Flags |= FD_VARIADIC;
+            break;
+        }
 
-	/* Read the declaration specifier */
-	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        /* Read the declaration specifier */
+        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
 
-       	/* We accept only auto and register as storage class specifiers */
+        /* We accept only auto and register as storage class specifiers */
         if ((Spec.StorageClass & SC_AUTO) == SC_AUTO) {
             Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
         } else if ((Spec.StorageClass & SC_REGISTER) == SC_REGISTER) {
             Spec.StorageClass = SC_REGISTER | SC_STATIC | SC_PARAM | SC_DEF;
         } else {
-	    Error ("Illegal storage class");
+            Error ("Illegal storage class");
             Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
-	}
+        }
 
-	/* Allow parameters without a name, but remember if we had some to
-      	 * eventually print an error message later.
-	 */
-	ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
-       	if (Decl.Ident[0] == '\0') {
+        /* Allow parameters without a name, but remember if we had some to
+         * eventually print an error message later.
+         */
+        ParseDecl (&Spec, &Decl, DM_ACCEPT_IDENT);
+        if (Decl.Ident[0] == '\0') {
 
-	    /* Unnamed symbol. Generate a name that is not user accessible,
-	     * then handle the symbol normal.
-	     */
-    	    AnonName (Decl.Ident, "param");
-    	    F->Flags |= FD_UNNAMED_PARAMS;
+            /* Unnamed symbol. Generate a name that is not user accessible,
+             * then handle the symbol normal.
+             */
+            AnonName (Decl.Ident, "param");
+            F->Flags |= FD_UNNAMED_PARAMS;
 
-    	    /* Clear defined bit on nonames */
-    	    Decl.StorageClass &= ~SC_DEF;
-    	}
+            /* Clear defined bit on nonames */
+            Decl.StorageClass &= ~SC_DEF;
+        }
 
-	/* Parse attributes for this parameter */
-	ParseAttribute (&Decl);
+        /* Parse attributes for this parameter */
+        ParseAttribute (&Decl);
 
-	/* Create a symbol table entry */
+        /* Create a symbol table entry */
         Sym = AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Decl.StorageClass, 0);
 
         /* Add attributes if we have any */
@@ -1278,15 +1278,15 @@ static void ParseAnsiParamList (FuncDesc* F)
             }
         }
 
-	/* Count arguments */
-       	++F->ParamCount;
+        /* Count arguments */
+        ++F->ParamCount;
 
-	/* Check for more parameters */
-	if (CurTok.Tok == TOK_COMMA) {
-	    NextToken ();
-	} else {
-	    break;
-	}
+        /* Check for more parameters */
+        if (CurTok.Tok == TOK_COMMA) {
+            NextToken ();
+        } else {
+            break;
+        }
     }
 
     /* Skip right paren. We must explicitly check for one here, since some of
@@ -1311,33 +1311,33 @@ static FuncDesc* ParseFuncDecl (void)
 
     /* Check for several special parameter lists */
     if (CurTok.Tok == TOK_RPAREN) {
-     	/* Parameter list is empty */
-     	F->Flags |= (FD_EMPTY | FD_VARIADIC);
+        /* Parameter list is empty */
+        F->Flags |= (FD_EMPTY | FD_VARIADIC);
     } else if (CurTok.Tok == TOK_VOID && NextTok.Tok == TOK_RPAREN) {
-     	/* Parameter list declared as void */
-     	NextToken ();
-     	F->Flags |= FD_VOID_PARAM;
+        /* Parameter list declared as void */
+        NextToken ();
+        F->Flags |= FD_VOID_PARAM;
     } else if (CurTok.Tok == TOK_IDENT &&
-     	       (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
-     	/* If the identifier is a typedef, we have a new style parameter list,
-     	 * if it's some other identifier, it's an old style parameter list.
-     	 */
-     	Sym = FindSym (CurTok.Ident);
-     	if (Sym == 0 || !SymIsTypeDef (Sym)) {
-     	    /* Old style (K&R) function. */
-     	    F->Flags |= FD_OLDSTYLE;
-     	}
+               (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
+        /* If the identifier is a typedef, we have a new style parameter list,
+         * if it's some other identifier, it's an old style parameter list.
+         */
+        Sym = FindSym (CurTok.Ident);
+        if (Sym == 0 || !SymIsTypeDef (Sym)) {
+            /* Old style (K&R) function. */
+            F->Flags |= FD_OLDSTYLE;
+        }
     }
 
     /* Parse params */
     if ((F->Flags & FD_OLDSTYLE) == 0) {
 
-	/* New style function */
-     	ParseAnsiParamList (F);
+        /* New style function */
+        ParseAnsiParamList (F);
 
     } else {
-	/* Old style function */
-	ParseOldStyleParamList (F);
+        /* Old style function */
+        ParseOldStyleParamList (F);
     }
 
     /* Remember the last function parameter. We need it later for several
@@ -1353,15 +1353,15 @@ static FuncDesc* ParseFuncDecl (void)
     Offs = (F->Flags & FD_VARIADIC)? 1 : 0;
     Sym = F->LastParam;
     while (Sym) {
-	unsigned Size = CheckedSizeOf (Sym->Type);
+        unsigned Size = CheckedSizeOf (Sym->Type);
         if (SymIsRegVar (Sym)) {
             Sym->V.R.SaveOffs = Offs;
         } else {
-     	    Sym->V.Offs = Offs;
+            Sym->V.Offs = Offs;
         }
-       	Offs += Size;
-	F->ParamSize += Size;
-     	Sym = Sym->PrevSym;
+        Offs += Size;
+        F->ParamSize += Size;
+        Sym = Sym->PrevSym;
     }
 
     /* Leave the lexical level remembering the symbol tables */
@@ -1388,58 +1388,58 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     if (CurTok.Tok == TOK_STAR) {
 
         /* Skip the star */
-       	NextToken ();
+        NextToken ();
 
-    	/* Allow const, restrict and volatile qualifiers */
+        /* Allow const, restrict and volatile qualifiers */
         Qualifiers |= OptionalQualifiers (T_QUAL_CONST | T_QUAL_VOLATILE | T_QUAL_RESTRICT);
 
         /* Parse the type, the pointer points to */
-       	Declarator (Spec, D, Mode);
+        Declarator (Spec, D, Mode);
 
-	/* Add the type */
-	AddTypeToDeclaration (D, T_PTR | Qualifiers);
-       	return;
+        /* Add the type */
+        AddTypeToDeclaration (D, T_PTR | Qualifiers);
+        return;
     }
 
     if (CurTok.Tok == TOK_LPAREN) {
-       	NextToken ();
-       	Declarator (Spec, D, Mode);
-       	ConsumeRParen ();
+        NextToken ();
+        Declarator (Spec, D, Mode);
+        ConsumeRParen ();
     } else {
-     	/* Things depend on Mode now:
-       	 *  - Mode == DM_NEED_IDENT means:
-     	 *   	we *must* have a type and a variable identifer.
-     	 *  - Mode == DM_NO_IDENT means:
-     	 *   	we must have a type but no variable identifer
-     	 *     	(if there is one, it's not read).
-     	 *  - Mode == DM_ACCEPT_IDENT means:
-     	 *   	we *may* have an identifier. If there is an identifier,
-     	 *   	it is read, but it is no error, if there is none.
-     	 */
-     	if (Mode == DM_NO_IDENT) {
-     	    D->Ident[0] = '\0';
-     	} else if (CurTok.Tok == TOK_IDENT) {
-       	    strcpy (D->Ident, CurTok.Ident);
-     	    NextToken ();
-     	} else {
-     	    if (Mode == DM_NEED_IDENT) {
-     	       	Error ("Identifier expected");
-     	    }
-     	    D->Ident[0] = '\0';
-     	}
+        /* Things depend on Mode now:
+         *  - Mode == DM_NEED_IDENT means:
+         *      we *must* have a type and a variable identifer.
+         *  - Mode == DM_NO_IDENT means:
+         *      we must have a type but no variable identifer
+         *      (if there is one, it's not read).
+         *  - Mode == DM_ACCEPT_IDENT means:
+         *      we *may* have an identifier. If there is an identifier,
+         *      it is read, but it is no error, if there is none.
+         */
+        if (Mode == DM_NO_IDENT) {
+            D->Ident[0] = '\0';
+        } else if (CurTok.Tok == TOK_IDENT) {
+            strcpy (D->Ident, CurTok.Ident);
+            NextToken ();
+        } else {
+            if (Mode == DM_NEED_IDENT) {
+                Error ("Identifier expected");
+            }
+            D->Ident[0] = '\0';
+        }
     }
 
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
-       	if (CurTok.Tok == TOK_LPAREN) {
+        if (CurTok.Tok == TOK_LPAREN) {
 
-       	    /* Function declaration */
-    	    FuncDesc* F;
+            /* Function declaration */
+            FuncDesc* F;
 
             /* Skip the opening paren */
-       	    NextToken ();
+            NextToken ();
 
-    	    /* Parse the function declaration */
-       	    F = ParseFuncDecl ();
+            /* Parse the function declaration */
+            F = ParseFuncDecl ();
 
             /* We cannot specify fastcall for variadic functions */
             if ((F->Flags & FD_VARIADIC) && (Qualifiers & T_QUAL_FASTCALL)) {
@@ -1447,7 +1447,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
                 Qualifiers &= ~T_QUAL_FASTCALL;
             }
 
-    	    /* Add the function type. Be sure to bounds check the type buffer */
+            /* Add the function type. Be sure to bounds check the type buffer */
             NeedTypeSpace (D, 1);
             D->Type[D->Index].C = T_FUNC | Qualifiers;
             D->Type[D->Index].A.P = F;
@@ -1456,9 +1456,9 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             /* Qualifiers now used */
             Qualifiers = T_QUAL_NONE;
 
-       	} else {
-    	    /* Array declaration. */
-       	    long Size = UNSPECIFIED;
+        } else {
+            /* Array declaration. */
+            long Size = UNSPECIFIED;
 
             /* We cannot have any qualifiers for an array */
             if (Qualifiers != T_QUAL_NONE) {
@@ -1467,12 +1467,12 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
             }
 
             /* Skip the left bracket */
-       	    NextToken ();
+            NextToken ();
 
-    	    /* Read the size if it is given */
-       	    if (CurTok.Tok != TOK_RBRACK) {
-    	     	ExprDesc Expr;
-       	       	ConstAbsIntExpr (hie1, &Expr);
+            /* Read the size if it is given */
+            if (CurTok.Tok != TOK_RBRACK) {
+                ExprDesc Expr;
+                ConstAbsIntExpr (hie1, &Expr);
                 if (Expr.IVal <= 0) {
                     if (D->Ident[0] != '\0') {
                         Error ("Size of array `%s' is invalid", D->Ident);
@@ -1481,18 +1481,18 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
                     }
                     Expr.IVal = 1;
                 }
-       	       	Size = Expr.IVal;
-       	    }
+                Size = Expr.IVal;
+            }
 
             /* Skip the right bracket */
-       	    ConsumeRBrack ();
+            ConsumeRBrack ();
 
-    	    /* Add the array type with the size to the type */
+            /* Add the array type with the size to the type */
             NeedTypeSpace (D, 1);
             D->Type[D->Index].C = T_ARRAY;
             D->Type[D->Index].A.L = Size;
             ++D->Index;
-       	}
+        }
     }
 
     /* If we have remaining qualifiers, flag them as invalid */
@@ -1513,7 +1513,7 @@ static void Declarator (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
 
 
 /*****************************************************************************/
-/*	       	      	       	     code	     			     */
+/*                                   code                                    */
 /*****************************************************************************/
 
 
@@ -1550,7 +1550,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, declmode_t Mode)
     Declarator (Spec, D, Mode);
 
     /* Add the base type. */
-    NeedTypeSpace (D, TypeLen (Spec->Type) + 1);	/* Bounds check */
+    NeedTypeSpace (D, TypeLen (Spec->Type) + 1);        /* Bounds check */
     TypeCopy (D->Type + D->Index, Spec->Type);
 
     /* Use the storage class from the declspec */
@@ -1663,7 +1663,7 @@ void CheckEmptyDecl (const DeclSpec* D)
  */
 {
     if ((D->Flags & DS_EXTRA_TYPE) == 0) {
-   	Warning ("Useless declaration");
+        Warning ("Useless declaration");
     }
 }
 
@@ -1734,7 +1734,7 @@ static void DefineData (ExprDesc* Expr)
 
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
-       	    g_defdata (TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            g_defdata (TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
             break;
 
         case E_LOC_GLOBAL:
@@ -1749,12 +1749,12 @@ static void DefineData (ExprDesc* Expr)
             break;
 
         case E_LOC_REGISTER:
-       	    /* Register variable. Taking the address is usually not
-       	     * allowed.
-       	     */
-       	    if (IS_Get (&AllowRegVarAddr) == 0) {
-       	      	Error ("Cannot take the address of a register variable");
-       	    }
+            /* Register variable. Taking the address is usually not
+             * allowed.
+             */
+            if (IS_Get (&AllowRegVarAddr) == 0) {
+                Error ("Cannot take the address of a register variable");
+            }
             g_defdata (CF_REGVAR, Expr->Name, Expr->IVal);
             break;
 
@@ -1764,8 +1764,8 @@ static void DefineData (ExprDesc* Expr)
             Error ("Non constant initializer");
             break;
 
-       	default:
-       	    Internal ("Unknown constant type: 0x%04X", ED_GetLoc (Expr));
+        default:
+            Internal ("Unknown constant type: 0x%04X", ED_GetLoc (Expr));
     }
 }
 
@@ -1972,11 +1972,11 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
      */
     Tab = Entry->V.S.SymTab;
     if (Tab == 0) {
-      	Error ("Cannot initialize variables with incomplete type");
+        Error ("Cannot initialize variables with incomplete type");
         /* Try error recovery */
         SkipInitializer (1);
-      	/* Nothing initialized */
-      	return 0;
+        /* Nothing initialized */
+        return 0;
     }
 
     /* Get a pointer to the list of symbols */
@@ -1989,11 +1989,11 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
     while (CurTok.Tok != TOK_RCURLY) {
 
         /* */
-      	if (Entry == 0) {
-      	    Error ("Too many initializers");
+        if (Entry == 0) {
+            Error ("Too many initializers");
             SkipInitializer (1);
-      	    return SI.Offs;
-    	}
+            return SI.Offs;
+        }
 
         /* Parse initialization of one field. Bit-fields need a special
          * handling.
@@ -2063,8 +2063,8 @@ static unsigned ParseStructInit (Type* T, int AllowFlexibleMembers)
         }
 
         /* More initializers? */
-       	if (CurTok.Tok != TOK_COMMA) {
-    	    break;
+        if (CurTok.Tok != TOK_COMMA) {
+            break;
         }
 
         /* Skip the comma */
@@ -2089,7 +2089,7 @@ NextMember:
 
     /* If there are struct fields left, reserve additional storage */
     if (SI.Offs < SI.Size) {
-    	g_zerobytes (SI.Size - SI.Offs);
+        g_zerobytes (SI.Size - SI.Offs);
         SI.Offs = SI.Size;
     }
 
@@ -2116,53 +2116,53 @@ static unsigned ParseVoidInit (void)
     /* Allow an arbitrary list of values */
     Size = 0;
     do {
-	ConstExpr (hie1, &Expr);
-	switch (UnqualifiedType (Expr.Type[0].C)) {
+        ConstExpr (hie1, &Expr);
+        switch (UnqualifiedType (Expr.Type[0].C)) {
 
-	    case T_SCHAR:
-	    case T_UCHAR:
-	    	if (ED_IsConstAbsInt (&Expr)) {
-	    	    /* Make it byte sized */
-	    	    Expr.IVal &= 0xFF;
-	    	}
-	    	DefineData (&Expr);
+            case T_SCHAR:
+            case T_UCHAR:
+                if (ED_IsConstAbsInt (&Expr)) {
+                    /* Make it byte sized */
+                    Expr.IVal &= 0xFF;
+                }
+                DefineData (&Expr);
                 Size += SIZEOF_CHAR;
                 break;
 
-	    case T_SHORT:
-	    case T_USHORT:
-	    case T_INT:
-	    case T_UINT:
-	    case T_PTR:
-	    case T_ARRAY:
-	    	if (ED_IsConstAbsInt (&Expr)) {
-    	      	    /* Make it word sized */
-	    	    Expr.IVal &= 0xFFFF;
-	    	}
-	    	DefineData (&Expr);
-	    	Size += SIZEOF_INT;
+            case T_SHORT:
+            case T_USHORT:
+            case T_INT:
+            case T_UINT:
+            case T_PTR:
+            case T_ARRAY:
+                if (ED_IsConstAbsInt (&Expr)) {
+                    /* Make it word sized */
+                    Expr.IVal &= 0xFFFF;
+                }
+                DefineData (&Expr);
+                Size += SIZEOF_INT;
                 break;
 
-	    case T_LONG:
-	    case T_ULONG:
-	    	if (ED_IsConstAbsInt (&Expr)) {
-    	      	    /* Make it dword sized */
-	    	    Expr.IVal &= 0xFFFFFFFF;
-	    	}
-	    	DefineData (&Expr);
-	    	Size += SIZEOF_LONG;
+            case T_LONG:
+            case T_ULONG:
+                if (ED_IsConstAbsInt (&Expr)) {
+                    /* Make it dword sized */
+                    Expr.IVal &= 0xFFFFFFFF;
+                }
+                DefineData (&Expr);
+                Size += SIZEOF_LONG;
                 break;
 
-	    default:
-	    	Error ("Illegal type in initialization");
-	    	break;
+            default:
+                Error ("Illegal type in initialization");
+                break;
 
-    	}
+        }
 
-    	if (CurTok.Tok != TOK_COMMA) {
-    	    break;
-    	}
-    	NextToken ();
+        if (CurTok.Tok != TOK_COMMA) {
+            break;
+        }
+        NextToken ();
 
     } while (CurTok.Tok != TOK_RCURLY);
 
@@ -2180,38 +2180,38 @@ static unsigned ParseInitInternal (Type* T, int AllowFlexibleMembers)
 {
     switch (UnqualifiedType (T->C)) {
 
-     	case T_SCHAR:
-     	case T_UCHAR:
-    	case T_SHORT:
-    	case T_USHORT:
-     	case T_INT:
-     	case T_UINT:
-    	case T_LONG:
-    	case T_ULONG:
+        case T_SCHAR:
+        case T_UCHAR:
+        case T_SHORT:
+        case T_USHORT:
+        case T_INT:
+        case T_UINT:
+        case T_LONG:
+        case T_ULONG:
         case T_FLOAT:
         case T_DOUBLE:
             return ParseScalarInit (T);
 
-     	case T_PTR:
+        case T_PTR:
             return ParsePointerInit (T);
 
-     	case T_ARRAY:
+        case T_ARRAY:
             return ParseArrayInit (T, AllowFlexibleMembers);
 
         case T_STRUCT:
         case T_UNION:
-	    return ParseStructInit (T, AllowFlexibleMembers);
+            return ParseStructInit (T, AllowFlexibleMembers);
 
-	case T_VOID:
-	    if (IS_Get (&Standard) == STD_CC65) {
-	    	/* Special cc65 extension in non ANSI mode */
-	      	return ParseVoidInit ();
-	    }
-	    /* FALLTHROUGH */
+        case T_VOID:
+            if (IS_Get (&Standard) == STD_CC65) {
+                /* Special cc65 extension in non ANSI mode */
+                return ParseVoidInit ();
+            }
+            /* FALLTHROUGH */
 
-     	default:
-	    Error ("Illegal type");
-	    return SIZEOF_CHAR;
+        default:
+            Error ("Illegal type");
+            return SIZEOF_CHAR;
 
     }
 }

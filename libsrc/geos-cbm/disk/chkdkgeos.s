@@ -5,14 +5,14 @@
 
 ; char ChkDkGEOS (void);
 
-	    .export _ChkDkGEOS
-	    .import setoserror
+            .export _ChkDkGEOS
+            .import setoserror
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "geossym.inc"
+        
 _ChkDkGEOS:
-	jsr ChkDkGEOS
-	jsr setoserror
-	lda isGEOS
-	rts
+        jsr ChkDkGEOS
+        jsr setoserror
+        lda isGEOS
+        rts

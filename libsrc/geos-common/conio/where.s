@@ -8,15 +8,15 @@
 ; unsigned char wherex (void);
 ; unsigned char wherey (void);
 
-	    .export _wherex, _wherey
-	    .importzp cursor_c, cursor_r
+            .export _wherex, _wherey
+            .importzp cursor_c, cursor_r
 
 _wherex:
-	lda cursor_c
-	ldx #0
-	rts
+        lda cursor_c
+        ldx #0
+        rts
 
 _wherey:
-	lda cursor_r
-	ldx #0
-	rts
+        lda cursor_r
+        ldx #0
+        rts

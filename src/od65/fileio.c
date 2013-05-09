@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   fileio.c				     */
+/*                                 fileio.c                                  */
 /*                                                                           */
-/*		File I/O for the od65 object file dump utility		     */
+/*              File I/O for the od65 object file dump utility               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -55,7 +55,7 @@ void FileSetPos (FILE* F, unsigned long Pos)
 /* Seek to the given absolute position, fail on errors */
 {                 
     if (fseek (F, Pos, SEEK_SET) != 0) {
- 	Error ("Cannot seek: %s", strerror (errno));
+        Error ("Cannot seek: %s", strerror (errno));
     }
 }
 
@@ -66,7 +66,7 @@ unsigned long FileGetPos (FILE* F)
 {
     long Pos = ftell (F);
     if (Pos < 0) {
-       	Error ("Error in ftell: %s", strerror (errno));
+        Error ("Error in ftell: %s", strerror (errno));
     }
     return Pos;
 }
@@ -78,7 +78,7 @@ unsigned Read8 (FILE* F)
 {
     int C = getc (F);
     if (C == EOF) {
- 	Error ("Read error (file corrupt?)");
+        Error ("Read error (file corrupt?)");
     }
     return C;
 }
@@ -123,8 +123,8 @@ long Read32Signed (FILE* F)
 
     /* Sign extend the value */
     if (V & 0x80000000UL) {
-	/* Signed value */
-	V |= ~0xFFFFFFFFUL;
+        /* Signed value */
+        V |= ~0xFFFFFFFFUL;
     }
 
     /* Return it as a long */
@@ -143,12 +143,12 @@ unsigned long ReadVar (FILE* F)
     unsigned long V = 0;
     unsigned Shift = 0;
     do {
-	/* Read one byte */
-	C = Read8 (F);
-	/* Encode it into the target value */
-	V |= ((unsigned long)(C & 0x7F)) << Shift;
-	/* Next value */
-	Shift += 7;
+        /* Read one byte */
+        C = Read8 (F);
+        /* Encode it into the target value */
+        V |= ((unsigned long)(C & 0x7F)) << Shift;
+        /* Next value */
+        Shift += 7;
     } while (C & 0x80);
 
     /* Return the value read */
@@ -180,7 +180,7 @@ FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 /* Read a file position from the file */
 {
     /* Read the data fields */
-    Pos->Line =	ReadVar (F);
+    Pos->Line = ReadVar (F);
     Pos->Col  = ReadVar (F);
     Pos->Name = ReadVar (F);
     return Pos;
@@ -193,9 +193,9 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
 {
     /* Accept zero sized reads */
     if (Size > 0) {
-	if (fread (Data, 1, Size, F) != Size) {
-	    Error ("Read error (file corrupt?)");
-	}
+        if (fread (Data, 1, Size, F) != Size) {
+            Error ("Read error (file corrupt?)");
+        }
     }
     return Data;
 }
@@ -206,15 +206,15 @@ void ReadObjHeader (FILE* F, ObjHeader* H)
 /* Read an object file header from the file */
 {
     /* Read all fields */
-    H->Magic	    = Read32 (F);
-    H->Version	    = Read16 (F);
-    H->Flags	    = Read16 (F);
+    H->Magic        = Read32 (F);
+    H->Version      = Read16 (F);
+    H->Flags        = Read16 (F);
     H->OptionOffs   = Read32 (F);
     H->OptionSize   = Read32 (F);
-    H->FileOffs	    = Read32 (F);
-    H->FileSize	    = Read32 (F);
-    H->SegOffs	    = Read32 (F);
-    H->SegSize	    = Read32 (F);
+    H->FileOffs     = Read32 (F);
+    H->FileSize     = Read32 (F);
+    H->SegOffs      = Read32 (F);
+    H->SegSize      = Read32 (F);
     H->ImportOffs   = Read32 (F);
     H->ImportSize   = Read32 (F);
     H->ExportOffs   = Read32 (F);

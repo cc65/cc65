@@ -5,34 +5,34 @@
 ; void cputc (char c);
 ;
 
-    	.export	       	_cputcxy, _cputc
-	.export		setscrptr, putchar
+        .export         _cputcxy, _cputc
+        .export         setscrptr, putchar
         .import         rvs
-	.import		popax
+        .import         popax
         .importzp       ptr2
 
-	.include	"atmos.inc"
+        .include        "atmos.inc"
 
 
 _cputcxy:
-	pha	    		; Save C
-	jsr	popax		; Get X and Y
+        pha                     ; Save C
+        jsr     popax           ; Get X and Y
         sta     CURS_Y          ; Store Y
         stx     CURS_X          ; Store X
-	pla			; Restore C
+        pla                     ; Restore C
 
 ; Plot a character - also used as internal function
 
-_cputc: cmp    	#$0D  		; CR?
-    	bne	L1
-    	lda	#0
-    	sta	CURS_X          ; Carriage return
+_cputc: cmp     #$0D            ; CR?
+        bne     L1
+        lda     #0
+        sta     CURS_X          ; Carriage return
         rts
 
-L1: 	cmp	#$0A  	  	; LF?
-       	bne     output
-        inc	CURS_Y          ; Newline
-    	rts
+L1:     cmp     #$0A            ; LF?
+        bne     output
+        inc     CURS_Y          ; Newline
+        rts
 
 ; Output the character, then advance the cursor position
 
@@ -40,13 +40,13 @@ output:
         jsr     putchar
 
 advance:
-   	iny
-   	cpy	#40
-   	bne	L3
-       	inc     CURS_Y          ; new line
-   	ldy	#0    	  	; + cr
-L3:	sty	CURS_X
-   	rts
+        iny
+        cpy     #40
+        bne     L3
+        inc     CURS_Y          ; new line
+        ldy     #0              ; + cr
+L3:     sty     CURS_X
+        rts
 
 ; ------------------------------------------------------------------------
 ; Set ptr2 to the screen, load the X offset into Y
@@ -59,7 +59,7 @@ L3:	sty	CURS_X
         sta     ptr2
         lda     ScrTabHi,y      ; Get high byte of line address
         sta     ptr2+1
-       	ldy    	CURS_X          ; Get X offset
+        ldy     CURS_X          ; Get X offset
         rts
 
 .endproc
@@ -71,12 +71,12 @@ L3:	sty	CURS_X
 .code
 .proc   putchar
 
-       	ora    	rvs             ; Set revers bit
+        ora     rvs             ; Set revers bit
         pha                     ; And save
         jsr     setscrptr       ; Set ptr2 to the screen
         pla                     ; Restore the character
-       	sta    	(ptr2),y	; Set char
-       	rts
+        sta     (ptr2),y        ; Set char
+        rts
 
 .endproc
 

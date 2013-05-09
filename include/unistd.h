@@ -39,15 +39,15 @@
 
 
 /*****************************************************************************/
-/*	       	   	  	     Data	   			     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Predefined file handles */
-#define STDIN_FILENO	0
-#define STDOUT_FILENO	1
-#define STDERR_FILENO	2
+#define STDIN_FILENO    0
+#define STDOUT_FILENO   1
+#define STDERR_FILENO   2
 
 /* WE need size_t */
 #ifndef _HAVE_size_t
@@ -68,7 +68,7 @@ extern int optind, opterr, optopt;
 
 
 /*****************************************************************************/
-/*		   		     Code	   			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -77,12 +77,12 @@ extern int optind, opterr, optopt;
 int __fastcall__ write (int fd, const void* buf, unsigned count);
 int __fastcall__ read (int fd, void* buf, unsigned count);
 off_t __fastcall__ lseek (int fd, off_t offset, int whence);
-int __fastcall__ unlink (const char* name);	/* Same as remove() */
+int __fastcall__ unlink (const char* name);     /* Same as remove() */
 
 /* Directories */
 int __fastcall__ chdir (const char* name);
 char* __fastcall__ getcwd (char* buf, size_t size);
-int mkdir (const char* name, ...);	  	/* May take a mode argument */
+int mkdir (const char* name, ...);              /* May take a mode argument */
 int __fastcall__ rmdir (const char* name);
 
 /* Others */

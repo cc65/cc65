@@ -4,15 +4,15 @@
 ; CC65 runtime: Increment ax by 2
 ;
 
-       	.export	       	incax2
+        .export         incax2
 
-	.macpack	generic
+        .macpack        generic
 
-.proc	incax2
+.proc   incax2
 
-    	add   	#2
-    	bcc   	@L9
-    	inx
-@L9:	rts
+        add     #2
+        bcc     @L9
+        inx
+@L9:    rts
 
 .endproc

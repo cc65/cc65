@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   inline.h				     */
+/*                                 inline.h                                  */
 /*                                                                           */
-/*		Definitions to use the inline compiler feature		     */
+/*              Definitions to use the inline compiler feature               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,14 +39,14 @@
 
 
 /*****************************************************************************/
-/*	      			    Defines				     */
+/*                                  Defines                                  */
 /*****************************************************************************/
 
 
 
 #if defined(__GNUC__) && !defined(DISABLE_INLINE)
-#  define HAVE_INLINE	1
-#  define INLINE    	static __inline__
+#  define HAVE_INLINE   1
+#  define INLINE        static __inline__
 #endif
 
 

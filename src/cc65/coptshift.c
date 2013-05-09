@@ -183,7 +183,7 @@ static unsigned GetShift (const char* Name)
 
 
 /*****************************************************************************/
-/*	       			Optimize shifts                              */
+/*                              Optimize shifts                              */
 /*****************************************************************************/
 
 
@@ -212,11 +212,11 @@ unsigned OptShift1 (CodeSeg* S)
         CodeEntry* X;
         CodeLabel* L;
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                          &&
+        /* Check for the sequence */
+        if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_DIR (Shift) == SHIFT_DIR_LEFT) {
 
@@ -294,11 +294,11 @@ unsigned OptShift1 (CodeSeg* S)
 
             /* Remember, we had changes */
             ++Changes;
-	}
+        }
 
 NextEntry:
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -327,11 +327,11 @@ unsigned OptShift2(CodeSeg* S)
         unsigned Shift;
         unsigned Count;
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                          &&
+        /* Check for the sequence */
+        if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_TYPE (Shift) == SHIFT_TYPE_ASR        &&
             (Count = SHIFT_COUNT (Shift)) > 0           &&
@@ -357,10 +357,10 @@ unsigned OptShift2(CodeSeg* S)
 
             /* Remember, we had changes */
             ++Changes;
-    	}
+        }
 
-    	/* Next entry */
-    	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -374,7 +374,7 @@ unsigned OptShift3 (CodeSeg* S)
 /* The sequence
  *
  *      bcc     L
- *  	inx
+ *      inx
  * L:   jsr     shrax1
  *
  * may get replaced by
@@ -397,19 +397,19 @@ unsigned OptShift3 (CodeSeg* S)
 
         unsigned   Shift;
         unsigned   Count;
-	CodeEntry* L[3];
+        CodeEntry* L[3];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if ((L[0]->OPC == OP65_BCC || L[0]->OPC == OP65_JCC)    &&
-	    L[0]->JumpTo != 0                                   &&
+        /* Check for the sequence */
+        if ((L[0]->OPC == OP65_BCC || L[0]->OPC == OP65_JCC)    &&
+            L[0]->JumpTo != 0                                   &&
             L[0]->RI->In.RegX == 0                              &&
-       	    CS_GetEntries (S, L+1, I+1, 2)                      &&
-	    L[1]->OPC == OP65_INX            	       	        &&
-	    L[0]->JumpTo->Owner == L[2]                         &&
-	    !CS_RangeHasLabel (S, I, 2)                         &&
+            CS_GetEntries (S, L+1, I+1, 2)                      &&
+            L[1]->OPC == OP65_INX                               &&
+            L[0]->JumpTo->Owner == L[2]                         &&
+            !CS_RangeHasLabel (S, I, 2)                         &&
             L[2]->OPC == OP65_JSR                               &&
             (Shift = GetShift (L[2]->Arg)) != SHIFT_NONE        &&
             SHIFT_DIR (Shift) == SHIFT_DIR_RIGHT                &&
@@ -423,16 +423,16 @@ unsigned OptShift3 (CodeSeg* S)
                 CS_InsertEntry (S, X, I+4);
             }
 
-	    /* Remove the bcs/dex/jsr */
-	    CS_DelEntries (S, I, 3);
+            /* Remove the bcs/dex/jsr */
+            CS_DelEntries (S, I, 3);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -457,14 +457,14 @@ unsigned OptShift4 (CodeSeg* S)
         unsigned Shift;
         unsigned Count;
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                          &&
+        /* Check for the sequence */
+        if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_DIR (Shift) == SHIFT_DIR_RIGHT        &&
-       	    E->RI->In.RegX == 0) {
+            E->RI->In.RegX == 0) {
 
             CodeEntry* X;
 
@@ -518,17 +518,17 @@ unsigned OptShift4 (CodeSeg* S)
 
             }
 
-	    /* Delete the call to shrax */
-	    CS_DelEntry (S, I);
+            /* Delete the call to shrax */
+            CS_DelEntry (S, I);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
 NextEntry:
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -566,22 +566,22 @@ unsigned OptShift5 (CodeSeg* S)
     while (I < CS_GetEntryCount (S)) {
 
         unsigned ShiftType;
-     	CodeEntry* L[5];
+        CodeEntry* L[5];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_LDA                               &&
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_LDA                               &&
             (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP)       &&
-       	    CS_GetEntries (S, L+1, I+1, 4)     	                &&
+            CS_GetEntries (S, L+1, I+1, 4)                      &&
             !CS_RangeHasLabel (S, I+1, 4)                       &&
             L[1]->OPC == OP65_LDX                               &&
             (L[1]->AM == AM65_ABS || L[1]->AM == AM65_ZP)       &&
             L[2]->OPC == OP65_JSR                               &&
             (ShiftType = GetShift (L[2]->Arg)) != SHIFT_NONE    &&
             SHIFT_COUNT(ShiftType) == 1                         &&
-       	    L[3]->OPC == OP65_STA                               &&
+            L[3]->OPC == OP65_STA                               &&
             (L[3]->AM == AM65_ABS || L[3]->AM == AM65_ZP)       &&
             L[4]->OPC == OP65_STX                               &&
             (L[4]->AM == AM65_ABS || L[4]->AM == AM65_ZP)       &&
@@ -644,13 +644,13 @@ unsigned OptShift5 (CodeSeg* S)
 
             }
 
-	    /* Remember, we had changes */
+            /* Remember, we had changes */
             ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -674,11 +674,11 @@ unsigned OptShift6 (CodeSeg* S)
         CodeEntry* X;
         unsigned   IP;
 
-      	/* Get next entry */
-     	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-     	/* Check for a call to one of the shift routine */
-	if (E->OPC == OP65_JSR                          &&
+        /* Check for a call to one of the shift routine */
+        if (E->OPC == OP65_JSR                          &&
             (Shift = GetShift (E->Arg)) != SHIFT_NONE   &&
             SHIFT_DIR (Shift) == SHIFT_DIR_LEFT         &&
             (Count = SHIFT_COUNT (Shift)) > 0) {
@@ -729,13 +729,13 @@ unsigned OptShift6 (CodeSeg* S)
             /* Remove the subroutine call */
             CS_DelEntry (S, I);
 
-	    /* Remember, we had changes */
+            /* Remember, we had changes */
             ++Changes;
-	}
+        }
 
 NextEntry:
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 

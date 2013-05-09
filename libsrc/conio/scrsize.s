@@ -4,22 +4,22 @@
 ; void screensize (unsigned char* x, unsigned char* y);
 ;
 
-    	.export	 	_screensize
+        .export         _screensize
 
-	.import	       	popsreg
-	.import	       	screensize
-	.importzp      	ptr1, sreg
+        .import         popsreg
+        .import         screensize
+        .importzp       ptr1, sreg
 
-.proc	_screensize
+.proc   _screensize
 
-	sta	ptr1   	       	; Store the y pointer
-	stx	ptr1+1
+        sta     ptr1            ; Store the y pointer
+        stx     ptr1+1
         jsr     popsreg         ; Get the x pointer into sreg
         jsr     screensize      ; Get screensize into X/Y
         tya                     ; Get Y size into A
 
 .IFP02
-      	ldy	#0
+        ldy     #0
         sta     (ptr1),y
         txa
         sta     (sreg),y
@@ -29,7 +29,7 @@
         sta     (sreg)
 .ENDIF
 
-   	rts
+        rts
 
 .endproc
 

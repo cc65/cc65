@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                   cputype.h                               */
 /*                                                                           */
-/*			     CPU type definitions			     */
+/*                           CPU type definitions                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*	   	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -51,7 +51,7 @@ typedef enum CPUType {
 } CPUType;
 
 /* Current CPU */
-extern CPUType	CPU;
+extern CPUType  CPU;
 
 
 

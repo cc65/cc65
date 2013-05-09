@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*				Optimize shifts                              */
+/*                              Optimize shifts                              */
 /*****************************************************************************/
 
 
@@ -74,7 +74,7 @@ unsigned OptShift3 (CodeSeg* S);
 /* The sequence
  *
  *      bcc     L
- *  	inx
+ *      inx
  * L:   jsr     shrax1
  *
  * may get replaced by

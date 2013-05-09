@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    	    	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -52,14 +52,14 @@ int ValidSegName (const char* Name)
 {
     /* Must start with '_' or a letter */
     if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
-       	return 0;
+        return 0;
     }
 
     /* Can have letters, digits or the underline */
     while (*++Name) {
-       	if (*Name != '_' && !IsAlNum(*Name)) {
-       	    return 0;
-       	}
+        if (*Name != '_' && !IsAlNum(*Name)) {
+            return 0;
+        }
     }
 
     /* Name is ok */

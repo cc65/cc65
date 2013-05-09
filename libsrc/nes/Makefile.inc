@@ -1,4 +1,4 @@
-../tgi/nes-64-56-2.tgi:	../wrk/nes/clrscr.o \
+../tgi/nes-64-56-2.tgi: ../wrk/nes/clrscr.o \
                         ../wrk/nes/cputc.o  \
                         ../wrk/nes/get_tv.o \
                         ../wrk/nes/gotoxy.o \

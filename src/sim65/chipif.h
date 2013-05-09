@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   chipif.h				     */
+/*                                 chipif.h                                  */
 /*                                                                           */
 /*         Interface header file for chip plugins - unused by sim65          */
 /*                                                                           */

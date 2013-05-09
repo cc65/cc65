@@ -5,8 +5,8 @@
 
 ; void MainLoop (void);
 
-	    .export _MainLoop
+            .export _MainLoop
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_MainLoop	= MainLoop
+_MainLoop       = MainLoop

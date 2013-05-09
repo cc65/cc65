@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  macrotab.h				     */
+/*                                macrotab.h                                 */
 /*                                                                           */
-/*	       Preprocessor macro table for the cc65 C compiler		     */
+/*             Preprocessor macro table for the cc65 C compiler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*   		 		     data				     */
+/*                                   data                                    */
 /*****************************************************************************/
 
 
@@ -54,20 +54,20 @@
 /* Structure describing a macro */
 typedef struct Macro Macro;
 struct Macro {
-    Macro*  	  Next;	        /* Next macro with same hash value */
+    Macro*        Next;         /* Next macro with same hash value */
     int           Expanding;    /* Are we currently expanding this macro? */
-    int	    	  ArgCount;	/* Number of parameters, -1 = no parens */
-    unsigned	  MaxArgs;	/* Size of formal argument list */
-    Collection    FormalArgs;	/* Formal argument list (char*) */
+    int           ArgCount;     /* Number of parameters, -1 = no parens */
+    unsigned      MaxArgs;      /* Size of formal argument list */
+    Collection    FormalArgs;   /* Formal argument list (char*) */
     StrBuf        Replacement;  /* Replacement text */
     unsigned char Variadic;     /* C99 variadic macro */
-    char    	  Name[1];   	/* Name, dynamically allocated */
+    char          Name[1];      /* Name, dynamically allocated */
 };
 
 
 
 /*****************************************************************************/
-/*   	    	 	   	     Code	    			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

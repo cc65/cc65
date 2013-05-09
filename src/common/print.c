@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    print.c				     */
+/*                                  print.c                                  */
 /*                                                                           */
-/*				Program output				     */
+/*                              Program output                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001	 Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -41,17 +41,17 @@
 
 
 /*****************************************************************************/
-/*     	       	       		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-unsigned char Verbosity = 0;    	/* Verbose operation flag */
+unsigned char Verbosity = 0;            /* Verbose operation flag */
 
 
 
 /*****************************************************************************/
-/*     	       	       		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -63,8 +63,8 @@ void Print (FILE* F, unsigned V, const char* Format, ...)
 
     /* Check the verbosity */
     if (V > Verbosity) {
-       	/* Don't output this message */
-       	return;
+        /* Don't output this message */
+        return;
     }
 
     /* Output */

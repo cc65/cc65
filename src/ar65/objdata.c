@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objdata.c				     */
+/*                                 objdata.c                                 */
 /*                                                                           */
-/*		Handling object file data for the ar65 archiver		     */
+/*              Handling object file data for the ar65 archiver              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -58,7 +58,7 @@ Collection       ObjPool        = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -70,12 +70,12 @@ ObjData* NewObjData (void)
     ObjData* O = xmalloc (sizeof (ObjData));
 
     /* Initialize the data */
-    O->Name  	   = 0;
+    O->Name        = 0;
 
-    O->Flags   	   = 0;
-    O->MTime 	   = 0;
-    O->Start	   = 0;
-    O->Size 	   = 0;
+    O->Flags       = 0;
+    O->MTime       = 0;
+    O->Start       = 0;
+    O->Size        = 0;
 
     O->Strings     = EmptyCollection;
     O->Exports     = EmptyCollection;
@@ -134,9 +134,9 @@ ObjData* FindObjData (const char* Module)
         ObjData* O = CollAtUnchecked (&ObjPool, I);
 
         /* Did we find it? */
-     	if (strcmp (O->Name, Module) == 0) {
-     	    return O;
-     	}
+        if (strcmp (O->Name, Module) == 0) {
+            return O;
+        }
     }
     return 0;
 }
@@ -153,15 +153,15 @@ void DelObjData (const char* Module)
         ObjData* O = CollAtUnchecked (&ObjPool, I);
 
         /* Did we find it? */
-     	if (strcmp (O->Name, Module) == 0) {
+        if (strcmp (O->Name, Module) == 0) {
 
-	    /* Free the entry */
+            /* Free the entry */
             CollDelete (&ObjPool, I);
-	    FreeObjData (O);
+            FreeObjData (O);
 
-	    /* Done */
-	    return;
-     	}
+            /* Done */
+            return;
+        }
     }
 
     /* Not found! */

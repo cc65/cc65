@@ -40,25 +40,25 @@
 
 ; Save the file pointer into the register bank
 
-    	sta  	file
-    	stx  	file+1
+        sta     file
+        stx     file+1
 
 ; Check if the file is open
 
-    	ldy  	#_FILE::f_flags
-    	lda  	(file),y
-    	and  	#_FOPEN		      	; Is the file open?
-       	beq    	@L1  			; Branch if no
+        ldy     #_FILE::f_flags
+        lda     (file),y
+        and     #_FOPEN                 ; Is the file open?
+        beq     @L1                     ; Branch if no
 
 ; Check if the stream is in an error state
 
-        lda  	(file),y		; get file->f_flags again
-	and  	#_FERROR
-	beq     @L2
+        lda     (file),y                ; get file->f_flags again
+        and     #_FERROR
+        beq     @L2
 
 ; File not open or in error state
 
-@L1:    lda    	#EINVAL
+@L1:    lda     #EINVAL
         jsr     __seterrno              ; Set __errno, return zero in A
         tax                             ; a/x = 0
         jmp     @L99                    ; Bail out
@@ -208,6 +208,6 @@
 ; Data
 
 .bss
-save:  	.res	2
+save:   .res    2
 pb:     .res    1
 

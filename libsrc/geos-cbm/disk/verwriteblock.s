@@ -5,19 +5,19 @@
 
 ; char VerWriteBlock (struct tr_se *myTS, char *buffer);
 
-	    .export _VerWriteBlock
-	    .import popax, setoserror
-	    .import gettrse
+            .export _VerWriteBlock
+            .import popax, setoserror
+            .import gettrse
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "geossym.inc"
+        
 _VerWriteBlock:
-	sta r4L
-	stx r4H
-	jsr popax
-	jsr gettrse
-	sta r1L
-	stx r1H
-	jsr VerWriteBlock
-	jmp setoserror
+        sta r4L
+        stx r4H
+        jsr popax
+        jsr gettrse
+        sta r1L
+        stx r1H
+        jsr VerWriteBlock
+        jmp setoserror

@@ -21,12 +21,12 @@
 ;    distribution.
 ;
 
-.define _SMCDesignator .mid(0, .tcount(label) - 1, label) .ident(.concat(.string(.right(1, label)), "_SMC"))
-.define _SMCAlias .mid(0, .tcount(alias) - 1, alias) .ident(.concat(.string(.right(1, alias)), "_SMC"))
+.define _SMCDesignator  .mid(0, .tcount(label) - 1, label) .ident(.concat(.string(.right(1, label)), "_SMC"))
+.define _SMCAlias       .mid(0, .tcount(alias) - 1, alias) .ident(.concat(.string(.right(1, alias)), "_SMC"))
 .define SMC_AbsAdr      $FADE
-.define SMC_ZpAdr               $00
+.define SMC_ZpAdr       $00
 .define SMC_Opcode      nop
-.define SMC_Value               $42
+.define SMC_Value       $42
 
 .macro SMC_OperateOnValue opcode, label
         opcode _SMCDesignator+1
@@ -48,86 +48,86 @@
 .export _SMCAlias := _SMCDesignator
 .endmacro
 
-.macro  SMC	label, statement
+.macro  SMC     label, statement
 _SMCDesignator: statement
 .endmacro
 
 .macro SMC_TransferOpcode       label, opcode, register
 .if .paramcount = 2 .or .match ({register}, a)
-                        lda #opcode
-                        sta _SMCDesignator
+        lda #opcode
+        sta _SMCDesignator
 .elseif .match ({register}, x)
-                        ldx #opcode
-                        stx _SMCDesignator
+        ldx #opcode
+        stx _SMCDesignator
 .elseif .match ({register}, y)
-                        ldy #opcode
-                        sty _SMCDesignator
+        ldy #opcode
+        sty _SMCDesignator
 .endif
 .endmacro
 
 .macro SMC_LoadOpcode   label, register
 .if .paramcount = 1 .or .match ({register}, a)
-                        lda _SMCDesignator
+        lda _SMCDesignator
 .elseif .match ({register}, x)
-                        ldx _SMCDesignator
+        ldx _SMCDesignator
 .elseif .match ({register}, y)
-                        ldy _SMCDesignator
+        ldy _SMCDesignator
 .endif
 .endmacro
 
 .macro SMC_StoreOpcode  label, register
 .if .paramcount = 1 .or .match ({register}, a)
-                        sta _SMCDesignator
+        sta _SMCDesignator
 .elseif .match ({register}, x)
-                        stx _SMCDesignator
+        stx _SMCDesignator
 .elseif .match ({register}, y)
-                        sty _SMCDesignator
+        sty _SMCDesignator
 .endif
 .endmacro
 
 .macro SMC_ChangeBranch         label, destination, register
 .if .paramcount = 2 .or .match ({register}, a)
-                        lda #(destination - _SMCDesignator -2)
-                        sta _SMCDesignator+1
+        lda #(destination - _SMCDesignator -2)
+        sta _SMCDesignator+1
 .elseif .match ({register}, x)
-                        ldx #(destination - _SMCDesignator - 2)
-                        stx _SMCDesignator+1
+        ldx #(destination - _SMCDesignator - 2)
+        stx _SMCDesignator+1
 .elseif .match ({register}, y)
-                        ldy #(destination - _SMCDesignator - 2)
-                        sty _SMCDesignator+1
+        ldy #(destination - _SMCDesignator - 2)
+        sty _SMCDesignator+1
 .endif
 .endmacro
 
 .macro SMC_TransferValue        label, value, register
 .if .paramcount = 2 .or .match ({register}, a)
-                        lda value
-                        sta _SMCDesignator+1
+        lda value
+        sta _SMCDesignator+1
 .elseif .match ({register}, x)
-                        ldx value
-                        stx _SMCDesignator+1
+        ldx value
+        stx _SMCDesignator+1
 .elseif .match ({register}, y)
-                        ldy value
-                        sty _SMCDesignator+1
+        ldy value
+        sty _SMCDesignator+1
 .endif
 .endmacro
 
 .macro SMC_LoadValue    label, register
 .if .paramcount = 1 .or .match ({register}, a)
-                        lda _SMCDesignator+1
+        lda _SMCDesignator+1
 .elseif .match ({register}, x)
-                        ldx _SMCDesignator+1
+        ldx _SMCDesignator+1
 .elseif .match ({register}, y)
-                        ldy _SMCDesignator+1
+        ldy _SMCDesignator+1
 .endif
 .endmacro
 
 .macro SMC_StoreValue   label, register
 .if .paramcount = 1 .or .match ({register}, a)
-                        sta _SMCDesignator+1
+        sta _SMCDesignator+1
 .elseif .match ({register}, x)
-                        stx _SMCDesignator+1
+        stx _SMCDesignator+1
 .elseif .match ({register}, y)
-                        sty _SMCDesignator+1
+        sty _SMCDesignator+1
 .endif
 .endmacro
 
@@ -146,49 +146,48 @@ SMC_StoreValue label, register
 
 .macro SMC_TransferHighByte     label, value, register
 .if .paramcount = 2 .or .match ({register}, a)
-                        lda	value
-                        sta _SMCDesignator+2
+        lda value
+        sta _SMCDesignator+2
 .elseif .match ({register}, x)
-                        ldx value
-                        stx _SMCDesignator+2
+        ldx value
+        stx _SMCDesignator+2
 .elseif .match ({register}, y)
-                        ldy value
-                        sty _SMCDesignator+2
+        ldy value
+        sty _SMCDesignator+2
 .endif
 .endmacro
 
 .macro SMC_LoadHighByte label, register
 .if .paramcount = 1 .or .match ({register}, a)
-                        lda _SMCDesignator+2
+        lda _SMCDesignator+2
 .elseif .match ({register}, x)
-                        ldx _SMCDesignator+2
+        ldx _SMCDesignator+2
 .elseif .match ({register}, y)
-                        ldy _SMCDesignator+2
+        ldy _SMCDesignator+2
 .endif
 .endmacro
 
 .macro SMC_StoreHighByte        label, register
 .if .paramcount = 1 .or .match ({register}, a)
-                        sta _SMCDesignator+2
+        sta _SMCDesignator+2
 .elseif .match ({register}, x)
-                        stx _SMCDesignator+2
+        stx _SMCDesignator+2
 .elseif .match ({register}, y)
-                        sty _SMCDesignator+2
+        sty _SMCDesignator+2
 .endif
 .endmacro
-
 
 .macro SMC_TransferAddressSingle        label, address, register
 .if .paramcount = 2 .or .match ((register), a)
         .if (.match (.left (1, {address}), #))
                 ; immediate mode
-        lda     #<(.right (.tcount ({address})-1, {address}))
+                lda #<(.right (.tcount ({address})-1, {address}))
                 sta _SMCDesignator+1
-        lda #>(.right (.tcount ({address})-1, {address}))
+                lda #>(.right (.tcount ({address})-1, {address}))
                 sta _SMCDesignator+2
-    .else
-        ; assume absolute or zero page
-                lda	address
+        .else
+                ; assume absolute or zero page
+                lda address
                 sta _SMCDesignator+1
                 lda 1+(address)
                 sta _SMCDesignator+2
@@ -196,13 +195,13 @@ SMC_StoreValue label, register
 .elseif .match ((register), x)
         .if (.match (.left (1, {address}), #))
                 ; immediate mode
-        ldx     #<(.right (.tcount ({address})-1, {address}))
+                ldx #<(.right (.tcount ({address})-1, {address}))
                 stx _SMCDesignator+1
-        ldx #>(.right (.tcount ({address})-1, {address}))
+                ldx #>(.right (.tcount ({address})-1, {address}))
                 stx _SMCDesignator+2
-    .else
-        ; assume absolute or zero page
-                ldx	address
+        .else
+                ; assume absolute or zero page
+                ldx address
                 stx _SMCDesignator+1
                 ldx 1+(address)
                 stx _SMCDesignator+2
@@ -210,13 +209,13 @@ SMC_StoreValue label, register
 .elseif .match ((register), y)
         .if (.match (.left (1, {address}), #))
                 ; immediate mode
-        ldy     #<(.right (.tcount ({address})-1, {address}))
+                ldy #<(.right (.tcount ({address})-1, {address}))
                 sty _SMCDesignator+1
-        ldy #>(.right (.tcount ({address})-1, {address}))
+                ldy #>(.right (.tcount ({address})-1, {address}))
                 sty _SMCDesignator+2
-    .else
-        ; assume absolute or zero page
-                ldy	address
+        .else
+                ; assume absolute or zero page
+                ldy address
                 sty _SMCDesignator+1
                 ldy 1+(address)
                 sty _SMCDesignator+2
@@ -224,17 +223,16 @@ SMC_StoreValue label, register
 .endif
 .endmacro
 
-
 .macro SMC_TransferAddress      label, address
 .if (.match (.left (1, {address}), #))
         ; immediate mode
-        lda	#<(.right (.tcount ({address})-1, {address}))
+        lda #<(.right (.tcount ({address})-1, {address}))
         sta _SMCDesignator+1
         ldx #>(.right (.tcount ({address})-1, {address}))
         stx _SMCDesignator+2
 .else
         ; assume absolute or zero page
-        lda	{address}
+        lda {address}
         sta _SMCDesignator+1
         ldx 1+{address}
         stx _SMCDesignator)+2
@@ -242,8 +240,6 @@ SMC_StoreValue label, register
 .endmacro
 
 .macro SMC_StoreAddress label
-                sta _SMCDesignator+1
-                stx _SMCDesignator+2
+        sta _SMCDesignator+1
+        stx _SMCDesignator+2
 .endmacro
-
-

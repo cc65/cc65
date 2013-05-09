@@ -5,11 +5,11 @@
 
 ; char GetRandom (void);
 
-	    .export _GetRandom
+            .export _GetRandom
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _GetRandom:
-	jsr GetRandom
-	ldx #0
-	rts
+        jsr GetRandom
+        ldx #0
+        rts

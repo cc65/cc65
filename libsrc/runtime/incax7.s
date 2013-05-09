@@ -4,13 +4,13 @@
 ; CC65 runtime: Increment ax by 7
 ;
 
-       	.export	       	incax7
-	.import		incaxy
+        .export         incax7
+        .import         incaxy
 
-.proc	incax7
+.proc   incax7
 
-	ldy   	#7
-	jmp	incaxy
+        ldy     #7
+        jmp     incaxy
 
 .endproc
 

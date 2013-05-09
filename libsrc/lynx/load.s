@@ -7,35 +7,35 @@
 ;
 ; void lynx_load(int fileno)
 ;
-	.importzp	_FileFileLen
-	.importzp	_FileDestAddr
-	.import		pushax,ldax0sp,pusha0,incsp2
-	.import		_openn
-	.import		_read
-	.export		_lynx_load
+        .importzp       _FileFileLen
+        .importzp       _FileDestAddr
+        .import         pushax,ldax0sp,pusha0,incsp2
+        .import         _openn
+        .import         _read
+        .export         _lynx_load
 
 ; ---------------------------------------------------------------
 ; void __near__ __fastcall__ lynx_load (int)
 ; ---------------------------------------------------------------
 
-.segment	"CODE"
+.segment        "CODE"
 
-.proc	_lynx_load: near
+.proc   _lynx_load: near
 
-.segment	"CODE"
+.segment        "CODE"
 
-	jsr     pushax
-	jsr     ldax0sp
-	jsr     _openn
-	lda     #$01
-	jsr     pusha0
-	lda     _FileDestAddr
-	ldx     _FileDestAddr+1
-	jsr     pushax
-	lda     _FileFileLen
-	ldx     _FileFileLen+1
-	jsr     _read
-	jmp     incsp2
+        jsr     pushax
+        jsr     ldax0sp
+        jsr     _openn
+        lda     #$01
+        jsr     pusha0
+        lda     _FileDestAddr
+        ldx     _FileDestAddr+1
+        jsr     pushax
+        lda     _FileFileLen
+        ldx     _FileFileLen+1
+        jsr     _read
+        jmp     incsp2
 
 .endproc
 

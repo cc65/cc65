@@ -4,37 +4,37 @@
 ; int __fastcall__ close (int fd);
 ;
 
-        .export 	_close
+        .export         _close
 
-        .import		closedirect, freebuffer
+        .import         closedirect, freebuffer
 
-        .include	"errno.inc"
-        .include	"filedes.inc"
+        .include        "errno.inc"
+        .include        "filedes.inc"
 
 _close:
         ; Process fd
-        jsr	getfd		; Returns A, Y and C
-        bcs	errno
+        jsr     getfd           ; Returns A, Y and C
+        bcs     errno
 
         ; Check for device
-        bmi	zerofd
+        bmi     zerofd
 
         ; Close file
-        jsr	closedirect	; Preserves Y
-        bcs	oserr
+        jsr     closedirect     ; Preserves Y
+        bcs     oserr
 
         ; Mark fdtab slot as free
-zerofd: lda	#$00
-        sta	fdtab + FD::REF_NUM,y
+zerofd: lda     #$00
+        sta     fdtab + FD::REF_NUM,y
 
         ; Cleanup I/O buffer
-        jsr	freebuffer
+        jsr     freebuffer
 
         ; Return success
-        lda	#$00
+        lda     #$00
 
         ; Set __oserror
-oserr:  jmp	__mappederrno
+oserr:  jmp     __mappederrno
 
         ; Set __errno
-errno:  jmp	__directerrno
+errno:  jmp     __directerrno

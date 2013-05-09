@@ -5,8 +5,8 @@
 
 ; void CallRoutine (myRoutine);
 
-	    .export _CallRoutine
+            .export _CallRoutine
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_CallRoutine	= CallRoutine
+_CallRoutine    = CallRoutine

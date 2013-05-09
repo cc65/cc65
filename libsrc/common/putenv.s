@@ -130,7 +130,7 @@
 
 ; Since free() has destroyed ptr2, we need another copy ...
 
-        jsr	copyenvptr		; Copy __environ to ptr2
+        jsr     copyenvptr              ; Copy __environ to ptr2
 
 ; Bump the environment count and remember it in X. Add the final NULL entry.
 
@@ -169,10 +169,10 @@ addentry:
 ; Error entries
 
 nomem:  lda     #ENOMEM
-error:	jsr	__seterrno
-	lda	#$FF			; Return -1
-	tax
-	rts
+error:  jsr     __seterrno
+        lda     #$FF                    ; Return -1
+        tax
+        rts
 
 .endproc
 

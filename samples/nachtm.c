@@ -22,16 +22,16 @@
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Tables with voice data.
  *
- *  Bit	    Description
+ *  Bit     Description
  * -------------------------------------------
- *  15	    Pause bit.
+ *  15      Pause bit.
  *  12-14   Octave
  *  8-11    Tone (index into frequency table)
  *  7       Unused. Was thought as a control bit in the original version to
@@ -885,12 +885,12 @@ static unsigned long FreqTab [12] = {
 
 
 typedef struct {
-    unsigned char      	DoneMask;	/* Set this if we're done */
-    unsigned char     	Trigger;	/* Trigger value */
-    unsigned char     	Ticks;		/* Ticks for this tone */
-    unsigned	      	Freq;		/* Actual frequency value */
-    unsigned*  	      	Data;		/* Pointer to data */
-    struct __sid_voice*	Voice;		/* Pointer to sid registers */
+    unsigned char       DoneMask;       /* Set this if we're done */
+    unsigned char       Trigger;        /* Trigger value */
+    unsigned char       Ticks;          /* Ticks for this tone */
+    unsigned            Freq;           /* Actual frequency value */
+    unsigned*           Data;           /* Pointer to data */
+    struct __sid_voice* Voice;          /* Pointer to sid registers */
 } VoiceCtrl;
 
 /* Control structs for all three voices */
@@ -919,7 +919,7 @@ static unsigned char NextClock;
 static clock_t StartTime;
 
 /* Number of ticks for each tone */
-#define	TICKS_PER_TONE	4
+#define TICKS_PER_TONE  4
 
 /* Done flag. Contains one bit for each voice. Will contain 0x07 if all
  * voices have finished playing.
@@ -929,7 +929,7 @@ static unsigned char Done;
 
 
 /*****************************************************************************/
-/*	    		   	     Code    	       			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -948,22 +948,22 @@ static void MakeNiceScreen (void)
 /* Make a nice screen */
 {
     typedef struct {
-     	unsigned char  	Y;
-     	char*	       	Msg;
+        unsigned char   Y;
+        char*           Msg;
     } TextDesc;
     static TextDesc Text [] = {
-       	{   2, "Wolfgang Amadeus Mozart"     	},
-        {   4, "\"Eine kleine Nachtmusik\""	},
-       	{   5, "(KV 525)"	      	  	},
+        {   2, "Wolfgang Amadeus Mozart"        },
+        {   4, "\"Eine kleine Nachtmusik\""     },
+        {   5, "(KV 525)"                       },
         {   9, "Ported to the SID in 1987 by" },
-       	{  11, "Joachim von Bassewitz"  	},
-       	{  12, "(joachim@von-bassewitz.de)"	},
-       	{  13, "and"	      		  	},
-       	{  14, "Ullrich von Bassewitz"  	},
-        {  15, "(ullrich@von-bassewitz.de)"	},
-       	{  18, "C Implementation by"	  	},
-       	{  19, "Ullrich von Bassewitz"  	},
-        {  23, "Press any key to quit..."	},
+        {  11, "Joachim von Bassewitz"          },
+        {  12, "(joachim@von-bassewitz.de)"     },
+        {  13, "and"                            },
+        {  14, "Ullrich von Bassewitz"          },
+        {  15, "(ullrich@von-bassewitz.de)"     },
+        {  18, "C Implementation by"            },
+        {  19, "Ullrich von Bassewitz"          },
+        {  23, "Press any key to quit..."       },
     };
 
     register const TextDesc* T;
@@ -1004,8 +1004,8 @@ static void MakeNiceScreen (void)
     /* Write something into the frame */
     for (I = 0, T = Text; I < sizeof (Text) / sizeof (Text [0]); ++I) {
         X = (XSize - strlen (T->Msg)) / 2;
-     	cputsxy (X, T->Y, T->Msg);
-     	++T;
+        cputsxy (X, T->Y, T->Msg);
+        ++T;
     }
 }
 
@@ -1017,7 +1017,7 @@ static void TimeSync (void)
     static unsigned char Clock;
 
     do {
-       	Clock = clock ();
+        Clock = clock ();
     } while (Clock != NextClock);
     NextClock = Clock + TICKS_PER_TONE;
 }
@@ -1041,11 +1041,11 @@ static void DisplayTime (void)
  * just write to the memory space.
  */
 #if defined(__CBM510__) || defined(__CBM610__)
-#  define outb(addr,val)	pokebsys ((unsigned)(addr), val)
-#  define outw(addr,val)	pokewsys ((unsigned)(addr), val)
+#  define outb(addr,val)        pokebsys ((unsigned)(addr), val)
+#  define outw(addr,val)        pokewsys ((unsigned)(addr), val)
 #else
-#  define outb(addr,val)	(*(addr)) = (val)
-#  define outw(addr,val)	(*(addr)) = (val)
+#  define outb(addr,val)        (*(addr)) = (val)
+#  define outw(addr,val)        (*(addr)) = (val)
 #endif
 
 
@@ -1055,9 +1055,9 @@ int main (void)
     unsigned char       I;
     unsigned char       Tone;
     unsigned char       Octave;
-    unsigned	 	Val;
-    struct __sid_voice*	Voice;
-    register VoiceCtrl*	VC;
+    unsigned            Val;
+    struct __sid_voice* Voice;
+    register VoiceCtrl* VC;
 
     /* Initialize the debugger */
     DbgInit (0);
@@ -1089,74 +1089,74 @@ int main (void)
     /* Play each voice until all three are done */
     while (Done != 0x07) {
 
-	/* Display the time in the lower left corner */
-       	DisplayTime ();
+        /* Display the time in the lower left corner */
+        DisplayTime ();
 
-	/* Wait for the next run */
-	TimeSync ();
+        /* Wait for the next run */
+        TimeSync ();
 
-	/* Check for a key */
-	if (kbhit ()) {
-	    if (cgetc () == 'd') {
-		/* Start the debugger */
-		BREAK ();
-	    } else {
-		/* Stop playing music */
-		break;
-	    }
-     	}
+        /* Check for a key */
+        if (kbhit ()) {
+            if (cgetc () == 'd') {
+                /* Start the debugger */
+                BREAK ();
+            } else {
+                /* Stop playing music */
+                break;
+            }
+        }
 
-    	/* Play all three voices */
-    	for (I = 0; I < 3; ++I) {
+        /* Play all three voices */
+        for (I = 0; I < 3; ++I) {
 
-    	    /* Get a pointer to this voice */
-    	    VC = V [I];
-	    Voice = VC->Voice;
+            /* Get a pointer to this voice */
+            VC = V [I];
+            Voice = VC->Voice;
 
-    	    /* Is this voice done? */
-    	    if (Done & VC->DoneMask) {
-    	       	/* Voice already done */
-    	       	continue;
-    	    }
+            /* Is this voice done? */
+            if (Done & VC->DoneMask) {
+                /* Voice already done */
+                continue;
+            }
 
-    	    /* Do we have any more ticks to play? */
-    	    if (VC->Ticks == 0) {
-    	      	/* We need new data */
-    	      	if ((Val = *VC->Data) == 0) {
-    	      	    /* End of data. Mark the voice as done */
-    	      	    Done |= VC->DoneMask;
-    	      	    continue;
-    	      	}
-	     	++VC->Data;
+            /* Do we have any more ticks to play? */
+            if (VC->Ticks == 0) {
+                /* We need new data */
+                if ((Val = *VC->Data) == 0) {
+                    /* End of data. Mark the voice as done */
+                    Done |= VC->DoneMask;
+                    continue;
+                }
+                ++VC->Data;
 
-    	      	/* Get the ticks from the data */
-       	       	VC->Ticks = (Val & 0x7F) - 1;
+                /* Get the ticks from the data */
+                VC->Ticks = (Val & 0x7F) - 1;
 
-    	      	/* Check if this is a tone or a pause */
-    	      	if (Val & 0x8000) {
-    	      	    /* This is a pause. Remember it and shut off the SID */
-       	       	    outb (&Voice->ctrl, VC->Trigger & 0xFE);
-    	      	} else {
-    	      	    /* This is a tone. Extract the attributes. */
-    	      	    Tone = (Val >> 8) & 0x0F;
-    	      	    Octave = ((Val >> 12) & 0x07) ^ 0x07;
-    	      	    /* Calculate the frequency */
-    	      	    VC->Freq = FreqTab [Tone] >> Octave;
-    	     	    /* Set the frequency */
-    	     	    outw (&Voice->freq, VC->Freq);
-    	     	    /* Start the tone */
-    	     	    outb (&Voice->ctrl, VC->Trigger);
-    	     	}
-    	    } else {
-    	      	/* Decrement the ticks. If this is the last tick of a tone,
-    	     	 * reset bit 0 of the trigger value and write it back to the
-    	     	 * SID to start the release phase.
-    	      	 */
-       	       	if (--(VC->Ticks) == 0) {
-    	      	    outb (&Voice->ctrl, VC->Trigger & 0xFE);
-    	      	}
-    	    }
-    	}
+                /* Check if this is a tone or a pause */
+                if (Val & 0x8000) {
+                    /* This is a pause. Remember it and shut off the SID */
+                    outb (&Voice->ctrl, VC->Trigger & 0xFE);
+                } else {
+                    /* This is a tone. Extract the attributes. */
+                    Tone = (Val >> 8) & 0x0F;
+                    Octave = ((Val >> 12) & 0x07) ^ 0x07;
+                    /* Calculate the frequency */
+                    VC->Freq = FreqTab [Tone] >> Octave;
+                    /* Set the frequency */
+                    outw (&Voice->freq, VC->Freq);
+                    /* Start the tone */
+                    outb (&Voice->ctrl, VC->Trigger);
+                }
+            } else {
+                /* Decrement the ticks. If this is the last tick of a tone,
+                 * reset bit 0 of the trigger value and write it back to the
+                 * SID to start the release phase.
+                 */
+                if (--(VC->Ticks) == 0) {
+                    outb (&Voice->ctrl, VC->Trigger & 0xFE);
+                }
+            }
+        }
     }
 
     /* Reset the SID */
@@ -1169,7 +1169,7 @@ int main (void)
 
     /* If we have a character, remove it from the buffer */
     if (kbhit ()) {
-       	cgetc ();
+        cgetc ();
     }
 
     /* Done */

@@ -7,9 +7,9 @@
 ; Using the readjoy code from Stefan Haubenthal
 ;
 
- 	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"joy-kernel.inc"
+        .include        "joy-kernel.inc"
         .include        "joy-error.inc"
         .include        "apple2.inc"
 
@@ -17,24 +17,24 @@
 
 ; Constants
 
-THRESHOLD =	20	; Deviation from center triggering movement
+THRESHOLD =     20      ; Deviation from center triggering movement
 
 ; ------------------------------------------------------------------------
 
 ; ROM entry points
 
-PREAD  	:=  	$FB1E	; Read paddle in X, return AD conv. value in Y
+PREAD   :=      $FB1E   ; Read paddle in X, return AD conv. value in Y
 
 ; ------------------------------------------------------------------------
 
 ; Header. Includes jump table.
 
-	.segment        "JUMPTABLE"
+        .segment        "JUMPTABLE"
 
 ; Driver signature
 
-        .byte   $6A, $6F, $79	; "joy"
-        .byte   JOY_API_VERSION	; Driver API version number
+        .byte   $6A, $6F, $79   ; "joy"
+        .byte   JOY_API_VERSION ; Driver API version number
 
 ; Button state masks (8 values)
 
@@ -57,7 +57,7 @@ PREAD  	:=  	$FB1E	; Read paddle in X, return AD conv. value in Y
 
 ; ------------------------------------------------------------------------
 
-	.code
+        .code
 
 ; INSTALL routine. Is called after the driver is loaded into memory. If
 ; possible, check if the hardware is present and determine the amount of
@@ -66,7 +66,7 @@ PREAD  	:=  	$FB1E	; Read paddle in X, return AD conv. value in Y
 INSTALL:
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
-	; Fall through
+        ; Fall through
 
 ; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
@@ -75,55 +75,55 @@ UNINSTALL:
 
 ; COUNT: Return the total number of available joysticks in a/x.
 COUNT:
-        lda     #$02		; Number of joysticks we support
+        lda     #$02            ; Number of joysticks we support
         ldx     #$00
         rts
 
 ; READ: Read a particular joystick passed in A.
 READJOY:
-        bit	$C082		; Switch in ROM
-	and    	#$01            ; Restrict joystick number
+        bit     $C082           ; Switch in ROM
+        and     #$01            ; Restrict joystick number
 
-	; Read horizontal paddle
-	asl			; Joystick number -> paddle number
-	tax	     		; Set paddle number (0, 2)
+        ; Read horizontal paddle
+        asl                     ; Joystick number -> paddle number
+        tax                     ; Set paddle number (0, 2)
         jsr     PREAD           ; Read paddle value
-        lda	#$00		; 0 0 0 0 0 0 0 0
+        lda     #$00            ; 0 0 0 0 0 0 0 0
         cpy     #127 - THRESHOLD
-        ror			; !LEFT 0 0 0 0 0 0 0
+        ror                     ; !LEFT 0 0 0 0 0 0 0
         cpy     #127 + THRESHOLD
-        ror			; RIGHT !LEFT 0 0 0 0 0 0
+        ror                     ; RIGHT !LEFT 0 0 0 0 0 0
 
-	; Read vertical paddle
+        ; Read vertical paddle
         pha
-        inx			; Set paddle number (1, 3)
+        inx                     ; Set paddle number (1, 3)
         jsr     PREAD           ; Read paddle value
         pla
         cpy     #127 - THRESHOLD
-        ror			; !UP RIGHT !LEFT 0 0 0 0 0
+        ror                     ; !UP RIGHT !LEFT 0 0 0 0 0
         cpy     #127 + THRESHOLD
-        ror			; DOWN !UP RIGHT !LEFT 0 0 0 0
+        ror                     ; DOWN !UP RIGHT !LEFT 0 0 0 0
 
-	; Read primary button
-	tay
-        lda     BUTN0-1,x	; Check button (1, 3)
+        ; Read primary button
+        tay
+        lda     BUTN0-1,x       ; Check button (1, 3)
         asl
         tya
-        ror			; FIRE DOWN !UP RIGHT !LEFT 0 0 0
+        ror                     ; FIRE DOWN !UP RIGHT !LEFT 0 0 0
 
-	; Read secondary button
-	tay
-	inx
-	txa
-	and	#$03		; IIgs has fourth button at TAPEIN
-	tax
-        lda     BUTN0-1,x	; Check button (2, 0)
+        ; Read secondary button
+        tay
+        inx
+        txa
+        and     #$03            ; IIgs has fourth button at TAPEIN
+        tax
+        lda     BUTN0-1,x       ; Check button (2, 0)
         asl
         tya
-	ror			; FIRE2 FIRE DOWN !UP RIGHT !LEFT 0 0
+        ror                     ; FIRE2 FIRE DOWN !UP RIGHT !LEFT 0 0
 
-	; Finalize
+        ; Finalize
         eor     #%00010100      ; FIRE2 FIRE DOWN UP RIGHT LEFT 0 0
         ldx     #$00
-	bit	$C080		; Switch in LC bank 2 for R/O
+        bit     $C080           ; Switch in LC bank 2 for R/O
         rts

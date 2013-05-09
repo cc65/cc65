@@ -117,11 +117,11 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
             if (is_header) {
                 l_dirent->type = CBM_T_HEADER;
 
-		/* Get the disk-format code. */
-		i = 6;
-		do {
-		    l_dirent->access = byte = cbm_k_basin();
-		} while (--i != 0);
+                /* Get the disk-format code. */
+                i = 6;
+                do {
+                    l_dirent->access = byte = cbm_k_basin();
+                } while (--i != 0);
 
             } else {
                 /* Go to the file-type column. */
@@ -144,10 +144,10 @@ unsigned char __fastcall__ cbm_readdir (unsigned char lfn, register struct cbm_d
                 /* Determine the file type */
                 l_dirent->type = _cbm_filetype (byte);
 
-		/* Notice whether it's a directory or a deleted file. */
-		if (cbm_k_basin() == 'i' && byte == 'd') {
-		    l_dirent->type = CBM_T_DIR;
-		}
+                /* Notice whether it's a directory or a deleted file. */
+                if (cbm_k_basin() == 'i' && byte == 'd') {
+                    l_dirent->type = CBM_T_DIR;
+                }
                 cbm_k_basin();
 
                 /* Locked files shouldn't be written. */

@@ -7,12 +7,12 @@
 ;
 ;
 
-	.importzp    	ptr1, ptr2
-       	.export	     	__heapmemavail
+        .importzp       ptr1, ptr2
+        .export         __heapmemavail
 
         .include        "_heap.inc"
 
-       	.macpack	generic
+        .macpack        generic
 
 ;-----------------------------------------------------------------------------
 ; Code

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 cbm610.h				     */
+/*                                 cbm610.h                                  */
 /*                                                                           */
-/*                    CBM610 system specific definitions		     */
+/*                    CBM610 system specific definitions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*                                   Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -74,15 +74,15 @@
 #define CH_F20                  243
 
 /* Color defines */
-#define COLOR_BLACK            	0x00
-#define COLOR_WHITE            	0x01
+#define COLOR_BLACK             0x00
+#define COLOR_WHITE             0x01
 
 /* Define hardware */
 #include <_6545.h>
 #define CRTC    (*(struct __6545)0xD800)
 
 #include <_sid.h>
-#define SID	(*(struct __sid*)0xDA00)
+#define SID     (*(struct __sid*)0xDA00)
 
 #include <_6526.h>
 #define CIA     (*(struct __6526*)0xDC00)
@@ -109,7 +109,7 @@ extern void cbm610_std_ser[];
 
 
 /*****************************************************************************/
-/*                                   Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

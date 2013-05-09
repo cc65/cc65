@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.c				     */
+/*                                 global.c                                  */
 /*                                                                           */
-/*	    Global variables for the cl65 compile and link utility	     */
+/*          Global variables for the cl65 compile and link utility           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -38,12 +38,12 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-unsigned char Debug	= 0;		/* Debug mode enabled? */
+unsigned char Debug     = 0;            /* Debug mode enabled? */
 
 
 

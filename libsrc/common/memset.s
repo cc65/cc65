@@ -15,79 +15,79 @@
 ;       in a/x is of any use.
 ;
 
- 	.export		_memset, _bzero, __bzero
-	.import		popax
-       	.importzp	sp, ptr1, ptr2, ptr3
+        .export         _memset, _bzero, __bzero
+        .import         popax
+        .importzp       sp, ptr1, ptr2, ptr3
 
 _bzero:
 __bzero:
         sta     ptr3
         stx     ptr3+1          ; Save n
-        ldx     #0		; Fill with zeros
+        ldx     #0              ; Fill with zeros
         beq     common
 
 _memset:
- 	sta	ptr3		; Save n
- 	stx	ptr3+1
- 	jsr	popax  	 	; Get c
-	tax
+        sta     ptr3            ; Save n
+        stx     ptr3+1
+        jsr     popax           ; Get c
+        tax
 
 ; Common stuff for memset and bzero from here
 
-common:				; Fill value is in X!
-	ldy     #1
+common:                         ; Fill value is in X!
+        ldy     #1
         lda     (sp),y
-        sta	ptr1+1		; save high byte of ptr
-        dey			; Y = 0
+        sta     ptr1+1          ; save high byte of ptr
+        dey                     ; Y = 0
         lda     (sp),y          ; Get ptr
- 	sta	ptr1
+        sta     ptr1
 
-	lsr	ptr3+1		; divide number of
-	ror	ptr3		; bytes by two to increase
-	bcc	evenCount	; speed (ptr3 = ptr3/2)
+        lsr     ptr3+1          ; divide number of
+        ror     ptr3            ; bytes by two to increase
+        bcc     evenCount       ; speed (ptr3 = ptr3/2)
 oddCount:
-				; y is still 0 here
-	txa			; restore fill value
-	sta	(ptr1),y	; save value and increase
-	inc	ptr1		; dest. pointer
-	bne	evenCount
-	inc	ptr1+1
+                                ; y is still 0 here
+        txa                     ; restore fill value
+        sta     (ptr1),y        ; save value and increase
+        inc     ptr1            ; dest. pointer
+        bne     evenCount
+        inc     ptr1+1
 evenCount:
-	lda	ptr1		; build second pointer section
-	clc
-	adc	ptr3		; ptr2 = ptr1 + (length/2) <- ptr3
-	sta	ptr2
-	lda	ptr1+1
-	adc	ptr3+1
-	sta	ptr2+1
+        lda     ptr1            ; build second pointer section
+        clc
+        adc     ptr3            ; ptr2 = ptr1 + (length/2) <- ptr3
+        sta     ptr2
+        lda     ptr1+1
+        adc     ptr3+1
+        sta     ptr2+1
 
-	txa			; restore fill value
-	ldx	ptr3+1  	; Get high byte of n
-       	beq    	L2		; Jump if zero
+        txa                     ; restore fill value
+        ldx     ptr3+1          ; Get high byte of n
+        beq     L2              ; Jump if zero
 
 ; Set 256/512 byte blocks
-				; y is still 0 here
-L1:    	.repeat 2		; Unroll this a bit to make it faster
-	sta	(ptr1),y	; Set byte in lower section
-  	sta	(ptr2),y	; Set byte in upper section
-	iny
-	.endrepeat
-  	bne	L1
-	inc	ptr1+1
-	inc	ptr2+1
-       	dex			; Next 256 byte block
-	bne	L1		; Repeat if any
+                                ; y is still 0 here
+L1:     .repeat 2               ; Unroll this a bit to make it faster
+        sta     (ptr1),y        ; Set byte in lower section
+        sta     (ptr2),y        ; Set byte in upper section
+        iny
+        .endrepeat
+        bne     L1
+        inc     ptr1+1
+        inc     ptr2+1
+        dex                     ; Next 256 byte block
+        bne     L1              ; Repeat if any
 
 ; Set the remaining bytes if any
 
-L2:    	ldy	ptr3		; Get the low byte of n
-  	beq	leave		; something to set? No -> leave
+L2:     ldy     ptr3            ; Get the low byte of n
+        beq     leave           ; something to set? No -> leave
 
-L3:	dey
-	sta	(ptr1),y		; set bytes in low
-	sta	(ptr2),y		; and high section
-	bne	L3		; flags still up to date from dey!
-leave:	
-  	jmp     popax           ; Pop ptr and return as result
+L3:     dey
+        sta     (ptr1),y                ; set bytes in low
+        sta     (ptr2),y                ; and high section
+        bne     L3              ; flags still up to date from dey!
+leave:  
+        jmp     popax           ; Pop ptr and return as result
 
                 

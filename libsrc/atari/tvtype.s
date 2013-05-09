@@ -9,18 +9,18 @@
 ;
 
 
-	.include	"atari.inc"
-	.include	"get_tv.inc"
+        .include        "atari.inc"
+        .include        "get_tv.inc"
 
-.proc	_get_tv
+.proc   _get_tv
 
-	ldx	#TV::NTSC	; Assume NTSC
-	lda	PAL	 	; use hw register, PALNTS is only supported on XL/XE ROM
-	and	#$0e
-	bne	@NTSC
-	inx			; = TV::PAL
-@NTSC:	txa
-	ldx	#0		; Expand to int
-	rts
+        ldx     #TV::NTSC       ; Assume NTSC
+        lda     PAL             ; use hw register, PALNTS is only supported on XL/XE ROM
+        and     #$0e
+        bne     @NTSC
+        inx                     ; = TV::PAL
+@NTSC:  txa
+        ldx     #0              ; Expand to int
+        rts
 
 .endproc

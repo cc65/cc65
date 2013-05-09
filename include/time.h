@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    time.h				     */
+/*                                  time.h                                   */
 /*                                                                           */
-/*				 Date and time				     */
+/*                               Date and time                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -40,7 +40,7 @@
 
 /* NULL pointer */
 #ifndef _HAVE_NULL
-#define NULL	0
+#define NULL    0
 #define _HAVE_NULL
 #endif
 
@@ -55,7 +55,7 @@ typedef unsigned long clock_t;
 
 /* Structure for broken down time */
 struct tm {     
-    int	    tm_sec;
+    int     tm_sec;
     int     tm_min;
     int     tm_hour;
     int     tm_mday;
@@ -79,32 +79,32 @@ extern struct _timezone {
 #if defined(__ATARI__)
 /* The clock depends on the video standard, so read it at runtime */
 unsigned _clocks_per_sec (void);
-#  define CLK_TCK		_clocks_per_sec()
-#  define CLOCKS_PER_SEC	_clocks_per_sec()
+#  define CLK_TCK               _clocks_per_sec()
+#  define CLOCKS_PER_SEC        _clocks_per_sec()
 #elif defined(__ATMOS__)
-#  define CLK_TCK      	       	100	/* POSIX */
-#  define CLOCKS_PER_SEC	100    	/* ANSI */
+#  define CLK_TCK               100     /* POSIX */
+#  define CLOCKS_PER_SEC        100     /* ANSI */
 #elif defined(__CBM__)
 #  if defined(__CBM510__) || defined(__CBM610__)
 /* The 510/610 gets its clock from the AC current */
-#    define CLK_TCK    	       	50 	/* POSIX */
-#    define CLOCKS_PER_SEC	50	/* ANSI */
+#    define CLK_TCK             50      /* POSIX */
+#    define CLOCKS_PER_SEC      50      /* ANSI */
 #  else
-#    define CLK_TCK	  	60	/* POSIX */
-#    define CLOCKS_PER_SEC	60     	/* ANSI */
+#    define CLK_TCK             60      /* POSIX */
+#    define CLOCKS_PER_SEC      60      /* ANSI */
 #  endif
 #elif defined(__NES__)
-#  define CLK_TCK    	       	50 	/* POSIX */
-#  define CLOCKS_PER_SEC	50	/* ANSI */
+#  define CLK_TCK               50      /* POSIX */
+#  define CLOCKS_PER_SEC        50      /* ANSI */
 #elif  defined(__GEOS__)
-#  define CLK_TCK		1	/* POSIX */
-#  define CLOCKS_PER_SEC	1	/* ANSI */
+#  define CLK_TCK               1       /* POSIX */
+#  define CLOCKS_PER_SEC        1       /* ANSI */
 #elif defined(__LYNX__)
 /* The clock-rate depends on the video scan-rate;
 ** so, read it at run-time. */
 extern clock_t _clk_tck (void);
-#  define CLK_TCK		_clk_tck()
-#  define CLOCKS_PER_SEC	_clk_tck()
+#  define CLK_TCK               _clk_tck()
+#  define CLOCKS_PER_SEC        _clk_tck()
 #endif
 
 

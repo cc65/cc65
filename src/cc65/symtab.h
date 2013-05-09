@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   symtab.h				     */
+/*                                 symtab.h                                  */
 /*                                                                           */
-/*		Symbol table management for the cc65 C compiler		     */
+/*              Symbol table management for the cc65 C compiler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*		     	     	     Data	       			     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -54,28 +54,28 @@
 /* Symbol table */
 typedef struct SymTable SymTable;
 struct SymTable {
-    SymTable*  	       	PrevTab;	/* Pointer to higher level symbol table */
-    SymEntry*  	       	SymHead;	/* Double linked list of symbols */
-    SymEntry*  		SymTail;	/* Double linked list of symbols */
-    unsigned   	     	SymCount;	/* Count of symbols in this table */
-    unsigned   	     	Size;		/* Size of table */
-    SymEntry*  	     	Tab[1];		/* Actual table, dynamically allocated */
+    SymTable*           PrevTab;        /* Pointer to higher level symbol table */
+    SymEntry*           SymHead;        /* Double linked list of symbols */
+    SymEntry*           SymTail;        /* Double linked list of symbols */
+    unsigned            SymCount;       /* Count of symbols in this table */
+    unsigned            Size;           /* Size of table */
+    SymEntry*           Tab[1];         /* Actual table, dynamically allocated */
 };
 
 /* An empty symbol table */
-extern SymTable		EmptySymTab;
+extern SymTable         EmptySymTab;
 
 /* Forwards */
 struct FuncDesc;
 
 /* Predefined lexical levels */
-#define LEX_LEVEL_GLOBAL	1U
+#define LEX_LEVEL_GLOBAL        1U
 #define LEX_LEVEL_FUNCTION      2U
 
 
 
 /*****************************************************************************/
-/*	       		  Handling of lexical levels			     */
+/*                        Handling of lexical levels                         */
 /*****************************************************************************/
 
 
@@ -116,7 +116,7 @@ void LeaveStructLevel (void);
 
 
 /*****************************************************************************/
-/*		      	       	Find functions				     */
+/*                              Find functions                               */
 /*****************************************************************************/
 
 
@@ -139,7 +139,7 @@ SymEntry* FindStructField (const Type* TypeArray, const char* Name);
 
 
 /*****************************************************************************/
-/*		   	 Add stuff to the symbol table			     */
+/*                       Add stuff to the symbol table                       */
 /*****************************************************************************/
 
 
@@ -165,7 +165,7 @@ SymEntry* AddGlobalSym (const char* Name, const Type* T, unsigned Flags);
 
 
 /*****************************************************************************/
-/*			      	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

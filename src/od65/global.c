@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.c				     */
+/*                                 global.c                                  */
 /*                                                                           */
-/*	    Global variables for the od65 object file dump utility	     */
+/*          Global variables for the od65 object file dump utility           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -38,12 +38,12 @@
 
 
 /*****************************************************************************/
-/*    				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-unsigned What	= 0;		/* What should get dumped? */
+unsigned What   = 0;            /* What should get dumped? */
 
 
 

@@ -4,7 +4,7 @@
 ; Ullrich von Bassewitz, 2004-11-27
 ;
 
-  	.export	      	_vscanf
+        .export         _vscanf
         .import         _vfscanf
         .import         _stdin
         .import         decsp2

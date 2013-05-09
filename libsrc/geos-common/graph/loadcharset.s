@@ -5,12 +5,12 @@
 
 ; void LoadCharSet (struct fontdesc *myFont);
 
-	    .export _LoadCharSet
+            .export _LoadCharSet
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _LoadCharSet:
-	sta r0L
-	stx r0H
-	jmp LoadCharSet
+        sta r0L
+        stx r0H
+        jmp LoadCharSet

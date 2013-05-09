@@ -95,8 +95,8 @@ static Collection ChipLibraries = STATIC_COLLECTION_INITIALIZER;
 
 /* SimData instance */
 static const SimData Sim65Data = {
-    1, 		    	/* MajorVersion */
-    1, 		    	/* MinorVersion */
+    1,                  /* MajorVersion */
+    1,                  /* MinorVersion */
     xmalloc,
     xfree,
     Warning,
@@ -158,7 +158,7 @@ static int GetCfgNum (void* CfgInfo, const char* Name, long* Val)
 
 
 static int CmpChips (void* Data attribute ((unused)),
-    		     const void* lhs, const void* rhs)
+                     const void* lhs, const void* rhs)
 /* Compare function for CollSort */
 {
     /* Cast the object pointers */
@@ -181,14 +181,14 @@ static Chip* FindChip (const char* Name)
     /* ## We do a linear search for now */
     for (I = 0; I < CollCount (&Chips); ++I) {
 
-       	/* Get the chip at this position */
-    	Chip* C = CollAt (&Chips, I);
+        /* Get the chip at this position */
+        Chip* C = CollAt (&Chips, I);
 
-    	/* Compare the name */
-    	if (strcmp (Name, C->Data->ChipName) == 0) {
-    	    /* Found */
-    	    return C;
-    	}
+        /* Compare the name */
+        if (strcmp (Name, C->Data->ChipName) == 0) {
+            /* Found */
+            return C;
+        }
     }
 
     /* Not found */
@@ -198,7 +198,7 @@ static Chip* FindChip (const char* Name)
 
 
 /*****************************************************************************/
-/*     	      	       	   	     Code	   			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -358,7 +358,7 @@ void LoadChipLibrary (const char* LibName)
     /* Check the error message */
     Msg = dlerror ();
     if (Msg) {
-       	/* We had an error */
+        /* We had an error */
         Error ("Cannot find export `GetChipData' in `%s': %s", L->LibName, Msg);
         FreeChipLibrary (L);
         return;
@@ -395,8 +395,8 @@ void LoadChipLibrary (const char* LibName)
             continue;
         }
 
-	/* Initialize the chip passing the simulator data */
-	D->InitChip (&Sim65Data);
+        /* Initialize the chip passing the simulator data */
+        D->InitChip (&Sim65Data);
 
         /* Generate a new chip */
         C = NewChip (L, D);
@@ -407,7 +407,7 @@ void LoadChipLibrary (const char* LibName)
         /* Output chip name and version to keep the user happy */
         Print (stdout, 1,
                "  Found %s `%s', version %u.%u in library `%s'\n",
-    	       (D->Type == CHIPDATA_TYPE_CHIP)? "chip" : "cpu",
+               (D->Type == CHIPDATA_TYPE_CHIP)? "chip" : "cpu",
                D->ChipName,
                D->MajorVersion,
                D->MinorVersion,

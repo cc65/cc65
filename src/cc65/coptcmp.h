@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptcmp.h                                 */
+/*                                 coptcmp.h                                 */
 /*                                                                           */
-/*			       Optimize compares                             */
+/*                             Optimize compares                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*  	       Remove calls to the bool transformer subroutines		     */
+/*             Remove calls to the bool transformer subroutines              */
 /*****************************************************************************/
 
 
@@ -57,7 +57,7 @@ unsigned OptBoolTrans (CodeSeg* S);
 
 
 /*****************************************************************************/
-/*		  	  Optimizations for compares                         */
+/*                        Optimizations for compares                         */
 /*****************************************************************************/
 
 
@@ -65,38 +65,38 @@ unsigned OptBoolTrans (CodeSeg* S);
 unsigned OptCmp1 (CodeSeg* S);
 /* Search for the sequence
  *
- *  	ldx	xx
- *  	stx	tmp1
- *  	ora	tmp1
+ *      ldx     xx
+ *      stx     tmp1
+ *      ora     tmp1
  *
  * and replace it by
  *
- *  	ora	xx
+ *      ora     xx
  */
 
 unsigned OptCmp2 (CodeSeg* S);
 /* Search for the sequence
  *
- *  	stx	xx
- *  	stx	tmp1
- *  	ora	tmp1
+ *      stx     xx
+ *      stx     tmp1
+ *      ora     tmp1
  *
  * and replace it by
  *
- *  	stx	xx
- *  	ora	xx
+ *      stx     xx
+ *      ora     xx
  */
 
 unsigned OptCmp3 (CodeSeg* S);
 /* Search for
  *
- *     	lda/and/ora/eor	...
- *  	cmp #$00
- *  	jeq/jne
+ *      lda/and/ora/eor ...
+ *      cmp #$00
+ *      jeq/jne
  * or
- *     	lda/and/ora/eor	...
- *  	cmp #$00
- *  	jsr boolxx
+ *      lda/and/ora/eor ...
+ *      cmp #$00
+ *      jsr boolxx
  *
  * and remove the cmp.
  */
@@ -104,19 +104,19 @@ unsigned OptCmp3 (CodeSeg* S);
 unsigned OptCmp4 (CodeSeg* S);
 /* Search for
  *
- *  	lda	x
- *  	ldx	y
- *  	cpx 	#a
- *  	bne 	L1
- *  	cmp 	#b
- *     	jne/jeq	L2
+ *      lda     x
+ *      ldx     y
+ *      cpx     #a
+ *      bne     L1
+ *      cmp     #b
+ *      jne/jeq L2
  *
  * If a is zero, we may remove the compare. If a and b are both zero, we may
  * replace it by the sequence
  *
- *  	lda 	x
- *  	ora 	x+1
- *  	jne/jeq ...
+ *      lda     x
+ *      ora     x+1
+ *      jne/jeq ...
  *
  * L1 may be either the label at the branch instruction, or the target label
  * of this instruction.
@@ -132,7 +132,7 @@ unsigned OptCmp5 (CodeSeg* S);
  *      lda     (sp),y
  *      cpx     #a
  *      bne     L1
- *   	cmp 	#b
+ *      cmp     #b
  *      jne/jeq L2
  */
 

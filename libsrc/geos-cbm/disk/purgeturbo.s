@@ -5,8 +5,8 @@
 
 ; void PurgeTurbo (void);
 
-	    .export _PurgeTurbo
+            .export _PurgeTurbo
 
-	    .include "jumptab.inc"
-	
-_PurgeTurbo	= PurgeTurbo
+            .include "jumptab.inc"
+        
+_PurgeTurbo     = PurgeTurbo

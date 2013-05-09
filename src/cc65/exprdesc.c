@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*		   		     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -118,31 +118,31 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
-       	    SB_Printf (&Buf, "$%04X", (int)(Offs & 0xFFFF));
+            SB_Printf (&Buf, "$%04X", (int)(Offs & 0xFFFF));
             break;
 
         case E_LOC_GLOBAL:
         case E_LOC_STATIC:
             /* Global or static variable */
-      	    if (Offs) {
-      	       	SB_Printf (&Buf, "%s%+ld", SymGetAsmName (Expr->Sym), Offs);
-      	    } else {
-      	       	SB_Printf (&Buf, "%s", SymGetAsmName (Expr->Sym));
-      	    }
+            if (Offs) {
+                SB_Printf (&Buf, "%s%+ld", SymGetAsmName (Expr->Sym), Offs);
+            } else {
+                SB_Printf (&Buf, "%s", SymGetAsmName (Expr->Sym));
+            }
             break;
 
         case E_LOC_REGISTER:
             /* Register variable */
-      	    SB_Printf (&Buf, "regbank+%u", (unsigned)((Offs + Expr->Name) & 0xFFFFU));
+            SB_Printf (&Buf, "regbank+%u", (unsigned)((Offs + Expr->Name) & 0xFFFFU));
             break;
 
         case E_LOC_LITERAL:
             /* Literal in the literal pool */
-      	    if (Offs) {
-      	       	SB_Printf (&Buf, "%s%+ld", LocalLabelName (Expr->Name), Offs);
-      	    } else {
-       	       	SB_Printf (&Buf, "%s", LocalLabelName (Expr->Name));
-	    }
+            if (Offs) {
+                SB_Printf (&Buf, "%s%+ld", LocalLabelName (Expr->Name), Offs);
+            } else {
+                SB_Printf (&Buf, "%s", LocalLabelName (Expr->Name));
+            }
             break;
 
         default:

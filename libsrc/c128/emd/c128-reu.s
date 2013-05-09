@@ -5,11 +5,11 @@
 ; Ullrich von Bassewitz, 2002-11-29
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
-	.include	"c128.inc"
+        .include        "c128.inc"
 
 
         .macpack        generic
@@ -23,7 +23,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -33,7 +33,7 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
@@ -61,12 +61,12 @@ curpage:        .res    2               ; Current page number
 
 window:         .res    256             ; Memory "window"
 
-reu_params:     .word 	$0000  		; Host address, lo, hi
-		.word 	$0000		; Exp  address, lo, hi
-                .byte	$00		; Expansion  bank no.
-       	       	.word  	$0000  		; # bytes to move, lo, hi
-       		.byte 	$00    		; Interrupt mask reg.
-       		.byte 	$00    		; Adress control reg.
+reu_params:     .word   $0000           ; Host address, lo, hi
+                .word   $0000           ; Exp  address, lo, hi
+                .byte   $00             ; Expansion  bank no.
+                .word   $0000           ; # bytes to move, lo, hi
+                .byte   $00             ; Interrupt mask reg.
+                .byte   $00             ; Adress control reg.
 
 .code
 
@@ -221,14 +221,14 @@ transfer1:
 ; Transfer subroutine for the REU. Expects command in Y.
 
 transfer:
-        sty    	REU_COMMAND     ; Issue command
+        sty     REU_COMMAND     ; Issue command
 
-        ldy    	MMU_CR		; Save the current MMU settings
-	lda	#MMU_CFG_RAM0  	;
-  	sei          	  	;
-        sta	MMU_CR		; Enable RAM in bank #0
+        ldy     MMU_CR          ; Save the current MMU settings
+        lda     #MMU_CFG_RAM0   ;
+        sei                     ;
+        sta     MMU_CR          ; Enable RAM in bank #0
         lda     REU_TRIGGER     ; Don't change $FF00
-        sta 	REU_TRIGGER     ; Start the transfer...
+        sta     REU_TRIGGER     ; Start the transfer...
 
         sty     MMU_CR          ; Restore the old configuration
         cli

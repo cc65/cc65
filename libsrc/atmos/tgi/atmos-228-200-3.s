@@ -5,59 +5,59 @@
 ; 2012-08-11, Greg King <greg.king5@verizon.net>
 ;
 
-	.include	"zeropage.inc"
+        .include        "zeropage.inc"
 
-	.include	"tgi-kernel.inc"
-	.include	"tgi-error.inc"
-	.include	"atmos.inc"
+        .include        "tgi-kernel.inc"
+        .include        "tgi-error.inc"
+        .include        "atmos.inc"
 
-	.macpack	generic
+        .macpack        generic
 
-XSIZE	=	6		; System font width
-YSIZE	=	8		; System font height
+XSIZE   =       6               ; System font width
+YSIZE   =       8               ; System font height
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
 
-.segment	"JUMPTABLE"
+.segment        "JUMPTABLE"
 
 ; The first part of the header is a structure that has a signature,
 ; and defines the capabilities of the driver.
 
-	.byte	"tgi"
-	.byte	TGI_API_VERSION	; TGI API version number
-	.word	228		; x resolution
-	.word	200		; y resolution
-	.byte	3		; Number of drawing colors
-	.byte	1		; Number of screens available
-	.byte	XSIZE		; System font x size
-	.byte	YSIZE		; System font y size
-	.word	$011C		; Aspect ratio (based on 4/3 display)
-	.byte	0		; TGI driver flags
+        .byte   "tgi"
+        .byte   TGI_API_VERSION ; TGI API version number
+        .word   228             ; x resolution
+        .word   200             ; y resolution
+        .byte   3               ; Number of drawing colors
+        .byte   1               ; Number of screens available
+        .byte   XSIZE           ; System font x size
+        .byte   YSIZE           ; System font y size
+        .word   $011C           ; Aspect ratio (based on 4/3 display)
+        .byte   0               ; TGI driver flags
 
 ; Next comes the jump table. Currently, all entries must be valid;
 ; and, may point to an RTS, for test versions (function not implemented).
 
-	.addr	INSTALL
-	.addr	UNINSTALL
-	.addr	INIT
-	.addr	DONE
-	.addr	GETERROR
-	.addr	CONTROL
-	.addr	CLEAR
-	.addr	SETVIEWPAGE
-	.addr	SETDRAWPAGE
-	.addr	SETCOLOR
-	.addr	SETPALETTE
-	.addr	GETPALETTE
-	.addr	GETDEFPALETTE
-	.addr	SETPIXEL
-	.addr	GETPIXEL
-	.addr	LINE
-	.addr	BAR
-	.addr	TEXTSTYLE
-	.addr	OUTTEXT
-	.addr	0		; IRQ entry is unused
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   INIT
+        .addr   DONE
+        .addr   GETERROR
+        .addr   CONTROL
+        .addr   CLEAR
+        .addr   SETVIEWPAGE
+        .addr   SETDRAWPAGE
+        .addr   SETCOLOR
+        .addr   SETPALETTE
+        .addr   GETPALETTE
+        .addr   GETDEFPALETTE
+        .addr   SETPIXEL
+        .addr   GETPIXEL
+        .addr   LINE
+        .addr   BAR
+        .addr   TEXTSTYLE
+        .addr   OUTTEXT
+        .addr   0               ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -65,34 +65,34 @@ YSIZE	=	8		; System font height
 ; Variables mapped to the zero-page segment variables. These are
 ; used for passing parameters to the driver.
 
-X1	:=	ptr1
-Y1	:=	ptr2
-X2	:=	ptr3
-Y2	:=	ptr4
+X1      :=      ptr1
+Y1      :=      ptr2
+X2      :=      ptr3
+Y2      :=      ptr4
 
 ; Absolute variables used in the code
 
 .bss
 
-ERROR:		.res	1	; Error code
-MODE:		.res	1	; Graphics mode
-PALETTE:	.res	2
+ERROR:          .res    1       ; Error code
+MODE:           .res    1       ; Graphics mode
+PALETTE:        .res    2
 
 ; Constants and table
 ; BASIC 1.1 addresses
-PATTERN	:=	$213
-PARAM1	:=	$2E1		; & $2E2
-PARAM2	:=	$2E3		; & $2E4
-PARAM3	:=	$2E5		; & $2E6
-TEXT	:=	$EC21
-HIRES	:=	$EC33
-CURSET	:=	$F0C8
-CURMOV	:=	$F0FD
-DRAW	:=	$F110
-CHAR	:=	$F12D
-POINT	:=	$F1C8
-PAPER	:=	$F204
-INK	:=	$F210
+PATTERN :=      $213
+PARAM1  :=      $2E1            ; & $2E2
+PARAM2  :=      $2E3            ; & $2E4
+PARAM3  :=      $2E5            ; & $2E6
+TEXT    :=      $EC21
+HIRES   :=      $EC33
+CURSET  :=      $F0C8
+CURMOV  :=      $F0FD
+DRAW    :=      $F110
+CHAR    :=      $F12D
+POINT   :=      $F1C8
+PAPER   :=      $F204
+INK     :=      $F210
 
 .rodata
 
@@ -100,7 +100,7 @@ INK	:=	$F210
 ; (The third "color" actually flips a pixel
 ; between the foreground and background colors.)
 ;
-DEFPALETTE:	.byte	0, 1
+DEFPALETTE:     .byte   0, 1
 
 .code
 
@@ -121,7 +121,7 @@ INIT:
 
 ; Switch into graphics mode.
 
-	jsr	HIRES
+        jsr     HIRES
 
 ; Done, reset the error code.
 
@@ -129,9 +129,9 @@ INIT:
 ; GETERROR: Return the error code in A, and clear it.
 
 GETERROR:
-	ldx	#TGI_ERR_OK
-	lda	ERROR
-	stx	ERROR
+        ldx     #TGI_ERR_OK
+        lda     ERROR
+        stx     ERROR
 
 ; ------------------------------------------------------------------------
 ; INSTALL routine. Is called after the driver is loaded into memory. May
@@ -151,7 +151,7 @@ INSTALL:
 ;
 
 UNINSTALL:
-	rts
+        rts
 
 ; ------------------------------------------------------------------------
 ; DONE: Will be called to switch the graphics device back into text mode.
@@ -161,7 +161,7 @@ UNINSTALL:
 ; Must set an error code: NO
 ;
 
-DONE	:=	TEXT
+DONE    :=      TEXT
 
 ; ------------------------------------------------------------------------
 ; CONTROL: Platform-/driver-specific entry point.
@@ -170,10 +170,10 @@ DONE	:=	TEXT
 ;
 
 CONTROL:
-	sta	PATTERN
-	lda	#TGI_ERR_OK
-	sta	ERROR
-	rts
+        sta     PATTERN
+        lda     #TGI_ERR_OK
+        sta     ERROR
+        rts
 
 ; ------------------------------------------------------------------------
 ; CLEAR: Clears the screen.
@@ -181,7 +181,7 @@ CONTROL:
 ; Must set an error code: NO
 ;
 
-CLEAR	:=	HIRES
+CLEAR   :=      HIRES
 
 ; ------------------------------------------------------------------------
 ; SETVIEWPAGE: Set the visible page. Called with the new page in A (0..n).
@@ -200,7 +200,7 @@ SETVIEWPAGE:
 ;
 
 SETDRAWPAGE:
-	rts
+        rts
 
 ; ------------------------------------------------------------------------
 ; SETCOLOR: Set the drawing color (in A). The new color already is checked
@@ -210,8 +210,8 @@ SETDRAWPAGE:
 ;
 
 SETCOLOR:
-	sta	MODE
-	rts
+        sta     MODE
+        rts
 
 ; ------------------------------------------------------------------------
 ; SETPALETTE: Set the palette (not available with all drivers/hardware).
@@ -222,27 +222,27 @@ SETCOLOR:
 ;
 
 SETPALETTE:
-	ldy	#0
-	jsr	flipcolor
-	sty	PARAM1+1
-	jsr	PAPER
-	ldy	#1
-	jsr	flipcolor
-	dey			; TGI_ERR_OK
-	sty	ERROR
-	sty	PARAM1+1
-	jmp	INK
+        ldy     #0
+        jsr     flipcolor
+        sty     PARAM1+1
+        jsr     PAPER
+        ldy     #1
+        jsr     flipcolor
+        dey                     ; TGI_ERR_OK
+        sty     ERROR
+        sty     PARAM1+1
+        jmp     INK
 
 flipcolor:
-	lda	(ptr1),y
-	sta	PALETTE,y
-	cmp	#1
-	beq	@flip
-	cmp	#7
-	bne	@keep
-@flip:	eor	#1 ^ 7
-@keep:	sta	PARAM1
-	rts
+        lda     (ptr1),y
+        sta     PALETTE,y
+        cmp     #1
+        beq     @flip
+        cmp     #7
+        bne     @keep
+@flip:  eor     #1 ^ 7
+@keep:  sta     PARAM1
+        rts
 
 ; ------------------------------------------------------------------------
 ; GETPALETTE: Return the current palette in A/X. Even drivers that cannot
@@ -253,9 +253,9 @@ flipcolor:
 ;
 
 GETPALETTE:
-	lda	#<PALETTE
-	ldx	#>PALETTE
-	rts
+        lda     #<PALETTE
+        ldx     #>PALETTE
+        rts
 
 ; ------------------------------------------------------------------------
 ; GETDEFPALETTE: Return the default palette for the driver in A/X. All
@@ -267,9 +267,9 @@ GETPALETTE:
 ;
 
 GETDEFPALETTE:
-	lda	#<DEFPALETTE
-	ldx	#>DEFPALETTE
-	rts
+        lda     #<DEFPALETTE
+        ldx     #>DEFPALETTE
+        rts
 
 ; ------------------------------------------------------------------------
 ; SETPIXEL: Draw one pixel at X1/Y1 = ptr1/ptr2 with the current drawing
@@ -280,18 +280,18 @@ GETDEFPALETTE:
 ;
 
 SETPIXEL:
-	lda	Y1
-	sta	PARAM2
-	lda	MODE
-mymode:	sta	PARAM3
-	lda	X1
-	add	#2 * XSIZE	; Skip screen attribute columns
-	sta	PARAM1
-	lda	#0
-	sta	PARAM1+1
-	sta	PARAM2+1
-	sta	PARAM3+1
-	jmp	CURSET
+        lda     Y1
+        sta     PARAM2
+        lda     MODE
+mymode: sta     PARAM3
+        lda     X1
+        add     #2 * XSIZE      ; Skip screen attribute columns
+        sta     PARAM1
+        lda     #0
+        sta     PARAM1+1
+        sta     PARAM2+1
+        sta     PARAM3+1
+        jmp     CURSET
 
 ; ------------------------------------------------------------------------
 ; GETPIXEL: Read the color value of a pixel, and return it in A/X. The
@@ -299,18 +299,18 @@ mymode:	sta	PARAM3
 ; area, so there is no need for clipping inside this function.
 
 GETPIXEL:
-	lda	X1
-	sta	PARAM1
-	lda	Y1
-	sta	PARAM2
-	lda	#0
-	sta	PARAM1+1
-	sta	PARAM2+1
-	jsr	POINT
-	lda	PARAM1
-	and	#%00000001
-	ldx	#0
-	rts
+        lda     X1
+        sta     PARAM1
+        lda     Y1
+        sta     PARAM2
+        lda     #0
+        sta     PARAM1+1
+        sta     PARAM2+1
+        jsr     POINT
+        lda     PARAM1
+        and     #%00000001
+        ldx     #0
+        rts
 
 ; ------------------------------------------------------------------------
 ; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
@@ -320,24 +320,24 @@ GETPIXEL:
 ;
 
 LINE:
-	jsr	SETPIXEL
-	lda	X2
-	sub	X1
-	sta	PARAM1
-	lda	X2+1
-	sbc	X1+1
-	sta	PARAM1+1
-	lda	Y2
-	sub	Y1
-	sta	PARAM2
-	lda	Y2+1
-	sbc	Y1+1
-	sta	PARAM2+1
-	lda	MODE
-	sta	PARAM3
-	ldx	#>0
-	stx	PARAM3+1
-	jmp	DRAW
+        jsr     SETPIXEL
+        lda     X2
+        sub     X1
+        sta     PARAM1
+        lda     X2+1
+        sbc     X1+1
+        sta     PARAM1+1
+        lda     Y2
+        sub     Y1
+        sta     PARAM2
+        lda     Y2+1
+        sbc     Y1+1
+        sta     PARAM2+1
+        lda     MODE
+        sta     PARAM3
+        ldx     #>0
+        stx     PARAM3+1
+        jmp     DRAW
 
 ; ------------------------------------------------------------------------
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
@@ -345,29 +345,29 @@ LINE:
 ; Contrary to most other functions, the graphics kernel will sort and clip
 ; the co-ordinates before calling the driver; so, on entry, the following
 ; conditions are valid:
-;	X1 <= X2
-;	Y1 <= Y2
-;	(X1 >= 0) && (X1 < XRES)
-;	(X2 >= 0) && (X2 < XRES)
-;	(Y1 >= 0) && (Y1 < YRES)
-;	(Y2 >= 0) && (Y2 < YRES)
+;       X1 <= X2
+;       Y1 <= Y2
+;       (X1 >= 0) && (X1 < XRES)
+;       (X2 >= 0) && (X2 < XRES)
+;       (Y1 >= 0) && (Y1 < YRES)
+;       (Y2 >= 0) && (Y2 < YRES)
 ;
 ; Must set an error code: NO
 ;
 
 BAR:
-	inc	Y2
-@L1:	lda	Y2
-	pha
-	lda	Y1
-	sta	Y2
-	jsr	LINE
-	pla
-	sta	Y2
-	inc	Y1
-	cmp	Y1
-	bne	@L1
-	rts
+        inc     Y2
+@L1:    lda     Y2
+        pha
+        lda     Y1
+        sta     Y2
+        jsr     LINE
+        pla
+        sta     Y2
+        inc     Y1
+        cmp     Y1
+        bne     @L1
+        rts
 
 ; ------------------------------------------------------------------------
 ; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in the x
@@ -377,7 +377,7 @@ BAR:
 ;
 
 TEXTSTYLE:
-	rts
+        rts
 
 
 ; ------------------------------------------------------------------------
@@ -389,38 +389,38 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-	lda	Y1
-	sub	#(YSIZE - 1)
-	sta	PARAM2
-	lda	#3		; (Move graphics cursor; don't draw)
-	jsr	mymode
+        lda     Y1
+        sub     #(YSIZE - 1)
+        sta     PARAM2
+        lda     #3              ; (Move graphics cursor; don't draw)
+        jsr     mymode
 
-	ldy	#0
-@next:	lda	(ptr3),y
-	beq	@end
-	sta	PARAM1
-	lda	#0
-	sta	PARAM2
-	sta	PARAM1+1
-	sta	PARAM2+1
-	sta	PARAM3+1
-	lda	MODE
-	sta	PARAM3
-	tya
-	pha
-	jsr	CHAR
-	lda	#XSIZE
-	sta	PARAM1
-	lda	#0
-	sta	PARAM2
-	sta	PARAM1+1
-	sta	PARAM2+1
-	sta	PARAM3+1
-	lda	#3
-	sta	PARAM3
-	jsr	CURMOV
-	pla
-	tay
-	iny
-	bne	@next
-@end:	rts
+        ldy     #0
+@next:  lda     (ptr3),y
+        beq     @end
+        sta     PARAM1
+        lda     #0
+        sta     PARAM2
+        sta     PARAM1+1
+        sta     PARAM2+1
+        sta     PARAM3+1
+        lda     MODE
+        sta     PARAM3
+        tya
+        pha
+        jsr     CHAR
+        lda     #XSIZE
+        sta     PARAM1
+        lda     #0
+        sta     PARAM2
+        sta     PARAM1+1
+        sta     PARAM2+1
+        sta     PARAM3+1
+        lda     #3
+        sta     PARAM3
+        jsr     CURMOV
+        pla
+        tay
+        iny
+        bne     @next
+@end:   rts

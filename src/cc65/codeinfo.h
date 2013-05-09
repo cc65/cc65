@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  codeinfo.h				     */
+/*                                codeinfo.h                                 */
 /*                                                                           */
-/*		    Additional information about 6502 code		     */
+/*                  Additional information about 6502 code                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -49,7 +49,7 @@ struct CodeSeg;
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data			       	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -58,16 +58,16 @@ struct CodeSeg;
 struct RegContents;
 
 /* Defines for registers. */
-#define REG_NONE       	0x0000U
-#define REG_A  	       	0x0001U
-#define REG_X  	       	0x0002U
-#define REG_Y  	       	0x0004U
-#define REG_TMP1       	0x0008U
-#define REG_PTR1_LO    	0x0010U
-#define REG_PTR1_HI    	0x0020U
+#define REG_NONE        0x0000U
+#define REG_A           0x0001U
+#define REG_X           0x0002U
+#define REG_Y           0x0004U
+#define REG_TMP1        0x0008U
+#define REG_PTR1_LO     0x0010U
+#define REG_PTR1_HI     0x0020U
 #define REG_PTR2_LO     0x0040U
 #define REG_PTR2_HI     0x0080U
-#define REG_SREG_LO    	0x0100U
+#define REG_SREG_LO     0x0100U
 #define REG_SREG_HI     0x0200U
 #define REG_SAVE_LO     0x0400U
 #define REG_SAVE_HI     0x0800U
@@ -81,10 +81,10 @@ struct RegContents;
 #define REG_SREG        (REG_SREG_LO | REG_SREG_HI)
 #define REG_SAVE        (REG_SAVE_LO | REG_SAVE_HI)
 #define REG_SP          (REG_SP_LO | REG_SP_HI)
-#define	REG_AX		(REG_A | REG_X)
+#define REG_AX          (REG_A | REG_X)
 #define REG_AY          (REG_A | REG_Y)
-#define REG_XY		(REG_X | REG_Y)
-#define REG_AXY		(REG_AX | REG_Y)
+#define REG_XY          (REG_X | REG_Y)
+#define REG_AXY         (REG_AX | REG_Y)
 #define REG_EAX         (REG_AX | REG_SREG)
 #define REG_EAXY        (REG_EAX | REG_Y)
 #define REG_ZP          0xFFF8U
@@ -95,7 +95,7 @@ struct RegContents;
 /* Zero page register info */
 typedef struct ZPInfo ZPInfo;
 struct ZPInfo {
-    unsigned char  Len;		/* Length of the following string */
+    unsigned char  Len;         /* Length of the following string */
     char           Name[11];    /* Name of zero page symbol */
     unsigned short ByteUse;     /* Register info for this symbol */
     unsigned short WordUse;     /* Register info for 16 bit access */
@@ -121,7 +121,7 @@ typedef enum {
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code			       	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

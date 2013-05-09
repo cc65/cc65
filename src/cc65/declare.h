@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   declare.h				     */
+/*                                 declare.h                                 */
 /*                                                                           */
-/*		   Parse variable and function declarations		     */
+/*                 Parse variable and function declarations                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,34 +48,34 @@
 
 
 /*****************************************************************************/
-/*	  	      		     Data		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Masks for the Flags field in DeclSpec */
-#define DS_DEF_STORAGE		0x0001U	/* Default storage class used 	*/
-#define DS_DEF_TYPE		0x0002U	/* Default type used 		*/
-#define DS_EXTRA_TYPE		0x0004U	/* Extra type declared 		*/
+#define DS_DEF_STORAGE          0x0001U /* Default storage class used   */
+#define DS_DEF_TYPE             0x0002U /* Default type used            */
+#define DS_EXTRA_TYPE           0x0004U /* Extra type declared          */
 
 /* Result of ParseDeclSpec */
 typedef struct DeclSpec DeclSpec;
 struct DeclSpec {
-    unsigned	StorageClass;           /* One of the SC_xxx flags      */
-    Type       	Type[MAXTYPELEN];       /* Type of the declaration spec */
-    unsigned	Flags;                  /* Bitmapped flags              */
+    unsigned    StorageClass;           /* One of the SC_xxx flags      */
+    Type        Type[MAXTYPELEN];       /* Type of the declaration spec */
+    unsigned    Flags;                  /* Bitmapped flags              */
 };
 
 /* Result of ParseDecl */
 typedef struct Declaration Declaration;
 struct Declaration {
     unsigned    StorageClass;           /* A set of SC_xxx flags */
-    Type      	Type[MAXTYPELEN];       /* The type */
-    ident     	Ident;                  /* The identifier, if any*/
+    Type        Type[MAXTYPELEN];       /* The type */
+    ident       Ident;                  /* The identifier, if any*/
     Collection* Attributes;             /* Attributes if any */
 
     /* Working variables */
-    unsigned	Index;              /* Used to build Type */
+    unsigned    Index;              /* Used to build Type */
 };
 
 /* Modes for ParseDecl */
@@ -88,7 +88,7 @@ typedef enum {
 
 
 /*****************************************************************************/
-/* 		      		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

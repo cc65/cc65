@@ -20,7 +20,7 @@ _cbm_k_save:
         ldx     tmp1
         ldy     tmp1+1
         jsr     SAVE
-	ldx     #0              ; Clear high byte
-	bcs	@NotOk
+        ldx     #0              ; Clear high byte
+        bcs     @NotOk
         txa
-@NotOk:	rts
+@NotOk: rts

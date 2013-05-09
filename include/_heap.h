@@ -29,19 +29,19 @@ struct usedblock {
  * Beware: Field order is significant!
  */                                                      
 struct freeblock {
-    unsigned 		size;
-    struct freeblock*  	next;
-    struct freeblock*  	prev;
+    unsigned            size;
+    struct freeblock*   next;
+    struct freeblock*   prev;
 };
 
 
 
 /* Variables that describe the heap */
-extern unsigned*       	  _heaporg;     /* Bottom of heap */
-extern unsigned*  	  _heapptr;	/* Current top */
-extern unsigned*  	  _heapend;	/* Upper limit */
-extern struct freeblock*  _heapfirst;	/* First free block in list */
-extern struct freeblock*  _heaplast;	/* Last free block in list */
+extern unsigned*          _heaporg;     /* Bottom of heap */
+extern unsigned*          _heapptr;     /* Current top */
+extern unsigned*          _heapend;     /* Upper limit */
+extern struct freeblock*  _heapfirst;   /* First free block in list */
+extern struct freeblock*  _heaplast;    /* Last free block in list */
 
 
 

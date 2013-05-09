@@ -6,8 +6,8 @@
 ; Return the size of an allocated block.
 ;
 
-	.importzp    	ptr1, ptr2
-       	.export	     	__heapblocksize
+        .importzp       ptr1, ptr2
+        .export         __heapblocksize
 
         .include        "_heap.inc"
 

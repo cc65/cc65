@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   repeat.c				     */
+/*                                 repeat.c                                  */
 /*                                                                           */
-/*		     Handle the .REPEAT pseudo instruction		     */
+/*                   Handle the .REPEAT pseudo instruction                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    	  	     Code			   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -65,25 +65,25 @@ static TokList* CollectRepeatTokens (void)
     unsigned Repeats = 0;
     while (Repeats != 0 || CurTok.Tok != TOK_ENDREP) {
 
-     	/* Check for end of input */
-       	if (CurTok.Tok == TOK_EOF) {
-     	    Error ("Unexpected end of file");
-	    FreeTokList (List);
-     	    return 0;
-     	}
+        /* Check for end of input */
+        if (CurTok.Tok == TOK_EOF) {
+            Error ("Unexpected end of file");
+            FreeTokList (List);
+            return 0;
+        }
 
-       	/* Collect all tokens in the list */
-	AddCurTok (List);
+        /* Collect all tokens in the list */
+        AddCurTok (List);
 
-     	/* Check for and count nested .REPEATs */
-     	if (CurTok.Tok == TOK_REPEAT) {
-     	    ++Repeats;
-     	} else if (CurTok.Tok == TOK_ENDREP) {
-     	    --Repeats;
-     	}
+        /* Check for and count nested .REPEATs */
+        if (CurTok.Tok == TOK_REPEAT) {
+            ++Repeats;
+        } else if (CurTok.Tok == TOK_ENDREP) {
+            --Repeats;
+        }
 
-       	/* Get the next token */
-     	NextTok ();
+        /* Get the next token */
+        NextTok ();
     }
 
     /* Eat the closing .ENDREP */
@@ -103,9 +103,9 @@ static void RepeatTokenCheck (TokList* L)
     if (CurTok.Tok == TOK_IDENT &&
         L->Data != 0            &&
         SB_CompareStr (&CurTok.SVal, L->Data) == 0) {
-     	/* Must replace by the repeat counter */
-     	CurTok.Tok  = TOK_INTCON;
-     	CurTok.IVal = L->RepCount;
+        /* Must replace by the repeat counter */
+        CurTok.Tok  = TOK_INTCON;
+        CurTok.IVal = L->RepCount;
     }
 }
 
@@ -120,26 +120,26 @@ void ParseRepeat (void)
     /* Repeat count follows */
     long RepCount = ConstExpression ();
     if (RepCount < 0) {
-     	Error ("Range error");
-     	RepCount = 0;
+        Error ("Range error");
+        RepCount = 0;
     }
 
     /* Optional there is a comma and a counter variable */
     Name = 0;
     if (CurTok.Tok == TOK_COMMA) {
 
-       	/* Skip the comma */
-       	NextTok ();
+        /* Skip the comma */
+        NextTok ();
 
-       	/* Check for an identifier */
-       	if (CurTok.Tok != TOK_IDENT) {
-       	    ErrorSkip ("Identifier expected");
-       	} else {
-       	    /* Remember the name and skip it */
+        /* Check for an identifier */
+        if (CurTok.Tok != TOK_IDENT) {
+            ErrorSkip ("Identifier expected");
+        } else {
+            /* Remember the name and skip it */
             SB_Terminate (&CurTok.SVal);
-       	    Name = xstrdup (SB_GetConstBuf (&CurTok.SVal));
-       	    NextTok ();
-       	}
+            Name = xstrdup (SB_GetConstBuf (&CurTok.SVal));
+            NextTok ();
+        }
     }
 
     /* Switch to raw token mode, then skip the separator */
@@ -151,8 +151,8 @@ void ParseRepeat (void)
 
     /* If we had an error, bail out */
     if (List == 0) {
-     	xfree (Name);
-       	goto Done;
+        xfree (Name);
+        goto Done;
     }
 
     /* Update the token list for replay */
@@ -164,8 +164,8 @@ void ParseRepeat (void)
      * to repeat.
      */
     if (List->Count == 0 || RepCount == 0) {
-     	FreeTokList (List);
-     	goto Done;
+        FreeTokList (List);
+        goto Done;
     }
 
     /* Read input from the repeat descriptor */

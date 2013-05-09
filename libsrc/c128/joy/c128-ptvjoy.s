@@ -61,7 +61,7 @@ JOY_COUNT       = 4             ; Number of joysticks we support
 INSTALL:
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
-;	rts                     ; Run into UNINSTALL instead
+;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -85,18 +85,18 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:   tax	                ; Joystick number into X
+READ:   tax                     ; Joystick number into X
         bne     joy2
 
 ; Read joystick 1
 
-joy1:   lda	#$7F
+joy1:   lda     #$7F
         sei
-        sta	CIA1_PRA
-        lda	CIA1_PRB
+        sta     CIA1_PRA
+        lda     CIA1_PRB
         cli
-        and	#$1F
-        eor	#$1F
+        and     #$1F
+        eor     #$1F
         rts
 
 ; Read joystick 2
@@ -104,15 +104,15 @@ joy1:   lda	#$7F
 joy2:   dex
         bne     joy3
 
-        lda 	#$E0
-        ldy 	#$FF
+        lda     #$E0
+        ldy     #$FF
         sei
-        sta 	CIA1_DDRA
-        lda 	CIA1_PRA
-        sty 	CIA1_DDRA
+        sta     CIA1_DDRA
+        lda     CIA1_PRA
+        sty     CIA1_DDRA
         cli
-        and 	#$1F
-        eor 	#$1F
+        and     #$1F
+        eor     #$1F
         rts
 
 ; Read joystick 3

@@ -18,8 +18,8 @@
 
 /* Definition of struct _FILE */
 struct _FILE {
-    char	    f_fd;
-    char	    f_flags;
+    char            f_fd;
+    char            f_flags;
     unsigned char   f_pushback;
 };
 
@@ -27,10 +27,10 @@ struct _FILE {
 extern FILE _filetab[FOPEN_MAX];
 
 /* Flags field */
-#define _FCLOSED	0x00
-#define	_FOPEN		0x01
-#define _FEOF		0x02
-#define _FERROR		0x04
+#define _FCLOSED        0x00
+#define _FOPEN          0x01
+#define _FEOF           0x02
+#define _FERROR         0x04
 #define _FPUSHBACK      0x08
 
 

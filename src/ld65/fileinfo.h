@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	      			  fileinfo.h                                 */
+/*                                fileinfo.h                                 */
 /*                                                                           */
-/*			  Source file info structure                         */
+/*                        Source file info structure                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*  	   	 		     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -58,7 +58,7 @@
 typedef struct FileInfo FileInfo;
 struct FileInfo {
     unsigned        Id;                 /* Id of file for debug info */
-    unsigned        Name;      	       	/* File name index */
+    unsigned        Name;               /* File name index */
     unsigned long   MTime;              /* Time of last modification */
     unsigned long   Size;               /* Size of the file */
     Collection      Modules;            /* Modules that use this file */
@@ -67,7 +67,7 @@ struct FileInfo {
 
 
 /*****************************************************************************/
-/*     	       	      	      	     Code			     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

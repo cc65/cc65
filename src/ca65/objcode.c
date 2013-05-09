@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objcode.c				     */
+/*                                 objcode.c                                 */
 /*                                                                           */
-/*	       Objectcode management for the ca65 macroassembler	     */
+/*             Objectcode management for the ca65 macroassembler             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*     	      	      	   	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -159,23 +159,23 @@ void EmitData (const void* D, unsigned Size)
 
     /* Create lots of fragments for the data */
     while (Size) {
-     	Fragment* F;
+        Fragment* F;
 
-     	/* Determine the length of the next fragment */
-     	unsigned Len = Size;
-       	if (Len > sizeof (F->V.Data)) {
-     	    Len = sizeof (F->V.Data);
-       	}
+        /* Determine the length of the next fragment */
+        unsigned Len = Size;
+        if (Len > sizeof (F->V.Data)) {
+            Len = sizeof (F->V.Data);
+        }
 
-     	/* Create a new fragment */
-     	F = GenFragment (FRAG_LITERAL, Len);
+        /* Create a new fragment */
+        F = GenFragment (FRAG_LITERAL, Len);
 
-     	/* Copy the data */
-     	memcpy (F->V.Data, Data, Len);
+        /* Copy the data */
+        memcpy (F->V.Data, Data, Len);
 
-     	/* Next chunk */
-     	Data += Len;
-     	Size -= Len;
+        /* Next chunk */
+        Data += Len;
+        Size -= Len;
 
     }
 }
@@ -270,12 +270,12 @@ void EmitFill (unsigned long Count)
 /* Emit Count fill bytes */
 {
     while (Count) {
-	/* Calculate the size of the next chunk */
-	unsigned Chunk = (Count > 0xFFFF)? 0xFFFF : (unsigned) Count;
-	Count -= Chunk;
+        /* Calculate the size of the next chunk */
+        unsigned Chunk = (Count > 0xFFFF)? 0xFFFF : (unsigned) Count;
+        Count -= Chunk;
 
-	/* Emit one chunk */
-	GenFragment (FRAG_FILL, Chunk);
+        /* Emit one chunk */
+        GenFragment (FRAG_FILL, Chunk);
     }
 }
 

@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*	       	     	       	     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -68,7 +68,7 @@ const FileId* GetFileId (const char* Name, const FileId* Table, unsigned Count)
 
     /* Do we have an extension? */
     if (Ext == 0) {
-    	return 0;
+        return 0;
     }
 
     /* Search for a table entry and return it */

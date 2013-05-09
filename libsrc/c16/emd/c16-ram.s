@@ -5,11 +5,11 @@
 ; Ullrich von Bassewitz, 2003-12-15
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
-	.include	"plus4.inc"
+        .include        "plus4.inc"
 
         .macpack        generic
 
@@ -22,7 +22,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -32,13 +32,13 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-BASE   	= $8000
+BASE    = $8000
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -63,7 +63,7 @@ INSTALL:
 ; $8000 up to MEMTOP
 
         sec
-        jsr     $FF99			; MEMTOP: Get top memory into Y/X
+        jsr     $FF99                   ; MEMTOP: Get top memory into Y/X
         tya
         sub     #>BASE                  ; Low 32 K are used
         bcc     nomem
@@ -104,17 +104,17 @@ PAGECOUNT:
 ; by the driver.
 ;
 
-MAP:    sta     curpage			; Remember the new page
+MAP:    sta     curpage                 ; Remember the new page
 
         add     #>BASE
-        sta	ptr1+1
-        ldy	#$00
-        sty    	ptr1
+        sta     ptr1+1
+        ldy     #$00
+        sty     ptr1
 
-        lda	#<window
-        sta	ptr2
-        lda	#>window
-        sta	ptr2+1
+        lda     #<window
+        sta     ptr2
+        lda     #>window
+        sta     ptr2+1
 
 ; Transfer one page
 
@@ -137,18 +137,18 @@ USE:    sta     curpage                 ; Remember the page
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.
 
-COMMIT: lda     curpage			; Get the current page
+COMMIT: lda     curpage                 ; Get the current page
         bmi     done                    ; Jump if no page mapped
 
         add     #>BASE
-        sta	ptr2+1
-        ldy	#$00
-        sty    	ptr2
+        sta     ptr2+1
+        ldy     #$00
+        sty     ptr2
 
-        lda	#<window
-        sta	ptr1
-        lda	#>window
-        sta	ptr1+1
+        lda     #<window
+        sta     ptr1
+        lda     #>window
+        sta     ptr1+1
 
 ; Transfer one page. Y must be zero on entry. Because we bank out the
 ; kernal, we will run the routine with interrupts disabled but leave
@@ -158,11 +158,11 @@ transfer:
         sei
         sta     ENABLE_RAM
 
-	.repeat	8
-        lda	(ptr1),y
-        sta	(ptr2),y
+        .repeat 8
+        lda     (ptr1),y
+        sta     (ptr2),y
         iny
-	.endrepeat
+        .endrepeat
 
         sta     ENABLE_ROM
         cli
@@ -225,8 +225,8 @@ common: ldy     #EM_COPY::COUNT+1
 ; Transfer the bytes in the last page
 
         ldy     #$00
-@L3:    lda	(ptr1),y
-        sta	(ptr2),y
+@L3:    lda     (ptr1),y
+        sta     (ptr2),y
         iny
         dex
         bne     @L3

@@ -5,8 +5,8 @@
 
 ; void InitTextPrompt (char height);
 
-	    .export _InitTextPrompt
+            .export _InitTextPrompt
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_InitTextPrompt	= InitTextPrompt
+_InitTextPrompt = InitTextPrompt

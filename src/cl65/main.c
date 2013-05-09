@@ -1,34 +1,34 @@
 /*****************************************************************************/
-/*									     */
-/*				    main.c				     */
-/*									     */
-/*	       Main module for the cl65 compile-and-link utility	     */
-/*									     */
-/*									     */
-/*									     */
+/*                                                                           */
+/*                                  main.c                                   */
+/*                                                                           */
+/*             Main module for the cl65 compile-and-link utility             */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
 /* (C) 1999-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
-/*									     */
-/*									     */
-/* This software is provided 'as-is', without any expressed or implied	     */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.				     */
-/*									     */
+/* arising from the use of this software.                                    */
+/*                                                                           */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:			     */
-/*									     */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.					     */
+/*    appreciated but is not required.                                       */
 /* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.			     */
-/* 3. This notice may not be removed or altered from any source		     */
-/*    distribution.							     */
-/*									     */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
 /*****************************************************************************/
 
 
@@ -73,7 +73,7 @@
 
 
 /*****************************************************************************/
-/*	   			     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -81,15 +81,15 @@
 /* Struct that describes a command */
 typedef struct CmdDesc CmdDesc;
 struct CmdDesc {
-    char*	Name;		/* The command name */
+    char*       Name;           /* The command name */
 
-    unsigned	ArgCount;	/* Count of arguments */
-    unsigned	ArgMax;		/* Maximum count of arguments */
-    char**	Args;		/* The arguments */
+    unsigned    ArgCount;       /* Count of arguments */
+    unsigned    ArgMax;         /* Maximum count of arguments */
+    char**      Args;           /* The arguments */
 
-    unsigned	FileCount;	/* Count of files to translate */
-    unsigned	FileMax;	/* Maximum count of files */
-    char**	Files;		/* The files */
+    unsigned    FileCount;      /* Count of files to translate */
+    unsigned    FileMax;        /* Maximum count of files */
+    char**      Files;          /* The files */
 };
 
 /* Command descriptors for the different programs */
@@ -125,7 +125,7 @@ static int Module = 0;
 #define MODULE_EXT      ".o65"
 
 /* Name of the target specific runtime library */
-static char* TargetLib	= 0;
+static char* TargetLib  = 0;
 
 
 
@@ -146,7 +146,7 @@ static char* TargetLib	= 0;
 
 
 /*****************************************************************************/
-/*			  Command structure handling			     */
+/*                        Command structure handling                         */
 /*****************************************************************************/
 
 
@@ -155,7 +155,7 @@ static void CmdExpand (CmdDesc* Cmd)
 /* Expand the argument vector */
 {
     unsigned NewMax  = Cmd->ArgMax + 10;
-    char**	 NewArgs = xmalloc (NewMax * sizeof (char*));
+    char**       NewArgs = xmalloc (NewMax * sizeof (char*));
     memcpy (NewArgs, Cmd->Args, Cmd->ArgMax * sizeof (char*));
     xfree (Cmd->Args);
     Cmd->Args   = NewArgs;
@@ -174,9 +174,9 @@ static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
 
     /* Add a copy of the new argument, allow a NULL pointer */
     if (Arg) {
-	Cmd->Args[Cmd->ArgCount++] = xstrdup (Arg);
+        Cmd->Args[Cmd->ArgCount++] = xstrdup (Arg);
     } else {
-	Cmd->Args[Cmd->ArgCount++] = 0;
+        Cmd->Args[Cmd->ArgCount++] = 0;
     }
 }
 
@@ -236,9 +236,9 @@ static void CmdDelArgs (CmdDesc* Cmd, unsigned LastValid)
 /* Remove all arguments with an index greater than LastValid */
 {
     while (Cmd->ArgCount > LastValid) {
-	Cmd->ArgCount--;
-	xfree (Cmd->Args [Cmd->ArgCount]);
-	Cmd->Args [Cmd->ArgCount] = 0;
+        Cmd->ArgCount--;
+        xfree (Cmd->Args [Cmd->ArgCount]);
+        Cmd->Args [Cmd->ArgCount] = 0;
     }
 }
 
@@ -249,12 +249,12 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
 {
     /* Expand the file vector if needed */
     if (Cmd->FileCount == Cmd->FileMax) {
-	unsigned NewMax   = Cmd->FileMax + 10;
-	char**	 NewFiles = xmalloc (NewMax * sizeof (char*));
-	memcpy (NewFiles, Cmd->Files, Cmd->FileMax * sizeof (char*));
-	xfree (Cmd->Files);
-	Cmd->Files   = NewFiles;
-	Cmd->FileMax = NewMax;
+        unsigned NewMax   = Cmd->FileMax + 10;
+        char**   NewFiles = xmalloc (NewMax * sizeof (char*));
+        memcpy (NewFiles, Cmd->Files, Cmd->FileMax * sizeof (char*));
+        xfree (Cmd->Files);
+        Cmd->Files   = NewFiles;
+        Cmd->FileMax = NewMax;
     }
 
     /* If the file name is not NULL (which is legal and is used to terminate
@@ -263,21 +263,21 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
      * the file.
      */
     if (File) {
-	unsigned I;
-	for (I = 0; I < Cmd->FileCount; ++I) {
-	    if (strcmp (Cmd->Files[I], File) == 0) {
-	     	/* Duplicate file */
-		Warning ("Duplicate file in argument list: `%s'", File);
-		/* No need to search further */
-	     	break;
-	    }
-	}
+        unsigned I;
+        for (I = 0; I < Cmd->FileCount; ++I) {
+            if (strcmp (Cmd->Files[I], File) == 0) {
+                /* Duplicate file */
+                Warning ("Duplicate file in argument list: `%s'", File);
+                /* No need to search further */
+                break;
+            }
+        }
 
-	/* Add the file */
-	Cmd->Files [Cmd->FileCount++] = xstrdup (File);
+        /* Add the file */
+        Cmd->Files [Cmd->FileCount++] = xstrdup (File);
     } else {
-	/* Add a NULL pointer */
-	Cmd->Files [Cmd->FileCount++] = 0;
+        /* Add a NULL pointer */
+        Cmd->Files [Cmd->FileCount++] = 0;
     }
 }
 
@@ -324,14 +324,14 @@ static void CmdPrint (CmdDesc* Cmd, FILE* F)
 {
     unsigned I;
     for (I = 0; I < Cmd->ArgCount && Cmd->Args[I] != 0; ++I) {
-	fprintf (F, "%s ", Cmd->Args[I]);
+        fprintf (F, "%s ", Cmd->Args[I]);
     }
 }
 
 
 
 /*****************************************************************************/
-/*   	   		     	Target handling				     */
+/*                              Target handling                              */
 /*****************************************************************************/
 
 
@@ -342,14 +342,14 @@ static void SetTargetFiles (void)
     /* Determine the names of the target specific library file */
     if (Target != TGT_NONE) {
 
- 	/* Get a pointer to the system name and its length */
- 	const char* TargetName = GetTargetName (Target);
- 	unsigned    TargetNameLen = strlen (TargetName);
+        /* Get a pointer to the system name and its length */
+        const char* TargetName = GetTargetName (Target);
+        unsigned    TargetNameLen = strlen (TargetName);
 
- 	/* Set the library file */
- 	TargetLib = xmalloc (TargetNameLen + 4 + 1);
- 	memcpy (TargetLib, TargetName, TargetNameLen);
- 	strcpy (TargetLib + TargetNameLen, ".lib");
+        /* Set the library file */
+        TargetLib = xmalloc (TargetNameLen + 4 + 1);
+        memcpy (TargetLib, TargetName, TargetNameLen);
+        strcpy (TargetLib + TargetNameLen, ".lib");
 
     }
 }
@@ -357,7 +357,7 @@ static void SetTargetFiles (void)
 
 
 /*****************************************************************************/
-/*	    		   	 Subprocesses				     */
+/*                               Subprocesses                                */
 /*****************************************************************************/
 
 
@@ -369,9 +369,9 @@ static void ExecProgram (CmdDesc* Cmd)
 
     /* If in debug mode, output the command line we will execute */
     if (Debug) {
-	printf ("Executing: ");
-       	CmdPrint (Cmd, stdout);
-	printf ("\n");
+        printf ("Executing: ");
+        CmdPrint (Cmd, stdout);
+        printf ("\n");
     }
 
     /* Call the program */
@@ -379,11 +379,11 @@ static void ExecProgram (CmdDesc* Cmd)
 
     /* Check the result code */
     if (Status < 0) {
-	/* Error executing the program */
-	Error ("Cannot execute `%s': %s", Cmd->Name, strerror (errno));
+        /* Error executing the program */
+        Error ("Cannot execute `%s': %s", Cmd->Name, strerror (errno));
     } else if (Status != 0) {
-	/* Called program had an error */
-	exit (Status);
+        /* Called program had an error */
+        exit (Status);
     }
 }
 
@@ -400,14 +400,14 @@ static void Link (void)
      */
     if (OutputName) {
 
-    	CmdSetOutput (&LD65, OutputName);
+        CmdSetOutput (&LD65, OutputName);
 
     } else if (FirstInput && FindExt (FirstInput)) {  /* Only if ext present! */
 
         const char* Extension = Module? MODULE_EXT : "";
-    	char* Output = MakeFilename (FirstInput, Extension);
-    	CmdSetOutput (&LD65, Output);
-    	xfree (Output);
+        char* Output = MakeFilename (FirstInput, Extension);
+        CmdSetOutput (&LD65, Output);
+        xfree (Output);
 
     }
 
@@ -418,11 +418,11 @@ static void Link (void)
         if (Module) {
             Error ("Cannot use -C and --module together");
         }
-       	CmdAddArg2 (&LD65, "-C", LinkerConfig);
+        CmdAddArg2 (&LD65, "-C", LinkerConfig);
     } else if (Module) {
         CmdSetTarget (&LD65, TGT_MODULE);
     } else {
-	CmdSetTarget (&LD65, Target);
+        CmdSetTarget (&LD65, Target);
     }
 
     /* Determine which target libraries are needed */
@@ -430,12 +430,12 @@ static void Link (void)
 
     /* Add all object files as parameters */
     for (I = 0; I < LD65.FileCount; ++I) {
-    	CmdAddArg (&LD65, LD65.Files [I]);
+        CmdAddArg (&LD65, LD65.Files [I]);
     }
 
     /* Add the system runtime library */
     if (TargetLib) {
-	CmdAddArg (&LD65, TargetLib);
+        CmdAddArg (&LD65, TargetLib);
     }
 
     /* Terminate the argument list with a NULL pointer */
@@ -462,9 +462,9 @@ static void AssembleFile (const char* File, unsigned ArgCount)
          * the the file list of the linker. The name of the output
          * file is that of the input file with ".s" replaced by ".o".
          */
-    	char* ObjName = MakeFilename (File, ".o");
-    	CmdAddFile (&LD65, ObjName);
-   	xfree (ObjName);
+        char* ObjName = MakeFilename (File, ".o");
+        CmdAddFile (&LD65, ObjName);
+        xfree (ObjName);
     } else {
         /* This is the final step. If an output name is given, set it */
         if (OutputName) {
@@ -590,7 +590,7 @@ static void Compile (const char* File)
      */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
-   	AssembleIntermediate (File);
+        AssembleIntermediate (File);
     }
 }
 
@@ -624,7 +624,7 @@ static void CompileRes (const char* File)
      */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
-   	AssembleIntermediate (File);
+        AssembleIntermediate (File);
     }
 }
 
@@ -640,7 +640,7 @@ static void ConvertO65 (const char* File)
      * output name.
      */
     if (!DoAssemble && OutputName) {
-       	CmdSetOutput (&CO65, OutputName);
+        CmdSetOutput (&CO65, OutputName);
     }
 
     /* Add the file as argument for the object file converter */
@@ -660,14 +660,14 @@ static void ConvertO65 (const char* File)
      */
     if (DoAssemble) {
         /* Assemble the intermediate file and remove it */
-   	AssembleIntermediate (File);
+        AssembleIntermediate (File);
     }
 }
 
 
 
 /*****************************************************************************/
-/*		    	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -765,7 +765,7 @@ static void Usage (void)
 
 
 static void OptAddSource (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Strict source code as comments to the generated asm code */
 {
     CmdAddArg (&CC65, "-T");
@@ -839,7 +839,7 @@ static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptCheckStack (const char* Opt attribute ((unused)),
-		  	   const char* Arg attribute ((unused)))
+                           const char* Arg attribute ((unused)))
 /* Handle the --check-stack option */
 {
     CmdAddArg (&CC65, "--check-stack");
@@ -935,7 +935,7 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebug (const char* Opt attribute ((unused)),
-	    	      const char* Arg attribute ((unused)))
+                      const char* Arg attribute ((unused)))
 /* Debug mode (compiler and cl65 utility) */
 {
     CmdAddArg (&CC65, "-d");
@@ -946,7 +946,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Debug Info - add to compiler and assembler */
 {
     CmdAddArg (&CC65, "-g");
@@ -973,7 +973,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print help - cl65 */
 {
     Usage ();
@@ -1031,14 +1031,14 @@ static void OptListing (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptListTargets (const char* Opt attribute ((unused)),
-		       	    const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* List all targets */
 {
     target_t T;
 
     /* List the targets */
     for (T = TGT_NONE; T < TGT_COUNT; ++T) {
-	printf ("%s\n", GetTargetName (T));
+        printf ("%s\n", GetTargetName (T));
     }
 
     /* Terminate */
@@ -1140,7 +1140,7 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
 
 
 static void OptSignedChars (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* Make default characters signed */
 {
     CmdAddArg (&CC65, "-j");
@@ -1165,7 +1165,7 @@ static void OptStartAddr (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptStaticLocals (const char* Opt attribute ((unused)),
-	      		     const char* Arg attribute ((unused)))
+                             const char* Arg attribute ((unused)))
 /* Place local variables in static storage */
 {
     CmdAddArg (&CC65, "-Cl");
@@ -1187,7 +1187,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptVerbose (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Verbose mode (compiler, assembler, linker) */
 {
     CmdAddArg (&CC65, "-v");
@@ -1199,7 +1199,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-		    	const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print version number */
 {
     fprintf (stderr, "cl65 V%s\n", GetVersionAsString ());
@@ -1228,56 +1228,56 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-	{ "--add-source",	0,    	OptAddSource 		},
+        { "--add-source",       0,      OptAddSource            },
         { "--asm-args",         1,      OptAsmArgs              },
-       	{ "--asm-define",      	1,     	OptAsmDefine            },
-	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
+        { "--asm-define",       1,      OptAsmDefine            },
+        { "--asm-include-dir",  1,      OptAsmIncludeDir        },
         { "--bin-include-dir",  1,      OptBinIncludeDir        },
-       	{ "--bss-label",       	1,     	OptBssLabel             },
-	{ "--bss-name",	 	1, 	OptBssName   		},
+        { "--bss-label",        1,      OptBssLabel             },
+        { "--bss-name",         1,      OptBssName              },
         { "--cc-args",          1,      OptCCArgs               },
-       	{ "--cfg-path",	       	1,     	OptCfgPath              },
-       	{ "--check-stack",	0,     	OptCheckStack		},
-       	{ "--code-label",      	1,     	OptCodeLabel            },
-	{ "--code-name", 	1, 	OptCodeName  		},
-	{ "--codesize",	 	1,	OptCodeSize		},
+        { "--cfg-path",         1,      OptCfgPath              },
+        { "--check-stack",      0,      OptCheckStack           },
+        { "--code-label",       1,      OptCodeLabel            },
+        { "--code-name",        1,      OptCodeName             },
+        { "--codesize",         1,      OptCodeSize             },
         { "--config",           1,      OptConfig               },
-        { "--cpu",     	       	1, 	OptCPU 			},
- 	{ "--create-dep",       1,      OptCreateDep            },
-	{ "--create-full-dep",  1,      OptCreateFullDep        },
-       	{ "--data-label",      	1,     	OptDataLabel            },
-	{ "--data-name",     	1, 	OptDataName  		},
-	{ "--debug",	     	0,	OptDebug		},
-	{ "--debug-info",    	0,	OptDebugInfo		},
-	{ "--feature",	     	1,	OptFeature		},
+        { "--cpu",              1,      OptCPU                  },
+        { "--create-dep",       1,      OptCreateDep            },
+        { "--create-full-dep",  1,      OptCreateFullDep        },
+        { "--data-label",       1,      OptDataLabel            },
+        { "--data-name",        1,      OptDataName             },
+        { "--debug",            0,      OptDebug                },
+        { "--debug-info",       0,      OptDebugInfo            },
+        { "--feature",          1,      OptFeature              },
         { "--force-import",     1,      OptForceImport          },
-	{ "--help",	     	0,	OptHelp			},
-	{ "--include-dir",   	1,	OptIncludeDir		},
+        { "--help",             0,      OptHelp                 },
+        { "--include-dir",      1,      OptIncludeDir           },
         { "--ld-args",          1,      OptLdArgs               },
-       	{ "--lib",     	       	1,     	OptLib                  },
-       	{ "--lib-path",	       	1,     	OptLibPath              },
-	{ "--list-targets",	0,	OptListTargets		},
-	{ "--listing",	      	1,	OptListing		},
+        { "--lib",              1,      OptLib                  },
+        { "--lib-path",         1,      OptLibPath              },
+        { "--list-targets",     0,      OptListTargets          },
+        { "--listing",          1,      OptListing              },
         { "--list-bytes",       1,      OptListBytes            },
-	{ "--mapfile",	      	1,	OptMapFile		},
+        { "--mapfile",          1,      OptMapFile              },
         { "--memory-model",     1,      OptMemoryModel          },
         { "--module",           0,      OptModule               },
         { "--module-id",        1,      OptModuleId             },
         { "--o65-model",        1,      OptO65Model             },
-       	{ "--obj",              1,     	OptObj                  },
-       	{ "--obj-path",	       	1,     	OptObjPath              },
+        { "--obj",              1,      OptObj                  },
+        { "--obj-path",         1,      OptObjPath              },
         { "--register-space",   1,      OptRegisterSpace        },
         { "--register-vars",    0,      OptRegisterVars         },
-	{ "--rodata-name",    	1, 	OptRodataName		},
-	{ "--signed-chars",   	0, 	OptSignedChars	       	},
+        { "--rodata-name",      1,      OptRodataName           },
+        { "--signed-chars",     0,      OptSignedChars          },
         { "--standard",         1,      OptStandard             },
-	{ "--start-addr",     	1,	OptStartAddr		},
-       	{ "--static-locals",   	0, 	OptStaticLocals	       	},
-	{ "--target",	      	1,	OptTarget		},
-	{ "--verbose",	      	0,	OptVerbose		},
-	{ "--version",	      	0,	OptVersion		},
-       	{ "--zeropage-label",   1,     	OptZeropageLabel        },
-	{ "--zeropage-name",    1, 	OptZeropageName         },
+        { "--start-addr",       1,      OptStartAddr            },
+        { "--static-locals",    0,      OptStaticLocals         },
+        { "--target",           1,      OptTarget               },
+        { "--verbose",          0,      OptVerbose              },
+        { "--version",          0,      OptVersion              },
+        { "--zeropage-label",   1,      OptZeropageLabel        },
+        { "--zeropage-name",    1,      OptZeropageName         },
     };
 
     char* CmdPath;
@@ -1316,211 +1316,211 @@ int main (int argc, char* argv [])
     I = 1;
     while (I < ArgCount) {
 
-	/* Get the argument */
-	const char* Arg = ArgVec[I];
+        /* Get the argument */
+        const char* Arg = ArgVec[I];
 
-	/* Check for an option */
-	if (Arg [0] == '-') {
+        /* Check for an option */
+        if (Arg [0] == '-') {
 
-	    switch (Arg [1]) {
+            switch (Arg [1]) {
 
-		case '-':
-		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
-		case 'C':
-	   	    if (Arg[2] == 'l' && Arg[3] == '\0') {
-			/* Make local variables static */
-			OptStaticLocals (Arg, 0);
-		    } else {
-		     	/* Specify linker config file */
-		     	OptConfig (Arg, GetArg (&I, 2));
-		    }
-	     	    break;
+                case 'C':
+                    if (Arg[2] == 'l' && Arg[3] == '\0') {
+                        /* Make local variables static */
+                        OptStaticLocals (Arg, 0);
+                    } else {
+                        /* Specify linker config file */
+                        OptConfig (Arg, GetArg (&I, 2));
+                    }
+                    break;
 
-		case 'D':
-		    /* Define a preprocessor symbol (compiler) */
-		    CmdAddArg2 (&CC65, "-D", GetArg (&I, 2));
-		    break;
+                case 'D':
+                    /* Define a preprocessor symbol (compiler) */
+                    CmdAddArg2 (&CC65, "-D", GetArg (&I, 2));
+                    break;
 
-		case 'I':
-		    /* Include directory (compiler) */
-		    OptIncludeDir (Arg, GetArg (&I, 2));
-		    break;
+                case 'I':
+                    /* Include directory (compiler) */
+                    OptIncludeDir (Arg, GetArg (&I, 2));
+                    break;
 
-	   	case 'L':
-		    if (Arg[2] == 'n' && Arg[3] == '\0') {
-		      	/* VICE label file (linker) */
-		      	CmdAddArg2 (&LD65, "-Ln", GetArg (&I, 3));
-		    } else {
+                case 'L':
+                    if (Arg[2] == 'n' && Arg[3] == '\0') {
+                        /* VICE label file (linker) */
+                        CmdAddArg2 (&LD65, "-Ln", GetArg (&I, 3));
+                    } else {
                         /* Library search path (linker) */
                         OptLibPath (Arg, GetArg (&I, 2));
-		    }
-	    	    break;
+                    }
+                    break;
 
-	    	case 'O':
-	    	    /* Optimize code (compiler, also covers -Oi and others) */
-	    	    CmdAddArg (&CC65, Arg);
-	    	    break;
+                case 'O':
+                    /* Optimize code (compiler, also covers -Oi and others) */
+                    CmdAddArg (&CC65, Arg);
+                    break;
 
-	    	case 'S':
-	    	    /* Dont assemble and link the created files */
+                case 'S':
+                    /* Dont assemble and link the created files */
                     DoAssemble = 0;
-		    DoLink     = 0;
-		    break;
+                    DoLink     = 0;
+                    break;
 
-	   	case 'T':
-		    /* Include source as comment (compiler) */
-		    OptAddSource (Arg, 0);
-		    break;
+                case 'T':
+                    /* Include source as comment (compiler) */
+                    OptAddSource (Arg, 0);
+                    break;
 
-		case 'V':
-		    /* Print version number */
-	       	    OptVersion (Arg, 0);
-	   	    break;
+                case 'V':
+                    /* Print version number */
+                    OptVersion (Arg, 0);
+                    break;
 
-		case 'W':
-		    if (Arg[2] == 'a' && Arg[3] == '\0') {
-			/* -Wa: Pass options to assembler */
-			OptAsmArgs (Arg, GetArg (&I, 3));
-		    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
-			/* -Wc: Pass options to compiler */
-			OptCCArgs (Arg, GetArg (&I, 3));
-		    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
-			/* -Wl: Pass options to linker */
-			OptLdArgs (Arg, GetArg (&I, 3));
-		    } else {
-			/* Anything else: Suppress warnings (compiler) */
-			CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));
-		    }
-		    break;
+                case 'W':
+                    if (Arg[2] == 'a' && Arg[3] == '\0') {
+                        /* -Wa: Pass options to assembler */
+                        OptAsmArgs (Arg, GetArg (&I, 3));
+                    } else if (Arg[2] == 'c' && Arg[3] == '\0') {
+                        /* -Wc: Pass options to compiler */
+                        OptCCArgs (Arg, GetArg (&I, 3));
+                    } else if (Arg[2] == 'l' && Arg[3] == '\0') {
+                        /* -Wl: Pass options to linker */
+                        OptLdArgs (Arg, GetArg (&I, 3));
+                    } else {
+                        /* Anything else: Suppress warnings (compiler) */
+                        CmdAddArg2 (&CC65, "-W", GetArg (&I, 2));
+                    }
+                    break;
 
-	   	case 'c':
-	   	    /* Don't link the resulting files */
-	   	    DoLink = 0;
-	   	    break;
+                case 'c':
+                    /* Don't link the resulting files */
+                    DoLink = 0;
+                    break;
 
-		case 'd':
-		    /* Debug mode (compiler) */
-		    OptDebug (Arg, 0);
-		    break;
+                case 'd':
+                    /* Debug mode (compiler) */
+                    OptDebug (Arg, 0);
+                    break;
 
-		case 'g':
-		    /* Debugging - add to compiler and assembler */
-		    OptDebugInfo (Arg, 0);
-		    break;
+                case 'g':
+                    /* Debugging - add to compiler and assembler */
+                    OptDebugInfo (Arg, 0);
+                    break;
 
-		case 'h':
-		case '?':
-		    /* Print help - cl65 */
-	     	    OptHelp (Arg, 0);
-		    break;
+                case 'h':
+                case '?':
+                    /* Print help - cl65 */
+                    OptHelp (Arg, 0);
+                    break;
 
-	   	case 'j':
-		    /* Default characters are signed */
-		    OptSignedChars (Arg, 0);
-		    break;
+                case 'j':
+                    /* Default characters are signed */
+                    OptSignedChars (Arg, 0);
+                    break;
 
-	   	case 'l':
-		    /* Create an assembler listing */
-		    OptListing (Arg, GetArg (&I, 2));
-		    break;
+                case 'l':
+                    /* Create an assembler listing */
+                    OptListing (Arg, GetArg (&I, 2));
+                    break;
 
-	   	case 'm':
-		    /* Create a map file (linker) */
-		    OptMapFile (Arg, GetArg (&I, 2));
-		    break;
+                case 'm':
+                    /* Create a map file (linker) */
+                    OptMapFile (Arg, GetArg (&I, 2));
+                    break;
 
-		case 'o':
-		    /* Name the output file */
-		    OutputName = GetArg (&I, 2);
-		    break;
+                case 'o':
+                    /* Name the output file */
+                    OutputName = GetArg (&I, 2);
+                    break;
 
-		case 'r':
-		    /* Enable register variables */
-		    OptRegisterVars (Arg, 0);
-		    break;
+                case 'r':
+                    /* Enable register variables */
+                    OptRegisterVars (Arg, 0);
+                    break;
 
-		case 't':
-		    /* Set target system - compiler, assembler and linker */
-		    OptTarget (Arg, GetArg (&I, 2));
-		    break;
+                case 't':
+                    /* Set target system - compiler, assembler and linker */
+                    OptTarget (Arg, GetArg (&I, 2));
+                    break;
 
-		case 'u':
-		    /* Force an import (linker) */
-		    OptForceImport (Arg, GetArg (&I, 2));
-		    break;
+                case 'u':
+                    /* Force an import (linker) */
+                    OptForceImport (Arg, GetArg (&I, 2));
+                    break;
 
-		case 'v':
-		    if (Arg [2] == 'm') {
-	     	     	/* Verbose map file (linker) */
-		     	CmdAddArg (&LD65, "-vm");
-	   	    } else {
-	   	     	/* Verbose mode (compiler, assembler, linker) */
-			OptVerbose (Arg, 0);
-	   	    }
-	   	    break;
+                case 'v':
+                    if (Arg [2] == 'm') {
+                        /* Verbose map file (linker) */
+                        CmdAddArg (&LD65, "-vm");
+                    } else {
+                        /* Verbose mode (compiler, assembler, linker) */
+                        OptVerbose (Arg, 0);
+                    }
+                    break;
 
-	     	default:
-	     	    UnknownOption (Arg);
-	    }
-	} else {
+                default:
+                    UnknownOption (Arg);
+            }
+        } else {
 
-	    /* Remember the first file name */
-	    if (FirstInput == 0) {
-	     	FirstInput = Arg;
-	    }
+            /* Remember the first file name */
+            if (FirstInput == 0) {
+                FirstInput = Arg;
+            }
 
-	    /* Determine the file type by the extension */
-	    switch (GetFileType (Arg)) {
+            /* Determine the file type by the extension */
+            switch (GetFileType (Arg)) {
 
-	     	case FILETYPE_C:
-	     	    /* Compile the file */
-	     	    Compile (Arg);
-	     	    break;
+                case FILETYPE_C:
+                    /* Compile the file */
+                    Compile (Arg);
+                    break;
 
-	     	case FILETYPE_ASM:
-	     	    /* Assemble the file */
-	     	    if (DoAssemble) {
-	     		Assemble (Arg);
-	     	    }
-	     	    break;
+                case FILETYPE_ASM:
+                    /* Assemble the file */
+                    if (DoAssemble) {
+                        Assemble (Arg);
+                    }
+                    break;
 
-	     	case FILETYPE_OBJ:
-	     	case FILETYPE_LIB:
-	     	    /* Add to the linker files */
-	     	    CmdAddFile (&LD65, Arg);
-	     	    break;
+                case FILETYPE_OBJ:
+                case FILETYPE_LIB:
+                    /* Add to the linker files */
+                    CmdAddFile (&LD65, Arg);
+                    break;
 
-		case FILETYPE_GR:
-		    /* Add to the resource compiler files */
-		    CompileRes (Arg);
-		    break;
+                case FILETYPE_GR:
+                    /* Add to the resource compiler files */
+                    CompileRes (Arg);
+                    break;
 
                 case FILETYPE_O65:
                     /* Add the the object file converter files */
                     ConvertO65 (Arg);
                     break;
 
-	     	default:
-	     	    Error ("Don't know what to do with `%s'", Arg);
+                default:
+                    Error ("Don't know what to do with `%s'", Arg);
 
-	    }
+            }
 
-	}
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Check if we had any input files */
     if (FirstInput == 0) {
-	Warning ("No input files");
+        Warning ("No input files");
     }
 
     /* Link the given files if requested and if we have any */
     if (DoLink && LD65.FileCount > 0) {
-	Link ();
+        Link ();
     }
 
     /* Return an apropriate exit code */

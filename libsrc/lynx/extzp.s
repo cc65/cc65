@@ -25,7 +25,7 @@ _abc_score_ptr3: .res 2
 
 ; ------------------------------------------------------------------------
 ; Filesystem variables needed for reading stuff from the Lynx cart
-_FileEntry: 			; The file directory entry is 8 bytes
+_FileEntry:                     ; The file directory entry is 8 bytes
 _FileStartBlock:    .res   1
 _FileBlockOffset:   .res   2
 _FileExecFlag:      .res   1

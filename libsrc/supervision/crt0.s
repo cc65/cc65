@@ -5,17 +5,17 @@
         .export         _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-	.import	        _main
+        .import         _main
         .import         initlib, donelib, copydata
         .import         zerobss
-	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
-	.import		__STACKSIZE__			; Linker generated
+        .import         __RAM_START__, __RAM_SIZE__     ; Linker generated
+        .import         __STACKSIZE__                   ; Linker generated
 
-	.include "zeropage.inc"
-	.include "supervision.inc"
+        .include "zeropage.inc"
+        .include "supervision.inc"
 
-	.export	_sv_irq_timer_counter, _sv_irq_dma_counter
-	.export	_sv_nmi_counter
+        .export _sv_irq_timer_counter, _sv_irq_dma_counter
+        .export _sv_nmi_counter
 
 .bss
 
@@ -26,41 +26,41 @@ _sv_nmi_counter:        .byte 0
 .code
 
 reset:
-	jsr	zerobss
+        jsr     zerobss
 
-	; initialize data
-	jsr	copydata
+        ; initialize data
+        jsr     copydata
 
-	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-       	sta	sp+1   		; Set argument stack ptr
-       	stz	sp              ; #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-	jsr	initlib
-	jsr	_main
-_exit:	jsr     donelib
-exit:   jmp    	exit
+        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp+1            ; Set argument stack ptr
+        stz     sp              ; #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        jsr     initlib
+        jsr     _main
+_exit:  jsr     donelib
+exit:   jmp     exit
 
 
 .proc   irq
-	pha
-	lda	sv_irq_source
-	and	#SV_IRQ_REQUEST_TIMER
-	beq	not_timer
-	lda	sv_timer_quit
-	inc	_sv_irq_timer_counter
+        pha
+        lda     sv_irq_source
+        and     #SV_IRQ_REQUEST_TIMER
+        beq     not_timer
+        lda     sv_timer_quit
+        inc     _sv_irq_timer_counter
 not_timer:
-	lda	sv_irq_source
-	and	#SV_IRQ_REQUEST_DMA
-	beq	not_dma
-	lda	sv_dma_quit
-	inc	_sv_irq_dma_counter
+        lda     sv_irq_source
+        and     #SV_IRQ_REQUEST_DMA
+        beq     not_dma
+        lda     sv_dma_quit
+        inc     _sv_irq_dma_counter
 not_dma:
-	pla
-	rti
+        pla
+        rti
 .endproc
 
 .proc   nmi
-	inc	_sv_nmi_counter
-	rti
+        inc     _sv_nmi_counter
+        rti
 .endproc
 
 ; removing this segment gives only a warning

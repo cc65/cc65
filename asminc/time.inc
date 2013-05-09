@@ -2,7 +2,7 @@
 ;/*                                                                           */
 ;/*                                 time.inc                                  */
 ;/*                                                                           */
-;/*                              Date and time				      */
+;/*                              Date and time                                */
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */

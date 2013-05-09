@@ -19,10 +19,10 @@
 ;-----------------------------------------------------------------------------
 ; Functions that are available in the kernal jump table
 
-CLRCH 		= $FFCC
-BASIN 		= $FFCF
-STOP  		= $FFE1
-GETIN 		= $FFE4
-CLALL 		= $FFE7
-UDTIM 		= $FFEA
+CLRCH           = $FFCC
+BASIN           = $FFCF
+STOP            = $FFE1
+GETIN           = $FFE4
+CLALL           = $FFE7
+UDTIM           = $FFEA
 

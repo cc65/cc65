@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.h				     */
+/*                                 scanner.h                                 */
 /*                                                                           */
-/*		    The scanner for the ca65 macroassembler		     */
+/*                  The scanner for the ca65 macroassembler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,19 +44,19 @@
 
 
 /*****************************************************************************/
-/*     	       	    	       	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Scanner variables */
 extern Token CurTok;            /* Current input token incl. attributes */
-extern int   ForcedEnd;	   	/* Force end of assembly */
+extern int   ForcedEnd;         /* Force end of assembly */
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code    				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

@@ -5,9 +5,9 @@
 
 ; void ExitTurbo (void);
 
-	    .export _ExitTurbo
-	    .import return0
+            .export _ExitTurbo
+            .import return0
 
-_ExitTurbo	= return0
-	
-	
+_ExitTurbo      = return0
+        
+        

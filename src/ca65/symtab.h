@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   symtab.h				     */
+/*                                 symtab.h                                  */
 /*                                                                           */
-/*		   Symbol table for the ca65 macroassembler		     */
+/*                 Symbol table for the ca65 macroassembler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -50,15 +50,15 @@
 
 
 /*****************************************************************************/
-/*   	       		      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Arguments for SymFind... */
 typedef enum {
-    SYM_FIND_EXISTING 	= 0x00,
-    SYM_ALLOC_NEW	= 0x01,
+    SYM_FIND_EXISTING   = 0x00,
+    SYM_ALLOC_NEW       = 0x01,
     SYM_CHECK_ONLY      = 0x02,
 } SymFindAction;
 
@@ -73,29 +73,29 @@ struct SymTable {
     SymTable*           Next;           /* Pointer to next table in list */
     SymTable*           Left;           /* Pointer to smaller entry */
     SymTable*           Right;          /* Pointer to greater entry */
-    SymTable*          	Parent;   	/* Link to enclosing scope if any */
+    SymTable*           Parent;         /* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
     SymEntry*           Label;          /* Scope label */
     Collection          Spans;          /* Spans for this scope */
     unsigned            Id;             /* Scope id */
     unsigned short      Flags;          /* Symbol table flags */
-    unsigned char    	AddrSize;       /* Address size */
+    unsigned char       AddrSize;       /* Address size */
     unsigned char       Type;           /* Type of the scope */
     unsigned            Level;          /* Lexical level */
-    unsigned   	     	TableSlots;	/* Number of hash table slots */
-    unsigned   	     	TableEntries;	/* Number of entries in the table */
+    unsigned            TableSlots;     /* Number of hash table slots */
+    unsigned            TableEntries;   /* Number of entries in the table */
     unsigned            Name;           /* Name of the scope */
-    SymEntry*  	       	Table[1];   	/* Dynamic allocation */
+    SymEntry*           Table[1];       /* Dynamic allocation */
 };
 
 /* Symbol tables */
 extern SymTable*        CurrentScope;   /* Pointer to current symbol table */
-extern SymTable*	RootScope;      /* Root symbol table */
+extern SymTable*        RootScope;      /* Root symbol table */
 
 
 
 /*****************************************************************************/
-/*   	       		      	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

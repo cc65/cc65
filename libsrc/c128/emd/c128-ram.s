@@ -5,9 +5,9 @@
 ; Ullrich von Bassewitz, 2002-12-04
 ;
 
-	.include  	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include  	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
         .include        "c128.inc"
 
@@ -23,7 +23,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -33,15 +33,15 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-BASE	= $400
+BASE    = $400
 TOPMEM  = $FF00
-PAGES  	= (TOPMEM - BASE) / 256
+PAGES   = (TOPMEM - BASE) / 256
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -96,10 +96,10 @@ MAP:    sta     curpage
         stx     curpage+1               ; Remember the new page
 
         clc
-        adc	#>BASE
-        sta	ptr1+1
-        ldy	#$00
-        sty    	ptr1
+        adc     #>BASE
+        sta     ptr1+1
+        ldy     #$00
+        sty     ptr1
 
         lda     #<ptr1
         sta     FETVEC
@@ -130,15 +130,15 @@ USE:    sta     curpage
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.
 
-COMMIT: lda     curpage			; Get the current page
+COMMIT: lda     curpage                 ; Get the current page
         ldx     curpage+1
         bmi     done                    ; Jump if no page mapped
 
         clc
-        adc	#>BASE
-        sta	ptr1+1
-        ldy	#$00
-        sty    	ptr1
+        adc     #>BASE
+        sta     ptr1+1
+        ldy     #$00
+        sty     ptr1
 
         lda     #<ptr1
         sta     STAVEC
@@ -212,7 +212,7 @@ COPYFROM:
         ldy     #$00
 @L3:    ldx     #MMU_CFG_RAM1
         jsr     FETCH
-        sta	(ptr2),y
+        sta     (ptr2),y
         iny
         dec     tmp1
         bne     @L3

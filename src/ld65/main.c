@@ -1,34 +1,34 @@
 /*****************************************************************************/
-/*		     							     */
-/*		     		    main.c				     */
-/*		     							     */
-/*		       Main program for the ld65 linker			     */
-/*		     							     */
-/*		     							     */
-/*		     							     */
+/*                                                                           */
+/*                                  main.c                                   */
+/*                                                                           */
+/*                     Main program for the ld65 linker                      */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
 /* (C) 1998-2013, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
-/*									     */
-/*									     */
-/* This software is provided 'as-is', without any expressed or implied	     */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.				     */
-/*									     */
+/* arising from the use of this software.                                    */
+/*                                                                           */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:			     */
-/*									     */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.					     */
+/*    appreciated but is not required.                                       */
 /* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.			     */
-/* 3. This notice may not be removed or altered from any source		     */
-/*    distribution.							     */
-/*									     */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
 /*****************************************************************************/
 
 
@@ -72,18 +72,18 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-static unsigned		ObjFiles   = 0; /* Count of object files linked */
-static unsigned		LibFiles   = 0; /* Count of library files linked */
+static unsigned         ObjFiles   = 0; /* Count of object files linked */
+static unsigned         LibFiles   = 0; /* Count of library files linked */
 
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -139,19 +139,19 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
  */
 {
     unsigned long Val;
-    int 	  Converted;
+    int           Converted;
 
     /* Convert */
     if (*Number == '$') {
-	++Number;
-	Converted = sscanf (Number, "%lx", &Val);
+        ++Number;
+        Converted = sscanf (Number, "%lx", &Val);
     } else {
-	Converted = sscanf (Number, "%li", (long*)&Val);
+        Converted = sscanf (Number, "%li", (long*)&Val);
     }
 
     /* Check if we do really have a number */
     if (Converted != 1) {
-       	Error ("Invalid number given in argument: %s\n", Arg);
+        Error ("Invalid number given in argument: %s\n", Arg);
     }
 
     /* Return the result */
@@ -217,19 +217,19 @@ static void LinkFile (const char* Name, FILETYPE Type)
      */
     switch (Magic) {
 
-       	case OBJ_MAGIC:
-       	    ObjAdd (F, PathName);
-       	    ++ObjFiles;
-       	    break;
+        case OBJ_MAGIC:
+            ObjAdd (F, PathName);
+            ++ObjFiles;
+            break;
 
-       	case LIB_MAGIC:
-       	    LibAdd (F, PathName);
-       	    ++LibFiles;
-       	    break;
+        case LIB_MAGIC:
+            LibAdd (F, PathName);
+            ++LibFiles;
+            break;
 
-       	default:
-	    fclose (F);
-	    Error ("File `%s' has unknown type", PathName);
+        default:
+            fclose (F);
+            Error ("File `%s' has unknown type", PathName);
 
     }
 
@@ -249,7 +249,7 @@ static void DefineSymbol (const char* Def)
 
     /* The symbol must start with a character or underline */
     if (Def [0] != '_' && !IsAlpha (Def [0])) {
-	InvDef (Def);
+        InvDef (Def);
     }
     P = Def;
 
@@ -263,18 +263,18 @@ static void DefineSymbol (const char* Def)
     if (*P != '=') {
         InvDef (Def);
     } else {
-    	/* We have a value */
-    	++P;
-    	if (*P == '$') {
-    	    ++P;
-    	    if (sscanf (P, "%lx", &Val) != 1) {
-    	       	InvDef (Def);
-    	    }
-    	} else {
-    	    if (sscanf (P, "%li", &Val) != 1) {
-     	       	InvDef (Def);
-    	    }
-       	}
+        /* We have a value */
+        ++P;
+        if (*P == '$') {
+            ++P;
+            if (sscanf (P, "%lx", &Val) != 1) {
+                InvDef (Def);
+            }
+        } else {
+            if (sscanf (P, "%li", &Val) != 1) {
+                InvDef (Def);
+            }
+        }
     }
 
     /* Define the new symbol */
@@ -297,7 +297,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
     char* PathName;
 
     if (CfgAvail ()) {
-	Error ("Cannot use -C/-t twice");
+        Error ("Cannot use -C/-t twice");
     }
     /* Search for the file */
     PathName = SearchFile (CfgSearchPath, Arg);
@@ -332,7 +332,7 @@ static void OptDefine (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptEndGroup (const char* Opt attribute ((unused)),
-	 	         const char* Arg attribute ((unused)))
+                         const char* Arg attribute ((unused)))
 /* End a library group */
 {
     LibEndGroup ();
@@ -379,7 +379,7 @@ static void OptForceImport (const char* Opt attribute ((unused)), const char* Ar
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -465,7 +465,7 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 
 
 static void OptStartGroup (const char* Opt attribute ((unused)),
-		           const char* Arg attribute ((unused)))
+                           const char* Arg attribute ((unused)))
 /* Start a library group */
 {
     LibStartGroup ();
@@ -482,7 +482,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     /* Map the target name to a target id */
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
-       	Error ("Invalid target name: `%s'", Arg);
+        Error ("Invalid target name: `%s'", Arg);
     }
 
     /* Set the target binary format */
@@ -513,7 +513,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr, "ld65 V%s\n", GetVersionAsString ());
@@ -526,23 +526,23 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-       	{ "--cfg-path",         1,     	OptCfgPath              },
-       	{ "--config",  	       	1,     	OptConfig    	    	},
-     	{ "--dbgfile",          1,      OptDbgFile              },
+        { "--cfg-path",         1,      OptCfgPath              },
+        { "--config",           1,      OptConfig               },
+        { "--dbgfile",          1,      OptDbgFile              },
         { "--define",           1,      OptDefine               },
         { "--end-group",        0,      OptEndGroup             },
         { "--force-import",     1,      OptForceImport          },
-     	{ "--help",	       	0,     	OptHelp	     	    	},
+        { "--help",             0,      OptHelp                 },
         { "--lib",              1,      OptLib                  },
-       	{ "--lib-path",         1,     	OptLibPath              },
-     	{ "--mapfile",		1,	OptMapFile	    	},
-       	{ "--module-id",        1,     	OptModuleId             },
+        { "--lib-path",         1,      OptLibPath              },
+        { "--mapfile",          1,      OptMapFile              },
+        { "--module-id",        1,      OptModuleId             },
         { "--obj",              1,      OptObj                  },
-       	{ "--obj-path",         1,     	OptObjPath              },
-	{ "--start-addr",	1,	OptStartAddr	    	},
+        { "--obj-path",         1,      OptObjPath              },
+        { "--start-addr",       1,      OptStartAddr            },
         { "--start-group",      0,      OptStartGroup           },
-	{ "--target",		1,	OptTarget    	    	},
-	{ "--version",	       	0,  	OptVersion   	    	},
+        { "--target",           1,      OptTarget               },
+        { "--version",          0,      OptVersion              },
     };
 
     unsigned I;
@@ -564,18 +564,18 @@ int main (int argc, char* argv [])
     I = 1;
     while (I < ArgCount) {
 
-	/* Get the argument */
-	const char* Arg = ArgVec[I];
+        /* Get the argument */
+        const char* Arg = ArgVec[I];
 
-	/* Check for an option */
-	if (Arg [0] == '-') {
+        /* Check for an option */
+        if (Arg [0] == '-') {
 
-	    /* An option */
-	    switch (Arg [1]) {
+            /* An option */
+            switch (Arg [1]) {
 
-		case '-':
-	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-	       	    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
                 case '(':
                     OptStartGroup (Arg, 0);
@@ -585,86 +585,86 @@ int main (int argc, char* argv [])
                     OptEndGroup (Arg, 0);
                     break;
 
-		case 'h':
-		case '?':
-	       	    OptHelp (Arg, 0);
-		    break;
+                case 'h':
+                case '?':
+                    OptHelp (Arg, 0);
+                    break;
 
-	       	case 'm':
-	       	    OptMapFile (Arg, GetArg (&I, 2));
-	       	    break;
+                case 'm':
+                    OptMapFile (Arg, GetArg (&I, 2));
+                    break;
 
-	       	case 'o':
-	       	    OptOutputName (Arg, GetArg (&I, 2));
-	       	    break;
+                case 'o':
+                    OptOutputName (Arg, GetArg (&I, 2));
+                    break;
 
-	       	case 't':
-	       	    if (CfgAvail ()) {
-	       	       	Error ("Cannot use -C/-t twice");
-	       	    }
-	       	    OptTarget (Arg, GetArg (&I, 2));
-	       	    break;
+                case 't':
+                    if (CfgAvail ()) {
+                        Error ("Cannot use -C/-t twice");
+                    }
+                    OptTarget (Arg, GetArg (&I, 2));
+                    break;
 
                 case 'u':
                     OptForceImport (Arg, GetArg (&I, 2));
                     break;
 
-	       	case 'v':
-	       	    switch (Arg [2]) {
-	       	       	case 'm':   VerboseMap = 1; 	break;
-    		       	case '\0':  ++Verbosity;    	break;
-		       	default:    UnknownOption (Arg);
-		    }
-		    break;
+                case 'v':
+                    switch (Arg [2]) {
+                        case 'm':   VerboseMap = 1;     break;
+                        case '\0':  ++Verbosity;        break;
+                        default:    UnknownOption (Arg);
+                    }
+                    break;
 
-		case 'C':
-		    OptConfig (Arg, GetArg (&I, 2));
-		    break;
+                case 'C':
+                    OptConfig (Arg, GetArg (&I, 2));
+                    break;
 
                 case 'D':
                     OptDefine (Arg, GetArg (&I, 2));
                     break;
 
-    		case 'L':
-		    switch (Arg [2]) {
+                case 'L':
+                    switch (Arg [2]) {
                         /* ## The first one is obsolete and will go */
-		       	case 'n': LabelFileName = GetArg (&I, 3);   break;
-		       	default:  OptLibPath (Arg, GetArg (&I, 2)); break;
-		    }
-		    break;
+                        case 'n': LabelFileName = GetArg (&I, 3);   break;
+                        default:  OptLibPath (Arg, GetArg (&I, 2)); break;
+                    }
+                    break;
 
-		case 'S':
-		    OptStartAddr (Arg, GetArg (&I, 2));
-		    break;
+                case 'S':
+                    OptStartAddr (Arg, GetArg (&I, 2));
+                    break;
 
-		case 'V':
-		    OptVersion (Arg, 0);
-		    break;
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
 
-	       	default:
-	       	    UnknownOption (Arg);
-	       	    break;
-	    }
+                default:
+                    UnknownOption (Arg);
+                    break;
+            }
 
-	} else {
+        } else {
 
-	    /* A filename */
-	    LinkFile (Arg, FILETYPE_UNKNOWN);
+            /* A filename */
+            LinkFile (Arg, FILETYPE_UNKNOWN);
 
-	}
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Check if we had any object files */
     if (ObjFiles == 0) {
-	Error ("No object files to link");
+        Error ("No object files to link");
     }
 
     /* Check if we have a valid configuration */
     if (!CfgAvail ()) {
-       	Error ("Memory configuration missing");
+        Error ("Memory configuration missing");
     }
 
     /* Check if we have open library groups */
@@ -705,19 +705,19 @@ int main (int argc, char* argv [])
 
     /* If requested, create a map file and a label file for VICE */
     if (MapFileName) {
-	CreateMapFile (LONG_MAPFILE);
+        CreateMapFile (LONG_MAPFILE);
     }
     if (LabelFileName) {
-	CreateLabelFile ();
+        CreateLabelFile ();
     }
     if (DbgFileName) {
-	CreateDbgFile ();
+        CreateDbgFile ();
     }
 
     /* Dump the data for debugging */
     if (Verbosity > 1) {
-	SegDump ();
-	ConDesDump ();
+        SegDump ();
+        ConDesDump ();
     }
 
     /* Return an apropriate exit code */

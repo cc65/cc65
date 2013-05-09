@@ -36,25 +36,25 @@
 ;----------------------------------------------------------------------------
 ; Constants
 
-_IOFBF		= 0
-_IOLBF		= 1
-_IONBF		= 2
-BUFSIZ		= 256
-EOF 	      	= -1
+_IOFBF          = 0
+_IOLBF          = 1
+_IONBF          = 2
+BUFSIZ          = 256
+EOF             = -1
 .if .defined(__APPLE2__) .or .defined(__APPLE2ENH__)
-FILENAME_MAX	= 64+1
+FILENAME_MAX    = 64+1
 .elseif .defined(__ATARI__)
-FILENAME_MAX	= 12+1
+FILENAME_MAX    = 12+1
 .elseif .defined(__LUNIX__)
 FILENAME_MAX    = 80+1
 .else
-FILENAME_MAX	= 16+1
+FILENAME_MAX    = 16+1
 .endif
-L_tmpnam	= FILENAME_MAX
-SEEK_CUR	= 0
-SEEK_END	= 1
-SEEK_SET	= 2
-TMP_MAX		= 256
+L_tmpnam        = FILENAME_MAX
+SEEK_CUR        = 0
+SEEK_END        = 1
+SEEK_SET        = 2
+TMP_MAX         = 256
 
 ; Maximum number of open files (size of the file table)
 FOPEN_MAX       = 8

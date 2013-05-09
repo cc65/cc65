@@ -6,8 +6,8 @@
 ; Since we don't have locales, this function is equivalent to strcmp.
 ;
 
-	.export		_strcoll
-	.import		_strcmp
+        .export         _strcoll
+        .import         _strcmp
 
-_strcoll	= _strcmp
+_strcoll        = _strcmp
 

@@ -4,9 +4,9 @@
 ; CC65 runtime: Compare < for long ints
 ;
 
-	.export		toslteax
-       	.import	       	toslcmp, boollt
+        .export         toslteax
+        .import         toslcmp, boollt
 
 toslteax:
-       	jsr    	toslcmp	   	; Set the flags
-	jmp	boollt		; Convert to boolean
+        jsr     toslcmp         ; Set the flags
+        jmp     boollt          ; Convert to boolean

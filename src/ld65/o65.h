@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     o65.h				     */
+/*                                   o65.h                                   */
 /*                                                                           */
-/*		    Module to handle the o65 binary format		     */
+/*                  Module to handle the o65 binary format                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -55,16 +55,16 @@
 typedef struct O65Desc O65Desc;
 
 /* Option tags */
-#define O65OPT_FILENAME		0
-#define O65OPT_OS		1
-#define O65OPT_ASM		2
-#define O65OPT_AUTHOR		3
-#define O65OPT_TIMESTAMP	4
+#define O65OPT_FILENAME         0
+#define O65OPT_OS               1
+#define O65OPT_ASM              2
+#define O65OPT_AUTHOR           3
+#define O65OPT_TIMESTAMP        4
 
 /* Operating system codes for O65OPT_OS */
 #define O65OS_MIN               1
-#define O65OS_OSA65		1
-#define O65OS_LUNIX		2
+#define O65OS_OSA65             1
+#define O65OS_LUNIX             2
 #define O65OS_CC65              3
 #define O65OS_OPENCBM           4
 #define O65OS_MAX               255
@@ -72,7 +72,7 @@ typedef struct O65Desc O65Desc;
 
 
 /*****************************************************************************/
-/*     	      	    		     Code			       	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

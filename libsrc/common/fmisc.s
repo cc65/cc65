@@ -4,9 +4,9 @@
 ; Several small file stream functions
 ;
 
-	.export		_clearerr, _feof, _ferror, _fileno, _fflush
-	.import	 	return0
-	.importzp 	ptr1
+        .export         _clearerr, _feof, _ferror, _fileno, _fflush
+        .import         return0
+        .importzp       ptr1
 
         .include        "_file.inc"
         .include        "errno.inc"
@@ -16,12 +16,12 @@
 ; and zero flag set in case of an error.
 
 .proc   getf
-        sta    	ptr1
-	stx    	ptr1+1
-	ldy    	#_FILE::f_flags
-	lda    	(ptr1),y      	; get f->f_flags
-	and    	#_FOPEN         ; file open?
-	rts
+        sta     ptr1
+        stx     ptr1+1
+        ldy     #_FILE::f_flags
+        lda     (ptr1),y        ; get f->f_flags
+        and     #_FOPEN         ; file open?
+        rts
 .endproc
 
 ;
@@ -29,12 +29,12 @@
 ;
 
 .proc   _clearerr
-       	jsr	getf
-       	beq     err
-       	lda	(ptr1),y
-       	and	#<~(_FEOF | _FERROR)
-       	sta	(ptr1),y
-err:	rts
+        jsr     getf
+        beq     err
+        lda     (ptr1),y
+        and     #<~(_FEOF | _FERROR)
+        sta     (ptr1),y
+err:    rts
 .endproc
 
 ;
@@ -42,12 +42,12 @@ err:	rts
 ;
 
 .proc   _feof
- 	jsr  	getf
+        jsr     getf
         beq     @L1             ; Return 0 on error
- 	lda  	(ptr1),y
- 	and  	#_FEOF
-@L1:    ldx  	#0
- 	rts
+        lda     (ptr1),y
+        and     #_FEOF
+@L1:    ldx     #0
+        rts
 .endproc
 
 ;
@@ -55,12 +55,12 @@ err:	rts
 ;
 
 .proc   _ferror
- 	jsr    	getf
+        jsr     getf
         beq     @L1             ; Return 0 on error
- 	lda	(ptr1),y
- 	and	#_FERROR
-@L1:    ldx	#0
- 	rts
+        lda     (ptr1),y
+        and     #_FERROR
+@L1:    ldx     #0
+        rts
 .endproc
 
 ;
@@ -68,12 +68,12 @@ err:	rts
 ;
 
 .proc   _fileno
- 	jsr    	getf
+        jsr     getf
         beq     error
-	ldy	#_FILE::f_fd
- 	lda	(ptr1),y
- 	ldx	#0
- 	rts
+        ldy     #_FILE::f_fd
+        lda     (ptr1),y
+        ldx     #0
+        rts
 
 ; If the file is not valid, fileno must set errno and return -1
 
@@ -88,6 +88,6 @@ error:  lda     #<EBADF
 ; int __fastcall__ fflush (FILE* f);
 ;
 
-_fflush	= return0
+_fflush = return0
 
 

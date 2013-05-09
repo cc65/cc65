@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*		      		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -67,13 +67,13 @@ unsigned Test (unsigned Label, int Invert)
         /* Result is constant, so we know the outcome */
         Result = (Expr.IVal != 0);
 
-      	/* Constant rvalue */
-       	if (!Invert && Expr.IVal == 0) {
-      	    g_jump (Label);
-     	    Warning ("Unreachable code");
-     	} else if (Invert && Expr.IVal != 0) {
- 	    g_jump (Label);
-      	}
+        /* Constant rvalue */
+        if (!Invert && Expr.IVal == 0) {
+            g_jump (Label);
+            Warning ("Unreachable code");
+        } else if (Invert && Expr.IVal != 0) {
+            g_jump (Label);
+        }
 
     } else {
 

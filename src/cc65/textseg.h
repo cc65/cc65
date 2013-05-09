@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   textseg.h				     */
+/*                                 textseg.h                                 */
 /*                                                                           */
-/*			    Text segment structure			     */
+/*                          Text segment structure                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -56,21 +56,21 @@
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data		    		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 typedef struct TextSeg TextSeg;
 struct TextSeg {
-    SymEntry*		Func;		/* Owner function */
-    Collection 	       	Lines;	       	/* List of text lines */
+    SymEntry*           Func;           /* Owner function */
+    Collection          Lines;          /* List of text lines */
 };
 
 
 
 /*****************************************************************************/
-/*     	       	       	  	     Code 				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

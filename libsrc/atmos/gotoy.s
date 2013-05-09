@@ -4,13 +4,13 @@
 ; void gotoy (unsigned char y);
 ;
 
-	.export		_gotoy
+        .export         _gotoy
 
         .include        "atmos.inc"
 
 .proc   _gotoy
 
-	sta    	CURS_Y		; Set Y
+        sta     CURS_Y          ; Set Y
         rts
 
 .endproc

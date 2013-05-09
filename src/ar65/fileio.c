@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   fileio.c				     */
+/*                                 fileio.c                                  */
 /*                                                                           */
-/*			File I/O for the ar65 archiver			     */
+/*                      File I/O for the ar65 archiver                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -54,7 +54,7 @@ void Write8 (FILE* F, unsigned char Val)
 /* Write an 8 bit value to the file */
 {
     if (putc (Val, F) == EOF) {
-    	Error ("Write error (disk full?)");
+        Error ("Write error (disk full?)");
     }
 }
 
@@ -89,12 +89,12 @@ void WriteVar (FILE* F, unsigned long V)
      * needing 5 bytes if a 32 bit value is written to file.
      */
     do {
-	unsigned char C = (V & 0x7F);
-	V >>= 7;
-	if (V) {
-	    C |= 0x80;
-	}
-	Write8 (F, C);
+        unsigned char C = (V & 0x7F);
+        V >>= 7;
+        if (V) {
+            C |= 0x80;
+        }
+        Write8 (F, C);
     } while (V != 0);
 }
 
@@ -114,7 +114,7 @@ void WriteData (FILE* F, const void* Data, unsigned Size)
 /* Write data to the file */
 {
     if (fwrite (Data, 1, Size, F) != Size) {
- 	Error ("Write error (disk full?)");
+        Error ("Write error (disk full?)");
     }
 }
 
@@ -125,7 +125,7 @@ unsigned Read8 (FILE* F)
 {
     int C = getc (F);
     if (C == EOF) {
- 	Error ("Read error (file corrupt?)");
+        Error ("Read error (file corrupt?)");
     }
     return C;
 }
@@ -162,12 +162,12 @@ unsigned long ReadVar (FILE* F)
     unsigned long V = 0;
     unsigned Shift = 0;
     do {
-	/* Read one byte */
-	C = Read8 (F);
-	/* Encode it into the target value */
-	V |= ((unsigned long)(C & 0x7F)) << Shift;
-	/* Next value */
-	Shift += 7;
+        /* Read one byte */
+        C = Read8 (F);
+        /* Encode it into the target value */
+        V |= ((unsigned long)(C & 0x7F)) << Shift;
+        /* Next value */
+        Shift += 7;
     } while (C & 0x80);
 
     /* Return the value read */
@@ -197,7 +197,7 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
 /* Read data from the file */
 {
     if (fread (Data, 1, Size, F) != Size) {
-	Error ("Read error (file corrupt?)");
+        Error ("Read error (file corrupt?)");
     }
     return Data;
 }

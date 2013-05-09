@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    ea65.c                                   */
+/*                                  ea65.c                                   */
 /*                                                                           */
 /*        65XX effective address parsing for the ca65 macroassembler         */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	      	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -83,87 +83,87 @@ void GetEA (EffAddr* A)
     /* Parse the effective address */
     if (TokIsSep (CurTok.Tok)) {
 
-	A->AddrModeSet = AM65_IMPLICIT;
+        A->AddrModeSet = AM65_IMPLICIT;
 
     } else if (CurTok.Tok == TOK_HASH) {
 
-	/* #val */
-	NextTok ();
-	A->Expr  = Expression ();
-	A->AddrModeSet = AM65_ALL_IMM;
+        /* #val */
+        NextTok ();
+        A->Expr  = Expression ();
+        A->AddrModeSet = AM65_ALL_IMM;
 
     } else if (CurTok.Tok == TOK_A) {
 
-	NextTok ();
-	A->AddrModeSet = AM65_ACCU;
+        NextTok ();
+        A->AddrModeSet = AM65_ACCU;
 
     } else if (CurTok.Tok == TOK_LBRACK) {
 
-	/* [dir] or [dir],y */
-	NextTok ();
-	A->Expr = Expression ();
-	Consume (TOK_RBRACK, "']' expected");
-	if (CurTok.Tok == TOK_COMMA) {
-	    /* [dir],y */
-	    NextTok ();
-	    Consume (TOK_Y, "`Y' expected");
-	    A->AddrModeSet = AM65_DIR_IND_LONG_Y;
-	} else {
-	    /* [dir] */
-	    A->AddrModeSet = AM65_DIR_IND_LONG;
-	}
+        /* [dir] or [dir],y */
+        NextTok ();
+        A->Expr = Expression ();
+        Consume (TOK_RBRACK, "']' expected");
+        if (CurTok.Tok == TOK_COMMA) {
+            /* [dir],y */
+            NextTok ();
+            Consume (TOK_Y, "`Y' expected");
+            A->AddrModeSet = AM65_DIR_IND_LONG_Y;
+        } else {
+            /* [dir] */
+            A->AddrModeSet = AM65_DIR_IND_LONG;
+        }
 
     } else if (CurTok.Tok == TOK_LPAREN) {
 
-    	/* One of the indirect modes */
-    	NextTok ();
-    	A->Expr = Expression ();
+        /* One of the indirect modes */
+        NextTok ();
+        A->Expr = Expression ();
 
-    	if (CurTok.Tok == TOK_COMMA) {
+        if (CurTok.Tok == TOK_COMMA) {
 
-    	    /* (expr,X) or (rel,S),y */
-    	    NextTok ();
-    	    if (CurTok.Tok == TOK_X) {
-	   	/* (adr,x) */
-    	   	NextTok ();
-       	       	A->AddrModeSet = AM65_ABS_X_IND | AM65_DIR_X_IND;
-    	       	ConsumeRParen ();
-    	    } else if (CurTok.Tok == TOK_S) {
-	   	/* (rel,s),y */
-    	 	NextTok ();
-    	 	A->AddrModeSet = AM65_STACK_REL_IND_Y;
-    	 	ConsumeRParen ();
-    	 	ConsumeComma ();
-    	 	Consume (TOK_Y, "`Y' expected");
-    	    } else {
-    	 	Error ("Syntax error");
-    	    }
+            /* (expr,X) or (rel,S),y */
+            NextTok ();
+            if (CurTok.Tok == TOK_X) {
+                /* (adr,x) */
+                NextTok ();
+                A->AddrModeSet = AM65_ABS_X_IND | AM65_DIR_X_IND;
+                ConsumeRParen ();
+            } else if (CurTok.Tok == TOK_S) {
+                /* (rel,s),y */
+                NextTok ();
+                A->AddrModeSet = AM65_STACK_REL_IND_Y;
+                ConsumeRParen ();
+                ConsumeComma ();
+                Consume (TOK_Y, "`Y' expected");
+            } else {
+                Error ("Syntax error");
+            }
 
-       	} else {
+        } else {
 
-	    /* (adr) or (adr),y */
-    	    ConsumeRParen ();
-    	    if (CurTok.Tok == TOK_COMMA) {
-		/* (adr),y */
-    	 	NextTok ();
-    	 	Consume (TOK_Y, "`Y' expected");
-    	 	A->AddrModeSet = AM65_DIR_IND_Y;
-    	    } else {
-		/* (adr) */
-    	 	A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
-    	    }
-    	}
+            /* (adr) or (adr),y */
+            ConsumeRParen ();
+            if (CurTok.Tok == TOK_COMMA) {
+                /* (adr),y */
+                NextTok ();
+                Consume (TOK_Y, "`Y' expected");
+                A->AddrModeSet = AM65_DIR_IND_Y;
+            } else {
+                /* (adr) */
+                A->AddrModeSet = AM65_ABS_IND | AM65_DIR_IND;
+            }
+        }
 
     } else {
 
-	/* Remaining stuff:
-	 *
-	 * adr
-	 * adr,x
-	 * adr,y
-	 * adr,s
-	 */
-       	A->Expr = Expression ();
+        /* Remaining stuff:
+         *
+         * adr
+         * adr,x
+         * adr,y
+         * adr,s
+         */
+        A->Expr = Expression ();
 
         if (CurTok.Tok == TOK_COMMA) {
 

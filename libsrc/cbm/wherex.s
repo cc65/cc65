@@ -4,13 +4,13 @@
 ; unsigned char wherex (void);
 ;
 
-  	.export		_wherex
+        .export         _wherex
         .import         CURS_X: zp
 
 
 .proc   _wherex
         lda     CURS_X
         ldx     #$00
-  	rts
+        rts
 .endproc
 

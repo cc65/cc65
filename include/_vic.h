@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	      			    _vic.h				     */
+/*                                  _vic.h                                   */
 /*                                                                           */
-/*	      	  Internal include file, do not use directly		     */
+/*                Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -40,21 +40,21 @@
 
 /* Define a structure with the vic register offsets */
 struct __vic {
-    unsigned char      	leftborder;
-    unsigned char	upperborder;
-    unsigned char      	charsperline;   /* Characters per line */
-    unsigned char	linecount;      /* Number of lines */
-    unsigned char	rasterline;     /* Current raster line */
-    unsigned char	addr;           /* Address of chargen and video ram */
-    unsigned char	strobe_x;	/* Light pen, X position */
-    unsigned char	strobe_y;	/* Light pen, Y position */
-    unsigned char      	analog_x;       /* Analog input X */
-    unsigned char	analog_y;       /* Analog input Y */
-    unsigned char	voice1;         /* Sound generator #1 */
-    unsigned char      	voice2;         /* Sound generator #2 */
-    unsigned char	voice3;         /* Sound generator #3 */
-    unsigned char	noise;          /* Noise generator */
-    unsigned char      	volume_color;   /* Bits 0..3: volume, 4..7: color */
+    unsigned char       leftborder;
+    unsigned char       upperborder;
+    unsigned char       charsperline;   /* Characters per line */
+    unsigned char       linecount;      /* Number of lines */
+    unsigned char       rasterline;     /* Current raster line */
+    unsigned char       addr;           /* Address of chargen and video ram */
+    unsigned char       strobe_x;       /* Light pen, X position */
+    unsigned char       strobe_y;       /* Light pen, Y position */
+    unsigned char       analog_x;       /* Analog input X */
+    unsigned char       analog_y;       /* Analog input Y */
+    unsigned char       voice1;         /* Sound generator #1 */
+    unsigned char       voice2;         /* Sound generator #2 */
+    unsigned char       voice3;         /* Sound generator #3 */
+    unsigned char       noise;          /* Noise generator */
+    unsigned char       volume_color;   /* Bits 0..3: volume, 4..7: color */
     unsigned char       bg_border_color;/* Background and border color */
 };
 

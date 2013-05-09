@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   segment.h				     */
+/*                                 segment.h                                 */
 /*                                                                           */
 /*                   Segments for the ca65 macroassembler                    */
 /*                                                                           */
@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*	   	 		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -58,12 +58,12 @@
 /* Segment definition */
 typedef struct Segment Segment;
 struct Segment {
-    Fragment*  	    Root;      	  	/* Root of fragment list */
-    Fragment*  	    Last;      	  	/* Pointer to last fragment */
+    Fragment*       Root;               /* Root of fragment list */
+    Fragment*       Last;               /* Pointer to last fragment */
     unsigned long   FragCount;          /* Number of fragments */
-    unsigned        Num;       		/* Segment number */
+    unsigned        Num;                /* Segment number */
     unsigned        Flags;              /* Segment flags */
-    unsigned long   Align;     		/* Segment alignment */
+    unsigned long   Align;              /* Segment alignment */
     int             RelocMode;          /* Relocatable mode if OrgPerSeg */
     unsigned long   PC;                 /* PC if in relocatable mode */
     unsigned long   AbsPC;              /* PC if in local absolute mode */
@@ -88,7 +88,7 @@ extern Segment* ActiveSeg;
 
 
 /*****************************************************************************/
-/*     	      	      	   	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

@@ -41,7 +41,7 @@
 
 
 /*****************************************************************************/
-/*	      	  		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -57,7 +57,7 @@ static const char* StdNames[STD_COUNT] = {
 
 
 /*****************************************************************************/
-/*	      	  		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -71,9 +71,9 @@ standard_t FindStandard (const char* Name)
 
     /* Check for a standard string */
     for (I = 0; I < STD_COUNT; ++I) {
-	if (strcmp (StdNames [I], Name) == 0) {
-	    return (standard_t)I;
-	}
+        if (strcmp (StdNames [I], Name) == 0) {
+            return (standard_t)I;
+        }
     }
 
     /* Not found */

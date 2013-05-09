@@ -5,11 +5,11 @@
 
 ; char NewDisk (void);
 
-	    .export _NewDisk
-	    .import setoserror
+            .export _NewDisk
+            .import setoserror
 
-	    .include "jumptab.inc"
-	
+            .include "jumptab.inc"
+        
 _NewDisk:
-	jsr NewDisk
-	jmp setoserror
+        jsr NewDisk
+        jmp setoserror

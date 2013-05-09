@@ -12,20 +12,20 @@
 
         .include "nes.inc"
 
-      	.export	       	_clock
-        .importzp	sreg
+        .export         _clock
+        .importzp       sreg
 
 
-.proc	_clock
+.proc   _clock
 
-        ldy    	#0  	    	; High word is always zero
-       	sty     sreg+1
-       	sty     sreg
+        ldy     #0              ; High word is always zero
+        sty     sreg+1
+        sty     sreg
 L1:     ldx     tickcount+1
         lda     tickcount
         cpx     tickcount+1     ; Did tickcount change?
         bne     L1              ; Yes, re-read it
-       	rts
+        rts
 
 .endproc
 

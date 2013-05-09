@@ -64,13 +64,13 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
         txa
         adc     #0
         bne     @L1                     ; Branch if high byte not zero
-   	lda	VIC_SPR_HI_X   		; Get high X bits of all sprites
-   	and	#MOUSE_SPR_NMASK        ; Clear high bit for sprite
+        lda     VIC_SPR_HI_X            ; Get high X bits of all sprites
+        and     #MOUSE_SPR_NMASK        ; Clear high bit for sprite
         sta     VIC_SPR_HI_X
         rts
 
-@L1:    lda	VIC_SPR_HI_X   		; Get high X bits of all sprites
-       	ora     #MOUSE_SPR_MASK         ; Set high bit for sprite
+@L1:    lda     VIC_SPR_HI_X            ; Get high X bits of all sprites
+        ora     #MOUSE_SPR_MASK         ; Set high bit for sprite
         sta     VIC_SPR_HI_X
         rts
 
@@ -83,7 +83,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 .proc   movey
 
         add     #50                     ; Y correction (first visible line)
-       	sta    	VIC_SPR_Y               ; Set Y position
+        sta     VIC_SPR_Y               ; Set Y position
         rts
 
 .endproc

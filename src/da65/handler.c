@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   handler.c				     */
+/*                                 handler.c                                 */
 /*                                                                           */
-/*		 Opcode handler functions for the disassembler		     */
+/*               Opcode handler functions for the disassembler               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -51,7 +51,7 @@
 
 
 /*****************************************************************************/
-/*		       	       Helper functions				     */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -110,18 +110,18 @@ static const char* GetAddrArg (unsigned Flags, unsigned Addr)
 {
     const char* Label = 0;
     if (Flags & flUseLabel) {
-       	Label = GetLabel (Addr, PC);
+        Label = GetLabel (Addr, PC);
     }
     if (Label) {
-       	return Label;
+        return Label;
     } else {
-       	static char Buf [32];
-       	if (Addr < 0x100) {
-       	    xsprintf (Buf, sizeof (Buf), "$%02X", Addr);
-       	} else {
-       	    xsprintf (Buf, sizeof (Buf), "$%04X", Addr);
-       	}
-       	return Buf;
+        static char Buf [32];
+        if (Addr < 0x100) {
+            xsprintf (Buf, sizeof (Buf), "$%02X", Addr);
+        } else {
+            xsprintf (Buf, sizeof (Buf), "$%04X", Addr);
+        }
+        return Buf;
     }
 }
 
@@ -132,66 +132,66 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
 {
     /* Generate labels in pass #1, and only if we don't have a label already */
     if (Pass == 1 && !HaveLabel (Addr) &&
-	/* Check if we must create a label */
-       	((Flags & flGenLabel) != 0 ||
-       	 ((Flags & flUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd))) {
+        /* Check if we must create a label */
+        ((Flags & flGenLabel) != 0 ||
+         ((Flags & flUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd))) {
 
-	/* As a special case, handle ranges with tables or similar. Within
-	 * such a range with a granularity > 1, do only generate dependent
-	 * labels for all addresses but the first one. Be sure to generate
-	 * a label for the start of the range, however.
-	 */
-	attr_t Style         = GetStyleAttr (Addr);
-	unsigned Granularity = GetGranularity (Style);
+        /* As a special case, handle ranges with tables or similar. Within
+         * such a range with a granularity > 1, do only generate dependent
+         * labels for all addresses but the first one. Be sure to generate
+         * a label for the start of the range, however.
+         */
+        attr_t Style         = GetStyleAttr (Addr);
+        unsigned Granularity = GetGranularity (Style);
 
-	if (Granularity == 1) {
-	    /* Just add the label */
-	    AddIntLabel (Addr);
-	} else {
+        if (Granularity == 1) {
+            /* Just add the label */
+            AddIntLabel (Addr);
+        } else {
 
             /* THIS CODE IS A MESS AND WILL FAIL ON SEVERAL CONDITIONS! ### */
 
 
-	    /* Search for the start of the range or the last non dependent
-	     * label in the range.
-	     */
-	    unsigned Offs;
-	    attr_t LabelAttr;
-	    unsigned LabelAddr = Addr;
-	    while (LabelAddr > CodeStart) {
+            /* Search for the start of the range or the last non dependent
+             * label in the range.
+             */
+            unsigned Offs;
+            attr_t LabelAttr;
+            unsigned LabelAddr = Addr;
+            while (LabelAddr > CodeStart) {
 
-		if (Style != GetStyleAttr (LabelAddr-1)) {
-		    /* End of range reached */
-		    break;
-		}
-		--LabelAddr;
-		LabelAttr = GetLabelAttr (LabelAddr);
-		if ((LabelAttr & (atIntLabel|atExtLabel)) != 0) {
-		    /* The address has an internal or external label */
-		    break;
-		}
-	    }
+                if (Style != GetStyleAttr (LabelAddr-1)) {
+                    /* End of range reached */
+                    break;
+                }
+                --LabelAddr;
+                LabelAttr = GetLabelAttr (LabelAddr);
+                if ((LabelAttr & (atIntLabel|atExtLabel)) != 0) {
+                    /* The address has an internal or external label */
+                    break;
+                }
+            }
 
-	    /* If the proposed label address doesn't have a label, define one */
-	    if ((GetLabelAttr (LabelAddr) & (atIntLabel|atExtLabel)) == 0) {
-		AddIntLabel (LabelAddr);
-	    }
+            /* If the proposed label address doesn't have a label, define one */
+            if ((GetLabelAttr (LabelAddr) & (atIntLabel|atExtLabel)) == 0) {
+                AddIntLabel (LabelAddr);
+            }
 
-	    /* Create the label */
-	    Offs = Addr - LabelAddr;
-	    if (Offs == 0) {
-		AddIntLabel (Addr);
-	    } else {
-	     	AddDepLabel (Addr, atIntLabel, GetLabelName (LabelAddr), Offs);
-	    }
-	}
+            /* Create the label */
+            Offs = Addr - LabelAddr;
+            if (Offs == 0) {
+                AddIntLabel (Addr);
+            } else {
+                AddDepLabel (Addr, atIntLabel, GetLabelName (LabelAddr), Offs);
+            }
+        }
     }
 }
 
 
 
 /*****************************************************************************/
-/*   	       	     	      	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

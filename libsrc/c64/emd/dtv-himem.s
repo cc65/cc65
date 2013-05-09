@@ -6,11 +6,11 @@
 ;
 
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
-	.import	_get_ostype
+        .import _get_ostype
 
 
         .macpack        generic
@@ -24,7 +24,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -34,7 +34,7 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
@@ -58,10 +58,10 @@ window:         .res    256             ; Memory "window"
 ; The MAP and COMMIT entries will actually call COPYFROM/COPYTO with
 ; a pointer to the following data structure:
 
-dma_params:     .word  	window          ; Host address
+dma_params:     .word   window          ; Host address
                 .byte   0               ; Offset in page
-curpage:        .word  	$0000  	       	; Page
-       	       	.word  	.sizeof (window); # bytes to move, lo, hi
+curpage:        .word   $0000           ; Page
+                .word   .sizeof (window); # bytes to move, lo, hi
 
 .code
 

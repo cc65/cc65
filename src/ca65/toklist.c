@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			       	   toklist.c				     */
+/*                                 toklist.c                                 */
 /*                                                                           */
-/*		    Token list for the ca65 macroassembler		     */
+/*                  Token list for the ca65 macroassembler                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -61,7 +61,7 @@ static unsigned PushCounter = 0;
 
 
 /*****************************************************************************/
-/*     	       	    		     Code	       			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -107,19 +107,19 @@ enum TC TokCmp (const TokNode* N)
 /* Compare the token given as parameter against the current token */
 {
     if (N->T.Tok != CurTok.Tok) {
-	/* Different token */
-	return tcDifferent;
+        /* Different token */
+        return tcDifferent;
     }
 
     /* If the token has string attribute, check it */
     if (TokHasSVal (N->T.Tok)) {
-       	if (SB_Compare (&CurTok.SVal, &N->T.SVal) != 0) {
-     	    return tcSameToken;
-	}
+        if (SB_Compare (&CurTok.SVal, &N->T.SVal) != 0) {
+            return tcSameToken;
+        }
     } else if (TokHasIVal (N->T.Tok)) {
-	if (N->T.IVal != CurTok.IVal) {
-     	    return tcSameToken;
-	}
+        if (N->T.IVal != CurTok.IVal) {
+            return tcSameToken;
+        }
     }
 
     /* Tokens are identical */
@@ -135,14 +135,14 @@ TokList* NewTokList (void)
     TokList* T = xmalloc (sizeof (TokList));
 
     /* Initialize the fields */
-    T->Next	= 0;
-    T->Root	= 0;
-    T->Last	= 0;
-    T->RepCount	= 0;
-    T->RepMax	= 1;
-    T->Count 	= 0;
-    T->Check	= 0;
-    T->Data	= 0;
+    T->Next     = 0;
+    T->Root     = 0;
+    T->Last     = 0;
+    T->RepCount = 0;
+    T->RepMax   = 1;
+    T->Count    = 0;
+    T->Check    = 0;
+    T->Data     = 0;
     T->LI       = 0;
 
     /* Return the new list */
@@ -157,9 +157,9 @@ void FreeTokList (TokList* List)
     /* Free the token list */
     TokNode* T = List->Root;
     while (T) {
-	TokNode* Tmp = T;
-	T = T->Next;
-	FreeTokNode (Tmp);
+        TokNode* Tmp = T;
+        T = T->Next;
+        FreeTokNode (Tmp);
     }
 
     /* Free associated line info */
@@ -169,7 +169,7 @@ void FreeTokList (TokList* List)
 
     /* If we have associated data, free it */
     if (List->Data) {
-	xfree (List->Data);
+        xfree (List->Data);
     }
 
     /* Free the list structure itself */
@@ -202,9 +202,9 @@ void AddCurTok (TokList* List)
 
     /* Insert the node into the list */
     if (List->Root == 0) {
-     	List->Root = T;
+        List->Root = T;
     } else {
-     	List->Last->Next = T;
+        List->Last->Next = T;
     }
     List->Last = T;
 
@@ -227,16 +227,16 @@ static int ReplayTokList (void* List)
      * zero, delete the list and remove the function from the stack.
      */
     if (L->Last == 0) {
-	if (++L->RepCount >= L->RepMax) {
-	    /* Done with this list */
-	    FreeTokList (L);
+        if (++L->RepCount >= L->RepMax) {
+            /* Done with this list */
+            FreeTokList (L);
             --PushCounter;
-	    PopInput ();
+            PopInput ();
             return 0;
-	} else {
-	    /* Replay one more time */
-	    L->Last = L->Root;
-	}
+        } else {
+            /* Replay one more time */
+            L->Last = L->Root;
+        }
     }
 
     /* Set the next token from the list */
@@ -252,7 +252,7 @@ static int ReplayTokList (void* List)
      * just set and changed it as apropriate.
      */
     if (L->Check) {
-	L->Check (L);
+        L->Check (L);
     }
 
     /* Set the pointer to the next token */
@@ -272,8 +272,8 @@ void PushTokList (TokList* List, const char* Desc)
 {
     /* If the list is empty, just delete it and bail out */
     if (List->Count == 0) {
-	FreeTokList (List);
-	return;
+        FreeTokList (List);
+        return;
     }
 
     /* Reset the last pointer to the first element */

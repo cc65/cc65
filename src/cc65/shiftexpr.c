@@ -47,13 +47,13 @@
 
 
 /*****************************************************************************/
-/*		     	       	     Data    				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /*****************************************************************************/
-/*	   	  		     Code    				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -64,13 +64,13 @@ void ShiftExpr (struct ExprDesc* Expr)
     ExprDesc Expr2;
     CodeMark Mark1;
     CodeMark Mark2;
-    token_t Tok;       	      	 	/* The operator token */
+    token_t Tok;                        /* The operator token */
     Type* EffType;                      /* Effective lhs type */
     Type* ResultType;                   /* Type of the result */
     unsigned ExprBits;                  /* Bits of the lhs operand */
     unsigned GenFlags;                  /* Generator flags */
     unsigned ltype;
-    int rconst;	       	       	       	/* Operand is a constant */
+    int rconst;                         /* Operand is a constant */
 
 
     /* Evaluate the lhs */
@@ -78,15 +78,15 @@ void ShiftExpr (struct ExprDesc* Expr)
 
     while (CurTok.Tok == TOK_SHL || CurTok.Tok == TOK_SHR) {
 
-	/* All operators that call this function expect an int on the lhs */
-	if (!IsClassInt (Expr->Type)) {
-	    Error ("Integer expression expected");
+        /* All operators that call this function expect an int on the lhs */
+        if (!IsClassInt (Expr->Type)) {
+            Error ("Integer expression expected");
             ED_MakeConstAbsInt (Expr, 1);
-	}
+        }
 
-	/* Remember the operator token, then skip it */
-       	Tok = CurTok.Tok;
-	NextToken ();
+        /* Remember the operator token, then skip it */
+        Tok = CurTok.Tok;
+        NextToken ();
 
         /* Get the type of the result */
         ResultType = EffType = IntPromotion (Expr->Type);
@@ -97,28 +97,28 @@ void ShiftExpr (struct ExprDesc* Expr)
         /* Calculate the number of bits the lhs operand has */
         ExprBits = SizeOf (ResultType) * 8;
 
-	/* Get the lhs on stack */
-       	GetCodePos (&Mark1);
-       	ltype = TypeOf (Expr->Type);
-       	if (ED_IsConstAbs (Expr)) {
-	    /* Constant value */
-	    GetCodePos (&Mark2);
-       	    g_push (ltype | CF_CONST, Expr->IVal);
-	} else {
-	    /* Value not constant */
-	    LoadExpr (CF_NONE, Expr);
-	    GetCodePos (&Mark2);
-	    g_push (ltype, 0);
-	}
+        /* Get the lhs on stack */
+        GetCodePos (&Mark1);
+        ltype = TypeOf (Expr->Type);
+        if (ED_IsConstAbs (Expr)) {
+            /* Constant value */
+            GetCodePos (&Mark2);
+            g_push (ltype | CF_CONST, Expr->IVal);
+        } else {
+            /* Value not constant */
+            LoadExpr (CF_NONE, Expr);
+            GetCodePos (&Mark2);
+            g_push (ltype, 0);
+        }
 
-	/* Get the right hand side */
+        /* Get the right hand side */
         ExprWithCheck (hie8, &Expr2);
 
-	/* Check the type of the rhs */
-	if (!IsClassInt (Expr2.Type)) {
-	    Error ("Integer expression expected");
+        /* Check the type of the rhs */
+        if (!IsClassInt (Expr2.Type)) {
+            Error ("Integer expression expected");
             ED_MakeConstAbsInt (&Expr2, 1);
-	}
+        }
 
         /* Check for a constant right side expression */
         rconst = ED_IsConstAbs (&Expr2);
@@ -232,7 +232,7 @@ MakeRVal:
 
 Next:
         /* Set the type of the result */
-       	Expr->Type = ResultType;
+        Expr->Type = ResultType;
     }
 }
 

@@ -4,7 +4,7 @@
 ; Screen size variables
 ;
 
-	.export		screensize
+        .export         screensize
 
         .include        "c128.inc"
 

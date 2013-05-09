@@ -30,11 +30,11 @@ umul8x16r16:
 
 umul8x16r24m:
 umul8x16r16m:
-       	ldx   	#0
+        ldx     #0
         stx     ptr1+1
-       	stx    	sreg
+        stx     sreg
 
-       	ldy    	#8              ; Number of bits
+        ldy     #8              ; Number of bits
         ldx     ptr3            ; Get into register for speed
         lda     ptr1
         ror     a               ; Get next bit into carry
@@ -51,13 +51,13 @@ umul8x16r16m:
         pla
 
 @L1:    ror     sreg
-     	ror   	ptr1+1
-     	ror   	a
+        ror     ptr1+1
+        ror     a
         dey
         bne     @L0
 
         sta     ptr1            ; Save low byte of result
         ldx     ptr1+1          ; Load high byte of result
-      	rts   	    		; Done
+        rts                     ; Done
 
 

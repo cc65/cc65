@@ -6,7 +6,7 @@
 
         .import         return0, popsreg, incsp2
         .importzp       sreg, ptr1, tmp1, tmp2
-       	.interruptor    mouse_irq               ; Export as IRQ handler
+        .interruptor    mouse_irq               ; Export as IRQ handler
 
         .include        "mouse-kernel.inc"
 
@@ -17,7 +17,7 @@
 
 
 .bss
-_mouse_drv:     .res    2      		; Pointer to driver
+_mouse_drv:     .res    2               ; Pointer to driver
 
 _mouse_hidden:  .res    1               ; Mouse visibility flag
 
@@ -29,13 +29,13 @@ mouse_uninstall:jmp     return0
 mouse_hide:     jmp     return0
 mouse_show:     jmp     return0
 mouse_setbox:   jmp     return0
-mouse_getbox:	jmp	return0
+mouse_getbox:   jmp     return0
 mouse_move:     jmp     return0
 mouse_buttons:  jmp     return0
 mouse_pos:      jmp     return0
 mouse_info:     jmp     return0
 mouse_ioctl:    jmp     return0
-mouse_irq:	.byte	$60, $00, $00	; RTS plus two dummy bytes
+mouse_irq:      .byte   $60, $00, $00   ; RTS plus two dummy bytes
 mouse_flags:    .byte   $00
 
 ; Driver header signature
@@ -50,10 +50,10 @@ mouse_sig:      .byte   $6d, $6f, $75, MOUSE_API_VERSION    ; "mou", version
 ; /* Install an already loaded driver. Returns an error code. */
 
 _mouse_install:
-       	sta     _mouse_drv
-  	sta	ptr1
-   	stx     _mouse_drv+1
-  	stx    	ptr1+1
+        sta     _mouse_drv
+        sta     ptr1
+        stx     _mouse_drv+1
+        stx     ptr1+1
 
 ; Check the driver signature
 
@@ -104,7 +104,7 @@ _mouse_install:
 
         bit     mouse_flags             ; Test MOUSE_FLAG_EARLY_IRQ
         bvc     @L3                     ; Jump if no interrupts at this time
-       	jsr     install_irq             ; Activate IRQ routine
+        jsr     install_irq             ; Activate IRQ routine
 
 ; Call driver install routine and check for errors
 
@@ -119,16 +119,16 @@ _mouse_install:
         bit     mouse_flags             ; Test MOUSE_FLAG_LATE_IRQ
         bpl     Exit                    ; Jump if vector not needed
 install_irq:
-       	ldy	#$4C			; Jump opcode
-       	sty    	mouse_irq               ; Activate IRQ routine
+        ldy     #$4C                    ; Jump opcode
+        sty     mouse_irq               ; Activate IRQ routine
 Exit:   rts
 
 ; Uninstall IRQ vector if install routine had errors. A/X may contain the
 ; error code from mouse_install, so don't use it.
 
 uninstall_irq:
-	ldy	#$60                    ; RTS opcode
-	sty	mouse_irq               ; Disable IRQ entry point
+        ldy     #$60                    ; RTS opcode
+        sty     mouse_irq               ; Disable IRQ entry point
         rts
 
 ; Driver signature invalid. One word is still on the stack
@@ -166,7 +166,7 @@ _mouse_uninstall:
 
         bit     mouse_flags             ; Test MOUSE_FLAG_LATE_IRQ
         bpl     @L1                     ; Don't disable interrupts now
-	jsr     uninstall_irq           ; Disable driver interrupts
+        jsr     uninstall_irq           ; Disable driver interrupts
 @L1:    jsr     mouse_uninstall         ; Call driver routine
 
 ; We don't check the flag a second time here, since disabling IRQs twice,

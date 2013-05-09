@@ -8,9 +8,9 @@
 ; Marco van den Heuvel, 2010-01-21
 ;
 
-	.include  	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include  	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
         .include        "c128.inc"
 
@@ -26,7 +26,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -36,13 +36,13 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-BASE	= $400
+BASE    = $400
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -103,9 +103,9 @@ INSTALL:
         ldx     #$FF
         stx     curpage
         stx     curpage+1       ; Invalidate the current page
-	inx
-       	txa                     ; A = X = EM_ERR_OK
-;	rts                     ; Run into UNINSTALL instead
+        inx
+        txa                     ; A = X = EM_ERR_OK
+;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -175,7 +175,7 @@ USE:    sta     curpage
 ; COMMIT: Commit changes in the memory window to extended storage.
 
 COMMIT: sei
-        lda     curpage			; Get the current page
+        lda     curpage                 ; Get the current page
         ldx     curpage+1
         bmi     done                    ; Jump if no page mapped
 
@@ -183,9 +183,9 @@ COMMIT: sei
         stx     curbank
 
         clc
-        adc	#>BASE
-        sta	ptr1+1
-        ldy	#$00
+        adc     #>BASE
+        sta     ptr1+1
+        ldy     #$00
         sty     ptr1
 
         lda     #<ptr1

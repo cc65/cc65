@@ -5,8 +5,8 @@
 
 ; void Panic (void);
 
-	    .export _Panic
+            .export _Panic
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_Panic		= Panic
+_Panic          = Panic

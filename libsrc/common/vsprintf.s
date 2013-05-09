@@ -4,9 +4,9 @@
 ; Ullrich von Bassewitz, 2009-09-26
 ;
 
-   	.export	       	_vsprintf
-	.import	       	pushw0sp, staxysp
-	.import	       	vsnprintf
+        .export         _vsprintf
+        .import         pushw0sp, staxysp
+        .import         vsnprintf
 
 
 ; ----------------------------------------------------------------------------
@@ -17,7 +17,7 @@
 
 
 _vsprintf:
-	pha	   		; Save low byte of ap
+        pha                     ; Save low byte of ap
         txa
         pha                     ; Save high byte of op
 

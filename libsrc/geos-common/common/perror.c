@@ -15,8 +15,8 @@ void __fastcall__ perror(const char* msg)
 
     ExitTurbo();
     if (msg && *msg) {
-	DlgBoxOk(msg, errmsg);
+        DlgBoxOk(msg, errmsg);
     } else {
-	DlgBoxOk("", errmsg);
+        DlgBoxOk("", errmsg);
     }
 }

@@ -10,15 +10,15 @@
 
 
 #ifndef DYN_DRV
-#  define DYN_DRV	1
+#  define DYN_DRV       1
 #endif
 
-#define COLOR_BACK	TGI_COLOR_BLACK
-#define COLOR_FORE	TGI_COLOR_WHITE
+#define COLOR_BACK      TGI_COLOR_BLACK
+#define COLOR_FORE      TGI_COLOR_WHITE
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -31,7 +31,7 @@ static unsigned AspectRatio;
 
 
 /*****************************************************************************/
-/*     	      	    	    	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

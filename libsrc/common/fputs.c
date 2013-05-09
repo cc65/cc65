@@ -17,7 +17,7 @@ int __fastcall__ fputs (const char* s, register FILE* f)
 {
     /* Check if the file is open or if there is an error condition */
     if ((f->f_flags & _FOPEN) == 0 || (f->f_flags & (_FERROR | _FEOF)) != 0) {
-    	return EOF;
+        return EOF;
     }
 
     /* Write the string */

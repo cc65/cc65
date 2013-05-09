@@ -10,15 +10,15 @@
 #elif defined(__C128__)
 #define DRIVERNAME      "c128-swlink.ser"
 #elif defined(__PLUS4__)
-#define DRIVERNAME	"plus4-stdser.ser"
+#define DRIVERNAME      "plus4-stdser.ser"
 #elif defined(__CBM610__)
-#define DRIVERNAME	"cbm610-std.ser"
+#define DRIVERNAME      "cbm610-std.ser"
 #elif defined(__APPLE2__)
-#define DRIVERNAME	"a2.ssc.ser"
+#define DRIVERNAME      "a2.ssc.ser"
 #elif defined(__APPLE2ENH__)
-#define DRIVERNAME	"a2e.ssc.ser"
+#define DRIVERNAME      "a2e.ssc.ser"
 #else
-#define DRIVERNAME	"unknown"
+#define DRIVERNAME      "unknown"
 #error "Unknown target system"
 #endif
 

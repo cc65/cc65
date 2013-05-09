@@ -8,12 +8,12 @@
 .proc _toascii
 
 ; Clear the inverse video bit
-	and	#$7F
+        and     #$7F
 
 ; X must be zero on return
-	ldx     #0
+        ldx     #0
 
 ; Done!
-	rts
+        rts
 
 .endproc

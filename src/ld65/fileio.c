@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   fileio.c				     */
+/*                                 fileio.c                                  */
 /*                                                                           */
-/*			 File I/O for the ld65 linker			     */
+/*                       File I/O for the ld65 linker                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -56,7 +56,7 @@ void FileSetPos (FILE* F, unsigned long Pos)
 /* Seek to the given absolute position, fail on errors */
 {
     if (fseek (F, Pos, SEEK_SET) != 0) {
- 	Error ("Cannot seek: %s", strerror (errno));
+        Error ("Cannot seek: %s", strerror (errno));
     }
 }
 
@@ -67,7 +67,7 @@ unsigned long FileGetPos (FILE* F)
 {
     long Pos = ftell (F);
     if (Pos < 0) {
-       	Error ("Error in ftell: %s", strerror (errno));
+        Error ("Error in ftell: %s", strerror (errno));
     }
     return Pos;
 }
@@ -78,7 +78,7 @@ void Write8 (FILE* F, unsigned Val)
 /* Write an 8 bit value to the file */
 {
     if (putc (Val, F) == EOF) {
-    	Error ("Write error (disk full?)");
+        Error ("Write error (disk full?)");
     }
 }
 
@@ -119,24 +119,24 @@ void WriteVal (FILE* F, unsigned long Val, unsigned Size)
 {
     switch (Size) {
 
-	case 1:
-	    Write8 (F, Val);
-	    break;
+        case 1:
+            Write8 (F, Val);
+            break;
 
-	case 2:
-	    Write16 (F, Val);
-	    break;
+        case 2:
+            Write16 (F, Val);
+            break;
 
-	case 3:
-	    Write24 (F, Val);
-	    break;
+        case 3:
+            Write24 (F, Val);
+            break;
 
-	case 4:
-	    Write32 (F, Val);
-	    break;
+        case 4:
+            Write32 (F, Val);
+            break;
 
-	default:
-       	    Internal ("WriteVal: Invalid size: %u", Size);
+        default:
+            Internal ("WriteVal: Invalid size: %u", Size);
 
     }
 }
@@ -152,12 +152,12 @@ void WriteVar (FILE* F, unsigned long V)
      * needing 5 bytes if a 32 bit value is written to file.
      */
     do {
-	unsigned char C = (V & 0x7F);
-	V >>= 7;
-	if (V) {
-	    C |= 0x80;
-	}
-	Write8 (F, C);
+        unsigned char C = (V & 0x7F);
+        V >>= 7;
+        if (V) {
+            C |= 0x80;
+        }
+        Write8 (F, C);
     } while (V != 0);
 }
 
@@ -177,7 +177,7 @@ void WriteData (FILE* F, const void* Data, unsigned Size)
 /* Write data to the file */
 {
     if (fwrite (Data, 1, Size, F) != Size) {
- 	Error ("Write error (disk full?)");
+        Error ("Write error (disk full?)");
     }
 }
 
@@ -187,7 +187,7 @@ void WriteMult (FILE* F, unsigned char Val, unsigned long Count)
 /* Write one byte several times to the file */
 {
     while (Count--) {
-	Write8 (F, Val);
+        Write8 (F, Val);
     }
 }
 
@@ -199,7 +199,7 @@ unsigned Read8 (FILE* F)
     int C = getc (F);
     if (C == EOF) {
         long Pos = ftell (F);
- 	Error ("Read error at position %ld (file corrupt?)", Pos);
+        Error ("Read error at position %ld (file corrupt?)", Pos);
     }
     return C;
 }
@@ -244,8 +244,8 @@ long Read32Signed (FILE* F)
 
     /* Sign extend the value */
     if (V & 0x80000000UL) {
-	/* Signed value */
-	V |= ~0xFFFFFFFFUL;
+        /* Signed value */
+        V |= ~0xFFFFFFFFUL;
     }
 
     /* Return it as a long */
@@ -264,12 +264,12 @@ unsigned long ReadVar (FILE* F)
     unsigned long V = 0;
     unsigned Shift = 0;
     do {
-	/* Read one byte */
-	C = Read8 (F);
-	/* Encode it into the target value */
-	V |= ((unsigned long)(C & 0x7F)) << Shift;
-	/* Next value */
-	Shift += 7;
+        /* Read one byte */
+        C = Read8 (F);
+        /* Encode it into the target value */
+        V |= ((unsigned long)(C & 0x7F)) << Shift;
+        /* Next value */
+        Shift += 7;
     } while (C & 0x80);
 
     /* Return the value read */
@@ -312,7 +312,7 @@ FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 /* Read a file position from the file */
 {
     /* Read the data fields */
-    Pos->Line =	ReadVar (F);
+    Pos->Line = ReadVar (F);
     Pos->Col  = ReadVar (F);
     Pos->Name = ReadVar (F);
     return Pos;
@@ -325,10 +325,10 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
 {
     /* Explicitly allow reading zero bytes */
     if (Size > 0) {
-	if (fread (Data, 1, Size, F) != Size) {
+        if (fread (Data, 1, Size, F) != Size) {
             long Pos = ftell (F);
             Error ("Read error at position %ld (file corrupt?)", Pos);
-	}
+        }
     }
     return Data;
 }

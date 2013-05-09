@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   typecmp.h				     */
+/*                                 typecmp.h                                 */
 /*                                                                           */
-/*		 Type compare function for the cc65 C compiler		     */
+/*               Type compare function for the cc65 C compiler               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,26 +43,26 @@
 
 
 /*****************************************************************************/
-/*	       	 		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Degree of type compatibility. Must be in ascending order */
 typedef enum {
-    TC_INCOMPATIBLE,		  /* Distinct types */
-    TC_SIGN_DIFF,		  /* Signedness differs */
+    TC_INCOMPATIBLE,              /* Distinct types */
+    TC_SIGN_DIFF,                 /* Signedness differs */
     TC_COMPATIBLE = TC_SIGN_DIFF, /* Compatible types */
-    TC_QUAL_DIFF,		  /* Types differ in qualifier of pointer */
-    TC_STRICT_COMPATIBLE,      	  /* Strict compatibility */
-    TC_EQUAL,			  /* Types are equal */
-    TC_IDENTICAL		  /* Types are identical */
+    TC_QUAL_DIFF,                 /* Types differ in qualifier of pointer */
+    TC_STRICT_COMPATIBLE,         /* Strict compatibility */
+    TC_EQUAL,                     /* Types are equal */
+    TC_IDENTICAL                  /* Types are identical */
 } typecmp_t;
 
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

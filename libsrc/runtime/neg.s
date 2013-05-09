@@ -4,18 +4,18 @@
 ; CC65 runtime: negation on ints
 ;
 
- 	.export		negax
+        .export         negax
 
-negax:	clc
- 	eor	#$FF
- 	adc	#1
- 	pha
- 	txa
- 	eor	#$FF
- 	adc	#0
-   	tax
- 	pla
-	rts
+negax:  clc
+        eor     #$FF
+        adc     #1
+        pha
+        txa
+        eor     #$FF
+        adc     #0
+        tax
+        pla
+        rts
 
 
 

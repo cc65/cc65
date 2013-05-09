@@ -1,34 +1,34 @@
 /*****************************************************************************/
-/*									     */
-/*				   xmalloc.c				     */
 /*                                                                           */
-/*			 Memory allocation subroutines			     */
-/*					    				     */
-/*					    				     */
-/*					    				     */
+/*                                 xmalloc.c                                 */
+/*                                                                           */
+/*                       Memory allocation subroutines                       */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
 /* (C) 2000-2006 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
-/*	   								     */
-/*	   								     */
-/* This software is provided 'as-is', without any expressed or implied	     */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.				     */
-/*	   								     */
+/* arising from the use of this software.                                    */
+/*                                                                           */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:			     */
-/*	   								     */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.					     */
+/*    appreciated but is not required.                                       */
 /* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.			     */
-/* 3. This notice may not be removed or altered from any source		     */
-/*    distribution.							     */
-/*	   								     */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
 /*****************************************************************************/
 
 
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*		      		     code				     */
+/*                                   code                                    */
 /*****************************************************************************/
 
 
@@ -81,7 +81,7 @@ void* xrealloc (void* P, size_t Size)
 
     /* Check for errors */
     if (N == 0 && Size != 0) {
-       	AbEnd ("Out of memory in realloc - requested block size = %lu", (unsigned long) Size);
+        AbEnd ("Out of memory in realloc - requested block size = %lu", (unsigned long) Size);
     }
 
     /* Return the pointer to the new block */
@@ -104,16 +104,16 @@ char* xstrdup (const char* S)
     /* Allow dup'ing of NULL strings */
     if (S) {
 
-	/* Get the length of the string */
-	unsigned Len = strlen (S) + 1;
+        /* Get the length of the string */
+        unsigned Len = strlen (S) + 1;
 
-	/* Allocate memory and return a copy */
-	return memcpy (xmalloc (Len), S, Len);
+        /* Allocate memory and return a copy */
+        return memcpy (xmalloc (Len), S, Len);
 
     } else {
 
-	/* Return a NULL pointer */
-	return 0;
+        /* Return a NULL pointer */
+        return 0;
 
     }
 }

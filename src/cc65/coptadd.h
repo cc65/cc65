@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptadd.h                                 */
+/*                                 coptadd.h                                 */
 /*                                                                           */
-/*			  Optimize addition sequences                        */
+/*                        Optimize addition sequences                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*			      Optimize additions                             */
+/*                            Optimize additions                             */
 /*****************************************************************************/
 
 
@@ -52,9 +52,9 @@
 unsigned OptAdd1 (CodeSeg* S);
 /* Search for the sequence
  *
- *     	jsr     pushax
+ *      jsr     pushax
  *      ldy     xxx
- *  	ldx     #$00
+ *      ldx     #$00
  *      lda     (sp),y
  *      jsr     tosaddax
  *
@@ -71,9 +71,9 @@ unsigned OptAdd1 (CodeSeg* S);
 unsigned OptAdd2 (CodeSeg* S);
 /* Search for the sequence
  *
- *     	ldy     #xx
+ *      ldy     #xx
  *      lda     (sp),y
- *  	tax
+ *      tax
  *      dey
  *      lda     (sp),y
  *      ldy     #$yy
@@ -99,8 +99,8 @@ unsigned OptAdd2 (CodeSeg* S);
 unsigned OptAdd3 (CodeSeg* S);
 /* Search for the sequence
  *
- *  	jsr     pushax
- *     	ldx     #$00
+ *      jsr     pushax
+ *      ldx     #$00
  *      lda     xxx
  *      jsr     tosaddax
  *
@@ -116,9 +116,9 @@ unsigned OptAdd3 (CodeSeg* S);
 unsigned OptAdd4 (CodeSeg* S);
 /* Search for the sequence
  *
- *  	jsr     pushax
+ *      jsr     pushax
  *      lda     xxx
- *     	ldx     yyy
+ *      ldx     yyy
  *      jsr     tosaddax
  *
  * and replace it by
@@ -140,9 +140,9 @@ unsigned OptAdd5 (CodeSeg* S);
 unsigned OptAdd6 (CodeSeg* S);
 /* Search for the sequence
  *
- *  	adc     ...
+ *      adc     ...
  *      bcc     L
- *  	inx
+ *      inx
  * L:
  *
  * and remove the handling of the high byte if X is not used later.

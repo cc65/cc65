@@ -5,12 +5,12 @@
 
 ; char NextRecord  (void);
 
-	    .import setoserror
-	    .export _NextRecord
+            .import setoserror
+            .export _NextRecord
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
 
 _NextRecord:
-	jsr NextRecord
-	jmp setoserror
+        jsr NextRecord
+        jmp setoserror

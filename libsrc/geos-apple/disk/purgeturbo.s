@@ -5,7 +5,7 @@
 
 ; void PurgeTurbo (void);
 
-	    .export _PurgeTurbo
-	    .import return0
+            .export _PurgeTurbo
+            .import return0
 
-_PurgeTurbo	= return0
+_PurgeTurbo     = return0

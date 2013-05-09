@@ -4,14 +4,14 @@
 ; CC65 runtime: Compare < for signed ints
 ;
 
-	.export		toslt00, toslta0, tosltax
-       	.import	       	tosicmp, boollt
+        .export         toslt00, toslta0, tosltax
+        .import         tosicmp, boollt
 
 toslt00:
-	lda	#$00
+        lda     #$00
 toslta0:
-	ldx	#$00
+        ldx     #$00
 tosltax:
-	jsr	tosicmp	   	; Set flags
-	jmp	boollt		; Convert to boolean
+        jsr     tosicmp         ; Set flags
+        jmp     boollt          ; Convert to boolean
 

@@ -6,7 +6,7 @@
 
         .import         return0
         .importzp       ptr1
-       	.interruptor    ser_irq, 29     ; Export as high priority IRQ handler
+        .interruptor    ser_irq, 29     ; Export as high priority IRQ handler
 
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
@@ -17,20 +17,20 @@
 
 
 .bss
-_ser_drv:       .res    2      		; Pointer to driver
+_ser_drv:       .res    2               ; Pointer to driver
 
 ; Jump table for the driver functions.
 .data
 ser_vectors:
-ser_install:   	jmp     return0
-ser_uninstall: 	jmp     return0
+ser_install:    jmp     return0
+ser_uninstall:  jmp     return0
 ser_open:       jmp     return0
 ser_close:      jmp     return0
 ser_get:        jmp     return0
 ser_put:        jmp     return0
 ser_status:     jmp     return0
 ser_ioctl:      jmp     return0
-ser_irq:	.byte	$60, $00, $00	; RTS plus two dummy bytes
+ser_irq:        .byte   $60, $00, $00   ; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
@@ -44,10 +44,10 @@ ser_sig:        .byte   $73, $65, $72, SER_API_VERSION  ; "ser", version
 
 
 _ser_install:
-       	sta     _ser_drv
-     	sta	ptr1
-     	stx     _ser_drv+1
-     	stx    	ptr1+1
+        sta     _ser_drv
+        sta     ptr1
+        stx     _ser_drv+1
+        stx     ptr1+1
 
 ; Check the driver signature
 
@@ -72,8 +72,8 @@ _ser_install:
 
         ldy     ser_irq+2               ; Check high byte of IRQ vector
         beq     @L2                     ; Jump if vector invalid
-	ldy	#$4C			; Jump opcode
-	sty	ser_irq			; Activate IRQ routine
+        ldy     #$4C                    ; Jump opcode
+        sty     ser_irq                 ; Activate IRQ routine
 @L2:    rts
 
 ; Driver signature invalid
@@ -100,8 +100,8 @@ copy:   lda     (ptr1),y
 _ser_uninstall:
         jsr     ser_uninstall           ; Call driver routine
 
-	lda	#$60			; RTS opcode
-	sta	ser_irq			; Disable IRQ entry point
+        lda     #$60                    ; RTS opcode
+        sta     ser_irq                 ; Disable IRQ entry point
 
 _ser_clear_ptr:                         ; External entry point
         lda     #0

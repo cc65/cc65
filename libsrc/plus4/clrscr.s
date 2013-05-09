@@ -4,9 +4,9 @@
 ; void clrscr (void);
 ;
 
-	.export		_clrscr
+        .export         _clrscr
 
-	.include	"plus4.inc"
+        .include        "plus4.inc"
 
 .segment        "LOWCODE"               ; Must go into low memory
 

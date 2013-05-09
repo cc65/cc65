@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   extract.c				     */
+/*                                 extract.c                                 */
 /*                                                                           */
-/*		 Object file extraction for the ar65 archiver		     */
+/*               Object file extraction for the ar65 archiver                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -55,10 +55,10 @@ void ExtractObjFiles (int argc, char* argv [])
 
     /* Check the argument count */
     if (argc <= 0) {
-    	Error ("No library name given");
+        Error ("No library name given");
     }
     if (argc <= 1) {
-    	Error ("No object files to extract");
+        Error ("No object files to extract");
     }
 
     /* Open the library, read the index */
@@ -67,8 +67,8 @@ void ExtractObjFiles (int argc, char* argv [])
     /* Extract the object files */
     I = 1;
     while (I < argc) {
-    	ObjExtract (argv [I]);
-    	++I;
+        ObjExtract (argv [I]);
+        ++I;
     }
 
     /* Create a new library file and close the old one */

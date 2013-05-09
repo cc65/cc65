@@ -4,10 +4,10 @@
 ; void gotoy (unsigned char y);
 ;
 
-	.export		_gotoy
-	.import		plot
-	.importzp	CURS_Y
+        .export         _gotoy
+        .import         plot
+        .importzp       CURS_Y
 
-_gotoy:	sta	CURS_Y		; Set the new position
-	jmp	plot		; And activate it
+_gotoy: sta     CURS_Y          ; Set the new position
+        jmp     plot            ; And activate it
 

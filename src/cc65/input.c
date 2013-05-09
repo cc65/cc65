@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    input.c				     */
+/*                                  input.c                                  */
 /*                                                                           */
-/*			      Input file handling			     */
+/*                            Input file handling                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -58,7 +58,7 @@
 
 
 /*****************************************************************************/
-/*	       	      	     	     Data		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -71,24 +71,24 @@ char CurC  = '\0';
 char NextC = '\0';
 
 /* Maximum count of nested includes */
-#define MAX_INC_NESTING 	16
+#define MAX_INC_NESTING         16
 
 /* Struct that describes an input file */
 typedef struct IFile IFile;
 struct IFile {
-    unsigned	    Index;     	/* File index */
-    unsigned	    Usage;     	/* Usage counter */
+    unsigned        Index;      /* File index */
+    unsigned        Usage;      /* Usage counter */
     unsigned long   Size;       /* File size */
     unsigned long   MTime;      /* Time of last modification */
     InputType       Type;       /* Type of input file */
-    char       	    Name[1];  	/* Name of file (dynamically allocated) */
+    char            Name[1];    /* Name of file (dynamically allocated) */
 };
 
 /* Struct that describes an active input file */
 typedef struct AFile AFile;
 struct AFile {
-    unsigned	Line; 	 	/* Line number for this file */
-    FILE*   	F;    	 	/* Input file stream */
+    unsigned    Line;           /* Line number for this file */
+    FILE*       F;              /* Input file stream */
     IFile*      Input;          /* Points to corresponding IFile */
     int         SearchPath;     /* True if we've added a path for this file */
 };
@@ -105,7 +105,7 @@ static Collection InputStack = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*  	       	      		 struct IFile	 			     */
+/*                               struct IFile                                */
 /*****************************************************************************/
 
 
@@ -137,7 +137,7 @@ static IFile* NewIFile (const char* Name, InputType Type)
 
 
 /*****************************************************************************/
-/*	       	      		 struct AFile				     */
+/*                               struct AFile                                */
 /*****************************************************************************/
 
 
@@ -163,7 +163,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
      */
     if (IF->Usage++ == 0) {
 
- 	/* Get file size and modification time. There a race condition here,
+        /* Get file size and modification time. There a race condition here,
          * since we cannot use fileno() (non standard identifier in standard
          * header file), and therefore not fstat. When using stat with the
          * file name, there's a risk that the file was deleted and recreated
@@ -171,16 +171,16 @@ static AFile* NewAFile (IFile* IF, FILE* F)
          * if a file has changed in the debugger, we will ignore this problem
          * here.
          */
-     	struct stat Buf;
- 	if (FileStat (IF->Name, &Buf) != 0) {
- 	    /* Error */
- 	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
- 	}
-       	IF->Size  = (unsigned long) Buf.st_size;
- 	IF->MTime = (unsigned long) Buf.st_mtime;
+        struct stat Buf;
+        if (FileStat (IF->Name, &Buf) != 0) {
+            /* Error */
+            Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
+        }
+        IF->Size  = (unsigned long) Buf.st_size;
+        IF->MTime = (unsigned long) Buf.st_mtime;
 
- 	/* Set the debug data */
- 	g_fileinfo (IF->Name, IF->Size, IF->MTime);
+        /* Set the debug data */
+        g_fileinfo (IF->Name, IF->Size, IF->MTime);
     }
 
     /* Insert the new structure into the AFile collection */
@@ -210,7 +210,7 @@ static void FreeAFile (AFile* AF)
 
 
 /*****************************************************************************/
-/*	       	     	     	     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -223,13 +223,13 @@ static IFile* FindFile (const char* Name)
 {
     unsigned I;
     for (I = 0; I < CollCount (&IFiles); ++I) {
-	/* Get the file struct */
-	IFile* IF = (IFile*) CollAt (&IFiles, I);
-	/* Check the name */
-	if (strcmp (Name, IF->Name) == 0) {
-	    /* Found, return the struct */
-	    return IF;
-       	}
+        /* Get the file struct */
+        IFile* IF = (IFile*) CollAt (&IFiles, I);
+        /* Check the name */
+        if (strcmp (Name, IF->Name) == 0) {
+            /* Found, return the struct */
+            return IF;
+        }
     }
 
     /* Not found */
@@ -250,8 +250,8 @@ void OpenMainFile (const char* Name)
     /* Open the file for reading */
     FILE* F = fopen (Name, "r");
     if (F == 0) {
-       	/* Cannot open */
-       	Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
+        /* Cannot open */
+        Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
     }
 
     /* Allocate a new AFile structure for the file */
@@ -277,15 +277,15 @@ void OpenIncludeFile (const char* Name, InputType IT)
 
     /* Check for the maximum include nesting */
     if (CollCount (&AFiles) > MAX_INC_NESTING) {
-     	PPError ("Include nesting too deep");
-      	return;
+        PPError ("Include nesting too deep");
+        return;
     }
 
     /* Search for the file */
     N = SearchFile ((IT == IT_SYSINC)? SysIncSearchPath : UsrIncSearchPath, Name);
     if (N == 0) {
-	PPError ("Include file `%s' not found", Name);
-     	return;
+        PPError ("Include file `%s' not found", Name);
+        return;
     }
 
     /* Search the list of all input files for this file. If we don't find
@@ -293,7 +293,7 @@ void OpenIncludeFile (const char* Name, InputType IT)
      */
     IF = FindFile (N);
     if (IF == 0) {
-	IF = NewIFile (N, IT);
+        IF = NewIFile (N, IT);
     }
 
     /* We don't need N any longer, since we may now use IF->Name */
@@ -302,9 +302,9 @@ void OpenIncludeFile (const char* Name, InputType IT)
     /* Open the file */
     F = fopen (IF->Name, "r");
     if (F == 0) {
-	/* Error opening the file */
-	PPError ("Cannot open include file `%s': %s", IF->Name, strerror (errno));
-	return;
+        /* Error opening the file */
+        PPError ("Cannot open include file `%s': %s", IF->Name, strerror (errno));
+        return;
     }
 
     /* Debugging output */
@@ -438,14 +438,14 @@ StrBuf* InitLine (StrBuf* Buf)
 int NextLine (void)
 /* Get a line from the current input. Returns 0 on end of file. */
 {
-    AFile*     	Input;
+    AFile*      Input;
 
     /* Clear the current line */
     ClearLine ();
 
     /* If there is no file open, bail out, otherwise get the current input file */
     if (CollCount (&AFiles) == 0) {
-     	return 0;
+        return 0;
     }
     Input = CollLast (&AFiles);
 
@@ -464,8 +464,8 @@ int NextLine (void)
                 break;
             }
 
-      	    /* Leave the current file */
-      	    CloseIncludeFile ();
+            /* Leave the current file */
+            CloseIncludeFile ();
 
             /* If there is no file open, bail out, otherwise get the
              * previous input file and start over.
@@ -536,17 +536,17 @@ const char* GetCurrentFile (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-     	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
-     	return AF->Input->Name;
+        const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
+        return AF->Input->Name;
     } else {
-     	/* No open file. Use the main file if we have one. */
-     	unsigned IFileCount = CollCount (&IFiles);
-     	if (IFileCount > 0) {
-     	    const IFile* IF = (const IFile*) CollAt (&IFiles, 0);
-     	    return IF->Name;
-     	} else {
-      	    return "(outside file scope)";
-     	}
+        /* No open file. Use the main file if we have one. */
+        unsigned IFileCount = CollCount (&IFiles);
+        if (IFileCount > 0) {
+            const IFile* IF = (const IFile*) CollAt (&IFiles, 0);
+            return IF->Name;
+        } else {
+            return "(outside file scope)";
+        }
     }
 }
 
@@ -557,11 +557,11 @@ unsigned GetCurrentLine (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-     	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
-     	return AF->Line;
+        const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
+        return AF->Line;
     } else {
-     	/* No open file */
-     	return 0;
+        /* No open file */
+        return 0;
     }
 }
 
@@ -591,20 +591,20 @@ static void WriteDep (FILE* F, InputType Types)
     unsigned FileCount = CollCount (&IFiles);
     for (I = 0; I < FileCount; ++I) {
 
-    	/* Get the next input file */
-    	const IFile* IF = (const IFile*) CollAt (&IFiles, I);
+        /* Get the next input file */
+        const IFile* IF = (const IFile*) CollAt (&IFiles, I);
 
         /* Ignore it if it is not of the correct type */
         if ((IF->Type & Types) == 0) {
             continue;
         }
 
-    	/* If this is not the first file, add a space */
-       	if (I > 0) {
+        /* If this is not the first file, add a space */
+        if (I > 0) {
             fputc (' ', F);
         }
 
-    	/* Print the dependency escaping spaces */
+        /* Print the dependency escaping spaces */
         WriteEscaped (F, IF->Name);
     }
 }
@@ -619,7 +619,7 @@ static void CreateDepFile (const char* Name, InputType Types)
     /* Open the file */
     FILE* F = fopen (Name, "w");
     if (F == 0) {
-       	Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
+        Fatal ("Cannot open dependency file `%s': %s", Name, strerror (errno));
     }
 
     /* If a dependency target was given, use it, otherwise use the output
@@ -642,8 +642,8 @@ static void CreateDepFile (const char* Name, InputType Types)
 
     /* Close the file, check for errors */
     if (fclose (F) != 0) {
-    	remove (Name);
-    	Fatal ("Cannot write to dependeny file (disk full?)");
+        remove (Name);
+        Fatal ("Cannot write to dependeny file (disk full?)");
     }
 }
 

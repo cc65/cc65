@@ -4,7 +4,7 @@
 ; int __fastcall__ putchar (int c);
 ;
 
-       	.export		_putchar
+        .export         _putchar
         .import         pushax
         .import         _stdout
         .import         _fputc

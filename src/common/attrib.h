@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                 attrib.h                                  */
 /*                                                                           */
-/*			     Handle gcc attributes			     */
+/*                           Handle gcc attributes                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,13 +39,13 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
 
 #if defined(__GNUC__)
-#  define attribute(a)	__attribute__(a)
+#  define attribute(a)  __attribute__(a)
 #else
 #  define attribute(a)
 #endif

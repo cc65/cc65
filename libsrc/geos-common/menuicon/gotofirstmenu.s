@@ -5,8 +5,8 @@
 
 ; void GotoFirstMenu (void);
 
-	    .export _GotoFirstMenu
+            .export _GotoFirstMenu
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_GotoFirstMenu	= GotoFirstMenu
+_GotoFirstMenu  = GotoFirstMenu

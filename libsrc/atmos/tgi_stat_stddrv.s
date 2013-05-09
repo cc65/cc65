@@ -6,8 +6,8 @@
 ; const void tgi_static_stddrv[];
 ;
 
-        .export	_tgi_static_stddrv
-        .import	_atmos_240_200_2_tgi
+        .export _tgi_static_stddrv
+        .import _atmos_240_200_2_tgi
 
 .rodata
 

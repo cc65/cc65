@@ -19,7 +19,7 @@
         .ifdef  __APPLE2ENH__
 initconio:
         sta     SETALTCHAR      ; Switch in alternate charset
-        bit	LORES		; Limit SET80COL-HISCR to text
+        bit     LORES           ; Limit SET80COL-HISCR to text
         rts
         .endif
 

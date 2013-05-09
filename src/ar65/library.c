@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   library.c				     */
+/*                                 library.c                                 */
 /*                                                                           */
-/*	   Library data structures and helpers for the ar65 archiver	     */
+/*         Library data structures and helpers for the ar65 archiver         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -56,20 +56,20 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Data     				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
                         
 /* Name of the library file */
-const char*  	        LibName = 0;
+const char*             LibName = 0;
 
 /* File descriptor for the library file */
-FILE*	       		NewLib = 0;
-static FILE*   		Lib = 0;
+FILE*                   NewLib = 0;
+static FILE*            Lib = 0;
 
 /* The library header */
-static LibHeader    	Header = {
+static LibHeader        Header = {
     LIB_MAGIC,
     LIB_VERSION,
     0,
@@ -79,7 +79,7 @@ static LibHeader    	Header = {
 
 
 /*****************************************************************************/
-/*			 Writing file data structures			     */
+/*                       Writing file data structures                        */
 /*****************************************************************************/
 
 
@@ -93,11 +93,11 @@ static void ReadHeader (void)
     /* Read the header fields, checking magic and version */
     Header.Magic   = Read32 (Lib);
     if (Header.Magic != LIB_MAGIC) {
-	Error ("`%s' is not a valid library file", LibName);
+        Error ("`%s' is not a valid library file", LibName);
     }
     Header.Version = Read16 (Lib);
     if (Header.Version != LIB_VERSION) {
-	Error ("Wrong data version in `%s'", LibName);
+        Error ("Wrong data version in `%s'", LibName);
     }
     Header.Flags   = Read16 (Lib);
     Header.IndexOffs = Read32 (Lib);
@@ -109,7 +109,7 @@ static void ReadIndexEntry (void)
 /* Read one entry in the index */
 {
     /* Create a new entry and insert it into the list */
-    ObjData* O 	= NewObjData ();
+    ObjData* O  = NewObjData ();
 
     /* Module name/flags/MTime/Start/Size */
     O->Name     = ReadStr (Lib);
@@ -134,7 +134,7 @@ static void ReadIndex (void)
 
     /* Read all entries in the index */
     while (Count--) {
-    	ReadIndexEntry ();
+        ReadIndexEntry ();
     }
 
     /* Read basic object file data from the actual entries */
@@ -151,7 +151,7 @@ static void ReadIndex (void)
 
 
 /*****************************************************************************/
-/*     	   		 Writing file data structures			     */
+/*                       Writing file data structures                        */
 /*****************************************************************************/
 
 
@@ -200,14 +200,14 @@ static void WriteIndex (void)
 
     /* Write the object files */
     for (I = 0; I < CollCount (&ObjPool); ++I) {
-	WriteIndexEntry (CollConstAt (&ObjPool, I));
+        WriteIndexEntry (CollConstAt (&ObjPool, I));
     }
 }
 
 
 
 /*****************************************************************************/
-/*	   		       High level stuff				     */
+/*                             High level stuff                              */
 /*****************************************************************************/
 
 
@@ -225,32 +225,32 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
     Lib = fopen (Name, "rb");
     if (Lib == 0) {
 
-       	/* File does not exist */
-       	if (MustExist) {
-       	    Error ("Library `%s' does not exist", Name);
-       	} else {
-	    Warning ("Library `%s' not found - will be created", Name);
-       	}
+        /* File does not exist */
+        if (MustExist) {
+            Error ("Library `%s' does not exist", Name);
+        } else {
+            Warning ("Library `%s' not found - will be created", Name);
+        }
 
     } else {
 
         /* We have an existing file: Read the header */
-	ReadHeader ();
+        ReadHeader ();
 
-	/* Now read the existing index */
-       	ReadIndex ();
+        /* Now read the existing index */
+        ReadIndex ();
 
     }
 
     if (NeedTemp) {
-	/* Create the temporary library */
-	NewLib = tmpfile ();
-	if (NewLib == 0) {
-	    Error ("Cannot create temporary file: %s", strerror (errno));
-	}
+        /* Create the temporary library */
+        NewLib = tmpfile ();
+        if (NewLib == 0) {
+            Error ("Cannot create temporary file: %s", strerror (errno));
+        }
 
-	/* Write a dummy header to the temp file */
-	WriteHeader ();
+        /* Write a dummy header to the temp file */
+        WriteHeader ();
     }
 }
 
@@ -268,10 +268,10 @@ unsigned long LibCopyTo (FILE* F, unsigned long Bytes)
 
     /* Copy loop */
     while (Bytes) {
-    	unsigned Count = (Bytes > sizeof (Buf))? sizeof (Buf) : Bytes;
-    	ReadData (F, Buf, Count);
-    	WriteData (NewLib, Buf, Count);
-    	Bytes -= Count;
+        unsigned Count = (Bytes > sizeof (Buf))? sizeof (Buf) : Bytes;
+        ReadData (F, Buf, Count);
+        WriteData (NewLib, Buf, Count);
+        Bytes -= Count;
     }
 
     /* Return the start position */
@@ -290,10 +290,10 @@ void LibCopyFrom (unsigned long Pos, unsigned long Bytes, FILE* F)
 
     /* Copy loop */
     while (Bytes) {
-    	unsigned Count = (Bytes > sizeof (Buf))? sizeof (Buf) : Bytes;
-    	ReadData (Lib, Buf, Count);
-    	WriteData (F, Buf, Count);
-    	Bytes -= Count;
+        unsigned Count = (Bytes > sizeof (Buf))? sizeof (Buf) : Bytes;
+        ReadData (Lib, Buf, Count);
+        WriteData (F, Buf, Count);
+        Bytes -= Count;
     }
 }
 
@@ -313,11 +313,11 @@ static void LibCheckExports (ObjData* O)
     for (I = 0; I < CollCount (&O->Exports); ++I) {
 
         /* Get the name of the export */
-	const char* Name = CollConstAt (&O->Exports, I);
+        const char* Name = CollConstAt (&O->Exports, I);
 
-      	/* Insert the name into the hash table */
-	Print (stdout, 1, "  %s\n", Name);
-     	ExpInsert (Name, O);
+        /* Insert the name into the hash table */
+        Print (stdout, 1, "  %s\n", Name);
+        ExpInsert (Name, O);
     }
 }
 
@@ -331,65 +331,65 @@ void LibClose (void)
     /* Do we have a temporary library? */
     if (NewLib) {
 
-	unsigned I;
-	unsigned char Buf [4096];
-	size_t Count;
+        unsigned I;
+        unsigned char Buf [4096];
+        size_t Count;
 
         /* Walk through the object file list, inserting exports into the
-     	 * export list checking for duplicates. Copy any data that is still
-     	 * in the old library into the new one.
-     	 */
-	for (I = 0; I < CollCount (&ObjPool); ++I) {
+         * export list checking for duplicates. Copy any data that is still
+         * in the old library into the new one.
+         */
+        for (I = 0; I < CollCount (&ObjPool); ++I) {
 
-       	    /* Get a pointer to the object */
-	    ObjData* O = CollAtUnchecked (&ObjPool, I);
+            /* Get a pointer to the object */
+            ObjData* O = CollAtUnchecked (&ObjPool, I);
 
-	    /* Check exports, make global export table */
-	    LibCheckExports (O);
+            /* Check exports, make global export table */
+            LibCheckExports (O);
 
-	    /* Copy data if needed */
-	    if ((O->Flags & OBJ_HAVEDATA) == 0) {
-	 	/* Data is still in the old library */
-	 	fseek (Lib, O->Start, SEEK_SET);
-	 	O->Start = ftell (NewLib);
-	 	LibCopyTo (Lib, O->Size);
-	 	O->Flags |= OBJ_HAVEDATA;
-	    }
-	}
+            /* Copy data if needed */
+            if ((O->Flags & OBJ_HAVEDATA) == 0) {
+                /* Data is still in the old library */
+                fseek (Lib, O->Start, SEEK_SET);
+                O->Start = ftell (NewLib);
+                LibCopyTo (Lib, O->Size);
+                O->Flags |= OBJ_HAVEDATA;
+            }
+        }
 
-	/* Write the index */
-	WriteIndex ();
+        /* Write the index */
+        WriteIndex ();
 
-	/* Write the updated header */
-	WriteHeader ();
+        /* Write the updated header */
+        WriteHeader ();
 
-	/* Close the file */
-	if (Lib && fclose (Lib) != 0) {
-	    Error ("Error closing library: %s", strerror (errno));
-	}
+        /* Close the file */
+        if (Lib && fclose (Lib) != 0) {
+            Error ("Error closing library: %s", strerror (errno));
+        }
 
-	/* Reopen the library and truncate it */
-	Lib = fopen (LibName, "wb");
-	if (Lib == 0) {
-	    Error ("Cannot open library `%s' for writing: %s",
-		   LibName, strerror (errno));
-	}
+        /* Reopen the library and truncate it */
+        Lib = fopen (LibName, "wb");
+        if (Lib == 0) {
+            Error ("Cannot open library `%s' for writing: %s",
+                   LibName, strerror (errno));
+        }
 
-	/* Copy the new library to the new one */
-	fseek (NewLib, 0, SEEK_SET);
-	while ((Count = fread (Buf, 1, sizeof (Buf), NewLib)) != 0) {
-	    if (fwrite (Buf, 1, Count, Lib) != Count) {
-		Error ("Cannot write to `%s': %s", LibName, strerror (errno));
-	    }
-	}
+        /* Copy the new library to the new one */
+        fseek (NewLib, 0, SEEK_SET);
+        while ((Count = fread (Buf, 1, sizeof (Buf), NewLib)) != 0) {
+            if (fwrite (Buf, 1, Count, Lib) != Count) {
+                Error ("Cannot write to `%s': %s", LibName, strerror (errno));
+            }
+        }
     }
 
     /* Close both files */
     if (Lib && fclose (Lib) != 0) {
-     	Error ("Problem closing `%s': %s", LibName, strerror (errno));
+        Error ("Problem closing `%s': %s", LibName, strerror (errno));
     }
     if (NewLib && fclose (NewLib) != 0) {
-     	Error ("Problem closing temporary library file: %s", strerror (errno));
+        Error ("Problem closing temporary library file: %s", strerror (errno));
     }
 }
 

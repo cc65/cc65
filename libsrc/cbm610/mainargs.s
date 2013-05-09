@@ -5,8 +5,8 @@
 ;
 
 
-	.constructor    initmainargs, 24
-       	.import         __argc, __argv
+        .constructor    initmainargs, 24
+        .import         __argc, __argv
 
 
 ;---------------------------------------------------------------------------

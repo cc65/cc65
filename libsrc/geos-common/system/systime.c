@@ -18,7 +18,7 @@ time_t _systime(void)
     currentTime.tm_mon = system_date.s_month;
     currentTime.tm_year = system_date.s_year;
     if (system_date.s_year < 87) {
-	currentTime.tm_year+=100;
+        currentTime.tm_year+=100;
     }
     currentTime.tm_isdst = -1;
 

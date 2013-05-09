@@ -5,9 +5,9 @@
 ; Ullrich von Bassewitz, 2002-12-21
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"joy-kernel.inc"
+        .include        "joy-kernel.inc"
         .include        "joy-error.inc"
         .include        "plus4.inc"
 
@@ -21,8 +21,8 @@
 
 ; Driver signature
 
-        .byte   $6A, $6F, $79		; "joy"
-        .byte   JOY_API_VERSION		; Driver API version number
+        .byte   $6A, $6F, $79           ; "joy"
+        .byte   JOY_API_VERSION         ; Driver API version number
 
 ; Button state masks (8 values)
 
@@ -65,7 +65,7 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 INSTALL:
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
-;	rts                     ; Run into UNINSTALL instead
+;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -89,16 +89,16 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:	ldy	#$FA		; Load index for joystick #1
-	tax			; Test joystick number
-       	beq    	@L1
-	ldy	#$FB		; Load index for joystick #2
+READ:   ldy     #$FA            ; Load index for joystick #1
+        tax                     ; Test joystick number
+        beq     @L1
+        ldy     #$FB            ; Load index for joystick #2
 @L1:    sei
-	sty	TED_KBD
-	lda	TED_KBD
-	cli
-	ldx	#$00		; Clear high byte
-     	and	#$1F
-     	eor	#$1F
-     	rts
+        sty     TED_KBD
+        lda     TED_KBD
+        cli
+        ldx     #$00            ; Clear high byte
+        and     #$1F
+        eor     #$1F
+        rts
 

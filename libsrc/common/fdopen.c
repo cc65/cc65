@@ -14,7 +14,7 @@
 
 
 /*****************************************************************************/
-/*     	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -29,8 +29,8 @@ FILE* __fastcall__ fdopen (int handle, const char* /*mode*/)
         f->f_fd    = handle;
         f->f_flags = _FOPEN;
     } else {
-       	/* No slots */
-       	_seterrno (EMFILE);      /* Too many files */
+        /* No slots */
+        _seterrno (EMFILE);      /* Too many files */
     }
 
     /* Return the file descriptor */

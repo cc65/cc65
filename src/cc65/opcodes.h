@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   opcodes.h				     */
+/*                                 opcodes.h                                 */
 /*                                                                           */
-/*		    Opcode and addressing mode definitions		     */
+/*                  Opcode and addressing mode definitions                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*  	       	   	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -132,18 +132,18 @@ typedef enum {
 
 /* 65XX addressing modes */
 typedef enum {
-    AM65_IMP,       	   	/* implicit */
-    AM65_ACC,       	   	/* accumulator */
-    AM65_IMM,       	   	/* immidiate */
-    AM65_ZP,        	   	/* zeropage */
-    AM65_ZPX,       	   	/* zeropage,X */
+    AM65_IMP,                   /* implicit */
+    AM65_ACC,                   /* accumulator */
+    AM65_IMM,                   /* immidiate */
+    AM65_ZP,                    /* zeropage */
+    AM65_ZPX,                   /* zeropage,X */
     AM65_ZPY,                   /* zeropage,Y */
-    AM65_ABS,       	   	/* absolute */
-    AM65_ABSX,      	   	/* absolute,X */
-    AM65_ABSY,      	   	/* absolute,Y */
-    AM65_ZPX_IND,      		/* (zeropage,x) */
-    AM65_ZP_INDY,      		/* (zeropage),y */
-    AM65_ZP_IND,      		/* (zeropage) */
+    AM65_ABS,                   /* absolute */
+    AM65_ABSX,                  /* absolute,X */
+    AM65_ABSY,                  /* absolute,Y */
+    AM65_ZPX_IND,               /* (zeropage,x) */
+    AM65_ZP_INDY,               /* (zeropage),y */
+    AM65_ZP_IND,                /* (zeropage) */
     AM65_BRA                    /* branch */
 } am_t;
 
@@ -160,14 +160,14 @@ typedef enum {
 } bc_t;
 
 /* Opcode info */
-#define OF_NONE	        0x0000U	/* No additional information */
-#define OF_UBRA	        0x0001U	/* Unconditional branch */
-#define OF_CBRA	        0x0002U	/* Conditional branch */
-#define OF_ZBRA         0x0004U	/* Branch on zero flag condition */
+#define OF_NONE         0x0000U /* No additional information */
+#define OF_UBRA         0x0001U /* Unconditional branch */
+#define OF_CBRA         0x0002U /* Conditional branch */
+#define OF_ZBRA         0x0004U /* Branch on zero flag condition */
 #define OF_FBRA         0x0008U /* Branch on cond set by a load */
-#define OF_LBRA         0x0010U	/* Jump/branch is long */
-#define OF_RET 	        0x0020U	/* Return from function */
-#define OF_LOAD         0x0040U	/* Register load */
+#define OF_LBRA         0x0010U /* Jump/branch is long */
+#define OF_RET          0x0020U /* Return from function */
+#define OF_LOAD         0x0040U /* Register load */
 #define OF_STORE        0x0080U /* Register store */
 #define OF_XFR          0x0100U /* Transfer instruction */
 #define OF_CALL         0x0200U /* A subroutine call */
@@ -177,17 +177,17 @@ typedef enum {
 #define OF_NOIMP        0x2000U /* Implicit addressing mode is actually A */
 
 /* Combined infos */
-#define OF_BRA 	(OF_UBRA | OF_CBRA)	/* Operation is a jump/branch */
-#define OF_DEAD	(OF_UBRA | OF_RET)	/* Dead end - no exec behind this point */
+#define OF_BRA  (OF_UBRA | OF_CBRA)     /* Operation is a jump/branch */
+#define OF_DEAD (OF_UBRA | OF_RET)      /* Dead end - no exec behind this point */
 
 /* Opcode description */
 typedef struct {
-    opc_t      	    OPC;       		/* Opcode */
-    char       	    Mnemo[9];  		/* Mnemonic */
-    unsigned char   Size;      		/* Size, 0 = check addressing mode */
-    unsigned short  Use;       		/* Registers used by this insn */
-    unsigned short  Chg;       		/* Registers changed by this insn */
-    unsigned short  Info;      		/* Additional information */
+    opc_t           OPC;                /* Opcode */
+    char            Mnemo[9];           /* Mnemonic */
+    unsigned char   Size;               /* Size, 0 = check addressing mode */
+    unsigned short  Use;                /* Registers used by this insn */
+    unsigned short  Chg;                /* Registers changed by this insn */
+    unsigned short  Info;               /* Additional information */
 } OPCDesc;
 
 /* Opcode description table */
@@ -196,7 +196,7 @@ extern const OPCDesc OPCTable[OP65_COUNT];
 
 
 /*****************************************************************************/
-/*     	       	      	   	     Code		    		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -217,7 +217,7 @@ INLINE const OPCDesc* GetOPCDesc (opc_t OPC)
     return &OPCTable [OPC];
 }
 #else
-#  define GetOPCDesc(OPC)	(&OPCTable [(OPC)])
+#  define GetOPCDesc(OPC)       (&OPCTable [(OPC)])
 #endif
 
 #if defined(HAVE_INLINE)
@@ -228,7 +228,7 @@ INLINE unsigned GetOPCInfo (opc_t OPC)
     return OPCTable[OPC].Info;
 }
 #else
-#  define GetOPCInfo(OPC)  	(OPCTable[(OPC)].Info)
+#  define GetOPCInfo(OPC)       (OPCTable[(OPC)].Info)
 #endif
 
 unsigned char GetAMUseInfo (am_t AM);

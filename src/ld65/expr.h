@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    expr.h				     */
+/*                                  expr.h                                   */
 /*                                                                           */
-/*		   Expression evaluation for the ld65 linker		     */
+/*                 Expression evaluation for the ld65 linker                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -57,15 +57,15 @@
 /* Structure for parsing segment based expression trees */
 typedef struct SegExprDesc SegExprDesc;
 struct SegExprDesc {
-    long       	    Val;		/* The offset value */
-    int	       	    TooComplex;	       	/* Expression too complex */
+    long            Val;                /* The offset value */
+    int             TooComplex;         /* Expression too complex */
     Segment*        Seg;                /* Segment reference if any */
 };
 
 
 
 /*****************************************************************************/
-/*     	      	     		     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

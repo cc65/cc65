@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		   		    loop.h				     */
+/*                                  loop.h                                   */
 /*                                                                           */
-/*		   		Loop management				     */
+/*                              Loop management                              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,23 +39,23 @@
 
 
 /*****************************************************************************/
-/*	   	  		     data		     		     */
+/*                                   data                                    */
 /*****************************************************************************/
 
 
 
 typedef struct LoopDesc LoopDesc;
 struct LoopDesc {
-    LoopDesc* 	Next;
-    unsigned 	StackPtr;
-    unsigned   	BreakLabel;
-    unsigned	ContinueLabel;
+    LoopDesc*   Next;
+    unsigned    StackPtr;
+    unsigned    BreakLabel;
+    unsigned    ContinueLabel;
 };
 
 
 
 /*****************************************************************************/
-/*	   	  		     code		     		     */
+/*                                   code                                    */
 /*****************************************************************************/
 
 

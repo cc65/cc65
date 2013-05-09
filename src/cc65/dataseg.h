@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		   		   dataseg.h				     */
+/*                                 dataseg.h                                 */
 /*                                                                           */
-/*		   	    Data segment structure			     */
+/*                          Data segment structure                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -50,22 +50,22 @@
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data		    		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 typedef struct DataSeg DataSeg;
 struct DataSeg {
-    char*      		SegName; 	/* Segment name */
-    SymEntry*  		Func;		/* Owner function */
-    Collection 	       	Lines;	       	/* List of code lines */
+    char*               SegName;        /* Segment name */
+    SymEntry*           Func;           /* Owner function */
+    Collection          Lines;          /* List of code lines */
 };
 
 
 
 /*****************************************************************************/
-/*     	       	       	  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

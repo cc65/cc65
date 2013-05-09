@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    macro.h				     */
+/*                                  macro.h                                  */
 /*                                                                           */
-/*		      Macros for the ca65 macroassembler		     */
+/*                    Macros for the ca65 macroassembler                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -49,14 +49,14 @@ struct StrBuf;
 
 
 /*****************************************************************************/
-/*			    	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Macro styles */
-#define MAC_STYLE_CLASSIC   	0
-#define MAC_STYLE_DEFINE    	1
+#define MAC_STYLE_CLASSIC       0
+#define MAC_STYLE_DEFINE        1
 
 /* Macro as an opaque data type */
 struct Macro;
@@ -65,7 +65,7 @@ typedef struct Macro Macro;
                                 
 
 /*****************************************************************************/
-/*     	       	    	    	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

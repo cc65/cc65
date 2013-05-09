@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   dataseg.c				     */
+/*                                 dataseg.c                                 */
 /*                                                                           */
-/*			    Data segment structure			     */
+/*                          Data segment structure                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -55,11 +55,11 @@ DataSeg* NewDataSeg (const char* Name, SymEntry* Func)
 /* Create a new data segment, initialize and return it */
 {
     /* Allocate memory */
-    DataSeg* S	= xmalloc (sizeof (DataSeg));
+    DataSeg* S  = xmalloc (sizeof (DataSeg));
 
     /* Initialize the fields */
-    S->SegName	= xstrdup (Name);
-    S->Func	= Func;
+    S->SegName  = xstrdup (Name);
+    S->Func     = Func;
     InitCollection (&S->Lines);
 
     /* Return the new struct */
@@ -76,7 +76,7 @@ void DS_Append (DataSeg* Target, const DataSeg* Source)
     /* Append all lines from Source to Target */
     unsigned Count = CollCount (&Source->Lines);
     for (I = 0; I < Count; ++I) {
-	CollAppend (&Target->Lines, xstrdup (CollConstAt (&Source->Lines, I)));
+        CollAppend (&Target->Lines, xstrdup (CollConstAt (&Source->Lines, I)));
     }
 }
 
@@ -116,7 +116,7 @@ void DS_Output (const DataSeg* S)
 
     /* If the segment is actually empty, bail out */
     if (Count == 0) {
-	return;
+        return;
     }
 
     /* Output the segment directive */
@@ -124,7 +124,7 @@ void DS_Output (const DataSeg* S)
 
     /* Output all entries */
     for (I = 0; I < Count; ++I) {
-	WriteOutput ("%s\n", (const char*) CollConstAt (&S->Lines, I));
+        WriteOutput ("%s\n", (const char*) CollConstAt (&S->Lines, I));
     }
 
     /* Add an additional newline after the segment output */

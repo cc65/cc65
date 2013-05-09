@@ -5,10 +5,10 @@
 ; /* Initialize the random number generator */
 ;
 
-    	.export	       	__randomize
-	.import		_srand
+        .export         __randomize
+        .import         _srand
 
-	.include	"vic20.inc"
+        .include        "vic20.inc"
 
 __randomize:
         lda     VIC_LINES       ; Get overflow bit

@@ -5,19 +5,19 @@
 ;
 ; Driver for GEOS standard input device interface
 ;
-					 
-	    .export _mouse_init, _mouse_done
-	    .export _mouse_hide, _mouse_show
-	    .export _mouse_box
-	    .export _mouse_pos, _mouse_info
-	    .export _mouse_move, _mouse_buttons
+                                         
+            .export _mouse_init, _mouse_done
+            .export _mouse_hide, _mouse_show
+            .export _mouse_box
+            .export _mouse_pos, _mouse_info
+            .export _mouse_move, _mouse_buttons
 
-	    .import popsreg, addysp1
-	    .importzp sp, sreg, ptr1
+            .import popsreg, addysp1
+            .importzp sp, sreg, ptr1
 
-	    .include "const.inc"
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "const.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 ; --------------------------------------------------------------------------
 ;
@@ -25,57 +25,57 @@
 ;
 
 _mouse_init:
-	jsr StartMouseMode
-	jsr MouseOff
+        jsr StartMouseMode
+        jsr MouseOff
 
-	lda #0
-	sta mouseTop
-	sta mouseLeft
-	sta mouseLeft+1
+        lda #0
+        sta mouseTop
+        sta mouseLeft
+        sta mouseLeft+1
 .ifdef __GEOS_CBM__
-	lda #199
-	sta mouseBottom
-	lda graphMode
-	bpl _mse_screen320
+        lda #199
+        sta mouseBottom
+        lda graphMode
+        bpl _mse_screen320
 
-	lda #<639		; 80 columns on C128
-	ldx #>639
-	bne _mse_storex
+        lda #<639               ; 80 columns on C128
+        ldx #>639
+        bne _mse_storex
 _mse_screen320:
-	lda #<319		; 40 columns on C64/C128
-	ldx #>319
+        lda #<319               ; 40 columns on C64/C128
+        ldx #>319
 _mse_storex:
 .else
-	lda #191
-	sta mouseBottom
-	lda #<559
-	ldx #>559
+        lda #191
+        sta mouseBottom
+        lda #<559
+        ldx #>559
 .endif
-	sta mouseRight
-	stx mouseRight+1
+        sta mouseRight
+        stx mouseRight+1
 _mse_initend:
-	lda #0
-	tax
+        lda #0
+        tax
 ; --------------------------------------------------------------------------
 ;
 ; void mouse_done (void);
 ;
 _mouse_done:
-	rts
+        rts
 
 ; --------------------------------------------------------------------------
 ;
 ; void mouse_hide (void);
 ;
 
-_mouse_hide	= MouseOff
+_mouse_hide     = MouseOff
 
 ; --------------------------------------------------------------------------
 ;
 ; void mouse_show (void);
 ;
 
-_mouse_show	= MouseUp
+_mouse_show     = MouseUp
 
 ; --------------------------------------------------------------------------
 ;
@@ -83,29 +83,29 @@ _mouse_show	= MouseUp
 ;
 
 _mouse_box:
-	ldy #0		  	; Stack offset
+        ldy #0                  ; Stack offset
 
-	sta mouseBottom
+        sta mouseBottom
 
-	lda (sp),y
-	sta mouseRight
-	iny
-	lda (sp),y
-	sta mouseRight+1	; maxx
+        lda (sp),y
+        sta mouseRight
+        iny
+        lda (sp),y
+        sta mouseRight+1        ; maxx
 
-	iny
-	lda (sp),y
-	sta mouseTop
-	iny			; Skip high byte
+        iny
+        lda (sp),y
+        sta mouseTop
+        iny                     ; Skip high byte
 
-	iny
-	lda (sp),y
-	sta mouseLeft
-	iny
-	lda (sp),y
-	sta mouseLeft+1		; minx
+        iny
+        lda (sp),y
+        sta mouseLeft
+        iny
+        lda (sp),y
+        sta mouseLeft+1         ; minx
 
-	jmp addysp1		; Drop params, return
+        jmp addysp1             ; Drop params, return
 
 ; --------------------------------------------------------------------------
 ;
@@ -114,28 +114,28 @@ _mouse_box:
 ;
 
 _mouse_pos:
-	sta ptr1
-	stx ptr1+1		; Remember the argument pointer
+        sta ptr1
+        stx ptr1+1              ; Remember the argument pointer
 
-	ldy #0			; Structure offset
+        ldy #0                  ; Structure offset
 
-	php
-	sei			; Disable interrupts
+        php
+        sei                     ; Disable interrupts
 
-	lda mouseXPos		; Transfer the position
-	sta (ptr1),y
-	lda mouseXPos+1
-	iny
-	sta (ptr1),y
-	lda mouseYPos
-	iny
-	sta (ptr1),y
-	lda #$00
-	iny
-	sta (ptr1),y
+        lda mouseXPos           ; Transfer the position
+        sta (ptr1),y
+        lda mouseXPos+1
+        iny
+        sta (ptr1),y
+        lda mouseYPos
+        iny
+        sta (ptr1),y
+        lda #$00
+        iny
+        sta (ptr1),y
 
-	plp			; Reenable interrupts
-	rts			; Done
+        plp                     ; Reenable interrupts
+        rts                     ; Done
 
 ; --------------------------------------------------------------------------
 ;
@@ -150,15 +150,15 @@ _mouse_info:
 ; call _mouse_pos to initialize the struct pointer and fill the position
 ; fields.
 
-	jsr _mouse_pos
+        jsr _mouse_pos
 
 ; Fill in the button state
 
-	jsr _mouse_buttons	; Will not touch ptr1
-	iny
-	sta (ptr1),y
+        jsr _mouse_buttons      ; Will not touch ptr1
+        iny
+        sta (ptr1),y
 
-	rts
+        rts
 
 ; --------------------------------------------------------------------------
 ;
@@ -166,16 +166,16 @@ _mouse_info:
 ;
 
 _mouse_move:
-	jsr popsreg		; Get X
-	php
-	sei			; Disable interrupts
-	sta mouseYPos
-	lda sreg
-	ldx sreg+1
-	sta mouseXPos
-	stx mouseXPos+1
-	plp			; Enable interrupts
-	rts
+        jsr popsreg             ; Get X
+        php
+        sei                     ; Disable interrupts
+        sta mouseYPos
+        lda sreg
+        ldx sreg+1
+        sta mouseXPos
+        stx mouseXPos+1
+        plp                     ; Enable interrupts
+        rts
 
 ; --------------------------------------------------------------------------
 ;
@@ -183,8 +183,8 @@ _mouse_move:
 ;
 
 _mouse_buttons:
-	ldx #0
-	lda pressFlag
-	and #SET_MOUSE
-	lsr
-	rts
+        ldx #0
+        lda pressFlag
+        and #SET_MOUSE
+        lsr
+        rts

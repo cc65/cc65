@@ -44,7 +44,7 @@
 
 
 
-extern unsigned char	Debug;			/* Debug mode */
+extern unsigned char    Debug;                  /* Debug mode */
 
 
 

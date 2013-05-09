@@ -5,8 +5,8 @@
 
 ; void Rectangle        (void);
 
-	    .export _Rectangle
-	    
-	    .include "jumptab.inc"
+            .export _Rectangle
+            
+            .include "jumptab.inc"
 
-_Rectangle	= Rectangle
+_Rectangle      = Rectangle

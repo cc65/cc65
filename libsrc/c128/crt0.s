@@ -2,119 +2,119 @@
 ; Startup code for cc65 (C128 version)
 ;
 
-	.export		_exit
-	.export		__STARTUP__ : absolute = 1      ; Mark as startup
-	.import		initlib, donelib
-	.import		zerobss
-	.import		push0, callmain
-	.import		RESTOR, BSOUT, CLRCH
-	.import		__RAM_START__, __RAM_SIZE__, __STACKSIZE__
-	.importzp	ST
+        .export         _exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
+        .import         initlib, donelib
+        .import         zerobss
+        .import         push0, callmain
+        .import         RESTOR, BSOUT, CLRCH
+        .import         __RAM_START__, __RAM_SIZE__, __STACKSIZE__
+        .importzp       ST
 
-	.include	"zeropage.inc"
-	.include	"c128.inc"
+        .include        "zeropage.inc"
+        .include        "c128.inc"
 
 
 ; ------------------------------------------------------------------------
 ; Startup code
 
-.segment	"STARTUP"
+.segment        "STARTUP"
 
 Start:
 
 ; Switch to the second charset
 
-	lda	#14
-	jsr	BSOUT
+        lda     #14
+        jsr     BSOUT
 
 ; Before doing anything else, we have to setup our banking configuration.
 ; Otherwise just the lowest 16K are actually RAM. Writing through the ROM
 ; to the underlying RAM works, but it is bad style.
 
-	lda	MMU_CR		; Get current memory configuration...
-	pha			; ...and save it for later
-	lda	#MMU_CFG_CC65	; Bank0 with kernal ROM
-	sta	MMU_CR
+        lda     MMU_CR          ; Get current memory configuration...
+        pha                     ; ...and save it for later
+        lda     #MMU_CFG_CC65   ; Bank0 with kernal ROM
+        sta     MMU_CR
 
 ; Save the zero page locations we need
 
-	ldx	#zpspace-1
-L1:	lda	sp,x
-	sta	zpsave,x
-	dex
-	bpl	L1
+        ldx     #zpspace-1
+L1:     lda     sp,x
+        sta     zpsave,x
+        dex
+        bpl     L1
 
 ; Clear the BSS data
 
-	jsr	zerobss
+        jsr     zerobss
 
 ; Save system stuff and setup the stack
 
-	pla		 	; Get MMU setting
-	sta	mmusave
+        pla                     ; Get MMU setting
+        sta     mmusave
 
-	tsx
-	stx	spsave	 	; Save the system stack pointer
+        tsx
+        stx     spsave          ; Save the system stack pointer
 
-	lda	#<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-	sta	sp
-	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-	sta	sp+1		; Set argument stack ptr
+        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp
+        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp+1            ; Set argument stack ptr
 
 ; Call module constructors
 
-	jsr	initlib
+        jsr     initlib
 
 ; Set the bank for the file name to our execution bank. We must do this,
 ; *after* calling constructors, because some of them may depend on the
 ; original value of this register.
 
-	lda	#0
-	sta	FNAM_BANK
+        lda     #0
+        sta     FNAM_BANK
 
 ; Push arguments and call main()
 
-	jsr	callmain
+        jsr     callmain
 
 ; Back from main (this is also the _exit entry). Run module destructors
 
-_exit:  pha			; Save the return code on stack
-	jsr	donelib
+_exit:  pha                     ; Save the return code on stack
+        jsr     donelib
 
 ; Copy back the zero page stuff
 
-	ldx	#zpspace-1
-L2:	lda	zpsave,x
-	sta	sp,x
-	dex
-	bpl	L2
+        ldx     #zpspace-1
+L2:     lda     zpsave,x
+        sta     sp,x
+        dex
+        bpl     L2
 
 ; Place the program return code into ST
 
-	pla
-	sta	ST
+        pla
+        sta     ST
 
 ; Reset the stack and the memory configuration
 
-	ldx	spsave
-	txs
-	ldx	mmusave
-	stx	MMU_CR
+        ldx     spsave
+        txs
+        ldx     mmusave
+        stx     MMU_CR
 
 ; Done, return to BASIC
 
-	rts
+        rts
 
 ; ------------------------------------------------------------------------
 ; Data
 
-.segment	"ZPSAVE"
+.segment        "ZPSAVE"
 
-zpsave:	.res	zpspace
+zpsave: .res    zpspace
 
 ; ------------------------------------------------------------------------
 
 .bss
 
-spsave:	.res	1
-mmusave:.res	1
+spsave: .res    1
+mmusave:.res    1

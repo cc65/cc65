@@ -5,13 +5,13 @@
 
 ; void DoMenu         (struct menu *mymenu);
 
-	    .export _DoMenu
+            .export _DoMenu
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _DoMenu:
-	sta r0L
-	stx r0H
-	lda #0
-	jmp DoMenu
+        sta r0L
+        stx r0H
+        lda #0
+        jmp DoMenu

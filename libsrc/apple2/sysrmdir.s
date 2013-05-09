@@ -5,6 +5,6 @@
 ;
 
         .export         __sysrmdir
-        .import		__sysremove
+        .import         __sysremove
 
 __sysrmdir := __sysremove

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  lineinfo.h                                 */
+/*                                lineinfo.h                                 */
 /*                                                                           */
-/*			Source file line info structure                      */
+/*                      Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*				   Forwards                                  */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -55,7 +55,7 @@ struct IFile;
 
 
 /*****************************************************************************/
-/*				     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -65,7 +65,7 @@ struct IFile;
  */
 typedef struct LineInfo LineInfo;
 struct LineInfo {
-    unsigned   	    RefCount;             /* Reference counter */
+    unsigned        RefCount;             /* Reference counter */
     struct IFile*   InputFile;            /* Input file for this line */
     unsigned        LineNum;              /* Line number */
     char            Line[1];              /* Source code line */
@@ -74,7 +74,7 @@ struct LineInfo {
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code			     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

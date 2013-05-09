@@ -5,20 +5,20 @@
 
 ; void * ClearRam         (char *dest, int length);
 
-	    .import DoublePop
-	    .export _ClearRam
+            .import DoublePop
+            .export _ClearRam
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _ClearRam:
-	jsr DoublePop
-	pha
-	txa
-	pha
-	jsr ClearRam
-	pla
-	tax
-	pla
-	rts
+        jsr DoublePop
+        pha
+        txa
+        pha
+        jsr ClearRam
+        pla
+        tax
+        pla
+        rts
 

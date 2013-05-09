@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -70,7 +70,7 @@ unsigned HashStr (const char* S)
     /* Do the hash */
     H = L = 0;
     while (*S) {
-    	H = ((H << 3) ^ ((unsigned char) *S++)) + L++;
+        H = ((H << 3) ^ ((unsigned char) *S++)) + L++;
     }
     return H;
 }
@@ -85,7 +85,7 @@ unsigned HashBuf (const StrBuf* S)
     /* Do the hash */
     H = L = 0;
     for (I = 0; I < SB_GetLen (S); ++I) {
-    	H = ((H << 3) ^ ((unsigned char) SB_AtUnchecked (S, I))) + L++;
+        H = ((H << 3) ^ ((unsigned char) SB_AtUnchecked (S, I))) + L++;
     }
     return H;
 }

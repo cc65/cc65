@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptsub.h                                 */
+/*                                 coptsub.h                                 */
 /*                                                                           */
-/*			Optimize subtraction sequences                       */
+/*                      Optimize subtraction sequences                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*			     Optimize subtractions                           */
+/*                           Optimize subtractions                           */
 /*****************************************************************************/
 
 
@@ -52,9 +52,9 @@
 unsigned OptSub1 (CodeSeg* S);
 /* Search for the sequence
  *
- *  	sbc     ...
+ *      sbc     ...
  *      bcs     L
- *  	dex
+ *      dex
  * L:
  *
  * and remove the handling of the high byte if X is not used later.
@@ -63,9 +63,9 @@ unsigned OptSub1 (CodeSeg* S);
 unsigned OptSub2 (CodeSeg* S);
 /* Search for the sequence
  *
- *  	lda     xx
+ *      lda     xx
  *      sec
- *  	sta     tmp1
+ *      sta     tmp1
  *      lda     yy
  *      sbc     tmp1
  *      sta     yy
@@ -74,7 +74,7 @@ unsigned OptSub2 (CodeSeg* S);
  *
  *      sec
  *      lda     yy
- *     	sbc     xx
+ *      sbc     xx
  *      sta     yy
  */
 

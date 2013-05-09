@@ -5,11 +5,11 @@
 
 ; char GetCharWidth (char character);
 
-	    .export _GetCharWidth
+            .export _GetCharWidth
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _GetCharWidth:
-	jsr GetCharWidth
-	ldx #0
-	rts
+        jsr GetCharWidth
+        ldx #0
+        rts

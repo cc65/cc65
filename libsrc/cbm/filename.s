@@ -172,7 +172,7 @@ drivedone:
 ; fnaddmode: Add ",m" to a filename, where "m" is passed in A
 
 fncomplete:
-	pha	   		; Save mode
+        pha                     ; Save mode
         lda     __filetype
         jsr     fnaddmode       ; Add the type
         pla

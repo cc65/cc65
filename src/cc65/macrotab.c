@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  macrotab.h				     */
+/*                                macrotab.h                                 */
 /*                                                                           */
-/*	       Preprocessor macro table for the cc65 C compiler		     */
+/*             Preprocessor macro table for the cc65 C compiler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,19 +47,19 @@
 
 
 /*****************************************************************************/
-/*				     data				     */
+/*                                   data                                    */
 /*****************************************************************************/
 
 
 
 /* The macro hash table */
-#define MACRO_TAB_SIZE	211
+#define MACRO_TAB_SIZE  211
 static Macro* MacroTab[MACRO_TAB_SIZE];
 
 
 
 /*****************************************************************************/
-/*	   		   	     code				     */
+/*                                   code                                    */
 /*****************************************************************************/
 
 
@@ -76,10 +76,10 @@ Macro* NewMacro (const char* Name)
     Macro* M = (Macro*) xmalloc (sizeof(Macro) + Len);
 
     /* Initialize the data */
-    M->Next   	   = 0;
+    M->Next        = 0;
     M->Expanding   = 0;
-    M->ArgCount    = -1;	/* Flag: Not a function like macro */
-    M->MaxArgs	   = 0;
+    M->ArgCount    = -1;        /* Flag: Not a function like macro */
+    M->MaxArgs     = 0;
     InitCollection (&M->FormalArgs);
     SB_Init (&M->Replacement);
     M->Variadic    = 0;
@@ -99,7 +99,7 @@ void FreeMacro (Macro* M)
     unsigned I;
 
     for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-	xfree (CollAtUnchecked (&M->FormalArgs, I));
+        xfree (CollAtUnchecked (&M->FormalArgs, I));
     }
     DoneCollection (&M->FormalArgs);
     SB_Done (&M->Replacement);
@@ -163,26 +163,26 @@ int UndefineMacro (const char* Name)
     Macro* L = 0;
     Macro* M = MacroTab[Hash];
     while (M) {
-	if (strcmp (M->Name, Name) == 0) {
+        if (strcmp (M->Name, Name) == 0) {
 
-	    /* Found it */
-	    if (L == 0) {
-	       	/* First in chain */
-	       	MacroTab[Hash] = M->Next;
-	    } else {
-	       	L->Next = M->Next;
-	    }
+            /* Found it */
+            if (L == 0) {
+                /* First in chain */
+                MacroTab[Hash] = M->Next;
+            } else {
+                L->Next = M->Next;
+            }
 
-	    /* Delete the macro */
-	    FreeMacro (M);
+            /* Delete the macro */
+            FreeMacro (M);
 
-	    /* Done */
-	    return 1;
-	}
+            /* Done */
+            return 1;
+        }
 
-	/* Next macro */
-	L = M;
-	M = M->Next;
+        /* Next macro */
+        L = M;
+        M = M->Next;
     }
 
     /* Not found */
@@ -200,13 +200,13 @@ Macro* FindMacro (const char* Name)
     /* Search the hash chain */
     Macro* M = MacroTab[Hash];
     while (M) {
-	if (strcmp (M->Name, Name) == 0) {
-	    /* Found it */
-	    return M;
-	}
+        if (strcmp (M->Name, Name) == 0) {
+            /* Found it */
+            return M;
+        }
 
-	/* Next macro */
-	M = M->Next;
+        /* Next macro */
+        M = M->Next;
     }
 
     /* Not found */
@@ -222,10 +222,10 @@ int FindMacroArg (Macro* M, const char* Arg)
 {
     unsigned I;
     for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-       	if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
-      	    /* Found */
-       	    return I;
-	}
+        if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
+            /* Found */
+            return I;
+        }
     }
 
     /* Not found */
@@ -243,11 +243,11 @@ void AddMacroArg (Macro* M, const char* Arg)
      */
     unsigned I;
     for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
-       	if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
-	    /* Found */
-	    Error ("Duplicate macro parameter: `%s'", Arg);
-	    break;
-	}
+        if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
+            /* Found */
+            Error ("Duplicate macro parameter: `%s'", Arg);
+            break;
+        }
     }
 
     /* Add the new argument */
@@ -264,15 +264,15 @@ int MacroCmp (const Macro* M1, const Macro* M2)
 
     /* Argument count must be identical */
     if (M1->ArgCount != M2->ArgCount) {
-	return 1;
+        return 1;
     }
 
     /* Compare the arguments */
     for (I = 0; I < M1->ArgCount; ++I) {
-       	if (strcmp (CollConstAt (&M1->FormalArgs, I),
+        if (strcmp (CollConstAt (&M1->FormalArgs, I),
                     CollConstAt (&M2->FormalArgs, I)) != 0) {
-	    return 1;
-	}
+            return 1;
+        }
     }
 
     /* Compare the replacement */
@@ -289,17 +289,17 @@ void PrintMacroStats (FILE* F)
 
     fprintf (F, "\n\nMacro Hash Table Summary\n");
     for (I = 0; I < MACRO_TAB_SIZE; ++I) {
-       	fprintf (F, "%3u : ", I);
-	M = MacroTab [I];
-	if (M) {
-	    while (M) {
-	     	fprintf (F, "%s ", M->Name);
-		M = M->Next;
-	    }
-	    fprintf (F, "\n");
-	} else {
-	    fprintf (F, "empty\n");
-	}
+        fprintf (F, "%3u : ", I);
+        M = MacroTab [I];
+        if (M) {
+            while (M) {
+                fprintf (F, "%s ", M->Name);
+                M = M->Next;
+            }
+            fprintf (F, "\n");
+        } else {
+            fprintf (F, "empty\n");
+        }
     }
 }
 

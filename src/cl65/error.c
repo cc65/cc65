@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.c				     */
+/*                                 global.c                                  */
 /*                                                                           */
-/*	   Error handling for the cl65 compile and link utility		     */
+/*         Error handling for the cl65 compile and link utility              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 /* common */
 #include "cmdline.h"
-	  
+          
 /* cl65 */
 #include "global.h"
 #include "error.h"
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

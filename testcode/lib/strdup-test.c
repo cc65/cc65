@@ -5,11 +5,11 @@
 
 
 /* From _heap.h */
-extern unsigned	_horg;       	/* Bottom of heap */
-extern unsigned _hptr;		/* Current top */
-extern unsigned _hend;		/* Upper limit */
-extern unsigned	_hfirst; 	/* First free block in list */
-extern unsigned _hlast;		/* Last free block in list */
+extern unsigned _horg;          /* Bottom of heap */
+extern unsigned _hptr;          /* Current top */
+extern unsigned _hend;          /* Upper limit */
+extern unsigned _hfirst;        /* First free block in list */
+extern unsigned _hlast;         /* Last free block in list */
 
 
 static unsigned char* V[256];
@@ -23,20 +23,20 @@ static void ShowInfo (void)
     unsigned Count = 0;
     unsigned** P = (unsigned**) _hfirst;
     while (P) {
-	++Count;
-	P = P[1];
+        ++Count;
+        P = P[1];
     }
     printf ("%04X  %04X  %04X  %04X  %04X %u\n",
-      	    _horg, _hptr, _hend, _hfirst, _hlast, Count);
+            _horg, _hptr, _hend, _hfirst, _hlast, Count);
 
     if (Count) {
-	P = (unsigned**) _hfirst;
-	while (P) {
-	    printf ("%04X  %04X  %04X %04X(%u)\n",
-		    (unsigned) P, P[2], P[1], P[0], P[0]);
-	    P = P[1];
-	}
-	getchar ();
+        P = (unsigned**) _hfirst;
+        while (P) {
+            printf ("%04X  %04X  %04X %04X(%u)\n",
+                    (unsigned) P, P[2], P[1], P[0], P[0]);
+            P = P[1];
+        }
+        getchar ();
     }
 }
 
@@ -51,10 +51,10 @@ static const char* RandStr (void)
     char C;
 
     for (I = 0; I < Len; ++I) {
-	do {
-	    C = rand() & 0xFF;
-	} while (C == 0);
-	S[I] = C;
+        do {
+            C = rand() & 0xFF;
+        } while (C == 0);
+        S[I] = C;
     }
     S[Len] = '\0';
 
@@ -68,8 +68,8 @@ static void FillArray (void)
 {
     unsigned char I = 0;
     do {
-       	V[I] = strdup (RandStr ());
-	++I;
+        V[I] = strdup (RandStr ());
+        ++I;
     } while (I != 0);
 }
 
@@ -80,8 +80,8 @@ static void FreeArray (void)
 {
     unsigned char I = 0;
     do {
-       	free (V[I]);
-	++I;
+        free (V[I]);
+        ++I;
     } while (I != 0);
 }
 

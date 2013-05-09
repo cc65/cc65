@@ -43,5 +43,5 @@ ok:     rts
 .bss
 
 __errno:
-	.word	0
+        .word   0
 

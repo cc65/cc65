@@ -4,7 +4,7 @@
 ; void __fastcall__ cbm_k_bsout (unsigned char C);
 ;
 
-       	.export	       	_cbm_k_bsout
+        .export         _cbm_k_bsout
         .import         BSOUT
 
 _cbm_k_bsout = BSOUT

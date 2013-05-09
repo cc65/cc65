@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			 	   litpool.c				     */
+/*                                 litpool.c                                 */
 /*                                                                           */
-/*		Literal string handling for the cc65 C compiler		     */
+/*              Literal string handling for the cc65 C compiler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,7 +53,7 @@
 
 
 /*****************************************************************************/
-/*  		    	  	     Data		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -215,7 +215,7 @@ unsigned GetLiteralSize (const Literal* L)
 
 
 /*****************************************************************************/
-/*  	       	       	   	     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -347,7 +347,7 @@ static void OutputWritableLiterals (Collection* Literals)
 
     /* If nothing there, exit... */
     if (CollCount (Literals) == 0) {
-    	return;
+        return;
     }
 
     /* Switch to the correct segment */
@@ -376,7 +376,7 @@ static void OutputReadOnlyLiterals (Collection* Literals)
 
     /* If nothing there, exit... */
     if (CollCount (Literals) == 0) {
-    	return;
+        return;
     }
 
     /* Switch to the correct segment */

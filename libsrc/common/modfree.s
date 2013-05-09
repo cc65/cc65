@@ -2,7 +2,7 @@
 ;*                                                                           */
 ;*                                   modfree.s                               */
 ;*                                                                           */
-;*			    Free loaded o65 modules			     */
+;*                          Free loaded o65 modules                          */
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */

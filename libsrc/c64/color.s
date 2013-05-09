@@ -7,27 +7,27 @@
 ;
 
 
- 	.export		_textcolor, _bgcolor, _bordercolor
+        .export         _textcolor, _bgcolor, _bordercolor
 
-	.include	"c64.inc"
+        .include        "c64.inc"
 
 _textcolor:
-	ldx	CHARCOLOR	; get old value
- 	sta	CHARCOLOR	; set new value
-	txa
-	rts
+        ldx     CHARCOLOR       ; get old value
+        sta     CHARCOLOR       ; set new value
+        txa
+        rts
 
 
 _bgcolor:
-	ldx	VIC_BG_COLOR0	; get old value
-	sta	VIC_BG_COLOR0	; set new value
-	txa
-	rts
+        ldx     VIC_BG_COLOR0   ; get old value
+        sta     VIC_BG_COLOR0   ; set new value
+        txa
+        rts
 
 
 _bordercolor:
-       	ldx    	VIC_BORDERCOLOR ; get old value
-	sta	VIC_BORDERCOLOR	; set new value
-	txa
-	rts
+        ldx     VIC_BORDERCOLOR ; get old value
+        sta     VIC_BORDERCOLOR ; set new value
+        txa
+        rts
 

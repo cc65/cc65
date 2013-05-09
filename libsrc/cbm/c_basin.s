@@ -4,11 +4,11 @@
 ; unsigned char cbm_k_basin (void);
 ;
 
-	.export		_cbm_k_basin
-	.import		BASIN
+        .export         _cbm_k_basin
+        .import         BASIN
 
 
 _cbm_k_basin:
-	jsr	BASIN
-	ldx	#0		; Clear high byte
-	rts
+        jsr     BASIN
+        ldx     #0              ; Clear high byte
+        rts

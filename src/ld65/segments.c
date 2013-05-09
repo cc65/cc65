@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  segments.c				     */
+/*                                segments.c                                 */
 /*                                                                           */
-/*		     Segment handling for the ld65 linker		     */
+/*                   Segment handling for the ld65 linker                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -62,15 +62,15 @@
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Hash table */
 #define HASHTAB_MASK    0x3FU
-#define HASHTAB_SIZE 	(HASHTAB_MASK + 1)
-static Segment*        	HashTab[HASHTAB_SIZE];
+#define HASHTAB_SIZE    (HASHTAB_MASK + 1)
+static Segment*         HashTab[HASHTAB_SIZE];
 
 /* List of all segments */
 static Collection       SegmentList = STATIC_COLLECTION_INITIALIZER;
@@ -78,7 +78,7 @@ static Collection       SegmentList = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*     	       	     	   	     Code  	      	  	  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -93,16 +93,16 @@ static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
 
     /* Initialize the fields */
     S->Name        = Name;
-    S->Next	   = 0;
+    S->Next        = 0;
     S->Flags       = SEG_FLAG_NONE;
     S->Sections    = EmptyCollection;
     S->MemArea     = 0;
-    S->PC   	   = 0;
-    S->Size    	   = 0;
+    S->PC          = 0;
+    S->Size        = 0;
     S->OutputName  = 0;
     S->OutputOffs  = 0;
     S->Alignment   = 1;
-    S->FillVal	   = 0;
+    S->FillVal     = 0;
     S->AddrSize    = AddrSize;
     S->ReadOnly    = 0;
     S->Dumped      = 0;
@@ -135,18 +135,18 @@ Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
      * the first section.
      */
     if (S == 0) {
-      	/* Create a new segment */
-      	S = NewSegment (Name, AddrSize);
+        /* Create a new segment */
+        S = NewSegment (Name, AddrSize);
     } else {
-       	/* Check if the existing segment has the requested address size */
-       	if (S->AddrSize != AddrSize) {
-     	    /* Allow an empty object name */
-	    if (ObjName == 0) {
-		ObjName = "[linker generated]";
-	    }
-	    Error ("Module `%s': Type mismatch for segment `%s'", ObjName,
+        /* Check if the existing segment has the requested address size */
+        if (S->AddrSize != AddrSize) {
+            /* Allow an empty object name */
+            if (ObjName == 0) {
+                ObjName = "[linker generated]";
+            }
+            Error ("Module `%s': Type mismatch for segment `%s'", ObjName,
                    GetString (Name));
-     	}
+        }
     }
 
     /* Return the segment */
@@ -162,12 +162,12 @@ Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSi
     Section* S = xmalloc (sizeof (Section));
 
     /* Initialize the data */
-    S->Next	= 0;
-    S->Seg   	= Seg;
+    S->Next     = 0;
+    S->Seg      = Seg;
     S->Obj      = 0;
     S->FragRoot = 0;
     S->FragLast = 0;
-    S->Size  	= 0;
+    S->Size     = 0;
     S->Alignment= Alignment;
     S->AddrSize = AddrSize;
 
@@ -176,7 +176,7 @@ Section* NewSection (Segment* Seg, unsigned long Alignment, unsigned char AddrSi
 
     /* Adjust the segment size and set the section offset */
     Seg->Size  += S->Fill;
-    S->Offs  	= Seg->Size;  	/* Current size is offset */
+    S->Offs     = Seg->Size;    /* Current size is offset */
 
     /* Insert the section into the segment */
     CollAppend (&Seg->Sections, S);
@@ -211,7 +211,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     /* Print some data */
     Print (stdout, 2,
            "Module `%s': Found segment `%s', size = %u, alignment = %lu, type = %u\n",
-    	   GetObjFileName (O), GetString (Name), Size, Alignment, Type);
+           GetObjFileName (O), GetString (Name), Size, Alignment, Type);
 
     /* Get the segment for this section */
     S = GetSegment (Name, Type, GetObjFileName (O));
@@ -241,46 +241,46 @@ Section* ReadSection (FILE* F, ObjData* O)
     /* Start reading fragments from the file and insert them into the section . */
     while (FragCount--) {
 
-    	Fragment* Frag;
+        Fragment* Frag;
 
-    	/* Read the fragment type */
-    	unsigned char Type = Read8 (F);
+        /* Read the fragment type */
+        unsigned char Type = Read8 (F);
 
         /* Extract the check mask from the type */
         unsigned char Bytes = Type & FRAG_BYTEMASK;
         Type &= FRAG_TYPEMASK;
 
-    	/* Handle the different fragment types */
-	switch (Type) {
+        /* Handle the different fragment types */
+        switch (Type) {
 
-	    case FRAG_LITERAL:
-	       	Frag = NewFragment (Type, ReadVar (F), Sec);
-		ReadData (F, Frag->LitBuf, Frag->Size);
-	       	break;
+            case FRAG_LITERAL:
+                Frag = NewFragment (Type, ReadVar (F), Sec);
+                ReadData (F, Frag->LitBuf, Frag->Size);
+                break;
 
-	    case FRAG_EXPR:
-	    case FRAG_SEXPR:
-       	       	Frag = NewFragment (Type, Bytes, Sec);
-		Frag->Expr = ReadExpr (F, O);
-	  	break;
+            case FRAG_EXPR:
+            case FRAG_SEXPR:
+                Frag = NewFragment (Type, Bytes, Sec);
+                Frag->Expr = ReadExpr (F, O);
+                break;
 
-	    case FRAG_FILL:
-	  	/* Will allocate memory, but we don't care... */
-     	  	Frag = NewFragment (Type, ReadVar (F), Sec);
-	  	break;
+            case FRAG_FILL:
+                /* Will allocate memory, but we don't care... */
+                Frag = NewFragment (Type, ReadVar (F), Sec);
+                break;
 
-	    default:
-	  	Error ("Unknown fragment type in module `%s', segment `%s': %02X",
-	  	       GetObjFileName (O), GetString (S->Name), Type);
-	  	/* NOTREACHED */
-	 	return 0;
-       	}
+            default:
+                Error ("Unknown fragment type in module `%s', segment `%s': %02X",
+                       GetObjFileName (O), GetString (S->Name), Type);
+                /* NOTREACHED */
+                return 0;
+        }
 
         /* Read the line infos into the list of the fragment */
         ReadLineInfoList (F, O, &Frag->LineInfos);
 
-	/* Remember the module we had this fragment from */
-	Frag->Obj = O;
+        /* Remember the module we had this fragment from */
+        Frag->Obj = O;
     }
 
     /* Return the section */
@@ -294,11 +294,11 @@ Segment* SegFind (unsigned Name)
 {
     Segment* S = HashTab[Name & HASHTAB_MASK];
     while (S) {
-       	if (Name == S->Name) {
-	    /* Found */
-	    break;
-	}
-	S = S->Next;
+        if (Name == S->Name) {
+            /* Found */
+            break;
+        }
+        S = S->Next;
     }
     /* Not found */
     return S;
@@ -318,24 +318,24 @@ int IsBSSType (Segment* S)
         /* Get the next section */
         Section* Sec = CollAtUnchecked (&S->Sections, I);
 
-	/* Loop over all fragments */
-	Fragment* F = Sec->FragRoot;
-	while (F) {
-	    if (F->Type == FRAG_LITERAL) {
-		unsigned char* Data = F->LitBuf;
-		unsigned long Count = F->Size;
-		while (Count--) {
-		    if (*Data++ != 0) {
-		   	return 0;
-		    }
-		}
-	    } else if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
-		if (GetExprVal (F->Expr) != 0) {
-		    return 0;
-		}
-	    }
-	    F = F->Next;
-	}
+        /* Loop over all fragments */
+        Fragment* F = Sec->FragRoot;
+        while (F) {
+            if (F->Type == FRAG_LITERAL) {
+                unsigned char* Data = F->LitBuf;
+                unsigned long Count = F->Size;
+                while (Count--) {
+                    if (*Data++ != 0) {
+                        return 0;
+                    }
+                }
+            } else if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
+                if (GetExprVal (F->Expr) != 0) {
+                    return 0;
+                }
+            }
+            F = F->Next;
+        }
     }
     return 1;
 }
@@ -351,53 +351,53 @@ void SegDump (void)
 
     for (I = 0; I < CollCount (&SegmentList); ++I) {
         Segment* Seg = CollAtUnchecked (&SegmentList, I);
-       	printf ("Segment: %s (%lu)\n", GetString (Seg->Name), Seg->Size);
+        printf ("Segment: %s (%lu)\n", GetString (Seg->Name), Seg->Size);
         for (J = 0; J < CollCount (&Seg->Sections); ++J) {
             Section* S = CollAtUnchecked (&Seg->Sections, J);
             unsigned J;
-	    Fragment* F = S->FragRoot;
-	    printf ("  Section:\n");
-	    while (F) {
-		switch (F->Type) {
+            Fragment* F = S->FragRoot;
+            printf ("  Section:\n");
+            while (F) {
+                switch (F->Type) {
 
-		    case FRAG_LITERAL:
-		       	printf ("    Literal (%u bytes):", F->Size);
-		       	Count = F->Size;
-		       	Data  = F->LitBuf;
-     		       	J = 100;
-		       	while (Count--) {
-		       	    if (J > 75) {
-			     	printf ("\n   ");
-		     	     	J = 3;
-			    }
-			    printf (" %02X", *Data++);
-			    J += 3;
-			}
-			printf ("\n");
-			break;
+                    case FRAG_LITERAL:
+                        printf ("    Literal (%u bytes):", F->Size);
+                        Count = F->Size;
+                        Data  = F->LitBuf;
+                        J = 100;
+                        while (Count--) {
+                            if (J > 75) {
+                                printf ("\n   ");
+                                J = 3;
+                            }
+                            printf (" %02X", *Data++);
+                            J += 3;
+                        }
+                        printf ("\n");
+                        break;
 
-		    case FRAG_EXPR:
-			printf ("    Expression (%u bytes):\n", F->Size);
-			printf ("    ");
-			DumpExpr (F->Expr, 0);
-			break;
+                    case FRAG_EXPR:
+                        printf ("    Expression (%u bytes):\n", F->Size);
+                        printf ("    ");
+                        DumpExpr (F->Expr, 0);
+                        break;
 
-		    case FRAG_SEXPR:
-			printf ("    Signed expression (%u bytes):\n", F->Size);
-			printf ("      ");
-			DumpExpr (F->Expr, 0);
-			break;
+                    case FRAG_SEXPR:
+                        printf ("    Signed expression (%u bytes):\n", F->Size);
+                        printf ("      ");
+                        DumpExpr (F->Expr, 0);
+                        break;
 
-		    case FRAG_FILL:
-			printf ("    Empty space (%u bytes)\n", F->Size);
-		     	break;
+                    case FRAG_FILL:
+                        printf ("    Empty space (%u bytes)\n", F->Size);
+                        break;
 
-		    default:
-			Internal ("Invalid fragment type: %02X", F->Type);
-		}
-		F = F->Next;
-	    }
-    	}
+                    default:
+                        Internal ("Invalid fragment type: %02X", F->Type);
+                }
+                F = F->Next;
+            }
+        }
     }
 }
 
@@ -409,13 +409,13 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
  */
 {
     static const unsigned long U_Hi[4] = {
-       	0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
+        0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
     };
     static const long S_Hi[4] = {
-       	0x0000007FL, 0x00007FFFL, 0x007FFFFFL, 0x7FFFFFFFL
+        0x0000007FL, 0x00007FFFL, 0x007FFFFFL, 0x7FFFFFFFL
     };
     static const long S_Lo[4] = {
-       	~0x0000007FL, ~0x00007FFFL, ~0x007FFFFFL, ~0x7FFFFFFFL
+        ~0x0000007FL, ~0x00007FFFL, ~0x007FFFFFL, ~0x7FFFFFFFL
     };
 
 
@@ -427,15 +427,15 @@ unsigned SegWriteConstExpr (FILE* F, ExprNode* E, int Signed, unsigned Size)
 
     /* Check for a range error */
     if (Signed) {
-	if (Val > S_Hi[Size-1] || Val < S_Lo[Size-1]) {
-	    /* Range error */
-	    return SEG_EXPR_RANGE_ERROR;
-	}
+        if (Val > S_Hi[Size-1] || Val < S_Lo[Size-1]) {
+            /* Range error */
+            return SEG_EXPR_RANGE_ERROR;
+        }
     } else {
-	if (((unsigned long)Val) > U_Hi[Size-1]) {
-	    /* Range error */
-	    return SEG_EXPR_RANGE_ERROR;
-	}
+        if (((unsigned long)Val) > U_Hi[Size-1]) {
+            /* Range error */
+            return SEG_EXPR_RANGE_ERROR;
+        }
     }
 
     /* Write the value to the file */
@@ -465,81 +465,81 @@ void SegWrite (const char* TgtName, FILE* Tgt, Segment* S, SegWriteFunc F, void*
     for (I = 0; I < CollCount (&S->Sections); ++I) {
 
         Section*        Sec = CollAtUnchecked (&S->Sections, I);
-     	Fragment*       Frag;
+        Fragment*       Frag;
         unsigned char   FillVal;
 
         /* Output were this section is from */
         Print (stdout, 2, "      Section from \"%s\"\n", GetObjFileName (Sec->Obj));
 
-     	/* If we have fill bytes, write them now. Beware: If this is the
+        /* If we have fill bytes, write them now. Beware: If this is the
          * first section, the fill value is not considered part of the segment
          * and therefore taken from the memory area.
          */
         FillVal = (I == 0)? S->MemArea->FillVal : S->FillVal;
-       	Print (stdout, 2, "        Filling 0x%lx bytes with 0x%02x\n",
+        Print (stdout, 2, "        Filling 0x%lx bytes with 0x%02x\n",
                Sec->Fill, FillVal);
-     	WriteMult (Tgt, FillVal, Sec->Fill);
-     	Offs += Sec->Fill;
+        WriteMult (Tgt, FillVal, Sec->Fill);
+        Offs += Sec->Fill;
 
-     	/* Loop over all fragments in this section */
-     	Frag = Sec->FragRoot;
-     	while (Frag) {
+        /* Loop over all fragments in this section */
+        Frag = Sec->FragRoot;
+        while (Frag) {
 
             /* Output fragment data */
-     	    switch (Frag->Type) {
+            switch (Frag->Type) {
 
-     		case FRAG_LITERAL:
-     		    WriteData (Tgt, Frag->LitBuf, Frag->Size);
-     		    break;
+                case FRAG_LITERAL:
+                    WriteData (Tgt, Frag->LitBuf, Frag->Size);
+                    break;
 
-     		case FRAG_EXPR:
-     		case FRAG_SEXPR:
-		    Sign = (Frag->Type == FRAG_SEXPR);
-		    /* Call the users function and evaluate the result */
-		    switch (F (Frag->Expr, Sign, Frag->Size, Offs, Data)) {
+                case FRAG_EXPR:
+                case FRAG_SEXPR:
+                    Sign = (Frag->Type == FRAG_SEXPR);
+                    /* Call the users function and evaluate the result */
+                    switch (F (Frag->Expr, Sign, Frag->Size, Offs, Data)) {
 
-		   	case SEG_EXPR_OK:
-		   	    break;
+                        case SEG_EXPR_OK:
+                            break;
 
-		   	case SEG_EXPR_RANGE_ERROR:
-     		   	    Error ("Range error in module `%s', line %u",
-		   	    	   GetFragmentSourceName (Frag),
-		   	 	   GetFragmentSourceLine (Frag));
-		   	    break;
+                        case SEG_EXPR_RANGE_ERROR:
+                            Error ("Range error in module `%s', line %u",
+                                   GetFragmentSourceName (Frag),
+                                   GetFragmentSourceLine (Frag));
+                            break;
 
-		   	case SEG_EXPR_TOO_COMPLEX:
-     		   	    Error ("Expression too complex in module `%s', line %u",
-		   	    	   GetFragmentSourceName (Frag),
-		   	 	   GetFragmentSourceLine (Frag));
-			    break;
+                        case SEG_EXPR_TOO_COMPLEX:
+                            Error ("Expression too complex in module `%s', line %u",
+                                   GetFragmentSourceName (Frag),
+                                   GetFragmentSourceLine (Frag));
+                            break;
 
-     			case SEG_EXPR_INVALID:
-			    Error ("Invalid expression in module `%s', line %u",
-		   	    	   GetFragmentSourceName (Frag),
-		   	 	   GetFragmentSourceLine (Frag));
-			    break;
+                        case SEG_EXPR_INVALID:
+                            Error ("Invalid expression in module `%s', line %u",
+                                   GetFragmentSourceName (Frag),
+                                   GetFragmentSourceLine (Frag));
+                            break;
 
-			default:
-			    Internal ("Invalid return code from SegWriteFunc");
-		    }
-		    break;
+                        default:
+                            Internal ("Invalid return code from SegWriteFunc");
+                    }
+                    break;
 
-		case FRAG_FILL:
-		    WriteMult (Tgt, S->FillVal,	Frag->Size);
-		    break;
+                case FRAG_FILL:
+                    WriteMult (Tgt, S->FillVal, Frag->Size);
+                    break;
 
-		default:
-		    Internal ("Invalid fragment type: %02X", Frag->Type);
-	    }
+                default:
+                    Internal ("Invalid fragment type: %02X", Frag->Type);
+            }
 
-     	    /* Update the offset */
+            /* Update the offset */
             Print (stdout, 2, "        Fragment with 0x%x bytes\n",
                    Frag->Size);
-	    Offs += Frag->Size;
+            Offs += Frag->Size;
 
-	    /* Next fragment */
-	    Frag = Frag->Next;
-     	}
+            /* Next fragment */
+            Frag = Frag->Next;
+        }
     }
 }
 
@@ -562,12 +562,12 @@ static int CmpSegStart (const void* K1, const void* K2)
 
     /* Compare the start addresses */
     if (S1->PC > S2->PC) {
-     	return 1;
+        return 1;
     } else if (S1->PC < S2->PC) {
-	return -1;
+        return -1;
     } else {
-	/* Sort segments with equal starts by name */
-     	return strcmp (GetString (S1->Name), GetString (S2->Name));
+        /* Sort segments with equal starts by name */
+        return strcmp (GetString (S1->Name), GetString (S2->Name));
     }
 }
 
@@ -591,25 +591,25 @@ void PrintSegmentMap (FILE* F)
 
     /* Print a header */
     fprintf (F, "Name                   Start     End    Size  Align\n"
-     	       	"----------------------------------------------------\n");
+                "----------------------------------------------------\n");
 
     /* Print the segments */
     for (I = 0; I < CollCount (&SegmentList); ++I) {
 
-     	/* Get a pointer to the segment */
-       	Segment* S = SegPool[I];
+        /* Get a pointer to the segment */
+        Segment* S = SegPool[I];
 
-     	/* Print empty segments only if explicitly requested */
-     	if (VerboseMap || S->Size > 0) {
-     	    /* Print the segment data */
-     	    long End = S->PC + S->Size;
-     	    if (S->Size > 0) {
-     		/* Point to last element addressed */
-     	     	--End;
-     	    }
-     	    fprintf (F, "%-20s  %06lX  %06lX  %06lX  %05lX\n",
-       	       	     GetString (S->Name), S->PC, End, S->Size, S->Alignment);
-     	}
+        /* Print empty segments only if explicitly requested */
+        if (VerboseMap || S->Size > 0) {
+            /* Print the segment data */
+            long End = S->PC + S->Size;
+            if (S->Size > 0) {
+                /* Point to last element addressed */
+                --End;
+            }
+            fprintf (F, "%-20s  %06lX  %06lX  %06lX  %05lX\n",
+                     GetString (S->Name), S->PC, End, S->Size, S->Alignment);
+        }
     }
 
     /* Free the segment pool */
@@ -656,10 +656,10 @@ void CheckSegments (void)
         const Segment* S = CollAtUnchecked (&SegmentList, I);
 
         /* Check it */
-     	if (S->Size > 0 && S->Dumped == 0) {
-       	    Error ("Missing memory area assignment for segment `%s'",
+        if (S->Size > 0 && S->Dumped == 0) {
+            Error ("Missing memory area assignment for segment `%s'",
                    GetString (S->Name));
-	}
+        }
     }
 }
 

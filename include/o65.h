@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     o65.h				     */
+/*                                   o65.h                                   */
 /*                                                                           */
-/*		      Definitions for the o65 file format		     */
+/*                    Definitions for the o65 file format                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -57,9 +57,9 @@ typedef struct o65_header o65_header;
 struct o65_header {
     char        marker[2];      /* Non-C64 marker */
     char        magic[3];       /* o65 magic */
-    char        version;	/* Version number */
+    char        version;        /* Version number */
     unsigned    mode;           /* Mode word */
-    o65_size	tbase;          /* Original text (code) segment address */
+    o65_size    tbase;          /* Original text (code) segment address */
     o65_size    tlen;           /* Size of text (code) segment */
     o65_size    dbase;          /* Original data segment address */
     o65_size    dlen;           /* Size of data segment */
@@ -81,7 +81,7 @@ struct o65_header {
 #define O65_VERSION             0x00
 
 /* Defines for the mode word */
-#define O65_CPU_65816           0x8000 	/* Executable is for 65816 */
+#define O65_CPU_65816           0x8000  /* Executable is for 65816 */
 #define O65_CPU_6502            0x0000  /* Executable is for the 6502 */
 #define O65_CPU_MASK            0x8000  /* Mask to extract CPU type */
 
@@ -89,7 +89,7 @@ struct o65_header {
 #define O65_RELOC_BYTE          0x0000  /* Byte wise relocation */
 #define O65_RELOC_MASK          0x4000  /* Mask to extract relocation type */
 
-#define O65_SIZE_32BIT          0x2000 	/* All size words are 32bit */
+#define O65_SIZE_32BIT          0x2000  /* All size words are 32bit */
 #define O65_SIZE_16BIT          0x0000  /* All size words are 16bit */
 #define O65_SIZE_MASK           0x2000  /* Mask to extract size */
 
@@ -108,7 +108,7 @@ struct o65_header {
 #define O65_BSSZERO_MASK        0x0200  /* Mask to extract bss zero flag */
 
 /* The following is used if O65_CPU == 6502 */
-#define O65_CPU2_6502		0x0000  /* Executable is for 6502 */
+#define O65_CPU2_6502           0x0000  /* Executable is for 6502 */
 #define O65_CPU2_65C02          0x0010  /* Executable is for 65C02 */
 #define O65_CPU2_65SC02         0x0020  /* Executable is for 65SC02 */
 #define O65_CPU2_65CE02         0x0030  /* Executable is for 65CE02 */
@@ -131,12 +131,12 @@ struct o65_header {
                                  O65_ALIGN_1)
 
 /* The four o65 segment types. */
-#define O65_SEGID_UNDEF  	0x00
-#define O65_SEGID_ABS	        0x01
-#define O65_SEGID_TEXT   	0x02
-#define O65_SEGID_DATA	        0x03
-#define O65_SEGID_BSS	        0x04
-#define O65_SEGID_ZP 	        0x05
+#define O65_SEGID_UNDEF         0x00
+#define O65_SEGID_ABS           0x01
+#define O65_SEGID_TEXT          0x02
+#define O65_SEGID_DATA          0x03
+#define O65_SEGID_BSS           0x04
+#define O65_SEGID_ZP            0x05
 #define O65_SEGID_MASK          0x07
 
 /* Relocation type codes */
@@ -158,14 +158,14 @@ struct o65_header {
 
 /* Option tags */
 #define O65_OPT_FILENAME        0
-#define O65_OPT_OS     		1
-#define O65_OPT_ASM		2
-#define O65_OPT_AUTHOR		3
-#define O65_OPT_TIMESTAMP	4
+#define O65_OPT_OS              1
+#define O65_OPT_ASM             2
+#define O65_OPT_AUTHOR          3
+#define O65_OPT_TIMESTAMP       4
 
 /* Operating system codes for O65_OPT_OS */
-#define O65_OS_OSA65		1
-#define O65_OS_LUNIX		2
+#define O65_OS_OSA65            1
+#define O65_OS_LUNIX            2
 #define O65_OS_CC65             3
 #define O65_OS_OPENCBM          4
 

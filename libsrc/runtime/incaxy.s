@@ -4,14 +4,14 @@
 ; CC65 runtime: Increment ax by valie in y
 ;
 
-       	.export	       	incaxy, incax4
-	.importzp	tmp1
-	.macpack	generic
+        .export         incaxy, incax4
+        .importzp       tmp1
+        .macpack        generic
 
-incax4:	ldy	#4
-incaxy:	sty	tmp1
-       	add	tmp1
-       	bcc	@L9
-       	inx
-@L9:   	rts
+incax4: ldy     #4
+incaxy: sty     tmp1
+        add     tmp1
+        bcc     @L9
+        inx
+@L9:    rts
 

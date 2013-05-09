@@ -76,7 +76,7 @@ typedef unsigned char CharSet[32];      /* 256 bits */
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code	    			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -85,10 +85,10 @@ typedef unsigned char CharSet[32];      /* 256 bits */
 #define ESCAPE_CHAR     '\\'
 
 /* Utility macro used in RecursiveMatch */
-#define IncPattern()	Pattern++;			\
-			if (*Pattern == '\0') {		\
-			    return 0;			\
-			}
+#define IncPattern()    Pattern++;                      \
+                        if (*Pattern == '\0') {         \
+                            return 0;                   \
+                        }
 
 
 
@@ -98,10 +98,10 @@ static int RealChar (const unsigned char* Pattern)
  */
 {
     if (*Pattern == ESCAPE_CHAR) {
-	Pattern++;
-	return (*Pattern == '\0') ? -1 : *Pattern;
+        Pattern++;
+        return (*Pattern == '\0') ? -1 : *Pattern;
     } else {
-	return *Pattern;
+        return *Pattern;
     }
 }
 
@@ -115,107 +115,107 @@ static int RecursiveMatch (const unsigned char* Source, const unsigned char* Pat
 
     while (1) {
 
-	if (*Pattern == '\0') {
+        if (*Pattern == '\0') {
 
-	    /* Reached the end of Pattern, what about Source? */
-	    return (*Source == '\0') ? 1 : 0;
+            /* Reached the end of Pattern, what about Source? */
+            return (*Source == '\0') ? 1 : 0;
 
-	} else if (*Pattern == '*') {
+        } else if (*Pattern == '*') {
 
-	    if (*++Pattern == '\0') {
-		/* A trailing '*' is always a match */
-		return 1;
-	    }
+            if (*++Pattern == '\0') {
+                /* A trailing '*' is always a match */
+                return 1;
+            }
 
-	    /* Check the rest of the string */
-	    while (*Source) {
-		if (RecursiveMatch (Source++, Pattern)) {
-		    /* Match! */
-		    return 1;
-		}
-	    }
+            /* Check the rest of the string */
+            while (*Source) {
+                if (RecursiveMatch (Source++, Pattern)) {
+                    /* Match! */
+                    return 1;
+                }
+            }
 
-	    /* No match... */
-	    return 0;
+            /* No match... */
+            return 0;
 
-	} else if (*Source == '\0') {
+        } else if (*Source == '\0') {
 
-	    /* End of Source reached, no match */
-	    return 0;
+            /* End of Source reached, no match */
+            return 0;
 
-	} else {
+        } else {
 
-	    /* Check a single char. Build a set of all possible characters in
-  	     * CS, then check if the current char of Source is contained in
-	     * there.
+            /* Check a single char. Build a set of all possible characters in
+             * CS, then check if the current char of Source is contained in
+             * there.
              */
-	    CS_CLEAR (CS);      /* Clear the character set */
+            CS_CLEAR (CS);      /* Clear the character set */
 
-	    if (*Pattern == '?') {
+            if (*Pattern == '?') {
 
-	       	/* All chars are allowed */
-	       	CS_SETALL (CS);
-		++Pattern; 		       	/* Skip '?' */
+                /* All chars are allowed */
+                CS_SETALL (CS);
+                ++Pattern;                      /* Skip '?' */
 
-	    } else if (*Pattern == ESCAPE_CHAR) {
+            } else if (*Pattern == ESCAPE_CHAR) {
 
-		/* Use the next char as is */
-		IncPattern ();
-		CS_ADD (CS, *Pattern);
-		++Pattern;		       	/* Skip the character */
+                /* Use the next char as is */
+                IncPattern ();
+                CS_ADD (CS, *Pattern);
+                ++Pattern;                      /* Skip the character */
 
-	    } else if (*Pattern == '[') {
+            } else if (*Pattern == '[') {
 
-		/* A set follows */
-		int Invert = 0;
-		IncPattern ();
-		if (*Pattern == '!') {
-		    IncPattern ();
-		    Invert = 1;
-		}
-		while (*Pattern != ']') {
+                /* A set follows */
+                int Invert = 0;
+                IncPattern ();
+                if (*Pattern == '!') {
+                    IncPattern ();
+                    Invert = 1;
+                }
+                while (*Pattern != ']') {
 
-		    int C1;
-		    if ((C1 = RealChar (Pattern)) == -1) {
-		    	return 0;
-		    }
-		    IncPattern ();
-		    if (*Pattern != '-') {
-		       	CS_ADD (CS, C1);
-		    } else {
-			int C2;
+                    int C1;
+                    if ((C1 = RealChar (Pattern)) == -1) {
+                        return 0;
+                    }
+                    IncPattern ();
+                    if (*Pattern != '-') {
+                        CS_ADD (CS, C1);
+                    } else {
+                        int C2;
                         unsigned char C;
-			IncPattern ();
-			if ((C2 = RealChar (Pattern)) == -1) {
-			    return 0;
-			}
-			IncPattern ();
-			for (C = C1; C <= C2; C++) {
-			    CS_ADD (CS, C);
-			}
-		    }
-		}
+                        IncPattern ();
+                        if ((C2 = RealChar (Pattern)) == -1) {
+                            return 0;
+                        }
+                        IncPattern ();
+                        for (C = C1; C <= C2; C++) {
+                            CS_ADD (CS, C);
+                        }
+                    }
+                }
                 /* Skip ']' */
-		++Pattern;
-		if (Invert) {
+                ++Pattern;
+                if (Invert) {
                     /* Reverse all bits in the set */
-		    CS_INVERT (CS);
-		}
+                    CS_INVERT (CS);
+                }
 
-	    } else {
+            } else {
 
-		/* Include the char in the charset, then skip it */
-		CS_ADD (CS, *Pattern);
-		++Pattern;
+                /* Include the char in the charset, then skip it */
+                CS_ADD (CS, *Pattern);
+                ++Pattern;
 
-	    }
+            }
 
-       	    if (!CS_CONTAINS (CS, *Source)) {
-		/* No match */
-		return 0;
-	    }
-	    ++Source;
-	}
+            if (!CS_CONTAINS (CS, *Source)) {
+                /* No match */
+                return 0;
+            }
+            ++Source;
+        }
     }
 }
 
@@ -232,7 +232,7 @@ int MatchPattern (const char* Source, const char* Pattern)
 {
     /* Handle the trivial cases */
     if (Pattern == 0 || *Pattern == '\0') {
-	return (Source == 0 || *Source == '\0');
+        return (Source == 0 || *Source == '\0');
     }
 
     /* Do the real thing */

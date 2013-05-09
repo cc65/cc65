@@ -27,9 +27,9 @@ typedef int __fastcall__ (*ungetfunc) (int c, void* data);
  * file, so check this when altering the structure.
  */
 struct scanfdata {
-    getfunc	get;	/* Pointer to input routine */
-    ungetfunc	unget;	/* Pointer to pushback routine */
-    void*	data;	/* Pointer to struct. used outside of _scanf() */
+    getfunc     get;    /* Pointer to input routine */
+    ungetfunc   unget;  /* Pointer to pushback routine */
+    void*       data;   /* Pointer to struct. used outside of _scanf() */
 };
 
 

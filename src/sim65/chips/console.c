@@ -106,7 +106,7 @@ static const struct ChipData CData[] = {
         /* -- Exported functions -- */
         ScreenInitChip,
         ScreenCreateInstance,
-	ScreenDestroyInstance,
+        ScreenDestroyInstance,
         ScreenWrite,
         ScreenWrite,
         ScreenRead,
@@ -624,7 +624,7 @@ static void ScreenEventLoop (void)
         switch (Event.type) {
 
             case Expose:
-		/* Calculate the area to redraw, then update the screen */
+                /* Calculate the area to redraw, then update the screen */
                 X1 = Event.xexpose.x;
                 Y1 = Event.xexpose.y;
                 X2 = Event.xexpose.x + Event.xexpose.width - 1;

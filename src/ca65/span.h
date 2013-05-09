@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*	   	    		     Data   				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -61,7 +61,7 @@ typedef struct Span Span;
 struct Span{
     HashNode        Node;               /* Node for hash table */
     unsigned        Id;                 /* Id of span */
-    struct Segment* Seg;       	       	/* Pointer to segment */
+    struct Segment* Seg;                /* Pointer to segment */
     unsigned        Start;              /* Start of range */
     unsigned        End;                /* End of range */
     unsigned        Type;               /* Type of data in span */
@@ -70,7 +70,7 @@ struct Span{
 
 
 /*****************************************************************************/
-/*     	       	      	   	     Code   				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

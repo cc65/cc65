@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   cbm510.h                                  */
+/*                                 cbm510.h                                  */
 /*                                                                           */
-/*	       System specific definitions for the CBM5x0 / P500             */
+/*             System specific definitions for the CBM5x0 / P500             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,68 +46,68 @@
 
 
 /*****************************************************************************/
-/*                                   Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Additional key defines */
-#define CH_F1			224
-#define CH_F2			225
-#define CH_F3			226
-#define CH_F4			227
-#define CH_F5			228
-#define CH_F6			229
-#define CH_F7			230
-#define CH_F8			231
-#define CH_F9			232
-#define CH_F10			233
-#define CH_F11			234
-#define CH_F12			235
-#define CH_F13			236
-#define CH_F14			237
-#define CH_F15			238
-#define CH_F16			239
-#define CH_F17			240
-#define CH_F18			241
-#define CH_F19			242
-#define CH_F20			243
+#define CH_F1                   224
+#define CH_F2                   225
+#define CH_F3                   226
+#define CH_F4                   227
+#define CH_F5                   228
+#define CH_F6                   229
+#define CH_F7                   230
+#define CH_F8                   231
+#define CH_F9                   232
+#define CH_F10                  233
+#define CH_F11                  234
+#define CH_F12                  235
+#define CH_F13                  236
+#define CH_F14                  237
+#define CH_F15                  238
+#define CH_F16                  239
+#define CH_F17                  240
+#define CH_F18                  241
+#define CH_F19                  242
+#define CH_F20                  243
 
 /* Color defines */
-#define COLOR_BLACK  	       	0x00
-#define COLOR_WHITE  	       	0x01
-#define COLOR_RED    	       	0x02
-#define COLOR_CYAN      	0x03
-#define COLOR_VIOLET 	       	0x04
+#define COLOR_BLACK             0x00
+#define COLOR_WHITE             0x01
+#define COLOR_RED               0x02
+#define COLOR_CYAN              0x03
+#define COLOR_VIOLET            0x04
 #define COLOR_PURPLE            COLOR_VIOLET
-#define COLOR_GREEN  	       	0x05
-#define COLOR_BLUE   	       	0x06
-#define COLOR_YELLOW 	       	0x07
-#define COLOR_ORANGE 	       	0x08
-#define COLOR_BROWN  	       	0x09
-#define COLOR_LIGHTRED       	0x0A
-#define COLOR_GRAY1  	       	0x0B
-#define COLOR_GRAY2  	       	0x0C
-#define COLOR_LIGHTGREEN     	0x0D
-#define COLOR_LIGHTBLUE      	0x0E
-#define COLOR_GRAY3  	       	0x0F
+#define COLOR_GREEN             0x05
+#define COLOR_BLUE              0x06
+#define COLOR_YELLOW            0x07
+#define COLOR_ORANGE            0x08
+#define COLOR_BROWN             0x09
+#define COLOR_LIGHTRED          0x0A
+#define COLOR_GRAY1             0x0B
+#define COLOR_GRAY2             0x0C
+#define COLOR_LIGHTGREEN        0x0D
+#define COLOR_LIGHTBLUE         0x0E
+#define COLOR_GRAY3             0x0F
 
 /* Define hardware */
 #include <_vic2.h>
-#define VIC    	(*(struct __vic2*)0xD800)
+#define VIC     (*(struct __vic2*)0xD800)
 
 #include <_sid.h>
-#define	SID	(*(struct __sid*)0xDA00)
+#define SID     (*(struct __sid*)0xDA00)
 
 #include <_6526.h>
-#define CIA	(*(struct __6526*)0xDC00)
+#define CIA     (*(struct __6526*)0xDC00)
 
 #include <_6551.h>
-#define ACIA	(*(struct __6551*)0xDD00)
+#define ACIA    (*(struct __6551*)0xDD00)
 
 #include <_6525.h>
-#define TPI1	(*(struct __6525*)0xDE00)
-#define TPI2	(*(struct __6525*)0xDF00)
+#define TPI1    (*(struct __6525*)0xDE00)
+#define TPI2    (*(struct __6525*)0xDF00)
 
 
 
@@ -119,13 +119,13 @@
 
 /* The addresses of the static drivers */
 extern void cbm510_ram_emd[];
-extern void cbm510_std_joy[];	/* Referred to by joy_static_stddrv[] */
+extern void cbm510_std_joy[];   /* Referred to by joy_static_stddrv[] */
 extern void cbm510_std_ser[];
 
 
 
 /*****************************************************************************/
-/*                                   Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

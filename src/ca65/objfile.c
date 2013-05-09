@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objfile.c				     */
+/*                                 objfile.c                                 */
 /*                                                                           */
-/*	   Object file writing routines for the ca65 macroassembler	     */
+/*         Object file writing routines for the ca65 macroassembler          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -59,7 +59,7 @@
 static FILE* F = 0;
 
 /* Default extension */
-#define	OBJ_EXT	".o"
+#define OBJ_EXT ".o"
 
 /* Header structure */
 static ObjHeader Header = {
@@ -93,7 +93,7 @@ static ObjHeader Header = {
 
 
 /*****************************************************************************/
-/*			   Internally used functions   			     */
+/*                         Internally used functions                         */
 /*****************************************************************************/
 
 
@@ -151,7 +151,7 @@ static void ObjWriteHeader (void)
 
 
 /*****************************************************************************/
-/*     	      	      	      	     Code		  		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -161,16 +161,16 @@ void ObjOpen (void)
 {
     /* Do we have a name for the output file? */
     if (OutFile == 0) {
-     	/* We don't have an output name explicitly given, construct one from
-     	 * the name of the input file.
-     	 */
-	OutFile = MakeFilename (InFile, OBJ_EXT);
+        /* We don't have an output name explicitly given, construct one from
+         * the name of the input file.
+         */
+        OutFile = MakeFilename (InFile, OBJ_EXT);
     }
 
     /* Create the output file */
     F = fopen (OutFile, "w+b");
     if (F == 0) {
- 	Fatal ("Cannot open output file `%s': %s", OutFile, strerror (errno));
+        Fatal ("Cannot open output file `%s': %s", OutFile, strerror (errno));
     }
 
     /* Write a dummy header */
@@ -184,7 +184,7 @@ void ObjClose (void)
 {
     /* Go back to the beginning */
     if (fseek (F, 0, SEEK_SET) != 0) {
-	ObjWriteError ();
+        ObjWriteError ();
     }
 
     /* If we have debug infos, set the flag in the header */
@@ -197,7 +197,7 @@ void ObjClose (void)
 
     /* Close the file */
     if (fclose (F) != 0) {
-	ObjWriteError ();
+        ObjWriteError ();
     }
 }
 
@@ -229,7 +229,7 @@ void ObjWrite8 (unsigned V)
 /* Write an 8 bit value to the file */
 {
     if (putc (V, F) == EOF) {
-	ObjWriteError ();
+        ObjWriteError ();
     }
 }
 
@@ -274,12 +274,12 @@ void ObjWriteVar (unsigned long V)
      * needing 5 bytes if a 32 bit value is written to file.
      */
     do {
-	unsigned char C = (V & 0x7F);
-	V >>= 7;
-	if (V) {
-	    C |= 0x80;
-	}
-	ObjWrite8 (C);
+        unsigned char C = (V & 0x7F);
+        V >>= 7;
+        if (V) {
+            C |= 0x80;
+        }
+        ObjWrite8 (C);
     } while (V != 0);
 }
 
@@ -317,7 +317,7 @@ void ObjWriteData (const void* Data, unsigned Size)
 /* Write literal data to the file */
 {
     if (fwrite (Data, 1, Size, F) != Size) {
-     	ObjWriteError ();
+        ObjWriteError ();
     }
 }
 
@@ -330,8 +330,8 @@ void ObjWritePos (const FilePos* Pos)
     ObjWriteVar (Pos->Line);
     ObjWriteVar (Pos->Col);
     if (Pos->Name == 0) {
- 	/* Position is outside file scope, use the main file instead */
- 	ObjWriteVar (0);
+        /* Position is outside file scope, use the main file instead */
+        ObjWriteVar (0);
     } else {
         ObjWriteVar (Pos->Name - 1);
     }

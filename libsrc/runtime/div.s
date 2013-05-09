@@ -7,15 +7,15 @@
 ; When negating values, we will ignore the possibility here, that one of the
 ; values if $8000, in which case the negate will fail.
 
-       	.export		tosdiva0, tosdivax
-	.import		popsargs, udiv16, negax
-	.importzp	sreg, tmp1, tmp2
+        .export         tosdiva0, tosdivax
+        .import         popsargs, udiv16, negax
+        .importzp       sreg, tmp1, tmp2
 
 tosdiva0:
-      	ldx	#0
+        ldx     #0
 tosdivax:
-	jsr	popsargs	; Get arguments from stack, adjust sign
-      	jsr	udiv16		; Do the division
+        jsr     popsargs        ; Get arguments from stack, adjust sign
+        jsr     udiv16          ; Do the division
         ldx     sreg+1          ; Load high byte of result
 
 ; Adjust the sign of the result. tmp1 contains the high byte of the left

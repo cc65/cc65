@@ -36,23 +36,23 @@
 
 
 /*****************************************************************************/
-/*	       	   	  	     Data	   			     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 struct DIR {
-    int	          fd;
+    int           fd;
     unsigned char entry_length;
     unsigned char entries_per_block;
     unsigned char current_entry;
     union {
-	unsigned char bytes[512];
-	struct {
-	    unsigned      prev_block;
-	    unsigned      next_block;
-	    unsigned char entries[1];
-	} content;
+        unsigned char bytes[512];
+        struct {
+            unsigned      prev_block;
+            unsigned      next_block;
+            unsigned char entries[1];
+        } content;
     } block;
 };
 

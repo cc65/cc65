@@ -5,15 +5,15 @@
 
 ; char VerifyRAM (char REUBank, int length, char *reuaddy, char *cpuaddy);
 
-	    .import REURegs
-	    .export _VerifyRAM
+            .import REURegs
+            .export _VerifyRAM
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _VerifyRAM:
-	jsr REURegs
-	jsr VerifyRAM
-	txa
-	ldx #0
-	rts
+        jsr REURegs
+        jsr VerifyRAM
+        txa
+        ldx #0
+        rts

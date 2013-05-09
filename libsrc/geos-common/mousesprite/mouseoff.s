@@ -5,8 +5,8 @@
 
 ; void MouseOff (void);
 
-	    .export _MouseOff
+            .export _MouseOff
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_MouseOff	= MouseOff
+_MouseOff       = MouseOff

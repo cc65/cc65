@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  chartype.h				     */
+/*                                chartype.h                                 */
 /*                                                                           */
-/*		      Character classification functions		     */
+/*                    Character classification functions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -80,7 +80,7 @@ INLINE int IsControl (char C)
     return iscntrl ((unsigned char) C);
 }
 #else
-#  define IsControl(C) 	       	iscntrl (C)
+#  define IsControl(C)          iscntrl (C)
 #endif
 
 int IsSpace (char C);

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		       		   reginfo.h                                 */
+/*                                 reginfo.h                                 */
 /*                                                                           */
-/*		       	  6502 register tracking info                        */
+/*                        6502 register tracking info                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*  	       	   	       	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -57,28 +57,28 @@
 /* Register contents */
 typedef struct RegContents RegContents;
 struct RegContents {
-    short      	RegA;
+    short       RegA;
     short       RegX;
     short       RegY;
     short       SRegLo;
     short       SRegHi;
     short       Ptr1Lo;
     short       Ptr1Hi;
-    short	Tmp1;
+    short       Tmp1;
 };
 
 /* Register change info */
 typedef struct RegInfo RegInfo;
 struct RegInfo {
-    RegContents	In;             /* Incoming register values */
+    RegContents In;             /* Incoming register values */
     RegContents Out;            /* Outgoing register values */
-    RegContents Out2;		/* Alternative outgoing reg values for branches */
+    RegContents Out2;           /* Alternative outgoing reg values for branches */
 };
 
 
 
 /*****************************************************************************/
-/*     	       	      	   	     Code		    		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

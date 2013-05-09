@@ -17,7 +17,7 @@
 
 ; Store the length of the name into the zero page
 
-	sta     FNAM_LEN
+        sta     FNAM_LEN
 
 ; Check if we have to copy the name to low memory
 

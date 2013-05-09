@@ -22,11 +22,11 @@
 ; TO-DO:
 ; Add a control-character quoting mechanism.
 
-        .constructor	initmainargs, 24
-        .import		__argc, __argv, __dos_type
+        .constructor    initmainargs, 24
+        .import         __argc, __argv, __dos_type
 
-        .include	"zeropage.inc"
-        .include	"apple2.inc"
+        .include        "zeropage.inc"
+        .include        "apple2.inc"
 
 ; Maximum number of arguments allowed in the argument table.
 ; (An argument contains a comma, at least.)
@@ -44,7 +44,7 @@ BUF_LEN = 122
 BASIC_BUF = $200
 FNAM_LEN  = $280
 FNAM      = $281
-REM       = $B2			; BASIC token-code
+REM       = $B2                 ; BASIC token-code
 
 ; Get possible command-line arguments. Goes into the special INIT segment,
 ; which may be reused after the startup code is run.
@@ -56,25 +56,25 @@ initmainargs:
 ; Assume that the program was loaded, a moment ago, by the traditional BLOAD
 ; statement of BASIC.SYSTEM. Save the filename as argument #0 if available.
 
-        ldx	__dos_type	; No ProDOS -> argv[0] = ""
-        beq	:+
+        ldx     __dos_type      ; No ProDOS -> argv[0] = ""
+        beq     :+
 
 ; Terminate the filename with a zero to make it a valid C string.
 
-        ldx	FNAM_LEN
-:       lda	#$00
-        sta	FNAM,x
+        ldx     FNAM_LEN
+:       lda     #$00
+        sta     FNAM,x
 
-        inc	__argc		; argc always is equal to, at least, 1
+        inc     __argc          ; argc always is equal to, at least, 1
 
 ; Find the "rem" token.
 
-        ldx	#$00
-:       lda	BASIC_BUF,x
-        beq	done		; No "rem" -> no args
+        ldx     #$00
+:       lda     BASIC_BUF,x
+        beq     done            ; No "rem" -> no args
         inx
-        cmp	#REM
-        bne	:-
+        cmp     #REM
+        bne     :-
 
 ; If a clock is present it is called by ProDOS on file operations. On machines
 ; with a slot-based clock (like the Thunder Clock) the clock firmware places
@@ -82,18 +82,18 @@ initmainargs:
 ; of the command-line in a different buffer before the original is potentially
 ; destroyed.
 
-	ldy	#$00
-:	lda	BASIC_BUF,x
-	sta	buffer,y
-	inx
-	iny
-	cpy	#BUF_LEN - 1	; Keep the terminating zero intact
-	bcc	:-
+        ldy     #$00
+:       lda     BASIC_BUF,x
+        sta     buffer,y
+        inx
+        iny
+        cpy     #BUF_LEN - 1    ; Keep the terminating zero intact
+        bcc     :-
 
 ; Start processing the arguments.
 
-	ldx	#$00
-	ldy	#$01 * 2	; Start with argv[1]
+        ldx     #$00
+        ldy     #$01 * 2        ; Start with argv[1]
 
 ; Find the next argument. Stop if the end of the string or a character with the
 ; hibit set is reached. The later is true if the string isn't already parsed by
@@ -105,65 +105,65 @@ initmainargs:
 ; for the REM token we stumbled across the first '2' character ($32+$80 = $B2)
 ; and interpreted the rest of the date as a spurious command-line parameter.
 
-next:   lda	buffer,x
-        beq	done
-        bmi	done
+next:   lda     buffer,x
+        beq     done
+        bmi     done
         inx
-        cmp	#' '		; Skip leading spaces
-        beq	next
+        cmp     #' '            ; Skip leading spaces
+        beq     next
 
 ; Found start of next argument. We've incremented the pointer in X already, so
 ; it points to the second character of the argument. This is useful since we
 ; will check now for a quoted argument, in which case we will have to skip this
 ; first character.
 
-        cmp	#'"'		; Is the argument quoted?
-        beq	:+		; Jump if so
-        dex			; Reset pointer to first argument character
-        lda	#' '		; A space ends the argument
-:       sta     tmp1		; Set end of argument marker
+        cmp     #'"'            ; Is the argument quoted?
+        beq     :+              ; Jump if so
+        dex                     ; Reset pointer to first argument character
+        lda     #' '            ; A space ends the argument
+:       sta     tmp1            ; Set end of argument marker
 
 ; Now store a pointer to the argument into the next slot.
 
-        txa			; Get low byte
+        txa                     ; Get low byte
         clc
-        adc	#<buffer
-        sta	argv,y		; argv[y] = &arg
+        adc     #<buffer
+        sta     argv,y          ; argv[y] = &arg
         iny
-        lda	#$00
-        adc	#>buffer
-        sta	argv,y
+        lda     #$00
+        adc     #>buffer
+        sta     argv,y
         iny
-        inc	__argc		; Found another arg
+        inc     __argc          ; Found another arg
 
 ; Search for the end of the argument.
 
 :       lda     buffer,x
-        beq	done
+        beq     done
         inx
-        cmp	tmp1
-        bne	:-
+        cmp     tmp1
+        bne     :-
 
 ; We've found the end of the argument. X points one character behind it, and
 ; A contains the terminating character. To make the argument a valid C string,
 ; replace the terminating character by a zero.
 
-        lda	#$00
-        sta	buffer-1,x
+        lda     #$00
+        sta     buffer-1,x
 
 ; Check if the maximum number of command-line arguments is reached. If not,
 ; parse the next one.
 
-        lda	__argc		; Get low byte of argument count
-        cmp	#MAXARGS	; Maximum number of arguments reached?
-        bcc	next		; Parse next one if not
+        lda     __argc          ; Get low byte of argument count
+        cmp     #MAXARGS        ; Maximum number of arguments reached?
+        bcc     next            ; Parse next one if not
 
 ; (The last vector in argv[] already is NULL.)
 
-done:   lda	#<argv
-        ldx	#>argv
-        sta	__argv
-        stx	__argv+1
+done:   lda     #<argv
+        ldx     #>argv
+        sta     __argv
+        stx     __argv+1
         rts
 
 ; This array is zeroed before initmainargs is called.
@@ -171,9 +171,9 @@ done:   lda	#<argv
 
         .data
 
-argv:   .addr	FNAM
-        .res	MAXARGS * 2
+argv:   .addr   FNAM
+        .res    MAXARGS * 2
 
-	.bss
+        .bss
 
-buffer:	.res	BUF_LEN
+buffer: .res    BUF_LEN

@@ -84,7 +84,7 @@ static unsigned long GetCycles (void* Data);
 
 
 /*****************************************************************************/
-/*     		    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -95,23 +95,23 @@ static const SimData* Sim;
 /* 6502 CPU registers */
 typedef struct CPURegs CPURegs;
 struct CPURegs {
-    unsigned    AC;		/* Accumulator */
-    unsigned    XR;		/* X register */
-    unsigned    YR;		/* Y register */
+    unsigned    AC;             /* Accumulator */
+    unsigned    XR;             /* X register */
+    unsigned    YR;             /* Y register */
     unsigned    ZR;             /* Z register */
-    unsigned    SR;		/* Status register */
-    unsigned    SP;		/* Stackpointer */
-    unsigned	PC;		/* Program counter */
+    unsigned    SR;             /* Status register */
+    unsigned    SP;             /* Stackpointer */
+    unsigned    PC;             /* Program counter */
 };
 
 /* Status register bits */
-#define CF	0x01		/* Carry flag */
-#define ZF	0x02		/* Zero flag */
-#define IF	0x04		/* Interrupt flag */
-#define DF	0x08		/* Decimal flag */
-#define BF	0x10   		/* Break flag */
-#define OF	0x40		/* Overflow flag */
-#define SF	0x80		/* Sign flag */
+#define CF      0x01            /* Carry flag */
+#define ZF      0x02            /* Zero flag */
+#define IF      0x04            /* Interrupt flag */
+#define DF      0x08            /* Decimal flag */
+#define BF      0x10            /* Break flag */
+#define OF      0x40            /* Overflow flag */
+#define SF      0x80            /* Sign flag */
 
 /* Type of an opcode handler function */
 struct CPUInstance;
@@ -172,7 +172,7 @@ struct CPUInstance {
 
 
 /*****************************************************************************/
-/*  		   	  Helper functions and macros			     */
+/*                        Helper functions and macros                        */
 /*****************************************************************************/
 
 
@@ -205,8 +205,8 @@ struct CPUInstance {
 #define TEST_CF(v)      SET_CF (((v) & 0xFF00) != 0)
 
 /* Program counter halves */
-#define PCL	       	(D->Regs.PC & 0xFF)
-#define PCH		((D->Regs.PC >> 8) & 0xFF)
+#define PCL             (D->Regs.PC & 0xFF)
+#define PCH             ((D->Regs.PC >> 8) & 0xFF)
 
 /* Stack operations */
 #define PUSH(Val)       MemWriteByte (D->StackPage + D->Regs.SP--, Val)
@@ -2909,7 +2909,7 @@ static const OPFunc OP65C02Table[256] = {
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

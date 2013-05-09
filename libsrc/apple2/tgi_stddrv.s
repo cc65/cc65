@@ -6,13 +6,13 @@
 ; const char tgi_stddrv[];
 ;
 
-        .export	_tgi_stddrv
+        .export _tgi_stddrv
 
 .rodata
 
 _tgi_stddrv:
-        .ifdef	__APPLE2ENH__
-        .asciiz	"A2E.HI.TGI"
+        .ifdef  __APPLE2ENH__
+        .asciiz "A2E.HI.TGI"
         .else
-        .asciiz	"A2.HI.TGI"
+        .asciiz "A2.HI.TGI"
         .endif

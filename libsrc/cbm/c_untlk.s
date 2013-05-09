@@ -4,7 +4,7 @@
 ; void cbm_untlk (void);
 ;
 
-       	.export	       	_cbm_untlk
+        .export         _cbm_untlk
         .import         UNTLK
 
 

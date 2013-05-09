@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    ctype.h				     */
+/*                                  ctype.h                                  */
 /*                                                                           */
-/*			      Character handling			     */
+/*                            Character handling                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -41,21 +41,21 @@
 extern unsigned char _ctype[256];
 
 /* Bits used to specify character classes */
-#define _CT_LOWER      	0x01   	/* 0 - Lower case char */
-#define _CT_UPPER   	0x02   	/* 1 - Upper case char */
-#define _CT_DIGIT   	0x04	/* 2 - Numeric digit */
-#define _CT_XDIGIT     	0x08	/* 3 - Hex digit (both lower and upper) */
-#define _CT_CNTRL      	0x10	/* 4 - Control character */
-#define _CT_SPACE   	0x20	/* 5 - The space character itself */
-#define _CT_OTHER_WS	0x40 	/* 6 - Other whitespace ('\f', '\n', '\r', '\t', and '\v') */
-#define _CT_SPACE_TAB	0x80 	/* 7 - Space or tab character */
+#define _CT_LOWER       0x01    /* 0 - Lower case char */
+#define _CT_UPPER       0x02    /* 1 - Upper case char */
+#define _CT_DIGIT       0x04    /* 2 - Numeric digit */
+#define _CT_XDIGIT      0x08    /* 3 - Hex digit (both lower and upper) */
+#define _CT_CNTRL       0x10    /* 4 - Control character */
+#define _CT_SPACE       0x20    /* 5 - The space character itself */
+#define _CT_OTHER_WS    0x40    /* 6 - Other whitespace ('\f', '\n', '\r', '\t', and '\v') */
+#define _CT_SPACE_TAB   0x80    /* 7 - Space or tab character */
 
 /* Bit combinations */
-#define _CT_ALNUM      	(_CT_LOWER | _CT_UPPER | _CT_DIGIT)
-#define _CT_ALPHA 	(_CT_LOWER | _CT_UPPER)
-#define _CT_NOT_GRAPH	(_CT_CNTRL | _CT_SPACE)
+#define _CT_ALNUM       (_CT_LOWER | _CT_UPPER | _CT_DIGIT)
+#define _CT_ALPHA       (_CT_LOWER | _CT_UPPER)
+#define _CT_NOT_GRAPH   (_CT_CNTRL | _CT_SPACE)
 #define _CT_NOT_PRINT   (_CT_CNTRL)
-#define _CT_NOT_PUNCT	(_CT_SPACE | _CT_CNTRL | _CT_DIGIT | _CT_UPPER | _CT_LOWER)
+#define _CT_NOT_PUNCT   (_CT_SPACE | _CT_CNTRL | _CT_DIGIT | _CT_UPPER | _CT_LOWER)
 #define _CT_WS          (_CT_SPACE | _CT_OTHER_WS)
 
 /* Character classification functions */
@@ -71,11 +71,11 @@ int __fastcall__ isspace (int c);
 int __fastcall__ isupper (int c);
 int __fastcall__ isxdigit (int c);
 #if __CC65_STD__ >= __CC65_STD_C99__
-int __fastcall__ isblank (int c);      	/* New in C99 */
+int __fastcall__ isblank (int c);       /* New in C99 */
 #endif
 
-int __fastcall__ toupper (int c); 	/* Always external */
-int __fastcall__ tolower (int c); 	/* Always external */
+int __fastcall__ toupper (int c);       /* Always external */
+int __fastcall__ tolower (int c);       /* Always external */
 
 #if __CC65_STD__ >= __CC65_STD_CC65__
 unsigned char __fastcall__ toascii (unsigned char c);
@@ -95,83 +95,83 @@ unsigned char __fastcall__ toascii (unsigned char c);
 
 #define isalnum(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-      	       	    __asm__ ("lda %v,y", _ctype),       \
-      	       	    __asm__ ("and #%b", _CT_ALNUM),     \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_ALNUM),     \
                     __AX__)
 
 #define isalpha(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-      	       	    __asm__ ("lda %v,y", _ctype),       \
-      	       	    __asm__ ("and #%b", _CT_ALPHA),     \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_ALPHA),     \
                     __AX__)
 
 #if __CC65_STD__ >= __CC65_STD_C99__
 #define isblank(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-      	       	    __asm__ ("lda %v,y", _ctype),       \
-      	       	    __asm__ ("and #%b", _CT_SPACE_TAB), \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_SPACE_TAB), \
                     __AX__)
 #endif
 
 #define iscntrl(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-      	       	    __asm__ ("lda %v,y", _ctype),       \
-      	       	    __asm__ ("and #%b", _CT_CNTRL),     \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_CNTRL),     \
                     __AX__)
 
 #define isdigit(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-      	       	    __asm__ ("lda %v,y", _ctype),       \
-      	       	    __asm__ ("and #%b", _CT_DIGIT),     \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_DIGIT),     \
                     __AX__)
 
 #define isgraph(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-	       	    __asm__ ("lda %v,y", _ctype),       \
-		    __asm__ ("and #%b", _CT_NOT_GRAPH), \
-	       	    __asm__ ("cmp #1"),                 \
-	       	    __asm__ ("lda #1"),                 \
-	       	    __asm__ ("sbc #1"),                 \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_NOT_GRAPH), \
+                    __asm__ ("cmp #1"),                 \
+                    __asm__ ("lda #1"),                 \
+                    __asm__ ("sbc #1"),                 \
                     __AX__)
 
 #define islower(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("and #%b", _CT_LOWER),     \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_LOWER),     \
                     __AX__)
 
 #define isprint(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("and #%b", _CT_NOT_PRINT), \
-	       	    __asm__ ("eor #%b", _CT_NOT_PRINT), \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_NOT_PRINT), \
+                    __asm__ ("eor #%b", _CT_NOT_PRINT), \
                     __AX__)
 
 #define ispunct(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("and #%b", _CT_NOT_PUNCT), \
-	       	    __asm__ ("cmp #1"),                 \
-	       	    __asm__ ("lda #1"),                 \
-	       	    __asm__ ("sbc #1"),                 \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_NOT_PUNCT), \
+                    __asm__ ("cmp #1"),                 \
+                    __asm__ ("lda #1"),                 \
+                    __asm__ ("sbc #1"),                 \
                     __AX__)
 
 #define isspace(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("and #%b", _CT_WS),        \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_WS),        \
                     __AX__)
 
 #define isupper(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("and #%b", _CT_UPPER),     \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_UPPER),     \
                     __AX__)
 
 #define isxdigit(c) (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
-	       	    __asm__ ("lda %v,y", _ctype),       \
-	       	    __asm__ ("and #%b", _CT_XDIGIT),    \
+                    __asm__ ("lda %v,y", _ctype),       \
+                    __asm__ ("and #%b", _CT_XDIGIT),    \
                     __AX__)
 
 #endif

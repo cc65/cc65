@@ -4,9 +4,9 @@
 ; Based on Stephen L. Judds GRLIB code
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"tgi-kernel.inc"
+        .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
 
@@ -39,7 +39,7 @@
         .addr   UNINSTALL
         .addr   INIT
         .addr   DONE
-       	.addr   GETERROR
+        .addr   GETERROR
         .addr   CONTROL
         .addr   CLEAR
         .addr   SETVIEWPAGE
@@ -82,7 +82,7 @@ OLDCHUNK        := X2+1         ; Dito
 
 .bss
 
-ERROR:  	.res	1     	; Error code
+ERROR:          .res    1       ; Error code
 PALETTE:        .res    2       ; The current palette
 
 BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
@@ -117,7 +117,7 @@ BITCHUNK:       .byte   $FF,$7F,$3F,$1F,$0F,$07,$03,$01
 
 CHARROM         := $D000                ; Character rom base address
 CBASE           := $D000                ; Color memory base address
-VBASE  	       	:= $E000                ; Video memory base address
+VBASE           := $E000                ; Video memory base address
 
 
 .code
@@ -177,10 +177,10 @@ INIT:
 
         lda     $D018
         sta     OLDD018
-        lda     #$48         	; Set color map to $D000, screen to $E000
+        lda     #$48            ; Set color map to $D000, screen to $E000
         sta     $D018
 
-        lda     $D011        	; And turn on bitmap
+        lda     $D011           ; And turn on bitmap
         ora     #$20
 DONE1:  sta     $D011
 
@@ -217,9 +217,9 @@ DONE:   lda     $DD02           ; Set the data direction regs
 ; GETERROR: Return the error code in A and clear it.
 
 GETERROR:
-       	ldx	#TGI_ERR_OK
-	lda	ERROR
-	stx	ERROR
+        ldx     #TGI_ERR_OK
+        lda     ERROR
+        stx     ERROR
         rts
 
 ; ------------------------------------------------------------------------
@@ -229,8 +229,8 @@ GETERROR:
 ;
 
 CONTROL:
-	lda	#TGI_ERR_INV_FUNC
-	sta	ERROR
+        lda     #TGI_ERR_INV_FUNC
+        sta     ERROR
         rts
 
 ; ------------------------------------------------------------------------
@@ -340,22 +340,22 @@ SETPALETTE:
 ; Initialize the color map with the new color settings (it is below the
 ; I/O area)
 
-       	ldy	#$00
-       	sei
-       	lda	$01	     	; Get ROM config
-       	pha	   	     	; Save it
-       	and    	#%11111100      ; Clear bit 0 and 1
-       	sta	$01
-       	txa                     ; Load color code
-@L2:    sta	CBASE+$0000,y
-   	sta	CBASE+$0100,y
-   	sta	CBASE+$0200,y
-   	sta	CBASE+$0300,y
-   	iny
-   	bne	@L2
-   	pla
-   	sta	$01
-  	cli
+        ldy     #$00
+        sei
+        lda     $01             ; Get ROM config
+        pha                     ; Save it
+        and     #%11111100      ; Clear bit 0 and 1
+        sta     $01
+        txa                     ; Load color code
+@L2:    sta     CBASE+$0000,y
+        sta     CBASE+$0100,y
+        sta     CBASE+$0200,y
+        sta     CBASE+$0300,y
+        iny
+        bne     @L2
+        pla
+        sta     $01
+        cli
 
 ; Done, reset the error code
 
@@ -664,7 +664,7 @@ XFIXC:  sta     TEMP
         bmi     @C1          ;Skip if column is negative
         cmp     #39          ;End if move past end of screen
         bcs     EXIT
-@C1:  	lda     POINT
+@C1:    lda     POINT
         adc     #8
         sta     POINT
         bcc     @CONT
@@ -734,7 +734,7 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
         bmi     @C1          ;If negative, then don't update
         cmp     #24
         bcs     @TOAST       ;If at bottom of screen then quit
-@C1:   	lda     POINT
+@C1:    lda     POINT
         adc     #<320
         sta     POINT
         lda     POINT+1
@@ -790,7 +790,7 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
 ; the original C wrapper and could be written much smaller (besides that,
 ; calling LINE is not a good idea either).
 
-BAR:	lda     Y2
+BAR:    lda     Y2
         sta     Y2SAVE
         lda     Y2+1
         sta     Y2SAVE+1
@@ -810,11 +810,11 @@ BAR:	lda     Y2
         lda     X1+1
         sta     X1SAVE+1
 
-@L1:	lda     Y1
+@L1:    lda     Y1
         sta     Y2
         lda     Y1+1
         sta     Y2+1
-	jsr     LINE
+        jsr     LINE
 
         lda     Y1SAVE
         cmp     Y2SAVE

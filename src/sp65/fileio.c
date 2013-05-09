@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   fileio.c				     */
+/*                                 fileio.c                                  */
 /*                                                                           */
 /*              File I/O for the sp65 sprite and bitmap utility              */
 /*                                                                           */
@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -52,7 +52,7 @@ void FileSetPos (FILE* F, unsigned long Pos)
 /* Seek to the given absolute position, fail on errors */
 {
     if (fseek (F, Pos, SEEK_SET) != 0) {
- 	Error ("Cannot seek: %s", strerror (errno));
+        Error ("Cannot seek: %s", strerror (errno));
     }
 }
 
@@ -63,7 +63,7 @@ unsigned long FileGetPos (FILE* F)
 {
     long Pos = ftell (F);
     if (Pos < 0) {
-       	Error ("Error in ftell: %s", strerror (errno));
+        Error ("Error in ftell: %s", strerror (errno));
     }
     return Pos;
 }
@@ -75,7 +75,7 @@ unsigned Read8 (FILE* F)
 {
     int C = getc (F);
     if (C == EOF) {
- 	Error ("Read error (file corrupt?)");
+        Error ("Read error (file corrupt?)");
     }
     return C;
 }
@@ -117,9 +117,9 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
 {
     /* Accept zero sized reads */
     if (Size > 0) {
-	if (fread (Data, 1, Size, F) != Size) {
-	    Error ("Read error (file corrupt?)");
-	}
+        if (fread (Data, 1, Size, F) != Size) {
+            Error ("Read error (file corrupt?)");
+        }
     }
     return Data;
 }

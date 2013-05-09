@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   cmdline.h				     */
+/*                                 cmdline.h                                 */
 /*                                                                           */
-/*		   Helper functions for command line parsing		     */
+/*                 Helper functions for command line parsing                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -56,17 +56,17 @@ extern char** ArgVec;
 extern unsigned ArgCount;
 
 /* Structure defining a long option */
-typedef struct LongOpt	LongOpt;
+typedef struct LongOpt  LongOpt;
 struct LongOpt {
-    const char*	Option;
-    unsigned	ArgCount;
-    void 	(*Func) (const char* Opt, const char* Arg);
+    const char* Option;
+    unsigned    ArgCount;
+    void        (*Func) (const char* Opt, const char* Arg);
 };
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

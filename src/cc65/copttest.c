@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  copttest.c                                 */
+/*                                copttest.c                                 */
 /*                                                                           */
-/*			    Optimize test sequences                          */
+/*                          Optimize test sequences                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -41,7 +41,7 @@
 
 
 /*****************************************************************************/
-/*  	    			Optimize tests                               */
+/*                              Optimize tests                               */
 /*****************************************************************************/
 
 
@@ -74,52 +74,52 @@ unsigned OptTest1 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-    	CodeEntry* L[3];
+        CodeEntry* L[3];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-    	/* Check if it's the sequence we're searching for */
-    	if (L[0]->OPC == OP65_STX              &&
-    	    CS_GetEntries (S, L+1, I+1, 2)     &&
-    	    !CE_HasLabel (L[1])                &&
-    	    L[1]->OPC == OP65_ORA              &&
-    	    strcmp (L[0]->Arg, L[1]->Arg) == 0 &&
-    	    !CE_HasLabel (L[2])                &&
-    	    (L[2]->Info & OF_ZBRA) != 0) {
+        /* Check if it's the sequence we're searching for */
+        if (L[0]->OPC == OP65_STX              &&
+            CS_GetEntries (S, L+1, I+1, 2)     &&
+            !CE_HasLabel (L[1])                &&
+            L[1]->OPC == OP65_ORA              &&
+            strcmp (L[0]->Arg, L[1]->Arg) == 0 &&
+            !CE_HasLabel (L[2])                &&
+            (L[2]->Info & OF_ZBRA) != 0) {
 
-    	    /* Check if X is zero */
-    	    if (L[0]->RI->In.RegX == 0) {
+            /* Check if X is zero */
+            if (L[0]->RI->In.RegX == 0) {
 
-    	    	/* Insert the compare */
-    	    	CodeEntry* N = NewCodeEntry (OP65_CMP, AM65_IMM, "$00", 0, L[0]->LI);
-    	    	CS_InsertEntry (S, N, I+2);
+                /* Insert the compare */
+                CodeEntry* N = NewCodeEntry (OP65_CMP, AM65_IMM, "$00", 0, L[0]->LI);
+                CS_InsertEntry (S, N, I+2);
 
-    	    	/* Remove the two other insns */
-    	    	CS_DelEntry (S, I+1);
-    	    	CS_DelEntry (S, I);
+                /* Remove the two other insns */
+                CS_DelEntry (S, I+1);
+                CS_DelEntry (S, I);
 
-    	    	/* We had changes */
-    		++Changes;
+                /* We had changes */
+                ++Changes;
 
-    	    /* Check if A is zero */
-    	    } else if (L[1]->RI->In.RegA == 0) {
+            /* Check if A is zero */
+            } else if (L[1]->RI->In.RegA == 0) {
 
-    		/* Insert the txa */
-    		CodeEntry* N = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[1]->LI);
-    		CS_InsertEntry (S, N, I+2);
+                /* Insert the txa */
+                CodeEntry* N = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[1]->LI);
+                CS_InsertEntry (S, N, I+2);
 
-    		/* Remove the two other insns */
-    		CS_DelEntry (S, I+1);
-    	  	CS_DelEntry (S, I);
+                /* Remove the two other insns */
+                CS_DelEntry (S, I+1);
+                CS_DelEntry (S, I);
 
-    	  	/* We had changes */
-    	  	++Changes;
-    	    }
-    	}
+                /* We had changes */
+                ++Changes;
+            }
+        }
 
-    	/* Next entry */
-    	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -141,28 +141,28 @@ unsigned OptTest2 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-    	CodeEntry* L[3];
+        CodeEntry* L[3];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-    	/* Check if it's the sequence we're searching for */
-       	if ((L[0]->OPC == OP65_INC || L[0]->OPC == OP65_DEC)    &&
-    	    CS_GetEntries (S, L+1, I+1, 2)                      &&
-    	    !CE_HasLabel (L[1])                                 &&
-       	    (L[1]->Info & OF_LOAD) != 0                         &&
+        /* Check if it's the sequence we're searching for */
+        if ((L[0]->OPC == OP65_INC || L[0]->OPC == OP65_DEC)    &&
+            CS_GetEntries (S, L+1, I+1, 2)                      &&
+            !CE_HasLabel (L[1])                                 &&
+            (L[1]->Info & OF_LOAD) != 0                         &&
             (L[2]->Info & OF_FBRA) != 0                         &&
             L[1]->AM == L[0]->AM                                &&
-    	    strcmp (L[0]->Arg, L[1]->Arg) == 0                  &&
+            strcmp (L[0]->Arg, L[1]->Arg) == 0                  &&
             (GetRegInfo (S, I+2, L[1]->Chg) & L[1]->Chg) == 0) {
 
             /* Remove the load */
             CS_DelEntry (S, I+1);
              ++Changes;
-    	}
+        }
 
-    	/* Next entry */
-    	++I;
+        /* Next entry */
+        ++I;
 
     }
 

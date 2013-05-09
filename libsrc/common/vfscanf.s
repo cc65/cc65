@@ -5,7 +5,7 @@
 ; 2004-12-21, Greg King
 ;
 
-  	.export	      	_vfscanf
+        .export         _vfscanf
         .import         _fgetc, _ungetc, _ferror
 
         .include        "zeropage.inc"
@@ -22,8 +22,8 @@ count   :=      ptr3            ; Result of scan
 
 .data
 d:      .addr   _fgetc          ; GET
-	.addr   _ungetc         ; UNGET
-       	.addr   0               ; data
+        .addr   _ungetc         ; UNGET
+        .addr   0               ; data
 
 
 ; ----------------------------------------------------------------------------

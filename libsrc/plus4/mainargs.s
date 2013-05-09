@@ -22,16 +22,16 @@
 ; - The "file-name" might be a path-name; don't copy the directory-components.
 ; - Add a control-character quoting mechanism.
 
-	.constructor	initmainargs, 24
-	.import		__argc, __argv
+        .constructor    initmainargs, 24
+        .import         __argc, __argv
 
-	.include	"plus4.inc"
+        .include        "plus4.inc"
                                                                             
 
 
-MAXARGS	 = 10                   ; Maximum number of arguments allowed
-REM	 = $8f		  	; BASIC token-code
-NAME_LEN = 16		  	; maximum length of command-name
+MAXARGS  = 10                   ; Maximum number of arguments allowed
+REM      = $8f                  ; BASIC token-code
+NAME_LEN = 16                   ; maximum length of command-name
 
 ; Get possible command-line arguments. Goes into the special INIT segment,
 ; which may be reused after the startup code is run
@@ -45,25 +45,25 @@ initmainargs:
 ; Because the buffer, that we're copying into, was zeroed out,
 ; we don't need to add a NUL character.
 ;
-	ldy	FNAM_LEN
-	cpy	#NAME_LEN + 1
-	bcc	L1
-	ldy	#NAME_LEN - 1	; limit the length
-L0:	lda	(FNAM),y
-	sta	name,y
-L1:	dey
-	bpl	L0
-	inc	__argc	   	; argc always is equal to, at least, 1
+        ldy     FNAM_LEN
+        cpy     #NAME_LEN + 1
+        bcc     L1
+        ldy     #NAME_LEN - 1   ; limit the length
+L0:     lda     (FNAM),y
+        sta     name,y
+L1:     dey
+        bpl     L0
+        inc     __argc          ; argc always is equal to, at least, 1
 
 ; Find the "rem" token.
 ;
-	ldx	#0
-L2:	lda	BASIC_BUF,x
-       	beq    	done   	       	; no "rem," no args.
-	inx
-	cmp	#REM
-	bne	L2
-	ldy	#1 * 2
+        ldx     #0
+L2:     lda     BASIC_BUF,x
+        beq     done            ; no "rem," no args.
+        inx
+        cmp     #REM
+        bne     L2
+        ldy     #1 * 2
 
 ; Find the next argument
 
@@ -89,11 +89,11 @@ setterm:sta     term            ; Set end of argument marker
 ; necessary.
 
         txa                     ; Get low byte
-	sta	argv,y		; argv[y]= &arg
-	iny
-	lda	#>BASIC_BUF
-	sta	argv,y
-	iny
+        sta     argv,y          ; argv[y]= &arg
+        iny
+        lda     #>BASIC_BUF
+        sta     argv,y
+        iny
         inc     __argc          ; Found another arg
 
 ; Search for the end of the argument
@@ -120,22 +120,22 @@ argloop:lda     BASIC_BUF,x
 
 ; (The last vector in argv[] already is NULL.)
 
-done:	lda	#<argv
-	ldx	#>argv
-	sta	__argv
-	stx	__argv + 1
-	rts
+done:   lda     #<argv
+        ldx     #>argv
+        sta     __argv
+        stx     __argv + 1
+        rts
                       
 ; --------------------------------------------------------------------------
 ; These arrays are zeroed before initmainargs is called.
-; char	name[16+1];
+; char  name[16+1];
 ; char* argv[MAXARGS+1]={name};
 ;
 .bss
-term:	.res	1
-name:	.res	NAME_LEN + 1
+term:   .res    1
+name:   .res    NAME_LEN + 1
 
 .data
 argv:   .addr   name
-        .res   	MAXARGS * 2
+        .res    MAXARGS * 2
 

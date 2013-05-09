@@ -11,9 +11,9 @@
 ;
 
 
-	.export		tosshrax, shraxy
-	.import		popax
-	.importzp	tmp1
+        .export         tosshrax, shraxy
+        .import         popax
+        .importzp       tmp1
 
 tosshrax:
         sta     tmp1            ; Save shift count
@@ -65,11 +65,11 @@ L4:     adc     #8              ; Correct counter
 L5:     lsr     tmp1
         ror     a
         dey
-       	bne     L5
+        bne     L5
 
 ; Done with shift
 
-        ldx	tmp1
+        ldx     tmp1
         rts
 
 

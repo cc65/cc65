@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			   	   exports.c				     */
+/*                                 exports.c                                 */
 /*                                                                           */
-/*		Duplicate export checking for the ar65 archiver		     */
+/*              Duplicate export checking for the ar65 archiver              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*     	      	      		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -56,19 +56,19 @@
 /* A hash table entry */
 typedef struct HashEntry HashEntry;
 struct HashEntry {
-    HashEntry* 	      	Next;		/* Next in list */
-    const ObjData*      Module;	       	/* Pointer to object module */
-    char		Name [1];	/* Name of identifier */
+    HashEntry*          Next;           /* Next in list */
+    const ObjData*      Module;         /* Pointer to object module */
+    char                Name [1];       /* Name of identifier */
 };
 
 /* Hash table */
-#define HASHTAB_SIZE	4783
-static HashEntry*	HashTab [HASHTAB_SIZE];
+#define HASHTAB_SIZE    4783
+static HashEntry*       HashTab [HASHTAB_SIZE];
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code  		  	  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -83,8 +83,8 @@ static HashEntry* NewHashEntry (const char* Name, const ObjData* Module)
     HashEntry* H = xmalloc (sizeof (HashEntry) + Len);
 
     /* Initialize the fields and return it */
-    H->Next	= 0;
-    H->Module	= Module;
+    H->Next     = 0;
+    H->Module   = Module;
     memcpy (H->Name, Name, Len);
     H->Name [Len] = '\0';
     return H;
@@ -105,23 +105,23 @@ void ExpInsert (const char* Name, const ObjData* Module)
 
     /* Search through the list in that slot and print matching duplicates */
     if (HashTab [HashVal] == 0) {
-    	/* The slot is empty */
-    	HashTab [HashVal] = H;
-    	return;
+        /* The slot is empty */
+        HashTab [HashVal] = H;
+        return;
     }
     L = HashTab [HashVal];
     while (1) {
-	if (strcmp (L->Name, Name) == 0) {
-	    /* Duplicate entry */
-       	    Warning ("External symbol `%s' in module `%s', library `%s' "
+        if (strcmp (L->Name, Name) == 0) {
+            /* Duplicate entry */
+            Warning ("External symbol `%s' in module `%s', library `%s' "
                      "is duplicated in module `%s'",
-	  	     Name, L->Name, LibName, Module->Name);
-	}
-     	if (L->Next == 0) {
-     	    break;
-     	} else {
-     	    L = L->Next;
-     	}
+                     Name, L->Name, LibName, Module->Name);
+        }
+        if (L->Next == 0) {
+            break;
+        } else {
+            L = L->Next;
+        }
     }
     L->Next = H;
 }
@@ -137,11 +137,11 @@ const ObjData* ExpFind (const char* Name)
     HashEntry* L = HashTab [HashStr (Name) % HASHTAB_SIZE];
     while (L) {
         /* Search through the list in that slot */
-	if (strcmp (L->Name, Name) == 0) {
-	    /* Entry found */
-	    return L->Module;
-	}
-	L = L->Next;
+        if (strcmp (L->Name, Name) == 0) {
+            /* Entry found */
+            return L->Module;
+        }
+        L = L->Next;
     }
 
     /* Not found */

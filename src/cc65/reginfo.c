@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   reginfo.c                                 */
+/*                                 reginfo.c                                 */
 /*                                                                           */
-/*			  6502 register tracking info                        */
+/*                        6502 register tracking info                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*     	       	      	   	     Code		    		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -113,13 +113,13 @@ RegInfo* NewRegInfo (const RegContents* RC)
 
     /* Initialize the registers */
     if (RC) {
-	RI->In   = *RC;
-	RI->Out	 = *RC;
-	RI->Out2 = *RC;
+        RI->In   = *RC;
+        RI->Out  = *RC;
+        RI->Out2 = *RC;
     } else {
-	RC_Invalidate (&RI->In);
-	RC_Invalidate (&RI->Out);
-	RC_Invalidate (&RI->Out2);
+        RC_Invalidate (&RI->In);
+        RC_Invalidate (&RI->Out);
+        RC_Invalidate (&RI->Out2);
     }
 
     /* Return the new struct */

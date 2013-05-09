@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			 	   nexttok.c				     */
+/*                                 nexttok.c                                 */
 /*                                                                           */
-/*		Get next token and handle token level functions		     */
+/*              Get next token and handle token level functions              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,12 +53,12 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			   	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-static unsigned RawMode = 0;		/* Raw token mode flag/counter */
+static unsigned RawMode = 0;            /* Raw token mode flag/counter */
 
 
 
@@ -86,7 +86,7 @@ static int LookAtStrCon (void)
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -109,21 +109,21 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
     unsigned Current = 0;
     while (CurTok.Tok != Term) {
 
-     	/* Check for end of line or end of input */
-     	if (TokIsSep (CurTok.Tok)) {
-     	    Error ("Unexpected end of line");
-     	    return List;
-     	}
+        /* Check for end of line or end of input */
+        if (TokIsSep (CurTok.Tok)) {
+            Error ("Unexpected end of line");
+            return List;
+        }
 
-     	/* Collect tokens in the given range */
-     	if (Current >= Start && Current < Start+Count) {
-     	    /* Add the current token to the list */
-     	    AddCurTok (List);
-     	}
+        /* Collect tokens in the given range */
+        if (Current >= Start && Current < Start+Count) {
+            /* Add the current token to the list */
+            AddCurTok (List);
+        }
 
-     	/* Get the next token */
-     	++Current;
-     	NextTok ();
+        /* Get the next token */
+        ++Current;
+        NextTok ();
     }
 
     /* Eat the terminator token */
@@ -154,35 +154,35 @@ static void FuncConcat (void)
     /* Concatenate any number of strings */
     while (1) {
 
-     	/* Next token must be a string */
+        /* Next token must be a string */
         if (!LookAtStrCon ()) {
             SB_Done (&Buf);
-     	    return;
-     	}
+            return;
+        }
 
         /* Append the string */
         SB_Append (&Buf, &CurTok.SVal);
 
-     	/* Skip the string token */
-     	NextTok ();
+        /* Skip the string token */
+        NextTok ();
 
-     	/* Comma means another argument */
-     	if (CurTok.Tok == TOK_COMMA) {
-     	    NextTok ();
-     	} else {
-     	    /* Done */
-     	    break;
-     	}
+        /* Comma means another argument */
+        if (CurTok.Tok == TOK_COMMA) {
+            NextTok ();
+        } else {
+            /* Done */
+            break;
+        }
     }
 
     /* We expect a closing parenthesis, but will not skip it but replace it
      * by the string token just created.
      */
     if (CurTok.Tok != TOK_RPAREN) {
-     	Error ("`)' expected");
+        Error ("`)' expected");
     } else {
-     	CurTok.Tok = TOK_STRCON;
-     	SB_Copy (&CurTok.SVal, &Buf);
+        CurTok.Tok = TOK_STRCON;
+        SB_Copy (&CurTok.SVal, &Buf);
         SB_Terminate (&CurTok.SVal);
     }
 
@@ -253,7 +253,7 @@ static void FuncIdent (void)
     SB_Copy (&Buf, &CurTok.SVal);
     NextTok ();
     if (CurTok.Tok != TOK_RPAREN) {
-     	Error ("`)' expected");
+        Error ("`)' expected");
     } else {
         CurTok.Tok = Id;
         SB_Copy (&CurTok.SVal, &Buf);
@@ -269,8 +269,8 @@ static void FuncIdent (void)
 static void FuncLeft (void)
 /* Handle the .LEFT function */
 {
-    long       	Count;
-    TokList* 	List;
+    long        Count;
+    TokList*    List;
 
     /* Skip it */
     NextTok ();
@@ -281,7 +281,7 @@ static void FuncLeft (void)
     /* Count argument. Correct negative counts to zero. */
     Count = ConstExpression ();
     if (Count < 0) {
-     	Count = 0;
+        Count = 0;
     }
     ConsumeComma ();
 
@@ -309,9 +309,9 @@ static void FuncLeft (void)
 static void FuncMid (void)
 /* Handle the .MID function */
 {
-    long    	Start;
-    long       	Count;
-    TokList* 	List;
+    long        Start;
+    long        Count;
+    TokList*    List;
 
     /* Skip it */
     NextTok ();
@@ -324,7 +324,7 @@ static void FuncMid (void)
      */
     Start = ConstExpression ();
     if (Start < 0 || Start > 100) {
-     	Start = 0;
+        Start = 0;
     }
     ConsumeComma ();
 
@@ -333,7 +333,7 @@ static void FuncMid (void)
      */
     Count = ConstExpression ();
     if (Count < 0) {
-     	Count = 0;
+        Count = 0;
     }
     ConsumeComma ();
 
@@ -361,8 +361,8 @@ static void FuncMid (void)
 static void FuncRight (void)
 /* Handle the .RIGHT function */
 {
-    long       	Count;
-    TokList* 	List;
+    long        Count;
+    TokList*    List;
 
     /* Skip it */
     NextTok ();
@@ -373,7 +373,7 @@ static void FuncRight (void)
     /* Count argument. Correct negative counts to zero. */
     Count = ConstExpression ();
     if (Count < 0) {
-     	Count = 0;
+        Count = 0;
     }
     ConsumeComma ();
 
@@ -382,17 +382,17 @@ static void FuncRight (void)
 
     /* Delete tokens from the list until Count tokens are remaining */
     while (List->Count > (unsigned) Count) {
-	/* Get the first node */
-	TokNode* T = List->Root;
+        /* Get the first node */
+        TokNode* T = List->Root;
 
-	/* Remove it from the list */
-	List->Root = List->Root->Next;
+        /* Remove it from the list */
+        List->Root = List->Root->Next;
 
-	/* Free the node */
-	FreeTokNode (T);
+        /* Free the node */
+        FreeTokNode (T);
 
-	/* Corrent the token counter */
-	List->Count--;
+        /* Corrent the token counter */
+        List->Count--;
     }
 
     /* Since we want to insert the list before the now current token, we have
@@ -600,9 +600,9 @@ static void FuncSPrintF (void)
      * by the string token just created.
      */
     if (CurTok.Tok != TOK_RPAREN) {
-     	Error ("`)' expected");
+        Error ("`)' expected");
     } else {
-     	CurTok.Tok = TOK_STRCON;
+        CurTok.Tok = TOK_STRCON;
         SB_Copy (&CurTok.SVal, &R);
         SB_Terminate (&CurTok.SVal);
     }
@@ -630,9 +630,9 @@ static void FuncString (void)
 
     /* Accept identifiers or numeric expressions */
     if (CurTok.Tok == TOK_LOCAL_IDENT) {
-     	/* Save the identifier, then skip it */
-       	SB_Copy (&Buf, &CurTok.SVal);
-     	NextTok ();
+        /* Save the identifier, then skip it */
+        SB_Copy (&Buf, &CurTok.SVal);
+        NextTok ();
     } else if (CurTok.Tok == TOK_NAMESPACE || CurTok.Tok == TOK_IDENT) {
 
         /* Parse a fully qualified symbol name. We cannot use
@@ -651,19 +651,19 @@ static void FuncString (void)
                  (NameSpace == 0 && CurTok.Tok == TOK_NAMESPACE));
 
     } else {
-     	/* Numeric expression */
-     	long Val = ConstExpression ();
-       	SB_Printf (&Buf, "%ld", Val);
+        /* Numeric expression */
+        long Val = ConstExpression ();
+        SB_Printf (&Buf, "%ld", Val);
     }
 
     /* We expect a closing parenthesis, but will not skip it but replace it
      * by the string token just created.
      */
     if (CurTok.Tok != TOK_RPAREN) {
-     	Error ("`)' expected");
+        Error ("`)' expected");
     } else {
-     	CurTok.Tok = TOK_STRCON;
-     	SB_Copy (&CurTok.SVal, &Buf);
+        CurTok.Tok = TOK_STRCON;
+        SB_Copy (&CurTok.SVal, &Buf);
         SB_Terminate (&CurTok.SVal);
     }
 
@@ -684,42 +684,42 @@ void NextTok (void)
      */
     if (RawMode == 0 && IfCond) {
 
-	/* Execute token handling functions */
-	switch (CurTok.Tok) {
+        /* Execute token handling functions */
+        switch (CurTok.Tok) {
 
-	    case TOK_CONCAT:
-		FuncConcat ();
-		break;
+            case TOK_CONCAT:
+                FuncConcat ();
+                break;
 
-	    case TOK_LEFT:
-		FuncLeft ();
-		break;
+            case TOK_LEFT:
+                FuncLeft ();
+                break;
 
             case TOK_MAKEIDENT:
                 FuncIdent ();
                 break;
 
-	    case TOK_MID:
-		FuncMid ();
-		break;
+            case TOK_MID:
+                FuncMid ();
+                break;
 
-	    case TOK_RIGHT:
-		FuncRight ();
-		break;
+            case TOK_RIGHT:
+                FuncRight ();
+                break;
 
             case TOK_SPRINTF:
                 FuncSPrintF ();
                 break;
 
-	    case TOK_STRING:
-		FuncString ();
-		break;
+            case TOK_STRING:
+                FuncString ();
+                break;
 
-	    default:
-		/* Quiet down gcc */
-		break;
+            default:
+                /* Quiet down gcc */
+                break;
 
-	}
+        }
     }
 }
 
@@ -729,9 +729,9 @@ void Consume (token_t Expected, const char* ErrMsg)
 /* Consume Expected, print an error if we don't find it */
 {
     if (CurTok.Tok == Expected) {
-	NextTok ();
+        NextTok ();
     } else {
-       	Error ("%s", ErrMsg);
+        Error ("%s", ErrMsg);
     }
 }
 
@@ -745,7 +745,7 @@ void ConsumeSep (void)
 
     /* If we are at end of line, skip it */
     if (CurTok.Tok == TOK_SEP) {
-	NextTok ();
+        NextTok ();
     }
 }
 
@@ -779,7 +779,7 @@ void SkipUntilSep (void)
 /* Skip tokens until we reach a line separator or end of file */
 {
     while (!TokIsSep (CurTok.Tok)) {
-     	NextTok ();
+        NextTok ();
     }
 }
 
@@ -791,7 +791,7 @@ void ExpectSep (void)
  */
 {
     if (!TokIsSep (CurTok.Tok)) {
-       	ErrorSkip ("Unexpected trailing garbage characters");
+        ErrorSkip ("Unexpected trailing garbage characters");
     }
 }
 

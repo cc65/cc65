@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   config.c				     */
+/*                                 config.c                                  */
 /*                                                                           */
-/*		 Target configuration file for the ld65 linker		     */
+/*               Target configuration file for the ld65 linker               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -72,7 +72,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -97,27 +97,27 @@ static Collection       FileList = STATIC_COLLECTION_INITIALIZER;
 static Collection       MemoryAreas = STATIC_COLLECTION_INITIALIZER;
 
 /* Memory attributes */
-#define MA_START       	0x0001
-#define MA_SIZE        	0x0002
-#define MA_TYPE        	0x0004
-#define MA_FILE        	0x0008
-#define MA_DEFINE      	0x0010
-#define MA_FILL	       	0x0020
-#define MA_FILLVAL     	0x0040
+#define MA_START        0x0001
+#define MA_SIZE         0x0002
+#define MA_TYPE         0x0004
+#define MA_FILE         0x0008
+#define MA_DEFINE       0x0010
+#define MA_FILL         0x0020
+#define MA_FILLVAL      0x0040
 #define MA_BANK         0x0080
 
 /* Segment list */
 static Collection       SegDescList = STATIC_COLLECTION_INITIALIZER;
 
 /* Segment attributes */
-#define SA_TYPE	       	0x0001
-#define SA_LOAD		0x0002
-#define SA_RUN		0x0004
-#define SA_ALIGN	0x0008
+#define SA_TYPE         0x0001
+#define SA_LOAD         0x0002
+#define SA_RUN          0x0004
+#define SA_ALIGN        0x0008
 #define SA_ALIGN_LOAD   0x0010
-#define SA_DEFINE	0x0020
-#define SA_OFFSET	0x0040
-#define SA_START	0x0080
+#define SA_DEFINE       0x0020
+#define SA_OFFSET       0x0040
+#define SA_START        0x0080
 #define SA_OPTIONAL     0x0100
 #define SA_FILLVAL      0x0200
 
@@ -147,13 +147,13 @@ struct CfgSymbol {
 static Collection       CfgSymbols = STATIC_COLLECTION_INITIALIZER;
 
 /* Descriptor holding information about the binary formats */
-static BinDesc*	BinFmtDesc	= 0;
-static O65Desc* O65FmtDesc	= 0;
+static BinDesc* BinFmtDesc      = 0;
+static O65Desc* O65FmtDesc      = 0;
 
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -164,7 +164,7 @@ static File* NewFile (unsigned Name);
 
 
 /*****************************************************************************/
-/*				List management				     */
+/*                              List management                              */
 /*****************************************************************************/
 
 
@@ -175,9 +175,9 @@ static File* FindFile (unsigned Name)
     unsigned I;
     for (I = 0; I < CollCount (&FileList); ++I) {
         File* F = CollAtUnchecked (&FileList, I);
-       	if (F->Name == Name) {
-       	    return F;
-       	}
+        if (F->Name == Name) {
+            return F;
+        }
     }
     return 0;
 }
@@ -189,8 +189,8 @@ static File* GetFile (unsigned Name)
 {
     File* F = FindFile (Name);
     if (F == 0) {
-	/* Create a new one */
-	F = NewFile (Name);
+        /* Create a new one */
+        F = NewFile (Name);
     }
     return F;
 }
@@ -212,9 +212,9 @@ static MemoryArea* CfgFindMemory (unsigned Name)
     unsigned I;
     for (I = 0; I < CollCount (&MemoryAreas); ++I) {
         MemoryArea* M = CollAtUnchecked (&MemoryAreas, I);
-       	if (M->Name == Name) {
-       	    return M;
-       	}
+        if (M->Name == Name) {
+            return M;
+        }
     }
     return 0;
 }
@@ -226,7 +226,7 @@ static MemoryArea* CfgGetMemory (unsigned Name)
 {
     MemoryArea* M = CfgFindMemory (Name);
     if (M == 0) {
- 	CfgError (&CfgErrorPos, "Invalid memory area `%s'", GetString (Name));
+        CfgError (&CfgErrorPos, "Invalid memory area `%s'", GetString (Name));
     }
     return M;
 }
@@ -239,10 +239,10 @@ static SegDesc* CfgFindSegDesc (unsigned Name)
     unsigned I;
     for (I = 0; I < CollCount (&SegDescList); ++I) {
         SegDesc* S = CollAtUnchecked (&SegDescList, I);
-       	if (S->Name == Name) {
-    	    /* Found */
-    	    return S;
-       	}
+        if (S->Name == Name) {
+            /* Found */
+            return S;
+        }
     }
 
     /* Not found */
@@ -261,7 +261,7 @@ static void MemoryInsert (MemoryArea* M, SegDesc* S)
 
 
 /*****************************************************************************/
-/*			   Constructors/Destructors			     */
+/*                         Constructors/Destructors                          */
 /*****************************************************************************/
 
 
@@ -319,7 +319,7 @@ static MemoryArea* CreateMemoryArea (const FilePos* Pos, unsigned Name)
     /* Check for duplicate names */
     MemoryArea* M = CfgFindMemory (Name);
     if (M) {
-	CfgError (&CfgErrorPos,
+        CfgError (&CfgErrorPos,
                   "Memory area `%s' defined twice",
                   GetString (Name));
     }
@@ -343,7 +343,7 @@ static SegDesc* NewSegDesc (unsigned Name)
     /* Check for duplicate names */
     SegDesc* S = CfgFindSegDesc (Name);
     if (S) {
-	CfgError (&CfgErrorPos, "Segment `%s' defined twice", GetString (Name));
+        CfgError (&CfgErrorPos, "Segment `%s' defined twice", GetString (Name));
     }
 
     /* Allocate memory */
@@ -389,7 +389,7 @@ static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
  */
 {
     if (*Flags & Mask) {
-    	CfgError (&CfgErrorPos, "%s is already defined", Name);
+        CfgError (&CfgErrorPos, "%s is already defined", Name);
     }
     *Flags |= Mask;
 }
@@ -400,7 +400,7 @@ static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
 /* Check that a mandatory attribute was given */
 {
     if ((Attr & Mask) == 0) {
-	CfgError (&CfgErrorPos, "%s attribute is missing", Name);
+        CfgError (&CfgErrorPos, "%s attribute is missing", Name);
     }
 }
 
@@ -413,121 +413,121 @@ static void ParseMemory (void)
         {   "BANK",     CFGTOK_BANK     },
         {   "DEFINE",   CFGTOK_DEFINE   },
         {   "FILE",     CFGTOK_FILE     },
-  	{   "FILL", 	CFGTOK_FILL     },
-       	{   "FILLVAL", 	CFGTOK_FILLVAL  },
-	{   "SIZE", 	CFGTOK_SIZE     },
-       	{   "START",  	CFGTOK_START    },
+        {   "FILL",     CFGTOK_FILL     },
+        {   "FILLVAL",  CFGTOK_FILLVAL  },
+        {   "SIZE",     CFGTOK_SIZE     },
+        {   "START",    CFGTOK_START    },
         {   "TYPE",     CFGTOK_TYPE     },
     };
     static const IdentTok Types [] = {
-       	{   "RO",    	CFGTOK_RO       },
-       	{   "RW",   	CFGTOK_RW       },
+        {   "RO",       CFGTOK_RO       },
+        {   "RW",       CFGTOK_RW       },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
 
-	/* Create a new entry on the heap */
-       	MemoryArea* M = CreateMemoryArea (&CfgErrorPos, GetStrBufId (&CfgSVal));
+        /* Create a new entry on the heap */
+        MemoryArea* M = CreateMemoryArea (&CfgErrorPos, GetStrBufId (&CfgSVal));
 
-	/* Skip the name and the following colon */
-	CfgNextTok ();
-	CfgConsumeColon ();
+        /* Skip the name and the following colon */
+        CfgNextTok ();
+        CfgConsumeColon ();
 
-       	/* Read the attributes */
-	while (CfgTok == CFGTOK_IDENT) {
+        /* Read the attributes */
+        while (CfgTok == CFGTOK_IDENT) {
 
-	    /* Map the identifier to a token */
-	    cfgtok_t AttrTok;
-	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-	    AttrTok = CfgTok;
+            /* Map the identifier to a token */
+            cfgtok_t AttrTok;
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            AttrTok = CfgTok;
 
-	    /* An optional assignment follows */
-	    CfgNextTok ();
-	    CfgOptionalAssign ();
+            /* An optional assignment follows */
+            CfgNextTok ();
+            CfgOptionalAssign ();
 
-	    /* Check which attribute was given */
-	    switch (AttrTok) {
+            /* Check which attribute was given */
+            switch (AttrTok) {
 
-	      	case CFGTOK_BANK:
-	     	    FlagAttr (&M->Attr, MA_BANK, "BANK");
-	      	    M->BankExpr = CfgExpr ();
-	    	    break;
+                case CFGTOK_BANK:
+                    FlagAttr (&M->Attr, MA_BANK, "BANK");
+                    M->BankExpr = CfgExpr ();
+                    break;
 
-	        case CFGTOK_DEFINE:
- 	    	    FlagAttr (&M->Attr, MA_DEFINE, "DEFINE");
-	    	    /* Map the token to a boolean */
-	    	    CfgBoolToken ();
-	    	    if (CfgTok == CFGTOK_TRUE) {
-	    	    	M->Flags |= MF_DEFINE;
-	    	    }
+                case CFGTOK_DEFINE:
+                    FlagAttr (&M->Attr, MA_DEFINE, "DEFINE");
+                    /* Map the token to a boolean */
+                    CfgBoolToken ();
+                    if (CfgTok == CFGTOK_TRUE) {
+                        M->Flags |= MF_DEFINE;
+                    }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	        case CFGTOK_FILE:
-	    	    FlagAttr (&M->Attr, MA_FILE, "FILE");
-	    	    CfgAssureStr ();
-       	       	    /* Get the file entry and insert the memory area */
-	    	    FileInsert (GetFile (GetStrBufId (&CfgSVal)), M);
+                case CFGTOK_FILE:
+                    FlagAttr (&M->Attr, MA_FILE, "FILE");
+                    CfgAssureStr ();
+                    /* Get the file entry and insert the memory area */
+                    FileInsert (GetFile (GetStrBufId (&CfgSVal)), M);
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	        case CFGTOK_FILL:
- 	    	    FlagAttr (&M->Attr, MA_FILL, "FILL");
-	    	    /* Map the token to a boolean */
-	    	    CfgBoolToken ();
-	    	    if (CfgTok == CFGTOK_TRUE) {
-	    	    	M->Flags |= MF_FILL;
-	    	    }
+                case CFGTOK_FILL:
+                    FlagAttr (&M->Attr, MA_FILL, "FILL");
+                    /* Map the token to a boolean */
+                    CfgBoolToken ();
+                    if (CfgTok == CFGTOK_TRUE) {
+                        M->Flags |= MF_FILL;
+                    }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	      	case CFGTOK_FILLVAL:
-	    	    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
-	      	    M->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
-	    	    break;
+                case CFGTOK_FILLVAL:
+                    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
+                    M->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
+                    break;
 
-	      	case CFGTOK_SIZE:
-	     	    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
-	      	    M->SizeExpr = CfgExpr ();
-	    	    break;
+                case CFGTOK_SIZE:
+                    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
+                    M->SizeExpr = CfgExpr ();
+                    break;
 
-		case CFGTOK_START:
-		    FlagAttr (&M->Attr, MA_START, "START");
+                case CFGTOK_START:
+                    FlagAttr (&M->Attr, MA_START, "START");
                     M->StartExpr = CfgExpr ();
-		    break;
+                    break;
 
-	    	case CFGTOK_TYPE:
-	    	    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
-      	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "TYPE");
-	    	    if (CfgTok == CFGTOK_RO) {
-	    	    	M->Flags |= MF_RO;
-	    	    }
+                case CFGTOK_TYPE:
+                    FlagAttr (&M->Attr, MA_TYPE, "TYPE");
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "TYPE");
+                    if (CfgTok == CFGTOK_RO) {
+                        M->Flags |= MF_RO;
+                    }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	     	default:
-	       	    FAIL ("Unexpected attribute token");
+                default:
+                    FAIL ("Unexpected attribute token");
 
-	    }
+            }
 
-	    /* Skip an optional comma */
-	    CfgOptionalComma ();
-	}
+            /* Skip an optional comma */
+            CfgOptionalComma ();
+        }
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
+        /* Skip the semicolon */
+        CfgConsumeSemi ();
 
-	/* Check for mandatory parameters */
-       	AttrCheck (M->Attr, MA_START, "START");
-	AttrCheck (M->Attr, MA_SIZE, "SIZE");
+        /* Check for mandatory parameters */
+        AttrCheck (M->Attr, MA_START, "START");
+        AttrCheck (M->Attr, MA_SIZE, "SIZE");
 
-	/* If we don't have a file name for output given, use the default
-	 * file name.
-	 */
-	if ((M->Attr & MA_FILE) == 0) {
-	    FileInsert (GetFile (GetStringId (OutputName)), M);
-	    OutputNameUsed = 1;
-	}
+        /* If we don't have a file name for output given, use the default
+         * file name.
+         */
+        if ((M->Attr & MA_FILE) == 0) {
+            FileInsert (GetFile (GetStringId (OutputName)), M);
+            OutputNameUsed = 1;
+        }
     }
 
     /* Remember we had this section */
@@ -540,12 +540,12 @@ static void ParseFiles (void)
 /* Parse a FILES section */
 {
     static const IdentTok Attributes [] = {
-       	{   "FORMAT",  	CFGTOK_FORMAT   },
+        {   "FORMAT",   CFGTOK_FORMAT   },
     };
     static const IdentTok Formats [] = {
-       	{   "O65",     	CFGTOK_O65     	},
-       	{   "BIN",     	CFGTOK_BIN      },
-       	{   "BINARY",   CFGTOK_BIN      },
+        {   "O65",      CFGTOK_O65      },
+        {   "BIN",      CFGTOK_BIN      },
+        {   "BINARY",   CFGTOK_BIN      },
     };
 
 
@@ -557,73 +557,73 @@ static void ParseFiles (void)
     /* Parse all files */
     while (CfgTok != CFGTOK_RCURLY) {
 
-	File* F;
+        File* F;
 
-	/* We expect a string value here */
-	CfgAssureStr ();
+        /* We expect a string value here */
+        CfgAssureStr ();
 
-	/* Search for the file, it must exist */
-       	F = FindFile (GetStrBufId (&CfgSVal));
-	if (F == 0) {
-       	    CfgError (&CfgErrorPos,
+        /* Search for the file, it must exist */
+        F = FindFile (GetStrBufId (&CfgSVal));
+        if (F == 0) {
+            CfgError (&CfgErrorPos,
                       "File `%s' not found in MEMORY section",
                       SB_GetConstBuf (&CfgSVal));
-	}
+        }
 
-	/* Skip the token and the following colon */
-	CfgNextTok ();
-	CfgConsumeColon ();
+        /* Skip the token and the following colon */
+        CfgNextTok ();
+        CfgConsumeColon ();
 
-	/* Read the attributes */
-	while (CfgTok == CFGTOK_IDENT) {
+        /* Read the attributes */
+        while (CfgTok == CFGTOK_IDENT) {
 
-	    /* Map the identifier to a token */
-	    cfgtok_t AttrTok;
-	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-	    AttrTok = CfgTok;
+            /* Map the identifier to a token */
+            cfgtok_t AttrTok;
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            AttrTok = CfgTok;
 
-	    /* An optional assignment follows */
-	    CfgNextTok ();
-	    CfgOptionalAssign ();
+            /* An optional assignment follows */
+            CfgNextTok ();
+            CfgOptionalAssign ();
 
-	    /* Check which attribute was given */
-	    switch (AttrTok) {
+            /* Check which attribute was given */
+            switch (AttrTok) {
 
-	    	case CFGTOK_FORMAT:
-	    	    if (F->Format != BINFMT_DEFAULT) {
-	    	  	/* We've set the format already! */
-		  	CfgError (&CfgErrorPos,
+                case CFGTOK_FORMAT:
+                    if (F->Format != BINFMT_DEFAULT) {
+                        /* We've set the format already! */
+                        CfgError (&CfgErrorPos,
                                   "Cannot set a file format twice");
-		    }
-		    /* Read the format token */
-		    CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
-		    switch (CfgTok) {
+                    }
+                    /* Read the format token */
+                    CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
+                    switch (CfgTok) {
 
-			case CFGTOK_BIN:
-			    F->Format = BINFMT_BINARY;
-			    break;
+                        case CFGTOK_BIN:
+                            F->Format = BINFMT_BINARY;
+                            break;
 
-			case CFGTOK_O65:
-			    F->Format = BINFMT_O65;
-			    break;
+                        case CFGTOK_O65:
+                            F->Format = BINFMT_O65;
+                            break;
 
-			default:
-			    Error ("Unexpected format token");
-		    }
-      		    break;
+                        default:
+                            Error ("Unexpected format token");
+                    }
+                    break;
 
-	     	default:
-	       	    FAIL ("Unexpected attribute token");
+                default:
+                    FAIL ("Unexpected attribute token");
 
-	    }
+            }
 
-	    /* Skip the attribute value and an optional comma */
-	    CfgNextTok ();
-	    CfgOptionalComma ();
-	}
+            /* Skip the attribute value and an optional comma */
+            CfgNextTok ();
+            CfgOptionalComma ();
+        }
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
+        /* Skip the semicolon */
+        CfgConsumeSemi ();
 
     }
 
@@ -641,18 +641,18 @@ static void ParseSegments (void)
         {   "ALIGN_LOAD",       CFGTOK_ALIGN_LOAD       },
         {   "DEFINE",           CFGTOK_DEFINE           },
         {   "FILLVAL",          CFGTOK_FILLVAL          },
-       	{   "LOAD",    	        CFGTOK_LOAD             },
-	{   "OFFSET",  	        CFGTOK_OFFSET           },
+        {   "LOAD",             CFGTOK_LOAD             },
+        {   "OFFSET",           CFGTOK_OFFSET           },
         {   "OPTIONAL",         CFGTOK_OPTIONAL         },
-	{   "RUN",     	        CFGTOK_RUN              },
-	{   "START",   	        CFGTOK_START            },
+        {   "RUN",              CFGTOK_RUN              },
+        {   "START",            CFGTOK_START            },
         {   "TYPE",             CFGTOK_TYPE             },
     };
     static const IdentTok Types [] = {
-       	{   "RO",      	        CFGTOK_RO               },
-       	{   "RW",      	        CFGTOK_RW               },
-       	{   "BSS",     	        CFGTOK_BSS              },
-	{   "ZP",      	        CFGTOK_ZP	        },
+        {   "RO",               CFGTOK_RO               },
+        {   "RW",               CFGTOK_RW               },
+        {   "BSS",              CFGTOK_BSS              },
+        {   "ZP",               CFGTOK_ZP               },
     };
 
     unsigned Count;
@@ -664,127 +664,127 @@ static void ParseSegments (void)
 
     while (CfgTok == CFGTOK_IDENT) {
 
-	SegDesc* S;
+        SegDesc* S;
 
-	/* Create a new entry on the heap */
-       	S = NewSegDesc (GetStrBufId (&CfgSVal));
+        /* Create a new entry on the heap */
+        S = NewSegDesc (GetStrBufId (&CfgSVal));
 
-	/* Skip the name and the following colon */
-	CfgNextTok ();
-	CfgConsumeColon ();
+        /* Skip the name and the following colon */
+        CfgNextTok ();
+        CfgConsumeColon ();
 
-       	/* Read the attributes */
-	while (CfgTok == CFGTOK_IDENT) {
+        /* Read the attributes */
+        while (CfgTok == CFGTOK_IDENT) {
 
-	    /* Map the identifier to a token */
-	    cfgtok_t AttrTok;
-	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-	    AttrTok = CfgTok;
+            /* Map the identifier to a token */
+            cfgtok_t AttrTok;
+            CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+            AttrTok = CfgTok;
 
-	    /* An optional assignment follows */
-	    CfgNextTok ();
-	    CfgOptionalAssign ();
+            /* An optional assignment follows */
+            CfgNextTok ();
+            CfgOptionalAssign ();
 
-	    /* Check which attribute was given */
-	    switch (AttrTok) {
+            /* Check which attribute was given */
+            switch (AttrTok) {
 
-	        case CFGTOK_ALIGN:
-	    	    FlagAttr (&S->Attr, SA_ALIGN, "ALIGN");
-	    	    S->RunAlignment = (unsigned) CfgCheckedConstExpr (1, MAX_ALIGNMENT);
-	    	    S->Flags |= SF_ALIGN;
-	    	    break;
+                case CFGTOK_ALIGN:
+                    FlagAttr (&S->Attr, SA_ALIGN, "ALIGN");
+                    S->RunAlignment = (unsigned) CfgCheckedConstExpr (1, MAX_ALIGNMENT);
+                    S->Flags |= SF_ALIGN;
+                    break;
 
                 case CFGTOK_ALIGN_LOAD:
-	    	    FlagAttr (&S->Attr, SA_ALIGN_LOAD, "ALIGN_LOAD");
-	    	    S->LoadAlignment = (unsigned) CfgCheckedConstExpr (1, MAX_ALIGNMENT);
-	    	    S->Flags |= SF_ALIGN_LOAD;
-	    	    break;
+                    FlagAttr (&S->Attr, SA_ALIGN_LOAD, "ALIGN_LOAD");
+                    S->LoadAlignment = (unsigned) CfgCheckedConstExpr (1, MAX_ALIGNMENT);
+                    S->Flags |= SF_ALIGN_LOAD;
+                    break;
 
-	        case CFGTOK_DEFINE:
- 	    	    FlagAttr (&S->Attr, SA_DEFINE, "DEFINE");
-	    	    /* Map the token to a boolean */
-	    	    CfgBoolToken ();
-	    	    if (CfgTok == CFGTOK_TRUE) {
-	    	     	S->Flags |= SF_DEFINE;
-	    	    }
+                case CFGTOK_DEFINE:
+                    FlagAttr (&S->Attr, SA_DEFINE, "DEFINE");
+                    /* Map the token to a boolean */
+                    CfgBoolToken ();
+                    if (CfgTok == CFGTOK_TRUE) {
+                        S->Flags |= SF_DEFINE;
+                    }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
                 case CFGTOK_FILLVAL:
-	    	    FlagAttr (&S->Attr, SA_FILLVAL, "FILLVAL");
-	      	    S->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
+                    FlagAttr (&S->Attr, SA_FILLVAL, "FILLVAL");
+                    S->FillVal = (unsigned char) CfgCheckedConstExpr (0, 0xFF);
                     S->Flags |= SF_FILLVAL;
-	    	    break;
+                    break;
 
-	    	case CFGTOK_LOAD:
-	      	    FlagAttr (&S->Attr, SA_LOAD, "LOAD");
-	    	    S->Load = CfgGetMemory (GetStrBufId (&CfgSVal));
+                case CFGTOK_LOAD:
+                    FlagAttr (&S->Attr, SA_LOAD, "LOAD");
+                    S->Load = CfgGetMemory (GetStrBufId (&CfgSVal));
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	        case CFGTOK_OFFSET:
-	    	    FlagAttr (&S->Attr, SA_OFFSET, "OFFSET");
-	    	    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
-	    	    S->Flags |= SF_OFFSET;
-	    	    break;
+                case CFGTOK_OFFSET:
+                    FlagAttr (&S->Attr, SA_OFFSET, "OFFSET");
+                    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
+                    S->Flags |= SF_OFFSET;
+                    break;
 
-	        case CFGTOK_OPTIONAL:
-	    	    FlagAttr (&S->Attr, SA_OPTIONAL, "OPTIONAL");
-		    CfgBoolToken ();
-		    if (CfgTok == CFGTOK_TRUE) {
-	  	    	S->Flags |= SF_OPTIONAL;
-		    }
+                case CFGTOK_OPTIONAL:
+                    FlagAttr (&S->Attr, SA_OPTIONAL, "OPTIONAL");
+                    CfgBoolToken ();
+                    if (CfgTok == CFGTOK_TRUE) {
+                        S->Flags |= SF_OPTIONAL;
+                    }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	    	case CFGTOK_RUN:
-      	    	    FlagAttr (&S->Attr, SA_RUN, "RUN");
- 	    	    S->Run = CfgGetMemory (GetStrBufId (&CfgSVal));
+                case CFGTOK_RUN:
+                    FlagAttr (&S->Attr, SA_RUN, "RUN");
+                    S->Run = CfgGetMemory (GetStrBufId (&CfgSVal));
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	        case CFGTOK_START:
-	    	    FlagAttr (&S->Attr, SA_START, "START");
-	    	    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
-	    	    S->Flags |= SF_START;
-	    	    break;
+                case CFGTOK_START:
+                    FlagAttr (&S->Attr, SA_START, "START");
+                    S->Addr   = CfgCheckedConstExpr (1, 0x1000000);
+                    S->Flags |= SF_START;
+                    break;
 
-	    	case CFGTOK_TYPE:
- 	    	    FlagAttr (&S->Attr, SA_TYPE, "TYPE");
-       	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
-	    	    switch (CfgTok) {
-       	       	       	case CFGTOK_RO:	   S->Flags |= SF_RO;               break;
-	    		case CFGTOK_RW:	   /* Default */		    break;
-	    	     	case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
-	    	     	case CFGTOK_ZP:	   S->Flags |= (SF_BSS | SF_ZP);    break;
-	    	     	default:      	   Internal ("Unexpected token: %d", CfgTok);
-	    	    }
+                case CFGTOK_TYPE:
+                    FlagAttr (&S->Attr, SA_TYPE, "TYPE");
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                    switch (CfgTok) {
+                        case CFGTOK_RO:    S->Flags |= SF_RO;               break;
+                        case CFGTOK_RW:    /* Default */                    break;
+                        case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
+                        case CFGTOK_ZP:    S->Flags |= (SF_BSS | SF_ZP);    break;
+                        default:           Internal ("Unexpected token: %d", CfgTok);
+                    }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	    	default:
-       	       	    FAIL ("Unexpected attribute token");
+                default:
+                    FAIL ("Unexpected attribute token");
 
-	    }
+            }
 
-	    /* Skip an optional comma */
-	    CfgOptionalComma ();
-	}
+            /* Skip an optional comma */
+            CfgOptionalComma ();
+        }
 
-	/* Check for mandatory parameters */
-	AttrCheck (S->Attr, SA_LOAD, "LOAD");
+        /* Check for mandatory parameters */
+        AttrCheck (S->Attr, SA_LOAD, "LOAD");
 
- 	/* Set defaults for stuff not given */
-	if ((S->Attr & SA_RUN) == 0) {
-	    S->Attr |= SA_RUN;
-	    S->Run = S->Load;
-	}
+        /* Set defaults for stuff not given */
+        if ((S->Attr & SA_RUN) == 0) {
+            S->Attr |= SA_RUN;
+            S->Run = S->Load;
+        }
 
         /* An attribute of ALIGN_LOAD doesn't make sense if there are no
          * separate run and load memory areas.
          */
         if ((S->Flags & SF_ALIGN_LOAD) != 0 && (S->Load == S->Run)) {
-       	    CfgWarning (&CfgErrorPos,
+            CfgWarning (&CfgErrorPos,
                         "ALIGN_LOAD attribute specified, but no separate "
                         "LOAD and RUN memory areas assigned");
             /* Remove the flag */
@@ -795,31 +795,31 @@ static void ParseSegments (void)
          * load and run memory areas, because it's is never written to disk.
          */
         if ((S->Flags & SF_BSS) != 0 && (S->Load != S->Run)) {
-       	    CfgWarning (&CfgErrorPos,
+            CfgWarning (&CfgErrorPos,
                         "Segment with type `bss' has both LOAD and RUN "
                         "memory areas assigned");
         }
 
-      	/* Don't allow read/write data to be put into a readonly area */
-      	if ((S->Flags & SF_RO) == 0) {
-       	    if (S->Run->Flags & MF_RO) {
-      	    	CfgError (&CfgErrorPos,
+        /* Don't allow read/write data to be put into a readonly area */
+        if ((S->Flags & SF_RO) == 0) {
+            if (S->Run->Flags & MF_RO) {
+                CfgError (&CfgErrorPos,
                           "Cannot put r/w segment `%s' in r/o memory area `%s'",
-      	    	     	  GetString (S->Name), GetString (S->Run->Name));
-      	    }
-      	}
+                          GetString (S->Name), GetString (S->Run->Name));
+            }
+        }
 
-      	/* Only one of ALIGN, START and OFFSET may be used */
-       	Count = ((S->Flags & SF_ALIGN)  != 0) +
-      	       	((S->Flags & SF_OFFSET) != 0) +
-      	    	((S->Flags & SF_START)  != 0);
-      	if (Count > 1) {
-       	    CfgError (&CfgErrorPos,
+        /* Only one of ALIGN, START and OFFSET may be used */
+        Count = ((S->Flags & SF_ALIGN)  != 0) +
+                ((S->Flags & SF_OFFSET) != 0) +
+                ((S->Flags & SF_START)  != 0);
+        if (Count > 1) {
+            CfgError (&CfgErrorPos,
                       "Only one of ALIGN, START, OFFSET may be used");
-      	}
+        }
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
+        /* Skip the semicolon */
+        CfgConsumeSemi ();
     }
 
     /* Remember we had this section */
@@ -832,32 +832,32 @@ static void ParseO65 (void)
 /* Parse the o65 format section */
 {
     static const IdentTok Attributes [] = {
-       	{   "EXPORT",   CFGTOK_EXPORT   	},
-	{   "IMPORT",	CFGTOK_IMPORT		},
-        {   "TYPE",     CFGTOK_TYPE     	},
-       	{   "OS",      	CFGTOK_OS       	},
-       	{   "ID",      	CFGTOK_ID       	},
-       	{   "VERSION",  CFGTOK_VERSION          },
+        {   "EXPORT",   CFGTOK_EXPORT           },
+        {   "IMPORT",   CFGTOK_IMPORT           },
+        {   "TYPE",     CFGTOK_TYPE             },
+        {   "OS",       CFGTOK_OS               },
+        {   "ID",       CFGTOK_ID               },
+        {   "VERSION",  CFGTOK_VERSION          },
     };
     static const IdentTok Types [] = {
-       	{   "SMALL",   	CFGTOK_SMALL    	},
-       	{   "LARGE",   	CFGTOK_LARGE    	},
+        {   "SMALL",    CFGTOK_SMALL            },
+        {   "LARGE",    CFGTOK_LARGE            },
     };
     static const IdentTok OperatingSystems [] = {
-       	{   "LUNIX",   	CFGTOK_LUNIX     	},
-       	{   "OSA65",   	CFGTOK_OSA65    	},
+        {   "LUNIX",    CFGTOK_LUNIX            },
+        {   "OSA65",    CFGTOK_OSA65            },
         {   "CC65",     CFGTOK_CC65             },
         {   "OPENCBM",  CFGTOK_OPENCBM          },
     };
 
     /* Bitmask to remember the attributes we got already */
     enum {
-       	atNone		= 0x0000,
-	atOS            = 0x0001,
+        atNone          = 0x0000,
+        atOS            = 0x0001,
         atOSVersion     = 0x0002,
-	atType	       	= 0x0004,
-	atImport        = 0x0008,
-	atExport    	= 0x0010,
+        atType          = 0x0004,
+        atImport        = 0x0008,
+        atExport        = 0x0010,
         atID            = 0x0020,
         atVersion       = 0x0040
     };
@@ -870,72 +870,72 @@ static void ParseO65 (void)
     /* Read the attributes */
     while (CfgTok == CFGTOK_IDENT) {
 
-	/* Map the identifier to a token */
-	cfgtok_t AttrTok;
-       	CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-	AttrTok = CfgTok;
+        /* Map the identifier to a token */
+        cfgtok_t AttrTok;
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        AttrTok = CfgTok;
 
-	/* An optional assignment follows */
-	CfgNextTok ();
-	CfgOptionalAssign ();
+        /* An optional assignment follows */
+        CfgNextTok ();
+        CfgOptionalAssign ();
 
-	/* Check which attribute was given */
-	switch (AttrTok) {
+        /* Check which attribute was given */
+        switch (AttrTok) {
 
-	    case CFGTOK_EXPORT:
+            case CFGTOK_EXPORT:
                 /* Remember we had this token (maybe more than once) */
                 AttrFlags |= atExport;
-	      	/* We expect an identifier */
-		CfgAssureIdent ();
+                /* We expect an identifier */
+                CfgAssureIdent ();
                 /* Remember it as an export for later */
                 NewCfgSymbol (CfgSymO65Export, GetStrBufId (&CfgSVal));
                 /* Eat the identifier token */
                 CfgNextTok ();
-	    	break;
+                break;
 
-	    case CFGTOK_IMPORT:
+            case CFGTOK_IMPORT:
                 /* Remember we had this token (maybe more than once) */
                 AttrFlags |= atImport;
-	      	/* We expect an identifier */
-		CfgAssureIdent ();
+                /* We expect an identifier */
+                CfgAssureIdent ();
                 /* Remember it as an import for later */
                 NewCfgSymbol (CfgSymO65Import, GetStrBufId (&CfgSVal));
                 /* Eat the identifier token */
                 CfgNextTok ();
-	    	break;
+                break;
 
-	    case CFGTOK_TYPE:
-		/* Cannot have this attribute twice */
-		FlagAttr (&AttrFlags, atType, "TYPE");
-	    	/* Get the type of the executable */
-		CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
-		switch (CfgTok) {
+            case CFGTOK_TYPE:
+                /* Cannot have this attribute twice */
+                FlagAttr (&AttrFlags, atType, "TYPE");
+                /* Get the type of the executable */
+                CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                switch (CfgTok) {
 
-		    case CFGTOK_SMALL:
-		        O65SetSmallModel (O65FmtDesc);
-		     	break;
+                    case CFGTOK_SMALL:
+                        O65SetSmallModel (O65FmtDesc);
+                        break;
 
-		    case CFGTOK_LARGE:
-		    	O65SetLargeModel (O65FmtDesc);
-	    	     	break;
+                    case CFGTOK_LARGE:
+                        O65SetLargeModel (O65FmtDesc);
+                        break;
 
-	    	    default:
-	    	     	CfgError (&CfgErrorPos, "Unexpected type token");
-	    	}
+                    default:
+                        CfgError (&CfgErrorPos, "Unexpected type token");
+                }
                 /* Eat the attribute token */
                 CfgNextTok ();
-	     	break;
+                break;
 
-	    case CFGTOK_OS:
-	     	/* Cannot use this attribute twice */
-	     	FlagAttr (&AttrFlags, atOS, "OS");
-	     	/* Get the operating system. It may be specified as name or
+            case CFGTOK_OS:
+                /* Cannot use this attribute twice */
+                FlagAttr (&AttrFlags, atOS, "OS");
+                /* Get the operating system. It may be specified as name or
                  * as a number in the range 1..255.
                  */
-		if (CfgTok == CFGTOK_INTCON) {
-		    CfgRangeCheck (O65OS_MIN, O65OS_MAX);
-		    OS = (unsigned) CfgIVal;
-		} else {
+                if (CfgTok == CFGTOK_INTCON) {
+                    CfgRangeCheck (O65OS_MIN, O65OS_MAX);
+                    OS = (unsigned) CfgIVal;
+                } else {
                     CfgSpecialToken (OperatingSystems, ENTRY_COUNT (OperatingSystems), "OS type");
                     switch (CfgTok) {
                         case CFGTOK_LUNIX:    OS = O65OS_LUNIX;     break;
@@ -946,7 +946,7 @@ static void ParseO65 (void)
                     }
                 }
                 CfgNextTok ();
-	     	break;
+                break;
 
             case CFGTOK_ID:
                 /* Cannot have this attribute twice */
@@ -962,13 +962,13 @@ static void ParseO65 (void)
                 Version = (unsigned) CfgCheckedConstExpr (0, 0xFF);
                 break;
 
-	    default:
-		FAIL ("Unexpected attribute token");
+            default:
+                FAIL ("Unexpected attribute token");
 
-	}
+        }
 
-	/* Skip an optional comma */
-	CfgOptionalComma ();
+        /* Skip an optional comma */
+        CfgOptionalComma ();
     }
 
     /* Check if we have all mandatory attributes */
@@ -997,39 +997,39 @@ static void ParseFormats (void)
 /* Parse a target format section */
 {
     static const IdentTok Formats [] = {
-       	{   "O65",     	CFGTOK_O65      },
-       	{   "BIN",     	CFGTOK_BIN      },
-       	{   "BINARY",   CFGTOK_BIN      },
+        {   "O65",      CFGTOK_O65      },
+        {   "BIN",      CFGTOK_BIN      },
+        {   "BINARY",   CFGTOK_BIN      },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
 
-	/* Map the identifier to a token */
-	cfgtok_t FormatTok;
-       	CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
-	FormatTok = CfgTok;
+        /* Map the identifier to a token */
+        cfgtok_t FormatTok;
+        CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
+        FormatTok = CfgTok;
 
-	/* Skip the name and the following colon */
-	CfgNextTok ();
-	CfgConsumeColon ();
+        /* Skip the name and the following colon */
+        CfgNextTok ();
+        CfgConsumeColon ();
 
-	/* Parse the format options */
-	switch (FormatTok) {
+        /* Parse the format options */
+        switch (FormatTok) {
 
-	    case CFGTOK_O65:
-		ParseO65 ();
-		break;
+            case CFGTOK_O65:
+                ParseO65 ();
+                break;
 
-	    case CFGTOK_BIN:
-		/* No attribibutes available */
-		break;
+            case CFGTOK_BIN:
+                /* No attribibutes available */
+                break;
 
-	    default:
-		Error ("Unexpected format token");
-	}
+            default:
+                Error ("Unexpected format token");
+        }
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
+        /* Skip the semicolon */
+        CfgConsumeSemi ();
     }
 
 
@@ -1043,23 +1043,23 @@ static void ParseConDes (void)
 /* Parse the CONDES feature */
 {
     static const IdentTok Attributes [] = {
-	{   "COUNT",	   	CFGTOK_COUNT		},
+        {   "COUNT",            CFGTOK_COUNT            },
         {   "IMPORT",           CFGTOK_IMPORT           },
-	{   "LABEL",  	   	CFGTOK_LABEL  		},
-	{   "ORDER",	   	CFGTOK_ORDER		},
-       	{   "SEGMENT",	   	CFGTOK_SEGMENT		},
-	{   "TYPE",	   	CFGTOK_TYPE   		},
+        {   "LABEL",            CFGTOK_LABEL            },
+        {   "ORDER",            CFGTOK_ORDER            },
+        {   "SEGMENT",          CFGTOK_SEGMENT          },
+        {   "TYPE",             CFGTOK_TYPE             },
     };
 
     static const IdentTok Types [] = {
-       	{   "CONSTRUCTOR",	CFGTOK_CONSTRUCTOR	},
-	{   "DESTRUCTOR",      	CFGTOK_DESTRUCTOR	},
+        {   "CONSTRUCTOR",      CFGTOK_CONSTRUCTOR      },
+        {   "DESTRUCTOR",       CFGTOK_DESTRUCTOR       },
         {   "INTERRUPTOR",      CFGTOK_INTERRUPTOR      },
     };
 
     static const IdentTok Orders [] = {
-	{   "DECREASING",      	CFGTOK_DECREASING	},
-       	{   "INCREASING",      	CFGTOK_INCREASING	},
+        {   "DECREASING",       CFGTOK_DECREASING       },
+        {   "INCREASING",       CFGTOK_INCREASING       },
     };
 
     /* Attribute values. */
@@ -1073,112 +1073,112 @@ static void ParseConDes (void)
 
     /* Bitmask to remember the attributes we got already */
     enum {
-	atNone	   	= 0x0000,
-	atCount	   	= 0x0001,
+        atNone          = 0x0000,
+        atCount         = 0x0001,
         atImport        = 0x0002,
-	atLabel	   	= 0x0004,
-	atOrder	   	= 0x0008,
-	atSegName  	= 0x0010,
-	atType	   	= 0x0020,
+        atLabel         = 0x0004,
+        atOrder         = 0x0008,
+        atSegName       = 0x0010,
+        atType          = 0x0020,
     };
     unsigned AttrFlags = atNone;
 
     /* Parse the attributes */
     while (1) {
 
-	/* Map the identifier to a token */
-	cfgtok_t AttrTok;
-       	CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-	AttrTok = CfgTok;
+        /* Map the identifier to a token */
+        cfgtok_t AttrTok;
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        AttrTok = CfgTok;
 
-	/* An optional assignment follows */
-	CfgNextTok ();
-	CfgOptionalAssign ();
+        /* An optional assignment follows */
+        CfgNextTok ();
+        CfgOptionalAssign ();
 
-	/* Check which attribute was given */
-	switch (AttrTok) {
+        /* Check which attribute was given */
+        switch (AttrTok) {
 
-	    case CFGTOK_COUNT:
-	       	/* Don't allow this twice */
-	    	FlagAttr (&AttrFlags, atCount, "COUNT");
-	      	/* We expect an identifier */
-	    	CfgAssureIdent ();
-	    	/* Remember the value for later */
-	    	Count = GetStrBufId (&CfgSVal);
-	    	break;
+            case CFGTOK_COUNT:
+                /* Don't allow this twice */
+                FlagAttr (&AttrFlags, atCount, "COUNT");
+                /* We expect an identifier */
+                CfgAssureIdent ();
+                /* Remember the value for later */
+                Count = GetStrBufId (&CfgSVal);
+                break;
 
-	    case CFGTOK_IMPORT:
-	       	/* Don't allow this twice */
-	    	FlagAttr (&AttrFlags, atImport, "IMPORT");
-	      	/* We expect an identifier */
-	    	CfgAssureIdent ();
-	    	/* Remember value and position for later */
-       	       	Import.Name = GetStrBufId (&CfgSVal);
+            case CFGTOK_IMPORT:
+                /* Don't allow this twice */
+                FlagAttr (&AttrFlags, atImport, "IMPORT");
+                /* We expect an identifier */
+                CfgAssureIdent ();
+                /* Remember value and position for later */
+                Import.Name = GetStrBufId (&CfgSVal);
                 Import.Pos = CfgErrorPos;
                 Import.AddrSize = ADDR_SIZE_ABS;
-	    	break;
+                break;
 
-	    case CFGTOK_LABEL:
-	       	/* Don't allow this twice */
-	    	FlagAttr (&AttrFlags, atLabel, "LABEL");
-	      	/* We expect an identifier */
-	    	CfgAssureIdent ();
-	    	/* Remember the value for later */
-	    	Label = GetStrBufId (&CfgSVal);
-	    	break;
+            case CFGTOK_LABEL:
+                /* Don't allow this twice */
+                FlagAttr (&AttrFlags, atLabel, "LABEL");
+                /* We expect an identifier */
+                CfgAssureIdent ();
+                /* Remember the value for later */
+                Label = GetStrBufId (&CfgSVal);
+                break;
 
-	    case CFGTOK_ORDER:
-	       	/* Don't allow this twice */
-		FlagAttr (&AttrFlags, atOrder, "ORDER");
-		CfgSpecialToken (Orders, ENTRY_COUNT (Orders), "Order");
-		switch (CfgTok) {
-		    case CFGTOK_DECREASING: Order = cdDecreasing;	break;
-		    case CFGTOK_INCREASING: Order = cdIncreasing;	break;
-		    default: FAIL ("Unexpected order token");
-		}
-		break;
+            case CFGTOK_ORDER:
+                /* Don't allow this twice */
+                FlagAttr (&AttrFlags, atOrder, "ORDER");
+                CfgSpecialToken (Orders, ENTRY_COUNT (Orders), "Order");
+                switch (CfgTok) {
+                    case CFGTOK_DECREASING: Order = cdDecreasing;       break;
+                    case CFGTOK_INCREASING: Order = cdIncreasing;       break;
+                    default: FAIL ("Unexpected order token");
+                }
+                break;
 
-	    case CFGTOK_SEGMENT:
-	    	/* Don't allow this twice */
-	    	FlagAttr (&AttrFlags, atSegName, "SEGMENT");
-	      	/* We expect an identifier */
-	    	CfgAssureIdent ();
-	    	/* Remember the value for later */
-	    	SegName = GetStrBufId (&CfgSVal);
-	    	break;
+            case CFGTOK_SEGMENT:
+                /* Don't allow this twice */
+                FlagAttr (&AttrFlags, atSegName, "SEGMENT");
+                /* We expect an identifier */
+                CfgAssureIdent ();
+                /* Remember the value for later */
+                SegName = GetStrBufId (&CfgSVal);
+                break;
 
-	    case CFGTOK_TYPE:
-	    	/* Don't allow this twice */
-	    	FlagAttr (&AttrFlags, atType, "TYPE");
-	    	/* The type may be given as id or numerical */
-	    	if (CfgTok == CFGTOK_INTCON) {
-	    	    CfgRangeCheck (CD_TYPE_MIN, CD_TYPE_MAX);
-	    	    Type = (int) CfgIVal;
-	    	} else {
-	     	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
-	    	    switch (CfgTok) {
-		       	case CFGTOK_CONSTRUCTOR: Type = CD_TYPE_CON;	break;
-		       	case CFGTOK_DESTRUCTOR:	 Type = CD_TYPE_DES;	break;
+            case CFGTOK_TYPE:
+                /* Don't allow this twice */
+                FlagAttr (&AttrFlags, atType, "TYPE");
+                /* The type may be given as id or numerical */
+                if (CfgTok == CFGTOK_INTCON) {
+                    CfgRangeCheck (CD_TYPE_MIN, CD_TYPE_MAX);
+                    Type = (int) CfgIVal;
+                } else {
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                    switch (CfgTok) {
+                        case CFGTOK_CONSTRUCTOR: Type = CD_TYPE_CON;    break;
+                        case CFGTOK_DESTRUCTOR:  Type = CD_TYPE_DES;    break;
                         case CFGTOK_INTERRUPTOR: Type = CD_TYPE_INT;    break;
-	     	       	default: FAIL ("Unexpected type token");
-		    }
-		}
-		break;
+                        default: FAIL ("Unexpected type token");
+                    }
+                }
+                break;
 
-	    default:
-		FAIL ("Unexpected attribute token");
+            default:
+                FAIL ("Unexpected attribute token");
 
-	}
+        }
 
-       	/* Skip the attribute value */
-	CfgNextTok ();
+        /* Skip the attribute value */
+        CfgNextTok ();
 
-	/* Semicolon ends the ConDes decl, otherwise accept an optional comma */
-	if (CfgTok == CFGTOK_SEMI) {
-	    break;
-	} else if (CfgTok == CFGTOK_COMMA) {
-	    CfgNextTok ();
-	}
+        /* Semicolon ends the ConDes decl, otherwise accept an optional comma */
+        if (CfgTok == CFGTOK_SEMI) {
+            break;
+        } else if (CfgTok == CFGTOK_COMMA) {
+            CfgNextTok ();
+        }
     }
 
     /* Check if we have all mandatory attributes */
@@ -1188,7 +1188,7 @@ static void ParseConDes (void)
 
     /* Check if the condes has already attributes defined */
     if (ConDesHasSegName(Type) || ConDesHasLabel(Type)) {
-	CfgError (&CfgErrorPos,
+        CfgError (&CfgErrorPos,
                   "CONDES attributes for type %d are already defined",
                   Type);
     }
@@ -1197,13 +1197,13 @@ static void ParseConDes (void)
     ConDesSetSegName (Type, SegName);
     ConDesSetLabel (Type, Label);
     if (AttrFlags & atCount) {
-	ConDesSetCountSym (Type, Count);
+        ConDesSetCountSym (Type, Count);
     }
     if (AttrFlags & atImport) {
-	ConDesSetImport (Type, &Import);
+        ConDesSetImport (Type, &Import);
     }
     if (AttrFlags & atOrder) {
-	ConDesSetOrder (Type, Order);
+        ConDesSetOrder (Type, Order);
     }
 }
 
@@ -1213,7 +1213,7 @@ static void ParseStartAddress (void)
 /* Parse the STARTADDRESS feature */
 {
     static const IdentTok Attributes [] = {
-       	{   "DEFAULT",  CFGTOK_DEFAULT },
+        {   "DEFAULT",  CFGTOK_DEFAULT },
     };
 
 
@@ -1222,44 +1222,44 @@ static void ParseStartAddress (void)
 
     /* Bitmask to remember the attributes we got already */
     enum {
-	atNone		= 0x0000,
-       	atDefault       = 0x0001
+        atNone          = 0x0000,
+        atDefault       = 0x0001
     };
     unsigned AttrFlags = atNone;
 
     /* Parse the attributes */
     while (1) {
 
-	/* Map the identifier to a token */
-	cfgtok_t AttrTok;
-       	CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-	AttrTok = CfgTok;
+        /* Map the identifier to a token */
+        cfgtok_t AttrTok;
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        AttrTok = CfgTok;
 
-	/* An optional assignment follows */
-	CfgNextTok ();
-	CfgOptionalAssign ();
+        /* An optional assignment follows */
+        CfgNextTok ();
+        CfgOptionalAssign ();
 
-	/* Check which attribute was given */
-	switch (AttrTok) {
+        /* Check which attribute was given */
+        switch (AttrTok) {
 
-	    case CFGTOK_DEFAULT:
-	  	/* Don't allow this twice */
-		FlagAttr (&AttrFlags, atDefault, "DEFAULT");
-	      	/* We expect a numeric expression */
+            case CFGTOK_DEFAULT:
+                /* Don't allow this twice */
+                FlagAttr (&AttrFlags, atDefault, "DEFAULT");
+                /* We expect a numeric expression */
                 DefStartAddr = CfgCheckedConstExpr (0, 0xFFFFFF);
-	    	break;
+                break;
 
-	    default:
-		FAIL ("Unexpected attribute token");
+            default:
+                FAIL ("Unexpected attribute token");
 
-	}
+        }
 
-	/* Semicolon ends the ConDes decl, otherwise accept an optional comma */
-	if (CfgTok == CFGTOK_SEMI) {
-	    break;
-	} else if (CfgTok == CFGTOK_COMMA) {
-	    CfgNextTok ();
-	}
+        /* Semicolon ends the ConDes decl, otherwise accept an optional comma */
+        if (CfgTok == CFGTOK_SEMI) {
+            break;
+        } else if (CfgTok == CFGTOK_COMMA) {
+            CfgNextTok ();
+        }
     }
 
     /* Check if we have all mandatory attributes */
@@ -1279,39 +1279,39 @@ static void ParseFeatures (void)
 /* Parse a features section */
 {
     static const IdentTok Features [] = {
-       	{   "CONDES",  	    CFGTOK_CONDES	},
+        {   "CONDES",       CFGTOK_CONDES       },
         {   "STARTADDRESS", CFGTOK_STARTADDRESS },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
 
-    	/* Map the identifier to a token */
-    	cfgtok_t FeatureTok;
-       	CfgSpecialToken (Features, ENTRY_COUNT (Features), "Feature");
-       	FeatureTok = CfgTok;
+        /* Map the identifier to a token */
+        cfgtok_t FeatureTok;
+        CfgSpecialToken (Features, ENTRY_COUNT (Features), "Feature");
+        FeatureTok = CfgTok;
 
-    	/* Skip the name and the following colon */
-    	CfgNextTok ();
-    	CfgConsumeColon ();
+        /* Skip the name and the following colon */
+        CfgNextTok ();
+        CfgConsumeColon ();
 
-    	/* Parse the format options */
-    	switch (FeatureTok) {
+        /* Parse the format options */
+        switch (FeatureTok) {
 
-    	    case CFGTOK_CONDES:
-    	 	ParseConDes ();
-    	 	break;
+            case CFGTOK_CONDES:
+                ParseConDes ();
+                break;
 
             case CFGTOK_STARTADDRESS:
                 ParseStartAddress ();
                 break;
 
 
-    	    default:
-       	       	FAIL ("Unexpected feature token");
-    	}
+            default:
+                FAIL ("Unexpected feature token");
+        }
 
-    	/* Skip the semicolon */
-    	CfgConsumeSemi ();
+        /* Skip the semicolon */
+        CfgConsumeSemi ();
     }
 
     /* Remember we had this section */
@@ -1326,48 +1326,48 @@ static void ParseSymbols (void)
     static const IdentTok Attributes[] = {
         {   "ADDRSIZE", CFGTOK_ADDRSIZE },
         {   "TYPE",     CFGTOK_TYPE     },
-       	{   "VALUE",   	CFGTOK_VALUE    },
+        {   "VALUE",    CFGTOK_VALUE    },
     };
 
     static const IdentTok AddrSizes [] = {
-       	{   "ABS",      CFGTOK_ABS      },
-       	{   "ABSOLUTE", CFGTOK_ABS      },
-       	{   "DIRECT",   CFGTOK_ZP       },
-       	{   "DWORD",    CFGTOK_LONG     },
-       	{   "FAR",      CFGTOK_FAR      },
-       	{   "LONG",     CFGTOK_LONG     },
-       	{   "NEAR",     CFGTOK_ABS      },
-       	{   "ZEROPAGE", CFGTOK_ZP       },
-       	{   "ZP",       CFGTOK_ZP       },
+        {   "ABS",      CFGTOK_ABS      },
+        {   "ABSOLUTE", CFGTOK_ABS      },
+        {   "DIRECT",   CFGTOK_ZP       },
+        {   "DWORD",    CFGTOK_LONG     },
+        {   "FAR",      CFGTOK_FAR      },
+        {   "LONG",     CFGTOK_LONG     },
+        {   "NEAR",     CFGTOK_ABS      },
+        {   "ZEROPAGE", CFGTOK_ZP       },
+        {   "ZP",       CFGTOK_ZP       },
     };
 
     static const IdentTok Types [] = {
-       	{   "EXPORT",   CFGTOK_EXPORT   },
-       	{   "IMPORT",   CFGTOK_IMPORT   },
-       	{   "WEAK",     CFGTOK_WEAK     },
+        {   "EXPORT",   CFGTOK_EXPORT   },
+        {   "IMPORT",   CFGTOK_IMPORT   },
+        {   "WEAK",     CFGTOK_WEAK     },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
 
         /* Bitmask to remember the attributes we got already */
         enum {
-            atNone     	= 0x0000,
+            atNone      = 0x0000,
             atAddrSize  = 0x0001,
             atType      = 0x0002,
             atValue     = 0x0004,
         };
         unsigned AttrFlags = atNone;
 
-       	ExprNode* Value = 0;
+        ExprNode* Value = 0;
         CfgSymType Type = CfgSymExport;
         unsigned char AddrSize = ADDR_SIZE_ABS;
         Import* Imp;
         Export* Exp;
         CfgSymbol* Sym;
 
-	/* Remember the name */
-	unsigned Name = GetStrBufId (&CfgSVal);
-	CfgNextTok ();
+        /* Remember the name */
+        unsigned Name = GetStrBufId (&CfgSVal);
+        CfgNextTok ();
 
         /* New syntax - skip the colon */
         CfgNextTok ();
@@ -1389,36 +1389,36 @@ static void ParseSymbols (void)
             /* Check which attribute was given */
             switch (AttrTok) {
 
-	    	case CFGTOK_ADDRSIZE:
+                case CFGTOK_ADDRSIZE:
                     /* Don't allow this twice */
                     FlagAttr (&AttrFlags, atAddrSize, "ADDRSIZE");
                     /* Map the type to a token */
-      	    	    CfgSpecialToken (AddrSizes, ENTRY_COUNT (AddrSizes), "AddrSize");
+                    CfgSpecialToken (AddrSizes, ENTRY_COUNT (AddrSizes), "AddrSize");
                     switch (CfgTok) {
                         case CFGTOK_ABS:    AddrSize = ADDR_SIZE_ABS;   break;
                         case CFGTOK_FAR:    AddrSize = ADDR_SIZE_FAR;   break;
                         case CFGTOK_LONG:   AddrSize = ADDR_SIZE_LONG;  break;
                         case CFGTOK_ZP:     AddrSize = ADDR_SIZE_ZP;    break;
-       	       	       	default:
+                        default:
                             Internal ("Unexpected token: %d", CfgTok);
                     }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
-	    	case CFGTOK_TYPE:
+                case CFGTOK_TYPE:
                     /* Don't allow this twice */
                     FlagAttr (&AttrFlags, atType, "TYPE");
                     /* Map the type to a token */
-      	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+                    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
                     switch (CfgTok) {
                         case CFGTOK_EXPORT:     Type = CfgSymExport;    break;
                         case CFGTOK_IMPORT:     Type = CfgSymImport;    break;
                         case CFGTOK_WEAK:       Type = CfgSymWeak;      break;
-       	       	       	default:
+                        default:
                             Internal ("Unexpected token: %d", CfgTok);
                     }
                     CfgNextTok ();
-	    	    break;
+                    break;
 
                 case CFGTOK_VALUE:
                     /* Don't allow this twice */
@@ -1478,8 +1478,8 @@ static void ParseSymbols (void)
                 Internal ("Unexpected symbol type %d", Type);
         }
 
-    	/* Skip the semicolon */
-    	CfgConsumeSemi ();
+        /* Skip the semicolon */
+        CfgConsumeSemi ();
     }
 
     /* Remember we had this section */
@@ -1492,59 +1492,59 @@ static void ParseConfig (void)
 /* Parse the config file */
 {
     static const IdentTok BlockNames [] = {
-	{   "MEMORY",  	CFGTOK_MEMORY	},
-	{   "FILES",    CFGTOK_FILES    },
+        {   "MEMORY",   CFGTOK_MEMORY   },
+        {   "FILES",    CFGTOK_FILES    },
         {   "SEGMENTS", CFGTOK_SEGMENTS },
-	{   "FORMATS", 	CFGTOK_FORMATS  },
-	{   "FEATURES", CFGTOK_FEATURES	},
-	{   "SYMBOLS",	CFGTOK_SYMBOLS 	},
+        {   "FORMATS",  CFGTOK_FORMATS  },
+        {   "FEATURES", CFGTOK_FEATURES },
+        {   "SYMBOLS",  CFGTOK_SYMBOLS  },
     };
     cfgtok_t BlockTok;
 
     do {
 
-	/* Read the block ident */
-       	CfgSpecialToken (BlockNames, ENTRY_COUNT (BlockNames), "Block identifier");
-	BlockTok = CfgTok;
-	CfgNextTok ();
+        /* Read the block ident */
+        CfgSpecialToken (BlockNames, ENTRY_COUNT (BlockNames), "Block identifier");
+        BlockTok = CfgTok;
+        CfgNextTok ();
 
-	/* Expected a curly brace */
-	CfgConsume (CFGTOK_LCURLY, "`{' expected");
+        /* Expected a curly brace */
+        CfgConsume (CFGTOK_LCURLY, "`{' expected");
 
-	/* Read the block */
-	switch (BlockTok) {
+        /* Read the block */
+        switch (BlockTok) {
 
-	    case CFGTOK_MEMORY:
-	     	ParseMemory ();
-	     	break;
+            case CFGTOK_MEMORY:
+                ParseMemory ();
+                break;
 
-	    case CFGTOK_FILES:
-	     	ParseFiles ();
-	     	break;
+            case CFGTOK_FILES:
+                ParseFiles ();
+                break;
 
-	    case CFGTOK_SEGMENTS:
-	     	ParseSegments ();
-	     	break;
+            case CFGTOK_SEGMENTS:
+                ParseSegments ();
+                break;
 
-	    case CFGTOK_FORMATS:
-	     	ParseFormats ();
-	     	break;
+            case CFGTOK_FORMATS:
+                ParseFormats ();
+                break;
 
-	    case CFGTOK_FEATURES:
-		ParseFeatures ();
-		break;
+            case CFGTOK_FEATURES:
+                ParseFeatures ();
+                break;
 
-	    case CFGTOK_SYMBOLS:
-		ParseSymbols ();
-		break;
+            case CFGTOK_SYMBOLS:
+                ParseSymbols ();
+                break;
 
-	    default:
-	     	FAIL ("Unexpected block token");
+            default:
+                FAIL ("Unexpected block token");
 
-	}
+        }
 
-	/* Skip closing brace */
-	CfgConsume (CFGTOK_RCURLY, "`}' expected");
+        /* Skip closing brace */
+        CfgConsume (CFGTOK_RCURLY, "`}' expected");
 
     } while (CfgTok != CFGTOK_EOF);
 }
@@ -1588,36 +1588,36 @@ static void ProcessSegments (void)
     while (I < CollCount (&SegDescList)) {
 
         /* Get the next segment descriptor */
-   	SegDesc* S = CollAtUnchecked (&SegDescList, I);
+        SegDesc* S = CollAtUnchecked (&SegDescList, I);
 
         /* Search for the actual segment in the input files. The function may
          * return NULL (no such segment), this is checked later.
          */
         S->Seg = SegFind (S->Name);
 
-   	/* If the segment is marked as BSS style, and if the segment exists
+        /* If the segment is marked as BSS style, and if the segment exists
          * in any of the object file, check that there's no initialized data
          * in the segment.
-   	 */
-   	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
-       	    CfgWarning (GetSourcePos (S->LI),
+         */
+        if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
+            CfgWarning (GetSourcePos (S->LI),
                         "Segment `%s' with type `bss' contains initialized data",
-   	    	        GetString (S->Name));
-   	}
+                        GetString (S->Name));
+        }
 
-      	/* If this segment does exist in any of the object files, insert the
-       	 * segment into the load/run memory areas. Otherwise print a warning
+        /* If this segment does exist in any of the object files, insert the
+         * segment into the load/run memory areas. Otherwise print a warning
          * and discard it, because the segment pointer in the descriptor is
          * invalid.
-      	 */
-      	if (S->Seg != 0) {
+         */
+        if (S->Seg != 0) {
 
-      	    /* Insert the segment into the memory area list */
-      	    MemoryInsert (S->Run, S);
-      	    if (S->Load != S->Run) {
-      	    	/* We have separate RUN and LOAD areas */
-      	    	MemoryInsert (S->Load, S);
-      	    }
+            /* Insert the segment into the memory area list */
+            MemoryInsert (S->Run, S);
+            if (S->Load != S->Run) {
+                /* We have separate RUN and LOAD areas */
+                MemoryInsert (S->Load, S);
+            }
 
             /* Use the fill value from the config */
             S->Seg->FillVal = S->FillVal;
@@ -1625,7 +1625,7 @@ static void ProcessSegments (void)
             /* Process the next segment descriptor in the next run */
             ++I;
 
-      	} else {
+        } else {
 
             /* Print a warning if the segment is not optional */
             if ((S->Flags & SF_OPTIONAL) == 0) {
@@ -1634,10 +1634,10 @@ static void ProcessSegments (void)
                             GetString (S->Name));
             }
 
-      	    /* Discard the descriptor and remove it from the collection */
-      	    FreeSegDesc (S);
+            /* Discard the descriptor and remove it from the collection */
+            FreeSegDesc (S);
             CollDelete (&SegDescList, I);
-      	}
+        }
     }
 }
 
@@ -1821,13 +1821,13 @@ unsigned CfgProcess (void)
          * Doing it here means that the expression for the size of the area
          * may reference this symbol.
          */
-	if (M->Flags & MF_DEFINE) {
+        if (M->Flags & MF_DEFINE) {
             Export* E;
-	    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+            StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
             /* Define the start of the memory area */
-	    SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
-	    E = CreateMemoryExport (GetStrBufId (&Buf), M, 0);
+            SB_Printf (&Buf, "__%s_START__", GetString (M->Name));
+            E = CreateMemoryExport (GetStrBufId (&Buf), M, 0);
             CollAppend (&E->DefLines, M->LI);
 
             SB_Done (&Buf);
@@ -1841,11 +1841,11 @@ unsigned CfgProcess (void)
         }
         M->Size = GetExprVal (M->SizeExpr);
 
-     	/* Walk through the segments in this memory area */
+        /* Walk through the segments in this memory area */
         for (J = 0; J < CollCount (&M->SegList); ++J) {
 
-     	    /* Get the segment */
-     	    SegDesc* S = CollAtUnchecked (&M->SegList, J);
+            /* Get the segment */
+            SegDesc* S = CollAtUnchecked (&M->SegList, J);
 
             /* Remember the start address before handling this segment */
             unsigned long StartAddr = Addr;
@@ -1931,56 +1931,56 @@ unsigned CfgProcess (void)
                 S->Seg->FillVal = M->FillVal;
             }
 
-     	    /* Increment the fill level of the memory area and check for an
-     	     * overflow.
-     	     */
-     	    M->FillLevel = Addr + S->Seg->Size - M->Start;
-       	    if (M->FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
+            /* Increment the fill level of the memory area and check for an
+             * overflow.
+             */
+            M->FillLevel = Addr + S->Seg->Size - M->Start;
+            if (M->FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
                 ++Overflows;
                 M->Flags |= MF_OVERFLOW;
                 CfgWarning (GetSourcePos (M->LI),
                             "Memory area overflow in `%s', segment `%s' (%lu bytes)",
                              GetString (M->Name), GetString (S->Name),
                              M->FillLevel - M->Size);
-     	    }
+            }
 
-     	    /* If requested, define symbols for the start and size of the
-     	     * segment.
-     	     */
-     	    if (S->Flags & SF_DEFINE) {
+            /* If requested, define symbols for the start and size of the
+             * segment.
+             */
+            if (S->Flags & SF_DEFINE) {
                 if (S->Run == M && (S->Flags & SF_RUN_DEF) == 0) {
                     CreateRunDefines (S, Addr);
                 }
                 if (S->Load == M && (S->Flags & SF_LOAD_DEF) == 0) {
                     CreateLoadDefines (S, Addr);
                 }
-     	    }
+            }
 
-     	    /* Calculate the new address */
-     	    Addr += S->Seg->Size;
+            /* Calculate the new address */
+            Addr += S->Seg->Size;
 
             /* If this segment goes out to the file, increase the file size */
             if ((S->Flags & SF_BSS) == 0 && S->Load == M) {
                 M->F->Size += Addr - StartAddr;
             }
 
-	}
+        }
 
-	/* If requested, define symbols for start, size and offset of the
+        /* If requested, define symbols for start, size and offset of the
          * memory area
          */
-	if (M->Flags & MF_DEFINE) {
+        if (M->Flags & MF_DEFINE) {
             Export* E;
-	    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+            StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
             /* Define the size of the memory area */
-	    SB_Printf (&Buf, "__%s_SIZE__", GetString (M->Name));
-	    E = CreateConstExport (GetStrBufId (&Buf), M->Size);
+            SB_Printf (&Buf, "__%s_SIZE__", GetString (M->Name));
+            E = CreateConstExport (GetStrBufId (&Buf), M->Size);
             CollAppend (&E->DefLines, M->LI);
 
             /* Define the fill level of the memory area */
-	    SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
-	    E = CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
+            SB_Printf (&Buf, "__%s_LAST__", GetString (M->Name));
+            E = CreateMemoryExport (GetStrBufId (&Buf), M, M->FillLevel);
             CollAppend (&E->DefLines, M->LI);
 
             /* Define the file offset of the memory area. This isn't of much
@@ -1994,7 +1994,7 @@ unsigned CfgProcess (void)
 
             /* Throw away the string buffer */
             SB_Done (&Buf);
-	}
+        }
 
         /* If we didn't have an overflow and are requested to fill the memory
          * area, acount for that in the file size.
@@ -2021,60 +2021,60 @@ void CfgWriteTarget (void)
         /* Get this entry */
         File* F = CollAtUnchecked (&FileList, I);
 
-    	/* We don't need to look at files with no memory areas */
-  	if (CollCount (&F->MemoryAreas) > 0) {
+        /* We don't need to look at files with no memory areas */
+        if (CollCount (&F->MemoryAreas) > 0) {
 
-  	    /* Is there an output file? */
-  	    if (SB_GetLen (GetStrBuf (F->Name)) > 0) {
+            /* Is there an output file? */
+            if (SB_GetLen (GetStrBuf (F->Name)) > 0) {
 
-  		/* Assign a proper binary format */
-  		if (F->Format == BINFMT_DEFAULT) {
-  	    	    F->Format = DefaultBinFmt;
-     		}
+                /* Assign a proper binary format */
+                if (F->Format == BINFMT_DEFAULT) {
+                    F->Format = DefaultBinFmt;
+                }
 
-     		/* Call the apropriate routine for the binary format */
-  		switch (F->Format) {
+                /* Call the apropriate routine for the binary format */
+                switch (F->Format) {
 
-  		    case BINFMT_BINARY:
-  		       	BinWriteTarget (BinFmtDesc, F);
-  		       	break;
+                    case BINFMT_BINARY:
+                        BinWriteTarget (BinFmtDesc, F);
+                        break;
 
-  		    case BINFMT_O65:
-  	    	       	O65WriteTarget (O65FmtDesc, F);
-  		       	break;
+                    case BINFMT_O65:
+                        O65WriteTarget (O65FmtDesc, F);
+                        break;
 
-  		    default:
-  		        Internal ("Invalid binary format: %u", F->Format);
+                    default:
+                        Internal ("Invalid binary format: %u", F->Format);
 
-  		}
+                }
 
-  	    } else {
+            } else {
 
-  		/* No output file. Walk through the list and mark all segments
-       	       	 * loading into these memory areas in this file as dumped.
-  		 */
+                /* No output file. Walk through the list and mark all segments
+                 * loading into these memory areas in this file as dumped.
+                 */
                 unsigned J;
                 for (J = 0; J < CollCount (&F->MemoryAreas); ++J) {
 
                     unsigned K;
 
                     /* Get this entry */
-  		    MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, J);
+                    MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, J);
 
-		    /* Debugging */
-       	       	    Print (stdout, 2, "Skipping `%s'...\n", GetString (M->Name));
+                    /* Debugging */
+                    Print (stdout, 2, "Skipping `%s'...\n", GetString (M->Name));
 
-  		    /* Walk throught the segments */
+                    /* Walk throught the segments */
                     for (K = 0; K < CollCount (&M->SegList); ++K) {
                         SegDesc* S = CollAtUnchecked (&M->SegList, K);
-		       	if (S->Load == M) {
-  		       	    /* Load area - mark the segment as dumped */
-  		       	    S->Seg->Dumped = 1;
-  		       	}
-		    }
-		}
-	    }
-	}
+                        if (S->Load == M) {
+                            /* Load area - mark the segment as dumped */
+                            S->Seg->Dumped = 1;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

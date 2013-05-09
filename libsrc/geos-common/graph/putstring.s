@@ -3,14 +3,14 @@
 ;
 ; 30.10.99
 
-; void PutString	(char *mytxt, char y, int x);
+; void PutString        (char *mytxt, char y, int x);
 
-	    .import popax, popa
-	    .import getintcharint
-	    .export _PutString
+            .import popax, popa
+            .import getintcharint
+            .export _PutString
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _PutString:
-	jsr getintcharint
-	jmp PutString
+        jsr getintcharint
+        jmp PutString

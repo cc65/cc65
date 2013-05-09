@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   codelab.h				     */
+/*                                 codelab.h                                 */
 /*                                                                           */
-/*			     Code label structure			     */
+/*                           Code label structure                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -54,7 +54,7 @@ struct CodeEntry;
 
 
 /*****************************************************************************/
-/*		  	       struct CodeLabel				     */
+/*                             struct CodeLabel                              */
 /*****************************************************************************/
 
 
@@ -62,17 +62,17 @@ struct CodeEntry;
 /* Label structure */
 typedef struct CodeLabel CodeLabel;
 struct CodeLabel {
-    CodeLabel*		Next;		/* Next in hash list */
-    char*		Name;		/* Label name */
-    unsigned            Hash;		/* Hash over the name */
-    struct CodeEntry*	Owner;		/* Owner entry */
-    Collection	    	JumpFrom;	/* Entries that jump here */
+    CodeLabel*          Next;           /* Next in hash list */
+    char*               Name;           /* Label name */
+    unsigned            Hash;           /* Hash over the name */
+    struct CodeEntry*   Owner;          /* Owner entry */
+    Collection          JumpFrom;       /* Entries that jump here */
 };
 
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code			     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -90,7 +90,7 @@ INLINE unsigned CL_GetRefCount (const CodeLabel* L)
     return CollCount (&L->JumpFrom);
 }
 #else
-#  define CL_GetRefCount(L)    	CollCount (&(L)->JumpFrom)
+#  define CL_GetRefCount(L)     CollCount (&(L)->JumpFrom)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -100,7 +100,7 @@ INLINE struct CodeEntry* CL_GetRef (CodeLabel* L, unsigned Index)
     return CollAt (&L->JumpFrom, Index);
 }
 #else
-#  define CL_GetRef(L, Index)  	CollAt (&(L)->JumpFrom, (Index))
+#  define CL_GetRef(L, Index)   CollAt (&(L)->JumpFrom, (Index))
 #endif
 
 void CL_AddRef (CodeLabel* L, struct CodeEntry* E);

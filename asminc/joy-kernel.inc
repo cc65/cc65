@@ -40,16 +40,16 @@
 ; Driver header stuff
 
 .struct JOY_HDR
-	ID	.byte	3	; $6A, $6F, $79 ("joy")
-	VERSION .byte	1	; Interface version
-	MASKS	.byte	8	; Joystick state mask array
-	JUMPTAB .struct
-	    INSTALL	.word	; INSTALL routine
-	    UNINSTALL   .word	; UNINSTALL routine
-	    COUNT       .word	; COUNT routine
-	    READ 	.word	; READ routine
+        ID      .byte   3       ; $6A, $6F, $79 ("joy")
+        VERSION .byte   1       ; Interface version
+        MASKS   .byte   8       ; Joystick state mask array
+        JUMPTAB .struct
+            INSTALL     .word   ; INSTALL routine
+            UNINSTALL   .word   ; UNINSTALL routine
+            COUNT       .word   ; COUNT routine
+            READ        .word   ; READ routine
             IRQ         .word   ; IRQ routine
-	.endstruct
+        .endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ JOY_API_VERSION         = $01
 ;------------------------------------------------------------------------------
 ; Variables
 
-       	.global	_joy_drv                        ; Pointer to driver
+        .global _joy_drv                        ; Pointer to driver
         .global _joy_masks
 
 ;------------------------------------------------------------------------------
@@ -76,10 +76,10 @@ JOY_API_VERSION         = $01
 
         .global _joy_load_driver
         .global _joy_unload
-       	.global	_joy_install
-       	.global _joy_uninstall
-       	.global	_joy_count
-       	.global	_joy_read
+        .global _joy_install
+        .global _joy_uninstall
+        .global _joy_count
+        .global _joy_read
 
         .global _joy_clear_ptr
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   strutil.h				     */
+/*                                 strutil.h                                 */
 /*                                                                           */
-/*			   String utility functions			     */
+/*                         String utility functions                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -56,9 +56,9 @@ char* StrCopy (char* Dest, size_t DestSize, const char* Source)
     size_t Len = strlen (Source);
     if (Len >= DestSize) {
         memcpy (Dest, Source, DestSize-1);
-	Dest[DestSize-1] = '\0';
+        Dest[DestSize-1] = '\0';
     } else {
-	memcpy (Dest, Source, Len+1);
+        memcpy (Dest, Source, Len+1);
     }
     return Dest;
 }

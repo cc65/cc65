@@ -4,17 +4,17 @@
 ; CC65 runtime: Push a extended with FF onto the stack
 ;
 
-       	.export	     	pushaFF
-	.import	      	pushax
+        .export         pushaFF
+        .import         pushax
 
 ; Beware: The optimizer knows about this function!
 
-.proc	pushaFF
+.proc   pushaFF
 
-	ldx    	#$FF
-	jmp 	pushax
+        ldx     #$FF
+        jmp     pushax
 
 .endproc
 
 
-		      
+                      

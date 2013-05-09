@@ -39,13 +39,13 @@
 
 
 /*****************************************************************************/
-/*				     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* TGI kernel variables */
-extern void*   	     tgi_drv;           /* Pointer to driver */
+extern void*         tgi_drv;           /* Pointer to driver */
 extern unsigned char tgi_error;         /* Last error code */
 extern unsigned char tgi_gmode;         /* Flag: Graphics mode active */
 extern int           tgi_curx;          /* Current drawing cursor X */

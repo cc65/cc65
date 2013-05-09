@@ -5,5 +5,5 @@
 ; Ullrich von Bassewitz, 2002-12-21
 ;
 
-	.include	"../../plus4/joy/plus4-stdjoy.s"
+        .include        "../../plus4/joy/plus4-stdjoy.s"
 

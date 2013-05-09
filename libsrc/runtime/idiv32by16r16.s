@@ -5,7 +5,7 @@
 ;
 
         .export         idiv32by16r16
-       	.import	       	negax, udiv32by16r16m
+        .import         negax, udiv32by16r16m
 
         .include        "zeropage.inc"
 

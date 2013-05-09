@@ -13,10 +13,10 @@
 _gotoxy:
         clc
         adc     WNDTOP
-        sta     CV		; Store Y
+        sta     CV              ; Store Y
         jsr     VTABZ
-        jsr     popa		; Get X
+        jsr     popa            ; Get X
 
 _gotox:
-        sta     CH		; Store X
+        sta     CH              ; Store X
         rts

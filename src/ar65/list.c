@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    list.c				     */
+/*                                  list.c                                   */
 /*                                                                           */
-/*		     Module listing for the ar65 archiver		     */
+/*                   Module listing for the ar65 archiver                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	   	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -58,10 +58,10 @@ void ListObjFiles (int argc, char* argv [])
 
     /* Check the argument count */
     if (argc <= 0) {
-    	Error ("No library name given");
+        Error ("No library name given");
     }
     if (argc > 2) {
-    	Error ("Too many arguments");
+        Error ("Too many arguments");
     }
 
     /* Open the library, read the index */
@@ -74,7 +74,7 @@ void ListObjFiles (int argc, char* argv [])
         O = CollConstAt (&ObjPool, I);
 
         /* Print the name */
-	printf ("%s\n", O->Name);
+        printf ("%s\n", O->Name);
 
     }
 

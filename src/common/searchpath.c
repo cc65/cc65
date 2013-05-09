@@ -53,7 +53,7 @@
 
 
 /*****************************************************************************/
-/*	      	     	      	     Code    		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -69,7 +69,7 @@ static char* CleanupPath (const char* Path)
 
     /* Check for a trailing path separator and remove it */
     if (Len > 0 && (Path[Len-1] == '\\' || Path[Len-1] == '/')) {
-    	--Len;
+        --Len;
     }
 
     /* Allocate memory for the new string */
@@ -130,8 +130,8 @@ void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* Sub
 
     const char* EnvVal = getenv (EnvVar);
     if (EnvVal == 0) {
-    	/* Not found */
-    	return;
+        /* Not found */
+        return;
     }
 
     /* Copy the environment variable to the buffer */
@@ -139,9 +139,9 @@ void AddSubSearchPathFromEnv (SearchPath* P, const char* EnvVar, const char* Sub
 
     /* Add a path separator if necessary */
     if (SB_NotEmpty (&Dir)) {
-	if (SB_LookAtLast (&Dir) != '\\' && SB_LookAtLast (&Dir) != '/') {
-	    SB_AppendChar (&Dir, '/');
-	}
+        if (SB_LookAtLast (&Dir) != '\\' && SB_LookAtLast (&Dir) != '/') {
+            SB_AppendChar (&Dir, '/');
+        }
     }
 
     /* Add the subdirectory and terminate the string */
@@ -252,19 +252,19 @@ char* SearchFile (const SearchPath* P, const char* File)
         /* Copy the next path element into the buffer */
         SB_CopyStr (&PathName, CollConstAt (P, I));
 
-	/* Add a path separator and the filename */
-       	if (SB_NotEmpty (&PathName)) {
-     	    SB_AppendChar (&PathName, '/');
-	}
-	SB_AppendStr (&PathName, File);
-    	SB_Terminate (&PathName);
+        /* Add a path separator and the filename */
+        if (SB_NotEmpty (&PathName)) {
+            SB_AppendChar (&PathName, '/');
+        }
+        SB_AppendStr (&PathName, File);
+        SB_Terminate (&PathName);
 
-	/* Check if this file exists */
-       	if (access (SB_GetBuf (&PathName), 0) == 0) {
-	    /* The file exists, we're done */
-	    Name = xstrdup (SB_GetBuf (&PathName));
+        /* Check if this file exists */
+        if (access (SB_GetBuf (&PathName), 0) == 0) {
+            /* The file exists, we're done */
+            Name = xstrdup (SB_GetBuf (&PathName));
             break;
-	}
+        }
     }
 
     /* Cleanup and return the result of the search */

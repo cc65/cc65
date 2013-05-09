@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			      	   objdefs.h   	       	       	       	     */
+/*                                 objdefs.h                                 */
 /*                                                                           */
-/*			    Object file definitions			     */
+/*                          Object file definitions                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,20 +39,20 @@
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Defines for magic and version */
-#define OBJ_MAGIC	0x616E7A55
-#define OBJ_VERSION	0x0011
+#define OBJ_MAGIC       0x616E7A55
+#define OBJ_VERSION     0x0011
 
 /* Size of an object file header */
-#define	OBJ_HDR_SIZE	(24*4)
+#define OBJ_HDR_SIZE    (24*4)
 
 /* Flag bits */
-#define OBJ_FLAGS_DBGINFO	0x0001	/* File has debug info */
+#define OBJ_FLAGS_DBGINFO       0x0001  /* File has debug info */
 #define OBJ_HAS_DBGINFO(x)      (((x) & OBJ_FLAGS_DBGINFO) != 0)
 
 
@@ -60,21 +60,21 @@
 /* Header structure */
 typedef struct ObjHeader ObjHeader;
 struct ObjHeader {
-    unsigned long     	Magic;		/* 32: Magic number */
-    unsigned 	  	Version;   	/* 16: Version number */
-    unsigned	  	Flags;	   	/* 16: flags */
-    unsigned long      	OptionOffs;	/* 32: Offset to option table */
-    unsigned long       OptionSize;	/* 32: Size of options */
-    unsigned long	FileOffs;  	/* 32: Offset to file table */
-    unsigned long	FileSize;  	/* 32: Size of files */
-    unsigned long	SegOffs;   	/* 32: Offset to segment table */
-    unsigned long	SegSize;   	/* 32: Size of segment table */
-    unsigned long	ImportOffs;	/* 32: Offset to import list */
-    unsigned long	ImportSize;	/* 32: Size of import list */
-    unsigned long      	ExportOffs;	/* 32: Offset to export list */
-    unsigned long	ExportSize;	/* 32: Size of export list */
-    unsigned long       DbgSymOffs;    	/* 32: Offset to list of debug symbols */
-    unsigned long	DbgSymSize;	/* 32: Size of debug symbols */
+    unsigned long       Magic;          /* 32: Magic number */
+    unsigned            Version;        /* 16: Version number */
+    unsigned            Flags;          /* 16: flags */
+    unsigned long       OptionOffs;     /* 32: Offset to option table */
+    unsigned long       OptionSize;     /* 32: Size of options */
+    unsigned long       FileOffs;       /* 32: Offset to file table */
+    unsigned long       FileSize;       /* 32: Size of files */
+    unsigned long       SegOffs;        /* 32: Offset to segment table */
+    unsigned long       SegSize;        /* 32: Size of segment table */
+    unsigned long       ImportOffs;     /* 32: Offset to import list */
+    unsigned long       ImportSize;     /* 32: Size of import list */
+    unsigned long       ExportOffs;     /* 32: Offset to export list */
+    unsigned long       ExportSize;     /* 32: Size of export list */
+    unsigned long       DbgSymOffs;     /* 32: Offset to list of debug symbols */
+    unsigned long       DbgSymSize;     /* 32: Size of debug symbols */
     unsigned long       LineInfoOffs;   /* 32: Offset to list of line infos */
     unsigned long       LineInfoSize;   /* 32: Size of line infos */
     unsigned long       StrPoolOffs;    /* 32: Offset to string pool */

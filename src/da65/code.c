@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    code.c				     */
+/*                                  code.c                                   */
 /*                                                                           */
-/*			    Binary code management			     */
+/*                          Binary code management                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,20 +48,20 @@
 
 
 /*****************************************************************************/
-/*	    			     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-unsigned char CodeBuf [0x10000];	/* Code buffer */
-unsigned long CodeStart;		/* Start address */
-unsigned long CodeEnd;	  	     	/* End address */
-unsigned long PC;			/* Current PC */
+unsigned char CodeBuf [0x10000];        /* Code buffer */
+unsigned long CodeStart;                /* Start address */
+unsigned long CodeEnd;                  /* End address */
+unsigned long PC;                       /* Current PC */
 
 
 
 /*****************************************************************************/
-/*	       		  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -78,12 +78,12 @@ void LoadCode (void)
     /* Open the file */
     F = fopen (InFile, "rb");
     if (F == 0) {
-     	Error ("Cannot open `%s': %s", InFile, strerror (errno));
+        Error ("Cannot open `%s': %s", InFile, strerror (errno));
     }
 
     /* Seek to the end to get the size of the file */
     if (fseek (F, 0, SEEK_END) != 0) {
-	Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
+        Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
     }
     Size = ftell (F);
 
@@ -101,7 +101,7 @@ void LoadCode (void)
      * the file.
      */
     if (fseek (F, InputOffs, SEEK_SET) != 0) {
-	Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
+        Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
     }
     Size -= InputOffs;
 
@@ -118,11 +118,11 @@ void LoadCode (void)
      * is a ROM that contains the hardware vectors at $FFFA.
      */
     if (StartAddr < 0) {
-     	if (Size > 0x10000) {
-     	    StartAddr = 0;
-     	} else {
-     	    StartAddr = 0x10000 - Size;
-     	}
+        if (Size > 0x10000) {
+            StartAddr = 0;
+        } else {
+            StartAddr = 0x10000 - Size;
+        }
     }
 
     /* Calculate the maximum code size */
@@ -130,19 +130,19 @@ void LoadCode (void)
 
     /* Check if the size is larger than what we can read */
     if (Size == 0) {
-       	Error ("Nothing to read from input file `%s'", InFile);
+        Error ("Nothing to read from input file `%s'", InFile);
     }
     if (Size > MaxCount) {
-       	Warning ("File `%s' is too large, ignoring %ld bytes",
-       		 InFile, Size - MaxCount);
+        Warning ("File `%s' is too large, ignoring %ld bytes",
+                 InFile, Size - MaxCount);
     } else if (MaxCount > Size) {
-       	MaxCount = (unsigned) Size;
+        MaxCount = (unsigned) Size;
     }
 
     /* Read from the file and remember the number of bytes read */
     Count = fread (CodeBuf + StartAddr, 1, MaxCount, F);
     if (ferror (F) || Count != MaxCount) {
-     	Error ("Error reading from `%s': %s", InFile, strerror (errno));
+        Error ("Error reading from `%s': %s", InFile, strerror (errno));
     }
 
     /* Close the file */
@@ -150,7 +150,7 @@ void LoadCode (void)
 
     /* Set the buffer variables */
     CodeStart = PC = StartAddr;
-    CodeEnd = CodeStart + Count - 1;	/* CodeEnd is inclusive */
+    CodeEnd = CodeStart + Count - 1;    /* CodeEnd is inclusive */
 }
 
 
@@ -198,9 +198,9 @@ unsigned GetRemainingBytes (void)
 /* Return the number of remaining code bytes */
 {
     if (CodeEnd >= PC) {
-    	return (CodeEnd - PC + 1);
+        return (CodeEnd - PC + 1);
     } else {
-    	return 0;
+        return 0;
     }
 }
 

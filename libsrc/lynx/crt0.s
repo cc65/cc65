@@ -15,122 +15,122 @@
 ; on the front of the fully linked binary (see EXEHDR segment.)
 ;
 
-	.export		_exit
-	.export		__STARTUP__ : absolute = 1	; Mark as startup
+        .export         _exit
+        .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-	.import		initlib, donelib
-	.import		zerobss
-	.import		callmain
-	.import		_main
-	.import		__RAM_START__, __RAM_SIZE__, __STACKSIZE__
+        .import         initlib, donelib
+        .import         zerobss
+        .import         callmain
+        .import         _main
+        .import         __RAM_START__, __RAM_SIZE__, __STACKSIZE__
 
-	.include	"zeropage.inc"
-	.include	"extzp.inc"
-	.include	"lynx.inc"
+        .include        "zeropage.inc"
+        .include        "extzp.inc"
+        .include        "lynx.inc"
 
 ; ------------------------------------------------------------------------
 ; Mikey and Suzy init data, reg offsets and data
 
-	.rodata
+        .rodata
 
-SuzyInitReg:	.byte $28,$2a,$04,$06,$92,$83,$90
-SuzyInitData:	.byte $7f,$7f,$00,$00,$24,$f3,$01
+SuzyInitReg:    .byte $28,$2a,$04,$06,$92,$83,$90
+SuzyInitData:   .byte $7f,$7f,$00,$00,$24,$f3,$01
 
-MikeyInitReg:	.byte $00,$01,$08,$09,$20,$28,$30,$38,$44,$50,$8a,$8b,$8c,$92,$93
-MikeyInitData:	.byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$29
+MikeyInitReg:   .byte $00,$01,$08,$09,$20,$28,$30,$38,$44,$50,$8a,$8b,$8c,$92,$93
+MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$29
 
 ; ------------------------------------------------------------------------
 ; Actual code
 
-	.segment "STARTUP"
+        .segment "STARTUP"
 
 ; set up system
 
-	sei
-	cld
-	ldx	#$FF
-	txs
+        sei
+        cld
+        ldx     #$FF
+        txs
 
 ; init bank switching
 
-	lda	#$C
-	sta	MAPCTL		; $FFF9
+        lda     #$C
+        sta     MAPCTL          ; $FFF9
 
 ; disable all timer interrupts
 
-	lda	#$80
-	trb	TIM0CTLA
-	trb	TIM1CTLA
-	trb	TIM2CTLA
-	trb	TIM3CTLA
-	trb	TIM5CTLA
-	trb	TIM6CTLA
-	trb	TIM7CTLA
+        lda     #$80
+        trb     TIM0CTLA
+        trb     TIM1CTLA
+        trb     TIM2CTLA
+        trb     TIM3CTLA
+        trb     TIM5CTLA
+        trb     TIM6CTLA
+        trb     TIM7CTLA
 
 ; disable TX/RX IRQ, set to 8E1
 
-	lda	#%11101
-	sta	SERCTL
+        lda     #%11101
+        sta     SERCTL
 
 ; clear all pending interrupts
 
-	lda	INTSET
-	sta	INTRST
+        lda     INTSET
+        sta     INTRST
 
 ; setup the stack
 
-	lda	#<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-	sta	sp
-	lda	#>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
-	sta	sp+1
+        lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp
+        lda     #>(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
+        sta     sp+1
 
 ; Init Mickey
 
-	ldx	#.sizeof(MikeyInitReg)-1
-mloop:	ldy	MikeyInitReg,x
-	lda	MikeyInitData,x
-	sta	$fd00,y
-	dex
-	bpl	mloop
+        ldx     #.sizeof(MikeyInitReg)-1
+mloop:  ldy     MikeyInitReg,x
+        lda     MikeyInitData,x
+        sta     $fd00,y
+        dex
+        bpl     mloop
 
 ; these are RAM-shadows of read only regs
 
-	ldx	#$1b
-	stx	__iodat
-	dex			; $1A
-	stx	__iodir
-	ldx	#$d
-	stx	__viddma
+        ldx     #$1b
+        stx     __iodat
+        dex                     ; $1A
+        stx     __iodir
+        ldx     #$d
+        stx     __viddma
 
 ; Init Suzy
 
-	ldx	#.sizeof(SuzyInitReg)-1
-sloop:	ldy	SuzyInitReg,x
-	lda	SuzyInitData,x
-	sta	$fc00,y
-	dex
-	bpl	sloop
+        ldx     #.sizeof(SuzyInitReg)-1
+sloop:  ldy     SuzyInitReg,x
+        lda     SuzyInitData,x
+        sta     $fc00,y
+        dex
+        bpl     sloop
 
-	lda	#$24
-	sta	__sprsys
-	cli
+        lda     #$24
+        sta     __sprsys
+        cli
 
 ; Clear the BSS data
 
-	jsr	zerobss
+        jsr     zerobss
 
 ; Call module constructors
 
-	jsr	initlib
+        jsr     initlib
 
 ; Push arguments and call main
 
-	jsr	callmain
+        jsr     callmain
 
 ; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	donelib		; Run module destructors
+_exit:  jsr     donelib         ; Run module destructors
 
 ; Endless loop
 
-noret:	bra	noret
+noret:  bra     noret

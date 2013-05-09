@@ -14,7 +14,7 @@
 
 
 /*****************************************************************************/
-/*     	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -25,9 +25,9 @@ int __fastcall__ puts (const char* s)
 
     /* Assume stdout is always open */
     if (write (stdout->f_fd, s, strlen (s)) < 0 ||
-	write (stdout->f_fd, &nl, 1)        < 0) {
-       	stdout->f_flags |= _FERROR;
-	return -1;
+        write (stdout->f_fd, &nl, 1)        < 0) {
+        stdout->f_flags |= _FERROR;
+        return -1;
     }
 
     /* Done */

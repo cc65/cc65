@@ -5,8 +5,8 @@
 
 ; void FrameRectangle   (char pattern);
 
-	    .export _FrameRectangle
+            .export _FrameRectangle
 
-	    .include "jumptab.inc"
-	    
-_FrameRectangle	= FrameRectangle
+            .include "jumptab.inc"
+            
+_FrameRectangle = FrameRectangle

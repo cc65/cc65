@@ -5,8 +5,8 @@
 
 ; void MouseUp (void);
 
-	    .export _MouseUp
+            .export _MouseUp
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_MouseUp	= MouseUp
+_MouseUp        = MouseUp

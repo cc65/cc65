@@ -5,9 +5,9 @@
 
 ; void InvertRectangle  (void);
 
-	    .export _InvertRectangle
-	    
-	    .include "jumptab.inc"
+            .export _InvertRectangle
+            
+            .include "jumptab.inc"
 
 _InvertRectangle = InvertRectangle
 

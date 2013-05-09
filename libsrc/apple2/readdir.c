@@ -38,7 +38,7 @@
 
 
 /*****************************************************************************/
-/*		   		     Code	   			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -50,27 +50,27 @@ struct dirent* __fastcall__ readdir (register DIR* dir)
     /* Search for the next active directory entry */
     do {
 
-	/* Read next directory block if necessary */
-	if (dir->current_entry == dir->entries_per_block) {
-	    if (read (dir->fd,
-		      dir->block.bytes,
-		      sizeof (dir->block)) != sizeof (dir->block)) {
+        /* Read next directory block if necessary */
+        if (dir->current_entry == dir->entries_per_block) {
+            if (read (dir->fd,
+                      dir->block.bytes,
+                      sizeof (dir->block)) != sizeof (dir->block)) {
 
-		/* Just return failure as read() has */
-		/* set errno if (and only if) no EOF */
-		return NULL;
-	    }
+                /* Just return failure as read() has */
+                /* set errno if (and only if) no EOF */
+                return NULL;
+            }
 
-	    /* Start with first entry in next block */
-	    dir->current_entry = 0;
-	}
+            /* Start with first entry in next block */
+            dir->current_entry = 0;
+        }
 
-	/* Compute pointer to current entry */
-	entry = dir->block.content.entries +
-		dir->current_entry * dir->entry_length;
+        /* Compute pointer to current entry */
+        entry = dir->block.content.entries +
+                dir->current_entry * dir->entry_length;
 
-	/* Switch to next entry */
-	++dir->current_entry;
+        /* Switch to next entry */
+        ++dir->current_entry;
     } while (entry[0x00] == 0);
 
     /* Move creation date/time to allow for next step below */

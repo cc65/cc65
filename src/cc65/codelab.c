@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   codelab.c				     */
+/*                                 codelab.c                                 */
 /*                                                                           */
-/*			     Code label structure			     */
+/*                           Code label structure                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -108,12 +108,12 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
     unsigned Count = CL_GetRefCount (OldLabel);
     while (Count--) {
 
-	/* Get the instruction that references the old label */
-	CodeEntry* E = CL_GetRef (OldLabel, Count);
+        /* Get the instruction that references the old label */
+        CodeEntry* E = CL_GetRef (OldLabel, Count);
 
-	/* Change the reference to the new label */
-	CHECK (E->JumpTo == OldLabel);
-	CL_AddRef (NewLabel, E);
+        /* Change the reference to the new label */
+        CHECK (E->JumpTo == OldLabel);
+        CL_AddRef (NewLabel, E);
 
     }
 
@@ -128,8 +128,8 @@ void CL_Output (const CodeLabel* L)
 {
     WriteOutput ("%s:", L->Name);
     if (strlen (L->Name) > 6) {
-	/* Label is too long, add a linefeed */
-     	WriteOutput ("\n");
+        /* Label is too long, add a linefeed */
+        WriteOutput ("\n");
     }
 }
 

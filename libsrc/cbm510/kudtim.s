@@ -8,16 +8,16 @@
         .export         UDTIM
         .import         time: zp
 
-.proc	UDTIM
+.proc   UDTIM
 
-	inc	time
-	bne	L9
-	inc	time+1
-	bne	L9
-	inc	time+2
-	bne	L9
-	inc	time+3
-L9:	rts
+        inc     time
+        bne     L9
+        inc     time+1
+        bne     L9
+        inc     time+2
+        bne     L9
+        inc     time+3
+L9:     rts
 
 .endproc
 

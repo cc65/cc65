@@ -6,7 +6,7 @@
 
         .include        "zeropage.inc"
         .include        "mouse-kernel.inc"
-	.include	"c128.inc"
+        .include        "c128.inc"
 
         .macpack        generic
 
@@ -73,11 +73,11 @@ SCREEN_WIDTH    = 320
 Vars:
 YPos:           .res    2               ; Current mouse position, Y
 XPos:           .res    2               ; Current mouse position, X
-XMin:		.res  	2	     	; X1 value of bounding box
-YMin:		.res  	2	     	; Y1 value of bounding box
-XMax:		.res  	2	     	; X2 value of bounding box
-YMax:		.res  	2	     	; Y2 value of bounding box
-Buttons:	.res  	1		; Button mask
+XMin:           .res    2               ; X1 value of bounding box
+YMin:           .res    2               ; Y1 value of bounding box
+XMax:           .res    2               ; X2 value of bounding box
+YMax:           .res    2               ; Y2 value of bounding box
+Buttons:        .res    1               ; Button mask
 
 ; Temporary value used in the int handler
 
@@ -94,7 +94,7 @@ Temp:           .res    1
         .word   0                       ; YMin
         .word   SCREEN_WIDTH            ; XMax
         .word   SCREEN_HEIGHT           ; YMax
-	.byte	0			; Buttons
+        .byte   0                       ; Buttons
 .endproc
 
 .code
@@ -183,7 +183,7 @@ SETBOX: sta     ptr1
         bpl     @L1
 
         cli
-       	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; GETBOX: Return the mouse bounding box. The parameters are passed as they
@@ -201,7 +201,7 @@ GETBOX: sta     ptr1
         bpl     @L1
 
         cli
-       	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; MOVE: Move the mouse to a new position. The position is passed as it comes
@@ -225,41 +225,41 @@ MOVE:   sei                             ; No interrupts
         lda     (sp),y
         sta     XPos                    ; New X position
 
-        jsr     CMOVEX			; Move the cursor
+        jsr     CMOVEX                  ; Move the cursor
 
-	cli                             ; Allow interrupts
-       	rts
+        cli                             ; Allow interrupts
+        rts
 
 ;----------------------------------------------------------------------------
 ; BUTTONS: Return the button mask in a/x.
 
 BUTTONS:
-	lda	Buttons
-	ldx	#$00
-	rts
+        lda     Buttons
+        ldx     #$00
+        rts
 
 ;----------------------------------------------------------------------------
 ; POS: Return the mouse position in the MOUSE_POS struct pointed to by ptr1.
 ; No return code required.
 
-POS:    ldy    	#MOUSE_POS::XCOORD      ; Structure offset
+POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
 
-	sei	    			; Disable interrupts
-	lda     XPos			; Transfer the position
-	sta	(ptr1),y
-	lda	XPos+1
-	iny
-	sta	(ptr1),y
-      	lda	YPos
+        sei                             ; Disable interrupts
+        lda     XPos                    ; Transfer the position
+        sta     (ptr1),y
+        lda     XPos+1
         iny
         sta     (ptr1),y
-	lda	YPos+1
-	cli	    			; Enable interrupts
+        lda     YPos
+        iny
+        sta     (ptr1),y
+        lda     YPos+1
+        cli                             ; Enable interrupts
 
         iny
         sta     (ptr1),y                ; Store last byte
 
-    	rts	    			; Done
+        rts                             ; Done
 
 ;----------------------------------------------------------------------------
 ; INFO: Returns mouse position and current button mask in the MOUSE_INFO
@@ -270,15 +270,15 @@ POS:    ldy    	#MOUSE_POS::XCOORD      ; Structure offset
 ; call _mouse_pos to initialize the struct pointer and fill the position
 ; fields.
 
-INFO:   jsr	POS
+INFO:   jsr     POS
 
 ; Fill in the button state
 
-       	lda	Buttons
-    	ldy	#MOUSE_INFO::BUTTONS
-    	sta	(ptr1),y
+        lda     Buttons
+        ldy     #MOUSE_INFO::BUTTONS
+        sta     (ptr1),y
 
-      	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
@@ -297,11 +297,11 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:	lda	#$7F
-     	sta	CIA1_PRA
-     	lda	CIA1_PRB                ; Read joystick #0
+IRQ:    lda     #$7F
+        sta     CIA1_PRA
+        lda     CIA1_PRB                ; Read joystick #0
         and     #$1F
-	eor	#$1F  	       		; Make all bits active high
+        eor     #$1F                    ; Make all bits active high
         sta     Temp
 
 ; Check for a pressed button and place the result into Buttons
@@ -315,45 +315,45 @@ IRQ:	lda	#$7F
 ; Check left/right
 
         lda     Temp                    ; Read joystick #0
-       	and    	#(JOY::LEFT | JOY::RIGHT)
-        beq     @SkipX			;
+        and     #(JOY::LEFT | JOY::RIGHT)
+        beq     @SkipX                  ;
 
 ; We will cheat here and rely on the fact that either the left, OR the right
 ; bit can be active
 
-       	and     #JOY::RIGHT             ; Check RIGHT bit
-       	bne	@Right
-      	lda	#$FF
-      	tax
-      	bne	@AddX                   ; Branch always
-@Right:	lda	#$01
-      	ldx	#$00
+        and     #JOY::RIGHT             ; Check RIGHT bit
+        bne     @Right
+        lda     #$FF
+        tax
+        bne     @AddX                   ; Branch always
+@Right: lda     #$01
+        ldx     #$00
 
 ; Calculate the new X coordinate (--> a/y)
 
 @AddX:  add     XPos
-      	tay	      			; Remember low byte
-      	txa
-      	adc	XPos+1
-    	tax
+        tay                             ; Remember low byte
+        txa
+        adc     XPos+1
+        tax
 
 ; Limit the X coordinate to the bounding box
 
-   	cpy	XMin
-   	sbc	XMin+1
-   	bpl	@L1
-       	ldy    	XMin
-       	ldx	XMin+1
-    	jmp	@L2
-@L1:	txa
+        cpy     XMin
+        sbc     XMin+1
+        bpl     @L1
+        ldy     XMin
+        ldx     XMin+1
+        jmp     @L2
+@L1:    txa
 
-    	cpy	XMax
-    	sbc	XMax+1
-    	bmi	@L2
-    	ldy	XMax
-    	ldx	XMax+1
-@L2:	sty	XPos
-   	stx	XPos+1
+        cpy     XMax
+        sbc     XMax+1
+        bmi     @L2
+        ldy     XMax
+        ldx     XMax+1
+@L2:    sty     XPos
+        stx     XPos+1
 
 ; Move the mouse pointer to the new X pos
 
@@ -363,45 +363,45 @@ IRQ:	lda	#$7F
 ; Calculate the Y movement vector
 
 @SkipX: lda     Temp                    ; Read joystick #0
-       	and    	#(JOY::UP | JOY::DOWN)  ; Check up/down
-        beq     @SkipY		 	;
+        and     #(JOY::UP | JOY::DOWN)  ; Check up/down
+        beq     @SkipY                  ;
 
 ; We will cheat here and rely on the fact that either the up, OR the down
 ; bit can be active
 
-       	lsr     a                       ; Check UP bit
-       	bcc	@Down
-      	lda	#$FF
-      	tax
-      	bne	@AddY
-@Down:	lda	#$01
-    	ldx	#$00
+        lsr     a                       ; Check UP bit
+        bcc     @Down
+        lda     #$FF
+        tax
+        bne     @AddY
+@Down:  lda     #$01
+        ldx     #$00
 
 ; Calculate the new Y coordinate (--> a/y)
 
-@AddY: 	add    	YPos
-      	tay	      			; Remember low byte
-      	txa
-      	adc	YPos+1
-    	tax
+@AddY:  add     YPos
+        tay                             ; Remember low byte
+        txa
+        adc     YPos+1
+        tax
 
 ; Limit the Y coordinate to the bounding box
 
-   	cpy	YMin
- 	sbc	YMin+1
- 	bpl	@L3
-       	ldy    	YMin
-       	ldx	YMin+1
-    	jmp	@L4
-@L3:	txa
+        cpy     YMin
+        sbc     YMin+1
+        bpl     @L3
+        ldy     YMin
+        ldx     YMin+1
+        jmp     @L4
+@L3:    txa
 
-    	cpy	YMax
-    	sbc	YMax+1
-    	bmi	@L4
-    	ldy	YMax
-    	ldx	YMax+1
-@L4:	sty	YPos
- 	stx	YPos+1
+        cpy     YMax
+        sbc     YMax+1
+        bmi     @L4
+        ldy     YMax
+        ldx     YMax+1
+@L4:    sty     YPos
+        stx     YPos+1
 
 ; Move the mouse pointer to the new X pos
 

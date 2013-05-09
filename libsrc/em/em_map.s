@@ -9,5 +9,5 @@
 
         .include        "em-kernel.inc"
 
-       	_em_map         = emd_map               ; Use driver entry
+        _em_map         = emd_map               ; Use driver entry
 

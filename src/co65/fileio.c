@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   fileio.c				     */
+/*                                 fileio.c                                  */
 /*                                                                           */
 /*              Binary file I/O for the co65 object file converter           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -55,7 +55,7 @@ unsigned Read8 (FILE* F)
 {
     int C = getc (F);
     if (C == EOF) {
- 	Error ("Read error (file corrupt?)");
+        Error ("Read error (file corrupt?)");
     }
     return C;
 }
@@ -97,9 +97,9 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
 {
     /* Explicitly allow reading zero bytes */
     if (Size > 0) {
-	if (fread (Data, 1, Size, F) != Size) {
-	    Error ("Read error (file corrupt?)");
-	}
+        if (fread (Data, 1, Size, F) != Size) {
+            Error ("Read error (file corrupt?)");
+        }
     }
     return Data;
 }

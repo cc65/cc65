@@ -5,18 +5,18 @@
 
 ; char BlkAlloc (struct tr_se output[], int length);
 
-	    .import popax, setoserror
-	    .export _BlkAlloc
+            .import popax, setoserror
+            .export _BlkAlloc
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _BlkAlloc:
-	sta r2L
-	stx r2H
-	jsr popax
-	sta r4L
-	stx r4H
-	jsr BlkAlloc
-	jmp setoserror
+        sta r2L
+        stx r2H
+        jsr popax
+        sta r4L
+        stx r4H
+        jsr BlkAlloc
+        jmp setoserror

@@ -4,11 +4,11 @@
 ; unsigned char cbm_k_acptr (void);
 ;
 
-       	.export	       	_cbm_k_acptr
+        .export         _cbm_k_acptr
         .import         ACPTR
 
 
 _cbm_k_acptr:
-	jsr	ACPTR
-	ldx	#0
-	rts
+        jsr     ACPTR
+        ldx     #0
+        rts

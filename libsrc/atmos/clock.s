@@ -4,14 +4,14 @@
 ; clock_t clock (void);
 ;
 
-	.export		_clock
+        .export         _clock
         .import         negax
-	.importzp	sreg
+        .importzp       sreg
 
-	.include	"atmos.inc"
+        .include        "atmos.inc"
 
 
-.proc	_clock
+.proc   _clock
 
 ; Clear the timer high 16 bits
 

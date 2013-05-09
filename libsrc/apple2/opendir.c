@@ -52,7 +52,7 @@ extern char _cwd[FILENAME_MAX];
 
 
 /*****************************************************************************/
-/*		   		     Code	   			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -64,44 +64,44 @@ DIR* __fastcall__ opendir (register const char* name)
     /* Alloc DIR */
     if ((dir = malloc (sizeof (*dir))) == NULL) {
 
-	/* May not have been done by malloc() */
-	_directerrno (ENOMEM);
+        /* May not have been done by malloc() */
+        _directerrno (ENOMEM);
 
-	/* Return failure */
-	return NULL;
+        /* Return failure */
+        return NULL;
     }
 
     /* Interpret dot as current working directory */
     if (*name == '.') {
-	name = _cwd;
+        name = _cwd;
     }
 
     /* Open directory file */
     if ((dir->fd = open (name, O_RDONLY)) != -1) {
 
-	/* Read directory key block */
-	if (read (dir->fd,
-		  dir->block.bytes,
-		  sizeof (dir->block)) == sizeof (dir->block)) {
+        /* Read directory key block */
+        if (read (dir->fd,
+                  dir->block.bytes,
+                  sizeof (dir->block)) == sizeof (dir->block)) {
 
-	    /* Get directory entry infos from directory header */
-	    dir->entry_length      = dir->block.bytes[0x23];
-	    dir->entries_per_block = dir->block.bytes[0x24];
+            /* Get directory entry infos from directory header */
+            dir->entry_length      = dir->block.bytes[0x23];
+            dir->entries_per_block = dir->block.bytes[0x24];
 
-	    /* Skip directory header entry */
-	    dir->current_entry = 1;
+            /* Skip directory header entry */
+            dir->current_entry = 1;
 
-	    /* Return success */
-	    return dir;
-	}
+            /* Return success */
+            return dir;
+        }
 
-	/* EOF: Most probably no directory file at all */
-	if (_oserror == 0) {
-	    _directerrno (EINVAL);
-	}
+        /* EOF: Most probably no directory file at all */
+        if (_oserror == 0) {
+            _directerrno (EINVAL);
+        }
 
-	/* Cleanup directory file */
-	close (dir->fd);
+        /* Cleanup directory file */
+        close (dir->fd);
     }
 
     /* Cleanup DIR */

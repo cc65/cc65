@@ -5,11 +5,11 @@
 
 ; char ChangeDiskDevice (char newDriveNumber);
 
-	    .export _ChangeDiskDevice
-	    .import setoserror
+            .export _ChangeDiskDevice
+            .import setoserror
 
-	    .include "jumptab.inc"
-	
+            .include "jumptab.inc"
+        
 _ChangeDiskDevice:
-	jsr ChangeDiskDevice
-	jmp setoserror
+        jsr ChangeDiskDevice
+        jmp setoserror

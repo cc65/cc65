@@ -5,10 +5,10 @@
 ; /* Initialize the random number generator */
 ;
 
-    	.export	       	__randomize
-	.import		_srand
+        .export         __randomize
+        .import         _srand
 
-	.include	"c64.inc"
+        .include        "c64.inc"
 
 __randomize:              
         ldx     VIC_HLINE       ; Use VIC rasterline as high byte

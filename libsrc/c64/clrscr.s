@@ -4,9 +4,9 @@
 ; void clrscr (void);
 ;
 
-	.export		_clrscr
+        .export         _clrscr
 
-	.include	"c64.inc"
+        .include        "c64.inc"
 
 _clrscr = CLRSCR
 

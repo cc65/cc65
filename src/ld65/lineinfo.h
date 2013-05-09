@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  lineinfo.h                                 */
+/*                                lineinfo.h                                 */
 /*                                                                           */
-/*			Source file line info structure                      */
+/*                      Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -51,7 +51,7 @@
 
 
 /*****************************************************************************/
-/*	       	 		   Forwards                                  */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -62,7 +62,7 @@ struct Segment;
 
 
 /*****************************************************************************/
-/*  	       	 		     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -74,7 +74,7 @@ struct Segment;
 typedef struct LineInfo LineInfo;
 struct LineInfo {
     unsigned            Id;             /* Line info id */
-    struct FileInfo*    File;	        /* File struct for this line if any */
+    struct FileInfo*    File;           /* File struct for this line if any */
     unsigned            Type;           /* Type of line info */
     FilePos             Pos;            /* Position in file */
     unsigned*           Spans;          /* Spans for this line */
@@ -83,7 +83,7 @@ struct LineInfo {
 
 
 /*****************************************************************************/
-/*     	       	      	      	     Code			     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

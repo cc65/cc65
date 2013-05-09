@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   textseg.c				     */
+/*                                 textseg.c                                 */
 /*                                                                           */
-/*			    Text segment structure			     */
+/*                          Text segment structure                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	  	     Code 				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -59,10 +59,10 @@ TextSeg* NewTextSeg (SymEntry* Func)
 /* Create a new text segment, initialize and return it */
 {
     /* Allocate memory for the structure */
-    TextSeg* S 	= xmalloc (sizeof (TextSeg));
+    TextSeg* S  = xmalloc (sizeof (TextSeg));
 
     /* Initialize the fields */
-    S->Func	= Func;
+    S->Func     = Func;
     InitCollection (&S->Lines);
 
     /* Return the new struct */
@@ -105,7 +105,7 @@ void TS_Output (const TextSeg* S)
 
     /* If the segment is actually empty, bail out */
     if (Count == 0) {
-	return;
+        return;
     }
 
     /* Output all entries */

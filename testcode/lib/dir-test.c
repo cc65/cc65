@@ -1,17 +1,17 @@
 
 /*
-	first test for posix directory routines for the c64
-	kludges:
-	-   currently uses cbm_open, which conflicts with standard i/o,
-	     	which in turn makes it infact kindof unuseable. this can
-	     	be easily changed however, since the only reason not to use
-	     	open/read was that it currently appends ,u,r to filenames
-	-   the offset in current dir stream should better be calculated
-	     	from the values returned by "read".
-	-   the type flag isnt filled in atm.
-	-   scandir/alphasort/versionsort is missing
-	-   some bits are currently untested (ie, unused in the testprogram)
-	27/02/2003 gpz
+        first test for posix directory routines for the c64
+        kludges:
+        -   currently uses cbm_open, which conflicts with standard i/o,
+                which in turn makes it infact kindof unuseable. this can
+                be easily changed however, since the only reason not to use
+                open/read was that it currently appends ,u,r to filenames
+        -   the offset in current dir stream should better be calculated
+                from the values returned by "read".
+        -   the type flag isnt filled in atm.
+        -   scandir/alphasort/versionsort is missing
+        -   some bits are currently untested (ie, unused in the testprogram)
+        27/02/2003 gpz
 */
 
 #include <stdio.h>

@@ -4,7 +4,7 @@
 ; unsigned char wherey (void);
 ;
 
- 	.export		_wherey
+        .export         _wherey
 
         .include        "atmos.inc"
 
@@ -12,7 +12,7 @@
 
         ldx     #$00
         lda     CURS_Y
-  	rts
+        rts
 
 .endproc
 

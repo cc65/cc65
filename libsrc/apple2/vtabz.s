@@ -4,17 +4,17 @@
 ; VTABZ routine
 ;
 
-	.export		VTABZ
+        .export         VTABZ
 
-	.include	"apple2.inc"
+        .include        "apple2.inc"
 
-	.segment        "LOWCODE"
+        .segment        "LOWCODE"
 
 VTABZ:
-	; Switch in ROM and call VTABZ
-	bit	$C082
-	jsr	$FC24		; Generate text base address
+        ; Switch in ROM and call VTABZ
+        bit     $C082
+        jsr     $FC24           ; Generate text base address
 
-	; Switch in LC bank 2 and return
-	bit	$C080
-	rts
+        ; Switch in LC bank 2 and return
+        bit     $C080
+        rts

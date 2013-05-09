@@ -5,7 +5,7 @@
 
 ; void EnterTurbo (void);
 
-	    .export _EnterTurbo
-	    .import return0
+            .export _EnterTurbo
+            .import return0
 
-_EnterTurbo	= return0
+_EnterTurbo     = return0

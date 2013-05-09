@@ -5,15 +5,15 @@
 
 ; char OpenRecordFile  (char *myName);
 
-	    .import setoserror
-	    .export _OpenRecordFile
+            .import setoserror
+            .export _OpenRecordFile
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _OpenRecordFile:
-	sta r0L
-	stx r0H
-	jsr OpenRecordFile
-	jmp setoserror
+        sta r0L
+        stx r0H
+        jsr OpenRecordFile
+        jmp setoserror

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objdata.c				     */
+/*                                 objdata.c                                 */
 /*                                                                           */
-/*		 Handling object file data for the ld65 linker		     */
+/*               Handling object file data for the ld65 linker               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -61,7 +61,7 @@ Collection       ObjDataList = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -73,21 +73,21 @@ ObjData* NewObjData (void)
     ObjData* O = xmalloc (sizeof (ObjData));
 
     /* Initialize the data */
-    O->Next        	= 0;
-    O->Name  	   	= INVALID_STRING_ID;
+    O->Next             = 0;
+    O->Name             = INVALID_STRING_ID;
     O->Lib              = 0;
     O->MTime            = 0;
-    O->Start	   	= 0;
-    O->Flags   	   	= 0;
+    O->Start            = 0;
+    O->Flags            = 0;
     O->HLLSymBaseId     = 0;
     O->SymBaseId        = 0;
     O->ScopeBaseId      = 0;
     O->SpanBaseId       = 0;
     O->Files            = EmptyCollection;
     O->Sections         = EmptyCollection;
-    O->Exports     	= EmptyCollection;
-    O->Imports     	= EmptyCollection;
-    O->DbgSyms		= EmptyCollection;
+    O->Exports          = EmptyCollection;
+    O->Imports          = EmptyCollection;
+    O->DbgSyms          = EmptyCollection;
     O->HLLDbgSyms       = EmptyCollection;
     O->LineInfos        = EmptyCollection;
     O->StringCount      = 0;
@@ -184,8 +184,8 @@ unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
 /* Convert a local string id into a global one and return it. */
 {
     if (Index >= O->StringCount) {
-       	Error ("Invalid string index (%u) in module `%s'",
-	       Index, GetObjFileName (O));
+        Error ("Invalid string index (%u) in module `%s'",
+               Index, GetObjFileName (O));
     }
     return O->Strings[Index];
 }

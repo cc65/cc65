@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	 	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -84,8 +84,8 @@ union CollEntry {
 
 typedef struct Collection Collection;
 struct Collection {
-    unsigned   	       	Count;		/* Number of items in the list */
-    unsigned   	       	Size;		/* Size of allocated array */
+    unsigned            Count;          /* Number of items in the list */
+    unsigned            Size;           /* Size of allocated array */
     CollEntry*          Items;          /* Array with dynamic size */
 };
 
@@ -161,7 +161,7 @@ typedef enum {
     TOK_SCOPE,                          /* SCOPE keyword */
     TOK_SEGMENT,                        /* SEGMENT keyword */
     TOK_SIZE,                           /* SIZE keyword */
-    TOK_SPAN,				/* SPAN keyword */
+    TOK_SPAN,                           /* SPAN keyword */
     TOK_START,                          /* START keyword */
     TOK_STATIC,                         /* STATIC keyword */
     TOK_STRUCT,                         /* STRUCT keyword */
@@ -194,14 +194,14 @@ struct DbgInfo {
     Collection          ModInfoById;    /* Module infos sorted by id */
     Collection          ScopeInfoById;  /* Scope infos sorted by id */
     Collection          SegInfoById;    /* Segment infos sorted by id */
-    Collection		SpanInfoById;	/* Span infos sorted by id */
+    Collection          SpanInfoById;   /* Span infos sorted by id */
     Collection          SymInfoById;    /* Symbol infos sorted by id */
     Collection          TypeInfoById;   /* Type infos sorted by id */
 
     /* Collections with other sort criteria */
     Collection          CSymFuncByName; /* C functions sorted by name */
     Collection          FileInfoByName; /* File infos sorted by name */
-    Collection		ModInfoByName;	/* Module info sorted by name */
+    Collection          ModInfoByName;  /* Module info sorted by name */
     Collection          ScopeInfoByName;/* Scope infos sorted by name */
     Collection          SegInfoByName;  /* Segment infos sorted by name */
     Collection          SymInfoByName;  /* Symbol infos sorted by name */
@@ -333,7 +333,7 @@ struct ScopeInfo {
         SymInfo*        Info;           /* Pointer to label symbol */
     } Label;
     CSymInfo*           CSymFunc;       /* C function for this scope */
-    Collection		SpanInfoList;	/* List of spans for this scope */
+    Collection          SpanInfoList;   /* List of spans for this scope */
     Collection          SymInfoByName;  /* Symbols in this scope */
     Collection*         CSymInfoByName; /* C symbols for this scope */
     Collection*         ChildScopeList; /* Child scopes of this scope */
@@ -356,14 +356,14 @@ struct SpanInfo {
     cc65_addr           Start;          /* Start of span */
     cc65_addr           End;            /* End of span */
     union {
-	unsigned	Id;		/* Id of segment */
-	SegInfo*	Info;		/* Pointer to segment */
+        unsigned        Id;             /* Id of segment */
+        SegInfo*        Info;           /* Pointer to segment */
     } Seg;
     union {
         unsigned        Id;             /* Id of type */
         TypeInfo*       Info;           /* Pointer to type */
     } Type;
-    Collection*		ScopeInfoList;	/* Scopes for this span */
+    Collection*         ScopeInfoList;  /* Scopes for this span */
     Collection*         LineInfoList;   /* Lines for this span */
 };
 
@@ -504,12 +504,12 @@ static void SB_Realloc (StrBuf* B, unsigned NewSize)
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
     if (NewAllocated == 0) {
-       	NewAllocated = 8;
+        NewAllocated = 8;
     }
 
     /* Round up to the next power of two */
     while (NewAllocated < NewSize) {
-       	NewAllocated *= 2;
+        NewAllocated *= 2;
     }
 
     /* Reallocate the buffer. Beware: The allocated size may be zero while the
@@ -539,12 +539,12 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
     if (NewAllocated == 0) {
-       	NewAllocated = 8;
+        NewAllocated = 8;
     }
 
     /* Round up to the next power of two */
     while (NewAllocated < NewSize) {
-       	NewAllocated *= 2;
+        NewAllocated *= 2;
     }
 
     /* Free the old buffer if there is one */
@@ -601,7 +601,7 @@ static void SB_Terminate (StrBuf* B)
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
-       	SB_Realloc (B, NewLen);
+        SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = '\0';
 }
@@ -643,7 +643,7 @@ static void SB_AppendChar (StrBuf* B, int C)
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
-       	SB_Realloc (B, NewLen);
+        SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = (char) C;
     B->Len = NewLen;
@@ -722,8 +722,8 @@ static void CollFree (Collection* C)
 {
     /* Accept NULL pointers */
     if (C) {
-       	xfree (C->Items);
-	xfree (C);
+        xfree (C->Items);
+        xfree (C);
     }
 }
 
@@ -788,13 +788,13 @@ static void CollPrepareInsert (Collection* C, unsigned Index)
 
     /* Grow the array if necessary */
     if (C->Count >= C->Size) {
-       	/* Must grow */
+        /* Must grow */
         CollGrow (C, (C->Size == 0)? 1 : C->Size * 2);
     }
 
     /* Move the existing elements if needed */
     if (C->Count != Index) {
-       	memmove (C->Items+Index+1, C->Items+Index, (C->Count-Index) * sizeof (void*));
+        memmove (C->Items+Index+1, C->Items+Index, (C->Count-Index) * sizeof (void*));
     }
     ++C->Count;
 }
@@ -913,7 +913,7 @@ static unsigned CollIdAt (const Collection* C, unsigned Index)
 
 
 static void CollQuickSort (Collection* C, int Lo, int Hi,
-       	                   int (*Compare) (const void*, const void*))
+                           int (*Compare) (const void*, const void*))
 /* Internal recursive sort function. */
 {
     /* Get a pointer to the items */
@@ -921,37 +921,37 @@ static void CollQuickSort (Collection* C, int Lo, int Hi,
 
     /* Quicksort */
     while (Hi > Lo) {
-       	int I = Lo + 1;
-       	int J = Hi;
-       	while (I <= J) {
-       	    while (I <= J && Compare (Items[Lo].Ptr, Items[I].Ptr) >= 0) {
-       	     	++I;
-       	    }
-       	    while (I <= J && Compare (Items[Lo].Ptr, Items[J].Ptr) < 0) {
-       	     	--J;
-       	    }
-       	    if (I <= J) {
-       	     	/* Swap I and J */
-       	       	CollEntry Tmp = Items[I];
-       		Items[I]  = Items[J];
-       		Items[J]  = Tmp;
-       	     	++I;
-       	     	--J;
-       	    }
-       	}
-       	if (J != Lo) {
-       	    /* Swap J and Lo */
-       	    CollEntry Tmp = Items[J];
-       	    Items[J]  = Items[Lo];
-       	    Items[Lo] = Tmp;
-       	}
-       	if (J > (Hi + Lo) / 2) {
-       	    CollQuickSort (C, J + 1, Hi, Compare);
-       	    Hi = J - 1;
-       	} else {
-       	    CollQuickSort (C, Lo, J - 1, Compare);
-       	    Lo = J + 1;
-       	}
+        int I = Lo + 1;
+        int J = Hi;
+        while (I <= J) {
+            while (I <= J && Compare (Items[Lo].Ptr, Items[I].Ptr) >= 0) {
+                ++I;
+            }
+            while (I <= J && Compare (Items[Lo].Ptr, Items[J].Ptr) < 0) {
+                --J;
+            }
+            if (I <= J) {
+                /* Swap I and J */
+                CollEntry Tmp = Items[I];
+                Items[I]  = Items[J];
+                Items[J]  = Tmp;
+                ++I;
+                --J;
+            }
+        }
+        if (J != Lo) {
+            /* Swap J and Lo */
+            CollEntry Tmp = Items[J];
+            Items[J]  = Items[Lo];
+            Items[Lo] = Tmp;
+        }
+        if (J > (Hi + Lo) / 2) {
+            CollQuickSort (C, J + 1, Hi, Compare);
+            Hi = J - 1;
+        } else {
+            CollQuickSort (C, Lo, J - 1, Compare);
+            Lo = J + 1;
+        }
     }
 }
 
@@ -2492,9 +2492,9 @@ static int DigitVal (int C)
 /* Return the value for a numeric digit. Return -1 if C is invalid */
 {
     if (isdigit (C)) {
-	return C - '0';
+        return C - '0';
     } else if (isxdigit (C)) {
-	return toupper (C) - 'A' + 10;
+        return toupper (C) - 'A' + 10;
     } else {
         return -1;
     }
@@ -2562,7 +2562,7 @@ static void NextToken (InputData* D)
         { "scope",      TOK_SCOPE       },
         { "seg",        TOK_SEGMENT     },
         { "size",       TOK_SIZE        },
-       	{ "span",	TOK_SPAN	},
+        { "span",       TOK_SPAN        },
         { "start",      TOK_START       },
         { "static",     TOK_STATIC      },
         { "struct",     TOK_STRUCT      },
@@ -2577,7 +2577,7 @@ static void NextToken (InputData* D)
 
     /* Skip whitespace */
     while (D->C == ' ' || D->C == '\t' || D->C == '\r') {
-     	NextChar (D);
+        NextChar (D);
     }
 
     /* Remember the current position as start of the next token */
@@ -2589,13 +2589,13 @@ static void NextToken (InputData* D)
 
         const struct KeywordEntry* Entry;
 
-	/* Read the identifier */
+        /* Read the identifier */
         SB_Clear (&D->SVal);
-	while (D->C == '_' || isalnum (D->C)) {
+        while (D->C == '_' || isalnum (D->C)) {
             SB_AppendChar (&D->SVal, D->C);
-	    NextChar (D);
-     	}
-       	SB_Terminate (&D->SVal);
+            NextChar (D);
+        }
+        SB_Terminate (&D->SVal);
 
         /* Search the identifier in the keyword table */
         Entry = bsearch (SB_GetConstBuf (&D->SVal),
@@ -2608,7 +2608,7 @@ static void NextToken (InputData* D)
         } else {
             D->Tok = Entry->Tok;
         }
-	return;
+        return;
     }
 
     /* Number? */
@@ -2626,13 +2626,13 @@ static void NextToken (InputData* D)
         } else {
             Base = 10;
         }
-       	D->IVal = 0;
+        D->IVal = 0;
         while ((Val = DigitVal (D->C)) >= 0 && Val < Base) {
-       	    D->IVal = D->IVal * Base + Val;
-	    NextChar (D);
-       	}
-	D->Tok = TOK_INTCON;
-	return;
+            D->IVal = D->IVal * Base + Val;
+            NextChar (D);
+        }
+        D->Tok = TOK_INTCON;
+        return;
     }
 
     /* Other characters */
@@ -2648,15 +2648,15 @@ static void NextToken (InputData* D)
             D->Tok = TOK_PLUS;
             break;
 
-	case ',':
-	    NextChar (D);
-	    D->Tok = TOK_COMMA;
-	    break;
+        case ',':
+            NextChar (D);
+            D->Tok = TOK_COMMA;
+            break;
 
-	case '=':
-	    NextChar (D);
-	    D->Tok = TOK_EQUAL;
-	    break;
+        case '=':
+            NextChar (D);
+            D->Tok = TOK_EQUAL;
+            break;
 
         case '\"':
             SB_Clear (&D->SVal);
@@ -2675,7 +2675,7 @@ static void NextToken (InputData* D)
             }
             SB_Terminate (&D->SVal);
             D->Tok = TOK_STRCON;
-       	    break;
+            break;
 
         case '\n':
             NextChar (D);
@@ -2683,11 +2683,11 @@ static void NextToken (InputData* D)
             break;
 
         case EOF:
-       	    D->Tok = TOK_EOF;
-	    break;
+            D->Tok = TOK_EOF;
+            break;
 
-	default:
-       	    ParseError (D, CC65_ERROR, "Invalid input character `%c'", D->C);
+        default:
+            ParseError (D, CC65_ERROR, "Invalid input character `%c'", D->C);
 
     }
 }
@@ -3157,7 +3157,7 @@ static void ParseInfo (InputData* D)
 
             case TOK_FILE:
                 CollGrow (&D->Info->FileInfoById,   D->IVal);
-	    	CollGrow (&D->Info->FileInfoByName, D->IVal);
+                CollGrow (&D->Info->FileInfoByName, D->IVal);
                 break;
 
             case TOK_LIBRARY:
@@ -3170,7 +3170,7 @@ static void ParseInfo (InputData* D)
 
             case TOK_MODULE:
                 CollGrow (&D->Info->ModInfoById,   D->IVal);
-	    	CollGrow (&D->Info->ModInfoByName, D->IVal);
+                CollGrow (&D->Info->ModInfoByName, D->IVal);
                 break;
 
             case TOK_SCOPE:
@@ -3180,7 +3180,7 @@ static void ParseInfo (InputData* D)
 
             case TOK_SEGMENT:
                 CollGrow (&D->Info->SegInfoById,   D->IVal);
-	    	CollGrow (&D->Info->SegInfoByName, D->IVal);
+                CollGrow (&D->Info->SegInfoByName, D->IVal);
                 break;
 
             case TOK_SPAN:
@@ -3190,7 +3190,7 @@ static void ParseInfo (InputData* D)
             case TOK_SYM:
                 CollGrow (&D->Info->SymInfoById,   D->IVal);
                 CollGrow (&D->Info->SymInfoByName, D->IVal);
-		CollGrow (&D->Info->SymInfoByVal,  D->IVal);
+                CollGrow (&D->Info->SymInfoByVal,  D->IVal);
                 break;
 
             case TOK_TYPE:
@@ -3414,7 +3414,7 @@ static void ParseLine (InputData* D)
                 InfoBits |= ibLine;
                 break;
 
-	    case TOK_SPAN:
+            case TOK_SPAN:
                 while (1) {
                     if (!IntConstFollows (D)) {
                         goto ErrorExit;
@@ -3640,7 +3640,7 @@ static void ParseScope (InputData* D)
     StrBuf              Name = STRBUF_INITIALIZER;
     unsigned            ModId = CC65_INV_ID;
     unsigned            ParentId = CC65_INV_ID;
-    Collection    	SpanIds = COLLECTION_INITIALIZER;
+    Collection          SpanIds = COLLECTION_INITIALIZER;
     unsigned            SymId = CC65_INV_ID;
     ScopeInfo*          S;
     enum {
@@ -3651,7 +3651,7 @@ static void ParseScope (InputData* D)
         ibName          = 0x004,
         ibParentId      = 0x008,
         ibSize          = 0x010,
-	ibSpanId       	= 0x020,
+        ibSpanId        = 0x020,
         ibSymId         = 0x040,
         ibType          = 0x080,
 
@@ -3669,8 +3669,8 @@ static void ParseScope (InputData* D)
         /* Something we know? */
         if (D->Tok != TOK_ID            && D->Tok != TOK_MODULE         &&
             D->Tok != TOK_NAME          && D->Tok != TOK_PARENT         &&
-            D->Tok != TOK_SIZE          && D->Tok != TOK_SPAN		&&
-	    D->Tok != TOK_SYM           && D->Tok != TOK_TYPE) {
+            D->Tok != TOK_SIZE          && D->Tok != TOK_SPAN           &&
+            D->Tok != TOK_SYM           && D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
             if (D->Tok == TOK_IDENT || TokenIsKeyword (D->Tok)) {
@@ -3738,7 +3738,7 @@ static void ParseScope (InputData* D)
                 NextToken (D);
                 break;
 
-	    case TOK_SPAN:
+            case TOK_SPAN:
                 while (1) {
                     if (!IntConstFollows (D)) {
                         goto ErrorExit;
@@ -4011,14 +4011,14 @@ static void ParseSpan (InputData* D)
     unsigned        Id = 0;
     cc65_addr       Start = 0;
     cc65_addr       Size = 0;
-    unsigned	    SegId = CC65_INV_ID;
+    unsigned        SegId = CC65_INV_ID;
     unsigned        TypeId = CC65_INV_ID;
     SpanInfo*       S;
     enum {
         ibNone      = 0x000,
 
         ibId        = 0x01,
-	ibSegId	    = 0x02,
+        ibSegId     = 0x02,
         ibSize      = 0x04,
         ibStart     = 0x08,
         ibType      = 0x10,
@@ -4035,8 +4035,8 @@ static void ParseSpan (InputData* D)
         Token Tok;
 
         /* Something we know? */
-        if (D->Tok != TOK_ID    && D->Tok != TOK_SEGMENT	&&
-            D->Tok != TOK_SIZE 	&& D->Tok != TOK_START          &&
+        if (D->Tok != TOK_ID    && D->Tok != TOK_SEGMENT        &&
+            D->Tok != TOK_SIZE  && D->Tok != TOK_START          &&
             D->Tok != TOK_TYPE) {
 
             /* Try smart error recovery */
@@ -5128,7 +5128,7 @@ static void ProcessLineInfo (InputData* D)
             CollAppend (&L->File.Info->LineInfoByLine, L);
         }
 
-	/* Resolve the spans ids */
+        /* Resolve the spans ids */
         for (J = 0; J < CollCount (&L->SpanInfoList); ++J) {
 
             /* Get the id of this span */
@@ -5148,9 +5148,9 @@ static void ProcessLineInfo (InputData* D)
                 CollReplace (&L->SpanInfoList, SP, J);
 
                 /* Insert a backpointer into the span */
-	    	if (SP->LineInfoList == 0) {
-	    	    SP->LineInfoList = CollNew ();
-	    	}
+                if (SP->LineInfoList == 0) {
+                    SP->LineInfoList = CollNew ();
+                }
                 CollAppend (SP->LineInfoList, L);
             }
         }
@@ -5194,7 +5194,7 @@ static void ProcessModInfo (InputData* D)
         }
 
         /* Resolve the library */
-	if (M->Lib.Id == CC65_INV_ID) {
+        if (M->Lib.Id == CC65_INV_ID) {
             M->Lib.Info = 0;
         } else if (M->Lib.Id >= CollCount (&D->Info->LibInfoById)) {
             ParseError (D,
@@ -5287,7 +5287,7 @@ static void ProcessScopeInfo (InputData* D)
             S->Label.Info = CollAt (&D->Info->SymInfoById, S->Label.Id);
         }
 
-	/* Resolve the spans ids */
+        /* Resolve the spans ids */
         for (J = 0; J < CollCount (&S->SpanInfoList); ++J) {
 
             /* Get the id of this span */
@@ -5307,9 +5307,9 @@ static void ProcessScopeInfo (InputData* D)
                 CollReplace (&S->SpanInfoList, SP, J);
 
                 /* Insert a backpointer into the span */
-	    	if (SP->ScopeInfoList == 0) {
-	    	    SP->ScopeInfoList = CollNew ();
-	    	}
+                if (SP->ScopeInfoList == 0) {
+                    SP->ScopeInfoList = CollNew ();
+                }
                 CollAppend (SP->ScopeInfoList, S);
             }
         }
@@ -5713,9 +5713,9 @@ cc65_dbginfo cc65_read_dbginfo (const char* FileName, cc65_errorfunc ErrFunc)
                 ParseSegment (&D);
                 break;
 
-	    case TOK_SPAN:
-		ParseSpan (&D);
-		break;
+            case TOK_SPAN:
+                ParseSpan (&D);
+                break;
 
             case TOK_SYM:
                 ParseSym (&D);

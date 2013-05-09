@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*                                 global.h                                  */
 /*                                                                           */
-/*		 Global variables for the ca65 macroassembler		     */
+/*               Global variables for the ca65 macroassembler                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,40 +44,40 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data   			    	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* File names */
-extern const char*     	InFile;	       	    /* Name of input file */
-extern const char*     	OutFile;       	    /* Name of output file */
+extern const char*      InFile;             /* Name of input file */
+extern const char*      OutFile;            /* Name of output file */
 extern StrBuf           ListingName;        /* Name of listing file */
 extern StrBuf           DepName;            /* Name of dependencies file */
 extern StrBuf           FullDepName;        /* Name of full dependencies file */
 
 /* Default extensions */
-extern const char      	ObjExt[];      	    /* Default object extension */
+extern const char       ObjExt[];           /* Default object extension */
 
-extern char    	       	LocalStart;    	    /* This char starts local symbols */
+extern char             LocalStart;         /* This char starts local symbols */
 
-extern unsigned char   	IgnoreCase;    	    /* Ignore case on identifiers? */
-extern unsigned char   	AutoImport;    	    /* Mark unresolveds as import */
-extern unsigned char   	SmartMode;     	    /* Smart mode */
-extern unsigned char   	DbgSyms;       	    /* Add debug symbols */
-extern unsigned char   	LineCont;      	    /* Allow line continuation */
+extern unsigned char    IgnoreCase;         /* Ignore case on identifiers? */
+extern unsigned char    AutoImport;         /* Mark unresolveds as import */
+extern unsigned char    SmartMode;          /* Smart mode */
+extern unsigned char    DbgSyms;            /* Add debug symbols */
+extern unsigned char    LineCont;           /* Allow line continuation */
 extern unsigned char    LargeAlignment;     /* Don't warn about large alignments */
 extern unsigned char    RelaxChecks;        /* Relax a few assembler checks */
 
 /* Emulation features */
-extern unsigned char   	DollarIsPC;    	    /* Allow the $ symbol as current PC */
-extern unsigned char   	NoColonLabels; 	    /* Allow labels without a colon */
-extern unsigned char   	LooseStringTerm;    /* Allow ' as string terminator */
-extern unsigned char   	LooseCharTerm; 	    /* Allow " for char constants */
-extern unsigned char    AtInIdents;    	    /* Allow '@' in identifiers */
-extern unsigned char   	DollarInIdents;	    /* Allow '$' in identifiers */
+extern unsigned char    DollarIsPC;         /* Allow the $ symbol as current PC */
+extern unsigned char    NoColonLabels;      /* Allow labels without a colon */
+extern unsigned char    LooseStringTerm;    /* Allow ' as string terminator */
+extern unsigned char    LooseCharTerm;      /* Allow " for char constants */
+extern unsigned char    AtInIdents;         /* Allow '@' in identifiers */
+extern unsigned char    DollarInIdents;     /* Allow '$' in identifiers */
 extern unsigned char    LeadingDotInIdents; /* Allow '.' to start an identifier */
-extern unsigned char   	PCAssignment;  	    /* Allow "* = $XXX" or "$ = $XXX" */
+extern unsigned char    PCAssignment;       /* Allow "* = $XXX" or "$ = $XXX" */
 extern unsigned char    MissingCharTerm;    /* Allow lda #'a (no closing term) */
 extern unsigned char    UbiquitousIdents;   /* Allow ubiquitous identifiers */
 extern unsigned char    OrgPerSeg;          /* Make .org local to current seg */

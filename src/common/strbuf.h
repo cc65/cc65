@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   strbuf.h                                  */
+/*                                 strbuf.h                                  */
 /*                                                                           */
-/*			 Variable sized string buffers                       */
+/*                       Variable sized string buffers                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/* 	       			     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -66,7 +66,7 @@ struct StrBuf {
 extern const StrBuf EmptyStrBuf;
 
 /* Initializer for static string bufs */
-#define STATIC_STRBUF_INITIALIZER 	{ 0, 0, 0, 0 }
+#define STATIC_STRBUF_INITIALIZER       { 0, 0, 0, 0 }
 
 /* Initializer for auto string bufs */
 #define AUTO_STRBUF_INITIALIZER         { 0, 0, 0, 0 }
@@ -77,7 +77,7 @@ extern const StrBuf EmptyStrBuf;
 
 
 /*****************************************************************************/
-/* 	      	      		     Code    	   	     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -368,7 +368,7 @@ INLINE void SB_Cut (StrBuf* B, unsigned Len)
  */
 {
     if (Len < B->Len) {
-       	B->Len = Len;
+        B->Len = Len;
     }
 }
 #else

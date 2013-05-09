@@ -11,9 +11,9 @@
 ;
 
 
-       	.export	       	tosasreax
-    	.import	       	popeax
-	.importzp      	sreg, tmp1
+        .export         tosasreax
+        .import         popeax
+        .importzp       sreg, tmp1
 
 
 tosasreax:
@@ -35,7 +35,7 @@ L2:     cpx     #$80            ; Copy bit 31 into the carry
         ror     tmp1
         ror     a
         dey
-       	bne    	L2
+        bne     L2
 
 ; Shift done
 

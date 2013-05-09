@@ -3,7 +3,7 @@
 ; /* Convert a target specific character to ascii */
 ;
 
-        .export	        _toascii
+        .export         _toascii
 
 _toascii:
         ldx     #$00

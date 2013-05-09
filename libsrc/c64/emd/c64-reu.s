@@ -5,9 +5,9 @@
 ; Ullrich von Bassewitz, 2002-11-29
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
 
 
@@ -22,7 +22,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -32,7 +32,7 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
@@ -60,12 +60,12 @@ curpage:        .res    2               ; Current page number
 
 window:         .res    256             ; Memory "window"
 
-reu_params:     .word 	$0000  		; Host address, lo, hi
-	 	.word 	$0000		; Exp  address, lo, hi
-                .byte	$00		; Expansion  bank no.
-       	       	.word  	$0000  		; # bytes to move, lo, hi
-       	 	.byte 	$00    		; Interrupt mask reg.
-       	 	.byte 	$00    		; Adress control reg.
+reu_params:     .word   $0000           ; Host address, lo, hi
+                .word   $0000           ; Exp  address, lo, hi
+                .byte   $00             ; Expansion  bank no.
+                .word   $0000           ; # bytes to move, lo, hi
+                .byte   $00             ; Interrupt mask reg.
+                .byte   $00             ; Adress control reg.
 
 .code
 
@@ -142,7 +142,7 @@ done:   rts
 
 ; ------------------------------------------------------------------------
 ; USE: Tell the driver that the window is now associated with a given page.
-					
+                                        
 USE:    sta     curpage
         stx     curpage+1               ; Remember the page
         lda     #<window
@@ -220,15 +220,15 @@ transfer1:
 ; Transfer subroutine for the REU. Expects command in Y.
 
 transfer:
-        sty    	REU_COMMAND     ; Issue command
+        sty     REU_COMMAND     ; Issue command
 
-        ldy 	$01       	; Save the value of the c64 control port...
-        tya          	  	;
+        ldy     $01             ; Save the value of the c64 control port...
+        tya                     ;
         and     #$F8            ; Disable ROMs and I/O.
-  	sei          	  	;
-        sta 	$01
+        sei                     ;
+        sta     $01
         lda     REU_TRIGGER     ; Don't change $FF00
-        sta 	REU_TRIGGER     ; Start the transfer...
+        sta     REU_TRIGGER     ; Start the transfer...
 
         sty     $01             ; Restore the old configuration
         cli

@@ -5,12 +5,12 @@
 
 ; char PutDirHead (void);
 
-	    .import setoserror
-	    .export _PutDirHead
+            .import setoserror
+            .export _PutDirHead
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+        
 _PutDirHead:
-	jsr PutDirHead
-	jmp setoserror
+        jsr PutDirHead
+        jmp setoserror

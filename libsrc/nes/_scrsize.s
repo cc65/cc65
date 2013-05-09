@@ -5,20 +5,20 @@
 ; Screen size function
 ;
 
-	.export		screensize
+        .export         screensize
 
-	.include	"nes.inc"
-	.include	"get_tv.inc"
+        .include        "nes.inc"
+        .include        "get_tv.inc"
 
 
-.proc	screensize
+.proc   screensize
 
-	jsr	_get_tv
-	ldx	#charsperline
-	ldy	#screenrows
-	cmp	#TV::PAL
-	beq	pal
-	dey		; NTSC rows
-pal:	rts
+        jsr     _get_tv
+        ldx     #charsperline
+        ldy     #screenrows
+        cmp     #TV::PAL
+        beq     pal
+        dey             ; NTSC rows
+pal:    rts
 
 .endproc

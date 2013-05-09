@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			   	  declattr.c				     */
+/*                                declattr.c                                 */
 /*                                                                           */
-/*			    Declaration attributes			     */
+/*                          Declaration attributes                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*	   	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -63,8 +63,8 @@ static void UnusedAttr (Declaration* D);
 /* Attribute table */
 typedef struct AttrDesc AttrDesc;
 struct AttrDesc {
-    const char	Name[15];
-    void      	(*Handler) (Declaration*);
+    const char  Name[15];
+    void        (*Handler) (Declaration*);
 };
 static const AttrDesc AttrTable [] = {
     { "__noreturn__",   NoReturnAttr    },
@@ -111,10 +111,10 @@ static const AttrDesc* FindAttribute (const char* Attr)
 
     /* For now do a linear search */
     for (A = 0; A < sizeof (AttrTable) / sizeof (AttrTable[0]); ++A) {
-       	if (strcmp (Attr, AttrTable[A].Name) == 0) {
-	    /* Found */
-       	    return AttrTable + A;
-	}
+        if (strcmp (Attr, AttrTable[A].Name) == 0) {
+            /* Found */
+            return AttrTable + A;
+        }
     }
 
     /* Not found */
@@ -182,8 +182,8 @@ void ParseAttribute (Declaration* D)
 {
     /* Do we have an attribute? */
     if (CurTok.Tok != TOK_ATTRIBUTE) {
-    	/* No attribute, bail out */
-    	return;
+        /* No attribute, bail out */
+        return;
     }
 
     /* Skip the attribute token */

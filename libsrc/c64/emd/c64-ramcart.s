@@ -7,10 +7,10 @@
 ;
 
 
-	.include	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include	"em-kernel.inc"
-        .include	"em-error.inc"
+        .include        "em-kernel.inc"
+        .include        "em-error.inc"
 
 
         .macpack        generic
@@ -24,7 +24,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -32,9 +32,9 @@
         .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
-	.word	USE
+        .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
@@ -61,46 +61,46 @@ pagecount:      .res    2               ; Number of available pages
 ;
 
 INSTALL:
-	ldx	RAMC_WINDOW
-	cpx	RAMC_WINDOW
-	bne	@notpresent
+        ldx     RAMC_WINDOW
+        cpx     RAMC_WINDOW
+        bne     @notpresent
 
-	lda	#0
-	sta	RAMC_PAGE_LO
-	sta	RAMC_PAGE_HI
-	ldx	RAMC_WINDOW
-	cpx	RAMC_WINDOW
-	bne	@notpresent
-	lda	#2
-	sta	RAMC_WINDOW
-	cmp	RAMC_WINDOW
-	beq	@cont
-	cpx	RAMC_WINDOW
-	beq	@readonly
-@cont:	ldy	#1
-	sty	RAMC_PAGE_HI
-	sty	RAMC_WINDOW
-	dey
-	sty	RAMC_PAGE_HI
-	iny
-	cpy	RAMC_WINDOW
-	beq	@rc64
-	; we're on rc128
-	ldx	#>512
-	bne	@setsize
-@rc64:	ldx	#>256
+        lda     #0
+        sta     RAMC_PAGE_LO
+        sta     RAMC_PAGE_HI
+        ldx     RAMC_WINDOW
+        cpx     RAMC_WINDOW
+        bne     @notpresent
+        lda     #2
+        sta     RAMC_WINDOW
+        cmp     RAMC_WINDOW
+        beq     @cont
+        cpx     RAMC_WINDOW
+        beq     @readonly
+@cont:  ldy     #1
+        sty     RAMC_PAGE_HI
+        sty     RAMC_WINDOW
+        dey
+        sty     RAMC_PAGE_HI
+        iny
+        cpy     RAMC_WINDOW
+        beq     @rc64
+        ; we're on rc128
+        ldx     #>512
+        bne     @setsize
+@rc64:  ldx     #>256
 @setsize:
-	lda	#0
-	sta	pagecount
-	stx	pagecount+1
+        lda     #0
+        sta     pagecount
+        stx     pagecount+1
         lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
         rts
 @notpresent:
 @readonly:
-	lda	#<EM_ERR_NO_DEVICE
-	ldx	#>EM_ERR_NO_DEVICE
-;	rts                             ; Run into UNINSTALL instead
+        lda     #<EM_ERR_NO_DEVICE
+        ldx     #>EM_ERR_NO_DEVICE
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -134,8 +134,8 @@ USE     = MAP
 ; by the driver.
 ;
 
-MAP:    sta	RAMC_PAGE_LO
-	stx	RAMC_PAGE_HI
+MAP:    sta     RAMC_PAGE_LO
+        stx     RAMC_PAGE_HI
         lda     #<RAMC_WINDOW
         ldx     #>RAMC_WINDOW
 
@@ -185,14 +185,14 @@ COPYFROM:
 
 ; Bump page register
 
-@L4:  	inc	tmp1
-	bne	@L5
-	inc	tmp2
-@L5:	lda	tmp1
-	sta	RAMC_PAGE_LO
-	lda	tmp2
-	sta	RAMC_PAGE_HI
-	jmp	@L3
+@L4:    inc     tmp1
+        bne     @L5
+        inc     tmp2
+@L5:    lda     tmp1
+        sta     RAMC_PAGE_LO
+        lda     tmp2
+        sta     RAMC_PAGE_HI
+        jmp     @L3
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure
@@ -233,14 +233,14 @@ COPYTO:
 
 ; Bump page register
 
-@L4:  	inc	tmp1
-	bne	@L5
-	inc	tmp2
-@L5:	lda	tmp1
-	sta	RAMC_PAGE_LO
-	lda	tmp2
-	sta	RAMC_PAGE_HI
-	jmp	@L3
+@L4:    inc     tmp1
+        bne     @L5
+        inc     tmp2
+@L5:    lda     tmp1
+        sta     RAMC_PAGE_LO
+        lda     tmp2
+        sta     RAMC_PAGE_HI
+        jmp     @L3
 
 ; ------------------------------------------------------------------------
 ; Helper function for COPYFROM and COPYTO: Store the pointer to the request

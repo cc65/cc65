@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   condes.h				     */
+/*                                 condes.h                                  */
 /*                                                                           */
-/*		     Module constructor/destructor support		     */
+/*                   Module constructor/destructor support                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*	      	  		   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -54,15 +54,15 @@ struct Export;
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Order of the tables */
 typedef enum {
-    cdIncreasing,		/* Increasing priority - default */
-    cdDecreasing		/* Decreasing priority */
+    cdIncreasing,               /* Increasing priority - default */
+    cdDecreasing                /* Decreasing priority */
 } ConDesOrder;
 
 /* Data for a forced condes import */
@@ -76,7 +76,7 @@ struct ConDesImport {
 
 
 /*****************************************************************************/
-/*     	       	     	   	     Code  	      	  	  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

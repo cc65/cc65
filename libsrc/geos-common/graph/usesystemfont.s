@@ -5,8 +5,8 @@
 
 ; void UseSystemFont (void);
 
-	    .export _UseSystemFont
+            .export _UseSystemFont
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_UseSystemFont	= UseSystemFont
+_UseSystemFont  = UseSystemFont

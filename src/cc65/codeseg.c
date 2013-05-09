@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   codeseg.c				     */
+/*                                 codeseg.c                                 */
 /*                                                                           */
-/*			    Code segment structure			     */
+/*                          Code segment structure                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -61,7 +61,7 @@
 
 
 /*****************************************************************************/
-/*	    		       Helper functions				     */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -95,11 +95,11 @@ static void CS_MoveLabelsToEntry (CodeSeg* S, CodeEntry* E)
     unsigned LabelCount = CollCount (&S->Labels);
     for (I = 0; I < LabelCount; ++I) {
 
-   	/* Get the label */
-   	CodeLabel* L = CollAt (&S->Labels, I);
+        /* Get the label */
+        CodeLabel* L = CollAt (&S->Labels, I);
 
-   	/* Attach it to the entry */
-   	CE_AttachLabel (E, L);
+        /* Attach it to the entry */
+        CE_AttachLabel (E, L);
     }
 
     /* Delete the transfered labels */
@@ -113,9 +113,9 @@ static void CS_MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
 {
     unsigned LabelCount = CE_GetLabelCount (E);
     while (LabelCount--) {
-   	CodeLabel* L = CE_GetLabel (E, LabelCount);
-	L->Owner = 0;
-	CollAppend (&S->Labels, L);
+        CodeLabel* L = CE_GetLabel (E, LabelCount);
+        L->Owner = 0;
+        CollAppend (&S->Labels, L);
     }
     CollDeleteAll (&E->Labels);
 }
@@ -130,11 +130,11 @@ static CodeLabel* CS_FindLabel (CodeSeg* S, const char* Name, unsigned Hash)
 
     /* Search the list */
     while (L) {
-	if (strcmp (Name, L->Name) == 0) {
-	    /* Found */
-	    break;
-      	}
-	L = L->Next;
+        if (strcmp (Name, L->Name) == 0) {
+            /* Found */
+            break;
+        }
+        L = L->Next;
     }
     return L;
 }
@@ -166,25 +166,25 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
     /* First, remove the label from the hash chain */
     if (List == L) {
-       	/* First entry in hash chain */
-       	S->LabelHash[L->Hash] = L->Next;
+        /* First entry in hash chain */
+        S->LabelHash[L->Hash] = L->Next;
     } else {
-       	/* Must search through the chain */
-       	while (List->Next != L) {
-       	    /* If we've reached the end of the chain, something is *really* wrong */
-       	    CHECK (List->Next != 0);
-       	    /* Next entry */
-       	    List = List->Next;
-       	}
-       	/* The next entry is the one, we have been searching for */
-       	List->Next = L->Next;
+        /* Must search through the chain */
+        while (List->Next != L) {
+            /* If we've reached the end of the chain, something is *really* wrong */
+            CHECK (List->Next != 0);
+            /* Next entry */
+            List = List->Next;
+        }
+        /* The next entry is the one, we have been searching for */
+        List->Next = L->Next;
     }
 }
 
 
 
 /*****************************************************************************/
-/*		      Functions for parsing instructions		     */
+/*                    Functions for parsing instructions                     */
 /*****************************************************************************/
 
 
@@ -193,7 +193,7 @@ static const char* SkipSpace (const char* S)
 /* Skip white space and return an updated pointer */
 {
     while (IsSpace (*S)) {
-	++S;
+        ++S;
     }
     return S;
 }
@@ -201,7 +201,7 @@ static const char* SkipSpace (const char* S)
 
 
 static const char* ReadToken (const char* L, const char* Term,
-		      	      char* Buf, unsigned BufSize)
+                              char* Buf, unsigned BufSize)
 /* Read the next token into Buf, return the updated line pointer. The
  * token is terminated by one of the characters given in term.
  */
@@ -210,21 +210,21 @@ static const char* ReadToken (const char* L, const char* Term,
     unsigned I = 0;
     unsigned ParenCount = 0;
     while (*L && (ParenCount > 0 || strchr (Term, *L) == 0)) {
-	if (I < BufSize-1) {
-	    Buf[I] = *L;
-	} else if (I == BufSize-1) {
-	    /* Cannot store this character, this is an input error (maybe
-	     * identifier too long or similar).
-	     */
-	    Error ("ASM code error: syntax error");
-	}
-	++I;
-	if (*L == ')') {
-	    --ParenCount;
-	} else if (*L == '(') {
-	    ++ParenCount;
-	}
-	++L;
+        if (I < BufSize-1) {
+            Buf[I] = *L;
+        } else if (I == BufSize-1) {
+            /* Cannot store this character, this is an input error (maybe
+             * identifier too long or similar).
+             */
+            Error ("ASM code error: syntax error");
+        }
+        ++I;
+        if (*L == ')') {
+            --ParenCount;
+        } else if (*L == '(') {
+            ++ParenCount;
+        }
+        ++L;
     }
 
     /* Terminate the buffer contents */
@@ -245,12 +245,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
  */
 {
     char                Mnemo[IDENTSIZE+10];
-    const OPCDesc* 	OPC;
-    am_t      	   	AM = 0;	       	/* Initialize to keep gcc silent */
+    const OPCDesc*      OPC;
+    am_t                AM = 0;         /* Initialize to keep gcc silent */
     char                Arg[IDENTSIZE+10];
-    char      	      	Reg;
-    CodeEntry*	     	E;
-    CodeLabel*	   	Label;
+    char                Reg;
+    CodeEntry*          E;
+    CodeLabel*          Label;
 
     /* Read the first token and skip white space after it */
     L = SkipSpace (ReadToken (L, " \t:", Mnemo, sizeof (Mnemo)));
@@ -258,20 +258,20 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     /* Check if we have a label */
     if (*L == ':') {
 
-	/* Skip the colon and following white space */
-	L = SkipSpace (L+1);
+        /* Skip the colon and following white space */
+        L = SkipSpace (L+1);
 
-	/* Add the label */
-	CS_AddLabel (S,	Mnemo);
+        /* Add the label */
+        CS_AddLabel (S, Mnemo);
 
-	/* If we have reached end of line, bail out, otherwise a mnemonic
-	 * may follow.
-	 */
-	if (*L == '\0') {
-	    return 0;
-	}
+        /* If we have reached end of line, bail out, otherwise a mnemonic
+         * may follow.
+         */
+        if (*L == '\0') {
+            return 0;
+        }
 
-	L = SkipSpace (ReadToken (L, " \t", Mnemo, sizeof (Mnemo)));
+        L = SkipSpace (ReadToken (L, " \t", Mnemo, sizeof (Mnemo)));
     }
 
     /* Try to find the opcode description for the mnemonic */
@@ -279,138 +279,138 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
     /* If we didn't find the opcode, print an error and bail out */
     if (OPC == 0) {
-	Error ("ASM code error: %s is not a valid mnemonic", Mnemo);
-	return 0;
+        Error ("ASM code error: %s is not a valid mnemonic", Mnemo);
+        return 0;
     }
 
     /* Get the addressing mode */
     Arg[0] = '\0';
     switch (*L) {
 
-	case '\0':
-	    /* Implicit or accu */
+        case '\0':
+            /* Implicit or accu */
             if (OPC->Info & OF_NOIMP) {
                 AM = AM65_ACC;
             } else {
                 AM = AM65_IMP;
             }
-	    break;
+            break;
 
-	case '#':
-	    /* Immidiate */
-	    StrCopy (Arg, sizeof (Arg), L+1);
-	    AM = AM65_IMM;
-	    break;
+        case '#':
+            /* Immidiate */
+            StrCopy (Arg, sizeof (Arg), L+1);
+            AM = AM65_IMM;
+            break;
 
-	case '(':
-	    /* Indirect */
-	    L = ReadToken (L+1, ",)", Arg, sizeof (Arg));
+        case '(':
+            /* Indirect */
+            L = ReadToken (L+1, ",)", Arg, sizeof (Arg));
 
-	    /* Check for errors */
-   	    if (*L == '\0') {
-	     	Error ("ASM code error: syntax error");
-	     	return 0;
-	    }
+            /* Check for errors */
+            if (*L == '\0') {
+                Error ("ASM code error: syntax error");
+                return 0;
+            }
 
-	    /* Check the different indirect modes */
-       	    if (*L == ',') {
-	     	/* Expect zp x indirect */
-	     	L = SkipSpace (L+1);
-	     	if (toupper (*L) != 'X') {
-	     	    Error ("ASM code error: `X' expected");
-	     	    return 0;
-	     	}
-	     	L = SkipSpace (L+1);
-	     	if (*L != ')') {
-	     	    Error ("ASM code error: `)' expected");
-	     	    return 0;
-	     	}
-	     	L = SkipSpace (L+1);
-	      	if (*L != '\0') {
-	     	    Error ("ASM code error: syntax error");
-	     	    return 0;
-	     	}
-	     	AM = AM65_ZPX_IND;
-	    } else if (*L == ')') {
-	     	/* zp indirect or zp indirect, y */
-	     	L = SkipSpace (L+1);
-	      	if (*L == ',') {
-	     	    L = SkipSpace (L+1);
-	     	    if (toupper (*L) != 'Y') {
-	     	      	Error ("ASM code error: `Y' expected");
-	     	      	return 0;
-	     	    }
-	     	    L = SkipSpace (L+1);
-	     	    if (*L != '\0') {
-	       	       	Error ("ASM code error: syntax error");
-	     	      	return 0;
-	     	    }
-	     	    AM = AM65_ZP_INDY;
-	     	} else if (*L == '\0') {
-	     	    AM = AM65_ZP_IND;
-	     	} else {
-	     	    Error ("ASM code error: syntax error");
-   	     	    return 0;
-	     	}
-	    }
-	    break;
+            /* Check the different indirect modes */
+            if (*L == ',') {
+                /* Expect zp x indirect */
+                L = SkipSpace (L+1);
+                if (toupper (*L) != 'X') {
+                    Error ("ASM code error: `X' expected");
+                    return 0;
+                }
+                L = SkipSpace (L+1);
+                if (*L != ')') {
+                    Error ("ASM code error: `)' expected");
+                    return 0;
+                }
+                L = SkipSpace (L+1);
+                if (*L != '\0') {
+                    Error ("ASM code error: syntax error");
+                    return 0;
+                }
+                AM = AM65_ZPX_IND;
+            } else if (*L == ')') {
+                /* zp indirect or zp indirect, y */
+                L = SkipSpace (L+1);
+                if (*L == ',') {
+                    L = SkipSpace (L+1);
+                    if (toupper (*L) != 'Y') {
+                        Error ("ASM code error: `Y' expected");
+                        return 0;
+                    }
+                    L = SkipSpace (L+1);
+                    if (*L != '\0') {
+                        Error ("ASM code error: syntax error");
+                        return 0;
+                    }
+                    AM = AM65_ZP_INDY;
+                } else if (*L == '\0') {
+                    AM = AM65_ZP_IND;
+                } else {
+                    Error ("ASM code error: syntax error");
+                    return 0;
+                }
+            }
+            break;
 
-	case 'a':
-       	case 'A':
-	    /* Accumulator? */
-	    if (L[1] == '\0') {
-	     	AM = AM65_ACC;
-	     	break;
-	    }
-	    /* FALLTHROUGH */
+        case 'a':
+        case 'A':
+            /* Accumulator? */
+            if (L[1] == '\0') {
+                AM = AM65_ACC;
+                break;
+            }
+            /* FALLTHROUGH */
 
-	default:
-	    /* Absolute, maybe indexed */
-	    L = ReadToken (L, ",", Arg, sizeof (Arg));
-	    if (*L == '\0') {
-	     	/* Absolute, zeropage or branch */
-	      	if ((OPC->Info & OF_BRA) != 0) {
-		    /* Branch */
-		    AM = AM65_BRA;
-		} else if (GetZPInfo(Arg) != 0) {
-		    AM = AM65_ZP;
-		} else {
+        default:
+            /* Absolute, maybe indexed */
+            L = ReadToken (L, ",", Arg, sizeof (Arg));
+            if (*L == '\0') {
+                /* Absolute, zeropage or branch */
+                if ((OPC->Info & OF_BRA) != 0) {
+                    /* Branch */
+                    AM = AM65_BRA;
+                } else if (GetZPInfo(Arg) != 0) {
+                    AM = AM65_ZP;
+                } else {
                     /* Check for subroutine call to local label */
                     if ((OPC->Info & OF_CALL) && IsLocalLabelName (Arg)) {
                         Error ("ASM code error: "
                                "Cannot use local label `%s' in subroutine call",
                                Arg);
                     }
-		    AM = AM65_ABS;
-		}
-	    } else if (*L == ',') {
-		/* Indexed */
-		L = SkipSpace (L+1);
-		if (*L == '\0') {
-      		    Error ("ASM code error: syntax error");
-		    return 0;
-		} else {
-	      	    Reg = toupper (*L);
-		    L = SkipSpace (L+1);
-		    if (Reg == 'X') {
-		      	if (GetZPInfo(Arg) != 0) {
-		      	    AM = AM65_ZPX;
-		      	} else {
-		      	    AM = AM65_ABSX;
-	    	      	}
-		    } else if (Reg == 'Y') {
-   		      	AM = AM65_ABSY;
-		    } else {
-		       	Error ("ASM code error: syntax error");
-	       	       	return 0;
-		    }
-		    if (*L != '\0') {
-	    	       	Error ("ASM code error: syntax error");
-	    	       	return 0;
-	    	    }
-	    	}
-	    }
-	    break;
+                    AM = AM65_ABS;
+                }
+            } else if (*L == ',') {
+                /* Indexed */
+                L = SkipSpace (L+1);
+                if (*L == '\0') {
+                    Error ("ASM code error: syntax error");
+                    return 0;
+                } else {
+                    Reg = toupper (*L);
+                    L = SkipSpace (L+1);
+                    if (Reg == 'X') {
+                        if (GetZPInfo(Arg) != 0) {
+                            AM = AM65_ZPX;
+                        } else {
+                            AM = AM65_ABSX;
+                        }
+                    } else if (Reg == 'Y') {
+                        AM = AM65_ABSY;
+                    } else {
+                        Error ("ASM code error: syntax error");
+                        return 0;
+                    }
+                    if (*L != '\0') {
+                        Error ("ASM code error: syntax error");
+                        return 0;
+                    }
+                }
+            }
+            break;
 
     }
 
@@ -422,15 +422,15 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     Label = 0;
     if (AM == AM65_BRA) {
 
-	/* Generate the hash over the label, then search for the label */
-	unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
-	Label = CS_FindLabel (S, Arg, Hash);
+        /* Generate the hash over the label, then search for the label */
+        unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
+        Label = CS_FindLabel (S, Arg, Hash);
 
-	/* If we don't have the label, it's a forward ref - create it */
-	if (Label == 0) {
-	    /* Generate a new label */
-	    Label = CS_NewCodeLabel (S, Arg, Hash);
-	}
+        /* If we don't have the label, it's a forward ref - create it */
+        if (Label == 0) {
+            /* Generate a new label */
+            Label = CS_NewCodeLabel (S, Arg, Hash);
+        }
     }
 
     /* We do now have the addressing mode in AM. Allocate a new CodeEntry
@@ -445,7 +445,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
 
 /*****************************************************************************/
-/*     	       	      	       	     Code	       			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -461,24 +461,24 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 
     /* Initialize the fields */
     S->SegName  = xstrdup (SegName);
-    S->Func	= Func;
+    S->Func     = Func;
     InitCollection (&S->Entries);
     InitCollection (&S->Labels);
     for (I = 0; I < sizeof(S->LabelHash) / sizeof(S->LabelHash[0]); ++I) {
-	S->LabelHash[I] = 0;
+        S->LabelHash[I] = 0;
     }
 
     /* If we have a function given, get the return type of the function.
      * Assume ANY return type besides void will use the A and X registers.
      */
     if (S->Func && !IsTypeVoid ((RetType = GetFuncReturn (Func->Type)))) {
-	if (SizeOf (RetType) == SizeOf (type_long)) {
-	    S->ExitRegs = REG_EAX;
-	} else {
-	    S->ExitRegs = REG_AX;
-	}
+        if (SizeOf (RetType) == SizeOf (type_long)) {
+            S->ExitRegs = REG_EAX;
+        } else {
+            S->ExitRegs = REG_AX;
+        }
     } else {
-	S->ExitRegs = REG_NONE;
+        S->ExitRegs = REG_NONE;
     }
 
     /* Copy the global optimization settings */
@@ -518,31 +518,31 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
     L = SkipSpace (SB_GetConstBuf (&Buf));
 
     /* Check which type of instruction we have */
-    E = 0;  	/* Assume no insn created */
+    E = 0;      /* Assume no insn created */
     switch (*L) {
 
-    	case '\0':
-	    /* Empty line, just ignore it */
-	    break;
+        case '\0':
+            /* Empty line, just ignore it */
+            break;
 
-	case ';':
-	    /* Comment or hint, ignore it for now */
-     	    break;
+        case ';':
+            /* Comment or hint, ignore it for now */
+            break;
 
-	case '.':
-	    /* Control instruction */
-	    ReadToken (L, " \t", Token, sizeof (Token));
-     	    Error ("ASM code error: Pseudo instruction `%s' not supported", Token);
-	    break;
+        case '.':
+            /* Control instruction */
+            ReadToken (L, " \t", Token, sizeof (Token));
+            Error ("ASM code error: Pseudo instruction `%s' not supported", Token);
+            break;
 
-	default:
-	    E = ParseInsn (S, LI, L);
-	    break;
+        default:
+            E = ParseInsn (S, LI, L);
+            break;
     }
 
     /* If we have a code entry, transfer the labels and insert it */
     if (E) {
-	CS_AddEntry (S, E);
+        CS_AddEntry (S, E);
     }
 
     /* Cleanup the string buffer */
@@ -593,31 +593,31 @@ void CS_DelEntry (CodeSeg* S, unsigned Index)
     unsigned Count = CE_GetLabelCount (E);
     if (Count > 0) {
 
-     	/* The instruction has labels attached. Check if there is a next
-     	 * instruction.
-     	 */
-     	if (Index == CS_GetEntryCount (S)-1) {
+        /* The instruction has labels attached. Check if there is a next
+         * instruction.
+         */
+        if (Index == CS_GetEntryCount (S)-1) {
 
-     	    /* No next instruction, move to the codeseg label pool */
-     	    CS_MoveLabelsToPool (S, E);
+            /* No next instruction, move to the codeseg label pool */
+            CS_MoveLabelsToPool (S, E);
 
-     	} else {
+        } else {
 
-     	    /* There is a next insn, get it */
-     	    CodeEntry* N = CS_GetEntry (S, Index+1);
+            /* There is a next insn, get it */
+            CodeEntry* N = CS_GetEntry (S, Index+1);
 
-     	    /* Move labels to the next entry */
-     	    CS_MoveLabels (S, E, N);
+            /* Move labels to the next entry */
+            CS_MoveLabels (S, E, N);
 
-     	}
+        }
     }
 
     /* If this insn references a label, remove the reference. And, if the
      * the reference count for this label drops to zero, remove this label.
      */
     if (E->JumpTo) {
-       	/* Remove the reference */
-       	CS_RemoveLabelRef (S, E);
+        /* Remove the reference */
+        CS_RemoveLabelRef (S, E);
     }
 
     /* Delete the pointer to the insn */
@@ -638,7 +638,7 @@ void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
      * memory moving.
      */
     while (Count--) {
-   	CS_DelEntry (S, Start + Count);
+        CS_DelEntry (S, Start + Count);
     }
 }
 
@@ -664,7 +664,7 @@ void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos
      * label pool to the first instruction of the moved range.
      */
     if (NewPos == CS_GetEntryCount (S)) {
-	CS_MoveLabelsToEntry (S, CS_GetEntry (S, Start));
+        CS_MoveLabelsToEntry (S, CS_GetEntry (S, Start));
     }
 
     /* Move the code block to the destination */
@@ -679,11 +679,11 @@ struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index)
  */
 {
     if (Index == 0) {
-   	/* This is the first entry */
-   	return 0;
+        /* This is the first entry */
+        return 0;
     } else {
-   	/* Previous entry available */
-       	return CollAtUnchecked (&S->Entries, Index-1);
+        /* Previous entry available */
+        return CollAtUnchecked (&S->Entries, Index-1);
     }
 }
 
@@ -695,30 +695,30 @@ struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
  */
 {
     if (Index >= CollCount (&S->Entries)-1) {
-   	/* This is the last entry */
-   	return 0;
+        /* This is the last entry */
+        return 0;
     } else {
-   	/* Code entries left */
-       	return CollAtUnchecked (&S->Entries, Index+1);
+        /* Code entries left */
+        return CollAtUnchecked (&S->Entries, Index+1);
     }
 }
 
 
 
 int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
-       	       	   unsigned Start, unsigned Count)
+                   unsigned Start, unsigned Count)
 /* Get Count code entries into List starting at index start. Return true if
  * we got the lines, return false if not enough lines were available.
  */
 {
     /* Check if enough entries are available */
     if (Start + Count > CollCount (&S->Entries)) {
-	return 0;
+        return 0;
     }
 
     /* Copy the entries */
     while (Count--) {
-	*List++ = CollAtUnchecked (&S->Entries, Start++);
+        *List++ = CollAtUnchecked (&S->Entries, Start++);
     }
 
     /* We have the entries */
@@ -748,17 +748,17 @@ int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
     /* Adjust count. We expect at least Start to be valid. */
     CHECK (Start < EntryCount);
     if (Start + Count > EntryCount) {
-    	Count = EntryCount - Start;
+        Count = EntryCount - Start;
     }
 
     /* Check each entry. Since we have validated the index above, we may
      * use the unchecked access function in the loop which is faster.
      */
     while (Count--) {
-	const CodeEntry* E = CollAtUnchecked (&S->Entries, Start++);
-	if (CE_HasLabel (E)) {
-	    return 1;
-	}
+        const CodeEntry* E = CollAtUnchecked (&S->Entries, Start++);
+        if (CE_HasLabel (E)) {
+            return 1;
+        }
     }
 
     /* No label in the complete range */
@@ -778,19 +778,19 @@ CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 
     /* Did we find it? */
     if (L) {
-     	/* We found it - be sure it does not already have an owner */
-    	if (L->Owner) {
-       	    Error ("ASM label `%s' is already defined", Name);
+        /* We found it - be sure it does not already have an owner */
+        if (L->Owner) {
+            Error ("ASM label `%s' is already defined", Name);
             return L;
-    	}
+        }
     } else {
-     	/* Not found - create a new one */
-     	L = CS_NewCodeLabel (S, Name, Hash);
+        /* Not found - create a new one */
+        L = CS_NewCodeLabel (S, Name, Hash);
     }
 
     /* Safety. This call is quite costly, but safety is better */
     if (CollIndex (&S->Labels, L) >= 0) {
-       	Error ("ASM label `%s' is already defined", Name);
+        Error ("ASM label `%s' is already defined", Name);
         return L;
     }
 
@@ -812,22 +812,22 @@ CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
 
     if (CE_HasLabel (E)) {
 
-	/* Get the label from this entry */
-	L = CE_GetLabel (E, 0);
+        /* Get the label from this entry */
+        L = CE_GetLabel (E, 0);
 
     } else {
 
-	/* Get a new name */
-	const char* Name = LocalLabelName (GetLocalLabel ());
+        /* Get a new name */
+        const char* Name = LocalLabelName (GetLocalLabel ());
 
-	/* Generate the hash over the name */
-	unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
+        /* Generate the hash over the name */
+        unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
 
-	/* Create a new label */
-	L = CS_NewCodeLabel (S, Name, Hash);
+        /* Create a new label */
+        L = CS_NewCodeLabel (S, Name, Hash);
 
-	/* Attach this label to the code entry */
-	CE_AttachLabel (E, L);
+        /* Attach this label to the code entry */
+        CE_AttachLabel (E, L);
 
     }
 
@@ -848,10 +848,10 @@ void CS_DelLabel (CodeSeg* S, CodeLabel* L)
     /* Remove references from insns jumping to this label */
     Count = CollCount (&L->JumpFrom);
     for (I = 0; I < Count; ++I) {
-       	/* Get the insn referencing this label */
-       	CodeEntry* E = CollAt (&L->JumpFrom, I);
-       	/* Remove the reference */
-       	CE_ClearJumpTo (E);
+        /* Get the insn referencing this label */
+        CodeEntry* E = CollAt (&L->JumpFrom, I);
+        /* Remove the reference */
+        CE_ClearJumpTo (E);
     }
     CollDeleteAll (&L->JumpFrom);
 
@@ -861,7 +861,7 @@ void CS_DelLabel (CodeSeg* S, CodeLabel* L)
      * errors to slip through.
      */
     if (L->Owner) {
-       	CollDeleteItem (&L->Owner->Labels, L);
+        CollDeleteItem (&L->Owner->Labels, L);
     }
 
     /* All references removed, delete the label itself */
@@ -884,83 +884,83 @@ void CS_MergeLabels (CodeSeg* S)
      */
     for (I = 0; I < CS_LABEL_HASH_SIZE; ++I) {
 
-      	/* Get the first label in this hash chain */
-      	CodeLabel** L = &S->LabelHash[I];
-      	while (*L) {
-      	    if ((*L)->Owner == 0) {
+        /* Get the first label in this hash chain */
+        CodeLabel** L = &S->LabelHash[I];
+        while (*L) {
+            if ((*L)->Owner == 0) {
 
-		/* The label does not have an owner, remove it from the chain */
-      	 	CodeLabel* X = *L;
-       	       	*L = X->Next;
+                /* The label does not have an owner, remove it from the chain */
+                CodeLabel* X = *L;
+                *L = X->Next;
 
-		/* Cleanup any entries jumping to this label */
-	       	for (J = 0; J < CL_GetRefCount (X); ++J) {
-		    /* Get the entry referencing this label */
-		    CodeEntry* E = CL_GetRef (X, J);
-		    /* And remove the reference. Do NOT call CE_ClearJumpTo
+                /* Cleanup any entries jumping to this label */
+                for (J = 0; J < CL_GetRefCount (X); ++J) {
+                    /* Get the entry referencing this label */
+                    CodeEntry* E = CL_GetRef (X, J);
+                    /* And remove the reference. Do NOT call CE_ClearJumpTo
                      * here, because this will also clear the label name,
                      * which is not what we want.
                      */
-		    E->JumpTo = 0;
-	   	}
+                    E->JumpTo = 0;
+                }
 
-		/* Print some debugging output */
-      		if (Debug) {
-      		    printf ("Removing unused global label `%s'", X->Name);
-      		}
+                /* Print some debugging output */
+                if (Debug) {
+                    printf ("Removing unused global label `%s'", X->Name);
+                }
 
-		/* And free the label */
-      	 	FreeCodeLabel (X);
-      	    } else {
-      	 	/* Label is owned, point to next code label pointer */
-      	       	L = &((*L)->Next);
-      	    }
-      	}
+                /* And free the label */
+                FreeCodeLabel (X);
+            } else {
+                /* Label is owned, point to next code label pointer */
+                L = &((*L)->Next);
+            }
+        }
     }
 
     /* Walk over all code entries */
     for (I = 0; I < CS_GetEntryCount (S); ++I) {
 
-       	CodeLabel* RefLab;
-       	unsigned   J;
+        CodeLabel* RefLab;
+        unsigned   J;
 
-     	/* Get a pointer to the next entry */
-     	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get a pointer to the next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-     	/* If this entry has zero labels, continue with the next one */
-     	unsigned LabelCount = CE_GetLabelCount (E);
-     	if (LabelCount == 0) {
-     	    continue;
-     	}
+        /* If this entry has zero labels, continue with the next one */
+        unsigned LabelCount = CE_GetLabelCount (E);
+        if (LabelCount == 0) {
+            continue;
+        }
 
-     	/* We have at least one label. Use the first one as reference label. */
-     	RefLab = CE_GetLabel (E, 0);
+        /* We have at least one label. Use the first one as reference label. */
+        RefLab = CE_GetLabel (E, 0);
 
-     	/* Walk through the remaining labels and change references to these
-     	 * labels to a reference to the one and only label. Delete the labels
-     	 * that are no longer used. To increase performance, walk backwards
-     	 * through the list.
-     	 */
-      	for (J = LabelCount-1; J >= 1; --J) {
+        /* Walk through the remaining labels and change references to these
+         * labels to a reference to the one and only label. Delete the labels
+         * that are no longer used. To increase performance, walk backwards
+         * through the list.
+         */
+        for (J = LabelCount-1; J >= 1; --J) {
 
-     	    /* Get the next label */
-     	    CodeLabel* L = CE_GetLabel (E, J);
+            /* Get the next label */
+            CodeLabel* L = CE_GetLabel (E, J);
 
-     	    /* Move all references from this label to the reference label */
-     	    CL_MoveRefs (L, RefLab);
+            /* Move all references from this label to the reference label */
+            CL_MoveRefs (L, RefLab);
 
-       	    /* Remove the label completely. */
-       	    CS_DelLabel (S, L);
-     	}
+            /* Remove the label completely. */
+            CS_DelLabel (S, L);
+        }
 
-     	/* The reference label is the only remaining label. Check if there
-     	 * are any references to this label, and delete it if this is not
-     	 * the case.
-     	 */
-       	if (CollCount (&RefLab->JumpFrom) == 0) {
-     	    /* Delete the label */
-       	    CS_DelLabel (S, RefLab);
-     	}
+        /* The reference label is the only remaining label. Check if there
+         * are any references to this label, and delete it if this is not
+         * the case.
+         */
+        if (CollCount (&RefLab->JumpFrom) == 0) {
+            /* Delete the label */
+            CS_DelLabel (S, RefLab);
+        }
     }
 }
 
@@ -979,30 +979,30 @@ void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
     /* Does the new entry have itself a label? */
     if (CE_HasLabel (New)) {
 
-	/* The new entry does already have a label - move references */
-	CodeLabel* NewLabel = CE_GetLabel (New, 0);
-	while (OldLabelCount--) {
+        /* The new entry does already have a label - move references */
+        CodeLabel* NewLabel = CE_GetLabel (New, 0);
+        while (OldLabelCount--) {
 
-	    /* Get the next label */
-	    CodeLabel* OldLabel = CE_GetLabel (Old, OldLabelCount);
+            /* Get the next label */
+            CodeLabel* OldLabel = CE_GetLabel (Old, OldLabelCount);
 
-	    /* Move references */
-	    CL_MoveRefs (OldLabel, NewLabel);
+            /* Move references */
+            CL_MoveRefs (OldLabel, NewLabel);
 
-	    /* Delete the label */
-	    CS_DelLabel (S, OldLabel);
+            /* Delete the label */
+            CS_DelLabel (S, OldLabel);
 
-     	}
+        }
 
     } else {
 
-	/* The new entry does not have a label, just move them */
-	while (OldLabelCount--) {
+        /* The new entry does not have a label, just move them */
+        while (OldLabelCount--) {
 
-	    /* Move the label to the new entry */
-	    CE_MoveLabel (CE_GetLabel (Old, OldLabelCount), New);
+            /* Move the label to the new entry */
+            CE_MoveLabel (CE_GetLabel (Old, OldLabelCount), New);
 
-	}
+        }
 
     }
 }
@@ -1028,7 +1028,7 @@ void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
 
     /* If there are no more references, delete the label */
     if (CollCount (&L->JumpFrom) == 0) {
-       	CS_DelLabel (S, L);
+        CS_DelLabel (S, L);
     }
 }
 
@@ -1088,8 +1088,8 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
             /* There is an entry after Last - move the labels */
             CS_MoveLabels (S, FirstEntry, FollowingEntry);
         } else {
-     	    /* Move the labels to the pool and clear the owner pointer */
-     	    CS_MoveLabelsToPool (S, FirstEntry);
+            /* Move the labels to the pool and clear the owner pointer */
+            CS_MoveLabelsToPool (S, FirstEntry);
         }
     }
 
@@ -1098,19 +1098,19 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
      */
     for (I = Last; I >= First; --I) {
 
-       	/* Get the next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get the next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Check if this entry has a label reference */
-       	if (E->JumpTo) {
+        /* Check if this entry has a label reference */
+        if (E->JumpTo) {
 
-       	    /* If the label is a label in the label pool, this is an error */
-       	    CodeLabel* L = E->JumpTo;
-       	    CHECK (CollIndex (&S->Labels, L) < 0);
+            /* If the label is a label in the label pool, this is an error */
+            CodeLabel* L = E->JumpTo;
+            CHECK (CollIndex (&S->Labels, L) < 0);
 
- 	    /* Remove the reference to the label */
- 	    CS_RemoveLabelRef (S, E);
- 	}
+            /* Remove the reference to the label */
+            CS_RemoveLabelRef (S, E);
+        }
     }
 
     /* Second pass: Delete the instructions. If a label attached to an
@@ -1119,17 +1119,17 @@ void CS_DelCodeRange (CodeSeg* S, unsigned First, unsigned Last)
      */
     for (I = Last; I >= First; --I) {
 
-    	/* Get the next entry */
-    	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get the next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Check if this entry has a label attached */
-    	CHECK (!CE_HasLabel (E));
+        /* Check if this entry has a label attached */
+        CHECK (!CE_HasLabel (E));
 
-	/* Delete the pointer to the entry */
-	CollDelete (&S->Entries, I);
+        /* Delete the pointer to the entry */
+        CollDelete (&S->Entries, I);
 
-	/* Delete the entry itself */
-	FreeCodeEntry (E);
+        /* Delete the entry itself */
+        FreeCodeEntry (E);
     }
 }
 
@@ -1147,24 +1147,24 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
     unsigned C = Count;
     while (Last < C--) {
 
-       	/* Get the next entry */
-       	CodeEntry* E = CS_GetEntry (S, C);
+        /* Get the next entry */
+        CodeEntry* E = CS_GetEntry (S, C);
 
-       	/* Check if this entry has a label reference */
-       	if (E->JumpTo) {
-       	    /* If the label is a label in the label pool and this is the last
-       	     * reference to the label, remove the label from the pool.
-       	     */
-       	    CodeLabel* L = E->JumpTo;
-       	    int Index = CollIndex (&S->Labels, L);
-       	    if (Index >= 0 && CollCount (&L->JumpFrom) == 1) {
-       	     	/* Delete it from the pool */
-       	     	CollDelete (&S->Labels, Index);
-       	    }
+        /* Check if this entry has a label reference */
+        if (E->JumpTo) {
+            /* If the label is a label in the label pool and this is the last
+             * reference to the label, remove the label from the pool.
+             */
+            CodeLabel* L = E->JumpTo;
+            int Index = CollIndex (&S->Labels, L);
+            if (Index >= 0 && CollCount (&L->JumpFrom) == 1) {
+                /* Delete it from the pool */
+                CollDelete (&S->Labels, Index);
+            }
 
-	    /* Remove the reference to the label */
-	    CS_RemoveLabelRef (S, E);
-	}
+            /* Remove the reference to the label */
+            CS_RemoveLabelRef (S, E);
+        }
 
     }
 
@@ -1176,20 +1176,20 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
     C = Count;
     while (Last < C--) {
 
-    	/* Get the next entry */
-    	CodeEntry* E = CS_GetEntry (S, C);
+        /* Get the next entry */
+        CodeEntry* E = CS_GetEntry (S, C);
 
-    	/* Check if this entry has a label attached */
-    	if (CE_HasLabel (E)) {
-	    /* Move the labels to the pool and clear the owner pointer */
-	    CS_MoveLabelsToPool (S, E);
-	}
+        /* Check if this entry has a label attached */
+        if (CE_HasLabel (E)) {
+            /* Move the labels to the pool and clear the owner pointer */
+            CS_MoveLabelsToPool (S, E);
+        }
 
-	/* Delete the pointer to the entry */
-	CollDelete (&S->Entries, C);
+        /* Delete the pointer to the entry */
+        CollDelete (&S->Entries, C);
 
-	/* Delete the entry itself */
-	FreeCodeEntry (E);
+        /* Delete the entry itself */
+        FreeCodeEntry (E);
     }
 }
 
@@ -1331,7 +1331,7 @@ void CS_OutputPrologue (const CodeSeg* S)
      */
     if (Func) {
         /* Get the function descriptor */
-       	CS_PrintFunctionHeader (S);
+        CS_PrintFunctionHeader (S);
         WriteOutput (".segment\t\"%s\"\n\n.proc\t_%s", S->SegName, Func->Name);
         if (IsQualNear (Func->Type)) {
             WriteOutput (": near");
@@ -1351,7 +1351,7 @@ void CS_OutputEpilogue (const CodeSeg* S)
  */
 {
     if (S->Func) {
-       	WriteOutput ("\n.endproc\n\n");
+        WriteOutput ("\n.endproc\n\n");
     }
 }
 
@@ -1368,7 +1368,7 @@ void CS_Output (CodeSeg* S)
 
     /* If the code segment is empty, bail out here */
     if (Count == 0) {
-	return;
+        return;
     }
 
     /* Generate register info */
@@ -1380,20 +1380,20 @@ void CS_Output (CodeSeg* S)
     /* Output all entries, prepended by the line information if it has changed */
     LI = 0;
     for (I = 0; I < Count; ++I) {
-    	/* Get the next entry */
-    	const CodeEntry* E = CollConstAt (&S->Entries, I);
-    	/* Check if the line info has changed. If so, output the source line
-    	 * if the option is enabled and output debug line info if the debug
-    	 * option is enabled.
-    	 */
-    	if (E->LI != LI) {
-    	    /* Line info has changed, remember the new line info */
-    	    LI = E->LI;
+        /* Get the next entry */
+        const CodeEntry* E = CollConstAt (&S->Entries, I);
+        /* Check if the line info has changed. If so, output the source line
+         * if the option is enabled and output debug line info if the debug
+         * option is enabled.
+         */
+        if (E->LI != LI) {
+            /* Line info has changed, remember the new line info */
+            LI = E->LI;
 
-    	    /* Add the source line as a comment. Beware: When line continuation
+            /* Add the source line as a comment. Beware: When line continuation
              * was used, the line may contain newlines.
              */
-    	    if (AddSource) {
+            if (AddSource) {
                 const char* L = LI->Line;
                 WriteOutput (";\n; ");
                 while (*L) {
@@ -1409,21 +1409,21 @@ void CS_Output (CodeSeg* S)
                     }
                 }
                 WriteOutput (";\n");
-    	    }
+            }
 
-    	    /* Add line debug info */
-	    if (DebugInfo) {
-	       	WriteOutput ("\t.dbg\tline, \"%s\", %u\n",
-	       	      	     GetInputName (LI), GetInputLine (LI));
-	    }
-	}
-	/* Output the code */
-	CE_Output (E);
+            /* Add line debug info */
+            if (DebugInfo) {
+                WriteOutput ("\t.dbg\tline, \"%s\", %u\n",
+                             GetInputName (LI), GetInputLine (LI));
+            }
+        }
+        /* Output the code */
+        CE_Output (E);
     }
 
     /* If debug info is enabled, terminate the last line number information */
     if (DebugInfo) {
-       	WriteOutput ("\t.dbg\tline\n");
+        WriteOutput ("\t.dbg\tline\n");
     }
 
     /* Free register info */
@@ -1447,7 +1447,7 @@ void CS_GenRegInfo (CodeSeg* S)
 /* Generate register infos for all instructions */
 {
     unsigned I;
-    RegContents Regs;		/* Initial register contents */
+    RegContents Regs;           /* Initial register contents */
     RegContents* CurrentRegs;   /* Current register contents */
     int WasJump;                /* True if last insn was a jump */
     int Done;                   /* All runs done flag */
@@ -1458,225 +1458,225 @@ void CS_GenRegInfo (CodeSeg* S)
     /* We may need two runs to get back references right */
     do {
 
-	/* Assume we're done after this run */
-	Done = 1;
+        /* Assume we're done after this run */
+        Done = 1;
 
-	/* On entry, the register contents are unknown */
-	RC_Invalidate (&Regs);
-	CurrentRegs = &Regs;
+        /* On entry, the register contents are unknown */
+        RC_Invalidate (&Regs);
+        CurrentRegs = &Regs;
 
-	/* Walk over all insns and note just the changes from one insn to the
-	 * next one.
-	 */
-	WasJump = 0;
-	for (I = 0; I < CS_GetEntryCount (S); ++I) {
+        /* Walk over all insns and note just the changes from one insn to the
+         * next one.
+         */
+        WasJump = 0;
+        for (I = 0; I < CS_GetEntryCount (S); ++I) {
 
-	    CodeEntry* P;
+            CodeEntry* P;
 
-	    /* Get the next instruction */
-	    CodeEntry* E = CollAtUnchecked (&S->Entries, I);
+            /* Get the next instruction */
+            CodeEntry* E = CollAtUnchecked (&S->Entries, I);
 
-	    /* If the instruction has a label, we need some special handling */
-	    unsigned LabelCount = CE_GetLabelCount (E);
-	    if (LabelCount > 0) {
+            /* If the instruction has a label, we need some special handling */
+            unsigned LabelCount = CE_GetLabelCount (E);
+            if (LabelCount > 0) {
 
-		/* Loop over all entry points that jump here. If these entry
-		 * points already have register info, check if all values are
-		 * known and identical. If all values are identical, and the
-		 * preceeding instruction was not an unconditional branch, check
-		 * if the register value on exit of the preceeding instruction
-		 * is also identical. If all these values are identical, the
-		 * value of a register is known, otherwise it is unknown.
-		 */
-		CodeLabel* Label = CE_GetLabel (E, 0);
-		unsigned Entry;
-		if (WasJump) {
-		    /* Preceeding insn was an unconditional branch */
-		    CodeEntry* J = CL_GetRef(Label, 0);
-		    if (J->RI) {
-			Regs = J->RI->Out2;
-		    } else {
-			RC_Invalidate (&Regs);
-		    }
-		    Entry = 1;
-		} else {
-		    Regs = *CurrentRegs;
-		    Entry = 0;
-		}
+                /* Loop over all entry points that jump here. If these entry
+                 * points already have register info, check if all values are
+                 * known and identical. If all values are identical, and the
+                 * preceeding instruction was not an unconditional branch, check
+                 * if the register value on exit of the preceeding instruction
+                 * is also identical. If all these values are identical, the
+                 * value of a register is known, otherwise it is unknown.
+                 */
+                CodeLabel* Label = CE_GetLabel (E, 0);
+                unsigned Entry;
+                if (WasJump) {
+                    /* Preceeding insn was an unconditional branch */
+                    CodeEntry* J = CL_GetRef(Label, 0);
+                    if (J->RI) {
+                        Regs = J->RI->Out2;
+                    } else {
+                        RC_Invalidate (&Regs);
+                    }
+                    Entry = 1;
+                } else {
+                    Regs = *CurrentRegs;
+                    Entry = 0;
+                }
 
-		while (Entry < CL_GetRefCount (Label)) {
-		    /* Get this entry */
-		    CodeEntry* J = CL_GetRef (Label, Entry);
-		    if (J->RI == 0) {
-			/* No register info for this entry. This means that the
-			 * instruction that jumps here is at higher addresses and
-			 * the jump is a backward jump. We need a second run to
-			 * get the register info right in this case. Until then,
-			 * assume unknown register contents.
-			 */
-			Done = 0;
-			RC_Invalidate (&Regs);
-			break;
-		    }
-		    if (J->RI->Out2.RegA != Regs.RegA) {
-	 		Regs.RegA = UNKNOWN_REGVAL;
-		    }
-		    if (J->RI->Out2.RegX != Regs.RegX) {
-			Regs.RegX = UNKNOWN_REGVAL;
-		    }
-		    if (J->RI->Out2.RegY != Regs.RegY) {
-			Regs.RegY = UNKNOWN_REGVAL;
-		    }
-		    if (J->RI->Out2.SRegLo != Regs.SRegLo) {
-			Regs.SRegLo = UNKNOWN_REGVAL;
-		    }
-		    if (J->RI->Out2.SRegHi != Regs.SRegHi) {
-			Regs.SRegHi = UNKNOWN_REGVAL;
-		    }
-       	       	    if (J->RI->Out2.Tmp1 != Regs.Tmp1) {
-			Regs.Tmp1 = UNKNOWN_REGVAL;
-		    }
-		    ++Entry;
-		}
+                while (Entry < CL_GetRefCount (Label)) {
+                    /* Get this entry */
+                    CodeEntry* J = CL_GetRef (Label, Entry);
+                    if (J->RI == 0) {
+                        /* No register info for this entry. This means that the
+                         * instruction that jumps here is at higher addresses and
+                         * the jump is a backward jump. We need a second run to
+                         * get the register info right in this case. Until then,
+                         * assume unknown register contents.
+                         */
+                        Done = 0;
+                        RC_Invalidate (&Regs);
+                        break;
+                    }
+                    if (J->RI->Out2.RegA != Regs.RegA) {
+                        Regs.RegA = UNKNOWN_REGVAL;
+                    }
+                    if (J->RI->Out2.RegX != Regs.RegX) {
+                        Regs.RegX = UNKNOWN_REGVAL;
+                    }
+                    if (J->RI->Out2.RegY != Regs.RegY) {
+                        Regs.RegY = UNKNOWN_REGVAL;
+                    }
+                    if (J->RI->Out2.SRegLo != Regs.SRegLo) {
+                        Regs.SRegLo = UNKNOWN_REGVAL;
+                    }
+                    if (J->RI->Out2.SRegHi != Regs.SRegHi) {
+                        Regs.SRegHi = UNKNOWN_REGVAL;
+                    }
+                    if (J->RI->Out2.Tmp1 != Regs.Tmp1) {
+                        Regs.Tmp1 = UNKNOWN_REGVAL;
+                    }
+                    ++Entry;
+                }
 
-		/* Use this register info */
-		CurrentRegs = &Regs;
+                /* Use this register info */
+                CurrentRegs = &Regs;
 
-	    }
+            }
 
-	    /* Generate register info for this instruction */
-	    CE_GenRegInfo (E, CurrentRegs);
+            /* Generate register info for this instruction */
+            CE_GenRegInfo (E, CurrentRegs);
 
-	    /* Remember for the next insn if this insn was an uncondition branch */
-	    WasJump = (E->Info & OF_UBRA) != 0;
+            /* Remember for the next insn if this insn was an uncondition branch */
+            WasJump = (E->Info & OF_UBRA) != 0;
 
-	    /* Output registers for this insn are input for the next */
-	    CurrentRegs = &E->RI->Out;
+            /* Output registers for this insn are input for the next */
+            CurrentRegs = &E->RI->Out;
 
-	    /* If this insn is a branch on zero flag, we may have more info on
-	     * register contents for one of both flow directions, but only if
-	     * there is a previous instruction.
-	     */
-	    if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
+            /* If this insn is a branch on zero flag, we may have more info on
+             * register contents for one of both flow directions, but only if
+             * there is a previous instruction.
+             */
+            if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
 
-		/* Get the branch condition */
-		bc_t BC = GetBranchCond (E->OPC);
+                /* Get the branch condition */
+                bc_t BC = GetBranchCond (E->OPC);
 
-		/* Check the previous instruction */
-		switch (P->OPC) {
+                /* Check the previous instruction */
+                switch (P->OPC) {
 
-	 	    case OP65_ADC:
-		    case OP65_AND:
-		    case OP65_DEA:
-		    case OP65_EOR:
-		    case OP65_INA:
-		    case OP65_LDA:
-		    case OP65_ORA:
-		    case OP65_PLA:
-		    case OP65_SBC:
-			/* A is zero in one execution flow direction */
-			if (BC == BC_EQ) {
-			    E->RI->Out2.RegA = 0;
-		      	} else {
-			    E->RI->Out.RegA = 0;
-			}
-			break;
+                    case OP65_ADC:
+                    case OP65_AND:
+                    case OP65_DEA:
+                    case OP65_EOR:
+                    case OP65_INA:
+                    case OP65_LDA:
+                    case OP65_ORA:
+                    case OP65_PLA:
+                    case OP65_SBC:
+                        /* A is zero in one execution flow direction */
+                        if (BC == BC_EQ) {
+                            E->RI->Out2.RegA = 0;
+                        } else {
+                            E->RI->Out.RegA = 0;
+                        }
+                        break;
 
-		    case OP65_CMP:
-			/* If this is an immidiate compare, the A register has
-			 * the value of the compare later.
-			 */
-			if (CE_IsConstImm (P)) {
-			    if (BC == BC_EQ) {
-				E->RI->Out2.RegA = (unsigned char)P->Num;
-			    } else {
-				E->RI->Out.RegA = (unsigned char)P->Num;
-		      	    }
-    			}
-			break;
+                    case OP65_CMP:
+                        /* If this is an immidiate compare, the A register has
+                         * the value of the compare later.
+                         */
+                        if (CE_IsConstImm (P)) {
+                            if (BC == BC_EQ) {
+                                E->RI->Out2.RegA = (unsigned char)P->Num;
+                            } else {
+                                E->RI->Out.RegA = (unsigned char)P->Num;
+                            }
+                        }
+                        break;
 
-		    case OP65_CPX:
-			/* If this is an immidiate compare, the X register has
-			 * the value of the compare later.
-			 */
-			if (CE_IsConstImm (P)) {
-			    if (BC == BC_EQ) {
-				E->RI->Out2.RegX = (unsigned char)P->Num;
-			    } else {
-				E->RI->Out.RegX = (unsigned char)P->Num;
-			    }
-			}
-			break;
+                    case OP65_CPX:
+                        /* If this is an immidiate compare, the X register has
+                         * the value of the compare later.
+                         */
+                        if (CE_IsConstImm (P)) {
+                            if (BC == BC_EQ) {
+                                E->RI->Out2.RegX = (unsigned char)P->Num;
+                            } else {
+                                E->RI->Out.RegX = (unsigned char)P->Num;
+                            }
+                        }
+                        break;
 
-		    case OP65_CPY:
-			/* If this is an immidiate compare, the Y register has
-			 * the value of the compare later.
-	 		 */
-			if (CE_IsConstImm (P)) {
-			    if (BC == BC_EQ) {
-				E->RI->Out2.RegY = (unsigned char)P->Num;
-			    } else {
-				E->RI->Out.RegY = (unsigned char)P->Num;
-			    }
-			}
-			break;
+                    case OP65_CPY:
+                        /* If this is an immidiate compare, the Y register has
+                         * the value of the compare later.
+                         */
+                        if (CE_IsConstImm (P)) {
+                            if (BC == BC_EQ) {
+                                E->RI->Out2.RegY = (unsigned char)P->Num;
+                            } else {
+                                E->RI->Out.RegY = (unsigned char)P->Num;
+                            }
+                        }
+                        break;
 
-		    case OP65_DEX:
-		    case OP65_INX:
-		    case OP65_LDX:
-		    case OP65_PLX:
-			/* X is zero in one execution flow direction */
-			if (BC == BC_EQ) {
-			    E->RI->Out2.RegX = 0;
-			} else {
-			    E->RI->Out.RegX = 0;
-		      	}
-			break;
+                    case OP65_DEX:
+                    case OP65_INX:
+                    case OP65_LDX:
+                    case OP65_PLX:
+                        /* X is zero in one execution flow direction */
+                        if (BC == BC_EQ) {
+                            E->RI->Out2.RegX = 0;
+                        } else {
+                            E->RI->Out.RegX = 0;
+                        }
+                        break;
 
-		    case OP65_DEY:
-		    case OP65_INY:
-    		    case OP65_LDY:
-		    case OP65_PLY:
-			/* X is zero in one execution flow direction */
-			if (BC == BC_EQ) {
-			    E->RI->Out2.RegY = 0;
-			} else {
-			    E->RI->Out.RegY = 0;
-			}
-			break;
+                    case OP65_DEY:
+                    case OP65_INY:
+                    case OP65_LDY:
+                    case OP65_PLY:
+                        /* X is zero in one execution flow direction */
+                        if (BC == BC_EQ) {
+                            E->RI->Out2.RegY = 0;
+                        } else {
+                            E->RI->Out.RegY = 0;
+                        }
+                        break;
 
-		    case OP65_TAX:
-		    case OP65_TXA:
-			/* If the branch is a beq, both A and X are zero at the
-			 * branch target, otherwise they are zero at the next
-			 * insn.
-			 */
-			if (BC == BC_EQ) {
-			    E->RI->Out2.RegA = E->RI->Out2.RegX = 0;
-			} else {
-			    E->RI->Out.RegA = E->RI->Out.RegX = 0;
-			}
-			break;
+                    case OP65_TAX:
+                    case OP65_TXA:
+                        /* If the branch is a beq, both A and X are zero at the
+                         * branch target, otherwise they are zero at the next
+                         * insn.
+                         */
+                        if (BC == BC_EQ) {
+                            E->RI->Out2.RegA = E->RI->Out2.RegX = 0;
+                        } else {
+                            E->RI->Out.RegA = E->RI->Out.RegX = 0;
+                        }
+                        break;
 
-		    case OP65_TAY:
-		    case OP65_TYA:
-			/* If the branch is a beq, both A and Y are zero at the
-			 * branch target, otherwise they are zero at the next
-			 * insn.
-			 */
-			if (BC == BC_EQ) {
-			    E->RI->Out2.RegA = E->RI->Out2.RegY = 0;
-			} else {
-			    E->RI->Out.RegA = E->RI->Out.RegY = 0;
-			}
-			break;
+                    case OP65_TAY:
+                    case OP65_TYA:
+                        /* If the branch is a beq, both A and Y are zero at the
+                         * branch target, otherwise they are zero at the next
+                         * insn.
+                         */
+                        if (BC == BC_EQ) {
+                            E->RI->Out2.RegA = E->RI->Out2.RegY = 0;
+                        } else {
+                            E->RI->Out.RegA = E->RI->Out.RegY = 0;
+                        }
+                        break;
 
-		    default:
-			break;
+                    default:
+                        break;
 
-		}
-	    }
-	}
+                }
+            }
+        }
     } while (!Done);
 
 }

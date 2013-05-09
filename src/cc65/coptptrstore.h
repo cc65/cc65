@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*		      		     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -56,10 +56,10 @@ unsigned OptPtrStore1 (CodeSeg* S);
  *      adc     xxx
  *      bcc     L
  *      inx
- * L:   jsr	pushax
- *	ldx	#$00
- *	lda	yyy
- *	ldy     #$00
+ * L:   jsr     pushax
+ *      ldx     #$00
+ *      lda     yyy
+ *      ldy     #$00
  *      jsr     staspidx
  *
  * and replace it by:
@@ -102,11 +102,11 @@ unsigned OptPtrStore2 (CodeSeg* S);
  *      adc     xxx
  *      bcc     L
  *      inx
- * L:   jsr	pushax
+ * L:   jsr     pushax
  *      ldy     yyy
- *	ldx	#$00
- *	lda	(sp),y
- *	ldy     #$00
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      ldy     #$00
  *      jsr     staspidx
  *
  * and replace it by:
@@ -149,12 +149,12 @@ unsigned OptPtrStore2 (CodeSeg* S);
 unsigned OptPtrStore3 (CodeSeg* S);
 /* Search for the sequence:
  *
- *    	jsr   	pushax
+ *      jsr     pushax
  *      ldy     xxx
  *      jsr     ldauidx
  *      subop
  *      ldy     yyy
- *  	jsr   	staspidx
+ *      jsr     staspidx
  *
  * and replace it by:
  *
@@ -163,7 +163,7 @@ unsigned OptPtrStore3 (CodeSeg* S);
  *      ldy     xxx
  *      ldx     #$00
  *      lda     (ptr1),y
- *	subop
+ *      subop
  *      ldy     yyy
  *      sta     (ptr1),y
  *

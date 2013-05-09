@@ -10,71 +10,71 @@
 ; at memmove!
 ;
 
-       	.export	    	_memcpy, memcpy_upwards, memcpy_getparams
-       	.import	    	popax
-       	.importzp      	sp, ptr1, ptr2, ptr3
+        .export         _memcpy, memcpy_upwards, memcpy_getparams
+        .import         popax
+        .importzp       sp, ptr1, ptr2, ptr3
 
 ; ----------------------------------------------------------------------
 _memcpy:
         jsr     memcpy_getparams
 
-memcpy_upwards:			; assert Y = 0
-	ldx	ptr3+1 		; Get high byte of n
-       	beq    	L2		; Jump if zero
+memcpy_upwards:                 ; assert Y = 0
+        ldx     ptr3+1          ; Get high byte of n
+        beq     L2              ; Jump if zero
 
-L1:	.repeat 2		; Unroll this a bit to make it faster...
-	lda	(ptr1),Y	; copy a byte
-	sta	(ptr2),Y
-	iny
-	.endrepeat
-	bne	L1
-	inc	ptr1+1
-	inc	ptr2+1
-	dex			; Next 256 byte block
-	bne	L1		; Repeat if any
+L1:     .repeat 2               ; Unroll this a bit to make it faster...
+        lda     (ptr1),Y        ; copy a byte
+        sta     (ptr2),Y
+        iny
+        .endrepeat
+        bne     L1
+        inc     ptr1+1
+        inc     ptr2+1
+        dex                     ; Next 256 byte block
+        bne     L1              ; Repeat if any
 
-	; the following section could be 10% faster if we were able to copy
-	; back to front - unfortunately we are forced to copy strict from
-	; low to high since this function is also used for
-	; memmove and blocks could be overlapping!
-	; {
-L2:				; assert Y = 0
-	ldx	ptr3		; Get the low byte of n
-	beq	done		; something to copy
+        ; the following section could be 10% faster if we were able to copy
+        ; back to front - unfortunately we are forced to copy strict from
+        ; low to high since this function is also used for
+        ; memmove and blocks could be overlapping!
+        ; {
+L2:                             ; assert Y = 0
+        ldx     ptr3            ; Get the low byte of n
+        beq     done            ; something to copy
 
-L3:	lda	(ptr1),Y	; copy a byte
-	sta	(ptr2),Y
-	iny
-	dex
-	bne	L3
+L3:     lda     (ptr1),Y        ; copy a byte
+        sta     (ptr2),Y
+        iny
+        dex
+        bne     L3
 
-	; }
+        ; }
 
-done:	jmp	popax		; Pop ptr and return as result
+done:   jmp     popax           ; Pop ptr and return as result
 
 ; ----------------------------------------------------------------------
 ; Get the parameters from stack as follows:
 ;
-;       size      	--> ptr3
+;       size            --> ptr3
 ;       src             --> ptr1
 ;       dest            --> ptr2
-;	First argument (dest) will remain on stack and is returned in a/x!
+;       First argument (dest) will remain on stack and is returned in a/x!
 
-memcpy_getparams:		; IMPORTANT! Function has to leave with Y=0!
-	sta     ptr3
+memcpy_getparams:               ; IMPORTANT! Function has to leave with Y=0!
+        sta     ptr3
         stx     ptr3+1          ; save n to ptr3
 
-	jsr	popax
-	sta	ptr1
-	stx	ptr1+1		; save src to ptr1
+        jsr     popax
+        sta     ptr1
+        stx     ptr1+1          ; save src to ptr1
 
-				; save dest to ptr2
-       	ldy     #1     	       	; (direct stack access is three cycles faster
+                                ; save dest to ptr2
+        ldy     #1              ; (direct stack access is three cycles faster
                                 ; (total cycle count with return))
         lda     (sp),y
-	tax
-        stx	ptr2+1		; save high byte of ptr2
-        dey			; Y = 0
+        tax
+        stx     ptr2+1          ; save high byte of ptr2
+        dey                     ; Y = 0
         lda     (sp),y          ; Get ptr2 low
- 	sta	ptr2
-	rts
+        sta     ptr2
+        rts

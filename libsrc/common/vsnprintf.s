@@ -4,12 +4,12 @@
 ; Ullrich von Bassewitz, 2009-09-26
 ;
 
-   	.export	      	_vsnprintf, vsnprintf
- 	.import	      	ldaxysp, popax, incsp2, incsp6
-	.import	      	_memcpy, __printf
-	.importzp     	sp, ptr1
+        .export         _vsnprintf, vsnprintf
+        .import         ldaxysp, popax, incsp2, incsp6
+        .import         _memcpy, __printf
+        .importzp       sp, ptr1
 
-	.macpack      	generic
+        .macpack        generic
 
 .data
 
@@ -18,10 +18,10 @@
 ; Static data for the _vsnprintf routine
 ;
 
-outdesc:	 	 	; Static outdesc structure
+outdesc:                        ; Static outdesc structure
 ccount: .word   0               ; ccount
-func:   .word   out	 	; Output function pointer
-bufptr: .word   0	 	; ptr
+func:   .word   out             ; Output function pointer
+bufptr: .word   0               ; ptr
 bufsize:.word   0               ; Buffer size
 
 .code
@@ -33,7 +33,7 @@ bufsize:.word   0               ; Buffer size
 ;
 
 _vsnprintf:
-    	pha	   		; Save ap
+        pha                     ; Save ap
         txa
         pha
 
@@ -41,9 +41,9 @@ _vsnprintf:
 ; vsprintf with ap on stack
 
 vsnprintf:
-    	lda	#0
-    	sta	ccount+0
-    	sta	ccount+1        ; Clear ccount
+        lda     #0
+        sta     ccount+0
+        sta     ccount+1        ; Clear ccount
 
 ; Get the size parameter and replace it by a pointer to outdesc. This is to
 ; build a stack frame for the call to _printf.
@@ -85,10 +85,10 @@ L1:     dex
 
 ; Restore ap and call _printf
 
-	pla
+        pla
         tax
         pla
-	jsr	__printf
+        jsr     __printf
 
 ; Terminate the string. The last char is either at bufptr+ccount or
 ; bufptr+bufsize, whichever is smaller.
@@ -116,7 +116,7 @@ L3:     adc     bufptr+0
 
         lda     ccount+0
         ldx     ccount+1
-	jmp     incsp2
+        jmp     incsp2
 
 ; Bail out if size is zero.
 

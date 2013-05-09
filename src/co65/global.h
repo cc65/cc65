@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*                                 global.h                                  */
 /*                                                                           */
 /*            Global variables for the co65 object file converter            */
 /*                                                                           */
@@ -39,17 +39,17 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data   			    	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* File names */
-extern const char*     	InputName;          /* Name of input file */
-extern const char*     	OutputName;         /* Name of output file */
+extern const char*      InputName;          /* Name of input file */
+extern const char*      OutputName;         /* Name of output file */
 
 /* Default extensions */
-extern const char      	AsmExt[];      	    /* Default assembler extension */
+extern const char       AsmExt[];           /* Default assembler extension */
 
 /* Segment names */
 extern const char*      CodeSeg;            /* Name of the code segment */

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    plus4.h                                  */
+/*                                  plus4.h                                  */
 /*                                                                           */
-/*		      Plus/4 system specific definitions                     */
+/*                    Plus/4 system specific definitions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

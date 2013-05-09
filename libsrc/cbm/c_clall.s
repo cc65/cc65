@@ -5,4 +5,4 @@
 ;
 
         .import         CLALL
-       	.export	       	_cbm_k_clall := CLALL
+        .export         _cbm_k_clall := CLALL

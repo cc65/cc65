@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     cbm.h			       	     */
+/*                                   cbm.h                                   */
 /*                                                                           */
-/*			CBM system-specific definitions			     */
+/*                      CBM system-specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -94,29 +94,29 @@ extern char _filetype;          /* Defaults to 's' */
 
 
 
-#define CH_HLINE	192
-#define CH_VLINE	221
-#define CH_ULCORNER	176
-#define CH_URCORNER	174
-#define CH_LLCORNER	173
-#define CH_LRCORNER	189
-#define CH_TTEE		178
-#define CH_BTEE		177
-#define CH_LTEE		171
-#define CH_RTEE		179
-#define CH_CROSS	219
-#define CH_CURS_UP	145
-#define CH_CURS_DOWN	 17
-#define CH_CURS_LEFT	157
-#define CH_CURS_RIGHT	 29
-#define CH_PI		222
-#define CH_HOME		 19
-#define CH_DEL		 20
-#define CH_INS		148
-#define CH_ENTER	 13
-#define CH_STOP		  3
-#define CH_LIRA		 92
-#define CH_ESC		 27
+#define CH_HLINE        192
+#define CH_VLINE        221
+#define CH_ULCORNER     176
+#define CH_URCORNER     174
+#define CH_LLCORNER     173
+#define CH_LRCORNER     189
+#define CH_TTEE         178
+#define CH_BTEE         177
+#define CH_LTEE         171
+#define CH_RTEE         179
+#define CH_CROSS        219
+#define CH_CURS_UP      145
+#define CH_CURS_DOWN     17
+#define CH_CURS_LEFT    157
+#define CH_CURS_RIGHT    29
+#define CH_PI           222
+#define CH_HOME          19
+#define CH_DEL           20
+#define CH_INS          148
+#define CH_ENTER         13
+#define CH_STOP           3
+#define CH_LIRA          92
+#define CH_ESC           27
 
 
 
@@ -166,9 +166,9 @@ unsigned char get_tv (void);
  *
  * e.g., cbm_open(2, 8, CBM_READ, "0:data,s");
  */
-#define CBM_READ	0	/* default is ",p" */
-#define CBM_WRITE	1	/* ditto */
-#define CBM_SEQ		2	/* default is ",r" -- or ",s" when writing */
+#define CBM_READ        0       /* default is ",p" */
+#define CBM_WRITE       1       /* ditto */
+#define CBM_SEQ         2       /* default is ",r" -- or ",s" when writing */
 
 /* Kernal-level functions */
 unsigned char cbm_k_acptr (void);
@@ -204,20 +204,20 @@ void cbm_k_unlsn (void);
 /* The cbm_* I/O functions below set _oserror (see errno.h),
  * in case of an error.
  *
- * error-code	BASIC error
- * ----------	-----------
- *	 1  =	too many files
- *	 2  =	file open
- *	 3  =	file not open
- *	 4  =	file not found
- *	 5  =	device not present
- *	 6  =	not input-file
- *	 7  =	not output-file
- *	 8  =	missing file-name
- *	 9  =	illegal device-number
+ * error-code   BASIC error
+ * ----------   -----------
+ *       1  =   too many files
+ *       2  =   file open
+ *       3  =   file not open
+ *       4  =   file not found
+ *       5  =   device not present
+ *       6  =   not input-file
+ *       7  =   not output-file
+ *       8  =   missing file-name
+ *       9  =   illegal device-number
  *
- *	10  =	STOP-key pushed
- *	11  =	general I/O-error
+ *      10  =   STOP-key pushed
+ *      11  =   general I/O-error
  */
 
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    fname.c				     */
+/*                                  fname.c                                  */
 /*                                                                           */
-/*			 File name handling utilities			     */
+/*                       File name handling utilities                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -41,7 +41,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -54,7 +54,7 @@ const char* FindExt (const char* Name)
     /* Get the length of the name */
     unsigned Len = strlen (Name);
     if (Len < 2) {
-	return 0;
+        return 0;
     }
 
     /* Get a pointer to the last character */
@@ -62,14 +62,14 @@ const char* FindExt (const char* Name)
 
     /* Search for the dot, beware of subdirectories */
     while (S >= Name && *S != '.' && *S != '\\' && *S != '/') {
-	--S;
+        --S;
     }
 
     /* Did we find an extension? */
     if (*S == '.') {
-	return S;
+        return S;
     } else {
-	return 0;
+        return 0;
     }
 }
 
@@ -85,7 +85,7 @@ const char* FindName (const char* Path)
 
     /* Search for the path separator */
     while (Len > 0 && Path[Len-1] != '\\' && Path[Len-1] != '/') {
-	--Len;
+        --Len;
     }
 
     /* Return the name or path */
@@ -104,14 +104,14 @@ char* MakeFilename (const char* Origin, const char* Ext)
     char* Out;
     const char* P = FindExt (Origin);
     if (P == 0) {
-	/* No dot, add the extension */
-	Out = xmalloc (strlen (Origin) + strlen (Ext) + 1);
-	strcpy (Out, Origin);
-	strcat (Out, Ext);
+        /* No dot, add the extension */
+        Out = xmalloc (strlen (Origin) + strlen (Ext) + 1);
+        strcpy (Out, Origin);
+        strcat (Out, Ext);
     } else {
-	Out = xmalloc (P - Origin + strlen (Ext) + 1);
-	memcpy (Out, Origin, P - Origin);
-	strcpy (Out + (P - Origin), Ext);
+        Out = xmalloc (P - Origin + strlen (Ext) + 1);
+        memcpy (Out, Origin, P - Origin);
+        strcpy (Out + (P - Origin), Ext);
     }
     return Out;
 }

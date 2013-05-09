@@ -4,15 +4,15 @@
 ; CC65 runtime: Push (int)7 onto the stack
 ;
 
-       	.export	     	push7
-	.import	      	pusha0
+        .export         push7
+        .import         pusha0
 
 ; Beware: The optimizer knows about this function!
 
-.proc	push7
+.proc   push7
 
-	lda   	#7
-	jmp 	pusha0
+        lda     #7
+        jmp     pusha0
 
 .endproc
 

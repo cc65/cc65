@@ -48,7 +48,7 @@
             PUT         .word   ; PUT routine
             STATUS      .word   ; STATUS routine
             IOCTL       .word   ; IOCTL routine
-	    IRQ		.word	; IRQ routine
+            IRQ         .word   ; IRQ routine
         .endstruct
 .endstruct
 
@@ -74,44 +74,44 @@ SER_API_VERSION         = $00
 
 ; Baudrate
 SER_BAUD_45_5           =       $00
-SER_BAUD_50            	=       $01
+SER_BAUD_50             =       $01
 SER_BAUD_75             =       $02
-SER_BAUD_110           	=       $03
-SER_BAUD_134_5         	=       $04
+SER_BAUD_110            =       $03
+SER_BAUD_134_5          =       $04
 SER_BAUD_150            =       $05
-SER_BAUD_300           	=       $06
-SER_BAUD_600           	=       $07
-SER_BAUD_1200          	=       $08
+SER_BAUD_300            =       $06
+SER_BAUD_600            =       $07
+SER_BAUD_1200           =       $08
 SER_BAUD_1800           =       $09
-SER_BAUD_2400          	=       $0A
+SER_BAUD_2400           =       $0A
 SER_BAUD_3600           =       $0B
-SER_BAUD_4800          	=       $0C
+SER_BAUD_4800           =       $0C
 SER_BAUD_7200           =       $0D
-SER_BAUD_9600          	=       $0E
-SER_BAUD_19200         	=       $0F
-SER_BAUD_38400         	=       $10
-SER_BAUD_57600         	=       $11
-SER_BAUD_115200        	=       $12
-SER_BAUD_230400        	=       $13
-SER_BAUD_31250		=	$14
-SER_BAUD_62500		=	$15
+SER_BAUD_9600           =       $0E
+SER_BAUD_19200          =       $0F
+SER_BAUD_38400          =       $10
+SER_BAUD_57600          =       $11
+SER_BAUD_115200         =       $12
+SER_BAUD_230400         =       $13
+SER_BAUD_31250          =       $14
+SER_BAUD_62500          =       $15
 
 ; Data bit settings
-SER_BITS_5             	=       $00
-SER_BITS_6             	=       $01
-SER_BITS_7             	=       $02
-SER_BITS_8             	=       $03
+SER_BITS_5              =       $00
+SER_BITS_6              =       $01
+SER_BITS_7              =       $02
+SER_BITS_8              =       $03
 
 ; Stop bit settings
-SER_STOP_1             	=       $00
-SER_STOP_2             	=       $01
+SER_STOP_1              =       $00
+SER_STOP_2              =       $01
 
 ; Parity
-SER_PAR_NONE           	=       $00
-SER_PAR_ODD            	=       $01
-SER_PAR_EVEN           	=       $02
-SER_PAR_MARK           	=       $03
-SER_PAR_SPACE          	=       $04
+SER_PAR_NONE            =       $00
+SER_PAR_ODD             =       $01
+SER_PAR_EVEN            =       $02
+SER_PAR_MARK            =       $03
+SER_PAR_SPACE           =       $04
 
 ; Handshake
 SER_HS_NONE             =       $00    ; No handshake
@@ -119,16 +119,16 @@ SER_HS_HW               =       $01    ; Hardware (RTS/CTS) handshake
 SER_HS_SW               =       $02    ; Software handshake
 
 ; Bit masks to mask out things from the status returned by ser_status
-SER_STATUS_PE          	=       $01	; Parity error
-SER_STATUS_FE  	       	=       $02	; Framing error
-SER_STATUS_OE           =       $04	; Overrun error
-SER_STATUS_DCD 	       	=       $20	; NOT data carrier detect
-SER_STATUS_DSR 	       	=       $40	; NOT data set ready
+SER_STATUS_PE           =       $01     ; Parity error
+SER_STATUS_FE           =       $02     ; Framing error
+SER_STATUS_OE           =       $04     ; Overrun error
+SER_STATUS_DCD          =       $20     ; NOT data carrier detect
+SER_STATUS_DSR          =       $40     ; NOT data set ready
 
 ;------------------------------------------------------------------------------
 ; Variables
 
-       	.global	_ser_drv                         ; Pointer to driver
+        .global _ser_drv                         ; Pointer to driver
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -141,7 +141,7 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
         .global ser_put
         .global ser_status
         .global ser_ioctl
-	.global	ser_irq
+        .global ser_irq
 
 ;------------------------------------------------------------------------------
 ; C callable functions

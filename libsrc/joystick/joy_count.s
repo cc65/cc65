@@ -7,4 +7,4 @@
 
         .include        "joy-kernel.inc"
 
-       	_joy_count      = joy_count             ; Use driver entry
+        _joy_count      = joy_count             ; Use driver entry

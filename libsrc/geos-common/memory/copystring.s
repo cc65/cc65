@@ -5,11 +5,11 @@
 
 ; void CopyString (char *dest, char* source);
 
-	    .import DoubleSPop
-	    .export _CopyString
+            .import DoubleSPop
+            .export _CopyString
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _CopyString:
-	jsr DoubleSPop
-	jmp CopyString
+        jsr DoubleSPop
+        jmp CopyString

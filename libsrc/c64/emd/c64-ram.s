@@ -5,9 +5,9 @@
 ; Ullrich von Bassewitz, 2002-12-02
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
 
 
@@ -22,7 +22,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -32,14 +32,14 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-BASE	= $D000
-PAGES  	= ($10000 - BASE) / 256
+BASE    = $D000
+PAGES   = ($10000 - BASE) / 256
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -88,18 +88,18 @@ PAGECOUNT:
 ; by the driver.
 ;
 
-MAP:    sta     curpage			; Remember the new page
+MAP:    sta     curpage                 ; Remember the new page
 
         clc
-        adc	#>BASE
-        sta	ptr1+1
-        ldy	#$00
-        sty    	ptr1
+        adc     #>BASE
+        sta     ptr1+1
+        ldy     #$00
+        sty     ptr1
 
-        lda	#<window
-        sta	ptr2
-        lda	#>window
-        sta	ptr2+1
+        lda     #<window
+        sta     ptr2
+        lda     #>window
+        sta     ptr2+1
 
 ; Transfer one page
 
@@ -122,36 +122,36 @@ USE:    sta     curpage                 ; Remember the page
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.
 
-COMMIT: lda     curpage			; Get the current page
+COMMIT: lda     curpage                 ; Get the current page
         bmi     done                    ; Jump if no page mapped
 
         clc
-        adc	#>BASE
-        sta	ptr2+1
-        ldy	#$00
-        sty    	ptr2
+        adc     #>BASE
+        sta     ptr2+1
+        ldy     #$00
+        sty     ptr2
 
-        lda	#<window
-        sta	ptr1
-        lda	#>window
-        sta	ptr1+1
+        lda     #<window
+        sta     ptr1
+        lda     #>window
+        sta     ptr1+1
 
 ; Transfer one page. Y must be zero on entry
 
 transfer:
-        ldx    	$01   			; Remember c64 control port
+        ldx     $01                     ; Remember c64 control port
         txa
-        and     #$F8           		; Bank out ROMs, I/O
+        and     #$F8                    ; Bank out ROMs, I/O
         sei
-        sta    	$01
+        sta     $01
 
 ; Unroll the following loop
 
-loop:	.repeat	8
-	lda	(ptr1),y
-        sta	(ptr2),y
+loop:   .repeat 8
+        lda     (ptr1),y
+        sta     (ptr2),y
         iny
-	.endrepeat
+        .endrepeat
 
         bne     loop
 
@@ -162,7 +162,7 @@ loop:	.repeat	8
 
 ; Done
 
-done:   rts		  
+done:   rts               
 
 ; ------------------------------------------------------------------------
 ; COPYFROM: Copy from extended into linear memory. A pointer to a structure
@@ -173,7 +173,7 @@ done:   rts
 COPYFROM:
         sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
-		       
+                       
         ldy     #EM_COPY::OFFS
         lda     (ptr3),y
         sta     ptr1
@@ -213,15 +213,15 @@ common: ldy     #EM_COPY::COUNT+1
 
         lda     $01                     ; Remember c64 control port
         pha
-        and     #$F8           		; Bank out ROMs, I/O
+        and     #$F8                    ; Bank out ROMs, I/O
         sei
-        sta    	$01
+        sta     $01
 
 ; Transfer the bytes in the last page
 
         ldy     #$00
-@L3:    lda	(ptr1),y
-        sta	(ptr2),y
+@L3:    lda     (ptr1),y
+        sta     (ptr2),y
         iny
         dex
         bne     @L3

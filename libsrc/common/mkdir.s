@@ -1,7 +1,7 @@
 ;
 ; Oliver Schmidt, 2005-08-30
 ;
-; int mkdir (const char* name, ...);	/* May take a mode argument */
+; int mkdir (const char* name, ...);    /* May take a mode argument */
 ;
 
         .export         _mkdir

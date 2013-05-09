@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -84,7 +84,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
     char*       L;
     const char* Comment;
     unsigned    Line;
-    unsigned	Len;
+    unsigned    Len;
     long        Val;
     unsigned    DVal;
     int         Sign;
@@ -111,12 +111,12 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
             ++L;
         }
 
-	/* Remove trailing whitespace */
-	Len = strlen (L);
-	while (Len > 0 && IsSpace (L[Len-1])) {
-	    --Len;
-	}
-	L[Len] = '\0';
+        /* Remove trailing whitespace */
+        Len = strlen (L);
+        while (Len > 0 && IsSpace (L[Len-1])) {
+            --Len;
+        }
+        L[Len] = '\0';
 
         /* If the line is empty or starts with a comment char, ignore it */
         if (*L == '\0' || *L == CommentStart) {
@@ -147,11 +147,11 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         } else if (*L == ':' && *++L == '=') {
             ++L;
         } else {
-	    if (!IgnoreUnknown) {
-	       	Error ("%s(%u): Missing `='", Filename, Line);
-	    }
-	    continue;
-	}
+            if (!IgnoreUnknown) {
+                Error ("%s(%u): Missing `='", Filename, Line);
+            }
+            continue;
+        }
 
         /* Allow white space once again */
         L = SkipWhitespace (L);

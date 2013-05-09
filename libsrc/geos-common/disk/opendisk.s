@@ -5,12 +5,12 @@
 
 ; char OpenDisk (void);
 
-	    .import setoserror
-	    .export _OpenDisk
+            .import setoserror
+            .export _OpenDisk
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+        
 _OpenDisk:
-	jsr OpenDisk
-	jmp setoserror
+        jsr OpenDisk
+        jmp setoserror

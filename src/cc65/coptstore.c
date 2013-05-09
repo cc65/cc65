@@ -41,7 +41,7 @@
 
 
 /*****************************************************************************/
-/*			     	     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -71,32 +71,32 @@ unsigned OptStore1 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[4];
+        CodeEntry* L[4];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
         /* Check for the sequence */
         if (L[0]->OPC == OP65_LDY                           &&
-	    CE_IsConstImm (L[0])                            &&
+            CE_IsConstImm (L[0])                            &&
             L[0]->Num < 0xFF                                &&
-	    !CS_RangeHasLabel (S, I+1, 3)                   &&
-       	    CS_GetEntries (S, L+1, I+1, 3)                  &&
+            !CS_RangeHasLabel (S, I+1, 3)                   &&
+            CS_GetEntries (S, L+1, I+1, 3)                  &&
             CE_IsCallTo (L[1], "staxysp")                   &&
             L[2]->OPC == OP65_LDY                           &&
             CE_IsKnownImm (L[2], L[0]->Num + 1)             &&
             CE_IsCallTo (L[3], "ldaxysp")) {
 
-       	    /* Register has already the correct value, remove the loads */
-	    CS_DelEntries (S, I+2, 2);
+            /* Register has already the correct value, remove the loads */
+            CS_DelEntries (S, I+2, 2);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -119,14 +119,14 @@ unsigned OptStore2 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
         /* Get the input registers */
         const RegInfo* RI = E->RI;
 
-     	/* Check for the call */
-       	if (CE_IsCallTo (E, "staxysp")          &&
+        /* Check for the call */
+        if (CE_IsCallTo (E, "staxysp")          &&
             RegValIsKnown (RI->In.RegA)         &&
             RegValIsKnown (RI->In.RegX)         &&
             RegValIsKnown (RI->In.RegY)         &&
@@ -160,13 +160,13 @@ unsigned OptStore2 (CodeSeg* S)
             /* Remove the call */
             CS_DelEntry (S, I);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -189,14 +189,14 @@ unsigned OptStore3 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
         /* Get the input registers */
         const RegInfo* RI = E->RI;
 
-     	/* Check for the call */
-	if (CE_IsCallTo (E, "steaxysp")         &&
+        /* Check for the call */
+        if (CE_IsCallTo (E, "steaxysp")         &&
             RegValIsKnown (RI->In.RegA)         &&
             RegValIsKnown (RI->In.RegX)         &&
             RegValIsKnown (RI->In.RegY)         &&
@@ -299,13 +299,13 @@ unsigned OptStore3 (CodeSeg* S)
             /* Remove the call */
             CS_DelEntry (S, I);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -333,16 +333,16 @@ unsigned OptStore4 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[5];
+        CodeEntry* L[5];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
         /* Check for the sequence */
         if (L[0]->OPC == OP65_STA                           &&
             (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP)   &&
-	    !CS_RangeHasLabel (S, I+1, 3)                   &&
-       	    CS_GetEntries (S, L+1, I+1, 4)                  &&
+            !CS_RangeHasLabel (S, I+1, 3)                   &&
+            CS_GetEntries (S, L+1, I+1, 4)                  &&
             L[1]->OPC == OP65_STX                           &&
             L[1]->AM == L[0]->AM                            &&
             L[2]->OPC == OP65_LDA                           &&
@@ -353,16 +353,16 @@ unsigned OptStore4 (CodeSeg* S)
             strcmp (L[1]->Arg, L[3]->Arg) == 0              &&
             !CE_UseLoadFlags (L[4])) {
 
-       	    /* Register has already the correct value, remove the loads */
-	    CS_DelEntries (S, I+2, 2);
+            /* Register has already the correct value, remove the loads */
+            CS_DelEntries (S, I+2, 2);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -397,15 +397,15 @@ unsigned OptStore5 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[4];
+        CodeEntry* L[4];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
         /* Check for the sequence */
         if (L[0]->OPC == OP65_LDA                           &&
-	    !CS_RangeHasLabel (S, I+1, 3)                   &&
-       	    CS_GetEntries (S, L+1, I+1, 3)                  &&
+            !CS_RangeHasLabel (S, I+1, 3)                   &&
+            CS_GetEntries (S, L+1, I+1, 3)                  &&
             L[1]->OPC == OP65_LDX                           &&
             L[2]->OPC == OP65_STA                           &&
             L[3]->OPC == OP65_STX                           &&
@@ -414,21 +414,21 @@ unsigned OptStore5 (CodeSeg* S)
             CodeEntry* X;
 
             /* Insert the code after the sequence */
-       	    X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
- 	    CS_InsertEntry (S, X, I+4);
-       	    X = NewCodeEntry (OP65_STA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
- 	    CS_InsertEntry (S, X, I+5);
+            X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+4);
+            X = NewCodeEntry (OP65_STA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
+            CS_InsertEntry (S, X, I+5);
 
-       	    /* Delete the old code */
+            /* Delete the old code */
             CS_DelEntry (S, I+3);
- 	    CS_DelEntry (S, I+1);
+            CS_DelEntry (S, I+1);
 
-	    /* Remember, we had changes */
-	    ++Changes;
-	}
+            /* Remember, we had changes */
+            ++Changes;
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 

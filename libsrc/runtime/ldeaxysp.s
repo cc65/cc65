@@ -4,25 +4,25 @@
 ; CC65 runtime: Load a long from somewhere in the stack
 ;
 ; Beware: The optimizer knows about the register contents after calling
-;	  this function!
+;         this function!
 ;
 
 
-      	.export	  	ldeax0sp, ldeaxysp
-	.importzp	sreg, sp
+        .export         ldeax0sp, ldeaxysp
+        .importzp       sreg, sp
 
 ldeax0sp:
-      	ldy 	#3
+        ldy     #3
 ldeaxysp:
-	lda	(sp),y
-	sta	sreg+1
-	dey
-	lda	(sp),y
-	sta	sreg
-	dey
-	lda	(sp),y
-	tax
-	dey
-	lda	(sp),y
- 	rts
+        lda     (sp),y
+        sta     sreg+1
+        dey
+        lda     (sp),y
+        sta     sreg
+        dey
+        lda     (sp),y
+        tax
+        dey
+        lda     (sp),y
+        rts
 

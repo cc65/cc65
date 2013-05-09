@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    _pia.h			       	     */
+/*                                  _pia.h                                   */
 /*                                                                           */
-/*		  Internal include file, do not use directly                 */
+/*                Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

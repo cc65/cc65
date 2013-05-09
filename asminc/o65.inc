@@ -1,8 +1,8 @@
 ;*****************************************************************************/
 ;*                                                                           */
-;*     	       	       	       	    o65.inc				     */
+;*                                  o65.inc                                  */
 ;*                                                                           */
-;*		      Definitions for the o65 file format		     */
+;*                    Definitions for the o65 file format                    */
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
@@ -64,7 +64,7 @@ O65_MAGIC_2             =       $35     ; '5'
 O65_VERSION             =       $00
 
 ; Defines for the mode word
-O65_CPU_65816           =       $8000  	; Executable is for 65816
+O65_CPU_65816           =       $8000   ; Executable is for 65816
 O65_CPU_6502            =       $0000   ; Executable is for the 6502
 O65_CPU_MASK            =       $8000   ; Mask to extract CPU type
 
@@ -91,7 +91,7 @@ O65_BSSZERO             =       $0200   ; BSS segment must be zeroed
 O65_BSSZERO_MASK        =       $0200   ; Mask to extract bss zero flag
 
 ; The following is used if O65_CPU == 6502
-O65_CPU2_6502  	       	=       $0000   ; Executable is for 6502
+O65_CPU2_6502           =       $0000   ; Executable is for 6502
 O65_CPU2_65C02          =       $0010   ; Executable is for 65C02
 O65_CPU2_65SC02         =       $0020   ; Executable is for 65SC02
 O65_CPU2_65CE02         =       $0030   ; Executable is for 65CE02
@@ -127,14 +127,14 @@ O65_SEGID_MASK          =       $07
 
 ; Option tags
 O65_OPT_FILENAME        =       0
-O65_OPT_OS     	       	=       1
-O65_OPT_ASM    	       	=       2
-O65_OPT_AUTHOR 	       	=       3
-O65_OPT_TIMESTAMP      	=       4
+O65_OPT_OS              =       1
+O65_OPT_ASM             =       2
+O65_OPT_AUTHOR          =       3
+O65_OPT_TIMESTAMP       =       4
 
 ; Operating system codes for O65_OPT_OS
-O65_OS_OSA65   	       	=       1
-O65_OS_LUNIX   	       	=       2
+O65_OS_OSA65            =       1
+O65_OS_LUNIX            =       2
 O65_OS_CC65             =       3
 O65_OS_OPENCBM          =       4
 

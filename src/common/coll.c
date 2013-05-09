@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    coll.c				     */
+/*                                  coll.c                                   */
 /*                                                                           */
-/*			  Collection (dynamic array)			     */
+/*                        Collection (dynamic array)                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	      	       		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -57,7 +57,7 @@ const Collection EmptyCollection = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*     	      	       		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -139,13 +139,13 @@ void CollInsert (Collection* C, void* Item, unsigned Index)
 
     /* Grow the array if necessary */
     if (C->Count >= C->Size) {
-     	/* Must grow */
+        /* Must grow */
         CollGrow (C, (C->Size == 0)? 4 : C->Size * 2);
     }
 
     /* Move the existing elements if needed */
     if (C->Count != Index) {
-     	memmove (C->Items+Index+1, C->Items+Index, (C->Count-Index) * sizeof (void*));
+        memmove (C->Items+Index+1, C->Items+Index, (C->Count-Index) * sizeof (void*));
     }
     ++C->Count;
 
@@ -246,10 +246,10 @@ int CollIndex (Collection* C, const void* Item)
     /* Linear search */
     unsigned I;
     for (I = 0; I < C->Count; ++I) {
-     	if (Item == C->Items[I]) {
-     	    /* Found */
-     	    return (int)I;
-	}
+        if (Item == C->Items[I]) {
+            /* Found */
+            return (int)I;
+        }
     }
 
     /* Not found */
@@ -352,8 +352,8 @@ void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
 
     /* Correct NewIndex if needed */
     if (NewIndex >= OldIndex) {
-   	/* Position has changed with removal */
-   	--NewIndex;
+        /* Position has changed with removal */
+        --NewIndex;
     }
 
     /* Now insert it at the new position */
@@ -378,7 +378,7 @@ void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned T
 
     /* Check for trivial parameters */
     if (Count == 0 || Start == Target) {
-    	return;
+        return;
     }
 
     /* Calculate the raw memory space used by the items to move */
@@ -396,24 +396,24 @@ void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned T
      */
     if (Target < Start) {
 
-     	/* Move downwards */
-	unsigned BytesToMove = (Start - Target) * sizeof (void*);
-       	memmove (C->Items+Target+Count, C->Items+Target, BytesToMove);
+        /* Move downwards */
+        unsigned BytesToMove = (Start - Target) * sizeof (void*);
+        memmove (C->Items+Target+Count, C->Items+Target, BytesToMove);
 
     } else if (Target < Start + Count) {
 
-	/* Target is inside range */
-	FAIL ("Not supported");
+        /* Target is inside range */
+        FAIL ("Not supported");
 
     } else {
 
-     	/* Move upwards */
-	unsigned ItemsToMove = (Target - Start - Count);
-       	unsigned BytesToMove = ItemsToMove * sizeof (void*);
-     	memmove (C->Items+Start, C->Items+Target-ItemsToMove, BytesToMove);
+        /* Move upwards */
+        unsigned ItemsToMove = (Target - Start - Count);
+        unsigned BytesToMove = ItemsToMove * sizeof (void*);
+        memmove (C->Items+Start, C->Items+Target-ItemsToMove, BytesToMove);
 
-	/* Adjust the target index */
-	Target -= Count;
+        /* Adjust the target index */
+        Target -= Count;
     }
 
     /* Move the old items to their final location */
@@ -426,8 +426,8 @@ void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned T
 
 
 static void QuickSort (Collection* C, int Lo, int Hi,
-   	               int (*Compare) (void*, const void*, const void*),
-   		       void* Data)
+                       int (*Compare) (void*, const void*, const void*),
+                       void* Data)
 /* Internal recursive sort function. */
 {
     /* Get a pointer to the items */
@@ -435,37 +435,37 @@ static void QuickSort (Collection* C, int Lo, int Hi,
 
     /* Quicksort */
     while (Hi > Lo) {
-   	int I = Lo + 1;
-   	int J = Hi;
-   	while (I <= J) {
-   	    while (I <= J && Compare (Data, Items[Lo], Items[I]) >= 0) {
-   	     	++I;
-   	    }
-   	    while (I <= J && Compare (Data, Items[Lo], Items[J]) < 0) {
-   	     	--J;
-   	    }
-   	    if (I <= J) {
-		/* Swap I and J */
-		void* Tmp = Items[I];
-		Items[I]  = Items[J];
-		Items[J]  = Tmp;
-   	     	++I;
-   	     	--J;
-   	    }
-      	}
-   	if (J != Lo) {
-	    /* Swap J and Lo */
-	    void* Tmp = Items[J];
-	    Items[J]  = Items[Lo];
-	    Items[Lo] = Tmp;
-   	}
-	if (J > (Hi + Lo) / 2) {
-	    QuickSort (C, J + 1, Hi, Compare, Data);
-	    Hi = J - 1;
-	} else {
-	    QuickSort (C, Lo, J - 1, Compare, Data);
-	    Lo = J + 1;
-	}
+        int I = Lo + 1;
+        int J = Hi;
+        while (I <= J) {
+            while (I <= J && Compare (Data, Items[Lo], Items[I]) >= 0) {
+                ++I;
+            }
+            while (I <= J && Compare (Data, Items[Lo], Items[J]) < 0) {
+                --J;
+            }
+            if (I <= J) {
+                /* Swap I and J */
+                void* Tmp = Items[I];
+                Items[I]  = Items[J];
+                Items[J]  = Tmp;
+                ++I;
+                --J;
+            }
+        }
+        if (J != Lo) {
+            /* Swap J and Lo */
+            void* Tmp = Items[J];
+            Items[J]  = Items[Lo];
+            Items[Lo] = Tmp;
+        }
+        if (J > (Hi + Lo) / 2) {
+            QuickSort (C, J + 1, Hi, Compare, Data);
+            Hi = J - 1;
+        } else {
+            QuickSort (C, Lo, J - 1, Compare, Data);
+            Lo = J + 1;
+        }
     }
 }
 
@@ -492,8 +492,8 @@ void CollTransfer (Collection* Dest, const Collection* Source)
 
 
 void CollSort (Collection* C,
-	       int (*Compare) (void*, const void*, const void*),
-	       void* Data)
+               int (*Compare) (void*, const void*, const void*),
+               void* Data)
 /* Sort the collection using the given compare function. The data pointer is
  * passed as *first* element to the compare function, it's not used by the
  * sort function itself. The other two pointer passed to the Compare function
@@ -501,7 +501,7 @@ void CollSort (Collection* C,
  */
 {
     if (C->Count > 1) {
-	QuickSort (C, 0, C->Count-1, Compare, Data);
+        QuickSort (C, 0, C->Count-1, Compare, Data);
     }
 }
 

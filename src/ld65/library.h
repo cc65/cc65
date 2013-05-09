@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   library.h				     */
+/*                                 library.h                                 */
 /*                                                                           */
-/*	    Library data structures and helpers for the ld65 linker	     */
+/*          Library data structures and helpers for the ld65 linker          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

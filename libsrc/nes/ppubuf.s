@@ -20,8 +20,8 @@
 
 
 @wait:  lda     ringcount
-	bne     @wait
-	rts
+        bne     @wait
+        rts
 
 .endproc
 
@@ -34,8 +34,8 @@
 
         lda     #$ff            ; (($0100/3)*1)
 @wait:  cmp     ringcount
-	beq     @wait
-	rts
+        beq     @wait
+        rts
 
 .endproc
 

@@ -57,7 +57,7 @@ Collection Locations = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*     	      	    		     Code		  		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -82,7 +82,7 @@ Location* NewLocation (unsigned long Start, unsigned long End)
 
 
 static int CmpLocations (void* Data attribute ((unused)),
-		         const void* lhs, const void* rhs)
+                         const void* lhs, const void* rhs)
 /* Compare function for CollSort */
 {
     /* Cast the object pointers */

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   swstmt.c                                  */
+/*                                 swstmt.c                                  */
 /*                                                                           */
-/*			  Parse the switch statement                         */
+/*                        Parse the switch statement                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*	  	    		     Data  		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -78,7 +78,7 @@ static SwitchCtrl* Switch = 0;
 
 
 /*****************************************************************************/
-/*  	       	    		     Code  		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -90,7 +90,7 @@ void SwitchStatement (void)
     CodeMark    CaseCodeStart;  /* Start of code marker */
     CodeMark    SwitchCodeStart;/* Start of switch code */
     CodeMark    SwitchCodeEnd;  /* End of switch code */
-    unsigned    ExitLabel;	/* Exit label */
+    unsigned    ExitLabel;      /* Exit label */
     unsigned    SwitchCodeLabel;/* Label for the switch code */
     int         HaveBreak = 0;  /* True if the last statement had a break */
     int         RCurlyBrace;    /* True if last token is right curly brace */
@@ -108,8 +108,8 @@ void SwitchStatement (void)
     Expression0 (&SwitchExpr);
     if (!IsClassInt (SwitchExpr.Type))  {
         Error ("Switch quantity is not an integer");
-     	/* To avoid any compiler errors, make the expression a valid int */
-     	ED_MakeConstAbsInt (&SwitchExpr, 1);
+        /* To avoid any compiler errors, make the expression a valid int */
+        ED_MakeConstAbsInt (&SwitchExpr, 1);
     }
     ConsumeRParen ();
 
@@ -156,7 +156,7 @@ void SwitchStatement (void)
 
     /* Check if we had any labels */
     if (CollCount (SwitchData.Nodes) == 0 && SwitchData.DefaultLabel == 0) {
-	Warning ("No case labels");
+        Warning ("No case labels");
     }
 
     /* If the last statement did not have a break, we may have an open

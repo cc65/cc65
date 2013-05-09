@@ -4,10 +4,10 @@
 ; 29.10.99
 
 ; void RecoverRectangle (void);
-	    
-	    .export _RecoverRectangle
+            
+            .export _RecoverRectangle
 
-	    .include "jumptab.inc"
-	    
+            .include "jumptab.inc"
+            
 _RecoverRectangle = RecoverRectangle
 

@@ -4,16 +4,16 @@
 ; Screen size variables
 ;
 
-	.export		screensize
+        .export         screensize
 
-	.include	"pet.inc"
+        .include        "pet.inc"
 
 .proc   screensize
 
-       	ldx	SCR_LINELEN
-	inx			; Variable is one less
-       	ldy	#25
-	rts
+        ldx     SCR_LINELEN
+        inx                     ; Variable is one less
+        ldy     #25
+        rts
 
 .endproc
 

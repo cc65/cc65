@@ -6,8 +6,8 @@
 ; const char joy_stddrv[];
 ;
 
-	.export	_joy_stddrv
+        .export _joy_stddrv
 
 .rodata
 
-_joy_stddrv:	.asciiz	"ataristd.joy"
+_joy_stddrv:    .asciiz "ataristd.joy"

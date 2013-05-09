@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.h				     */
+/*                                 scanner.h                                 */
 /*                                                                           */
-/*	     Configuration file scanner for the da65 disassembler	     */
+/*           Configuration file scanner for the da65 disassembler            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Data     				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -120,27 +120,27 @@ typedef enum token_t {
 /* Mapping table entry, special identifier --> token */
 typedef struct IdentTok IdentTok;
 struct IdentTok {
-    const char*	    	Ident;	     	/* Identifier */
-    token_t	    	Tok;	     	/* Token for identifier */
+    const char*         Ident;          /* Identifier */
+    token_t             Tok;            /* Token for identifier */
 };
-#define ENTRY_COUNT(s) 	(sizeof (s) / sizeof (s [0]))
+#define ENTRY_COUNT(s)  (sizeof (s) / sizeof (s [0]))
 
 
 
 /* Current token and attributes */
 #define CFG_MAX_IDENT_LEN  255
-extern unsigned	    	InfoTok;
-extern char    	       	InfoSVal[CFG_MAX_IDENT_LEN+1];
-extern long	        InfoIVal;
+extern unsigned         InfoTok;
+extern char             InfoSVal[CFG_MAX_IDENT_LEN+1];
+extern long             InfoIVal;
 
 /* Error location */
-extern unsigned        	InfoErrorLine;
-extern unsigned        	InfoErrorCol;
+extern unsigned         InfoErrorLine;
+extern unsigned         InfoErrorCol;
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

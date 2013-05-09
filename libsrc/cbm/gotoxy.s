@@ -4,14 +4,14 @@
 ; void gotoxy (unsigned char x, unsigned char y);
 ;
 
-	.export		_gotoxy
-	.import		popa, plot
-	.importzp	CURS_X, CURS_Y
+        .export         _gotoxy
+        .import         popa, plot
+        .importzp       CURS_X, CURS_Y
 
 _gotoxy:
-	sta	CURS_Y		; Set Y
-	jsr 	popa		; Get X
-	sta	CURS_X		; Set X
-	jmp	plot		; Set the cursor position
+        sta     CURS_Y          ; Set Y
+        jsr     popa            ; Get X
+        sta     CURS_X          ; Set X
+        jmp     plot            ; Set the cursor position
 
 

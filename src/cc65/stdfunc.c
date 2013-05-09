@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   stdfunc.c				     */
+/*                                 stdfunc.c                                 */
 /*                                                                           */
-/*	   Handle inlining of known functions for the cc65 compiler	     */
+/*         Handle inlining of known functions for the cc65 compiler          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -58,7 +58,7 @@
 
 
 /*****************************************************************************/
-/*	  	     	       Function forwards	    		     */
+/*                             Function forwards                             */
 /*****************************************************************************/
 
 
@@ -72,7 +72,7 @@ static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
 
 /*****************************************************************************/
-/*  	  	    	  	     Data   	    	    	   	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -81,17 +81,17 @@ static void StdFunc_strlen (FuncDesc*, ExprDesc*);
  * alphabetically!
  */
 static struct StdFuncDesc {
-    const char*	 	Name;
-    void  	 	(*Handler) (FuncDesc*, ExprDesc*);
+    const char*         Name;
+    void                (*Handler) (FuncDesc*, ExprDesc*);
 } StdFuncs[] = {
-    {  	"memcpy",      	StdFunc_memcpy 	       	},
-    {  	"memset",      	StdFunc_memset	  	},
-    {  	"strcmp",      	StdFunc_strcmp 	       	},
-    {  	"strcpy",	StdFunc_strcpy 	       	},
-    {  	"strlen",	StdFunc_strlen	  	},
+    {   "memcpy",       StdFunc_memcpy          },
+    {   "memset",       StdFunc_memset          },
+    {   "strcmp",       StdFunc_strcmp          },
+    {   "strcpy",       StdFunc_strcpy          },
+    {   "strlen",       StdFunc_strlen          },
 
 };
-#define FUNC_COUNT	(sizeof (StdFuncs) / sizeof (StdFuncs[0]))
+#define FUNC_COUNT      (sizeof (StdFuncs) / sizeof (StdFuncs[0]))
 
 typedef struct ArgDesc ArgDesc;
 struct ArgDesc {
@@ -107,7 +107,7 @@ struct ArgDesc {
 
 
 /*****************************************************************************/
-/*			       Helper functions	     	    		     */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -1290,7 +1290,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
 
 /*****************************************************************************/
-/*  		     	 	     Code	       	 		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

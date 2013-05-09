@@ -5,8 +5,8 @@
 ; /* Initialize the random number generator */
 ;
 
-    	.export	       	__randomize
-	.import		_srand
+        .export         __randomize
+        .import         _srand
         .importzp       time
 
 __randomize:

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    _ted.h				     */
+/*                                  _ted.h                                   */
 /*                                                                           */
-/*		  Internal include file, do not use directly		     */
+/*                Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

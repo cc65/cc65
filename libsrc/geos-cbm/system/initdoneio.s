@@ -6,10 +6,10 @@
 ; void InitForIO  (void);
 ; void DoneWithIO (void);
 
-	    .export _InitForIO, _DoneWithIO
+            .export _InitForIO, _DoneWithIO
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_InitForIO	= InitForIO
-	    
-_DoneWithIO	= DoneWithIO
+_InitForIO      = InitForIO
+            
+_DoneWithIO     = DoneWithIO

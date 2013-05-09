@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    c128.h				     */
+/*                                  c128.h                                   */
 /*                                                                           */
-/*		       C128 system specific definitions			     */
+/*                     C128 system specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,50 +46,50 @@
 
 
 /* Additional key defines */
-#define CH_F1			133
-#define CH_F2			137
-#define CH_F3			134
-#define CH_F4			138
-#define CH_F5			135
-#define CH_F6			139
-#define CH_F7			136
-#define CH_F8			140
+#define CH_F1                   133
+#define CH_F2                   137
+#define CH_F3                   134
+#define CH_F4                   138
+#define CH_F5                   135
+#define CH_F6                   139
+#define CH_F7                   136
+#define CH_F8                   140
 
 /* Color defines */
-#define COLOR_BLACK  	       	0x00
-#define COLOR_WHITE  	       	0x01
-#define COLOR_RED    	       	0x02
-#define COLOR_CYAN      	0x03
-#define COLOR_VIOLET 	       	0x04
-#define COLOR_GREEN  	       	0x05
-#define COLOR_BLUE   	       	0x06
-#define COLOR_YELLOW 	       	0x07
-#define COLOR_ORANGE 	       	0x08
-#define COLOR_BROWN  	       	0x09
-#define COLOR_LIGHTRED       	0x0A
-#define COLOR_GRAY1  	       	0x0B
-#define COLOR_GRAY2  	       	0x0C
-#define COLOR_LIGHTGREEN     	0x0D
-#define COLOR_LIGHTBLUE      	0x0E
-#define COLOR_GRAY3  	       	0x0F
+#define COLOR_BLACK             0x00
+#define COLOR_WHITE             0x01
+#define COLOR_RED               0x02
+#define COLOR_CYAN              0x03
+#define COLOR_VIOLET            0x04
+#define COLOR_GREEN             0x05
+#define COLOR_BLUE              0x06
+#define COLOR_YELLOW            0x07
+#define COLOR_ORANGE            0x08
+#define COLOR_BROWN             0x09
+#define COLOR_LIGHTRED          0x0A
+#define COLOR_GRAY1             0x0B
+#define COLOR_GRAY2             0x0C
+#define COLOR_LIGHTGREEN        0x0D
+#define COLOR_LIGHTBLUE         0x0E
+#define COLOR_GRAY3             0x0F
 
 /* TGI color defines */
-#define TGI_COLOR_BLACK  	COLOR_BLACK
-#define TGI_COLOR_WHITE  	COLOR_WHITE
-#define TGI_COLOR_RED    	COLOR_RED
-#define TGI_COLOR_CYAN      	COLOR_CYAN
-#define TGI_COLOR_VIOLET 	COLOR_VIOLET
-#define TGI_COLOR_GREEN  	COLOR_GREEN
-#define TGI_COLOR_BLUE   	COLOR_BLUE
-#define TGI_COLOR_YELLOW 	COLOR_YELLOW
-#define TGI_COLOR_ORANGE 	COLOR_ORANGE
-#define TGI_COLOR_BROWN  	COLOR_BROWN
+#define TGI_COLOR_BLACK         COLOR_BLACK
+#define TGI_COLOR_WHITE         COLOR_WHITE
+#define TGI_COLOR_RED           COLOR_RED
+#define TGI_COLOR_CYAN          COLOR_CYAN
+#define TGI_COLOR_VIOLET        COLOR_VIOLET
+#define TGI_COLOR_GREEN         COLOR_GREEN
+#define TGI_COLOR_BLUE          COLOR_BLUE
+#define TGI_COLOR_YELLOW        COLOR_YELLOW
+#define TGI_COLOR_ORANGE        COLOR_ORANGE
+#define TGI_COLOR_BROWN         COLOR_BROWN
 #define TGI_COLOR_LIGHTRED      COLOR_LIGHTRED
-#define TGI_COLOR_GRAY1  	COLOR_GRAY1
-#define TGI_COLOR_GRAY2  	COLOR_GRAY2
+#define TGI_COLOR_GRAY1         COLOR_GRAY1
+#define TGI_COLOR_GRAY2         COLOR_GRAY2
 #define TGI_COLOR_LIGHTGREEN    COLOR_LIGHTGREEN
 #define TGI_COLOR_LIGHTBLUE     COLOR_LIGHTBLUE
-#define TGI_COLOR_GRAY3  	COLOR_GRAY3
+#define TGI_COLOR_GRAY3         COLOR_GRAY3
 
 /* Video mode defines */
 #define VIDEOMODE_40x25         0x00
@@ -101,22 +101,22 @@
 
 /* Define hardware */
 #include <_vic2.h>
-#define VIC    	(*(struct __vic2*)0xD000)
+#define VIC     (*(struct __vic2*)0xD000)
 
 #include <_sid.h>
-#define	SID	(*(struct __sid*)0xD400)
+#define SID     (*(struct __sid*)0xD400)
 
 #include <_vdc.h>
 #define VDC     (*(struct __vdc*)0xD600)
 
 #include <_6526.h>
-#define CIA1	(*(struct __6526*)0xDC00)
-#define CIA2	(*(struct __6526*)0xDD00)
+#define CIA1    (*(struct __6526*)0xDC00)
+#define CIA2    (*(struct __6526*)0xDD00)
 
 
 
 /* Define special memory areas */
-#define COLOR_RAM	((unsigned char*)0xD800)
+#define COLOR_RAM       ((unsigned char*)0xD800)
 
 
 
@@ -128,12 +128,12 @@ extern void c128_ramcart_emd[];
 extern void c128_reu_emd[];
 extern void c128_vdc_emd[];
 extern void c128_ptvjoy_joy[];
-extern void c128_stdjoy_joy[];	/* Referred to by joy_static_stddrv[] */
-extern void c128_1351_mous[];	/* Referred to by mouse_static_stddrv[] */
+extern void c128_stdjoy_joy[];  /* Referred to by joy_static_stddrv[] */
+extern void c128_1351_mous[];   /* Referred to by mouse_static_stddrv[] */
 extern void c128_joy_mou[];
 extern void c128_pot_mou[];
 extern void c128_swlink_ser[];
-extern void c128_vdc_tgi[];	/* Referred to by tgi_static_stddrv[] */
+extern void c128_vdc_tgi[];     /* Referred to by tgi_static_stddrv[] */
 extern void c128_vdc2_tgi[];
 
 

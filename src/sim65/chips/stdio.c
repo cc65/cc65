@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    stdio.c				     */
+/*                                  stdio.c                                  */
 /*                                                                           */
-/*		   STDIO plugin for the sim65 6502 simulator		     */
+/*                 STDIO plugin for the sim65 6502 simulator                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -94,7 +94,7 @@ static const struct ChipData CData[1] = {
         /* -- Exported functions -- */
         InitChip,
         CreateInstance,
-	DestroyInstance,
+        DestroyInstance,
         WriteCtrl,
         Write,
         ReadCtrl,

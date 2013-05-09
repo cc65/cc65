@@ -5,33 +5,33 @@
 ;
 
         .export         __syschdir
-        .import		pushname, popname
-	.import		initcwd
+        .import         pushname, popname
+        .import         initcwd
 
-	.include	"zeropage.inc"
-	.include	"mli.inc"
+        .include        "zeropage.inc"
+        .include        "mli.inc"
 
 __syschdir:
         ; Push name
-        jsr	pushname
-        bne	oserr
+        jsr     pushname
+        bne     oserr
 
         ; Set pushed name
-        lda	sp
-        ldx	sp+1
-        sta	mliparam + MLI::PREFIX::PATHNAME
-        stx	mliparam + MLI::PREFIX::PATHNAME+1
+        lda     sp
+        ldx     sp+1
+        sta     mliparam + MLI::PREFIX::PATHNAME
+        stx     mliparam + MLI::PREFIX::PATHNAME+1
 
         ; Change directory
-        lda	#SET_PREFIX_CALL
-        ldx	#PREFIX_COUNT
-        jsr	callmli
-	bcs	cleanup
+        lda     #SET_PREFIX_CALL
+        ldx     #PREFIX_COUNT
+        jsr     callmli
+        bcs     cleanup
 
-	; Update current working directory
-	jsr	initcwd		; Returns with A = 0
+        ; Update current working directory
+        jsr     initcwd         ; Returns with A = 0
 
         ; Cleanup name
-cleanup:jsr	popname		; Preserves A
+cleanup:jsr     popname         ; Preserves A
 
-oserr:	rts
+oserr:  rts

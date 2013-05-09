@@ -5,8 +5,8 @@
 
 ; void SetPattern     (char pattern);
 
-	    .export _SetPattern
+            .export _SetPattern
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_SetPattern	= SetPattern
+_SetPattern     = SetPattern

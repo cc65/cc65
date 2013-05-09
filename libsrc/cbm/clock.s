@@ -4,19 +4,19 @@
 ; clock_t clock (void);
 ;
 
-      	.export	       	_clock
+        .export         _clock
         .import         RDTIM
-	.importzp	sreg
+        .importzp       sreg
 
 
 
-.proc	_clock
+.proc   _clock
 
-	lda	#0  	    	; Byte 3 is always zero
-       	sta    	sreg+1
-	jsr	RDTIM
-	sty	sreg
-       	rts
+        lda     #0              ; Byte 3 is always zero
+        sta     sreg+1
+        jsr     RDTIM
+        sty     sreg
+        rts
 
 .endproc
 

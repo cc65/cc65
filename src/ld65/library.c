@@ -1,34 +1,34 @@
 /*****************************************************************************/
-/*					   				     */
-/*				   library.c				     */
-/*					   				     */
-/*	    Library data structures and helpers for the ld65 linker	     */
-/*					   				     */
-/*					   				     */
-/*					   				     */
+/*                                                                           */
+/*                                 library.c                                 */
+/*                                                                           */
+/*          Library data structures and helpers for the ld65 linker          */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
 /* (C) 1998-2011, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
-/*									     */
-/*									     */
-/* This software is provided 'as-is', without any expressed or implied	     */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.				     */
-/*									     */
+/* arising from the use of this software.                                    */
+/*                                                                           */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:			     */
-/*									     */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.					     */
+/*    appreciated but is not required.                                       */
 /* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.			     */
-/* 3. This notice may not be removed or altered from any source		     */
-/*    distribution.							     */
-/*									     */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
 /*****************************************************************************/
 
 
@@ -57,7 +57,7 @@
 
 
 /*****************************************************************************/
-/*	  	 		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -135,7 +135,7 @@ static void FreeLibrary (Library* L)
 
 
 /*****************************************************************************/
-/*	       		 Reading file data structures			     */
+/*                       Reading file data structures                        */
 /*****************************************************************************/
 
 
@@ -158,7 +158,7 @@ static void LibReadHeader (Library* L)
     L->Header.Magic   = LIB_MAGIC;
     L->Header.Version = Read16 (L->F);
     if (L->Header.Version != LIB_VERSION) {
-       	Error ("Wrong data version in `%s'", GetString (L->Name));
+        Error ("Wrong data version in `%s'", GetString (L->Name));
     }
     L->Header.Flags   = Read16 (L->F);
     L->Header.IndexOffs = Read32 (L->F);
@@ -171,21 +171,21 @@ static void LibReadObjHeader (Library* L, ObjData* O)
 {
     O->Header.Magic = Read32 (L->F);
     if (O->Header.Magic != OBJ_MAGIC) {
-	Error ("Object file `%s' in library `%s' is invalid",
-	       GetObjFileName (O), GetString (L->Name));
+        Error ("Object file `%s' in library `%s' is invalid",
+               GetObjFileName (O), GetString (L->Name));
     }
     O->Header.Version = Read16 (L->F);
     if (O->Header.Version != OBJ_VERSION) {
-	Error ("Object file `%s' in library `%s' has wrong version",
-	       GetObjFileName (O), GetString (L->Name));
+        Error ("Object file `%s' in library `%s' has wrong version",
+               GetObjFileName (O), GetString (L->Name));
     }
-    O->Header.Flags    	   = Read16 (L->F);
+    O->Header.Flags        = Read16 (L->F);
     O->Header.OptionOffs   = Read32 (L->F);
     O->Header.OptionSize   = Read32 (L->F);
-    O->Header.FileOffs	   = Read32 (L->F);
-    O->Header.FileSize	   = Read32 (L->F);
-    O->Header.SegOffs	   = Read32 (L->F);
-    O->Header.SegSize	   = Read32 (L->F);
+    O->Header.FileOffs     = Read32 (L->F);
+    O->Header.FileSize     = Read32 (L->F);
+    O->Header.SegOffs      = Read32 (L->F);
+    O->Header.SegSize      = Read32 (L->F);
     O->Header.ImportOffs   = Read32 (L->F);
     O->Header.ImportSize   = Read32 (L->F);
     O->Header.ExportOffs   = Read32 (L->F);
@@ -210,7 +210,7 @@ static ObjData* ReadIndexEntry (Library* L)
 /* Read one entry in the index */
 {
     /* Create a new entry and insert it into the list */
-    ObjData* O	= NewObjData ();
+    ObjData* O  = NewObjData ();
 
     /* Remember from which library this module is */
     O->Lib = L;
@@ -219,10 +219,10 @@ static ObjData* ReadIndexEntry (Library* L)
     O->Name = ReadStr (L->F);
 
     /* Module flags/MTime/Start/Size */
-    O->Flags	= Read16 (L->F);
+    O->Flags    = Read16 (L->F);
     O->MTime    = Read32 (L->F);
-    O->Start	= Read32 (L->F);
-    Read32 (L->F);    			/* Skip Size */
+    O->Start    = Read32 (L->F);
+    Read32 (L->F);                      /* Skip Size */
 
     /* Done */
     return O;
@@ -271,7 +271,7 @@ static void LibReadIndex (Library* L)
 
     /* Read all entries in the index */
     while (ModuleCount--) {
-       	CollAppend (&L->Modules, ReadIndexEntry (L));
+        CollAppend (&L->Modules, ReadIndexEntry (L));
     }
 
     /* Walk over the index and read basic data for all object files in the
@@ -285,7 +285,7 @@ static void LibReadIndex (Library* L)
 
 
 /*****************************************************************************/
-/*  	   	  	       High level stuff				     */
+/*                             High level stuff                              */
 /*****************************************************************************/
 
 
@@ -300,12 +300,12 @@ static void LibCheckExports (ObjData* O)
     /* Check all exports */
     for (I = 0; I < CollCount (&O->Exports); ++I) {
         const Export* E = CollConstAt (&O->Exports, I);
-	if (IsUnresolved (E->Name)) {
+        if (IsUnresolved (E->Name)) {
            /* We need this module, insert the imports and exports */
-	    O->Flags |= OBJ_REF;
+            O->Flags |= OBJ_REF;
             InsertObjGlobals (O);
             break;
-    	}
+        }
     }
 }
 

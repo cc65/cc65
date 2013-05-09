@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   symtab.c				     */
+/*                                 symtab.c                                  */
 /*                                                                           */
-/*		   Symbol table for the ca65 macroassembler		     */
+/*                 Symbol table for the ca65 macroassembler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -61,18 +61,18 @@
 
 
 /*****************************************************************************/
-/*     	     	    	   	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Combined symbol entry flags used within this module */
-#define SF_UNDEFMASK	(SF_REFERENCED | SF_DEFINED | SF_IMPORT)
-#define SF_UNDEFVAL 	(SF_REFERENCED)
+#define SF_UNDEFMASK    (SF_REFERENCED | SF_DEFINED | SF_IMPORT)
+#define SF_UNDEFVAL     (SF_REFERENCED)
 
 /* Symbol tables */
-SymTable*      	    CurrentScope = 0;   /* Pointer to current symbol table */
-SymTable*	    RootScope    = 0;   /* Root symbol table */
+SymTable*           CurrentScope = 0;   /* Pointer to current symbol table */
+SymTable*           RootScope    = 0;   /* Root symbol table */
 static SymTable*    LastScope    = 0;   /* Pointer to last scope in list */
 static unsigned     ScopeCount   = 0;   /* Number of scopes */
 
@@ -83,7 +83,7 @@ static unsigned     ExportCount = 0;    /* Counter for export symbols */
 
 
 /*****************************************************************************/
-/*     	       	       	   Internally used functions		 	     */
+/*                         Internally used functions                         */
 /*****************************************************************************/
 
 
@@ -141,7 +141,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
     S->Parent       = Parent;
     S->Name         = GetStrBufId (Name);
     while (Slots--) {
-       	S->Table[Slots] = 0;
+        S->Table[Slots] = 0;
     }
 
     /* Insert the symbol table into the list of all symbol tables */
@@ -191,7 +191,7 @@ static SymTable* NewSymTable (SymTable* Parent, const StrBuf* Name)
 
 
 /*****************************************************************************/
-/*     	       	   	   	     Code		  	   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -310,12 +310,12 @@ SymTable* SymFindAnyScope (SymTable* Parent, const StrBuf* Name)
 {
     SymTable* Scope;
     do {
-	/* Search in the current table */
-	Scope = SymFindScope (Parent, Name, SYM_FIND_EXISTING);
-       	if (Scope == 0) {
-	    /* Not found, search in the parent scope, if we have one */
-	    Parent = Parent->Parent;
-	}
+        /* Search in the current table */
+        Scope = SymFindScope (Parent, Name, SYM_FIND_EXISTING);
+        if (Scope == 0) {
+            /* Not found, search in the parent scope, if we have one */
+            Parent = Parent->Parent;
+        }
     } while (Scope == 0 && Parent != 0);
 
     return Scope;
@@ -470,7 +470,7 @@ static void SymCheckUndefined (SymEntry* S)
      *
      *   - An undefined symbol in a nested lexical level. If the symbol is not
      *     fixed to this level, search for the symbol in the higher levels and
-     * 	   make the entry a trampoline entry if we find one.
+     *     make the entry a trampoline entry if we find one.
      *
      *   - If the symbol is not found, it is a real undefined symbol. If the
      *     AutoImport flag is set, make it an import. If the AutoImport flag is
@@ -499,12 +499,12 @@ static void SymCheckUndefined (SymEntry* S)
          * and check for problems.
          */
         if (S->Flags & SF_EXPORT) {
-	    if (Sym->Flags & SF_IMPORT) {
-	       	/* The symbol is already marked as import */
-       	       	LIError (&S->RefLines,
+            if (Sym->Flags & SF_IMPORT) {
+                /* The symbol is already marked as import */
+                LIError (&S->RefLines,
                          "Symbol `%s' is already an import",
                          GetString (Sym->Name));
-	    }
+            }
             if (Sym->Flags & SF_EXPORT) {
                 /* The symbol is already marked as an export. */
                 if (Sym->AddrSize > S->ExportSize) {
@@ -547,27 +547,27 @@ static void SymCheckUndefined (SymEntry* S)
         S->Flags = SF_UNUSED;
 
     } else {
-	/* The symbol is definitely undefined */
-	if (S->Flags & SF_EXPORT) {
-	    /* We will not auto-import an export */
-	    LIError (&S->RefLines,
+        /* The symbol is definitely undefined */
+        if (S->Flags & SF_EXPORT) {
+            /* We will not auto-import an export */
+            LIError (&S->RefLines,
                      "Exported symbol `%m%p' was never defined",
                      GetSymName (S));
-	} else {
-	    if (AutoImport) {
-	    	/* Mark as import, will be indexed later */
-	    	S->Flags |= SF_IMPORT;
+        } else {
+            if (AutoImport) {
+                /* Mark as import, will be indexed later */
+                S->Flags |= SF_IMPORT;
                 /* Use the address size for code */
                 S->AddrSize = CodeAddrSize;
                 /* Mark point of import */
                 GetFullLineInfo (&S->DefLines);
-	    } else {
-	    	/* Error */
-	        LIError (&S->RefLines,
+            } else {
+                /* Error */
+                LIError (&S->RefLines,
                          "Symbol `%m%p' is undefined",
                          GetSymName (S));
-	    }
-	}
+            }
+        }
     }
 }
 
@@ -580,7 +580,7 @@ void SymCheck (void)
 
     /* Check for open scopes */
     if (CurrentScope->Parent != 0) {
-	Error ("Local scope was not closed");
+        Error ("Local scope was not closed");
     }
 
     /* First pass: Walk through all symbols, checking for undefined's and
@@ -588,25 +588,25 @@ void SymCheck (void)
      */
     S = SymList;
     while (S) {
-	/* If the symbol is marked as global, mark it as export, if it is
-	 * already defined, otherwise mark it as import.
-	 */
-	if (S->Flags & SF_GLOBAL) {
-	    if (S->Flags & SF_DEFINED) {
-    	     	SymExportFromGlobal (S);
-    	    } else {
-    	     	SymImportFromGlobal (S);
-	    }
-	}
+        /* If the symbol is marked as global, mark it as export, if it is
+         * already defined, otherwise mark it as import.
+         */
+        if (S->Flags & SF_GLOBAL) {
+            if (S->Flags & SF_DEFINED) {
+                SymExportFromGlobal (S);
+            } else {
+                SymImportFromGlobal (S);
+            }
+        }
 
-	/* Handle undefined symbols */
-       	if ((S->Flags & SF_UNDEFMASK) == SF_UNDEFVAL) {
-	    /* This is an undefined symbol. Handle it. */
-	    SymCheckUndefined (S);
-	}
+        /* Handle undefined symbols */
+        if ((S->Flags & SF_UNDEFMASK) == SF_UNDEFVAL) {
+            /* This is an undefined symbol. Handle it. */
+            SymCheckUndefined (S);
+        }
 
-	/* Next symbol */
-	S = S->List;
+        /* Next symbol */
+        S = S->List;
     }
 
     /* Second pass: Walk again through the symbols. Count exports and imports
@@ -616,8 +616,8 @@ void SymCheck (void)
      */
     S = SymList;
     while (S) {
-	if ((S->Flags & SF_UNUSED) == 0 &&
-	    (S->Flags & SF_UNDEFMASK) != SF_UNDEFVAL) {
+        if ((S->Flags & SF_UNUSED) == 0 &&
+            (S->Flags & SF_UNDEFMASK) != SF_UNDEFVAL) {
 
             /* Check for defined symbols that were never referenced */
             if (IsSizeOfSymbol (S)) {
@@ -631,22 +631,22 @@ void SymCheck (void)
             }
 
             /* Assign an index to all imports */
-	    if (S->Flags & SF_IMPORT) {
-	    	if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
-	    	    /* Imported symbol is not referenced */
-	    	    LIWarning (&S->DefLines, 2,
+            if (S->Flags & SF_IMPORT) {
+                if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
+                    /* Imported symbol is not referenced */
+                    LIWarning (&S->DefLines, 2,
                                "Symbol `%m%p' is imported but never used",
                                GetSymName (S));
-	    	} else {
-	    	    /* Give the import an id, count imports */
-	    	    S->ImportId = ImportCount++;
-	    	}
-	    }
+                } else {
+                    /* Give the import an id, count imports */
+                    S->ImportId = ImportCount++;
+                }
+            }
 
             /* Count exports, assign the export ID */
-	    if (S->Flags & SF_EXPORT) {
+            if (S->Flags & SF_EXPORT) {
                 S->ExportId = ExportCount++;
-	    }
+            }
 
             /* If the symbol is defined but has an unknown address size,
              * recalculate it.
@@ -690,10 +690,10 @@ void SymCheck (void)
                 }
             }
 
-	}
+        }
 
-	/* Next symbol */
-     	S = S->List;
+        /* Next symbol */
+        S = S->List;
     }
 }
 
@@ -705,19 +705,19 @@ void SymDump (FILE* F)
     SymEntry* S = SymList;
 
     while (S) {
-	/* Ignore unused symbols */
-	if ((S->Flags & SF_UNUSED) != 0) {
-	    fprintf (F,
-		     "%m%-24p %s %s %s %s %s\n",
-		     GetSymName (S),
-		     (S->Flags & SF_DEFINED)? "DEF" : "---",
-		     (S->Flags & SF_REFERENCED)? "REF" : "---",
-		     (S->Flags & SF_IMPORT)? "IMP" : "---",
-		     (S->Flags & SF_EXPORT)? "EXP" : "---",
+        /* Ignore unused symbols */
+        if ((S->Flags & SF_UNUSED) != 0) {
+            fprintf (F,
+                     "%m%-24p %s %s %s %s %s\n",
+                     GetSymName (S),
+                     (S->Flags & SF_DEFINED)? "DEF" : "---",
+                     (S->Flags & SF_REFERENCED)? "REF" : "---",
+                     (S->Flags & SF_IMPORT)? "IMP" : "---",
+                     (S->Flags & SF_EXPORT)? "EXP" : "---",
                      AddrSizeToStr (S->AddrSize));
-	}
-	/* Next symbol */
-	S = S->List;
+        }
+        /* Next symbol */
+        S = S->List;
     }
 }
 
@@ -745,11 +745,11 @@ void WriteImports (void)
             (S->Flags & (SF_REFERENCED | SF_FORCED)) != 0) {
 
             ObjWrite8 (S->AddrSize);
-       	    ObjWriteVar (S->Name);
-     	    WriteLineInfo (&S->DefLines);
+            ObjWriteVar (S->Name);
+            WriteLineInfo (&S->DefLines);
             WriteLineInfo (&S->RefLines);
-     	}
-     	S = S->List;
+        }
+        S = S->List;
     }
 
     /* Done writing imports */
@@ -773,9 +773,9 @@ void WriteExports (void)
     /* Walk throught list and write all exports to the file */
     S = SymList;
     while (S) {
-       	if ((S->Flags & (SF_UNUSED | SF_EXPORT)) == SF_EXPORT) {
+        if ((S->Flags & (SF_UNUSED | SF_EXPORT)) == SF_EXPORT) {
 
-	    /* Get the expression bits and the value */
+            /* Get the expression bits and the value */
             long ConstVal;
             unsigned SymFlags = GetSymInfoFlags (S, &ConstVal);
 
@@ -788,37 +788,37 @@ void WriteExports (void)
                 SymFlags |= SYM_SIZE;
             }
 
-	    /* Count the number of ConDes types */
-	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
-	     	if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
-	     	    SYM_INC_CONDES_COUNT (SymFlags);
-	     	}
-	    }
+            /* Count the number of ConDes types */
+            for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
+                if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
+                    SYM_INC_CONDES_COUNT (SymFlags);
+                }
+            }
 
-	    /* Write the type and the export size */
-	    ObjWriteVar (SymFlags);
+            /* Write the type and the export size */
+            ObjWriteVar (SymFlags);
             ObjWrite8 (S->ExportSize);
 
-	    /* Write any ConDes declarations */
-	    if (SYM_GET_CONDES_COUNT (SymFlags) > 0) {
-	     	for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
-	     	    unsigned char Prio = S->ConDesPrio[Type];
-	     	    if (Prio != CD_PRIO_NONE) {
-	     	     	ObjWrite8 (CD_BUILD (Type, Prio));
-	     	    }
-	     	}
-	    }
+            /* Write any ConDes declarations */
+            if (SYM_GET_CONDES_COUNT (SymFlags) > 0) {
+                for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
+                    unsigned char Prio = S->ConDesPrio[Type];
+                    if (Prio != CD_PRIO_NONE) {
+                        ObjWrite8 (CD_BUILD (Type, Prio));
+                    }
+                }
+            }
 
-	    /* Write the name */
-       	    ObjWriteVar (S->Name);
+            /* Write the name */
+            ObjWriteVar (S->Name);
 
-	    /* Write the value */
-	    if (SYM_IS_CONST (SymFlags)) {
-	     	/* Constant value */
-    	     	ObjWrite32 (ConstVal);
-	    } else {
-	     	/* Expression involved */
-	        WriteExpr (S->Expr);
+            /* Write the value */
+            if (SYM_IS_CONST (SymFlags)) {
+                /* Constant value */
+                ObjWrite32 (ConstVal);
+            } else {
+                /* Expression involved */
+                WriteExpr (S->Expr);
             }
 
             /* If the symbol has a size, write it to the file */
@@ -826,11 +826,11 @@ void WriteExports (void)
                 ObjWriteVar (Size);
             }
 
-	    /* Write the line infos */
+            /* Write the line infos */
             WriteLineInfo (&S->DefLines);
-	    WriteLineInfo (&S->RefLines);
-	}
-     	S = S->List;
+            WriteLineInfo (&S->RefLines);
+        }
+        S = S->List;
     }
 
     /* Done writing exports */
@@ -851,25 +851,25 @@ void WriteDbgSyms (void)
     /* Check if debug info is requested */
     if (DbgSyms) {
 
-    	/* Walk through the list, give each symbol an id and count them */
-    	Count = 0;
-    	S = SymList;
-    	while (S) {
-    	    if (IsDbgSym (S)) {
+        /* Walk through the list, give each symbol an id and count them */
+        Count = 0;
+        S = SymList;
+        while (S) {
+            if (IsDbgSym (S)) {
                 S->DebugSymId = Count++;
-    	    }
-    	    S = S->List;
-    	}
+            }
+            S = S->List;
+        }
 
-    	/* Write the symbol count to the list */
-       	ObjWriteVar (Count);
+        /* Write the symbol count to the list */
+        ObjWriteVar (Count);
 
-       	/* Walk through list and write all symbols to the file. Ignore size
+        /* Walk through list and write all symbols to the file. Ignore size
          * symbols.
          */
-    	S = SymList;
-    	while (S) {
-    	    if (IsDbgSym (S)) {
+        S = SymList;
+        while (S) {
+            if (IsDbgSym (S)) {
 
                 /* Get the expression bits and the value */
                 long ConstVal;
@@ -884,8 +884,8 @@ void WriteDbgSyms (void)
                     SymFlags |= SYM_SIZE;
                 }
 
-		/* Write the type */
-		ObjWriteVar (SymFlags);
+                /* Write the type */
+                ObjWriteVar (SymFlags);
 
                 /* Write the address size */
                 ObjWrite8 (S->AddrSize);
@@ -899,17 +899,17 @@ void WriteDbgSyms (void)
                     ObjWriteVar (S->Sym.Entry->DebugSymId);
                 }
 
-		/* Write the name */
-       	       	ObjWriteVar (S->Name);
+                /* Write the name */
+                ObjWriteVar (S->Name);
 
-		/* Write the value */
-		if (SYM_IS_CONST (SymFlags)) {
-		    /* Constant value */
-		    ObjWrite32 (ConstVal);
-		} else {
-		    /* Expression involved */
-		    WriteExpr (S->Expr);
-		}
+                /* Write the value */
+                if (SYM_IS_CONST (SymFlags)) {
+                    /* Constant value */
+                    ObjWrite32 (ConstVal);
+                } else {
+                    /* Expression involved */
+                    WriteExpr (S->Expr);
+                }
 
                 /* If the symbol has a size, write it to the file */
                 if (SYM_HAS_SIZE (SymFlags)) {
@@ -924,17 +924,17 @@ void WriteDbgSyms (void)
                     ObjWriteVar (GetSymExportId (S));
                 }
 
-		/* Write the line infos */
+                /* Write the line infos */
                 WriteLineInfo (&S->DefLines);
-		WriteLineInfo (&S->RefLines);
-	    }
-	    S = S->List;
-	}
+                WriteLineInfo (&S->RefLines);
+            }
+            S = S->List;
+        }
 
     } else {
 
-	/* No debug symbols */
-	ObjWriteVar (0);
+        /* No debug symbols */
+        ObjWriteVar (0);
 
     }
 

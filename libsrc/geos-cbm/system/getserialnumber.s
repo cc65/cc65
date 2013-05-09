@@ -5,13 +5,13 @@
 
 ; int GetSerialNumber (void);
 
-	    .export _GetSerialNumber
+            .export _GetSerialNumber
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _GetSerialNumber:
-	jsr GetSerialNumber
-	lda r0L
-	ldx r0H
-	rts
+        jsr GetSerialNumber
+        lda r0L
+        ldx r0H
+        rts

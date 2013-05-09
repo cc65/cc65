@@ -12,11 +12,11 @@
         .include        "modload.inc"
 
 _em_unload:
-	lda	_em_drv
-	ora	_em_drv+1
-       	beq    	no_driver		; No driver
+        lda     _em_drv
+        ora     _em_drv+1
+        beq     no_driver               ; No driver
 
-	jsr	emd_uninstall		; Deinstall the driver
+        jsr     emd_uninstall           ; Deinstall the driver
 
         lda     _em_drv
         ldx     _em_drv+1
@@ -25,6 +25,6 @@ _em_unload:
         jmp     em_clear_ptr            ; Clear the driver pointer, return zero
 
 no_driver:
-	tax				; X = 0
-	lda	#EM_ERR_NO_DRIVER
-	rts
+        tax                             ; X = 0
+        lda     #EM_ERR_NO_DRIVER
+        rts

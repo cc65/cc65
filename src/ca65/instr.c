@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    instr.c				     */
+/*                                  instr.c                                  */
 /*                                                                           */
-/*	       Instruction encoding for the ca65 macroassembler		     */
+/*             Instruction encoding for the ca65 macroassembler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -134,7 +134,7 @@ static void PutSweet16Branch (const InsDesc* Ins);
 
 
 /*****************************************************************************/
-/*     	     	    		     Data   	  		  	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -153,62 +153,62 @@ static const struct {
 } InsTab6502 = {
     sizeof (InsTab6502.Ins) / sizeof (InsTab6502.Ins[0]),
     {
-       	{ "ADC",  0x080A26C, 0x60, 0, PutAll },
-       	{ "AND",  0x080A26C, 0x20, 0, PutAll },
-       	{ "ASL",  0x000006e, 0x02, 1, PutAll },
-       	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-       	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-       	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-       	{ "BIT",  0x000000C, 0x00, 2, PutAll },
-       	{ "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-       	{ "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-       	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-       	{ "BRK",  0x0000001, 0x00, 0, PutAll },
-       	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-       	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
-       	{ "CLC",  0x0000001, 0x18, 0, PutAll },
-       	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
-       	{ "CLI",  0x0000001, 0x58, 0, PutAll },
-       	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
-       	{ "CMP",  0x080A26C, 0xc0, 0, PutAll },
-       	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
-       	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
-       	{ "DEC",  0x000006C, 0x00, 3, PutAll },
-       	{ "DEX",  0x0000001, 0xca, 0, PutAll },
-       	{ "DEY",  0x0000001, 0x88, 0, PutAll },
-       	{ "EOR",  0x080A26C, 0x40, 0, PutAll },
-       	{ "INC",  0x000006c, 0x00, 4, PutAll },
-       	{ "INX",  0x0000001, 0xe8, 0, PutAll },
-       	{ "INY",  0x0000001, 0xc8, 0, PutAll },
-       	{ "JMP",  0x0000808, 0x4c, 6, PutJMP },
-       	{ "JSR",  0x0000008, 0x20, 7, PutAll },
-       	{ "LDA",  0x080A26C, 0xa0, 0, PutAll },
-       	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
-       	{ "LDY",  0x080006C, 0xa0, 1, PutAll },
-       	{ "LSR",  0x000006F, 0x42, 1, PutAll },
-       	{ "NOP",  0x0000001, 0xea, 0, PutAll },
-       	{ "ORA",  0x080A26C, 0x00, 0, PutAll },
-       	{ "PHA",  0x0000001, 0x48, 0, PutAll },
-       	{ "PHP",  0x0000001, 0x08, 0, PutAll },
-       	{ "PLA",  0x0000001, 0x68, 0, PutAll },
-       	{ "PLP",  0x0000001, 0x28, 0, PutAll },
-       	{ "ROL",  0x000006F, 0x22, 1, PutAll },
-       	{ "ROR",  0x000006F, 0x62, 1, PutAll },
-       	{ "RTI",  0x0000001, 0x40, 0, PutAll },
-       	{ "RTS",  0x0000001, 0x60, 0, PutAll },
-       	{ "SBC",  0x080A26C, 0xe0, 0, PutAll },
-       	{ "SEC",  0x0000001, 0x38, 0, PutAll },
-       	{ "SED",  0x0000001, 0xf8, 0, PutAll },
-       	{ "SEI",  0x0000001, 0x78, 0, PutAll },
-       	{ "STA",  0x000A26C, 0x80, 0, PutAll },
-       	{ "STX",  0x000010c, 0x82, 1, PutAll },
-       	{ "STY",  0x000002c, 0x80, 1, PutAll },
-       	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
-       	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
-       	{ "TSX",  0x0000001, 0xba, 0, PutAll },
-       	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
-       	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
-       	{ "TYA",  0x0000001, 0x98, 0, PutAll }
+        { "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x000000C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DEC",  0x000006C, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A26C, 0x40, 0, PutAll },
+        { "INC",  0x000006c, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JMP",  0x0000808, 0x4c, 6, PutJMP },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "STA",  0x000A26C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
     }
 };
 
@@ -219,76 +219,76 @@ static const struct {
 } InsTab6502X = {
     sizeof (InsTab6502X.Ins) / sizeof (InsTab6502X.Ins[0]),
     {
-       	{ "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "ADC",  0x080A26C, 0x60, 0, PutAll },
         { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
         { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
-       	{ "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "AND",  0x080A26C, 0x20, 0, PutAll },
         { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
-       	{ "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X */
-       	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-       	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-       	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-       	{ "BIT",  0x000000C, 0x00, 2, PutAll },
-       	{ "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-       	{ "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-       	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-       	{ "BRK",  0x0000001, 0x00, 0, PutAll },
-       	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-       	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
-       	{ "CLC",  0x0000001, 0x18, 0, PutAll },
-       	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
-       	{ "CLI",  0x0000001, 0x58, 0, PutAll },
-       	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
-       	{ "CMP",  0x080A26C, 0xc0, 0, PutAll },
-       	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
-       	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x000000C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A26C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
         { "DCP",  0x000A26C, 0xC3, 0, PutAll },         /* X */
-       	{ "DEC",  0x000006C, 0x00, 3, PutAll },
-       	{ "DEX",  0x0000001, 0xca, 0, PutAll },
-       	{ "DEY",  0x0000001, 0x88, 0, PutAll },
-       	{ "EOR",  0x080A26C, 0x40, 0, PutAll },
-       	{ "INC",  0x000006c, 0x00, 4, PutAll },
-       	{ "INX",  0x0000001, 0xe8, 0, PutAll },
-       	{ "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "DEC",  0x000006C, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A26C, 0x40, 0, PutAll },
+        { "INC",  0x000006c, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
         { "ISC",  0x000A26C, 0xE3, 0, PutAll },         /* X */
         { "JAM",  0x0000001, 0x02, 0, PutAll },         /* X */
-       	{ "JMP",  0x0000808, 0x4c, 6, PutJMP },
-       	{ "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "JMP",  0x0000808, 0x4c, 6, PutJMP },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
         { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X */
         { "LAX",  0x000A30C, 0xA3, 1, PutAll },         /* X */
-       	{ "LDA",  0x080A26C, 0xa0, 0, PutAll },
-       	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
-       	{ "LDY",  0x080006C, 0xa0, 1, PutAll },
-       	{ "LSR",  0x000006F, 0x42, 1, PutAll },
-       	{ "NOP",  0x0000001, 0xea, 0, PutAll },
-       	{ "ORA",  0x080A26C, 0x00, 0, PutAll },
-       	{ "PHA",  0x0000001, 0x48, 0, PutAll },
-       	{ "PHP",  0x0000001, 0x08, 0, PutAll },
-       	{ "PLA",  0x0000001, 0x68, 0, PutAll },
-       	{ "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "LDA",  0x080A26C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x080A26C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
         { "RLA",  0x000A26C, 0x23, 0, PutAll },         /* X */
-       	{ "ROL",  0x000006F, 0x22, 1, PutAll },
-       	{ "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
         { "RRA",  0x000A26C, 0x63, 0, PutAll },         /* X */
-       	{ "RTI",  0x0000001, 0x40, 0, PutAll },
-       	{ "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
         { "SAX",  0x000810C, 0x83, 1, PutAll },         /* X */
-       	{ "SBC",  0x080A26C, 0xe0, 0, PutAll },
-       	{ "SEC",  0x0000001, 0x38, 0, PutAll },
-       	{ "SED",  0x0000001, 0xf8, 0, PutAll },
-       	{ "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SBC",  0x080A26C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
         { "SLO",  0x000A26C, 0x03, 0, PutAll },         /* X */
         { "SRE",  0x000A26C, 0x43, 0, PutAll },         /* X */
-       	{ "STA",  0x000A26C, 0x80, 0, PutAll },
-       	{ "STX",  0x000010c, 0x82, 1, PutAll },
-       	{ "STY",  0x000002c, 0x80, 1, PutAll },
-       	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
-       	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
-       	{ "TSX",  0x0000001, 0xba, 0, PutAll },
-       	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
-       	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
-       	{ "TYA",  0x0000001, 0x98, 0, PutAll }
+        { "STA",  0x000A26C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
     }
 };
 
@@ -299,72 +299,72 @@ static const struct {
 } InsTab65SC02 = {
     sizeof (InsTab65SC02.Ins) / sizeof (InsTab65SC02.Ins[0]),
     {
-       	{ "ADC",  0x080A66C, 0x60, 0, PutAll },
-       	{ "AND",  0x080A66C, 0x20, 0, PutAll },
-       	{ "ASL",  0x000006e, 0x02, 1, PutAll },
-       	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-       	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-       	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-       	{ "BIT",  0x0A0006C, 0x00, 2, PutAll },
-       	{ "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-       	{ "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-       	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-       	{ "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-       	{ "BRK",  0x0000001, 0x00, 0, PutAll },
-       	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-       	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
-       	{ "CLC",  0x0000001, 0x18, 0, PutAll },
-       	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
-       	{ "CLI",  0x0000001, 0x58, 0, PutAll },
-       	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
-       	{ "CMP",  0x080A66C, 0xc0, 0, PutAll },
-       	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
-       	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
-       	{ "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
-       	{ "DEC",  0x000006F, 0x00, 3, PutAll },
-       	{ "DEX",  0x0000001, 0xca, 0, PutAll },
-       	{ "DEY",  0x0000001, 0x88, 0, PutAll },
-       	{ "EOR",  0x080A66C, 0x40, 0, PutAll },
-       	{ "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
-       	{ "INC",  0x000006f, 0x00, 4, PutAll },
-       	{ "INX",  0x0000001, 0xe8, 0, PutAll },
-       	{ "INY",  0x0000001, 0xc8, 0, PutAll },
-       	{ "JMP",  0x0010808, 0x4c, 6, PutAll },
-       	{ "JSR",  0x0000008, 0x20, 7, PutAll },
-       	{ "LDA",  0x080A66C, 0xa0, 0, PutAll },
-       	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
-       	{ "LDY",  0x080006C, 0xa0, 1, PutAll },
-       	{ "LSR",  0x000006F, 0x42, 1, PutAll },
-       	{ "NOP",  0x0000001, 0xea, 0, PutAll },
-       	{ "ORA",  0x080A66C, 0x00, 0, PutAll },
-       	{ "PHA",  0x0000001, 0x48, 0, PutAll },
-       	{ "PHP",  0x0000001, 0x08, 0, PutAll },
-       	{ "PHX",  0x0000001, 0xda, 0, PutAll },
-       	{ "PHY",  0x0000001, 0x5a, 0, PutAll },
-       	{ "PLA",  0x0000001, 0x68, 0, PutAll },
-       	{ "PLP",  0x0000001, 0x28, 0, PutAll },
-       	{ "PLX",  0x0000001, 0xfa, 0, PutAll },
-       	{ "PLY",  0x0000001, 0x7a, 0, PutAll },
-       	{ "ROL",  0x000006F, 0x22, 1, PutAll },
-       	{ "ROR",  0x000006F, 0x62, 1, PutAll },
-       	{ "RTI",  0x0000001, 0x40, 0, PutAll },
-       	{ "RTS",  0x0000001, 0x60, 0, PutAll },
-       	{ "SBC",  0x080A66C, 0xe0, 0, PutAll },
-       	{ "SEC",  0x0000001, 0x38, 0, PutAll },
-       	{ "SED",  0x0000001, 0xf8, 0, PutAll },
-       	{ "SEI",  0x0000001, 0x78, 0, PutAll },
-       	{ "STA",  0x000A66C, 0x80, 0, PutAll },
-       	{ "STX",  0x000010c, 0x82, 1, PutAll },
-       	{ "STY",  0x000002c, 0x80, 1, PutAll },
-       	{ "STZ",  0x000006c, 0x04, 5, PutAll },
-       	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
-       	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
-       	{ "TRB",  0x000000c, 0x10, 1, PutAll },
-       	{ "TSB",  0x000000c, 0x00, 1, PutAll },
-       	{ "TSX",  0x0000001, 0xba, 0, PutAll },
-       	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
-       	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
-       	{ "TYA",  0x0000001, 0x98, 0, PutAll }
+        { "ADC",  0x080A66C, 0x60, 0, PutAll },
+        { "AND",  0x080A66C, 0x20, 0, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x0A0006C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A66C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
+        { "DEC",  0x000006F, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A66C, 0x40, 0, PutAll },
+        { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
+        { "INC",  0x000006f, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JMP",  0x0010808, 0x4c, 6, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LDA",  0x080A66C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x080A66C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PHX",  0x0000001, 0xda, 0, PutAll },
+        { "PHY",  0x0000001, 0x5a, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "PLX",  0x0000001, 0xfa, 0, PutAll },
+        { "PLY",  0x0000001, 0x7a, 0, PutAll },
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SBC",  0x080A66C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "STA",  0x000A66C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "STZ",  0x000006c, 0x04, 5, PutAll },
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TRB",  0x000000c, 0x10, 1, PutAll },
+        { "TSB",  0x000000c, 0x00, 1, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
     }
 };
 
@@ -375,9 +375,9 @@ static const struct {
 } InsTab65C02 = {
     sizeof (InsTab65C02.Ins) / sizeof (InsTab65C02.Ins[0]),
     {
-       	{ "ADC",  0x080A66C, 0x60, 0, PutAll },
-       	{ "AND",  0x080A66C, 0x20, 0, PutAll },
-       	{ "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "ADC",  0x080A66C, 0x60, 0, PutAll },
+        { "AND",  0x080A66C, 0x20, 0, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch },
         { "BBR1", 0x0000000, 0x1F, 0, PutBitBranch },
         { "BBR2", 0x0000000, 0x2F, 0, PutBitBranch },
@@ -394,85 +394,85 @@ static const struct {
         { "BBS5", 0x0000000, 0xDF, 0, PutBitBranch },
         { "BBS6", 0x0000000, 0xEF, 0, PutBitBranch },
         { "BBS7", 0x0000000, 0xFF, 0, PutBitBranch },
-       	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-       	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-       	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-       	{ "BIT",  0x0A0006C, 0x00, 2, PutAll },
-       	{ "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-       	{ "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-       	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-       	{ "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-       	{ "BRK",  0x0000001, 0x00, 0, PutAll },
-       	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-       	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
-       	{ "CLC",  0x0000001, 0x18, 0, PutAll },
-       	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
-       	{ "CLI",  0x0000001, 0x58, 0, PutAll },
-       	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
-       	{ "CMP",  0x080A66C, 0xc0, 0, PutAll },
-       	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
-       	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
-       	{ "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
-       	{ "DEC",  0x000006F, 0x00, 3, PutAll },
-       	{ "DEX",  0x0000001, 0xca, 0, PutAll },
-       	{ "DEY",  0x0000001, 0x88, 0, PutAll },
-       	{ "EOR",  0x080A66C, 0x40, 0, PutAll },
-       	{ "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
-       	{ "INC",  0x000006f, 0x00, 4, PutAll },
-       	{ "INX",  0x0000001, 0xe8, 0, PutAll },
-       	{ "INY",  0x0000001, 0xc8, 0, PutAll },
-       	{ "JMP",  0x0010808, 0x4c, 6, PutAll },
-       	{ "JSR",  0x0000008, 0x20, 7, PutAll },
-       	{ "LDA",  0x080A66C, 0xa0, 0, PutAll },
-       	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
-       	{ "LDY",  0x080006C, 0xa0, 1, PutAll },
-       	{ "LSR",  0x000006F, 0x42, 1, PutAll },
-       	{ "NOP",  0x0000001, 0xea, 0, PutAll },
-       	{ "ORA",  0x080A66C, 0x00, 0, PutAll },
-       	{ "PHA",  0x0000001, 0x48, 0, PutAll },
-       	{ "PHP",  0x0000001, 0x08, 0, PutAll },
-       	{ "PHX",  0x0000001, 0xda, 0, PutAll },
-       	{ "PHY",  0x0000001, 0x5a, 0, PutAll },
-       	{ "PLA",  0x0000001, 0x68, 0, PutAll },
-       	{ "PLP",  0x0000001, 0x28, 0, PutAll },
-       	{ "PLX",  0x0000001, 0xfa, 0, PutAll },
-       	{ "PLY",  0x0000001, 0x7a, 0, PutAll },
-       	{ "RMB0", 0x0000004, 0x07, 1, PutAll },
-       	{ "RMB1", 0x0000004, 0x17, 1, PutAll },
-       	{ "RMB2", 0x0000004, 0x27, 1, PutAll },
-       	{ "RMB3", 0x0000004, 0x37, 1, PutAll },
-       	{ "RMB4", 0x0000004, 0x47, 1, PutAll },
-       	{ "RMB5", 0x0000004, 0x57, 1, PutAll },
-       	{ "RMB6", 0x0000004, 0x67, 1, PutAll },
-       	{ "RMB7", 0x0000004, 0x77, 1, PutAll },
-       	{ "ROL",  0x000006F, 0x22, 1, PutAll },
-       	{ "ROR",  0x000006F, 0x62, 1, PutAll },
-       	{ "RTI",  0x0000001, 0x40, 0, PutAll },
-       	{ "RTS",  0x0000001, 0x60, 0, PutAll },
-       	{ "SBC",  0x080A66C, 0xe0, 0, PutAll },
-       	{ "SEC",  0x0000001, 0x38, 0, PutAll },
-       	{ "SED",  0x0000001, 0xf8, 0, PutAll },
-       	{ "SEI",  0x0000001, 0x78, 0, PutAll },
-       	{ "SMB0", 0x0000004, 0x87, 1, PutAll },
-       	{ "SMB1", 0x0000004, 0x97, 1, PutAll },
-       	{ "SMB2", 0x0000004, 0xA7, 1, PutAll },
-       	{ "SMB3", 0x0000004, 0xB7, 1, PutAll },
-       	{ "SMB4", 0x0000004, 0xC7, 1, PutAll },
-       	{ "SMB5", 0x0000004, 0xD7, 1, PutAll },
-       	{ "SMB6", 0x0000004, 0xE7, 1, PutAll },
-       	{ "SMB7", 0x0000004, 0xF7, 1, PutAll },
-       	{ "STA",  0x000A66C, 0x80, 0, PutAll },
-       	{ "STX",  0x000010c, 0x82, 1, PutAll },
-       	{ "STY",  0x000002c, 0x80, 1, PutAll },
-       	{ "STZ",  0x000006c, 0x04, 5, PutAll },
-       	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
-       	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
-       	{ "TRB",  0x000000c, 0x10, 1, PutAll },
-       	{ "TSB",  0x000000c, 0x00, 1, PutAll },
-       	{ "TSX",  0x0000001, 0xba, 0, PutAll },
-       	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
-       	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
-       	{ "TYA",  0x0000001, 0x98, 0, PutAll }
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x0A0006C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x080A66C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
+        { "DEC",  0x000006F, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A66C, 0x40, 0, PutAll },
+        { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
+        { "INC",  0x000006f, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JMP",  0x0010808, 0x4c, 6, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LDA",  0x080A66C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x080A66C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PHX",  0x0000001, 0xda, 0, PutAll },
+        { "PHY",  0x0000001, 0x5a, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "PLX",  0x0000001, 0xfa, 0, PutAll },
+        { "PLY",  0x0000001, 0x7a, 0, PutAll },
+        { "RMB0", 0x0000004, 0x07, 1, PutAll },
+        { "RMB1", 0x0000004, 0x17, 1, PutAll },
+        { "RMB2", 0x0000004, 0x27, 1, PutAll },
+        { "RMB3", 0x0000004, 0x37, 1, PutAll },
+        { "RMB4", 0x0000004, 0x47, 1, PutAll },
+        { "RMB5", 0x0000004, 0x57, 1, PutAll },
+        { "RMB6", 0x0000004, 0x67, 1, PutAll },
+        { "RMB7", 0x0000004, 0x77, 1, PutAll },
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SBC",  0x080A66C, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SMB0", 0x0000004, 0x87, 1, PutAll },
+        { "SMB1", 0x0000004, 0x97, 1, PutAll },
+        { "SMB2", 0x0000004, 0xA7, 1, PutAll },
+        { "SMB3", 0x0000004, 0xB7, 1, PutAll },
+        { "SMB4", 0x0000004, 0xC7, 1, PutAll },
+        { "SMB5", 0x0000004, 0xD7, 1, PutAll },
+        { "SMB6", 0x0000004, 0xE7, 1, PutAll },
+        { "SMB7", 0x0000004, 0xF7, 1, PutAll },
+        { "STA",  0x000A66C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "STZ",  0x000006c, 0x04, 5, PutAll },
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TRB",  0x000000c, 0x10, 1, PutAll },
+        { "TSB",  0x000000c, 0x00, 1, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
     }
 };
 
@@ -483,105 +483,105 @@ static const struct {
 } InsTab65816 = {
     sizeof (InsTab65816.Ins) / sizeof (InsTab65816.Ins[0]),
     {
-       	{ "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
-       	{ "AND",  0x0b8f6fc, 0x20, 0, PutAll },
-       	{ "ASL",  0x000006e, 0x02, 1, PutAll },
-       	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-       	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-       	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-       	{ "BIT",  0x0a0006c, 0x00, 2, PutAll },
-       	{ "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-       	{ "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-       	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-       	{ "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-       	{ "BRK",  0x0000001, 0x00, 0, PutAll },
-       	{ "BRL",  0x0040000, 0x82, 0, PutPCRel16 },
-       	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-       	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
-       	{ "CLC",  0x0000001, 0x18, 0, PutAll },
-       	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
-       	{ "CLI",  0x0000001, 0x58, 0, PutAll },
-       	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
-       	{ "CMP",  0x0b8f6fc, 0xc0, 0, PutAll },
-       	{ "COP",  0x0000004, 0x02, 6, PutAll },
-       	{ "CPA",  0x0b8f6fc, 0xc0, 0, PutAll },   /* == CMP */
-       	{ "CPX",  0x0c0000c, 0xe0, 1, PutAll },
-       	{ "CPY",  0x0c0000c, 0xc0, 1, PutAll },
-       	{ "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
-       	{ "DEC",  0x000006F, 0x00, 3, PutAll },
-       	{ "DEX",  0x0000001, 0xca, 0, PutAll },
-       	{ "DEY",  0x0000001, 0x88, 0, PutAll },
-       	{ "EOR",  0x0b8f6fc, 0x40, 0, PutAll },
-       	{ "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
-       	{ "INC",  0x000006F, 0x00, 4, PutAll },
-       	{ "INX",  0x0000001, 0xe8, 0, PutAll },
-       	{ "INY",  0x0000001, 0xc8, 0, PutAll },
-       	{ "JML",  0x0000810, 0x5c, 1, PutAll },
-       	{ "JMP",  0x0010818, 0x4c, 6, PutAll },
-       	{ "JSL",  0x0000010, 0x20, 7, PutAll },
-       	{ "JSR",  0x0010018, 0x20, 7, PutAll },
-       	{ "LDA",  0x0b8f6fc, 0xa0, 0, PutAll },
-       	{ "LDX",  0x0c0030c, 0xa2, 1, PutAll },
-       	{ "LDY",  0x0c0006c, 0xa0, 1, PutAll },
-       	{ "LSR",  0x000006F, 0x42, 1, PutAll },
-       	{ "MVN",  0x1000000, 0x54, 0, PutBlockMove },
-       	{ "MVP",  0x1000000, 0x44, 0, PutBlockMove },
-       	{ "NOP",  0x0000001, 0xea, 0, PutAll },
-       	{ "ORA",  0x0b8f6fc, 0x00, 0, PutAll },
-       	{ "PEA",  0x0000008, 0xf4, 6, PutAll },
-       	{ "PEI",  0x0000400, 0xd4, 1, PutAll },
-       	{ "PER",  0x0040000, 0x62, 0, PutPCRel16 },
-       	{ "PHA",  0x0000001, 0x48, 0, PutAll },
-       	{ "PHB",  0x0000001, 0x8b, 0, PutAll },
-       	{ "PHD",  0x0000001, 0x0b, 0, PutAll },
-       	{ "PHK",  0x0000001, 0x4b, 0, PutAll },
-       	{ "PHP",  0x0000001, 0x08, 0, PutAll },
-       	{ "PHX",  0x0000001, 0xda, 0, PutAll },
-       	{ "PHY",  0x0000001, 0x5a, 0, PutAll },
-       	{ "PLA",  0x0000001, 0x68, 0, PutAll },
-       	{ "PLB",  0x0000001, 0xab, 0, PutAll },
-       	{ "PLD",  0x0000001, 0x2b, 0, PutAll },
-       	{ "PLP",  0x0000001, 0x28, 0, PutAll },
-       	{ "PLX",  0x0000001, 0xfa, 0, PutAll },
-       	{ "PLY",  0x0000001, 0x7a, 0, PutAll },
-       	{ "REP",  0x0800000, 0xc2, 1, PutREP },
-       	{ "ROL",  0x000006F, 0x22, 1, PutAll },
-       	{ "ROR",  0x000006F, 0x62, 1, PutAll },
-       	{ "RTI",  0x0000001, 0x40, 0, PutAll },
-       	{ "RTL",  0x0000001, 0x6b, 0, PutAll },
-       	{ "RTS",  0x0000001, 0x60, 0, PutRTS },
-       	{ "SBC",  0x0b8f6fc, 0xe0, 0, PutAll },
-       	{ "SEC",  0x0000001, 0x38, 0, PutAll },
-       	{ "SED",  0x0000001, 0xf8, 0, PutAll },
-       	{ "SEI",  0x0000001, 0x78, 0, PutAll },
-       	{ "SEP",  0x0800000, 0xe2, 1, PutSEP },
-       	{ "STA",  0x018f6fc, 0x80, 0, PutAll },
-       	{ "STP",  0x0000001, 0xdb, 0, PutAll },
-       	{ "STX",  0x000010c, 0x82, 1, PutAll },
-       	{ "STY",  0x000002c, 0x80, 1, PutAll },
-       	{ "STZ",  0x000006c, 0x04, 5, PutAll },
-       	{ "SWA",  0x0000001, 0xeb, 0, PutAll },   /* == XBA */
-       	{ "TAD",  0x0000001, 0x5b, 0, PutAll },   /* == TCD */
-       	{ "TAS",  0x0000001, 0x1b, 0, PutAll },   /* == TCS */
-       	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
-       	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
-       	{ "TCD",  0x0000001, 0x5b, 0, PutAll },
-       	{ "TCS",  0x0000001, 0x1b, 0, PutAll },
-       	{ "TDA",  0x0000001, 0x7b, 0, PutAll },   /* == TDC */
-       	{ "TDC",  0x0000001, 0x7b, 0, PutAll },
-       	{ "TRB",  0x000000c, 0x10, 1, PutAll },
-       	{ "TSA",  0x0000001, 0x3b, 0, PutAll },   /* == TSC */
-       	{ "TSB",  0x000000c, 0x00, 1, PutAll },
-       	{ "TSC",  0x0000001, 0x3b, 0, PutAll },
-       	{ "TSX",  0x0000001, 0xba, 0, PutAll },
-       	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
-       	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
-       	{ "TXY",  0x0000001, 0x9b, 0, PutAll },
-       	{ "TYA",  0x0000001, 0x98, 0, PutAll },
-       	{ "TYX",  0x0000001, 0xbb, 0, PutAll },
-       	{ "WAI",  0x0000001, 0xcb, 0, PutAll },
-       	{ "XBA",  0x0000001, 0xeb, 0, PutAll },
-       	{ "XCE",  0x0000001, 0xfb, 0, PutAll }
+        { "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
+        { "AND",  0x0b8f6fc, 0x20, 0, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x0a0006c, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BRL",  0x0040000, 0x82, 0, PutPCRel16 },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CMP",  0x0b8f6fc, 0xc0, 0, PutAll },
+        { "COP",  0x0000004, 0x02, 6, PutAll },
+        { "CPA",  0x0b8f6fc, 0xc0, 0, PutAll },   /* == CMP */
+        { "CPX",  0x0c0000c, 0xe0, 1, PutAll },
+        { "CPY",  0x0c0000c, 0xc0, 1, PutAll },
+        { "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
+        { "DEC",  0x000006F, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x0b8f6fc, 0x40, 0, PutAll },
+        { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
+        { "INC",  0x000006F, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JML",  0x0000810, 0x5c, 1, PutAll },
+        { "JMP",  0x0010818, 0x4c, 6, PutAll },
+        { "JSL",  0x0000010, 0x20, 7, PutAll },
+        { "JSR",  0x0010018, 0x20, 7, PutAll },
+        { "LDA",  0x0b8f6fc, 0xa0, 0, PutAll },
+        { "LDX",  0x0c0030c, 0xa2, 1, PutAll },
+        { "LDY",  0x0c0006c, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "MVN",  0x1000000, 0x54, 0, PutBlockMove },
+        { "MVP",  0x1000000, 0x44, 0, PutBlockMove },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x0b8f6fc, 0x00, 0, PutAll },
+        { "PEA",  0x0000008, 0xf4, 6, PutAll },
+        { "PEI",  0x0000400, 0xd4, 1, PutAll },
+        { "PER",  0x0040000, 0x62, 0, PutPCRel16 },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHB",  0x0000001, 0x8b, 0, PutAll },
+        { "PHD",  0x0000001, 0x0b, 0, PutAll },
+        { "PHK",  0x0000001, 0x4b, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PHX",  0x0000001, 0xda, 0, PutAll },
+        { "PHY",  0x0000001, 0x5a, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLB",  0x0000001, 0xab, 0, PutAll },
+        { "PLD",  0x0000001, 0x2b, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "PLX",  0x0000001, 0xfa, 0, PutAll },
+        { "PLY",  0x0000001, 0x7a, 0, PutAll },
+        { "REP",  0x0800000, 0xc2, 1, PutREP },
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTL",  0x0000001, 0x6b, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutRTS },
+        { "SBC",  0x0b8f6fc, 0xe0, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SEP",  0x0800000, 0xe2, 1, PutSEP },
+        { "STA",  0x018f6fc, 0x80, 0, PutAll },
+        { "STP",  0x0000001, 0xdb, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "STZ",  0x000006c, 0x04, 5, PutAll },
+        { "SWA",  0x0000001, 0xeb, 0, PutAll },   /* == XBA */
+        { "TAD",  0x0000001, 0x5b, 0, PutAll },   /* == TCD */
+        { "TAS",  0x0000001, 0x1b, 0, PutAll },   /* == TCS */
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TCD",  0x0000001, 0x5b, 0, PutAll },
+        { "TCS",  0x0000001, 0x1b, 0, PutAll },
+        { "TDA",  0x0000001, 0x7b, 0, PutAll },   /* == TDC */
+        { "TDC",  0x0000001, 0x7b, 0, PutAll },
+        { "TRB",  0x000000c, 0x10, 1, PutAll },
+        { "TSA",  0x0000001, 0x3b, 0, PutAll },   /* == TSC */
+        { "TSB",  0x000000c, 0x00, 1, PutAll },
+        { "TSC",  0x0000001, 0x3b, 0, PutAll },
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TXY",  0x0000001, 0x9b, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll },
+        { "TYX",  0x0000001, 0xbb, 0, PutAll },
+        { "WAI",  0x0000001, 0xcb, 0, PutAll },
+        { "XBA",  0x0000001, 0xeb, 0, PutAll },
+        { "XCE",  0x0000001, 0xfb, 0, PutAll }
     }
 };
 
@@ -633,9 +633,9 @@ static const struct {
 } InsTabHuC6280 = {
     sizeof (InsTabHuC6280.Ins) / sizeof (InsTabHuC6280.Ins[0]),
     {
-       	{ "ADC",  0x080A66C, 0x60, 0, PutAll },
-       	{ "AND",  0x080A66C, 0x20, 0, PutAll },
-       	{ "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "ADC",  0x080A66C, 0x60, 0, PutAll },
+        { "AND",  0x080A66C, 0x20, 0, PutAll },
+        { "ASL",  0x000006e, 0x02, 1, PutAll },
         { "BBR0", 0x0000000, 0x0F, 0, PutBitBranch },
         { "BBR1", 0x0000000, 0x1F, 0, PutBitBranch },
         { "BBR2", 0x0000000, 0x2F, 0, PutBitBranch },
@@ -652,122 +652,122 @@ static const struct {
         { "BBS5", 0x0000000, 0xDF, 0, PutBitBranch },
         { "BBS6", 0x0000000, 0xEF, 0, PutBitBranch },
         { "BBS7", 0x0000000, 0xFF, 0, PutBitBranch },
-       	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
-       	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
-       	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
-       	{ "BIT",  0x0A0006C, 0x00, 2, PutAll },
-       	{ "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
-       	{ "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
-       	{ "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
-       	{ "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
-       	{ "BRK",  0x0000001, 0x00, 0, PutAll },
-       	{ "BSR",  0x0020000, 0x44, 0, PutPCRel8 },
-       	{ "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
-       	{ "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
-       	{ "CLA",  0x0000001, 0x62, 0, PutAll },
-       	{ "CLC",  0x0000001, 0x18, 0, PutAll },
-       	{ "CLD",  0x0000001, 0xd8, 0, PutAll },
-       	{ "CLI",  0x0000001, 0x58, 0, PutAll },
-       	{ "CLV",  0x0000001, 0xb8, 0, PutAll },
-       	{ "CLX",  0x0000001, 0x82, 0, PutAll },
-       	{ "CLY",  0x0000001, 0xc2, 0, PutAll },
-       	{ "CMP",  0x080A66C, 0xc0, 0, PutAll },
-       	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
-       	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
-       	{ "CSH",  0x0000001, 0xd4, 0, PutAll },
-       	{ "CSL",  0x0000001, 0x54, 0, PutAll },
-       	{ "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
-       	{ "DEC",  0x000006F, 0x00, 3, PutAll },
-       	{ "DEX",  0x0000001, 0xca, 0, PutAll },
-       	{ "DEY",  0x0000001, 0x88, 0, PutAll },
-       	{ "EOR",  0x080A66C, 0x40, 0, PutAll },
-       	{ "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
-       	{ "INC",  0x000006f, 0x00, 4, PutAll },
-       	{ "INX",  0x0000001, 0xe8, 0, PutAll },
-       	{ "INY",  0x0000001, 0xc8, 0, PutAll },
-       	{ "JMP",  0x0010808, 0x4c, 6, PutAll },
-       	{ "JSR",  0x0000008, 0x20, 7, PutAll },
-       	{ "LDA",  0x080A66C, 0xa0, 0, PutAll },
-       	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
-       	{ "LDY",  0x080006C, 0xa0, 1, PutAll },
-       	{ "LSR",  0x000006F, 0x42, 1, PutAll },
-       	{ "NOP",  0x0000001, 0xea, 0, PutAll },
-       	{ "ORA",  0x080A66C, 0x00, 0, PutAll },
-       	{ "PHA",  0x0000001, 0x48, 0, PutAll },
-       	{ "PHP",  0x0000001, 0x08, 0, PutAll },
-       	{ "PHX",  0x0000001, 0xda, 0, PutAll },
-       	{ "PHY",  0x0000001, 0x5a, 0, PutAll },
-       	{ "PLA",  0x0000001, 0x68, 0, PutAll },
-       	{ "PLP",  0x0000001, 0x28, 0, PutAll },
-       	{ "PLX",  0x0000001, 0xfa, 0, PutAll },
-       	{ "PLY",  0x0000001, 0x7a, 0, PutAll },
-       	{ "RMB0", 0x0000004, 0x07, 1, PutAll },
-       	{ "RMB1", 0x0000004, 0x17, 1, PutAll },
-       	{ "RMB2", 0x0000004, 0x27, 1, PutAll },
-       	{ "RMB3", 0x0000004, 0x37, 1, PutAll },
-       	{ "RMB4", 0x0000004, 0x47, 1, PutAll },
-       	{ "RMB5", 0x0000004, 0x57, 1, PutAll },
-       	{ "RMB6", 0x0000004, 0x67, 1, PutAll },
-       	{ "RMB7", 0x0000004, 0x77, 1, PutAll },
-       	{ "ROL",  0x000006F, 0x22, 1, PutAll },
-       	{ "ROR",  0x000006F, 0x62, 1, PutAll },
-       	{ "RTI",  0x0000001, 0x40, 0, PutAll },
-       	{ "RTS",  0x0000001, 0x60, 0, PutAll },
-       	{ "SBC",  0x080A66C, 0xe0, 0, PutAll },
-       	{ "SAX",  0x0000001, 0x22, 0, PutAll },
-       	{ "SAY",  0x0000001, 0x42, 0, PutAll },
-       	{ "SEC",  0x0000001, 0x38, 0, PutAll },
-       	{ "SED",  0x0000001, 0xf8, 0, PutAll },
-       	{ "SEI",  0x0000001, 0x78, 0, PutAll },
-       	{ "SET",  0x0000001, 0xf4, 0, PutAll },
-       	{ "SMB0", 0x0000004, 0x87, 1, PutAll },
-       	{ "SMB1", 0x0000004, 0x97, 1, PutAll },
-       	{ "SMB2", 0x0000004, 0xA7, 1, PutAll },
-       	{ "SMB3", 0x0000004, 0xB7, 1, PutAll },
-       	{ "SMB4", 0x0000004, 0xC7, 1, PutAll },
-       	{ "SMB5", 0x0000004, 0xD7, 1, PutAll },
-       	{ "SMB6", 0x0000004, 0xE7, 1, PutAll },
-       	{ "SMB7", 0x0000004, 0xF7, 1, PutAll },
-       	{ "ST0",  0x0800000, 0x03, 1, PutAll },
-       	{ "ST1",  0x0800000, 0x13, 1, PutAll },
-       	{ "ST2",  0x0800000, 0x23, 1, PutAll },
-       	{ "STA",  0x000A66C, 0x80, 0, PutAll },
-       	{ "STX",  0x000010c, 0x82, 1, PutAll },
-       	{ "STY",  0x000002c, 0x80, 1, PutAll },
-       	{ "STZ",  0x000006c, 0x04, 5, PutAll },
-       	{ "SXY",  0x0000001, 0x02, 0, PutAll },
-       	{ "TAI",  0x2000000, 0xf3, 0, PutBlockTransfer },
-       	{ "TAM",  0x0800000, 0x53, 1, PutAll },
-       	{ "TAM0", 0x0000001, 0x01, 0, PutTAMn},
-       	{ "TAM1", 0x0000001, 0x02, 0, PutTAMn},
-       	{ "TAM2", 0x0000001, 0x04, 0, PutTAMn},
-       	{ "TAM3", 0x0000001, 0x08, 0, PutTAMn},
-       	{ "TAM4", 0x0000001, 0x10, 0, PutTAMn},
-       	{ "TAM5", 0x0000001, 0x20, 0, PutTAMn},
-       	{ "TAM6", 0x0000001, 0x40, 0, PutTAMn},
-       	{ "TAM7", 0x0000001, 0x80, 0, PutTAMn},
-       	{ "TAX",  0x0000001, 0xaa, 0, PutAll },
-       	{ "TAY",  0x0000001, 0xa8, 0, PutAll },
-       	{ "TDD",  0x2000000, 0xc3, 0, PutBlockTransfer },
-       	{ "TIA",  0x2000000, 0xe3, 0, PutBlockTransfer },
-       	{ "TII",  0x2000000, 0x73, 0, PutBlockTransfer },
-       	{ "TIN",  0x2000000, 0xD3, 0, PutBlockTransfer },
-       	{ "TMA",  0x0800000, 0x43, 1, PutTMA },
-       	{ "TMA0", 0x0000001, 0x01, 0, PutTMAn},
-       	{ "TMA1", 0x0000001, 0x02, 0, PutTMAn},
-       	{ "TMA2", 0x0000001, 0x04, 0, PutTMAn},
-       	{ "TMA3", 0x0000001, 0x08, 0, PutTMAn},
-       	{ "TMA4", 0x0000001, 0x10, 0, PutTMAn},
-       	{ "TMA5", 0x0000001, 0x20, 0, PutTMAn},
-       	{ "TMA6", 0x0000001, 0x40, 0, PutTMAn},
-       	{ "TMA7", 0x0000001, 0x80, 0, PutTMAn},
-       	{ "TRB",  0x000000c, 0x10, 1, PutAll },
-       	{ "TSB",  0x000000c, 0x00, 1, PutAll },
+        { "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
+        { "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
+        { "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
+        { "BIT",  0x0A0006C, 0x00, 2, PutAll },
+        { "BMI",  0x0020000, 0x30, 0, PutPCRel8 },
+        { "BNE",  0x0020000, 0xd0, 0, PutPCRel8 },
+        { "BPL",  0x0020000, 0x10, 0, PutPCRel8 },
+        { "BRA",  0x0020000, 0x80, 0, PutPCRel8 },
+        { "BRK",  0x0000001, 0x00, 0, PutAll },
+        { "BSR",  0x0020000, 0x44, 0, PutPCRel8 },
+        { "BVC",  0x0020000, 0x50, 0, PutPCRel8 },
+        { "BVS",  0x0020000, 0x70, 0, PutPCRel8 },
+        { "CLA",  0x0000001, 0x62, 0, PutAll },
+        { "CLC",  0x0000001, 0x18, 0, PutAll },
+        { "CLD",  0x0000001, 0xd8, 0, PutAll },
+        { "CLI",  0x0000001, 0x58, 0, PutAll },
+        { "CLV",  0x0000001, 0xb8, 0, PutAll },
+        { "CLX",  0x0000001, 0x82, 0, PutAll },
+        { "CLY",  0x0000001, 0xc2, 0, PutAll },
+        { "CMP",  0x080A66C, 0xc0, 0, PutAll },
+        { "CPX",  0x080000C, 0xe0, 1, PutAll },
+        { "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "CSH",  0x0000001, 0xd4, 0, PutAll },
+        { "CSL",  0x0000001, 0x54, 0, PutAll },
+        { "DEA",  0x0000001, 0x00, 3, PutAll },   /* == DEC */
+        { "DEC",  0x000006F, 0x00, 3, PutAll },
+        { "DEX",  0x0000001, 0xca, 0, PutAll },
+        { "DEY",  0x0000001, 0x88, 0, PutAll },
+        { "EOR",  0x080A66C, 0x40, 0, PutAll },
+        { "INA",  0x0000001, 0x00, 4, PutAll },   /* == INC */
+        { "INC",  0x000006f, 0x00, 4, PutAll },
+        { "INX",  0x0000001, 0xe8, 0, PutAll },
+        { "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "JMP",  0x0010808, 0x4c, 6, PutAll },
+        { "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LDA",  0x080A66C, 0xa0, 0, PutAll },
+        { "LDX",  0x080030C, 0xa2, 1, PutAll },
+        { "LDY",  0x080006C, 0xa0, 1, PutAll },
+        { "LSR",  0x000006F, 0x42, 1, PutAll },
+        { "NOP",  0x0000001, 0xea, 0, PutAll },
+        { "ORA",  0x080A66C, 0x00, 0, PutAll },
+        { "PHA",  0x0000001, 0x48, 0, PutAll },
+        { "PHP",  0x0000001, 0x08, 0, PutAll },
+        { "PHX",  0x0000001, 0xda, 0, PutAll },
+        { "PHY",  0x0000001, 0x5a, 0, PutAll },
+        { "PLA",  0x0000001, 0x68, 0, PutAll },
+        { "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "PLX",  0x0000001, 0xfa, 0, PutAll },
+        { "PLY",  0x0000001, 0x7a, 0, PutAll },
+        { "RMB0", 0x0000004, 0x07, 1, PutAll },
+        { "RMB1", 0x0000004, 0x17, 1, PutAll },
+        { "RMB2", 0x0000004, 0x27, 1, PutAll },
+        { "RMB3", 0x0000004, 0x37, 1, PutAll },
+        { "RMB4", 0x0000004, 0x47, 1, PutAll },
+        { "RMB5", 0x0000004, 0x57, 1, PutAll },
+        { "RMB6", 0x0000004, 0x67, 1, PutAll },
+        { "RMB7", 0x0000004, 0x77, 1, PutAll },
+        { "ROL",  0x000006F, 0x22, 1, PutAll },
+        { "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RTI",  0x0000001, 0x40, 0, PutAll },
+        { "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SBC",  0x080A66C, 0xe0, 0, PutAll },
+        { "SAX",  0x0000001, 0x22, 0, PutAll },
+        { "SAY",  0x0000001, 0x42, 0, PutAll },
+        { "SEC",  0x0000001, 0x38, 0, PutAll },
+        { "SED",  0x0000001, 0xf8, 0, PutAll },
+        { "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SET",  0x0000001, 0xf4, 0, PutAll },
+        { "SMB0", 0x0000004, 0x87, 1, PutAll },
+        { "SMB1", 0x0000004, 0x97, 1, PutAll },
+        { "SMB2", 0x0000004, 0xA7, 1, PutAll },
+        { "SMB3", 0x0000004, 0xB7, 1, PutAll },
+        { "SMB4", 0x0000004, 0xC7, 1, PutAll },
+        { "SMB5", 0x0000004, 0xD7, 1, PutAll },
+        { "SMB6", 0x0000004, 0xE7, 1, PutAll },
+        { "SMB7", 0x0000004, 0xF7, 1, PutAll },
+        { "ST0",  0x0800000, 0x03, 1, PutAll },
+        { "ST1",  0x0800000, 0x13, 1, PutAll },
+        { "ST2",  0x0800000, 0x23, 1, PutAll },
+        { "STA",  0x000A66C, 0x80, 0, PutAll },
+        { "STX",  0x000010c, 0x82, 1, PutAll },
+        { "STY",  0x000002c, 0x80, 1, PutAll },
+        { "STZ",  0x000006c, 0x04, 5, PutAll },
+        { "SXY",  0x0000001, 0x02, 0, PutAll },
+        { "TAI",  0x2000000, 0xf3, 0, PutBlockTransfer },
+        { "TAM",  0x0800000, 0x53, 1, PutAll },
+        { "TAM0", 0x0000001, 0x01, 0, PutTAMn},
+        { "TAM1", 0x0000001, 0x02, 0, PutTAMn},
+        { "TAM2", 0x0000001, 0x04, 0, PutTAMn},
+        { "TAM3", 0x0000001, 0x08, 0, PutTAMn},
+        { "TAM4", 0x0000001, 0x10, 0, PutTAMn},
+        { "TAM5", 0x0000001, 0x20, 0, PutTAMn},
+        { "TAM6", 0x0000001, 0x40, 0, PutTAMn},
+        { "TAM7", 0x0000001, 0x80, 0, PutTAMn},
+        { "TAX",  0x0000001, 0xaa, 0, PutAll },
+        { "TAY",  0x0000001, 0xa8, 0, PutAll },
+        { "TDD",  0x2000000, 0xc3, 0, PutBlockTransfer },
+        { "TIA",  0x2000000, 0xe3, 0, PutBlockTransfer },
+        { "TII",  0x2000000, 0x73, 0, PutBlockTransfer },
+        { "TIN",  0x2000000, 0xD3, 0, PutBlockTransfer },
+        { "TMA",  0x0800000, 0x43, 1, PutTMA },
+        { "TMA0", 0x0000001, 0x01, 0, PutTMAn},
+        { "TMA1", 0x0000001, 0x02, 0, PutTMAn},
+        { "TMA2", 0x0000001, 0x04, 0, PutTMAn},
+        { "TMA3", 0x0000001, 0x08, 0, PutTMAn},
+        { "TMA4", 0x0000001, 0x10, 0, PutTMAn},
+        { "TMA5", 0x0000001, 0x20, 0, PutTMAn},
+        { "TMA6", 0x0000001, 0x40, 0, PutTMAn},
+        { "TMA7", 0x0000001, 0x80, 0, PutTMAn},
+        { "TRB",  0x000000c, 0x10, 1, PutAll },
+        { "TSB",  0x000000c, 0x00, 1, PutAll },
         { "TST",  0x000006c, 0x83, 9, PutTST },
-       	{ "TSX",  0x0000001, 0xba, 0, PutAll },
-       	{ "TXA",  0x0000001, 0x8a, 0, PutAll },
-       	{ "TXS",  0x0000001, 0x9a, 0, PutAll },
-       	{ "TYA",  0x0000001, 0x98, 0, PutAll }
+        { "TSX",  0x0000001, 0xba, 0, PutAll },
+        { "TXA",  0x0000001, 0x8a, 0, PutAll },
+        { "TXS",  0x0000001, 0x9a, 0, PutAll },
+        { "TYA",  0x0000001, 0x98, 0, PutAll }
     }
 };
 
@@ -797,64 +797,64 @@ const InsTable* InsTab = (const InsTable*) &InsTab6502;
  */
 static unsigned char EATab[10][AM65I_COUNT] = {
     {   /* Table 0 */
-     	0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
-     	0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
-     	0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
-       	0x00, 0x00
+        0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
+        0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
+        0x00, 0x00, 0x00, 0x03, 0x13, 0x09, 0x00, 0x09,
+        0x00, 0x00
     },
     {   /* Table 1 */
-     	0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
-     	0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00, 0x00
+        0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
+        0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 2 */
-     	0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
-      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
-       	0x00, 0x00
+        0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 3 */
-     	0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00, 0x00
+        0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 4 */
-     	0x1A, 0x1A, 0xE6, 0xEE, 0x00, 0xF6, 0xFE, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00, 0x00
+        0x1A, 0x1A, 0xE6, 0xEE, 0x00, 0xF6, 0xFE, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 5 */
-     	0x00, 0x00, 0x60, 0x98, 0x00, 0x70, 0x9E, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00, 0x00
+        0x00, 0x00, 0x60, 0x98, 0x00, 0x70, 0x9E, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 6 */
-     	0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
-     	0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
+        0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 7 */
-     	0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     	0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00, 0x00
+        0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0xDC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 8 */
-       	0x00, 0x40, 0x01, 0x41, 0x00, 0x09, 0x49, 0x00,
-     	0x00, 0x00, 0x00, 0x51, 0x00, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
-       	0x00, 0x00
+        0x00, 0x40, 0x01, 0x41, 0x00, 0x09, 0x49, 0x00,
+        0x00, 0x00, 0x00, 0x51, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
+        0x00, 0x00
     },
     {   /* Table 9 */
-       	0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x30, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-     	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-       	0x00, 0x00
+        0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x30, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00
     },
 };
 
@@ -863,41 +863,41 @@ static unsigned char EATab[10][AM65I_COUNT] = {
  */
 static unsigned char Sweet16EATab[2][AMSW16I_COUNT] = {
     {   /* Table 0 */
-       	0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00,
     },
     {   /* Table 1 */
-       	0x00, 0x00, 0x00, 0x40, 0x20,
+        0x00, 0x00, 0x00, 0x40, 0x20,
     },
 };
 
 /* Table that encodes the additional bytes for each 65xx instruction */
 unsigned char ExtBytes[AM65I_COUNT] = {
-    0,	      	/* Implicit */
-    0,	      	/* Accu */
-    1,	      	/* Direct */
-    2,	      	/* Absolute */
-    3, 	      	/* Absolute long */
-    1,	      	/* Direct,X */
-    2,	      	/* Absolute,X */
-    3,	      	/* Absolute long,X */
-    1,	      	/* Direct,Y */
-    2,	      	/* Absolute,Y */
-    1,	      	/* (Direct) */
-    2,	      	/* (Absolute) */
-    1,	      	/* [Direct] */
-    1,	      	/* (Direct),Y */
-    1,	      	/* [Direct],Y */
-    1,	      	/* (Direct,X) */
-    2,	      	/* (Absolute,X) */
-    1,	      	/* Relative short */
-    2,	      	/* Relative long */
-    1,	      	/* r,s */
-    1,	      	/* (r,s),y */
-    1,	      	/* Immidiate accu */
-    1,	      	/* Immidiate index */
-    1,	      	/* Immidiate byte */
-    2, 	      	/* Blockmove (65816) */
-    7, 	       	/* Block transfer (HuC6280) */
+    0,          /* Implicit */
+    0,          /* Accu */
+    1,          /* Direct */
+    2,          /* Absolute */
+    3,          /* Absolute long */
+    1,          /* Direct,X */
+    2,          /* Absolute,X */
+    3,          /* Absolute long,X */
+    1,          /* Direct,Y */
+    2,          /* Absolute,Y */
+    1,          /* (Direct) */
+    2,          /* (Absolute) */
+    1,          /* [Direct] */
+    1,          /* (Direct),Y */
+    1,          /* [Direct],Y */
+    1,          /* (Direct,X) */
+    2,          /* (Absolute,X) */
+    1,          /* Relative short */
+    2,          /* Relative long */
+    1,          /* r,s */
+    1,          /* (r,s),y */
+    1,          /* Immidiate accu */
+    1,          /* Immidiate index */
+    1,          /* Immidiate byte */
+    2,          /* Blockmove (65816) */
+    7,          /* Block transfer (HuC6280) */
 };
 
 /* Table that encodes the additional bytes for each SWEET16 instruction */
@@ -989,8 +989,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
     /* Check if we have any adressing modes left */
     if (A->AddrModeSet == 0) {
-       	Error ("Illegal addressing mode");
-       	return 0;
+        Error ("Illegal addressing mode");
+        return 0;
     }
     A->AddrMode    = BitFind (A->AddrModeSet);
     A->AddrModeBit = (0x01UL << A->AddrMode);
@@ -1042,32 +1042,32 @@ static void EmitCode (EffAddr* A)
     switch (ExtBytes[A->AddrMode]) {
 
         case 0:
-      	    Emit0 (A->Opcode);
-      	    break;
+            Emit0 (A->Opcode);
+            break;
 
-      	case 1:
-      	    Emit1 (A->Opcode, A->Expr);
-      	    break;
+        case 1:
+            Emit1 (A->Opcode, A->Expr);
+            break;
 
-      	case 2:
-	    if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y))) {
-	      	/* This is a 16 bit mode that uses an address. If in 65816,
-	      	 * mode, force this address into 16 bit range to allow
-	      	 * addressing inside a 64K segment.
-	      	 */
-       	      	Emit2 (A->Opcode, GenWordExpr (A->Expr));
-	    } else {
-	      	Emit2 (A->Opcode, A->Expr);
-	    }
-	    break;
+        case 2:
+            if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y))) {
+                /* This is a 16 bit mode that uses an address. If in 65816,
+                 * mode, force this address into 16 bit range to allow
+                 * addressing inside a 64K segment.
+                 */
+                Emit2 (A->Opcode, GenWordExpr (A->Expr));
+            } else {
+                Emit2 (A->Opcode, A->Expr);
+            }
+            break;
 
-	case 3:
+        case 3:
             /* Far argument */
-	    Emit3 (A->Opcode, A->Expr);
-	    break;
+            Emit3 (A->Opcode, A->Expr);
+            break;
 
-	default:
-	    Internal ("Invalid operand byte count: %u", ExtBytes[A->AddrMode]);
+        default:
+            Internal ("Invalid operand byte count: %u", ExtBytes[A->AddrMode]);
 
     }
 }
@@ -1096,12 +1096,12 @@ static long PutImmed8 (const InsDesc* Ins)
     /* Check how many extension bytes are needed and output the instruction */
     switch (ExtBytes[A.AddrMode]) {
 
-      	case 1:
-      	    Emit1 (A.Opcode, A.Expr);
-     	    break;
+        case 1:
+            Emit1 (A.Opcode, A.Expr);
+            break;
 
-     	default:
-     	    Internal ("Invalid operand byte count: %u", ExtBytes[A.AddrMode]);
+        default:
+            Internal ("Invalid operand byte count: %u", ExtBytes[A.AddrMode]);
     }
 
     /* Return the expression value */
@@ -1170,20 +1170,20 @@ static void PutREP (const InsDesc* Ins)
     /* We track the status only for the 816 CPU and in smart mode */
     if (CPU == CPU_65816 && SmartMode) {
 
-	/* Check the range for Val. */
-	if (Val < 0) {
-	    /* We had an error */
-	    Warning (1, "Cannot track processor status byte");
-	} else {
-   	    if (Val & 0x10) {
-	       	/* Index registers to 16 bit */
-	       	ExtBytes[AM65I_IMM_INDEX] = 2;
-     	    }
-     	    if (Val & 0x20) {
-     	       	/* Accu to 16 bit */
-	       	ExtBytes[AM65I_IMM_ACCU] = 2;
-     	    }
-     	}
+        /* Check the range for Val. */
+        if (Val < 0) {
+            /* We had an error */
+            Warning (1, "Cannot track processor status byte");
+        } else {
+            if (Val & 0x10) {
+                /* Index registers to 16 bit */
+                ExtBytes[AM65I_IMM_INDEX] = 2;
+            }
+            if (Val & 0x20) {
+                /* Accu to 16 bit */
+                ExtBytes[AM65I_IMM_ACCU] = 2;
+            }
+        }
     }
 }
 
@@ -1198,20 +1198,20 @@ static void PutSEP (const InsDesc* Ins)
     /* We track the status only for the 816 CPU and in smart mode */
     if (CPU == CPU_65816 && SmartMode) {
 
-	/* Check the range for Val. */
-	if (Val < 0) {
-	    /* We had an error */
-     	    Warning (1, "Cannot track processor status byte");
-     	} else {
-     	    if (Val & 0x10) {
-     	      	/* Index registers to 8 bit */
-     	      	ExtBytes[AM65I_IMM_INDEX] = 1;
-     	    }
-     	    if (Val & 0x20) {
-     	      	/* Accu to 8 bit */
-     	      	ExtBytes[AM65I_IMM_ACCU] = 1;
-     	    }
-     	}
+        /* Check the range for Val. */
+        if (Val < 0) {
+            /* We had an error */
+            Warning (1, "Cannot track processor status byte");
+        } else {
+            if (Val & 0x10) {
+                /* Index registers to 8 bit */
+                ExtBytes[AM65I_IMM_INDEX] = 1;
+            }
+            if (Val & 0x20) {
+                /* Accu to 8 bit */
+                ExtBytes[AM65I_IMM_ACCU] = 1;
+            }
+        }
     }
 }
 
@@ -1394,8 +1394,8 @@ static void PutSweet16 (const InsDesc* Ins)
 
     /* Check if we have any adressing modes left */
     if (A.AddrModeSet == 0) {
-       	Error ("Illegal addressing mode");
-       	return;
+        Error ("Illegal addressing mode");
+        return;
     }
     A.AddrMode    = BitFind (A.AddrModeSet);
     A.AddrModeBit = (0x01UL << A.AddrMode);
@@ -1407,19 +1407,19 @@ static void PutSweet16 (const InsDesc* Ins)
     switch (Sweet16ExtBytes[A.AddrMode]) {
 
         case 0:
-      	    Emit0 (A.Opcode);
-      	    break;
+            Emit0 (A.Opcode);
+            break;
 
-      	case 1:
-      	    Emit1 (A.Opcode, A.Expr);
-      	    break;
+        case 1:
+            Emit1 (A.Opcode, A.Expr);
+            break;
 
-      	case 2:
+        case 2:
             Emit2 (A.Opcode, A.Expr);
-	    break;
+            break;
 
-	default:
-	    Internal ("Invalid operand byte count: %u", Sweet16ExtBytes[A.AddrMode]);
+        default:
+            Internal ("Invalid operand byte count: %u", Sweet16ExtBytes[A.AddrMode]);
 
     }
 }
@@ -1435,7 +1435,7 @@ static void PutSweet16Branch (const InsDesc* Ins)
 
 
 /*****************************************************************************/
-/*     	     	    	   	     Code   		      		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -1456,10 +1456,10 @@ void SetCPU (cpu_t NewCPU)
 
     /* Check if we have support for the new CPU, if so, use it */
     if (NewCPU != CPU_UNKNOWN && InsTabs[NewCPU]) {
-    	CPU = NewCPU;
-    	InsTab = InsTabs[CPU];
+        CPU = NewCPU;
+        InsTab = InsTabs[CPU];
     } else {
-     	Error ("CPU not supported");
+        Error ("CPU not supported");
     }
 }
 
@@ -1508,11 +1508,11 @@ int FindInstruction (const StrBuf* Ident)
     /* Search for the key */
     ID = bsearch (Key, InsTab->Ins, InsTab->Count, sizeof (InsDesc), CmpName);
     if (ID == 0) {
-       	/* Not found */
-       	return -1;
+        /* Not found */
+        return -1;
     } else {
-       	/* Found, return the entry */
-       	return ID - InsTab->Ins;
+        /* Found, return the entry */
+        return ID - InsTab->Ins;
     }
 }
 

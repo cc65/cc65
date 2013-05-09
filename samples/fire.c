@@ -3,7 +3,7 @@
  *                                                                           *
  * (w)2002 by groepaz/hitmen                                                 *
  *                                                                           *
- * Cleanup and porting by Ullrich von Bassewitz.			     *
+ * Cleanup and porting by Ullrich von Bassewitz.                             *
  * 2004-06-08, Greg King                                                     *
  *                                                                           *
  *****************************************************************************/
@@ -26,7 +26,7 @@
 #  define SCREEN2               0xE400
 #  define CHARSET               0xE800
 #  define COLORRAM              0xD800
-#  define outb(addr,val)       	(*(addr) = (val))
+#  define outb(addr,val)        (*(addr) = (val))
 #  define inb(addr)             (*(addr))
 #elif defined(__C128__)
 #  define BUFFER                0x0400
@@ -34,7 +34,7 @@
 #  define SCREEN2               0xE400
 #  define CHARSET               0xE800
 #  define COLORRAM              0xD800
-#  define outb(addr,val)       	(*(addr) = (val))
+#  define outb(addr,val)        (*(addr) = (val))
 #  define inb(addr)             (*(addr))
 #elif defined(__CBM510__)
 #  define BUFFER                0xF800
@@ -201,7 +201,7 @@ int main (void)
     /* Run the demo until a key was hit */
     t = clock ();
     while (!kbhit()) {
-	/* Build page 1, then make it visible */
+        /* Build page 1, then make it visible */
         fire (SCREEN1);
         waitvsync ();
         outb (&VIC.addr, PAGE1);

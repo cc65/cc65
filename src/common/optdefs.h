@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*     	       	       	       	   optdefs.h   	       	       	       	     */
+/*                                 optdefs.h                                 */
 /*                                                                           */
-/*		      Definitions for object file options	       	     */
+/*                    Definitions for object file options                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,32 +39,32 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Type of options */
-#define OPT_ARGMASK	0xC0		/* Mask for argument */
-#define OPT_ARGSTR	0x00		/* String argument */
-#define OPT_ARGNUM	0x40		/* Numerical argument */
+#define OPT_ARGMASK     0xC0            /* Mask for argument */
+#define OPT_ARGSTR      0x00            /* String argument */
+#define OPT_ARGNUM      0x40            /* Numerical argument */
 
-#define OPT_COMMENT  	(OPT_ARGSTR+0)  /* Generic comment */
-#define OPT_AUTHOR   	(OPT_ARGSTR+1)	/* Author specification */
-#define OPT_TRANSLATOR	(OPT_ARGSTR+2)	/* Translator specification */
-#define OPT_COMPILER 	(OPT_ARGSTR+3)	/* Compiler specification */
-#define OPT_OS		(OPT_ARGSTR+4)	/* Operating system specification */
+#define OPT_COMMENT     (OPT_ARGSTR+0)  /* Generic comment */
+#define OPT_AUTHOR      (OPT_ARGSTR+1)  /* Author specification */
+#define OPT_TRANSLATOR  (OPT_ARGSTR+2)  /* Translator specification */
+#define OPT_COMPILER    (OPT_ARGSTR+3)  /* Compiler specification */
+#define OPT_OS          (OPT_ARGSTR+4)  /* Operating system specification */
 
-#define	OPT_DATETIME   	(OPT_ARGNUM+0)	/* Date/time of translation */
+#define OPT_DATETIME    (OPT_ARGNUM+0)  /* Date/time of translation */
 
 
 
 /* Structure to encode options */
 typedef struct Option Option;
 struct Option {
-    Option*  	     	Next;		/* For list of options */
-    unsigned char    	Type;		/* Type of option */
-    unsigned long	Val;		/* Value attribute or string index */
+    Option*             Next;           /* For list of options */
+    unsigned char       Type;           /* Type of option */
+    unsigned long       Val;            /* Value attribute or string index */
 };
 
 

@@ -68,7 +68,7 @@ typedef struct {
 
 
 /* JOY kernel variables */
-extern joy_drv_header* 	joy_drv;       	/* Pointer to driver */
+extern joy_drv_header*  joy_drv;        /* Pointer to driver */
 
 
 

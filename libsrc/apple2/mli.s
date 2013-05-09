@@ -24,12 +24,12 @@ callmli:
         beq     oserr
 
         ; Call MLI and return
-        jsr     $BF00		; MLI call entry point
+        jsr     $BF00           ; MLI call entry point
 call:   .byte   $00
         .addr   mliparam
         rts
 
         ; Load oserror code and return
-oserr:  lda     #$01		; "Bad system call number"
+oserr:  lda     #$01            ; "Bad system call number"
         sec
         rts

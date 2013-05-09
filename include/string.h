@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   string.h   				     */
+/*                                 string.h                                  */
 /*                                                                           */
-/*				String handling				     */
+/*                              String handling                              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -72,7 +72,7 @@ void* __fastcall__ _bzero (void* ptr, size_t n);
 /* Non standard: */
 #if __CC65_STD__ == __CC65_STD_CC65__
 void __fastcall__ bzero (void* ptr, size_t n);                /* BSD */
-char* __fastcall__ strdup (const char* s);		      /* SYSV/BSD */
+char* __fastcall__ strdup (const char* s);                    /* SYSV/BSD */
 int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
 int __fastcall__ strnicmp (const char* s1, const char* s2, size_t count);     /* DOS/Windows */

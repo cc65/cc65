@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  fragment.h				     */
+/*                                fragment.h                                 */
 /*                                                                           */
-/*		  Data fragments for the ca65 crossassembler		     */
+/*                Data fragments for the ca65 crossassembler                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,21 +48,21 @@
 
 
 /*****************************************************************************/
-/*	       	 		struct Fragment				     */
+/*                              struct Fragment                              */
 /*****************************************************************************/
 
 
 
 typedef struct Fragment Fragment;
 struct Fragment {
-    Fragment*  	       	Next;       /* Pointer to next fragment in segment */
-    Fragment*	       	LineList;   /* List of fragments for one src line */
+    Fragment*           Next;       /* Pointer to next fragment in segment */
+    Fragment*           LineList;   /* List of fragments for one src line */
     Collection          LI;         /* Line info for this fragment */
-    unsigned short 	Len;        /* Length for this fragment */
-    unsigned char   	Type;       /* Fragment type */
+    unsigned short      Len;        /* Length for this fragment */
+    unsigned char       Type;       /* Fragment type */
     union {
-       	unsigned char  	Data[sizeof (ExprNode*)];       /* Literal values */
-       	ExprNode*   	Expr;                           /* Expression */
+        unsigned char   Data[sizeof (ExprNode*)];       /* Literal values */
+        ExprNode*       Expr;                           /* Expression */
     } V;
 };
 

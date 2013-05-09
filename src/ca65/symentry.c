@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			   	  symentry.c				     */
+/*                                symentry.c                                 */
 /*                                                                           */
 /*              Symbol table entry for the ca65 macroassembler               */
 /*                                                                           */
@@ -54,7 +54,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -68,7 +68,7 @@ SymEntry* SymLast = 0;
 
 
 /*****************************************************************************/
-/*     	       	   	  	     Code			   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -82,9 +82,9 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
     SymEntry* S = xmalloc (sizeof (SymEntry));
 
     /* Initialize the entry */
-    S->Left    	  = 0;
-    S->Right   	  = 0;
-    S->Locals  	  = 0;
+    S->Left       = 0;
+    S->Right      = 0;
+    S->Locals     = 0;
     S->Sym.Tab    = 0;
     S->DefLines   = EmptyCollection;
     S->RefLines   = EmptyCollection;
@@ -92,7 +92,7 @@ SymEntry* NewSymEntry (const StrBuf* Name, unsigned Flags)
         S->GuessedUse[I] = 0;
     }
     S->HLLSym     = 0;
-    S->Flags   	  = Flags;
+    S->Flags      = Flags;
     S->DebugSymId = ~0U;
     S->ImportId   = ~0U;
     S->ExportId   = ~0U;
@@ -124,8 +124,8 @@ int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E)
 {
     /* Is there a tree? */
     if (T == 0) {
-      	*E = 0;
-      	return 1;
+        *E = 0;
+        return 1;
     }
 
     /* We have a table, search it */
@@ -134,17 +134,17 @@ int SymSearchTree (SymEntry* T, const StrBuf* Name, SymEntry** E)
         /* Get the symbol name */
         const StrBuf* SymName = GetStrBuf (T->Name);
 
-      	/* Choose next entry */
+        /* Choose next entry */
         int Cmp = SB_Compare (Name, SymName);
-       	if (Cmp < 0 && T->Left) {
-	    T = T->Left;
-	} else if (Cmp > 0 && T->Right) {
-	    T = T->Right;
-	} else {
-     	    /* Found or end of search, return the result */
+        if (Cmp < 0 && T->Left) {
+            T = T->Left;
+        } else if (Cmp > 0 && T->Right) {
+            T = T->Right;
+        } else {
+            /* Found or end of search, return the result */
             *E = T;
             return Cmp;
-       	}
+        }
     }
 }
 
@@ -212,9 +212,9 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
 /* Define a new symbol */
 {
     if (S->Flags & SF_IMPORT) {
-       	/* Defined symbol is marked as imported external symbol */
-       	Error ("Symbol `%m%p' is already an import", GetSymName (S));
-       	return;
+        /* Defined symbol is marked as imported external symbol */
+        Error ("Symbol `%m%p' is already an import", GetSymName (S));
+        return;
     }
     if ((Flags & SF_VAR) != 0 && (S->Flags & (SF_EXPORT | SF_GLOBAL))) {
         /* Variable symbols cannot be exports or globals */
@@ -222,7 +222,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
         return;
     }
     if (S->Flags & SF_DEFINED) {
-       	/* Multiple definition. In case of a variable, this is legal. */
+        /* Multiple definition. In case of a variable, this is legal. */
         if ((S->Flags & SF_VAR) == 0) {
             Error ("Symbol `%m%p' is already defined", GetSymName (S));
             S->Flags |= SF_MULTDEF;
@@ -293,7 +293,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
 
     /* If this is not a local symbol, remember it as the last global one */
     if ((S->Flags & SF_LOCAL) == 0) {
-       	SymLast = S;
+        SymLast = S;
     }
 }
 
@@ -315,14 +315,14 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 /* Mark the given symbol as an imported symbol */
 {
     if (S->Flags & SF_DEFINED) {
-     	Error ("Symbol `%m%p' is already defined", GetSymName (S));
-     	S->Flags |= SF_MULTDEF;
-     	return;
+        Error ("Symbol `%m%p' is already defined", GetSymName (S));
+        S->Flags |= SF_MULTDEF;
+        return;
     }
     if (S->Flags & SF_EXPORT) {
-     	/* The symbol is already marked as exported symbol */
-     	Error ("Cannot import exported symbol `%m%p'", GetSymName (S));
-     	return;
+        /* The symbol is already marked as exported symbol */
+        Error ("Cannot import exported symbol `%m%p'", GetSymName (S));
+        return;
     }
 
     /* If no address size is given, use the address size of the enclosing
@@ -336,9 +336,9 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
      * then do silently remove the global flag.
      */
     if (S->Flags & SF_IMPORT) {
-     	if ((Flags & SF_FORCED) != (S->Flags & SF_FORCED)) {
-       	    Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
-     	}
+        if ((Flags & SF_FORCED) != (S->Flags & SF_FORCED)) {
+            Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
+        }
         if (AddrSize != S->AddrSize) {
             Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
         }
@@ -347,7 +347,7 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         S->Flags &= ~SF_GLOBAL;
         if (AddrSize != S->AddrSize) {
             Error ("Address size mismatch for symbol `%m%p'", GetSymName (S));
-     	}
+        }
     }
 
     /* Set the symbol data */
@@ -368,9 +368,9 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 {
     /* Check if it's ok to export the symbol */
     if (S->Flags & SF_IMPORT) {
-     	/* The symbol is already marked as imported external symbol */
-     	Error ("Symbol `%m%p' is already an import", GetSymName (S));
-     	return;
+        /* The symbol is already marked as imported external symbol */
+        Error ("Symbol `%m%p' is already an import", GetSymName (S));
+        return;
     }
     if (S->Flags & SF_VAR) {
         /* Variable symbols cannot be exported */
@@ -536,9 +536,9 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
 
     /* Check for errors */
     if (S->Flags & SF_IMPORT) {
-       	/* The symbol is already marked as imported external symbol */
-       	Error ("Symbol `%m%p' is already an import", GetSymName (S));
-       	return;
+        /* The symbol is already marked as imported external symbol */
+        Error ("Symbol `%m%p' is already an import", GetSymName (S));
+        return;
     }
     if (S->Flags & SF_VAR) {
         /* Variable symbols cannot be exported or imported */
@@ -574,9 +574,9 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
      * priority value is the same as the old one.
      */
     if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
- 	if (S->ConDesPrio[Type] != Prio) {
- 	    Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
- 	}
+        if (S->ConDesPrio[Type] != Prio) {
+            Error ("Redeclaration mismatch for symbol `%m%p'", GetSymName (S));
+        }
     }
     S->ConDesPrio[Type] = Prio;
 

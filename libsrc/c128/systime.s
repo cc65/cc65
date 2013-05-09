@@ -11,43 +11,43 @@
 
         .include        "time.inc"
         .include        "c128.inc"
-	.include	"get_tv.inc"
+        .include        "get_tv.inc"
 
         .constructor    initsystime
-	.importzp	tmp1, tmp2
-	.import		_get_tv
+        .importzp       tmp1, tmp2
+        .import         _get_tv
 
 
 ;----------------------------------------------------------------------------
 .code
 
-.proc	__systime
+.proc   __systime
 
-	lda	CIA1_TODHR
-	bpl	AM
-	and	#%01111111
-	sed
-	clc
-	adc	#$12
-	cld
-AM:	jsr	BCD2dec
-	sta	TM + tm::tm_hour
-	lda	CIA1_TODMIN
-	jsr	BCD2dec
-	sta	TM + tm::tm_min
-	lda	CIA1_TODSEC
-	jsr	BCD2dec
-	sta	TM + tm::tm_sec
-	lda	CIA1_TOD10              ; Dummy read to unfreeze
-	lda	#<TM
-	ldx	#>TM
-	jmp	_mktime
+        lda     CIA1_TODHR
+        bpl     AM
+        and     #%01111111
+        sed
+        clc
+        adc     #$12
+        cld
+AM:     jsr     BCD2dec
+        sta     TM + tm::tm_hour
+        lda     CIA1_TODMIN
+        jsr     BCD2dec
+        sta     TM + tm::tm_min
+        lda     CIA1_TODSEC
+        jsr     BCD2dec
+        sta     TM + tm::tm_sec
+        lda     CIA1_TOD10              ; Dummy read to unfreeze
+        lda     #<TM
+        ldx     #>TM
+        jmp     _mktime
 
 ; dec = (((BCD>>4)*10) + (BCD&0xf))
 BCD2dec:tax
-	and	#%00001111
-	sta	tmp1
-	txa
+        and     #%00001111
+        sta     tmp1
+        txa
         and     #%11110000      ; *16
         lsr                     ; *8
         sta     tmp2
@@ -68,13 +68,13 @@ BCD2dec:tax
 
         lda     CIA1_TOD10
         sta     CIA1_TOD10
-	jsr     _get_tv
-	cmp     #TV::PAL
-	bne     @60Hz
-	lda     CIA1_CRA
-	ora     #$80
-	sta     CIA1_CRA
-@60Hz:	rts
+        jsr     _get_tv
+        cmp     #TV::PAL
+        bne     @60Hz
+        lda     CIA1_CRA
+        ora     #$80
+        sta     CIA1_CRA
+@60Hz:  rts
 
 .endproc
 
@@ -83,7 +83,7 @@ BCD2dec:tax
 ; TM struct with date set to 1970-01-01
 .data
 
-TM:    	.word           0       ; tm_sec
+TM:     .word           0       ; tm_sec
         .word           0       ; tm_min
         .word           0       ; tm_hour
         .word           1       ; tm_mday

@@ -4,17 +4,17 @@
 ; void gotox (unsigned char x);
 ;
 
-	.export		_gotox
-	.import		setcursor
+        .export         _gotox
+        .import         setcursor
 
         .include        "nes.inc"
 
 .proc   _gotox
 
-	sta	CURS_X		; Set new position
+        sta     CURS_X          ; Set new position
         tay
         ldx     CURS_Y
-	jmp	setcursor       ; Set the cursor to the new position
+        jmp     setcursor       ; Set the cursor to the new position
 
 .endproc
 

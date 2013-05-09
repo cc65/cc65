@@ -6,8 +6,8 @@
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
-        .export		_textcolor, _bgcolor, _bordercolor
-        .import	       	return0, return1
+        .export         _textcolor, _bgcolor, _bordercolor
+        .import         return0, return1
 
 _textcolor      := return1
 

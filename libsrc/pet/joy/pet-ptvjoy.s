@@ -6,47 +6,47 @@
 ; obviously based on Ullrichs driver :)
 ;
 
-	.include "zeropage.inc"
+        .include "zeropage.inc"
 
-	.include "joy-kernel.inc"
-	.include "joy-error.inc"
-;	.include "pet.inc"
-VIA_PRA		:= $E841		; Port register A
-VIA_DDRA	:= $E843		; Data direction register A
+        .include "joy-kernel.inc"
+        .include "joy-error.inc"
+;       .include "pet.inc"
+VIA_PRA         := $E841                ; Port register A
+VIA_DDRA        := $E843                ; Data direction register A
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
-	.segment "JUMPTABLE"
+        .segment "JUMPTABLE"
 
 ; Driver signature
 
-	.byte	$6A, $6F, $79	; "joy"
-	.byte	JOY_API_VERSION ; Driver API version number
+        .byte   $6A, $6F, $79   ; "joy"
+        .byte   JOY_API_VERSION ; Driver API version number
 
 ; Button state masks (8 values)
 
-	.byte	$01			; JOY_UP
-	.byte	$02			; JOY_DOWN
-	.byte	$04			; JOY_LEFT
-	.byte	$08			; JOY_RIGHT
-	.byte	$10			; JOY_FIRE
-	.byte	$00			; JOY_FIRE2 unavailable
-	.byte	$00			; Future expansion
-	.byte	$00			; Future expansion
+        .byte   $01                     ; JOY_UP
+        .byte   $02                     ; JOY_DOWN
+        .byte   $04                     ; JOY_LEFT
+        .byte   $08                     ; JOY_RIGHT
+        .byte   $10                     ; JOY_FIRE
+        .byte   $00                     ; JOY_FIRE2 unavailable
+        .byte   $00                     ; Future expansion
+        .byte   $00                     ; Future expansion
 
 ; Jump table.
 
-	.addr	INSTALL
-	.addr	UNINSTALL
-	.addr	COUNT
-	.addr	READ
-	.addr	0			; IRQ entry unused
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   COUNT
+        .addr   READ
+        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-JOY_COUNT	= 2		; Number of joysticks we support
+JOY_COUNT       = 2             ; Number of joysticks we support
 
 
 .code
@@ -59,9 +59,9 @@ JOY_COUNT	= 2		; Number of joysticks we support
 ;
 
 INSTALL:
-	lda	#<JOY_ERR_OK
-	ldx	#>JOY_ERR_OK
-;	rts			; Run into UNINSTALL instead
+        lda     #<JOY_ERR_OK
+        ldx     #>JOY_ERR_OK
+;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -69,7 +69,7 @@ INSTALL:
 ;
 
 UNINSTALL:
-	rts
+        rts
 
 
 ; ------------------------------------------------------------------------
@@ -77,44 +77,44 @@ UNINSTALL:
 ;
 
 COUNT:
-	lda	#<JOY_COUNT
-	ldx	#>JOY_COUNT
-	rts
+        lda     #<JOY_COUNT
+        ldx     #>JOY_COUNT
+        rts
 
 ; ------------------------------------------------------------------------
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:	lda	#%10000000	; via port A Data-Direction
-	sta	VIA_DDRA	; bit 7: out	bit 6-0: in
+READ:   lda     #%10000000      ; via port A Data-Direction
+        sta     VIA_DDRA        ; bit 7: out    bit 6-0: in
 
-	tax			; Joystick number into X
-	bne	joy2
+        tax                     ; Joystick number into X
+        bne     joy2
 
 ; Read joystick 1
 
-joy1:	lda	#$80		; via port A read/write
-	sta	VIA_PRA		; (output one at PA7)
+joy1:   lda     #$80            ; via port A read/write
+        sta     VIA_PRA         ; (output one at PA7)
 
-	lda	VIA_PRA		; via port A read/write
-	and	#$1f		; get bit 4-0 (PA4-PA0)
-	eor	#$1f
-	rts
+        lda     VIA_PRA         ; via port A read/write
+        and     #$1f            ; get bit 4-0 (PA4-PA0)
+        eor     #$1f
+        rts
 
 ; Read joystick 2
 
-joy2:	lda	#$00		; via port A read/write
-	sta	VIA_PRA		; (output zero at PA7)
+joy2:   lda     #$00            ; via port A read/write
+        sta     VIA_PRA         ; (output zero at PA7)
 
-	lda	VIA_PRA		; via port A read/write
-	and	#$0f		; get bit 3-0 (PA3-PA0)
-	sta	tmp1		; joy 4 directions
+        lda     VIA_PRA         ; via port A read/write
+        and     #$0f            ; get bit 3-0 (PA3-PA0)
+        sta     tmp1            ; joy 4 directions
 
-	lda	VIA_PRA		; via port A read/write
-	and	#%00100000	; get bit 5 (PA5)
-	lsr
-	ora	tmp1
-	eor	#$1f
+        lda     VIA_PRA         ; via port A read/write
+        and     #%00100000      ; get bit 5 (PA5)
+        lsr
+        ora     tmp1
+        eor     #$1f
 
-	ldx	#0
-	rts
+        ldx     #0
+        rts

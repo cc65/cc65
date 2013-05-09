@@ -5,10 +5,10 @@
 ; /* Initialize the random number generator */
 ;
 
-    	.export	       	__randomize
-	.import		_srand
+        .export         __randomize
+        .import         _srand
 
-	.include	"pet.inc"
+        .include        "pet.inc"
 
 __randomize:              
         ldx     TIME

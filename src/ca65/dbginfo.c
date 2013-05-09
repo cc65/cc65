@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		     		   dbginfo.c				     */
+/*                                 dbginfo.c                                 */
 /*                                                                           */
-/*  		     	   Handle the .dbg commands			     */
+/*                         Handle the .dbg commands                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -58,7 +58,7 @@
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -181,8 +181,8 @@ void DbgInfoFile (void)
 
     /* Name */
     if (CurTok.Tok != TOK_STRCON) {
-       	ErrorSkip ("String constant expected");
-       	return;
+        ErrorSkip ("String constant expected");
+        return;
     }
     SB_Copy (&Name, &CurTok.SVal);
     NextTok ();
@@ -212,8 +212,8 @@ void DbgInfoFunc (void)
 /* Parse and handle func subcommand of the .dbg pseudo instruction */
 {
     static const char* StorageKeys[] = {
-       	"EXTERN",
-     	"STATIC",
+        "EXTERN",
+        "STATIC",
     };
 
     unsigned    Name;
@@ -228,8 +228,8 @@ void DbgInfoFunc (void)
 
     /* Name */
     if (CurTok.Tok != TOK_STRCON) {
-       	ErrorSkip ("String constant expected");
-       	return;
+        ErrorSkip ("String constant expected");
+        return;
     }
     Name = GetStrBufId (&CurTok.SVal);
     NextTok ();
@@ -239,8 +239,8 @@ void DbgInfoFunc (void)
 
     /* Type */
     if (CurTok.Tok != TOK_STRCON) {
-       	ErrorSkip ("String constant expected");
-       	return;
+        ErrorSkip ("String constant expected");
+        return;
     }
     Type = ValidateType (&CurTok.SVal);
     if (Type < 0) {
@@ -253,8 +253,8 @@ void DbgInfoFunc (void)
 
     /* The storage class follows */
     if (CurTok.Tok != TOK_IDENT) {
-       	ErrorSkip ("Storage class specifier expected");
-       	return;
+        ErrorSkip ("Storage class specifier expected");
+        return;
     }
     switch (GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]))) {
         case 0:   Flags = HLL_TYPE_FUNC | HLL_SC_EXTERN;            break;
@@ -314,7 +314,7 @@ void DbgInfoLine (void)
      * follow, the last line info is terminated.
      */
     if (CurTok.Tok == TOK_SEP) {
-	return;
+        return;
     }
 
     /* Parameters are separated by a comma */
@@ -322,8 +322,8 @@ void DbgInfoLine (void)
 
     /* The name of the file follows */
     if (CurTok.Tok != TOK_STRCON) {
-     	ErrorSkip ("String constant expected");
-     	return;
+        ErrorSkip ("String constant expected");
+        return;
     }
 
     /* Get the index in the file table for the name */
@@ -338,8 +338,8 @@ void DbgInfoLine (void)
     /* Line number */
     Line = ConstExpression ();
     if (Line < 0) {
-	ErrorSkip ("Line number is out of valid range");
-	return;
+        ErrorSkip ("Line number is out of valid range");
+        return;
     }
     Pos.Line = Line;
 
@@ -354,9 +354,9 @@ void DbgInfoSym (void)
 {
     static const char* StorageKeys[] = {
         "AUTO",
-       	"EXTERN",
+        "EXTERN",
         "REGISTER",
-     	"STATIC",
+        "STATIC",
     };
 
     unsigned    Name;
@@ -372,8 +372,8 @@ void DbgInfoSym (void)
 
     /* Name */
     if (CurTok.Tok != TOK_STRCON) {
-       	ErrorSkip ("String constant expected");
-       	return;
+        ErrorSkip ("String constant expected");
+        return;
     }
     Name = GetStrBufId (&CurTok.SVal);
     NextTok ();
@@ -383,8 +383,8 @@ void DbgInfoSym (void)
 
     /* Type */
     if (CurTok.Tok != TOK_STRCON) {
-       	ErrorSkip ("String constant expected");
-       	return;
+        ErrorSkip ("String constant expected");
+        return;
     }
     Type = ValidateType (&CurTok.SVal);
     if (Type < 0) {
@@ -397,8 +397,8 @@ void DbgInfoSym (void)
 
     /* The storage class follows */
     if (CurTok.Tok != TOK_IDENT) {
-       	ErrorSkip ("Storage class specifier expected");
-       	return;
+        ErrorSkip ("Storage class specifier expected");
+        return;
     }
     switch (GetSubKey (StorageKeys, sizeof (StorageKeys)/sizeof (StorageKeys[0]))) {
         case 0:   Flags = HLL_SC_AUTO;                              break;

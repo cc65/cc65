@@ -9,8 +9,8 @@
 
 .proc   SCREEN
 
-       	ldx    	#40		; Columns
-	ldy	#25		; Lines
-	rts
+        ldx     #40             ; Columns
+        ldy     #25             ; Lines
+        rts
 
 .endproc

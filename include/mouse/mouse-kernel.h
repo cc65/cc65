@@ -45,7 +45,7 @@
 
 
 /* Mouse kernel variables */
-extern void*   	mouse_drv;       	/* Pointer to driver */
+extern void*    mouse_drv;              /* Pointer to driver */
 
 
 

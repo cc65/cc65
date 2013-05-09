@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   _gtia.h			       	     */
+/*                                 _gtia.h                                   */
 /*                                                                           */
-/*		    Internal include file, do not use directly		     */
+/*                  Internal include file, do not use directly               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

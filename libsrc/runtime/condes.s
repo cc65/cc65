@@ -13,10 +13,10 @@
 ; code.
 
 
-       	.export	initlib, donelib, condes
+        .export initlib, donelib, condes
 
-       	.import	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
-	.import	__DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
+        .import __CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
+        .import __DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
         .macpack        cpu
 
@@ -25,12 +25,12 @@
 
 .segment        "INIT"
 
-.proc	initlib
+.proc   initlib
 
-     	ldy    	#<(__CONSTRUCTOR_COUNT__*2)
-       	beq    	exit
-     	lda    	#<__CONSTRUCTOR_TABLE__
-     	ldx    	#>__CONSTRUCTOR_TABLE__
+        ldy     #<(__CONSTRUCTOR_COUNT__*2)
+        beq     exit
+        lda     #<__CONSTRUCTOR_TABLE__
+        ldx     #>__CONSTRUCTOR_TABLE__
         jmp     condes
 exit:   rts
 
@@ -42,13 +42,13 @@ exit:   rts
 
 .code
 
-.proc	donelib
+.proc   donelib
 
-    	ldy 	#<(__DESTRUCTOR_COUNT__*2)
-    	beq     exit
-    	lda 	#<__DESTRUCTOR_TABLE__
-    	ldx 	#>__DESTRUCTOR_TABLE__
-    	jmp     condes
+        ldy     #<(__DESTRUCTOR_COUNT__*2)
+        beq     exit
+        lda     #<__DESTRUCTOR_TABLE__
+        ldx     #>__DESTRUCTOR_TABLE__
+        jmp     condes
 exit:   rts
 
 .endproc
@@ -61,22 +61,22 @@ exit:   rts
 
 .data
 
-.proc	condes
+.proc   condes
 
-     	sta   	fetch1+1
-     	stx	fetch1+2
-     	sta   	fetch2+1
-     	stx	fetch2+2
+        sta     fetch1+1
+        stx     fetch1+2
+        sta     fetch2+1
+        stx     fetch2+2
 loop:   dey
 fetch1: lda     $FFFF,y                 ; Patched at runtime
         sta     jmpvec+2
-     	dey
+        dey
 fetch2: lda     $FFFF,y                 ; Patched at runtime
         sta     jmpvec+1
-       	sty    	index+1
-jmpvec: jsr    	$FFFF                   ; Patched at runtime
-index: 	ldy    	#$FF                    ; Patched at runtime
-       	bne     loop
+        sty     index+1
+jmpvec: jsr     $FFFF                   ; Patched at runtime
+index:  ldy     #$FF                    ; Patched at runtime
+        bne     loop
         rts
 
 .endproc

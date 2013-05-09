@@ -4,10 +4,10 @@
 ; CC65 runtime: Compare >= for long unsigneds
 ;
 
-	.export		tosugeeax
-       	.import	       	toslcmp, booluge
+        .export         tosugeeax
+        .import         toslcmp, booluge
 
 tosugeeax:
-       	jsr    	toslcmp	   	; Set the flags
-       	jmp    	booluge		; Convert to boolean
+        jsr     toslcmp         ; Set the flags
+        jmp     booluge         ; Convert to boolean
 

@@ -4,7 +4,7 @@
 ; CC65 library: 32by16 => 16 signed division
 ;
 
-       	.export	       	_cc65_idiv32by16r16
+        .export         _cc65_idiv32by16r16
         .import         idiv32by16r16, incsp4
 
         .include        "zeropage.inc"

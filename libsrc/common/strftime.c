@@ -162,9 +162,9 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format,
 
                 case 'c':
                     sprintf (arg, "%.3s %.3s%3d %02d:%02d:%02d %d",
-	     	     	     days[tm->tm_wday], months[tm->tm_mon],
-	     	     	     tm->tm_mday, tm->tm_hour, tm->tm_min,
-	     	     	     tm->tm_sec, tm->tm_year + 1900);
+                             days[tm->tm_wday], months[tm->tm_mon],
+                             tm->tm_mday, tm->tm_hour, tm->tm_min,
+                             tm->tm_sec, tm->tm_year + 1900);
                     break;
 
                 case 'd':

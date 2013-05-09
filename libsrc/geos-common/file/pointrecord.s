@@ -5,12 +5,12 @@
 
 ; char PointRecord  (char recordNum);
 
-	    .import setoserror
-	    .export _PointRecord
+            .import setoserror
+            .export _PointRecord
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+        
 _PointRecord:
-	jsr PointRecord
-	jmp setoserror
+        jsr PointRecord
+        jmp setoserror

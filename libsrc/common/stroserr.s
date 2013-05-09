@@ -5,8 +5,8 @@
 ; /* Map an operating system error number to an error message. */
 ;
 
- 	.export	     	__stroserror
-  	.import	     	__sys_oserrlist
+        .export         __stroserror
+        .import         __sys_oserrlist
         .importzp       ptr1, tmp1
 
         .macpack        generic

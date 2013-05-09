@@ -6,7 +6,7 @@
 ;
 
         .include        "plus4.inc"
-	.include	"get_tv.inc"
+        .include        "get_tv.inc"
 
 
 ;--------------------------------------------------------------------------
@@ -14,7 +14,7 @@
 
 .proc   _get_tv
 
-        ldx     #TV::PAL	; Assume PAL
+        ldx     #TV::PAL        ; Assume PAL
         bit     TED_MULTI1      ; Test bit 6
         bvc     pal
         dex                     ; NTSC

@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -68,7 +68,7 @@ void Assignment (ExprDesc* Expr)
 
     /* Check for assignment to const */
     if (IsQualConst (ltype)) {
-    	Error ("Assignment to const");
+        Error ("Assignment to const");
     }
 
     /* Skip the '=' token */
@@ -99,12 +99,12 @@ void Assignment (ExprDesc* Expr)
             PushAddr (Expr);
         } else {
             ED_MakeRVal (Expr);
-      	    LoadExpr (CF_NONE, Expr);
+            LoadExpr (CF_NONE, Expr);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
 
-     	/* Get the expression on the right of the '=' into the primary */
-	hie1 (&Expr2);
+        /* Get the expression on the right of the '=' into the primary */
+        hie1 (&Expr2);
 
         /* Check for equality of the structs */
         if (TypeCmp (ltype, Expr2.Type) < TC_STRICT_COMPATIBLE) {
@@ -112,8 +112,8 @@ void Assignment (ExprDesc* Expr)
         }
 
         /* Check if the right hand side is an lvalue */
-	if (ED_IsLVal (&Expr2)) {
-	    /* We have an lvalue. Do we copy using the primary? */
+        if (ED_IsLVal (&Expr2)) {
+            /* We have an lvalue. Do we copy using the primary? */
             if (UseReg) {
                 /* Just use the replacement type */
                 Expr2.Type = stype;
@@ -193,13 +193,13 @@ void Assignment (ExprDesc* Expr)
         GetCodePos (&PushPos);
         g_push (Flags, 0);
 
-     	/* Read the expression on the right side of the '=' */
-       	MarkedExprWithCheck (hie1, &Expr2);
+        /* Read the expression on the right side of the '=' */
+        MarkedExprWithCheck (hie1, &Expr2);
 
-     	/* Do type conversion if necessary. Beware: Do not use char type
+        /* Do type conversion if necessary. Beware: Do not use char type
          * here!
          */
-     	TypeConversion (&Expr2, ltype);
+        TypeConversion (&Expr2, ltype);
 
         /* Special treatment if the value is constant. */
         /* Beware: Expr2 may contain side effects, so there must not be
@@ -238,28 +238,28 @@ void Assignment (ExprDesc* Expr)
             g_or (Flags, 0);
         }
 
-     	/* Generate a store instruction */
-     	Store (Expr, 0);
+        /* Generate a store instruction */
+        Store (Expr, 0);
 
         /* Restore the expression type */
         Expr->Type = ltype;
 
     } else {
 
-     	/* Get the address on stack if needed */
-     	PushAddr (Expr);
+        /* Get the address on stack if needed */
+        PushAddr (Expr);
 
-     	/* Read the expression on the right side of the '=' */
-     	hie1 (&Expr2);
+        /* Read the expression on the right side of the '=' */
+        hie1 (&Expr2);
 
-     	/* Do type conversion if necessary */
-     	TypeConversion (&Expr2, ltype);
+        /* Do type conversion if necessary */
+        TypeConversion (&Expr2, ltype);
 
-     	/* If necessary, load the value into the primary register */
-     	LoadExpr (CF_NONE, &Expr2);
+        /* If necessary, load the value into the primary register */
+        LoadExpr (CF_NONE, &Expr2);
 
-     	/* Generate a store instruction */
-     	Store (Expr, 0);
+        /* Generate a store instruction */
+        Store (Expr, 0);
 
     }
 

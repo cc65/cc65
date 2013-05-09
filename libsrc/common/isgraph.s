@@ -5,21 +5,21 @@
 ; int isgraph (int c);
 ;
 
-	.export		_isgraph
-	.include	"ctype.inc"
+        .export         _isgraph
+        .include        "ctype.inc"
 
 _isgraph:
-	cpx	#>0		; Char range OK?
-	bne	@L1		; Jump if no
-	tay
-	lda	__ctype,y	; Get character classification
-	and	#CT_CTRL_SPACE	; Mask character bits
-	cmp	#1		; If false, then set "borrow" flag
-	lda	#0
-	sbc	#0		; Invert logic
-	rts			; Return NOT control and NOT space
+        cpx     #>0             ; Char range OK?
+        bne     @L1             ; Jump if no
+        tay
+        lda     __ctype,y       ; Get character classification
+        and     #CT_CTRL_SPACE  ; Mask character bits
+        cmp     #1              ; If false, then set "borrow" flag
+        lda     #0
+        sbc     #0              ; Invert logic
+        rts                     ; Return NOT control and NOT space
 
-@L1:	lda	#<0		; Return false
-	tax
-	rts
+@L1:    lda     #<0             ; Return false
+        tax
+        rts
 

@@ -11,9 +11,9 @@
 ;
 
 
-    	.export	  	tosshreax
-    	.import	       	popeax
-	.importzp      	sreg, tmp1
+        .export         tosshreax
+        .import         popeax
+        .importzp       sreg, tmp1
 
 
 tosshreax:
@@ -29,11 +29,11 @@ tosshreax:
 ; Do the actual shift. Faster solutions are possible but need a lot more code.
 
 L2:     lsr     sreg+1
-   	ror     sreg
-        ror    	tmp1
+        ror     sreg
+        ror     tmp1
         ror     a
         dey
-       	bne     L2
+        bne     L2
 
 ; Shift done
 

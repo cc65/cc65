@@ -4,17 +4,17 @@
 ; CC65 runtime: Increment the stackpointer by 6
 ;
 
-       	.export		incsp6
-	.import		addysp
+        .export         incsp6
+        .import         addysp
 
-.proc	incsp6
+.proc   incsp6
 
-	ldy   	#6
-	jmp   	addysp
+        ldy     #6
+        jmp     addysp
 
 .endproc
 
 
 
 
-	
+        

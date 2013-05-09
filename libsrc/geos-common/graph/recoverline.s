@@ -5,12 +5,12 @@
 
 ; void RecoverLine    (char y, int xstart, int xend);
 
-	    .import HLineRegs
-	    .export _RecoverLine
-	    
-	    .include "jumptab.inc"
+            .import HLineRegs
+            .export _RecoverLine
+            
+            .include "jumptab.inc"
 
 _RecoverLine:
-	jsr HLineRegs
-	jmp RecoverLine
+        jsr HLineRegs
+        jmp RecoverLine
 

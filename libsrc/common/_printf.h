@@ -25,10 +25,10 @@ typedef void (*outfunc) (struct outdesc* desc, const char* buf, unsigned count);
  * so check this when altering the structure.
  */
 struct outdesc {
-    int		ccount;		/* Character counter */
-    outfunc    	fout;		/* Routine used to output data */
-    void*	ptr;        	/* Data internal to print routine */
-    unsigned	uns;		/* Data internal to print routine */
+    int         ccount;         /* Character counter */
+    outfunc     fout;           /* Routine used to output data */
+    void*       ptr;            /* Data internal to print routine */
+    unsigned    uns;            /* Data internal to print routine */
 };
 
 

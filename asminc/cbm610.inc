@@ -9,8 +9,8 @@
 ; ---------------------------------------------------------------------------
 ; Zeropage stuff
 
-ExecReg		= $00
-IndReg		= $01
+ExecReg         = $00
+IndReg          = $01
 
 ; ---------------------------------------------------------------------------
 ; Screen size
@@ -25,13 +25,13 @@ YSIZE           = 25
 ; I/O  $d800: CRTC 6545
 
 .struct CRTC
-        ADDR   	.byte
-        DATA   	.byte
+        ADDR    .byte
+        DATA    .byte
 .endstruct
 
 ; I/O  $db00: CIA 6526 Inter Process Communication
 ;
-; 	IPCcia		=	$db00
+;       IPCcia          =       $db00
 
 .struct CIA
         PRA     .byte
@@ -65,13 +65,13 @@ YSIZE           = 25
 
 ; I/O  $dc00: CIA 6526
 ;
-; 	cia		=	$dc00
+;       cia             =       $dc00
 
 
 
 ; I/O  $dd00: ACIA 6551
 ;
-; 	acia	       	=	$dd00
+;       acia            =       $dd00
 
 .struct ACIA
         DATA    .byte
@@ -83,7 +83,7 @@ YSIZE           = 25
 
 ; I/O  $de00: Triport #1 6525
 ;
-; 	tpi1  		=	$de00
+;       tpi1            =       $de00
 
 .struct TPI
         PRA     .byte
@@ -105,6 +105,6 @@ YSIZE           = 25
 
 ; I/O  $df00: Triport #2 6525
 
-; 	tpi2	     	=	$df00
+;       tpi2            =       $df00
 
 

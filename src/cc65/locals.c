@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   locals.c				     */
+/*                                 locals.c                                  */
 /*                                                                           */
-/*		Local variable handling for the cc65 C compiler		     */
+/*              Local variable handling for the cc65 C compiler              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*		   		     Code		       		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -411,7 +411,7 @@ static void ParseStaticDecl (Declaration* Decl)
 static void ParseOneDecl (const DeclSpec* Spec)
 /* Parse one variable declaration */
 {
-    Declaration Decl;	       	/* Declaration data structure */
+    Declaration Decl;           /* Declaration data structure */
 
 
     /* Read the declaration */
@@ -419,23 +419,23 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
     /* Set the correct storage class for functions */
     if ((Decl.StorageClass & SC_FUNC) == SC_FUNC) {
-    	/* Function prototypes are always external */
-       	if ((Decl.StorageClass & SC_EXTERN) == 0) {
-       	    Warning ("Function must be extern");
-    	}
-       	Decl.StorageClass |= SC_EXTERN;
+        /* Function prototypes are always external */
+        if ((Decl.StorageClass & SC_EXTERN) == 0) {
+            Warning ("Function must be extern");
+        }
+        Decl.StorageClass |= SC_EXTERN;
     }
 
     /* If we don't have a name, this was flagged as an error earlier.
      * To avoid problems later, use an anonymous name here.
      */
     if (Decl.Ident[0] == '\0') {
-       	AnonName (Decl.Ident, "param");
+        AnonName (Decl.Ident, "param");
     }
 
     /* If the symbol is not marked as external, it will be defined now */
     if ((Decl.StorageClass & SC_EXTERN) == 0) {
-       	Decl.StorageClass |= SC_DEF;
+        Decl.StorageClass |= SC_DEF;
     }
 
     /* Handle anything that needs storage (no functions, no typdefs) */
@@ -456,7 +456,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
         if ((Decl.StorageClass & SC_REGISTER) == SC_REGISTER) {
             /* Register variable */
             ParseRegisterDecl (&Decl, Reg);
-       	} else if ((Decl.StorageClass & SC_AUTO) == SC_AUTO) {
+        } else if ((Decl.StorageClass & SC_AUTO) == SC_AUTO) {
             /* Auto variable */
             ParseAutoDecl (&Decl);
         } else if ((Decl.StorageClass & SC_EXTERN) == SC_EXTERN) {
@@ -466,10 +466,10 @@ static void ParseOneDecl (const DeclSpec* Spec)
             }
             /* Add the external symbol to the symbol table */
             AddLocalSym (Decl.Ident, Decl.Type, Decl.StorageClass, 0);
-       	} else if ((Decl.StorageClass & SC_STATIC) == SC_STATIC) {
+        } else if ((Decl.StorageClass & SC_STATIC) == SC_STATIC) {
             /* Static variable */
             ParseStaticDecl (&Decl);
-       	} else {
+        } else {
             Internal ("Invalid storage class in ParseOneDecl: %04X", Decl.StorageClass);
         }
 
@@ -492,47 +492,47 @@ void DeclareLocals (void)
     /* Loop until we don't find any more variables */
     while (1) {
 
-     	/* Check variable declarations. We need to distinguish between a
-     	 * default int type and the end of variable declarations. So we
-     	 * will do the following: If there is no explicit storage class
-     	 * specifier *and* no explicit type given, *and* no type qualifiers
+        /* Check variable declarations. We need to distinguish between a
+         * default int type and the end of variable declarations. So we
+         * will do the following: If there is no explicit storage class
+         * specifier *and* no explicit type given, *and* no type qualifiers
          * have been read, it is assumed that we have reached the end of
          * declarations.
-     	 */
-     	DeclSpec Spec;
-     	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
-       	if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
+         */
+        DeclSpec Spec;
+        ParseDeclSpec (&Spec, SC_AUTO, T_INT);
+        if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
             (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */
             GetQualifier (Spec.Type) == T_QUAL_NONE) {  /* No type qualifier */
-     	    break;
-     	}
+            break;
+        }
 
-     	/* Accept type only declarations */
-     	if (CurTok.Tok == TOK_SEMI) {
-     	    /* Type declaration only */
-     	    CheckEmptyDecl (&Spec);
-     	    NextToken ();
-     	    continue;
-     	}
+        /* Accept type only declarations */
+        if (CurTok.Tok == TOK_SEMI) {
+            /* Type declaration only */
+            CheckEmptyDecl (&Spec);
+            NextToken ();
+            continue;
+        }
 
-      	/* Parse a comma separated variable list */
-      	while (1) {
+        /* Parse a comma separated variable list */
+        while (1) {
 
-     	    /* Parse one declaration */
-     	    ParseOneDecl (&Spec);
+            /* Parse one declaration */
+            ParseOneDecl (&Spec);
 
-     	    /* Check if there is more */
-     	    if (CurTok.Tok == TOK_COMMA) {
-     		/* More to come */
-		NextToken ();
-	    } else {
-		/* Done */
-     	      	break;
-	    }
-       	}
+            /* Check if there is more */
+            if (CurTok.Tok == TOK_COMMA) {
+                /* More to come */
+                NextToken ();
+            } else {
+                /* Done */
+                break;
+            }
+        }
 
-	/* A semicolon must follow */
-	ConsumeSemi ();
+        /* A semicolon must follow */
+        ConsumeSemi ();
     }
 
     /* Be sure to allocate any reserved space for locals */
@@ -542,7 +542,7 @@ void DeclareLocals (void)
      * the stack checking routine if stack checks are enabled.
      */
     if (IS_Get (&CheckStack) && InitialStack != StackPtr) {
-       	g_cstackcheck ();
+        g_cstackcheck ();
     }
 }
 

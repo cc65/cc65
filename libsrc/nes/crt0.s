@@ -7,20 +7,20 @@
 
         .export         _exit
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
-	.import		initlib, donelib, callmain
-	.import	        push0, _main, zerobss, copydata
+        .import         initlib, donelib, callmain
+        .import         push0, _main, zerobss, copydata
         .import         ppubuf_flush
 
         ; Linker generated symbols
-	.import		__RAM_START__, __RAM_SIZE__
-	.import		__SRAM_START__, __SRAM_SIZE__
-	.import		__ROM0_START__, __ROM0_SIZE__
-	.import		__STARTUP_LOAD__,__STARTUP_RUN__, __STARTUP_SIZE__
-	.import		__CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
-	.import		__RODATA_LOAD__,__RODATA_RUN__, __RODATA_SIZE__
+        .import         __RAM_START__, __RAM_SIZE__
+        .import         __SRAM_START__, __SRAM_SIZE__
+        .import         __ROM0_START__, __ROM0_SIZE__
+        .import         __STARTUP_LOAD__,__STARTUP_RUN__, __STARTUP_SIZE__
+        .import         __CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
+        .import         __RODATA_LOAD__,__RODATA_RUN__, __RODATA_SIZE__
 
         .include        "zeropage.inc"
-	.include        "nes.inc"
+        .include        "nes.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -55,18 +55,18 @@
 ;    | ..-EOF |      | CHR-ROM pages (in ascending order).      |
 ;    +--------+------+------------------------------------------+
 
-        .byte   $4e,$45,$53,$1a	; "NES"^Z
-	.byte   2	        ; ines prg  - Specifies the number of 16k prg banks.
-	.byte   1               ; ines chr  - Specifies the number of 8k chr banks.
-	.byte   %00000011       ; ines mir  - Specifies VRAM mirroring of the banks.
-	.byte   %00000000       ; ines map  - Specifies the NES mapper used.
-	.byte   0,0,0,0,0,0,0,0	; 8 zeroes
+        .byte   $4e,$45,$53,$1a ; "NES"^Z
+        .byte   2               ; ines prg  - Specifies the number of 16k prg banks.
+        .byte   1               ; ines chr  - Specifies the number of 8k chr banks.
+        .byte   %00000011       ; ines mir  - Specifies VRAM mirroring of the banks.
+        .byte   %00000000       ; ines map  - Specifies the NES mapper used.
+        .byte   0,0,0,0,0,0,0,0 ; 8 zeroes
 
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
 
-.segment       	"STARTUP"
+.segment        "STARTUP"
 
 start:
 
@@ -74,51 +74,51 @@ start:
 
         sei
         cld
-	ldx     #0
-	stx     VBLANK_FLAG
+        ldx     #0
+        stx     VBLANK_FLAG
 
-  	stx     ringread
-	stx     ringwrite
-	stx     ringcount
+        stx     ringread
+        stx     ringwrite
+        stx     ringcount
 
         txs
 
         lda     #$20
 @l:     sta     ringbuff,x
-	sta     ringbuff+$0100,x
-	sta     ringbuff+$0200,x
+        sta     ringbuff+$0100,x
+        sta     ringbuff+$0200,x
         inx
-	bne     @l
+        bne     @l
 
 ; Clear the BSS data
 
-        jsr	zerobss
+        jsr     zerobss
 
 ; initialize data
-	jsr	copydata
+        jsr     copydata
 
 ; setup the stack
 
         lda     #<(__SRAM_START__ + __SRAM_SIZE__)
-        sta	sp
-        lda	#>(__SRAM_START__ + __SRAM_SIZE__)
-       	sta	sp+1            ; Set argument stack ptr
+        sta     sp
+        lda     #>(__SRAM_START__ + __SRAM_SIZE__)
+        sta     sp+1            ; Set argument stack ptr
 
 ; Call module constructors
 
-	jsr	initlib
+        jsr     initlib
 
 ; Push arguments and call main()
 
-       	jsr    	callmain
+        jsr     callmain
 
 ; Call module destructors. This is also the _exit entry.
 
-_exit:  jsr	donelib		; Run module destructors
+_exit:  jsr     donelib         ; Run module destructors
 
 ; Reset the NES
 
-   	jmp start
+        jmp start
 
 ; ------------------------------------------------------------------------
 ; System V-Blank Interupt
@@ -175,8 +175,8 @@ irq:
         .word   irq1        ; $fff6 ?
         .word   timerirq    ; $fff8 ?
         .word   nmi         ; $fffa vblank nmi
-        .word   start	    ; $fffc reset
-   	.word	irq         ; $fffe irq / brk
+        .word   start       ; $fffc reset
+        .word   irq         ; $fffe irq / brk
 
 ; ------------------------------------------------------------------------
 ; character data

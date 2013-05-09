@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		     		   strbuf.c                                  */
+/*                                 strbuf.c                                  */
 /*                                                                           */
-/*			 Variable sized string buffers                       */
+/*                       Variable sized string buffers                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*		     		     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -57,7 +57,7 @@ const StrBuf EmptyStrBuf = STATIC_STRBUF_INITIALIZER;
 
 
 /*****************************************************************************/
-/*	      			     Code	   	     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -132,12 +132,12 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
     if (NewAllocated == 0) {
-     	NewAllocated = 8;
+        NewAllocated = 8;
     }
 
     /* Round up to the next power of two */
     while (NewAllocated < NewSize) {
-     	NewAllocated *= 2;
+        NewAllocated *= 2;
     }
 
     /* Reallocate the buffer. Beware: The allocated size may be zero while the
@@ -167,12 +167,12 @@ static void SB_CheapRealloc (StrBuf* B, unsigned NewSize)
     /* Get the current size, use a minimum of 8 bytes */
     unsigned NewAllocated = B->Allocated;
     if (NewAllocated == 0) {
-     	NewAllocated = 8;
+        NewAllocated = 8;
     }
 
     /* Round up to the next power of two */
     while (NewAllocated < NewSize) {
-     	NewAllocated *= 2;
+        NewAllocated *= 2;
     }
 
     /* Free the old buffer if there is one */
@@ -219,7 +219,7 @@ void SB_Terminate (StrBuf* B)
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
-	SB_Realloc (B, NewLen);
+        SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = '\0';
 }
@@ -266,7 +266,7 @@ void SB_AppendChar (StrBuf* B, int C)
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
-	SB_Realloc (B, NewLen);
+        SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = (char) C;
     B->Len = NewLen;
@@ -279,7 +279,7 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
 {
     unsigned NewLen = B->Len + Size;
     if (NewLen > B->Allocated) {
-	SB_Realloc (B, NewLen);
+        SB_Realloc (B, NewLen);
     }
     memcpy (B->Buf + B->Len, S, Size);
     B->Len = NewLen;
@@ -314,7 +314,7 @@ void SB_Cut (StrBuf* B, unsigned Len)
  */
 {
     if (Len < B->Len) {
-       	B->Len = Len;
+        B->Len = Len;
     }
 }
 #endif
@@ -330,17 +330,17 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
 {
     /* Calculate the length of the resulting buffer */
     if (Start >= Source->Len) {
-       	/* Target will be empty */
-	SB_Clear (Target);
-	return;
+        /* Target will be empty */
+        SB_Clear (Target);
+        return;
     }
     if (Start + Len > Source->Len) {
-       	Len = Source->Len - Start;
+        Len = Source->Len - Start;
     }
 
     /* Make sure we have enough room in the target string buffer */
     if (Len > Target->Allocated) {
-	SB_Realloc (Target, Len);
+        SB_Realloc (Target, Len);
     }
 
     /* Copy the slice */

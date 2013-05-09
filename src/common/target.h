@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   target.h				     */
+/*                                 target.h                                  */
 /*                                                                           */
-/*			     Target specification			     */
+/*                           Target specification                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,14 +44,14 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			    	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Supported target systems */
 typedef enum {
-    TGT_UNKNOWN = -1,		/* Not specified or invalid target */
+    TGT_UNKNOWN = -1,           /* Not specified or invalid target */
     TGT_NONE,
     TGT_MODULE,
     TGT_ATARI,
@@ -73,7 +73,7 @@ typedef enum {
     TGT_NES,
     TGT_SUPERVISION,
     TGT_LYNX,
-    TGT_COUNT			/* Number of target systems */
+    TGT_COUNT                   /* Number of target systems */
 } target_t;
 
 /* Collection of target properties */
@@ -86,17 +86,17 @@ struct TargetProperties {
 };
 
 /* Target system */
-extern target_t		Target;
+extern target_t         Target;
 
 /* Types of available output formats */
-#define BINFMT_DEFAULT 		0   	/* Default (binary) */
-#define BINFMT_BINARY		1	/* Straight binary format */
-#define BINFMT_O65		2	/* Andre Fachats o65 format */
+#define BINFMT_DEFAULT          0       /* Default (binary) */
+#define BINFMT_BINARY           1       /* Straight binary format */
+#define BINFMT_O65              2       /* Andre Fachats o65 format */
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			    	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

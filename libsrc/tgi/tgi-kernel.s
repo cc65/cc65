@@ -16,10 +16,10 @@
 
 .bss
 
-_tgi_drv:      	    .res    2		; Pointer to driver
+_tgi_drv:           .res    2           ; Pointer to driver
 ; From here on, variables get cleared when a new driver is loaded
 cstart:
-_tgi_error:    	    .res    1		; Last error code
+_tgi_error:         .res    1           ; Last error code
 _tgi_gmode:         .res    1           ; Flag: Graphics mode active
 _tgi_curx:          .res    2           ; Current drawing cursor X
 _tgi_cury:          .res    2           ; Current drawing cursor Y
@@ -61,11 +61,11 @@ _tgi_flags:         .res    1           ; TGI driver flags
 ; Jump table for the driver functions.
 
 jumpvectors:
-tgi_install:   	    jmp     $0000
-tgi_uninstall: 	    jmp     $0000
+tgi_install:        jmp     $0000
+tgi_uninstall:      jmp     $0000
 tgi_init:           jmp     $0000
 tgi_done:           jmp     $0000
-tgi_geterror:	    jmp	    $0000
+tgi_geterror:       jmp     $0000
 tgi_control:        jmp     $0000
 tgi_clear:          jmp     $0000
 tgi_setviewpage:    jmp     $0000
@@ -94,10 +94,10 @@ tgi_sig:        .byte   $74, $67, $69, TGI_API_VERSION  ; "tgi", version
 
 
 _tgi_install:
-       	sta     _tgi_drv
-  	sta 	ptr1
-  	stx     _tgi_drv+1
-  	stx    	ptr1+1
+        sta     _tgi_drv
+        sta     ptr1
+        stx     _tgi_drv+1
+        stx     ptr1+1
 
 ; Check the driver signature
 
@@ -138,8 +138,8 @@ _tgi_install:
 
         lda     tgi_irq+2               ; Check high byte of IRQ vector
         beq     @L4                     ; Jump if vector invalid
-   	lda	#$4C			; Jump opcode
-       	sta    	tgi_irq                 ; Activate IRQ routine
+        lda     #$4C                    ; Jump opcode
+        sta     tgi_irq                 ; Activate IRQ routine
 
 ; Initialize some other variables
 
@@ -149,7 +149,7 @@ _tgi_install:
         dex
         bpl     @L5
 
-	rts
+        rts
 
 ; Copy one byte to the jump vectors
 
@@ -179,10 +179,10 @@ tgi_inv_drv:
 ; Load the pointer to the tgi driver into ptr1.
 
 tgi_set_ptr:
-       	lda 	_tgi_drv
-  	sta 	ptr1
-  	lda 	_tgi_drv+1
-  	sta 	ptr1+1
+        lda     _tgi_drv
+        sta     ptr1
+        lda     _tgi_drv+1
+        sta     ptr1+1
         rts
 
 ;----------------------------------------------------------------------------
@@ -196,8 +196,8 @@ _tgi_uninstall:
 
         jsr     tgi_uninstall           ; Allow the driver to clean up
 
-	lda	#$60                    ; RTS opcode
-	sta	tgi_irq                 ; Disable IRQ entry point
+        lda     #$60                    ; RTS opcode
+        sta     tgi_irq                 ; Disable IRQ entry point
 
 ; Clear driver pointer and error code
 

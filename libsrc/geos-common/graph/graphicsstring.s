@@ -5,12 +5,12 @@
 
 ; void GraphicsString         (char *myString);
 
-	    .export _GraphicsString
+            .export _GraphicsString
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _GraphicsString:
-	sta r0L
-	stx r0H
-	jmp GraphicsString
+        sta r0L
+        stx r0H
+        jmp GraphicsString

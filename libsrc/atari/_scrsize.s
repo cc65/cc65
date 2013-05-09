@@ -4,8 +4,8 @@
 ; Screen size variables
 ;
 
-	.export		screensize
-	.include	"atari.inc"
+        .export         screensize
+        .include        "atari.inc"
 
 .proc   screensize
 

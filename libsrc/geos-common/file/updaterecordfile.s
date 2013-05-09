@@ -5,12 +5,12 @@
 
 ; char UpdateRecordFile  (void);
 
-	    .import setoserror
-	    .export _UpdateRecordFile
+            .import setoserror
+            .export _UpdateRecordFile
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
 
 _UpdateRecordFile:
-	jsr UpdateRecordFile
-	jmp setoserror
+        jsr UpdateRecordFile
+        jmp setoserror

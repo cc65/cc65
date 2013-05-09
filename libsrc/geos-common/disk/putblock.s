@@ -5,20 +5,20 @@
 
 ; char PutBlock (struct tr_se *myTS, char *buffer);
 
-	    .import popax, setoserror
-	    .import gettrse
-	    .export _PutBlock
+            .import popax, setoserror
+            .import gettrse
+            .export _PutBlock
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _PutBlock:
-	sta r4L
-	stx r4H
-	jsr popax
-	jsr gettrse
-	sta r1L
-	stx r1H
-	jsr PutBlock
-	jmp setoserror
+        sta r4L
+        stx r4H
+        jsr popax
+        jsr gettrse
+        sta r1L
+        stx r1H
+        jsr PutBlock
+        jmp setoserror

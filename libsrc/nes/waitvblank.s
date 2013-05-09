@@ -5,9 +5,9 @@
 ; void waitvblank(void);
 ;
 
-	.export _waitvblank
+        .export _waitvblank
 
-	.include "nes.inc"
+        .include "nes.inc"
 
 .proc   _waitvblank
 

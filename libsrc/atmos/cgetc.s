@@ -4,11 +4,11 @@
 ; char cgetc (void);
 ;
 
-	.export		_cgetc
+        .export         _cgetc
         .constructor    initcgetc
-	.import		cursor
+        .import         cursor
 
-	.include	"atmos.inc"
+        .include        "atmos.inc"
 
 
 

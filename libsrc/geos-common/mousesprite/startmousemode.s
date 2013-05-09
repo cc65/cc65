@@ -5,10 +5,10 @@
 
 ; void StartMouseMode (void);
 
-	    .export _StartMouseMode
+            .export _StartMouseMode
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _StartMouseMode:
-	clc
-	jmp StartMouseMode
+        clc
+        jmp StartMouseMode

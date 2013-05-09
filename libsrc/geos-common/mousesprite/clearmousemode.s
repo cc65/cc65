@@ -5,8 +5,8 @@
 
 ; void ClearMouseMode (void);
 
-	    .export _ClearMouseMode
+            .export _ClearMouseMode
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_ClearMouseMode	= ClearMouseMode
+_ClearMouseMode = ClearMouseMode

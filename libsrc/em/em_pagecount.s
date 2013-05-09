@@ -7,5 +7,5 @@
 
         .include        "em-kernel.inc"
 
-       	_em_pagecount   = emd_pagecount                 ; Use driver entry
+        _em_pagecount   = emd_pagecount                 ; Use driver entry
 

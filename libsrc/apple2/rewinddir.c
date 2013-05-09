@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*		   		     Code	   			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -49,17 +49,17 @@ void __fastcall__ rewinddir (register DIR* dir)
     /* Rewind directory file */
     if (lseek (dir->fd, 0, SEEK_SET)) {
 
-	/* Read directory key block */
-	if (read (dir->fd,
-		  dir->block.bytes,
-		  sizeof (dir->block)) == sizeof (dir->block)) {
+        /* Read directory key block */
+        if (read (dir->fd,
+                  dir->block.bytes,
+                  sizeof (dir->block)) == sizeof (dir->block)) {
 
-	    /* Skip directory header entry */
-	    dir->current_entry = 1;
+            /* Skip directory header entry */
+            dir->current_entry = 1;
 
-	    /* Return success */
-	    return;
-	}
+            /* Return success */
+            return;
+        }
     }
 
     /* Assert that no subsequent readdir() finds an active entry */

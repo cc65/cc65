@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    main.c				     */
+/*                                  main.c                                   */
 /*                                                                           */
-/*		    Main program for the da65 disassembler		     */
+/*                  Main program for the da65 disassembler                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -64,7 +64,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code 			  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -124,20 +124,20 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
  */
 {
     unsigned long Val;
-    int 	  Converted;
+    int           Converted;
     char          BoundsCheck;
 
     /* Convert */
     if (*Number == '$') {
-	++Number;
-      	Converted = sscanf (Number, "%lx%c", &Val, &BoundsCheck);
+        ++Number;
+        Converted = sscanf (Number, "%lx%c", &Val, &BoundsCheck);
     } else {
-      	Converted = sscanf (Number, "%li%c", (long*)&Val, &BoundsCheck);
+        Converted = sscanf (Number, "%li%c", (long*)&Val, &BoundsCheck);
     }
 
     /* Check if we do really have a number */
     if (Converted != 1) {
-       	Error ("Invalid number given in argument: %s\n", Arg);
+        Error ("Invalid number given in argument: %s\n", Arg);
     }
 
     /* Return the result */
@@ -217,7 +217,7 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
-      		    	  const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DebugInfo = 1;
@@ -226,7 +226,7 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 
 
 static void OptFormFeeds (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Add form feeds to the output */
 {
     FormFeeds = 1;
@@ -235,7 +235,7 @@ static void OptFormFeeds (const char* Opt attribute ((unused)),
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -245,7 +245,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 static void OptHexOffs (const char* Opt attribute ((unused)),
-		        const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Handle the --hexoffs option */
 {
     UseHexOffs = 1;
@@ -327,7 +327,7 @@ static void OptTextColumn (const char* Opt, const char* Arg)
 
 
 static void OptVerbose (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -336,7 +336,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print the disassembler version */
 {
     fprintf (stderr, "da65 V%s\n", GetVersionAsString ());
@@ -364,7 +364,7 @@ static void OneOpcode (unsigned RemainingBytes)
         if (Comment) {
             UserComment (Comment);
         }
-	DefLabel (GetLabelName (PC));
+        DefLabel (GetLabelName (PC));
     }
 
     /* Check...
@@ -374,33 +374,33 @@ static void OneOpcode (unsigned RemainingBytes)
      * If any of these conditions is false, switch to data mode.
      */
     if (Style == atDefault) {
-	if (D->Size > RemainingBytes) {
-	    Style = atIllegal;
-	    MarkAddr (PC, Style);
-       	} else if (D->Flags & flIllegal) {
-	    Style = atIllegal;
-	    MarkAddr (PC, Style);
-	} else {
-	    unsigned I;
-	    for (I = 1; I < D->Size; ++I) {
-	     	if (HaveLabel (PC+I) || HaveSegmentChange (PC+I)) {
-	    	    Style = atIllegal;
-     	     	    MarkAddr (PC, Style);
-	     	    break;
-	     	}
-	    }
-	}
+        if (D->Size > RemainingBytes) {
+            Style = atIllegal;
+            MarkAddr (PC, Style);
+        } else if (D->Flags & flIllegal) {
+            Style = atIllegal;
+            MarkAddr (PC, Style);
+        } else {
+            unsigned I;
+            for (I = 1; I < D->Size; ++I) {
+                if (HaveLabel (PC+I) || HaveSegmentChange (PC+I)) {
+                    Style = atIllegal;
+                    MarkAddr (PC, Style);
+                    break;
+                }
+            }
+        }
     }
 
     /* Disassemble the line */
     switch (Style) {
 
-	case atDefault:
-	    D->Handler (D);
-	    PC += D->Size;
-	    break;
+        case atDefault:
+            D->Handler (D);
+            PC += D->Size;
+            break;
 
-	case atCode:
+        case atCode:
             /* Beware: If we don't have enough bytes left to disassemble the
              * following insn, fall through to byte mode.
              */
@@ -417,42 +417,42 @@ static void OneOpcode (unsigned RemainingBytes)
             }
             /* FALLTHROUGH */
 
-	case atByteTab:
-	    ByteTable ();
-	    break;
+        case atByteTab:
+            ByteTable ();
+            break;
 
         case atDByteTab:
             DByteTable ();
             break;
 
-	case atWordTab:
-	    WordTable ();
-	    break;
+        case atWordTab:
+            WordTable ();
+            break;
 
-	case atDWordTab:
-	    DWordTable ();
-	    break;
+        case atDWordTab:
+            DWordTable ();
+            break;
 
-	case atAddrTab:
-	    AddrTable ();
-	    break;
+        case atAddrTab:
+            AddrTable ();
+            break;
 
-	case atRtsTab:
-	    RtsTable ();
-	    break;
+        case atRtsTab:
+            RtsTable ();
+            break;
 
-	case atTextTab:
-	    TextTable ();
-	    break;
+        case atTextTab:
+            TextTable ();
+            break;
 
         case atSkip:
             ++PC;
             break;
 
-	default:
-	    DataByteLine (1);
-	    ++PC;
-	    break;
+        default:
+            DataByteLine (1);
+            ++PC;
+            break;
 
     }
 }
@@ -466,7 +466,7 @@ static void OnePass (void)
 
     /* Disassemble until nothing left */
     while ((Count = GetRemainingBytes()) > 0) {
-      	OneOpcode (Count);
+        OneOpcode (Count);
     }
 }
 
@@ -501,19 +501,19 @@ int main (int argc, char* argv [])
         { "--bytes-per-line",   1,      OptBytesPerLine         },
         { "--comment-column",   1,      OptCommentColumn        },
         { "--comments",         1,      OptComments             },
-        { "--cpu",     	       	1,	OptCPU 	     		},
-       	{ "--debug-info",      	0,     	OptDebugInfo            },
-    	{ "--formfeeds",     	0,	OptFormFeeds 		},
-      	{ "--help",    	     	0,	OptHelp	     		},
-       	{ "--hexoffs", 	     	0,     	OptHexOffs              },
-       	{ "--info",    	       	1,     	OptInfo                 },
+        { "--cpu",              1,      OptCPU                  },
+        { "--debug-info",       0,      OptDebugInfo            },
+        { "--formfeeds",        0,      OptFormFeeds            },
+        { "--help",             0,      OptHelp                 },
+        { "--hexoffs",          0,      OptHexOffs              },
+        { "--info",             1,      OptInfo                 },
         { "--label-break",      1,      OptLabelBreak           },
         { "--mnemonic-column",  1,      OptMnemonicColumn       },
-      	{ "--pagelength",      	1,	OptPageLength		},
-    	{ "--start-addr", 	1,	OptStartAddr		},
+        { "--pagelength",       1,      OptPageLength           },
+        { "--start-addr",       1,      OptStartAddr            },
         { "--text-column",      1,      OptTextColumn           },
-      	{ "--verbose", 	       	0,	OptVerbose		},
-      	{ "--version", 	       	0,	OptVersion		},
+        { "--verbose",          0,      OptVerbose              },
+        { "--version",          0,      OptVersion              },
     };
 
     unsigned I;
@@ -526,63 +526,63 @@ int main (int argc, char* argv [])
     I = 1;
     while (I < ArgCount) {
 
-       	/* Get the argument */
-       	const char* Arg = ArgVec[I];
+        /* Get the argument */
+        const char* Arg = ArgVec[I];
 
-       	/* Check for an option */
-       	if (Arg [0] == '-') {
-       	    switch (Arg [1]) {
+        /* Check for an option */
+        if (Arg [0] == '-') {
+            switch (Arg [1]) {
 
-		case '-':
-		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
-		case 'g':
-		    OptDebugInfo (Arg, 0);
-		    break;
+                case 'g':
+                    OptDebugInfo (Arg, 0);
+                    break;
 
-		case 'h':
-		    OptHelp (Arg, 0);
-		    break;
+                case 'h':
+                    OptHelp (Arg, 0);
+                    break;
 
-       	        case 'i':
-       		    OptInfo (Arg, GetArg (&I, 2));
-       		    break;
+                case 'i':
+                    OptInfo (Arg, GetArg (&I, 2));
+                    break;
 
-       	        case 'o':
-       		    OutFile = GetArg (&I, 2);
-       		    break;
+                case 'o':
+                    OutFile = GetArg (&I, 2);
+                    break;
 
-       	       	case 'v':
-		    OptVerbose (Arg, 0);
-       	       	    break;
+                case 'v':
+                    OptVerbose (Arg, 0);
+                    break;
 
-		case 'S':
-		    OptStartAddr (Arg, GetArg (&I, 2));
-		    break;
+                case 'S':
+                    OptStartAddr (Arg, GetArg (&I, 2));
+                    break;
 
-       	        case 'V':
-    	    	    OptVersion (Arg, 0);
-       		    break;
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
 
-       	       	default:
-       	       	    UnknownOption (Arg);
-		    break;
+                default:
+                    UnknownOption (Arg);
+                    break;
 
-     	    }
-       	} else {
-    	    /* Filename. Check if we already had one */
-    	    if (InFile) {
-    	       	fprintf (stderr, "%s: Don't know what to do with `%s'\n",
-	     		 ProgName, Arg);
-	     	exit (EXIT_FAILURE);
-    	    } else {
-	     	InFile = Arg;
-	    }
-     	}
+            }
+        } else {
+            /* Filename. Check if we already had one */
+            if (InFile) {
+                fprintf (stderr, "%s: Don't know what to do with `%s'\n",
+                         ProgName, Arg);
+                exit (EXIT_FAILURE);
+            } else {
+                InFile = Arg;
+            }
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Try to read the info file */
@@ -590,7 +590,7 @@ int main (int argc, char* argv [])
 
     /* Must have an input file */
     if (InFile == 0) {
-     	AbEnd ("No input file");
+        AbEnd ("No input file");
     }
 
     /* Check the formatting options for reasonable values. Note: We will not

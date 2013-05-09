@@ -3,22 +3,22 @@
 ;
 ; 21.12.99
 
-; void BitmapClip	(char skipl, char skipr, int skipy, struct iconpic *myGfx);
+; void BitmapClip       (char skipl, char skipr, int skipy, struct iconpic *myGfx);
 
-	    .import popa, popax
-	    .import BitmapRegs
-	    .export _BitmapClip
+            .import popa, popax
+            .import BitmapRegs
+            .export _BitmapClip
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _BitmapClip:
-	jsr BitmapRegs
-	jsr popax
-	sta r12L
-	stx r12H
-	jsr popa
-	sta r11H
-	jsr popa
-	sta r11L
-	jmp BitmapClip
+        jsr BitmapRegs
+        jsr popax
+        sta r12L
+        stx r12H
+        jsr popa
+        sta r11H
+        jsr popa
+        sta r11L
+        jmp BitmapClip

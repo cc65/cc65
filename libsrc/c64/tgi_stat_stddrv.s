@@ -6,8 +6,8 @@
 ; const void tgi_static_stddrv[];
 ;
 
-        .export	_tgi_static_stddrv
-        .import	_c64_hi_tgi
+        .export _tgi_static_stddrv
+        .import _c64_hi_tgi
 
 .rodata
 

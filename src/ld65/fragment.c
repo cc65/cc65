@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  fragment.c				     */
+/*                                fragment.c                                 */
 /*                                                                           */
-/*			  Code/data fragment routines			     */
+/*                        Code/data fragment routines                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	      	     	   	     Code  	      	  	  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -78,10 +78,10 @@ Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
 
     /* Insert the code fragment into the section */
     if (S->FragRoot == 0) {
-      	/* First fragment */
-      	S->FragRoot = F;
+        /* First fragment */
+        S->FragRoot = F;
     } else {
-      	S->FragLast->Next = F;
+        S->FragLast->Next = F;
     }
     S->FragLast = F;
 

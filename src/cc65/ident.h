@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    ident.h				     */
+/*                                  ident.h                                  */
 /*                                                                           */
-/*		   Identifier handling for the cc65 compiler		     */
+/*                 Identifier handling for the cc65 compiler                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,14 +39,14 @@
 
 
 /*****************************************************************************/
-/*	       			     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Maximum length of an identifier and the corresponding char array */
-#define MAX_IDENTLEN	64
-#define	IDENTSIZE       (MAX_IDENTLEN+1)
+#define MAX_IDENTLEN    64
+#define IDENTSIZE       (MAX_IDENTLEN+1)
 
 /* Variable that holds an identifer */
 typedef char ident [IDENTSIZE];
@@ -54,7 +54,7 @@ typedef char ident [IDENTSIZE];
 
 
 /*****************************************************************************/
-/*	       		  	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

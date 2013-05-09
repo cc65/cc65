@@ -4,22 +4,22 @@
 ; CC65 runtime: long pop
 ;
 
- 	.export		popeax
-	.import		incsp4
-	.importzp	sp, sreg
+        .export         popeax
+        .import         incsp4
+        .importzp       sp, sreg
 
 
-popeax:	ldy	#3
-	lda	(sp),y
-	sta	sreg+1
-	dey
-	lda	(sp),y
-	sta	sreg
-	dey
-	lda	(sp),y
-	tax
-	dey
-	lda	(sp),y
-	jmp	incsp4
+popeax: ldy     #3
+        lda     (sp),y
+        sta     sreg+1
+        dey
+        lda     (sp),y
+        sta     sreg
+        dey
+        lda     (sp),y
+        tax
+        dey
+        lda     (sp),y
+        jmp     incsp4
 
 

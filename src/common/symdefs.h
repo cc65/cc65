@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   symdefs.h   	       	       	       	     */
+/*                                 symdefs.h                                 */
 /*                                                                           */
-/*		 Symbol definitions for the bin65 binary utils		     */
+/*               Symbol definitions for the bin65 binary utils               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,15 +43,15 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Number of module constructor/destructor declarations for an export */
-#define SYM_CONDES_MASK	        0x0007U
+#define SYM_CONDES_MASK         0x0007U
 
-#define SYM_IS_CONDES(x)	(((x) & SYM_CONDES_MASK) != 0)
+#define SYM_IS_CONDES(x)        (((x) & SYM_CONDES_MASK) != 0)
 #define SYM_GET_CONDES_COUNT(x) ((x) & SYM_CONDES_MASK)
 #define SYM_INC_CONDES_COUNT(x) ((x)++)
 
@@ -63,12 +63,12 @@
 #define SYM_HAS_SIZE(x)         (((x) & SYM_MASK_SIZE) == SYM_SIZE)
 
 /* Symbol value type */
-#define SYM_CONST     	        0x0000U /* Mask bit for const values */
-#define SYM_EXPR      	        0x0010U /* Mask bit for expr values */
-#define SYM_MASK_VAL  	        0x0010U /* Value mask */
+#define SYM_CONST               0x0000U /* Mask bit for const values */
+#define SYM_EXPR                0x0010U /* Mask bit for expr values */
+#define SYM_MASK_VAL            0x0010U /* Value mask */
 
-#define SYM_IS_CONST(x)	        (((x) & SYM_MASK_VAL) == SYM_CONST)
-#define SYM_IS_EXPR(x) 	        (((x) & SYM_MASK_VAL) == SYM_EXPR)
+#define SYM_IS_CONST(x)         (((x) & SYM_MASK_VAL) == SYM_CONST)
+#define SYM_IS_EXPR(x)          (((x) & SYM_MASK_VAL) == SYM_EXPR)
 
 /* Symbol usage */
 #define SYM_EQUATE              0x0000U /* Mask bit for an equate */

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   exports.h				     */
+/*                                 exports.h                                 */
 /*                                                                           */
-/*	     	      Exports handing for the ld65 linker		     */
+/*                    Exports handing for the ld65 linker                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -54,7 +54,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -62,12 +62,12 @@
 /* Import symbol structure */
 typedef struct Import Import;
 struct Import {
-    Import*  		Next;		/* Single linked list */
-    ObjData* 		Obj;		/* Object file that imports the name */
+    Import*             Next;           /* Single linked list */
+    ObjData*            Obj;            /* Object file that imports the name */
     Collection          DefLines;       /* Line infos of definition */
     Collection          RefLines;       /* Line infos of reference */
-    struct Export*	Exp;		/* Matching export for this import */
-    unsigned            Name;		/* Name if not in table */
+    struct Export*      Exp;            /* Matching export for this import */
+    unsigned            Name;           /* Name if not in table */
     unsigned short      Flags;          /* Generic flags */
     unsigned short      AddrSize;       /* Address size of import */
 };
@@ -77,20 +77,20 @@ struct Import {
 /* Export symbol structure */
 typedef struct Export Export;
 struct Export {
-    unsigned            Name;  	       	/* Name */
-    Export*    	       	Next;  		/* Hash table link */
-    unsigned 		Flags;		/* Generic flags */
-    ObjData* 		Obj;		/* Object file that exports the name */
-    unsigned 		ImpCount;	/* How many imports for this symbol? */
-    Import*  		ImpList;	/* List of imports for this symbol */
-    ExprNode*  		Expr;		/* Expression (0 if not def'd) */
+    unsigned            Name;           /* Name */
+    Export*             Next;           /* Hash table link */
+    unsigned            Flags;          /* Generic flags */
+    ObjData*            Obj;            /* Object file that exports the name */
+    unsigned            ImpCount;       /* How many imports for this symbol? */
+    Import*             ImpList;        /* List of imports for this symbol */
+    ExprNode*           Expr;           /* Expression (0 if not def'd) */
     unsigned            Size;           /* Size of the symbol if any */
     Collection          DefLines;       /* Line infos of definition */
     Collection          RefLines;       /* Line infos of reference */
     unsigned            DbgSymId;       /* Id of debug symbol for this export */
-    unsigned short      Type;		/* Type of export */
+    unsigned short      Type;           /* Type of export */
     unsigned short      AddrSize;       /* Address size of export */
-    unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
+    unsigned char       ConDes[CD_TYPE_COUNT];  /* Constructor/destructor decls */
 };
 
 
@@ -106,7 +106,7 @@ typedef int (*ExpCheckFunc) (unsigned Name, void* Data);
 
 
 /*****************************************************************************/
-/*     	      	    		     Code			       	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

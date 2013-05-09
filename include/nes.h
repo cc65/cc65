@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     nes.h			       	     */
+/*                                   nes.h                                   */
 /*                                                                           */
-/*		        NES system specific definitions			     */
+/*                      NES system specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

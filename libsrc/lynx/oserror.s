@@ -5,10 +5,10 @@
 ; /* Map a system specific error into a system independent code */
 ;
 
-	.include	"errno.inc"
+        .include        "errno.inc"
 
 .code
 
 __osmaperrno:
-	rts
+        rts
 

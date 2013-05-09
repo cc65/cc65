@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.h                                 */
+/*                                 scanner.h                                 */
 /*                                                                           */
-/*			Source file line info structure                      */
+/*                      Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*  			       Token definitions			     */
+/*                             Token definitions                             */
 /*****************************************************************************/
 
 
@@ -81,7 +81,7 @@ typedef enum token_t {
 
     /* Tokens denoting types */
     TOK_FIRST_TYPE,
-    TOK_ENUM	 	= TOK_FIRST_TYPE,
+    TOK_ENUM            = TOK_FIRST_TYPE,
     TOK_CHAR,
     TOK_INT,
     TOK_DOUBLE,
@@ -135,7 +135,7 @@ typedef enum token_t {
     TOK_MINUS,
     TOK_MUL_ASSIGN,
     TOK_STAR,
-    TOK_MUL = TOK_STAR,		/* Alias */
+    TOK_MUL = TOK_STAR,         /* Alias */
     TOK_DIV_ASSIGN,
     TOK_DIV,
     TOK_BOOL_AND,
@@ -187,7 +187,7 @@ typedef enum token_t {
 
 
 /*****************************************************************************/
-/*				     Data		   		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -198,22 +198,22 @@ struct Literal;
 /* Token stuff */
 typedef struct Token Token;
 struct Token {
-    token_t    	    Tok;        /* The token itself */
-    long    	    IVal;  	/* The integer attribute */
-    Double          FVal;  	/* The float attribute */
+    token_t         Tok;        /* The token itself */
+    long            IVal;       /* The integer attribute */
+    Double          FVal;       /* The float attribute */
     struct Literal* SVal;       /* String literal is any */
-    ident   	    Ident; 	/* Identifier if IDENT */
-    LineInfo*       LI;    	/* Source line where the token comes from */
-    Type*      	    Type;  	/* Type if integer or float constant */
+    ident           Ident;      /* Identifier if IDENT */
+    LineInfo*       LI;         /* Source line where the token comes from */
+    Type*           Type;       /* Type if integer or float constant */
 };
 
-extern Token CurTok;		/* The current token */
-extern Token NextTok;		/* The next token */
+extern Token CurTok;            /* The current token */
+extern Token NextTok;           /* The next token */
 
 
 
 /*****************************************************************************/
-/*	   			     Code     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

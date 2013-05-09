@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  symentry.h				     */
+/*                                symentry.h                                 */
 /*                                                                           */
-/*	    Symbol table entry forward for the ca65 macroassembler	     */
+/*          Symbol table entry forward for the ca65 macroassembler           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -51,7 +51,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -61,19 +61,19 @@ struct HLLDbgSym;
 
 /* Bits for the Flags value in SymEntry */
 #define SF_NONE         0x0000          /* Empty flag set */
-#define SF_USER	 	0x0001	    	/* User bit */
-#define SF_UNUSED       0x0002	    	/* Unused entry */
-#define SF_EXPORT      	0x0004	    	/* Export this symbol */
-#define SF_IMPORT   	0x0008	    	/* Import this symbol */
-#define SF_GLOBAL	0x0010	    	/* Global symbol */
+#define SF_USER         0x0001          /* User bit */
+#define SF_UNUSED       0x0002          /* Unused entry */
+#define SF_EXPORT       0x0004          /* Export this symbol */
+#define SF_IMPORT       0x0008          /* Import this symbol */
+#define SF_GLOBAL       0x0010          /* Global symbol */
 #define SF_LOCAL        0x0020          /* Cheap local symbol */
 #define SF_LABEL        0x0040          /* Used as a label */
 #define SF_VAR          0x0080          /* Variable symbol */
 #define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
 #define SF_FIXED        0x0200          /* May not be trampoline */
-#define SF_MULTDEF     	0x1000		/* Multiply defined symbol */
-#define	SF_DEFINED  	0x2000 	       	/* Defined */
-#define SF_REFERENCED	0x4000 	       	/* Referenced */
+#define SF_MULTDEF      0x1000          /* Multiply defined symbol */
+#define SF_DEFINED      0x2000          /* Defined */
+#define SF_REFERENCED   0x4000          /* Referenced */
 
 /* Combined values */
 #define SF_REFIMP       (SF_REFERENCED|SF_IMPORT)       /* A ref'd import */
@@ -81,12 +81,12 @@ struct HLLDbgSym;
 /* Structure of a symbol table entry */
 typedef struct SymEntry SymEntry;
 struct SymEntry {
-    SymEntry*  	      	Left;           /* Lexically smaller entry */
-    SymEntry*  	    	Right; 	        /* Lexically larger entry */
-    SymEntry*  	    	List;	        /* List of all entries */
-    SymEntry*  	       	Locals;         /* Root of subtree for local symbols */
+    SymEntry*           Left;           /* Lexically smaller entry */
+    SymEntry*           Right;          /* Lexically larger entry */
+    SymEntry*           List;           /* List of all entries */
+    SymEntry*           Locals;         /* Root of subtree for local symbols */
     union {
-        struct SymTable*    Tab;       	/* Table this symbol is in */
+        struct SymTable*    Tab;        /* Table this symbol is in */
         struct SymEntry*    Entry;      /* Parent for cheap locals */
     } Sym;
     Collection          DefLines;       /* Line infos for definition */
@@ -98,17 +98,17 @@ struct SymEntry {
                                          * addressing
                                          */
     struct HLLDbgSym*   HLLSym;         /* Symbol from high level language */
-    unsigned            Flags;	        /* Symbol flags */
+    unsigned            Flags;          /* Symbol flags */
     unsigned            DebugSymId;     /* Debug symbol id */
     unsigned            ImportId;       /* Id of import if this is one */
     unsigned            ExportId;       /* Id of export if this is one */
-    struct ExprNode*    Expr;      	/* Symbol expression */
+    struct ExprNode*    Expr;           /* Symbol expression */
     Collection          ExprRefs;       /* Expressions using this symbol */
     unsigned char       ExportSize;     /* Export address size */
     unsigned char       AddrSize;       /* Address size of label */
-    unsigned char      	ConDesPrio[CD_TYPE_COUNT]; 	/* ConDes priorities... */
-		    			/* ...actually value+1 (used as flag) */
-    unsigned            Name;      	/* Name index in global string pool */
+    unsigned char       ConDesPrio[CD_TYPE_COUNT];      /* ConDes priorities... */
+                                        /* ...actually value+1 (used as flag) */
+    unsigned            Name;           /* Name index in global string pool */
 };
 
 /* List of all symbol table entries */
@@ -120,7 +120,7 @@ extern SymEntry* SymLast;
 
 
 /*****************************************************************************/
-/*     	       	   	    	     Code	  		   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

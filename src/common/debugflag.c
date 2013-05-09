@@ -44,7 +44,7 @@
 
 
 
-unsigned char Debug		= 0;	/* Debug mode */
+unsigned char Debug             = 0;    /* Debug mode */
 
 
 

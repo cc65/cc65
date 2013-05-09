@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                  vic2.c                                   */
 /*                                                                           */
-/*		   VIC II plugin for the sim65 6502 simulator		     */
+/*                 VIC II plugin for the sim65 6502 simulator                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -136,7 +136,7 @@ static const struct ChipData CData[] = {
         /* -- Exported functions -- */
         VicInitChip,
         VicCreateInstance,
-	VicDestroyInstance,
+        VicDestroyInstance,
         VicWrite,
         VicWrite,
         VicRead,
@@ -151,7 +151,7 @@ static const struct ChipData CData[] = {
         /* -- Exported functions -- */
         VRamInitChip,
         VRamCreateInstance,
-	VRamDestroyInstance,
+        VRamDestroyInstance,
         VRamWrite,
         VRamWrite,
         VRamRead,
@@ -166,7 +166,7 @@ static const struct ChipData CData[] = {
         /* -- Exported functions -- */
         CRamInitChip,
         CRamCreateInstance,
-	CRamDestroyInstance,
+        CRamDestroyInstance,
         CRamWrite,
         CRamWrite,
         CRamRead,
@@ -176,8 +176,8 @@ static const struct ChipData CData[] = {
 
 /* Defines for the VIC chip */
 #define VIC_COLOR_COUNT         16
-#define VIC_BLACK	 	0
-#define VIC_WHITE	 	1
+#define VIC_BLACK               0
+#define VIC_WHITE               1
 
 /* The application color map. VIC II color values are taken from
  * http://www.pepto.de/projects/colorvic/ (Philip "Pepto" Timmermann)
@@ -774,7 +774,7 @@ static void VRamEventLoop (void)
         switch (Event.type) {
 
             case Expose:
-		/* Calculate the area to redraw, then update the screen */
+                /* Calculate the area to redraw, then update the screen */
                 X1 = Event.xexpose.x;
                 Y1 = Event.xexpose.y;
                 X2 = Event.xexpose.x + Event.xexpose.width - 1;

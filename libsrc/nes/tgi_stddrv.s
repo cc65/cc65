@@ -6,8 +6,8 @@
 ; const char tgi_stddrv[];
 ;
 
-        .export	_tgi_stddrv
+        .export _tgi_stddrv
 
 .rodata
 
-_tgi_stddrv:	.asciiz	"nes-64-56-2.tgi"
+_tgi_stddrv:    .asciiz "nes-64-56-2.tgi"

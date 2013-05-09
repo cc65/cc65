@@ -5,16 +5,16 @@
 
 ; char ReadBuff  (struct tr_se);
 
-	    .export _ReadBuff
-	    .import setoserror
-	    .import gettrse
+            .export _ReadBuff
+            .import setoserror
+            .import gettrse
 
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _ReadBuff:
-	jsr gettrse
-	sta r1L
-	stx r1H
-	jsr ReadBuff
-	jmp setoserror
+        jsr gettrse
+        sta r1L
+        stx r1H
+        jsr ReadBuff
+        jmp setoserror

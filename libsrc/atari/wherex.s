@@ -4,10 +4,10 @@
 ; unsigned char wherex (void);
 ;
 
-	.export	 _wherex
-	.include "atari.inc"
+        .export  _wherex
+        .include "atari.inc"
 
 _wherex:
-	lda	COLCRS
-	ldx	#0
-	rts
+        lda     COLCRS
+        ldx     #0
+        rts

@@ -17,7 +17,7 @@ int main (void)
 {
     char I;
     for (I = 0; I < 20; ++I) {
-      	printf ("%02d: %d\n", I, strncmp (S1, S2, I));
+        printf ("%02d: %d\n", I, strncmp (S1, S2, I));
     }
     return 0;
 }

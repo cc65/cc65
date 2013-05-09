@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   codegen.h				     */
+/*                                 codegen.h                                 */
 /*                                                                           */
-/*			      6502 code generator			     */
+/*                            6502 code generator                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*   			    	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -58,37 +58,37 @@
  * Note^2: The actual type including the sign flag is in the lower bits, so
  * we can mask the information and use them as a table index.
  */
-#define CF_NONE		0x0000	/* No special flags */
+#define CF_NONE         0x0000  /* No special flags */
 
 /* Values for the actual type */
-#define CF_CHAR	       	0x0003  /* Operation on characters */
-#define CF_INT		0x0001	/* Operation on ints */
-#define CF_PTR		CF_INT	/* Alias for readability */
-#define CF_LONG		0x0000	/* Operation on longs */
+#define CF_CHAR         0x0003  /* Operation on characters */
+#define CF_INT          0x0001  /* Operation on ints */
+#define CF_PTR          CF_INT  /* Alias for readability */
+#define CF_LONG         0x0000  /* Operation on longs */
 #define CF_FLOAT        0x0004  /* Operation on a float */
 
 /* Signedness */
-#define CF_UNSIGNED    	0x0008  /* Value is unsigned */
+#define CF_UNSIGNED     0x0008  /* Value is unsigned */
 
 /* Masks for retrieving type information */
 #define CF_TYPEMASK     0x0007  /* Type information */
 #define CF_STYPEMASK    0x000F  /* Includes signedness */
 
-#define CF_NOKEEP	0x0010  /* Value may get destroyed when storing */
-#define CF_CONST	0x0020 	/* Constant value available */
-#define CF_CONSTADDR	0x0040	/* Constant address value available */
-#define CF_TEST	       	0x0080 	/* Test value */
-#define CF_FIXARGC     	0x0100 	/* Function has fixed arg count */
-#define CF_FORCECHAR	0x0200	/* Handle chars as chars, not ints */
-#define CF_REG		0x0800	/* Value is in primary register */
+#define CF_NOKEEP       0x0010  /* Value may get destroyed when storing */
+#define CF_CONST        0x0020  /* Constant value available */
+#define CF_CONSTADDR    0x0040  /* Constant address value available */
+#define CF_TEST         0x0080  /* Test value */
+#define CF_FIXARGC      0x0100  /* Function has fixed arg count */
+#define CF_FORCECHAR    0x0200  /* Handle chars as chars, not ints */
+#define CF_REG          0x0800  /* Value is in primary register */
 
 /* Type of static address */
-#define CF_ADDRMASK    	0xF000 	/* Type of address */
-#define CF_STATIC	0x0000	/* Static local */
-#define CF_EXTERNAL	0x1000	/* Static external */
-#define CF_ABSOLUTE	0x2000	/* Numeric absolute address */
-#define CF_LOCAL       	0x4000 	/* Auto variable */
-#define CF_REGVAR	0x8000	/* Register variable */
+#define CF_ADDRMASK     0xF000  /* Type of address */
+#define CF_STATIC       0x0000  /* Static local */
+#define CF_EXTERNAL     0x1000  /* Static external */
+#define CF_ABSOLUTE     0x2000  /* Numeric absolute address */
+#define CF_LOCAL        0x4000  /* Auto variable */
+#define CF_REGVAR       0x8000  /* Register variable */
 
 
 
@@ -98,7 +98,7 @@ struct StrBuf;
 
 
 /*****************************************************************************/
-/*			   Files, pre- and postamble                         */
+/*                         Files, pre- and postamble                         */
 /*****************************************************************************/
 
 
@@ -112,7 +112,7 @@ void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime);
 
 
 /*****************************************************************************/
-/*  				Segment support				     */
+/*                              Segment support                              */
 /*****************************************************************************/
 
 
@@ -132,7 +132,7 @@ void g_segname (segment_t Seg);
 
 
 /*****************************************************************************/
-/*   			Functions handling local labels			     */
+/*                      Functions handling local labels                      */
 /*****************************************************************************/
 
 
@@ -149,7 +149,7 @@ void g_aliasdatalabel (unsigned label, unsigned baselabel, long offs);
 
 
 /*****************************************************************************/
-/*   		       Functions handling global labels			     */
+/*                     Functions handling global labels                      */
 /*****************************************************************************/
 
 
@@ -172,7 +172,7 @@ void g_importmainargs (void);
 
 
 /*****************************************************************************/
-/*			       	     stack				     */
+/*                                   stack                                   */
 /*****************************************************************************/
 
 
@@ -189,7 +189,7 @@ unsigned sizeofarg (unsigned flags);
 
 
 /*****************************************************************************/
-/*		      type conversion and similiar stuff		     */
+/*                    type conversion and similiar stuff                     */
 /*****************************************************************************/
 
 
@@ -227,7 +227,7 @@ void g_scale (unsigned flags, long val);
 
 
 /*****************************************************************************/
-/*     		     	    Function entry and exit			     */
+/*                          Function entry and exit                          */
 /*****************************************************************************/
 
 
@@ -241,7 +241,7 @@ void g_leave (void);
 
 
 /*****************************************************************************/
-/*			      Register variables			     */
+/*                            Register variables                             */
 /*****************************************************************************/
 
 
@@ -258,7 +258,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 
 
 /*****************************************************************************/
-/*			     Fetching memory cells			     */
+/*                           Fetching memory cells                           */
 /*****************************************************************************/
 
 
@@ -288,7 +288,7 @@ void g_leavariadic (int Offs);
 
 
 /*****************************************************************************/
-/*			       Store into memory	       	    	     */
+/*                             Store into memory                             */
 /*****************************************************************************/
 
 
@@ -307,7 +307,7 @@ void g_putind (unsigned flags, unsigned offs);
 
 
 /*****************************************************************************/
-/*	  	Adds and subs of variables fix a fixed address		     */
+/*              Adds and subs of variables fix a fixed address               */
 /*****************************************************************************/
 
 
@@ -321,13 +321,13 @@ void g_addstatic (unsigned flags, unsigned long label, long offs);
 
 
 /*****************************************************************************/
-/*			     Special op= functions	       	    	     */
+/*                           Special op= functions                           */
 /*****************************************************************************/
 
 
 
 void g_addeqstatic (unsigned flags, unsigned long label, long offs,
-       		    unsigned long val);
+                    unsigned long val);
 /* Emit += for a static variable */
 
 void g_addeqlocal (unsigned flags, int offs, unsigned long val);
@@ -337,7 +337,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val);
 /* Emit += for the location with address in ax */
 
 void g_subeqstatic (unsigned flags, unsigned long label, long offs,
-       		    unsigned long val);
+                    unsigned long val);
 /* Emit -= for a static variable */
 
 void g_subeqlocal (unsigned flags, int offs, unsigned long val);
@@ -349,7 +349,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val);
 
 
 /*****************************************************************************/
-/*     		   Add a variable address to the value in ax  		     */
+/*                 Add a variable address to the value in ax                 */
 /*****************************************************************************/
 
 
@@ -363,7 +363,7 @@ void g_addaddr_static (unsigned flags, unsigned long label, long offs);
 
 
 /*****************************************************************************/
-/*				     		  			     */
+/*                                                                           */
 /*****************************************************************************/
 
 
@@ -464,7 +464,7 @@ void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
 
 
 /*****************************************************************************/
-/*     			       Switch statement                              */
+/*                             Switch statement                              */
 /*****************************************************************************/
 
 
@@ -475,7 +475,7 @@ void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth);
 
 
 /*****************************************************************************/
-/*			 User supplied assembler code			     */
+/*                       User supplied assembler code                        */
 /*****************************************************************************/
 
 

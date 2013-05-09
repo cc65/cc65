@@ -48,15 +48,15 @@ void* __fastcall__ realloc (void* block, register size_t size)
 
     /* Check the block parameter */
     if (!block) {
-     	/* Block is NULL, same as malloc */
-     	return malloc (size);
+        /* Block is NULL, same as malloc */
+        return malloc (size);
     }
 
     /* Check the size parameter */
     if (size == 0) {
-     	/* Block is not NULL, but size is: free the block */
-     	free (block);
-    	return 0;
+        /* Block is not NULL, but size is: free the block */
+        free (block);
+        return 0;
     }
 
     /* Make the internal used size from the given size */
@@ -75,15 +75,15 @@ void* __fastcall__ realloc (void* block, register size_t size)
 
     /* Is the block at the current heap top? */
     if (((unsigned) b) + oldsize == ((unsigned) _heapptr)) {
-    	/* Check if we've enough memory at the heap top */
-    	newhptr = ((unsigned) _heapptr) - oldsize + size;
-    	if (newhptr <= ((unsigned) _heapend)) {
-    	    /* Ok, there's space enough */
-       	    _heapptr = (unsigned*) newhptr;
+        /* Check if we've enough memory at the heap top */
+        newhptr = ((unsigned) _heapptr) - oldsize + size;
+        if (newhptr <= ((unsigned) _heapend)) {
+            /* Ok, there's space enough */
+            _heapptr = (unsigned*) newhptr;
             b->size = size;
             b->start = b;
-    	    return block;
-    	}
+            return block;
+        }
     }
 
     /* The given block was not located on top of the heap, or there's no
@@ -91,19 +91,19 @@ void* __fastcall__ realloc (void* block, register size_t size)
      */
     if (newblock = malloc (size)) {
 
-    	/* Adjust the old size to the user visible portion */
-    	oldsize -= HEAP_ADMIN_SPACE;
+        /* Adjust the old size to the user visible portion */
+        oldsize -= HEAP_ADMIN_SPACE;
 
-    	/* If the new block is larger than the old one, copy the old
-    	 * data only
-    	 */
-    	if (size > oldsize) {
-    	    size = oldsize;
-    	}
+        /* If the new block is larger than the old one, copy the old
+         * data only
+         */
+        if (size > oldsize) {
+            size = oldsize;
+        }
 
-    	/* Copy the block data */
-     	memcpy (newblock, block, size);
-     	free (block);
+        /* Copy the block data */
+        memcpy (newblock, block, size);
+        free (block);
     }
     return newblock;
 }

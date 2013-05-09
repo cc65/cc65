@@ -5,11 +5,11 @@
 
 ; char SetGEOSDisk (void);
 
-	    .export _SetGEOSDisk
-	    .import setoserror
+            .export _SetGEOSDisk
+            .import setoserror
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _SetGEOSDisk:
-	jsr SetGEOSDisk
-	jmp setoserror
+        jsr SetGEOSDisk
+        jmp setoserror

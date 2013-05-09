@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   _pokey.h			       	     */
+/*                                 _pokey.h                                  */
 /*                                                                           */
-/*		  Internal include file, do not use directly                 */
+/*                Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

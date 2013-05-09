@@ -1,34 +1,34 @@
 /*****************************************************************************/
-/*									     */
-/*				   objfile.c				     */
-/*									     */
-/*		   Object file handling for the ld65 linker		     */
-/*									     */
-/*									     */
-/*									     */
+/*                                                                           */
+/*                                 objfile.c                                 */
+/*                                                                           */
+/*                 Object file handling for the ld65 linker                  */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
 /* (C) 1998-2012, Ullrich von Bassewitz                                      */
 /*                Roemerstrasse 52                                           */
 /*                D-70794 Filderstadt                                        */
 /* EMail:         uz@cc65.org                                                */
-/*									     */
-/*									     */
-/* This software is provided 'as-is', without any expressed or implied	     */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.				     */
-/*									     */
+/* arising from the use of this software.                                    */
+/*                                                                           */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:			     */
-/*									     */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.					     */
+/*    appreciated but is not required.                                       */
 /* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software.			     */
-/* 3. This notice may not be removed or altered from any source		     */
-/*    distribution.   							     */
-/*		      							     */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
 /*****************************************************************************/
 
 
@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -67,7 +67,7 @@ static unsigned GetModule (const char* Name)
     /* Make a module name from the file name */
     const char* Module = FindName (Name);
     if (*Module == 0) {
-	Error ("Cannot make module name from `%s'", Name);
+        Error ("Cannot make module name from `%s'", Name);
     }
     return GetStringId (Module);
 }
@@ -77,18 +77,18 @@ static unsigned GetModule (const char* Name)
 static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 /* Read the header of the object file checking the signature */
 {
-    H->Version	  = Read16 (Obj);
+    H->Version    = Read16 (Obj);
     if (H->Version != OBJ_VERSION) {
-       	Error ("Object file `%s' has wrong version, expected %08X, got %08X",
+        Error ("Object file `%s' has wrong version, expected %08X, got %08X",
                Name, OBJ_VERSION, H->Version);
     }
-    H->Flags	    = Read16 (Obj);
+    H->Flags        = Read16 (Obj);
     H->OptionOffs   = Read32 (Obj);
     H->OptionSize   = Read32 (Obj);
     H->FileOffs     = Read32 (Obj);
     H->FileSize     = Read32 (Obj);
-    H->SegOffs	    = Read32 (Obj);
-    H->SegSize	    = Read32 (Obj);
+    H->SegOffs      = Read32 (Obj);
+    H->SegSize      = Read32 (Obj);
     H->ImportOffs   = Read32 (Obj);
     H->ImportSize   = Read32 (Obj);
     H->ExportOffs   = Read32 (Obj);
@@ -122,7 +122,7 @@ void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
     FileCount  = ReadVar (F);
     CollGrow (&O->Files, FileCount);
     for (I = 0; I < FileCount; ++I) {
-       	CollAppend (&O->Files, ReadFileInfo (F, O));
+        CollAppend (&O->Files, ReadFileInfo (F, O));
     }
 }
 
@@ -141,7 +141,7 @@ void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
     SectionCount = ReadVar (F);
     CollGrow (&O->Sections, SectionCount);
     for (I = 0; I < SectionCount; ++I) {
-       	CollAppend (&O->Sections, ReadSection (F, O));
+        CollAppend (&O->Sections, ReadSection (F, O));
     }
 }
 
@@ -160,7 +160,7 @@ void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
     ImportCount = ReadVar (F);
     CollGrow (&O->Imports, ImportCount);
     for (I = 0; I < ImportCount; ++I) {
-       	CollAppend (&O->Imports, ReadImport (F, O));
+        CollAppend (&O->Imports, ReadImport (F, O));
     }
 }
 
@@ -179,7 +179,7 @@ void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O)
     ExportCount = ReadVar (F);
     CollGrow (&O->Exports, ExportCount);
     for (I = 0; I < ExportCount; ++I) {
-       	CollAppend (&O->Exports, ReadExport (F, O));
+        CollAppend (&O->Exports, ReadExport (F, O));
     }
 }
 
@@ -198,14 +198,14 @@ void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
     DbgSymCount = ReadVar (F);
     CollGrow (&O->DbgSyms, DbgSymCount);
     for (I = 0; I < DbgSymCount; ++I) {
-    	CollAppend (&O->DbgSyms, ReadDbgSym (F, O, I));
+        CollAppend (&O->DbgSyms, ReadDbgSym (F, O, I));
     }
 
     /* Read the hll debug symbols */
     DbgSymCount = ReadVar (F);
     CollGrow (&O->HLLDbgSyms, DbgSymCount);
     for (I = 0; I < DbgSymCount; ++I) {
-       	CollAppend (&O->HLLDbgSyms, ReadHLLDbgSym (F, O, I));
+        CollAppend (&O->HLLDbgSyms, ReadHLLDbgSym (F, O, I));
     }
 }
 
@@ -224,7 +224,7 @@ void ObjReadLineInfos (FILE* F, unsigned long Pos, ObjData* O)
     LineInfoCount = ReadVar (F);
     CollGrow (&O->LineInfos, LineInfoCount);
     for (I = 0; I < LineInfoCount; ++I) {
-       	CollAppend (&O->LineInfos, ReadLineInfo (F, O));
+        CollAppend (&O->LineInfos, ReadLineInfo (F, O));
     }
 }
 

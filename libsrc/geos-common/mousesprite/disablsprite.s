@@ -5,11 +5,11 @@
 
 ; void DisablSprite (char spritenum);
 
-	    .export _DisablSprite
+            .export _DisablSprite
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _DisablSprite:
-	sta r3L
-	jmp DisablSprite
+        sta r3L
+        jmp DisablSprite

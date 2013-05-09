@@ -60,7 +60,7 @@ typedef struct {
     void*               map;            /* MAP routine */
     void*               use;            /* USE routine */
     void*               mapclean;       /* MAPCLEAN routine */
-    void*		copyfrom; 	/* COPYFROM routine */
+    void*               copyfrom;       /* COPYFROM routine */
     void*               copyto;         /* COPYTO routine */
 
 } em_drv_header;
@@ -68,7 +68,7 @@ typedef struct {
 
 
 /* EM kernel variables */
-extern em_drv_header*  	em_drv;       	/* Pointer to driver */
+extern em_drv_header*   em_drv;         /* Pointer to driver */
 
 
 

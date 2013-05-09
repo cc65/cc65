@@ -10,12 +10,12 @@
 
 .proc   SETTIM
 
-	sei
-	sta  	time+0
-   	stx  	time+1
-	sty	time+2
-	cli
-	rts
+        sei
+        sta     time+0
+        stx     time+1
+        sty     time+2
+        cli
+        rts
 
 .endproc
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*  				    error.c				     */
+/*                                  error.c                                  */
 /*                                                                           */
-/*  		  Error handling for the ca65 macroassembler		     */
+/*                Error handling for the ca65 macroassembler                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -49,17 +49,17 @@
 
 
 /*****************************************************************************/
-/*	  			     Data		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Warning level */
-unsigned WarnLevel	= 1;
+unsigned WarnLevel      = 1;
 
 /* Statistics */
-unsigned ErrorCount	= 0;
-unsigned WarningCount	= 0;
+unsigned ErrorCount     = 0;
+unsigned WarningCount   = 0;
 
 /* Maximum number of additional notifications */
 #define MAX_NOTES       8
@@ -184,7 +184,7 @@ static void AddNotifications (const Collection* LineInfos)
 
 
 /*****************************************************************************/
-/*     	      	      	       	   Warnings 				     */
+/*                                 Warnings                                  */
 /*****************************************************************************/
 
 
@@ -262,7 +262,7 @@ void LIWarning (const Collection* LineInfos, unsigned Level, const char* Format,
 
 
 /*****************************************************************************/
-/*	       	     		    Errors				     */
+/*                                  Errors                                   */
 /*****************************************************************************/
 
 
@@ -357,7 +357,7 @@ void ErrorSkip (const char* Format, ...)
 
 
 /*****************************************************************************/
-/* 	       	      	    	     Code 		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

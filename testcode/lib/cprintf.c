@@ -25,14 +25,14 @@
 
 int main(void)
 {
-	clrscr();
-	cprintf("12345\n");
-	cprintf("67890\n");
-	gotoxy(0,4);
-	cprintf("12345\r");
-	cprintf("67890\r");
-	printf("\n\n");
-	printf("hit return to exit....\n");
-	fgetc(stdin);
-	return(0);
+        clrscr();
+        cprintf("12345\n");
+        cprintf("67890\n");
+        gotoxy(0,4);
+        cprintf("12345\r");
+        cprintf("67890\r");
+        printf("\n\n");
+        printf("hit return to exit....\n");
+        fgetc(stdin);
+        return(0);
 }

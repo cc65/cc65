@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			    	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -53,11 +53,11 @@ typedef enum {
     CPU_65SC02,
     CPU_65C02,
     CPU_65816,
-    CPU_SUNPLUS,	        /* Not in the freeware version - sorry */
+    CPU_SUNPLUS,                /* Not in the freeware version - sorry */
     CPU_SWEET16,
     CPU_HUC6280,                /* Used in PC engine */
     CPU_M740,                   /* Mitsubishi 740 series MCUs */
-    CPU_COUNT  	    	        /* Number of different CPUs */
+    CPU_COUNT                   /* Number of different CPUs */
 } cpu_t;
 
 /* CPU instruction sets */
@@ -86,7 +86,7 @@ extern const unsigned CPUIsets[CPU_COUNT];
 
 
 /*****************************************************************************/
-/*     	       	     	   	     Code      			    	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

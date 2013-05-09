@@ -12,9 +12,9 @@ unsigned __fastcall__ sleep (unsigned wait)
     char typ;
 
     if ( (get_tv()) & TV_NTSC ) {
-	typ = 60;
+        typ = 60;
     } else {
-	typ = 50;
+        typ = 50;
     }
 
     Sleep(wait*typ);

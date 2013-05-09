@@ -6,11 +6,11 @@
 ; Stefan Haubenthal, 2004-10-05
 ;
 
-        .include	"zeropage.inc"
+        .include        "zeropage.inc"
 
-        .include	"joy-kernel.inc"
-        .include	"joy-error.inc"
-        .include	"nes.inc"
+        .include        "joy-kernel.inc"
+        .include        "joy-error.inc"
+        .include        "nes.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -20,32 +20,32 @@
 
 ; Driver signature
 
-        .byte	$6A, $6F, $79		; "joy"
-        .byte	JOY_API_VERSION		; Driver API version number
+        .byte   $6A, $6F, $79           ; "joy"
+        .byte   JOY_API_VERSION         ; Driver API version number
 
 ; Button state masks (8 values)
 
-        .byte	$10			; JOY_UP
-        .byte	$20			; JOY_DOWN
-        .byte	$40			; JOY_LEFT
-        .byte	$80			; JOY_RIGHT
-        .byte	$01			; JOY_FIRE	(A)
-        .byte	$02			; JOY_FIRE2	(B)
-        .byte	$04			; 		(Select)
-        .byte	$08			; 		(Start)
+        .byte   $10                     ; JOY_UP
+        .byte   $20                     ; JOY_DOWN
+        .byte   $40                     ; JOY_LEFT
+        .byte   $80                     ; JOY_RIGHT
+        .byte   $01                     ; JOY_FIRE      (A)
+        .byte   $02                     ; JOY_FIRE2     (B)
+        .byte   $04                     ;               (Select)
+        .byte   $08                     ;               (Start)
 
 ; Jump table.
 
-        .addr	INSTALL
-        .addr	UNINSTALL
-        .addr	COUNT
-        .addr	READJOY
-        .addr	0			; IRQ entry unused
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   COUNT
+        .addr   READJOY
+        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-JOY_COUNT       = 2		; Number of joysticks we support
+JOY_COUNT       = 2             ; Number of joysticks we support
 
 
 .code
@@ -58,9 +58,9 @@ JOY_COUNT       = 2		; Number of joysticks we support
 ;
 
 INSTALL:
-        lda	#JOY_ERR_OK
-        ldx	#0
-;       rts			; Run into UNINSTALL instead
+        lda     #JOY_ERR_OK
+        ldx     #0
+;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -76,8 +76,8 @@ UNINSTALL:
 ;
 
 COUNT:
-        lda	#JOY_COUNT
-        ldx	#0
+        lda     #JOY_COUNT
+        ldx     #0
         rts
 
 ; ------------------------------------------------------------------------
@@ -85,23 +85,23 @@ COUNT:
 ;
 
 READJOY:
-        and	#$01		; Fix joystick number
-        tay			; Joystick number (0,1) into Y
+        and     #$01            ; Fix joystick number
+        tay                     ; Joystick number (0,1) into Y
 
-        lda	#1
-        sta	APU_PAD1,y
-        lda	#0
-        sta	APU_PAD1,y
+        lda     #1
+        sta     APU_PAD1,y
+        lda     #0
+        sta     APU_PAD1,y
 
 ; Read joystick
 
-        ldx	#8
-@Loop:  lda	APU_PAD1,y
-        ror	a
-        ror	tmp1
+        ldx     #8
+@Loop:  lda     APU_PAD1,y
+        ror     a
+        ror     tmp1
         dex
-        bne	@Loop
+        bne     @Loop
 
-        lda	tmp1
-;       ldx	#$00		; X implicitly fixed
+        lda     tmp1
+;       ldx     #$00            ; X implicitly fixed
         rts

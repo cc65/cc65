@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   pragma.c				     */
+/*                                 pragma.c                                  */
 /*                                                                           */
-/*		    Pragma handling for the cc65 C compiler		     */
+/*                  Pragma handling for the cc65 C compiler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -55,7 +55,7 @@
 
 
 /*****************************************************************************/
-/*		      		     data				     */
+/*                                   data                                    */
 /*****************************************************************************/
 
 
@@ -93,34 +93,34 @@ typedef enum {
 
 /* Pragma table */
 static const struct Pragma {
-    const char*	Key;		/* Keyword */
-    pragma_t   	Tok;		/* Token */
+    const char* Key;            /* Keyword */
+    pragma_t    Tok;            /* Token */
 } Pragmas[PRAGMA_COUNT] = {
     { "align",                  PRAGMA_ALIGN            },
     { "bss-name",               PRAGMA_BSS_NAME         },
     { "bssseg",                 PRAGMA_BSSSEG           },      /* obsolete */
     { "charmap",                PRAGMA_CHARMAP          },
     { "check-stack",            PRAGMA_CHECK_STACK      },
-    { "checkstack",             PRAGMA_CHECKSTACK  	},      /* obsolete */
+    { "checkstack",             PRAGMA_CHECKSTACK       },      /* obsolete */
     { "code-name",              PRAGMA_CODE_NAME        },
-    { "codeseg",                PRAGMA_CODESEG     	},      /* obsolete */
+    { "codeseg",                PRAGMA_CODESEG          },      /* obsolete */
     { "codesize",               PRAGMA_CODESIZE         },
     { "data-name",              PRAGMA_DATA_NAME        },
-    { "dataseg",                PRAGMA_DATASEG     	},      /* obsolete */
+    { "dataseg",                PRAGMA_DATASEG          },      /* obsolete */
     { "local-strings",          PRAGMA_LOCAL_STRINGS    },
     { "optimize",               PRAGMA_OPTIMIZE         },
     { "register-vars",          PRAGMA_REGISTER_VARS    },
-    { "regvaraddr",             PRAGMA_REGVARADDR  	},
+    { "regvaraddr",             PRAGMA_REGVARADDR       },
     { "regvars",                PRAGMA_REGVARS          },      /* obsolete */
     { "rodata-name",            PRAGMA_RODATA_NAME      },
-    { "rodataseg",              PRAGMA_RODATASEG   	},      /* obsolete */
+    { "rodataseg",              PRAGMA_RODATASEG        },      /* obsolete */
     { "signed-chars",           PRAGMA_SIGNED_CHARS     },
-    { "signedchars",            PRAGMA_SIGNEDCHARS 	},      /* obsolete */
+    { "signedchars",            PRAGMA_SIGNEDCHARS      },      /* obsolete */
     { "static-locals",          PRAGMA_STATIC_LOCALS    },
-    { "staticlocals",           PRAGMA_STATICLOCALS   	},      /* obsolete */
+    { "staticlocals",           PRAGMA_STATICLOCALS     },      /* obsolete */
     { "warn",                   PRAGMA_WARN             },
     { "writable-strings",       PRAGMA_WRITABLE_STRINGS },
-    { "zpsym",                  PRAGMA_ZPSYM       	},
+    { "zpsym",                  PRAGMA_ZPSYM            },
 };
 
 /* Result of ParsePushPop */
@@ -192,7 +192,7 @@ static int GetString (StrBuf* B, StrBuf* S)
  */
 {
     if (!SB_GetString (B, S)) {
-	Error ("String literal expected");
+        Error ("String literal expected");
         return 0;
     }
     return 1;
@@ -206,7 +206,7 @@ static int GetNumber (StrBuf* B, long* Val)
  */
 {
     if (!SB_GetNumber (B, Val)) {
-	Error ("Constant integer expected");
+        Error ("Constant integer expected");
         return 0;
     }
     return 1;
@@ -366,8 +366,8 @@ static void StringPragma (StrBuf* B, void (*Func) (const char*))
 
     /* We expect a string here */
     if (GetString (B, &S)) {
-       	/* Call the given function with the string argument */
-	Func (SB_GetConstBuf (&S));
+        /* Call the given function with the string argument */
+        Func (SB_GetConstBuf (&S));
     }
 
     /* Call the string buf destructor */
@@ -459,7 +459,7 @@ static void CharMapPragma (StrBuf* B)
         } else {
             Error ("Character index out of range");
         }
-     	return;
+        return;
     }
 
     /* Comma follows */
@@ -478,7 +478,7 @@ static void CharMapPragma (StrBuf* B)
         } else {
             Error ("Character code out of range");
         }
-    	return;
+        return;
     }
 
     /* Remap the character */
@@ -675,13 +675,13 @@ static void ParsePragma (void)
 
     /* Do we know this pragma? */
     if (Pragma == PRAGMA_ILLEGAL) {
-       	/* According to the ANSI standard, we're not allowed to generate errors
-       	 * for unknown pragmas, but warn about them if enabled (the default).
-       	 */
+        /* According to the ANSI standard, we're not allowed to generate errors
+         * for unknown pragmas, but warn about them if enabled (the default).
+         */
         if (IS_Get (&WarnUnknownPragma)) {
-       	    Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
+            Warning ("Unknown pragma `%s'", SB_GetConstBuf (&Ident));
         }
-       	goto ExitPoint;
+        goto ExitPoint;
     }
 
     /* Check for an open paren */
@@ -701,41 +701,41 @@ static void ParsePragma (void)
             IntPragma (&B, &DataAlignment, 1, 4096);
             break;
 
-     	case PRAGMA_BSSSEG:
+        case PRAGMA_BSSSEG:
             Warning ("#pragma bssseg is obsolete, please use #pragma bss-name instead");
             /* FALLTHROUGH */
         case PRAGMA_BSS_NAME:
-     	    SegNamePragma (&B, SEG_BSS);
-     	    break;
+            SegNamePragma (&B, SEG_BSS);
+            break;
 
-     	case PRAGMA_CHARMAP:
-     	    CharMapPragma (&B);
-     	    break;
+        case PRAGMA_CHARMAP:
+            CharMapPragma (&B);
+            break;
 
-     	case PRAGMA_CHECKSTACK:
+        case PRAGMA_CHECKSTACK:
             Warning ("#pragma checkstack is obsolete, please use #pragma check-stack instead");
             /* FALLTHROUGH */
         case PRAGMA_CHECK_STACK:
-     	    FlagPragma (&B, &CheckStack);
-     	    break;
+            FlagPragma (&B, &CheckStack);
+            break;
 
-     	case PRAGMA_CODESEG:
+        case PRAGMA_CODESEG:
             Warning ("#pragma codeseg is obsolete, please use #pragma code-name instead");
             /* FALLTHROUGH */
         case PRAGMA_CODE_NAME:
-     	    SegNamePragma (&B, SEG_CODE);
-     	    break;
+            SegNamePragma (&B, SEG_CODE);
+            break;
 
-     	case PRAGMA_CODESIZE:
-     	    IntPragma (&B, &CodeSizeFactor, 10, 1000);
-     	    break;
+        case PRAGMA_CODESIZE:
+            IntPragma (&B, &CodeSizeFactor, 10, 1000);
+            break;
 
-     	case PRAGMA_DATASEG:
+        case PRAGMA_DATASEG:
             Warning ("#pragma dataseg is obsolete, please use #pragma data-name instead");
             /* FALLTHROUGH */
         case PRAGMA_DATA_NAME:
-     	    SegNamePragma (&B, SEG_DATA);
-     	    break;
+            SegNamePragma (&B, SEG_DATA);
+            break;
 
         case PRAGMA_LOCAL_STRINGS:
             FlagPragma (&B, &LocalStrings);
@@ -745,37 +745,37 @@ static void ParsePragma (void)
             FlagPragma (&B, &Optimize);
             break;
 
-     	case PRAGMA_REGVARADDR:
-       	    FlagPragma (&B, &AllowRegVarAddr);
-     	    break;
+        case PRAGMA_REGVARADDR:
+            FlagPragma (&B, &AllowRegVarAddr);
+            break;
 
-     	case PRAGMA_REGVARS:
+        case PRAGMA_REGVARS:
             Warning ("#pragma regvars is obsolete, please use #pragma register-vars instead");
             /* FALLTHROUGH */
         case PRAGMA_REGISTER_VARS:
-       	    FlagPragma (&B, &EnableRegVars);
-     	    break;
+            FlagPragma (&B, &EnableRegVars);
+            break;
 
-     	case PRAGMA_RODATASEG:
+        case PRAGMA_RODATASEG:
             Warning ("#pragma rodataseg is obsolete, please use #pragma rodata-name instead");
             /* FALLTHROUGH */
         case PRAGMA_RODATA_NAME:
-     	    SegNamePragma (&B, SEG_RODATA);
-     	    break;
+            SegNamePragma (&B, SEG_RODATA);
+            break;
 
-     	case PRAGMA_SIGNEDCHARS:
+        case PRAGMA_SIGNEDCHARS:
             Warning ("#pragma signedchars is obsolete, please use #pragma signed-chars instead");
             /* FALLTHROUGH */
         case PRAGMA_SIGNED_CHARS:
-       	    FlagPragma (&B, &SignedChars);
-     	    break;
+            FlagPragma (&B, &SignedChars);
+            break;
 
-     	case PRAGMA_STATICLOCALS:
+        case PRAGMA_STATICLOCALS:
             Warning ("#pragma staticlocals is obsolete, please use #pragma static-locals instead");
             /* FALLTHROUGH */
         case PRAGMA_STATIC_LOCALS:
-     	    FlagPragma (&B, &StaticLocals);
-     	    break;
+            FlagPragma (&B, &StaticLocals);
+            break;
 
         case PRAGMA_WARN:
             WarnPragma (&B);
@@ -785,12 +785,12 @@ static void ParsePragma (void)
             FlagPragma (&B, &WritableStrings);
             break;
 
-     	case PRAGMA_ZPSYM:
-     	    StringPragma (&B, MakeZPSym);
-     	    break;
+        case PRAGMA_ZPSYM:
+            StringPragma (&B, MakeZPSym);
+            break;
 
-     	default:
-       	    Internal ("Invalid pragma");
+        default:
+            Internal ("Invalid pragma");
     }
 
     /* Closing paren expected */
@@ -828,24 +828,24 @@ void DoPragma (void)
 
     /* We expect an opening paren */
     if (!ConsumeLParen ()) {
-	return;
+        return;
     }
 
     /* String literal */
     if (CurTok.Tok != TOK_SCONST) {
 
-    	/* Print a diagnostic */
-     	Error ("String literal expected");
+        /* Print a diagnostic */
+        Error ("String literal expected");
 
-    	/* Try some smart error recovery: Skip tokens until we reach the
-    	 * enclosing paren, or a semicolon.
-    	 */
-       	PragmaErrorSkip ();
+        /* Try some smart error recovery: Skip tokens until we reach the
+         * enclosing paren, or a semicolon.
+         */
+        PragmaErrorSkip ();
 
     } else {
 
-    	/* Parse the _Pragma statement */
-    	ParsePragma ();
+        /* Parse the _Pragma statement */
+        ParsePragma ();
     }
 
     /* Closing paren needed */

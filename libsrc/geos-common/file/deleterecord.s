@@ -5,13 +5,13 @@
 
 ; char DeleteRecord  (void);
 
-	    .import setoserror
-	    .export _DeleteRecord
+            .import setoserror
+            .export _DeleteRecord
 
-	    .include "jumptab.inc"
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _DeleteRecord:
-	jsr DeleteRecord
-	jmp setoserror
+        jsr DeleteRecord
+        jmp setoserror

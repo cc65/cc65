@@ -4,14 +4,14 @@
 ; Screen size variables
 ;
 
-        .export	      	screensize
+        .export         screensize
 
         .include        "apple2.inc"
 
 screensize:
-        ldx	WNDWDTH
-        lda	WNDBTM
+        ldx     WNDWDTH
+        lda     WNDBTM
         sec
-        sbc	WNDTOP
+        sbc     WNDTOP
         tay
         rts

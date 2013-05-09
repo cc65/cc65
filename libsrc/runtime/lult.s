@@ -4,9 +4,9 @@
 ; CC65 runtime: Compare < for long unsigneds
 ;
 
-	.export		tosulteax
-       	.import	       	toslcmp, boolult
+        .export         tosulteax
+        .import         toslcmp, boolult
 
 tosulteax:
-       	jsr    	toslcmp 	; Set the flags
-	jmp	boolult		; Convert to boolean
+        jsr     toslcmp         ; Set the flags
+        jmp     boolult         ; Convert to boolean

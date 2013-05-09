@@ -61,7 +61,7 @@ ExprDesc* ED_Init (ExprDesc* ED)
 {
     ED->Flags     = ED_OK;
     ED->AddrSize  = ADDR_SIZE_DEFAULT;
-    ED->Val  	  = 0;
+    ED->Val       = 0;
     ED->SymCount  = 0;
     ED->SymLimit  = 0;
     ED->SymRef    = 0;
@@ -432,7 +432,7 @@ static void ED_Move (ExprDesc* From, ExprDesc* To)
 
 
 /*****************************************************************************/
-/*     	      	     	       	     Code	      			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -1283,29 +1283,29 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
     /* Study this expression node */
     switch (Expr->Op) {
 
-    	case EXPR_LITERAL:
+        case EXPR_LITERAL:
             StudyLiteral (Expr, D);
-    	    break;
+            break;
 
-    	case EXPR_SYMBOL:
+        case EXPR_SYMBOL:
             StudySymbol (Expr, D);
             break;
 
-    	case EXPR_SECTION:
+        case EXPR_SECTION:
             StudySection (Expr, D);
-    	    break;
+            break;
 
-	case EXPR_ULABEL:
+        case EXPR_ULABEL:
             StudyULabel (Expr, D);
             break;
 
-    	case EXPR_PLUS:
+        case EXPR_PLUS:
             StudyPlus (Expr, D);
-    	    break;
+            break;
 
-    	case EXPR_MINUS:
-       	    StudyMinus (Expr, D);
-    	    break;
+        case EXPR_MINUS:
+            StudyMinus (Expr, D);
+            break;
 
         case EXPR_MUL:
             StudyMul (Expr, D);
@@ -1436,8 +1436,8 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
             break;
 
         default:
-	    Internal ("Unknown Op type: %u", Expr->Op);
-    	    break;
+            Internal ("Unknown Op type: %u", Expr->Op);
+            break;
     }
 }
 

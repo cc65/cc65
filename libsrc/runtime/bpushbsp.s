@@ -4,15 +4,15 @@
 ; CC65 runtime: Load a from stack slot and push as byte
 ;
 
-	.export		bpushbsp, bpushbysp
-	.import		pusha
-	.importzp	sp
+        .export         bpushbsp, bpushbysp
+        .import         pusha
+        .importzp       sp
 
 bpushbsp:
-	ldy	#0
+        ldy     #0
 bpushbysp:
-	lda	(sp),y
-	jmp	pusha
+        lda     (sp),y
+        jmp     pusha
 
 
 

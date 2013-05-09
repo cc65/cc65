@@ -36,19 +36,19 @@
 ;------------------------------------------------------------------------------
 ; The driver header
 
-.struct	EMD_HDR
-	ID	.byte	3	; Contains 0x65, 0x6d, 0x64 ("emd")
-	VERSION .byte	1	; Interface version
-	JUMPTAB .struct
-	    INSTALL	.word	; INSTALL routine
-	    UNINSTALL	.word	; UNINSTALL routine
-	    PAGECOUNT	.word	; PAGECOUNT routine
-	    MAP	.word	; MAP routine
-	    USE	.word	; USE routine
-	    MAPCLEAN	.word	; MAPCLEAN routine
-	    COPYFROM	.word	; COPYFROM routine
-	    COPYTO	.word	; COPYTO routine
-	.endstruct
+.struct EMD_HDR
+        ID      .byte   3       ; Contains 0x65, 0x6d, 0x64 ("emd")
+        VERSION .byte   1       ; Interface version
+        JUMPTAB .struct
+            INSTALL     .word   ; INSTALL routine
+            UNINSTALL   .word   ; UNINSTALL routine
+            PAGECOUNT   .word   ; PAGECOUNT routine
+            MAP .word   ; MAP routine
+            USE .word   ; USE routine
+            MAPCLEAN    .word   ; MAPCLEAN routine
+            COPYFROM    .word   ; COPYFROM routine
+            COPYTO      .word   ; COPYTO routine
+        .endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
@@ -59,18 +59,18 @@ EMD_API_VERSION         = $00
 ;------------------------------------------------------------------------------
 ; The asm equivalent to the C em_copy structure
 
-.struct	EM_COPY
-	BUF	.word		; Memory buffer to copy from or to
-	OFFS	.byte		; Offset into page
-	PAGE	.word		; Starting page to copy from or to
-	COUNT	.word		; Number of bytes to copy
-	UNUSED	.byte		; Make the size 8 bytes
+.struct EM_COPY
+        BUF     .word           ; Memory buffer to copy from or to
+        OFFS    .byte           ; Offset into page
+        PAGE    .word           ; Starting page to copy from or to
+        COUNT   .word           ; Number of bytes to copy
+        UNUSED  .byte           ; Make the size 8 bytes
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; Variables
 
-       	.global	_em_drv                         ; Pointer to driver
+        .global _em_drv                         ; Pointer to driver
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -81,25 +81,25 @@ EMD_API_VERSION         = $00
         .global emd_map
         .global emd_use
         .global emd_commit
-	.global	emd_copyfrom
+        .global emd_copyfrom
         .global emd_copyto
 
 ;------------------------------------------------------------------------------
 ; ASM functions
 
-       	.global	em_clear_ptr
+        .global em_clear_ptr
 
 ;------------------------------------------------------------------------------
 ; C callable functions
 
-	.global	_em_load_driver
-	.global	_em_unload
-	.global	_em_install
-	.global _em_uninstall
-	.global	_em_pagecount
-	.global	_em_map
-	.global _em_use
-	.global	_em_commit
-	.global _em_copyfrom
-	.global	_em_copyto
+        .global _em_load_driver
+        .global _em_unload
+        .global _em_install
+        .global _em_uninstall
+        .global _em_pagecount
+        .global _em_map
+        .global _em_use
+        .global _em_commit
+        .global _em_copyfrom
+        .global _em_copyto
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptsub.c                                 */
+/*                                 coptsub.c                                 */
 /*                                                                           */
-/*			Optimize subtraction sequences                       */
+/*                      Optimize subtraction sequences                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*			     Optimize subtractions                           */
+/*                           Optimize subtractions                           */
 /*****************************************************************************/
 
 
@@ -52,9 +52,9 @@
 unsigned OptSub1 (CodeSeg* S)
 /* Search for the sequence
  *
- *  	sbc     ...
+ *      sbc     ...
  *      bcs     L
- *  	dex
+ *      dex
  * L:
  *
  * and remove the handling of the high byte if X is not used later.
@@ -66,32 +66,32 @@ unsigned OptSub1 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[3];
+        CodeEntry* L[3];
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_SBC 	  		             &&
-	    CS_GetEntries (S, L, I+1, 3) 	             &&
-       	    (L[0]->OPC == OP65_BCS || L[0]->OPC == OP65_JCS) &&
-	    L[0]->JumpTo != 0                                &&
-	    !CE_HasLabel (L[0])                              &&
-	    L[1]->OPC == OP65_DEX       	       	     &&
-	    !CE_HasLabel (L[1])                              &&
-	    L[0]->JumpTo->Owner == L[2]                      &&
-	    !RegXUsed (S, I+3)) {
+        /* Check for the sequence */
+        if (E->OPC == OP65_SBC                               &&
+            CS_GetEntries (S, L, I+1, 3)                     &&
+            (L[0]->OPC == OP65_BCS || L[0]->OPC == OP65_JCS) &&
+            L[0]->JumpTo != 0                                &&
+            !CE_HasLabel (L[0])                              &&
+            L[1]->OPC == OP65_DEX                            &&
+            !CE_HasLabel (L[1])                              &&
+            L[0]->JumpTo->Owner == L[2]                      &&
+            !RegXUsed (S, I+3)) {
 
-	    /* Remove the bcs/dex */
-	    CS_DelEntries (S, I+1, 2);
+            /* Remove the bcs/dex */
+            CS_DelEntries (S, I+1, 2);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -104,9 +104,9 @@ unsigned OptSub1 (CodeSeg* S)
 unsigned OptSub2 (CodeSeg* S)
 /* Search for the sequence
  *
- *  	lda     xx
+ *      lda     xx
  *      sec
- *  	sta     tmp1
+ *      sta     tmp1
  *      lda     yy
  *      sbc     tmp1
  *      sta     yy
@@ -115,7 +115,7 @@ unsigned OptSub2 (CodeSeg* S)
  *
  *      sec
  *      lda     yy
- *     	sbc     xx
+ *      sbc     xx
  *      sta     yy
  */
 {
@@ -125,50 +125,50 @@ unsigned OptSub2 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[5];
+        CodeEntry* L[5];
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA 	      		           &&
-	    !CS_RangeHasLabel (S, I+1, 5)                  &&
-	    CS_GetEntries (S, L, I+1, 5) 	           &&
-       	    L[0]->OPC == OP65_SEC                          &&
-       	    L[1]->OPC == OP65_STA       	       	   &&
-	    strcmp (L[1]->Arg, "tmp1") == 0                &&
-	    L[2]->OPC == OP65_LDA                          &&
-	    L[3]->OPC == OP65_SBC                          &&
-	    strcmp (L[3]->Arg, "tmp1") == 0                &&
-	    L[4]->OPC == OP65_STA                          &&
-	    strcmp (L[4]->Arg, L[2]->Arg) == 0) {
+        /* Check for the sequence */
+        if (E->OPC == OP65_LDA                             &&
+            !CS_RangeHasLabel (S, I+1, 5)                  &&
+            CS_GetEntries (S, L, I+1, 5)                   &&
+            L[0]->OPC == OP65_SEC                          &&
+            L[1]->OPC == OP65_STA                          &&
+            strcmp (L[1]->Arg, "tmp1") == 0                &&
+            L[2]->OPC == OP65_LDA                          &&
+            L[3]->OPC == OP65_SBC                          &&
+            strcmp (L[3]->Arg, "tmp1") == 0                &&
+            L[4]->OPC == OP65_STA                          &&
+            strcmp (L[4]->Arg, L[2]->Arg) == 0) {
 
-	    /* Remove the store to tmp1 */
-	    CS_DelEntry (S, I+2);
+            /* Remove the store to tmp1 */
+            CS_DelEntry (S, I+2);
 
-	    /* Remove the subtraction */
-	    CS_DelEntry (S, I+3);
+            /* Remove the subtraction */
+            CS_DelEntry (S, I+3);
 
-	    /* Move the lda to the position of the subtraction and change the
-	     * op to SBC.
-	     */
-	    CS_MoveEntry (S, I, I+3);
-	    CE_ReplaceOPC (E, OP65_SBC);
+            /* Move the lda to the position of the subtraction and change the
+             * op to SBC.
+             */
+            CS_MoveEntry (S, I, I+3);
+            CE_ReplaceOPC (E, OP65_SBC);
 
-	    /* If the sequence head had a label, move this label back to the
-	     * head.
-	     */
-	    if (CE_HasLabel (E)) {
-		CS_MoveLabels (S, E, L[0]);
-  	    }
+            /* If the sequence head had a label, move this label back to the
+             * head.
+             */
+            if (CE_HasLabel (E)) {
+                CS_MoveLabels (S, E, L[0]);
+            }
 
-	    /* Remember, we had changes */
-       	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -189,12 +189,12 @@ unsigned OptSub3 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* E;
+        CodeEntry* E;
 
-      	/* Get next entry */
-       	E = CS_GetEntry (S, I);
+        /* Get next entry */
+        E = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
+        /* Check for the sequence */
         if (E->OPC == OP65_JSR                          &&
             strncmp (E->Arg, "decax", 5) == 0           &&
             IsDigit (E->Arg[5])                         &&
@@ -205,23 +205,23 @@ unsigned OptSub3 (CodeSeg* S)
             const char* Arg;
 
             /* Insert new code behind the sequence */
-	    X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, E->LI);
-	    CS_InsertEntry (S, X, I+1);
+            X = NewCodeEntry (OP65_SEC, AM65_IMP, 0, 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
 
-	    Arg = MakeHexArg (E->Arg[5] - '0');
-       	    X = NewCodeEntry (OP65_SBC, AM65_IMM, Arg, 0, E->LI);
-	    CS_InsertEntry (S, X, I+2);
+            Arg = MakeHexArg (E->Arg[5] - '0');
+            X = NewCodeEntry (OP65_SBC, AM65_IMM, Arg, 0, E->LI);
+            CS_InsertEntry (S, X, I+2);
 
-       	    /* Delete the old code */
-	    CS_DelEntry (S, I);
+            /* Delete the old code */
+            CS_DelEntry (S, I);
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     ram.c				     */
+/*                                   ram.c                                   */
 /*                                                                           */
-/*		    RAM plugin for the sim65 6502 simulator		     */
+/*                  RAM plugin for the sim65 6502 simulator                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -87,7 +87,7 @@ static const struct ChipData CData[1] = {
         /* -- Exported functions -- */
         InitChip,
         CreateInstance,
-	DestroyInstance,
+        DestroyInstance,
         WriteCtrl,
         Write,
         ReadCtrl,
@@ -100,7 +100,7 @@ static const SimData* Sim;
 
 /* Possible RAM attributes */
 #define ATTR_INITIALIZED        0x01    /* RAM cell is intialized */
-#define ATTR_WPROT		0x02	/* RAM cell is write protected */
+#define ATTR_WPROT              0x02    /* RAM cell is write protected */
 
 /* Data for one RAM instance */
 typedef struct InstanceData InstanceData;

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    error.c				     */
+/*                                  error.c                                  */
 /*                                                                           */
-/*		    Error handling for the cc65 C compiler		     */
+/*                  Error handling for the cc65 C compiler                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -51,14 +51,14 @@
 
 
 /*****************************************************************************/
-/*   	  			     Data  		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Count of errors/warnings */
-unsigned ErrorCount	= 0;
-unsigned WarningCount	= 0;
+unsigned ErrorCount     = 0;
+unsigned WarningCount   = 0;
 
 /* Warning and error options */
 IntStack WarnEnable         = INTSTACK(1);  /* Enable warnings */
@@ -106,11 +106,11 @@ void Fatal (const char* Format, ...)
     const char* FileName;
     unsigned    LineNum;
     if (CurTok.LI) {
-     	FileName = GetInputName (CurTok.LI);
-     	LineNum  = GetInputLine (CurTok.LI);
+        FileName = GetInputName (CurTok.LI);
+        LineNum  = GetInputLine (CurTok.LI);
     } else {
-     	FileName = GetCurrentFile ();
-     	LineNum  = GetCurrentLine ();
+        FileName = GetCurrentFile ();
+        LineNum  = GetCurrentLine ();
     }
 
     fprintf (stderr, "%s(%u): Fatal: ", FileName, LineNum);
@@ -136,15 +136,15 @@ void Internal (const char* Format, ...)
     const char* FileName;
     unsigned    LineNum;
     if (CurTok.LI) {
-     	FileName = GetInputName (CurTok.LI);
-     	LineNum  = GetInputLine (CurTok.LI);
+        FileName = GetInputName (CurTok.LI);
+        LineNum  = GetInputLine (CurTok.LI);
     } else {
-     	FileName = GetCurrentFile ();
-     	LineNum  = GetCurrentLine ();
+        FileName = GetCurrentFile ();
+        LineNum  = GetCurrentLine ();
     }
 
     fprintf (stderr, "%s(%u): Internal compiler error:\n",
-     	     FileName, LineNum);
+             FileName, LineNum);
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -179,7 +179,7 @@ static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va
     }
     ++ErrorCount;
     if (ErrorCount > 10) {
-       	Fatal ("Too many errors");
+        Fatal ("Too many errors");
     }
 }
 
@@ -234,14 +234,14 @@ static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, 
 
     } else if (IS_Get (&WarnEnable)) {
 
-       	fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
-     	vfprintf (stderr, Msg, ap);
-     	fprintf (stderr, "\n");
+        fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
+        vfprintf (stderr, Msg, ap);
+        fprintf (stderr, "\n");
 
         if (Line) {
-     	    Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
+            Print (stderr, 1, "Input: %.*s\n", (int) SB_GetLen (Line), SB_GetConstBuf (Line));
         }
-     	++WarningCount;
+        ++WarningCount;
 
     }
 }

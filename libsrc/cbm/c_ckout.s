@@ -4,14 +4,14 @@
 ; unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
 ;
 
-       	.export	       	_cbm_k_ckout
+        .export         _cbm_k_ckout
         .import         CKOUT
 
 
 _cbm_k_ckout:
-	tax
-       	jsr    	CKOUT
-	ldx     #0              ; Clear high byte
-	bcs	@NotOk
+        tax
+        jsr     CKOUT
+        ldx     #0              ; Clear high byte
+        bcs     @NotOk
         txa
-@NotOk:	rts
+@NotOk: rts

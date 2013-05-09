@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    stdio.h				     */
+/*                                  stdio.h                                  */
 /*                                                                           */
-/*				 Input/output				     */
+/*                               Input/output                                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -57,33 +57,33 @@ extern FILE* stdout;
 extern FILE* stderr;
 
 /* Standard defines */
-#define _IOFBF		0
-#define _IOLBF		1
-#define _IONBF		2
-#define BUFSIZ		256
-#define EOF 	      	-1
-#define FOPEN_MAX	8
-#define SEEK_CUR	0
-#define SEEK_END	1
-#define SEEK_SET	2
-#define TMP_MAX		256
+#define _IOFBF          0
+#define _IOLBF          1
+#define _IONBF          2
+#define BUFSIZ          256
+#define EOF             -1
+#define FOPEN_MAX       8
+#define SEEK_CUR        0
+#define SEEK_END        1
+#define SEEK_SET        2
+#define TMP_MAX         256
 
 /* Standard defines that are platform dependent */
 #if defined(__APPLE2__) || defined(__APPLE2ENH__)
-#  define FILENAME_MAX	(64+1)
+#  define FILENAME_MAX  (64+1)
 #elif defined(__ATARI__)
-#  define FILENAME_MAX	(12+1)
+#  define FILENAME_MAX  (12+1)
 #elif defined(__LUNIX__)
 #  define FILENAME_MAX  (80+1)
 #else
 #  define FILENAME_MAX  (16+1)
 #endif
-#define L_tmpnam	FILENAME_MAX
+#define L_tmpnam        FILENAME_MAX
 
 
 
 /*****************************************************************************/
-/*     	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -132,14 +132,14 @@ int __fastcall__ vsscanf (const char* s, const char* format, va_list ap);
 int __fastcall__ vfscanf (FILE* f, const char* format, va_list ap);
 
 #if __CC65_STD__ == __CC65_STD_CC65__
-FILE* __fastcall__ fdopen (int fd, const char* mode); 	/* Unix */
-int __fastcall__ fileno (FILE* f);			/* Unix */
+FILE* __fastcall__ fdopen (int fd, const char* mode);   /* Unix */
+int __fastcall__ fileno (FILE* f);                      /* Unix */
 #endif
-void __fastcall__ _poserror (const char* msg);  	/* cc65 */
+void __fastcall__ _poserror (const char* msg);          /* cc65 */
 
 /* Masking macros for some functions */
-#define getc(f)	       	fgetc (f)     		/* ANSI */
-#define putc(c, f)     	fputc (c, f)  		/* ANSI */
+#define getc(f)         fgetc (f)               /* ANSI */
+#define putc(c, f)      fputc (c, f)            /* ANSI */
 
 
 

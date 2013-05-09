@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    loop.c				     */
+/*                                  loop.c                                   */
 /*                                                                           */
-/*				Loop management				     */
+/*                              Loop management                              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,7 +45,7 @@
 
 
 /*****************************************************************************/
-/*	  	  		     Data		     		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -56,7 +56,7 @@ static LoopDesc* LoopStack = 0;
 
 
 /*****************************************************************************/
-/*	   	  		     Code		     		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -68,9 +68,9 @@ LoopDesc* AddLoop (unsigned BreakLabel, unsigned ContinueLabel)
     LoopDesc* L = xmalloc (sizeof (LoopDesc));
 
     /* Fill in the data */
-    L->StackPtr	        = StackPtr;
+    L->StackPtr         = StackPtr;
     L->BreakLabel       = BreakLabel;
-    L->ContinueLabel   	= ContinueLabel;
+    L->ContinueLabel    = ContinueLabel;
 
     /* Insert it into the list */
     L->Next = LoopStack;

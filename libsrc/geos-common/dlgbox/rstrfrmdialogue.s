@@ -5,8 +5,8 @@
 
 ; char RstrFrmDialogue  (void);
 
-	    .export _RstrFrmDialogue
+            .export _RstrFrmDialogue
 
-	    .include "jumptab.inc"
-	
+            .include "jumptab.inc"
+        
 _RstrFrmDialogue = RstrFrmDialogue

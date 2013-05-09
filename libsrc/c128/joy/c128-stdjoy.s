@@ -6,9 +6,9 @@
 ; Ullrich von Bassewitz, 2002-12-21
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"joy-kernel.inc"
+        .include        "joy-kernel.inc"
         .include        "joy-error.inc"
         .include        "c128.inc"
 
@@ -22,8 +22,8 @@
 
 ; Driver signature
 
-        .byte   $6A, $6F, $79		; "joy"
-        .byte   JOY_API_VERSION		; Driver API version number
+        .byte   $6A, $6F, $79           ; "joy"
+        .byte   JOY_API_VERSION         ; Driver API version number
 
 ; Button state masks (8 values)
 
@@ -66,7 +66,7 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 INSTALL:
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
-;	rts                     ; Run into UNINSTALL instead
+;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -90,32 +90,32 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:   tax			; Joystick number into X
-	bne    	joy2
+READ:   tax                     ; Joystick number into X
+        bne     joy2
 
 ; Read joystick 1
 
-joy1:	lda	#$7F
-     	sei
-     	sta	CIA1_PRA
-     	lda	CIA1_PRB
-     	cli
-     	and	#$1F
-     	eor	#$1F
-     	rts
+joy1:   lda     #$7F
+        sei
+        sta     CIA1_PRA
+        lda     CIA1_PRB
+        cli
+        and     #$1F
+        eor     #$1F
+        rts
 
 ; Read joystick 2
 
-joy2:	ldx	#0
-	lda	#$E0
-	ldy	#$FF
-	sei
-	sta	CIA1_DDRA
-	lda	CIA1_PRA
-	sty	CIA1_DDRA
-	cli
-	and	#$1F
-	eor	#$1F
-	rts
+joy2:   ldx     #0
+        lda     #$E0
+        ldy     #$FF
+        sei
+        sta     CIA1_DDRA
+        lda     CIA1_PRA
+        sty     CIA1_DDRA
+        cli
+        and     #$1F
+        eor     #$1F
+        rts
 
 

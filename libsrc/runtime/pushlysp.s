@@ -5,26 +5,26 @@
 ;
 
 
-	.export		pushlysp
-	.import		pusheax
-	.importzp	sreg, sp
+        .export         pushlysp
+        .import         pusheax
+        .importzp       sreg, sp
 
-.proc	pushlysp
+.proc   pushlysp
 
-	iny
-	iny
-	lda	(sp),y
-	iny
-	sta	sreg
-	lda	(sp),y
-	sta	sreg+1
-	dey
-	dey
-	lda	(sp),y
-	dey
-	tax
-	lda 	(sp),y
-	jmp	pusheax
+        iny
+        iny
+        lda     (sp),y
+        iny
+        sta     sreg
+        lda     (sp),y
+        sta     sreg+1
+        dey
+        dey
+        lda     (sp),y
+        dey
+        tax
+        lda     (sp),y
+        jmp     pusheax
 
 .endproc
 

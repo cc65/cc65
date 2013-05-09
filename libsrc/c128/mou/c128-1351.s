@@ -7,7 +7,7 @@
 
         .include        "zeropage.inc"
         .include        "mouse-kernel.inc"
-	.include	"c128.inc"
+        .include        "c128.inc"
 
         .macpack        generic
 
@@ -64,18 +64,18 @@ SCREEN_WIDTH    = 320
 .bss
 
 Vars:
-OldPotX:   	.res   	1	     	; Old hw counter values
-OldPotY:	.res   	1
+OldPotX:        .res    1               ; Old hw counter values
+OldPotY:        .res    1
 
 YPos:           .res    2               ; Current mouse position, Y
 XPos:           .res    2               ; Current mouse position, X
-XMin:		.res	2	     	; X1 value of bounding box
-YMin:		.res	2	     	; Y1 value of bounding box
-XMax:		.res	2	     	; X2 value of bounding box
-YMax:		.res	2	     	; Y2 value of bounding box
+XMin:           .res    2               ; X1 value of bounding box
+YMin:           .res    2               ; Y1 value of bounding box
+XMax:           .res    2               ; X2 value of bounding box
+YMax:           .res    2               ; Y2 value of bounding box
 
-OldValue:	.res   	1	     	; Temp for MoveCheck routine
-NewValue:	.res   	1	     	; Temp for MoveCheck routine
+OldValue:       .res    1               ; Temp for MoveCheck routine
+NewValue:       .res    1               ; Temp for MoveCheck routine
 
 ; Default values for above variables
 
@@ -177,7 +177,7 @@ SETBOX: sta     ptr1
         bpl     @L1
 
         cli
-       	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; GETBOX: Return the mouse bounding box. The parameters are passed as they
@@ -195,7 +195,7 @@ GETBOX: sta     ptr1
         bpl     @L1
 
         cli
-       	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; MOVE: Move the mouse to a new position. The position is passed as it comes
@@ -219,47 +219,47 @@ MOVE:   sei                             ; No interrupts
         lda     (sp),y
         sta     XPos                    ; New X position
 
-        jsr     CMOVEX			; Move the cursor
+        jsr     CMOVEX                  ; Move the cursor
 
-	cli                             ; Allow interrupts
-       	rts
+        cli                             ; Allow interrupts
+        rts
 
 ;----------------------------------------------------------------------------
 ; BUTTONS: Return the button mask in a/x.
 
 BUTTONS:
-        lda	#$7F
-     	sei
-     	sta	CIA1_PRA
-     	lda	CIA1_PRB                ; Read joystick #0
-     	cli
+        lda     #$7F
+        sei
+        sta     CIA1_PRA
+        lda     CIA1_PRB                ; Read joystick #0
+        cli
         ldx     #0
-     	and	#$1F
-     	eor	#$1F
+        and     #$1F
+        eor     #$1F
         rts
 
 ;----------------------------------------------------------------------------
 ; POS: Return the mouse position in the MOUSE_POS struct pointed to by ptr1.
 ; No return code required.
 
-POS:    ldy    	#MOUSE_POS::XCOORD      ; Structure offset
+POS:    ldy     #MOUSE_POS::XCOORD      ; Structure offset
 
-	sei	    			; Disable interrupts
-	lda     XPos			; Transfer the position
-	sta	(ptr1),y
-	lda	XPos+1
-	iny
-	sta	(ptr1),y
-      	lda	YPos
+        sei                             ; Disable interrupts
+        lda     XPos                    ; Transfer the position
+        sta     (ptr1),y
+        lda     XPos+1
         iny
         sta     (ptr1),y
-	lda	YPos+1
-	cli	    			; Enable interrupts
+        lda     YPos
+        iny
+        sta     (ptr1),y
+        lda     YPos+1
+        cli                             ; Enable interrupts
 
         iny
         sta     (ptr1),y                ; Store last byte
 
-    	rts	    			; Done
+        rts                             ; Done
 
 ;----------------------------------------------------------------------------
 ; INFO: Returns mouse position and current button mask in the MOUSE_INFO
@@ -270,15 +270,15 @@ POS:    ldy    	#MOUSE_POS::XCOORD      ; Structure offset
 ; call _mouse_pos to initialize the struct pointer and fill the position
 ; fields.
 
-INFO:   jsr	POS
+INFO:   jsr     POS
 
 ; Fill in the button state
 
-    	jsr     BUTTONS                 ; Will not touch ptr1
-    	ldy	#MOUSE_INFO::BUTTONS
-    	sta	(ptr1),y
+        jsr     BUTTONS                 ; Will not touch ptr1
+        ldy     #MOUSE_INFO::BUTTONS
+        sta     (ptr1),y
 
-      	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; IOCTL: Driver defined entry point. The wrapper will pass a pointer to ioctl
@@ -297,10 +297,10 @@ IOCTL:  lda     #<MOUSE_ERR_INV_IOCTL     ; We don't support ioclts for now
 ; MUST return carry clear.
 ;
 
-IRQ:    lda	SID_ADConv1		; Get mouse X movement
-      	ldy	OldPotX
-      	jsr	MoveCheck  		; Calculate movement vector
-      	sty	OldPotX
+IRQ:    lda     SID_ADConv1             ; Get mouse X movement
+        ldy     OldPotX
+        jsr     MoveCheck               ; Calculate movement vector
+        sty     OldPotX
 
 ; Skip processing if nothing has changed
 
@@ -308,29 +308,29 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 
 ; Calculate the new X coordinate (--> a/y)
 
-       	add	XPos
-      	tay	      			; Remember low byte
-      	txa
-      	adc	XPos+1
-    	tax
+        add     XPos
+        tay                             ; Remember low byte
+        txa
+        adc     XPos+1
+        tax
 
 ; Limit the X coordinate to the bounding box
 
-   	cpy	XMin
-   	sbc	XMin+1
-   	bpl	@L1
-       	ldy    	XMin
-       	ldx	XMin+1
-    	jmp	@L2
-@L1:	txa
+        cpy     XMin
+        sbc     XMin+1
+        bpl     @L1
+        ldy     XMin
+        ldx     XMin+1
+        jmp     @L2
+@L1:    txa
 
-    	cpy	XMax
-    	sbc	XMax+1
-    	bmi	@L2
-    	ldy	XMax
-    	ldx	XMax+1
-@L2:	sty	XPos
-   	stx	XPos+1
+        cpy     XMax
+        sbc     XMax+1
+        bmi     @L2
+        ldy     XMax
+        ldx     XMax+1
+@L2:    sty     XPos
+        stx     XPos+1
 
 ; Move the mouse pointer to the new X pos
 
@@ -339,10 +339,10 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 
 ; Calculate the Y movement vector
 
-@SkipX: lda	SID_ADConv2	 	; Get mouse Y movement
- 	ldy	OldPotY
- 	jsr	MoveCheck	 	; Calculate movement
- 	sty	OldPotY
+@SkipX: lda     SID_ADConv2             ; Get mouse Y movement
+        ldy     OldPotY
+        jsr     MoveCheck               ; Calculate movement
+        sty     OldPotY
 
 ; Skip processing if nothing has changed
 
@@ -350,32 +350,32 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 
 ; Calculate the new Y coordinate (--> a/y)
 
-      	sta	OldValue
-      	lda	YPos
-      	sub	OldValue
-      	tay
-      	stx	OldValue
-      	lda	YPos+1
-      	sbc	OldValue
-      	tax
+        sta     OldValue
+        lda     YPos
+        sub     OldValue
+        tay
+        stx     OldValue
+        lda     YPos+1
+        sbc     OldValue
+        tax
 
 ; Limit the Y coordinate to the bounding box
 
-   	cpy	YMin
- 	sbc	YMin+1
- 	bpl	@L3
-       	ldy    	YMin
-       	ldx	YMin+1
-    	jmp	@L4
-@L3:	txa
+        cpy     YMin
+        sbc     YMin+1
+        bpl     @L3
+        ldy     YMin
+        ldx     YMin+1
+        jmp     @L4
+@L3:    txa
 
-    	cpy	YMax
-    	sbc	YMax+1
-    	bmi	@L4
-    	ldy	YMax
-    	ldx	YMax+1
-@L4:	sty	YPos
- 	stx	YPos+1
+        cpy     YMax
+        sbc     YMax+1
+        bmi     @L4
+        ldy     YMax
+        ldx     YMax+1
+@L4:    sty     YPos
+        stx     YPos+1
 
 ; Move the mouse pointer to the new X pos
 
@@ -391,38 +391,38 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 ;
 ; Move check routine, called for both coordinates.
 ;
-; Entry:   	y = old value of pot register
-;     	   	a = current value of pot register
-; Exit:	   	y = value to use for old value
-;     	   	x/a = delta value for position
+; Entry:        y = old value of pot register
+;               a = current value of pot register
+; Exit:         y = value to use for old value
+;               x/a = delta value for position
 ;
 
 MoveCheck:
-      	sty	OldValue
-      	sta	NewValue
-      	ldx 	#$00
+        sty     OldValue
+        sta     NewValue
+        ldx     #$00
 
-      	sub	OldValue	   	; a = mod64 (new - old)
-      	and	#%01111111
-      	cmp	#%01000000	   	; if (a > 0)
-      	bcs	@L1 		   	;
-      	lsr	a   		   	;   a /= 2;
-      	beq	@L2 		   	;   if (a != 0)
-      	ldy   	NewValue     	   	;     y = NewValue
+        sub     OldValue                ; a = mod64 (new - old)
+        and     #%01111111
+        cmp     #%01000000              ; if (a > 0)
+        bcs     @L1                     ;
+        lsr     a                       ;   a /= 2;
+        beq     @L2                     ;   if (a != 0)
+        ldy     NewValue                ;     y = NewValue
         sec
-      	rts   	    		   	;   return
+        rts                             ;   return
 
-@L1:  	ora   	#%11000000	   	; else or in high order bits
-      	cmp   	#$FF		   	; if (a != -1)
-      	beq   	@L2
-      	sec
-      	ror   	a   		   	;   a /= 2
-       	dex			   	;   high byte = -1 (X = $FF)
-      	ldy   	NewValue
+@L1:    ora     #%11000000              ; else or in high order bits
+        cmp     #$FF                    ; if (a != -1)
+        beq     @L2
         sec
-      	rts
+        ror     a                       ;   a /= 2
+        dex                             ;   high byte = -1 (X = $FF)
+        ldy     NewValue
+        sec
+        rts
 
-@L2:   	txa			   	; A = $00
+@L2:    txa                             ; A = $00
         clc
-      	rts
+        rts
 

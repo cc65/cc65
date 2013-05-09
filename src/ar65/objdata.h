@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objdata.h				     */
+/*                                 objdata.h                                 */
 /*                                                                           */
-/*		Handling object file data for the ar65 archiver		     */
+/*              Handling object file data for the ar65 archiver              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,32 +45,32 @@
 
 
 /*****************************************************************************/
-/*     	      	       		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Values for the Flags field */
-#define	OBJ_HAVEDATA   	0x0001		/* The object data is in the tmp file */
+#define OBJ_HAVEDATA    0x0001          /* The object data is in the tmp file */
 
 
 /* Internal structure holding object file data */
 typedef struct ObjData ObjData;
 struct ObjData {
-    char*     	     	Name;		/* Module name */
+    char*               Name;           /* Module name */
 
     /* Index entry */
-    unsigned  	     	Flags;
-    unsigned long    	MTime;		/* Modifiation time of object file */
-    unsigned long    	Start;		/* Start offset of data in library */
-    unsigned long    	Size;		/* Size of data in library */
+    unsigned            Flags;
+    unsigned long       MTime;          /* Modifiation time of object file */
+    unsigned long       Start;          /* Start offset of data in library */
+    unsigned long       Size;           /* Size of data in library */
 
     /* Object file header */
     ObjHeader           Header;
 
     /* Basic data needed for simple checks */
     Collection          Strings;        /* Strings from the object file */
-    Collection          Exports;       	/* Exports list from object file */
+    Collection          Exports;        /* Exports list from object file */
 };
 
 
@@ -81,7 +81,7 @@ extern Collection       ObjPool;
 
 
 /*****************************************************************************/
-/*     	      	    		     Code     		  	   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

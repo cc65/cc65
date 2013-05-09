@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	  			   easw16.c                                  */
+/*                                 easw16.c                                  */
 /*                                                                           */
 /*       SWEET16 effective address parsing for the ca65 macroassembler       */
 /*                                                                           */
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -82,13 +82,13 @@ void GetSweet16EA (EffAddr* A)
     /* Parse the effective address */
     if (TokIsSep (CurTok.Tok)) {
 
-       	A->AddrModeSet = AMSW16_IMP;
+        A->AddrModeSet = AMSW16_IMP;
 
     } else if (CurTok.Tok == TOK_AT) {
 
-       	/* @reg or @regnumber */
-	A->AddrModeSet = AMSW16_IND;
-	NextTok ();
+        /* @reg or @regnumber */
+        A->AddrModeSet = AMSW16_IND;
+        NextTok ();
         if (CurTok.Tok == TOK_REG) {
             A->Reg = (unsigned) CurTok.IVal;
             NextTok ();

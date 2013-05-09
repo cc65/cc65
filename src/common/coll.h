@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    coll.h				     */
+/*                                  coll.h                                   */
 /*                                                                           */
-/*			  Collection (dynamic array)			     */
+/*                        Collection (dynamic array)                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	      	       		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -54,16 +54,16 @@
 /* An array of pointers that grows if needed */
 typedef struct Collection Collection;
 struct Collection {
-    unsigned   	       	Count;		/* Number of items in the list */
-    unsigned   	       	Size;		/* Size of allocated array */
-    void**	    	Items;		/* Array with dynamic size */
+    unsigned            Count;          /* Number of items in the list */
+    unsigned            Size;           /* Size of allocated array */
+    void**              Items;          /* Array with dynamic size */
 };
 
 /* An empty collection */
 extern const Collection EmptyCollection;
 
 /* Initializer for static collections */
-#define STATIC_COLLECTION_INITIALIZER	{ 0, 0, 0 }
+#define STATIC_COLLECTION_INITIALIZER   { 0, 0, 0 }
 
 /* Initializer for auto collections */
 #define AUTO_COLLECTION_INITIALIZER     EmptyCollection
@@ -71,7 +71,7 @@ extern const Collection EmptyCollection;
 
 
 /*****************************************************************************/
-/*     	      	       		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -103,7 +103,7 @@ INLINE unsigned CollCount (const Collection* C)
     return C->Count;
 }
 #else
-#  define CollCount(C)	(C)->Count
+#  define CollCount(C)  (C)->Count
 #endif
 
 void CollInsert (Collection* C, void* Item, unsigned Index);
@@ -144,7 +144,7 @@ INLINE void* CollAtUnchecked (const Collection* C, unsigned Index)
     return C->Items[Index];
 }
 #else
-#  define CollAtUnchecked(C, Index) 	((C)->Items[(Index)])
+#  define CollAtUnchecked(C, Index)     ((C)->Items[(Index)])
 #endif
 
 #if defined(HAVE_INLINE)
@@ -237,7 +237,7 @@ INLINE void CollDeleteAll (Collection* C)
     C->Count = 0;
 }
 #else
-#  define CollDeleteAll(C)	((C)->Count = 0)
+#  define CollDeleteAll(C)      ((C)->Count = 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -288,8 +288,8 @@ void CollTransfer (Collection* Dest, const Collection* Source);
  */
 
 void CollSort (Collection* C,
-	       int (*Compare) (void*, const void*, const void*),
-	       void* Data);
+               int (*Compare) (void*, const void*, const void*),
+               void* Data);
 /* Sort the collection using the given compare function. The data pointer is
  * passed as *first* element to the compare function, it's not used by the
  * sort function itself. The other two pointer passed to the Compare function

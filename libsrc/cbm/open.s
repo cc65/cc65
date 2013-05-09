@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 16.11.2002
 ;
-; int open (const char* name, int flags, ...);	/* May take a mode argument */
+; int open (const char* name, int flags, ...);  /* May take a mode argument */
 ;
 ; Be sure to keep the value priority of closeallfiles lower than that of
 ; closeallstreams (which is the high level C file I/O counterpart and must be
@@ -58,12 +58,12 @@ next:   dex
 
 ; Throw away any additional parameters passed through the ellipsis
 
-       	dey                     ; Parm count < 4 shouldn't be needed to be...
-       	dey                     ; ...checked (it generates a c compiler warning)
+        dey                     ; Parm count < 4 shouldn't be needed to be...
+        dey                     ; ...checked (it generates a c compiler warning)
         dey
-       	dey
-       	beq  	parmok 	   	; Branch if parameter count ok
-       	jsr  	addysp	   	; Fix stack, throw away unused parameters
+        dey
+        beq     parmok          ; Branch if parameter count ok
+        jsr     addysp          ; Fix stack, throw away unused parameters
 
 ; Parameters ok. Pop the flags and save them into tmp3
 

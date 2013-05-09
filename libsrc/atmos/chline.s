@@ -5,25 +5,25 @@
 ; void chline (unsigned char length);
 ;
 
-    	.export		_chlinexy, _chline
+        .export         _chlinexy, _chline
         .import         setscrptr
         .import         rvs
-	.import		popax
+        .import         popax
         .importzp       ptr2
 
         .include        "atmos.inc"
 
 
 _chlinexy:
-       	pha	    	     	; Save the length
-	jsr	popax	     	; Get X and Y
+        pha                     ; Save the length
+        jsr     popax           ; Get X and Y
         sta     CURS_Y          ; Store Y
         stx     CURS_X          ; Store X
-       	pla		     	; Restore the length and run into _chline
+        pla                     ; Restore the length and run into _chline
 
 _chline:
-       	tax                     ; Is the length zero?
-       	beq	@L9  	     	; Jump if done
+        tax                     ; Is the length zero?
+        beq     @L9             ; Jump if done
         jsr     setscrptr       ; Set ptr2 to screen, won't use X
         txa                     ; Length into A
         clc
@@ -37,5 +37,5 @@ _chline:
         inc     ptr2+1          ; Bump high byte of screen pointer
 @L2:    dex
         bne     @L1
-@L9:	rts
+@L9:    rts
 

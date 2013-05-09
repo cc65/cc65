@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  joystick.h				     */
+/*                                joystick.h                                 */
 /*                                                                           */
-/*		 Read the joystick on systems that support it		     */
+/*               Read the joystick on systems that support it                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -52,8 +52,8 @@
 #define JOY_ERR_NO_DEVICE       4       /* Device (hardware) not found */
 
 /* Argument for the joy_read function */
-#define JOY_1		0
-#define JOY_2		1
+#define JOY_1           0
+#define JOY_2           1
 
 /* The following codes are *indices* into the joy_masks array */
 #define JOY_UP          0
@@ -83,7 +83,7 @@ extern const void joy_static_stddrv[];
 
 
 /*****************************************************************************/
-/* 	      	       	      	   Functions	       			     */
+/*                                 Functions                                 */
 /*****************************************************************************/
 
 

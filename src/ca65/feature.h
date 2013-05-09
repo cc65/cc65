@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   feature.h				     */
+/*                                 feature.h                                 */
 /*                                                                           */
-/*		    Subroutines for the emulation features		     */
+/*                  Subroutines for the emulation features                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -34,7 +34,7 @@
 
 
 #ifndef FEATURE_H
-#define	FEATURE_H
+#define FEATURE_H
 
 
 
@@ -44,13 +44,13 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			   	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 typedef enum {
-    FEAT_UNKNOWN 		= -1,
+    FEAT_UNKNOWN                = -1,
     FEAT_DOLLAR_IS_PC,
     FEAT_LABELS_WITHOUT_COLONS,
     FEAT_LOOSE_STRING_TERM,
@@ -73,7 +73,7 @@ typedef enum {
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

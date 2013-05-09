@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     o65.c				     */
+/*                                   o65.c                                   */
 /*                                                                           */
-/*		    Module to handle the o65 binary format		     */
+/*                  Module to handle the o65 binary format                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -61,13 +61,13 @@
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Header mode bits */
-#define MF_CPU_65816    0x8000		/* Executable is for 65816 */
+#define MF_CPU_65816    0x8000          /* Executable is for 65816 */
 #define MF_CPU_6502     0x0000          /* Executable is for the 6502 */
 #define MF_CPU_MASK     0x8000          /* Mask to extract CPU type */
 
@@ -75,7 +75,7 @@
 #define MF_RELOC_BYTE   0x0000          /* Byte wise relocation */
 #define MF_RELOC_MASK   0x4000          /* Mask to extract relocation type */
 
-#define MF_SIZE_32BIT	0x2000		/* All size words are 32bit */
+#define MF_SIZE_32BIT   0x2000          /* All size words are 32bit */
 #define MF_SIZE_16BIT   0x0000          /* All size words are 16bit */
 #define MF_SIZE_MASK    0x2000          /* Mask to extract size */
 
@@ -91,102 +91,102 @@
 #define MF_ALIGN_2      0x0001          /* Align words */
 #define MF_ALIGN_4      0x0002          /* Align longwords */
 #define MF_ALIGN_256    0x0003          /* Align pages (256 bytes) */
-#define MF_ALIGN_MASK   0x0003 	       	/* Mask to extract alignment */
+#define MF_ALIGN_MASK   0x0003          /* Mask to extract alignment */
 
 /* The four o65 segment types. Note: These values are identical to the values
  * needed for the segmentID in the o65 spec.
  */
-#define O65SEG_UNDEF	0x00
-#define O65SEG_ABS	0x01
-#define O65SEG_TEXT	0x02
-#define O65SEG_DATA	0x03
-#define O65SEG_BSS	0x04
-#define O65SEG_ZP 	0x05
+#define O65SEG_UNDEF    0x00
+#define O65SEG_ABS      0x01
+#define O65SEG_TEXT     0x02
+#define O65SEG_DATA     0x03
+#define O65SEG_BSS      0x04
+#define O65SEG_ZP       0x05
 
 /* Relocation type codes for the o65 format */
-#define O65RELOC_WORD	0x80
-#define O65RELOC_HIGH	0x40
-#define O65RELOC_LOW	0x20
-#define O65RELOC_SEGADR	0xC0
-#define O65RELOC_SEG	0xA0
+#define O65RELOC_WORD   0x80
+#define O65RELOC_HIGH   0x40
+#define O65RELOC_LOW    0x20
+#define O65RELOC_SEGADR 0xC0
+#define O65RELOC_SEG    0xA0
 #define O65RELOC_MASK   0xE0
 
 /* O65 executable file header */
 typedef struct O65Header O65Header;
 struct O65Header {
-    unsigned	    Version;	    	/* Version number for o65 format */
-    unsigned        Mode;      	    	/* Mode word */
-    unsigned long   TextBase;		/* Base address of text segment */
-    unsigned long   TextSize;		/* Size of text segment */
-    unsigned long   DataBase;		/* Base of data segment */
-    unsigned long   DataSize;		/* Size of data segment */
-    unsigned long   BssBase;		/* Base of bss segment */
-    unsigned long   BssSize;		/* Size of bss segment */
-    unsigned long   ZPBase;		/* Base of zeropage segment */
-    unsigned long   ZPSize;		/* Size of zeropage segment */
-    unsigned long   StackSize;		/* Requested stack size */
+    unsigned        Version;            /* Version number for o65 format */
+    unsigned        Mode;               /* Mode word */
+    unsigned long   TextBase;           /* Base address of text segment */
+    unsigned long   TextSize;           /* Size of text segment */
+    unsigned long   DataBase;           /* Base of data segment */
+    unsigned long   DataSize;           /* Size of data segment */
+    unsigned long   BssBase;            /* Base of bss segment */
+    unsigned long   BssSize;            /* Size of bss segment */
+    unsigned long   ZPBase;             /* Base of zeropage segment */
+    unsigned long   ZPSize;             /* Size of zeropage segment */
+    unsigned long   StackSize;          /* Requested stack size */
 };
 
 /* An o65 option */
 typedef struct O65Option O65Option;
 struct O65Option {
-    O65Option*	    Next;		/* Next in option list */
-    unsigned char   Type;	       	/* Type of option */
-    unsigned char   Len;	       	/* Data length */
-    unsigned char   Data [1];	       	/* Data, dynamically allocated */
+    O65Option*      Next;               /* Next in option list */
+    unsigned char   Type;               /* Type of option */
+    unsigned char   Len;                /* Data length */
+    unsigned char   Data [1];           /* Data, dynamically allocated */
 };
 
 /* A o65 relocation table */
 typedef struct O65RelocTab O65RelocTab;
 struct O65RelocTab {
-    unsigned 	    Size;   	       	/* Size of the table */
-    unsigned	    Fill;   	       	/* Amount used */
-    unsigned char*  Buf; 	       	/* Buffer, dynamically allocated */
+    unsigned        Size;               /* Size of the table */
+    unsigned        Fill;               /* Amount used */
+    unsigned char*  Buf;                /* Buffer, dynamically allocated */
 };
 
 /* Structure describing the format */
 struct O65Desc {
-    O65Header 	    Header; 	       	/* File header */
-    O65Option*	    Options;	       	/* List of file options */
-    ExtSymTab*	    Exports;	       	/* Table with exported symbols */
-    ExtSymTab*	    Imports;	       	/* Table with imported symbols */
-    unsigned   	    Undef;	       	/* Count of undefined symbols */
-    FILE*     	    F;		       	/* The file we're writing to */
-    const char*     Filename;	       	/* Name of the output file */
-    O65RelocTab*    TextReloc;	       	/* Relocation table for text segment */
-    O65RelocTab*    DataReloc;	       	/* Relocation table for data segment */
+    O65Header       Header;             /* File header */
+    O65Option*      Options;            /* List of file options */
+    ExtSymTab*      Exports;            /* Table with exported symbols */
+    ExtSymTab*      Imports;            /* Table with imported symbols */
+    unsigned        Undef;              /* Count of undefined symbols */
+    FILE*           F;                  /* The file we're writing to */
+    const char*     Filename;           /* Name of the output file */
+    O65RelocTab*    TextReloc;          /* Relocation table for text segment */
+    O65RelocTab*    DataReloc;          /* Relocation table for data segment */
 
-    unsigned  	    TextCount;	       	/* Number of segments assigned to .text */
-    SegDesc** 	    TextSeg;	       	/* Array of text segments */
-    unsigned  	    DataCount;	       	/* Number of segments assigned to .data */
-    SegDesc** 	    DataSeg;	       	/* Array of data segments */
-    unsigned  	    BssCount;	       	/* Number of segments assigned to .bss */
-    SegDesc** 	    BssSeg;    	       	/* Array of bss segments */
-    unsigned  	    ZPCount;	       	/* Number of segments assigned to .zp */
-    SegDesc** 	    ZPSeg;	       	/* Array of zp segments */
+    unsigned        TextCount;          /* Number of segments assigned to .text */
+    SegDesc**       TextSeg;            /* Array of text segments */
+    unsigned        DataCount;          /* Number of segments assigned to .data */
+    SegDesc**       DataSeg;            /* Array of data segments */
+    unsigned        BssCount;           /* Number of segments assigned to .bss */
+    SegDesc**       BssSeg;             /* Array of bss segments */
+    unsigned        ZPCount;            /* Number of segments assigned to .zp */
+    SegDesc**       ZPSeg;              /* Array of zp segments */
 
     /* Temporary data for writing segments */
     unsigned long   SegSize;
     O65RelocTab*    CurReloc;
-    long      	    LastOffs;
+    long            LastOffs;
 };
 
 /* Structure for parsing expression trees */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-    O65Desc*   	    D;			/* File format descriptor */
-    long       	    Val;		/* The offset value */
-    int	       	    TooComplex;	       	/* Expression too complex */
+    O65Desc*        D;                  /* File format descriptor */
+    long            Val;                /* The offset value */
+    int             TooComplex;         /* Expression too complex */
     MemoryArea*     MemRef;             /* Memory reference if any */
     Segment*        SegRef;             /* Segment reference if any */
-    Section*   	    SecRef;		/* Section reference if any */
-    ExtSym*    	    ExtRef;		/* External reference if any */
+    Section*        SecRef;             /* Section reference if any */
+    ExtSym*         ExtRef;             /* External reference if any */
 };
 
 
 
 /*****************************************************************************/
-/*  	       	    	       Helper functions	     			     */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
@@ -194,8 +194,8 @@ struct ExprDesc {
 static ExprDesc* InitExprDesc (ExprDesc* ED, O65Desc* D)
 /* Initialize an ExprDesc structure for use with O65ParseExpr */
 {
-    ED->D    	   = D;
-    ED->Val  	   = 0;
+    ED->D          = D;
+    ED->Val        = 0;
     ED->TooComplex = 0;
     ED->MemRef     = 0;
     ED->SegRef     = 0;
@@ -210,9 +210,9 @@ static void WriteSize (const O65Desc* D, unsigned long Val)
 /* Write a "size" word to the file */
 {
     switch (D->Header.Mode & MF_SIZE_MASK) {
-	case MF_SIZE_16BIT:     Write16 (D->F, (unsigned) Val); break;
-	case MF_SIZE_32BIT:     Write32 (D->F, Val);            break;
-    	default:                Internal ("Invalid size in header: %04X", D->Header.Mode);
+        case MF_SIZE_16BIT:     Write16 (D->F, (unsigned) Val); break;
+        case MF_SIZE_32BIT:     Write32 (D->F, Val);            break;
+        default:                Internal ("Invalid size in header: %04X", D->Header.Mode);
     }
 }
 
@@ -228,13 +228,13 @@ static unsigned O65SegType (const SegDesc* S)
      * to check SF_ZP first.
      */
     if (S->Flags & SF_RO) {
-    	return O65SEG_TEXT;
+        return O65SEG_TEXT;
     } else if (S->Flags & SF_ZP) {
-    	return O65SEG_ZP;
+        return O65SEG_ZP;
     } else if (S->Flags & SF_BSS) {
-    	return O65SEG_BSS;
+        return O65SEG_BSS;
     } else {
-    	return O65SEG_DATA;
+        return O65SEG_DATA;
     }
 }
 
@@ -257,7 +257,7 @@ static void CvtMemoryToSegment (ExprDesc* ED)
     for (I = 0; I < CollCount (&M->SegList); ++I) {
 
         /* Get the segment and check if it's a run segment */
-    	SegDesc* S = CollAtUnchecked (&M->SegList, I);
+        SegDesc* S = CollAtUnchecked (&M->SegList, I);
         if (S->Run == M) {
 
             unsigned long O;
@@ -297,10 +297,10 @@ static const SegDesc* FindSeg (SegDesc** const List, unsigned Count, const Segme
     unsigned I;
 
     for (I = 0; I < Count; ++I) {
-     	if (List[I]->Seg == S) {
-	    /* Found */
-     	    return List[I];
-     	}
+        if (List[I]->Seg == S) {
+            /* Found */
+            return List[I];
+        }
     }
 
     /* Not found */
@@ -315,16 +315,16 @@ static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
     const SegDesc* SD;
 
     if ((SD = FindSeg (D->TextSeg, D->TextCount, S)) != 0) {
-     	return SD;
+        return SD;
     }
     if ((SD = FindSeg (D->DataSeg, D->DataCount, S)) != 0) {
-     	return SD;
+        return SD;
     }
     if ((SD = FindSeg (D->BssSeg, D->BssCount, S)) != 0) {
-     	return SD;
+        return SD;
     }
     if ((SD = FindSeg (D->ZPSeg, D->ZPCount, S)) != 0) {
-     	return SD;
+        return SD;
     }
 
     /* Not found */
@@ -334,7 +334,7 @@ static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
 
 
 /*****************************************************************************/
-/*  	 	       	      Expression handling			     */
+/*                            Expression handling                            */
 /*****************************************************************************/
 
 
@@ -349,89 +349,89 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
 
     switch (Expr->Op) {
 
-	case EXPR_LITERAL:
+        case EXPR_LITERAL:
             D->Val += (Sign * Expr->V.IVal);
-	    break;
+            break;
 
-	case EXPR_SYMBOL:
-	    /* Get the referenced Export */
-	    E = GetExprExport (Expr);
-    	    /* If this export has a mark set, we've already encountered it.
-    	     * This means that the export is used to define it's own value,
-    	     * which in turn means, that we have a circular reference.
-    	     */
-    	    if (ExportHasMark (E)) {
-    		CircularRefError (E);
-    	    } else if (E->Expr == 0) {
-    		/* Dummy export, must be an o65 imported symbol */
-    		ExtSym* S = O65GetImport (D->D, E->Name);
-    		CHECK (S != 0);
-    		if (D->ExtRef) {
-    		    /* We cannot have more than one external reference in o65 */
-    		    D->TooComplex = 1;
-    		} else {
-    		    /* Remember the external reference */
-    		    D->ExtRef = S;
-    		}
-    	    } else {
-    		MarkExport (E);
-    	      	O65ParseExpr (E->Expr, D, Sign);
-    		UnmarkExport (E);
-    	    }
-    	    break;
+        case EXPR_SYMBOL:
+            /* Get the referenced Export */
+            E = GetExprExport (Expr);
+            /* If this export has a mark set, we've already encountered it.
+             * This means that the export is used to define it's own value,
+             * which in turn means, that we have a circular reference.
+             */
+            if (ExportHasMark (E)) {
+                CircularRefError (E);
+            } else if (E->Expr == 0) {
+                /* Dummy export, must be an o65 imported symbol */
+                ExtSym* S = O65GetImport (D->D, E->Name);
+                CHECK (S != 0);
+                if (D->ExtRef) {
+                    /* We cannot have more than one external reference in o65 */
+                    D->TooComplex = 1;
+                } else {
+                    /* Remember the external reference */
+                    D->ExtRef = S;
+                }
+            } else {
+                MarkExport (E);
+                O65ParseExpr (E->Expr, D, Sign);
+                UnmarkExport (E);
+            }
+            break;
 
-    	case EXPR_SECTION:
-    	    if (D->SecRef) {
-    	        /* We cannot handle more than one segment reference in o65 */
-    		D->TooComplex = 1;
-    	    } else {
-    	 	/* Remember the segment reference */
-    		D->SecRef = GetExprSection (Expr);
+        case EXPR_SECTION:
+            if (D->SecRef) {
+                /* We cannot handle more than one segment reference in o65 */
+                D->TooComplex = 1;
+            } else {
+                /* Remember the segment reference */
+                D->SecRef = GetExprSection (Expr);
                 /* Add the offset of the section to the constant value */
                 D->Val += Sign * (D->SecRef->Offs + D->SecRef->Seg->PC);
-    	    }
-    	    break;
+            }
+            break;
 
         case EXPR_SEGMENT:
-    	    if (D->SegRef) {
-    	        /* We cannot handle more than one segment reference in o65 */
-    		D->TooComplex = 1;
-    	    } else {
-    	 	/* Remember the segment reference */
-       	       	D->SegRef = Expr->V.Seg;
+            if (D->SegRef) {
+                /* We cannot handle more than one segment reference in o65 */
+                D->TooComplex = 1;
+            } else {
+                /* Remember the segment reference */
+                D->SegRef = Expr->V.Seg;
                 /* Add the offset of the segment to the constant value */
                 D->Val += (Sign * D->SegRef->PC);
-    	    }
-    	    break;
+            }
+            break;
 
         case EXPR_MEMAREA:
-    	    if (D->MemRef) {
-    	        /* We cannot handle more than one memory reference in o65 */
-    		D->TooComplex = 1;
-    	    } else {
-    	 	/* Remember the memory area reference */
-       	       	D->MemRef = Expr->V.Mem;
+            if (D->MemRef) {
+                /* We cannot handle more than one memory reference in o65 */
+                D->TooComplex = 1;
+            } else {
+                /* Remember the memory area reference */
+                D->MemRef = Expr->V.Mem;
                 /* Add the start address of the memory area to the constant
                  * value
                  */
                 D->Val += (Sign * D->MemRef->Start);
-    	    }
-    	    break;
+            }
+            break;
 
-    	case EXPR_PLUS:
-    	    O65ParseExpr (Expr->Left, D, Sign);
-      	    O65ParseExpr (Expr->Right, D, Sign);
-    	    break;
+        case EXPR_PLUS:
+            O65ParseExpr (Expr->Left, D, Sign);
+            O65ParseExpr (Expr->Right, D, Sign);
+            break;
 
-    	case EXPR_MINUS:
-    	    O65ParseExpr (Expr->Left, D, Sign);
-    	    O65ParseExpr (Expr->Right, D, -Sign);
-    	    break;
+        case EXPR_MINUS:
+            O65ParseExpr (Expr->Left, D, Sign);
+            O65ParseExpr (Expr->Right, D, -Sign);
+            break;
 
-     	default:
-    	    /* Expression contains illegal operators */
-    	    D->TooComplex = 1;
-    	    break;
+        default:
+            /* Expression contains illegal operators */
+            D->TooComplex = 1;
+            break;
 
     }
 }
@@ -439,7 +439,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
 
 
 /*****************************************************************************/
-/*  			       Relocation tables			     */
+/*                             Relocation tables                             */
 /*****************************************************************************/
 
 
@@ -475,7 +475,7 @@ static void O65RelocPutByte (O65RelocTab* R, unsigned B)
 {
     /* Do we have enough space in the buffer? */
     if (R->Fill == R->Size) {
-    	/* We need to grow the buffer */
+        /* We need to grow the buffer */
         if (R->Size) {
             R->Size *= 2;
         } else {
@@ -508,7 +508,7 @@ static void O65WriteReloc (O65RelocTab* R, FILE* F)
 
 
 /*****************************************************************************/
-/*  	       			Option handling				     */
+/*                              Option handling                              */
 /*****************************************************************************/
 
 
@@ -525,9 +525,9 @@ static O65Option* NewO65Option (unsigned Type, const void* Data, unsigned DataLe
     O = xmalloc (sizeof (O65Option) - 1 + DataLen);
 
     /* Initialize the structure */
-    O->Next    	= 0;
-    O->Type    	= Type;
-    O->Len     	= DataLen;
+    O->Next     = 0;
+    O->Type     = Type;
+    O->Len      = DataLen;
     memcpy (O->Data, Data, DataLen);
 
     /* Return the created struct */
@@ -537,7 +537,7 @@ static O65Option* NewO65Option (unsigned Type, const void* Data, unsigned DataLe
 
 
 static void FreeO65Option (O65Option* O)
-/* Free	an O65Option struct */
+/* Free an O65Option struct */
 {
     xfree (O);
 }
@@ -545,7 +545,7 @@ static void FreeO65Option (O65Option* O)
 
 
 /*****************************************************************************/
-/*	       	       Subroutines to write o65 sections	       	     */
+/*                     Subroutines to write o65 sections                     */
 /*****************************************************************************/
 
 
@@ -554,7 +554,7 @@ static void O65WriteHeader (O65Desc* D)
 /* Write the header of the executable to the given file */
 {
     static unsigned char Trailer [5] = {
-       	0x01, 0x00, 0x6F, 0x36, 0x35
+        0x01, 0x00, 0x6F, 0x36, 0x35
     };
 
     O65Option* O;
@@ -576,12 +576,12 @@ static void O65WriteHeader (O65Desc* D)
     /* Write the options */
     O = D->Options;
     while (O) {
-       	Write8 (D->F, O->Len + 2);		/* Account for len and type bytes */
-	Write8 (D->F, O->Type);
-	if (O->Len) {
-	    WriteData (D->F, O->Data, O->Len);
-	}
-	O = O->Next;
+        Write8 (D->F, O->Len + 2);              /* Account for len and type bytes */
+        Write8 (D->F, O->Type);
+        if (O->Len) {
+            WriteData (D->F, O->Data, O->Len);
+        }
+        O = O->Next;
     }
 
     /* Write the end-of-options byte */
@@ -591,7 +591,7 @@ static void O65WriteHeader (O65Desc* D)
 
 
 static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
-       	       	  	      unsigned long Offs, void* Data)
+                              unsigned long Offs, void* Data)
 /* Called from SegWrite for an expression. Evaluate the expression, check the
  * range and write the expression value to the file, update the relocation
  * table.
@@ -609,19 +609,19 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
     /* Check for a constant expression */
     if (IsConstExpr (E)) {
-       	/* Write out the constant expression */
-       	return SegWriteConstExpr (((O65Desc*)Data)->F, E, Signed, Size);
+        /* Write out the constant expression */
+        return SegWriteConstExpr (((O65Desc*)Data)->F, E, Signed, Size);
     }
 
     /* We have a relocatable expression that needs a relocation table entry.
      * Calculate the number of bytes between this entry and the last one, and
      * setup all necessary intermediate bytes in the relocation table.
      */
-    Offs += D->SegSize;	   	/* Calulate full offset */
+    Offs += D->SegSize;         /* Calulate full offset */
     Diff = ((long) Offs) - D->LastOffs;
     while (Diff > 0xFE) {
-       	O65RelocPutByte (D->CurReloc, 0xFF);
-       	Diff -= 0xFE;
+        O65RelocPutByte (D->CurReloc, 0xFF);
+        Diff -= 0xFE;
     }
     O65RelocPutByte (D->CurReloc, (unsigned char) Diff);
 
@@ -631,11 +631,11 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     /* Determine the expression to relocate */
     Expr = E;
     if (E->Op == EXPR_BYTE0   || E->Op == EXPR_BYTE1 ||
-       	E->Op == EXPR_BYTE2   || E->Op == EXPR_BYTE3 ||
-       	E->Op == EXPR_WORD0   || E->Op == EXPR_WORD1 ||
+        E->Op == EXPR_BYTE2   || E->Op == EXPR_BYTE3 ||
+        E->Op == EXPR_WORD0   || E->Op == EXPR_WORD1 ||
         E->Op == EXPR_FARADDR || E->Op == EXPR_DWORD) {
-       	/* Use the real expression */
-       	Expr = E->Left;
+        /* Use the real expression */
+        Expr = E->Left;
     }
 
     /* Recursively collect information about this expression */
@@ -645,7 +645,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     RefCount = (ED.MemRef != 0) + (ED.SegRef != 0) +
                (ED.SecRef != 0) + (ED.ExtRef != 0);
     if (RefCount > 1) {
-       	ED.TooComplex = 1;
+        ED.TooComplex = 1;
     }
 
     /* If we have a memory area reference, we need to convert it into a
@@ -661,7 +661,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
     /* Bail out if we cannot handle the expression */
     if (ED.TooComplex) {
-       	return SEG_EXPR_TOO_COMPLEX;
+        return SEG_EXPR_TOO_COMPLEX;
     }
 
     /* Safety: Check that we have exactly one reference */
@@ -670,12 +670,12 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     /* Write out the offset that goes into the segment. */
     BinVal = ED.Val;
     switch (E->Op) {
-       	case EXPR_BYTE0:    BinVal &= 0xFF;			break;
-       	case EXPR_BYTE1:    BinVal = (BinVal >>  8) & 0xFF;	break;
-       	case EXPR_BYTE2:    BinVal = (BinVal >> 16) & 0xFF;	break;
-       	case EXPR_BYTE3:    BinVal = (BinVal >> 24) & 0xFF;	break;
-       	case EXPR_WORD0:    BinVal &= 0xFFFF;			break;
-       	case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;	break;
+        case EXPR_BYTE0:    BinVal &= 0xFF;                     break;
+        case EXPR_BYTE1:    BinVal = (BinVal >>  8) & 0xFF;     break;
+        case EXPR_BYTE2:    BinVal = (BinVal >> 16) & 0xFF;     break;
+        case EXPR_BYTE3:    BinVal = (BinVal >> 24) & 0xFF;     break;
+        case EXPR_WORD0:    BinVal &= 0xFFFF;                   break;
+        case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;   break;
         case EXPR_FARADDR:  BinVal &= 0xFFFFFFUL;               break;
         case EXPR_DWORD:    BinVal &= 0xFFFFFFFFUL;             break;
     }
@@ -685,34 +685,34 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
      * information gathered about the expression.
      */
     if (E->Op == EXPR_BYTE0) {
-       	RelocType = O65RELOC_LOW;
+        RelocType = O65RELOC_LOW;
     } else if (E->Op == EXPR_BYTE1) {
-       	RelocType = O65RELOC_HIGH;
+        RelocType = O65RELOC_HIGH;
     } else if (E->Op == EXPR_BYTE2) {
-       	RelocType = O65RELOC_SEG;
+        RelocType = O65RELOC_SEG;
     } else {
-       	switch (Size) {
+        switch (Size) {
 
-       	    case 1:
-       	   	RelocType = O65RELOC_LOW;
-       	   	break;
+            case 1:
+                RelocType = O65RELOC_LOW;
+                break;
 
-       	    case 2:
-       	       	RelocType = O65RELOC_WORD;
-       	   	break;
+            case 2:
+                RelocType = O65RELOC_WORD;
+                break;
 
-       	    case 3:
-       	   	RelocType = O65RELOC_SEGADR;
-       	   	break;
+            case 3:
+                RelocType = O65RELOC_SEGADR;
+                break;
 
-       	    case 4:
-       	   	/* 4 byte expression not supported by o65 */
-       	   	return SEG_EXPR_TOO_COMPLEX;
+            case 4:
+                /* 4 byte expression not supported by o65 */
+                return SEG_EXPR_TOO_COMPLEX;
 
-       	    default:
-       	   	Internal ("O65WriteExpr: Invalid expression size: %u", Size);
-       	   	RelocType = 0;	  	/* Avoid gcc warnings */
-       	}
+            default:
+                Internal ("O65WriteExpr: Invalid expression size: %u", Size);
+                RelocType = 0;          /* Avoid gcc warnings */
+        }
     }
 
     /* Determine which segment we're referencing */
@@ -726,33 +726,33 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
             ED.SegRef = ED.SecRef->Seg;
         }
 
-       	/* Search for the segment and map it to it's o65 segmentID */
-       	Seg = O65FindSeg (D, ED.SegRef);
-    	if (Seg == 0) {
-    	    /* For some reason, we didn't find this segment in the list of
-    	     * segments written to the o65 file.
-    	     */
-    	    return SEG_EXPR_INVALID;
-    	}
-    	RelocType |= O65SegType (Seg);
-    	O65RelocPutByte (D->CurReloc, RelocType);
+        /* Search for the segment and map it to it's o65 segmentID */
+        Seg = O65FindSeg (D, ED.SegRef);
+        if (Seg == 0) {
+            /* For some reason, we didn't find this segment in the list of
+             * segments written to the o65 file.
+             */
+            return SEG_EXPR_INVALID;
+        }
+        RelocType |= O65SegType (Seg);
+        O65RelocPutByte (D->CurReloc, RelocType);
 
-    	/* Output additional data if needed */
-    	switch (RelocType & O65RELOC_MASK) {
-    	    case O65RELOC_HIGH:
-    	        O65RelocPutByte (D->CurReloc, ED.Val & 0xFF);
-    	        break;
-    	    case O65RELOC_SEG:
-    	        O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
-    	        break;
-    	}
+        /* Output additional data if needed */
+        switch (RelocType & O65RELOC_MASK) {
+            case O65RELOC_HIGH:
+                O65RelocPutByte (D->CurReloc, ED.Val & 0xFF);
+                break;
+            case O65RELOC_SEG:
+                O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
+                break;
+        }
 
     } else if (ED.ExtRef) {
-       	/* Imported symbol */
-       	RelocType |= O65SEG_UNDEF;
-       	O65RelocPutByte (D->CurReloc, RelocType);
-       	/* Put the number of the imported symbol into the table */
-       	O65RelocPutWord (D->CurReloc, ExtSymNum (ED.ExtRef));
+        /* Imported symbol */
+        RelocType |= O65SEG_UNDEF;
+        O65RelocPutByte (D->CurReloc, RelocType);
+        /* Put the number of the imported symbol into the table */
+        O65RelocPutWord (D->CurReloc, ExtSymNum (ED.ExtRef));
 
     } else {
 
@@ -780,22 +780,22 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
     /* Write out all segments */
     for (I = 0; I < Count; ++I) {
 
-	/* Get the segment from the list node */
-       	S = Seg [I];
+        /* Get the segment from the list node */
+        S = Seg [I];
 
-	/* Keep the user happy */
-	Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
+        /* Keep the user happy */
+        Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
 
-	/* Write this segment */
-       	if (DoWrite) {
-       	    SegWrite (D->Filename, D->F, S->Seg, O65WriteExpr, D);
-       	}
+        /* Write this segment */
+        if (DoWrite) {
+            SegWrite (D->Filename, D->F, S->Seg, O65WriteExpr, D);
+        }
 
-       	/* Mark the segment as dumped */
-       	S->Seg->Dumped = 1;
+        /* Mark the segment as dumped */
+        S->Seg->Dumped = 1;
 
-       	/* Calculate the total size */
-       	D->SegSize += S->Seg->Size;
+        /* Calculate the total size */
+        D->SegSize += S->Seg->Size;
     }
 
     /* Terminate the relocation table for this segment */
@@ -805,7 +805,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 
     /* Check the size of the segment for overflow */
     if ((D->Header.Mode & MF_SIZE_MASK) == MF_SIZE_16BIT && D->SegSize > 0xFFFF) {
-       	Error ("Segment overflow in file `%s'", D->Filename);
+        Error ("Segment overflow in file `%s'", D->Filename);
     }
 
 }
@@ -816,7 +816,7 @@ static void O65WriteTextSeg (O65Desc* D)
 /* Write the code segment to the o65 output file */
 {
     /* Initialize variables */
-    D->CurReloc	= D->TextReloc;
+    D->CurReloc = D->TextReloc;
 
     /* Dump all text segments */
     O65WriteSeg (D, D->TextSeg, D->TextCount, 1);
@@ -831,7 +831,7 @@ static void O65WriteDataSeg (O65Desc* D)
 /* Write the data segment to the o65 output file */
 {
     /* Initialize variables */
-    D->CurReloc	= D->DataReloc;
+    D->CurReloc = D->DataReloc;
 
     /* Dump all data segments */
     O65WriteSeg (D, D->DataSeg, D->DataCount, 1);
@@ -848,7 +848,7 @@ static void O65WriteBssSeg (O65Desc* D)
  */
 {
     /* Initialize variables */
-    D->CurReloc	= 0;
+    D->CurReloc = 0;
 
     /* Dump all bss segments */
     O65WriteSeg (D, D->BssSeg, D->BssCount, 0);
@@ -865,7 +865,7 @@ static void O65WriteZPSeg (O65Desc* D)
  */
 {
     /* Initialize variables */
-    D->CurReloc	= 0;
+    D->CurReloc = 0;
 
     /* Dump all zp segments */
     O65WriteSeg (D, D->ZPSeg, D->ZPCount, 0);
@@ -887,12 +887,12 @@ static void O65WriteImports (O65Desc* D)
     /* Write out the symbol names, zero terminated */
     S = ExtSymList (D->Imports);
     while (S) {
-     	/* Get the name */
-     	const char* Name = GetString (ExtSymName (S));
-     	/* And write it to the output file */
-     	WriteData (D->F, Name, strlen (Name) + 1);
-     	/* Next symbol */
-     	S = ExtSymNext (S);
+        /* Get the name */
+        const char* Name = GetString (ExtSymName (S));
+        /* And write it to the output file */
+        WriteData (D->F, Name, strlen (Name) + 1);
+        /* Next symbol */
+        S = ExtSymNext (S);
     }
 }
 
@@ -926,42 +926,42 @@ static void O65WriteExports (O65Desc* D)
     S = ExtSymList (D->Exports);
     while (S) {
 
-	ExprNode* Expr;
-	unsigned char SegmentID;
-	ExprDesc ED;
+        ExprNode* Expr;
+        unsigned char SegmentID;
+        ExprDesc ED;
 
-	/* Get the name */
-	unsigned NameIdx = ExtSymName (S);
+        /* Get the name */
+        unsigned NameIdx = ExtSymName (S);
         const char* Name = GetString (NameIdx);
 
-	/* Get the export for this symbol. We've checked before that this
-	 * export does really exist, so if it is unresolved, or if we don't
-	 * find it, there is an error in the linker code.
-	 */
-	Export*	E = FindExport (NameIdx);
-	if (E == 0 || IsUnresolvedExport (E)) {
-	    Internal ("Unresolved export `%s' found in O65WriteExports", Name);
-	}
+        /* Get the export for this symbol. We've checked before that this
+         * export does really exist, so if it is unresolved, or if we don't
+         * find it, there is an error in the linker code.
+         */
+        Export* E = FindExport (NameIdx);
+        if (E == 0 || IsUnresolvedExport (E)) {
+            Internal ("Unresolved export `%s' found in O65WriteExports", Name);
+        }
 
-	/* Get the expression for the symbol */
-	Expr = E->Expr;
+        /* Get the expression for the symbol */
+        Expr = E->Expr;
 
-	/* Recursively collect information about this expression */
-	O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
+        /* Recursively collect information about this expression */
+        O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
 
-       	/* We cannot handle expressions with imported symbols, or expressions
+        /* We cannot handle expressions with imported symbols, or expressions
          * with more than one segment reference here
          */
-	if (ED.ExtRef != 0 || (ED.SegRef != 0 && ED.SecRef != 0)) {
-	    ED.TooComplex = 1;
-	}
+        if (ED.ExtRef != 0 || (ED.SegRef != 0 && ED.SecRef != 0)) {
+            ED.TooComplex = 1;
+        }
 
-	/* Bail out if we cannot handle the expression */
-	if (ED.TooComplex) {
-	    Error ("Expression for symbol `%s' is too complex", Name);
-	}
+        /* Bail out if we cannot handle the expression */
+        if (ED.TooComplex) {
+            Error ("Expression for symbol `%s' is too complex", Name);
+        }
 
-	/* Determine the segment id for the expression */
+        /* Determine the segment id for the expression */
         if (ED.SegRef != 0 || ED.SecRef != 0) {
 
             const SegDesc* Seg;
@@ -971,39 +971,39 @@ static void O65WriteExports (O65Desc* D)
                 ED.SegRef = ED.SecRef->Seg;     /* Get segment from section */
             }
 
-       	    /* Search for the segment and map it to it's o65 segmentID */
-	    Seg = O65FindSeg (D, ED.SegRef);
-	    if (Seg == 0) {
-		/* For some reason, we didn't find this segment in the list of
-		 * segments written to the o65 file.
-		 */
-		Error ("Segment for symbol `%s' is undefined", Name);
-	    }
-	    SegmentID = O65SegType (Seg);
+            /* Search for the segment and map it to it's o65 segmentID */
+            Seg = O65FindSeg (D, ED.SegRef);
+            if (Seg == 0) {
+                /* For some reason, we didn't find this segment in the list of
+                 * segments written to the o65 file.
+                 */
+                Error ("Segment for symbol `%s' is undefined", Name);
+            }
+            SegmentID = O65SegType (Seg);
 
         } else {
 
-	    /* Absolute value */
-	    SegmentID = O65SEG_ABS;
+            /* Absolute value */
+            SegmentID = O65SEG_ABS;
 
-	}
+        }
 
-	/* Write the name to the output file */
-	WriteData (D->F, Name, strlen (Name) + 1);
+        /* Write the name to the output file */
+        WriteData (D->F, Name, strlen (Name) + 1);
 
-	/* Output the segment id followed by the literal value */
-       	Write8 (D->F, SegmentID);
-	WriteSize (D, ED.Val);
+        /* Output the segment id followed by the literal value */
+        Write8 (D->F, SegmentID);
+        WriteSize (D, ED.Val);
 
-	/* Next symbol */
-	S = ExtSymNext (S);
+        /* Next symbol */
+        S = ExtSymNext (S);
     }
 }
 
 
 
 /*****************************************************************************/
-/*  		   	 	  Public code				     */
+/*                                Public code                                */
 /*****************************************************************************/
 
 
@@ -1015,9 +1015,9 @@ O65Desc* NewO65Desc (void)
     O65Desc* D = xmalloc (sizeof (O65Desc));
 
     /* Initialize the header */
-    D->Header.Version	= 0;
+    D->Header.Version   = 0;
     D->Header.Mode      = 0;
-    D->Header.TextBase	= 0;
+    D->Header.TextBase  = 0;
     D->Header.TextSize  = 0;
     D->Header.DataBase  = 0;
     D->Header.DataSize  = 0;
@@ -1025,25 +1025,25 @@ O65Desc* NewO65Desc (void)
     D->Header.BssSize   = 0;
     D->Header.ZPBase    = 0;
     D->Header.ZPSize    = 0;
-    D->Header.StackSize = 0;		/* Let OS choose a good value */
+    D->Header.StackSize = 0;            /* Let OS choose a good value */
 
     /* Initialize other data */
-    D->Options	    	= 0;
-    D->Exports		= NewExtSymTab ();
-    D->Imports		= NewExtSymTab ();
-    D->Undef	   	= 0;
-    D->F	   	= 0;
-    D->Filename	   	= 0;
-    D->TextReloc   	= NewO65RelocTab ();
-    D->DataReloc   	= NewO65RelocTab ();
-    D->TextCount 	= 0;
-    D->TextSeg		= 0;
-    D->DataCount	= 0;
-    D->DataSeg		= 0;
-    D->BssCount		= 0;
-    D->BssSeg		= 0;
-    D->ZPCount		= 0;
-    D->ZPSeg		= 0;
+    D->Options          = 0;
+    D->Exports          = NewExtSymTab ();
+    D->Imports          = NewExtSymTab ();
+    D->Undef            = 0;
+    D->F                = 0;
+    D->Filename         = 0;
+    D->TextReloc        = NewO65RelocTab ();
+    D->DataReloc        = NewO65RelocTab ();
+    D->TextCount        = 0;
+    D->TextSeg          = 0;
+    D->DataCount        = 0;
+    D->DataSeg          = 0;
+    D->BssCount         = 0;
+    D->BssSeg           = 0;
+    D->ZPCount          = 0;
+    D->ZPSeg            = 0;
 
     /* Return the created struct */
     return D;
@@ -1067,8 +1067,8 @@ void FreeO65Desc (O65Desc* D)
     /* Free the option list */
     while (D->Options) {
         O65Option* O = D->Options;
-	D->Options = D->Options->Next;
-	FreeO65Option (O);
+        D->Options = D->Options->Next;
+        FreeO65Option (O);
     }
 
     /* Free the external symbol tables */
@@ -1121,9 +1121,9 @@ void O65SetAlignment (O65Desc* D, unsigned Alignment)
 
     /* Set the alignment bits */
     switch (Alignment) {
-	case 1:	  D->Header.Mode |= MF_ALIGN_1;   break;
-    	case 2:   D->Header.Mode |= MF_ALIGN_2;   break;
-	case 4:   D->Header.Mode |= MF_ALIGN_4;   break;
+        case 1:   D->Header.Mode |= MF_ALIGN_1;   break;
+        case 2:   D->Header.Mode |= MF_ALIGN_2;   break;
+        case 4:   D->Header.Mode |= MF_ALIGN_4;   break;
         case 256: D->Header.Mode |= MF_ALIGN_256; break;
         default:  Error ("Invalid alignment for O65 format: %u", Alignment);
     }
@@ -1155,17 +1155,17 @@ void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
     /* Write the correct option length */
     switch (OS) {
 
-     	case O65OS_CC65:
+        case O65OS_CC65:
             /* Set the 16 bit id */
             Opt[2] = (unsigned char) Id;
             Opt[3] = (unsigned char) (Id >> 8);
-     	    O65SetOption (D, O65OPT_OS, Opt, 4);
-     	    break;
+            O65SetOption (D, O65OPT_OS, Opt, 4);
+            break;
 
-     	default:
+        default:
             /* No id for OS/A65, Lunix, and unknown OSes */
-       	    O65SetOption (D, O65OPT_OS, Opt, 2);
-     	    break;
+            O65SetOption (D, O65OPT_OS, Opt, 2);
+            break;
 
     }
 }
@@ -1207,7 +1207,7 @@ void O65SetExport (O65Desc* D, unsigned Ident)
      */
     Export* E = FindExport (Ident);
     if (E == 0 || IsUnresolvedExport (E)) {
-	Error ("Unresolved export: `%s'", GetString (Ident));
+        Error ("Unresolved export: `%s'", GetString (Ident));
     }
 
     /* Insert the entry into the table */
@@ -1245,8 +1245,8 @@ static void O65SetupSegments (O65Desc* D, File* F)
                 case O65SEG_TEXT:   D->TextCount++; break;
                 case O65SEG_DATA:   D->DataCount++; break;
                 case O65SEG_BSS:    D->BssCount++;  break;
-                case O65SEG_ZP:	    D->ZPCount++;   break;
-                default:       	    Internal ("Invalid return from O65SegType");
+                case O65SEG_ZP:     D->ZPCount++;   break;
+                default:            Internal ("Invalid return from O65SegType");
             }
         }
     }
@@ -1272,11 +1272,11 @@ static void O65SetupSegments (O65Desc* D, File* F)
 
             /* Check the segment type. */
             switch (O65SegType (S)) {
-                case O65SEG_TEXT:   D->TextSeg [TextIdx++] = S;	break;
-                case O65SEG_DATA:   D->DataSeg [DataIdx++] = S;	break;
+                case O65SEG_TEXT:   D->TextSeg [TextIdx++] = S; break;
+                case O65SEG_DATA:   D->DataSeg [DataIdx++] = S; break;
                 case O65SEG_BSS:    D->BssSeg [BssIdx++]   = S; break;
-                case O65SEG_ZP:	    D->ZPSeg [ZPIdx++]     = S; break;
-                default:	    Internal ("Invalid return from O65SegType");
+                case O65SEG_ZP:     D->ZPSeg [ZPIdx++]     = S; break;
+                default:            Internal ("Invalid return from O65SegType");
             }
         }
     }
@@ -1289,12 +1289,12 @@ static int O65Unresolved (unsigned Name, void* D)
 {
     /* Check if the symbol is an imported o65 symbol */
     if (O65GetImport (D, Name) != 0) {
-	/* This is an external symbol, relax... */
-	return 1;
+        /* This is an external symbol, relax... */
+        return 1;
     } else {
-	/* This is actually an unresolved external. Bump the counter */
-	((O65Desc*) D)->Undef++;
-	return 0;
+        /* This is actually an unresolved external. Bump the counter */
+        ((O65Desc*) D)->Undef++;
+        return 0;
     }
 }
 
@@ -1335,7 +1335,7 @@ static void O65SetupHeader (O65Desc* D)
 void O65WriteTarget (O65Desc* D, File* F)
 /* Write an o65 output file */
 {
-    char        OptBuf [256];	/* Buffer for option strings */
+    char        OptBuf [256];   /* Buffer for option strings */
     unsigned    OptLen;
     time_t      T;
     const char* Name;
@@ -1346,11 +1346,11 @@ void O65WriteTarget (O65Desc* D, File* F)
     /* Check for unresolved symbols. The function O65Unresolved is called
      * if we get an unresolved symbol.
      */
-    D->Undef = 0;		/* Reset the counter */
+    D->Undef = 0;               /* Reset the counter */
     CheckUnresolvedImports (O65Unresolved, D);
     if (D->Undef > 0) {
-     	/* We had unresolved symbols, cannot create output file */
-       	Error ("%u unresolved external(s) found - cannot create output file", D->Undef);
+        /* We had unresolved symbols, cannot create output file */
+        Error ("%u unresolved external(s) found - cannot create output file", D->Undef);
     }
 
     /* Setup the segment arrays */
@@ -1362,7 +1362,7 @@ void O65WriteTarget (O65Desc* D, File* F)
     /* Open the file */
     D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-     	Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
@@ -1417,7 +1417,7 @@ void O65WriteTarget (O65Desc* D, File* F)
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-	Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */

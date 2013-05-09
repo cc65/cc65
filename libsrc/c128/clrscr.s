@@ -4,11 +4,11 @@
 ; void clrscr (void);
 ;
 
-	.export		_clrscr
+        .export         _clrscr
 
-	.include	"c128.inc"
+        .include        "c128.inc"
 
-_clrscr	= CLRSCR
+_clrscr = CLRSCR
 
 
 

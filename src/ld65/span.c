@@ -54,7 +54,7 @@
 
 /* Definition of a span */
 struct Span {
-    unsigned		Id;		/* Id of the span */
+    unsigned            Id;             /* Id of the span */
     unsigned            Sec;            /* Section id of this span */
     unsigned long       Offs;           /* Offset of span within segment */
     unsigned long       Size;           /* Size of span */
@@ -64,7 +64,7 @@ struct Span {
 
 
 /*****************************************************************************/
-/*     	       	       	      	     Code			     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

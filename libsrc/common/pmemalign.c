@@ -33,12 +33,12 @@
 
 
 
-#include <stddef.h>			/* define NULL */
-#include <stdlib.h>			/* declare function's prototype */
+#include <stddef.h>                     /* define NULL */
+#include <stdlib.h>                     /* declare function's prototype */
 #include <_heap.h>
 
 #include <errno.h>
-#define EOK		0		/* No errors (non-standard name) */
+#define EOK             0               /* No errors (non-standard name) */
 
 
 

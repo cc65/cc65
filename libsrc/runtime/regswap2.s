@@ -4,10 +4,10 @@
 ; CC65 runtime: Swap 2 bytes of register variable space
 ;
 
-   	.export	  	regswap2
-	.importzp      	sp, regbank
+        .export         regswap2
+        .importzp       sp, regbank
 
-.proc	regswap2
+.proc   regswap2
 
 ; First byte
 
@@ -28,7 +28,7 @@
         pla
         sta     (sp),y                  ; Store old value
 
-	rts
+        rts
 
 .endproc
 

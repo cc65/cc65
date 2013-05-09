@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    util.c                                   */
+/*                                  util.c                                   */
 /*                                                                           */
-/*		   Utility functions for the cc65 C compiler                 */
+/*                 Utility functions for the cc65 C compiler                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -38,7 +38,7 @@
 
 
 /*****************************************************************************/
-/*		     	   	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -52,10 +52,10 @@ int PowerOf2 (unsigned long Val)
     unsigned long Mask = 0x0001;
 
     for (I = 0; I < 32; ++I) {
-	if (Val == Mask) {
-	    return I;
-	}
-	Mask <<= 1;
+        if (Val == Mask) {
+            return I;
+        }
+        Mask <<= 1;
     }
     return -1;
 }

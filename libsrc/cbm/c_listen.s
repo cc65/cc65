@@ -5,7 +5,7 @@
 ;
 
         .import         LISTEN
-       	.export	       	_cbm_k_listen := LISTEN
+        .export         _cbm_k_listen := LISTEN
 
 
 

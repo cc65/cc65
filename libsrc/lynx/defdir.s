@@ -3,18 +3,18 @@
 ;
 ; A default directory with just the main executable.
 ;
-	.include "lynx.inc"
-	.import         __STARTOFDIRECTORY__
-	.import         __RAM_START__
-	.import         __CODE_SIZE__,__DATA_SIZE__,__RODATA_SIZE__
-	.import		__STARTUP_SIZE__,__INIT_SIZE__
-	.import		__BLOCKSIZE__
-	.export		__DEFDIR__: absolute = 1
+        .include "lynx.inc"
+        .import         __STARTOFDIRECTORY__
+        .import         __RAM_START__
+        .import         __CODE_SIZE__,__DATA_SIZE__,__RODATA_SIZE__
+        .import         __STARTUP_SIZE__,__INIT_SIZE__
+        .import         __BLOCKSIZE__
+        .export         __DEFDIR__: absolute = 1
 
 
 ; ------------------------------------------------------------------------
 ; Lynx directory
-	.segment "DIRECTORY"
+        .segment "DIRECTORY"
 
 __DIRECTORY_START__:
 off0=__STARTOFDIRECTORY__+(__DIRECTORY_END__-__DIRECTORY_START__)

@@ -4,17 +4,17 @@
 ; RDKEY routine
 ;
 
-	.export		RDKEY
+        .export         RDKEY
 
-	.include	"apple2.inc"
+        .include        "apple2.inc"
 
-	.segment        "LOWCODE"
+        .segment        "LOWCODE"
 
 RDKEY:
-	; Switch in ROM and call RDKEY
-	bit	$C082
-	jsr	$FD0C		; Display prompt and read key from user input routine
+        ; Switch in ROM and call RDKEY
+        bit     $C082
+        jsr     $FD0C           ; Display prompt and read key from user input routine
 
-	; Switch in LC bank 2 for R/O and return
-	bit	$C080
-	rts
+        ; Switch in LC bank 2 for R/O and return
+        bit     $C080
+        rts

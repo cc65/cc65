@@ -12,33 +12,33 @@
 ;
 ; int __fastcall__ read(int fd,void *buf,int count)
 ;
-	.importzp	_FileDestPtr
-	.import		lynxread0
-	.import		pushax,ldaxysp,ldax0sp,incsp6
-	.export		_read
+        .importzp       _FileDestPtr
+        .import         lynxread0
+        .import         pushax,ldaxysp,ldax0sp,incsp6
+        .export         _read
 
-.segment	"CODE"
+.segment        "CODE"
 
-.proc	_read: near
+.proc   _read: near
 
-.segment	"CODE"
+.segment        "CODE"
 
-	jsr     pushax
-	ldy     #$03
-	jsr     ldaxysp
-	sta     _FileDestPtr
-	stx     _FileDestPtr+1
-	jsr     ldax0sp
-	pha
+        jsr     pushax
+        ldy     #$03
+        jsr     ldaxysp
+        sta     _FileDestPtr
+        stx     _FileDestPtr+1
+        jsr     ldax0sp
+        pha
         txa
-	eor	#$FF
-	tay
-	pla
-	eor	#$FF
-	tax
-	jsr     lynxread0
-	jsr     ldax0sp
-	jmp     incsp6
+        eor     #$FF
+        tay
+        pla
+        eor     #$FF
+        tax
+        jsr     lynxread0
+        jsr     ldax0sp
+        jmp     incsp6
 
 .endproc
 

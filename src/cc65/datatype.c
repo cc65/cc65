@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  datatype.c				     */
+/*                                datatype.c                                 */
 /*                                                                           */
-/*		 Type string handling for the cc65 C compiler		     */
+/*               Type string handling for the cc65 C compiler                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,7 +53,7 @@
 
 
 /*****************************************************************************/
-/*		    	  	     Data	    			     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -73,7 +73,7 @@ Type type_double[]      = { TYPE(T_DOUBLE), TYPE(T_END) };
 
 
 /*****************************************************************************/
-/*		 		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -83,7 +83,7 @@ unsigned TypeLen (const Type* T)
 {
     const Type* Start = T;
     while (T->C != T_END) {
-	++T;
+        ++T;
     }
     return T - Start;
 }
@@ -95,11 +95,11 @@ Type* TypeCopy (Type* Dest, const Type* Src)
 {
     Type* Orig = Dest;
     while (1) {
-      	*Dest = *Src;
+        *Dest = *Src;
         if (Src->C == T_END) {
             break;
         }
-      	Src++;
+        Src++;
         Dest++;
     }
     return Orig;
@@ -138,9 +138,9 @@ int SignExtendChar (int C)
 /* Do correct sign extension of a character */
 {
     if (IS_Get (&SignedChars) && (C & 0x80) != 0) {
-       	return C | ~0xFF;
+        return C | ~0xFF;
     } else {
-       	return C & 0xFF;
+        return C & 0xFF;
     }
 }
 
@@ -207,7 +207,7 @@ Type* PointerTo (const Type* T)
     unsigned Size = TypeLen (T) + 1;
 
     /* Allocate the new type string */
-    Type* P = TypeAlloc	(Size + 1);
+    Type* P = TypeAlloc (Size + 1);
 
     /* Create the return type... */
     P[0].C = T_PTR | (T[0].C & T_QUAL_ADDRSIZE);
@@ -225,8 +225,8 @@ static TypeCode PrintTypeComp (FILE* F, TypeCode C, TypeCode Mask, const char* N
  */
 {
     if ((C & Mask) == Mask) {
-      	fprintf (F, "%s ", Name);
-	C &= ~Mask;
+        fprintf (F, "%s ", Name);
+        C &= ~Mask;
     }
     return C;
 }
@@ -242,73 +242,73 @@ void PrintType (FILE* F, const Type* T)
         /* Get the type code */
         TypeCode C = T->C;
 
-     	/* Print any qualifiers */
-       	C = PrintTypeComp (F, C, T_QUAL_CONST, "const");
-     	C = PrintTypeComp (F, C, T_QUAL_VOLATILE, "volatile");
+        /* Print any qualifiers */
+        C = PrintTypeComp (F, C, T_QUAL_CONST, "const");
+        C = PrintTypeComp (F, C, T_QUAL_VOLATILE, "volatile");
         C = PrintTypeComp (F, C, T_QUAL_RESTRICT, "restrict");
         C = PrintTypeComp (F, C, T_QUAL_NEAR, "__near__");
         C = PrintTypeComp (F, C, T_QUAL_FAR, "__far__");
         C = PrintTypeComp (F, C, T_QUAL_FASTCALL, "__fastcall__");
         C = PrintTypeComp (F, C, T_QUAL_CDECL, "__cdecl__");
 
-     	/* Signedness. Omit the signedness specifier for long and int */
-       	if ((C & T_MASK_TYPE) != T_TYPE_INT && (C & T_MASK_TYPE) != T_TYPE_LONG) {
-     	    C = PrintTypeComp (F, C, T_SIGN_SIGNED, "signed");
-     	}
-     	C = PrintTypeComp (F, C, T_SIGN_UNSIGNED, "unsigned");
+        /* Signedness. Omit the signedness specifier for long and int */
+        if ((C & T_MASK_TYPE) != T_TYPE_INT && (C & T_MASK_TYPE) != T_TYPE_LONG) {
+            C = PrintTypeComp (F, C, T_SIGN_SIGNED, "signed");
+        }
+        C = PrintTypeComp (F, C, T_SIGN_UNSIGNED, "unsigned");
 
-     	/* Now check the real type */
-     	switch (C & T_MASK_TYPE) {
-     	    case T_TYPE_CHAR:
-     	  	fprintf (F, "char");
-     	  	break;
-     	    case T_TYPE_SHORT:
-     		fprintf (F, "short");
-     		break;
-     	    case T_TYPE_INT:
-     	  	fprintf (F, "int");
-     	  	break;
-     	    case T_TYPE_LONG:
-     		fprintf (F, "long");
-     		break;
-     	    case T_TYPE_LONGLONG:
-     		fprintf (F, "long long");
-     		break;
-     	    case T_TYPE_FLOAT:
-     	     	fprintf (F, "float");
-     	     	break;
-     	    case T_TYPE_DOUBLE:
-     	     	fprintf (F, "double");
-     	     	break;
-     	    case T_TYPE_VOID:
-     	  	fprintf (F, "void");
-     	  	break;
-     	    case T_TYPE_STRUCT:
-     	     	fprintf (F, "struct %s", ((SymEntry*) T->A.P)->Name);
-     	     	break;
-     	    case T_TYPE_UNION:
-     	     	fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
-     	     	break;
-     	    case T_TYPE_ARRAY:
-     		/* Recursive call */
-     		PrintType (F, T + 1);
-     		if (T->A.L == UNSPECIFIED) {
-     		    fprintf (F, "[]");
-     		} else {
-     		    fprintf (F, "[%ld]", T->A.L);
-     		}
-     	     	return;
-     	    case T_TYPE_PTR:
-     		/* Recursive call */
-     		PrintType (F, T + 1);
-     		fprintf (F, "*");
-     	     	return;
-     	    case T_TYPE_FUNC:
-     	     	fprintf (F, "function returning ");
-     	     	break;
-     	    default:
-     	     	fprintf (F, "unknown type: %04lX", T->C);
-     	}
+        /* Now check the real type */
+        switch (C & T_MASK_TYPE) {
+            case T_TYPE_CHAR:
+                fprintf (F, "char");
+                break;
+            case T_TYPE_SHORT:
+                fprintf (F, "short");
+                break;
+            case T_TYPE_INT:
+                fprintf (F, "int");
+                break;
+            case T_TYPE_LONG:
+                fprintf (F, "long");
+                break;
+            case T_TYPE_LONGLONG:
+                fprintf (F, "long long");
+                break;
+            case T_TYPE_FLOAT:
+                fprintf (F, "float");
+                break;
+            case T_TYPE_DOUBLE:
+                fprintf (F, "double");
+                break;
+            case T_TYPE_VOID:
+                fprintf (F, "void");
+                break;
+            case T_TYPE_STRUCT:
+                fprintf (F, "struct %s", ((SymEntry*) T->A.P)->Name);
+                break;
+            case T_TYPE_UNION:
+                fprintf (F, "union %s", ((SymEntry*) T->A.P)->Name);
+                break;
+            case T_TYPE_ARRAY:
+                /* Recursive call */
+                PrintType (F, T + 1);
+                if (T->A.L == UNSPECIFIED) {
+                    fprintf (F, "[]");
+                } else {
+                    fprintf (F, "[%ld]", T->A.L);
+                }
+                return;
+            case T_TYPE_PTR:
+                /* Recursive call */
+                PrintType (F, T + 1);
+                fprintf (F, "*");
+                return;
+            case T_TYPE_FUNC:
+                fprintf (F, "function returning ");
+                break;
+            default:
+                fprintf (F, "unknown type: %04lX", T->C);
+        }
 
         /* Next element */
         ++T;
@@ -332,29 +332,29 @@ void PrintFuncSig (FILE* F, const char* Name, Type* T)
         fprintf (F, " __far__");
     }
     if (IsQualFastcall (T)) {
-     	fprintf (F, " __fastcall__");
+        fprintf (F, " __fastcall__");
     }
     if (IsQualCDecl (T)) {
-     	fprintf (F, " __cdecl__");
+        fprintf (F, " __cdecl__");
     }
     fprintf (F, " %s (", Name);
 
     /* Parameters */
     if (D->Flags & FD_VOID_PARAM) {
-     	fprintf (F, "void");
+        fprintf (F, "void");
     } else {
-     	unsigned I;
-     	SymEntry* E = D->SymTab->SymHead;
-     	for (I = 0; I < D->ParamCount; ++I) {
-     	    if (I > 0) {
-     		fprintf (F, ", ");
-     	    }
+        unsigned I;
+        SymEntry* E = D->SymTab->SymHead;
+        for (I = 0; I < D->ParamCount; ++I) {
+            if (I > 0) {
+                fprintf (F, ", ");
+            }
             if (SymIsRegVar (E)) {
                 fprintf (F, "register ");
             }
-     	    PrintType (F, E->Type);
-     	    E = E->NextSym;
-     	}
+            PrintType (F, E->Type);
+            E = E->NextSym;
+        }
     }
 
     /* End of parameter list */
@@ -367,7 +367,7 @@ void PrintRawType (FILE* F, const Type* T)
 /* Print a type string in raw format (for debugging) */
 {
     while (T->C != T_END) {
-       	fprintf (F, "%04lX ", T->C);
+        fprintf (F, "%04lX ", T->C);
         ++T;
     }
     fprintf (F, "\n");
@@ -388,57 +388,57 @@ unsigned SizeOf (const Type* T)
 {
     switch (UnqualifiedType (T->C)) {
 
-    	case T_VOID:
-       	    return 0;   /* Assume voids have size zero */
+        case T_VOID:
+            return 0;   /* Assume voids have size zero */
 
-	case T_SCHAR:
-	case T_UCHAR:
-	    return SIZEOF_CHAR;
+        case T_SCHAR:
+        case T_UCHAR:
+            return SIZEOF_CHAR;
 
-       	case T_SHORT:
-    	case T_USHORT:
+        case T_SHORT:
+        case T_USHORT:
             return SIZEOF_SHORT;
 
-    	case T_INT:
-	case T_UINT:
+        case T_INT:
+        case T_UINT:
             return SIZEOF_INT;
 
-	case T_PTR:
-	case T_FUNC:	/* Maybe pointer to function */
-	    return SIZEOF_PTR;
+        case T_PTR:
+        case T_FUNC:    /* Maybe pointer to function */
+            return SIZEOF_PTR;
 
         case T_LONG:
-    	case T_ULONG:
-	    return SIZEOF_LONG;
+        case T_ULONG:
+            return SIZEOF_LONG;
 
-	case T_LONGLONG:
-	case T_ULONGLONG:
-	    return SIZEOF_LONGLONG;
+        case T_LONGLONG:
+        case T_ULONGLONG:
+            return SIZEOF_LONGLONG;
 
         case T_ENUM:
-	    return SIZEOF_INT;
+            return SIZEOF_INT;
 
-	case T_FLOAT:
+        case T_FLOAT:
             return SIZEOF_FLOAT;
 
-	case T_DOUBLE:
-	    return SIZEOF_DOUBLE;
+        case T_DOUBLE:
+            return SIZEOF_DOUBLE;
 
-	case T_STRUCT:
-	case T_UNION:
+        case T_STRUCT:
+        case T_UNION:
             return ((SymEntry*) T->A.P)->V.S.Size;
 
-	case T_ARRAY:
+        case T_ARRAY:
             if (T->A.L == UNSPECIFIED) {
                 /* Array with unspecified size */
                 return 0;
             } else {
-	        return T->A.L * SizeOf (T + 1);
+                return T->A.L * SizeOf (T + 1);
             }
 
-    	default:
-	    Internal ("Unknown type in SizeOf: %04lX", T->C);
-	    return 0;
+        default:
+            Internal ("Unknown type in SizeOf: %04lX", T->C);
+            return 0;
 
     }
 }
@@ -494,28 +494,28 @@ unsigned TypeOf (const Type* T)
 {
     switch (UnqualifiedType (T->C)) {
 
-	case T_SCHAR:
-    	    return CF_CHAR;
+        case T_SCHAR:
+            return CF_CHAR;
 
-    	case T_UCHAR:
-    	    return CF_CHAR | CF_UNSIGNED;
+        case T_UCHAR:
+            return CF_CHAR | CF_UNSIGNED;
 
-    	case T_SHORT:
-	case T_INT:
+        case T_SHORT:
+        case T_INT:
         case T_ENUM:
-	    return CF_INT;
+            return CF_INT;
 
-    	case T_USHORT:
-	case T_UINT:
-	case T_PTR:
-    	case T_ARRAY:
-	    return CF_INT | CF_UNSIGNED;
+        case T_USHORT:
+        case T_UINT:
+        case T_PTR:
+        case T_ARRAY:
+            return CF_INT | CF_UNSIGNED;
 
         case T_LONG:
-	    return CF_LONG;
+            return CF_LONG;
 
-       	case T_ULONG:
-       	    return CF_LONG | CF_UNSIGNED;
+        case T_ULONG:
+            return CF_LONG | CF_UNSIGNED;
 
         case T_FLOAT:
         case T_DOUBLE:
@@ -523,16 +523,16 @@ unsigned TypeOf (const Type* T)
             return CF_FLOAT;
 
         case T_FUNC:
-	    return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
+            return (((FuncDesc*) T->A.P)->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
 
         case T_STRUCT:
         case T_UNION:
-       	    /* Address of ... */
-       	    return CF_INT | CF_UNSIGNED;
+            /* Address of ... */
+            return CF_INT | CF_UNSIGNED;
 
-       	default:
-       	    Error ("Illegal type %04lX", T->C);
-       	    return CF_INT;
+        default:
+            Error ("Illegal type %04lX", T->C);
+            return CF_INT;
     }
 }
 
@@ -576,8 +576,8 @@ FuncDesc* GetFuncDesc (const Type* T)
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 {
     if (UnqualifiedType (T->C) == T_PTR) {
- 	/* Pointer to function */
- 	++T;
+        /* Pointer to function */
+        ++T;
     }
 
     /* Be sure it's a function type */
@@ -593,8 +593,8 @@ void SetFuncDesc (Type* T, FuncDesc* F)
 /* Set the FuncDesc pointer in a function or pointer-to-function type */
 {
     if (UnqualifiedType (T->C) == T_PTR) {
- 	/* Pointer to function */
- 	++T;
+        /* Pointer to function */
+        ++T;
     }
 
     /* Be sure it's a function type */
@@ -610,8 +610,8 @@ Type* GetFuncReturn (Type* T)
 /* Return a pointer to the return type of a function or pointer-to-function type */
 {
     if (UnqualifiedType (T->C) == T_PTR) {
- 	/* Pointer to function */
- 	++T;
+        /* Pointer to function */
+        ++T;
     }
 
     /* Be sure it's a function type */
@@ -719,7 +719,7 @@ Type* PtrConversion (Type* T)
  */
 {
     if (IsTypeFunc (T)) {
-       	return PointerTo (T);
+        return PointerTo (T);
     } else if (IsTypeArray (T)) {
         return ArrayToPtr (T);
     } else {

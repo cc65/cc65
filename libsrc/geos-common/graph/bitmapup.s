@@ -3,13 +3,13 @@
 ;
 ; 21.12.99
 
-; void BitmapUp	(struct iconpic *myGfx);
+; void BitmapUp (struct iconpic *myGfx);
 
-	    .import BitmapRegs
-	    .export _BitmapUp
+            .import BitmapRegs
+            .export _BitmapUp
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _BitmapUp:
-	jsr BitmapRegs
-	jmp BitmapUp
+        jsr BitmapRegs
+        jmp BitmapUp

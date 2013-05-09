@@ -3,12 +3,12 @@
 ; /* Convert a target-specific character to ASCII. */
 ;
 
-.export	_toascii
+.export _toascii
 
-.proc	_toascii
+.proc   _toascii
 
 ; .X must be zero, on return.
-	ldx	#>0
-	rts
+        ldx     #>0
+        rts
 
 .endproc

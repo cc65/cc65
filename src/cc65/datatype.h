@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  datatype.h				     */
+/*                                datatype.h                                 */
 /*                                                                           */
-/*		 Type string handling for the cc65 C compiler		     */
+/*               Type string handling for the cc65 C compiler                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -51,7 +51,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	       	     Data   				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -59,16 +59,16 @@
 
 /* Basic data types */
 enum {
-    T_END      	    = 0x000000,
+    T_END           = 0x000000,
 
     /* Basic types */
-    T_TYPE_NONE	    = 0x000000,
-    T_TYPE_CHAR	    = 0x000001,
+    T_TYPE_NONE     = 0x000000,
+    T_TYPE_CHAR     = 0x000001,
     T_TYPE_SHORT    = 0x000002,
-    T_TYPE_INT 	    = 0x000003,
-    T_TYPE_LONG	    = 0x000004,
+    T_TYPE_INT      = 0x000003,
+    T_TYPE_LONG     = 0x000004,
     T_TYPE_LONGLONG = 0x000005,
-    T_TYPE_ENUM	    = 0x000006,
+    T_TYPE_ENUM     = 0x000006,
     T_TYPE_FLOAT    = 0x000007,
     T_TYPE_DOUBLE   = 0x000008,
     T_TYPE_VOID     = 0x000009,
@@ -77,29 +77,29 @@ enum {
     T_TYPE_ARRAY    = 0x00000C,
     T_TYPE_PTR      = 0x00000D,
     T_TYPE_FUNC     = 0x00000E,
-    T_MASK_TYPE	    = 0x00000F,
+    T_MASK_TYPE     = 0x00000F,
 
     /* Type classes */
     T_CLASS_NONE    = 0x000000,
-    T_CLASS_INT	    = 0x000010,
+    T_CLASS_INT     = 0x000010,
     T_CLASS_FLOAT   = 0x000020,
-    T_CLASS_PTR	    = 0x000030,
+    T_CLASS_PTR     = 0x000030,
     T_CLASS_STRUCT  = 0x000040,
     T_CLASS_FUNC    = 0x000050,
     T_MASK_CLASS    = 0x000070,
 
     /* Type signedness */
-    T_SIGN_NONE	    = 0x000000,
+    T_SIGN_NONE     = 0x000000,
     T_SIGN_UNSIGNED = 0x000080,
     T_SIGN_SIGNED   = 0x000100,
     T_MASK_SIGN     = 0x000180,
 
     /* Type size modifiers */
-    T_SIZE_NONE	    = 0x000000,
+    T_SIZE_NONE     = 0x000000,
     T_SIZE_SHORT    = 0x000200,
     T_SIZE_LONG     = 0x000400,
     T_SIZE_LONGLONG = 0x000600,
-    T_MASK_SIZE	    = 0x000600,
+    T_MASK_SIZE     = 0x000600,
 
     /* Type qualifiers */
     T_QUAL_NONE     = 0x000000,
@@ -112,29 +112,29 @@ enum {
     T_QUAL_FASTCALL = 0x010000,
     T_QUAL_CDECL    = 0x020000,
     T_QUAL_CCONV    = T_QUAL_FASTCALL | T_QUAL_CDECL,
-    T_MASK_QUAL	    = 0x03F800,
+    T_MASK_QUAL     = 0x03F800,
 
     /* Types */
-    T_CHAR     	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_SCHAR    	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UCHAR    	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_SHORT    	= T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
+    T_CHAR      = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UCHAR     = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SHORT     = T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
     T_USHORT    = T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_SHORT,
-    T_INT      	= T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UINT     	= T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_LONG     	= T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
-    T_ULONG    	= T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
-    T_LONGLONG 	= T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
-    T_ULONGLONG	= T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
-    T_ENUM     	= T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_FLOAT    	= T_TYPE_FLOAT    | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
-    T_DOUBLE   	= T_TYPE_DOUBLE   | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
-    T_VOID     	= T_TYPE_VOID     | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
+    T_INT       = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UINT      = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_LONG      = T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
+    T_ULONG     = T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
+    T_LONGLONG  = T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
+    T_ULONGLONG = T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
+    T_ENUM      = T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_FLOAT     = T_TYPE_FLOAT    | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_DOUBLE    = T_TYPE_DOUBLE   | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_VOID      = T_TYPE_VOID     | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
     T_STRUCT    = T_TYPE_STRUCT   | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
     T_UNION     = T_TYPE_UNION    | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
-    T_ARRAY    	= T_TYPE_ARRAY    | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
-    T_PTR      	= T_TYPE_PTR      | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
-    T_FUNC     	= T_TYPE_FUNC     | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
+    T_ARRAY     = T_TYPE_ARRAY    | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_PTR       = T_TYPE_PTR      | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_FUNC      = T_TYPE_FUNC     | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
 
     /* Aliases */
     T_SIZE_T    = T_UINT,
@@ -160,7 +160,7 @@ struct Type {
 #define TYPE(T)         { (T), { 0 } }
 
 /* Maximum length of a type string */
-#define MAXTYPELEN   	30
+#define MAXTYPELEN      30
 
 /* Special encodings for element counts of an array */
 #define UNSPECIFIED     -1L     /* Element count was not specified */
@@ -204,7 +204,7 @@ struct SymEntry;
 
 
 /*****************************************************************************/
-/*     	      	      	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

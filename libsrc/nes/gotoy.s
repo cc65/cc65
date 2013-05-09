@@ -4,17 +4,17 @@
 ; void gotoy (unsigned char y);
 ;
 
-	.export		_gotoy
-	.import		setcursor
+        .export         _gotoy
+        .import         setcursor
 
         .include        "nes.inc"
 
 .proc   _gotoy
 
-       	sta    	CURS_Y		; Set new position
+        sta     CURS_Y          ; Set new position
         tax
         ldy     CURS_X
-	jmp   	setcursor       ; Set the cursor to the new position
+        jmp     setcursor       ; Set the cursor to the new position
 
 .endproc
 

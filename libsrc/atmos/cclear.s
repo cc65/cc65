@@ -5,25 +5,25 @@
 ; void cclear (unsigned char length);
 ;
 
-    	.export		_cclearxy, _cclear
+        .export         _cclearxy, _cclear
         .import         setscrptr  
         .import         rvs
-	.import		popax
+        .import         popax
         .importzp       ptr2
 
         .include        "atmos.inc"
 
 
 _cclearxy:
-       	pha	    	     	; Save the length
-	jsr	popax	     	; Get X and Y
+        pha                     ; Save the length
+        jsr     popax           ; Get X and Y
         sta     CURS_Y          ; Store Y
         stx     CURS_X          ; Store X
-       	pla		     	; Restore the length and run into _cclear
+        pla                     ; Restore the length and run into _cclear
 
 _cclear:
-       	tax                     ; Is the length zero?
-       	beq	@L9  	     	; Jump if done
+        tax                     ; Is the length zero?
+        beq     @L9             ; Jump if done
         jsr     setscrptr       ; Set ptr2 to screen, won't use X
         lda     #' '       
         ora     rvs
@@ -33,6 +33,6 @@ _cclear:
         inc     ptr2+1          ; Bump high byte of screen pointer
 @L2:    dex
         bne     @L1
-@L9:	rts
+@L9:    rts
 
 

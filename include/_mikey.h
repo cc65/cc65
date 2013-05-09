@@ -98,7 +98,7 @@ struct __mikey {
   unsigned char     mtest2;         // 0xFD9E
   unsigned char     unused5;        // 0xFD9F  not used
   unsigned char     palette[32];    // 0xFDA0 - 0xFDBF  palette 32 bytes
-				    				// 0xFDC0 - 0xFDFF  not used
+                                    // 0xFDC0 - 0xFDFF  not used
 };
 
 

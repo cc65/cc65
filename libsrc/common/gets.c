@@ -12,7 +12,7 @@
 
 
 /*****************************************************************************/
-/*     	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -25,24 +25,24 @@ char* __fastcall__ gets (char* s)
 
     while (1) {
 
-       	/* Get next character */
-       	if ((c = fgetc (stdin)) == EOF) {
-       	    /* Error or EOF */
-       	    *p = '\0';
-       	    if (stdin->f_flags & _FERROR) {
-       	       	/* ERROR */
-       	       	return 0;
-       	    } else {
-       	        /* EOF */
-     	       	if (i) {
-     	       	    return s;
-     	       	} else {
-     	       	    return 0;
-     	       	}
-     	    }
-       	}
+        /* Get next character */
+        if ((c = fgetc (stdin)) == EOF) {
+            /* Error or EOF */
+            *p = '\0';
+            if (stdin->f_flags & _FERROR) {
+                /* ERROR */
+                return 0;
+            } else {
+                /* EOF */
+                if (i) {
+                    return s;
+                } else {
+                    return 0;
+                }
+            }
+        }
 
-       	/* One char more. Newline ends the input */
+        /* One char more. Newline ends the input */
         if ((char) c == '\n') {
             *p = '\0';
             break;

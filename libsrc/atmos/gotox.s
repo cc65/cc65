@@ -4,13 +4,13 @@
 ; void gotox (unsigned char x);
 ;
 
-	.export		_gotox
+        .export         _gotox
 
         .include        "atmos.inc"
 
 .proc   _gotox
 
-	sta	CURS_X		; Set X
+        sta     CURS_X          ; Set X
         rts
 
 .endproc

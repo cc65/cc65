@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  lineinfo.c                                 */
+/*                                lineinfo.c                                 */
 /*                                                                           */
-/*			Source file line info structure                      */
+/*                      Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*				     Data                                    */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -59,7 +59,7 @@ static LineInfo* CurLineInfo = 0;
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code			     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -78,7 +78,7 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* L
 
     /* Skip leading spaces in Line */
     while (Len > 0 && IsBlank (*S)) {
-       	++S;
+        ++S;
         --Len;
     }
 
@@ -96,13 +96,13 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* L
      */
     T = LI->Line;
     while (Len--) {
-       	if (*S == '\t') {
-       	    *T = ' ';
-       	} else {
-       	    *T = *S;
-       	}
-       	++S;
-       	++T;
+        if (*S == '\t') {
+            *T = ' ';
+        } else {
+            *T = *S;
+        }
+        ++S;
+        ++T;
     }
 
     /* Add the terminator */
@@ -139,8 +139,8 @@ void ReleaseLineInfo (LineInfo* LI)
 {
     CHECK (LI && LI->RefCount > 0);
     if (--LI->RefCount == 0) {
-	/* No more references, free it */
-	FreeLineInfo (LI);
+        /* No more references, free it */
+        FreeLineInfo (LI);
     }
 }
 
@@ -161,14 +161,14 @@ void UpdateLineInfo (struct IFile* F, unsigned LineNum, const StrBuf* Line)
 {
     /* If a current line info exists, release it */
     if (CurLineInfo) {
-	ReleaseLineInfo (CurLineInfo);
+        ReleaseLineInfo (CurLineInfo);
     }
 
     /* If we have intermixed assembly switched off, use an empty line instead
      * of the supplied one to save some memory.
      */
     if (!AddSource) {
-	Line = &EmptyStrBuf;
+        Line = &EmptyStrBuf;
     }
 
     /* Create a new line info */

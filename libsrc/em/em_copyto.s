@@ -7,5 +7,5 @@
 
         .include        "em-kernel.inc"
 
-	_em_copyto	= emd_copyto		; Use driver entry
+        _em_copyto      = emd_copyto            ; Use driver entry
 

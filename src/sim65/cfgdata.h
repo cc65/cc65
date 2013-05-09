@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   cfgdata.h				     */
+/*                                 cfgdata.h                                 */
 /*                                                                           */
-/*	     		     Config data structure			     */
+/*                           Config data structure                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,17 +53,17 @@ typedef struct CfgData CfgData;
 struct CfgData {
     enum {
         CfgDataInvalid,
-	CfgDataId,
-	CfgDataNumber,
-	CfgDataString
-    }		Type;		/* Type of the value */
+        CfgDataId,
+        CfgDataNumber,
+        CfgDataString
+    }           Type;           /* Type of the value */
     union {
         char*   SVal;           /* String or id value */
-	long	IVal;		/* Integer value */
+        long    IVal;           /* Integer value */
     } V;
     unsigned    Line;           /* Line where the attribute was defined */
     unsigned    Col;            /* Column of attribute definition */
-    char       	Attr[1];        /* The attribute name */
+    char        Attr[1];        /* The attribute name */
 };
 
 

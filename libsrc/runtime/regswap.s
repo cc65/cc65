@@ -4,10 +4,10 @@
 ; CC65 runtime: Swap x bytes of register variable space
 ;
 
-   	.export	  	regswap
-	.importzp      	sp, regbank, tmp1
+        .export         regswap
+        .importzp       sp, regbank, tmp1
 
-.proc	regswap
+.proc   regswap
 
         sta     tmp1                    ; Store count
 @L1:    lda     regbank,x               ; Get old value
@@ -21,7 +21,7 @@
         dec     tmp1
         bne     @L1
 
-	rts
+        rts
 
 .endproc
 

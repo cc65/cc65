@@ -5,7 +5,7 @@
 ; /* Set the video mode, return the old mode */
 ;
 
-	.export		_videomode
+        .export         _videomode
         .import         SWAPPER, BSOUT
 
         .include        "c128.inc"
@@ -20,8 +20,8 @@
         pha                             ; ... and save it
 
         jsr     SWAPPER                 ; Toggle the mode
- 	lda     #14
-       	jsr     BSOUT                   ; Switch to lower case chars
+        lda     #14
+        jsr     BSOUT                   ; Switch to lower case chars
 
         pla                             ; Get old mode into A
 

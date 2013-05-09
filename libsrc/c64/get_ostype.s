@@ -14,30 +14,30 @@
 ; $FF C64DTV
 ;
 
-	.export		_get_ostype
+        .export         _get_ostype
 
-.proc	_get_ostype
+.proc   _get_ostype
 
-	ldx 	#0            ; Clear high byte
+        ldx     #0            ; Clear high byte
 
-       	ldy	#1
-	sty	$d03f
-	ldy	$d040
-	cpy	$d000
-	bne	@c64dtv
-	inc	$d000
-	cpy	$d040
-	beq	@c64dtv
+        ldy     #1
+        sty     $d03f
+        ldy     $d040
+        cpy     $d000
+        bne     @c64dtv
+        inc     $d000
+        cpy     $d040
+        beq     @c64dtv
 
 ; Normal C64
 
-	lda 	$ff80
-	rts
+        lda     $ff80
+        rts
 
 ; C64 DTV
 
 @c64dtv:
-       	stx	$d03f
-	lda	#$ff
-	rts
+        stx     $d03f
+        lda     #$ff
+        rts
 .endproc

@@ -61,60 +61,60 @@ static int ParseChar (StrBuf* B)
 
     /* Check for escape chars */
     if ((C = SB_Get (B)) == '\\') {
-       	switch (SB_Peek (B)) {
-       	    case '?':
-		C = '?';
+        switch (SB_Peek (B)) {
+            case '?':
+                C = '?';
                 SB_Skip (B);
-		break;
-	    case 'a':
-	       	C = '\a';
+                break;
+            case 'a':
+                C = '\a';
                 SB_Skip (B);
-	    	break;
-	    case 'b':
-	       	C = '\b';
+                break;
+            case 'b':
+                C = '\b';
                 SB_Skip (B);
-	    	break;
-     	    case 'f':
-	    	C = '\f';
+                break;
+            case 'f':
+                C = '\f';
                 SB_Skip (B);
-	    	break;
-	    case 'r':
-	    	C = '\r';
+                break;
+            case 'r':
+                C = '\r';
                 SB_Skip (B);
-	    	break;
-	    case 'n':
-	    	C = '\n';
+                break;
+            case 'n':
+                C = '\n';
                 SB_Skip (B);
-	    	break;
-	    case 't':
-	    	C = '\t';
+                break;
+            case 't':
+                C = '\t';
                 SB_Skip (B);
-	    	break;
-	    case 'v':
-	    	C = '\v';
+                break;
+            case 'v':
+                C = '\v';
                 SB_Skip (B);
-	    	break;
-	    case '\"':
-	    	C = '\"';
+                break;
+            case '\"':
+                C = '\"';
                 SB_Skip (B);
-	    	break;
-	    case '\'':
-	    	C = '\'';
+                break;
+            case '\'':
+                C = '\'';
                 SB_Skip (B);
-	    	break;
-	    case '\\':
-		C = '\\';
+                break;
+            case '\\':
+                C = '\\';
                 SB_Skip (B);
-		break;
-	    case 'x':
-	    case 'X':
-		/* Hex character constant */
+                break;
+            case 'x':
+            case 'X':
+                /* Hex character constant */
                 SB_Skip (B);
-       	       	C = HexVal (SB_Get (B)) << 4;
-       	       	C |= HexVal (SB_Get (B));
-	   	break;
-	    case '0':
-	    case '1':
+                C = HexVal (SB_Get (B)) << 4;
+                C |= HexVal (SB_Get (B));
+                break;
+            case '0':
+            case '1':
             case '2':
             case '3':
             case '4':
@@ -124,20 +124,20 @@ static int ParseChar (StrBuf* B)
                 /* Octal constant */
                 I = 0;
                 Val = SB_Get (B) - '0';
-       	       	while (SB_Peek (B) >= '0' && SB_Peek (B) <= '7' && ++I <= 3) {
+                while (SB_Peek (B) >= '0' && SB_Peek (B) <= '7' && ++I <= 3) {
                     Val = (Val << 3) | (SB_Get (B) - '0');
-     	   	}
+                }
                 C = (int) Val;
                 if (Val > 256) {
                     Error ("Character constant out of range");
                     C = ' ';
                 }
-     	       	break;
-     	    default:
-     	    	Error ("Illegal character constant 0x%02X", SB_Get (B));
-	   	C = ' ';
-	   	break;
-     	}
+                break;
+            default:
+                Error ("Illegal character constant 0x%02X", SB_Get (B));
+                C = ' ';
+                break;
+        }
     }
 
     /* Return the character */
@@ -147,7 +147,7 @@ static int ParseChar (StrBuf* B)
 
 
 /*****************************************************************************/
-/*	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -188,9 +188,9 @@ int SB_GetSym (StrBuf* B, StrBuf* Ident, const char* SpecialChars)
         } while (IsIdent (C) || IsDigit (C) || 
                  (C != '\0' && strchr (SpecialChars, C) != 0));
         SB_Terminate (Ident);
-     	return 1;
+        return 1;
     } else {
-     	return 0;
+        return 0;
     }
 }
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptstop.c				     */
+/*                                 coptstop.c                                */
 /*                                                                           */
-/*	     Optimize operations that take operands via the stack            */
+/*           Optimize operations that take operands via the stack            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -364,7 +364,7 @@ static void TrackLoads (LoadInfo* LI, CodeEntry* E, int I)
 
 
 /*****************************************************************************/
-/*     	    	      	       	    Helpers                                  */
+/*                                  Helpers                                  */
 /*****************************************************************************/
 
 
@@ -428,14 +428,14 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
     int I = D->PushIndex + 1;
     while (I < D->OpIndex) {
 
-     	CodeEntry* E = CS_GetEntry (D->Code, I);
+        CodeEntry* E = CS_GetEntry (D->Code, I);
 
         int NeedCorrection = 0;
-     	if ((E->Use & REG_SP) != 0) {
+        if ((E->Use & REG_SP) != 0) {
 
-     	    /* Check for some things that should not happen */
-     	    CHECK (E->AM == AM65_ZP_INDY || E->RI->In.RegY >= (short) Offs);
-	    CHECK (strcmp (E->Arg, "sp") == 0);
+            /* Check for some things that should not happen */
+            CHECK (E->AM == AM65_ZP_INDY || E->RI->In.RegY >= (short) Offs);
+            CHECK (strcmp (E->Arg, "sp") == 0);
 
             /* We need to correct this one */
             NeedCorrection = 1;
@@ -449,37 +449,37 @@ static void AdjustStackOffset (StackOpData* D, unsigned Offs)
 
         if (NeedCorrection) {
 
-     	    /* Get the code entry before this one. If it's a LDY, adjust the
-     	     * value.
-     	     */
-     	    CodeEntry* P = CS_GetPrevEntry (D->Code, I);
-     	    if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
+            /* Get the code entry before this one. If it's a LDY, adjust the
+             * value.
+             */
+            CodeEntry* P = CS_GetPrevEntry (D->Code, I);
+            if (P && P->OPC == OP65_LDY && CE_IsConstImm (P)) {
 
-      	      	/* The Y load is just before the stack access, adjust it */
-      	      	CE_SetNumArg (P, P->Num - Offs);
+                /* The Y load is just before the stack access, adjust it */
+                CE_SetNumArg (P, P->Num - Offs);
 
-      	    } else {
+            } else {
 
-      	      	/* Insert a new load instruction before the stack access */
-      	      	const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
-      	      	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-      	    	InsertEntry (D, X, I++);
+                /* Insert a new load instruction before the stack access */
+                const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
+                CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+                InsertEntry (D, X, I++);
 
-      	    }
+            }
 
             /* If we need the value of Y later, be sure to reload it */
             if (RegYUsed (D->Code, I+1)) {
-      	    	const char* Arg = MakeHexArg (E->RI->In.RegY);
-      	    	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-      	    	InsertEntry (D, X, I+1);
+                const char* Arg = MakeHexArg (E->RI->In.RegY);
+                CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+                InsertEntry (D, X, I+1);
 
-      	    	/* Skip this instruction in the next round */
-      	    	++I;
+                /* Skip this instruction in the next round */
+                ++I;
             }
-      	}
+        }
 
-      	/* Next entry */
-      	++I;
+        /* Next entry */
+        ++I;
     }
 
     /* If we have rhs load insns that load from stack, we'll have to adjust
@@ -542,7 +542,7 @@ static void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
     CodeEntry* X;
 
     if ((LI->A.Flags & LI_DIRECT) != 0) {
-       	/* Op with a variable location. If the location is on the stack, we
+        /* Op with a variable location. If the location is on the stack, we
          * need to reload the Y register.
          */
         if ((LI->A.Flags & LI_RELOAD_Y) == 0) {
@@ -570,8 +570,8 @@ static void AddOpLow (StackOpData* D, opc_t OPC, LoadInfo* LI)
 
     } else {
 
-   	/* Op with temp storage */
-   	X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+        /* Op with temp storage */
+        X = NewCodeEntry (OPC, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
     }
@@ -588,9 +588,9 @@ static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
     CodeEntry* X;
 
     if (KeepResult) {
-	/* pha */
-	X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, D->OpEntry->LI);
-	InsertEntry (D, X, D->IP++);
+        /* pha */
+        X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
     }
 
     /* txa */
@@ -603,7 +603,7 @@ static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
 
             /* opc xxx */
             CodeEntry* LoadX = LI->X.LoadEntry;
-     	    X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+            X = NewCodeEntry (OPC, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
         } else {
@@ -628,13 +628,13 @@ static void AddOpHigh (StackOpData* D, opc_t OPC, LoadInfo* LI, int KeepResult)
     }
 
     if (KeepResult) {
-	/* tax */
-	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, D->OpEntry->LI);
-	InsertEntry (D, X, D->IP++);
+        /* tax */
+        X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
 
-	/* pla */
-	X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
-	InsertEntry (D, X, D->IP++);
+        /* pla */
+        X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
     }
 }
 
@@ -716,7 +716,7 @@ static int IsRegVar (StackOpData* D)
 
 
 /*****************************************************************************/
-/*   	       	       	 Actual optimization functions                       */
+/*                       Actual optimization functions                       */
 /*****************************************************************************/
 
 
@@ -791,15 +791,15 @@ static unsigned Opt_toseqax_tosneax (StackOpData* D, const char* BoolTransformer
 
         D->IP = D->OpIndex+1;
 
-	/* Add operand for low byte */
-	AddOpLow (D, OP65_CMP, &D->Rhs);
+        /* Add operand for low byte */
+        AddOpLow (D, OP65_CMP, &D->Rhs);
 
         /* bne L */
         X = NewCodeEntry (OP65_BNE, AM65_BRA, L->Name, L, D->OpEntry->LI);
         InsertEntry (D, X, D->IP++);
 
-	/* Add operand for high byte */
-	AddOpHigh (D, OP65_CMP, &D->Rhs, 0);
+        /* Add operand for high byte */
+        AddOpHigh (D, OP65_CMP, &D->Rhs, 0);
 
     } else {
 
@@ -945,7 +945,7 @@ static unsigned Opt___bzero (StackOpData* D)
             /* Loop using the sign bit */
 
             /* ldy #count-1 */
-	    Arg = MakeHexArg (D->OpEntry->RI->In.RegA - 1);
+            Arg = MakeHexArg (D->OpEntry->RI->In.RegA - 1);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+2);
 
@@ -980,7 +980,7 @@ static unsigned Opt___bzero (StackOpData* D)
             InsertEntry (D, X, D->OpIndex+4);
 
             /* cpy #count */
-	    Arg = MakeHexArg (D->OpEntry->RI->In.RegA);
+            Arg = MakeHexArg (D->OpEntry->RI->In.RegA);
             X = NewCodeEntry (OP65_CPY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->OpIndex+5);
 
@@ -1045,20 +1045,20 @@ static unsigned Opt_staxspidx (StackOpData* D)
 
     if (RegValIsKnown (D->OpEntry->RI->In.RegY)) {
         /* Value of Y is known */
-       	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
-       	X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
+        X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
         X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->OpIndex+2);
 
     if (RegValIsKnown (D->OpEntry->RI->In.RegX)) {
-       	/* Value of X is known */
-       	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
-       	X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        /* Value of X is known */
+        const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
+        X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
     } else {
-       	/* Value unknown */
-       	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
+        /* Value unknown */
+        X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->OpIndex+3);
 
@@ -1175,9 +1175,9 @@ static unsigned Opt_tosaddax (StackOpData* D)
             X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
 
-        } else if (D->OpEntry->RI->In.RegX == 0 			&&
-		   (RegValIsKnown (D->PushEntry->RI->In.RegX)  	||
-		    (D->Lhs.X.Flags & LI_RELOAD_Y) == 0)) {
+        } else if (D->OpEntry->RI->In.RegX == 0                         &&
+                   (RegValIsKnown (D->PushEntry->RI->In.RegX)   ||
+                    (D->Lhs.X.Flags & LI_RELOAD_Y) == 0)) {
 
             /* The high byte is that of the first operand plus carry */
             CodeLabel* L;
@@ -1187,14 +1187,14 @@ static unsigned Opt_tosaddax (StackOpData* D)
                 X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
             } else {
                 /* Value of first op high byte is unknown. Load from ZP or
-		 * original storage.
-		 */
-		if (D->Lhs.X.Flags & LI_DIRECT) {
-		    CodeEntry* LoadX = D->Lhs.X.LoadEntry;
-		    X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
-		} else {
+                 * original storage.
+                 */
+                if (D->Lhs.X.Flags & LI_DIRECT) {
+                    CodeEntry* LoadX = D->Lhs.X.LoadEntry;
+                    X = NewCodeEntry (OP65_LDX, LoadX->AM, LoadX->Arg, 0, D->OpEntry->LI);
+                } else {
                     X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
-		}
+                }
             }
             InsertEntry (D, X, D->IP++);
 
@@ -1623,12 +1623,12 @@ static unsigned Opt_tosxorax (StackOpData* D)
     /* High byte */
     if (RegValIsKnown (D->PushEntry->RI->In.RegX) &&
         RegValIsKnown (D->OpEntry->RI->In.RegX)) {
-     	/* Both values known, precalculate the result */
-     	const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX ^ D->OpEntry->RI->In.RegX);
-       	X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
-     	InsertEntry (D, X, D->IP++);
+        /* Both values known, precalculate the result */
+        const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX ^ D->OpEntry->RI->In.RegX);
+        X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
     } else if (D->PushEntry->RI->In.RegX != 0) {
-     	/* High byte is unknown */
+        /* High byte is unknown */
         AddOpHigh (D, OP65_EOR, &D->Lhs, 1);
     }
 
@@ -1642,7 +1642,7 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
 
 /*****************************************************************************/
-/*   	   	      		     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -1676,7 +1676,7 @@ static const OptFuncDesc FuncTable[] = {
 static int CmpFunc (const void* Key, const void* Func)
 /* Compare function for bsearch */
 {
-    return strcmp (Key, ((const	OptFuncDesc*) Func)->Name);
+    return strcmp (Key, ((const OptFuncDesc*) Func)->Name);
 }
 
 
@@ -1847,7 +1847,7 @@ static int PreCondOk (StackOpData* D)
 
 
 /*****************************************************************************/
-/*  	      	      	     	     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -1892,8 +1892,8 @@ unsigned OptStackOps (CodeSeg* S)
     I = 0;
     while (I < (int)CS_GetEntryCount (S)) {
 
-    	/* Get the next entry */
-    	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get the next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
         /* Actions depend on state */
         switch (State) {
@@ -2062,10 +2062,10 @@ unsigned OptStackOps (CodeSeg* S)
                 State = Initialize;
                 continue;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 

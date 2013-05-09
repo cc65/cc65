@@ -4,10 +4,10 @@
 ; void gotoy (unsigned char y);
 ;
 
-	.include	"atari.inc"
-	.export		_gotoy
-	.import		setcursor
+        .include        "atari.inc"
+        .export         _gotoy
+        .import         setcursor
 
 _gotoy:
-	sta	ROWCRS		; Set Y
-	jmp	setcursor
+        sta     ROWCRS          ; Set Y
+        jmp     setcursor

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objdata.h				     */
+/*                                 objdata.h                                 */
 /*                                                                           */
-/*		 Handling object file data for the ld65 linker		     */
+/*               Handling object file data for the ld65 linker               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	      	     Data		      		     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -60,30 +60,30 @@ struct Section;
 struct StrBuf;
 
 /* Values for the Flags field */
-#define	OBJ_REF		0x0001 	       	/* We have a reference to this file */
+#define OBJ_REF         0x0001          /* We have a reference to this file */
 
 /* Internal structure holding object file data */
 typedef struct ObjData ObjData;
 struct ObjData {
-    ObjData*	     	Next;  		/* Linked list of all objects */
+    ObjData*            Next;           /* Linked list of all objects */
     unsigned            Id;             /* Id of this module */
-    unsigned            Name;  		/* Module name */
+    unsigned            Name;           /* Module name */
     struct Library*     Lib;            /* Library where module comes from */
     unsigned long       MTime;          /* Time of last modification */
-    ObjHeader  	 	Header;		/* Header of file */
-    unsigned long  	Start;		/* Start offset of data in library */
-    unsigned   	     	Flags;
+    ObjHeader           Header;         /* Header of file */
+    unsigned long       Start;          /* Start offset of data in library */
+    unsigned            Flags;
 
     unsigned            HLLSymBaseId;   /* Debug info base id for hll symbols */
     unsigned            SymBaseId;      /* Debug info base id for symbols */
     unsigned            ScopeBaseId;    /* Debug info base id for scopes */
     unsigned            SpanBaseId;     /* Debug info base id for spans */
 
-    Collection          Files;		/* List of input files */
-    Collection          Sections;  	/* List of all sections */
-    Collection          Exports;       	/* List of all exports */
-    Collection          Imports;   	/* List of all imports */
-    Collection          DbgSyms;       	/* List of debug symbols */
+    Collection          Files;          /* List of input files */
+    Collection          Sections;       /* List of all sections */
+    Collection          Exports;        /* List of all exports */
+    Collection          Imports;        /* List of all imports */
+    Collection          DbgSyms;        /* List of debug symbols */
     Collection          HLLDbgSyms;     /* List of hll debug symbols */
     Collection          LineInfos;      /* List of line infos */
     unsigned            StringCount;    /* Count of strings */
@@ -101,7 +101,7 @@ extern Collection       ObjDataList;
 
 
 /*****************************************************************************/
-/*     	      	    	      	     Code		  	   	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

@@ -54,7 +54,7 @@
             UNINSTALL       .addr       ; UNINSTALL routine
             INIT            .addr       ; INIT routine
             DONE            .addr       ; DONE routine
-            GETERROR   	    .addr       ; GETERROR routine
+            GETERROR        .addr       ; GETERROR routine
             CONTROL         .addr       ; CONTROL routine
             CLEAR           .addr       ; CLEAR routine
             SETVIEWPAGE     .addr       ; SETVIEWPAGE routine
@@ -106,14 +106,14 @@ TGI_CLIP_TOP            = $08
 ;------------------------------------------------------------------------------
 ; ASM accessible color constants
 
-	.global	tgi_color_black:zp	; Target-specific value for black
-	.global	tgi_color_white:zp	; Target-specific value for white
+        .global tgi_color_black:zp      ; Target-specific value for black
+        .global tgi_color_white:zp      ; Target-specific value for white
 
 ;------------------------------------------------------------------------------
 ; C accessible variables
 
-	.global	_tgi_drv      		; Pointer to driver
-	.global	_tgi_error    		; Last error code
+        .global _tgi_drv                ; Pointer to driver
+        .global _tgi_error              ; Last error code
         .global _tgi_gmode              ; Flag: graphics mode active
         .global _tgi_curx               ; Current drawing cursor X
         .global _tgi_cury               ; Current drawing cursor Y
@@ -139,10 +139,10 @@ TGI_CLIP_TOP            = $08
 ;------------------------------------------------------------------------------
 ; ASM accessible variables
 
-       	.global	tgi_clip_x1             ; Coordinate for line clipper
-       	.global	tgi_clip_y1             ; Coordinate for line clipper
-       	.global	tgi_clip_x2             ; Coordinate for line clipper
-       	.global	tgi_clip_y2             ; Coordinate for line clipper
+        .global tgi_clip_x1             ; Coordinate for line clipper
+        .global tgi_clip_y1             ; Coordinate for line clipper
+        .global tgi_clip_x2             ; Coordinate for line clipper
+        .global tgi_clip_y2             ; Coordinate for line clipper
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -151,7 +151,7 @@ TGI_CLIP_TOP            = $08
         .global tgi_uninstall
         .global tgi_init
         .global tgi_done
-	.global	tgi_geterror
+        .global tgi_geterror
         .global tgi_control
         .global tgi_clear
         .global tgi_setviewpage
@@ -192,7 +192,7 @@ TGI_CLIP_TOP            = $08
         .global _tgi_clear
         .global _tgi_done
         .global _tgi_ellipse
-	.global _tgi_getaspectratio
+        .global _tgi_getaspectratio
         .global _tgi_getcolor
         .global _tgi_getcolorcount
         .global _tgi_getdefpalette
@@ -220,7 +220,7 @@ TGI_CLIP_TOP            = $08
         .global _tgi_outtext
         .global _tgi_outtextxy
         .global _tgi_pieslice
-	.global _tgi_setaspectratio
+        .global _tgi_setaspectratio
         .global _tgi_setcolor
         .global _tgi_setdrawpage
         .global _tgi_setpalette

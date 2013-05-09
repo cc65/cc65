@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   simdata.h				     */
+/*                                 simdata.h                                 */
 /*                                                                           */
-/*		   Simulator data passed to the chip plugins		     */
+/*                 Simulator data passed to the chip plugins                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -47,8 +47,8 @@
 /* SimData structure */
 typedef struct SimData SimData;
 struct SimData {
-    unsigned	MajorVersion;
-    unsigned	MinorVersion;
+    unsigned    MajorVersion;
+    unsigned    MinorVersion;
 
     /* -- Callback functions -- */
 

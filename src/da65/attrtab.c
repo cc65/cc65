@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   attrtab.c				     */
+/*                                 attrtab.c                                 */
 /*                                                                           */
-/*			 Disassembler attribute table			     */
+/*                       Disassembler attribute table                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -40,7 +40,7 @@
 
 
 /*****************************************************************************/
-/*			      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -51,7 +51,7 @@ static unsigned short AttrTab[0x10000];
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -60,7 +60,7 @@ void AddrCheck (unsigned Addr)
 /* Check if the given address has a valid range */
 {
     if (Addr >= 0x10000) {
-	Error ("Address out of range: %08X", Addr);
+        Error ("Address out of range: %08X", Addr);
     }
 }
 
@@ -95,21 +95,21 @@ unsigned GetGranularity (attr_t Style)
 /* Get the granularity for the given style */
 {
     switch (Style) {
-	case atDefault:	 return 1;
-	case atCode:	 return 1;
-	case atIllegal:	 return 1;
-	case atByteTab:	 return 1;
-	case atDByteTab: return 2;
-	case atWordTab:	 return 2;
-	case atDWordTab: return 4;
-	case atAddrTab:  return 2;
-	case atRtsTab:   return 2;
-	case atTextTab:  return 1;
+        case atDefault:  return 1;
+        case atCode:     return 1;
+        case atIllegal:  return 1;
+        case atByteTab:  return 1;
+        case atDByteTab: return 2;
+        case atWordTab:  return 2;
+        case atDWordTab: return 4;
+        case atAddrTab:  return 2;
+        case atRtsTab:   return 2;
+        case atTextTab:  return 1;
 
-	case atSkip:
-	default:
-	    Internal ("GetGraularity called for style = %d", Style);
-	    return 0;
+        case atSkip:
+        default:
+            Internal ("GetGraularity called for style = %d", Style);
+            return 0;
     }
 }
 
@@ -120,7 +120,7 @@ void MarkRange (unsigned Start, unsigned End, attr_t Attr)
 {
     /* Do it easy here... */
     while (Start <= End) {
-	MarkAddr (Start++, Attr);
+        MarkAddr (Start++, Attr);
     }
 }
 
@@ -134,9 +134,9 @@ void MarkAddr (unsigned Addr, attr_t Attr)
 
     /* We must not have more than one style bit */
     if (Attr & atStyleMask) {
-	if (AttrTab[Addr] & atStyleMask) {
-	    Error ("Duplicate style for address %04X", Addr);
-	}
+        if (AttrTab[Addr] & atStyleMask) {
+            Error ("Duplicate style for address %04X", Addr);
+        }
     }
 
     /* Set the style */

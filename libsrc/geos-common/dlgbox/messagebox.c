@@ -12,40 +12,40 @@
 void _mbprintout(void);
 
 static dlgBoxStr _mbdlg_EMPTY = {
-	DB_DEFPOS(1),
-	DB_OPVEC(&RstrFrmDialogue),
-	DB_USRROUT(&_mbprintout),
-	DB_END,
+        DB_DEFPOS(1),
+        DB_OPVEC(&RstrFrmDialogue),
+        DB_USRROUT(&_mbprintout),
+        DB_END,
 };
 
 static dlgBoxStr _mbdlg_OK = {
-	DB_DEFPOS(1),
-	DB_USRROUT(&_mbprintout),
-	DB_ICON(OK, DBI_X_1, DBI_Y_2),
-	DB_END,
+        DB_DEFPOS(1),
+        DB_USRROUT(&_mbprintout),
+        DB_ICON(OK, DBI_X_1, DBI_Y_2),
+        DB_END,
 };
 
 static dlgBoxStr _mbdlg_OKCANCEL = {
-	DB_DEFPOS(1),
-	DB_USRROUT(&_mbprintout),
-	DB_ICON(OK, DBI_X_0, DBI_Y_2),
-	DB_ICON(CANCEL, DBI_X_2, DBI_Y_2),
-	DB_END,
+        DB_DEFPOS(1),
+        DB_USRROUT(&_mbprintout),
+        DB_ICON(OK, DBI_X_0, DBI_Y_2),
+        DB_ICON(CANCEL, DBI_X_2, DBI_Y_2),
+        DB_END,
 };
 
 static dlgBoxStr _mbdlg_YESNO = {
-	DB_DEFPOS(1),
-	DB_USRROUT(&_mbprintout),
-	DB_ICON(YES, DBI_X_0, DBI_Y_2),
-	DB_ICON(NO, DBI_X_2, DBI_Y_2),
-	DB_END,
+        DB_DEFPOS(1),
+        DB_USRROUT(&_mbprintout),
+        DB_ICON(YES, DBI_X_0, DBI_Y_2),
+        DB_ICON(NO, DBI_X_2, DBI_Y_2),
+        DB_END,
 };
 
 static dlgBoxStr *_mbboxes[] = {
-	&_mbdlg_EMPTY,
-	&_mbdlg_OK,
-	&_mbdlg_OKCANCEL,
-	&_mbdlg_YESNO
+        &_mbdlg_EMPTY,
+        &_mbdlg_OK,
+        &_mbdlg_OKCANCEL,
+        &_mbdlg_YESNO
 };
 
 static char _mbbuffer[256];
@@ -63,13 +63,13 @@ char MessageBox(char mode, const char *format, ...)
     /* replace LFs by CRs */
     buf = &_mbbuffer[0];
     while (*buf) {
-	if (*buf==LF) *buf=CR;
-	++buf;
+        if (*buf==LF) *buf=CR;
+        ++buf;
     }
 
     /* validate mode */
     if (mode>=MB_LAST)
-	mode = MB_EMPTY;
+        mode = MB_EMPTY;
 
     return DoDlgBox(_mbboxes[mode]);
 }

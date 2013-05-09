@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   target.c				     */
+/*                                 target.c                                  */
 /*                                                                           */
-/*			     Target specification			     */
+/*                           Target specification                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -175,12 +175,12 @@ static const TargetProperties PropertyTable[TGT_COUNT] = {
 };
 
 /* Target system */
-target_t Target	= TGT_NONE;
+target_t Target = TGT_NONE;
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code     			    	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

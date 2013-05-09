@@ -12,7 +12,7 @@
 _gotoy:
         clc
         adc     WNDTOP
-        sta     CV		; Store Y
+        sta     CV              ; Store Y
         jmp     VTABZ
 
 

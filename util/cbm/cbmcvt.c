@@ -32,24 +32,24 @@ int main (int argc, char *argv[]) {
     size_t I = 0u;
 
     if (isatty(fileno(stdin))) {
-	fputs("cbmcvt v2.1 -- Conversion Filter (stdin --> stdout)\n"
-	      " -p  converts ISO-8859-1 to PetSCII\n"
-	      " else, converts in other direction.\n", stderr);
-	return 0;
-	}
+        fputs("cbmcvt v2.1 -- Conversion Filter (stdin --> stdout)\n"
+              " -p  converts ISO-8859-1 to PetSCII\n"
+              " else, converts in other direction.\n", stderr);
+        return 0;
+        }
     if (argc > 1 && argv[1][0] == '-' && argv[1][1] == 'p') {
-	while ((C = fgetc (stdin)) != EOF) {
-	    fputc (CTPET[C], stdout);
-	}
+        while ((C = fgetc (stdin)) != EOF) {
+            fputc (CTPET[C], stdout);
+        }
     } else {
-	/* Create translation table PetSCII -> ISO-8859-1 */
-	for (; I < sizeof CTPET; ++I) {
-	    CTISO[CTPET[I]] = I;
-	}
+        /* Create translation table PetSCII -> ISO-8859-1 */
+        for (; I < sizeof CTPET; ++I) {
+            CTISO[CTPET[I]] = I;
+        }
 
-	while ((C = fgetc (stdin)) != EOF) {
-	    fputc (CTISO[C], stdout);
-	}
+        while ((C = fgetc (stdin)) != EOF) {
+            fputc (CTISO[C], stdout);
+        }
     }
     return 0;
 }

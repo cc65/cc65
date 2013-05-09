@@ -14,7 +14,7 @@
 
 
 /*****************************************************************************/
-/*     	    	     		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -23,7 +23,7 @@ FILE* __fastcall__ freopen (const char* name, const char* mode, FILE* f)
 {
     /* Check if the file is open, if so, close it */
     if ((f->f_flags & _FOPEN) == 0) {
-	/* File is not open */
+        /* File is not open */
         return (FILE*) _seterrno (EINVAL);      /* File not input */
     }
 
@@ -32,7 +32,7 @@ FILE* __fastcall__ freopen (const char* name, const char* mode, FILE* f)
      */
     if (close (f->f_fd) < 0) {
         /* An error occured, errno is already set */
-	return 0;
+        return 0;
     }
 
     /* Open the file and return the descriptor */

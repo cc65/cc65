@@ -4,7 +4,7 @@
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
-#ifndef	_GMEMORY_H
+#ifndef _GMEMORY_H
 #define _GMEMORY_H
 
 #ifndef _GSTRUCT_H

@@ -23,7 +23,7 @@
 
 ; Copy the pointer to the environment to the zero page
 
-	jsr	copyenvptr
+        jsr     copyenvptr
 
 ; Loop over all environment entries trying to find the requested one.
 
@@ -71,13 +71,13 @@
 ; copyenvptr: Copy _environ to ptr2
 ;
 
-.proc	copyenvptr
+.proc   copyenvptr
 
         lda     __environ
         sta     ptr2
         lda     __environ+1
         sta     ptr2+1
-	rts
+        rts
 
 .endproc
 

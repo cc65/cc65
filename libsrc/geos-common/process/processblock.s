@@ -3,20 +3,20 @@
 ;
 ; 27.10.99
 
-; void	InitProcesses	(char number, struct process* proctab);
+; void  InitProcesses   (char number, struct process* proctab);
 ; (rest)
-; void	BlockProcess	(char number);
-; void	UnblockProcess	(char number);
+; void  BlockProcess    (char number);
+; void  UnblockProcess  (char number);
 
-	    .export _BlockProcess
-	    .export _UnblockProcess
+            .export _BlockProcess
+            .export _UnblockProcess
 
-	    .include "jumptab.inc"
-	    
+            .include "jumptab.inc"
+            
 _BlockProcess:
-	tax
-	jmp BlockProcess
-	    
+        tax
+        jmp BlockProcess
+            
 _UnblockProcess:
-	tax
-	jmp UnblockProcess
+        tax
+        jmp UnblockProcess

@@ -5,5 +5,5 @@
 ;
 
         .import         _strtoul
-      	.export		_strtoumax = _strtoul
+        .export         _strtoumax = _strtoul
 

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    main.c				     */
+/*                                  main.c                                   */
 /*                                                                           */
 /*            Main program of the sp65 sprite and bitmap utility             */
 /*                                                                           */
@@ -71,7 +71,7 @@ static StrBuf* D;
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Code			  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -80,27 +80,27 @@ static void Usage (void)
 /* Print usage information and exit */
 {
     printf (
-    	    "Usage: %s [options] file [options] [file]\n"
-    	    "Short options:\n"
-       	    "  -V\t\t\t\tPrint the version number and exit\n"
+            "Usage: %s [options] file [options] [file]\n"
+            "Short options:\n"
+            "  -V\t\t\t\tPrint the version number and exit\n"
             "  -c fmt[,attrlist]\t\tConvert into target format\n"
-       	    "  -h\t\t\t\tHelp (this text)\n"
+            "  -h\t\t\t\tHelp (this text)\n"
             "  -lc\t\t\t\tList all possible conversions\n"
             "  -r file[,attrlist]\t\tRead an input file\n"
             "  -v\t\t\t\tIncrease verbosity\n"
             "  -w file[,attrlist]\t\tWrite the output to a file\n"
-	    "\n"
-	    "Long options:\n"
+            "\n"
+            "Long options:\n"
             "  --convert-to fmt[,attrlist]\tConvert into target format\n"
-    	    "  --help\t\t\tHelp (this text)\n"
+            "  --help\t\t\tHelp (this text)\n"
             "  --list-conversions\t\tList all possible conversions\n"
             "  --pop\t\t\t\tRestore the original loaded image\n"
             "  --read file[,attrlist]\tRead an input file\n"
             "  --slice x,y,w,h\t\tGenerate a slice from the loaded bitmap\n"
             "  --verbose\t\t\tIncrease verbosity\n"
-       	    "  --version\t\t\tPrint the version number and exit\n"
+            "  --version\t\t\tPrint the version number and exit\n"
             "  --write file[,attrlist]\tWrite the output to a file\n",
-    	    ProgName);
+            ProgName);
 }
 
 
@@ -182,7 +182,7 @@ static void OptDumpPalette (const char* Opt attribute ((unused)),
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -192,7 +192,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 static void OptListConversions (const char* Opt attribute ((unused)),
-		                const char* Arg attribute ((unused)))
+                                const char* Arg attribute ((unused)))
 /* Print a list of all conversions */
 {
     ListConversionTargets (stdout);
@@ -202,7 +202,7 @@ static void OptListConversions (const char* Opt attribute ((unused)),
 
 
 static void OptPop (const char* Opt attribute ((unused)),
-		    const char* Arg attribute ((unused)))
+                    const char* Arg attribute ((unused)))
 /* Restore the original image */
 {
     /* C and B must differ and we must have an original */
@@ -272,7 +272,7 @@ static void OptSlice (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptVerbose (const char* Opt attribute ((unused)),
-		       	const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Increase versbosity */
 {
     ++Verbosity;
@@ -281,7 +281,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-		  	const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
@@ -321,14 +321,14 @@ int main (int argc, char* argv [])
     static const LongOpt OptTab[] = {
         { "--convert-to",       1,      OptConvertTo            },
         { "--dump-palette",     0,      OptDumpPalette          },
-	{ "--help",    		0,	OptHelp			},
+        { "--help",             0,      OptHelp                 },
         { "--list-conversions", 0,      OptListConversions      },
         { "--pop",              0,      OptPop                  },
         { "--read",             1,      OptRead                 },
         { "--slice",            1,      OptSlice                },
-       	{ "--verbose",          0,      OptVerbose              },
-	{ "--version", 	       	0,	OptVersion		},
-       	{ "--write",   	       	1,     	OptWrite                },
+        { "--verbose",          0,      OptVerbose              },
+        { "--version",          0,      OptVersion              },
+        { "--write",            1,      OptWrite                },
     };
 
     unsigned I;
@@ -340,28 +340,28 @@ int main (int argc, char* argv [])
     I = 1;
     while (I < ArgCount) {
 
-       	/* Get the argument */
-       	const char* Arg = ArgVec[I];
+        /* Get the argument */
+        const char* Arg = ArgVec[I];
 
-       	/* Check for an option */
-       	if (Arg[0] == '-') {
-       	    switch (Arg[1]) {
+        /* Check for an option */
+        if (Arg[0] == '-') {
+            switch (Arg[1]) {
 
-	       	case '-':
-	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-	       	    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
-       	        case 'V':
-    	       	    OptVersion (Arg, 0);
-       	       	    break;
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
 
                 case 'c':
                     OptConvertTo (Arg, GetArg (&I, 2));
                     break;
 
-	       	case 'h':
-	       	    OptHelp (Arg, 0);
-	       	    break;
+                case 'h':
+                    OptHelp (Arg, 0);
+                    break;
 
                 case 'l':
                     if (Arg[2] == 'c') {
@@ -375,26 +375,26 @@ int main (int argc, char* argv [])
                     OptRead (Arg, GetArg (&I, 2));
                     break;
 
-	 	case 'v':
-	 	    OptVerbose (Arg, 0);
-	 	    break;
+                case 'v':
+                    OptVerbose (Arg, 0);
+                    break;
 
                 case 'w':
                     OptWrite (Arg, GetArg (&I, 2));
                     break;
 
-       	       	default:
-       	       	    UnknownOption (Arg);
-		    break;
+                default:
+                    UnknownOption (Arg);
+                    break;
 
-     	    }
-       	} else {
-    	    /* We don't accept anything else */
+            }
+        } else {
+            /* We don't accept anything else */
             AbEnd ("Don't know what to do with `%s'", Arg);
-     	}
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Cleanup data */

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  funcdesc.h				     */
+/*                                funcdesc.h                                 */
 /*                                                                           */
-/*	     Function descriptor structure for the cc65 C compiler	     */
+/*           Function descriptor structure for the cc65 C compiler           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,19 +39,19 @@
 
 
 /*****************************************************************************/
-/*				struct FuncDesc				     */
+/*                              struct FuncDesc                              */
 /*****************************************************************************/
 
 
 
 /* Masks for the Flags field in FuncDesc */
-#define FD_NONE			0x0000U	/* No flags			     */
-#define FD_EMPTY       	       	0x0001U	/* Function with empty param list    */
-#define FD_VOID_PARAM   	0x0002U	/* Function with a void param list   */
-#define FD_VARIADIC		0x0004U	/* Function with variable param list */
-#define FD_OLDSTYLE    	       	0x0010U	/* Old style (K&R) function	     */
-#define FD_OLDSTYLE_INTRET    	0x0020U	/* K&R func has implicit int return  */
-#define FD_UNNAMED_PARAMS      	0x0040U	/* Function has unnamed params	     */
+#define FD_NONE                 0x0000U /* No flags                          */
+#define FD_EMPTY                0x0001U /* Function with empty param list    */
+#define FD_VOID_PARAM           0x0002U /* Function with a void param list   */
+#define FD_VARIADIC             0x0004U /* Function with variable param list */
+#define FD_OLDSTYLE             0x0010U /* Old style (K&R) function          */
+#define FD_OLDSTYLE_INTRET      0x0020U /* K&R func has implicit int return  */
+#define FD_UNNAMED_PARAMS       0x0040U /* Function has unnamed params       */
 
 /* Bits that must be ignored when comparing funcs */
 #define FD_IGNORE       (FD_OLDSTYLE | FD_OLDSTYLE_INTRET | FD_UNNAMED_PARAMS)
@@ -61,18 +61,18 @@
 /* Function descriptor */
 typedef struct FuncDesc FuncDesc;
 struct FuncDesc {
-    unsigned		Flags;		/* Bitmapped flags FD_... 	     */
-    struct SymTable*	SymTab;	  	/* Symbol table 		     */
-    struct SymTable*   	TagTab;		/* Symbol table for structs/enums    */
-    unsigned		ParamCount;	/* Number of parameters		     */
-    unsigned		ParamSize;	/* Size of the parameters	     */
-    struct SymEntry*	LastParam;	/* Pointer to last parameter	     */
+    unsigned            Flags;          /* Bitmapped flags FD_...            */
+    struct SymTable*    SymTab;         /* Symbol table                      */
+    struct SymTable*    TagTab;         /* Symbol table for structs/enums    */
+    unsigned            ParamCount;     /* Number of parameters              */
+    unsigned            ParamSize;      /* Size of the parameters            */
+    struct SymEntry*    LastParam;      /* Pointer to last parameter         */
 };
 
 
 
 /*****************************************************************************/
-/*	       	  	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

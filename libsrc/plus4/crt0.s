@@ -2,30 +2,30 @@
 ; Startup code for cc65 (Plus/4 version)
 ;
 
-	.export		_exit
+        .export         _exit
         .export         brk_jmp
         .export         __STARTUP__ : absolute = 1      ; Mark as startup
 
-	.import		callirq_y, initlib, donelib
-	.import	     	callmain, zerobss
-	.import	       	__INTERRUPTOR_COUNT__
-	.import         __RAM_START__, __RAM_SIZE__     ; Linker generated
-	.import         __STACKSIZE__                   ; Linker generated
-	.importzp       ST
+        .import         callirq_y, initlib, donelib
+        .import         callmain, zerobss
+        .import         __INTERRUPTOR_COUNT__
+        .import         __RAM_START__, __RAM_SIZE__     ; Linker generated
+        .import         __STACKSIZE__                   ; Linker generated
+        .importzp       ST
 
         .include        "zeropage.inc"
-	.include	"plus4.inc"
+        .include        "plus4.inc"
 
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-IRQInd 	       	= $500	; JMP $0000 - used as indirect IRQ vector
+IRQInd          = $500  ; JMP $0000 - used as indirect IRQ vector
 
 ; ------------------------------------------------------------------------
 ; Startup code
 
-.segment       	"STARTUP"
+.segment        "STARTUP"
 
 Start:
 
@@ -33,24 +33,24 @@ Start:
 
         sei                     ; No interrupts since we're banking out the ROM
         sta     ENABLE_RAM
-       	ldx   	#zpspace-1
-L1:	lda	sp,x
-   	sta	zpsave,x
-  	dex
-       	bpl	L1
+        ldx     #zpspace-1
+L1:     lda     sp,x
+        sta     zpsave,x
+        dex
+        bpl     L1
         sta     ENABLE_ROM
         cli
 
 ; Switch to second charset
 
-  	lda	#14
-  	jsr	$FFD2           ; BSOUT
+        lda     #14
+        jsr     $FFD2           ; BSOUT
 
 ; Save system stuff and setup the stack. The stack starts at the top of the
 ; usable RAM.
 
-       	tsx
-       	stx    	spsave         	; save system stk ptr
+        tsx
+        stx     spsave          ; save system stk ptr
 
         lda     #<(__RAM_START__ + __RAM_SIZE__ + __STACKSIZE__)
         sta     sp
@@ -69,7 +69,7 @@ L1:	lda	sp,x
 
 ; Clear the BSS data
 
-  	jsr	zerobss
+        jsr     zerobss
 
 ; Initialize irqcount, which means that from now own custom linked in IRQ
 ; handlers (via condes) will be called.
@@ -79,44 +79,44 @@ L1:	lda	sp,x
 
 ; Call module constructors
 
-  	jsr	initlib
+        jsr     initlib
 
 ; Push arguments and call main()
 
-  	jsr    	callmain
+        jsr     callmain
 
 ; Back from main (this is also the _exit entry). Run module destructors.
 
-_exit: 	pha		       	; Save the return code
-        jsr	donelib         ; Run module destructors
+_exit:  pha                     ; Save the return code
+        jsr     donelib         ; Run module destructors
 
 ; Disable chained IRQ handlers
 
-	lda     #0
+        lda     #0
         sta     irqcount        ; Disable custom IRQ handlers
 
 ; Copy back the zero page stuff
 
-  	ldx	#zpspace-1
-L2:	lda	zpsave,x
-  	sta	sp,x
-  	dex
-       	bpl	L2
+        ldx     #zpspace-1
+L2:     lda     zpsave,x
+        sta     sp,x
+        dex
+        bpl     L2
 
 ; Place the program return code into ST
 
-	pla
-	sta	ST
+        pla
+        sta     ST
 
 ; Restore the stack pointer
 
-       	ldx	spsave
-       	txs
+        ldx     spsave
+        txs
 
 ; Enable the ROM and return to BASIC
 
         sta     ENABLE_ROM
-       	rts
+        rts
 
 ; ------------------------------------------------------------------------
 ; IRQ handler. The handler in the ROM enables the kernal and jumps to
@@ -128,12 +128,12 @@ L2:	lda	zpsave,x
 
 .segment        "LOWCODE"
 
-IRQ:    cld			; Just to be sure
-  	pha
+IRQ:    cld                     ; Just to be sure
+        pha
         txa
         pha
-  	tya
-  	pha
+        tya
+        pha
         tsx                     ; Get the stack pointer
         lda     $0104,x         ; Get the saved status register
         and     #$10            ; Test for BRK bit
@@ -144,8 +144,8 @@ IRQ:    cld			; Just to be sure
 ; condes function is not reentrant. The irqcount flag will be set/reset from
 ; the main code, to avoid races.
 
-   	ldy    	irqcount
-    	beq	@L1
+        ldy     irqcount
+        beq     @L1
         jsr     callirq_y       ; Call the IRQ functions
 
 ; Since the ROM handler will end with an RTI, we have to fake an IRQ return
@@ -156,17 +156,17 @@ IRQ:    cld			; Just to be sure
         pha
         lda     #<irq_ret
         pha
-       	php		       	; Push faked IRQ frame on stack
-	pha		       	; Push faked A register
-	pha		       	; Push faked X register
-	pha		       	; Push faked Y register
+        php                     ; Push faked IRQ frame on stack
+        pha                     ; Push faked A register
+        pha                     ; Push faked X register
+        pha                     ; Push faked Y register
         sta     ENABLE_ROM      ; Switch to ROM
         jmp     (IRQVec)        ; Jump indirect to kernal irq handler
 
 irq_ret:
         sta     ENABLE_RAM      ; Switch back to RAM
-	pla
-	tay
+        pla
+        tay
         pla
         tax
         pla
@@ -191,12 +191,12 @@ nohandler:
 ; BRK handling
 brk_jmp:        jmp     $0000
 
-spsave:	        .res	1
+spsave:         .res    1
 
 irqcount:       .byte   0
 
 .segment        "ZPSAVE"
 
-zpsave:	        .res	zpspace
+zpsave:         .res    zpspace
 
 

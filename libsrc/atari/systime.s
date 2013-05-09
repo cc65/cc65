@@ -9,7 +9,7 @@
 ;  */
 ;
 
-	.export		__systime
+        .export         __systime
 
         .importzp       sreg
 

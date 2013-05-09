@@ -50,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -180,10 +180,10 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
 
     /* First, do some type checking */
     if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
-     	/* If one of the sides are of type void, output a more apropriate
-     	 * error message.
-     	 */
-       	Error ("Illegal type");
+        /* If one of the sides are of type void, output a more apropriate
+         * error message.
+         */
+        Error ("Illegal type");
     }
 
     /* If Expr is a function, convert it to pointer to function */
@@ -201,15 +201,15 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     if (IsClassInt (NewType)) {
 
         /* Handle conversions to int type */
-       	if (IsClassPtr (Expr->Type)) {
-     	    /* Pointer -> int conversion. Convert array to pointer */
+        if (IsClassPtr (Expr->Type)) {
+            /* Pointer -> int conversion. Convert array to pointer */
             if (IsTypeArray (Expr->Type)) {
                 Expr->Type = ArrayToPtr (Expr->Type);
             }
-     	    Warning ("Converting pointer to integer without a cast");
-       	} else if (!IsClassInt (Expr->Type) && !IsClassFloat (Expr->Type)) {
-     	    Error ("Incompatible types");
-       	}
+            Warning ("Converting pointer to integer without a cast");
+        } else if (!IsClassInt (Expr->Type) && !IsClassFloat (Expr->Type)) {
+            Error ("Incompatible types");
+        }
 
     } else if (IsClassFloat (NewType)) {
 
@@ -220,44 +220,44 @@ void TypeConversion (ExprDesc* Expr, Type* NewType)
     } else if (IsClassPtr (NewType)) {
 
         /* Handle conversions to pointer type */
-       	if (IsClassPtr (Expr->Type)) {
+        if (IsClassPtr (Expr->Type)) {
 
             /* Convert array to pointer */
             if (IsTypeArray (Expr->Type)) {
                 Expr->Type = ArrayToPtr (Expr->Type);
             }
 
-     	    /* Pointer to pointer assignment is valid, if:
-     	     *   - both point to the same types, or
-     	     *   - the rhs pointer is a void pointer, or
-    	     *   - the lhs pointer is a void pointer.
-     	     */
-    	    if (!IsTypeVoid (Indirect (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
-    	 	/* Compare the types */
+            /* Pointer to pointer assignment is valid, if:
+             *   - both point to the same types, or
+             *   - the rhs pointer is a void pointer, or
+             *   - the lhs pointer is a void pointer.
+             */
+            if (!IsTypeVoid (Indirect (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
+                /* Compare the types */
                 switch (TypeCmp (NewType, Expr->Type)) {
 
-    	 	    case TC_INCOMPATIBLE:
-    	 	 	Error ("Incompatible pointer types");
-    	 	 	break;
+                    case TC_INCOMPATIBLE:
+                        Error ("Incompatible pointer types");
+                        break;
 
-    	 	    case TC_QUAL_DIFF:
-    	 	 	Error ("Pointer types differ in type qualifiers");
-    	 	 	break;
+                    case TC_QUAL_DIFF:
+                        Error ("Pointer types differ in type qualifiers");
+                        break;
 
-    	 	    default:
-    	 	 	/* Ok */
-    	 	 	break;
-    	 	}
-    	    }
+                    default:
+                        /* Ok */
+                        break;
+                }
+            }
 
-     	} else if (IsClassInt (Expr->Type)) {
-     	    /* Int to pointer assignment is valid only for constant zero */
-     	    if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
-     	       	Warning ("Converting integer to pointer without a cast");
-     	    }
-     	} else {
-    	    Error ("Incompatible types");
-    	}
+        } else if (IsClassInt (Expr->Type)) {
+            /* Int to pointer assignment is valid only for constant zero */
+            if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
+                Warning ("Converting integer to pointer without a cast");
+            }
+        } else {
+            Error ("Incompatible types");
+        }
 
     } else {
 

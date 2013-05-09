@@ -5,16 +5,16 @@
 
 ; char WriteBuff (struct tr_se*);
 
-	    .export _WriteBuff
-	    .import setoserror
-	    .import gettrse
+            .export _WriteBuff
+            .import setoserror
+            .import gettrse
 
-	    .include "diskdrv.inc"
-	    .include "geossym.inc"
-	
+            .include "diskdrv.inc"
+            .include "geossym.inc"
+        
 _WriteBuff:
-	jsr gettrse
-	sta r1L
-	stx r1H
-	jsr WriteBuff
-	jmp setoserror
+        jsr gettrse
+        sta r1L
+        stx r1H
+        jsr WriteBuff
+        jmp setoserror

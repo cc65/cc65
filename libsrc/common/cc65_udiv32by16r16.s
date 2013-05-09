@@ -4,7 +4,7 @@
 ; CC65 library: 32by16 => 16 unsigned division
 ;
 
-       	.export	       	_cc65_udiv32by16r16
+        .export         _cc65_udiv32by16r16
         .import         udiv32by16r16m, incsp4
 
         .include        "zeropage.inc"

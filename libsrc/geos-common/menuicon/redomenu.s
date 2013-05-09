@@ -5,8 +5,8 @@
 
 ; void ReDoMenu (void);
 
-	    .export _ReDoMenu
+            .export _ReDoMenu
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_ReDoMenu	= ReDoMenu
+_ReDoMenu       = ReDoMenu

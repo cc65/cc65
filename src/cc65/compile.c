@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   compile.c				     */
+/*                                 compile.c                                 */
 /*                                                                           */
-/*		   	 Top level compiler subroutine			     */
+/*                       Top level compiler subroutine                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -65,7 +65,7 @@
 
 
 /*****************************************************************************/
-/*		    	      	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -83,34 +83,34 @@ static void Parse (void)
     /* Parse until end of input */
     while (CurTok.Tok != TOK_CEOF) {
 
-	DeclSpec  	Spec;
+        DeclSpec        Spec;
 
-	/* Check for empty statements */
-	if (CurTok.Tok == TOK_SEMI) {
-	    NextToken ();
-	    continue;
-	}
+        /* Check for empty statements */
+        if (CurTok.Tok == TOK_SEMI) {
+            NextToken ();
+            continue;
+        }
 
-       	/* Disallow ASM statements on global level */
-	if (CurTok.Tok == TOK_ASM) {
+        /* Disallow ASM statements on global level */
+        if (CurTok.Tok == TOK_ASM) {
             Error ("__asm__ is not allowed here");
             /* Parse and remove the statement for error recovery */
-	    AsmStatement ();
-	    ConsumeSemi ();
+            AsmStatement ();
+            ConsumeSemi ();
             RemoveGlobalCode ();
-	    continue;
-	}
+            continue;
+        }
 
-	/* Check for a #pragma */
-	if (CurTok.Tok == TOK_PRAGMA) {
-	    DoPragma ();
-	    continue;
-	}
+        /* Check for a #pragma */
+        if (CurTok.Tok == TOK_PRAGMA) {
+            DoPragma ();
+            continue;
+        }
 
-       	/* Read variable defs and functions */
-	ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
+        /* Read variable defs and functions */
+        ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
 
-	/* Don't accept illegal storage classes */
+        /* Don't accept illegal storage classes */
         if ((Spec.StorageClass & SC_TYPE) == 0) {
             if ((Spec.StorageClass & SC_AUTO) != 0 ||
                 (Spec.StorageClass & SC_REGISTER) != 0) {
@@ -119,26 +119,26 @@ static void Parse (void)
             }
         }
 
-	/* Check if this is only a type declaration */
-	if (CurTok.Tok == TOK_SEMI) {
-	    CheckEmptyDecl (&Spec);
-	    NextToken ();
-	    continue;
-	}
+        /* Check if this is only a type declaration */
+        if (CurTok.Tok == TOK_SEMI) {
+            CheckEmptyDecl (&Spec);
+            NextToken ();
+            continue;
+        }
 
-	/* Read declarations for this type */
-	Entry = 0;
-	comma = 0;
-       	while (1) {
+        /* Read declarations for this type */
+        Entry = 0;
+        comma = 0;
+        while (1) {
 
             Declaration         Decl;
 
-	    /* Read the next declaration */
-	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
-	    if (Decl.Ident[0] == '\0') {
-	    	NextToken ();
-	    	break;
-	    }
+            /* Read the next declaration */
+            ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
+            if (Decl.Ident[0] == '\0') {
+                NextToken ();
+                break;
+            }
 
             /* Check if we must reserve storage for the variable. We do this,
              *
@@ -149,7 +149,7 @@ static void Parse (void)
              *
              * This means that "extern int i;" will not get storage allocated.
              */
-	    if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
+            if ((Decl.StorageClass & SC_FUNC) != SC_FUNC          &&
                 (Decl.StorageClass & SC_TYPEMASK) != SC_TYPEDEF    &&
                 ((Spec.Flags & DS_DEF_STORAGE) != 0         ||
                  (Decl.StorageClass & (SC_EXTERN|SC_STATIC)) == SC_STATIC ||
@@ -157,8 +157,8 @@ static void Parse (void)
                   CurTok.Tok == TOK_ASSIGN))) {
 
                 /* We will allocate storage */
-		Decl.StorageClass |= SC_STORAGE | SC_DEF;
-	    }
+                Decl.StorageClass |= SC_STORAGE | SC_DEF;
+            }
 
             /* If this is a function declarator that is not followed by a comma
              * or semicolon, it must be followed by a function body. If this is
@@ -175,67 +175,67 @@ static void Parse (void)
                 }
             }
 
-	    /* Add an entry to the symbol table */
-	    Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
+            /* Add an entry to the symbol table */
+            Entry = AddGlobalSym (Decl.Ident, Decl.Type, Decl.StorageClass);
 
             /* Add declaration attributes */
             SymUseAttr (Entry, &Decl);
 
-	    /* Reserve storage for the variable if we need to */
-       	    if (Decl.StorageClass & SC_STORAGE) {
+            /* Reserve storage for the variable if we need to */
+            if (Decl.StorageClass & SC_STORAGE) {
 
-	     	/* Get the size of the variable */
-	     	unsigned Size = SizeOf (Decl.Type);
+                /* Get the size of the variable */
+                unsigned Size = SizeOf (Decl.Type);
 
-	     	/* Allow initialization */
-	     	if (CurTok.Tok == TOK_ASSIGN) {
+                /* Allow initialization */
+                if (CurTok.Tok == TOK_ASSIGN) {
 
-	     	    /* We cannot initialize types of unknown size, or
-	     	     * void types in non ANSI mode.
-	     	     */
-       	       	    if (Size == 0) {
-	     	    	if (!IsTypeVoid (Decl.Type)) {
-	     	    	    if (!IsTypeArray (Decl.Type)) {
-	     	      	      	/* Size is unknown and not an array */
-	     	    	      	Error ("Variable `%s' has unknown size", Decl.Ident);
-	     	    	    }
-	     	    	} else if (IS_Get (&Standard) != STD_CC65) {
-	     	    	    /* We cannot declare variables of type void */
-	     	    	    Error ("Illegal type for variable `%s'", Decl.Ident);
-	     	    	}
-	     	    }
+                    /* We cannot initialize types of unknown size, or
+                     * void types in non ANSI mode.
+                     */
+                    if (Size == 0) {
+                        if (!IsTypeVoid (Decl.Type)) {
+                            if (!IsTypeArray (Decl.Type)) {
+                                /* Size is unknown and not an array */
+                                Error ("Variable `%s' has unknown size", Decl.Ident);
+                            }
+                        } else if (IS_Get (&Standard) != STD_CC65) {
+                            /* We cannot declare variables of type void */
+                            Error ("Illegal type for variable `%s'", Decl.Ident);
+                        }
+                    }
 
-	     	    /* Switch to the data or rodata segment. For arrays, check
+                    /* Switch to the data or rodata segment. For arrays, check
                       * the element qualifiers, since not the array but its
                       * elements are const.
                       */
-		    if (IsQualConst (GetBaseElementType (Decl.Type))) {
-		      	g_userodata ();
-		    } else {
-			g_usedata ();
-		    }
+                    if (IsQualConst (GetBaseElementType (Decl.Type))) {
+                        g_userodata ();
+                    } else {
+                        g_usedata ();
+                    }
 
-	     	    /* Define a label */
-	     	    g_defgloblabel (Entry->Name);
+                    /* Define a label */
+                    g_defgloblabel (Entry->Name);
 
-	     	    /* Skip the '=' */
-	     	    NextToken ();
+                    /* Skip the '=' */
+                    NextToken ();
 
-	     	    /* Parse the initialization */
-	     	    ParseInit (Entry->Type);
-	     	} else {
+                    /* Parse the initialization */
+                    ParseInit (Entry->Type);
+                } else {
 
-	     	    if (IsTypeVoid (Decl.Type)) {
-	     	    	/* We cannot declare variables of type void */
-			Error ("Illegal type for variable `%s'", Decl.Ident);
+                    if (IsTypeVoid (Decl.Type)) {
+                        /* We cannot declare variables of type void */
+                        Error ("Illegal type for variable `%s'", Decl.Ident);
                         Entry->Flags &= ~(SC_STORAGE | SC_DEF);
                     } else if (Size == 0) {
-	     		/* Size is unknown. Is it an array? */
+                        /* Size is unknown. Is it an array? */
                         if (!IsTypeArray (Decl.Type)) {
                             Error ("Variable `%s' has unknown size", Decl.Ident);
                         }
                         Entry->Flags &= ~(SC_STORAGE | SC_DEF);
-	     	    }
+                    }
 
                     /* Allocate storage if it is still needed */
                     if (Entry->Flags & SC_STORAGE) {
@@ -249,28 +249,28 @@ static void Parse (void)
                         /* Allocate space for uninitialized variable */
                         g_res (Size);
                     }
-	     	}
+                }
 
-	    }
+            }
 
-	    /* Check for end of declaration list */
-	    if (CurTok.Tok == TOK_COMMA) {
-	    	NextToken ();
-	    	comma = 1;
-	    } else {
-	     	break;
-	    }
-	}
+            /* Check for end of declaration list */
+            if (CurTok.Tok == TOK_COMMA) {
+                NextToken ();
+                comma = 1;
+            } else {
+                break;
+            }
+        }
 
-	/* Function declaration? */
-	if (Entry && IsTypeFunc (Entry->Type)) {
+        /* Function declaration? */
+        if (Entry && IsTypeFunc (Entry->Type)) {
 
-	    /* Function */
-	    if (!comma) {
-	     	if (CurTok.Tok == TOK_SEMI) {
-	     	    /* Prototype only */
-	     	    NextToken ();
-	     	} else {
+            /* Function */
+            if (!comma) {
+                if (CurTok.Tok == TOK_SEMI) {
+                    /* Prototype only */
+                    NextToken ();
+                } else {
 
                     /* Function body. Check for duplicate function definitions */
                     if (SymIsDef (Entry)) {
@@ -280,15 +280,15 @@ static void Parse (void)
 
                     /* Parse the function body */
                     NewFunc (Entry);
-	     	}
-	    }
+                }
+            }
 
-	} else {
+        } else {
 
-	    /* Must be followed by a semicolon */
-	    ConsumeSemi ();
+            /* Must be followed by a semicolon */
+            ConsumeSemi ();
 
-	}
+        }
     }
 }
 
@@ -325,16 +325,16 @@ void Compile (const char* FileName)
      */
     if (IS_Get (&Optimize)) {
         long CodeSize = IS_Get (&CodeSizeFactor);
-    	DefineNumericMacro ("__OPT__", 1);
-       	if (CodeSize > 100) {
-    	    DefineNumericMacro ("__OPT_i__", CodeSize);
-    	}
-    	if (IS_Get (&EnableRegVars)) {
-    	    DefineNumericMacro ("__OPT_r__", 1);
-    	}
-       	if (IS_Get (&InlineStdFuncs)) {
-    	    DefineNumericMacro ("__OPT_s__", 1);
-    	}
+        DefineNumericMacro ("__OPT__", 1);
+        if (CodeSize > 100) {
+            DefineNumericMacro ("__OPT_i__", CodeSize);
+        }
+        if (IS_Get (&EnableRegVars)) {
+            DefineNumericMacro ("__OPT_r__", 1);
+        }
+        if (IS_Get (&InlineStdFuncs)) {
+            DefineNumericMacro ("__OPT_s__", 1);
+        }
     }
 
     /* __TIME__ and __DATE__ macros */
@@ -368,7 +368,7 @@ void Compile (const char* FileName)
     /* Are we supposed to compile or just preprocess the input? */
     if (PreprocessOnly) {
 
-	/* Open the file */
+        /* Open the file */
         OpenOutputFile ();
 
         /* Preprocess each line and write it to the output file */

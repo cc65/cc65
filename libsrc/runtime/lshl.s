@@ -11,9 +11,9 @@
 ;
 
 
-    	.export	       	tosasleax, tosshleax
-    	.import	       	popeax
-	.importzp      	sreg, tmp1
+        .export         tosasleax, tosshleax
+        .import         popeax
+        .importzp       sreg, tmp1
 
 
 tosshleax:
@@ -29,12 +29,12 @@ tosasleax:
 
 ; Do the actual shift. Faster solutions are possible but need a lot more code.
 
-L2:     asl	a
-   	rol    	tmp1
-   	rol    	sreg
-   	rol  	sreg+1
+L2:     asl     a
+        rol     tmp1
+        rol     sreg
+        rol     sreg+1
         dey
-       	bne     L2
+        bne     L2
 
 ; Shift done
 

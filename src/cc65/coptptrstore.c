@@ -59,32 +59,32 @@ static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
 {
     /* Check for a label attached to the entry */
     if (CE_HasLabel (L[0])) {
-	return 0;
+        return 0;
     }
 
     /* Check for single insn sub ops */
     if (L[0]->OPC == OP65_AND                                           ||
-    	L[0]->OPC == OP65_EOR                                           ||
-    	L[0]->OPC == OP65_ORA                                           ||
-    	(L[0]->OPC == OP65_JSR                          &&
+        L[0]->OPC == OP65_EOR                                           ||
+        L[0]->OPC == OP65_ORA                                           ||
+        (L[0]->OPC == OP65_JSR                          &&
          (strncmp (L[0]->Arg, "shlax", 5) == 0  ||
           strncmp (L[0]->Arg, "shrax", 5) == 0)         &&
          strlen (L[0]->Arg) == 6                        &&
          IsDigit (L[0]->Arg[5]))) {
 
-    	/* One insn */
-    	return 1;
+        /* One insn */
+        return 1;
 
     } else if (L[0]->OPC == OP65_CLC                      &&
-       	       (L[1] = CS_GetNextEntry (S, I)) != 0       &&
-    	       L[1]->OPC == OP65_ADC                      &&
-    	       !CE_HasLabel (L[1])) {
-    	return 2;
+               (L[1] = CS_GetNextEntry (S, I)) != 0       &&
+               L[1]->OPC == OP65_ADC                      &&
+               !CE_HasLabel (L[1])) {
+        return 2;
     } else if (L[0]->OPC == OP65_SEC                      &&
-    	       (L[1] = CS_GetNextEntry (S, I)) != 0       &&
-    	       L[1]->OPC == OP65_SBC                      &&
-    	       !CE_HasLabel (L[1])) {
-    	return 2;
+               (L[1] = CS_GetNextEntry (S, I)) != 0       &&
+               L[1]->OPC == OP65_SBC                      &&
+               !CE_HasLabel (L[1])) {
+        return 2;
     }
 
 
@@ -216,7 +216,7 @@ static const char* LoadAXImm (CodeSeg* S, unsigned I)
 
 
 /*****************************************************************************/
-/* 		     	 	     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -228,10 +228,10 @@ unsigned OptPtrStore1 (CodeSeg* S)
  *      adc     xxx
  *      bcc     L
  *      inx
- * L:   jsr	pushax
- *	ldx	#$00
- *	lda	yyy
- * 	ldy     #$00
+ * L:   jsr     pushax
+ *      ldx     #$00
+ *      lda     yyy
+ *      ldy     #$00
  *      jsr     staspidx
  *
  * and replace it by:
@@ -274,34 +274,34 @@ unsigned OptPtrStore1 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-   	CodeEntry* L[9];
+        CodeEntry* L[9];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_CLC                               &&
-       	    CS_GetEntries (S, L+1, I+1, 8)                      &&
-   	    L[1]->OPC == OP65_ADC                               &&
-   	    (L[1]->AM == AM65_ABS                       ||
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_CLC                               &&
+            CS_GetEntries (S, L+1, I+1, 8)                      &&
+            L[1]->OPC == OP65_ADC                               &&
+            (L[1]->AM == AM65_ABS                       ||
              L[1]->AM == AM65_ZP                        ||
              L[1]->AM == AM65_IMM                       ||
              (L[1]->AM == AM65_ZP_INDY          &&
               RegValIsKnown (L[1]->RI->In.RegY)))               &&
-       	    (L[2]->OPC == OP65_BCC || L[2]->OPC == OP65_JCC)    &&
-       	    L[2]->JumpTo != 0                                   &&
-       	    L[2]->JumpTo->Owner == L[4]                         &&
-       	    L[3]->OPC == OP65_INX                               &&
+            (L[2]->OPC == OP65_BCC || L[2]->OPC == OP65_JCC)    &&
+            L[2]->JumpTo != 0                                   &&
+            L[2]->JumpTo->Owner == L[4]                         &&
+            L[3]->OPC == OP65_INX                               &&
             CE_IsCallTo (L[4], "pushax")                        &&
             L[5]->OPC == OP65_LDX                               &&
             L[6]->OPC == OP65_LDA                               &&
-       	    L[7]->OPC == OP65_LDY                               &&
-       	    CE_IsKnownImm (L[7], 0)                             &&
-       	    CE_IsCallTo (L[8], "staspidx")                      &&
-       	    !CS_RangeHasLabel (S, I+1, 3)                       &&
+            L[7]->OPC == OP65_LDY                               &&
+            CE_IsKnownImm (L[7], 0)                             &&
+            CE_IsCallTo (L[8], "staspidx")                      &&
+            !CS_RangeHasLabel (S, I+1, 3)                       &&
             !CS_RangeHasLabel (S, I+5, 4)) {
 
-	    CodeEntry* X;
+            CodeEntry* X;
             const char* Loc;
             am_t AM;
 
@@ -364,19 +364,19 @@ unsigned OptPtrStore1 (CodeSeg* S)
             X = NewCodeEntry (OP65_STA, AM, Loc, 0, L[8]->LI);
             CS_InsertEntry (S, X, IP++);
 
-	    /* Remove the old code */
-	    CS_DelEntries (S, I, 9);
+            /* Remove the old code */
+            CS_DelEntries (S, I, 9);
 
             /* Skip most of the generated replacement code */
             I += 3;
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-  	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -393,11 +393,11 @@ unsigned OptPtrStore2 (CodeSeg* S)
  *      adc     xxx
  *      bcc     L
  *      inx
- * L:   jsr	pushax
+ * L:   jsr     pushax
  *      ldy     yyy
- *	ldx	#$00
- *	lda	(sp),y
- *	ldy     #$00
+ *      ldx     #$00
+ *      lda     (sp),y
+ *      ldy     #$00
  *      jsr     staspidx
  *
  * and replace it by:
@@ -444,24 +444,24 @@ unsigned OptPtrStore2 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[10];
+        CodeEntry* L[10];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_CLC                               &&
-       	    CS_GetEntries (S, L+1, I+1, 9)                      &&
-  	    L[1]->OPC == OP65_ADC                               &&
-   	    (L[1]->AM == AM65_ABS                       ||
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_CLC                               &&
+            CS_GetEntries (S, L+1, I+1, 9)                      &&
+            L[1]->OPC == OP65_ADC                               &&
+            (L[1]->AM == AM65_ABS                       ||
              L[1]->AM == AM65_ZP                        ||
              L[1]->AM == AM65_IMM                       ||
              (L[1]->AM == AM65_ZP_INDY          &&
               RegValIsKnown (L[1]->RI->In.RegY)))               &&
-       	    (L[2]->OPC == OP65_BCC || L[2]->OPC == OP65_JCC)    &&
-       	    L[2]->JumpTo != 0                                   &&
-       	    L[2]->JumpTo->Owner == L[4]                         &&
-       	    L[3]->OPC == OP65_INX                               &&
+            (L[2]->OPC == OP65_BCC || L[2]->OPC == OP65_JCC)    &&
+            L[2]->JumpTo != 0                                   &&
+            L[2]->JumpTo->Owner == L[4]                         &&
+            L[3]->OPC == OP65_INX                               &&
             CE_IsCallTo (L[4], "pushax")                        &&
             L[5]->OPC == OP65_LDY                               &&
             CE_IsConstImm (L[5])                                &&
@@ -469,15 +469,15 @@ unsigned OptPtrStore2 (CodeSeg* S)
             L[7]->OPC == OP65_LDA                               &&
             L[7]->AM == AM65_ZP_INDY                            &&
             strcmp (L[7]->Arg, "sp") == 0                       &&
-       	    L[8]->OPC == OP65_LDY                               &&
+            L[8]->OPC == OP65_LDY                               &&
             (L[8]->AM == AM65_ABS                       ||
              L[8]->AM == AM65_ZP                        ||
              L[8]->AM == AM65_IMM)                              &&
-       	    CE_IsCallTo (L[9], "staspidx")                      &&
-       	    !CS_RangeHasLabel (S, I+1, 3)                       &&
+            CE_IsCallTo (L[9], "staspidx")                      &&
+            !CS_RangeHasLabel (S, I+1, 3)                       &&
             !CS_RangeHasLabel (S, I+5, 5)) {
 
-	    CodeEntry* X;
+            CodeEntry* X;
             const char* Arg;
             const char* Loc;
             am_t AM;
@@ -606,19 +606,19 @@ unsigned OptPtrStore2 (CodeSeg* S)
 
             }
 
-	    /* Remove the old code */
-	    CS_DelEntries (S, I, 10);
+            /* Remove the old code */
+            CS_DelEntries (S, I, 10);
 
             /* Skip most of the generated replacement code */
             I += 4;
 
-	    /* Remember, we had changes */
-	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -631,12 +631,12 @@ unsigned OptPtrStore2 (CodeSeg* S)
 unsigned OptPtrStore3 (CodeSeg* S)
 /* Search for the sequence:
  *
- *    	jsr   	pushax
+ *      jsr     pushax
  *      ldy     xxx
  *      jsr     ldauidx
  *      subop
  *      ldy     yyy
- *  	jsr   	staspidx
+ *      jsr     staspidx
  *
  * and replace it by:
  *
@@ -645,7 +645,7 @@ unsigned OptPtrStore3 (CodeSeg* S)
  *      ldy     xxx
  *      ldx     #$00
  *      lda     (ptr1),y
- *	subop
+ *      subop
  *      ldy     yyy
  *      sta     (ptr1),y
  *
@@ -660,32 +660,32 @@ unsigned OptPtrStore3 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	unsigned K;
-     	CodeEntry* L[10];
+        unsigned K;
+        CodeEntry* L[10];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-       	if (CE_IsCallTo (L[0], "pushax")            &&
-       	    CS_GetEntries (S, L+1, I+1, 3)     	    &&
-       	    L[1]->OPC == OP65_LDY              	    &&
-       	    CE_IsConstImm (L[1])                    &&
-     	    !CE_HasLabel (L[1])      	       	    &&
-       	    CE_IsCallTo (L[2], "ldauidx")           &&
-     	    !CE_HasLabel (L[2])                     &&
-       	    (K = OptPtrStore1Sub (S, I+3, L+3)) > 0 &&
-	    CS_GetEntries (S, L+3+K, I+3+K, 2)      &&
-       	    L[3+K]->OPC == OP65_LDY                 &&
-     	    CE_IsConstImm (L[3+K])                  &&
-	    !CE_HasLabel (L[3+K])                   &&
-   	    CE_IsCallTo (L[4+K], "staspidx")        &&
-	    !CE_HasLabel (L[4+K])) {
+        /* Check for the sequence */
+        if (CE_IsCallTo (L[0], "pushax")            &&
+            CS_GetEntries (S, L+1, I+1, 3)          &&
+            L[1]->OPC == OP65_LDY                   &&
+            CE_IsConstImm (L[1])                    &&
+            !CE_HasLabel (L[1])                     &&
+            CE_IsCallTo (L[2], "ldauidx")           &&
+            !CE_HasLabel (L[2])                     &&
+            (K = OptPtrStore1Sub (S, I+3, L+3)) > 0 &&
+            CS_GetEntries (S, L+3+K, I+3+K, 2)      &&
+            L[3+K]->OPC == OP65_LDY                 &&
+            CE_IsConstImm (L[3+K])                  &&
+            !CE_HasLabel (L[3+K])                   &&
+            CE_IsCallTo (L[4+K], "staspidx")        &&
+            !CE_HasLabel (L[4+K])) {
 
 
             const char* RegBank = 0;
             const char* ZPLoc   = "ptr1";
-	    CodeEntry* X;
+            CodeEntry* X;
 
 
             /* Get the preceeding two instructions and check them. We check
@@ -717,21 +717,21 @@ unsigned OptPtrStore3 (CodeSeg* S)
                 }
             }
 
-	    /* Insert the load via the zp pointer */
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+3);
-	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, ZPLoc, 0, L[2]->LI);
-   	    CS_InsertEntry (S, X, I+4);
+            /* Insert the load via the zp pointer */
+            X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[3]->LI);
+            CS_InsertEntry (S, X, I+3);
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, ZPLoc, 0, L[2]->LI);
+            CS_InsertEntry (S, X, I+4);
 
-   	    /* Insert the store through the zp pointer */
-   	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLoc, 0, L[3]->LI);
-   	    CS_InsertEntry (S, X, I+6+K);
+            /* Insert the store through the zp pointer */
+            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLoc, 0, L[3]->LI);
+            CS_InsertEntry (S, X, I+6+K);
 
-   	    /* Delete the old code */
-   	    CS_DelEntry (S, I+7+K);     /* jsr spaspidx */
+            /* Delete the old code */
+            CS_DelEntry (S, I+7+K);     /* jsr spaspidx */
             CS_DelEntry (S, I+2);       /* jsr ldauidx */
 
-	    /* Create and insert the stores into the zp pointer if needed */
+            /* Create and insert the stores into the zp pointer if needed */
             if (RegBank == 0) {
                 X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
@@ -744,13 +744,13 @@ unsigned OptPtrStore3 (CodeSeg* S)
              */
             CS_DelEntry (S, I);         /* jsr pushax */
 
-   	    /* Remember, we had changes */
-   	    ++Changes;
+            /* Remember, we had changes */
+            ++Changes;
 
-   	}
+        }
 
-   	/* Next entry */
-   	++I;
+        /* Next entry */
+        ++I;
 
     }
 

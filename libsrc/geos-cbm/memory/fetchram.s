@@ -5,12 +5,12 @@
 
 ; void FetchRAM (char REUBank, int length, char *from, char *dest);
 
-	    .import REURegs
-	    .export _FetchRAM
+            .import REURegs
+            .export _FetchRAM
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
+            .include "jumptab.inc"
+            .include "geossym.inc"
 
 _FetchRAM:
-	jsr REURegs
-	jmp FetchRAM
+        jsr REURegs
+        jmp FetchRAM

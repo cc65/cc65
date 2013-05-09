@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    check.h				     */
+/*                                  check.h                                  */
 /*                                                                           */
-/*			      Assert like macros			     */
+/*                            Assert like macros                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,16 +48,16 @@
 
 
 
-extern const char* MsgInternalError;		/* "Internal error: "        */
-extern const char* MsgPrecondition;		/* "Precondition violated: " */
-extern const char* MsgCheckFailed;		/* "Check failed: "          */
-extern const char* MsgProgramAborted;		/* "Program aborted: "       */
+extern const char* MsgInternalError;            /* "Internal error: "        */
+extern const char* MsgPrecondition;             /* "Precondition violated: " */
+extern const char* MsgCheckFailed;              /* "Check failed: "          */
+extern const char* MsgProgramAborted;           /* "Program aborted: "       */
 
 
 
 extern void (*CheckFailed) (const char* Msg, const char* Cond,
-       	       	            const char* File, unsigned Line)
-			    attribute ((noreturn));
+                            const char* File, unsigned Line)
+                            attribute ((noreturn));
 /* Function pointer that is called from check if the condition code is true. */
 
 
@@ -80,7 +80,7 @@ extern void (*CheckFailed) (const char* Msg, const char* Cond,
 #define PRECONDITION(c) \
     ((void) ((c)? 0 : (CheckFailed (MsgPrecondition, #c, __FILE__, __LINE__), 0)))
 
-#define CHECK(c)	\
+#define CHECK(c)        \
     ((void) ((c)? 0 : (CheckFailed (MsgCheckFailed, #c, __FILE__, __LINE__), 0)))
 
 

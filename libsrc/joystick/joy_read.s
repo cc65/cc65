@@ -7,6 +7,6 @@
 
         .include        "joy-kernel.inc"
 
-       	_joy_read       = joy_read              ; Use driver entry
+        _joy_read       = joy_read              ; Use driver entry
 
                                                 

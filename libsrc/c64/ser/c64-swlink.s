@@ -24,7 +24,7 @@
         .include        "zeropage.inc"
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
-	.include	"c64.inc"
+        .include        "c64.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -52,7 +52,7 @@
 ;----------------------------------------------------------------------------
 ; I/O definitions
 
-ACIA   	        = $DE00
+ACIA            = $DE00
 ACIA_DATA       = ACIA+0        ; Data register
 ACIA_STATUS     = ACIA+1        ; Status register
 ACIA_CMD        = ACIA+2        ; Command register
@@ -73,16 +73,16 @@ SendTail        = $F9           ; Tail of send buffer
 SendFreeCnt     = $FA           ; Number of bytes free in send buffer
 
 .bss
-Stopped:     	.res   	1      	; Flow-stopped flag
-RtsOff:		.res	1      	;
+Stopped:        .res    1       ; Flow-stopped flag
+RtsOff:         .res    1       ;
 
 ; Send and receive buffers: 256 bytes each
-RecvBuf:	.res	256
-SendBuf:	.res	256
+RecvBuf:        .res    256
+SendBuf:        .res    256
 
 .data
-NmiContinue: 	.byte  	$4c    	; JMP instruction for NMI save -- continue
-NmiSave:     	.res   	2      	; normal NMI handler
+NmiContinue:    .byte   $4c     ; JMP instruction for NMI save -- continue
+NmiSave:        .res    2       ; normal NMI handler
 
 .rodata
 
@@ -138,25 +138,25 @@ INSTALL:
 
 ; Deactivate DTR and disable 6551 interrupts
 
-      	lda     #%00001010
-       	sta    	ACIA_CMD
+        lda     #%00001010
+        sta     ACIA_CMD
 
 ; Set up the nmi vector
 
-   	lda 	NMIVec
-   	ldy 	NMIVec+1
-   	sta 	NmiSave+0
-   	sty 	NmiSave+1
-   	lda 	#<NmiHandler
-   	ldy 	#>NmiHandler
-SetNMI: sta 	NMIVec
-   	sty 	NMIVec+1
+        lda     NMIVec
+        ldy     NMIVec+1
+        sta     NmiSave+0
+        sty     NmiSave+1
+        lda     #<NmiHandler
+        ldy     #>NmiHandler
+SetNMI: sta     NMIVec
+        sty     NMIVec+1
 
 ; Done, return an error code
 
         lda     #<SER_ERR_OK
         tax                     ; A is zero
-      	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -166,14 +166,14 @@ UNINSTALL:
 
 ; Stop interrupts, drop DTR
 
-      	lda     #%00001010
-       	sta    	ACIA_CMD
+        lda     #%00001010
+        sta     ACIA_CMD
 
 ; Restore NMI vector and return OK
 
-   	lda 	NmiSave+0
-      	ldy 	NmiSave+1
-	jmp	SetNMI
+        lda     NmiSave+0
+        ldy     NmiSave+1
+        jmp     SetNMI
 
 ;----------------------------------------------------------------------------
 ; PARAMS routine. A pointer to a ser_params structure is passed in ptr1.
@@ -183,10 +183,10 @@ OPEN:
 
 ; Check if the handshake setting is valid
 
-        ldy	#SER_PARAMS::HANDSHAKE	; Handshake
+        ldy     #SER_PARAMS::HANDSHAKE  ; Handshake
         lda     (ptr1),y
-        cmp	#SER_HS_HW		; This is all we support
-        bne	InvParam
+        cmp     #SER_HS_HW              ; This is all we support
+        bne     InvParam
 
 ; Initialize buffers
 
@@ -199,48 +199,48 @@ OPEN:
         lda     (ptr1),y                ; Baudrate index
         tay
         lda     BaudTable,y             ; Get 6551 value
-        bmi     InvBaud	   		; Branch if rate not supported
+        bmi     InvBaud                 ; Branch if rate not supported
         sta     tmp1
 
-        ldy	#SER_PARAMS::DATABITS	; Databits
+        ldy     #SER_PARAMS::DATABITS   ; Databits
         lda     (ptr1),y
         tay
         lda     BitTable,y
         ora     tmp1
         sta     tmp1
 
-        ldy	#SER_PARAMS::STOPBITS	; Stopbits
+        ldy     #SER_PARAMS::STOPBITS   ; Stopbits
         lda     (ptr1),y
         tay
         lda     StopTable,y
         ora     tmp1
-        ora	#%00010000		; Receiver clock source = baudrate
-	sta	ACIA_CTRL
+        ora     #%00010000              ; Receiver clock source = baudrate
+        sta     ACIA_CTRL
 
 ; Set the value for the command register. We remember the base value in
 ; RtsOff, since we will have to manipulate ACIA_CMD often.
 
-        ldy    	#SER_PARAMS::PARITY	; Parity
+        ldy     #SER_PARAMS::PARITY     ; Parity
         lda     (ptr1),y
         tay
         lda     ParityTable,y
-	ora	#%00000001		; DTR active
-	sta	RtsOff
-       	ora    	#%00001000		; Enable receive interrupts
-       	sta	ACIA_CMD
+        ora     #%00000001              ; DTR active
+        sta     RtsOff
+        ora     #%00001000              ; Enable receive interrupts
+        sta     ACIA_CMD
 
 ; Done
 
         lda     #<SER_ERR_OK
         tax                             ; A is zero
-       	rts
+        rts
 
 ; Invalid parameter
 
 InvParam:
-	lda	#<SER_ERR_INIT_FAILED
-	ldx	#>SER_ERR_INIT_FAILED
-	rts
+        lda     #<SER_ERR_INIT_FAILED
+        ldx     #>SER_ERR_INIT_FAILED
+        rts
 
 ; Baud rate not available
 
@@ -258,8 +258,8 @@ CLOSE:
 
 ; Stop interrupts, drop DTR
 
-      	lda     #%00001010
-       	sta    	ACIA_CMD
+        lda     #%00001010
+        sta     ACIA_CMD
 
 ; Initalize buffers. Returns zero in a
 
@@ -269,7 +269,7 @@ CLOSE:
 
         lda     #<SER_ERR_OK
         tax                             ; A is zero
-       	rts
+        rts
 
 ;----------------------------------------------------------------------------
 ; GET: Will fetch a character from the receive buffer and store it into the
@@ -277,43 +277,43 @@ CLOSE:
 ; return.
 ;
 
-GET:    ldx 	SendFreeCnt             ; Send data if necessary
-       	inx                             ; X == $FF?
-   	beq 	@L1
-   	lda 	#$00
-   	jsr    	TryToSend
+GET:    ldx     SendFreeCnt             ; Send data if necessary
+        inx                             ; X == $FF?
+        beq     @L1
+        lda     #$00
+        jsr     TryToSend
 
 ; Check for buffer empty
 
-@L1:  	lda 	RecvFreeCnt             ; (25)
-   	cmp 	#$ff
-   	bne 	@L2
-   	lda	#<SER_ERR_NO_DATA
-   	ldx 	#>SER_ERR_NO_DATA
-   	rts
+@L1:    lda     RecvFreeCnt             ; (25)
+        cmp     #$ff
+        bne     @L2
+        lda     #<SER_ERR_NO_DATA
+        ldx     #>SER_ERR_NO_DATA
+        rts
 
 ; Check for flow stopped & enough free: release flow control
 
-@L2:  	ldx 	Stopped                 ; (34)
-   	beq 	@L3
-   	cmp 	#63
-   	bcc 	@L3
-   	lda 	#$00
-   	sta 	Stopped
-   	lda 	RtsOff
-   	ora 	#%00001000
-   	sta	ACIA_CMD
+@L2:    ldx     Stopped                 ; (34)
+        beq     @L3
+        cmp     #63
+        bcc     @L3
+        lda     #$00
+        sta     Stopped
+        lda     RtsOff
+        ora     #%00001000
+        sta     ACIA_CMD
 
 ; Get byte from buffer
 
-@L3:  	ldx 	RecvHead                ; (41)
-       	lda 	RecvBuf,x
-      	inc 	RecvHead
-   	inc 	RecvFreeCnt
-       	ldx 	#$00                    ; (59)
-   	sta    	(ptr1,x)
-       	txa				; Return code = 0
-   	rts
+@L3:    ldx     RecvHead                ; (41)
+        lda     RecvBuf,x
+        inc     RecvHead
+        inc     RecvFreeCnt
+        ldx     #$00                    ; (59)
+        sta     (ptr1,x)
+        txa                             ; Return code = 0
+        rts
 
 ;----------------------------------------------------------------------------
 ; PUT: Output character in A.
@@ -324,40 +324,40 @@ PUT:
 
 ; Try to send
 
-        ldx 	SendFreeCnt
-       	inx                             ; X = $ff?
-   	beq 	@L2
-   	pha
-   	lda 	#$00
-   	jsr 	TryToSend
-   	pla
+        ldx     SendFreeCnt
+        inx                             ; X = $ff?
+        beq     @L2
+        pha
+        lda     #$00
+        jsr     TryToSend
+        pla
 
 ; Put byte into send buffer & send
 
-@L2:  	ldx 	SendFreeCnt
-   	bne 	@L3
-   	lda 	#<SER_ERR_OVERFLOW      ; X is already zero
-   	rts
+@L2:    ldx     SendFreeCnt
+        bne     @L3
+        lda     #<SER_ERR_OVERFLOW      ; X is already zero
+        rts
 
-@L3:  	ldx 	SendTail
-    	sta 	SendBuf,x
-    	inc 	SendTail
-    	dec 	SendFreeCnt
-   	lda 	#$ff
-   	jsr 	TryToSend
-   	lda	#<SER_ERR_OK
-   	tax
-       	rts
+@L3:    ldx     SendTail
+        sta     SendBuf,x
+        inc     SendTail
+        dec     SendFreeCnt
+        lda     #$ff
+        jsr     TryToSend
+        lda     #<SER_ERR_OK
+        tax
+        rts
 
 ;----------------------------------------------------------------------------
 ; STATUS: Return the status in the variable pointed to by ptr1.
 ; Must return an error code in a/x.
 ;
 
-STATUS: lda    	ACIA_STATUS
-       	ldx    	#0
- 	sta    	(ptr1,x)
- 	txa                             ; SER_ERR_OK
+STATUS: lda     ACIA_STATUS
+        ldx     #0
+        sta     (ptr1,x)
+        txa                             ; SER_ERR_OK
         rts
 
 ;----------------------------------------------------------------------------
@@ -390,68 +390,68 @@ IRQ     = $0000
 ;
 
 NmiHandler:
-     	pha
-       	lda    	ACIA_STATUS     ;(4) ;status ;check for byte received
-     	and 	#$08           	;(2)
-       	beq    	@L9  		;(2*)
-     	cld
-     	txa
-     	pha
-     	tya
-     	pha
-@L1:	lda 	ACIA_DATA       ;(4)  data  ;get byte and put into receive buffer
-    	ldy 	RecvTail 	;(4)
-    	ldx 	RecvFreeCnt  	;(4)
-      	beq 	@L3  		;(2*) Jump if no space in receive buffer
-    	sta 	RecvBuf,y 	;(5)
-    	inc 	RecvTail        ;(6)
-    	dec 	RecvFreeCnt     ;(6)
-    	cpx 	#33            	;(2)  check for buffer space low
-       	bcc    	@L2            	;(2*)
-    	jmp 	NMIEXIT         ;(3)
+        pha
+        lda     ACIA_STATUS     ;(4) ;status ;check for byte received
+        and     #$08            ;(2)
+        beq     @L9             ;(2*)
+        cld
+        txa
+        pha
+        tya
+        pha
+@L1:    lda     ACIA_DATA       ;(4)  data  ;get byte and put into receive buffer
+        ldy     RecvTail        ;(4)
+        ldx     RecvFreeCnt     ;(4)
+        beq     @L3             ;(2*) Jump if no space in receive buffer
+        sta     RecvBuf,y       ;(5)
+        inc     RecvTail        ;(6)
+        dec     RecvFreeCnt     ;(6)
+        cpx     #33             ;(2)  check for buffer space low
+        bcc     @L2             ;(2*)
+        jmp     NMIEXIT         ;(3)
 
 ; Assert flow control
 
-@L2:  	lda 	RtsOff       	;(3) assert flow control if buffer space too low
-    	sta 	ACIA_CMD	;(4) command
-    	sta 	Stopped      	;(3)
-@L3:    jmp 	NMIEXIT      	;(3)
+@L2:    lda     RtsOff          ;(3) assert flow control if buffer space too low
+        sta     ACIA_CMD        ;(4) command
+        sta     Stopped         ;(3)
+@L3:    jmp     NMIEXIT         ;(3)
 
-@L9:	pla
-	jmp 	NmiContinue
+@L9:    pla
+        jmp     NmiContinue
 
 ;----------------------------------------------------------------------------
 ; Try to send a byte. Internal routine. A = TryHard
 
 .proc   TryToSend
 
-   	sta 	tmp1	       	; Remember tryHard flag
-@L0:   	lda 	SendFreeCnt
-    	cmp 	#$ff
-    	beq 	@L3	       	; Bail out
+        sta     tmp1            ; Remember tryHard flag
+@L0:    lda     SendFreeCnt
+        cmp     #$ff
+        beq     @L3             ; Bail out
 
 ; Check for flow stopped
 
-@L1:	lda 	Stopped
-       	bne    	@L3	       	; Bail out
+@L1:    lda     Stopped
+        bne     @L3             ; Bail out
 
 ; Check that swiftlink is ready to send
 
-@L2:   	lda	ACIA_STATUS
-    	and 	#$10
-    	bne 	@L4
-    	bit 	tmp1	       	;keep trying if must try hard
-       	bmi 	@L0
-@L3:	rts
+@L2:    lda     ACIA_STATUS
+        and     #$10
+        bne     @L4
+        bit     tmp1            ;keep trying if must try hard
+        bmi     @L0
+@L3:    rts
 
 ; Send byte and try again
 
-@L4:  	ldx 	SendHead
-    	lda 	SendBuf,x
-    	sta	ACIA_DATA
-    	inc 	SendHead
-    	inc 	SendFreeCnt
-    	jmp 	@L0
+@L4:    ldx     SendHead
+        lda     SendBuf,x
+        sta     ACIA_DATA
+        inc     SendHead
+        inc     SendFreeCnt
+        jmp     @L0
 
 .endproc
 
@@ -460,14 +460,14 @@ NmiHandler:
 ; Initialize buffers
 
 InitBuffers:
-        ldx 	#0
+        ldx     #0
         stx     Stopped
-       	stx 	RecvHead
-    	stx 	RecvTail
-      	stx 	SendHead
-    	stx 	SendTail
+        stx     RecvHead
+        stx     RecvTail
+        stx     SendHead
+        stx     SendTail
         dex                             ; X = 255
-       	stx    	RecvFreeCnt
-      	stx 	SendFreeCnt
+        stx     RecvFreeCnt
+        stx     SendFreeCnt
         rts
 

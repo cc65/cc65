@@ -5,8 +5,8 @@
 ;
 
 
-	.export         callmain
-       	.export		__argc, __argv
+        .export         callmain
+        .export         __argc, __argv
 
         .import         _main, pushax
 
@@ -23,7 +23,7 @@
         ldx     __argv+1
         jsr     pushax          ; Push argv
 
-	ldy	#4   	  	; Argument size
+        ldy     #4              ; Argument size
         jmp     _main
 
 .endproc

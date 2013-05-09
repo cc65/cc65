@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    code.h				     */
+/*                                  code.h                                   */
 /*                                                                           */
-/*			    Binary code management			     */
+/*                          Binary code management                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,20 +39,20 @@
 
 
 /*****************************************************************************/
-/*     	    			     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-extern unsigned char CodeBuf [0x10000];		/* Code buffer */
-extern unsigned long CodeStart;			/* Start address */
-extern unsigned long CodeEnd;	  		/* End address */
-extern unsigned long PC;			/* Current PC */
+extern unsigned char CodeBuf [0x10000];         /* Code buffer */
+extern unsigned long CodeStart;                 /* Start address */
+extern unsigned long CodeEnd;                   /* End address */
+extern unsigned long PC;                        /* Current PC */
 
 
 
 /*****************************************************************************/
-/*     	    			     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

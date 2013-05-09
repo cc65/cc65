@@ -6,16 +6,16 @@
 ;  */
 ;
 
-	.export		_slow
+        .export         _slow
 
-	.include	"c128.inc"
+        .include        "c128.inc"
 
 
-.proc	_slow
+.proc   _slow
 
-	lda  	#$00
-	sta	VIC_CLK_128
-	rts
+        lda     #$00
+        sta     VIC_CLK_128
+        rts
 
 .endproc
 

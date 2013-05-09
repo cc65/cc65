@@ -62,7 +62,7 @@
 
 
 /*****************************************************************************/
-/*  		    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -93,7 +93,7 @@ struct MacroExp {
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -109,7 +109,7 @@ static void MacroReplacement (StrBuf* Source, StrBuf* Target);
 
 
 /*****************************************************************************/
-/*		     Low level preprocessor token handling                   */
+/*                   Low level preprocessor token handling                   */
 /*****************************************************************************/
 
 
@@ -136,26 +136,26 @@ typedef enum {
 
 /* Preprocessor keyword to token mapping table */
 static const struct PPToken {
-    const char*	Key;	   	/* Keyword */
-    pptoken_t  	Tok;	   	/* Token */
+    const char* Key;            /* Keyword */
+    pptoken_t   Tok;            /* Token */
 } PPTokens[] = {
-    {  	"define",      	PP_DEFINE	},
+    {   "define",       PP_DEFINE       },
     {   "elif",         PP_ELIF         },
-    {  	"else",	       	PP_ELSE		},
-    {  	"endif",       	PP_ENDIF	},
-    {  	"error",       	PP_ERROR	},
-    {  	"if",  	       	PP_IF		},
-    {  	"ifdef",       	PP_IFDEF	},
-    {  	"ifndef",      	PP_IFNDEF	},
-    {  	"include",     	PP_INCLUDE	},
-    {   "line",	       	PP_LINE		},
-    {  	"pragma",      	PP_PRAGMA	},
-    {  	"undef",       	PP_UNDEF	},
-    {  	"warning",      PP_WARNING      },
+    {   "else",         PP_ELSE         },
+    {   "endif",        PP_ENDIF        },
+    {   "error",        PP_ERROR        },
+    {   "if",           PP_IF           },
+    {   "ifdef",        PP_IFDEF        },
+    {   "ifndef",       PP_IFNDEF       },
+    {   "include",      PP_INCLUDE      },
+    {   "line",         PP_LINE         },
+    {   "pragma",       PP_PRAGMA       },
+    {   "undef",        PP_UNDEF        },
+    {   "warning",      PP_WARNING      },
 };
 
 /* Number of preprocessor tokens */
-#define PPTOKEN_COUNT  	(sizeof(PPTokens) / sizeof(PPTokens[0]))
+#define PPTOKEN_COUNT   (sizeof(PPTokens) / sizeof(PPTokens[0]))
 
 
 
@@ -246,7 +246,7 @@ static int ME_ArgIsVariadic (const MacroExp* E)
 
 
 /*****************************************************************************/
-/* 	      	    		     Code		    		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -296,18 +296,18 @@ static void OldStyleComment (void)
 
     /* Skip the comment */
     while (CurC != '*' || NextC != '/') {
-    	if (CurC == '\0') {
-    	    if (NextLine () == 0) {
-    	    	PPError ("End-of-file reached in comment starting at line %u",
-	    		 StartingLine);
-    	    	return;
-    	    }
-	} else {
-	    if (CurC == '/' && NextC == '*') {
-	    	PPWarning ("`/*' found inside a comment");
-   	    }
-	    NextChar ();
-	}
+        if (CurC == '\0') {
+            if (NextLine () == 0) {
+                PPError ("End-of-file reached in comment starting at line %u",
+                         StartingLine);
+                return;
+            }
+        } else {
+            if (CurC == '/' && NextC == '*') {
+                PPWarning ("`/*' found inside a comment");
+            }
+            NextChar ();
+        }
     }
 
     /* Skip the end of comment chars */
@@ -326,10 +326,10 @@ static void NewStyleComment (void)
      * source line is denoted by a lf (\n) character.
      */
     do {
-    	NextChar ();
+        NextChar ();
     } while (CurC != '\n' && CurC != '\0');
     if (CurC == '\n') {
-    	NextChar ();
+        NextChar ();
     }
 }
 
@@ -374,27 +374,27 @@ static void CopyQuotedString (StrBuf* Target)
 
     /* Copy the characters inside the string */
     while (CurC != '\0' && CurC != Quote) {
-       	/* Keep an escaped char */
-      	if (CurC == '\\') {
- 	    SB_AppendChar (Target, CurC);
-   	    NextChar ();
- 	}
- 	/* Copy the character */
-       	SB_AppendChar (Target, CurC);
-	NextChar ();
+        /* Keep an escaped char */
+        if (CurC == '\\') {
+            SB_AppendChar (Target, CurC);
+            NextChar ();
+        }
+        /* Copy the character */
+        SB_AppendChar (Target, CurC);
+        NextChar ();
     }
 
     /* If we had a terminating quote, copy it */
     if (CurC != '\0') {
- 	SB_AppendChar (Target, CurC);
-	NextChar ();
+        SB_AppendChar (Target, CurC);
+        NextChar ();
     }
 }
 
 
 
 /*****************************************************************************/
-/*				  Macro stuff	  	    		     */
+/*                                Macro stuff                                */
 /*****************************************************************************/
 
 
@@ -405,11 +405,11 @@ static int MacName (char* Ident)
  */
 {
     if (IsSym (Ident) == 0) {
- 	PPError ("Identifier expected");
-     	ClearLine ();
- 	return 0;
+        PPError ("Identifier expected");
+        ClearLine ();
+        return 0;
     } else {
-    	return 1;
+        return 1;
     }
 }
 
@@ -418,41 +418,41 @@ static int MacName (char* Ident)
 static void ReadMacroArgs (MacroExp* E)
 /* Identify the arguments to a macro call */
 {
-    unsigned  	Parens;         /* Number of open parenthesis */
+    unsigned    Parens;         /* Number of open parenthesis */
     StrBuf      Arg = STATIC_STRBUF_INITIALIZER;
 
     /* Read the actual macro arguments */
     Parens = 0;
     while (1) {
-       	if (CurC == '(') {
+        if (CurC == '(') {
 
-    	    /* Nested parenthesis */
-       	    SB_AppendChar (&Arg, CurC);
-    	    NextChar ();
-     	    ++Parens;
+            /* Nested parenthesis */
+            SB_AppendChar (&Arg, CurC);
+            NextChar ();
+            ++Parens;
 
-     	} else if (IsQuote (CurC)) {
+        } else if (IsQuote (CurC)) {
 
             /* Quoted string - just copy */
-       	    CopyQuotedString (&Arg);
+            CopyQuotedString (&Arg);
 
-     	} else if (CurC == ',' || CurC == ')') {
+        } else if (CurC == ',' || CurC == ')') {
 
-     	    if (Parens) {
-    	    	/* Comma or right paren inside nested parenthesis */
-     	       	if (CurC == ')') {
-     	       	    --Parens;
-     	       	}
-       	       	SB_AppendChar (&Arg, CurC);
-      	    	NextChar ();
+            if (Parens) {
+                /* Comma or right paren inside nested parenthesis */
+                if (CurC == ')') {
+                    --Parens;
+                }
+                SB_AppendChar (&Arg, CurC);
+                NextChar ();
             } else if (CurC == ',' && ME_ArgIsVariadic (E)) {
                 /* It's a comma, but we're inside a variadic macro argument, so
                  * just copy it and proceed.
                  */
                 SB_AppendChar (&Arg, CurC);
                 NextChar ();
-     	    } else {
-    	    	/* End of actual argument. Remove whitespace from the end. */
+            } else {
+                /* End of actual argument. Remove whitespace from the end. */
                 while (IsSpace (SB_LookAtLast (&Arg))) {
                     SB_Drop (&Arg, 1);
                 }
@@ -462,44 +462,44 @@ static void ReadMacroArgs (MacroExp* E)
                  */
                 if (CurC != ')' || SB_NotEmpty (&Arg) || E->M->ArgCount > 0) {
                     ME_AppendActual (E, &Arg);
-    	    	}
+                }
 
-    	    	/* Check for end of macro param list */
-    	     	if (CurC == ')') {
-    	    	    NextChar ();
-    	    	    break;
-    	    	}
+                /* Check for end of macro param list */
+                if (CurC == ')') {
+                    NextChar ();
+                    break;
+                }
 
-       	       	/* Start the next param */
-    	    	NextChar ();
+                /* Start the next param */
+                NextChar ();
                 SB_Clear (&Arg);
-     	    }
-     	} else if (SkipWhitespace (1)) {
-    	    /* Squeeze runs of blanks within an arg */
+            }
+        } else if (SkipWhitespace (1)) {
+            /* Squeeze runs of blanks within an arg */
             if (SB_NotEmpty (&Arg)) {
                 SB_AppendChar (&Arg, ' ');
             }
-    	} else if (CurC == '/' && NextC == '*') {
+        } else if (CurC == '/' && NextC == '*') {
             if (SB_NotEmpty (&Arg)) {
                 SB_AppendChar (&Arg, ' ');
             }
-     	    OldStyleComment ();
-     	} else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+            OldStyleComment ();
+        } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
             if (SB_NotEmpty (&Arg)) {
                 SB_AppendChar (&Arg, ' ');
             }
-    	    NewStyleComment ();
-     	} else if (CurC == '\0') {
-    	    /* End of input inside macro argument list */
+            NewStyleComment ();
+        } else if (CurC == '\0') {
+            /* End of input inside macro argument list */
             PPError ("Unterminated argument list invoking macro `%s'", E->M->Name);
 
             ClearLine ();
             break;
-     	} else {
-    	    /* Just copy the character */
-       	    SB_AppendChar (&Arg, CurC);
-    	    NextChar ();
-     	}
+        } else {
+            /* Just copy the character */
+            SB_AppendChar (&Arg, CurC);
+            NextChar ();
+        }
     }
 
     /* Deallocate string buf resources */
@@ -511,7 +511,7 @@ static void ReadMacroArgs (MacroExp* E)
 static void MacroArgSubst (MacroExp* E)
 /* Argument substitution according to ISO/IEC 9899:1999 (E), 6.10.3.1ff */
 {
-    ident   	Ident;
+    ident       Ident;
     int         ArgIdx;
     StrBuf*     OldSource;
     StrBuf*     Arg;
@@ -526,8 +526,8 @@ static void MacroArgSubst (MacroExp* E)
     /* Argument handling loop */
     while (CurC != '\0') {
 
-    	/* If we have an identifier, check if it's a macro */
-     	if (IsSym (Ident)) {
+        /* If we have an identifier, check if it's a macro */
+        if (IsSym (Ident)) {
 
             /* Check if it's a macro argument */
             if ((ArgIdx = FindMacroArg (E->M, Ident)) >= 0) {
@@ -564,9 +564,9 @@ static void MacroArgSubst (MacroExp* E)
             } else {
 
                 /* An identifier, keep it */
-    	    	SB_AppendStr (&E->Replacement, Ident);
+                SB_AppendStr (&E->Replacement, Ident);
 
-    	    }
+            }
 
         } else if (CurC == '#' && NextC == '#') {
 
@@ -619,12 +619,12 @@ static void MacroArgSubst (MacroExp* E)
                 Stringize (Arg, &E->Replacement);
             }
 
-     	} else if (IsQuote (CurC)) {
-     	    CopyQuotedString (&E->Replacement);
-     	} else {
-     	    SB_AppendChar (&E->Replacement, CurC);
-    	    NextChar ();
-     	}
+        } else if (IsQuote (CurC)) {
+            CopyQuotedString (&E->Replacement);
+        } else {
+            SB_AppendChar (&E->Replacement, CurC);
+            NextChar ();
+        }
     }
 
 #if 0
@@ -661,12 +661,12 @@ static void MacroCall (StrBuf* Target, Macro* M)
         StrBuf Arg = STATIC_STRBUF_INITIALIZER;
 
         /* Argument count mismatch */
-    	PPError ("Macro argument count mismatch");
+        PPError ("Macro argument count mismatch");
 
-    	/* Be sure to make enough empty arguments available */
-       	while (CollCount (&E.ActualArgs) < (unsigned) M->ArgCount) {
+        /* Be sure to make enough empty arguments available */
+        while (CollCount (&E.ActualArgs) < (unsigned) M->ArgCount) {
             ME_AppendActual (&E, &Arg);
-    	}
+        }
     }
 
     /* Replace macro arguments handling the # and ## operators */
@@ -737,15 +737,15 @@ static void ExpandMacro (StrBuf* Target, Macro* M)
 static void DefineMacro (void)
 /* Handle a macro definition. */
 {
-    ident    	Ident;
-    Macro*   	M;
-    Macro*   	Existing;
+    ident       Ident;
+    Macro*      M;
+    Macro*      Existing;
     int         C89;
 
     /* Read the macro name */
     SkipWhitespace (0);
     if (!MacName (Ident)) {
-    	return;
+        return;
     }
 
     /* Remember if we're in C89 mode */
@@ -760,19 +760,19 @@ static void DefineMacro (void)
     /* Check if this is a function like macro */
     if (CurC == '(') {
 
-    	/* Skip the left paren */
-    	NextChar ();
+        /* Skip the left paren */
+        NextChar ();
 
-       	/* Set the marker that this is a function like macro */
- 	M->ArgCount = 0;
+        /* Set the marker that this is a function like macro */
+        M->ArgCount = 0;
 
- 	/* Read the formal parameter list */
-     	while (1) {
+        /* Read the formal parameter list */
+        while (1) {
 
             /* Skip white space and check for end of parameter list */
-     	    SkipWhitespace (0);
-     	    if (CurC == ')') {
-     	     	break;
+            SkipWhitespace (0);
+            if (CurC == ')') {
+                break;
             }
 
             /* The next token must be either an identifier, or - if not in
@@ -808,26 +808,26 @@ static void DefineMacro (void)
                 }
 
                 /* Add the macro argument */
- 	        AddMacroArg (M, Ident);
+                AddMacroArg (M, Ident);
             }
 
             /* If we had an ellipsis, or the next char is not a comma, we've
              * reached the end of the macro argument list.
              */
-     	    SkipWhitespace (0);
-       	    if (M->Variadic || CurC != ',') {
-     	       	break;
+            SkipWhitespace (0);
+            if (M->Variadic || CurC != ',') {
+                break;
             }
-     	    NextChar ();
-     	}
+            NextChar ();
+        }
 
- 	/* Check for a right paren and eat it if we find one */
-     	if (CurC != ')') {
-       	    PPError ("`)' expected");
-     	    ClearLine ();
-     	    return;
-     	}
-     	NextChar ();
+        /* Check for a right paren and eat it if we find one */
+        if (CurC != ')') {
+            PPError ("`)' expected");
+            ClearLine ();
+            return;
+        }
+        NextChar ();
     }
 
     /* Skip whitespace before the macro replacement */
@@ -860,7 +860,7 @@ static void DefineMacro (void)
 
 
 /*****************************************************************************/
-/*  			  	 Preprocessing                               */
+/*                               Preprocessing                               */
 /*****************************************************************************/
 
 
@@ -871,8 +871,8 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
  */
 {
     unsigned    IdentCount;
-    ident   	Ident;
-    int     	HaveParen;
+    ident       Ident;
+    int         HaveParen;
 
     /* Switch to the new input source */
     StrBuf* OldSource = InitLine (Source);
@@ -880,55 +880,55 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
     /* Loop removing ws and comments */
     IdentCount = 0;
     while (CurC != '\0') {
-       	if (SkipWhitespace (0)) {
+        if (SkipWhitespace (0)) {
             /* Squeeze runs of blanks */
             if (!IsSpace (SB_LookAtLast (Target))) {
                 SB_AppendChar (Target, ' ');
             }
-       	} else if (IsSym (Ident)) {
-     	    if (Preprocessing && strcmp (Ident, "defined") == 0) {
-     	     	/* Handle the "defined" operator */
-     	     	SkipWhitespace (0);
-     	     	HaveParen = 0;
-     	     	if (CurC == '(') {
-     	     	    HaveParen = 1;
-     	     	    NextChar ();
-     	     	    SkipWhitespace (0);
-     	     	}
-     	     	if (IsSym (Ident)) {
-     	     	    SB_AppendChar (Target, IsMacro (Ident)? '1' : '0');
-     	     	    if (HaveParen) {
-     	     	       	SkipWhitespace (0);
-     	     	       	if (CurC != ')') {
-     	     	       	    PPError ("`)' expected");
-     	     	       	} else {
-     	     	       	    NextChar ();
-     	     	       	}
-     	     	    }
-     	     	} else {
-     	     	    PPError ("Identifier expected");
-     	     	    SB_AppendChar (Target, '0');
-     	     	}
-     	    } else {
-     	     	++IdentCount;
-     	     	SB_AppendStr (Target, Ident);
-     	    }
-     	} else if (IsQuote (CurC)) {
-     	    CopyQuotedString (Target);
-     	} else if (CurC == '/' && NextC == '*') {
+        } else if (IsSym (Ident)) {
+            if (Preprocessing && strcmp (Ident, "defined") == 0) {
+                /* Handle the "defined" operator */
+                SkipWhitespace (0);
+                HaveParen = 0;
+                if (CurC == '(') {
+                    HaveParen = 1;
+                    NextChar ();
+                    SkipWhitespace (0);
+                }
+                if (IsSym (Ident)) {
+                    SB_AppendChar (Target, IsMacro (Ident)? '1' : '0');
+                    if (HaveParen) {
+                        SkipWhitespace (0);
+                        if (CurC != ')') {
+                            PPError ("`)' expected");
+                        } else {
+                            NextChar ();
+                        }
+                    }
+                } else {
+                    PPError ("Identifier expected");
+                    SB_AppendChar (Target, '0');
+                }
+            } else {
+                ++IdentCount;
+                SB_AppendStr (Target, Ident);
+            }
+        } else if (IsQuote (CurC)) {
+            CopyQuotedString (Target);
+        } else if (CurC == '/' && NextC == '*') {
             if (!IsSpace (SB_LookAtLast (Target))) {
                 SB_AppendChar (Target, ' ');
             }
-     	    OldStyleComment ();
-     	} else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
+            OldStyleComment ();
+        } else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
             if (!IsSpace (SB_LookAtLast (Target))) {
                 SB_AppendChar (Target, ' ');
             }
-     	    NewStyleComment ();
-     	} else {
-     	    SB_AppendChar (Target, CurC);
-     	    NextChar ();
-     	}
+            NewStyleComment ();
+        } else {
+            SB_AppendChar (Target, CurC);
+            NextChar ();
+        }
     }
 
     /* Switch back to the old source */
@@ -943,35 +943,35 @@ static unsigned Pass1 (StrBuf* Source, StrBuf* Target)
 static void MacroReplacement (StrBuf* Source, StrBuf* Target)
 /* Perform macro replacement. */
 {
-    ident   	Ident;
-    Macro*  	M;
+    ident       Ident;
+    Macro*      M;
 
     /* Remember the current input and switch to Source */
     StrBuf* OldSource = InitLine (Source);
 
     /* Loop substituting macros */
     while (CurC != '\0') {
-    	/* If we have an identifier, check if it's a macro */
-     	if (IsSym (Ident)) {
+        /* If we have an identifier, check if it's a macro */
+        if (IsSym (Ident)) {
             /* Check if it's a macro */
             if ((M = FindMacro (Ident)) != 0 && !M->Expanding) {
                 /* It's a macro, expand it */
                 ExpandMacro (Target, M);
             } else {
                 /* An identifier, keep it */
-    	    	SB_AppendStr (Target, Ident);
-    	    }
-     	} else if (IsQuote (CurC)) {
-     	    CopyQuotedString (Target);
-     	} else if (IsSpace (CurC)) {
+                SB_AppendStr (Target, Ident);
+            }
+        } else if (IsQuote (CurC)) {
+            CopyQuotedString (Target);
+        } else if (IsSpace (CurC)) {
             if (!IsSpace (SB_LookAtLast (Target))) {
                 SB_AppendChar (Target, CurC);
             }
             NextChar ();
         } else {
-     	    SB_AppendChar (Target, CurC);
-    	    NextChar ();
-     	}
+            SB_AppendChar (Target, CurC);
+            NextChar ();
+        }
     }
 
     /* Switch back the input */
@@ -1006,18 +1006,18 @@ static int PushIf (int Skip, int Invert, int Cond)
 {
     /* Check for an overflow of the if stack */
     if (IfIndex >= MAX_IFS-1) {
-	PPError ("Too many nested #if clauses");
-	return 1;
+        PPError ("Too many nested #if clauses");
+        return 1;
     }
 
     /* Push the #if condition */
     ++IfIndex;
     if (Skip) {
-     	IfStack[IfIndex] = IFCOND_SKIP | IFCOND_NEEDTERM;
-     	return 1;
+        IfStack[IfIndex] = IFCOND_SKIP | IFCOND_NEEDTERM;
+        return 1;
     } else {
-     	IfStack[IfIndex] = IFCOND_NONE | IFCOND_NEEDTERM;
-     	return (Invert ^ Cond);
+        IfStack[IfIndex] = IFCOND_NONE | IFCOND_NEEDTERM;
+        return (Invert ^ Cond);
     }
 }
 
@@ -1028,7 +1028,7 @@ static void DoError (void)
 {
     SkipWhitespace (0);
     if (CurC == '\0') {
- 	PPError ("Invalid #error directive");
+        PPError ("Invalid #error directive");
     } else {
         PPError ("#error: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
     }
@@ -1054,10 +1054,10 @@ static int DoIf (int Skip)
 
     /* Make sure the line infos for the tokens won't get removed */
     if (SavedCurTok.LI) {
-    	UseLineInfo (SavedCurTok.LI);
+        UseLineInfo (SavedCurTok.LI);
     }
     if (SavedNextTok.LI) {
-    	UseLineInfo (SavedNextTok.LI);
+        UseLineInfo (SavedNextTok.LI);
     }
 
     /* Switch into special preprocessing mode */
@@ -1100,9 +1100,9 @@ static int DoIfDef (int skip, int flag)
 
     SkipWhitespace (0);
     if (MacName (Ident) == 0) {
-       	return 0;
+        return 0;
     } else {
-	return PushIf (skip, flag, IsMacro(Ident));
+        return PushIf (skip, flag, IsMacro(Ident));
     }
 }
 
@@ -1111,7 +1111,7 @@ static int DoIfDef (int skip, int flag)
 static void DoInclude (void)
 /* Open an include file. */
 {
-    char    	RTerm;
+    char        RTerm;
     InputType   IT;
     StrBuf      Filename = STATIC_STRBUF_INITIALIZER;
 
@@ -1127,26 +1127,26 @@ static void DoInclude (void)
      */
     switch (CurC) {
 
-       	case '\"':
-       	    RTerm   = '\"';
-       	    IT = IT_USRINC;
-       	    break;
+        case '\"':
+            RTerm   = '\"';
+            IT = IT_USRINC;
+            break;
 
-       	case '<':
-       	    RTerm   = '>';
-       	    IT = IT_SYSINC;
-       	    break;
+        case '<':
+            RTerm   = '>';
+            IT = IT_SYSINC;
+            break;
 
-       	default:
-       	    PPError ("`\"' or `<' expected");
-       	    goto Done;
+        default:
+            PPError ("`\"' or `<' expected");
+            goto Done;
     }
     NextChar ();
 
     /* Get a copy of the filename */
     while (CurC != '\0' && CurC != RTerm) {
-       	SB_AppendChar (&Filename, CurC);
-	NextChar ();
+        SB_AppendChar (&Filename, CurC);
+        NextChar ();
     }
     SB_Terminate (&Filename);
 
@@ -1155,8 +1155,8 @@ static void DoInclude (void)
         /* Open the include file */
         OpenIncludeFile (SB_GetConstBuf (&Filename), IT);
     } else if (CurC == '\0') {
-       	/* No terminator found */
-       	PPError ("#include expects \"FILENAME\" or <FILENAME>");
+        /* No terminator found */
+        PPError ("#include expects \"FILENAME\" or <FILENAME>");
     }
 
 Done:
@@ -1203,7 +1203,7 @@ static void DoUndef (void)
 
     SkipWhitespace (0);
     if (MacName (Ident)) {
-	UndefineMacro (Ident);
+        UndefineMacro (Ident);
     }
 }
 
@@ -1214,7 +1214,7 @@ static void DoWarning (void)
 {
     SkipWhitespace (0);
     if (CurC == '\0') {
- 	PPError ("Invalid #warning directive");
+        PPError ("Invalid #warning directive");
     } else {
         PPWarning ("#warning: %s", SB_GetConstBuf (Line) + SB_GetIndex (Line));
     }
@@ -1228,8 +1228,8 @@ static void DoWarning (void)
 void Preprocess (void)
 /* Preprocess a line */
 {
-    int    	Skip;
-    ident  	Directive;
+    int         Skip;
+    ident       Directive;
 
     /* Create the output buffer if we don't already have one */
     if (MLine == 0) {
@@ -1243,124 +1243,124 @@ void Preprocess (void)
     Skip = 0;
     while (CurC == '\0' || CurC == '#' || Skip) {
 
-       	/* Check for preprocessor lines lines */
-       	if (CurC == '#') {
-       	    NextChar ();
-       	    SkipWhitespace (0);
-       	    if (CurC == '\0') {
-       	    	/* Ignore the empty preprocessor directive */
-       	    	continue;
-       	    }
-       	    if (!IsSym (Directive)) {
-       	    	PPError ("Preprocessor directive expected");
-       	    	ClearLine ();
-       	    } else {
-       	       	switch (FindPPToken (Directive)) {
+        /* Check for preprocessor lines lines */
+        if (CurC == '#') {
+            NextChar ();
+            SkipWhitespace (0);
+            if (CurC == '\0') {
+                /* Ignore the empty preprocessor directive */
+                continue;
+            }
+            if (!IsSym (Directive)) {
+                PPError ("Preprocessor directive expected");
+                ClearLine ();
+            } else {
+                switch (FindPPToken (Directive)) {
 
-       	       	    case PP_DEFINE:
-       	    	    	if (!Skip) {
-       	    	    	    DefineMacro ();
-       	    	    	}
-       	    	    	break;
+                    case PP_DEFINE:
+                        if (!Skip) {
+                            DefineMacro ();
+                        }
+                        break;
 
-	    	    case PP_ELIF:
-	   	        if (IfIndex >= 0) {
-	   	    	    if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
+                    case PP_ELIF:
+                        if (IfIndex >= 0) {
+                            if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
 
-	   			/* Handle as #else/#if combination */
-	   	    	     	if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
-	   	    	     	    Skip = !Skip;
-	   	    	     	}
-	   	    	     	IfStack[IfIndex] |= IFCOND_ELSE;
-	   			Skip = DoIf (Skip);
+                                /* Handle as #else/#if combination */
+                                if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
+                                    Skip = !Skip;
+                                }
+                                IfStack[IfIndex] |= IFCOND_ELSE;
+                                Skip = DoIf (Skip);
 
-	   			/* #elif doesn't need a terminator */
-	   		 	IfStack[IfIndex] &= ~IFCOND_NEEDTERM;
-	   		    } else {
-	   	    	  	PPError ("Duplicate #else/#elif");
-	   	    	    }
-		    	} else {
-		    	    PPError ("Unexpected #elif");
-		    	}
-		        break;
+                                /* #elif doesn't need a terminator */
+                                IfStack[IfIndex] &= ~IFCOND_NEEDTERM;
+                            } else {
+                                PPError ("Duplicate #else/#elif");
+                            }
+                        } else {
+                            PPError ("Unexpected #elif");
+                        }
+                        break;
 
-       	       	    case PP_ELSE:
-       	    	    	if (IfIndex >= 0) {
-	    	    	    if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
-		    	     	if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
-		    	     	    Skip = !Skip;
-		    	     	}
-		    	     	IfStack[IfIndex] |= IFCOND_ELSE;
-		    	    } else {
-		    	     	PPError ("Duplicate #else");
-		    	    }
-       	    	    	} else {
-       	    	    	    PPError ("Unexpected `#else'");
-       	    	    	}
-       	    	    	break;
+                    case PP_ELSE:
+                        if (IfIndex >= 0) {
+                            if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
+                                if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
+                                    Skip = !Skip;
+                                }
+                                IfStack[IfIndex] |= IFCOND_ELSE;
+                            } else {
+                                PPError ("Duplicate #else");
+                            }
+                        } else {
+                            PPError ("Unexpected `#else'");
+                        }
+                        break;
 
-       	       	    case PP_ENDIF:
-       	    	    	if (IfIndex >= 0) {
-			    /* Remove any clauses on top of stack that do not
-			     * need a terminating #endif.
-			     */
-    			    while (IfIndex >= 0 && (IfStack[IfIndex] & IFCOND_NEEDTERM) == 0) {
-			       	--IfIndex;
-			    }
+                    case PP_ENDIF:
+                        if (IfIndex >= 0) {
+                            /* Remove any clauses on top of stack that do not
+                             * need a terminating #endif.
+                             */
+                            while (IfIndex >= 0 && (IfStack[IfIndex] & IFCOND_NEEDTERM) == 0) {
+                                --IfIndex;
+                            }
 
-			    /* Stack may not be empty here or something is wrong */
-			    CHECK (IfIndex >= 0);
+                            /* Stack may not be empty here or something is wrong */
+                            CHECK (IfIndex >= 0);
 
-			    /* Remove the clause that needs a terminator */
-			    Skip = (IfStack[IfIndex--] & IFCOND_SKIP) != 0;
-       	    	    	} else {
-       	    	    	    PPError ("Unexpected `#endif'");
-       	    	    	}
-       	    	    	break;
+                            /* Remove the clause that needs a terminator */
+                            Skip = (IfStack[IfIndex--] & IFCOND_SKIP) != 0;
+                        } else {
+                            PPError ("Unexpected `#endif'");
+                        }
+                        break;
 
-       	       	    case PP_ERROR:
-       	    	    	if (!Skip) {
-       	    	    	    DoError ();
-	    	    	}
-    	    	    	break;
+                    case PP_ERROR:
+                        if (!Skip) {
+                            DoError ();
+                        }
+                        break;
 
-       	       	    case PP_IF:
-    	    	    	Skip = DoIf (Skip);
-    	    	    	break;
+                    case PP_IF:
+                        Skip = DoIf (Skip);
+                        break;
 
-       	       	    case PP_IFDEF:
-    	    	    	Skip = DoIfDef (Skip, 1);
-    	    	    	break;
+                    case PP_IFDEF:
+                        Skip = DoIfDef (Skip, 1);
+                        break;
 
-       	       	    case PP_IFNDEF:
-    	    	    	Skip = DoIfDef (Skip, 0);
-    	    	    	break;
+                    case PP_IFNDEF:
+                        Skip = DoIfDef (Skip, 0);
+                        break;
 
-       	       	    case PP_INCLUDE:
-    	    	    	if (!Skip) {
-    	    	    	    DoInclude ();
-    	    	    	}
-    	    	    	break;
+                    case PP_INCLUDE:
+                        if (!Skip) {
+                            DoInclude ();
+                        }
+                        break;
 
-       	       	    case PP_LINE:
-	   		/* Should do something in C99 at least, but we ignore it */
-			if (!Skip) {
-			    ClearLine ();
-    			}
-    	    	    	break;
+                    case PP_LINE:
+                        /* Should do something in C99 at least, but we ignore it */
+                        if (!Skip) {
+                            ClearLine ();
+                        }
+                        break;
 
-       	       	    case PP_PRAGMA:
-    	    	    	if (!Skip) {
+                    case PP_PRAGMA:
+                        if (!Skip) {
                             DoPragma ();
                             goto Done;
-    	    	    	}
-    	    	    	break;
+                        }
+                        break;
 
-       	       	    case PP_UNDEF:
-    	    	    	if (!Skip) {
-    	    	    	    DoUndef ();
-    	    	    	}
-    	    	    	break;
+                    case PP_UNDEF:
+                        if (!Skip) {
+                            DoUndef ();
+                        }
+                        break;
 
                     case PP_WARNING:
                         /* #warning is a non standard extension */
@@ -1376,22 +1376,22 @@ void Preprocess (void)
                         }
                         break;
 
-    	    	    default:
+                    default:
                         if (!Skip) {
-    	    	    	    PPError ("Preprocessor directive expected");
+                            PPError ("Preprocessor directive expected");
                         }
-    	    	    	ClearLine ();
-    	    	}
-    	    }
+                        ClearLine ();
+                }
+            }
 
-    	}
-    	if (NextLine () == 0) {
-    	    if (IfIndex >= 0) {
-    	    	PPError ("`#endif' expected");
-    	    }
-    	    return;
-    	}
-    	SkipWhitespace (0);
+        }
+        if (NextLine () == 0) {
+            if (IfIndex >= 0) {
+                PPError ("`#endif' expected");
+            }
+            return;
+        }
+        SkipWhitespace (0);
     }
 
     PreprocessLine ();

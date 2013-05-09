@@ -5,7 +5,7 @@
 ;
 
         .importzp       ptr1
-       	.interruptor    joy_irq		; Export as IRQ handler
+        .interruptor    joy_irq         ; Export as IRQ handler
 
         .include        "joy-kernel.inc"
         .include        "joy-error.inc"
@@ -16,22 +16,22 @@
 
 
 .bss
-_joy_drv:       .res    2      		; Pointer to driver
+_joy_drv:       .res    2               ; Pointer to driver
 
 _joy_masks:     .res    .sizeof(JOY_HDR::MASKS)
 
 ; Jump table for the driver functions.
 .data
 joy_vectors:
-joy_install:   	jmp     $0000
-joy_uninstall: 	jmp     $0000
+joy_install:    jmp     $0000
+joy_uninstall:  jmp     $0000
 joy_count:      jmp     $0000
 joy_read:       jmp     $0000
 joy_irq:        .byte   $60, $00, $00   ; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
-joy_sig:        .byte   $6A, $6F, $79, JOY_API_VERSION	; "joy", version
+joy_sig:        .byte   $6A, $6F, $79, JOY_API_VERSION  ; "joy", version
 
 
 .code
@@ -41,10 +41,10 @@ joy_sig:        .byte   $6A, $6F, $79, JOY_API_VERSION	; "joy", version
 
 
 _joy_install:
-       	sta     _joy_drv
-      	sta	ptr1
-      	stx     _joy_drv+1
-      	stx    	ptr1+1
+        sta     _joy_drv
+        sta     ptr1
+        stx     _joy_drv+1
+        stx     ptr1+1
 
 ; Check the driver signature
 
@@ -84,8 +84,8 @@ _joy_install:
 
         ldy     joy_irq+2               ; Check high byte of IRQ vector
         beq     @L3                     ; Jump if vector invalid
-   	ldy	#$4C			; JMP opcode
-       	sty    	joy_irq                 ; Activate IRQ routine
+        ldy     #$4C                    ; JMP opcode
+        sty     joy_irq                 ; Activate IRQ routine
 @L3:    rts
 
 ; Driver signature invalid
@@ -110,8 +110,8 @@ set:    sta     joy_vectors,x
 ;  */
 
 _joy_uninstall:
-	lda	#$60                    ; RTS opcode
-       	sta    	joy_irq                 ; Disable IRQ entry point
+        lda     #$60                    ; RTS opcode
+        sta     joy_irq                 ; Disable IRQ entry point
 
         jsr     joy_uninstall           ; Call the driver routine
 

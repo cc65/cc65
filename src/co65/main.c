@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    main.c				     */
+/*                                  main.c                                   */
 /*                                                                           */
 /*              Main program for the co65 object file converter              */
 /*                                                                           */
@@ -60,7 +60,7 @@
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -123,7 +123,7 @@ static void CheckSegName (const char* Seg)
 {
     /* Print an error and abort if the name is not ok */
     if (!ValidSegName (Seg)) {
-	Error ("Segment name `%s' is invalid", Seg);
+        Error ("Segment name `%s' is invalid", Seg);
     }
 }
 
@@ -202,7 +202,7 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebug (const char* Opt attribute ((unused)),
-		      const char* Arg attribute ((unused)))
+                      const char* Arg attribute ((unused)))
 /* Enable debugging code */
 {
     ++Debug;
@@ -211,7 +211,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
-		    	  const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DebugInfo = 1;
@@ -220,7 +220,7 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-	       	     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -230,7 +230,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 static void OptNoOutput (const char* Opt attribute ((unused)),
-	       	         const char* Arg attribute ((unused)))
+                         const char* Arg attribute ((unused)))
 /* Handle the --no-output option */
 {
     NoOutput = 1;
@@ -251,7 +251,7 @@ static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptVerbose (const char* Opt attribute ((unused)),
-		  	const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -260,7 +260,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-		  	const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr, "co65 V%s\n", GetVersionAsString ());
@@ -313,21 +313,21 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-       	{ "--bss-label",	1,     	OptBssLabel   		},
-	{ "--bss-name",		1, 	OptBssName   		},
-       	{ "--code-label",      	1,     	OptCodeLabel   		},
-	{ "--code-name",	1, 	OptCodeName  		},
-       	{ "--data-label",      	1,     	OptDataLabel   		},
-	{ "--data-name",	1, 	OptDataName  		},
-       	{ "--debug",           	0,     	OptDebug 		},
-	{ "--debug-info",      	0, 	OptDebugInfo 		},
-	{ "--help",    	  	0,	OptHelp			},
-       	{ "--no-output",        0,     	OptNoOutput             },
+        { "--bss-label",        1,      OptBssLabel             },
+        { "--bss-name",         1,      OptBssName              },
+        { "--code-label",       1,      OptCodeLabel            },
+        { "--code-name",        1,      OptCodeName             },
+        { "--data-label",       1,      OptDataLabel            },
+        { "--data-name",        1,      OptDataName             },
+        { "--debug",            0,      OptDebug                },
+        { "--debug-info",       0,      OptDebugInfo            },
+        { "--help",             0,      OptHelp                 },
+        { "--no-output",        0,      OptNoOutput             },
         { "--o65-model",        1,      OptO65Model             },
-	{ "--verbose", 	       	0,	OptVerbose		},
-	{ "--version", 	       	0,	OptVersion		},
-       	{ "--zeropage-label",   1,     	OptZeropageLabel        },
-       	{ "--zeropage-name",   	1,     	OptZeropageName         },
+        { "--verbose",          0,      OptVerbose              },
+        { "--version",          0,      OptVersion              },
+        { "--zeropage-label",   1,      OptZeropageLabel        },
+        { "--zeropage-name",    1,      OptZeropageName         },
     };
 
     unsigned I;
@@ -339,24 +339,24 @@ int main (int argc, char* argv [])
     I = 1;
     while (I < ArgCount) {
 
-       	/* Get the argument */
-       	const char* Arg = ArgVec [I];
+        /* Get the argument */
+        const char* Arg = ArgVec [I];
 
-       	/* Check for an option */
-       	if (Arg [0] == '-') {
-       	    switch (Arg [1]) {
+        /* Check for an option */
+        if (Arg [0] == '-') {
+            switch (Arg [1]) {
 
-		case '-':
-		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
-	    	case 'g':
-	    	    OptDebugInfo (Arg, 0);
-	    	    break;
+                case 'g':
+                    OptDebugInfo (Arg, 0);
+                    break;
 
-		case 'h':
-		    OptHelp (Arg, 0);
-		    break;
+                case 'h':
+                    OptHelp (Arg, 0);
+                    break;
 
                 case 'm':
                     OptO65Model (Arg, GetArg (&I, 2));
@@ -366,39 +366,39 @@ int main (int argc, char* argv [])
                     OptNoOutput (Arg, 0);
                     break;
 
-       	        case 'o':
-       	  	    OutputName = GetArg (&I, 2);
-       	       	    break;
+                case 'o':
+                    OutputName = GetArg (&I, 2);
+                    break;
 
-       	       	case 'v':
-	       	    OptVerbose (Arg, 0);
-       	       	    break;
+                case 'v':
+                    OptVerbose (Arg, 0);
+                    break;
 
-       	        case 'V':
-    	       	    OptVersion (Arg, 0);
-       	       	    break;
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
 
-       	       	default:
-       	       	    UnknownOption (Arg);
-	       	    break;
+                default:
+                    UnknownOption (Arg);
+                    break;
 
-     	    }
-       	} else {
-    	    /* Filename. Check if we already had one */
-    	    if (InputName) {
-    	       	Error ("Don't know what to do with `%s'", Arg);
-    	    } else {
-	       	InputName = Arg;
-	    }
-     	}
+            }
+        } else {
+            /* Filename. Check if we already had one */
+            if (InputName) {
+                Error ("Don't know what to do with `%s'", Arg);
+            } else {
+                InputName = Arg;
+            }
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Do we have an input file? */
     if (InputName == 0) {
-       	Error ("No input file");
+        Error ("No input file");
     }
 
     /* Generate the name of the output file if none was specified */

@@ -4,12 +4,12 @@
 ; void gotox (unsigned char x);
 ;
 
-	.include	"atari.inc"
-	.export		_gotox
-	.import		setcursor
+        .include        "atari.inc"
+        .export         _gotox
+        .import         setcursor
 
 _gotox:
-	sta	COLCRS		; Set X
-	lda	#0
-	sta	COLCRS+1
-	jmp	setcursor
+        sta     COLCRS          ; Set X
+        lda     #0
+        sta     COLCRS+1
+        jmp     setcursor

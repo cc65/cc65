@@ -14,28 +14,28 @@
 
 
 /* Graphics definitions */
-#define SCREEN_X	(tgi_getxres())
-#define SCREEN_Y	(tgi_getyres())
-#define MAXCOL		(tgi_getcolorcount())
+#define SCREEN_X        (tgi_getxres())
+#define SCREEN_Y        (tgi_getyres())
+#define MAXCOL          (tgi_getcolorcount())
 
-#define maxiterations	32
-#define fpshift		(10)
-#define tofp(_x)	((_x)<<fpshift)
-#define fromfp(_x)	((_x)>>fpshift)
-#define fpabs(_x)	(abs(_x))
+#define maxiterations   32
+#define fpshift         (10)
+#define tofp(_x)        ((_x)<<fpshift)
+#define fromfp(_x)      ((_x)>>fpshift)
+#define fpabs(_x)       (abs(_x))
 
-#define mulfp(_a,_b)	((((signed long)_a)*(_b))>>fpshift)
-#define divfp(_a,_b)	((((signed long)_a)<<fpshift)/(_b))
+#define mulfp(_a,_b)    ((((signed long)_a)*(_b))>>fpshift)
+#define divfp(_a,_b)    ((((signed long)_a)<<fpshift)/(_b))
 
 /* Workaround missing clock stuff */
 #if defined(__APPLE2__) || defined(__APPLE2ENH__)
-#  define clock()	0
-#  define CLK_TCK	1
+#  define clock()       0
+#  define CLK_TCK       1
 #endif
 
 /* Use dynamically loaded driver by default */
 #ifndef DYN_DRV
-#  define DYN_DRV	1
+#  define DYN_DRV       1
 #endif
 
 /* Use static local variables for speed */

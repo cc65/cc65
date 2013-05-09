@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    main.c				     */
+/*                                  main.c                                   */
 /*                                                                           */
 /*                              sim65 main program                           */
 /*                                                                           */
@@ -62,7 +62,7 @@
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -108,17 +108,17 @@ static void OptChipDir (const char* Opt attribute ((unused)), const char* Arg)
     /* Read in all files and treat them as libraries */
     while ((E = readdir (D)) != 0) {
 
-	char*  Name;
+        char*  Name;
         struct stat S;
 
-	/* ### Ignore anything but *.so files */
-	unsigned NameLen = strlen (E->d_name);
-	if (NameLen <= 3) {
-	    continue;
-	}
-	if (strcmp (E->d_name + NameLen - 3, ".so") != 0) {
-	    continue;
-	}
+        /* ### Ignore anything but *.so files */
+        unsigned NameLen = strlen (E->d_name);
+        if (NameLen <= 3) {
+            continue;
+        }
+        if (strcmp (E->d_name + NameLen - 3, ".so") != 0) {
+            continue;
+        }
 
         /* Create the full file name */
         Name = xmalloc (DirLen + 1 + NameLen + 1);
@@ -153,11 +153,11 @@ static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
     if (strcmp (Arg, "6502") == 0) {
-       	CPU = CPU_6502;
+        CPU = CPU_6502;
     } else if (strcmp (Arg, "65C02") == 0) {
-	CPU = CPU_65C02;
+        CPU = CPU_65C02;
     } else {
-       	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+        AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
     }
 }
 
@@ -167,7 +167,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 /* Define the config file */
 {
     if (CfgAvail ()) {
-	Error ("Cannot use -C twice");
+        Error ("Cannot use -C twice");
     }                             
     CfgSetName (Arg);
 }
@@ -175,7 +175,7 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebug (const char* Opt attribute ((unused)),
-	   	      const char* Arg attribute ((unused)))
+                      const char* Arg attribute ((unused)))
 /* Simulator debug mode */
 {
     Debug = 1;
@@ -184,7 +184,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -194,7 +194,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 static void OptVerbose (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -203,7 +203,7 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr, "sim65 V%s\n", GetVersionAsString ());
@@ -215,13 +215,13 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-       	{ "--chipdir", 	       	1,     	OptChipDir    	    	},
-       	{ "--config",  	       	1,     	OptConfig    	    	},
-        { "--cpu",     	       	1, 	OptCPU 	     		},
-       	{ "--debug",           	0,     	OptDebug     		},
-	{ "--help", 	 	0, 	OptHelp	     		},
-	{ "--verbose",	       	0, 	OptVerbose   	       	},
-	{ "--version",	       	0,	OptVersion   	       	},
+        { "--chipdir",          1,      OptChipDir              },
+        { "--config",           1,      OptConfig               },
+        { "--cpu",              1,      OptCPU                  },
+        { "--debug",            0,      OptDebug                },
+        { "--help",             0,      OptHelp                 },
+        { "--verbose",          0,      OptVerbose              },
+        { "--version",          0,      OptVersion              },
     };
 
     unsigned I;
@@ -239,57 +239,57 @@ int main (int argc, char* argv[])
     I = 1;
     while (I < ArgCount) {
 
-       	/* Get the argument */
-       	const char* Arg = ArgVec[I];
+        /* Get the argument */
+        const char* Arg = ArgVec[I];
 
-       	/* Check for an option */
-       	if (Arg [0] == '-') {
+        /* Check for an option */
+        if (Arg [0] == '-') {
 
-       	    switch (Arg [1]) {
+            switch (Arg [1]) {
 
-	   	case '-':
-		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-	 	    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
-		case 'd':
-		    OptDebug (Arg, 0);
-		    break;
+                case 'd':
+                    OptDebug (Arg, 0);
+                    break;
 
-  		case 'h':
-		case '?':
-	       	    OptHelp (Arg, 0);
-		    break;
+                case 'h':
+                case '?':
+                    OptHelp (Arg, 0);
+                    break;
 
-		case 'v':
-		    OptVerbose (Arg, 0);
-		    break;
+                case 'v':
+                    OptVerbose (Arg, 0);
+                    break;
 
-		case 'C':
-		    OptConfig (Arg, GetArg (&I, 2));
-		    break;
+                case 'C':
+                    OptConfig (Arg, GetArg (&I, 2));
+                    break;
 
-		case 'L':
-		    OptChipDir (Arg, GetArg (&I, 2));
-		    break;
+                case 'L':
+                    OptChipDir (Arg, GetArg (&I, 2));
+                    break;
 
-       	       	case 'V':
-       	       	    OptVersion (Arg, 0);
-       	       	    break;
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
 
-       	       	default:
-       	       	    UnknownOption (Arg);
-       	       	    break;
-       	    }
-       	} else {
-       	    if (InputFile) {
-       	       	fprintf (stderr, "additional file specs ignored\n");
-       	    } else {
-       	       	InputFile = Arg;
-	    }
-	}
+                default:
+                    UnknownOption (Arg);
+                    break;
+            }
+        } else {
+            if (InputFile) {
+                fprintf (stderr, "additional file specs ignored\n");
+            } else {
+                InputFile = Arg;
+            }
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Sort the already loaded chips */
@@ -297,7 +297,7 @@ int main (int argc, char* argv[])
 
     /* Check if we have a valid configuration */
     if (!CfgAvail ()) {
-       	Error ("Simulator configuration missing");
+        Error ("Simulator configuration missing");
     }
 
     /* Initialize the simulated CPU memory */

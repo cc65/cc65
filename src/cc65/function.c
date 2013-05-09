@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  function.c				     */
+/*                                function.c                                 */
 /*                                                                           */
-/*			Parse function entry/body/exit			     */
+/*                      Parse function entry/body/exit                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*	     	    		     Data			 	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -71,14 +71,14 @@ typedef enum {
 
 /* Structure that holds all data needed for function activation */
 struct Function {
-    struct SymEntry*   	FuncEntry;  	/* Symbol table entry */
-    Type*     		ReturnType; 	/* Function return type */
-    FuncDesc*  	        Desc;	    	/* Function descriptor */
-    int	      		Reserved;   	/* Reserved local space */
-    unsigned  	  	RetLab;	    	/* Return code label */
-    int	      		TopLevelSP;	/* SP at function top level */
+    struct SymEntry*    FuncEntry;      /* Symbol table entry */
+    Type*               ReturnType;     /* Function return type */
+    FuncDesc*           Desc;           /* Function descriptor */
+    int                 Reserved;       /* Reserved local space */
+    unsigned            RetLab;         /* Return code label */
+    int                 TopLevelSP;     /* SP at function top level */
     unsigned            RegOffs;        /* Register variable space offset */
-    funcflags_t		Flags;     	/* Function flags */
+    funcflags_t         Flags;          /* Function flags */
 };
 
 /* Pointer to current function */
@@ -87,7 +87,7 @@ Function* CurrentFunc = 0;
 
 
 /*****************************************************************************/
-/*     		   Subroutines working with struct Function		     */
+/*                 Subroutines working with struct Function                  */
 /*****************************************************************************/
 
 
@@ -101,12 +101,12 @@ static Function* NewFunction (struct SymEntry* Sym)
     /* Initialize the fields */
     F->FuncEntry  = Sym;
     F->ReturnType = GetFuncReturn (Sym->Type);
-    F->Desc   	  = GetFuncDesc (Sym->Type);
-    F->Reserved	  = 0;
-    F->RetLab	  = GetLocalLabel ();
+    F->Desc       = GetFuncDesc (Sym->Type);
+    F->Reserved   = 0;
+    F->RetLab     = GetLocalLabel ();
     F->TopLevelSP = 0;
     F->RegOffs    = RegisterSpace;
-    F->Flags	  = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
+    F->Flags      = IsTypeVoid (F->ReturnType) ? FF_VOID_RETURN : FF_NONE;
 
     /* Return the new structure */
     return F;
@@ -254,14 +254,14 @@ void F_AllocLocalSpace (Function* F)
 {
     if (F->Reserved > 0) {
 
-       	/* Create space on the stack */
-       	g_space (F->Reserved);
+        /* Create space on the stack */
+        g_space (F->Reserved);
 
-       	/* Correct the stack pointer */
-       	StackPtr -= F->Reserved;
+        /* Correct the stack pointer */
+        StackPtr -= F->Reserved;
 
-       	/* Nothing more reserved */
-       	F->Reserved = 0;
+        /* Nothing more reserved */
+        F->Reserved = 0;
     }
 }
 
@@ -276,18 +276,18 @@ int F_AllocRegVar (Function* F, const Type* Type)
     /* Allow register variables only on top level and if enabled */
     if (IS_Get (&EnableRegVars) && GetLexicalLevel () == LEX_LEVEL_FUNCTION) {
 
-      	/* Get the size of the variable */
-      	unsigned Size = CheckedSizeOf (Type);
+        /* Get the size of the variable */
+        unsigned Size = CheckedSizeOf (Type);
 
-      	/* Do we have space left? */
-      	if (F->RegOffs >= Size) {
-      	    /* Space left. We allocate the variables from high to low addresses,
-      	     * so the adressing is compatible with the saved values on stack.
-      	     * This allows shorter code when saving/restoring the variables.
-      	     */
-      	    F->RegOffs -= Size;
-      	    return F->RegOffs;
-      	}
+        /* Do we have space left? */
+        if (F->RegOffs >= Size) {
+            /* Space left. We allocate the variables from high to low addresses,
+             * so the adressing is compatible with the saved values on stack.
+             * This allows shorter code when saving/restoring the variables.
+             */
+            F->RegOffs -= Size;
+            return F->RegOffs;
+        }
     }
 
     /* No space left or no allocation */
@@ -303,12 +303,12 @@ static void F_RestoreRegVars (Function* F)
 
     /* If we don't have register variables in this function, bail out early */
     if (F->RegOffs == RegisterSpace) {
-       	return;
+        return;
     }
 
     /* Save the accumulator if needed */
     if (!F_HasVoidReturn (F)) {
-       	g_save (CF_CHAR | CF_FORCECHAR);
+        g_save (CF_CHAR | CF_FORCECHAR);
     }
 
     /* Get the first symbol from the function symbol table */
@@ -363,7 +363,7 @@ static void F_RestoreRegVars (Function* F)
 
     /* Restore the accumulator if needed */
     if (!F_HasVoidReturn (F)) {
-     	g_restore (CF_CHAR | CF_FORCECHAR);
+        g_restore (CF_CHAR | CF_FORCECHAR);
     }
 }
 
@@ -387,7 +387,7 @@ static void F_EmitDebugInfo (void)
 
 
 /*****************************************************************************/
-/*     	      	   	    	     code	      		 	     */
+/*                                   code                                    */
 /*****************************************************************************/
 
 
@@ -420,12 +420,12 @@ void NewFunc (SymEntry* Func)
      */
     AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
     if (D->Flags & FD_VARIADIC) {
-      	/* Variadic function. The variable must be const. */
-      	static const Type T[] = { TYPE(T_UCHAR | T_QUAL_CONST), TYPE(T_END) };
-      	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
+        /* Variadic function. The variable must be const. */
+        static const Type T[] = { TYPE(T_UCHAR | T_QUAL_CONST), TYPE(T_END) };
+        AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
     } else {
-      	/* Non variadic */
-       	AddConstSym ("__argsize__", type_uchar, SC_DEF | SC_CONST, D->ParamSize);
+        /* Non variadic */
+        AddConstSym ("__argsize__", type_uchar, SC_DEF | SC_CONST, D->ParamSize);
     }
 
     /* Function body now defined */
@@ -480,19 +480,19 @@ void NewFunc (SymEntry* Func)
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsQualFastcall (Func->Type) && D->ParamCount > 0) {
 
-      	unsigned Flags;
+        unsigned Flags;
 
-      	/* Fastcall functions may never have an ellipsis or the compiler is buggy */
-      	CHECK ((D->Flags & FD_VARIADIC) == 0);
+        /* Fastcall functions may never have an ellipsis or the compiler is buggy */
+        CHECK ((D->Flags & FD_VARIADIC) == 0);
 
-      	/* Generate the push */
-      	if (IsTypeFunc (D->LastParam->Type)) {
-	    /* Pointer to function */
-	    Flags = CF_PTR;
-	} else {
-    	    Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
-	}
-	g_push (Flags, 0);
+        /* Generate the push */
+        if (IsTypeFunc (D->LastParam->Type)) {
+            /* Pointer to function */
+            Flags = CF_PTR;
+        } else {
+            Flags = TypeOf (D->LastParam->Type) | CF_FORCECHAR;
+        }
+        g_push (Flags, 0);
     }
 
     /* Generate function entry code if needed */
@@ -500,7 +500,7 @@ void NewFunc (SymEntry* Func)
 
     /* If stack checking code is requested, emit a call to the helper routine */
     if (IS_Get (&CheckStack)) {
-    	g_stackcheck ();
+        g_stackcheck ();
     }
 
     /* Setup the stack */

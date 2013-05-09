@@ -4,15 +4,15 @@
 ; unsigned __fastcall__ dio_query_sectsize (dhandle_t handle);
 ;
 
-        .export 	_dio_query_sectsize
+        .export         _dio_query_sectsize
 
-        .include	"errno.inc"
+        .include        "errno.inc"
 
 _dio_query_sectsize:
         ; Clear error
-        stx	__oserror	; X = 0
+        stx     __oserror       ; X = 0
 
         ; Return ProDOS 8 block size
-        txa			; X = 0
-        ldx	#>512
+        txa                     ; X = 0
+        ldx     #>512
         rts

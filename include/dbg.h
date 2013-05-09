@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     dbg.h				     */
+/*                                   dbg.h                                   */
 /*                                                                           */
-/*			   Debugger module interface			     */
+/*                         Debugger module interface                         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -61,7 +61,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       Utility functions			     */
+/*                             Utility functions                             */
 /*****************************************************************************/
 
 
@@ -101,7 +101,7 @@ char* DbgMemDump (unsigned Addr, char* Buf, unsigned char Len);
 
 
 /*****************************************************************************/
-/*			   High level user interface   			     */
+/*                         High level user interface                         */
 /*****************************************************************************/
 
 
@@ -111,7 +111,7 @@ void __fastcall__ DbgInit (unsigned unused);
  * next brk encountered.
  */
 
-#define BREAK()	       	__asm__ ("brk")
+#define BREAK()         __asm__ ("brk")
 /* Use this to insert breakpoints into your code */
 
 

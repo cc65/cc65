@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h			    	     */
+/*                                 global.h                                  */
 /*                                                                           */
-/*		     Global variables for the ld65 linker	    	     */
+/*                   Global variables for the ld65 linker                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -39,22 +39,22 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-extern const char*	OutputName;	/* Name of output file */
+extern const char*      OutputName;     /* Name of output file */
 extern unsigned         OutputNameUsed; /* Output name was used by %O */
 
 extern unsigned         ModuleId;       /* Id for o65 module */
 
 extern unsigned char    HaveStartAddr;  /* True if start address was given */
-extern unsigned long 	StartAddr;	/* Start address */
+extern unsigned long    StartAddr;      /* Start address */
 
-extern unsigned char	VerboseMap;	/* Verbose map file */
-extern const char*	MapFileName;	/* Name of the map file */
-extern const char*	LabelFileName;	/* Name of the label file */
+extern unsigned char    VerboseMap;     /* Verbose map file */
+extern const char*      MapFileName;    /* Name of the map file */
+extern const char*      LabelFileName;  /* Name of the label file */
 extern const char*      DbgFileName;    /* Name of the debug file */
 
 

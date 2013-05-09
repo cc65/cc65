@@ -4,13 +4,13 @@
 ; int abs (int x);
 ;
 
-	.export		_abs
-	.import		negax
+        .export         _abs
+        .import         negax
 
-_abs:	cpx     #$00            ; test hi byte
-	bpl	L1
-	jmp	negax	     	; Negate if negative
-L1:	rts
+_abs:   cpx     #$00            ; test hi byte
+        bpl     L1
+        jmp     negax           ; Negate if negative
+L1:     rts
 
 
 

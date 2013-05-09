@@ -6,37 +6,37 @@
 ; unsigned _clocks_per_sec (void);
 ;
 
-	.export		_clock, __clocks_per_sec
-	.importzp	sreg
+        .export         _clock, __clocks_per_sec
+        .importzp       sreg
 
-	.include	"atari.inc"
+        .include        "atari.inc"
 
 
-.proc	_clock
+.proc   _clock
 
-	ldx	#5		; Synchronize with Antic, so the interrupt won't change RTCLOK
-	stx	WSYNC		; while we're reading it. The synchronization is done same as
-@L1:	dex			; in SETVBLV function in Atari OS.
-	bne	@L1
-	stx	sreg+1		; Byte 3 is always zero
-	lda	RTCLOK+2
-	ldx	RTCLOK+1
-	ldy	RTCLOK
-	sty	sreg
-	rts
+        ldx     #5              ; Synchronize with Antic, so the interrupt won't change RTCLOK
+        stx     WSYNC           ; while we're reading it. The synchronization is done same as
+@L1:    dex                     ; in SETVBLV function in Atari OS.
+        bne     @L1
+        stx     sreg+1          ; Byte 3 is always zero
+        lda     RTCLOK+2
+        ldx     RTCLOK+1
+        ldy     RTCLOK
+        sty     sreg
+        rts
 
 .endproc
 
 
-.proc	__clocks_per_sec
+.proc   __clocks_per_sec
 
         ldx     #$00            ; Clear high byte of return value
-	lda	PAL		; use hw register, PALNTS is only supported on XL/XE ROM
-	and	#$0e
-	bne	@NTSC
-	lda	#50
-	rts
-@NTSC: 	lda	#60
-	rts
+        lda     PAL             ; use hw register, PALNTS is only supported on XL/XE ROM
+        and     #$0e
+        bne     @NTSC
+        lda     #50
+        rts
+@NTSC:  lda     #60
+        rts
 
 .endproc

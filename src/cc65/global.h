@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*                                 global.h                                  */
 /*                                                                           */
-/*		   Global variables for the cc65 C compiler		     */
+/*                 Global variables for the cc65 C compiler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -45,30 +45,30 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Options */
-extern unsigned char	AddSource;		/* Add source lines as comments */
-extern unsigned char	DebugInfo;		/* Add debug info to the obj */
+extern unsigned char    AddSource;              /* Add source lines as comments */
+extern unsigned char    DebugInfo;              /* Add debug info to the obj */
 extern unsigned char    PreprocessOnly;         /* Just preprocess the input */
 extern unsigned char    DebugOptOutput;         /* Output debug stuff */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
 
 /* Stackable options */
-extern IntStack         WritableStrings;	/* Literal strings are r/w */
+extern IntStack         WritableStrings;        /* Literal strings are r/w */
 extern IntStack         LocalStrings;           /* Emit string literals immediately */
-extern IntStack         InlineStdFuncs;	       	/* Inline some known functions */
-extern IntStack         EnableRegVars;		/* Enable register variables */
-extern IntStack         AllowRegVarAddr;	/* Allow taking addresses of register vars */
-extern IntStack         RegVarsToCallStack;	/* Save reg variables on call stack */
-extern IntStack         StaticLocals;		/* Make local variables static */
-extern IntStack         SignedChars;		/* Make characters signed by default */
-extern IntStack         CheckStack;		/* Generate stack overflow checks */
-extern IntStack         Optimize;		/* Optimize flag */
-extern IntStack         CodeSizeFactor;		/* Size factor for generated code */
+extern IntStack         InlineStdFuncs;         /* Inline some known functions */
+extern IntStack         EnableRegVars;          /* Enable register variables */
+extern IntStack         AllowRegVarAddr;        /* Allow taking addresses of register vars */
+extern IntStack         RegVarsToCallStack;     /* Save reg variables on call stack */
+extern IntStack         StaticLocals;           /* Make local variables static */
+extern IntStack         SignedChars;            /* Make characters signed by default */
+extern IntStack         CheckStack;             /* Generate stack overflow checks */
+extern IntStack         Optimize;               /* Optimize flag */
+extern IntStack         CodeSizeFactor;         /* Size factor for generated code */
 extern IntStack         DataAlignment;          /* Alignment for data */
 
 /* File names */

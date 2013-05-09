@@ -5,9 +5,9 @@
 ; Ullrich von Bassewitz, 2002-12-09, 2003-12-20
 ;
 
-	.include 	"zeropage.inc"
+        .include        "zeropage.inc"
 
-      	.include 	"em-kernel.inc"
+        .include        "em-kernel.inc"
         .include        "em-error.inc"
         .include        "cbm610.inc"
 
@@ -22,7 +22,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   EMD_API_VERSION		; EM API version number
+        .byte   EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
 
@@ -32,7 +32,7 @@
         .word   MAP
         .word   USE
         .word   COMMIT
-	.word	COPYFROM
+        .word   COPYFROM
         .word   COPYTO
 
 ; ------------------------------------------------------------------------
@@ -48,7 +48,7 @@ OFFS    = 2
 curpage:        .res    1               ; Current page number
 
 window:         .res    256             ; Memory "window"
-pagecount:	.res	1               ; Number of available pages
+pagecount:      .res    1               ; Number of available pages
 
 
 .code
@@ -61,14 +61,14 @@ pagecount:	.res	1               ; Number of available pages
 ;
 
 INSTALL:
-       	lda	#$FF
+        lda     #$FF
         sta     curpage                 ; Invalidate the current page
         sta     pagecount               ; Assume all memory available
 
         sec
         jsr     $FF99                   ; MEMTOP
 
-       	cmp     #RAMBANK                ; Top of memory in bank 2?
+        cmp     #RAMBANK                ; Top of memory in bank 2?
         bne     @L1                     ; No: We can use all the memory
         txa
         sub     #OFFS
@@ -78,7 +78,7 @@ INSTALL:
 
 @L1:    lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
-;       rts				; Run into UNINSTALL instead
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -104,11 +104,11 @@ PAGECOUNT:
 ; by the driver.
 ;
 
-MAP:    sta     curpage	   		; Remember the new page
+MAP:    sta     curpage                 ; Remember the new page
 
-        sta	ptr1+1
-        lda	#OFFS
-        sta    	ptr1
+        sta     ptr1+1
+        lda     #OFFS
+        sta     ptr1
 
 ; Transfer one page
 
@@ -143,7 +143,7 @@ USE:    sta     curpage                 ; Remember the page
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.
 
-COMMIT: lda     curpage			; Get the current page
+COMMIT: lda     curpage                 ; Get the current page
         cmp     #$FF
         beq     done                    ; Jump if no page mapped
 

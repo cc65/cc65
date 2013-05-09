@@ -13,5 +13,5 @@
 
         .include        "em-kernel.inc"
 
-       	_em_use         = emd_use               ; Use driver entry
+        _em_use         = emd_use               ; Use driver entry
 

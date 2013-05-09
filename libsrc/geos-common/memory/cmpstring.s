@@ -5,15 +5,15 @@
 
 ; char CmpString (char *dest, char* source);
 
-	    .import DoubleSPop
-	    .import return0, return1
-	    .export _CmpString
+            .import DoubleSPop
+            .import return0, return1
+            .export _CmpString
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
 _CmpString:
-	jsr DoubleSPop
-	jsr CmpString
-	bne L1
-	jmp return0
-L1:	jmp return1
+        jsr DoubleSPop
+        jsr CmpString
+        bne L1
+        jmp return0
+L1:     jmp return1

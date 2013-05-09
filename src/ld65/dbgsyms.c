@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   dbgsyms.c				     */
+/*                                 dbgsyms.c                                 */
 /*                                                                           */
-/*		   Debug symbol handling for the ld65 linker		     */
+/*                 Debug symbol handling for the ld65 linker                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -58,7 +58,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data			       	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -66,16 +66,16 @@
 /* Definition of the debug symbol structure */
 struct DbgSym {
     unsigned            Id;             /* Id of debug symbol */
-    DbgSym*    	       	Next;  		/* Pool linear list link */
-    ObjData*   		Obj;	    	/* Object file that exports the name */
+    DbgSym*             Next;           /* Pool linear list link */
+    ObjData*            Obj;            /* Object file that exports the name */
     Collection          DefLines;       /* Line infos for definition */
     Collection          RefLines;       /* Line infos for references */
-    ExprNode*  		Expr;		/* Expression (0 if not def'd) */
+    ExprNode*           Expr;           /* Expression (0 if not def'd) */
     unsigned            Size;           /* Symbol size if any */
     unsigned            OwnerId;        /* Id of parent/owner */
     unsigned            ImportId;       /* Id of import if this is one */
-    unsigned            Name;  	       	/* Name */
-    unsigned short      Type;		/* Type of symbol */
+    unsigned            Name;           /* Name */
+    unsigned short      Type;           /* Type of symbol */
     unsigned short      AddrSize;       /* Address size of symbol */
 };
 
@@ -93,12 +93,12 @@ struct HLLDbgSym {
 /* We will collect all debug symbols in the following array and remove
  * duplicates before outputing them into a label file.
  */
-static DbgSym*	DbgSymPool[256];
+static DbgSym*  DbgSymPool[256];
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code 			       	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -116,12 +116,12 @@ static DbgSym* NewDbgSym (unsigned Id, unsigned Type, unsigned char AddrSize,
     D->Obj        = O;
     D->DefLines   = EmptyCollection;
     D->RefLines   = EmptyCollection;
-    D->Expr    	  = 0;
+    D->Expr       = 0;
     D->Size       = 0;
     D->OwnerId    = ~0U;
     D->ImportId   = ~0U;
-    D->Name 	  = 0;
-    D->Type    	  = Type;
+    D->Name       = 0;
+    D->Type       = Type;
     D->AddrSize   = AddrSize;
 
     /* Return the new entry */
@@ -146,21 +146,21 @@ static DbgSym* GetDbgSym (DbgSym* D, long Val)
 {
     /* Create the hash. We hash over the symbol value */
     unsigned Hash = ((Val >> 24) & 0xFF) ^
-	       	    ((Val >> 16) & 0xFF) ^
-	       	    ((Val >>  8) & 0xFF) ^
-	       	    ((Val >>  0) & 0xFF);
+                    ((Val >> 16) & 0xFF) ^
+                    ((Val >>  8) & 0xFF) ^
+                    ((Val >>  0) & 0xFF);
 
     /* Check for this symbol */
     DbgSym* Sym = DbgSymPool[Hash];
     while (Sym) {
-	/* Is this symbol identical? */
-	if (Sym->Name == D->Name && EqualExpr (Sym->Expr, D->Expr)) {
-	    /* Found */
-	    return Sym;
-	}
+        /* Is this symbol identical? */
+        if (Sym->Name == D->Name && EqualExpr (Sym->Expr, D->Expr)) {
+            /* Found */
+            return Sym;
+        }
 
-	/* Next symbol */
-	Sym = Sym->Next;
+        /* Next symbol */
+        Sym = Sym->Next;
     }
 
     /* This is the first symbol of it's kind */
@@ -174,9 +174,9 @@ static void InsertDbgSym (DbgSym* D, long Val)
 {
     /* Create the hash. We hash over the symbol value */
     unsigned Hash = ((Val >> 24) & 0xFF) ^
-	    	    ((Val >> 16) & 0xFF) ^
-	    	    ((Val >>  8) & 0xFF) ^
-	    	    ((Val >>  0) & 0xFF);
+                    ((Val >> 16) & 0xFF) ^
+                    ((Val >>  8) & 0xFF) ^
+                    ((Val >>  0) & 0xFF);
 
     /* Insert the symbol */
     D->Next = DbgSymPool [Hash];
@@ -203,9 +203,9 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O, unsigned Id)
 
     /* Read the value */
     if (SYM_IS_EXPR (D->Type)) {
-       	D->Expr = ReadExpr (F, O);
+        D->Expr = ReadExpr (F, O);
     } else {
-    	D->Expr = LiteralExpr (Read32 (F), O);
+        D->Expr = LiteralExpr (Read32 (F), O);
     }
 
     /* Read the size */

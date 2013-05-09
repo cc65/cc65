@@ -9,43 +9,43 @@
 ;
 
 
- 	.export		__setcolor, __setcolor_low, __getcolor
-	.import		popa
-	.include	"atari.inc"
+        .export         __setcolor, __setcolor_low, __getcolor
+        .import         popa
+        .include        "atari.inc"
 
-.proc	__getcolor
+.proc   __getcolor
 
-	tax
-	lda	COLOR0,x	; get current value
-	ldx	#0
-	rts
-
-.endproc
-
-.proc	__setcolor
-
-;	asl	a		; not -> BASIC compatible
-	sta	lum		; remember luminance
-	jsr	popa		; get hue
-	asl	a
-	asl	a
-	asl	a
-	asl	a
-	ora	lum
-;	jmp	__setcolor_low
+        tax
+        lda     COLOR0,x        ; get current value
+        ldx     #0
+        rts
 
 .endproc
 
-.proc	__setcolor_low
+.proc   __setcolor
 
-	pha
-	jsr	popa
-	tax
-	pla
-	sta	COLOR0,x
-	rts
+;       asl     a               ; not -> BASIC compatible
+        sta     lum             ; remember luminance
+        jsr     popa            ; get hue
+        asl     a
+        asl     a
+        asl     a
+        asl     a
+        ora     lum
+;       jmp     __setcolor_low
 
 .endproc
 
-	.bss
-lum:	.res	1
+.proc   __setcolor_low
+
+        pha
+        jsr     popa
+        tax
+        pla
+        sta     COLOR0,x
+        rts
+
+.endproc
+
+        .bss
+lum:    .res    1

@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -64,7 +64,7 @@ static ExprNode* Factor (void)
 
     switch (CfgTok) {
 
-	case CFGTOK_IDENT:
+        case CFGTOK_IDENT:
             /* Get the name as an id */
             Name = GetStrBufId (&CfgSVal);
 
@@ -82,11 +82,11 @@ static ExprNode* Factor (void)
             CfgNextTok ();
             break;
 
-     	case CFGTOK_INTCON:
+        case CFGTOK_INTCON:
             /* An integer constant */
             N = LiteralExpr (CfgIVal, 0);
-	    CfgNextTok ();
-       	    break;
+            CfgNextTok ();
+            break;
 
         case CFGTOK_PLUS:
             /* Unary plus */
@@ -101,16 +101,16 @@ static ExprNode* Factor (void)
             N->Left = Factor ();
             break;
 
-       	case CFGTOK_LPAR:
+        case CFGTOK_LPAR:
             /* Left parenthesis */
-       	    CfgNextTok ();
-       	    N = CfgExpr ();
-       	    CfgConsume (CFGTOK_RPAR, "')' expected");
-       	    break;
+            CfgNextTok ();
+            N = CfgExpr ();
+            CfgConsume (CFGTOK_RPAR, "')' expected");
+            break;
 
-       	default:
-       	    CfgError (&CfgErrorPos, "Invalid expression: %d", CfgTok);
-       	    break;
+        default:
+            CfgError (&CfgErrorPos, "Invalid expression: %d", CfgTok);
+            break;
     }
 
     /* Return the new expression node */
@@ -238,7 +238,7 @@ long CfgCheckedConstExpr (long Min, long Max)
 
     /* Check the range */
     if (Val < Min || Val > Max) {
-     	CfgError (&CfgErrorPos, "Range error");
+        CfgError (&CfgErrorPos, "Range error");
     }
 
     /* Return the value */

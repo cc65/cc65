@@ -6,18 +6,18 @@
 ; char FindBAMBit (struct tr_se *TS);
 ; (might be called inUSE (if (!inUSE(block))))
 
-	    .export _FindBAMBit
-	    .import gettrse
-	    .import return0, return1
+            .export _FindBAMBit
+            .import gettrse
+            .import return0, return1
 
-	    .include "jumptab.inc"
-	    .include "geossym.inc"
-	
+            .include "jumptab.inc"
+            .include "geossym.inc"
+        
 _FindBAMBit:
-	jsr gettrse
-	sta r6L
-	stx r6H
-	jsr FindBAMBit
-	bne inUse
-	jmp return0
-inUse:	jmp return1
+        jsr gettrse
+        sta r6L
+        stx r6H
+        jsr FindBAMBit
+        bne inUse
+        jmp return0
+inUse:  jmp return1

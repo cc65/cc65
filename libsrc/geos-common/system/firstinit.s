@@ -5,8 +5,8 @@
 
 ; void FirstInit (void);
 
-	    .export _FirstInit
+            .export _FirstInit
 
-	    .include "jumptab.inc"
+            .include "jumptab.inc"
 
-_FirstInit	= FirstInit
+_FirstInit      = FirstInit

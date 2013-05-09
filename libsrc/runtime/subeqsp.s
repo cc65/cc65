@@ -4,23 +4,23 @@
 ; CC65 runtime: -= operator for ints on the stack
 ;
 
-       	.export	       	subeq0sp, subeqysp
-   	.importzp	sp
+        .export         subeq0sp, subeqysp
+        .importzp       sp
 
 subeq0sp:
-   	ldy	#0
+        ldy     #0
 subeqysp:
-	sec
-	eor	#$FF
-	adc    	(sp),y
-	sta	(sp),y
-	pha	      		; Save low byte
-	iny
-	txa
-	eor	#$FF
-       	adc	(sp),y
-	sta	(sp),y
-	tax
-	pla			; Restore low byte
-	rts
+        sec
+        eor     #$FF
+        adc     (sp),y
+        sta     (sp),y
+        pha                     ; Save low byte
+        iny
+        txa
+        eor     #$FF
+        adc     (sp),y
+        sta     (sp),y
+        tax
+        pla                     ; Restore low byte
+        rts
 

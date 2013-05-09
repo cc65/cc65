@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     bin.c  				     */
+/*                                   bin.c                                   */
 /*                                                                           */
-/*		    Module to handle the raw binary format		     */
+/*                  Module to handle the raw binary format                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -58,21 +58,21 @@
 
 
 /*****************************************************************************/
-/*     	       	    	       	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 struct BinDesc {
-    unsigned	Undef;          /* Count of undefined externals */
-    FILE*      	F;              /* Output file */
+    unsigned    Undef;          /* Count of undefined externals */
+    FILE*       F;              /* Output file */
     const char* Filename;       /* Name of output file */
 };
 
 
 
 /*****************************************************************************/
-/*     	      	    	   	     Code	 		       	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -84,8 +84,8 @@ BinDesc* NewBinDesc (void)
     BinDesc* D = xmalloc (sizeof (BinDesc));
 
     /* Initialize the fields */
-    D->Undef	= 0;
-    D->F	= 0;
+    D->Undef    = 0;
+    D->F        = 0;
     D->Filename = 0;
 
     /* Return the created struct */
@@ -103,8 +103,8 @@ void FreeBinDesc (BinDesc* D)
 
 
 static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
-		  	      unsigned long Offs attribute ((unused)),
-			      void* Data)
+                              unsigned long Offs attribute ((unused)),
+                              void* Data)
 /* Called from SegWrite for an expression. Evaluate the expression, check the
  * range and write the expression value to the file.
  */
@@ -148,20 +148,20 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
     /* Walk over all segments in this memory area */
     for (I = 0; I < CollCount (&M->SegList); ++I) {
 
-	int DoWrite;
+        int DoWrite;
 
-	/* Get the segment */
-    	SegDesc* S = CollAtUnchecked (&M->SegList, I);
+        /* Get the segment */
+        SegDesc* S = CollAtUnchecked (&M->SegList, I);
 
-	/* Keep the user happy */
-       	Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
+        /* Keep the user happy */
+        Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
 
-	/* Writes do only occur in the load area and not for BSS segments */
-       	DoWrite = (S->Flags & SF_BSS) == 0  	&& 	/* No BSS segment */
-	       	   S->Load == M 	    	&&	/* LOAD segment */
-	       	   S->Seg->Dumped == 0;	    		/* Not already written */
+        /* Writes do only occur in the load area and not for BSS segments */
+        DoWrite = (S->Flags & SF_BSS) == 0      &&      /* No BSS segment */
+                   S->Load == M                 &&      /* LOAD segment */
+                   S->Seg->Dumped == 0;                 /* Not already written */
 
-	/* Output debugging stuff */
+        /* Output debugging stuff */
         PrintBoolVal ("bss", S->Flags & SF_BSS);
         PrintBoolVal ("LoadArea", S->Load == M);
         PrintBoolVal ("Dumped", S->Seg->Dumped);
@@ -169,17 +169,17 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
         PrintNumVal  ("Address", Addr);
         PrintNumVal  ("FileOffs", (unsigned long) ftell (D->F));
 
-       	/* Check if the alignment for the segment from the linker config is
+        /* Check if the alignment for the segment from the linker config is
          * a multiple for that of the segment.
          */
         if ((S->RunAlignment % S->Seg->Alignment) != 0) {
-       	    /* Segment requires another alignment than configured
-	     * in the linker.
-	     */
-	    Warning ("Segment `%s' is not aligned properly. Resulting "
+            /* Segment requires another alignment than configured
+             * in the linker.
+             */
+            Warning ("Segment `%s' is not aligned properly. Resulting "
                      "executable may not be functional.",
-	       	     GetString (S->Name));
-	}
+                     GetString (S->Name));
+        }
 
         /* If this is the run memory area, we must apply run alignment. If
          * this is not the run memory area but the load memory area (which
@@ -226,31 +226,31 @@ static void BinWriteMem (BinDesc* D, MemoryArea* M)
 
         }
 
-	/* Now write the segment to disk if it is not a BSS type segment and
-	 * if the memory area is the load area.
-	 */
-       	if (DoWrite) {
+        /* Now write the segment to disk if it is not a BSS type segment and
+         * if the memory area is the load area.
+         */
+        if (DoWrite) {
             unsigned long P = ftell (D->F);
-	    SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
+            SegWrite (D->Filename, D->F, S->Seg, BinWriteExpr, D);
             PrintNumVal ("Wrote", (unsigned long) (ftell (D->F) - P));
-       	} else if (M->Flags & MF_FILL) {
-	    WriteMult (D->F, S->Seg->FillVal, S->Seg->Size);
+        } else if (M->Flags & MF_FILL) {
+            WriteMult (D->F, S->Seg->FillVal, S->Seg->Size);
             PrintNumVal ("Filled", (unsigned long) S->Seg->Size);
-	}
+        }
 
-	/* If this was the load memory area, mark the segment as dumped */
-	if (S->Load == M) {
-  	    S->Seg->Dumped = 1;
-       	}
+        /* If this was the load memory area, mark the segment as dumped */
+        if (S->Load == M) {
+            S->Seg->Dumped = 1;
+        }
 
-	/* Calculate the new address */
-	Addr += S->Seg->Size;
+        /* Calculate the new address */
+        Addr += S->Seg->Size;
     }
 
     /* If a fill was requested, fill the remaining space */
     if ((M->Flags & MF_FILL) != 0 && M->FillLevel < M->Size) {
         unsigned long ToFill = M->Size - M->FillLevel;
-       	Print (stdout, 2, "    Filling 0x%lx bytes with 0x%02x\n",
+        Print (stdout, 2, "    Filling 0x%lx bytes with 0x%02x\n",
                ToFill, M->FillVal);
         WriteMult (D->F, M->FillVal, ToFill);
         M->FillLevel = M->Size;
@@ -283,17 +283,17 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     /* Check for unresolved symbols. The function BinUnresolved is called
      * if we get an unresolved symbol.
      */
-    D->Undef = 0;   		/* Reset the counter */
+    D->Undef = 0;               /* Reset the counter */
     CheckUnresolvedImports (BinUnresolved, D);
     if (D->Undef > 0) {
-	/* We had unresolved symbols, cannot create output file */
-       	Error ("%u unresolved external(s) found - cannot create output file", D->Undef);
+        /* We had unresolved symbols, cannot create output file */
+        Error ("%u unresolved external(s) found - cannot create output file", D->Undef);
     }
 
     /* Open the file */
     D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-	Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
@@ -303,13 +303,13 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     for (I = 0; I < CollCount (&F->MemoryAreas); ++I) {
         /* Get this entry */
         MemoryArea* M = CollAtUnchecked (&F->MemoryAreas, I);
-	Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));
-	BinWriteMem (D, M);
+        Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));
+        BinWriteMem (D, M);
     }
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-	Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
+        Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */

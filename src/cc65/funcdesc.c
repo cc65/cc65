@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  funcdesc.c				     */
+/*                                funcdesc.c                                 */
 /*                                                                           */
-/*	     Function descriptor structure for the cc65 C compiler	     */
+/*           Function descriptor structure for the cc65 C compiler           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*	       	      	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -54,9 +54,9 @@ FuncDesc* NewFuncDesc (void)
     FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
 
     /* Nullify the fields */
-    F->Flags	  = 0;
-    F->SymTab	  = 0;
-    F->TagTab	  = 0;
+    F->Flags      = 0;
+    F->SymTab     = 0;
+    F->TagTab     = 0;
     F->ParamCount = 0;
     F->ParamSize  = 0;
     F->LastParam  = 0;

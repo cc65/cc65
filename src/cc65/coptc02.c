@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptc02.h                                 */
+/*                                 coptc02.h                                 */
 /*                                                                           */
-/*			 65C02 specific optimizations                        */
+/*                       65C02 specific optimizations                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -44,19 +44,19 @@
 
 
 /*****************************************************************************/
-/*  	       	  	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /*****************************************************************************/
-/*		  	       Helper functions                              */
+/*                             Helper functions                              */
 /*****************************************************************************/
 
 
 
 /*****************************************************************************/
-/*	      			     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -71,27 +71,27 @@ unsigned Opt65C02Ind (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Check for addressing mode indirect indexed Y where Y is zero.
-	 * Note: All opcodes that are available as (zp),y are also available
-	 * as (zp), so we can ignore the actual opcode here.
-	 */
-	if (E->AM == AM65_ZP_INDY && E->RI->In.RegY == 0) {
+        /* Check for addressing mode indirect indexed Y where Y is zero.
+         * Note: All opcodes that are available as (zp),y are also available
+         * as (zp), so we can ignore the actual opcode here.
+         */
+        if (E->AM == AM65_ZP_INDY && E->RI->In.RegY == 0) {
 
-	    /* Replace it by indirect addressing mode */
-	    CodeEntry* X = NewCodeEntry (E->OPC, AM65_ZP_IND, E->Arg, 0, E->LI);
-	    CS_InsertEntry (S, X, I+1);
-	    CS_DelEntry (S, I);
+            /* Replace it by indirect addressing mode */
+            CodeEntry* X = NewCodeEntry (E->OPC, AM65_ZP_IND, E->Arg, 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
+            CS_DelEntry (S, I);
 
-	    /* We had changes */
-	    ++Changes;
+            /* We had changes */
+            ++Changes;
 
-	}
+        }
 
-     	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -111,13 +111,13 @@ unsigned Opt65C02BitOps (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[3];
+        CodeEntry* L[3];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
+        /* Get next entry */
+        L[0] = CS_GetEntry (S, I);
 
-	/* Check for the sequence */
-	if (L[0]->OPC == OP65_LDA      	       	                &&
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_LDA                               &&
             (L[0]->AM == AM65_ZP || L[0]->AM == AM65_ABS)       &&
             !CS_RangeHasLabel (S, I+1, 2)                       &&
             CS_GetEntries (S, L+1, I+1, 2)                      &&
@@ -158,12 +158,12 @@ unsigned Opt65C02BitOps (CodeSeg* S)
             /* Delete the old stuff */
             CS_DelEntries (S, I, 3);
 
-	    /* We had changes */
-	    ++Changes;
-	}
+            /* We had changes */
+            ++Changes;
+        }
 
-     	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -183,15 +183,15 @@ unsigned Opt65C02Stores (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
-	/* Check for a store with a register value of zero and an addressing
-	 * mode available with STZ.
-	 */
-       	if (((E->OPC == OP65_STA && E->RI->In.RegA == 0) ||
-	     (E->OPC == OP65_STX && E->RI->In.RegX == 0) ||
-	     (E->OPC == OP65_STY && E->RI->In.RegY == 0))     	&&
+        /* Check for a store with a register value of zero and an addressing
+         * mode available with STZ.
+         */
+        if (((E->OPC == OP65_STA && E->RI->In.RegA == 0) ||
+             (E->OPC == OP65_STX && E->RI->In.RegX == 0) ||
+             (E->OPC == OP65_STY && E->RI->In.RegY == 0))       &&
             (E->AM == AM65_ZP  || E->AM == AM65_ABS ||
              E->AM == AM65_ZPX || E->AM == AM65_ABSX)) {
 
@@ -202,12 +202,12 @@ unsigned Opt65C02Stores (CodeSeg* S)
             /* Delete the old stuff */
             CS_DelEntry (S, I);
 
-	    /* We had changes */
-	    ++Changes;
-	}
+            /* We had changes */
+            ++Changes;
+        }
 
-     	/* Next entry */
-	++I;
+        /* Next entry */
+        ++I;
 
     }
 

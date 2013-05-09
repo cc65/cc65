@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   ulabel.c				     */
+/*                                 ulabel.c                                  */
 /*                                                                           */
-/*		  Unnamed labels for the ca65 macroassembler		     */
+/*                Unnamed labels for the ca65 macroassembler                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*  	    	       	      	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -57,18 +57,18 @@
 typedef struct ULabel ULabel;
 struct ULabel {
     Collection  LineInfos;      /* Position of the label in the source */
-    ExprNode*	Val;          	/* The label value - may be NULL */
+    ExprNode*   Val;            /* The label value - may be NULL */
     unsigned    Ref;            /* Number of references */
 };
 
 /* List management */
-static Collection ULabList	= STATIC_COLLECTION_INITIALIZER;
-static unsigned ULabDefCount	= 0;	/* Number of defined labels */
+static Collection ULabList      = STATIC_COLLECTION_INITIALIZER;
+static unsigned ULabDefCount    = 0;    /* Number of defined labels */
 
 
 
 /*****************************************************************************/
-/*     	      	     	  	     Code		     	     	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -104,7 +104,7 @@ ExprNode* ULabRef (int Which)
  * must be resolved later.
  */
 {
-    int	    Index;
+    int     Index;
     ULabel* L;
 
     /* Which can never be 0 */
@@ -112,27 +112,27 @@ ExprNode* ULabRef (int Which)
 
     /* Get the index of the referenced label */
     if (Which > 0) {
-     	--Which;
+        --Which;
     }
     Index = (int) ULabDefCount + Which;
 
     /* We cannot have negative label indices */
     if (Index < 0) {
-	/* Label does not exist */
-	Error ("Undefined label");
-	/* We must return something valid */
-	return GenCurrentPC();
+        /* Label does not exist */
+        Error ("Undefined label");
+        /* We must return something valid */
+        return GenCurrentPC();
     }
 
     /* Check if the label exists. If not, generate enough forward labels. */
     if (Index < (int) CollCount (&ULabList)) {
         /* The label exists, get it. */
-	L = CollAtUnchecked (&ULabList, Index);
+        L = CollAtUnchecked (&ULabList, Index);
     } else {
         /* Generate new, undefined labels */
-	while (Index >= (int) CollCount (&ULabList)) {
+        while (Index >= (int) CollCount (&ULabList)) {
             L = NewULabel (0);
-	}
+        }
     }
 
     /* Mark the label as referenced */
@@ -154,18 +154,18 @@ void ULabDef (void)
 /* Define an unnamed label at the current PC */
 {
     if (ULabDefCount < CollCount (&ULabList)) {
-	/* We did already have a forward reference to this label, so has
-	 * already been generated, but doesn't have a value. Use the current
-	 * PC for the label value.
-	 */
-	ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
-	CHECK (L->Val == 0);
-	L->Val = GenCurrentPC ();     
+        /* We did already have a forward reference to this label, so has
+         * already been generated, but doesn't have a value. Use the current
+         * PC for the label value.
+         */
+        ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
+        CHECK (L->Val == 0);
+        L->Val = GenCurrentPC ();     
         ReleaseFullLineInfo (&L->LineInfos);
         GetFullLineInfo (&L->LineInfos);
     } else {
-	/* There is no such label, create it */
-       	NewULabel (GenCurrentPC ());
+        /* There is no such label, create it */
+        NewULabel (GenCurrentPC ());
     }
 
     /* We have one more defined label */
@@ -207,9 +207,9 @@ void ULabDone (void)
     /* Check if there are undefined labels */
     unsigned I = ULabDefCount;
     while (I < CollCount (&ULabList)) {
-	ULabel* L = CollAtUnchecked (&ULabList, I);
-       	LIError (&L->LineInfos, "Undefined label");
-	++I;
+        ULabel* L = CollAtUnchecked (&ULabList, I);
+        LIError (&L->LineInfos, "Undefined label");
+        ++I;
     }
 
     /* Walk over all labels and emit a warning if any unreferenced ones

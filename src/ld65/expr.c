@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    expr.c				     */
+/*                                  expr.c                                   */
 /*                                                                           */
-/*		   Expression evaluation for the ld65 linker		     */
+/*                 Expression evaluation for the ld65 linker                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    	       	     Code	      			     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -59,11 +59,11 @@ ExprNode* NewExprNode (ObjData* O, unsigned char Op)
 {
     /* Allocate fresh memory */
     ExprNode* N = xmalloc (sizeof (ExprNode));
-    N->Op 	= Op;
-    N->Left 	= 0;
-    N->Right 	= 0;
-    N->Obj	= O;
-    N->V.IVal	= 0;
+    N->Op       = Op;
+    N->Left     = 0;
+    N->Right    = 0;
+    N->Obj      = O;
+    N->V.IVal   = 0;
 
     return N;
 }
@@ -83,9 +83,9 @@ void FreeExpr (ExprNode* Root)
 /* Free the expression, Root is pointing to. */
 {
     if (Root) {
-     	FreeExpr (Root->Left);
-	FreeExpr (Root->Right);
-	FreeExprNode (Root);
+        FreeExpr (Root->Left);
+        FreeExpr (Root->Right);
+        FreeExprNode (Root);
     }
 }
 
@@ -102,27 +102,27 @@ int IsConstExpr (ExprNode* Root)
     MemoryArea* M;
 
     if (EXPR_IS_LEAF (Root->Op)) {
-      	switch (Root->Op) {
+        switch (Root->Op) {
 
-      	    case EXPR_LITERAL:
-      	      	return 1;
+            case EXPR_LITERAL:
+                return 1;
 
-      	    case EXPR_SYMBOL:
-    		/* Get the referenced export */
-       	       	E = GetExprExport (Root);
-    		/* If this export has a mark set, we've already encountered it.
-    		 * This means that the export is used to define it's own value,
-    	   	 * which in turn means, that we have a circular reference.
-    		 */
-    		if (ExportHasMark (E)) {
+            case EXPR_SYMBOL:
+                /* Get the referenced export */
+                E = GetExprExport (Root);
+                /* If this export has a mark set, we've already encountered it.
+                 * This means that the export is used to define it's own value,
+                 * which in turn means, that we have a circular reference.
+                 */
+                if (ExportHasMark (E)) {
                     CircularRefError (E);
-    		    Const = 0;
-    		} else {
-    		    MarkExport (E);
-    		    Const = IsConstExport (E);
-    	   	    UnmarkExport (E);
-    	   	}
-    		return Const;
+                    Const = 0;
+                } else {
+                    MarkExport (E);
+                    Const = IsConstExport (E);
+                    UnmarkExport (E);
+                }
+                return Const;
 
             case EXPR_SECTION:
                 /* A section expression is const if the segment it is in is
@@ -142,11 +142,11 @@ int IsConstExpr (ExprNode* Root)
                 return !Root->V.Mem->Relocatable &&
                        (Root->V.Mem->Flags & MF_PLACED);
 
-      	    default:
+            default:
                 /* Anything else is not const */
-      	 	return 0;
+                return 0;
 
-      	}
+        }
 
     } else if (EXPR_IS_UNARY (Root->Op)) {
 
@@ -177,41 +177,41 @@ int IsConstExpr (ExprNode* Root)
 
     } else {
 
-      	/* We must handle shortcut boolean expressions here */
-      	switch (Root->Op) {
+        /* We must handle shortcut boolean expressions here */
+        switch (Root->Op) {
 
-      	    case EXPR_BOOLAND:
-      	 	if (IsConstExpr (Root->Left)) {
-      	 	    /* lhs is const, if it is zero, don't eval right */
-      	 	    if (GetExprVal (Root->Left) == 0) {
-      	 	 	return 1;
-      	  	    } else {
-      	 	 	return IsConstExpr (Root->Right);
-      	 	    }
-      	 	} else {
-      	 	    /* lhs not const --> tree not const */
-      	 	    return 0;
-      	 	}
-      	 	break;
+            case EXPR_BOOLAND:
+                if (IsConstExpr (Root->Left)) {
+                    /* lhs is const, if it is zero, don't eval right */
+                    if (GetExprVal (Root->Left) == 0) {
+                        return 1;
+                    } else {
+                        return IsConstExpr (Root->Right);
+                    }
+                } else {
+                    /* lhs not const --> tree not const */
+                    return 0;
+                }
+                break;
 
-      	    case EXPR_BOOLOR:
-      	 	if (IsConstExpr (Root->Left)) {
-      	 	    /* lhs is const, if it is not zero, don't eval right */
-      	 	    if (GetExprVal (Root->Left) != 0) {
-      	 	    	return 1;
-      	 	    } else {
-      	 	    	return IsConstExpr (Root->Right);
-      	 	    }
-      	 	} else {
-	 	    /* lhs not const --> tree not const */
-	 	    return 0;
-		}
-		break;
+            case EXPR_BOOLOR:
+                if (IsConstExpr (Root->Left)) {
+                    /* lhs is const, if it is not zero, don't eval right */
+                    if (GetExprVal (Root->Left) != 0) {
+                        return 1;
+                    } else {
+                        return IsConstExpr (Root->Right);
+                    }
+                } else {
+                    /* lhs not const --> tree not const */
+                    return 0;
+                }
+                break;
 
-	    default:
-		/* All others are handled normal */
-		return IsConstExpr (Root->Left) && IsConstExpr (Root->Right);
-	}
+            default:
+                /* All others are handled normal */
+                return IsConstExpr (Root->Left) && IsConstExpr (Root->Right);
+        }
     }
 }
 
@@ -228,10 +228,10 @@ Import* GetExprImport (ExprNode* Expr)
      * import pointer.
      */
     if (Expr->Obj) {
-    	/* Return the Import */
-       	return GetObjImport (Expr->Obj, Expr->V.ImpNum);
+        /* Return the Import */
+        return GetObjImport (Expr->Obj, Expr->V.ImpNum);
     } else {
-	return Expr->V.Imp;
+        return Expr->V.Imp;
     }
 }
 
@@ -260,10 +260,10 @@ Section* GetExprSection (ExprNode* Expr)
      * section pointer.
      */
     if (Expr->Obj) {
-	/* Return the export */
-       	return CollAt (&Expr->Obj->Sections, Expr->V.SecNum);
+        /* Return the export */
+        return CollAt (&Expr->Obj->Sections, Expr->V.SecNum);
     } else {
-	return Expr->V.Sec;
+        return Expr->V.Sec;
     }
 }
 
@@ -281,102 +281,102 @@ long GetExprVal (ExprNode* Expr)
 
     switch (Expr->Op) {
 
-       	case EXPR_LITERAL:
-     	    return Expr->V.IVal;
+        case EXPR_LITERAL:
+            return Expr->V.IVal;
 
-       	case EXPR_SYMBOL:
-     	    /* Get the referenced export */
-       	    E = GetExprExport (Expr);
-     	    /* If this export has a mark set, we've already encountered it.
-     	     * This means that the export is used to define it's own value,
-     	     * which in turn means, that we have a circular reference.
-     	     */
-     	    if (ExportHasMark (E)) {
-     	  	CircularRefError (E);
-     	  	Val = 0;
-     	    } else {
-     	  	MarkExport (E);
-     	    	Val = GetExportVal (E);
-     	  	UnmarkExport (E);
-     	    }
-     	    return Val;
+        case EXPR_SYMBOL:
+            /* Get the referenced export */
+            E = GetExprExport (Expr);
+            /* If this export has a mark set, we've already encountered it.
+             * This means that the export is used to define it's own value,
+             * which in turn means, that we have a circular reference.
+             */
+            if (ExportHasMark (E)) {
+                CircularRefError (E);
+                Val = 0;
+            } else {
+                MarkExport (E);
+                Val = GetExportVal (E);
+                UnmarkExport (E);
+            }
+            return Val;
 
         case EXPR_SECTION:
-       	    S = GetExprSection (Expr);
-     	    return S->Offs + S->Seg->PC;
+            S = GetExprSection (Expr);
+            return S->Offs + S->Seg->PC;
 
-     	case EXPR_SEGMENT:
-       	    return Expr->V.Seg->PC;
+        case EXPR_SEGMENT:
+            return Expr->V.Seg->PC;
 
         case EXPR_MEMAREA:
             return Expr->V.Mem->Start;
 
-       	case EXPR_PLUS:
-     	    return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
+        case EXPR_PLUS:
+            return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
 
-       	case EXPR_MINUS:
-     	    return GetExprVal (Expr->Left) - GetExprVal (Expr->Right);
+        case EXPR_MINUS:
+            return GetExprVal (Expr->Left) - GetExprVal (Expr->Right);
 
-       	case EXPR_MUL:
-     	    return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
+        case EXPR_MUL:
+            return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
 
-       	case EXPR_DIV:
-     	    Left  = GetExprVal (Expr->Left);
-     	    Right = GetExprVal (Expr->Right);
-	    if (Right == 0) {
-     	  	Error ("Division by zero");
-	    }
-	    return Left / Right;
+        case EXPR_DIV:
+            Left  = GetExprVal (Expr->Left);
+            Right = GetExprVal (Expr->Right);
+            if (Right == 0) {
+                Error ("Division by zero");
+            }
+            return Left / Right;
 
-       	case EXPR_MOD:
-     	    Left  = GetExprVal (Expr->Left);
-	    Right = GetExprVal (Expr->Right);
-	    if (Right == 0) {
-		Error ("Modulo operation with zero");
-	    }
-	    return Left % Right;
+        case EXPR_MOD:
+            Left  = GetExprVal (Expr->Left);
+            Right = GetExprVal (Expr->Right);
+            if (Right == 0) {
+                Error ("Modulo operation with zero");
+            }
+            return Left % Right;
 
-       	case EXPR_OR:
-       	    return GetExprVal (Expr->Left) | GetExprVal (Expr->Right);
+        case EXPR_OR:
+            return GetExprVal (Expr->Left) | GetExprVal (Expr->Right);
 
-       	case EXPR_XOR:
-       	    return GetExprVal (Expr->Left) ^ GetExprVal (Expr->Right);
+        case EXPR_XOR:
+            return GetExprVal (Expr->Left) ^ GetExprVal (Expr->Right);
 
-       	case EXPR_AND:
-       	    return GetExprVal (Expr->Left) & GetExprVal (Expr->Right);
+        case EXPR_AND:
+            return GetExprVal (Expr->Left) & GetExprVal (Expr->Right);
 
-       	case EXPR_SHL:
-       	    return GetExprVal (Expr->Left) << GetExprVal (Expr->Right);
+        case EXPR_SHL:
+            return GetExprVal (Expr->Left) << GetExprVal (Expr->Right);
 
-       	case EXPR_SHR:
-       	    return GetExprVal (Expr->Left) >> GetExprVal (Expr->Right);
+        case EXPR_SHR:
+            return GetExprVal (Expr->Left) >> GetExprVal (Expr->Right);
 
-       	case EXPR_EQ:
-       	    return (GetExprVal (Expr->Left) == GetExprVal (Expr->Right));
+        case EXPR_EQ:
+            return (GetExprVal (Expr->Left) == GetExprVal (Expr->Right));
 
-       	case EXPR_NE:
-       	    return (GetExprVal (Expr->Left) != GetExprVal (Expr->Right));
+        case EXPR_NE:
+            return (GetExprVal (Expr->Left) != GetExprVal (Expr->Right));
 
-       	case EXPR_LT:
-    	    return (GetExprVal (Expr->Left) < GetExprVal (Expr->Right));
+        case EXPR_LT:
+            return (GetExprVal (Expr->Left) < GetExprVal (Expr->Right));
 
-       	case EXPR_GT:
-    	    return (GetExprVal (Expr->Left) > GetExprVal (Expr->Right));
+        case EXPR_GT:
+            return (GetExprVal (Expr->Left) > GetExprVal (Expr->Right));
 
-       	case EXPR_LE:
-    	    return (GetExprVal (Expr->Left) <= GetExprVal (Expr->Right));
+        case EXPR_LE:
+            return (GetExprVal (Expr->Left) <= GetExprVal (Expr->Right));
 
-       	case EXPR_GE:
-    	    return (GetExprVal (Expr->Left) >= GetExprVal (Expr->Right));
+        case EXPR_GE:
+            return (GetExprVal (Expr->Left) >= GetExprVal (Expr->Right));
 
-	case EXPR_BOOLAND:
-	    return GetExprVal (Expr->Left) && GetExprVal (Expr->Right);
+        case EXPR_BOOLAND:
+            return GetExprVal (Expr->Left) && GetExprVal (Expr->Right);
 
-	case EXPR_BOOLOR:
-	    return GetExprVal (Expr->Left) || GetExprVal (Expr->Right);
+        case EXPR_BOOLOR:
+            return GetExprVal (Expr->Left) || GetExprVal (Expr->Right);
 
-    	case EXPR_BOOLXOR:
-    	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
+        case EXPR_BOOLXOR:
+            return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
 
         case EXPR_MAX:
             Left = GetExprVal (Expr->Left);
@@ -388,18 +388,18 @@ long GetExprVal (ExprNode* Expr)
             Right = GetExprVal (Expr->Right);
             return (Left < Right)? Left : Right;
 
-       	case EXPR_UNARY_MINUS:
-     	    return -GetExprVal (Expr->Left);
+        case EXPR_UNARY_MINUS:
+            return -GetExprVal (Expr->Left);
 
-       	case EXPR_NOT:
-     	    return ~GetExprVal (Expr->Left);
+        case EXPR_NOT:
+            return ~GetExprVal (Expr->Left);
 
         case EXPR_SWAP:
-     	    Left = GetExprVal (Expr->Left);
-     	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
+            Left = GetExprVal (Expr->Left);
+            return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
 
-     	case EXPR_BOOLNOT:
-       	    return !GetExprVal (Expr->Left);
+        case EXPR_BOOLNOT:
+            return !GetExprVal (Expr->Left);
 
         case EXPR_BANK:
             GetSegExprVal (Expr->Left, &D);
@@ -418,23 +418,23 @@ long GetExprVal (ExprNode* Expr)
             }
             return GetExprVal (D.Seg->MemArea->BankExpr);
 
-       	case EXPR_BYTE0:
-     	    return GetExprVal (Expr->Left) & 0xFF;
+        case EXPR_BYTE0:
+            return GetExprVal (Expr->Left) & 0xFF;
 
-       	case EXPR_BYTE1:
-     	    return (GetExprVal (Expr->Left) >> 8) & 0xFF;
+        case EXPR_BYTE1:
+            return (GetExprVal (Expr->Left) >> 8) & 0xFF;
 
-       	case EXPR_BYTE2:
-     	    return (GetExprVal (Expr->Left) >> 16) & 0xFF;
+        case EXPR_BYTE2:
+            return (GetExprVal (Expr->Left) >> 16) & 0xFF;
 
-       	case EXPR_BYTE3:
-     	    return (GetExprVal (Expr->Left) >> 24) & 0xFF;
+        case EXPR_BYTE3:
+            return (GetExprVal (Expr->Left) >> 24) & 0xFF;
 
-       	case EXPR_WORD0:
-     	    return GetExprVal (Expr->Left) & 0xFFFF;
+        case EXPR_WORD0:
+            return GetExprVal (Expr->Left) & 0xFFFF;
 
-       	case EXPR_WORD1:
-     	    return (GetExprVal (Expr->Left) >> 16) & 0xFFFF;
+        case EXPR_WORD1:
+            return (GetExprVal (Expr->Left) >> 16) & 0xFFFF;
 
         case EXPR_FARADDR:
             return GetExprVal (Expr->Left) & 0xFFFFFF;
@@ -443,9 +443,9 @@ long GetExprVal (ExprNode* Expr)
             return GetExprVal (Expr->Left) & 0xFFFFFFFF;
 
         default:
-       	    Internal ("Unknown expression Op type: %u", Expr->Op);
-      	    /* NOTREACHED */
-     	    return 0;
+            Internal ("Unknown expression Op type: %u", Expr->Op);
+            /* NOTREACHED */
+            return 0;
     }
 }
 
@@ -462,66 +462,66 @@ static void GetSegExprValInternal (ExprNode* Expr, SegExprDesc* D, int Sign)
 
     switch (Expr->Op) {
 
-	case EXPR_LITERAL:
+        case EXPR_LITERAL:
             D->Val += (Sign * Expr->V.IVal);
-	    break;
+            break;
 
-	case EXPR_SYMBOL:
-     	    /* Get the referenced export */
-       	    E = GetExprExport (Expr);
-     	    /* If this export has a mark set, we've already encountered it.
-     	     * This means that the export is used to define it's own value,
-     	     * which in turn means, that we have a circular reference.
-     	     */
-     	    if (ExportHasMark (E)) {
-     	    	CircularRefError (E);
-       	    } else {
-     	    	MarkExport (E);
-       	       	GetSegExprValInternal (E->Expr, D, Sign);
-     	    	UnmarkExport (E);
-     	    }
-     	    break;
+        case EXPR_SYMBOL:
+            /* Get the referenced export */
+            E = GetExprExport (Expr);
+            /* If this export has a mark set, we've already encountered it.
+             * This means that the export is used to define it's own value,
+             * which in turn means, that we have a circular reference.
+             */
+            if (ExportHasMark (E)) {
+                CircularRefError (E);
+            } else {
+                MarkExport (E);
+                GetSegExprValInternal (E->Expr, D, Sign);
+                UnmarkExport (E);
+            }
+            break;
 
-    	case EXPR_SECTION:
-    	    if (D->Seg) {
-    	        /* We cannot handle more than one segment reference in o65 */
-    	    	D->TooComplex = 1;
-    	    } else {
+        case EXPR_SECTION:
+            if (D->Seg) {
+                /* We cannot handle more than one segment reference in o65 */
+                D->TooComplex = 1;
+            } else {
                 /* Get the section from the expression */
                 Section* S = GetExprSection (Expr);
-    	    	/* Remember the segment reference */
-    	    	D->Seg = S->Seg;
+                /* Remember the segment reference */
+                D->Seg = S->Seg;
                 /* Add the offset of the section to the constant value */
                 D->Val += Sign * (S->Offs + D->Seg->PC);
-    	    }
-    	    break;
+            }
+            break;
 
         case EXPR_SEGMENT:
-    	    if (D->Seg) {
-    	        /* We cannot handle more than one segment reference in o65 */
-    		D->TooComplex = 1;
-    	    } else {
-       	 	/* Remember the segment reference */
-       	       	D->Seg = Expr->V.Seg;
+            if (D->Seg) {
+                /* We cannot handle more than one segment reference in o65 */
+                D->TooComplex = 1;
+            } else {
+                /* Remember the segment reference */
+                D->Seg = Expr->V.Seg;
                 /* Add the offset of the segment to the constant value */
                 D->Val += (Sign * D->Seg->PC);
-     	    }
-     	    break;
+            }
+            break;
 
-     	case EXPR_PLUS:
-     	    GetSegExprValInternal (Expr->Left, D, Sign);
-      	    GetSegExprValInternal (Expr->Right, D, Sign);
-       	    break;
+        case EXPR_PLUS:
+            GetSegExprValInternal (Expr->Left, D, Sign);
+            GetSegExprValInternal (Expr->Right, D, Sign);
+            break;
 
-    	case EXPR_MINUS:
-    	    GetSegExprValInternal (Expr->Left, D, Sign);
-    	    GetSegExprValInternal (Expr->Right, D, -Sign);
-    	    break;
+        case EXPR_MINUS:
+            GetSegExprValInternal (Expr->Left, D, Sign);
+            GetSegExprValInternal (Expr->Right, D, -Sign);
+            break;
 
-     	default:
-    	    /* Expression contains illegal operators */
-    	    D->TooComplex = 1;
-    	    break;
+        default:
+            /* Expression contains illegal operators */
+            D->TooComplex = 1;
+            break;
 
     }
 }
@@ -626,7 +626,7 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
     /* Read the node tag and handle NULL nodes */
     unsigned char Op = Read8 (F);
     if (Op == EXPR_NULL) {
-    	return 0;
+        return 0;
     }
 
     /* Create a new node */
@@ -634,32 +634,32 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 
     /* Check the tag and handle the different expression types */
     if (EXPR_IS_LEAF (Op)) {
-    	switch (Op) {
+        switch (Op) {
 
-    	    case EXPR_LITERAL:
-    	     	Expr->V.IVal = Read32Signed (F);
-    	     	break;
+            case EXPR_LITERAL:
+                Expr->V.IVal = Read32Signed (F);
+                break;
 
-    	    case EXPR_SYMBOL:
-    	     	/* Read the import number */
-	       	Expr->V.ImpNum = ReadVar (F);
-	     	break;
+            case EXPR_SYMBOL:
+                /* Read the import number */
+                Expr->V.ImpNum = ReadVar (F);
+                break;
 
-	    case EXPR_SECTION:
-	     	/* Read the section number */
-	     	Expr->V.SecNum = ReadVar (F);
-	     	break;
+            case EXPR_SECTION:
+                /* Read the section number */
+                Expr->V.SecNum = ReadVar (F);
+                break;
 
-	    default:
-	     	Error ("Invalid expression op: %02X", Op);
+            default:
+                Error ("Invalid expression op: %02X", Op);
 
-	}
+        }
 
     } else {
 
-    	/* Not a leaf node */
-    	Expr->Left = ReadExpr (F, O);
-	Expr->Right = ReadExpr (F, O);
+        /* Not a leaf node */
+        Expr->Left = ReadExpr (F, O);
+        Expr->Right = ReadExpr (F, O);
 
     }
 
@@ -674,43 +674,43 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
 {
     /* If one pointer is NULL, both must be NULL */
     if ((E1 == 0) ^ (E2 == 0)) {
-    	return 0;
+        return 0;
     }
     if (E1 == 0) {
-    	return 1;
+        return 1;
     }
 
     /* Both pointers not NULL, check OP */
     if (E1->Op != E2->Op) {
-    	return 0;
+        return 0;
     }
 
     /* OPs are identical, check data for leafs, or subtrees */
     switch (E1->Op) {
 
-	case EXPR_LITERAL:
-	    /* Value must be identical */
-	    return (E1->V.IVal == E2->V.IVal);
+        case EXPR_LITERAL:
+            /* Value must be identical */
+            return (E1->V.IVal == E2->V.IVal);
 
-	case EXPR_SYMBOL:
-	    /* Import must be identical */
-       	    return (GetExprImport (E1) == GetExprImport (E2));
+        case EXPR_SYMBOL:
+            /* Import must be identical */
+            return (GetExprImport (E1) == GetExprImport (E2));
 
-	case EXPR_SECTION:
-       	    /* Section must be identical */
-       	    return (GetExprSection (E1) == GetExprSection (E2));
+        case EXPR_SECTION:
+            /* Section must be identical */
+            return (GetExprSection (E1) == GetExprSection (E2));
 
-	case EXPR_SEGMENT:
-       	    /* Segment must be identical */
-       	    return (E1->V.Seg == E2->V.Seg);
+        case EXPR_SEGMENT:
+            /* Segment must be identical */
+            return (E1->V.Seg == E2->V.Seg);
 
-	case EXPR_MEMAREA:
-       	    /* Memory area must be identical */
-       	    return (E1->V.Mem == E2->V.Mem);
+        case EXPR_MEMAREA:
+            /* Memory area must be identical */
+            return (E1->V.Mem == E2->V.Mem);
 
-	default:
-	    /* Not a leaf node */
-       	    return EqualExpr (E1->Left, E2->Left) && EqualExpr (E1->Right, E2->Right);
+        default:
+            /* Not a leaf node */
+            return EqualExpr (E1->Left, E2->Left) && EqualExpr (E1->Right, E2->Right);
     }
 
 }

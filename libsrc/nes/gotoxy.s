@@ -4,20 +4,20 @@
 ; void gotoxy (unsigned char x, unsigned char y);
 ;
 
-	.export		_gotoxy
+        .export         _gotoxy
         .import         setcursor
-	.import		popa
+        .import         popa
 
         .include        "nes.inc"
 
 .proc   _gotoxy
 
-	sta	CURS_Y		; Set Y
-	jsr 	popa		; Get X
-	sta	CURS_X		; Set X
+        sta     CURS_Y          ; Set Y
+        jsr     popa            ; Get X
+        sta     CURS_X          ; Set X
         tay
         ldx     CURS_Y
-       	jmp    	setcursor       ; Set the cursor position
+        jmp     setcursor       ; Set the cursor position
 
 .endproc
 

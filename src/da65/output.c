@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   output.c				     */
+/*                                 output.c                                  */
 /*                                                                           */
-/*			 Disassembler output routines			     */
+/*                       Disassembler output routines                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,20 +53,20 @@
 
 
 /*****************************************************************************/
-/*	      	  		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-static FILE* 	F 	= 0;		/* Output stream */
-static unsigned	Col    	= 1;		/* Current column */
-static unsigned Line   	= 0;		/* Current line on page */
-static unsigned Page	= 1;		/* Current output page */
+static FILE*    F       = 0;            /* Output stream */
+static unsigned Col     = 1;            /* Current column */
+static unsigned Line    = 0;            /* Current line on page */
+static unsigned Page    = 1;            /* Current output page */
 
 
 
 /*****************************************************************************/
-/*	      	  		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -75,14 +75,14 @@ static void PageHeader (void)
 /* Print a page header */
 {
     fprintf (F,
-       	     "; da65 V%s\n"
+             "; da65 V%s\n"
              "; Created:    %s\n"
-     	     "; Input file: %s\n"
-     	     "; Page:       %u\n\n",
-       	     GetVersionAsString (),
+             "; Input file: %s\n"
+             "; Page:       %u\n\n",
+             GetVersionAsString (),
              Now,
-     	     InFile,
-     	     Page);
+             InFile,
+             Page);
 }
 
 
@@ -112,7 +112,7 @@ void CloseOutput (void)
 /* Close the output file */
 {
     if (F != stdout && fclose (F) != 0) {
-	Error ("Error closing output file: %s", strerror (errno));
+        Error ("Error closing output file: %s", strerror (errno));
     }
 }
 
@@ -122,10 +122,10 @@ void Output (const char* Format, ...)
 /* Write to the output file */
 {
     if (Pass == PassCount) {
-	va_list ap;
-	va_start (ap, Format);
-	Col += vfprintf (F, Format, ap);
-	va_end (ap);
+        va_list ap;
+        va_start (ap, Format);
+        Col += vfprintf (F, Format, ap);
+        va_end (ap);
     }
 }
 
@@ -135,10 +135,10 @@ void Indent (unsigned N)
 /* Make sure the current line column is at position N (zero based) */
 {
     if (Pass == PassCount) {
-	while (Col < N) {
-	    fputc (' ', F);
-	    ++Col;
-	}
+        while (Col < N) {
+            fputc (' ', F);
+            ++Col;
+        }
     }
 }
 
@@ -148,16 +148,16 @@ void LineFeed (void)
 /* Add a linefeed to the output file */
 {
     if (Pass == PassCount) {
-	fputc ('\n', F);
-       	if (PageLength > 0 && ++Line >= PageLength) {
-	    if (FormFeeds) {
-		fputc ('\f', F);
-	    }
-	    ++Page;
-	    PageHeader ();
-	    Line = 5;
- 	}
- 	Col = 1;
+        fputc ('\n', F);
+        if (PageLength > 0 && ++Line >= PageLength) {
+            if (FormFeeds) {
+                fputc ('\f', F);
+            }
+            ++Page;
+            PageHeader ();
+            Line = 5;
+        }
+        Col = 1;
     }
 }
 
@@ -171,7 +171,7 @@ void DefLabel (const char* Name)
      * the opcode column, start a new line.
      */
     if (Col > LBreak+2 || Col > MCol) {
-     	LineFeed ();
+        LineFeed ();
     }
 }
 
@@ -249,11 +249,11 @@ void DataByteLine (unsigned ByteCount)
     Output (".byte");
     Indent (ACol);
     for (I = 0; I < ByteCount; ++I) {
- 	if (I > 0) {
- 	    Output (",$%02X", CodeBuf[PC+I]);
- 	} else {
- 	    Output ("$%02X", CodeBuf[PC+I]);
- 	}
+        if (I > 0) {
+            Output (",$%02X", CodeBuf[PC+I]);
+        } else {
+            Output ("$%02X", CodeBuf[PC+I]);
+        }
     }
     LineComment (PC, ByteCount);
     LineFeed ();
@@ -270,11 +270,11 @@ void DataDByteLine (unsigned ByteCount)
     Output (".dbyt");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
-	if (I > 0) {
-       	    Output (",$%04X", GetCodeDByte (PC+I));
-	} else {
-	    Output ("$%04X", GetCodeDByte (PC+I));
-	}
+        if (I > 0) {
+            Output (",$%04X", GetCodeDByte (PC+I));
+        } else {
+            Output ("$%04X", GetCodeDByte (PC+I));
+        }
     }
     LineComment (PC, ByteCount);
     LineFeed ();
@@ -291,11 +291,11 @@ void DataWordLine (unsigned ByteCount)
     Output (".word");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 2) {
-	if (I > 0) {
-	    Output (",$%04X", GetCodeWord (PC+I));
-	} else {
-	    Output ("$%04X", GetCodeWord (PC+I));
-	}
+        if (I > 0) {
+            Output (",$%04X", GetCodeWord (PC+I));
+        } else {
+            Output ("$%04X", GetCodeWord (PC+I));
+        }
     }
     LineComment (PC, ByteCount);
     LineFeed ();
@@ -312,11 +312,11 @@ void DataDWordLine (unsigned ByteCount)
     Output (".dword");
     Indent (ACol);
     for (I = 0; I < ByteCount; I += 4) {
-	if (I > 0) {
-	    Output (",$%08lX", GetCodeDWord (PC+I));
-	} else {
-	    Output ("$%08lX", GetCodeDWord (PC+I));
-	}
+        if (I > 0) {
+            Output (",$%08lX", GetCodeDWord (PC+I));
+        } else {
+            Output ("$%08lX", GetCodeDWord (PC+I));
+        }
     }
     LineComment (PC, ByteCount);
     LineFeed ();
@@ -328,8 +328,8 @@ void SeparatorLine (void)
 /* Print a separator line */
 {
     if (Pass == PassCount && Comments >= 1) {
-	Output ("; ----------------------------------------------------------------------------");
-	LineFeed ();
+        Output ("; ----------------------------------------------------------------------------");
+        LineFeed ();
     }
 }
 
@@ -350,23 +350,23 @@ void LineComment (unsigned PC, unsigned Count)
     unsigned I;
 
     if (Pass == PassCount && Comments >= 2) {
-	Indent (CCol);
-	Output ("; %04X", PC);
-	if (Comments >= 3) {
-	    for (I = 0; I < Count; ++I) {
-	      	Output (" %02X", CodeBuf [PC+I]);
-	    }
-	    if (Comments >= 4) {
-	      	Indent (TCol);
-	      	for (I = 0; I < Count; ++I) {
-	      	    unsigned char C = CodeBuf [PC+I];
-	      	    if (!isprint (C)) {
-	      		C = '.';
-	      	    }
-	      	    Output ("%c", C);
-	      	}
-	    }
-	}
+        Indent (CCol);
+        Output ("; %04X", PC);
+        if (Comments >= 3) {
+            for (I = 0; I < Count; ++I) {
+                Output (" %02X", CodeBuf [PC+I]);
+            }
+            if (Comments >= 4) {
+                Indent (TCol);
+                for (I = 0; I < Count; ++I) {
+                    unsigned char C = CodeBuf [PC+I];
+                    if (!isprint (C)) {
+                        C = '.';
+                    }
+                    Output ("%c", C);
+                }
+            }
+        }
     }
 }
 

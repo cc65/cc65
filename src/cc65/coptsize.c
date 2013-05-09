@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptsize.c				     */
+/*                                 coptsize.c                                */
 /*                                                                           */
 /*                              Size optimizations                           */
 /*                                                                           */
@@ -811,7 +811,7 @@ static const CallDesc CallTable [] = {
 
 
 /*****************************************************************************/
-/*     		      	       	    Helpers                                  */
+/*                                  Helpers                                  */
 /*****************************************************************************/
 
 
@@ -828,22 +828,22 @@ static const CallDesc* FindCall (const char* Name)
 
     while (First <= Last) {
 
-       	/* Set current to mid of range */
-	int Current = (Last + First) / 2;
+        /* Set current to mid of range */
+        int Current = (Last + First) / 2;
 
-       	/* Do a compare */
-       	int Result = strcmp (CallTable[Current].LongFunc, Name);
-	if (Result < 0) {
-	    First = Current + 1;
-	} else {
-	    Last = Current - 1;
-	    if (Result == 0) {
-       	       	/* Found. Repeat the procedure until the first of all entries
+        /* Do a compare */
+        int Result = strcmp (CallTable[Current].LongFunc, Name);
+        if (Result < 0) {
+            First = Current + 1;
+        } else {
+            Last = Current - 1;
+            if (Result == 0) {
+                /* Found. Repeat the procedure until the first of all entries
                  * with the same name is found.
                  */
-	       	Found = 1;
-	    }
-	}
+                Found = 1;
+            }
+        }
     }
 
     /* Return the first entry if found, or NULL otherwise */
@@ -863,7 +863,7 @@ static int RegMatch (short Expected, short Actual)
 
 
 /*****************************************************************************/
-/*  		      	     	     Code                                    */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -887,11 +887,11 @@ unsigned OptSize1 (CodeSeg* S)
 
         const CallDesc* D;
 
-      	/* Get next entry */
-       	E = CS_GetEntry (S, I);
+        /* Get next entry */
+        E = CS_GetEntry (S, I);
 
-     	/* Check if it's a subroutine call */
-     	if (E->OPC == OP65_JSR && (D = FindCall (E->Arg)) != 0) {
+        /* Check if it's a subroutine call */
+        if (E->OPC == OP65_JSR && (D = FindCall (E->Arg)) != 0) {
 
             /* Get input register info for this insn */
             const RegContents* In = &E->RI->In;
@@ -934,8 +934,8 @@ unsigned OptSize1 (CodeSeg* S)
             }
         }
 
-    	/* Next entry */
-    	++I;
+        /* Next entry */
+        ++I;
 
     }
 
@@ -958,76 +958,76 @@ unsigned OptSize2 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+        /* Get next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
 
         /* Get the input registers */
         const RegContents* In = &E->RI->In;
 
-	/* Assume we have no replacement */
-	CodeEntry* X = 0;
+        /* Assume we have no replacement */
+        CodeEntry* X = 0;
 
-	/* Check the instruction */
-	switch (E->OPC) {
+        /* Check the instruction */
+        switch (E->OPC) {
 
-	    case OP65_LDA:
-	        if (CE_IsConstImm (E)) {
-		    short Val = (short) E->Num;
-		    if (Val == In->RegX) {
-		    	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == In->RegY) {
-		    	X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
-		    } else if (RegValIsKnown (In->RegA) && (CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
-		    	if (Val == ((In->RegA - 1) & 0xFF)) {
-		     	    X = NewCodeEntry (OP65_DEA, AM65_IMP, 0, 0, E->LI);
-		    	} else if (Val == ((In->RegA + 1) & 0xFF)) {
-		    	    X = NewCodeEntry (OP65_INA, AM65_IMP, 0, 0, E->LI);
-	      	    	}
-		    }
-	      	}
-	        break;
-
-	    case OP65_LDX:
-	        if (CE_IsConstImm (E)) {
-		    short Val = (short) E->Num;
-		    if (RegValIsKnown (In->RegX) && Val == ((In->RegX - 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, E->LI);
-       	       	    } else if (RegValIsKnown (In->RegX) && Val == ((In->RegX + 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == In->RegA) {
-			X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+            case OP65_LDA:
+                if (CE_IsConstImm (E)) {
+                    short Val = (short) E->Num;
+                    if (Val == In->RegX) {
+                        X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+                    } else if (Val == In->RegY) {
+                        X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+                    } else if (RegValIsKnown (In->RegA) && (CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
+                        if (Val == ((In->RegA - 1) & 0xFF)) {
+                            X = NewCodeEntry (OP65_DEA, AM65_IMP, 0, 0, E->LI);
+                        } else if (Val == ((In->RegA + 1) & 0xFF)) {
+                            X = NewCodeEntry (OP65_INA, AM65_IMP, 0, 0, E->LI);
+                        }
                     }
-		}
-	        break;
+                }
+                break;
 
-       	    case OP65_LDY:
-	        if (CE_IsConstImm (E)) {
-		    short Val = (short) E->Num;
-		    if (RegValIsKnown (In->RegY) && Val == ((In->RegY - 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
-		    } else if (RegValIsKnown (In->RegY) && Val == ((In->RegY + 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == In->RegA) {
-			X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
-		    }
-		}
-	        break;
+            case OP65_LDX:
+                if (CE_IsConstImm (E)) {
+                    short Val = (short) E->Num;
+                    if (RegValIsKnown (In->RegX) && Val == ((In->RegX - 1) & 0xFF)) {
+                        X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, E->LI);
+                    } else if (RegValIsKnown (In->RegX) && Val == ((In->RegX + 1) & 0xFF)) {
+                        X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
+                    } else if (Val == In->RegA) {
+                        X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+                    }
+                }
+                break;
 
-	    default:
-	        /* Avoid gcc warnings */
-	        break;
+            case OP65_LDY:
+                if (CE_IsConstImm (E)) {
+                    short Val = (short) E->Num;
+                    if (RegValIsKnown (In->RegY) && Val == ((In->RegY - 1) & 0xFF)) {
+                        X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
+                    } else if (RegValIsKnown (In->RegY) && Val == ((In->RegY + 1) & 0xFF)) {
+                        X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, E->LI);
+                    } else if (Val == In->RegA) {
+                        X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+                    }
+                }
+                break;
 
-	}
+            default:
+                /* Avoid gcc warnings */
+                break;
 
-	/* Insert the replacement if we have one */
-	if (X) {
-	    CS_InsertEntry (S, X, I+1);
-	    CS_DelEntry (S, I);
-	    ++Changes;
-	}
+        }
 
-	/* Next entry */
-	++I;
+        /* Insert the replacement if we have one */
+        if (X) {
+            CS_InsertEntry (S, X, I+1);
+            CS_DelEntry (S, I);
+            ++Changes;
+        }
+
+        /* Next entry */
+        ++I;
 
     }
 

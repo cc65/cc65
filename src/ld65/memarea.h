@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -61,32 +61,32 @@ typedef struct MemoryArea MemoryArea;
 struct MemoryArea {
     LineInfo*           LI;             /* Where was the area was defined? */
     unsigned            Name;           /* Name index of the memory area */
-    unsigned   	       	Attr;	  	/* Which values are valid? */
-    unsigned   	 	Flags;	  	/* Set of bitmapped flags */
+    unsigned            Attr;           /* Which values are valid? */
+    unsigned            Flags;          /* Set of bitmapped flags */
     unsigned long       FileOffs;       /* Offset in output file */
     struct ExprNode*    StartExpr;      /* Expression for start address */
-    unsigned long      	Start;          /* Start address */
+    unsigned long       Start;          /* Start address */
     struct ExprNode*    SizeExpr;       /* Expression for size */
-    unsigned long      	Size;           /* Length of memory section */
+    unsigned long       Size;           /* Length of memory section */
     struct ExprNode*    BankExpr;       /* Expression for bank */
-    unsigned long      	FillLevel;     	/* Actual fill level of segment */
-    unsigned char   	FillVal;  	/* Value used to fill rest of seg */
+    unsigned long       FillLevel;      /* Actual fill level of segment */
+    unsigned char       FillVal;        /* Value used to fill rest of seg */
     unsigned char       Relocatable;    /* Memory area is relocatable */
-    Collection          SegList;  	/* List of segments for this area */
-    struct File*       	F;    	  	/* Output file for this area */
+    Collection          SegList;        /* List of segments for this area */
+    struct File*        F;              /* Output file for this area */
 };
 
 /* Memory flags */
-#define MF_DEFINE      	0x0001	  	/* Define start and size */
-#define MF_FILL	       	0x0002	  	/* Fill segment */
-#define MF_RO	       	0x0004	  	/* Read only memory area */
+#define MF_DEFINE       0x0001          /* Define start and size */
+#define MF_FILL         0x0002          /* Fill segment */
+#define MF_RO           0x0004          /* Read only memory area */
 #define MF_OVERFLOW     0x0008          /* Memory area overflow */
 #define MF_PLACED       0x0010          /* Memory area was placed */
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code     				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

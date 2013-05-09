@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    main.c				     */
+/*                                  main.c                                   */
 /*                                                                           */
-/*	       Main program of the od65 object file dump utility	     */
+/*             Main program of the od65 object file dump utility             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -52,7 +52,7 @@
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Data			  	     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -62,7 +62,7 @@ static unsigned FilesProcessed = 0;
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Code			  	     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -71,32 +71,32 @@ static void Usage (void)
 /* Print usage information and exit */
 {
     printf ("Usage: %s [options] file [options] [file]\n"
-    	    "Short options:\n"
-       	    "  -h\t\t\tHelp (this text)\n"
-       	    "  -H\t\t\tDump the object file header\n"
-       	    "  -S\t\t\tDump segments sizes\n"
-       	    "  -V\t\t\tPrint the version number and exit\n"
-	    "\n"
-	    "Long options:\n"
-	    "  --dump-all\t\tDump all object file information\n"
-	    "  --dump-dbgsyms\tDump debug symbols\n"
-       	    "  --dump-exports\tDump exported symbols\n"
-	    "  --dump-files\t\tDump the source files\n"
-	    "  --dump-header\t\tDump the object file header\n"
-	    "  --dump-imports\tDump imported symbols\n"
-	    "  --dump-lineinfo\tDump line information\n"
-	    "  --dump-options\tDump object file options\n"
-	    "  --dump-segments\tDump the segments in the file\n"
-       	    "  --dump-segsize\tDump segments sizes\n"
-	    "  --help\t\tHelp (this text)\n"
-       	    "  --version\t\tPrint the version number and exit\n",
-    	    ProgName);
+            "Short options:\n"
+            "  -h\t\t\tHelp (this text)\n"
+            "  -H\t\t\tDump the object file header\n"
+            "  -S\t\t\tDump segments sizes\n"
+            "  -V\t\t\tPrint the version number and exit\n"
+            "\n"
+            "Long options:\n"
+            "  --dump-all\t\tDump all object file information\n"
+            "  --dump-dbgsyms\tDump debug symbols\n"
+            "  --dump-exports\tDump exported symbols\n"
+            "  --dump-files\t\tDump the source files\n"
+            "  --dump-header\t\tDump the object file header\n"
+            "  --dump-imports\tDump imported symbols\n"
+            "  --dump-lineinfo\tDump line information\n"
+            "  --dump-options\tDump object file options\n"
+            "  --dump-segments\tDump the segments in the file\n"
+            "  --dump-segsize\tDump segments sizes\n"
+            "  --help\t\tHelp (this text)\n"
+            "  --version\t\tPrint the version number and exit\n",
+            ProgName);
 }
 
 
 
 static void OptDumpAll (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Dump all object file information */
 {
     What |= D_ALL;
@@ -105,7 +105,7 @@ static void OptDumpAll (const char* Opt attribute ((unused)),
 
 
 static void OptDumpDbgSyms (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* Dump debug symbols contained in the object file */
 {
     What |= D_DBGSYMS;
@@ -114,7 +114,7 @@ static void OptDumpDbgSyms (const char* Opt attribute ((unused)),
 
 
 static void OptDumpExports (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* Dump the exported symbols */
 {
     What |= D_EXPORTS;
@@ -123,7 +123,7 @@ static void OptDumpExports (const char* Opt attribute ((unused)),
 
 
 static void OptDumpFiles (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+                          const char* Arg attribute ((unused)))
 /* Dump the source files */
 {
     What |= D_FILES;
@@ -132,7 +132,7 @@ static void OptDumpFiles (const char* Opt attribute ((unused)),
 
 
 static void OptDumpHeader (const char* Opt attribute ((unused)),
-			   const char* Arg attribute ((unused)))
+                           const char* Arg attribute ((unused)))
 /* Dump the object file header */
 {
     What |= D_HEADER;
@@ -141,7 +141,7 @@ static void OptDumpHeader (const char* Opt attribute ((unused)),
 
 
 static void OptDumpImports (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* Dump the imported symbols */
 {
     What |= D_IMPORTS;
@@ -150,7 +150,7 @@ static void OptDumpImports (const char* Opt attribute ((unused)),
 
 
 static void OptDumpLineInfo (const char* Opt attribute ((unused)),
-			     const char* Arg attribute ((unused)))
+                             const char* Arg attribute ((unused)))
 /* Dump the line infos */
 {
     What |= D_LINEINFO;
@@ -159,7 +159,7 @@ static void OptDumpLineInfo (const char* Opt attribute ((unused)),
 
 
 static void OptDumpOptions (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* Dump the object file options */
 {
     What |= D_OPTIONS;
@@ -168,7 +168,7 @@ static void OptDumpOptions (const char* Opt attribute ((unused)),
 
 
 static void OptDumpScopes (const char* Opt attribute ((unused)),
-	      		   const char* Arg attribute ((unused)))
+                           const char* Arg attribute ((unused)))
 /* Dump the scopes in the object file */
 {
     What |= D_SCOPES;
@@ -177,7 +177,7 @@ static void OptDumpScopes (const char* Opt attribute ((unused)),
 
 
 static void OptDumpSegments (const char* Opt attribute ((unused)),
-	    		     const char* Arg attribute ((unused)))
+                             const char* Arg attribute ((unused)))
 /* Dump the segments in the object file */
 {
     What |= D_SEGMENTS;
@@ -186,7 +186,7 @@ static void OptDumpSegments (const char* Opt attribute ((unused)),
 
 
 static void OptDumpSegSize (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+                            const char* Arg attribute ((unused)))
 /* Dump the segments in the object file */
 {
     What |= D_SEGSIZE;
@@ -195,7 +195,7 @@ static void OptDumpSegSize (const char* Opt attribute ((unused)),
 
 
 static void OptHelp (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
+                     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -205,7 +205,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+                        const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr, "%s V%s\n", ProgName, GetVersionAsString ());
@@ -221,7 +221,7 @@ static void DumpFile (const char* Name)
     /* Try to open the file */
     FILE* F = fopen (Name, "rb");
     if (F == 0) {
-	Error ("Cannot open `%s': %s", Name, strerror (errno));
+        Error ("Cannot open `%s': %s", Name, strerror (errno));
     }
 
     /* Read the magic word */
@@ -230,50 +230,50 @@ static void DumpFile (const char* Name)
     /* Do we know this type of file? */
     if (Magic != OBJ_MAGIC) {
 
-	/* Unknown format */
-       	printf ("%s: (no xo65 object file)\n", Name);
+        /* Unknown format */
+        printf ("%s: (no xo65 object file)\n", Name);
 
     } else if (What == 0) {
 
-	/* Special handling if no info was requested */
-     	printf ("%s: (no information requested)\n", Name);
+        /* Special handling if no info was requested */
+        printf ("%s: (no information requested)\n", Name);
 
     } else {
 
-     	/* Print the filename */
-     	printf ("%s:\n", Name);
+        /* Print the filename */
+        printf ("%s:\n", Name);
 
-     	/* Check what to dump */
-     	if (What & D_HEADER) {
-     	    DumpObjHeader (F, 0);
-     	}
-	if (What & D_OPTIONS) {
-	    DumpObjOptions (F, 0);
-	}
-	if (What & D_FILES) {
-	    DumpObjFiles (F, 0);
-	}
-	if (What & D_SEGMENTS) {
-	    DumpObjSegments (F, 0);
-	}
-	if (What & D_IMPORTS) {
-	    DumpObjImports (F, 0);
-	}
-	if (What & D_EXPORTS) {
-	    DumpObjExports (F, 0);
-	}
-	if (What & D_DBGSYMS) {
-	    DumpObjDbgSyms (F, 0);
-	}
-	if (What & D_LINEINFO) {
-	    DumpObjLineInfo (F, 0);
-	}
-       	if (What & D_SCOPES) {
-	    DumpObjScopes (F, 0);
-	}
-	if (What & D_SEGSIZE) {
-       	    DumpObjSegSize (F, 0);
-	}
+        /* Check what to dump */
+        if (What & D_HEADER) {
+            DumpObjHeader (F, 0);
+        }
+        if (What & D_OPTIONS) {
+            DumpObjOptions (F, 0);
+        }
+        if (What & D_FILES) {
+            DumpObjFiles (F, 0);
+        }
+        if (What & D_SEGMENTS) {
+            DumpObjSegments (F, 0);
+        }
+        if (What & D_IMPORTS) {
+            DumpObjImports (F, 0);
+        }
+        if (What & D_EXPORTS) {
+            DumpObjExports (F, 0);
+        }
+        if (What & D_DBGSYMS) {
+            DumpObjDbgSyms (F, 0);
+        }
+        if (What & D_LINEINFO) {
+            DumpObjLineInfo (F, 0);
+        }
+        if (What & D_SCOPES) {
+            DumpObjScopes (F, 0);
+        }
+        if (What & D_SEGSIZE) {
+            DumpObjSegSize (F, 0);
+        }
     }
 
     /* Close the file */
@@ -287,19 +287,19 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-       	{ "--dump-all",	   	0,     	OptDumpAll		},
-	{ "--dump-dbgsyms",	0,	OptDumpDbgSyms		},
-	{ "--dump-exports",	0,	OptDumpExports		},
-	{ "--dump-files", 	0,	OptDumpFiles		},
-	{ "--dump-header",	0,	OptDumpHeader		},
-	{ "--dump-imports",	0,	OptDumpImports		},
+        { "--dump-all",         0,      OptDumpAll              },
+        { "--dump-dbgsyms",     0,      OptDumpDbgSyms          },
+        { "--dump-exports",     0,      OptDumpExports          },
+        { "--dump-files",       0,      OptDumpFiles            },
+        { "--dump-header",      0,      OptDumpHeader           },
+        { "--dump-imports",     0,      OptDumpImports          },
         { "--dump-lineinfo",    0,      OptDumpLineInfo         },
-	{ "--dump-options",	0,	OptDumpOptions		},
+        { "--dump-options",     0,      OptDumpOptions          },
         { "--dump-scopes",      0,      OptDumpScopes           },
-	{ "--dump-segments",	0,	OptDumpSegments		},
-       	{ "--dump-segsize",    	0,     	OptDumpSegSize          },
-	{ "--help",    		0,	OptHelp			},
-	{ "--version", 	       	0,	OptVersion		},
+        { "--dump-segments",    0,      OptDumpSegments         },
+        { "--dump-segsize",     0,      OptDumpSegSize          },
+        { "--help",             0,      OptHelp                 },
+        { "--version",          0,      OptVersion              },
     };
 
     unsigned I;
@@ -311,51 +311,51 @@ int main (int argc, char* argv [])
     I = 1;
     while (I < ArgCount) {
 
-       	/* Get the argument */
-       	const char* Arg = ArgVec[I];
+        /* Get the argument */
+        const char* Arg = ArgVec[I];
 
-       	/* Check for an option */
-       	if (Arg [0] == '-') {
-       	    switch (Arg [1]) {
+        /* Check for an option */
+        if (Arg [0] == '-') {
+            switch (Arg [1]) {
 
-	 	case '-':
-	 	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-	 	    break;
+                case '-':
+                    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+                    break;
 
-	 	case 'h':
-	 	    OptHelp (Arg, 0);
-	 	    break;
+                case 'h':
+                    OptHelp (Arg, 0);
+                    break;
 
-	 	case 'H':
-		    OptDumpHeader (Arg, 0);
-		    break;
+                case 'H':
+                    OptDumpHeader (Arg, 0);
+                    break;
 
-	 	case 'S':
-		    OptDumpSegSize (Arg, 0);
-		    break;
+                case 'S':
+                    OptDumpSegSize (Arg, 0);
+                    break;
 
-       	        case 'V':
-    		    OptVersion (Arg, 0);
-       		    break;
+                case 'V':
+                    OptVersion (Arg, 0);
+                    break;
 
-       	       	default:
-       	       	    UnknownOption (Arg);
-		    break;
+                default:
+                    UnknownOption (Arg);
+                    break;
 
-     	    }
-       	} else {
-    	    /* Filename. Dump it. */
-	    DumpFile (Arg);
-	    ++FilesProcessed;
-     	}
+            }
+        } else {
+            /* Filename. Dump it. */
+            DumpFile (Arg);
+            ++FilesProcessed;
+        }
 
-	/* Next argument */
-	++I;
+        /* Next argument */
+        ++I;
     }
 
     /* Print a message if we did not process any files */
     if (FilesProcessed == 0) {
-	fprintf (stderr, "%s: No input files\n", ProgName);
+        fprintf (stderr, "%s: No input files\n", ProgName);
     }
 
     /* Success */

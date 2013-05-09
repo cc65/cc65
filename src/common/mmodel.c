@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -65,7 +65,7 @@ unsigned char ZpAddrSize   = ADDR_SIZE_ZP;
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -77,9 +77,9 @@ mmodel_t FindMemoryModel (const char* Name)
 
     /* Check all CPU names */
     for (I = 0; I < MMODEL_COUNT; ++I) {
-	if (strcmp (MemoryModelNames[I], Name) == 0) {
-	    return (mmodel_t)I;
-	}
+        if (strcmp (MemoryModelNames[I], Name) == 0) {
+            return (mmodel_t)I;
+        }
     }
 
     /* Not found */

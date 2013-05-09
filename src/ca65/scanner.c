@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   scanner.c				     */
+/*                                 scanner.c                                 */
 /*                                                                           */
-/*		    The scanner for the ca65 macroassembler		     */
+/*                  The scanner for the ca65 macroassembler                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -64,7 +64,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    	       	     Data 				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
@@ -75,25 +75,25 @@ Token CurTok = STATIC_TOKEN_INITIALIZER;
 /* Struct to handle include files. */
 typedef struct InputFile InputFile;
 struct InputFile {
-    FILE*      	    F;		       	/* Input file descriptor */
-    FilePos	    Pos;	       	/* Position in file */
-    token_t         Tok;	       	/* Last token */
-    int		    C;			/* Last character */
+    FILE*           F;                  /* Input file descriptor */
+    FilePos         Pos;                /* Position in file */
+    token_t         Tok;                /* Last token */
+    int             C;                  /* Last character */
     StrBuf          Line;               /* The current input line */
     int             IncSearchPath;      /* True if we've added a search path */
     int             BinSearchPath;      /* True if we've added a search path */
-    InputFile* 	    Next;      	       	/* Linked list of input files */
+    InputFile*      Next;               /* Linked list of input files */
 };
 
 /* Struct to handle textual input data */
 typedef struct InputData InputData;
 struct InputData {
-    char*      	    Text;               /* Pointer to the text data */
-    const char*     Pos;		/* Pointer to current position */
-    int	       	    Malloced;		/* Memory was malloced */
-    token_t         Tok;	    	/* Last token */
-    int	       	    C;			/* Last character */
-    InputData* 	    Next;		/* Linked list of input data */
+    char*           Text;               /* Pointer to the text data */
+    const char*     Pos;                /* Pointer to current position */
+    int             Malloced;           /* Memory was malloced */
+    token_t         Tok;                /* Last token */
+    int             C;                  /* Last character */
+    InputData*      Next;               /* Linked list of input data */
 };
 
 /* Input source: Either file or data */
@@ -110,8 +110,8 @@ struct CharSourceFunctions {
 /* Input source: Either file or data */
 struct CharSource {
     CharSource*                 Next;   /* Linked list of char sources */
-    token_t                     Tok;	/* Last token */
-    int		                C;	/* Last character */
+    token_t                     Tok;    /* Last token */
+    int                         C;      /* Last character */
     const CharSourceFunctions*  Func;   /* Pointer to function table */
     union {
         InputFile               File;   /* File data */
@@ -121,174 +121,174 @@ struct CharSource {
 
 /* Current input variables */
 static CharSource* Source       = 0;    /* Current char source */
-static unsigned	   FCount       = 0;  	/* Count of input files */
-static int	   C            = 0;	/* Current input character */
+static unsigned    FCount       = 0;    /* Count of input files */
+static int         C            = 0;    /* Current input character */
 
 /* Force end of assembly */
-int 		  ForcedEnd     = 0;
+int               ForcedEnd     = 0;
 
 /* List of dot keywords with the corresponding tokens */
 struct DotKeyword {
-    const char*	Key;			/* MUST be first field */
+    const char* Key;                    /* MUST be first field */
     token_t     Tok;
 } DotKeywords [] = {
-    { ".A16",  	    	TOK_A16		},
-    { ".A8",   	    	TOK_A8		},
-    { ".ADDR", 	    	TOK_ADDR	},
-    { ".ALIGN",	       	TOK_ALIGN     	},
-    { ".AND", 	    	TOK_BOOLAND 	},
-    { ".ASCIIZ",       	TOK_ASCIIZ	},
+    { ".A16",           TOK_A16         },
+    { ".A8",            TOK_A8          },
+    { ".ADDR",          TOK_ADDR        },
+    { ".ALIGN",         TOK_ALIGN       },
+    { ".AND",           TOK_BOOLAND     },
+    { ".ASCIIZ",        TOK_ASCIIZ      },
     { ".ASSERT",        TOK_ASSERT      },
-    { ".AUTOIMPORT", 	TOK_AUTOIMPORT	},
+    { ".AUTOIMPORT",    TOK_AUTOIMPORT  },
     { ".BANK",          TOK_BANK        },
     { ".BANKBYTE",      TOK_BANKBYTE    },
     { ".BANKBYTES",     TOK_BANKBYTES   },
-    { ".BITAND",	TOK_AND		},
-    { ".BITNOT",	TOK_NOT		},
-    { ".BITOR",	    	TOK_OR		},
-    { ".BITXOR",	TOK_XOR		},
-    { ".BLANK",	    	TOK_BLANK	},
-    { ".BSS",  	    	TOK_BSS		},
-    { ".BYT", 	    	TOK_BYTE	},
-    { ".BYTE", 	    	TOK_BYTE	},
-    { ".CASE",  	TOK_CASE	},
-    { ".CHARMAP",    	TOK_CHARMAP 	},
-    { ".CODE", 	    	TOK_CODE    	},
-    { ".CONCAT",       	TOK_CONCAT	},
-    { ".CONDES",	TOK_CONDES	},
-    { ".CONST", 	TOK_CONST	},
-    { ".CONSTRUCTOR",	TOK_CONSTRUCTOR	},
-    { ".CPU", 	  	TOK_CPU		},
-    { ".DATA",  	TOK_DATA	},
-    { ".DBG",		TOK_DBG		},
-    { ".DBYT",  	TOK_DBYT	},
-    { ".DEBUGINFO",	TOK_DEBUGINFO	},
-    { ".DEF",   	TOK_DEFINED	},
-    { ".DEFINE",	TOK_DEFINE	},
-    { ".DEFINED",	TOK_DEFINED	},
+    { ".BITAND",        TOK_AND         },
+    { ".BITNOT",        TOK_NOT         },
+    { ".BITOR",         TOK_OR          },
+    { ".BITXOR",        TOK_XOR         },
+    { ".BLANK",         TOK_BLANK       },
+    { ".BSS",           TOK_BSS         },
+    { ".BYT",           TOK_BYTE        },
+    { ".BYTE",          TOK_BYTE        },
+    { ".CASE",          TOK_CASE        },
+    { ".CHARMAP",       TOK_CHARMAP     },
+    { ".CODE",          TOK_CODE        },
+    { ".CONCAT",        TOK_CONCAT      },
+    { ".CONDES",        TOK_CONDES      },
+    { ".CONST",         TOK_CONST       },
+    { ".CONSTRUCTOR",   TOK_CONSTRUCTOR },
+    { ".CPU",           TOK_CPU         },
+    { ".DATA",          TOK_DATA        },
+    { ".DBG",           TOK_DBG         },
+    { ".DBYT",          TOK_DBYT        },
+    { ".DEBUGINFO",     TOK_DEBUGINFO   },
+    { ".DEF",           TOK_DEFINED     },
+    { ".DEFINE",        TOK_DEFINE      },
+    { ".DEFINED",       TOK_DEFINED     },
     { ".DELMAC",        TOK_DELMAC      },
     { ".DELMACRO",      TOK_DELMAC      },
-    { ".DESTRUCTOR",	TOK_DESTRUCTOR	},
-    { ".DWORD", 	TOK_DWORD	},
-    { ".ELSE",  	TOK_ELSE	},
-    { ".ELSEIF",	TOK_ELSEIF	},
-    { ".END",   	TOK_END		},
+    { ".DESTRUCTOR",    TOK_DESTRUCTOR  },
+    { ".DWORD",         TOK_DWORD       },
+    { ".ELSE",          TOK_ELSE        },
+    { ".ELSEIF",        TOK_ELSEIF      },
+    { ".END",           TOK_END         },
     { ".ENDENUM",       TOK_ENDENUM     },
-    { ".ENDIF", 	TOK_ENDIF	},
-    { ".ENDMAC",	TOK_ENDMACRO	},
-    { ".ENDMACRO",	TOK_ENDMACRO	},
-    { ".ENDPROC",	TOK_ENDPROC 	},
-    { ".ENDREP",	TOK_ENDREP	},
-    { ".ENDREPEAT",	TOK_ENDREP	},
+    { ".ENDIF",         TOK_ENDIF       },
+    { ".ENDMAC",        TOK_ENDMACRO    },
+    { ".ENDMACRO",      TOK_ENDMACRO    },
+    { ".ENDPROC",       TOK_ENDPROC     },
+    { ".ENDREP",        TOK_ENDREP      },
+    { ".ENDREPEAT",     TOK_ENDREP      },
     { ".ENDSCOPE",      TOK_ENDSCOPE    },
-    { ".ENDSTRUCT",	TOK_ENDSTRUCT	},
-    { ".ENDUNION",     	TOK_ENDUNION    },
+    { ".ENDSTRUCT",     TOK_ENDSTRUCT   },
+    { ".ENDUNION",      TOK_ENDUNION    },
     { ".ENUM",          TOK_ENUM        },
-    { ".ERROR", 	TOK_ERROR   	},
-    { ".EXITMAC",	TOK_EXITMACRO 	},
-    { ".EXITMACRO",	TOK_EXITMACRO	},
-    { ".EXPORT",	TOK_EXPORT	},
-    { ".EXPORTZP",	TOK_EXPORTZP	},
-    { ".FARADDR",	TOK_FARADDR	},
+    { ".ERROR",         TOK_ERROR       },
+    { ".EXITMAC",       TOK_EXITMACRO   },
+    { ".EXITMACRO",     TOK_EXITMACRO   },
+    { ".EXPORT",        TOK_EXPORT      },
+    { ".EXPORTZP",      TOK_EXPORTZP    },
+    { ".FARADDR",       TOK_FARADDR     },
     { ".FATAL",         TOK_FATAL       },
-    { ".FEATURE",	TOK_FEATURE	},
-    { ".FILEOPT",	TOK_FILEOPT	},
-    { ".FOPT",  	TOK_FILEOPT	},
+    { ".FEATURE",       TOK_FEATURE     },
+    { ".FILEOPT",       TOK_FILEOPT     },
+    { ".FOPT",          TOK_FILEOPT     },
     { ".FORCEIMPORT",   TOK_FORCEIMPORT },
-    { ".FORCEWORD",	TOK_FORCEWORD	},
-    { ".GLOBAL",	TOK_GLOBAL	},
-    { ".GLOBALZP",	TOK_GLOBALZP	},
+    { ".FORCEWORD",     TOK_FORCEWORD   },
+    { ".GLOBAL",        TOK_GLOBAL      },
+    { ".GLOBALZP",      TOK_GLOBALZP    },
     { ".HIBYTE",        TOK_HIBYTE      },
     { ".HIBYTES",       TOK_HIBYTES     },
     { ".HIWORD",        TOK_HIWORD      },
-    { ".I16",   	TOK_I16		},
-    { ".I8",    	TOK_I8		},
+    { ".I16",           TOK_I16         },
+    { ".I8",            TOK_I8          },
     { ".IDENT",         TOK_MAKEIDENT   },
-    { ".IF",    	TOK_IF		},
-    { ".IFBLANK",	TOK_IFBLANK	},
-    { ".IFCONST",	TOK_IFCONST	},
-    { ".IFDEF", 	TOK_IFDEF	},
-    { ".IFNBLANK",	TOK_IFNBLANK	},
-    { ".IFNCONST",	TOK_IFNCONST	},
-    { ".IFNDEF",	TOK_IFNDEF	},
-    { ".IFNREF",	TOK_IFNREF	},
-    { ".IFP02",		TOK_IFP02	},
-    { ".IFP816",	TOK_IFP816	},
-    { ".IFPC02",	TOK_IFPC02	},
-    { ".IFPSC02",      	TOK_IFPSC02	},
-    { ".IFREF",		TOK_IFREF	},
-    { ".IMPORT",	TOK_IMPORT	},
-    { ".IMPORTZP",	TOK_IMPORTZP	},
-    { ".INCBIN",	TOK_INCBIN	},
-    { ".INCLUDE",    	TOK_INCLUDE 	},
+    { ".IF",            TOK_IF          },
+    { ".IFBLANK",       TOK_IFBLANK     },
+    { ".IFCONST",       TOK_IFCONST     },
+    { ".IFDEF",         TOK_IFDEF       },
+    { ".IFNBLANK",      TOK_IFNBLANK    },
+    { ".IFNCONST",      TOK_IFNCONST    },
+    { ".IFNDEF",        TOK_IFNDEF      },
+    { ".IFNREF",        TOK_IFNREF      },
+    { ".IFP02",         TOK_IFP02       },
+    { ".IFP816",        TOK_IFP816      },
+    { ".IFPC02",        TOK_IFPC02      },
+    { ".IFPSC02",       TOK_IFPSC02     },
+    { ".IFREF",         TOK_IFREF       },
+    { ".IMPORT",        TOK_IMPORT      },
+    { ".IMPORTZP",      TOK_IMPORTZP    },
+    { ".INCBIN",        TOK_INCBIN      },
+    { ".INCLUDE",       TOK_INCLUDE     },
     { ".INTERRUPTOR",   TOK_INTERRUPTOR },
-    { ".LEFT",		TOK_LEFT	},
-    { ".LINECONT",	TOK_LINECONT	},
-    { ".LIST",		TOK_LIST	},
-    { ".LISTBYTES",	TOK_LISTBYTES	},
+    { ".LEFT",          TOK_LEFT        },
+    { ".LINECONT",      TOK_LINECONT    },
+    { ".LIST",          TOK_LIST        },
+    { ".LISTBYTES",     TOK_LISTBYTES   },
     { ".LOBYTE",        TOK_LOBYTE      },
     { ".LOBYTES",       TOK_LOBYTES     },
-    { ".LOCAL",		TOK_LOCAL	},
-    { ".LOCALCHAR",	TOK_LOCALCHAR	},
+    { ".LOCAL",         TOK_LOCAL       },
+    { ".LOCALCHAR",     TOK_LOCALCHAR   },
     { ".LOWORD",        TOK_LOWORD      },
-    { ".MAC",  		TOK_MACRO	},
-    { ".MACPACK",	TOK_MACPACK	},
-    { ".MACRO",	  	TOK_MACRO	},
-    { ".MATCH",		TOK_MATCH	},
+    { ".MAC",           TOK_MACRO       },
+    { ".MACPACK",       TOK_MACPACK     },
+    { ".MACRO",         TOK_MACRO       },
+    { ".MATCH",         TOK_MATCH       },
     { ".MAX",           TOK_MAX         },
-    { ".MID",   	TOK_MID		},
+    { ".MID",           TOK_MID         },
     { ".MIN",           TOK_MIN         },
-    { ".MOD", 		TOK_MOD		},
-    { ".NOT", 		TOK_BOOLNOT 	},
-    { ".NULL",		TOK_NULL      	},
-    { ".OR",  		TOK_BOOLOR  	},
-    { ".ORG",  		TOK_ORG		},
-    { ".OUT",  		TOK_OUT		},
-    { ".P02",  		TOK_P02		},
-    { ".P816", 		TOK_P816	},
-    { ".PAGELEN",	TOK_PAGELENGTH	},
-    { ".PAGELENGTH",	TOK_PAGELENGTH	},
-    { ".PARAMCOUNT", 	TOK_PARAMCOUNT  },
-    { ".PC02", 		TOK_PC02	},
+    { ".MOD",           TOK_MOD         },
+    { ".NOT",           TOK_BOOLNOT     },
+    { ".NULL",          TOK_NULL        },
+    { ".OR",            TOK_BOOLOR      },
+    { ".ORG",           TOK_ORG         },
+    { ".OUT",           TOK_OUT         },
+    { ".P02",           TOK_P02         },
+    { ".P816",          TOK_P816        },
+    { ".PAGELEN",       TOK_PAGELENGTH  },
+    { ".PAGELENGTH",    TOK_PAGELENGTH  },
+    { ".PARAMCOUNT",    TOK_PARAMCOUNT  },
+    { ".PC02",          TOK_PC02        },
     { ".POPCPU",        TOK_POPCPU      },
-    { ".POPSEG", 	TOK_POPSEG	},
-    { ".PROC", 		TOK_PROC	},
-    { ".PSC02",	       	TOK_PSC02	},
+    { ".POPSEG",        TOK_POPSEG      },
+    { ".PROC",          TOK_PROC        },
+    { ".PSC02",         TOK_PSC02       },
     { ".PUSHCPU",       TOK_PUSHCPU     },
-    { ".PUSHSEG",      	TOK_PUSHSEG	},
-    { ".REF", 		TOK_REFERENCED  },
-    { ".REFERENCED",	TOK_REFERENCED  },
-    { ".RELOC",		TOK_RELOC	},
-    { ".REPEAT",	TOK_REPEAT	},
-    { ".RES",  		TOK_RES		},
-    { ".RIGHT",	  	TOK_RIGHT	},
-    { ".RODATA",	TOK_RODATA	},
+    { ".PUSHSEG",       TOK_PUSHSEG     },
+    { ".REF",           TOK_REFERENCED  },
+    { ".REFERENCED",    TOK_REFERENCED  },
+    { ".RELOC",         TOK_RELOC       },
+    { ".REPEAT",        TOK_REPEAT      },
+    { ".RES",           TOK_RES         },
+    { ".RIGHT",         TOK_RIGHT       },
+    { ".RODATA",        TOK_RODATA      },
     { ".SCOPE",         TOK_SCOPE       },
-    { ".SEGMENT",  	TOK_SEGMENT	},
+    { ".SEGMENT",       TOK_SEGMENT     },
     { ".SET",           TOK_SET         },
-    { ".SETCPU",  	TOK_SETCPU    	},
-    { ".SHL",  	    	TOK_SHL		},
-    { ".SHR",  	  	TOK_SHR		},
+    { ".SETCPU",        TOK_SETCPU      },
+    { ".SHL",           TOK_SHL         },
+    { ".SHR",           TOK_SHR         },
     { ".SIZEOF",        TOK_SIZEOF      },
-    { ".SMART",	  	TOK_SMART	},
+    { ".SMART",         TOK_SMART       },
     { ".SPRINTF",       TOK_SPRINTF     },
-    { ".STRAT",		TOK_STRAT	},
-    { ".STRING",	TOK_STRING	},
-    { ".STRLEN",	TOK_STRLEN	},
+    { ".STRAT",         TOK_STRAT       },
+    { ".STRING",        TOK_STRING      },
+    { ".STRLEN",        TOK_STRLEN      },
     { ".STRUCT",        TOK_STRUCT      },
-    { ".SUNPLUS",  	TOK_SUNPLUS	},
+    { ".SUNPLUS",       TOK_SUNPLUS     },
     { ".TAG",           TOK_TAG         },
-    { ".TCOUNT",	TOK_TCOUNT	},
-    { ".TIME",         	TOK_TIME	},
+    { ".TCOUNT",        TOK_TCOUNT      },
+    { ".TIME",          TOK_TIME        },
     { ".UNDEF",         TOK_UNDEF       },
     { ".UNDEFINE",      TOK_UNDEF       },
     { ".UNION",         TOK_UNION       },
     { ".VERSION",       TOK_VERSION     },
-    { ".WARNING",	TOK_WARNING	},
-    { ".WORD", 	  	TOK_WORD	},
-    { ".XMATCH",	TOK_XMATCH	},
-    { ".XOR",  	       	TOK_BOOLXOR  	},
-    { ".ZEROPAGE", 	TOK_ZEROPAGE	},
+    { ".WARNING",       TOK_WARNING     },
+    { ".WORD",          TOK_WORD        },
+    { ".XMATCH",        TOK_XMATCH      },
+    { ".XOR",           TOK_BOOLXOR     },
+    { ".ZEROPAGE",      TOK_ZEROPAGE    },
 };
 
 
@@ -307,7 +307,7 @@ static void UseCharSource (CharSource* S)
     S->C        = C;
 
     /* Use the new input source */
-    S->Next   	= Source;
+    S->Next     = Source;
     Source      = S;
 
     /* Read the first character from the new file */
@@ -494,20 +494,20 @@ int NewInputFile (const char* Name)
         /* Main file */
         F = fopen (Name, "r");
         if (F == 0) {
-      	    Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
+            Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
         }
     } else {
-       	/* We are on include level. Search for the file in the include
-      	 * directories.
-      	 */
-      	PathName = SearchFile (IncSearchPath, Name);
-       	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
-      	    /* Not found or cannot open, print an error and bail out */
-      	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
+        /* We are on include level. Search for the file in the include
+         * directories.
+         */
+        PathName = SearchFile (IncSearchPath, Name);
+        if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
+            /* Not found or cannot open, print an error and bail out */
+            Error ("Cannot open include file `%s': %s", Name, strerror (errno));
             goto ExitPoint;
-      	}
+        }
 
-       	/* Use the path name from now on */
+        /* Use the path name from now on */
         Name = PathName;
     }
 
@@ -595,7 +595,7 @@ void IDDone (CharSource* S)
 {
     /* Cleanup the current stuff */
     if (S->V.Data.Malloced) {
-       	xfree (S->V.Data.Text);
+        xfree (S->V.Data.Text);
     }
 }
 
@@ -629,7 +629,7 @@ void NewInputData (char* Text, int Malloced)
 
 
 /*****************************************************************************/
-/*	      	      Character classification functions		     */
+/*                    Character classification functions                     */
 /*****************************************************************************/
 
 
@@ -637,10 +637,10 @@ void NewInputData (char* Text, int Malloced)
 int IsIdChar (int C)
 /* Return true if the character is a valid character for an identifier */
 {
-    return IsAlNum (C) 	     		||
-	   (C == '_')	     		||
-	   (C == '@' && AtInIdents)	||
-	   (C == '$' && DollarInIdents);
+    return IsAlNum (C)                  ||
+           (C == '_')                   ||
+           (C == '@' && AtInIdents)     ||
+           (C == '$' && DollarInIdents);
 }
 
 
@@ -654,7 +654,7 @@ int IsIdStart (int C)
 
 
 /*****************************************************************************/
-/*     	       	     	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -663,9 +663,9 @@ static unsigned DigitVal (unsigned char C)
 /* Convert a digit into it's numerical representation */
 {
     if (IsDigit (C)) {
-     	return C - '0';
+        return C - '0';
     } else {
-       	return toupper (C) - 'A' + 10;
+        return toupper (C) - 'A' + 10;
     }
 }
 
@@ -717,16 +717,16 @@ static token_t FindDotKeyword (void)
 
     /* If we aren't in ignore case mode, we have to uppercase the keyword */
     if (!IgnoreCase) {
-	UpcaseSVal ();
+        UpcaseSVal ();
     }
 
     /* Search for the keyword */
     R = bsearch (&K, DotKeywords, sizeof (DotKeywords) / sizeof (DotKeywords [0]),
-     	       	 sizeof (DotKeywords [0]), CmpDotKeyword);
+                 sizeof (DotKeywords [0]), CmpDotKeyword);
     if (R != 0) {
-     	return R->Tok;
+        return R->Tok;
     } else {
-	return TOK_NONE;
+        return TOK_NONE;
     }
 }
 
@@ -742,13 +742,13 @@ static void ReadIdent (void)
     /* Read the identifier */
     do {
         SB_AppendChar (&CurTok.SVal, C);
-    	NextChar ();
+        NextChar ();
     } while (IsIdChar (C));
     SB_Terminate (&CurTok.SVal);
 
     /* If we should ignore case, convert the identifier to upper case */
     if (IgnoreCase) {
-	UpcaseSVal ();
+        UpcaseSVal ();
     }
 }
 
@@ -762,19 +762,19 @@ static void ReadStringConst (int StringTerm)
 
     /* Read the string */
     while (1) {
-	if (C == StringTerm) {
-	    break;
-	}
-	if (C == '\n' || C == EOF) {
-	    Error ("Newline in string constant");
-	    break;
-      	}
+        if (C == StringTerm) {
+            break;
+        }
+        if (C == '\n' || C == EOF) {
+            Error ("Newline in string constant");
+            break;
+        }
 
-       	/* Append the char to the string */
+        /* Append the char to the string */
         SB_AppendChar (&CurTok.SVal, C);
 
-     	/* Skip the character */
-	NextChar ();
+        /* Skip the character */
+        NextChar ();
     }
 
     /* Skip the trailing terminator */
@@ -822,8 +822,8 @@ void NextRawTok (void)
 
     /* If we've a forced end of assembly, don't read further */
     if (ForcedEnd) {
-     	CurTok.Tok = TOK_EOF;
-     	return;
+        CurTok.Tok = TOK_EOF;
+        return;
     }
 
 Restart:
@@ -840,8 +840,8 @@ Restart:
 Again:
     /* Skip whitespace, remember if we had some */
     if ((CurTok.WS = IsBlank (C)) != 0) {
-	do {
-     	    NextChar ();
+        do {
+            NextChar ();
         } while (IsBlank (C));
     }
 
@@ -856,20 +856,20 @@ Again:
 
     /* Hex number or PC symbol? */
     if (C == '$') {
-     	NextChar ();
+        NextChar ();
 
-     	/* Hex digit must follow or DollarIsPC must be enabled */
-     	if (!IsXDigit (C)) {
-	    if (DollarIsPC) {
-	     	CurTok.Tok = TOK_PC;
-	    	return;
-	    } else {
-     	     	Error ("Hexadecimal digit expected");
-	    }
-     	}
+        /* Hex digit must follow or DollarIsPC must be enabled */
+        if (!IsXDigit (C)) {
+            if (DollarIsPC) {
+                CurTok.Tok = TOK_PC;
+                return;
+            } else {
+                Error ("Hexadecimal digit expected");
+            }
+        }
 
-      	/* Read the number */
-     	CurTok.IVal = 0;
+        /* Read the number */
+        CurTok.IVal = 0;
         while (1) {
             if (UnderlineInNumbers && C == '_') {
                 while (C == '_') {
@@ -891,21 +891,21 @@ Again:
             }
         }
 
-     	/* This is an integer constant */
-    	CurTok.Tok = TOK_INTCON;
-    	return;
+        /* This is an integer constant */
+        CurTok.Tok = TOK_INTCON;
+        return;
     }
 
     /* Binary number? */
     if (C == '%') {
-	NextChar ();
+        NextChar ();
 
-	/* 0 or 1 must follow */
-	if (!IsBDigit (C)) {
-	    Error ("Binary digit expected");
-	}
+        /* 0 or 1 must follow */
+        if (!IsBDigit (C)) {
+            Error ("Binary digit expected");
+        }
 
-      	/* Read the number */
+        /* Read the number */
         CurTok.IVal = 0;
         while (1) {
             if (UnderlineInNumbers && C == '_') {
@@ -928,9 +928,9 @@ Again:
             }
         }
 
-	/* This is an integer constant */
+        /* This is an integer constant */
         CurTok.Tok = TOK_INTCON;
-	return;
+        return;
     }
 
     /* Number? */
@@ -986,69 +986,69 @@ Again:
         /* Convert the number using the given base */
         CurTok.IVal = 0;
         for (I = 0; I < Digits; ++I) {
-       	    if (CurTok.IVal > Max) {
-       	       	Error ("Number out of range");
+            if (CurTok.IVal > Max) {
+                Error ("Number out of range");
                 CurTok.IVal = 0;
                 break;
-	    }
+            }
             DVal = DigitVal (Buf[I]);
             if (DVal > Base) {
                 Error ("Invalid digits in number");
                 CurTok.IVal = 0;
                 break;
             }
-	    CurTok.IVal = (CurTok.IVal * Base) + DVal;
+            CurTok.IVal = (CurTok.IVal * Base) + DVal;
         }
 
-	/* This is an integer constant */
-       	CurTok.Tok = TOK_INTCON;
-      	return;
+        /* This is an integer constant */
+        CurTok.Tok = TOK_INTCON;
+        return;
     }
 
     /* Control command? */
     if (C == '.') {
 
-	/* Remember and skip the dot */
-	NextChar ();
+        /* Remember and skip the dot */
+        NextChar ();
 
-    	/* Check if it's just a dot */
-       	if (!IsIdStart (C)) {
+        /* Check if it's just a dot */
+        if (!IsIdStart (C)) {
 
-	    /* Just a dot */
-	    CurTok.Tok = TOK_DOT;
+            /* Just a dot */
+            CurTok.Tok = TOK_DOT;
 
-	} else {
+        } else {
 
-	    /* Read the remainder of the identifier */
+            /* Read the remainder of the identifier */
             SB_AppendChar (&CurTok.SVal, '.');
-	    ReadIdent ();
+            ReadIdent ();
 
-	    /* Dot keyword, search for it */
-	    CurTok.Tok = FindDotKeyword ();
-	    if (CurTok.Tok == TOK_NONE) {
+            /* Dot keyword, search for it */
+            CurTok.Tok = FindDotKeyword ();
+            if (CurTok.Tok == TOK_NONE) {
 
-      	    	/* Not found */
-		if (!LeadingDotInIdents) {
-		    /* Invalid pseudo instruction */
-		    Error ("`%m%p' is not a recognized control command", &CurTok.SVal);
-		    goto Again;
-		}
+                /* Not found */
+                if (!LeadingDotInIdents) {
+                    /* Invalid pseudo instruction */
+                    Error ("`%m%p' is not a recognized control command", &CurTok.SVal);
+                    goto Again;
+                }
 
-		/* An identifier with a dot. Check if it's a define style
-		 * macro.
-		 */
-       	       	if ((M = FindDefine (&CurTok.SVal)) != 0) {
- 		    /* This is a define style macro - expand it */
-		    MacExpandStart (M);
-		    goto Restart;
-		}
+                /* An identifier with a dot. Check if it's a define style
+                 * macro.
+                 */
+                if ((M = FindDefine (&CurTok.SVal)) != 0) {
+                    /* This is a define style macro - expand it */
+                    MacExpandStart (M);
+                    goto Restart;
+                }
 
-		/* Just an identifier with a dot */
-		CurTok.Tok = TOK_IDENT;
-	    }
+                /* Just an identifier with a dot */
+                CurTok.Tok = TOK_IDENT;
+            }
 
-	}
-	return;
+        }
+        return;
     }
 
     /* Indirect op for sweet16 cpu. Must check this before checking for local
@@ -1063,78 +1063,78 @@ Again:
     /* Local symbol? */
     if (C == LocalStart) {
 
-    	/* Read the identifier. */
-    	ReadIdent ();
+        /* Read the identifier. */
+        ReadIdent ();
 
-     	/* Start character alone is not enough */
+        /* Start character alone is not enough */
         if (SB_GetLen (&CurTok.SVal) == 1) {
-	    Error ("Invalid cheap local symbol");
-       	    goto Again;
-	}
+            Error ("Invalid cheap local symbol");
+            goto Again;
+        }
 
-       	/* A local identifier */
+        /* A local identifier */
         CurTok.Tok = TOK_LOCAL_IDENT;
-	return;
+        return;
     }
 
 
     /* Identifier or keyword? */
     if (IsIdStart (C)) {
 
-    	/* Read the identifier */
-    	ReadIdent ();
+        /* Read the identifier */
+        ReadIdent ();
 
-       	/* Check for special names. Bail out if we have identified the type of
-	 * the token. Go on if the token is an identifier.
-	 */
+        /* Check for special names. Bail out if we have identified the type of
+         * the token. Go on if the token is an identifier.
+         */
         if (SB_GetLen (&CurTok.SVal) == 1) {
-    	    switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
+            switch (toupper (SB_AtUnchecked (&CurTok.SVal, 0))) {
 
-    	       	case 'A':
+                case 'A':
                     if (C == ':') {
                         NextChar ();
                         CurTok.Tok = TOK_OVERRIDE_ABS;
                     } else {
-    	     	        CurTok.Tok = TOK_A;
+                        CurTok.Tok = TOK_A;
                     }
-    	            return;
+                    return;
 
                 case 'F':
                     if (C == ':') {
                         NextChar ();
                         CurTok.Tok = TOK_OVERRIDE_FAR;
-		       	return;
+                        return;
                     }
-		    break;
+                    break;
 
-	        case 'S':
+                case 'S':
                     if (CPU == CPU_65816) {
                         CurTok.Tok = TOK_S;
                         return;
                     }
                     break;
 
-    	     	case 'X':
-     	     	    CurTok.Tok = TOK_X;
-	     	    return;
+                case 'X':
+                    CurTok.Tok = TOK_X;
+                    return;
 
- 	      	case 'Y':
-	     	    CurTok.Tok = TOK_Y;
-	     	    return;
+                case 'Y':
+                    CurTok.Tok = TOK_Y;
+                    return;
 
                 case 'Z':
                     if (C == ':') {
                         NextChar ();
                         CurTok.Tok = TOK_OVERRIDE_ZP;
-		       	return;
+                        return;
                     }
                     break;
 
-      	      	default:
-    	     	    break;
-   	    }
+                default:
+                    break;
+            }
 
-	} else if (CPU == CPU_SWEET16 &&
+        } else if (CPU == CPU_SWEET16 &&
                   (CurTok.IVal = Sweet16Reg (&CurTok.SVal)) >= 0) {
 
             /* A sweet16 register number in sweet16 mode */
@@ -1143,34 +1143,34 @@ Again:
 
         }
 
-	/* Check for define style macro */
-       	if ((M = FindDefine (&CurTok.SVal)) != 0) {
-	    /* Macro - expand it */
-	    MacExpandStart (M);
-	    goto Restart;
-	} else {
-	    /* An identifier */
-	    CurTok.Tok = TOK_IDENT;
-	}
-	return;
+        /* Check for define style macro */
+        if ((M = FindDefine (&CurTok.SVal)) != 0) {
+            /* Macro - expand it */
+            MacExpandStart (M);
+            goto Restart;
+        } else {
+            /* An identifier */
+            CurTok.Tok = TOK_IDENT;
+        }
+        return;
     }
 
     /* Ok, let's do the switch */
 CharAgain:
     switch (C) {
 
-	case '+':
-	    NextChar ();
-	    CurTok.Tok = TOK_PLUS;
-	    return;
+        case '+':
+            NextChar ();
+            CurTok.Tok = TOK_PLUS;
+            return;
 
-	case '-':
-	    NextChar ();
-     	    CurTok.Tok = TOK_MINUS;
-	    return;
+        case '-':
+            NextChar ();
+            CurTok.Tok = TOK_MINUS;
+            return;
 
-	case '/':
-	    NextChar ();
+        case '/':
+            NextChar ();
             if (C != '*') {
                 CurTok.Tok = TOK_DIV;
             } else if (CComments) {
@@ -1195,222 +1195,222 @@ CharAgain:
                 DoneCollection (&LineInfos);
                 goto Again;
             }
-	    return;
+            return;
 
-	case '*':
-	    NextChar ();
-	    CurTok.Tok = TOK_MUL;
-	    return;
+        case '*':
+            NextChar ();
+            CurTok.Tok = TOK_MUL;
+            return;
 
-	case '^':
-	    NextChar ();
-      	    CurTok.Tok = TOK_XOR;
-	    return;
+        case '^':
+            NextChar ();
+            CurTok.Tok = TOK_XOR;
+            return;
 
-	case '&':
-   	    NextChar ();
-	    if (C == '&') {
-	    	NextChar ();
-	    	CurTok.Tok = TOK_BOOLAND;
-	    } else {
-	        CurTok.Tok = TOK_AND;
-	    }
-       	    return;
+        case '&':
+            NextChar ();
+            if (C == '&') {
+                NextChar ();
+                CurTok.Tok = TOK_BOOLAND;
+            } else {
+                CurTok.Tok = TOK_AND;
+            }
+            return;
 
-	case '|':
-	    NextChar ();
-	    if (C == '|') {
-	    	NextChar ();
-	     	CurTok.Tok = TOK_BOOLOR;
-	    } else {
-	        CurTok.Tok = TOK_OR;
-	    }
-	    return;
+        case '|':
+            NextChar ();
+            if (C == '|') {
+                NextChar ();
+                CurTok.Tok = TOK_BOOLOR;
+            } else {
+                CurTok.Tok = TOK_OR;
+            }
+            return;
 
-	case ':':
-	    NextChar ();
-      	    switch (C) {
+        case ':':
+            NextChar ();
+            switch (C) {
 
-    		case ':':
-		    NextChar ();
-		    CurTok.Tok = TOK_NAMESPACE;
-		    break;
+                case ':':
+                    NextChar ();
+                    CurTok.Tok = TOK_NAMESPACE;
+                    break;
 
-		case '-':
-		    CurTok.IVal = 0;
-		    do {
-     		       	--CurTok.IVal;
-	  	       	NextChar ();
-		    } while (C == '-');
-		    CurTok.Tok = TOK_ULABEL;
-		    break;
+                case '-':
+                    CurTok.IVal = 0;
+                    do {
+                        --CurTok.IVal;
+                        NextChar ();
+                    } while (C == '-');
+                    CurTok.Tok = TOK_ULABEL;
+                    break;
 
-		case '+':
-		    CurTok.IVal = 0;
-		    do {
-		     	++CurTok.IVal;
-	     	     	NextChar ();
-	       	    } while (C == '+');
-	 	    CurTok.Tok = TOK_ULABEL;
-		    break;
+                case '+':
+                    CurTok.IVal = 0;
+                    do {
+                        ++CurTok.IVal;
+                        NextChar ();
+                    } while (C == '+');
+                    CurTok.Tok = TOK_ULABEL;
+                    break;
 
                 case '=':
                     NextChar ();
                     CurTok.Tok = TOK_ASSIGN;
                     break;
 
-		default:
-	            CurTok.Tok = TOK_COLON;
-		    break;
-	    }
-	    return;
+                default:
+                    CurTok.Tok = TOK_COLON;
+                    break;
+            }
+            return;
 
-	case ',':
-	    NextChar ();
-	    CurTok.Tok = TOK_COMMA;
-	    return;
+        case ',':
+            NextChar ();
+            CurTok.Tok = TOK_COMMA;
+            return;
 
-	case ';':
-	    NextChar ();
-	    while (C != '\n' && C != EOF) {
-	    	NextChar ();
-	    }
-	    goto CharAgain;
+        case ';':
+            NextChar ();
+            while (C != '\n' && C != EOF) {
+                NextChar ();
+            }
+            goto CharAgain;
 
-	case '#':
-	    NextChar ();
-      	    CurTok.Tok = TOK_HASH;
-    	    return;
+        case '#':
+            NextChar ();
+            CurTok.Tok = TOK_HASH;
+            return;
 
-	case '(':
-	    NextChar ();
-	    CurTok.Tok = TOK_LPAREN;
-	    return;
+        case '(':
+            NextChar ();
+            CurTok.Tok = TOK_LPAREN;
+            return;
 
-	case ')':
-       	    NextChar ();
+        case ')':
+            NextChar ();
             CurTok.Tok = TOK_RPAREN;
-	    return;
+            return;
 
-	case '[':
-	    NextChar ();
-	    CurTok.Tok = TOK_LBRACK;
-	    return;
+        case '[':
+            NextChar ();
+            CurTok.Tok = TOK_LBRACK;
+            return;
 
-	case ']':
-	    NextChar ();
-	    CurTok.Tok = TOK_RBRACK;
-	    return;
+        case ']':
+            NextChar ();
+            CurTok.Tok = TOK_RBRACK;
+            return;
 
-	case '{':
-	    NextChar ();
-      	    CurTok.Tok = TOK_LCURLY;
-	    return;
+        case '{':
+            NextChar ();
+            CurTok.Tok = TOK_LCURLY;
+            return;
 
-	case '}':
-	    NextChar ();
-	    CurTok.Tok = TOK_RCURLY;
-	    return;
+        case '}':
+            NextChar ();
+            CurTok.Tok = TOK_RCURLY;
+            return;
 
-	case '<':
- 	    NextChar ();
-	    if (C == '=') {
-	     	NextChar ();
-	      	CurTok.Tok = TOK_LE;
-	    } else if (C == '<') {
-		NextChar ();
-		CurTok.Tok = TOK_SHL;
-	    } else if (C == '>') {
-	      	NextChar ();
-		CurTok.Tok = TOK_NE;
-	    } else {
-		CurTok.Tok = TOK_LT;
-	    }
-	    return;
+        case '<':
+            NextChar ();
+            if (C == '=') {
+                NextChar ();
+                CurTok.Tok = TOK_LE;
+            } else if (C == '<') {
+                NextChar ();
+                CurTok.Tok = TOK_SHL;
+            } else if (C == '>') {
+                NextChar ();
+                CurTok.Tok = TOK_NE;
+            } else {
+                CurTok.Tok = TOK_LT;
+            }
+            return;
 
-	case '=':
-      	    NextChar ();
-       	    CurTok.Tok = TOK_EQ;
-	    return;
+        case '=':
+            NextChar ();
+            CurTok.Tok = TOK_EQ;
+            return;
 
-	case '!':
-	    NextChar ();
-	    CurTok.Tok = TOK_BOOLNOT;
-   	    return;
+        case '!':
+            NextChar ();
+            CurTok.Tok = TOK_BOOLNOT;
+            return;
 
-	case '>':
-     	    NextChar ();
-	    if (C == '=') {
-		NextChar ();
-		CurTok.Tok = TOK_GE;
-       	    } else if (C == '>') {
-		NextChar ();
-	       	CurTok.Tok = TOK_SHR;
-	    } else {
-	       	CurTok.Tok = TOK_GT;
-	    }
-	    return;
+        case '>':
+            NextChar ();
+            if (C == '=') {
+                NextChar ();
+                CurTok.Tok = TOK_GE;
+            } else if (C == '>') {
+                NextChar ();
+                CurTok.Tok = TOK_SHR;
+            } else {
+                CurTok.Tok = TOK_GT;
+            }
+            return;
 
         case '~':
-	    NextChar ();
-	    CurTok.Tok = TOK_NOT;
-      	    return;
+            NextChar ();
+            CurTok.Tok = TOK_NOT;
+            return;
 
- 	case '\'':
-	    /* Hack: If we allow ' as terminating character for strings, read
-	     * the following stuff as a string, and check for a one character
-	     * string later.
-	     */
-	    if (LooseStringTerm) {
-		ReadStringConst ('\'');
+        case '\'':
+            /* Hack: If we allow ' as terminating character for strings, read
+             * the following stuff as a string, and check for a one character
+             * string later.
+             */
+            if (LooseStringTerm) {
+                ReadStringConst ('\'');
                 if (SB_GetLen (&CurTok.SVal) == 1) {
-		    CurTok.IVal = SB_AtUnchecked (&CurTok.SVal, 0);
-	      	    CurTok.Tok = TOK_CHARCON;
-		} else {
-		    CurTok.Tok = TOK_STRCON;
-		}
-	    } else {
-		/* Always a character constant */
-	     	NextChar ();
-	     	if (C == EOF || IsControl (C)) {
-	     	    Error ("Illegal character constant");
-	     	    goto CharAgain;
-	     	}
-	     	CurTok.IVal = C;
-	     	CurTok.Tok = TOK_CHARCON;
-    	     	NextChar ();
-	     	if (C != '\'') {
+                    CurTok.IVal = SB_AtUnchecked (&CurTok.SVal, 0);
+                    CurTok.Tok = TOK_CHARCON;
+                } else {
+                    CurTok.Tok = TOK_STRCON;
+                }
+            } else {
+                /* Always a character constant */
+                NextChar ();
+                if (C == EOF || IsControl (C)) {
+                    Error ("Illegal character constant");
+                    goto CharAgain;
+                }
+                CurTok.IVal = C;
+                CurTok.Tok = TOK_CHARCON;
+                NextChar ();
+                if (C != '\'') {
                     if (!MissingCharTerm) {
                         Error ("Illegal character constant");
                     }
-	     	} else {
-	     	    NextChar ();
-	     	}
-	    }
-	    return;
+                } else {
+                    NextChar ();
+                }
+            }
+            return;
 
-	case '\"':
-     	    ReadStringConst ('\"');
-	    CurTok.Tok = TOK_STRCON;
-	    return;
+        case '\"':
+            ReadStringConst ('\"');
+            CurTok.Tok = TOK_STRCON;
+            return;
 
-	case '\\':
-	    /* Line continuation? */
-	    if (LineCont) {
-	    	NextChar ();
-	    	if (C == '\n') {
-     		    /* Handle as white space */
-     		    NextChar ();
-     		    C = ' ';
-     	     	    goto Again;
-     	       	}
-     	    }
-      	    break;
+        case '\\':
+            /* Line continuation? */
+            if (LineCont) {
+                NextChar ();
+                if (C == '\n') {
+                    /* Handle as white space */
+                    NextChar ();
+                    C = ' ';
+                    goto Again;
+                }
+            }
+            break;
 
         case '\n':
-     	    NextChar ();
-     	    CurTok.Tok = TOK_SEP;
-     	    return;
+            NextChar ();
+            CurTok.Tok = TOK_SEP;
+            return;
 
         case EOF:
             CheckInputStack ();
@@ -1419,7 +1419,7 @@ CharAgain:
                 DoneCharSource ();
                 goto Again;
             } else {
-     	     	CurTok.Tok = TOK_EOF;
+                CurTok.Tok = TOK_EOF;
             }
             return;
     }
@@ -1448,15 +1448,15 @@ int GetSubKey (const char** Keys, unsigned Count)
 
     /* If we aren't in ignore case mode, we have to uppercase the identifier */
     if (!IgnoreCase) {
-     	UpcaseSVal ();
+        UpcaseSVal ();
     }
 
     /* Do a linear search (a binary search is not worth the effort) */
     for (I = 0; I < Count; ++I) {
-       	if (SB_CompareStr (&CurTok.SVal, Keys [I]) == 0) {
-     	    /* Found it */
-     	    return I;
-     	}
+        if (SB_CompareStr (&CurTok.SVal, Keys [I]) == 0) {
+            /* Found it */
+            return I;
+        }
     }
 
     /* Not found */

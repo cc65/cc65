@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   codeseg.h				     */
+/*                                 codeseg.h                                 */
 /*                                                                           */
-/*			    Code segment structure			     */
+/*                          Code segment structure                           */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -53,7 +53,7 @@
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
@@ -63,23 +63,23 @@ struct CodeEntry;
 
 
 /*****************************************************************************/
-/*  	       	     	  	     Data				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
 /* Size of the label hash table */
-#define CS_LABEL_HASH_SIZE	29
+#define CS_LABEL_HASH_SIZE      29
 
 /* Code segment structure */
 typedef struct CodeSeg CodeSeg;
 struct CodeSeg {
-    char*	    SegName;  	  		/* Segment name */
-    SymEntry*	    Func;	  		/* Owner function */
-    Collection	    Entries;	  		/* List of code entries */
-    Collection	    Labels;	  		/* Labels for next insn */
-    CodeLabel* 	    LabelHash[CS_LABEL_HASH_SIZE]; /* Label hash table */
-    unsigned short  ExitRegs;			/* Register use on exit */
+    char*           SegName;                    /* Segment name */
+    SymEntry*       Func;                       /* Owner function */
+    Collection      Entries;                    /* List of code entries */
+    Collection      Labels;                     /* Labels for next insn */
+    CodeLabel*      LabelHash[CS_LABEL_HASH_SIZE]; /* Label hash table */
+    unsigned short  ExitRegs;                   /* Register use on exit */
 
     /* Optimization settings for this segment */
     unsigned char   Optimize;                   /* On/off switch */
@@ -89,7 +89,7 @@ struct CodeSeg {
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code      		  		     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -113,7 +113,7 @@ INLINE unsigned CS_GetEntryCount (const CodeSeg* S)
     return CollCount (&S->Entries);
 }
 #else
-#  define CS_GetEntryCount(S)	CollCount (&(S)->Entries)
+#  define CS_GetEntryCount(S)   CollCount (&(S)->Entries)
 #endif
 
 void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index);
@@ -164,7 +164,7 @@ INLINE struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)
     return CollAt (&S->Entries, Index);
 }
 #else
-#  define CS_GetEntry(S, Index)	((struct CodeEntry*) CollAt(&(S)->Entries, (Index)))
+#  define CS_GetEntry(S, Index) ((struct CodeEntry*) CollAt(&(S)->Entries, (Index)))
 #endif
 
 struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index);
@@ -178,7 +178,7 @@ struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index);
  */
 
 int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
-       	       	   unsigned Start, unsigned Count);
+                   unsigned Start, unsigned Count);
 /* Get Count code entries into List starting at index start. Return true if
  * we got the lines, return false if not enough lines were available.
  */

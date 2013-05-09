@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  symentry.h				     */
+/*                                symentry.h                                 */
 /*                                                                           */
-/*		 Symbol table entries for the cc65 C compiler		     */
+/*               Symbol table entries for the cc65 C compiler                */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -51,7 +51,7 @@
 
 
 /*****************************************************************************/
-/*				    Forwards				     */
+/*                                  Forwards                                 */
 /*****************************************************************************/
 
 
@@ -62,39 +62,39 @@ struct LiteralPool;
 
 
 /*****************************************************************************/
-/*	       	     	       	struct SymEntry				     */
+/*                              struct SymEntry                              */
 /*****************************************************************************/
 
 
 
 /* Storage classes and flags */
-#define SC_AUTO      	0x0001U         /* Auto variable */
-#define SC_REGISTER    	0x0002U	        /* Register variable */
-#define SC_STATIC    	0x0004U         /* Static */
-#define SC_EXTERN    	0x0008U         /* Extern linkage */
+#define SC_AUTO         0x0001U         /* Auto variable */
+#define SC_REGISTER     0x0002U         /* Register variable */
+#define SC_STATIC       0x0004U         /* Static */
+#define SC_EXTERN       0x0008U         /* Extern linkage */
 
-#define SC_ENUM	     	0x0030U	        /* An enum */
-#define SC_CONST     	0x0020U	        /* A numeric constant with a type */
-#define SC_LABEL       	0x0040U	        /* A goto label */
-#define SC_PARAM       	0x0080U	        /* A function parameter */
-#define SC_FUNC	     	0x0100U	        /* A function */
+#define SC_ENUM         0x0030U         /* An enum */
+#define SC_CONST        0x0020U         /* A numeric constant with a type */
+#define SC_LABEL        0x0040U         /* A goto label */
+#define SC_PARAM        0x0080U         /* A function parameter */
+#define SC_FUNC         0x0100U         /* A function */
 
 #define SC_DEFTYPE      0x0200U         /* Parameter has default type (=int, old style) */
-#define SC_STORAGE     	0x0400U	        /* Symbol with associated storage */
-#define SC_DEFAULT     	0x0800U	        /* Flag: default storage class was used */
+#define SC_STORAGE      0x0400U         /* Symbol with associated storage */
+#define SC_DEFAULT      0x0800U         /* Flag: default storage class was used */
 
-#define SC_DEF       	0x1000U	        /* Symbol is defined */
-#define SC_REF 	     	0x2000U         /* Symbol is referenced */
+#define SC_DEF          0x1000U         /* Symbol is defined */
+#define SC_REF          0x2000U         /* Symbol is referenced */
 
-#define SC_TYPE	       	0x4000U	        /* This is a type, struct, typedef, etc. */
-#define SC_STRUCT      	0x4001U	        /* Struct */
+#define SC_TYPE         0x4000U         /* This is a type, struct, typedef, etc. */
+#define SC_STRUCT       0x4001U         /* Struct */
 #define SC_UNION        0x4002U         /* Union */
-#define SC_STRUCTFIELD  0x4003U	        /* Struct or union field */
+#define SC_STRUCTFIELD  0x4003U         /* Struct or union field */
 #define SC_BITFIELD     0x4004U         /* A bit-field inside a struct or union */
-#define SC_TYPEDEF     	0x4005U         /* A typedef */
+#define SC_TYPEDEF      0x4005U         /* A typedef */
 #define SC_TYPEMASK     0x400FU         /* Mask for above types */
 
-#define SC_ZEROPAGE  	0x8000U	        /* Symbol marked as zeropage */
+#define SC_ZEROPAGE     0x8000U         /* Symbol marked as zeropage */
 
 #define SC_HAVEATTR     0x10000U        /* Symbol has attributes */
 
@@ -103,24 +103,24 @@ struct LiteralPool;
 /* Symbol table entry */
 typedef struct SymEntry SymEntry;
 struct SymEntry {
-    SymEntry*  			NextHash; /* Next entry in hash list */
-    SymEntry*  			PrevSym;  /* Previous symbol in dl list */
-    SymEntry*  			NextSym;  /* Next symbol double linked list */
-    SymEntry*  	     		Link;  	  /* General purpose single linked list */
-    struct SymTable*		Owner; 	  /* Symbol table the symbol is in */
-    unsigned   			Flags; 	  /* Symbol flags */
-    Type*      			Type;  	  /* Symbol type */
+    SymEntry*                   NextHash; /* Next entry in hash list */
+    SymEntry*                   PrevSym;  /* Previous symbol in dl list */
+    SymEntry*                   NextSym;  /* Next symbol double linked list */
+    SymEntry*                   Link;     /* General purpose single linked list */
+    struct SymTable*            Owner;    /* Symbol table the symbol is in */
+    unsigned                    Flags;    /* Symbol flags */
+    Type*                       Type;     /* Symbol type */
     Collection*                 Attr;     /* Attribute list if any */
     char*                       AsmName;  /* Assembler name if any */
 
     /* Data that differs for the different symbol types */
     union {
 
-       	/* Offset for locals or struct members */
-       	int    			Offs;
+        /* Offset for locals or struct members */
+        int                     Offs;
 
-       	/* Label name for static symbols */
-       	unsigned		Label;
+        /* Label name for static symbols */
+        unsigned                Label;
 
         /* Register bank offset and offset of the saved copy on stack for
          * register variables.
@@ -130,14 +130,14 @@ struct SymEntry {
             int                 SaveOffs;
         } R;
 
-       	/* Value for constants (including enums) */
-       	long			ConstVal;
+        /* Value for constants (including enums) */
+        long                    ConstVal;
 
-	/* Data for structs/unions */
-	struct {
-	    struct SymTable*	SymTab;	  /* Member symbol table */
-	    unsigned		Size;  	  /* Size of the union/struct */
-	} S;
+        /* Data for structs/unions */
+        struct {
+            struct SymTable*    SymTab;   /* Member symbol table */
+            unsigned            Size;     /* Size of the union/struct */
+        } S;
 
         /* Data for bit fields */
         struct {
@@ -146,21 +146,21 @@ struct SymEntry {
             unsigned            BitWidth; /* Width in bits */
         } B;
 
-	/* Data for functions */
-	struct {
-	    struct FuncDesc*	Func;	  /* Function descriptor */
-       	    struct Segments*	Seg;	  /* Segments for this function */
+        /* Data for functions */
+        struct {
+            struct FuncDesc*    Func;     /* Function descriptor */
+            struct Segments*    Seg;      /* Segments for this function */
             struct LiteralPool* LitPool;  /* Literal pool for this function */
-       	} F;
+        } F;
 
     } V;
-    char       	     	       Name[1];	/* Name, dynamically allocated */
+    char                       Name[1]; /* Name, dynamically allocated */
 };
 
 
 
 /*****************************************************************************/
-/*	       	     	       	     Code				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 

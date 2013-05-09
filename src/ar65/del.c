@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     del.h				     */
+/*                                   del.h                                   */
 /*                                                                           */
-/*		  Object file deleting for the ar65 archiver		     */
+/*                Object file deleting for the ar65 archiver                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Code    				     */
+/*                                   Code                                    */
 /*****************************************************************************/
 
 
@@ -55,10 +55,10 @@ void DelObjFiles (int argc, char* argv [])
 
     /* Check the argument count */
     if (argc <= 0) {
-    	Error ("No library name given");
+        Error ("No library name given");
     }
     if (argc <= 1) {
-    	Error ("No modules to delete");
+        Error ("No modules to delete");
     }
 
     /* Open the library, read the index */
@@ -67,9 +67,9 @@ void DelObjFiles (int argc, char* argv [])
     /* Delete the modules */
     I = 1;
     while (I < argc) {
-	/* Delete the module from the list */
-	DelObjData (argv [I]);
-	++I;
+        /* Delete the module from the list */
+        DelObjData (argv [I]);
+        ++I;
     }
 
     /* Create a new library file and close the old one */

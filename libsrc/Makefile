@@ -60,11 +60,11 @@ mostlyclean:
 	$(call RMDIR,../wrk)
 
 clean:
-	$(call RMDIR,../wrk ../lib $(addprefix ../,$(DRVTYPES)))
+	$(call RMDIR,../wrk ../lib ../targetutil $(addprefix ../,$(DRVTYPES)))
 
 else # TARGET
 
-CFLAGS += -Osir
+CFLAGS += -Osir -W error
 
 EXTZP = cbm510 \
         cbm610 \

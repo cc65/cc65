@@ -5,7 +5,10 @@ DEPS += ../wrk/$(TARGET)/convert.d
 ../wrk/$(TARGET)/convert.o: $(SRCDIR)/targetutil/convert.c | ../wrk/$(TARGET)
 	$(COMPILE_recipe)
 
-../targetutil/convert.system: ../wrk/$(TARGET)/convert.o | ../targetutil
-	$(LD) -o $@ -C apple2enh-system.cfg $^ apple2enh.lib
+../lib/apple2enh.lib:
+	@$(MAKE) --no-print-directory apple2enh
+
+../targetutil/convert.system: ../wrk/$(TARGET)/convert.o ../lib/apple2enh.lib | ../targetutil
+	$(LD) -o $@ -C apple2enh-system.cfg $^
 
 $(TARGET): ../targetutil/convert.system

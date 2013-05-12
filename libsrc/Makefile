@@ -211,7 +211,7 @@ endef
 define COMPILE_recipe
 
 @echo $(TARGET) - $<
-@$(CC) -t $(TARGET) $(CFLAGS) --create-dep $(@:.o=.d) -o $(@:.o=.s) $<
+@$(CC) -t $(TARGET) $(CFLAGS) --create-dep $(@:.o=.d) --dep-target $@ -o $(@:.o=.s) $<
 @$(CA) -t $(TARGET) -o $@ $(@:.o=.s)
 
 endef

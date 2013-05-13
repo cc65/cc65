@@ -29,9 +29,10 @@
     <p>Download the
        <a href="https://github.com/oliverschmidt/cc65/archive/master.zip">
        current cc65 source code</a> an unzip it to a path of your choice.
-       Change the current working directory to that path and enter 'make'. This
-       builds both the cc65 binaries (located in the subdirectory 'bin') and
-       the cc65 libraries. Now cc65 is fully functional without further steps.
+       Change the current working directory to the 'cc65-master' subdirectory
+       of that path and enter 'make'. This builds both the cc65 binaries
+       (located in the 'bin' subdirectory) and the cc65 libraries. Now cc65 is
+       fully functional without further steps.
     </p>
     <p>If you want to be able to run the cc65 binaries without providing their
        path you may additionally enter 'sudo make install'. This creates
@@ -47,27 +48,27 @@
        binary</a> and its
        <a href="http://gnuwin32.sourceforge.net/downlinks/make-dep-zip.php">
        dependencies</a> and unzip them both to the <u>same</u> path of your
-       choice (let's presume 'c:\gnu' here). Now you have two options...
+       choice (let's presume 'c:\cc65\gnu' here). Now you have two options...
        <ul class="bullet">
-         <li>Build the cc65 binaries using
-             <a href="http://www.microsoft.com/visualstudio/eng#downloads+d-2010-express">
-             Microsoft Visual C++ 2010 Express</a>:<br/>
+         <li>Build the cc65 binaries using Microsoft Visual C++ 2010 Express:
+             <br/>
              Open a 'Visual Studio Command Prompt (2010)', change the current
-             working directory to 'c:\cc65' and enter 'c:\gnu\bin\make'. This
-             builds both the cc65 binaries (located in 'c:\cc65\bin') and the
-             cc65 libraries. Now cc65 is fully functional without further
-             steps.
+             working directory to 'c:\cc65\cc65-master' and enter
+             'c:\cc65\gnu\bin\make'. This builds both the cc65 binaries
+             (located in 'c:\cc65\cc65-master\bin') and the cc65 libraries.
+             Now cc65 is fully functional without further steps.
          </li>
        </ul>
        <ul class="bullet">
-         <li>Use prebuilt cc65 binaries:<br/>
+         <li>Use prebuilt cc65 binaries:
+             <br/>
              Download the
              <a href="http://sourceforge.net/projects/cc65/files/latest/download">
              latest cc65 binaries</a> for Windows and unzip them to
-             'c:\cc65\bin'. Open a Command Prompt, change the current working
-             directory to 'c:\cc65' and enter 'c:\gnu\bin\make lib'. This
-             builds the cc65 libraries. Now cc65 is fully functional without
-             further steps.<br/>
+             'c:\cc65\cc65-master\bin'. Open a Command Prompt, change the
+             current working directory to 'c:\cc65\cc65-master' and enter
+             'c:\cc65\gnu\bin\make lib'. This builds the cc65 libraries. Now
+             cc65 is fully functional without further steps.<br/>
              <u>Note:</u> If you receive an error message complaining about
              'MSVCR100.dll' missing then you need to install the
              <a href="http://www.microsoft.com/en-us/download/details.aspx?id=8328">
@@ -76,8 +77,9 @@
        </ul>
     </p>
     <p>If you want to be able to run the cc65 binaries without providing their
-       path you may additionally add 'c:\cc65\bin' to your 'Path' environment
-       variable.
+       path you may additionally add 'c:\cc65\cc65-master\bin' to your 'Path'
+       environment variable.
     </p>
   </body>
 </html>
+

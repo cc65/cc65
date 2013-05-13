@@ -26,6 +26,7 @@ a:visited {
 
 /* title menu */
 div#menu {
+    clear:              both;
     width:              100%;
     padding:            0px;
     border-top:         1px solid #808080;

@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>cc65 - Getting Started</title>
+    <link rel="stylesheet" type="text/css" href="cc65.css"/>
+    <link rel="shortcut icon" type="image/x-icon" href="image/favicon.ico"/>
+  </head>
+  <body>
+    <img style="float:right;" width="300" height="150" src="image/cc65.png" alt=""/>
+    <h1>Getting Started</h1>
+    <div id="menu">
+      <div id="innermenu">
+        <ul>
+          <li><a href="index.html">Main Page</a>
+          </li>
+          <li id="here"><a href="getting-started.html">Getting Started</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <h2>Content</h2>
+    <ul class="down">
+      <li><a href="#GNU">GNU/Linux</a>
+      </li>
+      <li><a href="#Windows">Windows</a>
+      </li>
+    </ul>
+    <h2><a name="GNU">GNU/Linux</a></h2>
+    <p>Download the
+       <a href="https://github.com/oliverschmidt/cc65/archive/master.zip">
+       current cc65 source code</a> an unzip it to a path of your choice.
+       Change the current working directory to that path and enter 'make'. This
+       builds both the cc65 binaries (located in the subdirectory 'bin') and
+       the cc65 libraries. Now cc65 is fully functional without further steps.
+    </p>
+    <p>If you want to be able to run the cc65 binaries without providing their
+       path you may additionally enter 'sudo make install'. This creates
+       symbolic links to the binaries in '/usr/local/bin'.
+    </p>
+    <h2><a name="Windows">Windows</a></h2>
+    <p>Download the
+       <a href="https://github.com/oliverschmidt/cc65/archive/master.zip">
+       current cc65 source code</a> and unzip it to a path of your choice that
+       <u>doesn't contain spaces</u> (let's presume 'c:\cc65' here). Download
+       the 'Make for Windows'
+       <a href="http://gnuwin32.sourceforge.net/downlinks/make-bin-zip.php">
+       binary</a> and its
+       <a href="http://gnuwin32.sourceforge.net/downlinks/make-dep-zip.php">
+       dependencies</a> and unzip them both to the <u>same</u> path of your
+       choice (let's presume 'c:\gnu' here). Now you have two options...
+       <ul class="bullet">
+         <li>Build the cc65 binaries using
+             <a href="http://www.microsoft.com/visualstudio/eng#downloads+d-2010-express">
+             Microsoft Visual C++ 2010 Express</a>:<br/>
+             Open a 'Visual Studio Command Prompt (2010)', change the current
+             working directory to 'c:\cc65' and enter 'c:\gnu\bin\make'. This
+             builds both the cc65 binaries (located in 'c:\cc65\bin') and the
+             cc65 libraries. Now cc65 is fully functional without further
+             steps.
+         </li>
+       </ul>
+       <ul class="bullet">
+         <li>Use prebuilt cc65 binaries:<br/>
+             Download the
+             <a href="http://sourceforge.net/projects/cc65/files/latest/download">
+             latest cc65 binaries</a> for Windows and unzip them to
+             'c:\cc65\bin'. Open a Command Prompt, change the current working
+             directory to 'c:\cc65' and enter 'c:\gnu\bin\make lib'. This
+             builds the cc65 libraries. Now cc65 is fully functional without
+             further steps.<br/>
+             <u>Note:</u> If you receive an error message complaining about
+             'MSVCR100.dll' missing then you need to install the
+             <a href="http://www.microsoft.com/en-us/download/details.aspx?id=8328">
+             Microsoft Visual C++ 2010 SP1 Redistributable Package (x86)</a>.
+         </li>
+       </ul>
+    </p>
+    <p>If you want to be able to run the cc65 binaries without providing their
+       path you may additionally add 'c:\cc65\bin' to your 'Path' environment
+       variable.
+    </p>
+  </body>
+</html>

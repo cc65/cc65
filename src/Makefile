@@ -26,7 +26,7 @@ LDLIBS += -lm
 
 .SUFFIXES:
 
-.PHONY: all bin $(PROGS) mostlyclean clean install uninstall
+.PHONY: all bin $(PROGS) mostlyclean clean avail unavail
 
 all bin: $(PROGS)
 
@@ -36,15 +36,15 @@ mostlyclean:
 clean:
 	$(RM) -r ../wrk ../bin
 
-install: all
-	$(foreach prog,$(PROGS),$(INSTALL_recipe))
+avail: all
+	$(foreach prog,$(PROGS),$(AVAIL_recipe))
 
-uninstall:
-	$(foreach prog,$(PROGS),$(UNINSTALL_recipe))
+unavail:
+	$(foreach prog,$(PROGS),$(UNAVAIL_recipe))
 
 ##########
 
-define INSTALL_recipe
+define AVAIL_recipe
 
 ln -s $(abspath ../bin/$(prog)) /usr/local/bin/$(prog)
 
@@ -52,7 +52,7 @@ endef
 
 ##########
 
-define UNINSTALL_recipe
+define UNAVAIL_recipe
 
 $(RM) /usr/local/bin/$(prog)
 

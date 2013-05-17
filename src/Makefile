@@ -36,7 +36,7 @@ mostlyclean:
 clean:
 	$(RM) -r ../wrk ../bin
 
-avail: all
+avail:
 	$(foreach prog,$(PROGS),$(AVAIL_recipe))
 
 unavail:

@@ -18,20 +18,20 @@
 <P>Normal include files are searched in the following places:</P>
 <P>
 <OL>
-<LI>The current directory.</LI>
-<LI>An optionally compiled-in directory.</LI>
-<LI>The value of the environment variable <CODE>CA65_INC</CODE> if it is defined.</LI>
-<LI>A subdirectory named <CODE>asminc</CODE> of the directory defined in the
-environment variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
+<LI>The current file's directory.</LI>
 <LI>Any directory added with the <CODE>
 <A HREF="ca65-2.html#option-I">-I</A></CODE> option
 on the command line.</LI>
+<LI>The value of the environment variable <CODE>CA65_INC</CODE> if it is defined.</LI>
+<LI>A subdirectory named <CODE>asminc</CODE> of the directory defined in the
+environment variable <CODE>CC65_HOME</CODE>, if it is defined.</LI>
+<LI>An optionally compiled-in directory.</LI>
 </OL>
 </P>
 <P>Binary include files are searched in the following places:</P>
 <P>
 <OL>
-<LI>The current directory.</LI>
+<LI>The current file's directory.</LI>
 <LI>Any directory added with the <CODE>
 <A HREF="ca65-2.html#option--bin-include-dir">--bin-include-dir</A></CODE> option on the command line.</LI>
 </OL>

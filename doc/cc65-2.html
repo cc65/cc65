@@ -69,7 +69,6 @@ Long options:
   --dep-target target           Use this dependency target
   --disable-opt name            Disable an optimization step
   --enable-opt name             Enable an optimization step
-  --forget-inc-paths            Forget include search paths
   --help                        Help (this text)
   --include-dir dir             Set an include directory search path
   --list-opt-steps              List all optimizer steps and exit
@@ -178,12 +177,6 @@ option has no effect if neither <CODE>
 <DT><B><CODE>-D sym[=definition]</CODE></B><DD>
 <P>Define a macro on the command line. If no definition is given, the macro
 is defined to the value "1".</P>
-
-
-<DT><B><CODE>--forget-inc-paths</CODE></B><DD>
-<P>Forget the builtin include paths. This is most useful when building
-customized C or runtime libraries, in which case the standard header
-files should be ignored.</P>
 
 
 <DT><B><CODE>-g, --debug-info</CODE></B><DD>

@@ -283,6 +283,14 @@ static void SetSys (const char* Sys)
             NewSymbol ("__LYNX__", 1);
             break;
 
+        case TGT_SIM6502:
+            NewSymbol ("__SIM6502__", 1);
+            break;
+
+        case TGT_SIM65C02:
+            NewSymbol ("__SIM65C02__", 1);
+            break;
+
         default:
             AbEnd ("Invalid target name: `%s'", Sys);
 

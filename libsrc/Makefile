@@ -18,6 +18,8 @@ TARGETS = apple2    \
           $(GEOS)   \
           lynx      \
           nes       \
+          sim6502   \
+          sim65c02  \
           supervision
 
 DRVTYPES = emd \
@@ -94,6 +96,8 @@ ifeq ($(TARGET),apple2enh)
   OBJPFX = a2
   DRVPFX = a2e
   SRCDIR = apple2
+else ifeq ($(TARGET),sim65c02)
+  SRCDIR = sim6502
 else
   SRCDIR = $(TARGET)
 endif

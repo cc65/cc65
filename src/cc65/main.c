@@ -239,6 +239,14 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__LYNX__", 1);
             break;
 
+        case TGT_SIM6502:
+            DefineNumericMacro ("__SIM6502__", 1);
+            break;
+
+        case TGT_SIM65C02:
+            DefineNumericMacro ("__SIM65C02__", 1);
+            break;
+
         default:
             AbEnd ("Unknown target system type %d", Target);
     }
